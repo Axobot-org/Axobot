@@ -36,11 +36,29 @@ class InfosCog:
         self.translate = self.bot.cogs["LangCog"].tr
         self.utilities = self.bot.cogs["UtilitiesCog"]
         self.timecog = self.bot.cogs["TimeCog"]
+        self.codelines = await self.count_lines_code()
     
 
     async def is_support(self,ctx):
         """Check if a user is part of the ZBot team"""
         return await is_support_staff(ctx)
+    
+    async def count_lines_code(self):
+        """Count the number of lines for the whole project"""
+        count = 0
+        try:
+            with open('start.py','r') as file:
+                for line in file.read().split("\n"):
+                    if len(line.strip())>2 and line[0]!='#':
+                        count += 1
+            for cog in self.bot.cogs.values():
+                with open('fcts/'+cog.file+'.py','r') as file:
+                    for line in file.read().split("\n"):
+                        if len(line.strip())>2 and line[0]!='#':
+                            count += 1
+        except Exception as e:
+            await self.bot.cogs['ErrorsCog'].on_error(e,None)
+        return count
 
     @commands.command(name="stats",enabled=True)
     @commands.cooldown(2,60,commands.BucketType.guild)
@@ -62,7 +80,7 @@ class InfosCog:
                 except Exception as e:
                     print(e)
                     users = bots = 'unknown'
-                d = str(await self.translate(ctx.guild,"infos","stats")).format(bot_version,len_servers,users,bots,version,discord.__version__,round(py.memory_info()[0]/2.**30,3),psutil.cpu_percent(),round(r*1000,3))
+                d = str(await self.translate(ctx.guild,"infos","stats")).format(bot_version,len_servers,users,bots,self.codelines,version,discord.__version__,round(py.memory_info()[0]/2.**30,3),psutil.cpu_percent(),round(r*1000,3))
                 embed = ctx.bot.cogs['EmbedCog'].Embed(title=await self.translate(ctx.guild,"infos","stats-title"), color=ctx.bot.cogs['HelpCog'].help_color, time=ctx.message.created_at,desc=d,thumbnail=self.bot.user.avatar_url_as(format="png"))
                 embed.create_footer(ctx.author)
 
