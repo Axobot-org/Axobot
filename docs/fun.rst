@@ -230,3 +230,13 @@ Shrug
 Don't know the answer to a question? This is the opportunity to express it with a pretty gif straight out of our image bank! A simple command, but one which can be fun.
 
 .. warning:: ZBot needs "`Attach files <perms.html#attach-files>`_" permission to send any gif.
+
+
+Thanos
+------
+
+**Syntax:** :code:`thanos`
+
+I assume you know Thanos from the Avengers series. If not, to make it short, he's a bad guy who decided to kill half the universe with a single snap of his finger.
+
+Well, if you want to know if you will be spared by this guy or not, check out the great oracle Zbot!
