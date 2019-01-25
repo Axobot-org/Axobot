@@ -641,6 +641,7 @@ class ServerCog:
                     r = "Ø"
                 embed.fields.append({'name':i, 'value':r, 'inline':True})
             await channel.send(embed=embed.discord_embed())
+            embed.fields.clear()
             return
         elif ctx != None:
             if option in roles_options:
