@@ -61,10 +61,10 @@ errors={"cooldown":"You are on cooldown for this command :confused: Please wait 
 "disabled":"The command {} is disabled :confused:"}
 
 find={"user-0":"name: {}\nID: {}",
-"user-1":"Name: {}\nID: {}\nServers: {}\nPremium ? {}",
+"user-1":"Name: {}\nID: {}\nServers: {}\nLanguages: {}",
 "user-2":"User not found",
 "guild-0":"Server not found",
-"guild-1":"Name: {}\nID: {}\nOwner: {} ({})\nMembers: {} (including {} bots)",
+"guild-1":"Name: {}\nID: {}\nOwner: {} ({})\nMembers: {} (including {} bots)\nLanguage: {}",
 "chan-0":"Channel not found",
 "chan-1":"Name : {}\nID: {}\nServer: {} ({})",
 "help":"This command allows to find a server or a salon among all the servers on which is the bot. You can also search for a Discord user's information, no matter if he shares a server with me!\

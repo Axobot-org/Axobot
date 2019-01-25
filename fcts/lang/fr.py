@@ -61,10 +61,10 @@ errors={"cooldown":"Vous êtes en cooldown pour cette commande. Veuillez attendr
 "disabled":"La commande {} est désactivée"}
 
 find={"user-0":"Nom : {}\nID : {}",
-"user-1":"Nom : {}\nID : {}\nServeurs : {}\nPremium ? {}",
+"user-1":"Nom : {}\nID : {}\nServeurs : {}\nLangues : {}",
 "user-2":"Utilisateur introuvable",
 "guild-0":"Serveur introuvable",
-"guild-1":"Nom : {}\nID : {}\nPropriétaire : {} ({})\nMembres : {} (dont {} bots)",
+"guild-1":"Nom : {}\nID : {}\nPropriétaire : {} ({})\nMembres : {} (dont {} bots)\nLangue : {}",
 "chan-0":"Salon introuvable",
 "chan-1":"Nom : {}\nID : {}\nServeur : {} ({})",
 "help":"Cette commande permet de retrouver un serveur ou un salon parmi tout les serveurs sur lequel est le bot. Vous pouvez aussi rechercher les informations d'un utilisateur Discord, peu importe si il partage un serveur avec moi !\

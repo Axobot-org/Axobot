@@ -61,10 +61,10 @@ errors={"cooldown":"Yu are on cold-own for dis comandZ :confused: Plize wait {} 
 "disabled":"Da {} cmd is dizabled :confused:"}
 
 find={"user-0":"naym: {}\nID: {}",
-"user-1":"Naym: {}\nID: {}\nServers: {}\nPremium ? {}",
+"user-1":"Naym: {}\nID: {}\nServers: {}\nSpeak: {}",
 "user-2":"Usr not findz",
 "guild-0":"S3rvr not findz",
-"guild-1":"Name: {}\nID: {}\nOwnr: {} ({})\nMmbr: {} ({} robots)",
+"guild-1":"Name: {}\nID: {}\nOwnr: {} ({})\nMmbr: {} ({} robots)\nSpeak {}",
 "chan-0":"chAnnel not foundz",
 "chan-1":"Nayme : {}\nID: {}\nServr: {} ({})",
 "help":"Dis commnd allowz 2 find a servr or a chnnel among all the servers on which'z teh bot. U can so seerch 4 a Discord usr's info, no mater if he sharez servr wif me!\
