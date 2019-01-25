@@ -81,25 +81,11 @@ You can enter the name, the mention, or the `identifier <https://support.discord
 
 .. warning:: The necessary permissions for the bot depend on the desired result: for example "Manage webhook" is required to get the list of webhooks of a channel. 
 
-----
-Find 
-----
-
-**Syntax:** :code:`find (channel|guild|user) <ID>`
-
-This command is a very light version of the `info <#info>`_ command. It allows the bot to obtain the primary information concerning any user, server, or salon, only from its `ID <https://support.discordapp.com/hc/en-us/articles/206346498-Where-can-I-find-my-User-Server-Message-ID->`_ . Here is a list of the displayed parameters: 
-
-* guild: name, ID, server owner
-* channel: server name, ID, name and ID
-* user: name, ID, common servers with bot
-
-.. note:: No permission is required for this command, except "Send messages". Moreover, it is impossible to prevent your server from being included in this command; if this feature is enough requested it will be added later.
-
 -----------
 Permissions
 -----------
 
-**Syntax:** :code:`perms [user|role]` or :code:`perms_for [user|role]` or :code:`permissions [user|role]`
+**Syntax:** :code:`perms [user|role]` or :code:`permissions [user|role]`
 
 This small command allows you to see the list of permissions assigned to a member/role in a particular room. The channel is automatically the one where the command is entered. To inform a member or a role, it is only necessary to enter his exact name, his `ID <https://support.discordapp.com/hc/en-us/articles/206346498-Where-can-I-find-my-User-Server-Message-ID->`_ , or to mention it. If no name is given the targeted member will be the one who enters the order.
 
