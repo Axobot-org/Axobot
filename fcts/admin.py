@@ -1,7 +1,7 @@
 import discord
 from discord.ext import commands
 
-import time, importlib, sys, traceback, datetime, os, shutil, asyncio, inspect, typing, io, textwrap, copy, operator, feedparser, requests
+import time, importlib, sys, traceback, datetime, os, shutil, asyncio, inspect, typing, io, textwrap, copy, operator, feedparser, requests, random
 from contextlib import redirect_stdout
 from fcts import  reloads
 importlib.reload(reloads)
