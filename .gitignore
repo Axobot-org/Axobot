@@ -11,8 +11,6 @@ start2.py
 # VScode properties
 .vscode
 
-# Doc
-docs
-
-# Logs
+# Miscellaneous
 *.log
+._*
