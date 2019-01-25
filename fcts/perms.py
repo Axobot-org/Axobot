@@ -44,17 +44,17 @@ class PermsCog:
             else:
                 permsl.append(self.bot.cogs['EmojiCog'].customEmojis['red_cross']+perm)
         if ctx.channel.permissions_for(ctx.guild.me).embed_links:
-            # And to make it look nice, we wrap it in an Embed.
-            embed = discord.Embed(colour=col)
-            embed.set_author(icon_url=avatar, name=name)
             # \uFEFF is a Zero-Width Space, which basically allows us to have an empty field name.
             sep = int(len(permsl)/2)
             if len(permsl)%2 == 1:
                 sep+=1
-            embed.add_field(name='\uFEFF', value="\n".join(permsl[:sep]))
-            embed.add_field(name='\uFEFF', value="\n".join(permsl[sep:]))
-            embed = await self.bot.cogs['UtilitiesCog'].create_footer(embed,ctx.author)
-            await ctx.send(embed=embed)
+            # And to make it look nice, we wrap it in an Embed.
+            f1 = {'name':'\uFEFF','value':"\n".join(permsl[:sep]),'inline':True}
+            f2 = {'name':'\uFEFF','value':"\n".join(permsl[sep:]),'inline':True}
+            embed = ctx.bot.cogs['EmbedCog'].Embed(color=col,fields=[f1,f2]).create_footer(ctx.author)
+            embed.author_name = name
+            embed.author_icon = avatar
+            await ctx.send(embed=embed.discord_embed())
             # Thanks to Gio for the Command.
         else:
             try:
