@@ -547,9 +547,9 @@ You must be an administrator of this server to use this command."""
         else:
             for case in liste:
                 desc.append("{}".format(case[1]))
-        embed = discord.Embed(title=str(await self.translate(ctx.guild.id,"modo","ban-list-title")).format(ctx.guild.name), colour=self.bot.cogs["ServerCog"].embed_color, description="\n".join(desc), timestamp=ctx.message.created_at)
-        embed = await self.bot.cogs['UtilitiesCog'].create_footer(embed,ctx.author)
-        await ctx.send(embed=embed,delete_after=10)
+        embed = ctx.bot.cogs['EmbedCog'].Embed(title=str(await self.translate(ctx.guild.id,"modo","ban-list-title")).format(ctx.guild.name), color=self.bot.cogs["ServerCog"].embed_color, desc="\n".join(desc), time=ctx.message.created_at)
+        embed.create_footer(ctx.author)
+        await ctx.send(embed=embed.discord_embed(),delete_after=10)
 
 
     @commands.group(name="emoji")
