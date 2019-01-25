@@ -607,9 +607,8 @@ class ServerCog:
             if len(liste)==0:
                 return await channel.send(str(await self.translate(channel.guild,"server","not-found")).format(guild.name))
             liste=liste[0]
-            embed = discord.Embed(title=str(await self.translate(guild.id,"server","see-1")).format(guild.name), colour=self.embed_color, description=str(await self.translate(guild.id,"server","see-0")), timestamp=msg.created_at)
-            embed.set_thumbnail(url=guild.icon_url_as(format='png'))
-            embed.set_footer(text="Requested by {}".format(msg.author.display_name), icon_url=msg.author.avatar_url_as(format='png',size=512))
+            embed = ctx.bot.cogs['EmbedCog'].Embed(title=str(await self.translate(guild.id,"server","see-1")).format(guild.name), color=self.embed_color, desc=str(await self.translate(guild.id,"server","see-0")), time=msg.created_at,thumbnail=guild.icon_url_as(format='png'))
+            embed.create_footer(msg.author)
             diff = channel.guild != guild
             for i,v in liste.items():
                 if i in roles_options:
@@ -640,8 +639,8 @@ class ServerCog:
                     continue
                 if len(r) == 0:
                     r = "Ø"
-                embed.add_field(name=i, value=r)
-            await channel.send(embed=embed)
+                embed.fields.append({'name':i, 'value':r, 'inline':True})
+            await channel.send(embed=embed.discord_embed())
             return
         elif ctx != None:
             if option in roles_options:
@@ -678,10 +677,9 @@ class ServerCog:
                 if not ctx.channel.permissions_for(ctx.guild.me).embed_links:
                     await ctx.send(await self.translate(ctx.guild.id,"mc","cant-embed"))
                     return
-                embed = discord.Embed(title=str(await self.translate(ctx.guild.id,"server","opt_title")).format(option,ctx.guild.name), colour=self.embed_color, description=r, timestamp=ctx.message.created_at)
-                #embed.set_footer(text="Requested by {}".format(ctx.author.display_name), icon_url=ctx.author.avatar_url_as(format='png',size=512))
-                embed = await self.bot.cogs['UtilitiesCog'].create_footer(embed,ctx.author)
-                await ctx.send(embed=embed)
+                embed = ctx.bot.cogs["EmbedCog"].Embed(title=str(await self.translate(ctx.guild.id,"server","opt_title")).format(option,ctx.guild.name), color=self.embed_color, desc=r, time=ctx.message.created_at)
+                embed.create_footer(ctx.author)
+                await ctx.send(embed=embed.discord_embed())
             except Exception as e:
                 await self.bot.cogs['ErrorsCog'].on_error(e,ctx)
 
