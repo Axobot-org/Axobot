@@ -440,24 +440,39 @@ Available types: member, role, user, emoji, channel, guild, invite, category"""
     @find_main.command(name="user")
     async def find_user(self,ctx,user:discord.User):
         liste = list()
+        languages = list()
         for s in self.bot.guilds:
             if user in s.members:
-                liste.append(s.name)
-        #if await self.bot.cogs['UtilitiesCog'].is_premium(user):
-        #    pr = "Oui"
-        #else:
-        #    pr = "Non"
-        pr = 'shrug'
-        await ctx.send(str(await self.translate(ctx.guild,"find","user-1")).format(user,user.id,", ".join(liste),pr))
+                liste.append(s)
+                lang = await ctx.bot.cogs["ServerCog"].find_staff(s.id,'language')
+                if lang==None:
+                    lang = 0
+                languages.append(lang)
+        disp_lang = ""
+        for e in range(len(ctx.bot.cogs['LangCog'].languages)):
+            if languages.count(e)>0:
+                disp_lang += ctx.bot.cogs['LangCog'].languages[e]+" ("+str(round(languages.count(e)/len(languages)*100))+"%)  "
+        await ctx.send(str(await self.translate(ctx.guild,"find","user-1")).format(user,user.id,", ".join([x.name for x in liste]),disp_lang))
 
-    @find_main.command(name="guild")
-    async def find_guild(self,ctx,ID:int):
-        s = self.bot.get_guild(ID)
+    @find_main.command(name="guild",aliases=['server'])
+    async def find_guild(self,ctx,*,guild):
+        s = None
+        if guild.isnumeric():
+            s = ctx.bot.get_guild(int(guild))
+        else:
+            for x in self.bot.guilds:
+                if x.name==guild:
+                    s = x
         if s == None:
             await ctx.send(await self.translate(ctx.guild,"find","guild-0"))
             return
         bots = len([x for x in s.members if x.bot])
-        await ctx.send(str(await self.translate(ctx.guild,"find","guild-1")).format(s.name,s.id,s.owner,s.owner.id,len(s.members),bots))
+        lang = await ctx.bot.cogs["ServerCog"].find_staff(s.id,'language')
+        if lang==None:
+            lang = 'default'
+        else:
+            lang = ctx.bot.cogs['LangCog'].languages[lang]
+        await ctx.send(str(await self.translate(ctx.guild,"find","guild-1")).format(s.name,s.id,s.owner,s.owner.id,len(s.members),bots,lang))
 
     @find_main.command(name='channel')
     async def find_channel(self,ctx,ID:int):
