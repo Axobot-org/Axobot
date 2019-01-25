@@ -10,7 +10,7 @@ class EmbedCog:
 
 
     class Embed:
-        def __init__(self,content="",title="",desc="",url="",color=0,time="",footer_url="",footer_text="",thumbnail="",image="",author_name="",author_url="",author_icon="",fields=[]):
+        def __init__(self,content="",title="",desc="",url="",color=0,time=discord.Embed.Empty,footer_url="",footer_text="",thumbnail="",image="",author_name="",author_url="",author_icon="",fields=[]):
             self.content = content
             self.title = title
             self.description = desc
@@ -76,6 +76,11 @@ class EmbedCog:
         def set_author(self,user):
             self.author_name = user.name
             self.author_icon = user.avatar_url_as(format='gif') if user.is_avatar_animated() else user.avatar_url_as(format='png')
+            return self
+        
+        def create_footer(self,user):
+            self.footer_text = "Requested by {}".format(user.name)
+            self.footer_url = user.avatar_url_as(format='png')
             return self
 
         def discord_embed(self):
