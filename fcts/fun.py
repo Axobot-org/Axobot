@@ -147,7 +147,7 @@ You can specify a verification limit by adding a number in argument"""
         """Blame someone
         Use 'blame list' command to see every available name *for you*"""
         l1 = ['discord','mojang','zbot','google']
-        l2 = ['zrunner','tronics','aragorn','patate','neil','reddemoon','aragorn1202']
+        l2 = ['zrunner','tronics','aragorn','patate','neil','reddemoon','aragorn1202','awhikax']
         name = name.lower()
         if name in l1:
             await ctx.send(file=await self.utilities.find_img('blame-{}.png'.format(name)))
