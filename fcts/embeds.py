@@ -75,12 +75,12 @@ class EmbedCog:
 
         def set_author(self,user):
             self.author_name = user.name
-            self.author_icon = user.avatar_url_as(format='gif') if user.is_avatar_animated() else user.avatar_url_as(format='png')
+            self.author_icon = user.avatar_url_as(format='gif') if user.is_avatar_animated() else user.avatar_url_as(format='png',size=256)
             return self
         
         def create_footer(self,user):
             self.footer_text = "Requested by {}".format(user.name)
-            self.footer_url = user.avatar_url_as(format='png')
+            self.footer_url = user.avatar_url_as(format='png',size=256)
             return self
 
         def discord_embed(self):
