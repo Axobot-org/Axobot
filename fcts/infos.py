@@ -63,12 +63,12 @@ class InfosCog:
                     print(e)
                     users = bots = 'unknown'
                 d = str(await self.translate(ctx.guild,"infos","stats")).format(bot_version,len_servers,users,bots,version,discord.__version__,round(py.memory_info()[0]/2.**30,3),psutil.cpu_percent(),round(r*1000,3))
-                embed = discord.Embed(title=await self.translate(ctx.guild,"infos","stats-title"), colour=discord.Colour(0x63a718), timestamp=ctx.message.created_at,description=d)
-                embed = await self.bot.cogs['UtilitiesCog'].create_footer(embed,ctx.author)
-                embed.set_thumbnail(url=self.bot.user.avatar_url_as(format="png"))
-            await ctx.send(embed=embed)
+                embed = ctx.bot.cogs['EmbedCog'].Embed(title=await self.translate(ctx.guild,"infos","stats-title"), color=ctx.bot.cogs['HelpCog'].help_color, time=ctx.message.created_at,desc=d,thumbnail=self.bot.user.avatar_url_as(format="png"))
+                embed.create_footer(ctx.author)
+
+            await ctx.send(embed=embed.discord_embed())
         except Exception as e:
-            await ctx.bot.cogs['Errors'].on_command_error(ctx,e)
+            await ctx.bot.cogs['Errors'].on_command_error(e,ctx)
 
     def get_users_nber(self,ignored_guilds):
         users,bots=0,0
