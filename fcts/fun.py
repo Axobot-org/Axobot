@@ -48,15 +48,16 @@ class FunCog:
             self.translate = self.bot.cogs["LangCog"].tr
             self.utilities = self.bot.cogs["UtilitiesCog"]
 
-    async def is_on_frm(self,user):
+    async def is_on_guild(self,user,guild):
         if self.bot.user.id == 436835675304755200:
             return True
-        if user.id in [279568324260528128,392766377078816789]:
+        if user.id in [279568324260528128,392766377078816789,281404141841022976]:
             return True
-        server = self.bot.get_guild(391968999098810388)
+        server = self.bot.get_guild(guild)
         if server != None:
             return user in server.members
         return False
+    
     
 
     @commands.command(name='fun')
@@ -146,18 +147,24 @@ You can specify a verification limit by adding a number in argument"""
     async def blame(self,ctx,name):
         """Blame someone
         Use 'blame list' command to see every available name *for you*"""
-        l1 = ['discord','mojang','zbot','google']
-        l2 = ['zrunner','tronics','aragorn','patate','neil','reddemoon','aragorn1202','awhikax']
+        l1 = ['discord','mojang','zbot','google'] # tout le monde
+        l2 = ['zrunner','tronics','patate','neil','reddemoon','aragorn1202'] # frm
+        l3 = ['awhikax','aragorn'] # zbot
         name = name.lower()
         if name in l1:
             await ctx.send(file=await self.utilities.find_img('blame-{}.png'.format(name)))
         elif name in l2:
-            if await self.is_on_frm(ctx.author):
+            if await self.is_on_guild(ctx.author,391968999098810388):
+                await ctx.send(file=await self.utilities.find_img('blame-{}.png'.format(name)))
+        elif name in l3:
+            if await self.is_on_guild(ctx.author,356067272730607628):
                 await ctx.send(file=await self.utilities.find_img('blame-{}.png'.format(name)))
         elif name in ['help','list']:
             liste = l1
-            if await self.is_on_frm(ctx.author):
+            if await self.is_on_guild(ctx.author,391968999098810388):
                 liste += l2
+            if await self.is_on_guild(ctx.author,356067272730607628):
+                liste += l3
             txt = "- "+"\n- ".join(sorted(liste))
             title = str(await self.translate(ctx.guild,"fun","blame-0")).format(ctx.author)
             if ctx.channel.permissions_for(ctx.guild.me).embed_links:
@@ -447,6 +454,51 @@ You can specify a verification limit by adding a number in argument"""
             await ctx.send("Your bot cannot make a required system call `resource.setrlimit`")
             ctx.bot.remove_command(ctx.command.name)
     
+    @commands.command(name='embed')
+    @commands.has_permissions(embed_links=False)
+    async def send_embed(self,ctx,*,arguments):
+        """Send an embed
+        Syntax: !embed key1=\"value 1\" key2=\"value 2\"
+
+        Available keys:
+            - title: the title of the embed
+            - content: the text inside the box
+            - url: a well-formed url clickable via the title
+            - footer: a little text at the bottom of the box
+            - image: a well-formed url redirects to an image
+
+        If you want to use quotation marks in the texts, it is possible to escape them thanks to the backslash (`\\"`)
+        """
+        if not ctx.channel.permissions_for(ctx.guild.me).embed_links:
+            return await ctx.send(await self.translate(ctx.guild,"fun","no-embed-perm"))
+        arguments = arguments.replace("\\\"","|¬017")
+        arguments = arguments.split("\"")
+        k = {'title':"",'content':"",'url':'','footer':"",'image':''}
+        for e,a in enumerate(arguments):
+            a = a.strip().lower()
+            if len(a)==0:
+                continue
+            if a[-1]=='=':
+                if e==len(arguments)-1:
+                    continue
+                if a=='title=':
+                    k['title'] = arguments[e+1].replace("|¬017","\"")
+                elif a=='content=':
+                    k['content'] = arguments[e+1].replace("|¬017","\"")
+                elif a=='url=':
+                    k['url'] = arguments[e+1].replace("|¬017","\"")
+                elif a=='footer=':
+                    k['footer'] = arguments[e+1].replace("|¬017","\"")
+                elif a=='image=':
+                    k['image'] = arguments[e+1].replace("|¬017","\"")
+        emb = ctx.bot.cogs["EmbedCog"].Embed(title=k['title'], desc=k['content'], url=k['url'],footer_text=k['footer'],thumbnail=k['image'],color=ctx.bot.cogs['ServerCog'].embed_color).update_timestamp().set_author(ctx.author)
+        try:
+            await ctx.send(embed=emb.discord_embed())
+        except Exception as e:
+            await ctx.send(str(await self.translate(ctx.guild,"fun","embed-error")).format(e))
+            await ctx.bot.cogs['ErrorsCog'].on_error(e,ctx)
+
+
     async def add_vote(self,msg):
         if self.bot.database_online:
             emojiz = await self.bot.cogs["ServerCog"].find_staff(msg.guild,'vote_emojis')
