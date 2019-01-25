@@ -1,0 +1,10 @@
+-i https://pypi.org/simple
+pip>=18
+sphinxcontrib-asyncio
+sphinx_autodoc_napoleon_typehints
+requests==2.20
+regex==2018.08.29
+timeout-decorator==0.4.0
+mysql-connector-python==8.0.12
+#discord-rewrite==1.0.0a
+feedparser==5.2.1

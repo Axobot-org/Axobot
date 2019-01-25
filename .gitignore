@@ -1,0 +1,18 @@
+# Python executables
+*.pyc
+__pycache__
+fcts/tokens.py
+fcts/cryptage.py
+start2.py
+
+# Mac folders
+.DS_Store
+
+# VScode properties
+.vscode
+
+# Doc
+docs
+
+# Logs
+*.log
