@@ -25,6 +25,12 @@ async def is_fun_enabled(ctx):
                 self.fun_opt[str(ID)] = fun
     return fun == 1 or fun == True
 
+async def can_say(ctx):
+    if not ctx.bot.database_online:
+        return ctx.channel.permissions_for(ctx.author).administrator
+    else:
+        return await ctx.bot.cogs["ServerCog"].staff_finder(ctx.author,"say")
+
 class FunCog:
     """Add some fun commands, no obvious use. You can disable this module with the 'enable_fun' option (command 'config')"""
 
@@ -333,20 +339,16 @@ You can specify a verification limit by adding a number in argument"""
     async def osekour(self,ctx):
         l = await self.translate(ctx.guild,"fun","osekour")
         await ctx.send(random.choice(l))
-    
+
     @commands.command(name="say")
+    @commands.guild_only()
+    @commands.check(can_say)
     async def say(self,ctx,channel:typing.Optional[discord.TextChannel] = None,*,text):
         """Let the bot say something for you
         You can specify a channel where the bot must send this message. If channel is None, the current channel will be used"""
         await self.say_function(ctx,channel,text)
     
     async def say_function(self,ctx,channel,text):
-        if not ctx.bot.database_online:
-            if not ctx.channel.permissions_for(ctx.author).administrator:
-                return
-        else:
-            if not await self.bot.cogs["ServerCog"].staff_finder(ctx.author,"say"):
-                return
         try:
             text = await self.bot.cogs["UtilitiesCog"].clear_msg(text,everyone = not ctx.channel.permissions_for(ctx.author).mention_everyone, ctx=ctx)
             if channel==None:
@@ -496,7 +498,6 @@ You can specify a verification limit by adding a number in argument"""
             await ctx.send(embed=emb.discord_embed())
         except Exception as e:
             await ctx.send(str(await self.translate(ctx.guild,"fun","embed-error")).format(e))
-            await ctx.bot.cogs['ErrorsCog'].on_error(e,ctx)
 
 
     async def add_vote(self,msg):
