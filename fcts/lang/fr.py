@@ -91,7 +91,9 @@ fun={"count-0":"Comptage en cours...",
     "cant-react":"Je n'ai pas les permissions suffisantes pour envoyer des réactions !",
     "vote-0":"Vous ne pouvez pas mettre plus de 20 choix, encore moins un nombre négatif de choix !",
     "blame-0":"Liste des noms disponibles pour le membre **{}**",
-    "no-database":"Notre base de donnée étant hors ligne, l'accès aux commandes fun est restreint aux personnes ayant la permission de Gérer le Serveur"
+    "no-database":"Notre base de donnée étant hors ligne, l'accès aux commandes fun est restreint aux personnes ayant la permission de Gérer le Serveur",
+    "no-embed-perm":"Je ne possède pas la permission \"Intégrer des liens\" :confused:",
+    "embed-error":"Une erreur est survenue: `{}`"
     }
 
 infos={"text-0":"""Bonjour ! Moi c'est {0} !
@@ -110,7 +112,7 @@ Pour m'avoir aidé dans la création du bot, mon propriétaire et moi souhaitons
 Bonne journée !""",
 "docs":"Voici le lien vers la documentation du bot :",
 "stats-title":"**Statistiques du bot**",
-"stats":"""**Version du bot :** {} \n**Nombre de serveurs :** {} \n**Nombre de membres visibles :** {} (dont {} **bots**) \n**Version de Python :** {} \n**Version de la bibliothèque `discord.py` :** {} \n**Charge sur la mémoire vive :** {} GB \n**Charge sur le CPU :** {} % \n**Temps de latence de l'api :** {} ms""",
+"stats":"""**Version du bot :** {} \n**Nombre de serveurs :** {} \n**Nombre de membres visibles :** {} (dont {} **bots**)\n**Nombre de lignes de code :** {} \n**Version de Python :** {} \n**Version de la bibliothèque `discord.py` :** {} \n**Charge sur la mémoire vive :** {} GB \n**Charge sur le CPU :** {} % \n**Temps de latence de l'api :** {} ms""",
 "admins-list":"Les administrateurs de ce bot sont : {}"}
 
 infos_2={"membercount-0":"Nombre de membres total",

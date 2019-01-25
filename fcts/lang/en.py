@@ -91,7 +91,9 @@ fun={"count-0":"Counting in progress...",
     "cant-react":"I don't have enough permissions to send reactions!",
     "vote-0":"You can't put more than 20 choices, and even less a negative number of choices!",
     "blame-0":"List of available names for **{}**",
-    "no-database":"As our database is offline, access to fun commands is restricted to people with permission \"Manage Server\""
+    "no-database":"As our database is offline, access to fun commands is restricted to people with permission \"Manage Server\"",
+    "no-embed-perm":"I don't have permission to \"Embed links\" :confused:",
+    "embed-error":"An error has occurred: `{}`"
     }
 
 infos={"text-0":"""Hello! I'm {0} !
@@ -110,7 +112,7 @@ For helping me in the creation of the bot, my owner and I would like to thank Aw
 Have a nice day!""",
 "docs":"Here is the link to the bot documentation:",
 "stats-title":"**Bot statistics**",
-"stats":"""**Bot version:** {} \n**Number of servers:** {} \n**Number of visible members:** {} ({} **bots**) \n**Python version :** {} \n**Version of the `discord.py` lib:** {} \n**Loading on the RAM:** {} GB \n**Loading on the CPU:** {} % \n**API latency time:** {} ms""",
+"stats":"""**Bot version:** {} \n**Number of servers:** {} \n**Number of visible members:** {} ({} **bots**)\n**Number of code lines:** {}\n**Python version :** {} \n**Version of the `discord.py` lib:** {} \n**Loading on the RAM:** {} GB \n**Loading on the CPU:** {} % \n**API latency time:** {} ms""",
 "admins-list":"The administrators of this bot are : {}"}
 
 infos_2={"membercount-0":"Total number of members",
