@@ -59,9 +59,10 @@ class RssCog:
         self.flows = dict()
         self.flow_limit = 10
         self.time_loop = 10
-        self.time_between_flows_check = 0.2
+        self.time_between_flows_check = 0.15
         self.file = "rss"
         self.embed_color = discord.Color(6017876)
+        self.loop_processing = False
         if bot.user != None:
             self.table = 'rss_flow' if bot.user.id==486896267788812288 else 'rss_flow_beta'
         try:
@@ -432,6 +433,23 @@ class RssCog:
             return
 
 
+    @rss_main.command(name="reload")
+    @commands.guild_only()
+    @commands.check(can_use_rss)
+    @commands.cooldown(1,600,commands.BucketType.guild)
+    async def reload_guild_flows(self,ctx):
+        """Reload every rss feeds from your server"""
+        try:
+            t = time.time()
+            msg = await ctx.send(str(await self.translate(ctx.guild.id,"rss","guild-loading")).format(ctx.bot.cogs['EmojiCog'].customEmojis['loading']))
+            liste = await self.get_guild_flows(ctx.guild.id)
+            await self.main_loop(ctx.guild.id)
+            await ctx.send(str(await self.translate(ctx.guild.id,"rss","guild-complete")).format(len(liste),round(time.time()-t,1)))
+            await ctx.bot.cogs['UtilitiesCog'].suppr(msg)
+        except Exception as e:
+            await ctx.send(str(await self.translate(ctx.guild.id,"rss","guild-error")).format(e))
+
+
     async def parse_yt_url(self,url):
         r = r'(?:http.*://)?(?:www.)?(?:youtube.com|youtu.be)(?:/channel/|/user/)(.+)'
         match = re.search(r,url)
@@ -680,9 +698,15 @@ class RssCog:
         else:
             return
 
-    async def main_loop(self):
+    async def main_loop(self,guildID=None):
         t = time.time()
-        liste = await self.get_all_flows()
+        if self.loop_processing:
+            return
+        if guildID==None:
+            liste = await self.get_all_flows()
+            self.loop_processing = True
+        else:
+            liste = await self.get_guild_flows(guildID)
         check = 0
         for flow in liste:
             try:
@@ -699,6 +723,8 @@ class RssCog:
         self.bot.cogs['McCog'].flows = dict()
         emb = self.bot.cogs["EmbedCog"].Embed(desc="**RSS loop done** in {}s ({}/{} flows)".format(round(time.time()-t,3),check,len(liste)),color=1655066).update_timestamp().set_author(self.bot.guilds[0].me)
         await self.bot.cogs["EmbedCog"].send([emb],url="https://discordapp.com/api/webhooks/509079297353449492/1KlokgfF7vxRK37pHd15UjdxJSa5H9yzbOLAaRjYEQK7XIdjfMp9PCnER1-Dfz0PBSaM")
+        if guildID==None:
+            self.loop_processing = False
 
     async def loop_child(self):
         if not self.bot.database_online:
@@ -729,9 +755,12 @@ class RssCog:
             await ctx.send("Boucle rss relancée !")
             await self.loop()
         else:
-            await ctx.send("Et hop ! Une itération de la boucle en cours !")
-            await self.print(await self.bot.cogs['TimeCog'].date(datetime.datetime.now(),digital=True)+" Boucle rss forcée")
-            await self.main_loop()
+            if self.loop_processing:
+                await ctx.send("Une boucle rss est déjà en cours !")
+            else:
+                await ctx.send("Et hop ! Une itération de la boucle en cours !")
+                await self.print(await self.bot.cogs['TimeCog'].date(datetime.datetime.now(),digital=True)+" Boucle rss forcée")
+                await self.main_loop()
 
 
 def setup(bot):
