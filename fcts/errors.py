@@ -31,7 +31,7 @@ class ErrorsCog:
         if isinstance(error, ignored):
             return
         elif isinstance(error,commands.CommandOnCooldown):
-            await ctx.send(str(await self.translate(ctx.guild,'errors','cooldown')).format(round(error.retry_after,3)))
+            await ctx.send(str(await self.translate(ctx.guild,'errors','cooldown')).format(round(error.retry_after,2)))
             return
         elif isinstance(error,(commands.BadArgument,commands.BadUnionArgument)):
             args = error.args[0].split('\"')
