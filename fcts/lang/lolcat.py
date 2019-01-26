@@ -316,7 +316,9 @@ UrL : {link}""",
 "roles-1":"Those feeed has beeen modifiedz to do not ping ani role",
 "no-feed":"Oops, u donot hav any rss feds 2 managez plz!",
 "delete-success":"Teh flow had bein sussellfuccy delet!",
-"no-db":"As the databaz is auffline, dis feature iz temporarly disabled :confused:"
+"no-db":"As the databaz is auffline, dis feature iz temporarly disabled :confused:",
+"guild-complete":"{} rss streams haz correctly rechargd in {} seconds!",
+"guild-error":"A error occurrd durin teh load: `{}`\nIf you think dis err iz not your auwn, u can report it to support staff"
 }
 
 server={"config-help": "Dis cmd is mainly usd 2 configur ur srver. By doin `!config see [option]` u will get \

@@ -316,7 +316,9 @@ Link : {link}""",
 "roles-1":"This feed has been modified to not mention any role",
 "no-feed":"Oops, you don't have any rss feeds to manage!",
 "delete-success":"The flow has been successfully deleted!",
-"no-db":"As the database is currently offline, this feature is temporarily disabled :confused:"
+"no-db":"As the database is currently offline, this feature is temporarily disabled :confused:",
+"guild-complete":"{} rss streams have been correctly reloaded, in {} seconds!",
+"guild-error":"An error occurred during the procedure: `{}`\nIf you think this error is not your own, you can report it to support"
 }
 
 server={"config-help": "This command is mainly used to configure your server. By doing `!config see [option]` you will get \

@@ -316,7 +316,10 @@ Lien : {link}""",
 "roles-1":"Ce flux a bien été modifié pour ne mentionner aucun rôle",
 "no-feed":"Oups, vous n'avez aucun flux rss à gérer !",
 "delete-success":"Le flux a été supprimé avec succès !",
-"no-db":"La base de donnée étant actuellement hors ligne, cette fonctionnalité est temporairement désactivée :confused:"
+"no-db":"La base de donnée étant actuellement hors ligne, cette fonctionnalité est temporairement désactivée :confused:",
+"guild-complete":"{} flux rss ont correctement été rechargés, en {} secondes !",
+"guild-error":"Une erreur est survenue pendant la procédure : `{}`\nSi vous pensez que cette erreur ne vient pas de vous, vous pouvez en avertir le support",
+"guild-loading":"Rechargement en cours {}"
 }
 
 server={"config-help":"Cette commande sert principalement à configurer votre serveur. En faisant `!config see [option]` vous obtiendrez l'aperçu des configurations actuelles, \
