@@ -3,6 +3,17 @@ from discord.ext import commands
 
 admins_id = [279568324260528128,281404141841022976]
 
+async def check_admin(ctx):
+    if type(ctx) == commands.Context:
+        user = ctx.author
+    else:
+        user = ctx
+    if type(user) == str and user.isnumeric():
+        user = int(user)
+    elif type(user) != int:
+        user = user.id
+    return user in admins_id
+
 class ReloadsCog:
     """Cog to manage the other cogs. Even if all are disabled, this is the last one left."""
 
@@ -35,6 +46,7 @@ class ReloadsCog:
             ctx.bot.cogs['InfosCog'].codelines = await ctx.bot.cogs['InfosCog'].count_lines_code()
 
     @commands.command(name="add_cog")
+    @commands.check(check_admin)
     async def add_cog(self,ctx,name):
         """Ajouter un cog au bot"""
         if not ctx.author.id in admins_id:
@@ -46,6 +58,7 @@ class ReloadsCog:
             await ctx.send(str(e))
 
     @commands.command(name="del_cog",aliases=['remove_cog'])
+    @commands.check(check_admin)
     async def rm_cog(self,ctx,name):
         """Enlever un cog au bot"""
         if not ctx.author.id in admins_id:
