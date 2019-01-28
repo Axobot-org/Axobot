@@ -68,3 +68,14 @@ With this command, you can stop following an rss/minecraft flow. And it's also v
 The "flow ID" argument is the identifier of the flow (found with the command `rss list<#see-every-feed>`_). If you do not enter this argument, or if the feed can't be found, the bot will open a menu where you can choose which feed to modify.
 
 .. warning:: ZBot needs "`Embed Links <perms.html#embed-links>`_" permission to send the selection list!
+
+
+-----------------
+Reload every feed
+-----------------
+
+**Syntax:** :code:`rss reload`
+
+If your favorite youtube channel has just posted a new cool video, and the bot takes too long to post it in your specially designed living room, you can force it to refresh the list of your youtube, twitter and other websites, in addition to Minecraft servers. This command will allow you in a few seconds to be again at the top of the latest news!
+
+.. note:: Note that to avoid lags, a 10-minute cooldown is active on this command.
