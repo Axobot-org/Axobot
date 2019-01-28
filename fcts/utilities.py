@@ -29,10 +29,10 @@ class UtilitiesCog:
         else:
             cnx = self.bot.cogs['ServerCog'].connect()
             cursor = cnx.cursor(dictionary = False)
-            cursor.execute("SELECT `prefix` FROM `servers` WHERE `ID`="+str(guild.id))
+            cursor.execute("SELECT `prefix` FROM `{}` WHERE `ID`={}".format(self.bot.cogs["ServerCog"].table,guild.id))
             liste = list()
             for x in cursor:
-                if len(liste)>0:
+                if len(x)>0:
                     liste.append(x)
             cnx.close()
             if liste == []:
