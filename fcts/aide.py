@@ -58,57 +58,58 @@ class HelpCog:
     async def help_command(self,ctx, commands=()):
         """Main command for the creation of the help message
 If the bot can't send the new command format, it will try to send the old one."""
-        destination = None
-        if ctx.guild!=None:
-            if await self.bot.cogs["ServerCog"].find_staff(ctx.guild,'help_in_dm',channel=ctx.channel) == 1:
+        async with ctx.channel.typing():
+            destination = None
+            if ctx.guild!=None:
+                if await self.bot.cogs["ServerCog"].find_staff(ctx.guild,'help_in_dm',channel=ctx.channel) == 1:
+                    destination = ctx.message.author.dm_channel
+                    await self.bot.cogs["UtilitiesCog"].suppr(ctx.message)
+                else:
+                    destination = ctx.message.channel
+            if destination == None:
+                await ctx.message.author.create_dm()
                 destination = ctx.message.author.dm_channel
-                await self.bot.cogs["UtilitiesCog"].suppr(ctx.message)
-            else:
-                destination = ctx.message.channel
-        if destination == None:
-            await ctx.message.author.create_dm()
-            destination = ctx.message.author.dm_channel
         
-        def repl(obj):
-            return self._mentions_transforms.get(obj.group(0), '')
+            def repl(obj):
+                return self._mentions_transforms.get(obj.group(0), '')
 
-        if len(commands) == 0:  #aucune commande
-            pages = await self.all_commands(ctx)
-        elif len(commands) == 1:    #Nom de cog/commande unique ?
-            name = self._mention_pattern.sub(repl, commands[0])
-            command = None
-            if name in self.bot.cogs:
-                cog = self.bot.cogs[name]
-                pages = await self.cog_commands(ctx,cog)
-            else:
+            if len(commands) == 0:  #aucune commande
+                pages = await self.all_commands(ctx)
+            elif len(commands) == 1:    #Nom de cog/commande unique ?
+                name = self._mention_pattern.sub(repl, commands[0])
+                command = None
+                if name in self.bot.cogs:
+                    cog = self.bot.cogs[name]
+                    pages = await self.cog_commands(ctx,cog)
+                else:
+                    command = self.bot.all_commands.get(name)
+                    if command is None:
+                        await destination.send(str(await self.translate(ctx.guild,"aide","cmd-not-found")).format(name))
+                        return
+                    pages = await self.cmd_help(ctx,command)
+            else:  #nom de sous-commande ?
+                name = self._mention_pattern.sub(repl, commands[0])
                 command = self.bot.all_commands.get(name)
                 if command is None:
                     await destination.send(str(await self.translate(ctx.guild,"aide","cmd-not-found")).format(name))
                     return
-                pages = await self.cmd_help(ctx,command)
-        else:  #nom de sous-commande ?
-            name = self._mention_pattern.sub(repl, commands[0])
-            command = self.bot.all_commands.get(name)
-            if command is None:
-                await destination.send(str(await self.translate(ctx.guild,"aide","cmd-not-found")).format(name))
-                return
-            for key in commands[1:]:
-                try:
-                    key = self._mention_pattern.sub(repl, key)
-                    command = command.all_commands.get(key)
-                    if command is None:
-                        await destination.send(str(await self.translate(ctx.guild,"aide","subcmd-not-found")).format(key))
+                for key in commands[1:]:
+                    try:
+                        key = self._mention_pattern.sub(repl, key)
+                        command = command.all_commands.get(key)
+                        if command is None:
+                            await destination.send(str(await self.translate(ctx.guild,"aide","subcmd-not-found")).format(key))
+                            return
+                    except AttributeError:
+                        await destination.send(str(await self.translate(ctx.guild,"aide","no-subcmd")).format(command))
                         return
-                except AttributeError:
-                    await destination.send(str(await self.translate(ctx.guild,"aide","no-subcmd")).format(command))
-                    return
-            pages = await self.cmd_help(ctx,command)
+                pages = await self.cmd_help(ctx,command)
 
-        me = destination.me if type(destination)==discord.DMChannel else destination.guild.me
-        ft = await self.translate(ctx.guild,"aide","footer")
-        prefix = await self.bot.get_prefix(ctx.message)
-        if type(prefix)==list:
-            prefix = prefix[0]
+            me = destination.me if type(destination)==discord.DMChannel else destination.guild.me
+            ft = await self.translate(ctx.guild,"aide","footer")
+            prefix = await self.bot.get_prefix(ctx.message)
+            if type(prefix)==list:
+                prefix = prefix[0]
         if destination.permissions_for(me).embed_links:
             for page in pages:
                 embed = self.bot.cogs["EmbedCog"].Embed(desc=page,footer_text=ft.format(prefix)).update_timestamp().discord_embed()
