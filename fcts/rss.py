@@ -672,17 +672,17 @@ class RssCog:
                 print("[send_rss_msg] Can not send message on channel {}: {}".format(channel.id,e))
 
     async def check_flow(self,flow):
-        if flow['link'] in self.flows.keys():
-            objs = self.flows[flow['link']]
-        else:
-            guild = self.bot.get_guild(flow['guild'])
-            funct = eval('self.rss_{}'.format(flow['type']))
-            objs = await funct(guild,flow['link'],flow['date'])
-            self.flows[flow['link']] = objs
-        if type(objs) == str or len(objs) == 0:
-            return None
-        elif type(objs) == list:
-            try:
+        try:
+            if flow['link'] in self.flows.keys():
+                objs = self.flows[flow['link']]
+            else:
+                guild = self.bot.get_guild(flow['guild'])
+                funct = eval('self.rss_{}'.format(flow['type']))
+                objs = await funct(guild,flow['link'],flow['date'])
+                self.flows[flow['link']] = objs
+            if type(objs) == str or len(objs) == 0:
+                return None
+            elif type(objs) == list:
                 for o in objs:
                     guild = self.bot.get_guild(flow['guild'])
                     if guild == None:
@@ -692,11 +692,12 @@ class RssCog:
                     await o.fill_mention(guild,flow['roles'].split(';'),self.translate)
                     await self.send_rss_msg(o,chan)
                 await self.update_flow(flow['ID'],[('date',o.date)])
-            except Exception as e:
-                await self.bot.cogs['ErrorsCog'].senf_err_msg("Erreur rss sur le flux {} (type {} - salon {})".format(flow['link'],flow['type'],flow['channel']))
-                await self.bot.cogs['ErrorsCog'].on_error(e,None)
-        else:
-            return
+            else:
+                return
+        except Exception as e:
+            await self.bot.cogs['ErrorsCog'].senf_err_msg("Erreur rss sur le flux {} (type {} - salon {})".format(flow['link'],flow['type'],flow['channel']))
+            await self.bot.cogs['ErrorsCog'].on_error(e,None)
+        
 
     async def main_loop(self,guildID=None):
         t = time.time()
