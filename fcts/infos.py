@@ -89,18 +89,9 @@ class InfosCog:
             await ctx.bot.cogs['Errors'].on_command_error(e,ctx)
 
     def get_users_nber(self,ignored_guilds):
-        users,bots=0,0
-        t = time.time()
-        for user in self.bot.users:
-            user_guilds = [x.id for x in self.bot.guilds if user in x.members]
-            if len(set(ignored_guilds).intersection(user_guilds)) == len(user_guilds):
-                continue
-            if user.bot:
-                bots += 1
-            users += 1
-            if time.time()-t>7:
-                return str(round(users,-2))+'+', str(round(bots,-2))+'+'
-        return users,bots
+        members = [x.members for x in self.bot.guilds if x.id not in ignored_guilds]
+        members = [x for x in members for x in x]
+        return len(members),len([x for x in members if x.bot])
 
 
     @commands.command(name="ping",aliases=['rep'])
