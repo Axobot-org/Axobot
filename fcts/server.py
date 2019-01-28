@@ -77,6 +77,23 @@ class ServerCog:
         cnx.close()
         return liste
 
+    async def get_languages(self,ignored_guilds):
+        """Return percentages of languages"""
+        if not self.bot.database_online:
+            return list()
+        cnx = self.connect()
+        cursor = cnx.cursor(dictionary=True)
+        query = ("SELECT `language`,`ID` FROM `{}` WHERE 1".format(self.table))
+        cursor.execute(query)
+        liste,langs = list(), list()
+        for x in cursor:
+            if x['ID'] not in ignored_guilds:
+                liste.append(x['language'])
+        for e,l in enumerate(self.bot.cogs['LangCog'].languages):
+            langs.append((l,liste.count(e)))
+        cnx.close()
+        return langs
+
 
     def connect(self):
         return mysql.connector.connect(user=self.bot.database_keys['user'],password=self.bot.database_keys['password'],host=self.bot.database_keys['host'],database=self.bot.database_keys['database'])

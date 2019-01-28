@@ -74,13 +74,17 @@ class InfosCog:
                 ignored_guilds = [int(x) for x in self.bot.cogs['UtilitiesCog'].config[0]['banned_guilds'].split(";") if len(x)>0]
                 ignored_guilds += self.bot.cogs['ReloadsCog'].ignored_guilds
                 len_servers = len([x for x in ctx.bot.guilds if x.id not in ignored_guilds])
+                langs_list = await self.bot.cogs['ServerCog'].get_languages(ignored_guilds)
+                lang_total = sum([x[1] for x in langs_list])
+                langs_list = ["{}: {}%".format(x[0],round(x[1]/lang_total*100)) for x in langs_list if x[1]>0]
+                del lang_total
                 #premium_count = await self.bot.cogs['UtilitiesCog'].get_number_premium()
                 try:
                     users,bots = self.get_users_nber(ignored_guilds)
                 except Exception as e:
                     print(e)
                     users = bots = 'unknown'
-                d = str(await self.translate(ctx.guild,"infos","stats")).format(bot_version,len_servers,users,bots,self.codelines,version,discord.__version__,round(py.memory_info()[0]/2.**30,3),psutil.cpu_percent(),round(r*1000,3))
+                d = str(await self.translate(ctx.guild,"infos","stats")).format(bot_version,len_servers,users,bots,self.codelines,version,' | '.join(langs_list),discord.__version__,round(py.memory_info()[0]/2.**30,3),psutil.cpu_percent(),round(r*1000,3))
                 embed = ctx.bot.cogs['EmbedCog'].Embed(title=await self.translate(ctx.guild,"infos","stats-title"), color=ctx.bot.cogs['HelpCog'].help_color, time=ctx.message.created_at,desc=d,thumbnail=self.bot.user.avatar_url_as(format="png"))
                 embed.create_footer(ctx.author)
 
