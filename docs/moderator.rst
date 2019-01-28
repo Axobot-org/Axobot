@@ -226,4 +226,4 @@ With this command, you can become the undisputed master of the Emojis and handle
 * WIP...
 
 
-..warning:: The bot needs the `Manage Emojis <perms.html#manage-emojis>`_ permission to edit these pretty little pictures. And you, you need Administrator permission to use these commands.
+.. warning:: The bot needs the `Manage Emojis <perms.html#manage-emojis>`_ permission to edit these pretty little pictures. And you, you need Administrator permission to use these commands.
