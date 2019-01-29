@@ -57,6 +57,19 @@ The "flow ID" argument is the identifier of the flow (found with the command `rs
 .. warning:: For this command too, the bot needs "`Embed Links <perms.html#embed-links>`_" permission!
 
 
+-----------
+Move a feed
+-----------
+
+**Syntax:** :code:`rss move [flow ID] [new channel]`
+
+If you want to move an rss feed without having to delete it, recreate a new one and then reconfigure it, you can use this command. It can also be useful to configure a flow in a secret chat room, then reveal it to your entire server without having to temporarily close your chat!
+
+If no identifier is given, the bot will ask you which one to modify.  As for the channel, if you do not specify any, it will select the one in which you type the command.
+
+.. warning:: Here again, the bot needs "`Embed Links <perms.html#embed-links>`_" permission!
+
+
 ----------------------
 Delete a followed feed
 ----------------------

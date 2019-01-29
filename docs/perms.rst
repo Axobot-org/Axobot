@@ -113,7 +113,7 @@ Allows the bot to pin or delete any message. Used for: `mute <moderator.html#mut
 Embed Links
 -----------
 
-Allows the bot the bot to send an embed. Used for: `membercount <infos.html#membercount>`_ , `mojang <minecraft.html#mojang>`_ . Required for: `infos <infos.html#info>`_ , `mc <minecraft.html#mc>`_ , `config see <config.html#watch>`_, `manage rss feeds <rss.html#follow-a-feed>`_
+Allows the bot the bot to send an embed. Used for: `membercount <infos.html#membercount>`_ , `mojang <minecraft.html#mojang>`_ . Required for: `infos <infos.html#info>`_ , `mc <minecraft.html#mc>`_ , `config see <config.html#watch>`_, `a few rss commands <rss.html>`_
 
 
 Attach Files
