@@ -28,12 +28,12 @@ class UtilitiesCog:
             return self.list_prefixs[str(guild.id)]
         else:
             cnx = self.bot.cogs['ServerCog'].connect()
-            cursor = cnx.cursor(dictionary = False)
+            cursor = cnx.cursor(dictionary = True)
             cursor.execute("SELECT `prefix` FROM `{}` WHERE `ID`={}".format(self.bot.cogs["ServerCog"].table,guild.id))
             liste = list()
             for x in cursor:
-                if len(x)>0:
-                    liste.append(x)
+                if len(x['prefix'])>0:
+                    liste.append(x['prefix'])
             cnx.close()
             if liste == []:
                 self.list_prefixs[str(guild.id)] = '!'
