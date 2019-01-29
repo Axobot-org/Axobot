@@ -320,7 +320,16 @@ UrL : {link}""",
 "guild-complete":"{} rss streams haz correctly rechargd in {} seconds!",
 "guild-error":"A error occurrd durin teh load: `{}`\nIf you think dis err iz not your auwn, u can report it to support staff",
 "guild-loading":"Reloadz {}",
-"move-success":"Teh rsss feed #{} haz been movd in the chat {}!"
+"move-success":"Teh rsss feed #{} haz been movd in the chat {}!",
+"change-txt":"""Da current msg contains  \n```\n{text}\n```\nPlz enter teh text 2B usd when creating a new post. U can use a lot ov variables, here iz the list:
+- `{author}`: author of the post
+- `{channel}`: Discord channel in which the message is posted
+- `{date}`: post date (UTC)
+- `{link}` or `{url}`: a link 2 the post
+- `{logo}`: a emoji representing teh type of post (website, BlueBird, RedTriangle...)
+- `{mentions}`: the list ov mentioned roles
+- `{title}`: the titl of da post""",
+"text-success":"Teh text of the feed #{} haz been modified!\n New cute text : \n```\n{}\n```"
 }
 
 server={"config-help": "Dis cmd is mainly usd 2 configur ur srver. By doin `!config see [option]` u will get \

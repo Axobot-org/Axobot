@@ -86,7 +86,8 @@ class RssCog:
 
 
     class rssMessage:
-        def __init__(self,Type,url,title,emojis,date=datetime.datetime.now(),author=None,Format=None,channel=""):
+        def __init__(self,bot,Type,url,title,emojis,date=datetime.datetime.now(),author=None,Format=None,channel=""):
+            self.bot = bot
             self.Type = Type
             self.url = url
             self.title = title
@@ -137,7 +138,7 @@ class RssCog:
             else:
                 d = self.date
             Format = Format.replace('\\n','\n')
-            return Format.format(channel=self.channel,title=self.title,date=d,url=self.url,link=self.url,mentions=", ".join(self.mentions),logo=self.logo,author=self.author)
+            return Format.format_map(self.bot.SafeDict(channel=self.channel,title=self.title,date=d,url=self.url,link=self.url,mentions=", ".join(self.mentions),logo=self.logo,author=self.author))
 
 
     @commands.group(name="rss")
@@ -191,7 +192,7 @@ class RssCog:
     @commands.guild_only()
     @commands.check(can_use_rss)
     async def system_add(self,ctx,link):
-        """Subscribe to a rss feed (displayed on this channel regularly)"""
+        """Subscribe to a rss feed, displayed on this channel regularly"""
         if not ctx.bot.database_online:
             return await ctx.send(await self.translate(ctx.guild.id,"rss","no-db"))
         if str(ctx.guild.id) in guilds_limit_exceptions.keys():
@@ -483,6 +484,37 @@ class RssCog:
         except Exception as e:
             await ctx.send(str(await self.translate(ctx.guild.id,"rss","guild-error")).format(e))
 
+    @rss_main.command(name="text")
+    @commands.guild_only()
+    @commands.check(can_use_rss)
+    async def change_text_flow(self,ctx,ID:typing.Optional[int]=None,text=None):
+        """Change the text of an rss feed"""
+        try:
+            try:
+                flow = await self.askID(ID,ctx)
+            except Exception as e:
+                flow = []
+            if flow==None:
+                return
+            if len(flow)==0:
+                await ctx.send(await self.translate(ctx.guild,"rss","fail-add"))
+                await self.bot.cogs["ErrorsCog"].on_error(e,ctx)
+                return
+            flow = flow[0]
+            if text==None:
+                pres_msg = await ctx.send(str(await self.translate(ctx.guild.id,"rss","change-txt")).format_map(self.bot.SafeDict(text=flow['structure'])))
+                def check(msg):
+                    return msg.author==ctx.author and msg.channel==ctx.channel
+                try:
+                    msg = await self.bot.wait_for('message', check=check,timeout=30)
+                except asyncio.TimeoutError:
+                    await ctx.send(await self.translate(ctx.guild.id,"rss","too-long"))
+                    return await self.bot.cogs['UtilitiesCog'].suppr(pres_msg)
+            await self.update_flow(flow['ID'],[('structure',msg.content)])
+            await ctx.send(str(await self.translate(ctx.guild.id,"rss","text-success")).format(flow['ID'],msg.content))
+        except Exception as e:
+            await ctx.send(str(await self.translate(ctx.guild.id,"rss","guild-error")).format(e))
+
 
     async def parse_yt_url(self,url):
         r = r'(?:http.*://)?(?:www.)?(?:youtube.com|youtu.be)(?:/channel/|/user/)(.+)'
@@ -513,14 +545,14 @@ class RssCog:
                 return await self.translate(guild,"rss","nothing")
         if not date:
             feed = feeds.entries[0]
-            obj = self.rssMessage(Type='yt',url=feed['link'],title=feed['title'],emojis=self.bot.cogs['EmojiCog'].customEmojis,date=feed['published_parsed'],author=feed['author'])
+            obj = self.rssMessage(bot=self.bot,Type='yt',url=feed['link'],title=feed['title'],emojis=self.bot.cogs['EmojiCog'].customEmojis,date=feed['published_parsed'],author=feed['author'])
             return [obj]
         else:
             liste = list()
             for feed in feeds.entries:
                 if datetime.datetime(*feed['published_parsed'][:6]) <= date:
                     break
-                obj = self.rssMessage(Type='yt',url=feed['link'],title=feed['title'],emojis=self.bot.cogs['EmojiCog'].customEmojis,date=feed['published_parsed'],author=feed['author'])
+                obj = self.rssMessage(bot=self.bot,Type='yt',url=feed['link'],title=feed['title'],emojis=self.bot.cogs['EmojiCog'].customEmojis,date=feed['published_parsed'],author=feed['author'])
                 liste.append(obj)
             liste.reverse()
             return liste
@@ -550,14 +582,14 @@ class RssCog:
                 t = feed['title'].replace(r.group(1),'')
             else:
                 t = feed['title']
-            obj = self.rssMessage(Type='tw',url=feed['link'],title=t,emojis=self.bot.cogs['EmojiCog'].customEmojis,date=feed['published_parsed'],author=feed['author'],channel=feeds.feed['title'])
+            obj = self.rssMessage(bot=self.bot,Type='tw',url=feed['link'],title=t,emojis=self.bot.cogs['EmojiCog'].customEmojis,date=feed['published_parsed'],author=feed['author'],channel=feeds.feed['title'])
             return [obj]
         else:
             liste = list()
             for feed in feeds.entries:
                 if datetime.datetime(*feed['published_parsed'][:6]) <= date:
                     break
-                obj = self.rssMessage(Type='tw',url=feed['link'],title=feed['title'],emojis=self.bot.cogs['EmojiCog'].customEmojis,date=feed['published_parsed'],author=feed['author'],channel= feeds.feed['title'])
+                obj = self.rssMessage(bot=self.bot,Type='tw',url=feed['link'],title=feed['title'],emojis=self.bot.cogs['EmojiCog'].customEmojis,date=feed['published_parsed'],author=feed['author'],channel= feeds.feed['title'])
                 liste.append(obj)
             liste.reverse()
             return liste
@@ -583,7 +615,7 @@ class RssCog:
                 datz = 'Unknown'
             else:
                 datz = feed[published]
-            obj = self.rssMessage(Type='web',url=feed['link'],title=feed['title'],emojis=self.bot.cogs['EmojiCog'].customEmojis,date=datz,author=feed['author'] if 'author' in feed.keys() else None,channel= feeds.feed['title'])
+            obj = self.rssMessage(bot=self.bot,Type='web',url=feed['link'],title=feed['title'],emojis=self.bot.cogs['EmojiCog'].customEmojis,date=datz,author=feed['author'] if 'author' in feed.keys() else None,channel= feeds.feed['title'])
             return [obj]
         else:
             liste = list()
@@ -594,7 +626,7 @@ class RssCog:
                     datz = feed[published]
                 if datetime.datetime(*feed['published_parsed'][:6]) <= date:
                     break
-                obj = self.rssMessage(Type='web',url=feed['link'],title=feed['title'],emojis=self.bot.cogs['EmojiCog'].customEmojis,date=datz,author=feed['author'] if 'author' in feed.keys() else None,channel= feeds.feed['title'])
+                obj = self.rssMessage(bot=self.bot,Type='web',url=feed['link'],title=feed['title'],emojis=self.bot.cogs['EmojiCog'].customEmojis,date=datz,author=feed['author'] if 'author' in feed.keys() else None,channel= feeds.feed['title'])
                 liste.append(obj)
             liste.reverse()
             return liste

@@ -320,7 +320,16 @@ Link : {link}""",
 "guild-complete":"{} rss streams have been correctly reloaded, in {} seconds!",
 "guild-error":"An error occurred during the procedure: `{}`\nIf you think this error is not your own, you can report it to support",
 "guild-loading":"Reloading {}",
-"move-success":"The rss feed #{} has been moved in the channel {}!"
+"move-success":"The rss feed #{} has been moved in the channel {}!",
+"change-txt":"""The current message contains  \n```\n{text}\n```\nPlease enter the text to be used when creating a new post. You can use several variables, of which here is the list:
+- `{author}`: the author of the post
+- `{channel}`: the Discord channel in which the message is posted
+- `{date}`: the post date (UTC)
+- `{link}` or `{url}`: a link to the post
+- `{logo}`: an emoji representing the type of post (web, Twitter, YouTube...)
+- `{mentions}`: the list of mentioned roles
+- `{title}`: the title of the post""",
+"text-success":"The text of the feed #{} has been modified!\n New text : \n```\n{}\n```"
 }
 
 server={"config-help": "This command is mainly used to configure your server. By doing `!config see [option]` you will get \

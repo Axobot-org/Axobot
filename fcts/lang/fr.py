@@ -320,7 +320,16 @@ Lien : {link}""",
 "guild-complete":"{} flux rss ont correctement été rechargés, en {} secondes !",
 "guild-error":"Une erreur est survenue pendant la procédure : `{}`\nSi vous pensez que cette erreur ne vient pas de vous, vous pouvez en avertir le support",
 "guild-loading":"Rechargement en cours {}",
-"move-success":"Le flux rss n°{} a bien été bougé dans le salon {} !"
+"move-success":"Le flux rss n°{} a bien été bougé dans le salon {} !",
+"change-txt":"""Le message actuel contient \n```\n{text}\n```\nVeuillez entrer le texte à utiliser lors d'un nouveau post. Vous pouvez utiliser plusieurs variables, dont voici la liste :
+- `{author}` : l'auteur du post
+- `{channel}` : le salon Discord dans lequel est posté le message
+- `{date}` : la date du post (UTC)
+- `{link}` ou `{url}` : un lien vers le post
+- `{logo}` : un emoji représentant le type de post (web, Twitter, YouTube...)
+- `{mentions}` : la liste des rôles mentionnés
+- `{title}` : le titre du post""",
+"text-success":"Le texte du flux n°{} a bien été modifié ! Nouveau texte : \n```\n{}\n```"
 }
 
 server={"config-help":"Cette commande sert principalement à configurer votre serveur. En faisant `!config see [option]` vous obtiendrez l'aperçu des configurations actuelles, \

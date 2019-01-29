@@ -57,6 +57,19 @@ The "flow ID" argument is the identifier of the flow (found with the command `rs
 .. warning:: For this command too, the bot needs "`Embed Links <perms.html#embed-links>`_" permission!
 
 
+---------------
+Change the text
+---------------
+
+**Syntax:** :code:`rss text [flow ID] [new text]`
+
+This command is particularly useful if you want to change the text of an rss flow tracking, for example to have a customized text, or in your native language. Many tools are at your disposal (also known as *variables*) that allow an optimal personalization of the message. That's right, we thought of you.
+
+If the rss feed ID is not given, the bot will open a menu to select it. And for the text, if you have forgotten it, the bot will also ask you to know it, and will provide you the current text and a list of the usable variables.
+
+.. warning:: Yo know what? For this command, the bot needs "`Embed Links <perms.html#embed-links>`_" permission!
+
+
 -----------
 Move a feed
 -----------
