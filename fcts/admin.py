@@ -360,7 +360,10 @@ class AdminCog:
         text = "Liste des {} meilleures idées (sur {}) :".format(len(liste),count)
         for x in liste:
             text += "\n- {} ({} - {})".format(x[1],x[2],x[3])
-        await bot_msg.edit(content=text)
+        try:
+            await bot_msg.edit(content=text)
+        except discord.HTTPException:
+            await ctx.send("Le message est trop long pour être envoyé !")
 
     @commands.command(name="activity")
     @commands.check(reloads.check_admin)
