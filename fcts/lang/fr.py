@@ -278,7 +278,7 @@ Par exemple, pour %https://twitter.com/Mc_AsiliS*, il faut rentrer `Mc_AsiliS`",
 "nothing":"Je n'ai rien trouvé sur cette recherche :confused:",
 "success-add":"Le flux rss de type '{}' avec le lien <{}> a bien été ajouté dans le salon {} !",
 "invalid-link":"Oups, cette adresse url est invalide ou incomplète :confused:",
-"fail-add":"Une erreur s'est produite lors du traitement de votre réponse. Merci de réessayer plus tard, ou de contacter le support du bot (entrez la commande `botinfo` pour le lien du serveur)",
+"fail-add":"Une erreur s'est produite lors du traitement de votre réponse. Merci de réessayer plus tard, ou de contacter le support du bot (entrez la commande `about` pour le lien du serveur)",
 "flow-limit":"Pour des raisons de performances, vous ne pouvez pas suivre plus de {} flux rss par serveur.",
 "yt-form-last":"""{logo}  | Voici la dernière vidéo de {author}:
 {title}
@@ -319,7 +319,8 @@ Lien : {link}""",
 "no-db":"La base de donnée étant actuellement hors ligne, cette fonctionnalité est temporairement désactivée :confused:",
 "guild-complete":"{} flux rss ont correctement été rechargés, en {} secondes !",
 "guild-error":"Une erreur est survenue pendant la procédure : `{}`\nSi vous pensez que cette erreur ne vient pas de vous, vous pouvez en avertir le support",
-"guild-loading":"Rechargement en cours {}"
+"guild-loading":"Rechargement en cours {}",
+"move-success":"Le flux rss n°{} a bien été bougé dans le salon {} !"
 }
 
 server={"config-help":"Cette commande sert principalement à configurer votre serveur. En faisant `!config see [option]` vous obtiendrez l'aperçu des configurations actuelles, \

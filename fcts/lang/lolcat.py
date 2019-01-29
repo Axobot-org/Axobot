@@ -278,7 +278,7 @@ For ex:a:mple, for %https://twitter.com/Mc_AsiliS*, u must entr `Mc_AsiliS`.",
 "nothing":"I finnd nothin on this searrch :confused:",
 "success-add":"Teh rss feed for type '{}' with lik <{}> have bein prperly addded in the cannel {} !",
 "invalid-link":"Oops, dis url ADress is unvalid or outcompletz :confused:",
-"fail-add":"An fAtal erroR have occurred whale proczzing ur respond. Plz trye again laterz, r contakt boat suPPORt (entr teh comand `botinfo` 4 srver link)",
+"fail-add":"An fAtal erroR have occurred whale proczzing ur respond. Plz trye again laterz, r contakt boat suPPORt (entr teh comand `about` 4 srver link)",
 "flow-limit":"Fr pirformunce reesons, U can notz track mor than {} rss feeds per srver.",
 "yt-form-last":"""{logo}  | Her the lazt vid from {author}:
 {title}
@@ -318,7 +318,9 @@ UrL : {link}""",
 "delete-success":"Teh flow had bein sussellfuccy delet!",
 "no-db":"As the databaz is auffline, dis feature iz temporarly disabled :confused:",
 "guild-complete":"{} rss streams haz correctly rechargd in {} seconds!",
-"guild-error":"A error occurrd durin teh load: `{}`\nIf you think dis err iz not your auwn, u can report it to support staff"
+"guild-error":"A error occurrd durin teh load: `{}`\nIf you think dis err iz not your auwn, u can report it to support staff",
+"guild-loading":"Reloadz {}",
+"move-success":"Teh rsss feed #{} haz been movd in the chat {}!"
 }
 
 server={"config-help": "Dis cmd is mainly usd 2 configur ur srver. By doin `!config see [option]` u will get \

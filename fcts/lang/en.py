@@ -278,7 +278,7 @@ For example, for %https://twitter.com/Mc_AsiliS*, you must enter `Mc_AsiliS`.",
 "nothing":"I found nothing on this search :confused:",
 "success-add":"The rss feed of type '{}' with link <{}> has been properly added in the channel {} !",
 "invalid-link":"Oops, this url address is invalid or incomplete :confused:",
-"fail-add":"An error occurred while processing your response. Please try again later, or contact bot support (enter the command `botinfo` for server link)",
+"fail-add":"An error occurred while processing your response. Please try again later, or contact bot support (enter the command `about` for server link)",
 "flow-limit":"For performance reasons, you cannot track more than {} rss feeds per server.",
 "yt-form-last":"""{logo}  | Here is the last video of {author}:
 {title}
@@ -318,7 +318,9 @@ Link : {link}""",
 "delete-success":"The flow has been successfully deleted!",
 "no-db":"As the database is currently offline, this feature is temporarily disabled :confused:",
 "guild-complete":"{} rss streams have been correctly reloaded, in {} seconds!",
-"guild-error":"An error occurred during the procedure: `{}`\nIf you think this error is not your own, you can report it to support"
+"guild-error":"An error occurred during the procedure: `{}`\nIf you think this error is not your own, you can report it to support",
+"guild-loading":"Reloading {}",
+"move-success":"The rss feed #{} has been moved in the channel {}!"
 }
 
 server={"config-help": "This command is mainly used to configure your server. By doing `!config see [option]` you will get \
