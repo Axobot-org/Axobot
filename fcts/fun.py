@@ -456,7 +456,7 @@ You can specify a verification limit by adding a number in argument"""
             await ctx.send("Your bot cannot make a required system call `resource.setrlimit`")
             ctx.bot.remove_command(ctx.command.name)
     
-    @commands.command(name='embed',hidden=True)
+    @commands.command(name='embed',hidden=False)
     @commands.has_permissions(embed_links=True)
     async def send_embed(self,ctx,*,arguments):
         """Send an embed
