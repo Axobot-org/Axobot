@@ -1,4 +1,4 @@
-import discord, feedparser, datetime, time, re, asyncio, mysql, random
+import discord, feedparser, datetime, time, re, asyncio, mysql, random, typing
 from discord.ext import commands
 from fcts import cryptage, tokens
 
@@ -141,14 +141,14 @@ class RssCog:
 
 
     @commands.group(name="rss")
-    @commands.cooldown(2,20,commands.BucketType.channel)
+    @commands.cooldown(2,15,commands.BucketType.channel)
     async def rss_main(self,ctx):
         """See the last post of a rss feed"""
         return
 
     @rss_main.command(name="youtube",aliases=['yt'])
     async def request_yt(self,ctx,ID):
-        """the last video of a YouTube channel"""
+        """The last video of a YouTube channel"""
         if ID in yt_link.keys():
             ID = yt_link[ID]
         if "youtube.com" in ID or "youtu.be" in ID:
@@ -315,13 +315,8 @@ class RssCog:
             embed.add_field(name="\uFEFF", value=x, inline=False)
         await ctx.send(embed=embed)
 
-    @rss_main.command(name="roles")
-    @commands.guild_only()
-    @commands.check(can_use_rss)
-    async def roles_flows(self,ctx,ID:int=None):
-        """configures a role to be notified when a news is posted"""
-        if not ctx.bot.database_online:
-            return await ctx.send(await self.translate(ctx.guild.id,"rss","no-db"))
+    async def askID(self,ID,ctx):
+        """Demande l'ID d'un flux rss"""
         if ID != None:
             flow = await self.get_flow(ID)
             if flow == []:
@@ -358,9 +353,8 @@ class RssCog:
                     r = ", ".join(r)
                 MAX = e+1
                 text.append("{}) {} - {} - {} - {}".format(e+1,await self.translate(ctx.guild.id,'rss',x['type']),x['link'],c,r))
-            embed = discord.Embed(title=await self.translate(ctx.guild.id,"rss","choose-mentions-1"), colour=self.embed_color, description="\n".join(text), timestamp=ctx.message.created_at)
-            embed = await self.bot.cogs['UtilitiesCog'].create_footer(embed,ctx.author)
-            emb_msg = await ctx.send(embed=embed)
+            embed = self.bot.cogs['EmbedCog'].Embed(title=await self.translate(ctx.guild.id,"rss","choose-mentions-1"), color=self.embed_color, desc="\n".join(text), time=ctx.message.created_at).create_footer(ctx.author)
+            emb_msg = await ctx.send(embed=embed.discord_embed())
             def check(msg):
                 if not msg.content.isnumeric():
                     return False
@@ -372,6 +366,21 @@ class RssCog:
                 await self.bot.cogs['UtilitiesCog'].suppr(emb_msg)
                 return
             flow = await self.get_flow(list_of_IDs[int(msg.content)-1])
+        return flow
+
+    @rss_main.command(name="roles")
+    @commands.guild_only()
+    @commands.check(can_use_rss)
+    async def roles_flows(self,ctx,ID:int=None):
+        """Configures a role to be notified when a news is posted"""
+        if not ctx.bot.database_online:
+            return await ctx.send(await self.translate(ctx.guild.id,"rss","no-db"))
+        try:
+            flow = await self.askID(ID,ctx)
+        except Exception as e:
+            flow = []
+        if flow==None:
+            return
         if len(flow)==0:
             await ctx.send(await self.translate(ctx.guild,"rss","fail-add"))
             await self.bot.cogs["ErrorsCog"].on_error(e,ctx)
@@ -389,9 +398,10 @@ class RssCog:
                     r.append(item)
             r = ", ".join(r)
             text = str(await self.translate(ctx.guild.id,"rss","roles-list")).format(r)
-        embed = discord.Embed(title=await self.translate(ctx.guild.id,"rss","choose-roles"), colour=discord.Colour(0x77ea5c), description=text, timestamp=ctx.message.created_at)
-        emb_msg = await ctx.send(embed=embed)
+        embed = self.bot.cogs['EmbedCog'].Embed(title=await self.translate(ctx.guild.id,"rss","choose-roles"), color=discord.Colour(0x77ea5c), desc=text, time=ctx.message.created_at)
+        emb_msg = await ctx.send(embed=embed.discord_embed())
         err = await self.translate(ctx.guild.id,"rss",'not-a-role')
+        userID = ctx.author.id
         def check2(msg):
             return msg.author.id == userID
         cond = False
@@ -446,6 +456,30 @@ class RssCog:
             await self.main_loop(ctx.guild.id)
             await ctx.send(str(await self.translate(ctx.guild.id,"rss","guild-complete")).format(len(liste),round(time.time()-t,1)))
             await ctx.bot.cogs['UtilitiesCog'].suppr(msg)
+        except Exception as e:
+            await ctx.send(str(await self.translate(ctx.guild.id,"rss","guild-error")).format(e))
+
+    @rss_main.command(name="move")
+    @commands.guild_only()
+    @commands.check(can_use_rss)
+    async def move_guild_flow(self,ctx,ID:typing.Optional[int]=None,channel:discord.TextChannel=None):
+        """Move a rss feed in another channel"""
+        try:
+            if channel==None:
+                channel = ctx.channel
+            try:
+                flow = await self.askID(ID,ctx)
+            except Exception as e:
+                flow = []
+            if flow==None:
+                return
+            if len(flow)==0:
+                await ctx.send(await self.translate(ctx.guild,"rss","fail-add"))
+                await self.bot.cogs["ErrorsCog"].on_error(e,ctx)
+                return
+            flow = flow[0]
+            await self.update_flow(flow['ID'],[('channel',channel.id)])
+            await ctx.send(str(await self.translate(ctx.guild.id,"rss","move-success")).format(flow['ID'],channel.mention))
         except Exception as e:
             await ctx.send(str(await self.translate(ctx.guild.id,"rss","guild-error")).format(e))
 
