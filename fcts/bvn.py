@@ -9,9 +9,6 @@ class WelcomerCog:
         self.file = "bvn"
         self.no_message = [392766377078816789]
     
-    class SafeDict(dict):
-        def __missing__(self, key):
-            return '{' + key + '}'
 
     async def new_member(self,member):
         """Fonction principale appelée lorsqu'un membre rejoint un serveur"""
@@ -50,7 +47,7 @@ class WelcomerCog:
                 if channel == None:
                     continue
                 try:
-                    msg = msg.format_map(self.SafeDict(user=member.mention if Type=='welcome' else member.name,server=member.guild.name,owner=member.guild.owner.name,member_count=len(member.guild.members)))
+                    msg = msg.format_map(self.bot.SafeDict(user=member.mention if Type=='welcome' else member.name,server=member.guild.name,owner=member.guild.owner.name,member_count=len(member.guild.members)))
                     msg = await self.bot.cogs["UtilitiesCog"].clear_msg(msg,everyone=False)
                     await channel.send(msg)
                 except Exception as e:

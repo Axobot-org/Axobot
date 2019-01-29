@@ -80,6 +80,10 @@ class zbot(commands.bot.BotBase,discord.Client):
                 return user.avatar_url_as(format='png',size=size)
         except Exception as e:
             await self.cogs['ErrorsCog'].on_error(e,None)
+    
+    class SafeDict(dict):
+        def __missing__(self, key):
+            return '{' + key + '}'
 
 
 def get_prefix(bot,msg):
