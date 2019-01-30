@@ -112,7 +112,7 @@ Of helpin me in the creetion of the boat, my ownr an I wouLd like to tahnk Awhik
 Has a nice dayz !""",
 "docs":"Her'z teh link 2 the bot doc:",
 "stats-title":"**Boat statz**",
-"stats":"""**Baut vershun:** {} \n**Nbr ov serverz:** {} \n**Nbr ov visible memberz:** {} ({} **robots**)\n**Nbr ov code lin:** {}\nUzd languages: {}\n**Python vershun :** {} \n**Vershun ov teh `discord.py` lyb:** {} \n**Loadin on teh RAM:** {} GB \n**Loadin on the CPU:** {} % \n**API latency timz:** {} ms""",
+"stats":"""**Baut vershun:** {} \n**Nbr ov serverz:** {} \n**Nbr ov visible memberz:** {} ({} **robots**)\n**Nbr ov code lin:** {}\n**Uzd languages:** {}\n**Python vershun :** {} \n**Vershun ov teh `discord.py` lyb:** {} \n**Loadin on teh RAM:** {} GB \n**Loadin on the CPU:** {} % \n**API latency timz:** {} ms""",
 "admins-list":"My super-cool admins are : {}"}
 
 infos_2={"membercount-0":"Total nmber of membrz",
