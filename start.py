@@ -68,6 +68,7 @@ class zbot(commands.bot.BotBase,discord.Client):
         self.database_online = database_online
         self.beta = beta
         self.database_keys = dict()
+        self.log = logging.getLogger("runner")
     
     async def user_avatar_as(self,user,size=512):
         """Get the avatar of an user, format gif or png (as webp isn't supported by some browsers)"""
