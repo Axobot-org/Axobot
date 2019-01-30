@@ -5,7 +5,7 @@ from fcts import emoji
 from fcts.jailer import run_jailed
 importlib.reload(emoji)
 
-cmds_list = ['count_msg','ragequit','pong','run','nope','blame','party','bigtext','shrug','gg','money','pibkac','osekour','me','kill','cat','rekt','thanos','nuke','pikachu','pizza','lmgtfy','loading','piece']
+cmds_list = ['count_msg','ragequit','pong','run','nope','blame','party','bigtext','shrug','gg','money','pibkac','osekour','me','kill','cat','rekt','thanos','nuke','pikachu','pizza','google','loading','piece']
 
 async def is_fun_enabled(ctx):
     self = ctx.bot.cogs["FunCog"]
@@ -368,7 +368,7 @@ You can specify a verification limit by adding a number in argument"""
 
         await ctx.send(file=await self.utilities.find_img('pizza.gif'))
     
-    @commands.command(name="lmgtfy",hidden=True)
+    @commands.command(name="google",hidden=True)
     @commands.check(is_fun_enabled)
     async def lmgtfy(self,ctx,*,search):
         """How to use Google"""
