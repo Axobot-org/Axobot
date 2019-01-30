@@ -47,6 +47,8 @@ class HelpCog:
                 await self.help_command(ctx)
             else:
                 await self.help_command(ctx,commands)
+        except discord.errors.Forbidden:
+            pass
         except Exception as e:
             await self.bot.cogs["ErrorsCog"].on_error(e,ctx)
             if len(commands) == 0:
