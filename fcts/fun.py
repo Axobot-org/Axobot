@@ -234,70 +234,18 @@ You can specify a verification limit by adding a number in argument"""
         """If you wish to write bigger"""
         text1 = []
         contenu = await self.bot.cogs['UtilitiesCog'].clear_msg(text,ctx=ctx)
+        Em = self.bot.cogs['EmojiCog']
         for l in "¬¬".join(contenu.split("\n")):
             l = l.lower()
-            if l in string.ascii_letters+string.digits:
-                item = discord.utils.get(ctx.bot.emojis,name=l.upper()+'_')
-            elif l == " ":
-                item = self.bot.cogs['EmojiCog'].customEmojis['nothing']
-            elif l == "ù":
-                item = discord.utils.get(ctx.bot.emojis,name='U2')
-            elif l == "ú":
-                item = discord.utils.get(ctx.bot.emojis,name='U1')
-            elif l == ";":
-                item = discord.utils.get(ctx.bot.emojis,name='PointVirgule')
-            elif l == ".":
-                item = discord.utils.get(ctx.bot.emojis,name='Point')
-            elif l == '?':
-                item = discord.utils.get(ctx.bot.emojis,name='Interrogation')
-            elif l == "!":
-                item = discord.utils.get(ctx.bot.emojis,name='Exclamation')
-            elif l == "ß":
-                item = discord.utils.get(ctx.bot.emojis,name='eszett')
-            elif l == "ê":
-                item = discord.utils.get(ctx.bot.emojis,name='E3')
-            elif l == "è":
-                item = discord.utils.get(ctx.bot.emojis,name='E2')
-            elif l == "é":
-                item = discord.utils.get(ctx.bot.emojis,name='E1')
-            elif l == ":":
-                item = discord.utils.get(ctx.bot.emojis,name='DeuxPoints')
-            elif l == "ç":
-                item = discord.utils.get(ctx.bot.emojis,name='Cdille')
-            elif l == "à":
-                item = discord.utils.get(ctx.bot.emojis,name='A2')
-            elif l == "(":
-                item = discord.utils.get(ctx.bot.emojis,name='par1')
-            elif l == ")":
-                item = discord.utils.get(ctx.bot.emojis,name='par2')
-            elif l == "-":
-                item = discord.utils.get(ctx.bot.emojis,name='tiret')
-            elif l == "+":
-                item = discord.utils.get(ctx.bot.emojis,name='plus')
-            elif l == "@":
-                item = discord.utils.get(ctx.bot.emojis,name='arobazzz')
-            elif l == "&":
-                item = discord.utils.get(ctx.bot.emojis,name='and')
-            elif l == "%":
-                item = discord.utils.get(ctx.bot.emojis,name='percent')
-            elif l == "*":
-                item = discord.utils.get(ctx.bot.emojis,name='asterisque')
-            elif l == "=":
-                item = discord.utils.get(ctx.bot.emojis,name='egal')
-            elif l == "\"":
-                item = discord.utils.get(ctx.bot.emojis,name='guillemets')
-            elif l == "\\":
-                item = discord.utils.get(ctx.bot.emojis,name='slash_inverse')
-            elif l == "/":
-                item = discord.utils.get(ctx.bot.emojis,name='slash')
-            elif l == "~":
-                item = discord.utils.get(ctx.bot.emojis,name='tilde')
-            elif l == "_":
-                item = discord.utils.get(ctx.bot.emojis,name='underscore')
-            elif l == ",":
-                item = discord.utils.get(ctx.bot.emojis,name='virgule')
+            if l in string.ascii_letters:
+                item = discord.utils.get(ctx.bot.emojis,id=Em.alphabet[string.ascii_letters.index(l)])
+            elif l in string.digits:
+                item = discord.utils.get(ctx.bot.emojis,id=Em.numbers[int(l)])
             else:
-                item = l
+                try:
+                    item = discord.utils.get(ctx.bot.emojis,id=Em.chars[l])
+                except KeyError:
+                    item = l
             text1.append(str(item))
             caract = len("".join(text1))
             if caract>1970:
@@ -532,7 +480,7 @@ You can specify a verification limit by adding a number in argument"""
         If no number of choices is given, the emojis will be 👍 and 👎. Otherwise, it will be a series of numbers.
         The text sent by the bot is EXACTLY the one you give, without any more formatting."""
         text = await ctx.bot.cogs['UtilitiesCog'].clear_msg(text,ctx=ctx)
-        if not (ctx.channel.permissions_for(ctx.guild.me).read_message_history and ctx.channel.permissions_for(ctx.guild.me).add_reaction):
+        if not (ctx.channel.permissions_for(ctx.guild.me).read_message_history and ctx.channel.permissions_for(ctx.guild.me).add_reactions):
             await ctx.send(await self.translate(ctx.guild,"fun","cant-react"))
             return
         if number==0:
