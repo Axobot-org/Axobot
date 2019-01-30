@@ -34,6 +34,10 @@ class AdminCog:
         self.bot = bot
         self.file = "admin"
         self.emergency_time = 5.0
+        if self.bot.beta:
+            self.update = {'fr':'Foo','en':'Bar'}
+        else:
+            self.update = {'fr':None,'en':None}
         try:
             self.translate = self.bot.cogs["LangCog"].tr
             self.print = self.bot.cogs["UtilitiesCog"].print2
@@ -81,6 +85,72 @@ class AdminCog:
                     for cmds in cmd.commands:
                         text+="\n        - {} *({})*".format(cmds.name,cmds.help)
             await ctx.send(text)
+
+    @main_msg.command(name="update",hidden=True)
+    @commands.check(reloads.check_admin)
+    async def update_config(self,ctx,send=None):
+        """Préparer/lancer un message de mise à jour
+        Ajouter 'send' en argument déclenche la procédure pour l'envoyer à tous les serveurs"""
+        if send!=None and send=='send':
+            await self.send_updates(ctx)
+            return
+        def check(m):
+            return m.author == ctx.author and m.channel == ctx.channel
+        for x in self.update.keys():
+            await ctx.send("Message en {} ?".format(x))
+            try:
+                msg = await ctx.bot.wait_for('message', check=check,timeout=60)
+            except asyncio.TimeoutError:
+                return await ctx.send('Trop tard !')
+            if msg.content.lower() in ['none','annuler','stop','oups']:
+                return await ctx.send('Annulé !')
+            self.update[x] = msg.content
+        await ctx.bot.cogs['UtilitiesCog'].add_check_reaction(msg)
+    
+    async def send_updates(self,ctx):
+        """Lance un message de mise à jour"""
+        if None in self.update.values():
+            return await ctx.send("Les textes ne sont pas complets !")
+        text = "Vos messages contiennent"
+        if max([len(x) for x in self.update.values()]) > 1900//len(self.update.keys()):
+            for k,v in self.update.items():
+                text += "\n{}:``\n{}\n```".format(k,v)
+                msg = await ctx.send(text)
+                text = ''
+        else:
+            text += "\n"+"\n".join(["{}:\n```\n{}\n```".format(k,v) for k,v in self.update.items()])
+            msg = await ctx.send(text)
+        await ctx.bot.cogs['UtilitiesCog'].add_check_reaction(msg)
+        def check(reaction, user):
+            return user == ctx.author and reaction.message.id==msg.id
+        try:
+            await self.bot.wait_for('reaction_add', timeout=20.0, check=check)
+        except asyncio.TimeoutError:
+            return await ctx.send('Trop long !')
+        count = 0
+        for guild in ctx.bot.guilds:
+            channels = await ctx.bot.cogs["ServerCog"].find_staff(guild.id,'bot_news')
+            if channels==None or len(channels)==0:
+                continue
+            channels = [guild.get_channel(int(x)) for x in channels.split(';') if len(x)>5 and x.isnumeric()]
+            lang = await ctx.bot.cogs["ServerCog"].find_staff(guild.id,'language')
+            if type(lang)!=int:
+                lang = 0
+            lang = ctx.bot.cogs['LangCog'].languages[lang]
+            if lang not in self.update.keys():
+                if lang=='lolcat':
+                    lang = 'en'
+            for chan in channels:
+                try:
+                    await chan.send(self.update[lang])
+                except Exception as e:
+                    await ctx.bot.cogs['ErrorsCog'].on_error(e,ctx)
+                else:
+                    count += 1
+        for k in self.update.keys():
+            self.update[k] = None
+        await ctx.send("Message envoyé dans {} salons !".format(count))
+
 
     @main_msg.command(name="cogs",hidden=True)
     @commands.check(reloads.check_admin)
