@@ -1,6 +1,6 @@
 import discord, datetime, asyncio, logging
 
-log = logging.getLogger("runner")
+
 
 class Events:
     """Cog for the management of major events that do not belong elsewhere. Like when a new server invites the bot."""
@@ -38,10 +38,10 @@ class Events:
         """Send a log to the logging channel when the bot joins/leave a guild"""
         try:
             if Type == "join":
-                log.info("Le bot a rejoint le serveur {}".format(guild.id))
+                self.bot.log.info("Le bot a rejoint le serveur {}".format(guild.id))
                 desc = "Bot **joins the server** {}".format(guild.name)
             else:
-                log.info("Le bot a quitté le serveur {}".format(guild.id))
+                self.bot.log.info("Le bot a quitté le serveur {}".format(guild.id))
                 desc = "Bot **left the server** {}".format(guild.name)
             emb = self.bot.cogs["EmbedCog"].Embed(desc=desc,color=self.embed_colors['welcome']).update_timestamp().set_author(self.bot.user)
             await self.bot.cogs["EmbedCog"].send([emb])
