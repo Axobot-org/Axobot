@@ -255,6 +255,7 @@ You can specify a verification limit by adding a number in argument"""
             await ctx.channel.send("".join(text1).replace("¬¬","\n"))
         if ctx.bot.database_online and await self.bot.cogs["ServerCog"].staff_finder(ctx.author,'say'):
             await self.bot.cogs["UtilitiesCog"].suppr(ctx.message)
+        self.bot.log.info("{} used bigtext to say {}".format(ctx.author.id,text))
     
     @commands.command(name="shrug",hidden=True)
     @commands.check(is_fun_enabled)
@@ -270,6 +271,7 @@ You can specify a verification limit by adding a number in argument"""
     @commands.command(name="gg",hidden=True)
     @commands.check(is_fun_enabled)
     async def gg(self,ctx):
+        """Congrats! You just found something!"""
         await ctx.send(file=await self.utilities.find_img('gg.gif'))
     
     @commands.command(name="money",hidden=True)
@@ -285,6 +287,7 @@ You can specify a verification limit by adding a number in argument"""
     @commands.command(name="osekour",hidden=True)
     @commands.check(is_fun_enabled)
     async def osekour(self,ctx):
+        """Does anyone need help?"""
         l = await self.translate(ctx.guild,"fun","osekour")
         await ctx.send(random.choice(l))
 
@@ -365,7 +368,6 @@ You can specify a verification limit by adding a number in argument"""
     @commands.check(is_fun_enabled)
     async def pizza(self,ctx):
         """Hey, do U want some pizza?"""
-
         await ctx.send(file=await self.utilities.find_img('pizza.gif'))
     
     @commands.command(name="google",hidden=True)
@@ -379,6 +381,7 @@ You can specify a verification limit by adding a number in argument"""
     @commands.command(name="loading",hidden=True)
     @commands.check(is_fun_enabled)
     async def loading(self,ctx):
+        """time goes by soooo slowly..."""
         await ctx.send(file=await self.utilities.find_img('loading.gif'))
     
     @commands.command(name="thanos",hidden=True)
