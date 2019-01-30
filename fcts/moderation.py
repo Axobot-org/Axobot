@@ -403,7 +403,7 @@ class ModeratorCog:
                     await self.bot.cogs['ErrorsCog'].on_error(e,ctx)
                     pass
             reason = await self.bot.cogs["UtilitiesCog"].clear_msg(reason,everyone = not ctx.channel.permissions_for(ctx.author).mention_everyone)
-            await ctx.guild.ban(user,reason=reason)
+            await ctx.guild.ban(user,reason=reason,delete_message_days=0)
             await self.bot.cogs['Events'].add_event('ban')
             caseID = "'Unsaved'"
             if self.bot.database_online:
