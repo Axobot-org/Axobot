@@ -51,6 +51,13 @@ class AdminCog:
             l.append(str(self.bot.get_user(u)))
         await ctx.send(str(await self.translate(ctx.guild,"infos","admins-list")).format(", ".join(l)))
 
+    @commands.command(name='spoil',hidden=True)
+    @commands.check(reloads.check_admin)
+    async def send_spoiler(self,ctx,*,text):
+        """spoil spoil spoil"""
+        spoil = lambda text: "||"+"||||".join(text)+"||"
+        await ctx.send("```\n{}\n```".format(spoil(text)))
+
     @commands.command(name='msg',aliases=['tell'])
     @commands.check(reloads.check_admin)
     async def send_msg(self,ctx,user:discord.User,*,message):
@@ -333,8 +340,8 @@ class AdminCog:
                 text = file.read().split("\n")
             msg = str()
             liste = list()
-            i = 2
-            while len(liste)<=lines and i<len(text) and i<2000:
+            i = 1
+            while len(liste)<=lines and i<min(2000,len(text)):
                 i+=1
                 if (not match in text[-i]) or ctx.message.content in text[-i]:
                     continue
