@@ -264,7 +264,8 @@ modo={"slowmode-0":"The slowmode is now disabled in this channel.",
     "pin-error-3":"Oops, impossible to pin this message (do you have more than 50 pinned messages?). Error : `{}`",
     "react-clear":"I'm unable to find this message :confused:",
     "em-list":"{} (`:{}:`) added on {} {}",
-    "em-private":"[Restricted]"
+    "em-private":"[Restricted]",
+    "em-list-title":"Emojis of the server {}"
     }
 
 perms={"perms-0":"Member/role {} not found",

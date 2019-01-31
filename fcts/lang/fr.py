@@ -264,7 +264,8 @@ modo={"slowmode-0":"Le slowmode est désormais désactivé dans ce salon.",
     "pin-error-3":"Oups, impossible d'épingler ce message (Avez-vous plus de 50 messages épinglés ?). Erreur : `{}`",
     "react-clear":"Impossible de retrouver ce message :confused:",
     "em-list":"{} (`:{}:`) ajouté le {} {}",
-    "em-private":"[Restreint]"
+    "em-private":"[Restreint]",
+    "em-list-title":"Emojis du serveur {}"
     }
 
 perms={"perms-0":"Le membre/rôle {} n'a pas été trouvé",

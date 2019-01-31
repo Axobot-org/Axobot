@@ -615,6 +615,7 @@ You must be an administrator of this server to use this command."""
         date = ctx.bot.cogs['TimeCog'].date
         lang = await self.translate(ctx.guild.id,"current_lang","current")
         priv = "**"+await self.translate(ctx.guild.id,"modo","em-private")+"**"
+        title = str(await self.translate(ctx.guild.id,"modo","em-list-title")).format(ctx.guild.name)
         try:
             emotes = [structure.format(x,x.name,await date(x.created_at,lang,year=True,hour=False,digital=True),priv if len(x.roles)>0 else '') for x in ctx.guild.emojis if not x.animated]
             emotes += [structure.format(x,x.name,await date(x.created_at,lang,year=True,hour=False,digital=True),priv if len(x.roles)>0 else '') for x in ctx.guild.emojis if x.animated]
@@ -626,10 +627,10 @@ You must be an administrator of this server to use this command."""
                     l.append(x)
                 fields.append({'name':"{}-{}".format(i+1,i+10 if i+10<nbr else nbr), 'value':"\n".join(l), 'inline':False})
             if ctx.channel.permissions_for(ctx.guild.me).embed_links:
-                embed = ctx.bot.cogs['EmbedCog'].Embed(fields=fields,color=self.bot.cogs["ServerCog"].embed_color).create_footer(ctx.author)
+                embed = ctx.bot.cogs['EmbedCog'].Embed(title=title,fields=fields,color=self.bot.cogs["ServerCog"].embed_color).create_footer(ctx.author)
                 await ctx.send(embed=embed.discord_embed())
             else:
-                await ctx.send("bwaaaa")
+                await ctx.send(await self.translate(ctx.guild.id,"fun","no-embed-perms"))
         except Exception as e:
             await ctx.bot.cogs['ErrorsCog'].on_cmd_error(ctx,e)
 
