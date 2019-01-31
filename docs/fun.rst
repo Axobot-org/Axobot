@@ -68,7 +68,7 @@ This is a nice little gif to use when you want to congratulate your friend. And 
 Lmgtfy
 ------
 
-**Syntax:** :code:`lmgtfy <search>`
+**Syntax:** :code:`google <search>`
 
 Yes, that name is unpronounceable. On the other hand, commands are executed on written channels, not voice, so that's good. And, for use, refer to the website: "For all those people who find it more convenient to bother you with their question rather than search it for themselves."
 
