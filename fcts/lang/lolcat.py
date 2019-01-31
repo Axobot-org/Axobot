@@ -261,7 +261,10 @@ modo={"slowmode-0":"Teh very-cold-mode is now disabld in this nize place.",
     "emoji-renamed":"Teh emotz {} had bin renaamd!",
     "cant-pin":"Wups, I do'nt had permit to pin teh messag",
     "pin-error":"Oops, I ca't found dat msage (Error~~404~~ : `{}`)",
-    "pin-error-3":"WoOops, **im**possibl 2 pin dis mesge (doo u hav mor' tahn fYfti pinnd mesages?). Error : `{}`"
+    "pin-error-3":"WoOops, **im**possibl 2 pin dis mesge (doo u hav mor' tahn fYfti pinnd mesages?). Error : `{}`",
+    "react-clear":"I can't find dis message :confused:",
+    "em-list":"{} (`:{}:`) addd on {} {}",
+    "em-private":"[Restrictd]"
     }
 
 perms={"perms-0":"Membr/role {} not findz",

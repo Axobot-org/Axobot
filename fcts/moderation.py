@@ -595,6 +595,44 @@ You must be an administrator of this server to use this command."""
         await emoji.edit(name=emoji.name,roles=r)
         await ctx.send(str(await self.translate(ctx.guild.id,"modo","emoji-valid")).format(emoji,", ".join([x.name for x in r])))
 
+    @emoji_group.command(name="clear")
+    @commands.bot_has_permissions(manage_messages=True)
+    async def emoji_clear(self,ctx,message:int):
+        """Remove all reactions under a message"""
+        try:
+            msg = await ctx.channel.get_message(message)
+        except discord.errors.NotFound:
+            return await ctx.send(await self.translate(ctx.guild.id,"modo","react-clear"))
+        except Exception as e:
+            return await ctx.send(str(await self.translate(ctx.guild.id,"modo","pin-error")).format(e))
+        await msg.clear_reactions()
+        await ctx.message.delete()
+
+    @emoji_group.command(name="list")
+    async def emoji_list(self,ctx):
+        """List every emoji of your server"""
+        structure = await self.translate(ctx.guild.id,"modo","em-list")
+        date = ctx.bot.cogs['TimeCog'].date
+        lang = await self.translate(ctx.guild.id,"current_lang","current")
+        priv = "**"+await self.translate(ctx.guild.id,"modo","em-private")+"**"
+        try:
+            emotes = [structure.format(x,x.name,await date(x.created_at,lang,year=True,hour=False,digital=True),priv if len(x.roles)>0 else '') for x in ctx.guild.emojis if not x.animated]
+            emotes += [structure.format(x,x.name,await date(x.created_at,lang,year=True,hour=False,digital=True),priv if len(x.roles)>0 else '') for x in ctx.guild.emojis if x.animated]
+            nbr = len(emotes)
+            fields = list()
+            for i in range(0, nbr, 10):
+                l = list()
+                for x in emotes[i:i+10]:
+                    l.append(x)
+                fields.append({'name':"{}-{}".format(i+1,i+10 if i+10<nbr else nbr), 'value':"\n".join(l), 'inline':False})
+            if ctx.channel.permissions_for(ctx.guild.me).embed_links:
+                embed = ctx.bot.cogs['EmbedCog'].Embed(fields=fields,color=self.bot.cogs["ServerCog"].embed_color).create_footer(ctx.author)
+                await ctx.send(embed=embed.discord_embed())
+            else:
+                await ctx.send("bwaaaa")
+        except Exception as e:
+            await ctx.bot.cogs['ErrorsCog'].on_cmd_error(ctx,e)
+
 
 
     @commands.command(name="pin")

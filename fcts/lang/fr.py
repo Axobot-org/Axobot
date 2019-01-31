@@ -261,7 +261,10 @@ modo={"slowmode-0":"Le slowmode est désormais désactivé dans ce salon.",
     "emoji-renamed":"L'émoji {} a bien été renommé !",
     "cant-pin":"Oups, je ne dispose pas de la permission d'épingler des messages",
     "pin-error":"Oups, je n'arrive pas à retrouver ce message (Erreur : `{}`)",
-    "pin-error-3":"Oups, impossible d'épingler ce message (Avez-vous plus de 50 messages épinglés ?). Erreur : `{}`"
+    "pin-error-3":"Oups, impossible d'épingler ce message (Avez-vous plus de 50 messages épinglés ?). Erreur : `{}`",
+    "react-clear":"Impossible de retrouver ce message :confused:",
+    "em-list":"{} (`:{}:`) ajouté le {} {}",
+    "em-private":"[Restreint]"
     }
 
 perms={"perms-0":"Le membre/rôle {} n'a pas été trouvé",

@@ -261,7 +261,10 @@ modo={"slowmode-0":"The slowmode is now disabled in this channel.",
     "emoji-renamed":"The emoji {} has been renamed!",
     "cant-pin":"Oops, I don't have permission to pin messages",
     "pin-error":"Oops, I can't find that message (Error : `{}`)",
-    "pin-error-3":"Oops, impossible to pin this message (do you have more than 50 pinned messages?). Error : `{}`"
+    "pin-error-3":"Oops, impossible to pin this message (do you have more than 50 pinned messages?). Error : `{}`",
+    "react-clear":"I'm unable to find this message :confused:",
+    "em-list":"{} (`:{}:`) added on {} {}",
+    "em-private":"[Restricted]"
     }
 
 perms={"perms-0":"Member/role {} not found",
