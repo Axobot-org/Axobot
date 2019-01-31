@@ -754,22 +754,24 @@ class RssCog:
                 objs = await funct(guild,flow['link'],flow['date'])
                 self.flows[flow['link']] = objs
             if type(objs) == str or len(objs) == 0:
-                return None
+                return True
             elif type(objs) == list:
                 for o in objs:
                     guild = self.bot.get_guild(flow['guild'])
                     if guild == None:
-                        return
+                        return False
                     chan = guild.get_channel(flow['channel'])
                     o.format = flow['structure']
                     await o.fill_mention(guild,flow['roles'].split(';'),self.translate)
                     await self.send_rss_msg(o,chan)
                 await self.update_flow(flow['ID'],[('date',o.date)])
+                return True
             else:
-                return
+                return True
         except Exception as e:
             await self.bot.cogs['ErrorsCog'].senf_err_msg("Erreur rss sur le flux {} (type {} - salon {})".format(flow['link'],flow['type'],flow['channel']))
             await self.bot.cogs['ErrorsCog'].on_error(e,None)
+            return False
         
 
     async def main_loop(self,guildID=None):
@@ -785,8 +787,8 @@ class RssCog:
         for flow in liste:
             try:
                 if flow['type'] != 'mc':
-                    await self.check_flow(flow)
-                    check += 1
+                    if await self.check_flow(flow):
+                        check += 1
                 else:
                     await self.bot.cogs['McCog'].check_flow(flow)
                     check +=1
