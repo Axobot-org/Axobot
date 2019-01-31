@@ -146,12 +146,7 @@ class ModeratorCog:
             invites = 2
         else:
             invites = 1
-        #user
-        if ctx.message.mentions != []:
-            users = ctx.message.mentions
-        else:
-            users = ctx.guild.members
-        #0: does  -  2: does not  -  1: why do we care?
+        # 0: does  -  2: does not  -  1: why do we care?
         def check(m):
             i = self.bot.cogs["UtilitiesCog"].sync_check_discord_invite(m.content)
             r = self.bot.cogs["UtilitiesCog"].sync_check_any_link(m.content)
@@ -171,7 +166,10 @@ class ModeratorCog:
                 if (i == None and invites==2) or (i != None and invites==0):
                     c4 = False
             #return ((m.pinned == pinned) or ((m.attachments != []) == files) or ((r != None) == links)) and m.author in users
-            return c1 and c2 and c3 and c4 and m.author in users
+            if ctx.message.mentions != []:
+                return c1 and c2 and c3 and c4 and m.author in ctx.message.mentions
+            else:
+                return c1 and c2 and c3 and c4
         await ctx.message.delete()
         deleted = await ctx.channel.purge(limit=number, check=check)
         await ctx.send(str(await self.translate(ctx.guild,"modo","clear-0")).format(len(deleted)),delete_after=2.0)
