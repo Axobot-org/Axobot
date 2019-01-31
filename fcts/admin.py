@@ -7,18 +7,6 @@ from fcts import reloads
 importlib.reload(reloads)
 
 
-
-# async def check_admin(ctx):
-#         if type(ctx) == commands.Context:
-#             user = ctx.author
-#         else:
-#             user = ctx
-#         if type(user) == str and user.isnumeric():
-#             user = int(user)
-#         elif type(user) != int:
-#             user = user.id
-#         return user in reloads.admins_id
-
 def cleanup_code(content):
     """Automatically removes code blocks from the code."""
     # remove ```py\n```
