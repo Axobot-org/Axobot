@@ -86,7 +86,7 @@ class RssCog:
 
 
     class rssMessage:
-        def __init__(self,bot,Type,url,title,emojis,date=datetime.datetime.now(),author=None,Format=None,channel=""):
+        def __init__(self,bot,Type,url,title,emojis,date=datetime.datetime.now(),author=None,Format=None,channel="",retweeted_by=None):
             self.bot = bot
             self.Type = Type
             self.url = url
@@ -111,6 +111,7 @@ class RssCog:
                 self.logo = ':newspaper:'
             self.channel = channel
             self.mentions = []
+            self.rt_by = retweeted_by
             if self.author == None:
                 self.author = channel
         
@@ -130,14 +131,16 @@ class RssCog:
                 self.mentions = r
             return self
 
-        async def create_msg(self,fct,language,Format=None):
+        async def create_msg(self,language,Format=None):
             if Format == None:
                 Format = self.format
             if not isinstance(self.date,str):
-                d = await fct(self.date,lang=language,year=False,hour=True,digital=True)
+                d = await self.bot.cogs["TimeCog"].date(self.date,lang=language,year=False,hour=True,digital=True)
             else:
                 d = self.date
             Format = Format.replace('\\n','\n')
+            if self.rt_by!=None:
+                self.author = "{} (retweeted by @{})".format(self.author,self.rt_by)
             return Format.format_map(self.bot.SafeDict(channel=self.channel,title=self.title,date=d,url=self.url,link=self.url,mentions=", ".join(self.mentions),logo=self.logo,author=self.author))
 
 
@@ -159,7 +162,7 @@ class RssCog:
             await ctx.send(text)
         else:
             form = await self.translate(ctx.guild,"rss","yt-form-last")
-            await ctx.send(await text[0].create_msg(self.date,await self.translate(ctx.guild,"current_lang","current"),form))
+            await ctx.send(await text[0].create_msg(await self.translate(ctx.guild,"current_lang","current"),form))
 
     @rss_main.command(name='twitter',aliases=['tw'])
     async def request_tw(self,ctx,name):
@@ -174,7 +177,7 @@ class RssCog:
             await ctx.send(text)
         else:
             form = await self.translate(ctx.guild,"rss","tw-form-last")
-            await ctx.send(await text[0].create_msg(self.date,await self.translate(ctx.guild,"current_lang","current"),form))
+            await ctx.send(await text[0].create_msg(await self.translate(ctx.guild,"current_lang","current"),form))
 
     @rss_main.command(name="web")
     async def request_web(self,ctx,link):
@@ -186,7 +189,7 @@ class RssCog:
             await ctx.send(text)
         else:
             form = await self.translate(ctx.guild,"rss","web-form-last")
-            await ctx.send(await text[0].create_msg(self.date,await self.translate(ctx.guild,"current_lang","current"),form))
+            await ctx.send(await text[0].create_msg(await self.translate(ctx.guild,"current_lang","current"),form))
 
     @rss_main.command(name="add")
     @commands.guild_only()
@@ -582,7 +585,11 @@ class RssCog:
                 t = feed['title'].replace(r.group(1),'')
             else:
                 t = feed['title']
-            obj = self.rssMessage(bot=self.bot,Type='tw',url=feed['link'],title=t,emojis=self.bot.cogs['EmojiCog'].customEmojis,date=feed['published_parsed'],author=feed['author'],channel=feeds.feed['title'])
+            author = feed['author'].replace('(','').replace(')','')
+            rt = None
+            if author.replace('@','') not in url:
+                rt = url.split("=")[1]
+            obj = self.rssMessage(bot=self.bot,Type='tw',url=feed['link'],title=t,emojis=self.bot.cogs['EmojiCog'].customEmojis,date=feed['published_parsed'],author=author,retweeted_by=rt,channel=feeds.feed['title'])
             return [obj]
         else:
             liste = list()
@@ -731,7 +738,7 @@ class RssCog:
 
     async def send_rss_msg(self,obj,channel):
         if not channel == None:
-            t = await obj.create_msg(self.date,await self.translate(channel.guild,"current_lang","current"))
+            t = await obj.create_msg(await self.translate(channel.guild,"current_lang","current"))
             try:
                 await channel.send(t)
             except Exception as e:
