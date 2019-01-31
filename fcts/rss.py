@@ -1,6 +1,7 @@
-import discord, feedparser, datetime, time, re, asyncio, mysql, random, typing
+import discord, feedparser, datetime, time, re, asyncio, mysql, random, typing, importlib
 from discord.ext import commands
-from fcts import cryptage, tokens
+from fcts import cryptage, tokens, reloads
+importlib.reload(reloads)
 
 # secure_keys = dict()
 # with open('fcts/requirements','r') as file:
@@ -518,6 +519,61 @@ class RssCog:
         except Exception as e:
             await ctx.send(str(await self.translate(ctx.guild.id,"rss","guild-error")).format(e))
 
+    @rss_main.command(name="test")
+    @commands.check(reloads.check_admin)
+    async def test_rss(self,ctx,url,*,args=None):
+        """Test if an rss feed is usable"""
+        try:
+            feeds = feedparser.parse(url)
+            txt = "feeds.keys()\n```py\n{}\n```feeds.feed\n```py\n{}\n```".format(feeds.keys(),feeds.feed)
+            if len(feeds.entries)>0:
+                if len(str(feeds.entries[0]))<2000-len(txt):
+                    txt += "feeds.entries[0]\n```py\n{}\n```".format(feeds.entries[0])
+                else:
+                    txt += "feeds.entries[0].keys()\n```py\n{}\n```".format(feeds.entries[0].keys())
+            if args != None and 'feeds' in args and 'ctx' not in args:
+                txt += "\n{}\n```py\n{}\n```".format(args,eval(args))
+            await ctx.send(txt)
+            if args==None:
+                ok = '<:greencheck:513105826555363348>'
+                notok = '<:redcheck:513105827817717762>'
+                nothing = '<:_nothing:446782476375949323>'
+                txt = ['**__Analyse :__**','']
+                yt = await self.parse_yt_url(url)
+                if yt==None:
+                    tw = await self.parse_tw_url(url)
+                    if tw!=None:
+                        txt.append("<:twitter:437220693726330881>  "+tw)
+                    else:
+                        txt.append(":newspaper:  <"+feeds.feed['link']+'>')
+                else:
+                    txt.append("<:youtube:447459436982960143>  "+yt)
+                txt.append("Entrées : {}".format(len(feeds.entries)))
+                if len(feeds.entries)>0:
+                    entry = feeds.entries[0]
+                    if 'title' in entry.keys():
+                        txt.append(nothing+ok+" title: ")
+                        if len(entry['title'].split('\n'))>1:
+                            txt[-1] += entry['title'].split('\n')[0]+"..."
+                        else:
+                            txt[-1] += entry['title']
+                    else:
+                        txt.append(nothing+notok+' title')
+                    if 'published_parsed' in entry.keys():
+                        txt.append(nothing+ok+" published_parsed")
+                    elif 'published' in entry.keys():
+                        txt.append(nothing+ok+" published")
+                    elif 'updated_parsed' in entry.keys():
+                        txt.append(nothing+ok+" updated_parsed")
+                    else:
+                        txt.append(nothing+notok+' date')
+                    if 'author' in entry.keys():
+                        txt.append(nothing+ok+" author: "+entry['author'])
+                    else:
+                        txt.append(nothing+notok+' author')
+                await ctx.send("\n".join(txt))
+        except Exception as e:
+            await ctx.bot.cogs['ErrorsCog'].on_cmd_error(ctx,e)
 
     async def parse_yt_url(self,url):
         r = r'(?:http.*://)?(?:www.)?(?:youtube.com|youtu.be)(?:/channel/|/user/)(.+)'
@@ -619,7 +675,6 @@ class RssCog:
         if published!=None:
             while feeds.entries[0][published] < feeds.entries[1][published]:
                 del feeds.entries[0]
-            
         if not date or published == 'published':
             feed = feeds.entries[0]
             if published==None:
