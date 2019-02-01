@@ -1,4 +1,4 @@
-import discord, random, operator, string, importlib, timeout_decorator, re, typing, datetime, subprocess
+import discord, random, operator, string, importlib, re, typing, datetime, subprocess
 import emoji as emojilib
 from discord.ext import commands
 from fcts import emoji
