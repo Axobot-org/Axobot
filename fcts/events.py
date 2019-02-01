@@ -50,7 +50,6 @@ class Events:
 
 
     async def on_new_message(self,msg):
-        print(msg.content)
         if msg.guild == None:
             await self.send_mp(msg)
         else:
