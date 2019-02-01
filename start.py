@@ -211,7 +211,7 @@ def main():
         if not client.database_online:
             await client.change_presence(activity=discord.Activity(type=discord.ActivityType.listening,name=choice(["a signal",'a sign of life','nothing','a signal','a lost database'])))
         elif r=='1':
-            await client.change_presence(activity=discord.Game(name=choice(["entrer !help","something","entrer !help","entrer !help"])))
+            await client.change_presence(activity=discord.Game(name=choice(["entrer !help","something","type !help","type !help"])))
         elif r=='2':
             await client.change_presence(activity=discord.Game(name=choice(["SNAPSHOOT","snapshot day","somethin iz brokn"])))
         emb = client.cogs["EmbedCog"].Embed(desc="Bot **{} is launching** !".format(client.user.name),color=8311585).update_timestamp()
