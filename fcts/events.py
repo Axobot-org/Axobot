@@ -50,6 +50,7 @@ class Events:
 
 
     async def on_new_message(self,msg):
+        print(msg.content)
         if msg.guild == None:
             await self.send_mp(msg)
         else:
@@ -64,7 +65,7 @@ class Events:
             if self.bot.database_online:
                 cond = str(await self.bot.cogs["ServerCog"].find_staff(msg.guild,"anti_caps_lock")) in ['1','True']
             if cond:
-                if sum(1 for c in msg.content if c.isupper())/len(msg.content) > 0.75 and len(msg.content)>7:
+                if len(msg.content)>0 and sum(1 for c in msg.content if c.isupper())/len(msg.content.replace('|','')) > 0.75 and len(msg.content.replace('|',''))>7:
                     try:
                         await msg.channel.send(str(await self.bot.cogs["LangCog"].tr(msg.guild,"modo","caps-lock")).format(msg.author.mention),delete_after=4.0)
                     except:
