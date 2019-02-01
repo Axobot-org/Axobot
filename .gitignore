@@ -4,6 +4,7 @@ __pycache__
 fcts/tokens.py
 fcts/cryptage.py
 fcts/test.py
+fcts/libs_testing.py
 start2.py
 
 # Mac folders
