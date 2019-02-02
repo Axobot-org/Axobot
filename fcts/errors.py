@@ -42,8 +42,12 @@ class ErrorsCog:
                     if r == None:
                         r = re.search(r'User \"([^\"]+)\" not found',str(error))
                         if r==None:
-                            print('errors -',error)
-                            return
+                            r = re.search(r'Invalid duration: ([^\" ]+)',str(error))
+                            if r==None:
+                                print('errors -',error)
+                                return
+                            else:
+                                await ctx.send(str(await self.translate(ctx.guild,'errors','duration')).format(r.group(1)))
                         else:
                             await ctx.send(str(await self.translate(ctx.guild,'errors','usernotfound')).format(r.group(1)))
                     else:
