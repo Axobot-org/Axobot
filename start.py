@@ -130,7 +130,8 @@ def main():
                       'fcts.bvn',
                       'fcts.emoji',
                       'fcts.embeds',
-                      'fcts.events'
+                      'fcts.events',
+                      'fcts.timed'
     ]
     # Suppression du fichier debug.log s'il est trop volumineux
     if os.path.exists("debug.log"):
@@ -169,23 +170,6 @@ def main():
             print(f'\nFailed to load extension {extension}', file=sys.stderr)
             traceback.print_exc()
             count += 1
-    if count >0:
-        if not client.database_online:
-            raise Exception("\n{} modules not loaded".format(count))
-        else:
-            count = 0
-            client.database_online = False
-        for extension in initial_extensions:
-            try:
-                client.unload_extension(extension)
-            except Exception as e:
-                print("••••• ",e)
-            try:
-                client.load_extension(extension.replace('fcts','fctshl'))
-            except:
-                print(f'\nFailed to load extension {extension}', file=sys.stderr)
-                traceback.print_exc()
-                count += 1
         if count >0:
             raise Exception("\n{} modules not loaded".format(count))
     del count
