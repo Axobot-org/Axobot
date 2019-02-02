@@ -1,6 +1,6 @@
 
 count = 0
-for m in ["timeout_decorator","mysql","discord","frmc_lib","requests","re","asyncio","feedparser","datetime","time","importlib","traceback","sys"]:
+for m in ["mysql","discord","frmc_lib","requests","re","asyncio","feedparser","datetime","time","importlib","traceback","sys"]:
     try:
         exec("import "+m)
     except ModuleNotFoundError:
@@ -10,7 +10,7 @@ if count>0:
     raise
 
 
-import timeout_decorator, mysql, discord, frmc_lib, requests, re, asyncio, feedparser, datetime, time, importlib, traceback, sys
+import  mysql, discord, frmc_lib, requests, re, asyncio, feedparser, datetime, time, importlib, traceback, sys
 
 
 #Test traceback / sys :
@@ -23,16 +23,6 @@ Traceback (most recent call last):
     except Exception as e:
         print(e)
 
-#Test timeout_decorator :
-@timeout_decorator.timeout(3)
-def infinite_loop():
-    while True:
-        pass
-def test_timeout():
-    try:
-        infinite_loop()
-    except timeout_decorator.timeout_decorator.TimeoutError:
-        print("Success")
 
 #test discord :
 def test_discord():
@@ -79,8 +69,6 @@ def test_asyncio():
 def main():
     print("Test 1 - traceback/sys")
     test_error(KeyError)
-    print("\nTest 2 - timeout_decorator")
-    test_timeout()
     print("\nTest 3 - discord")
     test_discord()
     print("\nTest 4 - importlib")
