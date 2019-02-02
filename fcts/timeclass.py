@@ -41,11 +41,18 @@ class TimeCog:
             else:
                 self.seconds = round(seconds,self.precision)
 
-    async def time_delta(self,date1,date2,lang='fr',year=False,hour=True,digital=False,precision=2):
+    async def time_delta(self,date1,date2=None,lang='fr',year=False,hour=True,form='developed',precision=2):
         """Traduit un intervale de deux temps datetime.datetime en chaine de caractère lisible"""
-        delta = abs(date2 - date1)
-        t = await self.time_interval(delta,precision)
-        if digital:
+        if date2!=None:
+            if type(date2)==datetime.datetime:
+                delta = abs(date2 - date1)
+                t = await self.time_interval(delta,precision)
+            else:
+                raise ValueError
+        else:
+            t = self.timedelta(total_seconds=date1,precision=precision)
+            t.set_from_seconds()
+        if form=='digital':
             if hour:
                 h = "{}:{}:{}".format(t.hours,t.minutes,t.seconds)
             else:
@@ -54,6 +61,23 @@ class TimeCog:
                 text = '{}/{}{} {}'.format(t.days,t.months,"/"+str(t.years) if year else '',h)
             else:
                 text = '{}/{}{} {}'.format(t.months,t.days,"/"+str(t.years) if year else '',h)
+        elif form=='temp':
+            text = str()
+            if t.days+t.months*30.41>0:
+                d = round(t.days+t.months*30.41)
+                if not year:
+                    d += t.years*3.154e+7
+                text += str(d)+'d '
+            if year and t.years>0:
+                text += str(t.years)+'y '
+            if hour:
+                if t.hours>0:
+                    text += str(t.hours)+'h '
+                if t.minutes>0:
+                    text += str(t.minutes)+'m '
+                if t.seconds>0:
+                    text += str(t.seconds)+'s '
+            text = text.strip()
         else:
             text = str()
             if lang == 'fr':
