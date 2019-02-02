@@ -152,7 +152,7 @@ If the bot can't send the new command format, it will try to send the old one.""
                 else:
                     continue
             temp = await self.display_cmd(cmd)
-            if cmd.cog_name in ['AdminCog','ServerCog','ModeratorCog','CasesCog','ReloadsCog']:
+            if cmd.cog_name in ['AdminCog','ServerCog','ModeratorCog','CasesCog','ReloadsCog','TimedCog']:
                 modhelp += "\n"+temp
             else:
                 otherhelp += "\n"+temp
