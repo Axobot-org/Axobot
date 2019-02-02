@@ -51,8 +51,8 @@ class InfosCog:
                 for line in file.read().split("\n"):
                     if len(line.strip())>2 and line[0]!='#':
                         count += 1
-            for cog in self.bot.cogs.values():
-                with open('fcts/'+cog.file+'.py','r') as file:
+            for file in [x.file for x in self.bot.cogs.values()]+['args']:
+                with open('fcts/'+file+'.py','r') as file:
                     for line in file.read().split("\n"):
                         if len(line.strip())>2 and line[0]!='#':
                             count += 1
