@@ -58,7 +58,8 @@ errors={"cooldown":"Vous êtes en cooldown pour cette commande. Veuillez attendr
 "missingargument":"Oups, il manque l'argument \"{}\" {}",
 "membernotfound":"Impossible de trouver le membre `{}` :confused:",
 "usernotfound":"Impossible de trouver l'utilisateur `{}` :confused:",
-"disabled":"La commande {} est désactivée"}
+"disabled":"La commande {} est désactivée",
+"duration":"La durée `{}` est invalide"}
 
 find={"user-0":"Nom : {}\nID : {}",
 "user-1":"Nom : {}\nID : {}\nServeurs : {}\nLangues : {}",
@@ -174,7 +175,8 @@ logs={"slowmode-enabled":"Slowmode activé dans le salon {channel} ({seconds}s)"
 "mute-on":"{member} est maintenant muet (raison : {reason} | casier #{case})",
 "mute-off":"{member} n'est plus muet",
 "softban":"{member} a été 'softban' (raison : {reason} | casier #{case})",
-"warn":"{member} a reçu un avertissement : {reason} (casier #{case})"}
+"warn":"{member} a reçu un avertissement : {reason} (casier #{case})",
+"tempmute-on":"{member} est maintenant muet pour {duration} (raison : {reason} | casier #{case})",}
 
 mc={"contact-mail":"Si vous constatez une erreur dans les informations données, merci de me contacter rapidement, ou de rapporter l'erreur directement [sur le site](https://fr-minecraft.net).",
     "serv-title":"Informations du serveur {}",
@@ -265,7 +267,8 @@ modo={"slowmode-0":"Le slowmode est désormais désactivé dans ce salon.",
     "react-clear":"Impossible de retrouver ce message :confused:",
     "em-list":"{} (`:{}:`) ajouté le {} {}",
     "em-private":"[Restreint]",
-    "em-list-title":"Emojis du serveur {}"
+    "em-list-title":"Emojis du serveur {}",
+    "tempmute-1":"Le membre {} a bien été réduit au silence pour la raison `{}`, pendant {} !",
     }
 
 perms={"perms-0":"Le membre/rôle {} n'a pas été trouvé",
