@@ -210,7 +210,7 @@ class ModeratorCog:
             if self.bot.database_online:
                 CasesCog = self.bot.cogs['CasesCog']
                 caseIDs = await CasesCog.get_ids()
-                case = CasesCog.Case(guildID=ctx.guild.id,memberID=user.id,Type="kick",ModID=ctx.author.id,Reason=reason,date=datetime.datetime.now()).create_id(caseIDs)
+                case = CasesCog.Case(bot=self.bot,guildID=ctx.guild.id,memberID=user.id,Type="kick",ModID=ctx.author.id,Reason=reason,date=datetime.datetime.now()).create_id(caseIDs)
                 try:
                     await CasesCog.add_case(case)
                     caseID = case.id
@@ -255,7 +255,7 @@ class ModeratorCog:
             if self.bot.database_online:
                 CasesCog = self.bot.cogs['CasesCog']
                 caseIDs = await CasesCog.get_ids()
-                case = CasesCog.Case(guildID=ctx.guild.id,memberID=user.id,Type="warn",ModID=ctx.author.id,Reason=message,date=datetime.datetime.now()).create_id(caseIDs)
+                case = CasesCog.Case(bot=self.bot,guildID=ctx.guild.id,memberID=user.id,Type="warn",ModID=ctx.author.id,Reason=message,date=datetime.datetime.now()).create_id(caseIDs)
                 caseID = "'Unsaved'"
                 try:
                     await CasesCog.add_case(case)
@@ -308,7 +308,7 @@ class ModeratorCog:
             if self.bot.database_online:
                 CasesCog = self.bot.cogs['CasesCog']
                 caseIDs = await CasesCog.get_ids()
-                case = CasesCog.Case(guildID=ctx.guild.id,memberID=user.id,Type="mute",ModID=ctx.author.id,Reason=reason,date=datetime.datetime.now()).create_id(caseIDs)
+                case = CasesCog.Case(bot=self.bot,guildID=ctx.guild.id,memberID=user.id,Type="mute",ModID=ctx.author.id,Reason=reason,date=datetime.datetime.now()).create_id(caseIDs)
                 try:
                     await CasesCog.add_case(case)
                     caseID = case.id
@@ -407,7 +407,7 @@ class ModeratorCog:
             if self.bot.database_online:
                 CasesCog = self.bot.cogs['CasesCog']
                 caseIDs = await CasesCog.get_ids()
-                case = CasesCog.Case(guildID=ctx.guild.id,memberID=user.id,Type="ban",ModID=ctx.author.id,Reason=reason,date=datetime.datetime.now()).create_id(caseIDs)
+                case = CasesCog.Case(bot=self.bot,guildID=ctx.guild.id,memberID=user.id,Type="ban",ModID=ctx.author.id,Reason=reason,date=datetime.datetime.now()).create_id(caseIDs)
                 try:
                     await CasesCog.add_case(case)
                     caseID = case.id
@@ -455,7 +455,7 @@ class ModeratorCog:
             if self.bot.database_online:
                 CasesCog = self.bot.cogs['CasesCog']         
                 caseIDs = await CasesCog.get_ids()
-                case = CasesCog.Case(guildID=ctx.guild.id,memberID=user.id,Type="unban",ModID=ctx.author.id,Reason=reason,date=datetime.datetime.now()).create_id(caseIDs)
+                case = CasesCog.Case(bot=self.bot,guildID=ctx.guild.id,memberID=user.id,Type="unban",ModID=ctx.author.id,Reason=reason,date=datetime.datetime.now()).create_id(caseIDs)
                 try:
                     await CasesCog.add_case(case)
                     caseID = case.id
@@ -503,7 +503,7 @@ class ModeratorCog:
             if self.bot.database_online:
                 CasesCog = self.bot.cogs['CasesCog']
                 caseIDs = await CasesCog.get_ids()
-                case = CasesCog.Case(guildID=ctx.guild.id,memberID=user.id,Type="softban",ModID=ctx.author.id,Reason=reason,date=datetime.datetime.now()).create_id(caseIDs)
+                case = CasesCog.Case(bot=self.bot,guildID=ctx.guild.id,memberID=user.id,Type="softban",ModID=ctx.author.id,Reason=reason,date=datetime.datetime.now()).create_id(caseIDs)
                 try:
                     await CasesCog.add_case(case)
                     caseID = case.id
