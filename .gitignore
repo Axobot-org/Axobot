@@ -5,6 +5,7 @@ fcts/tokens.py
 fcts/cryptage.py
 fcts/test.py
 fcts/libs_testing.py
+fcts/requirements
 start2.py
 
 # Mac folders
