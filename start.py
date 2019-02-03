@@ -24,6 +24,7 @@ if check_libs():
     from fcts import cryptage, tokens
 else:
     print("Fin de l'exécution")
+    sys.exit()
 
 
 def setup_logger():
