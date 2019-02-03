@@ -85,11 +85,16 @@ class AdminCog:
     @commands.check(reloads.check_admin)
     async def send_faq(self,ctx):
         """Envoie les messages du salon <#541228784456695818> vers le salon <#508028818154323980>"""
-        destination = ctx.guild.get_channel(508028818154323980)
-        chan = ctx.guild.get_channel(541228784456695818)
-        await destination.purge()
-        async for message in chan.history(limit=200,reverse=True):
-            await destination.send(message.content)
+        destination_fr = ctx.guild.get_channel(508028818154323980)
+        destination_en = ctx.guild.get_channel(541599345972346881)
+        chan_fr = ctx.guild.get_channel(541228784456695818)
+        chan_en = ctx.guild.get_channel(541599226623426590)
+        await destination_fr.purge()
+        await destination_en.purge()
+        async for message in chan_fr.history(limit=200,reverse=True):
+            await destination_fr.send(message.content)
+        async for message in chan_en.history(limit=200,reverse=True):
+            await destination_en.send(message.content)
         await ctx.bot.cogs['UtilitiesCog'].add_check_reaction(ctx.message)
 
 
