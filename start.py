@@ -232,13 +232,16 @@ def main():
 
 
     if client.database_online:
-        r=input("Quel bot activer ? (1 release, 2 snapshot, 3 autre) ")
+        r=input("Quel bot activer ? (1 release, 2 snapshot, 3 redbot, 4 autre) ")
         if r=='1':
             token = tokens.get_token(client,486896267788812288)
         elif r=='2':
             token = tokens.get_token(client,436835675304755200)
             client.beta = True
         elif r=='3':
+            token = tokens.get_token(client,541740438953132032)
+            client.beta = True
+        elif r=='4':
             token = input("Token?\n> ")
         else:
             return
