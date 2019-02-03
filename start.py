@@ -3,7 +3,7 @@
 
 def check_libs():
     count = 0
-    for m in ["mysql","discord","frmc_lib","requests","re","asyncio","feedparser","datetime","time","importlib","traceback","sys","logging","sympy","psutil","platform","subprocess"]:
+    for m in ["mysql","discord","frmc_lib","requests","re","asyncio","feedparser","datetime","time","importlib","traceback","sys","logging","sympy","psutil","platform","subprocess","resource"]:
         try:
             exec("import "+m)
             exec("del "+m)
