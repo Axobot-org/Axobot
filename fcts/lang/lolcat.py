@@ -58,7 +58,8 @@ errors={"cooldown":"Yu are on cold-own for dis comandZ :confused: Plize wait {} 
 "missingargument":"Oops, te argumnt \"{}\" are missin {}",
 "membernotfound":"Unabl to found the membr `{}` :confused:",
 "usernotfound":"Unabled 2 find teh userZ `{}` :confused:",
-"disabled":"Da {} cmd is dizabled :confused:"}
+"disabled":"Da {} cmd is dizabled :confused:",
+"duration":"Invalid timer: `{}`"}
 
 find={"user-0":"naym: {}\nID: {}",
 "user-1":"Naym: {}\nID: {}\nServers: {}\nSpeak: {}",
@@ -174,7 +175,8 @@ logs={"slowmode-enabled":"Slwmod enable in {channel} ({seconds}s)",
 "mute-on":"{member} Is know mwuted (reason : {reason} | kase #{case})",
 "mute-off":"{member} is not more mutd",
 "softban":"{member} had beeen 'softBAnnnnned' (reasun: {reason} | caz #{case})",
-"warn":"{member} had been warner: {reason} (case #{case})"}
+"warn":"{member} had been warner: {reason} (case #{case})",
+"tempmute-on":"{member} is naw muted 4 {duration} (reason : {reason} | caz #{case})"}
 
 mc={"contact-mail":"If U notis an errrror in da info providd, plz contact my personale, or report teh errer directlly [with the nice website](https://fr-minecraft.net).",
     "serv-title":"Servr info {}",
@@ -261,7 +263,12 @@ modo={"slowmode-0":"Teh very-cold-mode is now disabld in this nize place.",
     "emoji-renamed":"Teh emotz {} had bin renaamd!",
     "cant-pin":"Wups, I do'nt had permit to pin teh messag",
     "pin-error":"Oops, I ca't found dat msage (Error~~404~~ : `{}`)",
-    "pin-error-3":"WoOops, **im**possibl 2 pin dis mesge (doo u hav mor' tahn fYfti pinnd mesages?). Error : `{}`"
+    "pin-error-3":"WoOops, **im**possibl 2 pin dis mesge (doo u hav mor' tahn fYfti pinnd mesages?). Error : `{}`",
+    "react-clear":"I can't find dis message :confused:",
+    "em-list":"{} (`:{}:`) addd on {} {}",
+    "em-private":"[Restrictd]",
+    "em-list-title":"Emojis of our super server",
+    "tempmute-1":"Da member {} is muted 4 the raeson `{}`, for {}!"
     }
 
 perms={"perms-0":"Membr/role {} not findz",
@@ -407,6 +414,7 @@ stats_infos={"not-found":"Unable 2 found {}",
             "emoji-0":"Animate",
             "emoji-1":"Managd by Twiitch",
             "emoji-2":"String (4 roboats)",
+            "emoji-3":"Good server who haz this",
             "textchan-0":"Catègoryz",
             "textchan-1":"Descripshun",
             "textchan-2":"Nut 4 kIdz (NSFVV)",

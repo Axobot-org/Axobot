@@ -3,7 +3,7 @@
 
 def check_libs():
     count = 0
-    for m in ["timeout_decorator","mysql","discord","frmc_lib","requests","re","asyncio","feedparser","datetime","time","importlib","traceback","sys","logging","sympy","psutil","platform","subprocess"]:
+    for m in ["mysql","discord","frmc_lib","requests","re","asyncio","feedparser","datetime","time","importlib","traceback","sys","logging","sympy","psutil","platform","subprocess"]:
         try:
             exec("import "+m)
             exec("del "+m)
@@ -23,7 +23,9 @@ if check_libs():
     from discord.ext import commands
     from fcts import cryptage, tokens
 else:
+    import sys
     print("Fin de l'exécution")
+    sys.exit()
 
 
 def setup_logger():
@@ -130,7 +132,8 @@ def main():
                       'fcts.bvn',
                       'fcts.emoji',
                       'fcts.embeds',
-                      'fcts.events'
+                      'fcts.events',
+                      'fcts.timed'
     ]
     # Suppression du fichier debug.log s'il est trop volumineux
     if os.path.exists("debug.log"):
@@ -169,23 +172,6 @@ def main():
             print(f'\nFailed to load extension {extension}', file=sys.stderr)
             traceback.print_exc()
             count += 1
-    if count >0:
-        if not client.database_online:
-            raise Exception("\n{} modules not loaded".format(count))
-        else:
-            count = 0
-            client.database_online = False
-        for extension in initial_extensions:
-            try:
-                client.unload_extension(extension)
-            except Exception as e:
-                print("••••• ",e)
-            try:
-                client.load_extension(extension.replace('fcts','fctshl'))
-            except:
-                print(f'\nFailed to load extension {extension}', file=sys.stderr)
-                traceback.print_exc()
-                count += 1
         if count >0:
             raise Exception("\n{} modules not loaded".format(count))
     del count
@@ -211,7 +197,7 @@ def main():
         if not client.database_online:
             await client.change_presence(activity=discord.Activity(type=discord.ActivityType.listening,name=choice(["a signal",'a sign of life','nothing','a signal','a lost database'])))
         elif r=='1':
-            await client.change_presence(activity=discord.Game(name=choice(["entrer !help","something","entrer !help","entrer !help"])))
+            await client.change_presence(activity=discord.Game(name=choice(["entrer !help","something","type !help","type !help"])))
         elif r=='2':
             await client.change_presence(activity=discord.Game(name=choice(["SNAPSHOOT","snapshot day","somethin iz brokn"])))
         emb = client.cogs["EmbedCog"].Embed(desc="Bot **{} is launching** !".format(client.user.name),color=8311585).update_timestamp()
@@ -248,13 +234,16 @@ def main():
 
 
     if client.database_online:
-        r=input("Quel bot activer ? (1 release, 2 snapshot, 3 autre) ")
+        r=input("Quel bot activer ? (1 release, 2 snapshot, 3 redbot, 4 autre) ")
         if r=='1':
             token = tokens.get_token(client,486896267788812288)
         elif r=='2':
             token = tokens.get_token(client,436835675304755200)
             client.beta = True
         elif r=='3':
+            token = tokens.get_token(client,541740438953132032)
+            client.beta = True
+        elif r=='4':
             token = input("Token?\n> ")
         else:
             return

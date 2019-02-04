@@ -28,13 +28,15 @@ class CasesCog:
         self.table = 'cases_beta' if self.bot.beta else 'cases'
 
     class Case:
-        def __init__(self,guildID,memberID,Type,ModID,Reason,date,caseID=None):
+        def __init__(self,bot,guildID,memberID,Type,ModID,Reason,date,duration=-1,caseID=None):
+            self.bot = bot
             self.guild = guildID
             self.id = caseID
             self.user = memberID
             self.type = Type
             self.mod = ModID
             self.reason = Reason
+            self.duration = duration
             if date == None:
                 self.date = "Unknown"
             else:
@@ -47,7 +49,7 @@ class CasesCog:
                 self.id = max(liste)+1
             return self
 
-        def display(self,bot,display_guild=False):
+        async def display(self,bot,display_guild=False):
             u = bot.get_user(self.user)
             if u == None:
                 u = self.user
@@ -67,6 +69,8 @@ class CasesCog:
 **Moderator:** {}
 **Date:** {}
 **Reason:** *{}*""".format(self.type,u,self.mod,self.date,self.reason)
+            if self.duration>0:
+                text += "\nDuration: {}".format(await self.bot.cogs['TimeCog'].time_delta(self.duration,lang='en',form='temp'))
             return text
 
 
@@ -106,7 +110,7 @@ class CasesCog:
         liste = list()
         if len(columns)==0:
             for x in cursor:
-                liste.append(self.Case(guildID=x['guild'],caseID=x['ID'],memberID=x['user'],Type=x['type'],ModID=x['mod'],date=x['created_at'],Reason=x['reason']))
+                liste.append(self.Case(bot=self.bot,guildID=x['guild'],caseID=x['ID'],memberID=x['user'],Type=x['type'],ModID=x['mod'],date=x['created_at'],Reason=x['reason']))
         else:
             for x in cursor:
                 liste.append(x)
@@ -135,7 +139,7 @@ class CasesCog:
             raise ValueError
         cnx = self.connect()
         cursor = cnx.cursor()
-        query = ("INSERT INTO `{}` (`ID`, `guild`, `user`, `type`, `mod`, `reason`) VALUES ('{}', '{}', '{}', '{}', '{}', \"\"\"{}\"\"\")".format(self.table,case.id,case.guild,case.user,case.type,case.mod,case.reason))
+        query = ("INSERT INTO `{}` (`ID`, `guild`, `user`, `type`, `mod`, `reason`,`duration`) VALUES ('{}', '{}', '{}', '{}', '{}', \"\"\"{}\"\"\",'{}')".format(self.table,case.id,case.guild,case.user,case.type,case.mod,case.reason,case.duration))
         cursor.execute(query)
         cnx.commit()
         cnx.close()
@@ -229,7 +233,7 @@ class CasesCog:
                 if len(cases)>0:
                     text = str(await self.translate(ctx.guild.id,"cases","cases-0")).format(len(cases),1,len(cases))+"\n"
                     for e,x in enumerate(cases):
-                        text += "```{}\n```".format(x.display(self.bot,True).replace('*',''))
+                        text += "```{}\n```".format(await x.display(self.bot,True).replace('*',''))
                         if len(text)>1800:
                             await ctx.send(text)
                             last_case = e+2

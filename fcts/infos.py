@@ -51,8 +51,8 @@ class InfosCog:
                 for line in file.read().split("\n"):
                     if len(line.strip())>2 and line[0]!='#':
                         count += 1
-            for cog in self.bot.cogs.values():
-                with open('fcts/'+cog.file+'.py','r') as file:
+            for file in [x.file for x in self.bot.cogs.values()]+['args']:
+                with open('fcts/'+file+'.py','r') as file:
                     for line in file.read().split("\n"):
                         if len(line.strip())>2 and line[0]!='#':
                             count += 1
@@ -302,12 +302,15 @@ Available types: member, role, user, emoji, channel, guild, invite, category"""
         else:
             manage = await self.translate(ctx.guild.id,"keywords","non")
         embed = discord.Embed(colour=default_color, timestamp=ctx.message.created_at)
+        embed.set_thumbnail(url=item.url)
         embed.set_author(name="Emoji '{}'".format(item.name), icon_url=item.url)
         embed.set_footer(text='Requested by {}'.format(ctx.author.name), icon_url=ctx.author.avatar_url_as(format='png'))
 
         embed.add_field(name=str(await self.translate(ctx.guild.id,"keywords","nom")).capitalize(), value=item.name,inline=True)
         embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","role-0"), value=str(item.id))
         embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","emoji-0"), value=animate.capitalize())
+        if item.guild != ctx.guild:
+            embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","emoji-3"), value=item.guild.name)
         embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","emoji-2"), value="`<:{}:{}>`".format(item.name,item.id))
         embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","emoji-1"), value=manage.capitalize())
         embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","member-1"), value = "{} ({} {})".format(await self.timecog.date(item.created_at,lang=lang,year=True),since,await self.timecog.time_delta(item.created_at,datetime.datetime.now(),lang=lang,year=True,precision=0,hour=False)), inline=False)

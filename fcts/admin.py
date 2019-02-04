@@ -7,18 +7,6 @@ from fcts import reloads
 importlib.reload(reloads)
 
 
-
-# async def check_admin(ctx):
-#         if type(ctx) == commands.Context:
-#             user = ctx.author
-#         else:
-#             user = ctx
-#         if type(user) == str and user.isnumeric():
-#             user = int(user)
-#         elif type(user) != int:
-#             user = user.id
-#         return user in reloads.admins_id
-
 def cleanup_code(content):
     """Automatically removes code blocks from the code."""
     # remove ```py\n```
@@ -63,6 +51,13 @@ class AdminCog:
             l.append(str(self.bot.get_user(u)))
         await ctx.send(str(await self.translate(ctx.guild,"infos","admins-list")).format(", ".join(l)))
 
+    @commands.command(name='spoil',hidden=True)
+    @commands.check(reloads.check_admin)
+    async def send_spoiler(self,ctx,*,text):
+        """spoil spoil spoil"""
+        spoil = lambda text: "||"+"||||".join(text)+"||"
+        await ctx.send("```\n{}\n```".format(spoil(text)))
+
     @commands.command(name='msg',aliases=['tell'])
     @commands.check(reloads.check_admin)
     async def send_msg(self,ctx,user:discord.User,*,message):
@@ -85,6 +80,23 @@ class AdminCog:
                     for cmds in cmd.commands:
                         text+="\n        - {} *({})*".format(cmds.name,cmds.help)
             await ctx.send(text)
+
+    @main_msg.command(name="faq",hidden=True)
+    @commands.check(reloads.check_admin)
+    async def send_faq(self,ctx):
+        """Envoie les messages du salon <#541228784456695818> vers le salon <#508028818154323980>"""
+        destination_fr = ctx.guild.get_channel(508028818154323980)
+        destination_en = ctx.guild.get_channel(541599345972346881)
+        chan_fr = ctx.guild.get_channel(541228784456695818)
+        chan_en = ctx.guild.get_channel(541599226623426590)
+        await destination_fr.purge()
+        await destination_en.purge()
+        async for message in chan_fr.history(limit=200,reverse=True):
+            await destination_fr.send(message.content)
+        async for message in chan_en.history(limit=200,reverse=True):
+            await destination_en.send(message.content)
+        await ctx.bot.cogs['UtilitiesCog'].add_check_reaction(ctx.message)
+
 
     @main_msg.command(name="update",hidden=True)
     @commands.check(reloads.check_admin)
@@ -345,8 +357,8 @@ class AdminCog:
                 text = file.read().split("\n")
             msg = str()
             liste = list()
-            i = 2
-            while len(liste)<=lines and i<len(text) and i<2000:
+            i = 1
+            while len(liste)<=lines and i<min(2000,len(text)):
                 i+=1
                 if (not match in text[-i]) or ctx.message.content in text[-i]:
                     continue

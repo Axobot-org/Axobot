@@ -58,7 +58,8 @@ errors={"cooldown":"You are on cooldown for this command :confused: Please wait 
 "missingargument":"Oops, the argument \"{}\" is missing {}",
 "membernotfound":"Unable to find the member `{}` :confused:",
 "usernotfound":"Unable to find the user `{}` :confused:",
-"disabled":"The command {} is disabled :confused:"}
+"disabled":"The command {} is disabled :confused:",
+"duration":"The duration `{}` is invalid"}
 
 find={"user-0":"name: {}\nID: {}",
 "user-1":"Name: {}\nID: {}\nServers: {}\nLanguages: {}",
@@ -174,7 +175,8 @@ logs={"slowmode-enabled":"Slowmode enabled in {channel} ({seconds}s)",
 "mute-on":"{member} is now muted (reason : {reason} | case #{case})",
 "mute-off":"{member} is no more muted",
 "softban":"{member} has been 'softbanned' (reason: {reason} | case #{case})",
-"warn":"{member} has been warned: {reason} (case #{case})"}
+"warn":"{member} has been warned: {reason} (case #{case})",
+"tempmute-on":"{member} is now muted for {duration} (reason : {reason} | case #{case})",}
 
 mc={"contact-mail":"If you notice an error in the information provided, please contact me personally, or report the error directly [on the site](https://fr-minecraft.net).",
     "serv-title":"Server information {}",
@@ -261,7 +263,12 @@ modo={"slowmode-0":"The slowmode is now disabled in this channel.",
     "emoji-renamed":"The emoji {} has been renamed!",
     "cant-pin":"Oops, I don't have permission to pin messages",
     "pin-error":"Oops, I can't find that message (Error : `{}`)",
-    "pin-error-3":"Oops, impossible to pin this message (do you have more than 50 pinned messages?). Error : `{}`"
+    "pin-error-3":"Oops, impossible to pin this message (do you have more than 50 pinned messages?). Error : `{}`",
+    "react-clear":"I'm unable to find this message :confused:",
+    "em-list":"{} (`:{}:`) added on {} {}",
+    "em-private":"[Restricted]",
+    "em-list-title":"Emojis of the server {}",
+    "tempmute-1":"The member {} has been silenced for the reason `{}`, for {}!",
     }
 
 perms={"perms-0":"Member/role {} not found",
@@ -407,6 +414,7 @@ stats_infos={"not-found":"Unable to find {}",
             "emoji-0":"Animated",
             "emoji-1":"Managed by Twitch",
             "emoji-2":"String (for bots)",
+            "emoji-3":"Server which own it",
             "textchan-0":"Category",
             "textchan-1":"Description",
             "textchan-2":"NSFW",
