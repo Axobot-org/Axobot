@@ -72,57 +72,57 @@ class TimedCog:
         return True
 
 
-    @commands.command(name="tempmute")
-    @commands.cooldown(5,20, commands.BucketType.guild)
-    @commands.guild_only()
-    @commands.check(moderation.can_mute)
-    async def test(self,ctx,user:discord.Member,time:commands.Greedy[args.tempdelta],*,reason="Unspecified"):
-        duration = sum(time)
-        f_duration = await self.bot.cogs['TimeCog'].time_delta(duration,lang='en',form='temp',precision=0)
-        #await ctx.send("{} a été mute pour {} secondes. Raison : {}".format(user,duration,reason))
-        try:
-            if self.bot.database_online and await self.bot.cogs["ServerCog"].staff_finder(user,"mute") or user==ctx.guild.me:
-                await ctx.send(str(await self.translate(ctx.guild.id,"modo","staff-mute"))+random.choice([':confused:',':upside_down:',self.bot.cogs['EmojiCog'].customEmojis['wat'],':no_mouth:',self.bot.cogs['EmojiCog'].customEmojis['owo'],':thinking:',]))
-                return
-            elif not self.bot.database_online and ctx.channel.permissions_for(user).manage_roles:
-                return await ctx.send(await self.translate(ctx.guild.id,"modo","staff-warn"))
-        except Exception as e:
-            await self.bot.cogs['ErrorsCog'].on_error(e,ctx)
-            return
-        role = discord.utils.get(ctx.guild.roles,name="muted")
-        if role in user.roles:
-            await ctx.send(await self.translate(ctx.guild.id,"modo","already-mute"))
-            return
-        if role == None:
-            await ctx.send(await self.translate(ctx.guild.id,"modo","no-mute"))
-            return
-        if not ctx.channel.permissions_for(ctx.guild.me).manage_roles:
-            await ctx.send(await self.translate(ctx.guild.id,"modo","cant-mute"))
-            return
-        if role.position > ctx.guild.me.roles[-1].position:
-            await ctx.send(await self.translate(ctx.guild.id,"modo","mute-high"))
-            return
-        caseID = "'Unsaved'"
-        try:
-            reason = await self.bot.cogs["UtilitiesCog"].clear_msg(reason,everyone = not ctx.channel.permissions_for(ctx.author).mention_everyone)
-            if self.bot.database_online:
-                CasesCog = self.bot.cogs['CasesCog']
-                caseIDs = await CasesCog.get_ids()
-                case = CasesCog.Case(bot=self.bot,guildID=ctx.guild.id,memberID=user.id,Type="tempmute",ModID=ctx.author.id,Reason=reason,date=datetime.datetime.now(),duration=duration).create_id(caseIDs)
-                try:
-                    await CasesCog.add_case(case)
-                    caseID = case.id
-                except Exception as e:
-                    await self.bot.cogs['ErrorsCog'].on_error(e,ctx)
-            await user.add_roles(role,reason=reason)
-            await ctx.send(str(await self.translate(ctx.guild.id,"modo","tempmute-1")).format(user,reason,f_duration))
-            log = str(await self.translate(ctx.guild.id,"logs","tempmute-on")).format(member=user,reason=reason,case=caseID,duration=f_duration)
-            await self.bot.cogs["Events"].send_logs_per_server(ctx.guild,"mute",log,ctx.author)
-            if ctx.channel.permissions_for(ctx.guild.me).manage_messages:
-                await ctx.message.delete()
-        except Exception as e:
-            await ctx.send(await self.translate(ctx.guild.id,"modo","error"))
-            await self.bot.cogs['ErrorsCog'].on_error(e,ctx)
+    # @commands.command(name="tempmute")
+    # @commands.cooldown(5,20, commands.BucketType.guild)
+    # @commands.guild_only()
+    # @commands.check(moderation.can_mute)
+    # async def test(self,ctx,user:discord.Member,time:commands.Greedy[args.tempdelta],*,reason="Unspecified"):
+    #     duration = sum(time)
+    #     f_duration = await self.bot.cogs['TimeCog'].time_delta(duration,lang='en',form='temp',precision=0)
+    #     #await ctx.send("{} a été mute pour {} secondes. Raison : {}".format(user,duration,reason))
+    #     try:
+    #         if self.bot.database_online and await self.bot.cogs["ServerCog"].staff_finder(user,"mute") or user==ctx.guild.me:
+    #             await ctx.send(str(await self.translate(ctx.guild.id,"modo","staff-mute"))+random.choice([':confused:',':upside_down:',self.bot.cogs['EmojiCog'].customEmojis['wat'],':no_mouth:',self.bot.cogs['EmojiCog'].customEmojis['owo'],':thinking:',]))
+    #             return
+    #         elif not self.bot.database_online and ctx.channel.permissions_for(user).manage_roles:
+    #             return await ctx.send(await self.translate(ctx.guild.id,"modo","staff-warn"))
+    #     except Exception as e:
+    #         await self.bot.cogs['ErrorsCog'].on_error(e,ctx)
+    #         return
+    #     role = discord.utils.get(ctx.guild.roles,name="muted")
+    #     if role in user.roles:
+    #         await ctx.send(await self.translate(ctx.guild.id,"modo","already-mute"))
+    #         return
+    #     if role == None:
+    #         await ctx.send(await self.translate(ctx.guild.id,"modo","no-mute"))
+    #         return
+    #     if not ctx.channel.permissions_for(ctx.guild.me).manage_roles:
+    #         await ctx.send(await self.translate(ctx.guild.id,"modo","cant-mute"))
+    #         return
+    #     if role.position > ctx.guild.me.roles[-1].position:
+    #         await ctx.send(await self.translate(ctx.guild.id,"modo","mute-high"))
+    #         return
+    #     caseID = "'Unsaved'"
+    #     try:
+    #         reason = await self.bot.cogs["UtilitiesCog"].clear_msg(reason,everyone = not ctx.channel.permissions_for(ctx.author).mention_everyone)
+    #         if self.bot.database_online:
+    #             CasesCog = self.bot.cogs['CasesCog']
+    #             caseIDs = await CasesCog.get_ids()
+    #             case = CasesCog.Case(bot=self.bot,guildID=ctx.guild.id,memberID=user.id,Type="tempmute",ModID=ctx.author.id,Reason=reason,date=datetime.datetime.now(),duration=duration).create_id(caseIDs)
+    #             try:
+    #                 await CasesCog.add_case(case)
+    #                 caseID = case.id
+    #             except Exception as e:
+    #                 await self.bot.cogs['ErrorsCog'].on_error(e,ctx)
+    #         await user.add_roles(role,reason=reason)
+    #         await ctx.send(str(await self.translate(ctx.guild.id,"modo","tempmute-1")).format(user,reason,f_duration))
+    #         log = str(await self.translate(ctx.guild.id,"logs","tempmute-on")).format(member=user,reason=reason,case=caseID,duration=f_duration)
+    #         await self.bot.cogs["Events"].send_logs_per_server(ctx.guild,"mute",log,ctx.author)
+    #         if ctx.channel.permissions_for(ctx.guild.me).manage_messages:
+    #             await ctx.message.delete()
+    #     except Exception as e:
+    #         await ctx.send(await self.translate(ctx.guild.id,"modo","error"))
+    #         await self.bot.cogs['ErrorsCog'].on_error(e,ctx)
 
 
 
