@@ -665,7 +665,7 @@ class RssCog:
         if url == 'help':
             return await self.translate(guild,"rss","web-help")
         feeds = feedparser.parse(url)
-        if 'bozo_exception' in feeds.keys() and len(feeds.entries)==0:
+        if 'bozo_exception' in feeds.keys() or len(feeds.entries)==0:
             return await self.translate(guild,"rss","web-invalid")
         published = None
         for i in ['published_parsed','published','updated_parsed']:
