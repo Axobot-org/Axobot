@@ -3,7 +3,7 @@
 
 def check_libs():
     count = 0
-    for m in ["mysql","discord","frmc_lib","requests","re","asyncio","feedparser","datetime","time","importlib","traceback","sys","logging","sympy","psutil","platform","subprocess","resource"]:
+    for m in ["mysql","discord","frmc_lib","requests","re","asyncio","feedparser","datetime","time","importlib","traceback","sys","logging","sympy","psutil","platform","subprocess"]:
         try:
             exec("import "+m)
             exec("del "+m)
@@ -23,6 +23,7 @@ if check_libs():
     from discord.ext import commands
     from fcts import cryptage, tokens
 else:
+    import sys
     print("Fin de l'exécution")
     sys.exit()
 

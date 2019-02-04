@@ -2,7 +2,6 @@ import discord, random, operator, string, importlib, re, typing, datetime, subpr
 import emoji as emojilib
 from discord.ext import commands
 from fcts import emoji
-from fcts.jailer import run_jailed
 importlib.reload(emoji)
 
 cmds_list = ['count_msg','ragequit','pong','run','nope','blame','party','bigtext','shrug','gg','money','pibkac','osekour','me','kill','cat','rekt','thanos','nuke','pikachu','pizza','google','loading','piece']
@@ -397,15 +396,6 @@ You can specify a verification limit by adding a number in argument"""
             await ctx.send(await self.translate(ctx.guild,"fun","piece-1"))
         else:
             await ctx.send(random.choice(await self.translate(ctx.guild,"fun","piece-0")))
-
-    @commands.command(name="calc",enabled=False)
-    async def calc(self,ctx,*,calcul):
-        """Do some complicated math"""
-        try:
-            await run_jailed(ctx=ctx, expr=calcul)
-        except subprocess.SubprocessError:
-            await ctx.send("Your bot cannot make a required system call `resource.setrlimit`")
-            ctx.bot.remove_command(ctx.command.name)
     
     @commands.command(name='embed',hidden=False)
     @commands.has_permissions(embed_links=True)
