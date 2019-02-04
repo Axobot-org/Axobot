@@ -412,7 +412,7 @@ class RssCog:
         cond = False
         while cond==False:
             try:
-                msg = await self.bot.wait_for('message',check=check2,timeout=20.0)
+                msg = await self.bot.wait_for('message',check=check2,timeout=30.0)
                 if msg.content.lower() in ['aucun','none','_','del']:
                     IDs = [None]
                 else:
@@ -510,7 +510,7 @@ class RssCog:
                 def check(msg):
                     return msg.author==ctx.author and msg.channel==ctx.channel
                 try:
-                    msg = await self.bot.wait_for('message', check=check,timeout=30)
+                    msg = await self.bot.wait_for('message', check=check,timeout=90)
                 except asyncio.TimeoutError:
                     await ctx.send(await self.translate(ctx.guild.id,"rss","too-long"))
                     return await self.bot.cogs['UtilitiesCog'].suppr(pres_msg)
