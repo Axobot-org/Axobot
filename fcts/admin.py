@@ -282,7 +282,7 @@ class AdminCog:
             try:
                 await self.bot.cogs["ServerCog"].send_see(guild,ctx.channel,None,ctx.message,None)
             except Exception as e:
-                await self.bot.cogs["Errors"].on_command_error(e,ctx)
+                await self.bot.cogs["Errors"].on_command_error(ctx,e)
         else:
             await ctx.send("Serveur introuvable")
 
