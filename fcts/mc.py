@@ -24,7 +24,10 @@ Every information come from the website www.fr-minecraft.net"""
         """Get Mojang server status"""
         desc = await self.translate(ctx.guild,"mc","mojang_desc")
         data = requests.get("https://status.mojang.com/check").json()
-        can_embed = ctx.channel.permissions_for(ctx.guild.me).embed_links
+        if ctx.guild==None:
+            can_embed = True
+        else:
+            can_embed = ctx.channel.permissions_for(ctx.guild.me).embed_links
         if can_embed:
             embed = discord.Embed(colour=discord.Colour(0x699bf9), timestamp=ctx.message.created_at)
             embed.set_thumbnail(url="https://pbs.twimg.com/profile_images/623422129502056448/9ehvGDEy.png")
