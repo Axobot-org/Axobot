@@ -70,13 +70,15 @@ class ModeratorCog:
     @commands.guild_only()
     @commands.cooldown(1, 3, commands.BucketType.guild)
     @commands.check(can_slowmode)
-    async def slowmode(self,ctx,time='off'):
+    async def slowmode(self,ctx,time=None):
         """Keep your chat cool"""
-        if time.isnumeric():
-            time = int(time)
         if not ctx.channel.permissions_for(ctx.guild.me).manage_channels:
             await ctx.send(await self.translate(ctx.guild.id,"modo","cant-slowmode"))
             return
+        if time==None:
+            return await ctx.send(str(await self.translate(ctx.guild.id,"modo","slowmode-info")).format(ctx.channel.slowmode_delay))
+        if time.isnumeric():
+            time = int(time)
         if time == 'off' or time==0:
             await ctx.bot.http.request(discord.http.Route('PATCH', '/channels/{cid}', cid=ctx.channel.id), json={'rate_limit_per_user':0})
             message = await self.translate(ctx.guild.id,"modo","slowmode-0")
@@ -696,6 +698,7 @@ ID corresponds to the Identifier of the message"""
                     chan_js = {'id':chan.id,'name':chan.name,'position':chan.position}
                     if isinstance(chan,discord.TextChannel):
                         chan_js['type'] = 'TextChannel'
+                        chan_js['description'] = chan.topic
                     elif isinstance(chan,discord.VoiceChannel):
                         chan_js['type'] = 'VoiceChannel'
                     else:
