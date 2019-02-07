@@ -190,6 +190,12 @@ class AdminCog:
     @commands.check(reloads.check_admin)
     async def shutdown(self,ctx,arg=""):
         """Eteint le bot"""
+        for folderName, _, filenames in os.walk('.'):
+            for filename in filenames:
+                if filename.endswith('.pyc'):
+                    os.unlink(folderName+'/'+filename)
+            if  folderName.endswith('__pycache__'):
+                os.rmdir(folderName)
         if arg != "no-backup":
             m = await ctx.send("Création de la sauvegarde...")
             #await backup_auto(client)
