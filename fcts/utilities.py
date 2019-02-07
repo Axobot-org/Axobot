@@ -1,4 +1,4 @@
-import discord, sys, traceback, importlib, datetime,random, re
+import discord, sys, traceback, importlib, datetime, random, re
 from fcts import utilities
 from discord.ext import commands
 
@@ -13,6 +13,7 @@ class UtilitiesCog:
         self.file = "utilities"
         self.config = None
         self.table = 'users'
+        self.new_pp = False
         
     async def on_ready(self):
         self.config = await self.bot.cogs['ServerCog'].get_bot_infos(self.bot.user.id)
@@ -147,6 +148,20 @@ class UtilitiesCog:
 
     async def global_check(self,ctx):
         """Check if the guild is a banned guild (aka ignored commands)"""
+        if datetime.datetime.today().day==8 and not self.new_pp:
+            with open('../images/birthday_avatar.png', 'rb') as f:
+                await ctx.bot.user.edit(avatar=f.read())
+                self.new_pp = True
+        elif datetime.datetime.today().day!=8 and self.new_pp:
+            pp = '../images/beta_avatar.png' if ctx.bot.beta else '../images/classic_avatar.png'
+            with open(pp, 'rb') as f:
+                await ctx.bot.user.edit(avatar=f.read())
+                self.new_pp = False
+        if datetime.datetime.today().day==8 and random.random()<0.05:
+            try:
+                await ctx.message.add_reaction(discord.utils.get(self.bot.emojis, name='fireworks',id=543086189893124098))
+            except Exception as e:
+                print(e)
         if type(ctx)==commands.context:
             ctx = ctx.guild
         elif type(ctx) != discord.guild:
