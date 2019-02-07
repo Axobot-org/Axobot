@@ -714,6 +714,8 @@ class ServerCog:
         ch = await self.find_staff(guild.id,"membercounter")
         if ch not in ['',None]:
             ch = guild.get_channel(int(ch))
+            if ch==None:
+                return
             lang = await self.translate(guild.id,"current_lang","current")
             text = "{}{}: {}".format(str(await self.translate(guild.id,"keywords","membres")).capitalize() , " " if lang=='fr' else "" , len(guild.members))
             try:
