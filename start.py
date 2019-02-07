@@ -3,7 +3,7 @@
 
 def check_libs():
     count = 0
-    for m in ["mysql","discord","frmc_lib","requests","re","asyncio","feedparser","datetime","time","importlib","traceback","sys","logging","sympy","psutil","platform","subprocess"]:
+    for m in ["mysql","discord","frmc_lib","requests","re","asyncio","feedparser","datetime","time","importlib","traceback","sys","logging","sympy","psutil","platform","subprocess",'json']:
         try:
             exec("import "+m)
             exec("del "+m)
@@ -257,7 +257,7 @@ def main():
             return
 
     client.add_listener(on_ready)
-    client.add_listener(check_once)
+    client.add_check(check_once,call_once=True)
     client.add_listener(on_member_join)
     client.add_listener(on_member_remove)
     client.add_listener(on_message)

@@ -90,7 +90,7 @@ class InfosCog:
 
             await ctx.send(embed=embed.discord_embed())
         except Exception as e:
-            await ctx.bot.cogs['Errors'].on_command_error(e,ctx)
+            await ctx.bot.cogs['Errors'].on_command_error(ctx,e)
 
     def get_users_nber(self,ignored_guilds):
         members = [x.members for x in self.bot.guilds if x.id not in ignored_guilds]
