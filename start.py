@@ -257,7 +257,7 @@ def main():
             return
 
     client.add_listener(on_ready)
-    client.add_listener(check_once)
+    client.add_check(check_once,call_once=True)
     client.add_listener(on_member_join)
     client.add_listener(on_member_remove)
     client.add_listener(on_message)
