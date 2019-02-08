@@ -68,7 +68,7 @@ class AdminCog:
         except Exception as e:
             await self.bot.cogs['ErrorsCog'].on_error(e,ctx)
 
-    @commands.group(name='admin')
+    @commands.group(name='admin',hidden=True)
     @commands.check(reloads.check_admin)
     async def main_msg(self,ctx):
         """Commandes réservées aux administrateurs de ZBot"""

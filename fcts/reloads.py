@@ -45,7 +45,7 @@ class ReloadsCog:
             await ctx.send("These cogs has successfully reloaded: {}".format(", ".join(reloaded_cogs)))
             ctx.bot.cogs['InfosCog'].codelines = await ctx.bot.cogs['InfosCog'].count_lines_code()
 
-    @commands.command(name="add_cog")
+    @commands.command(name="add_cog",hidden=True)
     @commands.check(check_admin)
     async def add_cog(self,ctx,name):
         """Ajouter un cog au bot"""
@@ -57,7 +57,7 @@ class ReloadsCog:
         except Exception as e:
             await ctx.send(str(e))
 
-    @commands.command(name="del_cog",aliases=['remove_cog'])
+    @commands.command(name="del_cog",aliases=['remove_cog'],hidden=True)
     @commands.check(check_admin)
     async def rm_cog(self,ctx,name):
         """Enlever un cog au bot"""
