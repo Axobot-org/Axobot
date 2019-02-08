@@ -64,6 +64,7 @@ class RssCog:
         self.file = "rss"
         self.embed_color = discord.Color(6017876)
         self.loop_processing = False
+        self.last_update = 0
         if bot.user != None:
             self.table = 'rss_flow' if bot.user.id==486896267788812288 else 'rss_flow_beta'
         try:
