@@ -301,12 +301,18 @@ Written on {date}
 
 Link : {url}
 """,
+"twitch-form-last":"""{logo}  | Here is the last video of {author}:
+{title}
+Published on {date}
+Link : {url}
+""",
 "web-form-last":"""{logo}  |  Here is the last post of {author}:
 **{title}**
 *Written on {date}*
 Link : {link}""",
-"yt-default-flow":"{logo}  | New video of {author} : **{title}**\nPublished on {date}\nLink : {link}\n{mentions}",
-"tw-default-flow":"{logo}  | New tweet of {author} ! ({date})\n\n{title}\n\nLink : {link}\n\n{mentions}",
+"yt-default-flow":"{logo}  | New video of {author}: **{title}**\nPublished on {date}\nLink : {link}\n{mentions}",
+"tw-default-flow":"{logo}  | New tweet of {author}! ({date})\n\n{title}\n\nLink: {link}\n\n{mentions}",
+"twitch-default-flow":"{logo}  | New live by {author}! ({date})\n\n{title}\n\nLink: {link}\n\n{mentions}",
 "web-default-flow":"{logo}  | New post on {author} ({date}) :\n    {title}\n\n{link}\n\n{mentions}",
 "list":"*Type the number of the flow to modify*\n\n**Link - Type - Channel - Mentions**\n",
 "list2":"*Type the number of the flow to delete*\n\n**Link - Type - Channel**\n",

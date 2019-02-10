@@ -301,13 +301,19 @@ Written on {date}
 
 Zelda : {url}
 """,
+"twitch-form-last":"""{logo}  | Hir iz the last video ov {author}:
+{title}
+Shown on {date}
+Link : {url}
+""",
 "web-form-last":"""{logo}  |  Here are the lazt P:o2:stz of {author}:
 **{title}**
 *Writen by {date}*
 UrL : {link}""",
-"yt-default-flow":"{logo}  | Naw videogramm of {author} : **{title}**\nPublishd on {date}\nLink : {link}\n{mentions}",
-"tw-default-flow":"{logo}  | New tweat for {author} ! ({date})\n\n{title}\n\nLink : {link}\n\n{mentions}",
-"web-default-flow":"{logo}  | New postz on {author} ({date}) :\n    {title}\n\n{link}\n\n{mentions}",
+"yt-default-flow":"{logo}  | Naw videogramm of {author}: **{title}**\nPublishd on {date}\nLink : {link}\n{mentions}",
+"tw-default-flow":"{logo}  | New tweat for {author}! ({date})\n\n{title}\n\nLink: {link}\n\n{mentions}",
+"twitch-default-flow":"{logo}  | Mew live by {author}! ({date})\n\n{title}\n\nLink: {link}\n\n{mentions}",
+"web-default-flow":"{logo}  | New postz on {author} ({date}):\n    {title}\n\n{link}\n\n{mentions}",
 "list":"*Tipe teh nbr of the floww 2 modyfi by*\n\n**Zelda - Typez - cHanel - Mentionz**\n",
 "list2":"*Type teh nmberZ ov the flowz 2 deletz*\n\n**Lnk - Tipe - Chanell**\n",
 'tw':'Twiter',
