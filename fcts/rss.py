@@ -528,7 +528,7 @@ class RssCog:
                 return
             flow = flow[0]
             if text==None:
-                pres_msg = await ctx.send(str(await self.translate(ctx.guild.id,"rss","change-txt")).format_map(self.bot.SafeDict(text=flow['structure'])))
+                await ctx.send(str(await self.translate(ctx.guild.id,"rss","change-txt")).format_map(self.bot.SafeDict(text=flow['structure'])))
                 def check(msg):
                     return msg.author==ctx.author and msg.channel==ctx.channel
                 try:
@@ -853,10 +853,10 @@ class RssCog:
         v = list()
         for x in values:
             if type(x) == bool:
-                v.append("`{x[0]}`={x[1]}".format(x=x))
+                v.append("""`{x[0]}`={x[1]}""".format(x=x))
             else:
-                v.append("`{x[0]}`='{x[1]}'".format(x=x))
-        query = "UPDATE `{t}` SET {v} WHERE `ID`={id}".format(t=self.table,v=",".join(v),id=ID)
+                v.append("`{x[0]}`=\"\"\"{x[1]}\"\"\"".format(x=x))
+        query = """UPDATE `{t}` SET {v} WHERE `ID`={id}""".format(t=self.table,v=",".join(v),id=ID)
         cursor.execute(query)
         cnx.commit()
         cnx.close()
