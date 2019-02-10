@@ -964,6 +964,7 @@ class EmojiCog:
 		'youtube':'<:youtube:447459436982960143>',
 		'twitter':'<:twitter:437220693726330881>',
 		'reddit':'<:reddit:447462065204887573>',
+		'twitch':'<:twitch:544192114440011792>',
 		'red_alert':'<a:red_alert:499690261107048458>',
 		'red_warning':'<a:red_warning:499687652073668608>',
 		'readthedocs':'<:readthedocs:484841075001786368>',
