@@ -223,21 +223,27 @@ class RssCog:
             await ctx.send(str(await self.translate(ctx.guild.id,"rss","flow-limit")).format(self.flow_limit))
             return
         identifiant = await self.parse_yt_url(link)
-        if not link.startswith("https://") and identifiant != None:
-            link = "https://"+link
-        Type = 'yt'
-        display_type = 'youtube'
+        if identifiant != None:
+            Type = 'yt'
+            display_type = 'youtube'
         if identifiant == None:
             identifiant = await self.parse_tw_url(link)
-            if not link.startswith("https://") and identifiant != None:
-                link = "https://"+link
-            Type = 'tw'
-            display_type = 'twitter'
+            if identifiant != None:
+                Type = 'tw'
+                display_type = 'twitter'
+        if identifiant == None:
+            identifiant = await self.parse_twitch_url(link)
+            if identifiant != None:
+                Type = 'twitch'
+                display_type = 'twitch'
+        if identifiant != None and not link.startswith("https://"):
+            link = "https://"+link
         if identifiant == None and link.startswith("http"):
             identifiant = link
             Type = "web"
             display_type = 'website'
         elif not link.startswith("http"):
+            print(link)
             await ctx.send(await self.translate(ctx.guild,"rss","invalid-link"))
             return
         try:
@@ -707,14 +713,14 @@ class RssCog:
             return await self.translate(guild,"rss","nothing")
         if not date:
             feed = feeds.entries[0]
-            obj = self.rssMessage(bot=self.bot,Type='twitch',url=feed['link'],title=feed['title'],emojis=self.bot.cogs['EmojiCog'].customEmojis,date=feed['published_parsed'],author=feeds.feed['title'].replace("s Twitch video RSS",""))
+            obj = self.rssMessage(bot=self.bot,Type='twitch',url=feed['link'],title=feed['title'],emojis=self.bot.cogs['EmojiCog'].customEmojis,date=feed['published_parsed'],author=feeds.feed['title'].replace("'s Twitch video RSS",""))
             return [obj]
         else:
             liste = list()
             for feed in feeds.entries:
                 if datetime.datetime(*feed['published_parsed'][:6]) <= date:
                     break
-                obj = self.rssMessage(bot=self.bot,Type='twitch',url=feed['link'],title=feed['title'],emojis=self.bot.cogs['EmojiCog'].customEmojis,date=feed['published_parsed'],author=feeds.feed['title'].replace("s Twitch video RSS",""))
+                obj = self.rssMessage(bot=self.bot,Type='twitch',url=feed['link'],title=feed['title'],emojis=self.bot.cogs['EmojiCog'].customEmojis,date=feed['published_parsed'],author=feeds.feed['title'].replace("'s Twitch video RSS",""))
                 liste.append(obj)
             liste.reverse()
             return liste
