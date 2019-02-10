@@ -1,4 +1,5 @@
-import discord, feedparser, datetime, time, re, asyncio, mysql, random, typing, importlib
+import discord, datetime, time, re, asyncio, mysql, random, typing, importlib, socket
+from libs import feedparser
 from discord.ext import commands
 from fcts import cryptage, tokens, reloads
 importlib.reload(reloads)
@@ -88,7 +89,7 @@ class RssCog:
 
 
     class rssMessage:
-        def __init__(self,bot,Type,url,title,emojis,date=datetime.datetime.now(),author=None,Format=None,channel="",retweeted_by=None):
+        def __init__(self,bot,Type,url,title,emojis,date=datetime.datetime.now(),author=None,Format=None,channel=None,retweeted_by=None):
             self.bot = bot
             self.Type = Type
             self.url = url
@@ -525,16 +526,25 @@ class RssCog:
     async def test_rss(self,ctx,url,*,args=None):
         """Test if an rss feed is usable"""
         try:
-            feeds = feedparser.parse(url)
-            txt = "feeds.keys()\n```py\n{}\n```feeds.feed\n```py\n{}\n```".format(feeds.keys(),feeds.feed)
+            feeds = feedparser.parse(url,timeout=8)
+            txt = "feeds.keys()\n```py\n{}\n```".format(feeds.keys())
+            if len(str(feeds.feed))<1400-len(txt):
+                txt += "feeds.feed\n```py\n{}\n```".format(feeds.feed)
+            else:
+                txt += "feeds.feed.keys()\n```py\n{}\n```".format(feeds.feed.keys())
             if len(feeds.entries)>0:
-                if len(str(feeds.entries[0]))<2000-len(txt):
+                if len(str(feeds.entries[0]))<1950-len(txt):
                     txt += "feeds.entries[0]\n```py\n{}\n```".format(feeds.entries[0])
                 else:
                     txt += "feeds.entries[0].keys()\n```py\n{}\n```".format(feeds.entries[0].keys())
             if args != None and 'feeds' in args and 'ctx' not in args:
                 txt += "\n{}\n```py\n{}\n```".format(args,eval(args))
-            await ctx.send(txt)
+            try:
+                await ctx.send(txt)
+            except Exception as e:
+                print("[rss_test] Error:",e)
+                await ctx.send("`Error`: "+str(e))
+                print(txt)
             if args==None:
                 ok = '<:greencheck:513105826555363348>'
                 notok = '<:redcheck:513105827817717762>'
@@ -665,7 +675,10 @@ class RssCog:
     async def rss_web(self,guild,url,date=None):
         if url == 'help':
             return await self.translate(guild,"rss","web-help")
-        feeds = feedparser.parse(url)
+        try:
+            feeds = feedparser.parse(url,timeout=5)
+        except socket.timeout:
+            return None
         if 'bozo_exception' in feeds.keys() or len(feeds.entries)==0:
             return await self.translate(guild,"rss","web-invalid")
         published = None
@@ -676,7 +689,7 @@ class RssCog:
         if published!=None:
             while feeds.entries[0][published] < feeds.entries[1][published]:
                 del feeds.entries[0]
-        if not date or published == 'published':
+        if not date or published != 'published_parsed':
             feed = feeds.entries[0]
             if published==None:
                 datz = 'Unknown'
