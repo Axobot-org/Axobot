@@ -301,12 +301,18 @@ Lien : {url}
 
 Lien : {url}
 """,
+"twitch-form-last":"""{logo}  | Voici la dernière vidéo de {author}:
+{title}
+Publiée le {date}
+Lien : {url}
+""",
 "web-form-last":"""{logo}  | Voici le dernier post de {author}:
 **{title}**
 *Ecrit le {date}*
 Lien : {link}""",
 "yt-default-flow":"{logo}  | Nouvelle vidéo de {author} : **{title}**\nPubliée le {date}\nLien : {link}\n{mentions}",
 "tw-default-flow":"{logo}  | Nouveau tweet de {author} ! ({date})\n\n{title}\n\nLien : {link}\n\n{mentions}",
+"twitch-default-flow":"{logo}  | Nouveau live de {author} ! ({date})\n\n{title}\n\nLien : {link}\n\n{mentions}",
 "web-default-flow":"{logo}  | Nouveau post sur {author} ({date}) :\n    {title}\n\n{link}\n\n{mentions}",
 "list":"*Entrez le numéro du flux à modifier*\n\n**Lien - Type - Salon - Roles**\n",
 "list2":"*Entrez le numéro du flux à supprimer*\n\n**Lien - Type - Salon**\n",

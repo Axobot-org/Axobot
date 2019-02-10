@@ -110,6 +110,8 @@ class RssCog:
                 self.logo = emojis['twitter']
             elif Type == 'reddit':
                 self.logo = emojis['reddit']
+            elif Type == 'twitch':
+                self.logo = emojis['twitch']
             else:
                 self.logo = ':newspaper:'
             self.channel = channel
@@ -165,6 +167,18 @@ class RssCog:
             await ctx.send(text)
         else:
             form = await self.translate(ctx.guild,"rss","yt-form-last")
+            await ctx.send(await text[0].create_msg(await self.translate(ctx.guild,"current_lang","current"),form))
+    
+    @rss_main.command(name="twitch",aliases=['tv'])
+    async def request_twitch(self,ctx,channel):
+        """The last video of a Twitch channel"""
+        if "twitch.tv" in channel:
+            ID= await self.parse_twitch_url(channel)
+        text = await self.rss_twitch(ctx.guild,channel)
+        if type(text) == str:
+            await ctx.send(text)
+        else:
+            form = await self.translate(ctx.guild,"rss","twitch-form-last")
             await ctx.send(await text[0].create_msg(await self.translate(ctx.guild,"current_lang","current"),form))
 
     @rss_main.command(name='twitter',aliases=['tw'])
@@ -607,6 +621,14 @@ class RssCog:
             return None
         else:
             return match.group(1)
+    
+    async def parse_twitch_url(self,url):
+        r = r'(?:http.*://)?(?:www.)?(?:twitch.tv/)([^?\s]+)'
+        match = re.search(r,url)
+        if match == None:
+            return None
+        else:
+            return match.group(1)
 
 
     async def rss_yt(self,guild,identifiant,date=None):
@@ -674,6 +696,25 @@ class RssCog:
                 if author.replace('@','') not in url:
                     rt = url.split("=")[1]
                 obj = self.rssMessage(bot=self.bot,Type='tw',url=feed['link'],title=feed['title'],emojis=self.bot.cogs['EmojiCog'].customEmojis,date=feed['published_parsed'],author=author,retweeted_by=rt,channel= feeds.feed['title'])
+                liste.append(obj)
+            liste.reverse()
+            return liste
+
+    async def rss_twitch(self,guild,nom,date=None):
+        url = 'https://twitchrss.appspot.com/vod/'+nom
+        feeds = feedparser.parse(url)
+        if feeds.entries==[]:
+            return await self.translate(guild,"rss","nothing")
+        if not date:
+            feed = feeds.entries[0]
+            obj = self.rssMessage(bot=self.bot,Type='twitch',url=feed['link'],title=feed['title'],emojis=self.bot.cogs['EmojiCog'].customEmojis,date=feed['published_parsed'],author=feeds.feed['title'].replace("s Twitch video RSS",""))
+            return [obj]
+        else:
+            liste = list()
+            for feed in feeds.entries:
+                if datetime.datetime(*feed['published_parsed'][:6]) <= date:
+                    break
+                obj = self.rssMessage(bot=self.bot,Type='twitch',url=feed['link'],title=feed['title'],emojis=self.bot.cogs['EmojiCog'].customEmojis,date=feed['published_parsed'],author=feeds.feed['title'].replace("s Twitch video RSS",""))
                 liste.append(obj)
             liste.reverse()
             return liste
