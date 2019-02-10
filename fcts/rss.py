@@ -525,9 +525,13 @@ class RssCog:
     @commands.check(reloads.check_admin)
     async def test_rss(self,ctx,url,*,args=None):
         """Test if an rss feed is usable"""
+        url = url.replace('<','').replace('>','')
         try:
             feeds = feedparser.parse(url,timeout=8)
             txt = "feeds.keys()\n```py\n{}\n```".format(feeds.keys())
+            if 'bozo_exception' in feeds.keys():
+                txt += "\nException ({}): {}".format(feeds['bozo'],str(feeds['bozo_exception']))
+                return await ctx.send(txt)
             if len(str(feeds.feed))<1400-len(txt):
                 txt += "feeds.feed\n```py\n{}\n```".format(feeds.feed)
             else:
@@ -555,8 +559,10 @@ class RssCog:
                     tw = await self.parse_tw_url(url)
                     if tw!=None:
                         txt.append("<:twitter:437220693726330881>  "+tw)
-                    else:
+                    elif 'link' in feeds.feed.keys():
                         txt.append(":newspaper:  <"+feeds.feed['link']+'>')
+                    else:
+                        txt.append(":newspaper:  No 'link' var")
                 else:
                     txt.append("<:youtube:447459436982960143>  "+yt)
                 txt.append("Entrées : {}".format(len(feeds.entries)))
