@@ -6,4 +6,3 @@ requests==2.20
 regex==2018.08.29
 mysql-connector-python==8.0.12
 #discord-rewrite==1.0.0a
-feedparser==5.2.1
