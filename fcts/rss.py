@@ -535,7 +535,6 @@ class RssCog:
                     msg = await self.bot.wait_for('message', check=check,timeout=90)
                 except asyncio.TimeoutError:
                     await ctx.send(await self.translate(ctx.guild.id,"rss","too-long"))
-                    return await self.bot.cogs['UtilitiesCog'].suppr(pres_msg)
             await self.update_flow(flow['ID'],[('structure',msg.content)])
             await ctx.send(str(await self.translate(ctx.guild.id,"rss","text-success")).format(flow['ID'],msg.content))
         except Exception as e:
