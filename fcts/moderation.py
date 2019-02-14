@@ -168,8 +168,11 @@ class ModeratorCog:
                 if (i == None and invites==2) or (i != None and invites==0):
                     c4 = False
             #return ((m.pinned == pinned) or ((m.attachments != []) == files) or ((r != None) == links)) and m.author in users
-            if ctx.message.mentions != []:
-                return c1 and c2 and c3 and c4 and m.author in ctx.message.mentions
+            mentions = [x.mention for x in ctx.message.mentions]
+            if ctx.prefix.strip() in mentions:
+                mentions.remove(ctx.prefix.strip())
+            if mentions != []:
+                return c1 and c2 and c3 and c4 and m.author.mention in mentions
             else:
                 return c1 and c2 and c3 and c4
         await ctx.message.delete()
