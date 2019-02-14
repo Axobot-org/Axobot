@@ -115,7 +115,8 @@ Has a nice dayz !""",
 "docs":"Her'z teh link 2 the bot doc:",
 "stats-title":"**Boat statz**",
 "stats":"""**Baut vershun:** {} \n**Nbr ov serverz:** {} \n**Nbr ov visible memberz:** {} ({} **robots**)\n**Nbr ov code lin:** {}\n**Uzd languages:** {}\n**Python vershun :** {} \n**Vershun ov teh `discord.py` lyb:** {} \n**Loadin on teh RAM:** {} GB \n**Loadin on the CPU:** {} % \n**API latency timz:** {} ms""",
-"admins-list":"My super-cool admins are : {}"}
+"admins-list":"My super-cool admins are : {}",
+"prefix":"List ov usable prefiXs:"}
 
 infos_2={"membercount-0":"Total nmber of membrz",
 "membercount-1":"Numbr ov botz",

@@ -115,7 +115,8 @@ Have a nice day!""",
 "docs":"Here is the link to the bot documentation:",
 "stats-title":"**Bot statistics**",
 "stats":"""**Bot version:** {} \n**Number of servers:** {} \n**Number of visible members:** {} ({} **bots**)\n**Number of code lines:** {}\n**Used languages:** {}\n**Python version :** {} \n**Version of the `discord.py` lib:** {} \n**Loading on the RAM:** {} GB \n**Loading on the CPU:** {} % \n**API latency time:** {} ms""",
-"admins-list":"The administrators of this bot are : {}"}
+"admins-list":"The administrators of this bot are : {}",
+"prefix":"List of currently usable prefixes:"}
 
 infos_2={"membercount-0":"Total number of members",
 "membercount-1":"Number of bots",
