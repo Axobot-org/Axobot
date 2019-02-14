@@ -15,6 +15,13 @@ class ErrorsCog:
     async def on_ready(self):
         self.translate = self.bot.cogs["LangCog"].tr
 
+    async def search_err(self,form:list,sentence:str):
+        for x in form:
+            r = re.search(x,sentence)
+            if r!= None:
+                return r
+
+
     async def on_cmd_error(self,ctx,error):
         """The event triggered when an error is raised while invoking a command."""
         # This prevents any commands with local handlers being handled here in on_command_error.
@@ -34,28 +41,25 @@ class ErrorsCog:
             await ctx.send(str(await self.translate(ctx.guild,'errors','cooldown')).format(round(error.retry_after,2)))
             return
         elif isinstance(error,(commands.BadArgument,commands.BadUnionArgument)):
-            args = error.args[0].split('\"')
-            if len(args)!=4:
-                r = re.search(r'Could not convert \"([^\"]+)\" into ([^.]+)',str(error))
-                if r == None:
-                    r = re.search(r'Member \"([^\"]+)\" not found',str(error))
-                    if r == None:
-                        r = re.search(r'User \"([^\"]+)\" not found',str(error))
-                        if r==None:
-                            r = re.search(r'Invalid duration: ([^\" ]+)',str(error))
-                            if r==None:
-                                print('errors -',error)
-                                return
-                            else:
-                                await ctx.send(str(await self.translate(ctx.guild,'errors','duration')).format(r.group(1)))
-                        else:
-                            await ctx.send(str(await self.translate(ctx.guild,'errors','usernotfound')).format(r.group(1)))
-                    else:
-                        await ctx.send(str(await self.translate(ctx.guild,'errors','membernotfound')).format(r.group(1)))
-                else:    
-                    args = [None,r.group(2),None,r.group(1)]
-            await ctx.send(str(await self.translate(ctx.guild,'errors','badarguments')).format(c=args))
-            return
+            # Could not convert "limit" into int. OR Converting to "int" failed for parameter "number".
+            r = re.search(r'Could not convert \"(?P<arg>[^\"]+)\" into (?P<type>[^.\n]+)',str(error))
+            if r==None:
+                r = re.search(r'Converting to \"(?P<type>[^\"]+)\" failed for parameter \"(?P<arg>[^.\n]+)\"',str(error))
+            if r!=None:
+                return await ctx.send(str(await self.translate(ctx.guild,'errors','badarguments')).format(r.group('arg'),r.group('type')))
+            # Member "Z_runner" not found
+            r = re.search(r'Member \"([^\"]+)\" not found',str(error))
+            if r!=None:
+                return await ctx.send(str(await self.translate(ctx.guild,'errors','membernotfound')).format(r.group(1)))
+            # User "Z_runner" not found
+            r = re.search(r'User \"([^\"]+)\" not found',str(error))
+            if r!=None:
+                return await ctx.send(str(await self.translate(ctx.guild,'errors','usernotfound')).format(r.group(1)))
+            # Invalid duration: 2d
+            r = re.search(r'Invalid duration: ([^\" ]+)',str(error))
+            if r != None:
+                return await ctx.send(str(await self.translate(ctx.guild,'errors','duration')).format(r.group(1)))
+            print('errors -',error)
         elif isinstance(error,commands.MissingRequiredArgument):
             await ctx.send(str(await self.translate(ctx.guild,'errors','missingargument')).format(error.param.name,random.choice([':eyes:','',':confused:',':thinking:',''])))
             return

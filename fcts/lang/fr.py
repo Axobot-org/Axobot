@@ -53,13 +53,13 @@ cases={"no-user":"Impossible de trouver cet utilisateur",
     'title-search':'Casier #{}',
     'no_database':"En raison d'une panne temporaire de la base de donnée, cette commande a été désactivée"}
 
-errors={"cooldown":"Vous êtes en cooldown pour cette commande. Veuillez attendre encore {} secondes...",
-"badarguments":"Oups, impossible de convertir le paramètre `{c[3]}` en type \"{c[1]}\" :confused:",
-"missingargument":"Oups, il manque l'argument \"{}\" {}",
-"membernotfound":"Impossible de trouver le membre `{}` :confused:",
-"usernotfound":"Impossible de trouver l'utilisateur `{}` :confused:",
-"disabled":"La commande {} est désactivée",
-"duration":"La durée `{}` est invalide"}
+errors={"cooldown":"Vous êtes en cooldown pour cette commande. Veuillez attendre encore {0} secondes...",
+"badarguments":"Oups, impossible de convertir le paramètre `{0}` en type \"{1}\" :confused:",
+"missingargument":"Oups, il manque l'argument \"{0}\" {1}",
+"membernotfound":"Impossible de trouver le membre `{0}` :confused:",
+"usernotfound":"Impossible de trouver l'utilisateur `{0}` :confused:",
+"disabled":"La commande {0} est désactivée",
+"duration":"La durée `{0}` est invalide"}
 
 find={"user-0":"Nom : {}\nID : {}",
 "user-1":"Nom : {}\nID : {}\nServeurs : {}\nLangues : {}",
