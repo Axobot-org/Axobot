@@ -90,3 +90,14 @@ Permissions
 This small command allows you to see the list of permissions assigned to a member/role in a particular room. The channel is automatically the one where the command is entered. To inform a member or a role, it is only necessary to enter his exact name, his `ID <https://support.discordapp.com/hc/en-us/articles/206346498-Where-can-I-find-my-User-Server-Message-ID->`_ , or to mention it. If no name is given the targeted member will be the one who enters the order.
 
 .. warning:: The only permission needed to grant the bot is "`Embed Links <perms.html#embed-links>`_".
+
+
+------
+Prefix
+------
+
+**Syntax:** :code:`prefix`
+
+A nice shortcut to know the prefixes to which the bot responds. This is usually the prefix defined in the `configuration <config.html>`_, plus the mention of the bot.
+
+Note that this result may differ from the :code:`config see prefix` command when the database is out of sync.
