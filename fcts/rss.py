@@ -859,7 +859,6 @@ class RssCog:
             else:
                 v.append("`{x[0]}`=\"\"\"{x[1]}\"\"\"".format(x=x))
         query = """UPDATE `{t}` SET {v} WHERE `ID`={id}""".format(t=self.table,v=",".join(v),id=ID)
-        print(query)
         cursor.execute(query)
         cnx.commit()
         cnx.close()
