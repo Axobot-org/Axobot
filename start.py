@@ -87,6 +87,9 @@ class zbot(commands.bot.BotBase,discord.Client):
     class SafeDict(dict):
         def __missing__(self, key):
             return '{' + key + '}'
+    
+    async def get_prefix(self,msg):
+        return get_prefix(self,msg)
 
 
 def get_prefix(bot,msg):
