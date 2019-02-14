@@ -74,7 +74,8 @@ class FunCog:
             else:
                 await ctx.send(await self.translate(ctx.guild,"fun","no-database"))
             return
-        text = await self.translate(ctx.guild,"fun","fun-list")
+        title = await self.translate(ctx.guild,"fun","fun-list")
+        text = str()
         for cmd in sorted(self.bot.get_cog_commands('FunCog'),key=operator.attrgetter('name')):
             if cmd.name in cmds_list and cmd.enabled:
                 if cmd.help != None:
@@ -84,7 +85,11 @@ class FunCog:
                 if type(cmd)==commands.core.Group:
                     for cmds in cmd.commands:
                         text+="\n    - {} *({})*".format(cmds.name,cmds.help)
-        await ctx.send(text)
+        if ctx.guild!=None:
+            if ctx.channel.permissions_for(ctx.guild.me).embed_links:
+                emb = ctx.bot.cogs['EmbedCog'].Embed(title=title,desc=text,color=ctx.bot.cogs['HelpCog'].help_color,time=ctx.message.created_at).create_footer(ctx.author)
+                return await ctx.send(embed=emb.discord_embed())
+        await ctx.send(title+text)
 
     @commands.command(name="cookie",hidden=True)
     @commands.check(is_fun_enabled)
