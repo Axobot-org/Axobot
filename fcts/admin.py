@@ -453,10 +453,9 @@ class AdminCog:
         for x in liste:
             text += "\n**[{} - {}]**  {} ".format(x[3],x[4],x[2])
         try:
-            if ctx.guild!=None:
-                if ctx.channel.permissions_for(ctx.guild.me).embed_links:
-                    emb = ctx.bot.cogs['EmbedCog'].Embed(title=title,desc=text,color=ctx.guild.me.color).update_timestamp()
-                    return await bot_msg.edit(content=None,embed=emb.discord_embed())
+            if ctx.guild==None or ctx.channel.permissions_for(ctx.guild.me).embed_links:
+                emb = ctx.bot.cogs['EmbedCog'].Embed(title=title,desc=text,color=ctx.guild.me.color).update_timestamp()
+                return await bot_msg.edit(content=None,embed=emb.discord_embed())
             await bot_msg.edit(content=title+text)
         except discord.HTTPException:
             await ctx.send("Le message est trop long pour être envoyé !")
