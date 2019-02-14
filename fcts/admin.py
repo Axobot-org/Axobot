@@ -439,15 +439,11 @@ class AdminCog:
                 up = 0
                 down = 0
                 for x in msg.reactions:
-                    users = await x.users().flatten()
+                    users = [x for x in await x.users().flatten() if not x.bot]
                     if x.emoji == '👍':
-                        up = x.count
-                        if ctx.guild.me in users :
-                            up -= 1
+                        up = len(users)
                     elif x.emoji == '👎':
-                        down = x.count
-                        if ctx.guild.me in users:
-                            down -= 1
+                        down = len(users)
                 liste.append((up-down,msg.content,up,down))
         liste.sort(reverse=True)
         count = len(liste)
