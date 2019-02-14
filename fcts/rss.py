@@ -65,7 +65,7 @@ class RssCog:
         self.file = "rss"
         self.embed_color = discord.Color(6017876)
         self.loop_processing = False
-        self.last_update = 0
+        self.last_update = None
         if bot.user != None:
             self.table = 'rss_flow' if bot.user.id==486896267788812288 else 'rss_flow_beta'
         try:
@@ -852,11 +852,14 @@ class RssCog:
         cursor = cnx.cursor()
         v = list()
         for x in values:
-            if type(x) == bool:
+            if isinstance(x[1],(bool,int)):
                 v.append("""`{x[0]}`={x[1]}""".format(x=x))
+            elif isinstance(x[1],(datetime.datetime,float)):
+                v.append("""`{x[0]}`=\"{x[1]}\"""".format(x=x))
             else:
                 v.append("`{x[0]}`=\"\"\"{x[1]}\"\"\"".format(x=x))
         query = """UPDATE `{t}` SET {v} WHERE `ID`={id}""".format(t=self.table,v=",".join(v),id=ID)
+        print(query)
         cursor.execute(query)
         cnx.commit()
         cnx.close()
