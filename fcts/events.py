@@ -145,5 +145,13 @@ class Events:
             return
 
 
+    async def loop(self):
+        await self.bot.wait_until_ready()
+        print("launching")
+        while not self.bot.is_closed():
+            if int(datetime.datetime.now().second)==0:
+                print("Hey!")
+            await asyncio.sleep(0.5)
+
 def setup(bot):
     bot.add_cog(Events(bot))
