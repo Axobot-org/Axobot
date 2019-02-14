@@ -148,7 +148,7 @@ class UtilitiesCog:
 
     async def global_check(self,ctx):
         """Check if the guild is a banned guild (aka ignored commands)"""
-        if (datetime.datetime.now() - ctx.bot.cogs['RssCog'].last_update).total_seconds() > 30*60:
+        if ctx.bot.cogs['RssCog'].last_update==None or (datetime.datetime.now() - ctx.bot.cogs['RssCog'].last_update).total_seconds() > 30*60:
             self.bot.log.info("Check RSS lancée")
             self.bot.cogs['RssCog'].last_update = datetime.datetime.now()
             await ctx.bot.cogs['RssCog'].main_loop()
