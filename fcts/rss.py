@@ -4,16 +4,6 @@ from discord.ext import commands
 from fcts import cryptage, tokens, reloads
 importlib.reload(reloads)
 
-# secure_keys = dict()
-# with open('fcts/requirements','r') as file:
-#     r = file.read().split('\n')
-#     for s in r:
-#         if s.startswith("//") or s=='':
-#             r.remove(s)
-#     while '' in r:
-#         r.remove('')
-#     for e,s in enumerate(['user','password','host','database']):
-#         secure_keys[s] = cryptage.uncrypte(r[e])
 
 web_link={'fr-minecraft':'http://fr-minecraft.net/rss.php',
           'frm':'http://fr-minecraft.net/rss.php',
