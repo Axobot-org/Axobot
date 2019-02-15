@@ -1,9 +1,9 @@
 import discord, mysql.connector, importlib, datetime, random
 from discord.ext import commands
 
-from fcts import args, cryptage, moderation
+from fcts import args, checks
 importlib.reload(args)
-importlib.reload(moderation)
+importlib.reload(checks)
 
 
 class TimedCog:
@@ -75,7 +75,7 @@ class TimedCog:
     # @commands.command(name="tempmute")
     # @commands.cooldown(5,20, commands.BucketType.guild)
     # @commands.guild_only()
-    # @commands.check(moderation.can_mute)
+    # @commands.check(checks.can_mute)
     # async def test(self,ctx,user:discord.Member,time:commands.Greedy[args.tempdelta],*,reason="Unspecified"):
     #     duration = sum(time)
     #     f_duration = await self.bot.cogs['TimeCog'].time_delta(duration,lang='en',form='temp',precision=0)
