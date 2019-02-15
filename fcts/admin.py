@@ -90,24 +90,18 @@ class AdminCog:
         destination_en = ctx.guild.get_channel(541599345972346881)
         chan_fr = ctx.guild.get_channel(541228784456695818)
         chan_en = ctx.guild.get_channel(541599226623426590)
-<<<<<<< HEAD
-=======
         role_fr = ctx.guild.get_role(541224634087899146)
         role_en = ctx.guild.get_role(537597687801839617)
         await destination_fr.set_permissions(role_fr, read_messages=False)
         await destination_en.set_permissions(role_en, read_messages=False)
->>>>>>> indev
         await destination_fr.purge()
         await destination_en.purge()
         async for message in chan_fr.history(limit=200,reverse=True):
             await destination_fr.send(message.content)
         async for message in chan_en.history(limit=200,reverse=True):
             await destination_en.send(message.content)
-<<<<<<< HEAD
-=======
         await destination_fr.set_permissions(role_fr, read_messages=True)
         await destination_en.set_permissions(role_en, read_messages=True)
->>>>>>> indev
         await ctx.bot.cogs['UtilitiesCog'].add_check_reaction(ctx.message)
 
 
@@ -203,26 +197,14 @@ class AdminCog:
     @commands.check(reloads.check_admin)
     async def shutdown(self,ctx):
         """Eteint le bot"""
-<<<<<<< HEAD
-=======
         m = await ctx.send("Nettoyage de l'espace de travail...")
->>>>>>> indev
         for folderName, _, filenames in os.walk('.'):
             for filename in filenames:
                 if filename.endswith('.pyc'):
                     os.unlink(folderName+'/'+filename)
             if  folderName.endswith('__pycache__'):
                 os.rmdir(folderName)
-<<<<<<< HEAD
-        if arg != "no-backup":
-            m = await ctx.send("Création de la sauvegarde...")
-            #await backup_auto(client)
-            await m.edit(content="Bot en voie d'extinction")
-        else:
-            await ctx.send("Bot en voie d'extinction")
-=======
         await m.edit(content="Bot en voie d'extinction")
->>>>>>> indev
         await self.bot.change_presence(status=discord.Status('offline'))
         await self.print("Bot en voie d'extinction")
         self.bot.log.info("Fermeture du bot")
