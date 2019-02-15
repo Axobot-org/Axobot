@@ -206,7 +206,6 @@ class AdminCog:
                 os.rmdir(folderName)
         await m.edit(content="Bot en voie d'extinction")
         await self.bot.change_presence(status=discord.Status('offline'))
-        await self.print("Bot en voie d'extinction")
         self.bot.log.info("Fermeture du bot")
         await self.bot.logout()
         await self.bot.close()
