@@ -32,7 +32,7 @@ def setup_logger():
     # on chope le premier logger
     log = logging.getLogger("runner")
     # on définis un formatteur
-    format = logging.Formatter("%(asctime)s %(module)s %(funcName)s l.%(lineno)d : %(message)s", datefmt="[%d/%m/%Y %H:%M]")
+    format = logging.Formatter("%(asctime)s %(levelname)s: %(message)s", datefmt="[%d/%m/%Y %H:%M]")
     # ex du format : [08/11/2018 14:46] WARNING RSSCog fetch_rss_flux l.288 : Cannot get the RSS flux because of the following error: (suivi du traceback)
 
     # log vers un fichier
@@ -203,14 +203,14 @@ def main():
             await client.change_presence(activity=discord.Game(name=choice(["entrer !help","something","type !help","type !help"])))
         elif r=='2':
             await client.change_presence(activity=discord.Game(name=choice(["SNAPSHOOT","snapshot day","somethin iz brokn"])))
-        emb = client.cogs["EmbedCog"].Embed(desc="Bot **{} is launching** !".format(client.user.name),color=8311585).update_timestamp()
+        emb = client.cogs["EmbedCog"].Embed(desc="**{}** is launching !".format(client.user.name),color=8311585).update_timestamp()
         await client.cogs["EmbedCog"].send([emb])
     
     async def check_once(ctx):
         try:
             return await ctx.bot.cogs['UtilitiesCog'].global_check(ctx)
         except Exception as e:
-            print("ERROR on global_check:",e,ctx.guild)
+            self.bot.log.error("ERROR on global_check:",e,ctx.guild)
             return True
 
     async def on_member_join(member):
