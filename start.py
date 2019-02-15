@@ -210,7 +210,7 @@ def main():
         try:
             return await ctx.bot.cogs['UtilitiesCog'].global_check(ctx)
         except Exception as e:
-            self.bot.log.error("ERROR on global_check:",e,ctx.guild)
+            ctx.bot.log.error("ERROR on global_check:",e,ctx.guild)
             return True
 
     async def on_member_join(member):
