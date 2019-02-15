@@ -1,7 +1,8 @@
 import discord
 from discord.ext import commands
 
-import time, importlib, sys, traceback, datetime, os, shutil, asyncio, inspect, typing, io, textwrap, copy, operator, feedparser, requests, random
+import time, importlib, sys, traceback, datetime, os, shutil, asyncio, inspect, typing, io, textwrap, copy, operator, requests, random
+from libs import feedparser
 from contextlib import redirect_stdout
 from fcts import reloads
 importlib.reload(reloads)
@@ -68,7 +69,7 @@ class AdminCog:
         except Exception as e:
             await self.bot.cogs['ErrorsCog'].on_error(e,ctx)
 
-    @commands.group(name='admin')
+    @commands.group(name='admin',hidden=True)
     @commands.check(reloads.check_admin)
     async def main_msg(self,ctx):
         """Commandes réservées aux administrateurs de ZBot"""
@@ -89,12 +90,24 @@ class AdminCog:
         destination_en = ctx.guild.get_channel(541599345972346881)
         chan_fr = ctx.guild.get_channel(541228784456695818)
         chan_en = ctx.guild.get_channel(541599226623426590)
+<<<<<<< HEAD
+=======
+        role_fr = ctx.guild.get_role(541224634087899146)
+        role_en = ctx.guild.get_role(537597687801839617)
+        await destination_fr.set_permissions(role_fr, read_messages=False)
+        await destination_en.set_permissions(role_en, read_messages=False)
+>>>>>>> indev
         await destination_fr.purge()
         await destination_en.purge()
         async for message in chan_fr.history(limit=200,reverse=True):
             await destination_fr.send(message.content)
         async for message in chan_en.history(limit=200,reverse=True):
             await destination_en.send(message.content)
+<<<<<<< HEAD
+=======
+        await destination_fr.set_permissions(role_fr, read_messages=True)
+        await destination_en.set_permissions(role_en, read_messages=True)
+>>>>>>> indev
         await ctx.bot.cogs['UtilitiesCog'].add_check_reaction(ctx.message)
 
 
@@ -188,22 +201,31 @@ class AdminCog:
 
     @main_msg.command(name='shutdown')
     @commands.check(reloads.check_admin)
-    async def shutdown(self,ctx,arg=""):
+    async def shutdown(self,ctx):
         """Eteint le bot"""
+<<<<<<< HEAD
+=======
+        m = await ctx.send("Nettoyage de l'espace de travail...")
+>>>>>>> indev
         for folderName, _, filenames in os.walk('.'):
             for filename in filenames:
                 if filename.endswith('.pyc'):
                     os.unlink(folderName+'/'+filename)
             if  folderName.endswith('__pycache__'):
                 os.rmdir(folderName)
+<<<<<<< HEAD
         if arg != "no-backup":
             m = await ctx.send("Création de la sauvegarde...")
             #await backup_auto(client)
             await m.edit(content="Bot en voie d'extinction")
         else:
             await ctx.send("Bot en voie d'extinction")
+=======
+        await m.edit(content="Bot en voie d'extinction")
+>>>>>>> indev
         await self.bot.change_presence(status=discord.Status('offline'))
         await self.print("Bot en voie d'extinction")
+        self.bot.log.info("Fermeture du bot")
         await self.bot.logout()
         await self.bot.close()
 
@@ -432,24 +454,24 @@ class AdminCog:
                 up = 0
                 down = 0
                 for x in msg.reactions:
-                    users = await x.users().flatten()
+                    users = [x for x in await x.users().flatten() if not x.bot]
                     if x.emoji == '👍':
-                        up = x.count
-                        if ctx.guild.me in users :
-                            up -= 1
+                        up = len(users)
                     elif x.emoji == '👎':
-                        down = x.count
-                        if ctx.guild.me in users:
-                            down -= 1
-                liste.append((up-down,msg.content,up,down))
+                        down = len(users)
+                liste.append((up-down,datetime.datetime.now()-msg.created_at,msg.content,up,down))
         liste.sort(reverse=True)
         count = len(liste)
         liste = liste[:number]
-        text = "Liste des {} meilleures idées (sur {}) :".format(len(liste),count)
+        title = "Liste des {} meilleures idées (sur {}) :".format(len(liste),count)
+        text = str()
         for x in liste:
-            text += "\n- {} ({} - {})".format(x[1],x[2],x[3])
+            text += "\n**[{} - {}]**  {} ".format(x[3],x[4],x[2])
         try:
-            await bot_msg.edit(content=text)
+            if ctx.guild==None or ctx.channel.permissions_for(ctx.guild.me).embed_links:
+                emb = ctx.bot.cogs['EmbedCog'].Embed(title=title,desc=text,color=ctx.guild.me.color).update_timestamp()
+                return await bot_msg.edit(content=None,embed=emb.discord_embed())
+            await bot_msg.edit(content=title+text)
         except discord.HTTPException:
             await ctx.send("Le message est trop long pour être envoyé !")
 

@@ -168,8 +168,11 @@ class ModeratorCog:
                 if (i == None and invites==2) or (i != None and invites==0):
                     c4 = False
             #return ((m.pinned == pinned) or ((m.attachments != []) == files) or ((r != None) == links)) and m.author in users
-            if ctx.message.mentions != []:
-                return c1 and c2 and c3 and c4 and m.author in ctx.message.mentions
+            mentions = [x.mention for x in ctx.message.mentions]
+            if ctx.prefix.strip() in mentions:
+                mentions.remove(ctx.prefix.strip())
+            if mentions != []:
+                return c1 and c2 and c3 and c4 and m.author.mention in mentions
             else:
                 return c1 and c2 and c3 and c4
         await ctx.message.delete()
@@ -404,6 +407,7 @@ class ModeratorCog:
                     pass
             reason = await self.bot.cogs["UtilitiesCog"].clear_msg(reason,everyone = not ctx.channel.permissions_for(ctx.author).mention_everyone)
             await ctx.guild.ban(user,reason=reason,delete_message_days=0)
+            self.bot.log.info("L'utilisateur {} a été banni du serveur {} pour la raison {}".format(user.id,ctx.guild.id,reason))
             await self.bot.cogs['Events'].add_event('ban')
             caseID = "'Unsaved'"
             if self.bot.database_online:

@@ -53,6 +53,7 @@ cases={"no-user":"Impossible de trouver cet utilisateur",
     'title-search':'Casier #{}',
     'no_database':"En raison d'une panne temporaire de la base de donnée, cette commande a été désactivée"}
 
+<<<<<<< HEAD
 errors={"cooldown":"Vous êtes en cooldown pour cette commande. Veuillez attendre encore {} secondes...",
 "badarguments":"Oups, impossible de convertir le paramètre `{c[3]}` en type \"{c[1]}\" :confused:",
 "missingargument":"Oups, il manque l'argument \"{}\" {}",
@@ -60,6 +61,15 @@ errors={"cooldown":"Vous êtes en cooldown pour cette commande. Veuillez attendr
 "usernotfound":"Impossible de trouver l'utilisateur `{}` :confused:",
 "disabled":"La commande {} est désactivée",
 "duration":"La durée `{}` est invalide"}
+=======
+errors={"cooldown":"Vous êtes en cooldown pour cette commande. Veuillez attendre encore {0} secondes...",
+"badarguments":"Oups, impossible de convertir le paramètre `{0}` en type \"{1}\" :confused:",
+"missingargument":"Oups, il manque l'argument \"{0}\" {1}",
+"membernotfound":"Impossible de trouver le membre `{0}` :confused:",
+"usernotfound":"Impossible de trouver l'utilisateur `{0}` :confused:",
+"disabled":"La commande {0} est désactivée",
+"duration":"La durée `{0}` est invalide"}
+>>>>>>> indev
 
 find={"user-0":"Nom : {}\nID : {}",
 "user-1":"Nom : {}\nID : {}\nServeurs : {}\nLangues : {}",
@@ -90,6 +100,7 @@ fun={"count-0":"Comptage en cours...",
     "calc-5":"Oups, une erreur est apparue : `{}`",
     "no-reaction":"Impossible d'ajouter les réactions. Vérifiez mes permissions",
     "cant-react":"Je n'ai pas les permissions suffisantes pour envoyer des réactions !",
+    "no-emoji":"Impossible de trouver cet emoji !",
     "vote-0":"Vous ne pouvez pas mettre plus de 20 choix, encore moins un nombre négatif de choix !",
     "blame-0":"Liste des noms disponibles pour le membre **{}**",
     "no-database":"Notre base de donnée étant hors ligne, l'accès aux commandes fun est restreint aux personnes ayant la permission de Gérer le Serveur",
@@ -114,7 +125,8 @@ Bonne journée !""",
 "docs":"Voici le lien vers la documentation du bot :",
 "stats-title":"**Statistiques du bot**",
 "stats":"""**Version du bot :** {} \n**Nombre de serveurs :** {} \n**Nombre de membres visibles :** {} (dont {} **bots**)\n**Nombre de lignes de code :** {}\n**Langues utilisées :** {} \n**Version de Python :** {} \n**Version de la bibliothèque `discord.py` :** {} \n**Charge sur la mémoire vive :** {} GB \n**Charge sur le CPU :** {} % \n**Temps de latence de l'api :** {} ms""",
-"admins-list":"Les administrateurs de ce bot sont : {}"}
+"admins-list":"Les administrateurs de ce bot sont : {}",
+"prefix":"Liste des préfixes actuellement utilisables :"}
 
 infos_2={"membercount-0":"Nombre de membres total",
 "membercount-1":"Nombre de bots",
@@ -300,17 +312,24 @@ Lien : {url}
 
 Lien : {url}
 """,
+"twitch-form-last":"""{logo}  | Voici la dernière vidéo de {author}:
+{title}
+Publiée le {date}
+Lien : {url}
+""",
 "web-form-last":"""{logo}  | Voici le dernier post de {author}:
 **{title}**
 *Ecrit le {date}*
 Lien : {link}""",
 "yt-default-flow":"{logo}  | Nouvelle vidéo de {author} : **{title}**\nPubliée le {date}\nLien : {link}\n{mentions}",
 "tw-default-flow":"{logo}  | Nouveau tweet de {author} ! ({date})\n\n{title}\n\nLien : {link}\n\n{mentions}",
+"twitch-default-flow":"{logo}  | Nouveau live de {author} ! ({date})\n\n{title}\n\nLien : {link}\n\n{mentions}",
 "web-default-flow":"{logo}  | Nouveau post sur {author} ({date}) :\n    {title}\n\n{link}\n\n{mentions}",
 "list":"*Entrez le numéro du flux à modifier*\n\n**Lien - Type - Salon - Roles**\n",
 "list2":"*Entrez le numéro du flux à supprimer*\n\n**Lien - Type - Salon**\n",
 'tw':'Twitter',
 'yt':'YouTube',
+'twitch':'Twitch',
 'web':'Web',
 'mc':'Minecraft',
 'choose-mentions-1':"Veuillez choisir le flux à modifier",
@@ -337,7 +356,8 @@ Lien : {link}""",
 - `{logo}` : un emoji représentant le type de post (web, Twitter, YouTube...)
 - `{mentions}` : la liste des rôles mentionnés
 - `{title}` : le titre du post""",
-"text-success":"Le texte du flux n°{} a bien été modifié ! Nouveau texte : \n```\n{}\n```"
+"text-success":"Le texte du flux n°{} a bien été modifié ! Nouveau texte : \n```\n{}\n```",
+"invalid-flow":"Cet url est invalide (flux rss vide ou inaccessible) :confused:"
 }
 
 server={"config-help":"Cette commande sert principalement à configurer votre serveur. En faisant `!config see [option]` vous obtiendrez l'aperçu des configurations actuelles, \

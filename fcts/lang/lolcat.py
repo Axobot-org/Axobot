@@ -90,6 +90,7 @@ fun={"count-0":"Countng in progrez...",
     "calc-5":"Oooops, an error appeared :upside_down: \n `{}`",
     "no-reaction":"Unable 2 add reactions. Plz check mah perms...",
     "cant-react":"I doan haz enough perms 2 send reactions!",
+    "no-emoji":"Unable 2 find tihs emote :eyes:",
     "vote-0":"U can't put moar than 20 choicez, an' even lesss negativ numbr of choicesz!",
     "blame-0":"Lizt ov availabl namz 4 **{}**",
     "no-database":"As our data ar offline, access to funz commandz iz restricted to guys with permishun \"Manage Server\"",
@@ -114,7 +115,8 @@ Has a nice dayz !""",
 "docs":"Her'z teh link 2 the bot doc:",
 "stats-title":"**Boat statz**",
 "stats":"""**Baut vershun:** {} \n**Nbr ov serverz:** {} \n**Nbr ov visible memberz:** {} ({} **robots**)\n**Nbr ov code lin:** {}\n**Uzd languages:** {}\n**Python vershun :** {} \n**Vershun ov teh `discord.py` lyb:** {} \n**Loadin on teh RAM:** {} GB \n**Loadin on the CPU:** {} % \n**API latency timz:** {} ms""",
-"admins-list":"My super-cool admins are : {}"}
+"admins-list":"My super-cool admins are : {}",
+"prefix":"List ov usable prefiXs:"}
 
 infos_2={"membercount-0":"Total nmber of membrz",
 "membercount-1":"Numbr ov botz",
@@ -300,17 +302,24 @@ Written on {date}
 
 Zelda : {url}
 """,
+"twitch-form-last":"""{logo}  | Hir iz the last video ov {author}:
+{title}
+Shown on {date}
+Link : {url}
+""",
 "web-form-last":"""{logo}  |  Here are the lazt P:o2:stz of {author}:
 **{title}**
 *Writen by {date}*
 UrL : {link}""",
-"yt-default-flow":"{logo}  | Naw videogramm of {author} : **{title}**\nPublishd on {date}\nLink : {link}\n{mentions}",
-"tw-default-flow":"{logo}  | New tweat for {author} ! ({date})\n\n{title}\n\nLink : {link}\n\n{mentions}",
-"web-default-flow":"{logo}  | New postz on {author} ({date}) :\n    {title}\n\n{link}\n\n{mentions}",
+"yt-default-flow":"{logo}  | Naw videogramm of {author}: **{title}**\nPublishd on {date}\nLink : {link}\n{mentions}",
+"tw-default-flow":"{logo}  | New tweat for {author}! ({date})\n\n{title}\n\nLink: {link}\n\n{mentions}",
+"twitch-default-flow":"{logo}  | Mew live by {author}! ({date})\n\n{title}\n\nLink: {link}\n\n{mentions}",
+"web-default-flow":"{logo}  | New postz on {author} ({date}):\n    {title}\n\n{link}\n\n{mentions}",
 "list":"*Tipe teh nbr of the floww 2 modyfi by*\n\n**Zelda - Typez - cHanel - Mentionz**\n",
 "list2":"*Type teh nmberZ ov the flowz 2 deletz*\n\n**Lnk - Tipe - Chanell**\n",
 'tw':'Twiter',
 'yt':'YouTwube',
+'twitch':'Twich',
 'web':'Weeb',
 'mc':'Minekrraft',
 'choose-mentions-1':"Pleese chose the flow 2 modify",
@@ -337,7 +346,8 @@ UrL : {link}""",
 - `{logo}`: a emoji representing teh type of post (website, BlueBird, RedTriangle...)
 - `{mentions}`: the list ov mentioned roles
 - `{title}`: the titl of da post""",
-"text-success":"Teh text of the feed #{} haz been modified!\n New cute text : \n```\n{}\n```"
+"text-success":"Teh text of the feed #{} haz been modified!\n New cute text : \n```\n{}\n```",
+"invalid-flow":"I can't add dis url (empty or inaccessible rss flew) :confused:"
 }
 
 server={"config-help": "Dis cmd is mainly usd 2 configur ur srver. By doin `!config see [option]` u will get \

@@ -1,4 +1,9 @@
+<<<<<<< HEAD
 import discord, feedparser, datetime, time, re, asyncio, mysql, random, typing, importlib
+=======
+import discord, datetime, time, re, asyncio, mysql, random, typing, importlib, socket
+from libs import feedparser
+>>>>>>> indev
 from discord.ext import commands
 from fcts import cryptage, tokens, reloads
 importlib.reload(reloads)
@@ -64,6 +69,7 @@ class RssCog:
         self.file = "rss"
         self.embed_color = discord.Color(6017876)
         self.loop_processing = False
+        self.last_update = None
         if bot.user != None:
             self.table = 'rss_flow' if bot.user.id==486896267788812288 else 'rss_flow_beta'
         try:
@@ -87,7 +93,11 @@ class RssCog:
 
 
     class rssMessage:
+<<<<<<< HEAD
         def __init__(self,bot,Type,url,title,emojis,date=datetime.datetime.now(),author=None,Format=None,channel="",retweeted_by=None):
+=======
+        def __init__(self,bot,Type,url,title,emojis,date=datetime.datetime.now(),author=None,Format=None,channel=None,retweeted_by=None):
+>>>>>>> indev
             self.bot = bot
             self.Type = Type
             self.url = url
@@ -108,6 +118,8 @@ class RssCog:
                 self.logo = emojis['twitter']
             elif Type == 'reddit':
                 self.logo = emojis['reddit']
+            elif Type == 'twitch':
+                self.logo = emojis['twitch']
             else:
                 self.logo = ':newspaper:'
             self.channel = channel
@@ -164,6 +176,21 @@ class RssCog:
         else:
             form = await self.translate(ctx.guild,"rss","yt-form-last")
             await ctx.send(await text[0].create_msg(await self.translate(ctx.guild,"current_lang","current"),form))
+<<<<<<< HEAD
+=======
+    
+    @rss_main.command(name="twitch",aliases=['tv'])
+    async def request_twitch(self,ctx,channel):
+        """The last video of a Twitch channel"""
+        if "twitch.tv" in channel:
+            ID= await self.parse_twitch_url(channel)
+        text = await self.rss_twitch(ctx.guild,channel)
+        if type(text) == str:
+            await ctx.send(text)
+        else:
+            form = await self.translate(ctx.guild,"rss","twitch-form-last")
+            await ctx.send(await text[0].create_msg(await self.translate(ctx.guild,"current_lang","current"),form))
+>>>>>>> indev
 
     @rss_main.command(name='twitter',aliases=['tw'])
     async def request_tw(self,ctx,name):
@@ -207,16 +234,21 @@ class RssCog:
             await ctx.send(str(await self.translate(ctx.guild.id,"rss","flow-limit")).format(self.flow_limit))
             return
         identifiant = await self.parse_yt_url(link)
-        if not link.startswith("https://") and identifiant != None:
-            link = "https://"+link
-        Type = 'yt'
-        display_type = 'youtube'
+        if identifiant != None:
+            Type = 'yt'
+            display_type = 'youtube'
         if identifiant == None:
             identifiant = await self.parse_tw_url(link)
-            if not link.startswith("https://") and identifiant != None:
-                link = "https://"+link
-            Type = 'tw'
-            display_type = 'twitter'
+            if identifiant != None:
+                Type = 'tw'
+                display_type = 'twitter'
+        if identifiant == None:
+            identifiant = await self.parse_twitch_url(link)
+            if identifiant != None:
+                Type = 'twitch'
+                display_type = 'twitch'
+        if identifiant != None and not link.startswith("https://"):
+            link = "https://"+link
         if identifiant == None and link.startswith("http"):
             identifiant = link
             Type = "web"
@@ -224,9 +256,12 @@ class RssCog:
         elif not link.startswith("http"):
             await ctx.send(await self.translate(ctx.guild,"rss","invalid-link"))
             return
+        if not await self.check_rss_url(link):
+            return await ctx.send(await self.translate(ctx.guild.id,"rss","invalid-flow"))
         try:
             await self.add_flow(ctx.guild.id,ctx.channel.id,Type,identifiant)
             await ctx.send(str(await self.translate(ctx.guild,"rss","success-add")).format(display_type,link,ctx.channel.mention))
+            self.bot.log.Info("Flux rss ajouté dans le serveur {} ({})".format(ctx.guild.id,link))
         except Exception as e:
             await ctx.send(await self.translate(ctx.guild,"rss","fail-add"))
             await self.bot.cogs["ErrorsCog"].on_error(e,ctx)
@@ -506,14 +541,13 @@ class RssCog:
                 return
             flow = flow[0]
             if text==None:
-                pres_msg = await ctx.send(str(await self.translate(ctx.guild.id,"rss","change-txt")).format_map(self.bot.SafeDict(text=flow['structure'])))
+                await ctx.send(str(await self.translate(ctx.guild.id,"rss","change-txt")).format_map(self.bot.SafeDict(text=flow['structure'])))
                 def check(msg):
                     return msg.author==ctx.author and msg.channel==ctx.channel
                 try:
                     msg = await self.bot.wait_for('message', check=check,timeout=90)
                 except asyncio.TimeoutError:
                     await ctx.send(await self.translate(ctx.guild.id,"rss","too-long"))
-                    return await self.bot.cogs['UtilitiesCog'].suppr(pres_msg)
             await self.update_flow(flow['ID'],[('structure',msg.content)])
             await ctx.send(str(await self.translate(ctx.guild.id,"rss","text-success")).format(flow['ID'],msg.content))
         except Exception as e:
@@ -523,17 +557,42 @@ class RssCog:
     @commands.check(reloads.check_admin)
     async def test_rss(self,ctx,url,*,args=None):
         """Test if an rss feed is usable"""
+<<<<<<< HEAD
         try:
             feeds = feedparser.parse(url)
             txt = "feeds.keys()\n```py\n{}\n```feeds.feed\n```py\n{}\n```".format(feeds.keys(),feeds.feed)
             if len(feeds.entries)>0:
                 if len(str(feeds.entries[0]))<2000-len(txt):
+=======
+        url = url.replace('<','').replace('>','')
+        try:
+            feeds = feedparser.parse(url,timeout=8)
+            txt = "feeds.keys()\n```py\n{}\n```".format(feeds.keys())
+            if 'bozo_exception' in feeds.keys():
+                txt += "\nException ({}): {}".format(feeds['bozo'],str(feeds['bozo_exception']))
+                return await ctx.send(txt)
+            if len(str(feeds.feed))<1400-len(txt):
+                txt += "feeds.feed\n```py\n{}\n```".format(feeds.feed)
+            else:
+                txt += "feeds.feed.keys()\n```py\n{}\n```".format(feeds.feed.keys())
+            if len(feeds.entries)>0:
+                if len(str(feeds.entries[0]))<1950-len(txt):
+>>>>>>> indev
                     txt += "feeds.entries[0]\n```py\n{}\n```".format(feeds.entries[0])
                 else:
                     txt += "feeds.entries[0].keys()\n```py\n{}\n```".format(feeds.entries[0].keys())
             if args != None and 'feeds' in args and 'ctx' not in args:
                 txt += "\n{}\n```py\n{}\n```".format(args,eval(args))
+<<<<<<< HEAD
             await ctx.send(txt)
+=======
+            try:
+                await ctx.send(txt)
+            except Exception as e:
+                print("[rss_test] Error:",e)
+                await ctx.send("`Error`: "+str(e))
+                print(txt)
+>>>>>>> indev
             if args==None:
                 ok = '<:greencheck:513105826555363348>'
                 notok = '<:redcheck:513105827817717762>'
@@ -544,8 +603,15 @@ class RssCog:
                     tw = await self.parse_tw_url(url)
                     if tw!=None:
                         txt.append("<:twitter:437220693726330881>  "+tw)
+<<<<<<< HEAD
                     else:
                         txt.append(":newspaper:  <"+feeds.feed['link']+'>')
+=======
+                    elif 'link' in feeds.feed.keys():
+                        txt.append(":newspaper:  <"+feeds.feed['link']+'>')
+                    else:
+                        txt.append(":newspaper:  No 'link' var")
+>>>>>>> indev
                 else:
                     txt.append("<:youtube:447459436982960143>  "+yt)
                 txt.append("Entrées : {}".format(len(feeds.entries)))
@@ -574,6 +640,27 @@ class RssCog:
                 await ctx.send("\n".join(txt))
         except Exception as e:
             await ctx.bot.cogs['ErrorsCog'].on_cmd_error(ctx,e)
+<<<<<<< HEAD
+=======
+
+    async def check_rss_url(self,url):
+        r = await self.parse_yt_url(url)
+        if r!=None:
+            return True
+        r = await self.parse_tw_url(url)
+        if r!=None:
+            return True
+        r = await self.parse_twitch_url(url)
+        if r!=None:
+            return True
+        try:
+            f = feedparser.parse(url)
+            _ = f.entries[0]
+            return True
+        except:
+            return False
+
+>>>>>>> indev
 
     async def parse_yt_url(self,url):
         r = r'(?:http.*://)?(?:www.)?(?:youtube.com|youtu.be)(?:/channel/|/user/)(.+)'
@@ -585,6 +672,14 @@ class RssCog:
 
     async def parse_tw_url(self,url):
         r = r'(?:http.*://)?(?:www.)?(?:twitter.com/)([^?\s]+)'
+        match = re.search(r,url)
+        if match == None:
+            return None
+        else:
+            return match.group(1)
+    
+    async def parse_twitch_url(self,url):
+        r = r'(?:http.*://)?(?:www.)?(?:twitch.tv/)([^?\s]+)'
         match = re.search(r,url)
         if match == None:
             return None
@@ -646,6 +741,8 @@ class RssCog:
             if author.replace('@','') not in url:
                 rt = url.split("=")[1]
             obj = self.rssMessage(bot=self.bot,Type='tw',url=feed['link'],title=t,emojis=self.bot.cogs['EmojiCog'].customEmojis,date=feed['published_parsed'],author=author,retweeted_by=rt,channel=feeds.feed['title'])
+<<<<<<< HEAD
+=======
             return [obj]
         else:
             liste = list()
@@ -661,10 +758,45 @@ class RssCog:
             liste.reverse()
             return liste
 
+    async def rss_twitch(self,guild,nom,date=None):
+        url = 'https://twitchrss.appspot.com/vod/'+nom
+        feeds = feedparser.parse(url)
+        if feeds.entries==[]:
+            return await self.translate(guild,"rss","nothing")
+        if not date:
+            feed = feeds.entries[0]
+            obj = self.rssMessage(bot=self.bot,Type='twitch',url=feed['link'],title=feed['title'],emojis=self.bot.cogs['EmojiCog'].customEmojis,date=feed['published_parsed'],author=feeds.feed['title'].replace("'s Twitch video RSS",""))
+>>>>>>> indev
+            return [obj]
+        else:
+            liste = list()
+            for feed in feeds.entries:
+                if datetime.datetime(*feed['published_parsed'][:6]) <= date:
+                    break
+<<<<<<< HEAD
+                author = feed['author'].replace('(','').replace(')','')
+                rt = None
+                if author.replace('@','') not in url:
+                    rt = url.split("=")[1]
+                obj = self.rssMessage(bot=self.bot,Type='tw',url=feed['link'],title=feed['title'],emojis=self.bot.cogs['EmojiCog'].customEmojis,date=feed['published_parsed'],author=author,retweeted_by=rt,channel= feeds.feed['title'])
+=======
+                obj = self.rssMessage(bot=self.bot,Type='twitch',url=feed['link'],title=feed['title'],emojis=self.bot.cogs['EmojiCog'].customEmojis,date=feed['published_parsed'],author=feeds.feed['title'].replace("'s Twitch video RSS",""))
+>>>>>>> indev
+                liste.append(obj)
+            liste.reverse()
+            return liste
+
     async def rss_web(self,guild,url,date=None):
         if url == 'help':
             return await self.translate(guild,"rss","web-help")
+<<<<<<< HEAD
         feeds = feedparser.parse(url)
+=======
+        try:
+            feeds = feedparser.parse(url,timeout=5)
+        except socket.timeout:
+            return None
+>>>>>>> indev
         if 'bozo_exception' in feeds.keys() or len(feeds.entries)==0:
             return await self.translate(guild,"rss","web-invalid")
         published = None
@@ -675,7 +807,11 @@ class RssCog:
         if published!=None:
             while feeds.entries[0][published] < feeds.entries[1][published]:
                 del feeds.entries[0]
+<<<<<<< HEAD
         if not date or published == 'published':
+=======
+        if not date or published != 'published_parsed':
+>>>>>>> indev
             feed = feeds.entries[0]
             if published==None:
                 datz = 'Unknown'
@@ -786,11 +922,13 @@ class RssCog:
         cursor = cnx.cursor()
         v = list()
         for x in values:
-            if type(x) == bool:
-                v.append("`{x[0]}`={x[1]}".format(x=x))
+            if isinstance(x[1],(bool,int)):
+                v.append("""`{x[0]}`={x[1]}""".format(x=x))
+            elif isinstance(x[1],(datetime.datetime,float)):
+                v.append("""`{x[0]}`=\"{x[1]}\"""".format(x=x))
             else:
-                v.append("`{x[0]}`='{x[1]}'".format(x=x))
-        query = "UPDATE `{t}` SET {v} WHERE `ID`={id}".format(t=self.table,v=",".join(v),id=ID)
+                v.append("`{x[0]}`=\"\"\"{x[1]}\"\"\"".format(x=x))
+        query = """UPDATE `{t}` SET {v} WHERE `ID`={id}""".format(t=self.table,v=",".join(v),id=ID)
         cursor.execute(query)
         cnx.commit()
         cnx.close()

@@ -39,10 +39,10 @@ class Events:
         try:
             if Type == "join":
                 self.bot.log.info("Le bot a rejoint le serveur {}".format(guild.id))
-                desc = "Bot **joins the server** {}".format(guild.name)
+                desc = "Bot **joins the server** {} ({})".format(guild.name,guild.id)
             else:
                 self.bot.log.info("Le bot a quitté le serveur {}".format(guild.id))
-                desc = "Bot **left the server** {}".format(guild.name)
+                desc = "Bot **left the server** {} ({})".format(guild.name,guild.id)
             emb = self.bot.cogs["EmbedCog"].Embed(desc=desc,color=self.embed_colors['welcome']).update_timestamp().set_author(self.bot.user)
             await self.bot.cogs["EmbedCog"].send([emb])
         except Exception as e:
@@ -64,7 +64,11 @@ class Events:
             if self.bot.database_online:
                 cond = str(await self.bot.cogs["ServerCog"].find_staff(msg.guild,"anti_caps_lock")) in ['1','True']
             if cond:
+<<<<<<< HEAD
                 if len(msg.content)>0 and sum(1 for c in msg.content if c.isupper())/len(msg.content.replace('|','')) > 0.75 and len(msg.content.replace('|',''))>7:
+=======
+                if len(msg.content)>0 and sum(1 for c in msg.content if c.isupper())/len(msg.content.replace('|','')) > 0.75 and len(msg.content.replace('|',''))>7 and not msg.channel.permissions_for(msg.author).administrator:
+>>>>>>> indev
                     try:
                         await msg.channel.send(str(await self.bot.cogs["LangCog"].tr(msg.guild,"modo","caps-lock")).format(msg.author.mention),delete_after=4.0)
                     except:
@@ -141,9 +145,18 @@ class Events:
                     await self.add_points(self.table['ban'])
                     break
         except Exception as e:
-            print("[check_user_left] {} (user {}/server {})".format(e,member.id,member.guild.id))
-            return
+            if member.guild.id!=264445053596991498:
+                print("[check_user_left] {} (user {}/server {})".format(e,member.id,member.guild.id))
 
+
+    async def loop(self):
+        await self.bot.wait_until_ready()
+        print("launching")
+        a = 0
+        while not self.bot.is_closed():
+            if int(datetime.datetime.now().second)==0:
+                a = a+2000/pow(10,3)-1
+            await asyncio.sleep(0.5)
 
 def setup(bot):
     bot.add_cog(Events(bot))

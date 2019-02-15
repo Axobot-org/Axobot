@@ -90,6 +90,7 @@ fun={"count-0":"Counting in progress...",
     "calc-5":"Oops, an error occured: `{}`",
     "no-reaction":"Unable to add reactions. Please check my permissions...",
     "cant-react":"I don't have enough permissions to send reactions!",
+    "no-emoji":"Unable to find this emoji!",
     "vote-0":"You can't put more than 20 choices, and even less a negative number of choices!",
     "blame-0":"List of available names for **{}**",
     "no-database":"As our database is offline, access to fun commands is restricted to people with permission \"Manage Server\"",
@@ -114,7 +115,8 @@ Have a nice day!""",
 "docs":"Here is the link to the bot documentation:",
 "stats-title":"**Bot statistics**",
 "stats":"""**Bot version:** {} \n**Number of servers:** {} \n**Number of visible members:** {} ({} **bots**)\n**Number of code lines:** {}\n**Used languages:** {}\n**Python version :** {} \n**Version of the `discord.py` lib:** {} \n**Loading on the RAM:** {} GB \n**Loading on the CPU:** {} % \n**API latency time:** {} ms""",
-"admins-list":"The administrators of this bot are : {}"}
+"admins-list":"The administrators of this bot are : {}",
+"prefix":"List of currently usable prefixes:"}
 
 infos_2={"membercount-0":"Total number of members",
 "membercount-1":"Number of bots",
@@ -300,17 +302,24 @@ Written on {date}
 
 Link : {url}
 """,
+"twitch-form-last":"""{logo}  | Here is the last video of {author}:
+{title}
+Published on {date}
+Link : {url}
+""",
 "web-form-last":"""{logo}  |  Here is the last post of {author}:
 **{title}**
 *Written on {date}*
 Link : {link}""",
-"yt-default-flow":"{logo}  | New video of {author} : **{title}**\nPublished on {date}\nLink : {link}\n{mentions}",
-"tw-default-flow":"{logo}  | New tweet of {author} ! ({date})\n\n{title}\n\nLink : {link}\n\n{mentions}",
+"yt-default-flow":"{logo}  | New video of {author}: **{title}**\nPublished on {date}\nLink : {link}\n{mentions}",
+"tw-default-flow":"{logo}  | New tweet of {author}! ({date})\n\n{title}\n\nLink: {link}\n\n{mentions}",
+"twitch-default-flow":"{logo}  | New live by {author}! ({date})\n\n{title}\n\nLink: {link}\n\n{mentions}",
 "web-default-flow":"{logo}  | New post on {author} ({date}) :\n    {title}\n\n{link}\n\n{mentions}",
 "list":"*Type the number of the flow to modify*\n\n**Link - Type - Channel - Mentions**\n",
 "list2":"*Type the number of the flow to delete*\n\n**Link - Type - Channel**\n",
 'tw':'Twitter',
 'yt':'YouTube',
+'twitch':'Twitch',
 'web':'Web',
 'mc':'Minecraft',
 'choose-mentions-1':"Please choose the flow to modify",
@@ -337,7 +346,8 @@ Link : {link}""",
 - `{logo}`: an emoji representing the type of post (web, Twitter, YouTube...)
 - `{mentions}`: the list of mentioned roles
 - `{title}`: the title of the post""",
-"text-success":"The text of the feed #{} has been modified!\n New text : \n```\n{}\n```"
+"text-success":"The text of the feed #{} has been modified!\n New text : \n```\n{}\n```",
+"invalid-flow":"This url is invalid (empty or inaccessible rss flow) :confused:"
 }
 
 server={"config-help": "This command is mainly used to configure your server. By doing `!config see [option]` you will get \

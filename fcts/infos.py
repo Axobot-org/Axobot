@@ -527,6 +527,15 @@ Available types: member, role, user, emoji, channel, guild, invite, category"""
                 text += "- {i[0]} : {i[1]}\n".format(i=i)
             await ctx.send(text)
 
+    @commands.command(name="prefix")
+    async def get_prefix(self,ctx):
+        """Show the usable prefix(s) for this server"""
+        txt = await self.translate(ctx.guild,"infos","prefix")
+        prefix = "\n\n".join(await ctx.bot.get_prefix(ctx.message))
+        if ctx.guild==None or ctx.channel.permissions_for(ctx.guild.me):
+            emb = ctx.bot.cogs['EmbedCog'].Embed(title=txt,desc=prefix,time=ctx.message.created_at,color=ctx.bot.cogs['HelpCog'].help_color).create_footer(ctx.author)
+            return await ctx.send(embed=emb.discord_embed())
+        await ctx.send(txt+"\n"+prefix)
 
 def setup(bot):
     bot.add_cog(InfosCog(bot))
