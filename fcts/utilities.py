@@ -147,8 +147,8 @@ class UtilitiesCog:
             pass
 
     async def global_check(self,ctx):
-        """Check if the guild is a banned guild (aka ignored commands)"""
-        if ctx.bot.cogs['RssCog'].last_update==None or (datetime.datetime.now() - ctx.bot.cogs['RssCog'].last_update).total_seconds() > 30*60:
+        """Do a lot of checks before executing a command (rss loop, banned guilds etc)"""
+        if ctx.bot.cogs['RssCog'].last_update==None or (datetime.datetime.now() - ctx.bot.cogs['RssCog'].last_update).total_seconds() > 45*60:
             self.bot.log.info("Check RSS lancée")
             self.bot.cogs['RssCog'].last_update = datetime.datetime.now()
             await ctx.bot.cogs['RssCog'].main_loop()
@@ -160,7 +160,11 @@ class UtilitiesCog:
             self.config = await self.bot.cogs['ServerCog'].get_bot_infos(self.bot.user.id)
         if len(self.config)==0:
             return True
-        return not str(ctx.id) in self.config[0]['banned_guilds'].split(";")
+        if str(ctx.guild.id) in self.config[0]['banned_guilds'].split(";"):
+            return False
+        if str(ctx.author.id) in self.config[0]['banned_users'].split(";"):
+            return False
+        return True 
 
     async def create_footer(self,embed,user):
         embed.set_footer(text="Requested by {}".format(user.name), icon_url=user.avatar_url_as(format='png'))
