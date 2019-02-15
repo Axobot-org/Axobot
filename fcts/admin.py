@@ -353,6 +353,46 @@ class AdminCog:
         else:
             await ctx.send("Commande `{}` introuvable".format(cmd))
     
+    @main_msg.command(name="ignore")
+    @commands.check(reloads.check_admin)
+    async def add_ignoring(self,ctx,ID:int):
+        """Ajoute un serveur ou un utilisateur dans la liste des utilisateurs/serveurs ignorés"""
+        serv = ctx.bot.get_guild(ID)
+        try:
+            usr = await ctx.bot.get_user_info(ID)
+        except:
+            usr = None
+        scog = ctx.bot.cogs['ServerCog']
+        try:
+            config = await ctx.bot.cogs['UtilitiesCog'].get_bot_infos()
+            if serv!=None and usr!=None:
+                await ctx.send("Serveur trouvé : {}\nUtilisateur trouvé : {}".format(serv.name,usr))
+            elif serv!=None:
+                servs = config['banned_guilds'].split(';')
+                if str(serv.id) in servs:
+                    servs.remove(str(serv.id))
+                    await scog.edit_bot_infos(self.bot.user.id,[('banned_guilds',';'.join(servs))])
+                    await ctx.send("Le serveur {} n'est plus blacklisté".format(serv.name))
+                else:
+                    servs.append(str(serv.id))
+                    await scog.edit_bot_infos(self.bot.user.id,[('banned_guilds',';'.join(servs))])
+                    await ctx.send("Le serveur {} a bien été blacklist".format(serv.name))
+            elif usr!=None:
+                usrs = config['banned_users'].split(';')
+                if str(usr.id) in usrs:
+                    usrs.remove(str(usr.id))
+                    await scog.edit_bot_infos(self.bot.user.id,[('banned_users',';'.join(usrs))])
+                    await ctx.send("L'utilisateur {} n'est plus blacklisté".format(usr))
+                else:
+                    usrs.append(str(usr.id))
+                    await scog.edit_bot_infos(self.bot.user.id,[('banned_users',';'.join(usrs))])
+                    await ctx.send("L'utilisateur {} a bien été blacklist".format(usr))
+            else:
+                await ctx.send("Impossible de trouver cet utilisateur/ce serveur")
+            ctx.bot.cogs['UtilitiesCog'].config = None
+        except Exception as e:
+            await ctx.bot.cogs['ErrorsCog'].on_command_error(ctx,e)
+
     @main_msg.command(name="logs")
     @commands.check(reloads.check_admin)
     async def show_last_logs(self,ctx,lines:typing.Optional[int]=5,match=''):

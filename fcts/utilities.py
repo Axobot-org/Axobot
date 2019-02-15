@@ -16,7 +16,7 @@ class UtilitiesCog:
         self.new_pp = False
         
     async def on_ready(self):
-        self.config = await self.bot.cogs['ServerCog'].get_bot_infos(self.bot.user.id)
+        self.config = (await self.bot.cogs['ServerCog'].get_bot_infos(self.bot.user.id))[0]
 
     async def reload(self,liste):
         for m in liste:
@@ -146,23 +146,27 @@ class UtilitiesCog:
             await self.print2("Unable to delete message "+str(msg))
             pass
 
+    async def get_bot_infos(self):
+        if self.config == None:
+            self.config = (await self.bot.cogs['ServerCog'].get_bot_infos(self.bot.user.id))[0]
+        return self.config
+
     async def global_check(self,ctx):
         """Do a lot of checks before executing a command (rss loop, banned guilds etc)"""
         if ctx.bot.cogs['RssCog'].last_update==None or (datetime.datetime.now() - ctx.bot.cogs['RssCog'].last_update).total_seconds() > 45*60:
             self.bot.log.info("Check RSS lancée")
             self.bot.cogs['RssCog'].last_update = datetime.datetime.now()
             await ctx.bot.cogs['RssCog'].main_loop()
-        if type(ctx)==commands.context:
-            ctx = ctx.guild
-        elif type(ctx) != discord.guild:
+        if type(ctx)!=commands.context.Context:
             return True
-        if self.config == None:
-            self.config = await self.bot.cogs['ServerCog'].get_bot_infos(self.bot.user.id)
+        if await self.bot.cogs['AdminCog'].check_if_admin(ctx):
+            return True
+        self.config = await self.get_bot_infos()
         if len(self.config)==0:
             return True
-        if str(ctx.guild.id) in self.config[0]['banned_guilds'].split(";"):
+        if str(ctx.guild.id) in self.config['banned_guilds'].split(";"):
             return False
-        if str(ctx.author.id) in self.config[0]['banned_users'].split(";"):
+        if str(ctx.author.id) in self.config['banned_users'].split(";"):
             return False
         return True 
 

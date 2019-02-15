@@ -76,6 +76,23 @@ class ServerCog:
             liste.append(x)
         cnx.close()
         return liste
+    
+    async def edit_bot_infos(self,botID,values=[()]):
+        if type(values)!=list:
+            raise ValueError
+        v = list()
+        cnx = self.connect()
+        cursor = cnx.cursor()
+        for x in values:
+            if type(x) == bool:
+                v.append("`{x[0]}`={x[1]}".format(x=x))
+            else:
+                v.append("""`{x[0]}`="{x[1]}" """.format(x=x))
+        query = ("UPDATE `bot_infos` SET {v} WHERE `ID`='{id}'".format(v=",".join(v),id=botID))
+        cursor.execute(query)
+        cnx.commit()
+        cnx.close()
+        return True
 
     async def get_languages(self,ignored_guilds):
         """Return percentages of languages"""
