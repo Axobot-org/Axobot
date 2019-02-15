@@ -141,16 +141,17 @@ class Events:
                     await self.add_points(self.table['ban'])
                     break
         except Exception as e:
-            print("[check_user_left] {} (user {}/server {})".format(e,member.id,member.guild.id))
-            return
+            if member.guild.id!=264445053596991498:
+                print("[check_user_left] {} (user {}/server {})".format(e,member.id,member.guild.id))
 
 
     async def loop(self):
         await self.bot.wait_until_ready()
         print("launching")
+        a = 0
         while not self.bot.is_closed():
             if int(datetime.datetime.now().second)==0:
-                print("Hey!")
+                a = a+2000/pow(10,3)-1
             await asyncio.sleep(0.5)
 
 def setup(bot):
