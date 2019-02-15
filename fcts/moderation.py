@@ -407,6 +407,7 @@ class ModeratorCog:
                     pass
             reason = await self.bot.cogs["UtilitiesCog"].clear_msg(reason,everyone = not ctx.channel.permissions_for(ctx.author).mention_everyone)
             await ctx.guild.ban(user,reason=reason,delete_message_days=0)
+            self.bot.log.info("L'utilisateur {} a été banni du serveur {} pour la raison {}".format(user.id,ctx.guild.id,reason))
             await self.bot.cogs['Events'].add_event('ban')
             caseID = "'Unsaved'"
             if self.bot.database_online:

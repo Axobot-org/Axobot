@@ -39,10 +39,10 @@ class Events:
         try:
             if Type == "join":
                 self.bot.log.info("Le bot a rejoint le serveur {}".format(guild.id))
-                desc = "Bot **joins the server** {}".format(guild.name)
+                desc = "Bot **joins the server** {} ({})".format(guild.name,guild.id)
             else:
                 self.bot.log.info("Le bot a quitté le serveur {}".format(guild.id))
-                desc = "Bot **left the server** {}".format(guild.name)
+                desc = "Bot **left the server** {} ({})".format(guild.name,guild.id)
             emb = self.bot.cogs["EmbedCog"].Embed(desc=desc,color=self.embed_colors['welcome']).update_timestamp().set_author(self.bot.user)
             await self.bot.cogs["EmbedCog"].send([emb])
         except Exception as e:

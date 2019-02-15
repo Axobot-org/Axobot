@@ -192,8 +192,9 @@ class ServerCog:
         if i == None:
             if channel != None:
                 await channel.send(await self.translate(channel.guild.id,"server","new_server"))
-            await self.bot.get_user(279568324260528128).send("Le serveur n°{} vient d'être ajouté dans la base de donnée".format(ID))
-            emb = self.bot.cogs["EmbedCog"].Embed(desc="New server in the database :tada: `{}".format(self.bot.get_guild(ID)),color=self.log_color).update_timestamp()
+            # await self.bot.get_user(279568324260528128).send("Le serveur n°{} vient d'être ajouté dans la base de donnée".format(ID))
+            g = self.bot.get_guild(ID)
+            emb = self.bot.cogs["EmbedCog"].Embed(desc="New server in the database :tada: `{}` ({})".format(g.name,g.id),color=self.log_color).update_timestamp()
             await self.bot.cogs["EmbedCog"].send([emb])
             return await self.add_server(ID)
         return True
@@ -278,7 +279,7 @@ class ServerCog:
             else:
                 msg = await self.translate(ctx.guild.id,"server","change-1")
             await ctx.send(msg.format(option))
-            emb = self.bot.cogs["EmbedCog"].Embed(desc="Reset option in server `{}`: {}".format(ctx.guild.name,option),color=self.log_color).update_timestamp().set_author(ctx.guild.me)
+            emb = self.bot.cogs["EmbedCog"].Embed(desc="Reset option in server `{}`: {}".format(ctx.guild.id,option),color=self.log_color).update_timestamp().set_author(ctx.guild.me)
             await self.bot.cogs["EmbedCog"].send([emb])
         except ValueError:
             await ctx.send(await self.translate(ctx.guild.id,"server","change-0"))
@@ -287,7 +288,7 @@ class ServerCog:
             await ctx.send(await self.translate(ctx.guild.id,"server","change-1"))
 
     async def send_embed(self,guild,option,value):
-        emb = self.bot.cogs["EmbedCog"].Embed(desc="Changed option in server `{}`: {} = {}".format(guild.name,option,value),color=self.log_color).update_timestamp().set_author(guild.me)
+        emb = self.bot.cogs["EmbedCog"].Embed(desc="Changed option in server `{}`: {} = {}".format(guild.id,option,value),color=self.log_color).update_timestamp().set_author(guild.me)
         await self.bot.cogs["EmbedCog"].send([emb])
 
 

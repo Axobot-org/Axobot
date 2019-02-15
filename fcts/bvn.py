@@ -124,11 +124,12 @@ class WelcomerCog:
         try:
             t = "Bot" if member.bot else "Member"
             if Type == "welcome":
-                desc = "{} {} joined the server {}".format(t,member,member.guild.name)
+                desc = "{} {} ({}) joined the server {}".format(t,member,member.id,member.guild.id)
             else:
-                desc = "{} {} left the server {}".format(t,member,member.guild.name)
+                desc = "{} {} ({}) left the server {}".format(t,member,member.id,member.guild.id)
             emb = self.bot.cogs["EmbedCog"].Embed(desc=desc,color=16098851).update_timestamp().set_author(self.bot.user)
             await self.bot.cogs["EmbedCog"].send([emb])
+            self.bot.log.info(desc)
         except Exception as e:
             await self.bot.cogs["ErrorsCog"].on_error(e,None)
 
