@@ -243,12 +243,14 @@ class RssCog:
             Type = "web"
             display_type = 'website'
         elif not link.startswith("http"):
-            print(link)
             await ctx.send(await self.translate(ctx.guild,"rss","invalid-link"))
             return
+        if not await self.check_rss_url(link):
+            return await ctx.send(await self.translate(ctx.guild.id,"rss","invalid-flow"))
         try:
             await self.add_flow(ctx.guild.id,ctx.channel.id,Type,identifiant)
             await ctx.send(str(await self.translate(ctx.guild,"rss","success-add")).format(display_type,link,ctx.channel.mention))
+            self.bot.log.Info("Flux rss ajouté dans le serveur {} ({})".format(ctx.guild.id,link))
         except Exception as e:
             await ctx.send(await self.translate(ctx.guild,"rss","fail-add"))
             await self.bot.cogs["ErrorsCog"].on_error(e,ctx)
@@ -610,6 +612,24 @@ class RssCog:
                 await ctx.send("\n".join(txt))
         except Exception as e:
             await ctx.bot.cogs['ErrorsCog'].on_cmd_error(ctx,e)
+
+    async def check_rss_url(self,url):
+        r = await self.parse_yt_url(url)
+        if r!=None:
+            return True
+        r = await self.parse_tw_url(url)
+        if r!=None:
+            return True
+        r = await self.parse_twitch_url(url)
+        if r!=None:
+            return True
+        try:
+            f = feedparser.parse(url)
+            _ = f.entries[0]
+            return True
+        except:
+            return False
+
 
     async def parse_yt_url(self,url):
         r = r'(?:http.*://)?(?:www.)?(?:youtube.com|youtu.be)(?:/channel/|/user/)(.+)'

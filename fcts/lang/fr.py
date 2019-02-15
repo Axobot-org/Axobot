@@ -346,7 +346,8 @@ Lien : {link}""",
 - `{logo}` : un emoji représentant le type de post (web, Twitter, YouTube...)
 - `{mentions}` : la liste des rôles mentionnés
 - `{title}` : le titre du post""",
-"text-success":"Le texte du flux n°{} a bien été modifié ! Nouveau texte : \n```\n{}\n```"
+"text-success":"Le texte du flux n°{} a bien été modifié ! Nouveau texte : \n```\n{}\n```",
+"invalid-flow":"Cet url est invalide (flux rss vide ou inaccessible) :confused:"
 }
 
 server={"config-help":"Cette commande sert principalement à configurer votre serveur. En faisant `!config see [option]` vous obtiendrez l'aperçu des configurations actuelles, \

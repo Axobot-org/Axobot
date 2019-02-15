@@ -346,7 +346,8 @@ Link : {link}""",
 - `{logo}`: an emoji representing the type of post (web, Twitter, YouTube...)
 - `{mentions}`: the list of mentioned roles
 - `{title}`: the title of the post""",
-"text-success":"The text of the feed #{} has been modified!\n New text : \n```\n{}\n```"
+"text-success":"The text of the feed #{} has been modified!\n New text : \n```\n{}\n```",
+"invalid-flow":"This url is invalid (empty or inaccessible rss flow) :confused:"
 }
 
 server={"config-help": "This command is mainly used to configure your server. By doing `!config see [option]` you will get \
