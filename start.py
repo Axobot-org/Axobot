@@ -37,7 +37,7 @@ def setup_logger():
 
     # log vers un fichier
     file_handler = logging.FileHandler("debug.log")
-    file_handler.setLevel(logging.INFO)  # tous les logs de niveau DEBUG et supérieur sont evoyés dans le fichier
+    file_handler.setLevel(logging.DEBUG)  # tous les logs de niveau DEBUG et supérieur sont evoyés dans le fichier
     file_handler.setFormatter(format)
 
     # log vers la console
