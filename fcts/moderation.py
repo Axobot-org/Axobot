@@ -229,6 +229,15 @@ class ModeratorCog:
             await ctx.send(await self.translate(ctx.guild.id,"modo","error"))
             await self.bot.cogs['ErrorsCog'].on_error(e,ctx)
 
+    async def get_muted_role(self,guild):
+        return discord.utils.get(guild.roles,name="muted")
+
+    async def mute_event(self,member,author,reason,caseID):
+        role = await self.get_muted_role(member.guild)
+        await member.add_roles(role,reason=reason)
+        log = str(await self.translate(member.guild.id,"logs","mute-on")).format(member=member,reason=reason,case=caseID)
+        await self.bot.cogs["Events"].send_logs_per_server(member.guild,"mute",log,author)
+
     @commands.command(name="mute")
     @commands.cooldown(5,20, commands.BucketType.guild)
     @commands.guild_only()
@@ -244,7 +253,7 @@ class ModeratorCog:
         except Exception as e:
             await self.bot.cogs['ErrorsCog'].on_error(e,ctx)
             return
-        role = discord.utils.get(ctx.guild.roles,name="muted")
+        role = await self.get_muted_role(ctx.guild)
         if role in user.roles:
             await ctx.send(await self.translate(ctx.guild.id,"modo","already-mute"))
             return
@@ -269,10 +278,8 @@ class ModeratorCog:
                     caseID = case.id
                 except Exception as e:
                     await self.bot.cogs['ErrorsCog'].on_error(e,ctx)
-            await user.add_roles(role,reason=reason)
+            await self.mute_event(user,ctx.author,reason,caseID)
             await ctx.send(str(await self.translate(ctx.guild.id,"modo","mute-1")).format(user,reason))
-            log = str(await self.translate(ctx.guild.id,"logs","mute-on")).format(member=user,reason=reason,case=caseID)
-            await self.bot.cogs["Events"].send_logs_per_server(ctx.guild,"mute",log,ctx.author)
             if ctx.channel.permissions_for(ctx.guild.me).manage_messages:
                 await ctx.message.delete()
         except Exception as e:
@@ -281,7 +288,7 @@ class ModeratorCog:
 
 
     async def unmute_event(self,guild,user,author):
-        role = discord.utils.get(guild.roles,name="muted")
+        role = await self.get_muted_role(guild)
         if author==guild.me:
             await user.remove_roles(role,reason="automatic unmute")
         else:
@@ -296,7 +303,7 @@ class ModeratorCog:
     async def unmute(self,ctx,user:discord.Member):
         """Unmute someone
         This will remove the role 'muted' for the targeted member"""
-        role = discord.utils.get(ctx.guild.roles,name="muted")
+        role = await self.get_muted_role(ctx.guild)
         if role not in user.roles:
             await ctx.send(await self.translate(ctx.guild.id,"modo","already-unmute"))
             return
