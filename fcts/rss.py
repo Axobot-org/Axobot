@@ -914,6 +914,7 @@ class RssCog:
         t = time.time()
         if self.loop_processing:
             return
+        self.bot.log.info("Check RSS lancée")
         if guildID==None:
             liste = await self.get_all_flows()
             self.loop_processing = True
