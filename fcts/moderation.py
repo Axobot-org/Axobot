@@ -712,5 +712,24 @@ ID corresponds to the Identifier of the message"""
             await ctx.bot.cogs['ErrorsCog'].on_cmd_error(ctx,e)
 
 
+    async def configure_muted_role(self,guild):
+        """Ajoute le rôle muted au serveur, avec les permissions nécessaires"""
+        if not guild.me.guild_permissions.manage_roles:
+            return False
+        try:
+            role = await guild.create_role(name="muted")
+            for x in guild.by_category():
+                count = 0
+                category,channelslist = x[0],x[1]
+                for channel in channelslist:
+                    if len(channel.changed_roles)!=0 and channel.changed_roles!=category.changed_roles:
+                        await channel.set_permissions(role,send_messages=False)
+                        count += 1
+                await category.set_permissions(role,send_messages=False)
+            return role.id
+        except Exception as e:
+            await self.bot.cogs['ErrorsCog'].on_error(e,None)
+
+
 def setup(bot):
     bot.add_cog(ModeratorCog(bot))
