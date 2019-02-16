@@ -1,4 +1,4 @@
-import discord, datetime, asyncio, logging
+import discord, datetime, asyncio, logging, time
 
 
 
@@ -142,16 +142,69 @@ class Events:
                     break
         except Exception as e:
             if member.guild.id!=264445053596991498:
-                print("[check_user_left] {} (user {}/server {})".format(e,member.id,member.guild.id))
+                self.bot.log.warn("[check_user_left] {} (user {}/server {})".format(e,member.id,member.guild.id))
 
+
+
+    async def get_events_from_db(self,all=False,IDonly=False):
+        """Renvoie une liste de tous les events qui doivent être exécutés"""
+        try:
+            cnx = self.bot.cogs['ServerCog'].connect()
+            cursor = cnx.cursor(dictionary = True)
+            if IDonly:
+                query = ("SELECT `ID` FROM `timed`")
+            else:
+                query = ("SELECT * FROM `timed`")
+            cursor.execute(query)
+            liste = list()
+            for x in cursor:
+                if all:
+                    liste.append(x)
+                else:
+                    if IDonly or x['begin'].timestamp()+x['duration'] < time.time():
+                        liste.append(x)
+            cnx.close()
+            if len(liste)>0:
+                return liste
+            else:
+                return []
+        except Exception as e:
+            await self.bot.cogs['ErrorsCog'].on_error(e,None)
+
+
+    async def check_tasks(self):
+        tasks = await self.get_events_from_db()
+        for task in tasks:
+            if task['action']=='mute':
+                try:
+                    guild = self.bot.get_guild(task['guild'])
+                    if guild==None:
+                        continue
+                    user = guild.get_member(task['user'])
+                    if user==None:
+                        continue
+                    await self.bot.cogs['ModeratorCog'].unmute_event(guild,user,guild.me)
+                except Exception as e:
+                    await self.bot.cogs['ErrorsCog'].on_error(e,None)
+                    self.bot.log.error("[unmute_task] Impossible d'unmute automatiquement : {}".format(e))
+
+    async def add_task(self,guildID,userID,action,duration):
+        """Ajoute une tâche à la liste"""
+        cnx = self.bot.cogs['ServerCog'].connect()
+        cursor = cnx.cursor()
+        ID = max([x['ID'] for x in await self.get_events_from_db(all=True,IDonly=True)])+1
+        query = ("INSERT INTO `timed` (`ID`,`guild`,`user`,`action`,`duration`) VALUES ({},{},{},'{}',{})".format(ID,guildID,userID,action,duration))
+        cursor.execute(query)
+        cnx.commit()
+        cnx.close()
+        return True
 
     async def loop(self):
         await self.bot.wait_until_ready()
-        print("launching")
-        a = 0
+        self.bot.log.info("[tasks_loop] Lancement de la boucle")
         while not self.bot.is_closed():
             if int(datetime.datetime.now().second)==0:
-                a = a+2000/pow(10,3)-1
+                await self.check_tasks()
             await asyncio.sleep(0.5)
 
 def setup(bot):
