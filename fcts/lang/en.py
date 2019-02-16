@@ -347,7 +347,8 @@ Link : {link}""",
 - `{mentions}`: the list of mentioned roles
 - `{title}`: the title of the post""",
 "text-success":"The text of the feed #{} has been modified!\n New text : \n```\n{}\n```",
-"invalid-flow":"This url is invalid (empty or inaccessible rss flow) :confused:"
+"invalid-flow":"This url is invalid (empty or inaccessible rss flow) :confused:",
+"research-timeout":"The web page took too long to answer, I had to interrupt the process :eyes:"
 }
 
 server={"config-help": "This command is mainly used to configure your server. By doing `!config see [option]` you will get \

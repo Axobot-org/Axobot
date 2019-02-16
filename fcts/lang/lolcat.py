@@ -347,7 +347,8 @@ UrL : {link}""",
 - `{mentions}`: the list ov mentioned roles
 - `{title}`: the titl of da post""",
 "text-success":"Teh text of the feed #{} haz been modified!\n New cute text : \n```\n{}\n```",
-"invalid-flow":"I can't add dis url (empty or inaccessible rss flew) :confused:"
+"invalid-flow":"I can't add dis url (empty or inaccessible rss flew) :confused:",
+"research-timeout":"This page took toooo long 2 answer, I had to stop teh process :eyes:"
 }
 
 server={"config-help": "Dis cmd is mainly usd 2 configur ur srver. By doin `!config see [option]` u will get \

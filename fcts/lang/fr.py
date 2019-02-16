@@ -347,7 +347,8 @@ Lien : {link}""",
 - `{mentions}` : la liste des rôles mentionnés
 - `{title}` : le titre du post""",
 "text-success":"Le texte du flux n°{} a bien été modifié ! Nouveau texte : \n```\n{}\n```",
-"invalid-flow":"Cet url est invalide (flux rss vide ou inaccessible) :confused:"
+"invalid-flow":"Cet url est invalide (flux rss vide ou inaccessible) :confused:",
+"research-timeout":"La page web a mis trop de temps à répondre, j'ai dû interrompre le processus :eyes:"
 }
 
 server={"config-help":"Cette commande sert principalement à configurer votre serveur. En faisant `!config see [option]` vous obtiendrez l'aperçu des configurations actuelles, \
