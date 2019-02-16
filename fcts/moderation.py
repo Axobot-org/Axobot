@@ -280,6 +280,15 @@ class ModeratorCog:
             await self.bot.cogs['ErrorsCog'].on_error(e,ctx)
 
 
+    async def unmute_event(self,guild,user,author):
+        role = discord.utils.get(guild.roles,name="muted")
+        if author==guild.me:
+            await user.remove_roles(role,reason="automatic unmute")
+        else:
+            await user.remove_roles(role,reason="unmuted by {}".format(author))
+        log = str(await self.translate(guild.id,"logs","mute-off")).format(member=user)
+        await self.bot.cogs["Events"].send_logs_per_server(guild,"mute",log,author)
+
     @commands.command(name="unmute")
     @commands.cooldown(5,20, commands.BucketType.guild)
     @commands.guild_only()
@@ -301,15 +310,14 @@ class ModeratorCog:
             await ctx.send(await self.translate(ctx.guild.id,"modo","mute-high"))
             return
         try:
-            await user.remove_roles(role,reason="unmuted by {}".format(ctx.author))
+            await self.unmute_event(ctx.guild,user,ctx.author)
             await ctx.send(str(await self.translate(ctx.guild.id,"modo","unmute-1")).format(user))
-            log = str(await self.translate(ctx.guild.id,"logs","mute-off")).format(member=user)
-            await self.bot.cogs["Events"].send_logs_per_server(ctx.guild,"mute",log,ctx.author)
             if ctx.channel.permissions_for(ctx.guild.me).manage_messages:
                 await ctx.message.delete()
         except Exception as e:
             await ctx.send(await self.translate(ctx.guild.id,"modo","error"))
             await self.bot.cogs['ErrorsCog'].on_error(e,ctx)
+
 
 
     @commands.command(name="ban")
