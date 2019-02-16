@@ -174,6 +174,9 @@ class Events:
 
     async def check_tasks(self):
         tasks = await self.get_events_from_db()
+        if len(tasks)==0:
+            return
+        self.bot.log.debug("[tasks_loop] Itération ({} tâches trouvées)".format(len(tasks)))
         for task in tasks:
             if task['action']=='mute':
                 try:
@@ -184,6 +187,7 @@ class Events:
                     if user==None:
                         continue
                     await self.bot.cogs['ModeratorCog'].unmute_event(guild,user,guild.me)
+                    await self.remove_task(task['ID'])
                 except Exception as e:
                     await self.bot.cogs['ErrorsCog'].on_error(e,None)
                     self.bot.log.error("[unmute_task] Impossible d'unmute automatiquement : {}".format(e))
@@ -192,8 +196,22 @@ class Events:
         """Ajoute une tâche à la liste"""
         cnx = self.bot.cogs['ServerCog'].connect()
         cursor = cnx.cursor()
-        ID = max([x['ID'] for x in await self.get_events_from_db(all=True,IDonly=True)])+1
+        ids = await self.get_events_from_db(all=True,IDonly=True)
+        if len(ids)>0:
+            ID = max([x['ID'] for x in ids])+1
+        else:
+            ID = 0
         query = ("INSERT INTO `timed` (`ID`,`guild`,`user`,`action`,`duration`) VALUES ({},{},{},'{}',{})".format(ID,guildID,userID,action,duration))
+        cursor.execute(query)
+        cnx.commit()
+        cnx.close()
+        return True
+
+    async def remove_task(self,ID:int):
+        """Enlève une tâche exécutée"""
+        cnx = self.bot.cogs['ServerCog'].connect()
+        cursor = cnx.cursor()
+        query = ("DELETE FROM `timed` WHERE `timed`.`ID` = {}".format(ID))
         cursor.execute(query)
         cnx.commit()
         cnx.close()
@@ -203,7 +221,7 @@ class Events:
         await self.bot.wait_until_ready()
         self.bot.log.info("[tasks_loop] Lancement de la boucle")
         while not self.bot.is_closed():
-            if int(datetime.datetime.now().second)==0:
+            if int(datetime.datetime.now().second)%30 == 0:
                 await self.check_tasks()
             await asyncio.sleep(0.5)
 
