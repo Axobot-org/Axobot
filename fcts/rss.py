@@ -162,7 +162,7 @@ class RssCog:
     async def request_twitch(self,ctx,channel):
         """The last video of a Twitch channel"""
         if "twitch.tv" in channel:
-            ID= await self.parse_twitch_url(channel)
+            channel = await self.parse_twitch_url(channel)
         text = await self.rss_twitch(ctx.guild,channel)
         if type(text) == str:
             await ctx.send(text)
