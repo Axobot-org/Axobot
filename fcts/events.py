@@ -192,8 +192,13 @@ class Events:
                     await self.bot.cogs['ErrorsCog'].on_error(e,None)
                     self.bot.log.error("[unmute_task] Impossible d'unmute automatiquement : {}".format(e))
 
+
     async def add_task(self,guildID,userID,action,duration):
         """Ajoute une tâche à la liste"""
+        tasks = await self.get_events_from_db(all=True)
+        for t in tasks:
+            if t['user']==userID and t['guild']==guildID and t['action']==action:
+                return await self.update_duration(t['ID'],duration)
         cnx = self.bot.cogs['ServerCog'].connect()
         cursor = cnx.cursor()
         ids = await self.get_events_from_db(all=True,IDonly=True)
@@ -202,6 +207,16 @@ class Events:
         else:
             ID = 0
         query = ("INSERT INTO `timed` (`ID`,`guild`,`user`,`action`,`duration`) VALUES ({},{},{},'{}',{})".format(ID,guildID,userID,action,duration))
+        cursor.execute(query)
+        cnx.commit()
+        cnx.close()
+        return True
+
+    async def update_duration(self,ID,new_duration):
+        """Modifie la durée d'une tâche"""
+        cnx = self.bot.cogs['ServerCog'].connect()
+        cursor = cnx.cursor()
+        query = ("UPDATE `timed` SET `duration`={} WHERE `ID`={}".format(new_duration,ID))
         cursor.execute(query)
         cnx.commit()
         cnx.close()
