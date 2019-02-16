@@ -1,4 +1,4 @@
-import discord, sys, traceback, importlib, datetime, random, re
+import discord, sys, traceback, importlib, datetime, random, re, asyncio
 from fcts import utilities
 from discord.ext import commands
 
@@ -153,10 +153,11 @@ class UtilitiesCog:
 
     async def global_check(self,ctx):
         """Do a lot of checks before executing a command (rss loop, banned guilds etc)"""
-        if ctx.bot.cogs['RssCog'].last_update==None or (datetime.datetime.now() - ctx.bot.cogs['RssCog'].last_update).total_seconds() > 45*60:
-            self.bot.log.info("Check RSS lancée")
+        if ctx.bot.cogs['RssCog'].last_update==None or (datetime.datetime.now() - ctx.bot.cogs['RssCog'].last_update).total_seconds() > 45*60*0.1:
+            
             self.bot.cogs['RssCog'].last_update = datetime.datetime.now()
-            await ctx.bot.cogs['RssCog'].main_loop()
+            asyncio.run_coroutine_threadsafe(ctx.bot.cogs['RssCog'].main_loop(),asyncio.get_running_loop())
+            print("launched")
         if type(ctx)!=commands.context.Context:
             return True
         if await self.bot.cogs['AdminCog'].check_if_admin(ctx):
