@@ -257,12 +257,12 @@ class ModeratorCog:
         if role in user.roles:
             await ctx.send(await self.translate(ctx.guild.id,"modo","already-mute"))
             return
-        if role == None:
-            await ctx.send(await self.translate(ctx.guild.id,"modo","no-mute"))
-            return
-        if not ctx.channel.permissions_for(ctx.guild.me).manage_roles:
+        if not ctx.guild.me.guild_permissions.manage_roles:
             await ctx.send(await self.translate(ctx.guild.id,"modo","cant-mute"))
             return
+        if role == None:
+            role = await self.configure_muted_role(ctx.guild)
+            await ctx.send(await self.translate(ctx.guild.id,"modo","mute-created"))
         if role.position > ctx.guild.me.roles[-1].position:
             await ctx.send(await self.translate(ctx.guild.id,"modo","mute-high"))
             return
@@ -289,6 +289,8 @@ class ModeratorCog:
 
     async def unmute_event(self,guild,user,author):
         role = await self.get_muted_role(guild)
+        if role==None or not role in user.roles:
+            return
         if author==guild.me:
             await user.remove_roles(role,reason="automatic unmute")
         else:
@@ -733,7 +735,7 @@ ID corresponds to the Identifier of the message"""
                         await channel.set_permissions(role,send_messages=False)
                         count += 1
                 await category.set_permissions(role,send_messages=False)
-            return role.id
+            return role
         except Exception as e:
             await self.bot.cogs['ErrorsCog'].on_error(e,None)
 

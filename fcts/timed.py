@@ -89,16 +89,16 @@ class TimedCog:
         except Exception as e:
             await self.bot.cogs['ErrorsCog'].on_error(e,ctx)
             return
-        role = discord.utils.get(ctx.guild.roles,name="muted")
+        role = await self.bot.cogs['ModeratorCog'].get_muted_role(ctx.guild)
         if role in user.roles:
             await ctx.send(await self.translate(ctx.guild.id,"modo","already-mute"))
             return
-        if role == None:
-            await ctx.send(await self.translate(ctx.guild.id,"modo","no-mute"))
-            return
-        if not ctx.channel.permissions_for(ctx.guild.me).manage_roles:
+        if not ctx.guild.me.guild_permissions.manage_roles:
             await ctx.send(await self.translate(ctx.guild.id,"modo","cant-mute"))
             return
+        if role == None:
+            role = await self.bot.cogs['ModeratorCog'].configure_muted_role(ctx.guild)
+            await ctx.send(await self.translate(ctx.guild.id,"modo","mute-created"))
         if role.position > ctx.guild.me.roles[-1].position:
             await ctx.send(await self.translate(ctx.guild.id,"modo","mute-high"))
             return
@@ -124,7 +124,6 @@ class TimedCog:
         except Exception as e:
             await ctx.send(await self.translate(ctx.guild.id,"modo","error"))
             await self.bot.cogs['ErrorsCog'].on_error(e,ctx)
-
 
 
 
