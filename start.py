@@ -179,9 +179,6 @@ def main():
             raise Exception("\n{} modules not loaded".format(count))
     del count
     
-
-    #@client.check_once
-    
     
     utilities = client.cogs["UtilitiesCog"]
 
