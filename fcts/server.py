@@ -296,8 +296,10 @@ class ServerCog:
             else:
                 msg = await self.translate(ctx.guild.id,"server","change-1")
             await ctx.send(msg.format(option))
-            emb = self.bot.cogs["EmbedCog"].Embed(desc="Reset option in server `{}`: {}".format(ctx.guild.id,option),color=self.log_color).update_timestamp().set_author(ctx.guild.me)
+            m = "Reset option in server {}: {}".format(ctx.guild.id,option)
+            emb = self.bot.cogs["EmbedCog"].Embed(desc=m,color=self.log_color).update_timestamp().set_author(ctx.guild.me)
             await self.bot.cogs["EmbedCog"].send([emb])
+            self.bot.log.debug(m)
         except ValueError:
             await ctx.send(await self.translate(ctx.guild.id,"server","change-0"))
         except Exception as e:
@@ -305,8 +307,10 @@ class ServerCog:
             await ctx.send(await self.translate(ctx.guild.id,"server","change-1"))
 
     async def send_embed(self,guild,option,value):
-        emb = self.bot.cogs["EmbedCog"].Embed(desc="Changed option in server `{}`: {} = {}".format(guild.id,option,value),color=self.log_color).update_timestamp().set_author(guild.me)
+        m = "Changed option in server {}: {} = `{}`".format(guild.id,option,value)
+        emb = self.bot.cogs["EmbedCog"].Embed(desc=m,color=self.log_color).update_timestamp().set_author(guild.me)
         await self.bot.cogs["EmbedCog"].send([emb])
+        self.bot.log.debug(m)
 
 
     async def conf_roles(self,ctx,option,value):
