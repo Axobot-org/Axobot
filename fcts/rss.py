@@ -393,6 +393,7 @@ class RssCog:
         """Configures a role to be notified when a news is posted"""
         if not ctx.bot.database_online:
             return await ctx.send(await self.translate(ctx.guild.id,"rss","no-db"))
+        e = None
         try:
             flow = await self.askID(ID,ctx)
         except Exception as e:
@@ -401,7 +402,8 @@ class RssCog:
             return
         if len(flow)==0:
             await ctx.send(await self.translate(ctx.guild,"rss","fail-add"))
-            await self.bot.cogs["ErrorsCog"].on_error(e,ctx)
+            if e !=None:
+                await self.bot.cogs["ErrorsCog"].on_error(e,ctx)
             return
         flow = flow[0]
         if flow['roles']=='':
@@ -787,6 +789,8 @@ class RssCog:
             numb = int('40'+numb)
         elif Type == 'mc':
             numb = int('50'+numb)
+        elif Type == 'twitch':
+            numb = int('60'+numb)
         else:
             numb = int('66'+numb)
         return numb
@@ -878,7 +882,7 @@ class RssCog:
             try:
                 await channel.send(t)
             except Exception as e:
-                print("[send_rss_msg] Can not send message on channel {}: {}".format(channel.id,e))
+                self.bot.log.info("[send_rss_msg] Can not send message on channel {}: {}".format(channel.id,e))
 
     async def check_flow(self,flow):
         try:
@@ -941,11 +945,11 @@ class RssCog:
 
     async def loop_child(self):
         if not self.bot.database_online:
-            print('Base de donnée hors ligne - check rss annulé')
+            self.bot.log.warn('Base de donnée hors ligne - check rss annulé')
             return
-        await self.print(await self.bot.cogs['TimeCog'].date(datetime.datetime.now(),digital=True)+" Boucle rss commencée !")
+        self.bot.log.info(await self.bot.cogs['TimeCog'].date(datetime.datetime.now(),digital=True)+" Boucle rss commencée !")
         await self.bot.cogs["RssCog"].main_loop()
-        await self.print(await self.bot.cogs['TimeCog'].date(datetime.datetime.now(),digital=True)+" Boucle rss terminée !")
+        self.bot.log.info(await self.bot.cogs['TimeCog'].date(datetime.datetime.now(),digital=True)+" Boucle rss terminée !")
 
     async def loop(self):
         await self.bot.wait_until_ready()
@@ -972,7 +976,7 @@ class RssCog:
                 await ctx.send("Une boucle rss est déjà en cours !")
             else:
                 await ctx.send("Et hop ! Une itération de la boucle en cours !")
-                await self.print(await self.bot.cogs['TimeCog'].date(datetime.datetime.now(),digital=True)+" Boucle rss forcée")
+                self.bot.log.info(await self.bot.cogs['TimeCog'].date(datetime.datetime.now(),digital=True)+" Boucle rss forcée")
                 await self.main_loop()
 
 
