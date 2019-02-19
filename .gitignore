@@ -6,6 +6,7 @@ fcts/cryptage.py
 fcts/test.py
 fcts/libs_testing.py
 fcts/requirements
+fcts/secret.py
 backup/*
 start2.py
 
