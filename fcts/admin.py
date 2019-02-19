@@ -414,11 +414,11 @@ class AdminCog:
                 liste.append(text[-i].replace('`',''))
             for i in liste:
                 if len(msg+i)>1900:
-                    await ctx.send("```\n{}\n```".format(msg))
+                    await ctx.send("```css\n{}\n```".format(msg))
                     msg = ""
                 if len(i)<1900:
                     msg += "\n"+i.replace('`','')
-            await ctx.send("```\n{}\n```".format(msg))
+            await ctx.send("```css\n{}\n```".format(msg))
         except Exception as e:
             await self.bot.cogs['ErrorsCog'].on_error(e,ctx)
 
