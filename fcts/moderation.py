@@ -171,8 +171,10 @@ class ModeratorCog:
                     caseID = case.id
                 except:
                     await self.bot.cogs['ErrorsCog'].on_error(e,ctx)
-            if ctx.channel.permissions_for(ctx.guild.me).manage_messages:
+            try:
                 await ctx.message.delete()
+            except:
+                pass
             await ctx.send(str( await self.translate(ctx.guild.id,"modo","kick")).format(user,reason))
             log = str(await self.translate(ctx.guild.id,"logs","kick")).format(member=user,reason=reason,case=caseID)
             await self.bot.cogs["Events"].send_logs_per_server(ctx.guild,"kick",log,ctx.author)
@@ -223,8 +225,10 @@ class ModeratorCog:
                 await self.bot.cogs["Events"].send_logs_per_server(ctx.guild,"warn",log,ctx.author)
             else:
                 await ctx.send(await self.translate(ctx.guild.id,'modo','warn-but-db'))
-            if ctx.channel.permissions_for(ctx.guild.me).manage_messages:
+            try:
                 await ctx.message.delete()
+            except:
+                pass
         except Exception as e:
             await ctx.send(await self.translate(ctx.guild.id,"modo","error"))
             await self.bot.cogs['ErrorsCog'].on_error(e,ctx)
@@ -280,8 +284,10 @@ class ModeratorCog:
                     await self.bot.cogs['ErrorsCog'].on_error(e,ctx)
             await self.mute_event(user,ctx.author,reason,caseID)
             await ctx.send(str(await self.translate(ctx.guild.id,"modo","mute-1")).format(user,reason))
-            if ctx.channel.permissions_for(ctx.guild.me).manage_messages:
+            try:
                 await ctx.message.delete()
+            except:
+                pass
         except Exception as e:
             await ctx.send(await self.translate(ctx.guild.id,"modo","error"))
             await self.bot.cogs['ErrorsCog'].on_error(e,ctx)
@@ -321,8 +327,10 @@ class ModeratorCog:
         try:
             await self.unmute_event(ctx.guild,user,ctx.author)
             await ctx.send(str(await self.translate(ctx.guild.id,"modo","unmute-1")).format(user))
-            if ctx.channel.permissions_for(ctx.guild.me).manage_messages:
+            try:
                 await ctx.message.delete()
+            except:
+                pass
         except Exception as e:
             await ctx.send(await self.translate(ctx.guild.id,"modo","error"))
             await self.bot.cogs['ErrorsCog'].on_error(e,ctx)
@@ -386,8 +394,10 @@ class ModeratorCog:
                     caseID = case.id
                 except Exception as e:
                     await self.bot.cogs['ErrorsCog'].on_error(e,ctx)
-            if ctx.channel.permissions_for(ctx.guild.me).manage_messages:
+            try:
                 await ctx.message.delete()
+            except:
+                pass
             await ctx.send(str( await self.translate(ctx.guild.id,"modo","ban")).format(user,reason))
             log = str(await self.translate(ctx.guild.id,"logs","ban")).format(member=user,reason=reason,case=caseID)
             await self.bot.cogs["Events"].send_logs_per_server(ctx.guild,"ban",log,ctx.author)
@@ -434,8 +444,10 @@ class ModeratorCog:
                     caseID = case.id
                 except Exception as e:
                     await self.bot.cogs['ErrorsCog'].on_error(e,ctx)
-            if ctx.channel.permissions_for(ctx.guild.me).manage_messages:
+            try:
                 await ctx.message.delete()
+            except:
+                pass
             await ctx.send(str( await self.translate(ctx.guild.id,"modo","unban")).format(user))
             log = str(await self.translate(ctx.guild.id,"logs","unban")).format(member=user,reason=reason,case=caseID)
             await self.bot.cogs["Events"].send_logs_per_server(ctx.guild,"ban",log,ctx.author)
@@ -482,8 +494,10 @@ class ModeratorCog:
                     caseID = case.id
                 except:
                     await self.bot.cogs['ErrorsCog'].on_error(e,ctx)
-            if ctx.channel.permissions_for(ctx.guild.me).manage_messages:
+            try:
                 await ctx.message.delete()
+            except:
+                pass
             await ctx.send(str( await self.translate(ctx.guild.id,"modo","kick")).format(user,reason))
             log = str(await self.translate(ctx.guild.id,"logs","softban")).format(member=user,reason=reason,case=caseID)
             await self.bot.cogs["Events"].send_logs_per_server(ctx.guild,"softban",log,ctx.author)
