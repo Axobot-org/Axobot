@@ -736,7 +736,7 @@ ID corresponds to the Identifier of the message"""
                         for r in channel.changed_roles:
                             if r.permissions.send_messages:
                                 obj = channel.overwrites_for(r)
-                                obj.update(send_messages=None)
+                                obj.send_messages=None
                                 await channel.set_permissions(r,overwrite=obj)
                         count += 1
                 await category.set_permissions(role,send_messages=False)
