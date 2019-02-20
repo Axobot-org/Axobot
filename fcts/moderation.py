@@ -234,7 +234,10 @@ class ModeratorCog:
             await self.bot.cogs['ErrorsCog'].on_error(e,ctx)
 
     async def get_muted_role(self,guild):
-        return discord.utils.get(guild.roles,name="muted")
+        opt = await self.bot.cogs['ServerCog'].find_staff(guild.id,'muted_role')
+        if not isinstance(opt,int):
+            return discord.utils.get(guild.roles,name="muted")
+        return guild.get_role(opt)
 
     async def mute_event(self,member,author,reason,caseID):
         role = await self.get_muted_role(member.guild)
@@ -754,6 +757,7 @@ ID corresponds to the Identifier of the message"""
                                 await channel.set_permissions(r,overwrite=obj)
                         count += 1
                 await category.set_permissions(role,send_messages=False)
+            await self.bot.cogs['ServerCog'].modify_server(guild.id,values=[('muted_role',role.id)])
             return role
         except Exception as e:
             await self.bot.cogs['ErrorsCog'].on_error(e,None)
