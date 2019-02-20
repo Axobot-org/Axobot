@@ -1,5 +1,5 @@
 from discord.ext import commands
-import discord, re, datetime, random, json, os
+import discord, re, datetime, random, json, os, typing
 from fcts import checks
 
 class ModeratorCog:
@@ -344,8 +344,10 @@ class ModeratorCog:
     @commands.cooldown(5,20, commands.BucketType.guild)
     @commands.guild_only()
     @commands.check(checks.can_ban)
-    async def ban(self,ctx,user,*,reason="Unspecified"):
-        """Ban someone"""
+    async def ban(self,ctx,user,days_to_delete:typing.Optional[int]=0,reason="Unspecified"):
+        """Ban someone
+        The 'days_to_delete' option represents the number of days worth of messages to delete from the user in the guild, bewteen 0 and 7
+        """
         try:
             backup = user
             try:
@@ -383,8 +385,10 @@ class ModeratorCog:
                 except Exception as e:
                     await self.bot.cogs['ErrorsCog'].on_error(e,ctx)
                     pass
+            if days_to_delete<0 or days_to_delete>7:
+                days_to_delete = 0
             reason = await self.bot.cogs["UtilitiesCog"].clear_msg(reason,everyone = not ctx.channel.permissions_for(ctx.author).mention_everyone)
-            await ctx.guild.ban(user,reason=reason,delete_message_days=0)
+            await ctx.guild.ban(user,reason=reason,delete_message_days=days_to_delete)
             self.bot.log.info("L'utilisateur {} a été banni du serveur {} pour la raison {}".format(user.id,ctx.guild.id,reason))
             await self.bot.cogs['Events'].add_event('ban')
             caseID = "'Unsaved'"
