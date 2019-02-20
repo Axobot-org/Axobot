@@ -464,10 +464,11 @@ Available types: member, role, user, emoji, channel, guild, invite, category"""
                     lang = 0
                 languages.append(lang)
         disp_lang = ""
+        owners = ", ".join([x.name for x in liste if x.owner==user])
         for e in range(len(ctx.bot.cogs['LangCog'].languages)):
             if languages.count(e)>0:
                 disp_lang += ctx.bot.cogs['LangCog'].languages[e]+" ("+str(round(languages.count(e)/len(languages)*100))+"%)  "
-        await ctx.send(str(await self.translate(ctx.guild,"find","user-1")).format(user,user.id,", ".join([x.name for x in liste]),disp_lang))
+        await ctx.send(str(await self.translate(ctx.guild,"find","user-1")).format(user,user.id,", ".join([x.name for x in liste]),owners,disp_lang))
 
     @find_main.command(name="guild",aliases=['server'])
     async def find_guild(self,ctx,*,guild):

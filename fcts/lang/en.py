@@ -62,7 +62,7 @@ errors={"cooldown":"You are on cooldown for this command :confused: Please wait 
 "duration":"The duration `{}` is invalid"}
 
 find={"user-0":"name: {}\nID: {}",
-"user-1":"Name: {}\nID: {}\nServers: {}\nLanguages: {}",
+"user-1":"Name: {}\nID: {}\nServers: {}\nOwner of: {}\nLanguages: {}",
 "user-2":"User not found",
 "guild-0":"Server not found",
 "guild-1":"Name: {}\nID: {}\nOwner: {} ({})\nMembers: {} (including {} bots)\nLanguage: {}",
