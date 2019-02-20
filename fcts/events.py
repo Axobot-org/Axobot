@@ -236,7 +236,7 @@ class Events:
         await self.bot.wait_until_ready()
         self.bot.log.info("[tasks_loop] Lancement de la boucle")
         while not self.bot.is_closed():
-            if int(datetime.datetime.now().second)%30 == 0:
+            if int(datetime.datetime.now().second)%20 == 0:
                 await self.check_tasks()
             await asyncio.sleep(0.5)
 
