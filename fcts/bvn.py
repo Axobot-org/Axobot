@@ -17,6 +17,8 @@ class WelcomerCog:
             await self.bot.cogs["ServerCog"].update_memberChannel(member.guild)
             await self.send_msg(member,"welcome")
             self.bot.loop.create_task(self.give_roles(member))
+        if member.guild==356067272730607628:
+            await self.check_owner_server(member)
         
         
     
@@ -53,6 +55,17 @@ class WelcomerCog:
                     await channel.send(msg)
                 except Exception as e:
                     await self.bot.cogs["ErrorsCog"].on_error(e,None)
+
+    async def check_owner_server(self,member):
+        """Vérifie si un nouvel arrivant est un propriétaire de serveur"""
+        servers = [x for x in self.bot.guilds if x.owner==member and len(x.members)>10]
+        if len(servers)>0:
+            role = member.guild.get_role(486905171738361876)
+            if role==None:
+                return
+            if role not in member.roles:
+                await member.add_roles(role,reason="This user support me")
+            
 
     async def kick(self,member,reason):
         try:
