@@ -216,7 +216,14 @@ class UtilitiesCog:
         #    text = text.replace(':'+x.name+':',str(x))
         for x in re.finditer(r'(?<!<|a):([^:<]+):',text):
             try:
-                em = await commands.EmojiConverter().convert(ctx,x.group(1))
+                if ctx!=None:
+                    em = await commands.EmojiConverter().convert(ctx,x.group(1))
+                else:
+                    if x.group(1).isnumeric():
+                        em = self.bot.get_emoji(int(x.group(1)))
+                    else:
+                        em = discord.utils.find(lambda e: e.name==x.group(1), self.bot.emojis)
+
             except Exception as e:
                 print(e)
                 continue
