@@ -748,7 +748,7 @@ class ServerCog:
             try:
                 await ch.edit(name=text,reason="Automated action")
             except Exception as e:
-                await self.bot.cogs['UtilitiesCog'].print2("[UpdateMemberChannel] "+str(e))
+                self.bot.debug("[UpdateMemberChannel] "+str(e))
     
     
 def setup(bot):
