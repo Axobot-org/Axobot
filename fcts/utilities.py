@@ -44,7 +44,7 @@ class UtilitiesCog:
 
     def update_prefix(self,ID,prefix):
         try:
-            print("Prefix updated for guild {} : changed to {}".format(ID,prefix))
+            self.bot.log.debug("Prefix updated for guild {} : changed to {}".format(ID,prefix))
         except:
             pass
         self.list_prefixs[str(ID)] = prefix
@@ -157,7 +157,6 @@ class UtilitiesCog:
             
             self.bot.cogs['RssCog'].last_update = datetime.datetime.now()
             asyncio.run_coroutine_threadsafe(ctx.bot.cogs['RssCog'].main_loop(),asyncio.get_running_loop())
-            print("launched")
         if type(ctx)!=commands.context.Context:
             return True
         if await self.bot.cogs['AdminCog'].check_if_admin(ctx):
@@ -225,7 +224,7 @@ class UtilitiesCog:
                         em = discord.utils.find(lambda e: e.name==x.group(1), self.bot.emojis)
 
             except Exception as e:
-                print(e)
+                # print(e)
                 continue
             if em != None:
                 text = text.replace(x.group(0),"<{}:{}:{}>".format('a' if em.animated else '' , em.name , em.id))

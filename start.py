@@ -101,10 +101,10 @@ def get_prefix(bot,msg):
                 bot.load_extension('fcts.utilities')
                 l = [bot.cogs['UtilitiesCog'].find_prefix(msg.guild)]
             except Exception as e:
-                print("[get_prefix]",e)
+                bot.log.warn("[get_prefix]",e)
                 l = ['!']
         except Exception as e:
-                print("[get_prefix]",e)
+                bot.log.warn("[get_prefix]",e)
                 l = ['!']
     else:
         l = ['!']

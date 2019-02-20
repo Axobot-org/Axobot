@@ -78,7 +78,7 @@ class Events:
             return
         channel = self.bot.get_channel(488768968891564033)
         if channel==None:
-            return print("[send_mp] Salon de MP introuvable")
+            return self.bot.log.warn("[send_mp] Salon de MP introuvable")
         emb = msg.embeds[0] if len(msg.embeds)>0 else None
         text = "__`{} ({} - {})`__\n{}".format(msg.author,msg.channel.recipient,await self.bot.cogs["TimeCog"].date(msg.created_at,digital=True),msg.content)
         if len(msg.attachments)>0:
@@ -120,12 +120,10 @@ class Events:
             self.points = 0
 
     async def add_event(self,event):
-        print("Points b4:",self.points)
         if event == "kick":
             await self.add_points(-self.table['kick'])
         elif event == "ban":
             await self.add_points(-self.table['ban'])
-        print("Points aftr:",self.points)
 
 
     async def check_user_left(self,member):

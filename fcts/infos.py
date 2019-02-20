@@ -82,7 +82,6 @@ class InfosCog:
                 try:
                     users,bots = self.get_users_nber(ignored_guilds)
                 except Exception as e:
-                    print(e)
                     users = bots = 'unknown'
                 d = str(await self.translate(ctx.guild,"infos","stats")).format(bot_version,len_servers,users,bots,self.codelines,' | '.join(langs_list),version,discord.__version__,round(py.memory_info()[0]/2.**30,3),psutil.cpu_percent(),round(r*1000,3))
                 embed = ctx.bot.cogs['EmbedCog'].Embed(title=await self.translate(ctx.guild,"infos","stats-title"), color=ctx.bot.cogs['HelpCog'].help_color, time=ctx.message.created_at,desc=d,thumbnail=self.bot.user.avatar_url_as(format="png"))

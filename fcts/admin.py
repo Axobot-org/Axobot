@@ -306,7 +306,6 @@ class AdminCog:
         for x in reloads.admins_id:
             try:
                 user = self.bot.get_user(x)
-                print(type(user),user)
                 if user.dm_channel==None:
                     await user.create_dm()
                 time = round(self.emergency_time - level/100,1)
