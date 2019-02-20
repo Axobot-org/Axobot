@@ -75,19 +75,6 @@ If you enter :code:`clear 1000 @Z_runner#7515 @ZBot beta#4940`, the bot will del
 
 .. warning:: The permissions "`Manage messages <perms.html#manage-messages>`_" and "`Read messages history <perms.html#read-message-history>`_" are required.
 
------
-Purge
------
-
-**Syntax:** :code:`purge`
-
-This command allows you to clean the place a little, by deleting all the messages in a channel, and leaving only the pinned messages, no matter who wrote them. Purge is limited to 10,000 messages per command, in order to avoid overloading the bot.A confirmation request will be sent to you, to avoid any false manipulation.
-
-The roles allowed to use this command are the same as for the `clear <#clear>`_ command.
-
-.. warning:: The permissions "`Manage messages <perms.html#manage-messages>`_" and "`Read messages history <perms.html#read-message-history>`_" are required.
-
-
 ----
 Kick
 ----
@@ -114,9 +101,9 @@ This command allows you to expel a member from your server, such as kick. But in
 Ban
 ---
 
-**Syntax:** :code:`ban <user> [reason]`
+**Syntax:** :code:`ban <user> [days_to_delete] [reason]`
 
-The ban allows you to instantly ban a member from your server. This means that the member will be ejected, and will not be able to return before being unbanned by a moderator.
+The ban allows you to instantly ban a member from your server. This means that the member will be ejected, and will not be able to return before being unbanned by a moderator. The 'days_to_delete' option represents the number of days worth of messages to delete from the user in the guild, bewteen 0 and 7 (0 by default)
 
 To cancel this action, use the Discord interface or the `unban <#unban>`_ command. The member will nevertheless have to decide for himself if he wishes to return to your server.
 
