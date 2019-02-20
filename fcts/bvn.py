@@ -33,8 +33,8 @@ class WelcomerCog:
 
     async def send_msg(self,member,Type):
         msg = await self.bot.cogs['ServerCog'].find_staff(member.guild.id,Type)
-        #if await self.raid_check(member) or member.id in self.no_message:
-        #    return
+        if await self.raid_check(member) or member.id in self.no_message:
+            return
         if await self.bot.cogs['UtilitiesCog'].check_any_link(member.name) != None:
             return
         if msg not in ['',None]:
