@@ -406,7 +406,8 @@ server_desc={"clear": "Lizt of rawles dat can us teh 'clear' commend: {}",
              "membercounter":"Channel dis-playin nmberz from memberz in iz nayme: {}",
              "anti_raid":"Lev3l of anti-rayderz protect: {} \n*([Dowcumetaton](https://zbot.rtfd.io/en/latest/moderator.html#anti-raid))*",
              "vote_emojis":"Emojiz use 4 powll reacts: {}",
-             "help_in_dm":"Sent help mess:a:ge on Prvte Msage? {}"}
+             "help_in_dm":"Sent help mess:a:ge on Prvte Msage? {}",
+             "muted_role":"Usd role 2 mute people : {}"}
 
 stats_infos={"not-found":"Unable 2 found {}",
             "member-0":"Lttle nayme",

@@ -406,7 +406,8 @@ server_desc={"clear": "List of roles that can use the 'clear' command: {}",
              "membercounter":"Channel displaying number of members in its name: {}",
              "anti_raid":"Level of anti-raid protection: {} \n*([Documentation](https://zbot.rtfd.io/en/latest/moderator.html#anti-raid))*",
              "vote_emojis":"Emojis used for poll reactions: {}",
-             "help_in_dm":"Send help message in Private Message? {}"}
+             "help_in_dm":"Send help message in Private Message? {}",
+             "muted_role":"Used role to mute members : {}"}
 
 stats_infos={"not-found":"Unable to find {}",
             "member-0":"Nickname",

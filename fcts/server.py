@@ -6,7 +6,7 @@ import discord
 from discord.ext import commands
 from fcts import cryptage
 
-roles_options = ["clear","slowmode","mute","kick","ban","warn","say","gived_roles"]
+roles_options = ["clear","slowmode","mute","kick","ban","warn","say","gived_roles","muted_role"]
 bool_options = ["save_roles","enable_xp","anti_caps_lock","enable_fun","help_in_dm"]
 textchan_options = ["hunter","welcome_channel","bot_news","poll_channels","modlogs_channel"]
 vocchan_options = ["membercounter"]
@@ -55,7 +55,8 @@ class ServerCog:
                "membercounter":"",
                "anti_raid":1,
                "vote_emojis":":thumbsup:;:thumbsdown:;",
-               "help_in_dm":0}
+               "help_in_dm":0,
+               "muted_role":0}
         self.optionsList = ["ID","Created at","prefix","language","clear","slowmode","mute","kick","ban","warn","say","hunter","welcome_channel","welcome","leave","gived_roles","bot_news","save_roles","poll_channels","modlogs_channel","enable_xp","anti_caps_lock","enable_fun","membercounter","anti_raid","vote_emojis","help_in_dm"]
 
     async def on_ready(self):
@@ -339,7 +340,7 @@ class ServerCog:
             await self.send_embed(ctx.guild,option,value)
 
     async def form_roles(self,guild,roles,ext=False):
-        if len(roles) == 0:
+        if roles==None or len(roles) == 0:
             return "Ø"
         roles = roles.split(";")
         g_roles = list()
