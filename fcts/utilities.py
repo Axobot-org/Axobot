@@ -1,4 +1,4 @@
-import discord, sys, traceback, importlib, datetime, random, re
+import discord, sys, traceback, importlib, datetime, random, re, asyncio
 from fcts import utilities
 from discord.ext import commands
 
@@ -16,7 +16,7 @@ class UtilitiesCog:
         self.new_pp = False
         
     async def on_ready(self):
-        self.config = await self.bot.cogs['ServerCog'].get_bot_infos(self.bot.user.id)
+        self.config = (await self.bot.cogs['ServerCog'].get_bot_infos(self.bot.user.id))[0]
 
     async def reload(self,liste):
         for m in liste:
@@ -146,21 +146,30 @@ class UtilitiesCog:
             await self.print2("Unable to delete message "+str(msg))
             pass
 
-    async def global_check(self,ctx):
-        """Check if the guild is a banned guild (aka ignored commands)"""
-        if ctx.bot.cogs['RssCog'].last_update==None or (datetime.datetime.now() - ctx.bot.cogs['RssCog'].last_update).total_seconds() > 30*60:
-            self.bot.log.info("Check RSS lancée")
-            self.bot.cogs['RssCog'].last_update = datetime.datetime.now()
-            await ctx.bot.cogs['RssCog'].main_loop()
-        if type(ctx)==commands.context:
-            ctx = ctx.guild
-        elif type(ctx) != discord.guild:
-            return True
+    async def get_bot_infos(self):
         if self.config == None:
-            self.config = await self.bot.cogs['ServerCog'].get_bot_infos(self.bot.user.id)
+            self.config = (await self.bot.cogs['ServerCog'].get_bot_infos(self.bot.user.id))[0]
+        return self.config
+
+    async def global_check(self,ctx):
+        """Do a lot of checks before executing a command (rss loop, banned guilds etc)"""
+        if ctx.bot.cogs['RssCog'].last_update==None or (datetime.datetime.now() - ctx.bot.cogs['RssCog'].last_update).total_seconds() > 45*60*0.1:
+            
+            self.bot.cogs['RssCog'].last_update = datetime.datetime.now()
+            asyncio.run_coroutine_threadsafe(ctx.bot.cogs['RssCog'].main_loop(),asyncio.get_running_loop())
+            print("launched")
+        if type(ctx)!=commands.context.Context:
+            return True
+        if await self.bot.cogs['AdminCog'].check_if_admin(ctx):
+            return True
+        self.config = await self.get_bot_infos()
         if len(self.config)==0:
             return True
-        return not str(ctx.id) in self.config[0]['banned_guilds'].split(";")
+        if str(ctx.guild.id) in self.config['banned_guilds'].split(";"):
+            return False
+        if str(ctx.author.id) in self.config['banned_users'].split(";"):
+            return False
+        return True 
 
     async def create_footer(self,embed,user):
         embed.set_footer(text="Requested by {}".format(user.name), icon_url=user.avatar_url_as(format='png'))

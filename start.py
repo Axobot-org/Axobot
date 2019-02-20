@@ -3,7 +3,7 @@
 
 def check_libs():
     count = 0
-    for m in ["mysql","discord","frmc_lib","requests","re","asyncio","datetime","time","importlib","traceback","sys","logging","sympy","psutil","platform","subprocess",'json']:
+    for m in ["mysql","discord","frmc_lib","requests","re","asyncio","datetime","time","importlib","traceback","sys","logging","sympy","psutil","platform","subprocess",'json','emoji']:
         try:
             exec("import "+m)
             exec("del "+m)
@@ -37,7 +37,7 @@ def setup_logger():
 
     # log vers un fichier
     file_handler = logging.FileHandler("debug.log")
-    file_handler.setLevel(logging.INFO)  # tous les logs de niveau DEBUG et supérieur sont evoyés dans le fichier
+    file_handler.setLevel(logging.DEBUG)  # tous les logs de niveau DEBUG et supérieur sont evoyés dans le fichier
     file_handler.setFormatter(format)
 
     # log vers la console
@@ -136,7 +136,8 @@ def main():
                       'fcts.emoji',
                       'fcts.embeds',
                       'fcts.events',
-                      'fcts.timed'
+                      'fcts.timed',
+                      'fcts.secret'
     ]
     # Suppression du fichier debug.log s'il est trop volumineux
     if os.path.exists("debug.log"):
@@ -178,9 +179,6 @@ def main():
         if count >0:
             raise Exception("\n{} modules not loaded".format(count))
     del count
-    
-
-    #@client.check_once
     
     
     utilities = client.cogs["UtilitiesCog"]

@@ -4,16 +4,6 @@ from discord.ext import commands
 from fcts import cryptage, tokens, reloads
 importlib.reload(reloads)
 
-# secure_keys = dict()
-# with open('fcts/requirements','r') as file:
-#     r = file.read().split('\n')
-#     for s in r:
-#         if s.startswith("//") or s=='':
-#             r.remove(s)
-#     while '' in r:
-#         r.remove('')
-#     for e,s in enumerate(['user','password','host','database']):
-#         secure_keys[s] = cryptage.uncrypte(r[e])
 
 web_link={'fr-minecraft':'http://fr-minecraft.net/rss.php',
           'frm':'http://fr-minecraft.net/rss.php',
@@ -28,8 +18,7 @@ reddit_link={'minecraft':'https://www.reddit.com/r/Minecraft',
              'discord':'https://www.reddit.com/r/discordapp'
              }
 
-yt_link={'neil3000':'UC7SdIxpBCuP-KXSqaexTdAw',
-         'grand_corbeau':'UCAt_W0Rgr33OePJ8jylkx0A',
+yt_link={'grand_corbeau':'UCAt_W0Rgr33OePJ8jylkx0A',
          'mojang':'UC1sELGmy5jp5fQUugmuYlXQ',
          'frm':'frminecraft',
          'fr-minecraft':'frminecraft',
@@ -173,7 +162,7 @@ class RssCog:
     async def request_twitch(self,ctx,channel):
         """The last video of a Twitch channel"""
         if "twitch.tv" in channel:
-            ID= await self.parse_twitch_url(channel)
+            channel = await self.parse_twitch_url(channel)
         text = await self.rss_twitch(ctx.guild,channel)
         if type(text) == str:
             await ctx.send(text)
@@ -250,7 +239,7 @@ class RssCog:
         try:
             await self.add_flow(ctx.guild.id,ctx.channel.id,Type,identifiant)
             await ctx.send(str(await self.translate(ctx.guild,"rss","success-add")).format(display_type,link,ctx.channel.mention))
-            self.bot.log.Info("Flux rss ajouté dans le serveur {} ({})".format(ctx.guild.id,link))
+            self.bot.log.info("Flux rss ajouté dans le serveur {} ({})".format(ctx.guild.id,link))
         except Exception as e:
             await ctx.send(await self.translate(ctx.guild,"rss","fail-add"))
             await self.bot.cogs["ErrorsCog"].on_error(e,ctx)
@@ -404,6 +393,7 @@ class RssCog:
         """Configures a role to be notified when a news is posted"""
         if not ctx.bot.database_online:
             return await ctx.send(await self.translate(ctx.guild.id,"rss","no-db"))
+        e = None
         try:
             flow = await self.askID(ID,ctx)
         except Exception as e:
@@ -412,7 +402,8 @@ class RssCog:
             return
         if len(flow)==0:
             await ctx.send(await self.translate(ctx.guild,"rss","fail-add"))
-            await self.bot.cogs["ErrorsCog"].on_error(e,ctx)
+            if e !=None:
+                await self.bot.cogs["ErrorsCog"].on_error(e,ctx)
             return
         flow = flow[0]
         if flow['roles']=='':
@@ -750,7 +741,7 @@ class RssCog:
         try:
             feeds = feedparser.parse(url,timeout=5)
         except socket.timeout:
-            return None
+            return await self.translate(guild,"rss","research-timeout")
         if 'bozo_exception' in feeds.keys() or len(feeds.entries)==0:
             return await self.translate(guild,"rss","web-invalid")
         published = None
@@ -798,6 +789,8 @@ class RssCog:
             numb = int('40'+numb)
         elif Type == 'mc':
             numb = int('50'+numb)
+        elif Type == 'twitch':
+            numb = int('60'+numb)
         else:
             numb = int('66'+numb)
         return numb
@@ -889,7 +882,7 @@ class RssCog:
             try:
                 await channel.send(t)
             except Exception as e:
-                print("[send_rss_msg] Can not send message on channel {}: {}".format(channel.id,e))
+                self.bot.log.info("[send_rss_msg] Can not send message on channel {}: {}".format(channel.id,e))
 
     async def check_flow(self,flow):
         try:
@@ -900,7 +893,7 @@ class RssCog:
                 funct = eval('self.rss_{}'.format(flow['type']))
                 objs = await funct(guild,flow['link'],flow['date'])
                 self.flows[flow['link']] = objs
-            if type(objs) == str or len(objs) == 0:
+            if isinstance(objs,(str,type(None),int)) or len(objs) == 0:
                 return True
             elif type(objs) == list:
                 for o in objs:
@@ -925,6 +918,7 @@ class RssCog:
         t = time.time()
         if self.loop_processing:
             return
+        self.bot.log.info("Check RSS lancé")
         if guildID==None:
             liste = await self.get_all_flows()
             self.loop_processing = True
@@ -951,11 +945,11 @@ class RssCog:
 
     async def loop_child(self):
         if not self.bot.database_online:
-            print('Base de donnée hors ligne - check rss annulé')
+            self.bot.log.warn('Base de donnée hors ligne - check rss annulé')
             return
-        await self.print(await self.bot.cogs['TimeCog'].date(datetime.datetime.now(),digital=True)+" Boucle rss commencée !")
+        self.bot.log.info(await self.bot.cogs['TimeCog'].date(datetime.datetime.now(),digital=True)+" Boucle rss commencée !")
         await self.bot.cogs["RssCog"].main_loop()
-        await self.print(await self.bot.cogs['TimeCog'].date(datetime.datetime.now(),digital=True)+" Boucle rss terminée !")
+        self.bot.log.info(await self.bot.cogs['TimeCog'].date(datetime.datetime.now(),digital=True)+" Boucle rss terminée !")
 
     async def loop(self):
         await self.bot.wait_until_ready()
@@ -982,7 +976,7 @@ class RssCog:
                 await ctx.send("Une boucle rss est déjà en cours !")
             else:
                 await ctx.send("Et hop ! Une itération de la boucle en cours !")
-                await self.print(await self.bot.cogs['TimeCog'].date(datetime.datetime.now(),digital=True)+" Boucle rss forcée")
+                self.bot.log.info(await self.bot.cogs['TimeCog'].date(datetime.datetime.now(),digital=True)+" Boucle rss forcée")
                 await self.main_loop()
 
 

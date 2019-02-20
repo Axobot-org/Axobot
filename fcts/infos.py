@@ -71,7 +71,7 @@ class InfosCog:
         r = self.bot.latency
         try:
             async with ctx.channel.typing():
-                ignored_guilds = [int(x) for x in self.bot.cogs['UtilitiesCog'].config[0]['banned_guilds'].split(";") if len(x)>0]
+                ignored_guilds = [int(x) for x in self.bot.cogs['UtilitiesCog'].config['banned_guilds'].split(";") if len(x)>0]
                 ignored_guilds += self.bot.cogs['ReloadsCog'].ignored_guilds
                 len_servers = len([x for x in ctx.bot.guilds if x.id not in ignored_guilds])
                 langs_list = await self.bot.cogs['ServerCog'].get_languages(ignored_guilds)
@@ -87,7 +87,6 @@ class InfosCog:
                 d = str(await self.translate(ctx.guild,"infos","stats")).format(bot_version,len_servers,users,bots,self.codelines,' | '.join(langs_list),version,discord.__version__,round(py.memory_info()[0]/2.**30,3),psutil.cpu_percent(),round(r*1000,3))
                 embed = ctx.bot.cogs['EmbedCog'].Embed(title=await self.translate(ctx.guild,"infos","stats-title"), color=ctx.bot.cogs['HelpCog'].help_color, time=ctx.message.created_at,desc=d,thumbnail=self.bot.user.avatar_url_as(format="png"))
                 embed.create_footer(ctx.author)
-
             await ctx.send(embed=embed.discord_embed())
         except Exception as e:
             await ctx.bot.cogs['Errors'].on_command_error(ctx,e)

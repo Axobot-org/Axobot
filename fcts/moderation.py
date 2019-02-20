@@ -1,56 +1,6 @@
 from discord.ext import commands
 import discord, re, datetime, random, json, os
-
-
-async def can_mute(ctx):
-    """Check if someone can mute"""
-    if ctx.bot.database_online:
-        return await ctx.bot.cogs["ServerCog"].staff_finder(ctx.author,"mute")
-    else:
-        return ctx.channel.permissions_for(ctx.author).manage_roles
-
-async def can_warn(ctx):
-    """Check if someone can warn"""
-    if ctx.bot.database_online:
-        return await ctx.bot.cogs["ServerCog"].staff_finder(ctx.author,"warn")
-    else:
-        return ctx.channel.permissions_for(ctx.author).manage_roles
-
-async def can_kick(ctx):
-    """Check if someone can kick"""
-    if ctx.bot.database_online:
-        return await ctx.bot.cogs["ServerCog"].staff_finder(ctx.author,"kick")
-    else:
-        return ctx.channel.permissions_for(ctx.author).kick_members
-
-async def can_ban(ctx):
-    """Check if someone can ban"""
-    if ctx.bot.database_online:
-        return await ctx.bot.cogs["ServerCog"].staff_finder(ctx.author,"ban")
-    else:
-        return ctx.channel.permissions_for(ctx.author).ban_members
-
-async def can_slowmode(ctx):
-    """Check if someone can use slowmode"""
-    if ctx.bot.database_online:
-        return await ctx.bot.cogs["ServerCog"].staff_finder(ctx.author,"slowmode")
-    else:
-        return ctx.channel.permissions_for(ctx.author).manage_channels
-
-async def can_clear(ctx):
-    """Check if someone can use clear"""
-    if ctx.bot.database_online:
-        return await ctx.bot.cogs["ServerCog"].staff_finder(ctx.author,"clear")
-    else:
-        return ctx.channel.permissions_for(ctx.author).manage_messages
-
-async def can_see_banlist(ctx):
-    """Check if someone can see the banlist"""
-    return ctx.channel.permissions_for(ctx.author).administrator or await ctx.bot.cogs["AdminCog"].check_if_admin(ctx)
-
-async def can_pin_msg(ctx):
-    """... if someone can pin a message"""
-    return ctx.channel.permissions_for(ctx.author).manage_messages or await ctx.bot.cogs["AdminCog"].check_if_admin(ctx)
+from fcts import checks
 
 class ModeratorCog:
     """Here you will find everything you need to moderate your server. Please note that most of the commands are reserved for certain members only."""
@@ -69,7 +19,7 @@ class ModeratorCog:
     @commands.command(name="slowmode")
     @commands.guild_only()
     @commands.cooldown(1, 3, commands.BucketType.guild)
-    @commands.check(can_slowmode)
+    @commands.check(checks.can_slowmode)
     async def slowmode(self,ctx,time=None):
         """Keep your chat cool"""
         if not ctx.channel.permissions_for(ctx.guild.me).manage_channels:
@@ -100,7 +50,7 @@ class ModeratorCog:
     @commands.command(name="clear")
     @commands.cooldown(4, 30, commands.BucketType.guild)
     @commands.guild_only()
-    @commands.check(can_clear)
+    @commands.check(checks.can_clear)
     async def clear(self,ctx,number:int,*,params=''):
         """Keep your chat clean
         <number> : number of messages to check
@@ -185,7 +135,7 @@ class ModeratorCog:
     @commands.command(name="kick")
     @commands.cooldown(5, 20, commands.BucketType.guild)
     @commands.guild_only()
-    @commands.check(can_kick)
+    @commands.check(checks.can_kick)
     async def kick(self,ctx,user:discord.Member,*,reason="Unspecified"):
         """Kick a member from this server"""
         try:
@@ -221,8 +171,10 @@ class ModeratorCog:
                     caseID = case.id
                 except:
                     await self.bot.cogs['ErrorsCog'].on_error(e,ctx)
-            if ctx.channel.permissions_for(ctx.guild.me).manage_messages:
+            try:
                 await ctx.message.delete()
+            except:
+                pass
             await ctx.send(str( await self.translate(ctx.guild.id,"modo","kick")).format(user,reason))
             log = str(await self.translate(ctx.guild.id,"logs","kick")).format(member=user,reason=reason,case=caseID)
             await self.bot.cogs["Events"].send_logs_per_server(ctx.guild,"kick",log,ctx.author)
@@ -237,7 +189,7 @@ class ModeratorCog:
     @commands.command(name="warn")
     @commands.cooldown(5, 20, commands.BucketType.guild)
     @commands.guild_only()
-    @commands.check(can_warn)
+    @commands.check(checks.can_warn)
     async def warn(self,ctx,user:discord.Member,*,message):
         """Send a warning to a member."""
         try:
@@ -273,16 +225,30 @@ class ModeratorCog:
                 await self.bot.cogs["Events"].send_logs_per_server(ctx.guild,"warn",log,ctx.author)
             else:
                 await ctx.send(await self.translate(ctx.guild.id,'modo','warn-but-db'))
-            if ctx.channel.permissions_for(ctx.guild.me).manage_messages:
+            try:
                 await ctx.message.delete()
+            except:
+                pass
         except Exception as e:
             await ctx.send(await self.translate(ctx.guild.id,"modo","error"))
             await self.bot.cogs['ErrorsCog'].on_error(e,ctx)
 
+    async def get_muted_role(self,guild):
+        opt = await self.bot.cogs['ServerCog'].find_staff(guild.id,'muted_role')
+        if not isinstance(opt,int):
+            return discord.utils.get(guild.roles,name="muted")
+        return guild.get_role(opt)
+
+    async def mute_event(self,member,author,reason,caseID):
+        role = await self.get_muted_role(member.guild)
+        await member.add_roles(role,reason=reason)
+        log = str(await self.translate(member.guild.id,"logs","mute-on")).format(member=member,reason=reason,case=caseID)
+        await self.bot.cogs["Events"].send_logs_per_server(member.guild,"mute",log,author)
+
     @commands.command(name="mute")
     @commands.cooldown(5,20, commands.BucketType.guild)
     @commands.guild_only()
-    @commands.check(can_mute)
+    @commands.check(checks.can_mute)
     async def mute(self,ctx,user:discord.Member,*,reason="Unspecified"):
         """Mute someone. When someone is muted, the bot adds the role "muted" to him"""
         try:
@@ -294,16 +260,16 @@ class ModeratorCog:
         except Exception as e:
             await self.bot.cogs['ErrorsCog'].on_error(e,ctx)
             return
-        role = discord.utils.get(ctx.guild.roles,name="muted")
+        role = await self.get_muted_role(ctx.guild)
         if role in user.roles:
             await ctx.send(await self.translate(ctx.guild.id,"modo","already-mute"))
             return
-        if role == None:
-            await ctx.send(await self.translate(ctx.guild.id,"modo","no-mute"))
-            return
-        if not ctx.channel.permissions_for(ctx.guild.me).manage_roles:
+        if not ctx.guild.me.guild_permissions.manage_roles:
             await ctx.send(await self.translate(ctx.guild.id,"modo","cant-mute"))
             return
+        if role == None:
+            role = await self.configure_muted_role(ctx.guild)
+            await ctx.send(await self.translate(ctx.guild.id,"modo","mute-created"))
         if role.position > ctx.guild.me.roles[-1].position:
             await ctx.send(await self.translate(ctx.guild.id,"modo","mute-high"))
             return
@@ -319,25 +285,36 @@ class ModeratorCog:
                     caseID = case.id
                 except Exception as e:
                     await self.bot.cogs['ErrorsCog'].on_error(e,ctx)
-            await user.add_roles(role,reason=reason)
+            await self.mute_event(user,ctx.author,reason,caseID)
             await ctx.send(str(await self.translate(ctx.guild.id,"modo","mute-1")).format(user,reason))
-            log = str(await self.translate(ctx.guild.id,"logs","mute-on")).format(member=user,reason=reason,case=caseID)
-            await self.bot.cogs["Events"].send_logs_per_server(ctx.guild,"mute",log,ctx.author)
-            if ctx.channel.permissions_for(ctx.guild.me).manage_messages:
+            try:
                 await ctx.message.delete()
+            except:
+                pass
         except Exception as e:
             await ctx.send(await self.translate(ctx.guild.id,"modo","error"))
             await self.bot.cogs['ErrorsCog'].on_error(e,ctx)
 
 
+    async def unmute_event(self,guild,user,author):
+        role = await self.get_muted_role(guild)
+        if role==None or not role in user.roles:
+            return
+        if author==guild.me:
+            await user.remove_roles(role,reason="automatic unmute")
+        else:
+            await user.remove_roles(role,reason="unmuted by {}".format(author))
+        log = str(await self.translate(guild.id,"logs","mute-off")).format(member=user)
+        await self.bot.cogs["Events"].send_logs_per_server(guild,"mute",log,author)
+
     @commands.command(name="unmute")
     @commands.cooldown(5,20, commands.BucketType.guild)
     @commands.guild_only()
-    @commands.check(can_mute)
+    @commands.check(checks.can_mute)
     async def unmute(self,ctx,user:discord.Member):
         """Unmute someone
         This will remove the role 'muted' for the targeted member"""
-        role = discord.utils.get(ctx.guild.roles,name="muted")
+        role = await self.get_muted_role(ctx.guild)
         if role not in user.roles:
             await ctx.send(await self.translate(ctx.guild.id,"modo","already-unmute"))
             return
@@ -351,21 +328,22 @@ class ModeratorCog:
             await ctx.send(await self.translate(ctx.guild.id,"modo","mute-high"))
             return
         try:
-            await user.remove_roles(role,reason="unmuted by {}".format(ctx.author))
+            await self.unmute_event(ctx.guild,user,ctx.author)
             await ctx.send(str(await self.translate(ctx.guild.id,"modo","unmute-1")).format(user))
-            log = str(await self.translate(ctx.guild.id,"logs","mute-off")).format(member=user)
-            await self.bot.cogs["Events"].send_logs_per_server(ctx.guild,"mute",log,ctx.author)
-            if ctx.channel.permissions_for(ctx.guild.me).manage_messages:
+            try:
                 await ctx.message.delete()
+            except:
+                pass
         except Exception as e:
             await ctx.send(await self.translate(ctx.guild.id,"modo","error"))
             await self.bot.cogs['ErrorsCog'].on_error(e,ctx)
 
 
+
     @commands.command(name="ban")
     @commands.cooldown(5,20, commands.BucketType.guild)
     @commands.guild_only()
-    @commands.check(can_ban)
+    @commands.check(checks.can_ban)
     async def ban(self,ctx,user,*,reason="Unspecified"):
         """Ban someone"""
         try:
@@ -419,8 +397,10 @@ class ModeratorCog:
                     caseID = case.id
                 except Exception as e:
                     await self.bot.cogs['ErrorsCog'].on_error(e,ctx)
-            if ctx.channel.permissions_for(ctx.guild.me).manage_messages:
+            try:
                 await ctx.message.delete()
+            except:
+                pass
             await ctx.send(str( await self.translate(ctx.guild.id,"modo","ban")).format(user,reason))
             log = str(await self.translate(ctx.guild.id,"logs","ban")).format(member=user,reason=reason,case=caseID)
             await self.bot.cogs["Events"].send_logs_per_server(ctx.guild,"ban",log,ctx.author)
@@ -433,7 +413,7 @@ class ModeratorCog:
     @commands.command(name="unban")
     @commands.cooldown(5,20, commands.BucketType.guild)
     @commands.guild_only()
-    @commands.check(can_ban)
+    @commands.check(checks.can_ban)
     async def unban(self,ctx,user,*,reason="Unspecified"):
         """Unban someone"""
         try:
@@ -467,8 +447,10 @@ class ModeratorCog:
                     caseID = case.id
                 except Exception as e:
                     await self.bot.cogs['ErrorsCog'].on_error(e,ctx)
-            if ctx.channel.permissions_for(ctx.guild.me).manage_messages:
+            try:
                 await ctx.message.delete()
+            except:
+                pass
             await ctx.send(str( await self.translate(ctx.guild.id,"modo","unban")).format(user))
             log = str(await self.translate(ctx.guild.id,"logs","unban")).format(member=user,reason=reason,case=caseID)
             await self.bot.cogs["Events"].send_logs_per_server(ctx.guild,"ban",log,ctx.author)
@@ -478,7 +460,7 @@ class ModeratorCog:
 
     @commands.command(name="softban")
     @commands.guild_only()
-    @commands.check(can_kick)
+    @commands.check(checks.can_kick)
     async def softban(self,ctx,user:discord.Member,reason="Unspecified"):
         """Kick a member and lets Discord delete all his messages up to 7 days old.
         Permissions for using this command are the same as for the kick"""
@@ -515,8 +497,10 @@ class ModeratorCog:
                     caseID = case.id
                 except:
                     await self.bot.cogs['ErrorsCog'].on_error(e,ctx)
-            if ctx.channel.permissions_for(ctx.guild.me).manage_messages:
+            try:
                 await ctx.message.delete()
+            except:
+                pass
             await ctx.send(str( await self.translate(ctx.guild.id,"modo","kick")).format(user,reason))
             log = str(await self.translate(ctx.guild.id,"logs","softban")).format(member=user,reason=reason,case=caseID)
             await self.bot.cogs["Events"].send_logs_per_server(ctx.guild,"softban",log,ctx.author)
@@ -529,7 +513,7 @@ class ModeratorCog:
 
     @commands.command(name="banlist")
     @commands.guild_only()
-    @commands.check(can_see_banlist)
+    @commands.check(checks.can_see_banlist)
     async def banlist(self,ctx,reasons:bool=True):
         """Check the list of currently banned members. 
 The 'reasons' parameter is used to display the ban reasons.
@@ -643,7 +627,7 @@ You must be an administrator of this server to use this command."""
 
 
     @commands.command(name="pin")
-    @commands.check(can_pin_msg)
+    @commands.check(checks.can_pin_msg)
     async def pin_msg(self,ctx,msg:int):
         """Pin a message
 ID corresponds to the Identifier of the message"""
@@ -752,6 +736,31 @@ ID corresponds to the Identifier of the message"""
             await ctx.send('Terminé !',file=discord.File(directory))
         except Exception as e:
             await ctx.bot.cogs['ErrorsCog'].on_cmd_error(ctx,e)
+
+
+    async def configure_muted_role(self,guild):
+        """Ajoute le rôle muted au serveur, avec les permissions nécessaires"""
+        if not guild.me.guild_permissions.manage_roles:
+            return False
+        try:
+            role = await guild.create_role(name="muted")
+            for x in guild.by_category():
+                count = 0
+                category,channelslist = x[0],x[1]
+                for channel in channelslist:
+                    if len(channel.changed_roles)!=0 and channel.changed_roles!=category.changed_roles:
+                        await channel.set_permissions(role,send_messages=False)
+                        for r in channel.changed_roles:
+                            if r.permissions.send_messages:
+                                obj = channel.overwrites_for(r)
+                                obj.send_messages=None
+                                await channel.set_permissions(r,overwrite=obj)
+                        count += 1
+                await category.set_permissions(role,send_messages=False)
+            await self.bot.cogs['ServerCog'].modify_server(guild.id,values=[('muted_role',role.id)])
+            return role
+        except Exception as e:
+            await self.bot.cogs['ErrorsCog'].on_error(e,None)
 
 
 def setup(bot):

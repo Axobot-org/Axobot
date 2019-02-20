@@ -242,6 +242,7 @@ modo={"slowmode-0":"Teh very-cold-mode is now disabld in this nize place.",
     "warn-but-db":"Our dataz being offline, so ze warning couldnt be savd. Don't worry, this guy did receive his warning in DM :innocent:",
     "staff-mute":"U cant prevent another cool staff member frm speek'ng ",
     "mute-1":"Teh mmber {} haz been silencd for the reezon `{}`!",
+    "mute-created":"Successsfully added da `muted` role!",
     "no-mute":"Oooops, seemz dat teh nice `muted` role doznt exist :rofl: Creat'it nd assign perms yourself",
     "cant-mute":"Ooops, 't seemz dat I dont haz enough perms for that.... Plz give me perm `Manage roles` :eyes:",
     "mute-high":"Ooops, 't sEEms dat `muted` rol iz tooo high 4 me to give it... Plz fiX dis problem by plac'ng my role higher than this nice `muted` role.",
@@ -347,7 +348,8 @@ UrL : {link}""",
 - `{mentions}`: the list ov mentioned roles
 - `{title}`: the titl of da post""",
 "text-success":"Teh text of the feed #{} haz been modified!\n New cute text : \n```\n{}\n```",
-"invalid-flow":"I can't add dis url (empty or inaccessible rss flew) :confused:"
+"invalid-flow":"I can't add dis url (empty or inaccessible rss flew) :confused:",
+"research-timeout":"This page took toooo long 2 answer, I had to stop teh process :eyes:"
 }
 
 server={"config-help": "Dis cmd is mainly usd 2 configur ur srver. By doin `!config see [option]` u will get \
@@ -404,7 +406,8 @@ server_desc={"clear": "Lizt of rawles dat can us teh 'clear' commend: {}",
              "membercounter":"Channel dis-playin nmberz from memberz in iz nayme: {}",
              "anti_raid":"Lev3l of anti-rayderz protect: {} \n*([Dowcumetaton](https://zbot.rtfd.io/en/latest/moderator.html#anti-raid))*",
              "vote_emojis":"Emojiz use 4 powll reacts: {}",
-             "help_in_dm":"Sent help mess:a:ge on Prvte Msage? {}"}
+             "help_in_dm":"Sent help mess:a:ge on Prvte Msage? {}",
+             "muted_role":"Usd role 2 mute people : {}"}
 
 stats_infos={"not-found":"Unable 2 found {}",
             "member-0":"Lttle nayme",

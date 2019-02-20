@@ -6,7 +6,7 @@ import discord
 from discord.ext import commands
 from fcts import cryptage
 
-roles_options = ["clear","slowmode","mute","kick","ban","warn","say","gived_roles"]
+roles_options = ["clear","slowmode","mute","kick","ban","warn","say","gived_roles","muted_role"]
 bool_options = ["save_roles","enable_xp","anti_caps_lock","enable_fun","help_in_dm"]
 textchan_options = ["hunter","welcome_channel","bot_news","poll_channels","modlogs_channel"]
 vocchan_options = ["membercounter"]
@@ -55,7 +55,8 @@ class ServerCog:
                "membercounter":"",
                "anti_raid":1,
                "vote_emojis":":thumbsup:;:thumbsdown:;",
-               "help_in_dm":0}
+               "help_in_dm":0,
+               "muted_role":0}
         self.optionsList = ["ID","Created at","prefix","language","clear","slowmode","mute","kick","ban","warn","say","hunter","welcome_channel","welcome","leave","gived_roles","bot_news","save_roles","poll_channels","modlogs_channel","enable_xp","anti_caps_lock","enable_fun","membercounter","anti_raid","vote_emojis","help_in_dm"]
 
     async def on_ready(self):
@@ -76,6 +77,23 @@ class ServerCog:
             liste.append(x)
         cnx.close()
         return liste
+    
+    async def edit_bot_infos(self,botID,values=[()]):
+        if type(values)!=list:
+            raise ValueError
+        v = list()
+        cnx = self.connect()
+        cursor = cnx.cursor()
+        for x in values:
+            if type(x) == bool:
+                v.append("`{x[0]}`={x[1]}".format(x=x))
+            else:
+                v.append("""`{x[0]}`="{x[1]}" """.format(x=x))
+        query = ("UPDATE `bot_infos` SET {v} WHERE `ID`='{id}'".format(v=",".join(v),id=botID))
+        cursor.execute(query)
+        cnx.commit()
+        cnx.close()
+        return True
 
     async def get_languages(self,ignored_guilds):
         """Return percentages of languages"""
@@ -279,8 +297,10 @@ class ServerCog:
             else:
                 msg = await self.translate(ctx.guild.id,"server","change-1")
             await ctx.send(msg.format(option))
-            emb = self.bot.cogs["EmbedCog"].Embed(desc="Reset option in server `{}`: {}".format(ctx.guild.id,option),color=self.log_color).update_timestamp().set_author(ctx.guild.me)
+            m = "Reset option in server {}: {}".format(ctx.guild.id,option)
+            emb = self.bot.cogs["EmbedCog"].Embed(desc=m,color=self.log_color).update_timestamp().set_author(ctx.guild.me)
             await self.bot.cogs["EmbedCog"].send([emb])
+            self.bot.log.debug(m)
         except ValueError:
             await ctx.send(await self.translate(ctx.guild.id,"server","change-0"))
         except Exception as e:
@@ -288,8 +308,10 @@ class ServerCog:
             await ctx.send(await self.translate(ctx.guild.id,"server","change-1"))
 
     async def send_embed(self,guild,option,value):
-        emb = self.bot.cogs["EmbedCog"].Embed(desc="Changed option in server `{}`: {} = {}".format(guild.id,option,value),color=self.log_color).update_timestamp().set_author(guild.me)
+        m = "Changed option in server {}: {} = `{}`".format(guild.id,option,value)
+        emb = self.bot.cogs["EmbedCog"].Embed(desc=m,color=self.log_color).update_timestamp().set_author(guild.me)
         await self.bot.cogs["EmbedCog"].send([emb])
+        self.bot.log.debug(m)
 
 
     async def conf_roles(self,ctx,option,value):
@@ -318,9 +340,12 @@ class ServerCog:
             await self.send_embed(ctx.guild,option,value)
 
     async def form_roles(self,guild,roles,ext=False):
-        if len(roles) == 0:
-            return "Ø"
-        roles = roles.split(";")
+        if not isinstance(roles,int):
+            if (roles==None or len(roles) == 0):
+                return "Ø"
+            roles = roles.split(";")
+        else:
+            roles = [roles]
         g_roles = list()
         for r in roles:
             g_role = discord.utils.get(guild.roles, id=int(r))
@@ -687,11 +712,10 @@ class ServerCog:
                 r = await self.conf_emoji(ctx,option,"scret-desc")
             else:
                 r = await self.translate(ctx.guild.id,"server","change-0")
-            if option in self.optionsList:
-                try:
-                    r = str(await self.translate(ctx.guild,"server_desc",option)).format(r)
-                except:
-                    pass
+            try:
+                r = str(await self.translate(ctx.guild,"server_desc",option)).format(r)
+            except Exception as e:
+                pass
             try:
                 if not ctx.channel.permissions_for(ctx.guild.me).embed_links:
                     await ctx.send(await self.translate(ctx.guild.id,"mc","cant-embed"))

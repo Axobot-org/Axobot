@@ -242,6 +242,7 @@ modo={"slowmode-0":"Le slowmode est désormais désactivé dans ce salon.",
     "warn-but-db":"Notre base de donnée étant hors ligne, l'avertisement n'a pas pu être enregistré. Néanmoins le membre a bien reçu son avertissement en MP",
     "staff-mute":"Vous ne pouvez pas empêcher de parler un autre membre du staff ",
     "mute-1":"Le membre {} a bien été réduit au silence pour la raison `{}` !",
+    "mute-created":"Rôle `muted` créé avec succès !",
     "no-mute":"Oups, il semble que le rôle `muted` n'existe pas :confused: Veuillez le créer et lui attribuer les permissions manuellement.",
     "cant-mute":"Oups, il semble que je ne possède pas les permissions suffisantes pour cela... Veuillez m'attribuer la permission `gérer les rôles` avant de continuer.",
     "mute-high":"Oups, il semble que le rôle `muted` soit trop haut pour que je puisse le donner... Veuillez fixer ce problème en plaçant mon rôle plus haut que le rôle `muted`.",
@@ -347,7 +348,8 @@ Lien : {link}""",
 - `{mentions}` : la liste des rôles mentionnés
 - `{title}` : le titre du post""",
 "text-success":"Le texte du flux n°{} a bien été modifié ! Nouveau texte : \n```\n{}\n```",
-"invalid-flow":"Cet url est invalide (flux rss vide ou inaccessible) :confused:"
+"invalid-flow":"Cet url est invalide (flux rss vide ou inaccessible) :confused:",
+"research-timeout":"La page web a mis trop de temps à répondre, j'ai dû interrompre le processus :eyes:"
 }
 
 server={"config-help":"Cette commande sert principalement à configurer votre serveur. En faisant `!config see [option]` vous obtiendrez l'aperçu des configurations actuelles, \
@@ -404,7 +406,8 @@ server_desc={"prefix":"Préfixe actuel du bot : {}",
              "membercounter":"Salon affichant dans son nom le nombre de membres : {}",
              "anti_raid":"Niveau de la protection anti-raid : {} \n*([Documentation](https://zbot.rtfd.io/en/latest/moderator.html#anti-raid))*",
              "vote_emojis":"Emojis utilisés pour les réactions de vote : {}",
-             "help_in_dm":"Envoyer le message d'aide en message privés ? {}"}
+             "help_in_dm":"Envoyer le message d'aide en message privés ? {}",
+             "muted_role":"Rôle utilisé pour rendre les gens muets : {}"}
 
 stats_infos={"not-found":"Impossible de trouver {}",
             "member-0":"Surnom",

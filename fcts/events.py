@@ -1,4 +1,4 @@
-import discord, datetime, asyncio, logging
+import discord, datetime, asyncio, logging, time
 
 
 
@@ -142,16 +142,102 @@ class Events:
                     break
         except Exception as e:
             if member.guild.id!=264445053596991498:
-                print("[check_user_left] {} (user {}/server {})".format(e,member.id,member.guild.id))
+                self.bot.log.warn("[check_user_left] {} (user {}/server {})".format(e,member.id,member.guild.id))
 
+
+
+    async def get_events_from_db(self,all=False,IDonly=False):
+        """Renvoie une liste de tous les events qui doivent être exécutés"""
+        try:
+            cnx = self.bot.cogs['ServerCog'].connect()
+            cursor = cnx.cursor(dictionary = True)
+            if IDonly:
+                query = ("SELECT `ID` FROM `timed`")
+            else:
+                query = ("SELECT * FROM `timed`")
+            cursor.execute(query)
+            liste = list()
+            for x in cursor:
+                if all:
+                    liste.append(x)
+                else:
+                    if IDonly or x['begin'].timestamp()+x['duration'] < time.time():
+                        liste.append(x)
+            cnx.close()
+            if len(liste)>0:
+                return liste
+            else:
+                return []
+        except Exception as e:
+            await self.bot.cogs['ErrorsCog'].on_error(e,None)
+
+
+    async def check_tasks(self):
+        tasks = await self.get_events_from_db()
+        if len(tasks)==0:
+            return
+        self.bot.log.debug("[tasks_loop] Itération ({} tâches trouvées)".format(len(tasks)))
+        for task in tasks:
+            if task['action']=='mute':
+                try:
+                    guild = self.bot.get_guild(task['guild'])
+                    if guild==None:
+                        continue
+                    user = guild.get_member(task['user'])
+                    if user==None:
+                        continue
+                    await self.bot.cogs['ModeratorCog'].unmute_event(guild,user,guild.me)
+                    await self.remove_task(task['ID'])
+                except Exception as e:
+                    await self.bot.cogs['ErrorsCog'].on_error(e,None)
+                    self.bot.log.error("[unmute_task] Impossible d'unmute automatiquement : {}".format(e))
+
+
+    async def add_task(self,guildID,userID,action,duration):
+        """Ajoute une tâche à la liste"""
+        tasks = await self.get_events_from_db(all=True)
+        for t in tasks:
+            if t['user']==userID and t['guild']==guildID and t['action']==action:
+                return await self.update_duration(t['ID'],duration)
+        cnx = self.bot.cogs['ServerCog'].connect()
+        cursor = cnx.cursor()
+        ids = await self.get_events_from_db(all=True,IDonly=True)
+        if len(ids)>0:
+            ID = max([x['ID'] for x in ids])+1
+        else:
+            ID = 0
+        query = ("INSERT INTO `timed` (`ID`,`guild`,`user`,`action`,`duration`) VALUES ({},{},{},'{}',{})".format(ID,guildID,userID,action,duration))
+        cursor.execute(query)
+        cnx.commit()
+        cnx.close()
+        return True
+
+    async def update_duration(self,ID,new_duration):
+        """Modifie la durée d'une tâche"""
+        cnx = self.bot.cogs['ServerCog'].connect()
+        cursor = cnx.cursor()
+        query = ("UPDATE `timed` SET `duration`={} WHERE `ID`={}".format(new_duration,ID))
+        cursor.execute(query)
+        cnx.commit()
+        cnx.close()
+        return True
+
+    async def remove_task(self,ID:int):
+        """Enlève une tâche exécutée"""
+        cnx = self.bot.cogs['ServerCog'].connect()
+        cursor = cnx.cursor()
+        query = ("DELETE FROM `timed` WHERE `timed`.`ID` = {}".format(ID))
+        cursor.execute(query)
+        cnx.commit()
+        cnx.close()
+        return True
 
     async def loop(self):
         await self.bot.wait_until_ready()
-        print("launching")
-        a = 0
+        self.bot.log.info("[tasks_loop] Lancement de la boucle")
         while not self.bot.is_closed():
-            if int(datetime.datetime.now().second)==0:
-                a = a+2000/pow(10,3)-1
+            if int(datetime.datetime.now().second)%30 == 0:
+                await self.check_tasks()
             await asyncio.sleep(0.5)
 
 def setup(bot):

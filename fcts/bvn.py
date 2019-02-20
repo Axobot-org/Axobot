@@ -7,7 +7,7 @@ class WelcomerCog:
     def __init__(self,bot):
         self.bot = bot
         self.file = "bvn"
-        self.no_message = [392766377078816789]
+        self.no_message = [392766377078816789,504269440872087564]
     
 
     async def new_member(self,member):

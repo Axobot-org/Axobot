@@ -242,6 +242,7 @@ modo={"slowmode-0":"The slowmode is now disabled in this channel.",
     "warn-but-db":"Our database being offline, the warning could not be saved. Nevertheless, the member did receive his warning in DM",
     "staff-mute":"You can't prevent another staff member from speaking ",
     "mute-1":"The member {} has been silenced for the reason `{}`!",
+    "mute-created":"Successfully created `muted` role!",
     "no-mute":"Oops, it seems that the role `muted` does not exist :confused: Please create it and assign permissions manually.",
     "cant-mute":"Oops, it seems that I don't have enough permissions for that.... Please give me permission `Manage roles` before continuing.",
     "mute-high":"Oops, it seems that the `muted` role is too high for me to give it... Please fix this problem by placing my role higher than the `muted` role.",
@@ -347,7 +348,8 @@ Link : {link}""",
 - `{mentions}`: the list of mentioned roles
 - `{title}`: the title of the post""",
 "text-success":"The text of the feed #{} has been modified!\n New text : \n```\n{}\n```",
-"invalid-flow":"This url is invalid (empty or inaccessible rss flow) :confused:"
+"invalid-flow":"This url is invalid (empty or inaccessible rss flow) :confused:",
+"research-timeout":"The web page took too long to answer, I had to interrupt the process :eyes:"
 }
 
 server={"config-help": "This command is mainly used to configure your server. By doing `!config see [option]` you will get \
@@ -404,7 +406,8 @@ server_desc={"clear": "List of roles that can use the 'clear' command: {}",
              "membercounter":"Channel displaying number of members in its name: {}",
              "anti_raid":"Level of anti-raid protection: {} \n*([Documentation](https://zbot.rtfd.io/en/latest/moderator.html#anti-raid))*",
              "vote_emojis":"Emojis used for poll reactions: {}",
-             "help_in_dm":"Send help message in Private Message? {}"}
+             "help_in_dm":"Send help message in Private Message? {}",
+             "muted_role":"Used role to mute members : {}"}
 
 stats_infos={"not-found":"Unable to find {}",
             "member-0":"Nickname",
