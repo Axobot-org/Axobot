@@ -340,9 +340,12 @@ class ServerCog:
             await self.send_embed(ctx.guild,option,value)
 
     async def form_roles(self,guild,roles,ext=False):
-        if roles==None or len(roles) == 0:
-            return "Ø"
-        roles = roles.split(";")
+        if not isinstance(roles,int):
+            if (roles==None or len(roles) == 0):
+                return "Ø"
+            roles = roles.split(";")
+        else:
+            roles = [roles]
         g_roles = list()
         for r in roles:
             g_role = discord.utils.get(guild.roles, id=int(r))
