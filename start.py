@@ -252,7 +252,7 @@ def main():
             r2=input("Lancement de la boucle rss ? (o/n) ")
             if r2=='o':
                 client.loop.create_task(client.cogs["RssCog"].loop())
-            r3=input("Lancement de la boucle de test ? (o/n) ")
+            r3=input("Lancement de la boucle d'events' ? (o/n) ")
             if r3=='o':
                 client.loop.create_task(client.cogs["Events"].loop())
     else:
