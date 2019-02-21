@@ -258,7 +258,7 @@ You can specify a verification limit by adding a number in argument"""
             await ctx.channel.send("".join(text1).replace("¬¬","\n"))
         if ctx.bot.database_online and await self.bot.cogs["ServerCog"].staff_finder(ctx.author,'say'):
             await self.bot.cogs["UtilitiesCog"].suppr(ctx.message)
-        self.bot.log.info("{} used bigtext to say {}".format(ctx.author.id,text))
+        self.bot.log.debug("{} used bigtext to say {}".format(ctx.author.id,text))
     
     @commands.command(name="shrug",hidden=True)
     @commands.check(is_fun_enabled)
