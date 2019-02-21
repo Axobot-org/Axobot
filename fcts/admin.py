@@ -1,7 +1,7 @@
 import discord
 from discord.ext import commands
 
-import time, importlib, sys, traceback, datetime, os, shutil, asyncio, inspect, typing, io, textwrap, copy, operator, requests, random
+import time, importlib, sys, traceback, datetime, os, shutil, asyncio, inspect, typing, io, textwrap, copy, operator, requests, random, ast
 from libs import feedparser
 from contextlib import redirect_stdout
 from fcts import reloads
@@ -600,6 +600,20 @@ class AdminCog:
         if ctx != None:
             await message.edit(content=msg)
             
+    @commands.command(name="idea")
+    @commands.check(reloads.check_admin)
+    async def make_suggestion(self,ctx,*,text):
+        """Ajouter une idée dans le salon des idées, en français et anglais"""
+        if len(text.split('\n'))!=2:
+            return await ctx.send("Il faut ne faire que deux paragraphes, le premier en français, le deuxième en anglais")
+        text = text.split('\n')
+        fr,en = text[0].replace('\\n','\n'), text[1].replace('\\n','\n')
+        emb = self.bot.cogs['EmbedCog'].Embed(fields=[{'name':'Français','value':fr},{'name':'English','value':en}],color=16106019)
+        chan = ctx.bot.get_channel(548138866591137802) if self.bot.beta else ctx.bot.get_channel(488769306524385301)
+        msg = await chan.send(embed=emb.discord_embed())
+        await self.bot.cogs['FunCog'].add_vote(msg)
+
+    
 
 def setup(bot):
     bot.add_cog(AdminCog(bot))
