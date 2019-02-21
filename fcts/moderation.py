@@ -301,9 +301,9 @@ class ModeratorCog:
         if role==None or not role in user.roles:
             return
         if author==guild.me:
-            await user.remove_roles(role,reason="automatic unmute")
+            await user.remove_roles(role,reason=await self.translate(guild.id,"logs","d-autounmute"))
         else:
-            await user.remove_roles(role,reason="unmuted by {}".format(author))
+            await user.remove_roles(role,reason=str(await self.translate(guild.id,"logs","d-unmute")).format(author))
         log = str(await self.translate(guild.id,"logs","mute-off")).format(member=user)
         await self.bot.cogs["Events"].send_logs_per_server(guild,"mute",log,author)
 

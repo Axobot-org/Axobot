@@ -746,7 +746,7 @@ class ServerCog:
             lang = await self.translate(guild.id,"current_lang","current")
             text = "{}{}: {}".format(str(await self.translate(guild.id,"keywords","membres")).capitalize() , " " if lang=='fr' else "" , len(guild.members))
             try:
-                await ch.edit(name=text,reason="Automated action")
+                await ch.edit(name=text,reason=await self.translate(guild.id,"logs","d-memberchan"))
             except Exception as e:
                 self.bot.debug("[UpdateMemberChannel] "+str(e))
     

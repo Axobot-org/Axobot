@@ -178,7 +178,13 @@ logs={"slowmode-enabled":"Slwmod enable in {channel} ({seconds}s)",
 "mute-off":"{member} is not more mutd",
 "softban":"{member} had beeen 'softBAnnnnned' (reasun: {reason} | caz #{case})",
 "warn":"{member} had been warner: {reason} (case #{case})",
-"tempmute-on":"{member} is naw muted 4 {duration} (reason : {reason} | caz #{case})"}
+"tempmute-on":"{member} is naw muted 4 {duration} (reason : {reason} | caz #{case})",
+"d-autounmute":"automatic unmute",
+"d-unmute":"unmuted by {}",
+"d-invite":"Automod (Discord invite)",
+"d-young":"Automod (too recent account)",
+"d-gived_roles":"Automated action (config gived_roles)",
+"d-memberchan":"Automated action (config membercount)"}
 
 mc={"contact-mail":"If U notis an errrror in da info providd, plz contact my personale, or report teh errer directlly [with the nice website](https://fr-minecraft.net).",
     "serv-title":"Servr info {}",

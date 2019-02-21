@@ -178,7 +178,13 @@ logs={"slowmode-enabled":"Slowmode activé dans le salon {channel} ({seconds}s)"
 "mute-off":"{member} n'est plus muet",
 "softban":"{member} a été 'softban' (raison : {reason} | casier #{case})",
 "warn":"{member} a reçu un avertissement : {reason} (casier #{case})",
-"tempmute-on":"{member} est maintenant muet pour {duration} (raison : {reason} | casier #{case})",}
+"tempmute-on":"{member} est maintenant muet pour {duration} (raison : {reason} | casier #{case})",
+"d-autounmute":"unmute automatique",
+"d-unmute":"unmute par {}",
+"d-invite":"Automod (invitation Discord)",
+"d-young":"Automod (compte trop récent)",
+"d-gived_roles":"Action automatique (config gived_roles)",
+"d-memberchan":"Action automatique (config membercount)"}
 
 mc={"contact-mail":"Si vous constatez une erreur dans les informations données, merci de me contacter rapidement, ou de rapporter l'erreur directement [sur le site](https://fr-minecraft.net).",
     "serv-title":"Informations du serveur {}",

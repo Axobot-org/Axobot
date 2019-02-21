@@ -8,6 +8,13 @@ class WelcomerCog:
         self.bot = bot
         self.file = "bvn"
         self.no_message = [392766377078816789,504269440872087564]
+        try:
+            self.translate = bot.cogs['LangCog'].tr
+        except:
+            pass
+    
+    async def on_ready(self):
+        self.translate = self.bot.cogs['LangCog'].tr
     
 
     async def new_member(self,member):
@@ -92,25 +99,25 @@ class WelcomerCog:
             return c
         if level >= 1:
             if await self.bot.cogs['UtilitiesCog'].check_discord_invite(member.name) != None:
-                await self.kick(member,"Automod (Discord invite)")
+                await self.kick(member,await self.translate(member.guild.id,"logs","d-invite"))
                 c = True
         if level >= 2:
             if (datetime.datetime.now() - member.created_at).seconds <= 1*60:
-                await self.kick(member,"Automod (too young account)")
+                await self.kick(member,await self.translate(member.guild.id,"logs","d-young"))
                 c = True
         if level >= 3 and can_ban:
             if await self.bot.cogs['UtilitiesCog'].check_discord_invite(member.name) != None:
-                await self.ban(member,"Automod (Discord invite)")
+                await self.ban(member,await self.translate(member.guild.id,"logs","d-invite"))
                 c = True
             if (datetime.datetime.now() - member.created_at).seconds <= 5*60:
-                await self.kick(member,"Automod (too young account)")
+                await self.kick(member,await self.translate(member.guild.id,"logs","d-young"))
                 c = True
         if level >= 4:
             if (datetime.datetime.now() - member.created_at).seconds <= 10*60:
-                await self.kick(member,"Automod (too young account)")
+                await self.kick(member,await self.translate(member.guild.id,"logs","d-young"))
                 c = True
             if (datetime.datetime.now() - member.created_at).seconds <= 3*60 and can_ban:
-                await self.ban(member,"Automod (too young account)")
+                await self.ban(member,await self.translate(member.guild.id,"logs","d-young"))
                 c = True
         return c
 
@@ -124,7 +131,7 @@ class WelcomerCog:
                     continue
                 role = member.guild.get_role(int(r))
                 if role != None:
-                    await member.add_roles(role,reason="Automated action (config gived_roles)")
+                    await member.add_roles(role,reason=await self.translate(member.guild.id,"logs","d-gived_roles"))
         except Exception as e:
             await self.bot.cogs["ErrorsCog"].on_error(e,None)
 
