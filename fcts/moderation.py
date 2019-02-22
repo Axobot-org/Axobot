@@ -12,10 +12,10 @@ class ModeratorCog:
             self.translate = bot.cogs['LangCog'].tr
         except:
             pass
-        
+
     async def on_ready(self):
         self.translate = self.bot.cogs['LangCog'].tr
-    
+
     @commands.command(name="slowmode")
     @commands.guild_only()
     @commands.cooldown(1, 3, commands.BucketType.guild)
@@ -45,7 +45,7 @@ class ModeratorCog:
         else:
                 message = await self.translate(ctx.guild.id,"modo","slowmode-3")
         await ctx.send(message)
-        
+
 
     @commands.command(name="clear")
     @commands.cooldown(4, 30, commands.BucketType.guild)
@@ -59,7 +59,7 @@ class ModeratorCog:
             ('-f' or) '+f' : delete if the message  (does not) contain any file
             ('-l' or) '+l' : delete if the message (does not) contain any link
             ('-p' or) '+p' : delete if the message is (not) pinned
-            ('-i' or) '+i' : delete if the message contain a discord invite
+            ('-i' or) '+i' : delete if the message (does not) contain a Discord invite
         By default, the bot will not delete pinned messages"""
         if not ctx.channel.permissions_for(ctx.guild.me).manage_messages:
             await ctx.send(await self.translate(ctx.guild.id,"modo","need-manage-messages"))
@@ -130,7 +130,7 @@ class ModeratorCog:
         await ctx.send(str(await self.translate(ctx.guild,"modo","clear-0")).format(len(deleted)),delete_after=2.0)
         log = str(await self.translate(ctx.guild.id,"logs","clear")).format(channel=ctx.channel.mention,number=len(deleted))
         await self.bot.cogs["Events"].send_logs_per_server(ctx.guild,"clear",log,ctx.author)
-        
+
 
     @commands.command(name="kick")
     @commands.cooldown(5, 20, commands.BucketType.guild)
@@ -443,7 +443,7 @@ class ModeratorCog:
             await ctx.guild.unban(user,reason=reason)
             caseID = "'Unsaved'"
             if self.bot.database_online:
-                CasesCog = self.bot.cogs['CasesCog']         
+                CasesCog = self.bot.cogs['CasesCog']
                 caseIDs = await CasesCog.get_ids()
                 case = CasesCog.Case(bot=self.bot,guildID=ctx.guild.id,memberID=user.id,Type="unban",ModID=ctx.author.id,Reason=reason,date=datetime.datetime.now()).create_id(caseIDs)
                 try:
@@ -519,7 +519,7 @@ class ModeratorCog:
     @commands.guild_only()
     @commands.check(checks.can_see_banlist)
     async def banlist(self,ctx,reasons:bool=True):
-        """Check the list of currently banned members. 
+        """Check the list of currently banned members.
 The 'reasons' parameter is used to display the ban reasons.
 
 You must be an administrator of this server to use this command."""
@@ -552,7 +552,7 @@ You must be an administrator of this server to use this command."""
         """Manage your emoji
         Administrator permission is required"""
         return
-    
+
     @emoji_group.command(name="rename")
     async def emoji_rename(self,ctx,emoji:discord.Emoji,name):
         """Rename an emoji"""

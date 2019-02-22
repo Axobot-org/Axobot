@@ -14,7 +14,7 @@ class UtilitiesCog:
         self.config = None
         self.table = 'users'
         self.new_pp = False
-        
+
     async def on_ready(self):
         self.config = (await self.bot.cogs['ServerCog'].get_bot_infos(self.bot.user.id))[0]
 
@@ -154,7 +154,7 @@ class UtilitiesCog:
     async def global_check(self,ctx):
         """Do a lot of checks before executing a command (rss loop, banned guilds etc)"""
         if ctx.bot.cogs['RssCog'].last_update==None or (datetime.datetime.now() - ctx.bot.cogs['RssCog'].last_update).total_seconds() > 30*60:
-            
+
             self.bot.cogs['RssCog'].last_update = datetime.datetime.now()
             asyncio.run_coroutine_threadsafe(ctx.bot.cogs['RssCog'].main_loop(),asyncio.get_running_loop())
         if type(ctx)!=commands.context.Context:
@@ -168,7 +168,7 @@ class UtilitiesCog:
             return False
         if str(ctx.author.id) in self.config['banned_users'].split(";"):
             return False
-        return True 
+        return True
 
     async def create_footer(self,embed,user):
         embed.set_footer(text="Requested by {}".format(user.name), icon_url=user.avatar_url_as(format='png'))
@@ -180,7 +180,7 @@ class UtilitiesCog:
             if str(m.status) in ["online","idle"]:
                 online += 1
         return online
-    
+
     async def get_bots_number(self,members):
         return len([x for x in members if x.bot])
 
@@ -206,7 +206,7 @@ class UtilitiesCog:
         return re.search(ch,text)
 
     async def clear_msg(self,text,everyone=True,ctx=None):
-        """Remove every mass mention form a text, and add custom emojis"""
+        """Remove every mass mention from a text, and add custom emojis"""
         if everyone:
             text = text.replace("@everyone","@"+u"\u200B"+"everyone").replace("@here","@"+u"\u200B"+"here")
         #for x in re.finditer(r'<(a?:[^:]+:)\d+>',text):
