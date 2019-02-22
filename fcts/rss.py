@@ -758,7 +758,11 @@ class RssCog:
                 datz = 'Unknown'
             else:
                 datz = feed[published]
-            obj = self.rssMessage(bot=self.bot,Type='web',url=feed['link'],title=feed['title'],emojis=self.bot.cogs['EmojiCog'].customEmojis,date=datz,author=feed['author'] if 'author' in feed.keys() else None,channel= feeds.feed['title'])
+            if 'link' in feed.keys():
+                l = feed['link']
+            else:
+                l = feeds['link']
+            obj = self.rssMessage(bot=self.bot,Type='web',url=l,title=feed['title'],emojis=self.bot.cogs['EmojiCog'].customEmojis,date=datz,author=feed['author'] if 'author' in feed.keys() else None,channel= feeds.feed['title'])
             return [obj]
         else:
             liste = list()
@@ -769,7 +773,11 @@ class RssCog:
                     datz = feed[published]
                 if datetime.datetime(*feed['published_parsed'][:6]) <= date:
                     break
-                obj = self.rssMessage(bot=self.bot,Type='web',url=feed['link'],title=feed['title'],emojis=self.bot.cogs['EmojiCog'].customEmojis,date=datz,author=feed['author'] if 'author' in feed.keys() else None,channel= feeds.feed['title'])
+                if 'link' in feed.keys():
+                    l = feed['link']
+                else:
+                    l = feeds['link']
+                obj = self.rssMessage(bot=self.bot,Type='web',url=l,title=feed['title'],emojis=self.bot.cogs['EmojiCog'].customEmojis,date=datz,author=feed['author'] if 'author' in feed.keys() else None,channel= feeds.feed['title'])
                 liste.append(obj)
             liste.reverse()
             return liste
