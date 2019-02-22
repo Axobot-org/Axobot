@@ -534,7 +534,7 @@ class RssCog:
             await ctx.send(str(await self.translate(ctx.guild.id,"rss","guild-error")).format(e))
 
     @rss_main.command(name="test")
-    @commands.check(reloads.check_admin)
+    @commands.check(reloads.is_support_staff)
     async def test_rss(self,ctx,url,*,args=None):
         """Test if an rss feed is usable"""
         url = url.replace('<','').replace('>','')
