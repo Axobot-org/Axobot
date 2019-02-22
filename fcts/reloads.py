@@ -14,6 +14,15 @@ async def check_admin(ctx):
         user = user.id
     return user in admins_id
 
+async def is_support_staff(ctx):
+    server = ctx.bot.get_guild(356067272730607628)
+    if server != None:
+        member = server.get_member(ctx.author.id)
+        role = server.get_role(412340503229497361)
+        if member != None and role != None:
+            return role in member.roles
+    return False
+
 class ReloadsCog:
     """Cog to manage the other cogs. Even if all are disabled, this is the last one left."""
 

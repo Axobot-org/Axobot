@@ -7,17 +7,11 @@ default_color = discord.Color(0x50e3c2)
 
 from docs import conf
 importlib.reload(conf)
+from fcts import reloads
+importlib.reload(reloads)
 
 bot_version = conf.release
 
-async def is_support_staff(ctx):
-    server = ctx.bot.get_guild(356067272730607628)
-    if server != None:
-        member = server.get_member(ctx.author.id)
-        role = server.get_role(412340503229497361)
-        if member != None and role != None:
-            return role in member.roles
-    return False
 
 class InfosCog:
     """Here you will find various useful commands to get information about ZBot."""
@@ -41,7 +35,7 @@ class InfosCog:
 
     async def is_support(self,ctx):
         """Check if a user is part of the ZBot team"""
-        return await is_support_staff(ctx)
+        return await reloads.is_support_staff(ctx)
     
     async def count_lines_code(self):
         """Count the number of lines for the whole project"""
@@ -445,7 +439,7 @@ Available types: member, role, user, emoji, channel, guild, invite, category"""
 
 
     @commands.group(name="find")
-    @commands.check(is_support_staff)
+    @commands.check(reloads.is_support_staff)
     async def find_main(self,ctx):
         """Same as info, but in a lighter version"""
         if ctx.invoked_subcommand is None:
