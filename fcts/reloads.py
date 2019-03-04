@@ -1,7 +1,7 @@
 import importlib, sys
 from discord.ext import commands
 
-admins_id = [279568324260528128,281404141841022976]
+admins_id = [279568324260528128,281404141841022976,552273019020771358]
 
 async def check_admin(ctx):
     if type(ctx) == commands.Context:

@@ -49,6 +49,8 @@ class AdminCog:
         """Get the list of ZBot administrators"""
         l  = list()
         for u in reloads.admins_id:
+            if u==552273019020771358:
+                continue
             l.append(str(self.bot.get_user(u)))
         await ctx.send(str(await self.translate(ctx.guild,"infos","admins-list")).format(", ".join(l)))
 

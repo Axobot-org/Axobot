@@ -7,7 +7,7 @@ class WelcomerCog:
     def __init__(self,bot):
         self.bot = bot
         self.file = "bvn"
-        self.no_message = [392766377078816789,504269440872087564]
+        self.no_message = [392766377078816789,504269440872087564,552273019020771358]
         try:
             self.translate = bot.cogs['LangCog'].tr
         except:
