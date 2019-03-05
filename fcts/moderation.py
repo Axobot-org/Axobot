@@ -118,18 +118,21 @@ class ModeratorCog:
                 if (i == None and invites==2) or (i != None and invites==0):
                     c4 = False
             #return ((m.pinned == pinned) or ((m.attachments != []) == files) or ((r != None) == links)) and m.author in users
-            mentions = [x.mention for x in ctx.message.mentions]
+            mentions = ctx.message.raw_mentions
             if ctx.prefix.strip() in mentions:
                 mentions.remove(ctx.prefix.strip())
-            if mentions != []:
+            if mentions != [] and m.author!=None:
                 return c1 and c2 and c3 and c4 and m.author.mention in mentions
             else:
                 return c1 and c2 and c3 and c4
-        await ctx.message.delete()
-        deleted = await ctx.channel.purge(limit=number, check=check)
-        await ctx.send(str(await self.translate(ctx.guild,"modo","clear-0")).format(len(deleted)),delete_after=2.0)
-        log = str(await self.translate(ctx.guild.id,"logs","clear")).format(channel=ctx.channel.mention,number=len(deleted))
-        await self.bot.cogs["Events"].send_logs_per_server(ctx.guild,"clear",log,ctx.author)
+        try:
+            await ctx.message.delete()
+            deleted = await ctx.channel.purge(limit=number, check=check)
+            await ctx.send(str(await self.translate(ctx.guild,"modo","clear-0")).format(len(deleted)),delete_after=2.0)
+            log = str(await self.translate(ctx.guild.id,"logs","clear")).format(channel=ctx.channel.mention,number=len(deleted))
+            await self.bot.cogs["Events"].send_logs_per_server(ctx.guild,"clear",log,ctx.author)
+        except Exception as e:
+            await self.bot.cogs['ErrorsCog'].on_command_error(ctx,e)
 
 
     @commands.command(name="kick")
