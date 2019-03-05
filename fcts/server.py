@@ -120,7 +120,7 @@ class ServerCog:
         """Check is user is part of a staff"""
         if option not in roles_options:
             raise TypeError
-        if await self.bot.cogs['AdminCog'].check_if_admin(user) or user==user.guild.owner:
+        if await self.bot.cogs['AdminCog'].check_if_admin(user) and user.guild.id in self.bot.cogs['AdminCog'].god_mode:
             return True
         if not self.bot.database_online:
             return False
@@ -748,7 +748,7 @@ class ServerCog:
             try:
                 await ch.edit(name=text,reason=await self.translate(guild.id,"logs","d-memberchan"))
             except Exception as e:
-                self.bot.debug("[UpdateMemberChannel] "+str(e))
+                self.bot.log.debug("[UpdateMemberChannel] "+str(e))
     
     
 def setup(bot):

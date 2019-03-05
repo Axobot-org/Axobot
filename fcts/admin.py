@@ -34,6 +34,7 @@ class AdminCog:
         except:
             pass
         self._last_result = None
+        self.god_mode = []
         
     async def on_ready(self):
         self.translate = self.bot.cogs["LangCog"].tr
@@ -53,6 +54,20 @@ class AdminCog:
                 continue
             l.append(str(self.bot.get_user(u)))
         await ctx.send(str(await self.translate(ctx.guild,"infos","admins-list")).format(", ".join(l)))
+
+    @commands.command(name='god')
+    @commands.check(reloads.check_admin)
+    @commands.guild_only()
+    async def enable_god_mode(self,ctx,enable:bool=True):
+        """Donne les pleins-pouvoirs aux admins du bot sur ce serveur (accès à toutes les commandes de modération)"""
+        if enable:
+            if ctx.guild.id not in self.god_mode:
+                self.god_mode.append(ctx.guild.id)
+            await ctx.send("<:nitro:548569774435598346> Mode superadmin activé sur ce serveur")
+        else:
+            if ctx.guild.id in self.god_mode:
+                self.god_mode.remove(ctx.guild.id)
+            await ctx.send("Mode superadmin désactivé sur ce serveur")
 
     @commands.command(name='spoil',hidden=True)
     @commands.check(reloads.check_admin)
