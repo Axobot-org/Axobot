@@ -446,7 +446,7 @@ You can specify a verification limit by adding a number in argument"""
 
 
     async def add_vote(self,msg):
-        if self.bot.database_online:
+        if self.bot.database_online and msg.guild!=None:
             emojiz = await self.bot.cogs["ServerCog"].find_staff(msg.guild,'vote_emojis')
         else:
             emojiz = None
@@ -477,9 +477,9 @@ You can specify a verification limit by adding a number in argument"""
         If no number of choices is given, the emojis will be 👍 and 👎. Otherwise, it will be a series of numbers.
         The text sent by the bot is EXACTLY the one you give, without any more formatting."""
         text = await ctx.bot.cogs['UtilitiesCog'].clear_msg(text,ctx=ctx)
-        if not (ctx.channel.permissions_for(ctx.guild.me).read_message_history and ctx.channel.permissions_for(ctx.guild.me).add_reactions):
-            await ctx.send(await self.translate(ctx.guild,"fun","cant-react"))
-            return
+        if ctx.guild != None:
+            if not (ctx.channel.permissions_for(ctx.guild.me).read_message_history and ctx.channel.permissions_for(ctx.guild.me).add_reactions):
+                return await ctx.send(await self.translate(ctx.guild,"fun","cant-react"))
         if number==0:
             m = await ctx.send(text)
             try:
