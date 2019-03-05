@@ -274,6 +274,26 @@ class UtilitiesCog:
             return False
         return parameters['premium']
 
+    async def is_support(self,user):
+        """Check if a user is support staff"""
+        try:
+            parameters = await self.get_db_userinfo(criters=["ID="+str(user.id)],columns=['support'])
+        except Exception as e:
+            await self.bot.cogs["Errors"].on_error(e,None)
+        if parameters==None:
+            return False
+        return parameters['support']
+
+    async def is_contributor(self,user):
+        """Check if a user is a contributor"""
+        try:
+            parameters = await self.get_db_userinfo(criters=["ID="+str(user.id)],columns=['contributor'])
+        except Exception as e:
+            await self.bot.cogs["Errors"].on_error(e,None)
+        if parameters==None:
+            return False
+        return parameters['contributor']
+
     async def add_check_reaction(self,message):
         try:
             emoji = discord.utils.get(self.bot.emojis, name='greencheck')

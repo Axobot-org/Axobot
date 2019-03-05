@@ -26,6 +26,8 @@ class WelcomerCog:
             self.bot.loop.create_task(self.give_roles(member))
         if member.guild==356067272730607628:
             await self.check_owner_server(member)
+            await self.check_support(member)
+            await self.check_contributor(member)
         
         
     
@@ -73,6 +75,19 @@ class WelcomerCog:
             if role not in member.roles:
                 await member.add_roles(role,reason="This user support me")
             
+    async def check_support(self,member):
+        """Vérifie si un nouvel arrivant fait partie du support"""
+        if await self.bot.cogs['UtilitiesCog'].is_support(member):
+            role = member.guild.get_role(412340503229497361)
+            if role!=None:
+                await member.add_roles(role)
+
+    async def check_contributor(self,member):
+        """Vérifie si un nouvel arrivant est un contributeur"""
+        if await self.bot.cogs['UtilitiesCog'].is_contributor(member):
+            role = member.guild.get_role(552428810562437126)
+            if role!=None:
+                await member.add_roles(role)
 
     async def kick(self,member,reason):
         try:
