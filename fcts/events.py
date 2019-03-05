@@ -74,7 +74,7 @@ class Events:
     async def send_mp(self,msg):
         if "vient d'être ajouté dans la base de donnée" in msg.content:
             return
-        if msg.channel.recipient.id in [392766377078816789,279568324260528128]:
+        if msg.channel.recipient.id in [392766377078816789,279568324260528128,552273019020771358]:
             return
         channel = self.bot.get_channel(488768968891564033)
         if channel==None:
