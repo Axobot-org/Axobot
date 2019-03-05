@@ -161,8 +161,11 @@ Available types: member, role, user, emoji, channel, guild, invite, category"""
                     return
             #-----
             if item == None:
-                msg = await self.translate(ctx.guild.id,"stats_infos","not-found")
-                await ctx.send(msg.format(name))
+                if Type.lower() not in ['member','role','user','textchannel','channel','invite','voicechannel','emoji','category','guild','server']:
+                    msg = await self.translate(ctx.guild.id,"stats_infos","type-invalid")
+                else:
+                    msg = await self.translate(ctx.guild.id,"stats_infos","not-found")
+                await ctx.send(msg.format(N=name,T=Type))
             elif type(item) == discord.Member:
                 await self.member_infos(ctx,item,lang)
             elif type(item) == discord.Role:

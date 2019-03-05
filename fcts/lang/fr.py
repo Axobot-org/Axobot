@@ -415,7 +415,8 @@ server_desc={"prefix":"Préfixe actuel du bot : {}",
              "help_in_dm":"Envoyer le message d'aide en message privés ? {}",
              "muted_role":"Rôle utilisé pour rendre les gens muets : {}"}
 
-stats_infos={"not-found":"Impossible de trouver {}",
+stats_infos={"not-found":"Impossible de trouver {N}",
+            "type-invalid":"Le type `{T}` est invalide :confused:",
             "member-0":"Surnom",
             "member-1":"Créé le",
             "member-2":"A rejoint le",
