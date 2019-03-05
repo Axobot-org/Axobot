@@ -1,7 +1,7 @@
 import importlib, sys
 from discord.ext import commands
 
-admins_id = [279568324260528128,281404141841022976]
+admins_id = [279568324260528128,281404141841022976,552273019020771358]
 
 async def check_admin(ctx):
     if type(ctx) == commands.Context:
@@ -13,6 +13,15 @@ async def check_admin(ctx):
     elif type(user) != int:
         user = user.id
     return user in admins_id
+
+async def is_support_staff(ctx):
+    server = ctx.bot.get_guild(356067272730607628)
+    if server != None:
+        member = server.get_member(ctx.author.id)
+        role = server.get_role(412340503229497361)
+        if member != None and role != None:
+            return role in member.roles
+    return False
 
 class ReloadsCog:
     """Cog to manage the other cogs. Even if all are disabled, this is the last one left."""

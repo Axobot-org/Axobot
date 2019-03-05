@@ -62,7 +62,7 @@ errors={"cooldown":"You are on cooldown for this command :confused: Please wait 
 "duration":"The duration `{}` is invalid"}
 
 find={"user-0":"name: {}\nID: {}",
-"user-1":"Name: {}\nID: {}\nServers: {}\nLanguages: {}",
+"user-1":"Name: {}\nID: {}\nServers: {}\nOwner of: {}\nLanguages: {}",
 "user-2":"User not found",
 "guild-0":"Server not found",
 "guild-1":"Name: {}\nID: {}\nOwner: {} ({})\nMembers: {} (including {} bots)\nLanguage: {}",
@@ -178,7 +178,13 @@ logs={"slowmode-enabled":"Slowmode enabled in {channel} ({seconds}s)",
 "mute-off":"{member} is no more muted",
 "softban":"{member} has been 'softbanned' (reason: {reason} | case #{case})",
 "warn":"{member} has been warned: {reason} (case #{case})",
-"tempmute-on":"{member} is now muted for {duration} (reason : {reason} | case #{case})",}
+"tempmute-on":"{member} is now muted for {duration} (reason : {reason} | case #{case})",
+"d-autounmute":"automatic unmute",
+"d-unmute":"unmuted by {}",
+"d-invite":"Automod (Discord invite)",
+"d-young":"Automod (too recent account)",
+"d-gived_roles":"Automated action (config gived_roles)",
+"d-memberchan":"Automated action (config membercount)"}
 
 mc={"contact-mail":"If you notice an error in the information provided, please contact me personally, or report the error directly [on the site](https://fr-minecraft.net).",
     "serv-title":"Server information {}",
@@ -409,7 +415,8 @@ server_desc={"clear": "List of roles that can use the 'clear' command: {}",
              "help_in_dm":"Send help message in Private Message? {}",
              "muted_role":"Used role to mute members : {}"}
 
-stats_infos={"not-found":"Unable to find {}",
+stats_infos={"not-found":"Unable to find {N}",
+            "type-invalid":"Invalid type: `{T}` :confused:",
             "member-0":"Nickname",
             "member-1":"Created at",
             "member-2":"Joined at",

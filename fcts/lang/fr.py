@@ -53,6 +53,8 @@ cases={"no-user":"Impossible de trouver cet utilisateur",
     'title-search':'Casier #{}',
     'no_database':"En raison d'une panne temporaire de la base de donnée, cette commande a été désactivée"}
 
+events={'mp-adv':"Vous cherchez sans doute à m'inviter sur ce serveur ? Si c'est le cas, je ne peux pas le rejoindre avec une simple invitation. Il faut qu'un administrateur utilise mon propre lien d'invitation, ici : <https://bot.discord.io/zbot> :wink:"}
+
 errors={"cooldown":"Vous êtes en cooldown pour cette commande. Veuillez attendre encore {0} secondes...",
 "badarguments":"Oups, impossible de convertir le paramètre `{0}` en type \"{1}\" :confused:",
 "missingargument":"Oups, il manque l'argument \"{0}\" {1}",
@@ -62,7 +64,7 @@ errors={"cooldown":"Vous êtes en cooldown pour cette commande. Veuillez attendr
 "duration":"La durée `{0}` est invalide"}
 
 find={"user-0":"Nom : {}\nID : {}",
-"user-1":"Nom : {}\nID : {}\nServeurs : {}\nLangues : {}",
+"user-1":"Nom : {}\nID : {}\nServeurs : {}\nPropriétaire de : {}\nLangues : {}",
 "user-2":"Utilisateur introuvable",
 "guild-0":"Serveur introuvable",
 "guild-1":"Nom : {}\nID : {}\nPropriétaire : {} ({})\nMembres : {} (dont {} bots)\nLangue : {}",
@@ -178,7 +180,13 @@ logs={"slowmode-enabled":"Slowmode activé dans le salon {channel} ({seconds}s)"
 "mute-off":"{member} n'est plus muet",
 "softban":"{member} a été 'softban' (raison : {reason} | casier #{case})",
 "warn":"{member} a reçu un avertissement : {reason} (casier #{case})",
-"tempmute-on":"{member} est maintenant muet pour {duration} (raison : {reason} | casier #{case})",}
+"tempmute-on":"{member} est maintenant muet pour {duration} (raison : {reason} | casier #{case})",
+"d-autounmute":"unmute automatique",
+"d-unmute":"unmute par {}",
+"d-invite":"Automod (invitation Discord)",
+"d-young":"Automod (compte trop récent)",
+"d-gived_roles":"Action automatique (config gived_roles)",
+"d-memberchan":"Action automatique (config membercount)"}
 
 mc={"contact-mail":"Si vous constatez une erreur dans les informations données, merci de me contacter rapidement, ou de rapporter l'erreur directement [sur le site](https://fr-minecraft.net).",
     "serv-title":"Informations du serveur {}",
@@ -409,7 +417,8 @@ server_desc={"prefix":"Préfixe actuel du bot : {}",
              "help_in_dm":"Envoyer le message d'aide en message privés ? {}",
              "muted_role":"Rôle utilisé pour rendre les gens muets : {}"}
 
-stats_infos={"not-found":"Impossible de trouver {}",
+stats_infos={"not-found":"Impossible de trouver {N}",
+            "type-invalid":"Le type `{T}` est invalide :confused:",
             "member-0":"Surnom",
             "member-1":"Créé le",
             "member-2":"A rejoint le",

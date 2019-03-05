@@ -101,10 +101,10 @@ def get_prefix(bot,msg):
                 bot.load_extension('fcts.utilities')
                 l = [bot.cogs['UtilitiesCog'].find_prefix(msg.guild)]
             except Exception as e:
-                print("[get_prefix]",e)
+                bot.log.warn("[get_prefix]",e)
                 l = ['!']
         except Exception as e:
-                print("[get_prefix]",e)
+                bot.log.warn("[get_prefix]",e)
                 l = ['!']
     else:
         l = ['!']
@@ -249,10 +249,7 @@ def main():
         else:
             return
         if r in ['1','2']:
-            r2=input("Lancement de la boucle rss ? (o/n) ")
-            if r2=='o':
-                client.loop.create_task(client.cogs["RssCog"].loop())
-            r3=input("Lancement de la boucle de test ? (o/n) ")
+            r3=input("Lancement de la boucle d'events' ? (o/n) ")
             if r3=='o':
                 client.loop.create_task(client.cogs["Events"].loop())
     else:

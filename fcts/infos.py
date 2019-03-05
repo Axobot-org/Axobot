@@ -7,17 +7,11 @@ default_color = discord.Color(0x50e3c2)
 
 from docs import conf
 importlib.reload(conf)
+from fcts import reloads
+importlib.reload(reloads)
 
 bot_version = conf.release
 
-async def is_support_staff(ctx):
-    server = ctx.bot.get_guild(356067272730607628)
-    if server != None:
-        member = server.get_member(ctx.author.id)
-        role = server.get_role(412340503229497361)
-        if member != None and role != None:
-            return role in member.roles
-    return False
 
 class InfosCog:
     """Here you will find various useful commands to get information about ZBot."""
@@ -41,7 +35,7 @@ class InfosCog:
 
     async def is_support(self,ctx):
         """Check if a user is part of the ZBot team"""
-        return await is_support_staff(ctx)
+        return await reloads.is_support_staff(ctx)
     
     async def count_lines_code(self):
         """Count the number of lines for the whole project"""
@@ -82,7 +76,6 @@ class InfosCog:
                 try:
                     users,bots = self.get_users_nber(ignored_guilds)
                 except Exception as e:
-                    print(e)
                     users = bots = 'unknown'
                 d = str(await self.translate(ctx.guild,"infos","stats")).format(bot_version,len_servers,users,bots,self.codelines,' | '.join(langs_list),version,discord.__version__,round(py.memory_info()[0]/2.**30,3),psutil.cpu_percent(),round(r*1000,3))
                 embed = ctx.bot.cogs['EmbedCog'].Embed(title=await self.translate(ctx.guild,"infos","stats-title"), color=ctx.bot.cogs['HelpCog'].help_color, time=ctx.message.created_at,desc=d,thumbnail=self.bot.user.avatar_url_as(format="png"))
@@ -134,21 +127,21 @@ class InfosCog:
     @commands.command(name="docs")
     async def display_doc(self,ctx):
         """Get the documentation url"""
-        text = str(self.bot.cogs['EmojiCog'].customEmojis['readthedocs']) + str(await self.translate(ctx.guild.id,"infos","docs")) + " https://zbot.rtfd.io"
+        text = str(self.bot.cogs['EmojiCog'].customEmojis['readthedocs']) + str(await self.translate(ctx.guild,"infos","docs")) + " https://zbot.rtfd.io"
         await ctx.send(text)
 
     @commands.command(name='info',aliases=['infos'])
     @commands.guild_only()
     async def infos(self,ctx,Type=None,*,name=None):
         """Find informations about someone/something
-Available types: member, role, user, emoji, channel, guild, invite, category"""
+Available types: member, role, user, emoji, channel, server, invite, category"""
         #lang = await self.bot.cogs["ServerCog"].conf_lang(ctx,'language','scret-desc')
         try:
             lang = await self.translate(ctx.guild.id,"current_lang","current")
             find = self.utilities.find_everything
             if Type in ["guild","server"]:
-                await self.guild_info(ctx,lang)
-                return
+                if name==None or not await self.bot.cogs['AdminCog'].check_if_admin(ctx):
+                    return await self.guild_info(ctx,ctx.guild,lang)
             if name == None:
                 if Type == None:
                     item = ctx.author
@@ -168,8 +161,11 @@ Available types: member, role, user, emoji, channel, guild, invite, category"""
                     return
             #-----
             if item == None:
-                msg = await self.translate(ctx.guild.id,"stats_infos","not-found")
-                await ctx.send(msg.format(name))
+                if Type.lower() not in ['member','role','user','textchannel','channel','invite','voicechannel','emoji','category','guild','server']:
+                    msg = await self.translate(ctx.guild.id,"stats_infos","type-invalid")
+                else:
+                    msg = await self.translate(ctx.guild.id,"stats_infos","not-found")
+                await ctx.send(msg.format(N=name,T=Type))
             elif type(item) == discord.Member:
                 await self.member_infos(ctx,item,lang)
             elif type(item) == discord.Role:
@@ -186,6 +182,8 @@ Available types: member, role, user, emoji, channel, guild, invite, category"""
                 await self.invite_info(ctx,item,lang)
             elif type(item) == discord.CategoryChannel:
                 await self.category_info(ctx,item,lang)
+            elif type(item) == discord.Guild:
+                await self.guild_info(ctx,item,lang)
             else:
                 await ctx.send(str(type(item))+" / "+str(item))
         except Exception as e:
@@ -356,9 +354,8 @@ Available types: member, role, user, emoji, channel, guild, invite, category"""
         embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","guild-2"), value=str(ctx.guild.region).capitalize())
         await ctx.send(embed=embed)
 
-    async def guild_info(self,ctx,lang):
+    async def guild_info(self,ctx,guild,lang):
         since = await self.translate(ctx.guild.id,"keywords","depuis")
-        guild = ctx.guild
         bot = await self.bot.cogs["UtilitiesCog"].get_bots_number(guild.members)
         online = await self.bot.cogs["UtilitiesCog"].get_online_number(guild.members)
         if guild.mfa_level:
@@ -446,7 +443,7 @@ Available types: member, role, user, emoji, channel, guild, invite, category"""
 
 
     @commands.group(name="find")
-    @commands.check(is_support_staff)
+    @commands.check(reloads.is_support_staff)
     async def find_main(self,ctx):
         """Same as info, but in a lighter version"""
         if ctx.invoked_subcommand is None:
@@ -464,10 +461,11 @@ Available types: member, role, user, emoji, channel, guild, invite, category"""
                     lang = 0
                 languages.append(lang)
         disp_lang = ""
+        owners = ", ".join([x.name for x in liste if x.owner==user])
         for e in range(len(ctx.bot.cogs['LangCog'].languages)):
             if languages.count(e)>0:
                 disp_lang += ctx.bot.cogs['LangCog'].languages[e]+" ("+str(round(languages.count(e)/len(languages)*100))+"%)  "
-        await ctx.send(str(await self.translate(ctx.guild,"find","user-1")).format(user,user.id,", ".join([x.name for x in liste]),disp_lang))
+        await ctx.send(str(await self.translate(ctx.guild,"find","user-1")).format(user,user.id,", ".join([x.name for x in liste]),owners,disp_lang))
 
     @find_main.command(name="guild",aliases=['server'])
     async def find_guild(self,ctx,*,guild):

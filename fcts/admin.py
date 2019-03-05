@@ -1,7 +1,7 @@
 import discord
 from discord.ext import commands
 
-import time, importlib, sys, traceback, datetime, os, shutil, asyncio, inspect, typing, io, textwrap, copy, operator, requests, random
+import time, importlib, sys, traceback, datetime, os, shutil, asyncio, inspect, typing, io, textwrap, copy, operator, requests, random, ast
 from libs import feedparser
 from contextlib import redirect_stdout
 from fcts import reloads
@@ -34,6 +34,7 @@ class AdminCog:
         except:
             pass
         self._last_result = None
+        self.god_mode = []
         
     async def on_ready(self):
         self.translate = self.bot.cogs["LangCog"].tr
@@ -49,8 +50,24 @@ class AdminCog:
         """Get the list of ZBot administrators"""
         l  = list()
         for u in reloads.admins_id:
+            if u==552273019020771358:
+                continue
             l.append(str(self.bot.get_user(u)))
         await ctx.send(str(await self.translate(ctx.guild,"infos","admins-list")).format(", ".join(l)))
+
+    @commands.command(name='god')
+    @commands.check(reloads.check_admin)
+    @commands.guild_only()
+    async def enable_god_mode(self,ctx,enable:bool=True):
+        """Donne les pleins-pouvoirs aux admins du bot sur ce serveur (accès à toutes les commandes de modération)"""
+        if enable:
+            if ctx.guild.id not in self.god_mode:
+                self.god_mode.append(ctx.guild.id)
+            await ctx.send("<:nitro:548569774435598346> Mode superadmin activé sur ce serveur")
+        else:
+            if ctx.guild.id in self.god_mode:
+                self.god_mode.remove(ctx.guild.id)
+            await ctx.send("Mode superadmin désactivé sur ce serveur")
 
     @commands.command(name='spoil',hidden=True)
     @commands.check(reloads.check_admin)
@@ -306,7 +323,6 @@ class AdminCog:
         for x in reloads.admins_id:
             try:
                 user = self.bot.get_user(x)
-                print(type(user),user)
                 if user.dm_channel==None:
                     await user.create_dm()
                 time = round(self.emergency_time - level/100,1)
@@ -466,7 +482,7 @@ class AdminCog:
         server = self.bot.get_guild(356067272730607628)
         if server==None:
             return await ctx.send("Serveur introuvable")
-        channel = server.get_channel(488769306524385301)
+        channel = server.get_channel(548138866591137802) if self.bot.beta else server.get_channel(488769306524385301)
         if channel == None:
             return await ctx.send("Salon introuvable")
         liste = list()
@@ -480,7 +496,10 @@ class AdminCog:
                         up = len(users)
                     elif x.emoji == '👎':
                         down = len(users)
-                liste.append((up-down,datetime.datetime.now()-msg.created_at,msg.content,up,down))
+                if len(msg.embeds)>0:
+                    liste.append((up-down,datetime.datetime.now()-msg.created_at,msg.embeds[0].fields[0].value,up,down))
+                else:
+                    liste.append((up-down,datetime.datetime.now()-msg.created_at,msg.content,up,down))
         liste.sort(reverse=True)
         count = len(liste)
         liste = liste[:number]
@@ -601,6 +620,20 @@ class AdminCog:
         if ctx != None:
             await message.edit(content=msg)
             
+    @commands.command(name="idea")
+    @commands.check(reloads.check_admin)
+    async def make_suggestion(self,ctx,*,text):
+        """Ajouter une idée dans le salon des idées, en français et anglais"""
+        if len(text.split('\n'))!=2:
+            return await ctx.send("Il faut ne faire que deux paragraphes, le premier en français, le deuxième en anglais")
+        text = text.split('\n')
+        fr,en = text[0].replace('\\n','\n'), text[1].replace('\\n','\n')
+        emb = self.bot.cogs['EmbedCog'].Embed(fields=[{'name':'Français','value':fr},{'name':'English','value':en}],color=16106019)
+        chan = ctx.bot.get_channel(548138866591137802) if self.bot.beta else ctx.bot.get_channel(488769306524385301)
+        msg = await chan.send(embed=emb.discord_embed())
+        await self.bot.cogs['FunCog'].add_vote(msg)
+
+    
 
 def setup(bot):
     bot.add_cog(AdminCog(bot))

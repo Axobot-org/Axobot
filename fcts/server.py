@@ -57,7 +57,7 @@ class ServerCog:
                "vote_emojis":":thumbsup:;:thumbsdown:;",
                "help_in_dm":0,
                "muted_role":0}
-        self.optionsList = ["ID","Created at","prefix","language","clear","slowmode","mute","kick","ban","warn","say","hunter","welcome_channel","welcome","leave","gived_roles","bot_news","save_roles","poll_channels","modlogs_channel","enable_xp","anti_caps_lock","enable_fun","membercounter","anti_raid","vote_emojis","help_in_dm"]
+        self.optionsList = ["ID","Created at","prefix","language","clear","slowmode","mute","kick","ban","warn","say","hunter","welcome_channel","welcome","leave","gived_roles","bot_news","poll_channels","modlogs_channel","anti_caps_lock","enable_fun","membercounter","anti_raid","vote_emojis","help_in_dm","muted_role"]
 
     async def on_ready(self):
         self.translate = self.bot.cogs["LangCog"].tr
@@ -120,7 +120,7 @@ class ServerCog:
         """Check is user is part of a staff"""
         if option not in roles_options:
             raise TypeError
-        if await self.bot.cogs['AdminCog'].check_if_admin(user) or user==user.guild.owner:
+        if await self.bot.cogs['AdminCog'].check_if_admin(user) and user.guild.id in self.bot.cogs['AdminCog'].god_mode:
             return True
         if not self.bot.database_online:
             return False
@@ -654,6 +654,8 @@ class ServerCog:
             embed.create_footer(msg.author)
             diff = channel.guild != guild
             for i,v in liste.items():
+                if i not in self.optionsList:
+                    continue
                 if i in roles_options:
                     r = await self.form_roles(guild,v,diff)
                     r = ", ".join(r)
@@ -744,9 +746,9 @@ class ServerCog:
             lang = await self.translate(guild.id,"current_lang","current")
             text = "{}{}: {}".format(str(await self.translate(guild.id,"keywords","membres")).capitalize() , " " if lang=='fr' else "" , len(guild.members))
             try:
-                await ch.edit(name=text,reason="Automated action")
+                await ch.edit(name=text,reason=await self.translate(guild.id,"logs","d-memberchan"))
             except Exception as e:
-                await self.bot.cogs['UtilitiesCog'].print2("[UpdateMemberChannel] "+str(e))
+                self.bot.log.debug("[UpdateMemberChannel] "+str(e))
     
     
 def setup(bot):

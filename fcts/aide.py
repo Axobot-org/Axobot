@@ -204,9 +204,17 @@ If the bot can't send the new command format, it will try to send the old one.""
             subcmds = "\n\n__{}__".format(str(await self.translate(ctx.guild,"keywords","subcmds")).capitalize())
             sublist = list()
             for x in sorted(cmd.all_commands.values(),key=self.sort_by_name):
-                if x.hidden==False and x.name not in sublist:
-                    subcmds += "\n- {} {}".format(x.name,"*({})*".format(x.short_doc) if len(x.short_doc)>0 else "")
-                    sublist.append(x.name)
+                try:
+                    if x.hidden==False and x.enabled==True and x.name not in sublist and await x.can_run(ctx):
+                        subcmds += "\n- {} {}".format(x.name,"*({})*".format(x.short_doc) if len(x.short_doc)>0 else "")
+                        sublist.append(x.name)
+                except Exception as e:
+                    if not "discord.ext.commands.errors" in str(type(e)):
+                        await ctx.send("`Error:` {}".format(e))
+                        await self.bot.cogs['ErrorsCog'].on_error(e,ctx)
+                        return []
+                    else:
+                        continue
         else:
             subcmds = ""
         return ["**{}{}\n\n{}\n*Cog: {}*{}".format(prefix,syntax,desc,cmd.cog_name,subcmds)]

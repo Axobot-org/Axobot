@@ -45,17 +45,6 @@ Welcome
 
 This command helps you to define a message sent automatically by ZBot when a member joins or leaves your server (see the `config <config.html>`_ command). You will find how to select the channel, as well as the variables that can be used in the messages.
 
-------
-Invite
-------
-
-**Syntax:** :code:`invite [channel]`
-
-This command allows you to get an invitation belonging to the server, as well as some primary information about it. If you specify a channel, the invite will point to it. If no invitation is found, the bot will try to create one immediately for you. 
-
-.. note:: When searching, ZBot favors invitations for unlimited use/duration, as well as the chat used (if no channel is specified)
-
-.. warning:: For this command to work, the bot needs "Manage server" (get the invitation) and "Create instant invite" (create an invitation if needed) permission.
 
 -----------
 Membercount

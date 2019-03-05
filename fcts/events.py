@@ -7,6 +7,10 @@ class Events:
 
     def __init__(self,bot):
         self.bot = bot
+        try:
+            self.translate = self.bot.cogs["LangCog"].tr
+        except:
+            pass
         self.file = "events"
         self.embed_colors = {"welcome":5301186,
         "mute":4868682,
@@ -25,6 +29,9 @@ class Events:
             'role':60,
             'guild':75}
     
+    async def on_ready(self):
+        self.translate = self.bot.cogs["LangCog"].tr
+
     async def on_guild_add(self,guild):
         """Called when the bot joins a guild"""
         await self.send_guild_log(guild,"join")
@@ -74,17 +81,29 @@ class Events:
     async def send_mp(self,msg):
         if "vient d'être ajouté dans la base de donnée" in msg.content:
             return
-        if msg.channel.recipient.id in [392766377078816789,279568324260528128]:
+        await self.check_mp_adv(msg)
+        if msg.channel.recipient.id in [392766377078816789,279568324260528128,552273019020771358]:
             return
         channel = self.bot.get_channel(488768968891564033)
         if channel==None:
-            return print("[send_mp] Salon de MP introuvable")
+            return self.bot.log.warn("[send_mp] Salon de MP introuvable")
         emb = msg.embeds[0] if len(msg.embeds)>0 else None
         text = "__`{} ({} - {})`__\n{}".format(msg.author,msg.channel.recipient,await self.bot.cogs["TimeCog"].date(msg.created_at,digital=True),msg.content)
         if len(msg.attachments)>0:
             text += "".join(["\n{}".format(x.url) for x in msg.attachments])
         await channel.send(text,embed=emb)
 
+    async def check_mp_adv(self,msg):
+        """Teste s'il s'agit d'une pub MP"""
+        if msg.author.id==self.bot.user.id or 'discord.gg/' not in msg.content:
+            return
+        try:
+            _ = await self.bot.get_invite(msg.content)
+        except:
+            return
+        d = datetime.datetime.utcnow() - (await msg.channel.history(limit=2).flatten())[1].created_at
+        if d.total_seconds() > 800:
+            await msg.channel.send(await self.translate(msg.channel,"events","mp-adv"))
 
 
     async def send_logs_per_server(self,guild,Type,message,author=None):
@@ -120,12 +139,10 @@ class Events:
             self.points = 0
 
     async def add_event(self,event):
-        print("Points b4:",self.points)
         if event == "kick":
             await self.add_points(-self.table['kick'])
         elif event == "ban":
             await self.add_points(-self.table['ban'])
-        print("Points aftr:",self.points)
 
 
     async def check_user_left(self,member):
@@ -236,7 +253,7 @@ class Events:
         await self.bot.wait_until_ready()
         self.bot.log.info("[tasks_loop] Lancement de la boucle")
         while not self.bot.is_closed():
-            if int(datetime.datetime.now().second)%30 == 0:
+            if int(datetime.datetime.now().second)%20 == 0:
                 await self.check_tasks()
             await asyncio.sleep(0.5)
 

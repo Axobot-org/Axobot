@@ -40,6 +40,8 @@ async def check_admin(ctx):
     return await ctx.bot.cogs['AdminCog'].check_if_admin(ctx)
 
 async def can_use_rss(ctx):
+    if ctx.guild==None:
+        return False
     return ctx.channel.permissions_for(ctx.author).administrator or await ctx.bot.cogs["AdminCog"].check_if_admin(ctx)
 
 class RssCog:
@@ -534,7 +536,7 @@ class RssCog:
             await ctx.send(str(await self.translate(ctx.guild.id,"rss","guild-error")).format(e))
 
     @rss_main.command(name="test")
-    @commands.check(reloads.check_admin)
+    @commands.check(reloads.is_support_staff)
     async def test_rss(self,ctx,url,*,args=None):
         """Test if an rss feed is usable"""
         url = url.replace('<','').replace('>','')
@@ -749,7 +751,7 @@ class RssCog:
             if i in feeds.entries[0].keys():
                 published = i
                 break
-        if published!=None:
+        if published!=None and len(feeds.entries)>1:
             while feeds.entries[0][published] < feeds.entries[1][published]:
                 del feeds.entries[0]
         if not date or published != 'published_parsed':
@@ -758,7 +760,13 @@ class RssCog:
                 datz = 'Unknown'
             else:
                 datz = feed[published]
-            obj = self.rssMessage(bot=self.bot,Type='web',url=feed['link'],title=feed['title'],emojis=self.bot.cogs['EmojiCog'].customEmojis,date=datz,author=feed['author'] if 'author' in feed.keys() else None,channel= feeds.feed['title'])
+            if 'link' in feed.keys():
+                l = feed['link']
+            elif 'link' in feeds.keys():
+                l = feeds['link']
+            else:
+                l = url
+            obj = self.rssMessage(bot=self.bot,Type='web',url=l,title=feed['title'],emojis=self.bot.cogs['EmojiCog'].customEmojis,date=datz,author=feed['author'] if 'author' in feed.keys() else None,channel= feeds.feed['title'])
             return [obj]
         else:
             liste = list()
@@ -769,7 +777,13 @@ class RssCog:
                     datz = feed[published]
                 if datetime.datetime(*feed['published_parsed'][:6]) <= date:
                     break
-                obj = self.rssMessage(bot=self.bot,Type='web',url=feed['link'],title=feed['title'],emojis=self.bot.cogs['EmojiCog'].customEmojis,date=datz,author=feed['author'] if 'author' in feed.keys() else None,channel= feeds.feed['title'])
+                if 'link' in feed.keys():
+                    l = feed['link']
+                elif 'link' in feeds.keys():
+                    l = feeds['link']
+                else:
+                    l = url
+                obj = self.rssMessage(bot=self.bot,Type='web',url=l,title=feed['title'],emojis=self.bot.cogs['EmojiCog'].customEmojis,date=datz,author=feed['author'] if 'author' in feed.keys() else None,channel= feeds.feed['title'])
                 liste.append(obj)
             liste.reverse()
             return liste

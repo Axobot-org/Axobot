@@ -26,7 +26,7 @@ class LangCog:
         """Renvoie le texte en fonction de la langue"""
         if type(serverID) == discord.Guild:
             serverID = serverID.id
-        if type(serverID) == None or not self.bot.database_online:
+        if isinstance(serverID,(type(None),discord.DMChannel)) or not self.bot.database_online:
             lang_opt = self.bot.cogs['ServerCog'].default_language
         elif str(serverID) in self.serv_opts.keys():
             lang_opt = self.serv_opts[str(serverID)]

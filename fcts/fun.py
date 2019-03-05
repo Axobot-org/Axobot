@@ -258,7 +258,7 @@ You can specify a verification limit by adding a number in argument"""
             await ctx.channel.send("".join(text1).replace("¬¬","\n"))
         if ctx.bot.database_online and await self.bot.cogs["ServerCog"].staff_finder(ctx.author,'say'):
             await self.bot.cogs["UtilitiesCog"].suppr(ctx.message)
-        self.bot.log.info("{} used bigtext to say {}".format(ctx.author.id,text))
+        self.bot.log.debug("{} used bigtext to say {}".format(ctx.author.id,text))
     
     @commands.command(name="shrug",hidden=True)
     @commands.check(is_fun_enabled)
@@ -318,7 +318,8 @@ You can specify a verification limit by adding a number in argument"""
 
     @say.error
     async def say_error(self,ctx,error):
-        await self.say_function(ctx,None,ctx.view.buffer.replace(ctx.prefix+ctx.invoked_with,""))
+        if str(error)!='The check functions for command say failed.':
+            await self.say_function(ctx,None,ctx.view.buffer.replace(ctx.prefix+ctx.invoked_with,"",1))
 
     @commands.command(name="me",hidden=True)
     @commands.check(is_fun_enabled)
@@ -446,7 +447,7 @@ You can specify a verification limit by adding a number in argument"""
 
 
     async def add_vote(self,msg):
-        if self.bot.database_online:
+        if self.bot.database_online and msg.guild!=None:
             emojiz = await self.bot.cogs["ServerCog"].find_staff(msg.guild,'vote_emojis')
         else:
             emojiz = None
@@ -477,9 +478,9 @@ You can specify a verification limit by adding a number in argument"""
         If no number of choices is given, the emojis will be 👍 and 👎. Otherwise, it will be a series of numbers.
         The text sent by the bot is EXACTLY the one you give, without any more formatting."""
         text = await ctx.bot.cogs['UtilitiesCog'].clear_msg(text,ctx=ctx)
-        if not (ctx.channel.permissions_for(ctx.guild.me).read_message_history and ctx.channel.permissions_for(ctx.guild.me).add_reactions):
-            await ctx.send(await self.translate(ctx.guild,"fun","cant-react"))
-            return
+        if ctx.guild != None:
+            if not (ctx.channel.permissions_for(ctx.guild.me).read_message_history and ctx.channel.permissions_for(ctx.guild.me).add_reactions):
+                return await ctx.send(await self.translate(ctx.guild,"fun","cant-react"))
         if number==0:
             m = await ctx.send(text)
             try:
