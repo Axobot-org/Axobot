@@ -762,8 +762,10 @@ class RssCog:
                 datz = feed[published]
             if 'link' in feed.keys():
                 l = feed['link']
-            else:
+            elif 'link' in feeds.keys():
                 l = feeds['link']
+            else:
+                l = url
             obj = self.rssMessage(bot=self.bot,Type='web',url=l,title=feed['title'],emojis=self.bot.cogs['EmojiCog'].customEmojis,date=datz,author=feed['author'] if 'author' in feed.keys() else None,channel= feeds.feed['title'])
             return [obj]
         else:
@@ -777,8 +779,10 @@ class RssCog:
                     break
                 if 'link' in feed.keys():
                     l = feed['link']
-                else:
+                elif 'link' in feeds.keys():
                     l = feeds['link']
+                else:
+                    l = url
                 obj = self.rssMessage(bot=self.bot,Type='web',url=l,title=feed['title'],emojis=self.bot.cogs['EmojiCog'].customEmojis,date=datz,author=feed['author'] if 'author' in feed.keys() else None,channel= feeds.feed['title'])
                 liste.append(obj)
             liste.reverse()
