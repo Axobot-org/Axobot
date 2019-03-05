@@ -482,7 +482,7 @@ class AdminCog:
         server = self.bot.get_guild(356067272730607628)
         if server==None:
             return await ctx.send("Serveur introuvable")
-        channel = server.get_channel(488769306524385301)
+        channel = server.get_channel(548138866591137802) if self.bot.beta else server.get_channel(488769306524385301)
         if channel == None:
             return await ctx.send("Salon introuvable")
         liste = list()
@@ -496,7 +496,10 @@ class AdminCog:
                         up = len(users)
                     elif x.emoji == '👎':
                         down = len(users)
-                liste.append((up-down,datetime.datetime.now()-msg.created_at,msg.content,up,down))
+                if len(msg.embeds)>0:
+                    liste.append((up-down,datetime.datetime.now()-msg.created_at,msg.embeds[0].fields[0].value,up,down))
+                else:
+                    liste.append((up-down,datetime.datetime.now()-msg.created_at,msg.content,up,down))
         liste.sort(reverse=True)
         count = len(liste)
         liste = liste[:number]
