@@ -40,6 +40,8 @@ async def check_admin(ctx):
     return await ctx.bot.cogs['AdminCog'].check_if_admin(ctx)
 
 async def can_use_rss(ctx):
+    if ctx.guild==None:
+        return False
     return ctx.channel.permissions_for(ctx.author).administrator or await ctx.bot.cogs["AdminCog"].check_if_admin(ctx)
 
 class RssCog:
