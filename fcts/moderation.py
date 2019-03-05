@@ -1,5 +1,5 @@
 from discord.ext import commands
-import discord, re, datetime, random, json, os
+import discord, re, datetime, random, json, os, typing
 from fcts import checks
 
 class ModeratorCog:
@@ -12,10 +12,10 @@ class ModeratorCog:
             self.translate = bot.cogs['LangCog'].tr
         except:
             pass
-        
+
     async def on_ready(self):
         self.translate = self.bot.cogs['LangCog'].tr
-    
+
     @commands.command(name="slowmode")
     @commands.guild_only()
     @commands.cooldown(1, 3, commands.BucketType.guild)
@@ -45,7 +45,7 @@ class ModeratorCog:
         else:
                 message = await self.translate(ctx.guild.id,"modo","slowmode-3")
         await ctx.send(message)
-        
+
 
     @commands.command(name="clear")
     @commands.cooldown(4, 30, commands.BucketType.guild)
@@ -59,7 +59,7 @@ class ModeratorCog:
             ('-f' or) '+f' : delete if the message  (does not) contain any file
             ('-l' or) '+l' : delete if the message (does not) contain any link
             ('-p' or) '+p' : delete if the message is (not) pinned
-            ('-i' or) '+i' : delete if the message contain a discord invite
+            ('-i' or) '+i' : delete if the message (does not) contain a Discord invite
         By default, the bot will not delete pinned messages"""
         if not ctx.channel.permissions_for(ctx.guild.me).manage_messages:
             await ctx.send(await self.translate(ctx.guild.id,"modo","need-manage-messages"))
@@ -118,19 +118,22 @@ class ModeratorCog:
                 if (i == None and invites==2) or (i != None and invites==0):
                     c4 = False
             #return ((m.pinned == pinned) or ((m.attachments != []) == files) or ((r != None) == links)) and m.author in users
-            mentions = [x.mention for x in ctx.message.mentions]
+            mentions = ctx.message.raw_mentions
             if ctx.prefix.strip() in mentions:
                 mentions.remove(ctx.prefix.strip())
-            if mentions != []:
+            if mentions != [] and m.author!=None:
                 return c1 and c2 and c3 and c4 and m.author.mention in mentions
             else:
                 return c1 and c2 and c3 and c4
-        await ctx.message.delete()
-        deleted = await ctx.channel.purge(limit=number, check=check)
-        await ctx.send(str(await self.translate(ctx.guild,"modo","clear-0")).format(len(deleted)),delete_after=2.0)
-        log = str(await self.translate(ctx.guild.id,"logs","clear")).format(channel=ctx.channel.mention,number=len(deleted))
-        await self.bot.cogs["Events"].send_logs_per_server(ctx.guild,"clear",log,ctx.author)
-        
+        try:
+            await ctx.message.delete()
+            deleted = await ctx.channel.purge(limit=number, check=check)
+            await ctx.send(str(await self.translate(ctx.guild,"modo","clear-0")).format(len(deleted)),delete_after=2.0)
+            log = str(await self.translate(ctx.guild.id,"logs","clear")).format(channel=ctx.channel.mention,number=len(deleted))
+            await self.bot.cogs["Events"].send_logs_per_server(ctx.guild,"clear",log,ctx.author)
+        except Exception as e:
+            await self.bot.cogs['ErrorsCog'].on_command_error(ctx,e)
+
 
     @commands.command(name="kick")
     @commands.cooldown(5, 20, commands.BucketType.guild)
@@ -301,9 +304,9 @@ class ModeratorCog:
         if role==None or not role in user.roles:
             return
         if author==guild.me:
-            await user.remove_roles(role,reason="automatic unmute")
+            await user.remove_roles(role,reason=await self.translate(guild.id,"logs","d-autounmute"))
         else:
-            await user.remove_roles(role,reason="unmuted by {}".format(author))
+            await user.remove_roles(role,reason=str(await self.translate(guild.id,"logs","d-unmute")).format(author))
         log = str(await self.translate(guild.id,"logs","mute-off")).format(member=user)
         await self.bot.cogs["Events"].send_logs_per_server(guild,"mute",log,author)
 
@@ -344,8 +347,10 @@ class ModeratorCog:
     @commands.cooldown(5,20, commands.BucketType.guild)
     @commands.guild_only()
     @commands.check(checks.can_ban)
-    async def ban(self,ctx,user,*,reason="Unspecified"):
-        """Ban someone"""
+    async def ban(self,ctx,user,days_to_delete:typing.Optional[int]=0,reason="Unspecified"):
+        """Ban someone
+        The 'days_to_delete' option represents the number of days worth of messages to delete from the user in the guild, bewteen 0 and 7
+        """
         try:
             backup = user
             try:
@@ -383,8 +388,10 @@ class ModeratorCog:
                 except Exception as e:
                     await self.bot.cogs['ErrorsCog'].on_error(e,ctx)
                     pass
+            if days_to_delete<0 or days_to_delete>7:
+                days_to_delete = 0
             reason = await self.bot.cogs["UtilitiesCog"].clear_msg(reason,everyone = not ctx.channel.permissions_for(ctx.author).mention_everyone)
-            await ctx.guild.ban(user,reason=reason,delete_message_days=0)
+            await ctx.guild.ban(user,reason=reason,delete_message_days=days_to_delete)
             self.bot.log.info("L'utilisateur {} a été banni du serveur {} pour la raison {}".format(user.id,ctx.guild.id,reason))
             await self.bot.cogs['Events'].add_event('ban')
             caseID = "'Unsaved'"
@@ -439,7 +446,7 @@ class ModeratorCog:
             await ctx.guild.unban(user,reason=reason)
             caseID = "'Unsaved'"
             if self.bot.database_online:
-                CasesCog = self.bot.cogs['CasesCog']         
+                CasesCog = self.bot.cogs['CasesCog']
                 caseIDs = await CasesCog.get_ids()
                 case = CasesCog.Case(bot=self.bot,guildID=ctx.guild.id,memberID=user.id,Type="unban",ModID=ctx.author.id,Reason=reason,date=datetime.datetime.now()).create_id(caseIDs)
                 try:
@@ -515,7 +522,7 @@ class ModeratorCog:
     @commands.guild_only()
     @commands.check(checks.can_see_banlist)
     async def banlist(self,ctx,reasons:bool=True):
-        """Check the list of currently banned members. 
+        """Check the list of currently banned members.
 The 'reasons' parameter is used to display the ban reasons.
 
 You must be an administrator of this server to use this command."""
@@ -548,7 +555,7 @@ You must be an administrator of this server to use this command."""
         """Manage your emoji
         Administrator permission is required"""
         return
-    
+
     @emoji_group.command(name="rename")
     async def emoji_rename(self,ctx,emoji:discord.Emoji,name):
         """Rename an emoji"""

@@ -7,7 +7,14 @@ class WelcomerCog:
     def __init__(self,bot):
         self.bot = bot
         self.file = "bvn"
-        self.no_message = [392766377078816789,504269440872087564]
+        self.no_message = [392766377078816789,504269440872087564,552273019020771358]
+        try:
+            self.translate = bot.cogs['LangCog'].tr
+        except:
+            pass
+    
+    async def on_ready(self):
+        self.translate = self.bot.cogs['LangCog'].tr
     
 
     async def new_member(self,member):
@@ -17,6 +24,10 @@ class WelcomerCog:
             await self.bot.cogs["ServerCog"].update_memberChannel(member.guild)
             await self.send_msg(member,"welcome")
             self.bot.loop.create_task(self.give_roles(member))
+        if member.guild==356067272730607628:
+            await self.check_owner_server(member)
+            await self.check_support(member)
+            await self.check_contributor(member)
         
         
     
@@ -40,6 +51,7 @@ class WelcomerCog:
             if ch == None:
                 return
             ch = ch.split(';')
+            msg = await self.bot.cogs['UtilitiesCog'].clear_msg(msg,ctx=None)
             for channel in ch:
                 if not channel.isnumeric():
                     continue
@@ -52,6 +64,30 @@ class WelcomerCog:
                     await channel.send(msg)
                 except Exception as e:
                     await self.bot.cogs["ErrorsCog"].on_error(e,None)
+
+    async def check_owner_server(self,member):
+        """Vérifie si un nouvel arrivant est un propriétaire de serveur"""
+        servers = [x for x in self.bot.guilds if x.owner==member and len(x.members)>10]
+        if len(servers)>0:
+            role = member.guild.get_role(486905171738361876)
+            if role==None:
+                return
+            if role not in member.roles:
+                await member.add_roles(role,reason="This user support me")
+            
+    async def check_support(self,member):
+        """Vérifie si un nouvel arrivant fait partie du support"""
+        if await self.bot.cogs['UtilitiesCog'].is_support(member):
+            role = member.guild.get_role(412340503229497361)
+            if role!=None:
+                await member.add_roles(role)
+
+    async def check_contributor(self,member):
+        """Vérifie si un nouvel arrivant est un contributeur"""
+        if await self.bot.cogs['UtilitiesCog'].is_contributor(member):
+            role = member.guild.get_role(552428810562437126)
+            if role!=None:
+                await member.add_roles(role)
 
     async def kick(self,member,reason):
         try:
@@ -78,25 +114,25 @@ class WelcomerCog:
             return c
         if level >= 1:
             if await self.bot.cogs['UtilitiesCog'].check_discord_invite(member.name) != None:
-                await self.kick(member,"Automod (Discord invite)")
+                await self.kick(member,await self.translate(member.guild.id,"logs","d-invite"))
                 c = True
         if level >= 2:
             if (datetime.datetime.now() - member.created_at).seconds <= 1*60:
-                await self.kick(member,"Automod (too young account)")
+                await self.kick(member,await self.translate(member.guild.id,"logs","d-young"))
                 c = True
         if level >= 3 and can_ban:
             if await self.bot.cogs['UtilitiesCog'].check_discord_invite(member.name) != None:
-                await self.ban(member,"Automod (Discord invite)")
+                await self.ban(member,await self.translate(member.guild.id,"logs","d-invite"))
                 c = True
             if (datetime.datetime.now() - member.created_at).seconds <= 5*60:
-                await self.kick(member,"Automod (too young account)")
+                await self.kick(member,await self.translate(member.guild.id,"logs","d-young"))
                 c = True
         if level >= 4:
             if (datetime.datetime.now() - member.created_at).seconds <= 10*60:
-                await self.kick(member,"Automod (too young account)")
+                await self.kick(member,await self.translate(member.guild.id,"logs","d-young"))
                 c = True
             if (datetime.datetime.now() - member.created_at).seconds <= 3*60 and can_ban:
-                await self.ban(member,"Automod (too young account)")
+                await self.ban(member,await self.translate(member.guild.id,"logs","d-young"))
                 c = True
         return c
 
@@ -110,7 +146,7 @@ class WelcomerCog:
                     continue
                 role = member.guild.get_role(int(r))
                 if role != None:
-                    await member.add_roles(role,reason="Automated action (config gived_roles)")
+                    await member.add_roles(role,reason=await self.translate(member.guild.id,"logs","d-gived_roles"))
         except Exception as e:
             await self.bot.cogs["ErrorsCog"].on_error(e,None)
 

@@ -48,7 +48,7 @@ List of every option
 --------------------
 
 * prefix: Character string that will be the bot prefix, for all commands, beginning with the validation message. The prefix must be between 1 and 5 characters long. By default, :code:`!`.
-* language: Language of the bot. Currently only the languages :code:`fr` (French) and :code:`en` (English) are available. The change takes place as soon as the order is validated by the system. Default :code:`fr`.
+* language: Language of the bot. Currently only the languages :code:`fr` (French) and :code:`en` (English) are available (also you ca try :code:`lolcat` for more fun). The change takes place as soon as the order is validated by the system. Default :code:`fr`.
 * clear: List of roles allowed to use the `clear <moderator.html#clear>`_ command. By default, none.
 * slowmode: List of roles allowed to use the `slowmode <moderator.html#slowmode>`_ and `freeze <moderator.html#freeze>`_ commands. By default, none.
 * mute: List of roles allowed to use the `mute <moderator.html#mute>`_ command. By default, none.

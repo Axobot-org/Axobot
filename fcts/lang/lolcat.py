@@ -62,7 +62,7 @@ errors={"cooldown":"Yu are on cold-own for dis comandZ :confused: Plize wait {} 
 "duration":"Invalid timer: `{}`"}
 
 find={"user-0":"naym: {}\nID: {}",
-"user-1":"Naym: {}\nID: {}\nServers: {}\nSpeak: {}",
+"user-1":"Naym: {}\nID: {}\nServers: {}\nAuwner ov: {}\nSpeak: {}",
 "user-2":"Usr not findz",
 "guild-0":"S3rvr not findz",
 "guild-1":"Name: {}\nID: {}\nOwnr: {} ({})\nMmbr: {} ({} robots)\nSpeak {}",
@@ -178,7 +178,13 @@ logs={"slowmode-enabled":"Slwmod enable in {channel} ({seconds}s)",
 "mute-off":"{member} is not more mutd",
 "softban":"{member} had beeen 'softBAnnnnned' (reasun: {reason} | caz #{case})",
 "warn":"{member} had been warner: {reason} (case #{case})",
-"tempmute-on":"{member} is naw muted 4 {duration} (reason : {reason} | caz #{case})"}
+"tempmute-on":"{member} is naw muted 4 {duration} (reason : {reason} | caz #{case})",
+"d-autounmute":"automatic unmute",
+"d-unmute":"unmuted by {}",
+"d-invite":"Automod (Discord invite)",
+"d-young":"Automod (too recent account)",
+"d-gived_roles":"Automated action (config gived_roles)",
+"d-memberchan":"Automated action (config membercount)"}
 
 mc={"contact-mail":"If U notis an errrror in da info providd, plz contact my personale, or report teh errer directlly [with the nice website](https://fr-minecraft.net).",
     "serv-title":"Servr info {}",
@@ -409,7 +415,8 @@ server_desc={"clear": "Lizt of rawles dat can us teh 'clear' commend: {}",
              "help_in_dm":"Sent help mess:a:ge on Prvte Msage? {}",
              "muted_role":"Usd role 2 mute people : {}"}
 
-stats_infos={"not-found":"Unable 2 found {}",
+stats_infos={"not-found":"Unable 2 found {N}",
+            "type-invalid":"Invalid type: `{T}`",
             "member-0":"Lttle nayme",
             "member-1":"Born at",
             "member-2":"New from",

@@ -44,7 +44,7 @@ class UtilitiesCog:
 
     def update_prefix(self,ID,prefix):
         try:
-            print("Prefix updated for guild {} : changed to {}".format(ID,prefix))
+            self.bot.log.debug("Prefix updated for guild {} : changed to {}".format(ID,prefix))
         except:
             pass
         self.list_prefixs[str(ID)] = prefix
@@ -153,11 +153,10 @@ class UtilitiesCog:
 
     async def global_check(self,ctx):
         """Do a lot of checks before executing a command (rss loop, banned guilds etc)"""
-        if ctx.bot.cogs['RssCog'].last_update==None or (datetime.datetime.now() - ctx.bot.cogs['RssCog'].last_update).total_seconds() > 45*60*0.1:
-            
+        if ctx.bot.cogs['RssCog'].last_update==None or (datetime.datetime.now() - ctx.bot.cogs['RssCog'].last_update).total_seconds() > 30*60:
+
             self.bot.cogs['RssCog'].last_update = datetime.datetime.now()
             asyncio.run_coroutine_threadsafe(ctx.bot.cogs['RssCog'].main_loop(),asyncio.get_running_loop())
-            print("launched")
         if type(ctx)!=commands.context.Context:
             return True
         if await self.bot.cogs['AdminCog'].check_if_admin(ctx):
@@ -169,7 +168,7 @@ class UtilitiesCog:
             return False
         if str(ctx.author.id) in self.config['banned_users'].split(";"):
             return False
-        return True 
+        return True
 
     async def create_footer(self,embed,user):
         embed.set_footer(text="Requested by {}".format(user.name), icon_url=user.avatar_url_as(format='png'))
@@ -181,7 +180,7 @@ class UtilitiesCog:
             if str(m.status) in ["online","idle"]:
                 online += 1
         return online
-    
+
     async def get_bots_number(self,members):
         return len([x for x in members if x.bot])
 
@@ -207,7 +206,7 @@ class UtilitiesCog:
         return re.search(ch,text)
 
     async def clear_msg(self,text,everyone=True,ctx=None):
-        """Remove every mass mention form a text, and add custom emojis"""
+        """Remove every mass mention from a text, and add custom emojis"""
         if everyone:
             text = text.replace("@everyone","@"+u"\u200B"+"everyone").replace("@here","@"+u"\u200B"+"here")
         #for x in re.finditer(r'<(a?:[^:]+:)\d+>',text):
@@ -216,9 +215,16 @@ class UtilitiesCog:
         #    text = text.replace(':'+x.name+':',str(x))
         for x in re.finditer(r'(?<!<|a):([^:<]+):',text):
             try:
-                em = await commands.EmojiConverter().convert(ctx,x.group(1))
+                if ctx!=None:
+                    em = await commands.EmojiConverter().convert(ctx,x.group(1))
+                else:
+                    if x.group(1).isnumeric():
+                        em = self.bot.get_emoji(int(x.group(1)))
+                    else:
+                        em = discord.utils.find(lambda e: e.name==x.group(1), self.bot.emojis)
+
             except Exception as e:
-                print(e)
+                # print(e)
                 continue
             if em != None:
                 text = text.replace(x.group(0),"<{}:{}:{}>".format('a' if em.animated else '' , em.name , em.id))
@@ -267,6 +273,26 @@ class UtilitiesCog:
         if parameters==None:
             return False
         return parameters['premium']
+
+    async def is_support(self,user):
+        """Check if a user is support staff"""
+        try:
+            parameters = await self.get_db_userinfo(criters=["ID="+str(user.id)],columns=['support'])
+        except Exception as e:
+            await self.bot.cogs["Errors"].on_error(e,None)
+        if parameters==None:
+            return False
+        return parameters['support']
+
+    async def is_contributor(self,user):
+        """Check if a user is a contributor"""
+        try:
+            parameters = await self.get_db_userinfo(criters=["ID="+str(user.id)],columns=['contributor'])
+        except Exception as e:
+            await self.bot.cogs["Errors"].on_error(e,None)
+        if parameters==None:
+            return False
+        return parameters['contributor']
 
     async def add_check_reaction(self,message):
         try:

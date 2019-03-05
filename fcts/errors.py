@@ -70,10 +70,9 @@ class ErrorsCog:
             try:
                 await ctx.send("`ERROR:` "+str(error))
             except:
-                print("[on_cmd_error] Can't send error on channel {}".format(ctx.channel.id))
+                self.bot.log.info("[on_cmd_error] Can't send error on channel {}".format(ctx.channel.id))
         # All other Errors not returned come here... And we can just print the default TraceBack.
-        print('Ignoring exception in command {}:'.format(ctx.command), file=sys.stderr)
-        #traceback.print_exception(type(error), error, error.__traceback__, file=sys.stderr)
+        self.bot.log.warning('Ignoring exception in command {}:'.format(ctx.command), exc_info=True)
         await self.on_error(error,ctx)
 
     async def on_command_error(self, ctx, error):
@@ -98,7 +97,7 @@ Traceback (most recent call last):
             else:
                 await self.senf_err_msg(ctx.guild.name+" | "+ctx.channel.name+"\n"+msg)
         except Exception as e:
-            print("[on_error]",e)
+            self.bot.log.warn("[on_error]",e)
         try:
             if sys.exc_info()[0] != None:
                 S = str(sys.exc_info()[0]).split("<class '")[1].split("'>")[0]+' : '+str(sys.exc_info()[1])
@@ -108,7 +107,7 @@ Traceback (most recent call last):
 {T} {S}
 """.format(T=" ".join(traceback.format_tb(sys.exc_info()[2])),S=S))
         except Exception as e:
-            print("[on_error]",e)
+            self.bot.log.warn("[on_error]",e)
 
 
     async def senf_err_msg(self,msg):
