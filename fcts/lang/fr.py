@@ -53,6 +53,8 @@ cases={"no-user":"Impossible de trouver cet utilisateur",
     'title-search':'Casier #{}',
     'no_database':"En raison d'une panne temporaire de la base de donnée, cette commande a été désactivée"}
 
+events={'mp-adv':"Vous cherchez sans doute à m'inviter sur ce serveur ? Si c'est le cas, je ne peux pas le rejoindre avec une simple invitation. Il faut qu'un administrateur utilise mon propre lien d'invitation, ici : <https://bot.discord.io/zbot> :wink:"}
+
 errors={"cooldown":"Vous êtes en cooldown pour cette commande. Veuillez attendre encore {0} secondes...",
 "badarguments":"Oups, impossible de convertir le paramètre `{0}` en type \"{1}\" :confused:",
 "missingargument":"Oups, il manque l'argument \"{0}\" {1}",
