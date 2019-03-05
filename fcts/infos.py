@@ -134,14 +134,14 @@ class InfosCog:
     @commands.guild_only()
     async def infos(self,ctx,Type=None,*,name=None):
         """Find informations about someone/something
-Available types: member, role, user, emoji, channel, guild, invite, category"""
+Available types: member, role, user, emoji, channel, server, invite, category"""
         #lang = await self.bot.cogs["ServerCog"].conf_lang(ctx,'language','scret-desc')
         try:
             lang = await self.translate(ctx.guild.id,"current_lang","current")
             find = self.utilities.find_everything
             if Type in ["guild","server"]:
-                await self.guild_info(ctx,lang)
-                return
+                if name==None or not await self.bot.cogs['AdminCog'].check_if_admin(ctx):
+                    return await self.guild_info(ctx,ctx.guild,lang)
             if name == None:
                 if Type == None:
                     item = ctx.author
@@ -182,6 +182,8 @@ Available types: member, role, user, emoji, channel, guild, invite, category"""
                 await self.invite_info(ctx,item,lang)
             elif type(item) == discord.CategoryChannel:
                 await self.category_info(ctx,item,lang)
+            elif type(item) == discord.Guild:
+                await self.guild_info(ctx,item,lang)
             else:
                 await ctx.send(str(type(item))+" / "+str(item))
         except Exception as e:
@@ -352,9 +354,8 @@ Available types: member, role, user, emoji, channel, guild, invite, category"""
         embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","guild-2"), value=str(ctx.guild.region).capitalize())
         await ctx.send(embed=embed)
 
-    async def guild_info(self,ctx,lang):
+    async def guild_info(self,ctx,guild,lang):
         since = await self.translate(ctx.guild.id,"keywords","depuis")
-        guild = ctx.guild
         bot = await self.bot.cogs["UtilitiesCog"].get_bots_number(guild.members)
         online = await self.bot.cogs["UtilitiesCog"].get_online_number(guild.members)
         if guild.mfa_level:
