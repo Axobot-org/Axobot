@@ -57,8 +57,8 @@ class MorpionCog:
     async def resultat_final(self,tour,guild):
         """Renvoie qui a gagné la partie"""
         if tour:
-            return await self.translate(guild,'morpion','win-1')
-        return await self.translate(guild,'morpion','win-2')
+            return await self.translate(guild,'morpion','win-2')
+        return await self.translate(guild,'morpion','win-1')
 
     async def test_cases_vides(self,grille):
         """Renvoie True s'il reste des cases vides"""
