@@ -8,6 +8,13 @@ class MorpionCog:
         self.entrees_valides = '123456789'
         self.file = 'morpion'
         self.compositions_gagnantes = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]]
+        try:
+            self.translate = bot.cogs['LangCog'].tr
+        except:
+            pass
+
+    async def on_ready(self):
+        self.translate = self.bot.cogs['LangCog'].tr
 
 
     async def qui_commence(self):
@@ -47,22 +54,27 @@ class MorpionCog:
                 return True
         return False
 
-    async def resultat_final(self,tour):
+    async def resultat_final(self,tour,guild):
         """Renvoie qui a gagné la partie"""
-        return "Bien joué, {} a gagné !" if tour == False else "J'ai gagné !"
+        if tour:
+            return await self.translate(guild,'morpion','win-1')
+        return await self.translate(guild,'morpion','win-2')
 
     async def test_cases_vides(self,grille):
         """Renvoie True s'il reste des cases vides"""
         return grille.count('O') +grille.count('X') != 9
 
-    @commands.command(name="morpion")
+    @commands.command(name="morpion",aliases=['crab'])
     async def main(self,ctx):
-        #Note : Le joueur est les CROIX (X) et l'ordinateur les RONDS (O)
+        """A simple mini-game that consists of aligning three chips on a 9-square grid.
+The bot plays in red, the user in blue.
+"""
         try:
             grille = [x for x in range(1,10)]
             tour = await self.qui_commence()
-            await ctx.send(str("{}, à toi de commencer !".format(ctx.author.mention) if tour == True else "Allez hop, je commence !")+"\n*Pour jouer, il suffit de taper un nombre entre 1 et 9, correspondant à la case choisie*")
-            resultat = "Match nul, personne n'a gagné..."
+            u_begin = await self.translate(ctx.guild,'morpion','user-begin') if tour == True else await self.translate(ctx.guild,'morpion','bot-begin')
+            await ctx.send(u_begin.format(ctx.author.mention)+await self.translate(ctx.guild,'morpion','tip'))
+            resultat = await self.translate(ctx.guild,'morpion','nul')
             def check(m):
                 # return m.content in [str(x) for x in range(1,10)] and m.channel == ctx.channel and m.author==ctx.author
                 return m.channel == ctx.channel and m.author==ctx.author
@@ -71,9 +83,9 @@ class MorpionCog:
                 if tour == True:   #Si c'est au joueur
                     await ctx.send(await self.afficher_grille(grille))
                     try:
-                        msg = await self.bot.wait_for('message', check=check,timeout=45)
+                        msg = await self.bot.wait_for('message', check=check,timeout=50)
                     except asyncio.TimeoutError:
-                        await ctx.channel.send("Vous avez mis trop de temps à vous décider")
+                        await ctx.channel.send(await self.translate(ctx.guild,'morpion','too-late'))
                         return
                     saisie = msg.content
                     if await self.test_saisie_valide(saisie) == True:
@@ -81,10 +93,10 @@ class MorpionCog:
                             grille = await self.remplacer_valeur(grille,tour,saisie)
                             tour = False
                         else :
-                            await ctx.send('Il y a déjà un pion sur cette case !')
+                            await ctx.send(await self.translate(ctx.guild,'morpion','pion-1'))
                             continue
                     else :
-                        await ctx.send('Case saisie invalide !')
+                        await ctx.send(await self.translate(ctx.guild,'morpion','pion-2'))
                         continue
             ###
                 else :  #Si c'est à l'ordinateur
@@ -108,7 +120,7 @@ class MorpionCog:
                         continue
             ###
                 if await self.test_win(grille) == True:
-                    resultat = await self.resultat_final(tour)
+                    resultat = await self.resultat_final(tour,ctx.guild)
                     break
             ###
             await ctx.send(await self.afficher_grille(grille)+'\n'+resultat.format(ctx.author.mention))
