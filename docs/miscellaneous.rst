@@ -46,3 +46,12 @@ This command is particularly useful if the 'say' command is no longer enough for
 Each argument is presented in the form :code:`name="value"`. If you want a line break, you can use the character :code:`\n`, and if you want to use quotation marks without closing the argument, you will have to escape them (with a \ in front). To better understand how it works, here is an example of how to use it: :code:`embed title="Here is my title!" content="Blah blah \nBlah ?" footer="Do you mean \"Text\"? "`
 
 .. warning:: Hey, this may sound weird, but Zbot needs "`Embed Links <perms.html#embed-links>`_" permission to send embeds...
+
+
+-------
+Morpion
+-------
+
+**Syntax:** :code:`crab` or :code:`morpion`
+
+Yes, we did it! A first mini-game for our bot, the crab! You can play against the bot in this fast and simplistic game, just by entering the command and following the instructions (enter a number between 1 and 9 corresponding to the chosen cell). And the best part is that the only special permission required is to use the external emojis!
