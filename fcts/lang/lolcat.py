@@ -53,6 +53,8 @@ cases={"no-user":"Unable to find dis usr :eyes:",
     'title-search':'Case #{}',
     'no_database':"Dude we'v got an databaz outage, so dis command haz been dizabled"}
 
+events={'mp-adv':"U're probably trying 2 invite me in dis server? If that's the case, I can't join him with a simple invite. An super-admin must use my own link, just here: <https://bot.discord.io/zbot> :innocent:"}
+
 errors={"cooldown":"Yu are on cold-own for dis comandZ :confused: Plize wait {} moRe secs...",
 "badarguments":"W0ops, unabled 2 convrt teh `{c[3]}` parameterz to \"{c[1]}\" tipe :confused:",
 "missingargument":"Oops, te argumnt \"{}\" are missin {}",
@@ -280,6 +282,16 @@ modo={"slowmode-0":"Teh very-cold-mode is now disabld in this nize place.",
     "em-list-title":"Emojis of our super server",
     "tempmute-1":"Da member {} is muted 4 the raeson `{}`, for {}!"
     }
+
+morpion={'user-begin':'{}, u begin!',
+        'bot-begin':"Hop, I'll start!",
+        'tip':"\n*To play, simply type a nbr beetween 1 - 9, corresponding 2 teh chosen case. I play the red, U play the blue*",
+        'nul':"Draw, nobody won... rip",
+        'too-late':"U was too long! End of the game!",
+        'pion-1':"There's already a pawn on dat cell!",
+        'pion-2':'Invalid input!',
+        'win-1':"GG, {} won!",
+        'win-2':"I won! Game over!"}
 
 perms={"perms-0":"Membr/role {} not findz",
         "perms-1":"**'{}' permissung:**\n\n"

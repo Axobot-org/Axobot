@@ -53,6 +53,8 @@ cases={"no-user":"Unable to find this user :eyes:",
     'title-search':'Case #{}',
     'no_database':"Due to a temporary database outage, this command has been disabled"}
 
+events={'mp-adv':"You are probably trying to invite me to this server? If that is the case, I can't join him with a simple invitation. An administrator must use my own invitation link, here: <https://bot.discord.io/zbot> :wink:"}
+
 errors={"cooldown":"You are on cooldown for this command :confused: Please wait {} more seconds...",
 "badarguments":"Oops, unable to convert the `{c[3]}` parameter to \"{c[1]}\" type :confused:",
 "missingargument":"Oops, the argument \"{}\" is missing {}",
@@ -280,6 +282,16 @@ modo={"slowmode-0":"The slowmode is now disabled in this channel.",
     "em-list-title":"Emojis of the server {}",
     "tempmute-1":"The member {} has been silenced for the reason `{}`, for {}!",
     }
+
+morpion={'user-begin':'{}, you begin!',
+        'bot-begin':"Let's go, I'll start!",
+        'tip':"\n*To play, simply type a number between 1 and 9, corresponding to the chosen case. I play the red, you play the blue*",
+        'nul':"Draw, no one won...",
+        'too-late':"You took too long to decide. Game over!",
+        'pion-1':"There's already a pawn on that cell!",
+        'pion-2':'Invalid input case',
+        'win-1':"Well done, {} won!",
+        'win-2':"I won! End of the game!"}
 
 perms={"perms-0":"Member/role {} not found",
         "perms-1":"**'{}' permissions:**\n\n"

@@ -283,6 +283,16 @@ modo={"slowmode-0":"Le slowmode est désormais désactivé dans ce salon.",
     "tempmute-1":"Le membre {} a bien été réduit au silence pour la raison `{}`, pendant {} !",
     }
 
+morpion={'user-begin':'{}, à toi de commencer !',
+        'bot-begin':'Allez hop, je commence !',
+        'tip':"\n*Pour jouer, il suffit de taper un nombre entre 1 et 9, correspondant à la case choisie. Je joue les rouges, toi les bleus*",
+        'nul':"Match nul, personne n'a gagné...",
+        'too-late':"Vous avez mis trop de temps à vous décider. Fin de la partie !",
+        'pion-1':'Il y a déjà un pion sur cette case !',
+        'pion-2':'Case saisie invalide !',
+        'win-1':"Bien joué, {} a gagné !",
+        'win-2':"J'ai gagné ! Fin du match !"}
+
 perms={"perms-0":"Le membre/rôle {} n'a pas été trouvé",
         "perms-1":"**Permission de '{}' :**\n\n"
        }
