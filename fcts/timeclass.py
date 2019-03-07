@@ -66,7 +66,7 @@ class TimeCog:
             if t.days+t.months*30.41>0:
                 d = round(t.days+t.months*30.41)
                 if not year:
-                    d += t.years*3.154e+7
+                    d += round(t.years*3.154e+7)
                 text += str(d)+'d '
             if year and t.years>0:
                 text += str(t.years)+'y '
