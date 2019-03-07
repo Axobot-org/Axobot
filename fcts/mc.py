@@ -2,7 +2,7 @@ import frmc_lib, requests, discord, re, datetime, time
 from discord.ext import commands
 
 
-class McCog:
+class McCog(commands.Cog):
     """Cog gathering all commands related to the Minecraft® game. 
 Every information come from the website www.fr-minecraft.net"""
     

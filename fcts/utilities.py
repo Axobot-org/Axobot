@@ -4,7 +4,7 @@ from discord.ext import commands
 
 
 
-class UtilitiesCog:
+class UtilitiesCog(commands.Cog):
     """This cog has various useful functions for the rest of the bot."""
 
     def __init__(self,bot):

@@ -16,7 +16,7 @@ emoji_option = ['vote_emojis']
 numb_options = []
 raid_options = ["anti_raid"]
 
-class ServerCog:
+class ServerCog(commands.Cog):
     """"Cog in charge of all the bot configuration management for your server. As soon as an option is searched, modified or deleted, this cog will handle the operations."""
 
     def __init__(self,bot):

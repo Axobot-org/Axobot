@@ -16,7 +16,7 @@ def cleanup_code(content):
     # remove `foo`
     return content.strip('` \n')
 
-class AdminCog:
+class AdminCog(commands.Cog):
     """Here are listed all commands related to the internal administration of the bot. Most of them are not accessible to users, but only to ZBot administrators."""
         
     def __init__(self, bot):

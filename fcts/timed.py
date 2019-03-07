@@ -6,7 +6,7 @@ importlib.reload(args)
 importlib.reload(checks)
 
 
-class TimedCog:
+class TimedCog(commands.Cog):
 
     def __init__(self,bot):
         self.bot = bot

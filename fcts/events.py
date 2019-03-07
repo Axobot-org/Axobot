@@ -2,7 +2,7 @@ import discord, datetime, asyncio, logging, time
 
 
 
-class Events:
+class Events(discord.ext.commands.Cog):
     """Cog for the management of major events that do not belong elsewhere. Like when a new server invites the bot."""
 
     def __init__(self,bot):

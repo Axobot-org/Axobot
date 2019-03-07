@@ -23,7 +23,7 @@ async def is_support_staff(ctx):
             return role in member.roles
     return False
 
-class ReloadsCog:
+class ReloadsCog(commands.Cog):
     """Cog to manage the other cogs. Even if all are disabled, this is the last one left."""
 
     def __init__(self,bot):

@@ -4,7 +4,7 @@ import discord, datetime, time
 fr_months=["Janvier","Février","Mars","Avril","Mai","Juin","Juillet","Aout","Septembre","Octobre","Novembre","Décembre"]
 en_months=["January","February","March","April","May","June","July","August","September","October","November","December"]
 
-class TimeCog:
+class TimeCog(discord.ext.commands.Cog):
     """This cog handles all manipulations of date, time, and time interval. So cool, and so fast"""
     def __init__(self,bot):
         self.bot = bot

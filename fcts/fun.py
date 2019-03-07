@@ -30,7 +30,7 @@ async def can_say(ctx):
     else:
         return await ctx.bot.cogs["ServerCog"].staff_finder(ctx.author,"say")
 
-class FunCog:
+class FunCog(commands.Cog):
     """Add some fun commands, no obvious use. You can disable this module with the 'enable_fun' option (command 'config')"""
 
     def __init__(self,bot):

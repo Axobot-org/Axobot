@@ -9,7 +9,7 @@ m_reload(en)
 m_reload(lolcat)
 
 
-class LangCog:
+class LangCog(discord.ext.commands.Cog):
 
     def __init__(self,bot):
         m_reload(fr)

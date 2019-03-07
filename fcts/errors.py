@@ -1,7 +1,7 @@
 import discord, sys, traceback, random, re
 from discord.ext import commands
 
-class ErrorsCog:
+class ErrorsCog(commands.Cog):
     """General cog for error management."""
 
     def __init__(self,bot):

@@ -10,7 +10,7 @@ async def can_edit_case(ctx):
         else:
             return False
 
-class CasesCog:
+class CasesCog(commands.Cog):
     """This part of the bot allows you to manage all your members' cases, to delete or edit them"""
 
     def __init__(self,bot):

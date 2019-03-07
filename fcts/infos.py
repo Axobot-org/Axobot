@@ -13,7 +13,7 @@ importlib.reload(reloads)
 bot_version = conf.release
 
 
-class InfosCog:
+class InfosCog(commands.Cog):
     """Here you will find various useful commands to get information about ZBot."""
 
     def __init__(self,bot):

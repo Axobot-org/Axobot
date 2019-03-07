@@ -1,7 +1,7 @@
 import discord, re, inspect
 from discord.ext import commands
 
-class HelpCog:
+class HelpCog(commands.Cog):
 
     def __init__(self,bot):
         self.bot = bot

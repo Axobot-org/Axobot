@@ -1,7 +1,7 @@
 import discord, datetime
 from discord.ext import commands
 
-class WelcomerCog:
+class WelcomerCog(commands.Cog):
     """Cog which manages the departure and arrival of members in the servers"""
     
     def __init__(self,bot):

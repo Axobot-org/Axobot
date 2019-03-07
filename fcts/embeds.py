@@ -1,6 +1,7 @@
 import datetime, discord, requests
+from discord.ext import commands
 
-class EmbedCog:
+class EmbedCog(commands.Cog):
     """Cog for the management of the embeds. No more, no less."""
 
     def __init__(self,bot):
