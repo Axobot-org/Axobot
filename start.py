@@ -137,7 +137,9 @@ def main():
                       'fcts.embeds',
                       'fcts.events',
                       'fcts.timed',
-                      'fcts.secret'
+                      'fcts.secret',
+                      'fcts.morpion',
+                      'fcts.xp'
     ]
     # Suppression du fichier debug.log s'il est trop volumineux
     if os.path.exists("debug.log"):
