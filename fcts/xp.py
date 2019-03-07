@@ -27,13 +27,19 @@ class XPCog:
 
     async def add_xp(self,msg):
         """Attribue un certain nombre d'xp à un message"""
+        if msg.author.bot:
+            return
         if msg.author.id in self.cache.keys():
-            if time.time() - self.cache[msg.author.id] < self.cooldown:
+            if time.time() - self.cache[str(msg.author.id)] < self.cooldown:
                 return
+        s = await self.bot.cogs['ServerCog'].find_staff(msg.guild.id,'enable_xp')
+        if not s:
+            return
         content = msg.clean_content
-        if len(content)<self.minimal_size or await self.check_spam(content) or msg.author.bot or await self.check_cmd(msg):
+        if len(content)<self.minimal_size or await self.check_spam(content) or await self.check_cmd(msg):
             return
         await self.bdd_set_xp(msg.author.id,await self.calc_xp(msg),'add')
+        self.cache[str(msg.author.id)] = round(time.time())
 
 
     async def check_cmd(self,msg):
@@ -173,8 +179,12 @@ class XPCog:
             if xp==None or len(xp)==0:
                 return await ctx.send("Ce membre ne possède pas d'xp !")
             xp = xp[0]['xp']
-            style = await self.bot.cogs['UtilitiesCog'].get_xp_style(user)
-            await ctx.send(file=await self.bot.cogs['XPCog'].create_card(user,style,xp))
+            try:
+                await ctx.send(file=discord.File('../cards/global/{}-{}.png'.format(user.id,xp)))
+            except FileNotFoundError:
+                style = await self.bot.cogs['UtilitiesCog'].get_xp_style(user)
+                await ctx.send(file=await self.bot.cogs['XPCog'].create_card(user,style,xp))
+                self.bot.log.debug("XP card for user {} ({}xp - style {})".format(user.id,xp,style))
         except Exception as e:
             await self.bot.cogs['ErrorsCog'].on_command_error(ctx,e)
 
