@@ -57,7 +57,7 @@ class ServerCog:
                "vote_emojis":":thumbsup:;:thumbsdown:;",
                "help_in_dm":0,
                "muted_role":0}
-        self.optionsList = ["ID","Created at","prefix","language","clear","slowmode","mute","kick","ban","warn","say","hunter","welcome_channel","welcome","leave","gived_roles","bot_news","poll_channels","modlogs_channel","anti_caps_lock","enable_fun","membercounter","anti_raid","vote_emojis","help_in_dm","muted_role"]
+        self.optionsList = ["ID","Created at","prefix","language","clear","slowmode","mute","kick","ban","warn","say","hunter","welcome_channel","welcome","leave","gived_roles","bot_news","poll_channels","modlogs_channel","enable_xp","anti_caps_lock","enable_fun","membercounter","anti_raid","vote_emojis","help_in_dm","muted_role"]
 
     async def on_ready(self):
         self.translate = self.bot.cogs["LangCog"].tr
