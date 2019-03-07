@@ -268,7 +268,7 @@ def main():
     client.add_listener(on_guild_remove)
     
     log = setup_logger()
-    log.setLevel(logging.INFO)
+    log.setLevel(logging.DEBUG)
     log.info("Lancement du bot")
 
     client.run(token)
