@@ -70,6 +70,8 @@ class ModeratorCog:
         if number<1:
             await ctx.send(str(await self.translate(ctx.guild.id,"modo","clear-1"))+" "+self.bot.cogs['EmojiCog'].customEmojis["owo"])
             return
+        if len(params)==0:
+            return await self.clear_simple(ctx,number)
         #file
         if "-f" in params:
             files = 0
@@ -125,6 +127,18 @@ class ModeratorCog:
                 return c1 and c2 and c3 and c4 and m.author.mention in mentions
             else:
                 return c1 and c2 and c3 and c4
+        try:
+            await ctx.message.delete()
+            deleted = await ctx.channel.purge(limit=number, check=check)
+            await ctx.send(str(await self.translate(ctx.guild,"modo","clear-0")).format(len(deleted)),delete_after=2.0)
+            log = str(await self.translate(ctx.guild.id,"logs","clear")).format(channel=ctx.channel.mention,number=len(deleted))
+            await self.bot.cogs["Events"].send_logs_per_server(ctx.guild,"clear",log,ctx.author)
+        except Exception as e:
+            await self.bot.cogs['ErrorsCog'].on_command_error(ctx,e)
+
+    async def clear_simple(self,ctx,number):
+        def check(m):
+            return not m.pinned
         try:
             await ctx.message.delete()
             deleted = await ctx.channel.purge(limit=number, check=check)
