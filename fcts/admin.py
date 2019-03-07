@@ -35,7 +35,8 @@ class AdminCog(commands.Cog):
             pass
         self._last_result = None
         self.god_mode = []
-        
+    
+    @commands.Cog.listener()
     async def on_ready(self):
         self.translate = self.bot.cogs["LangCog"].tr
         self.print = self.bot.cogs["UtilitiesCog"].print2

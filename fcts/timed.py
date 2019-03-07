@@ -22,6 +22,7 @@ class TimedCog(commands.Cog):
         except:
             pass
     
+    @commands.Cog.listener()
     async def on_ready(self):
         self.connect = self.bot.cogs['ServerCog'].connect
         self.translate = self.bot.cogs['LangCog'].tr

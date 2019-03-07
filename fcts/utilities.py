@@ -15,6 +15,7 @@ class UtilitiesCog(commands.Cog):
         self.table = 'users'
         self.new_pp = False
 
+    @commands.Cog.listener()
     async def on_ready(self):
         self.config = (await self.bot.cogs['ServerCog'].get_bot_infos(self.bot.user.id))[0]
 

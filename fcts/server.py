@@ -30,8 +30,7 @@ class ServerCog(commands.Cog):
             self.translate = self.bot.cogs["LangCog"].tr
         except:
             pass
-        if bot.user != None:
-            self.table = 'servers' if bot.user.id==486896267788812288 else 'servers_beta'
+        self.table = 'servers_beta' if bot.beta else 'servers'
         self.default_opt = {"language":0,
                "clear":"",
                "slowmode":"",
@@ -59,9 +58,9 @@ class ServerCog(commands.Cog):
                "muted_role":0}
         self.optionsList = ["ID","Created at","prefix","language","clear","slowmode","mute","kick","ban","warn","say","hunter","welcome_channel","welcome","leave","gived_roles","bot_news","poll_channels","modlogs_channel","enable_xp","anti_caps_lock","enable_fun","membercounter","anti_raid","vote_emojis","help_in_dm","muted_role"]
 
+    @commands.Cog.listener()
     async def on_ready(self):
         self.translate = self.bot.cogs["LangCog"].tr
-        self.table = 'servers' if self.bot.user.id==486896267788812288 else 'servers_beta'
 
 
     async def get_bot_infos(self,botID):

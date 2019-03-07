@@ -1,8 +1,9 @@
 import discord, datetime, asyncio, logging, time
+from discord.ext import commands
 
 
 
-class Events(discord.ext.commands.Cog):
+class Events(commands.Cog):
     """Cog for the management of major events that do not belong elsewhere. Like when a new server invites the bot."""
 
     def __init__(self,bot):
@@ -29,6 +30,7 @@ class Events(discord.ext.commands.Cog):
             'role':60,
             'guild':75}
     
+    @commands.Cog.listener()
     async def on_ready(self):
         self.translate = self.bot.cogs["LangCog"].tr
 

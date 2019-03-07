@@ -15,6 +15,7 @@ Every information come from the website www.fr-minecraft.net"""
         except:
             pass
 
+    @commands.Cog.listener()
     async def on_ready(self):
         self.translate = self.bot.cogs["LangCog"].tr
 

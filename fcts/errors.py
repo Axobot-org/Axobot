@@ -11,7 +11,8 @@ class ErrorsCog(commands.Cog):
             self.translate = self.bot.cogs["LangCog"].tr
         except:
             pass
-        
+    
+    @commands.Cog.listener()
     async def on_ready(self):
         self.translate = self.bot.cogs["LangCog"].tr
 
@@ -21,7 +22,7 @@ class ErrorsCog(commands.Cog):
             if r!= None:
                 return r
 
-
+    @commands.Cog.listener()
     async def on_cmd_error(self,ctx,error):
         """The event triggered when an error is raised while invoking a command."""
         # This prevents any commands with local handlers being handled here in on_command_error.
@@ -78,6 +79,7 @@ class ErrorsCog(commands.Cog):
     async def on_command_error(self, ctx, error):
         await self.on_cmd_error(ctx,error)
 
+    @commands.Cog.listener()
     async def on_error(self,error_msg,ctx):
         try:
             sysexc = sys.exc_info()

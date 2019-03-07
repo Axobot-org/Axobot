@@ -12,6 +12,7 @@ class PermsCog(commands.Cog):
         except:
             pass
 
+    @commands.Cog.listener()
     async def on_ready(self):
         self.translate = self.bot.cogs["LangCog"].tr
 

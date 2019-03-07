@@ -19,8 +19,6 @@ class LangCog(discord.ext.commands.Cog):
         self.languages = ['fr','en','lolcat']
         self.serv_opts = dict()
 
-    async def on_ready(self):
-        pass
 
     async def tr(self,serverID,moduleID,messageID):
         """Renvoie le texte en fonction de la langue"""

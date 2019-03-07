@@ -49,6 +49,7 @@ class FunCog(commands.Cog):
     async def cache_update(self,id,value):
         self.fun_opt[str(id)] = value
 
+    @commands.Cog.listener()
     async def on_ready(self):
             self.translate = self.bot.cogs["LangCog"].tr
             self.utilities = self.bot.cogs["UtilitiesCog"]

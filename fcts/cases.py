@@ -23,6 +23,7 @@ class CasesCog(commands.Cog):
         if bot.user != None:
             self.table = 'cases_beta' if bot.beta else 'cases'
     
+    @commands.Cog.listener()
     async def on_ready(self):
         self.translate = self.bot.cogs["LangCog"].tr
         self.table = 'cases_beta' if self.bot.beta else 'cases'
