@@ -231,7 +231,7 @@ class UtilitiesCog:
         return text
 
 
-    async def get_db_userinfo(self,columns=[],criters=["ID>1"],relation="AND",Type=dict):
+    async def get_db_userinfo(self,columns=[],criters=["userID>1"],relation="AND",Type=dict):
         """Get every info about a user with the database"""
         await self.bot.wait_until_ready()
         if type(columns)!=list or type(criters)!=list:
@@ -266,8 +266,9 @@ class UtilitiesCog:
 
     async def is_premium(self,user):
         """Check if a user is premium"""
+        parameters = None
         try:
-            parameters = await self.get_db_userinfo(criters=["ID="+str(user.id)],columns=['premium'])
+            parameters = await self.get_db_userinfo(criters=["userID="+str(user.id)],columns=['premium'])
         except Exception as e:
             await self.bot.cogs["Errors"].on_error(e,None)
         if parameters==None:
@@ -276,8 +277,9 @@ class UtilitiesCog:
 
     async def is_support(self,user):
         """Check if a user is support staff"""
+        parameters = None
         try:
-            parameters = await self.get_db_userinfo(criters=["ID="+str(user.id)],columns=['support'])
+            parameters = await self.get_db_userinfo(criters=["userID="+str(user.id)],columns=['support'])
         except Exception as e:
             await self.bot.cogs["Errors"].on_error(e,None)
         if parameters==None:
@@ -286,13 +288,24 @@ class UtilitiesCog:
 
     async def is_contributor(self,user):
         """Check if a user is a contributor"""
+        parameters = None
         try:
-            parameters = await self.get_db_userinfo(criters=["ID="+str(user.id)],columns=['contributor'])
+            parameters = await self.get_db_userinfo(criters=["userID="+str(user.id)],columns=['contributor'])
         except Exception as e:
             await self.bot.cogs["Errors"].on_error(e,None)
         if parameters==None:
             return False
         return parameters['contributor']
+    
+    async def get_xp_style(self,user):
+        parameters = None
+        try:
+            parameters = await self.get_db_userinfo(criters=["userID="+str(user.id)],columns=['xp_style'])
+        except Exception as e:
+            await self.bot.cogs["ErrorsCog"].on_error(e,None)
+        if parameters==None:
+            return 'dark'
+        return parameters['xp_style']
 
     async def add_check_reaction(self,message):
         try:
