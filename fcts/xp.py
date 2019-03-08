@@ -123,13 +123,8 @@ class XPCog(commands.Cog):
 
 
     async def get_raw_image(self,url,size=282):
-        # image_byt = requests.get(url,timeout=7).content
-        # im = io.BytesIO(image_byt)
-        # im2 = Image.open(im).resize(size=(size,size),resample=Image.BICUBIC)
-        # im.close()
         req = Request(url, headers={'User-Agent': 'Mozilla/5.0'})
         im = Image.open(io.BytesIO(urlopen(req).read()))
-        #im = Image.open(io.BytesIO(urlopen(url).read()))
         return im
 
     async def calc_pos(self,text,font,x,y,align='center'):
@@ -144,16 +139,12 @@ class XPCog(commands.Cog):
         card = Image.open("../cards/model/{}.png".format(style))
         if not user.is_avatar_animated():
             pfp = await self.get_raw_image(user.avatar_url_as(format='png',size=256))
-            img = await self.add_overlay(pfp,user,card,xp,rank)
+            img = await self.add_overlay(pfp.resize(size=(282,282)),user,card,xp,rank)
             img.save('../cards/global/{}-{}.png'.format(user.id,xp))
             return discord.File('../cards/global/{}-{}.png'.format(user.id,xp))
         else:
             pfp = await self.get_raw_image(user.avatar_url_as(format='gif'))
             images = []
-        # pfp = await self.get_raw_image("https://i.pinimg.com/originals/58/5f/26/585f26666215716fb4003a6e679b5af3.gif")
-        #pfp = await self.get_raw_image("http://antho.web.free.fr/tumblr_n7qhwubEE21r2geqjo1_500.gif")
-        #pfp = await self.get_raw_image((await self.bot.get_user_info(204377365189492737)).avatar_url)
-        # pfp = await self.get_raw_image("https://cdn.discordapp.com/avatars/204377365189492737/a_849686ea86007cbed7eea30ded4af330.gif")
             duration = []
             for i in range(pfp.n_frames):
                 pfp.seek(i)
@@ -167,7 +158,7 @@ class XPCog(commands.Cog):
     async def add_overlay(self,pfp,user,card,xp,rank):
         img = Image.new('RGBA', (card.width, card.height), color = (250,250,250,0))
         img.paste(pfp, (20, 29))
-        img.paste(card, (0, 0),card)
+        img.paste(card, (0, 0), card)
 
         name_fnt = ImageFont.truetype('/Library/Fonts/Roboto-Medium.ttf', 40)
         xp_fnt = ImageFont.truetype('/Library/Fonts/Verdana.ttf', 24)
@@ -206,7 +197,7 @@ class XPCog(commands.Cog):
                 return await ctx.send("Ce membre ne possède pas d'xp !")
             xp = xp[0]['xp']
             try:
-                await ctx.send(file=discord.File('../cards/global/a{}-{}.{}'.format(user.id,xp,'gif' if user.is_avatar_animated() else 'png')))
+                await ctx.send(file=discord.File('../cards/global/{}-{}.{}'.format(user.id,xp,'gif' if user.is_avatar_animated() else 'png')))
             except FileNotFoundError:
                 style = await self.bot.cogs['UtilitiesCog'].get_xp_style(user)
                 await ctx.send(file=await self.create_card(user,style,xp))
