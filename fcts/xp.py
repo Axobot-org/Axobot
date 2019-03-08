@@ -1,9 +1,12 @@
-import discord, random, time, asyncio
+import discord, random, time, asyncio, io, imageio, importlib
 from discord.ext import commands
 from PIL import Image, ImageDraw, ImageFont, ImageTk
-import requests, io, time
+from urllib.request import urlopen, Request
 
-class XPCog:
+from fcts import args
+importlib.reload(args)
+
+class XPCog(commands.Cog):
 
     def __init__(self,bot):
         self.bot = bot
@@ -12,7 +15,7 @@ class XPCog:
         self.table = 'xp_beta' if bot.beta else 'xp'
         self.cooldown = 10
         self.minimal_size = 5
-        self.spam_rate = 0.35
+        self.spam_rate = 0.30
         self.xp_per_char = 0.4
         self.file = 'xp'
         bot.add_listener(self.add_xp,'on_message')
@@ -21,6 +24,7 @@ class XPCog:
         except:
             pass
     
+    @commands.Cog.listener()
     async def on_ready(self):
         self.translate = self.bot.cogs['LangCog'].tr
         self.table = 'xp_beta' if self.bot.beta else 'xp'
@@ -116,15 +120,16 @@ class XPCog:
             return liste
         except Exception as e:
             await self.bot.cogs['ErrorsCog'].on_error(e,None)
-    
 
-    async def get_image_from_url(self,url):
-        return ImageTk.PhotoImage(await self.get_raw_image(url))
 
     async def get_raw_image(self,url,size=282):
-        image_byt = requests.get(url,timeout=7).content
-        im = io.BytesIO(image_byt)
-        im = Image.open(im).resize(size=(size,size),resample=Image.BICUBIC)
+        # image_byt = requests.get(url,timeout=7).content
+        # im = io.BytesIO(image_byt)
+        # im2 = Image.open(im).resize(size=(size,size),resample=Image.BICUBIC)
+        # im.close()
+        req = Request(url, headers={'User-Agent': 'Mozilla/5.0'})
+        im = Image.open(io.BytesIO(urlopen(req).read()))
+        #im = Image.open(io.BytesIO(urlopen(url).read()))
         return im
 
     async def calc_pos(self,text,font,x,y,align='center'):
@@ -137,12 +142,32 @@ class XPCog:
     async def create_card(self,user,style,xp,rank=[1,0]):
         """Crée la carte d'xp pour un utilisateur"""
         card = Image.open("../cards/model/{}.png".format(style))
-        pfp = await self.get_raw_image(user.avatar_url)
+        if not user.is_avatar_animated():
+            pfp = await self.get_raw_image(user.avatar_url_as(format='png',size=256))
+            img = await self.add_overlay(pfp,user,card,xp,rank)
+            img.save('../cards/global/{}-{}.png'.format(user.id,xp))
+            return discord.File('../cards/global/{}-{}.png'.format(user.id,xp))
+        else:
+            pfp = await self.get_raw_image(user.avatar_url_as(format='gif'))
+            images = []
+        # pfp = await self.get_raw_image("https://i.pinimg.com/originals/58/5f/26/585f26666215716fb4003a6e679b5af3.gif")
+        #pfp = await self.get_raw_image("http://antho.web.free.fr/tumblr_n7qhwubEE21r2geqjo1_500.gif")
+        #pfp = await self.get_raw_image((await self.bot.get_user_info(204377365189492737)).avatar_url)
+        # pfp = await self.get_raw_image("https://cdn.discordapp.com/avatars/204377365189492737/a_849686ea86007cbed7eea30ded4af330.gif")
+            duration = []
+            for i in range(pfp.n_frames):
+                pfp.seek(i)
+                img = await self.add_overlay(pfp.resize(size=(282,282)),user,card,xp,rank)
+                images.append(img)
+                duration.append(pfp.info['duration']/1000)
+            card.close()
+            imageio.mimsave('../cards/global/{}-{}.gif'.format(user.id,xp), images,format="GIF-PIL",duration=duration,subrectangles=True)
+            return discord.File('../cards/global/{}-{}.gif'.format(user.id,xp))
 
+    async def add_overlay(self,pfp,user,card,xp,rank):
         img = Image.new('RGBA', (card.width, card.height), color = (250,250,250,0))
         img.paste(pfp, (20, 29))
         img.paste(card, (0, 0),card)
-        card.close()
 
         name_fnt = ImageFont.truetype('/Library/Fonts/Roboto-Medium.ttf', 40)
         xp_fnt = ImageFont.truetype('/Library/Fonts/Verdana.ttf', 24)
@@ -162,28 +187,29 @@ class XPCog:
         temp = '{x[0]}/{x[1]}'.format(x=rank)
         d.text((await self.calc_pos('RANG',RANK_fnt,893,147,'center')), 'RANG', font=RANK_fnt, fill=colors['rank'])
         d.text((await self.calc_pos(temp,rank_fnt,893,180,'center')), temp, font=rank_fnt, fill=colors['rank'])
-
-        img.save('../cards/global/{}-{}.png'.format(user.id,xp))
-        return discord.File('../cards/global/{}-{}.png'.format(user.id,xp))
+        return img
 
 
     @commands.command(name='rank',hidden=True)
-    @commands.cooldown(1,15,commands.BucketType.user)
-    async def rank(self,ctx,*,user:discord.User=None):
+    #@commands.cooldown(1,15,commands.BucketType.user)
+    async def rank(self,ctx,*,user:args.user=None):
         """Display a user XP.
-        If you don't send any user, I'll display your own XP"""
+        If you don't send any user, I'll display your own XP
+        """
         try:
             if user==None:
                 user = ctx.author
             xp = await self.bdd_get_xp(user.id)
             if xp==None or len(xp)==0:
+                if ctx.author==user:
+                    return await ctx.send("Vous ne possédez pas encore d'xp !")
                 return await ctx.send("Ce membre ne possède pas d'xp !")
             xp = xp[0]['xp']
             try:
-                await ctx.send(file=discord.File('../cards/global/{}-{}.png'.format(user.id,xp)))
+                await ctx.send(file=discord.File('../cards/global/a{}-{}.{}'.format(user.id,xp,'gif' if user.is_avatar_animated() else 'png')))
             except FileNotFoundError:
                 style = await self.bot.cogs['UtilitiesCog'].get_xp_style(user)
-                await ctx.send(file=await self.bot.cogs['XPCog'].create_card(user,style,xp))
+                await ctx.send(file=await self.create_card(user,style,xp))
                 self.bot.log.debug("XP card for user {} ({}xp - style {})".format(user.id,xp,style))
         except Exception as e:
             await self.bot.cogs['ErrorsCog'].on_command_error(ctx,e)
