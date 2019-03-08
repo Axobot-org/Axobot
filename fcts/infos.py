@@ -219,7 +219,7 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
                 list_role.append(role.mention)
         position = str(sorted(ctx.guild.members, key=lambda m: m.joined_at).index(item) + 1) + "/" + str(len(ctx.guild.members))
         embed = discord.Embed(colour=item.color, timestamp=ctx.message.created_at)
-        embed.set_thumbnail(url=item.avatar_url_as(format='png'))
+        embed.set_thumbnail(url=item.avatar_url_as(format='gif') if item.is_avatar_animated() else item.avatar_url_as(format='png'))
         embed.set_author(name=str(item), icon_url=item.avatar_url_as(format='png'))
         embed.set_footer(text='Requested by {}'.format(ctx.author.name), icon_url=ctx.author.avatar_url_as(format='png'))
 
@@ -278,7 +278,7 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
         else:
             on_server = await self.translate(ctx.guild.id,"keywords","non")
         embed = discord.Embed(colour=default_color, timestamp=ctx.message.created_at)
-        embed.set_thumbnail(url=item.avatar_url_as(format='png'))
+        embed.set_thumbnail(url=item.avatar_url_as(format='gif') if item.is_avatar_animated() else item.avatar_url_as(format='png'))
         embed.set_author(name=str(item), icon_url=item.avatar_url_as(format='png'))
         embed.set_footer(text='Requested by {}'.format(ctx.author.name), icon_url=ctx.author.avatar_url_as(format='png'))
 
