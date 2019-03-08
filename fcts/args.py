@@ -17,3 +17,18 @@ class tempdelta(commands.converter.IDConverter):
         if not found:
             raise commands.errors.BadArgument('Invalid duration: '+argument)
         return d
+
+class user(commands.converter.IDConverter):
+    def __init__(self):
+        pass
+    
+    async def convert(self,ctx,argument):
+        if argument.isnumeric():
+            res = ctx.bot.get_user(int(argument))
+            if res == None:
+                try:
+                    res = await ctx.bot.get_user_info(int(argument))
+                except:
+                    pass
+            return res
+        return commands.UserConverter().convert(ctx,argument)
