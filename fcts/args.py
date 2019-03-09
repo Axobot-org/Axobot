@@ -32,3 +32,13 @@ class user(commands.converter.IDConverter):
                     pass
             return res
         return commands.UserConverter().convert(ctx,argument)
+
+class infoType(commands.converter.IDConverter):
+    def __init__(self):
+        pass
+    
+    async def convert(self,ctx,argument):
+        if argument in ['member','role','user','textchannel','channel','invite','voicechannel','emoji','category','guild','server']:
+            return argument
+        else:
+            raise commands.errors.BadArgument('Invalid type: '+argument)
