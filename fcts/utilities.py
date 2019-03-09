@@ -78,7 +78,7 @@ class UtilitiesCog(commands.Cog):
         if type(Type) == str:
             Type = Type.lower()
         if Type == None:
-            for i in [commands.RoleConverter,commands.MemberConverter,
+            for i in [commands.MemberConverter,commands.RoleConverter,
                     commands.TextChannelConverter,commands.InviteConverter,
                     commands.UserConverter,commands.VoiceChannelConverter,
                     commands.EmojiConverter,commands.CategoryChannelConverter]:
