@@ -1,5 +1,6 @@
-import discord, datetime, sys, psutil, os, requests, importlib, time, asyncio
+import discord, datetime, sys, psutil, os, requests, importlib, time, asyncio, typing
 from discord.ext import commands
+from inspect import signature
 from platform   import system as system_name  # Returns the system/OS name
 from subprocess import call   as system_call  # Execute a shell command
 
@@ -7,8 +8,9 @@ default_color = discord.Color(0x50e3c2)
 
 from docs import conf
 importlib.reload(conf)
-from fcts import reloads
+from fcts import reloads, args
 importlib.reload(reloads)
+importlib.reload(args)
 
 bot_version = conf.release
 
@@ -21,7 +23,6 @@ class InfosCog(commands.Cog):
         self.file = "infos"
         try:
             self.translate = bot.cogs["LangCog"].tr
-            self.utilities = bot.cogs["UtilitiesCog"]
             self.timecog = bot.cogs["TimeCog"]
         except:
             pass
@@ -29,7 +30,6 @@ class InfosCog(commands.Cog):
     @commands.Cog.listener()
     async def on_ready(self):
         self.translate = self.bot.cogs["LangCog"].tr
-        self.utilities = self.bot.cogs["UtilitiesCog"]
         self.timecog = self.bot.cogs["TimeCog"]
         self.codelines = await self.count_lines_code()
     
@@ -133,27 +133,19 @@ class InfosCog(commands.Cog):
 
     @commands.command(name='info',aliases=['infos'])
     @commands.guild_only()
-    async def infos(self,ctx,Type=None,*,name=None):
+    async def infos(self,ctx,Type:typing.Optional[args.infoType]=None,*,name:str=None):
         """Find informations about someone/something
 Available types: member, role, user, emoji, channel, server, invite, category"""
-        #lang = await self.bot.cogs["ServerCog"].conf_lang(ctx,'language','scret-desc')
+        if Type!=None and name==None:
+            raise commands.MissingRequiredArgument(self.infos.clean_params['name'])
         try:
             lang = await self.translate(ctx.guild.id,"current_lang","current")
-            find = self.utilities.find_everything
+            find = self.bot.cogs['UtilitiesCog'].find_everything
             if Type in ["guild","server"]:
                 if name==None or not await self.bot.cogs['AdminCog'].check_if_admin(ctx):
                     return await self.guild_info(ctx,ctx.guild,lang)
-            if name == None:
-                if Type == None:
-                    item = ctx.author
-                else:
-                    name = Type
-                    Type = None
-                    try:
-                        item = await find(ctx,name,Type=None)
-                    except:
-                        await ctx.send(str(await self.translate(ctx.guild.id,"modo","cant-find-user")).format(name))
-                        return
+            if name == None: # include Type==None bc of line 141
+                item = ctx.author
             else:
                 try:
                     item = await find(ctx,name,Type)
@@ -162,11 +154,8 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
                     return
             #-----
             if item == None:
-                if Type.lower() not in ['member','role','user','textchannel','channel','invite','voicechannel','emoji','category','guild','server']:
-                    msg = await self.translate(ctx.guild.id,"stats_infos","type-invalid")
-                else:
-                    msg = await self.translate(ctx.guild.id,"stats_infos","not-found")
-                await ctx.send(msg.format(N=name,T=Type))
+                msg = await self.translate(ctx.guild.id,"stats_infos","not-found")
+                await ctx.send(msg.format(N=name))
             elif type(item) == discord.Member:
                 await self.member_infos(ctx,item,lang)
             elif type(item) == discord.Role:
