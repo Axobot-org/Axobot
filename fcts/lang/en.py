@@ -428,7 +428,6 @@ server_desc={"clear": "List of roles that can use the 'clear' command: {}",
              "muted_role":"Used role to mute members : {}"}
 
 stats_infos={"not-found":"Unable to find {N}",
-            "type-invalid":"Invalid type: `{T}` :confused:",
             "member-0":"Nickname",
             "member-1":"Created at",
             "member-2":"Joined at",

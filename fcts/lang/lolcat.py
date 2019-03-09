@@ -428,7 +428,6 @@ server_desc={"clear": "Lizt of rawles dat can us teh 'clear' commend: {}",
              "muted_role":"Usd role 2 mute people : {}"}
 
 stats_infos={"not-found":"Unable 2 found {N}",
-            "type-invalid":"Invalid type: `{T}`",
             "member-0":"Lttle nayme",
             "member-1":"Born at",
             "member-2":"New from",
