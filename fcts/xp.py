@@ -46,7 +46,10 @@ class XPCog(commands.Cog):
         if len(content)<self.minimal_size or await self.check_spam(content) or await self.check_cmd(msg):
             return
         giv_points = await self.calc_xp(msg)
-        prev_points = self.cache[msg.author.id][1]
+        if msg.author.id in self.cache.keys():
+            prev_points = self.cache[msg.author.id][1]
+        else:
+            prev_points = 0
         await self.bdd_set_xp(msg.author.id, giv_points,'add')
         self.cache[msg.author.id] = [round(time.time()), prev_points+giv_points]
 
@@ -164,6 +167,20 @@ class XPCog(commands.Cog):
         except Exception as e:
             await self.bot.cogs['ErrorsCog'].on_error(e,None)
 
+    async def bdd_get_top(self,top:int):
+        try:
+            cnx = self.bot.cogs['ServerCog'].connect()
+            cursor = cnx.cursor(dictionary = True)
+            query = ("SELECT * FROM `{}` order by `xp` desc limit {}".format(self.table,top))
+            cursor.execute(query)
+            liste = list()
+            for x in cursor:
+                liste.append(x)
+            cnx.close()
+            return liste
+        except Exception as e:
+            await self.bot.cogs['ErrorsCog'].on_error(e,None)
+        
 
     async def get_raw_image(self,url,size=282):
         req = Request(url, headers={'User-Agent': 'Mozilla/5.0'})
@@ -224,9 +241,9 @@ class XPCog(commands.Cog):
         return img
 
 
-    @commands.command(name='rank',hidden=True)
+    @commands.command(name='rank')
     @commands.bot_has_permissions(send_messages=True)
-    #@commands.cooldown(1,15,commands.BucketType.user)
+    @commands.cooldown(1,15,commands.BucketType.user)
     async def rank(self,ctx,*,user:args.user=None):
         """Display a user XP.
         If you don't send any user, I'll display your own XP
@@ -279,6 +296,15 @@ class XPCog(commands.Cog):
 **{}** {}
 **{}** {}/{}""".format(user.name,xp,levels_info[1],txts[0],levels_info[0],txts[1],rank,ranks_nb)
         await ctx.send(msg)
+
+
+
+    @commands.command(name='top')
+    @commands.bot_has_permissions(send_messages=True)
+    @commands.cooldown(1,15,commands.BucketType.user)
+    async def top(self,ctx,limit:int=20):
+        """Get the list of the highest levels"""
+        await ctx.send(await self.bdd_get_top(limit))
 
 
 def setup(bot):
