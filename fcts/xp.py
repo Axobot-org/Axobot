@@ -13,7 +13,7 @@ class XPCog(commands.Cog):
         self.cache = dict() # {ID : [date, xp]}
         self.levels = [0]
         self.table = 'xp_beta' if bot.beta else 'xp'
-        self.cooldown = 10
+        self.cooldown = 30
         self.minimal_size = 5
         self.spam_rate = 0.30
         self.xp_per_char = 0.4
@@ -28,13 +28,16 @@ class XPCog(commands.Cog):
     async def on_ready(self):
         self.translate = self.bot.cogs['LangCog'].tr
         self.table = 'xp_beta' if self.bot.beta else 'xp'
+        await self.bdd_load_cache()
 
     async def add_xp(self,msg):
         """Attribue un certain nombre d'xp à un message"""
         if msg.author.bot:
             return
+        if len(self.cache)==0:
+            await self.bdd_load_cache()
         if msg.author.id in self.cache.keys():
-            if time.time() - self.cache[str(msg.author.id)][0] < self.cooldown:
+            if time.time() - self.cache[msg.author.id][0] < self.cooldown:
                 return
         s = await self.bot.cogs['ServerCog'].find_staff(msg.guild.id,'enable_xp')
         if not s:
@@ -43,9 +46,9 @@ class XPCog(commands.Cog):
         if len(content)<self.minimal_size or await self.check_spam(content) or await self.check_cmd(msg):
             return
         giv_points = await self.calc_xp(msg)
-        prev_points = self.cache[str(msg.author.id)][1]
+        prev_points = self.cache[msg.author.id][1]
         await self.bdd_set_xp(msg.author.id, giv_points,'add')
-        self.cache[str(msg.author.id)] = [round(time.time()), prev_points+giv_points]
+        self.cache[msg.author.id] = [round(time.time()), prev_points+giv_points]
 
 
     async def check_cmd(self,msg):
@@ -120,10 +123,10 @@ class XPCog(commands.Cog):
                 liste.append(x)
             cnx.close()
             if len(liste)==1:
-                if str(userID) in self.cache.keys():
-                    self.cache[str(userID)][1] = liste[0]['xp']
+                if userID in self.cache.keys():
+                    self.cache[userID][1] = liste[0]['xp']
                 else:
-                    self.cache[str(userID)] = [round(time.time())-60,liste[0]['xp']]
+                    self.cache[userID] = [round(time.time())-60,liste[0]['xp']]
             return liste
         except Exception as e:
             await self.bot.cogs['ErrorsCog'].on_error(e,None)
@@ -141,6 +144,23 @@ class XPCog(commands.Cog):
             cnx.close()
             if liste!=None and len(liste)==1:
                 return liste[0][0]
+        except Exception as e:
+            await self.bot.cogs['ErrorsCog'].on_error(e,None)
+
+    async def bdd_load_cache(self):
+        try:
+            cnx = self.bot.cogs['ServerCog'].connect()
+            cursor = cnx.cursor(dictionary = True)
+            self.bot.log.info("Chargement du cache XP")
+            query = ("SELECT `userID`,`xp` FROM `{}` WHERE `banned`=0".format(self.table))
+            cursor.execute(query)
+            liste = list()
+            for x in cursor:
+                liste.append(x)
+            cnx.close()
+            for l in liste:
+                self.cache[l['userID']] = [round(time.time())-60,l['xp']]
+            return liste
         except Exception as e:
             await self.bot.cogs['ErrorsCog'].on_error(e,None)
 
@@ -222,7 +242,7 @@ class XPCog(commands.Cog):
             xp = xp[0]['xp']
             ranks = sorted([(v[1],k) for k,v in self.cache.items()],reverse=True)
             ranks_nb = await self.bdd_get_nber()
-            rank = ranks.index((xp,str(user.id)))+1
+            rank = ranks.index((xp,user.id))+1
             if ctx.channel.permissions_for(ctx.guild.me).attach_files:
                 await self.send_card(ctx,user,xp,rank,ranks_nb)
             elif ctx.channel.permissions_for(ctx.guild.me).embed_links:
