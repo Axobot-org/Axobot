@@ -452,10 +452,15 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
                 languages.append(lang)
         disp_lang = ""
         owners = ", ".join([x.name for x in liste if x.owner==user])
+        r = requests.get('https://discordbots.org/api/bots/486896267788812288/check?userId={}'.format(user.id),headers={'Authorization':str(self.bot.dbl_token)})
+        if r.json()['voted']:
+            r = await self.translate(ctx.guild,'keywords','oui')
+        else:
+            r = await self.translate(ctx.guild,'keywords','non')
         for e in range(len(ctx.bot.cogs['LangCog'].languages)):
             if languages.count(e)>0:
                 disp_lang += ctx.bot.cogs['LangCog'].languages[e]+" ("+str(round(languages.count(e)/len(languages)*100))+"%)  "
-        await ctx.send(str(await self.translate(ctx.guild,"find","user-1")).format(user,user.id,", ".join([x.name for x in liste]),owners,disp_lang))
+        await ctx.send(str(await self.translate(ctx.guild,"find","user-1")).format(name=user,id=user.id,servers=", ".join([x.name for x in liste]),own=owners,lang=disp_lang,vote=r))
 
     @find_main.command(name="guild",aliases=['server'])
     async def find_guild(self,ctx,*,guild):
