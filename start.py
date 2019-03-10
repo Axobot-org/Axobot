@@ -65,12 +65,13 @@ def setup_logger():
 
 class zbot(commands.bot.BotBase,discord.Client):
 
-    def __init__(self,command_prefix=None,case_insensitive=None,status=None,database_online=True,beta=False):
+    def __init__(self,command_prefix=None,case_insensitive=None,status=None,database_online=True,beta=False,dbl_token=""):
         super().__init__(command_prefix=command_prefix,case_insensitive=case_insensitive,status=status)
         self.database_online = database_online
         self.beta = beta
         self.database_keys = dict()
         self.log = logging.getLogger("runner")
+        self.dbl_token = dbl_token
     
     async def user_avatar_as(self,user,size=512):
         """Get the avatar of an user, format gif or png (as webp isn't supported by some browsers)"""
@@ -166,6 +167,7 @@ def main():
         print(e)
         client.database_online = False
 
+    client.dbl_token = tokens.get_dbl_token()
 
     # Here we load our extensions(cogs) listed above in [initial_extensions]
     count = 0
