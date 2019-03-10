@@ -10,7 +10,7 @@ class XPCog(commands.Cog):
 
     def __init__(self,bot):
         self.bot = bot
-        self.cache = dict()
+        self.cache = dict() # {ID : [date, xp]}
         self.levels = [0]
         self.table = 'xp_beta' if bot.beta else 'xp'
         self.cooldown = 10
@@ -34,7 +34,7 @@ class XPCog(commands.Cog):
         if msg.author.bot:
             return
         if msg.author.id in self.cache.keys():
-            if time.time() - self.cache[str(msg.author.id)] < self.cooldown:
+            if time.time() - self.cache[str(msg.author.id)][0] < self.cooldown:
                 return
         s = await self.bot.cogs['ServerCog'].find_staff(msg.guild.id,'enable_xp')
         if not s:
@@ -42,8 +42,10 @@ class XPCog(commands.Cog):
         content = msg.clean_content
         if len(content)<self.minimal_size or await self.check_spam(content) or await self.check_cmd(msg):
             return
-        await self.bdd_set_xp(msg.author.id,await self.calc_xp(msg),'add')
-        self.cache[str(msg.author.id)] = round(time.time())
+        giv_points = await self.calc_xp(msg)
+        prev_points = self.cache[str(msg.author.id)][1]
+        await self.bdd_set_xp(msg.author.id, giv_points,'add')
+        self.cache[str(msg.author.id)] = [round(time.time()), prev_points+giv_points]
 
 
     async def check_cmd(self,msg):
@@ -117,7 +119,28 @@ class XPCog(commands.Cog):
             for x in cursor:
                 liste.append(x)
             cnx.close()
+            if len(liste)==1:
+                if str(userID) in self.cache.keys():
+                    self.cache[str(userID)][1] = liste[0]['xp']
+                else:
+                    self.cache[str(userID)] = [round(time.time())-60,liste[0]['xp']]
             return liste
+        except Exception as e:
+            await self.bot.cogs['ErrorsCog'].on_error(e,None)
+    
+    async def bdd_get_nber(self):
+        """Get the number of ranked users"""
+        try:
+            cnx = self.bot.cogs['ServerCog'].connect()
+            cursor = cnx.cursor(dictionary = False)
+            query = ("SELECT COUNT(*) FROM `{}` WHERE `banned`=0".format(self.table))
+            cursor.execute(query)
+            liste = list()
+            for x in cursor:
+                liste.append(x)
+            cnx.close()
+            if liste!=None and len(liste)==1:
+                return liste[0][0]
         except Exception as e:
             await self.bot.cogs['ErrorsCog'].on_error(e,None)
 
@@ -134,28 +157,28 @@ class XPCog(commands.Cog):
         elif align=='right':
             return x-w,y-h/2
 
-    async def create_card(self,user,style,xp,rank=[1,0]):
+    async def create_card(self,user,style,xp,rank=[1,0],txt=['NIVEAU','RANG']):
         """Crée la carte d'xp pour un utilisateur"""
         card = Image.open("../cards/model/{}.png".format(style))
         if not user.is_avatar_animated():
             pfp = await self.get_raw_image(user.avatar_url_as(format='png',size=256))
-            img = await self.add_overlay(pfp.resize(size=(282,282)),user,card,xp,rank)
-            img.save('../cards/global/{}-{}.png'.format(user.id,xp))
-            return discord.File('../cards/global/{}-{}.png'.format(user.id,xp))
+            img = await self.add_overlay(pfp.resize(size=(282,282)),user,card,xp,rank,txt)
+            img.save('../cards/global/{}-{}-{}.png'.format(user.id,xp,rank[0]))
+            return discord.File('../cards/global/{}-{}-{}.png'.format(user.id,xp,rank[0]))
         else:
             pfp = await self.get_raw_image(user.avatar_url_as(format='gif'))
             images = []
             duration = []
             for i in range(pfp.n_frames):
                 pfp.seek(i)
-                img = await self.add_overlay(pfp.resize(size=(282,282)),user,card,xp,rank)
+                img = await self.add_overlay(pfp.resize(size=(282,282)),user,card,xp,rank,txt)
                 images.append(img)
                 duration.append(pfp.info['duration']/1000)
             card.close()
-            imageio.mimsave('../cards/global/{}-{}.gif'.format(user.id,xp), images,format="GIF-PIL",duration=duration,subrectangles=True)
-            return discord.File('../cards/global/{}-{}.gif'.format(user.id,xp))
+            imageio.mimwrite('../cards/global/{}-{}-{}.gif'.format(user.id,xp,rank[0]), images, format="GIF-PIL", duration=duration, subrectangles=True)
+            return discord.File('../cards/global/{}-{}-{}.gif'.format(user.id,xp,rank[0]))
 
-    async def add_overlay(self,pfp,user,card,xp,rank):
+    async def add_overlay(self,pfp,user,card,xp,rank,txt):
         img = Image.new('RGBA', (card.width, card.height), color = (250,250,250,0))
         img.paste(pfp, (20, 29))
         img.paste(card, (0, 0), card)
@@ -173,15 +196,16 @@ class XPCog(commands.Cog):
         levels_info = await self.calc_level(xp)
         temp = '{} / {} xp'.format(xp,levels_info[1])
         d.text((await self.calc_pos(temp,xp_fnt,625,237)), temp, font=xp_fnt, fill=colors['xp'])
-        d.text((380,140), 'NIVEAU', font=NIVEAU_fnt, fill=colors['NIVEAU'])
+        d.text((380,140), txt[0], font=NIVEAU_fnt, fill=colors[txt[0]])
         d.text((await self.calc_pos(str(levels_info[0]),levels_fnt,740,160,'right')), str(levels_info[0]), font=levels_fnt, fill=colors['xp'])
         temp = '{x[0]}/{x[1]}'.format(x=rank)
-        d.text((await self.calc_pos('RANG',RANK_fnt,893,147,'center')), 'RANG', font=RANK_fnt, fill=colors['rank'])
+        d.text((await self.calc_pos(txt[1],RANK_fnt,893,147,'center')), txt[1], font=RANK_fnt, fill=colors['rank'])
         d.text((await self.calc_pos(temp,rank_fnt,893,180,'center')), temp, font=rank_fnt, fill=colors['rank'])
         return img
 
 
     @commands.command(name='rank',hidden=True)
+    @commands.bot_has_permissions(send_messages=True)
     #@commands.cooldown(1,15,commands.BucketType.user)
     async def rank(self,ctx,*,user:args.user=None):
         """Display a user XP.
@@ -193,17 +217,48 @@ class XPCog(commands.Cog):
             xp = await self.bdd_get_xp(user.id)
             if xp==None or len(xp)==0:
                 if ctx.author==user:
-                    return await ctx.send("Vous ne possédez pas encore d'xp !")
-                return await ctx.send("Ce membre ne possède pas d'xp !")
+                    return await ctx.send(await self.translate(ctx.guild,'xp','1-no-xp'))
+                return await ctx.send(await self.translate(ctx.guild,'xp','2-no-xp'))
             xp = xp[0]['xp']
-            try:
-                await ctx.send(file=discord.File('../cards/global/{}-{}.{}'.format(user.id,xp,'gif' if user.is_avatar_animated() else 'png')))
-            except FileNotFoundError:
-                style = await self.bot.cogs['UtilitiesCog'].get_xp_style(user)
-                await ctx.send(file=await self.create_card(user,style,xp))
-                self.bot.log.debug("XP card for user {} ({}xp - style {})".format(user.id,xp,style))
+            ranks = sorted([(v[1],k) for k,v in self.cache.items()],reverse=True)
+            ranks_nb = await self.bdd_get_nber()
+            rank = ranks.index((xp,str(user.id)))+1
+            if ctx.channel.permissions_for(ctx.guild.me).attach_files:
+                await self.send_card(ctx,user,xp,rank,ranks_nb)
+            elif ctx.channel.permissions_for(ctx.guild.me).embed_links:
+                await self.send_embed(ctx,user,xp,rank,ranks_nb)
+            else:
+                await self.send_txt(ctx,user,xp,rank,ranks_nb)
         except Exception as e:
             await self.bot.cogs['ErrorsCog'].on_command_error(ctx,e)
+    
+    async def send_card(self,ctx,user,xp,rank,ranks_nb):
+        try:
+            await ctx.send(file=discord.File('../cards/global/{}-{}-{}.{}'.format(user.id,xp,rank,'gif' if user.is_avatar_animated() else 'png')))
+        except FileNotFoundError:
+            style = await self.bot.cogs['UtilitiesCog'].get_xp_style(user)
+            txts = [await self.translate(ctx.guild,'xp','card-level'), await self.translate(ctx.guild,'xp','card-rank')]
+            await ctx.send(file=await self.create_card(user,style,xp,[rank,ranks_nb],txts))
+            self.bot.log.debug("XP card for user {} ({}xp - style {})".format(user.id,xp,style))
+    
+    async def send_embed(self,ctx,user,xp,rank,ranks_nb):
+        txts = [await self.translate(ctx.guild,'xp','card-level'), await self.translate(ctx.guild,'xp','card-rank')]
+        levels_info = await self.calc_level(xp)
+        fields = list()
+        fields.append({'name':'XP','value':"{}/{}".format(xp,levels_info[1]),'inline':True})
+        fields.append({'name':txts[0],'value':levels_info[0],'inline':True})
+        fields.append({'name':txts[1],'value':"{}/{}".format(rank,ranks_nb),'inline':True})
+        emb = self.bot.cogs['EmbedCog'].Embed(fields=fields).set_author(user)
+        await ctx.send(embed=emb.discord_embed())
+    
+    async def send_txt(self,ctx,user,xp,rank,ranks_nb):
+        txts = [await self.translate(ctx.guild,'xp','card-level'), await self.translate(ctx.guild,'xp','card-rank')]
+        levels_info = await self.calc_level(xp)
+        msg = """__**{}**__
+**XP** {}/{}
+**{}** {}
+**{}** {}/{}""".format(user.name,xp,levels_info[1],txts[0],levels_info[0],txts[1],rank,ranks_nb)
+        await ctx.send(msg)
 
 
 def setup(bot):
