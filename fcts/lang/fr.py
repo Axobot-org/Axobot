@@ -64,7 +64,7 @@ errors={"cooldown":"Vous êtes en cooldown pour cette commande. Veuillez attendr
 "duration":"La durée `{0}` est invalide"}
 
 find={"user-0":"Nom : {}\nID : {}",
-"user-1":"Nom : {}\nID : {}\nServeurs : {}\nPropriétaire de : {}\nLangues : {}",
+"user-1":"Nom : {name}\nID : {id}\nServeurs : {servers}\nPropriétaire de : {own}\nLangues : {lang}\nA voté : {vote}",
 "user-2":"Utilisateur introuvable",
 "guild-0":"Serveur introuvable",
 "guild-1":"Nom : {}\nID : {}\nPropriétaire : {} ({})\nMembres : {} (dont {} bots)\nLangue : {}",
