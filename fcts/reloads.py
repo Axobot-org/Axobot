@@ -15,6 +15,8 @@ async def check_admin(ctx):
     return user in admins_id
 
 async def is_support_staff(ctx):
+    if ctx.author.id in admins_id:
+        return True
     server = ctx.bot.get_guild(356067272730607628)
     if server != None:
         member = server.get_member(ctx.author.id)
