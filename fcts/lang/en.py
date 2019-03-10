@@ -477,3 +477,8 @@ stats_infos={"not-found":"Unable to find {N}",
             "categ-1":"Position",
             "categ-2":"Text : {} | Vocal : {}",
              }
+
+xp = {'card-level':'LEVEL',
+        'card-rank':'RANK',
+        '1-no-xp':"You don't have any xp yet!",
+        '2-no-xp':"This member does not have any xp!"}

@@ -477,3 +477,8 @@ stats_infos={"not-found":"Unable 2 found {N}",
             "categ-1":"Posishun",
             "categ-2":"Textz : {} | Vocaal : {}",
              }
+
+xp = {'card-level':'LVL',
+        'card-rank':'SEAT',
+        '1-no-xp':"U don't have any xP yet!",
+        '2-no-xp':"Dis user doezn't have any xp!"}
