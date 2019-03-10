@@ -31,7 +31,7 @@ class user(commands.converter.IDConverter):
                 except:
                     pass
             return res
-        return commands.UserConverter().convert(ctx,argument)
+        return await commands.UserConverter().convert(ctx,argument)
 
 class infoType(commands.converter.IDConverter):
     def __init__(self):
