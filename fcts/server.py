@@ -712,11 +712,14 @@ class ServerCog(commands.Cog):
             elif option in emoji_option:
                 r = await self.conf_emoji(ctx,option,"scret-desc")
             else:
+                r = None
+            if r!=None:
+                try:
+                    r = str(await self.translate(ctx.guild,"server_desc",option)).format(r)
+                except Exception as e:
+                    pass
+            else:
                 r = await self.translate(ctx.guild.id,"server","change-0")
-            try:
-                r = str(await self.translate(ctx.guild,"server_desc",option)).format(r)
-            except Exception as e:
-                pass
             try:
                 if not ctx.channel.permissions_for(ctx.guild.me).embed_links:
                     await ctx.send(await self.translate(ctx.guild.id,"mc","cant-embed"))
