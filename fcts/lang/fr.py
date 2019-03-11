@@ -481,4 +481,9 @@ stats_infos={"not-found":"Impossible de trouver {N}",
 xp = {'card-level':'NIVEAU',
         'card-rank':'RANG',
         '1-no-xp':"Vous ne possédez pas encore d'xp !",
-        '2-no-xp':"Ce membre ne possède pas d'xp !"}
+        '2-no-xp':"Ce membre ne possède pas d'xp !",
+        "del-user":"<deleted user>",
+        "low-page":"Impossible d'afficher un numéro de page négatif !",
+        "high-page":"Il n'y a pas autant de pages !",
+        "top-title-1":"Classement global",
+        "top-name":"__Top {}-{} :__"}

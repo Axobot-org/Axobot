@@ -481,4 +481,9 @@ stats_infos={"not-found":"Unable 2 found {N}",
 xp = {'card-level':'LVL',
         'card-rank':'SEAT',
         '1-no-xp':"U don't have any xP yet!",
-        '2-no-xp':"Dis user doezn't have any xp!"}
+        '2-no-xp':"Dis user doezn't have any xp!",
+        "del-user":"<deleted usr>",
+        "low-page":"Oops, I can't display a negative page!",
+        "high-page":"There aren't so much pages!",
+        "top-title-1":"Global ranks",
+        "top-name":"__Bests {}-{} :__"}
