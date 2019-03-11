@@ -1,5 +1,6 @@
 import discord, random, time, asyncio, io, imageio, importlib
 from discord.ext import commands
+from math import ceil
 from PIL import Image, ImageDraw, ImageFont, ImageTk
 from urllib.request import urlopen, Request
 
@@ -12,6 +13,7 @@ class XPCog(commands.Cog):
         self.bot = bot
         self.cache = dict() # {ID : [date, xp]}
         self.levels = [0]
+        self.embed_color = discord.Colour(0xffcf50)
         self.table = 'xp_beta' if bot.beta else 'xp'
         self.cooldown = 30
         self.minimal_size = 5
@@ -181,6 +183,21 @@ class XPCog(commands.Cog):
         except Exception as e:
             await self.bot.cogs['ErrorsCog'].on_error(e,None)
         
+    async def bdd_get_rank(self,userID:int):
+        """Get the rank of a user"""
+        try:
+            cnx = self.bot.cogs['ServerCog'].connect()
+            cursor = cnx.cursor(dictionary = True)
+            query = ("SELECT `xp`, @curRank := @curRank + 1 AS rank FROM `{}` p, (SELECT @curRank := 0) r WHERE `banned`='0' ORDER BY xp desc;".format(self.table))
+            cursor.execute(query)
+            liste = list()
+            for x in cursor:
+                liste.append(x)
+            cnx.close()
+            return liste
+        except Exception as e:
+            await self.bot.cogs['ErrorsCog'].on_error(e,None)
+
 
     async def get_raw_image(self,url,size=282):
         req = Request(url, headers={'User-Agent': 'Mozilla/5.0'})
@@ -285,7 +302,7 @@ class XPCog(commands.Cog):
         fields.append({'name':'XP','value':"{}/{}".format(xp,levels_info[1]),'inline':True})
         fields.append({'name':txts[0],'value':levels_info[0],'inline':True})
         fields.append({'name':txts[1],'value':"{}/{}".format(rank,ranks_nb),'inline':True})
-        emb = self.bot.cogs['EmbedCog'].Embed(fields=fields).set_author(user)
+        emb = self.bot.cogs['EmbedCog'].Embed(fields=fields,color=self.embed_color).set_author(user)
         await ctx.send(embed=emb.discord_embed())
     
     async def send_txt(self,ctx,user,xp,rank,ranks_nb):
@@ -301,10 +318,38 @@ class XPCog(commands.Cog):
 
     @commands.command(name='top')
     @commands.bot_has_permissions(send_messages=True)
-    @commands.cooldown(1,15,commands.BucketType.user)
-    async def top(self,ctx,limit:int=20):
-        """Get the list of the highest levels"""
-        await ctx.send(await self.bdd_get_top(limit))
+    @commands.cooldown(5,60,commands.BucketType.user)
+    async def top(self,ctx,page:int=1):
+        """Get the list of the highest levels
+        Each page has 20 users"""
+        if page<1:
+            return await ctx.send(await self.translate(ctx.guild,"xp",'low-page'))
+        elif page>ceil(len(self.cache)/20)+1:
+            return await ctx.send(await self.translate(ctx.guild,"xp",'high-page'))
+        ranks = await self.bdd_get_top(20*page)
+        ranks = ranks[(page-1)*20:]
+        txt = list()
+        i = (page-1)*20
+        for u in ranks:
+            i +=1
+            user = self.bot.get_user(u['userID'])
+            if user==None:
+                try:
+                    user = await self.bot.get_user_info(u['userID'])
+                except discord.NotFound:
+                    user = await self.translate(ctx.guild,'xp','del-user')
+            if isinstance(user,discord.User):
+                user = await self.bot.cogs['UtilitiesCog'].remove_markdown(user.name.replace('|',''))
+                if len(user)>18:
+                    user = user[:15]+'...'
+            l = await self.calc_level(u['xp'])
+            txt.append('{} • **{} |** `lvl {}` **|** `xp {}`'.format(i,user,l[0],u['xp']))
+        f_name = str(await self.translate(ctx.guild,'xp','top-name')).format((page-1)*20+1,i)
+        if ctx.channel.permissions_for(ctx.guild.me).embed_links:
+            emb = self.bot.cogs['EmbedCog'].Embed(title=await self.translate(ctx.guild,'xp','top-title-1'),fields=[{'name':f_name,'value':"\n".join(txt)}],color=self.embed_color,author_icon=self.bot.user.avatar_url_as(format='png')).create_footer(ctx.author)
+            await ctx.send(embed=emb.discord_embed())
+        else:
+            await ctx.send(f_name+"\n\n"+'\n'.join(txt))
 
 
 def setup(bot):
