@@ -318,6 +318,12 @@ class UtilitiesCog(commands.Cog):
         except:
             pass
 
+    async def remove_markdown(self,txt):
+        for x in ('||','*','__','~~'):
+            txt = txt.replace(x,'')
+        return txt
+
+
 
 def setup(bot):
     bot.add_cog(UtilitiesCog(bot))
