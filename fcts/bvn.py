@@ -161,9 +161,9 @@ class WelcomerCog(commands.Cog):
         try:
             t = "Bot" if member.bot else "Member"
             if Type == "welcome":
-                desc = "{} {} ({}) joined the server {}".format(t,member,member.id,member.guild.id)
+                desc = "{} {} ({}) joined {} ({})".format(t,member,member.id,member.guild.name,member.guild.id)
             else:
-                desc = "{} {} ({}) left the server {}".format(t,member,member.id,member.guild.id)
+                desc = "{} {} ({}) left {} ({})".format(t,member,member.id,member.guild.name,member.guild.id)
             emb = self.bot.cogs["EmbedCog"].Embed(desc=desc,color=16098851).update_timestamp().set_author(self.bot.user)
             await self.bot.cogs["EmbedCog"].send([emb])
             self.bot.log.info(desc)
