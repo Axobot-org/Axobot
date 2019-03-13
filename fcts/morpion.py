@@ -5,7 +5,7 @@ class MorpionCog(commands.Cog):
 
     def __init__(self,bot):
         self.bot = bot
-        self.entrees_valides = '123456789'
+        self.entrees_valides = [str(x) for x in range(1,10)]
         self.file = 'morpion'
         self.compositions_gagnantes = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]]
         try:
@@ -35,10 +35,6 @@ class MorpionCog(commands.Cog):
                 else:
                     affichage_grille += ':large_blue_circle:'
         return affichage_grille
-
-    async def test_saisie_valide(self,saisie):
-        """Test si la valeur saisie par la joueur est valide"""
-        return False if str(saisie) not in self.entrees_valides else True
 
     async def test_place_valide(self,grille,saisie):
         """Test si la place saisie par le joueur est libre"""
@@ -79,25 +75,30 @@ The bot plays in red, the user in blue.
             def check(m):
                 # return m.content in [str(x) for x in range(1,10)] and m.channel == ctx.channel and m.author==ctx.author
                 return m.channel == ctx.channel and m.author==ctx.author
+            display_grille = True
             while await self.test_cases_vides(grille):
             ###
                 if tour == True:   #Si c'est au joueur
-                    await ctx.send(await self.afficher_grille(grille))
+                    if display_grille:
+                        await ctx.send(await self.afficher_grille(grille))
+                    display_grille = True
                     try:
                         msg = await self.bot.wait_for('message', check=check,timeout=50)
                     except asyncio.TimeoutError:
                         await ctx.channel.send(await self.translate(ctx.guild,'morpion','too-late'))
                         return
                     saisie = msg.content
-                    if await self.test_saisie_valide(saisie) == True:
+                    if msg.content in self.entrees_valides:
                         if await self.test_place_valide(grille,saisie) == True:
                             grille = await self.remplacer_valeur(grille,tour,saisie)
                             tour = False
                         else :
                             await ctx.send(await self.translate(ctx.guild,'morpion','pion-1'))
+                            display_grille = False
                             continue
                     else :
                         await ctx.send(await self.translate(ctx.guild,'morpion','pion-2'))
+                        display_grille = False
                         continue
             ###
                 else :  #Si c'est à l'ordinateur
@@ -111,7 +112,7 @@ The bot plays in red, the user in blue.
                                 saisie = k
                                 break
                     #Test si la saisie est valide
-                    if await self.test_saisie_valide(saisie) == True:
+                    if str(saisie) in self.entrees_valides:
                         if await self.test_place_valide(grille,saisie) == True:
                             grille = await self.remplacer_valeur(grille,tour,saisie)
                             tour = True
@@ -119,6 +120,7 @@ The bot plays in red, the user in blue.
                             continue
                     else:
                         continue
+                    display_grille = True
             ###
                 if await self.test_win(grille) == True:
                     resultat = await self.resultat_final(tour,ctx.guild)
