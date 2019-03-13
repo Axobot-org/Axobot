@@ -64,11 +64,15 @@ class AdminCog(commands.Cog):
         if enable:
             if ctx.guild.id not in self.god_mode:
                 self.god_mode.append(ctx.guild.id)
-            await ctx.send("<:nitro:548569774435598346> Mode superadmin activé sur ce serveur")
+                await ctx.send("<:nitro:548569774435598346> Mode superadmin activé sur ce serveur",delete_after=3)
+            else:
+                await ctx.send("Mode superadmin déjà activé sur ce serveur",delete_after=3)
         else:
             if ctx.guild.id in self.god_mode:
                 self.god_mode.remove(ctx.guild.id)
-            await ctx.send("Mode superadmin désactivé sur ce serveur")
+                await ctx.send("Mode superadmin désactivé sur ce serveur",delete_after=3)
+            else:
+                await ctx.send("Ce mode n'est pas actif ici",delete_after=3)
 
     @commands.command(name='spoil',hidden=True)
     @commands.check(reloads.check_admin)
