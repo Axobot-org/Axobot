@@ -77,8 +77,22 @@ class TimedCog(commands.Cog):
     @commands.cooldown(5,20, commands.BucketType.guild)
     @commands.guild_only()
     @commands.check(checks.can_mute)
-    async def test(self,ctx,user:discord.Member,time:commands.Greedy[args.tempdelta],*,reason="Unspecified"):
+    async def tempmute(self,ctx,user:discord.Member,time:commands.Greedy[args.tempdelta],*,reason="Unspecified"):
+        """Mute a member for a defined duration
+The bot can currently have up to 30 sec of latency. If it has more, check if you didn't remove the "Manage Roles" permission.
+Durations : 
+`XXm` : XX minutes
+`XXh` : XX hours
+`XXd` : XX days
+Example: tempmute @someone 1d 3h Reason is becuz he's a bad guy
+"""
         duration = sum(time)
+        if duration==0:
+            try:
+                raise commands.errors.BadArgument('Invalid duration: 0s')
+            except Exception as e:
+                await self.bot.cogs['ErrorsCog'].on_cmd_error(ctx,e)
+                return
         f_duration = await self.bot.cogs['TimeCog'].time_delta(duration,lang='en',form='temp',precision=0)
         try:
             if self.bot.database_online and await self.bot.cogs["ServerCog"].staff_finder(user,"mute") or user==ctx.guild.me:
