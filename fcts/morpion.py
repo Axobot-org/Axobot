@@ -61,7 +61,7 @@ class MorpionCog(commands.Cog):
         """Renvoie True s'il reste des cases vides"""
         return grille.count('O') +grille.count('X') != 9
 
-    @commands.command(name="morpion",aliases=['crab'])
+    @commands.command(name="crab",aliases=['morpion'])
     async def main(self,ctx):
         """A simple mini-game that consists of aligning three chips on a 9-square grid.
 The bot plays in red, the user in blue.
