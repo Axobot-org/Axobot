@@ -73,6 +73,10 @@ class AdminCog(commands.Cog):
                 await ctx.send("Mode superadmin désactivé sur ce serveur",delete_after=3)
             else:
                 await ctx.send("Ce mode n'est pas actif ici",delete_after=3)
+        try:
+            await ctx.message.delete()
+        except:
+            pass
 
     @commands.command(name='spoil',hidden=True)
     @commands.check(reloads.check_admin)
