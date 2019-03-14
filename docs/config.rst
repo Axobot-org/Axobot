@@ -1,6 +1,6 @@
-=============
-Server config
-=============
+====================
+Server configuration
+====================
 
 Recently, ZBot has features that can be modified per server, to make each server unique. You will find the language of the bot, the activation of certain options (such as the xp system), the list of roles authorized to use certain commands (ban, clear...), the welcome messages, and many other options. 
 
