@@ -61,6 +61,7 @@ class ServerCog(commands.Cog):
     @commands.Cog.listener()
     async def on_ready(self):
         self.translate = self.bot.cogs["LangCog"].tr
+        self.table = 'servers_beta' if self.bot.beta else 'servers'
 
 
     async def get_bot_infos(self,botID):
