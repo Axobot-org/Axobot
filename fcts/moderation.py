@@ -362,7 +362,7 @@ class ModeratorCog(commands.Cog):
     @commands.cooldown(5,20, commands.BucketType.guild)
     @commands.guild_only()
     @commands.check(checks.can_ban)
-    async def ban(self,ctx,user,days_to_delete:typing.Optional[int]=0,reason="Unspecified"):
+    async def ban(self,ctx,user,days_to_delete:typing.Optional[int]=0,*,reason="Unspecified"):
         """Ban someone
         The 'days_to_delete' option represents the number of days worth of messages to delete from the user in the guild, bewteen 0 and 7
         """
