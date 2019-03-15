@@ -814,31 +814,29 @@ class RssCog(commands.Cog):
         return mysql.connector.connect(user=self.bot.database_keys['user'],password=self.bot.database_keys['password'],host=self.bot.database_keys['host'],database=self.bot.database_keys['database'])
 
     async def get_flow(self,ID):
-        cnx = self.connect()
+        cnx = self.bot.cnx
         cursor = cnx.cursor(dictionary = True)
         query = ("SELECT * FROM `{}` WHERE `ID`='{}'".format(self.table,ID))
         cursor.execute(query)
         liste = list()
         for x in cursor:
             liste.append(x)
-        cnx.close()
         return liste
 
     async def get_guild_flows(self,guildID):
         """Get every flow of a guild"""
-        cnx = self.connect()
+        cnx = self.bot.cnx
         cursor = cnx.cursor(dictionary = True)
         query = ("SELECT * FROM `{}` WHERE `guild`='{}'".format(self.table,guildID))
         cursor.execute(query)
         liste = list()
         for x in cursor:
             liste.append(x)
-        cnx.close()
         return liste
 
     async def add_flow(self,guildID,channelID,Type,link):
         """Add a flow in the database"""
-        cnx = self.connect()
+        cnx = self.bot.cnx
         cursor = cnx.cursor()
         ID = await self.create_id(channelID,guildID,Type,link)
         if Type == 'mc':
@@ -848,35 +846,32 @@ class RssCog(commands.Cog):
         query = ("INSERT INTO `{}` (`ID`,`guild`,`channel`,`type`,`link`,`structure`) VALUES ('{}','{}','{}','{}','{}','{}')".format(self.table,ID,guildID,channelID,Type,link,form))
         cursor.execute(query)
         cnx.commit()
-        cnx.close()
         return True
 
     async def remove_flow(self,ID):
         """Remove a flow from the database"""
         if type(ID)!=int:
             raise ValueError
-        cnx = self.connect()
+        cnx = self.bot.cnx
         cursor = cnx.cursor()
         query = ("DELETE FROM `{}` WHERE `ID`='{}'".format(self.table,ID))
         cursor.execute(query)
         cnx.commit()
-        cnx.close()
         return True
 
     async def get_all_flows(self):
         """Get every flow of the database"""
-        cnx = self.connect()
+        cnx = self.bot.cnx
         cursor = cnx.cursor(dictionary = True)
         query = ("SELECT * FROM `{}` WHERE 1".format(self.table))
         cursor.execute(query)
         liste = list()
         for x in cursor:
             liste.append(x)
-        cnx.close()
         return liste
 
     async def update_flow(self,ID,values=[(None,None)]):
-        cnx = self.connect()
+        cnx = self.bot.cnx
         cursor = cnx.cursor()
         v = list()
         for x in values:
@@ -889,7 +884,6 @@ class RssCog(commands.Cog):
         query = """UPDATE `{t}` SET {v} WHERE `ID`={id}""".format(t=self.table,v=",".join(v),id=ID)
         cursor.execute(query)
         cnx.commit()
-        cnx.close()
 
     async def send_rss_msg(self,obj,channel):
         if not channel == None:

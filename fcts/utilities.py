@@ -29,14 +29,13 @@ class UtilitiesCog(commands.Cog):
         if str(guild.id) in self.list_prefixs.keys():
             return self.list_prefixs[str(guild.id)]
         else:
-            cnx = self.bot.cogs['ServerCog'].connect()
+            cnx = self.bot.cogs['ServerCog'].bot.cnx
             cursor = cnx.cursor(dictionary = True)
             cursor.execute("SELECT `prefix` FROM `{}` WHERE `ID`={}".format(self.bot.cogs["ServerCog"].table,guild.id))
             liste = list()
             for x in cursor:
                 if len(x['prefix'])>0:
                     liste.append(x['prefix'])
-            cnx.close()
             if liste == []:
                 self.list_prefixs[str(guild.id)] = '!'
                 return '!'
@@ -237,7 +236,7 @@ class UtilitiesCog(commands.Cog):
         await self.bot.wait_until_ready()
         if type(columns)!=list or type(criters)!=list:
             raise ValueError
-        cnx = self.bot.cogs['ServerCog'].connect()
+        cnx = self.bot.cnx
         cursor = cnx.cursor(dictionary = True)
         if columns == []:
             cl = "*"
@@ -249,7 +248,6 @@ class UtilitiesCog(commands.Cog):
         liste = list()
         for x in cursor:
             liste.append(x)
-        cnx.close()
         if len(liste)==1:
             return liste[0]
         elif len(liste)>1:

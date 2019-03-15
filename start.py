@@ -72,6 +72,13 @@ class zbot(commands.bot.BotBase,discord.Client):
         self.database_keys = dict()
         self.log = logging.getLogger("runner")
         self.dbl_token = dbl_token
+        self.cnx = None
+    
+    def connect_database(self):
+        if len(self.database_keys)>0:
+            self.cnx = mysql.connector.connect(user=self.database_keys['user'],password=self.database_keys['password'],host=self.database_keys['host'],database=self.database_keys['database'])
+        else:
+            raise ValueError(dict)
     
     async def user_avatar_as(self,user,size=512):
         """Get the avatar of an user, format gif or png (as webp isn't supported by some browsers)"""
@@ -166,6 +173,9 @@ def main():
         print("---- ACCES IMPOSSIBLE A LA DATABASE ----")
         print(e)
         client.database_online = False
+
+    if client.database_online:
+        client.connect_database()
 
     client.dbl_token = tokens.get_dbl_token()
 

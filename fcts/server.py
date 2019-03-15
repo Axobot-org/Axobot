@@ -69,21 +69,20 @@ class ServerCog(commands.Cog):
         """return every options of a server"""
         if not self.bot.database_online:
             return list()
-        cnx = self.connect()
+        cnx = self.bot.cnx
         cursor = cnx.cursor(dictionary=True)
         query = ("SELECT * FROM `bot_infos` WHERE `ID`={}".format(botID))
         cursor.execute(query)
         liste = list()
         for x in cursor:
             liste.append(x)
-        cnx.close()
         return liste
     
     async def edit_bot_infos(self,botID,values=[()]):
         if type(values)!=list:
             raise ValueError
         v = list()
-        cnx = self.connect()
+        cnx = self.bot.cnx
         cursor = cnx.cursor()
         for x in values:
             if type(x) == bool:
@@ -93,14 +92,13 @@ class ServerCog(commands.Cog):
         query = ("UPDATE `bot_infos` SET {v} WHERE `ID`='{id}'".format(v=",".join(v),id=botID))
         cursor.execute(query)
         cnx.commit()
-        cnx.close()
         return True
 
     async def get_languages(self,ignored_guilds):
         """Return percentages of languages"""
         if not self.bot.database_online:
             return list()
-        cnx = self.connect()
+        cnx = self.bot.cnx
         cursor = cnx.cursor(dictionary=True)
         query = ("SELECT `language`,`ID` FROM `{}` WHERE 1".format(self.table))
         cursor.execute(query)
@@ -110,7 +108,6 @@ class ServerCog(commands.Cog):
                 liste.append(x['language'])
         for e,l in enumerate(self.bot.cogs['LangCog'].languages):
             langs.append((l,liste.count(e)))
-        cnx.close()
         return langs
 
 
@@ -149,7 +146,7 @@ class ServerCog(commands.Cog):
         await self.bot.wait_until_ready()
         if type(columns)!=list or type(criters)!=list:
             raise ValueError
-        cnx = self.connect()
+        cnx = self.bot.cnx
         cursor = cnx.cursor(dictionary = (Type==dict))
         if columns == []:
             cl = "*"
@@ -161,14 +158,13 @@ class ServerCog(commands.Cog):
         liste = list()
         for x in cursor:
             liste.append(x)
-        cnx.close()
         return liste    
 
     async def modify_server(self,ID,values=[()],channel=None):
         if type(values)!=list:
             raise ValueError
         v = list()
-        cnx = self.connect()
+        cnx = self.bot.cnx
         cursor = cnx.cursor()
         for x in values:
             if type(x) == bool:
@@ -178,7 +174,6 @@ class ServerCog(commands.Cog):
         query = ("UPDATE `{t}` SET {v} WHERE `ID`='{id}'".format(t=self.table,v=",".join(v),id=ID))
         cursor.execute(query)
         cnx.commit()
-        cnx.close()
         return True
 
     async def delete_option(self,ID,opt,channel=None):
@@ -197,12 +192,11 @@ class ServerCog(commands.Cog):
         if type(ID) == str:
             if not ID.isnumeric():
                 raise ValueError
-        cnx = self.connect()
+        cnx = self.bot.cnx
         cursor = cnx.cursor()
         query = ("INSERT INTO `{}` (`ID`) VALUES ('{}')".format(self.table,ID))
         cursor.execute(query)
         cnx.commit()
-        cnx.close()
         return True
 
     async def is_server_exist(self,ID,channel=None):
@@ -222,12 +216,11 @@ class ServerCog(commands.Cog):
         """remove a server from the db"""
         if type(ID)!=int:
             raise ValueError
-        cnx = self.connect()
+        cnx = self.bot.cnx
         cursor = cnx.cursor()
         query = ("DELETE FROM `{}` WHERE `ID`='{}'".format(self.table,ID))
         cursor.execute(query)
         cnx.commit()
-        cnx.close()
         return True
 
                  

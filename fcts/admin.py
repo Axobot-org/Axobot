@@ -233,6 +233,7 @@ class AdminCog(commands.Cog):
         await m.edit(content="Bot en voie d'extinction")
         await self.bot.change_presence(status=discord.Status('offline'))
         self.bot.log.info("Fermeture du bot")
+        self.bot.cnx.close()
         await self.bot.logout()
         await self.bot.close()
 

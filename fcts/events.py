@@ -168,7 +168,7 @@ class Events(commands.Cog):
     async def get_events_from_db(self,all=False,IDonly=False):
         """Renvoie une liste de tous les events qui doivent être exécutés"""
         try:
-            cnx = self.bot.cogs['ServerCog'].connect()
+            cnx = self.bot.cnx
             cursor = cnx.cursor(dictionary = True)
             if IDonly:
                 query = ("SELECT `ID` FROM `timed`")
@@ -182,7 +182,6 @@ class Events(commands.Cog):
                 else:
                     if IDonly or x['begin'].timestamp()+x['duration'] < time.time():
                         liste.append(x)
-            cnx.close()
             if len(liste)>0:
                 return liste
             else:
@@ -218,7 +217,7 @@ class Events(commands.Cog):
         for t in tasks:
             if t['user']==userID and t['guild']==guildID and t['action']==action:
                 return await self.update_duration(t['ID'],duration)
-        cnx = self.bot.cogs['ServerCog'].connect()
+        cnx = self.bot.cnx
         cursor = cnx.cursor()
         ids = await self.get_events_from_db(all=True,IDonly=True)
         if len(ids)>0:
@@ -228,27 +227,24 @@ class Events(commands.Cog):
         query = ("INSERT INTO `timed` (`ID`,`guild`,`user`,`action`,`duration`) VALUES ({},{},{},'{}',{})".format(ID,guildID,userID,action,duration))
         cursor.execute(query)
         cnx.commit()
-        cnx.close()
         return True
 
     async def update_duration(self,ID,new_duration):
         """Modifie la durée d'une tâche"""
-        cnx = self.bot.cogs['ServerCog'].connect()
+        cnx = self.bot.cnx
         cursor = cnx.cursor()
         query = ("UPDATE `timed` SET `duration`={} WHERE `ID`={}".format(new_duration,ID))
         cursor.execute(query)
         cnx.commit()
-        cnx.close()
         return True
 
     async def remove_task(self,ID:int):
         """Enlève une tâche exécutée"""
-        cnx = self.bot.cogs['ServerCog'].connect()
+        cnx = self.bot.cnx
         cursor = cnx.cursor()
         query = ("DELETE FROM `timed` WHERE `timed`.`ID` = {}".format(ID))
         cursor.execute(query)
         cnx.commit()
-        cnx.close()
         return True
 
     async def loop(self):

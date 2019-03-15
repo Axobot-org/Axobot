@@ -32,12 +32,11 @@ class TimedCog(commands.Cog):
         """add a new server to the db"""
         if not all([type(x)==int for x in (user,guild,begin,duration)]):
             raise ValueError
-        cnx = self.connect()
+        cnx = self.bot.cnx
         cursor = cnx.cursor()
         query = ("INSERT INTO `{}` (`guild`,`user`,`action`,`begin`,`duration`) VALUES ('{}','{}','{}','{}','{}')".format(self.table,guild,user,action,begin,duration))
         cursor.execute(query)
         cnx.commit()
-        cnx.close()
         return True
 
     async def get_infos(self,columns=[],criters=["ID>1"],relation="AND",Dict=True):
@@ -45,7 +44,7 @@ class TimedCog(commands.Cog):
         await self.bot.wait_until_ready()
         if type(columns)!=list or type(criters)!=list:
             raise ValueError
-        cnx = self.connect()
+        cnx = self.bot.cnx
         cursor = cnx.cursor(dictionary = Dict)
         if columns == []:
             cl = "*"
@@ -57,19 +56,17 @@ class TimedCog(commands.Cog):
         liste = list()
         for x in cursor:
             liste.append(x)
-        cnx.close()
         return liste
     
     async def delete_server(self,user,guild,action):
         """remove a server from the db"""
         if type(user)!=int or type(guild)!=int:
             raise ValueError
-        cnx = self.connect()
+        cnx = self.bot.cnx
         cursor = cnx.cursor()
         query = ("DELETE FROM `{}` WHERE `user`='{}' AND `guild`='{}' AND `action`='{}'".format(self.table,user,guild,action))
         cursor.execute(query)
         cnx.commit()
-        cnx.close()
         return True
 
 
