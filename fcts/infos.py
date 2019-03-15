@@ -492,6 +492,7 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
 
     @commands.command(name="membercount",aliases=['member_count'])
     @commands.guild_only()
+    @commands.bot_has_permissions(send_messages=True)
     async def membercount(self,ctx):
         """Get some digits on the number of server members"""
         if ctx.channel.permissions_for(ctx.guild.me).send_messages==False:
