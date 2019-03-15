@@ -10,7 +10,7 @@ roles_options = ["clear","slowmode","mute","kick","ban","warn","say","gived_role
 bool_options = ["save_roles","enable_xp","anti_caps_lock","enable_fun","help_in_dm"]
 textchan_options = ["hunter","welcome_channel","bot_news","poll_channels","modlogs_channel"]
 vocchan_options = ["membercounter"]
-text_options = ["welcome","leave"]
+text_options = ["welcome","leave","levelup_msg"]
 prefix_options = ['prefix']
 emoji_option = ['vote_emojis']
 numb_options = []
@@ -48,6 +48,7 @@ class ServerCog(commands.Cog):
                "poll_channels":"",
                "modlogs_channel":"",
                "enable_xp":1,
+               "levelup_msg":'',
                "anti_caps_lock":1,
                "enable_fun":1,
                "prefix":'!',
