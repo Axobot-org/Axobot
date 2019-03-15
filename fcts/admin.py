@@ -262,7 +262,7 @@ class AdminCog(commands.Cog):
         if self.bot.database_online:
             for x in self.bot.guilds:
                 await self.bot.cogs["ServerCog"].update_memberChannel(x)
-            await ctx.send(":ok_hand:")
+            await ctx.bot.cogs['UtilitiesCog'].add_check_reaction(ctx.message)
         else:
             await ctx.send("Impossible de faire ceci, la base de donnée est inaccessible")
 
@@ -424,10 +424,6 @@ class AdminCog(commands.Cog):
         """Affiche les <lines> derniers logs ayant <match> dedans"""
         try:
             with open('debug.log','r',encoding='utf-8') as file:
-                #try:
-                    #file.seek(-300*lines,2)
-                #except:
-                    #pass
                 text = file.read().split("\n")
             msg = str()
             liste = list()
@@ -599,6 +595,7 @@ class AdminCog(commands.Cog):
         new_ctx = await self.bot.get_context(msg)
         #new_ctx.db = ctx.db
         await self.bot.invoke(new_ctx)
+        await ctx.bot.cogs['UtilitiesCog'].add_check_reaction(ctx.message)
 
     async def backup_auto(self,ctx=None):
         """Crée une backup du code"""
@@ -641,6 +638,7 @@ class AdminCog(commands.Cog):
         chan = ctx.bot.get_channel(548138866591137802) if self.bot.beta else ctx.bot.get_channel(488769306524385301)
         msg = await chan.send(embed=emb.discord_embed())
         await self.bot.cogs['FunCog'].add_vote(msg)
+        await ctx.bot.cogs['UtilitiesCog'].add_check_reaction(ctx.message)
 
     
 

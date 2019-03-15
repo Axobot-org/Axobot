@@ -315,6 +315,8 @@ class UtilitiesCog(commands.Cog):
                 await message.add_reaction(emoji)
             else:
                 await message.add_reaction('\u2705')
+        except discord.Forbidden:
+            await message.channel.send(":ok:")
         except:
             pass
 
