@@ -38,6 +38,9 @@ class ErrorsCog(commands.Cog):
         if isinstance(error, ignored):
             return
         elif isinstance(error,commands.CommandOnCooldown):
+            if await self.bot.cogs['AdminCog'].check_if_admin(ctx):
+                await ctx.reinvoke()
+                return
             await ctx.send(str(await self.translate(ctx.guild,'errors','cooldown')).format(round(error.retry_after,2)))
             return
         elif isinstance(error,(commands.BadArgument,commands.BadUnionArgument)):
