@@ -63,7 +63,7 @@ Clear
 
 **Syntax:** :code:`clear <number> [parameters]`
 
-This command allows you to efficiently delete messages, with a list of possible parameters for more accuracy. You can thus specify a list of members to check by mentioning them, `+i` to delete all messages containing files/images, `+l` for those containing links or Discord invitations, `+p` for pinned messages. By default, the bot will not delete pinned messages
+This command allows you to efficiently delete messages, with a list of possible parameters for more accuracy. You can thus specify a list of members to check by mentioning them, `+i` to delete all messages containing files/images, `+l` for those containing links or Discord invitations, `+p` for pinned messages. By default, the bot will not delete pinned messages.
 
 Be careful, all specified settings must be validated for the message to be deleted. For example, if you enter :code:`clear 10 @Z_runner#7515 +i`, the bot will check in the last ten messages if the message comes from Z_runner#7515 AND if the message contains an image. 
 
@@ -107,7 +107,7 @@ The ban allows you to instantly ban a member from your server. This means that t
 
 To cancel this action, use the Discord interface or the `unban <#unban>`_ command. The member will nevertheless have to decide for himself if he wishes to return to your server.
 
-.. warning:: For the command to succeed, the bot must have "`Ban members <perms.html#ban-members>`_" permissions and be placed higher than the highest role of that member.
+
 
 
 **Syntax:** :code:`unban <user> [reason]`
@@ -116,7 +116,7 @@ This command allows you to revoke a ban, whether it was made via this bot or not
 
 The persons authorized to use this command are the same as for the `ban <#ban>`_ command(see the :code:`config` command). 
 
-.. warning:: For the command to succeed, the bot must have "`Ban members <perms.html#ban-members>`_" permissions.
+.. warning:: For both commands to succeed, the bot must have "`Ban members <perms.html#ban-members>`_" permissions (as well as be placed higher than the highest role of the member to ban).
 
 -------
 Banlist
