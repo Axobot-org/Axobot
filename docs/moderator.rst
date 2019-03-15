@@ -97,9 +97,9 @@ This command allows you to expel a member from your server, such as kick. But in
 
 .. warning:: For this command, the bot needs "`Ban members <perms.html#ban-members>`_" permission, and you need to have a role to use the "`kick <#kick>`_" command
 
----
-Ban
----
+--------
+Ban/Unan
+--------
 
 **Syntax:** :code:`ban <user> [days_to_delete] [reason]`
 
@@ -109,9 +109,6 @@ To cancel this action, use the Discord interface or the `unban <#unban>`_ comman
 
 .. warning:: For the command to succeed, the bot must have "`Ban members <perms.html#ban-members>`_" permissions and be placed higher than the highest role of that member.
 
------
-Unban
------
 
 **Syntax:** :code:`unban <user> [reason]`
 
