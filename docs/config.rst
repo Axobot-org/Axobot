@@ -65,7 +65,7 @@ List of every option
 * modlogs_channel: Channel where all moderation logs (ban, warn, clear...) will be sent.
 * save_roles: Boolean indicating if the bot should restore the roles of a member leaving then rejoining the server. All roles below the ZBot role will be redistributed. :code:`False` by default.
 * poll_channels: List of channels in which the bot will add the reactions 👍 and 👎 to each message
-* enable_xp: Boolean indicating whether the xp system is activated (documentation in preparation). Default is :code:`True`.
+* enable_xp: Boolean indicating whether the xp system is activated. Default is :code:`True`.
 * anti_caps_lock: Boolean indicating whether the bot should send a warning message when a message with too much capitalization is sent. Default is True.
 * enable_fun: Boolean indicating if the fun part (documentation in preparation) is activated. If so, all commands in this section will be available. Default is :code:`True`.
 * membercounter: A voice salon whose name displays the number of members on the server
