@@ -12,11 +12,6 @@ class TimedCog(commands.Cog):
         self.bot = bot
         self.file = 'timed'
         self.table = 'timed'
-        self.usable_actions = ['mute','ban']
-        try:
-            self.connect = bot.cogs['ServerCog'].connect
-        except:
-            pass
         try:
             self.translate = bot.cogs['LangCog'].tr
         except:
@@ -24,7 +19,6 @@ class TimedCog(commands.Cog):
     
     @commands.Cog.listener()
     async def on_ready(self):
-        self.connect = self.bot.cogs['ServerCog'].connect
         self.translate = self.bot.cogs['LangCog'].tr
 
 
