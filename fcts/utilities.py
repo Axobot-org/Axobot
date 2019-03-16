@@ -323,6 +323,19 @@ class UtilitiesCog(commands.Cog):
             txt = txt.replace(x,'')
         return txt
 
+    async def allowed_card_styles(self,user):
+        """Retourne la liste des styles autorisées pour la carte d'xp de cet utilisateur"""
+        liste = ['blue','dark','green','grey','orange','purple','red','turquoise','yellow']
+        liste2 = []
+        if await self.is_support(user):
+            liste2.append('support')
+        if await self.is_contributor(user):
+            liste2.append('contributor')
+        if await self.is_premium(user):
+            liste2.append('premium')
+        if await self.bot.cogs['AdminCog'].check_if_admin(user):
+            liste2.append('admin')
+        return sorted(liste2)+sorted(liste)
 
 
 def setup(bot):
