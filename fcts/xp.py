@@ -221,10 +221,10 @@ class XPCog(commands.Cog):
         elif align=='right':
             return x-w,y-h/2
 
-    async def create_card(self,user,style,xp,rank=[1,0],txt=['NIVEAU','RANG']):
+    async def create_card(self,user,style,xp,rank=[1,0],txt=['NIVEAU','RANG'],force_static=False):
         """Crée la carte d'xp pour un utilisateur"""
         card = Image.open("../cards/model/{}.png".format(style))
-        if not user.is_avatar_animated():
+        if not user.is_avatar_animated() or force_static:
             pfp = await self.get_raw_image(user.avatar_url_as(format='png',size=256))
             img = await self.add_overlay(pfp.resize(size=(282,282)),user,card,xp,rank,txt)
             img.save('../cards/global/{}-{}-{}.png'.format(user.id,xp,rank[0]))
