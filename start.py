@@ -76,7 +76,7 @@ class zbot(commands.bot.BotBase,discord.Client):
     
     @property
     def cnx(self):
-        if self._cnx[1] + 1400 < round(time.time()):
+        if self._cnx[1] + 1200 < round(time.time()): # 20min
             self.connect_database()
             self._cnx[1] = round(time.time())
             return self._cnx[0]
@@ -85,6 +85,9 @@ class zbot(commands.bot.BotBase,discord.Client):
     
     def connect_database(self):
         if len(self.database_keys)>0:
+            if self._cnx[0] != None:
+                self._cnx[0].close()
+            self.log.info('Connection à MySQL (user {})'.format(self.database_keys['user']))
             self._cnx[0] = mysql.connector.connect(user=self.database_keys['user'],password=self.database_keys['password'],host=self.database_keys['host'],database=self.database_keys['database'])
             self._cnx[1] = round(time.time())
         else:
@@ -155,9 +158,9 @@ def main():
                       'fcts.embeds',
                       'fcts.events',
                       'fcts.timed',
-                      'fcts.secret',
                       'fcts.morpion',
-                      'fcts.xp'
+                      'fcts.xp',
+                      'fcts.users'
     ]
     # Suppression du fichier debug.log s'il est trop volumineux
     if os.path.exists("debug.log"):
