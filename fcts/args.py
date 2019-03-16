@@ -42,3 +42,13 @@ class infoType(commands.converter.IDConverter):
             return argument
         else:
             raise commands.errors.BadArgument('Invalid type: '+argument)
+
+class cardStyle(commands.converter.IDConverter):
+    def __init__(self):
+        pass
+    
+    async def convert(self,ctx,argument):
+        if argument in await ctx.bot.cogs['UtilitiesCog'].allowed_card_styles(ctx.author):
+            return argument
+        else:
+            raise commands.errors.BadArgument('Invalid card style: '+argument)
