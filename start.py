@@ -72,11 +72,21 @@ class zbot(commands.bot.BotBase,discord.Client):
         self.database_keys = dict()
         self.log = logging.getLogger("runner")
         self.dbl_token = dbl_token
-        self.cnx = None
+        self._cnx = [None,0]
+    
+    @property
+    def cnx(self):
+        if self._cnx[1] + 1400 < round(time.time()):
+            self.connect_database()
+            self._cnx[1] = round(time.time())
+            return self._cnx[0]
+        else:
+            return self._cnx[0]
     
     def connect_database(self):
         if len(self.database_keys)>0:
-            self.cnx = mysql.connector.connect(user=self.database_keys['user'],password=self.database_keys['password'],host=self.database_keys['host'],database=self.database_keys['database'])
+            self._cnx[0] = mysql.connector.connect(user=self.database_keys['user'],password=self.database_keys['password'],host=self.database_keys['host'],database=self.database_keys['database'])
+            self._cnx[1] = round(time.time())
         else:
             raise ValueError(dict)
     
