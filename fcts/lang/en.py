@@ -487,4 +487,5 @@ xp = {'card-level':'LEVEL',
         "low-page":"I cannot display a negative page number!",
         "high-page":"There are not that many pages!",
         "top-title-1":"Global ranking",
-        "top-name":"__Top {}-{} :__"}
+        "top-name":"__Top {}-{} :__",
+        "default_levelup":"Hey, {user} has just reached **level {level}**! Keep this way!"}
