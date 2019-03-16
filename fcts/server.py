@@ -37,6 +37,7 @@ class ServerCog(commands.Cog):
                "mute":"",
                "kick":"",
                "ban":"",
+               "warn":"",
                "say":"",
                "hunter":"",
                "welcome_channel":'',
