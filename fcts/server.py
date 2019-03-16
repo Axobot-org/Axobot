@@ -112,8 +112,8 @@ class ServerCog(commands.Cog):
         return langs
 
 
-    def connect(self):
-        return mysql.connector.connect(user=self.bot.database_keys['user'],password=self.bot.database_keys['password'],host=self.bot.database_keys['host'],database=self.bot.database_keys['database'])
+    # def connect(self):
+    #     return mysql.connector.connect(user=self.bot.database_keys['user'],password=self.bot.database_keys['password'],host=self.bot.database_keys['host'],database=self.bot.database_keys['database'])
 
     async def staff_finder(self,user,option):
         """Check is user is part of a staff"""
@@ -208,6 +208,8 @@ class ServerCog(commands.Cog):
                 await channel.send(await self.translate(channel.guild.id,"server","new_server"))
             # await self.bot.get_user(279568324260528128).send("Le serveur n°{} vient d'être ajouté dans la base de donnée".format(ID))
             g = self.bot.get_guild(ID)
+            if g==None:
+                raise Exception("Guild not found")
             emb = self.bot.cogs["EmbedCog"].Embed(desc="New server in the database :tada: `{}` ({})".format(g.name,g.id),color=self.log_color).update_timestamp()
             await self.bot.cogs["EmbedCog"].send([emb])
             return await self.add_server(ID)
