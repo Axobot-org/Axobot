@@ -77,7 +77,7 @@ class FunCog(commands.Cog):
             return
         title = await self.translate(ctx.guild,"fun","fun-list")
         text = str()
-        for cmd in sorted(self.bot.get_cog_commands('FunCog'),key=operator.attrgetter('name')):
+        for cmd in sorted(self.get_commands(),key=operator.attrgetter('name')):
             if cmd.name in cmds_list and cmd.enabled:
                 if cmd.help != None:
                     text+="\n- {} *({})*".format(cmd.name,cmd.help.split('\n')[0])
