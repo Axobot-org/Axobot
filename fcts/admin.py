@@ -421,7 +421,7 @@ class AdminCog(commands.Cog):
 
     @main_msg.command(name="logs")
     @commands.check(reloads.check_admin)
-    async def show_last_logs(self,ctx,lines:typing.Optional[int]=5,match=''):
+    async def show_last_logs(self,ctx,lines:typing.Optional[int]=15,match=''):
         """Affiche les <lines> derniers logs ayant <match> dedans"""
         try:
             with open('debug.log','r',encoding='utf-8') as file:
