@@ -322,6 +322,18 @@ class AdminCog(commands.Cog):
         else:
             await ctx.send("Serveur introuvable")
 
+    @main_msg.command(name='db_reload')
+    @commands.check(reloads.check_admin)
+    async def db_reload(self,ctx):
+        """Reconnecte le bot à la base de donnée"""
+        try:
+            self.bot.cnx.close()
+            self.bot.connect_database()
+            if self.bot.cnx != None:
+                await ctx.bot.cogs['UtilitiesCog'].add_check_reaction(ctx.message)
+        except Exception as e:
+            await self.bot.cogs['ErrorsCog'].on_cmd_error(ctx,e)
+
     @main_msg.command(name="emergency")
     @commands.check(reloads.check_admin)
     async def emergency_cmd(self,ctx):
