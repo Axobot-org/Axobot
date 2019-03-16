@@ -34,7 +34,7 @@ class XPCog(commands.Cog):
 
     async def add_xp(self,msg):
         """Attribue un certain nombre d'xp à un message"""
-        if msg.author.bot:
+        if msg.author.bot or msg.guild==None:
             return
         if len(self.cache)==0:
             await self.bdd_load_cache()
@@ -54,7 +54,23 @@ class XPCog(commands.Cog):
             prev_points = 0
         await self.bdd_set_xp(msg.author.id, giv_points,'add')
         self.cache[msg.author.id] = [round(time.time()), prev_points+giv_points]
+        print("1")
+        new_lvl = await self.calc_level(self.cache[msg.author.id][1])
+        print("hey?")
+        if (await self.calc_level(prev_points))[0] < new_lvl[0]:
+            print("lol")
+            await self.send_levelup(msg,new_lvl)
 
+
+    async def send_levelup(self,msg,lvl):
+        """Envoie le message de levelup"""
+        if not msg.channel.permissions_for(msg.guild.me).send_messages:
+            return
+        text = await self.bot.cogs['ServerCog'].find_staff(msg.guild.id,'levelup_msg')
+        if text==None or len(text)==0:
+            text = await self.translate(msg.guild.id,'xp','default_levelup')
+        await msg.channel.send(text.format_map(self.bot.SafeDict(user=msg.author,level=lvl[0])))
+        
 
     async def check_cmd(self,msg):
         """Vérifie si un message est une commande"""
