@@ -1,7 +1,8 @@
 import discord, sys, traceback, importlib, datetime, random, re, asyncio
-from fcts import utilities
+from fcts import args
 from discord.ext import commands
 
+importlib.reload(args)
 
 
 class UtilitiesCog(commands.Cog):
@@ -79,18 +80,16 @@ class UtilitiesCog(commands.Cog):
         if Type == None:
             for i in [commands.MemberConverter,commands.RoleConverter,
                     commands.TextChannelConverter,commands.InviteConverter,
-                    commands.UserConverter,commands.VoiceChannelConverter,
+                    args.user,commands.VoiceChannelConverter,
                     commands.EmojiConverter,commands.CategoryChannelConverter]:
                 try:
                     a = await i().convert(ctx,name)
                     item = a
                     if item != None:
                         return item
-                except:
-                    if name.isnumeric() and i==commands.MemberConverter:
-                        item = await self.bot.get_user_info(int(name))
-                        if item != None:
-                            return item
+                except Exception as e:
+                    print(e)
+            return None
         elif Type == 'member':
             try:
                 item = await commands.MemberConverter().convert(ctx,name)
@@ -129,7 +128,7 @@ class UtilitiesCog(commands.Cog):
                 pass
         elif Type == 'category':
             try:
-                item = await commands.CategoryConverter().convert(ctx,name)
+                item = await commands.CategoryChannelConverter().convert(ctx,name)
             except:
                 pass
         elif Type == 'guild' and name.isnumeric():
