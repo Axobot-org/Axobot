@@ -254,6 +254,20 @@ class UtilitiesCog(commands.Cog):
             return liste
         else:
             return None
+    
+    async def change_db_userinfo(self,userID:int,key:str,value):
+        """Change something about a user in the database"""
+        try:
+            cnx = self.bot.cnx
+            cursor = cnx.cursor(dictionary = True)
+            query = ("INSERT INTO `{t}` (`userID`,`{k}`) VALUES ('{u}','{v}') ON DUPLICATE KEY UPDATE {k} = '{v}';".format(t=self.table,u=userID,k=key,v=value))
+            cursor.execute(query)
+            cnx.commit()
+            cursor.close()
+            return True
+        except Exception as e:
+            await self.bot.cogs['ErrorsCog'].on_error(e,None)
+            return False
 
     async def get_number_premium(self):
         """Return the number of premium users"""
