@@ -31,3 +31,22 @@ Get the general ranking
 If you want to know who is at the top of the ranking, or who is following you so closely, this command is the ideal function. It allows you to have the name, xp and level of 20 people per page. The operation of the pages is quite intuitive: page 1 shows 20 first users, page 2 between 21 and 40, page 3 between 41 and 60, and so on. Simple, right?
 
 .. note:: The bot can send this message without special permission, but don't hesitate to give him permission to `send embeds <perms.html#embed-links>`_ to make the result more aesthetic!
+
+
+---------
+Your info
+---------
+
+We were talking about adding customization options for each user. Here is the section that concerns them, where you can all configure some nice options to create your own identity on the bot. For the moment there are few (very few) options, but others will come later, we guarantee it!
+
+
+Change your xp card
+-------------------
+
+**Syntax:** :code:`profile card [style]`
+
+With this command, you can change the design of your xp card (the one used for the `rank` command). A long list of styles are available to everyone, but others are exclusively unlocked and reserved for certain people (more details on this part will come later).
+
+If you use the command without argument, the bot will show you an example of a xp card with the style you currently have. But if you enter a style name that does not exist, it will give you a list of usable styles *for you*.
+
+.. note:: Note that to be able to display your card, the bot needs `Attach Files <perms.html#attach-files>`_ permission!
