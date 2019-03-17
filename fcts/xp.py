@@ -119,7 +119,7 @@ class XPCog(commands.Cog):
     async def bdd_set_xp(self,userID,points,Type='add'):
         """Ajoute/reset de l'xp à un utilisateur dans la database générale"""
         try:
-            cnx = self.bot.cogs['ServerCog'].bot.cnx
+            cnx = self.bot.cnx
             cursor = cnx.cursor(dictionary = True)
             if Type=='add':
                 query = ("INSERT INTO `{t}` (`userID`,`xp`) VALUES ('{u}','{p}') ON DUPLICATE KEY UPDATE xp = xp + '{p}';".format(t=self.table,p=points,u=userID))
@@ -127,6 +127,7 @@ class XPCog(commands.Cog):
                 query = ("INSERT INTO `{t}` (`userID`,`xp`) VALUES ('{u}','{p}') ON DUPLICATE KEY UPDATE xp = '{p}';".format(t=self.table,p=points,u=userID))
             cursor.execute(query)
             cnx.commit()
+            cursor.close()
             return True
         except Exception as e:
             await self.bot.cogs['ErrorsCog'].on_error(e,None)
@@ -134,7 +135,7 @@ class XPCog(commands.Cog):
     
     async def bdd_get_xp(self,userID):
         try:
-            cnx = self.bot.cogs['ServerCog'].bot.cnx
+            cnx = self.bot.cnx
             cursor = cnx.cursor(dictionary = True)
             query = ("SELECT `xp` FROM `{}` WHERE `userID`={}".format(self.table,userID))
             cursor.execute(query)
@@ -146,6 +147,7 @@ class XPCog(commands.Cog):
                     self.cache[userID][1] = liste[0]['xp']
                 else:
                     self.cache[userID] = [round(time.time())-60,liste[0]['xp']]
+            cursor.close()
             return liste
         except Exception as e:
             await self.bot.cogs['ErrorsCog'].on_error(e,None)
@@ -153,21 +155,23 @@ class XPCog(commands.Cog):
     async def bdd_get_nber(self):
         """Get the number of ranked users"""
         try:
-            cnx = self.bot.cogs['ServerCog'].bot.cnx
+            cnx = self.bot.cnx
             cursor = cnx.cursor(dictionary = False)
             query = ("SELECT COUNT(*) FROM `{}` WHERE `banned`=0".format(self.table))
             cursor.execute(query)
             liste = list()
             for x in cursor:
                 liste.append(x)
+            cursor.close()
             if liste!=None and len(liste)==1:
                 return liste[0][0]
+            return 0
         except Exception as e:
             await self.bot.cogs['ErrorsCog'].on_error(e,None)
 
     async def bdd_load_cache(self):
         try:
-            cnx = self.bot.cogs['ServerCog'].bot.cnx
+            cnx = self.bot.cnx
             cursor = cnx.cursor(dictionary = True)
             self.bot.log.info("Chargement du cache XP")
             query = ("SELECT `userID`,`xp` FROM `{}` WHERE `banned`=0".format(self.table))
@@ -177,19 +181,21 @@ class XPCog(commands.Cog):
                 liste.append(x)
             for l in liste:
                 self.cache[l['userID']] = [round(time.time())-60,l['xp']]
+            cursor.close()
             return liste
         except Exception as e:
             await self.bot.cogs['ErrorsCog'].on_error(e,None)
 
     async def bdd_get_top(self,top:int):
         try:
-            cnx = self.bot.cogs['ServerCog'].bot.cnx
+            cnx = self.bot.cnx
             cursor = cnx.cursor(dictionary = True)
             query = ("SELECT * FROM `{}` order by `xp` desc limit {}".format(self.table,top))
             cursor.execute(query)
             liste = list()
             for x in cursor:
                 liste.append(x)
+            cursor.close()
             return liste
         except Exception as e:
             await self.bot.cogs['ErrorsCog'].on_error(e,None)
@@ -197,13 +203,14 @@ class XPCog(commands.Cog):
     async def bdd_get_rank(self,userID:int):
         """Get the rank of a user"""
         try:
-            cnx = self.bot.cogs['ServerCog'].bot.cnx
+            cnx = self.bot.cnx
             cursor = cnx.cursor(dictionary = True)
             query = ("SELECT `xp`, @curRank := @curRank + 1 AS rank FROM `{}` p, (SELECT @curRank := 0) r WHERE `banned`='0' ORDER BY xp desc;".format(self.table))
             cursor.execute(query)
             liste = list()
             for x in cursor:
                 liste.append(x)
+            cursor.close()
             return liste
         except Exception as e:
             await self.bot.cogs['ErrorsCog'].on_error(e,None)
