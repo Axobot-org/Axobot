@@ -31,7 +31,7 @@ This command mutes a member, preventing them from typing.
 
 The principle is to assign the *muted* role to the member, in order to distinguish him from the others. Simply configure the server permissions to have the "send messages" option disabled. And even if you don't, the bot will delete messages from recalcitrant mute members! 
 
-The duration of the tempmute is quite flexible: use `XXd` for days, `XXh` for hours and `XXm` for minutes (replacing **XX** by the corresponding number, of course!)
+The duration of the tempmute is quite flexible: use :code:`XXd` for days, :code:`XXh` for hours and :code:`XXm` for minutes (replacing **XX** by the corresponding number, of course!)
 
 .. warning:: The muted role must be placed below the bot role, and the bot must have "`Manage roles <perms.html#manage-roles>`_" (to give the role) and "`Manage messages <perms.html#manage-messages>`_" (to delete messages) permissions.
 
