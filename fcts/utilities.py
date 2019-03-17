@@ -87,8 +87,8 @@ class UtilitiesCog(commands.Cog):
                     item = a
                     if item != None:
                         return item
-                except Exception as e:
-                    print(e)
+                except:
+                    pass
             return None
         elif Type == 'member':
             try:
