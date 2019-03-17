@@ -136,7 +136,7 @@ class InfosCog(commands.Cog):
     async def infos(self,ctx,Type:typing.Optional[args.infoType]=None,*,name:str=None):
         """Find informations about someone/something
 Available types: member, role, user, emoji, channel, server, invite, category"""
-        if Type!=None and name==None:
+        if Type!=None and name==None and Type not in ["guild","server"]:
             raise commands.MissingRequiredArgument(self.infos.clean_params['name'])
         try:
             lang = await self.translate(ctx.guild.id,"current_lang","current")
@@ -364,14 +364,19 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
         embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","member-1"), value = "{} ({} {})".format(await self.timecog.date(guild.created_at,lang=lang,year=True),since,await self.timecog.time_delta(guild.created_at,datetime.datetime.now(),lang=lang,year=True,precision=0,hour=False)), inline=False)
         embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","role-3"), value = str(await self.translate(ctx.guild.id,"stats_infos","guild-7")).format(len(guild.members),bot,online))
         embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","guild-6"), value=str(await self.translate(ctx.guild.id,"stats_infos","guild-3")).format(len(guild.text_channels),len(guild.voice_channels),len(guild.categories)))
-        embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","guild-5"), value=str(len(guild.emojis)).capitalize())
+        embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","guild-5"), value=str(len(guild.emojis)))
+        if guild.me.guild_permissions.manage_guild:
+            embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","guild-12"), value=str(len(await guild.invites())))
         embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","guild-10"), value = str(int(guild.afk_timeout/60))+" minutes")
         embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","guild-8"), value=a2f.capitalize())
         embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","guild-9"), value=str(await self.translate(guild.id,"keywords",str(guild.verification_level))).capitalize())
         if guild.splash_url != '':
             embed.add_field(name="Splash url", value=guild.splash_url)
         try:
-            roles = [x.mention for x in guild.roles if len(x.members)>1][1:]
+            if ctx.guild==guild:
+                roles = [x.mention for x in guild.roles if len(x.members)>1][1:]
+            else:
+                roles = [x.name for x in guild.roles if len(x.members)>1][1:]
         except Exception as e:
             await self.bot.cogs['ErrorsCog'].on_error(e,ctx)
             await self.bot.cogs['UtilitiesCog'].print2(str([x.mention for x in guild.roles if len(x.members)>1]))
