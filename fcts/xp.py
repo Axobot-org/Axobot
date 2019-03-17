@@ -1,4 +1,4 @@
-import discord, random, time, asyncio, io, imageio, importlib, re
+import discord, random, time, asyncio, io, imageio, importlib, re, os, operator
 from discord.ext import commands
 from math import ceil
 from PIL import Image, ImageDraw, ImageFont, ImageTk
@@ -369,6 +369,18 @@ class XPCog(commands.Cog):
             await ctx.send(embed=emb.discord_embed())
         else:
             await ctx.send(f_name+"\n\n"+'\n'.join(txt))
+
+
+    async def clear_cards(self,all=False):
+        """Delete outdated rank cards"""
+        files =  os.listdir('../cards/global')
+        done = list()
+        for f in sorted([f.split('-')+['../cards/global/'+f] for f in files],key=operator.itemgetter(1),reverse=True):
+            if f[0] in done:
+                os.remove(f[3])
+            else:
+                done.append(f[0])
+
 
 
 def setup(bot):

@@ -253,6 +253,8 @@ class Events(commands.Cog):
         while not self.bot.is_closed():
             if int(datetime.datetime.now().second)%20 == 0:
                 await self.check_tasks()
+            if int(datetime.datetime.now().minute)%20 == 0:
+                await self.bot.cogs['XPCog'].clear_cards()
             await asyncio.sleep(0.5)
 
 def setup(bot):
