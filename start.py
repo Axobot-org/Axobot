@@ -76,7 +76,7 @@ class zbot(commands.bot.BotBase,discord.Client):
     
     @property
     def cnx(self):
-        if self._cnx[1] + 1200 < round(time.time()): # 20min
+        if self._cnx[1] + 1260 < round(time.time()): # 21min
             self.connect_database()
             self._cnx[1] = round(time.time())
             return self._cnx[0]

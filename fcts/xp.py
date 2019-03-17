@@ -107,6 +107,7 @@ class XPCog(commands.Cog):
             while needed_xp<xp:
                 temp = round(current_lvl**3+100)
                 self.levels.append(self.levels[-1]+temp)
+                self.levels.append(temp)
                 needed_xp = self.levels[-1]
                 current_lvl += 1
             return current_lvl,self.levels[-1]
