@@ -1,4 +1,4 @@
-import discord, random, time, asyncio, io, imageio, importlib
+import discord, random, time, asyncio, io, imageio, importlib, re
 from discord.ext import commands
 from math import ceil
 from PIL import Image, ImageDraw, ImageFont, ImageTk
@@ -92,7 +92,11 @@ class XPCog(commands.Cog):
 
     async def calc_xp(self,msg):
         """Calcule le nombre d'xp correspondant à un message"""
-        return round(len(msg.clean_content)*self.xp_per_char)
+        content = msg.clean_content
+        matches = re.finditer(r"<a?(:\w+:)\d+>", content, re.MULTILINE)
+        for _, match in enumerate(matches, start=1):
+            content = content.replace(match.group(0),match.group(1))
+        return round(len(content)*self.xp_per_char)
 
     async def calc_level(self,xp):
         """Calcule le niveau correspondant à un nombre d'xp"""
