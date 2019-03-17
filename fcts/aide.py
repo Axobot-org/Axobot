@@ -199,8 +199,7 @@ If the bot can't send the new command format, it will try to send the old one.""
         prefix = await self.bot.get_prefix(ctx.message)
         if type(prefix)==list:
             prefix = prefix[0]
-        syntax = cmd.name + " "
-        syntax += cmd.signature.replace(" ","** ",1) if " " in cmd.signature else cmd.signature+"**"
+        syntax = cmd.qualified_name + "** " + cmd.signature
         if type(cmd)==commands.core.Group:
             subcmds = "\n\n__{}__".format(str(await self.translate(ctx.guild,"keywords","subcmds")).capitalize())
             sublist = list()
@@ -218,7 +217,7 @@ If the bot can't send the new command format, it will try to send the old one.""
                         continue
         else:
             subcmds = ""
-        return ["**{}{}\n\n{}\n*Cog: {}*{}".format(prefix,syntax,desc,cmd.cog_name,subcmds)]
+        return ["**{}{}\n\n{}\n\n*Cog: {}*{}".format(prefix,syntax,desc,cmd.cog_name,subcmds)]
 
 
     async def _default_help_command(self,ctx, commands=()):
