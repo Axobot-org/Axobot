@@ -54,11 +54,8 @@ class XPCog(commands.Cog):
             prev_points = 0
         await self.bdd_set_xp(msg.author.id, giv_points,'add')
         self.cache[msg.author.id] = [round(time.time()), prev_points+giv_points]
-        print("1")
         new_lvl = await self.calc_level(self.cache[msg.author.id][1])
-        print("hey?")
         if (await self.calc_level(prev_points))[0] < new_lvl[0]:
-            print("lol")
             await self.send_levelup(msg,new_lvl)
 
 
@@ -104,7 +101,7 @@ class XPCog(commands.Cog):
             current_lvl = 0
             self.levels = [0]
             while needed_xp<xp:
-                temp = round(current_lvl**2+100)
+                temp = round(current_lvl**3+100)
                 self.levels.append(self.levels[-1]+temp)
                 needed_xp = self.levels[-1]
                 current_lvl += 1
