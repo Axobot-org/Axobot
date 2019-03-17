@@ -950,12 +950,14 @@ class RssCog(commands.Cog):
             await asyncio.sleep(self.time_between_flows_check)
         self.flows = dict()
         self.bot.cogs['McCog'].flows = dict()
-        d = "**RSS loop done** in {}s ({}/{} flows)".format(round(time.time()-t,3),check,len(liste))
-        emb = self.bot.cogs["EmbedCog"].Embed(desc=d,color=1655066).update_timestamp().set_author(self.bot.guilds[0].me)
-        await self.bot.cogs["EmbedCog"].send([emb],url="https://discordapp.com/api/webhooks/509079297353449492/1KlokgfF7vxRK37pHd15UjdxJSa5H9yzbOLAaRjYEQK7XIdjfMp9PCnER1-Dfz0PBSaM")
-        self.bot.log.debug(d)
+        d = ["**RSS loop done** in {}s ({}/{} flows)".format(round(time.time()-t,3),check,len(liste))]
         if len(errors)>0:
-            self.bot.log.warn('[RSS loop] {} errors: {}'.format(len(errors),' '.join(errors)))
+            d.append('{} errors: {}'.format(len(errors),' '.join(errors)))
+        emb = self.bot.cogs["EmbedCog"].Embed(desc='\n'.join(d),color=1655066).update_timestamp().set_author(self.bot.guilds[0].me)
+        await self.bot.cogs["EmbedCog"].send([emb],url="https://discordapp.com/api/webhooks/509079297353449492/1KlokgfF7vxRK37pHd15UjdxJSa5H9yzbOLAaRjYEQK7XIdjfMp9PCnER1-Dfz0PBSaM")
+        self.bot.log.debug(d[0])
+        if len(errors)>0:
+            self.bot.log.warn("[Rss loop] "+d[1])
         if guildID==None:
             self.loop_processing = False
 
