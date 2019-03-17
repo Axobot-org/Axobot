@@ -479,6 +479,11 @@ stats_infos={"not-found":"Unable 2 found {N}",
             "categ-2":"Textz : {} | Vocaal : {}",
              }
 
+users = {'invalid-card':'Dat style iz no valid. But yop, her\'s styles u can use: {}',
+        'missing-attach-files':'Oops, I\'m missing the Attach Files perms :upside_down:',
+        'changed-0':'Ur xp card naw use the style {}',
+        'changed-1':'Oops, a wicked error occurrd during the process ov ur request. Try again later or contact these nice support guys.'}
+
 xp = {'card-level':'LVL',
         'card-rank':'SEAT',
         '1-no-xp':"U don't have any xP yet!",

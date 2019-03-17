@@ -479,6 +479,11 @@ stats_infos={"not-found":"Impossible de trouver {N}",
             "categ-2":"Texte : {} | Vocal : {}",
              }
 
+users = {'invalid-card':'Ce style est invalide. Voici la liste des styles que vous pouvez utiliser : {}',
+        'missing-attach-files':'Oups, il me manque la permission d\'Attacher des Fichiers :confused:',
+        'changed-0':'Votre carte d\'xp utilise maintenant le style {}',
+        'changed-1':'Oups, une erreur interne est survenue pendant le traitement de la requête. Réessayez plus tard ou contactez le support.'}
+
 xp = {'card-level':'NIVEAU',
         'card-rank':'RANG',
         '1-no-xp':"Vous ne possédez pas encore d'xp !",

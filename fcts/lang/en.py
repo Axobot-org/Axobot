@@ -479,6 +479,11 @@ stats_infos={"not-found":"Unable to find {N}",
             "categ-2":"Text : {} | Vocal : {}",
              }
 
+users = {'invalid-card':'This style is invalid. Here is the list of styles you can use: {}',
+        'missing-attach-files':'Oops, I\'m missing the permission to Attach Files :confused:',
+        'changed-0':'Your xp card now uses the style {}',
+        'changed-1':'Oops, an internal error occurred during the processing of the request. Try again later or contact support.'}
+
 xp = {'card-level':'LEVEL',
         'card-rank':'RANK',
         '1-no-xp':"You don't have any xp yet!",
