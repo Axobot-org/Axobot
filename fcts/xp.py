@@ -342,7 +342,7 @@ class XPCog(commands.Cog):
         Each page has 20 users"""
         if page<1:
             return await ctx.send(await self.translate(ctx.guild,"xp",'low-page'))
-        elif page>ceil(len(self.cache)/20)+1:
+        elif page>ceil(len(self.cache)/20):
             return await ctx.send(await self.translate(ctx.guild,"xp",'high-page'))
         ranks = await self.bdd_get_top(20*page)
         ranks = ranks[(page-1)*20:]
