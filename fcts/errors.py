@@ -85,6 +85,8 @@ class ErrorsCog(commands.Cog):
     @commands.Cog.listener()
     async def on_error(self,error_msg,ctx):
         try:
+            if error_msg==None:
+                return
             sysexc = sys.exc_info()
             s = str(sysexc[0]).split("<class '")
             if len(s)>1:
