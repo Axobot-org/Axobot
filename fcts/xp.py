@@ -35,7 +35,7 @@ class XPCog(commands.Cog):
 
     async def add_xp(self,msg):
         """Attribue un certain nombre d'xp à un message"""
-        if msg.author.bot or msg.guild==None:
+        if msg.author.bot or msg.guild==None or not self.bot.enable_xp:
             return
         if len(self.cache)==0:
             await self.bdd_load_cache()
