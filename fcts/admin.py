@@ -456,6 +456,18 @@ class AdminCog(commands.Cog):
         except Exception as e:
             await self.bot.cogs['ErrorsCog'].on_error(e,ctx)
 
+    @main_msg.command(name="enable_xp")
+    @commands.check(reloads.check_admin)
+    async def enable_xp(self,ctx,enabling:bool):
+        """Empêche tous les utilisateurs de gagner de l'xp.
+Cette option affecte tous les serveurs"""
+        self.bot.enable_xp = enabling
+        if enabling:
+            await ctx.send("L'xp est mainenant activée")
+        else:
+            await ctx.send("L'xp est mainenant désactivée")
+            
+
     @main_msg.group(name="server")
     @commands.check(reloads.check_admin)
     async def main_botserv(self,ctx):
@@ -643,12 +655,32 @@ class AdminCog(commands.Cog):
     @commands.check(reloads.check_admin)
     async def make_suggestion(self,ctx,*,text):
         """Ajouter une idée dans le salon des idées, en français et anglais"""
+        chan = ctx.bot.get_channel(548138866591137802) if self.bot.beta else ctx.bot.get_channel(488769306524385301)
         if len(text.split('\n'))!=2:
+            if text.startswith('valid ') or text.startswith('unvalid '):
+                ID = text.split(' ')[1]
+                if not ID.isnumeric():
+                    return await ctx.send("ID invalide")
+                ID = int(ID)
+                if chan==None:
+                    return await ctx.send("Salon introuvable")
+                try:
+                    msg = await chan.get_message(ID)
+                except Exception as e:
+                    return await ctx.send("`Error:` {}".format(e))
+                if len(msg.embeds)!=1:
+                    return await ctx.send("Nombre d'embeds invalide")
+                emb = msg.embeds[0]
+                if text.split(' ')[0] == 'valid':
+                    emb.color = discord.Color(10146593)
+                else:
+                    emb.color = discord.Color(16106019)
+                await msg.edit(embed=emb)
+                return await ctx.bot.cogs['UtilitiesCog'].add_check_reaction(ctx.message)
             return await ctx.send("Il faut ne faire que deux paragraphes, le premier en français, le deuxième en anglais")
         text = text.split('\n')
         fr,en = text[0].replace('\\n','\n'), text[1].replace('\\n','\n')
         emb = self.bot.cogs['EmbedCog'].Embed(fields=[{'name':'Français','value':fr},{'name':'English','value':en}],color=16106019)
-        chan = ctx.bot.get_channel(548138866591137802) if self.bot.beta else ctx.bot.get_channel(488769306524385301)
         msg = await chan.send(embed=emb.discord_embed())
         await self.bot.cogs['FunCog'].add_vote(msg)
         await ctx.bot.cogs['UtilitiesCog'].add_check_reaction(ctx.message)
