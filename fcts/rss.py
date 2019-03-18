@@ -886,7 +886,7 @@ class RssCog(commands.Cog):
         cnx.commit()
 
     async def send_rss_msg(self,obj,channel):
-        if not channel == None:
+        if channel != None:
             t = await obj.create_msg(await self.translate(channel.guild,"current_lang","current"))
             try:
                 await channel.send(t)
@@ -908,8 +908,12 @@ class RssCog(commands.Cog):
                 for o in objs:
                     guild = self.bot.get_guild(flow['guild'])
                     if guild == None:
+                        self.bot.log.info("[send_rss_msg] Can not send message on server {} (unknown)".format(flow['guild']))
                         return False
                     chan = guild.get_channel(flow['channel'])
+                    if guild == None:
+                        self.bot.log.info("[send_rss_msg] Can not send message on channel {} (unknown)".format(flow['channel']))
+                        return False
                     o.format = flow['structure']
                     await o.fill_mention(guild,flow['roles'].split(';'),self.translate)
                     await self.send_rss_msg(o,chan)
@@ -952,7 +956,7 @@ class RssCog(commands.Cog):
         self.bot.cogs['McCog'].flows = dict()
         d = ["**RSS loop done** in {}s ({}/{} flows)".format(round(time.time()-t,3),check,len(liste))]
         if len(errors)>0:
-            d.append('{} errors: {}'.format(len(errors),' '.join(errors)))
+            d.append('{} errors: {}'.format(len(errors),' '.join([str(x) for x in errors])))
         emb = self.bot.cogs["EmbedCog"].Embed(desc='\n'.join(d),color=1655066).update_timestamp().set_author(self.bot.guilds[0].me)
         await self.bot.cogs["EmbedCog"].send([emb],url="https://discordapp.com/api/webhooks/509079297353449492/1KlokgfF7vxRK37pHd15UjdxJSa5H9yzbOLAaRjYEQK7XIdjfMp9PCnER1-Dfz0PBSaM")
         self.bot.log.debug(d[0])
