@@ -1,7 +1,7 @@
 import discord, typing
 from discord.ext import commands
 
-class PermsCog:
+class PermsCog(commands.Cog):
     """Cog with a single command, allowing you to see the permissions of a member or a role in a channel."""
 
     def __init__(self,bot):
@@ -12,6 +12,7 @@ class PermsCog:
         except:
             pass
 
+    @commands.Cog.listener()
     async def on_ready(self):
         self.translate = self.bot.cogs["LangCog"].tr
 

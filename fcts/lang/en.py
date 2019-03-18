@@ -53,6 +53,8 @@ cases={"no-user":"Unable to find this user :eyes:",
     'title-search':'Case #{}',
     'no_database':"Due to a temporary database outage, this command has been disabled"}
 
+events={'mp-adv':"You are probably trying to invite me to this server? If that is the case, I can't join him with a simple invitation. An administrator must use my own invitation link, here: <https://bot.discord.io/zbot> :wink:"}
+
 errors={"cooldown":"You are on cooldown for this command :confused: Please wait {} more seconds...",
 "badarguments":"Oops, unable to convert the `{c[3]}` parameter to \"{c[1]}\" type :confused:",
 "missingargument":"Oops, the argument \"{}\" is missing {}",
@@ -62,7 +64,7 @@ errors={"cooldown":"You are on cooldown for this command :confused: Please wait 
 "duration":"The duration `{}` is invalid"}
 
 find={"user-0":"name: {}\nID: {}",
-"user-1":"Name: {}\nID: {}\nServers: {}\nOwner of: {}\nLanguages: {}",
+"user-1":"Name: {name}\nID: {id}\nServers: {servers}\nOwner of: {own}\nLanguages: {lang}\nVoted? {vote}",
 "user-2":"User not found",
 "guild-0":"Server not found",
 "guild-1":"Name: {}\nID: {}\nOwner: {} ({})\nMembers: {} (including {} bots)\nLanguage: {}",
@@ -281,6 +283,16 @@ modo={"slowmode-0":"The slowmode is now disabled in this channel.",
     "tempmute-1":"The member {} has been silenced for the reason `{}`, for {}!",
     }
 
+morpion={'user-begin':'{}, you begin!',
+        'bot-begin':"Let's go, I'll start!",
+        'tip':"\n*To play, simply type a number between 1 and 9, corresponding to the chosen case. I play the red, you play the blue*",
+        'nul':"Draw, no one won...",
+        'too-late':"You took too long to decide. Game over!",
+        'pion-1':"There's already a pawn on that cell!",
+        'pion-2':'Invalid input case',
+        'win-1':"Well done, {} won!",
+        'win-2':"I won! End of the game!"}
+
 perms={"perms-0":"Member/role {} not found",
         "perms-1":"**'{}' permissions:**\n\n"
        }
@@ -388,35 +400,35 @@ to modify a configuration, or `!config del <option>` to reset the option (`!conf
         "not-found":"The server {} has not yet been registered in the database"
     }
 
-server_desc={"clear": "List of roles that can use the 'clear' command: {}",
-             "slowmode": "List of roles that can use 'slowmode' and 'freeze' commands: {}",
-             "mute": "List of roles that can use the 'mute' command: {}",
-             "kick": "List of roles that can use the 'kick' command: {}",
-             "ban": "List of roles that can use the command 'ban': {}",
-             "warn": "List of roles that can use commands 'warn' and 'cases': {}",
-             "say": "List of roles that can use the command 'say' : {}",
-             "gived_roles": "List of roles automatically given to new members: {}",
-             "save_roles": "Should roles be saved when a member leaves, in case he returns? {}",
-             "enable_xp": "Should the xp system be enabled? {}",
-             "anti_caps_lock": "Should the bot send a message when a member sends too many capital letters? {}",
-             "enable_fun": "Are the commands listed in the `!fun` command enabled? {}",
-             "hunter": "List of all chat rooms in which the game *Hunter* is active: {}",
-             "welcome_channel": "List of channels where to send welcome/leave messages: {}",
-             "bot_news": "List of channels where to send bot news: {}",
-             "modlogs_channel":"Channel where to send moderation logs: {}",
-             "poll_channels": "List of channels where :thumbsup: and :thumbsdown: reactions will be automatically added to each message : {}",
-             "welcome": "Message sent when a member arrives: {}",
-             "leave": "Message sent when a member leaves: {}",
-             "language": "Current bot language for this server: **{}**",
-             "prefix":"Current bot prefix: {}",
-             "membercounter":"Channel displaying number of members in its name: {}",
-             "anti_raid":"Level of anti-raid protection: {} \n*([Documentation](https://zbot.rtfd.io/en/latest/moderator.html#anti-raid))*",
-             "vote_emojis":"Emojis used for poll reactions: {}",
-             "help_in_dm":"Send help message in Private Message? {}",
-             "muted_role":"Used role to mute members : {}"}
+server_desc={"prefix":"Current bot prefix: {}",
+            "language": "Current bot language for this server: **{}**",
+            "clear": "List of roles that can use the 'clear' command: {}",
+            "slowmode": "List of roles that can use 'slowmode' and 'freeze' commands: {}",
+            "mute": "List of roles that can use the 'mute' command: {}",
+            "kick": "List of roles that can use the 'kick' command: {}",
+            "ban": "List of roles that can use the command 'ban': {}",
+            "warn": "List of roles that can use commands 'warn' and 'cases': {}",
+            "say": "List of roles that can use the command 'say' : {}",
+            "hunter": "List of all chat rooms in which the game *Hunter* is active: {}",
+            "welcome_channel": "List of channels where to send welcome/leave messages: {}",
+            "welcome": "Message sent when a member arrives: {}",
+            "leave": "Message sent when a member leaves: {}",
+            "gived_roles": "List of roles automatically given to new members: {}",
+            "bot_news": "List of channels where to send bot news: {}",
+            "modlogs_channel":"Channel where to send moderation logs: {}",
+            "save_roles": "Should roles be saved when a member leaves, in case he returns? {}",
+            "poll_channels": "List of channels where :thumbsup: and :thumbsdown: reactions will be automatically added to each message : {}",
+            "enable_xp": "Should the xp system be enabled? {}",
+            "levelup_msg":"Message sent when a member earns an xp level: {}",
+            "anti_caps_lock": "Should the bot send a message when a member sends too many capital letters? {}",
+            "enable_fun": "Are the commands listed in the `!fun` command enabled? {}",
+            "membercounter":"Channel displaying number of members in its name: {}",
+            "anti_raid":"Level of anti-raid protection: {} \n*([Documentation](https://zbot.rtfd.io/en/latest/moderator.html#anti-raid))*",
+            "vote_emojis":"Emojis used for poll reactions: {}",
+            "help_in_dm":"Send help message in Private Message? {}",
+            "muted_role":"Used role to mute members : {}"}
 
 stats_infos={"not-found":"Unable to find {N}",
-            "type-invalid":"Invalid type: `{T}` :confused:",
             "member-0":"Nickname",
             "member-1":"Created at",
             "member-2":"Joined at",
@@ -456,6 +468,7 @@ stats_infos={"not-found":"Unable to find {N}",
             "guild-10":"Time before being AFK",
             "guild-11.1":"20 first roles (total {})",
             "guild-11.2":"Roles list (total {})",
+            "guild-12":"Number of invites",
             "inv-0":"URL link",
             "inv-1":"Inviter",
             "inv-2":"Uses",
@@ -466,3 +479,19 @@ stats_infos={"not-found":"Unable to find {N}",
             "categ-1":"Position",
             "categ-2":"Text : {} | Vocal : {}",
              }
+
+users = {'invalid-card':'This style is invalid. Here is the list of styles you can use: {}',
+        'missing-attach-files':'Oops, I\'m missing the permission to Attach Files :confused:',
+        'changed-0':'Your xp card now uses the style {}',
+        'changed-1':'Oops, an internal error occurred during the processing of the request. Try again later or contact support.'}
+
+xp = {'card-level':'LEVEL',
+        'card-rank':'RANK',
+        '1-no-xp':"You don't have any xp yet!",
+        '2-no-xp':"This member does not have any xp!",
+        "del-user":"<deleted user>",
+        "low-page":"I cannot display a negative page number!",
+        "high-page":"There are not that many pages!",
+        "top-title-1":"Global ranking",
+        "top-name":"__Top {}-{} :__",
+        "default_levelup":"Hey, {user} has just reached **level {level}**! Keep this way!"}

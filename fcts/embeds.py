@@ -1,6 +1,7 @@
 import datetime, discord, requests
+from discord.ext import commands
 
-class EmbedCog:
+class EmbedCog(commands.Cog):
     """Cog for the management of the embeds. No more, no less."""
 
     def __init__(self,bot):
@@ -75,7 +76,7 @@ class EmbedCog:
 
         def set_author(self,user):
             self.author_name = user.name
-            self.author_icon = user.avatar_url_as(format='gif') if user.is_avatar_animated() else user.avatar_url_as(format='png',size=256)
+            self.author_icon = user.avatar_url_as(format='gif',size=256) if user.is_avatar_animated() else user.avatar_url_as(format='png',size=256)
             return self
         
         def create_footer(self,user):

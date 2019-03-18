@@ -1,7 +1,7 @@
 import discord, datetime
 from discord.ext import commands
 
-class WelcomerCog:
+class WelcomerCog(commands.Cog):
     """Cog which manages the departure and arrival of members in the servers"""
     
     def __init__(self,bot):
@@ -13,6 +13,7 @@ class WelcomerCog:
         except:
             pass
     
+    @commands.Cog.listener()
     async def on_ready(self):
         self.translate = self.bot.cogs['LangCog'].tr
     
@@ -160,9 +161,9 @@ class WelcomerCog:
         try:
             t = "Bot" if member.bot else "Member"
             if Type == "welcome":
-                desc = "{} {} ({}) joined the server {}".format(t,member,member.id,member.guild.id)
+                desc = "{} {} ({}) joined {} ({})".format(t,member,member.id,member.guild.name,member.guild.id)
             else:
-                desc = "{} {} ({}) left the server {}".format(t,member,member.id,member.guild.id)
+                desc = "{} {} ({}) left {} ({})".format(t,member,member.id,member.guild.name,member.guild.id)
             emb = self.bot.cogs["EmbedCog"].Embed(desc=desc,color=16098851).update_timestamp().set_author(self.bot.user)
             await self.bot.cogs["EmbedCog"].send([emb])
             self.bot.log.info(desc)

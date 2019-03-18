@@ -53,6 +53,8 @@ cases={"no-user":"Unable to find dis usr :eyes:",
     'title-search':'Case #{}',
     'no_database':"Dude we'v got an databaz outage, so dis command haz been dizabled"}
 
+events={'mp-adv':"U're probably trying 2 invite me in dis server? If that's the case, I can't join him with a simple invite. An super-admin must use my own link, just here: <https://bot.discord.io/zbot> :innocent:"}
+
 errors={"cooldown":"Yu are on cold-own for dis comandZ :confused: Plize wait {} moRe secs...",
 "badarguments":"W0ops, unabled 2 convrt teh `{c[3]}` parameterz to \"{c[1]}\" tipe :confused:",
 "missingargument":"Oops, te argumnt \"{}\" are missin {}",
@@ -62,7 +64,7 @@ errors={"cooldown":"Yu are on cold-own for dis comandZ :confused: Plize wait {} 
 "duration":"Invalid timer: `{}`"}
 
 find={"user-0":"naym: {}\nID: {}",
-"user-1":"Naym: {}\nID: {}\nServers: {}\nAuwner ov: {}\nSpeak: {}",
+"user-1":"Naym: {name}\nID: {id}\nServers: {servers}\nAuwner ov: {own}\nSpeak: {lang}\nNice guy? {vote}",
 "user-2":"Usr not findz",
 "guild-0":"S3rvr not findz",
 "guild-1":"Name: {}\nID: {}\nOwnr: {} ({})\nMmbr: {} ({} robots)\nSpeak {}",
@@ -281,6 +283,16 @@ modo={"slowmode-0":"Teh very-cold-mode is now disabld in this nize place.",
     "tempmute-1":"Da member {} is muted 4 the raeson `{}`, for {}!"
     }
 
+morpion={'user-begin':'{}, u begin!',
+        'bot-begin':"Hop, I'll start!",
+        'tip':"\n*To play, simply type a nbr beetween 1 - 9, corresponding 2 teh chosen case. I play the red, U play the blue*",
+        'nul':"Draw, nobody won... rip",
+        'too-late':"U was too long! End of the game!",
+        'pion-1':"There's already a pawn on dat cell!",
+        'pion-2':'Invalid input!',
+        'win-1':"GG, {} won!",
+        'win-2':"I won! Game over!"}
+
 perms={"perms-0":"Membr/role {} not findz",
         "perms-1":"**'{}' permissung:**\n\n"
        }
@@ -388,35 +400,35 @@ to modify configuraishun, or `!config del <option>` 2 reset teh option (`!config
         "not-found":"Teh server {} haznt been registered yet in da data board"
     }
 
-server_desc={"clear": "Lizt of rawles dat can us teh 'clear' commend: {}",
-             "slowmode": "Llst of rolz that ca' use 'slowmode' and 'freeze' commmandz: {}",
-             "mute": "Lis of roles dat kan us the 'mute' commmand: {}",
-             "kick": "Lizt of roles taht caan use tee 'kick' commad: {}",
-             "ban": "List for r:o2:les that cawn use this command 'ban': {}",
-             "warn": "Lizt of rawle thut can emploi commanDz 'warn' end 'cases' pliz: {}",
-             "say": "Lizt of Rawles dat can wuse teh comnd 'say' : {}",
-             "gived_roles": "Lizt from rles otomaticall giveD 2 knew mmbr: {}",
-             "save_roles": "Can role bee save:b: wHen an membr leive, in case him retrns? {}",
-             "enable_xp": "Shald teh xperiense systèm be enabld? {}",
-             "anti_caps_lock": "Shuld the baot sent a mssge when a mmBEr sents TOO MANY C:a:PITAL LETERZ ??!!??! {}",
-             "enable_fun": "R teh c0mmands lysteb in te `!fun` comand enubld? {}",
-             "hunter": "Lyst for al cat roums in wich teh gamz *Hunter* are actved: {}",
-             "welcome_channel": "Lst of canels whe're to sen wilcume/leivz mesage': {}",
-             "bot_news": "Liist for channnnels were 2 sendz bot nweZ: {}",
-             "modlogs_channel":"Chanel where 2 sent modrashun wOods: {}",
-             "poll_channels": "List oof channl whre :thumbsup: & :thumbsdown: réactonz would be aut:o2:maticall ad to aech msg pliz : {}",
-             "welcome": "Missge snt whem a mber arived :: {}",
-             "leave": "Mesae sen when an meberz leave: {}",
-             "language": "Cuurent zbot languge 4 dis lolcat: **{}**",
-             "prefix":"Currnt baot prfx: {}",
-             "membercounter":"Channel dis-playin nmberz from memberz in iz nayme: {}",
-             "anti_raid":"Lev3l of anti-rayderz protect: {} \n*([Dowcumetaton](https://zbot.rtfd.io/en/latest/moderator.html#anti-raid))*",
-             "vote_emojis":"Emojiz use 4 powll reacts: {}",
-             "help_in_dm":"Sent help mess:a:ge on Prvte Msage? {}",
-             "muted_role":"Usd role 2 mute people : {}"}
+server_desc={"prefix":"Currnt baot prfx: {}",
+            "language": "Cuurent zbot languge 4 dis lolcat: **{}**",
+            "clear": "Lizt of rawles dat can us teh 'clear' commend: {}",
+            "slowmode": "Llst of rolz that ca' use 'slowmode' and 'freeze' commmandz: {}",
+            "mute": "Lis of roles dat kan us the 'mute' commmand: {}",
+            "kick": "Lizt of roles taht caan use tee 'kick' commad: {}",
+            "ban": "List for r:o2:les that cawn use this command 'ban': {}",
+            "warn": "Lizt of rawle thut can emploi commanDz 'warn' end 'cases' pliz: {}",
+            "say": "Lizt of Rawles dat can wuse teh comnd 'say' : {}",
+            "hunter": "Lyst for al cat roums in wich teh gamz *Hunter* are actved: {}",
+            "welcome_channel": "Lst of canels whe're to sen wilcume/leivz mesage': {}",
+            "welcome": "Missge snt whem a mber arived :: {}",
+            "leave": "Mesae sen when an meberz leave: {}",
+            "gived_roles": "Lizt from rles otomaticall giveD 2 knew mmbr: {}",
+            "bot_news": "Liist for channnnels were 2 sendz bot nweZ: {}",
+            "modlogs_channel":"Chanel where 2 sent modrashun wOods: {}",
+            "save_roles": "Can role bee save:b: wHen an membr leive, in case him retrns? {}",
+            "poll_channels": "List oof channl whre :thumbsup: & :thumbsdown: réactonz would be aut:o2:maticall ad to aech msg pliz : {}",
+            "enable_xp": "Shald teh xperiense systèm be enabld? {}",
+            "levelup_msg":"Cool text sent when a member gets 1 xp lvl: {}",
+            "anti_caps_lock": "Shuld the baot sent a mssge when a mmBEr sents TOO MANY C:a:PITAL LETERZ ??!!??! {}",
+            "enable_fun": "R teh c0mmands lysteb in te `!fun` comand enubld? {}",
+            "membercounter":"Channel dis-playin nmberz from memberz in iz nayme: {}",
+            "anti_raid":"Lev3l of anti-rayderz protect: {} \n*([Dowcumetaton](https://zbot.rtfd.io/en/latest/moderator.html#anti-raid))*",
+            "vote_emojis":"Emojiz use 4 powll reacts: {}",
+            "help_in_dm":"Sent help mess:a:ge on Prvte Msage? {}",
+            "muted_role":"Usd role 2 mute people : {}"}
 
 stats_infos={"not-found":"Unable 2 found {N}",
-            "type-invalid":"Invalid type: `{T}`",
             "member-0":"Lttle nayme",
             "member-1":"Born at",
             "member-2":"New from",
@@ -456,6 +468,7 @@ stats_infos={"not-found":"Unable 2 found {N}",
             "guild-10":"Tim be4 being AFK",
             "guild-11.1":"20 first rawles (tot {})",
             "guild-11.2":"Rol list (totAl {})",
+            "guild-12":"Cool links numbr (invites)",
             "inv-0":"URL lnk",
             "inv-1":"Inviter",
             "inv-2":"Uzz",
@@ -466,3 +479,19 @@ stats_infos={"not-found":"Unable 2 found {N}",
             "categ-1":"Posishun",
             "categ-2":"Textz : {} | Vocaal : {}",
              }
+
+users = {'invalid-card':'Dat style iz no valid. But yop, her\'s styles u can use: {}',
+        'missing-attach-files':'Oops, I\'m missing the Attach Files perms :upside_down:',
+        'changed-0':'Ur xp card naw use the style {}',
+        'changed-1':'Oops, a wicked error occurrd during the process ov ur request. Try again later or contact these nice support guys.'}
+
+xp = {'card-level':'LVL',
+        'card-rank':'SEAT',
+        '1-no-xp':"U don't have any xP yet!",
+        '2-no-xp':"Dis user doezn't have any xp!",
+        "del-user":"<deleted usr>",
+        "low-page":"Oops, I can't display a negative page!",
+        "high-page":"There aren't so much pages!",
+        "top-title-1":"Global ranks",
+        "top-name":"__Bests {}-{} :__",
+        "default_levelup":"Weew, {user} has just got **lvl {level}**! What a smart guy!"}

@@ -10,13 +10,13 @@ roles_options = ["clear","slowmode","mute","kick","ban","warn","say","gived_role
 bool_options = ["save_roles","enable_xp","anti_caps_lock","enable_fun","help_in_dm"]
 textchan_options = ["hunter","welcome_channel","bot_news","poll_channels","modlogs_channel"]
 vocchan_options = ["membercounter"]
-text_options = ["welcome","leave"]
+text_options = ["welcome","leave","levelup_msg"]
 prefix_options = ['prefix']
 emoji_option = ['vote_emojis']
 numb_options = []
 raid_options = ["anti_raid"]
 
-class ServerCog:
+class ServerCog(commands.Cog):
     """"Cog in charge of all the bot configuration management for your server. As soon as an option is searched, modified or deleted, this cog will handle the operations."""
 
     def __init__(self,bot):
@@ -30,14 +30,14 @@ class ServerCog:
             self.translate = self.bot.cogs["LangCog"].tr
         except:
             pass
-        if bot.user != None:
-            self.table = 'servers' if bot.user.id==486896267788812288 else 'servers_beta'
+        self.table = 'servers_beta' if bot.beta else 'servers'
         self.default_opt = {"language":0,
                "clear":"",
                "slowmode":"",
                "mute":"",
                "kick":"",
                "ban":"",
+               "warn":"",
                "say":"",
                "hunter":"",
                "welcome_channel":'',
@@ -49,6 +49,7 @@ class ServerCog:
                "poll_channels":"",
                "modlogs_channel":"",
                "enable_xp":1,
+               "levelup_msg":'',
                "anti_caps_lock":1,
                "enable_fun":1,
                "prefix":'!',
@@ -57,32 +58,32 @@ class ServerCog:
                "vote_emojis":":thumbsup:;:thumbsdown:;",
                "help_in_dm":0,
                "muted_role":0}
-        self.optionsList = ["ID","Created at","prefix","language","clear","slowmode","mute","kick","ban","warn","say","hunter","welcome_channel","welcome","leave","gived_roles","bot_news","poll_channels","modlogs_channel","anti_caps_lock","enable_fun","membercounter","anti_raid","vote_emojis","help_in_dm","muted_role"]
+        self.optionsList = ["ID","Created at","prefix","language","clear","slowmode","mute","kick","ban","warn","say","hunter","welcome_channel","welcome","leave","gived_roles","bot_news","poll_channels","modlogs_channel","enable_xp","anti_caps_lock","enable_fun","membercounter","anti_raid","vote_emojis","help_in_dm","muted_role"]
 
+    @commands.Cog.listener()
     async def on_ready(self):
         self.translate = self.bot.cogs["LangCog"].tr
-        self.table = 'servers' if self.bot.user.id==486896267788812288 else 'servers_beta'
+        self.table = 'servers_beta' if self.bot.beta else 'servers'
 
 
     async def get_bot_infos(self,botID):
         """return every options of a server"""
         if not self.bot.database_online:
             return list()
-        cnx = self.connect()
+        cnx = self.bot.cnx
         cursor = cnx.cursor(dictionary=True)
         query = ("SELECT * FROM `bot_infos` WHERE `ID`={}".format(botID))
         cursor.execute(query)
         liste = list()
         for x in cursor:
             liste.append(x)
-        cnx.close()
         return liste
     
     async def edit_bot_infos(self,botID,values=[()]):
         if type(values)!=list:
             raise ValueError
         v = list()
-        cnx = self.connect()
+        cnx = self.bot.cnx
         cursor = cnx.cursor()
         for x in values:
             if type(x) == bool:
@@ -92,14 +93,13 @@ class ServerCog:
         query = ("UPDATE `bot_infos` SET {v} WHERE `ID`='{id}'".format(v=",".join(v),id=botID))
         cursor.execute(query)
         cnx.commit()
-        cnx.close()
         return True
 
     async def get_languages(self,ignored_guilds):
         """Return percentages of languages"""
         if not self.bot.database_online:
             return list()
-        cnx = self.connect()
+        cnx = self.bot.cnx
         cursor = cnx.cursor(dictionary=True)
         query = ("SELECT `language`,`ID` FROM `{}` WHERE 1".format(self.table))
         cursor.execute(query)
@@ -109,12 +109,11 @@ class ServerCog:
                 liste.append(x['language'])
         for e,l in enumerate(self.bot.cogs['LangCog'].languages):
             langs.append((l,liste.count(e)))
-        cnx.close()
         return langs
 
 
-    def connect(self):
-        return mysql.connector.connect(user=self.bot.database_keys['user'],password=self.bot.database_keys['password'],host=self.bot.database_keys['host'],database=self.bot.database_keys['database'])
+    # def connect(self):
+    #     return mysql.connector.connect(user=self.bot.database_keys['user'],password=self.bot.database_keys['password'],host=self.bot.database_keys['host'],database=self.bot.database_keys['database'])
 
     async def staff_finder(self,user,option):
         """Check is user is part of a staff"""
@@ -148,7 +147,7 @@ class ServerCog:
         await self.bot.wait_until_ready()
         if type(columns)!=list or type(criters)!=list:
             raise ValueError
-        cnx = self.connect()
+        cnx = self.bot.cnx
         cursor = cnx.cursor(dictionary = (Type==dict))
         if columns == []:
             cl = "*"
@@ -160,14 +159,13 @@ class ServerCog:
         liste = list()
         for x in cursor:
             liste.append(x)
-        cnx.close()
         return liste    
 
     async def modify_server(self,ID,values=[()],channel=None):
         if type(values)!=list:
             raise ValueError
         v = list()
-        cnx = self.connect()
+        cnx = self.bot.cnx
         cursor = cnx.cursor()
         for x in values:
             if type(x) == bool:
@@ -177,7 +175,6 @@ class ServerCog:
         query = ("UPDATE `{t}` SET {v} WHERE `ID`='{id}'".format(t=self.table,v=",".join(v),id=ID))
         cursor.execute(query)
         cnx.commit()
-        cnx.close()
         return True
 
     async def delete_option(self,ID,opt,channel=None):
@@ -196,12 +193,11 @@ class ServerCog:
         if type(ID) == str:
             if not ID.isnumeric():
                 raise ValueError
-        cnx = self.connect()
+        cnx = self.bot.cnx
         cursor = cnx.cursor()
         query = ("INSERT INTO `{}` (`ID`) VALUES ('{}')".format(self.table,ID))
         cursor.execute(query)
         cnx.commit()
-        cnx.close()
         return True
 
     async def is_server_exist(self,ID,channel=None):
@@ -212,6 +208,8 @@ class ServerCog:
                 await channel.send(await self.translate(channel.guild.id,"server","new_server"))
             # await self.bot.get_user(279568324260528128).send("Le serveur n°{} vient d'être ajouté dans la base de donnée".format(ID))
             g = self.bot.get_guild(ID)
+            if g==None:
+                raise Exception("Guild not found")
             emb = self.bot.cogs["EmbedCog"].Embed(desc="New server in the database :tada: `{}` ({})".format(g.name,g.id),color=self.log_color).update_timestamp()
             await self.bot.cogs["EmbedCog"].send([emb])
             return await self.add_server(ID)
@@ -221,12 +219,11 @@ class ServerCog:
         """remove a server from the db"""
         if type(ID)!=int:
             raise ValueError
-        cnx = self.connect()
+        cnx = self.bot.cnx
         cursor = cnx.cursor()
         query = ("DELETE FROM `{}` WHERE `ID`='{}'".format(self.table,ID))
         cursor.execute(query)
         cnx.commit()
-        cnx.close()
         return True
 
                  
@@ -365,7 +362,7 @@ class ServerCog:
             if value.lower() in ["true","vrai","1","oui","yes","activé"]:
                 value = True
                 v = 1
-            elif value.lower() in ["false","faux","non","no","désactivé","wrong"]:
+            elif value.lower() in ["false","faux","non","no","désactivé","wrong",'0']:
                 value = False
                 v = 0
             else:
@@ -713,11 +710,14 @@ class ServerCog:
             elif option in emoji_option:
                 r = await self.conf_emoji(ctx,option,"scret-desc")
             else:
+                r = None
+            if r!=None:
+                try:
+                    r = str(await self.translate(ctx.guild,"server_desc",option)).format(r)
+                except Exception as e:
+                    pass
+            else:
                 r = await self.translate(ctx.guild.id,"server","change-0")
-            try:
-                r = str(await self.translate(ctx.guild,"server_desc",option)).format(r)
-            except Exception as e:
-                pass
             try:
                 if not ctx.channel.permissions_for(ctx.guild.me).embed_links:
                     await ctx.send(await self.translate(ctx.guild.id,"mc","cant-embed"))

@@ -1,7 +1,7 @@
 import discord
 from discord.ext import commands
 
-import time, importlib, sys, traceback, datetime, os, shutil, asyncio, inspect, typing, io, textwrap, copy, operator, requests, random, ast
+import time, importlib, sys, traceback, datetime, os, shutil, asyncio, inspect, typing, io, textwrap, copy, operator, requests, random, ast, math
 from libs import feedparser
 from contextlib import redirect_stdout
 from fcts import reloads
@@ -16,7 +16,7 @@ def cleanup_code(content):
     # remove `foo`
     return content.strip('` \n')
 
-class AdminCog:
+class AdminCog(commands.Cog):
     """Here are listed all commands related to the internal administration of the bot. Most of them are not accessible to users, but only to ZBot administrators."""
         
     def __init__(self, bot):
@@ -35,7 +35,8 @@ class AdminCog:
             pass
         self._last_result = None
         self.god_mode = []
-        
+    
+    @commands.Cog.listener()
     async def on_ready(self):
         self.translate = self.bot.cogs["LangCog"].tr
         self.print = self.bot.cogs["UtilitiesCog"].print2
@@ -63,11 +64,19 @@ class AdminCog:
         if enable:
             if ctx.guild.id not in self.god_mode:
                 self.god_mode.append(ctx.guild.id)
-            await ctx.send("<:nitro:548569774435598346> Mode superadmin activé sur ce serveur")
+                await ctx.send("<:nitro:548569774435598346> Mode superadmin activé sur ce serveur",delete_after=3)
+            else:
+                await ctx.send("Mode superadmin déjà activé sur ce serveur",delete_after=3)
         else:
             if ctx.guild.id in self.god_mode:
                 self.god_mode.remove(ctx.guild.id)
-            await ctx.send("Mode superadmin désactivé sur ce serveur")
+                await ctx.send("Mode superadmin désactivé sur ce serveur",delete_after=3)
+            else:
+                await ctx.send("Ce mode n'est pas actif ici",delete_after=3)
+        try:
+            await ctx.message.delete()
+        except:
+            pass
 
     @commands.command(name='spoil',hidden=True)
     @commands.check(reloads.check_admin)
@@ -224,6 +233,7 @@ class AdminCog:
         await m.edit(content="Bot en voie d'extinction")
         await self.bot.change_presence(status=discord.Status('offline'))
         self.bot.log.info("Fermeture du bot")
+        self.bot.cnx.close()
         await self.bot.logout()
         await self.bot.close()
 
@@ -253,7 +263,7 @@ class AdminCog:
         if self.bot.database_online:
             for x in self.bot.guilds:
                 await self.bot.cogs["ServerCog"].update_memberChannel(x)
-            await ctx.send(":ok_hand:")
+            await ctx.bot.cogs['UtilitiesCog'].add_check_reaction(ctx.message)
         else:
             await ctx.send("Impossible de faire ceci, la base de donnée est inaccessible")
 
@@ -311,6 +321,18 @@ class AdminCog:
                 await self.bot.cogs["Errors"].on_command_error(ctx,e)
         else:
             await ctx.send("Serveur introuvable")
+
+    @main_msg.command(name='db_reload')
+    @commands.check(reloads.check_admin)
+    async def db_reload(self,ctx):
+        """Reconnecte le bot à la base de donnée"""
+        try:
+            self.bot.cnx.close()
+            self.bot.connect_database()
+            if self.bot.cnx != None:
+                await ctx.bot.cogs['UtilitiesCog'].add_check_reaction(ctx.message)
+        except Exception as e:
+            await self.bot.cogs['ErrorsCog'].on_cmd_error(ctx,e)
 
     @main_msg.command(name="emergency")
     @commands.check(reloads.check_admin)
@@ -411,14 +433,10 @@ class AdminCog:
 
     @main_msg.command(name="logs")
     @commands.check(reloads.check_admin)
-    async def show_last_logs(self,ctx,lines:typing.Optional[int]=5,match=''):
+    async def show_last_logs(self,ctx,lines:typing.Optional[int]=15,match=''):
         """Affiche les <lines> derniers logs ayant <match> dedans"""
         try:
             with open('debug.log','r',encoding='utf-8') as file:
-                #try:
-                    #file.seek(-300*lines,2)
-                #except:
-                    #pass
                 text = file.read().split("\n")
             msg = str()
             liste = list()
@@ -590,6 +608,7 @@ class AdminCog:
         new_ctx = await self.bot.get_context(msg)
         #new_ctx.db = ctx.db
         await self.bot.invoke(new_ctx)
+        await ctx.bot.cogs['UtilitiesCog'].add_check_reaction(ctx.message)
 
     async def backup_auto(self,ctx=None):
         """Crée une backup du code"""
@@ -632,6 +651,7 @@ class AdminCog:
         chan = ctx.bot.get_channel(548138866591137802) if self.bot.beta else ctx.bot.get_channel(488769306524385301)
         msg = await chan.send(embed=emb.discord_embed())
         await self.bot.cogs['FunCog'].add_vote(msg)
+        await ctx.bot.cogs['UtilitiesCog'].add_check_reaction(ctx.message)
 
     
 

@@ -6,24 +6,19 @@ importlib.reload(args)
 importlib.reload(checks)
 
 
-class TimedCog:
+class TimedCog(commands.Cog):
 
     def __init__(self,bot):
         self.bot = bot
         self.file = 'timed'
         self.table = 'timed'
-        self.usable_actions = ['mute','ban']
-        try:
-            self.connect = bot.cogs['ServerCog'].connect
-        except:
-            pass
         try:
             self.translate = bot.cogs['LangCog'].tr
         except:
             pass
     
+    @commands.Cog.listener()
     async def on_ready(self):
-        self.connect = self.bot.cogs['ServerCog'].connect
         self.translate = self.bot.cogs['LangCog'].tr
 
 
@@ -31,12 +26,11 @@ class TimedCog:
         """add a new server to the db"""
         if not all([type(x)==int for x in (user,guild,begin,duration)]):
             raise ValueError
-        cnx = self.connect()
+        cnx = self.bot.cnx
         cursor = cnx.cursor()
         query = ("INSERT INTO `{}` (`guild`,`user`,`action`,`begin`,`duration`) VALUES ('{}','{}','{}','{}','{}')".format(self.table,guild,user,action,begin,duration))
         cursor.execute(query)
         cnx.commit()
-        cnx.close()
         return True
 
     async def get_infos(self,columns=[],criters=["ID>1"],relation="AND",Dict=True):
@@ -44,7 +38,7 @@ class TimedCog:
         await self.bot.wait_until_ready()
         if type(columns)!=list or type(criters)!=list:
             raise ValueError
-        cnx = self.connect()
+        cnx = self.bot.cnx
         cursor = cnx.cursor(dictionary = Dict)
         if columns == []:
             cl = "*"
@@ -56,19 +50,17 @@ class TimedCog:
         liste = list()
         for x in cursor:
             liste.append(x)
-        cnx.close()
         return liste
     
     async def delete_server(self,user,guild,action):
         """remove a server from the db"""
         if type(user)!=int or type(guild)!=int:
             raise ValueError
-        cnx = self.connect()
+        cnx = self.bot.cnx
         cursor = cnx.cursor()
         query = ("DELETE FROM `{}` WHERE `user`='{}' AND `guild`='{}' AND `action`='{}'".format(self.table,user,guild,action))
         cursor.execute(query)
         cnx.commit()
-        cnx.close()
         return True
 
 
@@ -76,10 +68,9 @@ class TimedCog:
     @commands.cooldown(5,20, commands.BucketType.guild)
     @commands.guild_only()
     @commands.check(checks.can_mute)
-    async def test(self,ctx,user:discord.Member,time:commands.Greedy[args.tempdelta],*,reason="Unspecified"):
+    async def tempmute(self,ctx,user:discord.Member,time:commands.Greedy[args.tempdelta],*,reason="Unspecified"):
         """Mute a member for a defined duration
 The bot can currently have up to 30 sec of latency. If it has more, check if you didn't remove the "Manage Roles" permission.
-
 Durations : 
 `XXm` : XX minutes
 `XXh` : XX hours
@@ -87,8 +78,13 @@ Durations :
 Example: tempmute @someone 1d 3h Reason is becuz he's a bad guy
 """
         duration = sum(time)
+        if duration==0:
+            try:
+                raise commands.errors.BadArgument('Invalid duration: 0s')
+            except Exception as e:
+                await self.bot.cogs['ErrorsCog'].on_cmd_error(ctx,e)
+                return
         f_duration = await self.bot.cogs['TimeCog'].time_delta(duration,lang='en',form='temp',precision=0)
-        #await ctx.send("{} a été mute pour {} secondes. Raison : {}".format(user,duration,reason))
         try:
             if self.bot.database_online and await self.bot.cogs["ServerCog"].staff_finder(user,"mute") or user==ctx.guild.me:
                 await ctx.send(str(await self.translate(ctx.guild.id,"modo","staff-mute"))+random.choice([':confused:',':upside_down:',self.bot.cogs['EmojiCog'].customEmojis['wat'],':no_mouth:',self.bot.cogs['EmojiCog'].customEmojis['owo'],':thinking:',]))

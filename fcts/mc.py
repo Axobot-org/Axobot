@@ -2,7 +2,7 @@ import frmc_lib, requests, discord, re, datetime, time
 from discord.ext import commands
 
 
-class McCog:
+class McCog(commands.Cog):
     """Cog gathering all commands related to the Minecraft® game. 
 Every information come from the website www.fr-minecraft.net"""
     
@@ -15,6 +15,7 @@ Every information come from the website www.fr-minecraft.net"""
         except:
             pass
 
+    @commands.Cog.listener()
     async def on_ready(self):
         self.translate = self.bot.cogs["LangCog"].tr
 

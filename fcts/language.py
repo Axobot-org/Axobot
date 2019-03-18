@@ -9,7 +9,7 @@ m_reload(en)
 m_reload(lolcat)
 
 
-class LangCog:
+class LangCog(discord.ext.commands.Cog):
 
     def __init__(self,bot):
         m_reload(fr)
@@ -19,8 +19,6 @@ class LangCog:
         self.languages = ['fr','en','lolcat']
         self.serv_opts = dict()
 
-    async def on_ready(self):
-        pass
 
     async def tr(self,serverID,moduleID,messageID):
         """Renvoie le texte en fonction de la langue"""

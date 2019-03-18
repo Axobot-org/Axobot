@@ -2,6 +2,7 @@
 #coding=utf-8
 
 import requests, string
+from discord.ext import commands
 
 #https://github.com/ttacon/emoji/blob/master/emoji.go
 
@@ -940,7 +941,7 @@ characteres = {':': 513087396460363798,
 		' ': 446782476375949323}
 
 
-class EmojiCog:
+class EmojiCog(commands.Cog):
 	"""Cog for managing emojis. No more, no less."""
 	
 	def __init__(self,bot):
