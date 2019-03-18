@@ -461,7 +461,7 @@ class AdminCog(commands.Cog):
     async def enable_xp(self,ctx,enabling:bool):
         """Empêche tous les utilisateurs de gagner de l'xp.
 Cette option affecte tous les serveurs"""
-        self.bot.enable_xp = enabling
+        self.bot.xp_enabled = enabling
         if enabling:
             await ctx.send("L'xp est mainenant activée")
         else:
