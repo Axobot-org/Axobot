@@ -494,6 +494,27 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
             await ctx.send(await self.translate(ctx.guild,"find","chan-0"))
             return
         await ctx.send(str(await self.translate(ctx.guild,"find","chan-1")).format(c.name,c.id,c.guild.name,c.guild.id))
+    
+    @find_main.command(name='rss')
+    async def find_rss(self,ctx,ID:int):
+        flow = await self.bot.cogs['RssCog'].get_flow(ID)
+        if len(flow)==0:
+            await ctx.send("Invalid ID")
+        else:
+            flow = flow[0]
+        temp = self.bot.get_guild(flow['guild'])
+        if temp == None:
+            g = "Unknown ({})".format(flow['guild'])
+            
+        else:
+            g = "{} `{}`".format(temp.id,temp.name)
+            temp = self.bot.get_channel(flow['channel'])
+        if temp != None:
+            c = "{} `{}`".format(temp.id,temp.name)
+        else:
+            c = "Unknown ({})".format(flow['channel'])
+        d = await self.bot.cogs['TimeCog'].date(flow['date'],digital=True)
+        await ctx.send("ID: {}\nGuild: {}\nChannel: {}\nLink: <{}>\nType: {}\nLast post: {}".format(flow['ID'],g,c,flow['link'],flow['type'],d))
 
     @commands.command(name="membercount",aliases=['member_count'])
     @commands.guild_only()
