@@ -1,4 +1,4 @@
-import discord, random, time, asyncio, io, imageio, importlib, re, os, operator
+import discord, random, time, asyncio, io, imageio, importlib, re, os, operator, platform
 from discord.ext import commands
 from math import ceil
 from PIL import Image, ImageDraw, ImageFont, ImageTk
@@ -105,7 +105,7 @@ class XPCog(commands.Cog):
             current_lvl = 0
             self.levels = [0]
             while needed_xp<xp:
-                temp = round(current_lvl**3+100)
+                temp = round(current_lvl**3.2+100)
                 self.levels.append(self.levels[-1]+temp)
                 self.levels.append(temp)
                 needed_xp = self.levels[-1]
@@ -256,12 +256,16 @@ class XPCog(commands.Cog):
         img.paste(pfp, (20, 29))
         img.paste(card, (0, 0), card)
 
-        name_fnt = ImageFont.truetype('/Library/Fonts/Roboto-Medium.ttf', 40)
-        xp_fnt = ImageFont.truetype('/Library/Fonts/Verdana.ttf', 24)
-        NIVEAU_fnt = ImageFont.truetype('/Library/Fonts/Verdana.ttf', 42)
-        levels_fnt = ImageFont.truetype('/Library/Fonts/Verdana.ttf', 65)
-        rank_fnt = ImageFont.truetype('/Library/Fonts/Verdana.ttf',29)
-        RANK_fnt = ImageFont.truetype('/Library/Fonts/Verdana.ttf',23)
+        if platform.system()=='Darwin':
+            verdana_name = 'Verdana.ttf'
+        else:
+            verdana_name = 'Veranda.ttf'
+        name_fnt = ImageFont.truetype('Roboto-Medium.ttf', 40)
+        xp_fnt = ImageFont.truetype(verdana_name, 24)
+        NIVEAU_fnt = ImageFont.truetype(verdana_name, 42)
+        levels_fnt = ImageFont.truetype(verdana_name, 65)
+        rank_fnt = ImageFont.truetype(verdana_name,29)
+        RANK_fnt = ImageFont.truetype(verdana_name,23)
         colors = {'name':(124, 197, 118),'xp':(124, 197, 118),'NIVEAU':(255, 224, 77),'rank':(105, 157, 206)}
 
         d = ImageDraw.Draw(img)
@@ -269,7 +273,7 @@ class XPCog(commands.Cog):
         levels_info = await self.calc_level(xp)
         temp = '{} / {} xp'.format(xp,levels_info[1])
         d.text((await self.calc_pos(temp,xp_fnt,625,237)), temp, font=xp_fnt, fill=colors['xp'])
-        d.text((380,140), txt[0], font=NIVEAU_fnt, fill=colors[txt[0]])
+        d.text((380,140), txt[0], font=NIVEAU_fnt, fill=colors['NIVEAU'])
         d.text((await self.calc_pos(str(levels_info[0]),levels_fnt,740,160,'right')), str(levels_info[0]), font=levels_fnt, fill=colors['xp'])
         temp = '{x[0]}/{x[1]}'.format(x=rank)
         d.text((await self.calc_pos(txt[1],RANK_fnt,893,147,'center')), txt[1], font=RANK_fnt, fill=colors['rank'])
