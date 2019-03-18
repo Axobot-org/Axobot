@@ -3,7 +3,7 @@
 
 def check_libs():
     count = 0
-    for m in ["mysql","discord","frmc_lib","requests","re","asyncio","datetime","time","importlib","traceback","sys","logging","sympy","psutil","platform","subprocess",'json','emoji','imageio','platform']:
+    for m in ["mysql","discord","frmc_lib","requests","re","asyncio","datetime","time","importlib","traceback","sys","logging","sympy","psutil","platform","subprocess",'json','emoji','imageio','platform','geocoder','tzwhere','pytz']:
         try:
             exec("import "+m)
             exec("del "+m)
@@ -73,6 +73,7 @@ class zbot(commands.bot.BotBase,discord.Client):
         self.log = logging.getLogger("runner")
         self.dbl_token = dbl_token
         self._cnx = [None,0]
+        self.xp_enabled = True
     
     @property
     def cnx(self):
@@ -87,7 +88,7 @@ class zbot(commands.bot.BotBase,discord.Client):
         if len(self.database_keys)>0:
             if self._cnx[0] != None:
                 self._cnx[0].close()
-            self.log.info('Connection à MySQL (user {})'.format(self.database_keys['user']))
+            self.log.debug('Connection à MySQL (user {})'.format(self.database_keys['user']))
             self._cnx[0] = mysql.connector.connect(user=self.database_keys['user'],password=self.database_keys['password'],host=self.database_keys['host'],database=self.database_keys['database'])
             self._cnx[1] = round(time.time())
         else:

@@ -97,7 +97,8 @@ fun={"count-0":"Comptage en cours...",
     "blame-0":"Liste des noms disponibles pour le membre **{}**",
     "no-database":"Notre base de donnée étant hors ligne, l'accès aux commandes fun est restreint aux personnes ayant la permission de Gérer le Serveur",
     "no-embed-perm":"Je ne possède pas la permission \"Intégrer des liens\" :confused:",
-    "embed-error":"Une erreur est survenue: `{}`"
+    "embed-error":"Une erreur est survenue: `{}`",
+    "invalid-city":"Nom de ville invalide"
     }
 
 infos={"text-0":"""Bonjour ! Moi c'est {0} !

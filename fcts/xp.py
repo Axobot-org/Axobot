@@ -18,7 +18,8 @@ class XPCog(commands.Cog):
         self.cooldown = 30
         self.minimal_size = 5
         self.spam_rate = 0.30
-        self.xp_per_char = 0.4
+        self.xp_per_char = 0.35
+        self.max_xp_per_msg = 50
         self.file = 'xp'
         bot.add_listener(self.add_xp,'on_message')
         try:
@@ -34,7 +35,7 @@ class XPCog(commands.Cog):
 
     async def add_xp(self,msg):
         """Attribue un certain nombre d'xp à un message"""
-        if msg.author.bot or msg.guild==None:
+        if msg.author.bot or msg.guild==None or not self.bot.xp_enabled:
             return
         if len(self.cache)==0:
             await self.bdd_load_cache()
@@ -96,27 +97,15 @@ class XPCog(commands.Cog):
         matches = re.finditer(r"<a?(:\w+:)\d+>", content, re.MULTILINE)
         for _, match in enumerate(matches, start=1):
             content = content.replace(match.group(0),match.group(1))
-        return round(len(content)*self.xp_per_char)
+        return min(round(len(content)*self.xp_per_char), self.max_xp_per_msg)
 
     async def calc_level(self,xp):
         """Calcule le niveau correspondant à un nombre d'xp"""
-        if xp > max(self.levels):
-            needed_xp = 0
-            current_lvl = 0
-            self.levels = [0]
-            while needed_xp<xp:
-                temp = round(current_lvl**3.2+100)
-                self.levels.append(self.levels[-1]+temp)
-                self.levels.append(temp)
-                needed_xp = self.levels[-1]
-                current_lvl += 1
-            return current_lvl,self.levels[-1]
-        elif xp == max(self.levels):
-            return len(self.levels)-1,(await self.calc_level(xp+1))[1]
-        else:
-            for e in range(len(self.levels)):
-                if self.levels[e]>xp:
-                    return e,self.levels[e]
+        lvl = ceil(0.05*xp**0.61)
+        temp = xp
+        while ceil(0.05*temp**0.61)==lvl:
+            temp += 1
+        return [lvl,temp]
 
     async def bdd_set_xp(self,userID,points,Type='add'):
         """Ajoute/reset de l'xp à un utilisateur dans la database générale"""

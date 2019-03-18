@@ -97,7 +97,8 @@ fun={"count-0":"Countng in progrez...",
     "blame-0":"Lizt ov availabl namz 4 **{}**",
     "no-database":"As our data ar offline, access to funz commandz iz restricted to guys with permishun \"Manage Server\"",
     "no-embed-perm":"I dont haz permishun 2 \"Embed links\" :confused:",
-    "embed-error":"A' error went wrong: `{}`"
+    "embed-error":"A' error went wrong: `{}`",
+    "invalid-city":"Invalid place name :confused:"
     }
 
 infos={"text-0":"""Ho hi hello! I'm {0} !

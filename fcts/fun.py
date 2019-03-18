@@ -1,6 +1,9 @@
-import discord, random, operator, string, importlib, re, typing, datetime, subprocess
+import discord, random, operator, string, importlib, re, typing, datetime, subprocess, requests, json, geocoder
 import emoji as emojilib
 from discord.ext import commands
+from tzwhere import tzwhere
+from pytz import timezone
+
 from fcts import emoji
 importlib.reload(emoji)
 
@@ -37,6 +40,7 @@ class FunCog(commands.Cog):
         self.bot = bot
         self.fun_opt = dict()
         self.file = "fun"
+        self.tz = tzwhere.tzwhere(forceTZ=True)
         try:
             self.translate = self.bot.cogs["LangCog"].tr
         except:
@@ -403,6 +407,36 @@ You can specify a verification limit by adding a number in argument"""
         else:
             await ctx.send(random.choice(await self.translate(ctx.guild,"fun","piece-0")))
     
+    @commands.command(name="weather")
+    async def weather(self,ctx,*,city:str):
+        """Get the weather of a city
+        You need to provide the city name in english"""
+        city = city.replace(" ","%20")
+        r = requests.get("https://welcomer.glitch.me/weather?city="+city)
+        if r.ok:
+            try:
+                _ = r.json()
+            except json.decoder.JSONDecodeError:
+                if ctx.channel.permissions_for(ctx.me).embed_links:
+                    emb = self.bot.cogs['EmbedCog'].Embed(image="https://welcomer.glitch.me/weather?city="+city,footer_text="From https://welcomer.glitch.me/weather")
+                    await ctx.send(embed=emb.discord_embed())
+                else:
+                    await ctx.send("https://welcomer.glitch.me/weather?city="+city)
+                return
+        await ctx.send(await self.translate(ctx.guild,"fun","invalid-city"))
+
+    @commands.command(name="hour")
+    @commands.cooldown(4, 60, type=commands.BucketType.guild)
+    async def hour(self,ctx,*,city:str):
+        """Get the hour of a city"""
+        g = geocoder.arcgis(city)
+        timeZoneStr = self.tz.tzNameAt(g.json['lat'],g.json['lng'],forceTZ=True)
+        timeZoneObj = timezone(timeZoneStr)
+        d = datetime.datetime.now(timeZoneObj)
+        format_d = await self.bot.cogs['TimeCog'].date(d,lang=await self.translate(ctx.guild,"current_lang","current"))
+        await ctx.send("**{}**:\n{} ({})".format(timeZoneStr,format_d,d.tzname()))
+
+
     @commands.command(name='embed',hidden=False)
     @commands.has_permissions(embed_links=True)
     async def send_embed(self,ctx,*,arguments):
