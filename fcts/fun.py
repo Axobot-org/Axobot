@@ -40,6 +40,7 @@ class FunCog(commands.Cog):
         self.bot = bot
         self.fun_opt = dict()
         self.file = "fun"
+        self.tz = tzwhere.tzwhere(forceTZ=True)
         try:
             self.translate = self.bot.cogs["LangCog"].tr
         except:
@@ -429,8 +430,7 @@ You can specify a verification limit by adding a number in argument"""
     async def hour(self,ctx,*,city:str):
         """Get the hour of a city"""
         g = geocoder.arcgis(city)
-        tz = tzwhere.tzwhere(forceTZ=True)
-        timeZoneStr = tz.tzNameAt(g.json['lat'],g.json['lng'],forceTZ=True)
+        timeZoneStr = self.tz.tzNameAt(g.json['lat'],g.json['lng'],forceTZ=True)
         timeZoneObj = timezone(timeZoneStr)
         d = datetime.datetime.now(timeZoneObj)
         format_d = await self.bot.cogs['TimeCog'].date(d,lang=await self.translate(ctx.guild,"current_lang","current"))
