@@ -1,7 +1,7 @@
 import discord, sys, traceback, random, re
 from discord.ext import commands
 
-class ErrorsCog:
+class ErrorsCog(commands.Cog):
     """General cog for error management."""
 
     def __init__(self,bot):
@@ -11,7 +11,8 @@ class ErrorsCog:
             self.translate = self.bot.cogs["LangCog"].tr
         except:
             pass
-        
+    
+    @commands.Cog.listener()
     async def on_ready(self):
         self.translate = self.bot.cogs["LangCog"].tr
 
@@ -20,7 +21,6 @@ class ErrorsCog:
             r = re.search(x,sentence)
             if r!= None:
                 return r
-
 
     async def on_cmd_error(self,ctx,error):
         """The event triggered when an error is raised while invoking a command."""
@@ -38,6 +38,9 @@ class ErrorsCog:
         if isinstance(error, ignored):
             return
         elif isinstance(error,commands.CommandOnCooldown):
+            if await self.bot.cogs['AdminCog'].check_if_admin(ctx):
+                await ctx.reinvoke()
+                return
             await ctx.send(str(await self.translate(ctx.guild,'errors','cooldown')).format(round(error.retry_after,2)))
             return
         elif isinstance(error,(commands.BadArgument,commands.BadUnionArgument)):
@@ -75,11 +78,15 @@ class ErrorsCog:
         self.bot.log.warning('Ignoring exception in command {}:'.format(ctx.command), exc_info=True)
         await self.on_error(error,ctx)
 
+    @commands.Cog.listener()
     async def on_command_error(self, ctx, error):
         await self.on_cmd_error(ctx,error)
 
+    @commands.Cog.listener()
     async def on_error(self,error_msg,ctx):
         try:
+            if error_msg==None:
+                return
             sysexc = sys.exc_info()
             s = str(sysexc[0]).split("<class '")
             if len(s)>1:

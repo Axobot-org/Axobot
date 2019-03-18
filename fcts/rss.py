@@ -44,7 +44,7 @@ async def can_use_rss(ctx):
         return False
     return ctx.channel.permissions_for(ctx.author).administrator or await ctx.bot.cogs["AdminCog"].check_if_admin(ctx)
 
-class RssCog:
+class RssCog(commands.Cog):
     """Cog which deals with everything related to rss flows. Whether it is to add automatic tracking to a stream, or just to see the latest video released by Discord, it is this cog that will be used."""
 
     def __init__(self,bot):
@@ -72,6 +72,7 @@ class RssCog:
         except:
             pass
 
+    @commands.Cog.listener()
     async def on_ready(self):
         self.translate = self.bot.cogs["LangCog"].tr
         self.date = self.bot.cogs["TimeCog"].date
@@ -813,31 +814,29 @@ class RssCog:
         return mysql.connector.connect(user=self.bot.database_keys['user'],password=self.bot.database_keys['password'],host=self.bot.database_keys['host'],database=self.bot.database_keys['database'])
 
     async def get_flow(self,ID):
-        cnx = self.connect()
+        cnx = self.bot.cnx
         cursor = cnx.cursor(dictionary = True)
         query = ("SELECT * FROM `{}` WHERE `ID`='{}'".format(self.table,ID))
         cursor.execute(query)
         liste = list()
         for x in cursor:
             liste.append(x)
-        cnx.close()
         return liste
 
     async def get_guild_flows(self,guildID):
         """Get every flow of a guild"""
-        cnx = self.connect()
+        cnx = self.bot.cnx
         cursor = cnx.cursor(dictionary = True)
         query = ("SELECT * FROM `{}` WHERE `guild`='{}'".format(self.table,guildID))
         cursor.execute(query)
         liste = list()
         for x in cursor:
             liste.append(x)
-        cnx.close()
         return liste
 
     async def add_flow(self,guildID,channelID,Type,link):
         """Add a flow in the database"""
-        cnx = self.connect()
+        cnx = self.bot.cnx
         cursor = cnx.cursor()
         ID = await self.create_id(channelID,guildID,Type,link)
         if Type == 'mc':
@@ -847,35 +846,32 @@ class RssCog:
         query = ("INSERT INTO `{}` (`ID`,`guild`,`channel`,`type`,`link`,`structure`) VALUES ('{}','{}','{}','{}','{}','{}')".format(self.table,ID,guildID,channelID,Type,link,form))
         cursor.execute(query)
         cnx.commit()
-        cnx.close()
         return True
 
     async def remove_flow(self,ID):
         """Remove a flow from the database"""
         if type(ID)!=int:
             raise ValueError
-        cnx = self.connect()
+        cnx = self.bot.cnx
         cursor = cnx.cursor()
         query = ("DELETE FROM `{}` WHERE `ID`='{}'".format(self.table,ID))
         cursor.execute(query)
         cnx.commit()
-        cnx.close()
         return True
 
     async def get_all_flows(self):
         """Get every flow of the database"""
-        cnx = self.connect()
+        cnx = self.bot.cnx
         cursor = cnx.cursor(dictionary = True)
         query = ("SELECT * FROM `{}` WHERE 1".format(self.table))
         cursor.execute(query)
         liste = list()
         for x in cursor:
             liste.append(x)
-        cnx.close()
         return liste
 
     async def update_flow(self,ID,values=[(None,None)]):
-        cnx = self.connect()
+        cnx = self.bot.cnx
         cursor = cnx.cursor()
         v = list()
         for x in values:
@@ -888,10 +884,9 @@ class RssCog:
         query = """UPDATE `{t}` SET {v} WHERE `ID`={id}""".format(t=self.table,v=",".join(v),id=ID)
         cursor.execute(query)
         cnx.commit()
-        cnx.close()
 
     async def send_rss_msg(self,obj,channel):
-        if not channel == None:
+        if channel != None:
             t = await obj.create_msg(await self.translate(channel.guild,"current_lang","current"))
             try:
                 await channel.send(t)
@@ -913,8 +908,12 @@ class RssCog:
                 for o in objs:
                     guild = self.bot.get_guild(flow['guild'])
                     if guild == None:
+                        self.bot.log.info("[send_rss_msg] Can not send message on server {} (unknown)".format(flow['guild']))
                         return False
                     chan = guild.get_channel(flow['channel'])
+                    if guild == None:
+                        self.bot.log.info("[send_rss_msg] Can not send message on channel {} (unknown)".format(flow['channel']))
+                        return False
                     o.format = flow['structure']
                     await o.fill_mention(guild,flow['roles'].split(';'),self.translate)
                     await self.send_rss_msg(o,chan)
@@ -939,11 +938,14 @@ class RssCog:
         else:
             liste = await self.get_guild_flows(guildID)
         check = 0
+        errors = []
         for flow in liste:
             try:
                 if flow['type'] != 'mc':
                     if await self.check_flow(flow):
                         check += 1
+                    else:
+                        errors.append(flow['ID'])
                 else:
                     await self.bot.cogs['McCog'].check_flow(flow)
                     check +=1
@@ -952,8 +954,14 @@ class RssCog:
             await asyncio.sleep(self.time_between_flows_check)
         self.flows = dict()
         self.bot.cogs['McCog'].flows = dict()
-        emb = self.bot.cogs["EmbedCog"].Embed(desc="**RSS loop done** in {}s ({}/{} flows)".format(round(time.time()-t,3),check,len(liste)),color=1655066).update_timestamp().set_author(self.bot.guilds[0].me)
+        d = ["**RSS loop done** in {}s ({}/{} flows)".format(round(time.time()-t,3),check,len(liste))]
+        if len(errors)>0:
+            d.append('{} errors: {}'.format(len(errors),' '.join([str(x) for x in errors])))
+        emb = self.bot.cogs["EmbedCog"].Embed(desc='\n'.join(d),color=1655066).update_timestamp().set_author(self.bot.guilds[0].me)
         await self.bot.cogs["EmbedCog"].send([emb],url="https://discordapp.com/api/webhooks/509079297353449492/1KlokgfF7vxRK37pHd15UjdxJSa5H9yzbOLAaRjYEQK7XIdjfMp9PCnER1-Dfz0PBSaM")
+        self.bot.log.debug(d[0])
+        if len(errors)>0:
+            self.bot.log.warn("[Rss loop] "+d[1])
         if guildID==None:
             self.loop_processing = False
 

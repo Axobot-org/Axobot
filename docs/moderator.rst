@@ -31,7 +31,7 @@ This command mutes a member, preventing them from typing.
 
 The principle is to assign the *muted* role to the member, in order to distinguish him from the others. Simply configure the server permissions to have the "send messages" option disabled. And even if you don't, the bot will delete messages from recalcitrant mute members! 
 
-The duration of the tempmute is quite flexible: use `XXd` for days, `XXh` for hours and `XXm` for minutes (replacing **XX** by the corresponding number, of course!)
+The duration of the tempmute is quite flexible: use :code:`XXd` for days, :code:`XXh` for hours and :code:`XXm` for minutes (replacing **XX** by the corresponding number, of course!)
 
 .. warning:: The muted role must be placed below the bot role, and the bot must have "`Manage roles <perms.html#manage-roles>`_" (to give the role) and "`Manage messages <perms.html#manage-messages>`_" (to delete messages) permissions.
 
@@ -63,7 +63,7 @@ Clear
 
 **Syntax:** :code:`clear <number> [parameters]`
 
-This command allows you to efficiently delete messages, with a list of possible parameters for more accuracy. You can thus specify a list of members to check by mentioning them, `+i` to delete all messages containing files/images, `+l` for those containing links or Discord invitations, `+p` for pinned messages. By default, the bot will not delete pinned messages
+This command allows you to efficiently delete messages, with a list of possible parameters for more accuracy. You can thus specify a list of members to check by mentioning them, `+i` to delete all messages containing files/images, `+l` for those containing links or Discord invitations, `+p` for pinned messages. By default, the bot will not delete pinned messages.
 
 Be careful, all specified settings must be validated for the message to be deleted. For example, if you enter :code:`clear 10 @Z_runner#7515 +i`, the bot will check in the last ten messages if the message comes from Z_runner#7515 AND if the message contains an image. 
 
@@ -97,9 +97,9 @@ This command allows you to expel a member from your server, such as kick. But in
 
 .. warning:: For this command, the bot needs "`Ban members <perms.html#ban-members>`_" permission, and you need to have a role to use the "`kick <#kick>`_" command
 
----
-Ban
----
+--------
+Ban/Unan
+--------
 
 **Syntax:** :code:`ban <user> [days_to_delete] [reason]`
 
@@ -107,11 +107,8 @@ The ban allows you to instantly ban a member from your server. This means that t
 
 To cancel this action, use the Discord interface or the `unban <#unban>`_ command. The member will nevertheless have to decide for himself if he wishes to return to your server.
 
-.. warning:: For the command to succeed, the bot must have "`Ban members <perms.html#ban-members>`_" permissions and be placed higher than the highest role of that member.
 
------
-Unban
------
+
 
 **Syntax:** :code:`unban <user> [reason]`
 
@@ -119,7 +116,7 @@ This command allows you to revoke a ban, whether it was made via this bot or not
 
 The persons authorized to use this command are the same as for the `ban <#ban>`_ command(see the :code:`config` command). 
 
-.. warning:: For the command to succeed, the bot must have "`Ban members <perms.html#ban-members>`_" permissions.
+.. warning:: For both commands to succeed, the bot must have "`Ban members <perms.html#ban-members>`_" permissions (as well as be placed higher than the highest role of the member to ban).
 
 -------
 Banlist

@@ -4,7 +4,7 @@ import discord, datetime, time
 fr_months=["Janvier","Février","Mars","Avril","Mai","Juin","Juillet","Aout","Septembre","Octobre","Novembre","Décembre"]
 en_months=["January","February","March","April","May","June","July","August","September","October","November","December"]
 
-class TimeCog:
+class TimeCog(discord.ext.commands.Cog):
     """This cog handles all manipulations of date, time, and time interval. So cool, and so fast"""
     def __init__(self,bot):
         self.bot = bot
@@ -66,7 +66,7 @@ class TimeCog:
             if t.days+t.months*30.41>0:
                 d = round(t.days+t.months*30.41)
                 if not year:
-                    d += t.years*3.154e+7
+                    d += round(t.years*3.154e+7)
                 text += str(d)+'d '
             if year and t.years>0:
                 text += str(t.years)+'y '

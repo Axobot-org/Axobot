@@ -10,7 +10,7 @@ async def can_edit_case(ctx):
         else:
             return False
 
-class CasesCog:
+class CasesCog(commands.Cog):
     """This part of the bot allows you to manage all your members' cases, to delete or edit them"""
 
     def __init__(self,bot):
@@ -23,6 +23,7 @@ class CasesCog:
         if bot.user != None:
             self.table = 'cases_beta' if bot.beta else 'cases'
     
+    @commands.Cog.listener()
     async def on_ready(self):
         self.translate = self.bot.cogs["LangCog"].tr
         self.table = 'cases_beta' if self.bot.beta else 'cases'
@@ -98,7 +99,7 @@ class CasesCog:
             return None
         if type(columns)!=list or type(criters)!=list:
             raise ValueError
-        cnx = self.connect()
+        cnx = self.bot.cnx
         cursor = cnx.cursor(dictionary=True)
         if columns == []:
             cl = "*"
@@ -114,7 +115,6 @@ class CasesCog:
         else:
             for x in cursor:
                 liste.append(x)
-        cnx.close()
         return liste    
 
     async def delete_case(self,ID):
@@ -123,12 +123,11 @@ class CasesCog:
             return None
         if type(ID)!=int:
             raise ValueError
-        cnx = self.connect()
+        cnx = self.bot.cnx
         cursor = cnx.cursor()
         query = ("DELETE FROM `{}` WHERE `ID`='{}'".format(self.table,ID))
         cursor.execute(query)
         cnx.commit()
-        cnx.close()
         return True
     
     async def add_case(self,case):
@@ -137,12 +136,11 @@ class CasesCog:
             return None
         if type(case) != self.Case:
             raise ValueError
-        cnx = self.connect()
+        cnx = self.bot.cnx
         cursor = cnx.cursor()
         query = ("INSERT INTO `{}` (`ID`, `guild`, `user`, `type`, `mod`, `reason`,`duration`) VALUES ('{}', '{}', '{}', '{}', '{}', \"\"\"{}\"\"\",'{}')".format(self.table,case.id,case.guild,case.user,case.type,case.mod,case.reason,case.duration))
         cursor.execute(query)
         cnx.commit()
-        cnx.close()
         return True
 
     async def update_reason(self,case):
@@ -151,12 +149,11 @@ class CasesCog:
         """update infos of a case"""
         if type(case) != self.Case:
             raise ValueError
-        cnx = self.connect()
+        cnx = self.bot.cnx
         cursor = cnx.cursor()
         query = ("UPDATE `{}` SET `reason` = '{}' WHERE `ID` = {}".format(self.table,case.reason,case.id))
         cursor.execute(query)
         cnx.commit()
-        cnx.close()
         return True
 
 

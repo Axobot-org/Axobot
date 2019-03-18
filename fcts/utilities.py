@@ -1,10 +1,11 @@
 import discord, sys, traceback, importlib, datetime, random, re, asyncio
-from fcts import utilities
+from fcts import args
 from discord.ext import commands
 
+importlib.reload(args)
 
 
-class UtilitiesCog:
+class UtilitiesCog(commands.Cog):
     """This cog has various useful functions for the rest of the bot."""
 
     def __init__(self,bot):
@@ -14,7 +15,8 @@ class UtilitiesCog:
         self.config = None
         self.table = 'users'
         self.new_pp = False
-        
+
+    @commands.Cog.listener()
     async def on_ready(self):
         self.config = (await self.bot.cogs['ServerCog'].get_bot_infos(self.bot.user.id))[0]
 
@@ -28,14 +30,13 @@ class UtilitiesCog:
         if str(guild.id) in self.list_prefixs.keys():
             return self.list_prefixs[str(guild.id)]
         else:
-            cnx = self.bot.cogs['ServerCog'].connect()
+            cnx = self.bot.cogs['ServerCog'].bot.cnx
             cursor = cnx.cursor(dictionary = True)
             cursor.execute("SELECT `prefix` FROM `{}` WHERE `ID`={}".format(self.bot.cogs["ServerCog"].table,guild.id))
             liste = list()
             for x in cursor:
                 if len(x['prefix'])>0:
                     liste.append(x['prefix'])
-            cnx.close()
             if liste == []:
                 self.list_prefixs[str(guild.id)] = '!'
                 return '!'
@@ -77,9 +78,9 @@ class UtilitiesCog:
         if type(Type) == str:
             Type = Type.lower()
         if Type == None:
-            for i in [commands.RoleConverter,commands.MemberConverter,
+            for i in [commands.MemberConverter,commands.RoleConverter,
                     commands.TextChannelConverter,commands.InviteConverter,
-                    commands.UserConverter,commands.VoiceChannelConverter,
+                    args.user,commands.VoiceChannelConverter,
                     commands.EmojiConverter,commands.CategoryChannelConverter]:
                 try:
                     a = await i().convert(ctx,name)
@@ -87,10 +88,8 @@ class UtilitiesCog:
                     if item != None:
                         return item
                 except:
-                    if name.isnumeric() and i==commands.MemberConverter:
-                        item = await self.bot.get_user_info(int(name))
-                        if item != None:
-                            return item
+                    pass
+            return None
         elif Type == 'member':
             try:
                 item = await commands.MemberConverter().convert(ctx,name)
@@ -129,7 +128,7 @@ class UtilitiesCog:
                 pass
         elif Type == 'category':
             try:
-                item = await commands.CategoryConverter().convert(ctx,name)
+                item = await commands.CategoryChannelConverter().convert(ctx,name)
             except:
                 pass
         elif Type == 'guild' and name.isnumeric():
@@ -231,12 +230,12 @@ class UtilitiesCog:
         return text
 
 
-    async def get_db_userinfo(self,columns=[],criters=["ID>1"],relation="AND",Type=dict):
+    async def get_db_userinfo(self,columns=[],criters=["userID>1"],relation="AND",Type=dict):
         """Get every info about a user with the database"""
         await self.bot.wait_until_ready()
         if type(columns)!=list or type(criters)!=list:
             raise ValueError
-        cnx = self.bot.cogs['ServerCog'].connect()
+        cnx = self.bot.cnx
         cursor = cnx.cursor(dictionary = True)
         if columns == []:
             cl = "*"
@@ -248,13 +247,26 @@ class UtilitiesCog:
         liste = list()
         for x in cursor:
             liste.append(x)
-        cnx.close()
         if len(liste)==1:
             return liste[0]
         elif len(liste)>1:
             return liste
         else:
             return None
+    
+    async def change_db_userinfo(self,userID:int,key:str,value):
+        """Change something about a user in the database"""
+        try:
+            cnx = self.bot.cnx
+            cursor = cnx.cursor(dictionary = True)
+            query = ("INSERT INTO `{t}` (`userID`,`{k}`) VALUES ('{u}','{v}') ON DUPLICATE KEY UPDATE {k} = '{v}';".format(t=self.table,u=userID,k=key,v=value))
+            cursor.execute(query)
+            cnx.commit()
+            cursor.close()
+            return True
+        except Exception as e:
+            await self.bot.cogs['ErrorsCog'].on_error(e,None)
+            return False
 
     async def get_number_premium(self):
         """Return the number of premium users"""
@@ -266,8 +278,9 @@ class UtilitiesCog:
 
     async def is_premium(self,user):
         """Check if a user is premium"""
+        parameters = None
         try:
-            parameters = await self.get_db_userinfo(criters=["ID="+str(user.id)],columns=['premium'])
+            parameters = await self.get_db_userinfo(criters=["userID="+str(user.id)],columns=['premium'])
         except Exception as e:
             await self.bot.cogs["Errors"].on_error(e,None)
         if parameters==None:
@@ -276,8 +289,9 @@ class UtilitiesCog:
 
     async def is_support(self,user):
         """Check if a user is support staff"""
+        parameters = None
         try:
-            parameters = await self.get_db_userinfo(criters=["ID="+str(user.id)],columns=['support'])
+            parameters = await self.get_db_userinfo(criters=["userID="+str(user.id)],columns=['support'])
         except Exception as e:
             await self.bot.cogs["Errors"].on_error(e,None)
         if parameters==None:
@@ -286,13 +300,24 @@ class UtilitiesCog:
 
     async def is_contributor(self,user):
         """Check if a user is a contributor"""
+        parameters = None
         try:
-            parameters = await self.get_db_userinfo(criters=["ID="+str(user.id)],columns=['contributor'])
+            parameters = await self.get_db_userinfo(criters=["userID="+str(user.id)],columns=['contributor'])
         except Exception as e:
             await self.bot.cogs["Errors"].on_error(e,None)
         if parameters==None:
             return False
         return parameters['contributor']
+    
+    async def get_xp_style(self,user):
+        parameters = None
+        try:
+            parameters = await self.get_db_userinfo(criters=["userID="+str(user.id)],columns=['xp_style'])
+        except Exception as e:
+            await self.bot.cogs["ErrorsCog"].on_error(e,None)
+        if parameters==None:
+            return 'dark'
+        return parameters['xp_style']
 
     async def add_check_reaction(self,message):
         try:
@@ -301,8 +326,29 @@ class UtilitiesCog:
                 await message.add_reaction(emoji)
             else:
                 await message.add_reaction('\u2705')
+        except discord.Forbidden:
+            await message.channel.send(":ok:")
         except:
             pass
+
+    async def remove_markdown(self,txt):
+        for x in ('||','*','__','~~'):
+            txt = txt.replace(x,'')
+        return txt
+
+    async def allowed_card_styles(self,user):
+        """Retourne la liste des styles autorisées pour la carte d'xp de cet utilisateur"""
+        liste = ['blue','dark','green','grey','orange','purple','red','turquoise','yellow']
+        liste2 = []
+        if await self.is_support(user):
+            liste2.append('support')
+        if await self.is_contributor(user):
+            liste2.append('contributor')
+        if await self.is_premium(user):
+            liste2.append('premium')
+        if await self.bot.cogs['AdminCog'].check_if_admin(user):
+            liste2.append('admin')
+        return sorted(liste2)+sorted(liste)
 
 
 def setup(bot):

@@ -4,7 +4,7 @@ Permissions
 
 The permissions given to members is an important part in the configuration of a server. The same is also true for bots. This page is intended to show you each of the permissions necessary for the bot, as well as explain why they are necessary. All this in order to avoid putting unnecessary permissions on the bot, which it turn will keep your server clean and safe.
 
-.. warning:: Never *never* **never NEVER** never *(yes, 5 times never)* put a bot with administration permissions. It has already happened once that the bot's security key is stolen, which allows the thief to take full control of the bot, such as deleting your channels or banning your members. Even though safety has been completely redesigned since this incident, zero risk is not possible. Even bots like Mee6 are not immune from carelessness.
+.. warning:: Never *never* **never NEVER** never *(yes, 5 times never)* put a bot with administration permissions. It has already happened once that the bot's security key is stolen, which allows the thief to take full control of the bot, such as deleting your channels or banning your members. Even though safety has been completely redesigned since this incident, zero risk is not possible. Even bots like Mee6 are not immune from carelessness (as a MEE6 staff, I know what I'm saying).
 
 -------------------
 General Permissions
@@ -113,13 +113,13 @@ Allows the bot to pin or delete any message. Used for: `mute <moderator.html#mut
 Embed Links
 -----------
 
-Allows the bot the bot to send an embed. Used for: `membercount <infos.html#membercount>`_ , `mojang <minecraft.html#mojang>`_ . Required for: `infos <infos.html#info>`_ , `mc <minecraft.html#mc>`_ , `config see <config.html#watch>`_, `a few rss commands <rss.html>`_, `embeds generator <miscellaneous.html#embed>`_
+Allows the bot the bot to send an embed. Used for: `membercount <infos.html#membercount>`_ , `mojang <minecraft.html#mojang>`_, `XP system <user.html#xp-system>`_ . Required for: `infos <infos.html#info>`_ , `mc <minecraft.html#mc>`_ , `config see <config.html#watch>`_, `a few rss commands <rss.html>`_, `embeds generator <miscellaneous.html#embed>`_
 
 
 Attach Files
 ------------
 
-Allows the bot to send files (such as images) in a channel. Used for: `fun commands <fun.html>`_
+Allows the bot to send files (such as images) in a channel. Used for: `fun commands <fun.html>`_, `XP cards <user.html#check-the-xp-of-someone>`_
 
 
 Read Message History
@@ -143,7 +143,7 @@ Allows the bot to use emojis from any other server. The bot uses them in many si
 Add Reactions
 -------------
 
-Allows the bot you to add reactions to a message, whether they are Discord or server emotions. Used for:
+Allows the bot you to add reactions to a message, whether they are Discord or server emotions. Used for: `react <fun.html#react>`_, `vote command <miscellaneous.html#vote>`_ and `poll channels <config.html#list-of-every-option>`_
 
 -----------------
 Voice Permissions

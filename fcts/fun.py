@@ -30,7 +30,7 @@ async def can_say(ctx):
     else:
         return await ctx.bot.cogs["ServerCog"].staff_finder(ctx.author,"say")
 
-class FunCog:
+class FunCog(commands.Cog):
     """Add some fun commands, no obvious use. You can disable this module with the 'enable_fun' option (command 'config')"""
 
     def __init__(self,bot):
@@ -49,6 +49,7 @@ class FunCog:
     async def cache_update(self,id,value):
         self.fun_opt[str(id)] = value
 
+    @commands.Cog.listener()
     async def on_ready(self):
             self.translate = self.bot.cogs["LangCog"].tr
             self.utilities = self.bot.cogs["UtilitiesCog"]
@@ -76,7 +77,7 @@ class FunCog:
             return
         title = await self.translate(ctx.guild,"fun","fun-list")
         text = str()
-        for cmd in sorted(self.bot.get_cog_commands('FunCog'),key=operator.attrgetter('name')):
+        for cmd in sorted(self.get_commands(),key=operator.attrgetter('name')):
             if cmd.name in cmds_list and cmd.enabled:
                 if cmd.help != None:
                     text+="\n- {} *({})*".format(cmd.name,cmd.help.split('\n')[0])

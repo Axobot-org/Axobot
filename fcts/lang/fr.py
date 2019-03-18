@@ -64,7 +64,7 @@ errors={"cooldown":"Vous êtes en cooldown pour cette commande. Veuillez attendr
 "duration":"La durée `{0}` est invalide"}
 
 find={"user-0":"Nom : {}\nID : {}",
-"user-1":"Nom : {}\nID : {}\nServeurs : {}\nPropriétaire de : {}\nLangues : {}",
+"user-1":"Nom : {name}\nID : {id}\nServeurs : {servers}\nPropriétaire de : {own}\nLangues : {lang}\nA voté : {vote}",
 "user-2":"Utilisateur introuvable",
 "guild-0":"Serveur introuvable",
 "guild-1":"Nom : {}\nID : {}\nPropriétaire : {} ({})\nMembres : {} (dont {} bots)\nLangue : {}",
@@ -283,6 +283,16 @@ modo={"slowmode-0":"Le slowmode est désormais désactivé dans ce salon.",
     "tempmute-1":"Le membre {} a bien été réduit au silence pour la raison `{}`, pendant {} !",
     }
 
+morpion={'user-begin':'{}, à toi de commencer !',
+        'bot-begin':'Allez hop, je commence !',
+        'tip':"\n*Pour jouer, il suffit de taper un nombre entre 1 et 9, correspondant à la case choisie. Je joue les rouges, toi les bleus*",
+        'nul':"Match nul, personne n'a gagné...",
+        'too-late':"Vous avez mis trop de temps à vous décider. Fin de la partie !",
+        'pion-1':'Il y a déjà un pion sur cette case !',
+        'pion-2':'Case saisie invalide !',
+        'win-1':"Bien joué, {} a gagné !",
+        'win-2':"J'ai gagné ! Fin du match !"}
+
 perms={"perms-0":"Le membre/rôle {} n'a pas été trouvé",
         "perms-1":"**Permission de '{}' :**\n\n"
        }
@@ -409,6 +419,7 @@ server_desc={"prefix":"Préfixe actuel du bot : {}",
              "save_roles":"Les rôles doivent-ils être sauvegardés lorsqu'un membre part, au cas où il revienne ? {}",
              "poll_channels":"Liste des salons dans lesquels les réactions :thumbsup: et :thumbsdown: seront automatiquement ajoutées à chaque message : {}",
              "enable_xp":"Le système d'xp doit-il être activé ? {}",
+             "levelup_msg":"Message envoyé lorsqu'un membre gagne un niveau d'xp : {}",
              "anti_caps_lock":"Le bot doit-il envoyer un message lorsqu'un membre envoie trop de majuscules ? {}",
              "enable_fun":"Les commandes répertoriées dans la commande `!fun` sont-elles activées ? {}",    
              "membercounter":"Salon affichant dans son nom le nombre de membres : {}",
@@ -418,7 +429,6 @@ server_desc={"prefix":"Préfixe actuel du bot : {}",
              "muted_role":"Rôle utilisé pour rendre les gens muets : {}"}
 
 stats_infos={"not-found":"Impossible de trouver {N}",
-            "type-invalid":"Le type `{T}` est invalide :confused:",
             "member-0":"Surnom",
             "member-1":"Créé le",
             "member-2":"A rejoint le",
@@ -458,6 +468,7 @@ stats_infos={"not-found":"Impossible de trouver {N}",
             "guild-10":"Temps avant d'être AFK",
             "guild-11.1":"20 premiers rôles ({} total)",
             "guild-11.2":"Liste des rôles ({} total)",
+            "guild-12":"Nombre d'invitations",
             "inv-0":"Adresse url",
             "inv-1":"Créateur",
             "inv-2":"Utilisations",
@@ -468,3 +479,19 @@ stats_infos={"not-found":"Impossible de trouver {N}",
             "categ-1":"Position",
             "categ-2":"Texte : {} | Vocal : {}",
              }
+
+users = {'invalid-card':'Ce style est invalide. Voici la liste des styles que vous pouvez utiliser : {}',
+        'missing-attach-files':'Oups, il me manque la permission d\'Attacher des Fichiers :confused:',
+        'changed-0':'Votre carte d\'xp utilise maintenant le style {}',
+        'changed-1':'Oups, une erreur interne est survenue pendant le traitement de la requête. Réessayez plus tard ou contactez le support.'}
+
+xp = {'card-level':'NIVEAU',
+        'card-rank':'RANG',
+        '1-no-xp':"Vous ne possédez pas encore d'xp !",
+        '2-no-xp':"Ce membre ne possède pas d'xp !",
+        "del-user":"<deleted user>",
+        "low-page":"Impossible d'afficher un numéro de page négatif !",
+        "high-page":"Il n'y a pas autant de pages !",
+        "top-title-1":"Classement global",
+        "top-name":"__Top {}-{} :__",
+        "default_levelup":"{user} vient de passer **niveau {level}** ! GG !"}

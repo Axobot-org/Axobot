@@ -20,9 +20,10 @@ If you want to invite this bot to a server, `just click here <https://discordapp
 
    perms
    moderator
+   config
+   user
    infos
    minecraft
-   config
    rss
    fun
    miscellaneous

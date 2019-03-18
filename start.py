@@ -3,7 +3,7 @@
 
 def check_libs():
     count = 0
-    for m in ["mysql","discord","frmc_lib","requests","re","asyncio","datetime","time","importlib","traceback","sys","logging","sympy","psutil","platform","subprocess",'json','emoji']:
+    for m in ["mysql","discord","frmc_lib","requests","re","asyncio","datetime","time","importlib","traceback","sys","logging","sympy","psutil","platform","subprocess",'json','emoji','imageio','platform']:
         try:
             exec("import "+m)
             exec("del "+m)
@@ -65,12 +65,33 @@ def setup_logger():
 
 class zbot(commands.bot.BotBase,discord.Client):
 
-    def __init__(self,command_prefix=None,case_insensitive=None,status=None,database_online=True,beta=False):
+    def __init__(self,command_prefix=None,case_insensitive=None,status=None,database_online=True,beta=False,dbl_token=""):
         super().__init__(command_prefix=command_prefix,case_insensitive=case_insensitive,status=status)
         self.database_online = database_online
         self.beta = beta
         self.database_keys = dict()
         self.log = logging.getLogger("runner")
+        self.dbl_token = dbl_token
+        self._cnx = [None,0]
+    
+    @property
+    def cnx(self):
+        if self._cnx[1] + 1260 < round(time.time()): # 21min
+            self.connect_database()
+            self._cnx[1] = round(time.time())
+            return self._cnx[0]
+        else:
+            return self._cnx[0]
+    
+    def connect_database(self):
+        if len(self.database_keys)>0:
+            if self._cnx[0] != None:
+                self._cnx[0].close()
+            self.log.info('Connection à MySQL (user {})'.format(self.database_keys['user']))
+            self._cnx[0] = mysql.connector.connect(user=self.database_keys['user'],password=self.database_keys['password'],host=self.database_keys['host'],database=self.database_keys['database'])
+            self._cnx[1] = round(time.time())
+        else:
+            raise ValueError(dict)
     
     async def user_avatar_as(self,user,size=512):
         """Get the avatar of an user, format gif or png (as webp isn't supported by some browsers)"""
@@ -137,7 +158,9 @@ def main():
                       'fcts.embeds',
                       'fcts.events',
                       'fcts.timed',
-                      'fcts.secret'
+                      'fcts.morpion',
+                      'fcts.xp',
+                      'fcts.users'
     ]
     # Suppression du fichier debug.log s'il est trop volumineux
     if os.path.exists("debug.log"):
@@ -164,6 +187,10 @@ def main():
         print(e)
         client.database_online = False
 
+    if client.database_online:
+        client.connect_database()
+
+    client.dbl_token = tokens.get_dbl_token()
 
     # Here we load our extensions(cogs) listed above in [initial_extensions]
     count = 0
@@ -266,7 +293,7 @@ def main():
     client.add_listener(on_guild_remove)
     
     log = setup_logger()
-    log.setLevel(logging.INFO)
+    log.setLevel(logging.DEBUG)
     log.info("Lancement du bot")
 
     client.run(token)
