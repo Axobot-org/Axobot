@@ -1,6 +1,9 @@
-import discord, random, operator, string, importlib, re, typing, datetime, subprocess, requests, json
+import discord, random, operator, string, importlib, re, typing, datetime, subprocess, requests, json, geocoder
 import emoji as emojilib
 from discord.ext import commands
+from tzwhere import tzwhere
+from pytz import timezone
+
 from fcts import emoji
 importlib.reload(emoji)
 
@@ -419,7 +422,20 @@ You can specify a verification limit by adding a number in argument"""
                 else:
                     await ctx.send("https://welcomer.glitch.me/weather?city="+city)
                 return
-        await ctx.send("Invalid city")
+        await ctx.send(await self.translate(ctx.guild,"fun","invalid-city"))
+
+    @commands.command(name="hour")
+    @commands.cooldown(4, 60, type=commands.BucketType.guild)
+    async def hour(self,ctx,*,city:str):
+        """Get the hour of a city"""
+        g = geocoder.arcgis(city)
+        tz = tzwhere.tzwhere(forceTZ=True)
+        timeZoneStr = tz.tzNameAt(g.json['lat'],g.json['lng'],forceTZ=True)
+        timeZoneObj = timezone(timeZoneStr)
+        d = datetime.datetime.now(timeZoneObj)
+        format_d = await self.bot.cogs['TimeCog'].date(d,lang=await self.translate(ctx.guild,"current_lang","current"))
+        await ctx.send("**{}**:\n{} ({})".format(timeZoneStr,format_d,d.tzname()))
+
 
     @commands.command(name='embed',hidden=False)
     @commands.has_permissions(embed_links=True)
