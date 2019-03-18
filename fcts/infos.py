@@ -445,7 +445,7 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
             await ctx.send(await self.translate(ctx.guild,"find","help"))
 
     @find_main.command(name="user")
-    async def find_user(self,ctx,user:discord.User):
+    async def find_user(self,ctx,*,user:discord.User):
         liste = list()
         languages = list()
         for s in self.bot.guilds:

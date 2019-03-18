@@ -92,7 +92,7 @@ class ErrorsCog(commands.Cog):
             if len(s)>1:
                 s = s[1].split("'>")[0]
             else:
-                s = "None"
+                s = str(error_msg)
             msg = """```python
 Traceback (most recent call last):
 {T} {S}
