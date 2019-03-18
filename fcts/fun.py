@@ -1,4 +1,4 @@
-import discord, random, operator, string, importlib, re, typing, datetime, subprocess
+import discord, random, operator, string, importlib, re, typing, datetime, subprocess, requests, json
 import emoji as emojilib
 from discord.ext import commands
 from fcts import emoji
@@ -403,6 +403,24 @@ You can specify a verification limit by adding a number in argument"""
         else:
             await ctx.send(random.choice(await self.translate(ctx.guild,"fun","piece-0")))
     
+    @commands.command(name="weather")
+    async def weather(self,ctx,*,city:str):
+        """Get the weather of a city
+        You need to provide the city name in english"""
+        city = city.replace(" ","%20")
+        r = requests.get("https://welcomer.glitch.me/weather?city="+city)
+        if r.ok:
+            try:
+                _ = r.json()
+            except json.decoder.JSONDecodeError:
+                if ctx.channel.permissions_for(ctx.me).embed_links:
+                    emb = self.bot.cogs['EmbedCog'].Embed(image="https://welcomer.glitch.me/weather?city="+city,footer_text="From https://welcomer.glitch.me/weather")
+                    await ctx.send(embed=emb.discord_embed())
+                else:
+                    await ctx.send("https://welcomer.glitch.me/weather?city="+city)
+                return
+        await ctx.send("Invalid city")
+
     @commands.command(name='embed',hidden=False)
     @commands.has_permissions(embed_links=True)
     async def send_embed(self,ctx,*,arguments):
