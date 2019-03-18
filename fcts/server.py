@@ -362,7 +362,7 @@ class ServerCog(commands.Cog):
             if value.lower() in ["true","vrai","1","oui","yes","activé"]:
                 value = True
                 v = 1
-            elif value.lower() in ["false","faux","non","no","désactivé","wrong"]:
+            elif value.lower() in ["false","faux","non","no","désactivé","wrong",'0']:
                 value = False
                 v = 0
             else:
