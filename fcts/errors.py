@@ -85,14 +85,12 @@ class ErrorsCog(commands.Cog):
     @commands.Cog.listener()
     async def on_error(self,error_msg,ctx):
         try:
-            if error_msg==None:
-                return
             sysexc = sys.exc_info()
             s = str(sysexc[0]).split("<class '")
             if len(s)>1:
                 s = s[1].split("'>")[0]
             else:
-                s = "None"
+                s = str(error_msg)
             msg = """```python
 Traceback (most recent call last):
 {T} {S}
