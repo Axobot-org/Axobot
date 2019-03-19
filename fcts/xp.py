@@ -18,8 +18,8 @@ class XPCog(commands.Cog):
         self.cooldown = 30
         self.minimal_size = 5
         self.spam_rate = 0.30
-        self.xp_per_char = 0.35
-        self.max_xp_per_msg = 50
+        self.xp_per_char = 0.12
+        self.max_xp_per_msg = 60
         self.file = 'xp'
         bot.add_listener(self.add_xp,'on_message')
         try:
@@ -101,9 +101,9 @@ class XPCog(commands.Cog):
 
     async def calc_level(self,xp):
         """Calcule le niveau correspondant à un nombre d'xp"""
-        lvl = ceil(0.05*xp**0.61)
+        lvl = ceil(0.05*xp**0.62)
         temp = xp
-        while ceil(0.05*temp**0.61)==lvl:
+        while ceil(0.05*temp**0.62)==lvl:
             temp += 1
         return [lvl,temp]
 
