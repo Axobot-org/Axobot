@@ -863,7 +863,7 @@ class RssCog(commands.Cog):
         """Get every flow of the database"""
         cnx = self.bot.cnx
         cursor = cnx.cursor(dictionary = True)
-        query = ("SELECT * FROM `{}` WHERE 1".format(self.table))
+        query = ("SELECT * FROM `{}` WHERE `guild` in ({})".format(self.table,','.join(["'{}'".format(x.id) for x in self.bot.guilds])))
         cursor.execute(query)
         liste = list()
         for x in cursor:
