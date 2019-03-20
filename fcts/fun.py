@@ -340,7 +340,7 @@ You can specify a verification limit by adding a number in argument"""
         if self.bot.database_online and not await self.bot.cogs["ServerCog"].staff_finder(ctx.author,"say"):
             return
         try:
-            msg = await ctx.channel.get_message(ID)
+            msg = await ctx.channel.fetch_message(ID)
         except discord.errors.HTTPException as e:
             await ctx.send(await self.translate(ctx.guild,"fun",'react-0'))
             return

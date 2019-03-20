@@ -105,7 +105,7 @@ class UtilitiesCog(commands.Cog):
                 item = await commands.UserConverter().convert(ctx,name)
             except:
                 if name.isnumeric():
-                    item = await self.bot.get_user_info(int(name))
+                    item = await self.bot.fetch_user(int(name))
         elif Type == 'textchannel' or Type == "channel":
             try:
                 item = await commands.TextChannelConverter().convert(ctx,name)

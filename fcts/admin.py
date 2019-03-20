@@ -397,7 +397,7 @@ class AdminCog(commands.Cog):
         """Ajoute un serveur ou un utilisateur dans la liste des utilisateurs/serveurs ignorés"""
         serv = ctx.bot.get_guild(ID)
         try:
-            usr = await ctx.bot.get_user_info(ID)
+            usr = await ctx.bot.fetch_user(ID)
         except:
             usr = None
         scog = ctx.bot.cogs['ServerCog']
@@ -665,7 +665,7 @@ Cette option affecte tous les serveurs"""
                 if chan==None:
                     return await ctx.send("Salon introuvable")
                 try:
-                    msg = await chan.get_message(ID)
+                    msg = await chan.fetch_message(ID)
                 except Exception as e:
                     return await ctx.send("`Error:` {}".format(e))
                 if len(msg.embeds)!=1:

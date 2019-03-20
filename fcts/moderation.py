@@ -373,7 +373,7 @@ class ModeratorCog(commands.Cog):
             except:
                 if user.isnumeric():
                     try:
-                        user = await self.bot.get_user_info(int(user))
+                        user = await self.bot.fetch_user(int(user))
                         del backup
                     except:
                         user = None
@@ -445,7 +445,7 @@ class ModeratorCog(commands.Cog):
             except:
                 if user.isnumeric():
                     try:
-                        user = await self.bot.get_user_info(int(user))
+                        user = await self.bot.fetch_user(int(user))
                         del backup
                     except:
                         await ctx.send(str(await self.translate(ctx.guild.id,"modo","cant-find-user")).format(backup))
@@ -612,7 +612,7 @@ You must be an administrator of this server to use this command."""
     async def emoji_clear(self,ctx,message:int):
         """Remove all reactions under a message"""
         try:
-            msg = await ctx.channel.get_message(message)
+            msg = await ctx.channel.fetch_message(message)
         except discord.errors.NotFound:
             return await ctx.send(await self.translate(ctx.guild.id,"modo","react-clear"))
         except Exception as e:
@@ -657,7 +657,7 @@ ID corresponds to the Identifier of the message"""
             await ctx.send(await self.translate(ctx.guild,"modo","cant-pin"))
             return
         try:
-            message = await ctx.channel.get_message(msg)
+            message = await ctx.channel.fetch_message(msg)
         except Exception as e:
             await ctx.send(str(await self.translate(ctx.guild,"modo","pin-error")).format(e))
             return

@@ -347,7 +347,7 @@ class XPCog(commands.Cog):
             user = self.bot.get_user(u['userID'])
             if user==None:
                 try:
-                    user = await self.bot.get_user_info(u['userID'])
+                    user = await self.bot.fetch_user(u['userID'])
                 except discord.NotFound:
                     user = await self.translate(ctx.guild,'xp','del-user')
             if isinstance(user,discord.User):

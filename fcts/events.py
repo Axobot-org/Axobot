@@ -100,7 +100,7 @@ class Events(commands.Cog):
         if msg.author.id==self.bot.user.id or 'discord.gg/' not in msg.content:
             return
         try:
-            _ = await self.bot.get_invite(msg.content)
+            _ = await self.bot.fetch_invite(msg.content)
         except:
             return
         d = datetime.datetime.utcnow() - (await msg.channel.history(limit=2).flatten())[1].created_at
