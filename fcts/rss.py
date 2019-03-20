@@ -49,7 +49,6 @@ class RssCog(commands.Cog):
 
     def __init__(self,bot):
         self.bot = bot
-        self.flows = dict()
         self.flow_limit = 10
         self.time_loop = 10
         self.time_between_flows_check = 0.15
@@ -895,13 +894,9 @@ class RssCog(commands.Cog):
 
     async def check_flow(self,flow):
         try:
-            if flow['link'] in self.flows.keys():
-                objs = self.flows[flow['link']]
-            else:
-                guild = self.bot.get_guild(flow['guild'])
-                funct = eval('self.rss_{}'.format(flow['type']))
-                objs = await funct(guild,flow['link'],flow['date'])
-                self.flows[flow['link']] = objs
+            guild = self.bot.get_guild(flow['guild'])
+            funct = eval('self.rss_{}'.format(flow['type']))
+            objs = await funct(guild,flow['link'],flow['date'])
             if isinstance(objs,(str,type(None),int)) or len(objs) == 0:
                 return True
             elif type(objs) == list:
@@ -952,7 +947,6 @@ class RssCog(commands.Cog):
             except Exception as e:
                 await self.bot.cogs['ErrorsCog'].on_error(e,None)
             await asyncio.sleep(self.time_between_flows_check)
-        self.flows = dict()
         self.bot.cogs['McCog'].flows = dict()
         d = ["**RSS loop done** in {}s ({}/{} flows)".format(round(time.time()-t,3),check,len(liste))]
         if len(errors)>0:
