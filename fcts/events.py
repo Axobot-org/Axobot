@@ -159,6 +159,8 @@ class Events(commands.Cog):
                 elif entry.action==discord.AuditLogAction.ban and entry.target==member:
                     await self.add_points(self.table['ban'])
                     break
+        except discord.Forbidden:
+            pass
         except Exception as e:
             if member.guild.id!=264445053596991498:
                 self.bot.log.warn("[check_user_left] {} (user {}/server {})".format(e,member.id,member.guild.id))
