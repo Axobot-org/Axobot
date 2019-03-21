@@ -206,6 +206,21 @@ class XPCog(commands.Cog):
         except Exception as e:
             await self.bot.cogs['ErrorsCog'].on_error(e,None)
 
+    async def bdd_total_xp(self):
+        """Get the total number of earned xp"""
+        try:
+            cnx = self.bot.cnx
+            cursor = cnx.cursor(dictionary = True)
+            query = ("SELECT SUM(xp) FROM `{}`".format(self.table))
+            cursor.execute(query)
+            liste = list()
+            for x in cursor:
+                liste.append(x)
+            cursor.close()
+            return round(liste[0]['SUM(xp)'])
+        except Exception as e:
+            await self.bot.cogs['ErrorsCog'].on_error(e,None)
+
 
     async def get_raw_image(self,url,size=282):
         req = Request(url, headers={'User-Agent': 'Mozilla/5.0'})
