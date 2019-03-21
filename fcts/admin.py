@@ -99,7 +99,7 @@ class AdminCog(commands.Cog):
     @commands.check(reloads.check_admin)
     async def main_msg(self,ctx):
         """Commandes réservées aux administrateurs de ZBot"""
-        if ctx.invoked_subcommand is None:
+        if ctx.subcommand_passed==None:
             text = "Liste des commandes disponibles :"
             for cmd in self.main_msg.commands:
                 text+="\n- {} *({})*".format(cmd.name,cmd.help)
