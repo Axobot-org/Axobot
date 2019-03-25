@@ -64,7 +64,7 @@ errors={"cooldown":"Yu are on cold-own for dis comandZ :confused: Plize wait {} 
 "duration":"Invalid timer: `{}`"}
 
 find={"user-0":"naym: {}\nID: {}",
-"user-1":"Naym: {name}\nID: {id}\nServers: {servers}\nAuwner ov: {own}\nSpeak: {lang}\nNice guy? {vote}",
+"user-1":"Naym: {name}\nID: {id}\nPerks: {rangs}\nServers: {servers}\nAuwner ov: {own}\nSpeak: {lang}\nNice guy? {vote}\nRank card bg: {card}",
 "user-2":"Usr not findz",
 "guild-0":"S3rvr not findz",
 "guild-1":"Name: {}\nID: {}\nOwnr: {} ({})\nMmbr: {} ({} robots)\nSpeak {}",

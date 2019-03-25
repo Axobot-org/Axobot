@@ -458,6 +458,16 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
                 languages.append(lang)
         disp_lang = ""
         owners = ", ".join([x.name for x in liste if x.owner==user])
+        xp_card = await self.bot.cogs['UtilitiesCog'].get_xp_style(user)
+        perks = list()
+        if await self.bot.cogs["AdminCog"].check_if_admin(user):
+            perks.append('admin')
+        if await self.bot.cogs['UtilitiesCog'].is_support(user):
+            perks.append("support")
+        if await self.bot.cogs['UtilitiesCog'].is_contributor(user):
+            perks.append("contributor")
+        if await self.bot.cogs['UtilitiesCog'].is_premium(user):
+            perks.append("premium")
         r = requests.get('https://discordbots.org/api/bots/486896267788812288/check?userId={}'.format(user.id),headers={'Authorization':str(self.bot.dbl_token)})
         if r.json()['voted']:
             r = await self.translate(ctx.guild,'keywords','oui')
@@ -466,7 +476,7 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
         for e in range(len(ctx.bot.cogs['LangCog'].languages)):
             if languages.count(e)>0:
                 disp_lang += ctx.bot.cogs['LangCog'].languages[e]+" ("+str(round(languages.count(e)/len(languages)*100))+"%)  "
-        await ctx.send(str(await self.translate(ctx.guild,"find","user-1")).format(name=user,id=user.id,servers=", ".join([x.name for x in liste]),own=owners,lang=disp_lang,vote=r))
+        await ctx.send(str(await self.translate(ctx.guild,"find","user-1")).format(name=user,id=user.id,servers=", ".join([x.name for x in liste]),own=owners,lang=disp_lang,vote=r,card=xp_card,rangs=" - ".join(perks)))
 
     @find_main.command(name="guild",aliases=['server'])
     async def find_guild(self,ctx,*,guild):
