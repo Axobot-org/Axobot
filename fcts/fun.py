@@ -408,6 +408,7 @@ You can specify a verification limit by adding a number in argument"""
             await ctx.send(random.choice(await self.translate(ctx.guild,"fun","piece-0")))
     
     @commands.command(name="weather")
+    @commands.cooldown(4, 30, type=commands.BucketType.guild)
     async def weather(self,ctx,*,city:str):
         """Get the weather of a city
         You need to provide the city name in english"""
@@ -426,7 +427,7 @@ You can specify a verification limit by adding a number in argument"""
         await ctx.send(await self.translate(ctx.guild,"fun","invalid-city"))
 
     @commands.command(name="hour")
-    @commands.cooldown(4, 60, type=commands.BucketType.guild)
+    @commands.cooldown(4, 50, type=commands.BucketType.guild)
     async def hour(self,ctx,*,city:str):
         """Get the hour of a city"""
         g = geocoder.arcgis(city)
