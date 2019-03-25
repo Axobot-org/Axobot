@@ -494,5 +494,5 @@ xp = {'card-level':'NIVEAU',
         "low-page":"Impossible d'afficher un numéro de page négatif !",
         "high-page":"Il n'y a pas autant de pages !",
         "top-title-1":"Classement global",
-        "top-name":"__Top {}-{} :__",
+        "top-name":"__Top {}-{} (page {}/{}) :__",
         "default_levelup":"{user} vient de passer **niveau {level}** ! GG !"}

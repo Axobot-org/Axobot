@@ -56,7 +56,7 @@ class XPCog(commands.Cog):
         await self.bdd_set_xp(msg.author.id, giv_points,'add')
         self.cache[msg.author.id] = [round(time.time()), prev_points+giv_points]
         new_lvl = await self.calc_level(self.cache[msg.author.id][1])
-        if (await self.calc_level(prev_points))[0] < new_lvl[0]:
+        if 1 < (await self.calc_level(prev_points))[0] < new_lvl[0]:
             await self.send_levelup(msg,new_lvl)
 
 
@@ -101,9 +101,9 @@ class XPCog(commands.Cog):
 
     async def calc_level(self,xp):
         """Calcule le niveau correspondant à un nombre d'xp"""
-        lvl = ceil(0.05*xp**0.62)
+        lvl = ceil(0.05*xp**0.65)
         temp = xp
-        while ceil(0.05*temp**0.62)==lvl:
+        while ceil(0.05*temp**0.65)==lvl:
             temp += 1
         return [lvl,temp]
 
@@ -349,9 +349,10 @@ class XPCog(commands.Cog):
     async def top(self,ctx,page:int=1):
         """Get the list of the highest levels
         Each page has 20 users"""
+        max_page = ceil(len(self.cache)/20)
         if page<1:
             return await ctx.send(await self.translate(ctx.guild,"xp",'low-page'))
-        elif page>ceil(len(self.cache)/20):
+        elif page>max_page:
             return await ctx.send(await self.translate(ctx.guild,"xp",'high-page'))
         ranks = await self.bdd_get_top(20*page)
         ranks = ranks[(page-1)*20:]
@@ -371,7 +372,7 @@ class XPCog(commands.Cog):
                     user = user[:15]+'...'
             l = await self.calc_level(u['xp'])
             txt.append('{} • **{} |** `lvl {}` **|** `xp {}`'.format(i,user,l[0],u['xp']))
-        f_name = str(await self.translate(ctx.guild,'xp','top-name')).format((page-1)*20+1,i)
+        f_name = str(await self.translate(ctx.guild,'xp','top-name')).format((page-1)*20+1,i,page,max_page)
         if ctx.channel.permissions_for(ctx.guild.me).embed_links:
             emb = self.bot.cogs['EmbedCog'].Embed(title=await self.translate(ctx.guild,'xp','top-title-1'),fields=[{'name':f_name,'value':"\n".join(txt)}],color=self.embed_color,author_icon=self.bot.user.avatar_url_as(format='png')).create_footer(ctx.author)
             await ctx.send(embed=emb.discord_embed())

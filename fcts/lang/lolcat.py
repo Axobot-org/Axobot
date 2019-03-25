@@ -494,5 +494,5 @@ xp = {'card-level':'LVL',
         "low-page":"Oops, I can't display a negative page!",
         "high-page":"There aren't so much pages!",
         "top-title-1":"Global ranks",
-        "top-name":"__Bests {}-{} :__",
+        "top-name":"__Bests {}-{} ({}/{}):__",
         "default_levelup":"Weew, {user} has just got **lvl {level}**! What a smart guy!"}
