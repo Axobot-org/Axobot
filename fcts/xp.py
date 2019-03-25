@@ -97,6 +97,9 @@ class XPCog(commands.Cog):
         matches = re.finditer(r"<a?(:\w+:)\d+>", content, re.MULTILINE)
         for _, match in enumerate(matches, start=1):
             content = content.replace(match.group(0),match.group(1))
+        matches = re.finditer(r'((?:http|www)[^\s]+)', content, re.MULTILINE)
+        for _, match in enumerate(matches, start=1):
+            content = content.replace(match.group(0),"")
         return min(round(len(content)*self.xp_per_char), self.max_xp_per_msg)
 
     async def calc_level(self,xp):
