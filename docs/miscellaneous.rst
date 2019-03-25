@@ -55,3 +55,16 @@ Morpion
 **Syntax:** :code:`crab` or :code:`morpion`
 
 Yes, we did it! A first mini-game for our bot, the crab! You can play against the bot in this fast and simplistic game, just by entering the command and following the instructions (enter a number between 1 and 9 corresponding to the chosen cell). And the best part is that the only special permission required is to use the external emojis!
+
+
+--------------
+Hour & Weather
+--------------
+
+**Syntax:** :code:`hour <city>`
+
+**Syntax:** :code:`weather <city>`
+
+With these two commands, you can get the time (and timezone) or weather for any city in the world! All you have to do is enter the name of the city, preferably in English format (London instead of Londres for example), and the magic does the rest!
+
+.. note:: For the `weather` command, it is better to give the "`Embed Links <perms.html#embed-links>`_" permission to the bot, to get a better rendering. But it's not mandatory!
