@@ -199,10 +199,13 @@ class XPCog(commands.Cog):
         try:
             cnx = self.bot.cnx
             cursor = cnx.cursor(dictionary = True)
-            query = ("SELECT `xp`, @curRank := @curRank + 1 AS rank FROM `{}` p, (SELECT @curRank := 0) r WHERE `banned`='0' ORDER BY xp desc;".format(self.table))
+            query = ("SELECT `userID`,`xp`, @curRank := @curRank + 1 AS rank FROM `{}` p, (SELECT @curRank := 0) r WHERE `banned`='0' ORDER BY xp desc;".format(self.table))
             cursor.execute(query)
             liste = list()
             for x in cursor:
+                if x['userID'] != userID:
+                    continue
+                x['rank'] = round(x['rank'])
                 liste.append(x)
             cursor.close()
             return liste
@@ -370,14 +373,18 @@ class XPCog(commands.Cog):
                 except discord.NotFound:
                     user = await self.translate(ctx.guild,'xp','del-user')
             if isinstance(user,discord.User):
-                user = await self.bot.cogs['UtilitiesCog'].remove_markdown(user.name.replace('|',''))
-                if len(user)>18:
-                    user = user[:15]+'...'
+                user_name = await self.bot.cogs['UtilitiesCog'].remove_markdown(user.name.replace('|',''))
+                if len(user_name)>18:
+                    user_name = user_name[:15]+'...'
             l = await self.calc_level(u['xp'])
-            txt.append('{} • **{} |** `lvl {}` **|** `xp {}`'.format(i,user,l[0],u['xp']))
+            txt.append('{} • **{} |** `lvl {}` **|** `xp {}`'.format(i,"__"+user_name+"__" if user==ctx.author else user_name,l[0],u['xp']))
         f_name = str(await self.translate(ctx.guild,'xp','top-name')).format((page-1)*20+1,i,page,max_page)
+        # author
+        rank = await self.bdd_get_rank(ctx.author.id)
+        lvl = await self.calc_level(rank[0]['xp'])
+        your_rank = {'name':"__"+await self.translate(ctx.guild,"xp","top-your")+"__", 'value':"**#{} |** `lvl {}` **|** `xp {}`".format(rank[0]['rank'],lvl[0],rank[0]['xp'])}
         if ctx.channel.permissions_for(ctx.guild.me).embed_links:
-            emb = self.bot.cogs['EmbedCog'].Embed(title=await self.translate(ctx.guild,'xp','top-title-1'),fields=[{'name':f_name,'value':"\n".join(txt)}],color=self.embed_color,author_icon=self.bot.user.avatar_url_as(format='png')).create_footer(ctx.author)
+            emb = self.bot.cogs['EmbedCog'].Embed(title=await self.translate(ctx.guild,'xp','top-title-1'),fields=[{'name':f_name,'value':"\n".join(txt)},your_rank],color=self.embed_color,author_icon=self.bot.user.avatar_url_as(format='png')).create_footer(ctx.author)
             await ctx.send(embed=emb.discord_embed())
         else:
             await ctx.send(f_name+"\n\n"+'\n'.join(txt))

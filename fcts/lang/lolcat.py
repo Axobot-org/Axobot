@@ -495,4 +495,5 @@ xp = {'card-level':'LVL',
         "high-page":"There aren't so much pages!",
         "top-title-1":"Global ranks",
         "top-name":"__Bests {}-{} ({}/{}):__",
-        "default_levelup":"Weew, {user} has just got **lvl {level}**! What a smart guy!"}
+        "default_levelup":"Weew, {user} has just got **lvl {level}**! What a smart guy!",
+        "top-your":"Ur rank"}
