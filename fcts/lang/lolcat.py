@@ -484,7 +484,8 @@ stats_infos={"not-found":"Unable 2 found {N}",
 users = {'invalid-card':'Dat style iz no valid. But yop, her\'s styles u can use: {}',
         'missing-attach-files':'Oops, I\'m missing the Attach Files perms :upside_down:',
         'changed-0':'Ur xp card naw use the style {}',
-        'changed-1':'Oops, a wicked error occurrd during the process ov ur request. Try again later or contact these nice support guys.'}
+        'changed-1':'Oops, a wicked error occurrd during the process ov ur request. Try again later or contact these nice support guys.',
+        'card-desc':"Here iz example of ur xp card. U can enter teh command `profile card <style>` 2 change the style\n*Ur xp card will only refresh wehn u have won Xp*"}
 
 xp = {'card-level':'LVL',
         'card-rank':'SEAT',

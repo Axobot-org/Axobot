@@ -484,7 +484,8 @@ stats_infos={"not-found":"Unable to find {N}",
 users = {'invalid-card':'This style is invalid. Here is the list of styles you can use: {}',
         'missing-attach-files':'Oops, I\'m missing the permission to Attach Files :confused:',
         'changed-0':'Your xp card now uses the style {}',
-        'changed-1':'Oops, an internal error occurred during the processing of the request. Try again later or contact support.'}
+        'changed-1':'Oops, an internal error occurred during the processing of the request. Try again later or contact support.',
+        'card-desc':"Here is an example of your xp card. You can enter the command `profile card <style>` to change the style\n*Your xp card will only refresh when you have won xp*"}
 
 xp = {'card-level':'LEVEL',
         'card-rank':'RANK',

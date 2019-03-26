@@ -33,7 +33,8 @@ class UsersCog(commands.Cog):
             if ctx.channel.permissions_for(ctx.me).attach_files:
                 style = await self.bot.cogs['UtilitiesCog'].get_xp_style(ctx.author)
                 txts = [await self.translate(ctx.guild,'xp','card-level'), await self.translate(ctx.guild,'xp','card-rank')]
-                await ctx.send(file=await self.bot.cogs['XPCog'].create_card(ctx.author,style,0,[1,0],txts,force_static=True))
+                desc = await self.translate(ctx.guild,'users','card-desc')
+                await ctx.send(desc,file=await self.bot.cogs['XPCog'].create_card(ctx.author,style,0,[1,0],txts,force_static=True))
             else:
                 await ctx.send(await self.translate(ctx.guild,'users','missing-attach-files'))
         else:
