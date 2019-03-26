@@ -327,9 +327,8 @@ class XPCog(commands.Cog):
                     return await ctx.send(await self.translate(ctx.guild,'xp','1-no-xp'))
                 return await ctx.send(await self.translate(ctx.guild,'xp','2-no-xp'))
             xp = xp[0]['xp']
-            ranks = sorted([(v[1],k) for k,v in self.cache.items()],reverse=True)
             ranks_nb = await self.bdd_get_nber()
-            rank = ranks.index((xp,user.id))+1
+            rank = (await self.bdd_get_rank(user.id))[0]['rank']
             if ctx.channel.permissions_for(ctx.guild.me).attach_files:
                 await self.send_card(ctx,user,xp,rank,ranks_nb)
             elif ctx.channel.permissions_for(ctx.guild.me).embed_links:
