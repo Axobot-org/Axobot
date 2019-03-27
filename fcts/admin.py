@@ -651,39 +651,94 @@ Cette option affecte tous les serveurs"""
         if ctx != None:
             await message.edit(content=msg)
             
-    @commands.command(name="idea")
+    @commands.group(name='bug',hidden=True)
     @commands.check(reloads.check_admin)
-    async def make_suggestion(self,ctx,*,text):
+    async def main_bug(self,ctx):
+        """Gère la liste des bugs"""
+        pass
+    
+    @main_bug.command(name='add')
+    async def bug_add(self,ctx,*,bug):
+        """Ajoute un bug à la liste"""
+        try:
+            channel = ctx.bot.get_channel(548138866591137802) if self.bot.beta else ctx.bot.get_channel(488769283673948175)
+            if channel==None:
+                return await ctx.send("Salon 488769283673948175 introuvable")
+            text = bug.split('\n')
+            fr,en = text[0].replace('\\n','\n'), text[1].replace('\\n','\n')
+            emb = self.bot.cogs['EmbedCog'].Embed(title="New bug",fields=[{'name':'Français','value':fr},{'name':'English','value':en}],color=13632027).update_timestamp()
+            await channel.send(embed=emb.discord_embed())
+            await ctx.bot.cogs['UtilitiesCog'].add_check_reaction(ctx.message)
+        except Exception as e:
+            await self.bot.cogs['ErrorsCog'].on_cmd_error(ctx,e)
+    
+    @main_bug.command(name='fix')
+    async def bug_fix(self,ctx,ID:int,fixed:bool=True):
+        """Marque un bug comme étant fixé"""
+        try:
+            chan = ctx.bot.get_channel(548138866591137802) if self.bot.beta else ctx.bot.get_channel(488769283673948175)
+            if chan==None:
+                return await ctx.send("Salon introuvable")
+            try:
+                msg = await chan.fetch_message(ID)
+            except Exception as e:
+                return await ctx.send("`Error:` {}".format(e))
+            if len(msg.embeds)!=1:
+                return await ctx.send("Nombre d'embeds invalide")
+            emb = msg.embeds[0]
+            if fixed:
+                emb.color = discord.Color(10146593)
+            else:
+                emb.color = discord.Color(13632027)
+            await msg.edit(embed=emb)
+            await ctx.bot.cogs['UtilitiesCog'].add_check_reaction(ctx.message)
+        except Exception as e:
+            await self.bot.cogs['ErrorsCog'].on_cmd_error(ctx,e)
+
+    @commands.group(name="idea",hidden=True)
+    @commands.check(reloads.check_admin)
+    async def main_idea(self,ctx):
         """Ajouter une idée dans le salon des idées, en français et anglais"""
-        chan = ctx.bot.get_channel(548138866591137802) if self.bot.beta else ctx.bot.get_channel(488769306524385301)
-        if len(text.split('\n'))!=2:
-            if text.startswith('valid ') or text.startswith('unvalid '):
-                ID = text.split(' ')[1]
-                if not ID.isnumeric():
-                    return await ctx.send("ID invalide")
-                ID = int(ID)
-                if chan==None:
-                    return await ctx.send("Salon introuvable")
-                try:
-                    msg = await chan.fetch_message(ID)
-                except Exception as e:
-                    return await ctx.send("`Error:` {}".format(e))
-                if len(msg.embeds)!=1:
-                    return await ctx.send("Nombre d'embeds invalide")
-                emb = msg.embeds[0]
-                if text.split(' ')[0] == 'valid':
-                    emb.color = discord.Color(10146593)
-                else:
-                    emb.color = discord.Color(16106019)
-                await msg.edit(embed=emb)
-                return await ctx.bot.cogs['UtilitiesCog'].add_check_reaction(ctx.message)
-            return await ctx.send("Il faut ne faire que deux paragraphes, le premier en français, le deuxième en anglais")
-        text = text.split('\n')
-        fr,en = text[0].replace('\\n','\n'), text[1].replace('\\n','\n')
-        emb = self.bot.cogs['EmbedCog'].Embed(fields=[{'name':'Français','value':fr},{'name':'English','value':en}],color=16106019)
-        msg = await chan.send(embed=emb.discord_embed())
-        await self.bot.cogs['FunCog'].add_vote(msg)
-        await ctx.bot.cogs['UtilitiesCog'].add_check_reaction(ctx.message)
+        pass
+    
+    @main_idea.command(name='add')
+    async def idea_add(self,ctx,*,text):
+        """Ajoute une idée à la liste"""
+        try:
+            channel = ctx.bot.get_channel(548138866591137802) if self.bot.beta else ctx.bot.get_channel(488769306524385301)
+            if channel==None:
+                return await ctx.send("Salon introuvable")
+            text = text.split('\n')
+            fr,en = text[0].replace('\\n','\n'), text[1].replace('\\n','\n')
+            emb = self.bot.cogs['EmbedCog'].Embed(fields=[{'name':'Français','value':fr},{'name':'English','value':en}],color=16106019).update_timestamp()
+            msg = await channel.send(embed=emb.discord_embed())
+            await self.bot.cogs['FunCog'].add_vote(msg)
+            await ctx.bot.cogs['UtilitiesCog'].add_check_reaction(ctx.message)
+        except Exception as e:
+            await self.bot.cogs['ErrorsCog'].on_cmd_error(ctx,e)
+
+    @main_idea.command(name='valid')
+    async def idea_valid(self,ctx,ID:int,valid:bool=True):
+        """Marque une idée comme étant ajoutée à la prochaine MàJ"""
+        try:
+            chan = ctx.bot.get_channel(548138866591137802) if self.bot.beta else ctx.bot.get_channel(488769306524385301)
+            if chan==None:
+                return await ctx.send("Salon introuvable")
+            try:
+                msg = await chan.fetch_message(ID)
+            except Exception as e:
+                return await ctx.send("`Error:` {}".format(e))
+            if len(msg.embeds)!=1:
+                return await ctx.send("Nombre d'embeds invalide")
+            emb = msg.embeds[0]
+            if valid:
+                emb.color = discord.Color(10146593)
+            else:
+                emb.color = discord.Color(16106019)
+            await msg.edit(embed=emb)
+            await ctx.bot.cogs['UtilitiesCog'].add_check_reaction(ctx.message)
+        except Exception as e:
+            await self.bot.cogs['ErrorsCog'].on_cmd_error(ctx,e)
 
     
 
