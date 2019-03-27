@@ -241,7 +241,7 @@ class RssCog(commands.Cog):
         try:
             await self.add_flow(ctx.guild.id,ctx.channel.id,Type,identifiant)
             await ctx.send(str(await self.translate(ctx.guild,"rss","success-add")).format(display_type,link,ctx.channel.mention))
-            self.bot.log.info("Flux rss ajouté dans le serveur {} ({})".format(ctx.guild.id,link))
+            self.bot.log.info("RSS feed added into server {} ({})".format(ctx.guild.id,link))
         except Exception as e:
             await ctx.send(await self.translate(ctx.guild,"rss","fail-add"))
             await self.bot.cogs["ErrorsCog"].on_error(e,ctx)
@@ -301,6 +301,7 @@ class RssCog(commands.Cog):
             await self.bot.cogs["ErrorsCog"].on_error(e,ctx)
             return
         await ctx.send(await self.translate(ctx.guild,"rss","delete-success"))
+        self.bot.log.info("RSS feed deleted into server {} ({})".format(ctx.guild.id,flow[0]['ID']))
 
     @rss_main.command(name="list")
     @commands.guild_only()
