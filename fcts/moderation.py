@@ -552,14 +552,26 @@ You must be an administrator of this server to use this command."""
         if len(liste)==0:
             desc.append(await self.translate(ctx.guild.id,"modo","no-bans"))
         if reasons:
-            for case in liste:
+            for case in liste[:45]:
                 desc.append("{}  *({})*".format(case[1],case[0]))
+            if len(liste)>45:
+                title = await self.translate(ctx.guild.id,"modo","ban-list-title-1")
+            else:
+                title = await self.translate(ctx.guild.id,"modo","ban-list-title-0")
         else:
-            for case in liste:
+            for case in liste[:60]:
                 desc.append("{}".format(case[1]))
-        embed = ctx.bot.cogs['EmbedCog'].Embed(title=str(await self.translate(ctx.guild.id,"modo","ban-list-title")).format(ctx.guild.name), color=self.bot.cogs["ServerCog"].embed_color, desc="\n".join(desc), time=ctx.message.created_at)
+            if len(liste)>60:
+                title = await self.translate(ctx.guild.id,"modo","ban-list-title-2")
+            else:
+                title = await self.translate(ctx.guild.id,"modo","ban-list-title-0")
+        embed = ctx.bot.cogs['EmbedCog'].Embed(title=str(title).format(ctx.guild.name), color=self.bot.cogs["ServerCog"].embed_color, desc="\n".join(desc), time=ctx.message.created_at)
         embed.create_footer(ctx.author)
-        await ctx.send(embed=embed.discord_embed(),delete_after=10)
+        try:
+            await ctx.send(embed=embed.discord_embed(),delete_after=10)
+        except discord.errors.HTTPException as e:
+            if e.code==400:
+                await ctx.send(await self.translate(ctx.guild.id,"modo","ban-list-error"))
 
 
     @commands.group(name="emoji")
