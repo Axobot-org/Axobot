@@ -146,6 +146,8 @@ class ModeratorCog(commands.Cog):
             await ctx.send(str(await self.translate(ctx.guild,"modo","clear-0")).format(len(deleted)),delete_after=2.0)
             log = str(await self.translate(ctx.guild.id,"logs","clear")).format(channel=ctx.channel.mention,number=len(deleted))
             await self.bot.cogs["Events"].send_logs_per_server(ctx.guild,"clear",log,ctx.author)
+        except discord.errors.NotFound:
+            await ctx.send(await self.translate(ctx.guild,"modo","clear-nt-found"))
         except Exception as e:
             await self.bot.cogs['ErrorsCog'].on_command_error(ctx,e)
 
