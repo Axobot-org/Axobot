@@ -688,8 +688,10 @@ Cette option affecte tous les serveurs"""
             emb = msg.embeds[0]
             if fixed:
                 emb.color = discord.Color(10146593)
+                emb.title = "New bug [fixed soon]"
             else:
                 emb.color = discord.Color(13632027)
+                emb.title = "New bug"
             await msg.edit(embed=emb)
             await ctx.bot.cogs['UtilitiesCog'].add_check_reaction(ctx.message)
         except Exception as e:
