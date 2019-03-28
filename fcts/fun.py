@@ -163,21 +163,21 @@ You can specify a verification limit by adding a number in argument"""
         Use 'blame list' command to see every available name *for you*"""
         l1 = ['discord','mojang','zbot','google'] # tout le monde
         l2 = ['zrunner','tronics','patate','neil','reddemoon','aragorn1202'] # frm
-        l3 = ['awhikax','aragorn'] # zbot
+        l3 = ['awhikax','aragorn','adri'] # zbot
         name = name.lower()
         if name in l1:
             await ctx.send(file=await self.utilities.find_img('blame-{}.png'.format(name)))
         elif name in l2:
-            if await self.is_on_guild(ctx.author,391968999098810388):
+            if await self.is_on_guild(ctx.author,391968999098810388): # fr-minecraft
                 await ctx.send(file=await self.utilities.find_img('blame-{}.png'.format(name)))
         elif name in l3:
-            if await self.is_on_guild(ctx.author,356067272730607628):
+            if await self.is_on_guild(ctx.author,356067272730607628): # Zbot server
                 await ctx.send(file=await self.utilities.find_img('blame-{}.png'.format(name)))
         elif name in ['help','list']:
             liste = l1
-            if await self.is_on_guild(ctx.author,391968999098810388):
+            if await self.is_on_guild(ctx.author,391968999098810388): # fr-minecraft
                 liste += l2
-            if await self.is_on_guild(ctx.author,356067272730607628):
+            if await self.is_on_guild(ctx.author,356067272730607628): # Zbot server
                 liste += l3
             txt = "- "+"\n- ".join(sorted(liste))
             title = str(await self.translate(ctx.guild,"fun","blame-0")).format(ctx.author)
