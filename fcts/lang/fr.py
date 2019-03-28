@@ -67,7 +67,7 @@ find={"user-0":"Nom : {}\nID : {}",
 "user-1":"Nom : {name}\nID : {id}\nRangs : {rangs}\nServeurs : {servers}\nPropriétaire de : {own}\nLangues : {lang}\nA voté : {vote}\nCarte d'xp : {card}",
 "user-2":"Utilisateur introuvable",
 "guild-0":"Serveur introuvable",
-"guild-1":"Nom : {}\nID : {}\nPropriétaire : {} ({})\nMembres : {} (dont {} bots)\nLangue : {}",
+"guild-1":"Nom : {}\nID : {}\nPropriétaire : {} ({})\nMembres : {} (dont {} bots)\nLangue : {}\nPréfixe : `{}`",
 "chan-0":"Salon introuvable",
 "chan-1":"Nom : {}\nID : {}\nServeur : {} ({})",
 "help":"Cette commande permet de retrouver un serveur ou un salon parmi tout les serveurs sur lequel est le bot. Vous pouvez aussi rechercher les informations d'un utilisateur Discord, peu importe si il partage un serveur avec moi !\
