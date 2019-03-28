@@ -18,11 +18,11 @@ class UtilitiesCog(commands.Cog):
 
     @commands.Cog.listener()
     async def on_ready(self):
-        self.config = (await self.bot.cogs['ServerCog'].get_bot_infos(self.bot.user.id))[0]
+        await self.reload()
 
-    async def reload(self,liste):
-        for m in liste:
-            exec("importlib.reload({})".format(m))
+    async def reload(self):
+        self.config = (await self.bot.cogs['ServerCog'].get_bot_infos(self.bot.user.id))[0]
+        return self.config
 
     def find_prefix(self,guild):
         if guild==None or not self.bot.database_online:

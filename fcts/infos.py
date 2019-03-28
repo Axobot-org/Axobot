@@ -66,6 +66,9 @@ class InfosCog(commands.Cog):
         r = self.bot.latency
         try:
             async with ctx.channel.typing():
+                b_conf = self.bot.cogs['UtilitiesCog'].config
+                if b_conf == None:
+                    b_conf = await self.bot.cogs['UtilitiesCog'].reload()
                 ignored_guilds = [int(x) for x in self.bot.cogs['UtilitiesCog'].config['banned_guilds'].split(";") if len(x)>0]
                 ignored_guilds += self.bot.cogs['ReloadsCog'].ignored_guilds
                 len_servers = len([x for x in ctx.bot.guilds if x.id not in ignored_guilds])
@@ -84,7 +87,7 @@ class InfosCog(commands.Cog):
                 embed.create_footer(ctx.author)
             await ctx.send(embed=embed.discord_embed())
         except Exception as e:
-            await ctx.bot.cogs['Errors'].on_command_error(ctx,e)
+            await ctx.bot.cogs['ErrorsCog'].on_cmd_error(ctx,e)
 
     def get_users_nber(self,ignored_guilds):
         members = [x.members for x in self.bot.guilds if x.id not in ignored_guilds]
