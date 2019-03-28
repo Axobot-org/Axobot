@@ -377,7 +377,7 @@ Link : {link}""",
 
 server={"config-help": "This command is mainly used to configure your server. By doing `!config see [option]` you will get \
 an overview of the current configurations, and server administrators can enter `!config change <option> role1, role2, role3...` \
-to modify a configuration, or `!config del <option>` to reset the option (`!config change <option>` works the same way).",
+to modify a configuration, or `!config del <option>` to reset the option (`!config change <option>` works the same way).\nThe list of available options is available at <https://zbot.rtfd.io/en/latest/config.html#list-of-every-option>",
         "change-0": "This option does not exist :confused:",
         "change-1": "Oops, an internal error occurred...",
         "change-2": "The '{}' option value has been deleted",
