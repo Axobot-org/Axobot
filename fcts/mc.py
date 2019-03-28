@@ -1,4 +1,4 @@
-import frmc_lib, requests, discord, re, datetime, time
+import frmc_lib, aiohttp, discord, re, datetime, time, requests
 from discord.ext import commands
 
 
@@ -24,7 +24,10 @@ Every information come from the website www.fr-minecraft.net"""
     async def mojang_status(self,ctx):
         """Get Mojang server status"""
         desc = await self.translate(ctx.guild,"mc","mojang_desc")
-        data = requests.get("https://status.mojang.com/check").json()
+        async with aiohttp.ClientSession() as session:
+            async with session.get('https://status.mojang.com/check') as r:
+                # data = requests.get("https://status.mojang.com/check").json()
+                data = await r.json()
         if ctx.guild==None:
             can_embed = True
         else:
@@ -300,7 +303,6 @@ Every information come from the website www.fr-minecraft.net"""
 
 
     async def create_server_2(self,guild,ip,port):
-        print2 = self.bot.cogs['UtilitiesCog'].print2
         if port == None:
             url = "https://api.mcsrvstat.us/1/"+str(ip)
         else:
@@ -313,7 +315,7 @@ Every information come from the website www.fr-minecraft.net"""
             try:
                 r = requests.get("https://api.mcsrvstat.us/1/"+str(ip),timeout=5).json()
             except Exception as e:
-                await print2("(server_embed) Erreur sur l'url {} :".format(url))
+                await self.bot.log.warn("(server_embed) Erreur sur l'url {} :".format(url))
                 await self.bot.cogs['ErrorsCog'].on_error(e,None)
                 return await self.translate(guild,"mc","serv-error")
         if r["debug"]["ping"] == False:

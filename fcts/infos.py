@@ -1,4 +1,4 @@
-import discord, datetime, sys, psutil, os, requests, importlib, time, asyncio, typing
+import discord, datetime, sys, psutil, os, aiohttp, importlib, time, asyncio, typing
 from discord.ext import commands
 from inspect import signature
 from platform   import system as system_name  # Returns the system/OS name
@@ -468,11 +468,14 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
             perks.append("contributor")
         if await self.bot.cogs['UtilitiesCog'].is_premium(user):
             perks.append("premium")
-        r = requests.get('https://discordbots.org/api/bots/486896267788812288/check?userId={}'.format(user.id),headers={'Authorization':str(self.bot.dbl_token)})
-        if r.json()['voted']:
-            r = await self.translate(ctx.guild,'keywords','oui')
-        else:
-            r = await self.translate(ctx.guild,'keywords','non')
+        async with aiohttp.ClientSession() as session:
+            async with session.get('https://discordbots.org/api/bots/486896267788812288/check?userId={}'.format(user.id),headers={'Authorization':str(self.bot.dbl_token)}) as r:
+                #r = requests.get('https://discordbots.org/api/bots/486896267788812288/check?userId={}'.format(user.id),headers={'Authorization':str(self.bot.dbl_token)})
+                js = await r.json()
+                if js['voted']:
+                    r = await self.translate(ctx.guild,'keywords','oui')
+                else:
+                    r = await self.translate(ctx.guild,'keywords','non')
         for e in range(len(ctx.bot.cogs['LangCog'].languages)):
             if languages.count(e)>0:
                 disp_lang += ctx.bot.cogs['LangCog'].languages[e]+" ("+str(round(languages.count(e)/len(languages)*100))+"%)  "

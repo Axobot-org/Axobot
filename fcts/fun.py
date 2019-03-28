@@ -1,4 +1,4 @@
-import discord, random, operator, string, importlib, re, typing, datetime, subprocess, requests, json, geocoder
+import discord, random, operator, string, importlib, re, typing, datetime, subprocess, json, geocoder, time, aiohttp
 import emoji as emojilib
 from discord.ext import commands
 from tzwhere import tzwhere
@@ -413,17 +413,19 @@ You can specify a verification limit by adding a number in argument"""
         """Get the weather of a city
         You need to provide the city name in english"""
         city = city.replace(" ","%20")
-        r = requests.get("https://welcomer.glitch.me/weather?city="+city)
-        if r.ok:
-            try:
-                _ = r.json()
-            except json.decoder.JSONDecodeError:
-                if ctx.channel.permissions_for(ctx.me).embed_links:
-                    emb = self.bot.cogs['EmbedCog'].Embed(image="https://welcomer.glitch.me/weather?city="+city,footer_text="From https://welcomer.glitch.me/weather")
-                    await ctx.send(embed=emb.discord_embed())
-                else:
-                    await ctx.send("https://welcomer.glitch.me/weather?city="+city)
-                return
+        async with aiohttp.ClientSession() as session:
+            async with session.get("https://welcomer.glitch.me/weather?city="+city) as r:
+                if r.status == 200:
+                    try:
+                        _ = await r.json()
+                    except aiohttp.client_exceptions.ContentTypeError:
+                        if ctx.channel.permissions_for(ctx.me).embed_links:
+                            emb = self.bot.cogs['EmbedCog'].Embed(image="https://welcomer.glitch.me/weather?city="+city,footer_text="From https://welcomer.glitch.me/weather")
+                            return await ctx.send(embed=emb.discord_embed())
+                        else:
+                            return await ctx.send("https://welcomer.glitch.me/weather?city="+city)
+                    except Exception as e:
+                        await self.bot.cogs['ErrorsCog'].on_error(e,ctx)
         await ctx.send(await self.translate(ctx.guild,"fun","invalid-city"))
 
     @commands.command(name="hour")
