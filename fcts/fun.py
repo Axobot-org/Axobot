@@ -162,7 +162,7 @@ You can specify a verification limit by adding a number in argument"""
         """Blame someone
         Use 'blame list' command to see every available name *for you*"""
         l1 = ['discord','mojang','zbot','google'] # tout le monde
-        l2 = ['zrunner','tronics','patate','neil','reddemoon','aragorn1202'] # frm
+        l2 = ['zrunner','tronics','patate','neil','reddemoon','aragorn1202','platon'] # frm
         l3 = ['awhikax','aragorn','adri'] # zbot
         name = name.lower()
         if name in l1:
