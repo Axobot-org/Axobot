@@ -18,7 +18,7 @@ class XPCog(commands.Cog):
         self.table = 'xp_beta' if bot.beta else 'xp'
         self.cooldown = 30
         self.minimal_size = 5
-        self.spam_rate = 0.30
+        self.spam_rate = 0.20
         self.xp_per_char = 0.11
         self.max_xp_per_msg = 60
         self.file = 'xp'
