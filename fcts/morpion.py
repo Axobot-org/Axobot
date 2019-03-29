@@ -34,6 +34,7 @@ class MorpionCog(commands.Cog):
                 elif grille[k] == 'O':
                     if day==1:
                     #if day==29:
+                        self.bot.fishes += 1
                         affichage_grille += ':tropical_fish:'
                     else:
                         affichage_grille += ':red_circle:'

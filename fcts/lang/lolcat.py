@@ -117,8 +117,8 @@ Of helpin me in the creetion of the boat, my ownr an I wouLd like to tahnk Awhik
 Has a nice dayz !""",
 "docs":"Her'z teh link 2 the bot doc:",
 "stats-title":"**Boat statz**",
-"stats":"""**Baut vershun:** {} \n**Nbr ov serverz:** {} \n**Nbr ov visible memberz:** {} ({} **robots**)\n**Nbr ov code lin:** {}\n**Uzd languages:** {}\n**Python vershun :** {} \n**Vershun ov teh `discord.py` lyb:** {} \n**Loadin on teh RAM:** {} GB \n**Loadin on the CPU:** {} % \n**API latency timz:** {} ms""",
-"admins-list":"My super-cool admins are : {}\n**Nbr of xp won:** {}",
+"stats":"""**Baut vershun:** {bot_v} \n**Nbr ov serverz:** {s_count} \n**Nbr ov visible memberz:** {m_count} ({b_count} **robots**)\n**Nbr ov code lin:** {l_count}\n**Uzd languages:** {lang}\n**Python vershun :** {p_v} \n**Vershun ov teh `discord.py` lyb:** {d_v} \n**Loadin on teh RAM:** {ram} GB \n**Loadin on the CPU:** {cpu} % \n**API latency timz:** {api} ms\n**Nbr of xp won:** {xp}""",
+"admins-list":"My super-cool admins are : {}",
 "prefix":"List ov usable prefiXs:"}
 
 infos_2={"membercount-0":"Total nmber of membrz",

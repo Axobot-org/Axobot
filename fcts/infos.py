@@ -63,7 +63,8 @@ class InfosCog(commands.Cog):
         version = str(v.major)+"."+str(v.minor)+"."+str(v.micro)
         pid = os.getpid()
         py = psutil.Process(pid)
-        r = self.bot.latency
+        ram_cpu = [round(py.memory_info()[0]/2.**30,3), psutil.cpu_percent()]
+        latency = round(self.bot.latency*1000,3)
         try:
             async with ctx.channel.typing():
                 b_conf = self.bot.cogs['UtilitiesCog'].config
@@ -74,7 +75,7 @@ class InfosCog(commands.Cog):
                 len_servers = len([x for x in ctx.bot.guilds if x.id not in ignored_guilds])
                 langs_list = await self.bot.cogs['ServerCog'].get_languages(ignored_guilds)
                 lang_total = sum([x[1] for x in langs_list])
-                langs_list = ["{}: {}%".format(x[0],round(x[1]/lang_total*100)) for x in langs_list if x[1]>0]
+                langs_list = ' | '.join(["{}: {}%".format(x[0],round(x[1]/lang_total*100)) for x in langs_list if x[1]>0])
                 del lang_total
                 #premium_count = await self.bot.cogs['UtilitiesCog'].get_number_premium()
                 try:
@@ -82,7 +83,9 @@ class InfosCog(commands.Cog):
                 except Exception as e:
                     users = bots = 'unknown'
                 total_xp = await self.bot.cogs['XPCog'].bdd_total_xp()
-                d = str(await self.translate(ctx.guild,"infos","stats")).format(bot_version,len_servers,users,bots,self.codelines,' | '.join(langs_list),version,discord.__version__,round(py.memory_info()[0]/2.**30,3),psutil.cpu_percent(),round(r*1000,3),total_xp)
+                d = str(await self.translate(ctx.guild,"infos","stats")).format(bot_v=bot_version,s_count=len_servers,m_count=users,b_count=bots,l_count=self.codelines,lang=langs_list,p_v=version,d_v=discord.__version__,ram=ram_cpu[0],cpu=ram_cpu[1],api=latency,xp=total_xp)
+                if datetime.datetime.today().day == 1:
+                    d += "\n**{}:** {}".format(await self.translate(ctx.guild,"infos_2",'fish-1'),self.bot.fishes)
                 embed = ctx.bot.cogs['EmbedCog'].Embed(title=await self.translate(ctx.guild,"infos","stats-title"), color=ctx.bot.cogs['HelpCog'].help_color, time=ctx.message.created_at,desc=d,thumbnail=self.bot.user.avatar_url_as(format="png"))
                 embed.create_footer(ctx.author)
             await ctx.send(embed=embed.discord_embed())
@@ -553,7 +556,8 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
         (await self.translate(ctx.guild.id,"infos_2","membercount-2"),"{} ({}%)".format(h,int(round(h*100/total,0)))),
         (await self.translate(ctx.guild.id,"infos_2","membercount-1"),"{} ({}%)".format(bots,int(round(bots*100/total,0)))),
         (await self.translate(ctx.guild.id,"infos_2","membercount-3"),"{} ({}%)".format(c_co,int(round(c_co*100/total,0))))]
-        if datetime.datetime.today().day==29:
+        if datetime.datetime.today().day==1:
+            self.bot.fishes += 1
             l.append((await self.translate(ctx.guild.id,"infos_2","fish-1"),"{} {}".format(random.randrange(100),random.choice([':fish:',':tropical_fish:','']))))
         if ctx.channel.permissions_for(ctx.guild.me).embed_links:
             embed = discord.Embed(colour=ctx.guild.me.color)

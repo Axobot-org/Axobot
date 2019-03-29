@@ -117,7 +117,7 @@ For helping me in the creation of the bot, my owner and I would like to thank Aw
 Have a nice day!""",
 "docs":"Here is the link to the bot documentation:",
 "stats-title":"**Bot statistics**",
-"stats":"""**Bot version:** {} \n**Number of servers:** {} \n**Number of visible members:** {} ({} **bots**)\n**Number of code lines:** {}\n**Used languages:** {}\n**Python version :** {} \n**Version of the `discord.py` lib:** {} \n**Loading on the RAM:** {} GB \n**Loading on the CPU:** {} % \n**API latency time:** {} ms\n**Total of earned xp:** {}""",
+"stats":"""**Bot version:** {bot_v} \n**Number of servers:** {s_count} \n**Number of visible members:** {m_count} ({b_count} **bots**)\n**Number of code lines:** {l_count}\n**Used languages:** {lang}\n**Python version :** {p_v} \n**Version of the `discord.py` lib:** {d_v} \n**Loading on the RAM:** {ram} GB \n**Loading on the CPU:** {cpu} % \n**API latency time:** {api} ms\n**Total of earned xp:** {xp}""",
 "admins-list":"The administrators of this bot are : {}",
 "prefix":"List of currently usable prefixes:"}
 

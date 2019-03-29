@@ -74,6 +74,7 @@ class zbot(commands.bot.BotBase,discord.Client):
         self.dbl_token = dbl_token
         self._cnx = [None,0]
         self.xp_enabled = True
+        self.fishes = 0
     
     @property
     def cnx(self):
