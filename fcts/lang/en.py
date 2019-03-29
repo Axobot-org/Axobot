@@ -124,7 +124,8 @@ Have a nice day!""",
 infos_2={"membercount-0":"Total number of members",
 "membercount-1":"Number of bots",
 "membercount-2":"Number of humans",
-"membercount-3":"Number of online members"}
+"membercount-3":"Number of online members",
+"fish-1":"Number of fishes"}
 
 keywords={"depuis":"since",
           "nom":"name",

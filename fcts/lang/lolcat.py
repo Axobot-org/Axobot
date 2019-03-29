@@ -124,7 +124,8 @@ Has a nice dayz !""",
 infos_2={"membercount-0":"Total nmber of membrz",
 "membercount-1":"Numbr ov botz",
 "membercount-2":"Numbrz for good people",
-"membercount-3":"Nmbr ov god online peepl"}
+"membercount-3":"Nmbr ov god online peepl",
+"fish-1":"Nbr of :fish:"}
 
 keywords={"depuis":"sinze",
           "nom":"nayme",

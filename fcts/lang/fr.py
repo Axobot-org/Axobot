@@ -124,7 +124,8 @@ Bonne journée !""",
 infos_2={"membercount-0":"Nombre de membres total",
 "membercount-1":"Nombre de bots",
 "membercount-2":"Nombre d'humains",
-"membercount-3":"Nombre de membres connectés"}
+"membercount-3":"Nombre de membres connectés",
+"fish-1":"Nombre de poissons trouvés"}
 
 keywords={"depuis":"depuis",
           "nom":"nom",
