@@ -309,6 +309,17 @@ class UtilitiesCog(commands.Cog):
             return False
         return parameters['contributor']
     
+    async def has_rainbow_card(self,user):
+        """Check if a user won the rainbow card"""
+        parameters = None
+        try:
+            parameters = await self.get_db_userinfo(criters=["userID="+str(user.id)],columns=['unlocked_rainbow'])
+        except Exception as e:
+            await self.bot.cogs["Errors"].on_error(e,None)
+        if parameters==None:
+            return False
+        return parameters['unlocked_rainbow']
+    
     async def get_xp_style(self,user):
         parameters = None
         try:
@@ -348,6 +359,11 @@ class UtilitiesCog(commands.Cog):
             liste2.append('premium')
         if await self.bot.cogs['AdminCog'].check_if_admin(user):
             liste2.append('admin')
+        if datetime.datetime.today().day == 1:
+            liste.append('rainbow')
+        else:
+            if await self.has_rainbow_card(user):
+                liste.append('rainbow')
         return sorted(liste2)+sorted(liste)
 
 
