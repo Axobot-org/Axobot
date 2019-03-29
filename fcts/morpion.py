@@ -1,4 +1,4 @@
-import random, discord, asyncio
+import random, discord, asyncio, datetime
 from discord.ext import commands
 
 class MorpionCog(commands.Cog):
@@ -25,15 +25,24 @@ class MorpionCog(commands.Cog):
     async def afficher_grille(self,grille):
         """Affiche la grille qui est une liste sous forme de chaine de caractères"""
         affichage_grille = ''
+        day = datetime.datetime.today().day
         for k in range(9) :
                 if k%3 == 0 :
                      affichage_grille += '\n'
                 if grille[k] in range(10):
                     affichage_grille += '<:{}>'.format(self.bot.cogs['EmojiCog'].numbEmojis[grille[k]])
                 elif grille[k] == 'O':
-                    affichage_grille += ':red_circle:'
+                    if day==1:
+                    #if day==29:
+                        affichage_grille += ':tropical_fish:'
+                    else:
+                        affichage_grille += ':red_circle:'
                 else:
-                    affichage_grille += ':large_blue_circle:'
+                    #if day==29:
+                    if day==1:
+                        affichage_grille += ':fish:'
+                    else:
+                        affichage_grille += ':large_blue_circle:'
         return affichage_grille
 
     async def test_place_valide(self,grille,saisie):
