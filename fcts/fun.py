@@ -80,6 +80,8 @@ class FunCog(commands.Cog):
                 await ctx.send(await self.translate(ctx.guild,"fun","no-database"))
             return
         title = await self.translate(ctx.guild,"fun","fun-list")
+        if datetime.datetime.today().day==1:
+            title = ":fish: "+title
         text = str()
         for cmd in sorted(self.get_commands(),key=operator.attrgetter('name')):
             if cmd.name in cmds_list and cmd.enabled:
