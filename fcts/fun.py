@@ -537,10 +537,12 @@ You can specify a verification limit by adding a number in argument"""
             for x in range(1,number+1):
                 try:
                     await m.add_reaction(liste[x])
+                except discord.errors.NotFound:
+                    return
                 except Exception as e:
                     await self.bot.cogs['ErrorsCog'].on_error(e,ctx)
         await self.bot.cogs['UtilitiesCog'].suppr(ctx.message)
-        await self.utilities.print2(await self.bot.cogs['TimeCog'].date(datetime.datetime.now(),digital=True)+" Vote de {} : {}".format(ctx.author,ctx.message.content))
+        await self.bot.debug(await self.bot.cogs['TimeCog'].date(datetime.datetime.now(),digital=True)+" Vote de {} : {}".format(ctx.author,ctx.message.content))
 
 
     async def check_suggestion(self,message):
