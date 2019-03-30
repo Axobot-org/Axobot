@@ -7,7 +7,7 @@ from pytz import timezone
 from fcts import emoji
 importlib.reload(emoji)
 
-cmds_list = ['count_msg','ragequit','pong','run','nope','blame','party','bigtext','shrug','gg','money','pibkac','osekour','me','kill','cat','rekt','thanos','nuke','pikachu','pizza','google','loading','piece']
+cmds_list = ['count_msg','ragequit','pong','run','nope','blame','party','bigtext','shrug','gg','money','pibkac','osekour','me','kill','cat','rekt','thanos','nuke','pikachu','pizza','google','loading','piece','roll']
 
 async def is_fun_enabled(ctx):
     self = ctx.bot.cogs["FunCog"]
@@ -41,6 +41,7 @@ class FunCog(commands.Cog):
         self.fun_opt = dict()
         self.file = "fun"
         self.tz = tzwhere.tzwhere(forceTZ=True)
+        self.last_roll = None
         try:
             self.translate = self.bot.cogs["LangCog"].tr
         except:
@@ -97,6 +98,20 @@ class FunCog(commands.Cog):
             emb = ctx.bot.cogs['EmbedCog'].Embed(title=title,desc=text,color=ctx.bot.cogs['HelpCog'].help_color,time=ctx.message.created_at).create_footer(ctx.author)
             return await ctx.send(embed=emb.discord_embed())
         await ctx.send(title+text)
+
+    @commands.command(name='roll',hidden=True)
+    @commands.check(is_fun_enabled)
+    async def roll(self,ctx,*,options):
+        """Selects an option at random from a given list
+        The options must be separated by a semicolon `;`"""
+        liste = [x.strip() for x in options.split(';')]
+        if len(liste)==0:
+            return await ctx.send("Aucun élément trouvé")
+        await ctx.send(liste)
+        choosen = None
+        while choosen==self.last_roll:
+            choosen = random.choice(liste)
+        await ctx.send(choosen)
 
     @commands.command(name="cookie",hidden=True)
     @commands.check(is_fun_enabled)
