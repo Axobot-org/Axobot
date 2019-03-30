@@ -288,6 +288,7 @@ modo={"slowmode-0":"The slowmode is now disabled in this channel.",
     "em-private":"[Restricted]",
     "em-list-title":"Emojis of the server {}",
     "tempmute-1":"The member {} has been silenced for the reason `{}`, for {}!",
+    "role-high":"Oops, this role is too high for me to change. Please move my role above the role `{}` before trying again :confused:"
     }
 
 morpion={'user-begin':'{}, you begin!',

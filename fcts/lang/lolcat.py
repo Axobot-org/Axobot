@@ -287,7 +287,8 @@ modo={"slowmode-0":"Teh very-cold-mode is now disabld in this nize place.",
     "em-list":"{} (`:{}:`) addd on {} {}",
     "em-private":"[Restrictd]",
     "em-list-title":"Emojis of our super server",
-    "tempmute-1":"Da member {} is muted 4 the raeson `{}`, for {}!"
+    "tempmute-1":"Da member {} is muted 4 the raeson `{}`, for {}!",
+    "role-high":"Oops, tish role is 2 high for me to change. Move my role above the role `{}` be4 trying again, thx"
     }
 
 morpion={'user-begin':'{}, u begin!',

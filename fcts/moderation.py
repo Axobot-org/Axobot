@@ -661,6 +661,24 @@ You must be an administrator of this server to use this command."""
             await ctx.bot.cogs['ErrorsCog'].on_cmd_error(ctx,e)
 
 
+    @commands.group(name="role")
+    async def main_role(self,ctx):
+        """A few commands to manage roles"""
+        pass
+    
+    @main_role.command(name="color")
+    @commands.has_permissions(manage_roles=True)
+    async def role_color(self,ctx,role:discord.Role,color:discord.Color):
+        """Change a color of a role"""
+        if not ctx.guild.me.guild_permissions.manage_roles:
+            await ctx.send(await self.translate(ctx.guild.id,"modo","cant-mute"))
+            return
+        if role.position > ctx.guild.me.roles[-1].position:
+            await ctx.send(str(await self.translate(ctx.guild.id,"modo","role-high")).format(role.name))
+            return
+        await role.edit(colour=color,reason="Asked by {}".format(ctx.author))
+        await ctx.send(role.name)
+
 
     @commands.command(name="pin")
     @commands.check(checks.can_pin_msg)
