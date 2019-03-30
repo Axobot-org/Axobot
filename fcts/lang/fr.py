@@ -98,7 +98,8 @@ fun={"count-0":"Comptage en cours...",
     "no-database":"Notre base de donnée étant hors ligne, l'accès aux commandes fun est restreint aux personnes ayant la permission de Gérer le Serveur",
     "no-embed-perm":"Je ne possède pas la permission \"Intégrer des liens\" :confused:",
     "embed-error":"Une erreur est survenue: `{}`",
-    "invalid-city":"Nom de ville invalide"
+    "invalid-city":"Nom de ville invalide",
+    "no-roll":"Aucun élément trouvé"
     }
 
 infos={"text-0":"""Bonjour ! Moi c'est {0} !

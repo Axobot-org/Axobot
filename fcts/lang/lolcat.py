@@ -98,7 +98,8 @@ fun={"count-0":"Countng in progrez...",
     "no-database":"As our data ar offline, access to funz commandz iz restricted to guys with permishun \"Manage Server\"",
     "no-embed-perm":"I dont haz permishun 2 \"Embed links\" :confused:",
     "embed-error":"A' error went wrong: `{}`",
-    "invalid-city":"Invalid place name :confused:"
+    "invalid-city":"Invalid place name :confused:",
+    "no-roll":"Hmm I don't see any choice lol"
     }
 
 infos={"text-0":"""Ho hi hello! I'm {0} !

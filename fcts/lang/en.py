@@ -98,7 +98,8 @@ fun={"count-0":"Counting in progress...",
     "no-database":"As our database is offline, access to fun commands is restricted to people with permission \"Manage Server\"",
     "no-embed-perm":"I don't have permission to \"Embed links\" :confused:",
     "embed-error":"An error has occurred: `{}`",
-    "invalid-city":"Invalid city :confused:"
+    "invalid-city":"Invalid city :confused:",
+    "no-roll":"No choice found"
     }
 
 infos={"text-0":"""Hello! I'm {0} !
