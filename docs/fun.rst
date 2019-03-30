@@ -210,6 +210,16 @@ All reactions work, whether they are Discord or server reactions. All you have t
 .. warning:: To find the message, ZBot must have "`Read Message History <perms.html#read-message-history>`_" permission, and "`Add Reactions <perms.html#add-reactions>`_" permission to add reactions.
 
 
+Roll
+----
+
+**Syntax:** :code:`roll <options>`
+
+If you can't agree with your friends, or if you want to leave the decision of a difficult choice to chance, this command will surely delight you. It allows you to select an option randomly from a list of options you provide, separated by semicolons (`;`). And you can put as many choices as you need! 
+
+Example: :code:`roll a little; a lot; passionately; madly; not at all!`
+
+
 Run
 ---
 
