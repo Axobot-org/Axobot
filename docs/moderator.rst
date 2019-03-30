@@ -223,7 +223,7 @@ Role Manager
 
 Nice command that allows you to do different things with the server roles (other subcommands will be created later). The permissions required to execute them depend on the subcommands, ranging from anyone to the administrator. If you have any ideas or other suggestions, feel free to contact us via `our Discord server <https://discord.gg/N55zY88>`_, or in PM at the bot!
 
-* :code:`role color <role> <colour>` (alias `role colour`) : Changes the color of the given role. The color must be in hexadecimal form, although some common names are accepted (red, blue, gold...). To remove the color, use the name `default`. (1) (2)
+* :code:`role color <role> <colour>` (alias `role colour`) : Changes the color of the given role. The color must be in hexadecimal form, although some common names are accepted (red, blue, gold...). To remove the color, use the name `default`. Please check notes 1. and 2.
 
 
 .. warning:: (1) The bot need the "`Manage roles <perms.html#manage-roles>`_" permission, also his highest role need to be higher than the role he's trying to edit.
