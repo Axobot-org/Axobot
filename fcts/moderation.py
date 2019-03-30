@@ -666,7 +666,7 @@ You must be an administrator of this server to use this command."""
         """A few commands to manage roles"""
         pass
     
-    @main_role.command(name="color")
+    @main_role.command(name="color",aliases=['colour'])
     @commands.has_permissions(manage_roles=True)
     async def role_color(self,ctx,role:discord.Role,color:discord.Color):
         """Change a color of a role"""
