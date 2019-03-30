@@ -35,8 +35,10 @@ class ErrorsCog(commands.Cog):
         error = getattr(error, 'original', error)
 
         # Anything in ignored will return and prevent anything happening.
-        if isinstance(error, ignored):
+        if isinstance(error, ignored) and not self.bot.beta:
             return
+        elif isinstance(error,ignored):
+            return await ctx.send("`ERROR:` {}".format(error))
         elif isinstance(error,commands.CommandOnCooldown):
             if await self.bot.cogs['AdminCog'].check_if_admin(ctx):
                 await ctx.reinvoke()
