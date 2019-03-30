@@ -61,7 +61,9 @@ errors={"cooldown":"You are on cooldown for this command :confused: Please wait 
 "membernotfound":"Unable to find the member `{}` :confused:",
 "usernotfound":"Unable to find the user `{}` :confused:",
 "disabled":"The command {} is disabled :confused:",
-"duration":"The duration `{}` is invalid"}
+"duration":"The duration `{}` is invalid",
+"rolenotfound":"Unable to find the role `{0}`",
+"invalidcolor":"Color `{0}` invalid"}
 
 find={"user-0":"name: {}\nID: {}",
 "user-1":"Name: {name}\nID: {id}\nPerks: {rangs}\nServers: {servers}\nOwner of: {own}\nLanguages: {lang}\nVoted? {vote}\nXP card: {card}",

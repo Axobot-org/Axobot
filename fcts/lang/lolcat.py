@@ -61,7 +61,9 @@ errors={"cooldown":"Yu are on cold-own for dis comandZ :confused: Plize wait {} 
 "membernotfound":"Unabl to found the membr `{}` :confused:",
 "usernotfound":"Unabled 2 find teh userZ `{}` :confused:",
 "disabled":"Da {} cmd is dizabled :confused:",
-"duration":"Invalid timer: `{}`"}
+"duration":"Invalid timer: `{}`",
+"rolenotfound":"Unable 2 find ur role (`{0}`)",
+"invalidcolor":"Ups, I can't find the color `{0}` :confused:"}
 
 find={"user-0":"naym: {}\nID: {}",
 "user-1":"Naym: {name}\nID: {id}\nPerks: {rangs}\nServers: {servers}\nAuwner ov: {own}\nSpeak: {lang}\nNice guy? {vote}\nRank card bg: {card}",

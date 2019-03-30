@@ -60,6 +60,14 @@ class ErrorsCog(commands.Cog):
             r = re.search(r'User \"([^\"]+)\" not found',str(error))
             if r!=None:
                 return await ctx.send(str(await self.translate(ctx.guild,'errors','usernotfound')).format(r.group(1)))
+            # Role "Admin" not found
+            r = re.search(r'Role \"([^\"]+)\" not found',str(error))
+            if r!=None:
+                return await ctx.send(str(await self.translate(ctx.guild,'errors','rolenotfound')).format(r.group(1)))
+             # Role "Admin" not found
+            r = re.search(r'Colour \"([^\"]+)\" is invalid',str(error))
+            if r!=None:
+                return await ctx.send(str(await self.translate(ctx.guild,'errors','invalidcolor')).format(r.group(1)))
             # Invalid duration: 2d
             r = re.search(r'Invalid duration: ([^\" ]+)',str(error))
             if r != None:
