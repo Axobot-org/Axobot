@@ -107,7 +107,6 @@ class FunCog(commands.Cog):
         liste = [x.strip() for x in options.split(';')]
         if len(liste)==0:
             return await ctx.send(await self.translate(ctx.guild,"fun","no-roll"))
-        await ctx.send(liste)
         choosen = None
         while choosen==self.last_roll:
             choosen = random.choice(liste)
