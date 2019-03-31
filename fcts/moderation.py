@@ -146,6 +146,8 @@ class ModeratorCog(commands.Cog):
             await ctx.send(str(await self.translate(ctx.guild,"modo","clear-0")).format(len(deleted)),delete_after=2.0)
             log = str(await self.translate(ctx.guild.id,"logs","clear")).format(channel=ctx.channel.mention,number=len(deleted))
             await self.bot.cogs["Events"].send_logs_per_server(ctx.guild,"clear",log,ctx.author)
+        except discord.errors.NotFound:
+            await ctx.send(await self.translate(ctx.guild,"modo","clear-nt-found"))
         except Exception as e:
             await self.bot.cogs['ErrorsCog'].on_command_error(ctx,e)
 
@@ -373,7 +375,7 @@ class ModeratorCog(commands.Cog):
             except:
                 if user.isnumeric():
                     try:
-                        user = await self.bot.get_user_info(int(user))
+                        user = await self.bot.fetch_user(int(user))
                         del backup
                     except:
                         user = None
@@ -445,7 +447,7 @@ class ModeratorCog(commands.Cog):
             except:
                 if user.isnumeric():
                     try:
-                        user = await self.bot.get_user_info(int(user))
+                        user = await self.bot.fetch_user(int(user))
                         del backup
                     except:
                         await ctx.send(str(await self.translate(ctx.guild.id,"modo","cant-find-user")).format(backup))
@@ -552,14 +554,26 @@ You must be an administrator of this server to use this command."""
         if len(liste)==0:
             desc.append(await self.translate(ctx.guild.id,"modo","no-bans"))
         if reasons:
-            for case in liste:
+            for case in liste[:45]:
                 desc.append("{}  *({})*".format(case[1],case[0]))
+            if len(liste)>45:
+                title = await self.translate(ctx.guild.id,"modo","ban-list-title-1")
+            else:
+                title = await self.translate(ctx.guild.id,"modo","ban-list-title-0")
         else:
-            for case in liste:
+            for case in liste[:60]:
                 desc.append("{}".format(case[1]))
-        embed = ctx.bot.cogs['EmbedCog'].Embed(title=str(await self.translate(ctx.guild.id,"modo","ban-list-title")).format(ctx.guild.name), color=self.bot.cogs["ServerCog"].embed_color, desc="\n".join(desc), time=ctx.message.created_at)
+            if len(liste)>60:
+                title = await self.translate(ctx.guild.id,"modo","ban-list-title-2")
+            else:
+                title = await self.translate(ctx.guild.id,"modo","ban-list-title-0")
+        embed = ctx.bot.cogs['EmbedCog'].Embed(title=str(title).format(ctx.guild.name), color=self.bot.cogs["ServerCog"].embed_color, desc="\n".join(desc), time=ctx.message.created_at)
         embed.create_footer(ctx.author)
-        await ctx.send(embed=embed.discord_embed(),delete_after=10)
+        try:
+            await ctx.send(embed=embed.discord_embed(),delete_after=10)
+        except discord.errors.HTTPException as e:
+            if e.code==400:
+                await ctx.send(await self.translate(ctx.guild.id,"modo","ban-list-error"))
 
 
     @commands.group(name="emoji")
@@ -612,7 +626,7 @@ You must be an administrator of this server to use this command."""
     async def emoji_clear(self,ctx,message:int):
         """Remove all reactions under a message"""
         try:
-            msg = await ctx.channel.get_message(message)
+            msg = await ctx.channel.fetch_message(message)
         except discord.errors.NotFound:
             return await ctx.send(await self.translate(ctx.guild.id,"modo","react-clear"))
         except Exception as e:
@@ -647,6 +661,24 @@ You must be an administrator of this server to use this command."""
             await ctx.bot.cogs['ErrorsCog'].on_cmd_error(ctx,e)
 
 
+    @commands.group(name="role")
+    async def main_role(self,ctx):
+        """A few commands to manage roles"""
+        pass
+    
+    @main_role.command(name="color",aliases=['colour'])
+    @commands.has_permissions(manage_roles=True)
+    async def role_color(self,ctx,role:discord.Role,color:discord.Color):
+        """Change a color of a role"""
+        if not ctx.guild.me.guild_permissions.manage_roles:
+            await ctx.send(await self.translate(ctx.guild.id,"modo","cant-mute"))
+            return
+        if role.position > ctx.guild.me.roles[-1].position:
+            await ctx.send(str(await self.translate(ctx.guild.id,"modo","role-high")).format(role.name))
+            return
+        await role.edit(colour=color,reason="Asked by {}".format(ctx.author))
+        await ctx.send(role.name)
+
 
     @commands.command(name="pin")
     @commands.check(checks.can_pin_msg)
@@ -657,7 +689,7 @@ ID corresponds to the Identifier of the message"""
             await ctx.send(await self.translate(ctx.guild,"modo","cant-pin"))
             return
         try:
-            message = await ctx.channel.get_message(msg)
+            message = await ctx.channel.fetch_message(msg)
         except Exception as e:
             await ctx.send(str(await self.translate(ctx.guild,"modo","pin-error")).format(e))
             return

@@ -3,7 +3,7 @@
 
 def check_libs():
     count = 0
-    for m in ["mysql","discord","frmc_lib","requests","re","asyncio","datetime","time","importlib","traceback","sys","logging","sympy","psutil","platform","subprocess",'json','emoji','imageio','platform','geocoder','tzwhere','pytz']:
+    for m in ["mysql","discord","frmc_lib","aiohttp","requests","re","asyncio","datetime","time","importlib","traceback","sys","logging","sympy","psutil","platform","subprocess",'json','emoji','imageio','platform','geocoder','tzwhere','pytz']:
         try:
             exec("import "+m)
             exec("del "+m)
@@ -74,6 +74,7 @@ class zbot(commands.bot.BotBase,discord.Client):
         self.dbl_token = dbl_token
         self._cnx = [None,0]
         self.xp_enabled = True
+        self.fishes = 0
     
     @property
     def cnx(self):

@@ -61,13 +61,15 @@ errors={"cooldown":"Vous êtes en cooldown pour cette commande. Veuillez attendr
 "membernotfound":"Impossible de trouver le membre `{0}` :confused:",
 "usernotfound":"Impossible de trouver l'utilisateur `{0}` :confused:",
 "disabled":"La commande {0} est désactivée",
-"duration":"La durée `{0}` est invalide"}
+"duration":"La durée `{0}` est invalide",
+"rolenotfound":"Impossible de trouver le rôle `{0}`",
+"invalidcolor":"La couleur `{0}` est invalide"}
 
 find={"user-0":"Nom : {}\nID : {}",
-"user-1":"Nom : {name}\nID : {id}\nServeurs : {servers}\nPropriétaire de : {own}\nLangues : {lang}\nA voté : {vote}",
+"user-1":"Nom : {name}\nID : {id}\nRangs : {rangs}\nServeurs : {servers}\nPropriétaire de : {own}\nLangues : {lang}\nA voté : {vote}\nCarte d'xp : {card}",
 "user-2":"Utilisateur introuvable",
 "guild-0":"Serveur introuvable",
-"guild-1":"Nom : {}\nID : {}\nPropriétaire : {} ({})\nMembres : {} (dont {} bots)\nLangue : {}",
+"guild-1":"Nom : {}\nID : {}\nPropriétaire : {} ({})\nMembres : {} (dont {} bots)\nLangue : {}\nPréfixe : `{}`",
 "chan-0":"Salon introuvable",
 "chan-1":"Nom : {}\nID : {}\nServeur : {} ({})",
 "help":"Cette commande permet de retrouver un serveur ou un salon parmi tout les serveurs sur lequel est le bot. Vous pouvez aussi rechercher les informations d'un utilisateur Discord, peu importe si il partage un serveur avec moi !\
@@ -98,7 +100,8 @@ fun={"count-0":"Comptage en cours...",
     "no-database":"Notre base de donnée étant hors ligne, l'accès aux commandes fun est restreint aux personnes ayant la permission de Gérer le Serveur",
     "no-embed-perm":"Je ne possède pas la permission \"Intégrer des liens\" :confused:",
     "embed-error":"Une erreur est survenue: `{}`",
-    "invalid-city":"Nom de ville invalide"
+    "invalid-city":"Nom de ville invalide",
+    "no-roll":"Aucun élément trouvé"
     }
 
 infos={"text-0":"""Bonjour ! Moi c'est {0} !
@@ -117,14 +120,15 @@ Pour m'avoir aidé dans la création du bot, mon propriétaire et moi souhaitons
 Bonne journée !""",
 "docs":"Voici le lien vers la documentation du bot :",
 "stats-title":"**Statistiques du bot**",
-"stats":"""**Version du bot :** {} \n**Nombre de serveurs :** {} \n**Nombre de membres visibles :** {} (dont {} **bots**)\n**Nombre de lignes de code :** {}\n**Langues utilisées :** {} \n**Version de Python :** {} \n**Version de la bibliothèque `discord.py` :** {} \n**Charge sur la mémoire vive :** {} GB \n**Charge sur le CPU :** {} % \n**Temps de latence de l'api :** {} ms""",
+"stats":"""**Version du bot :** {bot_v} \n**Nombre de serveurs :** {s_count} \n**Nombre de membres visibles :** {m_count} (dont {b_count} **bots**)\n**Nombre de lignes de code :** {l_count}\n**Langues utilisées :** {lang} \n**Version de Python :** {p_v} \n**Version de la bibliothèque `discord.py` :** {d_v} \n**Charge sur la mémoire vive :** {ram} GB \n**Charge sur le CPU :** {cpu} % \n**Temps de latence de l'api :** {api} ms\n**Nombre total d'xp gagné :** {xp}xp""",
 "admins-list":"Les administrateurs de ce bot sont : {}",
 "prefix":"Liste des préfixes actuellement utilisables :"}
 
 infos_2={"membercount-0":"Nombre de membres total",
 "membercount-1":"Nombre de bots",
 "membercount-2":"Nombre d'humains",
-"membercount-3":"Nombre de membres connectés"}
+"membercount-3":"Nombre de membres connectés",
+"fish-1":"Nombre de poissons trouvés"}
 
 keywords={"depuis":"depuis",
           "nom":"nom",
@@ -237,6 +241,7 @@ modo={"slowmode-0":"Le slowmode est désormais désactivé dans ce salon.",
     "need-manage-messages":"Permission \"Gérer les messages\" manquante :confused:",
     "need-read-history":"Oups, il me manque la permission de \"Voir les anciens messages\" :confused: ",
     "clear-1":"Je ne peux pas supprimer si peu de messages",
+    "clear-nt-found":"Hum... impossible de supprimer ces messages. Discord me dit qu'ils n'existent pas :thinking:",
     "cant-kick":"Permission 'Kick members' manquante :confused:",
     "kick":"Le membre {} a bien été expulsé du serveur, avec la raison `{}`",
     "staff-kick":"Vous ne pouvez pas expulser un autre membre du staff !",
@@ -264,7 +269,10 @@ modo={"slowmode-0":"Le slowmode est désormais désactivé dans ce salon.",
     "ban-reason":"Vous venez d'être banni du serveur {} :confused:\nRaison : {}",
     "ban":"Le membre {} a bien été banni du serveur, avec la raison `{}`",
     "ban-1":"Il semble que ce membre soit trop haut pour que je puisse le bannir :thinking:",
-    "ban-list-title":"Liste des membres bannis du serveur '{}'",
+    "ban-list-title-0":"Liste des membres bannis du serveur '{}'",
+    "ban-list-title-1":"Liste des 45 premiers membres bannis du serveur '{}'",
+    "ban-list-title-2":"Liste des 60 premiers membres bannis du serveur '{}'",
+    "ban-list-error":"Oups, il y a trop de membres à afficher :confused:",
     "no-bans":"Aucun membre ne semble être banni de ce serveur",
     "unban":"Le membre {} n'est plus banni de ce serveur",
     "cant-find-user":"Oups, impossible de trouver l'utilisateur **{}**",
@@ -282,6 +290,7 @@ modo={"slowmode-0":"Le slowmode est désormais désactivé dans ce salon.",
     "em-private":"[Restreint]",
     "em-list-title":"Emojis du serveur {}",
     "tempmute-1":"Le membre {} a bien été réduit au silence pour la raison `{}`, pendant {} !",
+    "role-high":"Oups, ce rôle est trop haut pour que je puisse le modifier. Merci de déplacer mon rôle au-dessus du rôle `{}` avant de réessayer :confused:"
     }
 
 morpion={'user-begin':'{}, à toi de commencer !',
@@ -373,7 +382,7 @@ Lien : {link}""",
 
 server={"config-help":"Cette commande sert principalement à configurer votre serveur. En faisant `!config see [option]` vous obtiendrez l'aperçu des configurations actuelles, \
 et les administrateurs du serveur peuvent entrer `!config change <option> role1, role2, role3...` pour modifier une configuration, ou `!config del <option>` pour réinitialiser \
-l'option (`!config change <option> del` fonctionne de même).",
+l'option (`!config change <option> del` fonctionne de même).\nLa liste des options disponible est accessible à l'adresse <https://zbot.rtfd.io/en/latest/config.html#list-of-every-option>",
         "change-0":"Cette option n'existe pas :confused:",
         "change-1":"Oups, une erreur interne est survenue...",
         "change-2":"La valeur de l'option '{}' a bien été effacée",
@@ -484,7 +493,8 @@ stats_infos={"not-found":"Impossible de trouver {N}",
 users = {'invalid-card':'Ce style est invalide. Voici la liste des styles que vous pouvez utiliser : {}',
         'missing-attach-files':'Oups, il me manque la permission d\'Attacher des Fichiers :confused:',
         'changed-0':'Votre carte d\'xp utilise maintenant le style {}',
-        'changed-1':'Oups, une erreur interne est survenue pendant le traitement de la requête. Réessayez plus tard ou contactez le support.'}
+        'changed-1':'Oups, une erreur interne est survenue pendant le traitement de la requête. Réessayez plus tard ou contactez le support.',
+        'card-desc':"Voici un exemple de votre carte d'xp. Vous pouvez entrer la commande `profile card <style>` pour changer le style\n*Votre carte d'xp ne se réactualisera que lorsque vous aurez gagné de l'xp*"}
 
 xp = {'card-level':'NIVEAU',
         'card-rank':'RANG',
@@ -494,5 +504,6 @@ xp = {'card-level':'NIVEAU',
         "low-page":"Impossible d'afficher un numéro de page négatif !",
         "high-page":"Il n'y a pas autant de pages !",
         "top-title-1":"Classement global",
-        "top-name":"__Top {}-{} :__",
-        "default_levelup":"{user} vient de passer **niveau {level}** ! GG !"}
+        "top-name":"__Top {}-{} (page {}/{}) :__",
+        "default_levelup":"{user} vient de passer **niveau {level}** ! GG !",
+        "top-your":"Votre niveau"}

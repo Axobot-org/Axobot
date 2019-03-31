@@ -61,13 +61,15 @@ errors={"cooldown":"You are on cooldown for this command :confused: Please wait 
 "membernotfound":"Unable to find the member `{}` :confused:",
 "usernotfound":"Unable to find the user `{}` :confused:",
 "disabled":"The command {} is disabled :confused:",
-"duration":"The duration `{}` is invalid"}
+"duration":"The duration `{}` is invalid",
+"rolenotfound":"Unable to find the role `{0}`",
+"invalidcolor":"Color `{0}` invalid"}
 
 find={"user-0":"name: {}\nID: {}",
-"user-1":"Name: {name}\nID: {id}\nServers: {servers}\nOwner of: {own}\nLanguages: {lang}\nVoted? {vote}",
+"user-1":"Name: {name}\nID: {id}\nPerks: {rangs}\nServers: {servers}\nOwner of: {own}\nLanguages: {lang}\nVoted? {vote}\nXP card: {card}",
 "user-2":"User not found",
 "guild-0":"Server not found",
-"guild-1":"Name: {}\nID: {}\nOwner: {} ({})\nMembers: {} (including {} bots)\nLanguage: {}",
+"guild-1":"Name: {}\nID: {}\nOwner: {} ({})\nMembers: {} (including {} bots)\nLanguage: {}\nPrefix: `{}`",
 "chan-0":"Channel not found",
 "chan-1":"Name : {}\nID: {}\nServer: {} ({})",
 "help":"This command allows to find a server or a salon among all the servers on which is the bot. You can also search for a Discord user's information, no matter if he shares a server with me!\
@@ -98,7 +100,8 @@ fun={"count-0":"Counting in progress...",
     "no-database":"As our database is offline, access to fun commands is restricted to people with permission \"Manage Server\"",
     "no-embed-perm":"I don't have permission to \"Embed links\" :confused:",
     "embed-error":"An error has occurred: `{}`",
-    "invalid-city":"Invalid city :confused:"
+    "invalid-city":"Invalid city :confused:",
+    "no-roll":"No choice found"
     }
 
 infos={"text-0":"""Hello! I'm {0} !
@@ -117,14 +120,15 @@ For helping me in the creation of the bot, my owner and I would like to thank Aw
 Have a nice day!""",
 "docs":"Here is the link to the bot documentation:",
 "stats-title":"**Bot statistics**",
-"stats":"""**Bot version:** {} \n**Number of servers:** {} \n**Number of visible members:** {} ({} **bots**)\n**Number of code lines:** {}\n**Used languages:** {}\n**Python version :** {} \n**Version of the `discord.py` lib:** {} \n**Loading on the RAM:** {} GB \n**Loading on the CPU:** {} % \n**API latency time:** {} ms""",
+"stats":"""**Bot version:** {bot_v} \n**Number of servers:** {s_count} \n**Number of visible members:** {m_count} ({b_count} **bots**)\n**Number of code lines:** {l_count}\n**Used languages:** {lang}\n**Python version :** {p_v} \n**Version of the `discord.py` lib:** {d_v} \n**Loading on the RAM:** {ram} GB \n**Loading on the CPU:** {cpu} % \n**API latency time:** {api} ms\n**Total of earned xp:** {xp}""",
 "admins-list":"The administrators of this bot are : {}",
 "prefix":"List of currently usable prefixes:"}
 
 infos_2={"membercount-0":"Total number of members",
 "membercount-1":"Number of bots",
 "membercount-2":"Number of humans",
-"membercount-3":"Number of online members"}
+"membercount-3":"Number of online members",
+"fish-1":"Number of fishes"}
 
 keywords={"depuis":"since",
           "nom":"name",
@@ -237,6 +241,7 @@ modo={"slowmode-0":"The slowmode is now disabled in this channel.",
     "need-manage-messages":"Permission \"Manage Messages\" missing :confused:",
     "need-read-history":"Oops, I'm missing the permission to \"Read Message History\" :confused: ",
     "clear-1":"I can't delete so few messages",
+    "clear-nt-found":"Hmm... impossible to delete these messages. Discord tells me they don't exist :thinking:",
     "cant-kick":"Permission 'Kick members' needed :confused:",
     "kick":"Member {} has been kick from this server for the reason `{}`",
     "staff-kick":"You can't kick another staff!",
@@ -264,7 +269,10 @@ modo={"slowmode-0":"The slowmode is now disabled in this channel.",
     "ban-reason":"You have just been banned from the server {} :confused:\nReason : {}",
     "ban":"Member {} has been banned from this server for the reason `{}`",
     "ban-1":"It seems that this member is too high for me to ban him. :thinking:",
-    "ban-list-title":"List of banned members of the server '{}'",
+    "ban-list-title-0":"List of banned members of the server '{}'",
+    "ban-list-title-1":"List of 45 banned members of the server '{}'",
+    "ban-list-title-2":"List of 60 banned members of the server '{}'",
+    "ban-list-error":"Oops, it looks like there are too many users to display :confused:",
     "no-bans":"No member seems to be banned from here",
     "unban":"The member {} is no longer banned from this server",
     "cant-find-user":"Oops, no way to find the user **{}**",
@@ -282,6 +290,7 @@ modo={"slowmode-0":"The slowmode is now disabled in this channel.",
     "em-private":"[Restricted]",
     "em-list-title":"Emojis of the server {}",
     "tempmute-1":"The member {} has been silenced for the reason `{}`, for {}!",
+    "role-high":"Oops, this role is too high for me to change. Please move my role above the role `{}` before trying again :confused:"
     }
 
 morpion={'user-begin':'{}, you begin!',
@@ -373,7 +382,7 @@ Link : {link}""",
 
 server={"config-help": "This command is mainly used to configure your server. By doing `!config see [option]` you will get \
 an overview of the current configurations, and server administrators can enter `!config change <option> role1, role2, role3...` \
-to modify a configuration, or `!config del <option>` to reset the option (`!config change <option>` works the same way).",
+to modify a configuration, or `!config del <option>` to reset the option (`!config change <option>` works the same way).\nThe list of available options is available at <https://zbot.rtfd.io/en/latest/config.html#list-of-every-option>",
         "change-0": "This option does not exist :confused:",
         "change-1": "Oops, an internal error occurred...",
         "change-2": "The '{}' option value has been deleted",
@@ -484,7 +493,8 @@ stats_infos={"not-found":"Unable to find {N}",
 users = {'invalid-card':'This style is invalid. Here is the list of styles you can use: {}',
         'missing-attach-files':'Oops, I\'m missing the permission to Attach Files :confused:',
         'changed-0':'Your xp card now uses the style {}',
-        'changed-1':'Oops, an internal error occurred during the processing of the request. Try again later or contact support.'}
+        'changed-1':'Oops, an internal error occurred during the processing of the request. Try again later or contact support.',
+        'card-desc':"Here is an example of your xp card. You can enter the command `profile card <style>` to change the style\n*Your xp card will only refresh when you have won xp*"}
 
 xp = {'card-level':'LEVEL',
         'card-rank':'RANK',
@@ -494,5 +504,6 @@ xp = {'card-level':'LEVEL',
         "low-page":"I cannot display a negative page number!",
         "high-page":"There are not that many pages!",
         "top-title-1":"Global ranking",
-        "top-name":"__Top {}-{} :__",
-        "default_levelup":"Hey, {user} has just reached **level {level}**! Keep this way!"}
+        "top-name":"__Top {}-{} (page {}/{}):__",
+        "default_levelup":"Hey, {user} has just reached **level {level}**! Keep this way!",
+        "top-your":"Your rank"}

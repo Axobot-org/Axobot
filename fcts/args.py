@@ -27,7 +27,7 @@ class user(commands.converter.IDConverter):
             res = ctx.bot.get_user(int(argument))
             if res == None:
                 try:
-                    res = await ctx.bot.get_user_info(int(argument))
+                    res = await ctx.bot.fetch_user(int(argument))
                 except:
                     pass
             return res

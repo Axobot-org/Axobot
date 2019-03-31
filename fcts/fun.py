@@ -1,4 +1,4 @@
-import discord, random, operator, string, importlib, re, typing, datetime, subprocess, requests, json, geocoder
+import discord, random, operator, string, importlib, re, typing, datetime, subprocess, json, geocoder, time, aiohttp
 import emoji as emojilib
 from discord.ext import commands
 from tzwhere import tzwhere
@@ -7,7 +7,7 @@ from pytz import timezone
 from fcts import emoji
 importlib.reload(emoji)
 
-cmds_list = ['count_msg','ragequit','pong','run','nope','blame','party','bigtext','shrug','gg','money','pibkac','osekour','me','kill','cat','rekt','thanos','nuke','pikachu','pizza','google','loading','piece']
+cmds_list = ['count_msg','ragequit','pong','run','nope','blame','party','bigtext','shrug','gg','money','pibkac','osekour','me','kill','cat','rekt','thanos','nuke','pikachu','pizza','google','loading','piece','roll']
 
 async def is_fun_enabled(ctx):
     self = ctx.bot.cogs["FunCog"]
@@ -41,6 +41,7 @@ class FunCog(commands.Cog):
         self.fun_opt = dict()
         self.file = "fun"
         self.tz = tzwhere.tzwhere(forceTZ=True)
+        self.last_roll = None
         try:
             self.translate = self.bot.cogs["LangCog"].tr
         except:
@@ -80,6 +81,9 @@ class FunCog(commands.Cog):
                 await ctx.send(await self.translate(ctx.guild,"fun","no-database"))
             return
         title = await self.translate(ctx.guild,"fun","fun-list")
+        if datetime.datetime.today().day==1:
+            title = ":fish: "+title
+            self.bot.fishes += 1
         text = str()
         for cmd in sorted(self.get_commands(),key=operator.attrgetter('name')):
             if cmd.name in cmds_list and cmd.enabled:
@@ -94,6 +98,20 @@ class FunCog(commands.Cog):
             emb = ctx.bot.cogs['EmbedCog'].Embed(title=title,desc=text,color=ctx.bot.cogs['HelpCog'].help_color,time=ctx.message.created_at).create_footer(ctx.author)
             return await ctx.send(embed=emb.discord_embed())
         await ctx.send(title+text)
+
+    @commands.command(name='roll',hidden=True)
+    @commands.check(is_fun_enabled)
+    async def roll(self,ctx,*,options):
+        """Selects an option at random from a given list
+        The options must be separated by a semicolon `;`"""
+        liste = [x.strip() for x in options.split(';')]
+        if len(liste)==0:
+            return await ctx.send(await self.translate(ctx.guild,"fun","no-roll"))
+        await ctx.send(liste)
+        choosen = None
+        while choosen==self.last_roll:
+            choosen = random.choice(liste)
+        await ctx.send(choosen)
 
     @commands.command(name="cookie",hidden=True)
     @commands.check(is_fun_enabled)
@@ -162,22 +180,22 @@ You can specify a verification limit by adding a number in argument"""
         """Blame someone
         Use 'blame list' command to see every available name *for you*"""
         l1 = ['discord','mojang','zbot','google'] # tout le monde
-        l2 = ['zrunner','tronics','patate','neil','reddemoon','aragorn1202'] # frm
-        l3 = ['awhikax','aragorn'] # zbot
+        l2 = ['zrunner','tronics','patate','neil','reddemoon','aragorn1202','platon'] # frm
+        l3 = ['awhikax','aragorn','adri'] # zbot
         name = name.lower()
         if name in l1:
             await ctx.send(file=await self.utilities.find_img('blame-{}.png'.format(name)))
         elif name in l2:
-            if await self.is_on_guild(ctx.author,391968999098810388):
+            if await self.is_on_guild(ctx.author,391968999098810388): # fr-minecraft
                 await ctx.send(file=await self.utilities.find_img('blame-{}.png'.format(name)))
         elif name in l3:
-            if await self.is_on_guild(ctx.author,356067272730607628):
+            if await self.is_on_guild(ctx.author,356067272730607628): # Zbot server
                 await ctx.send(file=await self.utilities.find_img('blame-{}.png'.format(name)))
         elif name in ['help','list']:
             liste = l1
-            if await self.is_on_guild(ctx.author,391968999098810388):
+            if await self.is_on_guild(ctx.author,391968999098810388): # fr-minecraft
                 liste += l2
-            if await self.is_on_guild(ctx.author,356067272730607628):
+            if await self.is_on_guild(ctx.author,356067272730607628): # Zbot server
                 liste += l3
             txt = "- "+"\n- ".join(sorted(liste))
             title = str(await self.translate(ctx.guild,"fun","blame-0")).format(ctx.author)
@@ -340,7 +358,7 @@ You can specify a verification limit by adding a number in argument"""
         if self.bot.database_online and not await self.bot.cogs["ServerCog"].staff_finder(ctx.author,"say"):
             return
         try:
-            msg = await ctx.channel.get_message(ID)
+            msg = await ctx.channel.fetch_message(ID)
         except discord.errors.HTTPException as e:
             await ctx.send(await self.translate(ctx.guild,"fun",'react-0'))
             return
@@ -408,25 +426,28 @@ You can specify a verification limit by adding a number in argument"""
             await ctx.send(random.choice(await self.translate(ctx.guild,"fun","piece-0")))
     
     @commands.command(name="weather")
+    @commands.cooldown(4, 30, type=commands.BucketType.guild)
     async def weather(self,ctx,*,city:str):
         """Get the weather of a city
         You need to provide the city name in english"""
         city = city.replace(" ","%20")
-        r = requests.get("https://welcomer.glitch.me/weather?city="+city)
-        if r.ok:
-            try:
-                _ = r.json()
-            except json.decoder.JSONDecodeError:
-                if ctx.channel.permissions_for(ctx.me).embed_links:
-                    emb = self.bot.cogs['EmbedCog'].Embed(image="https://welcomer.glitch.me/weather?city="+city,footer_text="From https://welcomer.glitch.me/weather")
-                    await ctx.send(embed=emb.discord_embed())
-                else:
-                    await ctx.send("https://welcomer.glitch.me/weather?city="+city)
-                return
+        async with aiohttp.ClientSession() as session:
+            async with session.get("https://welcomer.glitch.me/weather?city="+city) as r:
+                if r.status == 200:
+                    try:
+                        _ = await r.json()
+                    except aiohttp.client_exceptions.ContentTypeError:
+                        if ctx.channel.permissions_for(ctx.me).embed_links:
+                            emb = self.bot.cogs['EmbedCog'].Embed(image="https://welcomer.glitch.me/weather?city="+city,footer_text="From https://welcomer.glitch.me/weather")
+                            return await ctx.send(embed=emb.discord_embed())
+                        else:
+                            return await ctx.send("https://welcomer.glitch.me/weather?city="+city)
+                    except Exception as e:
+                        await self.bot.cogs['ErrorsCog'].on_error(e,ctx)
         await ctx.send(await self.translate(ctx.guild,"fun","invalid-city"))
 
     @commands.command(name="hour")
-    @commands.cooldown(4, 60, type=commands.BucketType.guild)
+    @commands.cooldown(4, 50, type=commands.BucketType.guild)
     async def hour(self,ctx,*,city:str):
         """Get the hour of a city"""
         g = geocoder.arcgis(city)
@@ -532,10 +553,12 @@ You can specify a verification limit by adding a number in argument"""
             for x in range(1,number+1):
                 try:
                     await m.add_reaction(liste[x])
+                except discord.errors.NotFound:
+                    return
                 except Exception as e:
                     await self.bot.cogs['ErrorsCog'].on_error(e,ctx)
         await self.bot.cogs['UtilitiesCog'].suppr(ctx.message)
-        await self.utilities.print2(await self.bot.cogs['TimeCog'].date(datetime.datetime.now(),digital=True)+" Vote de {} : {}".format(ctx.author,ctx.message.content))
+        await self.bot.debug(await self.bot.cogs['TimeCog'].date(datetime.datetime.now(),digital=True)+" Vote de {} : {}".format(ctx.author,ctx.message.content))
 
 
     async def check_suggestion(self,message):

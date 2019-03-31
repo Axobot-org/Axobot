@@ -49,7 +49,6 @@ class RssCog(commands.Cog):
 
     def __init__(self,bot):
         self.bot = bot
-        self.flows = dict()
         self.flow_limit = 10
         self.time_loop = 10
         self.time_between_flows_check = 0.15
@@ -240,9 +239,10 @@ class RssCog(commands.Cog):
         if not await self.check_rss_url(link):
             return await ctx.send(await self.translate(ctx.guild.id,"rss","invalid-flow"))
         try:
-            await self.add_flow(ctx.guild.id,ctx.channel.id,Type,identifiant)
+            ID = await self.add_flow(ctx.guild.id,ctx.channel.id,Type,identifiant)
             await ctx.send(str(await self.translate(ctx.guild,"rss","success-add")).format(display_type,link,ctx.channel.mention))
-            self.bot.log.info("Flux rss ajouté dans le serveur {} ({})".format(ctx.guild.id,link))
+            self.bot.log.info("RSS feed added into server {} ({} - {})".format(ctx.guild.id,link,ID))
+            await self.send_log("Feed added into server {} ({})".format(ctx.guild.id,ID))
         except Exception as e:
             await ctx.send(await self.translate(ctx.guild,"rss","fail-add"))
             await self.bot.cogs["ErrorsCog"].on_error(e,ctx)
@@ -302,6 +302,8 @@ class RssCog(commands.Cog):
             await self.bot.cogs["ErrorsCog"].on_error(e,ctx)
             return
         await ctx.send(await self.translate(ctx.guild,"rss","delete-success"))
+        self.bot.log.info("RSS feed deleted into server {} ({})".format(ctx.guild.id,flow[0]['ID']))
+        await self.send_log("Feed deleted into server {} ({})".format(ctx.guild.id,flow[0]['ID']))
 
     @rss_main.command(name="list")
     @commands.guild_only()
@@ -846,7 +848,7 @@ class RssCog(commands.Cog):
         query = ("INSERT INTO `{}` (`ID`,`guild`,`channel`,`type`,`link`,`structure`) VALUES ('{}','{}','{}','{}','{}','{}')".format(self.table,ID,guildID,channelID,Type,link,form))
         cursor.execute(query)
         cnx.commit()
-        return True
+        return ID
 
     async def remove_flow(self,ID):
         """Remove a flow from the database"""
@@ -863,7 +865,7 @@ class RssCog(commands.Cog):
         """Get every flow of the database"""
         cnx = self.bot.cnx
         cursor = cnx.cursor(dictionary = True)
-        query = ("SELECT * FROM `{}` WHERE 1".format(self.table))
+        query = ("SELECT * FROM `{}` WHERE `guild` in ({})".format(self.table,','.join(["'{}'".format(x.id) for x in self.bot.guilds])))
         cursor.execute(query)
         liste = list()
         for x in cursor:
@@ -895,13 +897,9 @@ class RssCog(commands.Cog):
 
     async def check_flow(self,flow):
         try:
-            if flow['link'] in self.flows.keys():
-                objs = self.flows[flow['link']]
-            else:
-                guild = self.bot.get_guild(flow['guild'])
-                funct = eval('self.rss_{}'.format(flow['type']))
-                objs = await funct(guild,flow['link'],flow['date'])
-                self.flows[flow['link']] = objs
+            guild = self.bot.get_guild(flow['guild'])
+            funct = eval('self.rss_{}'.format(flow['type']))
+            objs = await funct(guild,flow['link'],flow['date'])
             if isinstance(objs,(str,type(None),int)) or len(objs) == 0:
                 return True
             elif type(objs) == list:
@@ -952,7 +950,6 @@ class RssCog(commands.Cog):
             except Exception as e:
                 await self.bot.cogs['ErrorsCog'].on_error(e,None)
             await asyncio.sleep(self.time_between_flows_check)
-        self.flows = dict()
         self.bot.cogs['McCog'].flows = dict()
         d = ["**RSS loop done** in {}s ({}/{} flows)".format(round(time.time()-t,3),check,len(liste))]
         if len(errors)>0:
@@ -1000,6 +997,14 @@ class RssCog(commands.Cog):
                 await ctx.send("Et hop ! Une itération de la boucle en cours !")
                 self.bot.log.info(await self.bot.cogs['TimeCog'].date(datetime.datetime.now(),digital=True)+" Boucle rss forcée")
                 await self.main_loop()
+    
+    async def send_log(self,text):
+        """Send a log to the logging channel"""
+        try:
+            emb = self.bot.cogs["EmbedCog"].Embed(desc="[RSS] "+text,color=5366650).update_timestamp().set_author(self.bot.user)
+            await self.bot.cogs["EmbedCog"].send([emb])
+        except Exception as e:
+            await self.bot.cogs["ErrorsCog"].on_error(e,None)
 
 
 def setup(bot):

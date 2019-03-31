@@ -48,10 +48,10 @@ class Events(commands.Cog):
         try:
             if Type == "join":
                 self.bot.log.info("Le bot a rejoint le serveur {}".format(guild.id))
-                desc = "Bot **joins the server** {} ({})".format(guild.name,guild.id)
+                desc = "Bot **joins the server** {} ({}) - {} users".format(guild.name,guild.id,len(guild.members))
             else:
                 self.bot.log.info("Le bot a quitté le serveur {}".format(guild.id))
-                desc = "Bot **left the server** {} ({})".format(guild.name,guild.id)
+                desc = "Bot **left the server** {} ({}) - {} users".format(guild.name,guild.id,len(guild.members))
             emb = self.bot.cogs["EmbedCog"].Embed(desc=desc,color=self.embed_colors['welcome']).update_timestamp().set_author(self.bot.user)
             await self.bot.cogs["EmbedCog"].send([emb])
         except Exception as e:
@@ -81,8 +81,6 @@ class Events(commands.Cog):
         
 
     async def send_mp(self,msg):
-        if "vient d'être ajouté dans la base de donnée" in msg.content:
-            return
         await self.check_mp_adv(msg)
         if msg.channel.recipient.id in [392766377078816789,279568324260528128,552273019020771358]:
             return
@@ -100,7 +98,7 @@ class Events(commands.Cog):
         if msg.author.id==self.bot.user.id or 'discord.gg/' not in msg.content:
             return
         try:
-            _ = await self.bot.get_invite(msg.content)
+            _ = await self.bot.fetch_invite(msg.content)
         except:
             return
         d = datetime.datetime.utcnow() - (await msg.channel.history(limit=2).flatten())[1].created_at
@@ -159,6 +157,8 @@ class Events(commands.Cog):
                 elif entry.action==discord.AuditLogAction.ban and entry.target==member:
                     await self.add_points(self.table['ban'])
                     break
+        except discord.Forbidden:
+            pass
         except Exception as e:
             if member.guild.id!=264445053596991498:
                 self.bot.log.warn("[check_user_left] {} (user {}/server {})".format(e,member.id,member.guild.id))

@@ -285,8 +285,8 @@ class CasesCog(commands.Cog):
             return
         try:
             case = cases[0]
-            user = await self.bot.get_user_info(case.user)
-            mod = await self.bot.get_user_info(case.mod)
+            user = await self.bot.fetch_user(case.user)
+            mod = await self.bot.fetch_user(case.mod)
             u = "{} ({})".format(user,user.id)
             if not isSupport:
                 guild = ctx.guild.name

@@ -18,11 +18,11 @@ class UtilitiesCog(commands.Cog):
 
     @commands.Cog.listener()
     async def on_ready(self):
-        self.config = (await self.bot.cogs['ServerCog'].get_bot_infos(self.bot.user.id))[0]
+        await self.reload()
 
-    async def reload(self,liste):
-        for m in liste:
-            exec("importlib.reload({})".format(m))
+    async def reload(self):
+        self.config = (await self.bot.cogs['ServerCog'].get_bot_infos(self.bot.user.id))[0]
+        return self.config
 
     def find_prefix(self,guild):
         if guild==None or not self.bot.database_online:
@@ -105,7 +105,7 @@ class UtilitiesCog(commands.Cog):
                 item = await commands.UserConverter().convert(ctx,name)
             except:
                 if name.isnumeric():
-                    item = await self.bot.get_user_info(int(name))
+                    item = await self.bot.fetch_user(int(name))
         elif Type == 'textchannel' or Type == "channel":
             try:
                 item = await commands.TextChannelConverter().convert(ctx,name)
@@ -309,6 +309,17 @@ class UtilitiesCog(commands.Cog):
             return False
         return parameters['contributor']
     
+    async def has_rainbow_card(self,user):
+        """Check if a user won the rainbow card"""
+        parameters = None
+        try:
+            parameters = await self.get_db_userinfo(criters=["userID="+str(user.id)],columns=['unlocked_rainbow'])
+        except Exception as e:
+            await self.bot.cogs["Errors"].on_error(e,None)
+        if parameters==None:
+            return False
+        return parameters['unlocked_rainbow']
+    
     async def get_xp_style(self,user):
         parameters = None
         try:
@@ -348,6 +359,11 @@ class UtilitiesCog(commands.Cog):
             liste2.append('premium')
         if await self.bot.cogs['AdminCog'].check_if_admin(user):
             liste2.append('admin')
+        if datetime.datetime.today().day == 1:
+            liste.append('rainbow')
+        else:
+            if await self.has_rainbow_card(user):
+                liste.append('rainbow')
         return sorted(liste2)+sorted(liste)
 
 

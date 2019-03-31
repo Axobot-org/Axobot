@@ -1,4 +1,4 @@
-import discord, importlib, typing
+import discord, importlib, typing, datetime
 from discord.ext import commands
 
 from fcts import args
@@ -33,11 +33,14 @@ class UsersCog(commands.Cog):
             if ctx.channel.permissions_for(ctx.me).attach_files:
                 style = await self.bot.cogs['UtilitiesCog'].get_xp_style(ctx.author)
                 txts = [await self.translate(ctx.guild,'xp','card-level'), await self.translate(ctx.guild,'xp','card-rank')]
-                await ctx.send(file=await self.bot.cogs['XPCog'].create_card(ctx.author,style,0,[1,0],txts,force_static=True))
+                desc = await self.translate(ctx.guild,'users','card-desc')
+                await ctx.send(desc,file=await self.bot.cogs['XPCog'].create_card(ctx.author,style,0,[1,0],txts,force_static=True))
             else:
                 await ctx.send(await self.translate(ctx.guild,'users','missing-attach-files'))
         else:
             if await ctx.bot.cogs['UtilitiesCog'].change_db_userinfo(ctx.author.id,'xp_style',style):
+                if style=='rainbow' and datetime.datetime.today().day==1:
+                    await ctx.bot.cogs['UtilitiesCog'].change_db_userinfo(ctx.author.id,'unlocked_rainbow',True)
                 await ctx.send(str(await self.translate(ctx.guild,'users','changed-0')).format(style))
             else:
                 await ctx.send(await self.translate(ctx.guild,'users','changed-1'))
