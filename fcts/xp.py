@@ -1,6 +1,7 @@
 import discord, random, time, asyncio, io, imageio, importlib, re, os, operator, platform
 from discord.ext import commands
 from math import ceil
+import numpy as np
 from PIL import Image, ImageDraw, ImageFont, ImageTk
 from urllib.request import urlopen, Request
 
@@ -17,9 +18,9 @@ class XPCog(commands.Cog):
         self.table = 'xp_beta' if bot.beta else 'xp'
         self.cooldown = 30
         self.minimal_size = 5
-        self.spam_rate = 0.30
-        self.xp_per_char = 0.35
-        self.max_xp_per_msg = 50
+        self.spam_rate = 0.20
+        self.xp_per_char = 0.11
+        self.max_xp_per_msg = 60
         self.file = 'xp'
         bot.add_listener(self.add_xp,'on_message')
         try:
@@ -56,7 +57,7 @@ class XPCog(commands.Cog):
         await self.bdd_set_xp(msg.author.id, giv_points,'add')
         self.cache[msg.author.id] = [round(time.time()), prev_points+giv_points]
         new_lvl = await self.calc_level(self.cache[msg.author.id][1])
-        if (await self.calc_level(prev_points))[0] < new_lvl[0]:
+        if 1 < (await self.calc_level(prev_points))[0] < new_lvl[0]:
             await self.send_levelup(msg,new_lvl)
 
 
@@ -97,13 +98,16 @@ class XPCog(commands.Cog):
         matches = re.finditer(r"<a?(:\w+:)\d+>", content, re.MULTILINE)
         for _, match in enumerate(matches, start=1):
             content = content.replace(match.group(0),match.group(1))
+        matches = re.finditer(r'((?:http|www)[^\s]+)', content, re.MULTILINE)
+        for _, match in enumerate(matches, start=1):
+            content = content.replace(match.group(0),"")
         return min(round(len(content)*self.xp_per_char), self.max_xp_per_msg)
 
     async def calc_level(self,xp):
         """Calcule le niveau correspondant à un nombre d'xp"""
-        lvl = ceil(0.05*xp**0.61)
+        lvl = ceil(0.05*xp**0.645)
         temp = xp
-        while ceil(0.05*temp**0.61)==lvl:
+        while ceil(0.05*temp**0.645)==lvl:
             temp += 1
         return [lvl,temp]
 
@@ -196,13 +200,31 @@ class XPCog(commands.Cog):
         try:
             cnx = self.bot.cnx
             cursor = cnx.cursor(dictionary = True)
-            query = ("SELECT `xp`, @curRank := @curRank + 1 AS rank FROM `{}` p, (SELECT @curRank := 0) r WHERE `banned`='0' ORDER BY xp desc;".format(self.table))
+            query = ("SELECT `userID`,`xp`, @curRank := @curRank + 1 AS rank FROM `{}` p, (SELECT @curRank := 0) r WHERE `banned`='0' ORDER BY xp desc;".format(self.table))
+            cursor.execute(query)
+            liste = list()
+            for x in cursor:
+                if x['userID'] != userID:
+                    continue
+                x['rank'] = round(x['rank'])
+                liste.append(x)
+            cursor.close()
+            return liste
+        except Exception as e:
+            await self.bot.cogs['ErrorsCog'].on_error(e,None)
+
+    async def bdd_total_xp(self):
+        """Get the total number of earned xp"""
+        try:
+            cnx = self.bot.cnx
+            cursor = cnx.cursor(dictionary = True)
+            query = ("SELECT SUM(xp) FROM `{}`".format(self.table))
             cursor.execute(query)
             liste = list()
             for x in cursor:
                 liste.append(x)
             cursor.close()
-            return liste
+            return round(liste[0]['SUM(xp)'])
         except Exception as e:
             await self.bot.cogs['ErrorsCog'].on_error(e,None)
 
@@ -222,9 +244,10 @@ class XPCog(commands.Cog):
     async def create_card(self,user,style,xp,rank=[1,0],txt=['NIVEAU','RANG'],force_static=False):
         """Crée la carte d'xp pour un utilisateur"""
         card = Image.open("../cards/model/{}.png".format(style))
+        bar_colors = await self.get_xp_bar_color(user.id)
         if not user.is_avatar_animated() or force_static:
             pfp = await self.get_raw_image(user.avatar_url_as(format='png',size=256))
-            img = await self.add_overlay(pfp.resize(size=(282,282)),user,card,xp,rank,txt)
+            img = await self.add_overlay(pfp.resize(size=(282,282)),user,card,xp,rank,txt,bar_colors)
             img.save('../cards/global/{}-{}-{}.png'.format(user.id,xp,rank[0]))
             return discord.File('../cards/global/{}-{}-{}.png'.format(user.id,xp,rank[0]))
         else:
@@ -233,14 +256,14 @@ class XPCog(commands.Cog):
             duration = []
             for i in range(pfp.n_frames):
                 pfp.seek(i)
-                img = await self.add_overlay(pfp.resize(size=(282,282)),user,card,xp,rank,txt)
+                img = await self.add_overlay(pfp.resize(size=(282,282)),user,card,xp,rank,txt,bar_colors)
                 images.append(img)
                 duration.append(pfp.info['duration']/1000)
             card.close()
             imageio.mimwrite('../cards/global/{}-{}-{}.gif'.format(user.id,xp,rank[0]), images, format="GIF-PIL", duration=duration, subrectangles=True)
             return discord.File('../cards/global/{}-{}-{}.gif'.format(user.id,xp,rank[0]))
 
-    async def add_overlay(self,pfp,user,card,xp,rank,txt):
+    async def add_overlay(self,pfp,user,card,xp,rank,txt,bar_colors):
         img = Image.new('RGBA', (card.width, card.height), color = (250,250,250,0))
         img.paste(pfp, (20, 29))
         img.paste(card, (0, 0), card)
@@ -257,9 +280,10 @@ class XPCog(commands.Cog):
         RANK_fnt = ImageFont.truetype(verdana_name,23)
         colors = {'name':(124, 197, 118),'xp':(124, 197, 118),'NIVEAU':(255, 224, 77),'rank':(105, 157, 206)}
 
+        levels_info = await self.calc_level(xp)
+        img = await self.add_xp_bar(img,xp,levels_info[1],bar_colors)
         d = ImageDraw.Draw(img)
         d.text(await self.calc_pos(user.name,name_fnt,610,68), user.name, font=name_fnt, fill=colors['name'])
-        levels_info = await self.calc_level(xp)
         temp = '{} / {} xp'.format(xp,levels_info[1])
         d.text((await self.calc_pos(temp,xp_fnt,625,237)), temp, font=xp_fnt, fill=colors['xp'])
         d.text((380,140), txt[0], font=NIVEAU_fnt, fill=colors['NIVEAU'])
@@ -269,6 +293,23 @@ class XPCog(commands.Cog):
         d.text((await self.calc_pos(temp,rank_fnt,893,180,'center')), temp, font=rank_fnt, fill=colors['rank'])
         return img
 
+    async def add_xp_bar(self,img,xp,needed_xp,colors):
+        """Colorize the xp bar"""
+        error_rate = 25
+        data = np.array(img)   # "data" is a height x width x 4 numpy array
+        red, green, blue, alpha = data.T # Temporarily unpack the bands for readability
+
+        # Replace white with red... (leaves alpha values alone...)
+        white_areas = (abs(red)-180<error_rate) & (abs(blue)-180<error_rate) & (abs(green)-180<error_rate)
+        white_areas[:298] = False & False & False
+        max_x = round(298 + (980-298)*xp/needed_xp)
+        white_areas[max_x:] = False & False & False
+        #white_areas[298:980] = True & True & True
+        data[..., :-1][white_areas.T] = colors # Transpose back needed
+        return Image.fromarray(data)
+
+    async def get_xp_bar_color(self,userID:int):
+        return (45,180,105)
 
     @commands.command(name='rank')
     @commands.bot_has_permissions(send_messages=True)
@@ -286,9 +327,8 @@ class XPCog(commands.Cog):
                     return await ctx.send(await self.translate(ctx.guild,'xp','1-no-xp'))
                 return await ctx.send(await self.translate(ctx.guild,'xp','2-no-xp'))
             xp = xp[0]['xp']
-            ranks = sorted([(v[1],k) for k,v in self.cache.items()],reverse=True)
             ranks_nb = await self.bdd_get_nber()
-            rank = ranks.index((xp,user.id))+1
+            rank = (await self.bdd_get_rank(user.id))[0]['rank']
             if ctx.channel.permissions_for(ctx.guild.me).attach_files:
                 await self.send_card(ctx,user,xp,rank,ranks_nb)
             elif ctx.channel.permissions_for(ctx.guild.me).embed_links:
@@ -334,9 +374,10 @@ class XPCog(commands.Cog):
     async def top(self,ctx,page:int=1):
         """Get the list of the highest levels
         Each page has 20 users"""
+        max_page = ceil(len(self.cache)/20)
         if page<1:
             return await ctx.send(await self.translate(ctx.guild,"xp",'low-page'))
-        elif page>ceil(len(self.cache)/20):
+        elif page>max_page:
             return await ctx.send(await self.translate(ctx.guild,"xp",'high-page'))
         ranks = await self.bdd_get_top(20*page)
         ranks = ranks[(page-1)*20:]
@@ -347,18 +388,22 @@ class XPCog(commands.Cog):
             user = self.bot.get_user(u['userID'])
             if user==None:
                 try:
-                    user = await self.bot.get_user_info(u['userID'])
+                    user = await self.bot.fetch_user(u['userID'])
                 except discord.NotFound:
                     user = await self.translate(ctx.guild,'xp','del-user')
             if isinstance(user,discord.User):
-                user = await self.bot.cogs['UtilitiesCog'].remove_markdown(user.name.replace('|',''))
-                if len(user)>18:
-                    user = user[:15]+'...'
+                user_name = await self.bot.cogs['UtilitiesCog'].remove_markdown(user.name.replace('|',''))
+                if len(user_name)>18:
+                    user_name = user_name[:15]+'...'
             l = await self.calc_level(u['xp'])
-            txt.append('{} • **{} |** `lvl {}` **|** `xp {}`'.format(i,user,l[0],u['xp']))
-        f_name = str(await self.translate(ctx.guild,'xp','top-name')).format((page-1)*20+1,i)
+            txt.append('{} • **{} |** `lvl {}` **|** `xp {}`'.format(i,"__"+user_name+"__" if user==ctx.author else user_name,l[0],u['xp']))
+        f_name = str(await self.translate(ctx.guild,'xp','top-name')).format((page-1)*20+1,i,page,max_page)
+        # author
+        rank = await self.bdd_get_rank(ctx.author.id)
+        lvl = await self.calc_level(rank[0]['xp'])
+        your_rank = {'name':"__"+await self.translate(ctx.guild,"xp","top-your")+"__", 'value':"**#{} |** `lvl {}` **|** `xp {}`".format(rank[0]['rank'],lvl[0],rank[0]['xp'])}
         if ctx.channel.permissions_for(ctx.guild.me).embed_links:
-            emb = self.bot.cogs['EmbedCog'].Embed(title=await self.translate(ctx.guild,'xp','top-title-1'),fields=[{'name':f_name,'value':"\n".join(txt)}],color=self.embed_color,author_icon=self.bot.user.avatar_url_as(format='png')).create_footer(ctx.author)
+            emb = self.bot.cogs['EmbedCog'].Embed(title=await self.translate(ctx.guild,'xp','top-title-1'),fields=[{'name':f_name,'value':"\n".join(txt)},your_rank],color=self.embed_color,author_icon=self.bot.user.avatar_url_as(format='png')).create_footer(ctx.author)
             await ctx.send(embed=emb.discord_embed())
         else:
             await ctx.send(f_name+"\n\n"+'\n'.join(txt))

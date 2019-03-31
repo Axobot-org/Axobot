@@ -17,6 +17,10 @@ async def check_admin(ctx):
 async def is_support_staff(ctx):
     if ctx.author.id in admins_id:
         return True
+    try:
+        return await ctx.bot.cogs['UtilitiesCog'].is_support(ctx.author)
+    except:
+        pass
     server = ctx.bot.get_guild(356067272730607628)
     if server != None:
         member = server.get_member(ctx.author.id)
@@ -45,7 +49,9 @@ class ReloadsCog(commands.Cog):
                 self.bot.unload_extension(fcog)
                 self.bot.load_extension(fcog)
             except ModuleNotFoundError:
-                await ctx.send("Module {} can't be found".format(cog))
+                await ctx.send("Cog {} can't be found".format(cog))
+            except commands.errors.ExtensionNotLoaded :
+                await ctx.send("Cog {} was never loaded".format(cog))
             except Exception as e:
                 await errors_cog.on_error(e,ctx)
                 await ctx.send(f'**`ERROR:`** {type(e).__name__} - {e}')

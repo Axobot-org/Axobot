@@ -1,4 +1,4 @@
-import discord, datetime, sys, psutil, os, requests, importlib, time, asyncio, typing
+import discord, datetime, sys, psutil, os, aiohttp, importlib, time, asyncio, typing, random
 from discord.ext import commands
 from inspect import signature
 from platform   import system as system_name  # Returns the system/OS name
@@ -63,27 +63,34 @@ class InfosCog(commands.Cog):
         version = str(v.major)+"."+str(v.minor)+"."+str(v.micro)
         pid = os.getpid()
         py = psutil.Process(pid)
-        r = self.bot.latency
+        ram_cpu = [round(py.memory_info()[0]/2.**30,3), psutil.cpu_percent()]
+        latency = round(self.bot.latency*1000,3)
         try:
             async with ctx.channel.typing():
+                b_conf = self.bot.cogs['UtilitiesCog'].config
+                if b_conf == None:
+                    b_conf = await self.bot.cogs['UtilitiesCog'].reload()
                 ignored_guilds = [int(x) for x in self.bot.cogs['UtilitiesCog'].config['banned_guilds'].split(";") if len(x)>0]
                 ignored_guilds += self.bot.cogs['ReloadsCog'].ignored_guilds
                 len_servers = len([x for x in ctx.bot.guilds if x.id not in ignored_guilds])
                 langs_list = await self.bot.cogs['ServerCog'].get_languages(ignored_guilds)
                 lang_total = sum([x[1] for x in langs_list])
-                langs_list = ["{}: {}%".format(x[0],round(x[1]/lang_total*100)) for x in langs_list if x[1]>0]
+                langs_list = ' | '.join(["{}: {}%".format(x[0],round(x[1]/lang_total*100)) for x in langs_list if x[1]>0])
                 del lang_total
                 #premium_count = await self.bot.cogs['UtilitiesCog'].get_number_premium()
                 try:
                     users,bots = self.get_users_nber(ignored_guilds)
                 except Exception as e:
                     users = bots = 'unknown'
-                d = str(await self.translate(ctx.guild,"infos","stats")).format(bot_version,len_servers,users,bots,self.codelines,' | '.join(langs_list),version,discord.__version__,round(py.memory_info()[0]/2.**30,3),psutil.cpu_percent(),round(r*1000,3))
+                total_xp = await self.bot.cogs['XPCog'].bdd_total_xp()
+                d = str(await self.translate(ctx.guild,"infos","stats")).format(bot_v=bot_version,s_count=len_servers,m_count=users,b_count=bots,l_count=self.codelines,lang=langs_list,p_v=version,d_v=discord.__version__,ram=ram_cpu[0],cpu=ram_cpu[1],api=latency,xp=total_xp)
+                if datetime.datetime.today().day == 1:
+                    d += "\n**{}:** {}".format(await self.translate(ctx.guild,"infos_2",'fish-1'),self.bot.fishes)
                 embed = ctx.bot.cogs['EmbedCog'].Embed(title=await self.translate(ctx.guild,"infos","stats-title"), color=ctx.bot.cogs['HelpCog'].help_color, time=ctx.message.created_at,desc=d,thumbnail=self.bot.user.avatar_url_as(format="png"))
                 embed.create_footer(ctx.author)
             await ctx.send(embed=embed.discord_embed())
         except Exception as e:
-            await ctx.bot.cogs['Errors'].on_command_error(ctx,e)
+            await ctx.bot.cogs['ErrorsCog'].on_cmd_error(ctx,e)
 
     def get_users_nber(self,ignored_guilds):
         members = [x.members for x in self.bot.guilds if x.id not in ignored_guilds]
@@ -457,15 +464,28 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
                 languages.append(lang)
         disp_lang = ""
         owners = ", ".join([x.name for x in liste if x.owner==user])
-        r = requests.get('https://discordbots.org/api/bots/486896267788812288/check?userId={}'.format(user.id),headers={'Authorization':str(self.bot.dbl_token)})
-        if r.json()['voted']:
-            r = await self.translate(ctx.guild,'keywords','oui')
-        else:
-            r = await self.translate(ctx.guild,'keywords','non')
+        xp_card = await self.bot.cogs['UtilitiesCog'].get_xp_style(user)
+        perks = list()
+        if await self.bot.cogs["AdminCog"].check_if_admin(user):
+            perks.append('admin')
+        if await self.bot.cogs['UtilitiesCog'].is_support(user):
+            perks.append("support")
+        if await self.bot.cogs['UtilitiesCog'].is_contributor(user):
+            perks.append("contributor")
+        if await self.bot.cogs['UtilitiesCog'].is_premium(user):
+            perks.append("premium")
+        async with aiohttp.ClientSession() as session:
+            async with session.get('https://discordbots.org/api/bots/486896267788812288/check?userId={}'.format(user.id),headers={'Authorization':str(self.bot.dbl_token)}) as r:
+                #r = requests.get('https://discordbots.org/api/bots/486896267788812288/check?userId={}'.format(user.id),headers={'Authorization':str(self.bot.dbl_token)})
+                js = await r.json()
+                if js['voted']:
+                    r = await self.translate(ctx.guild,'keywords','oui')
+                else:
+                    r = await self.translate(ctx.guild,'keywords','non')
         for e in range(len(ctx.bot.cogs['LangCog'].languages)):
             if languages.count(e)>0:
                 disp_lang += ctx.bot.cogs['LangCog'].languages[e]+" ("+str(round(languages.count(e)/len(languages)*100))+"%)  "
-        await ctx.send(str(await self.translate(ctx.guild,"find","user-1")).format(name=user,id=user.id,servers=", ".join([x.name for x in liste]),own=owners,lang=disp_lang,vote=r))
+        await ctx.send(str(await self.translate(ctx.guild,"find","user-1")).format(name=user,id=user.id,servers=", ".join([x.name for x in liste]),own=owners,lang=disp_lang,vote=r,card=xp_card,rangs=" - ".join(perks)))
 
     @find_main.command(name="guild",aliases=['server'])
     async def find_guild(self,ctx,*,guild):
@@ -485,7 +505,8 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
             lang = 'default'
         else:
             lang = ctx.bot.cogs['LangCog'].languages[lang]
-        await ctx.send(str(await self.translate(ctx.guild,"find","guild-1")).format(s.name,s.id,s.owner,s.owner.id,len(s.members),bots,lang))
+        pref = self.bot.cogs['UtilitiesCog'].find_prefix(s)
+        await ctx.send(str(await self.translate(ctx.guild,"find","guild-1")).format(s.name,s.id,s.owner,s.owner.id,len(s.members),bots,lang,pref))
 
     @find_main.command(name='channel')
     async def find_channel(self,ctx,ID:int):
@@ -535,6 +556,9 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
         (await self.translate(ctx.guild.id,"infos_2","membercount-2"),"{} ({}%)".format(h,int(round(h*100/total,0)))),
         (await self.translate(ctx.guild.id,"infos_2","membercount-1"),"{} ({}%)".format(bots,int(round(bots*100/total,0)))),
         (await self.translate(ctx.guild.id,"infos_2","membercount-3"),"{} ({}%)".format(c_co,int(round(c_co*100/total,0))))]
+        if datetime.datetime.today().day==1:
+            self.bot.fishes += 1
+            l.append((await self.translate(ctx.guild.id,"infos_2","fish-1"),"{} {}".format(random.randrange(100),random.choice([':fish:',':tropical_fish:','']))))
         if ctx.channel.permissions_for(ctx.guild.me).embed_links:
             embed = discord.Embed(colour=ctx.guild.me.color)
             for i in l:

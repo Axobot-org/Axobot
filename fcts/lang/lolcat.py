@@ -61,13 +61,15 @@ errors={"cooldown":"Yu are on cold-own for dis comandZ :confused: Plize wait {} 
 "membernotfound":"Unabl to found the membr `{}` :confused:",
 "usernotfound":"Unabled 2 find teh userZ `{}` :confused:",
 "disabled":"Da {} cmd is dizabled :confused:",
-"duration":"Invalid timer: `{}`"}
+"duration":"Invalid timer: `{}`",
+"rolenotfound":"Unable 2 find ur role (`{0}`)",
+"invalidcolor":"Ups, I can't find the color `{0}` :confused:"}
 
 find={"user-0":"naym: {}\nID: {}",
-"user-1":"Naym: {name}\nID: {id}\nServers: {servers}\nAuwner ov: {own}\nSpeak: {lang}\nNice guy? {vote}",
+"user-1":"Naym: {name}\nID: {id}\nPerks: {rangs}\nServers: {servers}\nAuwner ov: {own}\nSpeak: {lang}\nNice guy? {vote}\nRank card bg: {card}",
 "user-2":"Usr not findz",
 "guild-0":"S3rvr not findz",
-"guild-1":"Name: {}\nID: {}\nOwnr: {} ({})\nMmbr: {} ({} robots)\nSpeak {}",
+"guild-1":"Name: {}\nID: {}\nOwnr: {} ({})\nMmbr: {} ({} robots)\nSpeak {}\nPro-fix: `{}`",
 "chan-0":"chAnnel not foundz",
 "chan-1":"Nayme : {}\nID: {}\nServr: {} ({})",
 "help":"Dis commnd allowz 2 find a servr or a chnnel among all the servers on which'z teh bot. U can so seerch 4 a Discord usr's info, no mater if he sharez servr wif me!\
@@ -98,7 +100,8 @@ fun={"count-0":"Countng in progrez...",
     "no-database":"As our data ar offline, access to funz commandz iz restricted to guys with permishun \"Manage Server\"",
     "no-embed-perm":"I dont haz permishun 2 \"Embed links\" :confused:",
     "embed-error":"A' error went wrong: `{}`",
-    "invalid-city":"Invalid place name :confused:"
+    "invalid-city":"Invalid place name :confused:",
+    "no-roll":"Hmm I don't see any choice lol"
     }
 
 infos={"text-0":"""Ho hi hello! I'm {0} !
@@ -117,14 +120,15 @@ Of helpin me in the creetion of the boat, my ownr an I wouLd like to tahnk Awhik
 Has a nice dayz !""",
 "docs":"Her'z teh link 2 the bot doc:",
 "stats-title":"**Boat statz**",
-"stats":"""**Baut vershun:** {} \n**Nbr ov serverz:** {} \n**Nbr ov visible memberz:** {} ({} **robots**)\n**Nbr ov code lin:** {}\n**Uzd languages:** {}\n**Python vershun :** {} \n**Vershun ov teh `discord.py` lyb:** {} \n**Loadin on teh RAM:** {} GB \n**Loadin on the CPU:** {} % \n**API latency timz:** {} ms""",
+"stats":"""**Baut vershun:** {bot_v} \n**Nbr ov serverz:** {s_count} \n**Nbr ov visible memberz:** {m_count} ({b_count} **robots**)\n**Nbr ov code lin:** {l_count}\n**Uzd languages:** {lang}\n**Python vershun :** {p_v} \n**Vershun ov teh `discord.py` lyb:** {d_v} \n**Loadin on teh RAM:** {ram} GB \n**Loadin on the CPU:** {cpu} % \n**API latency timz:** {api} ms\n**Nbr of xp won:** {xp}""",
 "admins-list":"My super-cool admins are : {}",
 "prefix":"List ov usable prefiXs:"}
 
 infos_2={"membercount-0":"Total nmber of membrz",
 "membercount-1":"Numbr ov botz",
 "membercount-2":"Numbrz for good people",
-"membercount-3":"Nmbr ov god online peepl"}
+"membercount-3":"Nmbr ov god online peepl",
+"fish-1":"Nbr of :fish:"}
 
 keywords={"depuis":"sinze",
           "nom":"nayme",
@@ -237,6 +241,7 @@ modo={"slowmode-0":"Teh very-cold-mode is now disabld in this nize place.",
     "need-manage-messages":"Permishun \"Manage Messages\" missing :confused:",
     "need-read-history":"Oooops, I'm missing the perm 2 \"Read Message History\" :confused: ",
     "clear-1":"Ai cann:o2:t delte so few mesages plize",
+    "clear-nt-found":"Hmm... unable 2 delete these messages. Discord tell me they don't exist *LOL*",
     "cant-kick":"Perm 'Kick memberz' needed :confused:",
     "kick":"Membr {} haz been kick from dis servr. Just 'cause **{}**",
     "staff-kick":"Yolo NOPE ! U can't kick a-other nice staff mmber!",
@@ -264,7 +269,10 @@ modo={"slowmode-0":"Teh very-cold-mode is now disabld in this nize place.",
     "ban-reason":"You haz just been bannd from teh server {} :confused:\nReason : {}",
     "ban":"Mber {} has been banned fr0m dis cool servr. Just 'cause this : **{}**",
     "ban-1":"Maaaw... 'seems dat dis member iz too high 4 me to ban him :thinking:",
-    "ban-list-title":"List of bannd membrs ov this nice place '{}'",
+    "ban-list-title-0":"List of bannd membrs ov this nice place '{}'",
+    "ban-list-title-1":"List of 45 bannd membrs ov this nice place '{}'",
+    "ban-list-title-2":"List of 60 bannd membrs ov this nice place '{}'",
+    "ban-list-error":"Oops, seems like ther are 2 many usr to display :confused:",
     "no-bans":"No mmber seems to be bannd from here",
     "unban":"Mmber {} iz no langer bannd fr0m this servr",
     "cant-find-user":"Ooops, no way 2 find dis usr **{}**",
@@ -281,7 +289,8 @@ modo={"slowmode-0":"Teh very-cold-mode is now disabld in this nize place.",
     "em-list":"{} (`:{}:`) addd on {} {}",
     "em-private":"[Restrictd]",
     "em-list-title":"Emojis of our super server",
-    "tempmute-1":"Da member {} is muted 4 the raeson `{}`, for {}!"
+    "tempmute-1":"Da member {} is muted 4 the raeson `{}`, for {}!",
+    "role-high":"Oops, tish role is 2 high for me to change. Move my role above the role `{}` be4 trying again, thx"
     }
 
 morpion={'user-begin':'{}, u begin!',
@@ -373,7 +382,7 @@ UrL : {link}""",
 
 server={"config-help": "Dis cmd is mainly usd 2 configur ur srver. By doin `!config see [option]` u will get \
 overview ov teh currnt configuraishun, and supr cool servr masters can enter `!config change <option> role1, role2, role3...` \
-to modify configuraishun, or `!config del <option>` 2 reset teh option (`!config change <option>` works same).",
+to modify configuraishun, or `!config del <option>` 2 reset teh option (`!config change <option>` works same).\Teh list ov options is displayd at <https://zbot.rtfd.io/en/latest/config.html#list-of-every-option>",
         "change-0": "Dis option doz not exist :confused:",
         "change-1": "Oops, an internal error occurrd...\nBut doan worry, we'r on teh place: http://asset-5.soupcdn.com/asset/3247/3576_5092_600.jpeg",
         "change-2": "The '{}' opshun value haz been deleted",
@@ -484,7 +493,8 @@ stats_infos={"not-found":"Unable 2 found {N}",
 users = {'invalid-card':'Dat style iz no valid. But yop, her\'s styles u can use: {}',
         'missing-attach-files':'Oops, I\'m missing the Attach Files perms :upside_down:',
         'changed-0':'Ur xp card naw use the style {}',
-        'changed-1':'Oops, a wicked error occurrd during the process ov ur request. Try again later or contact these nice support guys.'}
+        'changed-1':'Oops, a wicked error occurrd during the process ov ur request. Try again later or contact these nice support guys.',
+        'card-desc':"Here iz example of ur xp card. U can enter teh command `profile card <style>` 2 change the style\n*Ur xp card will only refresh wehn u have won Xp*"}
 
 xp = {'card-level':'LVL',
         'card-rank':'SEAT',
@@ -494,5 +504,6 @@ xp = {'card-level':'LVL',
         "low-page":"Oops, I can't display a negative page!",
         "high-page":"There aren't so much pages!",
         "top-title-1":"Global ranks",
-        "top-name":"__Bests {}-{} :__",
-        "default_levelup":"Weew, {user} has just got **lvl {level}**! What a smart guy!"}
+        "top-name":"__Bests {}-{} ({}/{}):__",
+        "default_levelup":"Weew, {user} has just got **lvl {level}**! What a smart guy!",
+        "top-your":"Ur rank"}

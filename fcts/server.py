@@ -647,7 +647,7 @@ class ServerCog(commands.Cog):
             if len(liste)==0:
                 return await channel.send(str(await self.translate(channel.guild,"server","not-found")).format(guild.name))
             liste=liste[0]
-            embed = ctx.bot.cogs['EmbedCog'].Embed(title=str(await self.translate(guild.id,"server","see-1")).format(guild.name), color=self.embed_color, desc=str(await self.translate(guild.id,"server","see-0")), time=msg.created_at,thumbnail=guild.icon_url_as(format='png'))
+            embed = self.bot.cogs['EmbedCog'].Embed(title=str(await self.translate(guild.id,"server","see-1")).format(guild.name), color=self.embed_color, desc=str(await self.translate(guild.id,"server","see-0")), time=msg.created_at,thumbnail=guild.icon_url_as(format='png'))
             embed.create_footer(msg.author)
             diff = channel.guild != guild
             for i,v in liste.items():
