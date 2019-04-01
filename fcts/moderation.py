@@ -167,7 +167,7 @@ class ModeratorCog(commands.Cog):
                     return await ctx.send(await self.translate(ctx.guild.id,"modo","staff-kick"))
             elif user==ctx.guild.me or ctx.channel.permissions_for(user).kick_members:
                 return await ctx.send(await self.translate(ctx.guild.id,"modo","staff-kick"))
-            if user.roles[-1].position > ctx.guild.me.roles[-1].position:
+            if user.roles[-1].position >= ctx.guild.me.roles[-1].position:
                 await ctx.send(await self.translate(ctx.guild.id,"modo","kick-1"))
                 return
             if user.id not in self.bot.cogs['WelcomerCog'].no_message:
@@ -290,7 +290,7 @@ class ModeratorCog(commands.Cog):
         if role == None:
             role = await self.configure_muted_role(ctx.guild)
             await ctx.send(await self.translate(ctx.guild.id,"modo","mute-created"))
-        if role.position > ctx.guild.me.roles[-1].position:
+        if role.position >= ctx.guild.me.roles[-1].position:
             await ctx.send(await self.translate(ctx.guild.id,"modo","mute-high"))
             return
         caseID = "'Unsaved'"
@@ -344,7 +344,7 @@ class ModeratorCog(commands.Cog):
         if not ctx.channel.permissions_for(ctx.guild.me).manage_roles:
             await ctx.send(await self.translate(ctx.guild.id,"modo","cant-mute"))
             return
-        if role.position > ctx.guild.me.roles[-1].position:
+        if role.position >= ctx.guild.me.roles[-1].position:
             await ctx.send(await self.translate(ctx.guild.id,"modo","mute-high"))
             return
         try:
@@ -393,7 +393,7 @@ class ModeratorCog(commands.Cog):
                 elif not self.bot.database_online and (ctx.channel.permissions_for(member).ban_members or user==ctx.guild.me):
                     await ctx.send(await self.translate(ctx.guild.id,"modo","staff-ban"))
                     return
-                if member.roles[-1].position > ctx.guild.me.roles[-1].position:
+                if member.roles[-1].position >= ctx.guild.me.roles[-1].position:
                     await ctx.send(await self.translate(ctx.guild.id,"modo","ban-1"))
                     return
             if user in self.bot.users and user.id not in self.bot.cogs['WelcomerCog'].no_message:
@@ -497,7 +497,7 @@ class ModeratorCog(commands.Cog):
                     return await ctx.send(await self.translate(ctx.guild.id,"modo","staff-kick"))
             elif user==ctx.guild.me or ctx.channel.permissions_for(user).kick_members:
                 return await ctx.send(await self.translate(ctx.guild.id,"modo","staff-kick"))
-            if user.roles[-1].position > ctx.guild.me.roles[-1].position:
+            if user.roles[-1].position >= ctx.guild.me.roles[-1].position:
                 await ctx.send(await self.translate(ctx.guild.id,"modo","kick-1"))
                 return
             try:
@@ -673,7 +673,7 @@ You must be an administrator of this server to use this command."""
         if not ctx.guild.me.guild_permissions.manage_roles:
             await ctx.send(await self.translate(ctx.guild.id,"modo","cant-mute"))
             return
-        if role.position > ctx.guild.me.roles[-1].position:
+        if role.position >= ctx.guild.me.roles[-1].position:
             await ctx.send(str(await self.translate(ctx.guild.id,"modo","role-high")).format(role.name))
             return
         await role.edit(colour=color,reason="Asked by {}".format(ctx.author))
