@@ -686,17 +686,17 @@ You must be an administrator of this server to use this command."""
         """Pin a message
 ID corresponds to the Identifier of the message"""
         if not ctx.channel.permissions_for(ctx.guild.me).manage_messages:
-            await ctx.send(await self.translate(ctx.guild,"modo","cant-pin"))
+            await ctx.send(await self.translate(ctx.channel,"modo","cant-pin"))
             return
         try:
             message = await ctx.channel.fetch_message(msg)
         except Exception as e:
-            await ctx.send(str(await self.translate(ctx.guild,"modo","pin-error")).format(e))
+            await ctx.send(str(await self.translate(ctx.channel,"modo","pin-error")).format(e))
             return
         try:
             await message.pin()
         except Exception as e:
-            await ctx.send(str(await self.translate(ctx.guild,"modo","pin-error-2")).format(e))
+            await ctx.send(str(await self.translate(ctx.channel,"modo","pin-error-2")).format(e))
             return
 
     @commands.command(name='backup')

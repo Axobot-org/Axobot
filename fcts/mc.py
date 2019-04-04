@@ -23,7 +23,7 @@ Every information come from the website www.fr-minecraft.net"""
     @commands.cooldown(5,20,commands.BucketType.user)
     async def mojang_status(self,ctx):
         """Get Mojang server status"""
-        desc = await self.translate(ctx.guild,"mc","mojang_desc")
+        desc = await self.translate(ctx.channel,"mc","mojang_desc")
         async with aiohttp.ClientSession() as session:
             async with session.get('https://status.mojang.com/check') as r:
                 # data = requests.get("https://status.mojang.com/check").json()
@@ -75,20 +75,20 @@ Every information come from the website www.fr-minecraft.net"""
     async def mc_block(self,ctx,value='help'):
         """Get infos about any block"""
         if value=='help':
-            await ctx.send(await self.translate(ctx.guild,"mc","block-help"))
+            await ctx.send(await self.translate(ctx.channel,"mc","block-help"))
             return
         try:
             Block = frmc_lib.main(value,'Bloc')
         except:
-            await ctx.send(await self.translate(ctx.guild,"mc","no-block"))
+            await ctx.send(await self.translate(ctx.channel,"mc","no-block"))
             return
-        title = "{} - {}".format((await self.translate(ctx.guild,"mc","names"))[0],Block.Name)
-        embed = discord.Embed(title=title, colour=discord.Colour(int('16BD06',16)), url=Block.Url, timestamp=ctx.message.created_at,description=await self.translate(ctx.guild,'mc','contact-mail'))
+        title = "{} - {}".format((await self.translate(ctx.channel,"mc","names"))[0],Block.Name)
+        embed = discord.Embed(title=title, colour=discord.Colour(int('16BD06',16)), url=Block.Url, timestamp=ctx.message.created_at,description=await self.translate(ctx.channel,'mc','contact-mail'))
         embed.set_thumbnail(url=Block.Image)
         embed = await self.bot.cogs["UtilitiesCog"].create_footer(embed,ctx.author)
         embed.add_field(name="Nom", value=Block.Name,inline=False)
         l = ("\n".join(Block.ID),Block.Stack,Block.CreativeTab,Block.Damage,Block.Strength,Block.Tool,", ".join(Block.Mobs),Block.Version)
-        for e,v in enumerate(await self.translate(ctx.guild,"mc","block-fields")):
+        for e,v in enumerate(await self.translate(ctx.channel,"mc","block-fields")):
             if l[e] not in [None,'']:
                 try:
                     embed.add_field(name=v, value=l[e])
@@ -98,58 +98,58 @@ Every information come from the website www.fr-minecraft.net"""
             await ctx.send(embed=embed)
         except Exception as e:
             await self.bot.cogs['ErrorsCog'].on_error(e,ctx)
-            await ctx.send(await self.translate(ctx.guild,"mc","no-entity"))
+            await ctx.send(await self.translate(ctx.channel,"mc","no-entity"))
 
     @mc_main.command(name="entity",aliases=["entité","mob"])
     async def mc_entity(self,ctx,value='help'):
         """Get infos about any entity"""
         if value=='help':
-            await ctx.send(await self.translate(ctx.guild,"mc","entity-help"))
+            await ctx.send(await self.translate(ctx.channel,"mc","entity-help"))
             return
         try:
             Entity = frmc_lib.main(value,'Entité')
         except:
-            await ctx.send(await self.translate(ctx.guild,"mc","no-entity"))
+            await ctx.send(await self.translate(ctx.channel,"mc","no-entity"))
             return
-        title = "{} - {}".format((await self.translate(ctx.guild,"mc","names"))[1],Entity.Name)
-        embed = discord.Embed(title=title, colour=discord.Colour(int('16BD06',16)), url=Entity.Url, timestamp=ctx.message.created_at,description=await self.translate(ctx.guild,'mc','contact-mail'))
+        title = "{} - {}".format((await self.translate(ctx.channel,"mc","names"))[1],Entity.Name)
+        embed = discord.Embed(title=title, colour=discord.Colour(int('16BD06',16)), url=Entity.Url, timestamp=ctx.message.created_at,description=await self.translate(ctx.channel,'mc','contact-mail'))
         embed.set_thumbnail(url=Entity.Image)
         embed = await self.bot.cogs["UtilitiesCog"].create_footer(embed,ctx.author)
         embed.add_field(name="Nom", value=Entity.Name,inline=False)
         l = (Entity.ID,Entity.Type,Entity.PV,Entity.PA,Entity.XP,", ".join(Entity.Biomes),Entity.Version)
-        for e,v in enumerate(await self.translate(ctx.guild,"mc","entity-fields")):
+        for e,v in enumerate(await self.translate(ctx.channel,"mc","entity-fields")):
             if l[e] not in [None,'']:
                 try:
                     embed.add_field(name=v, value=l[e])
                 except:
                     pass
         if Entity.Dimensions != [0,0,0]:
-            embed.add_field(name="Dimensions",value=str(await self.translate(ctx.guild,"mc","dimensions")).format(d=Entity.Dimensions))
+            embed.add_field(name="Dimensions",value=str(await self.translate(ctx.channel,"mc","dimensions")).format(d=Entity.Dimensions))
         try:
             await ctx.send(embed=embed)
         except Exception as e:
             await self.bot.cogs['ErrorsCog'].on_error(e,ctx)
-            await ctx.send(await self.translate(ctx.guild,"mc","no-entity"))
+            await ctx.send(await self.translate(ctx.channel,"mc","no-entity"))
     
     @mc_main.command(name="item",aliases=['object'])
     async def mc_item(self,ctx,value='help'):
         """Get infos about any item"""
         if value=='help':
-            await ctx.send(await self.translate(ctx.guild,"mc","item-help"))
+            await ctx.send(await self.translate(ctx.channel,"mc","item-help"))
             return
         try:
             Item = frmc_lib.main(value,"Item")
         except:
-            await ctx.send(await self.translate(ctx.guild,"mc","no-item"))
+            await ctx.send(await self.translate(ctx.channel,"mc","no-item"))
             return
-        title = "{} - {}".format((await self.translate(ctx.guild,"mc","names"))[2],Item.Name)
-        embed = discord.Embed(title=title, colour=discord.Colour(int('16BD06',16)), url=Item.Url, timestamp=ctx.message.created_at,description=await self.translate(ctx.guild,'mc','contact-mail'))
+        title = "{} - {}".format((await self.translate(ctx.channel,"mc","names"))[2],Item.Name)
+        embed = discord.Embed(title=title, colour=discord.Colour(int('16BD06',16)), url=Item.Url, timestamp=ctx.message.created_at,description=await self.translate(ctx.channel,'mc','contact-mail'))
         if Item.Image != None:
             embed.set_thumbnail(url=Item.Image)
         embed = await self.bot.cogs["UtilitiesCog"].create_footer(embed,ctx.author)
         embed.add_field(name="Nom", value=Item.Name,inline=False)
         l = ('\n'.join(Item.ID),Item.Stack,Item.CreativeTab,Item.Damage,Item.Strength,Item.Tool,", ".join(Item.Mobs),Item.Version)
-        for e,v in enumerate(await self.translate(ctx.guild,"mc","item-fields")):
+        for e,v in enumerate(await self.translate(ctx.channel,"mc","item-fields")):
             if l[e] not in [None,'']:
                 try:
                     embed.add_field(name=v, value=l[e])
@@ -159,24 +159,24 @@ Every information come from the website www.fr-minecraft.net"""
             await ctx.send(embed=embed)
         except Exception as e:
             await self.bot.cogs['ErrorsCog'].on_error(e,ctx)
-            await ctx.send(await self.translate(ctx.guild,"mc","no-entity"))
+            await ctx.send(await self.translate(ctx.channel,"mc","no-entity"))
 
     @mc_main.command(name="command",aliases=["commande","cmd"])
     async def mc_cmd(self,ctx,value='help'):
         """Get infos about any command"""
         if value=='help':
-            await ctx.send(await self.translate(ctx.guild,"mc","cmd-help"))
+            await ctx.send(await self.translate(ctx.channel,"mc","cmd-help"))
             return
         try:
             Cmd = frmc_lib.main(value,'Commande')
         except:
-            await ctx.send(await self.translate(ctx.guild,"mc","no-cmd"))
+            await ctx.send(await self.translate(ctx.channel,"mc","no-cmd"))
             return
-        title = "{} - {}".format((await self.translate(ctx.guild,"mc","names"))[3],Cmd.Name)
-        embed = discord.Embed(title=title, colour=discord.Colour(int('16BD06',16)), url=Cmd.Url, timestamp=ctx.message.created_at,description=await self.translate(ctx.guild,'mc','contact-mail'))
+        title = "{} - {}".format((await self.translate(ctx.channel,"mc","names"))[3],Cmd.Name)
+        embed = discord.Embed(title=title, colour=discord.Colour(int('16BD06',16)), url=Cmd.Url, timestamp=ctx.message.created_at,description=await self.translate(ctx.channel,'mc','contact-mail'))
         embed = await self.bot.cogs["UtilitiesCog"].create_footer(embed,ctx.author)
         l = (Cmd.Name," ".join(Cmd.Syntax),Cmd.Examples,Cmd.Version)
-        for e,v in enumerate(await self.translate(ctx.guild,"mc","cmd-fields")):
+        for e,v in enumerate(await self.translate(ctx.channel,"mc","cmd-fields")):
             if e==2:
                 if len(l[e]) > 0:
                     examples = ["`{}`\n*{}*".format(x[0],x[1]) for x in l[e][:5]]
@@ -191,26 +191,26 @@ Every information come from the website www.fr-minecraft.net"""
             await ctx.send(embed=embed)
         except Exception as e:
             await self.bot.cogs['ErrorsCog'].on_error(e,ctx)
-            await ctx.send(await self.translate(ctx.guild,"mc","no-cmd"))
+            await ctx.send(await self.translate(ctx.channel,"mc","no-cmd"))
     
     @mc_main.command(name="advancement",aliases=["advc","progrès"])
     async def mc_advc(self,ctx,value='help'):
         """Get infos about any advancement"""
         if value=='help':
-            await ctx.send(await self.translate(ctx.guild,"mc","adv-help"))
+            await ctx.send(await self.translate(ctx.channel,"mc","adv-help"))
             return
         try:
             Adv = frmc_lib.main(value,'Progrès')
         except:
-            await ctx.send(await self.translate(ctx.guild,"mc","no-adv"))
+            await ctx.send(await self.translate(ctx.channel,"mc","no-adv"))
             return
-        title = "{} - {}".format((await self.translate(ctx.guild,"mc","names"))[4],Adv.Name)
-        embed = discord.Embed(title=title, colour=discord.Colour(int('16BD06',16)), url=Adv.Url, timestamp=ctx.message.created_at,description=await self.translate(ctx.guild,'mc','contact-mail'))
+        title = "{} - {}".format((await self.translate(ctx.channel,"mc","names"))[4],Adv.Name)
+        embed = discord.Embed(title=title, colour=discord.Colour(int('16BD06',16)), url=Adv.Url, timestamp=ctx.message.created_at,description=await self.translate(ctx.channel,'mc','contact-mail'))
         embed = await self.bot.cogs["UtilitiesCog"].create_footer(embed,ctx.author)
         if Adv.Image != None:
             embed.set_thumbnail(url=Adv.Image)
         l = (Adv.Name,Adv.ID,Adv.Type,Adv.Action,Adv.Parent,", ".join(Adv.Children),Adv.Version)   #("Nom","Identifiant","Type","Action","Parent","Enfants","Version d'ajout")
-        for e,v in enumerate(await self.translate(ctx.guild,"mc","adv-fields")):
+        for e,v in enumerate(await self.translate(ctx.channel,"mc","adv-fields")):
             if l[e] not in [None,'']:
                 try:
                     embed.add_field(name=v, value=l[e])
@@ -220,7 +220,7 @@ Every information come from the website www.fr-minecraft.net"""
             await ctx.send(embed=embed)
         except Exception as e:
             await self.bot.cogs['ErrorsCog'].on_error(e,ctx)
-            await ctx.send(await self.translate(ctx.guild,"mc","no-adv"))
+            await ctx.send(await self.translate(ctx.channel,"mc","no-adv"))
 
 
     @mc_main.command(name="server")

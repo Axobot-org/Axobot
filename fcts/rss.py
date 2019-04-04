@@ -157,8 +157,8 @@ class RssCog(commands.Cog):
         if type(text) == str:
             await ctx.send(text)
         else:
-            form = await self.translate(ctx.guild,"rss","yt-form-last")
-            await ctx.send(await text[0].create_msg(await self.translate(ctx.guild,"current_lang","current"),form))
+            form = await self.translate(ctx.channel,"rss","yt-form-last")
+            await ctx.send(await text[0].create_msg(await self.translate(ctx.channel,"current_lang","current"),form))
     
     @rss_main.command(name="twitch",aliases=['tv'])
     async def request_twitch(self,ctx,channel):
@@ -169,8 +169,8 @@ class RssCog(commands.Cog):
         if type(text) == str:
             await ctx.send(text)
         else:
-            form = await self.translate(ctx.guild,"rss","twitch-form-last")
-            await ctx.send(await text[0].create_msg(await self.translate(ctx.guild,"current_lang","current"),form))
+            form = await self.translate(ctx.channel,"rss","twitch-form-last")
+            await ctx.send(await text[0].create_msg(await self.translate(ctx.channel,"current_lang","current"),form))
 
     @rss_main.command(name='twitter',aliases=['tw'])
     async def request_tw(self,ctx,name):
@@ -184,8 +184,8 @@ class RssCog(commands.Cog):
         if type(text) == str:
             await ctx.send(text)
         else:
-            form = await self.translate(ctx.guild,"rss","tw-form-last")
-            await ctx.send(await text[0].create_msg(await self.translate(ctx.guild,"current_lang","current"),form))
+            form = await self.translate(ctx.channel,"rss","tw-form-last")
+            await ctx.send(await text[0].create_msg(await self.translate(ctx.channel,"current_lang","current"),form))
 
     @rss_main.command(name="web")
     async def request_web(self,ctx,link):
@@ -196,8 +196,8 @@ class RssCog(commands.Cog):
         if type(text) == str:
             await ctx.send(text)
         else:
-            form = await self.translate(ctx.guild,"rss","web-form-last")
-            await ctx.send(await text[0].create_msg(await self.translate(ctx.guild,"current_lang","current"),form))
+            form = await self.translate(ctx.channel,"rss","web-form-last")
+            await ctx.send(await text[0].create_msg(await self.translate(ctx.channel,"current_lang","current"),form))
 
     @rss_main.command(name="add")
     @commands.guild_only()

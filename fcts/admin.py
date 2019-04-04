@@ -54,7 +54,7 @@ class AdminCog(commands.Cog):
             if u==552273019020771358:
                 continue
             l.append(str(self.bot.get_user(u)))
-        await ctx.send(str(await self.translate(ctx.guild,"infos","admins-list")).format(", ".join(l)))
+        await ctx.send(str(await self.translate(ctx.channel,"infos","admins-list")).format(", ".join(l)))
 
     @commands.command(name='god')
     @commands.check(reloads.check_admin)

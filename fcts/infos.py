@@ -83,10 +83,10 @@ class InfosCog(commands.Cog):
                 except Exception as e:
                     users = bots = 'unknown'
                 total_xp = await self.bot.cogs['XPCog'].bdd_total_xp()
-                d = str(await self.translate(ctx.guild,"infos","stats")).format(bot_v=bot_version,s_count=len_servers,m_count=users,b_count=bots,l_count=self.codelines,lang=langs_list,p_v=version,d_v=discord.__version__,ram=ram_cpu[0],cpu=ram_cpu[1],api=latency,xp=total_xp)
+                d = str(await self.translate(ctx.channel,"infos","stats")).format(bot_v=bot_version,s_count=len_servers,m_count=users,b_count=bots,l_count=self.codelines,lang=langs_list,p_v=version,d_v=discord.__version__,ram=ram_cpu[0],cpu=ram_cpu[1],api=latency,xp=total_xp)
                 if datetime.datetime.today().day == 1:
-                    d += "\n**{}:** {}".format(await self.translate(ctx.guild,"infos_2",'fish-1'),self.bot.fishes)
-                embed = ctx.bot.cogs['EmbedCog'].Embed(title=await self.translate(ctx.guild,"infos","stats-title"), color=ctx.bot.cogs['HelpCog'].help_color, time=ctx.message.created_at,desc=d,thumbnail=self.bot.user.avatar_url_as(format="png"))
+                    d += "\n**{}:** {}".format(await self.translate(ctx.channel,"infos_2",'fish-1'),self.bot.fishes)
+                embed = ctx.bot.cogs['EmbedCog'].Embed(title=await self.translate(ctx.channel,"infos","stats-title"), color=ctx.bot.cogs['HelpCog'].help_color, time=ctx.message.created_at,desc=d,thumbnail=self.bot.user.avatar_url_as(format="png"))
                 embed.create_footer(ctx.author)
             await ctx.send(embed=embed.discord_embed())
         except Exception as e:
@@ -135,7 +135,7 @@ class InfosCog(commands.Cog):
     @commands.command(name="docs")
     async def display_doc(self,ctx):
         """Get the documentation url"""
-        text = str(self.bot.cogs['EmojiCog'].customEmojis['readthedocs']) + str(await self.translate(ctx.guild,"infos","docs")) + " https://zbot.rtfd.io"
+        text = str(self.bot.cogs['EmojiCog'].customEmojis['readthedocs']) + str(await self.translate(ctx.channel,"infos","docs")) + " https://zbot.rtfd.io"
         await ctx.send(text)
 
     @commands.command(name='info',aliases=['infos'])
@@ -220,7 +220,7 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
         embed.set_footer(text='Requested by {}'.format(ctx.author.name), icon_url=ctx.author.avatar_url_as(format='png'))
 
         embed.add_field(name=str(await self.translate(ctx.guild.id,"keywords","nom")).capitalize(), value=item.name,inline=True)
-        embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","member-0"), value=item.nick if item.nick else str(await self.translate(ctx.guild,"keywords","none")).capitalize(),inline=True)
+        embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","member-0"), value=item.nick if item.nick else str(await self.translate(ctx.channel,"keywords","none")).capitalize(),inline=True)
         embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","role-0"), value=str(item.id))
         embed.add_field(name="Bot", value=botb.capitalize())
         embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","member-1"), value = "{} ({} {})".format(await self.timecog.date(item.created_at,lang=lang,year=True),since,await self.timecog.time_delta(item.created_at,datetime.datetime.now(),lang=lang,year=True,precision=0,hour=False)), inline=False)
@@ -449,7 +449,7 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
     async def find_main(self,ctx):
         """Same as info, but in a lighter version"""
         if ctx.invoked_subcommand is None:
-            await ctx.send(await self.translate(ctx.guild,"find","help"))
+            await ctx.send(await self.translate(ctx.channel,"find","help"))
 
     @find_main.command(name="user")
     async def find_user(self,ctx,*,user:discord.User):
@@ -475,14 +475,14 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
             async with session.get('https://discordbots.org/api/bots/486896267788812288/check?userId={}'.format(user.id),headers={'Authorization':str(self.bot.dbl_token)}) as r:
                 js = await r.json()
                 if js['voted']:
-                    r = await self.translate(ctx.guild,'keywords','oui')
+                    r = await self.translate(ctx.channel,'keywords','oui')
                 else:
-                    r = await self.translate(ctx.guild,'keywords','non')
+                    r = await self.translate(ctx.channel,'keywords','non')
                 r = r.capitalize()
         disp_lang = str()
         for lang in await self.bot.cogs['UtilitiesCog'].get_languages(user):
             disp_lang += '{} ({}%)   '.format(lang[0],round(lang[1]*100))
-        await ctx.send(str(await self.translate(ctx.guild,"find","user-1")).format(name=user,id=user.id,servers=", ".join(servers_in),own=", ".join(owners),lang=disp_lang,vote=r,card=xp_card,rangs=" - ".join(perks)))
+        await ctx.send(str(await self.translate(ctx.channel,"find","user-1")).format(name=user,id=user.id,servers=", ".join(servers_in),own=", ".join(owners),lang=disp_lang,vote=r,card=xp_card,rangs=" - ".join(perks)))
 
     @find_main.command(name="guild",aliases=['server'])
     async def find_guild(self,ctx,*,guild):
@@ -494,7 +494,7 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
                 if x.name==guild:
                     s = x
         if s == None:
-            await ctx.send(await self.translate(ctx.guild,"find","guild-0"))
+            await ctx.send(await self.translate(ctx.channel,"find","guild-0"))
             return
         bots = len([x for x in s.members if x.bot])
         lang = await ctx.bot.cogs["ServerCog"].find_staff(s.id,'language')
@@ -503,15 +503,15 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
         else:
             lang = ctx.bot.cogs['LangCog'].languages[lang]
         pref = self.bot.cogs['UtilitiesCog'].find_prefix(s)
-        await ctx.send(str(await self.translate(ctx.guild,"find","guild-1")).format(s.name,s.id,s.owner,s.owner.id,len(s.members),bots,lang,pref))
+        await ctx.send(str(await self.translate(ctx.channel,"find","guild-1")).format(s.name,s.id,s.owner,s.owner.id,len(s.members),bots,lang,pref))
 
     @find_main.command(name='channel')
     async def find_channel(self,ctx,ID:int):
         c = self.bot.get_channel(ID)
         if c == None:
-            await ctx.send(await self.translate(ctx.guild,"find","chan-0"))
+            await ctx.send(await self.translate(ctx.channel,"find","chan-0"))
             return
-        await ctx.send(str(await self.translate(ctx.guild,"find","chan-1")).format(c.name,c.id,c.guild.name,c.guild.id))
+        await ctx.send(str(await self.translate(ctx.channel,"find","chan-1")).format(c.name,c.id,c.guild.name,c.guild.id))
     
     @find_main.command(name='rss')
     async def find_rss(self,ctx,ID:int):
@@ -570,7 +570,7 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
     @commands.command(name="prefix")
     async def get_prefix(self,ctx):
         """Show the usable prefix(s) for this server"""
-        txt = await self.translate(ctx.guild,"infos","prefix")
+        txt = await self.translate(ctx.channel,"infos","prefix")
         prefix = "\n\n".join(await ctx.bot.get_prefix(ctx.message))
         if ctx.guild==None or ctx.channel.permissions_for(ctx.guild.me):
             emb = ctx.bot.cogs['EmbedCog'].Embed(title=txt,desc=prefix,time=ctx.message.created_at,color=ctx.bot.cogs['HelpCog'].help_color).create_footer(ctx.author)

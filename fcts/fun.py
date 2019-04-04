@@ -76,11 +76,11 @@ class FunCog(commands.Cog):
         """Get a list of all fun commands"""
         if not await is_fun_enabled(ctx):
             if ctx.bot.database_online:
-                await ctx.send(await self.translate(ctx.guild,"fun","no-fun"))
+                await ctx.send(await self.translate(ctx.channel,"fun","no-fun"))
             else:
-                await ctx.send(await self.translate(ctx.guild,"fun","no-database"))
+                await ctx.send(await self.translate(ctx.channel,"fun","no-database"))
             return
-        title = await self.translate(ctx.guild,"fun","fun-list")
+        title = await self.translate(ctx.channel,"fun","fun-list")
         if datetime.datetime.today().day==1:
             title = ":fish: "+title
             self.bot.fishes += 1
@@ -106,7 +106,7 @@ class FunCog(commands.Cog):
         The options must be separated by a semicolon `;`"""
         liste = [x.strip() for x in options.split(';')]
         if len(liste)==0:
-            return await ctx.send(await self.translate(ctx.guild,"fun","no-roll"))
+            return await ctx.send(await self.translate(ctx.channel,"fun","no-roll"))
         choosen = None
         while choosen==self.last_roll:
             choosen = random.choice(liste)
@@ -131,20 +131,20 @@ class FunCog(commands.Cog):
 You can specify a verification limit by adding a number in argument"""
         l = 100000
         if limit > l:
-            await ctx.send(str(await self.translate(ctx.guild,"fun","count-2")).format(l=l,e=self.bot.cogs['EmojiCog'].customEmojis['wat']))
+            await ctx.send(str(await self.translate(ctx.channel,"fun","count-2")).format(l=l,e=self.bot.cogs['EmojiCog'].customEmojis['wat']))
             return
-        if not ctx.channel.permissions_for(ctx.guild.me).read_message_history:
-            await ctx.send(str(await self.translate(ctx.guild,"fun","count-3")).format(l))
+        if ctx.guild!=None and not ctx.channel.permissions_for(ctx.guild.me).read_message_history:
+            await ctx.send(str(await self.translate(ctx.channel,"fun","count-3")).format(l))
             return
         counter = 0
-        tmp = await ctx.send(await self.translate(ctx.guild,'fun','count-0'))
+        tmp = await ctx.send(await self.translate(ctx.channel,'fun','count-0'))
         m = 0
         async for log in ctx.channel.history(limit=limit):
             m += 1
             if log.author == ctx.author:
                 counter += 1
         r = round(counter*100/m,2)
-        await tmp.edit(content = str(await self.translate(ctx.guild,'fun','count-1')).format(m,counter,r))
+        await tmp.edit(content = str(await self.translate(ctx.channel,'fun','count-1')).format(m,counter,r))
 
     @commands.command(name="ragequit",hidden=True)
     @commands.check(is_fun_enabled)
@@ -197,7 +197,7 @@ You can specify a verification limit by adding a number in argument"""
             if await self.is_on_guild(ctx.author,356067272730607628): # Zbot server
                 liste += l3
             txt = "- "+"\n- ".join(sorted(liste))
-            title = str(await self.translate(ctx.guild,"fun","blame-0")).format(ctx.author)
+            title = str(await self.translate(ctx.channel,"fun","blame-0")).format(ctx.author)
             if ctx.channel.permissions_for(ctx.guild.me).embed_links:
                 emb = self.bot.cogs["EmbedCog"].Embed(title=title,desc=txt,color=self.bot.cogs["HelpCog"].help_color).update_timestamp()
                 await ctx.send(embed=emb.discord_embed())
@@ -215,7 +215,7 @@ You can specify a verification limit by adding a number in argument"""
             victime = name
             ex = name.replace(" ","_")
         author = ctx.author.mention
-        liste = await self.translate(ctx.guild,"kill","list")
+        liste = await self.translate(ctx.channel,"kill","list")
         msg = random.choice(liste)
         tries = 0
         while '{0}' in msg and name == None and tries<50:
@@ -313,7 +313,7 @@ You can specify a verification limit by adding a number in argument"""
     @commands.check(is_fun_enabled)
     async def osekour(self,ctx):
         """Does anyone need help?"""
-        l = await self.translate(ctx.guild,"fun","osekour")
+        l = await self.translate(ctx.channel,"fun","osekour")
         await ctx.send(random.choice(l))
 
     @commands.command(name="say")
@@ -359,7 +359,7 @@ You can specify a verification limit by adding a number in argument"""
         try:
             msg = await ctx.channel.fetch_message(ID)
         except discord.errors.HTTPException as e:
-            await ctx.send(await self.translate(ctx.guild,"fun",'react-0'))
+            await ctx.send(await self.translate(ctx.channel,"fun",'react-0'))
             return
         for r in reactions.split():
             try:
@@ -369,7 +369,7 @@ You can specify a verification limit by adding a number in argument"""
                 try:
                     await msg.add_reaction(r)
                 except discord.errors.HTTPException:
-                    await ctx.send(await self.translate(ctx.guild,'fun','no-emoji'))
+                    await ctx.send(await self.translate(ctx.channel,'fun','no-emoji'))
                     return
                 except Exception as e:
                     await self.bot.cogs["ErrorsCog"].on_error(e,ctx)
@@ -413,16 +413,16 @@ You can specify a verification limit by adding a number in argument"""
     @commands.command(name="thanos",hidden=True)
     @commands.check(is_fun_enabled)
     async def thanos(self,ctx):
-        await ctx.send(random.choice(await self.translate(ctx.guild,"fun","thanos")).format(ctx.author.mention))
+        await ctx.send(random.choice(await self.translate(ctx.channel,"fun","thanos")).format(ctx.author.mention))
     
     @commands.command(name="piece",hidden=True)
     @commands.check(is_fun_enabled)
     async def piece(self,ctx):
         """Heads or tails?"""
         if random.random() < 0.04:
-            await ctx.send(await self.translate(ctx.guild,"fun","piece-1"))
+            await ctx.send(await self.translate(ctx.channel,"fun","piece-1"))
         else:
-            await ctx.send(random.choice(await self.translate(ctx.guild,"fun","piece-0")))
+            await ctx.send(random.choice(await self.translate(ctx.channel,"fun","piece-0")))
     
     @commands.command(name="weather")
     @commands.cooldown(4, 30, type=commands.BucketType.guild)
@@ -443,7 +443,7 @@ You can specify a verification limit by adding a number in argument"""
                             return await ctx.send("https://welcomer.glitch.me/weather?city="+city)
                     except Exception as e:
                         await self.bot.cogs['ErrorsCog'].on_error(e,ctx)
-        await ctx.send(await self.translate(ctx.guild,"fun","invalid-city"))
+        await ctx.send(await self.translate(ctx.channel,"fun","invalid-city"))
 
     @commands.command(name="hour")
     @commands.cooldown(4, 50, type=commands.BucketType.guild)
@@ -453,7 +453,7 @@ You can specify a verification limit by adding a number in argument"""
         timeZoneStr = self.tz.tzNameAt(g.json['lat'],g.json['lng'],forceTZ=True)
         timeZoneObj = timezone(timeZoneStr)
         d = datetime.datetime.now(timeZoneObj)
-        format_d = await self.bot.cogs['TimeCog'].date(d,lang=await self.translate(ctx.guild,"current_lang","current"))
+        format_d = await self.bot.cogs['TimeCog'].date(d,lang=await self.translate(ctx.channel,"current_lang","current"))
         await ctx.send("**{}**:\n{} ({})".format(timeZoneStr,format_d,d.tzname()))
 
 
@@ -473,7 +473,7 @@ You can specify a verification limit by adding a number in argument"""
         If you want to use quotation marks in the texts, it is possible to escape them thanks to the backslash (`\\"`)
         """
         if not ctx.channel.permissions_for(ctx.guild.me).embed_links:
-            return await ctx.send(await self.translate(ctx.guild,"fun","no-embed-perm"))
+            return await ctx.send(await self.translate(ctx.channel,"fun","no-embed-perm"))
         arguments = arguments.replace("\\\"","|¬017")
         arguments = arguments.split("\"")
         k = {'title':"",'content':"",'url':'','footer':"",'image':''}
@@ -498,7 +498,7 @@ You can specify a verification limit by adding a number in argument"""
         try:
             await ctx.send(embed=emb.discord_embed())
         except Exception as e:
-            await ctx.send(str(await self.translate(ctx.guild,"fun","embed-error")).format(e))
+            await ctx.send(str(await self.translate(ctx.channel,"fun","embed-error")).format(e))
 
 
     async def add_vote(self,msg):
@@ -535,18 +535,18 @@ You can specify a verification limit by adding a number in argument"""
         text = await ctx.bot.cogs['UtilitiesCog'].clear_msg(text,ctx=ctx)
         if ctx.guild != None:
             if not (ctx.channel.permissions_for(ctx.guild.me).read_message_history and ctx.channel.permissions_for(ctx.guild.me).add_reactions):
-                return await ctx.send(await self.translate(ctx.guild,"fun","cant-react"))
+                return await ctx.send(await self.translate(ctx.channel,"fun","cant-react"))
         if number==0:
             m = await ctx.send(text)
             try:
                 await self.add_vote(m)
             except:
-                await ctx.send(await self.translate(ctx.guild,"fun","no-reaction"))
+                await ctx.send(await self.translate(ctx.channel,"fun","no-reaction"))
                 return
         else:
             liste = self.bot.cogs['EmojiCog'].numbEmojis
             if number>20 or number<0:
-                await ctx.send(await self.translate(ctx.guild,"fun","vote-0"))
+                await ctx.send(await self.translate(ctx.channel,"fun","vote-0"))
                 return
             m = await ctx.send(text)
             for x in range(1,number+1):

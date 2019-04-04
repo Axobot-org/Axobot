@@ -79,9 +79,9 @@ The bot plays in red, the user in blue.
         try:
             grille = [x for x in range(1,10)]
             tour = await self.qui_commence()
-            u_begin = await self.translate(ctx.guild,'morpion','user-begin') if tour == True else await self.translate(ctx.guild,'morpion','bot-begin')
-            await ctx.send(u_begin.format(ctx.author.mention)+await self.translate(ctx.guild,'morpion','tip'))
-            resultat = await self.translate(ctx.guild,'morpion','nul')
+            u_begin = await self.translate(ctx.channel,'morpion','user-begin') if tour == True else await self.translate(ctx.channel,'morpion','bot-begin')
+            await ctx.send(u_begin.format(ctx.author.mention)+await self.translate(ctx.channel,'morpion','tip'))
+            resultat = await self.translate(ctx.channel,'morpion','nul')
             def check(m):
                 # return m.content in [str(x) for x in range(1,10)] and m.channel == ctx.channel and m.author==ctx.author
                 return m.channel == ctx.channel and m.author==ctx.author
@@ -95,7 +95,7 @@ The bot plays in red, the user in blue.
                     try:
                         msg = await self.bot.wait_for('message', check=check,timeout=50)
                     except asyncio.TimeoutError:
-                        await ctx.channel.send(await self.translate(ctx.guild,'morpion','too-late'))
+                        await ctx.channel.send(await self.translate(ctx.channel,'morpion','too-late'))
                         return
                     saisie = msg.content
                     if msg.content in self.entrees_valides:
@@ -103,11 +103,11 @@ The bot plays in red, the user in blue.
                             grille = await self.remplacer_valeur(grille,tour,saisie)
                             tour = False
                         else :
-                            await ctx.send(await self.translate(ctx.guild,'morpion','pion-1'))
+                            await ctx.send(await self.translate(ctx.channel,'morpion','pion-1'))
                             display_grille = False
                             continue
                     else :
-                        await ctx.send(await self.translate(ctx.guild,'morpion','pion-2'))
+                        await ctx.send(await self.translate(ctx.channel,'morpion','pion-2'))
                         display_grille = False
                         continue
             ###

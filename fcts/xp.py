@@ -324,8 +324,8 @@ class XPCog(commands.Cog):
             xp = await self.bdd_get_xp(user.id)
             if xp==None or len(xp)==0:
                 if ctx.author==user:
-                    return await ctx.send(await self.translate(ctx.guild,'xp','1-no-xp'))
-                return await ctx.send(await self.translate(ctx.guild,'xp','2-no-xp'))
+                    return await ctx.send(await self.translate(ctx.channel,'xp','1-no-xp'))
+                return await ctx.send(await self.translate(ctx.channel,'xp','2-no-xp'))
             xp = xp[0]['xp']
             ranks_nb = await self.bdd_get_nber()
             rank = (await self.bdd_get_rank(user.id))[0]['rank']
@@ -343,12 +343,12 @@ class XPCog(commands.Cog):
             await ctx.send(file=discord.File('../cards/global/{}-{}-{}.{}'.format(user.id,xp,rank,'gif' if user.is_avatar_animated() else 'png')))
         except FileNotFoundError:
             style = await self.bot.cogs['UtilitiesCog'].get_xp_style(user)
-            txts = [await self.translate(ctx.guild,'xp','card-level'), await self.translate(ctx.guild,'xp','card-rank')]
+            txts = [await self.translate(ctx.channel,'xp','card-level'), await self.translate(ctx.channel,'xp','card-rank')]
             await ctx.send(file=await self.create_card(user,style,xp,[rank,ranks_nb],txts))
             self.bot.log.debug("XP card for user {} ({}xp - style {})".format(user.id,xp,style))
     
     async def send_embed(self,ctx,user,xp,rank,ranks_nb):
-        txts = [await self.translate(ctx.guild,'xp','card-level'), await self.translate(ctx.guild,'xp','card-rank')]
+        txts = [await self.translate(ctx.channel,'xp','card-level'), await self.translate(ctx.channel,'xp','card-rank')]
         levels_info = await self.calc_level(xp)
         fields = list()
         fields.append({'name':'XP','value':"{}/{}".format(xp,levels_info[1]),'inline':True})
@@ -358,7 +358,7 @@ class XPCog(commands.Cog):
         await ctx.send(embed=emb.discord_embed())
     
     async def send_txt(self,ctx,user,xp,rank,ranks_nb):
-        txts = [await self.translate(ctx.guild,'xp','card-level'), await self.translate(ctx.guild,'xp','card-rank')]
+        txts = [await self.translate(ctx.channel,'xp','card-level'), await self.translate(ctx.channel,'xp','card-rank')]
         levels_info = await self.calc_level(xp)
         msg = """__**{}**__
 **XP** {}/{}
@@ -376,9 +376,9 @@ class XPCog(commands.Cog):
         Each page has 20 users"""
         max_page = ceil(len(self.cache)/20)
         if page<1:
-            return await ctx.send(await self.translate(ctx.guild,"xp",'low-page'))
+            return await ctx.send(await self.translate(ctx.channel,"xp",'low-page'))
         elif page>max_page:
-            return await ctx.send(await self.translate(ctx.guild,"xp",'high-page'))
+            return await ctx.send(await self.translate(ctx.channel,"xp",'high-page'))
         ranks = await self.bdd_get_top(20*page)
         ranks = ranks[(page-1)*20:]
         txt = list()
@@ -390,20 +390,20 @@ class XPCog(commands.Cog):
                 try:
                     user = await self.bot.fetch_user(u['userID'])
                 except discord.NotFound:
-                    user = await self.translate(ctx.guild,'xp','del-user')
+                    user = await self.translate(ctx.channel,'xp','del-user')
             if isinstance(user,discord.User):
                 user_name = await self.bot.cogs['UtilitiesCog'].remove_markdown(user.name.replace('|',''))
                 if len(user_name)>18:
                     user_name = user_name[:15]+'...'
             l = await self.calc_level(u['xp'])
             txt.append('{} • **{} |** `lvl {}` **|** `xp {}`'.format(i,"__"+user_name+"__" if user==ctx.author else user_name,l[0],u['xp']))
-        f_name = str(await self.translate(ctx.guild,'xp','top-name')).format((page-1)*20+1,i,page,max_page)
+        f_name = str(await self.translate(ctx.channel,'xp','top-name')).format((page-1)*20+1,i,page,max_page)
         # author
         rank = await self.bdd_get_rank(ctx.author.id)
         lvl = await self.calc_level(rank[0]['xp'])
-        your_rank = {'name':"__"+await self.translate(ctx.guild,"xp","top-your")+"__", 'value':"**#{} |** `lvl {}` **|** `xp {}`".format(rank[0]['rank'],lvl[0],rank[0]['xp'])}
+        your_rank = {'name':"__"+await self.translate(ctx.channel,"xp","top-your")+"__", 'value':"**#{} |** `lvl {}` **|** `xp {}`".format(rank[0]['rank'],lvl[0],rank[0]['xp'])}
         if ctx.channel.permissions_for(ctx.guild.me).embed_links:
-            emb = self.bot.cogs['EmbedCog'].Embed(title=await self.translate(ctx.guild,'xp','top-title-1'),fields=[{'name':f_name,'value':"\n".join(txt)},your_rank],color=self.embed_color,author_icon=self.bot.user.avatar_url_as(format='png')).create_footer(ctx.author)
+            emb = self.bot.cogs['EmbedCog'].Embed(title=await self.translate(ctx.channel,'xp','top-title-1'),fields=[{'name':f_name,'value':"\n".join(txt)},your_rank],color=self.embed_color,author_icon=self.bot.user.avatar_url_as(format='png')).create_footer(ctx.author)
             await ctx.send(embed=emb.discord_embed())
         else:
             await ctx.send(f_name+"\n\n"+'\n'.join(txt))

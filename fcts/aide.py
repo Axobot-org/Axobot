@@ -86,29 +86,29 @@ If the bot can't send the new command format, it will try to send the old one.""
                 else:
                     command = self.bot.all_commands.get(name)
                     if command is None:
-                        await destination.send(str(await self.translate(ctx.guild,"aide","cmd-not-found")).format(name))
+                        await destination.send(str(await self.translate(ctx.channel,"aide","cmd-not-found")).format(name))
                         return
                     pages = await self.cmd_help(ctx,command)
             else:  #nom de sous-commande ?
                 name = self._mention_pattern.sub(repl, commands[0])
                 command = self.bot.all_commands.get(name)
                 if command is None:
-                    await destination.send(str(await self.translate(ctx.guild,"aide","cmd-not-found")).format(name))
+                    await destination.send(str(await self.translate(ctx.channel,"aide","cmd-not-found")).format(name))
                     return
                 for key in commands[1:]:
                     try:
                         key = self._mention_pattern.sub(repl, key)
                         command = command.all_commands.get(key)
                         if command is None:
-                            await destination.send(str(await self.translate(ctx.guild,"aide","subcmd-not-found")).format(key))
+                            await destination.send(str(await self.translate(ctx.channel,"aide","subcmd-not-found")).format(key))
                             return
                     except AttributeError:
-                        await destination.send(str(await self.translate(ctx.guild,"aide","no-subcmd")).format(command))
+                        await destination.send(str(await self.translate(ctx.channel,"aide","no-subcmd")).format(command))
                         return
                 pages = await self.cmd_help(ctx,command)
 
             me = destination.me if type(destination)==discord.DMChannel else destination.guild.me
-            ft = await self.translate(ctx.guild,"aide","footer")
+            ft = await self.translate(ctx.channel,"aide","footer")
             prefix = await self.bot.get_prefix(ctx.message)
             if type(prefix)==list:
                 prefix = prefix[0]
@@ -158,7 +158,7 @@ If the bot can't send the new command format, it will try to send the old one.""
                 modhelp += "\n"+temp
             else:
                 otherhelp += "\n"+temp
-        tr = await self.translate(ctx.guild,"aide","mods")
+        tr = await self.translate(ctx.channel,"aide","mods")
         if len(modhelp+otherhelp)<1900:
             return ["__• **{}**__\n{}".format(tr[0],modhelp) + "\n\n__• **{}**__\n{}".format(tr[1],otherhelp)]
         else:
@@ -172,7 +172,7 @@ If the bot can't send the new command format, it will try to send the old one.""
         pages = list()
         cog_name = cog.__class__.__name__
         if description == None:
-            description = await self.translate(ctx.guild,"aide","no-desc-cog")
+            description = await self.translate(ctx.channel,"aide","no-desc-cog")
         for cmd in sorted([c for c in self.bot.commands],key=self.sort_by_name):
             try:
                 if (await cmd.can_run(ctx))==False or cmd.hidden==True or cmd.enabled==False or cmd.cog_name != cog_name:
@@ -195,7 +195,7 @@ If the bot can't send the new command format, it will try to send the old one.""
     
     async def cmd_help(self,ctx,cmd):
         """Create pages for a command explanation"""
-        desc = cmd.description if cmd.description!=None else str(await self.translate(ctx.guild,"aide","no-desc-cmd"))
+        desc = cmd.description if cmd.description!=None else str(await self.translate(ctx.channel,"aide","no-desc-cmd"))
         if desc=='':
             desc = cmd.help
         prefix = await self.bot.get_prefix(ctx.message)
@@ -203,7 +203,7 @@ If the bot can't send the new command format, it will try to send the old one.""
             prefix = prefix[0]
         syntax = cmd.qualified_name + "** " + cmd.signature
         if type(cmd)==commands.core.Group:
-            subcmds = "\n\n__{}__".format(str(await self.translate(ctx.guild,"keywords","subcmds")).capitalize())
+            subcmds = "\n\n__{}__".format(str(await self.translate(ctx.channel,"keywords","subcmds")).capitalize())
             sublist = list()
             for x in sorted(cmd.all_commands.values(),key=self.sort_by_name):
                 try:
@@ -263,7 +263,7 @@ If the bot can't send the new command format, it will try to send the old one.""
                         await destination.send(bot.command_not_found.format(key))
                         return
                 except AttributeError:
-                    await destination.send(str(await self.translate(ctx.guild,"aide","no-subcmd")).format(command))
+                    await destination.send(str(await self.translate(ctx.channel,"aide","no-subcmd")).format(command))
                     return
 
             pages = await bot.formatter.format_help_for(ctx, command)

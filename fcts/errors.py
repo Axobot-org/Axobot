@@ -43,7 +43,7 @@ class ErrorsCog(commands.Cog):
             if await self.bot.cogs['AdminCog'].check_if_admin(ctx):
                 await ctx.reinvoke()
                 return
-            await ctx.send(str(await self.translate(ctx.guild,'errors','cooldown')).format(round(error.retry_after,2)))
+            await ctx.send(str(await self.translate(ctx.channel,'errors','cooldown')).format(round(error.retry_after,2)))
             return
         elif isinstance(error,(commands.BadArgument,commands.BadUnionArgument)):
             # Could not convert "limit" into int. OR Converting to "int" failed for parameter "number".
@@ -51,33 +51,33 @@ class ErrorsCog(commands.Cog):
             if r==None:
                 r = re.search(r'Converting to \"(?P<type>[^\"]+)\" failed for parameter \"(?P<arg>[^.\n]+)\"',str(error))
             if r!=None:
-                return await ctx.send(str(await self.translate(ctx.guild,'errors','badarguments')).format(r.group('arg'),r.group('type')))
+                return await ctx.send(str(await self.translate(ctx.channel,'errors','badarguments')).format(r.group('arg'),r.group('type')))
             # Member "Z_runner" not found
             r = re.search(r'Member \"([^\"]+)\" not found',str(error))
             if r!=None:
-                return await ctx.send(str(await self.translate(ctx.guild,'errors','membernotfound')).format(r.group(1)))
+                return await ctx.send(str(await self.translate(ctx.channel,'errors','membernotfound')).format(r.group(1)))
             # User "Z_runner" not found
             r = re.search(r'User \"([^\"]+)\" not found',str(error))
             if r!=None:
-                return await ctx.send(str(await self.translate(ctx.guild,'errors','usernotfound')).format(r.group(1)))
+                return await ctx.send(str(await self.translate(ctx.channel,'errors','usernotfound')).format(r.group(1)))
             # Role "Admin" not found
             r = re.search(r'Role \"([^\"]+)\" not found',str(error))
             if r!=None:
-                return await ctx.send(str(await self.translate(ctx.guild,'errors','rolenotfound')).format(r.group(1)))
+                return await ctx.send(str(await self.translate(ctx.channel,'errors','rolenotfound')).format(r.group(1)))
              # Role "Admin" not found
             r = re.search(r'Colour \"([^\"]+)\" is invalid',str(error))
             if r!=None:
-                return await ctx.send(str(await self.translate(ctx.guild,'errors','invalidcolor')).format(r.group(1)))
+                return await ctx.send(str(await self.translate(ctx.channel,'errors','invalidcolor')).format(r.group(1)))
             # Invalid duration: 2d
             r = re.search(r'Invalid duration: ([^\" ]+)',str(error))
             if r != None:
-                return await ctx.send(str(await self.translate(ctx.guild,'errors','duration')).format(r.group(1)))
+                return await ctx.send(str(await self.translate(ctx.channel,'errors','duration')).format(r.group(1)))
             print('errors -',error)
         elif isinstance(error,commands.MissingRequiredArgument):
-            await ctx.send(str(await self.translate(ctx.guild,'errors','missingargument')).format(error.param.name,random.choice([':eyes:','',':confused:',':thinking:',''])))
+            await ctx.send(str(await self.translate(ctx.channel,'errors','missingargument')).format(error.param.name,random.choice([':eyes:','',':confused:',':thinking:',''])))
             return
         elif isinstance(error,commands.DisabledCommand):
-            await ctx.send(str(await self.translate(ctx.guild,'errors','disabled')).format(ctx.invoked_with))
+            await ctx.send(str(await self.translate(ctx.channel,'errors','disabled')).format(ctx.invoked_with))
             return
         else:
             try:

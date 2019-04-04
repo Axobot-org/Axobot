@@ -24,13 +24,23 @@ class LangCog(discord.ext.commands.Cog):
         """Renvoie le texte en fonction de la langue"""
         if type(serverID) == discord.Guild:
             serverID = serverID.id
-        if isinstance(serverID,(type(None),discord.DMChannel)) or not self.bot.database_online:
+            print(0)
+        elif isinstance(serverID,discord.TextChannel):
+            serverID = serverID.guild
+            print(1)
+        if not self.bot.database_online or serverID==None:
             lang_opt = self.bot.cogs['ServerCog'].default_language
+            print(2)
+        elif isinstance(serverID,(discord.DMChannel,discord.GroupChannel)):
+            lang_opt = 'en'
+            print(3)
         elif str(serverID) in self.serv_opts.keys():
+            print(4)
             lang_opt = self.serv_opts[str(serverID)]
             #print("Ex langage:",lang_opt)
             #print(self.serv_opts)
         else:
+            print(5)
             conf_lang = self.bot.cogs["ServerCog"].conf_lang
             lang_opt = await conf_lang(serverID,"language","scret-desc")
             self.serv_opts[str(serverID)] = lang_opt
