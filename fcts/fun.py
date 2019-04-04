@@ -557,7 +557,7 @@ You can specify a verification limit by adding a number in argument"""
                 except Exception as e:
                     await self.bot.cogs['ErrorsCog'].on_error(e,ctx)
         await self.bot.cogs['UtilitiesCog'].suppr(ctx.message)
-        await self.bot.debug(await self.bot.cogs['TimeCog'].date(datetime.datetime.now(),digital=True)+" Vote de {} : {}".format(ctx.author,ctx.message.content))
+        await self.bot.log.debug(await self.bot.cogs['TimeCog'].date(datetime.datetime.now(),digital=True)+" Vote de {} : {}".format(ctx.author,ctx.message.content))
 
 
     async def check_suggestion(self,message):
