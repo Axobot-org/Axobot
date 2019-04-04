@@ -387,7 +387,16 @@ class AdminCog(commands.Cog):
         cmds = self.bot.commands
         obj = await self.bot.cogs['UtilitiesCog'].set_find(cmds,cmd)
         if obj != None:
-            await ctx.send("```py\n{}\n```".format(inspect.getsource(obj.callback)))
+            code = inspect.getsource(obj.callback)
+            if len(code)>1950:
+                liste = str()
+                for line in code.split('\n'):
+                    if len(liste+"\n"+line)>1950:
+                        await ctx.send("```py\n{}\n```".format(liste))
+                        liste = str()
+                    liste += '\n'+line
+            else:
+                await ctx.send("```py\n{}\n```".format(code))
         else:
             await ctx.send("Commande `{}` introuvable".format(cmd))
     
