@@ -63,7 +63,7 @@ class XPCog(commands.Cog):
 
     async def send_levelup(self,msg,lvl):
         """Envoie le message de levelup"""
-        if not msg.channel.permissions_for(msg.guild.me).send_messages:
+        if ctx.guild!=None and not msg.channel.permissions_for(msg.guild.me).send_messages:
             return
         text = await self.bot.cogs['ServerCog'].find_staff(msg.guild.id,'levelup_msg')
         if text==None or len(text)==0:
@@ -329,7 +329,7 @@ class XPCog(commands.Cog):
             xp = xp[0]['xp']
             ranks_nb = await self.bdd_get_nber()
             rank = (await self.bdd_get_rank(user.id))[0]['rank']
-            if ctx.channel.permissions_for(ctx.guild.me).attach_files:
+            if ctx.guild==None or ctx.channel.permissions_for(ctx.guild.me).attach_files:
                 await self.send_card(ctx,user,xp,rank,ranks_nb)
             elif ctx.channel.permissions_for(ctx.guild.me).embed_links:
                 await self.send_embed(ctx,user,xp,rank,ranks_nb)
@@ -402,7 +402,7 @@ class XPCog(commands.Cog):
         rank = await self.bdd_get_rank(ctx.author.id)
         lvl = await self.calc_level(rank[0]['xp'])
         your_rank = {'name':"__"+await self.translate(ctx.channel,"xp","top-your")+"__", 'value':"**#{} |** `lvl {}` **|** `xp {}`".format(rank[0]['rank'],lvl[0],rank[0]['xp'])}
-        if ctx.channel.permissions_for(ctx.guild.me).embed_links:
+        if ctx.guild==None or ctx.channel.permissions_for(ctx.guild.me).embed_links:
             emb = self.bot.cogs['EmbedCog'].Embed(title=await self.translate(ctx.channel,'xp','top-title-1'),fields=[{'name':f_name,'value':"\n".join(txt)},your_rank],color=self.embed_color,author_icon=self.bot.user.avatar_url_as(format='png')).create_footer(ctx.author)
             await ctx.send(embed=emb.discord_embed())
         else:

@@ -198,7 +198,7 @@ You can specify a verification limit by adding a number in argument"""
                 liste += l3
             txt = "- "+"\n- ".join(sorted(liste))
             title = str(await self.translate(ctx.channel,"fun","blame-0")).format(ctx.author)
-            if ctx.channel.permissions_for(ctx.guild.me).embed_links:
+            if ctx.guild==None or ctx.channel.permissions_for(ctx.guild.me).embed_links:
                 emb = self.bot.cogs["EmbedCog"].Embed(title=title,desc=txt,color=self.bot.cogs["HelpCog"].help_color).update_timestamp()
                 await ctx.send(embed=emb.discord_embed())
             else:
@@ -472,7 +472,7 @@ You can specify a verification limit by adding a number in argument"""
 
         If you want to use quotation marks in the texts, it is possible to escape them thanks to the backslash (`\\"`)
         """
-        if not ctx.channel.permissions_for(ctx.guild.me).embed_links:
+        if ctx.guild!=None and not ctx.channel.permissions_for(ctx.guild.me).embed_links:
             return await ctx.send(await self.translate(ctx.channel,"fun","no-embed-perm"))
         arguments = arguments.replace("\\\"","|¬017")
         arguments = arguments.split("\"")

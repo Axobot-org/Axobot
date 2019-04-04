@@ -544,11 +544,15 @@ Cette option affecte tous les serveurs"""
         liste = liste[:number]
         title = "Liste des {} meilleures idées (sur {}) :".format(len(liste),count)
         text = str()
+        if ctx.guild!=None:
+            color = ctx.guild.me.color
+        else:
+            color = discord.Colour(8311585)
         for x in liste:
             text += "\n**[{} - {}]**  {} ".format(x[3],x[4],x[2])
         try:
             if ctx.guild==None or ctx.channel.permissions_for(ctx.guild.me).embed_links:
-                emb = ctx.bot.cogs['EmbedCog'].Embed(title=title,desc=text,color=ctx.guild.me.color).update_timestamp()
+                emb = ctx.bot.cogs['EmbedCog'].Embed(title=title,desc=text,color=color).update_timestamp()
                 return await bot_msg.edit(content=None,embed=emb.discord_embed())
             await bot_msg.edit(content=title+text)
         except discord.HTTPException:

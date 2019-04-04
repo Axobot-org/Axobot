@@ -685,7 +685,7 @@ You must be an administrator of this server to use this command."""
     async def pin_msg(self,ctx,msg:int):
         """Pin a message
 ID corresponds to the Identifier of the message"""
-        if not ctx.channel.permissions_for(ctx.guild.me).manage_messages:
+        if ctx.guild!=None and not ctx.channel.permissions_for(ctx.guild.me).manage_messages:
             await ctx.send(await self.translate(ctx.channel,"modo","cant-pin"))
             return
         try:
