@@ -751,7 +751,7 @@ class RssCog(commands.Cog):
             return await self.translate(guild,"rss","web-invalid")
         published = None
         for i in ['published_parsed','published','updated_parsed']:
-            if i in feeds.entries[0].keys():
+            if i in feeds.entries[0].keys() and feeds.entries[0][i]!=None:
                 published = i
                 break
         if published!=None and len(feeds.entries)>1:
