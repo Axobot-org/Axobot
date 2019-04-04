@@ -453,17 +453,14 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
 
     @find_main.command(name="user")
     async def find_user(self,ctx,*,user:discord.User):
-        liste = list()
-        languages = list()
+        servers_in = list()
+        owners = list()
         for s in self.bot.guilds:
             if user in s.members:
-                liste.append(s)
-                lang = await ctx.bot.cogs["ServerCog"].find_staff(s.id,'language')
-                if lang==None:
-                    lang = 0
-                languages.append(lang)
+                servers_in.append(s.name)
+                if s.owner==user:
+                    owners.append(s.name)
         disp_lang = ""
-        owners = ", ".join([x.name for x in liste if x.owner==user])
         xp_card = await self.bot.cogs['UtilitiesCog'].get_xp_style(user)
         perks = list()
         if await self.bot.cogs["AdminCog"].check_if_admin(user):
@@ -476,16 +473,16 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
             perks.append("premium")
         async with aiohttp.ClientSession() as session:
             async with session.get('https://discordbots.org/api/bots/486896267788812288/check?userId={}'.format(user.id),headers={'Authorization':str(self.bot.dbl_token)}) as r:
-                #r = requests.get('https://discordbots.org/api/bots/486896267788812288/check?userId={}'.format(user.id),headers={'Authorization':str(self.bot.dbl_token)})
                 js = await r.json()
                 if js['voted']:
                     r = await self.translate(ctx.guild,'keywords','oui')
                 else:
                     r = await self.translate(ctx.guild,'keywords','non')
-        for e in range(len(ctx.bot.cogs['LangCog'].languages)):
-            if languages.count(e)>0:
-                disp_lang += ctx.bot.cogs['LangCog'].languages[e]+" ("+str(round(languages.count(e)/len(languages)*100))+"%)  "
-        await ctx.send(str(await self.translate(ctx.guild,"find","user-1")).format(name=user,id=user.id,servers=", ".join([x.name for x in liste]),own=owners,lang=disp_lang,vote=r,card=xp_card,rangs=" - ".join(perks)))
+                r = r.capitalize()
+        disp_lang = str()
+        for lang in await self.bot.cogs['UtilitiesCog'].get_languages(user):
+            disp_lang += '{} ({}%)   '.format(lang[0],round(lang[1]*100))
+        await ctx.send(str(await self.translate(ctx.guild,"find","user-1")).format(name=user,id=user.id,servers=", ".join(servers_in),own=", ".join(owners),lang=disp_lang,vote=r,card=xp_card,rangs=" - ".join(perks)))
 
     @find_main.command(name="guild",aliases=['server'])
     async def find_guild(self,ctx,*,guild):
