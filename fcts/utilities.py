@@ -1,4 +1,4 @@
-import discord, sys, traceback, importlib, datetime, random, re, asyncio
+import discord, sys, traceback, importlib, datetime, random, re, asyncio, operator
 from fcts import args
 from discord.ext import commands
 
@@ -365,6 +365,26 @@ class UtilitiesCog(commands.Cog):
             if await self.has_rainbow_card(user):
                 liste.append('rainbow')
         return sorted(liste2)+sorted(liste)
+
+    async def get_languages(self,user,limit=0):
+        """Get the most used languages of an user
+        If limit=0, return every languages"""
+        languages = list()
+        disp_lang = list()
+        for s in self.bot.guilds:
+            if user in s.members:
+                lang = await self.bot.cogs["ServerCog"].find_staff(s.id,'language')
+                if lang==None:
+                    lang = 0
+                languages.append(lang)
+        for e in range(len(self.bot.cogs['LangCog'].languages)):
+            if languages.count(e)>0:
+                disp_lang.append((self.bot.cogs['LangCog'].languages[e],round(languages.count(e)/len(languages),2)))
+        disp_lang.sort(key = operator.itemgetter(1))
+        if limit==0:
+            return disp_lang
+        else:
+            return disp_lang[:limit]
 
 
 def setup(bot):
