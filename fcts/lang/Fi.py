@@ -52,27 +52,27 @@ cases={"no-user":"Tämä on mahdotonta löytää tämä käyttäjä. :eyes:",
 
 events={'mp-adv':"Sinä varmaan yrität kutsua minut tähän servuun? Jos tämä on oikein, en voi liittyä helpolla kutsu linkillä. Adminin täytyy käyttää minun omaa kutsu linkkiä, täällä:<https://bot.discord.io/zbot> :wink:"}
 
-errors={"cooldown":"You are on cooldown for this command :confused: Please wait {} more seconds...",
-"badarguments":"Oops, unable to convert the `{c[3]}` parameter to \"{c[1]}\" type :confused:",
-"missingargument":"Oops, the argument \"{}\" is missing {}",
-"membernotfound":"Unable to find the member `{}` :confused:",
-"usernotfound":"Unable to find the user `{}` :confused:",
-"disabled":"The command {} is disabled :confused:",
-"duration":"The duration `{}` is invalid",
-"rolenotfound":"Unable to find the role `{0}`",
-"invalidcolor":"Color `{0}` invalid"}
+errors={"cooldown":"Olet jäähyllä tältä commandilta :confused: Please wait {} more seconds...",
+"badarguments":"Upsis, on mahdotonta muuntaa `{c[3]}` paramittarin\"{c[1]}\" tyyppiä :confused:",
+"missingargument":"Upsis, argumentti \"{}\" puuttuu {}",
+"membernotfound":"On mahdotonta löytää käyttäjä `{}` :confused:",
+"usernotfound":"On mahdotonta löytää käyttäjä `{}` :confused:",
+"disabled":"Commandi {} on poissa käytöstä :confused:",
+"duration":"Aika `{}` on epäselvä",
+"rolenotfound":"On mahdotonta löytää rooli `{0}`",
+"invalidcolor":"Väri `{0}` epäselvä"}
 
-find={"user-0":"name: {}\nID: {}",
-"user-1":"Name: {name}\nID: {id}\nPerks: {rangs}\nServers: {servers}\nOwner of: {own}\nLanguages: {lang}\nVoted? {vote}\nXP card: {card}",
-"user-2":"User not found",
-"guild-0":"Server not found",
-"guild-1":"Name: {}\nID: {}\nOwner: {} ({})\nMembers: {} (including {} bots)\nLanguage: {}\nPrefix: `{}`",
-"chan-0":"Channel not found",
-"chan-1":"Name : {}\nID: {}\nServer: {} ({})",
-"help":"This command allows to find a server or a salon among all the servers on which is the bot. You can also search for a Discord user's information, no matter if he shares a server with me!\
-The syntax is `!find <user|channel|guild> <ID>`"}
+find={"user-0":"nimi: {}\nID: {}",
+"user-1":"Nimi: {name}\nID: {id}\nPerks: {rangs}\nServers: {servers}\nOwner of: {own}\nLanguages: {lang}\nVoted? {vote}\nXP card: {card}",
+"user-2":"Käyttäjää ei löytynyt",
+"guild-0":"Serveriä ei löytynyt",
+"guild-1":"Nimi: {}\nID: {}\nOmistaja: {} ({})\nKäyttäjät: {} Mukaan lukien {} bottia)\nKieli: {}\nEtuliite (prefix): `{}`",
+"chan-0":"kanavaa ei löytynyt",
+"chan-1":"Nimi : {}\nID: {}\nServeri: {} ({})",
+"help":"Tämä commandi hyväksyy löytämään serverin tai salongin kaikista servereistä missä botti on. Voit myös etsiä Discord käyttäjän tiedot, siltikin vaikka jos hän ei ole minun kanssani serverissä!\
+Syntaksi tälle on `!find <user|channel|guild> <ID>`"}
 
-fun={"count-0":"Counting in progress...",
+fun={"count-0":"Laskeminen on kesken...",
     "count-1":"On the last {} posts, you have posted {} messages ({}%)",
     "count-2":"You wanna blow up Discord! {e} For obvious performance reasons, I will impose a limit of {l} messages.",
     "count-3":"Oops, I'm unable to read this channel history. Please check my permissions...",
