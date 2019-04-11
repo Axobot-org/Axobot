@@ -795,7 +795,7 @@ class RssCog(commands.Cog):
 
 
     async def create_id(self,channelID,guildID,Type,link):
-        numb = str(guildID + channelID + len(link))[:14] + str(random.randint(0,99))
+        numb = str(round(time.time()/2)) + str(random.randint(0,99))
         if Type == 'yt':
             numb = int('10'+numb)
         elif Type == 'tw':
