@@ -81,7 +81,7 @@ class ErrorsCog(commands.Cog):
             return
         else:
             try:
-                await ctx.send("`ERROR:` "+str(error))
+                await ctx.send("`ERROR:` {}".format(str(error)))
             except:
                 self.bot.log.info("[on_cmd_error] Can't send error on channel {}".format(ctx.channel.id))
         # All other Errors not returned come here... And we can just print the default TraceBack.
@@ -104,7 +104,7 @@ class ErrorsCog(commands.Cog):
             msg = """```python
 Traceback (most recent call last):
 {T} {S}
-```""".format(T=" ".join(traceback.format_tb(sysexc[2])),S=s+' : '+str(sysexc[1]))
+```""".format(T=" ".join(traceback.format_tb(sysexc[2])),S='{} : {}'.format(s,str(sysexc[1])))
             if ctx == None:
                 await self.senf_err_msg("Internal Error\n"+msg)
             elif ctx.guild == None:
