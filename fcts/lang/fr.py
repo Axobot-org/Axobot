@@ -232,7 +232,7 @@ mc={"contact-mail":"Si vous constatez une erreur dans les informations données,
     }
 
 modo={"slowmode-0":"Le slowmode est désormais désactivé dans ce salon.",
-    "slowmode-1":"Impossible de mettre une fréquence supérieure à deux minutes",
+    "slowmode-1":"Impossible de mettre une fréquence supérieure à six heures",
     "slowmode-2":"Le channel {} est désormais en slowmode.\nAttendez {} secondes avant d'envoyer un message.",
     "slowmode-3":"Cette valeur est invalide",
     "slowmode-info":"Le slowmode de ce salon est actuellement à {} secondes",

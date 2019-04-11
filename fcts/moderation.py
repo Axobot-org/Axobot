@@ -22,7 +22,8 @@ class ModeratorCog(commands.Cog):
     @commands.cooldown(1, 3, commands.BucketType.guild)
     @commands.check(checks.can_slowmode)
     async def slowmode(self,ctx,time=None):
-        """Keep your chat cool"""
+        """Keep your chat cool
+        Slowmode works up to one message every 6h (21600s)"""
         if not ctx.channel.permissions_for(ctx.guild.me).manage_channels:
             await ctx.send(await self.translate(ctx.guild.id,"modo","cant-slowmode"))
             return
@@ -31,15 +32,17 @@ class ModeratorCog(commands.Cog):
         if time.isnumeric():
             time = int(time)
         if time == 'off' or time==0:
-            await ctx.bot.http.request(discord.http.Route('PATCH', '/channels/{cid}', cid=ctx.channel.id), json={'rate_limit_per_user':0})
+            #await ctx.bot.http.request(discord.http.Route('PATCH', '/channels/{cid}', cid=ctx.channel.id), json={'rate_limit_per_user':0})
+            await ctx.channel.edit(slowmode_delay=0)
             message = await self.translate(ctx.guild.id,"modo","slowmode-0")
             log = str(await self.translate(ctx.guild.id,"logs","slowmode-disabled")).format(channel=ctx.channel.mention)
             await self.bot.cogs["Events"].send_logs_per_server(ctx.guild,"slowmode",log,ctx.author)
         elif type(time)==int:
-            if time>120:
+            if time>21600:
                 message = await self.translate(ctx.guild.id,"modo","slowmode-1")
             else:
-                await ctx.bot.http.request(discord.http.Route('PATCH', '/channels/{cid}', cid=ctx.channel.id), json={'rate_limit_per_user':time})
+                #await ctx.bot.http.request(discord.http.Route('PATCH', '/channels/{cid}', cid=ctx.channel.id), json={'rate_limit_per_user':time})
+                await ctx.channel.edit(slowmode_delay=time)
                 message = str(await self.translate(ctx.guild.id,"modo","slowmode-2")).format(ctx.channel.mention,time)
                 log = str(await self.translate(ctx.guild.id,"logs","slowmode-enabled")).format(channel=ctx.channel.mention,seconds=time)
                 await self.bot.cogs["Events"].send_logs_per_server(ctx.guild,"slowmode",log,ctx.author)

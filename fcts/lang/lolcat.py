@@ -232,7 +232,7 @@ mc={"contact-mail":"If U notis an errrror in da info providd, plz contact my per
       }
 
 modo={"slowmode-0":"Teh very-cold-mode is now disabld in this nize place.",
-    "slowmode-1":"Impossible to set a frequency higher than two minutes",
+    "slowmode-1":"Impossible to set a frequency higher than 6 hourz",
     "slowmode-2":"The {} channl iz naw in very-cold-mode. Wait {} secondz be4 sending a mesage.",
     "slowmode-3":"Nope, dis valu iz invalid",
     "slowmode-info":"Da slow mode ov this chat iz currently at {}s",
