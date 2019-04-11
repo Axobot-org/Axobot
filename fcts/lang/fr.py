@@ -146,7 +146,8 @@ keywords={"depuis":"depuis",
           "aucune":"aucune",
           "membres":"membres",
           "subcmds":"sous-commandes",
-          "ghost":"Fantôme"
+          "ghost":"Fantôme",
+          'unknown':'Inconnu'
           }
 
 kill={"list":["Oh toi, tu vas mourir !",

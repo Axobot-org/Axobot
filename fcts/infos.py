@@ -377,8 +377,9 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
         embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","guild-10"), value = str(int(guild.afk_timeout/60))+" minutes")
         embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","guild-8"), value=a2f.capitalize())
         embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","guild-9"), value=str(await self.translate(guild.id,"keywords",str(guild.verification_level))).capitalize())
-        if guild.splash_url != '':
-            embed.add_field(name="Splash url", value=guild.splash_url)
+        a = str(guild.splash_url_as(format='png'))
+        if str(guild.splash_url_as(format='png')) != '':
+            embed.add_field(name="Splash url", value=str(guild.splash_url_as(format='png')))
         try:
             if ctx.guild==guild:
                 roles = [x.mention for x in guild.roles if len(x.members)>1][1:]
@@ -406,7 +407,7 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
 
         embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","inv-0"), value=invite.url,inline=True)
         embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","role-0"), value=str(invite.id))
-        embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","inv-1"), value=str(invite.inviter))
+        embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","inv-1"), value=str(invite.inviter) if invite.inviter!= None else await self.translate(ctx.guild,'keywords','unknown'))
         if invite.max_uses!=None and invite.uses!=None:
             if invite.max_uses == 0:
                 uses = "{}/∞".format(invite.uses)
@@ -415,10 +416,10 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
             embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","inv-2"), value=uses)
         if invite.max_age!=None:
             embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","inv-3"), value=str(invite.max_age) if invite.max_age != 0 else "∞")
-        if type(invite.channel) == discord.abc.GuildChannel:
-            embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","guild-0"), value=str(invite.channel.guild))
-            embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","textchan-5"), value=str(invite.channel))
-            embed.set_thumbnail(url=invite.channel.guild.icon_url_as(format='png'))
+        if isinstance(invite.channel,(discord.PartialInviteChannel,discord.TextChannel)):
+            embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","guild-0"), value=str(invite.guild.name))
+            embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","textchan-5"), value="#"+str(invite.channel.name))
+            embed.set_thumbnail(url=invite.guild.icon_url_as(format='png'))
         if invite.created_at != None:
             embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","member-1"), value = "{} ({} {})".format(await self.timecog.date(invite.created_at,lang=lang,year=True),since,await self.timecog.time_delta(invite.created_at,datetime.datetime.now(),lang=lang,year=True,precision=0,hour=False)), inline=False)
         await ctx.send(embed=embed)

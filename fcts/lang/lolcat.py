@@ -146,7 +146,8 @@ keywords={"depuis":"sinze",
           "aucune":"none",
           "membres":"memberz",
           "subcmds":"subcommands",
-          "ghost":"Goast"
+          "ghost":"Goast",
+          'unknown':'No known'
           }
 
 kill={"list":["Hi ho ! Oh u, u gonna die!",
