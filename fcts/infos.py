@@ -504,7 +504,8 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
         else:
             lang = ctx.bot.cogs['LangCog'].languages[lang]
         pref = self.bot.cogs['UtilitiesCog'].find_prefix(s)
-        await ctx.send(str(await self.translate(ctx.channel,"find","guild-1")).format(s.name,s.id,s.owner,s.owner.id,len(s.members),bots,lang,pref))
+        rss_numb = len(await self.bot.cogs['RssCog'].get_guild_flows(s.id))
+        await ctx.send(str(await self.translate(ctx.channel,"find","guild-1")).format(s.name,s.id,s.owner,s.owner.id,len(s.members),bots,lang,pref,rss_numb))
 
     @find_main.command(name='channel')
     async def find_channel(self,ctx,ID:int):
