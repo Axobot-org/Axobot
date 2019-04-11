@@ -7,6 +7,7 @@ class MorpionCog(commands.Cog):
         self.bot = bot
         self.entrees_valides = [str(x) for x in range(1,10)]
         self.file = 'morpion'
+        self.in_game = list()
         self.compositions_gagnantes = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]]
         try:
             self.translate = bot.cogs['LangCog'].tr
@@ -77,6 +78,9 @@ class MorpionCog(commands.Cog):
 The bot plays in red, the user in blue.
 """
         try:
+            if ctx.author.id in self.in_game:
+                return await ctx.send(await self.translate(ctx.guild,'morpion','already-playing'))
+            self.in_game.append(ctx.author.id)
             grille = [x for x in range(1,10)]
             tour = await self.qui_commence()
             u_begin = await self.translate(ctx.channel,'morpion','user-begin') if tour == True else await self.translate(ctx.channel,'morpion','bot-begin')
@@ -96,6 +100,7 @@ The bot plays in red, the user in blue.
                         msg = await self.bot.wait_for('message', check=check,timeout=50)
                     except asyncio.TimeoutError:
                         await ctx.channel.send(await self.translate(ctx.channel,'morpion','too-late'))
+                        self.in_game.remove(ctx.author.id)
                         return
                     saisie = msg.content
                     if msg.content in self.entrees_valides:
@@ -137,6 +142,7 @@ The bot plays in red, the user in blue.
                     break
             ###
             await ctx.send(await self.afficher_grille(grille)+'\n'+resultat.format(ctx.author.mention))
+            self.in_game.remove(ctx.author.id)
         except Exception as e:
             await self.bot.cogs['ErrorsCog'].on_command_error(ctx,e)
 

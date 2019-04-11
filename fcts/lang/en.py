@@ -302,7 +302,8 @@ morpion={'user-begin':'{}, you begin!',
         'pion-1':"There's already a pawn on that cell!",
         'pion-2':'Invalid input case',
         'win-1':"Well done, {} won!",
-        'win-2':"I won! End of the game!"}
+        'win-2':"I won! End of the game!",
+        'already-playing':"You already have a game in progress!"}
 
 perms={"perms-0":"Member/role {} not found",
         "perms-1":"**'{}' permissions:**\n\n"

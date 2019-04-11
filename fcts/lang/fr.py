@@ -302,7 +302,8 @@ morpion={'user-begin':'{}, à toi de commencer !',
         'pion-1':'Il y a déjà un pion sur cette case !',
         'pion-2':'Case saisie invalide !',
         'win-1':"Bien joué, {} a gagné !",
-        'win-2':"J'ai gagné ! Fin du match !"}
+        'win-2':"J'ai gagné ! Fin du match !",
+        'already-playing':"Vous avez déjà une partie en cours !"}
 
 perms={"perms-0":"Le membre/rôle {} n'a pas été trouvé",
         "perms-1":"**Permission de '{}' :**\n\n"
