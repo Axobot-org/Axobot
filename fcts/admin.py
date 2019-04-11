@@ -239,7 +239,7 @@ class AdminCog(commands.Cog):
 
     @main_msg.command(name='reload')
     @commands.check(reloads.check_admin)
-    async def cog_reload(self, ctx, *, cog: str):
+    async def reload_cog(self, ctx, *, cog: str):
         """Recharge un module"""
         cogs = cog.split(" ")
         await self.bot.cogs["ReloadsCog"].reload_cogs(ctx,cogs)
