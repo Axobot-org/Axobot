@@ -204,8 +204,8 @@ class CasesCog(commands.Cog):
                 if u == None:
                     embed.set_author(name=str(user))
                 else:
-                    embed.set_author(name="Cases from "+str(u), url=u.avatar_url_as(format='png'), icon_url=u.avatar_url_as(format='png'))
-                embed.set_footer(text="Requested by {}".format(ctx.author), icon_url=ctx.author.avatar_url_as(format='png'))
+                    embed.set_author(name="Cases from "+str(u), url=u.avatar_url_as(format='png'), icon_url=str(u.avatar_url_as(format='png')))
+                embed.set_footer(text="Requested by {}".format(ctx.author), icon_url=str(ctx.author.avatar_url_as(format='png')))
                 if len(cases)>0:
                     l = await self.translate(ctx.guild.id,"current_lang","current")
                     for e,x in enumerate(cases):
