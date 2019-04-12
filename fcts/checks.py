@@ -50,3 +50,7 @@ async def can_see_banlist(ctx):
 async def can_pin_msg(ctx):
     """... if someone can pin a message"""
     return ctx.channel.permissions_for(ctx.author).manage_messages or await ctx.bot.cogs["AdminCog"].check_if_admin(ctx)
+
+async def can_manage_server(ctx):
+    """... if someone can manage the server"""
+    return ctx.channel.permissions_for(ctx.author).manage_guild or ctx.guild.id in ctx.bot.cogs['AdminCog'].god_mode
