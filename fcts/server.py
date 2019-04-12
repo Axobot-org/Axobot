@@ -8,7 +8,7 @@ from fcts import cryptage
 
 roles_options = ["clear","slowmode","mute","kick","ban","warn","say","gived_roles","muted_role"]
 bool_options = ["save_roles","enable_xp","anti_caps_lock","enable_fun","help_in_dm"]
-textchan_options = ["hunter","welcome_channel","bot_news","poll_channels","modlogs_channel"]
+textchan_options = ["hunter","welcome_channel","bot_news","poll_channels","modlogs_channel","noxp_channels"]
 vocchan_options = ["membercounter"]
 text_options = ["welcome","leave","levelup_msg"]
 prefix_options = ['prefix']
@@ -50,6 +50,7 @@ class ServerCog(commands.Cog):
                "modlogs_channel":"",
                "enable_xp":1,
                "levelup_msg":'',
+               "noxp_channels":'',
                "anti_caps_lock":1,
                "enable_fun":1,
                "prefix":'!',
@@ -406,6 +407,8 @@ class ServerCog(commands.Cog):
                 liste.append(str(c.id))
                 liste2.append(c.mention)
             await self.modify_server(ctx.guild.id,values=[(option,";".join(liste))],channel=ctx.channel)
+            if option=='noxp_channels':
+                self.bot.cogs['XPCog'].xp_channels_cache[ctx.guild.id] = [int(x) for x in liste]
             msg = await self.translate(ctx.guild.id,"server","change-textchan")
             await ctx.send(msg.format(option,", ".join(liste2)))
             await self.send_embed(ctx.guild,option,value)

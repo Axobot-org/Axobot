@@ -22,6 +22,7 @@ class XPCog(commands.Cog):
         self.xp_per_char = 0.11
         self.max_xp_per_msg = 60
         self.file = 'xp'
+        self.xp_channels_cache = dict()
         bot.add_listener(self.add_xp,'on_message')
         try:
             self.translate = bot.cogs['LangCog'].tr
@@ -38,6 +39,8 @@ class XPCog(commands.Cog):
         """Attribue un certain nombre d'xp à un message"""
         if msg.author.bot or msg.guild==None or not self.bot.xp_enabled:
             return
+        if not await self.check_noxp(msg):
+            return 
         if len(self.cache)==0:
             await self.bdd_load_cache()
         if msg.author.id in self.cache.keys():
@@ -60,10 +63,28 @@ class XPCog(commands.Cog):
         if 1 < (await self.calc_level(prev_points))[0] < new_lvl[0]:
             await self.send_levelup(msg,new_lvl)
 
+    async def check_noxp(self,msg):
+        """Check if this channel/user can get xp"""
+        if msg.guild == None:
+            return False
+        if msg.guild.id in self.xp_channels_cache.keys():
+            if msg.channel.id in self.xp_channels_cache[msg.guild.id]:
+                return False
+        else:
+            chans = await self.bot.cogs["ServerCog"].find_staff(msg.guild.id,'noxp_channels')
+            if chans != None:
+                chans = [int(x) for x in chans.split(';') if x.isnumeric()]
+                if msg.channel.id in chans:
+                    return False
+            else:
+                chans = []
+            self.xp_channels_cache[msg.guild.id] = chans
+        return True
+
 
     async def send_levelup(self,msg,lvl):
         """Envoie le message de levelup"""
-        if ctx.guild!=None and not msg.channel.permissions_for(msg.guild.me).send_messages:
+        if msg.guild!=None and not msg.channel.permissions_for(msg.guild.me).send_messages:
             return
         text = await self.bot.cogs['ServerCog'].find_staff(msg.guild.id,'levelup_msg')
         if text==None or len(text)==0:

@@ -438,7 +438,8 @@ server_desc={"prefix":"Préfixe actuel du bot : {}",
              "anti_raid":"Niveau de la protection anti-raid : {} \n*([Documentation](https://zbot.rtfd.io/en/latest/moderator.html#anti-raid))*",
              "vote_emojis":"Emojis utilisés pour les réactions de vote : {}",
              "help_in_dm":"Envoyer le message d'aide en message privés ? {}",
-             "muted_role":"Rôle utilisé pour rendre les gens muets : {}"}
+             "muted_role":"Rôle utilisé pour rendre les gens muets : {}",
+             "noxp_channels":"Salons où il est impossible d'obtenir de l'xp : {}"}
 
 stats_infos={"not-found":"Impossible de trouver {N}",
             "member-0":"Surnom",

@@ -438,7 +438,8 @@ server_desc={"prefix":"Currnt baot prfx: {}",
             "anti_raid":"Lev3l of anti-rayderz protect: {} \n*([Dowcumetaton](https://zbot.rtfd.io/en/latest/moderator.html#anti-raid))*",
             "vote_emojis":"Emojiz use 4 powll reacts: {}",
             "help_in_dm":"Sent help mess:a:ge on Prvte Msage? {}",
-            "muted_role":"Usd role 2 mute people : {}"}
+            "muted_role":"Usd role 2 mute people : {}",
+            "noxp_channels":"Chats where xp is for:b:idden: {}"}
 
 stats_infos={"not-found":"Unable 2 found {N}",
             "member-0":"Lttle nayme",
