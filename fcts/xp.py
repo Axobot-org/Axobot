@@ -1,4 +1,4 @@
-import discord, random, time, asyncio, io, imageio, importlib, re, os, operator, platform
+import discord, random, time, asyncio, io, imageio, importlib, re, os, operator, platform, typing
 from discord.ext import commands
 from math import ceil
 import numpy as np
@@ -202,35 +202,45 @@ class XPCog(commands.Cog):
         except Exception as e:
             await self.bot.cogs['ErrorsCog'].on_error(e,None)
 
-    async def bdd_get_top(self,top:int):
+    async def bdd_get_top(self,top:int,guild=None):
         try:
             cnx = self.bot.cnx
             cursor = cnx.cursor(dictionary = True)
             query = ("SELECT * FROM `{}` order by `xp` desc limit {}".format(self.table,top))
             cursor.execute(query)
             liste = list()
-            for x in cursor:
-                liste.append(x)
+            if guild==None:
+                liste = [x for x in cursor]
+            else:
+                ids = [x.id for x in guild.members]
+                liste = [x for x in cursor if x['userID'] in ids]
+            #for x in cursor:
+            #    liste.append(x)
             cursor.close()
             return liste
         except Exception as e:
             await self.bot.cogs['ErrorsCog'].on_error(e,None)
         
-    async def bdd_get_rank(self,userID:int):
+    async def bdd_get_rank(self,userID:int,guild:discord.Guild=None):
         """Get the rank of a user"""
         try:
             cnx = self.bot.cnx
             cursor = cnx.cursor(dictionary = True)
             query = ("SELECT `userID`,`xp`, @curRank := @curRank + 1 AS rank FROM `{}` p, (SELECT @curRank := 0) r WHERE `banned`='0' ORDER BY xp desc;".format(self.table))
             cursor.execute(query)
-            liste = list()
+            userdata = list()
+            i = 0
+            if guild!=None:
+                users = [x.id for x in guild.members]
             for x in cursor:
-                if x['userID'] != userID:
-                    continue
-                x['rank'] = round(x['rank'])
-                liste.append(x)
+                if (guild!=None and x['userID'] in users) or guild==None:
+                    i += 1
+                if x['userID']== userID:
+                    x['rank'] = i
+                    userdata = x
+                    break
             cursor.close()
-            return liste
+            return userdata
         except Exception as e:
             await self.bot.cogs['ErrorsCog'].on_error(e,None)
 
@@ -349,7 +359,7 @@ class XPCog(commands.Cog):
                 return await ctx.send(await self.translate(ctx.channel,'xp','2-no-xp'))
             xp = xp[0]['xp']
             ranks_nb = await self.bdd_get_nber()
-            rank = (await self.bdd_get_rank(user.id))[0]['rank']
+            rank = (await self.bdd_get_rank(user.id))['rank']
             if ctx.guild==None or ctx.channel.permissions_for(ctx.guild.me).attach_files:
                 await self.send_card(ctx,user,xp,rank,ranks_nb)
             elif ctx.channel.permissions_for(ctx.guild.me).embed_links:
@@ -392,15 +402,19 @@ class XPCog(commands.Cog):
     @commands.command(name='top')
     @commands.bot_has_permissions(send_messages=True)
     @commands.cooldown(5,60,commands.BucketType.user)
-    async def top(self,ctx,page:int=1):
+    async def top(self,ctx,page:typing.Optional[int]=1,Type:args.LeaderboardType='global'):
         """Get the list of the highest levels
         Each page has 20 users"""
-        max_page = ceil(len(self.cache)/20)
+        if Type=='global':
+            max_page = ceil(len(self.cache)/20)
+            ranks = await self.bdd_get_top(20*page)
+        elif Type=='guild':
+            ranks = await self.bdd_get_top(1000000,guild=ctx.guild)
+            max_page = ceil(len(ranks)/20)
         if page<1:
             return await ctx.send(await self.translate(ctx.channel,"xp",'low-page'))
         elif page>max_page:
             return await ctx.send(await self.translate(ctx.channel,"xp",'high-page'))
-        ranks = await self.bdd_get_top(20*page)
         ranks = ranks[(page-1)*20:]
         txt = list()
         i = (page-1)*20
@@ -420,11 +434,16 @@ class XPCog(commands.Cog):
             txt.append('{} • **{} |** `lvl {}` **|** `xp {}`'.format(i,"__"+user_name+"__" if user==ctx.author else user_name,l[0],u['xp']))
         f_name = str(await self.translate(ctx.channel,'xp','top-name')).format((page-1)*20+1,i,page,max_page)
         # author
-        rank = await self.bdd_get_rank(ctx.author.id)
-        lvl = await self.calc_level(rank[0]['xp'])
-        your_rank = {'name':"__"+await self.translate(ctx.channel,"xp","top-your")+"__", 'value':"**#{} |** `lvl {}` **|** `xp {}`".format(rank[0]['rank'],lvl[0],rank[0]['xp'])}
+        rank = await self.bdd_get_rank(ctx.author.id,ctx.guild if Type=='guild' else None)
+        lvl = await self.calc_level(rank['xp'])
+        your_rank = {'name':"__"+await self.translate(ctx.channel,"xp","top-your")+"__", 'value':"**#{} |** `lvl {}` **|** `xp {}`".format(rank['rank'],lvl[0],rank['xp'])}
+        # title
+        if Type=='guild':
+            t = await self.translate(ctx.channel,'xp','top-title-2')
+        else:
+            t = await self.translate(ctx.channel,'xp','top-title-1')
         if ctx.guild==None or ctx.channel.permissions_for(ctx.guild.me).embed_links:
-            emb = self.bot.cogs['EmbedCog'].Embed(title=await self.translate(ctx.channel,'xp','top-title-1'),fields=[{'name':f_name,'value':"\n".join(txt)},your_rank],color=self.embed_color,author_icon=self.bot.user.avatar_url_as(format='png')).create_footer(ctx.author)
+            emb = self.bot.cogs['EmbedCog'].Embed(title=t,fields=[{'name':f_name,'value':"\n".join(txt)},your_rank],color=self.embed_color,author_icon=self.bot.user.avatar_url_as(format='png')).create_footer(ctx.author)
             await ctx.send(embed=emb.discord_embed())
         else:
             await ctx.send(f_name+"\n\n"+'\n'.join(txt))

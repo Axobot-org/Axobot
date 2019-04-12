@@ -1,7 +1,7 @@
 import discord, re
 from discord.ext import commands
 
-class tempdelta(commands.converter.IDConverter):
+class tempdelta(commands.Converter):
     def __init__(self):
         pass
     
@@ -18,7 +18,7 @@ class tempdelta(commands.converter.IDConverter):
             raise commands.errors.BadArgument('Invalid duration: '+argument)
         return d
 
-class user(commands.converter.IDConverter):
+class user(commands.converter.UserConverter):
     def __init__(self):
         pass
     
@@ -33,7 +33,7 @@ class user(commands.converter.IDConverter):
             return res
         return await commands.UserConverter().convert(ctx,argument)
 
-class infoType(commands.converter.IDConverter):
+class infoType(commands.Converter):
     def __init__(self):
         pass
     
@@ -43,7 +43,7 @@ class infoType(commands.converter.IDConverter):
         else:
             raise commands.errors.BadArgument('Invalid type: '+argument)
 
-class cardStyle(commands.converter.IDConverter):
+class cardStyle(commands.Converter):
     def __init__(self):
         pass
     
@@ -52,3 +52,16 @@ class cardStyle(commands.converter.IDConverter):
             return argument
         else:
             raise commands.errors.BadArgument('Invalid card style: '+argument)
+
+class LeaderboardType(commands.Converter):
+    def __init__(self):
+        pass
+    
+    async def convert(self,ctx,argument):
+        if argument in ['server','guild','serveur','local']:
+            if ctx.guild==None:
+                raise commands.errors.BadArgument('Cannot use {} leaderboard type outside a server'.format(argument))
+            return 'guild'
+        elif argument in ['all','global','tout']:
+            return 'global'
+        raise commands.errors.BadArgument('Invalid leaderboard type: {}'.format(argument))
