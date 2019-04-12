@@ -5,8 +5,9 @@ import numpy as np
 from PIL import Image, ImageDraw, ImageFont, ImageTk
 from urllib.request import urlopen, Request
 
-from fcts import args
+from fcts import args, checks
 importlib.reload(args)
+importlib.reload(checks)
 
 class XPCog(commands.Cog):
 
@@ -459,6 +460,39 @@ class XPCog(commands.Cog):
             else:
                 done.append(f[0])
 
+
+
+    async def gen_rr_id(self):
+        return round(time.time()/2)
+
+    async def rr_add_role(self,guild:int,role:int,level:int):
+        """Add a role reward in the database"""
+        cnx = self.bot.cnx
+        cursor = cnx.cursor(dictionary = True)
+        ID = await self.gen_rr_id()
+        query = ("INSERT INTO `roles_rewards` (`ID`,`guild`,`role`,`level`) VALUES ('{i}','{g}','{r}','{l}');".format(i=ID,g=guild,r=role,l=level))
+        cursor.execute(query)
+        cnx.commit()
+        cursor.close()
+        return True
+
+    @commands.group(name="roles_rewards",aliases=['rr'])
+    @commands.guild_only()
+    async def rr_main(self,ctx):
+        """Manage your roles rewards like a boss"""
+        pass
+    
+    @rr_main.command(name="add")
+    @commands.check(checks.can_manage_server)
+    async def rr_add(self,ctx,level:int,*,role:discord.Role):
+        """Add a role reward
+        This role will be given to every member who reaches the level"""
+        try:
+            await self.rr_add_role(ctx.guild.id,role.id,level)
+        except Exception as e:
+            await self.bot.cogs['ErrorsCog'].on_cmd_error(ctx,e)
+        else:
+            await ctx.send('Rôle ajouté !')
 
 
 def setup(bot):
