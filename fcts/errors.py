@@ -28,18 +28,19 @@ class ErrorsCog(commands.Cog):
         if hasattr(ctx.command, 'on_error'):
             return
         
-        ignored = (commands.CommandNotFound,commands.CheckFailure,commands.ConversionError,commands.BotMissingPermissions,discord.errors.Forbidden)
+        ignored = (commands.errors.CommandNotFound,commands.errors.CheckFailure,commands.errors.ConversionError,discord.errors.Forbidden)
         
         # Allows us to check for original exceptions raised and sent to CommandInvokeError.
         # If nothing is found. We keep the exception passed to on_command_error.
         error = getattr(error, 'original', error)
 
         # Anything in ignored will return and prevent anything happening.
-        if isinstance(error, ignored) and not self.bot.beta:
+        if isinstance(error, ignored):
+            if self.bot.beta:
+                c = str(type(error)).replace("<class '",'').replace("'>",'')
+                await ctx.send('`Ignored error:` [{}] {}'.format(c,error))
             return
-        elif isinstance(error,ignored):
-            return await ctx.send("`ERROR:` {}".format(error))
-        elif isinstance(error,commands.CommandOnCooldown):
+        elif isinstance(error,commands.errors.CommandOnCooldown):
             if await self.bot.cogs['AdminCog'].check_if_admin(ctx):
                 await ctx.reinvoke()
                 return
@@ -64,7 +65,7 @@ class ErrorsCog(commands.Cog):
             r = re.search(r'Role \"([^\"]+)\" not found',str(error))
             if r!=None:
                 return await ctx.send(str(await self.translate(ctx.channel,'errors','rolenotfound')).format(r.group(1)))
-             # Role "Admin" not found
+             # Colour "blue" is invalid
             r = re.search(r'Colour \"([^\"]+)\" is invalid',str(error))
             if r!=None:
                 return await ctx.send(str(await self.translate(ctx.channel,'errors','invalidcolor')).format(r.group(1)))
@@ -72,6 +73,10 @@ class ErrorsCog(commands.Cog):
             r = re.search(r'Invalid duration: ([^\" ]+)',str(error))
             if r != None:
                 return await ctx.send(str(await self.translate(ctx.channel,'errors','duration')).format(r.group(1)))
+            # Role "Admin" not found
+            r = re.search(r'You are missing () permission(s) to run command.',str(error))
+            if r!=None:
+                return await ctx.send(str(await self.translate(ctx.channel,'errors','rolenotfound')).format(r.group(1)))
             print('errors -',error)
         elif isinstance(error,commands.MissingRequiredArgument):
             await ctx.send(str(await self.translate(ctx.channel,'errors','missingargument')).format(error.param.name,random.choice([':eyes:','',':confused:',':thinking:',''])))
