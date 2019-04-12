@@ -1,6 +1,7 @@
 from discord.ext import commands
-import discord, re, datetime, random, json, os, typing
+import discord, re, datetime, random, json, os, typing, importlib
 from fcts import checks
+importlib.reload(checks)
 
 class ModeratorCog(commands.Cog):
     """Here you will find everything you need to moderate your server. Please note that most of the commands are reserved for certain members only."""
