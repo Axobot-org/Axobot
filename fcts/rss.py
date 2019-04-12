@@ -778,7 +778,7 @@ class RssCog(commands.Cog):
                     datz = 'Unknown'
                 else:
                     datz = feed[published]
-                if datetime.datetime(*feed['published_parsed'][:6]) <= date:
+                if feed['published_parsed']==None or datetime.datetime(*feed['published_parsed'][:6]) <= date:
                     break
                 if 'link' in feed.keys():
                     l = feed['link']
