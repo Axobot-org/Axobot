@@ -90,7 +90,7 @@ class zbot(commands.bot.BotBase,discord.Client):
             if self._cnx[0] != None:
                 self._cnx[0].close()
             self.log.debug('Connection à MySQL (user {})'.format(self.database_keys['user']))
-            self._cnx[0] = mysql.connector.connect(user=self.database_keys['user'],password=self.database_keys['password'],host=self.database_keys['host'],database=self.database_keys['database'])
+            self._cnx[0] = mysql.connector.connect(user=self.database_keys['user'],password=self.database_keys['password'],host=self.database_keys['host'],database=self.database_keys['database'],buffered=True)
             self._cnx[1] = round(time.time())
         else:
             raise ValueError(dict)
