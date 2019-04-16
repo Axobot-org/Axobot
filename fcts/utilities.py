@@ -12,7 +12,7 @@ class UtilitiesCog(commands.Cog):
         self.bot = bot
         self.list_prefixs = dict()
         self.file = "utilities"
-        self.config = None
+        self.config = {}
         self.table = 'users'
         self.new_pp = False
 
@@ -160,13 +160,15 @@ class UtilitiesCog(commands.Cog):
             return True
         if await self.bot.cogs['AdminCog'].check_if_admin(ctx):
             return True
-        self.config = await self.get_bot_infos()
+        if len(self.config)==0:
+            self.config = await self.get_bot_infos()
         if len(self.config)==0:
             return True
-        if str(ctx.guild.id) in self.config['banned_guilds'].split(";"):
-            return False
-        if str(ctx.author.id) in self.config['banned_users'].split(";"):
-            return False
+        if ctx.guild != None:
+            if str(ctx.guild.id) in self.config['banned_guilds'].split(";"):
+                return False
+            if str(ctx.author.id) in self.config['banned_users'].split(";"):
+                return False
         return True
 
     async def create_footer(self,embed,user):
