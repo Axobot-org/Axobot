@@ -666,6 +666,7 @@ You must be an administrator of this server to use this command."""
 
 
     @commands.group(name="role")
+    @commands.guild_only()
     async def main_role(self,ctx):
         """A few commands to manage roles"""
         pass
