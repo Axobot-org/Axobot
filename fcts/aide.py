@@ -144,7 +144,7 @@ If the bot can't send the new command format, it will try to send the old one.""
             try:
                 if cmd.hidden==True or cmd.enabled==False:
                     continue
-                if isinstance(ctx.author,discord.Member) and (await cmd.can_run(ctx))==False:
+                if (await cmd.can_run(ctx))==False:
                     continue
             except Exception as e:
                 if not "discord.ext.commands.errors" in str(type(e)):
