@@ -122,7 +122,7 @@ class ServerCog(commands.Cog):
             raise TypeError
         if await self.bot.cogs['AdminCog'].check_if_admin(user) and user.guild.id in self.bot.cogs['AdminCog'].god_mode:
             return True
-        if not self.bot.database_online:
+        if not self.bot.database_online or not isinstance(user,discord.Member):
             return False
         staff = str(await self.find_staff(user.guild.id,option)).split(";")
         for r in user.roles:
