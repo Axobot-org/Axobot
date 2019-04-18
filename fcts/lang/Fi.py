@@ -90,21 +90,21 @@ fun={"count-0":"Laskeminen on kesken...",
     "calc-4":"Laskulla `{}` ei ole ratkaisua",
     "calc-5":"Upsis, error tuli: `{}`",
     "no-reaction":"Mahdotonta lisätä reaktioita. Katso minun käyttöoikeudet...",
-    "cant-react":"I don't have enough permissions to send reactions!",
-    "no-emoji":"Unable to find this emoji!",
-    "vote-0":"You can't put more than 20 choices, and even less a negative number of choices!",
-    "blame-0":"List of available names for **{}**",
+    "cant-react":"Minulla ei ole tarpeeksi käyttöoikeuksia lisätä reaktioita!",
+    "no-emoji":"Mahdotonta löytää tämä emoji!",
+    "vote-0":"Sinä voit laittaa enemmän kuin 20 vaihtoehtoa, ja myös vähemmän negatiivisiä!",
+    "blame-0":"Lista kaikista käytettävistä nimistä**{}**:lle",
     "no-database":"As our database is offline, access to fun commands is restricted to people with permission \"Manage Server\"",
-    "no-embed-perm":"I don't have permission to \"Embed links\" :confused:",
-    "embed-error":"An error has occurred: `{}`",
-    "invalid-city":"Invalid city :confused:",
-    "no-roll":"No choice found"
+    "no-embed-perm":"Minulla ei ole käyttöoikeuksia \"Embed links\" :confused:",
+    "embed-error":"Error havaittu: `{}`",
+    "invalid-city":"Pätemätön kaupunki :confused:",
+    "no-roll":"Ei vaihtoehtoa löydetty"
     }
 
-infos={"text-0":"""Hello! I'm {0} !
-I'm a bot that allows you to do a lot of things: moderation, mini-games, an xp system, statistics and many other super useful commands (and totally pointless ones)! 
-You can start by typing `!help` in this chat to see the list of available commands, then `!config see` will let you see the configuration options (a website is in preparation). 
-For helping me in the creation of the bot, my owner and I would like to thank Awhikax for his support during the various crises, Aragorn1202 for all his ideas and sentences full of good sense, Adri526 for all these beautiful logos, emojis and profile pics, and Pilotnick54 to review and correct my English!
+infos={"text-0":"""Moi! Olen {0} !
+Olen robotti joka voi tehä monia asioita: Valvontaa, pieniä pelejä, taso systeemi, tilastoja, ja monia muita hyödyttäviä commandeja (ja myös täysin turhia)! 
+Voit aloittaa viestittämällä `!help` tällä kanavalla niin näet kaikki käytettävissä olevat commandit, sitten `!config see` aikoo näyttää configuraatio muodot (nettisivua ollaan tekemässä). 
+Kaikki jotka auttoivat minun tekeimsessä, minun omistaja ja minä haluamme kiittää Adri526, Awhikax ja Aragorn1202! Iso kiitos heille.
 :globe_with_meridians: Some links may be useful: 
 :arrow_forward: My Discord server : http://discord.gg/N55zY88
 :arrow_forward: A link to invite me to another server : <https://bot.discord.io/zbot>
