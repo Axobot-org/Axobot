@@ -104,24 +104,24 @@ fun={"count-0":"Laskeminen on kesken...",
 infos={"text-0":"""Moi! Olen {0} !
 Olen robotti joka voi tehä monia asioita: Valvontaa, pieniä pelejä, taso systeemi, tilastoja, ja monia muita hyödyttäviä commandeja (ja myös täysin turhia)! 
 Voit aloittaa viestittämällä `!help` tällä kanavalla niin näet kaikki käytettävissä olevat commandit, sitten `!config see` aikoo näyttää configuraatio muodot (nettisivua ollaan tekemässä). 
-Kaikki jotka auttoivat minun tekeimsessä, minun omistaja ja minä haluamme kiittää Adri526, Awhikax ja Aragorn1202! Iso kiitos heille.
+Kaikki jotka auttoivat minun tekeimsessä, minun omistaja ja minä haluamme kiittää Adri526, Awhikax, Jees1 (tämän kielen kääntäjä) ja Aragorn1202! Iso kiitos heille.
 :globe_with_meridians: Some links may be useful: 
-:arrow_forward: My Discord server : http://discord.gg/N55zY88
-:arrow_forward: A link to invite me to another server : <https://bot.discord.io/zbot>
-:arrow_forward: The bot documentation : <https://zbot.rtfd.io/>
-:arrow_forward: My creator's Twitter account : <https://twitter.com/z_runnerr>
-Have a nice day!""",
-"docs":"Here is the link to the bot documentation:",
-"stats-title":"**Bot statistics**",
-"stats":"""**Bot version:** {bot_v} \n**Number of servers:** {s_count} \n**Number of visible members:** {m_count} ({b_count} **bots**)\n**Number of code lines:** {l_count}\n**Used languages:** {lang}\n**Python version :** {p_v} \n**Version of the `discord.py` lib:** {d_v} \n**Loading on the RAM:** {ram} GB \n**Loading on the CPU:** {cpu} % \n**API latency time:** {api} ms\n**Total of earned xp:** {xp}""",
-"admins-list":"The administrators of this bot are : {}",
-"prefix":"List of currently usable prefixes:"}
+:arrow_forward: Minun Discord palvelin: : http://discord.gg/N55zY88
+:arrow_forward: Linkki kutsua minut toiselle palvelimelle : <https://bot.discord.io/zbot>
+:arrow_forward: Bot documentti : <https://zbot.rtfd.io/>
+:arrow_forward: Minun tekijän Twitteri : <https://twitter.com/z_runnerr>
+ Hyvää päivän jatkoa!""",
+"docs":"Tässä on linkki botin documenttiin:",
+"stats-title":"**Bot tilastot**",
+"stats":"""**Bot versio:** {bot_v} \n**Kaikkien palvelimien numero missä olen:** {s_count} \n**Numero kaikista näkyvistä jäsenistä:** {m_count} ({b_count} **botit**)\n**Numero koodi riveistä:** {l_count}\n**Käytettyjä kieliä:** {lang}\n** {p_v} \n**Versio `discord.py`stä:** {d_v} \n**Ladataan RAMia:** {ram} GB \n**Ladataan CPU:ssa:** {cpu} % \n**API viive aika:** {api} ms\n**Kaikki xp kerätty:** {xp}""",
+"admins-list":"Adminit tälle botille ovat : {}",
+"prefix":"Lista kaikista käytettävissä olevista etuliitoista:"}
 
-infos_2={"membercount-0":"Total number of members",
-"membercount-1":"Number of bots",
-"membercount-2":"Number of humans",
-"membercount-3":"Number of online members",
-"fish-1":"Number of fishes"}
+infos_2={"membercount-0":"Numero jäsenistä",
+"membercount-1":"Numero boteista",
+"membercount-2":"Numero ihmisistä",
+"membercount-3":"Numero online jäsenistä",
+"fish-1":"Numero kaloista"}
 
 keywords={"depuis":"since",
           "nom":"name",
