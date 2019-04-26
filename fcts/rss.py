@@ -769,7 +769,19 @@ class RssCog(commands.Cog):
                 l = feeds['link']
             else:
                 l = url
-            obj = self.rssMessage(bot=self.bot,Type='web',url=l,title=feed['title'],emojis=self.bot.cogs['EmojiCog'].customEmojis,date=datz,author=feed['author'] if 'author' in feed.keys() else None,channel= feeds.feed['title'])
+            if 'author' in feed.keys():
+                author = feed['author']
+            elif 'author' in feeds.keys():
+                author = feeds['author']
+            else:
+                author = '?'
+            if 'title' in feed.keys():
+                title = feed['title']
+            elif 'title' in feeds.keys():
+                title = feeds['title']
+            else:
+                title = '?'
+            obj = self.rssMessage(bot=self.bot,Type='web',url=l,title=title,emojis=self.bot.cogs['EmojiCog'].customEmojis,date=datz,author=author,channel= feeds.feed['title'])
             return [obj]
         else:
             liste = list()
@@ -786,7 +798,19 @@ class RssCog(commands.Cog):
                     l = feeds['link']
                 else:
                     l = url
-                obj = self.rssMessage(bot=self.bot,Type='web',url=l,title=feed['title'],emojis=self.bot.cogs['EmojiCog'].customEmojis,date=datz,author=feed['author'] if 'author' in feed.keys() else None,channel= feeds.feed['title'])
+                if 'author' in feed.keys():
+                    author = feed['author']
+                elif 'author' in feeds.keys():
+                    author = feeds['author']
+                else:
+                    author = '?'
+                if 'title' in feed.keys():
+                    title = feed['title']
+                elif 'title' in feeds.keys():
+                    title = feeds['title']
+                else:
+                    title = '?'
+                obj = self.rssMessage(bot=self.bot,Type='web',url=l,title=title,emojis=self.bot.cogs['EmojiCog'].customEmojis,date=datz,author=author,channel= feeds.feed['title'])
                 liste.append(obj)
             liste.reverse()
             return liste
