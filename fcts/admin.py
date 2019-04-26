@@ -503,6 +503,9 @@ Cette option affecte tous les serveurs"""
         owner_list = list()
         for guild in self.bot.guilds:
             if len(guild.members)>9:
+                if guild.owner==None:
+                    await ctx.send("Oops, askip le propriétaire de {} n'existe pas ._.".format(guild.id))
+                    continue
                 owner_list.append(guild.owner.id)
         for member in server.members:
             if member.id in owner_list and role not in member.roles:
