@@ -4,7 +4,7 @@
 
 Welcome to the ZBot bot documentation, a Discord bot coded in Python 3 by a small French developer, **Z_runner**. You will find in the documentation all the explanations on each of the usable commands, as well as the list of the last additions and some code examples. The documentation is currently in English but the bot is available in several languages, including its main language, French.
 
-Full documentation can be found on the [ReadTheDocs](https://zbot.readthedocs.io/en/v3/) page (under development)
+Full documentation can be found on the [ReadTheDocs](https://zbot.readthedocs.io/en/latest/) page (under development)
 
 ## The Bot
 
