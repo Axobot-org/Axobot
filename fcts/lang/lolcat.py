@@ -29,6 +29,16 @@ aide={"no-subcmd":"Teh kommand `{0.name}` had not sub~~scribe~~commanD",
 "cmd-not-found":"Dere are no comand naymme \"{}\"",
 "subcmd-not-found":"Thiz commnd have no sUbcommant newmed \"{}\""}
 
+blurple = {'check_intro':'{}, starting blurple img analys (Plz note dat this may take one or two while)',
+    'check_invalid':'{}, plz link a valid img URL',
+    'check_resized':"{}, img resized smaller 4 easier processing ({}s)",
+    'check_fields':["Total amount of Blurple","Blurple (rgb(114, 137, 218))","White (rgb(255, 255, 255))","Dark Blurple (rgb(78, 93, 148))","Blurple, White, Dark Blurple = Blurple, White, and Dark Blurple (respectively) \nBlack = Not Blurple, White, or Dark Blurple","A big love to **Rocked03** for his code :blue_heart: https://github.com/Rocked03/Blurplefied.git","Please note: Discord often reduces qualitey ov ur images, so the % may be slightly inaccurate. | Content requested by {}"],
+    'create_title':"Blurplefier - makes your img blurple!",
+    'create_footer_1':"Dis cool blurplefier is automated and therefore may not always give you da best result. | Content requested by {}",
+    'create_footer_2':"plz note that My dear blurplefier is automated and so may not always give you the best result :heart:. Disclaimer: This img is a gif, and the quality does not always turn out great. HOWEVER, da gif is quite often not as grainy as it appears in the preview lol | Content requested by {}",
+    'create_oops':"{}, whoops! It looks like this gif is tooooo big 2 upload. If U want, U can give it another go, but with a smaller version ov the img. Sorry about that!"
+    }
+
 bvn={"aide":"""__**Wilcom 2 teh join end leef mesg modul**__
 
 Dis modul is usd 2 configur a' automatic mesage each tiem membr enters or exits ur servr.

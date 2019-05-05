@@ -29,6 +29,16 @@ aide={"no-subcmd":"La commande {0.name} n'a aucune sous-commande",
 "cmd-not-found":"Aucune commande nommée \"{}\"",
 "subcmd-not-found":"Cette commande ne possède aucune sous-commande nommée \"{}\""}
 
+blurple = {'check_intro':"{}, début de l'analyse blurple (Notez que cela peut prendre un certain temps)",
+    'check_invalid':'{}, veillez donner une URL valide',
+    'check_resized':"{}, l'image a été changée de taille pour faciliter le processus ({}s)",
+    'check_fields':["Pourcentage total de Blurple","Blurple (rgb(114, 137, 218))","Blanc (rgb(255, 255, 255))","Blurple Sombre (rgb(78, 93, 148))","Blurple, Blanc, Blurple Sombre = Blurple, Blanc, and Blurple Sombre (respectively) \nNoir = ni Blurple, ni Blanc, ni Blurple Sombre","Un énorme merci à **Rocked03** pour son code :blue_heart: https://github.com/Rocked03/Blurplefied.git","Remarque : Discord réduit la qualité des images, donc les pourcentages peuvent être légèrement imprécis. | Content requested by {}"],
+    'create_title':"Blurplefier - makes your image blurple!",
+    'create_footer_1':"Veuillez noter que ce blurplefier est automatisé et qu'il peut donc ne pas toujours vous donner le meilleur résultat. | Content requested by {}",
+    'create_footer_2':"Veuillez noter que ce blurplefier est automatisé et qu'il peut donc ne pas toujours vous donner le meilleur résultat. Avertissement : Cette image est un gif, et la qualité n'est pas toujours bonne. TOUTEFOIS, le gif n'est souvent pas aussi granuleux qu'il n'y paraît dans la prévisualisation. | Content requested by {}",
+    'create_oops':"{}, oups ! Il semble que ce gif est trop gros pour être téléchargé. Si vous voulez, vous pouvez lui donner une autre chance, mais avec une version plus petite de l'image. Désolé !"
+    }
+
 bvn={"aide":"""__**Bienvenue dans le module des message de join et de leave**__
 
 Ce module vous sert à configurer un message automatique à chaque fois qu'un membre rentre ou sort de votre serveur.
