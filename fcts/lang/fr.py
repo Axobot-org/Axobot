@@ -520,4 +520,5 @@ xp = {'card-level':'NIVEAU',
         "top-title-2":"Classement du serveur",
         "top-name":"__Top {}-{} (page {}/{}) :__",
         "default_levelup":"{user} vient de passer **niveau {level}** ! GG !",
-        "top-your":"Votre niveau"}
+        "top-your":"Votre niveau",
+        'rr_list':"Liste des rôles"}

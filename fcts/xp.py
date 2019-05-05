@@ -475,6 +475,20 @@ class XPCog(commands.Cog):
         cnx.commit()
         cursor.close()
         return True
+        
+    
+    async def rr_list_role(self,guild:int,level:int=-1):
+        """Add a role reward in the database"""
+        cnx = self.bot.cnx
+        cursor = cnx.cursor(dictionary = True)
+        ID = await self.gen_rr_id()
+        query = ("SELECT * FROM `roles_rewards` WHERE guild={g} ORDER BY level;".format(g=guild)) if level<0 else ("FROM `roles_rewards` SELECT * WHERE guild={g} AND level={l} ORDER BY level;".format(g=guild,l=level))
+        cursor.execute(query)
+        liste = list()
+        for x in cursor:
+            liste.append(x)
+        cursor.close()
+        return liste        
 
     @commands.group(name="roles_rewards",aliases=['rr'])
     @commands.guild_only()
@@ -493,6 +507,19 @@ class XPCog(commands.Cog):
             await self.bot.cogs['ErrorsCog'].on_cmd_error(ctx,e)
         else:
             await ctx.send('Rôle ajouté !')
+    
+    @rr_main.command(name="list")
+    @commands.check(checks.can_manage_server)
+    async def rr_list(self,ctx):
+        """List every roles rewards of your server"""
+        try:
+            l = await self.rr_list_role(ctx.guild.id)
+        except Exception as e:
+            await self.bot.cogs['ErrorsCog'].on_cmd_error(ctx,e)
+        else:
+            des = '\n'.join(["• <@&{}> : lvl {}".format(x['role'], x['level']) for x in l])
+            emb = self.bot.cogs['EmbedCog'].Embed(title=await self.translate(ctx.guild.id,"xp",'rr_list'),desc=des).update_timestamp().create_footer(ctx.author)
+            await ctx.send(embed=emb.discord_embed())
 
 
 def setup(bot):

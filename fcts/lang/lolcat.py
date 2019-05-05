@@ -520,4 +520,6 @@ xp = {'card-level':'LVL',
         "top-title-2":"Servr rnk",
         "top-name":"__Bests {}-{} ({}/{}):__",
         "default_levelup":"Weew, {user} has just got **lvl {level}**! What a smart guy!",
-        "top-your":"Ur rank"}
+        "top-your":"Ur rank",
+        'rr_list':"Roles list"
+        }
