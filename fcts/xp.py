@@ -475,14 +475,12 @@ class XPCog(commands.Cog):
         cnx.commit()
         cursor.close()
         return True
-        
     
     async def rr_list_role(self,guild:int,level:int=-1):
         """Add a role reward in the database"""
         cnx = self.bot.cnx
         cursor = cnx.cursor(dictionary = True)
-        ID = await self.gen_rr_id()
-        query = ("SELECT * FROM `roles_rewards` WHERE guild={g} ORDER BY level;".format(g=guild)) if level<0 else ("FROM `roles_rewards` SELECT * WHERE guild={g} AND level={l} ORDER BY level;".format(g=guild,l=level))
+        query = ("SELECT * FROM `roles_rewards` WHERE guild={g} ORDER BY level;".format(g=guild)) if level<0 else ("SELECT * FROM `roles_rewards` WHERE guild={g} AND level={l} ORDER BY level;".format(g=guild,l=level))
         cursor.execute(query)
         liste = list()
         for x in cursor:
