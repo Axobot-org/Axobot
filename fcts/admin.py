@@ -445,12 +445,15 @@ class AdminCog(commands.Cog):
     async def show_last_logs(self,ctx,lines:typing.Optional[int]=15,match=''):
         """Affiche les <lines> derniers logs ayant <match> dedans"""
         try:
+            if lines>1000:
+                match = str(lines)
+                lines = 15
             with open('debug.log','r',encoding='utf-8') as file:
                 text = file.read().split("\n")
             msg = str()
             liste = list()
             i = 1
-            while len(liste)<=lines and i<min(2000,len(text)):
+            while len(liste)<lines and i<min(2000,len(text)):
                 i+=1
                 if (not match in text[-i]) or ctx.message.content in text[-i]:
                     continue
@@ -503,7 +506,7 @@ Cette option affecte tous les serveurs"""
         owner_list = list()
         for guild in self.bot.guilds:
             if len(guild.members)>9:
-                if guild.owner==None:
+                if guild.owner==None or guild.owner.id==None:
                     await ctx.send("Oops, askip le propriétaire de {} n'existe pas ._.".format(guild.id))
                     continue
                 owner_list.append(guild.owner.id)
