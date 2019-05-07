@@ -127,11 +127,11 @@ class XPCog(commands.Cog):
 
     async def calc_level(self,xp):
         """Calcule le niveau correspondant à un nombre d'xp"""
-        lvl = ceil(0.05*xp**0.645)
-        temp = xp
-        while ceil(0.05*temp**0.645)==lvl:
-            temp += 1
-        return [lvl,temp]
+        lvl = ceil(0.05*xp**0.646)
+        next_step = xp
+        while ceil(0.05*next_step**0.646)==lvl:
+            next_step += 1
+        return [lvl,next_step,ceil(20*20**(177/323)*(lvl-1)**(500/323))]
 
     async def bdd_set_xp(self,userID,points,Type='add'):
         """Ajoute/reset de l'xp à un utilisateur dans la database générale"""
@@ -313,10 +313,10 @@ class XPCog(commands.Cog):
         colors = {'name':(124, 197, 118),'xp':(124, 197, 118),'NIVEAU':(255, 224, 77),'rank':(105, 157, 206)}
 
         levels_info = await self.calc_level(xp)
-        img = await self.add_xp_bar(img,xp,levels_info[1],bar_colors)
+        img = await self.add_xp_bar(img,xp-levels_info[2],levels_info[1]-levels_info[2],bar_colors)
         d = ImageDraw.Draw(img)
         d.text(await self.calc_pos(user.name,name_fnt,610,68), user.name, font=name_fnt, fill=colors['name'])
-        temp = '{} / {} xp'.format(xp,levels_info[1])
+        temp = '{} / {} xp ({}/{})'.format(xp-levels_info[2],levels_info[1]-levels_info[2],xp,levels_info[1])
         d.text((await self.calc_pos(temp,xp_fnt,625,237)), temp, font=xp_fnt, fill=colors['xp'])
         d.text((380,140), txt[0], font=NIVEAU_fnt, fill=colors['NIVEAU'])
         d.text((await self.calc_pos(str(levels_info[0]),levels_fnt,740,160,'right')), str(levels_info[0]), font=levels_fnt, fill=colors['xp'])
