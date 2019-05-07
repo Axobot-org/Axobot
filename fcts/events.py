@@ -255,6 +255,8 @@ class Events(commands.Cog):
                 await self.check_tasks()
             if int(datetime.datetime.now().minute)%20 == 0:
                 await self.bot.cogs['XPCog'].clear_cards()
+                self.bot.cogs['RssCog'].last_update = datetime.datetime.now()
+                asyncio.run_coroutine_threadsafe(self.bot.cogs['RssCog'].main_loop(),asyncio.get_running_loop())
             await asyncio.sleep(0.5)
 
 def setup(bot):
