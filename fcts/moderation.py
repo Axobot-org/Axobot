@@ -125,11 +125,11 @@ class ModeratorCog(commands.Cog):
                 if (i == None and invites==2) or (i != None and invites==0):
                     c4 = False
             #return ((m.pinned == pinned) or ((m.attachments != []) == files) or ((r != None) == links)) and m.author in users
-            mentions = ctx.message.raw_mentions
-            if ctx.prefix.strip() in mentions:
-                mentions.remove(ctx.prefix.strip())
+            mentions = [x.id for x in ctx.message.mentions]
+            if str(ctx.bot.user.id) in ctx.prefix:
+                mentions.remove(ctx.bot.user.id)
             if mentions != [] and m.author!=None:
-                return c1 and c2 and c3 and c4 and m.author.mention in mentions
+                return c1 and c2 and c3 and c4 and m.author.id in mentions
             else:
                 return c1 and c2 and c3 and c4
         try:
