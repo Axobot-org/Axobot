@@ -44,6 +44,12 @@ class AdminCog(commands.Cog):
 
     async def check_if_admin(self,ctx):
         return await reloads.check_admin(ctx)
+    
+    async def check_if_god(self,ctx):
+        if ctx.guild!=None:
+            return await reloads.check_admin(ctx) and ctx.guild.id in self.god_mode
+        else:
+            return await reloads.check_admin(ctx)
 
     
     @commands.command(name='admins')

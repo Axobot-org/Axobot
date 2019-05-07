@@ -120,7 +120,7 @@ class ServerCog(commands.Cog):
         """Check is user is part of a staff"""
         if option not in roles_options:
             raise TypeError
-        if await self.bot.cogs['AdminCog'].check_if_admin(user) and user.guild.id in self.bot.cogs['AdminCog'].god_mode:
+        if await self.bot.cogs['AdminCog'].check_if_god(user):
             return True
         if not self.bot.database_online or not isinstance(user,discord.Member):
             return False

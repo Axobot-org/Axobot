@@ -53,4 +53,4 @@ async def can_pin_msg(ctx):
 
 async def can_manage_server(ctx):
     """... if someone can manage the server"""
-    return ctx.channel.permissions_for(ctx.author).manage_guild or ctx.guild.id in ctx.bot.cogs['AdminCog'].god_mode
+    return ctx.channel.permissions_for(ctx.author).manage_guild or await ctx.bot.cogs['AdminCog'].check_if_god(ctx)
