@@ -361,7 +361,7 @@ Every information come from the website www.fr-minecraft.net"""
             self.desc = self.desc.replace("\n             ","\n")
             return self
 
-        async def create_msg(self,guild,tr):
+        async def create_msg(self,guild,translate):
             if self.players==[]:
                 if self.online_players==0:
                     p = ["Aucun"]
@@ -369,27 +369,28 @@ Every information come from the website www.fr-minecraft.net"""
                     p = ['Non disponible']
             else:
                 p = self.players
-            embed = discord.Embed(title=str(await tr(guild,"mc","serv-title")).format(self.ip), colour=discord.Colour(0x417505), timestamp=datetime.datetime.utcfromtimestamp(time.time()))
+            embed = discord.Embed(title=str(await translate(guild,"mc","serv-title")).format(self.ip), colour=discord.Colour(0x417505), timestamp=datetime.datetime.utcfromtimestamp(time.time()))
             embed.set_footer(text="From {}".format(self.api))
             if self.image != None:
                 embed.set_thumbnail(url=self.image)
             embed.add_field(name="Version", value=self.version)
-            embed.add_field(name=await tr(guild,"mc","serv-0"), value="{}/{}".format(self.online_players,self.max_players))
+            embed.add_field(name=await translate(guild,"mc","serv-0"), value="{}/{}".format(self.online_players,self.max_players))
             if len(p)>20:
-                embed.add_field(name=await tr(guild,"mc","serv-1"), value=", ".join(p[:20]))
+                embed.add_field(name=await translate(guild,"mc","serv-1"), value=", ".join(p[:20]))
             else:
-                embed.add_field(name=await tr(guild,"mc","serv-2"), value=", ".join(p))
+                embed.add_field(name=await translate(guild,"mc","serv-2"), value=", ".join(p))
             if self.ping != None:
-                embed.add_field(name=await tr(guild,"mc","serv-3"), value=str(self.ping)+" ms")
+                embed.add_field(name=await translate(guild,"mc","serv-3"), value=str(self.ping)+" ms")
             embed.add_field(name="Description", value=self.desc,inline=False)
             return embed
 
     async def send_msg_server(self,obj,channel,ip):
-        e = await self.form_msg_server(obj,channel.guild,ip)
-        if channel.permissions_for(channel.guild.me).embed_links:
+        guild = None if isinstance(channel,discord.DMChannel) else channel.guild
+        e = await self.form_msg_server(obj,guild,ip)
+        if isinstance(channel,discord.DMChannel) or channel.permissions_for(channel.guild.me).embed_links:
             await channel.send(embed=e)
         else:
-            await channel.send(await self.translate(channel.guild,"mc","cant-embed"))
+            await channel.send(await self.translate(guild,"mc","cant-embed"))
 
     async def form_msg_server(self,obj,guild,ip):
         if type(obj) == str:
