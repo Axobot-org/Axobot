@@ -419,7 +419,8 @@ to modify a configuration, or `!config del <option>` to reset the option (`!conf
         "change-prefix-1":"This prefix is too long to be used!",
         "wrong-prefix":"Oops, it seems this prefix is invalid :thinking: If the problem persists, please choose another one",
         "opt_title":"Option '{}' of server {}",
-        "not-found":"The server {} has not yet been registered in the database"
+        "not-found":"The server {} has not yet been registered in the database",
+        "need-admin":"You need Administrator permission to execute this command."
     }
 
 server_desc={"prefix":"Current bot prefix: {}",

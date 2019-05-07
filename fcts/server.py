@@ -201,12 +201,10 @@ class ServerCog(commands.Cog):
         cnx.commit()
         return True
 
-    async def is_server_exist(self,ID,channel=None):
+    async def is_server_exist(self,ID):
         """Check if a server is already in the db"""
         i = await self.find_staff(ID,"ID")
         if i == None:
-            if channel != None:
-                await channel.send(await self.translate(channel.guild.id,"server","new_server"))
             # await self.bot.get_user(279568324260528128).send("Le serveur n°{} vient d'être ajouté dans la base de donnée".format(ID))
             g = self.bot.get_guild(ID)
             if g==None:
@@ -235,7 +233,7 @@ class ServerCog(commands.Cog):
     async def sconfig_main(self,ctx):
         """Function for setting the bot on a server"""
         if ctx.bot.database_online:
-            await self.is_server_exist(ctx.guild.id,ctx.channel)
+            await self.is_server_exist(ctx.guild.id)
         if ctx.invoked_subcommand is None:
             msg = await self.translate(ctx.guild,"server","config-help")
             await ctx.send(msg.format(ctx.guild.owner.name))
@@ -243,8 +241,8 @@ class ServerCog(commands.Cog):
     @sconfig_main.command(name="del")
     async def sconfig_del(self,ctx,option):
         """Reset an option to zero"""
-        if not (ctx.channel.permissions_for(ctx.author).administrator or await self.bot.cogs["AdminCog"].check_if_admin(ctx)):
-            return
+        if not (ctx.channel.permissions_for(ctx.author).administrator or await self.bot.cogs["AdminCog"].check_if_god(ctx)):
+            return await ctx.send(await self.translate(ctx.guild.id,"server","need-admin"))
         if not ctx.bot.database_online:
             return await ctx.send(await self.translate(ctx.guild.id,"cases","no_database"))
         await self.sconfig_del2(ctx,option)
@@ -252,8 +250,8 @@ class ServerCog(commands.Cog):
     @sconfig_main.command(name="change")
     async def sconfig_change(self,ctx,option,*,value):
         """Allows you to modify an option"""
-        if not (ctx.channel.permissions_for(ctx.author).administrator or await self.bot.cogs["AdminCog"].check_if_admin(ctx)):
-            return
+        if not (ctx.channel.permissions_for(ctx.author).administrator or await self.bot.cogs["AdminCog"].check_if_god(ctx)):
+            return await ctx.send(await self.translate(ctx.guild.id,"server","need-admin"))
         if not ctx.bot.database_online:
             return await ctx.send(await self.translate(ctx.guild.id,"cases","no_database"))
         if value=='del':
