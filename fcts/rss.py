@@ -950,6 +950,8 @@ class RssCog(commands.Cog):
         
 
     async def main_loop(self,guildID=None):
+        if not self.bot.rss_enabled:
+            return
         t = time.time()
         if self.loop_processing:
             return

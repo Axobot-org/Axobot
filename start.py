@@ -74,6 +74,7 @@ class zbot(commands.bot.BotBase,discord.Client):
         self.dbl_token = dbl_token
         self._cnx = [None,0]
         self.xp_enabled = True
+        self.rss_enabled = True
         self.fishes = 0
     
     @property
@@ -282,6 +283,9 @@ def main():
             r3=input("Lancement de la boucle d'events' ? (o/n) ")
             if r3=='o':
                 client.loop.create_task(client.cogs["Events"].loop())
+            r3=input("Activation des flux RSS ? (o/n) ")
+            if r3!='o':
+                client.rss_enabled = False
     else:
         token = input("Token?\n> ")
         if len(token)<10:

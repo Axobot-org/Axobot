@@ -474,16 +474,25 @@ class AdminCog(commands.Cog):
         except Exception as e:
             await self.bot.cogs['ErrorsCog'].on_error(e,ctx)
 
-    @main_msg.command(name="enable_xp")
+    @main_msg.command(name="enable_module")
     @commands.check(reloads.check_admin)
-    async def enable_xp(self,ctx,enabling:bool):
+    async def enable_xp(self,ctx,enabling:bool,module:str):
         """Empêche tous les utilisateurs de gagner de l'xp.
 Cette option affecte tous les serveurs"""
-        self.bot.xp_enabled = enabling
-        if enabling:
-            await ctx.send("L'xp est mainenant activée")
+        if module=='xp':
+            self.bot.xp_enabled = enabling
+            if enabling:
+                await ctx.send("L'xp est mainenant activée")
+            else:
+                await ctx.send("L'xp est mainenant désactivée")
+        elif module=='rss':
+            self.bot.rss_enabled = enabling
+            if enabling:
+                await ctx.send("Les flux RSS sont mainenant activée")
+            else:
+                await ctx.send("Les flux RSS sont mainenant désactivée")
         else:
-            await ctx.send("L'xp est mainenant désactivée")
+            await ctx.send('Module introuvable')
             
 
     @main_msg.group(name="server")
