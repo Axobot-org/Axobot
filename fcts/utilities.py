@@ -321,6 +321,17 @@ class UtilitiesCog(commands.Cog):
             return False
         return parameters['unlocked_rainbow']
     
+    async def has_blurple_card(self,user):
+        """Check if a user won the blurple card"""
+        parameters = None
+        try:
+            parameters = await self.get_db_userinfo(criters=["userID="+str(user.id)],columns=['unlocked_blurple'])
+        except Exception as e:
+            await self.bot.cogs["Errors"].on_error(e,None)
+        if parameters==None:
+            return False
+        return parameters['unlocked_blurple']
+    
     async def get_xp_style(self,user):
         parameters = None
         try:
@@ -365,6 +376,8 @@ class UtilitiesCog(commands.Cog):
         else:
             if await self.has_rainbow_card(user):
                 liste.append('rainbow')
+        if await self.has_blurple_card(user):
+            liste.append('blurple')
         return sorted(liste2)+sorted(liste)
 
     async def get_languages(self,user,limit=0):
