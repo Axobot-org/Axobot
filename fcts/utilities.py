@@ -341,7 +341,7 @@ class UtilitiesCog(commands.Cog):
             parameters = await self.get_db_userinfo(criters=["userID="+str(user.id)],columns=['xp_style'])
         except Exception as e:
             await self.bot.cogs["ErrorsCog"].on_error(e,None)
-        if parameters==None or len(parameters)==0:
+        if parameters==None or parameters['xp_style']=='':
             return 'dark'
         return parameters['xp_style']
 
