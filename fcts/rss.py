@@ -957,8 +957,8 @@ class RssCog(commands.Cog):
             return
         self.bot.log.info("Check RSS lancé")
         if guildID==None:
-            liste = await self.get_all_flows()
             self.loop_processing = True
+            liste = await self.get_all_flows()
         else:
             liste = await self.get_guild_flows(guildID)
         check = 0
