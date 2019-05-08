@@ -29,6 +29,16 @@ aide={"no-subcmd":"Teh kommand `{0.name}` had not sub~~scribe~~commanD",
 "cmd-not-found":"Dere are no comand naymme \"{}\"",
 "subcmd-not-found":"Thiz commnd have no sUbcommant newmed \"{}\""}
 
+blurple = {'check_intro':'{}, starting blurple img analys (Plz note dat this may take one or two while)',
+    'check_invalid':'{}, plz link a valid img URL',
+    'check_resized':"{}, img resized smaller 4 easier processing ({}s)",
+    'check_fields':["Total amount of Blurple","Blurple (rgb(114, 137, 218))","White (rgb(255, 255, 255))","Dark Blurple (rgb(78, 93, 148))","Blurple, White, Dark Blurple = Blurple, White, and Dark Blurple (respectively) \nBlack = Not Blurple, White, or Dark Blurple","A big love to **Rocked03** for his code :blue_heart: https://github.com/Rocked03/Blurplefied.git","Please note: Discord often reduces qualitey ov ur images, so the % may be slightly inaccurate. | Content requested by {}"],
+    'create_title':"Blurplefier - makes your img blurple!",
+    'create_footer_1':"Dis cool blurplefier is automated and therefore may not always give you da best result. | Content requested by {}",
+    'create_footer_2':"plz note that My dear blurplefier is automated and so may not always give you the best result :heart:. Disclaimer: This img is a gif, and the quality does not always turn out great. HOWEVER, da gif is quite often not as grainy as it appears in the preview lol | Content requested by {}",
+    'create_oops':"{}, whoops! It looks like this gif is tooooo big 2 upload. If U want, U can give it another go, but with a smaller version ov the img. Sorry about that!"
+    }
+
 bvn={"aide":"""__**Wilcom 2 teh join end leef mesg modul**__
 
 Dis modul is usd 2 configur a' automatic mesage each tiem membr enters or exits ur servr.
@@ -101,7 +111,8 @@ fun={"count-0":"Countng in progrez...",
     "no-embed-perm":"I dont haz permishun 2 \"Embed links\" :confused:",
     "embed-error":"A' error went wrong: `{}`",
     "invalid-city":"Invalid place name :confused:",
-    "no-roll":"Hmm I don't see any choice lol"
+    "no-roll":"Hmm I don't see any choice lol",
+    'no-say':"Unable 2 send any message in tish channel"
     }
 
 infos={"text-0":"""Ho hi hello! I'm {0} !
@@ -146,7 +157,8 @@ keywords={"depuis":"sinze",
           "aucune":"none",
           "membres":"memberz",
           "subcmds":"subcommands",
-          "ghost":"Goast"
+          "ghost":"Goast",
+          'unknown':'No known'
           }
 
 kill={"list":["Hi ho ! Oh u, u gonna die!",
@@ -232,7 +244,7 @@ mc={"contact-mail":"If U notis an errrror in da info providd, plz contact my per
       }
 
 modo={"slowmode-0":"Teh very-cold-mode is now disabld in this nize place.",
-    "slowmode-1":"Impossible to set a frequency higher than two minutes",
+    "slowmode-1":"Impossible to set a frequency higher than 6 hourz",
     "slowmode-2":"The {} channl iz naw in very-cold-mode. Wait {} secondz be4 sending a mesage.",
     "slowmode-3":"Nope, dis valu iz invalid",
     "slowmode-info":"Da slow mode ov this chat iz currently at {}s",
@@ -301,7 +313,8 @@ morpion={'user-begin':'{}, u begin!',
         'pion-1':"There's already a pawn on dat cell!",
         'pion-2':'Invalid input!',
         'win-1':"GG, {} won!",
-        'win-2':"I won! Game over!"}
+        'win-2':"I won! Game over!",
+        'already-playing':"U already are ingame!"}
 
 perms={"perms-0":"Membr/role {} not findz",
         "perms-1":"**'{}' permissung:**\n\n"
@@ -407,7 +420,8 @@ to modify configuraishun, or `!config del <option>` 2 reset teh option (`!config
         "change-prefix-1":"Dis prèfix:x: iz too long 2 be used!",
         "wrong-prefix":"Oooops, it seemz dis prefix is no valid :thinking: If teh problem persists, plz choose a' other one",
         "opt_title":"Opzion '{}' of srver {}",
-        "not-found":"Teh server {} haznt been registered yet in da data board"
+        "not-found":"Teh server {} haznt been registered yet in da data board",
+        "need-admin":"U need to be a Big Boss (admin) to get this cmd"
     }
 
 server_desc={"prefix":"Currnt baot prfx: {}",
@@ -436,7 +450,8 @@ server_desc={"prefix":"Currnt baot prfx: {}",
             "anti_raid":"Lev3l of anti-rayderz protect: {} \n*([Dowcumetaton](https://zbot.rtfd.io/en/latest/moderator.html#anti-raid))*",
             "vote_emojis":"Emojiz use 4 powll reacts: {}",
             "help_in_dm":"Sent help mess:a:ge on Prvte Msage? {}",
-            "muted_role":"Usd role 2 mute people : {}"}
+            "muted_role":"Usd role 2 mute people : {}",
+            "noxp_channels":"Chats where xp is for:b:idden: {}"}
 
 stats_infos={"not-found":"Unable 2 found {N}",
             "member-0":"Lttle nayme",
@@ -504,6 +519,13 @@ xp = {'card-level':'LVL',
         "low-page":"Oops, I can't display a negative page!",
         "high-page":"There aren't so much pages!",
         "top-title-1":"Global ranks",
+        "top-title-2":"Servr rnk",
         "top-name":"__Bests {}-{} ({}/{}):__",
         "default_levelup":"Weew, {user} has just got **lvl {level}**! What a smart guy!",
-        "top-your":"Ur rank"}
+        "top-your":"Ur rank",
+        'rr_list':"Roles list",
+        'rr-added':"Role `{}` haz been added 4 level {} !",
+        'already-1-rr':"Ther's already a role setup for tihs level :thinking:",
+        'no-rr':"None role is configured for this level",
+        'rr-removed':"None role will be givn anymore for level #{}"
+        }

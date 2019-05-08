@@ -74,6 +74,7 @@ class zbot(commands.bot.BotBase,discord.Client):
         self.dbl_token = dbl_token
         self._cnx = [None,0]
         self.xp_enabled = True
+        self.rss_enabled = True
         self.fishes = 0
     
     @property
@@ -90,7 +91,7 @@ class zbot(commands.bot.BotBase,discord.Client):
             if self._cnx[0] != None:
                 self._cnx[0].close()
             self.log.debug('Connection à MySQL (user {})'.format(self.database_keys['user']))
-            self._cnx[0] = mysql.connector.connect(user=self.database_keys['user'],password=self.database_keys['password'],host=self.database_keys['host'],database=self.database_keys['database'])
+            self._cnx[0] = mysql.connector.connect(user=self.database_keys['user'],password=self.database_keys['password'],host=self.database_keys['host'],database=self.database_keys['database'],buffered=True)
             self._cnx[1] = round(time.time())
         else:
             raise ValueError(dict)
@@ -162,7 +163,8 @@ def main():
                       'fcts.timed',
                       'fcts.morpion',
                       'fcts.xp',
-                      'fcts.users'
+                      'fcts.users',
+                      'fcts.blurple'
     ]
     # Suppression du fichier debug.log s'il est trop volumineux
     if os.path.exists("debug.log"):
@@ -226,10 +228,10 @@ def main():
         await asyncio.sleep(3)
         if not client.database_online:
             await client.change_presence(activity=discord.Activity(type=discord.ActivityType.listening,name=choice(["a signal",'a sign of life','nothing','a signal','a lost database'])))
-        elif r=='1':
-            await client.change_presence(activity=discord.Game(name=choice(["entrer !help","something","type !help","type !help"])))
-        elif r=='2':
+        elif client.beta:
             await client.change_presence(activity=discord.Game(name=choice(["SNAPSHOOT","snapshot day","somethin iz brokn"])))
+        else:
+            await client.change_presence(activity=discord.Game(name=choice(["entrer !help","something","type !help","type !help"])))
         emb = client.cogs["EmbedCog"].Embed(desc="**{}** is launching !".format(client.user.name),color=8311585).update_timestamp()
         await client.cogs["EmbedCog"].send([emb])
     
@@ -281,6 +283,9 @@ def main():
             r3=input("Lancement de la boucle d'events' ? (o/n) ")
             if r3=='o':
                 client.loop.create_task(client.cogs["Events"].loop())
+            r3=input("Activation des flux RSS ? (o/n) ")
+            if r3!='o':
+                client.rss_enabled = False
     else:
         token = input("Token?\n> ")
         if len(token)<10:

@@ -16,7 +16,7 @@ class LangCog(discord.ext.commands.Cog):
         m_reload(en)
         self.bot = bot
         self.file = "language"
-        self.languages = ['fr','en','lolcat']
+        self.languages = ['fr','en','lolcat','fi']
         self.serv_opts = dict()
 
 
@@ -24,8 +24,13 @@ class LangCog(discord.ext.commands.Cog):
         """Renvoie le texte en fonction de la langue"""
         if type(serverID) == discord.Guild:
             serverID = serverID.id
-        if isinstance(serverID,(type(None),discord.DMChannel)) or not self.bot.database_online:
+        elif isinstance(serverID,discord.TextChannel):
+            serverID = serverID.guild
+        if not self.bot.database_online or serverID==None or isinstance(serverID,discord.DMChannel):
             lang_opt = self.bot.cogs['ServerCog'].default_language
+        elif isinstance(serverID,discord.GroupChannel):
+            used_langs = await self.bot.cogs['UtilitiesCog'].get_languages(serverID.recipient,limit=1)
+            lang_opt = used_langs[0][0]
         elif str(serverID) in self.serv_opts.keys():
             lang_opt = self.serv_opts[str(serverID)]
             #print("Ex langage:",lang_opt)
@@ -37,6 +42,12 @@ class LangCog(discord.ext.commands.Cog):
             #print("New langage:",lang_opt)
         if lang_opt not in self.languages:
             lang_opt = self.bot.cogs['ServerCog'].default_language
+        if lang_opt == 'fi':
+            try:
+                return eval("fi."+moduleID+"[\""+messageID+"\"]")
+            except:
+                await self.msg_not_found(moduleID,messageID,"fi")
+                lang_opt = 'en'
         if lang_opt == 'lolcat':
             try:
                 return eval("lolcat."+moduleID+"[\""+messageID+"\"]")

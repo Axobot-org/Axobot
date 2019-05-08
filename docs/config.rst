@@ -72,3 +72,4 @@ List of every option
 * anti_raid: Anti-raid protection with some useful features. More information `here <moderator.html#anti-raid>`_. Default level: 0
 * vote_emojis: List of emojis that the bot will have to use when there is a voting message. This case may occur when using the vote command, or in a poll channel.
 * help_in_dm: Boolean indicating whether the help command message should be sent as a private message, or in the server. If the value is set to :code:`True`, the message will be sent in DM.
+* noxp_channels: List of text channels where members will not be able to earn any exp. Not necessary if XP is disabled in your server.

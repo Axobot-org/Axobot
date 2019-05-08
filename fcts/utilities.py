@@ -1,4 +1,4 @@
-import discord, sys, traceback, importlib, datetime, random, re, asyncio
+import discord, sys, traceback, importlib, datetime, random, re, asyncio, operator
 from fcts import args
 from discord.ext import commands
 
@@ -12,7 +12,7 @@ class UtilitiesCog(commands.Cog):
         self.bot = bot
         self.list_prefixs = dict()
         self.file = "utilities"
-        self.config = None
+        self.config = {}
         self.table = 'users'
         self.new_pp = False
 
@@ -152,25 +152,26 @@ class UtilitiesCog(commands.Cog):
 
     async def global_check(self,ctx):
         """Do a lot of checks before executing a command (rss loop, banned guilds etc)"""
-        if ctx.bot.cogs['RssCog'].last_update==None or (datetime.datetime.now() - ctx.bot.cogs['RssCog'].last_update).total_seconds() > 30*60:
-
+        if ctx.bot.cogs['RssCog'].last_update==None or (datetime.datetime.now() - ctx.bot.cogs['RssCog'].last_update).total_seconds() > 20*60:
             self.bot.cogs['RssCog'].last_update = datetime.datetime.now()
             asyncio.run_coroutine_threadsafe(ctx.bot.cogs['RssCog'].main_loop(),asyncio.get_running_loop())
         if type(ctx)!=commands.context.Context:
             return True
         if await self.bot.cogs['AdminCog'].check_if_admin(ctx):
             return True
-        self.config = await self.get_bot_infos()
+        if len(self.config)==0:
+            self.config = await self.get_bot_infos()
         if len(self.config)==0:
             return True
-        if str(ctx.guild.id) in self.config['banned_guilds'].split(";"):
-            return False
-        if str(ctx.author.id) in self.config['banned_users'].split(";"):
-            return False
+        if ctx.guild != None:
+            if str(ctx.guild.id) in self.config['banned_guilds'].split(";"):
+                return False
+            if str(ctx.author.id) in self.config['banned_users'].split(";"):
+                return False
         return True
 
     async def create_footer(self,embed,user):
-        embed.set_footer(text="Requested by {}".format(user.name), icon_url=user.avatar_url_as(format='png'))
+        embed.set_footer(text="Requested by {}".format(user.name), icon_url=str(user.avatar_url_as(format='png')))
         return embed
 
     async def get_online_number(self,members):
@@ -365,6 +366,26 @@ class UtilitiesCog(commands.Cog):
             if await self.has_rainbow_card(user):
                 liste.append('rainbow')
         return sorted(liste2)+sorted(liste)
+
+    async def get_languages(self,user,limit=0):
+        """Get the most used languages of an user
+        If limit=0, return every languages"""
+        languages = list()
+        disp_lang = list()
+        for s in self.bot.guilds:
+            if user in s.members:
+                lang = await self.bot.cogs["ServerCog"].find_staff(s.id,'language')
+                if lang==None:
+                    lang = 0
+                languages.append(lang)
+        for e in range(len(self.bot.cogs['LangCog'].languages)):
+            if languages.count(e)>0:
+                disp_lang.append((self.bot.cogs['LangCog'].languages[e],round(languages.count(e)/len(languages),2)))
+        disp_lang.sort(key = operator.itemgetter(1))
+        if limit==0:
+            return disp_lang
+        else:
+            return disp_lang[:limit]
 
 
 def setup(bot):

@@ -28,22 +28,22 @@ class UsersCog(commands.Cog):
     async def profile_card(self,ctx,style:typing.Optional[args.cardStyle]=None):
         """Change your xp card style"""
         if style==None and len(ctx.view.buffer.split(' '))>2:
-            return await ctx.send(str(await self.translate(ctx.guild,'users','invalid-card')).format(', '.join(await ctx.bot.cogs['UtilitiesCog'].allowed_card_styles(ctx.author))))
+            return await ctx.send(str(await self.translate(ctx.channel,'users','invalid-card')).format(', '.join(await ctx.bot.cogs['UtilitiesCog'].allowed_card_styles(ctx.author))))
         elif style==None:
             if ctx.channel.permissions_for(ctx.me).attach_files:
                 style = await self.bot.cogs['UtilitiesCog'].get_xp_style(ctx.author)
-                txts = [await self.translate(ctx.guild,'xp','card-level'), await self.translate(ctx.guild,'xp','card-rank')]
-                desc = await self.translate(ctx.guild,'users','card-desc')
+                txts = [await self.translate(ctx.channel,'xp','card-level'), await self.translate(ctx.channel,'xp','card-rank')]
+                desc = await self.translate(ctx.channel,'users','card-desc')
                 await ctx.send(desc,file=await self.bot.cogs['XPCog'].create_card(ctx.author,style,0,[1,0],txts,force_static=True))
             else:
-                await ctx.send(await self.translate(ctx.guild,'users','missing-attach-files'))
+                await ctx.send(await self.translate(ctx.channel,'users','missing-attach-files'))
         else:
             if await ctx.bot.cogs['UtilitiesCog'].change_db_userinfo(ctx.author.id,'xp_style',style):
                 if style=='rainbow' and datetime.datetime.today().day==1:
                     await ctx.bot.cogs['UtilitiesCog'].change_db_userinfo(ctx.author.id,'unlocked_rainbow',True)
-                await ctx.send(str(await self.translate(ctx.guild,'users','changed-0')).format(style))
+                await ctx.send(str(await self.translate(ctx.channel,'users','changed-0')).format(style))
             else:
-                await ctx.send(await self.translate(ctx.guild,'users','changed-1'))
+                await ctx.send(await self.translate(ctx.channel,'users','changed-1'))
 
 
 

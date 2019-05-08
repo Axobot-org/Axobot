@@ -52,7 +52,7 @@ class EmbedCog(commands.Cog):
             if str(self.timestamp) != "":
                 emb["timestamp"] = str(self.timestamp)
             if self.footer_text != "" and self.footer_url != "":
-                emb["footer"] = {"icon_url":self.footer_url,"icon_text":self.footer_text}
+                emb["footer"] = {"icon_url":str(self.footer_url),"icon_text":self.footer_text}
             if self.thumbnail != "":
                 emb["thumbnail"] = {"url":self.thumbnail}
             if self.image != "":
@@ -64,7 +64,7 @@ class EmbedCog(commands.Cog):
                 if self.author_url != "":
                     auth["url"] = self.author_url
                 if self.author_icon != "":
-                    auth["icon_url"] = self.author_icon
+                    auth["icon_url"] = str(self.author_icon)
                 emb["author"] = auth
             if self.fields != []:
                 emb["fields"] = self.fields
@@ -76,7 +76,7 @@ class EmbedCog(commands.Cog):
 
         def set_author(self,user):
             self.author_name = user.name
-            self.author_icon = user.avatar_url_as(format='gif',size=256) if user.is_avatar_animated() else user.avatar_url_as(format='png',size=256)
+            self.author_icon = str(user.avatar_url_as(format='gif',size=256)) if user.is_avatar_animated() else str(user.avatar_url_as(format='png',size=256))
             return self
         
         def create_footer(self,user):
@@ -92,8 +92,8 @@ class EmbedCog(commands.Cog):
             emb = discord.Embed(title=self.title, colour=color, url=self.url, description=self.description, timestamp=self.timestamp)
             emb.set_image(url=self.image)
             emb.set_thumbnail(url=self.thumbnail)
-            emb.set_author(name=self.author_name, url=self.author_url, icon_url=self.author_icon)
-            emb.set_footer(text=self.footer_text, icon_url=self.footer_url)
+            emb.set_author(name=self.author_name, url=self.author_url, icon_url=str(self.author_icon))
+            emb.set_footer(text=self.footer_text, icon_url=str(self.footer_url))
             for x in self.fields:
                 emb.add_field(name=x["name"],value=x["value"],inline=x["inline"])
             return emb

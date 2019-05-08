@@ -44,6 +44,12 @@ class AdminCog(commands.Cog):
 
     async def check_if_admin(self,ctx):
         return await reloads.check_admin(ctx)
+    
+    async def check_if_god(self,ctx):
+        if ctx.guild!=None:
+            return await reloads.check_admin(ctx) and ctx.guild.id in self.god_mode
+        else:
+            return await reloads.check_admin(ctx)
 
     
     @commands.command(name='admins')
@@ -54,7 +60,36 @@ class AdminCog(commands.Cog):
             if u==552273019020771358:
                 continue
             l.append(str(self.bot.get_user(u)))
-        await ctx.send(str(await self.translate(ctx.guild,"infos","admins-list")).format(", ".join(l)))
+        await ctx.send(str(await self.translate(ctx.channel,"infos","admins-list")).format(", ".join(l)))
+
+    @commands.command(name='god')
+    @commands.check(reloads.check_admin)
+    @commands.guild_only()
+    async def enable_god_mode(self,ctx,enable:bool=True):
+        """Donne les pleins-pouvoirs aux admins du bot sur ce serveur (accès à toutes les commandes de modération)"""
+        if enable:
+            if ctx.guild.id not in self.god_mode:
+                self.god_mode.append(ctx.guild.id)
+                await ctx.send("<:nitro:548569774435598346> Mode superadmin activé sur ce serveur",delete_after=3)
+            else:
+                await ctx.send("Mode superadmin déjà activé sur ce serveur",delete_after=3)
+        else:
+            if ctx.guild.id in self.god_mode:
+                self.god_mode.remove(ctx.guild.id)
+                await ctx.send("Mode superadmin désactivé sur ce serveur",delete_after=3)
+            else:
+                await ctx.send("Ce mode n'est pas actif ici",delete_after=3)
+        try:
+            await ctx.message.delete()
+        except:
+            pass
+
+    @commands.command(name='spoil',hidden=True)
+    @commands.check(reloads.check_admin)
+    async def send_spoiler(self,ctx,*,text):
+        """spoil spoil spoil"""
+        spoil = lambda text: "||"+"||||".join(text)+"||"
+        await ctx.send("```\n{}\n```".format(spoil(text)))
 
     @commands.command(name='god')
     @commands.check(reloads.check_admin)
@@ -239,7 +274,7 @@ class AdminCog(commands.Cog):
 
     @main_msg.command(name='reload')
     @commands.check(reloads.check_admin)
-    async def cog_reload(self, ctx, *, cog: str):
+    async def reload_cog(self, ctx, *, cog: str):
         """Recharge un module"""
         cogs = cog.split(" ")
         await self.bot.cogs["ReloadsCog"].reload_cogs(ctx,cogs)
@@ -387,7 +422,16 @@ class AdminCog(commands.Cog):
         cmds = self.bot.commands
         obj = await self.bot.cogs['UtilitiesCog'].set_find(cmds,cmd)
         if obj != None:
-            await ctx.send("```py\n{}\n```".format(inspect.getsource(obj.callback)))
+            code = inspect.getsource(obj.callback)
+            if len(code)>1950:
+                liste = str()
+                for line in code.split('\n'):
+                    if len(liste+"\n"+line)>1950:
+                        await ctx.send("```py\n{}\n```".format(liste))
+                        liste = str()
+                    liste += '\n'+line
+            else:
+                await ctx.send("```py\n{}\n```".format(code))
         else:
             await ctx.send("Commande `{}` introuvable".format(cmd))
     
@@ -436,12 +480,15 @@ class AdminCog(commands.Cog):
     async def show_last_logs(self,ctx,lines:typing.Optional[int]=15,match=''):
         """Affiche les <lines> derniers logs ayant <match> dedans"""
         try:
+            if lines>1000:
+                match = str(lines)
+                lines = 15
             with open('debug.log','r',encoding='utf-8') as file:
                 text = file.read().split("\n")
             msg = str()
             liste = list()
             i = 1
-            while len(liste)<=lines and i<min(2000,len(text)):
+            while len(liste)<lines and i<min(2000,len(text)):
                 i+=1
                 if (not match in text[-i]) or ctx.message.content in text[-i]:
                     continue
@@ -456,16 +503,25 @@ class AdminCog(commands.Cog):
         except Exception as e:
             await self.bot.cogs['ErrorsCog'].on_error(e,ctx)
 
-    @main_msg.command(name="enable_xp")
+    @main_msg.command(name="enable_module")
     @commands.check(reloads.check_admin)
-    async def enable_xp(self,ctx,enabling:bool):
+    async def enable_xp(self,ctx,enabling:bool,module:str):
         """Empêche tous les utilisateurs de gagner de l'xp.
 Cette option affecte tous les serveurs"""
-        self.bot.xp_enabled = enabling
-        if enabling:
-            await ctx.send("L'xp est mainenant activée")
+        if module=='xp':
+            self.bot.xp_enabled = enabling
+            if enabling:
+                await ctx.send("L'xp est mainenant activée")
+            else:
+                await ctx.send("L'xp est mainenant désactivée")
+        elif module=='rss':
+            self.bot.rss_enabled = enabling
+            if enabling:
+                await ctx.send("Les flux RSS sont mainenant activée")
+            else:
+                await ctx.send("Les flux RSS sont mainenant désactivée")
         else:
-            await ctx.send("L'xp est mainenant désactivée")
+            await ctx.send('Module introuvable')
             
 
     @main_msg.group(name="server")
@@ -494,6 +550,9 @@ Cette option affecte tous les serveurs"""
         owner_list = list()
         for guild in self.bot.guilds:
             if len(guild.members)>9:
+                if guild.owner==None or guild.owner.id==None:
+                    await ctx.send("Oops, askip le propriétaire de {} n'existe pas ._.".format(guild.id))
+                    continue
                 owner_list.append(guild.owner.id)
         for member in server.members:
             if member.id in owner_list and role not in member.roles:
@@ -535,11 +594,15 @@ Cette option affecte tous les serveurs"""
         liste = liste[:number]
         title = "Liste des {} meilleures idées (sur {}) :".format(len(liste),count)
         text = str()
+        if ctx.guild!=None:
+            color = ctx.guild.me.color
+        else:
+            color = discord.Colour(8311585)
         for x in liste:
             text += "\n**[{} - {}]**  {} ".format(x[3],x[4],x[2])
         try:
             if ctx.guild==None or ctx.channel.permissions_for(ctx.guild.me).embed_links:
-                emb = ctx.bot.cogs['EmbedCog'].Embed(title=title,desc=text,color=ctx.guild.me.color).update_timestamp()
+                emb = ctx.bot.cogs['EmbedCog'].Embed(title=title,desc=text,color=color).update_timestamp()
                 return await bot_msg.edit(content=None,embed=emb.discord_embed())
             await bot_msg.edit(content=title+text)
         except discord.HTTPException:
