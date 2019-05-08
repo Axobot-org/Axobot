@@ -279,7 +279,7 @@ class XPCog(commands.Cog):
         bar_colors = await self.get_xp_bar_color(user.id)
         colors = {'name':(124, 197, 118),'xp':(124, 197, 118),'NIVEAU':(255, 224, 77),'rank':(105, 157, 206),'bar':bar_colors}
         if style=='blurple':
-            colors = {'name':(134, 157, 228),'xp':(1,1,35),'NIVEAU':(255, 255, 255, 255),'rank':(255, 255, 255),'bar':(70, 83, 138)}
+            colors = {'name':(35,35,50),'xp':(235, 235, 255),'NIVEAU':(245, 245, 255),'rank':(255, 255, 255),'bar':(70, 83, 138)}
         if not user.is_avatar_animated() or force_static:
             pfp = await self.get_raw_image(user.avatar_url_as(format='png',size=256))
             img = await self.add_overlay(pfp.resize(size=(282,282)),user,card,xp,rank,txt,colors)
