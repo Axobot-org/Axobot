@@ -72,6 +72,7 @@ class WelcomerCog(commands.Cog):
         if len(servers)>0:
             role = member.guild.get_role(486905171738361876)
             if role==None:
+                self.bot.log.warn('[check_owner_server] Owner role not found')
                 return
             if role not in member.roles:
                 await member.add_roles(role,reason="This user support me")
@@ -82,6 +83,8 @@ class WelcomerCog(commands.Cog):
             role = member.guild.get_role(412340503229497361)
             if role!=None:
                 await member.add_roles(role)
+            else:
+                self.bot.log.warn('[check_support] Support role not found')
 
     async def check_contributor(self,member):
         """Vérifie si un nouvel arrivant est un contributeur"""
@@ -89,6 +92,8 @@ class WelcomerCog(commands.Cog):
             role = member.guild.get_role(552428810562437126)
             if role!=None:
                 await member.add_roles(role)
+            else:
+                self.bot.log.warn('[check_contributor] Contributor role not found')
 
     async def kick(self,member,reason):
         try:

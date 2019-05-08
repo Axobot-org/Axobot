@@ -1,6 +1,7 @@
 from discord.ext import commands
-import discord, re, datetime, random, json, os, typing
+import discord, re, datetime, random, json, os, typing, importlib
 from fcts import checks
+importlib.reload(checks)
 
 class ModeratorCog(commands.Cog):
     """Here you will find everything you need to moderate your server. Please note that most of the commands are reserved for certain members only."""
@@ -22,7 +23,8 @@ class ModeratorCog(commands.Cog):
     @commands.cooldown(1, 3, commands.BucketType.guild)
     @commands.check(checks.can_slowmode)
     async def slowmode(self,ctx,time=None):
-        """Keep your chat cool"""
+        """Keep your chat cool
+        Slowmode works up to one message every 6h (21600s)"""
         if not ctx.channel.permissions_for(ctx.guild.me).manage_channels:
             await ctx.send(await self.translate(ctx.guild.id,"modo","cant-slowmode"))
             return
@@ -31,15 +33,17 @@ class ModeratorCog(commands.Cog):
         if time.isnumeric():
             time = int(time)
         if time == 'off' or time==0:
-            await ctx.bot.http.request(discord.http.Route('PATCH', '/channels/{cid}', cid=ctx.channel.id), json={'rate_limit_per_user':0})
+            #await ctx.bot.http.request(discord.http.Route('PATCH', '/channels/{cid}', cid=ctx.channel.id), json={'rate_limit_per_user':0})
+            await ctx.channel.edit(slowmode_delay=0)
             message = await self.translate(ctx.guild.id,"modo","slowmode-0")
             log = str(await self.translate(ctx.guild.id,"logs","slowmode-disabled")).format(channel=ctx.channel.mention)
             await self.bot.cogs["Events"].send_logs_per_server(ctx.guild,"slowmode",log,ctx.author)
         elif type(time)==int:
-            if time>120:
+            if time>21600:
                 message = await self.translate(ctx.guild.id,"modo","slowmode-1")
             else:
-                await ctx.bot.http.request(discord.http.Route('PATCH', '/channels/{cid}', cid=ctx.channel.id), json={'rate_limit_per_user':time})
+                #await ctx.bot.http.request(discord.http.Route('PATCH', '/channels/{cid}', cid=ctx.channel.id), json={'rate_limit_per_user':time})
+                await ctx.channel.edit(slowmode_delay=time)
                 message = str(await self.translate(ctx.guild.id,"modo","slowmode-2")).format(ctx.channel.mention,time)
                 log = str(await self.translate(ctx.guild.id,"logs","slowmode-enabled")).format(channel=ctx.channel.mention,seconds=time)
                 await self.bot.cogs["Events"].send_logs_per_server(ctx.guild,"slowmode",log,ctx.author)
@@ -121,11 +125,11 @@ class ModeratorCog(commands.Cog):
                 if (i == None and invites==2) or (i != None and invites==0):
                     c4 = False
             #return ((m.pinned == pinned) or ((m.attachments != []) == files) or ((r != None) == links)) and m.author in users
-            mentions = ctx.message.raw_mentions
-            if ctx.prefix.strip() in mentions:
-                mentions.remove(ctx.prefix.strip())
+            mentions = [x.id for x in ctx.message.mentions]
+            if str(ctx.bot.user.id) in ctx.prefix:
+                mentions.remove(ctx.bot.user.id)
             if mentions != [] and m.author!=None:
-                return c1 and c2 and c3 and c4 and m.author.mention in mentions
+                return c1 and c2 and c3 and c4 and m.author.id in mentions
             else:
                 return c1 and c2 and c3 and c4
         try:
@@ -167,7 +171,7 @@ class ModeratorCog(commands.Cog):
                     return await ctx.send(await self.translate(ctx.guild.id,"modo","staff-kick"))
             elif user==ctx.guild.me or ctx.channel.permissions_for(user).kick_members:
                 return await ctx.send(await self.translate(ctx.guild.id,"modo","staff-kick"))
-            if user.roles[-1].position > ctx.guild.me.roles[-1].position:
+            if user.roles[-1].position >= ctx.guild.me.roles[-1].position:
                 await ctx.send(await self.translate(ctx.guild.id,"modo","kick-1"))
                 return
             if user.id not in self.bot.cogs['WelcomerCog'].no_message:
@@ -290,7 +294,7 @@ class ModeratorCog(commands.Cog):
         if role == None:
             role = await self.configure_muted_role(ctx.guild)
             await ctx.send(await self.translate(ctx.guild.id,"modo","mute-created"))
-        if role.position > ctx.guild.me.roles[-1].position:
+        if role.position >= ctx.guild.me.roles[-1].position:
             await ctx.send(await self.translate(ctx.guild.id,"modo","mute-high"))
             return
         caseID = "'Unsaved'"
@@ -344,7 +348,7 @@ class ModeratorCog(commands.Cog):
         if not ctx.channel.permissions_for(ctx.guild.me).manage_roles:
             await ctx.send(await self.translate(ctx.guild.id,"modo","cant-mute"))
             return
-        if role.position > ctx.guild.me.roles[-1].position:
+        if role.position >= ctx.guild.me.roles[-1].position:
             await ctx.send(await self.translate(ctx.guild.id,"modo","mute-high"))
             return
         try:
@@ -393,7 +397,7 @@ class ModeratorCog(commands.Cog):
                 elif not self.bot.database_online and (ctx.channel.permissions_for(member).ban_members or user==ctx.guild.me):
                     await ctx.send(await self.translate(ctx.guild.id,"modo","staff-ban"))
                     return
-                if member.roles[-1].position > ctx.guild.me.roles[-1].position:
+                if member.roles[-1].position >= ctx.guild.me.roles[-1].position:
                     await ctx.send(await self.translate(ctx.guild.id,"modo","ban-1"))
                     return
             if user in self.bot.users and user.id not in self.bot.cogs['WelcomerCog'].no_message:
@@ -497,7 +501,7 @@ class ModeratorCog(commands.Cog):
                     return await ctx.send(await self.translate(ctx.guild.id,"modo","staff-kick"))
             elif user==ctx.guild.me or ctx.channel.permissions_for(user).kick_members:
                 return await ctx.send(await self.translate(ctx.guild.id,"modo","staff-kick"))
-            if user.roles[-1].position > ctx.guild.me.roles[-1].position:
+            if user.roles[-1].position >= ctx.guild.me.roles[-1].position:
                 await ctx.send(await self.translate(ctx.guild.id,"modo","kick-1"))
                 return
             try:
@@ -662,6 +666,7 @@ You must be an administrator of this server to use this command."""
 
 
     @commands.group(name="role")
+    @commands.guild_only()
     async def main_role(self,ctx):
         """A few commands to manage roles"""
         pass
@@ -673,7 +678,7 @@ You must be an administrator of this server to use this command."""
         if not ctx.guild.me.guild_permissions.manage_roles:
             await ctx.send(await self.translate(ctx.guild.id,"modo","cant-mute"))
             return
-        if role.position > ctx.guild.me.roles[-1].position:
+        if role.position >= ctx.guild.me.roles[-1].position:
             await ctx.send(str(await self.translate(ctx.guild.id,"modo","role-high")).format(role.name))
             return
         await role.edit(colour=color,reason="Asked by {}".format(ctx.author))
@@ -685,18 +690,18 @@ You must be an administrator of this server to use this command."""
     async def pin_msg(self,ctx,msg:int):
         """Pin a message
 ID corresponds to the Identifier of the message"""
-        if not ctx.channel.permissions_for(ctx.guild.me).manage_messages:
-            await ctx.send(await self.translate(ctx.guild,"modo","cant-pin"))
+        if ctx.guild!=None and not ctx.channel.permissions_for(ctx.guild.me).manage_messages:
+            await ctx.send(await self.translate(ctx.channel,"modo","cant-pin"))
             return
         try:
             message = await ctx.channel.fetch_message(msg)
         except Exception as e:
-            await ctx.send(str(await self.translate(ctx.guild,"modo","pin-error")).format(e))
+            await ctx.send(str(await self.translate(ctx.channel,"modo","pin-error")).format(e))
             return
         try:
             await message.pin()
         except Exception as e:
-            await ctx.send(str(await self.translate(ctx.guild,"modo","pin-error-2")).format(e))
+            await ctx.send(str(await self.translate(ctx.channel,"modo","pin-error-2")).format(e))
             return
 
     @commands.command(name='backup')
@@ -709,7 +714,7 @@ ID corresponds to the Identifier of the message"""
         Please note that audit logs, messages and invites are not used"""
         try:
             g = ctx.guild
-            back = {'name':g.name,'id':g.id,'owner':g.owner.id,'voiceregion':str(g.region),'afk_timeout':g.afk_timeout,'afk_channel':g.afk_channel,'icon':g.icon_url,'verification_level':str(g.verification_level),'mfa_level':g.mfa_level,'explicit_content_filter':str(g.explicit_content_filter),'default_notifications':str(g.default_notifications),'created_at':int(g.created_at.timestamp())}
+            back = {'name':g.name,'id':g.id,'owner':g.owner.id,'voiceregion':str(g.region),'afk_timeout':g.afk_timeout,'afk_channel':g.afk_channel,'icon':str(g.icon_url),'verification_level':str(g.verification_level),'mfa_level':g.mfa_level,'explicit_content_filter':str(g.explicit_content_filter),'default_notifications':str(g.default_notifications),'created_at':int(g.created_at.timestamp())}
             back['system_channel'] = g.system_channel.id if g.system_channel!=None else None
             roles = list()
             for x in g.roles:

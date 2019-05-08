@@ -29,6 +29,16 @@ aide={"no-subcmd":"La commande {0.name} n'a aucune sous-commande",
 "cmd-not-found":"Aucune commande nommée \"{}\"",
 "subcmd-not-found":"Cette commande ne possède aucune sous-commande nommée \"{}\""}
 
+blurple = {'check_intro':"{}, début de l'analyse blurple (Notez que cela peut prendre un certain temps)",
+    'check_invalid':'{}, veillez donner une URL valide',
+    'check_resized':"{}, l'image a été changée de taille pour faciliter le processus ({}s)",
+    'check_fields':["Pourcentage total de Blurple","Blurple (rgb(114, 137, 218))","Blanc (rgb(255, 255, 255))","Blurple Sombre (rgb(78, 93, 148))","Blurple, Blanc, Blurple Sombre = Blurple, Blanc, and Blurple Sombre (respectively) \nNoir = ni Blurple, ni Blanc, ni Blurple Sombre","Un énorme merci à **Rocked03** pour son code :blue_heart: https://github.com/Rocked03/Blurplefied.git","Remarque : Discord réduit la qualité des images, donc les pourcentages peuvent être légèrement imprécis. | Content requested by {}"],
+    'create_title':"Blurplefier - makes your image blurple!",
+    'create_footer_1':"Veuillez noter que ce blurplefier est automatisé et qu'il peut donc ne pas toujours vous donner le meilleur résultat. | Content requested by {}",
+    'create_footer_2':"Veuillez noter que ce blurplefier est automatisé et qu'il peut donc ne pas toujours vous donner le meilleur résultat. Avertissement : Cette image est un gif, et la qualité n'est pas toujours bonne. TOUTEFOIS, le gif n'est souvent pas aussi granuleux qu'il n'y paraît dans la prévisualisation. | Content requested by {}",
+    'create_oops':"{}, oups ! Il semble que ce gif est trop gros pour être téléchargé. Si vous voulez, vous pouvez lui donner une autre chance, mais avec une version plus petite de l'image. Désolé !"
+    }
+
 bvn={"aide":"""__**Bienvenue dans le module des message de join et de leave**__
 
 Ce module vous sert à configurer un message automatique à chaque fois qu'un membre rentre ou sort de votre serveur.
@@ -69,7 +79,7 @@ find={"user-0":"Nom : {}\nID : {}",
 "user-1":"Nom : {name}\nID : {id}\nRangs : {rangs}\nServeurs : {servers}\nPropriétaire de : {own}\nLangues : {lang}\nA voté : {vote}\nCarte d'xp : {card}",
 "user-2":"Utilisateur introuvable",
 "guild-0":"Serveur introuvable",
-"guild-1":"Nom : {}\nID : {}\nPropriétaire : {} ({})\nMembres : {} (dont {} bots)\nLangue : {}\nPréfixe : `{}`",
+"guild-1":"Nom : {}\nID : {}\nPropriétaire : {} ({})\nMembres : {} (dont {} bots)\nLangue : {}\nPréfixe : `{}`\nNombre de flux rss : {}",
 "chan-0":"Salon introuvable",
 "chan-1":"Nom : {}\nID : {}\nServeur : {} ({})",
 "help":"Cette commande permet de retrouver un serveur ou un salon parmi tout les serveurs sur lequel est le bot. Vous pouvez aussi rechercher les informations d'un utilisateur Discord, peu importe si il partage un serveur avec moi !\
@@ -101,7 +111,8 @@ fun={"count-0":"Comptage en cours...",
     "no-embed-perm":"Je ne possède pas la permission \"Intégrer des liens\" :confused:",
     "embed-error":"Une erreur est survenue: `{}`",
     "invalid-city":"Nom de ville invalide",
-    "no-roll":"Aucun élément trouvé"
+    "no-roll":"Aucun élément trouvé",
+    'no-say':"Impossible d'envoyer un message dans ce salon"
     }
 
 infos={"text-0":"""Bonjour ! Moi c'est {0} !
@@ -146,7 +157,8 @@ keywords={"depuis":"depuis",
           "aucune":"aucune",
           "membres":"membres",
           "subcmds":"sous-commandes",
-          "ghost":"Fantôme"
+          "ghost":"Fantôme",
+          'unknown':'Inconnu'
           }
 
 kill={"list":["Oh toi, tu vas mourir !",
@@ -232,7 +244,7 @@ mc={"contact-mail":"Si vous constatez une erreur dans les informations données,
     }
 
 modo={"slowmode-0":"Le slowmode est désormais désactivé dans ce salon.",
-    "slowmode-1":"Impossible de mettre une fréquence supérieure à deux minutes",
+    "slowmode-1":"Impossible de mettre une fréquence supérieure à six heures",
     "slowmode-2":"Le channel {} est désormais en slowmode.\nAttendez {} secondes avant d'envoyer un message.",
     "slowmode-3":"Cette valeur est invalide",
     "slowmode-info":"Le slowmode de ce salon est actuellement à {} secondes",
@@ -301,7 +313,8 @@ morpion={'user-begin':'{}, à toi de commencer !',
         'pion-1':'Il y a déjà un pion sur cette case !',
         'pion-2':'Case saisie invalide !',
         'win-1':"Bien joué, {} a gagné !",
-        'win-2':"J'ai gagné ! Fin du match !"}
+        'win-2':"J'ai gagné ! Fin du match !",
+        'already-playing':"Vous avez déjà une partie en cours !"}
 
 perms={"perms-0":"Le membre/rôle {} n'a pas été trouvé",
         "perms-1":"**Permission de '{}' :**\n\n"
@@ -407,7 +420,8 @@ l'option (`!config change <option> del` fonctionne de même).\nLa liste des opti
         "change-prefix-1":"Ce préfixe est trop long pour être utilisé !",
         "wrong-prefix":"Oups, il semble que ce préfixe est invalide :thinking: Si le problème persiste, veuillez en choisir un autre",
         "opt_title":"Option '{}' du serveur {}",
-        "not-found":"Le serveur {} n'a pas encore été enregistré dans la base de donnée"
+        "not-found":"Le serveur {} n'a pas encore été enregistré dans la base de donnée",
+        "need-admin":"Vous devez avoir les permissions Administrateur pour exécuter cette commande."
         }
 
 server_desc={"prefix":"Préfixe actuel du bot : {}",
@@ -436,7 +450,8 @@ server_desc={"prefix":"Préfixe actuel du bot : {}",
              "anti_raid":"Niveau de la protection anti-raid : {} \n*([Documentation](https://zbot.rtfd.io/en/latest/moderator.html#anti-raid))*",
              "vote_emojis":"Emojis utilisés pour les réactions de vote : {}",
              "help_in_dm":"Envoyer le message d'aide en message privés ? {}",
-             "muted_role":"Rôle utilisé pour rendre les gens muets : {}"}
+             "muted_role":"Rôle utilisé pour rendre les gens muets : {}",
+             "noxp_channels":"Salons où il est impossible d'obtenir de l'xp : {}"}
 
 stats_infos={"not-found":"Impossible de trouver {N}",
             "member-0":"Surnom",
@@ -504,6 +519,13 @@ xp = {'card-level':'NIVEAU',
         "low-page":"Impossible d'afficher un numéro de page négatif !",
         "high-page":"Il n'y a pas autant de pages !",
         "top-title-1":"Classement global",
+        "top-title-2":"Classement du serveur",
         "top-name":"__Top {}-{} (page {}/{}) :__",
         "default_levelup":"{user} vient de passer **niveau {level}** ! GG !",
-        "top-your":"Votre niveau"}
+        "top-your":"Votre niveau",
+        'rr_list':"Liste des rôles",
+        'rr-added':"Le rôle `{}` a correctement été ajouté pour le niveau {} !",
+        'already-1-rr':"Il y a déjà un rôle configuré pour ce niveau !",
+        'no-rr':"Aucun rôle n'a été configuré pour ce niveau",
+        'rr-removed':"Plus aucun rôle ne sera donné pour le niveau {}"
+        }

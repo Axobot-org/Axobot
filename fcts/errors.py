@@ -28,22 +28,23 @@ class ErrorsCog(commands.Cog):
         if hasattr(ctx.command, 'on_error'):
             return
         
-        ignored = (commands.CommandNotFound,commands.CheckFailure,commands.ConversionError,commands.BotMissingPermissions,discord.errors.Forbidden)
+        ignored = (commands.errors.CommandNotFound,commands.errors.CheckFailure,commands.errors.ConversionError,discord.errors.Forbidden)
         
         # Allows us to check for original exceptions raised and sent to CommandInvokeError.
         # If nothing is found. We keep the exception passed to on_command_error.
         error = getattr(error, 'original', error)
 
         # Anything in ignored will return and prevent anything happening.
-        if isinstance(error, ignored) and not self.bot.beta:
+        if isinstance(error, ignored):
+            if self.bot.beta:
+                c = str(type(error)).replace("<class '",'').replace("'>",'')
+                await ctx.send('`Ignored error:` [{}] {}'.format(c,error))
             return
-        elif isinstance(error,ignored):
-            return await ctx.send("`ERROR:` {}".format(error))
-        elif isinstance(error,commands.CommandOnCooldown):
+        elif isinstance(error,commands.errors.CommandOnCooldown):
             if await self.bot.cogs['AdminCog'].check_if_admin(ctx):
                 await ctx.reinvoke()
                 return
-            await ctx.send(str(await self.translate(ctx.guild,'errors','cooldown')).format(round(error.retry_after,2)))
+            await ctx.send(str(await self.translate(ctx.channel,'errors','cooldown')).format(round(error.retry_after,2)))
             return
         elif isinstance(error,(commands.BadArgument,commands.BadUnionArgument)):
             # Could not convert "limit" into int. OR Converting to "int" failed for parameter "number".
@@ -51,37 +52,41 @@ class ErrorsCog(commands.Cog):
             if r==None:
                 r = re.search(r'Converting to \"(?P<type>[^\"]+)\" failed for parameter \"(?P<arg>[^.\n]+)\"',str(error))
             if r!=None:
-                return await ctx.send(str(await self.translate(ctx.guild,'errors','badarguments')).format(r.group('arg'),r.group('type')))
+                return await ctx.send(str(await self.translate(ctx.channel,'errors','badarguments')).format(r.group('arg'),r.group('type')))
             # Member "Z_runner" not found
             r = re.search(r'Member \"([^\"]+)\" not found',str(error))
             if r!=None:
-                return await ctx.send(str(await self.translate(ctx.guild,'errors','membernotfound')).format(r.group(1)))
+                return await ctx.send(str(await self.translate(ctx.channel,'errors','membernotfound')).format(r.group(1)))
             # User "Z_runner" not found
             r = re.search(r'User \"([^\"]+)\" not found',str(error))
             if r!=None:
-                return await ctx.send(str(await self.translate(ctx.guild,'errors','usernotfound')).format(r.group(1)))
+                return await ctx.send(str(await self.translate(ctx.channel,'errors','usernotfound')).format(r.group(1)))
             # Role "Admin" not found
             r = re.search(r'Role \"([^\"]+)\" not found',str(error))
             if r!=None:
-                return await ctx.send(str(await self.translate(ctx.guild,'errors','rolenotfound')).format(r.group(1)))
-             # Role "Admin" not found
+                return await ctx.send(str(await self.translate(ctx.channel,'errors','rolenotfound')).format(r.group(1)))
+             # Colour "blue" is invalid
             r = re.search(r'Colour \"([^\"]+)\" is invalid',str(error))
             if r!=None:
-                return await ctx.send(str(await self.translate(ctx.guild,'errors','invalidcolor')).format(r.group(1)))
+                return await ctx.send(str(await self.translate(ctx.channel,'errors','invalidcolor')).format(r.group(1)))
             # Invalid duration: 2d
             r = re.search(r'Invalid duration: ([^\" ]+)',str(error))
             if r != None:
-                return await ctx.send(str(await self.translate(ctx.guild,'errors','duration')).format(r.group(1)))
+                return await ctx.send(str(await self.translate(ctx.channel,'errors','duration')).format(r.group(1)))
+            # Role "Admin" not found
+            r = re.search(r'You are missing () permission(s) to run command.',str(error))
+            if r!=None:
+                return await ctx.send(str(await self.translate(ctx.channel,'errors','rolenotfound')).format(r.group(1)))
             print('errors -',error)
         elif isinstance(error,commands.MissingRequiredArgument):
-            await ctx.send(str(await self.translate(ctx.guild,'errors','missingargument')).format(error.param.name,random.choice([':eyes:','',':confused:',':thinking:',''])))
+            await ctx.send(str(await self.translate(ctx.channel,'errors','missingargument')).format(error.param.name,random.choice([':eyes:','',':confused:',':thinking:',''])))
             return
         elif isinstance(error,commands.DisabledCommand):
-            await ctx.send(str(await self.translate(ctx.guild,'errors','disabled')).format(ctx.invoked_with))
+            await ctx.send(str(await self.translate(ctx.channel,'errors','disabled')).format(ctx.invoked_with))
             return
         else:
             try:
-                await ctx.send("`ERROR:` "+str(error))
+                await ctx.send("`ERROR:` {}".format(str(error)))
             except:
                 self.bot.log.info("[on_cmd_error] Can't send error on channel {}".format(ctx.channel.id))
         # All other Errors not returned come here... And we can just print the default TraceBack.
@@ -106,7 +111,7 @@ class ErrorsCog(commands.Cog):
             msg = """```python
 Traceback (most recent call last):
 {T} {S}
-```""".format(T=" ".join(traceback.format_tb(sysexc[2])),S=s+' : '+str(sysexc[1]))
+```""".format(T=" ".join(traceback.format_tb(sysexc[2])),S='{} : {}'.format(s,str(sysexc[1])))
             if ctx == None:
                 await self.senf_err_msg("Internal Error\n"+msg)
             elif ctx.guild == None:

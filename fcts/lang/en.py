@@ -29,6 +29,16 @@ aide={"no-subcmd":"The command `{0.name}` has no subcommand",
 "cmd-not-found":"There is no command nammed \"{}\"",
 "subcmd-not-found":"This command has no subcommand named \"{}\""}
 
+blurple = {'check_intro':'{}, starting blurple image analysis (Please note that this may take a while)',
+    'check_invalid':'{}, please link a valid image URL',
+    'check_resized':"{}, image resized smaller for easier processing ({}s)",
+    'check_fields':["Total amount of Blurple","Blurple (rgb(114, 137, 218))","White (rgb(255, 255, 255))","Dark Blurple (rgb(78, 93, 148))","Blurple, White, Dark Blurple = Blurple, White, and Dark Blurple (respectively) \nBlack = Not Blurple, White, or Dark Blurple","A big thanks to **Rocked03** for his code :blue_heart: https://github.com/Rocked03/Blurplefied.git","Please note: Discord slightly reduces quality of the images, therefore the percentages may be slightly inaccurate. | Content requested by {}"],
+    'create_title':"Blurplefier - makes your image blurple!",
+    'create_footer_1':"Please note - This blurplefier is automated and therefore may not always give you the best result. | Content requested by {}",
+    'create_footer_2':"Please note - This blurplefier is automated and therefore may not always give you the best result. Disclaimer: This image is a gif, and the quality does not always turn out great. HOWEVER, the gif is quite often not as grainy as it appears in the preview | Content requested by {}",
+    'create_oops':"{}, whoops! It looks like this gif is too big to upload. If you want, you can give it another go, except with a smaller version of the image. Sorry about that!"
+    }
+
 bvn={"aide":"""__**Welcome to the join & leave message module**__
 
 This module is used to configure an automatic message each time a member enters or exits your server.
@@ -69,7 +79,7 @@ find={"user-0":"name: {}\nID: {}",
 "user-1":"Name: {name}\nID: {id}\nPerks: {rangs}\nServers: {servers}\nOwner of: {own}\nLanguages: {lang}\nVoted? {vote}\nXP card: {card}",
 "user-2":"User not found",
 "guild-0":"Server not found",
-"guild-1":"Name: {}\nID: {}\nOwner: {} ({})\nMembers: {} (including {} bots)\nLanguage: {}\nPrefix: `{}`",
+"guild-1":"Name: {}\nID: {}\nOwner: {} ({})\nMembers: {} (including {} bots)\nLanguage: {}\nPrefix: `{}`\nRss feeds number: {}",
 "chan-0":"Channel not found",
 "chan-1":"Name : {}\nID: {}\nServer: {} ({})",
 "help":"This command allows to find a server or a salon among all the servers on which is the bot. You can also search for a Discord user's information, no matter if he shares a server with me!\
@@ -101,7 +111,8 @@ fun={"count-0":"Counting in progress...",
     "no-embed-perm":"I don't have permission to \"Embed links\" :confused:",
     "embed-error":"An error has occurred: `{}`",
     "invalid-city":"Invalid city :confused:",
-    "no-roll":"No choice found"
+    "no-roll":"No choice found",
+    'no-say':"Unable to send any message in this channel"
     }
 
 infos={"text-0":"""Hello! I'm {0} !
@@ -146,7 +157,8 @@ keywords={"depuis":"since",
           "aucune":"none",
           "membres":"members",
           "subcmds":"subcommands",
-          "ghost":"Ghost"
+          "ghost":"Ghost",
+          "unknown":"Unknown"
           }
 
 kill={"list":["Oh you, you gonna to die!",
@@ -232,7 +244,7 @@ mc={"contact-mail":"If you notice an error in the information provided, please c
       }
 
 modo={"slowmode-0":"The slowmode is now disabled in this channel.",
-    "slowmode-1":"Impossible to set a frequency higher than two minutes",
+    "slowmode-1":"Impossible to set a frequency higher than six hours",
     "slowmode-2":"The {} channel is now in slowmode. Wait {} seconds before sending a message.",
     "slowmode-3":"This value is invalid",
     "slowmode-info":"The slowmode of this channel is currently at {} seconds",
@@ -301,7 +313,8 @@ morpion={'user-begin':'{}, you begin!',
         'pion-1':"There's already a pawn on that cell!",
         'pion-2':'Invalid input case',
         'win-1':"Well done, {} won!",
-        'win-2':"I won! End of the game!"}
+        'win-2':"I won! End of the game!",
+        'already-playing':"You already have a game in progress!"}
 
 perms={"perms-0":"Member/role {} not found",
         "perms-1":"**'{}' permissions:**\n\n"
@@ -407,7 +420,8 @@ to modify a configuration, or `!config del <option>` to reset the option (`!conf
         "change-prefix-1":"This prefix is too long to be used!",
         "wrong-prefix":"Oops, it seems this prefix is invalid :thinking: If the problem persists, please choose another one",
         "opt_title":"Option '{}' of server {}",
-        "not-found":"The server {} has not yet been registered in the database"
+        "not-found":"The server {} has not yet been registered in the database",
+        "need-admin":"You need Administrator permission to execute this command."
     }
 
 server_desc={"prefix":"Current bot prefix: {}",
@@ -436,7 +450,8 @@ server_desc={"prefix":"Current bot prefix: {}",
             "anti_raid":"Level of anti-raid protection: {} \n*([Documentation](https://zbot.rtfd.io/en/latest/moderator.html#anti-raid))*",
             "vote_emojis":"Emojis used for poll reactions: {}",
             "help_in_dm":"Send help message in Private Message? {}",
-            "muted_role":"Used role to mute members : {}"}
+            "muted_role":"Used role to mute members : {}",
+            "noxp_channels":"Channels where you can't get xp: {}"}
 
 stats_infos={"not-found":"Unable to find {N}",
             "member-0":"Nickname",
@@ -504,6 +519,13 @@ xp = {'card-level':'LEVEL',
         "low-page":"I cannot display a negative page number!",
         "high-page":"There are not that many pages!",
         "top-title-1":"Global ranking",
+        "top-title-2":"Server ranking",
         "top-name":"__Top {}-{} (page {}/{}):__",
         "default_levelup":"Hey, {user} has just reached **level {level}**! Keep this way!",
-        "top-your":"Your rank"}
+        "top-your":"Your rank",
+        'rr_list':"Roles rewards list",
+        'rr-added':"The role `{}` has been correctly added for level {} !",
+        'already-1-rr':"There is already a role configured for this level!",
+        'no-rr':"No role has been configured for this level",
+        'rr-removed':"No role will be given for level {} anymore"
+        }

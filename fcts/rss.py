@@ -157,8 +157,8 @@ class RssCog(commands.Cog):
         if type(text) == str:
             await ctx.send(text)
         else:
-            form = await self.translate(ctx.guild,"rss","yt-form-last")
-            await ctx.send(await text[0].create_msg(await self.translate(ctx.guild,"current_lang","current"),form))
+            form = await self.translate(ctx.channel,"rss","yt-form-last")
+            await ctx.send(await text[0].create_msg(await self.translate(ctx.channel,"current_lang","current"),form))
     
     @rss_main.command(name="twitch",aliases=['tv'])
     async def request_twitch(self,ctx,channel):
@@ -169,8 +169,8 @@ class RssCog(commands.Cog):
         if type(text) == str:
             await ctx.send(text)
         else:
-            form = await self.translate(ctx.guild,"rss","twitch-form-last")
-            await ctx.send(await text[0].create_msg(await self.translate(ctx.guild,"current_lang","current"),form))
+            form = await self.translate(ctx.channel,"rss","twitch-form-last")
+            await ctx.send(await text[0].create_msg(await self.translate(ctx.channel,"current_lang","current"),form))
 
     @rss_main.command(name='twitter',aliases=['tw'])
     async def request_tw(self,ctx,name):
@@ -184,8 +184,8 @@ class RssCog(commands.Cog):
         if type(text) == str:
             await ctx.send(text)
         else:
-            form = await self.translate(ctx.guild,"rss","tw-form-last")
-            await ctx.send(await text[0].create_msg(await self.translate(ctx.guild,"current_lang","current"),form))
+            form = await self.translate(ctx.channel,"rss","tw-form-last")
+            await ctx.send(await text[0].create_msg(await self.translate(ctx.channel,"current_lang","current"),form))
 
     @rss_main.command(name="web")
     async def request_web(self,ctx,link):
@@ -196,8 +196,8 @@ class RssCog(commands.Cog):
         if type(text) == str:
             await ctx.send(text)
         else:
-            form = await self.translate(ctx.guild,"rss","web-form-last")
-            await ctx.send(await text[0].create_msg(await self.translate(ctx.guild,"current_lang","current"),form))
+            form = await self.translate(ctx.channel,"rss","web-form-last")
+            await ctx.send(await text[0].create_msg(await self.translate(ctx.channel,"current_lang","current"),form))
 
     @rss_main.command(name="add")
     @commands.guild_only()
@@ -751,7 +751,7 @@ class RssCog(commands.Cog):
             return await self.translate(guild,"rss","web-invalid")
         published = None
         for i in ['published_parsed','published','updated_parsed']:
-            if i in feeds.entries[0].keys():
+            if i in feeds.entries[0].keys() and feeds.entries[0][i]!=None:
                 published = i
                 break
         if published!=None and len(feeds.entries)>1:
@@ -769,7 +769,19 @@ class RssCog(commands.Cog):
                 l = feeds['link']
             else:
                 l = url
-            obj = self.rssMessage(bot=self.bot,Type='web',url=l,title=feed['title'],emojis=self.bot.cogs['EmojiCog'].customEmojis,date=datz,author=feed['author'] if 'author' in feed.keys() else None,channel= feeds.feed['title'])
+            if 'author' in feed.keys():
+                author = feed['author']
+            elif 'author' in feeds.keys():
+                author = feeds['author']
+            else:
+                author = '?'
+            if 'title' in feed.keys():
+                title = feed['title']
+            elif 'title' in feeds.keys():
+                title = feeds['title']
+            else:
+                title = '?'
+            obj = self.rssMessage(bot=self.bot,Type='web',url=l,title=title,emojis=self.bot.cogs['EmojiCog'].customEmojis,date=datz,author=author,channel= feeds.feed['title'])
             return [obj]
         else:
             liste = list()
@@ -778,7 +790,7 @@ class RssCog(commands.Cog):
                     datz = 'Unknown'
                 else:
                     datz = feed[published]
-                if datetime.datetime(*feed['published_parsed'][:6]) <= date:
+                if feed['published_parsed']==None or datetime.datetime(*feed['published_parsed'][:6]) <= date:
                     break
                 if 'link' in feed.keys():
                     l = feed['link']
@@ -786,7 +798,19 @@ class RssCog(commands.Cog):
                     l = feeds['link']
                 else:
                     l = url
-                obj = self.rssMessage(bot=self.bot,Type='web',url=l,title=feed['title'],emojis=self.bot.cogs['EmojiCog'].customEmojis,date=datz,author=feed['author'] if 'author' in feed.keys() else None,channel= feeds.feed['title'])
+                if 'author' in feed.keys():
+                    author = feed['author']
+                elif 'author' in feeds.keys():
+                    author = feeds['author']
+                else:
+                    author = '?'
+                if 'title' in feed.keys():
+                    title = feed['title']
+                elif 'title' in feeds.keys():
+                    title = feeds['title']
+                else:
+                    title = '?'
+                obj = self.rssMessage(bot=self.bot,Type='web',url=l,title=title,emojis=self.bot.cogs['EmojiCog'].customEmojis,date=datz,author=author,channel= feeds.feed['title'])
                 liste.append(obj)
             liste.reverse()
             return liste
@@ -795,7 +819,7 @@ class RssCog(commands.Cog):
 
 
     async def create_id(self,channelID,guildID,Type,link):
-        numb = str(guildID + channelID + len(link))[:14] + str(random.randint(0,99))
+        numb = str(round(time.time()/2)) + str(random.randint(0,99))
         if Type == 'yt':
             numb = int('10'+numb)
         elif Type == 'tw':
@@ -879,7 +903,7 @@ class RssCog(commands.Cog):
         for x in values:
             if isinstance(x[1],(bool,int)):
                 v.append("""`{x[0]}`={x[1]}""".format(x=x))
-            elif isinstance(x[1],(datetime.datetime,float)):
+            elif isinstance(x[1],(datetime.datetime,float)) or x[0]=='roles':
                 v.append("""`{x[0]}`=\"{x[1]}\"""".format(x=x))
             else:
                 v.append("`{x[0]}`=\"\"\"{x[1]}\"\"\"".format(x=x))
@@ -926,13 +950,15 @@ class RssCog(commands.Cog):
         
 
     async def main_loop(self,guildID=None):
+        if not self.bot.rss_enabled:
+            return
         t = time.time()
         if self.loop_processing:
             return
         self.bot.log.info("Check RSS lancé")
         if guildID==None:
-            liste = await self.get_all_flows()
             self.loop_processing = True
+            liste = await self.get_all_flows()
         else:
             liste = await self.get_guild_flows(guildID)
         check = 0

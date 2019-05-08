@@ -83,10 +83,10 @@ class InfosCog(commands.Cog):
                 except Exception as e:
                     users = bots = 'unknown'
                 total_xp = await self.bot.cogs['XPCog'].bdd_total_xp()
-                d = str(await self.translate(ctx.guild,"infos","stats")).format(bot_v=bot_version,s_count=len_servers,m_count=users,b_count=bots,l_count=self.codelines,lang=langs_list,p_v=version,d_v=discord.__version__,ram=ram_cpu[0],cpu=ram_cpu[1],api=latency,xp=total_xp)
+                d = str(await self.translate(ctx.channel,"infos","stats")).format(bot_v=bot_version,s_count=len_servers,m_count=users,b_count=bots,l_count=self.codelines,lang=langs_list,p_v=version,d_v=discord.__version__,ram=ram_cpu[0],cpu=ram_cpu[1],api=latency,xp=total_xp)
                 if datetime.datetime.today().day == 1:
-                    d += "\n**{}:** {}".format(await self.translate(ctx.guild,"infos_2",'fish-1'),self.bot.fishes)
-                embed = ctx.bot.cogs['EmbedCog'].Embed(title=await self.translate(ctx.guild,"infos","stats-title"), color=ctx.bot.cogs['HelpCog'].help_color, time=ctx.message.created_at,desc=d,thumbnail=self.bot.user.avatar_url_as(format="png"))
+                    d += "\n**{}:** {}".format(await self.translate(ctx.channel,"infos_2",'fish-1'),self.bot.fishes)
+                embed = ctx.bot.cogs['EmbedCog'].Embed(title=await self.translate(ctx.channel,"infos","stats-title"), color=ctx.bot.cogs['HelpCog'].help_color, time=ctx.message.created_at,desc=d,thumbnail=self.bot.user.avatar_url_as(format="png"))
                 embed.create_footer(ctx.author)
             await ctx.send(embed=embed.discord_embed())
         except Exception as e:
@@ -135,7 +135,7 @@ class InfosCog(commands.Cog):
     @commands.command(name="docs")
     async def display_doc(self,ctx):
         """Get the documentation url"""
-        text = str(self.bot.cogs['EmojiCog'].customEmojis['readthedocs']) + str(await self.translate(ctx.guild,"infos","docs")) + " https://zbot.rtfd.io"
+        text = str(self.bot.cogs['EmojiCog'].customEmojis['readthedocs']) + str(await self.translate(ctx.channel,"infos","docs")) + " https://zbot.rtfd.io"
         await ctx.send(text)
 
     @commands.command(name='info',aliases=['infos'])
@@ -216,11 +216,11 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
         position = str(sorted(ctx.guild.members, key=lambda m: m.joined_at).index(item) + 1) + "/" + str(len(ctx.guild.members))
         embed = discord.Embed(colour=item.color, timestamp=ctx.message.created_at)
         embed.set_thumbnail(url=item.avatar_url_as(format='gif') if item.is_avatar_animated() else item.avatar_url_as(format='png'))
-        embed.set_author(name=str(item), icon_url=item.avatar_url_as(format='png'))
-        embed.set_footer(text='Requested by {}'.format(ctx.author.name), icon_url=ctx.author.avatar_url_as(format='png'))
+        embed.set_author(name=str(item), icon_url=str(item.avatar_url_as(format='png')))
+        embed.set_footer(text='Requested by {}'.format(ctx.author.name), icon_url=str(ctx.author.avatar_url_as(format='png')))
 
         embed.add_field(name=str(await self.translate(ctx.guild.id,"keywords","nom")).capitalize(), value=item.name,inline=True)
-        embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","member-0"), value=item.nick if item.nick else str(await self.translate(ctx.guild,"keywords","none")).capitalize(),inline=True)
+        embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","member-0"), value=item.nick if item.nick else str(await self.translate(ctx.channel,"keywords","none")).capitalize(),inline=True)
         embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","role-0"), value=str(item.id))
         embed.add_field(name="Bot", value=botb.capitalize())
         embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","member-1"), value = "{} ({} {})".format(await self.timecog.date(item.created_at,lang=lang,year=True),since,await self.timecog.time_delta(item.created_at,datetime.datetime.now(),lang=lang,year=True,precision=0,hour=False)), inline=False)
@@ -377,8 +377,9 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
         embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","guild-10"), value = str(int(guild.afk_timeout/60))+" minutes")
         embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","guild-8"), value=a2f.capitalize())
         embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","guild-9"), value=str(await self.translate(guild.id,"keywords",str(guild.verification_level))).capitalize())
-        if guild.splash_url != '':
-            embed.add_field(name="Splash url", value=guild.splash_url)
+        a = str(guild.splash_url_as(format='png'))
+        if str(guild.splash_url_as(format='png')) != '':
+            embed.add_field(name="Splash url", value=str(guild.splash_url_as(format='png')))
         try:
             if ctx.guild==guild:
                 roles = [x.mention for x in guild.roles if len(x.members)>1][1:]
@@ -406,7 +407,7 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
 
         embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","inv-0"), value=invite.url,inline=True)
         embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","role-0"), value=str(invite.id))
-        embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","inv-1"), value=str(invite.inviter))
+        embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","inv-1"), value=str(invite.inviter) if invite.inviter!= None else await self.translate(ctx.guild,'keywords','unknown'))
         if invite.max_uses!=None and invite.uses!=None:
             if invite.max_uses == 0:
                 uses = "{}/∞".format(invite.uses)
@@ -415,10 +416,10 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
             embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","inv-2"), value=uses)
         if invite.max_age!=None:
             embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","inv-3"), value=str(invite.max_age) if invite.max_age != 0 else "∞")
-        if type(invite.channel) == discord.abc.GuildChannel:
-            embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","guild-0"), value=str(invite.channel.guild))
-            embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","textchan-5"), value=str(invite.channel))
-            embed.set_thumbnail(url=invite.channel.guild.icon_url_as(format='png'))
+        if isinstance(invite.channel,(discord.PartialInviteChannel,discord.TextChannel)):
+            embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","guild-0"), value=str(invite.guild.name))
+            embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","textchan-5"), value="#"+str(invite.channel.name))
+            embed.set_thumbnail(url=invite.guild.icon_url_as(format='png'))
         if invite.created_at != None:
             embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","member-1"), value = "{} ({} {})".format(await self.timecog.date(invite.created_at,lang=lang,year=True),since,await self.timecog.time_delta(invite.created_at,datetime.datetime.now(),lang=lang,year=True,precision=0,hour=False)), inline=False)
         await ctx.send(embed=embed)
@@ -449,21 +450,18 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
     async def find_main(self,ctx):
         """Same as info, but in a lighter version"""
         if ctx.invoked_subcommand is None:
-            await ctx.send(await self.translate(ctx.guild,"find","help"))
+            await ctx.send(await self.translate(ctx.channel,"find","help"))
 
     @find_main.command(name="user")
     async def find_user(self,ctx,*,user:discord.User):
-        liste = list()
-        languages = list()
+        servers_in = list()
+        owners = list()
         for s in self.bot.guilds:
             if user in s.members:
-                liste.append(s)
-                lang = await ctx.bot.cogs["ServerCog"].find_staff(s.id,'language')
-                if lang==None:
-                    lang = 0
-                languages.append(lang)
+                servers_in.append(s.name)
+                if s.owner==user:
+                    owners.append(s.name)
         disp_lang = ""
-        owners = ", ".join([x.name for x in liste if x.owner==user])
         xp_card = await self.bot.cogs['UtilitiesCog'].get_xp_style(user)
         perks = list()
         if await self.bot.cogs["AdminCog"].check_if_admin(user):
@@ -476,16 +474,16 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
             perks.append("premium")
         async with aiohttp.ClientSession() as session:
             async with session.get('https://discordbots.org/api/bots/486896267788812288/check?userId={}'.format(user.id),headers={'Authorization':str(self.bot.dbl_token)}) as r:
-                #r = requests.get('https://discordbots.org/api/bots/486896267788812288/check?userId={}'.format(user.id),headers={'Authorization':str(self.bot.dbl_token)})
                 js = await r.json()
                 if js['voted']:
-                    r = await self.translate(ctx.guild,'keywords','oui')
+                    r = await self.translate(ctx.channel,'keywords','oui')
                 else:
-                    r = await self.translate(ctx.guild,'keywords','non')
-        for e in range(len(ctx.bot.cogs['LangCog'].languages)):
-            if languages.count(e)>0:
-                disp_lang += ctx.bot.cogs['LangCog'].languages[e]+" ("+str(round(languages.count(e)/len(languages)*100))+"%)  "
-        await ctx.send(str(await self.translate(ctx.guild,"find","user-1")).format(name=user,id=user.id,servers=", ".join([x.name for x in liste]),own=owners,lang=disp_lang,vote=r,card=xp_card,rangs=" - ".join(perks)))
+                    r = await self.translate(ctx.channel,'keywords','non')
+                r = r.capitalize()
+        disp_lang = str()
+        for lang in await self.bot.cogs['UtilitiesCog'].get_languages(user):
+            disp_lang += '{} ({}%)   '.format(lang[0],round(lang[1]*100))
+        await ctx.send(str(await self.translate(ctx.channel,"find","user-1")).format(name=user,id=user.id,servers=", ".join(servers_in),own=", ".join(owners),lang=disp_lang,vote=r,card=xp_card,rangs=" - ".join(perks)))
 
     @find_main.command(name="guild",aliases=['server'])
     async def find_guild(self,ctx,*,guild):
@@ -497,7 +495,7 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
                 if x.name==guild:
                     s = x
         if s == None:
-            await ctx.send(await self.translate(ctx.guild,"find","guild-0"))
+            await ctx.send(await self.translate(ctx.channel,"find","guild-0"))
             return
         bots = len([x for x in s.members if x.bot])
         lang = await ctx.bot.cogs["ServerCog"].find_staff(s.id,'language')
@@ -506,15 +504,16 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
         else:
             lang = ctx.bot.cogs['LangCog'].languages[lang]
         pref = self.bot.cogs['UtilitiesCog'].find_prefix(s)
-        await ctx.send(str(await self.translate(ctx.guild,"find","guild-1")).format(s.name,s.id,s.owner,s.owner.id,len(s.members),bots,lang,pref))
+        rss_numb = len(await self.bot.cogs['RssCog'].get_guild_flows(s.id))
+        await ctx.send(str(await self.translate(ctx.channel,"find","guild-1")).format(s.name,s.id,s.owner,s.owner.id,len(s.members),bots,lang,pref,rss_numb))
 
     @find_main.command(name='channel')
     async def find_channel(self,ctx,ID:int):
         c = self.bot.get_channel(ID)
         if c == None:
-            await ctx.send(await self.translate(ctx.guild,"find","chan-0"))
+            await ctx.send(await self.translate(ctx.channel,"find","chan-0"))
             return
-        await ctx.send(str(await self.translate(ctx.guild,"find","chan-1")).format(c.name,c.id,c.guild.name,c.guild.id))
+        await ctx.send(str(await self.translate(ctx.channel,"find","chan-1")).format(c.name,c.id,c.guild.name,c.guild.id))
     
     @find_main.command(name='rss')
     async def find_rss(self,ctx,ID:int):
@@ -573,7 +572,7 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
     @commands.command(name="prefix")
     async def get_prefix(self,ctx):
         """Show the usable prefix(s) for this server"""
-        txt = await self.translate(ctx.guild,"infos","prefix")
+        txt = await self.translate(ctx.channel,"infos","prefix")
         prefix = "\n\n".join(await ctx.bot.get_prefix(ctx.message))
         if ctx.guild==None or ctx.channel.permissions_for(ctx.guild.me):
             emb = ctx.bot.cogs['EmbedCog'].Embed(title=txt,desc=prefix,time=ctx.message.created_at,color=ctx.bot.cogs['HelpCog'].help_color).create_footer(ctx.author)

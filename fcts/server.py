@@ -8,7 +8,7 @@ from fcts import cryptage
 
 roles_options = ["clear","slowmode","mute","kick","ban","warn","say","gived_roles","muted_role"]
 bool_options = ["save_roles","enable_xp","anti_caps_lock","enable_fun","help_in_dm"]
-textchan_options = ["hunter","welcome_channel","bot_news","poll_channels","modlogs_channel"]
+textchan_options = ["hunter","welcome_channel","bot_news","poll_channels","modlogs_channel","noxp_channels"]
 vocchan_options = ["membercounter"]
 text_options = ["welcome","leave","levelup_msg"]
 prefix_options = ['prefix']
@@ -50,6 +50,7 @@ class ServerCog(commands.Cog):
                "modlogs_channel":"",
                "enable_xp":1,
                "levelup_msg":'',
+               "noxp_channels":'',
                "anti_caps_lock":1,
                "enable_fun":1,
                "prefix":'!',
@@ -119,9 +120,9 @@ class ServerCog(commands.Cog):
         """Check is user is part of a staff"""
         if option not in roles_options:
             raise TypeError
-        if await self.bot.cogs['AdminCog'].check_if_admin(user) and user.guild.id in self.bot.cogs['AdminCog'].god_mode:
+        if await self.bot.cogs['AdminCog'].check_if_god(user):
             return True
-        if not self.bot.database_online:
+        if not self.bot.database_online or not isinstance(user,discord.Member):
             return False
         staff = str(await self.find_staff(user.guild.id,option)).split(";")
         for r in user.roles:
@@ -200,12 +201,10 @@ class ServerCog(commands.Cog):
         cnx.commit()
         return True
 
-    async def is_server_exist(self,ID,channel=None):
+    async def is_server_exist(self,ID):
         """Check if a server is already in the db"""
         i = await self.find_staff(ID,"ID")
         if i == None:
-            if channel != None:
-                await channel.send(await self.translate(channel.guild.id,"server","new_server"))
             # await self.bot.get_user(279568324260528128).send("Le serveur n°{} vient d'être ajouté dans la base de donnée".format(ID))
             g = self.bot.get_guild(ID)
             if g==None:
@@ -234,7 +233,7 @@ class ServerCog(commands.Cog):
     async def sconfig_main(self,ctx):
         """Function for setting the bot on a server"""
         if ctx.bot.database_online:
-            await self.is_server_exist(ctx.guild.id,ctx.channel)
+            await self.is_server_exist(ctx.guild.id)
         if ctx.invoked_subcommand is None:
             msg = await self.translate(ctx.guild,"server","config-help")
             await ctx.send(msg.format(ctx.guild.owner.name))
@@ -242,8 +241,8 @@ class ServerCog(commands.Cog):
     @sconfig_main.command(name="del")
     async def sconfig_del(self,ctx,option):
         """Reset an option to zero"""
-        if not (ctx.channel.permissions_for(ctx.author).administrator or await self.bot.cogs["AdminCog"].check_if_admin(ctx)):
-            return
+        if not (ctx.channel.permissions_for(ctx.author).administrator or await self.bot.cogs["AdminCog"].check_if_god(ctx)):
+            return await ctx.send(await self.translate(ctx.guild.id,"server","need-admin"))
         if not ctx.bot.database_online:
             return await ctx.send(await self.translate(ctx.guild.id,"cases","no_database"))
         await self.sconfig_del2(ctx,option)
@@ -251,8 +250,8 @@ class ServerCog(commands.Cog):
     @sconfig_main.command(name="change")
     async def sconfig_change(self,ctx,option,*,value):
         """Allows you to modify an option"""
-        if not (ctx.channel.permissions_for(ctx.author).administrator or await self.bot.cogs["AdminCog"].check_if_admin(ctx)):
-            return
+        if not (ctx.channel.permissions_for(ctx.author).administrator or await self.bot.cogs["AdminCog"].check_if_god(ctx)):
+            return await ctx.send(await self.translate(ctx.guild.id,"server","need-admin"))
         if not ctx.bot.database_online:
             return await ctx.send(await self.translate(ctx.guild.id,"cases","no_database"))
         if value=='del':
@@ -406,6 +405,8 @@ class ServerCog(commands.Cog):
                 liste.append(str(c.id))
                 liste2.append(c.mention)
             await self.modify_server(ctx.guild.id,values=[(option,";".join(liste))],channel=ctx.channel)
+            if option=='noxp_channels':
+                self.bot.cogs['XPCog'].xp_channels_cache[ctx.guild.id] = [int(x) for x in liste]
             msg = await self.translate(ctx.guild.id,"server","change-textchan")
             await ctx.send(msg.format(option,", ".join(liste2)))
             await self.send_embed(ctx.guild,option,value)
