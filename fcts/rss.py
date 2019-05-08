@@ -903,7 +903,7 @@ class RssCog(commands.Cog):
         for x in values:
             if isinstance(x[1],(bool,int)):
                 v.append("""`{x[0]}`={x[1]}""".format(x=x))
-            elif isinstance(x[1],(datetime.datetime,float)):
+            elif isinstance(x[1],(datetime.datetime,float)) or x[0]=='roles':
                 v.append("""`{x[0]}`=\"{x[1]}\"""".format(x=x))
             else:
                 v.append("`{x[0]}`=\"\"\"{x[1]}\"\"\"".format(x=x))
