@@ -111,7 +111,8 @@ fun={"count-0":"Countng in progrez...",
     "no-embed-perm":"I dont haz permishun 2 \"Embed links\" :confused:",
     "embed-error":"A' error went wrong: `{}`",
     "invalid-city":"Invalid place name :confused:",
-    "no-roll":"Hmm I don't see any choice lol"
+    "no-roll":"Hmm I don't see any choice lol",
+    'no-say':"Unable 2 send any message in tish channel"
     }
 
 infos={"text-0":"""Ho hi hello! I'm {0} !

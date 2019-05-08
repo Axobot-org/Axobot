@@ -111,7 +111,8 @@ fun={"count-0":"Comptage en cours...",
     "no-embed-perm":"Je ne possède pas la permission \"Intégrer des liens\" :confused:",
     "embed-error":"Une erreur est survenue: `{}`",
     "invalid-city":"Nom de ville invalide",
-    "no-roll":"Aucun élément trouvé"
+    "no-roll":"Aucun élément trouvé",
+    'no-say':"Impossible d'envoyer un message dans ce salon"
     }
 
 infos={"text-0":"""Bonjour ! Moi c'est {0} !

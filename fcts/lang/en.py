@@ -111,7 +111,8 @@ fun={"count-0":"Counting in progress...",
     "no-embed-perm":"I don't have permission to \"Embed links\" :confused:",
     "embed-error":"An error has occurred: `{}`",
     "invalid-city":"Invalid city :confused:",
-    "no-roll":"No choice found"
+    "no-roll":"No choice found",
+    'no-say':"Unable to send any message in this channel"
     }
 
 infos={"text-0":"""Hello! I'm {0} !

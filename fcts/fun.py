@@ -333,6 +333,8 @@ You can specify a verification limit by adding a number in argument"""
             await self.bot.cogs['ErrorsCog'].on_error(e,ctx)
             return
         try:
+            if not channel.permissions_for(ctx.guild.me).send_messages:
+                return await ctx.send(str(await self.translate(ctx.guild.id,'fun','no-say'))+random.choice([' :confused:','','','']))
             await channel.send(text)
             await self.bot.cogs["UtilitiesCog"].suppr(ctx.message)
         except:
