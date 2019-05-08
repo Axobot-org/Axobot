@@ -55,6 +55,16 @@ class InfosCog(commands.Cog):
             await self.bot.cogs['ErrorsCog'].on_error(e,None)
         return count
 
+    @commands.command(name='admins')
+    async def admin_list(self,ctx):
+        """Get the list of ZBot administrators"""
+        l  = list()
+        for u in reloads.admins_id:
+            if u==552273019020771358:
+                continue
+            l.append(str(self.bot.get_user(u)))
+        await ctx.send(str(await self.translate(ctx.channel,"infos","admins-list")).format(", ".join(l)))
+
     @commands.command(name="stats",enabled=True)
     @commands.cooldown(2,60,commands.BucketType.guild)
     async def stats(self,ctx):
@@ -573,7 +583,7 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
     async def get_prefix(self,ctx):
         """Show the usable prefix(s) for this server"""
         txt = await self.translate(ctx.channel,"infos","prefix")
-        prefix = "\n\n".join(await ctx.bot.get_prefix(ctx.message))
+        prefix = "\n".join(await ctx.bot.get_prefix(ctx.message))
         if ctx.guild==None or ctx.channel.permissions_for(ctx.guild.me):
             emb = ctx.bot.cogs['EmbedCog'].Embed(title=txt,desc=prefix,time=ctx.message.created_at,color=ctx.bot.cogs['HelpCog'].help_color).create_footer(ctx.author)
             return await ctx.send(embed=emb.discord_embed())

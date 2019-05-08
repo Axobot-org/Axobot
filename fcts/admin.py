@@ -52,15 +52,6 @@ class AdminCog(commands.Cog):
             return await reloads.check_admin(ctx)
 
     
-    @commands.command(name='admins')
-    async def admin_list(self,ctx):
-        """Get the list of ZBot administrators"""
-        l  = list()
-        for u in reloads.admins_id:
-            if u==552273019020771358:
-                continue
-            l.append(str(self.bot.get_user(u)))
-        await ctx.send(str(await self.translate(ctx.channel,"infos","admins-list")).format(", ".join(l)))
 
     @commands.command(name='god')
     @commands.check(reloads.check_admin)
