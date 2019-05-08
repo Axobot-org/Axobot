@@ -277,9 +277,12 @@ class XPCog(commands.Cog):
         """Crée la carte d'xp pour un utilisateur"""
         card = Image.open("../cards/model/{}.png".format(style))
         bar_colors = await self.get_xp_bar_color(user.id)
+        colors = {'name':(124, 197, 118),'xp':(124, 197, 118),'NIVEAU':(255, 224, 77),'rank':(105, 157, 206),'bar':bar_colors}
+        if style=='blurple':
+            colors = {'name':(134, 157, 228),'xp':(1,1,35),'NIVEAU':(255, 255, 255, 255),'rank':(255, 255, 255),'bar':(70, 83, 138)}
         if not user.is_avatar_animated() or force_static:
             pfp = await self.get_raw_image(user.avatar_url_as(format='png',size=256))
-            img = await self.add_overlay(pfp.resize(size=(282,282)),user,card,xp,rank,txt,bar_colors)
+            img = await self.add_overlay(pfp.resize(size=(282,282)),user,card,xp,rank,txt,colors)
             img.save('../cards/global/{}-{}-{}.png'.format(user.id,xp,rank[0]))
             return discord.File('../cards/global/{}-{}-{}.png'.format(user.id,xp,rank[0]))
         else:
@@ -288,18 +291,17 @@ class XPCog(commands.Cog):
             duration = []
             for i in range(pfp.n_frames):
                 pfp.seek(i)
-                img = await self.add_overlay(pfp.resize(size=(282,282)),user,card,xp,rank,txt,bar_colors)
+                img = await self.add_overlay(pfp.resize(size=(282,282)),user,card,xp,rank,txt,colors)
                 images.append(img)
                 duration.append(pfp.info['duration']/1000)
             card.close()
             imageio.mimwrite('../cards/global/{}-{}-{}.gif'.format(user.id,xp,rank[0]), images, format="GIF-PIL", duration=duration, subrectangles=True)
             return discord.File('../cards/global/{}-{}-{}.gif'.format(user.id,xp,rank[0]))
 
-    async def add_overlay(self,pfp,user,card,xp,rank,txt,bar_colors):
+    async def add_overlay(self,pfp,user,card,xp,rank,txt,colors):
         img = Image.new('RGBA', (card.width, card.height), color = (250,250,250,0))
         img.paste(pfp, (20, 29))
         img.paste(card, (0, 0), card)
-
         if platform.system()=='Darwin':
             verdana_name = 'Verdana.ttf'
         else:
@@ -310,10 +312,10 @@ class XPCog(commands.Cog):
         levels_fnt = ImageFont.truetype(verdana_name, 65)
         rank_fnt = ImageFont.truetype(verdana_name,29)
         RANK_fnt = ImageFont.truetype(verdana_name,23)
-        colors = {'name':(124, 197, 118),'xp':(124, 197, 118),'NIVEAU':(255, 224, 77),'rank':(105, 157, 206)}
+        
 
         levels_info = await self.calc_level(xp)
-        img = await self.add_xp_bar(img,xp-levels_info[2],levels_info[1]-levels_info[2],bar_colors)
+        img = await self.add_xp_bar(img,xp-levels_info[2],levels_info[1]-levels_info[2],colors['bar'])
         d = ImageDraw.Draw(img)
         d.text(await self.calc_pos(user.name,name_fnt,610,68), user.name, font=name_fnt, fill=colors['name'])
         temp = '{} / {} xp ({}/{})'.format(xp-levels_info[2],levels_info[1]-levels_info[2],xp,levels_info[1])
