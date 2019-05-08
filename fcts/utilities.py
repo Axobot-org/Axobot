@@ -260,7 +260,10 @@ class UtilitiesCog(commands.Cog):
         try:
             cnx = self.bot.cnx
             cursor = cnx.cursor(dictionary = True)
-            query = ("INSERT INTO `{t}` (`userID`,`{k}`) VALUES ('{u}','{v}') ON DUPLICATE KEY UPDATE {k} = '{v}';".format(t=self.table,u=userID,k=key,v=value))
+            if not isinstance(value,(bool,int)):
+                value = "'"+value+"'"
+            query = ("INSERT INTO `{t}` (`userID`,`{k}`) VALUES ('{u}',{v}) ON DUPLICATE KEY UPDATE {k} = {v};".format(t=self.table,u=userID,k=key,v=value))
+            # INSERT INTO `users` (`userID`,`unlocked_blurple`) VALUES ('279568324260528128','True') ON DUPLICATE KEY UPDATE unlocked_blurple = 'True';
             cursor.execute(query)
             cnx.commit()
             cursor.close()
