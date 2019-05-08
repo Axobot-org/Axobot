@@ -374,11 +374,8 @@ class UtilitiesCog(commands.Cog):
             liste2.append('premium')
         if await self.bot.cogs['AdminCog'].check_if_admin(user):
             liste2.append('admin')
-        if datetime.datetime.today().day == 1:
+        if await self.has_rainbow_card(user):
             liste.append('rainbow')
-        else:
-            if await self.has_rainbow_card(user):
-                liste.append('rainbow')
         if await self.has_blurple_card(user):
             liste.append('blurple')
         return sorted(liste2)+sorted(liste)
