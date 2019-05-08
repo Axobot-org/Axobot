@@ -2,11 +2,12 @@
 #coding=utf-8
 
 from importlib import reload as m_reload
-from fcts.lang import fr, en, lolcat
+from fcts.lang import fr, en, lolcat, fi
 import discord
 m_reload(fr)
 m_reload(en)
 m_reload(lolcat)
+m_reload(fi)
 
 
 class LangCog(discord.ext.commands.Cog):
