@@ -251,13 +251,22 @@ class Events(commands.Cog):
         await self.bot.wait_until_ready()
         self.bot.log.info("[tasks_loop] Lancement de la boucle")
         while not self.bot.is_closed():
-            if int(datetime.datetime.now().second)%20 == 0:
-                await self.check_tasks()
-            if int(datetime.datetime.now().minute)%20 == 0:
-                await self.bot.cogs['XPCog'].clear_cards()
-                self.bot.cogs['RssCog'].last_update = datetime.datetime.now()
-                asyncio.run_coroutine_threadsafe(self.bot.cogs['RssCog'].main_loop(),asyncio.get_running_loop())
+            try:
+                if int(datetime.datetime.now().second)%20 == 0:
+                    await self.check_tasks()
+                if int(datetime.datetime.now().minute)%20 == 0:
+                    await self.bot.cogs['XPCog'].clear_cards()
+                    await self.rss_loop()
+            except Exception as e:
+                await self.bot.cogs['ErrorsCog'].on_error(e,None)
             await asyncio.sleep(0.5)
+    
+
+
+    async def rss_loop(self):
+        if self.bot.cogs['RssCog'].last_update==None or (self.bot.cogs['RssCog'].last_update - datetime.datetime.now()).total_seconds() > 5*60:
+            self.bot.cogs['RssCog'].last_update = datetime.datetime.now()
+            asyncio.run_coroutine_threadsafe(self.bot.cogs['RssCog'].main_loop(),asyncio.get_running_loop())
 
 def setup(bot):
     bot.add_cog(Events(bot))
