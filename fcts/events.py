@@ -264,7 +264,7 @@ class Events(commands.Cog):
 
 
     async def rss_loop(self):
-        if self.bot.cogs['RssCog'].last_update==None or (self.bot.cogs['RssCog'].last_update - datetime.datetime.now()).total_seconds() > 5*60:
+        if self.bot.cogs['RssCog'].last_update==None or (datetime.datetime.now() - self.bot.cogs['RssCog'].last_update).total_seconds()  > 5*60:
             self.bot.cogs['RssCog'].last_update = datetime.datetime.now()
             asyncio.run_coroutine_threadsafe(self.bot.cogs['RssCog'].main_loop(),asyncio.get_running_loop())
 
