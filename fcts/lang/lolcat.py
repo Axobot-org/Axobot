@@ -522,5 +522,9 @@ xp = {'card-level':'LVL',
         "top-name":"__Bests {}-{} ({}/{}):__",
         "default_levelup":"Weew, {user} has just got **lvl {level}**! What a smart guy!",
         "top-your":"Ur rank",
-        'rr_list':"Roles list"
+        'rr_list':"Roles list",
+        'rr-added':"Role `{}` haz been added 4 level {} !",
+        'already-1-rr':"Ther's already a role setup for tihs level :thinking:",
+        'no-rr':"None role is configured for this level",
+        'rr-removed':"None role will be givn anymore for level #{}"
         }

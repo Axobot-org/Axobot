@@ -522,5 +522,9 @@ xp = {'card-level':'LEVEL',
         "top-name":"__Top {}-{} (page {}/{}):__",
         "default_levelup":"Hey, {user} has just reached **level {level}**! Keep this way!",
         "top-your":"Your rank",
-        'rr_list':"Roles rewards list"
+        'rr_list':"Roles rewards list",
+        'rr-added':"The role `{}` has been correctly added for level {} !",
+        'already-1-rr':"There is already a role configured for this level!",
+        'no-rr':"No role has been configured for this level",
+        'rr-removed':"No role will be given for level {} anymore"
         }

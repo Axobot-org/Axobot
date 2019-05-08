@@ -522,4 +522,9 @@ xp = {'card-level':'NIVEAU',
         "top-name":"__Top {}-{} (page {}/{}) :__",
         "default_levelup":"{user} vient de passer **niveau {level}** ! GG !",
         "top-your":"Votre niveau",
-        'rr_list':"Liste des rôles"}
+        'rr_list':"Liste des rôles",
+        'rr-added':"Le rôle `{}` a correctement été ajouté pour le niveau {} !",
+        'already-1-rr':"Il y a déjà un rôle configuré pour ce niveau !",
+        'no-rr':"Aucun rôle n'a été configuré pour ce niveau",
+        'rr-removed':"Plus aucun rôle ne sera donné pour le niveau {}"
+        }

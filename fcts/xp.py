@@ -127,11 +127,11 @@ class XPCog(commands.Cog):
 
     async def calc_level(self,xp):
         """Calcule le niveau correspondant à un nombre d'xp"""
-        lvl = ceil(0.05*xp**0.646)
+        lvl = ceil(0.05*xp**0.647)
         next_step = xp
-        while ceil(0.05*next_step**0.646)==lvl:
+        while ceil(0.05*next_step**0.647)==lvl:
             next_step += 1
-        return [lvl,next_step,ceil(20*20**(177/323)*(lvl-1)**(500/323))]
+        return [lvl,next_step,ceil(20*20**(353/647)*(lvl-1)**(1000/647))]
 
     async def bdd_set_xp(self,userID,points,Type='add'):
         """Ajoute/reset de l'xp à un utilisateur dans la database générale"""
@@ -486,7 +486,17 @@ class XPCog(commands.Cog):
         for x in cursor:
             liste.append(x)
         cursor.close()
-        return liste        
+        return liste
+    
+    async def rr_remove_role(self,ID:int):
+        """Remove a role reward from the database"""
+        cnx = self.bot.cnx
+        cursor = cnx.cursor(dictionary = True)
+        query = ("DELETE FROM `roles_rewards` WHERE `ID`={};".format(ID))
+        cursor.execute(query)
+        cnx.commit()
+        cursor.close()
+        return True
 
     @commands.group(name="roles_rewards",aliases=['rr'])
     @commands.guild_only()
@@ -500,11 +510,14 @@ class XPCog(commands.Cog):
         """Add a role reward
         This role will be given to every member who reaches the level"""
         try:
+            l = await self.rr_list_role(ctx.guild.id,level)
+            if len(l)>0:
+                return await ctx.send(await self.translate(ctx.guild.id,'xp','already-1-rr'))
             await self.rr_add_role(ctx.guild.id,role.id,level)
         except Exception as e:
             await self.bot.cogs['ErrorsCog'].on_cmd_error(ctx,e)
         else:
-            await ctx.send('Rôle ajouté !')
+            await ctx.send(str(await self.translate(ctx.guild.id,'xp','rr-added')).format(role.name,level))
     
     @rr_main.command(name="list")
     @commands.check(checks.can_manage_server)
@@ -518,6 +531,21 @@ class XPCog(commands.Cog):
             des = '\n'.join(["• <@&{}> : lvl {}".format(x['role'], x['level']) for x in l])
             emb = self.bot.cogs['EmbedCog'].Embed(title=await self.translate(ctx.guild.id,"xp",'rr_list'),desc=des).update_timestamp().create_footer(ctx.author)
             await ctx.send(embed=emb.discord_embed())
+    
+    @rr_main.command(name="remove")
+    @commands.check(checks.can_manage_server)
+    async def rr_remove(self,ctx,level:int):
+        """Remove a role reward
+        When a member reaches this level, no role will be given anymore"""
+        try:
+            l = await self.rr_list_role(ctx.guild.id,level)
+            if len(l)==0:
+                return await ctx.send(await self.translate(ctx.guild.id,'xp','no-rr'))
+            await self.rr_remove_role(l[0]['ID'])
+        except Exception as e:
+            await self.bot.cogs['ErrorsCog'].on_cmd_error(ctx,e)
+        else:
+            await ctx.send(str(await self.translate(ctx.guild.id,'xp','rr-removed')).format(level))
 
 
 def setup(bot):
