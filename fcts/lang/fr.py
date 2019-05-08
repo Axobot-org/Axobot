@@ -36,7 +36,8 @@ blurple = {'check_intro':"{}, début de l'analyse blurple (Notez que cela peut p
     'create_title':"Blurplefier - makes your image blurple!",
     'create_footer_1':"Veuillez noter que ce blurplefier est automatisé et qu'il peut donc ne pas toujours vous donner le meilleur résultat. | Content requested by {}",
     'create_footer_2':"Veuillez noter que ce blurplefier est automatisé et qu'il peut donc ne pas toujours vous donner le meilleur résultat. Avertissement : Cette image est un gif, et la qualité n'est pas toujours bonne. TOUTEFOIS, le gif n'est souvent pas aussi granuleux qu'il n'y paraît dans la prévisualisation. | Content requested by {}",
-    'create_oops':"{}, oups ! Il semble que ce gif est trop gros pour être téléchargé. Si vous voulez, vous pouvez lui donner une autre chance, mais avec une version plus petite de l'image. Désolé !"
+    'create_oops':"{}, oups ! Il semble que ce gif est trop gros pour être téléchargé. Si vous voulez, vous pouvez lui donner une autre chance, mais avec une version plus petite de l'image. Désolé !",
+    'won-card':"Wow! Magnifique image blurple {}! tellement beau que j'ai décidé de t'offrir la carte d'xp blurple, je suis sûr qu'elles iront bien ensemble ! Tu peux l'utiliser en tapant la commande `{}profile card blurple` {}"
     }
 
 bvn={"aide":"""__**Bienvenue dans le module des message de join et de leave**__

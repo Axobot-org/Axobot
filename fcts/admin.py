@@ -52,44 +52,6 @@ class AdminCog(commands.Cog):
             return await reloads.check_admin(ctx)
 
     
-    @commands.command(name='admins')
-    async def admin_list(self,ctx):
-        """Get the list of ZBot administrators"""
-        l  = list()
-        for u in reloads.admins_id:
-            if u==552273019020771358:
-                continue
-            l.append(str(self.bot.get_user(u)))
-        await ctx.send(str(await self.translate(ctx.channel,"infos","admins-list")).format(", ".join(l)))
-
-    @commands.command(name='god')
-    @commands.check(reloads.check_admin)
-    @commands.guild_only()
-    async def enable_god_mode(self,ctx,enable:bool=True):
-        """Donne les pleins-pouvoirs aux admins du bot sur ce serveur (accès à toutes les commandes de modération)"""
-        if enable:
-            if ctx.guild.id not in self.god_mode:
-                self.god_mode.append(ctx.guild.id)
-                await ctx.send("<:nitro:548569774435598346> Mode superadmin activé sur ce serveur",delete_after=3)
-            else:
-                await ctx.send("Mode superadmin déjà activé sur ce serveur",delete_after=3)
-        else:
-            if ctx.guild.id in self.god_mode:
-                self.god_mode.remove(ctx.guild.id)
-                await ctx.send("Mode superadmin désactivé sur ce serveur",delete_after=3)
-            else:
-                await ctx.send("Ce mode n'est pas actif ici",delete_after=3)
-        try:
-            await ctx.message.delete()
-        except:
-            pass
-
-    @commands.command(name='spoil',hidden=True)
-    @commands.check(reloads.check_admin)
-    async def send_spoiler(self,ctx,*,text):
-        """spoil spoil spoil"""
-        spoil = lambda text: "||"+"||||".join(text)+"||"
-        await ctx.send("```\n{}\n```".format(spoil(text)))
 
     @commands.command(name='god')
     @commands.check(reloads.check_admin)

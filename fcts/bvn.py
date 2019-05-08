@@ -25,7 +25,7 @@ class WelcomerCog(commands.Cog):
             await self.bot.cogs["ServerCog"].update_memberChannel(member.guild)
             await self.send_msg(member,"welcome")
             self.bot.loop.create_task(self.give_roles(member))
-        if member.guild==356067272730607628:
+        if member.guild.id==356067272730607628:
             await self.check_owner_server(member)
             await self.check_support(member)
             await self.check_contributor(member)

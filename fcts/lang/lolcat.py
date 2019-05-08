@@ -36,7 +36,8 @@ blurple = {'check_intro':'{}, starting blurple img analys (Plz note dat this may
     'create_title':"Blurplefier - makes your img blurple!",
     'create_footer_1':"Dis cool blurplefier is automated and therefore may not always give you da best result. | Content requested by {}",
     'create_footer_2':"plz note that My dear blurplefier is automated and so may not always give you the best result :heart:. Disclaimer: This img is a gif, and the quality does not always turn out great. HOWEVER, da gif is quite often not as grainy as it appears in the preview lol | Content requested by {}",
-    'create_oops':"{}, whoops! It looks like this gif is tooooo big 2 upload. If U want, U can give it another go, but with a smaller version ov the img. Sorry about that!"
+    'create_oops':"{}, whoops! It looks like this gif is tooooo big 2 upload. If U want, U can give it another go, but with a smaller version ov the img. Sorry about that!",
+    'won-card':"WeeeeW very nice blurple pfp {}! so beauty-full that I decided to give U the card of xp blurple! You can use it by typing teh command `{}profile card blurple` {}"
     }
 
 bvn={"aide":"""__**Wilcom 2 teh join end leef mesg modul**__
