@@ -36,7 +36,8 @@ blurple = {'check_intro':'{}, starting blurple image analysis (Please note that 
     'create_title':"Blurplefier - makes your image blurple!",
     'create_footer_1':"Please note - This blurplefier is automated and therefore may not always give you the best result. | Content requested by {}",
     'create_footer_2':"Please note - This blurplefier is automated and therefore may not always give you the best result. Disclaimer: This image is a gif, and the quality does not always turn out great. HOWEVER, the gif is quite often not as grainy as it appears in the preview | Content requested by {}",
-    'create_oops':"{}, whoops! It looks like this gif is too big to upload. If you want, you can give it another go, except with a smaller version of the image. Sorry about that!"
+    'create_oops':"{}, whoops! It looks like this gif is too big to upload. If you want, you can give it another go, except with a smaller version of the image. Sorry about that!",
+    'won-card':"Wow! Very nice blurple picture {}! so beautiful that I decided to offer you the card of xp blurple! You can use it by typing the command `{}profile card blurple` {}"
     }
 
 bvn={"aide":"""__**Welcome to the join & leave message module**__
