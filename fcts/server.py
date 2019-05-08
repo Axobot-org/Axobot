@@ -21,7 +21,7 @@ class ServerCog(commands.Cog):
 
     def __init__(self,bot):
         self.bot = bot
-        self.default_language = 'fr'
+        self.default_language = 'en'
         self.embed_color = discord.Colour(0x3fb9ef)
         self.log_color = 1793969
         self.file = "server"
@@ -31,7 +31,7 @@ class ServerCog(commands.Cog):
         except:
             pass
         self.table = 'servers_beta' if bot.beta else 'servers'
-        self.default_opt = {"language":0,
+        self.default_opt = {"language":1,
                "clear":"",
                "slowmode":"",
                "mute":"",

@@ -2,11 +2,12 @@
 #coding=utf-8
 
 from importlib import reload as m_reload
-from fcts.lang import fr, en, lolcat
+from fcts.lang import fr, en, lolcat, fi
 import discord
 m_reload(fr)
 m_reload(en)
 m_reload(lolcat)
+m_reload(fi)
 
 
 class LangCog(discord.ext.commands.Cog):
@@ -25,7 +26,7 @@ class LangCog(discord.ext.commands.Cog):
         if type(serverID) == discord.Guild:
             serverID = serverID.id
         elif isinstance(serverID,discord.TextChannel):
-            serverID = serverID.guild
+            serverID = serverID.guild.id
         if not self.bot.database_online or serverID==None or isinstance(serverID,discord.DMChannel):
             lang_opt = self.bot.cogs['ServerCog'].default_language
         elif isinstance(serverID,discord.GroupChannel):

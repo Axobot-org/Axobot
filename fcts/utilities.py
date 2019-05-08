@@ -260,7 +260,10 @@ class UtilitiesCog(commands.Cog):
         try:
             cnx = self.bot.cnx
             cursor = cnx.cursor(dictionary = True)
-            query = ("INSERT INTO `{t}` (`userID`,`{k}`) VALUES ('{u}','{v}') ON DUPLICATE KEY UPDATE {k} = '{v}';".format(t=self.table,u=userID,k=key,v=value))
+            if not isinstance(value,(bool,int)):
+                value = "'"+value+"'"
+            query = ("INSERT INTO `{t}` (`userID`,`{k}`) VALUES ('{u}',{v}) ON DUPLICATE KEY UPDATE {k} = {v};".format(t=self.table,u=userID,k=key,v=value))
+            # INSERT INTO `users` (`userID`,`unlocked_blurple`) VALUES ('279568324260528128','True') ON DUPLICATE KEY UPDATE unlocked_blurple = 'True';
             cursor.execute(query)
             cnx.commit()
             cursor.close()
@@ -321,13 +324,24 @@ class UtilitiesCog(commands.Cog):
             return False
         return parameters['unlocked_rainbow']
     
+    async def has_blurple_card(self,user):
+        """Check if a user won the blurple card"""
+        parameters = None
+        try:
+            parameters = await self.get_db_userinfo(criters=["userID="+str(user.id)],columns=['unlocked_blurple'])
+        except Exception as e:
+            await self.bot.cogs["Errors"].on_error(e,None)
+        if parameters==None:
+            return False
+        return parameters['unlocked_blurple']
+    
     async def get_xp_style(self,user):
         parameters = None
         try:
             parameters = await self.get_db_userinfo(criters=["userID="+str(user.id)],columns=['xp_style'])
         except Exception as e:
             await self.bot.cogs["ErrorsCog"].on_error(e,None)
-        if parameters==None:
+        if parameters==None or parameters['xp_style']=='':
             return 'dark'
         return parameters['xp_style']
 
@@ -360,11 +374,10 @@ class UtilitiesCog(commands.Cog):
             liste2.append('premium')
         if await self.bot.cogs['AdminCog'].check_if_admin(user):
             liste2.append('admin')
-        if datetime.datetime.today().day == 1:
+        if await self.has_rainbow_card(user):
             liste.append('rainbow')
-        else:
-            if await self.has_rainbow_card(user):
-                liste.append('rainbow')
+        if await self.has_blurple_card(user):
+            liste.append('blurple')
         return sorted(liste2)+sorted(liste)
 
     async def get_languages(self,user,limit=0):

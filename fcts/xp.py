@@ -277,9 +277,12 @@ class XPCog(commands.Cog):
         """Crée la carte d'xp pour un utilisateur"""
         card = Image.open("../cards/model/{}.png".format(style))
         bar_colors = await self.get_xp_bar_color(user.id)
+        colors = {'name':(124, 197, 118),'xp':(124, 197, 118),'NIVEAU':(255, 224, 77),'rank':(105, 157, 206),'bar':bar_colors}
+        if style=='blurple':
+            colors = {'name':(35,35,50),'xp':(235, 235, 255),'NIVEAU':(245, 245, 255),'rank':(255, 255, 255),'bar':(70, 83, 138)}
         if not user.is_avatar_animated() or force_static:
             pfp = await self.get_raw_image(user.avatar_url_as(format='png',size=256))
-            img = await self.add_overlay(pfp.resize(size=(282,282)),user,card,xp,rank,txt,bar_colors)
+            img = await self.add_overlay(pfp.resize(size=(282,282)),user,card,xp,rank,txt,colors)
             img.save('../cards/global/{}-{}-{}.png'.format(user.id,xp,rank[0]))
             return discord.File('../cards/global/{}-{}-{}.png'.format(user.id,xp,rank[0]))
         else:
@@ -288,18 +291,17 @@ class XPCog(commands.Cog):
             duration = []
             for i in range(pfp.n_frames):
                 pfp.seek(i)
-                img = await self.add_overlay(pfp.resize(size=(282,282)),user,card,xp,rank,txt,bar_colors)
+                img = await self.add_overlay(pfp.resize(size=(282,282)),user,card,xp,rank,txt,colors)
                 images.append(img)
                 duration.append(pfp.info['duration']/1000)
             card.close()
             imageio.mimwrite('../cards/global/{}-{}-{}.gif'.format(user.id,xp,rank[0]), images, format="GIF-PIL", duration=duration, subrectangles=True)
             return discord.File('../cards/global/{}-{}-{}.gif'.format(user.id,xp,rank[0]))
 
-    async def add_overlay(self,pfp,user,card,xp,rank,txt,bar_colors):
+    async def add_overlay(self,pfp,user,card,xp,rank,txt,colors):
         img = Image.new('RGBA', (card.width, card.height), color = (250,250,250,0))
         img.paste(pfp, (20, 29))
         img.paste(card, (0, 0), card)
-
         if platform.system()=='Darwin':
             verdana_name = 'Verdana.ttf'
         else:
@@ -310,10 +312,10 @@ class XPCog(commands.Cog):
         levels_fnt = ImageFont.truetype(verdana_name, 65)
         rank_fnt = ImageFont.truetype(verdana_name,29)
         RANK_fnt = ImageFont.truetype(verdana_name,23)
-        colors = {'name':(124, 197, 118),'xp':(124, 197, 118),'NIVEAU':(255, 224, 77),'rank':(105, 157, 206)}
+        
 
         levels_info = await self.calc_level(xp)
-        img = await self.add_xp_bar(img,xp-levels_info[2],levels_info[1]-levels_info[2],bar_colors)
+        img = await self.add_xp_bar(img,xp-levels_info[2],levels_info[1]-levels_info[2],colors['bar'])
         d = ImageDraw.Draw(img)
         d.text(await self.calc_pos(user.name,name_fnt,610,68), user.name, font=name_fnt, fill=colors['name'])
         temp = '{} / {} xp ({}/{})'.format(xp-levels_info[2],levels_info[1]-levels_info[2],xp,levels_info[1])
@@ -399,27 +401,10 @@ class XPCog(commands.Cog):
         await ctx.send(msg)
 
 
-
-    @commands.command(name='top')
-    @commands.bot_has_permissions(send_messages=True)
-    @commands.cooldown(5,60,commands.BucketType.user)
-    async def top(self,ctx,page:typing.Optional[int]=1,Type:args.LeaderboardType='global'):
-        """Get the list of the highest levels
-        Each page has 20 users"""
-        if Type=='global':
-            max_page = ceil(len(self.cache)/20)
-            ranks = await self.bdd_get_top(20*page)
-        elif Type=='guild':
-            ranks = await self.bdd_get_top(1000000,guild=ctx.guild)
-            max_page = ceil(len(ranks)/20)
-        if page<1:
-            return await ctx.send(await self.translate(ctx.channel,"xp",'low-page'))
-        elif page>max_page:
-            return await ctx.send(await self.translate(ctx.channel,"xp",'high-page'))
-        ranks = ranks[(page-1)*20:]
+    async def create_top_main(self,ranks,nbr,page,ctx):
         txt = list()
-        i = (page-1)*20
-        for u in ranks:
+        i = (page-1)*nbr
+        for u in ranks[:nbr]:
             i +=1
             user = self.bot.get_user(u['userID'])
             if user==None:
@@ -433,6 +418,32 @@ class XPCog(commands.Cog):
                     user_name = user_name[:15]+'...'
             l = await self.calc_level(u['xp'])
             txt.append('{} • **{} |** `lvl {}` **|** `xp {}`'.format(i,"__"+user_name+"__" if user==ctx.author else user_name,l[0],u['xp']))
+        return txt,i
+
+    @commands.command(name='top')
+    @commands.bot_has_permissions(send_messages=True)
+    @commands.cooldown(5,60,commands.BucketType.user)
+    async def top(self,ctx,page:typing.Optional[int]=1,Type:args.LeaderboardType='global'):
+        """Get the list of the highest levels
+        Each page has 20 users"""
+        if Type=='global':
+            max_page = ceil(len(self.cache)/20)
+            ranks = await self.bdd_get_top(20*page)
+        elif Type=='guild':
+            ranks = await self.bdd_get_top(10000,guild=ctx.guild)
+            max_page = ceil(len(ranks)/20)
+        if page<1:
+            return await ctx.send(await self.translate(ctx.channel,"xp",'low-page'))
+        elif page>max_page:
+            return await ctx.send(await self.translate(ctx.channel,"xp",'high-page'))
+        ranks = ranks[(page-1)*20:]
+        nbr = 20
+        txt,i = await self.create_top_main(ranks,nbr,page,ctx)
+        while len("\n".join(txt))>1000 and nbr>0:
+            print(nbr,len("\n".join(txt)))
+            nbr -= 1
+            txt,i = await self.create_top_main(ranks,nbr,page,ctx)
+            await asyncio.sleep(0.2)
         f_name = str(await self.translate(ctx.channel,'xp','top-name')).format((page-1)*20+1,i,page,max_page)
         # author
         rank = await self.bdd_get_rank(ctx.author.id,ctx.guild if Type=='guild' else None)
