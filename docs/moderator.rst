@@ -196,6 +196,32 @@ This option allows you to moderate the entry of your server, with several levels
 
 
 
+---------
+XP System
+---------
+
+The xp system is a system for evaluating a person's activity on a server using a point system. Each message brings a certain number of points to its author, allowing him to gain in level and to rise in the ranking. To avoid having a too easy system, each level is a bit more difficult to reach than the previous one, and security measures have obviously been taken against spam or cheating.
+
+
+Roles rewards
+-------------
+
+Reward roles are roles given to your members when they reach a certain level of xp. These levels are defined by you (or by anyone with "Manage Server" permission), and you can add up to 7 levels per server. 
+
+The main command to manage these roles is :code:`roles_rewards` (or :code:`rr`). Here is the list of commands currently available :
+
+* :code:`roles_rewards add <level> <role>` : allows you to add a new role to the list of roles-rewards. The level is at least 1, without maximum, and to fill the role you can give either the IDentifier or the name.
+
+* :code:`roles_rewards remove <level>` : allows you to delete a role-rweard at a certain level, to prevent the next people reaching that level from getting the role. People currently with this role will not lose it, unless you perform a reload via the following command.
+
+* :code:`roles_rewards reload` : reload all roles, to check that each member has the right roles. If a member has excess rewards roles, they will be removed; similarly, if a member misses certain rewards roles, they will be assigned to him.
+
+* :code:`roles_rewards list` : lists all currently configured roles-rewards, with their corresponding level, as well as the maximum number of roles allowed for your server. The bot must have "`Embed Links <perms.html#embed-links>`_" permission.
+
+.. warning:: For these roles to work properly, the bot **must** have "Manage Roles" permission. The roles to be given or removed **must** also be lower than the role of Zbot in your server hierarchy (Server Settings > Roles tab).
+
+
+
 --------------
 Miscellaneaous
 --------------
@@ -206,7 +232,7 @@ Emoji Manager
 
 With this command, you can become the undisputed master of the Emojis and handle them all as you please. You can even do something that no one has ever done before, a beta exclusivity straight out of the Discord labs: restrict the use of certain emojis to certain roles! **YES!** It's possible! Come on, let's not waste any time, here's the list of commands currently available :
 
-* :code:`emoji rename <emoji> <new name>` : renames your emoji, without going through the Discord interface. No more complicated thing
+* :code:`emoji rename <emoji> <new name>` : renames your emoji, without going through the Discord interface. No more complicated thing.
 
 * :code:`emoji restrict <emoji> <roles>` : restrict the use of an emoji to certain roles. Members who do not have this role will simply not see the emoji in the list. Note that there is no need to mention, just put the identifier or the name.
 
