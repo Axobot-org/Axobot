@@ -63,6 +63,7 @@ class XPCog(commands.Cog):
         new_lvl = await self.calc_level(self.cache[msg.author.id][1])
         if 1 < (await self.calc_level(prev_points))[0] < new_lvl[0]:
             await self.send_levelup(msg,new_lvl)
+            await self.give_rr(msg.author,new_lvl[0],await self.rr_list_role(msg.guild.id))
 
     async def check_noxp(self,msg):
         """Check if this channel/user can get xp"""
@@ -132,6 +133,36 @@ class XPCog(commands.Cog):
         while ceil(0.05*next_step**0.647)==lvl:
             next_step += 1
         return [lvl,next_step,ceil(20*20**(353/647)*(lvl-1)**(1000/647))]
+
+    async def give_rr(self,member:discord.Member,level:int,rr_list:list,remove=False):
+        """Give (and remove?) roles rewards to a member"""
+        c = 0
+        has_roles = [x.id for x in member.roles]
+        for role in [x for x in rr_list if x['level']<=level and x['role'] not in has_roles]:
+            try:
+                r = member.guild.get_role(role['role'])
+                if r==None:
+                    continue
+                await member.add_roles(r,reason="Role reward (lvl {})".format(role['level']))
+                c += 1
+            except Exception as e:
+                if self.bot.beta:
+                    await self.bot.cogs['ErrorsCog'].on_error(e,None)
+                pass
+        if not remove:
+            return c
+        for role in [x for x in rr_list if x['level']>level and x['role'] in has_roles]:
+            try:
+                r = member.guild.get_role(role['role'])
+                if r==None:
+                    continue
+                await member.remove_roles(r,reason="Role reward (lvl {})".format(role['level']))
+                c += 1
+            except:
+                if self.bot.beta:
+                    await self.bot.cogs['ErrorsCog'].on_error(e,None)
+                pass
+        return c
 
     async def bdd_set_xp(self,userID,points,Type='add'):
         """Ajoute/reset de l'xp à un utilisateur dans la database générale"""
@@ -203,20 +234,23 @@ class XPCog(commands.Cog):
         except Exception as e:
             await self.bot.cogs['ErrorsCog'].on_error(e,None)
 
-    async def bdd_get_top(self,top:int,guild=None):
+    async def bdd_get_top(self,top:int,guild:discord.Guild=None):
         try:
             cnx = self.bot.cnx
             cursor = cnx.cursor(dictionary = True)
-            query = ("SELECT * FROM `{}` order by `xp` desc limit {}".format(self.table,top))
+            query = ("SELECT * FROM `{}` order by `xp` desc".format(self.table))
             cursor.execute(query)
             liste = list()
             if guild==None:
-                liste = [x for x in cursor]
+                liste = [x for x in cursor][:top]
             else:
                 ids = [x.id for x in guild.members]
-                liste = [x for x in cursor if x['userID'] in ids]
-            #for x in cursor:
-            #    liste.append(x)
+                i = 0
+                l2 = [x for x in cursor]
+                while len(liste)<top and i<len(l2):
+                    if l2[i]['userID'] in ids:
+                        liste.append(l2[i])
+                    i += 1
             cursor.close()
             return liste
         except Exception as e:
@@ -488,7 +522,7 @@ class XPCog(commands.Cog):
         return True
     
     async def rr_list_role(self,guild:int,level:int=-1):
-        """Add a role reward in the database"""
+        """List role rewards in the database"""
         cnx = self.bot.cnx
         cursor = cnx.cursor(dictionary = True)
         query = ("SELECT * FROM `roles_rewards` WHERE guild={g} ORDER BY level;".format(g=guild)) if level<0 else ("SELECT * FROM `roles_rewards` WHERE guild={g} AND level={l} ORDER BY level;".format(g=guild,l=level))
@@ -560,6 +594,23 @@ class XPCog(commands.Cog):
             await self.bot.cogs['ErrorsCog'].on_cmd_error(ctx,e)
         else:
             await ctx.send(str(await self.translate(ctx.guild.id,'xp','rr-removed')).format(level))
+    
+    @rr_main.command(name="reload")
+    @commands.check(checks.can_manage_server)
+    @commands.cooldown(1,300,commands.BucketType.guild)
+    async def rr_reload(self,ctx):
+        """Refresh roles rewards for the whole server"""
+        try:
+            if not ctx.guild.me.guild_permissions.manage_roles:
+                return await ctx.send(await self.translate(ctx.guild.id,'modo','cant-mute'))
+            c = 0
+            rr_list = await self.rr_list_role(ctx.guild.id)
+            xps = await self.bdd_get_top(len(ctx.guild.members),ctx.guild)
+            for member in xps:
+                c += await self.give_rr(ctx.guild.get_member(member['userID']),(await self.calc_level(member['xp']))[0],rr_list)
+            await ctx.send(str(await self.translate(ctx.guild.id,'xp','rr-reload')).format(c,len(ctx.guild.members)))
+        except Exception as e:
+            await self.bot.cogs['ErrorsCog'].on_cmd_error(ctx,e)
 
 
 def setup(bot):

@@ -531,5 +531,7 @@ xp = {'card-level':'LEVEL',
         'rr-added':"The role `{}` has been correctly added for level {} !",
         'already-1-rr':"There is already a role configured for this level!",
         'no-rr':"No role has been configured for this level",
-        'rr-removed':"No role will be given for level {} anymore"
+        'rr-removed':"No role will be given for level {} anymore",
+        'too-many-rr':"You already have {} roles rewards, you can't add more!",
+        'rr-reload':"{} updated roles / {} scanned members"
         }

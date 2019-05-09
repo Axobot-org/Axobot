@@ -532,5 +532,6 @@ xp = {'card-level':'NIVEAU',
         'already-1-rr':"Il y a déjà un rôle configuré pour ce niveau !",
         'no-rr':"Aucun rôle n'a été configuré pour ce niveau",
         'rr-removed':"Plus aucun rôle ne sera donné pour le niveau {}",
-        'too-many-rr':"Vous avez déjà {} rôles, vous ne pouvez pas en ajouter plus !"
+        'too-many-rr':"Vous avez déjà {} rôles, vous ne pouvez pas en ajouter plus !",
+        'rr-reload':"{} rôles mis à jour / {} membres scannés"
         }
