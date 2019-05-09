@@ -521,9 +521,11 @@ class XPCog(commands.Cog):
         """Add a role reward
         This role will be given to every member who reaches the level"""
         try:
-            l = await self.rr_list_role(ctx.guild.id,level)
-            if len(l)>0:
+            l = await self.rr_list_role(ctx.guild.id)
+            if len([x for x in l if x['level']==level])>0:
                 return await ctx.send(await self.translate(ctx.guild.id,'xp','already-1-rr'))
+            if len(l) >= await self.bot.cogs['ServerCog'].find_staff(ctx.guild.id,'rr_max_number',ctx.channel):
+                return await ctx.send(str(await self.translate(ctx.guild.id,'xp','too-many-rr')).format(len(l)))
             await self.rr_add_role(ctx.guild.id,role.id,level)
         except Exception as e:
             await self.bot.cogs['ErrorsCog'].on_cmd_error(ctx,e)
@@ -540,7 +542,8 @@ class XPCog(commands.Cog):
             await self.bot.cogs['ErrorsCog'].on_cmd_error(ctx,e)
         else:
             des = '\n'.join(["• <@&{}> : lvl {}".format(x['role'], x['level']) for x in l])
-            emb = self.bot.cogs['EmbedCog'].Embed(title=await self.translate(ctx.guild.id,"xp",'rr_list'),desc=des).update_timestamp().create_footer(ctx.author)
+            title = str(await self.translate(ctx.guild.id,"xp",'rr_list')).format(len(l),await self.bot.cogs['ServerCog'].find_staff(ctx.guild.id,'rr_max_number',ctx.channel))
+            emb = self.bot.cogs['EmbedCog'].Embed(title=title,desc=des).update_timestamp().create_footer(ctx.author)
             await ctx.send(embed=emb.discord_embed())
     
     @rr_main.command(name="remove")
