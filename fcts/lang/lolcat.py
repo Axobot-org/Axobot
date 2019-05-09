@@ -113,7 +113,8 @@ fun={"count-0":"Countng in progrez...",
     "embed-error":"A' error went wrong: `{}`",
     "invalid-city":"Invalid place name :confused:",
     "no-roll":"Hmm I don't see any choice lol",
-    'no-say':"Unable 2 send any message in tish channel"
+    'no-say':"Unable 2 send any message in tish channel",
+    'no-voicechan':'Wait, U forgot teh vocal channel? :eyes:'
     }
 
 infos={"text-0":"""Ho hi hello! I'm {0} !

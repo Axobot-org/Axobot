@@ -501,6 +501,16 @@ You can specify a verification limit by adding a number in argument"""
             await ctx.send(embed=emb.discord_embed())
         except Exception as e:
             await ctx.send(str(await self.translate(ctx.channel,"fun","embed-error")).format(e))
+    
+    @commands.command(name='camlink')
+    @commands.guild_only()
+    async def camlink(self,ctx,):
+        """Give an URL to share your screen in a vocal channel
+        You must be in a vocal channel to run this command"""
+        voicestate = ctx.author.voice
+        if voicestate==None:
+            return await ctx.send(await self.translate(ctx.guild.id,'fun','no-voicechan'))
+        await ctx.send(f"{voicestate.channel.mention} : https://api.discordapp.com/channels/{ctx.guild.id}/{voicestate.channel.id}")
 
 
     async def add_vote(self,msg):
@@ -559,7 +569,7 @@ You can specify a verification limit by adding a number in argument"""
                 except Exception as e:
                     await self.bot.cogs['ErrorsCog'].on_error(e,ctx)
         await self.bot.cogs['UtilitiesCog'].suppr(ctx.message)
-        await self.bot.log.debug(await self.bot.cogs['TimeCog'].date(datetime.datetime.now(),digital=True)+" Vote de {} : {}".format(ctx.author,ctx.message.content))
+        self.bot.log.debug(await self.bot.cogs['TimeCog'].date(datetime.datetime.now(),digital=True)+" Vote de {} : {}".format(ctx.author,ctx.message.content))
 
 
     async def check_suggestion(self,message):

@@ -113,7 +113,8 @@ fun={"count-0":"Comptage en cours...",
     "embed-error":"Une erreur est survenue: `{}`",
     "invalid-city":"Nom de ville invalide",
     "no-roll":"Aucun élément trouvé",
-    'no-say':"Impossible d'envoyer un message dans ce salon"
+    'no-say':"Impossible d'envoyer un message dans ce salon",
+    'no-voicechan':'Vous devez être connecté à un salon vocal pour utiliser cette commande.'
     }
 
 infos={"text-0":"""Bonjour ! Moi c'est {0} !

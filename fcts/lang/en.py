@@ -113,7 +113,8 @@ fun={"count-0":"Counting in progress...",
     "embed-error":"An error has occurred: `{}`",
     "invalid-city":"Invalid city :confused:",
     "no-roll":"No choice found",
-    'no-say':"Unable to send any message in this channel"
+    'no-say':"Unable to send any message in this channel",
+    'no-voicechan':'You must be in a vocal channel in order to use this command.'
     }
 
 infos={"text-0":"""Hello! I'm {0} !

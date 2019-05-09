@@ -7,6 +7,16 @@ Some commands are difficult to classify in the categories of the site. They are 
 Here is the list of these particular commands.
 
 
+-------
+Camlink
+-------
+
+**Syntax:** :code:`camlink [channel]`
+
+This command is useful for doing something that Discord has but does not yet offer to do: video calls in a server. Just connect to a voice channel on your server, then click on the link provided by the bot, and there you go! Wonderful, isn't it? With this you can share your most beautiful grins in live, or use the screen sharing for a conference, it's up to you if you want to be serious...
+
+.. note:: As mentioned above, you must be in a voice channel of your server to use this command. Also it obviously doesn't work outside a server.
+
 ---
 Say
 ---
