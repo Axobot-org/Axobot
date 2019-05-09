@@ -77,14 +77,16 @@ errors={"cooldown":"You are on cooldown for this command :confused: Please wait 
 "invalidcolor":"Color `{0}` invalid"}
 
 find={"user-0":"name: {}\nID: {}",
-"user-1":"Name: {name}\nID: {id}\nPerks: {rangs}\nServers: {servers}\nOwner of: {own}\nLanguages: {lang}\nVoted? {vote}\nXP card: {card}",
-"user-2":"User not found",
-"guild-0":"Server not found",
-"guild-1":"Name: {}\nID: {}\nOwner: {} ({})\nMembers: {} (including {} bots)\nLanguage: {}\nPrefix: `{}`\nRss feeds number: {}",
-"chan-0":"Channel not found",
-"chan-1":"Name : {}\nID: {}\nServer: {} ({})",
-"help":"This command allows to find a server or a salon among all the servers on which is the bot. You can also search for a Discord user's information, no matter if he shares a server with me!\
-The syntax is `!find <user|channel|guild> <ID>`"}
+    "user-1":"Name: {name}\nID: {id}\nPerks: {rangs}\nServers: {servers}\nOwner of: {own}\nLanguages: {lang}\nVoted? {vote}\nXP card: {card}",
+    "user-2":"User not found",
+    "guild-0":"Server not found",
+    "guild-1":"Name: {}\nID: {}\nOwner: {} ({})\nMembers: {} (including {} bots)\nLanguage: {}\nPrefix: `{}`\nRss feeds number: {}",
+    "chan-0":"Channel not found",
+    "chan-1":"Name : {}\nID: {}\nServer: {} ({})",
+    "help":"This command allows to find a server or a salon among all the servers on which is the bot. You can also search for a Discord user's information, no matter if he shares a server with me!\nThe syntax is `!find <user|channel|guild> <ID>`",
+    "role-0":"Role not found",
+    "role-1":"Name: {}\nID: {}\nGuild: {} ({})\nMembers number: {}\nColour: {}"
+    }
 
 fun={"count-0":"Counting in progress...",
     "count-1":"On the last {} posts, you have posted {} messages ({}%)",
@@ -525,7 +527,7 @@ xp = {'card-level':'LEVEL',
         "top-name":"__Top {}-{} (page {}/{}):__",
         "default_levelup":"Hey, {user} has just reached **level {level}**! Keep this way!",
         "top-your":"Your rank",
-        'rr_list':"Roles rewards list",
+        'rr_list':"Roles rewards list ({}/{})",
         'rr-added':"The role `{}` has been correctly added for level {} !",
         'already-1-rr':"There is already a role configured for this level!",
         'no-rr':"No role has been configured for this level",

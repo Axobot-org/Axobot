@@ -77,14 +77,15 @@ errors={"cooldown":"Yu are on cold-own for dis comandZ :confused: Plize wait {} 
 "invalidcolor":"Ups, I can't find the color `{0}` :confused:"}
 
 find={"user-0":"naym: {}\nID: {}",
-"user-1":"Naym: {name}\nID: {id}\nPerks: {rangs}\nServers: {servers}\nAuwner ov: {own}\nSpeak: {lang}\nNice guy? {vote}\nRank card bg: {card}",
-"user-2":"Usr not findz",
-"guild-0":"S3rvr not findz",
-"guild-1":"Name: {}\nID: {}\nOwnr: {} ({})\nMmbr: {} ({} robots)\nSpeak {}\nPro-fix: `{}`",
-"chan-0":"chAnnel not foundz",
-"chan-1":"Nayme : {}\nID: {}\nServr: {} ({})",
-"help":"Dis commnd allowz 2 find a servr or a chnnel among all the servers on which'z teh bot. U can so seerch 4 a Discord usr's info, no mater if he sharez servr wif me!\
-Teh syntax'z `!find <user|channel|guild> <ID>`"}
+    "user-1":"Naym: {name}\nID: {id}\nPerks: {rangs}\nServers: {servers}\nAuwner ov: {own}\nSpeak: {lang}\nNice guy? {vote}\nRank card bg: {card}",
+    "user-2":"Usr not findz",
+    "guild-0":"S3rvr not findz",
+    "guild-1":"Name: {}\nID: {}\nOwnr: {} ({})\nMmbr: {} ({} robots)\nSpeak {}\nPro-fix: `{}`",
+    "chan-0":"chAnnel not foundz",
+    "chan-1":"Nayme : {}\nID: {}\nServr: {} ({})",
+    "help":"Dis commnd allowz 2 find a servr or a chnnel among all the servers on which'z teh bot. U can so seerch 4 a Discord usr's info, no mater if he sharez servr wif me!\nTeh syntax'z `!find <user|channel|guild> <ID>`",
+    "role-0":"Role not found",
+    "role-1":"Naym: {}\nID: {}\nZerver: {} ({})\Mbr br: {}\nCoulor: {}"}
 
 fun={"count-0":"Countng in progrez...",
     "count-1":"On teh last {} posts, U has postd {} msgs ({}%)",
@@ -525,7 +526,7 @@ xp = {'card-level':'LVL',
         "top-name":"__Bests {}-{} ({}/{}):__",
         "default_levelup":"Weew, {user} has just got **lvl {level}**! What a smart guy!",
         "top-your":"Ur rank",
-        'rr_list':"Roles list",
+        'rr_list':"Roles list ({}/{})",
         'rr-added':"Role `{}` haz been added 4 level {} !",
         'already-1-rr':"Ther's already a role setup for tihs level :thinking:",
         'no-rr':"None role is configured for this level",

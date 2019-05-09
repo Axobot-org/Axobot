@@ -77,14 +77,16 @@ errors={"cooldown":"Vous êtes en cooldown pour cette commande. Veuillez attendr
 "invalidcolor":"La couleur `{0}` est invalide"}
 
 find={"user-0":"Nom : {}\nID : {}",
-"user-1":"Nom : {name}\nID : {id}\nRangs : {rangs}\nServeurs : {servers}\nPropriétaire de : {own}\nLangues : {lang}\nA voté : {vote}\nCarte d'xp : {card}",
-"user-2":"Utilisateur introuvable",
-"guild-0":"Serveur introuvable",
-"guild-1":"Nom : {}\nID : {}\nPropriétaire : {} ({})\nMembres : {} (dont {} bots)\nLangue : {}\nPréfixe : `{}`\nNombre de flux rss : {}",
-"chan-0":"Salon introuvable",
-"chan-1":"Nom : {}\nID : {}\nServeur : {} ({})",
-"help":"Cette commande permet de retrouver un serveur ou un salon parmi tout les serveurs sur lequel est le bot. Vous pouvez aussi rechercher les informations d'un utilisateur Discord, peu importe si il partage un serveur avec moi !\
-La syntaxe est `!find <user|channel|guild> <ID>`"}
+    "user-1":"Nom : {name}\nID : {id}\nRangs : {rangs}\nServeurs : {servers}\nPropriétaire de : {own}\nLangues : {lang}\nA voté : {vote}\nCarte d'xp : {card}",
+    "user-2":"Utilisateur introuvable",
+    "guild-0":"Serveur introuvable",
+    "guild-1":"Nom : {}\nID : {}\nPropriétaire : {} ({})\nMembres : {} (dont {} bots)\nLangue : {}\nPréfixe : `{}`\nNombre de flux rss : {}",
+    "chan-0":"Salon introuvable",
+    "chan-1":"Nom : {}\nID : {}\nServeur : {} ({})",
+    "help":"Cette commande permet de retrouver un serveur ou un salon parmi tout les serveurs sur lequel est le bot. Vous pouvez aussi rechercher les informations d'un utilisateur Discord, peu importe si il partage un serveur avec moi !\nLa syntaxe est `!find <user|channel|guild> <ID>`",
+    "role-0":"Rôle introuvable",
+    "role-1":"Nom : {}\nID : {}\nServeur : {} ({})\nNombre de membres : {}\nCouleur : {}"
+}
 
 fun={"count-0":"Comptage en cours...",
     "count-1":"Sur les {} derniers messages, vous en avez posté {} ({}%)",
@@ -525,9 +527,10 @@ xp = {'card-level':'NIVEAU',
         "top-name":"__Top {}-{} (page {}/{}) :__",
         "default_levelup":"{user} vient de passer **niveau {level}** ! GG !",
         "top-your":"Votre niveau",
-        'rr_list':"Liste des rôles",
+        'rr_list':"Liste des rôles ({}/{})",
         'rr-added':"Le rôle `{}` a correctement été ajouté pour le niveau {} !",
         'already-1-rr':"Il y a déjà un rôle configuré pour ce niveau !",
         'no-rr':"Aucun rôle n'a été configuré pour ce niveau",
-        'rr-removed':"Plus aucun rôle ne sera donné pour le niveau {}"
+        'rr-removed':"Plus aucun rôle ne sera donné pour le niveau {}",
+        'too-many-rr':"Vous avez déjà {} rôles, vous ne pouvez pas en ajouter plus !"
         }

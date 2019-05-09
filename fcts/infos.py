@@ -525,6 +525,17 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
             return
         await ctx.send(str(await self.translate(ctx.channel,"find","chan-1")).format(c.name,c.id,c.guild.name,c.guild.id))
     
+    @find_main.command(name='role')
+    async def find_role(self,ctx,ID:int):
+        every_roles = list()
+        for serv in ctx.bot.guilds:
+            every_roles += serv.roles
+        c = discord.utils.find(lambda role:role.id==ID,every_roles)
+        if c == None:
+            await ctx.send(await self.translate(ctx.channel,"find","role-0"))
+            return
+        await ctx.send(str(await self.translate(ctx.channel,"find","role-1")).format(c.name,c.id,c.guild.name,c.guild.id,len(c.members),c.colour))
+    
     @find_main.command(name='rss')
     async def find_rss(self,ctx,ID:int):
         flow = await self.bot.cogs['RssCog'].get_flow(ID)
