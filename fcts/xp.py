@@ -607,7 +607,7 @@ class XPCog(commands.Cog):
             rr_list = await self.rr_list_role(ctx.guild.id)
             xps = await self.bdd_get_top(len(ctx.guild.members),ctx.guild)
             for member in xps:
-                c += await self.give_rr(ctx.guild.get_member(member['userID']),(await self.calc_level(member['xp']))[0],rr_list)
+                c += await self.give_rr(ctx.guild.get_member(member['userID']),(await self.calc_level(member['xp']))[0],rr_list,remove=True)
             await ctx.send(str(await self.translate(ctx.guild.id,'xp','rr-reload')).format(c,len(ctx.guild.members)))
         except Exception as e:
             await self.bot.cogs['ErrorsCog'].on_cmd_error(ctx,e)
