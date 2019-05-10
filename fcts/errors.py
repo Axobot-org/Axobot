@@ -90,7 +90,7 @@ class ErrorsCog(commands.Cog):
             except:
                 self.bot.log.info("[on_cmd_error] Can't send error on channel {}".format(ctx.channel.id))
         # All other Errors not returned come here... And we can just print the default TraceBack.
-        self.bot.log.warning('Ignoring exception in command {}:'.format(ctx.command), exc_info=True)
+        self.bot.log.warning('Ignoring exception in command {}:'.format(ctx.message.content))      
         await self.on_error(error,ctx)
 
     @commands.Cog.listener()
@@ -98,36 +98,22 @@ class ErrorsCog(commands.Cog):
         await self.on_cmd_error(ctx,error)
 
     @commands.Cog.listener()
-    async def on_error(self,error_msg,ctx):
+    async def on_error(self,error,ctx):
         try:
-            sysexc = sys.exc_info()
-            s = str(sysexc[0]).split("<class '")
-            if len(s)>1:
-                s = s[1].split("'>")[0]
-            else:
-                s = str(error_msg)
-            msg = """```python
-Traceback (most recent call last):
-{T} {S}
-```""".format(T=" ".join(traceback.format_tb(sysexc[2])),S='{} : {}'.format(s,str(sysexc[1])))
+            tr = traceback.format_exception(type(error), error, error.__traceback__)
+            msg = "```python\n{}\n```".format(" ".join(tr[:1]+tr[2:]))
             if ctx == None:
-                await self.senf_err_msg("Internal Error\n"+msg)
+                await self.senf_err_msg(f"Internal Error\n{msg}")
             elif ctx.guild == None:
-                await self.senf_err_msg("DM | "+ctx.channel.recipient.name+"\n"+msg)
+                await self.senf_err_msg(f"DM | {ctx.channel.recipient.name}\n{msg}")
             else:
                 await self.senf_err_msg(ctx.guild.name+" | "+ctx.channel.name+"\n"+msg)
         except Exception as e:
-            self.bot.log.warn("[on_error]",e)
+            self.bot.log.warn(f"[on_error] {e}", exc_info=True)
         try:
-            if sys.exc_info()[0] != None:
-                S = str(sys.exc_info()[0]).split("<class '")[1].split("'>")[0]+' : '+str(sys.exc_info()[1])
-            else:
-                S = "None"
-            print("""Traceback (most recent call last):
-{T} {S}
-""".format(T=" ".join(traceback.format_tb(sys.exc_info()[2])),S=S))
+            traceback.print_exception(type(error), error, error.__traceback__, file=sys.stderr)
         except Exception as e:
-            self.bot.log.warn("[on_error]",e)
+            self.bot.log.warning(f"[on_error] {e}", exc_info=True)
 
 
     async def senf_err_msg(self,msg):
