@@ -115,7 +115,24 @@ class CasesCog(commands.Cog):
         else:
             for x in cursor:
                 liste.append(x)
-        return liste    
+        return liste
+    
+    async def get_nber(self,userID:int,guildID:int):
+        """Get the number of users infractions"""
+        try:
+            cnx = self.bot.cnx
+            cursor = cnx.cursor(dictionary = False)
+            query = ("SELECT COUNT(*) FROM `{}` WHERE `user`={} AND `guild`={}".format(self.table,userID,guildID))
+            cursor.execute(query)
+            liste = list()
+            for x in cursor:
+                liste.append(x)
+            cursor.close()
+            if liste!=None and len(liste)==1:
+                return liste[0][0]
+            return 0
+        except Exception as e:
+            await self.bot.cogs['ErrorsCog'].on_error(e,None)
 
     async def delete_case(self,ID):
         """delete a case from the db"""
