@@ -155,7 +155,6 @@ class CasesCog(commands.Cog):
             raise ValueError
         cnx = self.bot.cnx
         cursor = cnx.cursor()
-        print("\'" in case.reason,"\\\'" in case.reason)
         query = ("""INSERT INTO `{}` (`ID`, `guild`, `user`, `type`, `mod`, `reason`,`duration`) VALUES ('{}', '{}', '{}', '{}', '{}', '{}','{}')""".format(self.table,case.id,case.guild,case.user,case.type,case.mod,case.reason.replace("\'","\\\'"),case.duration))
         cursor.execute(query)
         cnx.commit()

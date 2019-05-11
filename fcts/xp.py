@@ -474,7 +474,6 @@ class XPCog(commands.Cog):
         nbr = 20
         txt,i = await self.create_top_main(ranks,nbr,page,ctx)
         while len("\n".join(txt))>1000 and nbr>0:
-            print(nbr,len("\n".join(txt)))
             nbr -= 1
             txt,i = await self.create_top_main(ranks,nbr,page,ctx)
             await asyncio.sleep(0.2)
