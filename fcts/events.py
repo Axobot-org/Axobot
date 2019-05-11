@@ -249,6 +249,7 @@ class Events(commands.Cog):
 
     async def loop(self):
         await self.bot.wait_until_ready()
+        await self.rss_loop()
         self.bot.log.info("[tasks_loop] Lancement de la boucle")
         while not self.bot.is_closed():
             try:
