@@ -922,8 +922,8 @@ class RssCog(commands.Cog):
                 if isinstance(role,discord.Role) and not role.mentionable:
                     try:
                         await role.edit(mentionable=True)
-                    except Exception as e:
-                        print(e)
+                    except:
+                        pass
                     else:
                         mentions.append(role)
             try:
