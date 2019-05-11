@@ -1,5 +1,5 @@
 import discord, datetime, asyncio, logging, time
-from discord.ext import commands
+from discord.ext import commands, tasks
 
 
 
@@ -29,6 +29,10 @@ class Events(commands.Cog):
             'channel':45,
             'role':60,
             'guild':75}
+
+    
+    def cog_unload(self):
+        self.loop.cancel()
     
     @commands.Cog.listener()
     async def on_ready(self):
@@ -247,22 +251,23 @@ class Events(commands.Cog):
         cnx.commit()
         return True
 
+    @tasks.loop(seconds=0.5)
     async def loop(self):
+        try:
+            if int(datetime.datetime.now().second)%20 == 0:
+                await self.check_tasks()
+            if int(datetime.datetime.now().minute)%20 == 0:
+                await self.bot.cogs['XPCog'].clear_cards()
+                await self.rss_loop()
+        except Exception as e:
+            await self.bot.cogs['ErrorsCog'].on_error(e,None)
+    
+    @loop.before_loop
+    async def before_loop(self):
         await self.bot.wait_until_ready()
         await self.rss_loop()
         self.bot.log.info("[tasks_loop] Lancement de la boucle")
-        while not self.bot.is_closed():
-            try:
-                if int(datetime.datetime.now().second)%20 == 0:
-                    await self.check_tasks()
-                if int(datetime.datetime.now().minute)%20 == 0:
-                    await self.bot.cogs['XPCog'].clear_cards()
-                    await self.rss_loop()
-            except Exception as e:
-                await self.bot.cogs['ErrorsCog'].on_error(e,None)
-            await asyncio.sleep(0.5)
     
-
 
     async def rss_loop(self):
         if self.bot.cogs['RssCog'].last_update==None or (datetime.datetime.now() - self.bot.cogs['RssCog'].last_update).total_seconds()  > 5*60:

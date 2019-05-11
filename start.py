@@ -280,9 +280,9 @@ def main():
         else:
             return
         if r in ['1','2']:
-            r3=input("Lancement de la boucle d'events' ? (o/n) ")
+            r3=input("Lancement de la boucle d'events ? (o/n) ")
             if r3=='o':
-                client.loop.create_task(client.cogs["Events"].loop())
+                client.cogs['Events'].loop.start()
             r3=input("Activation des flux RSS ? (o/n) ")
             if r3!='o':
                 client.rss_enabled = False
