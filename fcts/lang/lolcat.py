@@ -119,7 +119,8 @@ fun={"count-0":"Countng in progrez...",
         "invalid-city":"Invalid place name :confused:",
         "no-roll":"Hmm I don't see any choice lol",
         'no-say':"Unable 2 send any message in tish channel",
-        'no-voicechan':'Wait, U forgot teh vocal channel? :eyes:'
+        'no-voicechan':'Wait, U forgot teh vocal channel? :eyes:',
+        'cant-stream':":warning: U don't have enough permissionz to do a video cat (Perm \"Stream\")."
         }
 
 infos={"text-0":"""Ho hi hello! I'm {0} !

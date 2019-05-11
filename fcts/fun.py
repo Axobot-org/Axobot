@@ -504,13 +504,16 @@ You can specify a verification limit by adding a number in argument"""
     
     @commands.command(name='camlink')
     @commands.guild_only()
-    async def camlink(self,ctx,):
+    async def camlink(self,ctx):
         """Give an URL to share your screen in a vocal channel
         You must be in a vocal channel to run this command"""
         voicestate = ctx.author.voice
         if voicestate==None:
             return await ctx.send(await self.translate(ctx.guild.id,'fun','no-voicechan'))
-        await ctx.send(f"{voicestate.channel.mention} : https://api.discordapp.com/channels/{ctx.guild.id}/{voicestate.channel.id}")
+        txt = f"{voicestate.channel.mention} : https://api.discordapp.com/channels/{ctx.guild.id}/{voicestate.channel.id}"
+        if not voicestate.channel.permissions_for(ctx.author).stream:
+            txt += "\n"+await self.translate(ctx.guild.id,'fun','cant-stream')
+        await ctx.send(txt)
 
 
     async def add_vote(self,msg):

@@ -119,7 +119,8 @@ fun={"count-0":"Counting in progress...",
         "invalid-city":"Invalid city :confused:",
         "no-roll":"No choice found",
         'no-say':"Unable to send any message in this channel",
-        'no-voicechan':'You must be in a vocal channel in order to use this command.'
+        'no-voicechan':'You must be in a vocal channel in order to use this command.',
+        'cant-stream':"Warning: You don't have enough permissions to make a video chat (Permission \"Stream\")."
         }
 
 infos={"text-0":"""Hello! I'm {0} !

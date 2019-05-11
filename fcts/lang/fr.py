@@ -119,7 +119,8 @@ fun={"count-0":"Comptage en cours...",
         "invalid-city":"Nom de ville invalide",
         "no-roll":"Aucun élément trouvé",
         'no-say':"Impossible d'envoyer un message dans ce salon",
-        'no-voicechan':'Vous devez être connecté à un salon vocal pour utiliser cette commande.'
+        'no-voicechan':'Vous devez être connecté à un salon vocal pour utiliser cette commande.',
+        'cant-stream':"Attention : vous n'avez pas la permission de faire de partage vidéo (Permission \"Stream\")."
         }
 
 infos={"text-0":"""Bonjour ! Moi c'est {0} !
