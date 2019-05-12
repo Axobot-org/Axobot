@@ -18,26 +18,26 @@ admin={
     "bug-0":"Bugi #{} ei löytynyt",
     "emergency":"Hätätilanne on havaittu tälle botille. Tämä saattaa olla koska joku yrittää päästä sisään minun koodiini.\n\
 Jotta voidaan välttää sattumia, Minut oli pakotettu lähtemään kaikilta servuilta heti, missä olin toivoen että ei ole liian myöhäistä.\n\
-Lisätietoja tästä hätätilaanteesta mene minun servulleni: https://discord.me/z_bot (Katso linkki dokumentistä jos linkki ei toimi enää: https://zbot.rtfd.io)"
+Lisätietoja tästä hätätilaanteesta mene minun servulleni: https://discord.me/z_bot (Katso linkki dokumenttiin jos linkki ei toimi enää: https://zbot.rtfd.io)"
     }
 
-aide={"no-subcmd":"Commandilla `{0.name}`ei ole sub-commandia",
+aide={"no-subcmd":"komenolla `{0.name}`ei ole toissijaista komentoa",
 "mods":['Valvoja:','toinen:'],
-"footer":"Kirjoita {}help commandi lisätietoja tietystä commandista",
+"footer":"Viestitä {}help komento niin saat lisätietoja tietyistä komennoista",
 "no-desc-cog":"Ei lisätietoja tästä cog:stä.",
-"no-desc-cmd":"Ei lisätietoja tästä commandista.",
-"cmd-not-found":"Commandia ei ole nimetty \"{}\"",
-"subcmd-not-found":"Tällä commandilla ei ole subcommandia nimetty. \"{}\""}
+"no-desc-cmd":"Ei lisätietoja tästä komennosta.",
+"cmd-not-found":"Komentoa  \"{}\"" ei ole nimetty,
+"subcmd-not-found":"Tällä komennolla ei ole toissijaista komentoa nimetty. \"{}\""}
 
 bvn={"aide":"""__**Tervetuloa liittymis & lähtö viesti moduuliin**__
-Tätä moduulia käytetään configuroimaan automaattinen viesti joka kerta kun joku tulee tai lähtee servultasi.
-__** Configuraatio**__
-`1-` Jotta voit configuroida mihin nämä viestit lähetetään, kirjoita `!config change welcome_channel`lisättynä kanava ID (Right clickkaa -> "Copy ID" tietokoneella,tai jatka painamista kanavaa -> "Copy ID" puhelimelle, mutta sinun pitää ensin ottaa käyttöön Developer muoto jotta saat tämän muodon).
-`2-` Jotta voit configuroida viestin, kirjoita  `!config change <welcome|leave> <message>`. Tälle viestille voit käyttää variableja:
+Tätä moduulia käytetään konfiguroimaan automaattinen viesti joka kerta kun joku tulee tai lähtee servultasi.
+__** Konfiguraatio**__
+`1-` Jotta voit konfiguroida mihin nämä viestit lähetetään, kirjoita `!config change welcome_channel`lisättynä kanava tunniste (Right klikkaa -> "Copy ID" tietokoneella,tai jatka painamista kanavaa -> "Kopioi tunniste" puhelimelle, mutta sinun pitää ensin ottaa käyttöön Developer muoto jotta saat tämän muodon).
+`2-` Jotta voit konfiguroida viestin, kirjoita  `!config change <welcome|leave> <message>`. Tälle viestille voit käyttää variableja:
  - `{user}` Tägää käyttäjän
  - `{server}` näyttää serverin nimen
  - `{owner}` näyttää serverin omistajan nimen
- - `{member_count}` näyttää tämän hetkisen käyttäjä määrän
+ - `{member_count}` näyttää tämänhetkisen käyttäjämäärän
 """}
 
 cases={"no-user":"Tämä on mahdotonta löytää tämä käyttäjä. :eyes:",
@@ -48,7 +48,7 @@ cases={"no-user":"Tämä on mahdotonta löytää tämä käyttäjä. :eyes:",
     "search-0":"**Käyttäjä:** {U}\n**Muoto:** {T}\n**Valvoja:** {M}\n**Päivämäärä:** {D}\n**Syy:** *{R}*",
     "search-1":"**Käyttäjä:** {U}\n**Serveri:** {G}\n**Muoto:** {T}\n**Valvoja:** {M}\n**Päivämäärä:** {D}\n**Syy:** *{R}*",
     'title-search':'Case #{}',
-    'no_database':"Jonkun ajan database alaskäynnin takia, tämä commandi on pois käytöstä"}
+    'no_database':"Jonkun ajan database alas käynnin takia, tämä komento on pois käytöstä"}
 
 events={'mp-adv':"Sinä varmaan yrität kutsua minut tähän servuun? Jos tämä on oikein, en voi liittyä helpolla kutsu linkillä. Adminin täytyy käyttää minun omaa kutsu linkkiä, täällä:<https://bot.discord.io/zbot> :wink:"}
 
@@ -69,15 +69,15 @@ find={"user-0":"nimi: {}\nID: {}",
 "guild-1":"Nimi: {}\nID: {}\nOmistaja: {} ({})\nKäyttäjät: {} Mukaan lukien {} bottia)\nKieli: {}\nEtuliite (prefix): `{}`",
 "chan-0":"kanavaa ei löytynyt",
 "chan-1":"Nimi : {}\nID: {}\nServeri: {} ({})",
-"help":"Tämä commandi hyväksyy löytämään serverin tai salongin kaikista servereistä missä botti on. Voit myös etsiä Discord käyttäjän tiedot, siltikin vaikka jos hän ei ole minun kanssani serverissä!\
+"help":"Tämä komento hyväksyy löytämään serverin tai salongin kaikista servereistä missä botti on. Voit myös etsiä Discord käyttäjän tiedot, siltikin vaikka jos hän ei ole minun kanssani serverissä!\
 Syntaksi tälle on `!find <user|channel|guild> <ID>`"}
 
 fun={"count-0":"Laskeminen on kesken...",
     "count-1":"Viimeiset {} lähetystä, olet lähettänyt {} viestiä ({}%)",
     "count-2":"Sinä haluat räjäyttää Discordin! {e} Selvien suorituskykyjen syyksi, Minä laitan rajotuksen {l} viestille.",
     "count-3":"Upsis, en pysty lukea tämän kanavan historiaa. Varmista minun luvat asetuksista...",
-    "fun-list":"Tässä on lista kaikista käytettävistä hauska commandeista:",
-    "no-fun":"Hauska commandit ovat kytketty pois käytöstä tällä serverillä. Näet listan niistä täältä: https://zbot.rtfd.io/en/v3/fun.html",
+    "fun-list":"Tässä on lista kaikista käytettävistä hauska komentoista:",
+    "no-fun":"Hauska komennot ovat kytketty pois käytöstä tällä serverillä. Näet listan niistä täältä: https://zbot.rtfd.io/en/v3/fun.html",
     "osekour":["Odota, minä olen kohta katsonut elokuvani.","Olemme tulossa! Mutta miksi et vastaa enää? Älä esitä kuollutta!","Kyllä, me tiedämme että siellä on tulipalo, meidän ei tarvitse tulla: Meillä on juhlat palokunnan talossa.","*Pelastus ei ole mahollinen, odota kunnes tämä tauko loppuu, kiitos*","*Tämä numero ei ole olemassa. Yritä uudelleen uudella numerolla.*","*Ylläpito on menossa. Yritä uudelleen 430 tunnin kuluttua.*","*Sinun puheaika on loppunut. Voit ostaa lisää puhe aikaa 86,25 eurolla!*","Kaksi lisää kappaletta Lord of the Ringsissä että olen lukenut tarpeeksi, ja sitten  minulla on aikaa! ","Kiitos että et häirinnyt meitä loman aikana","Anteeksi, täällä on enemmän kuin 3 lumihiutaletta: me olemme jumissa autotallissa","Meidän täytyy odottaa meidän jäähyn loppuun asti... Oletko sanomassa että et tiedä?! On ollut kaksi kuukautta kun aloitimme!"],
     "react-0":"En voinut löytää corresponding viestiä. Sinun täytyy lisätä viesti ID ensimmäiseen argumenttiin, ja emoji toiseen:upside_down:\n Katso myös että voin lukea kanavan viesti historiaa!",
     "thanos":["{0} oli jaettu Thanoksen kanssa","Thanos päätti muuttaa {0} tuhkiin. Ihmiskunnan hyväksi ...."],
@@ -92,26 +92,27 @@ fun={"count-0":"Laskeminen on kesken...",
     "no-reaction":"Mahdotonta lisätä reaktioita. Katso minun käyttöoikeudet...",
     "cant-react":"Minulla ei ole tarpeeksi käyttöoikeuksia lisätä reaktioita!",
     "no-emoji":"Mahdotonta löytää tämä emoji!",
-    "vote-0":"Sinä voit laittaa enemmän kuin 20 vaihtoehtoa, ja myös vähemmän negatiivisiä!",
+    "vote-0":"Sinä voit laittaa enemmän kuin 20 vaihtoehtoa, ja myös vähemmän negatiivisia!",
     "blame-0":"Lista kaikista käytettävistä nimistä**{}**:lle",
     "no-database":"As our database is offline, access to fun commands is restricted to people with permission \"Manage Server\"",
     "no-embed-perm":"Minulla ei ole käyttöoikeuksia \"Embed links\" :confused:",
-    "embed-error":"Error havaittu: `{}`",
+    "embed-error":"Virhe havaittu: `{}`",
     "invalid-city":"Pätemätön kaupunki :confused:",
-    "no-roll":"Ei vaihtoehtoa löydetty"
+    "no-roll":"Ei vaihtoehtoa löydetty",
+    'no-say':"Unable to send any message in this channel"
     }
 
 infos={"text-0":"""Moi! Olen {0} !
-Olen robotti joka voi tehä monia asioita: Valvontaa, pieniä pelejä, taso systeemi, tilastoja, ja monia muita hyödyttäviä commandeja (ja myös täysin turhia)! 
-Voit aloittaa viestittämällä `!help` tällä kanavalla niin näet kaikki käytettävissä olevat commandit, sitten `!config see` aikoo näyttää configuraatio muodot (nettisivua ollaan tekemässä). 
+Olen robotti joka voi tehdä monia asioita: Valvontaa, pieniä pelejä, taso systeemi, tilastoja, ja monia muita hyödyttäviä komentoja (ja myös täysin turhia)! 
+Voit aloittaa viestittämällä `!help` tällä kanavalla niin näet kaikki käytettävissä olevat komennot, sitten `!config see` aikoo näyttää konfiguraatio muodot (nettisivua ollaan tekemässä). 
 Kaikki jotka auttoivat minun tekeimsessä, minun omistaja ja minä haluamme kiittää Adri526, Awhikax, Jees1 (tämän kielen kääntäjä) ja Aragorn1202! Iso kiitos heille.
-:globe_with_meridians: Some links may be useful: 
+:globe_with_meridians: Jotain linkkejä jotka voivat auttaa: 
 :arrow_forward: Minun Discord palvelin: : http://discord.gg/N55zY88
 :arrow_forward: Linkki kutsua minut toiselle palvelimelle : <https://bot.discord.io/zbot>
-:arrow_forward: Bot documentti : <https://zbot.rtfd.io/>
-:arrow_forward: Minun tekijän Twitteri : <https://twitter.com/z_runnerr>
+:arrow_forward: Bot dokumentti : <https://zbot.rtfd.io/>
+:arrow_forward: Minun tekijän Twitter : <https://twitter.com/z_runnerr>
  Hyvää päivän jatkoa!""",
-"docs":"Tässä on linkki botin documenttiin:",
+"docs":"Tässä on linkki botin dokumenttiin:",
 "stats-title":"**Bot tilastot**",
 "stats":"""**Bot versio:** {bot_v} \n**Kaikkien palvelimien numero missä olen:** {s_count} \n**Numero kaikista näkyvistä jäsenistä:** {m_count} ({b_count} **botit**)\n**Numero koodi riveistä:** {l_count}\n**Käytettyjä kieliä:** {lang}\n** {p_v} \n**Versio `discord.py`stä:** {d_v} \n**Ladataan RAMia:** {ram} GB \n**Ladataan CPU:ssa:** {cpu} % \n**API viive aika:** {api} ms\n**Kaikki xp kerätty:** {xp}""",
 "admins-list":"Adminit tälle botille ovat : {}",
@@ -139,7 +140,8 @@ keywords={"depuis":"asti",
           "aucune":"ei yhtään",
           "membres":"members",
           "subcmds":"Toissijainen komento",
-          "ghost":"Haamu"
+          "ghost":"Haamu",
+          "unknown":"Unknown"
           }
 
 kill={"list":["Jaahas, olet kuolemassa!",
@@ -294,7 +296,8 @@ morpion={'user-begin':'{}, you begin!',
         'pion-1':"There's already a pawn on that cell!",
         'pion-2':'Invalid input case',
         'win-1':"Well done, {} won!",
-        'win-2':"I won! End of the game!"}
+        'win-2':"I won! End of the game!",
+        'already-playing':"You already have a game in progress!"}
 
 perms={"perms-0":"Member/role {} not found",
         "perms-1":"**'{}' permissions:**\n\n"
@@ -398,7 +401,8 @@ to modify a configuration, or `!config del <option>` to reset the option (`!conf
         "change-prefix-1":"This prefix is too long to be used!",
         "wrong-prefix":"Oops, it seems this prefix is invalid :thinking: If the problem persists, please choose another one",
         "opt_title":"Option '{}' of server {}",
-        "not-found":"The server {} has not yet been registered in the database"
+        "not-found":"The server {} has not yet been registered in the database",
+        "need-admin":"You need Administrator permission to execute this command."
     }
 
 server_desc={"prefix":"Current bot prefix: {}",
@@ -427,7 +431,8 @@ server_desc={"prefix":"Current bot prefix: {}",
             "anti_raid":"Level of anti-raid protection: {} \n*([Documentation](https://zbot.rtfd.io/en/latest/moderator.html#anti-raid))*",
             "vote_emojis":"Emojis used for poll reactions: {}",
             "help_in_dm":"Send help message in Private Message? {}",
-            "muted_role":"Used role to mute members : {}"}
+            "muted_role":"Used role to mute members : {}",
+            "noxp_channels":"Channels where you can't get xp: {}"}
 
 stats_infos={"not-found":"Unable to find {N}",
             "member-0":"Nickname",
@@ -495,6 +500,13 @@ xp = {'card-level':'LEVEL',
         "low-page":"I cannot display a negative page number!",
         "high-page":"There are not that many pages!",
         "top-title-1":"Global ranking",
+        "top-title-2":"Server ranking",
         "top-name":"__Top {}-{} (page {}/{}):__",
         "default_levelup":"Hey, {user} has just reached **level {level}**! Keep this way!",
-        "top-your":"Your rank"}
+        "top-your":"Your rank",
+        'rr_list':"Roles rewards list",
+        'rr-added':"The role `{}` has been correctly added for level {} !",
+        'already-1-rr':"There is already a role configured for this level!",
+        'no-rr':"No role has been configured for this level",
+        'rr-removed':"No role will be given for level {} anymore"
+        }
