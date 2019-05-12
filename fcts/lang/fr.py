@@ -418,6 +418,7 @@ l'option (`!config change <option> del` fonctionne de même).\nLa liste des opti
         "change-7":"Cette langue n'est pas disponible. Voici la liste des langues actuellement supportées : {}",
         "change-8":"Ce niveau n'existe pas. Voici la liste des niveaux actuellement disponibles : {}",
         "change-9":"L'émoji `{}` n'a pas été trouvé",
+        "change-10":"Ce système d'xp n'existe pas. Voici la liste des systèmes disponibles : {}",
         "change-role":"L'option '{}' a bien été modifiée avec les rôles suivants : {}",
         "change-bool":"L'option '{}' a bien été modifiée avec la valeur *{}*",
         "change-textchan":"L'option '{}' a bien été modifiée avec les salons {}",
@@ -426,6 +427,7 @@ l'option (`!config change <option> del` fonctionne de même).\nLa liste des opti
         "change-lang":"La langue du bot est maintenant en `{}`",
         "change-raid":"Le niveau de sécurité anti-raid est maintenant défini à **{}** ({})",
         "change-emojis":"Les émojis pour l'option '{}' sont maintenant {}",
+        "change-xp":"Le type d'xp utilisé est maintenant {}",
         "new_server":"Votre serveur vient d'être enregistré pour la première fois dans notre base de donnée. Félicitations :tada:",
         "see-0":"Entrez `!config help` pour plus de détails",
         "see-1":"Configuration du serveur {}",
@@ -463,7 +465,8 @@ server_desc={"prefix":"Préfixe actuel du bot : {}",
         "vote_emojis":"Emojis utilisés pour les réactions de vote : {}",
         "help_in_dm":"Envoyer le message d'aide en message privés ? {}",
         "muted_role":"Rôle utilisé pour rendre les gens muets : {}",
-        "noxp_channels":"Salons où il est impossible d'obtenir de l'xp : {}"
+        "noxp_channels":"Salons où il est impossible d'obtenir de l'xp : {}",
+        "xp_type":"Type de système d'xp : {}"
         }
 
 stats_infos={"not-found":"Impossible de trouver {N}",

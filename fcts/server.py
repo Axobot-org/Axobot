@@ -15,6 +15,7 @@ prefix_options = ['prefix']
 emoji_option = ['vote_emojis']
 numb_options = []
 raid_options = ["anti_raid"]
+xp_type_options = ['xp_type']
 
 class ServerCog(commands.Cog):
     """"Cog in charge of all the bot configuration management for your server. As soon as an option is searched, modified or deleted, this cog will handle the operations."""
@@ -278,6 +279,8 @@ class ServerCog(commands.Cog):
                 await self.conf_raid(ctx,option,value)
             elif option in emoji_option:
                 await self.conf_emoji(ctx,option,value)
+            elif option in xp_type_options:
+                await self.conf_xp_type(ctx,option,value)
             else:
                 await ctx.send(await self.translate(ctx.guild.id,"server","change-0"))
                 return
@@ -633,6 +636,37 @@ class ServerCog(commands.Cog):
         else:
             return self.raids_levels[value]
     
+    async def conf_xp_type(self,ctx,option,value):
+        if value == "scret-desc":
+            if type(ctx) == commands.Context:
+                guild = ctx.guild.id
+            elif type(ctx) == str:
+                if ctx.isnumeric():
+                    guild = int(ctx)
+            elif type(ctx) == int:
+                guild = ctx
+            else:
+                return self.bot.cogs['XPCog'].types[0]
+            v = await self.find_staff(guild,option,channel=None)
+            return await self.form_xp_type(v)
+        else:
+            available_types = self.bot.cogs["XPCog"].types
+            if value in available_types:
+                v = available_types.index(value)
+                await self.modify_server(ctx.guild.id,values=[(option,v)],channel=ctx.channel)
+                msg = await self.translate(ctx.guild.id,"server","change-xp")
+                await ctx.send(msg.format(value))
+                await self.send_embed(ctx.guild,option,value)
+            else:
+                msg = await self.translate(ctx.guild.id,"server","change-10")
+                await ctx.send(msg.format(", ".join(available_types)))
+
+    async def form_xp_type(self,value):
+        if value == None:
+            return self.bot.cogs['XPCog'].types[0]
+        else:
+            return self.bot.cogs["XPCog"].types[value]
+    
     @sconfig_main.command(name="see")
     @commands.cooldown(1,10,commands.BucketType.guild)
     async def sconfig_see(self,ctx,option=None):
@@ -678,6 +712,8 @@ class ServerCog(commands.Cog):
                     r = await self.form_raid(v)
                 elif i in emoji_option:
                     r = ", ".join(await self.form_emoji(v))
+                elif i in xp_type_options:
+                    r = ", ".join(await self.form_xp_type(v))
                 else:
                     continue
                 if len(r) == 0:
@@ -710,6 +746,8 @@ class ServerCog(commands.Cog):
                 r = await self.conf_raid(ctx,option,'scret-desc')
             elif option in emoji_option:
                 r = await self.conf_emoji(ctx,option,"scret-desc")
+            elif option in xp_type_options:
+                r = await self.conf_xp_type(ctx,option,"scret-desc")
             else:
                 r = None
             if r!=None:
