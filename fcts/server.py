@@ -138,13 +138,13 @@ class ServerCog(commands.Cog):
             ID = ID.id
         elif type(ID)==None or not self.bot.database_online:
             return None
-        l = await self.get_server([name],criters=["ID="+str(ID)],ID=ID,channel=channel,Type=list)
+        l = await self.get_server([name],criters=["ID="+str(ID)],Type=list)
         if l == []:
             return None
         else:
             return l[0][0]
         
-    async def get_server(self,columns=[],criters=["ID>1"],relation="AND",ID=None,channel=None,Type=dict):
+    async def get_server(self,columns=[],criters=["ID>1"],relation="AND",Type=dict):
         """return every options of a server"""
         await self.bot.wait_until_ready()
         if type(columns)!=list or type(criters)!=list:
@@ -678,7 +678,7 @@ class ServerCog(commands.Cog):
     async def send_see(self,guild,channel,option,msg,ctx):
         """Envoie l'embed dans un salon"""
         if option==None:
-            liste = await self.get_server([],criters=["ID="+str(guild.id)],ID=guild.id,channel=channel)
+            liste = await self.get_server([],criters=["ID="+str(guild.id)])
             if len(liste)==0:
                 return await channel.send(str(await self.translate(channel.guild,"server","not-found")).format(guild.name))
             liste=liste[0]
@@ -788,6 +788,7 @@ class ServerCog(commands.Cog):
                 await ch.edit(name=text,reason=await self.translate(guild.id,"logs","d-memberchan"))
             except Exception as e:
                 self.bot.log.debug("[UpdateMemberChannel] "+str(e))
+
     
     
 def setup(bot):
