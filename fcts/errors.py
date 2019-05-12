@@ -101,7 +101,7 @@ class ErrorsCog(commands.Cog):
     async def on_error(self,error,ctx):
         try:
             tr = traceback.format_exception(type(error), error, error.__traceback__)
-            msg = "```python\n{}\n```".format(" ".join(tr[:1]+tr[2:]))
+            msg = "```python\n{}\n```".format(" ".join(tr))
             if ctx == None:
                 await self.senf_err_msg(f"Internal Error\n{msg}")
             elif ctx.guild == None:
