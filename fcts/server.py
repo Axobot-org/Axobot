@@ -52,6 +52,7 @@ class ServerCog(commands.Cog):
                "enable_xp":1,
                "levelup_msg":'',
                "noxp_channels":'',
+               "xp_type":0,
                "anti_caps_lock":1,
                "enable_fun":1,
                "prefix":'!',

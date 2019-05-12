@@ -92,7 +92,7 @@ class XPCog(commands.Cog):
         text = await self.bot.cogs['ServerCog'].find_staff(msg.guild.id,'levelup_msg')
         if text==None or len(text)==0:
             text = await self.translate(msg.guild.id,'xp','default_levelup')
-        await msg.channel.send(text.format_map(self.bot.SafeDict(user=msg.author,level=lvl[0])))
+        await msg.channel.send(text.format_map(self.bot.SafeDict(user=msg.author.mention,level=lvl[0])))
         
     async def check_cmd(self,msg):
         """Vérifie si un message est une commande"""
