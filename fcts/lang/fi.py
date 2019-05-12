@@ -103,7 +103,9 @@ fun={"count-0":"Laskeminen on kesken...",
         "embed-error":"Error havaittu: `{}`",
         "invalid-city":"Pätemätön kaupunki :confused:",
         "no-roll":"Ei vaihtoehtoa löydetty",
-        'no-say':"Unable to send any message in this channel"
+        'no-say':"Unable to send any message in this channel",
+        'no-voicechan':'You must be in a vocal channel in order to use this command.',
+        'cant-stream':"Warning: You don't have enough permissions to make a video chat (Permission \"Stream\")."
         }
 
 infos={"text-0":"""Moi! Olen {0} !
@@ -395,6 +397,7 @@ to modify a configuration, or `!config del <option>` to reset the option (`!conf
         "change-7": "This language is not available. Here is the list of currently supported languages: {}",
         "change-8": "This level does not exist. Here is the list of the levels currently available: {}",
         "change-9": "The emoji `{}` was not found",
+        "change-10":"This xp system doesn't exist. Here is the list of available systems: {}",
         "change-role": "The '{}' option has been modified with the following roles: {}",
         "change-bool": "The '{}' option has been modified with the value *{}*",
         "change-textchan": "The '{}' option has been modified with the channels {}",
@@ -403,6 +406,7 @@ to modify a configuration, or `!config del <option>` to reset the option (`!conf
         "change-lang": "The bot language is now in `{}`",
         "change-raid":"The anti-raid security level is now set to **{}** ({})",
         "change-emojis":"The emotions for the option '{}' are now {}",
+        "change-xp":"The xp system used is now {}",
         "new_server": "Your server has just been registered for the first time in our database. Congratulations :tada:",
         "see-0":"Enter `!config help` for more details",
         "see-1":"{} server configuration",
@@ -440,7 +444,8 @@ server_desc={"prefix":"Current bot prefix: {}",
         "vote_emojis":"Emojis used for poll reactions: {}",
         "help_in_dm":"Send help message in Private Message? {}",
         "muted_role":"Used role to mute members : {}",
-        "noxp_channels":"Channels where you can't get xp: {}"
+        "noxp_channels":"Channels where you can't get xp: {}",
+        "xp_type":"XP system used: {}"
         }
 
 stats_infos={"not-found":"Unable to find {N}",
@@ -451,6 +456,7 @@ stats_infos={"not-found":"Unable to find {N}",
         "member-4":"Status",
         "member-5":"Activity",
         "member-6":"Administrator",
+        "member-7":"Infractions",
         "role-0":"ID",
         "role-1":"Color",
         "role-2":"Mentionable",
@@ -518,5 +524,8 @@ xp = {'card-level':'LEVEL',
         'rr-added':"The role `{}` has been correctly added for level {} !",
         'already-1-rr':"There is already a role configured for this level!",
         'no-rr':"No role has been configured for this level",
-        'rr-removed':"No role will be given for level {} anymore"
+        'rr-removed':"No role will be given for level {} anymore",
+        'too-many-rr':"You already have {} roles rewards, you can't add more!",
+        'rr-reload':"{} updated roles / {} scanned members",
+        'no-mee6':"Oops, you have configured the xp system to use the MEE6 system, but this bot is not in the server! Change the system type (`{}config change xp_type` followed by the system name), or invite MEE6 here."
         }
