@@ -159,7 +159,7 @@ class XPCog(commands.Cog):
                     continue
                 await member.remove_roles(r,reason="Role reward (lvl {})".format(role['level']))
                 c += 1
-            except:
+            except Exception as e:
                 if self.bot.beta:
                     await self.bot.cogs['ErrorsCog'].on_error(e,None)
                 pass
@@ -392,6 +392,8 @@ class XPCog(commands.Cog):
                 user = ctx.author
             need_mee6 = ctx.guild!=None and await self.bot.cogs['ServerCog'].find_staff(ctx.guild.id,'xp_type')==1
             if need_mee6:
+                if ctx.guild.get_member(159985870458322944)==None:
+                    return await ctx.send(str(await self.translate(ctx.guild.id,'xp','no-mee6')).format(ctx.prefix))
                 user = ctx.guild.get_member(user.id)
                 if user==None:
                     return await ctx.send(await self.translate(ctx.channel,'xp','not-member'))
@@ -408,10 +410,10 @@ class XPCog(commands.Cog):
                 ranks_nb = await self.bdd_get_nber()
                 rank = (await self.bdd_get_rank(user.id))['rank']
             else:
-                levels_info = [xp['level']+1,xp['detailed_xp'][1]-xp['detailed_xp'][0]+xp['detailed_xp'][2],xp['detailed_xp'][2]-xp['detailed_xp'][0]]
+                levels_info = [xp['level'],xp['detailed_xp'][1]-xp['detailed_xp'][0]+xp['detailed_xp'][2],xp['detailed_xp'][2]-xp['detailed_xp'][0]]
                 xp = xp['xp']
                 ranks_nb = ctx.guild.member_count
-                rank = await self.mee6_get_rank(user)
+                rank = await self.mee6_get_rank(user)+1
             if ctx.guild==None or ctx.channel.permissions_for(ctx.guild.me).attach_files:
                 await self.send_card(ctx,user,xp,rank,ranks_nb,levels_info)
             elif ctx.channel.permissions_for(ctx.guild.me).embed_links:
@@ -486,6 +488,8 @@ class XPCog(commands.Cog):
                 ranks = await self.bdd_get_top(10000,guild=ctx.guild)
                 max_page = ceil(len(ranks)/20)
         else:
+            if ctx.guild.get_member(159985870458322944)==None:
+                return await ctx.send(str(await self.translate(ctx.guild.id,'xp','no-mee6')).format(ctx.prefix))
             ranks = await self.mee6_get_top(ctx.guild,20*page)
             max_page = ceil(len(ranks)/20)
         if page<1:
@@ -507,12 +511,18 @@ class XPCog(commands.Cog):
         # author
         if need_mee6:
             lvl = await self.mee6_get_player(ctx.author)
-            rank = {'rank':await self.mee6_get_rank(ctx.author)+1,'xp':lvl['xp']}
-            lvl = lvl['level']
+            if lvl==None:
+                your_rank = {'name':"__"+await self.translate(ctx.channel,"xp","top-your")+"__",'value':await self.translate(ctx.guild.id,"xp","1-no-xp")}
+            else:
+                your_rank = {'name':"__"+await self.translate(ctx.channel,"xp","top-your")+"__", 'value':"**#{} |** `lvl {}` **|** `xp {}`".format(await self.mee6_get_rank(ctx.author)+1,lvl['level'],lvl['xp'])}
         else:
             rank = await self.bdd_get_rank(ctx.author.id,ctx.guild if Type=='guild' else None)
-            lvl = (await self.calc_level(rank['xp']))[0]
-        your_rank = {'name':"__"+await self.translate(ctx.channel,"xp","top-your")+"__", 'value':"**#{} |** `lvl {}` **|** `xp {}`".format(rank['rank'],lvl,rank['xp'])}
+            if len(rank)==0:
+                your_rank = {'name':"__"+await self.translate(ctx.channel,"xp","top-your")+"__",'value':await self.translate(ctx.guild,"xp","1-no-xp")}
+            else:
+                lvl = await self.calc_level(rank['xp'])
+                lvl = lvl[0]
+                your_rank = {'name':"__"+await self.translate(ctx.channel,"xp","top-your")+"__", 'value':"**#{} |** `lvl {}` **|** `xp {}`".format(rank['rank'],lvl,rank['xp'])}
         # title
         if Type=='guild':
             t = await self.translate(ctx.channel,'xp','top-title-2')
@@ -636,20 +646,41 @@ class XPCog(commands.Cog):
             c = 0
             rr_list = await self.rr_list_role(ctx.guild.id)
             if await self.bot.cogs['ServerCog'].find_staff(ctx.guild.id,'xp_type')==1:
-                xps = [{'user':x['id'],'xp':x['xp'],'level':x['level']} for x in await self.mee6_get_top(ctx.guild,nb=1000000)]
+                if ctx.guild.get_member(159985870458322944)==None:
+                    return await ctx.send(str(await self.translate(ctx.guild.id,'xp','no-mee6')).format(ctx.prefix))
+                xps = [{'user':int(x['id']),'xp':x['xp'],'level':x['level']} for x in await self.mee6_get_top(ctx.guild,nb=1000000)]
             else:
                 xps = [{'user':x['userID'],'xp':x['xp'],'level':(await self.calc_level(x['xp']))[0]} for x in await self.bdd_get_top(ctx.guild.member_count,ctx.guild)]
             for member in xps:
-                c += await self.give_rr(ctx.guild.get_member(member['user']),member['level'],rr_list,remove=True)
+                m = ctx.guild.get_member(member['user'])
+                if m!=None:
+                    c += await self.give_rr(m,member['level'],rr_list,remove=True)
             await ctx.send(str(await self.translate(ctx.guild.id,'xp','rr-reload')).format(c,ctx.guild.member_count))
         except Exception as e:
             await self.bot.cogs['ErrorsCog'].on_cmd_error(ctx,e)
     
 
+    async def mee6_reload_rr(self,guild):
+        """Reloads every role rewards from a guild using MEE6 xp"""
+        if await self.bot.cogs['ServerCog'].find_staff(guild.id,'xp_type')!=1 or guild.get_member(159985870458322944)==None:
+            return -1
+        c = [0,0]
+        xps = [{'user':x['id'],'xp':x['xp'],'level':x['level']} for x in await self.mee6_get_top(guild,nb=1000000)]
+        rr_list = await self.rr_list_role(guild.id)
+        for member in xps:
+            m = guild.get_member(int(member['user']))
+            if m==None:
+                continue
+            temp = await self.give_rr(m,member['level'],rr_list,remove=True)
+            c[1] += temp
+            if temp>0:
+                c[0] += 1
+        return c
+
     async def mee6_get_top(self,guild:discord.Guild,nb:int=1000):
         """Get the leaderboard of a guild using MEE6 levels plugin"""
         if guild.get_member(159985870458322944)==None:
-            return Exception
+            raise Exception
         nb = min(guild.member_count,nb)
         async with aiohttp.ClientSession() as session:
             i = 0
@@ -663,7 +694,7 @@ class XPCog(commands.Cog):
     async def mee6_get_player(self,user:discord.Member):
         """Get the xp of a player using MEE6 levels plugin"""
         if user.guild.get_member(159985870458322944)==None:
-            return Exception
+            raise Exception
         async with aiohttp.ClientSession() as session:
             i = 0
             js = {'players':[]}
@@ -679,7 +710,7 @@ class XPCog(commands.Cog):
     async def mee6_get_rank(self,user:discord.Member):
         """Get the rank of a player in a guild"""
         if user.guild.get_member(159985870458322944)==None:
-            return Exception
+            raise Exception
         async with aiohttp.ClientSession() as session:
             i = 0
             pos = 0

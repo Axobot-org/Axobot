@@ -547,5 +547,6 @@ xp = {'card-level':'NIVEAU',
         'no-rr':"Aucun rôle n'a été configuré pour ce niveau",
         'rr-removed':"Plus aucun rôle ne sera donné pour le niveau {}",
         'too-many-rr':"Vous avez déjà {} rôles, vous ne pouvez pas en ajouter plus !",
-        'rr-reload':"{} rôles mis à jour / {} membres scannés"
+        'rr-reload':"{} rôles mis à jour / {} membres scannés",
+        'no-mee6':"Oups, vous avez configuré le type de système d'xp pour utiliser celui de MEE6, mais ce bot n'est pas dans le serveur ! Changez le type de système (`{}config change xp_type` suivit du nom du système), ou invitez MEE6 ici."
     }

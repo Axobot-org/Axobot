@@ -419,6 +419,7 @@ to modify configuraishun, or `!config del <option>` 2 reset teh option (`!config
         "change-8": "Ups, dis lvl doz nope exist. Heer iz da list ov currrently availaible levelz: {}",
         "change-9": "Ups, da emoji `{}` wasnt findz",
         "change-role": "The '{}' option haz been edted with teh following rolz: {}",
+        "change-10":"Tihs xp system don't exist. Here is teh list ov availble systems: {}",
         "change-bool": "The '{}' opzion haz been modified wif the value *{}*",
         "change-textchan": "The '{}' opshun has been modifid wif teh channelz {}",
         "change-text": "Teh opshun '{}' haz been replacd by the followin txt: \n```\n{}\n```",
@@ -426,6 +427,7 @@ to modify configuraishun, or `!config del <option>` 2 reset teh option (`!config
         "change-lang": "Teh bot lang is naw in `{}`",
         "change-raid":"Teh anti-rayd security lvl iz naw set 2 **{}** ({})",
         "change-emojis":"Teh emojiz 4 the opshun '{}' are naw {}",
+        "change-xp":"Da xp system uzed is naw {}",
         "new_server": "Ur server haz just been written for da furst time in r database. Congratulashuns :tada:",
         "see-0":"Enter `!config help` 4 more details",
         "see-1":"{} server configurashiun",
@@ -463,7 +465,8 @@ server_desc={"prefix":"Currnt baot prfx: {}",
         "vote_emojis":"Emojiz use 4 powll reacts: {}",
         "help_in_dm":"Sent help mess:a:ge on Prvte Msage? {}",
         "muted_role":"Usd role 2 mute people : {}",
-        "noxp_channels":"Chats where xp is for:b:idden: {}"
+        "noxp_channels":"Chats where xp is for:b:idden: {}",
+        "xp_type":"XP system used: {}"
         }
 
 stats_infos={"not-found":"Unable 2 found {N}",
@@ -544,5 +547,6 @@ xp = {'card-level':'LVL',
         'no-rr':"None role is configured for this level",
         'rr-removed':"None role will be givn anymore for level #{}",
         'too-many-rr':"U already has {} roles rewards, you can't add more!",
-        'rr-reload':"{} updated roles / {} members"
+        'rr-reload':"{} updated roles / {} members",
+        'no-mee6':"Oops, U configured the xp system 2 use the MEE6 system (u know, this nice blue bot?), but dis bot is not in ur server! Change teh system type (`{}config change xp_type` followd by the system naem), orr invite MEE6 here."
         }

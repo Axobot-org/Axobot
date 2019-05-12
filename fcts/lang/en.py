@@ -419,6 +419,7 @@ to modify a configuration, or `!config del <option>` to reset the option (`!conf
         "change-8": "This level does not exist. Here is the list of the levels currently available: {}",
         "change-9": "The emoji `{}` was not found",
         "change-role": "The '{}' option has been modified with the following roles: {}",
+        "change-10":"This xp system doesn't exist. Here is the list of available systems: {}",
         "change-bool": "The '{}' option has been modified with the value *{}*",
         "change-textchan": "The '{}' option has been modified with the channels {}",
         "change-text": "The option '{}' has been replaced by the following text: \n```\n{}\n```",
@@ -427,6 +428,7 @@ to modify a configuration, or `!config del <option>` to reset the option (`!conf
         "change-raid":"The anti-raid security level is now set to **{}** ({})",
         "change-emojis":"The emotions for the option '{}' are now {}",
         "new_server": "Your server has just been registered for the first time in our database. Congratulations :tada:",
+        "change-xp":"The xp system used is now {}",
         "see-0":"Enter `!config help` for more details",
         "see-1":"{} server configuration",
         "change-prefix-1":"This prefix is too long to be used!",
@@ -453,7 +455,7 @@ server_desc={"prefix":"Current bot prefix: {}",
         "bot_news": "List of channels where to send bot news: {}",
         "modlogs_channel":"Channel where to send moderation logs: {}",
         "save_roles": "Should roles be saved when a member leaves, in case he returns? {}",
-        "poll_channels": "List of channels where :thumbsup: and :thumbsdown: reactions will be automatically added to each message : {}",
+        "poll_channels": "List of channels where :thumbsup: and :thumbsdown: reactions will be automatically added to each message: {}",
         "enable_xp": "Should the xp system be enabled? {}",
         "levelup_msg":"Message sent when a member earns an xp level: {}",
         "anti_caps_lock": "Should the bot send a message when a member sends too many capital letters? {}",
@@ -462,8 +464,9 @@ server_desc={"prefix":"Current bot prefix: {}",
         "anti_raid":"Level of anti-raid protection: {} \n*([Documentation](https://zbot.rtfd.io/en/latest/moderator.html#anti-raid))*",
         "vote_emojis":"Emojis used for poll reactions: {}",
         "help_in_dm":"Send help message in Private Message? {}",
-        "muted_role":"Used role to mute members : {}",
-        "noxp_channels":"Channels where you can't get xp: {}"
+        "muted_role":"Used role to mute members: {}",
+        "noxp_channels":"Channels where you can't get xp: {}",
+        "xp_type":"XP system used: {}"
         }
 
 stats_infos={"not-found":"Unable to find {N}",
@@ -544,5 +547,6 @@ xp = {'card-level':'LEVEL',
         'no-rr':"No role has been configured for this level",
         'rr-removed':"No role will be given for level {} anymore",
         'too-many-rr':"You already have {} roles rewards, you can't add more!",
-        'rr-reload':"{} updated roles / {} scanned members"
+        'rr-reload':"{} updated roles / {} scanned members",
+        'no-mee6':"Oops, you have configured the xp system to use the MEE6 system, but this bot is not in the server! Change the system type (`{}config change xp_type` followed by the system name), or invite MEE6 here."
         }
