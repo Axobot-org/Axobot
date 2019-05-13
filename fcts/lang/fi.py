@@ -159,15 +159,15 @@ kill={"list":["Jaahas, olet kuolemassa!",
           "{0} tappoi {1}",
           "{0} ampui käyttäjän {1}",
           "Heippa {1} ! :ghost:",
-          "{1} saw a flying anvil fall... on his head :head_bandage:",
+          "{1} näki alsin putouksen... hänen päähän päin :head_bandage:",
           "{1} commit suicide after {0} has cut his connection",
-          "Caution {1} ! Fire burns :fire:",
-          "{1} fought zombies without shovel",
-          "{1} tried to hug a creeper",
-          "{1}, lava baths are hot, but lava burns...",
+          "Huomio {1} ! Tuli palaa :fire:",
+          "{1} tappeli zombeja ilman lapiota",
+          "{1} yritti halata creepperiä",
+          "{1}, laava kylvyt on kuumia mutta, laava palaa...",
           "{1} tried a rocket jump",
-          "You shouldn't listen to the pretty melody of the Lullaby, {1} :musical_note:",
-          "{2}.exe *has stopped working*"
+          "Sinun ei kannattaisi kuunnella söpöä melodiaa keholaulusta, {1} :musical_note:",
+          "{2}.exe *On lakannut toimimasta*"
           ]}
 
 logs={"slowmode-enabled":"Slowmode enabled in {channel} ({seconds}s)",
