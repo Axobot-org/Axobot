@@ -179,8 +179,8 @@ You can specify a verification limit by adding a number in argument"""
         """Blame someone
         Use 'blame list' command to see every available name *for you*"""
         l1 = ['discord','mojang','zbot','google'] # tout le monde
-        l2 = ['zrunner','tronics','patate','neil','reddemoon','aragorn1202','platon'] # frm
-        l3 = ['awhikax','aragorn','adri'] # zbot
+        l2 = ['tronics','patate','neil','reddemoon','aragorn1202','platon'] # frm
+        l3 = ['awhikax','aragorn','adri','zrunner'] # zbot
         name = name.lower()
         if name in l1:
             await ctx.send(file=await self.utilities.find_img('blame-{}.png'.format(name)))
@@ -452,6 +452,8 @@ You can specify a verification limit by adding a number in argument"""
     async def hour(self,ctx,*,city:str):
         """Get the hour of a city"""
         g = geocoder.arcgis(city)
+        if not g.ok:
+            return await ctx.send(await self.translate(ctx.channel,"fun","invalid-city"))
         timeZoneStr = self.tz.tzNameAt(g.json['lat'],g.json['lng'],forceTZ=True)
         timeZoneObj = timezone(timeZoneStr)
         d = datetime.datetime.now(timeZoneObj)
