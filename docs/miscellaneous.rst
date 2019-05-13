@@ -58,9 +58,9 @@ Each argument is presented in the form :code:`name="value"`. If you want a line 
 .. warning:: Hey, this may sound weird, but Zbot needs "`Embed Links <perms.html#embed-links>`_" permission to send embeds...
 
 
--------
-Morpion
--------
+----
+Crab
+----
 
 **Syntax:** :code:`crab` or :code:`morpion`
 
