@@ -1,4 +1,4 @@
-import discord, datetime, asyncio, logging, time
+import discord, datetime, asyncio, logging, time, aiohttp
 from discord.ext import commands, tasks
 
 
@@ -13,6 +13,7 @@ class Events(commands.Cog):
         except:
             pass
         self.file = "events"
+        self.mee6_last_check = datetime.datetime.utcfromtimestamp(0)
         self.embed_colors = {"welcome":5301186,
         "mute":4868682,
         "kick":16730625,
@@ -30,10 +31,10 @@ class Events(commands.Cog):
             'role':60,
             'guild':75}
 
-    
+
     def cog_unload(self):
         self.loop.cancel()
-    
+
     @commands.Cog.listener()
     async def on_ready(self):
         self.translate = self.bot.cogs["LangCog"].tr
@@ -82,7 +83,7 @@ class Events(commands.Cog):
                         await msg.channel.send(str(await self.bot.cogs["LangCog"].tr(msg.guild,"modo","caps-lock")).format(msg.author.mention),delete_after=4.0)
                     except:
                         pass
-        
+
 
     async def send_mp(self,msg):
         await self.check_mp_adv(msg)
@@ -254,37 +255,46 @@ class Events(commands.Cog):
     @tasks.loop(seconds=0.5)
     async def loop(self):
         try:
-            if int(datetime.datetime.now().second)%20 == 0:
+            d = datetime.datetime.now()
+            if int(d.second)%20 == 0:
                 await self.check_tasks()
-            if int(datetime.datetime.now().minute)%20 == 0:
+            if int(d.minute)%20 == 0:
                 await self.bot.cogs['XPCog'].clear_cards()
                 await self.rss_loop()
-            if int(datetime.datetime.now().hour)%4 == 0:
+            if int(d.hour)%4 == 0 and d.hour != self.mee6_last_check.hour:
                 await self.mee6_xp_loop()
         except Exception as e:
             await self.bot.cogs['ErrorsCog'].on_error(e,None)
-    
+
     @loop.before_loop
     async def before_loop(self):
         await self.bot.wait_until_ready()
         await self.rss_loop()
         await self.mee6_xp_loop()
         self.bot.log.info("[tasks_loop] Lancement de la boucle")
-    
+
 
     async def rss_loop(self):
         if self.bot.cogs['RssCog'].last_update==None or (datetime.datetime.now() - self.bot.cogs['RssCog'].last_update).total_seconds()  > 5*60:
             self.bot.cogs['RssCog'].last_update = datetime.datetime.now()
             asyncio.run_coroutine_threadsafe(self.bot.cogs['RssCog'].main_loop(),asyncio.get_running_loop())
-    
+
     async def mee6_xp_loop(self):
         """Check roles rewards for every server which use MEE6 xp system"""
+        self.mee6_last_check = datetime.datetime.now()
         l = await self.bot.cogs['ServerCog'].get_server(columns=['ID','xp_type'],criters=['xp_type=1'])
-        print(len(l))
+        self.bot.log.info(f"[mee6-rewards] Lancement du check pour {len(l)} serveurs")
         for guild in l:
             g = self.bot.get_guild(guild['ID'])
             if g!=None:
-                await self.bot.cogs['XPCog'].mee6_reload_rr()
+                try:
+                    await self.bot.cogs['XPCog'].mee6_reload_rr(g)
+                except aiohttp.client_exceptions.ContentTypeError:
+                    await self.bot.cogs['ErrorsCog'].on_error(e,None)
+                    return
+                except Exception as e:
+                    await self.bot.cogs['ErrorsCog'].on_error(e,None)
+        
 
 def setup(bot):
     bot.add_cog(Events(bot))

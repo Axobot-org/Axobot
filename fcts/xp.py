@@ -128,6 +128,8 @@ class XPCog(commands.Cog):
 
     async def calc_level(self,xp):
         """Calcule le niveau correspondant à un nombre d'xp"""
+        if xp==0:
+            return [0,ceil(20*20**(353/647)*1**(1000/647)),0]
         lvl = ceil(0.05*xp**0.647)
         next_step = xp
         while ceil(0.05*next_step**0.647)==lvl:
@@ -687,7 +689,11 @@ class XPCog(commands.Cog):
             result = list()
             while i<=ceil(nb/100):
                 async with session.get(f'https://mee6.xyz/api/plugins/levels/leaderboard/{guild.id}?page={i}') as resp:
-                    result += (await resp.json())['players']
+                    try:
+                        result += (await resp.json())['players']
+                    except Exception as e:
+                        await self.bot.cogs['ErrorsCog'].senf_err_msg(f"Error on `mee6_get_top`: url https://mee6.xyz/api/plugins/levels/leaderboard/{guild.id}?page={i}")
+                        raise e
                 i += 1
         return result[:nb]
 
