@@ -25,6 +25,7 @@ class WelcomerCog(commands.Cog):
             await self.bot.cogs["ServerCog"].update_memberChannel(member.guild)
             await self.send_msg(member,"welcome")
             self.bot.loop.create_task(self.give_roles(member))
+            await self.give_roles_back(member)
         if member.guild.id==356067272730607628:
             await self.check_owner_server(member)
             await self.check_support(member)
@@ -94,6 +95,13 @@ class WelcomerCog(commands.Cog):
                 await member.add_roles(role)
             else:
                 self.bot.log.warn('[check_contributor] Contributor role not found')
+
+    async def give_roles_back(self,member):
+        """Give roles rewards/muted role to new users"""
+        xp = await self.bot.cogs['XPCog'].bdd_get_xp(member.id)
+        if len(xp)==1:
+            await self.bot.cogs['XPCog'].give_rr(member.id,(await self.bot.cogs['XPCog'].calc_level(xp['xp']))[0],await self.bot.cogs['XPCog'].rr_list_role(member.guild.id))
+
 
     async def kick(self,member,reason):
         try:

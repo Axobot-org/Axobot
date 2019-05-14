@@ -66,6 +66,9 @@ List of every option
 * save_roles: Boolean indicating if the bot should restore the roles of a member leaving then rejoining the server. All roles below the ZBot role will be redistributed. :code:`False` by default.
 * poll_channels: List of channels in which the bot will add the reactions 👍 and 👎 to each message
 * enable_xp: Boolean indicating whether the xp system is activated. Default is :code:`True`.
+* levelup_msg: Message to send when someone reaches a new XP level. You can use :code:`{level}` variable to include the reached level, and :code:`{user}` to mention the user. Default is :code:`Hey, {user} has just reached **level {level}**! Keep this way!`
+* noxp_channels: List of channels where your members can't get xp. None by default.
+* xp_type: Type of XP system to use: :code:`global` if you want to use the accross-server system, common with every other servers which use it, or :code:`mee6` if you want to use the `MEE6 <https://mee6.xyz>`_ levels plugin. Default to :code:`global`.
 * anti_caps_lock: Boolean indicating whether the bot should send a warning message when a message with too much capitalization is sent. Default is True.
 * enable_fun: Boolean indicating if the fun part (documentation in preparation) is activated. If so, all commands in this section will be available. Default is :code:`True`.
 * membercounter: A voice salon whose name displays the number of members on the server

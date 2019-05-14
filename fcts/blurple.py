@@ -153,7 +153,6 @@ class BlurpleCog(commands.Cog):
             end = time.time()
             image = discord.File(fp=image, filename='image.png')
 
-            print('correct',noofpixels,'total:',nooftotalpixels)
             blurplenesspercentage = round(((nooftotalpixels/noofpixels)*100), 2)
             percentblurple = round(((noofblurplepixels/noofpixels)*100), 2)
             percentdblurple = round(((noofdarkblurplepixels/noofpixels)*100), 2)
