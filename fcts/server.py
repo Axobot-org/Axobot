@@ -15,6 +15,7 @@ prefix_options = ['prefix']
 emoji_option = ['vote_emojis']
 numb_options = []
 raid_options = ["anti_raid"]
+xp_type_options = ['xp_type']
 
 class ServerCog(commands.Cog):
     """"Cog in charge of all the bot configuration management for your server. As soon as an option is searched, modified or deleted, this cog will handle the operations."""
@@ -51,6 +52,7 @@ class ServerCog(commands.Cog):
                "enable_xp":1,
                "levelup_msg":'',
                "noxp_channels":'',
+               "xp_type":0,
                "anti_caps_lock":1,
                "enable_fun":1,
                "prefix":'!',
@@ -137,13 +139,13 @@ class ServerCog(commands.Cog):
             ID = ID.id
         elif type(ID)==None or not self.bot.database_online:
             return None
-        l = await self.get_server([name],criters=["ID="+str(ID)],ID=ID,channel=channel,Type=list)
+        l = await self.get_server([name],criters=["ID="+str(ID)],Type=list)
         if l == []:
             return None
         else:
             return l[0][0]
         
-    async def get_server(self,columns=[],criters=["ID>1"],relation="AND",ID=None,channel=None,Type=dict):
+    async def get_server(self,columns=[],criters=["ID>1"],relation="AND",Type=dict):
         """return every options of a server"""
         await self.bot.wait_until_ready()
         if type(columns)!=list or type(criters)!=list:
@@ -278,6 +280,8 @@ class ServerCog(commands.Cog):
                 await self.conf_raid(ctx,option,value)
             elif option in emoji_option:
                 await self.conf_emoji(ctx,option,value)
+            elif option in xp_type_options:
+                await self.conf_xp_type(ctx,option,value)
             else:
                 await ctx.send(await self.translate(ctx.guild.id,"server","change-0"))
                 return
@@ -633,6 +637,37 @@ class ServerCog(commands.Cog):
         else:
             return self.raids_levels[value]
     
+    async def conf_xp_type(self,ctx,option,value):
+        if value == "scret-desc":
+            if type(ctx) == commands.Context:
+                guild = ctx.guild.id
+            elif type(ctx) == str:
+                if ctx.isnumeric():
+                    guild = int(ctx)
+            elif type(ctx) == int:
+                guild = ctx
+            else:
+                return self.bot.cogs['XPCog'].types[0]
+            v = await self.find_staff(guild,option,channel=None)
+            return await self.form_xp_type(v)
+        else:
+            available_types = self.bot.cogs["XPCog"].types
+            if value in available_types:
+                v = available_types.index(value)
+                await self.modify_server(ctx.guild.id,values=[(option,v)],channel=ctx.channel)
+                msg = await self.translate(ctx.guild.id,"server","change-xp")
+                await ctx.send(msg.format(value))
+                await self.send_embed(ctx.guild,option,value)
+            else:
+                msg = await self.translate(ctx.guild.id,"server","change-10")
+                await ctx.send(msg.format(", ".join(available_types)))
+
+    async def form_xp_type(self,value):
+        if value == None:
+            return self.bot.cogs['XPCog'].types[0]
+        else:
+            return self.bot.cogs["XPCog"].types[value]
+    
     @sconfig_main.command(name="see")
     @commands.cooldown(1,10,commands.BucketType.guild)
     async def sconfig_see(self,ctx,option=None):
@@ -644,7 +679,7 @@ class ServerCog(commands.Cog):
     async def send_see(self,guild,channel,option,msg,ctx):
         """Envoie l'embed dans un salon"""
         if option==None:
-            liste = await self.get_server([],criters=["ID="+str(guild.id)],ID=guild.id,channel=channel)
+            liste = await self.get_server([],criters=["ID="+str(guild.id)])
             if len(liste)==0:
                 return await channel.send(str(await self.translate(channel.guild,"server","not-found")).format(guild.name))
             liste=liste[0]
@@ -678,6 +713,8 @@ class ServerCog(commands.Cog):
                     r = await self.form_raid(v)
                 elif i in emoji_option:
                     r = ", ".join(await self.form_emoji(v))
+                elif i in xp_type_options:
+                    r = ", ".join(await self.form_xp_type(v))
                 else:
                     continue
                 if len(r) == 0:
@@ -710,6 +747,8 @@ class ServerCog(commands.Cog):
                 r = await self.conf_raid(ctx,option,'scret-desc')
             elif option in emoji_option:
                 r = await self.conf_emoji(ctx,option,"scret-desc")
+            elif option in xp_type_options:
+                r = await self.conf_xp_type(ctx,option,"scret-desc")
             else:
                 r = None
             if r!=None:
@@ -750,6 +789,7 @@ class ServerCog(commands.Cog):
                 await ch.edit(name=text,reason=await self.translate(guild.id,"logs","d-memberchan"))
             except Exception as e:
                 self.bot.log.debug("[UpdateMemberChannel] "+str(e))
+
     
     
 def setup(bot):

@@ -58,6 +58,8 @@ class ReloadsCog(commands.Cog):
             else:
                 await self.bot.cogs["UtilitiesCog"].print2("Module {} rechargé".format(cog))
                 reloaded_cogs.append(cog)
+            if cog == 'utilities':
+                await self.bot.cogs['UtilitiesCog'].on_ready()
         if len(reloaded_cogs)>0:
             await ctx.send("These cogs has successfully reloaded: {}".format(", ".join(reloaded_cogs)))
             ctx.bot.cogs['InfosCog'].codelines = await ctx.bot.cogs['InfosCog'].count_lines_code()

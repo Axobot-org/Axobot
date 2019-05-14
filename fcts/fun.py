@@ -118,7 +118,7 @@ class FunCog(commands.Cog):
         """COOKIE !!!"""
                             #Z_runner           neil3000            Awhikax           Adri526         Theventreur         Catastrophix        Platon_Neutron
         if ctx.author.id in [279568324260528128,278611007952257034,281404141841022976,409470110131027979,229194747862843392,438372385293336577,286827468445319168]:
-            await ctx.send("{} a offert une boîte de cookies à <@375598088850505728> ! {}".format(ctx.author.mention,self.bot.cogs['EmojiCog'].customEmojis['cookies_eat']))
+            await ctx.send(str(await self.translate(ctx.guild,"fun","cookie")).format(ctx.author.mention,self.bot.cogs['EmojiCog'].customEmojis['cookies_eat']))
         elif ctx.author.id == 375598088850505728:
             await ctx.send(file=await self.utilities.find_img("cookie_target.png"))
         else:
@@ -179,8 +179,8 @@ You can specify a verification limit by adding a number in argument"""
         """Blame someone
         Use 'blame list' command to see every available name *for you*"""
         l1 = ['discord','mojang','zbot','google'] # tout le monde
-        l2 = ['zrunner','tronics','patate','neil','reddemoon','aragorn1202','platon'] # frm
-        l3 = ['awhikax','aragorn','adri'] # zbot
+        l2 = ['tronics','patate','neil','reddemoon','aragorn1202','platon'] # frm
+        l3 = ['awhikax','aragorn','adri','zrunner'] # zbot
         name = name.lower()
         if name in l1:
             await ctx.send(file=await self.utilities.find_img('blame-{}.png'.format(name)))
@@ -257,10 +257,14 @@ You can specify a verification limit by adding a number in argument"""
     @commands.check(is_fun_enabled)
     async def big_text(self,ctx,*,text):
         """If you wish to write bigger"""
-        text1 = []
         contenu = await self.bot.cogs['UtilitiesCog'].clear_msg(text,ctx=ctx)
+        text = ""
         Em = self.bot.cogs['EmojiCog']
-        for l in "¬¬".join(contenu.split("\n")):
+        mentions = [x.group(1) for x in re.finditer(r'(<(?:@!?&?|#|a?:[a-zA-Z0-9]+:)\d+>)',ctx.message.content)]
+        content = "¬¬".join(contenu.split("\n"))
+        for x in mentions:
+            content = content.replace(x,'¤¤')
+        for l in content:
             l = l.lower()
             if l in string.ascii_letters:
                 item = discord.utils.get(ctx.bot.emojis,id=Em.alphabet[string.ascii_letters.index(l)])
@@ -271,13 +275,20 @@ You can specify a verification limit by adding a number in argument"""
                     item = discord.utils.get(ctx.bot.emojis,id=Em.chars[l])
                 except KeyError:
                     item = l
-            text1.append(str(item))
+            text += str(item)+'¬'
+        text = text.replace("¬¬","\n")
+        for m in mentions:
+            text = text.replace('¤¬¤',m,1)
+        text = text.split('¬')[:-1]
+        text1 = list()
+        for line in text:
+            text1.append(line)
             caract = len("".join(text1))
             if caract>1970:
-                await ctx.channel.send("".join(text1).replace("¬¬","\n"))
+                await ctx.channel.send("".join(text1))
                 text1 = []
         if text1 != []:
-            await ctx.channel.send("".join(text1).replace("¬¬","\n"))
+            await ctx.channel.send(''.join(text1))
         if ctx.bot.database_online and await self.bot.cogs["ServerCog"].staff_finder(ctx.author,'say'):
             await self.bot.cogs["UtilitiesCog"].suppr(ctx.message)
         self.bot.log.debug("{} used bigtext to say {}".format(ctx.author.id,text))
@@ -452,6 +463,8 @@ You can specify a verification limit by adding a number in argument"""
     async def hour(self,ctx,*,city:str):
         """Get the hour of a city"""
         g = geocoder.arcgis(city)
+        if not g.ok:
+            return await ctx.send(await self.translate(ctx.channel,"fun","invalid-city"))
         timeZoneStr = self.tz.tzNameAt(g.json['lat'],g.json['lng'],forceTZ=True)
         timeZoneObj = timezone(timeZoneStr)
         d = datetime.datetime.now(timeZoneObj)
@@ -501,6 +514,19 @@ You can specify a verification limit by adding a number in argument"""
             await ctx.send(embed=emb.discord_embed())
         except Exception as e:
             await ctx.send(str(await self.translate(ctx.channel,"fun","embed-error")).format(e))
+    
+    @commands.command(name='camlink')
+    @commands.guild_only()
+    async def camlink(self,ctx):
+        """Give an URL to share your screen in a vocal channel
+        You must be in a vocal channel to run this command"""
+        voicestate = ctx.author.voice
+        if voicestate==None:
+            return await ctx.send(await self.translate(ctx.guild.id,'fun','no-voicechan'))
+        txt = f"{voicestate.channel.mention} : https://api.discordapp.com/channels/{ctx.guild.id}/{voicestate.channel.id}"
+        if not voicestate.channel.permissions_for(ctx.author).stream:
+            txt += "\n"+await self.translate(ctx.guild.id,'fun','cant-stream')
+        await ctx.send(txt)
 
 
     async def add_vote(self,msg):
@@ -559,7 +585,7 @@ You can specify a verification limit by adding a number in argument"""
                 except Exception as e:
                     await self.bot.cogs['ErrorsCog'].on_error(e,ctx)
         await self.bot.cogs['UtilitiesCog'].suppr(ctx.message)
-        await self.bot.log.debug(await self.bot.cogs['TimeCog'].date(datetime.datetime.now(),digital=True)+" Vote de {} : {}".format(ctx.author,ctx.message.content))
+        self.bot.log.debug(await self.bot.cogs['TimeCog'].date(datetime.datetime.now(),digital=True)+" Vote de {} : {}".format(ctx.author,ctx.message.content))
 
 
     async def check_suggestion(self,message):

@@ -146,6 +146,8 @@ class InfosCog(commands.Cog):
     async def display_doc(self,ctx):
         """Get the documentation url"""
         text = str(self.bot.cogs['EmojiCog'].customEmojis['readthedocs']) + str(await self.translate(ctx.channel,"infos","docs")) + " https://zbot.rtfd.io"
+        if self.bot.beta:
+            text += '/en/indev'
         await ctx.send(text)
 
     @commands.command(name='info',aliases=['infos'])
@@ -169,12 +171,13 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
                 except:
                     await ctx.send(str(await self.translate(ctx.guild.id,"modo","cant-find-user")).format(name))
                     return
+            critical = ctx.author.guild_permissions.manage_guild or await self.bot.cogs['AdminCog'].check_if_god(ctx)
             #-----
             if item == None:
                 msg = await self.translate(ctx.guild.id,"stats_infos","not-found")
                 await ctx.send(msg.format(N=name))
             elif type(item) == discord.Member:
-                await self.member_infos(ctx,item,lang)
+                await self.member_infos(ctx,item,lang,critical)
             elif type(item) == discord.Role:
                 await self.role_infos(ctx,item,lang)
             elif type(item) == discord.User:
@@ -190,14 +193,14 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
             elif type(item) == discord.CategoryChannel:
                 await self.category_info(ctx,item,lang)
             elif type(item) == discord.Guild:
-                await self.guild_info(ctx,item,lang)
+                await self.guild_info(ctx,item,lang,critical)
             else:
                 await ctx.send(str(type(item))+" / "+str(item))
         except Exception as e:
             await self.bot.cogs["ErrorsCog"].on_error(e,ctx)
             await ctx.send("`Error`: "+e)
 
-    async def member_infos(self,ctx,item,lang):
+    async def member_infos(self,ctx,item,lang,critical_info=False):
         since = await self.translate(ctx.guild.id,"keywords","depuis")
         if item.activity==None:
             m_activity = await self.translate(ctx.guild.id,"activity","rien")
@@ -240,9 +243,11 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
         embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","member-5"), value = m_activity.capitalize(),inline=True)
         embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","member-6"), value = admin.capitalize(),inline=True)
         if len(list_role)>0:
-            embed.add_field(name="Roles [{}]".format(len(list_role)), value = ", ".join(list_role), inline=True)
+            embed.add_field(name="Roles [{}]".format(len(list_role)), value = ", ".join(list_role), inline=False)
         else:
-            embed.add_field(name="Roles [0]", value = await self.translate(ctx.guild.id,"activity","rien"), inline=True)
+            embed.add_field(name="Roles [0]", value = await self.translate(ctx.guild.id,"activity","rien"), inline=False)
+        if critical_info:
+            embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","member-7"), value = await self.bot.cogs['CasesCog'].get_nber(item.id,ctx.guild.id),inline=True)
         await ctx.send(embed=embed)
 
 
@@ -361,7 +366,7 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
         embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","guild-2"), value=str(ctx.guild.region).capitalize())
         await ctx.send(embed=embed)
 
-    async def guild_info(self,ctx,guild,lang):
+    async def guild_info(self,ctx,guild,lang,critical_info=False):
         since = await self.translate(ctx.guild.id,"keywords","depuis")
         bot = await self.bot.cogs["UtilitiesCog"].get_bots_number(guild.members)
         online = await self.bot.cogs["UtilitiesCog"].get_online_number(guild.members)
@@ -385,11 +390,12 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
         if guild.me.guild_permissions.manage_guild:
             embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","guild-12"), value=str(len(await guild.invites())))
         embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","guild-10"), value = str(int(guild.afk_timeout/60))+" minutes")
-        embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","guild-8"), value=a2f.capitalize())
-        embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","guild-9"), value=str(await self.translate(guild.id,"keywords",str(guild.verification_level))).capitalize())
-        a = str(guild.splash_url_as(format='png'))
-        if str(guild.splash_url_as(format='png')) != '':
-            embed.add_field(name="Splash url", value=str(guild.splash_url_as(format='png')))
+        if critical_info:
+            embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","guild-8"), value=a2f.capitalize())
+            embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","guild-9"), value=str(await self.translate(guild.id,"keywords",str(guild.verification_level))).capitalize())
+        splash_url = str(guild.splash_url_as(format='png'))
+        if splash_url != '':
+            embed.add_field(name="Splash url", value=splash_url)
         try:
             if ctx.guild==guild:
                 roles = [x.mention for x in guild.roles if len(x.members)>1][1:]
@@ -524,6 +530,17 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
             await ctx.send(await self.translate(ctx.channel,"find","chan-0"))
             return
         await ctx.send(str(await self.translate(ctx.channel,"find","chan-1")).format(c.name,c.id,c.guild.name,c.guild.id))
+    
+    @find_main.command(name='role')
+    async def find_role(self,ctx,ID:int):
+        every_roles = list()
+        for serv in ctx.bot.guilds:
+            every_roles += serv.roles
+        c = discord.utils.find(lambda role:role.id==ID,every_roles)
+        if c == None:
+            await ctx.send(await self.translate(ctx.channel,"find","role-0"))
+            return
+        await ctx.send(str(await self.translate(ctx.channel,"find","role-1")).format(c.name,c.id,c.guild.name,c.guild.id,len(c.members),c.colour))
     
     @find_main.command(name='rss')
     async def find_rss(self,ctx,ID:int):

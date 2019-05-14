@@ -391,7 +391,7 @@ class RssCog(commands.Cog):
             flow = await self.get_flow(list_of_IDs[int(msg.content)-1])
         return flow
 
-    @rss_main.command(name="roles")
+    @rss_main.command(name="roles",aliases=['mentions'])
     @commands.guild_only()
     @commands.check(can_use_rss)
     async def roles_flows(self,ctx,ID:int=None):
@@ -911,11 +911,25 @@ class RssCog(commands.Cog):
         cursor.execute(query)
         cnx.commit()
 
-    async def send_rss_msg(self,obj,channel):
+    async def send_rss_msg(self,obj,channel,roles):
         if channel != None:
             t = await obj.create_msg(await self.translate(channel.guild,"current_lang","current"))
+            mentions = list()
+            for item in roles:
+                if item=='':
+                    continue
+                role = discord.utils.get(channel.guild.roles,id=int(item))
+                if isinstance(role,discord.Role) and not role.mentionable:
+                    try:
+                        await role.edit(mentionable=True)
+                    except:
+                        pass
+                    else:
+                        mentions.append(role)
             try:
                 await channel.send(t)
+                for role in mentions:
+                    await role.edit(mentionable=False)
             except Exception as e:
                 self.bot.log.info("[send_rss_msg] Can not send message on channel {}: {}".format(channel.id,e))
 
@@ -938,7 +952,7 @@ class RssCog(commands.Cog):
                         return False
                     o.format = flow['structure']
                     await o.fill_mention(guild,flow['roles'].split(';'),self.translate)
-                    await self.send_rss_msg(o,chan)
+                    await self.send_rss_msg(o,chan,flow['roles'].split(';'),)
                 await self.update_flow(flow['ID'],[('date',o.date)])
                 return True
             else:
