@@ -257,10 +257,14 @@ You can specify a verification limit by adding a number in argument"""
     @commands.check(is_fun_enabled)
     async def big_text(self,ctx,*,text):
         """If you wish to write bigger"""
-        text1 = []
         contenu = await self.bot.cogs['UtilitiesCog'].clear_msg(text,ctx=ctx)
+        text = ""
         Em = self.bot.cogs['EmojiCog']
-        for l in "¬¬".join(contenu.split("\n")):
+        mentions = [x.group(1) for x in re.finditer(r'(<(?:@!?&?|#|a?:[a-zA-Z0-9]+:)\d+>)',ctx.message.content)]
+        content = "¬¬".join(contenu.split("\n"))
+        for x in mentions:
+            content = content.replace(x,'¤¤')
+        for l in content:
             l = l.lower()
             if l in string.ascii_letters:
                 item = discord.utils.get(ctx.bot.emojis,id=Em.alphabet[string.ascii_letters.index(l)])
@@ -271,13 +275,20 @@ You can specify a verification limit by adding a number in argument"""
                     item = discord.utils.get(ctx.bot.emojis,id=Em.chars[l])
                 except KeyError:
                     item = l
-            text1.append(str(item))
+            text += str(item)+'¬'
+        text = text.replace("¬¬","\n")
+        for m in mentions:
+            text = text.replace('¤¬¤',m,1)
+        text = text.split('¬')[:-1]
+        text1 = list()
+        for line in text:
+            text1.append(line)
             caract = len("".join(text1))
             if caract>1970:
-                await ctx.channel.send("".join(text1).replace("¬¬","\n"))
+                await ctx.channel.send("".join(text1))
                 text1 = []
         if text1 != []:
-            await ctx.channel.send("".join(text1).replace("¬¬","\n"))
+            await ctx.channel.send(''.join(text1))
         if ctx.bot.database_online and await self.bot.cogs["ServerCog"].staff_finder(ctx.author,'say'):
             await self.bot.cogs["UtilitiesCog"].suppr(ctx.message)
         self.bot.log.debug("{} used bigtext to say {}".format(ctx.author.id,text))
