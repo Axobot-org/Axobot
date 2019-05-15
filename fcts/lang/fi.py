@@ -88,7 +88,7 @@ fun={"count-0":"Laskeminen on kesken...",
     "calc-2":"Laskennan ratkaisut `{c}` ovat `{l[0]}` and `{l[1]}`",
     "calc-3":"Laskennan ratkaisu `{}` on `{}`",
     "calc-4":"Laskulla `{}` ei ole ratkaisua",
-    "calc-5":"Upsis, error tuli: `{}`",
+    "calc-5":"Upsis, virhe tuli: `{}`",
     "no-reaction":"Mahdotonta lisätä reaktioita. Katso minun käyttöoikeudet...",
     "cant-react":"Minulla ei ole tarpeeksi käyttöoikeuksia lisätä reaktioita!",
     "no-emoji":"Mahdotonta löytää tämä emoji!",
@@ -99,7 +99,7 @@ fun={"count-0":"Laskeminen on kesken...",
     "embed-error":"Virhe havaittu: `{}`",
     "invalid-city":"Pätemätön kaupunki :confused:",
     "no-roll":"Ei vaihtoehtoa löydetty",
-    'no-say':"Unable to send any message in this channel"
+    'no-say':"En voi lähettää viestiä tälle kanavalle"
     }
 
 infos={"text-0":"""Moi! Olen {0} !
