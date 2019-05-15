@@ -121,7 +121,7 @@ Kaikki jotka auttoivat minun tekeimsessä, minun omistaja ja minä haluamme kiit
 infos_2={"membercount-0":"Numero jäsenistä",
 "membercount-1":"Numero boteista",
 "membercount-2":"Numero ihmisistä",
-"membercount-3":"Numero online jäsenistä",
+"membercount-3":"Numero paikalla olevista jäsenistä",
 "fish-1":"Numero kaloista"}
 
 keywords={"depuis":"asti",
@@ -141,7 +141,7 @@ keywords={"depuis":"asti",
           "membres":"members",
           "subcmds":"Toissijainen komento",
           "ghost":"Haamu",
-          "unknown":"Unknown"
+          "unknown":"Tuntematon"
           }
 
 kill={"list":["Jaahas, olet kuolemassa!",
@@ -179,7 +179,7 @@ logs={"slowmode-enabled":"Hidastusmuoto on kytketty päälle kanavalla {channel}
 "mute-on":"{member} on nyt mykistetty (syy : {reason} | tapaus #{case})",
 "mute-off":"{member} ei ole enään mykistetty",
 "softban":"{member} has been 'softbanned' (reason: {reason} | tapaus #{case})",
-"warn":"{member} has been warned: {reason} (case #{case})",
+"warn":"{member} on varoitettu: {reason} (tapaus #{case})",
 "tempmute-on":"{member} is now muted for {duration} (reason : {reason} | case #{case})",
 "d-autounmute":"automatic unmute",
 "d-unmute":"unmuted by {}",
