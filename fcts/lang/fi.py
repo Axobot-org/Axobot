@@ -183,10 +183,10 @@ logs={"slowmode-enabled":"Hidastusmuoto on kytketty päälle kanavalla {channel}
 "tempmute-on":"{member} on nyt mykistetty, ajaksi {duration} (syy : {reason} | tapaus #{case})",
 "d-autounmute":"automaattinen mykistyksen poisto",
 "d-unmute":"mykistäjä {}",
-"d-invite":"Automod (Discord invite)",
-"d-young":"Automod (too recent account)",
-"d-gived_roles":"Automated action (config gived_roles)",
-"d-memberchan":"Automated action (config membercount)"}
+"d-invite":"Automaattinen valvoja (Discord kutsu linkki)",
+"d-young":"Automaattinen valvoja (liian uusi käyttäjä)",
+"d-gived_roles":"Automaattinen tapahtuma (configuraatio annettiin_roolit)",
+"d-memberchan":"Automaattinen tapahtuma (configuraatio käyttäjänlaskelma)"}
 
 mc={"contact-mail":"If you notice an error in the information provided, please contact me personally, or report the error directly [on the site](https://fr-minecraft.net).",
     "serv-title":"Server information {}",
