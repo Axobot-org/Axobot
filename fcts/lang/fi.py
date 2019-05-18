@@ -188,11 +188,11 @@ logs={"slowmode-enabled":"Hidastusmuoto on kytketty päälle kanavalla {channel}
 "d-gived_roles":"Automaattinen tapahtuma (configuraatio annettiin_roolit)",
 "d-memberchan":"Automaattinen tapahtuma (configuraatio käyttäjänlaskelma)"}
 
-mc={"contact-mail":"If you notice an error in the information provided, please contact me personally, or report the error directly [on the site](https://fr-minecraft.net).",
-    "serv-title":"Server information {}",
-    "serv-0":"Number of players",
-    "serv-1":"List of the first 20 players connected",
-    "serv-2":"List of online players",
+mc={"contact-mail":"Jos huomaat virheen annetuissa tiedoissa, ota minuun yhteyttä personaalisesti, tai ota yhteyttä tänne: [sivustolla](https://fr-minecraft.net).",
+    "serv-title":"Palvelin tiedot {}",
+    "serv-0":"Numero pelaajista",
+    "serv-1":"Lista 20 ensimmäisestä pealaajasta yhdistettynä",
+    "serv-2":"Lista paikalla olevista pelaajista",
     "serv-3":"Latency",
     "serv-error":"Oops, an unknown error occurred. Please try again later :confused:",
     "no-api":"Error: Unable to connect to API",
