@@ -243,7 +243,7 @@ mc={"contact-mail":"Si vous constatez une erreur dans les informations données,
         "entity-help":"Cette commande permet d'obtenir des informations sur n'importe quelle entité de Minecraft. Vous pouvez donner son nom complet ou partiel, en français ou en anglais, ou même son identifiant. Il suffit d'entrer `!mc entity <nom>`",
         "block-help":"Cette commande permet d'obtenir des informations sur n'importe quel bloc de Minecraft. Vous pouvez donner son nom complet ou partiel, en français ou en anglais, ou même son identifiant. Il suffit d'entrer `!mc block <nom>`",
         "item-help":"Cette commande permet d'obtenir des informations sur n'importe quel item de Minecraft. Vous pouvez donner son nom complet ou partiel, en français ou en anglais, ou même son identifiant. Il suffit d'entrer `!mc item <nom>`",
-        "cmd-help":"Cette commande permet d'obtenir des informations sur n'importe quelle commande de Minecraft. Il suffit d'entrer `!mc entity <nom>`",
+        "cmd-help":"Cette commande permet d'obtenir des informations sur n'importe quelle commande de Minecraft. Il suffit d'entrer `!mc command <nom>`",
         "adv-help":"Cette commande permet d'obtenir des informations sur n'importe quel progrès du jeu Minecraft (parfois ausis appelé 'avancement'). Il vous suffit d'entrer le nom ou l'identifiant du progrès.",
         "no-entity":"Entité introuvable",
         "no-block":"Bloc introuvable",
@@ -339,17 +339,6 @@ morpion={'user-begin':'{}, à toi de commencer !',
         'win-2':"J'ai gagné ! Fin du match !",
         'already-playing':"Vous avez déjà une partie en cours !"
         }
-
-morpion={'user-begin':'{}, à toi de commencer !',
-        'bot-begin':'Allez hop, je commence !',
-        'tip':"\n*Pour jouer, il suffit de taper un nombre entre 1 et 9, correspondant à la case choisie. Je joue les rouges, toi les bleus*",
-        'nul':"Match nul, personne n'a gagné...",
-        'too-late':"Vous avez mis trop de temps à vous décider. Fin de la partie !",
-        'pion-1':'Il y a déjà un pion sur cette case !',
-        'pion-2':'Case saisie invalide !',
-        'win-1':"Bien joué, {} a gagné !",
-        'win-2':"J'ai gagné ! Fin du match !",
-        'already-playing':"Vous avez déjà une partie en cours !"}
 
 perms={"perms-0":"Le membre/rôle {} n'a pas été trouvé",
         "perms-1":"**Permission de '{}' :**\n\n"

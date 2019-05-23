@@ -79,8 +79,6 @@ cases={"no-user":"Unable to find this user :eyes:",
 
 events={'mp-adv':"You are probably trying to invite me to this server? If that is the case, I can't join him with a simple invitation. An administrator must use my own invitation link, here: <https://bot.discord.io/zbot> :wink:"}
 
-events={'mp-adv':"You are probably trying to invite me to this server? If that is the case, I can't join him with a simple invitation. An administrator must use my own invitation link, here: <https://bot.discord.io/zbot> :wink:"}
-
 errors={"cooldown":"You are on cooldown for this command :confused: Please wait {} more seconds...",
         "badarguments":"Oops, unable to convert the `{c[3]}` parameter to \"{c[1]}\" type :confused:",
         "missingargument":"Oops, the argument \"{}\" is missing {}",
@@ -245,7 +243,7 @@ mc={"contact-mail":"If you notice an error in the information provided, please c
         "entity-help":"This command allows you to obtain information about any Minecraft entity. You can give its full or partial name, in French or English, or even its identifier. Just enter `!mc entity <name>`",
         "block-help":"This command allows you to obtain information on any Minecraft block. You can give its full or partial name, in French or English, or even its identifier. Just enter `!mc block <name>`",
         "item-help":"This command allows you to obtain information on any Minecraft item. You can give its full or partial name, in French or English, or even its identifier. Just enter `!mc item <name>`",
-        "cmd-help":"This command allows you to obtain information about any Minecraft command. All you have to do is type `!mc entity <nom>`",
+        "cmd-help":"This command allows you to obtain information about any Minecraft command. All you have to do is type `!mc command <nom>`",
         "adv-help":"This command provides information about any advancement of the game Minecraft. Simply enter the name or the identifier of the advancement.",
         "no-entity":"Unable to find this entity",
         "no-block":"Unable to find this block",
@@ -341,17 +339,6 @@ morpion={'user-begin':'{}, you begin!',
         'win-2':"I won! End of the game!",
         'already-playing':"You already have a game in progress!"
         }
-
-morpion={'user-begin':'{}, you begin!',
-        'bot-begin':"Let's go, I'll start!",
-        'tip':"\n*To play, simply type a number between 1 and 9, corresponding to the chosen case. I play the red, you play the blue*",
-        'nul':"Draw, no one won...",
-        'too-late':"You took too long to decide. Game over!",
-        'pion-1':"There's already a pawn on that cell!",
-        'pion-2':'Invalid input case',
-        'win-1':"Well done, {} won!",
-        'win-2':"I won! End of the game!",
-        'already-playing':"You already have a game in progress!"}
 
 perms={"perms-0":"Member/role {} not found",
         "perms-1":"**'{}' permissions:**\n\n"
