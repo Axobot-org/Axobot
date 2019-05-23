@@ -691,13 +691,16 @@ class XPCog(commands.Cog):
         async with aiohttp.ClientSession() as session:
             i = 0
             result = list()
-            while i<=ceil(nb/100):
-                async with session.get(f'https://mee6.xyz/api/plugins/levels/leaderboard/{guild.id}?page={i}') as resp:
+            while i<=ceil(nb/1000):
+                async with session.get(f'https://mee6.xyz/api/plugins/levels/leaderboard/{guild.id}?page={i}&limit=1000') as resp:
                     try:
-                        result += (await resp.json())['players']
+                        temp = (await resp.json())['players']
+                        result += temp
                     except Exception as e:
                         await self.bot.cogs['ErrorsCog'].senf_err_msg(f"Error on `mee6_get_top`: url https://mee6.xyz/api/plugins/levels/leaderboard/{guild.id}?page={i}")
                         raise e
+                if len(temp)==0:
+                    break
                 i += 1
         return result[:nb]
 
@@ -709,7 +712,7 @@ class XPCog(commands.Cog):
             i = 0
             js = {'players':[]}
             while len([x for x in js['players'] if x['id']==str(user.id)])==0 and i<=ceil(user.guild.member_count/100):
-                async with session.get(f'https://mee6.xyz/api/plugins/levels/leaderboard/{user.guild.id}?page={i}') as resp:
+                async with session.get(f'https://mee6.xyz/api/plugins/levels/leaderboard/{user.guild.id}?page={i}&limit=1000') as resp:
                     js = await resp.json()
                 i += 1
         try:
@@ -724,13 +727,14 @@ class XPCog(commands.Cog):
         async with aiohttp.ClientSession() as session:
             i = 0
             pos = 0
-            while i<=ceil(user.guild.member_count/100):
-                async with session.get(f'https://mee6.xyz/api/plugins/levels/leaderboard/{user.guild.id}?page={i}') as resp:
+            while i<=ceil(user.guild.member_count/1000):
+                async with session.get(f'https://mee6.xyz/api/plugins/levels/leaderboard/{user.guild.id}?page={i}&limit=1000') as resp:
                     l = [x['id'] for x in (await resp.json())['players']]
                     if str(user.id) in l:
-                        return pos+l.index(str(user.id))
+                        break
                 i += 1
                 pos += 100
+            return pos+l.index(str(user.id))
         return user.guild.member_count
 
 
