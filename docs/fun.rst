@@ -36,15 +36,6 @@ You can access even more names by being on some secret servers! Enter the :code:
 
 .. warning:: ZBot needs "`Attach files <perms.html#attach-files>`_" permission to send its message. You're not gonna ask him to be angry without giving him permission to do it?
 
-Calc
-----
-
-**Syntax:** :code:`calc <operation>`
-
-If you love math like me, you probably have complicated calculations to make from time-to-time. Don't worry, ZBot can probably help you! Solving equations with an unidentified element, deriving functions, simplifying calculations.... If you don't understand what I'm talking about, don't worry, he also does additions and subtractions!
-
-To use a derivative function, just type :code:`derivate(...)`. Simple, isn't it?
-
 
 Count messages
 --------------
@@ -54,6 +45,7 @@ Count messages
 A nice little order that counts the number of messages in the history of this channel. The limit corresponds to the number of messages to study in the chat, 1000 by default. And since some very old chats can have a very many many many MANY many messages (yes, 5 times *many*), we have a set limit on the number of messages you wish to search. 
 
 .. warning:: It seems obvious, but the bot needs "`Read message history <perms.html#read-message-history>`_" permission to read the messages history...
+
 
 Congrats
 --------
