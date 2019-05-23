@@ -79,8 +79,6 @@ cases={"no-user":"Unable to find dis usr :eyes:",
 
 events={'mp-adv':"U're probably trying 2 invite me in dis server? If that's the case, I can't join him with a simple invite. An super-admin must use my own link, just here: <https://bot.discord.io/zbot> :innocent:"}
 
-events={'mp-adv':"U're probably trying 2 invite me in dis server? If that's the case, I can't join him with a simple invite. An super-admin must use my own link, just here: <https://bot.discord.io/zbot> :innocent:"}
-
 errors={"cooldown":"Yu are on cold-own for dis comandZ :confused: Plize wait {} moRe secs...",
         "badarguments":"W0ops, unabled 2 convrt teh `{c[3]}` parameterz to \"{c[1]}\" tipe :confused:",
         "missingargument":"Oops, te argumnt \"{}\" are missin {}",
@@ -245,7 +243,7 @@ mc={"contact-mail":"If U notis an errrror in da info providd, plz contact my per
         "entity-help":"Dis cmd allows U to obtain info 'bout any Minekrahft entity. U can giv itz full or partial naym, in French or English, or even itz identifir. Just enter `!mc entity <name>`",
         "block-help":"This comand allows U to obt:a:in inforation on any Mine-craft bloc pleez. U can give itz full or partial name, in French r English, or evn itz identifier. Just enter `!mc block <name>`",
         "item-help":"Dis command allowz you to earn info 'bout any Minecraft itam. You can gave its full or partial nayme, in French r English, r even its identifier. Just entr `!mc item <name>`",
-        "cmd-help":"This comand a-laws yu to obtayn informtionz abut any Mynekrahft commandZ. Al u had 2 doo iz type `!mc entity <nom>`",
+        "cmd-help":"This comand a-laws yu to obtayn informtionz abut any Mynekrahft commandZ. Al u had 2 doo iz type `!mc command <nom>`",
         "adv-help":"Dis cmd provids informashunz 'bout any advanshement ov the gayme Minekraft. Simple entr the naime or teh identifer of thE advancemenZ.",
         "no-entity":"Unable 2 find this entity",
         "no-block":"Unable 2 found dis block",
@@ -341,17 +339,6 @@ morpion={'user-begin':'{}, u begin!',
         'win-2':"I won! Game over!",
         'already-playing':"U already are ingame!"
         }
-
-morpion={'user-begin':'{}, u begin!',
-        'bot-begin':"Hop, I'll start!",
-        'tip':"\n*To play, simply type a nbr beetween 1 - 9, corresponding 2 teh chosen case. I play the red, U play the blue*",
-        'nul':"Draw, nobody won... rip",
-        'too-late':"U was too long! End of the game!",
-        'pion-1':"There's already a pawn on dat cell!",
-        'pion-2':'Invalid input!',
-        'win-1':"GG, {} won!",
-        'win-2':"I won! Game over!",
-        'already-playing':"U already are ingame!"}
 
 perms={"perms-0":"Membr/role {} not findz",
         "perms-1":"**'{}' permissung:**\n\n"
