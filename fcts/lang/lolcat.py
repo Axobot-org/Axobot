@@ -535,6 +535,7 @@ stats_infos={"not-found":"Unable 2 found {N}",
         }
 
 users = {'invalid-card':'Dat style iz no valid. But yop, her\'s styles u can use: {}',
+        'list-cards':"Her's da list of cards u can use: {}",
         'missing-attach-files':'Oops, I\'m missing the Attach Files perms :upside_down:',
         'changed-0':'Ur xp card naw use the style {}',
         'changed-1':'Oops, a wicked error occurrd during the process ov ur request. Try again later or contact these nice support guys.',

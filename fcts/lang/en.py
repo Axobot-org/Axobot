@@ -535,6 +535,7 @@ stats_infos={"not-found":"Unable to find {N}",
         }
 
 users = {'invalid-card':'This style is invalid. Here is the list of styles you can use: {}',
+        'list-cards':"Here is the list of available rank cards for you: {}",
         'missing-attach-files':'Oops, I\'m missing the permission to Attach Files :confused:',
         'changed-0':'Your xp card now uses the style {}',
         'changed-1':'Oops, an internal error occurred during the processing of the request. Try again later or contact support.',
