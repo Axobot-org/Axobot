@@ -104,7 +104,7 @@ class FunCog(commands.Cog):
     async def roll(self,ctx,*,options):
         """Selects an option at random from a given list
         The options must be separated by a semicolon `;`"""
-        liste = [x.strip() for x in options.split(';')]
+        liste = [x for x in [x.strip() for x in options.split(';')] if len(x)>0]
         if len(liste)==0:
             return await ctx.send(await self.translate(ctx.channel,"fun","no-roll"))
         choosen = None
