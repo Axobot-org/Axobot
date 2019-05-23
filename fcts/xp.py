@@ -600,7 +600,9 @@ class XPCog(commands.Cog):
             l = await self.rr_list_role(ctx.guild.id)
             if len([x for x in l if x['level']==level])>0:
                 return await ctx.send(await self.translate(ctx.guild.id,'xp','already-1-rr'))
-            if len(l) >= await self.bot.cogs['ServerCog'].find_staff(ctx.guild.id,'rr_max_number',ctx.channel):
+            max_rr = await self.bot.cogs['ServerCog'].find_staff(ctx.guild.id,'rr_max_number')
+            max_rr = self.bot.cogs["ServerCog"].default_opt['rr_max_number'] if max_rr==None else max_rr
+            if len(l) >= max_rr:
                 return await ctx.send(str(await self.translate(ctx.guild.id,'xp','too-many-rr')).format(len(l)))
             await self.rr_add_role(ctx.guild.id,role.id,level)
         except Exception as e:
@@ -618,7 +620,9 @@ class XPCog(commands.Cog):
             await self.bot.cogs['ErrorsCog'].on_cmd_error(ctx,e)
         else:
             des = '\n'.join(["• <@&{}> : lvl {}".format(x['role'], x['level']) for x in l])
-            title = str(await self.translate(ctx.guild.id,"xp",'rr_list')).format(len(l),await self.bot.cogs['ServerCog'].find_staff(ctx.guild.id,'rr_max_number',ctx.channel))
+            max_rr = await self.bot.cogs['ServerCog'].find_staff(ctx.guild.id,'rr_max_number')
+            max_rr = self.bot.cogs["ServerCog"].default_opt['rr_max_number'] if max_rr==None else max_rr
+            title = str(await self.translate(ctx.guild.id,"xp",'rr_list')).format(len(l),max_rr)
             emb = self.bot.cogs['EmbedCog'].Embed(title=title,desc=des).update_timestamp().create_footer(ctx.author)
             await ctx.send(embed=emb.discord_embed())
     
