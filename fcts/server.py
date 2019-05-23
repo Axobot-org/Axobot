@@ -32,7 +32,8 @@ class ServerCog(commands.Cog):
         except:
             pass
         self.table = 'servers_beta' if bot.beta else 'servers'
-        self.default_opt = {"language":1,
+        self.default_opt = {"rr_max_number":7,
+               "language":1,
                "clear":"",
                "slowmode":"",
                "mute":"",
@@ -132,7 +133,7 @@ class ServerCog(commands.Cog):
                 return True
         return False
 
-    async def find_staff(self,ID,name,channel=None):
+    async def find_staff(self,ID,name):
         """return the value of an option
         Return None if this option doesn't exist or if no value has been set"""
         if type(ID)==discord.Guild:
@@ -164,7 +165,7 @@ class ServerCog(commands.Cog):
             liste.append(x)
         return liste    
 
-    async def modify_server(self,ID,values=[()],channel=None):
+    async def modify_server(self,ID,values=[()]):
         if type(values)!=list:
             raise ValueError
         v = list()
@@ -180,7 +181,7 @@ class ServerCog(commands.Cog):
         cnx.commit()
         return True
 
-    async def delete_option(self,ID,opt,channel=None):
+    async def delete_option(self,ID,opt):
         """reset an option"""
         if opt not in self.default_opt.keys():
             raise ValueError
@@ -189,7 +190,7 @@ class ServerCog(commands.Cog):
             await self.bot.cogs['LangCog'].change_cache(ID,value)
         elif opt == 'prefix':
             self.bot.cogs['UtilitiesCog'].update_prefix(ID,value)
-        return await self.modify_server(ID,values=[(opt,value)],channel=channel)
+        return await self.modify_server(ID,values=[(opt,value)])
 
     async def add_server(self,ID):
         """add a new server to the db"""
@@ -291,7 +292,7 @@ class ServerCog(commands.Cog):
     
     async def sconfig_del2(self,ctx,option):
         try:
-            t = await self.delete_option(ctx.guild.id,option,channel=ctx.channel)
+            t = await self.delete_option(ctx.guild.id,option)
             if t:
                 msg = await self.translate(ctx.guild.id,"server","change-2")
             else:
@@ -316,7 +317,7 @@ class ServerCog(commands.Cog):
 
     async def conf_roles(self,ctx,option,value):
         if value == "scret-desc":
-            roles = await self.find_staff(ctx.guild.id,option,channel=ctx.channel)
+            roles = await self.find_staff(ctx.guild.id,option)
             return await self.form_roles(ctx.guild,roles)
         else:
             roles = value.split(",")
@@ -334,7 +335,7 @@ class ServerCog(commands.Cog):
                     continue
                 liste.append(str(r.id))
                 liste2.append(r.name)
-            await self.modify_server(ctx.guild.id,values=[(option,";".join(liste))],channel=ctx.channel)
+            await self.modify_server(ctx.guild.id,values=[(option,";".join(liste))])
             msg = await self.translate(ctx.guild.id,"server","change-role")
             await ctx.send(msg.format(option,", ".join(liste2)))
             await self.send_embed(ctx.guild,option,value)
@@ -359,7 +360,7 @@ class ServerCog(commands.Cog):
         
     async def conf_bool(self,ctx,option,value):
         if value == "scret-desc":
-            v = await self.find_staff(ctx.guild.id,option,channel=ctx.channel)
+            v = await self.find_staff(ctx.guild.id,option)
             return await self.form_bool(v)
         else:
             if value.lower() in ["true","vrai","1","oui","yes","activé"]:
@@ -374,7 +375,7 @@ class ServerCog(commands.Cog):
                 return
             if option == "enable_fun":
                 await self.bot.cogs["FunCog"].cache_update(ctx.guild.id,v)
-            await self.modify_server(ctx.guild.id,values=[(option,v)],channel=ctx.channel)
+            await self.modify_server(ctx.guild.id,values=[(option,v)])
             msg = await self.translate(ctx.guild.id,"server","change-bool")
             await ctx.send(msg.format(option,value))
             await self.send_embed(ctx.guild,option,value)
@@ -388,7 +389,7 @@ class ServerCog(commands.Cog):
     
     async def conf_textchan(self,ctx,option,value):
         if value == "scret-desc":
-            chans = await self.find_staff(ctx.guild.id,option,channel=ctx.channel)
+            chans = await self.find_staff(ctx.guild.id,option)
             return await self.form_textchan(ctx.guild,chans)
         else:
             chans = value.split(",")
@@ -408,7 +409,7 @@ class ServerCog(commands.Cog):
                     continue
                 liste.append(str(c.id))
                 liste2.append(c.mention)
-            await self.modify_server(ctx.guild.id,values=[(option,";".join(liste))],channel=ctx.channel)
+            await self.modify_server(ctx.guild.id,values=[(option,";".join(liste))])
             if option=='noxp_channels':
                 self.bot.cogs['XPCog'].xp_channels_cache[ctx.guild.id] = [int(x) for x in liste]
             msg = await self.translate(ctx.guild.id,"server","change-textchan")
@@ -432,7 +433,7 @@ class ServerCog(commands.Cog):
 
     async def conf_emoji(self,ctx,option,value):
         if value == "scret-desc":
-            emojis = await self.find_staff(ctx.guild.id,option,channel=ctx.channel)
+            emojis = await self.find_staff(ctx.guild.id,option)
             return await self.form_emoji(emojis)
         else:
             emojis = value.split(",")
@@ -456,7 +457,7 @@ class ServerCog(commands.Cog):
                     if str(e.id) not in liste:
                         liste.append(str(e.id))
                         liste2.append("<:{}:{}>".format(e.name,e.id))
-            await self.modify_server(ctx.guild.id,values=[(option,";".join(liste))],channel=ctx.channel)
+            await self.modify_server(ctx.guild.id,values=[(option,";".join(liste))])
             msg = await self.translate(ctx.guild.id,"server","change-emojis")
             await ctx.send(msg.format(option,", ".join(liste2)))
             await self.send_embed(ctx.guild,option,value)
@@ -479,7 +480,7 @@ class ServerCog(commands.Cog):
 
     async def conf_vocal(self,ctx,option,value):
         if value == "scret-desc":
-            chans = await self.find_staff(ctx.guild.id,option,channel=ctx.channel)
+            chans = await self.find_staff(ctx.guild.id,option)
             return await self.form_vocal(ctx.guild,chans)
         else:
             chans = value.split(",")
@@ -497,7 +498,7 @@ class ServerCog(commands.Cog):
                     continue
                 liste.append(str(c.id))
                 liste2.append(c.mention)
-            await self.modify_server(ctx.guild.id,values=[(option,";".join(liste))],channel=ctx.channel)
+            await self.modify_server(ctx.guild.id,values=[(option,";".join(liste))])
             msg = await self.translate(ctx.guild.id,"server","change-textchan")
             await ctx.send(msg.format(option,", ".join(liste2)))
             await self.send_embed(ctx.guild,option,value)
@@ -517,10 +518,10 @@ class ServerCog(commands.Cog):
 
     async def conf_text(self,ctx,option,value):
         if value == "scret-desc":
-            text = await self.find_staff(ctx.guild.id,option,channel=ctx.channel)
+            text = await self.find_staff(ctx.guild.id,option)
             return await self.form_text(text)
         else:
-            await self.modify_server(ctx.guild.id,values=[(option,value.replace('"','\"'))],channel=ctx.channel)
+            await self.modify_server(ctx.guild.id,values=[(option,value.replace('"','\"'))])
             msg = await self.translate(ctx.guild.id,"server","change-text")
             await ctx.send(msg.format(option,value))
             await self.send_embed(ctx.guild,option,value)
@@ -534,14 +535,14 @@ class ServerCog(commands.Cog):
 
     async def conf_prefix(self,ctx,option,value):
         if value == "scret-desc":
-            text = await self.find_staff(ctx.guild.id,'prefix',channel=ctx.channel)
+            text = await self.find_staff(ctx.guild.id,'prefix')
             return await self.form_prefix(text)
         else:
             if len(value)>5:
                 await ctx.send(await self.translate(ctx.guild.id,"server","change-prefix-1"))
                 return
             try:
-                await self.modify_server(ctx.guild.id,values=[('prefix',value)],channel=ctx.channel)
+                await self.modify_server(ctx.guild.id,values=[('prefix',value)])
             except:
                 await ctx.send(await self.translate(ctx.guild.id,"server","wrong-prefix"))
                 return
@@ -557,7 +558,7 @@ class ServerCog(commands.Cog):
 
     async def conf_numb(self,ctx,option,value):
         if value == "scret-desc":
-            return await self.find_staff(ctx.guild.id,option,channel=ctx.channel)
+            return await self.find_staff(ctx.guild.id,option)
         else:
             if value.isnumeric():
                 value = eval(value)
@@ -577,13 +578,13 @@ class ServerCog(commands.Cog):
                 guild = ctx
             else:
                 return self.default_language
-            v = await self.find_staff(guild,option,channel=None)
+            v = await self.find_staff(guild,option)
             return await self.form_lang(v)
         else:
             languages = self.bot.cogs["LangCog"].languages
             if value in languages:
                 v = languages.index(value)
-                await self.modify_server(ctx.guild.id,values=[(option,v)],channel=ctx.channel)
+                await self.modify_server(ctx.guild.id,values=[(option,v)])
                 await self.bot.cogs['LangCog'].change_cache(ctx.guild.id,value)
                 msg = await self.translate(ctx.guild.id,"server","change-lang")
                 await ctx.send(msg.format(value))
@@ -610,7 +611,7 @@ class ServerCog(commands.Cog):
                     guild = ctx
                 else:
                     return self.default_opt['anti_raid']
-                v = await self.find_staff(guild,option,channel=None)
+                v = await self.find_staff(guild,option)
                 return await self.form_raid(v)
             else:
                 raids = self.raids_levels
@@ -621,7 +622,7 @@ class ServerCog(commands.Cog):
                         value = raids[value]
                 if value in raids:
                     v = raids.index(value)
-                    await self.modify_server(ctx.guild.id,values=[(option,v)],channel=ctx.channel)
+                    await self.modify_server(ctx.guild.id,values=[(option,v)])
                     msg = await self.translate(ctx.guild.id,"server","change-raid")
                     await ctx.send(msg.format(value,raids.index(value)))
                     await self.send_embed(ctx.guild,option,value)
@@ -648,13 +649,13 @@ class ServerCog(commands.Cog):
                 guild = ctx
             else:
                 return self.bot.cogs['XPCog'].types[0]
-            v = await self.find_staff(guild,option,channel=None)
+            v = await self.find_staff(guild,option)
             return await self.form_xp_type(v)
         else:
             available_types = self.bot.cogs["XPCog"].types
             if value in available_types:
                 v = available_types.index(value)
-                await self.modify_server(ctx.guild.id,values=[(option,v)],channel=ctx.channel)
+                await self.modify_server(ctx.guild.id,values=[(option,v)])
                 msg = await self.translate(ctx.guild.id,"server","change-xp")
                 await ctx.send(msg.format(value))
                 await self.send_embed(ctx.guild,option,value)
