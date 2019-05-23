@@ -28,7 +28,11 @@ class UsersCog(commands.Cog):
     async def profile_card(self,ctx,style:typing.Optional[args.cardStyle]=None):
         """Change your xp card style"""
         if style==None and len(ctx.view.buffer.split(' '))>2:
-            return await ctx.send(str(await self.translate(ctx.channel,'users','invalid-card')).format(', '.join(await ctx.bot.cogs['UtilitiesCog'].allowed_card_styles(ctx.author))))
+            if ctx.view.buffer.split(' ')[2]=='list':
+                await ctx.send(str(await self.translate(ctx.channel,'users','list-cards')).format(', '.join(await ctx.bot.cogs['UtilitiesCog'].allowed_card_styles(ctx.author))))
+            else:
+                await ctx.send(str(await self.translate(ctx.channel,'users','invalid-card')).format(', '.join(await ctx.bot.cogs['UtilitiesCog'].allowed_card_styles(ctx.author))))
+            return
         elif style==None:
             if ctx.channel.permissions_for(ctx.me).attach_files:
                 style = await self.bot.cogs['UtilitiesCog'].get_xp_style(ctx.author)
