@@ -164,7 +164,6 @@ def main():
                       'fcts.morpion',
                       'fcts.xp',
                       'fcts.users',
-                      'fcts.blurple'
     ]
     # Suppression du fichier debug.log s'il est trop volumineux
     if os.path.exists("debug.log"):
