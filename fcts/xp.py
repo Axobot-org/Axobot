@@ -2,8 +2,11 @@ import discord, random, time, asyncio, io, imageio, importlib, re, os, operator,
 from discord.ext import commands
 from math import ceil
 import numpy as np
-from PIL import Image, ImageDraw, ImageFont, ImageTk
+from PIL import Image, ImageDraw, ImageFont, ImageTk, ImageSequence, ImageEnhance
 from urllib.request import urlopen, Request
+
+from io import BytesIO
+from math import sqrt
 
 from fcts import args, checks
 importlib.reload(args)
@@ -303,7 +306,7 @@ class XPCog(commands.Cog):
         im = Image.open(io.BytesIO(urlopen(req).read()))
         return im
 
-    async def calc_pos(self,text,font,x,y,align='center'):
+    def calc_pos(self,text,font,x,y,align='center'):
         w,h = font.getsize(text)
         if align=='center':
             return x-w/2,y-h/2
@@ -319,52 +322,76 @@ class XPCog(commands.Cog):
         colors = {'name':(124, 197, 118),'xp':(124, 197, 118),'NIVEAU':(255, 224, 77),'rank':(105, 157, 206),'bar':bar_colors}
         if style=='blurple':
             colors = {'name':(35,35,50),'xp':(235, 235, 255),'NIVEAU':(245, 245, 255),'rank':(255, 255, 255),'bar':(70, 83, 138)}
-        if not user.is_avatar_animated() or force_static:
-            pfp = await self.get_raw_image(user.avatar_url_as(format='png',size=256))
-            img = await self.add_overlay(pfp.resize(size=(282,282)),user,card,xp,rank,txt,colors,levels_info)
-            img.save('../cards/global/{}-{}-{}.png'.format(user.id,xp,rank[0]))
-            return discord.File('../cards/global/{}-{}-{}.png'.format(user.id,xp,rank[0]))
-        else:
-            pfp = await self.get_raw_image(user.avatar_url_as(format='gif'))
-            images = []
-            duration = []
-            for i in range(pfp.n_frames):
-                pfp.seek(i)
-                img = await self.add_overlay(pfp.resize(size=(282,282)),user,card,xp,rank,txt,colors,levels_info)
-                images.append(img)
-                duration.append(pfp.info['duration']/1000)
-            card.close()
-            imageio.mimwrite('../cards/global/{}-{}-{}.gif'.format(user.id,xp,rank[0]), images, format="GIF-PIL", duration=duration, subrectangles=True)
-            return discord.File('../cards/global/{}-{}-{}.gif'.format(user.id,xp,rank[0]))
-
-    async def add_overlay(self,pfp,user,card,xp,rank,txt,colors,levels_info):
-        img = Image.new('RGBA', (card.width, card.height), color = (250,250,250,0))
-        img.paste(pfp, (20, 29))
-        img.paste(card, (0, 0), card)
         if platform.system()=='Darwin':
             verdana_name = 'Verdana.ttf'
         else:
             verdana_name = 'Veranda.ttf'
         name_fnt = ImageFont.truetype('Roboto-Medium.ttf', 40)
+
+        if not user.is_avatar_animated() or force_static:
+            pfp = await self.get_raw_image(user.avatar_url_as(format='png',size=256))
+            img = await self.bot.loop.run_in_executor(None,self.add_overlay,pfp.resize(size=(282,282)),user,card,xp,rank,txt,colors,levels_info,verdana_name,name_fnt)
+            img.save('../cards/global/{}-{}-{}.png'.format(user.id,xp,rank[0]))
+            return discord.File('../cards/global/{}-{}-{}.png'.format(user.id,xp,rank[0]))
+
+        else:
+            async with aiohttp.ClientSession() as cs:
+                async with cs.get(str(user.avatar_url)) as r:
+                    response = await r.read()
+                    pfp = Image.open(BytesIO(response))
+
+            images = []
+            duration = []
+            frames = [frame.copy() for frame in ImageSequence.Iterator(pfp)]
+            for frame in frames:
+                frame = frame.convert(mode='RGBA')
+                img = await self.bot.loop.run_in_executor(None,self.add_overlay,frame.resize(size=(282,282)),user,card.copy(),xp,rank,txt,colors,levels_info,verdana_name,name_fnt)
+                img = ImageEnhance.Contrast(img).enhance(1.5)
+                images.append(img)
+                duration.append(pfp.info['duration']/1000)
+            card.close()
+
+            image_file_object = BytesIO()
+            gif = images[0]
+            gif.save(image_file_object, format='gif', save_all=True, append_images=images[1:], loop=0, duration=duration[0], subrectangles=True)
+            image_file_object.seek(0)
+            return discord.File(fp=image_file_object, filename='card.gif')
+            # imageio.mimwrite('../cards/global/{}-{}-{}.gif'.format(user.id,xp,rank[0]), images, format="GIF-PIL", duration=duration, subrectangles=True)
+            # return discord.File('../cards/global/{}-{}-{}.gif'.format(user.id,xp,rank[0]))
+
+    def add_overlay(self,pfp,user,img,xp,rank,txt,colors,levels_info,verdana_name,name_fnt):
+        #img = Image.new('RGBA', (card.width, card.height), color = (250,250,250,0))
+        #img.paste(pfp, (20, 29))
+        #img.paste(card, (0, 0), card)
+        cardL = img.load()
+        pfpL = pfp.load()
+        for x in range(list(img.size)[0]):
+            for y in range(img.size[1]):
+                if sqrt((x-162)**2 + (y-170)**2) < 139:
+                    cardL[x,y] = pfpL[x-20,y-29]
+                elif cardL[x, y][3]<128:
+                    cardL[x,y] = (255,255,255,0)
+                    
+        
         xp_fnt = ImageFont.truetype(verdana_name, 24)
         NIVEAU_fnt = ImageFont.truetype(verdana_name, 42)
         levels_fnt = ImageFont.truetype(verdana_name, 65)
         rank_fnt = ImageFont.truetype(verdana_name,29)
         RANK_fnt = ImageFont.truetype(verdana_name,23)
         
-        img = await self.add_xp_bar(img,xp-levels_info[2],levels_info[1]-levels_info[2],colors['bar'])
+        img = self.add_xp_bar(img,xp-levels_info[2],levels_info[1]-levels_info[2],colors['bar'])
         d = ImageDraw.Draw(img)
-        d.text(await self.calc_pos(user.name,name_fnt,610,68), user.name, font=name_fnt, fill=colors['name'])
+        d.text(self.calc_pos(user.name,name_fnt,610,68), user.name, font=name_fnt, fill=colors['name'])
         temp = '{} / {} xp ({}/{})'.format(xp-levels_info[2],levels_info[1]-levels_info[2],xp,levels_info[1])
-        d.text((await self.calc_pos(temp,xp_fnt,625,237)), temp, font=xp_fnt, fill=colors['xp'])
+        d.text((self.calc_pos(temp,xp_fnt,625,237)), temp, font=xp_fnt, fill=colors['xp'])
         d.text((380,140), txt[0], font=NIVEAU_fnt, fill=colors['NIVEAU'])
-        d.text((await self.calc_pos(str(levels_info[0]),levels_fnt,740,160,'right')), str(levels_info[0]), font=levels_fnt, fill=colors['xp'])
+        d.text((self.calc_pos(str(levels_info[0]),levels_fnt,740,160,'right')), str(levels_info[0]), font=levels_fnt, fill=colors['xp'])
         temp = '{x[0]}/{x[1]}'.format(x=rank)
-        d.text((await self.calc_pos(txt[1],RANK_fnt,893,147,'center')), txt[1], font=RANK_fnt, fill=colors['rank'])
-        d.text((await self.calc_pos(temp,rank_fnt,893,180,'center')), temp, font=rank_fnt, fill=colors['rank'])
+        d.text((self.calc_pos(txt[1],RANK_fnt,893,147,'center')), txt[1], font=RANK_fnt, fill=colors['rank'])
+        d.text((self.calc_pos(temp,rank_fnt,893,180,'center')), temp, font=rank_fnt, fill=colors['rank'])
         return img
 
-    async def add_xp_bar(self,img,xp,needed_xp,colors):
+    def add_xp_bar(self,img,xp,needed_xp,colors):
         """Colorize the xp bar"""
         error_rate = 25
         data = np.array(img)   # "data" is a height x width x 4 numpy array
@@ -691,13 +718,13 @@ class XPCog(commands.Cog):
         async with aiohttp.ClientSession() as session:
             i = 0
             result = list()
-            while i<=ceil(nb/1000):
-                async with session.get(f'https://mee6.xyz/api/plugins/levels/leaderboard/{guild.id}?page={i}&limit=1000') as resp:
+            while i<=ceil(nb/999):
+                async with session.get(f'https://mee6.xyz/api/plugins/levels/leaderboard/{guild.id}?page={i}&limit=999') as resp:
                     try:
                         temp = (await resp.json())['players']
                         result += temp
                     except Exception as e:
-                        await self.bot.cogs['ErrorsCog'].senf_err_msg(f"Error on `mee6_get_top`: url https://mee6.xyz/api/plugins/levels/leaderboard/{guild.id}?page={i}")
+                        await self.bot.cogs['ErrorsCog'].senf_err_msg(f"Error on `mee6_get_top`: url https://mee6.xyz/api/plugins/levels/leaderboard/{guild.id}?page={i}&limit=999")
                         raise e
                 if len(temp)==0:
                     break
@@ -711,8 +738,9 @@ class XPCog(commands.Cog):
         async with aiohttp.ClientSession() as session:
             i = 0
             js = {'players':[]}
-            while len([x for x in js['players'] if x['id']==str(user.id)])==0 and i<=ceil(user.guild.member_count/100):
-                async with session.get(f'https://mee6.xyz/api/plugins/levels/leaderboard/{user.guild.id}?page={i}&limit=1000') as resp:
+            while len([x for x in js['players'] if x['id']==str(user.id)])==0 and i<=ceil(user.guild.member_count/999):
+                url = f'https://mee6.xyz/api/plugins/levels/leaderboard/{user.guild.id}?page={i}&limit=999'
+                async with session.get(url) as resp:
                     js = await resp.json()
                 i += 1
         try:
@@ -727,8 +755,8 @@ class XPCog(commands.Cog):
         async with aiohttp.ClientSession() as session:
             i = 0
             pos = 0
-            while i<=ceil(user.guild.member_count/1000):
-                async with session.get(f'https://mee6.xyz/api/plugins/levels/leaderboard/{user.guild.id}?page={i}&limit=1000') as resp:
+            while i<=ceil(user.guild.member_count/999):
+                async with session.get(f'https://mee6.xyz/api/plugins/levels/leaderboard/{user.guild.id}?page={i}&limit=999') as resp:
                     l = [x['id'] for x in (await resp.json())['players']]
                     if str(user.id) in l:
                         break
