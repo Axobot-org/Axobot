@@ -133,7 +133,12 @@ fun={"count-0":"Counting in progress...",
         "no-roll":"No choice found",
         'no-say':"Unable to send any message in this channel",
         'no-voicechan':'You must be in a vocal channel in order to use this command.',
-        'cant-stream':"Warning: You don't have enough permissions to make a video chat (Permission \"Stream\")."
+        'cant-stream':"Warning: You don't have enough permissions to make a video chat (Permission \"Stream\").",
+        "afk-no-perm":"Oops, I cannot change your nickname :confused:",
+        "afk-user-1":"This member is AFK, because {}",
+        "afk-user-2":"This user is AFK!",
+        "afk-done":"You are now AFK",
+        "unafk-done":"You aren't anymore AFK"
         }
 
 infos={"text-0":"""Hello! I'm {0} !

@@ -133,7 +133,12 @@ fun={"count-0":"Comptage en cours...",
         "no-roll":"Aucun élément trouvé",
         'no-say':"Impossible d'envoyer un message dans ce salon",
         'no-voicechan':'Vous devez être connecté à un salon vocal pour utiliser cette commande.',
-        'cant-stream':"Attention : vous n'avez pas la permission de faire de partage vidéo (Permission \"Stream\")."
+        'cant-stream':"Attention : vous n'avez pas la permission de faire de partage vidéo (Permission \"Stream\").",
+        "afk-no-perm":"Oops, je ne peux pas modifier votre pseudo :confused:",
+        "afk-user-1":"Ce membre est AFK, pour la raison {}",
+        "afk-user-2":"Ce membre est AFK !",
+        "afk-done":"Vous êtes maintenant AFK",
+        "unafk-done":"Vous n'êtes maintenant plus AFK"
         }
 
 infos={"text-0":"""Bonjour ! Moi c'est {0} !

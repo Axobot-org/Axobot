@@ -133,7 +133,13 @@ fun={"count-0":"Countng in progrez...",
         "no-roll":"Hmm I don't see any choice lol",
         'no-say':"Unable 2 send any message in tish channel",
         'no-voicechan':'Wait, U forgot teh vocal channel? :eyes:',
-        'cant-stream':":warning: U don't have enough permissionz to do a video cat (Perm \"Stream\")."
+        'cant-stream':":warning: U don't have enough permissionz to do a video cat (Perm \"Stream\").",
+        'cant-stream':"Warning: You don't have enough permissions to make a video chat (Permission \"Stream\").",
+        "afk-no-perm":"Oops, I can't change Ur nickname :confused:",
+        "afk-user-1":"Taht member iz AFK, 'cuz {}",
+        "afk-user-2":"This usr is AFK!",
+        "afk-done":"U'r now AFK",
+        "unafk-done":"U'rn't anymore AFK"
         }
 
 infos={"text-0":"""Ho hi hello! I'm {0} !
