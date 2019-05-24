@@ -520,10 +520,10 @@ You can specify a verification limit by adding a number in argument"""
         Syntax: !embed key1=\"value 1\" key2=\"value 2\"
 
         Available keys:
-            - title: the title of the embed
-            - content: the text inside the box
+            - title: the title of the embed [256 characters]
+            - content: the text inside the box [2048 characters]
             - url: a well-formed url clickable via the title
-            - footer: a little text at the bottom of the box
+            - footer: a little text at the bottom of the box [90 characters]
             - image: a well-formed url redirects to an image
 
         If you want to use quotation marks in the texts, it is possible to escape them thanks to the backslash (`\\"`)
@@ -541,13 +541,13 @@ You can specify a verification limit by adding a number in argument"""
                 if e==len(arguments)-1:
                     continue
                 if a=='title=':
-                    k['title'] = arguments[e+1].replace("|¬017","\"")
+                    k['title'] = arguments[e+1].replace("|¬017","\"")[:255]
                 elif a=='content=':
                     k['content'] = arguments[e+1].replace("|¬017","\"")
                 elif a=='url=':
                     k['url'] = arguments[e+1].replace("|¬017","\"")
                 elif a=='footer=':
-                    k['footer'] = arguments[e+1].replace("|¬017","\"")
+                    k['footer'] = arguments[e+1].replace("|¬017","\"")[:90]
                 elif a=='image=':
                     k['image'] = arguments[e+1].replace("|¬017","\"")
         emb = ctx.bot.cogs["EmbedCog"].Embed(title=k['title'], desc=k['content'], url=k['url'],footer_text=k['footer'],thumbnail=k['image'],color=ctx.bot.cogs['ServerCog'].embed_color).update_timestamp().set_author(ctx.author)
