@@ -462,14 +462,18 @@ You can specify a verification limit by adding a number in argument"""
     @commands.cooldown(4, 50, type=commands.BucketType.guild)
     async def hour(self,ctx,*,city:str):
         """Get the hour of a city"""
+        if city.lower() in ['mee6','mee6land']:
+            return await ctx.send('**Mee6Land/MEE6**:\nEverytime (NoWhere)\n (Mee6Land - lat: unknown - long: unknown)')
         g = geocoder.arcgis(city)
         if not g.ok:
             return await ctx.send(await self.translate(ctx.channel,"fun","invalid-city"))
         timeZoneStr = self.tz.tzNameAt(g.json['lat'],g.json['lng'],forceTZ=True)
+        if timeZoneStr=='uninhabited':
+            return await ctx.send(await self.translate(ctx.channel,"fun","uninhabited-city"))
         timeZoneObj = timezone(timeZoneStr)
         d = datetime.datetime.now(timeZoneObj)
         format_d = await self.bot.cogs['TimeCog'].date(d,lang=await self.translate(ctx.channel,"current_lang","current"))
-        await ctx.send("**{}**:\n{} ({})".format(timeZoneStr,format_d,d.tzname()))
+        await ctx.send("**{}**:\n{} ({})\n ({} - lat: {} - long: {})".format(timeZoneStr,format_d,d.tzname(),g.current_result.address,round(g.json['lat'],2),round(g.json['lng'],2)))
 
 
     @commands.command(name='embed',hidden=False)
