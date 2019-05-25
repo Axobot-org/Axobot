@@ -788,8 +788,10 @@ class ServerCog(commands.Cog):
             text = "{}{}: {}".format(str(await self.translate(guild.id,"keywords","membres")).capitalize() , " " if lang=='fr' else "" , len(guild.members))
             try:
                 await ch.edit(name=text,reason=await self.translate(guild.id,"logs","d-memberchan"))
+                return True
             except Exception as e:
                 self.bot.log.debug("[UpdateMemberChannel] "+str(e))
+        return False
 
     
     

@@ -258,9 +258,11 @@ class AdminCog(commands.Cog):
     async def membercounter(self,ctx):
         """Recharge tout ces salons qui contiennent le nombre de membres, pour tout les serveurs"""
         if self.bot.database_online:
+            i = 0
             for x in self.bot.guilds:
-                await self.bot.cogs["ServerCog"].update_memberChannel(x)
-            await ctx.bot.cogs['UtilitiesCog'].add_check_reaction(ctx.message)
+                if await self.bot.cogs["ServerCog"].update_memberChannel(x):
+                    i += 1
+            await ctx.send(f"{i} salons mis à jours !")
         else:
             await ctx.send("Impossible de faire ceci, la base de donnée est inaccessible")
 
