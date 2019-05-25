@@ -134,7 +134,6 @@ fun={"count-0":"Countng in progrez...",
         'no-say':"Unable 2 send any message in tish channel",
         'no-voicechan':'Wait, U forgot teh vocal channel? :eyes:',
         'cant-stream':":warning: U don't have enough permissionz to do a video cat (Perm \"Stream\").",
-        'cant-stream':"Warning: You don't have enough permissions to make a video chat (Permission \"Stream\").",
         "afk-no-perm":"Oops, I can't change Ur nickname :confused:",
         "afk-user-1":"Taht member iz AFK, 'cuz {}",
         "afk-user-2":"This usr is AFK!",
@@ -166,8 +165,7 @@ Has a nice dayz !""",
                 'Report a bug/ a user':'https://dis.gd/report',
                 'Suggest something to Discord':'https://dis.gd/feedback',
                 'Selfbots article':'https://support.discordapp.com/hc/articles/115002192352',
-                'ToS for bot devs':'https://discordapp.com/developers/docs/legal'
-        }
+                'ToS for bot devs':'https://discordapp.com/developers/docs/legal'},
         }
 
 infos_2={"membercount-0":"Total nmber of membrz",
@@ -339,7 +337,8 @@ modo={"slowmode-0":"Teh very-cold-mode is now disabld in this nize place.",
         "em-private":"[Restrictd]",
         "em-list-title":"Emojis of our super server",
         "tempmute-1":"Da member {} is muted 4 the raeson `{}`, for {}!",
-        "role-high":"Oops, tish role is 2 high for me to change. Move my role above the role `{}` be4 trying again, thx"
+        "role-high":"Oops, tish role is 2 high for me to change. Move my role above the role `{}` be4 trying again, thx",
+        'role-color':"Teh coulor of role {} haz bee'n changd!"
         }
 
 morpion={'user-begin':'{}, u begin!',

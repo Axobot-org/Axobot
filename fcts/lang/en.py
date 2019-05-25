@@ -165,7 +165,7 @@ Have a nice day!""",
                 'Report a bug/ a user':'https://dis.gd/report',
                 'Suggest something to Discord':'https://dis.gd/feedback',
                 'Selfbots article':'https://support.discordapp.com/hc/articles/115002192352',
-                'ToS for bot devs':'https://discordapp.com/developers/docs/legal'
+                'ToS for bot devs':'https://discordapp.com/developers/docs/legal'},
         }
 
 infos_2={"membercount-0":"Total number of members",
@@ -337,7 +337,8 @@ modo={"slowmode-0":"The slowmode is now disabled in this channel.",
         "em-private":"[Restricted]",
         "em-list-title":"Emojis of the server {}",
         "tempmute-1":"The member {} has been silenced for the reason `{}`, for {}!",
-        "role-high":"Oops, this role is too high for me to change. Please move my role above the role `{}` before trying again :confused:"
+        "role-high":"Oops, this role is too high for me to change. Please move my role above the role `{}` before trying again :confused:",
+        'role-color':'The role {} has changed color!'
         }
 
 morpion={'user-begin':'{}, you begin!',

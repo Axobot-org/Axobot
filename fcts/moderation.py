@@ -580,16 +580,17 @@ You must be an administrator of this server to use this command."""
                 await ctx.send(await self.translate(ctx.guild.id,"modo","ban-list-error"))
 
 
-    @commands.group(name="emoji")
+    @commands.group(name="emoji",aliases=['emojis'])
     @commands.guild_only()
-    @commands.has_permissions(administrator=True)
     @commands.cooldown(5,20, commands.BucketType.guild)
     async def emoji_group(self,ctx):
         """Manage your emoji
         Administrator permission is required"""
-        return
+        if ctx.subcommand_passed==None:
+            await self.bot.cogs['HelpCog'].help_command(ctx,['emoji'])
 
     @emoji_group.command(name="rename")
+    @commands.has_permissions(administrator=True)
     async def emoji_rename(self,ctx,emoji:discord.Emoji,name):
         """Rename an emoji"""
         if emoji.guild != ctx.guild:
@@ -602,6 +603,7 @@ You must be an administrator of this server to use this command."""
         await ctx.send(str(await self.translate(ctx.guild.id,"modo","emoji-renamed")).format(emoji))
 
     @emoji_group.command(name="restrict")
+    @commands.has_permissions(administrator=True)
     async def emoji_restrict(self,ctx,emoji:discord.Emoji,*,roles):
         """Restrict the use of an emoji to certain roles"""
         if emoji.guild != ctx.guild:
@@ -626,21 +628,20 @@ You must be an administrator of this server to use this command."""
         await ctx.send(str(await self.translate(ctx.guild.id,"modo","emoji-valid")).format(emoji,", ".join([x.name for x in r])))
 
     @emoji_group.command(name="clear")
+    @commands.has_permissions(manage_messages=True)
     @commands.bot_has_permissions(manage_messages=True)
-    async def emoji_clear(self,ctx,message:int):
+    async def emoji_clear(self,ctx,message:discord.Message):
         """Remove all reactions under a message"""
-        try:
-            msg = await ctx.channel.fetch_message(message)
-        except discord.errors.NotFound:
-            return await ctx.send(await self.translate(ctx.guild.id,"modo","react-clear"))
-        except Exception as e:
-            return await ctx.send(str(await self.translate(ctx.guild.id,"modo","pin-error")).format(e))
-        await msg.clear_reactions()
+        if not ctx.channel.permissions_for(ctx.guild.me).manage_messages:
+            return await ctx.send(await self.translate(ctx.guild.id,'modo','need-manage-messages'))
+        await message.clear_reactions()
         await ctx.message.delete()
 
     @emoji_group.command(name="list")
     async def emoji_list(self,ctx):
         """List every emoji of your server"""
+        if not ctx.channel.permissions_for(ctx.guild.me).embed_links:
+            return await ctx.send(await self.translate(ctx.guild.id,"fun","no-embed-perm"))
         structure = await self.translate(ctx.guild.id,"modo","em-list")
         date = ctx.bot.cogs['TimeCog'].date
         lang = await self.translate(ctx.guild.id,"current_lang","current")
@@ -656,11 +657,9 @@ You must be an administrator of this server to use this command."""
                 for x in emotes[i:i+10]:
                     l.append(x)
                 fields.append({'name':"{}-{}".format(i+1,i+10 if i+10<nbr else nbr), 'value':"\n".join(l), 'inline':False})
-            if ctx.channel.permissions_for(ctx.guild.me).embed_links:
+            
                 embed = ctx.bot.cogs['EmbedCog'].Embed(title=title,fields=fields,color=self.bot.cogs["ServerCog"].embed_color).create_footer(ctx.author)
                 await ctx.send(embed=embed.discord_embed())
-            else:
-                await ctx.send(await self.translate(ctx.guild.id,"fun","no-embed-perms"))
         except Exception as e:
             await ctx.bot.cogs['ErrorsCog'].on_cmd_error(ctx,e)
 
@@ -669,7 +668,8 @@ You must be an administrator of this server to use this command."""
     @commands.guild_only()
     async def main_role(self,ctx):
         """A few commands to manage roles"""
-        pass
+        if ctx.subcommand_passed==None:
+            await self.bot.cogs['HelpCog'].help_command(ctx,['role'])
     
     @main_role.command(name="color",aliases=['colour'])
     @commands.has_permissions(manage_roles=True)
@@ -682,7 +682,7 @@ You must be an administrator of this server to use this command."""
             await ctx.send(str(await self.translate(ctx.guild.id,"modo","role-high")).format(role.name))
             return
         await role.edit(colour=color,reason="Asked by {}".format(ctx.author))
-        await ctx.send(role.name)
+        await ctx.send(str(await self.translate(ctx.guild.id,'modo','role-color')).format(role.name))
 
 
     @commands.command(name="pin")
