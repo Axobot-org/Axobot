@@ -616,7 +616,8 @@ class XPCog(commands.Cog):
     @commands.guild_only()
     async def rr_main(self,ctx):
         """Manage your roles rewards like a boss"""
-        pass
+        if ctx.subcommand_passed==None:
+            await self.bot.cogs['HelpCog'].help_command(ctx,['rr'])
     
     @rr_main.command(name="add")
     @commands.check(checks.can_manage_server)
@@ -641,6 +642,8 @@ class XPCog(commands.Cog):
     @commands.check(checks.can_manage_server)
     async def rr_list(self,ctx):
         """List every roles rewards of your server"""
+        if not ctx.channel.permissions_for(ctx.guild.me).embed_links:
+            return await ctx.send(await self.translate(ctx.guild.id,"fun","no-embed-perm"))
         try:
             l = await self.rr_list_role(ctx.guild.id)
         except Exception as e:
