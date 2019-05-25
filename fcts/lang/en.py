@@ -159,7 +159,13 @@ Have a nice day!""",
         "stats-title":"**Bot statistics**",
         "stats":"""**Bot version:** {bot_v} \n**Number of servers:** {s_count} \n**Number of visible members:** {m_count} ({b_count} **bots**)\n**Number of code lines:** {l_count}\n**Used languages:** {lang}\n**Python version :** {p_v} \n**Version of the `discord.py` lib:** {d_v} \n**Loading on the RAM:** {ram} GB \n**Loading on the CPU:** {cpu} % \n**API latency time:** {api} ms\n**Total of earned xp:** {xp}""",
         "admins-list":"The administrators of this bot are : {}",
-        "prefix":"List of currently usable prefixes:"
+        "prefix":"List of currently usable prefixes:",
+        'discordlinks':{'Servers status':'https://dis.gd/status',
+                'Discord ToS':'https://dis.gd/tos',
+                'Report a bug/ a user':'https://dis.gd/report',
+                'Suggest something to Discord':'https://dis.gd/feedback',
+                'Selfbots article':'https://support.discordapp.com/hc/articles/115002192352',
+                'ToS for bot devs':'https://discordapp.com/developers/docs/legal'
         }
 
 infos_2={"membercount-0":"Total number of members",

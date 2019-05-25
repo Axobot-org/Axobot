@@ -159,7 +159,13 @@ Bonne journée !""",
         "stats-title":"**Statistiques du bot**",
         "stats":"""**Version du bot :** {bot_v} \n**Nombre de serveurs :** {s_count} \n**Nombre de membres visibles :** {m_count} (dont {b_count} **bots**)\n**Nombre de lignes de code :** {l_count}\n**Langues utilisées :** {lang} \n**Version de Python :** {p_v} \n**Version de la bibliothèque `discord.py` :** {d_v} \n**Charge sur la mémoire vive :** {ram} GB \n**Charge sur le CPU :** {cpu} % \n**Temps de latence de l'api :** {api} ms\n**Nombre total d'xp gagné :** {xp}xp""",
         "admins-list":"Les administrateurs de ce bot sont : {}",
-        "prefix":"Liste des préfixes actuellement utilisables :"
+        "prefix":"Liste des préfixes actuellement utilisables :",
+        'discordlinks':{'Status des serveurs':'https://dis.gd/status',
+                'CGU de Discord':'https://dis.gd/tos',
+                'Rapporter un bug ou un utilisateur':'https://dis.gd/report',
+                'Proposer une idée à Discord':'https://dis.gd/feedback',
+                'Explication des selfbots':'https://support.discordapp.com/hc/articles/115002192352',
+                'CGU pour les développeurs de bot':'https://discordapp.com/developers/docs/legal'},
         }
 
 infos_2={"membercount-0":"Nombre de membres total",

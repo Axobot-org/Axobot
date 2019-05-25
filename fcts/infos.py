@@ -605,6 +605,20 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
             emb = ctx.bot.cogs['EmbedCog'].Embed(title=txt,desc=prefix,time=ctx.message.created_at,color=ctx.bot.cogs['HelpCog'].help_color).create_footer(ctx.author)
             return await ctx.send(embed=emb.discord_embed())
         await ctx.send(txt+"\n"+prefix)
+    
+    @commands.command(name="discordlinks",aliases=['discord','discordurls'])
+    async def discord_status(self,ctx):
+        """Get some useful links about Discord"""
+        can_embed = True if isinstance(ctx.channel,discord.DMChannel) else ctx.channel.permissions_for(ctx.guild.me).embed_links
+        if can_embed:
+            txt = "\n".join([f'[{k}]({v})' for k,v in (await self.translate(ctx.channel,'infos','discordlinks')).items()])
+            em = self.bot.cogs["EmbedCog"].Embed(desc=txt).update_timestamp().create_footer(ctx.author).discord_embed()
+            await ctx.send(embed=em)
+        else:
+            txt = "\n".join([f'• {k}: <{v}>' for k,v in (await self.translate(ctx.channel,'infos','discordlinks')).items()])
+            await ctx.send(txt)
+                
+
 
 def setup(bot):
     bot.add_cog(InfosCog(bot))

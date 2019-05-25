@@ -160,7 +160,14 @@ Has a nice dayz !""",
         "stats-title":"**Boat statz**",
         "stats":"""**Baut vershun:** {bot_v} \n**Nbr ov serverz:** {s_count} \n**Nbr ov visible memberz:** {m_count} ({b_count} **robots**)\n**Nbr ov code lin:** {l_count}\n**Uzd languages:** {lang}\n**Python vershun :** {p_v} \n**Vershun ov teh `discord.py` lyb:** {d_v} \n**Loadin on teh RAM:** {ram} GB \n**Loadin on the CPU:** {cpu} % \n**API latency timz:** {api} ms\n**Nbr of xp won:** {xp}""",
         "admins-list":"My super-cool admins are : {}",
-        "prefix":"List ov usable prefiXs:"
+        "prefix":"List ov usable prefiXs:",
+        'discordlinks':{'Servers status':'https://dis.gd/status',
+                'Discord ToS':'https://dis.gd/tos',
+                'Report a bug/ a user':'https://dis.gd/report',
+                'Suggest something to Discord':'https://dis.gd/feedback',
+                'Selfbots article':'https://support.discordapp.com/hc/articles/115002192352',
+                'ToS for bot devs':'https://discordapp.com/developers/docs/legal'
+        }
         }
 
 infos_2={"membercount-0":"Total nmber of membrz",
