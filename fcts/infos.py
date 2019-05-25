@@ -513,15 +513,32 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
         if s == None:
             await ctx.send(await self.translate(ctx.channel,"find","guild-0"))
             return
+        msglang = await self.translate(ctx.channel,'current_lang','current')
+        # Bots
         bots = len([x for x in s.members if x.bot])
+        # Lang
         lang = await ctx.bot.cogs["ServerCog"].find_staff(s.id,'language')
         if lang==None:
             lang = 'default'
         else:
             lang = ctx.bot.cogs['LangCog'].languages[lang]
+        # Roles rewards
+        rr_len = await self.bot.cogs['ServerCog'].find_staff(s.id,'rr_max_number')
+        rr_len = self.bot.cogs["ServerCog"].default_opt['rr_max_number'] if rr_len==None else rr_len
+        rr_len = '{}/{}'.format(len(await self.bot.cogs['XPCog'].rr_list_role(s.id)),rr_len)
+        # Prefix
         pref = self.bot.cogs['UtilitiesCog'].find_prefix(s)
+        # Rss
         rss_numb = len(await self.bot.cogs['RssCog'].get_guild_flows(s.id))
-        await ctx.send(str(await self.translate(ctx.channel,"find","guild-1")).format(s.name,s.id,s.owner,s.owner.id,len(s.members),bots,lang,pref,rss_numb))
+        await ctx.send(str(await self.translate(ctx.channel,"find","guild-1")).format(name=s.name,
+            id=s.id,
+            owner=s.owner,ownerid=s.owner.id,
+            join=await self.bot.cogs['TimeCog'].date(s.me.joined_at,msglang,year=True,digital=True),
+            members=len(s.members),bots=bots,
+            lang=lang,
+            prefix=pref,
+            rss=rss_numb,
+            rr=rr_len))
 
     @find_main.command(name='channel')
     async def find_channel(self,ctx,ID:int):
