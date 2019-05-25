@@ -11,8 +11,7 @@ class EmbedCog(commands.Cog):
 
 
     class Embed:
-        def __init__(self,content="",title="",desc="",url="",color=0,time=discord.Embed.Empty,footer_url="",footer_text="",thumbnail="",image="",author_name="",author_url="",author_icon="",fields=[]):
-            self.content = content
+        def __init__(self,title="",desc="",url="",color=0,time=discord.Embed.Empty,footer_url="",footer_text="",thumbnail="",image="",author_name="",author_url="",author_icon="",fields=[]):
             self.title = title
             self.description = desc
             self.url = url
@@ -70,8 +69,6 @@ class EmbedCog(commands.Cog):
                 emb["fields"] = self.fields
             if emb != {}:
                 j["embed"] = emb
-            if self.content != "":
-                j["content"] = self.content
             return j
 
         def set_author(self,user):
