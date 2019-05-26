@@ -34,3 +34,12 @@ If you can't use Discord and you really need to contact me, you can [send me an 
 ## LICENSE
 
 Such content is subject to a **MIT-type license**, which means that you are free to reuse such content for commercial or non-commercial purposes, provided that "**the copyright notice and the permission notice is included in all copies or substantial portions of the Software**". For more information, refer to the [LICENSE](https://github.com/ZRunner/ZBot/blob/v3/LICENSE) file in the source code.
+
+
+## Discord Bots Lists
+
+[![Discord Bots](https://discordbots.org/api/widget/486896267788812288.svg)](https://discordbots.org/bot/486896267788812288)
+
+[![Divine Discord Bots](https://divinediscordbots.com/api/widget/486896267788812288.svg)](https://divinediscordbots.com/bot/486896267788812288)
+
+[![Bots on Discord](https://bots.ondiscord.xyz/bots/486896267788812288/embed)](https://bots.ondiscord.xyz/bots/486896267788812288)
