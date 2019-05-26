@@ -183,7 +183,6 @@ def main():
             r.remove('')
         for e,s in enumerate(['user','password','host','database']):
             client.database_keys[s] = cryptage.uncrypte(r[e])
-        client.others['dbl_client'] = dbl.Client(client,cryptage.uncrypte(r[4]))
         client.others['divinediscordbots'] = cryptage.uncrypte(r[5])
         client.others['botsondiscord'] = cryptage.uncrypte(r[6])
     try:

@@ -303,9 +303,15 @@ class Events(commands.Cog):
     async def dbl_send_data(self):
         """Send guilds count to Discord Bots Lists"""
         self.bot.log.info("[DBL] Envoi des infos sur le nombre de guildes...")
+        session = aiohttp.ClientSession(loop=self.bot.loop)
         if not self.bot.beta:
             # https://discordbots.org/bot/486896267788812288
-            await self.bot.others['dbl_client'].post_server_count()
+            # await self.bot.others['dbl_client'].post_server_count()
+            payload = json.dumps({
+            'server_count': len(self.bot.guilds)
+            })
+            async with session.post('https://discordbots.org/api/bots/486896267788812288/stats',data=payload,headers={'Authorization':str(self.bot.dbl_token)}) as r:
+                js = await r.json()
         # https://divinediscordbots.com/bot/486896267788812288
         payload = json.dumps({
           'server_count': len(self.bot.guilds)
@@ -314,7 +320,6 @@ class Events(commands.Cog):
               'authorization': self.bot.others['divinediscordbots'],
               'content-type': 'application/json'
           }
-        session = aiohttp.ClientSession(loop=self.bot.loop)
         async with session.post('https://divinediscordbots.com/bot/{}/stats'.format(self.bot.user.id), data=payload, headers=headers) as resp:
               self.bot.log.debug('divinediscordbots statistics returned {} for {}'.format(resp.status, payload))
         # https://bots.ondiscord.xyz/bots/486896267788812288
