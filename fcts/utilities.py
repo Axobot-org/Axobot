@@ -131,7 +131,7 @@ class UtilitiesCog(commands.Cog):
                 item = await commands.CategoryChannelConverter().convert(ctx,name)
             except:
                 pass
-        elif Type == 'guild' and name.isnumeric():
+        elif (Type == 'guild' or Type == "server") and name.isnumeric():
             item = self.bot.get_guild(int(name))
         return item
 

@@ -3,7 +3,7 @@
 
 def check_libs():
     count = 0
-    for m in ["mysql","discord","frmc_lib","aiohttp","requests","re","asyncio","datetime","time","importlib","traceback","sys","logging","sympy","psutil","platform","subprocess",'json','emoji','imageio','platform','geocoder','tzwhere','pytz']:
+    for m in ["mysql","discord","frmc_lib","aiohttp","requests","re","asyncio","datetime","time","importlib","traceback","sys","logging","sympy","psutil","platform","subprocess",'json','emoji','imageio','platform','geocoder','tzwhere','pytz','dbl']:
         try:
             exec("import "+m)
             exec("del "+m)
@@ -22,6 +22,7 @@ if check_libs():
     from random import choice
     from discord.ext import commands
     from fcts import cryptage, tokens
+    import dbl
 else:
     import sys
     print("Fin de l'exécution")
@@ -75,7 +76,7 @@ class zbot(commands.bot.BotBase,discord.Client):
         self._cnx = [None,0]
         self.xp_enabled = True
         self.rss_enabled = True
-        self.fishes = 0
+        self.others = dict()
     
     @property
     def cnx(self):
@@ -164,7 +165,6 @@ def main():
                       'fcts.morpion',
                       'fcts.xp',
                       'fcts.users',
-                      'fcts.blurple'
     ]
     # Suppression du fichier debug.log s'il est trop volumineux
     if os.path.exists("debug.log"):
@@ -183,6 +183,9 @@ def main():
             r.remove('')
         for e,s in enumerate(['user','password','host','database']):
             client.database_keys[s] = cryptage.uncrypte(r[e])
+        client.others['dbl_client'] = dbl.Client(client,cryptage.uncrypte(r[4]))
+        client.others['divinediscordbots'] = cryptage.uncrypte(r[5])
+        client.others['botsondiscord'] = cryptage.uncrypte(r[6])
     try:
         cnx = mysql.connector.connect(user=client.database_keys['user'],password=client.database_keys['password'],host=client.database_keys['host'],database=client.database_keys['database'])
         cnx.close()

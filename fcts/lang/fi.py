@@ -10,7 +10,8 @@ activity={"rien":"Ei mitään",
         "watch":"katsoo"
         }
 
-admin={"change_game-0":"Valitse *play*, *watch*, *listen* tai *stream* seurattu nimellä",
+admin={
+        "change_game-0":"Valitse *play*, *watch*, *listen* tai *stream* seurattu nimellä",
         "msg_2-0":"Operaatio käynnissä...",
         "msg_2-1":"Ei vaikuttavia käyttäjiä",
         "msg_2-2":"1 vaikuttanut käyttäjä",
@@ -18,27 +19,27 @@ admin={"change_game-0":"Valitse *play*, *watch*, *listen* tai *stream* seurattu 
         "bug-0":"Bugi #{} ei löytynyt",
         "emergency":"Hätätilanne on havaittu tälle botille. Tämä saattaa olla koska joku yrittää päästä sisään minun koodiini.\n\
 Jotta voidaan välttää sattumia, Minut oli pakotettu lähtemään kaikilta servuilta heti, missä olin toivoen että ei ole liian myöhäistä.\n\
-Lisätietoja tästä hätätilaanteesta mene minun servulleni: https://discord.me/z_bot (Katso linkki dokumentistä jos linkki ei toimi enää: https://zbot.rtfd.io)"
+Lisätietoja tästä hätätilaanteesta mene minun servulleni: https://discord.me/z_bot (Katso linkki dokumenttiin jos linkki ei toimi enää: https://zbot.rtfd.io)"
         }
 
-aide={"no-subcmd":"Commandilla `{0.name}`ei ole sub-commandia",
+aide={"no-subcmd":"komenolla `{0.name}`ei ole toissijaista komentoa",
         "mods":['Valvoja:','toinen:'],
-        "footer":"Kirjoita {}help commandi lisätietoja tietystä commandista",
+        "footer":"Viestitä {}help komento niin saat lisätietoja tietyistä komennoista",
         "no-desc-cog":"Ei lisätietoja tästä cog:stä.",
-        "no-desc-cmd":"Ei lisätietoja tästä commandista.",
-        "cmd-not-found":"Commandia ei ole nimetty \"{}\"",
-        "subcmd-not-found":"Tällä commandilla ei ole subcommandia nimetty. \"{}\""
+        "no-desc-cmd":"Ei lisätietoja tästä komennosta.",
+        "cmd-not-found":"Komentoa  \"{}\" ei ole nimetty",
+        "subcmd-not-found":"Tällä komennolla ei ole toissijaista komentoa nimetty. \"{}\""
         }
 
 bvn={"aide":"""__**Tervetuloa liittymis & lähtö viesti moduuliin**__
-Tätä moduulia käytetään configuroimaan automaattinen viesti joka kerta kun joku tulee tai lähtee servultasi.
-__** Configuraatio**__
-`1-` Jotta voit configuroida mihin nämä viestit lähetetään, kirjoita `!config change welcome_channel`lisättynä kanava ID (Right clickkaa -> "Copy ID" tietokoneella,tai jatka painamista kanavaa -> "Copy ID" puhelimelle, mutta sinun pitää ensin ottaa käyttöön Developer muoto jotta saat tämän muodon).
-`2-` Jotta voit configuroida viestin, kirjoita  `!config change <welcome|leave> <message>`. Tälle viestille voit käyttää variableja:
+Tätä moduulia käytetään konfiguroimaan automaattinen viesti joka kerta kun joku tulee tai lähtee servultasi.
+__** Konfiguraatio**__
+`1-` Jotta voit konfiguroida mihin nämä viestit lähetetään, kirjoita `!config change welcome_channel`lisättynä kanava tunniste (Right klikkaa -> "Copy ID" tietokoneella,tai jatka painamista kanavaa -> "Kopioi tunniste" puhelimelle, mutta sinun pitää ensin ottaa käyttöön Developer muoto jotta saat tämän muodon).
+`2-` Jotta voit konfiguroida viestin, kirjoita  `!config change <welcome|leave> <message>`. Tälle viestille voit käyttää variableja:
  - `{user}` Tägää käyttäjän
  - `{server}` näyttää serverin nimen
  - `{owner}` näyttää serverin omistajan nimen
- - `{member_count}` näyttää tämän hetkisen käyttäjä määrän
+ - `{member_count}` näyttää tämänhetkisen käyttäjämäärän
 """}
 
 cases={"no-user":"Tämä on mahdotonta löytää tämä käyttäjä. :eyes:",
@@ -49,8 +50,7 @@ cases={"no-user":"Tämä on mahdotonta löytää tämä käyttäjä. :eyes:",
         "search-0":"**Käyttäjä:** {U}\n**Muoto:** {T}\n**Valvoja:** {M}\n**Päivämäärä:** {D}\n**Syy:** *{R}*",
         "search-1":"**Käyttäjä:** {U}\n**Serveri:** {G}\n**Muoto:** {T}\n**Valvoja:** {M}\n**Päivämäärä:** {D}\n**Syy:** *{R}*",
         'title-search':'Case #{}',
-        'no_database':"Jonkun ajan database alaskäynnin takia, tämä commandi on pois käytöstä"
-        }
+        'no_database':"Jonkun ajan database alas käynnin takia, tämä komento on pois käytöstä"}
 
 events={'mp-adv':"Sinä varmaan yrität kutsua minut tähän servuun? Jos tämä on oikein, en voi liittyä helpolla kutsu linkillä. Adminin täytyy käyttää minun omaa kutsu linkkiä, täällä:<https://bot.discord.io/zbot> :wink:"}
 
@@ -62,8 +62,7 @@ errors={"cooldown":"Olet jäähyllä tältä commandilta :confused: Please wait 
         "disabled":"Commandi {} on poissa käytöstä :confused:",
         "duration":"Aika `{}` on epäselvä",
         "rolenotfound":"On mahdotonta löytää rooli `{0}`",
-        "invalidcolor":"Väri `{0}` epäselvä"
-        }
+        "invalidcolor":"Väri `{0}` epäselvä"}
 
 find={"user-0":"nimi: {}\nID: {}",
         "user-1":"Nimi: {name}\nID: {id}\nPerks: {rangs}\nServers: {servers}\nOwner of: {own}\nLanguages: {lang}\nVoted? {vote}\nXP card: {card}",
@@ -72,138 +71,149 @@ find={"user-0":"nimi: {}\nID: {}",
         "guild-1":"Nimi: {}\nID: {}\nOmistaja: {} ({})\nKäyttäjät: {} Mukaan lukien {} bottia)\nKieli: {}\nEtuliite (prefix): `{}`",
         "chan-0":"kanavaa ei löytynyt",
         "chan-1":"Nimi : {}\nID: {}\nServeri: {} ({})",
-        "help":"Tämä commandi hyväksyy löytämään serverin tai salongin kaikista servereistä missä botti on. Voit myös etsiä Discord käyttäjän tiedot, siltikin vaikka jos hän ei ole minun kanssani serverissä!\
-Syntaksi tälle on `!find <user|channel|guild> <ID>`"
-        }
+        "help":"Tämä komento hyväksyy löytämään serverin tai salongin kaikista servereistä missä botti on. Voit myös etsiä Discord käyttäjän tiedot, siltikin vaikka jos hän ei ole minun kanssani serverissä!\
+Syntaksi tälle on `!find <user|channel|guild> <ID>`",
+        "role-0":"Role not found",
+        "role-1":"Name: {}\nID: {}\nGuild: {} ({})\nMembers number: {}\nColour: {}"}
 
 fun={"count-0":"Laskeminen on kesken...",
         "count-1":"Viimeiset {} lähetystä, olet lähettänyt {} viestiä ({}%)",
         "count-2":"Sinä haluat räjäyttää Discordin! {e} Selvien suorituskykyjen syyksi, Minä laitan rajotuksen {l} viestille.",
         "count-3":"Upsis, en pysty lukea tämän kanavan historiaa. Varmista minun luvat asetuksista...",
-        "fun-list":"Tässä on lista kaikista käytettävistä hauska commandeista:",
-        "no-fun":"Hauska commandit ovat kytketty pois käytöstä tällä serverillä. Näet listan niistä täältä: https://zbot.rtfd.io/en/v3/fun.html",
+        "fun-list":"Tässä on lista kaikista käytettävistä hauska komentoista:",
+        "no-fun":"Hauska komennot ovat kytketty pois käytöstä tällä serverillä. Näet listan niistä täältä: https://zbot.rtfd.io/en/v3/fun.html",
         "osekour":["Odota, minä olen kohta katsonut elokuvani.","Olemme tulossa! Mutta miksi et vastaa enää? Älä esitä kuollutta!","Kyllä, me tiedämme että siellä on tulipalo, meidän ei tarvitse tulla: Meillä on juhlat palokunnan talossa.","*Pelastus ei ole mahollinen, odota kunnes tämä tauko loppuu, kiitos*","*Tämä numero ei ole olemassa. Yritä uudelleen uudella numerolla.*","*Ylläpito on menossa. Yritä uudelleen 430 tunnin kuluttua.*","*Sinun puheaika on loppunut. Voit ostaa lisää puhe aikaa 86,25 eurolla!*","Kaksi lisää kappaletta Lord of the Ringsissä että olen lukenut tarpeeksi, ja sitten  minulla on aikaa! ","Kiitos että et häirinnyt meitä loman aikana","Anteeksi, täällä on enemmän kuin 3 lumihiutaletta: me olemme jumissa autotallissa","Meidän täytyy odottaa meidän jäähyn loppuun asti... Oletko sanomassa että et tiedä?! On ollut kaksi kuukautta kun aloitimme!"],
         "react-0":"En voinut löytää corresponding viestiä. Sinun täytyy lisätä viesti ID ensimmäiseen argumenttiin, ja emoji toiseen:upside_down:\n Katso myös että voin lukea kanavan viesti historiaa!",
         "thanos":["{0} oli jaettu Thanoksen kanssa","Thanos päätti muuttaa {0} tuhkiin. Ihmiskunnan hyväksi ...."],
         "piece-0":["Kruuna!","Klaava!"],
         "piece-1":"Epäonnistui, se tippu reunaan!",
+        "cookie":"{} offered a box of cookies to <@375598088850505728>! {}",
         "calc-0":"Vastauksessa kestää liian kauan ladata:/",
         "calc-1":"Laskennan ratkaisut `{}` ovat `{}`",
         "calc-2":"Laskennan ratkaisut `{c}` ovat `{l[0]}` and `{l[1]}`",
         "calc-3":"Laskennan ratkaisu `{}` on `{}`",
         "calc-4":"Laskulla `{}` ei ole ratkaisua",
-        "calc-5":"Upsis, error tuli: `{}`",
+        "calc-5":"Upsis, virhe tuli: `{}`",
         "no-reaction":"Mahdotonta lisätä reaktioita. Katso minun käyttöoikeudet...",
         "cant-react":"Minulla ei ole tarpeeksi käyttöoikeuksia lisätä reaktioita!",
         "no-emoji":"Mahdotonta löytää tämä emoji!",
-        "vote-0":"Sinä voit laittaa enemmän kuin 20 vaihtoehtoa, ja myös vähemmän negatiivisiä!",
+        "vote-0":"Sinä voit laittaa enemmän kuin 20 vaihtoehtoa, ja myös vähemmän negatiivisia!",
         "blame-0":"Lista kaikista käytettävistä nimistä**{}**:lle",
         "no-database":"As our database is offline, access to fun commands is restricted to people with permission \"Manage Server\"",
         "no-embed-perm":"Minulla ei ole käyttöoikeuksia \"Embed links\" :confused:",
-        "embed-error":"Error havaittu: `{}`",
+        "embed-error":"Virhe havaittu: `{}`",
         "invalid-city":"Pätemätön kaupunki :confused:",
+        "uninhabited-city":"Uninhabited city :confused:",
         "no-roll":"Ei vaihtoehtoa löydetty",
-        'no-say':"Unable to send any message in this channel",
+        'no-say':"En voi lähettää viestiä tälle kanavalle",
         'no-voicechan':'You must be in a vocal channel in order to use this command.',
-        'cant-stream':"Warning: You don't have enough permissions to make a video chat (Permission \"Stream\")."
+        'cant-stream':"Warning: You don't have enough permissions to make a video chat (Permission \"Stream\").",
+        "afk-no-perm":"Oops, I cannot change your nickname :confused:",
+        "afk-user-1":"This member is AFK, because {}",
+        "afk-user-2":"This user is AFK!",
+        "afk-done":"You are now AFK",
+        "unafk-done":"You aren't anymore AFK"
         }
 
 infos={"text-0":"""Moi! Olen {0} !
-Olen robotti joka voi tehä monia asioita: Valvontaa, pieniä pelejä, taso systeemi, tilastoja, ja monia muita hyödyttäviä commandeja (ja myös täysin turhia)! 
-Voit aloittaa viestittämällä `!help` tällä kanavalla niin näet kaikki käytettävissä olevat commandit, sitten `!config see` aikoo näyttää configuraatio muodot (nettisivua ollaan tekemässä). 
+Olen robotti joka voi tehdä monia asioita: Valvontaa, pieniä pelejä, taso systeemi, tilastoja, ja monia muita hyödyttäviä komentoja (ja myös täysin turhia)! 
+Voit aloittaa viestittämällä `!help` tällä kanavalla niin näet kaikki käytettävissä olevat komennot, sitten `!config see` aikoo näyttää konfiguraatio muodot (nettisivua ollaan tekemässä). 
 Kaikki jotka auttoivat minun tekeimsessä, minun omistaja ja minä haluamme kiittää Adri526, Awhikax, Jees1 (tämän kielen kääntäjä) ja Aragorn1202! Iso kiitos heille.
-:globe_with_meridians: Some links may be useful: 
+:globe_with_meridians: Jotain linkkejä jotka voivat auttaa: 
 :arrow_forward: Minun Discord palvelin: : http://discord.gg/N55zY88
 :arrow_forward: Linkki kutsua minut toiselle palvelimelle : <https://bot.discord.io/zbot>
-:arrow_forward: Bot documentti : <https://zbot.rtfd.io/>
-:arrow_forward: Minun tekijän Twitteri : <https://twitter.com/z_runnerr>
+:arrow_forward: Bot dokumentti : <https://zbot.rtfd.io/>
+:arrow_forward: Minun tekijän Twitter : <https://twitter.com/z_runnerr>
  Hyvää päivän jatkoa!""",
-        "docs":"Tässä on linkki botin documenttiin:",
+        "docs":"Tässä on linkki botin dokumenttiin:",
         "stats-title":"**Bot tilastot**",
         "stats":"""**Bot versio:** {bot_v} \n**Kaikkien palvelimien numero missä olen:** {s_count} \n**Numero kaikista näkyvistä jäsenistä:** {m_count} ({b_count} **botit**)\n**Numero koodi riveistä:** {l_count}\n**Käytettyjä kieliä:** {lang}\n** {p_v} \n**Versio `discord.py`stä:** {d_v} \n**Ladataan RAMia:** {ram} GB \n**Ladataan CPU:ssa:** {cpu} % \n**API viive aika:** {api} ms\n**Kaikki xp kerätty:** {xp}""",
         "admins-list":"Adminit tälle botille ovat : {}",
-        "prefix":"Lista kaikista käytettävissä olevista etuliitoista:"
-        }
+        "prefix":"Lista kaikista käytettävissä olevista etuliitoista:",
+        'discordlinks':{'Servers status':'https://dis.gd/status',
+                'Discord ToS':'https://dis.gd/tos',
+                'Report a bug/ a user':'https://dis.gd/report',
+                'Suggest something to Discord':'https://dis.gd/feedback',
+                'Selfbots article':'https://support.discordapp.com/hc/articles/115002192352',
+                'ToS for bot devs':'https://discordapp.com/developers/docs/legal'},}
 
 infos_2={"membercount-0":"Numero jäsenistä",
-        "membercount-1":"Numero boteista",
-        "membercount-2":"Numero ihmisistä",
-        "membercount-3":"Numero online jäsenistä",
-        "fish-1":"Numero kaloista"
-        }
+"membercount-1":"Numero boteista",
+"membercount-2":"Numero ihmisistä",
+"membercount-3":"Numero paikalla olevista jäsenistä",
+"fish-1":"Numero kaloista"}
 
 keywords={"depuis":"asti",
-        "nom":"nimi",
-        "online":"paikalla",
-        "idle":"toimeton",
-        "dnd":"älä häiritse",
-        "offline":"offline tilassa",
-        "oui":"kyllä",
-        "non":"ei",
-        "none":"ei yhtään",
-        "low":"alhainen",
-        "medium":"keskikokoinen",
-        "high":"ylhäinen",
-        "extreme":"äärimmäinen",
-        "aucune":"ei yhtään",
-        "membres":"members",
-        "subcmds":"Toissijainen komento",
-        "ghost":"Haamu",
-        "unknown":"Unknown"
-        }
+          "nom":"nimi",
+          "online":"paikalla",
+          "idle":"toimeton",
+          "dnd":"älä häiritse",
+          "offline":"offline tilassa",
+          "oui":"kyllä",
+          "non":"ei",
+          "none":"ei yhtään",
+          "low":"alhainen",
+          "medium":"keskikokoinen",
+          "high":"ylhäinen",
+          "extreme":"äärimmäinen",
+          "aucune":"ei yhtään",
+          "membres":"members",
+          "subcmds":"Toissijainen komento",
+          "ghost":"Haamu",
+          "unknown":"Tuntematon"
+          }
 
 kill={"list":["Jaahas, olet kuolemassa!",
-        "***PUM !*** {1} tippui ansaan, {0} viritti ansan !",
-        "Onneksi, maa oli pehmustettu tippumisen käyttäjältä {1} !",
-        "{0} Huusi \"Fus Roh Dah\" kun {1} oli kallion vieressä...",
-        "Et voi pysäyttää panoksia käsilläsi, {1}. :shrug:",
-        "Sinun pitää olla hissin __sisällä__, {1}. Ei __yläpuolella__...",
-        "{1} oli liian lähellä kaijuttimia monster rokki konsertissa.",
-        "Staying within 10 meters of an atomic explosion wasn't a good idea {1}...",
-        "Eii ! Tupla hypyt ei ole mahdollisia, {1} !",
-        "{1} imitated Icare... splash.",
-        "It's nice to have a portal gun {1}, but don't open portals above spades...",
-        "{1} died. Peace to his soul... :sneezing_face:",
-        "{0} tappoi {1}",
-        "{0} ampui käyttäjän {1}",
-        "Heippa {1} ! :ghost:",
-        "{1} saw a flying anvil fall... on his head :head_bandage:",
-        "{1} commit suicide after {0} has cut his connection",
-        "Caution {1} ! Fire burns :fire:",
-        "{1} fought zombies without shovel",
-        "{1} tried to hug a creeper",
-        "{1}, lava baths are hot, but lava burns...",
-        "{1} tried a rocket jump",
-        "You shouldn't listen to the pretty melody of the Lullaby, {1} :musical_note:",
-        "{2}.exe *has stopped working*"
-        ]}
+          "***PUM !*** {1} tippui ansaan, {0} viritti ansan !",
+          "Onneksi, maa oli pehmustettu tippumisen käyttäjältä {1} !",
+          "{0} Huusi \"Fus Roh Dah\" kun {1} oli kallion vieressä...",
+          "Et voi pysäyttää panoksia käsilläsi, {1}. :shrug:",
+          "Sinun pitää olla hissin __sisällä__, {1}. Ei __yläpuolella__...",
+          "{1} oli liian lähellä kaijuttimia monster rokki konsertissa.",
+          "Staying within 10 meters of an atomic explosion wasn't a good idea {1}...",
+          "Eii ! Tupla hypyt ei ole mahdollisia, {1} !",
+          "{1} imitated Icare... splash.",
+          "It's nice to have a portal gun {1}, but don't open portals above spades...",
+          "{1} died. Peace to his soul... :sneezing_face:",
+          "{0} tappoi {1}",
+          "{0} ampui käyttäjän {1}",
+          "Heippa {1} ! :ghost:",
+          "{1} näki alsin putouksen... hänen päähän päin :head_bandage:",
+          "{1} commit suicide after {0} has cut his connection",
+          "Huomio {1} ! Tuli palaa :fire:",
+          "{1} tappeli zombeja ilman lapiota",
+          "{1} yritti halata creepperiä",
+          "{1}, laava kylvyt on kuumia mutta, laava palaa...",
+          "{1} tried a rocket jump",
+          "Sinun ei kannattaisi kuunnella söpöä melodiaa keholaulusta, {1} :musical_note:",
+          "{2}.exe *On lakannut toimimasta*"
+          ]}
 
-logs={"slowmode-enabled":"Slowmode enabled in {channel} ({seconds}s)",
-        "slowmode-disabled":"Slowmode disabled in {channel}",
-        "clear":"{number} deleted messages in {channel}",
-        "kick":"{member} has been kicked (reason: {reason} | case #{case})",
-        "ban":"{member} has been banned (reason: {reason} | case #{case})",
-        "unban":"{member} is no more banned (reason: {reason})",
-        "mute-on":"{member} is now muted (reason : {reason} | case #{case})",
-        "mute-off":"{member} is no more muted",
-        "softban":"{member} has been 'softbanned' (reason: {reason} | case #{case})",
-        "warn":"{member} has been warned: {reason} (case #{case})",
-        "tempmute-on":"{member} is now muted for {duration} (reason : {reason} | case #{case})",
-        "d-autounmute":"automatic unmute",
-        "d-unmute":"unmuted by {}",
-        "d-invite":"Automod (Discord invite)",
-        "d-young":"Automod (too recent account)",
-        "d-gived_roles":"Automated action (config gived_roles)",
-        "d-memberchan":"Automated action (config membercount)"
-        }
+logs={"slowmode-enabled":"Hidastusmuoto on kytketty päälle kanavalla {channel} ({seconds}s)",
+"slowmode-disabled":"Hidastusmuoto on kytketty pois kanavalla {channel}",
+"clear":"{number} viestiä poistettu kanavalla {channel}",
+"kick":"{member} on potkittu (syyllä: {reason} | tapaus #{case})",
+"ban":"Käyttäjälle {member} on annettu porttikielto (syyllä: {reason} | keissi #{case})",
+"unban":"Käyttäjällä {member} ei ole enään porttikieltoa (syy: {reason})",
+"mute-on":"{member} on nyt mykistetty (syy : {reason} | tapaus #{case})",
+"mute-off":"{member} ei ole enään mykistetty",
+"softban":"{member} on väliäikaisesti potkittu (syy: {reason} | tapaus #{case})",
+"warn":"{member} on varoitettu: {reason} (tapaus #{case})",
+"tempmute-on":"{member} on nyt mykistetty, ajaksi {duration} (syy : {reason} | tapaus #{case})",
+"d-autounmute":"automaattinen mykistyksen poisto",
+"d-unmute":"mykistäjä {}",
+"d-invite":"Automaattinen valvoja (Discord kutsu linkki)",
+"d-young":"Automaattinen valvoja (liian uusi käyttäjä)",
+"d-gived_roles":"Automaattinen tapahtuma (configuraatio annettiin_roolit)",
+"d-memberchan":"Automaattinen tapahtuma (configuraatio käyttäjänlaskelma)"}
 
-mc={"contact-mail":"If you notice an error in the information provided, please contact me personally, or report the error directly [on the site](https://fr-minecraft.net).",
-        "serv-title":"Server information {}",
-        "serv-0":"Number of players",
-        "serv-1":"List of the first 20 players connected",
-        "serv-2":"List of online players",
+mc={"contact-mail":"Jos huomaat virheen annetuissa tiedoissa, ota minuun yhteyttä personaalisesti, tai ota yhteyttä tänne: [sivustolla](https://fr-minecraft.net).",
+        "serv-title":"Palvelin tiedot {}",
+        "serv-0":"Numero pelaajista",
+        "serv-1":"Lista 20 ensimmäisestä pealaajasta yhdistettynä",
+        "serv-2":"Lista paikalla olevista pelaajista",
         "serv-3":"Latency",
-        "serv-error":"Oops, an unknown error occurred. Please try again later :confused:",
+        "serv-error":"Ups, tuntematon virhe havaittu. Yritä uudelleen myöhemmin :confused:",
         "no-api":"Error: Unable to connect to API",
         "no-ping":"Error: Unable to ping this server",
         "success-add":"A message with server details {} has been added to the channel {} !",
@@ -220,20 +230,20 @@ mc={"contact-mail":"If you notice an error in the information provided, please c
         "no-cmd":"Unable to find this command",
         "no-adv":"Unable to find this advancement",
         "mojang_desc":{'minecraft.net':'Official Site',
-        'session.minecraft.net':'Multiplayer sessions (obsolete)',
-        'account.mojang.com':'Mojang account management site',
-        'authserver.mojang.com': "Authentication server",
-        'sessionserver.mojang.com':'Multiplayer sessions',
-        'api.mojang.com': "API service provided by Mojang",
-        'textures.minecraft.net':'Texture server (skin & capes)',
-        'mojang.com':'Official website'},
+          'session.minecraft.net':'Multiplayer sessions (obsolete)',
+          'account.mojang.com':'Mojang account management site',
+          'authserver.mojang.com': "Authentication server",
+          'sessionserver.mojang.com':'Multiplayer sessions',
+          'api.mojang.com': "API service provided by Mojang",
+          'textures.minecraft.net':'Texture server (skin & capes)',
+          'mojang.com':'Official website'},
         "dimensions":"Width: {d[0]}\nLength: {d[1]}\nHeight: {d[2]}",
         "entity-fields":('ID','Type','Health Points','Attack Points','Experience Points Released to Death','Preferred Biomes','Added in the version'),
         "block-fields":("ID","Stack size","Creative mod tab","Damage points","Durability","Tool able to destroy it","Mobs able to loot it","Added in the version"),
         "item-fields":('ID',"Size of a stack",'Creative mode tab','Damage points',"Durability points","Tool able to destroy it","Mobs able to drop this item","Added in the version"),
         "cmd-fields":("Name","Syntax","Examples","Added in the version"),
         "adv-fields":("Name","ID","Type","Action","Parent","Children","Added in the version"),
-        }
+          }
 
 modo={"slowmode-0":"The slowmode is now disabled in this channel.",
         "slowmode-1":"Impossible to set a frequency higher than two minutes",
@@ -294,23 +304,23 @@ modo={"slowmode-0":"The slowmode is now disabled in this channel.",
         "em-private":"[Restricted]",
         "em-list-title":"Emojis of the server {}",
         "tempmute-1":"The member {} has been silenced for the reason `{}`, for {}!",
-        "role-high":"Oops, this role is too high for me to change. Please move my role above the role `{}` before trying again :confused:"
+        "role-high":"Oops, this role is too high for me to change. Please move my role above the role `{}` before trying again :confused:",
+        'role-color':'The role {} has changed color!'
         }
 
-morpion={'user-begin':'{}, you begin!',
-        'bot-begin':"Let's go, I'll start!",
-        'tip':"\n*To play, simply type a number between 1 and 9, corresponding to the chosen case. I play the red, you play the blue*",
-        'nul':"Draw, no one won...",
-        'too-late':"You took too long to decide. Game over!",
-        'pion-1':"There's already a pawn on that cell!",
-        'pion-2':'Invalid input case',
-        'win-1':"Well done, {} won!",
-        'win-2':"I won! End of the game!",
-        'already-playing':"You already have a game in progress!"
-        }
+morpion={'user-begin':'{}, aloita sinä!',
+        'bot-begin':"Mennään, minä aloitan!",
+        'tip':"\n*Näin peli toimii, kirjoita numero yhden (1) ja yhdeksän (9) välistä, vastaavana valitsevaan tapaukseen. Minä pelaan punaista, sinä sinistä!*",
+        'nul':"Tasapeli, kukaan ei voittanut...",
+        'too-late':"Sinulla kesti liian kauan valita. Peli pelattu!",
+        'pion-1':"Siinä on jo pelinappula!",
+        'pion-2':'Pätemätön syöte tapaus',
+        'win-1':"Hyvin tehty, {} voitti!",
+        'win-2':"Minä voitin! Peli päättyi!",
+        'already-playing':"Sinulla on jo peli menossa!"}
 
-perms={"perms-0":"Member/role {} not found",
-        "perms-1":"**'{}' permissions:**\n\n"
+perms={"perms-0":"Jäsen/rooli {} ei löytynyt",
+        "perms-1":"**'{}' käyttöoikeudet:**\n\n"
         }
 
 rss={"yt-help":"To search for a youtube channel, you must enter the channel ID. You will find it at the end of the string url, it can be either the name, or a string of random characters. \
@@ -382,7 +392,7 @@ Link : {link}""",
         "text-success":"The text of the feed #{} has been modified!\n New text : \n```\n{}\n```",
         "invalid-flow":"This url is invalid (empty or inaccessible rss flow) :confused:",
         "research-timeout":"The web page took too long to answer, I had to interrupt the process :eyes:"
-        }
+}
 
 server={"config-help": "This command is mainly used to configure your server. By doing `!config see [option]` you will get \
 an overview of the current configurations, and server administrators can enter `!config change <option> role1, role2, role3...` \
@@ -445,86 +455,117 @@ server_desc={"prefix":"Current bot prefix: {}",
         "help_in_dm":"Send help message in Private Message? {}",
         "muted_role":"Used role to mute members : {}",
         "noxp_channels":"Channels where you can't get xp: {}",
-        "xp_type":"XP system used: {}"
-        }
+        "xp_type":"XP system used: {}"}
 
-stats_infos={"not-found":"Unable to find {N}",
-        "member-0":"Nickname",
-        "member-1":"Created at",
-        "member-2":"Joined at",
-        "member-3":"Arrival position",
-        "member-4":"Status",
-        "member-5":"Activity",
-        "member-6":"Administrator",
+stats_infos={"not-found":"Kyvytöntä löytää {N}",
+        "member-0":"Lempinimi",
+        "member-1":"Luotu",
+        "member-2":"Liittynyt",
+        "member-3":"Saapumis asento",
+        "member-4":"Tila",
+        "member-5":"Toiminta",
+        "member-6":"Järjestyksenvalvoja",
         "member-7":"Infractions",
-        "role-0":"ID",
-        "role-1":"Color",
-        "role-2":"Mentionable",
-        "role-3":"Number of members",
-        "role-4":"Displayed separately",
-        "role-5":"Hierarchical position",
-        "role-6":"Unique member with this role",
-        "user-0":"On this server?",
-        "emoji-0":"Animated",
-        "emoji-1":"Managed by Twitch",
-        "emoji-2":"String (for bots)",
-        "emoji-3":"Server which own it",
-        "textchan-0":"Category",
-        "textchan-1":"Description",
+        "role-0":"Tunniste",
+        "role-1":"Väri",
+        "role-2":"Voi mainita",
+        "role-3":"Jäsen numero",
+        "role-4":"Näkyy erikseen muista jäsenistä",
+        "role-5":"Arvojärjestyksen asento",
+         "role-6":"Ainutlaatuinen jäsen tällä roolilla",
+        "user-0":"Tällä palvelimella?",
+        "emoji-0":"Animoitu",
+        "emoji-1":"Twitchin hallinnossa",
+        "emoji-2":"Jänne (boteille)",
+        "emoji-3":"Palvelin joka omistaa sen",
+        "textchan-0":"Kategoria",
+        "textchan-1":"Kuvaus",
         "textchan-2":"NSFW",
-        "textchan-3":"Number of webhooks",
-        "textchan-4":":warning: Missing permissions !",
-        "textchan-5":"Channel",
-        "voicechan-0":"Vocal channel",
-        "guild-0":"Guild",
-        "guild-1":"Owner",
-        "guild-2":"Region",
-        "guild-3":"Text : {} | Vocal : {} ({} categories)",
-        "guild-4":"Online members",
-        "guild-5":"Number of emojis",
-        "guild-6":"Number of channels",
-        "guild-7":"{} including {} bots ({} connected)",
-        "guild-8":"Two-factor authentification",
-        "guild-9":"Security level",
-        "guild-10":"Time before being AFK",
-        "guild-11.1":"20 first roles (total {})",
-        "guild-11.2":"Roles list (total {})",
-        "guild-12":"Number of invites",
-        "inv-0":"URL link",
-        "inv-1":"Inviter",
-        "inv-2":"Uses",
-        "inv-3":"Time left",
-        "inv-4":"Invite",
-        "inv-5":"If information seems missing, it is unfortunately because Discord did not communicate it",
-        "categ-0":"Category",
-        "categ-1":"Position",
-        "categ-2":"Text : {} | Vocal : {}",
-        }
+        "textchan-3":"Numero verkkokoukuista",
+        "textchan-4":":warning: Käyttöoikeuksia puuttuu !",
+        "textchan-5":"Kanava",
+        "voicechan-0":"Ääni kanava",
+        "guild-0":"Palvelin",
+        "guild-1":"Omistaja",
+        "guild-2":"Maa alue",
+        "guild-3":"Teksti : {} | Ääni : {} ({} kategoriat)",
+        "guild-4":"Paikalla jäsenet",
+        "guild-5":"Numero emojeista",
+        "guild-6":"Numero kanavista",
+        "guild-7":"{} mukaan lukien {} botit ({} yhdistetty)",
+        "guild-8":"Kaksivaiheinen todennus",
+        "guild-9":"Turvallisuus taso",
+        "guild-10":"Aika ennen kun oli AFK",
+        "guild-11.1":"20 ensimmäistä roolia (yhteismäärä {})",
+        "guild-11.2":"Lista RooleistaRoles list (yhteismäärä {})",
+        "guild-12":"Numero kutsuista",
+        "inv-0":"URL linkki",
+        "inv-1":"Kutsuja",
+        "inv-2":"Käyttöjä",
+        "inv-3":"Aikaa jäljellä",
+        "inv-4":"Kutsu",
+        "inv-5":"Jos tietoa näyttää puuttuvan, valitettavasti se on koska Discord ei kommunikoi sitä",
+        "categ-0":"Kategoria",
+        "categ-1":"Asento",
+        "categ-2":"Teksti : {} | Ääni : {}",
+         }
 
-users = {'invalid-card':'This style is invalid. Here is the list of styles you can use: {}',
+users = {'invalid-card':'Tämä tyyli on pätemätön. Tässä on lista tyyleistä sinä voit käyttää: {}',
+        'list-cards':"Here is the list of available rank cards for you: {}",
         'missing-attach-files':'Oops, I\'m missing the permission to Attach Files :confused:',
         'changed-0':'Your xp card now uses the style {}',
         'changed-1':'Oops, an internal error occurred during the processing of the request. Try again later or contact support.',
-        'card-desc':"Here is an example of your xp card. You can enter the command `profile card <style>` to change the style\n*Your xp card will only refresh when you have won xp*"
-        }
+        'card-desc':"Here is an example of your xp card. You can enter the command `profile card <style>` to change the style\n*Your xp card will only refresh when you have won xp*"}
 
-xp = {'card-level':'LEVEL',
-        'card-rank':'RANK',
-        '1-no-xp':"You don't have any xp yet!",
-        '2-no-xp':"This member does not have any xp!",
-        "del-user":"<deleted user>",
-        "low-page":"I cannot display a negative page number!",
-        "high-page":"There are not that many pages!",
-        "top-title-1":"Global ranking",
-        "top-title-2":"Server ranking",
-        "top-name":"__Top {}-{} (page {}/{}):__",
-        "default_levelup":"Hey, {user} has just reached **level {level}**! Keep this way!",
-        "top-your":"Your rank",
-        'rr_list':"Roles rewards list",
-        'rr-added':"The role `{}` has been correctly added for level {} !",
-        'already-1-rr':"There is already a role configured for this level!",
-        'no-rr':"No role has been configured for this level",
-        'rr-removed':"No role will be given for level {} anymore",
+xp = {'card-level':'TASO',
+        'card-rank':'SIJA',
+        '1-no-xp':"Sinulla ei ole XP:tä vielä!",
+        '2-no-xp':"Tällä jäsenellä ei ole XP:tä!",
+        "del-user":"<poistettu käyttäjä>",
+        "low-page":"En voi näyttää negatiivista sivu numeroa!",
+        "high-page":"Ei ole noin monta sivua!",
+        "top-title-1":"Maailmanlaajuinen sijoitus",
+        "top-title-2":"Palvelin sijoitus",
+        "top-name":"__Top {}-{} (sivu {}/{}):__",
+        "default_levelup":["Hey, {user} has just reached **level {level}**! Keep this way!",
+        "Crossing to level {level}{user}. Attack and defense increased by 1."
+        "Thanks to this level {level}, you can finally use the legendary {random} user {user}",
+        "Speech level {level}, {user}. Be careful not to scream too loudly.",
+        "{user} is flying to the Top 1 with his level {level}!",
+        "But, wouldn't it be a new level for {user}? Level {level}!",
+        "Summoner {user} at level {level}. New champions to be won.",
+        "{user} evolves to **{user} level {level}!**",
+        "Thanks to your level {level}, you have a new point of competence {user}."
+        "You have gained {level} levels of experience {user}. Don't forget to use them before they're blown up by a creeper!"
+        "I wonder where I'm going to store the {level} of {user}. I'm going to end up with no more room for that many numbers...",
+        "Maybe you can finally get your souls back with your level {level}, {user}?",
+        "Don't forget to use the money earned from this level {level} to improve the ship, Captain {user}."
+        "You are now level {level}, but justice does not yet rule the city, {user}...",
+        "By dint of dying, you've gone beyond level {level}, {user}. Now, do that dungeon again and lower that boss."
+        "You may be a level {level}{user}, but you'll still get eaten by a deer. Anyway, no one will regret you.",
+        "Hey! Wake up {user}! You've gone up to level {level}! Hey!",
+        "{user} is level {level}, from eating mushrooms."
+        "You may be level {level}, but your princess is still in another castle. ",
+        "The force is more powerful in you {user}, now that you are level {level}.",
+        "By dodging these millions of infernal bullets, {user} has passed level {level}.",
+        "The virus resistance of {user} has increased to {level}. Try not to be eaten by a zombie anyway.",
+        "The assassin's discretion {user} has evolved to the level {level}. The brotherhood is counting on you.",
+        "Congratulations {user}, you are {level}. Remember to use {random} to keep improving.",
+        "Thanks to the level {level}, you can try to win {random} at the raffle, {user} !",
+        "Despite your level, it is dangerous to travel alone {user}! Take {random} !",
+        "Level {level} for {user}! {random} is available from the seller!",
+        "Bravo {user}! You are now level {level}! However, it is still necessary to climb to obtain {random} legendary rarity...",
+        "Houston, we have a problem. {user} has passed level {level}!!!!!",
+        "You see, the world is divided into two categories: those who levelup and those who don't levelup. You {user}, you levelup to level {level}!!!!",
+        "*May the level {level} be with you, {user}.*",
+        ],
+        "levelup-items":["this sword","this bow","this guitar","this dagger","this hammer","this banana","this portal gun","this mushroom","this shovel", "this shotgun","this magic wand"," this craft table"," this cow", "this window", "this wallpaper", "this emoji", "this bubble gun", "this wrench", "this hood", "this cap", "this bicorne", "this trident", "this lasso", "this purse", "this pin", "this bottle", "this tap", "this toilet","this bike", "this pizza", "this anvil", "this clothespin", "this spoon", "this cape", "this potion", "this pen", "this cushion", "this tractor", "this tea", "this balloon", "this sofa", "this caddy", "this barbecue", "this lightsaber","this pyjama", "this cookie", "this very", "this dragon", "these marshmallows", "these croquettes", "this grappling hook", "this yo-yo", "this demon", "this mechanical arm", "this hot chocolate", "these chips", "this French baguette", "this cheese", "this backpack", "this rock"],
+        "top-your":"Sinun sija",
+        'rr_list':"Rooli palkinto lista",
+        'rr-added':"Rooli `{}` on lisätty oikein tasolle {} !",
+        'already-1-rr':"Tälle tasolle on jo rooli konfiguroitu!",
+        'no-rr':"Ei roolia konfiguroitu tälle tasolle",
+        'rr-removed':"Ei roolia anneta tasolle {} enään",
         'too-many-rr':"You already have {} roles rewards, you can't add more!",
         'rr-reload':"{} updated roles / {} scanned members",
         'no-mee6':"Oops, you have configured the xp system to use the MEE6 system, but this bot is not in the server! Change the system type (`{}config change xp_type` followed by the system name), or invite MEE6 here."

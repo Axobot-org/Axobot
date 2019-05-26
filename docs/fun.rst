@@ -11,6 +11,16 @@ However, if too much fun bothers you, this option can be disabled at any time wi
 List of every command
 ---------------------
 
+AFK
+---
+
+**Syntax:** :code:`afk [reason]` or :code:`unafk`
+
+This command will be useful if you are often busy doing something while Discord is open. The principle is to put a tag[AFK] (which means Away From Keyboard) on you and notify anyone who tries to mention you. So there is a command to put you in AFK mode (the reason is optional, it will be indicated to people who are trying to mention you), and another command to exit AFK mode.
+
+.. note:: Note that even if the system is specific to each server (it works with your nickname), the reason is global: if you change the reason in one server, it will be effective on all other servers having you as AFK!
+
+
 Bigtext
 -------
 
@@ -36,15 +46,6 @@ You can access even more names by being on some secret servers! Enter the :code:
 
 .. warning:: ZBot needs "`Attach files <perms.html#attach-files>`_" permission to send its message. You're not gonna ask him to be angry without giving him permission to do it?
 
-Calc
-----
-
-**Syntax:** :code:`calc <operation>`
-
-If you love math like me, you probably have complicated calculations to make from time-to-time. Don't worry, ZBot can probably help you! Solving equations with an unidentified element, deriving functions, simplifying calculations.... If you don't understand what I'm talking about, don't worry, he also does additions and subtractions!
-
-To use a derivative function, just type :code:`derivate(...)`. Simple, isn't it?
-
 
 Count messages
 --------------
@@ -54,6 +55,7 @@ Count messages
 A nice little order that counts the number of messages in the history of this channel. The limit corresponds to the number of messages to study in the chat, 1000 by default. And since some very old chats can have a very many many many MANY many messages (yes, 5 times *many*), we have a set limit on the number of messages you wish to search. 
 
 .. warning:: It seems obvious, but the bot needs "`Read message history <perms.html#read-message-history>`_" permission to read the messages history...
+
 
 Congrats
 --------
@@ -68,7 +70,7 @@ This is a nice little gif to use when you want to congratulate your friend. And 
 Lmgtfy
 ------
 
-**Syntax:** :code:`lmgtfy <search>`
+**Syntax:** :code:`google <search>`
 
 Yes, that name is unpronounceable. On the other hand, commands are executed on written channels, not voice, so that's good. And, for use, refer to the website: "For all those people who find it more convenient to bother you with their question rather than search it for themselves."
 

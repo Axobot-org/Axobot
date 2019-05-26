@@ -1,4 +1,4 @@
-import discord, datetime, asyncio, logging, time, aiohttp
+import discord, datetime, asyncio, logging, time, aiohttp, json
 from discord.ext import commands, tasks
 
 
@@ -14,6 +14,7 @@ class Events(commands.Cog):
             pass
         self.file = "events"
         self.mee6_last_check = datetime.datetime.utcfromtimestamp(0)
+        self.dbl_last_sending = datetime.datetime.utcfromtimestamp(0)
         self.embed_colors = {"welcome":5301186,
         "mute":4868682,
         "kick":16730625,
@@ -73,6 +74,8 @@ class Events(commands.Cog):
                 pass
             except Exception as e:
                 await self.bot.cogs['ErrorsCog'].on_error(e,msg)
+            if len(msg.mentions)>0:
+                await self.bot.cogs['FunCog'].check_afk(msg)
         if msg.author.bot==False and await self.bot.cogs['AdminCog'].check_if_admin(msg.author) == False and msg.guild!=None:
             cond = True
             if self.bot.database_online:
@@ -263,6 +266,8 @@ class Events(commands.Cog):
                 await self.rss_loop()
             if int(d.hour)%4 == 0 and d.hour != self.mee6_last_check.hour:
                 await self.mee6_xp_loop()
+            if int(d.hour) == 0 and d.hour != self.dbl_last_sending.hour:
+                await self.dbl_send_data()
         except Exception as e:
             await self.bot.cogs['ErrorsCog'].on_error(e,None)
 
@@ -294,7 +299,35 @@ class Events(commands.Cog):
                     return
                 except Exception as e:
                     await self.bot.cogs['ErrorsCog'].on_error(e,None)
-        
+    
+    async def dbl_send_data(self):
+        """Send guilds count to Discord Bots Lists"""
+        self.bot.log.info("[DBL] Envoi des infos sur le nombre de guildes...")
+        if not self.bot.beta:
+            # https://discordbots.org/bot/486896267788812288
+            await self.bot.others['dbl_client'].post_server_count()
+        # https://divinediscordbots.com/bot/486896267788812288
+        payload = json.dumps({
+          'server_count': len(self.bot.guilds)
+          })
+        headers = {
+              'authorization': self.bot.others['divinediscordbots'],
+              'content-type': 'application/json'
+          }
+        session = aiohttp.ClientSession(loop=self.bot.loop)
+        async with session.post('https://divinediscordbots.com/bot/{}/stats'.format(self.bot.user.id), data=payload, headers=headers) as resp:
+              self.bot.log.debug('divinediscordbots statistics returned {} for {}'.format(resp.status, payload))
+        # https://bots.ondiscord.xyz/bots/486896267788812288
+        payload = json.dumps({
+          'guildCount': len(self.bot.guilds)
+          })
+        headers = {
+              'Authorization': self.bot.others['botsondiscord'],
+              'Content-Type': 'application/json'
+          }
+        async with session.post('https://bots.ondiscord.xyz/bot-api/bots/{}/guilds'.format(self.bot.user.id), data=payload, headers=headers) as resp:
+              self.bot.log.debug('BotsOnDiscord returned {} for {}'.format(resp.status, payload))
+        await session.close()
 
 def setup(bot):
     bot.add_cog(Events(bot))

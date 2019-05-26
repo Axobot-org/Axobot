@@ -42,6 +42,7 @@ class FunCog(commands.Cog):
         self.file = "fun"
         self.tz = tzwhere.tzwhere(forceTZ=True)
         self.last_roll = None
+        self.afk_guys = dict()
         try:
             self.translate = self.bot.cogs["LangCog"].tr
         except:
@@ -104,7 +105,7 @@ class FunCog(commands.Cog):
     async def roll(self,ctx,*,options):
         """Selects an option at random from a given list
         The options must be separated by a semicolon `;`"""
-        liste = [x.strip() for x in options.split(';')]
+        liste = [x for x in [x.strip() for x in options.split(';')] if len(x)>0]
         if len(liste)==0:
             return await ctx.send(await self.translate(ctx.channel,"fun","no-roll"))
         choosen = None
@@ -462,15 +463,55 @@ You can specify a verification limit by adding a number in argument"""
     @commands.cooldown(4, 50, type=commands.BucketType.guild)
     async def hour(self,ctx,*,city:str):
         """Get the hour of a city"""
+        if city.lower() in ['mee6','mee6land']:
+            return await ctx.send('**Mee6Land/MEE6**:\nEverytime (NoWhere)\n (Mee6Land - lat: unknown - long: unknown)')
         g = geocoder.arcgis(city)
         if not g.ok:
             return await ctx.send(await self.translate(ctx.channel,"fun","invalid-city"))
         timeZoneStr = self.tz.tzNameAt(g.json['lat'],g.json['lng'],forceTZ=True)
+        if timeZoneStr=='uninhabited':
+            return await ctx.send(await self.translate(ctx.channel,"fun","uninhabited-city"))
         timeZoneObj = timezone(timeZoneStr)
         d = datetime.datetime.now(timeZoneObj)
         format_d = await self.bot.cogs['TimeCog'].date(d,lang=await self.translate(ctx.channel,"current_lang","current"))
-        await ctx.send("**{}**:\n{} ({})".format(timeZoneStr,format_d,d.tzname()))
+        await ctx.send("**{}**:\n{} ({})\n ({} - lat: {} - long: {})".format(timeZoneStr,format_d,d.tzname(),g.current_result.address,round(g.json['lat'],2),round(g.json['lng'],2)))
 
+    @commands.command(name='afk')
+    @commands.check(is_fun_enabled)
+    @commands.guild_only()
+    async def afk(self,ctx,*,reason=""):
+        """Make you AFK
+        You'll get a nice nickname, because nicknames are cool, aren't they?"""
+        try:
+            if (not ctx.author.display_name.startswith(' [AFK]')) and len(ctx.author.display_name)<26:
+                await ctx.author.edit(nick=ctx.author.display_name+" [AFK]")
+                self.afk_guys[ctx.author.id] = reason
+                await ctx.send(await self.translate(ctx.guild.id,"fun","afk-done"))
+        except discord.errors.Forbidden:
+            return await ctx.send(await self.translate(ctx.guild.id,"fun","afk-no-perm"))
+    
+    @commands.command(name='unafk')
+    @commands.check(is_fun_enabled)
+    @commands.guild_only()
+    async def unafk(self,ctx):
+        """Remove you from the AFK system
+        Welcome back dude"""
+        try:
+            await ctx.author.edit(nick=ctx.author.display_name.replace(" [AFK]",''))
+            if ctx.author.id in self.afk_guys.keys():
+                del self.afk_guys[ctx.author.id]
+                await ctx.send(await self.translate(ctx.guild.id,"fun","unafk-done"))
+        except discord.errors.Forbidden:
+            return await ctx.send(await self.translate(ctx.guild.id,"fun","afk-no-perm"))
+    
+    async def check_afk(self,msg):
+        """Check if someone pinged is afk"""
+        for member in msg.mentions:
+            if member.display_name.endswith(' [AFK]') and member!=msg.author:
+                if member.id not in self.afk_guys or len(self.afk_guys[member.id])==0:
+                    await msg.channel.send(await self.translate(msg.guild.id,"fun","afk-user-2"))
+                else:
+                    await msg.channel.send(str(await self.translate(msg.guild.id,"fun","afk-user-1")).format(self.afk_guys[member.id]))
 
     @commands.command(name='embed',hidden=False)
     @commands.has_permissions(embed_links=True)
@@ -479,10 +520,10 @@ You can specify a verification limit by adding a number in argument"""
         Syntax: !embed key1=\"value 1\" key2=\"value 2\"
 
         Available keys:
-            - title: the title of the embed
-            - content: the text inside the box
+            - title: the title of the embed [256 characters]
+            - content: the text inside the box [2048 characters]
             - url: a well-formed url clickable via the title
-            - footer: a little text at the bottom of the box
+            - footer: a little text at the bottom of the box [90 characters]
             - image: a well-formed url redirects to an image
 
         If you want to use quotation marks in the texts, it is possible to escape them thanks to the backslash (`\\"`)
@@ -500,13 +541,13 @@ You can specify a verification limit by adding a number in argument"""
                 if e==len(arguments)-1:
                     continue
                 if a=='title=':
-                    k['title'] = arguments[e+1].replace("|¬017","\"")
+                    k['title'] = arguments[e+1].replace("|¬017","\"")[:255]
                 elif a=='content=':
                     k['content'] = arguments[e+1].replace("|¬017","\"")
                 elif a=='url=':
                     k['url'] = arguments[e+1].replace("|¬017","\"")
                 elif a=='footer=':
-                    k['footer'] = arguments[e+1].replace("|¬017","\"")
+                    k['footer'] = arguments[e+1].replace("|¬017","\"")[:90]
                 elif a=='image=':
                     k['image'] = arguments[e+1].replace("|¬017","\"")
         emb = ctx.bot.cogs["EmbedCog"].Embed(title=k['title'], desc=k['content'], url=k['url'],footer_text=k['footer'],thumbnail=k['image'],color=ctx.bot.cogs['ServerCog'].embed_color).update_timestamp().set_author(ctx.author)
@@ -515,6 +556,7 @@ You can specify a verification limit by adding a number in argument"""
         except Exception as e:
             await ctx.send(str(await self.translate(ctx.channel,"fun","embed-error")).format(e))
     
+
     @commands.command(name='camlink')
     @commands.guild_only()
     async def camlink(self,ctx):

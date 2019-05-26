@@ -41,6 +41,17 @@ blurple = {'check_intro':'{}, starting blurple img analys (Plz note dat this may
         'won-card':"WeeeeW very nice blurple pfp {}! so beauty-full that I decided to give U the card of xp blurple! You can use it by typing teh command `{}profile card blurple` {}"
         }
 
+blurple = {'check_intro':'{}, starting blurple img analys (Plz note dat this may take one or two while)',
+    'check_invalid':'{}, plz link a valid img URL',
+    'check_resized':"{}, img resized smaller 4 easier processing ({}s)",
+    'check_fields':["Total amount of Blurple","Blurple (rgb(114, 137, 218))","White (rgb(255, 255, 255))","Dark Blurple (rgb(78, 93, 148))","Blurple, White, Dark Blurple = Blurple, White, and Dark Blurple (respectively) \nBlack = Not Blurple, White, or Dark Blurple","A big love to **Rocked03** for his code :blue_heart: https://github.com/Rocked03/Blurplefied.git","Please note: Discord often reduces qualitey ov ur images, so the % may be slightly inaccurate. | Content requested by {}"],
+    'create_title':"Blurplefier - makes your img blurple!",
+    'create_footer_1':"Dis cool blurplefier is automated and therefore may not always give you da best result. | Content requested by {}",
+    'create_footer_2':"plz note that My dear blurplefier is automated and so may not always give you the best result :heart:. Disclaimer: This img is a gif, and the quality does not always turn out great. HOWEVER, da gif is quite often not as grainy as it appears in the preview lol | Content requested by {}",
+    'create_oops':"{}, whoops! It looks like this gif is tooooo big 2 upload. If U want, U can give it another go, but with a smaller version ov the img. Sorry about that!",
+    'won-card':"WeeeeW very nice blurple pfp {}! so beauty-full that I decided to give U the card of xp blurple! You can use it by typing teh command `{}profile card blurple` {}"
+    }
+
 bvn={"aide":"""__**Wilcom 2 teh join end leef mesg modul**__
 
 Dis modul is usd 2 configur a' automatic mesage each tiem membr enters or exits ur servr.
@@ -83,7 +94,7 @@ find={"user-0":"naym: {}\nID: {}",
         "user-1":"Naym: {name}\nID: {id}\nPerks: {rangs}\nServers: {servers}\nAuwner ov: {own}\nSpeak: {lang}\nNice guy? {vote}\nRank card bg: {card}",
         "user-2":"Usr not findz",
         "guild-0":"S3rvr not findz",
-        "guild-1":"Name: {}\nID: {}\nOwnr: {} ({})\nMmbr: {} ({} robots)\nSpeak {}\nPro-fix: `{}`",
+        "guild-1":"Name: {name}\nID: {id}\nOwnr: {owner} ({ownerid})\nJoinat: {join}\nMmbr: {members} ({bots} robots)\nSpeak {lang}\nPro-fix: `{prefix}\nRR nber: {rr}`",
         "chan-0":"chAnnel not foundz",
         "chan-1":"Nayme : {}\nID: {}\nServr: {} ({})",
         "help":"Dis commnd allowz 2 find a servr or a chnnel among all the servers on which'z teh bot. U can so seerch 4 a Discord usr's info, no mater if he sharez servr wif me!\nTeh syntax'z `!find <user|channel|guild> <ID>`",
@@ -118,10 +129,16 @@ fun={"count-0":"Countng in progrez...",
         "no-embed-perm":"I dont haz permishun 2 \"Embed links\" :confused:",
         "embed-error":"A' error went wrong: `{}`",
         "invalid-city":"Invalid place name :confused:",
+        "uninhabited-city":"Tish place have 0 inhabitant :upside_down:",
         "no-roll":"Hmm I don't see any choice lol",
         'no-say':"Unable 2 send any message in tish channel",
         'no-voicechan':'Wait, U forgot teh vocal channel? :eyes:',
-        'cant-stream':":warning: U don't have enough permissionz to do a video cat (Perm \"Stream\")."
+        'cant-stream':":warning: U don't have enough permissionz to do a video cat (Perm \"Stream\").",
+        "afk-no-perm":"Oops, I can't change Ur nickname :confused:",
+        "afk-user-1":"Taht member iz AFK, 'cuz {}",
+        "afk-user-2":"This usr is AFK!",
+        "afk-done":"U'r now AFK",
+        "unafk-done":"U'rn't anymore AFK"
         }
 
 infos={"text-0":"""Ho hi hello! I'm {0} !
@@ -142,7 +159,13 @@ Has a nice dayz !""",
         "stats-title":"**Boat statz**",
         "stats":"""**Baut vershun:** {bot_v} \n**Nbr ov serverz:** {s_count} \n**Nbr ov visible memberz:** {m_count} ({b_count} **robots**)\n**Nbr ov code lin:** {l_count}\n**Uzd languages:** {lang}\n**Python vershun :** {p_v} \n**Vershun ov teh `discord.py` lyb:** {d_v} \n**Loadin on teh RAM:** {ram} GB \n**Loadin on the CPU:** {cpu} % \n**API latency timz:** {api} ms\n**Nbr of xp won:** {xp}""",
         "admins-list":"My super-cool admins are : {}",
-        "prefix":"List ov usable prefiXs:"
+        "prefix":"List ov usable prefiXs:",
+        'discordlinks':{'Servers status':'https://dis.gd/status',
+                'Discord ToS':'https://dis.gd/tos',
+                'Report a bug/ a user':'https://dis.gd/report',
+                'Suggest something to Discord':'https://dis.gd/feedback',
+                'Selfbots article':'https://support.discordapp.com/hc/articles/115002192352',
+                'ToS for bot devs':'https://discordapp.com/developers/docs/legal'},
         }
 
 infos_2={"membercount-0":"Total nmber of membrz",
@@ -232,7 +255,7 @@ mc={"contact-mail":"If U notis an errrror in da info providd, plz contact my per
         "entity-help":"Dis cmd allows U to obtain info 'bout any Minekrahft entity. U can giv itz full or partial naym, in French or English, or even itz identifir. Just enter `!mc entity <name>`",
         "block-help":"This comand allows U to obt:a:in inforation on any Mine-craft bloc pleez. U can give itz full or partial name, in French r English, or evn itz identifier. Just enter `!mc block <name>`",
         "item-help":"Dis command allowz you to earn info 'bout any Minecraft itam. You can gave its full or partial nayme, in French r English, r even its identifier. Just entr `!mc item <name>`",
-        "cmd-help":"This comand a-laws yu to obtayn informtionz abut any Mynekrahft commandZ. Al u had 2 doo iz type `!mc entity <nom>`",
+        "cmd-help":"This comand a-laws yu to obtayn informtionz abut any Mynekrahft commandZ. Al u had 2 doo iz type `!mc command <nom>`",
         "adv-help":"Dis cmd provids informashunz 'bout any advanshement ov the gayme Minekraft. Simple entr the naime or teh identifer of thE advancemenZ.",
         "no-entity":"Unable 2 find this entity",
         "no-block":"Unable 2 found dis block",
@@ -314,7 +337,8 @@ modo={"slowmode-0":"Teh very-cold-mode is now disabld in this nize place.",
         "em-private":"[Restrictd]",
         "em-list-title":"Emojis of our super server",
         "tempmute-1":"Da member {} is muted 4 the raeson `{}`, for {}!",
-        "role-high":"Oops, tish role is 2 high for me to change. Move my role above the role `{}` be4 trying again, thx"
+        "role-high":"Oops, tish role is 2 high for me to change. Move my role above the role `{}` be4 trying again, thx",
+        'role-color':"Teh coulor of role {} haz bee'n changd!"
         }
 
 morpion={'user-begin':'{}, u begin!',
@@ -524,6 +548,7 @@ stats_infos={"not-found":"Unable 2 found {N}",
         }
 
 users = {'invalid-card':'Dat style iz no valid. But yop, her\'s styles u can use: {}',
+        'list-cards':"Her's da list of cards u can use: {}",
         'missing-attach-files':'Oops, I\'m missing the Attach Files perms :upside_down:',
         'changed-0':'Ur xp card naw use the style {}',
         'changed-1':'Oops, a wicked error occurrd during the process ov ur request. Try again later or contact these nice support guys.',
@@ -540,7 +565,39 @@ xp = {'card-level':'LVL',
         "top-title-1":"Global ranks",
         "top-title-2":"Servr rnk",
         "top-name":"__Bests {}-{} ({}/{}):__",
-        "default_levelup":"Weew, {user} has just got **lvl {level}**! What a smart guy!",
+        "default_levelup":["Hey, {user} has just reached **level {level}**! Keep this way!",
+                "Crossing to level {level}{user}. Attack and defense increased by 1."
+                "Thanks to this level {level}, you can finally use the legendary {random} user {user}",
+                "Speech level {level}, {user}. Be careful not to scream too loudly.",
+                "{user} is flying to the Top 1 with his level {level}!",
+                "But, wouldn't it be a new level for {user}? Level {level}!",
+                "Summoner {user} at level {level}. New champions to be won.",
+                "{user} evolves to **{user} level {level}!**",
+                "Thanks to your level {level}, you have a new point of competence {user}."
+                "You have gained {level} levels of experience {user}. Don't forget to use them before they're blown up by a creeper!"
+                "I wonder where I'm going to store the {level} of {user}. I'm going to end up with no more room for that many numbers...",
+                "Maybe you can finally get your souls back with your level {level}, {user}?",
+                "Don't forget to use the money earned from this level {level} to improve the ship, Captain {user}."
+                "You are now level {level}, but justice does not yet rule the city, {user}...",
+                "By dint of dying, you've gone beyond level {level}, {user}. Now, do that dungeon again and lower that boss."
+                "You may be a level {level}{user}, but you'll still get eaten by a deer. Anyway, no one will regret you.",
+                "Hey! Wake up {user}! You've gone up to level {level}! Hey!",
+                "{user} is level {level}, from eating mushrooms."
+                "You may be level {level}, but your princess is still in another castle. ",
+                "The force is more powerful in you {user}, now that you are level {level}.",
+                "By dodging these millions of infernal bullets, {user} has passed level {level}.",
+                "The virus resistance of {user} has increased to {level}. Try not to be eaten by a zombie anyway.",
+                "The assassin's discretion {user} has evolved to the level {level}. The brotherhood is counting on you.",
+                "Congratulations {user}, you are {level}. Remember to use {random} to keep improving.",
+                "Thanks to the level {level}, you can try to win {random} at the raffle, {user} !",
+                "Despite your level, it is dangerous to travel alone {user}! Take {random} !",
+                "Level {level} for {user}! {random} is available from the seller!",
+                "Bravo {user}! You are now level {level}! However, it is still necessary to climb to obtain {random} legendary rarity...",
+                "Houston, we have a problem. {user} has passed level {level}!!!!!",
+                "You see, the world is divided into two categories: those who levelup and those who don't levelup. You {user}, you levelup to level {level}!!!!",
+                "*May the level {level} be with you, {user}.*",
+                ],
+        "levelup-items":["this guitar","this dagger","this hammer","this banana","this portal gun","this mushroom","this magic wand"," this craft table"," this cow", "this window", "this wallpaper", "this emoji", "this bubble gun","this bicorne", "this trident","this toilet","this bike", "this pizza", "this anvil","this spoon", "this cape", "this cookie", "this pen","this tea", "this balloon", "this sofa", "this caddy", "this barbecue", "this lightsaber","this pyjama", "this cookie","this dragon", "these marshmallows", "these croquettes", "this cute cat", "this yo-yo", "this demon","this hot chocolate", "these chips", "this French baguette", "this cheese","this ball","tish wool pelota"],
         "top-your":"Ur rank",
         'rr_list':"Roles list ({}/{})",
         'rr-added':"Role `{}` haz been added 4 level {} !",

@@ -41,6 +41,17 @@ blurple = {'check_intro':'{}, starting blurple image analysis (Please note that 
         'won-card':"Wow! Very nice blurple picture {}! so beautiful that I decided to offer you the card of xp blurple! You can use it by typing the command `{}profile card blurple` {}"
         }
 
+blurple = {'check_intro':'{}, starting blurple image analysis (Please note that this may take a while)',
+    'check_invalid':'{}, please link a valid image URL',
+    'check_resized':"{}, image resized smaller for easier processing ({}s)",
+    'check_fields':["Total amount of Blurple","Blurple (rgb(114, 137, 218))","White (rgb(255, 255, 255))","Dark Blurple (rgb(78, 93, 148))","Blurple, White, Dark Blurple = Blurple, White, and Dark Blurple (respectively) \nBlack = Not Blurple, White, or Dark Blurple","A big thanks to **Rocked03** for his code :blue_heart: https://github.com/Rocked03/Blurplefied.git","Please note: Discord slightly reduces quality of the images, therefore the percentages may be slightly inaccurate. | Content requested by {}"],
+    'create_title':"Blurplefier - makes your image blurple!",
+    'create_footer_1':"Please note - This blurplefier is automated and therefore may not always give you the best result. | Content requested by {}",
+    'create_footer_2':"Please note - This blurplefier is automated and therefore may not always give you the best result. Disclaimer: This image is a gif, and the quality does not always turn out great. HOWEVER, the gif is quite often not as grainy as it appears in the preview | Content requested by {}",
+    'create_oops':"{}, whoops! It looks like this gif is too big to upload. If you want, you can give it another go, except with a smaller version of the image. Sorry about that!",
+    'won-card':"Wow! Very nice blurple picture {}! so beautiful that I decided to offer you the card of xp blurple! You can use it by typing the command `{}profile card blurple` {}"
+    }
+
 bvn={"aide":"""__**Welcome to the join & leave message module**__
 
 This module is used to configure an automatic message each time a member enters or exits your server.
@@ -83,7 +94,7 @@ find={"user-0":"name: {}\nID: {}",
         "user-1":"Name: {name}\nID: {id}\nPerks: {rangs}\nServers: {servers}\nOwner of: {own}\nLanguages: {lang}\nVoted? {vote}\nXP card: {card}",
         "user-2":"User not found",
         "guild-0":"Server not found",
-        "guild-1":"Name: {}\nID: {}\nOwner: {} ({})\nMembers: {} (including {} bots)\nLanguage: {}\nPrefix: `{}`\nRss feeds number: {}",
+        "guild-1":"Name: {name}\nID: {id}\nOwner: {owner} ({ownerid})\nJoined at: {join}\nMembers: {members} (including {bots} bots)\nLanguage: {lang}\nPrefix: `{prefix}`\nRss feeds number: {rss}\nRoles rewards numbers: {rr}",
         "chan-0":"Channel not found",
         "chan-1":"Name : {}\nID: {}\nServer: {} ({})",
         "help":"This command allows to find a server or a salon among all the servers on which is the bot. You can also search for a Discord user's information, no matter if he shares a server with me!\nThe syntax is `!find <user|channel|guild> <ID>`",
@@ -118,10 +129,16 @@ fun={"count-0":"Counting in progress...",
         "no-embed-perm":"I don't have permission to \"Embed links\" :confused:",
         "embed-error":"An error has occurred: `{}`",
         "invalid-city":"Invalid city :confused:",
+        "uninhabited-city":"Uninhabited city :confused:",
         "no-roll":"No choice found",
         'no-say':"Unable to send any message in this channel",
         'no-voicechan':'You must be in a vocal channel in order to use this command.',
-        'cant-stream':"Warning: You don't have enough permissions to make a video chat (Permission \"Stream\")."
+        'cant-stream':"Warning: You don't have enough permissions to make a video chat (Permission \"Stream\").",
+        "afk-no-perm":"Oops, I cannot change your nickname :confused:",
+        "afk-user-1":"This member is AFK, because {}",
+        "afk-user-2":"This user is AFK!",
+        "afk-done":"You are now AFK",
+        "unafk-done":"You aren't anymore AFK"
         }
 
 infos={"text-0":"""Hello! I'm {0} !
@@ -142,7 +159,13 @@ Have a nice day!""",
         "stats-title":"**Bot statistics**",
         "stats":"""**Bot version:** {bot_v} \n**Number of servers:** {s_count} \n**Number of visible members:** {m_count} ({b_count} **bots**)\n**Number of code lines:** {l_count}\n**Used languages:** {lang}\n**Python version :** {p_v} \n**Version of the `discord.py` lib:** {d_v} \n**Loading on the RAM:** {ram} GB \n**Loading on the CPU:** {cpu} % \n**API latency time:** {api} ms\n**Total of earned xp:** {xp}""",
         "admins-list":"The administrators of this bot are : {}",
-        "prefix":"List of currently usable prefixes:"
+        "prefix":"List of currently usable prefixes:",
+        'discordlinks':{'Servers status':'https://dis.gd/status',
+                'Discord ToS':'https://dis.gd/tos',
+                'Report a bug/ a user':'https://dis.gd/report',
+                'Suggest something to Discord':'https://dis.gd/feedback',
+                'Selfbots article':'https://support.discordapp.com/hc/articles/115002192352',
+                'ToS for bot devs':'https://discordapp.com/developers/docs/legal'},
         }
 
 infos_2={"membercount-0":"Total number of members",
@@ -232,7 +255,7 @@ mc={"contact-mail":"If you notice an error in the information provided, please c
         "entity-help":"This command allows you to obtain information about any Minecraft entity. You can give its full or partial name, in French or English, or even its identifier. Just enter `!mc entity <name>`",
         "block-help":"This command allows you to obtain information on any Minecraft block. You can give its full or partial name, in French or English, or even its identifier. Just enter `!mc block <name>`",
         "item-help":"This command allows you to obtain information on any Minecraft item. You can give its full or partial name, in French or English, or even its identifier. Just enter `!mc item <name>`",
-        "cmd-help":"This command allows you to obtain information about any Minecraft command. All you have to do is type `!mc entity <nom>`",
+        "cmd-help":"This command allows you to obtain information about any Minecraft command. All you have to do is type `!mc command <nom>`",
         "adv-help":"This command provides information about any advancement of the game Minecraft. Simply enter the name or the identifier of the advancement.",
         "no-entity":"Unable to find this entity",
         "no-block":"Unable to find this block",
@@ -314,7 +337,8 @@ modo={"slowmode-0":"The slowmode is now disabled in this channel.",
         "em-private":"[Restricted]",
         "em-list-title":"Emojis of the server {}",
         "tempmute-1":"The member {} has been silenced for the reason `{}`, for {}!",
-        "role-high":"Oops, this role is too high for me to change. Please move my role above the role `{}` before trying again :confused:"
+        "role-high":"Oops, this role is too high for me to change. Please move my role above the role `{}` before trying again :confused:",
+        'role-color':'The role {} has changed color!'
         }
 
 morpion={'user-begin':'{}, you begin!',
@@ -524,11 +548,12 @@ stats_infos={"not-found":"Unable to find {N}",
         }
 
 users = {'invalid-card':'This style is invalid. Here is the list of styles you can use: {}',
+        'list-cards':"Here is the list of available rank cards for you: {}",
         'missing-attach-files':'Oops, I\'m missing the permission to Attach Files :confused:',
         'changed-0':'Your xp card now uses the style {}',
         'changed-1':'Oops, an internal error occurred during the processing of the request. Try again later or contact support.',
         'card-desc':"Here is an example of your xp card. You can enter the command `profile card <style>` to change the style\n*Your xp card will only refresh when you have won xp*"
-                }
+        }
 
 xp = {'card-level':'LEVEL',
         'card-rank':'RANK',
@@ -540,7 +565,39 @@ xp = {'card-level':'LEVEL',
         "top-title-1":"Global ranking",
         "top-title-2":"Server ranking",
         "top-name":"__Top {}-{} (page {}/{}):__",
-        "default_levelup":"Hey, {user} has just reached **level {level}**! Keep this way!",
+        "default_levelup":["Hey, {user} has just reached **level {level}**! Keep this way!",
+                "Crossing to level {level}{user}. Attack and defense increased by 1."
+                "Thanks to this level {level}, you can finally use the legendary {random} user {user}",
+                "Speech level {level}, {user}. Be careful not to scream too loudly.",
+                "{user} is flying to the Top 1 with his level {level}!",
+                "But, wouldn't it be a new level for {user}? Level {level}!",
+                "Summoner {user} at level {level}. New champions to be won.",
+                "{user} evolves to **{user} level {level}!**",
+                "Thanks to your level {level}, you have a new point of competence {user}."
+                "You have gained {level} levels of experience {user}. Don't forget to use them before they're blown up by a creeper!"
+                "I wonder where I'm going to store the {level} of {user}. I'm going to end up with no more room for that many numbers...",
+                "Maybe you can finally get your souls back with your level {level}, {user}?",
+                "Don't forget to use the money earned from this level {level} to improve the ship, Captain {user}."
+                "You are now level {level}, but justice does not yet rule the city, {user}...",
+                "By dint of dying, you've gone beyond level {level}, {user}. Now, do that dungeon again and lower that boss."
+                "You may be a level {level}{user}, but you'll still get eaten by a deer. Anyway, no one will regret you.",
+                "Hey! Wake up {user}! You've gone up to level {level}! Hey!",
+                "{user} is level {level}, from eating mushrooms."
+                "You may be level {level}, but your princess is still in another castle. ",
+                "The force is more powerful in you {user}, now that you are level {level}.",
+                "By dodging these millions of infernal bullets, {user} has passed level {level}.",
+                "The virus resistance of {user} has increased to {level}. Try not to be eaten by a zombie anyway.",
+                "The assassin's discretion {user} has evolved to the level {level}. The brotherhood is counting on you.",
+                "Congratulations {user}, you are {level}. Remember to use {random} to keep improving.",
+                "Thanks to the level {level}, you can try to win {random} at the raffle, {user} !",
+                "Despite your level, it is dangerous to travel alone {user}! Take {random} !",
+                "Level {level} for {user}! {random} is available from the seller!",
+                "Bravo {user}! You are now level {level}! However, it is still necessary to climb to obtain {random} legendary rarity...",
+                "Houston, we have a problem. {user} has passed level {level}!!!!!",
+                "You see, the world is divided into two categories: those who levelup and those who don't levelup. You {user}, you levelup to level {level}!!!!",
+                "*May the level {level} be with you, {user}.*",
+                ],
+        "levelup-items":["this sword","this bow","this guitar","this dagger","this hammer","this banana","this portal gun","this mushroom","this shovel", "this shotgun","this magic wand"," this craft table"," this cow", "this window", "this wallpaper", "this emoji", "this bubble gun", "this wrench", "this hood", "this cap", "this bicorne", "this trident", "this lasso", "this purse", "this pin", "this bottle", "this tap", "this toilet","this bike", "this pizza", "this anvil", "this clothespin", "this spoon", "this cape", "this potion", "this pen", "this cushion", "this tractor", "this tea", "this balloon", "this sofa", "this caddy", "this barbecue", "this lightsaber","this pyjama", "this cookie", "this very", "this dragon", "these marshmallows", "these croquettes", "this grappling hook", "this yo-yo", "this demon", "this mechanical arm", "this hot chocolate", "these chips", "this French baguette", "this cheese", "this backpack", "this rock"],
         "top-your":"Your rank",
         'rr_list':"Roles rewards list ({}/{})",
         'rr-added':"The role `{}` has been correctly added for level {} !",

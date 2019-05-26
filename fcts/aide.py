@@ -63,7 +63,7 @@ If the bot can't send the new command format, it will try to send the old one.""
         async with ctx.channel.typing():
             destination = None
             if ctx.guild!=None:
-                if await self.bot.cogs["ServerCog"].find_staff(ctx.guild,'help_in_dm',channel=ctx.channel) == 1:
+                if await self.bot.cogs["ServerCog"].find_staff(ctx.guild,'help_in_dm') == 1:
                     destination = ctx.message.author.dm_channel
                     await self.bot.cogs["UtilitiesCog"].suppr(ctx.message)
                 else:
@@ -224,7 +224,7 @@ If the bot can't send the new command format, it will try to send the old one.""
 
     async def _default_help_command(self,ctx, commands=()):
         bot = ctx.bot
-        if await self.bot.cogs["ServerCog"].find_staff(ctx.guild,'help_in_dm',channel=ctx.channel) == 1:
+        if await self.bot.cogs["ServerCog"].find_staff(ctx.guild,'help_in_dm') == 1:
             destination = ctx.message.author
             await bot.cogs["UtilitiesCog"].suppr(ctx.message)
         else :
