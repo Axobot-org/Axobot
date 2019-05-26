@@ -94,8 +94,12 @@ class XPCog(commands.Cog):
             return
         text = await self.bot.cogs['ServerCog'].find_staff(msg.guild.id,'levelup_msg')
         if text==None or len(text)==0:
-            text = await self.translate(msg.guild.id,'xp','default_levelup')
-        await msg.channel.send(text.format_map(self.bot.SafeDict(user=msg.author.mention,level=lvl[0])))
+            text = random.choice(await self.bot.cogs['LangCog'].tr(msg.channel,'xp','default_levelup'))
+        if '{random}' in text:
+            item = random.choice(await self.bot.cogs['LangCog'].tr(msg.channel,'xp','levelup-items'))
+        else:
+            item = ''
+        await msg.channel.send(text.format_map(self.bot.SafeDict(user=msg.author.mention,level=lvl[0],random=item)))
         
     async def check_cmd(self,msg):
         """Vérifie si un message est une commande"""
