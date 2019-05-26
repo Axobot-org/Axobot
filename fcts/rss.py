@@ -1006,9 +1006,9 @@ class RssCog(commands.Cog):
         if not self.bot.database_online:
             self.bot.log.warn('Base de donnée hors ligne - check rss annulé')
             return
-        self.bot.log.info(await self.bot.cogs['TimeCog'].date(datetime.datetime.now(),digital=True)+" Boucle rss commencée !")
+        self.bot.log.info(" Boucle rss commencée !")
         await self.bot.cogs["RssCog"].main_loop()
-        self.bot.log.info(await self.bot.cogs['TimeCog'].date(datetime.datetime.now(),digital=True)+" Boucle rss terminée !")
+        self.bot.log.info(" Boucle rss terminée !")
 
     async def loop(self):
         await self.bot.wait_until_ready()
@@ -1035,7 +1035,7 @@ class RssCog(commands.Cog):
                 await ctx.send("Une boucle rss est déjà en cours !")
             else:
                 await ctx.send("Et hop ! Une itération de la boucle en cours !")
-                self.bot.log.info(await self.bot.cogs['TimeCog'].date(datetime.datetime.now(),digital=True)+" Boucle rss forcée")
+                self.bot.log.info(" Boucle rss forcée")
                 await self.main_loop()
     
     async def send_log(self,text):
