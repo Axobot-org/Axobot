@@ -94,11 +94,12 @@ class InfosCog(commands.Cog):
                     users = bots = 'unknown'
                 total_xp = await self.bot.cogs['XPCog'].bdd_total_xp()
                 d = str(await self.translate(ctx.channel,"infos","stats")).format(bot_v=bot_version,s_count=len_servers,m_count=users,b_count=bots,l_count=self.codelines,lang=langs_list,p_v=version,d_v=discord.__version__,ram=ram_cpu[0],cpu=ram_cpu[1],api=latency,xp=total_xp)
-                if datetime.datetime.today().day == 1:
-                    d += "\n**{}:** {}".format(await self.translate(ctx.channel,"infos_2",'fish-1'),self.bot.fishes)
+            if isinstance(ctx.channel,discord.DMChannel) or ctx.channel.permissions_for(ctx.guild.me).embed_links:
                 embed = ctx.bot.cogs['EmbedCog'].Embed(title=await self.translate(ctx.channel,"infos","stats-title"), color=ctx.bot.cogs['HelpCog'].help_color, time=ctx.message.created_at,desc=d,thumbnail=self.bot.user.avatar_url_as(format="png"))
                 embed.create_footer(ctx.author)
-            await ctx.send(embed=embed.discord_embed())
+                await ctx.send(embed=embed.discord_embed())
+            else:
+                await ctx.send(d)
         except Exception as e:
             await ctx.bot.cogs['ErrorsCog'].on_cmd_error(ctx,e)
 
