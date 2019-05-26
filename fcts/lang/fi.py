@@ -288,19 +288,19 @@ modo={"slowmode-0":"The slowmode is now disabled in this channel.",
     "role-high":"Oops, this role is too high for me to change. Please move my role above the role `{}` before trying again :confused:"
     }
 
-morpion={'user-begin':'{}, you begin!',
-        'bot-begin':"Let's go, I'll start!",
-        'tip':"\n*To play, simply type a number between 1 and 9, corresponding to the chosen case. I play the red, you play the blue*",
-        'nul':"Draw, no one won...",
-        'too-late':"You took too long to decide. Game over!",
-        'pion-1':"There's already a pawn on that cell!",
-        'pion-2':'Invalid input case',
-        'win-1':"Well done, {} won!",
-        'win-2':"I won! End of the game!",
-        'already-playing':"You already have a game in progress!"}
+morpion={'user-begin':'{}, aloita sinä!',
+        'bot-begin':"Mennään, minä aloitan!",
+        'tip':"\n*Näin peli toimii, kirjoita numero yhden (1) ja yhdeksän (9) välistä, vastaavana valitsevaan tapaukseen. Minä pelaan punaista, sinä sinistä!*",
+        'nul':"Tasapeli, kukaan ei voittanut...",
+        'too-late':"Sinulla kesti liian kauan valita. Peli pelattu!",
+        'pion-1':"Siinä on jo pelinappula!",
+        'pion-2':'Pätemätön syöte tapaus',
+        'win-1':"Hyvin tehty, {} voitti!",
+        'win-2':"Minä voitin! Peli päättyi!",
+        'already-playing':"Sinulla on jo peli menossa!"}
 
-perms={"perms-0":"Member/role {} not found",
-        "perms-1":"**'{}' permissions:**\n\n"
+perms={"perms-0":"Jäsen/rooli {} ei löytynyt",
+        "perms-1":"**'{}' käyttöoikeudet:**\n\n"
        }
 
 rss={"yt-help":"To search for a youtube channel, you must enter the channel ID. You will find it at the end of the string url, it can be either the name, or a string of random characters. \
@@ -486,7 +486,7 @@ stats_infos={"not-found":"Unable to find {N}",
             "categ-2":"Text : {} | Vocal : {}",
              }
 
-users = {'invalid-card':'This style is invalid. Here is the list of styles you can use: {}',
+users = {'invalid-card':'Tämä tyyli on pätemätön. Tässä on lista tyyleistä sinä voit käyttää: {}',
         'missing-attach-files':'Oops, I\'m missing the permission to Attach Files :confused:',
         'changed-0':'Your xp card now uses the style {}',
         'changed-1':'Oops, an internal error occurred during the processing of the request. Try again later or contact support.',
