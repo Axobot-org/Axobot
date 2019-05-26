@@ -566,23 +566,23 @@ xp = {'card-level':'LVL',
         "top-title-2":"Servr rnk",
         "top-name":"__Bests {}-{} ({}/{}):__",
         "default_levelup":["Hey, {user} has just reached **level {level}**! Keep this way!",
-                "Crossing to level {level}{user}. Attack and defense increased by 1."
+                "Crossing to level {level}{user}. Attack and defense increased by 1.",
                 "Thanks to this level {level}, you can finally use the legendary {random} user {user}",
                 "Speech level {level}, {user}. Be careful not to scream too loudly.",
                 "{user} is flying to the Top 1 with his level {level}!",
                 "But, wouldn't it be a new level for {user}? Level {level}!",
                 "Summoner {user} at level {level}. New champions to be won.",
                 "{user} evolves to **{user} level {level}!**",
-                "Thanks to your level {level}, you have a new point of competence {user}."
-                "You have gained {level} levels of experience {user}. Don't forget to use them before they're blown up by a creeper!"
+                "Thanks to your level {level}, you have a new point of competence {user}.",
+                "You have gained {level} levels of experience {user}. Don't forget to use them before they're blown up by a creeper!",
                 "I wonder where I'm going to store the {level} of {user}. I'm going to end up with no more room for that many numbers...",
                 "Maybe you can finally get your souls back with your level {level}, {user}?",
-                "Don't forget to use the money earned from this level {level} to improve the ship, Captain {user}."
+                "Don't forget to use the money earned from this level {level} to improve the ship, Captain {user}.",
                 "You are now level {level}, but justice does not yet rule the city, {user}...",
-                "By dint of dying, you've gone beyond level {level}, {user}. Now, do that dungeon again and lower that boss."
+                "By dint of dying, you've gone beyond level {level}, {user}. Now, do that dungeon again and lower that boss.",
                 "You may be a level {level}{user}, but you'll still get eaten by a deer. Anyway, no one will regret you.",
                 "Hey! Wake up {user}! You've gone up to level {level}! Hey!",
-                "{user} is level {level}, from eating mushrooms."
+                "{user} is level {level}, from eating mushrooms.",
                 "You may be level {level}, but your princess is still in another castle. ",
                 "The force is more powerful in you {user}, now that you are level {level}.",
                 "By dodging these millions of infernal bullets, {user} has passed level {level}.",

@@ -136,12 +136,12 @@ class XPCog(commands.Cog):
     async def calc_level(self,xp):
         """Calcule le niveau correspondant à un nombre d'xp"""
         if xp==0:
-            return [0,ceil(20*20**(353/647)*1**(1000/647)),0]
-        lvl = ceil(0.05*xp**0.647)
+            return [0,ceil((1*125/7)**(20/13)),0]
+        lvl = ceil(0.056*xp**0.65)
         next_step = xp
-        while ceil(0.05*next_step**0.647)==lvl:
+        while ceil(0.056*next_step**0.65)==lvl:
             next_step += 1
-        return [lvl,next_step,ceil(20*20**(353/647)*(lvl-1)**(1000/647))]
+        return [lvl,next_step,ceil(((lvl-1)*125/7)**(20/13))]
         # Niveau actuel - XP total pour le prochain niveau - XP total pour le niveau actuel
 
     async def give_rr(self,member:discord.Member,level:int,rr_list:list,remove=False):
