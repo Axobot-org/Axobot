@@ -511,11 +511,11 @@ stats_infos={"not-found":"Kyvytöntä löytää {N}",
          }
 
 users = {'invalid-card':'Tämä tyyli on pätemätön. Tässä on lista tyyleistä sinä voit käyttää: {}',
-        'list-cards':"Here is the list of available rank cards for you: {}",
-        'missing-attach-files':'Oops, I\'m missing the permission to Attach Files :confused:',
-        'changed-0':'Your xp card now uses the style {}',
-        'changed-1':'Oops, an internal error occurred during the processing of the request. Try again later or contact support.',
-        'card-desc':"Here is an example of your xp card. You can enter the command `profile card <style>` to change the style\n*Your xp card will only refresh when you have won xp*"}
+        'list-cards':"Tässä on lista kaikista tyyleistä sinä voit käyttää: {}",
+        'missing-attach-files':'Ups, minulta puuttuu käyttöoikeus: Liitä tiedostoja :confused:',
+        'changed-0':'Sinun XP kortti käyttää nyt tyyliä: {}',
+        'changed-1':'Ups, sisäinen virhe tapahtui pyynnön lähettämisessä. Yritä uudelleen myöhemmin tai ota yhteyttä tukeen.',
+        'card-desc':"Tässä on esimerkki sinun XP kortistasi. Jos haluat vaihtaa tyyliäsi voit viestittää komennon `profile card <tyyli>` *Sinun XP kortti aikoo päivittyä vain kun ole saanut XP:tä*"}
 
 xp = {'card-level':'TASO',
         'card-rank':'SIJA',
@@ -547,5 +547,5 @@ xp = {'card-level':'TASO',
         'rr-removed':"Ei roolia anneta tasolle {} enään",
         'too-many-rr':"Sinulla on jo {} rooli palkintoa, et voi lisätä lisää!",
         'rr-reload':"{} päivitti rooleja / {} skannasi jäsenet",
-        'no-mee6':"Ups, olet konfiguroinut XP Oops, you have configured the xp system to use the MEE6 system, but this bot is not in the server! Change the system type (`{}config change xp_type` followed by the system name), or invite MEE6 here."
+        'no-mee6':"Ups, olet konfiguroinut XP systeemin käyttämään MEE6 systeemiä, mutta MEE6 ei ole tällä palvelimella! Voit vaihtaa systeemin helposti viestittämällä (`{}config change xp_type` jonka perässä on systeemin nimi), tai kutsu MEE6 tälle palvelimelle."
         }
