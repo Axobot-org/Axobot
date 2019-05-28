@@ -515,7 +515,7 @@ users = {'invalid-card':'Tämä tyyli on pätemätön. Tässä on lista tyyleist
         'missing-attach-files':'Ups, minulta puuttuu käyttöoikeus: Liitä tiedostoja :confused:',
         'changed-0':'Sinun XP kortti käyttää nyt tyyliä: {}',
         'changed-1':'Ups, sisäinen virhe tapahtui pyynnön lähettämisessä. Yritä uudelleen myöhemmin tai ota yhteyttä tukeen.',
-        'card-desc':"Tässä on esimerkki sinun XP kortistasi. Jos haluat vaihtaa tyyliäsi voit viestittää komennon `profile card <tyyli>` *Sinun XP kortti aikoo päivittyä vain kun ole saanut XP:tä*"}
+        'card-desc':"Tässä on esimerkki sinun XP kortistasi. Jos haluat vaihtaa tyyliäsi voit viestittää komennon `profile card <style>` *Sinun XP kortti aikoo päivittyä vain kun ole saanut XP:tä*"}
 
 xp = {'card-level':'TASO',
         'card-rank':'SIJA',
