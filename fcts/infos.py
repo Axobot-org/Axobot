@@ -158,6 +158,8 @@ class InfosCog(commands.Cog):
 Available types: member, role, user, emoji, channel, server, invite, category"""
         if Type!=None and name==None and Type not in ["guild","server"]:
             raise commands.MissingRequiredArgument(self.infos.clean_params['name'])
+        if not ctx.channel.permissions_for(ctx.guild.me).embed_links:
+            return await ctx.send(await self.translate(ctx.guild.id,"fun","no-embed-perm"))
         try:
             lang = await self.translate(ctx.guild.id,"current_lang","current")
             find = self.bot.cogs['UtilitiesCog'].find_everything
@@ -263,9 +265,9 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
         else:
             hoist = await self.translate(ctx.guild.id,"keywords","non")
         embed = discord.Embed(colour=item.color, timestamp=ctx.message.created_at)
-        embed.set_author(name=str(item), icon_url=ctx.guild.icon_url_as(format='png'))
-        embed.set_footer(text='Requested by {}'.format(ctx.author.name), icon_url=ctx.author.avatar_url_as(format='png'))
-
+        embed.set_author(name=str(item), icon_url=ctx.guild.icon_url)
+        embed.set_footer(text='Requested by {}'.format(ctx.author.name), icon_url=ctx.author.avatar_url)
+ 
         embed.add_field(name=str(await self.translate(ctx.guild.id,"keywords","nom")).capitalize(), value=item.mention,inline=True)
         embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","role-0"), value=str(item.id),inline=True)
         embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","role-1"), value=str(item.color),inline=True)
@@ -355,8 +357,8 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
     async def voiceChannel_info(self,ctx,chan,lang):
         since = await self.translate(ctx.guild.id,"keywords","depuis")
         embed = discord.Embed(colour=default_color, timestamp=ctx.message.created_at)
-        embed.set_author(name="{} '{}'".format(await self.translate(ctx.guild.id,"stats_infos","voicechan-0"),chan.name), icon_url=ctx.guild.icon_url_as(format='png'))
-        embed.set_footer(text='Requested by {}'.format(ctx.author.name), icon_url=ctx.author.avatar_url_as(format='png'))
+        embed.set_author(name="{} '{}'".format(await self.translate(ctx.guild.id,"stats_infos","voicechan-0"),chan.name), icon_url=ctx.guild.icon_url)
+        embed.set_footer(text='Requested by {}'.format(ctx.author.name), icon_url=ctx.author.avatar_url)
 
         embed.add_field(name=str(await self.translate(ctx.guild.id,"keywords","nom")).capitalize(), value=chan.name,inline=True)
         embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","role-0"), value=str(chan.id))
@@ -376,9 +378,9 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
         else:
             a2f = await self.translate(ctx.guild.id,"keywords","non")
         embed = discord.Embed(colour=default_color, timestamp=ctx.message.created_at)
-        embed.set_author(name="{} '{}'".format(await self.translate(guild.id,"stats_infos","guild-0"),guild.name), icon_url=guild.icon_url_as(format='png'))
-        embed.set_footer(text='Requested by {}'.format(ctx.author.name), icon_url=ctx.author.avatar_url_as(format='png'))
-        embed.set_thumbnail(url=guild.icon_url_as(format='png'))
+        embed.set_author(name="{} '{}'".format(await self.translate(guild.id,"stats_infos","guild-0"),guild.name), icon_url=guild.icon_url)
+        embed.set_footer(text='Requested by {}'.format(ctx.author.name), icon_url=ctx.author.avatar_url)
+        embed.set_thumbnail(url=guild.icon_url)
 
         embed.add_field(name=str(await self.translate(ctx.guild.id,"keywords","nom")).capitalize(), value=guild.name,inline=True)
         embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","role-0"), value=str(guild.id))
@@ -419,8 +421,8 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
     async def invite_info(self,ctx,invite,lang):
         since = await self.translate(ctx.guild.id,"keywords","depuis")
         embed = discord.Embed(colour=default_color, timestamp=ctx.message.created_at,description=await self.translate(ctx.guild.id,"stats_infos","inv-5"))
-        embed.set_author(name="{} '{}'".format(await self.translate(ctx.guild.id,"stats_infos","inv-4"),invite.code), icon_url=ctx.guild.icon_url_as(format='png'))
-        embed.set_footer(text='Requested by {}'.format(ctx.author.name), icon_url=ctx.author.avatar_url_as(format='png'))
+        embed.set_author(name="{} '{}'".format(await self.translate(ctx.guild.id,"stats_infos","inv-4"),invite.code), icon_url=ctx.guild.icon_url)
+        embed.set_footer(text='Requested by {}'.format(ctx.author.name), icon_url=ctx.author.avatar_url)
 
         embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","inv-0"), value=invite.url,inline=True)
         embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","role-0"), value=str(invite.id))
@@ -436,7 +438,8 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
         if isinstance(invite.channel,(discord.PartialInviteChannel,discord.TextChannel)):
             embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","guild-0"), value=str(invite.guild.name))
             embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","textchan-5"), value="#"+str(invite.channel.name))
-            embed.set_thumbnail(url=invite.guild.icon_url_as(format='png'))
+            embed.set_thumbnail(url=invite.guild.icon_url)
+            embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","role-0"), value=str(invite.guild.id))
         if invite.created_at != None:
             embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","member-1"), value = "{} ({} {})".format(await self.timecog.date(invite.created_at,lang=lang,year=True),since,await self.timecog.time_delta(invite.created_at,datetime.datetime.now(),lang=lang,year=True,precision=0,hour=False)), inline=False)
         await ctx.send(embed=embed)
@@ -451,8 +454,8 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
             elif type(channel) == discord.VoiceChannel:
                 vchan +=1
         embed = discord.Embed(colour=default_color, timestamp=ctx.message.created_at)
-        embed.set_author(name="{} '{}'".format(await self.translate(ctx.guild.id,"stats_infos","categ-0"),categ.name), icon_url=ctx.guild.icon_url_as(format='png'))
-        embed.set_footer(text='Requested by {}'.format(ctx.author.name), icon_url=ctx.author.avatar_url_as(format='png'))
+        embed.set_author(name="{} '{}'".format(await self.translate(ctx.guild.id,"stats_infos","categ-0"),categ.name), icon_url=ctx.guild.icon_url)
+        embed.set_footer(text='Requested by {}'.format(ctx.author.name), icon_url=ctx.author.avatar_url)
 
         embed.add_field(name=str(await self.translate(ctx.guild.id,"keywords","nom")).capitalize(), value=categ.name,inline=True)
         embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","role-0"), value=str(categ.id))
