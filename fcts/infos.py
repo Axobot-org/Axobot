@@ -206,15 +206,15 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
     async def member_infos(self,ctx,item,lang,critical_info=False):
         since = await self.translate(ctx.guild.id,"keywords","depuis")
         if item.activity==None:
-            m_activity = await self.translate(ctx.guild.id,"activity","rien")
+            m_activity = str(await self.translate(ctx.guild.id,"activity","rien")).capitalize()
         elif item.activity.type==discord.ActivityType.playing:
-            m_activity = await self.translate(ctx.guild.id,"activity","play") + " " + item.activity.name
+            m_activity = str(await self.translate(ctx.guild.id,"activity","play")).capitalize() + " " + item.activity.name
         elif item.activity.type==discord.ActivityType.streaming:
-            m_activity = await self.translate(ctx.guild.id,"activity","stream") + " (" + item.activity.name + ")"
+            m_activity = str(await self.translate(ctx.guild.id,"activity","stream")).capitalize() + " (" + item.activity.name + ")"
         elif item.activity.type==discord.ActivityType.listening:
-            m_activity = await self.translate(ctx.guild.id,"activity","listen") + " " + item.activity.name
+            m_activity = str(await self.translate(ctx.guild.id,"activity","listen")).capitalize() + " " + item.activity.name
         elif item.activity.type==discord.ActivityType.watching:
-            m_activity = await self.translate(ctx.guild.id,"activity","watch") +" " + item.activity.name
+            m_activity = str(await self.translate(ctx.guild.id,"activity","watch")).capitalize() +" " + item.activity.name
         else:
             m_activity="Error"
         if item.bot:
@@ -243,7 +243,7 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
         embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","member-2"), value = "{} ({} {})".format(await self.timecog.date(item.joined_at,lang=lang,year=True),since,await self.timecog.time_delta(item.joined_at,datetime.datetime.now(),lang=lang,year=True,precision=0,hour=False)), inline=False)
         embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","member-3"), value = position,inline=True)
         embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","member-4"), value = str(await self.translate(ctx.guild.id,"keywords",str(item.status))).capitalize(),inline=True)
-        embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","member-5"), value = m_activity.capitalize(),inline=True)
+        embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","member-5"), value = m_activity,inline=True)
         embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","member-6"), value = admin.capitalize(),inline=True)
         if len(list_role)>0:
             embed.add_field(name="Roles [{}]".format(len(list_role)), value = ", ".join(list_role), inline=False)
