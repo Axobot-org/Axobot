@@ -453,9 +453,9 @@ server_desc={"prefix":"Current bot prefix: {}",
         "anti_raid":"Level of anti-raid protection: {} \n*([Documentation](https://zbot.rtfd.io/en/latest/moderator.html#anti-raid))*",
         "vote_emojis":"Emojis used for poll reactions: {}",
         "help_in_dm":"Send help message in Private Message? {}",
-        "muted_role":"Used role to mute members : {}",
-        "noxp_channels":"Channels where you can't get xp: {}",
-        "xp_type":"XP system used: {}"}
+        "muted_role":"Käytetty mykistys rooli : {}",
+        "noxp_channels":"Kanavat joilla et voi saada XP:tä: {}",
+        "xp_type":"XP systeemiä: {} käytetään nyt"}
 
 stats_infos={"not-found":"Kyvytöntä löytää {N}",
         "member-0":"Lempinimi",
