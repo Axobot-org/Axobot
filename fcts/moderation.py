@@ -294,6 +294,8 @@ class ModeratorCog(commands.Cog):
         if role == None:
             role = await self.configure_muted_role(ctx.guild)
             await ctx.send(await self.translate(ctx.guild.id,"modo","mute-created"))
+        if role == None:
+            await ctx.send(await self.translate(ctx.guild.id,"modo","error"))
         if role.position >= ctx.guild.me.roles[-1].position:
             await ctx.send(await self.translate(ctx.guild.id,"modo","mute-high"))
             return
@@ -807,6 +809,8 @@ ID corresponds to the Identifier of the message"""
                 count = 0
                 category,channelslist = x[0],x[1]
                 for channel in channelslist:
+                    if channel==None:
+                        continue
                     if len(channel.changed_roles)!=0 and channel.changed_roles!=category.changed_roles:
                         await channel.set_permissions(role,send_messages=False)
                         for r in channel.changed_roles:
