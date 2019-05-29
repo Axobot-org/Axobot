@@ -716,7 +716,11 @@ class RssCog(commands.Cog):
                 rt = None
                 if author.replace('@','') not in url:
                     rt = url.split("=")[1]
-                obj = self.rssMessage(bot=self.bot,Type='tw',url=feed['link'],title=feed['title'],emojis=self.bot.cogs['EmojiCog'].customEmojis,date=feed['published_parsed'],author=author,retweeted_by=rt,channel= feeds.feed['title'])
+                if r != None:
+                    t = feed['title'].replace(r.group(1),'')
+                else:
+                    t = feed['title']
+                obj = self.rssMessage(bot=self.bot,Type='tw',url=feed['link'],title=t,emojis=self.bot.cogs['EmojiCog'].customEmojis,date=feed['published_parsed'],author=author,retweeted_by=rt,channel= feeds.feed['title'])
                 liste.append(obj)
             liste.reverse()
             return liste
