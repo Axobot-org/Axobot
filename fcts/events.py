@@ -199,6 +199,7 @@ class Events(commands.Cog):
 
 
     async def check_tasks(self):
+        await self.bot.wait_until_ready()
         tasks = await self.get_events_from_db()
         if len(tasks)==0:
             return
@@ -266,7 +267,7 @@ class Events(commands.Cog):
                 await self.rss_loop()
             if int(d.hour)%4 == 0 and d.hour != self.mee6_last_check.hour:
                 await self.mee6_xp_loop()
-            if int(d.hour) == 0 and d.hour != self.dbl_last_sending.hour:
+            if int(d.hour) == 0 and d.day != self.dbl_last_sending.day:
                 await self.dbl_send_data()
         except Exception as e:
             await self.bot.cogs['ErrorsCog'].on_error(e,None)
@@ -286,32 +287,39 @@ class Events(commands.Cog):
 
     async def mee6_xp_loop(self):
         """Check roles rewards for every server which use MEE6 xp system"""
+        t = time.time()
+        counts = [0,0]
         self.mee6_last_check = datetime.datetime.now()
         l = await self.bot.cogs['ServerCog'].get_server(columns=['ID','xp_type'],criters=['xp_type=1'])
         self.bot.log.info(f"[mee6-rewards] Lancement du check pour {len(l)} serveurs")
         for guild in l:
             g = self.bot.get_guild(guild['ID'])
             if g!=None:
+                counts[0] += 1
                 try:
-                    await self.bot.cogs['XPCog'].mee6_reload_rr(g)
+                    counts[1] += await self.bot.cogs['XPCog'].mee6_reload_rr(g)
                 except aiohttp.client_exceptions.ContentTypeError:
                     await self.bot.cogs['ErrorsCog'].on_error(e,None)
                     return
                 except Exception as e:
                     await self.bot.cogs['ErrorsCog'].on_error(e,None)
+        emb = self.bot.cogs["EmbedCog"].Embed(desc='**MEE6 rewards** updated in {}s ({} guilds / {} roles given)'.format(round(time.time()-t,3),counts[0],counts[1]),color=6476789).update_timestamp().set_author(self.bot.user)
+        await self.bot.cogs["EmbedCog"].send([emb],url="https://discordapp.com/api/webhooks/509079297353449492/1KlokgfF7vxRK37pHd15UjdxJSa5H9yzbOLAaRjYEQK7XIdjfMp9PCnER1-Dfz0PBSaM")
     
     async def dbl_send_data(self):
         """Send guilds count to Discord Bots Lists"""
+        t = time.time()
+        answers = ['None','None','None']
         self.bot.log.info("[DBL] Envoi des infos sur le nombre de guildes...")
         session = aiohttp.ClientSession(loop=self.bot.loop)
         if not self.bot.beta:
             # https://discordbots.org/bot/486896267788812288
-            # await self.bot.others['dbl_client'].post_server_count()
             payload = json.dumps({
             'server_count': len(self.bot.guilds)
             })
-            async with session.post('https://discordbots.org/api/bots/486896267788812288/stats',data=payload,headers={'Authorization':str(self.bot.dbl_token)}) as r:
-                js = await r.json()
+            async with session.post('https://discordbots.org/api/bots/486896267788812288/stats',data=payload,headers={'Authorization':str(self.bot.dbl_token)}) as resp:
+                self.bot.log.debug('discordbots.org returned {} for {}'.format(resp.status, payload))
+                answers[0] = resp.status
         # https://divinediscordbots.com/bot/486896267788812288
         payload = json.dumps({
           'server_count': len(self.bot.guilds)
@@ -322,6 +330,7 @@ class Events(commands.Cog):
           }
         async with session.post('https://divinediscordbots.com/bot/{}/stats'.format(self.bot.user.id), data=payload, headers=headers) as resp:
               self.bot.log.debug('divinediscordbots statistics returned {} for {}'.format(resp.status, payload))
+              answers[1] = resp.status
         # https://bots.ondiscord.xyz/bots/486896267788812288
         payload = json.dumps({
           'guildCount': len(self.bot.guilds)
@@ -332,7 +341,10 @@ class Events(commands.Cog):
           }
         async with session.post('https://bots.ondiscord.xyz/bot-api/bots/{}/guilds'.format(self.bot.user.id), data=payload, headers=headers) as resp:
               self.bot.log.debug('BotsOnDiscord returned {} for {}'.format(resp.status, payload))
+              answers[2] = resp.status
         await session.close()
+        emb = self.bot.cogs["EmbedCog"].Embed(desc='**Guilds count updated** in {}s ({})'.format(round(time.time()-t,3),'-'.join(answers)),color=7229109).update_timestamp().set_author(self.bot.user)
+        await self.bot.cogs["EmbedCog"].send([emb],url="https://discordapp.com/api/webhooks/509079297353449492/1KlokgfF7vxRK37pHd15UjdxJSa5H9yzbOLAaRjYEQK7XIdjfMp9PCnER1-Dfz0PBSaM")
 
 def setup(bot):
     bot.add_cog(Events(bot))
