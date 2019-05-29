@@ -314,9 +314,7 @@ class Events(commands.Cog):
         session = aiohttp.ClientSession(loop=self.bot.loop)
         if not self.bot.beta:
             # https://discordbots.org/bot/486896267788812288
-            payload = json.dumps({
-            'server_count': len(self.bot.guilds)
-            })
+            payload = {'server_count': len(self.bot.guilds)}
             async with session.post('https://discordbots.org/api/bots/486896267788812288/stats',data=payload,headers={'Authorization':str(self.bot.dbl_token)}) as resp:
                 self.bot.log.debug('discordbots.org returned {} for {}'.format(resp.status, payload))
                 answers[0] = resp.status
