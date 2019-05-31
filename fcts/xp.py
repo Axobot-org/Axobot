@@ -179,6 +179,8 @@ class XPCog(commands.Cog):
     async def bdd_set_xp(self,userID,points,Type='add'):
         """Ajoute/reset de l'xp à un utilisateur dans la database générale"""
         try:
+            if points==0:
+                return True
             cnx = self.bot.cnx
             cursor = cnx.cursor(dictionary = True)
             if Type=='add':
