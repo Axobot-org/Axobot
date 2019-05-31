@@ -52,13 +52,46 @@ class PartnerCog(commands.Cog):
         except Exception as e:
             await self.bot.cogs['ErrorsCog'].on_error(e,None)
     
+    async def bdd_get_partnered(self,invites:list):
+        """Return every guilds which has this one as partner"""
+        try:
+            cnx = self.bot.cnx
+            cursor = cnx.cursor(dictionary = True)
+            query = ("SELECT * FROM `{}` WHERE `type`='guild' AND ({})".format(self.table," OR ".join([f"`target`='{x.code}'" for x in invites])))
+            cursor.execute(query)
+            liste = list()
+            for x in cursor:
+                liste.append(x)
+            cursor.close()
+            return liste
+        except Exception as e:
+            await self.bot.cogs['ErrorsCog'].on_error(e,None)
+    
     async def bdd_set_partner(self,guildID:int,partnerID:str,partnerType:str):
-        """Ajoute un partenaire à un serveur"""
+        """Add a partner into a server"""
         try:
             ID = await self.generate_id()
             cnx = self.bot.cnx
             cursor = cnx.cursor(dictionary = True)
             query = ("INSERT INTO `{table}` (`ID`,`guild`,`target`,`type`) VALUES ('{id}','{guild}','{target}','{type}');".format(table=self.table,id=ID,guild=guildID,target=partnerID,type=partnerType))
+            cursor.execute(query)
+            cnx.commit()
+            cursor.close()
+            return True
+        except Exception as e:
+            await self.bot.cogs['ErrorsCog'].on_error(e,None)
+            return False
+    
+    async def bdd_edit_partner(self,partnerID:str,target:str=None,desc:str=None):
+        """Modify a partner"""
+        try:
+            cnx = self.bot.cnx
+            cursor = cnx.cursor(dictionary = True)
+            query = ""
+            if target!=None:
+                query += ("UPDATE `{table}` SET `target` = \"{target}\" WHERE `ID` = {id};".format(table=self.table,target=target,id=partnerID))
+            if desc!=None:
+                query += ("UPDATE `{table}` SET `description` = \"{desc}\" WHERE `ID` = {id};".format(table=self.table,desc=desc.replace('"','\"'),id=partnerID))
             cursor.execute(query)
             cnx.commit()
             cursor.close()
@@ -111,6 +144,20 @@ class PartnerCog(commands.Cog):
         await self.bdd_set_partner(guildID=ctx.guild.id,partnerID=item.id,partnerType=Type)
         await ctx.send("done")
     
+    @partner_main.command(name='description',aliases=['desc'])
+    async def partner_desc(self,ctx,ID:int,*,description:str):
+        """Add or modify a description for a partner"""
+        if not ctx.channel.permissions_for(ctx.guild.me).add_reactions:
+            return await ctx.send("Permission 'Ajouter des réactions' manquante")
+        l = await self.bdd_get_partner(ID,ctx.guild.id)
+        if len(l)==0:
+            return await ctx.send("Partenaire introuvable")
+        l = l[0]
+        if await self.bdd_edit_partner(l['ID'],desc=description):
+            await ctx.send("La description a bien été modifiée !")
+        else:
+            await ctx.send("Une erreur inconnue est survenue. Veuillez contacter le support pour plus d'informations")
+
     @partner_main.command(name='remove')
     async def partner_remove(self,ctx,ID:int):
         """Remove a partner from the partners list"""
@@ -145,6 +192,44 @@ class PartnerCog(commands.Cog):
             await ctx.send("Ce partenaire a bien été supprimé de votre liste")
         else:
             await ctx.send("Une erreur inconnue est survenue. Veuillez contacter le support pour plus d'informations")
+        
+    @partner_main.command(name='list')
+    async def partner_list(self,ctx):
+        """Get the list of every partners"""
+        f = ['','']
+        lang = 'fr'
+        for l in await self.bdd_get_guild(ctx.guild.id):
+            date = await ctx.bot.cogs['TimeCog'].date(l['added_at'],lang=lang)
+            if l['type']=='bot':
+                try:
+                    bot = await self.bot.fetch_user(l['target'])
+                except:
+                    bot = l['target']
+                f[0] += "[{}] **Bot** `{}` (Ajouté le {})\n".format(l['ID'],bot,date)
+            elif l['type']=='guild':
+                try:
+                    server = (await self.bot.fetch_invite(l['target'])).name
+                except:
+                    server = 'discord.gg/'+l['target']
+                f[0] += "[{}] **Serveur** `{}` (Ajouté le {})\n".format(l['ID'],server,date)
+        for l in await self.bdd_get_partnered(await ctx.guild.invites()):
+            server = ctx.bot.get_guild(l['guild'])
+            if server==None:
+                server = l['guild']
+                f[1] += f"[{l['ID']}] Inconnu (ID: {server})"
+            else:
+                f[1] += f"[{l['ID']}] {server.name} (Propriétaire : {server.owner})"
+        if len(f[0])==0:
+            f[0] = ctx.send("Vous n'avez aucun partenaire")
+        if len(f[1])==0:
+            f[1] = ctx.send("Aucun serveur n'a de partenariat avec vous")
+        if isinstance(ctx.channel,discord.DMChannel) or ctx.channel.permissions_for(ctx.guild.me).embed_links:
+            color = await ctx.bot.cogs['ServerCog'].find_staff(ctx.guild.id,'partner_color')
+            emb = ctx.bot.cogs['EmbedCog'].Embed(fields=[{'name':'Liste de vos partenaires','value':f[0]},{'name':'Liste des serveurs vous ayant comme partenaire','value':f[1]}],color=color).create_footer(ctx.author).update_timestamp()
+            await ctx.send(embed=emb.discord_embed())
+        else:
+            await ctx.send(f[0]+'\n'+f[1])
+
 
 
 
