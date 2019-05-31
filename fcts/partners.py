@@ -147,14 +147,27 @@ class PartnerCog(commands.Cog):
     @partner_main.command(name='description',aliases=['desc'])
     async def partner_desc(self,ctx,ID:int,*,description:str):
         """Add or modify a description for a partner"""
-        if not ctx.channel.permissions_for(ctx.guild.me).add_reactions:
-            return await ctx.send("Permission 'Ajouter des réactions' manquante")
         l = await self.bdd_get_partner(ID,ctx.guild.id)
         if len(l)==0:
             return await ctx.send("Partenaire introuvable")
         l = l[0]
         if await self.bdd_edit_partner(l['ID'],desc=description):
             await ctx.send("La description a bien été modifiée !")
+        else:
+            await ctx.send("Une erreur inconnue est survenue. Veuillez contacter le support pour plus d'informations")
+
+    @partner_main.command(name='invite')
+    async def partner_invite(self,ctx,ID:int,new_invite:discord.Invite=None):
+        """Get the invite of a guild partner. 
+        If you specify an invite, the partner will be updated with this new invite"""
+        l = await self.bdd_get_partner(ID,ctx.guild.id)
+        if len(l)==0 or l[0]['type']!='guild':
+            return await ctx.send("Serveur partenaire introuvable")
+        l = l[0]
+        if new_invite==None:
+            return await ctx.send('discord.gg/'+l['target'])
+        if await self.bdd_edit_partner(l['ID'],target=new_invite.code):
+            await ctx.send("L'invitation a bien été modifiée !")
         else:
             await ctx.send("Une erreur inconnue est survenue. Veuillez contacter le support pour plus d'informations")
 
