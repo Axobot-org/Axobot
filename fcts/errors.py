@@ -73,10 +73,10 @@ class ErrorsCog(commands.Cog):
             r = re.search(r'Invalid duration: ([^\" ]+)',str(error))
             if r != None:
                 return await ctx.send(str(await self.translate(ctx.channel,'errors','duration')).format(r.group(1)))
-            # Role "Admin" not found
-            r = re.search(r'You are missing () permission(s) to run command.',str(error))
+            # Invalid invite: nope
+            r = re.search(r'Invalid invite: (\S+)',str(error))
             if r!=None:
-                return await ctx.send(str(await self.translate(ctx.channel,'errors','rolenotfound')).format(r.group(1)))
+                return await ctx.send(str(await self.translate(ctx.channel,'errors','invalidinvite')).format(r.group(1)))
             print('errors -',error)
         elif isinstance(error,commands.MissingRequiredArgument):
             await ctx.send(str(await self.translate(ctx.channel,'errors','missingargument')).format(error.param.name,random.choice([':eyes:','',':confused:',':thinking:',''])))
