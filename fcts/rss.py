@@ -785,7 +785,7 @@ class RssCog(commands.Cog):
                 title = feeds['title']
             else:
                 title = '?'
-            obj = self.rssMessage(bot=self.bot,Type='web',url=l,title=title,emojis=self.bot.cogs['EmojiCog'].customEmojis,date=datz,author=author,channel= feeds.feed['title'])
+            obj = self.rssMessage(bot=self.bot,Type='web',url=l,title=title,emojis=self.bot.cogs['EmojiCog'].customEmojis,date=datz,author=author,channel=feeds.feed['title'] if 'title' in feeds.feed.keys() else '?')
             return [obj]
         else:
             liste = list()
