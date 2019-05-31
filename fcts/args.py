@@ -65,3 +65,20 @@ class LeaderboardType(commands.Converter):
         elif argument in ['all','global','tout']:
             return 'global'
         raise commands.errors.BadArgument('Invalid leaderboard type: {}'.format(argument))
+
+class Invite(commands.Converter):
+    def __init__(self):
+        pass
+    
+    async def convert(self,ctx:commands.context,argument):
+        answer = None
+        r = re.search(r'https://discordapp\.com/oauth2/authorize\?client_id=(\d{18})&scope=bot',argument)
+        if r==None:
+            r = re.search(r'(?:discord\.gg|discordapp\.com/invite)/([^\s/]+)',argument)
+            if r!=None:
+                answer = r.group(1)
+        else:
+            answer = int(r.group(1))
+        if r==None or answer==None:
+            raise commands.errors.BadArgument('Invalid invite: '+argument)
+        return answer
