@@ -8,7 +8,7 @@ from fcts import cryptage
 
 roles_options = ["clear","slowmode","mute","kick","ban","warn","say","gived_roles","muted_role"]
 bool_options = ["save_roles","enable_xp","anti_caps_lock","enable_fun","help_in_dm"]
-textchan_options = ["hunter","welcome_channel","bot_news","poll_channels","modlogs_channel","noxp_channels"]
+textchan_options = ["hunter","welcome_channel","bot_news","poll_channels","modlogs_channel","noxp_channels","partner_channel"]
 vocchan_options = ["membercounter"]
 text_options = ["welcome","leave","levelup_msg"]
 prefix_options = ['prefix']
@@ -16,6 +16,7 @@ emoji_option = ['vote_emojis']
 numb_options = []
 raid_options = ["anti_raid"]
 xp_type_options = ['xp_type']
+color_options = ['partner_color']
 
 class ServerCog(commands.Cog):
     """"Cog in charge of all the bot configuration management for your server. As soon as an option is searched, modified or deleted, this cog will handle the operations."""
@@ -61,8 +62,10 @@ class ServerCog(commands.Cog):
                "anti_raid":1,
                "vote_emojis":":thumbsup:;:thumbsdown:;",
                "help_in_dm":0,
-               "muted_role":0}
-        self.optionsList = ["ID","Created at","prefix","language","clear","slowmode","mute","kick","ban","warn","say","hunter","welcome_channel","welcome","leave","gived_roles","bot_news","poll_channels","modlogs_channel","enable_xp","anti_caps_lock","enable_fun","membercounter","anti_raid","vote_emojis","help_in_dm","muted_role"]
+               "muted_role":0,
+               "partner_channel":'',
+               "partner_color":10949630}
+        self.optionsList = ["prefix","language","clear","slowmode","mute","kick","ban","warn","say","welcome_channel","welcome","leave","gived_roles","bot_news","poll_channels","partner_channel","modlogs_channel","enable_xp","anti_caps_lock","enable_fun","membercounter","anti_raid","vote_emojis","help_in_dm","muted_role"]
 
     @commands.Cog.listener()
     async def on_ready(self):
@@ -283,6 +286,8 @@ class ServerCog(commands.Cog):
                 await self.conf_emoji(ctx,option,value)
             elif option in xp_type_options:
                 await self.conf_xp_type(ctx,option,value)
+            elif option in color_options:
+                await self.conf_color(ctx,option,value)
             else:
                 await ctx.send(await self.translate(ctx.guild.id,"server","change-0"))
                 return
@@ -669,6 +674,37 @@ class ServerCog(commands.Cog):
         else:
             return self.bot.cogs["XPCog"].types[value]
     
+    async def conf_color(self,ctx:commands.context,option,value):
+        if value == "scret-desc":
+            if type(ctx) == commands.Context:
+                guild = ctx.guild.id
+            elif type(ctx) == str:
+                if ctx.isnumeric():
+                    guild = int(ctx)
+            elif type(ctx) == int:
+                guild = ctx
+            else:
+                return str(discord.Colour(self.default_opt[option]))
+            v = await self.find_staff(guild,option)
+            return await self.form_color(option,v)
+        else:
+            try:
+                color = await commands.ColourConverter().convert(ctx,value)
+            except commands.errors.BadArgument:
+                msg = await self.translate(ctx.guild.id,"server","change-11")
+                await ctx.send(msg.format(value))
+                return
+            await self.modify_server(ctx.guild.id,values=[(option,int(color))])
+            msg = await self.translate(ctx.guild.id,"server","change-color")
+            await ctx.send(msg.format(option,", ".join(color)))
+            await self.send_embed(ctx.guild,option,color)
+
+    async def form_color(self,option,value):
+        if value == None:
+            return str(discord.Colour(self.default_opt[option]))
+        else:
+            return str(discord.Colour(value))
+    
     @sconfig_main.command(name="see")
     @commands.cooldown(1,10,commands.BucketType.guild)
     async def sconfig_see(self,ctx,option=None):
@@ -716,6 +752,8 @@ class ServerCog(commands.Cog):
                     r = ", ".join(await self.form_emoji(v))
                 elif i in xp_type_options:
                     r = ", ".join(await self.form_xp_type(v))
+                elif i in color_options:
+                    r = await self.form_color(i,v)
                 else:
                     continue
                 if len(r) == 0:
@@ -750,6 +788,8 @@ class ServerCog(commands.Cog):
                 r = await self.conf_emoji(ctx,option,"scret-desc")
             elif option in xp_type_options:
                 r = await self.conf_xp_type(ctx,option,"scret-desc")
+            elif option in color_options:
+                r = await self.conf_color(ctx,option,"scret-desc")
             else:
                 r = None
             if r!=None:
