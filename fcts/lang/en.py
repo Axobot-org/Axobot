@@ -87,7 +87,8 @@ errors={"cooldown":"You are on cooldown for this command :confused: Please wait 
         "disabled":"The command {} is disabled :confused:",
         "duration":"The duration `{}` is invalid",
         "rolenotfound":"Unable to find the role `{0}`",
-        "invalidcolor":"Color `{0}` invalid"
+        "invalidcolor":"Color `{0}` invalid",
+        "invalidinvite":"Invalid bot/server invite: `{0}`"
         }
 
 find={"user-0":"name: {}\nID: {}",
@@ -353,6 +354,23 @@ morpion={'user-begin':'{}, you begin!',
         'already-playing':"You already have a game in progress!"
         }
 
+partners={'invalid-bot':"Unable to find this bot",
+        'invalid-invite':"Invalid invite",
+        'invalid-partner':"Partner not found",
+        'changed-desc':"The description has been modified!",
+        'unknown-error':"An unknown error occurred. Please contact support for more information",
+        'unknown-server':'Server partner not found',
+        'changed-invite':"The invitation has been modified!",
+        'missing-reactions':"Permission 'Add reactions' missing :confused:",
+        'confirm-bot':'Do you really want to remove the bot `{}` from your partners?',
+        'confirm-server':'Do you really want to delete the server `{}` from your partners?',
+        'del-canceled':'Deletion cancelled',
+        'deleted':'This partner has been successfully deleted from your list',
+        'no-partner':"You don't have any partners",
+        'no-partner-2':"No server has a partnership with you",
+        'partners-list':['List of your partners','List of servers with you as a partner']
+        }
+
 perms={"perms-0":"Member/role {} not found",
         "perms-1":"**'{}' permissions:**\n\n"
         }
@@ -444,6 +462,7 @@ to modify a configuration, or `!config del <option>` to reset the option (`!conf
         "change-8": "This level does not exist. Here is the list of the levels currently available: {}",
         "change-9": "The emoji `{}` was not found",
         "change-10":"This xp system doesn't exist. Here is the list of available systems: {}",
+        "change-11":"This colour is invalid",
         "change-role": "The '{}' option has been modified with the following roles: {}",
         "change-bool": "The '{}' option has been modified with the value *{}*",
         "change-textchan": "The '{}' option has been modified with the channels {}",
@@ -453,6 +472,7 @@ to modify a configuration, or `!config del <option>` to reset the option (`!conf
         "change-raid":"The anti-raid security level is now set to **{}** ({})",
         "change-emojis":"The emotions for the option '{}' are now {}",
         "change-xp":"The xp system used is now {}",
+        "change-color":"The color used for the option {} is now {}",
         "new_server": "Your server has just been registered for the first time in our database. Congratulations :tada:",
         "see-0":"Enter `!config help` for more details",
         "see-1":"{} server configuration",
