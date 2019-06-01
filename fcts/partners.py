@@ -161,7 +161,7 @@ class PartnersCog(commands.Cog):
                     title += tr_unknown
                     field1 = None
                 field2 = {'name':tr_invite.capitalize(),'value':'[{}](https://discord.gg/{})'.format(tr_click.capitalize(),partner['target'])}
-            emb = self.bot.cogs['EmbedCog'].Embed(title=title,desc=partner['description'],fields=[x for x in (field1,field2) if not x==None],color=color).update_timestamp()
+            emb = self.bot.cogs['EmbedCog'].Embed(title=title,desc=partner['description'],fields=[x for x in (field1,field2) if not x==None],color=color,footer_text=str(partner['ID'])).update_timestamp()
             try:
                 msg = await channel.fetch_message(partner['messageID'])
                 await msg.edit(embed=emb.discord_embed())
@@ -228,7 +228,7 @@ class PartnersCog(commands.Cog):
             return await ctx.send(await self.translate(ctx.guild.id,'partners','unknown-server'))
         l = l[0]
         if new_invite==None:
-            return await ctx.send('discord.gg/'+l['target'])
+            return await ctx.send('{}: discord.gg/{}'.format(await self.translate(ctx.guild.id,'stats_infos','inv-4'),l['target']))
         if await self.bdd_edit_partner(l['ID'],target=new_invite.code):
             await ctx.send(await self.translate(ctx.guild.id,'partners','changed-invite'))
         else:
