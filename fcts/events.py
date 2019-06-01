@@ -268,7 +268,7 @@ class Events(commands.Cog):
                 await self.rss_loop()
             if int(d.hour)%4 == 0 and d.hour != self.mee6_last_check.hour:
                 await self.mee6_xp_loop()
-            if int(d.hour)%7 == 0 and d.hour != self.partner_last_check.hour:
+            if int(d.hour)%7 == 1 and d.hour != self.partner_last_check.hour:
                 await self.partners_loop()
             if int(d.hour) == 0 and d.day != self.dbl_last_sending.day:
                 await self.dbl_send_data()
