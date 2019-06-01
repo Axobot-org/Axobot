@@ -6,7 +6,10 @@ class EmbedCog(commands.Cog):
 
     def __init__(self,bot):
         self.bot = bot
-        self.logs = "https://discordapp.com/api/webhooks/507910810991853573/F0TB5XoIXOMYCLUtsOb6_LPUcR_sLFuEaJkyE4VhAOAvbFXyYgsqLGBe48n1AzGXvUJm"
+        self.logs = {'classic':"https://discordapp.com/api/webhooks/507910810991853573/F0TB5XoIXOMYCLUtsOb6_LPUcR_sLFuEaJkyE4VhAOAvbFXyYgsqLGBe48n1AzGXvUJm",
+            'loop':'https://discordapp.com/api/webhooks/509079297353449492/1KlokgfF7vxRK37pHd15UjdxJSa5H9yzbOLAaRjYEQK7XIdjfMp9PCnER1-Dfz0PBSaM',
+            'members':'https://discordapp.com/api/webhooks/584381991919550474/7ocQuqPNPN4n1OlHjNyG8eBeABL9XD-AGbHCk9oURTCL4a9kFb596biFGNNI-A5qzkHt'
+        }
         self.file = "embeds"
 
 
@@ -98,7 +101,10 @@ class EmbedCog(commands.Cog):
 
     async def send(self,embeds,url=None,ctx=None):
         if url == None:
-            url = self.logs
+            url = self.logs['classic']
+        else:
+            if url in self.logs.keys():
+                url = self.logs[url]
         liste = list()
         for x in embeds:
             if type(x) == self.Embed:
@@ -106,17 +112,13 @@ class EmbedCog(commands.Cog):
             else:
                 liste.append(x["embed"])
         r = requests.post(url,json={"embeds":liste})
-        if ctx != None:
-            try:
-                msg = eval(r.text)
-                if "message" in msg.keys():
-                    msg = msg["message"]
-                elif "_misc" in msg.keys():
-                    msg = msg["_misc"][0]
-            except:
-                return
-            await ctx.send("`Erreur {}:` {}".format(r.status_code,msg))
-
+        try:
+            msg = r.json()
+            if "error" in msg.keys():
+                await self.bot.cogs['ErrorsCog'].senf_err_msg("`Erreur webhook {}:` [code {}] {}".format(url,r.status_code,msg))
+        except:
+            return
+        
 
 def setup(bot):
     bot.add_cog(EmbedCog(bot))

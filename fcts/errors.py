@@ -73,10 +73,10 @@ class ErrorsCog(commands.Cog):
             r = re.search(r'Invalid duration: ([^\" ]+)',str(error))
             if r != None:
                 return await ctx.send(str(await self.translate(ctx.channel,'errors','duration')).format(r.group(1)))
-            # Role "Admin" not found
-            r = re.search(r'You are missing () permission(s) to run command.',str(error))
+            # Invalid invite: nope
+            r = re.search(r'Invalid invite: (\S+)',str(error))
             if r!=None:
-                return await ctx.send(str(await self.translate(ctx.channel,'errors','rolenotfound')).format(r.group(1)))
+                return await ctx.send(str(await self.translate(ctx.channel,'errors','invalidinvite')).format(r.group(1)))
             print('errors -',error)
         elif isinstance(error,commands.MissingRequiredArgument):
             await ctx.send(str(await self.translate(ctx.channel,'errors','missingargument')).format(error.param.name,random.choice([':eyes:','',':confused:',':thinking:',''])))
@@ -106,6 +106,8 @@ class ErrorsCog(commands.Cog):
                 await self.senf_err_msg(f"Internal Error\n{msg}")
             elif ctx.guild == None:
                 await self.senf_err_msg(f"DM | {ctx.channel.recipient.name}\n{msg}")
+            elif ctx.channel.id==488768405629960203:
+                return await ctx.send(ctx.guild.name+" | "+ctx.channel.name+"\n"+msg)
             else:
                 await self.senf_err_msg(ctx.guild.name+" | "+ctx.channel.name+"\n"+msg)
         except Exception as e:

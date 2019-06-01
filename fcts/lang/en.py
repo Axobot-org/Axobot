@@ -31,17 +31,6 @@ aide={"no-subcmd":"The command `{0.name}` has no subcommand",
         }
 
 blurple = {'check_intro':'{}, starting blurple image analysis (Please note that this may take a while)',
-        'check_invalid':'{}, please link a valid image URL',
-        'check_resized':"{}, image resized smaller for easier processing ({}s)",
-        'check_fields':["Total amount of Blurple","Blurple (rgb(114, 137, 218))","White (rgb(255, 255, 255))","Dark Blurple (rgb(78, 93, 148))","Blurple, White, Dark Blurple = Blurple, White, and Dark Blurple (respectively) \nBlack = Not Blurple, White, or Dark Blurple","A big thanks to **Rocked03** for his code :blue_heart: https://github.com/Rocked03/Blurplefied.git","Please note: Discord slightly reduces quality of the images, therefore the percentages may be slightly inaccurate. | Content requested by {}"],
-        'create_title':"Blurplefier - makes your image blurple!",
-        'create_footer_1':"Please note - This blurplefier is automated and therefore may not always give you the best result. | Content requested by {}",
-        'create_footer_2':"Please note - This blurplefier is automated and therefore may not always give you the best result. Disclaimer: This image is a gif, and the quality does not always turn out great. HOWEVER, the gif is quite often not as grainy as it appears in the preview | Content requested by {}",
-        'create_oops':"{}, whoops! It looks like this gif is too big to upload. If you want, you can give it another go, except with a smaller version of the image. Sorry about that!",
-        'won-card':"Wow! Very nice blurple picture {}! so beautiful that I decided to offer you the card of xp blurple! You can use it by typing the command `{}profile card blurple` {}"
-        }
-
-blurple = {'check_intro':'{}, starting blurple image analysis (Please note that this may take a while)',
     'check_invalid':'{}, please link a valid image URL',
     'check_resized':"{}, image resized smaller for easier processing ({}s)",
     'check_fields':["Total amount of Blurple","Blurple (rgb(114, 137, 218))","White (rgb(255, 255, 255))","Dark Blurple (rgb(78, 93, 148))","Blurple, White, Dark Blurple = Blurple, White, and Dark Blurple (respectively) \nBlack = Not Blurple, White, or Dark Blurple","A big thanks to **Rocked03** for his code :blue_heart: https://github.com/Rocked03/Blurplefied.git","Please note: Discord slightly reduces quality of the images, therefore the percentages may be slightly inaccurate. | Content requested by {}"],
@@ -87,7 +76,8 @@ errors={"cooldown":"You are on cooldown for this command :confused: Please wait 
         "disabled":"The command {} is disabled :confused:",
         "duration":"The duration `{}` is invalid",
         "rolenotfound":"Unable to find the role `{0}`",
-        "invalidcolor":"Color `{0}` invalid"
+        "invalidcolor":"Color `{0}` invalid",
+        "invalidinvite":"Invalid bot/server invite: `{0}`"
         }
 
 find={"user-0":"name: {}\nID: {}",
@@ -97,7 +87,7 @@ find={"user-0":"name: {}\nID: {}",
         "guild-1":"Name: {name}\nID: {id}\nOwner: {owner} ({ownerid})\nJoined at: {join}\nMembers: {members} (including {bots} bots)\nLanguage: {lang}\nPrefix: `{prefix}`\nRss feeds number: {rss}\nRoles rewards numbers: {rr}",
         "chan-0":"Channel not found",
         "chan-1":"Name : {}\nID: {}\nServer: {} ({})",
-        "help":"This command allows to find a server or a salon among all the servers on which is the bot. You can also search for a Discord user's information, no matter if he shares a server with me!\nThe syntax is `!find <user|channel|guild> <ID>`",
+        "help":"This command allows to find a server or a salon among all the servers on which is the bot. You can also search for a Discord user's information, no matter if they shares a server with me!\nThe syntax is `!find <user|channel|guild> <ID>`",
         "role-0":"Role not found",
         "role-1":"Name: {}\nID: {}\nGuild: {} ({})\nMembers number: {}\nColour: {}"
         }
@@ -192,7 +182,12 @@ keywords={"depuis":"since",
         "membres":"members",
         "subcmds":"subcommands",
         "ghost":"Ghost",
-        "unknown":"Unknown"
+        "unknown":"Unknown",
+        'added_at':'Added at',
+        'bot':'bot',
+        'server':'server',
+        'servers':'servers',
+        'click_here':'Click here'
         }
 
 kill={"list":["Oh you, you gonna to die!",
@@ -206,12 +201,12 @@ kill={"list":["Oh you, you gonna to die!",
         "No ! Double jumps are not possible {1} !",
         "{1} imitated Icare... splash.",
         "It's nice to have a portal gun {1}, but don't open portals above spades...",
-        "{1} died. Peace to his soul... :sneezing_face:",
+        "{1} died. Peace to their soul... :sneezing_face:",
         "{0} killed {1}",
         "{1} was shot by {0}",
         "Bye {1} ! :ghost:",
-        "{1} saw a flying anvil fall... on his head :head_bandage:",
-        "{1} commit suicide after {0} has cut his connection",
+        "{1} saw a flying anvil fall... on their head :head_bandage:",
+        "{1} commit suicide after {0} has cut their connection",
         "Caution {1} ! Fire burns :fire:",
         "{1} fought zombies without shovel",
         "{1} tried to hug a creeper",
@@ -300,7 +295,7 @@ modo={"slowmode-0":"The slowmode is now disabled in this channel.",
         "staff-warn":"You can't warn another staff member!",
         "warn-1":"The member `{}` has been warned for the reason `{}`",
         "warn-bot":"I can't warn a bot ^^",
-        "warn-but-db":"Our database being offline, the warning could not be saved. Nevertheless, the member did receive his warning in DM",
+        "warn-but-db":"Our database being offline, the warning could not be saved. Nevertheless, the member did receive heir warning in DM",
         "staff-mute":"You can't prevent another staff member from speaking ",
         "mute-1":"The member {} has been silenced for the reason `{}`!",
         "mute-created":"Successfully created `muted` role!",
@@ -351,6 +346,24 @@ morpion={'user-begin':'{}, you begin!',
         'win-1':"Well done, {} won!",
         'win-2':"I won! End of the game!",
         'already-playing':"You already have a game in progress!"
+        }
+
+partners={'invalid-bot':"Unable to find this bot",
+        'invalid-invite':"Invalid invite",
+        'invalid-partner':"Partner not found",
+        'added-partner':'This partner has been successfully added',
+        'changed-desc':"The description has been modified!",
+        'unknown-error':"An unknown error occurred. Please contact support for more information",
+        'unknown-server':'Server partner not found',
+        'changed-invite':"The invitation has been modified!",
+        'missing-reactions':"Permission 'Add reactions' missing :confused:",
+        'confirm-bot':'Do you really want to remove the bot `{}` from your partners?',
+        'confirm-server':'Do you really want to delete the server `{}` from your partners?',
+        'del-canceled':'Deletion cancelled',
+        'deleted':'This partner has been successfully deleted from your list',
+        'no-partner':"You don't have any partners",
+        'no-partner-2':"No server has a partnership with you",
+        'partners-list':['Server partners','List of your partners','List of servers with you as a partner']
         }
 
 perms={"perms-0":"Member/role {} not found",
@@ -444,6 +457,7 @@ to modify a configuration, or `!config del <option>` to reset the option (`!conf
         "change-8": "This level does not exist. Here is the list of the levels currently available: {}",
         "change-9": "The emoji `{}` was not found",
         "change-10":"This xp system doesn't exist. Here is the list of available systems: {}",
+        "change-11":"This colour is invalid",
         "change-role": "The '{}' option has been modified with the following roles: {}",
         "change-bool": "The '{}' option has been modified with the value *{}*",
         "change-textchan": "The '{}' option has been modified with the channels {}",
@@ -453,6 +467,7 @@ to modify a configuration, or `!config del <option>` to reset the option (`!conf
         "change-raid":"The anti-raid security level is now set to **{}** ({})",
         "change-emojis":"The emotions for the option '{}' are now {}",
         "change-xp":"The xp system used is now {}",
+        "change-color":"The color used for the option {} is now {}",
         "new_server": "Your server has just been registered for the first time in our database. Congratulations :tada:",
         "see-0":"Enter `!config help` for more details",
         "see-1":"{} server configuration",
@@ -479,7 +494,7 @@ server_desc={"prefix":"Current bot prefix: {}",
         "gived_roles": "List of roles automatically given to new members: {}",
         "bot_news": "List of channels where to send bot news: {}",
         "modlogs_channel":"Channel where to send moderation logs: {}",
-        "save_roles": "Should roles be saved when a member leaves, in case he returns? {}",
+        "save_roles": "Should roles be saved when a member leaves, in case they returns? {}",
         "poll_channels": "List of channels where :thumbsup: and :thumbsdown: reactions will be automatically added to each message: {}",
         "enable_xp": "Should the xp system be enabled? {}",
         "levelup_msg":"Message sent when a member earns an xp level: {}",
@@ -491,7 +506,9 @@ server_desc={"prefix":"Current bot prefix: {}",
         "help_in_dm":"Send help message in Private Message? {}",
         "muted_role":"Used role to mute members: {}",
         "noxp_channels":"Channels where you can't get xp: {}",
-        "xp_type":"XP system used: {}"
+        "xp_type":"XP system used: {}",
+        "partner_channel":"Channel where partners are sent: {}",
+        "partner_color":"Color of partners embed: {}"
         }
 
 stats_infos={"not-found":"Unable to find {N}",
@@ -569,20 +586,20 @@ xp = {'card-level':'LEVEL',
                 "Crossing to level {level}{user}. Attack and defense increased by 1."
                 "Thanks to this level {level}, you can finally use the legendary {random} user {user}",
                 "Speech level {level}, {user}. Be careful not to scream too loudly.",
-                "{user} is flying to the Top 1 with his level {level}!",
+                "{user} is flying to the Top 1 with their level {level}!",
                 "But, wouldn't it be a new level for {user}? Level {level}!",
                 "Summoner {user} at level {level}. New champions to be won.",
                 "{user} evolves to **{user} level {level}!**",
-                "Thanks to your level {level}, you have a new point of competence {user}."
-                "You have gained {level} levels of experience {user}. Don't forget to use them before they're blown up by a creeper!"
+                "Thanks to your level {level}, you have a new point of competence {user}.",
+                "You have gained {level} levels of experience {user}. Don't forget to use them before they're blown up by a creeper!",
                 "I wonder where I'm going to store the {level} of {user}. I'm going to end up with no more room for that many numbers...",
                 "Maybe you can finally get your souls back with your level {level}, {user}?",
-                "Don't forget to use the money earned from this level {level} to improve the ship, Captain {user}."
+                "Don't forget to use the money earned from this level {level} to improve the ship, Captain {user}.",
                 "You are now level {level}, but justice does not yet rule the city, {user}...",
-                "By dint of dying, you've gone beyond level {level}, {user}. Now, do that dungeon again and lower that boss."
+                "By dint of dying, you've gone beyond level {level}, {user}. Now, do that dungeon again and lower that boss.",
                 "You may be a level {level}{user}, but you'll still get eaten by a deer. Anyway, no one will regret you.",
                 "Hey! Wake up {user}! You've gone up to level {level}! Hey!",
-                "{user} is level {level}, from eating mushrooms."
+                "{user} is level {level}, from eating mushrooms.",
                 "You may be level {level}, but your princess is still in another castle. ",
                 "The force is more powerful in you {user}, now that you are level {level}.",
                 "By dodging these millions of infernal bullets, {user} has passed level {level}.",

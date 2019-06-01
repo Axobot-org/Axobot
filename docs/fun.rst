@@ -4,7 +4,7 @@ Fun
 
 This section of the bot contains lots of fun commands, which will be less useful than the other sections, but will add a good atmosphere in your server. Because a server's life is not just about moderation or utilities, ZBot couldn't be without a few moments of fun. 
 
-However, if too much fun bothers you, this option can be disabled at any time with the `config command <config.html>`_ (`enable_fun` parameter). The choice is yours!
+However, if too much fun bothers you, this option can be disabled at any time with the `config command <server.html>`_ (`enable_fun` parameter). The choice is yours!
 
 
 ---------------------
@@ -28,7 +28,7 @@ Bigtext
 
 Here is a handy command for people who have trouble seeing small text of Discord. Or just for those who want to have some fun. In fact the bot will use your text to converts each letter into Discord Emojis, so that you have bigger text.
 
-You want some good news? If you have permission to use the `say <config.html#list-of-every-option>`_ command, the bot will delete your message after posting it !
+You want some good news? If you have permission to use the `say <server.html#list-of-every-option>`_ command, the bot will delete your message after posting it !
 
 .. warning:: The only permission required is "`Manage messages <perms.html#manage-messages>`_" to possibly delete your own message.
 
@@ -92,7 +92,7 @@ Me
 
 **Syntax:** :code:`me <text>`
 
-When you need the bot to talk about you, like *"Z_runner runs away very fast"*, use this command. The "me" will be replaced by your nickname, and if you are allowed to use the `say <config.html#list-of-every-option>`_ command, your original message will be deleted.
+When you need the bot to talk about you, like *"Z_runner runs away very fast"*, use this command. The "me" will be replaced by your nickname, and if you are allowed to use the `say <server.html#list-of-every-option>`_ command, your original message will be deleted.
 
 Money
 -----
@@ -109,7 +109,7 @@ Nope
 
 **Syntax:** :code:`nope`
 
-A small command to use when you do not agree with your interlocutor. Small, but it has the merit to be clear and to quickly cut short the discussion. And even better, if you have permission to use the `say <config.html#list-of-every-option>`_ command, your invocation message will be deleted ! *Camouflage activated!*
+A small command to use when you do not agree with your interlocutor. Small, but it has the merit to be clear and to quickly cut short the discussion. And even better, if you have permission to use the `say <server.html#list-of-every-option>`_ command, your invocation message will be deleted ! *Camouflage activated!*
 
 .. warning:: ZBot needs "`Attach files <perms.html#attach-files>`_" permission to send its message, and "`Manage messages <perms.html#manage-messages>`_" to delete yours.
 

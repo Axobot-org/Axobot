@@ -483,10 +483,10 @@ You can specify a verification limit by adding a number in argument"""
         """Make you AFK
         You'll get a nice nickname, because nicknames are cool, aren't they?"""
         try:
-            if (not ctx.author.display_name.startswith(' [AFK]')) and len(ctx.author.display_name)<26:
+            if (not ctx.author.display_name.endswith(' [AFK]')) and len(ctx.author.display_name)<26:
                 await ctx.author.edit(nick=ctx.author.display_name+" [AFK]")
-                self.afk_guys[ctx.author.id] = reason
-                await ctx.send(await self.translate(ctx.guild.id,"fun","afk-done"))
+            self.afk_guys[ctx.author.id] = reason
+            await ctx.send(await self.translate(ctx.guild.id,"fun","afk-done"))
         except discord.errors.Forbidden:
             return await ctx.send(await self.translate(ctx.guild.id,"fun","afk-no-perm"))
     
@@ -506,12 +506,14 @@ You can specify a verification limit by adding a number in argument"""
     
     async def check_afk(self,msg):
         """Check if someone pinged is afk"""
+        ctx = await self.bot.get_context(msg)
         for member in msg.mentions:
             if member.display_name.endswith(' [AFK]') and member!=msg.author:
                 if member.id not in self.afk_guys or len(self.afk_guys[member.id])==0:
                     await msg.channel.send(await self.translate(msg.guild.id,"fun","afk-user-2"))
                 else:
-                    await msg.channel.send(str(await self.translate(msg.guild.id,"fun","afk-user-1")).format(self.afk_guys[member.id]))
+                    reason = await self.bot.cogs['UtilitiesCog'].clear_msg(str(await self.translate(msg.guild.id,"fun","afk-user-1")).format(self.afk_guys[member.id]),everyone=True,ctx=ctx)
+                    await msg.channel.send(reason)
 
     @commands.command(name='embed',hidden=False)
     @commands.has_permissions(embed_links=True)

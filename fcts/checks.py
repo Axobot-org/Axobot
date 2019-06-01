@@ -43,14 +43,18 @@ async def can_clear(ctx):
     else:
         return ctx.channel.permissions_for(ctx.author).manage_messages
 
-async def can_see_banlist(ctx):
+async def has_admin(ctx):
     """Check if someone can see the banlist"""
-    return ctx.channel.permissions_for(ctx.author).administrator or await ctx.bot.cogs["AdminCog"].check_if_admin(ctx)
+    return ctx.channel.permissions_for(ctx.author).administrator or await ctx.bot.cogs["AdminCog"].check_if_god(ctx)
 
-async def can_pin_msg(ctx):
+async def has_manage_msg(ctx):
     """... if someone can pin a message"""
-    return ctx.channel.permissions_for(ctx.author).manage_messages or await ctx.bot.cogs["AdminCog"].check_if_admin(ctx)
+    return ctx.channel.permissions_for(ctx.author).manage_messages or await ctx.bot.cogs["AdminCog"].check_if_god(ctx)
 
-async def can_manage_server(ctx):
+async def has_manage_guild(ctx):
     """... if someone can manage the server"""
     return ctx.channel.permissions_for(ctx.author).manage_guild or await ctx.bot.cogs['AdminCog'].check_if_god(ctx)
+
+async def has_manage_roles(ctx):
+    """... if someone can manage the roles"""
+    return ctx.channel.permissions_for(ctx.author).manage_roles or await ctx.bot.cogs['AdminCog'].check_if_god(ctx)

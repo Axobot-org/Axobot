@@ -205,7 +205,7 @@ class UtilitiesCog(commands.Cog):
         ch = r"((?:discord\.gg|discordapp.com/invite|discord.me)/.+)"
         return re.search(ch,text)
 
-    async def clear_msg(self,text,everyone=True,ctx=None):
+    async def clear_msg(self,text:str,everyone=True,ctx=None):
         """Remove every mass mention from a text, and add custom emojis"""
         if everyone:
             text = text.replace("@everyone","@"+u"\u200B"+"everyone").replace("@here","@"+u"\u200B"+"here")
