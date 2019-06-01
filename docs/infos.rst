@@ -15,7 +15,7 @@ Allows you to know the list of all the orders currently available for you. The l
 
 You can specify a command (or subcommand) to get more details about it, or a cog (a code module) to see the list of commands related to that cog.
 
-.. note:: For a better visual overview, it is recommended to give the permission "`Embed Links <perms.html#embed-links>`_" to the bot. In addition, you can configure the bot to `send the message as a private message <config.html#list-of-every-option>`_.
+.. note:: For a better visual overview, it is recommended to give the permission "`Embed Links <perms.html#embed-links>`_" to the bot. In addition, you can configure the bot to `send the message as a private message <server.html#list-of-every-option>`_.
 
 -----
 About
@@ -43,7 +43,7 @@ Welcome
 
 **Syntax:** :code:`welcome` or :code:`bvn`
 
-This command helps you to define a message sent automatically by ZBot when a member joins or leaves your server (see the `config <config.html>`_ command). You will find how to select the channel, as well as the variables that can be used in the messages.
+This command helps you to define a message sent automatically by ZBot when a member joins or leaves your server (see the `config <server.html>`_ command). You will find how to select the channel, as well as the variables that can be used in the messages.
 
 
 -----------
@@ -87,6 +87,6 @@ Prefix
 
 **Syntax:** :code:`prefix`
 
-A nice shortcut to know the prefixes to which the bot responds. This is usually the prefix defined in the `configuration <config.html>`_, plus the mention of the bot.
+A nice shortcut to know the prefixes to which the bot responds. This is usually the prefix defined in the `configuration <server.html>`_, plus the mention of the bot.
 
 Note that this result may differ from the :code:`config see prefix` command when the database is out of sync.

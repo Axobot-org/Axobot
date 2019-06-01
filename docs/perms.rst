@@ -31,7 +31,7 @@ Allows the bot to create and delete roles, or edit the permissions of roles lowe
 Manage Channels
 ---------------
 
-Allows the bot to create, delete and modify channels (create invitations for example). Used for: `membercounter option <config.html#list-of-every-option>`_
+Allows the bot to create, delete and modify channels (create invitations for example). Used for: `membercounter option <server.html#list-of-every-option>`_
 
 
 Kick Members
@@ -113,7 +113,7 @@ Allows the bot to pin or delete any message. Used for: `mute <moderator.html#mut
 Embed Links
 -----------
 
-Allows the bot the bot to send an embed. Used for: `membercount <infos.html#membercount>`_ , `mojang <minecraft.html#mojang>`_, `XP system <user.html#xp-system>`_ . Required for: `infos <infos.html#info>`_ , `mc <minecraft.html#mc>`_ , `config see <config.html#watch>`_, `a few rss commands <rss.html>`_, `embeds generator <miscellaneous.html#embed>`_
+Allows the bot the bot to send an embed. Used for: `membercount <infos.html#membercount>`_ , `mojang <minecraft.html#mojang>`_, `XP system <user.html#xp-system>`_ . Required for: `infos <infos.html#info>`_ , `mc <minecraft.html#mc>`_ , `config see <server.html#watch>`_, `a few rss commands <rss.html>`_, `embeds generator <miscellaneous.html#embed>`_
 
 
 Attach Files
@@ -143,7 +143,7 @@ Allows the bot to use emojis from any other server. The bot uses them in many si
 Add Reactions
 -------------
 
-Allows the bot you to add reactions to a message, whether they are Discord or server emotions. Used for: `react <fun.html#react>`_, `vote command <miscellaneous.html#vote>`_ and `poll channels <config.html#list-of-every-option>`_
+Allows the bot you to add reactions to a message, whether they are Discord or server emotions. Used for: `react <fun.html#react>`_, `vote command <miscellaneous.html#vote>`_ and `poll channels <server.html#list-of-every-option>`_
 
 -----------------
 Voice Permissions
@@ -152,7 +152,7 @@ Voice Permissions
 Connect
 -------
 
-Allows the bot to connect in this voice channel. It is also required to edit this channel. Used for: `membercounter option <config.html#list-of-every-option>`_
+Allows the bot to connect in this voice channel. It is also required to edit this channel. Used for: `membercounter option <server.html#list-of-every-option>`_
 
 Speak
 -----

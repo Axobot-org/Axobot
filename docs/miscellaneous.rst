@@ -25,7 +25,7 @@ Say
 
 If you want to talk through the bot, as if it were sending your messages, this command will be a great help. Just indicate the text to send, and voilà, it's over. If a channel is specified, the message will be sent there. Otherwise, it will be sent in the current channel.
 
-.. note:: Note that this command is reserved for certain roles, which you can define in the `configuration section <config.html>`_.
+.. note:: Note that this command is reserved for certain roles, which you can define in the `configuration section <server.html>`_.
 
 .. warning:: In addition, "`Manage Messages <perms.html#manage-messages>`_" permission is required if you want the bot to delete your message as soon as it has posted its copy.
 
