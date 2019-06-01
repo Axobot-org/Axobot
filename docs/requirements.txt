@@ -1,8 +1,8 @@
 -i https://pypi.org/simple
-pip>=18
+pip>=19.1
 sphinxcontrib-asyncio
 sphinx_autodoc_napoleon_typehints
-requests==2.20
-regex==2018.08.29
-mysql-connector-python==8.0.12
-#discord-rewrite==1.0.0a
+requests==2.21
+re==2.2.1
+mysql-connector-python==8.0.16
+discord-rewrite==1.1.1
