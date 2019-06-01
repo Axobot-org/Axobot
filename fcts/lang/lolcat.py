@@ -192,7 +192,12 @@ keywords={"depuis":"sinze",
         "membres":"memberz",
         "subcmds":"subcommands",
         "ghost":"Goast",
-        'unknown':'No known'
+        'unknown':'No known',
+        'added_at':'Addd at',
+        'bot':'robot',
+        'server':'nice place',
+        'servers':'guilds',
+        'click_here':'BLUE BUTTON TO CLICK'
         }
 
 kill={"list":["Hi ho ! Oh u, u gonna die!",
@@ -351,6 +356,24 @@ morpion={'user-begin':'{}, u begin!',
         'win-1':"GG, {} won!",
         'win-2':"I won! Game over!",
         'already-playing':"U already are ingame!"
+        }
+
+partners={'invalid-bot':"Unable 2 find tihs bot",
+        'invalid-invite':"Invalid invit",
+        'invalid-partner':"Partner naut find",
+        'added-partner':'Tish partner has bee corectly added',
+        'changed-desc':"Teh description haz be modified!",
+        'unknown-error':"Un unknown error sadly happenned. Plz contact support if u want more info",
+        'unknown-server':'Server partner not find',
+        'changed-invite':"The invite haz been modified!",
+        'missing-reactions':"Perm 'Add reactions' missing :confused:",
+        'confirm-bot':'Do U really want 2 remove the bot `{}` form Ur partners?',
+        'confirm-server':'Do U really want to delete teh server `{}` from Ur partners?',
+        'del-canceled':'Deletion cancelled :eyes:',
+        'deleted':'This partner have been successsfully deleted from ur list',
+        'no-partner':"You donnut have any partners",
+        'no-partner-2':"No server has sadly a partnership with U. Feels alone.",
+        'partners-list':['Server partners','List of Ur partners','List of servers with U as a cool partner']
         }
 
 perms={"perms-0":"Membr/role {} not findz",

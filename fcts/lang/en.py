@@ -193,7 +193,12 @@ keywords={"depuis":"since",
         "membres":"members",
         "subcmds":"subcommands",
         "ghost":"Ghost",
-        "unknown":"Unknown"
+        "unknown":"Unknown",
+        'added_at':'Added at',
+        'bot':'bot',
+        'server':'server',
+        'servers':'servers',
+        'click_here':'Click here'
         }
 
 kill={"list":["Oh you, you gonna to die!",
@@ -357,6 +362,7 @@ morpion={'user-begin':'{}, you begin!',
 partners={'invalid-bot':"Unable to find this bot",
         'invalid-invite':"Invalid invite",
         'invalid-partner':"Partner not found",
+        'added-partner':'This partner has been successfully added',
         'changed-desc':"The description has been modified!",
         'unknown-error':"An unknown error occurred. Please contact support for more information",
         'unknown-server':'Server partner not found',
@@ -368,7 +374,7 @@ partners={'invalid-bot':"Unable to find this bot",
         'deleted':'This partner has been successfully deleted from your list',
         'no-partner':"You don't have any partners",
         'no-partner-2':"No server has a partnership with you",
-        'partners-list':['List of your partners','List of servers with you as a partner']
+        'partners-list':['Server partners','List of your partners','List of servers with you as a partner']
         }
 
 perms={"perms-0":"Member/role {} not found",
