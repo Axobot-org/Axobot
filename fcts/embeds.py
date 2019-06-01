@@ -104,7 +104,7 @@ class EmbedCog(commands.Cog):
             url = self.logs['classic']
         else:
             if url in self.logs.keys():
-                url = self.logs['url']
+                url = self.logs[url]
         liste = list()
         for x in embeds:
             if type(x) == self.Embed:
