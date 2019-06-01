@@ -1,7 +1,8 @@
 import discord, time, typing, importlib, asyncio, aiohttp
 from discord.ext import commands
-from fcts import args
+from fcts import args, checks
 importlib.reload(args)
+importlib.reload(checks)
 
 class PartnersCog(commands.Cog):
 
@@ -203,6 +204,7 @@ class PartnersCog(commands.Cog):
             await self.bot.cogs['HelpCog'].help_command(ctx,['partner'])
 
     @partner_main.command(name='add')
+    @commands.check(checks.has_admin)
     async def partner_add(self,ctx,invite:args.Invite):
         """Add a partner in your llist"""
         if isinstance(invite,int):
@@ -225,6 +227,7 @@ class PartnersCog(commands.Cog):
         await ctx.send(await self.translate(ctx.guild.id,'partners','added-partner'))
     
     @partner_main.command(name='description',aliases=['desc'])
+    @commands.check(checks.has_admin)
     async def partner_desc(self,ctx,ID:int,*,description:str):
         """Add or modify a description for a partner"""
         l = await self.bdd_get_partner(ID,ctx.guild.id)
@@ -246,12 +249,15 @@ class PartnersCog(commands.Cog):
         l = l[0]
         if new_invite==None:
             return await ctx.send('{}: discord.gg/{}'.format(await self.translate(ctx.guild.id,'stats_infos','inv-4'),l['target']))
+        if not await checks.has_admin(ctx):
+            return
         if await self.bdd_edit_partner(l['ID'],target=new_invite.code):
             await ctx.send(await self.translate(ctx.guild.id,'partners','changed-invite'))
         else:
             await ctx.send(await self.translate(ctx.guild.id,'partners','unknown-error'))
 
     @partner_main.command(name='remove')
+    @commands.check(checks.has_admin)
     async def partner_remove(self,ctx,ID:int):
         """Remove a partner from the partners list"""
         if not ctx.channel.permissions_for(ctx.guild.me).add_reactions:
@@ -287,6 +293,7 @@ class PartnersCog(commands.Cog):
             await ctx.send(await self.translate(ctx.guild.id,'partners','unknown-error'))
         
     @partner_main.command(name='list')
+    @commands.check(checks.has_manage_guild)
     async def partner_list(self,ctx):
         """Get the list of every partners"""
         f = ['','']

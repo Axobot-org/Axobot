@@ -628,7 +628,7 @@ class XPCog(commands.Cog):
             await self.bot.cogs['HelpCog'].help_command(ctx,['rr'])
     
     @rr_main.command(name="add")
-    @commands.check(checks.can_manage_server)
+    @commands.check(checks.has_manage_guild)
     async def rr_add(self,ctx,level:int,*,role:discord.Role):
         """Add a role reward
         This role will be given to every member who reaches the level"""
@@ -647,7 +647,7 @@ class XPCog(commands.Cog):
             await ctx.send(str(await self.translate(ctx.guild.id,'xp','rr-added')).format(role.name,level))
     
     @rr_main.command(name="list")
-    @commands.check(checks.can_manage_server)
+    @commands.check(checks.has_manage_guild)
     async def rr_list(self,ctx):
         """List every roles rewards of your server"""
         if not ctx.channel.permissions_for(ctx.guild.me).embed_links:
@@ -665,7 +665,7 @@ class XPCog(commands.Cog):
             await ctx.send(embed=emb.discord_embed())
     
     @rr_main.command(name="remove")
-    @commands.check(checks.can_manage_server)
+    @commands.check(checks.has_manage_guild)
     async def rr_remove(self,ctx,level:int):
         """Remove a role reward
         When a member reaches this level, no role will be given anymore"""
@@ -680,7 +680,7 @@ class XPCog(commands.Cog):
             await ctx.send(str(await self.translate(ctx.guild.id,'xp','rr-removed')).format(level))
     
     @rr_main.command(name="reload")
-    @commands.check(checks.can_manage_server)
+    @commands.check(checks.has_manage_guild)
     @commands.cooldown(1,300,commands.BucketType.guild)
     async def rr_reload(self,ctx):
         """Refresh roles rewards for the whole server"""

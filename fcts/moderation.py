@@ -543,7 +543,7 @@ class ModeratorCog(commands.Cog):
 
     @commands.command(name="banlist")
     @commands.guild_only()
-    @commands.check(checks.can_see_banlist)
+    @commands.check(checks.has_admin)
     async def banlist(self,ctx,reasons:bool=True):
         """Check the list of currently banned members.
 The 'reasons' parameter is used to display the ban reasons.
@@ -688,7 +688,7 @@ You must be an administrator of this server to use this command."""
 
 
     @commands.command(name="pin")
-    @commands.check(checks.can_pin_msg)
+    @commands.check(checks.has_manage_msg)
     async def pin_msg(self,ctx,msg:int):
         """Pin a message
 ID corresponds to the Identifier of the message"""
