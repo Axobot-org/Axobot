@@ -999,7 +999,7 @@ class RssCog(commands.Cog):
         if len(errors)>0:
             d.append('{} errors: {}'.format(len(errors),' '.join([str(x) for x in errors])))
         emb = self.bot.cogs["EmbedCog"].Embed(desc='\n'.join(d),color=1655066).update_timestamp().set_author(self.bot.guilds[0].me)
-        await self.bot.cogs["EmbedCog"].send([emb],url="https://discordapp.com/api/webhooks/509079297353449492/1KlokgfF7vxRK37pHd15UjdxJSa5H9yzbOLAaRjYEQK7XIdjfMp9PCnER1-Dfz0PBSaM")
+        await self.bot.cogs["EmbedCog"].send([emb],url="loop")
         self.bot.log.debug(d[0])
         if len(errors)>0:
             self.bot.log.warn("[Rss loop] "+d[1])

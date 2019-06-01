@@ -178,7 +178,7 @@ class WelcomerCog(commands.Cog):
             else:
                 desc = "{} {} ({}) left {} ({})".format(t,member,member.id,member.guild.name,member.guild.id)
             emb = self.bot.cogs["EmbedCog"].Embed(desc=desc,color=16098851).update_timestamp().set_author(self.bot.user)
-            await self.bot.cogs["EmbedCog"].send([emb])
+            await self.bot.cogs["EmbedCog"].send([emb],url='members')
             self.bot.log.info(desc)
         except Exception as e:
             await self.bot.cogs["ErrorsCog"].on_error(e,None)

@@ -307,7 +307,7 @@ class Events(commands.Cog):
                 except Exception as e:
                     await self.bot.cogs['ErrorsCog'].on_error(e,None)
         emb = self.bot.cogs["EmbedCog"].Embed(desc='**MEE6 rewards** updated in {}s ({} guilds / {} roles given)'.format(round(time.time()-t,3),counts[0],counts[1]),color=6476789).update_timestamp().set_author(self.bot.user)
-        await self.bot.cogs["EmbedCog"].send([emb],url="https://discordapp.com/api/webhooks/509079297353449492/1KlokgfF7vxRK37pHd15UjdxJSa5H9yzbOLAaRjYEQK7XIdjfMp9PCnER1-Dfz0PBSaM")
+        await self.bot.cogs["EmbedCog"].send([emb],url="loop")
     
     async def dbl_send_data(self):
         """Send guilds count to Discord Bots Lists"""
@@ -346,7 +346,7 @@ class Events(commands.Cog):
               answers[2] = resp.status
         await session.close()
         emb = self.bot.cogs["EmbedCog"].Embed(desc='**Guilds count updated** in {}s ({})'.format(round(time.time()-t,3),'-'.join(answers)),color=7229109).update_timestamp().set_author(self.bot.user)
-        await self.bot.cogs["EmbedCog"].send([emb],url="https://discordapp.com/api/webhooks/509079297353449492/1KlokgfF7vxRK37pHd15UjdxJSa5H9yzbOLAaRjYEQK7XIdjfMp9PCnER1-Dfz0PBSaM")
+        await self.bot.cogs["EmbedCog"].send([emb],url="loop")
 
 
     async def partners_loop(self):
@@ -365,7 +365,7 @@ class Events(commands.Cog):
             count[0] += 1
             count[1] += await self.bot.cogs['PartnersCog'].update_partners(chan,guild['partner_color'])
         emb = self.bot.cogs["EmbedCog"].Embed(desc='**Partners channels updated** in {}s ({} channels - {} partners)'.format(round(time.time()-t,3),count[0],count[1]),color=10949630).update_timestamp().set_author(self.bot.user)
-        await self.bot.cogs["EmbedCog"].send([emb],url="https://discordapp.com/api/webhooks/509079297353449492/1KlokgfF7vxRK37pHd15UjdxJSa5H9yzbOLAaRjYEQK7XIdjfMp9PCnER1-Dfz0PBSaM")
+        await self.bot.cogs["EmbedCog"].send([emb],url="loop")
         
             
 
