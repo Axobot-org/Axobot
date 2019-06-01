@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #coding=utf-8
 
-import mysql.connector, time, datetime, emoji
+import time, datetime, emoji
 import discord
 from discord.ext import commands
 from fcts import cryptage
@@ -117,10 +117,6 @@ class ServerCog(commands.Cog):
         for e,l in enumerate(self.bot.cogs['LangCog'].languages):
             langs.append((l,liste.count(e)))
         return langs
-
-
-    # def connect(self):
-    #     return mysql.connector.connect(user=self.bot.database_keys['user'],password=self.bot.database_keys['password'],host=self.bot.database_keys['host'],database=self.bot.database_keys['database'])
 
     async def staff_finder(self,user,option):
         """Check is user is part of a staff"""
