@@ -133,8 +133,11 @@ class PartnersCog(commands.Cog):
         count = 0
         if color==None:
             color = await self.bot.cogs['ServerCog'].find_staff(channel.guild.id,'partner_color')
+        if color==None:
+            color = self.bot.cogs['ServerCog'].default_opt['partner_color']
         session = aiohttp.ClientSession(loop=self.bot.loop)
         for partner in partners:
+            image = ""
             if partner['type']=='bot':
                 title = "**{}** ".format(tr_bot.capitalize())
                 try:
@@ -145,16 +148,19 @@ class PartnersCog(commands.Cog):
                             field1 = {'name':tr_guilds.capitalize(),'value':str(ans['server_count'])}
                         else:
                             field1 = None
+                    image = (await self.bot.fetch_user(int(partner['target']))).avatar_url.__str__()
                 except discord.errors.NotFound:
                     title += "ID: "+partner['target']
                     field1 = None
                 except Exception as e:
                     field1 = None
+                    image = (await self.bot.fetch_user(int(partner['target']))).avatar_url
                     await self.bot.cogs["ErrorsCog"].on_error(e,None)
                 field2 = {'name':tr_invite.capitalize(),'value':'[Click here](https://discordapp.com/oauth2/authorize?client_id={}&scope=bot&permissions=2113273087)'.format(partner['target'])}
             else:
                 title = "**{}** ".format(tr_guild.capitalize())
                 inv = await self.bot.fetch_invite(partner['target'])
+                image = inv.guild.icon_url.__str__()
                 if isinstance(inv,discord.Invite) and not inv.revoked:
                     title += inv.guild.name
                     field1 = {'name':tr_members.capitalize(),'value':str(inv.approximate_member_count)}
@@ -163,7 +169,7 @@ class PartnersCog(commands.Cog):
                     title += tr_unknown
                     field1 = None
                 field2 = {'name':tr_invite.capitalize(),'value':'[{}](https://discord.gg/{})'.format(tr_click.capitalize(),partner['target'])}
-            emb = self.bot.cogs['EmbedCog'].Embed(title=title,desc=partner['description'],fields=[x for x in (field1,field2) if not x==None],color=color,footer_text=str(partner['ID'])).update_timestamp()
+            emb = self.bot.cogs['EmbedCog'].Embed(title=title,desc=partner['description'],fields=[x for x in (field1,field2) if not x==None],color=color,footer_text=str(partner['ID']),thumbnail=image).update_timestamp()
             try:
                 msg = await channel.fetch_message(partner['messageID'])
                 await msg.edit(embed=emb.discord_embed())
@@ -325,12 +331,14 @@ class PartnersCog(commands.Cog):
             else:
                 f[1] += f"[{l['ID']}] {server.name} ({tr_owner} : {server.owner})"
         if len(f[0])==0:
-            f[0] = ctx.send(await self.translate(ctx.guild.id,'partners','no-partner'))
+            f[0] = await self.translate(ctx.guild.id,'partners','no-partner')
         if len(f[1])==0:
-            f[1] = ctx.send(await self.translate(ctx.guild.id,'partners','no-partner-2'))
+            f[1] = await self.translate(ctx.guild.id,'partners','no-partner-2')
         fields_name = await self.translate(ctx.guild.id,'partners','partners-list')
         if isinstance(ctx.channel,discord.DMChannel) or ctx.channel.permissions_for(ctx.guild.me).embed_links:
             color = await ctx.bot.cogs['ServerCog'].find_staff(ctx.guild.id,'partner_color')
+            if color==None:
+                color = self.bot.cogs['ServerCog'].default_opt['partner_color']
             emb = ctx.bot.cogs['EmbedCog'].Embed(title=fields_name[0],fields=[{'name':fields_name[1],'value':f[0]},{'name':'​','value':'​'},{'name':fields_name[2],'value':f[1]}],color=color,thumbnail=ctx.guild.icon_url).create_footer(ctx.author).update_timestamp()
             await ctx.send(embed=emb.discord_embed())
         else:
