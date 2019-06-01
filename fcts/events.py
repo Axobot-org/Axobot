@@ -273,7 +273,7 @@ class Events(commands.Cog):
             if int(d.hour) == 0 and d.day != self.dbl_last_sending.day:
                 await self.dbl_send_data()
         except Exception as e:
-            await self.bot.cogs['ErrorsCog'].on_error(e,None)
+            await self.bot.cogs['ErrorCog'].on_error(e,None)
 
     @loop.before_loop
     async def before_loop(self):
@@ -301,7 +301,7 @@ class Events(commands.Cog):
             if g!=None:
                 counts[0] += 1
                 try:
-                    counts[1] += await self.bot.cogs['XPCog'].mee6_reload_rr(g)
+                    counts[1] += (await self.bot.cogs['XPCog'].mee6_reload_rr(g))[1]
                 except aiohttp.client_exceptions.ContentTypeError:
                     await self.bot.cogs['ErrorsCog'].on_error(e,None)
                     return
@@ -346,8 +346,10 @@ class Events(commands.Cog):
               self.bot.log.debug('BotsOnDiscord returned {} for {}'.format(resp.status, payload))
               answers[2] = resp.status
         await session.close()
+        answers = [str(x) for x in answers]
         emb = self.bot.cogs["EmbedCog"].Embed(desc='**Guilds count updated** in {}s ({})'.format(round(time.time()-t,3),'-'.join(answers)),color=7229109).update_timestamp().set_author(self.bot.user)
         await self.bot.cogs["EmbedCog"].send([emb],url="loop")
+        self.dbl_last_sending = datetime.datetime.now()
 
 
     async def partners_loop(self):
