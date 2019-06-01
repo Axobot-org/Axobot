@@ -418,13 +418,13 @@ to modify a configuration, or `!config del <option>` to reset the option (`!conf
         "change-emojis":"The emotions for the option '{}' are now {}",
         "change-xp":"The xp system used is now {}",
         "new_server": "Your server has just been registered for the first time in our database. Congratulations :tada:",
-        "see-0":"Enter `!config help` for more details",
-        "see-1":"{} server configuration",
-        "change-prefix-1":"This prefix is too long to be used!",
-        "wrong-prefix":"Oops, it seems this prefix is invalid :thinking: If the problem persists, please choose another one",
-        "opt_title":"Option '{}' of server {}",
-        "not-found":"The server {} has not yet been registered in the database",
-        "need-admin":"You need Administrator permission to execute this command."
+        "see-0":"Viestitä `!config help` saadakseen lisätietoja",
+        "see-1":"{} palvelin konfigurointi",
+        "change-prefix-1":"Tätä etuliite on liian pitkä!",
+        "wrong-prefix":"Ups, näyttää siltä että tämä ei ole etuliite :thinking: Jos tämä jatkuu, valitse joku toinen",
+        "opt_title":"Vaihtoehto '{}' palvelimesta {}",
+        "not-found":"Palvelin {} ei ole vielä rekisteröity databaseen",
+        "need-admin":"Tarvitset Järjestyksenvalvoja käyttöoikeudet että voit käyttää tätä komentoa."
         }
 
 server_desc={"prefix":"Tämän hetkinen botin etuliite: {}",
