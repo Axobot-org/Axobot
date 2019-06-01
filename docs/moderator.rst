@@ -52,7 +52,7 @@ Freeze
 **Syntax:** :code:`freeze (on|off)`
 
 The freeze command is made to completely freeze a chat that has gotten too hot, so that nobody can talk before being cooled. To break the ice, just turn it off.
-People authorized to use the freeze command are the same as the ones who can use `slowmode <#slowmode>`_ (see the `config <config.html>`_ command). 
+People authorized to use the freeze command are the same as the ones who can use `slowmode <#slowmode>`_ (see the `config <server.html>`_ command). 
 
 .. warning:: The bot needs "`Manage messages <perms.html#manage-messages>`_" permission in order to delete messages from chatty members. In addition, members authorized to trigger the freeze are immune to this effect.
 
@@ -249,7 +249,9 @@ Role Manager
 
 Nice command that allows you to do different things with the server roles (other subcommands will be created later). The permissions required to execute them depend on the subcommands, ranging from anyone to the administrator. If you have any ideas or other suggestions, feel free to contact us via `our Discord server <https://discord.gg/N55zY88>`_, or in PM at the bot!
 
-* :code:`role color <role> <colour>` (alias `role colour`) : Changes the color of the given role. The color must be in hexadecimal form, although some common names are accepted (red, blue, gold...). To remove the color, use the name `default`. Please check notes 1. and 2.
+* :code:`role color <role> <colour>` (alias `role colour`): Changes the color of the given role. The color must be in hexadecimal form, although some common names are accepted (red, blue, gold...). To remove the color, use the name `default`. Please check notes 1. and 2.
+
+* :code:`role list <role>` : List every members who are in a specific role, if this number is under 200. The bot must have "`Embed Links <perms.html#embed-links>`_" permission to display the result. Please check note 2.
 
 
 .. warning:: (1) The bot need the "`Manage roles <perms.html#manage-roles>`_" permission, also his highest role need to be higher than the role he's trying to edit.
