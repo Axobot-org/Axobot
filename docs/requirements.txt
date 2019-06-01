@@ -5,4 +5,4 @@ sphinx_autodoc_napoleon_typehints
 requests==2.21
 regex==2019.4.14
 mysql-connector-python==8.0.16
-discord-rewrite==1.1.1
+discord==1.1.1
