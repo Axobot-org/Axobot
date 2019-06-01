@@ -294,6 +294,8 @@ class ModeratorCog(commands.Cog):
         if role == None:
             role = await self.configure_muted_role(ctx.guild)
             await ctx.send(await self.translate(ctx.guild.id,"modo","mute-created"))
+        if role == None:
+            await ctx.send(await self.translate(ctx.guild.id,"modo","error"))
         if role.position >= ctx.guild.me.roles[-1].position:
             await ctx.send(await self.translate(ctx.guild.id,"modo","mute-high"))
             return
@@ -541,7 +543,7 @@ class ModeratorCog(commands.Cog):
 
     @commands.command(name="banlist")
     @commands.guild_only()
-    @commands.check(checks.can_see_banlist)
+    @commands.check(checks.has_admin)
     async def banlist(self,ctx,reasons:bool=True):
         """Check the list of currently banned members.
 The 'reasons' parameter is used to display the ban reasons.
@@ -672,7 +674,7 @@ You must be an administrator of this server to use this command."""
             await self.bot.cogs['HelpCog'].help_command(ctx,['role'])
     
     @main_role.command(name="color",aliases=['colour'])
-    @commands.has_permissions(manage_roles=True)
+    @commands.check(checks.has_manage_roles)
     async def role_color(self,ctx,role:discord.Role,color:discord.Color):
         """Change a color of a role"""
         if not ctx.guild.me.guild_permissions.manage_roles:
@@ -683,10 +685,35 @@ You must be an administrator of this server to use this command."""
             return
         await role.edit(colour=color,reason="Asked by {}".format(ctx.author))
         await ctx.send(str(await self.translate(ctx.guild.id,'modo','role-color')).format(role.name))
+    
+    @main_role.command(name="list")
+    @commands.cooldown(5,30,commands.BucketType.guild)
+    async def role_list(self,ctx,*,role:discord.Role):
+        """Send the list of members in a role"""
+        if not (await checks.has_manage_roles(ctx) or await checks.has_manage_guild(ctx) or await checks.has_manage_msg(ctx)):
+            return
+        if not ctx.channel.permissions_for(ctx.guild.me).embed_links:
+            return await ctx.send(await self.translate(ctx.guild.id,'fun','no-embed-perm'))
+        tr_nbr = await self.translate(ctx.guild.id,'stats_infos','role-3')
+        tr_mbr = await self.translate(ctx.guild.id,"keywords","membres")
+        txt = str()
+        fields = list()
+        fields.append({'name':tr_nbr.capitalize(),'value':str(len(role.members))})
+        nbr = len(role.members)
+        if nbr<=200:
+            for i in range(nbr):
+                txt += role.members[i].mention+" "
+                if i<nbr-1 and len(txt+role.members[i+1].mention)>1000:
+                    fields.append({'name':tr_mbr.capitalize(),'value':txt})
+                    txt = str()
+            if len(txt)>0:
+                fields.append({'name':tr_mbr.capitalize(),'value':txt})
+        emb = self.bot.cogs['EmbedCog'].Embed(title=role.name,fields=fields,color=role.color).update_timestamp().create_footer(ctx.author)
+        await ctx.send(embed=emb.discord_embed())
 
 
     @commands.command(name="pin")
-    @commands.check(checks.can_pin_msg)
+    @commands.check(checks.has_manage_msg)
     async def pin_msg(self,ctx,msg:int):
         """Pin a message
 ID corresponds to the Identifier of the message"""
@@ -807,6 +834,8 @@ ID corresponds to the Identifier of the message"""
                 count = 0
                 category,channelslist = x[0],x[1]
                 for channel in channelslist:
+                    if channel==None:
+                        continue
                     if len(channel.changed_roles)!=0 and channel.changed_roles!=category.changed_roles:
                         await channel.set_permissions(role,send_messages=False)
                         for r in channel.changed_roles:

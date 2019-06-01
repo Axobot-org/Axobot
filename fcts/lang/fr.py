@@ -87,7 +87,8 @@ errors={"cooldown":"Vous êtes en cooldown pour cette commande. Veuillez attendr
         "disabled":"La commande {0} est désactivée",
         "duration":"La durée `{0}` est invalide",
         "rolenotfound":"Impossible de trouver le rôle `{0}`",
-        "invalidcolor":"La couleur `{0}` est invalide"
+        "invalidcolor":"La couleur `{0}` est invalide",
+        "invalidinvite":"Invitation de bot ou de serveur invalide : `{0}`"
         }
 
 find={"user-0":"Nom : {}\nID : {}",
@@ -192,7 +193,12 @@ keywords={"depuis":"depuis",
         "membres":"membres",
         "subcmds":"sous-commandes",
         "ghost":"Fantôme",
-        'unknown':'Inconnu'
+        'unknown':'Inconnu',
+        'added_at':'Ajouté le',
+        'bot':'bot',
+        'server':'serveur',
+        'servers':'serveurs',
+        'click_here':'Cliquez ici'
         }
 
 kill={"list":["Oh toi, tu vas mourir !",
@@ -353,6 +359,24 @@ morpion={'user-begin':'{}, à toi de commencer !',
         'already-playing':"Vous avez déjà une partie en cours !"
         }
 
+partners={'invalid-bot':"Impossible de trouver ce bot",
+        'invalid-invite':"Invitation invalide",
+        'invalid-partner':"Partenaire introuvable",
+        'added-partner':'Le partenaire a bien été ajouté',
+        'changed-desc':"La description a bien été modifiée !",
+        'unknown-error':"Une erreur inconnue est survenue. Veuillez contacter le support pour plus d'informations",
+        'unknown-server':'Serveur partenaire introuvable',
+        'changed-invite':"L'invitation a bien été modifiée !",
+        'missing-reactions':"Permission 'Ajouter des réactions' manquante :confused:",
+        'confirm-bot':'Voulez-vous vraiment supprimer le bot `{}` de vos partenaires ?',
+        'confirm-server':'Voulez-vous vraiment supprimer le serveur `{}` de vos partenaires ?',
+        'del-canceled':'Suppression annulée',
+        'deleted':'Ce partenaire a bien été supprimé de votre liste',
+        'no-partner':"Vous n'avez aucun partenaire",
+        'no-partner-2':"Aucun serveur n'a de partenariat avec vous",
+        'partners-list':['Partenaires du serveur','Liste de vos partenaires','Liste des serveurs vous ayant comme partenaire']
+        }
+
 perms={"perms-0":"Le membre/rôle {} n'a pas été trouvé",
         "perms-1":"**Permission de '{}' :**\n\n"
         }
@@ -444,6 +468,7 @@ l'option (`!config change <option> del` fonctionne de même).\nLa liste des opti
         "change-8":"Ce niveau n'existe pas. Voici la liste des niveaux actuellement disponibles : {}",
         "change-9":"L'émoji `{}` n'a pas été trouvé",
         "change-10":"Ce système d'xp n'existe pas. Voici la liste des systèmes disponibles : {}",
+        "change-11":"Cette couleur est invalide",
         "change-role":"L'option '{}' a bien été modifiée avec les rôles suivants : {}",
         "change-bool":"L'option '{}' a bien été modifiée avec la valeur *{}*",
         "change-textchan":"L'option '{}' a bien été modifiée avec les salons {}",
@@ -453,6 +478,7 @@ l'option (`!config change <option> del` fonctionne de même).\nLa liste des opti
         "change-raid":"Le niveau de sécurité anti-raid est maintenant défini à **{}** ({})",
         "change-emojis":"Les émojis pour l'option '{}' sont maintenant {}",
         "change-xp":"Le type d'xp utilisé est maintenant {}",
+        "change-color":"La couleur utilisée pour l'option {} est maintenant {}",
         "new_server":"Votre serveur vient d'être enregistré pour la première fois dans notre base de donnée. Félicitations :tada:",
         "see-0":"Entrez `!config help` pour plus de détails",
         "see-1":"Configuration du serveur {}",
@@ -491,7 +517,9 @@ server_desc={"prefix":"Préfixe actuel du bot : {}",
         "help_in_dm":"Envoyer le message d'aide en message privés ? {}",
         "muted_role":"Rôle utilisé pour rendre les gens muets : {}",
         "noxp_channels":"Salons où il est impossible d'obtenir de l'xp : {}",
-        "xp_type":"Type de système d'xp : {}"
+        "xp_type":"Type de système d'xp : {}",
+        "partner_channel":"Salon dans lequel envoyer les partenaires : {}",
+        "partner_color":"Couleur de l'embed des partenaires : {}"
         }
 
 stats_infos={"not-found":"Impossible de trouver {N}",
@@ -570,32 +598,32 @@ xp = {'card-level':'NIVEAU',
                 "Grâce à ce niveau {level}, tu peux enfin te servir de {random} légendaire {user}",
                 "Speech level {level}, {user}. Attention à ne pas crier trop fort.",
                 "{user} s'envole vers le Top 1 avec son niveau {level} !",
-                "Mais, ne serait ce pas un nouveau niveau pour {user} ? Level {level} !",
+                "Mais, ne serait ce pas un nouveau niveau pour {user} ? Niveau {level} !",
                 "Invocateur {user} au niveau {level}. Nouveaux champions obtenables.",
                 "{user} évolue en **{user} niveau {level} !**",
                 "Grâce à votre niveau {level}, vous disposez d'un nouveau point de compétence {user}.",
-                "Tu as gagné {level} niveaux d'expérience {user}. N'oublie pas de les utiliser avant d'être explosé par un creeper !",
+                "Tu as gagné {level} niveaux d'expérience {user}. N'oublie pas de les utiliser avant de te faire surprendre par un creeper !",
                 "Je me demande où je vais ranger le niveau {level} de {user}. Je vais finir par ne plus avoir de place pour autant de chiffres.",
                 "Peut-être que tu peux enfin récupérer tes âmes avec ton niveau {level}, {user} ?",
                 "N'oubliez pas d'utiliser l'argent gagné grâce à ce level {level} pour améliorer le vaisseau, capitaine {user}.",
                 "Tu es désormais niveau {level}, mais justice ne règne pas encore sur la ville, {user}...",
-                "A force de mourir, tu es passé niveau {level}, {user}. Maintenant, recommence encore ce donjon et bas ce boss.",
+                "A force de mourir, tu passes niveau {level}, {user}. Maintenant, recommence encore ce donjon et bats ce boss.",
                 "Vous avez beau être niveau {level} {user}, vous vous ferez encore manger par un cerf. De toute façon, personne ne vous regrettera.",
-                "Hey ! Réveille toi {user} ! Tu es passé au niveau {level} ! Hey !",
+                "Hey ! Réveille toi {user} ! Tu passes au niveau {level} ! Hey !",
                 "{user} est niveau {level}, à force de manger des champignons.",
-                "Tu as beau être level {level}, ta princesse est toujours dans un autre château {user}. ",
+                "Tu as beau être niveau {level}, ta princesse est toujours dans un autre château {user}. ",
                 "La force est plus puissante en toi {user}, maintenant que tu es niveau {level}.",
-                "A force d'esquiver ces millions de balles infernales, {user} est passé niveau {level}.",
-                "La résistance au virus de {user} est passée au niveau {level}. Essaie tout de même de ne pas être mangé par un zombie.",
+                "A force d'esquiver ces millions de balles infernales, {user} passes niveau {level}.",
+                "La résistance au virus de {user} est passée au niveau {level}. Essaie tout de même de ne pas te faire manger par un zombie...",
                 "La discrétion de l'assassin {user} a évoluée au niveau {level}. La confrérie compte sur toi.",
-                "Félicitations {user}, tu es {level}. Pense à te servir de {random} pour continuer à progresser.",
+                "Félicitations {user}, tu es niveau {level}. Pense à te servir de {random} pour continuer à progresser.",
                 "Grâce au niveau {level}, vous pouvez tenter de gagner {random} à la tombola, {user} !",
                 "Malgré ton level {level}, il est dangereux de voyager seul {user} ! Prends {random} !",
                 "Niveau {level} {user} ! {random} est disponible chez le vendeur !",
                 "Bravo {user} ! Tu es désormais niveau {level} ! Cependant, il faut encore monter pour obtenir {random} d'une rareté légendaire...",
-                "Houston, on a un problème. {user} est passé niveau {level} !!!",
+                "Houston, on a un problème. {user} a atteint le niveau {level} !!!",
                 "Tu vois, le monde se divise en deux catégories : ceux qui levelup et ceux qui levelup pas. Toi {user}, tu levelup au niveau {level} !!!",
-                "Que le niveau {level} soit avec toi {user}.",
+                "Que le niveau {level} soit avec toi, {user}.",
                 ],
         "levelup-items":["cette épée"," cet arc","cette guitare","cette dague","ce marteau", "cette banane","ce pistolet à portails","ce champignon","cette pelle","ce fusil à pompe","cette baguette magique","cette table de craft","cette vache","cette fenêtre", "ce papier peint","cet emoji","ce pistolet à bulles","cette clé à molette","cette capuche","cette casquette","ce bicorne","ce trident","ce lasso","ce porte-monnaie","ce pin's","cette bouteille","ces claquettes","ces toilettes","ce vélo","cette pizza","cette enclume","cette épingle à linge","cette cuillère","cette cape","cette potion","ce stylo","ce coussin","ce tracteur","ce thé","ce ballon","ce canapé","ce caddie","ce barbecue","ce sabre laser","ce pyjama","ce cookie","ce meme","ce dragon","ces chamallows","ces croquettes","ce grappin","ce yo-yo","ce démon","ce bras mécanique","ce chocolat chaud","ces frites","cette baguette française","ce fromage","ce sac-à-dos","ce caillou"],
         "top-your":"Votre niveau",

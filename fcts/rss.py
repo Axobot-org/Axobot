@@ -716,7 +716,11 @@ class RssCog(commands.Cog):
                 rt = None
                 if author.replace('@','') not in url:
                     rt = url.split("=")[1]
-                obj = self.rssMessage(bot=self.bot,Type='tw',url=feed['link'],title=feed['title'],emojis=self.bot.cogs['EmojiCog'].customEmojis,date=feed['published_parsed'],author=author,retweeted_by=rt,channel= feeds.feed['title'])
+                if rt != None:
+                    t = feed['title'].replace(rt,'')
+                else:
+                    t = feed['title']
+                obj = self.rssMessage(bot=self.bot,Type='tw',url=feed['link'],title=t,emojis=self.bot.cogs['EmojiCog'].customEmojis,date=feed['published_parsed'],author=author,retweeted_by=rt,channel= feeds.feed['title'])
                 liste.append(obj)
             liste.reverse()
             return liste
@@ -781,7 +785,7 @@ class RssCog(commands.Cog):
                 title = feeds['title']
             else:
                 title = '?'
-            obj = self.rssMessage(bot=self.bot,Type='web',url=l,title=title,emojis=self.bot.cogs['EmojiCog'].customEmojis,date=datz,author=author,channel= feeds.feed['title'])
+            obj = self.rssMessage(bot=self.bot,Type='web',url=l,title=title,emojis=self.bot.cogs['EmojiCog'].customEmojis,date=datz,author=author,channel=feeds.feed['title'] if 'title' in feeds.feed.keys() else '?')
             return [obj]
         else:
             liste = list()
@@ -995,7 +999,7 @@ class RssCog(commands.Cog):
         if len(errors)>0:
             d.append('{} errors: {}'.format(len(errors),' '.join([str(x) for x in errors])))
         emb = self.bot.cogs["EmbedCog"].Embed(desc='\n'.join(d),color=1655066).update_timestamp().set_author(self.bot.guilds[0].me)
-        await self.bot.cogs["EmbedCog"].send([emb],url="https://discordapp.com/api/webhooks/509079297353449492/1KlokgfF7vxRK37pHd15UjdxJSa5H9yzbOLAaRjYEQK7XIdjfMp9PCnER1-Dfz0PBSaM")
+        await self.bot.cogs["EmbedCog"].send([emb],url="loop")
         self.bot.log.debug(d[0])
         if len(errors)>0:
             self.bot.log.warn("[Rss loop] "+d[1])
@@ -1006,9 +1010,9 @@ class RssCog(commands.Cog):
         if not self.bot.database_online:
             self.bot.log.warn('Base de donnée hors ligne - check rss annulé')
             return
-        self.bot.log.info(await self.bot.cogs['TimeCog'].date(datetime.datetime.now(),digital=True)+" Boucle rss commencée !")
+        self.bot.log.info(" Boucle rss commencée !")
         await self.bot.cogs["RssCog"].main_loop()
-        self.bot.log.info(await self.bot.cogs['TimeCog'].date(datetime.datetime.now(),digital=True)+" Boucle rss terminée !")
+        self.bot.log.info(" Boucle rss terminée !")
 
     async def loop(self):
         await self.bot.wait_until_ready()
@@ -1035,7 +1039,7 @@ class RssCog(commands.Cog):
                 await ctx.send("Une boucle rss est déjà en cours !")
             else:
                 await ctx.send("Et hop ! Une itération de la boucle en cours !")
-                self.bot.log.info(await self.bot.cogs['TimeCog'].date(datetime.datetime.now(),digital=True)+" Boucle rss forcée")
+                self.bot.log.info(" Boucle rss forcée")
                 await self.main_loop()
     
     async def send_log(self,text):

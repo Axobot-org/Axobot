@@ -95,6 +95,8 @@ class XPCog(commands.Cog):
         text = await self.bot.cogs['ServerCog'].find_staff(msg.guild.id,'levelup_msg')
         if text==None or len(text)==0:
             text = random.choice(await self.bot.cogs['LangCog'].tr(msg.channel,'xp','default_levelup'))
+            while (not '{random}' in text) and random.random()<0.8:
+                text = random.choice(await self.bot.cogs['LangCog'].tr(msg.channel,'xp','default_levelup'))
         if '{random}' in text:
             item = random.choice(await self.bot.cogs['LangCog'].tr(msg.channel,'xp','levelup-items'))
         else:
@@ -136,12 +138,12 @@ class XPCog(commands.Cog):
     async def calc_level(self,xp):
         """Calcule le niveau correspondant à un nombre d'xp"""
         if xp==0:
-            return [0,ceil(20*20**(353/647)*1**(1000/647)),0]
-        lvl = ceil(0.05*xp**0.647)
+            return [0,ceil((1*125/7)**(20/13)),0]
+        lvl = ceil(0.056*xp**0.65)
         next_step = xp
-        while ceil(0.05*next_step**0.647)==lvl:
+        while ceil(0.056*next_step**0.65)==lvl:
             next_step += 1
-        return [lvl,next_step,ceil(20*20**(353/647)*(lvl-1)**(1000/647))]
+        return [lvl,next_step,ceil(((lvl-1)*125/7)**(20/13))]
         # Niveau actuel - XP total pour le prochain niveau - XP total pour le niveau actuel
 
     async def give_rr(self,member:discord.Member,level:int,rr_list:list,remove=False):
@@ -177,6 +179,8 @@ class XPCog(commands.Cog):
     async def bdd_set_xp(self,userID,points,Type='add'):
         """Ajoute/reset de l'xp à un utilisateur dans la database générale"""
         try:
+            if points==0:
+                return True
             cnx = self.bot.cnx
             cursor = cnx.cursor(dictionary = True)
             if Type=='add':
@@ -624,7 +628,7 @@ class XPCog(commands.Cog):
             await self.bot.cogs['HelpCog'].help_command(ctx,['rr'])
     
     @rr_main.command(name="add")
-    @commands.check(checks.can_manage_server)
+    @commands.check(checks.has_manage_guild)
     async def rr_add(self,ctx,level:int,*,role:discord.Role):
         """Add a role reward
         This role will be given to every member who reaches the level"""
@@ -643,7 +647,7 @@ class XPCog(commands.Cog):
             await ctx.send(str(await self.translate(ctx.guild.id,'xp','rr-added')).format(role.name,level))
     
     @rr_main.command(name="list")
-    @commands.check(checks.can_manage_server)
+    @commands.check(checks.has_manage_guild)
     async def rr_list(self,ctx):
         """List every roles rewards of your server"""
         if not ctx.channel.permissions_for(ctx.guild.me).embed_links:
@@ -661,7 +665,7 @@ class XPCog(commands.Cog):
             await ctx.send(embed=emb.discord_embed())
     
     @rr_main.command(name="remove")
-    @commands.check(checks.can_manage_server)
+    @commands.check(checks.has_manage_guild)
     async def rr_remove(self,ctx,level:int):
         """Remove a role reward
         When a member reaches this level, no role will be given anymore"""
@@ -676,7 +680,7 @@ class XPCog(commands.Cog):
             await ctx.send(str(await self.translate(ctx.guild.id,'xp','rr-removed')).format(level))
     
     @rr_main.command(name="reload")
-    @commands.check(checks.can_manage_server)
+    @commands.check(checks.has_manage_guild)
     @commands.cooldown(1,300,commands.BucketType.guild)
     async def rr_reload(self,ctx):
         """Refresh roles rewards for the whole server"""

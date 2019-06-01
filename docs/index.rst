@@ -21,7 +21,7 @@ And to join our official support server, `click on this link <https://discord.gg
 
    perms
    moderator
-   config
+   server
    user
    infos
    minecraft

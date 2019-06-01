@@ -3,6 +3,7 @@ import discord, datetime, time
 
 fr_months=["Janvier","Février","Mars","Avril","Mai","Juin","Juillet","Aout","Septembre","Octobre","Novembre","Décembre"]
 en_months=["January","February","March","April","May","June","July","August","September","October","November","December"]
+fi_months=['tammikuu','helmikuu','maaliskuu','huhtikuu','toukokuu','kesäkuu','heinäkuu','elokuu','syyskuu','lokakuu','marraskuu','joulukuu']
 
 class TimeCog(discord.ext.commands.Cog):
     """This cog handles all manipulations of date, time, and time interval. So cool, and so fast"""
@@ -84,6 +85,8 @@ class TimeCog(discord.ext.commands.Cog):
                 lib = ['ans','an','mois','mois','jours','jour','heures','heure','minutes','minute','secondes','seconde']
             elif lang == 'lolcat':
                 lib = ['yearz','year','mons','month','dayz','day','hourz','hour','minutz','minut','secondz','secnd']
+            elif lang=='fi':
+                lib = [ 'Vuotta', 'vuosi', 'kuukautta', 'kuukausi', 'päivää', 'päivä', 'tuntia', 'h', 'minuuttia', 'minute', 'sekuntia', 'toinen']
             else:
                 lib = ['years','year','months','month','days','day','hours','hour','minutes','minute','seconds','second']
             if year and t.years != 0:
@@ -140,10 +143,10 @@ class TimeCog(discord.ext.commands.Cog):
             h=[]
             if lang == 'fr':
                 month = fr_months
-            elif lang == 'en':
-                month = en_months
+            elif lang == 'fi':
+                month = fi_months
             else:
-                month = fr_months
+                month = en_months
             for i in ['hour','minute','second']:
                 a = eval(str("date."+i))
                 if len(str(a))==1:
@@ -155,16 +158,18 @@ class TimeCog(discord.ext.commands.Cog):
                     month = "0"+str(date.month)
                 else:
                     month = str(date.month)
-                if lang == 'en':
-                    df = "{m}/{d}{y}  {h}"
-                else:
+                if lang == 'fr':
                     df = "{d}/{m}{y}  {h}"
+                elif lang == 'fi':
+                    df = "{d}.{m}.{y}  {h}"
+                else:
+                    df = "{m}/{d}{y}  {h}"
                 df = df.format(d=jour,m=month,y = "/"+str(date.year) if year else "",h = ":".join(h) if hour else "")
             else:
-                if lang == 'en':
-                    df = "{m} {d}, {y}  {h}"
-                else:
+                if lang == 'fr' or lang=='fi':
                     df = "{d} {m} {y}  {h}"
+                else:
+                    df = "{m} {d}, {y}  {h}"
                 df = df.format(d=jour,m=month[date.month-1],y=str(date.year) if year else "",h=":".join(h) if hour else "")
             return df
 

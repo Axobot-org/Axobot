@@ -142,29 +142,30 @@ def get_prefix(bot,msg):
 def main():
     client = zbot(command_prefix=get_prefix,case_insensitive=True,status=discord.Status('online'))
 
-    initial_extensions = ['fcts.admin',
-                      'fcts.utilities',
-                      'fcts.reloads',
-                      'fcts.language',
-                      'fcts.server',
-                      'fcts.errors',
-                      'fcts.perms',
+    initial_extensions = ['fcts.language',
+                      'fcts.admin',
                       'fcts.aide',
-                      'fcts.mc',
-                      'fcts.infos',
-                      'fcts.timeclass',
-                      'fcts.fun',
-                      'fcts.rss',
-                      'fcts.moderation',
-                      'fcts.cases',
                       'fcts.bvn',
-                      'fcts.emoji',
+                      'fcts.cases',
                       'fcts.embeds',
+                      'fcts.emoji',
+                      'fcts.errors',
                       'fcts.events',
-                      'fcts.timed',
+                      'fcts.fun',
+                      'fcts.infos',
+                      'fcts.mc',
+                      'fcts.moderation',
                       'fcts.morpion',
-                      'fcts.xp',
+                      'fcts.partners',
+                      'fcts.perms',
+                      'fcts.reloads',
+                      'fcts.rss',
+                      'fcts.server',
+                      'fcts.timeclass',
+                      'fcts.timed',
                       'fcts.users',
+                      'fcts.utilities',
+                      'fcts.xp',           
     ]
     # Suppression du fichier debug.log s'il est trop volumineux
     if os.path.exists("debug.log"):
@@ -183,9 +184,8 @@ def main():
             r.remove('')
         for e,s in enumerate(['user','password','host','database']):
             client.database_keys[s] = cryptage.uncrypte(r[e])
-        client.others['dbl_client'] = dbl.Client(client,cryptage.uncrypte(r[4]))
-        client.others['divinediscordbots'] = cryptage.uncrypte(r[5])
-        client.others['botsondiscord'] = cryptage.uncrypte(r[6])
+        client.others['divinediscordbots'] = cryptage.uncrypte(r[4])
+        client.others['botsondiscord'] = cryptage.uncrypte(r[5])
     try:
         cnx = mysql.connector.connect(user=client.database_keys['user'],password=client.database_keys['password'],host=client.database_keys['host'],database=client.database_keys['database'])
         cnx.close()
