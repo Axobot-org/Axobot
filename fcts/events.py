@@ -278,6 +278,7 @@ class Events(commands.Cog):
     @loop.before_loop
     async def before_loop(self):
         await self.bot.wait_until_ready()
+        await asyncio.sleep(2)
         await self.rss_loop()
         await self.mee6_xp_loop()
         self.bot.log.info("[tasks_loop] Lancement de la boucle")
@@ -352,6 +353,7 @@ class Events(commands.Cog):
     async def partners_loop(self):
         """Update partners channels (every 7 hours)"""
         t = time.time()
+        self.partner_last_check = datetime.datetime.now()
         channels_list = await self.bot.cogs['ServerCog'].get_server(criters=["`partner_channel`<>''"],columns=['ID','partner_channel','partner_color'])
         self.bot.log.info("[Partners] Rafraîchissement des salons ({} serveurs prévus)...".format(len(channels_list)))
         count = [0,0]

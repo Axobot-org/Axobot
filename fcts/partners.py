@@ -158,7 +158,7 @@ class PartnersCog(commands.Cog):
                 if isinstance(inv,discord.Invite) and not inv.revoked:
                     title += inv.guild.name
                     field1 = {'name':tr_members.capitalize(),'value':str(inv.approximate_member_count)}
-                    await self.bot.loop.run_in_executor(None, self.give_roles, inv, channel.guild)
+                    await self.give_roles(inv,channel.guild)
                 else:
                     title += tr_unknown
                     field1 = None
@@ -310,13 +310,13 @@ class PartnersCog(commands.Cog):
                     bot = await self.bot.fetch_user(l['target'])
                 except:
                     bot = l['target']
-                f[0] += "[{}] **{}** `{}` ({} {})\n".format(l['ID'],tr_bot,bot,tr_added,date)
+                f[0] += "[{}] **{}** `{}` ({} {})\n".format(l['ID'],tr_bot.capitalize(),bot,tr_added,date)
             elif l['type']=='guild':
                 try:
-                    server = (await self.bot.fetch_invite(l['target'])).name
+                    server = (await self.bot.fetch_invite(l['target'])).guild.name
                 except:
                     server = 'discord.gg/'+l['target']
-                f[0] += "[{}] **{}** `{}` ({} {})\n".format(l['ID'],tr_guild,server,tr_added,date)
+                f[0] += "[{}] **{}** `{}` ({} {})\n".format(l['ID'],tr_guild.capitalize(),server,tr_added,date)
         for l in await self.bdd_get_partnered(await ctx.guild.invites()):
             server = ctx.bot.get_guild(l['guild'])
             if server==None:
