@@ -82,7 +82,7 @@ class PartnersCog(commands.Cog):
             await self.bot.cogs['ErrorsCog'].on_error(e,None)
             return False
     
-    async def bdd_edit_partner(self,partnerID:str,target:str=None,desc:str=None):
+    async def bdd_edit_partner(self,partnerID:int,target:str=None,desc:str=None,msg:int=None):
         """Modify a partner"""
         try:
             cnx = self.bot.cnx
@@ -92,6 +92,8 @@ class PartnersCog(commands.Cog):
                 query += ("UPDATE `{table}` SET `target` = \"{target}\" WHERE `ID` = {id};".format(table=self.table,target=target,id=partnerID))
             if desc!=None:
                 query += ("UPDATE `{table}` SET `description` = \"{desc}\" WHERE `ID` = {id};".format(table=self.table,desc=desc.replace('"','\"'),id=partnerID))
+            if msg!=None:
+                query += ("UPDATE `{table}` SET `messageID` = \"{msg}\" WHERE `ID` = {id};".format(table=self.table,msg=msg,id=partnerID))
             cursor.execute(query)
             cnx.commit()
             cursor.close()
@@ -115,7 +117,7 @@ class PartnersCog(commands.Cog):
             return False
 
 
-    async def update_partners(self,channel:discord.TextChannel):
+    async def update_partners(self,channel:discord.TextChannel,color:int=None):
         """Update every partners of a channel"""
         partners = await self.bdd_get_guild(channel.guild.id)
         if not channel.permissions_for(channel.guild.me).embed_links:
@@ -127,7 +129,9 @@ class PartnersCog(commands.Cog):
         tr_guilds = await self.translate(channel.guild.id,'keywords','servers')
         tr_invite = await self.translate(channel.guild.id,'stats_infos','inv-4')
         tr_click = await self.translate(channel.guild.id,'keywords','click_here')
-        color = await self.bot.cogs['ServerCog'].find_staff(channel.guild.id,'partner_color')
+        count = 0
+        if color==None:
+            color = await self.bot.cogs['ServerCog'].find_staff(channel.guild.id,'partner_color')
         session = aiohttp.ClientSession(loop=self.bot.loop)
         for partner in partners:
             if partner['type']=='bot':
@@ -162,11 +166,15 @@ class PartnersCog(commands.Cog):
                 msg = await channel.fetch_message(partner['messageID'])
                 await msg.edit(embed=emb.discord_embed())
             except discord.errors.NotFound:
-                await channel.send(embed=emb.discord_embed())
+                msg = await channel.send(embed=emb.discord_embed())
+                await self.bdd_edit_partner(partnerID=partner['ID'],msg=msg.id)
             except Exception as e:
-                await channel.send(embed=emb.discord_embed())
+                msg = await channel.send(embed=emb.discord_embed())
+                await self.bdd_edit_partner(partnerID=partner['ID'],msg=msg.id)
                 await self.bot.cogs['ErrorsCog'].on_error(e,None)
+            count += 1
         await session.close()
+        return count
 
 
 
