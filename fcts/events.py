@@ -15,6 +15,7 @@ class Events(commands.Cog):
         self.file = "events"
         self.mee6_last_check = datetime.datetime.utcfromtimestamp(0)
         self.dbl_last_sending = datetime.datetime.utcfromtimestamp(0)
+        self.partner_last_check = datetime.datetime.utcfromtimestamp(0)
         self.embed_colors = {"welcome":5301186,
         "mute":4868682,
         "kick":16730625,
@@ -267,6 +268,8 @@ class Events(commands.Cog):
                 await self.rss_loop()
             if int(d.hour)%4 == 0 and d.hour != self.mee6_last_check.hour:
                 await self.mee6_xp_loop()
+            if int(d.hour)%7 == 0 and d.hour != self.partner_last_check.hour:
+                await self.partners_loop()
             if int(d.hour) == 0 and d.day != self.dbl_last_sending.day:
                 await self.dbl_send_data()
         except Exception as e:
@@ -344,6 +347,28 @@ class Events(commands.Cog):
         await session.close()
         emb = self.bot.cogs["EmbedCog"].Embed(desc='**Guilds count updated** in {}s ({})'.format(round(time.time()-t,3),'-'.join(answers)),color=7229109).update_timestamp().set_author(self.bot.user)
         await self.bot.cogs["EmbedCog"].send([emb],url="https://discordapp.com/api/webhooks/509079297353449492/1KlokgfF7vxRK37pHd15UjdxJSa5H9yzbOLAaRjYEQK7XIdjfMp9PCnER1-Dfz0PBSaM")
+
+
+    async def partners_loop(self):
+        """Update partners channels (every 7 hours)"""
+        t = time.time()
+        channels_list = await self.bot.cogs['ServerCog'].get_server(criters=["`partner_channel`<>''"],columns=['ID','partner_channel','partner_color'])
+        self.bot.log.info("[Partners] Rafraîchissement des salons ({} serveurs prévus)...".format(len(channels_list)))
+        count = [0,0]
+        for guild in channels_list:
+            chan = guild['partner_channel'].split(';')[0]
+            if not chan.isnumeric():
+                continue
+            chan = self.bot.get_channel(int(chan))
+            if chan==None:
+                continue
+            count[0] += 1
+            count[1] += await self.bot.cogs['PartnersCog'].update_partners(chan,guild['partner_color'])
+        emb = self.bot.cogs["EmbedCog"].Embed(desc='**Partners channels updated** in {}s ({} channels - {} partners)'.format(round(time.time()-t,3),count[0],count[1]),color=10949630).update_timestamp().set_author(self.bot.user)
+        await self.bot.cogs["EmbedCog"].send([emb],url="https://discordapp.com/api/webhooks/509079297353449492/1KlokgfF7vxRK37pHd15UjdxJSa5H9yzbOLAaRjYEQK7XIdjfMp9PCnER1-Dfz0PBSaM")
+        
+            
+
 
 def setup(bot):
     bot.add_cog(Events(bot))
