@@ -6,7 +6,7 @@ import discord
 from discord.ext import commands
 from fcts import cryptage
 
-roles_options = ["clear","slowmode","mute","kick","ban","warn","say","gived_roles","muted_role"]
+roles_options = ["clear","slowmode","mute","kick","ban","warn","say","gived_roles","muted_role",'partner_role']
 bool_options = ["save_roles","enable_xp","anti_caps_lock","enable_fun","help_in_dm"]
 textchan_options = ["hunter","welcome_channel","bot_news","poll_channels","modlogs_channel","noxp_channels","partner_channel"]
 vocchan_options = ["membercounter"]
@@ -64,7 +64,8 @@ class ServerCog(commands.Cog):
                "help_in_dm":0,
                "muted_role":0,
                "partner_channel":'',
-               "partner_color":10949630}
+               "partner_color":10949630,
+               'partner_role':''}
         self.optionsList = ["prefix","language","clear","slowmode","mute","kick","ban","warn","say","welcome_channel","welcome","leave","gived_roles","bot_news","poll_channels","partner_channel","modlogs_channel","enable_xp","anti_caps_lock","enable_fun","membercounter","anti_raid","vote_emojis","help_in_dm","muted_role"]
 
     @commands.Cog.listener()

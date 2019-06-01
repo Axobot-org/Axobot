@@ -157,6 +157,7 @@ class PartnersCog(commands.Cog):
                 if isinstance(inv,discord.Invite) and not inv.revoked:
                     title += inv.guild.name
                     field1 = {'name':tr_members.capitalize(),'value':str(inv.approximate_member_count)}
+                    await self.bot.loop.run_in_executor(None, self.give_roles, inv, channel.guild)
                 else:
                     title += tr_unknown
                     field1 = None
@@ -175,6 +176,22 @@ class PartnersCog(commands.Cog):
             count += 1
         await session.close()
         return count
+
+    async def give_roles(self,invite:discord.Invite,guild:discord.Guild):
+        """Give a role to admins of partners"""
+        if isinstance(invite.guild,discord.Guild):
+            roles = await self.bot.cogs['ServerCog'].find_staff(guild.id,'partner_role')
+            roles = [x for x in [guild.get_role(int(x)) for x in roles.split(';') if len(x)>0 and x.isnumeric()] if x!=None]
+            admins = [x for x in invite.guild.members if x.guild_permissions.administrator]
+            for admin in admins:
+                if admin in guild.members:
+                    member = guild.get_member(admin.id)
+                    for role in roles:
+                        if role not in member.roles:
+                            try:
+                                await member.add_roles(role)
+                            except:
+                                pass
 
 
 
