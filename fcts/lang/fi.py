@@ -394,7 +394,7 @@ Link : {link}""",
         "research-timeout":"The web page took too long to answer, I had to interrupt the process :eyes:"
 }
 
-server={"config-help": "This command is mainly used to configure your server. By doing `!config see [option]` you will get \
+server={"config-help": "Tätä komentoa yleensä käytetään palvelimen konfigurointiin. Viestittämällä `!config see [option]` sinä aiot saadayou will get \
 an overview of the current configurations, and server administrators can enter `!config change <option> role1, role2, role3...` \
 to modify a configuration, or `!config del <option>` to reset the option (`!config change <option>` works the same way).\nThe list of available options is available at <https://zbot.rtfd.io/en/latest/config.html#list-of-every-option>",
         "change-0": "Tämä vaihtoehto ei ole olemassa :confused:",
