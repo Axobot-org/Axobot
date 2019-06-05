@@ -43,23 +43,23 @@ __** Konfiguraatio**__
 """}
 
 cases={"no-user":"Tämä on mahdotonta löytää tämä käyttäjä. :eyes:",
-        "not-found":"Tätä keissiä ei löydetty :confused:",
-        "reason-edited":"Syy keissille #{} on vaihdettu!",
-        "deleted":"Keissi #{} on poistettu!",
-        "cases-0":"{} keissit löydetty: ({}-{})",
+        "not-found":"Tätä tapausta ei löydetty :confused:",
+        "reason-edited":"Syy tapaukselle #{} on vaihdettu!",
+        "deleted":"Tapaus #{} on poistettu!",
+        "cases-0":"{} tapaukset löydetty: ({}-{})",
         "search-0":"**Käyttäjä:** {U}\n**Muoto:** {T}\n**Valvoja:** {M}\n**Päivämäärä:** {D}\n**Syy:** *{R}*",
         "search-1":"**Käyttäjä:** {U}\n**Serveri:** {G}\n**Muoto:** {T}\n**Valvoja:** {M}\n**Päivämäärä:** {D}\n**Syy:** *{R}*",
-        'title-search':'Case #{}',
-        'no_database':"Jonkun ajan database alas käynnin takia, tämä komento on pois käytöstä"}
+        'title-search':'Tapaus #{}',
+        'no_database':"Jonkun ajan tietokannan alas käynnin takia, tämä komento on pois käytöstä"}
 
-events={'mp-adv':"Sinä varmaan yrität kutsua minut tähän servuun? Jos tämä on oikein, en voi liittyä helpolla kutsu linkillä. Adminin täytyy käyttää minun omaa kutsu linkkiä, täällä:<https://bot.discord.io/zbot> :wink:"}
+events={'mp-adv':"Sinä varmaan yrität kutsua minut tähän palvelimeen? Jos tämä on oikein, en voi liittyä helpolla kutsu linkillä. Järjestyksenvalvojan täytyy käyttää minun omaa kutsu linkkiä, täällä:<https://bot.discord.io/zbot> :wink:"}
 
-errors={"cooldown":"Olet jäähyllä tältä commandilta :confused: Please wait {} more seconds...",
+errors={"cooldown":"Olet jäähyllä tältä commandilta :confused:  Odota {} lisää sekunttia...",
         "badarguments":"Upsis, on mahdotonta muuntaa `{c[3]}` paramittarin\"{c[1]}\" tyyppiä :confused:",
         "missingargument":"Upsis, argumentti \"{}\" puuttuu {}",
         "membernotfound":"On mahdotonta löytää käyttäjä `{}` :confused:",
         "usernotfound":"On mahdotonta löytää käyttäjä `{}` :confused:",
-        "disabled":"Commandi {} on poissa käytöstä :confused:",
+        "disabled":"Komento {} on poissa käytöstä :confused:",
         "duration":"Aika `{}` on epäselvä",
         "rolenotfound":"On mahdotonta löytää rooli `{0}`",
         "invalidcolor":"Väri `{0}` epäselvä"}
@@ -73,8 +73,8 @@ find={"user-0":"nimi: {}\nID: {}",
         "chan-1":"Nimi : {}\nID: {}\nServeri: {} ({})",
         "help":"Tämä komento hyväksyy löytämään serverin tai salongin kaikista servereistä missä botti on. Voit myös etsiä Discord käyttäjän tiedot, siltikin vaikka jos hän ei ole minun kanssani serverissä!\
 Syntaksi tälle on `!find <user|channel|guild> <ID>`",
-        "role-0":"Role not found",
-        "role-1":"Name: {}\nID: {}\nGuild: {} ({})\nMembers number: {}\nColour: {}"}
+        "role-0":"Rooli ei löytynyt",
+        "role-1":"Nimi: {}\nTunniste: {}\nPalvelin: {} ({})\nJäsenten numero: {}\nVäri: {}"}
 
 fun={"count-0":"Laskeminen on kesken...",
         "count-1":"Viimeiset {} lähetystä, olet lähettänyt {} viestiä ({}%)",
@@ -128,14 +128,14 @@ Kaikki jotka auttoivat minun tekeimsessä, minun omistaja ja minä haluamme kiit
         "docs":"Tässä on linkki botin dokumenttiin:",
         "stats-title":"**Bot tilastot**",
         "stats":"""**Bot versio:** {bot_v} \n**Kaikkien palvelimien numero missä olen:** {s_count} \n**Numero kaikista näkyvistä jäsenistä:** {m_count} ({b_count} **botit**)\n**Numero koodi riveistä:** {l_count}\n**Käytettyjä kieliä:** {lang}\n** {p_v} \n**Versio `discord.py`stä:** {d_v} \n**Ladataan RAMia:** {ram} GB \n**Ladataan CPU:ssa:** {cpu} % \n**API viive aika:** {api} ms\n**Kaikki xp kerätty:** {xp}""",
-        "admins-list":"Adminit tälle botille ovat : {}",
+        "admins-list":"Järjestyksenvalvojat tälle botille ovat : {}",
         "prefix":"Lista kaikista käytettävissä olevista etuliitoista:",
-        'discordlinks':{'Servers status':'https://dis.gd/status',
-                'Discord ToS':'https://dis.gd/tos',
-                'Report a bug/ a user':'https://dis.gd/report',
-                'Suggest something to Discord':'https://dis.gd/feedback',
-                'Selfbots article':'https://support.discordapp.com/hc/articles/115002192352',
-                'ToS for bot devs':'https://discordapp.com/developers/docs/legal'},}
+        'discordlinks':{'Palvelin tila':'https://dis.gd/status',
+                'Discord käyttöehdot ToS:''https://dis.gd/tos',
+                'Raportoi ongelma/ käyttäjä':'https://dis.gd/report',
+                'Ehdota jotain Discordille ':'https://dis.gd/feedback',
+                'Itsebotti artikkeli':'https://support.discordapp.com/hc/articles/115002192352',
+                'Käyttöehdot botin tekijöille':'https://discordapp.com/developers/docs/legal'},}
 
 infos_2={"membercount-0":"Numero jäsenistä",
 "membercount-1":"Numero boteista",
@@ -171,17 +171,17 @@ kill={"list":["Jaahas, olet kuolemassa!",
           "Sinun pitää olla hissin __sisällä__, {1}. Ei __yläpuolella__...",
           "{1} oli liian lähellä kaijuttimia monster rokki konsertissa.",
           "Eii ! Tupla hypyt ei ole mahdollisia, {1} !",
-          "{1} died. Peace to his soul... :sneezing_face:",
+          "{1} kuoli. Rauhaa hänen hengelle... :sneezing_face:",
           "{0} tappoi {1}",
           "{0} ampui käyttäjän {1}",
           "Heippa {1} ! :ghost:",
           "{1} näki alsin putouksen... hänen päähän päin :head_bandage:",
-          "{1} commit suicide after {0} has cut his connection",
+          "{1} teki itsemurhan sen jälkeen kun {0} leikkasi hänen yhteyde",
           "Huomio {1} ! Tuli palaa :fire:",
           "{1} tappeli zombeja ilman lapiota",
           "{1} yritti halata creepperiä",
           "{1}, laava kylvyt on kuumia mutta, laava palaa...",
-          "{1} tried a rocket jump",
+          "{1} yritti roketti hypätä",
           "Sinun ei kannattaisi kuunnella söpöä melodiaa keholaulusta, {1} :musical_note:",
           "{2}.exe *On lakannut toimimasta*"
           ]}
