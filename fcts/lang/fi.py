@@ -211,7 +211,7 @@ mc={"contact-mail":"Jos huomaat virheen annetuissa tiedoissa, ota minuun yhteytt
         "serv-2":"Lista paikalla olevista pelaajista",
         "serv-3":"Latency",
         "serv-error":"Ups, tuntematon virhe havaittu. Yritä uudelleen myöhemmin :confused:",
-        "no-api":"Error: Unable to connect to API",
+        "no-api":"Virhe: Mahdotonta yhdistää API:hin",
         "no-ping":"Error: Unable to ping this server",
         "success-add":"A message with server details {} has been added to the channel {} !",
         "cant-embed":"Cannot send embed. Please make sure the \"Embed links\" permission is enabled.",
@@ -391,9 +391,9 @@ Link : {link}""",
         "research-timeout":"The web page took too long to answer, I had to interrupt the process :eyes:"
 }
 
-server={"config-help": "Tätä komentoa yleensä käytetään palvelimen konfigurointiin. Viestittämällä `!config see [option]` sinä aiot saadayou will get \
-an overview of the current configurations, and server administrators can enter `!config change <option> role1, role2, role3...` \
-to modify a configuration, or `!config del <option>` to reset the option (`!config change <option>` works the same way).\nThe list of available options is available at <https://zbot.rtfd.io/en/latest/config.html#list-of-every-option>",
+server={"config-help": "Tätä komentoa yleensä käytetään palvelimen konfigurointiin. Viestittämällä `!config see [option]` sinä aiot saada \
+näyn tämänaikaisesta konfiguraatiosta, ja palvelimen järjestyksenvalvojat voivat viestittää `!config change <option> role1, role2, role3...` \
+jolla voi muuttaa konfigurointia, tai `!config del <option>` jolla voi asettaa uudelleen vaitoehdon (`!config change <option>` toimii samallain).\nLista mahdollisista vaihtoehdoista löytyy täältä: <https://zbot.rtfd.io/en/latest/config.html#list-of-every-option>",
         "change-0": "Tämä vaihtoehto ei ole olemassa :confused:",
         "change-1": "Ups, sisäinen virhe tapahtui...",
         "change-2": "Vaihtoehto '{}' hinta on poistettu",
