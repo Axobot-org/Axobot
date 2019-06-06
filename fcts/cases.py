@@ -1,5 +1,9 @@
-import discord, mysql.connector
+import discord, mysql.connector, importlib, typing
 from discord.ext import commands
+
+from fcts import args, reloads
+importlib.reload(reloads)
+importlib.reload(args)
 
 
 async def can_edit_case(ctx):
@@ -187,22 +191,29 @@ class CasesCog(commands.Cog):
     @case_main.command(name="list")
     @commands.guild_only()
     @commands.cooldown(5, 30, commands.BucketType.user)
-    async def see_case(self,ctx,user,guild:int=None):
+    async def see_case(self,ctx,*,user:args.user):
         """Get every case of a user
         This user can have left the server"""
         if not self.bot.database_online:
             return await ctx.send(await self.translate(ctx.guild.id,'cases','no_database'))
-        if user.isnumeric():
-            user = int(user)
-        else:
-            try:
-                user = await commands.UserConverter().convert(ctx,user)
-                user = user.id
-            except:
-                await ctx.send(await self.translate(ctx.guild.id,"cases","no-user"))
-                return
-        if not await self.bot.cogs['AdminCog'].check_if_admin(ctx):
-            guild = ctx.guild.id
+        await self.see_case_main(ctx,ctx.guild.id,user.id)
+    
+    @case_main.command(name="glist")
+    @commands.guild_only()
+    @commands.check(reloads.is_support_staff)
+    async def see_case_2(self,ctx,guild:typing.Optional[int],*,user:args.user):
+        """Get every case of a user on a specific guild
+        This user can have left the server"""
+        if not self.bot.database_online:
+            return await ctx.send(await self.translate(ctx.guild.id,'cases','no_database'))
+        if guild!=None:
+            guild = self.bot.get_guild(guild)
+            if guild==None:
+                return await ctx.send("Impossibled de trouver ce serveur")
+            guild = guild.id
+        await self.see_case_main(ctx,guild,user.id)
+        
+    async def see_case_main(self,ctx,guild:discord.Guild,user:discord.User):
         if guild != None:
             c = ["`user`='{}'".format(user),"guild='{}'".format(guild)]
             v = "**Type:** {T}\n**Moderator:** {M}\n**Date:** {D}\n**Reason:** *{R}*"  
