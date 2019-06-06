@@ -447,7 +447,7 @@ Lien : {link}""",
 
 server={"config-help":"Cette commande sert principalement à configurer votre serveur. En faisant `!config see [option]` vous obtiendrez l'aperçu des configurations actuelles, \
 et les administrateurs du serveur peuvent entrer `!config change <option> role1, role2, role3...` pour modifier une configuration, ou `!config del <option>` pour réinitialiser \
-l'option (`!config change <option> del` fonctionne de même).\nLa liste des options disponible est accessible à l'adresse <https://zbot.rtfd.io/en/latest/config.html#list-of-every-option>",
+l'option (`!config change <option> del` fonctionne de même).\nLa liste des options disponible est accessible à l'adresse <https://zbot.rtfd.io/en/latest/server.html#list-of-every-option>",
         "change-0":"Cette option n'existe pas :confused:",
         "change-1":"Oups, une erreur interne est survenue...",
         "change-2":"La valeur de l'option '{}' a bien été effacée",
