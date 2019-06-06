@@ -53,6 +53,10 @@ class ErrorsCog(commands.Cog):
                 r = re.search(r'Converting to \"(?P<type>[^\"]+)\" failed for parameter \"(?P<arg>[^.\n]+)\"',str(error))
             if r!=None:
                 return await ctx.send(str(await self.translate(ctx.channel,'errors','badarguments')).format(r.group('arg'),r.group('type')))
+            # zzz is not a recognised boolean option
+            r = re.search(r'(?P<arg>[^\"]+) is not a recognised (?P<type>[^.\n]+) option',str(error))
+            if r!=None:
+                return await ctx.send(str(await self.translate(ctx.channel,'errors','badarguments-2')).format(r.group('arg'),r.group('type')))
             # Member "Z_runner" not found
             r = re.search(r'Member \"([^\"]+)\" not found',str(error))
             if r!=None:
@@ -69,6 +73,10 @@ class ErrorsCog(commands.Cog):
             r = re.search(r'Colour \"([^\"]+)\" is invalid',str(error))
             if r!=None:
                 return await ctx.send(str(await self.translate(ctx.channel,'errors','invalidcolor')).format(r.group(1)))
+            # Channel "twitter" not found.
+            r = re.search(r'Channel \"([^\"]+)\" not found',str(error))
+            if r!=None:
+                return await ctx.send(str(await self.translate(ctx.channel,'errors','channotfound')).format(r.group(1)))
             # Invalid duration: 2d
             r = re.search(r'Invalid duration: ([^\" ]+)',str(error))
             if r != None:
