@@ -70,6 +70,7 @@ events={'mp-adv':"U're probably trying 2 invite me in dis server? If that's the 
 
 errors={"cooldown":"Yu are on cold-own for dis comandZ :confused: Plize wait {} moRe secs...",
         "badarguments":"W0ops, unabled 2 convrt teh `{c[3]}` parameterz to \"{c[1]}\" tipe :confused:",
+        'badarguments-2':"`{0}` iznt a true {1} option",
         "missingargument":"Oops, te argumnt \"{}\" are missin {}",
         "membernotfound":"Unabl to found the membr `{}` :confused:",
         "usernotfound":"Unabled 2 find teh userZ `{}` :confused:",
@@ -77,7 +78,8 @@ errors={"cooldown":"Yu are on cold-own for dis comandZ :confused: Plize wait {} 
         "duration":"Invalid timer: `{}`",
         "rolenotfound":"Unable 2 find ur role (`{0}`)",
         "invalidcolor":"Ups, I can't find the color `{0}` :confused:",
-        "invalidinvite":"Invalid bot/server link: `{0}`"
+        "invalidinvite":"Invalid bot/server link: `{0}`",
+        'channotfound':"Super chat room {0} don't want 2 be found"
         }
 
 find={"user-0":"naym: {}\nID: {}",
@@ -569,7 +571,10 @@ users = {'invalid-card':'Dat style iz no valid. But yop, her\'s styles u can use
         'missing-attach-files':'Oops, I\'m missing the Attach Files perms :upside_down:',
         'changed-0':'Ur xp card naw use the style {}',
         'changed-1':'Oops, a wicked error occurrd during the process ov ur request. Try again later or contact these nice support guys.',
-        'card-desc':"Here iz example of ur xp card. U can enter teh command `profile card <style>` 2 change the style\n*Ur xp card will only refresh wehn u have won Xp*"
+        'card-desc':"Here iz example of ur xp card. U can enter teh command `profile card <style>` 2 change the style\n*Ur xp card will only refresh wehn u have won Xp*",
+        'allow_animated_true':"Animated xp cards ar naw enabled 4U",
+        'allow_animated_false':"Anamited xp cards are naw disabld for you",
+        'allow_animated_success':"Dat parameter have been redefined 2 {}"
         }
 
 xp = {'card-level':'LVL',

@@ -70,6 +70,7 @@ events={'mp-adv':"You are probably trying to invite me to this server? If that i
 
 errors={"cooldown":"You are on cooldown for this command :confused: Please wait {} more seconds...",
         "badarguments":"Oops, unable to convert the `{c[3]}` parameter to \"{c[1]}\" type :confused:",
+        'badarguments-2':"`{0}` is not a recognised {1} option",
         "missingargument":"Oops, the argument \"{}\" is missing {}",
         "membernotfound":"Unable to find the member `{}` :confused:",
         "usernotfound":"Unable to find the user `{}` :confused:",
@@ -77,7 +78,8 @@ errors={"cooldown":"You are on cooldown for this command :confused: Please wait 
         "duration":"The duration `{}` is invalid",
         "rolenotfound":"Unable to find the role `{0}`",
         "invalidcolor":"Color `{0}` invalid",
-        "invalidinvite":"Invalid bot/server invite: `{0}`"
+        "invalidinvite":"Invalid bot/server invite: `{0}`",
+        'channotfound':"Channel {0} not found"
         }
 
 find={"user-0":"name: {}\nID: {}",
@@ -569,7 +571,10 @@ users = {'invalid-card':'This style is invalid. Here is the list of styles you c
         'missing-attach-files':'Oops, I\'m missing the permission to Attach Files :confused:',
         'changed-0':'Your xp card now uses the style {}',
         'changed-1':'Oops, an internal error occurred during the processing of the request. Try again later or contact support.',
-        'card-desc':"Here is an example of your xp card. You can enter the command `profile card <style>` to change the style\n*Your xp card will only refresh when you have won xp*"
+        'card-desc':"Here is an example of your xp card. You can enter the command `profile card <style>` to change the style\n*Your xp card will only refresh when you have won xp*",
+        'allow_animated_true':"Animated xp cards are currently enabled for you",
+        'allow_animated_false':"Animated xp cards are currently disabled for you",
+        'allow_animated_success':"This parameter has been redefined to {}"
         }
 
 xp = {'card-level':'LEVEL',
@@ -608,7 +613,7 @@ xp = {'card-level':'LEVEL',
                 "Congratulations {user}, you are {level}. Remember to use {random} to keep improving.",
                 "Thanks to the level {level}, you can try to win {random} at the raffle, {user} !",
                 "Despite your level, it is dangerous to travel alone {user}! Take {random} !",
-                "Level {level} for {user}! {random} is available from the seller!",
+                "Level {level} for {user}, {random} is available from the seller!",
                 "Bravo {user}! You are now level {level}! However, it is still necessary to climb to obtain {random} legendary rarity...",
                 "Houston, we have a problem. {user} has passed level {level}!!!!!",
                 "You see, the world is divided into two categories: those who levelup and those who don't levelup. You {user}, you levelup to level {level}!!!!",

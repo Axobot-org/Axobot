@@ -354,18 +354,36 @@ class XPCog(commands.Cog):
             for frame in frames:
                 frame = frame.convert(mode='RGBA')
                 img = await self.bot.loop.run_in_executor(None,self.add_overlay,frame.resize(size=(282,282)),user,card.copy(),xp,rank,txt,colors,levels_info,verdana_name,name_fnt)
-                img = ImageEnhance.Contrast(img).enhance(1.5)
+                img = ImageEnhance.Contrast(img).enhance(1.5).resize((800,265))
                 images.append(img)
                 duration.append(pfp.info['duration']/1000)
+                
             card.close()
 
             image_file_object = BytesIO()
             gif = images[0]
             gif.save(image_file_object, format='gif', save_all=True, append_images=images[1:], loop=0, duration=duration[0], subrectangles=True)
             image_file_object.seek(0)
+            print(image_file_object.getbuffer().nbytes)
             return discord.File(fp=image_file_object, filename='card.gif')
             # imageio.mimwrite('../cards/global/{}-{}-{}.gif'.format(user.id,xp,rank[0]), images, format="GIF-PIL", duration=duration, subrectangles=True)
             # return discord.File('../cards/global/{}-{}-{}.gif'.format(user.id,xp,rank[0]))
+
+    def compress(self,original_file, max_size, scale):
+        assert(0.0 < scale < 1.0)
+        orig_image = Image.open(original_file)
+        cur_size = orig_image.size
+
+        while True:
+            cur_size = (int(cur_size[0] * scale), int(cur_size[1] * scale))
+            resized_file = orig_image.resize(cur_size, Image.ANTIALIAS)
+
+            with io.BytesIO() as file_bytes:
+                resized_file.save(file_bytes, optimize=True, quality=95, format='png')
+
+                if file_bytes.tell() <= max_size:
+                    file_bytes.seek(0, 0)
+                    return file_bytes
 
     def add_overlay(self,pfp,user,img,xp,rank,txt,colors,levels_info,verdana_name,name_fnt):
         #img = Image.new('RGBA', (card.width, card.height), color = (250,250,250,0))
@@ -419,7 +437,7 @@ class XPCog(commands.Cog):
 
     @commands.command(name='rank')
     @commands.bot_has_permissions(send_messages=True)
-    @commands.cooldown(1,15,commands.BucketType.user)
+    @commands.cooldown(1,20,commands.BucketType.user)
     async def rank(self,ctx,*,user:args.user=None):
         """Display a user XP.
         If you don't send any user, I'll display your own XP
@@ -460,13 +478,19 @@ class XPCog(commands.Cog):
         except Exception as e:
             await self.bot.cogs['ErrorsCog'].on_command_error(ctx,e)
     
-    async def send_card(self,ctx,user,xp,rank,ranks_nb,levels_info=None):
+    async def send_card(self,ctx:commands.context,user:discord.User,xp,rank,ranks_nb,levels_info=None):
         try:
             await ctx.send(file=discord.File('../cards/global/{}-{}-{}.{}'.format(user.id,xp,rank,'gif' if user.is_avatar_animated() else 'png')))
         except FileNotFoundError:
             style = await self.bot.cogs['UtilitiesCog'].get_xp_style(user)
             txts = [await self.translate(ctx.channel,'xp','card-level'), await self.translate(ctx.channel,'xp','card-rank')]
-            await ctx.send(file=await self.create_card(user,style,xp,[rank,ranks_nb],txts,levels_info=levels_info))
+            static = await self.bot.cogs['UtilitiesCog'].get_db_userinfo(['animated_card'],[f'`userID`={user.id}'])
+            if user.is_avatar_animated():
+                if static!=None:
+                    static = not static['animated_card']
+                else:
+                    static = True
+            await ctx.send(file=await self.create_card(user,style,xp,[rank,ranks_nb],txts,force_static=static,levels_info=levels_info))
             self.bot.log.debug("XP card for user {} ({}xp - style {})".format(user.id,xp,style))
     
     async def send_embed(self,ctx,user,xp,rank,ranks_nb,levels_info):

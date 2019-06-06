@@ -41,17 +41,6 @@ blurple = {'check_intro':"{}, début de l'analyse blurple (Notez que cela peut p
         'won-card':"Wow! Magnifique image blurple {}! tellement beau que j'ai décidé de t'offrir la carte d'xp blurple, je suis sûr qu'elles iront bien ensemble ! Tu peux l'utiliser en tapant la commande `{}profile card blurple` {}"
         }
 
-blurple = {'check_intro':"{}, début de l'analyse blurple (Notez que cela peut prendre un certain temps)",
-    'check_invalid':'{}, veillez donner une URL valide',
-    'check_resized':"{}, l'image a été changée de taille pour faciliter le processus ({}s)",
-    'check_fields':["Pourcentage total de Blurple","Blurple (rgb(114, 137, 218))","Blanc (rgb(255, 255, 255))","Blurple Sombre (rgb(78, 93, 148))","Blurple, Blanc, Blurple Sombre = Blurple, Blanc, and Blurple Sombre (respectively) \nNoir = ni Blurple, ni Blanc, ni Blurple Sombre","Un énorme merci à **Rocked03** pour son code :blue_heart: https://github.com/Rocked03/Blurplefied.git","Remarque : Discord réduit la qualité des images, donc les pourcentages peuvent être légèrement imprécis. | Content requested by {}"],
-    'create_title':"Blurplefier - makes your image blurple!",
-    'create_footer_1':"Veuillez noter que ce blurplefier est automatisé et qu'il peut donc ne pas toujours vous donner le meilleur résultat. | Content requested by {}",
-    'create_footer_2':"Veuillez noter que ce blurplefier est automatisé et qu'il peut donc ne pas toujours vous donner le meilleur résultat. Avertissement : Cette image est un gif, et la qualité n'est pas toujours bonne. TOUTEFOIS, le gif n'est souvent pas aussi granuleux qu'il n'y paraît dans la prévisualisation. | Content requested by {}",
-    'create_oops':"{}, oups ! Il semble que ce gif est trop gros pour être téléchargé. Si vous voulez, vous pouvez lui donner une autre chance, mais avec une version plus petite de l'image. Désolé !",
-    'won-card':"Wow! Magnifique image blurple {}! tellement beau que j'ai décidé de t'offrir la carte d'xp blurple, je suis sûr qu'elles iront bien ensemble ! Tu peux l'utiliser en tapant la commande `{}profile card blurple` {}"
-    }
-
 bvn={"aide":"""__**Bienvenue dans le module des message de join et de leave**__
 
 Ce module vous sert à configurer un message automatique à chaque fois qu'un membre rentre ou sort de votre serveur.
@@ -81,6 +70,7 @@ events={'mp-adv':"Vous cherchez sans doute à m'inviter sur ce serveur ? Si c'es
 
 errors={"cooldown":"Vous êtes en cooldown pour cette commande. Veuillez attendre encore {0} secondes...",
         "badarguments":"Oups, impossible de convertir le paramètre `{0}` en type \"{1}\" :confused:",
+        'badarguments-2':"`{0}` n'est pas de type {1}",
         "missingargument":"Oups, il manque l'argument \"{0}\" {1}",
         "membernotfound":"Impossible de trouver le membre `{0}` :confused:",
         "usernotfound":"Impossible de trouver l'utilisateur `{0}` :confused:",
@@ -88,7 +78,8 @@ errors={"cooldown":"Vous êtes en cooldown pour cette commande. Veuillez attendr
         "duration":"La durée `{0}` est invalide",
         "rolenotfound":"Impossible de trouver le rôle `{0}`",
         "invalidcolor":"La couleur `{0}` est invalide",
-        "invalidinvite":"Invitation de bot ou de serveur invalide : `{0}`"
+        "invalidinvite":"Invitation de bot ou de serveur invalide : `{0}`",
+        'channotfound':"Le salon {0} est introuvable"
         }
 
 find={"user-0":"Nom : {}\nID : {}",
@@ -580,7 +571,10 @@ users = {'invalid-card':'Ce style est invalide. Voici la liste des styles que vo
         'missing-attach-files':'Oups, il me manque la permission d\'Attacher des Fichiers :confused:',
         'changed-0':'Votre carte d\'xp utilise maintenant le style {}',
         'changed-1':'Oups, une erreur interne est survenue pendant le traitement de la requête. Réessayez plus tard ou contactez le support.',
-        'card-desc':"Voici un exemple de votre carte d'xp. Vous pouvez entrer la commande `profile card <style>` pour changer le style\n*Votre carte d'xp ne se réactualisera que lorsque vous aurez gagné de l'xp*"
+        'card-desc':"Voici un exemple de votre carte d'xp. Vous pouvez entrer la commande `profile card <style>` pour changer le style\n*Votre carte d'xp ne se réactualisera que lorsque vous aurez gagné de l'xp*",
+        'allow_animated_true':"Les cartes d'xp animées sont actuellement autorisées pour vous",
+        'allow_animated_false':"Les cartes d'xp animées ne sont actuellement pas autorisées pour vous",
+        'allow_animated_success':"Ce paramètre a bien été redéfini à {}"
         }
 
 xp = {'card-level':'NIVEAU',
@@ -619,7 +613,7 @@ xp = {'card-level':'NIVEAU',
                 "Félicitations {user}, tu es niveau {level}. Pense à te servir de {random} pour continuer à progresser.",
                 "Grâce au niveau {level}, vous pouvez tenter de gagner {random} à la tombola, {user} !",
                 "Malgré ton level {level}, il est dangereux de voyager seul {user} ! Prends {random} !",
-                "Niveau {level} {user} ! {random} est disponible chez le vendeur !",
+                "Niveau {level} {user} : {random} est disponible chez le vendeur !",
                 "Bravo {user} ! Tu es désormais niveau {level} ! Cependant, il faut encore monter pour obtenir {random} d'une rareté légendaire...",
                 "Houston, on a un problème. {user} a atteint le niveau {level} !!!",
                 "Tu vois, le monde se divise en deux catégories : ceux qui levelup et ceux qui levelup pas. Toi {user}, tu levelup au niveau {level} !!!",
