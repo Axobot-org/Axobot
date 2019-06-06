@@ -510,7 +510,8 @@ server_desc={"prefix":"Currnt baot prfx: {}",
         "noxp_channels":"Chats where xp is for:b:idden: {}",
         "xp_type":"XP system used: {}",
         "partner_channel":"Channel where partners are sended: {}",
-        "partner_color":"Coulor of partners box: {}"
+        "partner_color":"Coulor of partners box: {}",
+        "partner_role":"Role givn 2 partners: {}"
         }
 
 stats_infos={"not-found":"Unable 2 found {N}",

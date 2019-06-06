@@ -510,7 +510,8 @@ server_desc={"prefix":"Current bot prefix: {}",
         "noxp_channels":"Channels where you can't get xp: {}",
         "xp_type":"XP system used: {}",
         "partner_channel":"Channel where partners are sent: {}",
-        "partner_color":"Color of partners embed: {}"
+        "partner_color":"Color of partners embed: {}",
+        "partner_role":"Role given to partners: {}"
         }
 
 stats_infos={"not-found":"Unable to find {N}",

@@ -510,7 +510,8 @@ server_desc={"prefix":"Préfixe actuel du bot : {}",
         "noxp_channels":"Salons où il est impossible d'obtenir de l'xp : {}",
         "xp_type":"Type de système d'xp : {}",
         "partner_channel":"Salon dans lequel envoyer les partenaires : {}",
-        "partner_color":"Couleur de l'embed des partenaires : {}"
+        "partner_color":"Couleur de l'embed des partenaires : {}",
+        "partner_role":"Rôle donné aux partenaires : {}"
         }
 
 stats_infos={"not-found":"Impossible de trouver {N}",
