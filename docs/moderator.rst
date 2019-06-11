@@ -45,18 +45,6 @@ Slowmode keeps your text channel quiet when excited people have decided to talk 
 
 .. note:: The system uses a brand new feature released on September 8th in Discord beta. It therefore is a completely new as in very few bots have it) feature and can be highly integrated into your applications. It is even better than just deleting messages.
 
-------
-Freeze
-------
-
-**Syntax:** :code:`freeze (on|off)`
-
-The freeze command is made to completely freeze a chat that has gotten too hot, so that nobody can talk before being cooled. To break the ice, just turn it off.
-People authorized to use the freeze command are the same as the ones who can use `slowmode <#slowmode>`_ (see the `config <server.html>`_ command). 
-
-.. warning:: The bot needs "`Manage messages <perms.html#manage-messages>`_" permission in order to delete messages from chatty members. In addition, members authorized to trigger the freeze are immune to this effect.
-
-
 -----
 Clear
 -----
