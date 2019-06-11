@@ -22,7 +22,8 @@ class UsersCog(commands.Cog):
     @commands.group(name='profile')
     async def profile_main(self,ctx):
         """Get and change info about yourself"""
-        pass
+        if ctx.subcommand_passed==None:
+            await self.bot.cogs['HelpCog'].help_command(ctx,['profile'])
     
     @profile_main.command(name='card')
     async def profile_card(self,ctx,style:typing.Optional[args.cardStyle]=None):
