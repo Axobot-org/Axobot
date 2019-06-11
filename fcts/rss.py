@@ -511,7 +511,7 @@ class RssCog(commands.Cog):
     @rss_main.command(name="text")
     @commands.guild_only()
     @commands.check(can_use_rss)
-    async def change_text_flow(self,ctx,ID:typing.Optional[int]=None,text=None):
+    async def change_text_flow(self,ctx,ID:typing.Optional[int]=None,*,text=None):
         """Change the text of an rss feed"""
         try:
             try:
@@ -532,11 +532,13 @@ class RssCog(commands.Cog):
                 try:
                     msg = await self.bot.wait_for('message', check=check,timeout=90)
                 except asyncio.TimeoutError:
-                    await ctx.send(await self.translate(ctx.guild.id,"rss","too-long"))
-            await self.update_flow(flow['ID'],[('structure',msg.content)])
-            await ctx.send(str(await self.translate(ctx.guild.id,"rss","text-success")).format(flow['ID'],msg.content))
+                    return await ctx.send(await self.translate(ctx.guild.id,"rss","too-long"))
+                text = msg.content
+            await self.update_flow(flow['ID'],[('structure',text)])
+            await ctx.send(str(await self.translate(ctx.guild.id,"rss","text-success")).format(flow['ID'],text))
         except Exception as e:
             await ctx.send(str(await self.translate(ctx.guild.id,"rss","guild-error")).format(e))
+            await ctx.bot.cogs['ErrorsCog'].on_error(e,ctx)
 
     @rss_main.command(name="test")
     @commands.check(reloads.is_support_staff)
