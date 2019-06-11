@@ -1,6 +1,7 @@
 import discord, random, time, asyncio, io, imageio, importlib, re, os, operator, platform, typing, aiohttp
 from discord.ext import commands
 from math import ceil
+from json import dumps
 import numpy as np
 from PIL import Image, ImageDraw, ImageFont, ImageTk, ImageSequence, ImageEnhance
 from urllib.request import urlopen, Request
@@ -759,7 +760,12 @@ class XPCog(commands.Cog):
                         temp = (await resp.json())['players']
                         result += temp
                     except Exception as e:
+                        j = dumps(await resp.json(), sort_keys=True, indent=2)
                         await self.bot.cogs['ErrorsCog'].senf_err_msg(f"Error on `mee6_get_top`: url https://mee6.xyz/api/plugins/levels/leaderboard/{guild.id}?page={i}&limit=999")
+                        try:
+                            [await self.bot.get_user(279568324260528128).send("```json\n{}\n```".format(x)) for x in [j[l:l+1950] for l in range(0, len(j), 1950) ][:5] ]
+                        except:
+                            pass
                         raise e
                 if len(temp)==0:
                     break

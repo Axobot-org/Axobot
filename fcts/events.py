@@ -296,18 +296,26 @@ class Events(commands.Cog):
         self.mee6_last_check = datetime.datetime.now()
         l = await self.bot.cogs['ServerCog'].get_server(columns=['ID','xp_type'],criters=['xp_type=1'])
         self.bot.log.info(f"[mee6-rewards] Lancement du check pour {len(l)} serveurs")
+        errors = list()
         for guild in l:
             g = self.bot.get_guild(guild['ID'])
             if g!=None:
                 counts[0] += 1
                 try:
-                    counts[1] += (await self.bot.cogs['XPCog'].mee6_reload_rr(g))[1]
+                    temp = await self.bot.cogs['XPCog'].mee6_reload_rr(g)
+                    if isinstance(temp,list):
+                        counts[1] += ()[1]
+                    else:
+                        errors.append(guild['ID'])
                 except aiohttp.client_exceptions.ContentTypeError:
                     await self.bot.cogs['ErrorsCog'].on_error(e,None)
                     return
                 except Exception as e:
                     await self.bot.cogs['ErrorsCog'].on_error(e,None)
-        emb = self.bot.cogs["EmbedCog"].Embed(desc='**MEE6 rewards** updated in {}s ({} guilds / {} roles given)'.format(round(time.time()-t,3),counts[0],counts[1]),color=6476789).update_timestamp().set_author(self.bot.user)
+        desc = '**MEE6 rewards** updated in {}s ({} guilds / {} roles given)'.format(round(time.time()-t,3),counts[0],counts[1])
+        if len(errors)>0:
+            desc += "\n{} errors: {}".format(len(errors),' - '.join(errors))
+        emb = self.bot.cogs["EmbedCog"].Embed(desc=desc,color=6476789).update_timestamp().set_author(self.bot.user)
         await self.bot.cogs["EmbedCog"].send([emb],url="loop")
     
     async def dbl_send_data(self):
