@@ -691,7 +691,7 @@ class ServerCog(commands.Cog):
                 msg = await self.translate(ctx.guild.id,"server","change-11")
                 await ctx.send(msg.format(value))
                 return
-            await self.modify_server(ctx.guild.id,values=[(option,int(color))])
+            await self.modify_server(ctx.guild.id,values=[(option,color.value)])
             msg = await self.translate(ctx.guild.id,"server","change-color")
             await ctx.send(msg.format(option,", ".join(color)))
             await self.send_embed(ctx.guild,option,color)

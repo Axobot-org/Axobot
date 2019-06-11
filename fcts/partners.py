@@ -282,7 +282,7 @@ class PartnersCog(commands.Cog):
             msg = await ctx.send((await self.translate(ctx.guild.id,'partners','confirm-bot')).format(bot))
         elif l['type']=='guild':
             try:
-                server = (await self.bot.fetch_invite(l['target'])).name
+                server = (await self.bot.fetch_invite(l['target'])).guild.name
             except:
                 server = l['target']
             msg = await ctx.send((await self.translate(ctx.guild.id,'partners','confirm-server')).format(server))
