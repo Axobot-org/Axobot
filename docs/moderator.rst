@@ -98,7 +98,7 @@ This command allows you to expel a member from your server, such as kick. But in
 .. warning:: For this command, the bot needs "`Ban members <perms.html#ban-members>`_" permission, and you need to have a role to use the "`kick <#kick>`_" command
 
 --------
-Ban/Unan
+Ban/Unban
 --------
 
 **Syntax:** :code:`ban <user> [days_to_delete] [reason]`
