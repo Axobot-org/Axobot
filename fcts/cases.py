@@ -126,7 +126,7 @@ class CasesCog(commands.Cog):
         try:
             cnx = self.bot.cnx
             cursor = cnx.cursor(dictionary = False)
-            query = ("SELECT COUNT(*) FROM `{}` WHERE `user`={} AND `guild`={}".format(self.table,userID,guildID))
+            query = ("SELECT COUNT(*) FROM `{}` WHERE `user`={} AND `guild`={} AND `type`!='unban'".format(self.table,userID,guildID))
             cursor.execute(query)
             liste = list()
             for x in cursor:
