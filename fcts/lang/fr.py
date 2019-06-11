@@ -79,7 +79,8 @@ errors={"cooldown":"Vous êtes en cooldown pour cette commande. Veuillez attendr
         "rolenotfound":"Impossible de trouver le rôle `{0}`",
         "invalidcolor":"La couleur `{0}` est invalide",
         "invalidinvite":"Invitation de bot ou de serveur invalide : `{0}`",
-        'channotfound':"Le salon {0} est introuvable"
+        'channotfound':"Le salon {0} est introuvable",
+        'DM':"Cette commande est indisponible en Messages Privés"
         }
 
 find={"user-0":"Nom : {}\nID : {}",

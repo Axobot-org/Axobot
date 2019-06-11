@@ -79,7 +79,8 @@ errors={"cooldown":"Yu are on cold-own for dis comandZ :confused: Plize wait {} 
         "rolenotfound":"Unable 2 find ur role (`{0}`)",
         "invalidcolor":"Ups, I can't find the color `{0}` :confused:",
         "invalidinvite":"Invalid bot/server link: `{0}`",
-        'channotfound':"Super chat room {0} don't want 2 be found"
+        'channotfound':"Super chat room {0} don't want 2 be found",
+        'DM':"Dat command isn't enabled in PM"
         }
 
 find={"user-0":"naym: {}\nID: {}",

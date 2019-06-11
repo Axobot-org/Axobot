@@ -29,13 +29,14 @@ class ErrorsCog(commands.Cog):
             return
         
         ignored = (commands.errors.CommandNotFound,commands.errors.CheckFailure,commands.errors.ConversionError,discord.errors.Forbidden)
+        actually_not_ignored = (commands.errors.NoPrivateMessage)
         
         # Allows us to check for original exceptions raised and sent to CommandInvokeError.
         # If nothing is found. We keep the exception passed to on_command_error.
         error = getattr(error, 'original', error)
 
         # Anything in ignored will return and prevent anything happening.
-        if isinstance(error, ignored):
+        if isinstance(error, ignored) and not isinstance(error,actually_not_ignored):
             if self.bot.beta:
                 c = str(type(error)).replace("<class '",'').replace("'>",'')
                 await ctx.send('`Ignored error:` [{}] {}'.format(c,error))
@@ -91,6 +92,9 @@ class ErrorsCog(commands.Cog):
             return
         elif isinstance(error,commands.DisabledCommand):
             await ctx.send(str(await self.translate(ctx.channel,'errors','disabled')).format(ctx.invoked_with))
+            return
+        elif isinstance(error,commands.errors.NoPrivateMessage):
+            await ctx.send(str(await self.translate(ctx.channel,'errors','DM')).format(ctx.invoked_with))
             return
         else:
             try:

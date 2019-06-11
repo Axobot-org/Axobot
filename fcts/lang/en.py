@@ -79,7 +79,8 @@ errors={"cooldown":"You are on cooldown for this command :confused: Please wait 
         "rolenotfound":"Unable to find the role `{0}`",
         "invalidcolor":"Color `{0}` invalid",
         "invalidinvite":"Invalid bot/server invite: `{0}`",
-        'channotfound':"Channel {0} not found"
+        'channotfound':"Channel {0} not found",
+        'DM':"This command isn't available in Direct Messages"
         }
 
 find={"user-0":"name: {}\nID: {}",
