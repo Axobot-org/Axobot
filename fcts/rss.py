@@ -912,7 +912,7 @@ class RssCog(commands.Cog):
             elif isinstance(x[1],(datetime.datetime,float)) or x[0]=='roles':
                 v.append("""`{x[0]}`=\"{x[1]}\"""".format(x=x))
             else:
-                v.append("`{x[0]}`=\"\"\"{x[1]}\"\"\"".format(x=x))
+                v.append("`{}`=\"{}\"".format(x[0],x[1].replace('"','\\"')))
         query = """UPDATE `{t}` SET {v} WHERE `ID`={id}""".format(t=self.table,v=",".join(v),id=ID)
         cursor.execute(query)
         cnx.commit()
