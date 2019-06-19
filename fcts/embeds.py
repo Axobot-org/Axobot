@@ -10,7 +10,8 @@ class EmbedCog(commands.Cog):
         self.bot = bot
         self.logs = {'classic':"589806375366950913/Vy1Toc--s9MKLwz0S6g0khMgxIJcNO06KvRccpwrSTrTUXXeXkZavYgLhCZ3OuRONKfq",
             'loop':'589807300546527245/EqhdboEF8H0ysUr7X77ty6NUBNkJa-_nfcNw22aPX9MqvTtvIrvDi88wSFX3IiII0sIE',
-            'members':'584381991919550474/7ocQuqPNPN4n1OlHjNyG8eBeABL9XD-AGbHCk9oURTCL4a9kFb596biFGNNI-A5qzkHt'
+            'members':'584381991919550474/7ocQuqPNPN4n1OlHjNyG8eBeABL9XD-AGbHCk9oURTCL4a9kFb596biFGNNI-A5qzkHt',
+            'beta':'590966608063758365/89JAR_BWffLlMMzNnpwtbcRR8Rp4y0xIB3pCfP724bG5Y65OY02Xy_QvUsgw57kpqv-d'
         }
         self.file = "embeds"
 
@@ -103,7 +104,7 @@ class EmbedCog(commands.Cog):
 
     async def send(self,embeds,url=None,ctx=None):
         if url == None:
-            url = url_base + self.logs['classic']
+            url = url_base + self.logs['beta'] if self.bot.beta else self.logs['classic']
         else:
             if url in self.logs.keys():
                 url = url_base + self.logs[url]
