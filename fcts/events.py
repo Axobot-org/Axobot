@@ -307,7 +307,7 @@ class Events(commands.Cog):
                         counts[1] += ()[1]
                     else:
                         errors.append(guild['ID'])
-                except aiohttp.client_exceptions.ContentTypeError:
+                except aiohttp.client_exceptions.ContentTypeError as e:
                     await self.bot.cogs['ErrorsCog'].on_error(e,None)
                     return
                 except Exception as e:
@@ -359,6 +359,12 @@ class Events(commands.Cog):
         await self.bot.cogs["EmbedCog"].send([emb],url="loop")
         self.dbl_last_sending = datetime.datetime.now()
 
+    async def send_mee6_stats(self):
+        """temporary log to see how many mee6api requests have been done"""
+        stats = self.bot.cogs['XPCog'].mee6_calls
+        emb = self.bot.cogs["EmbedCog"].Embed(desc='MEE6 api called {} times since {} ({}-{}-{})'.format(sum(stats[1:]),round(time.time()-stats[0]),stats[1],stats[2],stats[3]))
+        emb.update_timestamp().set_author(self.bot.user)
+        await self.bot.cogs["EmbedCog"].send([emb],url="loop")
 
     async def partners_loop(self):
         """Update partners channels (every 7 hours)"""
