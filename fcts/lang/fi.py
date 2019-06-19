@@ -56,13 +56,18 @@ events={'mp-adv':"Sinä varmaan yrität kutsua minut tähän palvelimeen? Jos t�
 
 errors={"cooldown":"Olet jäähyllä tältä commandilta :confused:  Odota {} lisää sekunttia...",
         "badarguments":"Upsis, on mahdotonta muuntaa `{c[3]}` paramittarin\"{c[1]}\" tyyppiä :confused:",
+        'badarguments-2':"`{0}` is not a recognised {1} option",
         "missingargument":"Upsis, argumentti \"{}\" puuttuu {}",
         "membernotfound":"On mahdotonta löytää käyttäjä `{}` :confused:",
         "usernotfound":"On mahdotonta löytää käyttäjä `{}` :confused:",
         "disabled":"Komento {} on poissa käytöstä :confused:",
         "duration":"Aika `{}` on epäselvä",
         "rolenotfound":"On mahdotonta löytää rooli `{0}`",
-        "invalidcolor":"Väri `{0}` epäselvä"}
+        "invalidcolor":"Väri `{0}` epäselvä",
+        "invalidinvite":"Invalid bot/server invite: `{0}`",
+        'channotfound':"Channel {0} not found",
+        'DM':"This command isn't available in Direct Messages",
+        }
 
 find={"user-0":"nimi: {}\nID: {}",
         "user-1":"Nimi: {name}\nID: {id}\nPerks: {rangs}\nServers: {servers}\nOwner of: {own}\nLanguages: {lang}\nVoted? {vote}\nXP card: {card}",
@@ -138,30 +143,36 @@ Kaikki jotka auttoivat minun tekeimsessä, minun omistaja ja minä haluamme kiit
                 'Käyttöehdot botin tekijöille':'https://discordapp.com/developers/docs/legal'},}
 
 infos_2={"membercount-0":"Numero jäsenistä",
-"membercount-1":"Numero boteista",
-"membercount-2":"Numero ihmisistä",
-"membercount-3":"Numero paikalla olevista jäsenistä",
-"fish-1":"Numero kaloista"}
+        "membercount-1":"Numero boteista",
+        "membercount-2":"Numero ihmisistä",
+        "membercount-3":"Numero paikalla olevista jäsenistä",
+        "fish-1":"Numero kaloista"
+        }
 
 keywords={"depuis":"asti",
-          "nom":"nimi",
-          "online":"paikalla",
-          "idle":"toimeton",
-          "dnd":"älä häiritse",
-          "offline":"offline tilassa",
-          "oui":"kyllä",
-          "non":"ei",
-          "none":"ei yhtään",
-          "low":"alhainen",
-          "medium":"keskikokoinen",
-          "high":"ylhäinen",
-          "extreme":"äärimmäinen",
-          "aucune":"ei yhtään",
-          "membres":"jäsenet",
-          "subcmds":"Toissijainen komento",
-          "ghost":"Haamu",
-          "unknown":"Tuntematon"
-          }
+        "nom":"nimi",
+        "online":"paikalla",
+        "idle":"toimeton",
+        "dnd":"älä häiritse",
+        "offline":"offline tilassa",
+        "oui":"kyllä",
+        "non":"ei",
+        "none":"ei yhtään",
+        "low":"alhainen",
+        "medium":"keskikokoinen",
+        "high":"ylhäinen",
+        "extreme":"äärimmäinen",
+        "aucune":"ei yhtään",
+        "membres":"jäsenet",
+        "subcmds":"Toissijainen komento",
+        "ghost":"Haamu",
+        "unknown":"Tuntematon",
+        'added_at':'Added at',
+        'bot':'bot',
+        'server':'server',
+        'servers':'servers',
+        'click_here':'Click here'
+        }
 
 kill={"list":["Jaahas, olet kuolemassa!",
           "***PUM !*** {1} tippui ansaan, {0} viritti ansan !",
@@ -316,6 +327,24 @@ morpion={'user-begin':'{}, aloita sinä!',
         'win-2':"Minä voitin! Peli päättyi!",
         'already-playing':"Sinulla on jo peli menossa!"}
 
+partners={'invalid-bot':"Unable to find this bot",
+        'invalid-invite':"Invalid invite",
+        'invalid-partner':"Partner not found",
+        'added-partner':'This partner has been successfully added',
+        'changed-desc':"The description has been modified!",
+        'unknown-error':"An unknown error occurred. Please contact support for more information",
+        'unknown-server':'Server partner not found',
+        'changed-invite':"The invitation has been modified!",
+        'missing-reactions':"Permission 'Add reactions' missing :confused:",
+        'confirm-bot':'Do you really want to remove the bot `{}` from your partners?',
+        'confirm-server':'Do you really want to delete the server `{}` from your partners?',
+        'del-canceled':'Deletion cancelled',
+        'deleted':'This partner has been successfully deleted from your list',
+        'no-partner':"You don't have any partners",
+        'no-partner-2':"No server has a partnership with you",
+        'partners-list':['Server partners','List of your partners','List of servers with you as a partner']
+        }
+
 perms={"perms-0":"Jäsen/rooli {} ei löytynyt",
         "perms-1":"**'{}' käyttöoikeudet:**\n\n"
         }
@@ -405,6 +434,7 @@ jolla voi muuttaa konfigurointia, tai `!config del <option>` jolla voi asettaa u
         "change-8": "Tämä taso ei ole olemassa. Tässä on lista kaikista mahdollisista tasoista: {}",
         "change-9": "Emoji `{}` ei löytynyt",
         "change-10":"Tämä XP systeemi ei ole olemassa. Tässä on lista kaikista mahdollisista systeemeistä: {}",
+        "change-11":"This colour is invalid",
         "change-role": "Vaihtoehto '{}' on nyt aktivoitu rooleille: {}",
         "change-bool": "Vaihtoehto '{}' on nyt aktivioitu hinnalle *{}*",
         "change-textchan": "Vaihtoehto '{}' on nyt aktivoitu kanaville {}",
@@ -414,6 +444,7 @@ jolla voi muuttaa konfigurointia, tai `!config del <option>` jolla voi asettaa u
         "change-raid":"Anti-raid suojaus taso on nyt aktivoitu tasolle **{}** ({})",
         "change-emojis":"Tunteet vaihdoehdolle '{}' on nyt {}",
         "change-xp":"XP systeemiä on nyt käytössä {}",
+        "change-color":"The color used for the option {} is now {}",
         "new_server": "Sinun palvelimesi on juuri rekisteröity meidän databaseen ekaa kertaa. Onnea :tada:",
         "see-0":"Viestitä `!config help` saadakseen lisätietoja",
         "see-1":"{} palvelin konfigurointi",
@@ -452,7 +483,11 @@ server_desc={"prefix":"Tämän hetkinen botin etuliite: {}",
         "help_in_dm":"Lähetetäänkö help viesti yksityis viestillä? {}",
         "muted_role":"Käytetty mykistys rooli : {}",
         "noxp_channels":"Kanavat joilla et voi saada XP:tä: {}",
-        "xp_type":"XP systeemiä: {} käytetään nyt"}
+        "xp_type":"XP systeemiä: {} käytetään nyt",
+        "partner_channel":"Channel where partners are sent: {}",
+        "partner_color":"Color of partners embed: {}",
+        "partner_role":"Role given to partners: {}"
+        }
 
 stats_infos={"not-found":"Kyvytöntä löytää {N}",
         "member-0":"Lempinimi",
@@ -512,7 +547,11 @@ users = {'invalid-card':'Tämä tyyli on pätemätön. Tässä on lista tyyleist
         'missing-attach-files':'Ups, minulta puuttuu käyttöoikeus: Liitä tiedostoja :confused:',
         'changed-0':'Sinun XP kortti käyttää nyt tyyliä: {}',
         'changed-1':'Ups, sisäinen virhe tapahtui pyynnön lähettämisessä. Yritä uudelleen myöhemmin tai ota yhteyttä tukeen.',
-        'card-desc':"Tässä on esimerkki sinun XP kortistasi. Jos haluat vaihtaa tyyliäsi voit viestittää komennon `profile card <style>` *Sinun XP kortti aikoo päivittyä vain kun ole saanut XP:tä*"}
+        'card-desc':"Tässä on esimerkki sinun XP kortistasi. Jos haluat vaihtaa tyyliäsi voit viestittää komennon `profile card <style>` *Sinun XP kortti aikoo päivittyä vain kun ole saanut XP:tä*",
+        'allow_animated_true':"Animated xp cards are currently enabled for you",
+        'allow_animated_false':"Animated xp cards are currently disabled for you",
+        'allow_animated_success':"This parameter has been redefined to {}"
+        }
 
 xp = {'card-level':'TASO',
         'card-rank':'SIJA',
