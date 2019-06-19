@@ -28,6 +28,7 @@ class XPCog(commands.Cog):
         self.max_xp_per_msg = 60
         self.file = 'xp'
         self.xp_channels_cache = dict()
+        self.mee6_calls = [0,0,0,0]
         bot.add_listener(self.add_xp,'on_message')
         try:
             self.translate = bot.cogs['LangCog'].tr
@@ -156,7 +157,8 @@ class XPCog(commands.Cog):
                 r = member.guild.get_role(role['role'])
                 if r==None:
                     continue
-                await member.add_roles(r,reason="Role reward (lvl {})".format(role['level']))
+                if not self.bot.beta:
+                    await member.add_roles(r,reason="Role reward (lvl {})".format(role['level']))
                 c += 1
             except Exception as e:
                 if self.bot.beta:
@@ -169,7 +171,8 @@ class XPCog(commands.Cog):
                 r = member.guild.get_role(role['role'])
                 if r==None:
                     continue
-                await member.remove_roles(r,reason="Role reward (lvl {})".format(role['level']))
+                if not self.bot.beta:
+                    await member.remove_roles(r,reason="Role reward (lvl {})".format(role['level']))
                 c += 1
             except Exception as e:
                 if self.bot.beta:
@@ -729,12 +732,17 @@ class XPCog(commands.Cog):
             await self.bot.cogs['ErrorsCog'].on_cmd_error(ctx,e)
     
 
+    def update_mee6_calls(self,i:int):
+        if self.mee6_calls[0] == 0:
+            self.mee6_calls[0] = round(time.time())
+        self.mee6_calls[i] += 1
+
     async def mee6_reload_rr(self,guild):
         """Reloads every role rewards from a guild using MEE6 xp"""
         if await self.bot.cogs['ServerCog'].find_staff(guild.id,'xp_type')!=1 or guild.get_member(159985870458322944)==None:
             return -1
         c = [0,0]
-        xps = [{'user':x['id'],'xp':x['xp'],'level':x['level']} for x in await self.mee6_get_top(guild,nb=1000000)]
+        xps = [{'user':x['id'],'xp':x['xp'],'level':x['level']} for x in await self.mee6_get_top(guild)]
         rr_list = await self.rr_list_role(guild.id)
         for member in xps:
             m = guild.get_member(int(member['user']))
@@ -754,8 +762,9 @@ class XPCog(commands.Cog):
         async with aiohttp.ClientSession() as session:
             i = 0
             result = list()
-            while i<=ceil(nb/999):
+            while i<ceil(nb/999):
                 async with session.get(f'https://mee6.xyz/api/plugins/levels/leaderboard/{guild.id}?page={i}&limit=999') as resp:
+                    self.update_mee6_calls(1)
                     try:
                         temp = (await resp.json())['players']
                         result += temp
@@ -781,6 +790,7 @@ class XPCog(commands.Cog):
             js = {'players':[]}
             while len([x for x in js['players'] if x['id']==str(user.id)])==0 and i<=ceil(user.guild.member_count/999):
                 url = f'https://mee6.xyz/api/plugins/levels/leaderboard/{user.guild.id}?page={i}&limit=999'
+                self.update_mee6_calls(2)
                 async with session.get(url) as resp:
                     js = await resp.json()
                 i += 1
@@ -798,6 +808,7 @@ class XPCog(commands.Cog):
             pos = 0
             while i<=ceil(user.guild.member_count/999):
                 async with session.get(f'https://mee6.xyz/api/plugins/levels/leaderboard/{user.guild.id}?page={i}&limit=999') as resp:
+                    self.update_mee6_calls(3)
                     l = [x['id'] for x in (await resp.json())['players']]
                     if str(user.id) in l:
                         break
