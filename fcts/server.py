@@ -686,14 +686,17 @@ class ServerCog(commands.Cog):
             return await self.form_color(option,v)
         else:
             try:
-                color = await commands.ColourConverter().convert(ctx,value)
+                if value=="default":
+                    color = discord.Color(self.default_opt[option])
+                else:
+                    color = await commands.ColourConverter().convert(ctx,value)
             except commands.errors.BadArgument:
                 msg = await self.translate(ctx.guild.id,"server","change-11")
                 await ctx.send(msg.format(value))
                 return
             await self.modify_server(ctx.guild.id,values=[(option,color.value)])
             msg = await self.translate(ctx.guild.id,"server","change-color")
-            await ctx.send(msg.format(option,", ".join(color)))
+            await ctx.send(msg.format(option,color))
             await self.send_embed(ctx.guild,option,color)
 
     async def form_color(self,option,value):
