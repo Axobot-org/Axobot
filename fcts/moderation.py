@@ -659,9 +659,8 @@ You must be an administrator of this server to use this command."""
                 for x in emotes[i:i+10]:
                     l.append(x)
                 fields.append({'name':"{}-{}".format(i+1,i+10 if i+10<nbr else nbr), 'value':"\n".join(l), 'inline':False})
-            
-                embed = ctx.bot.cogs['EmbedCog'].Embed(title=title,fields=fields,color=self.bot.cogs["ServerCog"].embed_color).create_footer(ctx.author)
-                await ctx.send(embed=embed.discord_embed())
+            embed = ctx.bot.cogs['EmbedCog'].Embed(title=title,fields=fields,color=self.bot.cogs["ServerCog"].embed_color).create_footer(ctx.author)
+            await ctx.send(embed=embed.discord_embed())
         except Exception as e:
             await ctx.bot.cogs['ErrorsCog'].on_cmd_error(ctx,e)
 
