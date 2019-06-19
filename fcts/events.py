@@ -304,7 +304,7 @@ class Events(commands.Cog):
                 try:
                     temp = await self.bot.cogs['XPCog'].mee6_reload_rr(g)
                     if isinstance(temp,list):
-                        counts[1] += ()[1]
+                        counts[1] += temp[1]
                     else:
                         errors.append(guild['ID'])
                 except aiohttp.client_exceptions.ContentTypeError as e:
