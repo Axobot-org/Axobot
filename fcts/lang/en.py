@@ -80,7 +80,7 @@ errors={"cooldown":"You are on cooldown for this command :confused: Please wait 
         "invalidcolor":"Color `{0}` invalid",
         "invalidinvite":"Invalid bot/server invite: `{0}`",
         'channotfound':"Channel {0} not found",
-        'DM':"This command isn't available in Direct Messages"
+        'DM':"This command isn't available in Direct Messages",
         }
 
 find={"user-0":"name: {}\nID: {}",
