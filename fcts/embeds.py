@@ -104,7 +104,7 @@ class EmbedCog(commands.Cog):
 
     async def send(self,embeds,url=None,ctx=None):
         if url == None:
-            url = url_base + self.logs['beta'] if self.bot.beta else self.logs['classic']
+            url = url_base + self.logs['beta'] if self.bot.beta else url_base + self.logs['classic']
         else:
             if url in self.logs.keys():
                 url = url_base + self.logs[url]
