@@ -201,16 +201,11 @@ class CasesCog(commands.Cog):
     @case_main.command(name="glist")
     @commands.guild_only()
     @commands.check(reloads.is_support_staff)
-    async def see_case_2(self,ctx,guild:typing.Optional[int],*,user:args.user):
+    async def see_case_2(self,ctx,guild:typing.Optional[args.Guild],*,user:args.user):
         """Get every case of a user on a specific guild
         This user can have left the server"""
         if not self.bot.database_online:
             return await ctx.send(await self.translate(ctx.guild.id,'cases','no_database'))
-        if guild!=None:
-            guild = self.bot.get_guild(guild)
-            if guild==None:
-                return await ctx.send("Impossibled de trouver ce serveur")
-            guild = guild.id
         await self.see_case_main(ctx,guild,user.id)
         
     async def see_case_main(self,ctx,guild:discord.Guild,user:discord.User):

@@ -82,3 +82,15 @@ class Invite(commands.Converter):
         if r==None or answer==None:
             raise commands.errors.BadArgument('Invalid invite: '+argument)
         return answer
+
+
+class Guild(commands.Converter):
+    def __init__(self):
+        pass
+    
+    async def convert(self,ctx:commands.context,argument):
+        if argument.isnumeric():
+            res = ctx.bot.get_guild(int(argument))
+            if res != None:
+                return res
+        raise commands.errors.BadArgument('Invalid guild: '+argument)
