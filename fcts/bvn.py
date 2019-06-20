@@ -60,8 +60,9 @@ class WelcomerCog(commands.Cog):
                 channel = member.guild.get_channel(int(channel))
                 if channel == None:
                     continue
+                botormember = await self.translate(member.guild,"keywords",'bot' if member.bot else 'member')
                 try:
-                    msg = msg.format_map(self.bot.SafeDict(user=member.mention if Type=='welcome' else member.name,server=member.guild.name,owner=member.guild.owner.name,member_count=len(member.guild.members)))
+                    msg = msg.format_map(self.bot.SafeDict(user=member.mention if Type=='welcome' else member.name,server=member.guild.name,owner=member.guild.owner.name,member_count=len(member.guild.members),type=botormember))
                     msg = await self.bot.cogs["UtilitiesCog"].clear_msg(msg,everyone=False)
                     await channel.send(msg)
                 except Exception as e:

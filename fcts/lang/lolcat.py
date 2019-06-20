@@ -53,6 +53,7 @@ __** ConfiGrationZ**__
  - `{server}` displayz the servr nayme
  - `{owner}` displayz teh servr ownr nam
  - `{member_count}` showz the curent nbr oof memberz
+ - `{type}` show theh type of the user (bot/member)
 """}
 
 cases={"no-user":"Unable to find dis usr :eyes:",
@@ -188,6 +189,7 @@ keywords={"depuis":"sinze",
         'unknown':'No known',
         'added_at':'Addd at',
         'bot':'robot',
+        'member':'human',
         'server':'nice place',
         'servers':'guilds',
         'click_here':'BLUE BUTTON TO CLICK'

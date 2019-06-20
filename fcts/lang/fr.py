@@ -53,6 +53,7 @@ __**La configuration**__
  - `{server}` affiche le nom du serveur
  - `{owner}` affiche le nom du propriétaire du serveur
  - `{member_count}` affiche le nombre actuel de membres
+ - `{type}` retourne 'bot' si le membre est un bot, 'membre' sinon
 """}
 
 cases={"no-user":"Impossible de trouver cet utilisateur",
@@ -188,6 +189,7 @@ keywords={"depuis":"depuis",
         'unknown':'Inconnu',
         'added_at':'Ajouté le',
         'bot':'bot',
+        'member':'membre',
         'server':'serveur',
         'servers':'serveurs',
         'click_here':'Cliquez ici'

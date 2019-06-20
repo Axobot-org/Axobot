@@ -53,6 +53,7 @@ __** Configuration**__
  - `{server}` displays the server name
  - `{owner}` displays the server owner name
  - `{member_count}` shows the current number of members
+ - `{type}` return 'member' or 'bot'
 """}
 
 cases={"no-user":"Unable to find this user :eyes:",
@@ -188,6 +189,7 @@ keywords={"depuis":"since",
         "unknown":"Unknown",
         'added_at':'Added at',
         'bot':'bot',
+        'member':'member',
         'server':'server',
         'servers':'servers',
         'click_here':'Click here'
