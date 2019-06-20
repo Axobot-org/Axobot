@@ -52,3 +52,11 @@ With this command, you can change the design of your xp card (the one used for t
 If you use the command without argument, the bot will show you an example of a xp card with the style you currently have. But if you enter a style name that does not exist, it will give you a list of usable styles *for you*.
 
 .. note:: Note that to be able to display your card, the bot needs `Attach Files <perms.html#attach-files>`_ permission!
+
+
+Allow animated rank card
+------------------------
+
+**Syntax:** :code:`profile animated_card [true|false]`
+
+This option allows you to enable the rendering of your xp card in.gif format if you have an animated profile image. Since the image processing time is much longer, with reduced quality, this option is disabled by default.

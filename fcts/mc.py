@@ -271,7 +271,8 @@ Every information come from the website www.fr-minecraft.net"""
         except requests.exceptions.ReadTimeout:
             return await self.create_server_2(guild,ip,port)
         except Exception as e:
-            await print2("(server_embed) Erreur sur l'url {} :".format(url))
+            return await self.create_server_2(guild,ip,port)
+            self.bot.log.warn("[mc-server-1] Erreur sur l'url {} :".format(url))
             await self.bot.cogs['ErrorsCog'].on_error(e,None)
             return await self.translate(guild,"mc","serv-error")
         if "error" in r.keys():
@@ -315,7 +316,8 @@ Every information come from the website www.fr-minecraft.net"""
             try:
                 r = requests.get("https://api.mcsrvstat.us/1/"+str(ip),timeout=5).json()
             except Exception as e:
-                await self.bot.log.warn("(server_embed) Erreur sur l'url {} :".format(url))
+                if not isinstance(e,requests.exceptions.ReadTimeout):
+                    await self.bot.log.error("[mc-server-2] Erreur sur l'url {} :".format(url))
                 await self.bot.cogs['ErrorsCog'].on_error(e,None)
                 return await self.translate(guild,"mc","serv-error")
         if r["debug"]["ping"] == False:

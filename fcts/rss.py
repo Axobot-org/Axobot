@@ -511,7 +511,7 @@ class RssCog(commands.Cog):
     @rss_main.command(name="text")
     @commands.guild_only()
     @commands.check(can_use_rss)
-    async def change_text_flow(self,ctx,ID:typing.Optional[int]=None,text=None):
+    async def change_text_flow(self,ctx,ID:typing.Optional[int]=None,*,text=None):
         """Change the text of an rss feed"""
         try:
             try:
@@ -532,11 +532,101 @@ class RssCog(commands.Cog):
                 try:
                     msg = await self.bot.wait_for('message', check=check,timeout=90)
                 except asyncio.TimeoutError:
-                    await ctx.send(await self.translate(ctx.guild.id,"rss","too-long"))
-            await self.update_flow(flow['ID'],[('structure',msg.content)])
-            await ctx.send(str(await self.translate(ctx.guild.id,"rss","text-success")).format(flow['ID'],msg.content))
+                    return await ctx.send(await self.translate(ctx.guild.id,"rss","too-long"))
+                text = msg.content
+            await self.update_flow(flow['ID'],[('structure',text)])
+            await ctx.send(str(await self.translate(ctx.guild.id,"rss","text-success")).format(flow['ID'],text))
         except Exception as e:
             await ctx.send(str(await self.translate(ctx.guild.id,"rss","guild-error")).format(e))
+            await ctx.bot.cogs['ErrorsCog'].on_error(e,ctx)
+
+    @rss_main.command(name="test")
+    @commands.check(reloads.is_support_staff)
+    async def test_rss(self,ctx,url,*,args=None):
+        """Test if an rss feed is usable"""
+        url = url.replace('<','').replace('>','')
+        try:
+            feeds = feedparser.parse(url,timeout=8)
+            txt = "feeds.keys()\n```py\n{}\n```".format(feeds.keys())
+            if 'bozo_exception' in feeds.keys():
+                txt += "\nException ({}): {}".format(feeds['bozo'],str(feeds['bozo_exception']))
+                return await ctx.send(txt)
+            if len(str(feeds.feed))<1400-len(txt):
+                txt += "feeds.feed\n```py\n{}\n```".format(feeds.feed)
+            else:
+                txt += "feeds.feed.keys()\n```py\n{}\n```".format(feeds.feed.keys())
+            if len(feeds.entries)>0:
+                if len(str(feeds.entries[0]))<1950-len(txt):
+                    txt += "feeds.entries[0]\n```py\n{}\n```".format(feeds.entries[0])
+                else:
+                    txt += "feeds.entries[0].keys()\n```py\n{}\n```".format(feeds.entries[0].keys())
+            if args != None and 'feeds' in args and 'ctx' not in args:
+                txt += "\n{}\n```py\n{}\n```".format(args,eval(args))
+            try:
+                await ctx.send(txt)
+            except Exception as e:
+                print("[rss_test] Error:",e)
+                await ctx.send("`Error`: "+str(e))
+                print(txt)
+            if args==None:
+                ok = '<:greencheck:513105826555363348>'
+                notok = '<:redcheck:513105827817717762>'
+                nothing = '<:_nothing:446782476375949323>'
+                txt = ['**__Analyse :__**','']
+                yt = await self.parse_yt_url(url)
+                if yt==None:
+                    tw = await self.parse_tw_url(url)
+                    if tw!=None:
+                        txt.append("<:twitter:437220693726330881>  "+tw)
+                    elif 'link' in feeds.feed.keys():
+                        txt.append(":newspaper:  <"+feeds.feed['link']+'>')
+                    else:
+                        txt.append(":newspaper:  No 'link' var")
+                else:
+                    txt.append("<:youtube:447459436982960143>  "+yt)
+                txt.append("Entrées : {}".format(len(feeds.entries)))
+                if len(feeds.entries)>0:
+                    entry = feeds.entries[0]
+                    if 'title' in entry.keys():
+                        txt.append(nothing+ok+" title: ")
+                        if len(entry['title'].split('\n'))>1:
+                            txt[-1] += entry['title'].split('\n')[0]+"..."
+                        else:
+                            txt[-1] += entry['title']
+                    else:
+                        txt.append(nothing+notok+' title')
+                    if 'published_parsed' in entry.keys():
+                        txt.append(nothing+ok+" published_parsed")
+                    elif 'published' in entry.keys():
+                        txt.append(nothing+ok+" published")
+                    elif 'updated_parsed' in entry.keys():
+                        txt.append(nothing+ok+" updated_parsed")
+                    else:
+                        txt.append(nothing+notok+' date')
+                    if 'author' in entry.keys():
+                        txt.append(nothing+ok+" author: "+entry['author'])
+                    else:
+                        txt.append(nothing+notok+' author')
+                await ctx.send("\n".join(txt))
+        except Exception as e:
+            await ctx.bot.cogs['ErrorsCog'].on_cmd_error(ctx,e)
+
+    async def check_rss_url(self,url):
+        r = await self.parse_yt_url(url)
+        if r!=None:
+            return True
+        r = await self.parse_tw_url(url)
+        if r!=None:
+            return True
+        r = await self.parse_twitch_url(url)
+        if r!=None:
+            return True
+        try:
+            f = feedparser.parse(url)
+            _ = f.entries[0]
+            return True
+        except:
+            return False
 
     @rss_main.command(name="test")
     @commands.check(reloads.is_support_staff)
@@ -910,7 +1000,7 @@ class RssCog(commands.Cog):
             elif isinstance(x[1],(datetime.datetime,float)) or x[0]=='roles':
                 v.append("""`{x[0]}`=\"{x[1]}\"""".format(x=x))
             else:
-                v.append("`{x[0]}`=\"\"\"{x[1]}\"\"\"".format(x=x))
+                v.append("`{}`=\"{}\"".format(x[0],x[1].replace('"','\\"')))
         query = """UPDATE `{t}` SET {v} WHERE `ID`={id}""".format(t=self.table,v=",".join(v),id=ID)
         cursor.execute(query)
         cnx.commit()

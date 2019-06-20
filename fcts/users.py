@@ -22,7 +22,8 @@ class UsersCog(commands.Cog):
     @commands.group(name='profile')
     async def profile_main(self,ctx):
         """Get and change info about yourself"""
-        pass
+        if ctx.subcommand_passed==None:
+            await self.bot.cogs['HelpCog'].help_command(ctx,['profile'])
     
     @profile_main.command(name='card')
     async def profile_card(self,ctx,style:typing.Optional[args.cardStyle]=None):
@@ -49,6 +50,25 @@ class UsersCog(commands.Cog):
             else:
                 await ctx.send(await self.translate(ctx.channel,'users','changed-1'))
 
+    @profile_main.command(name='animated_card')
+    async def set_animated_card(self,ctx,allowed:bool=None):
+        """Allow your rank card to be animated or not 
+        This is only used if you have an animated pfp"""
+        if allowed==None:
+            allowed = await self.bot.cogs['UtilitiesCog'].get_db_userinfo(['animated_card'],[f'`userID`={ctx.author.id}'])
+            if allowed==None:
+                allowed = False
+            else:
+                allowed = allowed['animated_card']
+            if allowed:
+                await ctx.send(await self.translate(ctx.channel,'users','allow_animated_true'))
+            else:
+                await ctx.send(await self.translate(ctx.channel,'users','allow_animated_false'))
+        else:
+            if await self.bot.cogs['UtilitiesCog'].change_db_userinfo(ctx.author.id,'animated_card',allowed):
+                await ctx.send(str(await self.translate(ctx.channel,'users','allow_animated_success')).format(allowed))
+            else:
+                await ctx.send(await self.translate(ctx.channel,'users','changed-1'))
 
 
 def setup(bot):

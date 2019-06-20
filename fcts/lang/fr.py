@@ -41,17 +41,6 @@ blurple = {'check_intro':"{}, début de l'analyse blurple (Notez que cela peut p
         'won-card':"Wow! Magnifique image blurple {}! tellement beau que j'ai décidé de t'offrir la carte d'xp blurple, je suis sûr qu'elles iront bien ensemble ! Tu peux l'utiliser en tapant la commande `{}profile card blurple` {}"
         }
 
-blurple = {'check_intro':"{}, début de l'analyse blurple (Notez que cela peut prendre un certain temps)",
-    'check_invalid':'{}, veillez donner une URL valide',
-    'check_resized':"{}, l'image a été changée de taille pour faciliter le processus ({}s)",
-    'check_fields':["Pourcentage total de Blurple","Blurple (rgb(114, 137, 218))","Blanc (rgb(255, 255, 255))","Blurple Sombre (rgb(78, 93, 148))","Blurple, Blanc, Blurple Sombre = Blurple, Blanc, and Blurple Sombre (respectively) \nNoir = ni Blurple, ni Blanc, ni Blurple Sombre","Un énorme merci à **Rocked03** pour son code :blue_heart: https://github.com/Rocked03/Blurplefied.git","Remarque : Discord réduit la qualité des images, donc les pourcentages peuvent être légèrement imprécis. | Content requested by {}"],
-    'create_title':"Blurplefier - makes your image blurple!",
-    'create_footer_1':"Veuillez noter que ce blurplefier est automatisé et qu'il peut donc ne pas toujours vous donner le meilleur résultat. | Content requested by {}",
-    'create_footer_2':"Veuillez noter que ce blurplefier est automatisé et qu'il peut donc ne pas toujours vous donner le meilleur résultat. Avertissement : Cette image est un gif, et la qualité n'est pas toujours bonne. TOUTEFOIS, le gif n'est souvent pas aussi granuleux qu'il n'y paraît dans la prévisualisation. | Content requested by {}",
-    'create_oops':"{}, oups ! Il semble que ce gif est trop gros pour être téléchargé. Si vous voulez, vous pouvez lui donner une autre chance, mais avec une version plus petite de l'image. Désolé !",
-    'won-card':"Wow! Magnifique image blurple {}! tellement beau que j'ai décidé de t'offrir la carte d'xp blurple, je suis sûr qu'elles iront bien ensemble ! Tu peux l'utiliser en tapant la commande `{}profile card blurple` {}"
-    }
-
 bvn={"aide":"""__**Bienvenue dans le module des message de join et de leave**__
 
 Ce module vous sert à configurer un message automatique à chaque fois qu'un membre rentre ou sort de votre serveur.
@@ -64,6 +53,7 @@ __**La configuration**__
  - `{server}` affiche le nom du serveur
  - `{owner}` affiche le nom du propriétaire du serveur
  - `{member_count}` affiche le nombre actuel de membres
+ - `{type}` retourne 'bot' si le membre est un bot, 'membre' sinon
 """}
 
 cases={"no-user":"Impossible de trouver cet utilisateur",
@@ -81,6 +71,7 @@ events={'mp-adv':"Vous cherchez sans doute à m'inviter sur ce serveur ? Si c'es
 
 errors={"cooldown":"Vous êtes en cooldown pour cette commande. Veuillez attendre encore {0} secondes...",
         "badarguments":"Oups, impossible de convertir le paramètre `{0}` en type \"{1}\" :confused:",
+        'badarguments-2':"`{0}` n'est pas de type {1}",
         "missingargument":"Oups, il manque l'argument \"{0}\" {1}",
         "membernotfound":"Impossible de trouver le membre `{0}` :confused:",
         "usernotfound":"Impossible de trouver l'utilisateur `{0}` :confused:",
@@ -88,7 +79,9 @@ errors={"cooldown":"Vous êtes en cooldown pour cette commande. Veuillez attendr
         "duration":"La durée `{0}` est invalide",
         "rolenotfound":"Impossible de trouver le rôle `{0}`",
         "invalidcolor":"La couleur `{0}` est invalide",
-        "invalidinvite":"Invitation de bot ou de serveur invalide : `{0}`"
+        "invalidinvite":"Invitation de bot ou de serveur invalide : `{0}`",
+        'channotfound':"Le salon {0} est introuvable",
+        'DM':"Cette commande est indisponible en Messages Privés"
         }
 
 find={"user-0":"Nom : {}\nID : {}",
@@ -107,6 +100,7 @@ fun={"count-0":"Comptage en cours...",
         "count-1":"Sur les {} derniers messages, vous en avez posté {} ({}%)",
         "count-2":"Mais vous voulez faire exploser Discord ! {e} Pour des raisons évidentes de performances, je vais vous imposer une limite à {l} messages.",
         "count-3":"Oups, il m'est impossible de lire l'historique de ce salon. Veuillez vérifier mes permissions...",
+        "count-4":"Sur les {} derniers messages, {} en a posté {} ({}%)",
         "fun-list":"Voici la liste des commandes fun disponibles :",
         "no-fun":"Les commandes fun ont été désactivées sur ce serveur. Pour voir leur liste, regardez https://zbot.rtfd.io/en/v3/fun.html",
         "osekour":["Attends, je finis de regarder mon film","On arrive ! Mais pourquoi ne répondez-vous plus ? Ne simulez pas la mort !","Oui on sait qu'il y a du feu, on n'a pas besoin de venir : on fait un barbecue à la caserne","*Les secours sont actuellement indisponibles, veuillez attendre la fin de la pause*","*Ce numéro n'existe pas. Veuillez réessayer avec un autre numéro.*","*Maintenance de la ligne en cours. Veuillez réessayer d'ici 430 heures.*","*Votre forfait mobile est arrivé à son terme. Vous pouvez en racheter un pour 86,25€*","Encore 2 tomes du Seigneur des Anneaux à finir de lire, et je suis à vous !","Merci de ne pas nous déranger pendant les fêtes","Désolé, il y a plus de 3 flocons de neige: nous sommes coincés au garage","Il va falloir attendre la fin de notre grève... Comment ça, vous n'êtes pas au courant ?! Ça fait pourtant bien deux mois que nous avons commencé !"],
@@ -196,6 +190,7 @@ keywords={"depuis":"depuis",
         'unknown':'Inconnu',
         'added_at':'Ajouté le',
         'bot':'bot',
+        'member':'membre',
         'server':'serveur',
         'servers':'serveurs',
         'click_here':'Cliquez ici'
@@ -232,6 +227,7 @@ logs={"slowmode-enabled":"Slowmode activé dans le salon {channel} ({seconds}s)"
         "clear":"{number} messages supprimés dans {channel}",
         "kick":"{member} a été expulsé du serveur (raison : {reason} | casier #{case})",
         "ban":"{member} a été banni du serveur (raison : {reason} | casier #{case})",
+        "tempban":"{member} a été banni du serveur pour {duration} (raison : {reason} | casier #{case})",
         "unban":"{member} n'est plus banni de ce serveur (raison : {reason})",
         "mute-on":"{member} est maintenant muet (raison : {reason} | casier #{case})",
         "mute-off":"{member} n'est plus muet",
@@ -243,7 +239,8 @@ logs={"slowmode-enabled":"Slowmode activé dans le salon {channel} ({seconds}s)"
         "d-invite":"Automod (invitation Discord)",
         "d-young":"Automod (compte trop récent)",
         "d-gived_roles":"Action automatique (config gived_roles)",
-        "d-memberchan":"Action automatique (config membercount)"
+        "d-memberchan":"Action automatique (config membercount)",
+        "d-unban":"unban par {}",
         }
 
 mc={"contact-mail":"Si vous constatez une erreur dans les informations données, merci de me contacter rapidement, ou de rapporter l'erreur directement [sur le site](https://fr-minecraft.net).",
@@ -321,6 +318,7 @@ modo={"slowmode-0":"Le slowmode est désormais désactivé dans ce salon.",
         "ban-noreason":"Vous venez d'être banni du serveur {} :confused:",
         "ban-reason":"Vous venez d'être banni du serveur {} :confused:\nRaison : {}",
         "ban":"Le membre {} a bien été banni du serveur, avec la raison `{}`",
+        "tempban":"Le membre {} a bien été banni du serveur pour {}, avec la raison `{}`",
         "ban-1":"Il semble que ce membre soit trop haut pour que je puisse le bannir :thinking:",
         "ban-list-title-0":"Liste des membres bannis du serveur '{}'",
         "ban-list-title-1":"Liste des 45 premiers membres bannis du serveur '{}'",
@@ -456,7 +454,7 @@ Lien : {link}""",
 
 server={"config-help":"Cette commande sert principalement à configurer votre serveur. En faisant `!config see [option]` vous obtiendrez l'aperçu des configurations actuelles, \
 et les administrateurs du serveur peuvent entrer `!config change <option> role1, role2, role3...` pour modifier une configuration, ou `!config del <option>` pour réinitialiser \
-l'option (`!config change <option> del` fonctionne de même).\nLa liste des options disponible est accessible à l'adresse <https://zbot.rtfd.io/en/latest/config.html#list-of-every-option>",
+l'option (`!config change <option> del` fonctionne de même).\nLa liste des options disponible est accessible à l'adresse <https://zbot.rtfd.io/en/latest/server.html#list-of-every-option>",
         "change-0":"Cette option n'existe pas :confused:",
         "change-1":"Oups, une erreur interne est survenue...",
         "change-2":"La valeur de l'option '{}' a bien été effacée",
@@ -519,7 +517,8 @@ server_desc={"prefix":"Préfixe actuel du bot : {}",
         "noxp_channels":"Salons où il est impossible d'obtenir de l'xp : {}",
         "xp_type":"Type de système d'xp : {}",
         "partner_channel":"Salon dans lequel envoyer les partenaires : {}",
-        "partner_color":"Couleur de l'embed des partenaires : {}"
+        "partner_color":"Couleur de l'embed des partenaires : {}",
+        "partner_role":"Rôle donné aux partenaires : {}"
         }
 
 stats_infos={"not-found":"Impossible de trouver {N}",
@@ -580,7 +579,10 @@ users = {'invalid-card':'Ce style est invalide. Voici la liste des styles que vo
         'missing-attach-files':'Oups, il me manque la permission d\'Attacher des Fichiers :confused:',
         'changed-0':'Votre carte d\'xp utilise maintenant le style {}',
         'changed-1':'Oups, une erreur interne est survenue pendant le traitement de la requête. Réessayez plus tard ou contactez le support.',
-        'card-desc':"Voici un exemple de votre carte d'xp. Vous pouvez entrer la commande `profile card <style>` pour changer le style\n*Votre carte d'xp ne se réactualisera que lorsque vous aurez gagné de l'xp*"
+        'card-desc':"Voici un exemple de votre carte d'xp. Vous pouvez entrer la commande `profile card <style>` pour changer le style\n*Votre carte d'xp ne se réactualisera que lorsque vous aurez gagné de l'xp*",
+        'allow_animated_true':"Les cartes d'xp animées sont actuellement autorisées pour vous",
+        'allow_animated_false':"Les cartes d'xp animées ne sont actuellement pas autorisées pour vous",
+        'allow_animated_success':"Ce paramètre a bien été redéfini à {}"
         }
 
 xp = {'card-level':'NIVEAU',
@@ -619,7 +621,7 @@ xp = {'card-level':'NIVEAU',
                 "Félicitations {user}, tu es niveau {level}. Pense à te servir de {random} pour continuer à progresser.",
                 "Grâce au niveau {level}, vous pouvez tenter de gagner {random} à la tombola, {user} !",
                 "Malgré ton level {level}, il est dangereux de voyager seul {user} ! Prends {random} !",
-                "Niveau {level} {user} ! {random} est disponible chez le vendeur !",
+                "Niveau {level} {user} : {random} est disponible chez le vendeur !",
                 "Bravo {user} ! Tu es désormais niveau {level} ! Cependant, il faut encore monter pour obtenir {random} d'une rareté légendaire...",
                 "Houston, on a un problème. {user} a atteint le niveau {level} !!!",
                 "Tu vois, le monde se divise en deux catégories : ceux qui levelup et ceux qui levelup pas. Toi {user}, tu levelup au niveau {level} !!!",

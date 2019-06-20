@@ -53,6 +53,7 @@ __** ConfiGrationZ**__
  - `{server}` displayz the servr nayme
  - `{owner}` displayz teh servr ownr nam
  - `{member_count}` showz the curent nbr oof memberz
+ - `{type}` show theh type of the user (bot/member)
 """}
 
 cases={"no-user":"Unable to find dis usr :eyes:",
@@ -70,6 +71,7 @@ events={'mp-adv':"U're probably trying 2 invite me in dis server? If that's the 
 
 errors={"cooldown":"Yu are on cold-own for dis comandZ :confused: Plize wait {} moRe secs...",
         "badarguments":"W0ops, unabled 2 convrt teh `{c[3]}` parameterz to \"{c[1]}\" tipe :confused:",
+        'badarguments-2':"`{0}` iznt a true {1} option",
         "missingargument":"Oops, te argumnt \"{}\" are missin {}",
         "membernotfound":"Unabl to found the membr `{}` :confused:",
         "usernotfound":"Unabled 2 find teh userZ `{}` :confused:",
@@ -77,7 +79,9 @@ errors={"cooldown":"Yu are on cold-own for dis comandZ :confused: Plize wait {} 
         "duration":"Invalid timer: `{}`",
         "rolenotfound":"Unable 2 find ur role (`{0}`)",
         "invalidcolor":"Ups, I can't find the color `{0}` :confused:",
-        "invalidinvite":"Invalid bot/server link: `{0}`"
+        "invalidinvite":"Invalid bot/server link: `{0}`",
+        'channotfound':"Super chat room {0} don't want 2 be found",
+        'DM':"Dat command isn't enabled in PM"
         }
 
 find={"user-0":"naym: {}\nID: {}",
@@ -96,6 +100,7 @@ fun={"count-0":"Countng in progrez...",
         "count-1":"On teh last {} posts, U has postd {} msgs ({}%)",
         "count-2":"You wanna blow up Discord! {e} For obvious performance reasons, I'm gonna impose limit ov {l} msgz.",
         "count-3":"Oops, Im unable to reed dis channel ystory. Pls check mah perms...",
+        "count-1":"On teh last {} msgs, {} had postd {} things ({}%)",
         "fun-list":"Her iz the list ov available fun commandz:",
         "no-fun":"Fun comands haz beeen disabld on dis server. 2 C their list, look at https://zbot.rtfd.io/en/v3/fun.html",
 	"osekour":["Oh hum wait, Im finshin watchin mi movi.","We r comin! But wy donot yu answr anymor? Do'nt fak ded dude!","Yeh, we now ther'z an fire, we don'b ned 2 come: we're avin a barbeQ at teh fire stashun.","*Reskue iz curentlly unaivalab, pliz wait untile the and of teh braek*","*Dis numbr doz not exyzt. Pleash try agan with anoder number.*","*Manetenanec ov teh current lien, Srsly . plz twee agaen in 430 hourz.*","*ur mobiel plan has expired. u can buy wan 4 86,25€*","2 moar volumes ov Lord ov teh Rings 2 finish readin, an meh all urz!","Tank u 4 not disturbin us durin teh holidais","Shurry, ther is moar dan tree snowflakz: wuz stuck in teh garaeg","Well haz 2 wait til teh end ov r striek.. R u sayin you dun't knoe?! iz been 2 monfz sinec we startd pliz!"],
@@ -185,6 +190,7 @@ keywords={"depuis":"sinze",
         'unknown':'No known',
         'added_at':'Addd at',
         'bot':'robot',
+        'member':'human',
         'server':'nice place',
         'servers':'guilds',
         'click_here':'BLUE BUTTON TO CLICK'
@@ -221,6 +227,7 @@ logs={"slowmode-enabled":"Slwmod enable in {channel} ({seconds}s)",
         "clear":"{number} dletd mesage for {channel}",
         "kick":"{member} had been kik (reson: {reason} | caze #{case})",
         "ban":"{member} have bin :b:an (reashun: {reason} | caseZ #{case})",
+        "tempban":"{member} is now been :b:anned for {duration} (raeson : {reason} | case #{case})",
         "unban":"{member} iz no mor band (rson: {reason})",
         "mute-on":"{member} Is know mwuted (reason : {reason} | kase #{case})",
         "mute-off":"{member} is not more mutd",
@@ -232,7 +239,8 @@ logs={"slowmode-enabled":"Slwmod enable in {channel} ({seconds}s)",
         "d-invite":"Automod (Discord invite)",
         "d-young":"Automod (too recent account)",
         "d-gived_roles":"Automated action (config gived_roles)",
-        "d-memberchan":"Automated action (config membercount)"
+        "d-memberchan":"Automated action (config membercount)",
+        "d-unban":"unbanned by {}",
         }
 
 mc={"contact-mail":"If U notis an errrror in da info providd, plz contact my personale, or report teh errer directlly [with the nice website](https://fr-minecraft.net).",
@@ -310,6 +318,7 @@ modo={"slowmode-0":"Teh very-cold-mode is now disabld in this nize place.",
         "ban-noreason":"U haz just been bannd fr0m the servr {} :confused:",
         "ban-reason":"You haz just been bannd from teh server {} :confused:\nReason : {}",
         "ban":"Mber {} has been banned fr0m dis cool servr. Just 'cause this : **{}**",
+        "tempban":"Mber {} had be banned fron this server 4 {}, with da reason `{}`",
         "ban-1":"Maaaw... 'seems dat dis member iz too high 4 me to ban him :thinking:",
         "ban-list-title-0":"List of bannd membrs ov this nice place '{}'",
         "ban-list-title-1":"List of 45 bannd membrs ov this nice place '{}'",
@@ -445,7 +454,7 @@ UrL : {link}""",
 
 server={"config-help": "Dis cmd is mainly usd 2 configur ur srver. By doin `!config see [option]` u will get \
 overview ov teh currnt configuraishun, and supr cool servr masters can enter `!config change <option> role1, role2, role3...` \
-to modify configuraishun, or `!config del <option>` 2 reset teh option (`!config change <option>` works same).\nTeh list ov options is displayd at <https://zbot.rtfd.io/en/latest/config.html#list-of-every-option>",
+to modify configuraishun, or `!config del <option>` 2 reset teh option (`!config change <option>` works same).\nTeh list ov options is displayd at <https://zbot.rtfd.io/en/latest/server.html#list-of-every-option>",
         "change-0": "Dis option doz not exist :confused:",
         "change-1": "Oops, an internal error occurrd...\nBut doan worry, we'r on teh place: http://asset-5.soupcdn.com/asset/3247/3576_5092_600.jpeg",
         "change-2": "The '{}' opshun value haz been deleted",
@@ -508,7 +517,8 @@ server_desc={"prefix":"Currnt baot prfx: {}",
         "noxp_channels":"Chats where xp is for:b:idden: {}",
         "xp_type":"XP system used: {}",
         "partner_channel":"Channel where partners are sended: {}",
-        "partner_color":"Coulor of partners box: {}"
+        "partner_color":"Coulor of partners box: {}",
+        "partner_role":"Role givn 2 partners: {}"
         }
 
 stats_infos={"not-found":"Unable 2 found {N}",
@@ -569,7 +579,10 @@ users = {'invalid-card':'Dat style iz no valid. But yop, her\'s styles u can use
         'missing-attach-files':'Oops, I\'m missing the Attach Files perms :upside_down:',
         'changed-0':'Ur xp card naw use the style {}',
         'changed-1':'Oops, a wicked error occurrd during the process ov ur request. Try again later or contact these nice support guys.',
-        'card-desc':"Here iz example of ur xp card. U can enter teh command `profile card <style>` 2 change the style\n*Ur xp card will only refresh wehn u have won Xp*"
+        'card-desc':"Here iz example of ur xp card. U can enter teh command `profile card <style>` 2 change the style\n*Ur xp card will only refresh wehn u have won Xp*",
+        'allow_animated_true':"Animated xp cards ar naw enabled 4U",
+        'allow_animated_false':"Anamited xp cards are naw disabld for you",
+        'allow_animated_success':"Dat parameter have been redefined 2 {}"
         }
 
 xp = {'card-level':'LVL',

@@ -24,8 +24,7 @@ This command allows you to warn a member, without really sanctioning him. This m
 Mute
 ----
 
-**Syntax:** :code:`mute <user> [reason]`
-**Syntax:** :code:`tempmute <user> <duration> [reason]`
+**Syntax:** :code:`mute <user> [duration] [reason]`
 
 This command mutes a member, preventing them from typing. 
 
@@ -44,18 +43,6 @@ Slowmode
 Slowmode keeps your text channel quiet when excited people have decided to talk a little too fast. More precisely, it prevents members from posting messages too often. The frequency between two consecutive messages from the same member is indicated in the command.  
 
 .. note:: The system uses a brand new feature released on September 8th in Discord beta. It therefore is a completely new as in very few bots have it) feature and can be highly integrated into your applications. It is even better than just deleting messages.
-
-------
-Freeze
-------
-
-**Syntax:** :code:`freeze (on|off)`
-
-The freeze command is made to completely freeze a chat that has gotten too hot, so that nobody can talk before being cooled. To break the ice, just turn it off.
-People authorized to use the freeze command are the same as the ones who can use `slowmode <#slowmode>`_ (see the `config <server.html>`_ command). 
-
-.. warning:: The bot needs "`Manage messages <perms.html#manage-messages>`_" permission in order to delete messages from chatty members. In addition, members authorized to trigger the freeze are immune to this effect.
-
 
 -----
 Clear
@@ -98,15 +85,16 @@ This command allows you to expel a member from your server, such as kick. But in
 .. warning:: For this command, the bot needs "`Ban members <perms.html#ban-members>`_" permission, and you need to have a role to use the "`kick <#kick>`_" command
 
 --------
-Ban/Unan
+Ban/Unban
 --------
 
-**Syntax:** :code:`ban <user> [days_to_delete] [reason]`
+**Syntax:** :code:`ban <user> [duration] [days_to_delete] [reason]`
 
 The ban allows you to instantly ban a member from your server. This means that the member will be ejected, and will not be able to return before being unbanned by a moderator. The 'days_to_delete' option represents the number of days worth of messages to delete from the user in the guild, bewteen 0 and 7 (0 by default)
 
-To cancel this action, use the Discord interface or the `unban <#unban>`_ command. The member will nevertheless have to decide for himself if he wishes to return to your server.
+The duration of the tempban is the same as for the tempmute: use :code:`XXd` for days, :code:`XXh` for hours and :code:`XXm` for minutes (replacing **XX** by the corresponding number, of course!)
 
+To cancel this action, use the Discord interface or the `unban <#unban>`_ command. The member will nevertheless have to decide for himself if he wishes to return to your server.
 
 
 

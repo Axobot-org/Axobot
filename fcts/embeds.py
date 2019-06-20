@@ -1,14 +1,17 @@
 import datetime, discord, requests
 from discord.ext import commands
 
+url_base = 'https://discordapp.com/api/webhooks/'
+
 class EmbedCog(commands.Cog):
     """Cog for the management of the embeds. No more, no less."""
 
     def __init__(self,bot):
         self.bot = bot
-        self.logs = {'classic':"https://discordapp.com/api/webhooks/507910810991853573/F0TB5XoIXOMYCLUtsOb6_LPUcR_sLFuEaJkyE4VhAOAvbFXyYgsqLGBe48n1AzGXvUJm",
-            'loop':'https://discordapp.com/api/webhooks/509079297353449492/1KlokgfF7vxRK37pHd15UjdxJSa5H9yzbOLAaRjYEQK7XIdjfMp9PCnER1-Dfz0PBSaM',
-            'members':'https://discordapp.com/api/webhooks/584381991919550474/7ocQuqPNPN4n1OlHjNyG8eBeABL9XD-AGbHCk9oURTCL4a9kFb596biFGNNI-A5qzkHt'
+        self.logs = {'classic':"589806375366950913/Vy1Toc--s9MKLwz0S6g0khMgxIJcNO06KvRccpwrSTrTUXXeXkZavYgLhCZ3OuRONKfq",
+            'loop':'589807300546527245/EqhdboEF8H0ysUr7X77ty6NUBNkJa-_nfcNw22aPX9MqvTtvIrvDi88wSFX3IiII0sIE',
+            'members':'584381991919550474/7ocQuqPNPN4n1OlHjNyG8eBeABL9XD-AGbHCk9oURTCL4a9kFb596biFGNNI-A5qzkHt',
+            'beta':'590966608063758365/89JAR_BWffLlMMzNnpwtbcRR8Rp4y0xIB3pCfP724bG5Y65OY02Xy_QvUsgw57kpqv-d'
         }
         self.file = "embeds"
 
@@ -101,10 +104,10 @@ class EmbedCog(commands.Cog):
 
     async def send(self,embeds,url=None,ctx=None):
         if url == None:
-            url = self.logs['classic']
+            url = url_base + self.logs['beta'] if self.bot.beta else url_base + self.logs['classic']
         else:
             if url in self.logs.keys():
-                url = self.logs[url]
+                url = url_base + self.logs[url]
         liste = list()
         for x in embeds:
             if type(x) == self.Embed:

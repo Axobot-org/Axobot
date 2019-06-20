@@ -162,7 +162,6 @@ def main():
                       'fcts.rss',
                       'fcts.server',
                       'fcts.timeclass',
-                      'fcts.timed',
                       'fcts.users',
                       'fcts.utilities',
                       'fcts.xp',           
@@ -186,6 +185,7 @@ def main():
             client.database_keys[s] = cryptage.uncrypte(r[e])
         client.others['divinediscordbots'] = cryptage.uncrypte(r[4])
         client.others['botsondiscord'] = cryptage.uncrypte(r[5])
+        client.others['discordbotsgroup'] = cryptage.uncrypte(r[6])
     try:
         cnx = mysql.connector.connect(user=client.database_keys['user'],password=client.database_keys['password'],host=client.database_keys['host'],database=client.database_keys['database'])
         cnx.close()
