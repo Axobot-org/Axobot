@@ -162,7 +162,6 @@ def main():
                       'fcts.rss',
                       'fcts.server',
                       'fcts.timeclass',
-                      'fcts.timed',
                       'fcts.users',
                       'fcts.utilities',
                       'fcts.xp',           
