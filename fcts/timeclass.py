@@ -42,7 +42,7 @@ class TimeCog(discord.ext.commands.Cog):
             else:
                 self.seconds = round(seconds,self.precision)
 
-    async def time_delta(self,date1,date2=None,lang='fr',year=False,hour=True,form='developed',precision=2):
+    async def time_delta(self,date1,date2=None,lang='en',year=False,hour=True,form='developed',precision=2):
         """Traduit un intervale de deux temps datetime.datetime en chaine de caractère lisible"""
         if date2!=None:
             if type(date2)==datetime.datetime:
@@ -68,9 +68,9 @@ class TimeCog(discord.ext.commands.Cog):
                 d = round(t.days+t.months*30.41)
                 if not year:
                     d += round(t.years*3.154e+7)
-                text += str(d)+'d '
+                text += str(d) + 'j ' if lang=='fr' else 'd '
             if year and t.years>0:
-                text += str(t.years)+'y '
+                text += str(t.years) + 'a ' if lang=='fr' else 'y '
             if hour:
                 if t.hours>0:
                     text += str(t.hours)+'h '

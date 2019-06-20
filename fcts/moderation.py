@@ -393,24 +393,16 @@ Or: mute @someone Plz respect me"""
     @commands.cooldown(5,20, commands.BucketType.guild)
     @commands.guild_only()
     @commands.check(checks.can_ban)
-    async def ban(self,ctx,user,days_to_delete:typing.Optional[int]=0,*,reason="Unspecified"):
+    async def ban(self,ctx,user:args.user,time:commands.Greedy[args.tempdelta],days_to_delete:typing.Optional[int]=0,*,reason="Unspecified"):
         """Ban someone
         The 'days_to_delete' option represents the number of days worth of messages to delete from the user in the guild, bewteen 0 and 7
         """
         try:
-            backup = user
-            try:
-                user = await commands.UserConverter().convert(ctx,user)
-            except:
-                if user.isnumeric():
-                    try:
-                        user = await self.bot.fetch_user(int(user))
-                        del backup
-                    except:
-                        user = None
-            if user==None or type(user)==str:
-                await ctx.send(str(await self.translate(ctx.guild.id,"modo","cant-find-user")).format(backup))
-                return
+            duration = sum(time)
+            if duration>0:
+                f_duration = await self.bot.cogs['TimeCog'].time_delta(duration,lang=await self.translate(ctx.guild,'current_lang','current'),form='temp',precision=0)
+            else:
+                f_duration = None
             if not ctx.channel.permissions_for(ctx.guild.me).ban_members:
                 await ctx.send(await self.translate(ctx.guild.id,"modo","cant-ban"))
                 return
@@ -434,28 +426,36 @@ Or: mute @someone Plz respect me"""
                 except Exception as e:
                     await self.bot.cogs['ErrorsCog'].on_error(e,ctx)
                     pass
-            if days_to_delete<0 or days_to_delete>7:
+            if not days_to_delete in range(8):
                 days_to_delete = 0
             reason = await self.bot.cogs["UtilitiesCog"].clear_msg(reason,everyone = not ctx.channel.permissions_for(ctx.author).mention_everyone)
-            await ctx.guild.ban(user,reason=reason,delete_message_days=days_to_delete)
-            self.bot.log.info("L'utilisateur {} a été banni du serveur {} pour la raison {}".format(user.id,ctx.guild.id,reason))
+            #await ctx.guild.ban(user,reason=reason,delete_message_days=days_to_delete)
+            if f_duration==None:
+                self.bot.log.info("L'utilisateur {} a été banni du serveur {} pour la raison {}".format(user.id,ctx.guild.id,reason))
+            else:
+                self.bot.log.info("L'utilisateur {} a été banni du serveur {} pour la raison {} pendant {}".format(user.id,ctx.guild.id,reason,f_duration))
             await self.bot.cogs['Events'].add_event('ban')
             caseID = "'Unsaved'"
             if self.bot.database_online:
                 CasesCog = self.bot.cogs['CasesCog']
                 caseIDs = await CasesCog.get_ids()
-                case = CasesCog.Case(bot=self.bot,guildID=ctx.guild.id,memberID=user.id,Type="ban",ModID=ctx.author.id,Reason=reason,date=datetime.datetime.now()).create_id(caseIDs)
+                if f_duration==None:
+                    case = CasesCog.Case(bot=self.bot,guildID=ctx.guild.id,memberID=user.id,Type="ban",ModID=ctx.author.id,Reason=reason,date=datetime.datetime.now()).create_id(caseIDs)
+                else:
+                    case = CasesCog.Case(bot=self.bot,guildID=ctx.guild.id,memberID=user.id,Type="tempban",ModID=ctx.author.id,Reason=reason,date=datetime.datetime.now(),duration=duration).create_id(caseIDs)
                 try:
                     await CasesCog.add_case(case)
                     caseID = case.id
                 except Exception as e:
                     await self.bot.cogs['ErrorsCog'].on_error(e,ctx)
-            try:
+            if ctx.channel.permissions_for(ctx.guild.me).manage_messages:
                 await ctx.message.delete()
-            except:
-                pass
-            await ctx.send(str( await self.translate(ctx.guild.id,"modo","ban")).format(user,reason))
-            log = str(await self.translate(ctx.guild.id,"logs","ban")).format(member=user,reason=reason,case=caseID)
+            if f_duration==None:
+                await ctx.send(str( await self.translate(ctx.guild.id,"modo","ban")).format(user,reason))
+                log = str(await self.translate(ctx.guild.id,"logs","ban")).format(member=user,reason=reason,case=caseID)
+            else:
+                await ctx.send(str( await self.translate(ctx.guild.id,"modo","tempban")).format(user,f_duration,reason))
+                log = str(await self.translate(ctx.guild.id,"logs","tempban")).format(member=user,reason=reason,case=caseID,duration=f_duration)
             await self.bot.cogs["Events"].send_logs_per_server(ctx.guild,"ban",log,ctx.author)
         except discord.errors.Forbidden:
             await ctx.send(await self.translate(ctx.guild.id,"modo","ban-1"))

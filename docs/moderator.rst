@@ -88,12 +88,13 @@ This command allows you to expel a member from your server, such as kick. But in
 Ban/Unban
 --------
 
-**Syntax:** :code:`ban <user> [days_to_delete] [reason]`
+**Syntax:** :code:`ban <user> [duration] [days_to_delete] [reason]`
 
 The ban allows you to instantly ban a member from your server. This means that the member will be ejected, and will not be able to return before being unbanned by a moderator. The 'days_to_delete' option represents the number of days worth of messages to delete from the user in the guild, bewteen 0 and 7 (0 by default)
 
-To cancel this action, use the Discord interface or the `unban <#unban>`_ command. The member will nevertheless have to decide for himself if he wishes to return to your server.
+The duration of the tempban is the same as for the tempmute: use :code:`XXd` for days, :code:`XXh` for hours and :code:`XXm` for minutes (replacing **XX** by the corresponding number, of course!)
 
+To cancel this action, use the Discord interface or the `unban <#unban>`_ command. The member will nevertheless have to decide for himself if he wishes to return to your server.
 
 
 
