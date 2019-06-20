@@ -219,6 +219,22 @@ class Events(commands.Cog):
                 except Exception as e:
                     await self.bot.cogs['ErrorsCog'].on_error(e,None)
                     self.bot.log.error("[unmute_task] Impossible d'unmute automatiquement : {}".format(e))
+            if task['action']=='ban':
+                try:
+                    guild = self.bot.get_guild(task['guild'])
+                    if guild==None:
+                        continue
+                    try:
+                        user = await self.bot.fetch_user(task['user'])
+                    except:
+                        continue
+                    await self.bot.cogs['ModeratorCog'].unban_event(guild,user,guild.me)
+                    await self.remove_task(task['ID'])
+                except discord.errors.NotFound:
+                    await self.remove_task(task['ID'])
+                except Exception as e:
+                    await self.bot.cogs['ErrorsCog'].on_error(e,None)
+                    self.bot.log.error("[unban_task] Impossible d'unban automatiquement : {}".format(e))
 
 
     async def add_task(self,guildID,userID,action,duration):
@@ -257,7 +273,7 @@ class Events(commands.Cog):
         cnx.commit()
         return True
 
-    @tasks.loop(seconds=0.5)
+    @tasks.loop(seconds=1.0)
     async def loop(self):
         try:
             d = datetime.datetime.now()
@@ -314,7 +330,7 @@ class Events(commands.Cog):
                     await self.bot.cogs['ErrorsCog'].on_error(e,None)
         desc = '**MEE6 rewards** updated in {}s ({} guilds / {} roles given)'.format(round(time.time()-t,3),counts[0],counts[1])
         if len(errors)>0:
-            desc += "\n{} errors: {}".format(len(errors),' - '.join(errors))
+            desc += "\n{} errors: {}".format(len(errors),' - '.join([str(x) for x in errors]))
         emb = self.bot.cogs["EmbedCog"].Embed(desc=desc,color=6476789).update_timestamp().set_author(self.bot.user)
         await self.bot.cogs["EmbedCog"].send([emb],url="loop")
     

@@ -239,7 +239,8 @@ logs={"slowmode-enabled":"Slowmode enabled in {channel} ({seconds}s)",
         "d-invite":"Automod (Discord invite)",
         "d-young":"Automod (too recent account)",
         "d-gived_roles":"Automated action (config gived_roles)",
-        "d-memberchan":"Automated action (config membercount)"
+        "d-memberchan":"Automated action (config membercount)",
+        "d-unban":"unbanned by {}",
         }
 
 mc={"contact-mail":"If you notice an error in the information provided, please contact me personally, or report the error directly [on the site](https://fr-minecraft.net).",

@@ -429,7 +429,7 @@ Or: mute @someone Plz respect me"""
             if not days_to_delete in range(8):
                 days_to_delete = 0
             reason = await self.bot.cogs["UtilitiesCog"].clear_msg(reason,everyone = not ctx.channel.permissions_for(ctx.author).mention_everyone)
-            #await ctx.guild.ban(user,reason=reason,delete_message_days=days_to_delete)
+            await ctx.guild.ban(user,reason=reason,delete_message_days=days_to_delete)
             if f_duration==None:
                 self.bot.log.info("L'utilisateur {} a été banni du serveur {} pour la raison {}".format(user.id,ctx.guild.id,reason))
             else:
@@ -443,6 +443,7 @@ Or: mute @someone Plz respect me"""
                     case = CasesCog.Case(bot=self.bot,guildID=ctx.guild.id,memberID=user.id,Type="ban",ModID=ctx.author.id,Reason=reason,date=datetime.datetime.now()).create_id(caseIDs)
                 else:
                     case = CasesCog.Case(bot=self.bot,guildID=ctx.guild.id,memberID=user.id,Type="tempban",ModID=ctx.author.id,Reason=reason,date=datetime.datetime.now(),duration=duration).create_id(caseIDs)
+                    await self.bot.cogs['Events'].add_task(ctx.guild.id,user.id,'ban',duration)
                 try:
                     await CasesCog.add_case(case)
                     caseID = case.id
@@ -462,6 +463,13 @@ Or: mute @someone Plz respect me"""
         except Exception as e:
             await ctx.send(await self.translate(ctx.guild.id,"modo","error"))
             await self.bot.cogs['ErrorsCog'].on_error(e,ctx)
+
+    async def unban_event(self,guild,user,author):
+        if not guild.me.guild_permissions.ban_members:
+            return
+        await guild.unban(user,reason=str(await self.translate(guild.id,"logs","d-unban")).format(author))
+        log = str(await self.translate(guild.id,"logs","unban")).format(member=user,reason="automod")
+        await self.bot.cogs["Events"].send_logs_per_server(guild,"ban",log,author)
 
     @commands.command(name="unban")
     @commands.cooldown(5,20, commands.BucketType.guild)
