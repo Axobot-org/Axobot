@@ -53,6 +53,7 @@ __** Configuration**__
  - `{server}` displays the server name
  - `{owner}` displays the server owner name
  - `{member_count}` shows the current number of members
+ - `{type}` return 'member' or 'bot'
 """}
 
 cases={"no-user":"Unable to find this user :eyes:",
@@ -70,6 +71,7 @@ events={'mp-adv':"You are probably trying to invite me to this server? If that i
 
 errors={"cooldown":"You are on cooldown for this command :confused: Please wait {} more seconds...",
         "badarguments":"Oops, unable to convert the `{c[3]}` parameter to \"{c[1]}\" type :confused:",
+        'badarguments-2':"`{0}` is not a recognised {1} option",
         "missingargument":"Oops, the argument \"{}\" is missing {}",
         "membernotfound":"Unable to find the member `{}` :confused:",
         "usernotfound":"Unable to find the user `{}` :confused:",
@@ -77,7 +79,9 @@ errors={"cooldown":"You are on cooldown for this command :confused: Please wait 
         "duration":"The duration `{}` is invalid",
         "rolenotfound":"Unable to find the role `{0}`",
         "invalidcolor":"Color `{0}` invalid",
-        "invalidinvite":"Invalid bot/server invite: `{0}`"
+        "invalidinvite":"Invalid bot/server invite: `{0}`",
+        'channotfound':"Channel {0} not found",
+        'DM':"This command isn't available in Direct Messages",
         }
 
 find={"user-0":"name: {}\nID: {}",
@@ -96,6 +100,7 @@ fun={"count-0":"Counting in progress...",
         "count-1":"On the last {} posts, you have posted {} messages ({}%)",
         "count-2":"You wanna blow up Discord! {e} For obvious performance reasons, I will impose a limit of {l} messages.",
         "count-3":"Oops, I'm unable to read this channel history. Please check my permissions...",
+        "count-4":"On the last {} messages, {} have posted {} messages ({}%)",
         "fun-list":"Here is the list of available fun commands:",
         "no-fun":"Fun commands have been disabled on this server. To see their list, look at https://zbot.rtfd.io/en/v3/fun.html",
         "osekour":["Wait, I'm finishing watching my movie.","We're coming! But why don't you answer anymore? Don't fake death!","Yes, we know there's a fire, we don't need to come: we're having a barbecue at the fire station.","*Rescue is currently unavailable, please wait until the end of the break*","*This number does not exist. Please try again with another number.*","*Maintenance of the current line. Please try again in 430 hours.*","*Your mobile plan has expired. You can buy one for 86,25€*","Two more volumes of Lord of the Rings to finish reading, and I'm all yours!","Thank you for not disturbing us during the holidays","Sorry, there are more than 3 snowflakes: we're stuck in the garage","We'll have to wait until the end of our strike... Are you saying you don't know?! It's been two months since we started!"],
@@ -185,6 +190,7 @@ keywords={"depuis":"since",
         "unknown":"Unknown",
         'added_at':'Added at',
         'bot':'bot',
+        'member':'member',
         'server':'server',
         'servers':'servers',
         'click_here':'Click here'
@@ -221,6 +227,7 @@ logs={"slowmode-enabled":"Slowmode enabled in {channel} ({seconds}s)",
         "clear":"{number} deleted messages in {channel}",
         "kick":"{member} has been kicked (reason: {reason} | case #{case})",
         "ban":"{member} has been banned (reason: {reason} | case #{case})",
+        "tempban":"{member} has been banned for {duration} (reason : {reason} | case #{case})",
         "unban":"{member} is no more banned (reason: {reason})",
         "mute-on":"{member} is now muted (reason : {reason} | case #{case})",
         "mute-off":"{member} is no more muted",
@@ -232,7 +239,8 @@ logs={"slowmode-enabled":"Slowmode enabled in {channel} ({seconds}s)",
         "d-invite":"Automod (Discord invite)",
         "d-young":"Automod (too recent account)",
         "d-gived_roles":"Automated action (config gived_roles)",
-        "d-memberchan":"Automated action (config membercount)"
+        "d-memberchan":"Automated action (config membercount)",
+        "d-unban":"unbanned by {}",
         }
 
 mc={"contact-mail":"If you notice an error in the information provided, please contact me personally, or report the error directly [on the site](https://fr-minecraft.net).",
@@ -310,6 +318,7 @@ modo={"slowmode-0":"The slowmode is now disabled in this channel.",
         "ban-noreason":"You have just been banned from the server {} :confused:",
         "ban-reason":"You have just been banned from the server {} :confused:\nReason : {}",
         "ban":"Member {} has been banned from this server for the reason `{}`",
+        "tempban":"Member {} has been banned from this server for {}, with the reason `{}`",
         "ban-1":"It seems that this member is too high for me to ban him. :thinking:",
         "ban-list-title-0":"List of banned members of the server '{}'",
         "ban-list-title-1":"List of 45 banned members of the server '{}'",
@@ -445,7 +454,7 @@ Link : {link}""",
 
 server={"config-help": "This command is mainly used to configure your server. By doing `!config see [option]` you will get \
 an overview of the current configurations, and server administrators can enter `!config change <option> role1, role2, role3...` \
-to modify a configuration, or `!config del <option>` to reset the option (`!config change <option>` works the same way).\nThe list of available options is available at <https://zbot.rtfd.io/en/latest/config.html#list-of-every-option>",
+to modify a configuration, or `!config del <option>` to reset the option (`!config change <option>` works the same way).\nThe list of available options is available at <https://zbot.rtfd.io/en/latest/server.html#list-of-every-option>",
         "change-0": "This option does not exist :confused:",
         "change-1": "Oops, an internal error occurred...",
         "change-2": "The '{}' option value has been deleted",
@@ -508,7 +517,8 @@ server_desc={"prefix":"Current bot prefix: {}",
         "noxp_channels":"Channels where you can't get xp: {}",
         "xp_type":"XP system used: {}",
         "partner_channel":"Channel where partners are sent: {}",
-        "partner_color":"Color of partners embed: {}"
+        "partner_color":"Color of partners embed: {}",
+        "partner_role":"Role given to partners: {}"
         }
 
 stats_infos={"not-found":"Unable to find {N}",
@@ -569,7 +579,10 @@ users = {'invalid-card':'This style is invalid. Here is the list of styles you c
         'missing-attach-files':'Oops, I\'m missing the permission to Attach Files :confused:',
         'changed-0':'Your xp card now uses the style {}',
         'changed-1':'Oops, an internal error occurred during the processing of the request. Try again later or contact support.',
-        'card-desc':"Here is an example of your xp card. You can enter the command `profile card <style>` to change the style\n*Your xp card will only refresh when you have won xp*"
+        'card-desc':"Here is an example of your xp card. You can enter the command `profile card <style>` to change the style\n*Your xp card will only refresh when you have won xp*",
+        'allow_animated_true':"Animated xp cards are currently enabled for you",
+        'allow_animated_false':"Animated xp cards are currently disabled for you",
+        'allow_animated_success':"This parameter has been redefined to {}"
         }
 
 xp = {'card-level':'LEVEL',
@@ -608,7 +621,7 @@ xp = {'card-level':'LEVEL',
                 "Congratulations {user}, you are {level}. Remember to use {random} to keep improving.",
                 "Thanks to the level {level}, you can try to win {random} at the raffle, {user} !",
                 "Despite your level, it is dangerous to travel alone {user}! Take {random} !",
-                "Level {level} for {user}! {random} is available from the seller!",
+                "Level {level} for {user}, {random} is available from the seller!",
                 "Bravo {user}! You are now level {level}! However, it is still necessary to climb to obtain {random} legendary rarity...",
                 "Houston, we have a problem. {user} has passed level {level}!!!!!",
                 "You see, the world is divided into two categories: those who levelup and those who don't levelup. You {user}, you levelup to level {level}!!!!",

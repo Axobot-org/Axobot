@@ -29,13 +29,14 @@ class ErrorsCog(commands.Cog):
             return
         
         ignored = (commands.errors.CommandNotFound,commands.errors.CheckFailure,commands.errors.ConversionError,discord.errors.Forbidden)
+        actually_not_ignored = (commands.errors.NoPrivateMessage)
         
         # Allows us to check for original exceptions raised and sent to CommandInvokeError.
         # If nothing is found. We keep the exception passed to on_command_error.
         error = getattr(error, 'original', error)
 
         # Anything in ignored will return and prevent anything happening.
-        if isinstance(error, ignored):
+        if isinstance(error, ignored) and not isinstance(error,actually_not_ignored):
             if self.bot.beta:
                 c = str(type(error)).replace("<class '",'').replace("'>",'')
                 await ctx.send('`Ignored error:` [{}] {}'.format(c,error))
@@ -53,6 +54,10 @@ class ErrorsCog(commands.Cog):
                 r = re.search(r'Converting to \"(?P<type>[^\"]+)\" failed for parameter \"(?P<arg>[^.\n]+)\"',str(error))
             if r!=None:
                 return await ctx.send(str(await self.translate(ctx.channel,'errors','badarguments')).format(r.group('arg'),r.group('type')))
+            # zzz is not a recognised boolean option
+            r = re.search(r'(?P<arg>[^\"]+) is not a recognised (?P<type>[^.\n]+) option',str(error))
+            if r!=None:
+                return await ctx.send(str(await self.translate(ctx.channel,'errors','badarguments-2')).format(r.group('arg'),r.group('type')))
             # Member "Z_runner" not found
             r = re.search(r'Member \"([^\"]+)\" not found',str(error))
             if r!=None:
@@ -69,6 +74,10 @@ class ErrorsCog(commands.Cog):
             r = re.search(r'Colour \"([^\"]+)\" is invalid',str(error))
             if r!=None:
                 return await ctx.send(str(await self.translate(ctx.channel,'errors','invalidcolor')).format(r.group(1)))
+            # Channel "twitter" not found.
+            r = re.search(r'Channel \"([^\"]+)\" not found',str(error))
+            if r!=None:
+                return await ctx.send(str(await self.translate(ctx.channel,'errors','channotfound')).format(r.group(1)))
             # Invalid duration: 2d
             r = re.search(r'Invalid duration: ([^\" ]+)',str(error))
             if r != None:
@@ -83,6 +92,9 @@ class ErrorsCog(commands.Cog):
             return
         elif isinstance(error,commands.DisabledCommand):
             await ctx.send(str(await self.translate(ctx.channel,'errors','disabled')).format(ctx.invoked_with))
+            return
+        elif isinstance(error,commands.errors.NoPrivateMessage):
+            await ctx.send(str(await self.translate(ctx.channel,'errors','DM')).format(ctx.invoked_with))
             return
         else:
             try:

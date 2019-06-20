@@ -1,6 +1,7 @@
 import discord, random, time, asyncio, io, imageio, importlib, re, os, operator, platform, typing, aiohttp
 from discord.ext import commands
 from math import ceil
+from json import dumps
 import numpy as np
 from PIL import Image, ImageDraw, ImageFont, ImageTk, ImageSequence, ImageEnhance
 from urllib.request import urlopen, Request
@@ -27,6 +28,7 @@ class XPCog(commands.Cog):
         self.max_xp_per_msg = 60
         self.file = 'xp'
         self.xp_channels_cache = dict()
+        self.mee6_calls = [0,0,0,0]
         bot.add_listener(self.add_xp,'on_message')
         try:
             self.translate = bot.cogs['LangCog'].tr
@@ -155,7 +157,8 @@ class XPCog(commands.Cog):
                 r = member.guild.get_role(role['role'])
                 if r==None:
                     continue
-                await member.add_roles(r,reason="Role reward (lvl {})".format(role['level']))
+                if not self.bot.beta:
+                    await member.add_roles(r,reason="Role reward (lvl {})".format(role['level']))
                 c += 1
             except Exception as e:
                 if self.bot.beta:
@@ -168,7 +171,8 @@ class XPCog(commands.Cog):
                 r = member.guild.get_role(role['role'])
                 if r==None:
                     continue
-                await member.remove_roles(r,reason="Role reward (lvl {})".format(role['level']))
+                if not self.bot.beta:
+                    await member.remove_roles(r,reason="Role reward (lvl {})".format(role['level']))
                 c += 1
             except Exception as e:
                 if self.bot.beta:
@@ -354,18 +358,36 @@ class XPCog(commands.Cog):
             for frame in frames:
                 frame = frame.convert(mode='RGBA')
                 img = await self.bot.loop.run_in_executor(None,self.add_overlay,frame.resize(size=(282,282)),user,card.copy(),xp,rank,txt,colors,levels_info,verdana_name,name_fnt)
-                img = ImageEnhance.Contrast(img).enhance(1.5)
+                img = ImageEnhance.Contrast(img).enhance(1.5).resize((800,265))
                 images.append(img)
                 duration.append(pfp.info['duration']/1000)
+                
             card.close()
 
             image_file_object = BytesIO()
             gif = images[0]
             gif.save(image_file_object, format='gif', save_all=True, append_images=images[1:], loop=0, duration=duration[0], subrectangles=True)
             image_file_object.seek(0)
+            print(image_file_object.getbuffer().nbytes)
             return discord.File(fp=image_file_object, filename='card.gif')
             # imageio.mimwrite('../cards/global/{}-{}-{}.gif'.format(user.id,xp,rank[0]), images, format="GIF-PIL", duration=duration, subrectangles=True)
             # return discord.File('../cards/global/{}-{}-{}.gif'.format(user.id,xp,rank[0]))
+
+    def compress(self,original_file, max_size, scale):
+        assert(0.0 < scale < 1.0)
+        orig_image = Image.open(original_file)
+        cur_size = orig_image.size
+
+        while True:
+            cur_size = (int(cur_size[0] * scale), int(cur_size[1] * scale))
+            resized_file = orig_image.resize(cur_size, Image.ANTIALIAS)
+
+            with io.BytesIO() as file_bytes:
+                resized_file.save(file_bytes, optimize=True, quality=95, format='png')
+
+                if file_bytes.tell() <= max_size:
+                    file_bytes.seek(0, 0)
+                    return file_bytes
 
     def add_overlay(self,pfp,user,img,xp,rank,txt,colors,levels_info,verdana_name,name_fnt):
         #img = Image.new('RGBA', (card.width, card.height), color = (250,250,250,0))
@@ -419,7 +441,7 @@ class XPCog(commands.Cog):
 
     @commands.command(name='rank')
     @commands.bot_has_permissions(send_messages=True)
-    @commands.cooldown(1,15,commands.BucketType.user)
+    @commands.cooldown(1,20,commands.BucketType.user)
     async def rank(self,ctx,*,user:args.user=None):
         """Display a user XP.
         If you don't send any user, I'll display your own XP
@@ -460,13 +482,19 @@ class XPCog(commands.Cog):
         except Exception as e:
             await self.bot.cogs['ErrorsCog'].on_command_error(ctx,e)
     
-    async def send_card(self,ctx,user,xp,rank,ranks_nb,levels_info=None):
+    async def send_card(self,ctx:commands.context,user:discord.User,xp,rank,ranks_nb,levels_info=None):
         try:
             await ctx.send(file=discord.File('../cards/global/{}-{}-{}.{}'.format(user.id,xp,rank,'gif' if user.is_avatar_animated() else 'png')))
         except FileNotFoundError:
             style = await self.bot.cogs['UtilitiesCog'].get_xp_style(user)
             txts = [await self.translate(ctx.channel,'xp','card-level'), await self.translate(ctx.channel,'xp','card-rank')]
-            await ctx.send(file=await self.create_card(user,style,xp,[rank,ranks_nb],txts,levels_info=levels_info))
+            static = await self.bot.cogs['UtilitiesCog'].get_db_userinfo(['animated_card'],[f'`userID`={user.id}'])
+            if user.is_avatar_animated():
+                if static!=None:
+                    static = not static['animated_card']
+                else:
+                    static = True
+            await ctx.send(file=await self.create_card(user,style,xp,[rank,ranks_nb],txts,force_static=static,levels_info=levels_info))
             self.bot.log.debug("XP card for user {} ({}xp - style {})".format(user.id,xp,style))
     
     async def send_embed(self,ctx,user,xp,rank,ranks_nb,levels_info):
@@ -704,12 +732,17 @@ class XPCog(commands.Cog):
             await self.bot.cogs['ErrorsCog'].on_cmd_error(ctx,e)
     
 
+    def update_mee6_calls(self,i:int):
+        if self.mee6_calls[0] == 0:
+            self.mee6_calls[0] = round(time.time())
+        self.mee6_calls[i] += 1
+
     async def mee6_reload_rr(self,guild):
         """Reloads every role rewards from a guild using MEE6 xp"""
         if await self.bot.cogs['ServerCog'].find_staff(guild.id,'xp_type')!=1 or guild.get_member(159985870458322944)==None:
             return -1
         c = [0,0]
-        xps = [{'user':x['id'],'xp':x['xp'],'level':x['level']} for x in await self.mee6_get_top(guild,nb=1000000)]
+        xps = [{'user':x['id'],'xp':x['xp'],'level':x['level']} for x in await self.mee6_get_top(guild)]
         rr_list = await self.rr_list_role(guild.id)
         for member in xps:
             m = guild.get_member(int(member['user']))
@@ -729,13 +762,19 @@ class XPCog(commands.Cog):
         async with aiohttp.ClientSession() as session:
             i = 0
             result = list()
-            while i<=ceil(nb/999):
+            while i<ceil(nb/999):
                 async with session.get(f'https://mee6.xyz/api/plugins/levels/leaderboard/{guild.id}?page={i}&limit=999') as resp:
+                    self.update_mee6_calls(1)
                     try:
                         temp = (await resp.json())['players']
                         result += temp
                     except Exception as e:
+                        j = dumps(await resp.json(), sort_keys=True, indent=2)
                         await self.bot.cogs['ErrorsCog'].senf_err_msg(f"Error on `mee6_get_top`: url https://mee6.xyz/api/plugins/levels/leaderboard/{guild.id}?page={i}&limit=999")
+                        try:
+                            [await self.bot.get_user(279568324260528128).send("```json\n{}\n```".format(x)) for x in [j[l:l+1950] for l in range(0, len(j), 1950) ][:5] ]
+                        except:
+                            pass
                         raise e
                 if len(temp)==0:
                     break
@@ -751,6 +790,7 @@ class XPCog(commands.Cog):
             js = {'players':[]}
             while len([x for x in js['players'] if x['id']==str(user.id)])==0 and i<=ceil(user.guild.member_count/999):
                 url = f'https://mee6.xyz/api/plugins/levels/leaderboard/{user.guild.id}?page={i}&limit=999'
+                self.update_mee6_calls(2)
                 async with session.get(url) as resp:
                     js = await resp.json()
                 i += 1
@@ -768,6 +808,7 @@ class XPCog(commands.Cog):
             pos = 0
             while i<=ceil(user.guild.member_count/999):
                 async with session.get(f'https://mee6.xyz/api/plugins/levels/leaderboard/{user.guild.id}?page={i}&limit=999') as resp:
+                    self.update_mee6_calls(3)
                     l = [x['id'] for x in (await resp.json())['players']]
                     if str(user.id) in l:
                         break

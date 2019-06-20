@@ -24,15 +24,12 @@ def del_emoji(text):
         text=text.replace(v,'')
     return text
 
-def anti_code(text):
-    for k,v in emojiMap.items():
-        text=text.replace(v,k)
-    return text
-
 
 
 emojiMap={
+
 	":capricorn:":                    "\U00002651",
+	":upside_down:":				  "\U0001F643",
 	":end:":                          "\U0001f51a",
 	":no_mobile_phones:":             "\U0001f4f5",
 	":couple:":                       "\U0001f46b",
@@ -976,6 +973,11 @@ class EmojiCog(commands.Cog):
 		for x in r.text:
 			if x not in string.printable and x not in self.unicode_list:
 				self.unicode_list.append(x)
+	
+	async def anti_code(self,text):
+		for k,v in emojiMap.items():
+			text=text.replace(v,k)
+		return text
 		
 def setup(bot):
 	bot.add_cog(EmojiCog(bot))

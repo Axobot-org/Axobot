@@ -56,6 +56,8 @@ class PartnersCog(commands.Cog):
     async def bdd_get_partnered(self,invites:list):
         """Return every guilds which has this one as partner"""
         try:
+            if len(invites)==0:
+                return list()
             cnx = self.bot.cnx
             cursor = cnx.cursor(dictionary = True)
             query = ("SELECT * FROM `{}` WHERE `type`='guild' AND ({})".format(self.table," OR ".join([f"`target`='{x.code}'" for x in invites])))
@@ -68,13 +70,13 @@ class PartnersCog(commands.Cog):
         except Exception as e:
             await self.bot.cogs['ErrorsCog'].on_error(e,None)
     
-    async def bdd_set_partner(self,guildID:int,partnerID:str,partnerType:str):
+    async def bdd_set_partner(self,guildID:int,partnerID:str,partnerType:str,desc:str):
         """Add a partner into a server"""
         try:
             ID = await self.generate_id()
             cnx = self.bot.cnx
             cursor = cnx.cursor(dictionary = True)
-            query = ("INSERT INTO `{table}` (`ID`,`guild`,`target`,`type`) VALUES ('{id}','{guild}','{target}','{type}');".format(table=self.table,id=ID,guild=guildID,target=partnerID,type=partnerType))
+            query = ("INSERT INTO `{table}` (`ID`,`guild`,`target`,`type`,`description`) VALUES ('{id}','{guild}','{target}','{type}','{desc}');".format(table=self.table,id=ID,guild=guildID,target=partnerID,type=partnerType,desc=desc.replace("'","\\'")))
             cursor.execute(query)
             cnx.commit()
             cursor.close()
@@ -211,7 +213,7 @@ class PartnersCog(commands.Cog):
 
     @partner_main.command(name='add')
     @commands.check(checks.has_admin)
-    async def partner_add(self,ctx,invite:args.Invite):
+    async def partner_add(self,ctx,invite:args.Invite,*,description=''):
         """Add a partner in your llist"""
         if isinstance(invite,int):
             try:
@@ -229,7 +231,9 @@ class PartnersCog(commands.Cog):
             Type = 'guild'
         else:
             return
-        await self.bdd_set_partner(guildID=ctx.guild.id,partnerID=item.id,partnerType=Type)
+        if len(description)>0:
+            description = await self.bot.cogs['EmojiCog'].anti_code(description)
+        await self.bdd_set_partner(guildID=ctx.guild.id,partnerID=item.id,partnerType=Type,desc=description)
         await ctx.send(await self.translate(ctx.guild.id,'partners','added-partner'))
     
     @partner_main.command(name='description',aliases=['desc'])
@@ -240,6 +244,7 @@ class PartnersCog(commands.Cog):
         if len(l)==0:
             return await ctx.send(await self.translate(ctx.guild.id,'partners','invalid-partner'))
         l = l[0]
+        description = await self.bot.cogs['EmojiCog'].anti_code(description)
         if await self.bdd_edit_partner(l['ID'],desc=description):
             await ctx.send(await self.translate(ctx.guild.id,'partners','changed-desc'))
         else:
@@ -280,7 +285,7 @@ class PartnersCog(commands.Cog):
             msg = await ctx.send((await self.translate(ctx.guild.id,'partners','confirm-bot')).format(bot))
         elif l['type']=='guild':
             try:
-                server = (await self.bot.fetch_invite(l['target'])).name
+                server = (await self.bot.fetch_invite(l['target'])).guild.name
             except:
                 server = l['target']
             msg = await ctx.send((await self.translate(ctx.guild.id,'partners','confirm-server')).format(server))
@@ -327,9 +332,9 @@ class PartnersCog(commands.Cog):
             server = ctx.bot.get_guild(l['guild'])
             if server==None:
                 server = l['guild']
-                f[1] += f"[{l['ID']}] {tr_unknown} (ID: {server})"
+                f[1] += f"{tr_unknown} (ID: {server})"
             else:
-                f[1] += f"[{l['ID']}] {server.name} ({tr_owner} : {server.owner})"
+                f[1] += f"{server.name} ({tr_owner} : {server.owner})"
         if len(f[0])==0:
             f[0] = await self.translate(ctx.guild.id,'partners','no-partner')
         if len(f[1])==0:

@@ -22,48 +22,6 @@ class TimedCog(commands.Cog):
         self.translate = self.bot.cogs['LangCog'].tr
 
 
-    async def add_action(self,guild,user,action,begin,duration):
-        """add a new server to the db"""
-        if not all([type(x)==int for x in (user,guild,begin,duration)]):
-            raise ValueError
-        cnx = self.bot.cnx
-        cursor = cnx.cursor()
-        query = ("INSERT INTO `{}` (`guild`,`user`,`action`,`begin`,`duration`) VALUES ('{}','{}','{}','{}','{}')".format(self.table,guild,user,action,begin,duration))
-        cursor.execute(query)
-        cnx.commit()
-        return True
-
-    async def get_infos(self,columns=[],criters=["ID>1"],relation="AND",Dict=True):
-        """return every options of a server"""
-        await self.bot.wait_until_ready()
-        if type(columns)!=list or type(criters)!=list:
-            raise ValueError
-        cnx = self.bot.cnx
-        cursor = cnx.cursor(dictionary = Dict)
-        if columns == []:
-            cl = "*"
-        else:
-            cl = "`"+"`,`".join(columns)+"`"
-        relation = " "+relation+" "
-        query = ("SELECT {} FROM `{}` WHERE {}".format(cl,self.table,relation.join(criters)))
-        cursor.execute(query)
-        liste = list()
-        for x in cursor:
-            liste.append(x)
-        return liste
-    
-    async def delete_server(self,user,guild,action):
-        """remove a server from the db"""
-        if type(user)!=int or type(guild)!=int:
-            raise ValueError
-        cnx = self.bot.cnx
-        cursor = cnx.cursor()
-        query = ("DELETE FROM `{}` WHERE `user`='{}' AND `guild`='{}' AND `action`='{}'".format(self.table,user,guild,action))
-        cursor.execute(query)
-        cnx.commit()
-        return True
-
-
     @commands.command(name="tempmute")
     @commands.cooldown(5,20, commands.BucketType.guild)
     @commands.guild_only()
@@ -79,6 +37,7 @@ Example: tempmute @someone 1d 3h Reason is becuz he's a bad guy
 """
         duration = sum(time)
         if duration==0:
+            await ctx.send(time)
             try:
                 raise commands.errors.BadArgument('Invalid duration: 0s')
             except Exception as e:
@@ -95,18 +54,7 @@ Example: tempmute @someone 1d 3h Reason is becuz he's a bad guy
             await self.bot.cogs['ErrorsCog'].on_error(e,ctx)
             return
         role = await self.bot.cogs['ModeratorCog'].get_muted_role(ctx.guild)
-        if role in user.roles:
-            await ctx.send(await self.translate(ctx.guild.id,"modo","already-mute"))
-            return
-        if not ctx.guild.me.guild_permissions.manage_roles:
-            await ctx.send(await self.translate(ctx.guild.id,"modo","cant-mute"))
-            return
-        if role == None:
-            role = await self.bot.cogs['ModeratorCog'].configure_muted_role(ctx.guild)
-            await ctx.send(await self.translate(ctx.guild.id,"modo","mute-created"))
-        if role.position > ctx.guild.me.roles[-1].position:
-            await ctx.send(await self.translate(ctx.guild.id,"modo","mute-high"))
-            return
+        
         caseID = "'Unsaved'"
         try:
             reason = await self.bot.cogs["UtilitiesCog"].clear_msg(reason,everyone = not ctx.channel.permissions_for(ctx.author).mention_everyone)
