@@ -16,6 +16,7 @@ class Events(commands.Cog):
         self.mee6_last_check = datetime.datetime.utcfromtimestamp(0)
         self.dbl_last_sending = datetime.datetime.utcfromtimestamp(0)
         self.partner_last_check = datetime.datetime.utcfromtimestamp(0)
+        self.mee6_stats_last = datetime.datetime.utcfromtimestamp(0)
         self.embed_colors = {"welcome":5301186,
         "mute":4868682,
         "kick":16730625,
@@ -288,6 +289,8 @@ class Events(commands.Cog):
                 await self.partners_loop()
             if int(d.hour) == 0 and d.day != self.dbl_last_sending.day:
                 await self.dbl_send_data()
+            if int(d.hour) == 0 and d.day != self.mee6_stats_last:
+                await self.send_mee6_stats()
         except Exception as e:
             await self.bot.cogs['ErrorCog'].on_error(e,None)
 
