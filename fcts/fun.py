@@ -127,7 +127,7 @@ class FunCog(commands.Cog):
 
     @commands.command(name="count_msg",hidden=True)
     @commands.check(is_fun_enabled)
-    async def count(self,ctx,limit:int=1000):
+    async def count(self,ctx,user:typing.Optional[discord.User]=None,limit:int=1000):
         """Count the number of messages sent by the user
 You can specify a verification limit by adding a number in argument"""
         l = 100000
@@ -137,15 +137,20 @@ You can specify a verification limit by adding a number in argument"""
         if ctx.guild!=None and not ctx.channel.permissions_for(ctx.guild.me).read_message_history:
             await ctx.send(str(await self.translate(ctx.channel,"fun","count-3")).format(l))
             return
+        if user==None:
+            user = ctx.author
         counter = 0
         tmp = await ctx.send(await self.translate(ctx.channel,'fun','count-0'))
         m = 0
         async for log in ctx.channel.history(limit=limit):
             m += 1
-            if log.author == ctx.author:
+            if log.author == user:
                 counter += 1
         r = round(counter*100/m,2)
-        await tmp.edit(content = str(await self.translate(ctx.channel,'fun','count-1')).format(m,counter,r))
+        if user==ctx.author:
+            await tmp.edit(content = str(await self.translate(ctx.channel,'fun','count-1')).format(m,counter,r))
+        else:
+            await tmp.edit(content = str(await self.translate(ctx.channel,'fun','count-4')).format(m,user.display_name,counter,r))
 
     @commands.command(name="ragequit",hidden=True)
     @commands.check(is_fun_enabled)
