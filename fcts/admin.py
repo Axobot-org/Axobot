@@ -53,27 +53,7 @@ class AdminCog(commands.Cog):
 
     
 
-    @commands.command(name='god')
-    @commands.check(reloads.check_admin)
-    @commands.guild_only()
-    async def enable_god_mode(self,ctx,enable:bool=True):
-        """Donne les pleins-pouvoirs aux admins du bot sur ce serveur (accès à toutes les commandes de modération)"""
-        if enable:
-            if ctx.guild.id not in self.god_mode:
-                self.god_mode.append(ctx.guild.id)
-                await ctx.send("<:nitro:548569774435598346> Mode superadmin activé sur ce serveur",delete_after=3)
-            else:
-                await ctx.send("Mode superadmin déjà activé sur ce serveur",delete_after=3)
-        else:
-            if ctx.guild.id in self.god_mode:
-                self.god_mode.remove(ctx.guild.id)
-                await ctx.send("Mode superadmin désactivé sur ce serveur",delete_after=3)
-            else:
-                await ctx.send("Ce mode n'est pas actif ici",delete_after=3)
-        try:
-            await ctx.message.delete()
-        except:
-            pass
+    
 
     @commands.command(name='spoil',hidden=True)
     @commands.check(reloads.check_admin)
@@ -104,6 +84,28 @@ class AdminCog(commands.Cog):
                     for cmds in cmd.commands:
                         text+="\n        - {} *({})*".format(cmds.name,cmds.help)
             await ctx.send(text)
+
+    @main_msg.command(name='god')
+    @commands.check(reloads.check_admin)
+    @commands.guild_only()
+    async def enable_god_mode(self,ctx,enable:bool=True):
+        """Donne les pleins-pouvoirs aux admins du bot sur ce serveur (accès à toutes les commandes de modération)"""
+        if enable:
+            if ctx.guild.id not in self.god_mode:
+                self.god_mode.append(ctx.guild.id)
+                await ctx.send("<:nitro:548569774435598346> Mode superadmin activé sur ce serveur",delete_after=3)
+            else:
+                await ctx.send("Mode superadmin déjà activé sur ce serveur",delete_after=3)
+        else:
+            if ctx.guild.id in self.god_mode:
+                self.god_mode.remove(ctx.guild.id)
+                await ctx.send("Mode superadmin désactivé sur ce serveur",delete_after=3)
+            else:
+                await ctx.send("Ce mode n'est pas actif ici",delete_after=3)
+        try:
+            await ctx.message.delete()
+        except:
+            pass
 
     @main_msg.command(name="faq",hidden=True)
     @commands.check(reloads.check_admin)
