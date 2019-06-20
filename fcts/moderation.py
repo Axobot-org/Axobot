@@ -1,7 +1,8 @@
 from discord.ext import commands
 import discord, re, datetime, random, json, os, typing, importlib
-from fcts import checks
+from fcts import checks, args
 importlib.reload(checks)
+importlib.reload(args)
 
 class ModeratorCog(commands.Cog):
     """Here you will find everything you need to moderate your server. Please note that most of the commands are reserved for certain members only."""
@@ -263,18 +264,46 @@ class ModeratorCog(commands.Cog):
             return discord.utils.get(guild.roles,name="muted")
         return guild.get_role(opt)
 
-    async def mute_event(self,member,author,reason,caseID):
+    async def mute_event(self,member,author,reason,caseID:int,duration:str=None):
         role = await self.get_muted_role(member.guild)
         await member.add_roles(role,reason=reason)
-        log = str(await self.translate(member.guild.id,"logs","mute-on")).format(member=member,reason=reason,case=caseID)
+        log = str(await self.translate(member.guild.id,"logs","mute-on" if duration==None else "tempmute-on")).format(member=member,reason=reason,case=caseID,duration=duration)
         await self.bot.cogs["Events"].send_logs_per_server(member.guild,"mute",log,author)
+
+    async def check_mute_context(self,ctx,role,user):
+        if role in user.roles:
+            await ctx.send(await self.translate(ctx.guild.id,"modo","already-mute"))
+            return False
+        if not ctx.guild.me.guild_permissions.manage_roles:
+            await ctx.send(await self.translate(ctx.guild.id,"modo","cant-mute"))
+            return False
+        if role == None:
+            role = await self.bot.cogs['ModeratorCog'].configure_muted_role(ctx.guild)
+            await ctx.send(await self.translate(ctx.guild.id,"modo","mute-created"))
+            return True
+        if role.position > ctx.guild.me.roles[-1].position:
+            await ctx.send(await self.translate(ctx.guild.id,"modo","mute-high"))
+            return False
+        return True
 
     @commands.command(name="mute")
     @commands.cooldown(5,20, commands.BucketType.guild)
     @commands.guild_only()
     @commands.check(checks.can_mute)
-    async def mute(self,ctx,user:discord.Member,*,reason="Unspecified"):
-        """Mute someone. When someone is muted, the bot adds the role "muted" to him"""
+    async def mute(self,ctx,user:discord.Member,time:commands.Greedy[args.tempdelta],*,reason="Unspecified"):
+        """Mute someone. 
+When someone is muted, the bot adds the role "muted" to them
+You can also mute this member for a defined duration, then use the following format:
+`XXm` : XX minutes
+`XXh` : XX hours
+`XXd` : XX days
+Example: tempmute @someone 1d 3h Reason is becuz he's a bad guy
+Or: mute @someone Plz respect me"""
+        duration = sum(time)
+        if duration>0:
+            f_duration = await self.bot.cogs['TimeCog'].time_delta(duration,lang=await self.translate(ctx.guild,'current_lang','current'),form='temp',precision=0)
+        else:
+            f_duration = None
         try:
             if self.bot.database_online and await self.bot.cogs["ServerCog"].staff_finder(user,"mute") or user==ctx.guild.me:
                 await ctx.send(str(await self.translate(ctx.guild.id,"modo","staff-mute"))+random.choice([':confused:',':upside_down:',self.bot.cogs['EmojiCog'].customEmojis['wat'],':no_mouth:',self.bot.cogs['EmojiCog'].customEmojis['owo'],':thinking:',]))
@@ -285,19 +314,7 @@ class ModeratorCog(commands.Cog):
             await self.bot.cogs['ErrorsCog'].on_error(e,ctx)
             return
         role = await self.get_muted_role(ctx.guild)
-        if role in user.roles:
-            await ctx.send(await self.translate(ctx.guild.id,"modo","already-mute"))
-            return
-        if not ctx.guild.me.guild_permissions.manage_roles:
-            await ctx.send(await self.translate(ctx.guild.id,"modo","cant-mute"))
-            return
-        if role == None:
-            role = await self.configure_muted_role(ctx.guild)
-            await ctx.send(await self.translate(ctx.guild.id,"modo","mute-created"))
-        if role == None:
-            await ctx.send(await self.translate(ctx.guild.id,"modo","error"))
-        if role.position >= ctx.guild.me.roles[-1].position:
-            await ctx.send(await self.translate(ctx.guild.id,"modo","mute-high"))
+        if not await self.check_mute_context(ctx,role,user):
             return
         caseID = "'Unsaved'"
         try:
@@ -305,18 +322,24 @@ class ModeratorCog(commands.Cog):
             if self.bot.database_online:
                 CasesCog = self.bot.cogs['CasesCog']
                 caseIDs = await CasesCog.get_ids()
-                case = CasesCog.Case(bot=self.bot,guildID=ctx.guild.id,memberID=user.id,Type="mute",ModID=ctx.author.id,Reason=reason,date=datetime.datetime.now()).create_id(caseIDs)
+                if f_duration==None:
+                    case = CasesCog.Case(bot=self.bot,guildID=ctx.guild.id,memberID=user.id,Type="mute",ModID=ctx.author.id,Reason=reason,date=datetime.datetime.now()).create_id(caseIDs)
+                else:
+                    case = CasesCog.Case(bot=self.bot,guildID=ctx.guild.id,memberID=user.id,Type="tempmute",ModID=ctx.author.id,Reason=reason,date=datetime.datetime.now(),duration=duration).create_id(caseIDs)
+                    await self.bot.cogs['Events'].add_task(ctx.guild.id,user.id,'mute',duration)
                 try:
                     await CasesCog.add_case(case)
                     caseID = case.id
                 except Exception as e:
                     await self.bot.cogs['ErrorsCog'].on_error(e,ctx)
-            await self.mute_event(user,ctx.author,reason,caseID)
-            await ctx.send(str(await self.translate(ctx.guild.id,"modo","mute-1")).format(user,reason))
-            try:
+            if f_duration==None:
+                await self.mute_event(user,ctx.author,reason,caseID)
+                await ctx.send(str(await self.translate(ctx.guild.id,"modo","mute-1")).format(user,reason))
+            else:
+                await self.mute_event(user,ctx.author,reason,caseID,f_duration)
+                await ctx.send(str(await self.translate(ctx.guild.id,"modo","tempmute-1")).format(user,reason,f_duration))
+            if ctx.channel.permissions_for(ctx.guild.me).manage_messages:
                 await ctx.message.delete()
-            except:
-                pass
         except Exception as e:
             await ctx.send(await self.translate(ctx.guild.id,"modo","error"))
             await self.bot.cogs['ErrorsCog'].on_error(e,ctx)

@@ -24,8 +24,7 @@ This command allows you to warn a member, without really sanctioning him. This m
 Mute
 ----
 
-**Syntax:** :code:`mute <user> [reason]`
-**Syntax:** :code:`tempmute <user> <duration> [reason]`
+**Syntax:** :code:`mute <user> [duration] [reason]`
 
 This command mutes a member, preventing them from typing. 
 
