@@ -396,6 +396,7 @@ class Events(commands.Cog):
         emb = self.bot.cogs["EmbedCog"].Embed(desc='MEE6 api called {} times since {} ({}-{}-{})'.format(sum(stats[1:]),t,stats[1],stats[2],stats[3]))
         emb.update_timestamp().set_author(self.bot.user)
         await self.bot.cogs["EmbedCog"].send([emb],url="loop")
+        self.mee6_stats_last = datetime.datetime.now()
 
     async def partners_loop(self):
         """Update partners channels (every 7 hours)"""
