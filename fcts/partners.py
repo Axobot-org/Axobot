@@ -328,13 +328,16 @@ class PartnersCog(commands.Cog):
                 except:
                     server = 'discord.gg/'+l['target']
                 f[0] += "[{}] **{}** `{}` ({} {})\n".format(l['ID'],tr_guild.capitalize(),server,tr_added,date)
-        for l in await self.bdd_get_partnered(await ctx.guild.invites()):
-            server = ctx.bot.get_guild(l['guild'])
-            if server==None:
-                server = l['guild']
-                f[1] += f"{tr_unknown} (ID: {server})"
-            else:
-                f[1] += f"{server.name} ({tr_owner} : {server.owner})"
+        if ctx.guild.me.guild_permissions.manage_guild:
+            for l in await self.bdd_get_partnered(await ctx.guild.invites()):
+                server = ctx.bot.get_guild(l['guild'])
+                if server==None:
+                    server = l['guild']
+                    f[1] += f"{tr_unknown} (ID: {server})"
+                else:
+                    f[1] += f"{server.name} ({tr_owner} : {server.owner})"
+        else:
+            f[1] = await self.translate(ctx.guild.id,'partners','missing-manage-guild')
         if len(f[0])==0:
             f[0] = await self.translate(ctx.guild.id,'partners','no-partner')
         if len(f[1])==0:
