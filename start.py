@@ -73,46 +73,46 @@ class zbot(commands.bot.BotBase,discord.Client):
         self.database_keys = dict()
         self.log = logging.getLogger("runner")
         self.dbl_token = dbl_token
-        self._cnx = [None,0]
+        self._cnx = [[None,0],[None,0]]
         self.xp_enabled = True
         self.rss_enabled = True
         self.others = dict()
     
     @property
     def cnx_frm(self):
-        if self._cnx[1] + 1260 < round(time.time()): # 21min
+        if self._cnx[0][1] + 1260 < round(time.time()): # 21min
             self.connect_database_frm()
-            self._cnx[1] = round(time.time())
-            return self._cnx[0]
+            self._cnx[0][1] = round(time.time())
+            return self._cnx[0][0]
         else:
-            return self._cnx[0]
+            return self._cnx[0][0]
     
     def connect_database_frm(self):
         if len(self.database_keys)>0:
-            if self._cnx[0] != None:
-                self._cnx[0].close()
+            if self._cnx[0][0] != None:
+                self._cnx[0][0].close()
             self.log.debug('Connection à MySQL (user {})'.format(self.database_keys['user']))
-            self._cnx[0] = mysql.connector.connect(user=self.database_keys['user'],password=self.database_keys['password'],host=self.database_keys['host'],database=self.database_keys['database1'],buffered=True)
-            self._cnx[1] = round(time.time())
+            self._cnx[0][0] = mysql.connector.connect(user=self.database_keys['user'],password=self.database_keys['password'],host=self.database_keys['host'],database=self.database_keys['database1'],buffered=True)
+            self._cnx[0][1] = round(time.time())
         else:
             raise ValueError(dict)
     
     @property
     def cnx_xp(self):
-        if self._cnx[1] + 1260 < round(time.time()): # 21min
+        if self._cnx[1][1] + 1260 < round(time.time()): # 21min
             self.connect_database_frm()
-            self._cnx[1] = round(time.time())
-            return self._cnx[0]
+            self._cnx[1][1] = round(time.time())
+            return self._cnx[1][0]
         else:
-            return self._cnx[0]
+            return self._cnx[1][0]
     
     def connect_database_xp(self):
         if len(self.database_keys)>0:
-            if self._cnx[0] != None:
-                self._cnx[0].close()
+            if self._cnx[1][0] != None:
+                self._cnx[1][0].close()
             self.log.debug('Connection à MySQL (user {})'.format(self.database_keys['user']))
-            self._cnx[0] = mysql.connector.connect(user=self.database_keys['user'],password=self.database_keys['password'],host=self.database_keys['host'],database=self.database_keys['database2'],buffered=True)
-            self._cnx[1] = round(time.time())
+            self._cnx[1][0] = mysql.connector.connect(user=self.database_keys['user'],password=self.database_keys['password'],host=self.database_keys['host'],database=self.database_keys['database2'],buffered=True)
+            self._cnx[1][1] = round(time.time())
         else:
             raise ValueError(dict)
     
@@ -206,7 +206,7 @@ def main():
         client.others['botsondiscord'] = cryptage.uncrypte(r[6])
         client.others['discordbotsgroup'] = cryptage.uncrypte(r[7])
     try:
-        cnx = mysql.connector.connect(user=client.database_keys['user'],password=client.database_keys['password'],host=client.database_keys['host'],database=client.database_keys['database'])
+        cnx = mysql.connector.connect(user=client.database_keys['user'],password=client.database_keys['password'],host=client.database_keys['host'],database=client.database_keys['database1'])
         cnx.close()
     except Exception as e:
         print("---- ACCES IMPOSSIBLE A LA DATABASE ----")
@@ -222,8 +222,6 @@ def main():
     # Here we load our extensions(cogs) listed above in [initial_extensions]
     count = 0
     for extension in initial_extensions:
-        if not client.database_online:
-            extension = extension.replace('fcts','fctshl')
         try:
             client.load_extension(extension)
         except:
