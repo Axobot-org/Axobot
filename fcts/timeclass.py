@@ -26,8 +26,8 @@ class TimeCog(discord.ext.commands.Cog):
         def set_from_seconds(self):
             t = self.total_seconds
             rest = 0
-            years, rest = divmod(t,3.154e+7)
-            months, rest = divmod(rest,2.628e+6)
+            years, rest = divmod(t,86400*365)
+            months, rest = divmod(rest,86400*365/12)
             days, rest = divmod(rest,86400)
             hours, rest = divmod(rest,3600)
             minutes, rest = divmod(rest,60)
@@ -64,13 +64,13 @@ class TimeCog(discord.ext.commands.Cog):
                 text = '{}/{}{} {}'.format(t.months,t.days,"/"+str(t.years) if year else '',h)
         elif form=='temp':
             text = str()
-            if t.days+t.months*30.41>0:
-                d = round(t.days+t.months*30.41)
+            if t.days + t.months*365/12 + t.years*365 > 0:
+                d = round(t.days+t.months*365/12)
                 if not year:
-                    d += round(t.years*3.154e+7)
+                    d += round(t.years*365)
+                elif year and t.years>0:
+                    text += str(t.years) + 'a ' if lang=='fr' else 'y '
                 text += str(d) + 'j ' if lang=='fr' else 'd '
-            if year and t.years>0:
-                text += str(t.years) + 'a ' if lang=='fr' else 'y '
             if hour:
                 if t.hours>0:
                     text += str(t.hours)+'h '

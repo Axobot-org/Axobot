@@ -9,7 +9,7 @@ class tempdelta(commands.Converter):
         d = 0
         found = False
         # ctx.invoked_with
-        for x in [('y',3.154e+7),('d',86400),('h',3600),('m',60)]:
+        for x in [('y',86400*365),('d',86400),('h',3600),('m',60)]:
             r = re.search(r'(\d+)'+x[0],argument)
             if r!= None:
                 d += int(r.group(1))*x[1]
@@ -82,3 +82,15 @@ class Invite(commands.Converter):
         if r==None or answer==None:
             raise commands.errors.BadArgument('Invalid invite: '+argument)
         return answer
+
+
+class Guild(commands.Converter):
+    def __init__(self):
+        pass
+    
+    async def convert(self,ctx:commands.context,argument):
+        if argument.isnumeric():
+            res = ctx.bot.get_guild(int(argument))
+            if res != None:
+                return res
+        raise commands.errors.BadArgument('Invalid guild: '+argument)
