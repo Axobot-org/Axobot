@@ -46,7 +46,7 @@ class AdminCog(commands.Cog):
         return await reloads.check_admin(ctx)
     
     async def check_if_god(self,ctx):
-        if isinstance(ctx.guild,discord.Guild) and ctx.guild!=None:
+        if isinstance(ctx,discord.User) or (isinstance(ctx.guild,discord.Guild) and ctx.guild!=None):
             return await reloads.check_admin(ctx) and ctx.guild.id in self.god_mode
         else:
             return await reloads.check_admin(ctx)
