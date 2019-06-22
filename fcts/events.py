@@ -178,7 +178,7 @@ class Events(commands.Cog):
     async def get_events_from_db(self,all=False,IDonly=False):
         """Renvoie une liste de tous les events qui doivent être exécutés"""
         try:
-            cnx = self.bot.cnx
+            cnx = self.bot.cnx_frm
             cursor = cnx.cursor(dictionary = True)
             if IDonly:
                 query = ("SELECT `ID` FROM `timed`")
@@ -244,7 +244,7 @@ class Events(commands.Cog):
         for t in tasks:
             if t['user']==userID and t['guild']==guildID and t['action']==action:
                 return await self.update_duration(t['ID'],duration)
-        cnx = self.bot.cnx
+        cnx = self.bot.cnx_frm
         cursor = cnx.cursor()
         ids = await self.get_events_from_db(all=True,IDonly=True)
         if len(ids)>0:
@@ -258,7 +258,7 @@ class Events(commands.Cog):
 
     async def update_duration(self,ID,new_duration):
         """Modifie la durée d'une tâche"""
-        cnx = self.bot.cnx
+        cnx = self.bot.cnx_frm
         cursor = cnx.cursor()
         query = ("UPDATE `timed` SET `duration`={} WHERE `ID`={}".format(new_duration,ID))
         cursor.execute(query)
@@ -267,7 +267,7 @@ class Events(commands.Cog):
 
     async def remove_task(self,ID:int):
         """Enlève une tâche exécutée"""
-        cnx = self.bot.cnx
+        cnx = self.bot.cnx_frm
         cursor = cnx.cursor()
         query = ("DELETE FROM `timed` WHERE `timed`.`ID` = {}".format(ID))
         cursor.execute(query)

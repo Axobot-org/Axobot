@@ -78,7 +78,7 @@ class ServerCog(commands.Cog):
         """return every options of a server"""
         if not self.bot.database_online:
             return list()
-        cnx = self.bot.cnx
+        cnx = self.bot.cnx_frm
         cursor = cnx.cursor(dictionary=True)
         query = ("SELECT * FROM `bot_infos` WHERE `ID`={}".format(botID))
         cursor.execute(query)
@@ -91,7 +91,7 @@ class ServerCog(commands.Cog):
         if type(values)!=list:
             raise ValueError
         v = list()
-        cnx = self.bot.cnx
+        cnx = self.bot.cnx_frm
         cursor = cnx.cursor()
         for x in values:
             if type(x) == bool:
@@ -107,7 +107,7 @@ class ServerCog(commands.Cog):
         """Return percentages of languages"""
         if not self.bot.database_online:
             return list()
-        cnx = self.bot.cnx
+        cnx = self.bot.cnx_frm
         cursor = cnx.cursor(dictionary=True)
         query = ("SELECT `language`,`ID` FROM `{}` WHERE 1".format(self.table))
         cursor.execute(query)
@@ -151,7 +151,7 @@ class ServerCog(commands.Cog):
         await self.bot.wait_until_ready()
         if type(columns)!=list or type(criters)!=list:
             raise ValueError
-        cnx = self.bot.cnx
+        cnx = self.bot.cnx_frm
         cursor = cnx.cursor(dictionary = (Type==dict))
         if columns == []:
             cl = "*"
@@ -169,7 +169,7 @@ class ServerCog(commands.Cog):
         if type(values)!=list:
             raise ValueError
         v = list()
-        cnx = self.bot.cnx
+        cnx = self.bot.cnx_frm
         cursor = cnx.cursor()
         for x in values:
             if type(x) == bool:
@@ -197,7 +197,7 @@ class ServerCog(commands.Cog):
         if type(ID) == str:
             if not ID.isnumeric():
                 raise ValueError
-        cnx = self.bot.cnx
+        cnx = self.bot.cnx_frm
         cursor = cnx.cursor()
         query = ("INSERT INTO `{}` (`ID`) VALUES ('{}')".format(self.table,ID))
         cursor.execute(query)
@@ -221,7 +221,7 @@ class ServerCog(commands.Cog):
         """remove a server from the db"""
         if type(ID)!=int:
             raise ValueError
-        cnx = self.bot.cnx
+        cnx = self.bot.cnx_frm
         cursor = cnx.cursor()
         query = ("DELETE FROM `{}` WHERE `ID`='{}'".format(self.table,ID))
         cursor.execute(query)

@@ -103,7 +103,7 @@ class CasesCog(commands.Cog):
             return None
         if type(columns)!=list or type(criters)!=list:
             raise ValueError
-        cnx = self.bot.cnx
+        cnx = self.bot.cnx_frm
         cursor = cnx.cursor(dictionary=True)
         if columns == []:
             cl = "*"
@@ -124,7 +124,7 @@ class CasesCog(commands.Cog):
     async def get_nber(self,userID:int,guildID:int):
         """Get the number of users infractions"""
         try:
-            cnx = self.bot.cnx
+            cnx = self.bot.cnx_frm
             cursor = cnx.cursor(dictionary = False)
             query = ("SELECT COUNT(*) FROM `{}` WHERE `user`={} AND `guild`={} AND `type`!='unban'".format(self.table,userID,guildID))
             cursor.execute(query)
@@ -144,7 +144,7 @@ class CasesCog(commands.Cog):
             return None
         if type(ID)!=int:
             raise ValueError
-        cnx = self.bot.cnx
+        cnx = self.bot.cnx_frm
         cursor = cnx.cursor()
         query = ("DELETE FROM `{}` WHERE `ID`='{}'".format(self.table,ID))
         cursor.execute(query)
@@ -157,7 +157,7 @@ class CasesCog(commands.Cog):
             return None
         if type(case) != self.Case:
             raise ValueError
-        cnx = self.bot.cnx
+        cnx = self.bot.cnx_frm
         cursor = cnx.cursor()
         query = ("""INSERT INTO `{}` (`ID`, `guild`, `user`, `type`, `mod`, `reason`,`duration`) VALUES ('{}', '{}', '{}', '{}', '{}', '{}','{}')""".format(self.table,case.id,case.guild,case.user,case.type,case.mod,case.reason.replace("\'","\\\'"),case.duration))
         cursor.execute(query)
@@ -170,7 +170,7 @@ class CasesCog(commands.Cog):
         """update infos of a case"""
         if type(case) != self.Case:
             raise ValueError
-        cnx = self.bot.cnx
+        cnx = self.bot.cnx_frm
         cursor = cnx.cursor()
         query = ("UPDATE `{}` SET `reason` = '{}' WHERE `ID` = {}".format(self.table,case.reason,case.id))
         cursor.execute(query)

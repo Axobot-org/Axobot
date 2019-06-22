@@ -30,7 +30,7 @@ class UtilitiesCog(commands.Cog):
         if str(guild.id) in self.list_prefixs.keys():
             return self.list_prefixs[str(guild.id)]
         else:
-            cnx = self.bot.cogs['ServerCog'].bot.cnx
+            cnx = self.bot.cogs['ServerCog'].bot.cnx_frm
             cursor = cnx.cursor(dictionary = True)
             cursor.execute("SELECT `prefix` FROM `{}` WHERE `ID`={}".format(self.bot.cogs["ServerCog"].table,guild.id))
             liste = list()
@@ -222,8 +222,8 @@ class UtilitiesCog(commands.Cog):
                         em = self.bot.get_emoji(int(x.group(1)))
                     else:
                         em = discord.utils.find(lambda e: e.name==x.group(1), self.bot.emojis)
-
-            except Exception as e:
+            except:
+            #except Exception as e:
                 # print(e)
                 continue
             if em != None:
@@ -236,7 +236,7 @@ class UtilitiesCog(commands.Cog):
         await self.bot.wait_until_ready()
         if type(columns)!=list or type(criters)!=list:
             raise ValueError
-        cnx = self.bot.cnx
+        cnx = self.bot.cnx_frm
         cursor = cnx.cursor(dictionary = True)
         if columns == []:
             cl = "*"
@@ -258,7 +258,7 @@ class UtilitiesCog(commands.Cog):
     async def change_db_userinfo(self,userID:int,key:str,value):
         """Change something about a user in the database"""
         try:
-            cnx = self.bot.cnx
+            cnx = self.bot.cnx_frm
             cursor = cnx.cursor(dictionary = True)
             if not isinstance(value,(bool,int)):
                 value = "'"+value+"'"

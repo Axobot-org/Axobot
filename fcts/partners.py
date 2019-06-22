@@ -26,7 +26,7 @@ class PartnersCog(commands.Cog):
     async def bdd_get_partner(self,partnerID:int,guildID:int):
         """Return a partner based on its ID"""
         try:
-            cnx = self.bot.cnx
+            cnx = self.bot.cnx_frm
             cursor = cnx.cursor(dictionary = True)
             query = ("SELECT * FROM `{}` WHERE `ID`={} AND `guild`={}".format(self.table,partnerID,guildID))
             cursor.execute(query)
@@ -41,7 +41,7 @@ class PartnersCog(commands.Cog):
     async def bdd_get_guild(self,guildID:int):
         """Return every partners of a guild"""
         try:
-            cnx = self.bot.cnx
+            cnx = self.bot.cnx_frm
             cursor = cnx.cursor(dictionary = True)
             query = ("SELECT * FROM `{}` WHERE `guild`={}".format(self.table,guildID))
             cursor.execute(query)
@@ -58,7 +58,7 @@ class PartnersCog(commands.Cog):
         try:
             if len(invites)==0:
                 return list()
-            cnx = self.bot.cnx
+            cnx = self.bot.cnx_frm
             cursor = cnx.cursor(dictionary = True)
             query = ("SELECT * FROM `{}` WHERE `type`='guild' AND ({})".format(self.table," OR ".join([f"`target`='{x.code}'" for x in invites])))
             cursor.execute(query)
@@ -74,7 +74,7 @@ class PartnersCog(commands.Cog):
         """Add a partner into a server"""
         try:
             ID = await self.generate_id()
-            cnx = self.bot.cnx
+            cnx = self.bot.cnx_frm
             cursor = cnx.cursor(dictionary = True)
             query = ("INSERT INTO `{table}` (`ID`,`guild`,`target`,`type`,`description`) VALUES ('{id}','{guild}','{target}','{type}','{desc}');".format(table=self.table,id=ID,guild=guildID,target=partnerID,type=partnerType,desc=desc.replace("'","\\'")))
             cursor.execute(query)
@@ -88,7 +88,7 @@ class PartnersCog(commands.Cog):
     async def bdd_edit_partner(self,partnerID:int,target:str=None,desc:str=None,msg:int=None):
         """Modify a partner"""
         try:
-            cnx = self.bot.cnx
+            cnx = self.bot.cnx_frm
             cursor = cnx.cursor(dictionary = True)
             query = ""
             if target!=None:
@@ -108,7 +108,7 @@ class PartnersCog(commands.Cog):
     async def bdd_del_partner(self,ID:int):
         """Delete a partner from a guild list"""
         try:
-            cnx = self.bot.cnx
+            cnx = self.bot.cnx_frm
             cursor = cnx.cursor(dictionary = True)
             query = ("DELETE FROM `{}` WHERE `ID` = {}".format(self.table,ID))
             cursor.execute(query)

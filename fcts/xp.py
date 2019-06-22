@@ -185,7 +185,7 @@ class XPCog(commands.Cog):
         try:
             if points==0:
                 return True
-            cnx = self.bot.cnx
+            cnx = self.bot.cnx_frm
             cursor = cnx.cursor(dictionary = True)
             if Type=='add':
                 query = ("INSERT INTO `{t}` (`userID`,`xp`) VALUES ('{u}','{p}') ON DUPLICATE KEY UPDATE xp = xp + '{p}';".format(t=self.table,p=points,u=userID))
@@ -201,7 +201,7 @@ class XPCog(commands.Cog):
     
     async def bdd_get_xp(self,userID):
         try:
-            cnx = self.bot.cnx
+            cnx = self.bot.cnx_frm
             cursor = cnx.cursor(dictionary = True)
             query = ("SELECT `xp` FROM `{}` WHERE `userID`={}".format(self.table,userID))
             cursor.execute(query)
@@ -221,7 +221,7 @@ class XPCog(commands.Cog):
     async def bdd_get_nber(self):
         """Get the number of ranked users"""
         try:
-            cnx = self.bot.cnx
+            cnx = self.bot.cnx_frm
             cursor = cnx.cursor(dictionary = False)
             query = ("SELECT COUNT(*) FROM `{}` WHERE `banned`=0".format(self.table))
             cursor.execute(query)
@@ -237,7 +237,7 @@ class XPCog(commands.Cog):
 
     async def bdd_load_cache(self):
         try:
-            cnx = self.bot.cnx
+            cnx = self.bot.cnx_frm
             cursor = cnx.cursor(dictionary = True)
             self.bot.log.info("Chargement du cache XP")
             query = ("SELECT `userID`,`xp` FROM `{}` WHERE `banned`=0".format(self.table))
@@ -254,7 +254,7 @@ class XPCog(commands.Cog):
 
     async def bdd_get_top(self,top:int,guild:discord.Guild=None):
         try:
-            cnx = self.bot.cnx
+            cnx = self.bot.cnx_frm
             cursor = cnx.cursor(dictionary = True)
             query = ("SELECT * FROM `{}` order by `xp` desc".format(self.table))
             cursor.execute(query)
@@ -277,7 +277,7 @@ class XPCog(commands.Cog):
     async def bdd_get_rank(self,userID:int,guild:discord.Guild=None):
         """Get the rank of a user"""
         try:
-            cnx = self.bot.cnx
+            cnx = self.bot.cnx_frm
             cursor = cnx.cursor(dictionary = True)
             query = ("SELECT `userID`,`xp`, @curRank := @curRank + 1 AS rank FROM `{}` p, (SELECT @curRank := 0) r WHERE `banned`='0' ORDER BY xp desc;".format(self.table))
             cursor.execute(query)
@@ -300,7 +300,7 @@ class XPCog(commands.Cog):
     async def bdd_total_xp(self):
         """Get the total number of earned xp"""
         try:
-            cnx = self.bot.cnx
+            cnx = self.bot.cnx_frm
             cursor = cnx.cursor(dictionary = True)
             query = ("SELECT SUM(xp) FROM `{}`".format(self.table))
             cursor.execute(query)
@@ -617,7 +617,7 @@ class XPCog(commands.Cog):
 
     async def rr_add_role(self,guild:int,role:int,level:int):
         """Add a role reward in the database"""
-        cnx = self.bot.cnx
+        cnx = self.bot.cnx_frm
         cursor = cnx.cursor(dictionary = True)
         ID = await self.gen_rr_id()
         query = ("INSERT INTO `roles_rewards` (`ID`,`guild`,`role`,`level`) VALUES ('{i}','{g}','{r}','{l}');".format(i=ID,g=guild,r=role,l=level))
@@ -628,7 +628,7 @@ class XPCog(commands.Cog):
     
     async def rr_list_role(self,guild:int,level:int=-1):
         """List role rewards in the database"""
-        cnx = self.bot.cnx
+        cnx = self.bot.cnx_frm
         cursor = cnx.cursor(dictionary = True)
         query = ("SELECT * FROM `roles_rewards` WHERE guild={g} ORDER BY level;".format(g=guild)) if level<0 else ("SELECT * FROM `roles_rewards` WHERE guild={g} AND level={l} ORDER BY level;".format(g=guild,l=level))
         cursor.execute(query)
@@ -640,7 +640,7 @@ class XPCog(commands.Cog):
     
     async def rr_remove_role(self,ID:int):
         """Remove a role reward from the database"""
-        cnx = self.bot.cnx
+        cnx = self.bot.cnx_frm
         cursor = cnx.cursor(dictionary = True)
         query = ("DELETE FROM `roles_rewards` WHERE `ID`={};".format(ID))
         cursor.execute(query)

@@ -232,7 +232,7 @@ class AdminCog(commands.Cog):
         await m.edit(content="Bot en voie d'extinction")
         await self.bot.change_presence(status=discord.Status('offline'))
         self.bot.log.info("Fermeture du bot")
-        self.bot.cnx.close()
+        self.bot.cnx_frm.close()
         await self.bot.logout()
         await self.bot.close()
 
@@ -328,9 +328,9 @@ class AdminCog(commands.Cog):
     async def db_reload(self,ctx):
         """Reconnecte le bot à la base de donnée"""
         try:
-            self.bot.cnx.close()
-            self.bot.connect_database()
-            if self.bot.cnx != None:
+            self.bot.cnx_frm.close()
+            self.bot.connect_database_frm()
+            if self.bot.cnx_frm != None:
                 await ctx.bot.cogs['UtilitiesCog'].add_check_reaction(ctx.message)
         except Exception as e:
             await self.bot.cogs['ErrorsCog'].on_cmd_error(ctx,e)

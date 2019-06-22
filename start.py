@@ -79,20 +79,39 @@ class zbot(commands.bot.BotBase,discord.Client):
         self.others = dict()
     
     @property
-    def cnx(self):
+    def cnx_frm(self):
         if self._cnx[1] + 1260 < round(time.time()): # 21min
-            self.connect_database()
+            self.connect_database_frm()
             self._cnx[1] = round(time.time())
             return self._cnx[0]
         else:
             return self._cnx[0]
     
-    def connect_database(self):
+    def connect_database_frm(self):
         if len(self.database_keys)>0:
             if self._cnx[0] != None:
                 self._cnx[0].close()
             self.log.debug('Connection à MySQL (user {})'.format(self.database_keys['user']))
-            self._cnx[0] = mysql.connector.connect(user=self.database_keys['user'],password=self.database_keys['password'],host=self.database_keys['host'],database=self.database_keys['database'],buffered=True)
+            self._cnx[0] = mysql.connector.connect(user=self.database_keys['user'],password=self.database_keys['password'],host=self.database_keys['host'],database=self.database_keys['database1'],buffered=True)
+            self._cnx[1] = round(time.time())
+        else:
+            raise ValueError(dict)
+    
+    @property
+    def cnx_xp(self):
+        if self._cnx[1] + 1260 < round(time.time()): # 21min
+            self.connect_database_frm()
+            self._cnx[1] = round(time.time())
+            return self._cnx[0]
+        else:
+            return self._cnx[0]
+    
+    def connect_database_xp(self):
+        if len(self.database_keys)>0:
+            if self._cnx[0] != None:
+                self._cnx[0].close()
+            self.log.debug('Connection à MySQL (user {})'.format(self.database_keys['user']))
+            self._cnx[0] = mysql.connector.connect(user=self.database_keys['user'],password=self.database_keys['password'],host=self.database_keys['host'],database=self.database_keys['database2'],buffered=True)
             self._cnx[1] = round(time.time())
         else:
             raise ValueError(dict)
@@ -181,11 +200,11 @@ def main():
                 r.remove(s)
         while '' in r:
             r.remove('')
-        for e,s in enumerate(['user','password','host','database']):
+        for e,s in enumerate(['user','password','host','database1','database2']):
             client.database_keys[s] = cryptage.uncrypte(r[e])
-        client.others['divinediscordbots'] = cryptage.uncrypte(r[4])
-        client.others['botsondiscord'] = cryptage.uncrypte(r[5])
-        client.others['discordbotsgroup'] = cryptage.uncrypte(r[6])
+        client.others['divinediscordbots'] = cryptage.uncrypte(r[5])
+        client.others['botsondiscord'] = cryptage.uncrypte(r[6])
+        client.others['discordbotsgroup'] = cryptage.uncrypte(r[7])
     try:
         cnx = mysql.connector.connect(user=client.database_keys['user'],password=client.database_keys['password'],host=client.database_keys['host'],database=client.database_keys['database'])
         cnx.close()
@@ -195,7 +214,8 @@ def main():
         client.database_online = False
 
     if client.database_online:
-        client.connect_database()
+        client.connect_database_frm()
+        client.connect_database_xp()
 
     client.dbl_token = tokens.get_dbl_token()
 
