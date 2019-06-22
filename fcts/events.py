@@ -289,7 +289,7 @@ class Events(commands.Cog):
                 await self.partners_loop()
             if int(d.hour) == 0 and d.day != self.dbl_last_sending.day:
                 await self.dbl_send_data()
-            if int(d.hour) == 0 and d.day != self.mee6_stats_last:
+            if int(d.hour) == 0 and d.day != self.mee6_stats_last.day:
                 await self.send_mee6_stats()
         except Exception as e:
             await self.bot.cogs['ErrorCog'].on_error(e,None)
