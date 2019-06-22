@@ -537,7 +537,7 @@ You can specify a verification limit by adding a number in argument"""
         """
         if ctx.guild!=None and not ctx.channel.permissions_for(ctx.guild.me).embed_links:
             return await ctx.send(await self.translate(ctx.channel,"fun","no-embed-perm"))
-        arguments = arguments.replace("\\\"","|¬017")
+        arguments = arguments.replace("\\\"","|¬017").replace("\\n","\n")
         arguments = arguments.split("\"")
         k = {'title':"",'content':"",'url':'','footer':"",'image':''}
         for e,a in enumerate(arguments):

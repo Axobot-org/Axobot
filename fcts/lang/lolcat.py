@@ -372,7 +372,8 @@ partners={'invalid-bot':"Unable 2 find tihs bot",
         'deleted':'This partner have been successsfully deleted from ur list',
         'no-partner':"You donnut have any partners",
         'no-partner-2':"No server has sadly a partnership with U. Feels alone.",
-        'partners-list':['Server partners','List of Ur partners','List of servers with U as a cool partner']
+        'partners-list':['Server partners','List of Ur partners','List of servers with U as a cool partner'],
+        "missing-manage-guild":"Unable 2 see server invites (missing 'Manage server' perm)",
         }
 
 perms={"perms-0":"Membr/role {} not findz",
