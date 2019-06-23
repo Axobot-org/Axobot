@@ -397,7 +397,18 @@ class XPCog(commands.Cog):
             for x in cursor:
                 liste.append(x)
             cursor.close()
-            return round(liste[0]['SUM(xp)'])
+            result = round(liste[0]['SUM(xp)'])
+
+            cnx = self.bot.cnx_xp
+            cursor = cnx.cursor()
+            cursor.execute("show tables")
+            tables = [x[0] for x in cursor if x[0].isnumeric()]
+            for table in tables:
+                cursor.execute("SELECT SUM(xp) FROM `{}`".format(table))
+                res = [x for x in cursor]
+                result += round(res[0][0])
+            cursor.close()
+            return result
         except Exception as e:
             await self.bot.cogs['ErrorsCog'].on_error(e,None)
 
