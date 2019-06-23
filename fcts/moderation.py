@@ -340,8 +340,6 @@ Or: mute @someone Plz respect me"""
                 await ctx.send(str(await self.translate(ctx.guild.id,"modo","tempmute-1")).format(user,reason,f_duration))
             if ctx.channel.permissions_for(ctx.guild.me).manage_messages:
                 await ctx.message.delete()
-            except:
-                pass
         except Exception as e:
             await ctx.send(await self.translate(ctx.guild.id,"modo","error"))
             await self.bot.cogs['ErrorsCog'].on_error(e,ctx)
@@ -453,6 +451,8 @@ Or: mute @someone Plz respect me"""
                     await self.bot.cogs['ErrorsCog'].on_error(e,ctx)
             try:
                 await ctx.message.delete()
+            except:
+                pass
             if f_duration==None:
                 await ctx.send(str( await self.translate(ctx.guild.id,"modo","ban")).format(user,reason))
                 log = str(await self.translate(ctx.guild.id,"logs","ban")).format(member=user,reason=reason,case=caseID)
