@@ -155,13 +155,13 @@ class WelcomerCog(commands.Cog):
     async def give_roles(self,member):
         """Give new roles to new users"""
         try:
-            roles = str(await self.bot.cogs['ServerCog'].find_staff(member.guild.id,"gived_roles"))
+            roles = str(await self.bot.cogs['ServerCog'].find_staff(member.guild.id,"welcome_roles"))
             for r in roles.split(";"):
                 if (not r.isnumeric()) or len(r)==0:
                     continue
                 role = member.guild.get_role(int(r))
                 if role != None:
-                    await member.add_roles(role,reason=await self.translate(member.guild.id,"logs","d-gived_roles"))
+                    await member.add_roles(role,reason=await self.translate(member.guild.id,"logs","d-welcome_roles"))
         except Exception as e:
             await self.bot.cogs["ErrorsCog"].on_error(e,None)
 

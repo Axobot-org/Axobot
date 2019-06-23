@@ -212,7 +212,7 @@ logs={"slowmode-enabled":"Hidastusmuoto on kytketty päälle kanavalla {channel}
 "d-unmute":"mykistäjä {}",
 "d-invite":"Automaattinen valvoja (Discord kutsu linkki)",
 "d-young":"Automaattinen valvoja (liian uusi käyttäjä)",
-"d-gived_roles":"Automaattinen tapahtuma (configuraatio annettiin_roolit)",
+"d-welcome_roles":"Automaattinen tapahtuma (configuraatio annettiin_roolit)",
 "d-memberchan":"Automaattinen tapahtuma (configuraatio käyttäjänlaskelma)"}
 
 mc={"contact-mail":"Jos huomaat virheen annetuissa tiedoissa, ota minuun yhteyttä personaalisesti, tai ota yhteyttä tänne: [sivustolla](https://fr-minecraft.net).",
@@ -468,7 +468,7 @@ server_desc={"prefix":"Tämän hetkinen botin etuliite: {}",
         "welcome_channel": "Lista kanavista johon Tervetuloa ja Heippa viestit lähetetään: {}",
         "welcome": "Viesti joka lähetetään kun jäsen liittyy: {}",
         "leave": "Viesti joka lähetetään kun jäsen lähtee: {}",
-        "gived_roles": "Lista rooleista jotka annetaan uusille jäsenille: {}",
+        "welcome_roles": "Lista rooleista jotka annetaan uusille jäsenille: {}",
         "bot_news": "Lista kanavista johon lähetetään botin uutiset: {}",
         "modlogs_channel":"Kanava johon laitetaan valvonta lokit: {}",
         "save_roles": "Pitäisikö roolit tallentua kun jäsen lähtee, jos hän palaa takaisin? {}",
