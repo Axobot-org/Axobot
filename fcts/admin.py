@@ -330,7 +330,9 @@ class AdminCog(commands.Cog):
         try:
             self.bot.cnx_frm.close()
             self.bot.connect_database_frm()
-            if self.bot.cnx_frm != None:
+            self.bot.cnx_xp.close()
+            self.bot.connect_database_xp()
+            if self.bot.cnx_frm != None and self.bot.cnx_xp != None:
                 await ctx.bot.cogs['UtilitiesCog'].add_check_reaction(ctx.message)
         except Exception as e:
             await self.bot.cogs['ErrorsCog'].on_cmd_error(ctx,e)
