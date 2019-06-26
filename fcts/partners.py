@@ -185,6 +185,7 @@ class PartnersCog(commands.Cog):
                     title += tr_unknown
                     field1 = None
                 field2 = {'name':tr_invite.capitalize(),'value':'[{}](https://discord.gg/{})'.format(tr_click.capitalize(),partner['target'])}
+                field3 = None
             emb = self.bot.cogs['EmbedCog'].Embed(title=title,desc=partner['description'],fields=[x for x in (field1,field2,field3) if not x==None],color=color,footer_text=str(partner['ID']),thumbnail=image).update_timestamp()
             try:
                 msg = await channel.fetch_message(partner['messageID'])
