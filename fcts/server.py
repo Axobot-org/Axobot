@@ -115,6 +115,8 @@ class ServerCog(commands.Cog):
         for x in cursor:
             if x['ID'] not in ignored_guilds:
                 liste.append(x['language'])
+        for _ in range(len(self.bot.guilds)-len(liste)-len(ignored_guilds)):
+            liste.append(self.default_language)
         for e,l in enumerate(self.bot.cogs['LangCog'].languages):
             langs.append((l,liste.count(e)))
         return langs
@@ -312,7 +314,7 @@ class ServerCog(commands.Cog):
 
     async def send_embed(self,guild,option,value):
         m = "Changed option in server {}: {} = `{}`".format(guild.id,option,value)
-        emb = self.bot.cogs["EmbedCog"].Embed(desc=m,color=self.log_color).update_timestamp().set_author(guild.me)
+        emb = self.bot.cogs["EmbedCog"].Embed(desc=m,color=self.log_color,footer_text=guild.name).update_timestamp().set_author(guild.me)
         await self.bot.cogs["EmbedCog"].send([emb])
         self.bot.log.debug(m)
 
