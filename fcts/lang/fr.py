@@ -374,7 +374,9 @@ partners={'invalid-bot':"Impossible de trouver ce bot",
         'no-partner-2':"Aucun serveur n'a de partenariat avec vous",
         'partners-list':['Partenaires du serveur','Liste de vos partenaires','Liste des serveurs vous ayant comme partenaire'],
         "missing-manage-guild":"Impossible de voir les invitations de ce serveur (permission 'Gérer le serveur' manquante)",
-        'bot-uptime':"Disponibilité"
+        'bot-uptime':"Disponibilité",
+        'no-channel':"Aucun salon de partenaires n'a été configuré",
+        'reloaded':"{} partenaires ont été rechargés",
         }
 
 perms={"perms-0":"Le membre/rôle {} n'a pas été trouvé",

@@ -966,7 +966,7 @@ class EmojiCog(commands.Cog):
 		'red_alert':'<a:red_alert:499690261107048458>',
 		'red_warning':'<a:red_warning:499687652073668608>',
 		'readthedocs':'<:readthedocs:484841075001786368>',
-		'loading':'<a:loading:538721250986688512>'}
+		'loading':'<a:loading:589205493013151770>'}
 
 		r = requests.get("https://www.unicode.org/Public/emoji/11.0/emoji-test.txt")
 		self.unicode_list = list()

@@ -382,6 +382,24 @@ class PartnersCog(commands.Cog):
         """Change the color of the partners embed
     It has the same result as `config change partner_color`"""
         await self.bot.cogs['ServerCog'].conf_color(ctx,'partner_color',str(color))
+    
+    @partner_main.command(name='reload')
+    @commands.check(checks.has_admin)
+    @commands.cooldown(1,60,commands.BucketType.guild)
+    async def partner_reload(self,ctx):
+        """Reload your partners channel"""
+        msg = await ctx.send(str(await self.translate(ctx.guild,'rss','guild-loading')).format(self.bot.cogs['EmojiCog'].customEmojis['loading']))
+        channel = await self.bot.cogs['ServerCog'].get_server(criters=[f"`ID`={ctx.guild.id}"],columns=['partner_channel','partner_color'])
+        if len(channel)==0:
+            return await msg.edit(content=await self.translate(ctx.guild,'partners','no-channel'))
+        chan = channel[0]['partner_channel'].split(';')[0]
+        if not chan.isnumeric():
+            return await msg.edit(content=await self.translate(ctx.guild,'partners','no-channel'))
+        chan = ctx.guild.get_channel(int(chan))
+        if chan==None:
+            return await msg.edit(content=await self.translate(ctx.guild,'partners','no-channel'))
+        count = await self.update_partners(chan,channel[0]['partner_color'])
+        await msg.edit(content=str(await self.translate(ctx.guild,'partners','reloaded')).format(count))
 
 
 

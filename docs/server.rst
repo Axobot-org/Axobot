@@ -135,8 +135,17 @@ Lists all the partners that your server currently has. The bot will display the 
 
 .. warning:: For a better display of the list, it is recommended to give "`Embed Links <perms.html#embed-links>`_" permission to the bot.
 
+
+Reload your list
+----------------
+
+**Syntax:**:code:`partner reload`
+
+Allows you to remove a partner from the list. You will be asked for a confirmation, to avoid misuse. Once a partner is removed, you must reconfigure it completely if you want to put it back into the channel.
+
+
 Remove a partner
------------------
+----------------
 
 **Syntax:**:code:`partner remove <ID>`
 

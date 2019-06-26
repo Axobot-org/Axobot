@@ -374,7 +374,9 @@ partners={'invalid-bot':"Unable 2 find tihs bot",
         'no-partner-2':"No server has sadly a partnership with U. Feels alone.",
         'partners-list':['Server partners','List of Ur partners','List of servers with U as a cool partner'],
         "missing-manage-guild":"Unable 2 see server invites (missing 'Manage server' perm)",
-        "bot-uptime":"Time up"
+        "bot-uptime":"Time up",
+        'no-channel':"U didn't have setted any partner channel :sad:",
+        'reloaded':"{} partners has beeen reloaded! Enjoy!",
         }
 
 perms={"perms-0":"Membr/role {} not findz",

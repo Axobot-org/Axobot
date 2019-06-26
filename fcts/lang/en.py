@@ -374,7 +374,9 @@ partners={'invalid-bot':"Unable to find this bot",
         'no-partner-2':"No server has a partnership with you",
         'partners-list':['Server partners','List of your partners','List of servers with you as a partner'],
         "missing-manage-guild":"Unable to find server invites (missing 'Manage server' permission)",
-        "bot-uptime":"Uptime"
+        "bot-uptime":"Uptime",
+        'no-channel':"You didn't set any partner channel",
+        'reloaded':"{} partners have been reloaded",
         }
 
 perms={"perms-0":"Member/role {} not found",
