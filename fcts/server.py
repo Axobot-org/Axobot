@@ -10,7 +10,7 @@ roles_options = ["clear","slowmode","mute","kick","ban","warn","say","welcome_ro
 bool_options = ["save_roles","enable_xp","anti_caps_lock","enable_fun","help_in_dm"]
 textchan_options = ["hunter","welcome_channel","bot_news","poll_channels","modlogs_channel","noxp_channels","partner_channel"]
 vocchan_options = ["membercounter"]
-text_options = ["welcome","leave","levelup_msg"]
+text_options = ["welcome","leave","levelup_msg","description"]
 prefix_options = ['prefix']
 emoji_option = ['vote_emojis']
 numb_options = []
@@ -35,6 +35,7 @@ class ServerCog(commands.Cog):
         self.table = 'servers_beta' if bot.beta else 'servers'
         self.default_opt = {"rr_max_number":7,
                "language":1,
+               "description":"",
                "clear":"",
                "slowmode":"",
                "mute":"",
@@ -66,7 +67,7 @@ class ServerCog(commands.Cog):
                "partner_channel":'',
                "partner_color":10949630,
                'partner_role':''}
-        self.optionsList = ["prefix","language","clear","slowmode","mute","kick","ban","warn","say","welcome_channel","welcome","leave","welcome_roles","bot_news","poll_channels","partner_channel","modlogs_channel","enable_xp","anti_caps_lock","enable_fun","membercounter","anti_raid","vote_emojis","help_in_dm","muted_role"]
+        self.optionsList = ["prefix","language","description","clear","slowmode","mute","kick","ban","warn","say","welcome_channel","welcome","leave","welcome_roles","bot_news","poll_channels","partner_channel","modlogs_channel","enable_xp","anti_caps_lock","enable_fun","membercounter","anti_raid","vote_emojis","help_in_dm","muted_role"]
 
     @commands.Cog.listener()
     async def on_ready(self):
@@ -534,7 +535,7 @@ class ServerCog(commands.Cog):
         if len(text) == 0:
             text = "Ø"
         else:
-            text = "```\n"+text+"\```"
+            text = "```\n"+text+"```"
         return text
 
     async def conf_prefix(self,ctx,option,value):

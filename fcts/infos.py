@@ -395,7 +395,8 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
             a2f = await self.translate(ctx.guild.id,"keywords","oui")
         else:
             a2f = await self.translate(ctx.guild.id,"keywords","non")
-        embed = discord.Embed(colour=default_color, timestamp=ctx.message.created_at)
+        desc = await self.bot.cogs['ServerCog'].find_staff(guild.id,'description')
+        embed = discord.Embed(colour=default_color, timestamp=ctx.message.created_at, description=desc)
         embed.set_author(name="{} '{}'".format(await self.translate(guild.id,"stats_infos","guild-0"),guild.name), icon_url=guild.icon_url)
         embed.set_footer(text='Requested by {}'.format(ctx.author.name), icon_url=ctx.author.avatar_url)
         embed.set_thumbnail(url=guild.icon_url)

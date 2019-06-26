@@ -494,6 +494,7 @@ l'option (`!config change <option> del` fonctionne de même).\nLa liste des opti
 
 server_desc={"prefix":"Préfixe actuel du bot : {}",
         "language":"Langue actuelle du bot pour ce serveur : **{}**",
+        "description":"Description du serveur :\n {}",
         "clear":"Liste des rôles qui peuvent utiliser la commande 'clear' : {}",
         "slowmode":"Liste des rôles qui peuvent utiliser les commandes 'slowmode' et 'freeze' : {}",
         "mute":"Liste des rôles qui peuvent utiliser la commande 'mute' : {}",

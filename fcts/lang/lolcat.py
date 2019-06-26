@@ -494,6 +494,7 @@ to modify configuraishun, or `!config del <option>` 2 reset teh option (`!config
 
 server_desc={"prefix":"Currnt baot prfx: {}",
         "language": "Cuurent zbot languge 4 dis lolcat: **{}**",
+        "description":"Server description:\n {}",
         "clear": "Lizt of rawles dat can us teh 'clear' commend: {}",
         "slowmode": "Llst of rolz that ca' use 'slowmode' and 'freeze' commmandz: {}",
         "mute": "Lis of roles dat kan us the 'mute' commmand: {}",

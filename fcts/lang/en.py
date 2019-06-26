@@ -494,6 +494,7 @@ to modify a configuration, or `!config del <option>` to reset the option (`!conf
 
 server_desc={"prefix":"Current bot prefix: {}",
         "language": "Current bot language for this server: **{}**",
+        "description":"Server description:\n {}",
         "clear": "List of roles that can use the 'clear' command: {}",
         "slowmode": "List of roles that can use 'slowmode' and 'freeze' commands: {}",
         "mute": "List of roles that can use the 'mute' command: {}",
