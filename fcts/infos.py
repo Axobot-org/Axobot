@@ -251,6 +251,15 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
             embed.add_field(name="Roles [0]", value = await self.translate(ctx.guild.id,"activity","rien"), inline=False)
         if critical_info:
             embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","member-7"), value = await self.bot.cogs['CasesCog'].get_nber(item.id,ctx.guild.id),inline=True)
+        if item.bot:
+            session = aiohttp.ClientSession(loop=self.bot.loop)
+            guilds_count = await self.bot.cogs['PartnersCog'].get_guilds(item.id,session)
+            if guilds_count!=None:
+                embed.add_field(name=str(await self.translate(ctx.guild.id,'keywords','servers')).capitalize(),value=guilds_count)
+            uptime = await self.bot.cogs['PartnersCog'].get_uptimes(item.id,session)
+            if uptime!=None:
+                embed.add_field(name=await self.translate(ctx.guild,'partners','bot-uptime'),value=f'{round(uptime)}%')
+            await session.close()
         await ctx.send(embed=embed)
 
 
@@ -301,6 +310,15 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
         embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","member-1"), value = "{} ({} {})".format(await self.timecog.date(item.created_at,lang=lang,year=True),since,await self.timecog.time_delta(item.created_at,datetime.datetime.now(),lang=lang,year=True,precision=0,hour=False)), inline=False)
         embed.add_field(name="Bot", value=botb.capitalize())
         embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","user-0"), value=on_server.capitalize())
+        if item.bot:
+            session = aiohttp.ClientSession(loop=self.bot.loop)
+            guilds_count = await self.bot.cogs['PartnersCog'].get_guilds(item.id,session)
+            if guilds_count!=None:
+                embed.add_field(name=str(await self.translate(ctx.guild.id,'keywords','servers')).capitalize(),value=guilds_count)
+            uptime = await self.bot.cogs['PartnersCog'].get_uptimes(item.id,session)
+            if uptime!=None:
+                embed.add_field(name=await self.translate(ctx.guild,'partners','bot-uptime'),value=f'{round(uptime)}%')
+            await session.close()
         await ctx.send(embed=embed)
 
     async def emoji_infos(self,ctx,item,lang):

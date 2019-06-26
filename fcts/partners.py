@@ -128,6 +128,16 @@ class PartnersCog(commands.Cog):
             if ans['error']:
                 return None
             return ans['percentage']
+    
+    async def get_guilds(self,bot:int,session:aiohttp.ClientSession):
+        """Get the guilds count of a bot
+        None if unknown"""
+        async with session.get('https://discordbots.org/api/bots/{}/stats'.format(bot),headers={'Authorization':str(self.bot.dbl_token)}) as resp:
+            ans = await resp.json()
+            if 'server_count' in ans.keys():
+                return ans['server_count']
+            return None
+
 
     async def update_partners(self,channel:discord.TextChannel,color:int=None):
         """Update every partners of a channel"""
@@ -153,12 +163,11 @@ class PartnersCog(commands.Cog):
                 title = "**{}** ".format(tr_bot.capitalize())
                 try:
                     title += str(await self.bot.fetch_user(int(partner['target'])))
-                    async with session.get('https://discordbots.org/api/bots/{}/stats'.format(partner['target']),headers={'Authorization':str(self.bot.dbl_token)}) as resp:
-                        ans = await resp.json()
-                        if 'server_count' in ans.keys():
-                            field1 = {'name':tr_guilds.capitalize(),'value':str(ans['server_count'])}
-                        else:
-                            field1 = None
+                    guild_nbr = await self.get_guilds(partner['target'],session)
+                    if guild_nbr!=None:
+                        field1 = {'name':tr_guilds.capitalize(),'value':str(guild_nbr)}
+                    else:
+                        field1 = None
                     image = (await self.bot.fetch_user(int(partner['target']))).avatar_url.__str__()
                 except discord.errors.NotFound:
                     title += "ID: "+partner['target']
