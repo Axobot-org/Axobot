@@ -255,6 +255,9 @@ class PartnersCog(commands.Cog):
             Type = 'guild'
         else:
             return
+        current_list = [x['target'] for x in await self.bdd_get_guild(ctx.guild.id)]
+        if str(item.id) in current_list:
+            return await ctx.send(await self.translate(ctx.guild,"partners","already-added"))
         if len(description)>0:
             description = await self.bot.cogs['EmojiCog'].anti_code(description)
         await self.bdd_set_partner(guildID=ctx.guild.id,partnerID=item.id,partnerType=Type,desc=description)

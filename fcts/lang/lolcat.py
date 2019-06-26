@@ -377,6 +377,7 @@ partners={'invalid-bot':"Unable 2 find tihs bot",
         "bot-uptime":"Time up",
         'no-channel':"U didn't have setted any partner channel :sad:",
         'reloaded':"{} partners has beeen reloaded! Enjoy!",
+        'already-added':"NO U already have addd tish partner!",
         }
 
 perms={"perms-0":"Membr/role {} not findz",

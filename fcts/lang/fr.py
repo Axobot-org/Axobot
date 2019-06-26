@@ -377,6 +377,7 @@ partners={'invalid-bot':"Impossible de trouver ce bot",
         'bot-uptime':"Disponibilité",
         'no-channel':"Aucun salon de partenaires n'a été configuré",
         'reloaded':"{} partenaires ont été rechargés",
+        'already-added':"Vous avez déjà ajouté ce partenaire !",
         }
 
 perms={"perms-0":"Le membre/rôle {} n'a pas été trouvé",
