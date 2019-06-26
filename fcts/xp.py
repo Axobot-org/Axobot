@@ -13,6 +13,8 @@ from fcts import args, checks
 importlib.reload(args)
 importlib.reload(checks)
 
+
+
 class XPCog(commands.Cog):
 
     def __init__(self,bot):
@@ -717,6 +719,23 @@ class XPCog(commands.Cog):
                 os.remove(f[3])
             else:
                 done.append(f[0])
+    
+
+    @commands.command(name='set_xp')
+    @commands.guild_only()
+    @commands.check(checks.has_admin)
+    async def set_xp(self,ctx,xp:int,*,user:args.user):
+        """Set the XP of a user"""
+        if user.bot:
+            return await ctx.send(await self.translate(ctx.guild.id,'xp','no-bot'))
+        if await self.bot.cogs['ServerCog'].find_staff(ctx.guild.id,'xp_type') <2:
+            return await ctx.send(await self.translate(ctx.guild.id,'xp','change-global-xp'))
+        try:
+            await self.bdd_set_xp(user.id,xp,Type='set',guild=ctx.guild.id)
+            await ctx.send(await self.translate(ctx.guild.id,'xp','change-xp-ok',user=str(user),xp=xp))
+        except Exception as e:
+            await ctx.send(await self.translate(ctx.guild.id,'mc','serv-error'))
+            await self.bot.cogs['ErrorsCog'].on_error(e,ctx)
 
 
 

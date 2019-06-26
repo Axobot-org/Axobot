@@ -642,5 +642,8 @@ xp = {'card-level':'LVL',
         'rr-removed':"None role will be givn anymore for level #{}",
         'too-many-rr':"U already has {} roles rewards, you can't add more!",
         'rr-reload':"{} updated roles / {} members",
-        'no-mee6':"Oops, U configured the xp system 2 use the MEE6 system (u know, this nice blue bot?), but dis bot is not in ur server! Change teh system type (`{}config change xp_type` followd by the system naem), orr invite MEE6 here."
+        'no-mee6':"Oops, U configured the xp system 2 use the MEE6 system (u know, this nice blue bot?), but dis bot is not in ur server! Change teh system type (`{}config change xp_type` followd by the system naem), orr invite MEE6 here.",
+        'change-global-xp':"NOT possible 2 edit XP of the global super mega system!",
+        'change-xp-ok':"XP of teh user {user} have been set 2 {xp}xp!",
+        'no-bot':"Impossible 2 modify the XP ov a robot!"
         }
