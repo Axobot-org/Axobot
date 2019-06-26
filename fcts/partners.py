@@ -118,7 +118,16 @@ class PartnersCog(commands.Cog):
         except Exception as e:
             await self.bot.cogs['ErrorsCog'].on_error(e,None)
             return False
+    
 
+    async def get_uptimes(self,bot:int,session:aiohttp.ClientSession):
+        """Get the uptime of a bot
+        None if unknown"""
+        async with session.get(f'https://api.discordbots.group/v1/bot/{bot}/uptime') as resp:
+            ans = await resp.json()
+            if ans['error']:
+                return None
+            return ans['percentage']
 
     async def update_partners(self,channel:discord.TextChannel,color:int=None):
         """Update every partners of a channel"""
@@ -159,6 +168,11 @@ class PartnersCog(commands.Cog):
                     image = (await self.bot.fetch_user(int(partner['target']))).avatar_url
                     await self.bot.cogs["ErrorsCog"].on_error(e,None)
                 field2 = {'name':tr_invite.capitalize(),'value':'[Click here](https://discordapp.com/oauth2/authorize?client_id={}&scope=bot&permissions=2113273087)'.format(partner['target'])}
+                up = await self.get_uptimes(partner['target'],session)
+                if up!=None:
+                    field3 = {'name':await self.translate(channel.guild,'partners','bot-uptime'), 'value':f"{round(up,2)}%"}
+                else:
+                    field3 = None
             else:
                 title = "**{}** ".format(tr_guild.capitalize())
                 inv = await self.bot.fetch_invite(partner['target'])
@@ -171,7 +185,7 @@ class PartnersCog(commands.Cog):
                     title += tr_unknown
                     field1 = None
                 field2 = {'name':tr_invite.capitalize(),'value':'[{}](https://discord.gg/{})'.format(tr_click.capitalize(),partner['target'])}
-            emb = self.bot.cogs['EmbedCog'].Embed(title=title,desc=partner['description'],fields=[x for x in (field1,field2) if not x==None],color=color,footer_text=str(partner['ID']),thumbnail=image).update_timestamp()
+            emb = self.bot.cogs['EmbedCog'].Embed(title=title,desc=partner['description'],fields=[x for x in (field1,field2,field3) if not x==None],color=color,footer_text=str(partner['ID']),thumbnail=image).update_timestamp()
             try:
                 msg = await channel.fetch_message(partner['messageID'])
                 await msg.edit(embed=emb.discord_embed())
