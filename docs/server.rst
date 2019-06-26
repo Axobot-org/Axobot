@@ -100,6 +100,14 @@ Add a partner
 Allows you to add a server or bot to your partner list. The invitation must be either a server invitation (starting with discord.gg) or a bot invitation (discordapp.com/oauth). This invitation will be used to synchronize the partner, so make sure it does not expire.
 
 
+Change the embed color
+----------------------
+
+**Syntax:**:code:`partner color <new color>`
+
+Modifies the color of the partner embed, i. e. the color of the bar to the left of the presentations. An alias exists with the subcommand "colour".
+
+
 Modify a description
 --------------------
 

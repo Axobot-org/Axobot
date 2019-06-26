@@ -696,7 +696,10 @@ class ServerCog(commands.Cog):
                 return
             await self.modify_server(ctx.guild.id,values=[(option,color.value)])
             msg = await self.translate(ctx.guild.id,"server","change-color")
-            await ctx.send(msg.format(option,color))
+            if ctx.channel.permissions_for(ctx.guild.me).embed_links:
+                await ctx.send(embed=discord.Embed(description=msg.format(option,color),colour=color))
+            else:
+                await ctx.send(msg.format(option,color))
             await self.send_embed(ctx.guild,option,color)
 
     async def form_color(self,option,value):

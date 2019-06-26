@@ -376,6 +376,13 @@ class PartnersCog(commands.Cog):
         else:
             await ctx.send(f"__{fields_name[0]}:__\n{f[0]}\n\n__{fields_name[1]}:__\n{f[1]}")
 
+    @partner_main.command(name="color",aliases=['colour'])
+    @commands.check(checks.has_manage_guild)
+    async def partner_color(self,ctx,color):
+        """Change the color of the partners embed
+    It has the same result as `config change partner_color`"""
+        await self.bot.cogs['ServerCog'].conf_color(ctx,'partner_color',str(color))
+
 
 
 
