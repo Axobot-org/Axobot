@@ -159,6 +159,7 @@ class PartnersCog(commands.Cog):
         session = aiohttp.ClientSession(loop=self.bot.loop)
         for partner in partners:
             image = ""
+            target_desc = partner['description']
             if partner['type']=='bot':
                 title = "**{}** ".format(tr_bot.capitalize())
                 try:
@@ -195,7 +196,9 @@ class PartnersCog(commands.Cog):
                     field1 = None
                 field2 = {'name':tr_invite.capitalize(),'value':'[{}](https://discord.gg/{})'.format(tr_click.capitalize(),partner['target'])}
                 field3 = None
-            emb = self.bot.cogs['EmbedCog'].Embed(title=title,desc=partner['description'],fields=[x for x in (field1,field2,field3) if not x==None],color=color,footer_text=str(partner['ID']),thumbnail=image).update_timestamp()
+                if len(target_desc)==0:
+                    target_desc = await self.bot.cogs['ServerCog'].find_staff(inv.guild.id,'description')
+            emb = self.bot.cogs['EmbedCog'].Embed(title=title,desc=target_desc,fields=[x for x in (field1,field2,field3) if not x==None],color=color,footer_text=str(partner['ID']),thumbnail=image).update_timestamp()
             try:
                 msg = await channel.fetch_message(partner['messageID'])
                 await msg.edit(embed=emb.discord_embed())
