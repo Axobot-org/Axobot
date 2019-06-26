@@ -244,3 +244,13 @@ Nice command that allows you to do different things with the server roles (other
 
 .. warning:: (1) The bot need the "`Manage roles <perms.html#manage-roles>`_" permission, also his highest role need to be higher than the role he's trying to edit.
     (2) You need to have the "`Manage roles <perms.html#manage-roles>`_" permission (or be an administrator) to use this command. Else, Zbot won't react.
+
+
+Unhoist members
+---------------
+
+People like to put strange characters in their nicknames to appear at the top of the membership list. With this command you will be able to put an end to this habit. Simply type the command without argument to remove all non-alphabetic characters (a-z A-Z 0-9) at the beginning of the nickname, and you can give your own characters via an argument. Easy, isn't it?
+
+**Syntax:** :code:`unhoist [characters]`
+
+.. warning:: It is necessary that the bot has "Manage nicknames" permission, and that its role is above the roles of the members to be renamed.

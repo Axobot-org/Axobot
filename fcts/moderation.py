@@ -1,5 +1,5 @@
 from discord.ext import commands
-import discord, re, datetime, random, json, os, typing, importlib
+import discord, re, datetime, random, json, os, typing, importlib, string
 from fcts import checks, args
 importlib.reload(checks)
 importlib.reload(args)
@@ -760,6 +760,37 @@ ID corresponds to the Identifier of the message"""
         except Exception as e:
             await ctx.send(str(await self.translate(ctx.channel,"modo","pin-error-2")).format(e))
             return
+    
+    @commands.command(name='unhoist')
+    @commands.guild_only()
+    @commands.check(checks.has_manage_nicknames)
+    async def unhoist(self,ctx,chars=None):
+        """"Remove the special characters from usernames"""
+        count = 0
+        if not ctx.channel.permissions_for(ctx.guild.me).manage_nicknames:
+            return await ctx.send(await self.translate(ctx.guild.id,'modo','missing-manage-nick'))
+        if chars==None:
+            accepted_chars = string.ascii_letters + string.digits
+            def check(username):
+                while not username[0] in accepted_chars:
+                    username = username[1:]
+                return username
+        else:
+            chars = chars.lower()
+            def check(username):
+                while username[0].lower() in chars+' ':
+                    username = username[1:]
+                return username
+        for member in ctx.guild.members:
+            try:
+                new = check(member.display_name)
+                if new!=member.display_name:
+                    if not self.bot.beta:
+                        await member.edit(nick=new)
+                    count += 1
+            except:
+                pass
+        await ctx.send(await self.translate(ctx.guild.id,'modo','unhoisted',c=count))
 
     @commands.command(name='backup')
     @commands.guild_only()

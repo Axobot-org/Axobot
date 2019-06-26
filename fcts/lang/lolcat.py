@@ -342,7 +342,9 @@ modo={"slowmode-0":"Teh very-cold-mode is now disabld in this nize place.",
         "em-list-title":"Emojis of our super server",
         "tempmute-1":"Da member {} is muted 4 the raeson `{}`, for {}!",
         "role-high":"Oops, tish role is 2 high for me to change. Move my role above the role `{}` be4 trying again, thx",
-        'role-color':"Teh coulor of role {} haz bee'n changd!"
+        'role-color':"Teh coulor of role {} haz bee'n changd!",
+        'unhoisted':'{c} bad names edited!',
+        'missing-manage-nick':"Oops, I'm missing the cool \"Manage nicknames\" perms! :sad:",
         }
 
 morpion={'user-begin':'{}, u begin!',
