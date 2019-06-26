@@ -174,7 +174,7 @@ class PartnersCog(commands.Cog):
                     field1 = None
                 except Exception as e:
                     field1 = None
-                    image = (await self.bot.fetch_user(int(partner['target']))).avatar_url
+                    image = (await self.bot.fetch_user(int(partner['target']))).avatar_url.__str__()
                     await self.bot.cogs["ErrorsCog"].on_error(e,None)
                 field2 = {'name':tr_invite.capitalize(),'value':'[Click here](https://discordapp.com/oauth2/authorize?client_id={}&scope=bot&permissions=2113273087)'.format(partner['target'])}
                 up = await self.get_uptimes(partner['target'],session)
