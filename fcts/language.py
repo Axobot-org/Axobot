@@ -21,7 +21,7 @@ class LangCog(discord.ext.commands.Cog):
         self.serv_opts = dict()
 
 
-    async def tr(self,serverID,moduleID,messageID):
+    async def tr(self,serverID,moduleID,messageID,**args):
         """Renvoie le texte en fonction de la langue"""
         if type(serverID) == discord.Guild:
             serverID = serverID.id
@@ -45,28 +45,29 @@ class LangCog(discord.ext.commands.Cog):
             lang_opt = self.bot.cogs['ServerCog'].default_language
         if lang_opt == 'fi':
             try:
-                return eval("fi."+moduleID+"[\""+messageID+"\"]")
+                result = eval("fi."+moduleID+"[\""+messageID+"\"]")
             except:
                 await self.msg_not_found(moduleID,messageID,"fi")
                 lang_opt = 'en'
         if lang_opt == 'lolcat':
             try:
-                return eval("lolcat."+moduleID+"[\""+messageID+"\"]")
+                result = eval("lolcat."+moduleID+"[\""+messageID+"\"]")
             except:
                 await self.msg_not_found(moduleID,messageID,"lolcat")
                 lang_opt = 'en'
         if lang_opt == 'en':
             try:
-                return eval("en."+moduleID+"[\""+messageID+"\"]")
+                result = eval("en."+moduleID+"[\""+messageID+"\"]")
             except:
                 await self.msg_not_found(moduleID,messageID,"en")
                 lang_opt = 'fr'
         if lang_opt == 'fr':
             try:
-                return eval("fr."+moduleID+"[\""+messageID+"\"]")
+                result = eval("fr."+moduleID+"[\""+messageID+"\"]")
             except:
                 await self.msg_not_found(moduleID,messageID,"fr")
-                return ""
+                result = ""
+        return result.format_map(self.bot.SafeDict(args))
 
     async def msg_not_found(self,moduleID,messageID,lang):
         try:
