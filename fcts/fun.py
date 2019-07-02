@@ -132,10 +132,10 @@ class FunCog(commands.Cog):
 You can specify a verification limit by adding a number in argument"""
         l = 100000
         if limit > l:
-            await ctx.send(str(await self.translate(ctx.channel,"fun","count-2")).format(l=l,e=self.bot.cogs['EmojiCog'].customEmojis['wat']))
+            await ctx.send(await self.translate(ctx.channel,"fun","count-2",l=l,e=self.bot.cogs['EmojiCog'].customEmojis['wat']))
             return
         if ctx.guild!=None and not ctx.channel.permissions_for(ctx.guild.me).read_message_history:
-            await ctx.send(str(await self.translate(ctx.channel,"fun","count-3")).format(l))
+            await ctx.send(await self.translate(ctx.channel,"fun","count-3"))
             return
         if user==None:
             user = ctx.author
@@ -148,9 +148,9 @@ You can specify a verification limit by adding a number in argument"""
                 counter += 1
         r = round(counter*100/m,2)
         if user==ctx.author:
-            await tmp.edit(content = str(await self.translate(ctx.channel,'fun','count-1')).format(m,counter,r))
+            await tmp.edit(content = await self.translate(ctx.channel,'fun','count-1',limit=m,x=counter,p=r))
         else:
-            await tmp.edit(content = str(await self.translate(ctx.channel,'fun','count-4')).format(m,user.display_name,counter,r))
+            await tmp.edit(content = await self.translate(ctx.channel,'fun','count-4', limit=m,user=user.display_name,x=counter,p=r))
 
     @commands.command(name="ragequit",hidden=True)
     @commands.check(is_fun_enabled)
