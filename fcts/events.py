@@ -114,7 +114,7 @@ class Events(commands.Cog):
         except:
             return
         d = datetime.datetime.utcnow() - (await msg.channel.history(limit=2).flatten())[1].created_at
-        if d.total_seconds() > 800:
+        if d.total_seconds() > 600:
             await msg.channel.send(await self.translate(msg.channel,"events","mp-adv"))
 
 
