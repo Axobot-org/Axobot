@@ -27,9 +27,9 @@ class LangCog(discord.ext.commands.Cog):
             serverID = serverID.id
         elif isinstance(serverID,discord.TextChannel):
             serverID = serverID.guild.id
-        if not self.bot.database_online or serverID==None or isinstance(serverID,discord.DMChannel):
+        if not self.bot.database_online:
             lang_opt = self.bot.cogs['ServerCog'].default_language
-        elif isinstance(serverID,discord.GroupChannel):
+        elif isinstance(serverID,(discord.DMChannel,type(None))):
             used_langs = await self.bot.cogs['UtilitiesCog'].get_languages(serverID.recipient,limit=1)
             lang_opt = used_langs[0][0]
         elif str(serverID) in self.serv_opts.keys():

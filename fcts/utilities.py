@@ -389,7 +389,7 @@ class UtilitiesCog(commands.Cog):
             if user in s.members:
                 lang = await self.bot.cogs["ServerCog"].find_staff(s.id,'language')
                 if lang==None:
-                    lang = 0
+                    lang = self.bot.cogs['ServerCog'].default_language
                 languages.append(lang)
         for e in range(len(self.bot.cogs['LangCog'].languages)):
             if languages.count(e)>0:
