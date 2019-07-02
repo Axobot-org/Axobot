@@ -1,4 +1,4 @@
-import discord, datetime, sys, psutil, os, aiohttp, importlib, time, asyncio, typing, random
+import discord, datetime, sys, psutil, os, aiohttp, importlib, time, asyncio, typing, random, re
 from discord.ext import commands
 from inspect import signature
 from platform   import system as system_name  # Returns the system/OS name
@@ -657,7 +657,24 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
         else:
             txt = "\n".join([f'• {k}: <{v}>' for k,v in (await self.translate(ctx.channel,'infos','discordlinks')).items()])
             await ctx.send(txt)
-                
+    
+
+    async def emoji_analysis(self,msg):
+        """Lists the emojis used in a message"""
+        try:
+            liste = list(set(re.findall(r'<:[\w-]+:(\d{18})>',msg.content)))
+            if len(liste)==0:
+                return
+            cnx = self.bot.cnx_frm
+            cursor = cnx.cursor()
+            current_timestamp = datetime.datetime.fromtimestamp(round(time.time()))
+            table = 'emojis_beta' if self.bot.beta else 'emojis'
+            query = ["INSERT INTO `{t}` (`ID`,`count`,`last_update`) VALUES ('{i}',1,'{l}') ON DUPLICATE KEY UPDATE count = `count` + 1, last_update = '{l}';".format(t=table,i=x,l=current_timestamp) for x in liste]
+            cursor.execute(*query)
+            cnx.commit()
+            cursor.close()
+        except Exception as e:
+            await self.bot.cogs['ErrorsCog'].on_error(e,None)
 
 
 def setup(bot):

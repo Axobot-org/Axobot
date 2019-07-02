@@ -78,6 +78,8 @@ class Events(commands.Cog):
                 await self.bot.cogs['ErrorsCog'].on_error(e,msg)
             if len(msg.mentions)>0:
                 await self.bot.cogs['FunCog'].check_afk(msg)
+        if msg.author != self.bot.user:
+            await self.bot.cogs['InfosCog'].emoji_analysis(msg)
         if msg.author.bot==False and await self.bot.cogs['AdminCog'].check_if_admin(msg.author) == False and msg.guild!=None:
             cond = True
             if self.bot.database_online:
