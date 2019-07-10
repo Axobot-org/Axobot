@@ -185,7 +185,10 @@ class PartnersCog(commands.Cog):
                     field3 = None
             else:
                 title = "**{}** ".format(tr_guild.capitalize())
-                inv = await self.bot.fetch_invite(partner['target'])
+                try:
+                    inv = await self.bot.fetch_invite(partner['target'])
+                except discord.errors.NotFound:
+                    continue
                 image = inv.guild.icon_url.__str__()
                 if isinstance(inv,discord.Invite) and not inv.revoked:
                     title += inv.guild.name
