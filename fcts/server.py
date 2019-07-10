@@ -76,7 +76,7 @@ class ServerCog(commands.Cog):
 
 
     async def get_bot_infos(self,botID):
-        """return every options of a server"""
+        """Return every options of the bot"""
         if not self.bot.database_online:
             return list()
         cnx = self.bot.cnx_frm
