@@ -133,7 +133,8 @@ fun={"count-0":"Comptage en cours...",
         "afk-user-1":"Ce membre est AFK, pour la raison {}",
         "afk-user-2":"Ce membre est AFK !",
         "afk-done":"Vous êtes maintenant AFK",
-        "unafk-done":"Vous n'êtes maintenant plus AFK"
+        "unafk-done":"Vous n'êtes maintenant plus AFK",
+        "tip-list":["Le saviez-vous ? Il existe plusieurs langues pour le bot, dont une très amusante à tester : le lolcat","Pro-tip : pour changer la langue du bot, utilisez la commande `config` !","Pro-tip : vous trouverez les explications de chaque commande dans la documentation du bot, à l'adresse https://zbot.rtfd.io. Peut-être même des commandes que vous ne connaissiez pas !","Le saviez-vous ? Les résultats de la commande `stats` cachent certains serveurs, comme les serveurs de liste de bots, ou ceux internes","Le saviez-vous ? Ce bot était au début conçu pour un serveur d'une communauté Minecraft. C'est de là qu'il s'est fait connaître, et c'est ce qui explique toutes ses commandes sur le thème du jeu"],
         }
 
 infos={"text-0":"""Bonjour ! Moi c'est {0} !

@@ -481,6 +481,11 @@ You can specify a verification limit by adding a number in argument"""
         format_d = await self.bot.cogs['TimeCog'].date(d,lang=await self.translate(ctx.channel,"current_lang","current"))
         await ctx.send("**{}**:\n{} ({})\n ({} - lat: {} - long: {})".format(timeZoneStr,format_d,d.tzname(),g.current_result.address,round(g.json['lat'],2),round(g.json['lng'],2)))
 
+    @commands.command(name="tip")
+    async def tip(self,ctx:commands.Context):
+        """Send a tip, a fun fact or something else"""
+        await ctx.send(random.choice(await self.translate(ctx.guild,"fun","tip-list")))
+
     @commands.command(name='afk')
     @commands.check(is_fun_enabled)
     @commands.guild_only()
