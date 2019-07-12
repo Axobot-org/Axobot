@@ -67,7 +67,13 @@ class LangCog(discord.ext.commands.Cog):
             except:
                 await self.msg_not_found(moduleID,messageID,"fr")
                 result = ""
-        return result.format_map(self.bot.SafeDict(args))
+        if isinstance(result,str):
+            try:
+                return result.format_map(self.bot.SafeDict(args))
+            except ValueError:
+                return result
+        else:
+            return result
 
     async def msg_not_found(self,moduleID,messageID,lang):
         try:
