@@ -69,6 +69,26 @@ class UsersCog(commands.Cog):
                 await ctx.send(str(await self.translate(ctx.channel,'users','allow_animated_success')).format(allowed))
             else:
                 await ctx.send(await self.translate(ctx.channel,'users','changed-1'))
+    
+    @profile_main.command(name='auto_unafk')
+    async def set_auto_unafk(self,ctx,value:bool=None):
+        """Automatically remove your AFK mode
+        This system will remove your AFK tag as soon as you send a message, but only in the server you sent it"""
+        if value==None:
+            value = await self.bot.cogs['UtilitiesCog'].get_db_userinfo(['auto_unafk'],[f'`userID`={ctx.author.id}'])
+            if value==None:
+                value = False
+            else:
+                value = value['auto_unafk']
+            if value:
+                await ctx.send(await self.translate(ctx.channel,'users','allow_auto_unafk_true'))
+            else:
+                await ctx.send(await self.translate(ctx.channel,'users','allow_auto_unafk_false'))
+        else:
+            if await self.bot.cogs['UtilitiesCog'].change_db_userinfo(ctx.author.id,'auto_unafk',value):
+                await ctx.send(str(await self.translate(ctx.channel,'users','allow_animated_success')).format(value))
+            else:
+                await ctx.send(await self.translate(ctx.channel,'users','changed-1'))
 
 
 def setup(bot):

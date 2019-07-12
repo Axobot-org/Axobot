@@ -611,7 +611,9 @@ users = {'invalid-card':'This style is invalid. Here is the list of styles you c
         'card-desc':"Here is an example of your xp card. You can enter the command `profile card <style>` to change the style\n*Your xp card will only refresh when you have won xp*",
         'allow_animated_true':"Animated xp cards are currently enabled for you",
         'allow_animated_false':"Animated xp cards are currently disabled for you",
-        'allow_animated_success':"This parameter has been redefined to {}"
+        'allow_animated_success':"This parameter has been redefined to {}",
+        'allow_auto_unafk_true':"I'll remove the AFK tag from you as soon as you send a message",
+        'allow_auto_unafk_false':"You must remove the AFK tag yourself",
         }
 
 xp = {'card-level':'LEVEL',

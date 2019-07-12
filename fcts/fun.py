@@ -1,4 +1,4 @@
-import discord, random, operator, string, importlib, re, typing, datetime, subprocess, json, geocoder, time, aiohttp
+import discord, random, operator, string, importlib, re, typing, datetime, subprocess, json, geocoder, time, aiohttp, copy
 import emoji as emojilib
 from discord.ext import commands
 from tzwhere import tzwhere
@@ -514,7 +514,7 @@ You can specify a verification limit by adding a number in argument"""
         except discord.errors.Forbidden:
             return await ctx.send(await self.translate(ctx.guild.id,"fun","afk-no-perm"))
     
-    async def check_afk(self,msg):
+    async def check_afk(self,msg:discord.Message):
         """Check if someone pinged is afk"""
         ctx = await self.bot.get_context(msg)
         for member in msg.mentions:
@@ -524,6 +524,12 @@ You can specify a verification limit by adding a number in argument"""
                 else:
                     reason = await self.bot.cogs['UtilitiesCog'].clear_msg(str(await self.translate(msg.guild.id,"fun","afk-user-1")).format(self.afk_guys[member.id]),everyone=True,ctx=ctx)
                     await msg.channel.send(reason)
+        if ctx.author.display_name.endswith(' [AFK]'):
+            msg = copy.copy(msg)
+            msg.content = (await self.bot.get_prefix(msg))[0] + 'unafk'
+            new_ctx = await self.bot.get_context(msg)
+            await self.bot.invoke(new_ctx)
+
 
     @commands.command(name='embed',hidden=False)
     @commands.has_permissions(embed_links=True)

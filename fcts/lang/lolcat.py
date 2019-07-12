@@ -611,7 +611,9 @@ users = {'invalid-card':'Dat style iz no valid. But yop, her\'s styles u can use
         'card-desc':"Here iz example of ur xp card. U can enter teh command `profile card <style>` 2 change the style\n*Ur xp card will only refresh wehn u have won Xp*",
         'allow_animated_true':"Animated xp cards ar naw enabled 4U",
         'allow_animated_false':"Anamited xp cards are naw disabld for you",
-        'allow_animated_success':"Dat parameter have been redefined 2 {}"
+        'allow_animated_success':"Dat parameter have been redefined 2 {}",
+        'allow_auto_unafk_true':"I'll help u, no worries :green_heart:",
+        'allow_auto_unafk_false':"U do ur own job, okay?",
         }
 
 xp = {'card-level':'LVL',

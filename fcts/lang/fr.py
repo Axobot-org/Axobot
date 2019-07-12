@@ -611,7 +611,9 @@ users = {'invalid-card':'Ce style est invalide. Voici la liste des styles que vo
         'card-desc':"Voici un exemple de votre carte d'xp. Vous pouvez entrer la commande `profile card <style>` pour changer le style\n*Votre carte d'xp ne se réactualisera que lorsque vous aurez gagné de l'xp*",
         'allow_animated_true':"Les cartes d'xp animées sont actuellement autorisées pour vous",
         'allow_animated_false':"Les cartes d'xp animées ne sont actuellement pas autorisées pour vous",
-        'allow_animated_success':"Ce paramètre a bien été redéfini à {}"
+        'allow_animated_success':"Ce paramètre a bien été redéfini à {}",
+        'allow_auto_unafk_true':"Je vous enlèverai le tag AFK dès que vous enverrez un message",
+        'allow_auto_unafk_false':"Vous devez enlever le tag AFK vous-même",
         }
 
 xp = {'card-level':'NIVEAU',
