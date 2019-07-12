@@ -151,7 +151,7 @@ class AdminCog(commands.Cog):
             self.update[x] = msg.content
         await ctx.bot.cogs['UtilitiesCog'].add_check_reaction(msg)
     
-    async def send_updates(self,ctx):
+    async def send_updates(self,ctx:commands.Context):
         """Lance un message de mise à jour"""
         if None in self.update.values():
             return await ctx.send("Les textes ne sont pas complets !")
@@ -168,7 +168,7 @@ class AdminCog(commands.Cog):
         def check(reaction, user):
             return user == ctx.author and reaction.message.id==msg.id
         try:
-            await self.bot.wait_for('reaction_add', timeout=20.0, check=check)
+            await self.bot.wait_for('reaction_add', timeout=30.0, check=check)
         except asyncio.TimeoutError:
             return await ctx.send('Trop long !')
         count = 0
@@ -184,9 +184,20 @@ class AdminCog(commands.Cog):
             if lang not in self.update.keys():
                 if lang=='lolcat':
                     lang = 'en'
+            mentions_str = await self.bot.cogs['ServerCog'].find_staff(guild.id,'update_mentions')
+            if mentions_str == None:
+                mentions = []
+            else:
+                mentions = []
+                for r in mentions_str.split(';'):
+                    try:
+                        mentions.append(guild.get_role(int(r)))
+                    except:
+                        pass
+                mentions = [x.mention for x in mentions if x!=None]
             for chan in channels:
                 try:
-                    await chan.send(self.update[lang])
+                    await chan.send(self.update[lang]+"\n\n"+" ".join(mentions))
                 except Exception as e:
                     await ctx.bot.cogs['ErrorsCog'].on_error(e,ctx)
                 else:
