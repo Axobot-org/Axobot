@@ -547,7 +547,8 @@ server_desc={"prefix":"Préfixe actuel du bot : {}",
         "xp_type":"Type de système d'xp : {}",
         "partner_channel":"Salon dans lequel envoyer les partenaires : {}",
         "partner_color":"Couleur de l'embed des partenaires : {}",
-        "partner_role":"Rôle donné aux partenaires : {}"
+        "partner_role":"Rôle donné aux partenaires : {}",
+        "update_mentions":"Rôles mentionnés lors d'une mise à jour du bot : {}",
         }
 
 stats_infos={"not-found":"Impossible de trouver {N}",

@@ -547,7 +547,8 @@ server_desc={"prefix":"Currnt baot prfx: {}",
         "xp_type":"XP system used: {}",
         "partner_channel":"Channel where partners are sended: {}",
         "partner_color":"Coulor of partners box: {}",
-        "partner_role":"Role givn 2 partners: {}"
+        "partner_role":"Role givn 2 partners: {}",
+        "update_mentions":"Roles pinged on teh bot changlog: {}",
         }
 
 stats_infos={"not-found":"Unable 2 found {N}",
