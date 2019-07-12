@@ -254,3 +254,11 @@ Thanos
 I assume you know Thanos from the Avengers series. If not, to make it short, he's a bad guy who decided to kill half the universe with a single snap of his finger.
 
 Well, if you want to know if you will be spared by this guy or not, check out the great oracle Zbot!
+
+
+Tip
+---
+
+**Syntax:** :code:`tip`
+
+If you want to get some advice on how to use the bot, or just a funny fact, you will surely find what you are looking for here. This command returns a random phrase from a defined list of "Pro-tip" and "Did you know?", to hopefully teach you something!
