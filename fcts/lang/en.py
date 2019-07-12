@@ -134,7 +134,27 @@ fun={"count-0":"Counting in progress...",
         "afk-user-2":"This user is AFK!",
         "afk-done":"You are now AFK",
         "unafk-done":"You aren't anymore AFK",
-        "tip-list":["Did you know that? There are several languages for the bot, including one very fun to test: lolcat","Pro-tip: to change the bot language, use the command `config` !","Pro-tip: you will find explanations of each command in the bot documentation, at https://zbot.rtfd.io Maybe even commands you didn't know about!","Did you know that? The results of the `stats` command hide some servers, such as bot list servers, or internal ones","Did you know that? This bot was originally designed for a server in a Minecraft community. That's where he made his name, and that's why he has commands on the theme of the game."],
+        "tip-list":["Did you know that? There are several languages for the bot, including one very fun to test: lolcat",
+                "Pro-tip: to change the bot language, use the command `config` !",
+                "Pro-tip: you will find explanations of each command in the bot documentation, at https://zbot.rtfd.io Maybe even commands you didn't know about!",
+                "Did you know that? The results of the `stats` command hide some servers, such as bot list servers, or internal ones",
+                "Did you know that? This bot was originally designed for a server in a Minecraft community. That's where he made his name, and that's why he has commands on the theme of the game.",
+                "Did you know that? The first version of the bot was written in February 2018, for personal use. At the time there were only two or three easy commands to make, like `clear` and `say`",
+                "Pro-tip: With the `say` command, you can use the emojis from any server where Zbot is, even animated emojis! Just give the emoji as if you were using it yourself",
+                "Pro-tip: To use a custom emoji in the `react` command, just give its name. And it works with any emoji!",
+                "Pro-tip: With the command `me <text>`, you can make the bot say what you want, with your nickname in front of it! Like, for example, \"*Wumpus likes bananas*\".",
+                "Pro-tip: The command `roll Nothing; Nothing; Nothing; Nothing; Nothing; Nothing; Nothing; PAN !` allows you to play Russian roulette! Be careful with that, though, okay?",
+                "Pro-tip: If you need help, feel free to use the `osekour` command",
+                "Did you know that? Sometimes, the levelup message mentions a random object. To do this, Aragorn1202 had to create a list of 60 of them, including 'a bicorne', 'a cookie' or 'a banana'!",
+                "Did you know that? In the past, Zbot's profile picture was... a creeper."
+                "Did you know that? The ZBot Staff is composed of a talented developer Admin, a second admin named after a kibble brand as well as a cat, a Ban hammer and a mushroom!",
+                "Pro-tip: The `say <text>` command is very useful for posting anonymous messages... at least when you have access to it."
+                "Pro-tip: The `discordlinks` command will give you all the useful links related to discord!",
+                "Did you know that?  All designs related to the bot are made by Adri526#9223, including the huge list of emojis used in the `bigtext` command!",
+                "Did you know that? ZBot takes its name from.... its creator, Z_runner",
+                "Pro-tip: The bot has a Discord, where you can see the current bugs and vote for the next updates! Use the `about` command to get the invite",
+                "Pro-tip: the `prefix` command allows you to have a list of the prefixes currently usable in the server",
+                ],
         }
 
 infos={"text-0":"""Hello! I'm {0} !
