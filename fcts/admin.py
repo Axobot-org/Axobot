@@ -397,6 +397,7 @@ class AdminCog(commands.Cog):
         return "Qui a appuyé sur le bouton rouge ? :thinking:"
 
     @main_msg.command(name="code")
+    @commands.check(reloads.check_admin)
     async def show_code(self,ctx,cmd):
         cmds = self.bot.commands
         obj = await self.bot.cogs['UtilitiesCog'].set_find(cmds,cmd)
