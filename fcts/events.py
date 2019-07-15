@@ -1,4 +1,4 @@
-import discord, datetime, asyncio, logging, time, aiohttp, json
+import discord, datetime, asyncio, logging, time, aiohttp, json, random
 from discord.ext import commands, tasks
 
 
@@ -33,6 +33,7 @@ class Events(commands.Cog):
             'channel':45,
             'role':60,
             'guild':75}
+        bot.add_listener(self.on_new_message,'on_message')
 
 
     def cog_unload(self):
@@ -79,6 +80,15 @@ class Events(commands.Cog):
             await self.bot.cogs['FunCog'].check_afk(msg)
         if msg.author != self.bot.user:
             await self.bot.cogs['InfosCog'].emoji_analysis(msg)
+        print(msg.content)
+        if "send nudes" in msg.content.lower() and len(msg.content)<13 and random.random()>0.0:
+            try:
+                nudes_reacts = [':eyes:',':innocent:',':rolling_eyes:',':confused:',':smirk:']
+                if msg.guild==None or msg.channel.permissions_for(msg.guild.me).external_emojis:
+                    nudes_reacts += ['<:ThinkSmirk:485902639838789635>','<:whut:485924115199426600>','<:thinksmart:513105826530197514>','<:excusemewhat:418154673523130398>','<:blobthinking:499661417012527104>','<a:ano_U:568494122856611850>','<:catsmirk:523929843331498015>','<a:ablobno:537680872820965377>']
+                await msg.channel.send(random.choice(nudes_reacts))
+            except Exception as e:
+                print(e)
         if msg.author.bot==False and await self.bot.cogs['AdminCog'].check_if_admin(msg.author) == False and msg.guild!=None:
             cond = True
             if self.bot.database_online:
