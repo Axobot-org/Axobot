@@ -80,7 +80,6 @@ class Events(commands.Cog):
             await self.bot.cogs['FunCog'].check_afk(msg)
         if msg.author != self.bot.user:
             await self.bot.cogs['InfosCog'].emoji_analysis(msg)
-        print(msg.content)
         if "send nudes" in msg.content.lower() and len(msg.content)<13 and random.random()>0.0:
             try:
                 nudes_reacts = [':eyes:',':innocent:',':rolling_eyes:',':confused:',':smirk:']
