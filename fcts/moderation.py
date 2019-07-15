@@ -623,7 +623,7 @@ You must be an administrator of this server to use this command."""
             await self.bot.cogs['HelpCog'].help_command(ctx,['emoji'])
 
     @emoji_group.command(name="rename")
-    @commands.has_permissions(administrator=True)
+    @commands.check(checks.has_admin)
     async def emoji_rename(self,ctx,emoji:discord.Emoji,name):
         """Rename an emoji"""
         if emoji.guild != ctx.guild:
@@ -636,7 +636,7 @@ You must be an administrator of this server to use this command."""
         await ctx.send(str(await self.translate(ctx.guild.id,"modo","emoji-renamed")).format(emoji))
 
     @emoji_group.command(name="restrict")
-    @commands.has_permissions(administrator=True)
+    @commands.check(checks.has_admin)
     async def emoji_restrict(self,ctx,emoji:discord.Emoji,*,roles):
         """Restrict the use of an emoji to certain roles"""
         if emoji.guild != ctx.guild:
@@ -661,8 +661,7 @@ You must be an administrator of this server to use this command."""
         await ctx.send(str(await self.translate(ctx.guild.id,"modo","emoji-valid")).format(emoji,", ".join([x.name for x in r])))
 
     @emoji_group.command(name="clear")
-    @commands.has_permissions(manage_messages=True)
-    @commands.bot_has_permissions(manage_messages=True)
+    @commands.check(checks.has_manage_msg)
     async def emoji_clear(self,ctx,message:discord.Message):
         """Remove all reactions under a message"""
         if not ctx.channel.permissions_for(ctx.guild.me).manage_messages:
@@ -795,7 +794,7 @@ ID corresponds to the Identifier of the message"""
     @commands.command(name='backup')
     @commands.guild_only()
     @commands.cooldown(2,120, commands.BucketType.guild)
-    @commands.has_permissions(administrator=True)
+    @commands.check(checks.has_admin)
     async def backup_server(self,ctx):
         """Make and send a backup of this server
         You will find there the configuration of your server, every general settings, the list of members with their roles, the list of categories and channels (with their permissions), emotes, and webhooks.
