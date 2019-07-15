@@ -201,7 +201,7 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
                 await ctx.send(str(type(item))+" / "+str(item))
         except Exception as e:
             await self.bot.cogs["ErrorsCog"].on_error(e,ctx)
-            await ctx.send("`Error`: "+e)
+            await ctx.send("`Error`: "+str(e))
 
     async def member_infos(self,ctx,item,lang,critical_info=False):
         since = await self.translate(ctx.guild.id,"keywords","depuis")
@@ -387,7 +387,7 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
         embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","guild-2"), value=str(ctx.guild.region).capitalize())
         await ctx.send(embed=embed)
 
-    async def guild_info(self,ctx,guild,lang,critical_info=False):
+    async def guild_info(self,ctx:commands.Context,guild:discord.Guild,lang:str,critical_info:bool=False):
         since = await self.translate(ctx.guild.id,"keywords","depuis")
         bot = await self.bot.cogs["UtilitiesCog"].get_bots_number(guild.members)
         online = await self.bot.cogs["UtilitiesCog"].get_online_number(guild.members)
@@ -408,7 +408,7 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
         embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","member-1"), value = "{} ({} {})".format(await self.timecog.date(guild.created_at,lang=lang,year=True),since,await self.timecog.time_delta(guild.created_at,datetime.datetime.now(),lang=lang,year=True,precision=0,hour=False)), inline=False)
         embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","role-3"), value = str(await self.translate(ctx.guild.id,"stats_infos","guild-7")).format(len(guild.members),bot,online))
         embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","guild-6"), value=str(await self.translate(ctx.guild.id,"stats_infos","guild-3")).format(len(guild.text_channels),len(guild.voice_channels),len(guild.categories)))
-        embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","guild-5"), value=str(len(guild.emojis)))
+        embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","guild-5"), value="{}/{}".format(len(guild.emojis),guild.emoji_limit))
         if guild.me.guild_permissions.manage_guild:
             embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","guild-12"), value=str(len(await guild.invites())))
         embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","guild-10"), value = str(int(guild.afk_timeout/60))+" minutes")
@@ -432,6 +432,13 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
             embed.add_field(name=str(await self.translate(ctx.guild.id,"stats_infos","guild-11.1")).format(len(guild.roles)-1), value=", ".join(roles[:20]))
         else:
             embed.add_field(name=str(await self.translate(ctx.guild.id,"stats_infos","guild-11.2")).format(len(guild.roles)-1), value=", ".join(roles))
+        if guild.premium_subscription_count>0:
+            embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","guild-13"), value=await self.translate(ctx.guild.id,"stats_infos","guild-13v",b=guild.premium_subscription_count,p=guild.premium_tier))
+        embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","guild-14"), value=await self.translate(ctx.guild.id,"stats_infos","guild-14v",
+            bit=round(guild.bitrate_limit/1000),
+            fil=round(guild.filesize_limit/1.049e+6),
+            emo=guild.emoji_limit,
+            mem=guild.max_presences))
         await ctx.send(embed=embed)
         if guild.features != []:
             owner = self.bot.get_user(279568324260528128)
