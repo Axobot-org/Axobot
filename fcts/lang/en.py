@@ -84,8 +84,11 @@ cases={"no-user":"Unable to find this user :eyes:",
         "cases-0":"{} cases found: ({}-{})",
         "search-0":"**User:** {U}\n**Type:** {T}\n**Moderator:** {M}\n**Date:** {D}\n**Reason:** *{R}*",
         "search-1":"**User:** {U}\n**Guild:** {G}\n**Type:** {T}\n**Moderator:** {M}\n**Date:** {D}\n**Reason:** *{R}*",
+        "list-0":"**Type:** {T}\n**Moderator:** {M}\n**Date:** {D}\n**Reason:** *{R}*",
+        "list-1":"**Server:** {G}\n**Type:** {T}\n**Moderator:** {M}\n**Date:** {D}\n**Reason:** *{R}*",
+        "list-2":"\n**Duration:** {D}",
         'title-search':'Case #{}',
-        'no_database':"Due to a temporary database outage, this command has been disabled"
+        'no_database':"Due to a temporary database outage, this command has been disabled",
         }
 
 events={'mp-adv':"You are probably trying to invite me to this server? If that is the case, I can't join him with a simple invitation. An administrator must use my own invitation link, here: <https://bot.discord.io/zbot> :wink:"}

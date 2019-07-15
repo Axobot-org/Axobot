@@ -115,7 +115,7 @@ class CasesCog(commands.Cog):
         liste = list()
         if len(columns)==0:
             for x in cursor:
-                liste.append(self.Case(bot=self.bot,guildID=x['guild'],caseID=x['ID'],memberID=x['user'],Type=x['type'],ModID=x['mod'],date=x['created_at'],Reason=x['reason']))
+                liste.append(self.Case(bot=self.bot,guildID=x['guild'],caseID=x['ID'],memberID=x['user'],Type=x['type'],ModID=x['mod'],date=x['created_at'],Reason=x['reason'],duration=x['duration']))
         else:
             for x in cursor:
                 liste.append(x)
@@ -210,13 +210,13 @@ class CasesCog(commands.Cog):
         
     async def see_case_main(self,ctx,guild:discord.Guild,user:discord.User):
         if guild != None:
-            c = ["`user`='{}'".format(user),"guild='{}'".format(guild)]
-            v = "**Type:** {T}\n**Moderator:** {M}\n**Date:** {D}\n**Reason:** *{R}*"  
+            criters = ["`user`='{}'".format(user),"guild='{}'".format(guild)]
+            syntax = await self.translate(ctx.guild,'cases','list-0')  
         else:
-            v = "**Guild:** {G}\n**Type:** {T}\n**Moderator:** {M}\n**Date:** {D}\n**Reason:** *{R}*"
-            c = ["`user`='{}'".format(user)]
+            syntax = await self.translate(ctx.guild,'cases','list-1')
+            criters = ["`user`='{}'".format(user)]
         try:
-            cases = await self.get_case(criters=c)
+            cases = await self.get_case(criters=criters)
             cases.reverse()
             u = self.bot.get_user(user)
             last_case = 1 if len(cases)>0 else 0
@@ -241,8 +241,11 @@ class CasesCog(commands.Cog):
                             m = x.mod
                         else:
                             m = m.mention
-                        embed.add_field(name="Case #{}".format(x.id),value=v.format(G=g,T=x.type,M=m,R=x.reason,D=await self.bot.cogs['TimeCog'].date(x.date,lang=l,year=True,digital=True)),inline=False)
-                        if len(embed.fields)>15:
+                        text = syntax.format(G=g,T=x.type,M=m,R=x.reason,D=await self.bot.cogs['TimeCog'].date(x.date,lang=l,year=True,digital=True))
+                        if x.duration != None:
+                            text += await self.translate(ctx.guild.id,'cases','list-2',D=await self.bot.cogs['TimeCog'].time_delta(x.duration,lang=l,year=False,form='temp'))
+                        embed.add_field(name="Case #{}".format(x.id),value=text,inline=False)
+                        if len(embed.fields)>20:
                             embed.title = str(await self.translate(ctx.guild.id,"cases","cases-0")).format(len(cases),last_case,e+1)
                             await ctx.send(embed=embed)
                             embed.clear_fields()

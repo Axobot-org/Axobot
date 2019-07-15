@@ -84,8 +84,11 @@ cases={"no-user":"Impossible de trouver cet utilisateur",
         "cases-0":"{} casiers trouvés : ({}-{})",
         "search-0":"**Membre:** {U}\n**Type:** {T}\n**Moderateur:** {M}\n**Date:** {D}\n**Raison:** *{R}*",
         "search-1":"**Membre:** {U}\n**Serveur:** {G}\n**Type:** {T}\n**Moderateur:** {M}\n**Date:** {D}\n**Raison:** *{R}*",
+        "list-0":"**Type:** {T}\n**Moderateur:** {M}\n**Date:** {D}\n**Raison:** *{R}*",
+        "list-1":"**Serveur:** {G}\n**Type:** {T}\n**Moderateur:** {M}\n**Date:** {D}\n**Raison:** *{R}*",
+        "list-2":"\n**Durée :** {D}",
         'title-search':'Casier #{}',
-        'no_database':"En raison d'une panne temporaire de la base de donnée, cette commande a été désactivée"
+        'no_database':"En raison d'une panne temporaire de la base de donnée, cette commande a été désactivée",
         }
 
 events={'mp-adv':"Vous cherchez sans doute à m'inviter sur ce serveur ? Si c'est le cas, je ne peux pas le rejoindre avec une simple invitation. Il faut qu'un administrateur utilise mon propre lien d'invitation, ici : <https://bot.discord.io/zbot> :wink:"}

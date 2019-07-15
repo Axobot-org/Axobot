@@ -84,6 +84,9 @@ cases={"no-user":"Unable to find dis usr :eyes:",
         "cases-0":"{} cases fund: ({}-{})",
         "search-0":"**Uzr:** {U}\n**Type:** {T}\n**Mod:** {M}\n**Date:** {D}\n**Reazon:** *{R}*",
         "search-1":"**Uzr:** {U}\n**Servr:** {G}\n**Type:** {T}\n**Modz:** {M}\n**Date:** {D}\n**Reazon:** *{R}*",
+        "list-0":"**Type:** {T}\n**mod:** {M}\n**Date:** {D}\n**Txt:** *{R}*",
+        "list-1":"**Srvr:** {G}\n**Type:** {T}\n**Modz:** {M}\n**date:** {D}\n**Reason:** *{R}*",
+        "list-2":"\n**How long:** {D}",
         'title-search':'Case #{}',
         'no_database':"Dude we'v got an databaz outage, so dis command haz been dizabled"
         }
