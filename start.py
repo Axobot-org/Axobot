@@ -275,8 +275,6 @@ def main():
     async def on_guild_remove(guild):
         await client.cogs["Events"].on_guild_del(guild)
 
-    async def on_message(msg):
-        await client.cogs["Events"].on_new_message(msg)
 
 
     async def sigterm_handler(bot):
@@ -316,7 +314,6 @@ def main():
     client.add_check(check_once,call_once=True)
     client.add_listener(on_member_join)
     client.add_listener(on_member_remove)
-    client.add_listener(on_message)
     client.add_listener(on_guild_join)
     client.add_listener(on_guild_remove)
     
