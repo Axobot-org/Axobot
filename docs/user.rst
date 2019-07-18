@@ -60,3 +60,11 @@ Allow animated rank card
 **Syntax:** :code:`profile animated_card [true|false]`
 
 This option allows you to enable the rendering of your xp card in.gif format if you have an animated profile image. Since the image processing time is much longer, with reduced quality, this option is disabled by default.
+
+
+Automatic unafk
+---------------
+
+**Syntax:** :code:`profile auto_unafk [true|false]`
+
+This option has been designed for people who don't want to manually type the `unafk` command as soon as they are back. So by activating this system, Zbot will automatically remove the AFK tag from you as soon as you send a message. As simple as that!

@@ -846,7 +846,7 @@ class RssCog(commands.Cog):
         return mysql.connector.connect(user=self.bot.database_keys['user'],password=self.bot.database_keys['password'],host=self.bot.database_keys['host'],database=self.bot.database_keys['database'])
 
     async def get_flow(self,ID):
-        cnx = self.bot.cnx
+        cnx = self.bot.cnx_frm
         cursor = cnx.cursor(dictionary = True)
         query = ("SELECT * FROM `{}` WHERE `ID`='{}'".format(self.table,ID))
         cursor.execute(query)
@@ -857,7 +857,7 @@ class RssCog(commands.Cog):
 
     async def get_guild_flows(self,guildID):
         """Get every flow of a guild"""
-        cnx = self.bot.cnx
+        cnx = self.bot.cnx_frm
         cursor = cnx.cursor(dictionary = True)
         query = ("SELECT * FROM `{}` WHERE `guild`='{}'".format(self.table,guildID))
         cursor.execute(query)
@@ -868,7 +868,7 @@ class RssCog(commands.Cog):
 
     async def add_flow(self,guildID,channelID,Type,link):
         """Add a flow in the database"""
-        cnx = self.bot.cnx
+        cnx = self.bot.cnx_frm
         cursor = cnx.cursor()
         ID = await self.create_id(channelID,guildID,Type,link)
         if Type == 'mc':
@@ -884,7 +884,7 @@ class RssCog(commands.Cog):
         """Remove a flow from the database"""
         if type(ID)!=int:
             raise ValueError
-        cnx = self.bot.cnx
+        cnx = self.bot.cnx_frm
         cursor = cnx.cursor()
         query = ("DELETE FROM `{}` WHERE `ID`='{}'".format(self.table,ID))
         cursor.execute(query)
@@ -893,7 +893,7 @@ class RssCog(commands.Cog):
 
     async def get_all_flows(self):
         """Get every flow of the database"""
-        cnx = self.bot.cnx
+        cnx = self.bot.cnx_frm
         cursor = cnx.cursor(dictionary = True)
         query = ("SELECT * FROM `{}` WHERE `guild` in ({})".format(self.table,','.join(["'{}'".format(x.id) for x in self.bot.guilds])))
         cursor.execute(query)
@@ -903,7 +903,7 @@ class RssCog(commands.Cog):
         return liste
 
     async def update_flow(self,ID,values=[(None,None)]):
-        cnx = self.bot.cnx
+        cnx = self.bot.cnx_frm
         cursor = cnx.cursor()
         v = list()
         for x in values:

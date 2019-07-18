@@ -112,6 +112,8 @@ class ErrorsCog(commands.Cog):
     @commands.Cog.listener()
     async def on_error(self,error,ctx):
         try:
+            if isinstance(ctx,discord.Message):
+                ctx = await self.bot.get_context(ctx)
             tr = traceback.format_exception(type(error), error, error.__traceback__)
             msg = "```python\n{}\n```".format(" ".join(tr))
             if ctx == None:

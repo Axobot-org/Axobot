@@ -5,7 +5,7 @@ class tempdelta(commands.Converter):
     def __init__(self):
         pass
     
-    async def convert(self,ctx,argument):
+    async def convert(self,ctx:commands.Context,argument):
         d = 0
         found = False
         # ctx.invoked_with
@@ -22,22 +22,28 @@ class user(commands.converter.UserConverter):
     def __init__(self):
         pass
     
-    async def convert(self,ctx,argument):
+    async def convert(self,ctx:commands.Context,argument):
         if argument.isnumeric():
-            res = ctx.bot.get_user(int(argument))
+            if ctx.guild != None:
+                res = ctx.guild.get_member(int(argument))
+            if res == None:
+                res = ctx.bot.get_user(int(argument))
             if res == None:
                 try:
                     res = await ctx.bot.fetch_user(int(argument))
                 except:
                     pass
             return res
-        return await commands.UserConverter().convert(ctx,argument)
+        try:
+            return await commands.MemberConverter().convert(ctx,argument)
+        except:
+            return await commands.UserConverter().convert(ctx,argument)
 
 class infoType(commands.Converter):
     def __init__(self):
         pass
     
-    async def convert(self,ctx,argument):
+    async def convert(self,ctx:commands.Context,argument):
         if argument in ['member','role','user','textchannel','channel','invite','voicechannel','emoji','category','guild','server']:
             return argument
         else:
@@ -47,7 +53,7 @@ class cardStyle(commands.Converter):
     def __init__(self):
         pass
     
-    async def convert(self,ctx,argument):
+    async def convert(self,ctx:commands.Context,argument):
         if argument in await ctx.bot.cogs['UtilitiesCog'].allowed_card_styles(ctx.author):
             return argument
         else:
@@ -57,7 +63,7 @@ class LeaderboardType(commands.Converter):
     def __init__(self):
         pass
     
-    async def convert(self,ctx,argument):
+    async def convert(self,ctx:commands.Context,argument):
         if argument in ['server','guild','serveur','local']:
             if ctx.guild==None:
                 raise commands.errors.BadArgument('Cannot use {} leaderboard type outside a server'.format(argument))

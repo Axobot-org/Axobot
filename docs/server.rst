@@ -51,7 +51,8 @@ List of every option
 --------------------
 
 * prefix: Character string that will be the bot prefix, for all commands, beginning with the validation message. The prefix must be between 1 and 5 characters long. By default, :code:`!`.
-* language: Language of the bot. Currently only the languages :code:`fr` (French), :code:`en` (English) and :code:`fi` (Finnish) are available (also you ca try :code:`lolcat` for more fun). The change takes place as soon as the order is validated by the system. Default :code:`fr`.
+* language: Language of the bot. Currently only the languages :code:`fr` (French), :code:`en` (English) and :code:`fi` (Finnish) are available (also you can use :code:`lolcat` for more fun). The change takes place as soon as the order is validated by the system. Default :code:`fr`.
+* description: Description of the server, used for the `info server <infos.html#info>`_ command and potential partners. Default empty.
 * clear: List of roles allowed to use the `clear <moderator.html#clear>`_ command. By default, none.
 * slowmode: List of roles allowed to use the `slowmode <moderator.html#slowmode>`_ and `freeze <moderator.html#freeze>`_ commands. By default, none.
 * mute: List of roles allowed to use the `mute <moderator.html#mute>`_ command. By default, none.
@@ -69,7 +70,7 @@ List of every option
 * poll_channels: List of channels in which the bot will add the reactions 👍 and 👎 to each message
 * enable_xp: Boolean indicating whether the xp system is activated. Default is :code:`True`.
 * levelup_msg: Message to send when someone reaches a new XP level. You can use :code:`{level}` variable to include the reached level, and :code:`{user}` to mention the user. Default is a random sentence.
-* xp_type: Type of XP system to use: :code:`global` if you want to use the accross-server system, common with every other servers which use it, or :code:`mee6` if you want to use the `MEE6 <https://mee6.xyz>`_ levels plugin. Default to :code:`global`.
+* xp_type: Type of XP system to use: :code:`global` if you want to use the accross-server system, common with every other servers which use it, or :code:`local` if you want a more private system. Default to :code:`global`.
 * noxp_channels: List of text channels where members will not be able to earn any exp. Not necessary if XP is disabled in your server.
 * anti_caps_lock: Boolean indicating whether the bot should send a warning message when a message with too much capitalization is sent. Default is True.
 * enable_fun: Boolean indicating if the fun part (documentation in preparation) is activated. If so, all commands in this section will be available. Default is :code:`True`.
@@ -80,6 +81,7 @@ List of every option
 * partner_channel: One channel where every partners of the server will be displayed. Default to None.
 * partner_color: The color of the partners embeds. Can be hex, integer or common english names. Default to #a713fe.
 * partner_role: A role given to every administrator of a partner server. Default to None.
+* update_mentions: A list of roles which will be mentioned in each update changelog. You can enable those changelogs with the `bot_news` option. Default to None.
 
 
 
@@ -98,6 +100,14 @@ Add a partner
 **Syntax:**:code:`partner add <invite> [description]`
 
 Allows you to add a server or bot to your partner list. The invitation must be either a server invitation (starting with discord.gg) or a bot invitation (discordapp.com/oauth). This invitation will be used to synchronize the partner, so make sure it does not expire.
+
+
+Change the embed color
+----------------------
+
+**Syntax:**:code:`partner color <new color>`
+
+Modifies the color of the partner embed, i. e. the color of the bar to the left of the presentations. An alias exists with the subcommand "colour".
 
 
 Modify a description
@@ -127,8 +137,17 @@ Lists all the partners that your server currently has. The bot will display the 
 
 .. warning:: For a better display of the list, it is recommended to give "`Embed Links <perms.html#embed-links>`_" permission to the bot.
 
+
+Reload your list
+----------------
+
+**Syntax:**:code:`partner reload`
+
+Allows you to remove a partner from the list. You will be asked for a confirmation, to avoid misuse. Once a partner is removed, you must reconfigure it completely if you want to put it back into the channel.
+
+
 Remove a partner
------------------
+----------------
 
 **Syntax:**:code:`partner remove <ID>`
 

@@ -1,4 +1,4 @@
-import discord, random, time, asyncio, io, imageio, importlib, re, os, operator, platform, typing, aiohttp
+import discord, random, time, asyncio, io, imageio, importlib, re, os, operator, platform, typing, aiohttp, mysql
 from discord.ext import commands
 from math import ceil
 from json import dumps
@@ -13,11 +13,13 @@ from fcts import args, checks
 importlib.reload(args)
 importlib.reload(checks)
 
+
+
 class XPCog(commands.Cog):
 
     def __init__(self,bot):
         self.bot = bot
-        self.cache = dict() # {ID : [date, xp]}
+        self.cache = {'global':{}}
         self.levels = [0]
         self.embed_color = discord.Colour(0xffcf50)
         self.table = 'xp_beta' if bot.beta else 'xp'
@@ -34,42 +36,82 @@ class XPCog(commands.Cog):
             self.translate = bot.cogs['LangCog'].tr
         except:
             pass
-        self.types = ['global','mee6']
+        self.types = ['global','mee6','local']
+        if platform.system()=='Darwin':
+            verdana_name = 'Verdana.ttf'
+        else:
+            verdana_name = 'Veranda.ttf'
+        self.fonts = {'xp_fnt': ImageFont.truetype(verdana_name, 24),
+        'NIVEAU_fnt': ImageFont.truetype(verdana_name, 42),
+        'levels_fnt': ImageFont.truetype(verdana_name, 65),
+        'rank_fnt': ImageFont.truetype(verdana_name,29),
+        'RANK_fnt': ImageFont.truetype(verdana_name,23)}
     
     @commands.Cog.listener()
     async def on_ready(self):
         self.translate = self.bot.cogs['LangCog'].tr
         self.table = 'xp_beta' if self.bot.beta else 'xp'
-        await self.bdd_load_cache()
+        bot_guilds = [x.id for x in self.bot.guilds]
+        for guild in [x[0] for x in await self.bot.cogs["ServerCog"].get_server(['ID'],criters=["`xp_type`=0"],Type=list)]:
+            if guild in bot_guilds:
+                await self.bdd_load_cache(guild,True)
 
     async def add_xp(self,msg):
         """Attribue un certain nombre d'xp à un message"""
         if msg.author.bot or msg.guild==None or not self.bot.xp_enabled:
             return
-        if not await self.check_noxp(msg) or await self.bot.cogs['ServerCog'].find_staff(msg.guild.id,'xp_type')==1:
+        used_xp_type = await self.bot.cogs['ServerCog'].find_staff(msg.guild.id,'xp_type')
+        if not await self.check_noxp(msg) or used_xp_type==1:
             return 
-        if len(self.cache)==0:
-            await self.bdd_load_cache()
-        if msg.author.id in self.cache.keys():
-            if time.time() - self.cache[msg.author.id][0] < self.cooldown:
-                return
-        s = await self.bot.cogs['ServerCog'].find_staff(msg.guild.id,'enable_xp')
-        if not s:
+        if not await self.bot.cogs['ServerCog'].find_staff(msg.guild.id,'enable_xp'):
             return
+        if used_xp_type==0:
+            await self.add_xp_0(msg)
+        elif used_xp_type==2:
+            await self.add_xp_2(msg)
+    
+    async def add_xp_0(self,msg):
+        if msg.author.id in self.cache['global'].keys():
+            if time.time() - self.cache['global'][msg.author.id][0] < self.cooldown:
+                return
         content = msg.clean_content
         if len(content)<self.minimal_size or await self.check_spam(content) or await self.check_cmd(msg):
             return
         giv_points = await self.calc_xp(msg)
-        if msg.author.id in self.cache.keys():
-            prev_points = self.cache[msg.author.id][1]
+        if msg.author.id in self.cache['global'].keys():
+            prev_points = self.cache['global'][msg.author.id][1]
         else:
             prev_points = 0
-        await self.bdd_set_xp(msg.author.id, giv_points,'add')
-        self.cache[msg.author.id] = [round(time.time()), prev_points+giv_points]
-        new_lvl = await self.calc_level(self.cache[msg.author.id][1])
+        await self.bdd_set_xp(msg.author.id, giv_points, 'add')
+        self.cache['global'][msg.author.id] = [round(time.time()), prev_points+giv_points]
+        new_lvl = await self.calc_level(self.cache['global'][msg.author.id][1])
         if 1 < (await self.calc_level(prev_points))[0] < new_lvl[0]:
             await self.send_levelup(msg,new_lvl)
             await self.give_rr(msg.author,new_lvl[0],await self.rr_list_role(msg.guild.id))
+    
+    async def add_xp_2(self,msg):
+        if msg.guild.id not in self.cache.keys() or len(self.cache[msg.guild.id])==0:
+            await self.bdd_load_cache(msg.guild.id, False)
+        if msg.author.id in self.cache[msg.guild.id].keys():
+            if time.time() - self.cache[msg.guild.id][msg.author.id][0] < self.cooldown:
+                return
+        content = msg.clean_content
+        if len(content)<self.minimal_size or await self.check_spam(content) or await self.check_cmd(msg):
+            return
+        giv_points = await self.calc_xp(msg)
+        if msg.author.id in self.cache[msg.guild.id].keys():
+            prev_points = self.cache[msg.guild.id][msg.author.id][1]
+        else:
+            prev_points = 0
+        await self.bdd_set_xp(msg.author.id, giv_points, 'add', msg.guild.id)
+        self.cache[msg.guild.id][msg.author.id] = [round(time.time()), prev_points+giv_points]
+        new_lvl = await self.calc_level(self.cache[msg.guild.id][msg.author.id][1])
+        if 1 < (await self.calc_level(prev_points))[0] < new_lvl[0]:
+            await self.send_levelup(msg,new_lvl)
+            await self.give_rr(msg.author,new_lvl[0],await self.rr_list_role(msg.guild.id))
+    
+    
+
 
     async def check_noxp(self,msg):
         """Check if this channel/user can get xp"""
@@ -180,17 +222,36 @@ class XPCog(commands.Cog):
                 pass
         return c
 
-    async def bdd_set_xp(self,userID,points,Type='add'):
-        """Ajoute/reset de l'xp à un utilisateur dans la database générale"""
+    async def get_table(self,guild:int):
+        """Get the table name of a guild, and create one if no one exist"""
+        if guild==None:
+            return self.table
+        cnx = self.bot.cnx_xp
+        cursor = cnx.cursor()
+        try:
+            cursor.execute("SELECT 1 FROM `{}` LIMIT 1;".format(guild))
+            return guild
+        except mysql.connector.errors.ProgrammingError:
+            cursor.execute("CREATE TABLE `{}` LIKE `example`;".format(guild))
+            cursor.execute("SELECT 1 FROM `{}` LIMIT 1;".format(guild))
+            return guild
+
+
+    async def bdd_set_xp(self,userID,points,Type='add',guild:int=None):
+        """Ajoute/reset de l'xp à un utilisateur dans la database"""
         try:
             if points==0:
                 return True
-            cnx = self.bot.cnx
+            if guild==None:
+                cnx = self.bot.cnx_frm
+            else:
+                cnx = self.bot.cnx_xp
+            table = await self.get_table(guild)
             cursor = cnx.cursor(dictionary = True)
             if Type=='add':
-                query = ("INSERT INTO `{t}` (`userID`,`xp`) VALUES ('{u}','{p}') ON DUPLICATE KEY UPDATE xp = xp + '{p}';".format(t=self.table,p=points,u=userID))
+                query = ("INSERT INTO `{t}` (`userID`,`xp`) VALUES ('{u}','{p}') ON DUPLICATE KEY UPDATE xp = xp + '{p}';".format(t=table,p=points,u=userID))
             else:
-                query = ("INSERT INTO `{t}` (`userID`,`xp`) VALUES ('{u}','{p}') ON DUPLICATE KEY UPDATE xp = '{p}';".format(t=self.table,p=points,u=userID))
+                query = ("INSERT INTO `{t}` (`userID`,`xp`) VALUES ('{u}','{p}') ON DUPLICATE KEY UPDATE xp = '{p}';".format(t=table,p=points,u=userID))
             cursor.execute(query)
             cnx.commit()
             cursor.close()
@@ -199,11 +260,14 @@ class XPCog(commands.Cog):
             await self.bot.cogs['ErrorsCog'].on_error(e,None)
             return False
     
-    async def bdd_get_xp(self,userID):
+    async def bdd_get_xp(self,userID,guild:int):
         try:
-            cnx = self.bot.cnx
+            if guild==None:
+                cnx = self.bot.cnx_frm
+            else:
+                cnx = self.bot.cnx_xp
+            query = ("SELECT `xp` FROM `{}` WHERE `userID`={} AND `banned`=0".format(await self.get_table(guild),userID))
             cursor = cnx.cursor(dictionary = True)
-            query = ("SELECT `xp` FROM `{}` WHERE `userID`={}".format(self.table,userID))
             cursor.execute(query)
             liste = list()
             for x in cursor:
@@ -218,12 +282,15 @@ class XPCog(commands.Cog):
         except Exception as e:
             await self.bot.cogs['ErrorsCog'].on_error(e,None)
     
-    async def bdd_get_nber(self):
+    async def bdd_get_nber(self,guild:int=None):
         """Get the number of ranked users"""
         try:
-            cnx = self.bot.cnx
+            if guild==None:
+                cnx = self.bot.cnx_frm
+            else:
+                cnx = self.bot.cnx_xp
+            query = ("SELECT COUNT(*) FROM `{}` WHERE `banned`=0".format(await self.get_table(guild)))
             cursor = cnx.cursor(dictionary = False)
-            query = ("SELECT COUNT(*) FROM `{}` WHERE `banned`=0".format(self.table))
             cursor.execute(query)
             liste = list()
             for x in cursor:
@@ -235,18 +302,34 @@ class XPCog(commands.Cog):
         except Exception as e:
             await self.bot.cogs['ErrorsCog'].on_error(e,None)
 
-    async def bdd_load_cache(self):
+    async def bdd_load_cache(self,guild:int,globalS:bool=False):
         try:
-            cnx = self.bot.cnx
+            self.bot.log.info("Chargement du cache XP (guild {})".format(guild))
+            if globalS:
+                cnx = self.bot.cnx_frm
+                query = ("SELECT `userID`,`xp` FROM `{}` WHERE `banned`=0".format(self.table))
+            else:
+                cnx = self.bot.cnx_xp
+                query = ("SELECT `userID`,`xp` FROM `{}` WHERE `banned`=0".format(await self.get_table(guild)))
             cursor = cnx.cursor(dictionary = True)
-            self.bot.log.info("Chargement du cache XP")
-            query = ("SELECT `userID`,`xp` FROM `{}` WHERE `banned`=0".format(self.table))
             cursor.execute(query)
             liste = list()
             for x in cursor:
                 liste.append(x)
-            for l in liste:
-                self.cache[l['userID']] = [round(time.time())-60,l['xp']]
+            if len(liste)==0:
+                self.cache['global' if globalS else guild] = {}
+            if globalS:
+                for l in liste:
+                    if len(self.cache['global'].keys())==0:
+                        self.cache['global'] = {l['userID']:[round(time.time())-60,l['xp']]}
+                    else:
+                        self.cache['global'][l['userID']] = [round(time.time())-60,l['xp']]
+            else:
+                for l in liste:
+                    if guild not in self.cache.keys():
+                        self.cache[guild] = {l['userID']:[round(time.time())-60,l['xp']]}
+                    else:
+                        self.cache[guild][l['userID']] = [round(time.time())-60,l['xp']]
             cursor.close()
             return liste
         except Exception as e:
@@ -254,9 +337,13 @@ class XPCog(commands.Cog):
 
     async def bdd_get_top(self,top:int,guild:discord.Guild=None):
         try:
-            cnx = self.bot.cnx
+            if guild!=None and await self.bot.cogs['ServerCog'].find_staff(guild.id,'xp_type')==2:
+                cnx = self.bot.cnx_xp
+                query = ("SELECT * FROM `{}` order by `xp` desc".format(await self.get_table(guild.id)))
+            else:
+                cnx = self.bot.cnx_frm
+                query = ("SELECT * FROM `{}` order by `xp` desc".format(self.table))
             cursor = cnx.cursor(dictionary = True)
-            query = ("SELECT * FROM `{}` order by `xp` desc".format(self.table))
             cursor.execute(query)
             liste = list()
             if guild==None:
@@ -277,11 +364,15 @@ class XPCog(commands.Cog):
     async def bdd_get_rank(self,userID:int,guild:discord.Guild=None):
         """Get the rank of a user"""
         try:
-            cnx = self.bot.cnx
+            if guild!=None and await self.bot.cogs['ServerCog'].find_staff(guild.id,'xp_type')==2:
+                cnx = self.bot.cnx_xp
+                query = ("SELECT `userID`,`xp`, @curRank := @curRank + 1 AS rank FROM `{}` p, (SELECT @curRank := 0) r WHERE `banned`='0' ORDER BY xp desc;".format(await self.get_table(guild.id)))
+            else:
+                cnx = self.bot.cnx_frm
+                query = ("SELECT `userID`,`xp`, @curRank := @curRank + 1 AS rank FROM `{}` p, (SELECT @curRank := 0) r WHERE `banned`='0' ORDER BY xp desc;".format(self.table))
             cursor = cnx.cursor(dictionary = True)
-            query = ("SELECT `userID`,`xp`, @curRank := @curRank + 1 AS rank FROM `{}` p, (SELECT @curRank := 0) r WHERE `banned`='0' ORDER BY xp desc;".format(self.table))
             cursor.execute(query)
-            userdata = list()
+            userdata = dict()
             i = 0
             if guild!=None:
                 users = [x.id for x in guild.members]
@@ -300,7 +391,7 @@ class XPCog(commands.Cog):
     async def bdd_total_xp(self):
         """Get the total number of earned xp"""
         try:
-            cnx = self.bot.cnx
+            cnx = self.bot.cnx_frm
             cursor = cnx.cursor(dictionary = True)
             query = ("SELECT SUM(xp) FROM `{}`".format(self.table))
             cursor.execute(query)
@@ -308,7 +399,18 @@ class XPCog(commands.Cog):
             for x in cursor:
                 liste.append(x)
             cursor.close()
-            return round(liste[0]['SUM(xp)'])
+            result = round(liste[0]['SUM(xp)'])
+
+            cnx = self.bot.cnx_xp
+            cursor = cnx.cursor()
+            cursor.execute("show tables")
+            tables = [x[0] for x in cursor if x[0].isnumeric()]
+            for table in tables:
+                cursor.execute("SELECT SUM(xp) FROM `{}`".format(table))
+                res = [x for x in cursor]
+                result += round(res[0][0])
+            cursor.close()
+            return result
         except Exception as e:
             await self.bot.cogs['ErrorsCog'].on_error(e,None)
 
@@ -334,15 +436,12 @@ class XPCog(commands.Cog):
         colors = {'name':(124, 197, 118),'xp':(124, 197, 118),'NIVEAU':(255, 224, 77),'rank':(105, 157, 206),'bar':bar_colors}
         if style=='blurple':
             colors = {'name':(35,35,50),'xp':(235, 235, 255),'NIVEAU':(245, 245, 255),'rank':(255, 255, 255),'bar':(70, 83, 138)}
-        if platform.system()=='Darwin':
-            verdana_name = 'Verdana.ttf'
-        else:
-            verdana_name = 'Veranda.ttf'
+        
         name_fnt = ImageFont.truetype('Roboto-Medium.ttf', 40)
 
         if not user.is_avatar_animated() or force_static:
             pfp = await self.get_raw_image(user.avatar_url_as(format='png',size=256))
-            img = await self.bot.loop.run_in_executor(None,self.add_overlay,pfp.resize(size=(282,282)),user,card,xp,rank,txt,colors,levels_info,verdana_name,name_fnt)
+            img = await self.bot.loop.run_in_executor(None,self.add_overlay,pfp.resize(size=(282,282)),user,card,xp,rank,txt,colors,levels_info,name_fnt)
             img.save('../cards/global/{}-{}-{}.png'.format(user.id,xp,rank[0]))
             return discord.File('../cards/global/{}-{}-{}.png'.format(user.id,xp,rank[0]))
 
@@ -357,7 +456,7 @@ class XPCog(commands.Cog):
             frames = [frame.copy() for frame in ImageSequence.Iterator(pfp)]
             for frame in frames:
                 frame = frame.convert(mode='RGBA')
-                img = await self.bot.loop.run_in_executor(None,self.add_overlay,frame.resize(size=(282,282)),user,card.copy(),xp,rank,txt,colors,levels_info,verdana_name,name_fnt)
+                img = await self.bot.loop.run_in_executor(None,self.add_overlay,frame.resize(size=(282,282)),user,card.copy(),xp,rank,txt,colors,levels_info,name_fnt)
                 img = ImageEnhance.Contrast(img).enhance(1.5).resize((800,265))
                 images.append(img)
                 duration.append(pfp.info['duration']/1000)
@@ -389,7 +488,7 @@ class XPCog(commands.Cog):
                     file_bytes.seek(0, 0)
                     return file_bytes
 
-    def add_overlay(self,pfp,user,img,xp,rank,txt,colors,levels_info,verdana_name,name_fnt):
+    def add_overlay(self,pfp,user,img,xp,rank,txt,colors,levels_info,name_fnt):
         #img = Image.new('RGBA', (card.width, card.height), color = (250,250,250,0))
         #img.paste(pfp, (20, 29))
         #img.paste(card, (0, 0), card)
@@ -403,11 +502,11 @@ class XPCog(commands.Cog):
                     cardL[x,y] = (255,255,255,0)
                     
         
-        xp_fnt = ImageFont.truetype(verdana_name, 24)
-        NIVEAU_fnt = ImageFont.truetype(verdana_name, 42)
-        levels_fnt = ImageFont.truetype(verdana_name, 65)
-        rank_fnt = ImageFont.truetype(verdana_name,29)
-        RANK_fnt = ImageFont.truetype(verdana_name,23)
+        xp_fnt = self.fonts['xp_fnt']
+        NIVEAU_fnt = self.fonts['NIVEAU_fnt']
+        levels_fnt = self.fonts['levels_fnt']
+        rank_fnt = self.fonts['rank_fnt']
+        RANK_fnt = self.fonts['RANK_fnt']
         
         img = self.add_xp_bar(img,xp-levels_info[2],levels_info[1]-levels_info[2],colors['bar'])
         d = ImageDraw.Draw(img)
@@ -449,7 +548,8 @@ class XPCog(commands.Cog):
         try:
             if user==None:
                 user = ctx.author
-            need_mee6 = ctx.guild!=None and await self.bot.cogs['ServerCog'].find_staff(ctx.guild.id,'xp_type')==1
+            xp_used_type = await self.bot.cogs['ServerCog'].find_staff(ctx.guild.id,'xp_type')
+            need_mee6 = ctx.guild!=None and xp_used_type==1
             if need_mee6:
                 if ctx.guild.get_member(159985870458322944)==None:
                     return await ctx.send(str(await self.translate(ctx.guild.id,'xp','no-mee6')).format(ctx.prefix))
@@ -458,7 +558,7 @@ class XPCog(commands.Cog):
                     return await ctx.send(await self.translate(ctx.channel,'xp','not-member'))
                 xp = await self.mee6_get_player(user)
             else:
-                xp = await self.bdd_get_xp(user.id)
+                xp = await self.bdd_get_xp(user.id,ctx.guild.id)
             if xp==None or (isinstance(xp,list) and len(xp)==0):
                 if ctx.author==user:
                     return await ctx.send(await self.translate(ctx.channel,'xp','1-no-xp'))
@@ -466,8 +566,12 @@ class XPCog(commands.Cog):
             if not need_mee6:
                 levels_info = None
                 xp = xp[0]['xp']
-                ranks_nb = await self.bdd_get_nber()
-                rank = (await self.bdd_get_rank(user.id))['rank']
+                if xp_used_type==2:
+                    ranks_nb = await self.bdd_get_nber(ctx.guild.id)
+                    rank = (await self.bdd_get_rank(user.id,ctx.guild))['rank']
+                else:
+                    ranks_nb = await self.bdd_get_nber()
+                    rank = (await self.bdd_get_rank(user.id))['rank']
             else:
                 levels_info = [xp['level'],xp['detailed_xp'][1]-xp['detailed_xp'][0]+xp['detailed_xp'][2],xp['detailed_xp'][2]-xp['detailed_xp'][0]]
                 xp = xp['xp']
@@ -544,25 +648,31 @@ class XPCog(commands.Cog):
     async def top(self,ctx,page:typing.Optional[int]=1,Type:args.LeaderboardType='global'):
         """Get the list of the highest levels
         Each page has 20 users"""
-        need_mee6 =  ctx.guild!=None and await self.bot.cogs['ServerCog'].find_staff(ctx.guild.id,'xp_type')==1
-        if not need_mee6:
+        if ctx.guild!=None:
+            xp_system_used = await self.bot.cogs['ServerCog'].find_staff(ctx.guild.id,'xp_type')
+        else:
+            xp_system_used = 0
+        if xp_system_used==0:
             if Type=='global':
                 ranks = await self.bdd_get_top(20*page)
-                max_page = ceil(len(self.cache)/20)
+                max_page = ceil(len(self.cache['global'])/20)
             elif Type=='guild':
                 ranks = await self.bdd_get_top(10000,guild=ctx.guild)
                 max_page = ceil(len(ranks)/20)
-        else:
+        elif xp_system_used==1:
             if ctx.guild.get_member(159985870458322944)==None:
                 return await ctx.send(str(await self.translate(ctx.guild.id,'xp','no-mee6')).format(ctx.prefix))
             ranks = await self.mee6_get_top(ctx.guild,20*page)
+            max_page = ceil(len(ranks)/20)
+        else:
+            ranks = await self.bdd_get_top(20*page,guild=ctx.guild)
             max_page = ceil(len(ranks)/20)
         if page<1:
             return await ctx.send(await self.translate(ctx.channel,"xp",'low-page'))
         elif page>max_page:
             return await ctx.send(await self.translate(ctx.channel,"xp",'high-page'))
         ranks = ranks[(page-1)*20:]
-        if need_mee6:
+        if xp_system_used==1:
             ranks = [{'user':x['id'],'xp':x['xp']} for x in ranks]
         else:
             ranks = [{'user':x['userID'],'xp':x['xp']} for x in ranks]
@@ -574,14 +684,14 @@ class XPCog(commands.Cog):
             await asyncio.sleep(0.2)
         f_name = str(await self.translate(ctx.channel,'xp','top-name')).format((page-1)*20+1,i,page,max_page)
         # author
-        if need_mee6:
+        if xp_system_used==1:
             lvl = await self.mee6_get_player(ctx.author)
             if lvl==None:
                 your_rank = {'name':"__"+await self.translate(ctx.channel,"xp","top-your")+"__",'value':await self.translate(ctx.guild.id,"xp","1-no-xp")}
             else:
                 your_rank = {'name':"__"+await self.translate(ctx.channel,"xp","top-your")+"__", 'value':"**#{} |** `lvl {}` **|** `xp {}`".format(await self.mee6_get_rank(ctx.author)+1,lvl['level'],lvl['xp'])}
         else:
-            rank = await self.bdd_get_rank(ctx.author.id,ctx.guild if Type=='guild' else None)
+            rank = await self.bdd_get_rank(ctx.author.id,ctx.guild if (Type=='guild' or xp_system_used==2) else None)
             if len(rank)==0:
                 your_rank = {'name':"__"+await self.translate(ctx.channel,"xp","top-your")+"__",'value':await self.translate(ctx.guild,"xp","1-no-xp")}
             else:
@@ -609,6 +719,23 @@ class XPCog(commands.Cog):
                 os.remove(f[3])
             else:
                 done.append(f[0])
+    
+
+    @commands.command(name='set_xp')
+    @commands.guild_only()
+    @commands.check(checks.has_admin)
+    async def set_xp(self,ctx,xp:int,*,user:args.user):
+        """Set the XP of a user"""
+        if user.bot:
+            return await ctx.send(await self.translate(ctx.guild.id,'xp','no-bot'))
+        if await self.bot.cogs['ServerCog'].find_staff(ctx.guild.id,'xp_type') <2:
+            return await ctx.send(await self.translate(ctx.guild.id,'xp','change-global-xp'))
+        try:
+            await self.bdd_set_xp(user.id,xp,Type='set',guild=ctx.guild.id)
+            await ctx.send(await self.translate(ctx.guild.id,'xp','change-xp-ok',user=str(user),xp=xp))
+        except Exception as e:
+            await ctx.send(await self.translate(ctx.guild.id,'mc','serv-error'))
+            await self.bot.cogs['ErrorsCog'].on_error(e,ctx)
 
 
 
@@ -617,7 +744,7 @@ class XPCog(commands.Cog):
 
     async def rr_add_role(self,guild:int,role:int,level:int):
         """Add a role reward in the database"""
-        cnx = self.bot.cnx
+        cnx = self.bot.cnx_frm
         cursor = cnx.cursor(dictionary = True)
         ID = await self.gen_rr_id()
         query = ("INSERT INTO `roles_rewards` (`ID`,`guild`,`role`,`level`) VALUES ('{i}','{g}','{r}','{l}');".format(i=ID,g=guild,r=role,l=level))
@@ -628,7 +755,7 @@ class XPCog(commands.Cog):
     
     async def rr_list_role(self,guild:int,level:int=-1):
         """List role rewards in the database"""
-        cnx = self.bot.cnx
+        cnx = self.bot.cnx_frm
         cursor = cnx.cursor(dictionary = True)
         query = ("SELECT * FROM `roles_rewards` WHERE guild={g} ORDER BY level;".format(g=guild)) if level<0 else ("SELECT * FROM `roles_rewards` WHERE guild={g} AND level={l} ORDER BY level;".format(g=guild,l=level))
         cursor.execute(query)
@@ -640,7 +767,7 @@ class XPCog(commands.Cog):
     
     async def rr_remove_role(self,ID:int):
         """Remove a role reward from the database"""
-        cnx = self.bot.cnx
+        cnx = self.bot.cnx_frm
         cursor = cnx.cursor(dictionary = True)
         query = ("DELETE FROM `roles_rewards` WHERE `ID`={};".format(ID))
         cursor.execute(query)

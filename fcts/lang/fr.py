@@ -27,7 +27,28 @@ aide={"no-subcmd":"La commande {0.name} n'a aucune sous-commande",
         "no-desc-cog":"Aucune description pour ce module.",
         "no-desc-cmd":"Aucune description pour cette commande",
         "cmd-not-found":"Aucune commande nommée \"{}\"",
-        "subcmd-not-found":"Cette commande ne possède aucune sous-commande nommée \"{}\""
+        "subcmd-not-found":"Cette commande ne possède aucune sous-commande nommée \"{}\"",
+        "aliases":"Alias :",
+        "not-enabled":":warning: Cette commande est désactivée",
+        "check-desc":{'check_admin':['Il faut être administrateur du bot',"Vous n'êtes pas administrateur du bot"],
+                'can_ban':["L'un de vos rôles est autorisé à utiliser cette commande (`ban`)","Rôle autorisé manquant (`ban`)"],
+                'can_mute':["L'un de vos rôles est autorisé à utiliser cette commande (`mute`)","Rôle autorisé manquant (`mute`)"],
+                'can_warn':["L'un de vos rôles est autorisé à utiliser cette commande (`warn`)","Rôle autorisé manquant (`warn`)"],
+                'can_kick':["L'un de vos rôles est autorisé à utiliser cette commande (`kick`)","Rôle autorisé manquant (`kick`)"],
+                'can_slowmode':["L'un de vos rôles est autorisé à utiliser cette commande (`slowmode`)","Rôle autorisé manquant (`slowmode`)"],
+                'can_clear':["L'un de vos rôles est autorisé à utiliser cette commande (`clear`)","Rôle autorisé manquant (`clear`)"],
+                'has_admin':["Vous avez la permission 'Administrateur'","Permission 'Administrateur' manquante"],
+                'has_manage_msg':["Vous avez la permission 'Gérer les messages'","Permission 'Gérer les messages' manquante"],
+                'has_manage_guild':["Vous avez la permission 'Gérer le serveur'","Permission 'Gérer le serveur' manquante"],
+                'has_manage_roles':["Vous avez la permission 'Gérer les rôles'","Permission 'Gérer les rôles' manquante"],
+                'has_manage_nicknames':["Vous avez la permission 'Gérer les pseudos'","Permission 'Gérer les pseudos' manquante"],
+                'guild_only':['Utilisable uniquement dans un serveur']*2,
+                'can_edit_case':["L'un de vos rôles est autorisé à utiliser cette commande (`warn`)","Rôle autorisé manquant (`warn`)"],
+                'is_support_staff':['Vous faites partie du staff du bot','Vous devez faire partie du staff du bot'],
+                'is_fun_enabled':['Les commandes de fun sont activées','Les commandes de fun doivent être activées'],
+                'can_use_rss':["Vous avez la permission 'Administrateur'","Permission 'Administrateur' manquante"],
+                'is_owner':['Il faut être le propriétaire du bot',"Vous n'êtes pas le propriétaire du bot"],
+                'bot_has_permissions':["Le bot possède les permissions suffisantes","Le bot ne possède pas les permissions suffisantes"]}
         }
 
 blurple = {'check_intro':"{}, début de l'analyse blurple (Notez que cela peut prendre un certain temps)",
@@ -63,8 +84,11 @@ cases={"no-user":"Impossible de trouver cet utilisateur",
         "cases-0":"{} casiers trouvés : ({}-{})",
         "search-0":"**Membre:** {U}\n**Type:** {T}\n**Moderateur:** {M}\n**Date:** {D}\n**Raison:** *{R}*",
         "search-1":"**Membre:** {U}\n**Serveur:** {G}\n**Type:** {T}\n**Moderateur:** {M}\n**Date:** {D}\n**Raison:** *{R}*",
+        "list-0":"**Type:** {T}\n**Moderateur:** {M}\n**Date:** {D}\n**Raison:** *{R}*",
+        "list-1":"**Serveur:** {G}\n**Type:** {T}\n**Moderateur:** {M}\n**Date:** {D}\n**Raison:** *{R}*",
+        "list-2":"\n**Durée :** {D}",
         'title-search':'Casier #{}',
-        'no_database':"En raison d'une panne temporaire de la base de donnée, cette commande a été désactivée"
+        'no_database':"En raison d'une panne temporaire de la base de donnée, cette commande a été désactivée",
         }
 
 events={'mp-adv':"Vous cherchez sans doute à m'inviter sur ce serveur ? Si c'est le cas, je ne peux pas le rejoindre avec une simple invitation. Il faut qu'un administrateur utilise mon propre lien d'invitation, ici : <https://bot.discord.io/zbot> :wink:"}
@@ -97,10 +121,10 @@ find={"user-0":"Nom : {}\nID : {}",
         }
 
 fun={"count-0":"Comptage en cours...",
-        "count-1":"Sur les {} derniers messages, vous en avez posté {} ({}%)",
+        "count-1":"Sur les {limit} derniers messages, vous en avez posté {x} ({p}%)",
         "count-2":"Mais vous voulez faire exploser Discord ! {e} Pour des raisons évidentes de performances, je vais vous imposer une limite à {l} messages.",
         "count-3":"Oups, il m'est impossible de lire l'historique de ce salon. Veuillez vérifier mes permissions...",
-        "count-4":"Sur les {} derniers messages, {} en a posté {} ({}%)",
+        "count-4":"Sur les {limit} derniers messages, {user} en a posté {x} ({p}%)",
         "fun-list":"Voici la liste des commandes fun disponibles :",
         "no-fun":"Les commandes fun ont été désactivées sur ce serveur. Pour voir leur liste, regardez https://zbot.rtfd.io/en/v3/fun.html",
         "osekour":["Attends, je finis de regarder mon film","On arrive ! Mais pourquoi ne répondez-vous plus ? Ne simulez pas la mort !","Oui on sait qu'il y a du feu, on n'a pas besoin de venir : on fait un barbecue à la caserne","*Les secours sont actuellement indisponibles, veuillez attendre la fin de la pause*","*Ce numéro n'existe pas. Veuillez réessayer avec un autre numéro.*","*Maintenance de la ligne en cours. Veuillez réessayer d'ici 430 heures.*","*Votre forfait mobile est arrivé à son terme. Vous pouvez en racheter un pour 86,25€*","Encore 2 tomes du Seigneur des Anneaux à finir de lire, et je suis à vous !","Merci de ne pas nous déranger pendant les fêtes","Désolé, il y a plus de 3 flocons de neige: nous sommes coincés au garage","Il va falloir attendre la fin de notre grève... Comment ça, vous n'êtes pas au courant ?! Ça fait pourtant bien deux mois que nous avons commencé !"],
@@ -133,7 +157,28 @@ fun={"count-0":"Comptage en cours...",
         "afk-user-1":"Ce membre est AFK, pour la raison {}",
         "afk-user-2":"Ce membre est AFK !",
         "afk-done":"Vous êtes maintenant AFK",
-        "unafk-done":"Vous n'êtes maintenant plus AFK"
+        "unafk-done":"Vous n'êtes maintenant plus AFK",
+        "tip-list":["Le saviez-vous ? Il existe plusieurs langues pour le bot, dont une très amusante à tester : le lolcat",
+                "Pro-tip : pour changer la langue du bot, utilisez la commande `config` !",
+                "Pro-tip : vous trouverez les explications de chaque commande dans la documentation du bot, à l'adresse https://zbot.rtfd.io. Peut-être même des commandes que vous ne connaissiez pas !",
+                "Le saviez-vous ? Les résultats de la commande `stats` cachent certains serveurs, comme les serveurs de liste de bots, ou ceux internes",
+                "Le saviez-vous ? Ce bot était au début conçu pour un serveur d'une communauté Minecraft. C'est de là qu'il s'est fait connaître, et c'est ce qui explique toutes ses commandes sur le thème du jeu",
+                "Le saviez-vous ? La première version du bot a été écrite en février 2018, pour un usage personnel. A l'époque il n'y avait que deux trois commandes faciles à faire, comme le `clear` et le `say`",
+                "Pro-tip : Avec la commande `say`, vous pouvez utiliser les émojis de n'importe quel serveur où est Zbot, même les émojis animés ! Il suffit de donner l'émoji comme si vous l'utilisez vous-même",
+                "Pro-tip : Pour utiliser un émoji custom dans la commande `react`, il suffit de donner son nom. Et cela fonctionne avec n'importe quel émoji !",
+                "Pro-tip : Avec la commande `me <texte>`, vous pouvez faire dire au bot ce que vous voulez, avec votre pseudo devant ! Comme par exemple \"*Wumpus aime les bananes*\"",
+                "Pro-tip : La commande `roll Rien ; Rien ; Rien ; Rien ; Rien ; PAN !` vous permet de jouer à la roulette russe ! Faites tout de même attention avec ça, d'accord ?",
+                "Pro-tip : Si vous avez besoin d'aide, n'hésitez pas à utiliser la commande `osekour`",
+                "Le saviez-vous ? Des fois, le message de levelup mentionne un objet aléatoire. Pour ce faire, Aragorn1202 a dû créer une liste de 60 d'entre eux, dont 'un bicorne', 'un cookie' ou 'une banane' !",
+                "Le saviez-vous ? Dans le passé, la photo de profil de Zbot était... un creeper.",
+                "Le saviez-vous ? Le Staff de ZBot est Composé d'un Admin développeur talentueux, d'un deuxième admin ayant comme nom une marque de croquette ainsi que d'un chat, un marteau de Ban et un champignon !",
+                "Pro-tip : La commande `say <texte>` est très utile pour poster des messages anonymes... du moins quand vous y avez accès.",
+                "Pro-tip : La commande `discordlinks` vous donnera tous les liens utiles relatifs à discord !",
+                "Le saviez-vous ?  Tous les designs relatifs au bot sont réalisés par Adri526#9223, dont l'énorme liste d'émojis utilisés dans la commande `bigtext` !",
+                "Le saviez-vous ? ZBot tiens son nom... de son créateur, Z_runner",
+                "Pro-tip : Le bot possède un Discord, où vous pourrez voir les bugs actuels et voter pour les prochaines mises à jour ! Utilisez la commande `about` pour en obtenir le lien",
+                "Pro-tip : la commande `prefix` permet d'avoir la liste des préfixes actuellement utilisables dans le serveur"
+                ],
         }
 
 infos={"text-0":"""Bonjour ! Moi c'est {0} !
@@ -342,7 +387,9 @@ modo={"slowmode-0":"Le slowmode est désormais désactivé dans ce salon.",
         "em-list-title":"Emojis du serveur {}",
         "tempmute-1":"Le membre {} a bien été réduit au silence pour la raison `{}`, pendant {} !",
         "role-high":"Oups, ce rôle est trop haut pour que je puisse le modifier. Merci de déplacer mon rôle au-dessus du rôle `{}` avant de réessayer :confused:",
-        'role-color':'Le rôle {} a changé de couleur !'
+        'role-color':'Le rôle {} a changé de couleur !',
+        'unhoisted':'{c} surnoms édités !',
+        'missing-manage-nick':"Oups, il me manque la permission \"Gérer les pseudos\"",
         }
 
 morpion={'user-begin':'{}, à toi de commencer !',
@@ -374,6 +421,10 @@ partners={'invalid-bot':"Impossible de trouver ce bot",
         'no-partner-2':"Aucun serveur n'a de partenariat avec vous",
         'partners-list':['Partenaires du serveur','Liste de vos partenaires','Liste des serveurs vous ayant comme partenaire'],
         "missing-manage-guild":"Impossible de voir les invitations de ce serveur (permission 'Gérer le serveur' manquante)",
+        'bot-uptime':"Disponibilité",
+        'no-channel':"Aucun salon de partenaires n'a été configuré",
+        'reloaded':"{} partenaires ont été rechargés",
+        'already-added':"Vous avez déjà ajouté ce partenaire !",
         }
 
 perms={"perms-0":"Le membre/rôle {} n'a pas été trouvé",
@@ -490,6 +541,7 @@ l'option (`!config change <option> del` fonctionne de même).\nLa liste des opti
 
 server_desc={"prefix":"Préfixe actuel du bot : {}",
         "language":"Langue actuelle du bot pour ce serveur : **{}**",
+        "description":"Description du serveur :\n {}",
         "clear":"Liste des rôles qui peuvent utiliser la commande 'clear' : {}",
         "slowmode":"Liste des rôles qui peuvent utiliser les commandes 'slowmode' et 'freeze' : {}",
         "mute":"Liste des rôles qui peuvent utiliser la commande 'mute' : {}",
@@ -519,7 +571,8 @@ server_desc={"prefix":"Préfixe actuel du bot : {}",
         "xp_type":"Type de système d'xp : {}",
         "partner_channel":"Salon dans lequel envoyer les partenaires : {}",
         "partner_color":"Couleur de l'embed des partenaires : {}",
-        "partner_role":"Rôle donné aux partenaires : {}"
+        "partner_role":"Rôle donné aux partenaires : {}",
+        "update_mentions":"Rôles mentionnés lors d'une mise à jour du bot : {}",
         }
 
 stats_infos={"not-found":"Impossible de trouver {N}",
@@ -564,6 +617,10 @@ stats_infos={"not-found":"Impossible de trouver {N}",
         "guild-11.1":"20 premiers rôles ({} total)",
         "guild-11.2":"Liste des rôles ({} total)",
         "guild-12":"Nombre d'invitations",
+        "guild-13":"Nombre de boosts",
+        "guild-13v":"{b} (palier {p})",
+        "guild-14":"Limitations",
+        "guild-14v":"Bitrate : {bit}kbps\nTaille de fichier : {fil}MB\nNombre d'émojis : {emo}\nNombre de membres connectés : {mem}",
         "inv-0":"Adresse url",
         "inv-1":"Créateur",
         "inv-2":"Utilisations",
@@ -583,7 +640,9 @@ users = {'invalid-card':'Ce style est invalide. Voici la liste des styles que vo
         'card-desc':"Voici un exemple de votre carte d'xp. Vous pouvez entrer la commande `profile card <style>` pour changer le style\n*Votre carte d'xp ne se réactualisera que lorsque vous aurez gagné de l'xp*",
         'allow_animated_true':"Les cartes d'xp animées sont actuellement autorisées pour vous",
         'allow_animated_false':"Les cartes d'xp animées ne sont actuellement pas autorisées pour vous",
-        'allow_animated_success':"Ce paramètre a bien été redéfini à {}"
+        'allow_animated_success':"Ce paramètre a bien été redéfini à {}",
+        'allow_auto_unafk_true':"Je vous enlèverai le tag AFK dès que vous enverrez un message",
+        'allow_auto_unafk_false':"Vous devez enlever le tag AFK vous-même",
         }
 
 xp = {'card-level':'NIVEAU',
@@ -638,4 +697,7 @@ xp = {'card-level':'NIVEAU',
         'too-many-rr':"Vous avez déjà {} rôles, vous ne pouvez pas en ajouter plus !",
         'rr-reload':"{} rôles mis à jour / {} membres scannés",
         'no-mee6':"Oups, vous avez configuré le type de système d'xp pour utiliser celui de MEE6, mais ce bot n'est pas dans le serveur ! Changez le type de système (`{}config change xp_type` suivit du nom du système), ou invitez MEE6 ici.",
+        'change-global-xp':"Impossible d'éditer l'XP du système global !",
+        'change-xp-ok':"L'XP de l'utilisateur {user} a bien été mis à {xp} points !",
+        'no-bot':"Impossible de modifier l'XP d'un bot !"
     }

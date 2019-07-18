@@ -3,7 +3,7 @@
 
 def check_libs():
     count = 0
-    for m in ["mysql","discord","frmc_lib","aiohttp","requests","re","asyncio","datetime","time","importlib","traceback","sys","logging","sympy","psutil","platform","subprocess",'json','emoji','imageio','platform','geocoder','tzwhere','pytz','dbl']:
+    for m in ["mysql","discord","frmc_lib","aiohttp","requests","re","asyncio","datetime","time","importlib","traceback","sys","logging","sympy","psutil","platform","subprocess",'json','emoji','imageio','geocoder','tzwhere','pytz','dbl']:
         try:
             exec("import "+m)
             exec("del "+m)
@@ -73,27 +73,46 @@ class zbot(commands.bot.BotBase,discord.Client):
         self.database_keys = dict()
         self.log = logging.getLogger("runner")
         self.dbl_token = dbl_token
-        self._cnx = [None,0]
+        self._cnx = [[None,0],[None,0]]
         self.xp_enabled = True
         self.rss_enabled = True
         self.others = dict()
     
     @property
-    def cnx(self):
-        if self._cnx[1] + 1260 < round(time.time()): # 21min
-            self.connect_database()
-            self._cnx[1] = round(time.time())
-            return self._cnx[0]
+    def cnx_frm(self):
+        if self._cnx[0][1] + 1260 < round(time.time()): # 21min
+            self.connect_database_frm()
+            self._cnx[0][1] = round(time.time())
+            return self._cnx[0][0]
         else:
-            return self._cnx[0]
+            return self._cnx[0][0]
     
-    def connect_database(self):
+    def connect_database_frm(self):
         if len(self.database_keys)>0:
-            if self._cnx[0] != None:
-                self._cnx[0].close()
+            if self._cnx[0][0] != None:
+                self._cnx[0][0].close()
             self.log.debug('Connection à MySQL (user {})'.format(self.database_keys['user']))
-            self._cnx[0] = mysql.connector.connect(user=self.database_keys['user'],password=self.database_keys['password'],host=self.database_keys['host'],database=self.database_keys['database'],buffered=True)
-            self._cnx[1] = round(time.time())
+            self._cnx[0][0] = mysql.connector.connect(user=self.database_keys['user'],password=self.database_keys['password'],host=self.database_keys['host'],database=self.database_keys['database1'],buffered=True)
+            self._cnx[0][1] = round(time.time())
+        else:
+            raise ValueError(dict)
+    
+    @property
+    def cnx_xp(self):
+        if self._cnx[1][1] + 1260 < round(time.time()): # 21min
+            self.connect_database_frm()
+            self._cnx[1][1] = round(time.time())
+            return self._cnx[1][0]
+        else:
+            return self._cnx[1][0]
+    
+    def connect_database_xp(self):
+        if len(self.database_keys)>0:
+            if self._cnx[1][0] != None:
+                self._cnx[1][0].close()
+            self.log.debug('Connection à MySQL (user {})'.format(self.database_keys['user']))
+            self._cnx[1][0] = mysql.connector.connect(user=self.database_keys['user'],password=self.database_keys['password'],host=self.database_keys['host'],database=self.database_keys['database2'],buffered=True)
+            self._cnx[1][1] = round(time.time())
         else:
             raise ValueError(dict)
     
@@ -181,13 +200,13 @@ def main():
                 r.remove(s)
         while '' in r:
             r.remove('')
-        for e,s in enumerate(['user','password','host','database']):
+        for e,s in enumerate(['user','password','host','database1','database2']):
             client.database_keys[s] = cryptage.uncrypte(r[e])
-        client.others['divinediscordbots'] = cryptage.uncrypte(r[4])
-        client.others['botsondiscord'] = cryptage.uncrypte(r[5])
-        client.others['discordbotsgroup'] = cryptage.uncrypte(r[6])
+        client.others['divinediscordbots'] = cryptage.uncrypte(r[5])
+        client.others['botsondiscord'] = cryptage.uncrypte(r[6])
+        client.others['discordbotsgroup'] = cryptage.uncrypte(r[7])
     try:
-        cnx = mysql.connector.connect(user=client.database_keys['user'],password=client.database_keys['password'],host=client.database_keys['host'],database=client.database_keys['database'])
+        cnx = mysql.connector.connect(user=client.database_keys['user'],password=client.database_keys['password'],host=client.database_keys['host'],database=client.database_keys['database1'])
         cnx.close()
     except Exception as e:
         print("---- ACCES IMPOSSIBLE A LA DATABASE ----")
@@ -195,15 +214,14 @@ def main():
         client.database_online = False
 
     if client.database_online:
-        client.connect_database()
+        client.connect_database_frm()
+        client.connect_database_xp()
 
     client.dbl_token = tokens.get_dbl_token()
 
     # Here we load our extensions(cogs) listed above in [initial_extensions]
     count = 0
     for extension in initial_extensions:
-        if not client.database_online:
-            extension = extension.replace('fcts','fctshl')
         try:
             client.load_extension(extension)
         except:
@@ -257,8 +275,6 @@ def main():
     async def on_guild_remove(guild):
         await client.cogs["Events"].on_guild_del(guild)
 
-    async def on_message(msg):
-        await client.cogs["Events"].on_new_message(msg)
 
 
     async def sigterm_handler(bot):
@@ -298,7 +314,6 @@ def main():
     client.add_check(check_once,call_once=True)
     client.add_listener(on_member_join)
     client.add_listener(on_member_remove)
-    client.add_listener(on_message)
     client.add_listener(on_guild_join)
     client.add_listener(on_guild_remove)
     

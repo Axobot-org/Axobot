@@ -1,4 +1,4 @@
-import discord, random, operator, string, importlib, re, typing, datetime, subprocess, json, geocoder, time, aiohttp
+import discord, random, operator, string, importlib, re, typing, datetime, subprocess, json, geocoder, time, aiohttp, copy
 import emoji as emojilib
 from discord.ext import commands
 from tzwhere import tzwhere
@@ -132,10 +132,10 @@ class FunCog(commands.Cog):
 You can specify a verification limit by adding a number in argument"""
         l = 100000
         if limit > l:
-            await ctx.send(str(await self.translate(ctx.channel,"fun","count-2")).format(l=l,e=self.bot.cogs['EmojiCog'].customEmojis['wat']))
+            await ctx.send(await self.translate(ctx.channel,"fun","count-2",l=l,e=self.bot.cogs['EmojiCog'].customEmojis['wat']))
             return
         if ctx.guild!=None and not ctx.channel.permissions_for(ctx.guild.me).read_message_history:
-            await ctx.send(str(await self.translate(ctx.channel,"fun","count-3")).format(l))
+            await ctx.send(await self.translate(ctx.channel,"fun","count-3"))
             return
         if user==None:
             user = ctx.author
@@ -148,9 +148,9 @@ You can specify a verification limit by adding a number in argument"""
                 counter += 1
         r = round(counter*100/m,2)
         if user==ctx.author:
-            await tmp.edit(content = str(await self.translate(ctx.channel,'fun','count-1')).format(m,counter,r))
+            await tmp.edit(content = await self.translate(ctx.channel,'fun','count-1',limit=m,x=counter,p=r))
         else:
-            await tmp.edit(content = str(await self.translate(ctx.channel,'fun','count-4')).format(m,user.display_name,counter,r))
+            await tmp.edit(content = await self.translate(ctx.channel,'fun','count-4', limit=m,user=user.display_name,x=counter,p=r))
 
     @commands.command(name="ragequit",hidden=True)
     @commands.check(is_fun_enabled)
@@ -255,9 +255,12 @@ You can specify a verification limit by adding a number in argument"""
     @commands.check(is_fun_enabled)
     async def cat_gif(self,ctx):
         """Wow... So cuuuute !"""
-        await ctx.send(random.choice(['http://images6.fanpop.com/image/photos/40800000/tummy-rub-kitten-animated-gif-cute-kittens-40838484-380-227.gif','http://25.media.tumblr.com/7774fd7794d99b5998318ebd5438ba21/tumblr_n2r7h35U211rudcwro1_400.gif','https://www.2tout2rien.fr/wp-content/uploads/2014/10/37-pestes-de-chats-mes-bonbons.gif',
+        await ctx.send(random.choice(['http://images6.fanpop.com/image/photos/40800000/tummy-rub-kitten-animated-gif-cute-kittens-40838484-380-227.gif',
+        'http://25.media.tumblr.com/7774fd7794d99b5998318ebd5438ba21/tumblr_n2r7h35U211rudcwro1_400.gif',
+        'https://www.2tout2rien.fr/wp-content/uploads/2014/10/37-pestes-de-chats-mes-bonbons.gif',
         'https://snowchvojnica.eu/assets/cat.gif',
-        'http://coquelico.c.o.pic.centerblog.net/chat-peur.gif']))
+        'http://coquelico.c.o.pic.centerblog.net/chat-peur.gif',
+        'https://tenor.com/view/nope-bye-cat-leave-done-gif-12387359']))
     
     @commands.command(name="bigtext",hidden=True)
     @commands.check(is_fun_enabled)
@@ -481,6 +484,11 @@ You can specify a verification limit by adding a number in argument"""
         format_d = await self.bot.cogs['TimeCog'].date(d,lang=await self.translate(ctx.channel,"current_lang","current"))
         await ctx.send("**{}**:\n{} ({})\n ({} - lat: {} - long: {})".format(timeZoneStr,format_d,d.tzname(),g.current_result.address,round(g.json['lat'],2),round(g.json['lng'],2)))
 
+    @commands.command(name="tip")
+    async def tip(self,ctx:commands.Context):
+        """Send a tip, a fun fact or something else"""
+        await ctx.send(random.choice(await self.translate(ctx.guild,"fun","tip-list")))
+
     @commands.command(name='afk')
     @commands.check(is_fun_enabled)
     @commands.guild_only()
@@ -509,7 +517,7 @@ You can specify a verification limit by adding a number in argument"""
         except discord.errors.Forbidden:
             return await ctx.send(await self.translate(ctx.guild.id,"fun","afk-no-perm"))
     
-    async def check_afk(self,msg):
+    async def check_afk(self,msg:discord.Message):
         """Check if someone pinged is afk"""
         ctx = await self.bot.get_context(msg)
         for member in msg.mentions:
@@ -519,6 +527,12 @@ You can specify a verification limit by adding a number in argument"""
                 else:
                     reason = await self.bot.cogs['UtilitiesCog'].clear_msg(str(await self.translate(msg.guild.id,"fun","afk-user-1")).format(self.afk_guys[member.id]),everyone=True,ctx=ctx)
                     await msg.channel.send(reason)
+        if ctx.author.display_name.endswith(' [AFK]'):
+            msg = copy.copy(msg)
+            msg.content = (await self.bot.get_prefix(msg))[0] + 'unafk'
+            new_ctx = await self.bot.get_context(msg)
+            await self.bot.invoke(new_ctx)
+
 
     @commands.command(name='embed',hidden=False)
     @commands.has_permissions(embed_links=True)

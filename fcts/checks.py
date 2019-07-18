@@ -58,3 +58,7 @@ async def has_manage_guild(ctx):
 async def has_manage_roles(ctx):
     """... if someone can manage the roles"""
     return ctx.channel.permissions_for(ctx.author).manage_roles or await ctx.bot.cogs['AdminCog'].check_if_god(ctx)
+
+async def has_manage_nicknames(ctx):
+    """... if someone can change nicknames"""
+    return ctx.channel.permissions_for(ctx.author).manage_nicknames or await ctx.bot.cogs['AdminCog'].check_if_god(ctx)

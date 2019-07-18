@@ -1,5 +1,5 @@
 from discord.ext import commands
-import discord, re, datetime, random, json, os, typing, importlib
+import discord, re, datetime, random, json, os, typing, importlib, string
 from fcts import checks, args
 importlib.reload(checks)
 importlib.reload(args)
@@ -451,8 +451,6 @@ Or: mute @someone Plz respect me"""
                     await self.bot.cogs['ErrorsCog'].on_error(e,ctx)
             try:
                 await ctx.message.delete()
-            except:
-                pass
             if f_duration==None:
                 await ctx.send(str( await self.translate(ctx.guild.id,"modo","ban")).format(user,reason))
                 log = str(await self.translate(ctx.guild.id,"logs","ban")).format(member=user,reason=reason,case=caseID)
@@ -625,7 +623,7 @@ You must be an administrator of this server to use this command."""
             await self.bot.cogs['HelpCog'].help_command(ctx,['emoji'])
 
     @emoji_group.command(name="rename")
-    @commands.has_permissions(administrator=True)
+    @commands.check(checks.has_admin)
     async def emoji_rename(self,ctx,emoji:discord.Emoji,name):
         """Rename an emoji"""
         if emoji.guild != ctx.guild:
@@ -638,7 +636,7 @@ You must be an administrator of this server to use this command."""
         await ctx.send(str(await self.translate(ctx.guild.id,"modo","emoji-renamed")).format(emoji))
 
     @emoji_group.command(name="restrict")
-    @commands.has_permissions(administrator=True)
+    @commands.check(checks.has_admin)
     async def emoji_restrict(self,ctx,emoji:discord.Emoji,*,roles):
         """Restrict the use of an emoji to certain roles"""
         if emoji.guild != ctx.guild:
@@ -663,8 +661,7 @@ You must be an administrator of this server to use this command."""
         await ctx.send(str(await self.translate(ctx.guild.id,"modo","emoji-valid")).format(emoji,", ".join([x.name for x in r])))
 
     @emoji_group.command(name="clear")
-    @commands.has_permissions(manage_messages=True)
-    @commands.bot_has_permissions(manage_messages=True)
+    @commands.check(checks.has_manage_msg)
     async def emoji_clear(self,ctx,message:discord.Message):
         """Remove all reactions under a message"""
         if not ctx.channel.permissions_for(ctx.guild.me).manage_messages:
@@ -762,6 +759,156 @@ ID corresponds to the Identifier of the message"""
         except Exception as e:
             await ctx.send(str(await self.translate(ctx.channel,"modo","pin-error-2")).format(e))
             return
+    
+    @commands.command(name='unhoist')
+    @commands.guild_only()
+    @commands.check(checks.has_manage_nicknames)
+    async def unhoist(self,ctx,chars=None):
+        """"Remove the special characters from usernames"""
+        count = 0
+        if not ctx.channel.permissions_for(ctx.guild.me).manage_nicknames:
+            return await ctx.send(await self.translate(ctx.guild.id,'modo','missing-manage-nick'))
+        if chars==None:
+            accepted_chars = string.ascii_letters + string.digits
+            def check(username):
+                while not username[0] in accepted_chars:
+                    username = username[1:]
+                return username
+        else:
+            chars = chars.lower()
+            def check(username):
+                while username[0].lower() in chars+' ':
+                    username = username[1:]
+                return username
+        for member in ctx.guild.members:
+            try:
+                new = check(member.display_name)
+                if new!=member.display_name:
+                    if not self.bot.beta:
+                        await member.edit(nick=new)
+                    count += 1
+            except:
+                pass
+        await ctx.send(await self.translate(ctx.guild.id,'modo','unhoisted',c=count))
+
+    @commands.command(name='backup')
+    @commands.guild_only()
+    @commands.cooldown(2,120, commands.BucketType.guild)
+    @commands.check(checks.has_admin)
+    async def backup_server(self,ctx):
+        """Make and send a backup of this server
+        You will find there the configuration of your server, every general settings, the list of members with their roles, the list of categories and channels (with their permissions), emotes, and webhooks.
+        Please note that audit logs, messages and invites are not used"""
+        try:
+            g = ctx.guild
+            back = {'name':g.name,'id':g.id,'owner':g.owner.id,'voiceregion':str(g.region),'afk_timeout':g.afk_timeout,'afk_channel':g.afk_channel,'icon':str(g.icon_url),'verification_level':str(g.verification_level),'mfa_level':g.mfa_level,'explicit_content_filter':str(g.explicit_content_filter),'default_notifications':str(g.default_notifications),'created_at':int(g.created_at.timestamp())}
+            back['system_channel'] = g.system_channel.id if g.system_channel!=None else None
+            roles = list()
+            for x in g.roles:
+                roles.append({'id':x.id,'name':x.name,'color':str(x.colour),'position':x.position,'hoist':x.hoist,'mentionable':x.mentionable,'permissions':x.permissions.value})
+            back['roles'] = roles
+            categ = list()
+            for x in g.by_category():
+                c,l = x[0],x[1]
+                if c==None:
+                    temp = {'type':None}
+                else:
+                    temp = {'id':c.id,'name':c.name,'position':c.position,'is_nsfw':c.is_nsfw()}
+                    perms = list()
+                    for p in c.overwrites:
+                        temp2 = {'id':p[0].id}
+                        if isinstance(p[0],discord.Member):
+                            temp2['type'] = 'member'
+                        else:
+                            temp2['type'] = 'role'
+                        temp2['permissions'] = dict()
+                        for x in iter(p[1]):
+                            if x[1] != None:
+                                temp2['permissions'][x[0]] = x[1]
+                        perms.append(temp2)
+                    temp['permissions_overwrites'] = perms
+                temp['channels'] = list()
+                for chan in l:
+                    chan_js = {'id':chan.id,'name':chan.name,'position':chan.position}
+                    if isinstance(chan,discord.TextChannel):
+                        chan_js['type'] = 'TextChannel'
+                        chan_js['description'] = chan.topic
+                    elif isinstance(chan,discord.VoiceChannel):
+                        chan_js['type'] = 'VoiceChannel'
+                    else:
+                        chan_js['type'] = str(type(chan))
+                    perms = list()
+                    for p in chan.overwrites:
+                        temp2 = {'id':p[0].id}
+                        if isinstance(p[0],discord.Member):
+                            temp2['type'] = 'member'
+                        else:
+                            temp2['type'] = 'role'
+                        temp2['permissions'] = dict()
+                        for x in iter(p[1]):
+                            if x[1] != None:
+                                temp2['permissions'][x[0]] = x[1]
+                        perms.append(temp2)
+                    chan_js['permissions_overwrites'] = perms
+                    temp['channels'].append(chan_js)
+                categ.append(temp)
+            back['categories'] = categ
+            back['emojis'] = dict()
+            for e in g.emojis:
+                back['emojis'][e.name] = e.url
+            try:
+                banned = dict()
+                for b in await g.bans():
+                    banned[b.user.id] = b.reason
+                back['banned_users'] = banned
+            except:
+                await ctx.send("msg-ban")
+            try:
+                webs = list()
+                for w in await g.webhooks():
+                    webs.append({'channel':w.channel_id,'name':w.name,'avatar':w.avatar_url,'url':w.url})
+                back['webhooks'] = webs
+            except:
+                await ctx.send("msg-webhook")
+            back['members'] = list()
+            for memb in g.members:
+                back['members'].append({'id':memb.id,'nickname':memb.nick,'bot':memb.bot,'roles':[x.id for x in memb.roles][1:]})
+            js = json.dumps(back, sort_keys=True, indent=4)
+            directory = 'backup/{}.json'.format(g.id)
+            if not os.path.exists('backup/'):
+                os.makedirs('backup/')
+            with open(directory,'w',encoding='utf-8') as file:
+                file.write(js)
+            await ctx.send('Terminé !',file=discord.File(directory))
+        except Exception as e:
+            await ctx.bot.cogs['ErrorsCog'].on_cmd_error(ctx,e)
+
+
+    async def configure_muted_role(self,guild):
+        """Ajoute le rôle muted au serveur, avec les permissions nécessaires"""
+        if not guild.me.guild_permissions.manage_roles:
+            return False
+        try:
+            role = await guild.create_role(name="muted")
+            for x in guild.by_category():
+                count = 0
+                category,channelslist = x[0],x[1]
+                for channel in channelslist:
+                    if channel==None:
+                        continue
+                    if len(channel.changed_roles)!=0 and channel.changed_roles!=category.changed_roles:
+                        await channel.set_permissions(role,send_messages=False)
+                        for r in channel.changed_roles:
+                            if r.permissions.send_messages:
+                                obj = channel.overwrites_for(r)
+                                obj.send_messages=None
+                                await channel.set_permissions(r,overwrite=obj)
+                        count += 1
+                await category.set_permissions(role,send_messages=False)
+            await self.bot.cogs['ServerCog'].modify_server(guild.id,values=[('muted_role',role.id)])
+            return role
+        except Exception as e:
+            await self.bot.cogs['ErrorsCog'].on_error(e,None)
 
     @commands.command(name='backup')
     @commands.guild_only()

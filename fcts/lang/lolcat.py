@@ -27,7 +27,28 @@ aide={"no-subcmd":"Teh kommand `{0.name}` had not sub~~scribe~~commanD",
         "no-desc-cog":"No more discripton for dis cogg.",
         "no-desc-cmd":"No descripshun for those c:o2:mmand",
         "cmd-not-found":"Dere are no comand naymme \"{}\"",
-        "subcmd-not-found":"Thiz commnd have no sUbcommant newmed \"{}\""
+        "subcmd-not-found":"Thiz commnd have no sUbcommant newmed \"{}\"",
+        "aliases":"Otherz names:",
+        "not-enabled":":warning: This command iz def not enable",
+        "check-desc":{'check_admin':['You need 2B one of the bot Admins',"U are not a bot Admin"],
+                'can_ban':["One of your roles iz allowd 2 use this command (`ban`)","U missed allowed role (`ban`)"],
+                'can_mute':["One of your roles iz allowd to use this command (`mute`)","U missed allowed role (`mute`)"],
+                'can_warn':["One of ur roles iz allowd 2 use this command (`warn`)","U missed allowed role (`warn`)"],
+                'can_kick':["One of your roles iiz allowd to use this command (`kick`)","U missed allowed role (`kick`)"],
+                'can_slowmode':["One of your roles's authorized 2 use this command (`slowmode`)","U missed allowed role (`slowmode`)"],
+                'can_clear':["One of Ur roles is authorized to use this command (`clear`)","U missed allowed role (`clear`)"],
+                'has_admin':["U have 'Administrator' permission","'Administrator' permission missed"],
+                'has_manage_msg':["You have 'Manage Messages' permission","'Manage Messages' permission missed"],
+                'has_manage_guild':["U have 'Manage Server' permission","'Manage Server' permission missed"],
+                'has_manage_roles':["You have 'Manage Roles' permission","'Manage Roles' permission missed"],
+                'has_manage_nicknames':["You have 'Manage Nicknames' permission","'Manage Nicknames' permission missed"],
+                'guild_only':['Can only be usd in a server']*2,
+                'can_edit_case':["One of UR roles is authorized to use this command (`warn`)","U missed allowed role (`warn`)"],
+                'is_support_staff':["You're a member of the bot staff",'U must be part of the bot staff'],
+                'is_fun_enabled':['Fun commands are enabled','Fun commands must be enabled'],
+                'can_use_rss':["U have 'Administrator' permission","'Administrator' permission is missed"],
+                'is_owner':["You must be the owner of the bot","You are not the owner of the bot"],
+                'bot_has_permissions':["The bot have enough perms", "The bot donot've sufficient perms"]}
         }
 
 blurple = {'check_intro':'{}, starting blurple img analys (Plz note dat this may take one or two while)',
@@ -63,6 +84,9 @@ cases={"no-user":"Unable to find dis usr :eyes:",
         "cases-0":"{} cases fund: ({}-{})",
         "search-0":"**Uzr:** {U}\n**Type:** {T}\n**Mod:** {M}\n**Date:** {D}\n**Reazon:** *{R}*",
         "search-1":"**Uzr:** {U}\n**Servr:** {G}\n**Type:** {T}\n**Modz:** {M}\n**Date:** {D}\n**Reazon:** *{R}*",
+        "list-0":"**Type:** {T}\n**mod:** {M}\n**Date:** {D}\n**Txt:** *{R}*",
+        "list-1":"**Srvr:** {G}\n**Type:** {T}\n**Modz:** {M}\n**date:** {D}\n**Reason:** *{R}*",
+        "list-2":"\n**How long:** {D}",
         'title-search':'Case #{}',
         'no_database':"Dude we'v got an databaz outage, so dis command haz been dizabled"
         }
@@ -97,10 +121,10 @@ find={"user-0":"naym: {}\nID: {}",
         }
 
 fun={"count-0":"Countng in progrez...",
-        "count-1":"On teh last {} posts, U has postd {} msgs ({}%)",
+        "count-1":"On teh last {limit} posts, U has postd {x} msgs ({p}%)",
         "count-2":"You wanna blow up Discord! {e} For obvious performance reasons, I'm gonna impose limit ov {l} msgz.",
         "count-3":"Oops, Im unable to reed dis channel ystory. Pls check mah perms...",
-        "count-1":"On teh last {} msgs, {} had postd {} things ({}%)",
+        "count-4":"On teh last {limit} msgs, {user} had postd {x} things ({p}%)",
         "fun-list":"Her iz the list ov available fun commandz:",
         "no-fun":"Fun comands haz beeen disabld on dis server. 2 C their list, look at https://zbot.rtfd.io/en/v3/fun.html",
 	"osekour":["Oh hum wait, Im finshin watchin mi movi.","We r comin! But wy donot yu answr anymor? Do'nt fak ded dude!","Yeh, we now ther'z an fire, we don'b ned 2 come: we're avin a barbeQ at teh fire stashun.","*Reskue iz curentlly unaivalab, pliz wait untile the and of teh braek*","*Dis numbr doz not exyzt. Pleash try agan with anoder number.*","*Manetenanec ov teh current lien, Srsly . plz twee agaen in 430 hourz.*","*ur mobiel plan has expired. u can buy wan 4 86,25€*","2 moar volumes ov Lord ov teh Rings 2 finish readin, an meh all urz!","Tank u 4 not disturbin us durin teh holidais","Shurry, ther is moar dan tree snowflakz: wuz stuck in teh garaeg","Well haz 2 wait til teh end ov r striek.. R u sayin you dun't knoe?! iz been 2 monfz sinec we startd pliz!"],
@@ -133,7 +157,28 @@ fun={"count-0":"Countng in progrez...",
         "afk-user-1":"Taht member iz AFK, 'cuz {}",
         "afk-user-2":"This usr is AFK!",
         "afk-done":"U'r now AFK",
-        "unafk-done":"U'rn't anymore AFK"
+        "unafk-done":"U'rn't anymore AFK",
+        "tip-list":["Did you know that? There are several languages for the bot, including one very fun to test: lolcat",
+                "Pro-tip: to change the bot language, use the command `config` !",
+                "Pro-tip: you will find explanations of each command in the bot documentation, at https://zbot.rtfd.io Maybe even commands you didn't know about!",
+                "Did you know that? The results of the `stats` command hide some servers, such as bot list servers, or internal ones",
+                "Did you know that? This bot was originally designed for a server in a Minecraft community. That's where he made his name, and that's why he has commands on the theme of the game.",
+                "Did you know that? The first version of the bot was written in February 2018, for personal use. At the time there were only two or three easy commands to make, like `clear` and `say`",
+                "Pro-tip: With the `say` command, you can use the emojis from any server where Zbot is, even animated emojis! Just give the emoji as if you were using it yourself",
+                "Pro-tip: To use a custom emoji in the `react` command, just give its name. And it works with any emoji!",
+                "Pro-tip: With the command `me <text>`, you can make the bot say what you want, with your nickname in front of it! Like, for example, \"*Wumpus likes bananas*\".",
+                "Pro-tip: The command `roll Nothing; Nothing; Nothing; Nothing; Nothing; Nothing; Nothing; PAN !` allows you to play Russian roulette! Be careful with that, though, okay?",
+                "Pro-tip: If you need help, feel free to use the `osekour` command",
+                "Did you know that? Sometimes, the levelup message mentions a random object. To do this, Aragorn1202 had to create a list of 60 of them, including 'a bicorne', 'a cookie' or 'a banana'!",
+                "Did you know that? In the past, Zbot's profile picture was... a creeper."
+                "Did you know that? The ZBot Staff is composed of a talented developer Admin, a second admin named after a kibble brand as well as a cat, a Ban hammer and a mushroom!",
+                "Pro-tip: The `say <text>` command is very useful for posting anonymous messages... at least when you have access to it."
+                "Pro-tip: The `discordlinks` command will give you all the useful links related to discord!",
+                "Did you know that?  All designs related to the bot are made by Adri526#9223, including the huge list of emojis used in the `bigtext` command!",
+                "Did you know that? ZBot takes its name from.... its creator, Z_runner",
+                "Pro-tip: The bot has a Discord, where you can see the current bugs and vote for the next updates! Use the `about` command to get the invite",
+                "Pro-tip: the `prefix` command allows you to have a list of the prefixes currently usable in the server",
+                ],
         }
 
 infos={"text-0":"""Ho hi hello! I'm {0} !
@@ -342,7 +387,9 @@ modo={"slowmode-0":"Teh very-cold-mode is now disabld in this nize place.",
         "em-list-title":"Emojis of our super server",
         "tempmute-1":"Da member {} is muted 4 the raeson `{}`, for {}!",
         "role-high":"Oops, tish role is 2 high for me to change. Move my role above the role `{}` be4 trying again, thx",
-        'role-color':"Teh coulor of role {} haz bee'n changd!"
+        'role-color':"Teh coulor of role {} haz bee'n changd!",
+        'unhoisted':'{c} bad names edited!',
+        'missing-manage-nick':"Oops, I'm missing the cool \"Manage nicknames\" perms! :sad:",
         }
 
 morpion={'user-begin':'{}, u begin!',
@@ -374,6 +421,10 @@ partners={'invalid-bot':"Unable 2 find tihs bot",
         'no-partner-2':"No server has sadly a partnership with U. Feels alone.",
         'partners-list':['Server partners','List of Ur partners','List of servers with U as a cool partner'],
         "missing-manage-guild":"Unable 2 see server invites (missing 'Manage server' perm)",
+        "bot-uptime":"Time up",
+        'no-channel':"U didn't have setted any partner channel :sad:",
+        'reloaded':"{} partners has beeen reloaded! Enjoy!",
+        'already-added':"NO U already have addd tish partner!",
         }
 
 perms={"perms-0":"Membr/role {} not findz",
@@ -490,6 +541,7 @@ to modify configuraishun, or `!config del <option>` 2 reset teh option (`!config
 
 server_desc={"prefix":"Currnt baot prfx: {}",
         "language": "Cuurent zbot languge 4 dis lolcat: **{}**",
+        "description":"Server description:\n {}",
         "clear": "Lizt of rawles dat can us teh 'clear' commend: {}",
         "slowmode": "Llst of rolz that ca' use 'slowmode' and 'freeze' commmandz: {}",
         "mute": "Lis of roles dat kan us the 'mute' commmand: {}",
@@ -519,7 +571,8 @@ server_desc={"prefix":"Currnt baot prfx: {}",
         "xp_type":"XP system used: {}",
         "partner_channel":"Channel where partners are sended: {}",
         "partner_color":"Coulor of partners box: {}",
-        "partner_role":"Role givn 2 partners: {}"
+        "partner_role":"Role givn 2 partners: {}",
+        "update_mentions":"Roles pinged on teh bot changlog: {}",
         }
 
 stats_infos={"not-found":"Unable 2 found {N}",
@@ -564,6 +617,10 @@ stats_infos={"not-found":"Unable 2 found {N}",
         "guild-11.1":"20 first rawles (tot {})",
         "guild-11.2":"Rol list (totAl {})",
         "guild-12":"Cool links numbr (invites)",
+        "guild-13":"Boosts nbr",
+        "guild-13v":"{b} (milestone {p})",
+        "guild-14":"Limitz",
+        "guild-14v":"Voice: {bit}kbps\nFiles size: {fil}MB\nEmojis nbr: {emo}\nConnected mmbrs: {mem}",
         "inv-0":"URL lnk",
         "inv-1":"Inviter",
         "inv-2":"Uzz",
@@ -583,7 +640,9 @@ users = {'invalid-card':'Dat style iz no valid. But yop, her\'s styles u can use
         'card-desc':"Here iz example of ur xp card. U can enter teh command `profile card <style>` 2 change the style\n*Ur xp card will only refresh wehn u have won Xp*",
         'allow_animated_true':"Animated xp cards ar naw enabled 4U",
         'allow_animated_false':"Anamited xp cards are naw disabld for you",
-        'allow_animated_success':"Dat parameter have been redefined 2 {}"
+        'allow_animated_success':"Dat parameter have been redefined 2 {}",
+        'allow_auto_unafk_true':"I'll help u, no worries :green_heart:",
+        'allow_auto_unafk_false':"U do ur own job, okay?",
         }
 
 xp = {'card-level':'LVL',
@@ -637,5 +696,8 @@ xp = {'card-level':'LVL',
         'rr-removed':"None role will be givn anymore for level #{}",
         'too-many-rr':"U already has {} roles rewards, you can't add more!",
         'rr-reload':"{} updated roles / {} members",
-        'no-mee6':"Oops, U configured the xp system 2 use the MEE6 system (u know, this nice blue bot?), but dis bot is not in ur server! Change teh system type (`{}config change xp_type` followd by the system naem), orr invite MEE6 here."
+        'no-mee6':"Oops, U configured the xp system 2 use the MEE6 system (u know, this nice blue bot?), but dis bot is not in ur server! Change teh system type (`{}config change xp_type` followd by the system naem), orr invite MEE6 here.",
+        'change-global-xp':"NOT possible 2 edit XP of the global super mega system!",
+        'change-xp-ok':"XP of teh user {user} have been set 2 {xp}xp!",
+        'no-bot':"Impossible 2 modify the XP ov a robot!"
         }
