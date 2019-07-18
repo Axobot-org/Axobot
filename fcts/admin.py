@@ -46,7 +46,9 @@ class AdminCog(commands.Cog):
         return await reloads.check_admin(ctx)
     
     async def check_if_god(self,ctx):
-        if isinstance(ctx.guild,discord.Guild) and ctx.guild!=None:
+        if isinstance(ctx,discord.User):
+            return await reloads.check_admin(ctx)
+        elif isinstance(ctx.guild,discord.Guild) and ctx.guild!=None:
             return await reloads.check_admin(ctx) and ctx.guild.id in self.god_mode
         else:
             return await reloads.check_admin(ctx)
@@ -111,6 +113,7 @@ class AdminCog(commands.Cog):
     @commands.check(reloads.check_admin)
     async def send_faq(self,ctx):
         """Envoie les messages du salon <#541228784456695818> vers le salon <#508028818154323980>"""
+        msg = await ctx.send("Suppression des salons...")
         destination_fr = ctx.guild.get_channel(508028818154323980)
         destination_en = ctx.guild.get_channel(541599345972346881)
         chan_fr = ctx.guild.get_channel(541228784456695818)
@@ -121,12 +124,14 @@ class AdminCog(commands.Cog):
         await destination_en.set_permissions(role_en, read_messages=False)
         await destination_fr.purge()
         await destination_en.purge()
-        async for message in chan_fr.history(limit=200,reverse=True):
+        await msg.edit(content="Envoi des messages...")
+        async for message in chan_fr.history(limit=200,oldest_first=True):
             await destination_fr.send(message.content)
-        async for message in chan_en.history(limit=200,reverse=True):
+        async for message in chan_en.history(limit=200,oldest_first=True):
             await destination_en.send(message.content)
         await destination_fr.set_permissions(role_fr, read_messages=True)
         await destination_en.set_permissions(role_en, read_messages=True)
+        await msg.edit(content="Terminé !")
         await ctx.bot.cogs['UtilitiesCog'].add_check_reaction(ctx.message)
 
 
@@ -151,7 +156,7 @@ class AdminCog(commands.Cog):
             self.update[x] = msg.content
         await ctx.bot.cogs['UtilitiesCog'].add_check_reaction(msg)
     
-    async def send_updates(self,ctx):
+    async def send_updates(self,ctx:commands.Context):
         """Lance un message de mise à jour"""
         if None in self.update.values():
             return await ctx.send("Les textes ne sont pas complets !")
@@ -168,7 +173,7 @@ class AdminCog(commands.Cog):
         def check(reaction, user):
             return user == ctx.author and reaction.message.id==msg.id
         try:
-            await self.bot.wait_for('reaction_add', timeout=20.0, check=check)
+            await self.bot.wait_for('reaction_add', timeout=30.0, check=check)
         except asyncio.TimeoutError:
             return await ctx.send('Trop long !')
         count = 0
@@ -184,9 +189,20 @@ class AdminCog(commands.Cog):
             if lang not in self.update.keys():
                 if lang=='lolcat':
                     lang = 'en'
+            mentions_str = await self.bot.cogs['ServerCog'].find_staff(guild.id,'update_mentions')
+            if mentions_str == None:
+                mentions = []
+            else:
+                mentions = []
+                for r in mentions_str.split(';'):
+                    try:
+                        mentions.append(guild.get_role(int(r)))
+                    except:
+                        pass
+                mentions = [x.mention for x in mentions if x!=None]
             for chan in channels:
                 try:
-                    await chan.send(self.update[lang])
+                    await chan.send(self.update[lang]+"\n\n"+" ".join(mentions))
                 except Exception as e:
                     await ctx.bot.cogs['ErrorsCog'].on_error(e,ctx)
                 else:
@@ -232,7 +248,7 @@ class AdminCog(commands.Cog):
         await m.edit(content="Bot en voie d'extinction")
         await self.bot.change_presence(status=discord.Status('offline'))
         self.bot.log.info("Fermeture du bot")
-        self.bot.cnx.close()
+        self.bot.cnx_frm.close()
         await self.bot.logout()
         await self.bot.close()
 
@@ -328,9 +344,11 @@ class AdminCog(commands.Cog):
     async def db_reload(self,ctx):
         """Reconnecte le bot à la base de donnée"""
         try:
-            self.bot.cnx.close()
-            self.bot.connect_database()
-            if self.bot.cnx != None:
+            self.bot.cnx_frm.close()
+            self.bot.connect_database_frm()
+            self.bot.cnx_xp.close()
+            self.bot.connect_database_xp()
+            if self.bot.cnx_frm != None and self.bot.cnx_xp != None:
                 await ctx.bot.cogs['UtilitiesCog'].add_check_reaction(ctx.message)
         except Exception as e:
             await self.bot.cogs['ErrorsCog'].on_cmd_error(ctx,e)
@@ -384,6 +402,7 @@ class AdminCog(commands.Cog):
         return "Qui a appuyé sur le bouton rouge ? :thinking:"
 
     @main_msg.command(name="code")
+    @commands.check(reloads.check_admin)
     async def show_code(self,ctx,cmd):
         cmds = self.bot.commands
         obj = await self.bot.cogs['UtilitiesCog'].set_find(cmds,cmd)

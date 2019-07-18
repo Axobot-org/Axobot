@@ -21,15 +21,15 @@ class LangCog(discord.ext.commands.Cog):
         self.serv_opts = dict()
 
 
-    async def tr(self,serverID,moduleID,messageID):
+    async def tr(self,serverID,moduleID,messageID,**args):
         """Renvoie le texte en fonction de la langue"""
         if type(serverID) == discord.Guild:
             serverID = serverID.id
         elif isinstance(serverID,discord.TextChannel):
             serverID = serverID.guild.id
-        if not self.bot.database_online or serverID==None or isinstance(serverID,discord.DMChannel):
+        if not self.bot.database_online:
             lang_opt = self.bot.cogs['ServerCog'].default_language
-        elif isinstance(serverID,discord.GroupChannel):
+        elif isinstance(serverID,(discord.DMChannel,type(None))):
             used_langs = await self.bot.cogs['UtilitiesCog'].get_languages(serverID.recipient,limit=1)
             lang_opt = used_langs[0][0]
         elif str(serverID) in self.serv_opts.keys():
@@ -45,28 +45,35 @@ class LangCog(discord.ext.commands.Cog):
             lang_opt = self.bot.cogs['ServerCog'].default_language
         if lang_opt == 'fi':
             try:
-                return eval("fi."+moduleID+"[\""+messageID+"\"]")
+                result = eval("fi."+moduleID+"[\""+messageID+"\"]")
             except:
                 await self.msg_not_found(moduleID,messageID,"fi")
                 lang_opt = 'en'
         if lang_opt == 'lolcat':
             try:
-                return eval("lolcat."+moduleID+"[\""+messageID+"\"]")
+                result = eval("lolcat."+moduleID+"[\""+messageID+"\"]")
             except:
                 await self.msg_not_found(moduleID,messageID,"lolcat")
                 lang_opt = 'en'
         if lang_opt == 'en':
             try:
-                return eval("en."+moduleID+"[\""+messageID+"\"]")
+                result = eval("en."+moduleID+"[\""+messageID+"\"]")
             except:
                 await self.msg_not_found(moduleID,messageID,"en")
                 lang_opt = 'fr'
         if lang_opt == 'fr':
             try:
-                return eval("fr."+moduleID+"[\""+messageID+"\"]")
+                result = eval("fr."+moduleID+"[\""+messageID+"\"]")
             except:
                 await self.msg_not_found(moduleID,messageID,"fr")
-                return ""
+                result = ""
+        if isinstance(result,str):
+            try:
+                return result.format_map(self.bot.SafeDict(args))
+            except ValueError:
+                return result
+        else:
+            return result
 
     async def msg_not_found(self,moduleID,messageID,lang):
         try:

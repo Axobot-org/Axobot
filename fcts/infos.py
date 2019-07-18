@@ -1,4 +1,4 @@
-import discord, datetime, sys, psutil, os, aiohttp, importlib, time, asyncio, typing, random
+import discord, datetime, sys, psutil, os, aiohttp, importlib, time, asyncio, typing, random, re
 from discord.ext import commands
 from inspect import signature
 from platform   import system as system_name  # Returns the system/OS name
@@ -201,7 +201,7 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
                 await ctx.send(str(type(item))+" / "+str(item))
         except Exception as e:
             await self.bot.cogs["ErrorsCog"].on_error(e,ctx)
-            await ctx.send("`Error`: "+e)
+            await ctx.send("`Error`: "+str(e))
 
     async def member_infos(self,ctx,item,lang,critical_info=False):
         since = await self.translate(ctx.guild.id,"keywords","depuis")
@@ -251,6 +251,15 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
             embed.add_field(name="Roles [0]", value = await self.translate(ctx.guild.id,"activity","rien"), inline=False)
         if critical_info:
             embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","member-7"), value = await self.bot.cogs['CasesCog'].get_nber(item.id,ctx.guild.id),inline=True)
+        if item.bot:
+            session = aiohttp.ClientSession(loop=self.bot.loop)
+            guilds_count = await self.bot.cogs['PartnersCog'].get_guilds(item.id,session)
+            if guilds_count!=None:
+                embed.add_field(name=str(await self.translate(ctx.guild.id,'keywords','servers')).capitalize(),value=guilds_count)
+            uptime = await self.bot.cogs['PartnersCog'].get_uptimes(item.id,session)
+            if uptime!=None:
+                embed.add_field(name=await self.translate(ctx.guild,'partners','bot-uptime'),value=f'{round(uptime)}%')
+            await session.close()
         await ctx.send(embed=embed)
 
 
@@ -301,6 +310,15 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
         embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","member-1"), value = "{} ({} {})".format(await self.timecog.date(item.created_at,lang=lang,year=True),since,await self.timecog.time_delta(item.created_at,datetime.datetime.now(),lang=lang,year=True,precision=0,hour=False)), inline=False)
         embed.add_field(name="Bot", value=botb.capitalize())
         embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","user-0"), value=on_server.capitalize())
+        if item.bot:
+            session = aiohttp.ClientSession(loop=self.bot.loop)
+            guilds_count = await self.bot.cogs['PartnersCog'].get_guilds(item.id,session)
+            if guilds_count!=None:
+                embed.add_field(name=str(await self.translate(ctx.guild.id,'keywords','servers')).capitalize(),value=guilds_count)
+            uptime = await self.bot.cogs['PartnersCog'].get_uptimes(item.id,session)
+            if uptime!=None:
+                embed.add_field(name=await self.translate(ctx.guild,'partners','bot-uptime'),value=f'{round(uptime)}%')
+            await session.close()
         await ctx.send(embed=embed)
 
     async def emoji_infos(self,ctx,item,lang):
@@ -369,7 +387,7 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
         embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","guild-2"), value=str(ctx.guild.region).capitalize())
         await ctx.send(embed=embed)
 
-    async def guild_info(self,ctx,guild,lang,critical_info=False):
+    async def guild_info(self,ctx:commands.Context,guild:discord.Guild,lang:str,critical_info:bool=False):
         since = await self.translate(ctx.guild.id,"keywords","depuis")
         bot = await self.bot.cogs["UtilitiesCog"].get_bots_number(guild.members)
         online = await self.bot.cogs["UtilitiesCog"].get_online_number(guild.members)
@@ -377,7 +395,8 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
             a2f = await self.translate(ctx.guild.id,"keywords","oui")
         else:
             a2f = await self.translate(ctx.guild.id,"keywords","non")
-        embed = discord.Embed(colour=default_color, timestamp=ctx.message.created_at)
+        desc = await self.bot.cogs['ServerCog'].find_staff(guild.id,'description')
+        embed = discord.Embed(colour=default_color, timestamp=ctx.message.created_at, description=desc)
         embed.set_author(name="{} '{}'".format(await self.translate(guild.id,"stats_infos","guild-0"),guild.name), icon_url=guild.icon_url)
         embed.set_footer(text='Requested by {}'.format(ctx.author.name), icon_url=ctx.author.avatar_url)
         embed.set_thumbnail(url=guild.icon_url)
@@ -389,7 +408,7 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
         embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","member-1"), value = "{} ({} {})".format(await self.timecog.date(guild.created_at,lang=lang,year=True),since,await self.timecog.time_delta(guild.created_at,datetime.datetime.now(),lang=lang,year=True,precision=0,hour=False)), inline=False)
         embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","role-3"), value = str(await self.translate(ctx.guild.id,"stats_infos","guild-7")).format(len(guild.members),bot,online))
         embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","guild-6"), value=str(await self.translate(ctx.guild.id,"stats_infos","guild-3")).format(len(guild.text_channels),len(guild.voice_channels),len(guild.categories)))
-        embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","guild-5"), value=str(len(guild.emojis)))
+        embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","guild-5"), value="{}/{}".format(len(guild.emojis),guild.emoji_limit))
         if guild.me.guild_permissions.manage_guild:
             embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","guild-12"), value=str(len(await guild.invites())))
         embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","guild-10"), value = str(int(guild.afk_timeout/60))+" minutes")
@@ -413,6 +432,13 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
             embed.add_field(name=str(await self.translate(ctx.guild.id,"stats_infos","guild-11.1")).format(len(guild.roles)-1), value=", ".join(roles[:20]))
         else:
             embed.add_field(name=str(await self.translate(ctx.guild.id,"stats_infos","guild-11.2")).format(len(guild.roles)-1), value=", ".join(roles))
+        if guild.premium_subscription_count>0:
+            embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","guild-13"), value=await self.translate(ctx.guild.id,"stats_infos","guild-13v",b=guild.premium_subscription_count,p=guild.premium_tier))
+        embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","guild-14"), value=await self.translate(ctx.guild.id,"stats_infos","guild-14v",
+            bit=round(guild.bitrate_limit/1000),
+            fil=round(guild.filesize_limit/1.049e+6),
+            emo=guild.emoji_limit,
+            mem=guild.max_presences))
         await ctx.send(embed=embed)
         if guild.features != []:
             owner = self.bot.get_user(279568324260528128)
@@ -638,7 +664,24 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
         else:
             txt = "\n".join([f'• {k}: <{v}>' for k,v in (await self.translate(ctx.channel,'infos','discordlinks')).items()])
             await ctx.send(txt)
-                
+    
+
+    async def emoji_analysis(self,msg):
+        """Lists the emojis used in a message"""
+        try:
+            liste = list(set(re.findall(r'<:[\w-]+:(\d{18})>',msg.content)))
+            if len(liste)==0:
+                return
+            cnx = self.bot.cnx_frm
+            cursor = cnx.cursor()
+            current_timestamp = datetime.datetime.fromtimestamp(round(time.time()))
+            table = 'emojis_beta' if self.bot.beta else 'emojis'
+            query = ["INSERT INTO `{t}` (`ID`,`count`,`last_update`) VALUES ('{i}',1,'{l}') ON DUPLICATE KEY UPDATE count = `count` + 1, last_update = '{l}';".format(t=table,i=x,l=current_timestamp) for x in liste]
+            cursor.execute(*query)
+            cnx.commit()
+            cursor.close()
+        except Exception as e:
+            await self.bot.cogs['ErrorsCog'].on_error(e,None)
 
 
 def setup(bot):

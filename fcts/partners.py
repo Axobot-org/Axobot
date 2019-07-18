@@ -26,7 +26,7 @@ class PartnersCog(commands.Cog):
     async def bdd_get_partner(self,partnerID:int,guildID:int):
         """Return a partner based on its ID"""
         try:
-            cnx = self.bot.cnx
+            cnx = self.bot.cnx_frm
             cursor = cnx.cursor(dictionary = True)
             query = ("SELECT * FROM `{}` WHERE `ID`={} AND `guild`={}".format(self.table,partnerID,guildID))
             cursor.execute(query)
@@ -41,7 +41,7 @@ class PartnersCog(commands.Cog):
     async def bdd_get_guild(self,guildID:int):
         """Return every partners of a guild"""
         try:
-            cnx = self.bot.cnx
+            cnx = self.bot.cnx_frm
             cursor = cnx.cursor(dictionary = True)
             query = ("SELECT * FROM `{}` WHERE `guild`={}".format(self.table,guildID))
             cursor.execute(query)
@@ -58,7 +58,7 @@ class PartnersCog(commands.Cog):
         try:
             if len(invites)==0:
                 return list()
-            cnx = self.bot.cnx
+            cnx = self.bot.cnx_frm
             cursor = cnx.cursor(dictionary = True)
             query = ("SELECT * FROM `{}` WHERE `type`='guild' AND ({})".format(self.table," OR ".join([f"`target`='{x.code}'" for x in invites])))
             cursor.execute(query)
@@ -74,7 +74,7 @@ class PartnersCog(commands.Cog):
         """Add a partner into a server"""
         try:
             ID = await self.generate_id()
-            cnx = self.bot.cnx
+            cnx = self.bot.cnx_frm
             cursor = cnx.cursor(dictionary = True)
             query = ("INSERT INTO `{table}` (`ID`,`guild`,`target`,`type`,`description`) VALUES ('{id}','{guild}','{target}','{type}','{desc}');".format(table=self.table,id=ID,guild=guildID,target=partnerID,type=partnerType,desc=desc.replace("'","\\'")))
             cursor.execute(query)
@@ -88,7 +88,7 @@ class PartnersCog(commands.Cog):
     async def bdd_edit_partner(self,partnerID:int,target:str=None,desc:str=None,msg:int=None):
         """Modify a partner"""
         try:
-            cnx = self.bot.cnx
+            cnx = self.bot.cnx_frm
             cursor = cnx.cursor(dictionary = True)
             query = ""
             if target!=None:
@@ -108,7 +108,7 @@ class PartnersCog(commands.Cog):
     async def bdd_del_partner(self,ID:int):
         """Delete a partner from a guild list"""
         try:
-            cnx = self.bot.cnx
+            cnx = self.bot.cnx_frm
             cursor = cnx.cursor(dictionary = True)
             query = ("DELETE FROM `{}` WHERE `ID` = {}".format(self.table,ID))
             cursor.execute(query)
@@ -118,6 +118,25 @@ class PartnersCog(commands.Cog):
         except Exception as e:
             await self.bot.cogs['ErrorsCog'].on_error(e,None)
             return False
+    
+
+    async def get_uptimes(self,bot:int,session:aiohttp.ClientSession):
+        """Get the uptime of a bot
+        None if unknown"""
+        async with session.get(f'https://api.discordbots.group/v1/bot/{bot}/uptime') as resp:
+            ans = await resp.json()
+            if ans['error']:
+                return None
+            return ans['percentage']
+    
+    async def get_guilds(self,bot:int,session:aiohttp.ClientSession):
+        """Get the guilds count of a bot
+        None if unknown"""
+        async with session.get('https://discordbots.org/api/bots/{}/stats'.format(bot),headers={'Authorization':str(self.bot.dbl_token)}) as resp:
+            ans = await resp.json()
+            if 'server_count' in ans.keys():
+                return ans['server_count']
+            return None
 
 
     async def update_partners(self,channel:discord.TextChannel,color:int=None):
@@ -140,28 +159,36 @@ class PartnersCog(commands.Cog):
         session = aiohttp.ClientSession(loop=self.bot.loop)
         for partner in partners:
             image = ""
+            target_desc = partner['description']
             if partner['type']=='bot':
                 title = "**{}** ".format(tr_bot.capitalize())
                 try:
                     title += str(await self.bot.fetch_user(int(partner['target'])))
-                    async with session.get('https://discordbots.org/api/bots/{}/stats'.format(partner['target']),headers={'Authorization':str(self.bot.dbl_token)}) as resp:
-                        ans = await resp.json()
-                        if 'server_count' in ans.keys():
-                            field1 = {'name':tr_guilds.capitalize(),'value':str(ans['server_count'])}
-                        else:
-                            field1 = None
+                    guild_nbr = await self.get_guilds(partner['target'],session)
+                    if guild_nbr!=None:
+                        field1 = {'name':tr_guilds.capitalize(),'value':str(guild_nbr)}
+                    else:
+                        field1 = None
                     image = (await self.bot.fetch_user(int(partner['target']))).avatar_url.__str__()
                 except discord.errors.NotFound:
                     title += "ID: "+partner['target']
                     field1 = None
                 except Exception as e:
                     field1 = None
-                    image = (await self.bot.fetch_user(int(partner['target']))).avatar_url
+                    image = (await self.bot.fetch_user(int(partner['target']))).avatar_url.__str__()
                     await self.bot.cogs["ErrorsCog"].on_error(e,None)
                 field2 = {'name':tr_invite.capitalize(),'value':'[Click here](https://discordapp.com/oauth2/authorize?client_id={}&scope=bot&permissions=2113273087)'.format(partner['target'])}
+                up = await self.get_uptimes(partner['target'],session)
+                if up!=None:
+                    field3 = {'name':await self.translate(channel.guild,'partners','bot-uptime'), 'value':f"{round(up,2)}%"}
+                else:
+                    field3 = None
             else:
                 title = "**{}** ".format(tr_guild.capitalize())
-                inv = await self.bot.fetch_invite(partner['target'])
+                try:
+                    inv = await self.bot.fetch_invite(partner['target'])
+                except discord.errors.NotFound:
+                    continue
                 image = inv.guild.icon_url.__str__()
                 if isinstance(inv,discord.Invite) and not inv.revoked:
                     title += inv.guild.name
@@ -171,7 +198,10 @@ class PartnersCog(commands.Cog):
                     title += tr_unknown
                     field1 = None
                 field2 = {'name':tr_invite.capitalize(),'value':'[{}](https://discord.gg/{})'.format(tr_click.capitalize(),partner['target'])}
-            emb = self.bot.cogs['EmbedCog'].Embed(title=title,desc=partner['description'],fields=[x for x in (field1,field2) if not x==None],color=color,footer_text=str(partner['ID']),thumbnail=image).update_timestamp()
+                field3 = None
+                if len(target_desc)==0:
+                    target_desc = await self.bot.cogs['ServerCog'].find_staff(inv.guild.id,'description')
+            emb = self.bot.cogs['EmbedCog'].Embed(title=title,desc=target_desc,fields=[x for x in (field1,field2,field3) if not x==None],color=color,footer_text=str(partner['ID']),thumbnail=image).update_timestamp()
             try:
                 msg = await channel.fetch_message(partner['messageID'])
                 await msg.edit(embed=emb.discord_embed())
@@ -231,6 +261,9 @@ class PartnersCog(commands.Cog):
             Type = 'guild'
         else:
             return
+        current_list = [x['target'] for x in await self.bdd_get_guild(ctx.guild.id)]
+        if str(item.id) in current_list:
+            return await ctx.send(await self.translate(ctx.guild,"partners","already-added"))
         if len(description)>0:
             description = await self.bot.cogs['EmojiCog'].anti_code(description)
         await self.bdd_set_partner(guildID=ctx.guild.id,partnerID=item.id,partnerType=Type,desc=description)
@@ -351,6 +384,31 @@ class PartnersCog(commands.Cog):
             await ctx.send(embed=emb.discord_embed())
         else:
             await ctx.send(f"__{fields_name[0]}:__\n{f[0]}\n\n__{fields_name[1]}:__\n{f[1]}")
+
+    @partner_main.command(name="color",aliases=['colour'])
+    @commands.check(checks.has_manage_guild)
+    async def partner_color(self,ctx,color):
+        """Change the color of the partners embed
+    It has the same result as `config change partner_color`"""
+        await self.bot.cogs['ServerCog'].conf_color(ctx,'partner_color',str(color))
+    
+    @partner_main.command(name='reload')
+    @commands.check(checks.has_admin)
+    @commands.cooldown(1,60,commands.BucketType.guild)
+    async def partner_reload(self,ctx):
+        """Reload your partners channel"""
+        msg = await ctx.send(str(await self.translate(ctx.guild,'rss','guild-loading')).format(self.bot.cogs['EmojiCog'].customEmojis['loading']))
+        channel = await self.bot.cogs['ServerCog'].get_server(criters=[f"`ID`={ctx.guild.id}"],columns=['partner_channel','partner_color'])
+        if len(channel)==0:
+            return await msg.edit(content=await self.translate(ctx.guild,'partners','no-channel'))
+        chan = channel[0]['partner_channel'].split(';')[0]
+        if not chan.isnumeric():
+            return await msg.edit(content=await self.translate(ctx.guild,'partners','no-channel'))
+        chan = ctx.guild.get_channel(int(chan))
+        if chan==None:
+            return await msg.edit(content=await self.translate(ctx.guild,'partners','no-channel'))
+        count = await self.update_partners(chan,channel[0]['partner_color'])
+        await msg.edit(content=str(await self.translate(ctx.guild,'partners','reloaded')).format(count))
 
 
 

@@ -129,7 +129,7 @@ If the bot can't send the new command format, it will try to send the old one.""
     def sort_by_name(self,cmd):
             return cmd.name
 
-    async def all_commands(self,ctx):
+    async def all_commands(self,ctx:commands.Context):
         """Create pages for every bot command"""
         def category(cmd):
             cog = cmd.cog_name
@@ -148,9 +148,7 @@ If the bot can't send the new command format, it will try to send the old one.""
                     continue
             except Exception as e:
                 if not "discord.ext.commands.errors" in str(type(e)):
-                    await ctx.send("`Error:` {}".format(e))
-                    await self.bot.cogs['ErrorsCog'].on_error(e,ctx)
-                    return []
+                    raise e
                 else:
                     continue
             temp = await self.display_cmd(cmd)
@@ -164,7 +162,7 @@ If the bot can't send the new command format, it will try to send the old one.""
         else:
             return ["__• **{}**__\n{}".format(tr[0],modhelp) , "\n\n__• **{}**__\n{}".format(tr[1],otherhelp)]
 
-    async def cog_commands(self,ctx,cog):
+    async def cog_commands(self,ctx:commands.Context,cog:commands.Cog):
         """Create pages for every command of a cog"""
         description = inspect.getdoc(cog)
         page = ""
@@ -179,9 +177,7 @@ If the bot can't send the new command format, it will try to send the old one.""
                     continue
             except Exception as e:
                 if not "discord.ext.commands.errors" in str(type(e)):
-                    await ctx.send("`Error:` {}".format(e))
-                    await self.bot.cogs['ErrorsCog'].on_error(e,ctx)
-                    return []
+                    raise e
                 else:
                     continue
             text = await self.display_cmd(cmd)
@@ -193,17 +189,21 @@ If the bot can't send the new command format, it will try to send the old one.""
         pages.append(form.format(cog_name,description,page))
         return pages
     
-    async def cmd_help(self,ctx,cmd):
+    async def cmd_help(self,ctx:commands.Context,cmd:commands.core.Command):
         """Create pages for a command explanation"""
-        desc = cmd.description if cmd.description!=None else str(await self.translate(ctx.channel,"aide","no-desc-cmd"))
-        if desc=='':
-            desc = cmd.help
+        desc = cmd.description.strip() if cmd.description!=None else str(await self.translate(ctx.channel,"aide","no-desc-cmd"))
+        if desc=='' and cmd.help!=None:
+            desc = cmd.help.strip()
+        # Prefix
         prefix = await self.bot.get_prefix(ctx.message)
         if type(prefix)==list:
             prefix = prefix[0]
+        # Syntax
         syntax = cmd.qualified_name + "** " + cmd.signature
+        # Subcommands
         if type(cmd)==commands.core.Group:
-            subcmds = "\n\n__{}__".format(str(await self.translate(ctx.channel,"keywords","subcmds")).capitalize())
+            syntax += " ..."
+            subcmds = "__{}__".format(str(await self.translate(ctx.channel,"keywords","subcmds")).capitalize())
             sublist = list()
             for x in sorted(cmd.all_commands.values(),key=self.sort_by_name):
                 try:
@@ -212,70 +212,104 @@ If the bot can't send the new command format, it will try to send the old one.""
                         sublist.append(x.name)
                 except Exception as e:
                     if not "discord.ext.commands.errors" in str(type(e)):
-                        await ctx.send("`Error:` {}".format(e))
-                        await self.bot.cogs['ErrorsCog'].on_error(e,ctx)
-                        return []
+                        raise e
                     else:
                         continue
+            if len(sublist)==0:
+                subcmds = ""
         else:
             subcmds = ""
-        return ["**{}{}\n\n{}\n\n*Cog: {}*{}".format(prefix,syntax,desc,cmd.cog_name,subcmds)]
-
-
-    async def _default_help_command(self,ctx, commands=()):
-        bot = ctx.bot
-        if await self.bot.cogs["ServerCog"].find_staff(ctx.guild,'help_in_dm') == 1:
-            destination = ctx.message.author
-            await bot.cogs["UtilitiesCog"].suppr(ctx.message)
-        else :
-            destination = ctx.message.channel
-        def repl(obj):
-            return self._mentions_transforms.get(obj.group(0), '')
-
-            # help by itself just lists our own commands.
-        if len(commands) == 0:
-            pages = await bot.formatter.format_help_for(ctx, bot)
-        elif len(commands) == 1:
-            # try to see if it is a cog name
-            name = self._mention_pattern.sub(repl, commands[0])
-            command = None
-            if name in bot.cogs:
-                command = bot.cogs[name]
-            else:
-                command = bot.all_commands.get(name)
-                if command is None:
-                    await destination.send(bot.command_not_found.format(name))
-                    return
-
-            pages = await bot.formatter.format_help_for(ctx, command)
-        else:
-            name = self._mention_pattern.sub(repl, commands[0])
-            command = bot.all_commands.get(name)
-            if command is None:
-                await destination.send(bot.command_not_found.format(name))
-                return
-
-            for key in commands[1:]:
+        # Aliases
+        aliases = " - ".join(cmd.aliases)
+        if len(aliases)>0:
+            aliases = await self.translate(ctx.channel,"aide","aliases") + " " + aliases
+        # Is enabled
+        enabled = ""
+        if not cmd.enabled:
+            enabled = await self.translate(ctx.channel,"aide","not-enabled")
+        # Checks
+        checks = list()
+        if len(cmd.checks)>0:
+            maybe_coro = discord.utils.maybe_coroutine
+            check_msgs = await self.translate(ctx.channel,'aide','check-desc')
+            for c in cmd.checks:
                 try:
-                    key = self._mention_pattern.sub(repl, key)
-                    command = command.all_commands.get(key)
-                    if command is None:
-                        await destination.send(bot.command_not_found.format(key))
-                        return
-                except AttributeError:
-                    await destination.send(str(await self.translate(ctx.channel,"aide","no-subcmd")).format(command))
-                    return
+                    if 'guild_only.<locals>.predicate' in str(c):
+                        check_name = 'guild_only'
+                    elif 'is_owner.<locals>.predicate' in str(c):
+                        check_name = 'is_owner'
+                    elif 'bot_has_permissions.<locals>.predicate' in str(c):
+                        check_name = 'bot_has_permissions'
+                    else:
+                        check_name = c.__name__
+                    if check_name in check_msgs.keys():
+                        try:
+                            pass_check = await maybe_coro(c,ctx)
+                        except:
+                            pass_check = False
+                        if pass_check:
+                            checks.append(":small_orange_diamond: "+check_msgs[check_name][0])
+                        else:
+                            pass
+                            checks.append('❌ '+check_msgs[check_name][1])
+                    else:
+                        print(check_name,str(c))
+                except Exception as e:
+                    await self.bot.cogs["ErrorsCog"].on_error(e,ctx)
+        checks = '\n'.join(checks)
 
-            pages = await bot.formatter.format_help_for(ctx, command)
+        answer = f"**{prefix}{syntax}\n\n{desc}\n"
+        if len(subcmds)>0:
+            answer += "\n"+subcmds+"\n"
+        if len(aliases)>0:
+            answer += "\n"+aliases
+        if len(enabled)>0:
+            answer += enabled
+        if len(checks)>0:
+            answer += "\n"+checks
+        return [answer]
 
-        if bot.pm_help is None:
-            characters = sum(map(len, pages))
-            # modify destination based on length of pages.
-            if characters > 1000:
-                destination = ctx.message.author
 
-        for page in pages:
-            await destination.send(page)
+
+    async def _default_help_command(self,ctx:commands.Context,command=None):
+        truc = commands.DefaultHelpCommand()
+        truc.context = ctx
+        truc._command_impl = self.help_cmd
+        # General help
+        if command is None:
+            mapping = truc.get_bot_mapping()
+            return await truc.send_bot_help(mapping)
+        # Check if it's a cog
+        cog = self.bot.get_cog(" ".join(command))
+        if cog is not None:
+            return await truc.send_cog_help(cog)
+        # If it's not a cog then it's a command.
+        # Since we want to have detailed errors when someone
+        # passes an invalid subcommand, we need to walk through
+        # the command group chain ourselves.
+        maybe_coro = discord.utils.maybe_coroutine
+        keys = command
+        cmd = self.bot.all_commands.get(keys[0])
+        if cmd is None:
+            string = await maybe_coro(truc.command_not_found, truc.remove_mentions(keys[0]))
+            return await truc.send_error_message(string)
+
+        for key in keys[1:]:
+            try:
+                found = cmd.all_commands.get(key)
+            except AttributeError:
+                string = await maybe_coro(truc.subcommand_not_found, cmd, truc.remove_mentions(key))
+                return await truc.send_error_message(string)
+            else:
+                if found is None:
+                    string = await maybe_coro(truc.subcommand_not_found, cmd, truc.remove_mentions(key))
+                    return await truc.send_error_message(string)
+                cmd = found
+
+        if isinstance(cmd, commands.Group):
+            return await truc.send_group_help(cmd)
+        else:
+            return await truc.send_command_help(cmd)
 
 
 def setup(bot):

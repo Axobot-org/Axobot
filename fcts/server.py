@@ -6,11 +6,11 @@ import discord
 from discord.ext import commands
 from fcts import cryptage
 
-roles_options = ["clear","slowmode","mute","kick","ban","warn","say","welcome_roles","muted_role",'partner_role']
+roles_options = ["clear","slowmode","mute","kick","ban","warn","say","welcome_roles","muted_role",'partner_role','update_mentions']
 bool_options = ["save_roles","enable_xp","anti_caps_lock","enable_fun","help_in_dm"]
 textchan_options = ["hunter","welcome_channel","bot_news","poll_channels","modlogs_channel","noxp_channels","partner_channel"]
 vocchan_options = ["membercounter"]
-text_options = ["welcome","leave","levelup_msg"]
+text_options = ["welcome","leave","levelup_msg","description"]
 prefix_options = ['prefix']
 emoji_option = ['vote_emojis']
 numb_options = []
@@ -35,6 +35,7 @@ class ServerCog(commands.Cog):
         self.table = 'servers_beta' if bot.beta else 'servers'
         self.default_opt = {"rr_max_number":7,
                "language":1,
+               "description":"",
                "clear":"",
                "slowmode":"",
                "mute":"",
@@ -65,8 +66,9 @@ class ServerCog(commands.Cog):
                "muted_role":0,
                "partner_channel":'',
                "partner_color":10949630,
-               'partner_role':''}
-        self.optionsList = ["prefix","language","clear","slowmode","mute","kick","ban","warn","say","welcome_channel","welcome","leave","welcome_roles","bot_news","poll_channels","partner_channel","modlogs_channel","enable_xp","anti_caps_lock","enable_fun","membercounter","anti_raid","vote_emojis","help_in_dm","muted_role"]
+               'partner_role':'',
+               'update_mentions':''}
+        self.optionsList = ["prefix","language","description","clear","slowmode","mute","kick","ban","warn","say","welcome_channel","welcome","leave","welcome_roles","bot_news","poll_channels","partner_channel","modlogs_channel","enable_xp","anti_caps_lock","enable_fun","membercounter","anti_raid","vote_emojis","help_in_dm","muted_role"]
 
     @commands.Cog.listener()
     async def on_ready(self):
@@ -75,10 +77,10 @@ class ServerCog(commands.Cog):
 
 
     async def get_bot_infos(self,botID):
-        """return every options of a server"""
+        """Return every options of the bot"""
         if not self.bot.database_online:
             return list()
-        cnx = self.bot.cnx
+        cnx = self.bot.cnx_frm
         cursor = cnx.cursor(dictionary=True)
         query = ("SELECT * FROM `bot_infos` WHERE `ID`={}".format(botID))
         cursor.execute(query)
@@ -91,7 +93,7 @@ class ServerCog(commands.Cog):
         if type(values)!=list:
             raise ValueError
         v = list()
-        cnx = self.bot.cnx
+        cnx = self.bot.cnx_frm
         cursor = cnx.cursor()
         for x in values:
             if type(x) == bool:
@@ -107,7 +109,7 @@ class ServerCog(commands.Cog):
         """Return percentages of languages"""
         if not self.bot.database_online:
             return list()
-        cnx = self.bot.cnx
+        cnx = self.bot.cnx_frm
         cursor = cnx.cursor(dictionary=True)
         query = ("SELECT `language`,`ID` FROM `{}` WHERE 1".format(self.table))
         cursor.execute(query)
@@ -115,6 +117,8 @@ class ServerCog(commands.Cog):
         for x in cursor:
             if x['ID'] not in ignored_guilds:
                 liste.append(x['language'])
+        for _ in range(len(self.bot.guilds)-len(liste)-len(ignored_guilds)):
+            liste.append(self.default_language)
         for e,l in enumerate(self.bot.cogs['LangCog'].languages):
             langs.append((l,liste.count(e)))
         return langs
@@ -151,7 +155,7 @@ class ServerCog(commands.Cog):
         await self.bot.wait_until_ready()
         if type(columns)!=list or type(criters)!=list:
             raise ValueError
-        cnx = self.bot.cnx
+        cnx = self.bot.cnx_frm
         cursor = cnx.cursor(dictionary = (Type==dict))
         if columns == []:
             cl = "*"
@@ -169,7 +173,7 @@ class ServerCog(commands.Cog):
         if type(values)!=list:
             raise ValueError
         v = list()
-        cnx = self.bot.cnx
+        cnx = self.bot.cnx_frm
         cursor = cnx.cursor()
         for x in values:
             if type(x) == bool:
@@ -197,7 +201,7 @@ class ServerCog(commands.Cog):
         if type(ID) == str:
             if not ID.isnumeric():
                 raise ValueError
-        cnx = self.bot.cnx
+        cnx = self.bot.cnx_frm
         cursor = cnx.cursor()
         query = ("INSERT INTO `{}` (`ID`) VALUES ('{}')".format(self.table,ID))
         cursor.execute(query)
@@ -221,7 +225,7 @@ class ServerCog(commands.Cog):
         """remove a server from the db"""
         if type(ID)!=int:
             raise ValueError
-        cnx = self.bot.cnx
+        cnx = self.bot.cnx_frm
         cursor = cnx.cursor()
         query = ("DELETE FROM `{}` WHERE `ID`='{}'".format(self.table,ID))
         cursor.execute(query)
@@ -312,7 +316,7 @@ class ServerCog(commands.Cog):
 
     async def send_embed(self,guild,option,value):
         m = "Changed option in server {}: {} = `{}`".format(guild.id,option,value)
-        emb = self.bot.cogs["EmbedCog"].Embed(desc=m,color=self.log_color).update_timestamp().set_author(guild.me)
+        emb = self.bot.cogs["EmbedCog"].Embed(desc=m,color=self.log_color,footer_text=guild.name).update_timestamp().set_author(guild.me)
         await self.bot.cogs["EmbedCog"].send([emb])
         self.bot.log.debug(m)
 
@@ -532,7 +536,7 @@ class ServerCog(commands.Cog):
         if len(text) == 0:
             text = "Ø"
         else:
-            text = "```\n"+text+"\```"
+            text = "```\n"+text+"```"
         return text
 
     async def conf_prefix(self,ctx,option,value):
@@ -696,7 +700,10 @@ class ServerCog(commands.Cog):
                 return
             await self.modify_server(ctx.guild.id,values=[(option,color.value)])
             msg = await self.translate(ctx.guild.id,"server","change-color")
-            await ctx.send(msg.format(option,color))
+            if ctx.channel.permissions_for(ctx.guild.me).embed_links:
+                await ctx.send(embed=discord.Embed(description=msg.format(option,color),colour=color))
+            else:
+                await ctx.send(msg.format(option,color))
             await self.send_embed(ctx.guild,option,color)
 
     async def form_color(self,option,value):
@@ -810,7 +817,7 @@ class ServerCog(commands.Cog):
                 await self.bot.cogs['ErrorsCog'].on_error(e,ctx)
 
             
-    @sconfig_main.command(name="delete",hidden=True)
+    @sconfig_main.command(name="reset",hidden=True)
     @commands.is_owner()
     async def admin_delete(self,ctx,ID:int):
         if await self.delete_server(ID):
