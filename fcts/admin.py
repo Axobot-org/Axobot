@@ -113,6 +113,7 @@ class AdminCog(commands.Cog):
     @commands.check(reloads.check_admin)
     async def send_faq(self,ctx):
         """Envoie les messages du salon <#541228784456695818> vers le salon <#508028818154323980>"""
+        msg = await ctx.send("Suppression des salons...")
         destination_fr = ctx.guild.get_channel(508028818154323980)
         destination_en = ctx.guild.get_channel(541599345972346881)
         chan_fr = ctx.guild.get_channel(541228784456695818)
@@ -123,12 +124,14 @@ class AdminCog(commands.Cog):
         await destination_en.set_permissions(role_en, read_messages=False)
         await destination_fr.purge()
         await destination_en.purge()
-        async for message in chan_fr.history(limit=200,reverse=True):
+        await msg.edit(content="Envoi des messages...")
+        async for message in chan_fr.history(limit=200,oldest_first=True):
             await destination_fr.send(message.content)
-        async for message in chan_en.history(limit=200,reverse=True):
+        async for message in chan_en.history(limit=200,oldest_first=True):
             await destination_en.send(message.content)
         await destination_fr.set_permissions(role_fr, read_messages=True)
         await destination_en.set_permissions(role_en, read_messages=True)
+        await msg.edit(content="Terminé !")
         await ctx.bot.cogs['UtilitiesCog'].add_check_reaction(ctx.message)
 
 
