@@ -446,7 +446,7 @@ You can specify a verification limit by adding a number in argument"""
         else:
             await ctx.send(random.choice(await self.translate(ctx.channel,"fun","piece-0")))
     
-    @commands.command(name="weather")
+    @commands.command(name="weather",aliases=['météo'])
     @commands.cooldown(4, 30, type=commands.BucketType.guild)
     async def weather(self,ctx,*,city:str):
         """Get the weather of a city
@@ -455,16 +455,14 @@ You can specify a verification limit by adding a number in argument"""
         async with aiohttp.ClientSession() as session:
             async with session.get("https://welcomer.glitch.me/weather?city="+city) as r:
                 if r.status == 200:
-                    try:
-                        _ = await r.json()
-                    except aiohttp.client_exceptions.ContentTypeError:
+                    if r.content_type == 'image/png':
                         if ctx.channel.permissions_for(ctx.me).embed_links:
                             emb = self.bot.cogs['EmbedCog'].Embed(image="https://welcomer.glitch.me/weather?city="+city,footer_text="From https://welcomer.glitch.me/weather")
                             return await ctx.send(embed=emb.discord_embed())
                         else:
                             return await ctx.send("https://welcomer.glitch.me/weather?city="+city)
-                    except Exception as e:
-                        await self.bot.cogs['ErrorsCog'].on_error(e,ctx)
+                    #except Exception as e:
+                    #    await self.bot.cogs['ErrorsCog'].on_error(e,ctx)
         await ctx.send(await self.translate(ctx.channel,"fun","invalid-city"))
 
     @commands.command(name="hour")
