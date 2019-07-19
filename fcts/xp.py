@@ -408,7 +408,8 @@ class XPCog(commands.Cog):
             for table in tables:
                 cursor.execute("SELECT SUM(xp) FROM `{}`".format(table))
                 res = [x for x in cursor]
-                result += round(res[0][0])
+                if res[0][0]!=None:
+                    result += round(res[0][0])
             cursor.close()
             return result
         except Exception as e:
@@ -558,7 +559,7 @@ class XPCog(commands.Cog):
                     return await ctx.send(await self.translate(ctx.channel,'xp','not-member'))
                 xp = await self.mee6_get_player(user)
             else:
-                xp = await self.bdd_get_xp(user.id,ctx.guild.id)
+                xp = await self.bdd_get_xp(user.id,None if xp_used_type==0 else ctx.guild.id)
             if xp==None or (isinstance(xp,list) and len(xp)==0):
                 if ctx.author==user:
                     return await ctx.send(await self.translate(ctx.channel,'xp','1-no-xp'))
