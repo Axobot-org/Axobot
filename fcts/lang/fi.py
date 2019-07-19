@@ -6,7 +6,7 @@ current_lang = {'current':'fi'}
 activity={"rien":"Ei mitään",
         "play":"soittaa",
         "stream":"striimaa",
-        "listen":"listening to",
+        "listen":"kuuntelee",
         "watch":"katsoo"
         }
 
@@ -28,13 +28,34 @@ aide={"no-subcmd":"komenolla `{0.name}`ei ole toissijaista komentoa",
         "no-desc-cog":"Ei lisätietoja tästä cog:stä.",
         "no-desc-cmd":"Ei lisätietoja tästä komennosta.",
         "cmd-not-found":"Komentoa  \"{}\" ei ole nimetty",
-        "subcmd-not-found":"Tällä komennolla ei ole toissijaista komentoa nimetty. \"{}\""
+        "subcmd-not-found":"Tällä komennolla ei ole toissijaista komentoa nimetty. \"{}\"",
+        "aliases":"Aliases:",
+        "not-enabled":":warning: This command is disabled",
+        "check-desc":{'check_admin':['You need to be one of the bot Admins',"You are not a bot Admin"],
+                'can_ban':["One of your roles is authorized to use this command (`ban`)","Missing allowed role (`ban`)"],
+                'can_mute':["One of your roles is authorized to use this command (`mute`)","Missing allowed role (`mute`)"],
+                'can_warn':["One of your roles is authorized to use this command (`warn`)","Missing allowed role (`warn`)"],
+                'can_kick':["One of your roles is authorized to use this command (`kick`)","Missing allowed role (`kick`)"],
+                'can_slowmode':["One of your roles is authorized to use this command (`slowmode`)","Missing allowed role (`slowmode`)"],
+                'can_clear':["One of your roles is authorized to use this command (`clear`)","Missing allowed role (`clear`)"],
+                'has_admin':["You have 'Administrator' permission","'Administrator' permission missing"],
+                'has_manage_msg':["You have 'Manage Messages' permission","'Manage Messages' permission missing"],
+                'has_manage_guild':["You have 'Manage Server' permission","'Manage Server' permission missing"],
+                'has_manage_roles':["You have 'Manage Roles' permission","'Manage Roles' permission missing"],
+                'has_manage_nicknames':["You have 'Manage Nicknames' permission","'Manage Nicknames' permission missing"],
+                'guild_only':['Can only be used in a server']*2,
+                'can_edit_case':["One of your roles is authorized to use this command (`warn`)","Missing allowed role (`warn`)"],
+                'is_support_staff':['You are a member of the bot staff','You must be part of the bot staff'],
+                'is_fun_enabled':['Fun commands are enabled','Fun commands must be enabled'],
+                'can_use_rss':["You have 'Administrator' permission","'Administrator' permission is missing"],
+                'is_owner':["You must be the owner of the bot","You are not the owner of the bot"],
+                'bot_has_permissions':["The bot has sufficient permissions", "The bot does not have sufficient permissions"]}
         }
 
 bvn={"aide":"""__**Tervetuloa liittymis & lähtö viesti moduuliin**__
 Tätä moduulia käytetään konfiguroimaan automaattinen viesti joka kerta kun joku tulee tai lähtee servultasi.
 __** Konfiguraatio**__
-`1-` Jotta voit konfiguroida mihin nämä viestit lähetetään, kirjoita `!config change welcome_channel`lisättynä kanava tunniste (Right klikkaa -> "Copy ID" tietokoneella,tai jatka painamista kanavaa -> "Kopioi tunniste" puhelimelle, mutta sinun pitää ensin ottaa käyttöön Developer muoto jotta saat tämän muodon).
+`1-` Jotta voit konfiguroida mihin nämä viestit lähetetään, viestitä `!config change welcome_channel`lisättynä kanava tunniste (Right klikkaa -> "Copy ID" tietokoneella,tai jatka painamista kanavaa -> "Kopioi tunniste" puhelimelle, mutta sinun pitää ensin ottaa käyttöön Developer muoto jotta saat tämän muodon).
 `2-` Jotta voit konfiguroida viestin, kirjoita  `!config change <welcome|leave> <message>`. Tälle viestille voit käyttää variableja:
  - `{user}` Tägää käyttäjän
  - `{server}` näyttää serverin nimen
@@ -49,6 +70,9 @@ cases={"no-user":"Tämä on mahdotonta löytää tämä käyttäjä. :eyes:",
         "cases-0":"{} tapaukset löydetty: ({}-{})",
         "search-0":"**Käyttäjä:** {U}\n**Muoto:** {T}\n**Valvoja:** {M}\n**Päivämäärä:** {D}\n**Syy:** *{R}*",
         "search-1":"**Käyttäjä:** {U}\n**Serveri:** {G}\n**Muoto:** {T}\n**Valvoja:** {M}\n**Päivämäärä:** {D}\n**Syy:** *{R}*",
+        "list-0":"**Type:** {T}\n**Moderator:** {M}\n**Date:** {D}\n**Reason:** *{R}*",
+        "list-1":"**Server:** {G}\n**Type:** {T}\n**Moderator:** {M}\n**Date:** {D}\n**Reason:** *{R}*",
+        "list-2":"\n**Duration:** {D}",
         'title-search':'Tapaus #{}',
         'no_database':"Jonkun ajan tietokannan alas käynnin takia, tämä komento on pois käytöstä"}
 
@@ -85,6 +109,7 @@ fun={"count-0":"Laskeminen on kesken...",
         "count-1":"Viimeiset {} lähetystä, olet lähettänyt {} viestiä ({}%)",
         "count-2":"Sinä haluat räjäyttää Discordin! {e} Selvien suorituskykyjen syyksi, Minä laitan rajotuksen {l} viestille.",
         "count-3":"Upsis, en pysty lukea tämän kanavan historiaa. Varmista minun luvat asetuksista...",
+        "count-4":"On the last {limit} messages, {user} have posted {x} messages ({p}%)",
         "fun-list":"Tässä on lista kaikista käytettävistä hauska komentoista:",
         "no-fun":"Hauska komennot ovat kytketty pois käytöstä tällä serverillä. Näet listan niistä täältä: https://zbot.rtfd.io/en/v3/fun.html",
         "osekour":["Odota, minä olen kohta katsonut elokuvani.","Olemme tulossa! Mutta miksi et vastaa enää? Älä esitä kuollutta!","Kyllä, me tiedämme että siellä on tulipalo, meidän ei tarvitse tulla: Meillä on juhlat palokunnan talossa.","*Pelastus ei ole mahollinen, odota kunnes tämä tauko loppuu, kiitos*","*Tämä numero ei ole olemassa. Yritä uudelleen uudella numerolla.*","*Ylläpito on menossa. Yritä uudelleen 430 tunnin kuluttua.*","*Sinun puheaika on loppunut. Voit ostaa lisää puhe aikaa 86,25 eurolla!*","Kaksi lisää kappaletta Lord of the Ringsissä että olen lukenut tarpeeksi, ja sitten  minulla on aikaa! ","Kiitos että et häirinnyt meitä loman aikana","Anteeksi, täällä on enemmän kuin 3 lumihiutaletta: me olemme jumissa autotallissa","Meidän täytyy odottaa meidän jäähyn loppuun asti... Oletko sanomassa että et tiedä?! On ollut kaksi kuukautta kun aloitimme!"],
@@ -117,7 +142,28 @@ fun={"count-0":"Laskeminen on kesken...",
         "afk-user-1":"Tämä jäsen on AFK:illa koska, {}",
         "afk-user-2":"Tämä jäsen on AFK:illa!",
         "afk-done":"Sinä olet nyt AFK:illa",
-        "unafk-done":"Et ole enää AFK:illa"
+        "unafk-done":"Et ole enää AFK:illa",
+        "tip-list":["Did you know that? There are several languages for the bot, including one very fun to test: lolcat",
+                "Pro-tip: to change the bot language, use the command `config` !",
+                "Pro-tip: you will find explanations of each command in the bot documentation, at https://zbot.rtfd.io Maybe even commands you didn't know about!",
+                "Did you know that? The results of the `stats` command hide some servers, such as bot list servers, or internal ones",
+                "Did you know that? This bot was originally designed for a server in a Minecraft community. That's where he made his name, and that's why he has commands on the theme of the game.",
+                "Did you know that? The first version of the bot was written in February 2018, for personal use. At the time there were only two or three easy commands to make, like `clear` and `say`",
+                "Pro-tip: With the `say` command, you can use the emojis from any server where Zbot is, even animated emojis! Just give the emoji as if you were using it yourself",
+                "Pro-tip: To use a custom emoji in the `react` command, just give its name. And it works with any emoji!",
+                "Pro-tip: With the command `me <text>`, you can make the bot say what you want, with your nickname in front of it! Like, for example, \"*Wumpus likes bananas*\".",
+                "Pro-tip: The command `roll Nothing; Nothing; Nothing; Nothing; Nothing; Nothing; Nothing; PAN !` allows you to play Russian roulette! Be careful with that, though, okay?",
+                "Pro-tip: If you need help, feel free to use the `osekour` command",
+                "Did you know that? Sometimes, the levelup message mentions a random object. To do this, Aragorn1202 had to create a list of 60 of them, including 'a bicorne', 'a cookie' or 'a banana'!",
+                "Did you know that? In the past, Zbot's profile picture was... a creeper."
+                "Did you know that? The ZBot Staff is composed of a talented developer Admin, a second admin named after a kibble brand as well as a cat, a Ban hammer and a mushroom!",
+                "Pro-tip: The `say <text>` command is very useful for posting anonymous messages... at least when you have access to it."
+                "Pro-tip: The `discordlinks` command will give you all the useful links related to discord!",
+                "Did you know that?  All designs related to the bot are made by Adri526#9223, including the huge list of emojis used in the `bigtext` command!",
+                "Did you know that? ZBot takes its name from.... its creator, Z_runner",
+                "Pro-tip: The bot has a Discord, where you can see the current bugs and vote for the next updates! Use the `about` command to get the invite",
+                "Pro-tip: the `prefix` command allows you to have a list of the prefixes currently usable in the server",
+                ],
         }
 
 infos={"text-0":"""Moi! Olen {0} !
@@ -169,6 +215,7 @@ keywords={"depuis":"asti",
         "unknown":"Tuntematon",
         'added_at':'Added at',
         'bot':'bot',
+        'member':'member',
         'server':'server',
         'servers':'servers',
         'click_here':'Click here'
@@ -198,22 +245,26 @@ kill={"list":["Jaahas, olet kuolemassa!",
           ]}
 
 logs={"slowmode-enabled":"Hidastusmuoto on kytketty päälle kanavalla {channel} ({seconds}s)",
-"slowmode-disabled":"Hidastusmuoto on kytketty pois kanavalla {channel}",
-"clear":"{number} viestiä poistettu kanavalla {channel}",
-"kick":"{member} on potkittu (syyllä: {reason} | tapaus #{case})",
-"ban":"Käyttäjälle {member} on annettu porttikielto (syyllä: {reason} | keissi #{case})",
-"unban":"Käyttäjällä {member} ei ole enään porttikieltoa (syy: {reason})",
-"mute-on":"{member} on nyt mykistetty (syy : {reason} | tapaus #{case})",
-"mute-off":"{member} ei ole enään mykistetty",
-"softban":"{member} on väliäikaisesti potkittu (syy: {reason} | tapaus #{case})",
-"warn":"{member} on varoitettu: {reason} (tapaus #{case})",
-"tempmute-on":"{member} on nyt mykistetty, ajaksi {duration} (syy : {reason} | tapaus #{case})",
-"d-autounmute":"automaattinen mykistyksen poisto",
-"d-unmute":"mykistäjä {}",
-"d-invite":"Automaattinen valvoja (Discord kutsu linkki)",
-"d-young":"Automaattinen valvoja (liian uusi käyttäjä)",
-"d-welcome_roles":"Automaattinen tapahtuma (configuraatio annettiin_roolit)",
-"d-memberchan":"Automaattinen tapahtuma (configuraatio käyttäjänlaskelma)"}
+        "slowmode-disabled":"Hidastusmuoto on kytketty pois kanavalla {channel}",
+        "clear":"{number} viestiä poistettu kanavalla {channel}",
+        "kick":"{member} on potkittu (syyllä: {reason} | tapaus #{case})",
+        "ban":"Käyttäjälle {member} on annettu porttikielto (syyllä: {reason} | keissi #{case})",
+        "tempban":"{member} has been banned for {duration} (reason : {reason} | case #{case})",
+        "unban":"Käyttäjällä {member} ei ole enään porttikieltoa (syy: {reason})",
+        "mute-on":"{member} on nyt mykistetty (syy : {reason} | tapaus #{case})",
+        "mute-off":"{member} ei ole enään mykistetty",
+        "softban":"{member} on väliäikaisesti potkittu (syy: {reason} | tapaus #{case})",
+        "warn":"{member} on varoitettu: {reason} (tapaus #{case})",
+        "tempmute-on":"{member} on nyt mykistetty, ajaksi {duration} (syy : {reason} | tapaus #{case})",
+        "d-autounmute":"automaattinen mykistyksen poisto",
+        "d-unmute":"mykistäjä {}",
+        "d-invite":"Automaattinen valvoja (Discord kutsu linkki)",
+        "d-young":"Automaattinen valvoja (liian uusi käyttäjä)",
+        "d-welcome_roles":"Automated action (config welcome_roles)",
+        "d-gived_roles":"Automaattinen tapahtuma (configuraatio annettiin_roolit)",
+        "d-memberchan":"Automaattinen tapahtuma (configuraatio käyttäjänlaskelma)",
+        "d-unban":"unbanned by {}",
+        }
 
 mc={"contact-mail":"Jos huomaat virheen annetuissa tiedoissa, ota minuun yhteyttä personaalisesti, tai ota yhteyttä tänne: [sivustolla](https://fr-minecraft.net).",
         "serv-title":"Palvelin tiedot {}",
@@ -290,6 +341,7 @@ modo={"slowmode-0":"The slowmode is now disabled in this channel.",
         "ban-noreason":"You have just been banned from the server {} :confused:",
         "ban-reason":"You have just been banned from the server {} :confused:\nReason : {}",
         "ban":"Member {} has been banned from this server for the reason `{}`",
+        "tempban":"Member {} has been banned from this server for {}, with the reason `{}`",
         "ban-1":"It seems that this member is too high for me to ban him. :thinking:",
         "ban-list-title-0":"List of banned members of the server '{}'",
         "ban-list-title-1":"List of 45 banned members of the server '{}'",
@@ -313,7 +365,9 @@ modo={"slowmode-0":"The slowmode is now disabled in this channel.",
         "em-list-title":"Emojis of the server {}",
         "tempmute-1":"The member {} has been silenced for the reason `{}`, for {}!",
         "role-high":"Oops, this role is too high for me to change. Please move my role above the role `{}` before trying again :confused:",
-        'role-color':'The role {} has changed color!'
+        'role-color':'The role {} has changed color!',
+        'unhoisted':'{c} edited nicknames!',
+        'missing-manage-nick':"Oops, I'm missing the \"Manage nicknames\" permission!",
         }
 
 morpion={'user-begin':'{}, aloita sinä!',
@@ -342,7 +396,12 @@ partners={'invalid-bot':"Unable to find this bot",
         'deleted':'This partner has been successfully deleted from your list',
         'no-partner':"You don't have any partners",
         'no-partner-2':"No server has a partnership with you",
-        'partners-list':['Server partners','List of your partners','List of servers with you as a partner']
+        'partners-list':['Server partners','List of your partners','List of servers with you as a partner'],
+        "missing-manage-guild":"Unable to find server invites (missing 'Manage server' permission)",
+        "bot-uptime":"Uptime",
+        'no-channel':"You didn't set any partner channel",
+        'reloaded':"{} partners have been reloaded",
+        'already-added':"You have already added this partner!",
         }
 
 perms={"perms-0":"Jäsen/rooli {} ei löytynyt",
@@ -457,6 +516,7 @@ jolla voi muuttaa konfigurointia, tai `!config del <option>` jolla voi asettaa u
 
 server_desc={"prefix":"Tämän hetkinen botin etuliite: {}",
         "language": "Tämän hetkinen kieli tälle palvelimelle: **{}**",
+        "description":"Server description:\n {}",
         "clear": "Lista rooleista jotka voivat käyttää komentoa 'clear': {}",
         "slowmode": "Lista rooleista jotka voivat käyttää komentoja 'slowmode' ja 'freeze': {}",
         "mute": "Lista rooleista jotka voivat käyttää komentoa 'mute': {}",
@@ -486,7 +546,8 @@ server_desc={"prefix":"Tämän hetkinen botin etuliite: {}",
         "xp_type":"XP systeemiä: {} käytetään nyt",
         "partner_channel":"Channel where partners are sent: {}",
         "partner_color":"Color of partners embed: {}",
-        "partner_role":"Role given to partners: {}"
+        "partner_role":"Role given to partners: {}",
+        "update_mentions":"Roles mentioned in the bot changelog: {}",
         }
 
 stats_infos={"not-found":"Kyvytöntä löytää {N}",
@@ -531,6 +592,10 @@ stats_infos={"not-found":"Kyvytöntä löytää {N}",
         "guild-11.1":"20 ensimmäistä roolia (yhteismäärä {})",
         "guild-11.2":"Lista RooleistaRoles list (yhteismäärä {})",
         "guild-12":"Numero kutsuista",
+        "guild-13":"Boosts number",
+        "guild-13v":"{b} (tier {p})",
+        "guild-14":"Limitations",
+        "guild-14v":"Bitrate: {bit}kbps\nFiles size: {fil}MB\nEmojis count: {emo}\nConnected members: {mem}",
         "inv-0":"URL linkki",
         "inv-1":"Kutsuja",
         "inv-2":"Käyttöjä",
@@ -550,7 +615,9 @@ users = {'invalid-card':'Tämä tyyli on pätemätön. Tässä on lista tyyleist
         'card-desc':"Tässä on esimerkki sinun XP kortistasi. Jos haluat vaihtaa tyyliäsi voit viestittää komennon `profile card <style>` *Sinun XP kortti aikoo päivittyä vain kun ole saanut XP:tä*",
         'allow_animated_true':"Animated xp cards are currently enabled for you",
         'allow_animated_false':"Animated xp cards are currently disabled for you",
-        'allow_animated_success':"This parameter has been redefined to {}"
+        'allow_animated_success':"This parameter has been redefined to {}",
+        'allow_auto_unafk_true':"I'll remove the AFK tag from you as soon as you send a message",
+        'allow_auto_unafk_false':"You must remove the AFK tag yourself",
         }
 
 xp = {'card-level':'TASO',
@@ -583,5 +650,8 @@ xp = {'card-level':'TASO',
         'rr-removed':"Ei roolia anneta tasolle {} enään",
         'too-many-rr':"Sinulla on jo {} rooli palkintoa, et voi lisätä lisää!",
         'rr-reload':"{} päivitti rooleja / {} skannasi jäsenet",
-        'no-mee6':"Ups, olet konfiguroinut XP systeemin käyttämään MEE6 systeemiä, mutta MEE6 ei ole tällä palvelimella! Voit vaihtaa systeemin helposti viestittämällä (`{}config change xp_type` jonka perässä on systeemin nimi), tai kutsu MEE6 tälle palvelimelle."
+        'no-mee6':"Ups, olet konfiguroinut XP systeemin käyttämään MEE6 systeemiä, mutta MEE6 ei ole tällä palvelimella! Voit vaihtaa systeemin helposti viestittämällä (`{}config change xp_type` jonka perässä on systeemin nimi), tai kutsu MEE6 tälle palvelimelle.",
+        'change-global-xp':"Impossible to edit XP of the global system!",
+        'change-xp-ok':"The XP of the user {user} has been set to {xp} points!",
+        'no-bot':"Impossible to modify the XP of a bot!"
         }
