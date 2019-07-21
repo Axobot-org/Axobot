@@ -78,11 +78,14 @@ class XPCog(commands.Cog):
         if msg.author.id in self.cache['global'].keys():
             prev_points = self.cache['global'][msg.author.id][1]
         else:
-            prev_points = 0
+            try:
+                prev_points = (await self.bdd_get_xp(msg.author.id,None))['xp']
+            except:
+                prev_points = 0
         await self.bdd_set_xp(msg.author.id, giv_points, 'add')
         self.cache['global'][msg.author.id] = [round(time.time()), prev_points+giv_points]
         new_lvl = await self.calc_level(self.cache['global'][msg.author.id][1])
-        if 1 < (await self.calc_level(prev_points))[0] < new_lvl[0]:
+        if 0 < (await self.calc_level(prev_points))[0] < new_lvl[0]:
             await self.send_levelup(msg,new_lvl)
             await self.give_rr(msg.author,new_lvl[0],await self.rr_list_role(msg.guild.id))
     
@@ -99,11 +102,14 @@ class XPCog(commands.Cog):
         if msg.author.id in self.cache[msg.guild.id].keys():
             prev_points = self.cache[msg.guild.id][msg.author.id][1]
         else:
-            prev_points = 0
+            try:
+                prev_points = (await self.bdd_get_xp(msg.author.id,msg.guild.id))['xp']
+            except:
+                prev_points = 0
         await self.bdd_set_xp(msg.author.id, giv_points, 'add', msg.guild.id)
         self.cache[msg.guild.id][msg.author.id] = [round(time.time()), prev_points+giv_points]
         new_lvl = await self.calc_level(self.cache[msg.guild.id][msg.author.id][1])
-        if 1 < (await self.calc_level(prev_points))[0] < new_lvl[0]:
+        if 0 < (await self.calc_level(prev_points))[0] < new_lvl[0]:
             await self.send_levelup(msg,new_lvl)
             await self.give_rr(msg.author,new_lvl[0],await self.rr_list_role(msg.guild.id))
     
