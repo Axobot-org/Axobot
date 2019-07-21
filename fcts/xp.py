@@ -51,10 +51,7 @@ class XPCog(commands.Cog):
     async def on_ready(self):
         self.translate = self.bot.cogs['LangCog'].tr
         self.table = 'xp_beta' if self.bot.beta else 'xp'
-        bot_guilds = [x.id for x in self.bot.guilds]
-        for guild in [x[0] for x in await self.bot.cogs["ServerCog"].get_server(['ID'],criters=["`xp_type`=0"],Type=list)]:
-            if guild in bot_guilds:
-                await self.bdd_load_cache(guild,True)
+        await self.bdd_load_cache(-1)
 
     async def add_xp(self,msg):
         """Attribue un certain nombre d'xp à un message"""
@@ -91,7 +88,7 @@ class XPCog(commands.Cog):
     
     async def add_xp_2(self,msg):
         if msg.guild.id not in self.cache.keys() or len(self.cache[msg.guild.id])==0:
-            await self.bdd_load_cache(msg.guild.id, False)
+            await self.bdd_load_cache(msg.guild.id)
         if msg.author.id in self.cache[msg.guild.id].keys():
             if time.time() - self.cache[msg.guild.id][msg.author.id][0] < self.cooldown:
                 return
@@ -302,13 +299,15 @@ class XPCog(commands.Cog):
         except Exception as e:
             await self.bot.cogs['ErrorsCog'].on_error(e,None)
 
-    async def bdd_load_cache(self,guild:int,globalS:bool=False):
+    async def bdd_load_cache(self,guild:int):
         try:
-            self.bot.log.info("Chargement du cache XP (guild {})".format(guild))
+            globalS = guild==-1
             if globalS:
+                self.bot.log.info("Chargement du cache XP (global)")
                 cnx = self.bot.cnx_frm
                 query = ("SELECT `userID`,`xp` FROM `{}` WHERE `banned`=0".format(self.table))
             else:
+                self.bot.log.info("Chargement du cache XP (guild {})".format(guild))
                 cnx = self.bot.cnx_xp
                 query = ("SELECT `userID`,`xp` FROM `{}` WHERE `banned`=0".format(await self.get_table(guild)))
             cursor = cnx.cursor(dictionary = True)
@@ -408,7 +407,8 @@ class XPCog(commands.Cog):
             for table in tables:
                 cursor.execute("SELECT SUM(xp) FROM `{}`".format(table))
                 res = [x for x in cursor]
-                result += round(res[0][0])
+                if res[0][0]!=None:
+                    result += round(res[0][0])
             cursor.close()
             return result
         except Exception as e:
@@ -558,7 +558,7 @@ class XPCog(commands.Cog):
                     return await ctx.send(await self.translate(ctx.channel,'xp','not-member'))
                 xp = await self.mee6_get_player(user)
             else:
-                xp = await self.bdd_get_xp(user.id,ctx.guild.id)
+                xp = await self.bdd_get_xp(user.id,None if xp_used_type==0 else ctx.guild.id)
             if xp==None or (isinstance(xp,list) and len(xp)==0):
                 if ctx.author==user:
                     return await ctx.send(await self.translate(ctx.channel,'xp','1-no-xp'))
@@ -802,7 +802,6 @@ class XPCog(commands.Cog):
             await ctx.send(str(await self.translate(ctx.guild.id,'xp','rr-added')).format(role.name,level))
     
     @rr_main.command(name="list")
-    @commands.check(checks.has_manage_guild)
     async def rr_list(self,ctx):
         """List every roles rewards of your server"""
         if not ctx.channel.permissions_for(ctx.guild.me).embed_links:

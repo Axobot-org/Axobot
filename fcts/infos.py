@@ -677,7 +677,8 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
             current_timestamp = datetime.datetime.fromtimestamp(round(time.time()))
             table = 'emojis_beta' if self.bot.beta else 'emojis'
             query = ["INSERT INTO `{t}` (`ID`,`count`,`last_update`) VALUES ('{i}',1,'{l}') ON DUPLICATE KEY UPDATE count = `count` + 1, last_update = '{l}';".format(t=table,i=x,l=current_timestamp) for x in liste]
-            cursor.execute(*query)
+            for q in query:
+                cursor.execute(q)
             cnx.commit()
             cursor.close()
         except Exception as e:

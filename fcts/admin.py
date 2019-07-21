@@ -462,7 +462,7 @@ class AdminCog(commands.Cog):
 
     @main_msg.command(name="logs")
     @commands.check(reloads.check_admin)
-    async def show_last_logs(self,ctx,lines:typing.Optional[int]=15,match=''):
+    async def show_last_logs(self,ctx,lines:typing.Optional[int]=15,*,match=''):
         """Affiche les <lines> derniers logs ayant <match> dedans"""
         try:
             if lines>1000:
