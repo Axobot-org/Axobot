@@ -26,12 +26,14 @@ class InfosCog(commands.Cog):
             self.timecog = bot.cogs["TimeCog"]
         except:
             pass
+        self.emoji_table = 'emojis_beta' if self.bot.beta else 'emojis'
 
     @commands.Cog.listener()
     async def on_ready(self):
         self.translate = self.bot.cogs["LangCog"].tr
         self.timecog = self.bot.cogs["TimeCog"]
         self.codelines = await self.count_lines_code()
+        self.emoji_table = 'emojis_beta' if self.bot.beta else 'emojis'
     
 
     async def is_support(self,ctx):
@@ -344,6 +346,14 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
         embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","emoji-2"), value="`<:{}:{}>`".format(item.name,item.id))
         embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","emoji-1"), value=manage.capitalize())
         embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","member-1"), value = "{} ({} {})".format(await self.timecog.date(item.created_at,lang=lang,year=True),since,await self.timecog.time_delta(item.created_at,datetime.datetime.now(),lang=lang,year=True,precision=0,hour=False)), inline=False)
+        if len(item.roles)>0:
+            embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","emoji-4"), value=" ".join([x.mention for x in item.roles]))
+        infos_uses = await self.get_emojis_info(item.id)
+        if len(infos_uses)>0:
+            infos_uses = infos_uses[0]
+            lang = await self.translate(ctx.channel,'current_lang','current')
+            date = await self.bot.cogs['TimeCog'].date(infos_uses['added_at'],lang,year=True,hour=False)
+            embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","emoji-5"), value=await self.translate(ctx.guild.id,"stats_infos","emoji-5v",nbr=infos_uses['count'],date=date))
         await ctx.send(embed=embed)
 
     async def textChannel_infos(self,ctx,chan,lang):
@@ -669,21 +679,39 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
     async def emoji_analysis(self,msg):
         """Lists the emojis used in a message"""
         try:
+            ctx = await self.bot.get_context(msg)
+            if ctx.command!=None:
+                return
             liste = list(set(re.findall(r'<:[\w-]+:(\d{18})>',msg.content)))
             if len(liste)==0:
                 return
             cnx = self.bot.cnx_frm
             cursor = cnx.cursor()
             current_timestamp = datetime.datetime.fromtimestamp(round(time.time()))
-            table = 'emojis_beta' if self.bot.beta else 'emojis'
-            query = ["INSERT INTO `{t}` (`ID`,`count`,`last_update`) VALUES ('{i}',1,'{l}') ON DUPLICATE KEY UPDATE count = `count` + 1, last_update = '{l}';".format(t=table,i=x,l=current_timestamp) for x in liste]
+            query = ["INSERT INTO `{t}` (`ID`,`count`,`last_update`) VALUES ('{i}',1,'{l}') ON DUPLICATE KEY UPDATE count = `count` + 1, last_update = '{l}';".format(t=self.emoji_table,i=x,l=current_timestamp) for x in liste]
             for q in query:
                 cursor.execute(q)
             cnx.commit()
             cursor.close()
         except Exception as e:
             await self.bot.cogs['ErrorsCog'].on_error(e,None)
-
+    
+    async def get_emojis_info(self,ID:typing.Union[int,list]):
+        """Get info about an emoji"""
+        if isinstance(ID,int):
+            query = "Select * from `{}` WHERE `ID`={}".format(self.emoji_table,ID)
+        else:
+            query = "Select * from `{}` WHERE {}".format(self.emoji_table,"OR".join([f'`ID`={x}' for x in ID]))
+        cnx = self.bot.cnx_frm
+        cursor = cnx.cursor(dictionary = True)
+        cursor.execute(query)
+        liste = list()
+        for x in cursor:
+            x['emoji'] = self.bot.get_emoji(x['ID'])
+            liste.append(x)
+        cursor.close()
+        return liste
+        
 
 def setup(bot):
     bot.add_cog(InfosCog(bot))
