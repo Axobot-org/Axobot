@@ -1,4 +1,4 @@
-import discord, datetime, sys, psutil, os, aiohttp, importlib, time, asyncio, typing, random, re
+import discord, datetime, sys, psutil, os, aiohttp, importlib, time, asyncio, typing, random, re, copy
 from discord.ext import commands
 from inspect import signature
 from platform   import system as system_name  # Returns the system/OS name
@@ -11,6 +11,8 @@ importlib.reload(conf)
 from fcts import reloads, args
 importlib.reload(reloads)
 importlib.reload(args)
+from libs import bitly_api
+importlib.reload(bitly_api)
 
 bot_version = conf.release
 
@@ -27,6 +29,7 @@ class InfosCog(commands.Cog):
         except:
             pass
         self.emoji_table = 'emojis_beta' if self.bot.beta else 'emojis'
+        self.BitlyClient = bitly_api.Bitly(login='zrunner',api_key=self.bot.others['bitly'])
 
     @commands.Cog.listener()
     async def on_ready(self):
@@ -711,6 +714,41 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
             liste.append(x)
         cursor.close()
         return liste
+    
+
+    @commands.group(name="bitly")
+    async def bitly_main(self,ctx:commands.Context):
+        """Bit.ly website, but in Discord
+        Create shortened url and unpack them by using Bitly services"""
+        if ctx.subcommand_passed==None:
+            await self.bot.cogs['HelpCog'].help_command(ctx,['bitly'])
+        elif ctx.invoked_subcommand==None and ctx.subcommand_passed!=None:
+            try:
+                url = await args.url().convert(ctx,ctx.subcommand_passed)
+            except:
+                return
+            if url.domain == 'bit.ly':
+                msg = copy.copy(ctx.message)
+                msg.content = ctx.prefix + 'bitly find '+url.url
+                new_ctx = await self.bot.get_context(msg)
+                await self.bot.invoke(new_ctx)
+            else:
+                msg = copy.copy(ctx.message)
+                msg.content = ctx.prefix + 'bitly create '+url.url
+                new_ctx = await self.bot.get_context(msg)
+                await self.bot.invoke(new_ctx)
+
+    @bitly_main.command(name="create")
+    async def bitly_create(self,ctx,url:args.url):
+        """Create a shortened url"""
+        await ctx.send(await self.translate(ctx.channel,'infos','bitly_short',url=self.BitlyClient.shorten_url(url.url)))
+    
+    @bitly_main.command(name="find")
+    async def bitly_find(self,ctx,url:args.url):
+        """Find the long url from a bitly link"""
+        if url.domain != 'bit.ly':
+            return await ctx.send(await self.translate(ctx.channel,'infos','bitly_nobit'))
+        await ctx.send(await self.translate(ctx.channel,'infos','bitly_long',url=self.BitlyClient.expand_url(url.url)))
         
 
 def setup(bot):
