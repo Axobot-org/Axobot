@@ -208,6 +208,9 @@ Bonne journée !""",
                 'Proposer une idée à Discord':'https://dis.gd/feedback',
                 'Explication des selfbots':'https://support.discordapp.com/hc/articles/115002192352',
                 'CGU pour les développeurs de bot':'https://discordapp.com/developers/docs/legal'},
+        "bitly_short":"URL raccourcie : {url}",
+        "bitly_long":"URL d'origine : {url}",
+        "bitly_nobit":"Cette adresse n'est pas un lien bit.ly !",
         }
 
 infos_2={"membercount-0":"Nombre de membres total",

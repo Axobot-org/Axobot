@@ -208,6 +208,9 @@ Has a nice dayz !""",
                 'Suggest something to Discord':'https://dis.gd/feedback',
                 'Selfbots article':'https://support.discordapp.com/hc/articles/115002192352',
                 'ToS for bot devs':'https://discordapp.com/developers/docs/legal'},
+        "bitly_short":"Quick linq: {url}",
+        "bitly_long":"Slow link: {url}",
+        "bitly_nobit":"HAHA NOPE, dat's not a bit.ly link!",
         }
 
 infos_2={"membercount-0":"Total nmber of membrz",

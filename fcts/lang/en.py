@@ -208,6 +208,9 @@ Have a nice day!""",
                 'Suggest something to Discord':'https://dis.gd/feedback',
                 'Selfbots article':'https://support.discordapp.com/hc/articles/115002192352',
                 'ToS for bot devs':'https://discordapp.com/developers/docs/legal'},
+        "bitly_short":"Shortened URL: {url}",
+        "bitly_long":"Original URL: {url}",
+        "bitly_nobit":"This address is not a bit.ly link!",
         }
 
 infos_2={"membercount-0":"Total number of members",
