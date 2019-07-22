@@ -118,7 +118,7 @@ class url(commands.Converter):
             return f"Url(url='{self.url}', domain='{self.domain}', path='{self.path}', is_https={self.is_https})"
 
     async def convert(self,ctx:commands.Context,argument):
-        r = re.search(r'(?P<https>https?)://(?:www.)?(?P<domain>[^/\s]+)(?:/(?P<path>[\S]+))?', argument)
+        r = re.search(r'(?P<https>https?)://(?:www\.)?(?P<domain>[^/\s]+)(?:/(?P<path>[\S]+))?', argument)
         if r==None:
             raise commands.errors.BadArgument('Invalid url: '+argument)
         return self.Url(r)
