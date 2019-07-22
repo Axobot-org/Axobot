@@ -78,3 +78,12 @@ Hour & Weather
 With these two commands, you can get the time (and timezone) or weather for any city in the world! All you have to do is enter the name of the city, preferably in English format (London instead of Londres for example), and the magic does the rest!
 
 .. note:: For the `weather` command, it is better to give the "`Embed Links <perms.html#embed-links>`_" permission to the bot, to get a better rendering. But it's not mandatory!
+
+
+----------
+Bitly urls
+----------
+
+**Syntax:** :code:`bitly [create|find] <url>`
+
+Bitly is a famous website for shortening web addresses (aka url). With this command you can create a shortcut yourself instantly using their services, and see to which address a bit.ly link refers without having to click on it. Practical, isn't it?
