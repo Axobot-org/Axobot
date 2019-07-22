@@ -93,18 +93,20 @@ cases={"no-user":"Unable to find dis usr :eyes:",
 
 events={'mp-adv':"U're probably trying 2 invite me in dis server? If that's the case, I can't join him with a simple invite. An super-admin must use my own link, just here: <https://bot.discord.io/zbot> :innocent:"}
 
-errors={"cooldown":"Yu are on cold-own for dis comandZ :confused: Plize wait {} moRe secs...",
-        "badarguments":"W0ops, unabled 2 convrt teh `{c[3]}` parameterz to \"{c[1]}\" tipe :confused:",
-        'badarguments-2':"`{0}` iznt a true {1} option",
-        "missingargument":"Oops, te argumnt \"{}\" are missin {}",
-        "membernotfound":"Unabl to found the membr `{}` :confused:",
-        "usernotfound":"Unabled 2 find teh userZ `{}` :confused:",
-        "disabled":"Da {} cmd is dizabled :confused:",
-        "duration":"Invalid timer: `{}`",
-        "rolenotfound":"Unable 2 find ur role (`{0}`)",
-        "invalidcolor":"Ups, I can't find the color `{0}` :confused:",
-        "invalidinvite":"Invalid bot/server link: `{0}`",
-        'channotfound':"Super chat room {0} don't want 2 be found",
+errors={"cooldown":"Yu are on cold-own for dis comandZ :confused: Plize wait {d} moRe secs...",
+        "badarguments":"W0ops, unabled 2 convrt teh `{p}` parameterz to \"{t}\" tipe :confused:",
+        'badarguments-2':"`{p}` iznt a true {t} option",
+        "missingargument":"Oops, te argumnt \"{a}\" are missin {e}",
+        "membernotfound":"Unabl to found the membr `{m}` :confused:",
+        "usernotfound":"Unabled 2 find teh userZ `{u}` :confused:",
+        "disabled":"Da {c} cmd is dizabled :confused:",
+        "duration":"Invalid timer: `{d}`",
+        "rolenotfound":"Unable 2 find ur role (`{r}`)",
+        "invalidcolor":"Ups, I can't find the color `{c}` :confused:",
+        "invalidinvite":"Invalid bot/server link: `{i}`",
+        "invalidguild":"Upsi, dat guild don't want to be find: {g}",
+        "invalidurl":"Nope, `{u}` iznt a valid ~~cat~~ link",
+        'channotfound':"Super chat room {c} don't want 2 be found",
         'DM':"Dat command isn't enabled in PM"
         }
 
