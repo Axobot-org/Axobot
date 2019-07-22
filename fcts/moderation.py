@@ -795,7 +795,7 @@ ID corresponds to the Identifier of the message"""
     @commands.guild_only()
     @commands.cooldown(2,120, commands.BucketType.guild)
     @commands.check(checks.has_admin)
-    async def backup_server(self,ctx):
+    async def backup_server(self,ctx:commands.Context):
         """Make and send a backup of this server
         You will find there the configuration of your server, every general settings, the list of members with their roles, the list of categories and channels (with their permissions), emotes, and webhooks.
         Please note that audit logs, messages and invites are not used"""
@@ -815,14 +815,14 @@ ID corresponds to the Identifier of the message"""
                 else:
                     temp = {'id':c.id,'name':c.name,'position':c.position,'is_nsfw':c.is_nsfw()}
                     perms = list()
-                    for p in c.overwrites:
-                        temp2 = {'id':p[0].id}
-                        if isinstance(p[0],discord.Member):
+                    for iter_obj, iter_perm in c.overwrites.items():
+                        temp2 = {'id':iter_obj.id}
+                        if isinstance(iter_obj,discord.Member):
                             temp2['type'] = 'member'
                         else:
                             temp2['type'] = 'role'
                         temp2['permissions'] = dict()
-                        for x in iter(p[1]):
+                        for x in iter(iter_perm):
                             if x[1] != None:
                                 temp2['permissions'][x[0]] = x[1]
                         perms.append(temp2)
@@ -838,14 +838,14 @@ ID corresponds to the Identifier of the message"""
                     else:
                         chan_js['type'] = str(type(chan))
                     perms = list()
-                    for p in chan.overwrites:
-                        temp2 = {'id':p[0].id}
-                        if isinstance(p[0],discord.Member):
+                    for iter_obj,iter_perm in chan.overwrites.items():
+                        temp2 = {'id':iter_obj.id}
+                        if isinstance(iter_obj,discord.Member):
                             temp2['type'] = 'member'
                         else:
                             temp2['type'] = 'role'
                         temp2['permissions'] = dict()
-                        for x in iter(p[1]):
+                        for x in iter(iter_perm):
                             if x[1] != None:
                                 temp2['permissions'][x[0]] = x[1]
                         perms.append(temp2)
@@ -855,21 +855,25 @@ ID corresponds to the Identifier of the message"""
             back['categories'] = categ
             back['emojis'] = dict()
             for e in g.emojis:
-                back['emojis'][e.name] = e.url
+                back['emojis'][e.name] = str(e.url)
             try:
                 banned = dict()
                 for b in await g.bans():
                     banned[b.user.id] = b.reason
                 back['banned_users'] = banned
-            except:
-                await ctx.send("msg-ban")
+            except discord.errors.Forbidden:
+                pass
+            except Exception as e:
+                await ctx.bot.cogs['ErrorsCog'].on_error(e,ctx)
             try:
                 webs = list()
                 for w in await g.webhooks():
-                    webs.append({'channel':w.channel_id,'name':w.name,'avatar':w.avatar_url,'url':w.url})
+                    webs.append({'channel':w.channel_id,'name':w.name,'avatar':str(w.avatar_url),'url':w.url})
                 back['webhooks'] = webs
-            except:
-                await ctx.send("msg-webhook")
+            except discord.errors.Forbidden:
+                pass
+            except Exception as e:
+                await ctx.bot.cogs['ErrorsCog'].on_error(e,ctx)
             back['members'] = list()
             for memb in g.members:
                 back['members'].append({'id':memb.id,'nickname':memb.nick,'bot':memb.bot,'roles':[x.id for x in memb.roles][1:]})
