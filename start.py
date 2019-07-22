@@ -205,6 +205,7 @@ def main():
         client.others['divinediscordbots'] = cryptage.uncrypte(r[5])
         client.others['botsondiscord'] = cryptage.uncrypte(r[6])
         client.others['discordbotsgroup'] = cryptage.uncrypte(r[7])
+        client.others['bitly'] = cryptage.uncrypte(r[8])
     try:
         cnx = mysql.connector.connect(user=client.database_keys['user'],password=client.database_keys['password'],host=client.database_keys['host'],database=client.database_keys['database1'])
         cnx.close()
