@@ -1,5 +1,6 @@
 import discord, re
 from discord.ext import commands
+from urllib.parse import urlparse
 
 class tempdelta(commands.Converter):
     def __init__(self):
@@ -94,7 +95,7 @@ class Guild(commands.Converter):
     def __init__(self):
         pass
     
-    async def convert(self,ctx:commands.context,argument):
+    async def convert(self,ctx:commands.Context,argument):
         if argument.isnumeric():
             res = ctx.bot.get_guild(int(argument))
             if res != None:
@@ -106,8 +107,18 @@ class url(commands.Converter):
     def __init__(self):
         pass
     
-    async def convert(self,ctx:commands.context,argument):
-        r = re.search(r'(https?://\S+\.[^/\s]+(?:/\S+|))',argument)
+    class Url:
+        def __init__(self,regex_exp:re.Match):
+            self.domain = regex_exp.group('domain')
+            self.path = regex_exp.group('path')
+            self.is_https = regex_exp.group('https') == 'https'
+            self.url = regex_exp.group(0)
+        
+        def __str__(self):
+            return f"Url(url='{self.url}', domain='{self.domain}', path='{self.path}', is_https={self.is_https})"
+
+    async def convert(self,ctx:commands.Context,argument):
+        r = re.search(r'(?P<https>https?)://(?:www.)?(?P<domain>[^/\s]+)(?:/(?P<path>[\S]+))?', argument)
         if r==None:
             raise commands.errors.BadArgument('Invalid url: '+argument)
-        return r.group(0)
+        return self.Url(r)
