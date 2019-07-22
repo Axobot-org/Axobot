@@ -100,3 +100,14 @@ class Guild(commands.Converter):
             if res != None:
                 return res
         raise commands.errors.BadArgument('Invalid guild: '+argument)
+
+
+class url(commands.Converter):
+    def __init__(self):
+        pass
+    
+    async def convert(self,ctx:commands.context,argument):
+        r = re.search(r'(https?://\S+\.[^/\s]+(?:/\S+|))',argument)
+        if r==None:
+            raise commands.errors.BadArgument('Invalid url: '+argument)
+        return r.group(0)
