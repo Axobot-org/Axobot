@@ -43,6 +43,7 @@ class HelpCog(commands.Cog):
         """Shows this message
         Enable "Embed Links" permission for better rendering"""
         try:
+            commands = [x.replace('@everyone','@​everyone').replace('@here','@​here') for x in commands]
             if len(commands) == 0:
                 await self.help_command(ctx)
             else:
