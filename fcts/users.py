@@ -44,8 +44,6 @@ class UsersCog(commands.Cog):
                 await ctx.send(await self.translate(ctx.channel,'users','missing-attach-files'))
         else:
             if await ctx.bot.cogs['UtilitiesCog'].change_db_userinfo(ctx.author.id,'xp_style',style):
-                if style=='rainbow' and datetime.datetime.today().day==1:
-                    await ctx.bot.cogs['UtilitiesCog'].change_db_userinfo(ctx.author.id,'unlocked_rainbow',True)
                 await ctx.send(str(await self.translate(ctx.channel,'users','changed-0')).format(style))
             else:
                 await ctx.send(await self.translate(ctx.channel,'users','changed-1'))
