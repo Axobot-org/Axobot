@@ -4,8 +4,8 @@ from discord.ext import commands
 from tzwhere import tzwhere
 from pytz import timezone
 
-from fcts import emoji
-importlib.reload(emoji)
+from fcts import emojis
+importlib.reload(emojis)
 
 cmds_list = ['count_msg','ragequit','pong','run','nope','blame','party','bigtext','shrug','gg','money','pibkac','osekour','me','kill','cat','rekt','thanos','nuke','pikachu','pizza','google','loading','piece','roll']
 

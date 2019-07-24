@@ -167,7 +167,7 @@ def main():
                       'fcts.bvn',
                       'fcts.cases',
                       'fcts.embeds',
-                      'fcts.emoji',
+                      'fcts.emojis',
                       'fcts.errors',
                       'fcts.events',
                       'fcts.fun',
