@@ -85,8 +85,10 @@ This small command allows you to see the list of permissions assigned to a membe
 Prefix
 ------
 
-**Syntax:** :code:`prefix`
+**Syntax:** :code:`prefix` or :code:`prefix change <new prefix>`
 
 A nice shortcut to know the prefixes to which the bot responds. This is usually the prefix defined in the `configuration <server.html>`_, plus the mention of the bot.
 
 Note that this result may differ from the :code:`config see prefix` command when the database is out of sync.
+
+..note:: The subcommand :code:`prefix change` is an alias of :code:`config change prefix`

@@ -651,15 +651,26 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
                 text += "- {i[0]} : {i[1]}\n".format(i=i)
             await ctx.send(text)
 
-    @commands.command(name="prefix")
-    async def get_prefix(self,ctx):
+    @commands.group(name="prefix")
+    async def get_prefix(self,ctx:commands.Context):
         """Show the usable prefix(s) for this server"""
+        if ctx.invoked_subcommand != None:
+            return
         txt = await self.translate(ctx.channel,"infos","prefix")
         prefix = "\n".join(await ctx.bot.get_prefix(ctx.message))
         if ctx.guild==None or ctx.channel.permissions_for(ctx.guild.me):
             emb = ctx.bot.cogs['EmbedCog'].Embed(title=txt,desc=prefix,time=ctx.message.created_at,color=ctx.bot.cogs['HelpCog'].help_color).create_footer(ctx.author)
             return await ctx.send(embed=emb.discord_embed())
         await ctx.send(txt+"\n"+prefix)
+    
+    @get_prefix.command(name="change")
+    @commands.guild_only()
+    async def prefix_change(self,ctx,new_prefix):
+        """Change the user prefix"""
+        msg = copy.copy(ctx.message)
+        msg.content = ctx.prefix + 'config change prefix '+new_prefix
+        new_ctx = await self.bot.get_context(msg)
+        await self.bot.invoke(new_ctx)
     
     @commands.command(name="discordlinks",aliases=['discord','discordurls'])
     async def discord_status(self,ctx):
