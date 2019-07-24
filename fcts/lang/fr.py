@@ -106,6 +106,7 @@ errors={"cooldown":"Vous êtes en cooldown pour cette commande. Veuillez attendr
         "invalidinvite":"Invitation de bot ou de serveur invalide : `{i}`",
         "invalidguild":"Ce serveur est introuvable : `{g}`",
         "invalidurl":"Url invalide : `{u}`",
+        "invalidleaderboard":"Type de classement inexistant",
         'channotfound':"Le salon {c} est introuvable",
         'DM':"Cette commande est indisponible en Messages Privés",
         }

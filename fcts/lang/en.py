@@ -105,6 +105,7 @@ errors={"cooldown":"You are on cooldown for this command :confused: Please wait 
         "invalidcolor":"Color `{c}` invalid",
         "invalidinvite":"Invalid bot/server invite: `{i}`",
         "invalidguild":"This server can't be found: `{g}`",
+        "invalidleaderboard":"Invalid leaderboard type",
         "invalidurl":"Invalid url: `{u}`",
         'channotfound':"Channel {c} not found",
         'DM':"This command isn't available in Direct Messages",
