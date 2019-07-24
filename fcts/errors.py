@@ -49,7 +49,7 @@ class ErrorsCog(commands.Cog):
             await ctx.send(await self.translate(ctx.channel,'errors','cooldown',d=round(error.retry_after,2)))
             return
         elif isinstance(error,(commands.BadArgument,commands.BadUnionArgument)):
-            raw_error = raw_error.replace('@eveyrone','@​everyone').replace('@here','@​here')
+            raw_error = str(error).replace('@eveyrone','@​everyone').replace('@here','@​here')
             # Could not convert "limit" into int. OR Converting to "int" failed for parameter "number".
             r = re.search(r'Could not convert \"(?P<arg>[^\"]+)\" into (?P<type>[^.\n]+)',raw_error)
             if r==None:
@@ -96,6 +96,10 @@ class ErrorsCog(commands.Cog):
             r = re.search(r'Invalid url: (\S+)',raw_error)
             if r!=None:
                 return await ctx.send(await self.translate(ctx.channel,'errors','invalidurl',u=r.group(1)))
+            # Invalid leaderboard type: lol
+            r = re.search(r'Invalid leaderboard type: (\S+)',raw_error)
+            if r!=None:
+                return await ctx.send(await self.translate(ctx.channel,'errors','invalidleaderboard'))
             print('errors -',error)
         elif isinstance(error,commands.MissingRequiredArgument):
             await ctx.send(await self.translate(ctx.channel,'errors','missingargument',a=error.param.name,e=random.choice([':eyes:','',':confused:',':thinking:',''])))
