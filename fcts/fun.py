@@ -422,7 +422,7 @@ You can specify a verification limit by adding a number in argument"""
     @commands.check(is_fun_enabled)
     async def lmgtfy(self,ctx,*,search):
         """How to use Google"""
-        link = "http://lmgtfy.com/?q="+search.replace(" ","+")
+        link = "http://lmgtfy.com/?q="+search.replace(" ","+").replacee('@eveyrone','@+everyone').replace('@here','@+here')
         await ctx.send(link)
         await self.bot.cogs['UtilitiesCog'].suppr(ctx.message)
     
