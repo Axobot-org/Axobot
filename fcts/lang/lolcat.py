@@ -511,7 +511,7 @@ UrL : {link}""",
         }
 
 server={"config-help": "Dis cmd is mainly usd 2 configur ur srver. By doin `!config see [option]` u will get \
-overview ov teh currnt configuraishun, and supr cool servr masters can enter `!config change <option> role1, role2, role3...` \
+overview ov teh currnt configuraishun, and supr cool servr masters can enter `!config change <option> val1 , val2, val4...` \
 to modify configuraishun, or `!config del <option>` 2 reset teh option (`!config change <option>` works same).\nTeh list ov options is displayd at <https://zbot.rtfd.io/en/latest/server.html#list-of-every-option>",
         "change-0": "Dis option doz not exist :confused:",
         "change-1": "Oops, an internal error occurrd...\nBut doan worry, we'r on teh place: http://asset-5.soupcdn.com/asset/3247/3576_5092_600.jpeg",
