@@ -794,6 +794,8 @@ class XPCog(commands.Cog):
         """Add a role reward
         This role will be given to every member who reaches the level"""
         try:
+            if role.name == '@everyone':
+                raise commands.BadArgument(f'Role "{role.name}" not found')
             l = await self.rr_list_role(ctx.guild.id)
             if len([x for x in l if x['level']==level])>0:
                 return await ctx.send(await self.translate(ctx.guild.id,'xp','already-1-rr'))

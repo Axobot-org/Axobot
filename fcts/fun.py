@@ -110,7 +110,7 @@ class FunCog(commands.Cog):
             return await ctx.send(await self.translate(ctx.channel,"fun","no-roll"))
         choosen = None
         while choosen==self.last_roll:
-            choosen = random.choice(liste)
+            choosen = random.choice(liste).replace('@everyone','@​everyone').replace('@here','@​here')
         await ctx.send(choosen)
 
     @commands.command(name="cookie",hidden=True)
@@ -218,7 +218,7 @@ You can specify a verification limit by adding a number in argument"""
             victime = ctx.author.display_name
             ex = ctx.author.display_name.replace(" ","_")
         else:
-            victime = name
+            victime = name.replace('@everyone','@​everyone').replace('@here','@​here')
             ex = name.replace(" ","_")
         author = ctx.author.mention
         liste = await self.translate(ctx.channel,"kill","list")
@@ -369,6 +369,7 @@ You can specify a verification limit by adding a number in argument"""
     @commands.check(is_fun_enabled)
     async def me(self,ctx,*,text):
         """No U"""
+        text = await self.bot.cogs["UtilitiesCog"].clear_msg(text,everyone=ctx.message.mention_everyone,ctx=ctx)
         await ctx.send("*{} {}*".format(ctx.author.display_name,text))
         if self.bot.database_online and await self.bot.cogs["ServerCog"].staff_finder(ctx.author,"say"):
             await self.bot.cogs["UtilitiesCog"].suppr(ctx.message)
@@ -494,6 +495,7 @@ You can specify a verification limit by adding a number in argument"""
         """Make you AFK
         You'll get a nice nickname, because nicknames are cool, aren't they?"""
         try:
+            reason = await self.bot.cogs['UtilitiesCog'].clear_msg(reason,ctx.message.mention_everyone,ctx)
             if (not ctx.author.display_name.endswith(' [AFK]')) and len(ctx.author.display_name)<26:
                 await ctx.author.edit(nick=ctx.author.display_name+" [AFK]")
             self.afk_guys[ctx.author.id] = reason

@@ -177,6 +177,7 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
                 try:
                     item = await find(ctx,name,Type)
                 except:
+                    name = name.replace('@everyone',"@"+u"\u200B"+"everyone").replace("@here","@"+u"\u200B"+"here")
                     await ctx.send(str(await self.translate(ctx.guild.id,"modo","cant-find-user")).format(name))
                     return
             critical = ctx.author.guild_permissions.manage_guild or await self.bot.cogs['AdminCog'].check_if_god(ctx)
@@ -261,9 +262,6 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
             guilds_count = await self.bot.cogs['PartnersCog'].get_guilds(item.id,session)
             if guilds_count!=None:
                 embed.add_field(name=str(await self.translate(ctx.guild.id,'keywords','servers')).capitalize(),value=guilds_count)
-            uptime = await self.bot.cogs['PartnersCog'].get_uptimes(item.id,session)
-            if uptime!=None:
-                embed.add_field(name=await self.translate(ctx.guild,'partners','bot-uptime'),value=f'{round(uptime)}%')
             await session.close()
         await ctx.send(embed=embed)
 
@@ -320,9 +318,6 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
             guilds_count = await self.bot.cogs['PartnersCog'].get_guilds(item.id,session)
             if guilds_count!=None:
                 embed.add_field(name=str(await self.translate(ctx.guild.id,'keywords','servers')).capitalize(),value=guilds_count)
-            uptime = await self.bot.cogs['PartnersCog'].get_uptimes(item.id,session)
-            if uptime!=None:
-                embed.add_field(name=await self.translate(ctx.guild,'partners','bot-uptime'),value=f'{round(uptime)}%')
             await session.close()
         await ctx.send(embed=embed)
 
