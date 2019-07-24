@@ -944,7 +944,7 @@ class EmojiCog(commands.Cog):
 	def __init__(self,bot):
 		self.bot = bot
 		self.emojiMap = emojiMap
-		self.file = "emoji"
+		self.file = "emojis"
 		self.numbers = numbers
 		self.alphabet = alphabet
 		self.chars = characteres
