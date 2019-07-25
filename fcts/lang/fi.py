@@ -78,18 +78,18 @@ cases={"no-user":"Tämä on mahdotonta löytää tämä käyttäjä. :eyes:",
 
 events={'mp-adv':"Sinä varmaan yrität kutsua minut tähän palvelimeen? Jos tämä on oikein, en voi liittyä helpolla kutsu linkillä. Järjestyksenvalvojan täytyy käyttää minun omaa kutsu linkkiä, täällä:<https://bot.discord.io/zbot> :wink:"}
 
-errors={"cooldown":"Olet jäähyllä tältä commandilta :confused:  Odota {d} lisää sekunttia...",
-        "badarguments":"Upsis, on mahdotonta muuntaa `{p}` paramittarin\"{t}\" tyyppiä :confused:",
-        'badarguments-2':"`{p}` is not a recognised {t} option",
-        "missingargument":"Upsis, argumentti \"{a}\" puuttuu {e}",
-        "membernotfound":"On mahdotonta löytää käyttäjä `{m}` :confused:",
-        "usernotfound":"On mahdotonta löytää käyttäjä `{u}` :confused:",
-        "disabled":"Komento {c} on poissa käytöstä :confused:",
-        "duration":"Aika `{d}` on epäselvä",
-        "rolenotfound":"On mahdotonta löytää rooli `{r}`",
-        "invalidcolor":"Väri `{c}` epäselvä",
-        "invalidinvite":"Invalid bot/server invite: `{i}`",
-        'channotfound':"Channel {c} not found",
+errors={"cooldown":"Olet jäähyllä tältä commandilta :confused:  Odota {} lisää sekunttia...",
+        "badarguments":"Upsis, on mahdotonta muuntaa `{c[3]}` paramittarin\"{c[1]}\" tyyppiä :confused:",
+        'badarguments-2':"`{0}` is not a recognised {1} option",
+        "missingargument":"Upsis, argumentti \"{}\" puuttuu {}",
+        "membernotfound":"On mahdotonta löytää käyttäjä `{}` :confused:",
+        "usernotfound":"On mahdotonta löytää käyttäjä `{}` :confused:",
+        "disabled":"Komento {} on poissa käytöstä :confused:",
+        "duration":"Aika `{}` on epäselvä",
+        "rolenotfound":"On mahdotonta löytää rooli `{0}`",
+        "invalidcolor":"Väri `{0}` epäselvä",
+        "invalidinvite":"Invalid bot/server invite: `{0}`",
+        'channotfound':"Channel {0} not found",
         'DM':"This command isn't available in Direct Messages",
         }
 
@@ -480,7 +480,7 @@ Link : {link}""",
 }
 
 server={"config-help": "Tätä komentoa yleensä käytetään palvelimen konfigurointiin. Viestittämällä `!config see [option]` sinä aiot saada \
-näyn tämänaikaisesta konfiguraatiosta, ja palvelimen järjestyksenvalvojat voivat viestittää `!config change <option> role1, role2, role3...` \
+näyn tämänaikaisesta konfiguraatiosta, ja palvelimen järjestyksenvalvojat voivat viestittää `!config change <option> ominaisuus1, ominaisuus2...` \
 jolla voi muuttaa konfigurointia, tai `!config del <option>` jolla voi asettaa uudelleen vaitoehdon (`!config change <option>` toimii samallain).\nLista mahdollisista vaihtoehdoista löytyy täältä: <https://zbot.rtfd.io/en/latest/config.html#list-of-every-option>",
         "change-0": "Tämä vaihtoehto ei ole olemassa :confused:",
         "change-1": "Ups, sisäinen virhe tapahtui...",
@@ -607,7 +607,7 @@ stats_infos={"not-found":"Kyvytöntä löytää {N}",
         "categ-2":"Teksti : {} | Ääni : {}",
          }
 
-users = {'invalid-card':'Tämä tyyli on pätemätön. Tässä on lista tyyleistä sinä voit käyttää: {}',
+users = {'invalid-card':'Tämä tyyli on pätemätön. Tässä on lista tyyleistä joita sinä voit käyttää: {}',
         'list-cards':"Tässä on lista kaikista tyyleistä sinä voit käyttää: {}",
         'missing-attach-files':'Ups, minulta puuttuu käyttöoikeus: Liitä tiedostoja :confused:',
         'changed-0':'Sinun XP kortti käyttää nyt tyyliä: {}',
@@ -651,7 +651,7 @@ xp = {'card-level':'TASO',
         'too-many-rr':"Sinulla on jo {} rooli palkintoa, et voi lisätä lisää!",
         'rr-reload':"{} päivitti rooleja / {} skannasi jäsenet",
         'no-mee6':"Ups, olet konfiguroinut XP systeemin käyttämään MEE6 systeemiä, mutta MEE6 ei ole tällä palvelimella! Voit vaihtaa systeemin helposti viestittämällä (`{}config change xp_type` jonka perässä on systeemin nimi), tai kutsu MEE6 tälle palvelimelle.",
-        'change-global-xp':"Impossible to edit XP of the global system!",
-        'change-xp-ok':"The XP of the user {user} has been set to {xp} points!",
-        'no-bot':"Impossible to modify the XP of a bot!"
+        'change-global-xp':"Ei voi muokata XP:tä maailmanlaajuisesta systeemistä!",
+        'change-xp-ok':"XP käyttäjälle {user} on asetettu {xp} pisteeseen!",
+        'no-bot':"Ei voi muokata bottejen XP:tä!"
         }
