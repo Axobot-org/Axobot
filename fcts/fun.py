@@ -403,8 +403,6 @@ You can specify a verification limit by adding a number in argument"""
     @commands.check(is_fun_enabled)
     async def nuke(self,ctx):
         """BOOOM"""
-        if self.bot.database_online and not await self.bot.cogs["ServerCog"].staff_finder(ctx.author,"say"):
-            return
         await ctx.send(file=await self.utilities.find_img('nuke.gif'))
     
     @commands.command(name="pikachu",hidden=True)
