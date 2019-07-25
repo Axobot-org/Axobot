@@ -562,6 +562,7 @@ class XPCog(commands.Cog):
                 user = ctx.guild.get_member(user.id)
                 if user==None:
                     return await ctx.send(await self.translate(ctx.channel,'xp','not-member'))
+                return
                 xp = await self.mee6_get_player(user)
             else:
                 xp = await self.bdd_get_xp(user.id,None if xp_used_type==0 else ctx.guild.id)
@@ -668,6 +669,7 @@ class XPCog(commands.Cog):
         elif xp_system_used==1:
             if ctx.guild.get_member(159985870458322944)==None:
                 return await ctx.send(str(await self.translate(ctx.guild.id,'xp','no-mee6')).format(ctx.prefix))
+            return
             ranks = await self.mee6_get_top(ctx.guild,20*page)
             max_page = ceil(len(ranks)/20)
         else:
