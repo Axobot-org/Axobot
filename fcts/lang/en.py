@@ -182,6 +182,22 @@ fun={"count-0":"Counting in progress...",
                 "Pro-tip: The bot has a Discord, where you can see the current bugs and vote for the next updates! Use the `about` command to get the invite",
                 "Pro-tip: the `prefix` command allows you to have a list of the prefixes currently usable in the server",
                 ],
+        "markdown":r"""__**Markdown Rules** on *Discord*__
+
+`*italics*` = *italics*
+`__underline__` = __underline__
+`**bold**` = **bold**
+`***bold italics***` = ***bold italics***
+`~~strikeout~~` = ~~strikeout~~
+`__*underline italics*__` = __*underline italics*__
+`__**underline bold**__` = __**underline bold**__
+`__***underline bold italics***__` = __***underline bold italics***__
+`||spoiler||` = ||spoiler||
+> quote = `> quote`
+\`code\` = `code`
+\\ to ignore
+
+For code blocks, cf <https://discord.gg/DGahTNn>""",
         }
 
 infos={"text-0":"""Hello! I'm {0} !

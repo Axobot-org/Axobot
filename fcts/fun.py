@@ -7,7 +7,7 @@ from pytz import timezone
 from fcts import emojis
 importlib.reload(emojis)
 
-cmds_list = ['count_msg','ragequit','pong','run','nope','blame','party','bigtext','shrug','gg','money','pibkac','osekour','me','kill','cat','rekt','thanos','nuke','pikachu','pizza','google','loading','piece','roll']
+cmds_list = ['count_msg','ragequit','pong','run','nope','blame','party','bigtext','shrug','gg','money','pibkac','osekour','me','kill','cat','rekt','thanos','nuke','pikachu','pizza','google','loading','piece','roll','afk']
 
 async def is_fun_enabled(ctx):
     self = ctx.bot.cogs["FunCog"]
@@ -612,6 +612,11 @@ You can specify a verification limit by adding a number in argument"""
             if count==0:
                 await msg.add_reaction('👍')
                 await msg.add_reaction('👎')
+
+    @commands.command(name="markdown")
+    async def markdown(self,ctx):
+        """Get help about markdown in Discord"""
+        await ctx.send(await self.translate(ctx.channel,'fun','markdown'))
 
     @commands.command(name="vote")
     @commands.cooldown(4, 30, type=commands.BucketType.guild)
