@@ -354,6 +354,7 @@ class RssCog(commands.Cog):
                 return
             text = [await self.translate(ctx.guild.id,'rss','list')]
             list_of_IDs = list()
+            iterator = 1
             for e,x in enumerate(gl):
                 if x['type']=='mc':
                     continue
@@ -374,20 +375,21 @@ class RssCog(commands.Cog):
                         else:
                             r.append(item)
                     r = ", ".join(r)
-                MAX = e+1
-                text.append("{}) {} - {} - {} - {}".format(e+1,await self.translate(ctx.guild.id,'rss',x['type']),x['link'],c,r))
+                text.append("{}) {} - {} - {} - {}".format(iterator,await self.translate(ctx.guild.id,'rss',x['type']),x['link'],c,r))
+                iterator += 1
             embed = self.bot.cogs['EmbedCog'].Embed(title=await self.translate(ctx.guild.id,"rss","choose-mentions-1"), color=self.embed_color, desc="\n".join(text), time=ctx.message.created_at).create_footer(ctx.author)
             emb_msg = await ctx.send(embed=embed.discord_embed())
             def check(msg):
                 if not msg.content.isnumeric():
                     return False
-                return msg.author.id==userID and int(msg.content) in range(1,MAX+1)
+                return msg.author.id==userID and int(msg.content) in range(1,iterator+1)
             try:
                 msg = await self.bot.wait_for('message',check=check,timeout=20.0)
             except asyncio.TimeoutError:
                 await ctx.send(await self.translate(ctx.guild.id,"rss","too-long"))
                 await self.bot.cogs['UtilitiesCog'].suppr(emb_msg)
                 return
+            print(int(msg.content)-1)
             flow = await self.get_flow(list_of_IDs[int(msg.content)-1])
         return flow
 
@@ -536,6 +538,48 @@ class RssCog(commands.Cog):
                 text = msg.content
             await self.update_flow(flow['ID'],[('structure',text)])
             await ctx.send(str(await self.translate(ctx.guild.id,"rss","text-success")).format(flow['ID'],text))
+        except Exception as e:
+            await ctx.send(str(await self.translate(ctx.guild.id,"rss","guild-error")).format(e))
+            await ctx.bot.cogs['ErrorsCog'].on_error(e,ctx)
+
+    @rss_main.command(name="use_embed",aliases=['embed'])
+    @commands.guild_only()
+    @commands.check(can_use_rss)
+    async def change_use_embed(self,ctx,ID:typing.Optional[int]=None,value:bool=None):
+        """Use an embed or not for a flox"""
+        try:
+            try:
+                flow = await self.askID(ID,ctx)
+            except Exception as e:
+                flow = []
+                await self.bot.cogs["ErrorsCog"].on_error(e,ctx)
+            if flow==None:
+                return
+            try:
+                e
+            except UnboundLocalError:
+                e = None
+            if len(flow)==0:
+                await ctx.send(await self.translate(ctx.guild,"rss","fail-add"))
+                if e!=None:
+                    await self.bot.cogs["ErrorsCog"].on_error(e,ctx)
+                return
+            flow = flow[0]
+            if value==None:
+                await ctx.send(await self.translate(ctx.guild.id,"rss","use_embed_true" if flow['use_embed'] else 'use_embed_false'))
+                def check(msg):
+                    try:
+                        _ = commands.core._convert_to_bool(msg.content)
+                    except:
+                        return False
+                    return msg.author==ctx.author and msg.channel==ctx.channel
+                try:
+                    msg = await self.bot.wait_for('message', check=check,timeout=20)
+                except asyncio.TimeoutError:
+                    return await ctx.send(await self.translate(ctx.guild.id,"rss","too-long"))
+                value =  commands.core._convert_to_bool(msg.content)
+            await self.update_flow(flow['ID'],[('use_embed',value)])
+            await ctx.send(await self.translate(ctx.guild.id,"rss","use_embed-success",v=value,f=flow['ID']))
         except Exception as e:
             await ctx.send(str(await self.translate(ctx.guild.id,"rss","guild-error")).format(e))
             await ctx.bot.cogs['ErrorsCog'].on_error(e,ctx)

@@ -507,7 +507,10 @@ Lien : {link}""",
 - `{title}` : le titre du post""",
         "text-success":"Le texte du flux n°{} a bien été modifié ! Nouveau texte : \n```\n{}\n```",
         "invalid-flow":"Cet url est invalide (flux rss vide ou inaccessible) :confused:",
-        "research-timeout":"La page web a mis trop de temps à répondre, j'ai dû interrompre le processus :eyes:"
+        "research-timeout":"La page web a mis trop de temps à répondre, j'ai dû interrompre le processus :eyes:",
+        "use_embed_true":"Ce flux utilise actuellement les embeds pour être envoyé. Voulez-vous toujours utiliser les embeds pour ce flux ? (true/false)",
+        "use_embed_false":"Ce flux n'utilise pas d'embed pour être envoyé. Voulez-vous utiliser les embeds pour ce flux ? (true/false)",
+        "use_embed-success":"La valeur a bien été modifiée à {v} pour le flux n°{f} !",
         }
 
 server={"config-help":"Cette commande sert principalement à configurer votre serveur. En faisant `!config see [option]` vous obtiendrez l'aperçu des configurations actuelles, \

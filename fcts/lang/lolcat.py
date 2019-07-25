@@ -507,7 +507,10 @@ UrL : {link}""",
 - `{title}`: the titl of da post""",
         "text-success":"Teh text of the feed #{} haz been modified!\n New cute text : \n```\n{}\n```",
         "invalid-flow":"I can't add dis url (empty or inaccessible rss flew) :confused:",
-        "research-timeout":"This page took toooo long 2 answer, I had to stop teh process :eyes:"
+        "research-timeout":"This page took toooo long 2 answer, I had to stop teh process :eyes:",
+        "use_embed_true":"This one use currntly embeds to be sent. Do U still wanted 2 use an embed for this flow? (true/false)",
+        "use_embed_false":"This feed do not use colored box 2B sent. Do U wants to use a nice box 4 tish flow? (true/false)",
+        "use_embed-success":"The value has been changed to {v} for flow n°{f}!",
         }
 
 server={"config-help": "Dis cmd is mainly usd 2 configur ur srver. By doin `!config see [option]` u will get \

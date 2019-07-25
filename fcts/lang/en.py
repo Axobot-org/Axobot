@@ -507,7 +507,10 @@ Link : {link}""",
 - `{title}`: the title of the post""",
         "text-success":"The text of the feed #{} has been modified!\n New text : \n```\n{}\n```",
         "invalid-flow":"This url is invalid (empty or inaccessible rss flow) :confused:",
-        "research-timeout":"The web page took too long to answer, I had to interrupt the process :eyes:"
+        "research-timeout":"The web page took too long to answer, I had to interrupt the process :eyes:",
+        "use_embed_true":"This flow currently uses embeds to be sent. Do you still want to use an embed for this flow? (true/false)",
+        "use_embed_false":"This feed does not use embed to be sent. Do you want to use an embed for this flow? (true/false)",
+        "use_embed-success":"The value has been changed to {v} for flow n°{f}!",
         }
 
 server={"config-help": "This command is mainly used to configure your server. By doing `!config see [option]` you will get \
