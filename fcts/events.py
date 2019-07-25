@@ -416,14 +416,17 @@ class Events(commands.Cog):
         self.bot.log.info("[Partners] Rafraîchissement des salons ({} serveurs prévus)...".format(len(channels_list)))
         count = [0,0]
         for guild in channels_list:
-            chan = guild['partner_channel'].split(';')[0]
-            if not chan.isnumeric():
-                continue
-            chan = self.bot.get_channel(int(chan))
-            if chan==None:
-                continue
-            count[0] += 1
-            count[1] += await self.bot.cogs['PartnersCog'].update_partners(chan,guild['partner_color'])
+            try:
+                chan = guild['partner_channel'].split(';')[0]
+                if not chan.isnumeric():
+                    continue
+                chan = self.bot.get_channel(int(chan))
+                if chan==None:
+                    continue
+                count[0] += 1
+                count[1] += await self.bot.cogs['PartnersCog'].update_partners(chan,guild['partner_color'])
+            except Exception as e:
+                await self.bot.cogs['ErrorsCog'].on_error(e,None)
         emb = self.bot.cogs["EmbedCog"].Embed(desc='**Partners channels updated** in {}s ({} channels - {} partners)'.format(round(time.time()-t,3),count[0],count[1]),color=10949630).update_timestamp().set_author(self.bot.user)
         await self.bot.cogs["EmbedCog"].send([emb],url="loop")
         
