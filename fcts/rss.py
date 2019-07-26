@@ -391,7 +391,7 @@ class RssCog(commands.Cog):
             text = [await self.translate(ctx.guild.id,'rss','list')]
             list_of_IDs = list()
             iterator = 1
-            for e,x in enumerate(gl):
+            for x in gl:
                 if x['type']=='mc':
                     continue
                 list_of_IDs.append(x['ID'])
