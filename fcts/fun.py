@@ -4,10 +4,10 @@ from discord.ext import commands
 from tzwhere import tzwhere
 from pytz import timezone
 
-from fcts import emoji
-importlib.reload(emoji)
+from fcts import emojis
+importlib.reload(emojis)
 
-cmds_list = ['count_msg','ragequit','pong','run','nope','blame','party','bigtext','shrug','gg','money','pibkac','osekour','me','kill','cat','rekt','thanos','nuke','pikachu','pizza','google','loading','piece','roll']
+cmds_list = ['count_msg','ragequit','pong','run','nope','blame','party','bigtext','shrug','gg','money','pibkac','osekour','me','kill','cat','rekt','thanos','nuke','pikachu','pizza','google','loading','piece','roll','afk']
 
 async def is_fun_enabled(ctx):
     self = ctx.bot.cogs["FunCog"]
@@ -110,7 +110,7 @@ class FunCog(commands.Cog):
             return await ctx.send(await self.translate(ctx.channel,"fun","no-roll"))
         choosen = None
         while choosen==self.last_roll:
-            choosen = random.choice(liste)
+            choosen = random.choice(liste).replace('@everyone','@​everyone').replace('@here','@​here')
         await ctx.send(choosen)
 
     @commands.command(name="cookie",hidden=True)
@@ -218,7 +218,7 @@ You can specify a verification limit by adding a number in argument"""
             victime = ctx.author.display_name
             ex = ctx.author.display_name.replace(" ","_")
         else:
-            victime = name
+            victime = name.replace('@everyone','@​everyone').replace('@here','@​here')
             ex = name.replace(" ","_")
         author = ctx.author.mention
         liste = await self.translate(ctx.channel,"kill","list")
@@ -369,6 +369,7 @@ You can specify a verification limit by adding a number in argument"""
     @commands.check(is_fun_enabled)
     async def me(self,ctx,*,text):
         """No U"""
+        text = await self.bot.cogs["UtilitiesCog"].clear_msg(text,everyone=ctx.message.mention_everyone,ctx=ctx)
         await ctx.send("*{} {}*".format(ctx.author.display_name,text))
         if self.bot.database_online and await self.bot.cogs["ServerCog"].staff_finder(ctx.author,"say"):
             await self.bot.cogs["UtilitiesCog"].suppr(ctx.message)
@@ -402,8 +403,6 @@ You can specify a verification limit by adding a number in argument"""
     @commands.check(is_fun_enabled)
     async def nuke(self,ctx):
         """BOOOM"""
-        if self.bot.database_online and not await self.bot.cogs["ServerCog"].staff_finder(ctx.author,"say"):
-            return
         await ctx.send(file=await self.utilities.find_img('nuke.gif'))
     
     @commands.command(name="pikachu",hidden=True)
@@ -422,7 +421,7 @@ You can specify a verification limit by adding a number in argument"""
     @commands.check(is_fun_enabled)
     async def lmgtfy(self,ctx,*,search):
         """How to use Google"""
-        link = "http://lmgtfy.com/?q="+search.replace(" ","+")
+        link = "http://lmgtfy.com/?q="+search.replace(" ","+").replacee('@eveyrone','@+everyone').replace('@here','@+here')
         await ctx.send(link)
         await self.bot.cogs['UtilitiesCog'].suppr(ctx.message)
     
@@ -494,6 +493,7 @@ You can specify a verification limit by adding a number in argument"""
         """Make you AFK
         You'll get a nice nickname, because nicknames are cool, aren't they?"""
         try:
+            reason = await self.bot.cogs['UtilitiesCog'].clear_msg(reason,ctx.message.mention_everyone,ctx)
             if (not ctx.author.display_name.endswith(' [AFK]')) and len(ctx.author.display_name)<26:
                 await ctx.author.edit(nick=ctx.author.display_name+" [AFK]")
             self.afk_guys[ctx.author.id] = reason
@@ -612,6 +612,11 @@ You can specify a verification limit by adding a number in argument"""
             if count==0:
                 await msg.add_reaction('👍')
                 await msg.add_reaction('👎')
+
+    @commands.command(name="markdown")
+    async def markdown(self,ctx):
+        """Get help about markdown in Discord"""
+        await ctx.send(await self.translate(ctx.channel,'fun','markdown'))
 
     @commands.command(name="vote")
     @commands.cooldown(4, 30, type=commands.BucketType.guild)

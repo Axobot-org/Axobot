@@ -171,7 +171,7 @@ class TimeCog(discord.ext.commands.Cog):
                 else:
                     df = "{m} {d}, {y}  {h}"
                 df = df.format(d=jour,m=month[date.month-1],y=str(date.year) if year else "",h=":".join(h) if hour else "")
-            return df
+            return df.strip()
 
 
 

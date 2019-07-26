@@ -78,11 +78,14 @@ class XPCog(commands.Cog):
         if msg.author.id in self.cache['global'].keys():
             prev_points = self.cache['global'][msg.author.id][1]
         else:
-            prev_points = 0
+            try:
+                prev_points = (await self.bdd_get_xp(msg.author.id,None))['xp']
+            except:
+                prev_points = 0
         await self.bdd_set_xp(msg.author.id, giv_points, 'add')
         self.cache['global'][msg.author.id] = [round(time.time()), prev_points+giv_points]
         new_lvl = await self.calc_level(self.cache['global'][msg.author.id][1])
-        if 1 < (await self.calc_level(prev_points))[0] < new_lvl[0]:
+        if 0 < (await self.calc_level(prev_points))[0] < new_lvl[0]:
             await self.send_levelup(msg,new_lvl)
             await self.give_rr(msg.author,new_lvl[0],await self.rr_list_role(msg.guild.id))
     
@@ -99,11 +102,14 @@ class XPCog(commands.Cog):
         if msg.author.id in self.cache[msg.guild.id].keys():
             prev_points = self.cache[msg.guild.id][msg.author.id][1]
         else:
-            prev_points = 0
+            try:
+                prev_points = (await self.bdd_get_xp(msg.author.id,msg.guild.id))['xp']
+            except:
+                prev_points = 0
         await self.bdd_set_xp(msg.author.id, giv_points, 'add', msg.guild.id)
         self.cache[msg.guild.id][msg.author.id] = [round(time.time()), prev_points+giv_points]
         new_lvl = await self.calc_level(self.cache[msg.guild.id][msg.author.id][1])
-        if 1 < (await self.calc_level(prev_points))[0] < new_lvl[0]:
+        if 0 < (await self.calc_level(prev_points))[0] < new_lvl[0]:
             await self.send_levelup(msg,new_lvl)
             await self.give_rr(msg.author,new_lvl[0],await self.rr_list_role(msg.guild.id))
     
@@ -556,6 +562,7 @@ class XPCog(commands.Cog):
                 user = ctx.guild.get_member(user.id)
                 if user==None:
                     return await ctx.send(await self.translate(ctx.channel,'xp','not-member'))
+                return
                 xp = await self.mee6_get_player(user)
             else:
                 xp = await self.bdd_get_xp(user.id,None if xp_used_type==0 else ctx.guild.id)
@@ -662,6 +669,7 @@ class XPCog(commands.Cog):
         elif xp_system_used==1:
             if ctx.guild.get_member(159985870458322944)==None:
                 return await ctx.send(str(await self.translate(ctx.guild.id,'xp','no-mee6')).format(ctx.prefix))
+            return
             ranks = await self.mee6_get_top(ctx.guild,20*page)
             max_page = ceil(len(ranks)/20)
         else:
@@ -788,6 +796,8 @@ class XPCog(commands.Cog):
         """Add a role reward
         This role will be given to every member who reaches the level"""
         try:
+            if role.name == '@everyone':
+                raise commands.BadArgument(f'Role "{role.name}" not found')
             l = await self.rr_list_role(ctx.guild.id)
             if len([x for x in l if x['level']==level])>0:
                 return await ctx.send(await self.translate(ctx.guild.id,'xp','already-1-rr'))

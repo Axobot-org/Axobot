@@ -593,16 +593,16 @@ Cette option affecte tous les serveurs"""
         except discord.HTTPException:
             await ctx.send("Le message est trop long pour être envoyé !")
 
-    @commands.command(name="activity")
+    @main_msg.command(name="activity")
     @commands.check(reloads.check_admin)
     async def change_activity(self,ctx, Type: str, * act: str):
         """Change l'activité du bot (play, watch, listen, stream)"""
         act = " ".join(act)
-        if Type in ['game','play']:
+        if Type in ['game','play','playing']:
             await self.bot.change_presence(activity=discord.Game(name=act))
-        elif Type in ['watch','see']:
+        elif Type in ['watch','see','watching']:
             await self.bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching,name=act,timestamps={'start':time.time()}))
-        elif Type in ['listen']:
+        elif Type in ['listen','listening']:
             await self.bot.change_presence(activity=discord.Activity(type=discord.ActivityType.listening,name=act,timestamps={'start':time.time()}))
         elif Type in ['stream']:
             await self.bot.change_presence(activity=discord.Activity(type=discord.ActivityType.streaming,name=act,timestamps={'start':time.time()}))
