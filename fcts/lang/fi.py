@@ -89,6 +89,9 @@ errors={"cooldown":"Olet jäähyllä tältä commandilta :confused:  Odota {} li
         "rolenotfound":"On mahdotonta löytää rooli `{0}`",
         "invalidcolor":"Väri `{0}` epäselvä",
         "invalidinvite":"Invalid bot/server invite: `{0}`",
+        "invalidguild":"This server can't be found: `{g}`",
+        "invalidleaderboard":"Invalid leaderboard type",
+        "invalidurl":"Invalid url: `{u}`",
         'channotfound':"Channel {0} not found",
         'DM':"This command isn't available in Direct Messages",
         }
@@ -164,6 +167,22 @@ fun={"count-0":"Laskeminen on kesken...",
                 "Pro-tip: The bot has a Discord, where you can see the current bugs and vote for the next updates! Use the `about` command to get the invite",
                 "Pro-tip: the `prefix` command allows you to have a list of the prefixes currently usable in the server",
                 ],
+        "markdown":r"""__**Markdown Rules** on *Discord*__
+
+`*italics*` = *italics*
+`__underline__` = __underline__
+`**bold**` = **bold**
+`***bold italics***` = ***bold italics***
+`~~strikeout~~` = ~~strikeout~~
+`__*underline italics*__` = __*underline italics*__
+`__**underline bold**__` = __**underline bold**__
+`__***underline bold italics***__` = __***underline bold italics***__
+`||spoiler||` = ||spoiler||
+> quote = `> quote`
+\`code\` = `code`
+\\ to ignore
+                
+For code blocks, cf <https://discord.gg/DGahTNn>"""
         }
 
 infos={"text-0":"""Moi! Olen {0} !
@@ -186,7 +205,11 @@ Kaikki jotka auttoivat minun tekeimsessä, minun omistaja ja minä haluamme kiit
                 'Raportoi ongelma/ käyttäjä':'https://dis.gd/report',
                 'Ehdota jotain Discordille ':'https://dis.gd/feedback',
                 'Itsebotti artikkeli':'https://support.discordapp.com/hc/articles/115002192352',
-                'Käyttöehdot botin tekijöille':'https://discordapp.com/developers/docs/legal'},}
+                'Käyttöehdot botin tekijöille':'https://discordapp.com/developers/docs/legal'},
+        "bitly_short":"Shortened URL: {url}",
+        "bitly_long":"Original URL: {url}",
+        "bitly_nobit":"This address is not a bit.ly link!",
+        }
 
 infos_2={"membercount-0":"Numero jäsenistä",
         "membercount-1":"Numero boteista",
@@ -476,7 +499,10 @@ Link : {link}""",
 - `{title}`: the title of the post""",
         "text-success":"The text of the feed #{} has been modified!\n New text : \n```\n{}\n```",
         "invalid-flow":"This url is invalid (empty or inaccessible rss flow) :confused:",
-        "research-timeout":"The web page took too long to answer, I had to interrupt the process :eyes:"
+        "research-timeout":"The web page took too long to answer, I had to interrupt the process :eyes:",
+        "use_embed_true":"This flow currently uses embeds to be sent. Do you still want to use an embed for this flow? (true/false)",
+        "use_embed_false":"This feed does not use embed to be sent. Do you want to use an embed for this flow? (true/false)",
+        "use_embed-success":"The value has been changed to {v} for flow n°{f}!",
 }
 
 server={"config-help": "Tätä komentoa yleensä käytetään palvelimen konfigurointiin. Viestittämällä `!config see [option]` sinä aiot saada \
@@ -571,6 +597,9 @@ stats_infos={"not-found":"Kyvytöntä löytää {N}",
         "emoji-1":"Twitchin hallinnossa",
         "emoji-2":"Jänne (boteille)",
         "emoji-3":"Palvelin joka omistaa sen",
+        "emoji-4":"Restrictions",
+        "emoji-5":"Amount of uses",
+        "emoji-5v":"{nbr} (1st registered use: {date})",
         "textchan-0":"Kategoria",
         "textchan-1":"Kuvaus",
         "textchan-2":"NSFW",
