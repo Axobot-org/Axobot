@@ -480,7 +480,7 @@ Link : {link}""",
 }
 
 server={"config-help": "Tätä komentoa yleensä käytetään palvelimen konfigurointiin. Viestittämällä `!config see [option]` sinä aiot saada \
-näyn tämänaikaisesta konfiguraatiosta, ja palvelimen järjestyksenvalvojat voivat viestittää `!config change <option> role1, role2, role3...` \
+näyn tämänaikaisesta konfiguraatiosta, ja palvelimen järjestyksenvalvojat voivat viestittää `!config change <option> ominaisuus1, ominaisuus2...` \
 jolla voi muuttaa konfigurointia, tai `!config del <option>` jolla voi asettaa uudelleen vaitoehdon (`!config change <option>` toimii samallain).\nLista mahdollisista vaihtoehdoista löytyy täältä: <https://zbot.rtfd.io/en/latest/config.html#list-of-every-option>",
         "change-0": "Tämä vaihtoehto ei ole olemassa :confused:",
         "change-1": "Ups, sisäinen virhe tapahtui...",
@@ -607,7 +607,7 @@ stats_infos={"not-found":"Kyvytöntä löytää {N}",
         "categ-2":"Teksti : {} | Ääni : {}",
          }
 
-users = {'invalid-card':'Tämä tyyli on pätemätön. Tässä on lista tyyleistä sinä voit käyttää: {}',
+users = {'invalid-card':'Tämä tyyli on pätemätön. Tässä on lista tyyleistä joita sinä voit käyttää: {}',
         'list-cards':"Tässä on lista kaikista tyyleistä sinä voit käyttää: {}",
         'missing-attach-files':'Ups, minulta puuttuu käyttöoikeus: Liitä tiedostoja :confused:',
         'changed-0':'Sinun XP kortti käyttää nyt tyyliä: {}',
@@ -651,7 +651,7 @@ xp = {'card-level':'TASO',
         'too-many-rr':"Sinulla on jo {} rooli palkintoa, et voi lisätä lisää!",
         'rr-reload':"{} päivitti rooleja / {} skannasi jäsenet",
         'no-mee6':"Ups, olet konfiguroinut XP systeemin käyttämään MEE6 systeemiä, mutta MEE6 ei ole tällä palvelimella! Voit vaihtaa systeemin helposti viestittämällä (`{}config change xp_type` jonka perässä on systeemin nimi), tai kutsu MEE6 tälle palvelimelle.",
-        'change-global-xp':"Impossible to edit XP of the global system!",
-        'change-xp-ok':"The XP of the user {user} has been set to {xp} points!",
-        'no-bot':"Impossible to modify the XP of a bot!"
+        'change-global-xp':"Ei voi muokata XP:tä maailmanlaajuisesta systeemistä!",
+        'change-xp-ok':"XP käyttäjälle {user} on asetettu {xp} pisteeseen!",
+        'no-bot':"Ei voi muokata bottejen XP:tä!"
         }

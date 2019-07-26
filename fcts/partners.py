@@ -119,16 +119,6 @@ class PartnersCog(commands.Cog):
             await self.bot.cogs['ErrorsCog'].on_error(e,None)
             return False
     
-
-    async def get_uptimes(self,bot:int,session:aiohttp.ClientSession):
-        """Get the uptime of a bot
-        None if unknown"""
-        async with session.get(f'https://api.discordbots.group/v1/bot/{bot}/uptime') as resp:
-            ans = await resp.json()
-            if ans['error']:
-                return None
-            return ans['percentage']
-    
     async def get_guilds(self,bot:int,session:aiohttp.ClientSession):
         """Get the guilds count of a bot
         None if unknown"""
@@ -178,11 +168,6 @@ class PartnersCog(commands.Cog):
                     image = (await self.bot.fetch_user(int(partner['target']))).avatar_url.__str__()
                     await self.bot.cogs["ErrorsCog"].on_error(e,None)
                 field2 = {'name':tr_invite.capitalize(),'value':'[Click here](https://discordapp.com/oauth2/authorize?client_id={}&scope=bot&permissions=2113273087)'.format(partner['target'])}
-                up = await self.get_uptimes(partner['target'],session)
-                if up!=None:
-                    field3 = {'name':await self.translate(channel.guild,'partners','bot-uptime'), 'value':f"{round(up,2)}%"}
-                else:
-                    field3 = None
             else:
                 title = "**{}** ".format(tr_guild.capitalize())
                 try:
@@ -198,10 +183,9 @@ class PartnersCog(commands.Cog):
                     title += tr_unknown
                     field1 = None
                 field2 = {'name':tr_invite.capitalize(),'value':'[{}](https://discord.gg/{})'.format(tr_click.capitalize(),partner['target'])}
-                field3 = None
                 if len(target_desc)==0:
                     target_desc = await self.bot.cogs['ServerCog'].find_staff(inv.guild.id,'description')
-            emb = self.bot.cogs['EmbedCog'].Embed(title=title,desc=target_desc,fields=[x for x in (field1,field2,field3) if not x==None],color=color,footer_text=str(partner['ID']),thumbnail=image).update_timestamp()
+            emb = self.bot.cogs['EmbedCog'].Embed(title=title,desc=target_desc,fields=[x for x in (field1,field2) if not x==None],color=color,footer_text=str(partner['ID']),thumbnail=image).update_timestamp()
             try:
                 msg = await channel.fetch_message(partner['messageID'])
                 await msg.edit(embed=emb.discord_embed())
@@ -219,6 +203,8 @@ class PartnersCog(commands.Cog):
     async def give_roles(self,invite:discord.Invite,guild:discord.Guild):
         """Give a role to admins of partners"""
         if isinstance(invite.guild,discord.Guild):
+            if invite.guild.id == 356067272730607628 and self.bot.beta:
+                return
             roles = await self.bot.cogs['ServerCog'].find_staff(guild.id,'partner_role')
             roles = [x for x in [guild.get_role(int(x)) for x in roles.split(';') if len(x)>0 and x.isnumeric()] if x!=None]
             admins = [x for x in invite.guild.members if x.guild_permissions.administrator]

@@ -390,9 +390,11 @@ Every information come from the website www.fr-minecraft.net"""
         guild = None if isinstance(channel,discord.DMChannel) else channel.guild
         e = await self.form_msg_server(obj,guild,ip)
         if isinstance(channel,discord.DMChannel) or channel.permissions_for(channel.guild.me).embed_links:
-            await channel.send(embed=e)
+            msg = await channel.send(embed=e)
         else:
             await channel.send(await self.translate(guild,"mc","cant-embed"))
+            msg = None
+        return msg
 
     async def form_msg_server(self,obj,guild,ip):
         if type(obj) == str:
@@ -404,21 +406,26 @@ Every information come from the website www.fr-minecraft.net"""
         else:
             return await obj.create_msg(guild,self.translate)
 
-    async def find_msg(self,channel,ip):
+    async def find_msg(self,channel:discord.TextChannel,ip:list,ID:str):
         if channel == None:
             return None
-        async for msg in channel.history(limit=10000):
+        if ID.isnumeric():
             try:
-                if len(msg.embeds)>0 and msg.author == channel.guild.me:
-                    e = msg.embeds[0]
-                    if ip[1] == None:
-                        c = ip[0] in e.title
-                    else:
-                        c = ":".join(ip) in e.title
-                    if c:
-                        return msg
+                return await channel.fetch_message(int(ID))
             except:
-                continue
+                pass
+        # async for msg in channel.history(limit=10000):
+        #     try:
+        #         if len(msg.embeds)>0 and msg.author == channel.guild.me:
+        #             e = msg.embeds[0]
+        #             if ip[1] == None:
+        #                 c = ip[0] in e.title
+        #             else:
+        #                 c = ":".join(ip) in e.title
+        #             if c:
+        #                 return msg
+        #     except:
+        #         continue
         return None
 
     async def check_flow(self,flow):
@@ -426,6 +433,8 @@ Every information come from the website www.fr-minecraft.net"""
         if i[1] == '':
             i[1] = None
         guild = self.bot.get_guild(flow['guild'])
+        if guild==None:
+            return
         if flow['link'] in self.flows.keys():
             obj = self.flows[flow['link']]
         else:
@@ -439,9 +448,11 @@ Every information come from the website www.fr-minecraft.net"""
             channel = guild.get_channel(flow['channel'])
             if channel == None:
                 return
-            msg = await self.find_msg(channel,i)
+            msg = await self.find_msg(channel,i,flow['structure'])
             if msg == None:
-                await self.send_msg_server(obj,channel,i)
+                msg = await self.send_msg_server(obj,channel,i)
+                if msg!=None:
+                    await self.bot.cogs['RssCog'].update_flow(flow['ID'],[('structure',str(msg.id)),('date',datetime.datetime.utcnow())])
                 return
             e = await self.form_msg_server(obj,guild,i)
             await msg.edit(embed=e)

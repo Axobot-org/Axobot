@@ -1,4 +1,4 @@
-import discord, datetime, time, re, asyncio, mysql, random, typing, importlib, socket
+import discord, datetime, time, re, asyncio, mysql, random, typing, importlib, socket, requests
 from libs import feedparser
 from discord.ext import commands
 from fcts import cryptage, tokens, reloads
@@ -7,9 +7,7 @@ importlib.reload(reloads)
 
 web_link={'fr-minecraft':'http://fr-minecraft.net/rss.php',
           'frm':'http://fr-minecraft.net/rss.php',
-          'minecraft.net':'https://minecraft.net/fr-fr/feeds/community-content/rss',
-          'arobazzz':'http://le-minecraftien.e-monsite.com/blog/do/rss.xml',
-          'minecraftien':'http://le-minecraftien.e-monsite.com/blog/do/rss.xml',
+          'minecraft.net':'https://fr-minecraft.net/minecraft_net_rss.xml',
           'gunivers':'https://gunivers.net/feed/'
           }
 
@@ -70,6 +68,12 @@ class RssCog(commands.Cog):
             self.print = bot.cogs["UtilitiesCog"].print2
         except:
             pass
+        try:
+            requests.get('http://twitrss.me/twitter_user_to_rss/?user=discordapp').json()
+        except:
+            self.twitter_api_url = 'http://twitrss.me/mobile_twitter_to_rss/?user='
+        else:
+            self.twitter_api_url = 'http://twitrss.me/twitter_to_rss/?user='
 
     @commands.Cog.listener()
     async def on_ready(self):
@@ -80,11 +84,13 @@ class RssCog(commands.Cog):
 
 
     class rssMessage:
-        def __init__(self,bot,Type,url,title,emojis,date=datetime.datetime.now(),author=None,Format=None,channel=None,retweeted_by=None):
+        def __init__(self,bot,Type,url,title,emojis,date=datetime.datetime.now(),author=None,Format=None,channel=None,retweeted_by=None,image=None):
             self.bot = bot
             self.Type = Type
             self.url = url
             self.title = title
+            self.embed = False # WARNING COOKIES WARNINNG
+            self.image = image
             if type(date) == datetime.datetime:
                 self.date = date
             elif type(date) == time.struct_time:
@@ -137,7 +143,21 @@ class RssCog(commands.Cog):
             Format = Format.replace('\\n','\n')
             if self.rt_by!=None:
                 self.author = "{} (retweeted by @{})".format(self.author,self.rt_by)
-            return Format.format_map(self.bot.SafeDict(channel=self.channel,title=self.title,date=d,url=self.url,link=self.url,mentions=", ".join(self.mentions),logo=self.logo,author=self.author))
+            text = Format.format_map(self.bot.SafeDict(channel=self.channel,title=self.title,date=d,url=self.url,link=self.url,mentions=", ".join(self.mentions),logo=self.logo,author=self.author))
+            if not self.embed:
+                return text
+            else:
+                emb = discord.Embed()
+                if self.Type != 'tw':
+                    emb.title = self.title
+                else:
+                    emb.title = self.author
+                emb.description = text
+                emb.add_field(name='URL',value=self.url)
+                emb.timestamp = self.date
+                if self.image != None:
+                    emb.set_thumbnail(url=self.image)
+                return emb
 
 
     @commands.group(name="rss")
@@ -158,7 +178,11 @@ class RssCog(commands.Cog):
             await ctx.send(text)
         else:
             form = await self.translate(ctx.channel,"rss","yt-form-last")
-            await ctx.send(await text[0].create_msg(await self.translate(ctx.channel,"current_lang","current"),form))
+            obj = await text[0].create_msg(await self.translate(ctx.channel,"current_lang","current"),form)
+            if isinstance(obj,discord.Embed):
+                await ctx.send(embed=obj)
+            else:
+                await ctx.send(obj)
     
     @rss_main.command(name="twitch",aliases=['tv'])
     async def request_twitch(self,ctx,channel):
@@ -170,7 +194,11 @@ class RssCog(commands.Cog):
             await ctx.send(text)
         else:
             form = await self.translate(ctx.channel,"rss","twitch-form-last")
-            await ctx.send(await text[0].create_msg(await self.translate(ctx.channel,"current_lang","current"),form))
+            obj = await text[0].create_msg(await self.translate(ctx.channel,"current_lang","current"),form)
+            if isinstance(obj,discord.Embed):
+                await ctx.send(embed=obj)
+            else:
+                await ctx.send(obj)
 
     @rss_main.command(name='twitter',aliases=['tw'])
     async def request_tw(self,ctx,name):
@@ -185,7 +213,11 @@ class RssCog(commands.Cog):
             await ctx.send(text)
         else:
             form = await self.translate(ctx.channel,"rss","tw-form-last")
-            await ctx.send(await text[0].create_msg(await self.translate(ctx.channel,"current_lang","current"),form))
+            obj = await text[0].create_msg(await self.translate(ctx.channel,"current_lang","current"),form)
+            if isinstance(obj,discord.Embed):
+                await ctx.send(embed=obj)
+            else:
+                await ctx.send(obj)
 
     @rss_main.command(name="web")
     async def request_web(self,ctx,link):
@@ -197,7 +229,11 @@ class RssCog(commands.Cog):
             await ctx.send(text)
         else:
             form = await self.translate(ctx.channel,"rss","web-form-last")
-            await ctx.send(await text[0].create_msg(await self.translate(ctx.channel,"current_lang","current"),form))
+            obj = await text[0].create_msg(await self.translate(ctx.channel,"current_lang","current"),form)
+            if isinstance(obj,discord.Embed):
+                await ctx.send(embed=obj)
+            else:
+                await ctx.send(obj)
 
     @rss_main.command(name="add")
     @commands.guild_only()
@@ -354,6 +390,7 @@ class RssCog(commands.Cog):
                 return
             text = [await self.translate(ctx.guild.id,'rss','list')]
             list_of_IDs = list()
+            iterator = 1
             for e,x in enumerate(gl):
                 if x['type']=='mc':
                     continue
@@ -374,14 +411,14 @@ class RssCog(commands.Cog):
                         else:
                             r.append(item)
                     r = ", ".join(r)
-                MAX = e+1
-                text.append("{}) {} - {} - {} - {}".format(e+1,await self.translate(ctx.guild.id,'rss',x['type']),x['link'],c,r))
+                text.append("{}) {} - {} - {} - {}".format(iterator,await self.translate(ctx.guild.id,'rss',x['type']),x['link'],c,r))
+                iterator += 1
             embed = self.bot.cogs['EmbedCog'].Embed(title=await self.translate(ctx.guild.id,"rss","choose-mentions-1"), color=self.embed_color, desc="\n".join(text), time=ctx.message.created_at).create_footer(ctx.author)
             emb_msg = await ctx.send(embed=embed.discord_embed())
             def check(msg):
                 if not msg.content.isnumeric():
                     return False
-                return msg.author.id==userID and int(msg.content) in range(1,MAX+1)
+                return msg.author.id==userID and int(msg.content) in range(1,iterator+1)
             try:
                 msg = await self.bot.wait_for('message',check=check,timeout=20.0)
             except asyncio.TimeoutError:
@@ -540,6 +577,48 @@ class RssCog(commands.Cog):
             await ctx.send(str(await self.translate(ctx.guild.id,"rss","guild-error")).format(e))
             await ctx.bot.cogs['ErrorsCog'].on_error(e,ctx)
 
+    @rss_main.command(name="use_embed",aliases=['embed'])
+    @commands.guild_only()
+    @commands.check(can_use_rss)
+    async def change_use_embed(self,ctx,ID:typing.Optional[int]=None,value:bool=None):
+        """Use an embed or not for a flox"""
+        try:
+            try:
+                flow = await self.askID(ID,ctx)
+            except Exception as e:
+                flow = []
+                await self.bot.cogs["ErrorsCog"].on_error(e,ctx)
+            if flow==None:
+                return
+            try:
+                e
+            except UnboundLocalError:
+                e = None
+            if len(flow)==0:
+                await ctx.send(await self.translate(ctx.guild,"rss","fail-add"))
+                if e!=None:
+                    await self.bot.cogs["ErrorsCog"].on_error(e,ctx)
+                return
+            flow = flow[0]
+            if value==None:
+                await ctx.send(await self.translate(ctx.guild.id,"rss","use_embed_true" if flow['use_embed'] else 'use_embed_false'))
+                def check(msg):
+                    try:
+                        _ = commands.core._convert_to_bool(msg.content)
+                    except:
+                        return False
+                    return msg.author==ctx.author and msg.channel==ctx.channel
+                try:
+                    msg = await self.bot.wait_for('message', check=check,timeout=20)
+                except asyncio.TimeoutError:
+                    return await ctx.send(await self.translate(ctx.guild.id,"rss","too-long"))
+                value =  commands.core._convert_to_bool(msg.content)
+            await self.update_flow(flow['ID'],[('use_embed',value)])
+            await ctx.send(await self.translate(ctx.guild.id,"rss","use_embed-success",v=value,f=flow['ID']))
+        except Exception as e:
+            await ctx.send(str(await self.translate(ctx.guild.id,"rss","guild-error")).format(e))
+            await ctx.bot.cogs['ErrorsCog'].on_error(e,ctx)
+
     @rss_main.command(name="test")
     @commands.check(reloads.is_support_staff)
     async def test_rss(self,ctx,url,*,args=None):
@@ -666,14 +745,20 @@ class RssCog(commands.Cog):
                 return await self.translate(guild,"rss","nothing")
         if not date:
             feed = feeds.entries[0]
-            obj = self.rssMessage(bot=self.bot,Type='yt',url=feed['link'],title=feed['title'],emojis=self.bot.cogs['EmojiCog'].customEmojis,date=feed['published_parsed'],author=feed['author'])
+            img_url = None
+            if 'media_thumbnail' in feed.keys() and len(feed['media_thumbnail'])>0:
+                img_url = feed['media_thumbnail'][0]['url']
+            obj = self.rssMessage(bot=self.bot,Type='yt',url=feed['link'],title=feed['title'],emojis=self.bot.cogs['EmojiCog'].customEmojis,date=feed['published_parsed'],author=feed['author'],image=img_url)
             return [obj]
         else:
             liste = list()
             for feed in feeds.entries:
                 if datetime.datetime(*feed['published_parsed'][:6]) <= date:
                     break
-                obj = self.rssMessage(bot=self.bot,Type='yt',url=feed['link'],title=feed['title'],emojis=self.bot.cogs['EmojiCog'].customEmojis,date=feed['published_parsed'],author=feed['author'])
+                img_url = None
+                if 'media_thumbnail' in feed.keys() and len(feed['media_thumbnail'])>0:
+                    img_url = feed['media_thumbnail'][0]['url']
+                obj = self.rssMessage(bot=self.bot,Type='yt',url=feed['link'],title=feed['title'],emojis=self.bot.cogs['EmojiCog'].customEmojis,date=feed['published_parsed'],author=feed['author'],image=img_url)
                 liste.append(obj)
             liste.reverse()
             return liste
@@ -681,13 +766,13 @@ class RssCog(commands.Cog):
     async def rss_tw(self,guild,nom,date=None):
         if nom == 'help':
             return await self.translate(guild,"rss","tw-help")
-        url = 'http://twitrss.me/twitter_user_to_rss/?user='+nom
+        url = self.twitter_api_url+nom
         feeds = feedparser.parse(url)
         if feeds.entries==[]:
-            url = 'http://twitrss.me/twitter_user_to_rss/?user='+nom.capitalize()
+            url = self.twitter_api_url+nom.capitalize()
             feeds = feedparser.parse(url)
             if feeds.entries==[]:
-                url = 'http://twitrss.me/twitter_user_to_rss/?user='+nom.lower()
+                url = self.twitter_api_url+nom.lower()
                 feeds = feedparser.parse(url)
                 if feeds.entries==[]:
                     return await self.translate(guild,"rss","nothing")
@@ -734,14 +819,22 @@ class RssCog(commands.Cog):
             return await self.translate(guild,"rss","nothing")
         if not date:
             feed = feeds.entries[0]
-            obj = self.rssMessage(bot=self.bot,Type='twitch',url=feed['link'],title=feed['title'],emojis=self.bot.cogs['EmojiCog'].customEmojis,date=feed['published_parsed'],author=feeds.feed['title'].replace("'s Twitch video RSS",""))
+            r = re.search(r'<img src="([^"]+)" />',feed['summary'])
+            img_url = None
+            if r != None:
+                img_url = r.group(1)
+            obj = self.rssMessage(bot=self.bot,Type='twitch',url=feed['link'],title=feed['title'],emojis=self.bot.cogs['EmojiCog'].customEmojis,date=feed['published_parsed'],author=feeds.feed['title'].replace("'s Twitch video RSS",""),image=img_url)
             return [obj]
         else:
             liste = list()
             for feed in feeds.entries:
                 if datetime.datetime(*feed['published_parsed'][:6]) <= date:
                     break
-                obj = self.rssMessage(bot=self.bot,Type='twitch',url=feed['link'],title=feed['title'],emojis=self.bot.cogs['EmojiCog'].customEmojis,date=feed['published_parsed'],author=feeds.feed['title'].replace("'s Twitch video RSS",""))
+                r = re.search(r'<img src="([^"]+)" />',feed['summary'])
+                img_url = None
+                if r != None:
+                    img_url = r.group(1)
+                obj = self.rssMessage(bot=self.bot,Type='twitch',url=feed['link'],title=feed['title'],emojis=self.bot.cogs['EmojiCog'].customEmojis,date=feed['published_parsed'],author=feeds.feed['title'].replace("'s Twitch video RSS",""),image=img_url)
                 liste.append(obj)
             liste.reverse()
             return liste
@@ -779,6 +872,8 @@ class RssCog(commands.Cog):
                 author = feed['author']
             elif 'author' in feeds.keys():
                 author = feeds['author']
+            elif 'title' in feeds['feed'].keys():
+                author = feeds['feed']['title']
             else:
                 author = '?'
             if 'title' in feed.keys():
@@ -933,11 +1028,14 @@ class RssCog(commands.Cog):
                     else:
                         mentions.append(role)
             try:
-                await channel.send(t)
+                if isinstance(t,discord.Embed):
+                    await channel.send(" ".join(obj.mentions),embed=t)
+                else:
+                    await channel.send(t)
                 for role in mentions:
                     await role.edit(mentionable=False)
             except Exception as e:
-                self.bot.log.info("[send_rss_msg] Can not send message on channel {}: {}".format(channel.id,e))
+                self.bot.log.info("[send_rss_msg] Cannot send message on channel {}: {}".format(channel.id,e))
 
     async def check_flow(self,flow):
         try:
@@ -957,6 +1055,7 @@ class RssCog(commands.Cog):
                         self.bot.log.info("[send_rss_msg] Can not send message on channel {} (unknown)".format(flow['channel']))
                         return False
                     o.format = flow['structure']
+                    o.embed = flow['use_embed']
                     await o.fill_mention(guild,flow['roles'].split(';'),self.translate)
                     await self.send_rss_msg(o,chan,flow['roles'].split(';'),)
                 await self.update_flow(flow['ID'],[('date',o.date)])

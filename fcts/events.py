@@ -416,6 +416,125 @@ class Events(commands.Cog):
         self.bot.log.info("[Partners] Rafraîchissement des salons ({} serveurs prévus)...".format(len(channels_list)))
         count = [0,0]
         for guild in channels_list:
+            try:
+                chan = guild['partner_channel'].split(';')[0]
+                if not chan.isnumeric():
+                    continue
+                chan = self.bot.get_channel(int(chan))
+                if chan==None:
+                    continue
+                count[0] += 1
+                count[1] += await self.bot.cogs['PartnersCog'].update_partners(chan,guild['partner_color'])
+            except Exception as e:
+                await self.bot.cogs['ErrorsCog'].on_error(e,None)
+        emb = self.bot.cogs["EmbedCog"].Embed(desc='**Partners channels updated** in {}s ({} channels - {} partners)'.format(round(time.time()-t,3),count[0],count[1]),color=10949630).update_timestamp().set_author(self.bot.user)
+        await self.bot.cogs["EmbedCog"].send([emb],url="loop")
+        
+            
+
+    async def rss_loop(self):
+        if self.bot.cogs['RssCog'].last_update==None or (datetime.datetime.now() - self.bot.cogs['RssCog'].last_update).total_seconds()  > 5*60:
+            self.bot.cogs['RssCog'].last_update = datetime.datetime.now()
+            asyncio.run_coroutine_threadsafe(self.bot.cogs['RssCog'].main_loop(),asyncio.get_running_loop())
+
+    async def mee6_xp_loop(self):
+        """Check roles rewards for every server which use MEE6 xp system"""
+        t = time.time()
+        counts = [0,0]
+        self.mee6_last_check = datetime.datetime.now()
+        l = await self.bot.cogs['ServerCog'].get_server(columns=['ID','xp_type'],criters=['xp_type=1'])
+        self.bot.log.info(f"[mee6-rewards] Lancement du check pour {len(l)} serveurs")
+        errors = list()
+        for guild in l:
+            g = self.bot.get_guild(guild['ID'])
+            if g!=None:
+                counts[0] += 1
+                try:
+                    temp = await self.bot.cogs['XPCog'].mee6_reload_rr(g)
+                    if isinstance(temp,list):
+                        counts[1] += temp[1]
+                    else:
+                        errors.append(guild['ID'])
+                except aiohttp.client_exceptions.ContentTypeError as e:
+                    await self.bot.cogs['ErrorsCog'].on_error(e,None)
+                    return
+                except Exception as e:
+                    await self.bot.cogs['ErrorsCog'].on_error(e,None)
+        desc = '**MEE6 rewards** updated in {}s ({} guilds / {} roles given)'.format(round(time.time()-t,3),counts[0],counts[1])
+        if len(errors)>0:
+            desc += "\n{} errors: {}".format(len(errors),' - '.join([str(x) for x in errors]))
+        emb = self.bot.cogs["EmbedCog"].Embed(desc=desc,color=6476789).update_timestamp().set_author(self.bot.user)
+        await self.bot.cogs["EmbedCog"].send([emb],url="loop")
+    
+    async def dbl_send_data(self):
+        """Send guilds count to Discord Bots Lists"""
+        if self.bot.beta:
+            return
+        t = time.time()
+        answers = ['None','None','None','None']
+        self.bot.log.info("[DBL] Envoi des infos sur le nombre de guildes...")
+        session = aiohttp.ClientSession(loop=self.bot.loop)
+        # https://discordbots.org/bot/486896267788812288
+        payload = {'server_count': len(self.bot.guilds)}
+        async with session.post('https://discordbots.org/api/bots/486896267788812288/stats',data=payload,headers={'Authorization':str(self.bot.dbl_token)}) as resp:
+            self.bot.log.debug('discordbots.org returned {} for {}'.format(resp.status, payload))
+            answers[0] = resp.status
+        # https://divinediscordbots.com/bot/486896267788812288
+        payload = json.dumps({
+          'server_count': len(self.bot.guilds)
+          })
+        headers = {
+              'authorization': self.bot.others['divinediscordbots'],
+              'content-type': 'application/json'
+          }
+        async with session.post('https://divinediscordbots.com/bot/{}/stats'.format(self.bot.user.id), data=payload, headers=headers) as resp:
+              self.bot.log.debug('divinediscordbots statistics returned {} for {}'.format(resp.status, payload))
+              answers[1] = resp.status
+        # https://bots.ondiscord.xyz/bots/486896267788812288
+        payload = json.dumps({
+          'guildCount': len(self.bot.guilds)
+          })
+        headers = {
+              'Authorization': self.bot.others['botsondiscord'],
+              'Content-Type': 'application/json'
+          }
+        async with session.post('https://bots.ondiscord.xyz/bot-api/bots/{}/guilds'.format(self.bot.user.id), data=payload, headers=headers) as resp:
+              self.bot.log.debug('BotsOnDiscord returned {} for {}'.format(resp.status, payload))
+              answers[2] = resp.status
+        # https://discordbots.group/bot/486896267788812288
+        payload = json.dumps({
+          'server_count': len(self.bot.guilds)
+          })
+        headers = {
+              'Authorization': self.bot.others['discordbotsgroup'],
+              'content-type': 'application/json'
+          }
+        async with session.post('https://api.discordbots.group/v1/bot/{}'.format(self.bot.user.id), data=payload, headers=headers) as resp:
+              self.bot.log.debug('DiscordBotsGroup returned {} for {}'.format(resp.status, payload))
+              answers[3] = resp.status
+        await session.close()
+        answers = [str(x) for x in answers]
+        emb = self.bot.cogs["EmbedCog"].Embed(desc='**Guilds count updated** in {}s ({})'.format(round(time.time()-t,3),'-'.join(answers)),color=7229109).update_timestamp().set_author(self.bot.user)
+        await self.bot.cogs["EmbedCog"].send([emb],url="loop")
+        self.dbl_last_sending = datetime.datetime.now()
+
+    async def send_mee6_stats(self):
+        """temporary log to see how many mee6api requests have been done"""
+        stats = self.bot.cogs['XPCog'].mee6_calls
+        t = await self.bot.cogs['TimeCog'].time_delta(round(time.time()-stats[0]))
+        emb = self.bot.cogs["EmbedCog"].Embed(desc='MEE6 api called {} times since {} ({}-{}-{})'.format(sum(stats[1:]),t,stats[1],stats[2],stats[3]))
+        emb.update_timestamp().set_author(self.bot.user)
+        await self.bot.cogs["EmbedCog"].send([emb],url="loop")
+        self.mee6_stats_last = datetime.datetime.now()
+
+    async def partners_loop(self):
+        """Update partners channels (every 7 hours)"""
+        t = time.time()
+        self.partner_last_check = datetime.datetime.now()
+        channels_list = await self.bot.cogs['ServerCog'].get_server(criters=["`partner_channel`<>''"],columns=['ID','partner_channel','partner_color'])
+        self.bot.log.info("[Partners] Rafraîchissement des salons ({} serveurs prévus)...".format(len(channels_list)))
+        count = [0,0]
+        for guild in channels_list:
             chan = guild['partner_channel'].split(';')[0]
             if not chan.isnumeric():
                 continue

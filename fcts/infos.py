@@ -1,4 +1,4 @@
-import discord, datetime, sys, psutil, os, aiohttp, importlib, time, asyncio, typing, random, re
+import discord, datetime, sys, psutil, os, aiohttp, importlib, time, asyncio, typing, random, re, copy
 from discord.ext import commands
 from inspect import signature
 from platform   import system as system_name  # Returns the system/OS name
@@ -11,6 +11,8 @@ importlib.reload(conf)
 from fcts import reloads, args
 importlib.reload(reloads)
 importlib.reload(args)
+from libs import bitly_api
+importlib.reload(bitly_api)
 
 bot_version = conf.release
 
@@ -26,12 +28,15 @@ class InfosCog(commands.Cog):
             self.timecog = bot.cogs["TimeCog"]
         except:
             pass
+        self.emoji_table = 'emojis_beta' if self.bot.beta else 'emojis'
+        self.BitlyClient = bitly_api.Bitly(login='zrunner',api_key=self.bot.others['bitly'])
 
     @commands.Cog.listener()
     async def on_ready(self):
         self.translate = self.bot.cogs["LangCog"].tr
         self.timecog = self.bot.cogs["TimeCog"]
         self.codelines = await self.count_lines_code()
+        self.emoji_table = 'emojis_beta' if self.bot.beta else 'emojis'
     
 
     async def is_support(self,ctx):
@@ -116,7 +121,7 @@ class InfosCog(commands.Cog):
         if ip==None:
             m = await ctx.send("Pong !")
             t = (m.created_at - ctx.message.created_at).total_seconds()
-            await m.edit(content="Pong ! ("+str(round(t*1000,3))+"ms)")
+            await m.edit(content="Pong ! ("+str(round(t*1000))+"ms)")
         else:
             asyncio.run_coroutine_threadsafe(self.ping_adress(ctx,ip),asyncio.get_event_loop())
 
@@ -172,6 +177,7 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
                 try:
                     item = await find(ctx,name,Type)
                 except:
+                    name = name.replace('@everyone',"@"+u"\u200B"+"everyone").replace("@here","@"+u"\u200B"+"here")
                     await ctx.send(str(await self.translate(ctx.guild.id,"modo","cant-find-user")).format(name))
                     return
             critical = ctx.author.guild_permissions.manage_guild or await self.bot.cogs['AdminCog'].check_if_god(ctx)
@@ -256,9 +262,6 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
             guilds_count = await self.bot.cogs['PartnersCog'].get_guilds(item.id,session)
             if guilds_count!=None:
                 embed.add_field(name=str(await self.translate(ctx.guild.id,'keywords','servers')).capitalize(),value=guilds_count)
-            uptime = await self.bot.cogs['PartnersCog'].get_uptimes(item.id,session)
-            if uptime!=None:
-                embed.add_field(name=await self.translate(ctx.guild,'partners','bot-uptime'),value=f'{round(uptime)}%')
             await session.close()
         await ctx.send(embed=embed)
 
@@ -315,9 +318,6 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
             guilds_count = await self.bot.cogs['PartnersCog'].get_guilds(item.id,session)
             if guilds_count!=None:
                 embed.add_field(name=str(await self.translate(ctx.guild.id,'keywords','servers')).capitalize(),value=guilds_count)
-            uptime = await self.bot.cogs['PartnersCog'].get_uptimes(item.id,session)
-            if uptime!=None:
-                embed.add_field(name=await self.translate(ctx.guild,'partners','bot-uptime'),value=f'{round(uptime)}%')
             await session.close()
         await ctx.send(embed=embed)
 
@@ -344,6 +344,14 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
         embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","emoji-2"), value="`<:{}:{}>`".format(item.name,item.id))
         embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","emoji-1"), value=manage.capitalize())
         embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","member-1"), value = "{} ({} {})".format(await self.timecog.date(item.created_at,lang=lang,year=True),since,await self.timecog.time_delta(item.created_at,datetime.datetime.now(),lang=lang,year=True,precision=0,hour=False)), inline=False)
+        if len(item.roles)>0:
+            embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","emoji-4"), value=" ".join([x.mention for x in item.roles]))
+        infos_uses = await self.get_emojis_info(item.id)
+        if len(infos_uses)>0:
+            infos_uses = infos_uses[0]
+            lang = await self.translate(ctx.channel,'current_lang','current')
+            date = await self.bot.cogs['TimeCog'].date(infos_uses['added_at'],lang,year=True,hour=False)
+            embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","emoji-5"), value=await self.translate(ctx.guild.id,"stats_infos","emoji-5v",nbr=infos_uses['count'],date=date))
         await ctx.send(embed=embed)
 
     async def textChannel_infos(self,ctx,chan,lang):
@@ -643,15 +651,26 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
                 text += "- {i[0]} : {i[1]}\n".format(i=i)
             await ctx.send(text)
 
-    @commands.command(name="prefix")
-    async def get_prefix(self,ctx):
+    @commands.group(name="prefix")
+    async def get_prefix(self,ctx:commands.Context):
         """Show the usable prefix(s) for this server"""
+        if ctx.invoked_subcommand != None:
+            return
         txt = await self.translate(ctx.channel,"infos","prefix")
         prefix = "\n".join(await ctx.bot.get_prefix(ctx.message))
         if ctx.guild==None or ctx.channel.permissions_for(ctx.guild.me):
             emb = ctx.bot.cogs['EmbedCog'].Embed(title=txt,desc=prefix,time=ctx.message.created_at,color=ctx.bot.cogs['HelpCog'].help_color).create_footer(ctx.author)
             return await ctx.send(embed=emb.discord_embed())
         await ctx.send(txt+"\n"+prefix)
+    
+    @get_prefix.command(name="change")
+    @commands.guild_only()
+    async def prefix_change(self,ctx,new_prefix):
+        """Change the user prefix"""
+        msg = copy.copy(ctx.message)
+        msg.content = ctx.prefix + 'config change prefix '+new_prefix
+        new_ctx = await self.bot.get_context(msg)
+        await self.bot.invoke(new_ctx)
     
     @commands.command(name="discordlinks",aliases=['discord','discordurls'])
     async def discord_status(self,ctx):
@@ -669,21 +688,74 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
     async def emoji_analysis(self,msg):
         """Lists the emojis used in a message"""
         try:
+            ctx = await self.bot.get_context(msg)
+            if ctx.command!=None:
+                return
             liste = list(set(re.findall(r'<:[\w-]+:(\d{18})>',msg.content)))
             if len(liste)==0:
                 return
             cnx = self.bot.cnx_frm
             cursor = cnx.cursor()
             current_timestamp = datetime.datetime.fromtimestamp(round(time.time()))
-            table = 'emojis_beta' if self.bot.beta else 'emojis'
-            query = ["INSERT INTO `{t}` (`ID`,`count`,`last_update`) VALUES ('{i}',1,'{l}') ON DUPLICATE KEY UPDATE count = `count` + 1, last_update = '{l}';".format(t=table,i=x,l=current_timestamp) for x in liste]
+            query = ["INSERT INTO `{t}` (`ID`,`count`,`last_update`) VALUES ('{i}',1,'{l}') ON DUPLICATE KEY UPDATE count = `count` + 1, last_update = '{l}';".format(t=self.emoji_table,i=x,l=current_timestamp) for x in liste]
             for q in query:
                 cursor.execute(q)
             cnx.commit()
             cursor.close()
         except Exception as e:
             await self.bot.cogs['ErrorsCog'].on_error(e,None)
+    
+    async def get_emojis_info(self,ID:typing.Union[int,list]):
+        """Get info about an emoji"""
+        if isinstance(ID,int):
+            query = "Select * from `{}` WHERE `ID`={}".format(self.emoji_table,ID)
+        else:
+            query = "Select * from `{}` WHERE {}".format(self.emoji_table,"OR".join([f'`ID`={x}' for x in ID]))
+        cnx = self.bot.cnx_frm
+        cursor = cnx.cursor(dictionary = True)
+        cursor.execute(query)
+        liste = list()
+        for x in cursor:
+            x['emoji'] = self.bot.get_emoji(x['ID'])
+            liste.append(x)
+        cursor.close()
+        return liste
+    
 
+    @commands.group(name="bitly")
+    async def bitly_main(self,ctx:commands.Context):
+        """Bit.ly website, but in Discord
+        Create shortened url and unpack them by using Bitly services"""
+        if ctx.subcommand_passed==None:
+            await self.bot.cogs['HelpCog'].help_command(ctx,['bitly'])
+        elif ctx.invoked_subcommand==None and ctx.subcommand_passed!=None:
+            try:
+                url = await args.url().convert(ctx,ctx.subcommand_passed)
+            except:
+                return
+            if url.domain == 'bit.ly':
+                msg = copy.copy(ctx.message)
+                msg.content = ctx.prefix + 'bitly find '+url.url
+                new_ctx = await self.bot.get_context(msg)
+                await self.bot.invoke(new_ctx)
+            else:
+                msg = copy.copy(ctx.message)
+                msg.content = ctx.prefix + 'bitly create '+url.url
+                new_ctx = await self.bot.get_context(msg)
+                await self.bot.invoke(new_ctx)
+
+    @bitly_main.command(name="create")
+    async def bitly_create(self,ctx,url:args.url):
+        """Create a shortened url"""
+        await ctx.send(await self.translate(ctx.channel,'infos','bitly_short',url=self.BitlyClient.shorten_url(url.url)))
+    
+    @bitly_main.command(name="find")
+    async def bitly_find(self,ctx,url:args.url):
+        """Find the long url from a bitly link"""
+        if url.domain != 'bit.ly':
+            return await ctx.send(await self.translate(ctx.channel,'infos','bitly_nobit'))
+        await ctx.send(await self.translate(ctx.channel,'infos','bitly_long',url=self.BitlyClient.expand_url(url.url)))
+        
 
 def setup(bot):
     bot.add_cog(InfosCog(bot))

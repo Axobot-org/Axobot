@@ -93,19 +93,22 @@ cases={"no-user":"Impossible de trouver cet utilisateur",
 
 events={'mp-adv':"Vous cherchez sans doute à m'inviter sur ce serveur ? Si c'est le cas, je ne peux pas le rejoindre avec une simple invitation. Il faut qu'un administrateur utilise mon propre lien d'invitation, ici : <https://bot.discord.io/zbot> :wink:"}
 
-errors={"cooldown":"Vous êtes en cooldown pour cette commande. Veuillez attendre encore {0} secondes...",
-        "badarguments":"Oups, impossible de convertir le paramètre `{0}` en type \"{1}\" :confused:",
-        'badarguments-2':"`{0}` n'est pas de type {1}",
-        "missingargument":"Oups, il manque l'argument \"{0}\" {1}",
-        "membernotfound":"Impossible de trouver le membre `{0}` :confused:",
-        "usernotfound":"Impossible de trouver l'utilisateur `{0}` :confused:",
-        "disabled":"La commande {0} est désactivée",
-        "duration":"La durée `{0}` est invalide",
-        "rolenotfound":"Impossible de trouver le rôle `{0}`",
-        "invalidcolor":"La couleur `{0}` est invalide",
-        "invalidinvite":"Invitation de bot ou de serveur invalide : `{0}`",
-        'channotfound':"Le salon {0} est introuvable",
-        'DM':"Cette commande est indisponible en Messages Privés"
+errors={"cooldown":"Vous êtes en cooldown pour cette commande. Veuillez attendre encore {d} secondes...",
+        "badarguments":"Oups, impossible de convertir le paramètre `{p}` en type \"{t}\" :confused:",
+        'badarguments-2':"`{p}` n'est pas de type {t}",
+        "missingargument":"Oups, il manque l'argument \"{a}\" {e}",
+        "membernotfound":"Impossible de trouver le membre `{m}` :confused:",
+        "usernotfound":"Impossible de trouver l'utilisateur `{u}` :confused:",
+        "disabled":"La commande {c} est désactivée",
+        "duration":"La durée `{d}` est invalide",
+        "rolenotfound":"Impossible de trouver le rôle `{r}`",
+        "invalidcolor":"La couleur `{c}` est invalide",
+        "invalidinvite":"Invitation de bot ou de serveur invalide : `{i}`",
+        "invalidguild":"Ce serveur est introuvable : `{g}`",
+        "invalidurl":"Url invalide : `{u}`",
+        "invalidleaderboard":"Type de classement inexistant",
+        'channotfound':"Le salon {c} est introuvable",
+        'DM':"Cette commande est indisponible en Messages Privés",
         }
 
 find={"user-0":"Nom : {}\nID : {}",
@@ -179,6 +182,22 @@ fun={"count-0":"Comptage en cours...",
                 "Pro-tip : Le bot possède un Discord, où vous pourrez voir les bugs actuels et voter pour les prochaines mises à jour ! Utilisez la commande `about` pour en obtenir le lien",
                 "Pro-tip : la commande `prefix` permet d'avoir la liste des préfixes actuellement utilisables dans le serveur"
                 ],
+        "markdown":r"""__**Règles du Markdown** sur *Discord*__
+
+`*italique*` = *italique*
+`__souligné__` = __souligné__
+`**gras**` = **gras**
+`***gras italique***` = ***gras italique***
+`~~barré~~` = ~~barré~~
+`__*souligné italique*__` = __*souligné italique*__
+`__**souligné gras**__` = __**souligné gras**__
+`__***souligné gras italique***__` = __***souligné gras italique***__
+`||spoiler||` = ||spoiler||
+> citation = `> citation`
+\`code\` = `code`
+\\ pour ignorer
+
+Pour les blocs de code, cf <https://discord.gg/DGahTNn>""",
         }
 
 infos={"text-0":"""Bonjour ! Moi c'est {0} !
@@ -206,6 +225,9 @@ Bonne journée !""",
                 'Proposer une idée à Discord':'https://dis.gd/feedback',
                 'Explication des selfbots':'https://support.discordapp.com/hc/articles/115002192352',
                 'CGU pour les développeurs de bot':'https://discordapp.com/developers/docs/legal'},
+        "bitly_short":"URL raccourcie : {url}",
+        "bitly_long":"URL d'origine : {url}",
+        "bitly_nobit":"Cette adresse n'est pas un lien bit.ly !",
         }
 
 infos_2={"membercount-0":"Nombre de membres total",
@@ -501,11 +523,14 @@ Lien : {link}""",
 - `{title}` : le titre du post""",
         "text-success":"Le texte du flux n°{} a bien été modifié ! Nouveau texte : \n```\n{}\n```",
         "invalid-flow":"Cet url est invalide (flux rss vide ou inaccessible) :confused:",
-        "research-timeout":"La page web a mis trop de temps à répondre, j'ai dû interrompre le processus :eyes:"
+        "research-timeout":"La page web a mis trop de temps à répondre, j'ai dû interrompre le processus :eyes:",
+        "use_embed_true":"Ce flux utilise actuellement les embeds pour être envoyé. Voulez-vous toujours utiliser les embeds pour ce flux ? (true/false)",
+        "use_embed_false":"Ce flux n'utilise pas d'embed pour être envoyé. Voulez-vous utiliser les embeds pour ce flux ? (true/false)",
+        "use_embed-success":"La valeur a bien été modifiée à {v} pour le flux n°{f} !",
         }
 
 server={"config-help":"Cette commande sert principalement à configurer votre serveur. En faisant `!config see [option]` vous obtiendrez l'aperçu des configurations actuelles, \
-et les administrateurs du serveur peuvent entrer `!config change <option> role1, role2, role3...` pour modifier une configuration, ou `!config del <option>` pour réinitialiser \
+et les administrateurs du serveur peuvent entrer `!config change <option> valeur1, valeur2...` pour modifier une configuration, ou `!config del <option>` pour réinitialiser \
 l'option (`!config change <option> del` fonctionne de même).\nLa liste des options disponible est accessible à l'adresse <https://zbot.rtfd.io/en/latest/server.html#list-of-every-option>",
         "change-0":"Cette option n'existe pas :confused:",
         "change-1":"Oups, une erreur interne est survenue...",
@@ -596,6 +621,9 @@ stats_infos={"not-found":"Impossible de trouver {N}",
         "emoji-1":"Intégré par Twitch",
         "emoji-2":"Chaine de caractères (pour bot)",
         "emoji-3":"Serveur sur lequel est l'émoji",
+        "emoji-4":"Restrictions",
+        "emoji-5":"Nombre d'utilisations",
+        "emoji-5v":"{nbr} (1st uz savd : {date})",
         "textchan-0":"Catégorie",
         "textchan-1":"Description",
         "textchan-2":"NSFW",

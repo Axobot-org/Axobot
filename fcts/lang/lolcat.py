@@ -93,18 +93,21 @@ cases={"no-user":"Unable to find dis usr :eyes:",
 
 events={'mp-adv':"U're probably trying 2 invite me in dis server? If that's the case, I can't join him with a simple invite. An super-admin must use my own link, just here: <https://bot.discord.io/zbot> :innocent:"}
 
-errors={"cooldown":"Yu are on cold-own for dis comandZ :confused: Plize wait {} moRe secs...",
-        "badarguments":"W0ops, unabled 2 convrt teh `{c[3]}` parameterz to \"{c[1]}\" tipe :confused:",
-        'badarguments-2':"`{0}` iznt a true {1} option",
-        "missingargument":"Oops, te argumnt \"{}\" are missin {}",
-        "membernotfound":"Unabl to found the membr `{}` :confused:",
-        "usernotfound":"Unabled 2 find teh userZ `{}` :confused:",
-        "disabled":"Da {} cmd is dizabled :confused:",
-        "duration":"Invalid timer: `{}`",
-        "rolenotfound":"Unable 2 find ur role (`{0}`)",
-        "invalidcolor":"Ups, I can't find the color `{0}` :confused:",
-        "invalidinvite":"Invalid bot/server link: `{0}`",
-        'channotfound':"Super chat room {0} don't want 2 be found",
+errors={"cooldown":"Yu are on cold-own for dis comandZ :confused: Plize wait {d} moRe secs...",
+        "badarguments":"W0ops, unabled 2 convrt teh `{p}` parameterz to \"{t}\" tipe :confused:",
+        'badarguments-2':"`{p}` iznt a true {t} option",
+        "missingargument":"Oops, te argumnt \"{a}\" are missin {e}",
+        "membernotfound":"Unabl to found the membr `{m}` :confused:",
+        "usernotfound":"Unabled 2 find teh userZ `{u}` :confused:",
+        "disabled":"Da {c} cmd is dizabled :confused:",
+        "duration":"Invalid timer: `{d}`",
+        "rolenotfound":"Unable 2 find ur role (`{r}`)",
+        "invalidcolor":"Ups, I can't find the color `{c}` :confused:",
+        "invalidinvite":"Invalid bot/server link: `{i}`",
+        "invalidguild":"Upsi, dat guild don't want to be find: {g}",
+        "invalidurl":"Nope, `{u}` iznt a valid ~~cat~~ link",
+        "invalidleaderboard":"Not found levels table type",
+        'channotfound':"Super chat room {c} don't want 2 be found",
         'DM':"Dat command isn't enabled in PM"
         }
 
@@ -179,6 +182,22 @@ fun={"count-0":"Countng in progrez...",
                 "Pro-tip: The bot has a Discord, where you can see the current bugs and vote for the next updates! Use the `about` command to get the invite",
                 "Pro-tip: the `prefix` command allows you to have a list of the prefixes currently usable in the server",
                 ],
+        "markdown":r"""__**Markdown Rules** on *Discord*__
+
+`*italics*` = *italics*
+`__underline__` = __underline__
+`**bold**` = **bold**
+`***bold italics***` = ***bold italics***
+`~~strikeout~~` = ~~strikeout~~
+`__*underline italics*__` = __*underline italics*__
+`__**underline bold**__` = __**underline bold**__
+`__***underline bold italics***__` = __***underline bold italics***__
+`||spoiler||` = ||spoiler||
+> quote = `> quote`
+\`code\` = `code`
+\\ to ignore
+                
+For code blocks, cf <https://discord.gg/DGahTNn>"""
         }
 
 infos={"text-0":"""Ho hi hello! I'm {0} !
@@ -206,6 +225,9 @@ Has a nice dayz !""",
                 'Suggest something to Discord':'https://dis.gd/feedback',
                 'Selfbots article':'https://support.discordapp.com/hc/articles/115002192352',
                 'ToS for bot devs':'https://discordapp.com/developers/docs/legal'},
+        "bitly_short":"Quick linq: {url}",
+        "bitly_long":"Slow link: {url}",
+        "bitly_nobit":"HAHA NOPE, dat's not a bit.ly link!",
         }
 
 infos_2={"membercount-0":"Total nmber of membrz",
@@ -501,11 +523,14 @@ UrL : {link}""",
 - `{title}`: the titl of da post""",
         "text-success":"Teh text of the feed #{} haz been modified!\n New cute text : \n```\n{}\n```",
         "invalid-flow":"I can't add dis url (empty or inaccessible rss flew) :confused:",
-        "research-timeout":"This page took toooo long 2 answer, I had to stop teh process :eyes:"
+        "research-timeout":"This page took toooo long 2 answer, I had to stop teh process :eyes:",
+        "use_embed_true":"This one use currntly embeds to be sent. Do U still wanted 2 use an embed for this flow? (true/false)",
+        "use_embed_false":"This feed do not use colored box 2B sent. Do U wants to use a nice box 4 tish flow? (true/false)",
+        "use_embed-success":"The value has been changed to {v} for flow n°{f}!",
         }
 
 server={"config-help": "Dis cmd is mainly usd 2 configur ur srver. By doin `!config see [option]` u will get \
-overview ov teh currnt configuraishun, and supr cool servr masters can enter `!config change <option> role1, role2, role3...` \
+overview ov teh currnt configuraishun, and supr cool servr masters can enter `!config change <option> val1 , val2, val4...` \
 to modify configuraishun, or `!config del <option>` 2 reset teh option (`!config change <option>` works same).\nTeh list ov options is displayd at <https://zbot.rtfd.io/en/latest/server.html#list-of-every-option>",
         "change-0": "Dis option doz not exist :confused:",
         "change-1": "Oops, an internal error occurrd...\nBut doan worry, we'r on teh place: http://asset-5.soupcdn.com/asset/3247/3576_5092_600.jpeg",
@@ -596,6 +621,9 @@ stats_infos={"not-found":"Unable 2 found {N}",
         "emoji-1":"Managd by Twiitch",
         "emoji-2":"String (4 roboats)",
         "emoji-3":"Good server who haz this",
+        "emoji-4":"Limits",
+        "emoji-5":"Uzes nbr",
+        "emoji-5v":"{nbr} (1st registered use: {date})",
         "textchan-0":"Catègoryz",
         "textchan-1":"Descripshun",
         "textchan-2":"Nut 4 kIdz (NSFVV)",

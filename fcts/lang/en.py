@@ -93,18 +93,21 @@ cases={"no-user":"Unable to find this user :eyes:",
 
 events={'mp-adv':"You are probably trying to invite me to this server? If that is the case, I can't join him with a simple invitation. An administrator must use my own invitation link, here: <https://bot.discord.io/zbot> :wink:"}
 
-errors={"cooldown":"You are on cooldown for this command :confused: Please wait {} more seconds...",
-        "badarguments":"Oops, unable to convert the `{c[3]}` parameter to \"{c[1]}\" type :confused:",
-        'badarguments-2':"`{0}` is not a recognised {1} option",
-        "missingargument":"Oops, the argument \"{}\" is missing {}",
-        "membernotfound":"Unable to find the member `{}` :confused:",
-        "usernotfound":"Unable to find the user `{}` :confused:",
-        "disabled":"The command {} is disabled :confused:",
-        "duration":"The duration `{}` is invalid",
-        "rolenotfound":"Unable to find the role `{0}`",
-        "invalidcolor":"Color `{0}` invalid",
-        "invalidinvite":"Invalid bot/server invite: `{0}`",
-        'channotfound':"Channel {0} not found",
+errors={"cooldown":"You are on cooldown for this command :confused: Please wait {d} more seconds...",
+        "badarguments":"Oops, unable to convert the `{p}` parameter to \"{t}\" type :confused:",
+        'badarguments-2':"`{p}` is not a recognised {t} option",
+        "missingargument":"Oops, the argument \"{a}\" is missing {e}",
+        "membernotfound":"Unable to find the member `{m}` :confused:",
+        "usernotfound":"Unable to find the user `{u}` :confused:",
+        "disabled":"The command {c} is disabled :confused:",
+        "duration":"The duration `{d}` is invalid",
+        "rolenotfound":"Unable to find the role `{r}`",
+        "invalidcolor":"Color `{c}` invalid",
+        "invalidinvite":"Invalid bot/server invite: `{i}`",
+        "invalidguild":"This server can't be found: `{g}`",
+        "invalidleaderboard":"Invalid leaderboard type",
+        "invalidurl":"Invalid url: `{u}`",
+        'channotfound':"Channel {c} not found",
         'DM':"This command isn't available in Direct Messages",
         }
 
@@ -179,6 +182,22 @@ fun={"count-0":"Counting in progress...",
                 "Pro-tip: The bot has a Discord, where you can see the current bugs and vote for the next updates! Use the `about` command to get the invite",
                 "Pro-tip: the `prefix` command allows you to have a list of the prefixes currently usable in the server",
                 ],
+        "markdown":r"""__**Markdown Rules** on *Discord*__
+
+`*italics*` = *italics*
+`__underline__` = __underline__
+`**bold**` = **bold**
+`***bold italics***` = ***bold italics***
+`~~strikeout~~` = ~~strikeout~~
+`__*underline italics*__` = __*underline italics*__
+`__**underline bold**__` = __**underline bold**__
+`__***underline bold italics***__` = __***underline bold italics***__
+`||spoiler||` = ||spoiler||
+> quote = `> quote`
+\`code\` = `code`
+\\ to ignore
+
+For code blocks, cf <https://discord.gg/DGahTNn>""",
         }
 
 infos={"text-0":"""Hello! I'm {0} !
@@ -206,6 +225,9 @@ Have a nice day!""",
                 'Suggest something to Discord':'https://dis.gd/feedback',
                 'Selfbots article':'https://support.discordapp.com/hc/articles/115002192352',
                 'ToS for bot devs':'https://discordapp.com/developers/docs/legal'},
+        "bitly_short":"Shortened URL: {url}",
+        "bitly_long":"Original URL: {url}",
+        "bitly_nobit":"This address is not a bit.ly link!",
         }
 
 infos_2={"membercount-0":"Total number of members",
@@ -501,11 +523,14 @@ Link : {link}""",
 - `{title}`: the title of the post""",
         "text-success":"The text of the feed #{} has been modified!\n New text : \n```\n{}\n```",
         "invalid-flow":"This url is invalid (empty or inaccessible rss flow) :confused:",
-        "research-timeout":"The web page took too long to answer, I had to interrupt the process :eyes:"
+        "research-timeout":"The web page took too long to answer, I had to interrupt the process :eyes:",
+        "use_embed_true":"This flow currently uses embeds to be sent. Do you still want to use an embed for this flow? (true/false)",
+        "use_embed_false":"This feed does not use embed to be sent. Do you want to use an embed for this flow? (true/false)",
+        "use_embed-success":"The value has been changed to {v} for flow n°{f}!",
         }
 
 server={"config-help": "This command is mainly used to configure your server. By doing `!config see [option]` you will get \
-an overview of the current configurations, and server administrators can enter `!config change <option> role1, role2, role3...` \
+an overview of the current configurations, and server administrators can enter `!config change <option> value1, value2...` \
 to modify a configuration, or `!config del <option>` to reset the option (`!config change <option>` works the same way).\nThe list of available options is available at <https://zbot.rtfd.io/en/latest/server.html#list-of-every-option>",
         "change-0": "This option does not exist :confused:",
         "change-1": "Oops, an internal error occurred...",
@@ -596,6 +621,9 @@ stats_infos={"not-found":"Unable to find {N}",
         "emoji-1":"Managed by Twitch",
         "emoji-2":"String (for bots)",
         "emoji-3":"Server which own it",
+        "emoji-4":"Restrictions",
+        "emoji-5":"Amount of uses",
+        "emoji-5v":"{nbr} (1st registered use: {date})",
         "textchan-0":"Category",
         "textchan-1":"Description",
         "textchan-2":"NSFW",
