@@ -25,18 +25,23 @@ class LibCog(commands.Cog):
         self.translate = self.bot.cogs['LangCog'].tr
 
 
-    async def search_book(self,isbn:int,keywords:str) -> dict:
+    async def search_book(self,isbn:int,keywords:str,language:str=None) -> dict:
         """Search a book from its ISBN"""
         keywords = keywords.replace(' ','+')
+        if language=='fr':
+            language = None
         url = f'https://www.googleapis.com/books/v1/volumes?q={keywords}'
         if isbn != None:
             url += f'+isbn:{isbn}' if len(keywords)>0 else f'_isbn:{isbn}'
+        if language != None:
+            url += f'&langRestrict={language}'
         async with aiohttp.ClientSession() as session:
             async with session.get(url) as resp:
-                print(url)
                 resp = await resp.json()
         if 'items' in resp.keys():
             return resp['items'][0]
+        if language != None:
+            return await self.search_book(isbn,keywords)
         return None
 
 
@@ -47,12 +52,12 @@ class LibCog(commands.Cog):
         pass
     
     @book_main.command(name="search",aliases=["book"])
-    async def book_search(self,ctx,ISBN:typing.Optional[ISBN],*,keywords:str=''):
+    async def book_search(self,ctx:commands.Context,ISBN:typing.Optional[ISBN],*,keywords:str=''):
         """Search from a book from its ISBN or search terms"""
         keywords = keywords.replace('-','')
         while '  ' in keywords:
             keywords = keywords.replace('  ',' ')
-        book = await self.search_book(ISBN,keywords)
+        book = await self.search_book(ISBN,keywords,language = await self.translate(ctx.channel,'current_lang','current'))
         if book==None:
             return await ctx.send(await self.translate(ctx.channel,'library','no-found'))
         vinfo = book['volumeInfo']
@@ -64,11 +69,11 @@ class LibCog(commands.Cog):
         txt = await self.translate(ctx.channel,'library','book_pres',
             title=vinfo['title'],
             subtitle=vinfo['subtitle'] if 'subtitle' in vinfo.keys() else '',
-            author=' - '.join(vinfo['authors']),
-            publisher=vinfo['publisher'],
-            publication=vinfo['publishedDate'],
+            author=' - '.join(vinfo['authors'] if 'authors' in vinfo.keys() else '?'),
+            publisher=vinfo['publisher'] if 'publisher' in vinfo.keys() else '?',
+            publication=vinfo['publishedDate'] if 'publishedDate' in vinfo.keys() else '?',
             language=vinfo['language'],
-            pages=vinfo['pageCount'],
+            pages=vinfo['pageCount'] if 'pageCount' in vinfo.keys() else '?',
             isbn=real_isbn
             )
         try:
@@ -77,7 +82,15 @@ class LibCog(commands.Cog):
             thumb = ''
         if ctx.guild == None or ctx.channel.permissions_for(ctx.guild.me).embed_links:
             emb = self.bot.cogs['EmbedCog'].Embed(title=vinfo['title'],desc=txt,url=vinfo['infoLink'],thumbnail=thumb,color=5301186).create_footer(ctx.author)
+            try:
+                price = [f"{k}: {x['amount']} {x['currencyCode']}" for k,x in book['saleInfo'].items() if k in ['listPrice','retailPrice']]
+                if len(price)>0:
+                    emb.add_field('LOL',"\n".join(price))
+            except Exception as e:
+                await self.bot.cogs['ErrorsCog'].on_cmd_error(ctx,e)
+                pass
             await ctx.send(embed=emb.discord_embed())
+            del emb
         else:
             await ctx.send(txt)
 
