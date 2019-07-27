@@ -64,8 +64,11 @@ class LangCog(discord.ext.commands.Cog):
         if lang_opt == 'fr':
             try:
                 result = eval("fr."+moduleID+"[\""+messageID+"\"]")
-            except:
+            except KeyError:
                 await self.msg_not_found(moduleID,messageID,"fr")
+                result = ""
+            except Exception as e:
+                await self.bot.cogs['ErrorsCog'].on_error(e,None)
                 result = ""
         if isinstance(result,str):
             try:
