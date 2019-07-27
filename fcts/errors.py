@@ -100,6 +100,10 @@ class ErrorsCog(commands.Cog):
             r = re.search(r'Invalid leaderboard type: (\S+)',raw_error)
             if r!=None:
                 return await ctx.send(await self.translate(ctx.channel,'errors','invalidleaderboard'))
+            # Invalid ISBN: lol
+            r = re.search(r'Invalid ISBN: (\S+)',raw_error)
+            if r!=None:
+                return await ctx.send(await self.translate(ctx.channel,'errors','invalidisbn'))
             print('errors -',error)
         elif isinstance(error,commands.MissingRequiredArgument):
             await ctx.send(await self.translate(ctx.channel,'errors','missingargument',a=error.param.name,e=random.choice([':eyes:','',':confused:',':thinking:',''])))
@@ -112,10 +116,10 @@ class ErrorsCog(commands.Cog):
             return
         else:
             try:
-                raw_error = raw_error.replace('@eveyrone','@​everyone').replace('@here','@​here')
+                raw_error = str(error).replace('@eveyrone','@​everyone').replace('@here','@​here')
                 await ctx.send("`ERROR:` {}".format(raw_error))
-            except:
-                self.bot.log.info("[on_cmd_error] Can't send error on channel {}".format(ctx.channel.id))
+            except Exception as newerror:
+                self.bot.log.info("[on_cmd_error] Can't send error on channel {}: {}".format(ctx.channel.id,newerror))
         # All other Errors not returned come here... And we can just print the default TraceBack.
         self.bot.log.warning('Ignoring exception in command {}:'.format(ctx.message.content))      
         await self.on_error(error,ctx)
