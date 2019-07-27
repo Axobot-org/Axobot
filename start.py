@@ -172,6 +172,7 @@ def main():
                       'fcts.events',
                       'fcts.fun',
                       'fcts.infos',
+                      'fcts.library',
                       'fcts.mc',
                       'fcts.moderation',
                       'fcts.morpion',

@@ -107,6 +107,7 @@ errors={"cooldown":"Vous êtes en cooldown pour cette commande. Veuillez attendr
         "invalidguild":"Ce serveur est introuvable : `{g}`",
         "invalidurl":"Url invalide : `{u}`",
         "invalidleaderboard":"Type de classement inexistant",
+        "invalidisbn":"ISBN invalide",
         'channotfound':"Le salon {c} est introuvable",
         'DM':"Cette commande est indisponible en Messages Privés",
         }
@@ -288,6 +289,19 @@ kill={"list":["Oh toi, tu vas mourir !",
         "Il ne fallait pas écouter la jolie mélodie de la Lullaby, {1} :musical_note:",
         "{2}.exe *a cessé de fonctionner*"
         ]}
+
+library={"book_pres":"""Titre : {title}
+Sous-titre : {subtitle}
+Auteur(s) : {author}
+Editeur : {publisher}
+Date de publication : {publication}
+Langue de publication : {language}
+Nombre de pages : {pages}
+
+ISBN : {isbn}
+""",
+        "no-found":"Impossible de trouver un livre correspondant"
+        }
 
 logs={"slowmode-enabled":"Slowmode activé dans le salon {channel} ({seconds}s)",
         "slowmode-disabled":"Slowmode désactivé dans le salon {channel}",
