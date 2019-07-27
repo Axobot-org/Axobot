@@ -764,7 +764,7 @@ ID corresponds to the Identifier of the message"""
     @commands.guild_only()
     @commands.check(checks.has_manage_nicknames)
     async def unhoist(self,ctx,chars=None):
-        """"Remove the special characters from usernames"""
+        """Remove the special characters from usernames"""
         count = 0
         if not ctx.channel.permissions_for(ctx.guild.me).manage_nicknames:
             return await ctx.send(await self.translate(ctx.guild.id,'modo','missing-manage-nick'))
