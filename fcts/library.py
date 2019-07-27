@@ -1,4 +1,4 @@
-import discord, aiohttp, re, typing
+import discord, aiohttp, re, typing, datetime
 from discord.ext import commands
 
 
@@ -16,13 +16,27 @@ class LibCog(commands.Cog):
     def __init__(self,bot:commands.Bot):
         self.bot = bot
         self.file = 'library'
+        self.tables = ['librarystats_beta','library_beta'] if bot.beta else ['librarystats','library']
         try:
             self.translate = bot.cogs['LangCog'].tr
         except:
             pass
     
     async def on_ready(self):
+        self.tables = ['librarystats_beta','library_beta'] if self.bot.beta else ['librarystats','library']
         self.translate = self.bot.cogs['LangCog'].tr
+
+
+    async def db_add_search(self,ISBN:int,name:str):
+        name = name.replace('"','\\\"')
+        cnx = self.bot.cnx_frm
+        cursor = cnx.cursor()
+        current_timestamp = datetime.datetime.utcnow()
+        query = "INSERT INTO `{t}` (`ISBN`,`name`,`count`,`last_update`) VALUES ('{i}',\"{n}\",1,'{l}') ON DUPLICATE KEY UPDATE count = `count` + 1, last_update = '{l}';".format(t=self.tables[0],i=ISBN,n=name,l=current_timestamp)
+        cursor.execute(query)
+        cnx.commit()
+        cursor.close()
+
 
 
     async def search_book(self,isbn:int,keywords:str,language:str=None) -> dict:
@@ -85,7 +99,7 @@ class LibCog(commands.Cog):
             try:
                 price = [f"{k}: {x['amount']} {x['currencyCode']}" for k,x in book['saleInfo'].items() if k in ['listPrice','retailPrice']]
                 if len(price)>0:
-                    emb.add_field('LOL',"\n".join(price))
+                    emb.add_field(await self.translate(ctx.channel,'library','price'),"\n".join(price))
             except Exception as e:
                 await self.bot.cogs['ErrorsCog'].on_cmd_error(ctx,e)
                 pass
@@ -93,6 +107,7 @@ class LibCog(commands.Cog):
             del emb
         else:
             await ctx.send(txt)
+        await self.db_add_search(int(real_isbn),vinfo['title'])
 
 
 
