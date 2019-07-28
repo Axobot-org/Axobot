@@ -68,5 +68,5 @@ async def verify_role_exists(ctx):
     if ctx.guild==None:
         return False
     roles_raw = await ctx.bot.cogs['ServerCog'].find_staff(ctx.guild.id,"verification_role")
-    roles = [r for r in [ctx.guild.get_role(int(x)) for x in roles_raw.split(';') if x.isnumeric] if r!=None]
+    roles = [r for r in [ctx.guild.get_role(int(x)) for x in roles_raw.split(';') if x.isnumeric() and len(x)>0] if r!=None]
     return len(roles) > 0
