@@ -27,15 +27,15 @@ class LangCog(discord.ext.commands.Cog):
             serverID = serverID.id
         elif isinstance(serverID,discord.TextChannel):
             serverID = serverID.guild.id
-        if not self.bot.database_online:
+        if str(serverID) in self.serv_opts.keys():
+            lang_opt = self.serv_opts[str(serverID)]
+            #print("Ex langage:",lang_opt)
+            #print(self.serv_opts)
+        elif not self.bot.database_online:
             lang_opt = self.bot.cogs['ServerCog'].default_language
         elif isinstance(serverID,(discord.DMChannel,type(None))):
             used_langs = await self.bot.cogs['UtilitiesCog'].get_languages(serverID.recipient,limit=1)
             lang_opt = used_langs[0][0]
-        elif str(serverID) in self.serv_opts.keys():
-            lang_opt = self.serv_opts[str(serverID)]
-            #print("Ex langage:",lang_opt)
-            #print(self.serv_opts)
         else:
             conf_lang = self.bot.cogs["ServerCog"].conf_lang
             lang_opt = await conf_lang(serverID,"language","scret-desc")
