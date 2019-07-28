@@ -811,7 +811,7 @@ ID corresponds to the Identifier of the message"""
     @commands.check(checks.verify_role_exists)
     @commands.cooldown(5,120,commands.BucketType.user)
     async def verify_urself(self,ctx:commands.Context):
-        """Verify yourself and get the role"""
+        """Verify yourself and loose the role"""
         roles_raw = await ctx.bot.cogs['ServerCog'].find_staff(ctx.guild.id,"verification_role")
         roles = [r for r in [ctx.guild.get_role(int(x)) for x in roles_raw.split(';') if x.isnumeric] if r!=None]
         if not ctx.guild.me.guild_permissions.manage_roles:
@@ -841,7 +841,7 @@ ID corresponds to the Identifier of the message"""
                     pass
                 await qu_msg.delete()
                 try:
-                    await ctx.author.add_roles(*roles,reason="Verified")
+                    await ctx.author.remove_roles(*roles,reason="Verified")
                 except Exception as e:
                     await self.bot.cogs['ErrorsCog'].on_cmd_error(ctx,e)
 
