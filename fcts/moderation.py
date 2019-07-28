@@ -804,6 +804,8 @@ ID corresponds to the Identifier of the message"""
                     a = ctx.guild.name
                 else:
                     return self.find_verify_question(ctx)
+            elif a=='_special_userdiscrim':
+                a = ctx.author.discriminator
         return q,a
 
     @commands.command(name="verify")

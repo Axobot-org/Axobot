@@ -433,7 +433,15 @@ modo={"slowmode-0":"Le slowmode est désormais désactivé dans ce salon.",
                 'Combien de côtés possède un carré ?':'4',
                 'Quel est le résultat de 10-6 ?':'4',
                 'Quelle est la première lettre de `Zbot` ?':'z',
-                'Quel est le nom de ce serveur ?':'_special_servername'},
+                'Quel est le discriminant situé après votre pseudo discord ?':'_special_userdiscrim',
+                "Comment s'appelle le système d'exploitation des téléphones de la marque Apple ?":'iOS',
+                "Comment s'appelle le système d'exploitation des téléphones de la marque Samsung ? ":'Android',
+                "Quel est le nom du pain français connu partout dans le monde ? (un seul mot)":"baguette",
+                'Quel est le nom de ce serveur ?':'_special_servername',
+                "L'émoji :pig: représente : un insecte, légume, animal ?":'animal',
+                'Lequel de ces mots désigne un fruit ? pizza, pomme, dinosaure':'pomme',
+                'Quel est le résultat du produit de deux et cinq ? (en lettres)':'dix',
+                'Quelle forme géométrique possède 3 côtés ?':'triangle'},
         'verify-role-high':"Oups, il semble que le rôle `{r}` soit trop haut pour que je puisse le donner. Veuillez placer ce rôle plus bas que le mien, ou placer mon rôle au-dessus.",
         }
 
