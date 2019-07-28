@@ -48,7 +48,8 @@ aide={"no-subcmd":"La commande {0.name} n'a aucune sous-commande",
                 'is_fun_enabled':['Les commandes de fun sont activées','Les commandes de fun doivent être activées'],
                 'can_use_rss':["Vous avez la permission 'Administrateur'","Permission 'Administrateur' manquante"],
                 'is_owner':['Il faut être le propriétaire du bot',"Vous n'êtes pas le propriétaire du bot"],
-                'bot_has_permissions':["Le bot possède les permissions suffisantes","Le bot ne possède pas les permissions suffisantes"]}
+                'bot_has_permissions':["Le bot possède les permissions suffisantes","Le bot ne possède pas les permissions suffisantes"],
+                'verify_role_exists':["Un rôle de vérification est configuré","Aucun rôle de vérification n'a été configuré"]}
         }
 
 blurple = {'check_intro':"{}, début de l'analyse blurple (Notez que cela peut prendre un certain temps)",
@@ -426,6 +427,14 @@ modo={"slowmode-0":"Le slowmode est désormais désactivé dans ce salon.",
         'role-color':'Le rôle {} a changé de couleur !',
         'unhoisted':'{c} surnoms édités !',
         'missing-manage-nick':"Oups, il me manque la permission \"Gérer les pseudos\"",
+        'verify_questions':{'Combien font 2+7 ?':'9',
+                'Que donne le produit de 2 par 3 ?':'6',
+                'Lequel de ces mots commence par P ? `poussin`, `corbeau`, `hirondelle`':'poussin',
+                'Combien de côtés possède un carré ?':'4',
+                'Quel est le résultat de 10-6 ?':'4',
+                'Quelle est la première lettre de `Zbot` ?':'z',
+                'Quel est le nom de ce serveur ?':'_special_servername'},
+        'verify-role-high':"Oups, il semble que le rôle `{r}` soit trop haut pour que je puisse le donner. Veuillez placer ce rôle plus bas que le mien, ou placer mon rôle au-dessus.",
         }
 
 morpion={'user-begin':'{}, à toi de commencer !',

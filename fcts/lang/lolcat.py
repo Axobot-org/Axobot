@@ -48,7 +48,8 @@ aide={"no-subcmd":"Teh kommand `{0.name}` had not sub~~scribe~~commanD",
                 'is_fun_enabled':['Fun commands are enabled','Fun commands must be enabled'],
                 'can_use_rss':["U have 'Administrator' permission","'Administrator' permission is missed"],
                 'is_owner':["You must be the owner of the bot","You are not the owner of the bot"],
-                'bot_has_permissions':["The bot have enough perms", "The bot donot've sufficient perms"]}
+                'bot_has_permissions':["The bot have enough perms", "The bot donot've sufficient perms"],
+                'verify_role_exists':["A verification role hav bee setted up","No verification rol has been addd"]}
         }
 
 blurple = {'check_intro':'{}, starting blurple img analys (Plz note dat this may take one or two while)',
@@ -413,6 +414,14 @@ modo={"slowmode-0":"Teh very-cold-mode is now disabld in this nize place.",
         'role-color':"Teh coulor of role {} haz bee'n changd!",
         'unhoisted':'{c} bad names edited!',
         'missing-manage-nick':"Oops, I'm missing the cool \"Manage nicknames\" perms! :sad:",
+        'verify_questions':{'What do 2+7?':'9',
+                'What does the product of 2 by 3 give?':'6',
+                'Which of these words begins with D? `bathtub`, `crow`, `galion` or `drawing`':'drawing',
+                'How many sides does a triangle have?':'3',
+                'What is the result of 10 minus 5?':'5',
+                'What is the first letter of `Zbot`?':'z',
+                'What is the name of this server?':'_special_servername'},
+        'verify-role-high':"Oops, that role `{r}` is toooooooo high 4 me 2 give it. Plz place it role lawer than mine, or place my role 'bove it :plz:",
         }
 
 morpion={'user-begin':'{}, u begin!',

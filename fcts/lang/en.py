@@ -48,7 +48,8 @@ aide={"no-subcmd":"The command `{0.name}` has no subcommand",
                 'is_fun_enabled':['Fun commands are enabled','Fun commands must be enabled'],
                 'can_use_rss':["You have 'Administrator' permission","'Administrator' permission is missing"],
                 'is_owner':["You must be the owner of the bot","You are not the owner of the bot"],
-                'bot_has_permissions':["The bot has sufficient permissions", "The bot does not have sufficient permissions"]}
+                'bot_has_permissions':["The bot has sufficient permissions", "The bot does not have sufficient permissions"],
+                'verify_role_exists':["A verification role has been set up","No verification role has been added"]}
         }
 
 blurple = {'check_intro':'{}, starting blurple image analysis (Please note that this may take a while)',
@@ -426,6 +427,14 @@ modo={"slowmode-0":"The slowmode is now disabled in this channel.",
         'role-color':'The role {} has changed color!',
         'unhoisted':'{c} edited nicknames!',
         'missing-manage-nick':"Oops, I'm missing the \"Manage nicknames\" permission!",
+        'verify_questions':{'What is 2+7?':'9',
+                'What does the product of 2 by 3 give?':'6',
+                'Which of these words begins with D? `bathtub`, `crow`, `galion` or `drawing`':'drawing',
+                'How many sides does a triangle have?':'3',
+                'What is the result of 10 minus 5?':'5',
+                'What is the first letter of `Zbot`?':'z',
+                'What is the name of this server?':'_special_servername'},
+        'verify-role-high':"Oops, it seems that the role `{r}` is too high for me to give it. Please place this role lower than mine, or place my role above it.",
         }
 
 morpion={'user-begin':'{}, you begin!',

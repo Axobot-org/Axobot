@@ -1,5 +1,5 @@
 from discord.ext import commands
-import discord, re, datetime, random, json, os, typing, importlib, string
+import discord, re, datetime, random, json, os, typing, importlib, string, asyncio
 from fcts import checks, args
 importlib.reload(checks)
 importlib.reload(args)
@@ -790,6 +790,62 @@ ID corresponds to the Identifier of the message"""
             except:
                 pass
         await ctx.send(await self.translate(ctx.guild.id,'modo','unhoisted',c=count))
+    
+
+    async def find_verify_question(self,ctx:commands.Context) -> (str,str):
+        """Find a question/answer for a verification question"""
+        raw_info = await self.translate(ctx.guild,'modo','verify_questions')
+        q = random.choice(list(raw_info.keys()))
+        a = raw_info[q]
+        if a.startswith('_'):
+            if a=='_special_servername':
+                isascii = lambda s: len(s) == len(s.encode())
+                if isascii(ctx.guild.name):
+                    a = ctx.guild.name
+                else:
+                    return self.find_verify_question(ctx)
+        return q,a
+
+    @commands.command(name="verify")
+    @commands.guild_only()
+    @commands.check(checks.verify_role_exists)
+    @commands.cooldown(5,120,commands.BucketType.user)
+    async def verify_urself(self,ctx:commands.Context):
+        """Verify yourself and get the role"""
+        roles_raw = await ctx.bot.cogs['ServerCog'].find_staff(ctx.guild.id,"verification_role")
+        roles = [r for r in [ctx.guild.get_role(int(x)) for x in roles_raw.split(';') if x.isnumeric] if r!=None]
+        if not ctx.guild.me.guild_permissions.manage_roles:
+            return await ctx.send(await self.translate(ctx.guild.id,"modo","cant-mute"))
+        txt = str()
+        for role in roles:
+            if role.position > ctx.guild.me.roles[-1].position:
+                txt += await self.translate(ctx.guild.id,"modo","verify-role-high",r=role.name) + "\n"
+        if len(txt)>0:
+            return await ctx.send(txt)
+        del txt
+
+        q,a = await self.find_verify_question(ctx)
+        qu_msg = await ctx.send(q)
+        await asyncio.sleep(random.random()*1.3)
+        def check(m):
+            return m.author == ctx.author and m.channel == ctx.channel
+        try:
+            msg = await ctx.bot.wait_for('message', check=check, timeout=12)
+        except asyncio.TimeoutError:
+            await qu_msg.delete()
+        else:
+            if msg.content.lower() == a.lower():
+                try:
+                    await msg.delete()
+                except:
+                    pass
+                await qu_msg.delete()
+                try:
+                    await ctx.author.add_roles(*roles,reason="Verified")
+                except Exception as e:
+                    await self.bot.cogs['ErrorsCog'].on_cmd_error(ctx,e)
+
+
 
     @commands.command(name='backup')
     @commands.guild_only()

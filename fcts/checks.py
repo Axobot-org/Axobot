@@ -62,3 +62,11 @@ async def has_manage_roles(ctx):
 async def has_manage_nicknames(ctx):
     """... if someone can change nicknames"""
     return ctx.channel.permissions_for(ctx.author).manage_nicknames or await ctx.bot.cogs['AdminCog'].check_if_god(ctx)
+
+async def verify_role_exists(ctx):
+    """Check if the verify role exists"""
+    if ctx.guild==None:
+        return False
+    roles_raw = await ctx.bot.cogs['ServerCog'].find_staff(ctx.guild.id,"verification_role")
+    roles = [r for r in [ctx.guild.get_role(int(x)) for x in roles_raw.split(';') if x.isnumeric] if r!=None]
+    return len(roles) > 0
