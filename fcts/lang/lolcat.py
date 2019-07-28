@@ -105,8 +105,9 @@ errors={"cooldown":"Yu are on cold-own for dis comandZ :confused: Plize wait {d}
         "invalidcolor":"Ups, I can't find the color `{c}` :confused:",
         "invalidinvite":"Invalid bot/server link: `{i}`",
         "invalidguild":"Upsi, dat guild don't want to be find: {g}",
-        "invalidurl":"Nope, `{u}` iznt a valid ~~cat~~ link",
         "invalidleaderboard":"Not found levels table type",
+        "invalidurl":"Nope, `{u}` iznt a valid ~~cat~~ link",
+        "invalidisbn":"Invalid ISBN",
         'channotfound':"Super chat room {c} don't want 2 be found",
         'DM':"Dat command isn't enabled in PM"
         }

@@ -107,6 +107,7 @@ errors={"cooldown":"You are on cooldown for this command :confused: Please wait 
         "invalidguild":"This server can't be found: `{g}`",
         "invalidleaderboard":"Invalid leaderboard type",
         "invalidurl":"Invalid url: `{u}`",
+        "invalidisbn":"Invalid ISBN",
         'channotfound':"Channel {c} not found",
         'DM':"This command isn't available in Direct Messages",
         }
@@ -288,6 +289,19 @@ kill={"list":["Oh you, you gonna to die!",
         "You shouldn't listen to the pretty melody of the Lullaby, {1} :musical_note:",
         "{2}.exe *has stopped working*"
         ]}
+
+library={"book_pres":"""Title: {title}
+Subtitle: {subtitle}
+Autor(s): {author}
+Publisher: {publisher}
+Publication date: {publication}
+Language: {language}
+Page count: {pages}
+        
+ISBN : {isbn}""",
+        "no-found":"Unable to find this book",
+        "price":"Price",
+        }
 
 logs={"slowmode-enabled":"Slowmode enabled in {channel} ({seconds}s)",
         "slowmode-disabled":"Slowmode disabled in {channel}",

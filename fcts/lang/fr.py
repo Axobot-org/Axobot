@@ -105,8 +105,8 @@ errors={"cooldown":"Vous êtes en cooldown pour cette commande. Veuillez attendr
         "invalidcolor":"La couleur `{c}` est invalide",
         "invalidinvite":"Invitation de bot ou de serveur invalide : `{i}`",
         "invalidguild":"Ce serveur est introuvable : `{g}`",
-        "invalidurl":"Url invalide : `{u}`",
         "invalidleaderboard":"Type de classement inexistant",
+        "invalidurl":"Url invalide : `{u}`",
         "invalidisbn":"ISBN invalide",
         'channotfound':"Le salon {c} est introuvable",
         'DM':"Cette commande est indisponible en Messages Privés",
@@ -298,9 +298,9 @@ Date de publication : {publication}
 Langue de publication : {language}
 Nombre de pages : {pages}
 
-ISBN : {isbn}
-""",
-        "no-found":"Impossible de trouver un livre correspondant"
+ISBN : {isbn}""",
+        "no-found":"Impossible de trouver un livre correspondant",
+        "price":"Prix",
         }
 
 logs={"slowmode-enabled":"Slowmode activé dans le salon {channel} ({seconds}s)",
