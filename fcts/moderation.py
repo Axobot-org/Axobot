@@ -827,12 +827,12 @@ ID corresponds to the Identifier of the message"""
         del txt
 
         q,a = await self.find_verify_question(ctx)
-        qu_msg = await ctx.send(q)
+        qu_msg = await ctx.send(ctx.author.mention+': '+q)
         await asyncio.sleep(random.random()*1.3)
         def check(m):
             return m.author == ctx.author and m.channel == ctx.channel
         try:
-            msg = await ctx.bot.wait_for('message', check=check, timeout=12)
+            msg = await ctx.bot.wait_for('message', check=check, timeout=15)
         except asyncio.TimeoutError:
             await qu_msg.delete()
         else:
@@ -841,11 +841,11 @@ ID corresponds to the Identifier of the message"""
                     await msg.delete()
                 except:
                     pass
-                await qu_msg.delete()
                 try:
                     await ctx.author.remove_roles(*roles,reason="Verified")
                 except Exception as e:
                     await self.bot.cogs['ErrorsCog'].on_cmd_error(ctx,e)
+            await qu_msg.delete()
 
 
 
