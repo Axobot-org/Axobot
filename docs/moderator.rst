@@ -222,7 +222,7 @@ Zbot uses a list of random questions he asks the user to test it, and if the ans
 It is recommended to give this role to all new members via the `welcome_roles` option, then block access to the server for this role, in order to force the new members to check themselves.
 
 
-**List of commands: **
+**List of commands:**
 :code:`verify`: ask a question to check the member
 :code:`config change verification_role <role>>` configures the role to be removed from the verified members
 
