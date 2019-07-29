@@ -54,7 +54,7 @@ class RssCog(commands.Cog):
         self.embed_color = discord.Color(6017876)
         self.loop_processing = False
         self.last_update = None
-        self.twitterAPI = twitter.Api(consumer_key='EGH3EOjoLiQX2HQQ5SyWaIuk7', consumer_secret='Ke9NrLqehEYIVhdwawmIk60oYwP6htEEJpfTUI26ZeHqtitbMz', access_token_key='915682404202946560-whACgc7whYPxMdsgu7bOYxk1mda1XA0', access_token_secret='SsOOOALUWziHjkKl9fGt571X54OBdvW4VmU3ibJR2z5LD')
+        self.twitterAPI = twitter.Api(**bot.others['twitter'])
         if bot.user != None:
             self.table = 'rss_flow' if bot.user.id==486896267788812288 else 'rss_flow_beta'
         try:
@@ -779,7 +779,7 @@ class RssCog(commands.Cog):
                 feeds = feedparser.parse(url)
                 
         tweets_list_official = await self.get_tw_official(nom)
-        tweets_ids = [x.id for x in tweets_list_official]
+        tweets_ids = [x.id_str for x in tweets_list_official]
         entries = [x for x in feeds.entries if x.link.split('/')[-1].replace('?p=v','') in tweets_ids]
         if len(entries)==0:
             return await self.translate(guild,"rss","nothing")
@@ -799,7 +799,7 @@ class RssCog(commands.Cog):
             rt = None
             if author.replace('@','') not in url:
                 rt = url.split("=")[1]
-            obj = self.rssMessage(bot=self.bot,Type='tw',url=feed['link'],title=t,emojis=self.bot.cogs['EmojiCog'].customEmojis,date=feed['published_parsed'],author=author,retweeted_by=rt,channel=feeds.feed['title'])
+            obj = self.rssMessage(bot=self.bot,Type='tw',url=feed['link'].replace('mobile.',''),title=t,emojis=self.bot.cogs['EmojiCog'].customEmojis,date=feed['published_parsed'],author=author,retweeted_by=rt,channel=feeds.feed['title'])
             return [obj]
         else:
             liste = list()
@@ -814,7 +814,7 @@ class RssCog(commands.Cog):
                     t = feed['title'].replace(rt,'')
                 else:
                     t = feed['title']
-                obj = self.rssMessage(bot=self.bot,Type='tw',url=feed['link'],title=t,emojis=self.bot.cogs['EmojiCog'].customEmojis,date=feed['published_parsed'],author=author,retweeted_by=rt,channel= feeds.feed['title'])
+                obj = self.rssMessage(bot=self.bot,Type='tw',url=feed['link'].replace('mobile.',''),title=t,emojis=self.bot.cogs['EmojiCog'].customEmojis,date=feed['published_parsed'],author=author,retweeted_by=rt,channel= feeds.feed['title'])
                 liste.append(obj)
             liste.reverse()
             return liste
