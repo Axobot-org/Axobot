@@ -36,7 +36,7 @@ class XPCog(commands.Cog):
             self.translate = bot.cogs['LangCog'].tr
         except:
             pass
-        self.types = ['global','mee6','local']
+        self.types = ['global','mee6-like','local']
         if platform.system()=='Darwin':
             verdana_name = 'Verdana.ttf'
         else:
@@ -58,12 +58,12 @@ class XPCog(commands.Cog):
         if msg.author.bot or msg.guild==None or not self.bot.xp_enabled:
             return
         used_xp_type = await self.bot.cogs['ServerCog'].find_staff(msg.guild.id,'xp_type')
-        if not await self.check_noxp(msg) or used_xp_type==1:
-            return 
-        if not await self.bot.cogs['ServerCog'].find_staff(msg.guild.id,'enable_xp'):
+        if not ( await self.check_noxp(msg) or await self.bot.cogs['ServerCog'].find_staff(msg.guild.id,'enable_xp') ):
             return
         if used_xp_type==0:
             await self.add_xp_0(msg)
+        elif used_xp_type==1:
+            await self.add_xp_1(msg)
         elif used_xp_type==2:
             await self.add_xp_2(msg)
     
@@ -84,11 +84,35 @@ class XPCog(commands.Cog):
                 prev_points = 0
         await self.bdd_set_xp(msg.author.id, giv_points, 'add')
         self.cache['global'][msg.author.id] = [round(time.time()), prev_points+giv_points]
-        new_lvl = await self.calc_level(self.cache['global'][msg.author.id][1])
-        if 0 < (await self.calc_level(prev_points))[0] < new_lvl[0]:
+        new_lvl = await self.calc_level(self.cache['global'][msg.author.id][1],0)
+        if 0 < (await self.calc_level(prev_points,0))[0] < new_lvl[0]:
             await self.send_levelup(msg,new_lvl)
             await self.give_rr(msg.author,new_lvl[0],await self.rr_list_role(msg.guild.id))
     
+    async def add_xp_1(self,msg):
+        if msg.guild.id not in self.cache.keys() or len(self.cache[msg.guild.id])==0:
+            await self.bdd_load_cache(msg.guild.id)
+        if msg.author.id in self.cache[msg.guild.id].keys():
+            if time.time() - self.cache[msg.guild.id][msg.author.id][0] < 60:
+                return
+        content = msg.clean_content
+        if len(content)<self.minimal_size or await self.check_spam(content) or await self.check_cmd(msg):
+            return
+        giv_points = random.randint(15,25)
+        if msg.author.id in self.cache[msg.guild.id].keys():
+            prev_points = self.cache[msg.guild.id][msg.author.id][1]
+        else:
+            try:
+                prev_points = (await self.bdd_get_xp(msg.author.id,msg.guild.id))['xp']
+            except:
+                prev_points = 0
+        await self.bdd_set_xp(msg.author.id, giv_points, 'add', msg.guild.id)
+        self.cache[msg.guild.id][msg.author.id] = [round(time.time()), prev_points+giv_points]
+        new_lvl = await self.calc_level(self.cache[msg.guild.id][msg.author.id][1],1)
+        if 0 < (await self.calc_level(prev_points,1))[0] < new_lvl[0]:
+            await self.send_levelup(msg,new_lvl)
+            await self.give_rr(msg.author,new_lvl[0],await self.rr_list_role(msg.guild.id))
+
     async def add_xp_2(self,msg):
         if msg.guild.id not in self.cache.keys() or len(self.cache[msg.guild.id])==0:
             await self.bdd_load_cache(msg.guild.id)
@@ -108,8 +132,8 @@ class XPCog(commands.Cog):
                 prev_points = 0
         await self.bdd_set_xp(msg.author.id, giv_points, 'add', msg.guild.id)
         self.cache[msg.guild.id][msg.author.id] = [round(time.time()), prev_points+giv_points]
-        new_lvl = await self.calc_level(self.cache[msg.guild.id][msg.author.id][1])
-        if 0 < (await self.calc_level(prev_points))[0] < new_lvl[0]:
+        new_lvl = await self.calc_level(self.cache[msg.guild.id][msg.author.id][1],2)
+        if 0 < (await self.calc_level(prev_points,2))[0] < new_lvl[0]:
             await self.send_levelup(msg,new_lvl)
             await self.give_rr(msg.author,new_lvl[0],await self.rr_list_role(msg.guild.id))
     
@@ -171,7 +195,7 @@ class XPCog(commands.Cog):
                 return True
         return False
 
-    async def calc_xp(self,msg):
+    async def calc_xp(self,msg,type):
         """Calcule le nombre d'xp correspondant à un message"""
         content = msg.clean_content
         matches = re.finditer(r"<a?(:\w+:)\d+>", content, re.MULTILINE)
@@ -182,16 +206,32 @@ class XPCog(commands.Cog):
             content = content.replace(match.group(0),"")
         return min(round(len(content)*self.xp_per_char), self.max_xp_per_msg)
 
-    async def calc_level(self,xp):
+    async def calc_level(self,xp:int,system:int):
         """Calcule le niveau correspondant à un nombre d'xp"""
-        if xp==0:
-            return [0,ceil((1*125/7)**(20/13)),0]
-        lvl = ceil(0.056*xp**0.65)
-        next_step = xp
-        while ceil(0.056*next_step**0.65)==lvl:
-            next_step += 1
-        return [lvl,next_step,ceil(((lvl-1)*125/7)**(20/13))]
+        if system != 1:
+            if xp==0:
+                return [0,ceil((1*125/7)**(20/13)),0]
+            lvl = ceil(0.056*xp**0.65)
+            next_step = xp
+            while ceil(0.056*next_step**0.65)==lvl:
+                next_step += 1
+            return [lvl,next_step,ceil(((lvl-1)*125/7)**(20/13))]
         # Niveau actuel - XP total pour le prochain niveau - XP total pour le niveau actuel
+        else:
+            def recursive(lvl):
+                t = 0
+                for i in range(lvl):
+                    t += 5*pow(i,2) + 50*i + 100
+                return t
+
+            if xp==0:
+                return [0,100,0]
+            lvl = 0
+            total_xp = 0
+            while xp >= total_xp:
+                total_xp += 5*pow(lvl,2) + 50*lvl + 100
+                lvl += 1
+            return [lvl-1,recursive(lvl),recursive(lvl-1)]
 
     async def give_rr(self,member:discord.Member,level:int,rr_list:list,remove=False):
         """Give (and remove?) roles rewards to a member"""
@@ -433,12 +473,12 @@ class XPCog(commands.Cog):
         elif align=='right':
             return x-w,y-h/2
 
-    async def create_card(self,user,style,xp,rank=[1,0],txt=['NIVEAU','RANG'],force_static=False,levels_info=None):
+    async def create_card(self,user,style,xp,used_system:int,rank=[1,0],txt=['NIVEAU','RANG'],force_static=False,levels_info=None):
         """Crée la carte d'xp pour un utilisateur"""
         card = Image.open("../cards/model/{}.png".format(style))
         bar_colors = await self.get_xp_bar_color(user.id)
         if levels_info==None:
-            levels_info = await self.calc_level(xp)
+            levels_info = await self.calc_level(xp,used_system)
         colors = {'name':(124, 197, 118),'xp':(124, 197, 118),'NIVEAU':(255, 224, 77),'rank':(105, 157, 206),'bar':bar_colors}
         if style=='blurple':
             colors = {'name':(35,35,50),'xp':(235, 235, 255),'NIVEAU':(245, 245, 255),'rank':(255, 255, 255),'bar':(70, 83, 138)}
@@ -555,45 +595,29 @@ class XPCog(commands.Cog):
             if user==None:
                 user = ctx.author
             xp_used_type = await self.bot.cogs['ServerCog'].find_staff(ctx.guild.id,'xp_type')
-            need_mee6 = ctx.guild!=None and xp_used_type==1
-            if need_mee6:
-                if ctx.guild.get_member(159985870458322944)==None:
-                    return await ctx.send(str(await self.translate(ctx.guild.id,'xp','no-mee6')).format(ctx.prefix))
-                user = ctx.guild.get_member(user.id)
-                if user==None:
-                    return await ctx.send(await self.translate(ctx.channel,'xp','not-member'))
-                return
-                xp = await self.mee6_get_player(user)
-            else:
-                xp = await self.bdd_get_xp(user.id,None if xp_used_type==0 else ctx.guild.id)
+            xp = await self.bdd_get_xp(user.id,None if xp_used_type==0 else ctx.guild.id)
             if xp==None or (isinstance(xp,list) and len(xp)==0):
                 if ctx.author==user:
                     return await ctx.send(await self.translate(ctx.channel,'xp','1-no-xp'))
                 return await ctx.send(await self.translate(ctx.channel,'xp','2-no-xp'))
-            if not need_mee6:
-                levels_info = None
-                xp = xp[0]['xp']
-                if xp_used_type==2:
-                    ranks_nb = await self.bdd_get_nber(ctx.guild.id)
-                    rank = (await self.bdd_get_rank(user.id,ctx.guild))['rank']
-                else:
-                    ranks_nb = await self.bdd_get_nber()
-                    rank = (await self.bdd_get_rank(user.id))['rank']
+            levels_info = None
+            xp = xp[0]['xp']
+            if xp_used_type==0:
+                ranks_nb = await self.bdd_get_nber()
+                rank = (await self.bdd_get_rank(user.id))['rank']
             else:
-                levels_info = [xp['level'],xp['detailed_xp'][1]-xp['detailed_xp'][0]+xp['detailed_xp'][2],xp['detailed_xp'][2]-xp['detailed_xp'][0]]
-                xp = xp['xp']
-                ranks_nb = ctx.guild.member_count
-                rank = await self.mee6_get_rank(user)+1
+                ranks_nb = await self.bdd_get_nber(ctx.guild.id)
+                rank = (await self.bdd_get_rank(user.id,ctx.guild))['rank']
             if ctx.guild==None or ctx.channel.permissions_for(ctx.guild.me).attach_files:
-                await self.send_card(ctx,user,xp,rank,ranks_nb,levels_info)
+                await self.send_card(ctx,user,xp,rank,ranks_nb,xp_used_type,levels_info)
             elif ctx.channel.permissions_for(ctx.guild.me).embed_links:
-                await self.send_embed(ctx,user,xp,rank,ranks_nb,levels_info)
+                await self.send_embed(ctx,user,xp,rank,ranks_nb,xp_used_type,levels_info)
             else:
-                await self.send_txt(ctx,user,xp,rank,ranks_nb,levels_info)
+                await self.send_txt(ctx,user,xp,rank,ranks_nb,levels_info,xp_used_type)
         except Exception as e:
             await self.bot.cogs['ErrorsCog'].on_command_error(ctx,e)
     
-    async def send_card(self,ctx:commands.context,user:discord.User,xp,rank,ranks_nb,levels_info=None):
+    async def send_card(self,ctx:commands.context,user:discord.User,xp,rank,ranks_nb,used_system,levels_info=None):
         try:
             await ctx.send(file=discord.File('../cards/global/{}-{}-{}.{}'.format(user.id,xp,rank,'gif' if user.is_avatar_animated() else 'png')))
         except FileNotFoundError:
@@ -605,13 +629,13 @@ class XPCog(commands.Cog):
                     static = not static['animated_card']
                 else:
                     static = True
-            await ctx.send(file=await self.create_card(user,style,xp,[rank,ranks_nb],txts,force_static=static,levels_info=levels_info))
+            await ctx.send(file=await self.create_card(user,style,xp,used_system,[rank,ranks_nb],txts,force_static=static,levels_info=levels_info))
             self.bot.log.debug("XP card for user {} ({}xp - style {})".format(user.id,xp,style))
     
-    async def send_embed(self,ctx,user,xp,rank,ranks_nb,levels_info):
+    async def send_embed(self,ctx,user,xp,rank,ranks_nb,levels_info,used_system):
         txts = [await self.translate(ctx.channel,'xp','card-level'), await self.translate(ctx.channel,'xp','card-rank')]
         if levels_info==None:
-            levels_info = await self.calc_level(xp)
+            levels_info = await self.calc_level(xp,used_system)
         fields = list()
         fields.append({'name':'XP','value':"{}/{}".format(xp,levels_info[1]),'inline':True})
         fields.append({'name':txts[0],'value':levels_info[0],'inline':True})
@@ -619,10 +643,10 @@ class XPCog(commands.Cog):
         emb = self.bot.cogs['EmbedCog'].Embed(fields=fields,color=self.embed_color).set_author(user)
         await ctx.send(embed=emb.discord_embed())
     
-    async def send_txt(self,ctx,user,xp,rank,ranks_nb,levels_info):
+    async def send_txt(self,ctx,user,xp,rank,ranks_nb,levels_info,used_system):
         txts = [await self.translate(ctx.channel,'xp','card-level'), await self.translate(ctx.channel,'xp','card-rank')]
         if levels_info==None:
-            levels_info = await self.calc_level(xp)
+            levels_info = await self.calc_level(xp,used_system)
         msg = """__**{}**__
 **XP** {}/{}
 **{}** {}
@@ -630,7 +654,7 @@ class XPCog(commands.Cog):
         await ctx.send(msg)
 
 
-    async def create_top_main(self,ranks,nbr,page,ctx):
+    async def create_top_main(self,ranks,nbr,page,ctx,used_system):
         txt = list()
         i = (page-1)*nbr
         for u in ranks[:nbr]:
@@ -645,7 +669,7 @@ class XPCog(commands.Cog):
                 user_name = await self.bot.cogs['UtilitiesCog'].remove_markdown(user.name.replace('|',''))
                 if len(user_name)>18:
                     user_name = user_name[:15]+'...'
-            l = await self.calc_level(u['xp'])
+            l = await self.calc_level(u['xp'],used_system)
             txt.append('{} • **{} |** `lvl {}` **|** `xp {}`'.format(i,"__"+user_name+"__" if user==ctx.author else user_name,l[0],u['xp']))
         return txt,i
 
@@ -666,12 +690,6 @@ class XPCog(commands.Cog):
             elif Type=='guild':
                 ranks = await self.bdd_get_top(10000,guild=ctx.guild)
                 max_page = ceil(len(ranks)/20)
-        elif xp_system_used==1:
-            if ctx.guild.get_member(159985870458322944)==None:
-                return await ctx.send(str(await self.translate(ctx.guild.id,'xp','no-mee6')).format(ctx.prefix))
-            return
-            ranks = await self.mee6_get_top(ctx.guild,20*page)
-            max_page = ceil(len(ranks)/20)
         else:
             ranks = await self.bdd_get_top(20*page,guild=ctx.guild)
             max_page = ceil(len(ranks)/20)
@@ -680,32 +698,22 @@ class XPCog(commands.Cog):
         elif page>max_page:
             return await ctx.send(await self.translate(ctx.channel,"xp",'high-page'))
         ranks = ranks[(page-1)*20:]
-        if xp_system_used==1:
-            ranks = [{'user':x['id'],'xp':x['xp']} for x in ranks]
-        else:
-            ranks = [{'user':x['userID'],'xp':x['xp']} for x in ranks]
+        ranks = [{'user':x['userID'],'xp':x['xp']} for x in ranks]
         nbr = 20
-        txt,i = await self.create_top_main(ranks,nbr,page,ctx)
+        txt,i = await self.create_top_main(ranks,nbr,page,ctx,xp_system_used)
         while len("\n".join(txt))>1000 and nbr>0:
             nbr -= 1
-            txt,i = await self.create_top_main(ranks,nbr,page,ctx)
+            txt,i = await self.create_top_main(ranks,nbr,page,ctx,xp_system_used)
             await asyncio.sleep(0.2)
         f_name = str(await self.translate(ctx.channel,'xp','top-name')).format((page-1)*20+1,i,page,max_page)
         # author
-        if xp_system_used==1:
-            lvl = await self.mee6_get_player(ctx.author)
-            if lvl==None:
-                your_rank = {'name':"__"+await self.translate(ctx.channel,"xp","top-your")+"__",'value':await self.translate(ctx.guild.id,"xp","1-no-xp")}
-            else:
-                your_rank = {'name':"__"+await self.translate(ctx.channel,"xp","top-your")+"__", 'value':"**#{} |** `lvl {}` **|** `xp {}`".format(await self.mee6_get_rank(ctx.author)+1,lvl['level'],lvl['xp'])}
+        rank = await self.bdd_get_rank(ctx.author.id,ctx.guild if (Type=='guild' or xp_system_used!=1) else None)
+        if len(rank)==0:
+            your_rank = {'name':"__"+await self.translate(ctx.channel,"xp","top-your")+"__",'value':await self.translate(ctx.guild,"xp","1-no-xp")}
         else:
-            rank = await self.bdd_get_rank(ctx.author.id,ctx.guild if (Type=='guild' or xp_system_used==2) else None)
-            if len(rank)==0:
-                your_rank = {'name':"__"+await self.translate(ctx.channel,"xp","top-your")+"__",'value':await self.translate(ctx.guild,"xp","1-no-xp")}
-            else:
-                lvl = await self.calc_level(rank['xp'])
-                lvl = lvl[0]
-                your_rank = {'name':"__"+await self.translate(ctx.channel,"xp","top-your")+"__", 'value':"**#{} |** `lvl {}` **|** `xp {}`".format(rank['rank'],lvl,rank['xp'])}
+            lvl = await self.calc_level(rank['xp'],xp_system_used)
+            lvl = lvl[0]
+            your_rank = {'name':"__"+await self.translate(ctx.channel,"xp","top-your")+"__", 'value':"**#{} |** `lvl {}` **|** `xp {}`".format(rank['rank'],lvl,rank['xp'])}
         # title
         if Type=='guild':
             t = await self.translate(ctx.channel,'xp','top-title-2')
@@ -853,12 +861,13 @@ class XPCog(commands.Cog):
                 return await ctx.send(await self.translate(ctx.guild.id,'modo','cant-mute'))
             c = 0
             rr_list = await self.rr_list_role(ctx.guild.id)
-            if await self.bot.cogs['ServerCog'].find_staff(ctx.guild.id,'xp_type')==1:
+            used_system = await self.bot.cogs['ServerCog'].find_staff(ctx.guild.id,'xp_type')
+            if used_system==1:
                 if ctx.guild.get_member(159985870458322944)==None:
                     return await ctx.send(str(await self.translate(ctx.guild.id,'xp','no-mee6')).format(ctx.prefix))
                 xps = [{'user':int(x['id']),'xp':x['xp'],'level':x['level']} for x in await self.mee6_get_top(ctx.guild,nb=1000000)]
             else:
-                xps = [{'user':x['userID'],'xp':x['xp'],'level':(await self.calc_level(x['xp']))[0]} for x in await self.bdd_get_top(ctx.guild.member_count,ctx.guild)]
+                xps = [{'user':x['userID'],'xp':x['xp'],'level':(await self.calc_level(x['xp'],used_system))[0]} for x in await self.bdd_get_top(ctx.guild.member_count,ctx.guild)]
             for member in xps:
                 m = ctx.guild.get_member(member['user'])
                 if m!=None:
