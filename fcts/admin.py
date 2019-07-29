@@ -1,7 +1,7 @@
 import discord
 from discord.ext import commands
 
-import time, importlib, sys, traceback, datetime, os, shutil, asyncio, inspect, typing, io, textwrap, copy, operator, requests, random, ast, math
+import time, importlib, sys, traceback, datetime, os, shutil, asyncio, inspect, typing, io, textwrap, copy, operator, requests, random, ast, math, mysql
 from libs import feedparser
 from contextlib import redirect_stdout
 from fcts import reloads
@@ -507,7 +507,36 @@ Cette option affecte tous les serveurs"""
                 await ctx.send("Les flux RSS sont mainenant désactivée")
         else:
             await ctx.send('Module introuvable')
-            
+    
+    @main_msg.command(name="flag")
+    @commands.check(reloads.check_admin)
+    async def admin_flag(self,ctx:commands.Context,add,user:discord.User,flag):
+        """Ajoute ou retire un attribut à un utilisateur
+        
+        Flag valides : support, premium, contributor, partner, unlocked_rainbow, unlocked_blurple"""
+        if add not in ['add','remove']:
+            return await ctx.send("Action invalide")
+        try:
+            info = await self.bot.cogs['UtilitiesCog'].get_db_userinfo(columns=[flag],criters=[f'userID={user.id}'])
+        except mysql.connector.errors.ProgrammingError:
+            return await ctx.send("Flag invalide")
+        except Exception as e:
+            return await self.bot.cogs['ErrorsCog'].on_error(e,ctx)
+        if info != None:
+            if info[flag] and add=='add':
+                return await ctx.send("Cet utilisateur a déjà ce flag")
+            if (not info[flag]) and add=='remove':
+                return await ctx.send("Cet utilisateur n'a pas ce flag")
+        await self.bot.cogs['UtilitiesCog'].change_db_userinfo(user.id,flag,'1' if add=="add" else '0')
+        if add=="add":
+            await ctx.send(f"L'utilisateur {user} a maintenant le flag `{flag}`",delete_after=3.0)
+        elif add=="remove":
+            await ctx.send(f"L'utilisateur {user} n'a plus le flag `{flag}`",delete_after=3.0)
+        try:
+            await ctx.message.detele()
+        except:
+            pass
+
 
     @main_msg.group(name="server")
     @commands.check(reloads.check_admin)
