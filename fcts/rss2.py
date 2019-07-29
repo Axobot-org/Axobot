@@ -1,4 +1,4 @@
-import discord, datetime, time, re, asyncio, mysql, random, typing, importlib, socket, requests
+import discord, datetime, time, re, asyncio, mysql, random, typing, importlib, socket, requests, twitter
 from libs import feedparser
 from discord.ext import commands
 from fcts import cryptage, tokens, reloads
@@ -54,6 +54,7 @@ class RssCog(commands.Cog):
         self.embed_color = discord.Color(6017876)
         self.loop_processing = False
         self.last_update = None
+        self.twitterAPI = twitter.Api(consumer_key='EGH3EOjoLiQX2HQQ5SyWaIuk7', consumer_secret='Ke9NrLqehEYIVhdwawmIk60oYwP6htEEJpfTUI26ZeHqtitbMz', access_token_key='915682404202946560-whACgc7whYPxMdsgu7bOYxk1mda1XA0', access_token_secret='SsOOOALUWziHjkKl9fGt571X54OBdvW4VmU3ibJR2z5LD')
         if bot.user != None:
             self.table = 'rss_flow' if bot.user.id==486896267788812288 else 'rss_flow_beta'
         try:
@@ -208,16 +209,17 @@ class RssCog(commands.Cog):
         try:
             text = await self.rss_tw(ctx.guild,name)
         except Exception as e:
-            await self.bot.cogs['ErrorsCog'].on_error(e,ctx)
+            return await self.bot.cogs['ErrorsCog'].on_error(e,ctx)
         if type(text) == str:
             await ctx.send(text)
         else:
             form = await self.translate(ctx.channel,"rss","tw-form-last")
-            obj = await text[0].create_msg(await self.translate(ctx.channel,"current_lang","current"),form)
-            if isinstance(obj,discord.Embed):
-                await ctx.send(embed=obj)
-            else:
-                await ctx.send(obj)
+            for single in text[:5]:
+                obj = await single.create_msg(await self.translate(ctx.channel,"current_lang","current"),form)
+                if isinstance(obj,discord.Embed):
+                    await ctx.send(embed=obj)
+                else:
+                    await ctx.send(obj)
 
     @rss_main.command(name="web")
     async def request_web(self,ctx,link):
@@ -242,10 +244,7 @@ class RssCog(commands.Cog):
         """Subscribe to a rss feed, displayed on this channel regularly"""
         if not ctx.bot.database_online:
             return await ctx.send(await self.translate(ctx.guild.id,"rss","no-db"))
-        if str(ctx.guild.id) in guilds_limit_exceptions.keys():
-            flow_limit = guilds_limit_exceptions[str(ctx.guild.id)]
-        else:
-            flow_limit = self.flow_limit
+        flow_limit = await self.bot.cogs['ServerCog'].find_staff(ctx.guild.id,'rss_max_number')
         if len(await self.get_guild_flows(ctx.guild.id)) >= flow_limit:
             await ctx.send(str(await self.translate(ctx.guild.id,"rss","flow-limit")).format(self.flow_limit))
             return
@@ -763,6 +762,10 @@ class RssCog(commands.Cog):
             liste.reverse()
             return liste
 
+
+    async def get_tw_official(self,nom:str,count:int=None):
+        return [x for x in self.twitterAPI.GetUserTimeline(screen_name=nom,exclude_replies=True,trim_user=True,count=count)]
+
     async def rss_tw(self,guild,nom,date=None):
         if nom == 'help':
             return await self.translate(guild,"rss","tw-help")
@@ -774,15 +777,19 @@ class RssCog(commands.Cog):
             if feeds.entries==[]:
                 url = self.twitter_api_url+nom.lower()
                 feeds = feedparser.parse(url)
-                if feeds.entries==[]:
-                    return await self.translate(guild,"rss","nothing")
-        if len(feeds.entries)>1:
+                
+        tweets_list_official = await self.get_tw_official(nom)
+        tweets_ids = [x.id for x in tweets_list_official]
+        entries = [x for x in feeds.entries if x.link.split('/')[-1].replace('?p=v','') in tweets_ids]
+        if len(entries)==0:
+            return await self.translate(guild,"rss","nothing")
+        if len(entries)>1:
             while feeds.entries[0]['published_parsed'] < feeds.entries[1]['published_parsed']:
                 del feeds.entries[0]
                 if len(feeds.entries)==1:
                     break
         if not date:
-            feed = feeds.entries[0]
+            feed = entries[0]
             r = re.search(r"(pic.twitter.com/[^\s]+)",feed['title'])
             if r != None:
                 t = feed['title'].replace(r.group(1),'')
@@ -796,7 +803,7 @@ class RssCog(commands.Cog):
             return [obj]
         else:
             liste = list()
-            for feed in feeds.entries:
+            for feed in entries:
                 if datetime.datetime(*feed['published_parsed'][:6]) <= date:
                     break
                 author = feed['author'].replace('(','').replace(')','')
@@ -810,6 +817,37 @@ class RssCog(commands.Cog):
                 obj = self.rssMessage(bot=self.bot,Type='tw',url=feed['link'],title=t,emojis=self.bot.cogs['EmojiCog'].customEmojis,date=feed['published_parsed'],author=author,retweeted_by=rt,channel= feeds.feed['title'])
                 liste.append(obj)
             liste.reverse()
+            return liste
+
+
+    async def rss_tw2(self,guild,nom:str,date=None):
+        if nom == 'help':
+            return await self.translate(guild,"rss","tw-help")
+        #if not date:
+        if False:
+            lastpost = self.twitterAPI.GetUserTimeline(screen_name=nom,exclude_replies=True,count=1)
+            if len(lastpost)==0:
+                return 'aucun msg'
+            lastpost = lastpost[0]
+            rt = None
+            if lastpost.retweeted:
+                rt = "retweet"
+            obj = self.rssMessage(bot=self.bot,Type='tw',url=lastpost.urls[0].url,title=lastpost.text,emojis=self.bot.cogs['EmojiCog'].customEmojis,date=datetime.datetime.fromtimestamp(lastpost.created_at_in_seconds),author=lastpost.user.screen_name,retweeted_by=rt,channel=lastpost.user.name)
+            return [obj]
+        else:
+            posts = self.twitterAPI.GetUserTimeline(screen_name=nom,exclude_replies=True)
+            liste = list()
+            for post in posts:
+                # if datetime.datetime.fromtimestamp(post.created_at_in_seconds) <= date:
+                #     break
+                rt = None
+                if post.retweeted:
+                    rt = "retweet"
+                url = None
+                if len(post.urls)>0:
+                    url = post.urls[0].url
+                obj = self.rssMessage(bot=self.bot,Type='tw',url=url,title=post.text,emojis=self.bot.cogs['EmojiCog'].customEmojis,date=datetime.datetime.fromtimestamp(post.created_at_in_seconds),author=post.user.screen_name,retweeted_by=rt,channel=post.user.name)
+                liste.append(obj)
             return liste
 
     async def rss_twitch(self,guild,nom,date=None):

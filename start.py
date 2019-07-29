@@ -179,7 +179,7 @@ def main():
                       'fcts.partners',
                       'fcts.perms',
                       'fcts.reloads',
-                      'fcts.rss',
+                      'fcts.rss2',
                       'fcts.server',
                       'fcts.timeclass',
                       'fcts.users',
