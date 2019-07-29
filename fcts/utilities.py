@@ -385,15 +385,16 @@ class UtilitiesCog(commands.Cog):
         If limit=0, return every languages"""
         languages = list()
         disp_lang = list()
+        available_langs = self.bot.cogs['LangCog'].languages
         for s in self.bot.guilds:
             if user in s.members:
                 lang = await self.bot.cogs["ServerCog"].find_staff(s.id,'language')
                 if lang==None:
-                    lang = self.bot.cogs['ServerCog'].default_language
+                    lang = available_langs.index(self.bot.cogs['ServerCog'].default_language)
                 languages.append(lang)
         for e in range(len(self.bot.cogs['LangCog'].languages)):
             if languages.count(e)>0:
-                disp_lang.append((self.bot.cogs['LangCog'].languages[e],round(languages.count(e)/len(languages),2)))
+                disp_lang.append((available_langs[e],round(languages.count(e)/len(languages),2)))
         disp_lang.sort(key = operator.itemgetter(1))
         if limit==0:
             return disp_lang

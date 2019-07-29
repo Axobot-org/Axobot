@@ -120,7 +120,7 @@ class ServerCog(commands.Cog):
             if x['ID'] not in ignored_guilds:
                 liste.append(x['language'])
         for _ in range(len(self.bot.guilds)-len(liste)-len(ignored_guilds)):
-            liste.append(self.default_language)
+            liste.append(self.bot.cogs['LangCog'].languages.index(self.default_language))
         for e,l in enumerate(self.bot.cogs['LangCog'].languages):
             langs.append((l,liste.count(e)))
         return langs
