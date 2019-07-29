@@ -526,7 +526,7 @@ class XPCog(commands.Cog):
         d.text((self.calc_pos(temp,rank_fnt,893,180,'center')), temp, font=rank_fnt, fill=colors['rank'])
         return img
 
-    def add_xp_bar(self,img,xp,needed_xp,colors):
+    def add_xp_bar(self,img,xp,needed_xp,color):
         """Colorize the xp bar"""
         error_rate = 25
         data = np.array(img)   # "data" is a height x width x 4 numpy array
@@ -538,7 +538,7 @@ class XPCog(commands.Cog):
         max_x = round(298 + (980-298)*xp/needed_xp)
         white_areas[max_x:] = False & False & False
         #white_areas[298:980] = True & True & True
-        data[..., :-1][white_areas.T] = colors # Transpose back needed
+        data[..., :-1][white_areas.T] = color # Transpose back needed
         return Image.fromarray(data)
 
     async def get_xp_bar_color(self,userID:int):
