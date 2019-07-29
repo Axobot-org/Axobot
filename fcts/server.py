@@ -34,6 +34,7 @@ class ServerCog(commands.Cog):
             pass
         self.table = 'servers_beta' if bot.beta else 'servers'
         self.default_opt = {"rr_max_number":7,
+               "rss_max_number":10,
                "language":1,
                "description":"",
                "clear":"",
