@@ -195,7 +195,7 @@ class XPCog(commands.Cog):
                 return True
         return False
 
-    async def calc_xp(self,msg,type):
+    async def calc_xp(self,msg):
         """Calcule le nombre d'xp correspondant à un message"""
         content = msg.clean_content
         matches = re.finditer(r"<a?(:\w+:)\d+>", content, re.MULTILINE)
