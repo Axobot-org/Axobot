@@ -1,5 +1,9 @@
-import discord, time
+import discord, time, importlib
 from discord.ext import commands
+from fcts import checks, args
+importlib.reload(checks)
+importlib.reload(args)
+
 
 class RolesReact(commands.Cog):
     def __init__(self,bot:commands.Bot):
@@ -19,22 +23,26 @@ class RolesReact(commands.Cog):
     async def gen_id(self):
         return round(time.time()/2)
 
-    async def rr_add_role(self,guild:int,role:int,emoji:str):
+    async def rr_add_role(self,guild:int,role:int,emoji:str,desc:str):
         """Add a role reaction in the database"""
         cnx = self.bot.cnx_frm
+        if isinstance(emoji,discord.Emoji):
+            emoji = emoji.id
         cursor = cnx.cursor(dictionary = True)
         ID = await self.gen_id()
-        query = ("INSERT INTO `{}` (`ID`,`guild`,`role`,`emoji`) VALUES ('{i}','{g}','{r}','{e}');".format(self.table,i=ID,g=guild,r=role,e=emoji))
+        query = ("INSERT INTO `{}` (`ID`,`guild`,`role`,`emoji`,`description`) VALUES ('{i}','{g}','{r}','{e}','{d}');".format(self.table,i=ID,g=guild,r=role,e=emoji,d=desc))
         cursor.execute(query)
         cnx.commit()
         cursor.close()
         return True
     
-    async def rr_list_role(self,guild:int):
+    async def rr_list_role(self,guild:int,emoji:str=None):
         """List role reaction in the database"""
         cnx = self.bot.cnx_frm
+        if isinstance(emoji,discord.Emoji):
+            emoji = emoji.id
         cursor = cnx.cursor(dictionary = True)
-        query ="SELECT * FROM `{}` WHERE guild={} ORDER BY level;".format(self.table,guild)
+        query = "SELECT * FROM `{}` WHERE guild={} ORDER BY added_at;".format(self.table,guild) if emoji==None else "SELECT * FROM `{}` WHERE guild={} AND emoji='{}' ORDER BY added_at;".format(self.table,guild,emoji)
         cursor.execute(query)
         liste = list()
         for x in cursor:
@@ -58,6 +66,64 @@ class RolesReact(commands.Cog):
         """Manage your roles reactions"""
         if ctx.subcommand_passed==None:
             await self.bot.cogs['HelpCog'].help_command(ctx,['roles_react'])
+    
+    @rr_main.command(name="add")
+    @commands.check(checks.has_manage_guild)
+    async def rr_add(self,ctx,emoji:args.anyEmoji,role:discord.Role,*,description:str=None):
+        """Add a role reaction
+        This role will be given when a membre click on a specific reaction"""
+        try:
+            if role.name == '@everyone':
+                raise commands.BadArgument(f'Role "{role.name}" not found')
+            l = await self.rr_list_role(ctx.guild.id,emoji)
+            if len(l)>0:
+                return await ctx.send(await self.translate(ctx.guild.id,'roles_react','already-1-rr'))
+            max_rr = await self.bot.cogs['ServerCog'].find_staff(ctx.guild.id,'roles_react_max_number')
+            max_rr = self.bot.cogs["ServerCog"].default_opt['roles_react_max_number'] if max_rr==None else max_rr
+            if len(l) >= max_rr:
+                return await ctx.send(await self.translate(ctx.guild.id,'roles_react','too-many-rr',l=max_rr))
+            await self.rr_add_role(ctx.guild.id,role.id,emoji,description)
+        except Exception as e:
+            await self.bot.cogs['ErrorsCog'].on_cmd_error(ctx,e)
+        else:
+            await ctx.send(await self.translate(ctx.guild.id,'roles_react','rr-added',r=role.name,e=emoji))
+    
+    @rr_main.command(name="remove")
+    @commands.check(checks.has_manage_guild)
+    async def rr_remove(self,ctx,emoji:args.anyEmoji):
+        """Remove a role react"""
+        try:
+            l = await self.rr_list_role(ctx.guild.id,emoji)
+            if len(l)==0:
+                return await ctx.send(await self.translate(ctx.guild.id,'roles_react','no-rr'))
+            await self.rr_remove_role(l[0]['ID'])
+        except Exception as e:
+            await self.bot.cogs['ErrorsCog'].on_cmd_error(ctx,e)
+        else:
+            role = ctx.guild.get_role(l[0]['role'])
+            await ctx.send(await self.translate(ctx.guild.id,'roles_react','rr-removed',r=role,e=emoji))
+        
+    @rr_main.command(name="list")
+    async def rr_list(self,ctx):
+        """List every roles reactions of your server"""
+        if not ctx.channel.permissions_for(ctx.guild.me).embed_links:
+            return await ctx.send(await self.translate(ctx.guild.id,"fun","no-embed-perm"))
+        try:
+            l = await self.rr_list_role(ctx.guild.id)
+        except Exception as e:
+            await self.bot.cogs['ErrorsCog'].on_cmd_error(ctx,e)
+        else:
+            for k in l:
+                if len(k['emoji'])>5 and k['emoji'].isnumeric():
+                    temp = await ctx.guild.fetch_emoji(int(k['emoji']))
+                    if temp != None:
+                        k['emoji'] = str(temp)
+            des = '\n'.join(["{}   <@&{}> ".format(x['emoji'], x['role']) for x in l])
+            max_rr = await self.bot.cogs['ServerCog'].find_staff(ctx.guild.id,'roles_react_max_number')
+            max_rr = self.bot.cogs["ServerCog"].default_opt['roles_react_max_number'] if max_rr==None else max_rr
+            title = await self.translate(ctx.guild.id,"roles_react",'rr-list',n=len(l),m=max_rr)
+            emb = self.bot.cogs['EmbedCog'].Embed(title=title,desc=des).update_timestamp().create_footer(ctx.author)
+            await ctx.send(embed=emb.discord_embed())
 
 
 
