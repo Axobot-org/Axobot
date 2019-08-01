@@ -104,6 +104,10 @@ class ErrorsCog(commands.Cog):
             r = re.search(r'Invalid ISBN: (\S+)',raw_error)
             if r!=None:
                 return await ctx.send(await self.translate(ctx.channel,'errors','invalidisbn'))
+            # Invalid emoji: lmao
+            r = re.search(r'Invalid emoji: (\S+)',raw_error)
+            if r!=None:
+                return await ctx.send(await self.translate(ctx.channel,'errors','invalidemoji'))
             print('errors -',error)
         elif isinstance(error,commands.MissingRequiredArgument):
             await ctx.send(await self.translate(ctx.channel,'errors','missingargument',a=error.param.name,e=random.choice([':eyes:','',':confused:',':thinking:',''])))

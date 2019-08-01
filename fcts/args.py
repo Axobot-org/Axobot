@@ -1,4 +1,4 @@
-import discord, re
+import discord, re, string
 from discord.ext import commands
 from urllib.parse import urlparse
 
@@ -122,3 +122,21 @@ class url(commands.Converter):
         if r==None:
             raise commands.errors.BadArgument('Invalid url: '+argument)
         return self.Url(r)
+
+class anyEmoji(commands.Converter):
+    def __init__(self):
+        pass
+
+    async def convert(self,ctx:commands.Context,argument):
+        r = re.search(r'<a?:[^:]+:(\d+)>', argument)
+        if r==None:
+            if len(argument)==1 and argument not in string.printable:
+                return argument
+        else:
+            try:
+                return await commands.EmojiConverter().convert(ctx,r.group(1))
+            except Exception as e:
+                print(e)
+                return r.group(1)
+        print(len(argument))
+        raise commands.errors.BadArgument('Invalid emoji: '+argument)
