@@ -81,7 +81,7 @@ events={'mp-adv':"Sinä varmaan yrität kutsua minut tähän palvelimeen? Jos t�
 errors={"cooldown":"Olet jäähyllä tältä commandilta :confused:  Odota {} lisää sekunttia...",
         "badarguments":"Upsis, on mahdotonta muuntaa `{c[3]}` paramittarin\"{c[1]}\" tyyppiä :confused:",
         'badarguments-2':"`{0}` is not a recognised {1} option",
-        "missingargument":"Upsis, argumentti \"{}\" puuttuu {}",
+        "missingargument":"Upsis, argumentti \"{a}\" puuttuu {e}",
         "membernotfound":"On mahdotonta löytää käyttäjä `{}` :confused:",
         "usernotfound":"On mahdotonta löytää käyttäjä `{}` :confused:",
         "disabled":"Komento {} on poissa käytöstä :confused:",
