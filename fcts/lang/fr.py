@@ -424,7 +424,7 @@ modo={"slowmode-0":"Le slowmode est désormais désactivé dans ce salon.",
         "em-private":"[Restreint]",
         "em-list-title":"Emojis du serveur {}",
         "tempmute-1":"Le membre {} a bien été réduit au silence pour la raison `{}`, pendant {} !",
-        "role-high":"Oups, ce rôle est trop haut pour que je puisse le modifier. Merci de déplacer mon rôle au-dessus du rôle `{}` avant de réessayer :confused:",
+        "role-high":"Oups, ce rôle est trop haut pour que je puisse le modifier. Merci de déplacer mon rôle au-dessus du rôle `{r}` avant de réessayer :confused:",
         'role-color':'Le rôle {} a changé de couleur !',
         'unhoisted':'{c} surnoms édités !',
         'missing-manage-nick':"Oups, il me manque la permission \"Gérer les pseudos\"",
@@ -486,11 +486,17 @@ perms={"perms-0":"Le membre/rôle {} n'a pas été trouvé",
         }
 
 roles_react={"already-1-rr":"Vous avez déjà un rôle désigné pour cet émoji",
-        "too-many-rr":"Vous avez déjà atteint la limite de {l} rôles/",
+        "too-many-rr":"Vous avez déjà atteint la limite de {l} rôles",
         "rr-added":"Le rôle {r} a bien été ajouté pour l'émoji {e}",
         "no-rr":"Aucun rôle n'est lié à cet émoji",
         "rr-removed":"Le rôle {r} ne peut plus être donné via l'émoji {e}",
-        "rr-list":"Liste des rôles réactions ({n}/{m})"
+        "rr-list":"Liste des rôles réactions ({n}/{m})",
+        "already-have":"Vous avez déjà ce rôle",
+        "already-dont-have":"Vous n'avez pas ce rôle",
+        "role-given":"Le rôle {r} a bien été donné",
+        "role-not-in-list":"Ce rôle ne fait pas partie des rôles attribuables",
+        "rr-embed":"S'attribuer un rôle",
+        "role-lost":"Le rôle {r} a bien été retiré"
         }
 
 rss={"yt-help":"Pour rechercher une chaîne youtube, vous devez entrer l'identifiant de cette chaîne. Vous la trouverez à la fin de l'url de la chaine, elle peut être soit le nom, soit une suite de caractères aléatoires. \

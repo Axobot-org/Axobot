@@ -109,6 +109,7 @@ errors={"cooldown":"You are on cooldown for this command :confused: Please wait 
         "invalidleaderboard":"Invalid leaderboard type",
         "invalidurl":"Invalid url: `{u}`",
         "invalidisbn":"Invalid ISBN",
+        "invalidemoji":"Invalid emoji",
         'channotfound':"Channel {c} not found",
         'DM':"This command isn't available in Direct Messages",
         }
@@ -480,6 +481,20 @@ partners={'invalid-bot':"Unable to find this bot",
 
 perms={"perms-0":"Member/role {} not found",
         "perms-1":"**'{}' permissions:**\n\n"
+        }
+
+roles_react={"already-1-rr":"You already have a designated role for this emoji",
+        "too-many-rr":"You have already reached the limit of {l} roles",
+        "rr-added":"The role {r} has been added for the emoji {e}",
+        "no-rr":"No role is related to this emoji",
+        "rr-removed":"The role {r} can no longer be given via the emoji {e}",
+        "rr-list":"List of reaction roles ({n}/{m})",
+        "already-have":"You already have this role",
+        "already-dont-have":"You don't have this role",
+        "role-given":"The role {r} has been given",
+        "role-not-in-list":"This role is not part of the attributable roles",
+        "rr-embed":"Taking on a role",
+        "role-lost":"The role {r} has been removed from your roles"
         }
 
 rss={"yt-help":"To search for a youtube channel, you must enter the channel ID. You will find it at the end of the string url, it can be either the name, or a string of random characters. \

@@ -1,4 +1,4 @@
-import discord, time, importlib
+import discord, time, importlib, typing
 from discord.ext import commands
 from fcts import checks, args
 importlib.reload(checks)
@@ -12,6 +12,7 @@ class RolesReact(commands.Cog):
         self.table = 'roles_react_beta' if bot.beta else 'roles_react'
         self.guilds_which_have_roles = set()
         self.cache_initialized = False
+        self.embed_color = 12118406
         try:
             self.translate = bot.cogs['LangCog'].tr
         except:
@@ -22,37 +23,42 @@ class RolesReact(commands.Cog):
         self.translate = self.bot.cogs['LangCog'].tr
         self.table = 'roles_react_beta' if self.bot.beta else 'roles_react'
     
-    async def prepare_react(self,payload:discord.RawReactionActionEvent):
-        if payload.guild_id==None:
-            return
+    async def prepare_react(self,payload:discord.RawReactionActionEvent) -> (discord.Message,discord.Role):
+        if payload.guild_id==None or payload.user_id==self.bot.user.id:
+            return None, None
         if not self.cache_initialized:
             await self.rr_get_guilds()
         if payload.guild_id not in self.guilds_which_have_roles:
-            return
+            return None, None
         chan = self.bot.get_channel(payload.channel_id)
         if chan == None:
-            return
+            return None, None
         try:
             msg = await chan.fetch_message(payload.message_id)
         except:
-            return
-        if len(msg.embeds)==0 or msg.embeds[0].footer.text!='ZBot roles reactions':
-            return
-        return msg
+            return None, None
+        if len(msg.embeds)==0 or msg.embeds[0].footer.text!='ZBot roles reactions' or msg.author.id != self.bot.user.id:
+            return None, None
+        temp = await self.rr_list_role(payload.guild_id, payload.emoji.id if payload.emoji.is_custom_emoji() else payload.emoji.name)
+        if len(temp)==0:
+            return None, None
+        role = self.bot.get_guild(payload.guild_id).get_role(temp[0]["role"])
+        return msg, role
 
 
     @commands.Cog.listener('on_raw_reaction_add')
-    # @commands.Cog.listener('on_raw_reaction_remove')
     async def on_raw_reaction(self,payload:discord.RawReactionActionEvent):
-        msg = await self.prepare_react(payload)
+        msg,role = await self.prepare_react(payload)
         if msg != None:
-            await msg.channel.send('`added` '+msg.content)
+            user = msg.guild.get_member(payload.user_id)
+            await self.give_remove_role(user,role,msg.guild,msg.channel,True,ignore_success=True)
     
     @commands.Cog.listener('on_raw_reaction_remove')
     async def on_raw_reaction_2(self,payload:discord.RawReactionActionEvent):
-        msg = await self.prepare_react(payload)
+        msg,role = await self.prepare_react(payload)
         if msg != None:
-            await msg.channel.send('`removed` '+msg.content)
+            user = msg.guild.get_member(payload.user_id)
+            await self.give_remove_role(user,role,msg.guild,msg.channel,False,ignore_success=True)
     
     async def gen_id(self):
         return round(time.time()/2)
@@ -151,6 +157,21 @@ class RolesReact(commands.Cog):
             if len(l)<2:
                 self.guilds_which_have_roles.remove(ctx.guild.id)
         
+    async def create_list_embed(self,liste:list,guild:discord.Guild) -> (str,list):
+        """Create a text with the roles list"""
+        emojis = list()
+        for k in liste:
+            if len(k['emoji'])>5 and k['emoji'].isnumeric():
+                temp = await guild.fetch_emoji(int(k['emoji']))
+                if temp != None:
+                    emojis.append(temp)
+                    k['emoji'] = str(temp)
+                else:
+                    emojis.append(k['emoji'])
+            else:
+                emojis.append(k['emoji'])
+        return '\n'.join(["{}   <@&{}> ".format(x['emoji'], x['role']) for x in liste]), emojis
+
     @rr_main.command(name="list")
     async def rr_list(self,ctx):
         """List every roles reactions of your server"""
@@ -161,19 +182,70 @@ class RolesReact(commands.Cog):
         except Exception as e:
             await self.bot.cogs['ErrorsCog'].on_cmd_error(ctx,e)
         else:
-            for k in l:
-                if len(k['emoji'])>5 and k['emoji'].isnumeric():
-                    temp = await ctx.guild.fetch_emoji(int(k['emoji']))
-                    if temp != None:
-                        k['emoji'] = str(temp)
-            des = '\n'.join(["{}   <@&{}> ".format(x['emoji'], x['role']) for x in l])
+            des, _ = await self.create_list_embed(l,ctx.guild)
             max_rr = await self.bot.cogs['ServerCog'].find_staff(ctx.guild.id,'roles_react_max_number')
             max_rr = self.bot.cogs["ServerCog"].default_opt['roles_react_max_number'] if max_rr==None else max_rr
             title = await self.translate(ctx.guild.id,"roles_react",'rr-list',n=len(l),m=max_rr)
-            emb = self.bot.cogs['EmbedCog'].Embed(title=title,desc=des).update_timestamp().create_footer(ctx.author)
+            emb = self.bot.cogs['EmbedCog'].Embed(title=title,desc=des,color=self.embed_color).update_timestamp().create_footer(ctx.author)
             await ctx.send(embed=emb.discord_embed())
+    
+    @rr_main.command(name="get",aliases=['join'])
+    async def rr_get(self,ctx:commands.Context,role:typing.Optional[discord.Role]):
+        """Get one of the roles
+        If you don't speficy any role, I will display the whole message with reactions"""
+        if role != None:
+            if not role.id in [x['role'] for x in await self.rr_list_role(ctx.guild.id)]:
+                return await ctx.send(await self.translate(ctx.guild.id,'roles_react','role-not-in-list'))
+            await self.give_remove_role(ctx.author,role,ctx.guild,ctx.channel)
+        else:
+            if not ctx.channel.permissions_for(ctx.guild.me).embed_links:
+                return await ctx.send(await self.translate(ctx.guild.id,"fun","no-embed-perm"))
+            try:
+                l = await self.rr_list_role(ctx.guild.id)
+            except Exception as e:
+                await self.bot.cogs['ErrorsCog'].on_cmd_error(ctx,e)
+            else:
+                des, emojis = await self.create_list_embed(l,ctx.guild)
+                title = await self.translate(ctx.guild.id,"roles_react",'rr-embed')
+                emb = self.bot.cogs['EmbedCog'].Embed(title=title,desc=des,color=self.embed_color,footer_text='ZBot roles reactions').update_timestamp()
+                msg = await ctx.send(embed=emb.discord_embed())
+                for e in emojis:
+                    try:
+                        await msg.add_reaction(e)
+                    except:
+                        pass
 
+    @rr_main.command(name="leave")
+    async def rr_leave(self,ctx:commands.Context,role:discord.Role):
+        """Leave a role without using reactions"""
+        await self.give_remove_role(ctx.author,role,ctx.guild,ctx.channel,give=False)
 
+    async def give_remove_role(self,user:discord.Member,role:discord.Role,guild:discord.Guild,channel:discord.TextChannel,give:bool=True,ignore_success:bool=False,ignore_failure:bool=False):
+        """Add or remove a role to a user if possible"""
+        role_name = role.name.replace('@','@'+u"\u200B")
+        if not ignore_failure:
+            if role in user.roles and give:
+                if not ignore_success:
+                    await channel.send(await self.translate(guild.id,"roles_react","already-have"))
+                return
+            elif not (role in user.roles or give):
+                if not ignore_success:
+                    await channel.send(await self.translate(guild.id,"roles_react","already-dont-have"))
+                return
+            if not channel.permissions_for(guild.me).manage_roles:
+                return await channel.send(await self.translate(guild.id,'modo','cant-mute'))
+            if role.position >= guild.me.top_role.position:
+                return await channel.send(await self.translate(guild.id,'modo','role_high',r=role_name))
+        try:
+            if give:
+                await user.add_roles(role,reason="Roles reaction")
+            else:
+                await user.remove_roles(role,reason="Roles reaction")
+        except Exception as e:
+            await self.bot.cogs['ErrorsCog'].on_error(e,None)
+        else:
+            if not ignore_success:
+                await channel.send(await self.translate(guild.id,'roles_react','role-given' if give else 'role-lost',r=role_name))
 
 
 def setup(bot):

@@ -109,6 +109,7 @@ errors={"cooldown":"Yu are on cold-own for dis comandZ :confused: Plize wait {d}
         "invalidleaderboard":"Not found levels table type",
         "invalidurl":"Nope, `{u}` iznt a valid ~~cat~~ link",
         "invalidisbn":"Invalid ISBN",
+        "invalidemoji":"INvalid smiley",
         'channotfound':"Super chat room {c} don't want 2 be found",
         'DM':"Dat command isn't enabled in PM"
         }
@@ -291,6 +292,19 @@ kill={"list":["Hi ho ! Oh u, u gonna die!",
         "{2}.exe *has stopeD wurkin*"
         ]}
 
+library={"book_pres":"""Title: {title}
+Sub: {subtitle}
+Otaur(s): {author}
+Guy who printed: {publisher}
+Book date in your favorite store: {publication}
+Langu: {language}
+Page count: {pages}
+        
+ISBN : {isbn}""",
+        "no-found":"NOT abL 2 find lol book",
+        "price":"Coststs",
+        }
+
 logs={"slowmode-enabled":"Slwmod enable in {channel} ({seconds}s)",
         "slowmode-disabled":"Shlowmode disabld in {channel}",
         "clear":"{number} dletd mesage for {channel}",
@@ -461,6 +475,20 @@ partners={'invalid-bot':"Unable 2 find tihs bot",
 
 perms={"perms-0":"Membr/role {} not findz",
         "perms-1":"**'{}' permissung:**\n\n"
+        }
+
+roles_react={"already-1-rr":"U already has a designated role 4 this emoji",
+        "too-many-rr":"You have 'ready reached da limit ov {l} roles",
+        "rr-added":"Da role {r} has been added for the emoji {e}",
+        "no-rr":"NO role is related to this emoji",
+        "rr-removed":"The role {r} can no longer be given via the emoji {e}",
+        "rr-list":"lIsT 0v REacti0n RoLes ({n}/{m})",
+        "already-have":"yOu AlReADY HAVE ThIS rOLE",
+        "already-dont-have":"U don'ut have this role",
+        "role-given":"The role {r} has been given",
+        "role-not-in-list":"Tish role iz NOT part ov the giveable r0ls",
+        "rr-embed":"tAkInG on A ROle",
+        "role-lost":"ThE rolE {r} HAS BEeN reMoVEd fR0M yOUr ROLEs"
         }
 
 rss={"yt-help":"To seerch for a youtwube channel, you may enter the channil ID. You will found it at teh and of the strin url, it can be 8ther the nayme, or a strin of randem characteRs. \
