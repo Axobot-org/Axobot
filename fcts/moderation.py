@@ -710,7 +710,7 @@ You must be an administrator of this server to use this command."""
             await ctx.send(await self.translate(ctx.guild.id,"modo","cant-mute"))
             return
         if role.position >= ctx.guild.me.roles[-1].position:
-            await ctx.send(str(await self.translate(ctx.guild.id,"modo","role-high")).format(role.name))
+            await ctx.send(await self.translate(ctx.guild.id,"modo","role-high",r=role.name))
             return
         await role.edit(colour=color,reason="Asked by {}".format(ctx.author))
         await ctx.send(str(await self.translate(ctx.guild.id,'modo','role-color')).format(role.name))
