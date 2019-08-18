@@ -436,6 +436,7 @@ modo={"slowmode-0":"Teh very-cold-mode is now disabld in this nize place.",
                 'What is the first letter of `Zbot`?':'z',
                 'What is the name of this server?':'_special_servername'},
         'verify-role-high':"Oops, that role `{r}` is toooooooo high 4 me 2 give it. Plz place it role lawer than mine, or place my role 'bove it :plz:",
+        'backup-done':"i wrote some things on tihs file. Don'ut ask me what plz.",
         }
 
 morpion={'user-begin':'{}, u begin!',

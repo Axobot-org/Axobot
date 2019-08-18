@@ -941,7 +941,7 @@ ID corresponds to the Identifier of the message"""
                 os.makedirs('backup/')
             with open(directory,'w',encoding='utf-8') as file:
                 file.write(js)
-            await ctx.send('Terminé !',file=discord.File(directory))
+            await ctx.send(await self.translate(ctx.guild.id,'modo','backup-done'),file=discord.File(directory))
         except Exception as e:
             await ctx.bot.cogs['ErrorsCog'].on_cmd_error(ctx,e)
 

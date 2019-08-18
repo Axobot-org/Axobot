@@ -444,6 +444,7 @@ modo={"slowmode-0":"Le slowmode est désormais désactivé dans ce salon.",
                 'Quel est le résultat du produit de deux et cinq ? (en lettres)':'dix',
                 'Quelle forme géométrique possède 3 côtés ?':'triangle'},
         'verify-role-high':"Oups, il semble que le rôle `{r}` soit trop haut pour que je puisse le donner. Veuillez placer ce rôle plus bas que le mien, ou placer mon rôle au-dessus.",
+        'backup-done':"Sauvegarde terminée !",
         }
 
 morpion={'user-begin':'{}, à toi de commencer !',

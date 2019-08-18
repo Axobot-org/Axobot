@@ -442,6 +442,7 @@ modo={"slowmode-0":"The slowmode is now disabled in this channel.",
                 'What geometric shape has 3 sides?':'triangle',
                 'How many seconds are there in a minute?':'60'},
         'verify-role-high':"Oops, it seems that the role `{r}` is too high for me to give it. Please place this role lower than mine, or place my role above it.",
+        'backup-done':"Backup done!",
         }
 
 morpion={'user-begin':'{}, you begin!',
