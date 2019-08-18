@@ -507,7 +507,7 @@ Link : {link}""",
 
 server={"config-help": "Tätä komentoa yleensä käytetään palvelimen konfigurointiin. Viestittämällä `!config see [option]` sinä aiot saada \
 näyn tämänaikaisesta konfiguraatiosta, ja palvelimen järjestyksenvalvojat voivat viestittää `!config change <option> ominaisuus1, ominaisuus2...` \
-jolla voi muuttaa konfigurointia, tai `!config del <option>` jolla voi asettaa uudelleen vaitoehdon (`!config change <option>` toimii samallain).\nLista mahdollisista vaihtoehdoista löytyy täältä: <https://zbot.rtfd.io/en/latest/config.html#list-of-every-option>",
+jolla voi muuttaa konfigurointia, tai `!config del <option>` jolla voi asettaa uudelleen vaitoehdon (`!config change <option>` toimii samallain).\nLista mahdollisista vaihtoehdoista löytyy täältä: <https://zbot.rtfd.io/en/latest/server.html#list-of-every-option>",
         "change-0": "Tämä vaihtoehto ei ole olemassa :confused:",
         "change-1": "Ups, sisäinen virhe tapahtui...",
         "change-2": "Vaihtoehto '{}' hinta on poistettu",
