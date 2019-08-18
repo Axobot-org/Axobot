@@ -17,6 +17,7 @@ class Events(commands.Cog):
         self.dbl_last_sending = datetime.datetime.utcfromtimestamp(0)
         self.partner_last_check = datetime.datetime.utcfromtimestamp(0)
         self.mee6_stats_last = datetime.datetime.utcfromtimestamp(0)
+        self.loop_errors = [0,datetime.datetime.utcfromtimestamp(0)]
         self.embed_colors = {"welcome":5301186,
         "mute":4868682,
         "kick":16730625,
@@ -299,8 +300,16 @@ class Events(commands.Cog):
                 await self.dbl_send_data()
             if int(d.hour) == 0 and d.day != self.mee6_stats_last.day:
                 await self.send_mee6_stats()
+            2/0
         except Exception as e:
-            await self.bot.cogs['ErrorCog'].on_error(e,None)
+            await self.bot.cogs['ErrorsCog'].on_error(e,None)
+            self.loop_errors[0] += 1
+            if (datetime.datetime.now() - self.loop_errors[1]).total_seconds() > 120:
+                self.loop_errors[0] = 0
+                self.loop_errors[1] = datetime.datetime.now()
+            if self.loop_errors[0] > 10:
+                await self.bot.cogs['ErrorsCog'].senf_err_msg(":warning: **Trop d'erreurs : ARRET DE LA BOUCLE PRINCIPALE** :warning:")
+                self.loop.cancel()
 
     @loop.before_loop
     async def before_loop(self):
