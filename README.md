@@ -4,7 +4,7 @@
 
 Welcome to the ZBot bot documentation, a Discord bot coded in Python 3 by a small French developer, **Z_runner**. You will find in the documentation all the explanations on each of the usable commands, as well as the list of the last additions and some code examples. The documentation is currently in English but the bot is available in several languages, including its main language, French.
 
-Full documentation can be found on the [ReadTheDocs](https://zbot.readthedocs.io/en/latest/) page (under development)
+Full documentation can be found on the [ReadTheDocs](https://zbot.readthedocs.io/en/latest/) page
 
 ## The Bot
 
@@ -16,9 +16,10 @@ ZBot is a multifunction Discord bot, which allows among other things to :
 - create a system of xp proportional to the written activity of the members
 - send messages when a member arrives or leaves
 - do a couple of completely useless fun things, so indispensable
-- make mini games such as a crab or a *Hunter*
-- make server animations: voting and polling, rss feed tracking, and soon auto role distribution
+- make mini games such as a crab
+- make server animations: voting and polling, rss feed tracking, roles reactions, partners managment etc
 - search for Minecraft game elements: blocks, entities, advancements, commands...
+- search for a book and manage your library
 
 and many other things, which the list is constantly evolving
 
