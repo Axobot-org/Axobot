@@ -375,10 +375,9 @@ You can specify a verification limit by adding a number in argument"""
             await self.bot.cogs["UtilitiesCog"].suppr(ctx.message)
     
     @commands.command(name="react")
+    @commands.check(can_say)
     async def react(self,ctx,ID:int,*,reactions):
         """Add reaction(s) to a message. Server emojis also work."""
-        if self.bot.database_online and not await self.bot.cogs["ServerCog"].staff_finder(ctx.author,"say"):
-            return
         try:
             msg = await ctx.channel.fetch_message(ID)
         except discord.errors.HTTPException as e:
