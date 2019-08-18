@@ -320,7 +320,7 @@ class Events(commands.Cog):
         if self.bot.beta:
             return
         t = time.time()
-        answers = ['None','None','None','None']
+        answers = ['None','None','None']
         self.bot.log.info("[DBL] Envoi des infos sur le nombre de guildes...")
         session = aiohttp.ClientSession(loop=self.bot.loop)
         # https://discordbots.org/bot/486896267788812288
@@ -350,17 +350,6 @@ class Events(commands.Cog):
         async with session.post('https://bots.ondiscord.xyz/bot-api/bots/{}/guilds'.format(self.bot.user.id), data=payload, headers=headers) as resp:
               self.bot.log.debug('BotsOnDiscord returned {} for {}'.format(resp.status, payload))
               answers[2] = resp.status
-        # https://discordbots.group/bot/486896267788812288
-        payload = json.dumps({
-          'server_count': len(self.bot.guilds)
-          })
-        headers = {
-              'Authorization': self.bot.others['discordbotsgroup'],
-              'content-type': 'application/json'
-          }
-        async with session.post('https://api.discordbots.group/v1/bot/{}'.format(self.bot.user.id), data=payload, headers=headers) as resp:
-              self.bot.log.debug('DiscordBotsGroup returned {} for {}'.format(resp.status, payload))
-              answers[3] = resp.status
         await session.close()
         answers = [str(x) for x in answers]
         emb = self.bot.cogs["EmbedCog"].Embed(desc='**Guilds count updated** in {}s ({})'.format(round(time.time()-t,3),'-'.join(answers)),color=7229109).update_timestamp().set_author(self.bot.user)
