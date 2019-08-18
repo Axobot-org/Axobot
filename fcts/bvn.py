@@ -163,6 +163,8 @@ class WelcomerCog(commands.Cog):
                 role = member.guild.get_role(int(r))
                 if role != None:
                     await member.add_roles(role,reason=await self.translate(member.guild.id,"logs","d-welcome_roles"))
+        except discord.errors.NotFound:
+            pass
         except Exception as e:
             await self.bot.cogs["ErrorsCog"].on_error(e,None)
 
