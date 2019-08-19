@@ -33,6 +33,10 @@ async def can_say(ctx):
     else:
         return await ctx.bot.cogs["ServerCog"].staff_finder(ctx.author,"say")
 
+async def can_use_cookie(ctx):
+#                            Z_runner           neil3000            Awhikax           Adri526         Theventreur         Catastrophix        Platon_Neutron      Aragorn1202
+    return ctx.author.id in [279568324260528128,278611007952257034,281404141841022976,409470110131027979,229194747862843392,438372385293336577,286827468445319168,375598088850505728]
+
 class FunCog(commands.Cog):
     """Add some fun commands, no obvious use. You can disable this module with the 'enable_fun' option (command 'config')"""
 
@@ -113,7 +117,8 @@ class FunCog(commands.Cog):
             choosen = random.choice(liste).replace('@everyone','@​everyone').replace('@here','@​here')
         await ctx.send(choosen)
 
-    @commands.command(name="cookie",hidden=True)
+    @commands.command(name="cookie",aliases=['cookies'],hidden=True)
+    @commands.check(can_use_cookie)
     @commands.check(is_fun_enabled)
     async def cookie(self,ctx):
         """COOKIE !!!"""
