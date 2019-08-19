@@ -95,8 +95,7 @@ class XPCog(commands.Cog):
         if msg.author.id in self.cache[msg.guild.id].keys():
             if time.time() - self.cache[msg.guild.id][msg.author.id][0] < 60:
                 return
-        content = msg.clean_content
-        if len(content)<self.minimal_size or await self.check_spam(content) or await self.check_cmd(msg):
+        if await self.check_cmd(msg):
             return
         giv_points = random.randint(15,25)
         if msg.author.id in self.cache[msg.guild.id].keys():
@@ -361,20 +360,16 @@ class XPCog(commands.Cog):
             liste = list()
             for x in cursor:
                 liste.append(x)
-            if len(liste)==0:
-                self.cache['global' if globalS else guild] = {}
             if globalS:
+                if len(self.cache['global'].keys())==0:
+                    self.cache['global'] = dict()
                 for l in liste:
-                    if len(self.cache['global'].keys())==0:
-                        self.cache['global'] = {l['userID']:[round(time.time())-60,l['xp']]}
-                    else:
-                        self.cache['global'][l['userID']] = [round(time.time())-60,l['xp']]
+                    self.cache['global'][l['userID']] = [round(time.time())-60,l['xp']]
             else:
+                if guild not in self.cache.keys():
+                    self.cache[guild] = dict()
                 for l in liste:
-                    if guild not in self.cache.keys():
-                        self.cache[guild] = {l['userID']:[round(time.time())-60,l['xp']]}
-                    else:
-                        self.cache[guild][l['userID']] = [round(time.time())-60,l['xp']]
+                    self.cache[guild][l['userID']] = [round(time.time())-60,l['xp']]
             cursor.close()
             return liste
         except Exception as e:
