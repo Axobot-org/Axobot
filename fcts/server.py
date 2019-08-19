@@ -820,7 +820,7 @@ class ServerCog(commands.Cog):
                 await self.bot.cogs['ErrorsCog'].on_error(e,ctx)
 
             
-    @sconfig_main.command(name="reset",hidden=True)
+    @sconfig_main.command(name="reset")
     @commands.is_owner()
     async def admin_delete(self,ctx,ID:int):
         if await self.delete_server(ID):
