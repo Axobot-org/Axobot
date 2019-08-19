@@ -148,7 +148,7 @@ class InfosCog(commands.Cog):
         if m!=None:
             await m.delete()
 
-    @commands.command(name="docs")
+    @commands.command(name="docs",aliases=['doc','documentation'])
     async def display_doc(self,ctx):
         """Get the documentation url"""
         text = str(self.bot.cogs['EmojiCog'].customEmojis['readthedocs']) + str(await self.translate(ctx.channel,"infos","docs")) + " https://zbot.rtfd.io"
