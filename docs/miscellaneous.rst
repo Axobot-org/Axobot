@@ -87,7 +87,7 @@ Markdown
 
 The markdown is a set of formatting rules used everywhere, such as on GitHub or Discord. This command gives you these formatting rules, which will allow you to display spoilers, code blocks, or just simple strikethrough or italicized text.
 
-..warning:: Warning, this command contains an invitation link to the information server on the code blocks.
+.. warning:: Warning, this command contains an invitation link to the information server on the code blocks.
 
 ---
 Say

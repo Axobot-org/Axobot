@@ -36,7 +36,7 @@ For the first case, the 'get' command alone will display a list of available rol
 If you know exactly which role to get/remove, it is faster to use the 'get' and 'leave' subcommands followed by the role in question. You can give either the name of the role or its ID as a parameter. Note that it is not possible by this means to obtain a role which is not in the list of reaction roles.
 
 
-.. warn:: For the **first** command, the bot needs "`Embed Links <perms.html#embed-links>`_" and "`Add Reactions <perms.html#add-reactions>`_" permissions for this command
+.. warning:: For the **first** command, the bot needs "`Embed Links <perms.html#embed-links>`_" and "`Add Reactions <perms.html#add-reactions>`_" permissions for this command
 
 --------------------------
 List every roles-reactions
