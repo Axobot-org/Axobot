@@ -113,6 +113,7 @@ errors={"cooldown":"Vous êtes en cooldown pour cette commande. Veuillez attendr
         "invalidemoji":"Emoji invalide",
         'channotfound':"Le salon {c} est introuvable",
         'DM':"Cette commande est indisponible en Messages Privés",
+        "emojinotfound":"Emoji `{e}` introuvable",
         }
 
 find={"user-0":"Nom : {}\nID : {}",

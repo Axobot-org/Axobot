@@ -72,6 +72,10 @@ class ErrorsCog(commands.Cog):
             r = re.search(r'Role \"([^\"]+)\" not found',raw_error)
             if r!=None:
                 return await ctx.send(await self.translate(ctx.channel,'errors','rolenotfound',r=r.group(1)))
+            # Emoji ":shock:" not found
+            r = re.search(r'Emoji \"([^\"]+)\" not found',raw_error)
+            if r!=None:
+                return await ctx.send(await self.translate(ctx.channel,'errors','emojinotfound',e=r.group(1)))
              # Colour "blue" is invalid
             r = re.search(r'Colour \"([^\"]+)\" is invalid',raw_error)
             if r!=None:

@@ -113,6 +113,7 @@ errors={"cooldown":"You are on cooldown for this command :confused: Please wait 
         "invalidemoji":"Invalid emoji",
         'channotfound':"Channel {c} not found",
         'DM':"This command isn't available in Direct Messages",
+        "emojinotfound":"Emoji `{e}` not found",
         }
 
 find={"user-0":"name: {}\nID: {}",

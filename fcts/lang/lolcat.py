@@ -112,7 +112,8 @@ errors={"cooldown":"Yu are on cold-own for dis comandZ :confused: Plize wait {d}
         "invalidisbn":"Invalid ISBN",
         "invalidemoji":"INvalid smiley",
         'channotfound':"Super chat room {c} don't want 2 be found",
-        'DM':"Dat command isn't enabled in PM"
+        'DM':"Dat command isn't enabled in PM",
+        "emojinotfound":"Emoji `{e}` cannot found been",
         }
 
 find={"user-0":"naym: {}\nID: {}",
