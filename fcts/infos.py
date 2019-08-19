@@ -539,7 +539,7 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
         disp_lang = str()
         for lang in await self.bot.cogs['UtilitiesCog'].get_languages(user):
             disp_lang += '{} ({}%)   '.format(lang[0],round(lang[1]*100))
-        await ctx.send(str(await self.translate(ctx.channel,"find","user-1")).format(name=user,id=user.id,servers=", ".join(servers_in),own=", ".join(owners),lang=disp_lang,vote=r,card=xp_card,rangs=" - ".join(perks)))
+        await ctx.send(str(await self.translate(ctx.channel,"find","user-1")).format(name=str(user) + ' <:BOT:544149528761204736>' if user.bot else '',id=user.id,servers=", ".join(servers_in),own=", ".join(owners),lang=disp_lang,vote=r,card=xp_card,rangs=" - ".join(perks)))
 
     @find_main.command(name="guild",aliases=['server'])
     async def find_guild(self,ctx,*,guild):
