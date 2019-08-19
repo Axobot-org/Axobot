@@ -3,6 +3,5 @@ pip>=19.2
 sphinxcontrib-asyncio
 sphinx_autodoc_napoleon_typehints
 requests==2.22
-regex==2019.6
 mysql-connector>=2.2.9
 discord.py>=1.2
