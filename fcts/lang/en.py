@@ -771,7 +771,6 @@ xp = {'card-level':'LEVEL',
         'rr-removed':"No role will be given for level {} anymore",
         'too-many-rr':"You already have {} roles rewards, you can't add more!",
         'rr-reload':"{} updated roles / {} scanned members",
-        'no-mee6':"Oops, you have configured the xp system to use the MEE6 system, but this bot is not in the server! Change the system type (`{}config change xp_type` followed by the system name), or invite MEE6 here.",
         'change-global-xp':"Impossible to edit XP of the global system!",
         'change-xp-ok':"The XP of the user {user} has been set to {xp} points!",
         'no-bot':"Impossible to modify the XP of a bot!"

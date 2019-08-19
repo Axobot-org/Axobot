@@ -13,10 +13,8 @@ class Events(commands.Cog):
         except:
             pass
         self.file = "events"
-        self.mee6_last_check = datetime.datetime.utcfromtimestamp(0)
         self.dbl_last_sending = datetime.datetime.utcfromtimestamp(0)
         self.partner_last_check = datetime.datetime.utcfromtimestamp(0)
-        self.mee6_stats_last = datetime.datetime.utcfromtimestamp(0)
         self.loop_errors = [0,datetime.datetime.utcfromtimestamp(0)]
         self.embed_colors = {"welcome":5301186,
         "mute":4868682,
@@ -298,9 +296,6 @@ class Events(commands.Cog):
                 await self.partners_loop()
             if int(d.hour) == 0 and d.day != self.dbl_last_sending.day:
                 await self.dbl_send_data()
-            if int(d.hour) == 0 and d.day != self.mee6_stats_last.day:
-                await self.send_mee6_stats()
-            2/0
         except Exception as e:
             await self.bot.cogs['ErrorsCog'].on_error(e,None)
             self.loop_errors[0] += 1
@@ -364,15 +359,6 @@ class Events(commands.Cog):
         emb = self.bot.cogs["EmbedCog"].Embed(desc='**Guilds count updated** in {}s ({})'.format(round(time.time()-t,3),'-'.join(answers)),color=7229109).update_timestamp().set_author(self.bot.user)
         await self.bot.cogs["EmbedCog"].send([emb],url="loop")
         self.dbl_last_sending = datetime.datetime.now()
-
-    async def send_mee6_stats(self):
-        """temporary log to see how many mee6api requests have been done"""
-        stats = self.bot.cogs['XPCog'].mee6_calls
-        t = await self.bot.cogs['TimeCog'].time_delta(round(time.time()-stats[0]))
-        emb = self.bot.cogs["EmbedCog"].Embed(desc='MEE6 api called {} times since {} ({}-{}-{})'.format(sum(stats[1:]),t,stats[1],stats[2],stats[3]))
-        emb.update_timestamp().set_author(self.bot.user)
-        await self.bot.cogs["EmbedCog"].send([emb],url="loop")
-        self.mee6_stats_last = datetime.datetime.now()
 
     async def partners_loop(self):
         """Update partners channels (every 7 hours)"""

@@ -679,7 +679,6 @@ xp = {'card-level':'TASO',
         'rr-removed':"Ei roolia anneta tasolle {} enään",
         'too-many-rr':"Sinulla on jo {} rooli palkintoa, et voi lisätä lisää!",
         'rr-reload':"{} päivitti rooleja / {} skannasi jäsenet",
-        'no-mee6':"Ups, olet konfiguroinut XP systeemin käyttämään MEE6 systeemiä, mutta MEE6 ei ole tällä palvelimella! Voit vaihtaa systeemin helposti viestittämällä (`{}config change xp_type` jonka perässä on systeemin nimi), tai kutsu MEE6 tälle palvelimelle.",
         'change-global-xp':"Ei voi muokata XP:tä maailmanlaajuisesta systeemistä!",
         'change-xp-ok':"XP käyttäjälle {user} on asetettu {xp} pisteeseen!",
         'no-bot':"Ei voi muokata bottejen XP:tä!"

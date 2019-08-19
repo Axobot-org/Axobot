@@ -715,7 +715,7 @@ class XPCog(commands.Cog):
             lvl = lvl[0]
             your_rank = {'name':"__"+await self.translate(ctx.channel,"xp","top-your")+"__", 'value':"**#{} |** `lvl {}` **|** `xp {}`".format(rank['rank'],lvl,rank['xp'])}
         # title
-        if Type=='guild':
+        if Type=='guild' or xp_system_used!=0:
             t = await self.translate(ctx.channel,'xp','top-title-2')
         else:
             t = await self.translate(ctx.channel,'xp','top-title-1')
@@ -862,12 +862,7 @@ class XPCog(commands.Cog):
             c = 0
             rr_list = await self.rr_list_role(ctx.guild.id)
             used_system = await self.bot.cogs['ServerCog'].find_staff(ctx.guild.id,'xp_type')
-            if used_system==1:
-                if ctx.guild.get_member(159985870458322944)==None:
-                    return await ctx.send(str(await self.translate(ctx.guild.id,'xp','no-mee6')).format(ctx.prefix))
-                xps = [{'user':int(x['id']),'xp':x['xp'],'level':x['level']} for x in await self.mee6_get_top(ctx.guild,nb=1000000)]
-            else:
-                xps = [{'user':x['userID'],'xp':x['xp'],'level':(await self.calc_level(x['xp'],used_system))[0]} for x in await self.bdd_get_top(ctx.guild.member_count,ctx.guild)]
+            xps = [{'user':x['userID'],'xp':x['xp'],'level':(await self.calc_level(x['xp'],used_system))[0]} for x in await self.bdd_get_top(ctx.guild.member_count, ctx.guild if used_system>0 else None)]
             for member in xps:
                 m = ctx.guild.get_member(member['user'])
                 if m!=None:
@@ -876,91 +871,6 @@ class XPCog(commands.Cog):
         except Exception as e:
             await self.bot.cogs['ErrorsCog'].on_cmd_error(ctx,e)
     
-
-    def update_mee6_calls(self,i:int):
-        if self.mee6_calls[0] == 0:
-            self.mee6_calls[0] = round(time.time())
-        self.mee6_calls[i] += 1
-
-    async def mee6_reload_rr(self,guild):
-        """Reloads every role rewards from a guild using MEE6 xp"""
-        if await self.bot.cogs['ServerCog'].find_staff(guild.id,'xp_type')!=1 or guild.get_member(159985870458322944)==None:
-            return -1
-        c = [0,0]
-        xps = [{'user':x['id'],'xp':x['xp'],'level':x['level']} for x in await self.mee6_get_top(guild)]
-        rr_list = await self.rr_list_role(guild.id)
-        for member in xps:
-            m = guild.get_member(int(member['user']))
-            if m==None:
-                continue
-            temp = await self.give_rr(m,member['level'],rr_list,remove=True)
-            c[1] += temp
-            if temp>0:
-                c[0] += 1
-        return c
-
-    async def mee6_get_top(self,guild:discord.Guild,nb:int=1000):
-        """Get the leaderboard of a guild using MEE6 levels plugin"""
-        if guild.get_member(159985870458322944)==None:
-            raise Exception
-        nb = min(guild.member_count,nb)
-        async with aiohttp.ClientSession() as session:
-            i = 0
-            result = list()
-            while i<ceil(nb/999):
-                async with session.get(f'https://mee6.xyz/api/plugins/levels/leaderboard/{guild.id}?page={i}&limit=999') as resp:
-                    self.update_mee6_calls(1)
-                    try:
-                        temp = (await resp.json())['players']
-                        result += temp
-                    except Exception as e:
-                        j = dumps(await resp.json(), sort_keys=True, indent=2)
-                        await self.bot.cogs['ErrorsCog'].senf_err_msg(f"Error on `mee6_get_top`: url https://mee6.xyz/api/plugins/levels/leaderboard/{guild.id}?page={i}&limit=999")
-                        try:
-                            [await self.bot.get_user(279568324260528128).send("```json\n{}\n```".format(x)) for x in [j[l:l+1950] for l in range(0, len(j), 1950) ][:5] ]
-                        except:
-                            pass
-                        raise e
-                if len(temp)==0:
-                    break
-                i += 1
-        return result[:nb]
-
-    async def mee6_get_player(self,user:discord.Member):
-        """Get the xp of a player using MEE6 levels plugin"""
-        if user.guild.get_member(159985870458322944)==None:
-            raise Exception
-        async with aiohttp.ClientSession() as session:
-            i = 0
-            js = {'players':[]}
-            while len([x for x in js['players'] if x['id']==str(user.id)])==0 and i<=ceil(user.guild.member_count/999):
-                url = f'https://mee6.xyz/api/plugins/levels/leaderboard/{user.guild.id}?page={i}&limit=999'
-                self.update_mee6_calls(2)
-                async with session.get(url) as resp:
-                    js = await resp.json()
-                i += 1
-        try:
-            return [x for x in js['players'] if x['id']==str(user.id)][0]
-        except IndexError:
-            return None
-    
-    async def mee6_get_rank(self,user:discord.Member):
-        """Get the rank of a player in a guild"""
-        if user.guild.get_member(159985870458322944)==None:
-            raise Exception
-        async with aiohttp.ClientSession() as session:
-            i = 0
-            pos = 0
-            while i<=ceil(user.guild.member_count/999):
-                async with session.get(f'https://mee6.xyz/api/plugins/levels/leaderboard/{user.guild.id}?page={i}&limit=999') as resp:
-                    self.update_mee6_calls(3)
-                    l = [x['id'] for x in (await resp.json())['players']]
-                    if str(user.id) in l:
-                        break
-                i += 1
-                pos += 100
-            return pos+l.index(str(user.id))
-        return user.guild.member_count
 
 
 def setup(bot):
