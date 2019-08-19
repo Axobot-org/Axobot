@@ -117,10 +117,11 @@ class ServerCog(commands.Cog):
         query = ("SELECT `language`,`ID` FROM `{}` WHERE 1".format(self.table))
         cursor.execute(query)
         liste,langs = list(), list()
+        guilds = [x.id for x in self.bot.guilds if x.id not in ignored_guilds]
         for x in cursor:
-            if x['ID'] not in ignored_guilds:
+            if x['ID'] in guilds:
                 liste.append(x['language'])
-        for _ in range(len(self.bot.guilds)-len(liste)-len(ignored_guilds)):
+        for _ in range(len(guilds)-len(liste)):
             liste.append(self.bot.cogs['LangCog'].languages.index(self.default_language))
         for e,l in enumerate(self.bot.cogs['LangCog'].languages):
             langs.append((l,liste.count(e)))
