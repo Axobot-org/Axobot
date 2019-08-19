@@ -55,7 +55,7 @@ aide={"no-subcmd":"komenolla `{0.name}`ei ole toissijaista komentoa",
 bvn={"aide":"""__**Tervetuloa liittymis & lähtö viesti moduuliin**__
 Tätä moduulia käytetään konfiguroimaan automaattinen viesti joka kerta kun joku tulee tai lähtee servultasi.
 __** Konfiguraatio**__
-`1-` Jotta voit konfiguroida mihin nämä viestit lähetetään, viestitä `!config change welcome_channel`lisättynä kanava tunniste (Right klikkaa -> "Copy ID" tietokoneella,tai jatka painamista kanavaa -> "Kopioi tunniste" puhelimelle, mutta sinun pitää ensin ottaa käyttöön Developer muoto jotta saat tämän muodon).
+`1-` Jotta voit konfiguroida mihin nämä viestit lähetetään, viestitä `!config change welcome_channel` lisättynä kanava.
 `2-` Jotta voit konfiguroida viestin, kirjoita  `!config change <welcome|leave> <message>`. Tälle viestille voit käyttää variableja:
  - `{user}` Tägää käyttäjän
  - `{server}` näyttää serverin nimen

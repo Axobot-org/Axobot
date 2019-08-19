@@ -70,7 +70,7 @@ Ce module vous sert à configurer un message automatique à chaque fois qu'un me
 
 __**La configuration**__
 
-`1-` Pour configurer le salon où ces messages s'écrivent, entrez `!config change welcome_channel` suivi de l'identifiant du salon (clic droit -> "Copier l'identifiant" pour ordinateur, ou rester appuyez sur le salon -> "Copier l'identifiant" pour téléphone, mais il vous faudra avoir activé le mode développeur pour obtenir cette option).
+`1-` Pour configurer le salon où ces messages s'écrivent, entrez `!config change welcome_channel` suivi du salon (vous pouvez utiliser aussi bien sa mention que son identifiant ou son nom complet).
 `2-` Pour configurer un message, entrez `!config change <welcome|leave> <message>`. Pour ce message vous pouvez utiliser les variables suivantes :
  - `{user}` mentionne le membre
  - `{server}` affiche le nom du serveur
