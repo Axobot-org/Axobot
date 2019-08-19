@@ -486,6 +486,7 @@ partners={'invalid-bot':"Impossible de trouver ce bot",
 
 perms={"perms-0":"Le membre/rôle {} n'a pas été trouvé",
         "perms-1":"**Permission de '{}' :**\n\n",
+        "general":"Permissions générales"
         }
 
 roles_react={"already-1-rr":"Vous avez déjà un rôle désigné pour cet émoji",

@@ -477,7 +477,8 @@ partners={'invalid-bot':"Unable 2 find tihs bot",
         }
 
 perms={"perms-0":"Membr/role {} not findz",
-        "perms-1":"**'{}' permissung:**\n\n"
+        "perms-1":"**'{}' permissung:**\n\n",
+        "general":"gLoBal pErmZ"
         }
 
 roles_react={"already-1-rr":"U already has a designated role 4 this emoji",
