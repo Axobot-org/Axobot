@@ -203,6 +203,8 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
                 await self.category_info(ctx,item,lang)
             elif type(item) == discord.Guild:
                 await self.guild_info(ctx,item,lang,critical)
+            elif isinstance(item,discord.user.ClientUser):
+                await  self.member_infos(ctx,ctx.guild.me,lang,critical)
             else:
                 await ctx.send(str(type(item))+" / "+str(item))
         except Exception as e:
@@ -255,7 +257,7 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
             embed.add_field(name="Roles [{}]".format(len(list_role)), value = ", ".join(list_role), inline=False)
         else:
             embed.add_field(name="Roles [0]", value = await self.translate(ctx.guild.id,"activity","rien"), inline=False)
-        if critical_info:
+        if critical_info and not item.bot:
             embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","member-7"), value = await self.bot.cogs['CasesCog'].get_nber(item.id,ctx.guild.id),inline=True)
         if item.bot:
             session = aiohttp.ClientSession(loop=self.bot.loop)
