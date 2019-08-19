@@ -25,7 +25,10 @@ class HelpCog(commands.Cog):
     @commands.cooldown(10,30,commands.BucketType.channel)
     async def bvn_help(self,ctx):
         """Help on setting up welcome / leave messages"""
-        await ctx.send(await self.bot.cogs['LangCog'].tr(ctx.guild,'bvn','aide'))
+        prefix = await self.bot.get_prefix(ctx.message)
+        if type(prefix)==list:
+            prefix = prefix[0]
+        await ctx.send(await self.bot.cogs['LangCog'].tr(ctx.guild,'bvn','aide',p=prefix))
 
 
     @commands.command(name="about",aliases=["botinfos","botinfo"])

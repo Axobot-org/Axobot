@@ -70,8 +70,8 @@ Dis modul is usd 2 configur a' automatic mesage each tiem membr enters or exits 
 
 __** ConfiGrationZ**__
 
-`1-` To configur teh channel wer thees mesagez 're writtn, entr `!config change welcome_channel` followd by teh channl ID (U can use it # as wellas its iD or its full nice name).
-`2-` To configure a msg, entr `!config change <welcome|leave> <message>`. 4 dis mesage u can uz somm variabl':
+`1-` To configur teh channel wer thees mesagez 're writtn, entr `{p}config change welcome_channel` followd by teh channl ID (U can use it # as wellas its iD or its full nice name).
+`2-` To configure a msg, entr `{p}config change <welcome|leave> <message>`. 4 dis mesage u can uz somm variabl':
  - `{user}` mentionz teh member
  - `{server}` displayz the servr nayme
  - `{owner}` displayz teh servr ownr nam

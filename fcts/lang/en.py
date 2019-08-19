@@ -70,8 +70,8 @@ This module is used to configure an automatic message each time a member enters 
 
 __** Configuration**__
 
-`1-` To configure the chat room where these messages are written, enter `!config change welcome_channel` followed by the channel (you can use its mention as well as its identifier or its full name).
-`2-` To configure a message, enter `!config change <welcome|leave> <message>`. For this message you can use some variables:
+`1-` To configure the chat room where these messages are written, enter `{p}config change welcome_channel` followed by the channel (you can use its mention as well as its identifier or its full name).
+`2-` To configure a message, enter `{p}config change <welcome|leave> <message>`. For this message you can use some variables:
  - `{user}` mentions the member
  - `{server}` displays the server name
  - `{owner}` displays the server owner name
