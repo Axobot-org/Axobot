@@ -180,7 +180,7 @@ class ServerCog(commands.Cog):
         cnx = self.bot.cnx_frm
         cursor = cnx.cursor()
         for x in values:
-            if type(x) == bool:
+            if type(x[1]) == bool:
                 v.append("`{x[0]}`={x[1]}".format(x=x))
             else:
                 v.append("""`{x[0]}`="{x[1]}" """.format(x=x))
