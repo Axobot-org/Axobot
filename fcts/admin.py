@@ -53,9 +53,6 @@ class AdminCog(commands.Cog):
         else:
             return await reloads.check_admin(ctx)
 
-    
-
-    
 
     @commands.command(name='spoil',hidden=True)
     @commands.check(reloads.check_admin)
@@ -818,8 +815,6 @@ Cette option affecte tous les serveurs"""
             await ctx.bot.cogs['UtilitiesCog'].add_check_reaction(ctx.message)
         except Exception as e:
             await self.bot.cogs['ErrorsCog'].on_cmd_error(ctx,e)
-
-    
 
 def setup(bot):
     bot.add_cog(AdminCog(bot))
