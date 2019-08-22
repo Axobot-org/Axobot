@@ -2,19 +2,22 @@
 #coding=utf-8
 
 from importlib import reload as m_reload
-from fcts.lang import fr, en, lolcat, fi
-import discord
+from fcts.lang import fr, lolcat
+import discord, json
 m_reload(fr)
-m_reload(en)
 m_reload(lolcat)
-m_reload(fi)
+fr = {x: getattr(fr,x) for x in dir(fr)}
+lolcat = {x: getattr(lolcat,x) for x in dir(lolcat)}
+
+with open('fcts/lang/en.json','r') as f:
+    en = json.load(f)
+with open('fcts/lang/fi.json','r') as f:
+    fi = json.load(f)
 
 
 class LangCog(discord.ext.commands.Cog):
 
     def __init__(self,bot):
-        m_reload(fr)
-        m_reload(en)
         self.bot = bot
         self.file = "language"
         self.languages = ['fr','en','lolcat','fi']
@@ -45,25 +48,25 @@ class LangCog(discord.ext.commands.Cog):
             lang_opt = self.bot.cogs['ServerCog'].default_language
         if lang_opt == 'fi':
             try:
-                result = eval("fi."+moduleID+"[\""+messageID+"\"]")
+                result = fi[moduleID][messageID]
             except:
                 await self.msg_not_found(moduleID,messageID,"fi")
                 lang_opt = 'en'
         if lang_opt == 'lolcat':
             try:
-                result = eval("lolcat."+moduleID+"[\""+messageID+"\"]")
+                result = lolcat[moduleID][messageID]
             except:
                 await self.msg_not_found(moduleID,messageID,"lolcat")
                 lang_opt = 'en'
         if lang_opt == 'en':
             try:
-                result = eval("en."+moduleID+"[\""+messageID+"\"]")
+                result = en[moduleID][messageID]
             except:
                 await self.msg_not_found(moduleID,messageID,"en")
                 lang_opt = 'fr'
         if lang_opt == 'fr':
             try:
-                result = eval("fr."+moduleID+"[\""+messageID+"\"]")
+                result = fr[moduleID][messageID]
             except KeyError:
                 await self.msg_not_found(moduleID,messageID,"fr")
                 result = ""
