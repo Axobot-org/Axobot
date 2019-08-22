@@ -244,6 +244,8 @@ If the bot can't send the new command format, it will try to send the old one.""
                         check_name = 'is_owner'
                     elif 'bot_has_permissions.<locals>.predicate' in str(c):
                         check_name = 'bot_has_permissions'
+                    elif '_has_permissions.<locals>.predicate' in str(c):
+                        check_name = 'has_permissions'
                     else:
                         check_name = c.__name__
                     if check_name in check_msgs.keys():
