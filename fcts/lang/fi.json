@@ -238,36 +238,10 @@
             "Pro-tip: The bot has a Discord, where you can see the current bugs and vote for the next updates! Use the `about` command to get the invite",
             "Pro-tip: the `prefix` command allows you to have a list of the prefixes currently usable in the server"
         ],
-        "markdown": [
-            "__**Markdown Rules** on *Discord*__\n",
-            "`*italics*` = *italics*",
-            "`__underline__` = __underline__",
-            "`**bold**` = **bold**",
-            "`***bold italics***` = ***bold italics***",
-            "`~~strikeout~~` = ~~strikeout~~",
-            "`__*underline italics*__` = __*underline italics*__",
-            "`__**underline bold**__` = __**underline bold**__",
-            "`__***underline bold italics***__` = __***underline bold italics***__",
-            "`||spoiler||` = ||spoiler||",
-            "> quote = `> quote`",
-            "\\`code\\` = `code`",
-            "\\ to ignore\n",
-            "For code blocks, cf <https://discord.gg/DGahTNn>"
-        ]
+        "markdown": "__**Markdown Rules** on *Discord*__\n\n`*italics*` = *italics*\n`__underline__` = __underline__\n`**bold**` = **bold**\n`***bold italics***` = ***bold italics***\n`~~strikeout~~` = ~~strikeout~~\n`__*underline italics*__` = __*underline italics*__\n`__**underline bold**__` = __**underline bold**__\n`__***underline bold italics***__` = __***underline bold italics***__\n`||spoiler||` = ||spoiler||\n> quote = `> quote`\n\\`code\\` = `code`\n\\ to ignore\n\nFor code blocks, cf <https://discord.gg/DGahTNn>"
     },
     "infos": {
-        "text-0": [
-            "Moi! Olen {0} !",
-            "Olen robotti joka voi tehdä monia asioita: Valvontaa, pieniä pelejä, taso systeemi, tilastoja, ja monia muita hyödyttäviä komentoja (ja myös täysin turhia)! ",
-            "Voit aloittaa viestittämällä `!help` tällä kanavalla niin näet kaikki käytettävissä olevat komennot, sitten `!config see` aikoo näyttää konfiguraatio muodot (nettisivua ollaan tekemässä). ",
-            "Kaikki jotka auttoivat minun tekeimsessä, minun omistaja ja minä haluamme kiittää Adri526, Awhikax, Jees1 (tämän kielen kääntäjä) ja Aragorn1202! Iso kiitos heille.",
-            ":globe_with_meridians: Jotain linkkejä jotka voivat auttaa: ",
-            ":arrow_forward: Minun Discord palvelin: : http://discord.gg/N55zY88",
-            ":arrow_forward: Linkki kutsua minut toiselle palvelimelle : <https://bot.discord.io/zbot>",
-            ":arrow_forward: Bot dokumentti : <https://zbot.rtfd.io/>",
-            ":arrow_forward: Minun tekijän Twitter : <https://twitter.com/z_runnerr>",
-            " Hyvää päivän jatkoa!"
-        ],
+        "text-0": "Moi! Olen {0} !\nOlen robotti joka voi tehdä monia asioita: Valvontaa, pieniä pelejä, taso systeemi, tilastoja, ja monia muita hyödyttäviä komentoja (ja myös täysin turhia)!\nVoit aloittaa viestittämällä `!help` tällä kanavalla niin näet kaikki käytettävissä olevat komennot, sitten `!config see` aikoo näyttää konfiguraatio muodot (nettisivua ollaan tekemässä).\nKaikki jotka auttoivat minun tekeimsessä, minun omistaja ja minä haluamme kiittää Adri526, Awhikax, Jees1 (tämän kielen kääntäjä) ja Aragorn1202! Iso kiitos heille.\n\n:globe_with_meridians: Jotain linkkejä jotka voivat auttaa:\n:arrow_forward: Minun Discord palvelin: : http://discord.gg/N55zY88\n:arrow_forward: Linkki kutsua minut toiselle palvelimelle : <https://bot.discord.io/zbot>\n:arrow_forward: Bot dokumentti : <https://zbot.rtfd.io/>\n:arrow_forward: Minun tekijän Twitter : <https://twitter.com/z_runnerr>\n\nHyvää päivän jatkoa!",
         "docs": "Tässä on linkki botin dokumenttiin:",
         "stats-title": "**Bot tilastot**",
         "stats": "**Bot versio:** {bot_v} \n**Kaikkien palvelimien numero missä olen:** {s_count} \n**Numero kaikista näkyvistä jäsenistä:** {m_count} ({b_count} **botit**)\n**Numero koodi riveistä:** {l_count}\n**Käytettyjä kieliä:** {lang}\n** {p_v} \n**Versio `discord.py`stä:** {d_v} \n**Ladataan RAMia:** {ram} GB \n**Ladataan CPU:ssa:** {cpu} % \n**API viive aika:** {api} ms\n**Kaikki xp kerätty:** {xp}",
