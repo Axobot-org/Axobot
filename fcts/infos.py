@@ -471,7 +471,7 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
             embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","inv-2"), value=uses)
         if invite.max_age!=None:
             embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","inv-3"), value=str(invite.max_age) if invite.max_age != 0 else "∞")
-        if isinstance(invite.channel,(discord.PartialInviteChannel,discord.TextChannel)):
+        if isinstance(invite.channel,(discord.PartialInviteChannel,discord.abc.GuildChannel)):
             embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","guild-0"), value=str(invite.guild.name))
             embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","textchan-5"), value="#"+str(invite.channel.name))
             embed.set_thumbnail(url=invite.guild.icon_url)
