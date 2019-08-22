@@ -53,7 +53,8 @@ aide={"no-subcmd":"La commande {0.name} n'a aucune sous-commande",
                 'is_owner':['Il faut être le propriétaire du bot',"Vous n'êtes pas le propriétaire du bot"],
                 'bot_has_permissions':["Le bot possède les permissions suffisantes","Le bot ne possède pas les permissions suffisantes"],
                 'has_permissions':["Vous avez les permissions Discord suffisantes","Vous n'avez pas les permissions Discord suffisantes"],
-                'verify_role_exists':["Un rôle de vérification est configuré","Aucun rôle de vérification n'a été configuré"]}
+                'verify_role_exists':["Un rôle de vérification est configuré","Aucun rôle de vérification n'a été configuré"],
+                'is_translator':["Vous faites bien partie de l'équipe de traducteurs","Vous devez faire partie de l'équipe de traducteurs"]}
         }
 
 blurple = {'check_intro':"{}, début de l'analyse blurple (Notez que cela peut prendre un certain temps)",

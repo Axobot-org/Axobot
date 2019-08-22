@@ -107,6 +107,10 @@
             "bot_has_permissions": [
                 "Botilla on riittävästi käyttöoikeuksia",
                 "Botilla ei ole riittävästi käyttöoikeuksia"
+            ],
+            "is_translator": [
+                "Olet osa kääntäjien tiimiä",
+                "Sinun on oltava osa kääntäjätiimiä"
             ]
         }
     },
@@ -131,14 +135,14 @@
         "mp-adv": "Sinä varmaan yrität kutsua minut tähän palvelimeen? Jos tämä on oikein, en voi liittyä helpolla kutsu linkillä. Järjestyksenvalvojan täytyy käyttää minun omaa kutsu linkkiä, täällä:<https://bot.discord.io/zbot> :wink:"
     },
     "errors": {
-        "cooldown": "Olet jäähyllä tältä commandilta :confused:  Odota {} lisää sekunttia...",
+        "cooldown": "Olet jäähyllä tältä commandilta :confused:  Odota {d} lisää sekunttia...",
         "badarguments": "Upsis, on mahdotonta muuntaa `{c[3]}` paramittarin\"{c[1]}\" tyyppiä :confused:",
         "badarguments-2": "`{0}` is not a recognised {1} option",
-        "missingargument": "Upsis, argumentti \"{}\" puuttuu {}",
-        "membernotfound": "On mahdotonta löytää käyttäjä `{}` :confused:",
-        "usernotfound": "On mahdotonta löytää käyttäjä `{}` :confused:",
-        "disabled": "Komento {} on poissa käytöstä :confused:",
-        "duration": "Aika `{}` on epäselvä",
+        "missingargument": "Upsis, argumentti \"{a}\" puuttuu {e}",
+        "membernotfound": "On mahdotonta löytää käyttäjä `{m}` :confused:",
+        "usernotfound": "On mahdotonta löytää käyttäjä `{u}` :confused:",
+        "disabled": "Komento {c} on poissa käytöstä :confused:",
+        "duration": "Aika `{d}` on epäselvä",
         "rolenotfound": "On mahdotonta löytää rooli `{0}`",
         "invalidcolor": "Väri `{0}` epäselvä",
         "invalidinvite": "Invalid bot/server invite: `{0}`",
@@ -151,7 +155,7 @@
         "user-1": "Nimi: {name}\nID: {id}\nPerks: {rangs}\nServers: {servers}\nOwner of: {own}\nLanguages: {lang}\nVoted? {vote}\nXP card: {card}",
         "user-2": "Käyttäjää ei löytynyt",
         "guild-0": "Serveriä ei löytynyt",
-        "guild-1": "Nimi: {}\nID: {}\nOmistaja: {} ({})\nKäyttäjät: {} Mukaan lukien {} bottia)\nKieli: {}\nEtuliite (prefix): `{}`",
+        "guild-1": "Nimi: {name}\nID: {id}\nOmistaja: {owner} ({ownerid})\nLiittynyt: {join}\nKäyttäjät: {members} (Mukaan lukien {bots} bottia)\nKieli: {lang}\nEtuliite (prefix): `{}`",
         "chan-0": "kanavaa ei löytynyt",
         "chan-1": "Nimi : {}\nID: {}\nServeri: {} ({})",
         "help": "Tämä komento hyväksyy löytämään serverin tai salongin kaikista servereistä missä botti on. Voit myös etsiä Discord käyttäjän tiedot, siltikin vaikka jos hän ei ole minun kanssani serverissä!\nSyntaksi tälle on `!find <user|channel|guild> <ID>`",

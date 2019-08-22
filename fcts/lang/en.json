@@ -127,6 +127,10 @@
             "verify_role_exists": [
                 "A verification role has been set up",
                 "No verification role has been added"
+            ],
+            "is_translator": [
+                "You are part of the translators team",
+                "You must be part of the translators team"
             ]
         }
     },
