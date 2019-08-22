@@ -63,6 +63,12 @@ async def has_manage_nicknames(ctx):
     """... if someone can change nicknames"""
     return ctx.channel.permissions_for(ctx.author).manage_nicknames or await ctx.bot.cogs['AdminCog'].check_if_god(ctx)
 
+async def has_embed_links(ctx):
+    """... if someone can send embeds"""
+    if not isinstance(ctx.author,discord.Member):
+        return True
+    return ctx.channel.permissions_for(ctx.author).embed_links or await ctx.bot.cogs['AdminCog'].check_if_god(ctx)
+
 async def verify_role_exists(ctx):
     """Check if the verify role exists"""
     if ctx.guild==None:

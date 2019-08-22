@@ -44,6 +44,7 @@ aide={"no-subcmd":"The command `{0.name}` has no subcommand",
                 'has_manage_guild':["You have 'Manage Server' permission","'Manage Server' permission missing"],
                 'has_manage_roles':["You have 'Manage Roles' permission","'Manage Roles' permission missing"],
                 'has_manage_nicknames':["You have 'Manage Nicknames' permission","'Manage Nicknames' permission missing"],
+                'has_embed_links':['You have the "Embed links" permission','You need to have "Embed links" permission'],
                 'guild_only':['Can only be used in a server']*2,
                 'can_edit_case':["One of your roles is authorized to use this command (`warn`)","Missing allowed role (`warn`)"],
                 'is_support_staff':['You are a member of the bot staff','You must be part of the bot staff'],
@@ -51,6 +52,7 @@ aide={"no-subcmd":"The command `{0.name}` has no subcommand",
                 'can_use_rss':["You have 'Administrator' permission","'Administrator' permission is missing"],
                 'is_owner':["You must be the owner of the bot","You are not the owner of the bot"],
                 'bot_has_permissions':["The bot has sufficient permissions", "The bot does not have sufficient permissions"],
+                'has_permissions':["You have the sufficient Discord permissions","You do not have the right Discord permissions"],
                 'verify_role_exists':["A verification role has been set up","No verification role has been added"]}
         }
 

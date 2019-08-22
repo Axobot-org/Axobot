@@ -44,6 +44,7 @@ aide={"no-subcmd":"La commande {0.name} n'a aucune sous-commande",
                 'has_manage_guild':["Vous avez la permission 'Gérer le serveur'","Permission 'Gérer le serveur' manquante"],
                 'has_manage_roles':["Vous avez la permission 'Gérer les rôles'","Permission 'Gérer les rôles' manquante"],
                 'has_manage_nicknames':["Vous avez la permission 'Gérer les pseudos'","Permission 'Gérer les pseudos' manquante"],
+                'has_embed_links':['Vous avez la permission "Intégrer des liens"','Vous devez avoir la permission "Intégrer des liens"'],
                 'guild_only':['Utilisable uniquement dans un serveur']*2,
                 'can_edit_case':["L'un de vos rôles est autorisé à utiliser cette commande (`warn`)","Rôle autorisé manquant (`warn`)"],
                 'is_support_staff':['Vous faites partie du staff du bot','Vous devez faire partie du staff du bot'],
@@ -51,6 +52,7 @@ aide={"no-subcmd":"La commande {0.name} n'a aucune sous-commande",
                 'can_use_rss':["Vous avez la permission 'Administrateur'","Permission 'Administrateur' manquante"],
                 'is_owner':['Il faut être le propriétaire du bot',"Vous n'êtes pas le propriétaire du bot"],
                 'bot_has_permissions':["Le bot possède les permissions suffisantes","Le bot ne possède pas les permissions suffisantes"],
+                'has_permissions':["Vous avez les permissions Discord suffisantes","Vous n'avez pas les permissions Discord suffisantes"],
                 'verify_role_exists':["Un rôle de vérification est configuré","Aucun rôle de vérification n'a été configuré"]}
         }
 

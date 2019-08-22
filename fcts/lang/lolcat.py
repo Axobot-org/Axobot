@@ -44,6 +44,7 @@ aide={"no-subcmd":"Teh kommand `{0.name}` had not sub~~scribe~~commanD",
                 'has_manage_guild':["U have 'Manage Server' permission","'Manage Server' permission missed"],
                 'has_manage_roles':["You have 'Manage Roles' permission","'Manage Roles' permission missed"],
                 'has_manage_nicknames':["You have 'Manage Nicknames' permission","'Manage Nicknames' permission missed"],
+                'has_embed_links':['U haz "Embed links" thing','U need 2 b "Embed links" perms'],
                 'guild_only':['Can only be usd in a server']*2,
                 'can_edit_case':["One of UR roles is authorized to use this command (`warn`)","U missed allowed role (`warn`)"],
                 'is_support_staff':["You're a member of the bot staff",'U must be part of the bot staff'],
@@ -51,6 +52,7 @@ aide={"no-subcmd":"Teh kommand `{0.name}` had not sub~~scribe~~commanD",
                 'can_use_rss':["U have 'Administrator' permission","'Administrator' permission is missed"],
                 'is_owner':["You must be the owner of the bot","You are not the owner of the bot"],
                 'bot_has_permissions':["The bot have enough perms", "The bot donot've sufficient perms"],
+                'has_permissions':["U have enugh Discord permz","U donut has the right Discord things"],
                 'verify_role_exists':["A verification role hav bee setted up","No verification rol has been addd"]}
         }
 
