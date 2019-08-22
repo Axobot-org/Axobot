@@ -4,8 +4,9 @@ from discord.ext import commands
 from tzwhere import tzwhere
 from pytz import timezone
 
-from fcts import emojis
+from fcts import emojis, checks
 importlib.reload(emojis)
+importlib.reload(checks)
 
 cmds_list = ['count_msg','ragequit','pong','run','nope','blame','party','bigtext','shrug','gg','money','pibkac','osekour','me','kill','cat','rekt','thanos','nuke','pikachu','pizza','google','loading','piece','roll','afk']
 
@@ -537,7 +538,7 @@ You can specify a verification limit by adding a number in argument"""
 
 
     @commands.command(name='embed',hidden=False)
-    @commands.has_permissions(embed_links=True)
+    @commands.check(checks.has_embed_links)
     async def send_embed(self,ctx,*,arguments):
         """Send an embed
         Syntax: !embed key1=\"value 1\" key2=\"value 2\"
