@@ -191,7 +191,8 @@ fun={"count-0":"Comptage en cours...",
                 "Pro-tip : Le bot possède un Discord, où vous pourrez voir les bugs actuels et voter pour les prochaines mises à jour ! Utilisez la commande `about` pour en obtenir le lien",
                 "Pro-tip : la commande `prefix` permet d'avoir la liste des préfixes actuellement utilisables dans le serveur",
                 "Le saviez-vous ? Vous pouvez donner une description de votre serveur qui pourra être utilisée dans d’autres serveurs, via l’option `description` de la commande `config`",
-                "Le saviez-vous ? Lors de certains événements spéciaux, il est possible d'obtenir des cartes d'xp collector. N'oubliez pas de suivre les news via le serveur officiel !"
+                "Le saviez-vous ? Lors de certains événements spéciaux, il est possible d'obtenir des cartes d'xp collector. N'oubliez pas de suivre les news via le serveur officiel !",
+                "> Cela aussi passera\n*(vous avez la référence ?)*"
                 ],
         "markdown":r"""__**Règles du Markdown** sur *Discord*__
 
