@@ -87,10 +87,10 @@ class TranslatorsCog(commands.Cog):
             return await ctx.send("This language is already 100% translated :tada:")
         key = self.todo[lang][0]
         value = self.translations['en'].__getitem__(key)
-        await ctx.send(value)
+        await ctx.send("```\n"+value+"\n```")
         await ctx.send(f"How would you translate it in {lang}?\n\n  *Key: {key}*\nType 'pass' to choose another one")
         msg = await self.bot.wait_for('message', check=lambda msg: msg.author.id==ctx.author.id and msg.channel.id==ctx.channel.id)
-        if msg.content == 'pass':
+        if msg.content.lower() == 'pass':
             await ctx.send("This message will be ignored until the next reload of this command")
         else:
             await self.modify_project(lang,key,msg.content)
