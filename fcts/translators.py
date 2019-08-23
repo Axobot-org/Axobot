@@ -56,7 +56,7 @@ class TranslatorsCog(commands.Cog):
             pass
         else:
             did = result.keys()
-            for k,v in temp:
+            for k,v in temp.items():
                 if k not in did:
                     result[k] = v
         return result
@@ -72,7 +72,7 @@ class TranslatorsCog(commands.Cog):
     async def modify_project(self,lang:str,key:str,new:str):
         """Modify a string inside the project file"""
         with open('fcts/translation/'+lang+'.txt','a',encoding='utf-8') as f:
-            f.write('\n'+key+' '+new.replace('\n','\\n'))
+            f.write(key+' '+new.replace('\n','\\n')+'\n')
         self.translations[lang][key] = new
 
     @commands.command(name='translate')
@@ -87,14 +87,15 @@ class TranslatorsCog(commands.Cog):
             return await ctx.send("This language is already 100% translated :tada:")
         key = self.todo[lang][0]
         value = self.translations['en'].__getitem__(key)
-        await ctx.send(f"`EN`: {value}\nHow would you translate it in {lang}?\n\n  *Key: {key}*\nType 'pass' to choose another one")
+        await ctx.send(value)
+        await ctx.send(f"How would you translate it in {lang}?\n\n  *Key: {key}*\nType 'pass' to choose another one")
         msg = await self.bot.wait_for('message', check=lambda msg: msg.author.id==ctx.author.id and msg.channel.id==ctx.channel.id)
         if msg.content == 'pass':
             await ctx.send("This message will be ignored until the next reload of this command")
         else:
             await self.modify_project(lang,key,msg.content)
             await ctx.send(f"New translation:\n :arrow_right: {msg.content}")
-        self.todo.pop(key,None)
+        self.todo[lang].remove(key)
     
     @commands.command(name='tr-reload-todo')
     @commands.check(is_translator)
