@@ -97,7 +97,7 @@ class RolesReact(commands.Cog):
         cursor.execute(query)
         liste = list()
         for x in cursor:
-            if x['emoji'] == emoji:
+            if emoji==None or x['emoji'] == emoji:
                 liste.append(x)
         cursor.close()
         return liste
@@ -162,7 +162,7 @@ class RolesReact(commands.Cog):
         """Create a text with the roles list"""
         emojis = list()
         for k in liste:
-            if len(k['emoji'])>5 and k['emoji'].isnumeric():
+            if len(k['emoji'])>15 and k['emoji'].isnumeric():
                 temp = await guild.fetch_emoji(int(k['emoji']))
                 if temp != None:
                     emojis.append(temp)
