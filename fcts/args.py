@@ -130,7 +130,7 @@ class anyEmoji(commands.Converter):
     async def convert(self,ctx:commands.Context,argument):
         r = re.search(r'<a?:[^:]+:(\d+)>', argument)
         if r==None:
-            if len(argument)==1 and argument not in string.printable:
+            if all([x not in string.printable for x in argument]):
                 return argument
         else:
             try:

@@ -97,7 +97,8 @@ class RolesReact(commands.Cog):
         cursor.execute(query)
         liste = list()
         for x in cursor:
-            liste.append(x)
+            if x['emoji'] == emoji:
+                liste.append(x)
         cursor.close()
         return liste
     
@@ -190,7 +191,7 @@ class RolesReact(commands.Cog):
             await ctx.send(embed=emb.discord_embed())
     
     @rr_main.command(name="get",aliases=['join'])
-    async def rr_get(self,ctx:commands.Context,role:typing.Optional[discord.Role]):
+    async def rr_get(self,ctx:commands.Context,*,role:typing.Optional[discord.Role]):
         """Get one of the roles
         If you don't speficy any role, I will display the whole message with reactions"""
         if role != None:
