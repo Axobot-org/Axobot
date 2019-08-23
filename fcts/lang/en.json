@@ -283,7 +283,9 @@
             "Did you know that?  All designs related to the bot are made by Adri526#9223, including the huge list of emojis used in the `bigtext` command!",
             "Did you know that? ZBot takes its name from.... its creator, Z_runner",
             "Pro-tip: The bot has a Discord, where you can see the current bugs and vote for the next updates! Use the `about` command to get the invite",
-            "Pro-tip: the `prefix` command allows you to have a list of the prefixes currently usable in the server"
+            "Pro-tip: The `prefix` command allows you to have a list of the prefixes currently usable in the server",
+            "Did you know that? You can give a description of your server that can be used in other servers, via the `description` option of the `config` command",
+            "Did you know that? At some special events, it is possible to obtain collector xp cards. Don't forget to follow the news on the official server!"
         ],
         "markdown": "__**Markdown Rules** on *Discord*__\n\n`*italics*` = *italics*\n`__underline__` = __underline__\n`**bold**` = **bold**\n`***bold italics***` = ***bold italics***\n`~~strikeout~~` = ~~strikeout~~\n`__*underline italics*__` = __*underline italics*__\n`__**underline bold**__` = __**underline bold**__\n`__***underline bold italics***__` = __***underline bold italics***__\n`||spoiler||` = ||spoiler||\n> quote = `> quote`\n\\`code\\` = `code`\n \\ to ignore\n\nFor code blocks, cf <https://discord.gg/DGahTNn>"
     },

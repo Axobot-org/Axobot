@@ -189,7 +189,9 @@ fun={"count-0":"Comptage en cours...",
                 "Le saviez-vous ?  Tous les designs relatifs au bot sont réalisés par Adri526#9223, dont l'énorme liste d'émojis utilisés dans la commande `bigtext` !",
                 "Le saviez-vous ? ZBot tiens son nom... de son créateur, Z_runner",
                 "Pro-tip : Le bot possède un Discord, où vous pourrez voir les bugs actuels et voter pour les prochaines mises à jour ! Utilisez la commande `about` pour en obtenir le lien",
-                "Pro-tip : la commande `prefix` permet d'avoir la liste des préfixes actuellement utilisables dans le serveur"
+                "Pro-tip : la commande `prefix` permet d'avoir la liste des préfixes actuellement utilisables dans le serveur",
+                "Le saviez-vous ? Vous pouvez donner une description de votre serveur qui pourra être utilisée dans d’autres serveurs, via l’option `description` de la commande `config`",
+                "Le saviez-vous ? Lors de certains événements spéciaux, il est possible d'obtenir des cartes d'xp collector. N'oubliez pas de suivre les news via le serveur officiel !"
                 ],
         "markdown":r"""__**Règles du Markdown** sur *Discord*__
 
