@@ -16,6 +16,23 @@ Bitly urls
 Bitly is a famous website for shortening web addresses (aka url). With this command you can create a shortcut yourself instantly using their services, and see to which address a bit.ly link refers without having to click on it. Practical, isn't it?
 
 
+----
+Book
+----
+
+This command allows you to manage your own library, saving your books easily. You can also only use the search function, for example to share a specific book with your Discord friends. Anything is possible!
+
+
+.. warning:: This command is under construction, and is therefore only in its early stages. Feel free to give your ideas on the official `bot server <https://discord.gg/N55zY88>`_!
+
+Search by ISBN
+--------------
+
+**Syntax:** :code:`book search <ISBN>`
+
+Used to search for a book from its ISBN, and displays its main information. ISBNs of length 10 and 13 are accepted.
+
+
 -------
 Camlink
 -------
@@ -70,7 +87,7 @@ Markdown
 
 The markdown is a set of formatting rules used everywhere, such as on GitHub or Discord. This command gives you these formatting rules, which will allow you to display spoilers, code blocks, or just simple strikethrough or italicized text.
 
-..warning:: Warning, this command contains an invitation link to the information server on the code blocks.
+.. warning:: Warning, this command contains an invitation link to the information server on the code blocks.
 
 ---
 Say

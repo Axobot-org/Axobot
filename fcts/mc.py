@@ -392,7 +392,10 @@ Every information come from the website www.fr-minecraft.net"""
         if isinstance(channel,discord.DMChannel) or channel.permissions_for(channel.guild.me).embed_links:
             msg = await channel.send(embed=e)
         else:
-            await channel.send(await self.translate(guild,"mc","cant-embed"))
+            try:
+                await channel.send(await self.translate(guild,"mc","cant-embed"))
+            except discord.errors.Forbidden:
+                pass
             msg = None
         return msg
 
@@ -414,18 +417,6 @@ Every information come from the website www.fr-minecraft.net"""
                 return await channel.fetch_message(int(ID))
             except:
                 pass
-        # async for msg in channel.history(limit=10000):
-        #     try:
-        #         if len(msg.embeds)>0 and msg.author == channel.guild.me:
-        #             e = msg.embeds[0]
-        #             if ip[1] == None:
-        #                 c = ip[0] in e.title
-        #             else:
-        #                 c = ":".join(ip) in e.title
-        #             if c:
-        #                 return msg
-        #     except:
-        #         continue
         return None
 
     async def check_flow(self,flow):

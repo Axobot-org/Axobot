@@ -19,22 +19,22 @@ sys.path.insert(0, os.path.abspath('.'))
 # -- Project information -----------------------------------------------------
 
 project = 'ZBot'
-copyright = '2018, ZRunner'
+copyright = '2019, ZRunner'
 author = 'ZRunner'
 
 # The short X.Y version
 version = '3.5'
 # The full version, including alpha/beta/rc tags
-release = '3.5.2'
+release = '3.5.3'
 
 
 # Example configuration for intersphinx: refer to the Python standard library.
 import re
 intersphinx_mapping = {
-    "python": ("https://docs.python.org/3.6", None),
+    "python": ("https://docs.python.org/3.7", None),
     "requests": ("http://docs.python-requests.org/en/master", None),
-    "re": ("https://docs.python.org/3.6/library", None),
-    "discord": ("https://discordpy.readthedocs.io/en/rewrite/", None)
+    "re": ("https://docs.python.org/3.7/library", None),
+    "discord": ("https://discordpy.readthedocs.io/en/latest/", None)
 }
 
 # -- General configuration ---------------------------------------------------

@@ -37,18 +37,24 @@ aide={"no-subcmd":"La commande {0.name} n'a aucune sous-commande",
                 'can_kick':["L'un de vos rôles est autorisé à utiliser cette commande (`kick`)","Rôle autorisé manquant (`kick`)"],
                 'can_slowmode':["L'un de vos rôles est autorisé à utiliser cette commande (`slowmode`)","Rôle autorisé manquant (`slowmode`)"],
                 'can_clear':["L'un de vos rôles est autorisé à utiliser cette commande (`clear`)","Rôle autorisé manquant (`clear`)"],
+                'can_say':["L'un de vos rôles est autorisé à utiliser cette commande (`say`)","Rôle autorisé manquant (`say`)"],
+                'can_use_cookie':["Vous êtes un élu de chez Aragorn1202","Cette commande est sur Whitelist"],
                 'has_admin':["Vous avez la permission 'Administrateur'","Permission 'Administrateur' manquante"],
                 'has_manage_msg':["Vous avez la permission 'Gérer les messages'","Permission 'Gérer les messages' manquante"],
                 'has_manage_guild':["Vous avez la permission 'Gérer le serveur'","Permission 'Gérer le serveur' manquante"],
                 'has_manage_roles':["Vous avez la permission 'Gérer les rôles'","Permission 'Gérer les rôles' manquante"],
                 'has_manage_nicknames':["Vous avez la permission 'Gérer les pseudos'","Permission 'Gérer les pseudos' manquante"],
+                'has_embed_links':['Vous avez la permission "Intégrer des liens"','Vous devez avoir la permission "Intégrer des liens"'],
                 'guild_only':['Utilisable uniquement dans un serveur']*2,
                 'can_edit_case':["L'un de vos rôles est autorisé à utiliser cette commande (`warn`)","Rôle autorisé manquant (`warn`)"],
                 'is_support_staff':['Vous faites partie du staff du bot','Vous devez faire partie du staff du bot'],
                 'is_fun_enabled':['Les commandes de fun sont activées','Les commandes de fun doivent être activées'],
                 'can_use_rss':["Vous avez la permission 'Administrateur'","Permission 'Administrateur' manquante"],
                 'is_owner':['Il faut être le propriétaire du bot',"Vous n'êtes pas le propriétaire du bot"],
-                'bot_has_permissions':["Le bot possède les permissions suffisantes","Le bot ne possède pas les permissions suffisantes"]}
+                'bot_has_permissions':["Le bot possède les permissions suffisantes","Le bot ne possède pas les permissions suffisantes"],
+                'has_permissions':["Vous avez les permissions Discord suffisantes","Vous n'avez pas les permissions Discord suffisantes"],
+                'verify_role_exists':["Un rôle de vérification est configuré","Aucun rôle de vérification n'a été configuré"],
+                'is_translator':["Vous faites bien partie de l'équipe de traducteurs","Vous devez faire partie de l'équipe de traducteurs"]}
         }
 
 blurple = {'check_intro':"{}, début de l'analyse blurple (Notez que cela peut prendre un certain temps)",
@@ -68,8 +74,8 @@ Ce module vous sert à configurer un message automatique à chaque fois qu'un me
 
 __**La configuration**__
 
-`1-` Pour configurer le salon où ces messages s'écrivent, entrez `!config change welcome_channel` suivi de l'identifiant du salon (clic droit -> "Copier l'identifiant" pour ordinateur, ou rester appuyez sur le salon -> "Copier l'identifiant" pour téléphone, mais il vous faudra avoir activé le mode développeur pour obtenir cette option).
-`2-` Pour configurer un message, entrez `!config change <welcome|leave> <message>`. Pour ce message vous pouvez utiliser les variables suivantes :
+`1-` Pour configurer le salon où ces messages s'écrivent, entrez `{p}config change welcome_channel` suivi du salon (vous pouvez utiliser aussi bien sa mention que son identifiant ou son nom complet).
+`2-` Pour configurer un message, entrez `{p}config change <welcome|leave> <message>`. Pour ce message vous pouvez utiliser les variables suivantes :
  - `{user}` mentionne le membre
  - `{server}` affiche le nom du serveur
  - `{owner}` affiche le nom du propriétaire du serveur
@@ -105,10 +111,13 @@ errors={"cooldown":"Vous êtes en cooldown pour cette commande. Veuillez attendr
         "invalidcolor":"La couleur `{c}` est invalide",
         "invalidinvite":"Invitation de bot ou de serveur invalide : `{i}`",
         "invalidguild":"Ce serveur est introuvable : `{g}`",
-        "invalidurl":"Url invalide : `{u}`",
         "invalidleaderboard":"Type de classement inexistant",
+        "invalidurl":"Url invalide : `{u}`",
+        "invalidisbn":"ISBN invalide",
+        "invalidemoji":"Emoji invalide",
         'channotfound':"Le salon {c} est introuvable",
         'DM':"Cette commande est indisponible en Messages Privés",
+        "emojinotfound":"Emoji `{e}` introuvable",
         }
 
 find={"user-0":"Nom : {}\nID : {}",
@@ -180,7 +189,10 @@ fun={"count-0":"Comptage en cours...",
                 "Le saviez-vous ?  Tous les designs relatifs au bot sont réalisés par Adri526#9223, dont l'énorme liste d'émojis utilisés dans la commande `bigtext` !",
                 "Le saviez-vous ? ZBot tiens son nom... de son créateur, Z_runner",
                 "Pro-tip : Le bot possède un Discord, où vous pourrez voir les bugs actuels et voter pour les prochaines mises à jour ! Utilisez la commande `about` pour en obtenir le lien",
-                "Pro-tip : la commande `prefix` permet d'avoir la liste des préfixes actuellement utilisables dans le serveur"
+                "Pro-tip : la commande `prefix` permet d'avoir la liste des préfixes actuellement utilisables dans le serveur",
+                "Le saviez-vous ? Vous pouvez donner une description de votre serveur qui pourra être utilisée dans d’autres serveurs, via l’option `description` de la commande `config`",
+                "Le saviez-vous ? Lors de certains événements spéciaux, il est possible d'obtenir des cartes d'xp collector. N'oubliez pas de suivre les news via le serveur officiel !",
+                "> Cela aussi passera\n*(vous avez la référence ?)*"
                 ],
         "markdown":r"""__**Règles du Markdown** sur *Discord*__
 
@@ -288,6 +300,19 @@ kill={"list":["Oh toi, tu vas mourir !",
         "Il ne fallait pas écouter la jolie mélodie de la Lullaby, {1} :musical_note:",
         "{2}.exe *a cessé de fonctionner*"
         ]}
+
+library={"book_pres":"""Titre : {title}
+Sous-titre : {subtitle}
+Auteur(s) : {author}
+Editeur : {publisher}
+Date de publication : {publication}
+Langue de publication : {language}
+Nombre de pages : {pages}
+
+ISBN : {isbn}""",
+        "no-found":"Impossible de trouver un livre correspondant",
+        "price":"Prix",
+        }
 
 logs={"slowmode-enabled":"Slowmode activé dans le salon {channel} ({seconds}s)",
         "slowmode-disabled":"Slowmode désactivé dans le salon {channel}",
@@ -408,10 +433,27 @@ modo={"slowmode-0":"Le slowmode est désormais désactivé dans ce salon.",
         "em-private":"[Restreint]",
         "em-list-title":"Emojis du serveur {}",
         "tempmute-1":"Le membre {} a bien été réduit au silence pour la raison `{}`, pendant {} !",
-        "role-high":"Oups, ce rôle est trop haut pour que je puisse le modifier. Merci de déplacer mon rôle au-dessus du rôle `{}` avant de réessayer :confused:",
+        "role-high":"Oups, ce rôle est trop haut pour que je puisse le modifier. Merci de déplacer mon rôle au-dessus du rôle `{r}` avant de réessayer :confused:",
         'role-color':'Le rôle {} a changé de couleur !',
         'unhoisted':'{c} surnoms édités !',
         'missing-manage-nick':"Oups, il me manque la permission \"Gérer les pseudos\"",
+        'verify_questions':{'Combien font 2+7 ?':'9',
+                'Que donne le produit de 2 par 3 ?':'6',
+                'Lequel de ces mots commence par P ? `poussin`, `corbeau`, `hirondelle`':'poussin',
+                'Combien de côtés possède un carré ?':'4',
+                'Quel est le résultat de 10-6 ?':'4',
+                'Quelle est la première lettre de `Zbot` ?':'z',
+                'Quel est le discriminant situé après votre pseudo discord ?':'_special_userdiscrim',
+                "Comment s'appelle le système d'exploitation des téléphones de la marque Apple ?":'iOS',
+                "Comment s'appelle le système d'exploitation des téléphones de la marque Samsung ? ":'Android',
+                "Quel est le nom du pain français connu partout dans le monde ? (un seul mot)":"baguette",
+                'Quel est le nom de ce serveur ?':'_special_servername',
+                "L'émoji :pig: représente : un insecte, légume, animal ?":'animal',
+                'Lequel de ces mots désigne un fruit ? pizza, pomme, dinosaure':'pomme',
+                'Quel est le résultat du produit de deux et cinq ? (en lettres)':'dix',
+                'Quelle forme géométrique possède 3 côtés ?':'triangle'},
+        'verify-role-high':"Oups, il semble que le rôle `{r}` soit trop haut pour que je puisse le donner. Veuillez placer ce rôle plus bas que le mien, ou placer mon rôle au-dessus.",
+        'backup-done':"Sauvegarde terminée !",
         }
 
 morpion={'user-begin':'{}, à toi de commencer !',
@@ -450,7 +492,22 @@ partners={'invalid-bot':"Impossible de trouver ce bot",
         }
 
 perms={"perms-0":"Le membre/rôle {} n'a pas été trouvé",
-        "perms-1":"**Permission de '{}' :**\n\n"
+        "perms-1":"**Permission de '{}' :**\n\n",
+        "general":"Permissions générales"
+        }
+
+roles_react={"already-1-rr":"Vous avez déjà un rôle désigné pour cet émoji",
+        "too-many-rr":"Vous avez déjà atteint la limite de {l} rôles",
+        "rr-added":"Le rôle {r} a bien été ajouté pour l'émoji {e}",
+        "no-rr":"Aucun rôle n'est lié à cet émoji",
+        "rr-removed":"Le rôle {r} ne peut plus être donné via l'émoji {e}",
+        "rr-list":"Liste des rôles réactions ({n}/{m})",
+        "already-have":"Vous avez déjà ce rôle",
+        "already-dont-have":"Vous n'avez pas ce rôle",
+        "role-given":"Le rôle {r} a bien été donné",
+        "role-not-in-list":"Ce rôle ne fait pas partie des rôles attribuables",
+        "rr-embed":"S'attribuer un rôle",
+        "role-lost":"Le rôle {r} a bien été retiré"
         }
 
 rss={"yt-help":"Pour rechercher une chaîne youtube, vous devez entrer l'identifiant de cette chaîne. Vous la trouverez à la fin de l'url de la chaine, elle peut être soit le nom, soit une suite de caractères aléatoires. \
@@ -724,7 +781,6 @@ xp = {'card-level':'NIVEAU',
         'rr-removed':"Plus aucun rôle ne sera donné pour le niveau {}",
         'too-many-rr':"Vous avez déjà {} rôles, vous ne pouvez pas en ajouter plus !",
         'rr-reload':"{} rôles mis à jour / {} membres scannés",
-        'no-mee6':"Oups, vous avez configuré le type de système d'xp pour utiliser celui de MEE6, mais ce bot n'est pas dans le serveur ! Changez le type de système (`{}config change xp_type` suivit du nom du système), ou invitez MEE6 ici.",
         'change-global-xp':"Impossible d'éditer l'XP du système global !",
         'change-xp-ok':"L'XP de l'utilisateur {user} a bien été mis à {xp} points !",
         'no-bot':"Impossible de modifier l'XP d'un bot !"

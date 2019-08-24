@@ -301,6 +301,17 @@ class UtilitiesCog(commands.Cog):
         if parameters==None:
             return False
         return parameters['support']
+    
+    async def is_partner(self,user):
+        """Check if a user is support staff"""
+        parameters = None
+        try:
+            parameters = await self.get_db_userinfo(criters=["userID="+str(user.id)],columns=['partner'])
+        except Exception as e:
+            await self.bot.cogs["Errors"].on_error(e,None)
+        if parameters==None:
+            return False
+        return parameters['partner']
 
     async def is_contributor(self,user):
         """Check if a user is a contributor"""
@@ -366,18 +377,20 @@ class UtilitiesCog(commands.Cog):
         """Retourne la liste des styles autorisées pour la carte d'xp de cet utilisateur"""
         liste = ['blue','dark','green','grey','orange','purple','red','turquoise','yellow']
         liste2 = []
+        if await self.bot.cogs['AdminCog'].check_if_admin(user):
+            liste2.append('admin')
         if await self.is_support(user):
             liste2.append('support')
         if await self.is_contributor(user):
             liste2.append('contributor')
+        if await self.is_partner(user):
+            liste2.append('partner')
         if await self.is_premium(user):
             liste2.append('premium')
-        if await self.bot.cogs['AdminCog'].check_if_admin(user):
-            liste2.append('admin')
-        if await self.has_rainbow_card(user):
-            liste.append('rainbow')
         if await self.has_blurple_card(user):
             liste.append('blurple')
+        if await self.has_rainbow_card(user):
+            liste.append('rainbow')
         return sorted(liste2)+sorted(liste)
 
     async def get_languages(self,user,limit=0):
@@ -385,15 +398,16 @@ class UtilitiesCog(commands.Cog):
         If limit=0, return every languages"""
         languages = list()
         disp_lang = list()
+        available_langs = self.bot.cogs['LangCog'].languages
         for s in self.bot.guilds:
             if user in s.members:
                 lang = await self.bot.cogs["ServerCog"].find_staff(s.id,'language')
                 if lang==None:
-                    lang = self.bot.cogs['ServerCog'].default_language
+                    lang = available_langs.index(self.bot.cogs['ServerCog'].default_language)
                 languages.append(lang)
         for e in range(len(self.bot.cogs['LangCog'].languages)):
             if languages.count(e)>0:
-                disp_lang.append((self.bot.cogs['LangCog'].languages[e],round(languages.count(e)/len(languages),2)))
+                disp_lang.append((available_langs[e],round(languages.count(e)/len(languages),2)))
         disp_lang.sort(key = operator.itemgetter(1))
         if limit==0:
             return disp_lang

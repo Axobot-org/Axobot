@@ -26,6 +26,7 @@ And to join our official support server, `click on this link <https://discord.gg
    infos
    minecraft
    rss
+   roles-reactions
    fun
    miscellaneous
 

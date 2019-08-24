@@ -3,7 +3,7 @@
 
 def check_libs():
     count = 0
-    for m in ["mysql","discord","frmc_lib","aiohttp","requests","re","asyncio","datetime","time","importlib","traceback","sys","logging","sympy","psutil","platform","subprocess",'json','emoji','imageio','geocoder','tzwhere','pytz','dbl']:
+    for m in ["mysql","discord","frmc_lib","aiohttp","requests","re","asyncio","datetime","time","importlib","traceback","sys","logging","psutil","platform","subprocess",'json','emoji','imageio','geocoder','tzwhere','pytz','dbl','twitter']:
         try:
             exec("import "+m)
             exec("del "+m)
@@ -92,7 +92,7 @@ class zbot(commands.bot.BotBase,discord.Client):
             if self._cnx[0][0] != None:
                 self._cnx[0][0].close()
             self.log.debug('Connection à MySQL (user {})'.format(self.database_keys['user']))
-            self._cnx[0][0] = mysql.connector.connect(user=self.database_keys['user'],password=self.database_keys['password'],host=self.database_keys['host'],database=self.database_keys['database1'],buffered=True)
+            self._cnx[0][0] = mysql.connector.connect(user=self.database_keys['user'],password=self.database_keys['password'],host=self.database_keys['host'],database=self.database_keys['database1'],buffered=True,charset='utf8mb4',collation='utf8mb4_unicode_ci')
             self._cnx[0][1] = round(time.time())
         else:
             raise ValueError(dict)
@@ -172,15 +172,18 @@ def main():
                       'fcts.events',
                       'fcts.fun',
                       'fcts.infos',
+                      'fcts.library',
                       'fcts.mc',
                       'fcts.moderation',
                       'fcts.morpion',
                       'fcts.partners',
                       'fcts.perms',
                       'fcts.reloads',
-                      'fcts.rss',
+                      'fcts.roles_react',
+                      'fcts.rss2',
                       'fcts.server',
                       'fcts.timeclass',
+                      'fcts.translators',
                       'fcts.users',
                       'fcts.utilities',
                       'fcts.xp',           
@@ -206,6 +209,10 @@ def main():
         client.others['botsondiscord'] = cryptage.uncrypte(r[6])
         client.others['discordbotsgroup'] = cryptage.uncrypte(r[7])
         client.others['bitly'] = cryptage.uncrypte(r[8])
+        client.others['twitter'] = {'consumer_key':cryptage.uncrypte(r[9]),
+            'consumer_secret':cryptage.uncrypte(r[10]),
+            'access_token_key':cryptage.uncrypte(r[11]),
+            'access_token_secret':cryptage.uncrypte(r[12])}
     try:
         cnx = mysql.connector.connect(user=client.database_keys['user'],password=client.database_keys['password'],host=client.database_keys['host'],database=client.database_keys['database1'])
         cnx.close()

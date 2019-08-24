@@ -209,6 +209,27 @@ The main command to manage these roles is :code:`roles_rewards` (or its alias :c
 .. warning:: For these roles to work properly, the bot **must** have "Manage Roles" permission. The roles to be given or removed **must** also be lower than the role of Zbot in your server hierarchy (Server Settings > Roles tab).
 
 
+---------------------
+Anti-bot verification
+---------------------
+
+**How does it work?**
+
+The verification system works with a simple command and a role, and filters most of the selfbots that attack your servers.
+
+Zbot uses a list of random questions he asks the user to test it, and if the answer is correct, the user is removed from the defined role (if he has it). The command to type to "verify" is :code:`verify`, and to define which role to remove, it is the configuration option `verification_role`, configurable using the command :code:`config change verification_role <role>`.
+
+It is recommended to give this role to all new members via the `welcome_roles` option, then block access to the server for this role, in order to force the new members to check themselves.
+
+
+**List of commands:**
+:code:`verify`: ask a question to check the member
+:code:`config change verification_role <role>>` configures the role to be removed from the verified members
+
+
+.. warning:: For this system, the bot **must** have "`Manage Roles<perms.html#manage-roles>`_" permission. The roles to be removed **must** also be lower than the role of Zbot in your server hierarchy (Server Settings > Roles tab).
+
+
 
 --------------
 Miscellaneaous

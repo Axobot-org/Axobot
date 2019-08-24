@@ -6,7 +6,7 @@ import discord
 from discord.ext import commands
 from fcts import cryptage
 
-roles_options = ["clear","slowmode","mute","kick","ban","warn","say","welcome_roles","muted_role",'partner_role','update_mentions']
+roles_options = ["clear","slowmode","mute","kick","ban","warn","say","welcome_roles","muted_role",'partner_role','update_mentions','verification_role']
 bool_options = ["save_roles","enable_xp","anti_caps_lock","enable_fun","help_in_dm"]
 textchan_options = ["hunter","welcome_channel","bot_news","poll_channels","modlogs_channel","noxp_channels","partner_channel"]
 vocchan_options = ["membercounter"]
@@ -34,6 +34,8 @@ class ServerCog(commands.Cog):
             pass
         self.table = 'servers_beta' if bot.beta else 'servers'
         self.default_opt = {"rr_max_number":7,
+               "rss_max_number":10,
+               "roles_react_max_number":20,
                "language":1,
                "description":"",
                "clear":"",
@@ -67,7 +69,8 @@ class ServerCog(commands.Cog):
                "partner_channel":'',
                "partner_color":10949630,
                'partner_role':'',
-               'update_mentions':''}
+               'update_mentions':'',
+               'verification_role':''}
         self.optionsList = ["prefix","language","description","clear","slowmode","mute","kick","ban","warn","say","welcome_channel","welcome","leave","welcome_roles","bot_news","poll_channels","partner_channel","modlogs_channel","enable_xp","anti_caps_lock","enable_fun","membercounter","anti_raid","vote_emojis","help_in_dm","muted_role"]
 
     @commands.Cog.listener()
@@ -114,11 +117,12 @@ class ServerCog(commands.Cog):
         query = ("SELECT `language`,`ID` FROM `{}` WHERE 1".format(self.table))
         cursor.execute(query)
         liste,langs = list(), list()
+        guilds = [x.id for x in self.bot.guilds if x.id not in ignored_guilds]
         for x in cursor:
-            if x['ID'] not in ignored_guilds:
+            if x['ID'] in guilds:
                 liste.append(x['language'])
-        for _ in range(len(self.bot.guilds)-len(liste)-len(ignored_guilds)):
-            liste.append(self.default_language)
+        for _ in range(len(guilds)-len(liste)):
+            liste.append(self.bot.cogs['LangCog'].languages.index(self.default_language))
         for e,l in enumerate(self.bot.cogs['LangCog'].languages):
             langs.append((l,liste.count(e)))
         return langs
@@ -176,7 +180,7 @@ class ServerCog(commands.Cog):
         cnx = self.bot.cnx_frm
         cursor = cnx.cursor()
         for x in values:
-            if type(x) == bool:
+            if type(x[1]) == bool:
                 v.append("`{x[0]}`={x[1]}".format(x=x))
             else:
                 v.append("""`{x[0]}`="{x[1]}" """.format(x=x))
@@ -817,7 +821,7 @@ class ServerCog(commands.Cog):
                 await self.bot.cogs['ErrorsCog'].on_error(e,ctx)
 
             
-    @sconfig_main.command(name="reset",hidden=True)
+    @sconfig_main.command(name="reset")
     @commands.is_owner()
     async def admin_delete(self,ctx,ID:int):
         if await self.delete_server(ID):
