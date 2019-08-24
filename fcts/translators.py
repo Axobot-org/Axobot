@@ -16,8 +16,8 @@ class TranslatorsCog(commands.Cog):
     def __init__(self,bot:commands.Bot):
         self.bot = bot
         self.file = 'translators'
-        if not os.path.exists('fcts/translation/'):
-            os.makedirs('fcts/translation/')
+        if not os.path.exists('translation/'):
+            os.makedirs('translation/')
         self.translations = {'en':self.load_translation('en'),
             'fi':self.load_translation('fi')}
         try:
@@ -63,7 +63,7 @@ class TranslatorsCog(commands.Cog):
     
     def load_project(self,lang:str):
         result = dict()
-        with open('fcts/translation/'+lang+'.txt','r',encoding='utf-8') as f:
+        with open('translation/'+lang+'.txt','r',encoding='utf-8') as f:
             for line in f.readlines():
                 temp = line.split(' ')
                 result[temp[0]] = " ".join(temp[1:])
@@ -71,7 +71,7 @@ class TranslatorsCog(commands.Cog):
 
     async def modify_project(self,lang:str,key:str,new:str):
         """Modify a string inside the project file"""
-        with open('fcts/translation/'+lang+'.txt','a',encoding='utf-8') as f:
+        with open('translation/'+lang+'.txt','a',encoding='utf-8') as f:
             f.write(key+' '+new.replace('\n','\\n')+'\n')
         self.translations[lang][key] = new
 

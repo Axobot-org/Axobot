@@ -19,4 +19,4 @@ start2.py
 # Miscellaneous
 *.log
 ._*
-fcts/translation
+translation
