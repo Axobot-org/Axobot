@@ -132,7 +132,7 @@
         "no_database": "Jonkun ajan tietokannan alas käynnin takia, tämä komento on pois käytöstä"
     },
     "events": {
-        "mp-adv": "Sinä varmaan yrität kutsua minut tähän palvelimeen? Jos tämä on oikein, en voi liittyä helpolla kutsu linkillä. Järjestyksenvalvojan täytyy käyttää minun omaa kutsu linkkiä, täällä:<https://bot.discord.io/zbot> :wink:"
+        "mp-adv": "Sinä varmaan yrität kutsua minut tähän palvelimeen? Jos tämä on oikein, en voi liittyä helpolla kutsu linkillä. Järjestelmänvalvojan täytyy käyttää minun omaa kutsu linkkiä, täällä:<https://bot.discord.io/zbot> :wink:"
     },
     "errors": {
         "cooldown": "Olet jäähyllä tältä commandilta :confused:  Odota {d} lisää sekunttia...",
@@ -249,7 +249,7 @@
         "docs": "Tässä on linkki botin dokumenttiin:",
         "stats-title": "**Bot tilastot**",
         "stats": "**Bot versio:** {bot_v} \n**Kaikkien palvelimien numero missä olen:** {s_count} \n**Numero kaikista näkyvistä jäsenistä:** {m_count} ({b_count} **botit**)\n**Numero koodi riveistä:** {l_count}\n**Käytettyjä kieliä:** {lang}\n** {p_v} \n**Versio `discord.py`stä:** {d_v} \n**Ladataan RAMia:** {ram} GB \n**Ladataan CPU:ssa:** {cpu} % \n**API viive aika:** {api} ms\n**Kaikki xp kerätty:** {xp}",
-        "admins-list": "Järjestyksenvalvojat tälle botille ovat : {}",
+        "admins-list": "Järjestelmänvalvojat tälle botille ovat : {}",
         "prefix": "Lista kaikista käytettävissä olevista etuliitoista:",
         "discordlinks": {
             "Palvelin tila": "https://dis.gd/status",
@@ -375,7 +375,7 @@
         "perms-1": "**\"{}\" käyttöoikeudet:**\n\n"
     },
     "server": {
-        "config-help": "Tätä komentoa yleensä käytetään palvelimen konfigurointiin. Viestittämällä `!config see [option]` sinä aiot saada näyn tämänaikaisesta konfiguraatiosta, ja palvelimen järjestyksenvalvojat voivat viestittää `!config change <option> ominaisuus1, ominaisuus2...` jolla voi muuttaa konfigurointia, tai `!config del <option>` jolla voi asettaa uudelleen vaitoehdon (`!config change <option>` toimii samallain). Lista mahdollisista vaihtoehdoista löytyy täältä: <https://zbot.rtfd.io/en/latest/server.html#list-of-every-option>",
+        "config-help": "Tätä komentoa yleensä käytetään palvelimen konfigurointiin. Viestittämällä `!config see [option]` sinä aiot saada näyn tämänaikaisesta konfiguraatiosta, ja palvelimen järjestelmänvalvojat voivat viestittää `!config change <option> ominaisuus1, ominaisuus2...` jolla voi muuttaa konfigurointia, tai `!config del <option>` jolla voi asettaa uudelleen vaitoehdon (`!config change <option>` toimii samallain). Lista mahdollisista vaihtoehdoista löytyy täältä: <https://zbot.rtfd.io/en/latest/server.html#list-of-every-option>",
         "change-0": "Tämä vaihtoehto ei ole olemassa :confused:",
         "change-1": "Ups, sisäinen virhe tapahtui...",
         "change-2": "Vaihtoehto \"{}\" hinta on poistettu",
@@ -405,7 +405,7 @@
         "wrong-prefix": "Ups, näyttää siltä että tämä ei ole etuliite :thinking: Jos tämä jatkuu, valitse joku toinen",
         "opt_title": "Vaihtoehto \"{}\" palvelimesta {}",
         "not-found": "Palvelin {} ei ole vielä rekisteröity databaseen",
-        "need-admin": "Tarvitset Järjestyksenvalvoja käyttöoikeudet että voit käyttää tätä komentoa."
+        "need-admin": "Tarvitset järjestelmänvalvoja käyttöoikeudet että voit käyttää tätä komentoa."
     },
     "server_desc": {
         "prefix": "Tämän hetkinen botin etuliite: {}",
@@ -447,7 +447,7 @@
         "member-3": "Saapumis asento",
         "member-4": "Tila",
         "member-5": "Toiminta",
-        "member-6": "Järjestyksenvalvoja",
+        "member-6": "Järjestelmänvalvoja",
         "member-7": "Infractions",
         "role-0": "Tunniste",
         "role-1": "Väri",
