@@ -203,7 +203,7 @@ class PartnersCog(commands.Cog):
     async def give_roles(self,invite:discord.Invite,guild:discord.Guild):
         """Give a role to admins of partners"""
         if isinstance(invite.guild,discord.Guild):
-            if invite.guild.id == 356067272730607628 and self.bot.beta:
+            if guild.id == 356067272730607628 and self.bot.beta:
                 return
             roles = await self.bot.cogs['ServerCog'].find_staff(guild.id,'partner_role')
             roles = [x for x in [guild.get_role(int(x)) for x in roles.split(';') if len(x)>0 and x.isnumeric()] if x!=None]

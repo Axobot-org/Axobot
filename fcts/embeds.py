@@ -17,7 +17,7 @@ class EmbedCog(commands.Cog):
 
 
     class Embed:
-        def __init__(self,title="",desc="",url="",color=0,time=discord.Embed.Empty,footer_url="",footer_text="",thumbnail="",image="",author_name="",author_url="",author_icon="",fields=[]):
+        def __init__(self,title="",desc="",url="",color=0,time=discord.Embed.Empty,footer_url="",footer_text="",thumbnail="",image="",author_name="",author_url="",author_icon="",fields=None):
             self.title = title
             self.description = desc
             self.url = url
@@ -30,14 +30,19 @@ class EmbedCog(commands.Cog):
             self.author_name = author_name
             self.author_url = author_url
             self.author_icon = author_icon
-            self.fields = fields
-            for x in self.fields:
+            if fields==None:
+                fields = list()
+            for e,x in enumerate(fields):
                 if "inline" not in x.keys():
-                    x['inline'] = False
+                    fields[e]['inline'] = False
                 if "name" not in x.keys():
-                    x["name"] = "No name"
+                    fields[e]["name"] = "No name"
                 if "value" not in x.keys():
-                    x["value"] = "No value"
+                    fields[e]["value"] = "No value"
+            self.fields = fields
+        
+        def add_field(self,name="No name",value="No value",inline=False):
+            self.fields.append({'name':name,'value':value,'inline':inline})
         
         def update_timestamp(self):
             self.timestamp = datetime.datetime.utcnow()

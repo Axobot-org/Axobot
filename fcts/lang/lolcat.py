@@ -37,18 +37,23 @@ aide={"no-subcmd":"Teh kommand `{0.name}` had not sub~~scribe~~commanD",
                 'can_kick':["One of your roles iiz allowd to use this command (`kick`)","U missed allowed role (`kick`)"],
                 'can_slowmode':["One of your roles's authorized 2 use this command (`slowmode`)","U missed allowed role (`slowmode`)"],
                 'can_clear':["One of Ur roles is authorized to use this command (`clear`)","U missed allowed role (`clear`)"],
+                'can_say':["One of Ur roles is authorized to use this command (`say`)","U missed allowed role (`say`)"],
+                'can_use_cookie':["U are THE CHOOSEN ONE from Aragorn1202 :congrats:","This command is on Whitelist. aka NO U LMAO"],
                 'has_admin':["U have 'Administrator' permission","'Administrator' permission missed"],
                 'has_manage_msg':["You have 'Manage Messages' permission","'Manage Messages' permission missed"],
                 'has_manage_guild':["U have 'Manage Server' permission","'Manage Server' permission missed"],
                 'has_manage_roles':["You have 'Manage Roles' permission","'Manage Roles' permission missed"],
                 'has_manage_nicknames':["You have 'Manage Nicknames' permission","'Manage Nicknames' permission missed"],
+                'has_embed_links':['U haz "Embed links" thing','U need 2 b "Embed links" perms'],
                 'guild_only':['Can only be usd in a server']*2,
                 'can_edit_case':["One of UR roles is authorized to use this command (`warn`)","U missed allowed role (`warn`)"],
                 'is_support_staff':["You're a member of the bot staff",'U must be part of the bot staff'],
                 'is_fun_enabled':['Fun commands are enabled','Fun commands must be enabled'],
                 'can_use_rss':["U have 'Administrator' permission","'Administrator' permission is missed"],
                 'is_owner':["You must be the owner of the bot","You are not the owner of the bot"],
-                'bot_has_permissions':["The bot have enough perms", "The bot donot've sufficient perms"]}
+                'bot_has_permissions':["The bot have enough perms", "The bot donot've sufficient perms"],
+                'has_permissions':["U have enugh Discord permz","U donut has the right Discord things"],
+                'verify_role_exists':["A verification role hav bee setted up","No verification rol has been addd"]}
         }
 
 blurple = {'check_intro':'{}, starting blurple img analys (Plz note dat this may take one or two while)',
@@ -68,8 +73,8 @@ Dis modul is usd 2 configur a' automatic mesage each tiem membr enters or exits 
 
 __** ConfiGrationZ**__
 
-`1-` To configur teh channel wer thees mesagez 're writtn, entr `!config change welcome_channel` followd by teh channl ID (rite clik -> "Copy ID" 4 computer, or keep pressin on teh channel -> "Copy ID" 4 phone, but you w'll nede to have enabld teh developer mode to get dis optn).
-`2-` To configure a msg, entr `!config change <welcome|leave> <message>`. 4 dis mesage u can uz somm variabl':
+`1-` To configur teh channel wer thees mesagez 're writtn, entr `{p}config change welcome_channel` followd by teh channl ID (U can use it # as wellas its iD or its full nice name).
+`2-` To configure a msg, entr `{p}config change <welcome|leave> <message>`. 4 dis mesage u can uz somm variabl':
  - `{user}` mentionz teh member
  - `{server}` displayz the servr nayme
  - `{owner}` displayz teh servr ownr nam
@@ -105,10 +110,13 @@ errors={"cooldown":"Yu are on cold-own for dis comandZ :confused: Plize wait {d}
         "invalidcolor":"Ups, I can't find the color `{c}` :confused:",
         "invalidinvite":"Invalid bot/server link: `{i}`",
         "invalidguild":"Upsi, dat guild don't want to be find: {g}",
-        "invalidurl":"Nope, `{u}` iznt a valid ~~cat~~ link",
         "invalidleaderboard":"Not found levels table type",
+        "invalidurl":"Nope, `{u}` iznt a valid ~~cat~~ link",
+        "invalidisbn":"Invalid ISBN",
+        "invalidemoji":"INvalid smiley",
         'channotfound':"Super chat room {c} don't want 2 be found",
-        'DM':"Dat command isn't enabled in PM"
+        'DM':"Dat command isn't enabled in PM",
+        "emojinotfound":"Emoji `{e}` cannot found been",
         }
 
 find={"user-0":"naym: {}\nID: {}",
@@ -166,21 +174,23 @@ fun={"count-0":"Countng in progrez...",
                 "Pro-tip: you will find explanations of each command in the bot documentation, at https://zbot.rtfd.io Maybe even commands you didn't know about!",
                 "Did you know that? The results of the `stats` command hide some servers, such as bot list servers, or internal ones",
                 "Did you know that? This bot was originally designed for a server in a Minecraft community. That's where he made his name, and that's why he has commands on the theme of the game.",
-                "Did you know that? The first version of the bot was written in February 2018, for personal use. At the time there were only two or three easy commands to make, like `clear` and `say`",
+                "Did you know that? The first version of the bot was written in February 2018, for personal use. At the time there were only two or three easy commands 2 make, like `clear` and `say`",
                 "Pro-tip: With the `say` command, you can use the emojis from any server where Zbot is, even animated emojis! Just give the emoji as if you were using it yourself",
                 "Pro-tip: To use a custom emoji in the `react` command, just give its name. And it works with any emoji!",
                 "Pro-tip: With the command `me <text>`, you can make the bot say what you want, with your nickname in front of it! Like, for example, \"*Wumpus likes bananas*\".",
                 "Pro-tip: The command `roll Nothing; Nothing; Nothing; Nothing; Nothing; Nothing; Nothing; PAN !` allows you to play Russian roulette! Be careful with that, though, okay?",
-                "Pro-tip: If you need help, feel free to use the `osekour` command",
+                "Pro-tip: If you need help, feel free 2 use the `osekour` command",
                 "Did you know that? Sometimes, the levelup message mentions a random object. To do this, Aragorn1202 had to create a list of 60 of them, including 'a bicorne', 'a cookie' or 'a banana'!",
                 "Did you know that? In the past, Zbot's profile picture was... a creeper."
                 "Did you know that? The ZBot Staff is composed of a talented developer Admin, a second admin named after a kibble brand as well as a cat, a Ban hammer and a mushroom!",
                 "Pro-tip: The `say <text>` command is very useful for posting anonymous messages... at least when you have access to it."
                 "Pro-tip: The `discordlinks` command will give you all the useful links related to discord!",
-                "Did you know that?  All designs related to the bot are made by Adri526#9223, including the huge list of emojis used in the `bigtext` command!",
+                "Did you know that?  All designs related 2 the bot are made by Adri526#9223, including the huge list of emojis used in the `bigtext` command!",
                 "Did you know that? ZBot takes its name from.... its creator, Z_runner",
                 "Pro-tip: The bot has a Discord, where you can see the current bugs and vote for the next updates! Use the `about` command to get the invite",
-                "Pro-tip: the `prefix` command allows you to have a list of the prefixes currently usable in the server",
+                "Pro-tip: Teh `prefix` command allows you to have a list of the prefixes currently usable in the server",
+                "Did you know that? U can give a description of your server that can be used in other servers, via the `description` option of the `config` command",
+                "Did you know that? @ some special events, itz possible 2 obtain collector xp cards. Don't forget to follow the news on the officially cool server!"
                 ],
         "markdown":r"""__**Markdown Rules** on *Discord*__
 
@@ -288,6 +298,19 @@ kill={"list":["Hi ho ! Oh u, u gonna die!",
         "You shuldn't lissen 2 teh prety melodi ov teh Lullaby, {1} :musical_note:",
         "{2}.exe *has stopeD wurkin*"
         ]}
+
+library={"book_pres":"""Title: {title}
+Sub: {subtitle}
+Otaur(s): {author}
+Guy who printed: {publisher}
+Book date in your favorite store: {publication}
+Langu: {language}
+Page count: {pages}
+        
+ISBN : {isbn}""",
+        "no-found":"NOT abL 2 find lol book",
+        "price":"Coststs",
+        }
 
 logs={"slowmode-enabled":"Slwmod enable in {channel} ({seconds}s)",
         "slowmode-disabled":"Shlowmode disabld in {channel}",
@@ -408,10 +431,19 @@ modo={"slowmode-0":"Teh very-cold-mode is now disabld in this nize place.",
         "em-private":"[Restrictd]",
         "em-list-title":"Emojis of our super server",
         "tempmute-1":"Da member {} is muted 4 the raeson `{}`, for {}!",
-        "role-high":"Oops, tish role is 2 high for me to change. Move my role above the role `{}` be4 trying again, thx",
+        "role-high":"Oops, tish role is 2 high for me to change. Move my role above the role `{r}` be4 trying again, thx",
         'role-color':"Teh coulor of role {} haz bee'n changd!",
         'unhoisted':'{c} bad names edited!',
         'missing-manage-nick':"Oops, I'm missing the cool \"Manage nicknames\" perms! :sad:",
+        'verify_questions':{'What do 2+7?':'9',
+                'What does the product of 2 by 3 give?':'6',
+                'Which of these words begins with D? `bathtub`, `crow`, `galion` or `drawing`':'drawing',
+                'How many sides does a triangle have?':'3',
+                'What is the result of 10 minus 5?':'5',
+                'What is the first letter of `Zbot`?':'z',
+                'What is the name of this server?':'_special_servername'},
+        'verify-role-high':"Oops, that role `{r}` is toooooooo high 4 me 2 give it. Plz place it role lawer than mine, or place my role 'bove it :plz:",
+        'backup-done':"i wrote some things on tihs file. Don'ut ask me what plz.",
         }
 
 morpion={'user-begin':'{}, u begin!',
@@ -450,7 +482,22 @@ partners={'invalid-bot':"Unable 2 find tihs bot",
         }
 
 perms={"perms-0":"Membr/role {} not findz",
-        "perms-1":"**'{}' permissung:**\n\n"
+        "perms-1":"**'{}' permissung:**\n\n",
+        "general":"gLoBal pErmZ"
+        }
+
+roles_react={"already-1-rr":"U already has a designated role 4 this emoji",
+        "too-many-rr":"You have 'ready reached da limit ov {l} roles",
+        "rr-added":"Da role {r} has been added for the emoji {e}",
+        "no-rr":"NO role is related to this emoji",
+        "rr-removed":"The role {r} can no longer be given via the emoji {e}",
+        "rr-list":"lIsT 0v REacti0n RoLes ({n}/{m})",
+        "already-have":"yOu AlReADY HAVE ThIS rOLE",
+        "already-dont-have":"U don'ut have this role",
+        "role-given":"The role {r} has been given",
+        "role-not-in-list":"Tish role iz NOT part ov the giveable r0ls",
+        "rr-embed":"tAkInG on A ROle",
+        "role-lost":"ThE rolE {r} HAS BEeN reMoVEd fR0M yOUr ROLEs"
         }
 
 rss={"yt-help":"To seerch for a youtwube channel, you may enter the channil ID. You will found it at teh and of the strin url, it can be 8ther the nayme, or a strin of randem characteRs. \
@@ -684,16 +731,16 @@ xp = {'card-level':'LVL',
         "top-title-2":"Servr rnk",
         "top-name":"__Bests {}-{} ({}/{}):__",
         "default_levelup":["Hey, {user} has just reached **level {level}**! Keep this way!",
-                "Crossing to level {level}{user}. Attack and defense increased by 1.",
+                "Crossing to level {level}{user}. Attack and defense increased by 1."
                 "Thanks to this level {level}, you can finally use the legendary {random} user {user}",
                 "Speech level {level}, {user}. Be careful not to scream too loudly.",
-                "{user} is flying to the Top 1 with his level {level}!",
+                "{user} is flying to the Top 1 with their level {level}!",
                 "But, wouldn't it be a new level for {user}? Level {level}!",
                 "Summoner {user} at level {level}. New champions to be won.",
                 "{user} evolves to **{user} level {level}!**",
                 "Thanks to your level {level}, you have a new point of competence {user}.",
                 "You have gained {level} levels of experience {user}. Don't forget to use them before they're blown up by a creeper!",
-                "I wonder where I'm going to store the {level} of {user}. I'm going to end up with no more room for that many numbers...",
+                "I wonder where I'm going to store the level {level} of {user}. I'm going to end up with no more room for that many numbers...",
                 "Maybe you can finally get your souls back with your level {level}, {user}?",
                 "Don't forget to use the money earned from this level {level} to improve the ship, Captain {user}.",
                 "You are now level {level}, but justice does not yet rule the city, {user}...",
@@ -704,17 +751,17 @@ xp = {'card-level':'LVL',
                 "You may be level {level}, but your princess is still in another castle. ",
                 "The force is more powerful in you {user}, now that you are level {level}.",
                 "By dodging these millions of infernal bullets, {user} has passed level {level}.",
-                "The virus resistance of {user} has increased to {level}. Try not to be eaten by a zombie anyway.",
+                "The virus resistance of {user} has increased to level {level}. Try not to be eaten by a zombie anyway.",
                 "The assassin's discretion {user} has evolved to the level {level}. The brotherhood is counting on you.",
-                "Congratulations {user}, you are {level}. Remember to use {random} to keep improving.",
+                "Congratulations {user}, you are level {level}. Remember to use {random} to keep improving.",
                 "Thanks to the level {level}, you can try to win {random} at the raffle, {user} !",
-                "Despite your level, it is dangerous to travel alone {user}! Take {random} !",
-                "Level {level} for {user}! {random} is available from the seller!",
+                "Despite your level {level}, it is dangerous to travel alone {user}! Take {random} !",
+                "Level {level} for {user}, {random} is available from the seller!",
                 "Bravo {user}! You are now level {level}! However, it is still necessary to climb to obtain {random} legendary rarity...",
                 "Houston, we have a problem. {user} has passed level {level}!!!!!",
                 "You see, the world is divided into two categories: those who levelup and those who don't levelup. You {user}, you levelup to level {level}!!!!",
                 "*May the level {level} be with you, {user}.*",
-                ],
+        ],
         "levelup-items":["this guitar","this dagger","this hammer","this banana","this portal gun","this mushroom","this magic wand"," this craft table"," this cow", "this window", "this wallpaper", "this emoji", "this bubble gun","this bicorne", "this trident","this toilet","this bike", "this pizza", "this anvil","this spoon", "this cape", "this cookie", "this pen","this tea", "this balloon", "this sofa", "this caddy", "this barbecue", "this lightsaber","this pyjama", "this cookie","this dragon", "these marshmallows", "these croquettes", "this cute cat", "this yo-yo", "this demon","this hot chocolate", "these chips", "this French baguette", "this cheese","this ball","tish wool pelota"],
         "top-your":"Ur rank",
         'rr_list':"Roles list ({}/{})",
@@ -724,7 +771,6 @@ xp = {'card-level':'LVL',
         'rr-removed':"None role will be givn anymore for level #{}",
         'too-many-rr':"U already has {} roles rewards, you can't add more!",
         'rr-reload':"{} updated roles / {} members",
-        'no-mee6':"Oops, U configured the xp system 2 use the MEE6 system (u know, this nice blue bot?), but dis bot is not in ur server! Change teh system type (`{}config change xp_type` followd by the system naem), orr invite MEE6 here.",
         'change-global-xp':"NOT possible 2 edit XP of the global super mega system!",
         'change-xp-ok':"XP of teh user {user} have been set 2 {xp}xp!",
         'no-bot':"Impossible 2 modify the XP ov a robot!"

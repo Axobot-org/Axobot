@@ -13,10 +13,9 @@ class Events(commands.Cog):
         except:
             pass
         self.file = "events"
-        self.mee6_last_check = datetime.datetime.utcfromtimestamp(0)
         self.dbl_last_sending = datetime.datetime.utcfromtimestamp(0)
         self.partner_last_check = datetime.datetime.utcfromtimestamp(0)
-        self.mee6_stats_last = datetime.datetime.utcfromtimestamp(0)
+        self.loop_errors = [0,datetime.datetime.utcfromtimestamp(0)]
         self.embed_colors = {"welcome":5301186,
         "mute":4868682,
         "kick":16730625,
@@ -293,23 +292,25 @@ class Events(commands.Cog):
             if int(d.minute)%20 == 0:
                 await self.bot.cogs['XPCog'].clear_cards()
                 await self.rss_loop()
-            if int(d.hour)%4 == 0 and d.hour != self.mee6_last_check.hour:
-                await self.mee6_xp_loop()
             if int(d.hour)%7 == 1 and d.hour != self.partner_last_check.hour:
                 await self.partners_loop()
             if int(d.hour) == 0 and d.day != self.dbl_last_sending.day:
                 await self.dbl_send_data()
-            if int(d.hour) == 0 and d.day != self.mee6_stats_last.day:
-                await self.send_mee6_stats()
         except Exception as e:
-            await self.bot.cogs['ErrorCog'].on_error(e,None)
+            await self.bot.cogs['ErrorsCog'].on_error(e,None)
+            self.loop_errors[0] += 1
+            if (datetime.datetime.now() - self.loop_errors[1]).total_seconds() > 120:
+                self.loop_errors[0] = 0
+                self.loop_errors[1] = datetime.datetime.now()
+            if self.loop_errors[0] > 10:
+                await self.bot.cogs['ErrorsCog'].senf_err_msg(":warning: **Trop d'erreurs : ARRET DE LA BOUCLE PRINCIPALE** :warning:")
+                self.loop.cancel()
 
     @loop.before_loop
     async def before_loop(self):
         await self.bot.wait_until_ready()
         await asyncio.sleep(2)
         await self.rss_loop()
-        await self.mee6_xp_loop()
         self.bot.log.info("[tasks_loop] Lancement de la boucle")
 
 
@@ -317,42 +318,13 @@ class Events(commands.Cog):
         if self.bot.cogs['RssCog'].last_update==None or (datetime.datetime.now() - self.bot.cogs['RssCog'].last_update).total_seconds()  > 5*60:
             self.bot.cogs['RssCog'].last_update = datetime.datetime.now()
             asyncio.run_coroutine_threadsafe(self.bot.cogs['RssCog'].main_loop(),asyncio.get_running_loop())
-
-    async def mee6_xp_loop(self):
-        """Check roles rewards for every server which use MEE6 xp system"""
-        t = time.time()
-        counts = [0,0]
-        self.mee6_last_check = datetime.datetime.now()
-        l = await self.bot.cogs['ServerCog'].get_server(columns=['ID','xp_type'],criters=['xp_type=1'])
-        self.bot.log.info(f"[mee6-rewards] Lancement du check pour {len(l)} serveurs")
-        errors = list()
-        for guild in l:
-            g = self.bot.get_guild(guild['ID'])
-            if g!=None:
-                counts[0] += 1
-                try:
-                    temp = await self.bot.cogs['XPCog'].mee6_reload_rr(g)
-                    if isinstance(temp,list):
-                        counts[1] += temp[1]
-                    else:
-                        errors.append(guild['ID'])
-                except aiohttp.client_exceptions.ContentTypeError as e:
-                    await self.bot.cogs['ErrorsCog'].on_error(e,None)
-                    return
-                except Exception as e:
-                    await self.bot.cogs['ErrorsCog'].on_error(e,None)
-        desc = '**MEE6 rewards** updated in {}s ({} guilds / {} roles given)'.format(round(time.time()-t,3),counts[0],counts[1])
-        if len(errors)>0:
-            desc += "\n{} errors: {}".format(len(errors),' - '.join([str(x) for x in errors]))
-        emb = self.bot.cogs["EmbedCog"].Embed(desc=desc,color=6476789).update_timestamp().set_author(self.bot.user)
-        await self.bot.cogs["EmbedCog"].send([emb],url="loop")
     
     async def dbl_send_data(self):
         """Send guilds count to Discord Bots Lists"""
         if self.bot.beta:
             return
         t = time.time()
-        answers = ['None','None','None','None']
+        answers = ['None','None','None']
         self.bot.log.info("[DBL] Envoi des infos sur le nombre de guildes...")
         session = aiohttp.ClientSession(loop=self.bot.loop)
         # https://discordbots.org/bot/486896267788812288
@@ -382,31 +354,11 @@ class Events(commands.Cog):
         async with session.post('https://bots.ondiscord.xyz/bot-api/bots/{}/guilds'.format(self.bot.user.id), data=payload, headers=headers) as resp:
               self.bot.log.debug('BotsOnDiscord returned {} for {}'.format(resp.status, payload))
               answers[2] = resp.status
-        # https://discordbots.group/bot/486896267788812288
-        payload = json.dumps({
-          'server_count': len(self.bot.guilds)
-          })
-        headers = {
-              'Authorization': self.bot.others['discordbotsgroup'],
-              'content-type': 'application/json'
-          }
-        async with session.post('https://api.discordbots.group/v1/bot/{}'.format(self.bot.user.id), data=payload, headers=headers) as resp:
-              self.bot.log.debug('DiscordBotsGroup returned {} for {}'.format(resp.status, payload))
-              answers[3] = resp.status
         await session.close()
         answers = [str(x) for x in answers]
         emb = self.bot.cogs["EmbedCog"].Embed(desc='**Guilds count updated** in {}s ({})'.format(round(time.time()-t,3),'-'.join(answers)),color=7229109).update_timestamp().set_author(self.bot.user)
         await self.bot.cogs["EmbedCog"].send([emb],url="loop")
         self.dbl_last_sending = datetime.datetime.now()
-
-    async def send_mee6_stats(self):
-        """temporary log to see how many mee6api requests have been done"""
-        stats = self.bot.cogs['XPCog'].mee6_calls
-        t = await self.bot.cogs['TimeCog'].time_delta(round(time.time()-stats[0]))
-        emb = self.bot.cogs["EmbedCog"].Embed(desc='MEE6 api called {} times since {} ({}-{}-{})'.format(sum(stats[1:]),t,stats[1],stats[2],stats[3]))
-        emb.update_timestamp().set_author(self.bot.user)
-        await self.bot.cogs["EmbedCog"].send([emb],url="loop")
-        self.mee6_stats_last = datetime.datetime.now()
 
     async def partners_loop(self):
         """Update partners channels (every 7 hours)"""
@@ -427,303 +379,6 @@ class Events(commands.Cog):
                 count[1] += await self.bot.cogs['PartnersCog'].update_partners(chan,guild['partner_color'])
             except Exception as e:
                 await self.bot.cogs['ErrorsCog'].on_error(e,None)
-        emb = self.bot.cogs["EmbedCog"].Embed(desc='**Partners channels updated** in {}s ({} channels - {} partners)'.format(round(time.time()-t,3),count[0],count[1]),color=10949630).update_timestamp().set_author(self.bot.user)
-        await self.bot.cogs["EmbedCog"].send([emb],url="loop")
-        
-            
-
-    async def rss_loop(self):
-        if self.bot.cogs['RssCog'].last_update==None or (datetime.datetime.now() - self.bot.cogs['RssCog'].last_update).total_seconds()  > 5*60:
-            self.bot.cogs['RssCog'].last_update = datetime.datetime.now()
-            asyncio.run_coroutine_threadsafe(self.bot.cogs['RssCog'].main_loop(),asyncio.get_running_loop())
-
-    async def mee6_xp_loop(self):
-        """Check roles rewards for every server which use MEE6 xp system"""
-        t = time.time()
-        counts = [0,0]
-        self.mee6_last_check = datetime.datetime.now()
-        l = await self.bot.cogs['ServerCog'].get_server(columns=['ID','xp_type'],criters=['xp_type=1'])
-        self.bot.log.info(f"[mee6-rewards] Lancement du check pour {len(l)} serveurs")
-        errors = list()
-        for guild in l:
-            g = self.bot.get_guild(guild['ID'])
-            if g!=None:
-                counts[0] += 1
-                try:
-                    temp = await self.bot.cogs['XPCog'].mee6_reload_rr(g)
-                    if isinstance(temp,list):
-                        counts[1] += temp[1]
-                    else:
-                        errors.append(guild['ID'])
-                except aiohttp.client_exceptions.ContentTypeError as e:
-                    await self.bot.cogs['ErrorsCog'].on_error(e,None)
-                    return
-                except Exception as e:
-                    await self.bot.cogs['ErrorsCog'].on_error(e,None)
-        desc = '**MEE6 rewards** updated in {}s ({} guilds / {} roles given)'.format(round(time.time()-t,3),counts[0],counts[1])
-        if len(errors)>0:
-            desc += "\n{} errors: {}".format(len(errors),' - '.join([str(x) for x in errors]))
-        emb = self.bot.cogs["EmbedCog"].Embed(desc=desc,color=6476789).update_timestamp().set_author(self.bot.user)
-        await self.bot.cogs["EmbedCog"].send([emb],url="loop")
-    
-    async def dbl_send_data(self):
-        """Send guilds count to Discord Bots Lists"""
-        if self.bot.beta:
-            return
-        t = time.time()
-        answers = ['None','None','None','None']
-        self.bot.log.info("[DBL] Envoi des infos sur le nombre de guildes...")
-        session = aiohttp.ClientSession(loop=self.bot.loop)
-        # https://discordbots.org/bot/486896267788812288
-        payload = {'server_count': len(self.bot.guilds)}
-        async with session.post('https://discordbots.org/api/bots/486896267788812288/stats',data=payload,headers={'Authorization':str(self.bot.dbl_token)}) as resp:
-            self.bot.log.debug('discordbots.org returned {} for {}'.format(resp.status, payload))
-            answers[0] = resp.status
-        # https://divinediscordbots.com/bot/486896267788812288
-        payload = json.dumps({
-          'server_count': len(self.bot.guilds)
-          })
-        headers = {
-              'authorization': self.bot.others['divinediscordbots'],
-              'content-type': 'application/json'
-          }
-        async with session.post('https://divinediscordbots.com/bot/{}/stats'.format(self.bot.user.id), data=payload, headers=headers) as resp:
-              self.bot.log.debug('divinediscordbots statistics returned {} for {}'.format(resp.status, payload))
-              answers[1] = resp.status
-        # https://bots.ondiscord.xyz/bots/486896267788812288
-        payload = json.dumps({
-          'guildCount': len(self.bot.guilds)
-          })
-        headers = {
-              'Authorization': self.bot.others['botsondiscord'],
-              'Content-Type': 'application/json'
-          }
-        async with session.post('https://bots.ondiscord.xyz/bot-api/bots/{}/guilds'.format(self.bot.user.id), data=payload, headers=headers) as resp:
-              self.bot.log.debug('BotsOnDiscord returned {} for {}'.format(resp.status, payload))
-              answers[2] = resp.status
-        # https://discordbots.group/bot/486896267788812288
-        payload = json.dumps({
-          'server_count': len(self.bot.guilds)
-          })
-        headers = {
-              'Authorization': self.bot.others['discordbotsgroup'],
-              'content-type': 'application/json'
-          }
-        async with session.post('https://api.discordbots.group/v1/bot/{}'.format(self.bot.user.id), data=payload, headers=headers) as resp:
-              self.bot.log.debug('DiscordBotsGroup returned {} for {}'.format(resp.status, payload))
-              answers[3] = resp.status
-        await session.close()
-        answers = [str(x) for x in answers]
-        emb = self.bot.cogs["EmbedCog"].Embed(desc='**Guilds count updated** in {}s ({})'.format(round(time.time()-t,3),'-'.join(answers)),color=7229109).update_timestamp().set_author(self.bot.user)
-        await self.bot.cogs["EmbedCog"].send([emb],url="loop")
-        self.dbl_last_sending = datetime.datetime.now()
-
-    async def send_mee6_stats(self):
-        """temporary log to see how many mee6api requests have been done"""
-        stats = self.bot.cogs['XPCog'].mee6_calls
-        t = await self.bot.cogs['TimeCog'].time_delta(round(time.time()-stats[0]))
-        emb = self.bot.cogs["EmbedCog"].Embed(desc='MEE6 api called {} times since {} ({}-{}-{})'.format(sum(stats[1:]),t,stats[1],stats[2],stats[3]))
-        emb.update_timestamp().set_author(self.bot.user)
-        await self.bot.cogs["EmbedCog"].send([emb],url="loop")
-        self.mee6_stats_last = datetime.datetime.now()
-
-    async def partners_loop(self):
-        """Update partners channels (every 7 hours)"""
-        t = time.time()
-        self.partner_last_check = datetime.datetime.now()
-        channels_list = await self.bot.cogs['ServerCog'].get_server(criters=["`partner_channel`<>''"],columns=['ID','partner_channel','partner_color'])
-        self.bot.log.info("[Partners] Rafraîchissement des salons ({} serveurs prévus)...".format(len(channels_list)))
-        count = [0,0]
-        for guild in channels_list:
-            chan = guild['partner_channel'].split(';')[0]
-            if not chan.isnumeric():
-                continue
-            chan = self.bot.get_channel(int(chan))
-            if chan==None:
-                continue
-            count[0] += 1
-            count[1] += await self.bot.cogs['PartnersCog'].update_partners(chan,guild['partner_color'])
-        emb = self.bot.cogs["EmbedCog"].Embed(desc='**Partners channels updated** in {}s ({} channels - {} partners)'.format(round(time.time()-t,3),count[0],count[1]),color=10949630).update_timestamp().set_author(self.bot.user)
-        await self.bot.cogs["EmbedCog"].send([emb],url="loop")
-        
-            
-
-    async def add_task(self,guildID,userID,action,duration):
-        """Ajoute une tâche à la liste"""
-        tasks = await self.get_events_from_db(all=True)
-        for t in tasks:
-            if t['user']==userID and t['guild']==guildID and t['action']==action:
-                return await self.update_duration(t['ID'],duration)
-        cnx = self.bot.cnx_frm
-        cursor = cnx.cursor()
-        ids = await self.get_events_from_db(all=True,IDonly=True)
-        if len(ids)>0:
-            ID = max([x['ID'] for x in ids])+1
-        else:
-            ID = 0
-        query = ("INSERT INTO `timed` (`ID`,`guild`,`user`,`action`,`duration`) VALUES ({},{},{},'{}',{})".format(ID,guildID,userID,action,duration))
-        cursor.execute(query)
-        cnx.commit()
-        return True
-
-    async def update_duration(self,ID,new_duration):
-        """Modifie la durée d'une tâche"""
-        cnx = self.bot.cnx_frm
-        cursor = cnx.cursor()
-        query = ("UPDATE `timed` SET `duration`={} WHERE `ID`={}".format(new_duration,ID))
-        cursor.execute(query)
-        cnx.commit()
-        return True
-
-    async def remove_task(self,ID:int):
-        """Enlève une tâche exécutée"""
-        cnx = self.bot.cnx_frm
-        cursor = cnx.cursor()
-        query = ("DELETE FROM `timed` WHERE `timed`.`ID` = {}".format(ID))
-        cursor.execute(query)
-        cnx.commit()
-        return True
-
-    @tasks.loop(seconds=1.0)
-    async def loop(self):
-        try:
-            d = datetime.datetime.now()
-            if int(d.second)%20 == 0:
-                await self.check_tasks()
-            if int(d.minute)%20 == 0:
-                await self.bot.cogs['XPCog'].clear_cards()
-                await self.rss_loop()
-            if int(d.hour)%4 == 0 and d.hour != self.mee6_last_check.hour:
-                await self.mee6_xp_loop()
-            if int(d.hour)%7 == 1 and d.hour != self.partner_last_check.hour:
-                await self.partners_loop()
-            if int(d.hour) == 0 and d.day != self.dbl_last_sending.day:
-                await self.dbl_send_data()
-            if int(d.hour) == 0 and d.day != self.mee6_stats_last.day:
-                await self.send_mee6_stats()
-        except Exception as e:
-            await self.bot.cogs['ErrorCog'].on_error(e,None)
-
-    @loop.before_loop
-    async def before_loop(self):
-        await self.bot.wait_until_ready()
-        await asyncio.sleep(2)
-        await self.rss_loop()
-        await self.mee6_xp_loop()
-        self.bot.log.info("[tasks_loop] Lancement de la boucle")
-
-
-    async def rss_loop(self):
-        if self.bot.cogs['RssCog'].last_update==None or (datetime.datetime.now() - self.bot.cogs['RssCog'].last_update).total_seconds()  > 5*60:
-            self.bot.cogs['RssCog'].last_update = datetime.datetime.now()
-            asyncio.run_coroutine_threadsafe(self.bot.cogs['RssCog'].main_loop(),asyncio.get_running_loop())
-
-    async def mee6_xp_loop(self):
-        """Check roles rewards for every server which use MEE6 xp system"""
-        t = time.time()
-        counts = [0,0]
-        self.mee6_last_check = datetime.datetime.now()
-        l = await self.bot.cogs['ServerCog'].get_server(columns=['ID','xp_type'],criters=['xp_type=1'])
-        self.bot.log.info(f"[mee6-rewards] Lancement du check pour {len(l)} serveurs")
-        errors = list()
-        for guild in l:
-            g = self.bot.get_guild(guild['ID'])
-            if g!=None:
-                counts[0] += 1
-                try:
-                    temp = await self.bot.cogs['XPCog'].mee6_reload_rr(g)
-                    if isinstance(temp,list):
-                        counts[1] += temp[1]
-                    else:
-                        errors.append(guild['ID'])
-                except aiohttp.client_exceptions.ContentTypeError as e:
-                    await self.bot.cogs['ErrorsCog'].on_error(e,None)
-                    return
-                except Exception as e:
-                    await self.bot.cogs['ErrorsCog'].on_error(e,None)
-        desc = '**MEE6 rewards** updated in {}s ({} guilds / {} roles given)'.format(round(time.time()-t,3),counts[0],counts[1])
-        if len(errors)>0:
-            desc += "\n{} errors: {}".format(len(errors),' - '.join([str(x) for x in errors]))
-        emb = self.bot.cogs["EmbedCog"].Embed(desc=desc,color=6476789).update_timestamp().set_author(self.bot.user)
-        await self.bot.cogs["EmbedCog"].send([emb],url="loop")
-    
-    async def dbl_send_data(self):
-        """Send guilds count to Discord Bots Lists"""
-        if self.bot.beta:
-            return
-        t = time.time()
-        answers = ['None','None','None','None']
-        self.bot.log.info("[DBL] Envoi des infos sur le nombre de guildes...")
-        session = aiohttp.ClientSession(loop=self.bot.loop)
-        # https://discordbots.org/bot/486896267788812288
-        payload = {'server_count': len(self.bot.guilds)}
-        async with session.post('https://discordbots.org/api/bots/486896267788812288/stats',data=payload,headers={'Authorization':str(self.bot.dbl_token)}) as resp:
-            self.bot.log.debug('discordbots.org returned {} for {}'.format(resp.status, payload))
-            answers[0] = resp.status
-        # https://divinediscordbots.com/bot/486896267788812288
-        payload = json.dumps({
-          'server_count': len(self.bot.guilds)
-          })
-        headers = {
-              'authorization': self.bot.others['divinediscordbots'],
-              'content-type': 'application/json'
-          }
-        async with session.post('https://divinediscordbots.com/bot/{}/stats'.format(self.bot.user.id), data=payload, headers=headers) as resp:
-              self.bot.log.debug('divinediscordbots statistics returned {} for {}'.format(resp.status, payload))
-              answers[1] = resp.status
-        # https://bots.ondiscord.xyz/bots/486896267788812288
-        payload = json.dumps({
-          'guildCount': len(self.bot.guilds)
-          })
-        headers = {
-              'Authorization': self.bot.others['botsondiscord'],
-              'Content-Type': 'application/json'
-          }
-        async with session.post('https://bots.ondiscord.xyz/bot-api/bots/{}/guilds'.format(self.bot.user.id), data=payload, headers=headers) as resp:
-              self.bot.log.debug('BotsOnDiscord returned {} for {}'.format(resp.status, payload))
-              answers[2] = resp.status
-        # https://discordbots.group/bot/486896267788812288
-        payload = json.dumps({
-          'server_count': len(self.bot.guilds)
-          })
-        headers = {
-              'Authorization': self.bot.others['discordbotsgroup'],
-              'content-type': 'application/json'
-          }
-        async with session.post('https://api.discordbots.group/v1/bot/{}'.format(self.bot.user.id), data=payload, headers=headers) as resp:
-              self.bot.log.debug('DiscordBotsGroup returned {} for {}'.format(resp.status, payload))
-              answers[3] = resp.status
-        await session.close()
-        answers = [str(x) for x in answers]
-        emb = self.bot.cogs["EmbedCog"].Embed(desc='**Guilds count updated** in {}s ({})'.format(round(time.time()-t,3),'-'.join(answers)),color=7229109).update_timestamp().set_author(self.bot.user)
-        await self.bot.cogs["EmbedCog"].send([emb],url="loop")
-        self.dbl_last_sending = datetime.datetime.now()
-
-    async def send_mee6_stats(self):
-        """temporary log to see how many mee6api requests have been done"""
-        stats = self.bot.cogs['XPCog'].mee6_calls
-        t = await self.bot.cogs['TimeCog'].time_delta(round(time.time()-stats[0]))
-        emb = self.bot.cogs["EmbedCog"].Embed(desc='MEE6 api called {} times since {} ({}-{}-{})'.format(sum(stats[1:]),t,stats[1],stats[2],stats[3]))
-        emb.update_timestamp().set_author(self.bot.user)
-        await self.bot.cogs["EmbedCog"].send([emb],url="loop")
-        self.mee6_stats_last = datetime.datetime.now()
-
-    async def partners_loop(self):
-        """Update partners channels (every 7 hours)"""
-        t = time.time()
-        self.partner_last_check = datetime.datetime.now()
-        channels_list = await self.bot.cogs['ServerCog'].get_server(criters=["`partner_channel`<>''"],columns=['ID','partner_channel','partner_color'])
-        self.bot.log.info("[Partners] Rafraîchissement des salons ({} serveurs prévus)...".format(len(channels_list)))
-        count = [0,0]
-        for guild in channels_list:
-            chan = guild['partner_channel'].split(';')[0]
-            if not chan.isnumeric():
-                continue
-            chan = self.bot.get_channel(int(chan))
-            if chan==None:
-                continue
-            count[0] += 1
-            count[1] += await self.bot.cogs['PartnersCog'].update_partners(chan,guild['partner_color'])
         emb = self.bot.cogs["EmbedCog"].Embed(desc='**Partners channels updated** in {}s ({} channels - {} partners)'.format(round(time.time()-t,3),count[0],count[1]),color=10949630).update_timestamp().set_author(self.bot.user)
         await self.bot.cogs["EmbedCog"].send([emb],url="loop")
         

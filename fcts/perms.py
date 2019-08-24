@@ -7,6 +7,11 @@ class PermsCog(commands.Cog):
     def __init__(self,bot):
         self.bot = bot
         self.file = "perms"
+        chan_perms = [key for key,value in discord.Permissions().all_channel() if value]
+        self.perms_name = {'general':[key for key,value in discord.Permissions().general() if value],
+            'text':[key for key,value in discord.Permissions().text() if value],
+            'voice':[key for key,value in discord.Permissions().voice() if value]}
+        self.perms_name['common_channel'] = [x for x in chan_perms if x in self.perms_name['general']]
         try:
             self.translate = self.bot.cogs["LangCog"].tr
         except:
@@ -18,27 +23,32 @@ class PermsCog(commands.Cog):
 
     @commands.command(name='perms', aliases=['permissions'])
     @commands.guild_only()
-    async def check_permissions(self, ctx, *, target:typing.Union[discord.Member,discord.Role]=None):
+    async def check_permissions(self, ctx, channel:typing.Optional[typing.Union[discord.TextChannel,discord.VoiceChannel]]=None, *, target:typing.Union[discord.Member,discord.Role]=None):
         """Permissions assigned to a member/role (the user by default)
         The channel used to view permissions is the channel in which the command is entered."""
+        if target==None:
+            target = ctx.author
         if isinstance(target,discord.Member):
-            perms = target.guild_permissions
+            if channel==None:
+                perms = target.guild_permissions
+            else:
+                perms = channel.permissions_for(target)
             col = target.color
             avatar = await self.bot.user_avatar_as(target,size=256)
             name = str(target)
-        elif target == None :
-            perms = ctx.author.guild_permissions
-            col = ctx.author.color
-            avatar = await self.bot.user_avatar_as(ctx.author,size=256)
-            name = str(ctx.author)
         elif isinstance(target,discord.Role):
             perms = target.permissions
+            if channel != None:
+                perms.update(**{x[0]:x[1] for x in channel.overwrites_for(ctx.guild.default_role) if x[1]!=None})
+                perms.update(**{x[0]:x[1] for x in channel.overwrites_for(target) if x[1]!=None})
             col = target.color
             avatar = ctx.guild.icon_url_as(format='png',size=256)
             name = str(target)
         permsl = list()
         # Here we check if the value of each permission is True.
         for perm, value in perms:
+            if (perm not in self.perms_name['text']+self.perms_name['common_channel'] and isinstance(channel,discord.TextChannel)) or (perm not in self.perms_name['voice']+self.perms_name['common_channel'] and isinstance(channel,discord.VoiceChannel)):
+                continue
             perm = perm.replace('_',' ').title()
             if value:
                 permsl.append(self.bot.cogs['EmojiCog'].customEmojis['green_check']+perm)
@@ -52,7 +62,11 @@ class PermsCog(commands.Cog):
             # And to make it look nice, we wrap it in an Embed.
             f1 = {'name':'\uFEFF','value':"\n".join(permsl[:sep]),'inline':True}
             f2 = {'name':'\uFEFF','value':"\n".join(permsl[sep:]),'inline':True}
-            embed = ctx.bot.cogs['EmbedCog'].Embed(color=col,fields=[f1,f2]).create_footer(ctx.author)
+            if channel==None:
+                desc = await self.translate(ctx.guild.id,'perms','general')
+            else:
+                desc = channel.mention
+            embed = ctx.bot.cogs['EmbedCog'].Embed(color=col,fields=[f1,f2],desc=desc).create_footer(ctx.author)
             embed.author_name = name
             embed.author_icon = avatar
             await ctx.send(embed=embed.discord_embed())

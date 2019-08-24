@@ -148,7 +148,7 @@ class InfosCog(commands.Cog):
         if m!=None:
             await m.delete()
 
-    @commands.command(name="docs")
+    @commands.command(name="docs",aliases=['doc','documentation'])
     async def display_doc(self,ctx):
         """Get the documentation url"""
         text = str(self.bot.cogs['EmojiCog'].customEmojis['readthedocs']) + str(await self.translate(ctx.channel,"infos","docs")) + " https://zbot.rtfd.io"
@@ -203,6 +203,8 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
                 await self.category_info(ctx,item,lang)
             elif type(item) == discord.Guild:
                 await self.guild_info(ctx,item,lang,critical)
+            elif isinstance(item,discord.user.ClientUser):
+                await  self.member_infos(ctx,ctx.guild.me,lang,critical)
             else:
                 await ctx.send(str(type(item))+" / "+str(item))
         except Exception as e:
@@ -255,7 +257,7 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
             embed.add_field(name="Roles [{}]".format(len(list_role)), value = ", ".join(list_role), inline=False)
         else:
             embed.add_field(name="Roles [0]", value = await self.translate(ctx.guild.id,"activity","rien"), inline=False)
-        if critical_info:
+        if critical_info and not item.bot:
             embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","member-7"), value = await self.bot.cogs['CasesCog'].get_nber(item.id,ctx.guild.id),inline=True)
         if item.bot:
             session = aiohttp.ClientSession(loop=self.bot.loop)
@@ -469,7 +471,7 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
             embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","inv-2"), value=uses)
         if invite.max_age!=None:
             embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","inv-3"), value=str(invite.max_age) if invite.max_age != 0 else "∞")
-        if isinstance(invite.channel,(discord.PartialInviteChannel,discord.TextChannel)):
+        if isinstance(invite.channel,(discord.PartialInviteChannel,discord.abc.GuildChannel)):
             embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","guild-0"), value=str(invite.guild.name))
             embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","textchan-5"), value="#"+str(invite.channel.name))
             embed.set_thumbnail(url=invite.guild.icon_url)
@@ -537,7 +539,7 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
         disp_lang = str()
         for lang in await self.bot.cogs['UtilitiesCog'].get_languages(user):
             disp_lang += '{} ({}%)   '.format(lang[0],round(lang[1]*100))
-        await ctx.send(str(await self.translate(ctx.channel,"find","user-1")).format(name=user,id=user.id,servers=", ".join(servers_in),own=", ".join(owners),lang=disp_lang,vote=r,card=xp_card,rangs=" - ".join(perks)))
+        await ctx.send(str(await self.translate(ctx.channel,"find","user-1")).format(name=str(user) + ' <:BOT:544149528761204736>' if user.bot else '',id=user.id,servers=", ".join(servers_in),own=", ".join(owners),lang=disp_lang,vote=r,card=xp_card,rangs=" - ".join(perks)))
 
     @find_main.command(name="guild",aliases=['server'])
     async def find_guild(self,ctx,*,guild):

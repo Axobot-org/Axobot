@@ -72,6 +72,10 @@ class ErrorsCog(commands.Cog):
             r = re.search(r'Role \"([^\"]+)\" not found',raw_error)
             if r!=None:
                 return await ctx.send(await self.translate(ctx.channel,'errors','rolenotfound',r=r.group(1)))
+            # Emoji ":shock:" not found
+            r = re.search(r'Emoji \"([^\"]+)\" not found',raw_error)
+            if r!=None:
+                return await ctx.send(await self.translate(ctx.channel,'errors','emojinotfound',e=r.group(1)))
              # Colour "blue" is invalid
             r = re.search(r'Colour \"([^\"]+)\" is invalid',raw_error)
             if r!=None:
@@ -100,6 +104,14 @@ class ErrorsCog(commands.Cog):
             r = re.search(r'Invalid leaderboard type: (\S+)',raw_error)
             if r!=None:
                 return await ctx.send(await self.translate(ctx.channel,'errors','invalidleaderboard'))
+            # Invalid ISBN: lol
+            r = re.search(r'Invalid ISBN: (\S+)',raw_error)
+            if r!=None:
+                return await ctx.send(await self.translate(ctx.channel,'errors','invalidisbn'))
+            # Invalid emoji: lmao
+            r = re.search(r'Invalid emoji: (\S+)',raw_error)
+            if r!=None:
+                return await ctx.send(await self.translate(ctx.channel,'errors','invalidemoji'))
             print('errors -',error)
         elif isinstance(error,commands.MissingRequiredArgument):
             await ctx.send(await self.translate(ctx.channel,'errors','missingargument',a=error.param.name,e=random.choice([':eyes:','',':confused:',':thinking:',''])))
@@ -112,10 +124,10 @@ class ErrorsCog(commands.Cog):
             return
         else:
             try:
-                raw_error = raw_error.replace('@eveyrone','@​everyone').replace('@here','@​here')
+                raw_error = str(error).replace('@eveyrone','@​everyone').replace('@here','@​here')
                 await ctx.send("`ERROR:` {}".format(raw_error))
-            except:
-                self.bot.log.info("[on_cmd_error] Can't send error on channel {}".format(ctx.channel.id))
+            except Exception as newerror:
+                self.bot.log.info("[on_cmd_error] Can't send error on channel {}: {}".format(ctx.channel.id,newerror))
         # All other Errors not returned come here... And we can just print the default TraceBack.
         self.bot.log.warning('Ignoring exception in command {}:'.format(ctx.message.content))      
         await self.on_error(error,ctx)

@@ -1,5 +1,5 @@
 from discord.ext import commands
-import discord, re, datetime, random, json, os, typing, importlib, string
+import discord, re, datetime, random, json, os, typing, importlib, string, asyncio
 from fcts import checks, args
 importlib.reload(checks)
 importlib.reload(args)
@@ -710,7 +710,7 @@ You must be an administrator of this server to use this command."""
             await ctx.send(await self.translate(ctx.guild.id,"modo","cant-mute"))
             return
         if role.position >= ctx.guild.me.roles[-1].position:
-            await ctx.send(str(await self.translate(ctx.guild.id,"modo","role-high")).format(role.name))
+            await ctx.send(await self.translate(ctx.guild.id,"modo","role-high",r=role.name))
             return
         await role.edit(colour=color,reason="Asked by {}".format(ctx.author))
         await ctx.send(str(await self.translate(ctx.guild.id,'modo','role-color')).format(role.name))
@@ -764,7 +764,7 @@ ID corresponds to the Identifier of the message"""
     @commands.guild_only()
     @commands.check(checks.has_manage_nicknames)
     async def unhoist(self,ctx,chars=None):
-        """"Remove the special characters from usernames"""
+        """Remove the special characters from usernames"""
         count = 0
         if not ctx.channel.permissions_for(ctx.guild.me).manage_nicknames:
             return await ctx.send(await self.translate(ctx.guild.id,'modo','missing-manage-nick'))
@@ -790,6 +790,64 @@ ID corresponds to the Identifier of the message"""
             except:
                 pass
         await ctx.send(await self.translate(ctx.guild.id,'modo','unhoisted',c=count))
+    
+
+    async def find_verify_question(self,ctx:commands.Context) -> (str,str):
+        """Find a question/answer for a verification question"""
+        raw_info = await self.translate(ctx.guild,'modo','verify_questions')
+        q = random.choice(list(raw_info.keys()))
+        a = raw_info[q]
+        if a.startswith('_'):
+            if a=='_special_servername':
+                isascii = lambda s: len(s) == len(s.encode())
+                if isascii(ctx.guild.name):
+                    a = ctx.guild.name
+                else:
+                    return self.find_verify_question(ctx)
+            elif a=='_special_userdiscrim':
+                a = ctx.author.discriminator
+        return q,a
+
+    @commands.command(name="verify")
+    @commands.guild_only()
+    @commands.check(checks.verify_role_exists)
+    @commands.cooldown(5,120,commands.BucketType.user)
+    async def verify_urself(self,ctx:commands.Context):
+        """Verify yourself and loose the role"""
+        roles_raw = await ctx.bot.cogs['ServerCog'].find_staff(ctx.guild.id,"verification_role")
+        roles = [r for r in [ctx.guild.get_role(int(x)) for x in roles_raw.split(';') if x.isnumeric] if r!=None]
+        if not ctx.guild.me.guild_permissions.manage_roles:
+            return await ctx.send(await self.translate(ctx.guild.id,"modo","cant-mute"))
+        txt = str()
+        for role in roles:
+            if role.position > ctx.guild.me.roles[-1].position:
+                txt += await self.translate(ctx.guild.id,"modo","verify-role-high",r=role.name) + "\n"
+        if len(txt)>0:
+            return await ctx.send(txt)
+        del txt
+
+        q,a = await self.find_verify_question(ctx)
+        qu_msg = await ctx.send(ctx.author.mention+': '+q)
+        await asyncio.sleep(random.random()*1.3)
+        def check(m):
+            return m.author == ctx.author and m.channel == ctx.channel
+        try:
+            msg = await ctx.bot.wait_for('message', check=check, timeout=15)
+        except asyncio.TimeoutError:
+            await qu_msg.delete()
+        else:
+            if msg.content.lower() == a.lower():
+                try:
+                    await msg.delete()
+                except:
+                    pass
+                try:
+                    await ctx.author.remove_roles(*roles,reason="Verified")
+                except Exception as e:
+                    await self.bot.cogs['ErrorsCog'].on_cmd_error(ctx,e)
+            await qu_msg.delete()
+
+
 
     @commands.command(name='backup')
     @commands.guild_only()
@@ -883,7 +941,7 @@ ID corresponds to the Identifier of the message"""
                 os.makedirs('backup/')
             with open(directory,'w',encoding='utf-8') as file:
                 file.write(js)
-            await ctx.send('Terminé !',file=discord.File(directory))
+            await ctx.send(await self.translate(ctx.guild.id,'modo','backup-done'),file=discord.File(directory))
         except Exception as e:
             await ctx.bot.cogs['ErrorsCog'].on_cmd_error(ctx,e)
 

@@ -102,7 +102,7 @@ class WelcomerCog(commands.Cog):
         used_xp_type = await self.bot.cogs['ServerCog'].find_staff(member.guild.id,'xp_type')
         xp = await self.bot.cogs['XPCog'].bdd_get_xp(member.id, None if used_xp_type==0 else member.guild.id)
         if len(xp)==1:
-            await self.bot.cogs['XPCog'].give_rr(member.id,(await self.bot.cogs['XPCog'].calc_level(xp[0]['xp']))[0],await self.bot.cogs['XPCog'].rr_list_role(member.guild.id))
+            await self.bot.cogs['XPCog'].give_rr(member.id,(await self.bot.cogs['XPCog'].calc_level(xp[0]['xp'],used_xp_type))[0],await self.bot.cogs['XPCog'].rr_list_role(member.guild.id))
 
 
     async def kick(self,member,reason):
@@ -163,6 +163,8 @@ class WelcomerCog(commands.Cog):
                 role = member.guild.get_role(int(r))
                 if role != None:
                     await member.add_roles(role,reason=await self.translate(member.guild.id,"logs","d-welcome_roles"))
+        except discord.errors.NotFound:
+            pass
         except Exception as e:
             await self.bot.cogs["ErrorsCog"].on_error(e,None)
 

@@ -37,18 +37,23 @@ aide={"no-subcmd":"The command `{0.name}` has no subcommand",
                 'can_kick':["One of your roles is authorized to use this command (`kick`)","Missing allowed role (`kick`)"],
                 'can_slowmode':["One of your roles is authorized to use this command (`slowmode`)","Missing allowed role (`slowmode`)"],
                 'can_clear':["One of your roles is authorized to use this command (`clear`)","Missing allowed role (`clear`)"],
+                'can_say':["One of your roles is authorized to use this command (`say`)","Missing allowed role (`say`)"],
+                'can_use_cookie':["You are an chosen one from Aragorn1202","This command is on Whitelist"],
                 'has_admin':["You have 'Administrator' permission","'Administrator' permission missing"],
                 'has_manage_msg':["You have 'Manage Messages' permission","'Manage Messages' permission missing"],
                 'has_manage_guild':["You have 'Manage Server' permission","'Manage Server' permission missing"],
                 'has_manage_roles':["You have 'Manage Roles' permission","'Manage Roles' permission missing"],
                 'has_manage_nicknames':["You have 'Manage Nicknames' permission","'Manage Nicknames' permission missing"],
+                'has_embed_links':['You have the "Embed links" permission','You need to have "Embed links" permission'],
                 'guild_only':['Can only be used in a server']*2,
                 'can_edit_case':["One of your roles is authorized to use this command (`warn`)","Missing allowed role (`warn`)"],
                 'is_support_staff':['You are a member of the bot staff','You must be part of the bot staff'],
                 'is_fun_enabled':['Fun commands are enabled','Fun commands must be enabled'],
                 'can_use_rss':["You have 'Administrator' permission","'Administrator' permission is missing"],
                 'is_owner':["You must be the owner of the bot","You are not the owner of the bot"],
-                'bot_has_permissions':["The bot has sufficient permissions", "The bot does not have sufficient permissions"]}
+                'bot_has_permissions':["The bot has sufficient permissions", "The bot does not have sufficient permissions"],
+                'has_permissions':["You have the sufficient Discord permissions","You do not have the right Discord permissions"],
+                'verify_role_exists':["A verification role has been set up","No verification role has been added"]}
         }
 
 blurple = {'check_intro':'{}, starting blurple image analysis (Please note that this may take a while)',
@@ -68,8 +73,8 @@ This module is used to configure an automatic message each time a member enters 
 
 __** Configuration**__
 
-`1-` To configure the chat room where these messages are written, enter `!config change welcome_channel` followed by the channel ID (right click -> "Copy ID" for computer, or keep pressing on the channel -> "Copy ID" for phone, but you will need to have enabled the developer mode to get this option).
-`2-` To configure a message, enter `!config change <welcome|leave> <message>`. For this message you can use some variables:
+`1-` To configure the chat room where these messages are written, enter `{p}config change welcome_channel` followed by the channel (you can use its mention as well as its identifier or its full name).
+`2-` To configure a message, enter `{p}config change <welcome|leave> <message>`. For this message you can use some variables:
  - `{user}` mentions the member
  - `{server}` displays the server name
  - `{owner}` displays the server owner name
@@ -107,8 +112,11 @@ errors={"cooldown":"You are on cooldown for this command :confused: Please wait 
         "invalidguild":"This server can't be found: `{g}`",
         "invalidleaderboard":"Invalid leaderboard type",
         "invalidurl":"Invalid url: `{u}`",
+        "invalidisbn":"Invalid ISBN",
+        "invalidemoji":"Invalid emoji",
         'channotfound':"Channel {c} not found",
         'DM':"This command isn't available in Direct Messages",
+        "emojinotfound":"Emoji `{e}` not found",
         }
 
 find={"user-0":"name: {}\nID: {}",
@@ -289,6 +297,19 @@ kill={"list":["Oh you, you gonna to die!",
         "{2}.exe *has stopped working*"
         ]}
 
+library={"book_pres":"""Title: {title}
+Subtitle: {subtitle}
+Autor(s): {author}
+Publisher: {publisher}
+Publication date: {publication}
+Language: {language}
+Page count: {pages}
+        
+ISBN : {isbn}""",
+        "no-found":"Unable to find this book",
+        "price":"Price",
+        }
+
 logs={"slowmode-enabled":"Slowmode enabled in {channel} ({seconds}s)",
         "slowmode-disabled":"Slowmode disabled in {channel}",
         "clear":"{number} deleted messages in {channel}",
@@ -408,10 +429,25 @@ modo={"slowmode-0":"The slowmode is now disabled in this channel.",
         "em-private":"[Restricted]",
         "em-list-title":"Emojis of the server {}",
         "tempmute-1":"The member {} has been silenced for the reason `{}`, for {}!",
-        "role-high":"Oops, this role is too high for me to change. Please move my role above the role `{}` before trying again :confused:",
+        "role-high":"Oops, this role is too high for me to change. Please move my role above the role `{r}` before trying again :confused:",
         'role-color':'The role {} has changed color!',
         'unhoisted':'{c} edited nicknames!',
         'missing-manage-nick':"Oops, I'm missing the \"Manage nicknames\" permission!",
+        'verify_questions':{'What is 2+7?':'9',
+                'What does the product of 2 by 3 give?':'6',
+                'Which of these words begins with D? `bathtub`, `crow`, `galion` or `drawing`':'drawing',
+                'How many sides does a triangle have?':'3',
+                'What is the result of 10 minus 5?':'5',
+                'What is the first letter of `Zbot`?':'z',
+                'What is the name of this server?':'_special_servername',
+                "What is the name of the French bread known all over the world? (one word)":"baguette",
+                "What is the opposite color to black?":"white",
+                'What is the fourth cardinal point? North, south, east,...':'west',
+                'What does the emoji :pig: represent? a `fish`, `plant` or `pig`?':'pig',
+                'What geometric shape has 3 sides?':'triangle',
+                'How many seconds are there in a minute?':'60'},
+        'verify-role-high':"Oops, it seems that the role `{r}` is too high for me to give it. Please place this role lower than mine, or place my role above it.",
+        'backup-done':"Backup done!",
         }
 
 morpion={'user-begin':'{}, you begin!',
@@ -450,7 +486,22 @@ partners={'invalid-bot':"Unable to find this bot",
         }
 
 perms={"perms-0":"Member/role {} not found",
-        "perms-1":"**'{}' permissions:**\n\n"
+        "perms-1":"**'{}' permissions:**\n\n",
+        "general":"General permissions"
+        }
+
+roles_react={"already-1-rr":"You already have a designated role for this emoji",
+        "too-many-rr":"You have already reached the limit of {l} roles",
+        "rr-added":"The role {r} has been added for the emoji {e}",
+        "no-rr":"No role is related to this emoji",
+        "rr-removed":"The role {r} can no longer be given via the emoji {e}",
+        "rr-list":"List of reaction roles ({n}/{m})",
+        "already-have":"You already have this role",
+        "already-dont-have":"You don't have this role",
+        "role-given":"The role {r} has been given",
+        "role-not-in-list":"This role is not part of the attributable roles",
+        "rr-embed":"Taking on a role",
+        "role-lost":"The role {r} has been removed from your roles"
         }
 
 rss={"yt-help":"To search for a youtube channel, you must enter the channel ID. You will find it at the end of the string url, it can be either the name, or a string of random characters. \
@@ -693,28 +744,28 @@ xp = {'card-level':'LEVEL',
                 "{user} evolves to **{user} level {level}!**",
                 "Thanks to your level {level}, you have a new point of competence {user}.",
                 "You have gained {level} levels of experience {user}. Don't forget to use them before they're blown up by a creeper!",
-                "I wonder where I'm going to store the {level} of {user}. I'm going to end up with no more room for that many numbers...",
+                "I wonder how I'm going to store all of {user}'s xp... Already level {level}! I'm going to end up with no more room for that many numbers...",
                 "Maybe you can finally get your souls back with your level {level}, {user}?",
                 "Don't forget to use the money earned from this level {level} to improve the ship, Captain {user}.",
                 "You are now level {level}, but justice does not yet rule the city, {user}...",
                 "By dint of dying, you've gone beyond level {level}, {user}. Now, do that dungeon again and lower that boss.",
-                "You may be a level {level}{user}, but you'll still get eaten by a deer. Anyway, no one will regret you.",
+                "You may be a level {level} {user}, but you'll still get eaten by a deer. Anyway, no one will regret you.",
                 "Hey! Wake up {user}! You've gone up to level {level}! Hey!",
                 "{user} is level {level}, from eating mushrooms.",
                 "You may be level {level}, but your princess is still in another castle. ",
                 "The force is more powerful in you {user}, now that you are level {level}.",
                 "By dodging these millions of infernal bullets, {user} has passed level {level}.",
-                "The virus resistance of {user} has increased to {level}. Try not to be eaten by a zombie anyway.",
+                "The virus resistance of {user} has increased to level {level}. Try not to be eaten by a zombie anyway.",
                 "The assassin's discretion {user} has evolved to the level {level}. The brotherhood is counting on you.",
-                "Congratulations {user}, you are {level}. Remember to use {random} to keep improving.",
+                "Congratulations {user}, you are level {level}. Remember to use {random} to keep improving.",
                 "Thanks to the level {level}, you can try to win {random} at the raffle, {user} !",
-                "Despite your level, it is dangerous to travel alone {user}! Take {random} !",
+                "Despite your level {level}, it is dangerous to travel alone {user}! Take {random} !",
                 "Level {level} for {user}, {random} is available from the seller!",
                 "Bravo {user}! You are now level {level}! However, it is still necessary to climb to obtain {random} legendary rarity...",
                 "Houston, we have a problem. {user} has passed level {level}!!!!!",
                 "You see, the world is divided into two categories: those who levelup and those who don't levelup. You {user}, you levelup to level {level}!!!!",
                 "*May the level {level} be with you, {user}.*",
-                ],
+        ],
         "levelup-items":["this sword","this bow","this guitar","this dagger","this hammer","this banana","this portal gun","this mushroom","this shovel", "this shotgun","this magic wand"," this craft table"," this cow", "this window", "this wallpaper", "this emoji", "this bubble gun", "this wrench", "this hood", "this cap", "this bicorne", "this trident", "this lasso", "this purse", "this pin", "this bottle", "this tap", "this toilet","this bike", "this pizza", "this anvil", "this clothespin", "this spoon", "this cape", "this potion", "this pen", "this cushion", "this tractor", "this tea", "this balloon", "this sofa", "this caddy", "this barbecue", "this lightsaber","this pyjama", "this cookie", "this very", "this dragon", "these marshmallows", "these croquettes", "this grappling hook", "this yo-yo", "this demon", "this mechanical arm", "this hot chocolate", "these chips", "this French baguette", "this cheese", "this backpack", "this rock"],
         "top-your":"Your rank",
         'rr_list':"Roles rewards list ({}/{})",
@@ -724,7 +775,6 @@ xp = {'card-level':'LEVEL',
         'rr-removed':"No role will be given for level {} anymore",
         'too-many-rr':"You already have {} roles rewards, you can't add more!",
         'rr-reload':"{} updated roles / {} scanned members",
-        'no-mee6':"Oops, you have configured the xp system to use the MEE6 system, but this bot is not in the server! Change the system type (`{}config change xp_type` followed by the system name), or invite MEE6 here.",
         'change-global-xp':"Impossible to edit XP of the global system!",
         'change-xp-ok':"The XP of the user {user} has been set to {xp} points!",
         'no-bot':"Impossible to modify the XP of a bot!"
