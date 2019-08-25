@@ -714,7 +714,7 @@ class XPCog(commands.Cog):
             await asyncio.sleep(0.2)
         f_name = str(await self.translate(ctx.channel,'xp','top-name')).format((page-1)*20+1,i,page,max_page)
         # author
-        rank = await self.bdd_get_rank(ctx.author.id,ctx.guild if (Type=='guild' or xp_system_used!=1) else None)
+        rank = await self.bdd_get_rank(ctx.author.id,ctx.guild if (Type=='guild' or xp_system_used!=0) else None)
         if len(rank)==0:
             your_rank = {'name':"__"+await self.translate(ctx.channel,"xp","top-your")+"__",'value':await self.translate(ctx.guild,"xp","1-no-xp")}
         else:
