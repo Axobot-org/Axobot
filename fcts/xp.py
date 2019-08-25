@@ -58,7 +58,7 @@ class XPCog(commands.Cog):
         if msg.author.bot or msg.guild==None or not self.bot.xp_enabled:
             return
         used_xp_type = await self.bot.cogs['ServerCog'].find_staff(msg.guild.id,'xp_type')
-        if not ( await self.check_noxp(msg) or await self.bot.cogs['ServerCog'].find_staff(msg.guild.id,'enable_xp') ):
+        if not ( await self.check_noxp(msg) and await self.bot.cogs['ServerCog'].find_staff(msg.guild.id,'enable_xp') ):
             return
         if used_xp_type==0:
             await self.add_xp_0(msg)
@@ -79,7 +79,11 @@ class XPCog(commands.Cog):
             prev_points = self.cache['global'][msg.author.id][1]
         else:
             try:
-                prev_points = (await self.bdd_get_xp(msg.author.id,None))['xp']
+                prev_points = (await self.bdd_get_xp(msg.author.id,None))
+                if len(prev_points)>0:
+                    prev_points = prev_points[0]['xp']
+                else:
+                    prev_points = 0
             except:
                 prev_points = 0
         await self.bdd_set_xp(msg.author.id, giv_points, 'add')
@@ -102,7 +106,11 @@ class XPCog(commands.Cog):
             prev_points = self.cache[msg.guild.id][msg.author.id][1]
         else:
             try:
-                prev_points = (await self.bdd_get_xp(msg.author.id,msg.guild.id))['xp']
+                prev_points = (await self.bdd_get_xp(msg.author.id,msg.guild.id))
+                if len(prev_points)>0:
+                    prev_points = prev_points[0]['xp']
+                else:
+                    prev_points = 0
             except:
                 prev_points = 0
         await self.bdd_set_xp(msg.author.id, giv_points, 'add', msg.guild.id)
@@ -126,7 +134,11 @@ class XPCog(commands.Cog):
             prev_points = self.cache[msg.guild.id][msg.author.id][1]
         else:
             try:
-                prev_points = (await self.bdd_get_xp(msg.author.id,msg.guild.id))['xp']
+                prev_points = (await self.bdd_get_xp(msg.author.id,msg.guild.id))
+                if len(prev_points)>0:
+                    prev_points = prev_points[0]['xp']
+                else:
+                    prev_points = 0
             except:
                 prev_points = 0
         await self.bdd_set_xp(msg.author.id, giv_points, 'add', msg.guild.id)
