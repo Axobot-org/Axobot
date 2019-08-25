@@ -601,7 +601,10 @@ class XPCog(commands.Cog):
         try:
             if user==None:
                 user = ctx.author
-            xp_used_type = await self.bot.cogs['ServerCog'].find_staff(ctx.guild.id,'xp_type')
+            if ctx.guild != None:
+                xp_used_type = await self.bot.cogs['ServerCog'].find_staff(ctx.guild.id,'xp_type')
+            else:
+                xp_used_type = 0
             xp = await self.bdd_get_xp(user.id,None if xp_used_type==0 else ctx.guild.id)
             if xp==None or (isinstance(xp,list) and len(xp)==0):
                 if ctx.author==user:
