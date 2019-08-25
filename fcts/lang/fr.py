@@ -655,6 +655,7 @@ server_desc={"prefix":"Préfixe actuel du bot : {}",
         "partner_color":"Couleur de l'embed des partenaires : {}",
         "partner_role":"Rôle donné aux partenaires : {}",
         "update_mentions":"Rôles mentionnés lors d'une mise à jour du bot : {}",
+        "verification_role":"Rôles enlevés lorsqu'un joueur s'authentifie avec la commande `verify` : {}"
         }
 
 stats_infos={"not-found":"Impossible de trouver {N}",

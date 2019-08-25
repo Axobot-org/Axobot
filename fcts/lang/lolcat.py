@@ -645,6 +645,7 @@ server_desc={"prefix":"Currnt baot prfx: {}",
         "partner_color":"Coulor of partners box: {}",
         "partner_role":"Role givn 2 partners: {}",
         "update_mentions":"Roles pinged on teh bot changlog: {}",
+        "verification_role":"Roles removd when smone use !verify itself: {}"
         }
 
 stats_infos={"not-found":"Unable 2 found {N}",

@@ -737,7 +737,8 @@
         "partner_channel": "Channel where partners are sent: {}",
         "partner_color": "Color of partners embed: {}",
         "partner_role": "Role given to partners: {}",
-        "update_mentions": "Roles mentioned in the bot changelog: {}"
+        "update_mentions": "Roles mentioned in the bot changelog: {}",
+        "verification_role":"Roles removed when a user use the `verify` command: {}"
     },
     "stats_infos": {
         "not-found": "Unable to find {N}",
