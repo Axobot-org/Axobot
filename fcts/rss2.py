@@ -780,7 +780,10 @@ class RssCog(commands.Cog):
                 
         tweets_list_official = await self.get_tw_official(nom)
         tweets_ids = [x.id_str for x in tweets_list_official]
-        entries = [x for x in feeds.entries if x.link.split('/')[-1].replace('?p=v','') in tweets_ids]
+        try:
+            entries = [x for x in feeds.entries if hasattr(x,'link') and x.link.split('/')[-1].replace('?p=v','') in tweets_ids]
+        except:
+            entries = []
         if len(entries)==0:
             return await self.translate(guild,"rss","nothing")
         if len(entries)>1:
