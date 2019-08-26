@@ -30,9 +30,6 @@ yt_link={'grand_corbeau':'UCAt_W0Rgr33OePJ8jylkx0A',
          'aragorn1202':'UCjDG6KLKOm6_8ax--zgeB6Q'
          }
 
-guilds_limit_exceptions={"391968999098810388":30,
-        "356067272730607628":30}
-
 
 async def check_admin(ctx):
     return await ctx.bot.cogs['AdminCog'].check_if_admin(ctx)
@@ -47,7 +44,6 @@ class RssCog(commands.Cog):
 
     def __init__(self,bot):
         self.bot = bot
-        self.flow_limit = 10
         self.time_loop = 10
         self.time_between_flows_check = 0.15
         self.file = "rss"
@@ -242,12 +238,11 @@ class RssCog(commands.Cog):
         """Subscribe to a rss feed, displayed on this channel regularly"""
         if not ctx.bot.database_online:
             return await ctx.send(await self.translate(ctx.guild.id,"rss","no-db"))
-        if str(ctx.guild.id) in guilds_limit_exceptions.keys():
-            flow_limit = guilds_limit_exceptions[str(ctx.guild.id)]
-        else:
-            flow_limit = self.flow_limit
+        flow_limit = await self.bot.cogs['ServerCog'].find_staff(ctx.guild.id,'rss_max_number')
+        if flow_limit==None:
+            flow_limit = self.bot.cogs['ServerCog'].default_opt['rss_max_number']
         if len(await self.get_guild_flows(ctx.guild.id)) >= flow_limit:
-            await ctx.send(str(await self.translate(ctx.guild.id,"rss","flow-limit")).format(self.flow_limit))
+            await ctx.send(str(await self.translate(ctx.guild.id,"rss","flow-limit")).format(flow_limit))
             return
         identifiant = await self.parse_yt_url(link)
         if identifiant != None:
