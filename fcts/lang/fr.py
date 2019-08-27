@@ -618,7 +618,8 @@ l'option (`!config change <option> del` fonctionne de même).\nLa liste des opti
         "wrong-prefix":"Oups, il semble que ce préfixe est invalide :thinking: Si le problème persiste, veuillez en choisir un autre",
         "opt_title":"Option '{}' du serveur {}",
         "not-found":"Le serveur {} n'a pas encore été enregistré dans la base de donnée",
-        "need-admin":"Vous devez avoir les permissions Administrateur pour exécuter cette commande."
+        "need-admin":"Vous devez avoir les permissions Administrateur pour exécuter cette commande.",
+        "config-list":"Liste des options disponibles :{text}Plus d'information : {link}"
         }
 
 server_desc={"prefix":"Préfixe actuel du bot : {}",

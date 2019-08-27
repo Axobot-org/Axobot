@@ -7,8 +7,8 @@ from discord.ext import commands
 from fcts import cryptage
 
 roles_options = ["clear","slowmode","mute","kick","ban","warn","say","welcome_roles","muted_role",'partner_role','update_mentions','verification_role']
-bool_options = ["save_roles","enable_xp","anti_caps_lock","enable_fun","help_in_dm"]
-textchan_options = ["hunter","welcome_channel","bot_news","poll_channels","modlogs_channel","noxp_channels","partner_channel"]
+bool_options = ["enable_xp","anti_caps_lock","enable_fun","help_in_dm"]
+textchan_options = ["welcome_channel","bot_news","poll_channels","modlogs_channel","noxp_channels","partner_channel"]
 vocchan_options = ["membercounter"]
 text_options = ["welcome","leave","levelup_msg","description"]
 prefix_options = ['prefix']
@@ -716,6 +716,12 @@ class ServerCog(commands.Cog):
         else:
             return str(discord.Colour(value))
     
+    @sconfig_main.command(name='list')
+    async def sconfig_list(self,ctx):
+        """Get the list of every usable option"""
+        options = sorted(roles_options+bool_options+textchan_options+vocchan_options+text_options+prefix_options+emoji_option+numb_options+raid_options+xp_type_options+color_options)
+        await ctx.send(await self.translate(ctx.guild.id,'server','config-list',text="\n```\n-{}\n```\n".format('\n-'.join(options)),link="<https://zbot.readthedocs.io/en/latest/server.html#list-of-every-option>"))
+
     @sconfig_main.command(name="see")
     @commands.cooldown(1,10,commands.BucketType.guild)
     async def sconfig_see(self,ctx,option=None):

@@ -608,7 +608,8 @@ to modify configuraishun, or `!config del <option>` 2 reset teh option (`!config
         "wrong-prefix":"Oooops, it seemz dis prefix is no valid :thinking: If teh problem persists, plz choose a' other one",
         "opt_title":"Opzion '{}' of srver {}",
         "not-found":"Teh server {} haznt been registered yet in da data board",
-        "need-admin":"U need to be a Big Boss (admin) to get this cmd"
+        "need-admin":"U need to be a Big Boss (admin) to get this cmd",
+        "config-list": "List ov options cool taht u can use: {text}More info @ {link}"
         }
 
 server_desc={"prefix":"Currnt baot prfx: {}",

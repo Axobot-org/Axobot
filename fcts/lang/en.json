@@ -701,7 +701,8 @@
         "wrong-prefix": "Oops, it seems this prefix is invalid :thinking: If the problem persists, please choose another one",
         "opt_title": "Option \"{}\" of server {}",
         "not-found": "The server {} has not yet been registered in the database",
-        "need-admin": "You need Administrator permission to execute this command."
+        "need-admin": "You need Administrator permission to execute this command.",
+        "config-list": "List of available options: {text}More info at {link}"
     },
     "server_desc": {
         "prefix": "Current bot prefix: {}",
