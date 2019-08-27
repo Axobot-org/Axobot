@@ -58,7 +58,7 @@ class XPCog(commands.Cog):
         if msg.author.bot or msg.guild==None or not self.bot.xp_enabled:
             return
         used_xp_type = await self.bot.cogs['ServerCog'].find_staff(msg.guild.id,'xp_type')
-        if not ( await self.check_noxp(msg) or await self.bot.cogs['ServerCog'].find_staff(msg.guild.id,'enable_xp') ):
+        if not ( await self.check_noxp(msg) and await self.bot.cogs['ServerCog'].find_staff(msg.guild.id,'enable_xp') ):
             return
         if used_xp_type==0:
             await self.add_xp_0(msg)
@@ -79,7 +79,11 @@ class XPCog(commands.Cog):
             prev_points = self.cache['global'][msg.author.id][1]
         else:
             try:
-                prev_points = (await self.bdd_get_xp(msg.author.id,None))['xp']
+                prev_points = (await self.bdd_get_xp(msg.author.id,None))
+                if len(prev_points)>0:
+                    prev_points = prev_points[0]['xp']
+                else:
+                    prev_points = 0
             except:
                 prev_points = 0
         await self.bdd_set_xp(msg.author.id, giv_points, 'add')
@@ -102,7 +106,11 @@ class XPCog(commands.Cog):
             prev_points = self.cache[msg.guild.id][msg.author.id][1]
         else:
             try:
-                prev_points = (await self.bdd_get_xp(msg.author.id,msg.guild.id))['xp']
+                prev_points = (await self.bdd_get_xp(msg.author.id,msg.guild.id))
+                if len(prev_points)>0:
+                    prev_points = prev_points[0]['xp']
+                else:
+                    prev_points = 0
             except:
                 prev_points = 0
         await self.bdd_set_xp(msg.author.id, giv_points, 'add', msg.guild.id)
@@ -126,7 +134,11 @@ class XPCog(commands.Cog):
             prev_points = self.cache[msg.guild.id][msg.author.id][1]
         else:
             try:
-                prev_points = (await self.bdd_get_xp(msg.author.id,msg.guild.id))['xp']
+                prev_points = (await self.bdd_get_xp(msg.author.id,msg.guild.id))
+                if len(prev_points)>0:
+                    prev_points = prev_points[0]['xp']
+                else:
+                    prev_points = 0
             except:
                 prev_points = 0
         await self.bdd_set_xp(msg.author.id, giv_points, 'add', msg.guild.id)
@@ -589,7 +601,10 @@ class XPCog(commands.Cog):
         try:
             if user==None:
                 user = ctx.author
-            xp_used_type = await self.bot.cogs['ServerCog'].find_staff(ctx.guild.id,'xp_type')
+            if ctx.guild != None:
+                xp_used_type = await self.bot.cogs['ServerCog'].find_staff(ctx.guild.id,'xp_type')
+            else:
+                xp_used_type = 0
             xp = await self.bdd_get_xp(user.id,None if xp_used_type==0 else ctx.guild.id)
             if xp==None or (isinstance(xp,list) and len(xp)==0):
                 if ctx.author==user:
@@ -702,7 +717,7 @@ class XPCog(commands.Cog):
             await asyncio.sleep(0.2)
         f_name = str(await self.translate(ctx.channel,'xp','top-name')).format((page-1)*20+1,i,page,max_page)
         # author
-        rank = await self.bdd_get_rank(ctx.author.id,ctx.guild if (Type=='guild' or xp_system_used!=1) else None)
+        rank = await self.bdd_get_rank(ctx.author.id,ctx.guild if (Type=='guild' or xp_system_used!=0) else None)
         if len(rank)==0:
             your_rank = {'name':"__"+await self.translate(ctx.channel,"xp","top-your")+"__",'value':await self.translate(ctx.guild,"xp","1-no-xp")}
         else:

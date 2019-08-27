@@ -49,6 +49,7 @@ class LibCog(commands.Cog):
             url += f'+isbn:{isbn}' if len(keywords)>0 else f'_isbn:{isbn}'
         if language != None:
             url += f'&langRestrict={language}'
+        url += '&country=FR'
         async with aiohttp.ClientSession() as session:
             async with session.get(url) as resp:
                 resp = await resp.json()

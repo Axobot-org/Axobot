@@ -26,6 +26,11 @@ A detailed list of all options is available `below <#list-of-every-option>`_ .
 .. warning:: To display this command correctly, ZBot only needs Embed links permission.
 
 
+**Syntax:** :code:`config list`
+
+This command will give you a list of all the bot configuration options, in case you are looking for a specific name, or if you just want to make sure you know them all. However, no details will be given, to know what these options are used for you will have to go to the documentation.
+
+
 Modify
 ------
 

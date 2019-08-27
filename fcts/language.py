@@ -26,6 +26,9 @@ class LangCog(discord.ext.commands.Cog):
             self.translations['en'] = json.load(f)
         with open('fcts/lang/fi.json','r') as f:
             self.translations['fi'] = json.load(f)
+        for cog in bot.cogs.values():
+            if hasattr(cog,'translate'):
+                cog.translate = self.tr
 
 
     async def tr(self,serverID,moduleID,messageID,**args):

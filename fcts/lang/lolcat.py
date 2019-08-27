@@ -608,7 +608,8 @@ to modify configuraishun, or `!config del <option>` 2 reset teh option (`!config
         "wrong-prefix":"Oooops, it seemz dis prefix is no valid :thinking: If teh problem persists, plz choose a' other one",
         "opt_title":"Opzion '{}' of srver {}",
         "not-found":"Teh server {} haznt been registered yet in da data board",
-        "need-admin":"U need to be a Big Boss (admin) to get this cmd"
+        "need-admin":"U need to be a Big Boss (admin) to get this cmd",
+        "config-list": "List ov options cool taht u can use: {text}More info @ {link}"
         }
 
 server_desc={"prefix":"Currnt baot prfx: {}",
@@ -645,6 +646,7 @@ server_desc={"prefix":"Currnt baot prfx: {}",
         "partner_color":"Coulor of partners box: {}",
         "partner_role":"Role givn 2 partners: {}",
         "update_mentions":"Roles pinged on teh bot changlog: {}",
+        "verification_role":"Roles removd when smone use !verify itself: {}"
         }
 
 stats_infos={"not-found":"Unable 2 found {N}",
