@@ -192,8 +192,9 @@ class RolesReact(commands.Cog):
     
     @rr_main.command(name="get",aliases=['join'])
     async def rr_get(self,ctx:commands.Context,*,role:typing.Optional[discord.Role]):
-        """Get one of the roles
-        If you don't speficy any role, I will display the whole message with reactions"""
+        """Send the roles embed
+        If you don't speficy any role, I will display the whole message with reactions
+        But if you do, then you can have directly one role without waiting for reactions"""
         if role != None:
             if not role.id in [x['role'] for x in await self.rr_list_role(ctx.guild.id)]:
                 return await ctx.send(await self.translate(ctx.guild.id,'roles_react','role-not-in-list'))

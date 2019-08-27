@@ -701,7 +701,8 @@
         "wrong-prefix": "Oops, it seems this prefix is invalid :thinking: If the problem persists, please choose another one",
         "opt_title": "Option \"{}\" of server {}",
         "not-found": "The server {} has not yet been registered in the database",
-        "need-admin": "You need Administrator permission to execute this command."
+        "need-admin": "You need Administrator permission to execute this command.",
+        "config-list": "List of available options: {text}More info at {link}"
     },
     "server_desc": {
         "prefix": "Current bot prefix: {}",
@@ -737,7 +738,8 @@
         "partner_channel": "Channel where partners are sent: {}",
         "partner_color": "Color of partners embed: {}",
         "partner_role": "Role given to partners: {}",
-        "update_mentions": "Roles mentioned in the bot changelog: {}"
+        "update_mentions": "Roles mentioned in the bot changelog: {}",
+        "verification_role":"Roles removed when a user use the `verify` command: {}"
     },
     "stats_infos": {
         "not-found": "Unable to find {N}",

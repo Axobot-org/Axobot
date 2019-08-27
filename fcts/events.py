@@ -390,6 +390,143 @@ class Events(commands.Cog):
         for t in tasks:
             if t['user']==userID and t['guild']==guildID and t['action']==action:
                 return await self.update_duration(t['ID'],duration)
+        cnx = self.bot.cnx_frm
+        cursor = cnx.cursor()
+        ids = await self.get_events_from_db(all=True,IDonly=True)
+        if len(ids)>0:
+            ID = max([x['ID'] for x in ids])+1
+        else:
+            ID = 0
+        query = ("INSERT INTO `timed` (`ID`,`guild`,`user`,`action`,`duration`) VALUES ({},{},{},'{}',{})".format(ID,guildID,userID,action,duration))
+        cursor.execute(query)
+        cnx.commit()
+        return True
+
+    async def update_duration(self,ID,new_duration):
+        """Modifie la durée d'une tâche"""
+        cnx = self.bot.cnx_frm
+        cursor = cnx.cursor()
+        query = ("UPDATE `timed` SET `duration`={} WHERE `ID`={}".format(new_duration,ID))
+        cursor.execute(query)
+        cnx.commit()
+        return True
+
+    async def remove_task(self,ID:int):
+        """Enlève une tâche exécutée"""
+        cnx = self.bot.cnx_frm
+        cursor = cnx.cursor()
+        query = ("DELETE FROM `timed` WHERE `timed`.`ID` = {}".format(ID))
+        cursor.execute(query)
+        cnx.commit()
+        return True
+
+    @tasks.loop(seconds=1.0)
+    async def loop(self):
+        try:
+            d = datetime.datetime.now()
+            if int(d.second)%20 == 0:
+                await self.check_tasks()
+            if int(d.minute)%20 == 0:
+                await self.bot.cogs['XPCog'].clear_cards()
+                await self.rss_loop()
+            if int(d.hour)%7 == 1 and d.hour != self.partner_last_check.hour:
+                await self.partners_loop()
+            if int(d.hour) == 0 and d.day != self.dbl_last_sending.day:
+                await self.dbl_send_data()
+        except Exception as e:
+            await self.bot.cogs['ErrorsCog'].on_error(e,None)
+            self.loop_errors[0] += 1
+            if (datetime.datetime.now() - self.loop_errors[1]).total_seconds() > 120:
+                self.loop_errors[0] = 0
+                self.loop_errors[1] = datetime.datetime.now()
+            if self.loop_errors[0] > 10:
+                await self.bot.cogs['ErrorsCog'].senf_err_msg(":warning: **Trop d'erreurs : ARRET DE LA BOUCLE PRINCIPALE** :warning:")
+                self.loop.cancel()
+
+    @loop.before_loop
+    async def before_loop(self):
+        await self.bot.wait_until_ready()
+        await asyncio.sleep(2)
+        await self.rss_loop()
+        self.bot.log.info("[tasks_loop] Lancement de la boucle")
+
+
+    async def rss_loop(self):
+        if self.bot.cogs['RssCog'].last_update==None or (datetime.datetime.now() - self.bot.cogs['RssCog'].last_update).total_seconds()  > 5*60:
+            self.bot.cogs['RssCog'].last_update = datetime.datetime.now()
+            asyncio.run_coroutine_threadsafe(self.bot.cogs['RssCog'].main_loop(),asyncio.get_running_loop())
+    
+    async def dbl_send_data(self):
+        """Send guilds count to Discord Bots Lists"""
+        if self.bot.beta:
+            return
+        t = time.time()
+        answers = ['None','None','None']
+        self.bot.log.info("[DBL] Envoi des infos sur le nombre de guildes...")
+        session = aiohttp.ClientSession(loop=self.bot.loop)
+        # https://discordbots.org/bot/486896267788812288
+        payload = {'server_count': len(self.bot.guilds)}
+        async with session.post('https://discordbots.org/api/bots/486896267788812288/stats',data=payload,headers={'Authorization':str(self.bot.dbl_token)}) as resp:
+            self.bot.log.debug('discordbots.org returned {} for {}'.format(resp.status, payload))
+            answers[0] = resp.status
+        # https://divinediscordbots.com/bot/486896267788812288
+        payload = json.dumps({
+          'server_count': len(self.bot.guilds)
+          })
+        headers = {
+              'authorization': self.bot.others['divinediscordbots'],
+              'content-type': 'application/json'
+          }
+        async with session.post('https://divinediscordbots.com/bot/{}/stats'.format(self.bot.user.id), data=payload, headers=headers) as resp:
+              self.bot.log.debug('divinediscordbots statistics returned {} for {}'.format(resp.status, payload))
+              answers[1] = resp.status
+        # https://bots.ondiscord.xyz/bots/486896267788812288
+        payload = json.dumps({
+          'guildCount': len(self.bot.guilds)
+          })
+        headers = {
+              'Authorization': self.bot.others['botsondiscord'],
+              'Content-Type': 'application/json'
+          }
+        async with session.post('https://bots.ondiscord.xyz/bot-api/bots/{}/guilds'.format(self.bot.user.id), data=payload, headers=headers) as resp:
+              self.bot.log.debug('BotsOnDiscord returned {} for {}'.format(resp.status, payload))
+              answers[2] = resp.status
+        await session.close()
+        answers = [str(x) for x in answers]
+        emb = self.bot.cogs["EmbedCog"].Embed(desc='**Guilds count updated** in {}s ({})'.format(round(time.time()-t,3),'-'.join(answers)),color=7229109).update_timestamp().set_author(self.bot.user)
+        await self.bot.cogs["EmbedCog"].send([emb],url="loop")
+        self.dbl_last_sending = datetime.datetime.now()
+
+    async def partners_loop(self):
+        """Update partners channels (every 7 hours)"""
+        t = time.time()
+        self.partner_last_check = datetime.datetime.now()
+        channels_list = await self.bot.cogs['ServerCog'].get_server(criters=["`partner_channel`<>''"],columns=['ID','partner_channel','partner_color'])
+        self.bot.log.info("[Partners] Rafraîchissement des salons ({} serveurs prévus)...".format(len(channels_list)))
+        count = [0,0]
+        for guild in channels_list:
+            try:
+                chan = guild['partner_channel'].split(';')[0]
+                if not chan.isnumeric():
+                    continue
+                chan = self.bot.get_channel(int(chan))
+                if chan==None:
+                    continue
+                count[0] += 1
+                count[1] += await self.bot.cogs['PartnersCog'].update_partners(chan,guild['partner_color'])
+            except Exception as e:
+                await self.bot.cogs['ErrorsCog'].on_error(e,None)
+        emb = self.bot.cogs["EmbedCog"].Embed(desc='**Partners channels updated** in {}s ({} channels - {} partners)'.format(round(time.time()-t,3),count[0],count[1]),color=10949630).update_timestamp().set_author(self.bot.user)
+        await self.bot.cogs["EmbedCog"].send([emb],url="loop")
+        
+            
+
+    async def add_task(self,guildID,userID,action,duration):
+        """Ajoute une tâche à la liste"""
+        tasks = await self.get_events_from_db(all=True)
+        for t in tasks:
+            if t['user']==userID and t['guild']==guildID and t['action']==action:
+                return await self.update_duration(t['ID'],duration)
         cnx = self.bot.cnx
         cursor = cnx.cursor()
         ids = await self.get_events_from_db(all=True,IDonly=True)
