@@ -849,7 +849,7 @@ class RssCog(commands.Cog):
                 published = i
                 break
         if published!=None and len(feeds.entries)>1:
-            while feeds.entries[0][published] < feeds.entries[1][published]:
+            while len(feeds.entries)>1 and feeds.entries[0][published] < feeds.entries[1][published]:
                 del feeds.entries[0]
         if not date or published != 'published_parsed':
             feed = feeds.entries[0]
