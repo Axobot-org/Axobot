@@ -346,7 +346,8 @@
         "member": "member",
         "server": "server",
         "servers": "servers",
-        "click_here": "Click here"
+        "click_here": "Click here",
+        "category": "category"
     },
     "kill": {
         "list": [

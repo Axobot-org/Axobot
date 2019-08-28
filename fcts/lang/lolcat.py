@@ -274,13 +274,14 @@ keywords={"depuis":"sinze",
         "membres":"memberz",
         "subcmds":"subcommands",
         "ghost":"Goast",
-        'unknown':'No known',
-        'added_at':'Addd at',
-        'bot':'robot',
-        'member':'human',
-        'server':'nice place',
-        'servers':'guilds',
-        'click_here':'BLUE BUTTON TO CLICK'
+        "unknown":"No known",
+        "added_at":"Addd at",
+        "bot":"robot",
+        "member":"human",
+        "server":"nice place",
+        "servers":"guilds",
+        "click_here":"BLUE BUTTON TO CLICK",
+        "category":"box"
         }
 
 kill={"list":["Hi ho ! Oh u, u gonna die!",

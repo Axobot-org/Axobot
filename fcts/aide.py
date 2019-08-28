@@ -288,7 +288,13 @@ If the bot can't send the new command format, it will try to send the old one.""
                 except Exception as e:
                     await self.bot.cogs["ErrorsCog"].on_error(e,ctx)
         checks = '\n'.join(checks)
-
+        # Module
+        category = "unclassed"
+        for k,v in self.commands_list.items():
+            if cmd.name in v:
+                category = k
+                break
+        category = (await self.translate(ctx.channel,'keywords','category')).capitalize() + ": " + (await self.translate(ctx.channel,"aide","categories"))[category]
         answer = f"**{prefix}{syntax}\n\n{desc}\n"
         if len(subcmds)>0:
             answer += "\n"+subcmds+"\n"
@@ -298,6 +304,7 @@ If the bot can't send the new command format, it will try to send the old one.""
             answer += enabled
         if len(checks)>0:
             answer += "\n"+checks
+        answer += f"\n\n\n*{category}*"
         return [answer]
 
 

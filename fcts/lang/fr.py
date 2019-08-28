@@ -267,13 +267,14 @@ keywords={"depuis":"depuis",
         "membres":"membres",
         "subcmds":"sous-commandes",
         "ghost":"Fantôme",
-        'unknown':'Inconnu',
-        'added_at':'Ajouté le',
-        'bot':'bot',
-        'member':'membre',
-        'server':'serveur',
-        'servers':'serveurs',
-        'click_here':'Cliquez ici'
+        "unknown":"Inconnu",
+        "added_at":"Ajouté le",
+        "bot":"bot",
+        "member":"membre",
+        "server":"serveur",
+        "servers":"serveurs",
+        "click_here":"Cliquez ici",
+        "category":"catégorie"
         }
 
 kill={"list":["Oh toi, tu vas mourir !",
