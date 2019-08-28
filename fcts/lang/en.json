@@ -20,7 +20,7 @@
     },
     "aide": {
         "no-subcmd": "The command `{0.name}` has no subcommand",
-        "embed_title": "Liste des commandes disponibles pour {u}",
+        "embed_title": "Avalilable commands for {u}",
         "categories": {
             "fun": "fun",
             "info": "information",
@@ -28,7 +28,8 @@
             "other": "others",
             "server-settings": "server settings",
             "staff": "bot staff",
-            "users-info": "Users information"
+            "users-info": "Users information",
+            "unclassed":"Unclassed"
         },
         "footer": "Type {}help command for more info on a command",
         "no-desc-cog": "No description for this cog.",

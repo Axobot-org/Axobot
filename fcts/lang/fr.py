@@ -23,7 +23,7 @@ admin={"change_game-0":"Sélectionnez *play*, *watch*, *listen* ou *stream* suiv
 
 aide={"no-subcmd":"La commande {0.name} n'a aucune sous-commande",
         "embed_title":"Liste des commandes disponibles pour {u}",
-        "categories":{"fun":"fun","info":"informations","moderation":"modération","other":"autres","server-settings":"configuration","staff":"staff du bot","users-info":"Infos sur les utilisateurs"},
+        "categories":{"fun":"fun","info":"informations","moderation":"modération","other":"autres","server-settings":"configuration","staff":"staff du bot","users-info":"Infos sur les utilisateurs","unclassed":"non classé"},
         "footer":"Entrez {}help commande pour plus d'informations sur une commande",
         "no-desc-cog":"Aucune description pour ce module.",
         "no-desc-cmd":"Aucune description pour cette commande",

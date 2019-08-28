@@ -146,13 +146,7 @@ If the bot can't send the new command format, it will try to send the old one.""
             return cmd.name
 
     async def all_commands(self,ctx:commands.Context):
-        """Create pages for every bot command"""
-        def category(cmd):
-            cog = cmd.cog_name
-            # we insert the zero width space there to give it approximate
-            # last place sorting position.
-            return cog + ':' if cog is not None else '\u200bNo Category:'
-        
+        """Create pages for every bot command"""      
         cmds = sorted([c for c in self.bot.commands],key=self.sort_by_name)
         categories = {x:list() for x in self.commands_list.keys()}
         for cmd in cmds:
@@ -174,9 +168,28 @@ If the bot can't send the new command format, it will try to send the old one.""
                     found = True
                     break
             if not found:
-                categories['other'].append(temp)
+                categories['unclassed'].append(temp)
         tr = await self.translate(ctx.channel,"aide","categories")
-        return [("__**"+tr[k].capitalize()+"**__", "\n".join(v)) for k,v in categories.items() if len(v)>0]
+        answer = list()
+        for k,v in categories.items():
+            if len(v)==0:
+                continue
+            if len("\n".join(v))>1020:
+                temp = list(v)
+                v = list()
+                i = 1
+                for line in temp:
+                    if len("\n".join(v+[line]))>1020:
+                        title = tr[k]+' - '+str(i) if k in tr.keys() else k+' - '+str(i)
+                        answer.append(("__**"+title.capitalize()+"**__", "\n".join(v)))
+                        v = list()
+                        i += 1
+                    v.append(line)
+                title = tr[k]+' - '+str(i) if k in tr.keys() else k+' - '+str(i)
+                answer.append(("__**"+title.capitalize()+"**__", "\n".join(v)))
+            else:
+                answer.append(("__**"+tr[k].capitalize()+"**__", "\n".join(v)))
+        return answer
 
     async def cog_commands(self,ctx:commands.Context,cog:commands.Cog):
         """Create pages for every command of a cog"""

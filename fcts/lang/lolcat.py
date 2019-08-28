@@ -22,6 +22,7 @@ For much infoZ on de current state ov dis crisis, gonna to my offishial srver: h
         }
 
 aide={"no-subcmd":"Teh kommand `{0.name}` had not sub~~scribe~~commanD",
+        "embed_title": "Cmds list 4 {u}",
         "categories": {
             "fun": "cool things",
             "info": "usefull things",
@@ -29,7 +30,8 @@ aide={"no-subcmd":"Teh kommand `{0.name}` had not sub~~scribe~~commanD",
             "other": "idk, dont ask me plz",
             "server-settings": "other usefl tihngs",
             "staff": "bot things",
-            "users-info": "random things :shruh:"
+            "users-info": "things 'bout cats/people",
+            "unclassed":"random things :shrug:"
         },
         "footer":"Type {}help cmd 4 mure info abawt an commandZ",
         "no-desc-cog":"No more discripton for dis cogg.",
