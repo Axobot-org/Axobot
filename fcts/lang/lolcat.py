@@ -22,7 +22,15 @@ For much infoZ on de current state ov dis crisis, gonna to my offishial srver: h
         }
 
 aide={"no-subcmd":"Teh kommand `{0.name}` had not sub~~scribe~~commanD",
-        "mods":['Moderashun:','Oderz:'],
+        "categories": {
+            "fun": "cool things",
+            "info": "usefull things",
+            "moderation": "acute things",
+            "other": "idk, dont ask me plz",
+            "server-settings": "other usefl tihngs",
+            "staff": "bot things",
+            "users-info": "random things :shruh:"
+        },
         "footer":"Type {}help cmd 4 mure info abawt an commandZ",
         "no-desc-cog":"No more discripton for dis cogg.",
         "no-desc-cmd":"No descripshun for those c:o2:mmand",

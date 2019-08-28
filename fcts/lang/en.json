@@ -20,10 +20,16 @@
     },
     "aide": {
         "no-subcmd": "The command `{0.name}` has no subcommand",
-        "mods": [
-            "Moderation:",
-            "Other:"
-        ],
+        "embed_title": "Liste des commandes disponibles pour {u}",
+        "categories": {
+            "fun": "fun",
+            "info": "information",
+            "moderation": "moderation",
+            "other": "others",
+            "server-settings": "server settings",
+            "staff": "bot staff",
+            "users-info": "Users information"
+        },
         "footer": "Type {}help command for more info on a command",
         "no-desc-cog": "No description for this cog.",
         "no-desc-cmd": "No description for this command",
@@ -739,7 +745,7 @@
         "partner_color": "Color of partners embed: {}",
         "partner_role": "Role given to partners: {}",
         "update_mentions": "Roles mentioned in the bot changelog: {}",
-        "verification_role":"Roles removed when a user use the `verify` command: {}"
+        "verification_role": "Roles removed when a user use the `verify` command: {}"
     },
     "stats_infos": {
         "not-found": "Unable to find {N}",
