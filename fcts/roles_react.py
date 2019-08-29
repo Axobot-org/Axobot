@@ -124,7 +124,8 @@ class RolesReact(commands.Cog):
     @commands.check(checks.has_manage_guild)
     async def rr_add(self,ctx,emoji:args.anyEmoji,role:discord.Role,*,description:str=''):
         """Add a role reaction
-        This role will be given when a membre click on a specific reaction"""
+        This role will be given when a membre click on a specific reaction
+        Your description can only be a maximum of 150 characters"""
         try:
             if role.name == '@everyone':
                 raise commands.BadArgument(f'Role "{role.name}" not found')
@@ -135,7 +136,7 @@ class RolesReact(commands.Cog):
             max_rr = self.bot.cogs["ServerCog"].default_opt['roles_react_max_number'] if max_rr==None else max_rr
             if len(l) >= max_rr:
                 return await ctx.send(await self.translate(ctx.guild.id,'roles_react','too-many-rr',l=max_rr))
-            await self.rr_add_role(ctx.guild.id,role.id,emoji,description)
+            await self.rr_add_role(ctx.guild.id,role.id,emoji,description[:150])
         except Exception as e:
             await self.bot.cogs['ErrorsCog'].on_cmd_error(ctx,e)
         else:
