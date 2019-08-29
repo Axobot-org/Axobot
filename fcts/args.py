@@ -162,3 +162,4 @@ class guildMessage(commands.Converter):
                 pass
             else:
                 return msg
+        raise commands.errors.BadArgument('Message "{}" not found.'.format(argument))
