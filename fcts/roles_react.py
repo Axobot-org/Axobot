@@ -121,7 +121,7 @@ class RolesReact(commands.Cog):
     
     @rr_main.command(name="add")
     @commands.check(checks.has_manage_guild)
-    async def rr_add(self,ctx,emoji:args.anyEmoji,role:discord.Role,*,description:str=None):
+    async def rr_add(self,ctx,emoji:args.anyEmoji,role:discord.Role,*,description:str=''):
         """Add a role reaction
         This role will be given when a membre click on a specific reaction"""
         try:
@@ -171,7 +171,7 @@ class RolesReact(commands.Cog):
                     emojis.append(k['emoji'])
             else:
                 emojis.append(k['emoji'])
-        return '\n'.join(["{}   <@&{}> ".format(x['emoji'], x['role']) for x in liste]), emojis
+        return '\n'.join(["{}   <@&{}> - *{}*".format(x['emoji'], x['role'], x['description']) for x in liste]), emojis
 
     @rr_main.command(name="list")
     async def rr_list(self,ctx):
