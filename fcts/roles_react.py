@@ -13,6 +13,7 @@ class RolesReact(commands.Cog):
         self.guilds_which_have_roles = set()
         self.cache_initialized = False
         self.embed_color = 12118406
+        self.footer_txt = 'ZBot roles reactions'
         try:
             self.translate = bot.cogs['LangCog'].tr
         except:
@@ -37,7 +38,7 @@ class RolesReact(commands.Cog):
             msg = await chan.fetch_message(payload.message_id)
         except:
             return None, None
-        if len(msg.embeds)==0 or msg.embeds[0].footer.text!='ZBot roles reactions' or msg.author.id != self.bot.user.id:
+        if len(msg.embeds)==0 or msg.embeds[0].footer.text!=self.footer_txt or msg.author.id != self.bot.user.id:
             return None, None
         temp = await self.rr_list_role(payload.guild_id, payload.emoji.id if payload.emoji.is_custom_emoji() else payload.emoji.name)
         if len(temp)==0:
@@ -112,7 +113,7 @@ class RolesReact(commands.Cog):
         cursor.close()
         return True
 
-    @commands.group(name="roles_react")
+    @commands.group(name="roles_react",aliases=['role_react'])
     @commands.guild_only()
     async def rr_main(self,ctx):
         """Manage your roles reactions"""
@@ -209,7 +210,7 @@ class RolesReact(commands.Cog):
             else:
                 des, emojis = await self.create_list_embed(l,ctx.guild)
                 title = await self.translate(ctx.guild.id,"roles_react",'rr-embed')
-                emb = self.bot.cogs['EmbedCog'].Embed(title=title,desc=des,color=self.embed_color,footer_text='ZBot roles reactions').update_timestamp()
+                emb = self.bot.cogs['EmbedCog'].Embed(title=title,desc=des,color=self.embed_color,footer_text=self.footer_txt).update_timestamp()
                 msg = await ctx.send(embed=emb.discord_embed())
                 for e in emojis:
                     try:
@@ -248,6 +249,28 @@ class RolesReact(commands.Cog):
         else:
             if not ignore_success:
                 await channel.send(await self.translate(guild.id,'roles_react','role-given' if give else 'role-lost',r=role_name))
+    
+
+    @rr_main.command(name='update')
+    async def rr_update(self,ctx:commands.Context,embed:args.guildMessage):
+        """Update a Zbot message to refresh roles/reactions"""
+        if embed.author!=ctx.guild.me:
+            return await ctx.send(await self.translate(ctx.guild,'roles_react','not-zbot-msg'))
+        if len(embed.embeds)!=1 or embed.embeds[0].footer.text!=self.footer_txt:
+            return await ctx.send(await self.translate(ctx.guild,'roles_react','not-zbot-embed'))
+        emb = embed.embeds[0]
+        try:
+            l = await self.rr_list_role(ctx.guild.id)
+        except Exception as e:
+            return await self.bot.cogs['ErrorsCog'].on_cmd_error(ctx,e)
+        desc, emojis = await self.create_list_embed(l,ctx.guild)
+        reacts = [x.emoji for x in embed.reactions]
+        for emoji in emojis:
+            if emoji not in reacts:
+                await embed.add_reaction(emoji)
+        if emb.description != desc:
+            emb.description = desc
+            await embed.edit(embed=emb)
 
 
 def setup(bot):

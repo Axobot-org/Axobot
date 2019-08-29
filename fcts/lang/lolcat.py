@@ -124,9 +124,12 @@ errors={"cooldown":"Yu are on cold-own for dis comandZ :confused: Plize wait {d}
         "invalidurl":"Nope, `{u}` iznt a valid ~~cat~~ link",
         "invalidisbn":"Invalid ISBN",
         "invalidemoji":"INvalid smiley",
+        "invalidmsgid":"InVAlid msg ID",
         'channotfound':"Super chat room {c} don't want 2 be found",
         'DM':"Dat command isn't enabled in PM",
         "emojinotfound":"Emoji `{e}` cannot found been",
+        "msgnotfound": "NoAble 2 find any msg with ID {msg}",
+        "toomanytxtchan": "U have toooo many visibl text channels lmao. Why so much? useless/20. U should seriously think 'bout it dude. Pro-tip :smirk:"
         }
 
 find={"user-0":"naym: {}\nID: {}",
@@ -508,7 +511,9 @@ roles_react={"already-1-rr":"U already has a designated role 4 this emoji",
         "role-given":"The role {r} has been given",
         "role-not-in-list":"Tish role iz NOT part ov the giveable r0ls",
         "rr-embed":"tAkInG on A ROle",
-        "role-lost":"ThE rolE {r} HAS BEeN reMoVEd fR0M yOUr ROLEs"
+        "role-lost":"ThE rolE {r} HAS BEeN reMoVEd fR0M yOUr ROLEs",
+        "not-zbot-msg":"NOOOOOOO tish msg is not Zbot's. bad dude.",
+        "not-zbot-embed":"This msg dont has any rolereact colorful box"
         }
 
 rss={"yt-help":"To seerch for a youtwube channel, you may enter the channil ID. You will found it at teh and of the strin url, it can be 8ther the nayme, or a strin of randem characteRs. \

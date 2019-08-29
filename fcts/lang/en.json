@@ -197,9 +197,12 @@
         "invalidurl": "Invalid url: `{u}`",
         "invalidisbn": "Invalid ISBN",
         "invalidemoji": "Invalid emoji",
+        "invalidmsgid": "Invalid message ID",
         "channotfound": "Channel {c} not found",
         "DM": "This command isn't available in Direct Messages",
-        "emojinotfound": "Emoji `{e}` not found"
+        "emojinotfound": "Emoji `{e}` not found",
+        "msgnotfound": "Unable to find any message with ID {msg}",
+        "toomanytxtchan": "You have too many accessible text channels"
     },
     "find": {
         "user-0": "name: {}\nID: {}",
@@ -627,7 +630,9 @@
         "role-given": "The role {r} has been given",
         "role-not-in-list": "This role is not part of the attributable roles",
         "rr-embed": "Taking on a role",
-        "role-lost": "The role {r} has been removed from your roles"
+        "role-lost": "The role {r} has been removed from your roles",
+        "not-zbot-msg":"This message is not Zbot's",
+        "not-zbot-embed":"This message does not contain any role-reaction embed"
     },
     "rss": {
         "yt-help": "To search for a youtube channel, you must enter the channel ID. You will find it at the end of the string url, it can be either the name, or a string of random characters.\n*Tip: some channels are already filled in my code. Sometimes you can just put `neil3000` or `Oxisius`* :wink:",

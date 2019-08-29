@@ -116,9 +116,12 @@ errors={"cooldown":"Vous êtes en cooldown pour cette commande. Veuillez attendr
         "invalidurl":"Url invalide : `{u}`",
         "invalidisbn":"ISBN invalide",
         "invalidemoji":"Emoji invalide",
+        "invalidmsgid":"ID invalide",
         'channotfound':"Le salon {c} est introuvable",
         'DM':"Cette commande est indisponible en Messages Privés",
         "emojinotfound":"Emoji `{e}` introuvable",
+        "msgnotfound":"Message introuvable",
+        "toomanytxtchan":"Vous avez trop de salons textuels accessibles"
         }
 
 find={"user-0":"Nom : {}\nID : {}",
@@ -509,7 +512,9 @@ roles_react={"already-1-rr":"Vous avez déjà un rôle désigné pour cet émoji
         "role-given":"Le rôle {r} a bien été donné",
         "role-not-in-list":"Ce rôle ne fait pas partie des rôles attribuables",
         "rr-embed":"S'attribuer un rôle",
-        "role-lost":"Le rôle {r} a bien été retiré"
+        "role-lost":"Le rôle {r} a bien été retiré",
+        "not-zbot-msg":"Ce message n'est pas celui de Zbot",
+        "not-zbot-embed":"Ce message ne contient pas d'embed de roles-reactions"
         }
 
 rss={"yt-help":"Pour rechercher une chaîne youtube, vous devez entrer l'identifiant de cette chaîne. Vous la trouverez à la fin de l'url de la chaine, elle peut être soit le nom, soit une suite de caractères aléatoires. \
