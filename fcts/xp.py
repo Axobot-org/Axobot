@@ -601,6 +601,8 @@ class XPCog(commands.Cog):
         try:
             if user==None:
                 user = ctx.author
+            if user.bot:
+                return await ctx.send(await self.translate(ctx.channel,'xp','bot-rank'))
             if ctx.guild != None:
                 xp_used_type = await self.bot.cogs['ServerCog'].find_staff(ctx.guild.id,'xp_type')
             else:

@@ -793,5 +793,6 @@ xp = {'card-level':'NIVEAU',
         'rr-reload':"{} rôles mis à jour / {} membres scannés",
         'change-global-xp':"Impossible d'éditer l'XP du système global !",
         'change-xp-ok':"L'XP de l'utilisateur {user} a bien été mis à {xp} points !",
-        'no-bot':"Impossible de modifier l'XP d'un bot !"
+        'no-bot':"Impossible de modifier l'XP d'un bot !",
+        'bot-rank':"Les bots ne peuvent pas avoir d'xp"
     }
