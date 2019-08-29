@@ -252,8 +252,9 @@ class RolesReact(commands.Cog):
     
 
     @rr_main.command(name='update')
-    async def rr_update(self,ctx:commands.Context,embed:args.guildMessage):
-        """Update a Zbot message to refresh roles/reactions"""
+    async def rr_update(self,ctx:commands.Context,embed:args.guildMessage,changeDescription:bool=True):
+        """Update a Zbot message to refresh roles/reactions
+        If you don't want to update the embed content, for example if it's a custom embed, then you can use 'False' as a second argument. Zbot will only check the reactions"""
         if embed.author!=ctx.guild.me:
             return await ctx.send(await self.translate(ctx.guild,'roles_react','not-zbot-msg'))
         if len(embed.embeds)!=1 or embed.embeds[0].footer.text!=self.footer_txt:
@@ -268,7 +269,7 @@ class RolesReact(commands.Cog):
         for emoji in emojis:
             if emoji not in reacts:
                 await embed.add_reaction(emoji)
-        if emb.description != desc:
+        if emb.description != desc and changeDescription:
             emb.description = desc
             await embed.edit(embed=emb)
 
