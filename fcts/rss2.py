@@ -46,6 +46,7 @@ class RssCog(commands.Cog):
         self.bot = bot
         self.time_loop = 10
         self.time_between_flows_check = 0.15
+        self.min_time_between_posts = 120
         self.file = "rss"
         self.embed_color = discord.Color(6017876)
         self.loop_processing = False
@@ -805,7 +806,7 @@ class RssCog(commands.Cog):
         else:
             liste = list()
             for feed in entries:
-                if datetime.datetime(*feed['published_parsed'][:6]) <= date:
+                if (datetime.datetime(*feed['published_parsed'][:6]) - date).total_seconds() < self.min_time_between_posts:
                     break
                 author = feed['author'].replace('(','').replace(')','')
                 rt = None
@@ -839,8 +840,8 @@ class RssCog(commands.Cog):
             posts = self.twitterAPI.GetUserTimeline(screen_name=nom,exclude_replies=True)
             liste = list()
             for post in posts:
-                # if datetime.datetime.fromtimestamp(post.created_at_in_seconds) <= date:
-                #     break
+                if (datetime.datetime.fromtimestamp(post.created_at_in_seconds) - date).total_seconds() < self.min_time_between_posts:
+                    break
                 rt = None
                 if post.retweeted:
                     rt = "retweet"
@@ -930,7 +931,7 @@ class RssCog(commands.Cog):
                     datz = 'Unknown'
                 else:
                     datz = feed[published]
-                if feed['published_parsed']==None or datetime.datetime(*feed['published_parsed'][:6]) <= date:
+                if feed['published_parsed']==None or (datetime.datetime(*feed['published_parsed'][:6]) - date).total_seconds() < self.min_time_between_posts:
                     break
                 if 'link' in feed.keys():
                     l = feed['link']
