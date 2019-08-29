@@ -1,4 +1,4 @@
-import discord
+import discord, asyncio
 from discord.ext import commands
 import json, os
 
@@ -89,7 +89,10 @@ class TranslatorsCog(commands.Cog):
         value = self.translations['en'].__getitem__(key)
         await ctx.send("```\n"+value+"\n```")
         await ctx.send(f"How would you translate it in {lang}?\n\n  *Key: {key}*\nType 'pass' to choose another one")
-        msg = await self.bot.wait_for('message', check=lambda msg: msg.author.id==ctx.author.id and msg.channel.id==ctx.channel.id)
+        try:
+            msg = await self.bot.wait_for('message', check=lambda msg: msg.author.id==ctx.author.id and msg.channel.id==ctx.channel.id, timeout=45)
+        except asyncio.TimeoutError:
+            await ctx.send("You were too slow. Try again.")
         if msg.content.lower() == 'pass':
             await ctx.send("This message will be ignored until the next reload of this command")
         else:
