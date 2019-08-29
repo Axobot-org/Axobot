@@ -82,7 +82,8 @@ __**La configuration**__
  - `{owner}` affiche le nom du propriétaire du serveur
  - `{member_count}` affiche le nombre actuel de membres
  - `{type}` retourne 'bot' si le membre est un bot, 'membre' sinon
-"""}
+""",
+        "error-give-roles":"Impossible de donner le rôle '{r}' au nouveau membre {u} : erreur de permissions\nVérifiez la hiérarchie des rôles ainsi que ma permission 'Gérer les rôles'"}
 
 cases={"no-user":"Impossible de trouver cet utilisateur",
         "not-found":"Ce casier n'a pas été trouvé :confused:",

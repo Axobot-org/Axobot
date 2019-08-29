@@ -90,7 +90,8 @@ __** ConfiGrationZ**__
  - `{owner}` displayz teh servr ownr nam
  - `{member_count}` showz the curent nbr oof memberz
  - `{type}` show theh type of the user (bot/member)
-"""}
+""",
+        "error-give-roles":"Srry I wasn't abl 2 give role '{r}' to new cat `{u}`. Pls check hierarchy and 'Manage roles' perms :sad:"}
 
 cases={"no-user":"Unable to find dis usr :eyes:",
         "not-found":"Dis caze was not fund :upside_down:",

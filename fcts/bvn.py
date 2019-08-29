@@ -162,7 +162,10 @@ class WelcomerCog(commands.Cog):
                     continue
                 role = member.guild.get_role(int(r))
                 if role != None:
-                    await member.add_roles(role,reason=await self.translate(member.guild.id,"logs","d-welcome_roles"))
+                    try:
+                        await member.add_roles(role,reason=await self.translate(member.guild.id,"logs","d-welcome_roles"))
+                    except discord.errors.Forbidden:
+                        await self.bot.cogs['Events'].send_logs_per_server(member.guild,'error',await self.translate(member.guild,'bvn','error-give-roles',r=role.name,u=str(member)), member.guild.me)
         except discord.errors.NotFound:
             pass
         except Exception as e:

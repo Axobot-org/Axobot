@@ -23,7 +23,8 @@ class Events(commands.Cog):
         "slowmode":5671364,
         "clear":16312092,
         "warn":9131818,
-        "softban":16720385}
+        "softban":16720385,
+        "error":16078115}
         self.points = 0
         self.table = {'kick':3,
             'ban':7,
