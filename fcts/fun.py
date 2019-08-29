@@ -4,9 +4,10 @@ from discord.ext import commands
 from tzwhere import tzwhere
 from pytz import timezone
 
-from fcts import emojis, checks
+from fcts import emojis, checks, args
 importlib.reload(emojis)
 importlib.reload(checks)
+importlib.reload(args)
 
 cmds_list = ['count_msg','ragequit','pong','run','nope','blame','party','bigtext','shrug','gg','money','pibkac','osekour','me','kill','cat','rekt','thanos','nuke','pikachu','pizza','google','loading','piece','roll','afk']
 
@@ -382,20 +383,20 @@ You can specify a verification limit by adding a number in argument"""
     
     @commands.command(name="react")
     @commands.check(can_say)
-    async def react(self,ctx,ID:int,*,reactions):
+    async def react(self,ctx,message:args.guildMessage,*,reactions):
         """Add reaction(s) to a message. Server emojis also work."""
-        try:
-            msg = await ctx.channel.fetch_message(ID)
-        except discord.errors.HTTPException as e:
-            await ctx.send(await self.translate(ctx.channel,"fun",'react-0'))
-            return
+        #try:
+        #    msg = await ctx.channel.fetch_message(ID)
+        #except discord.errors.HTTPException as e:
+        #    await ctx.send(await self.translate(ctx.channel,"fun",'react-0'))
+        #    return
         for r in reactions.split():
             try:
                 e = await commands.EmojiConverter().convert(ctx,r)
                 await msg.add_reaction(e)
             except:
                 try:
-                    await msg.add_reaction(r)
+                    await message.add_reaction(r)
                 except discord.errors.HTTPException:
                     await ctx.send(await self.translate(ctx.channel,'fun','no-emoji'))
                     return
