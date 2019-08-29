@@ -550,6 +550,7 @@ You can specify a verification limit by adding a number in argument"""
             - url: a well-formed url clickable via the title
             - footer: a little text at the bottom of the box [90 characters]
             - image: a well-formed url redirects to an image
+            - color: the color of the embed bar (#hex or int)
 
         If you want to use quotation marks in the texts, it is possible to escape them thanks to the backslash (`\\"`)
         """
@@ -557,7 +558,7 @@ You can specify a verification limit by adding a number in argument"""
             return await ctx.send(await self.translate(ctx.channel,"fun","no-embed-perm"))
         arguments = arguments.replace("\\\"","|¬017").replace("\\n","\n")
         arguments = arguments.split("\"")
-        k = {'title':"",'content':"",'url':'','footer':"",'image':''}
+        k = {'title':"",'content':"",'url':'','footer':"",'image':'','color':ctx.bot.cogs['ServerCog'].embed_color}
         for e,a in enumerate(arguments):
             a = a.strip().lower()
             if len(a)==0:
@@ -575,7 +576,14 @@ You can specify a verification limit by adding a number in argument"""
                     k['footer'] = arguments[e+1].replace("|¬017","\"")[:90]
                 elif a=='image=':
                     k['image'] = arguments[e+1].replace("|¬017","\"")
-        emb = ctx.bot.cogs["EmbedCog"].Embed(title=k['title'], desc=k['content'], url=k['url'],footer_text=k['footer'],thumbnail=k['image'],color=ctx.bot.cogs['ServerCog'].embed_color).update_timestamp().set_author(ctx.author)
+                elif a=='color=' or a=='colour=':
+                    if arguments[e+1].startswith('#') and len(arguments[e+1])%3==1:
+                        arg = arguments[e+1][1:]
+                        rgb = [int(arg[i:i+2], 16) for i in range(0,len(arg),len(arg)//3)]
+                        k['color'] = discord.Colour(0).from_rgb(rgb[0], rgb[1], rgb[2])
+                    elif arguments[e+1].isnumeric():
+                        k['color'] = discord.Colour(int(arguments[e+1]))
+        emb = ctx.bot.cogs["EmbedCog"].Embed(title=k['title'], desc=k['content'], url=k['url'],footer_text=k['footer'],thumbnail=k['image'],color=k['color']).update_timestamp().set_author(ctx.author)
         try:
             await ctx.send(embed=emb.discord_embed())
         except Exception as e:
