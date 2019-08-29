@@ -87,7 +87,7 @@ class ErrorsCog(commands.Cog):
             # Message "1243" not found.
             r = re.search(r'Message \"([^\"]+)\" not found',raw_error)
             if r!=None:
-                return await ctx.send(await self.translate(ctx.channel,'errors','msgnotfound',c=r.group(1)))
+                return await ctx.send(await self.translate(ctx.channel,'errors','msgnotfound',msg=r.group(1)))
             # Too many text channels
             if raw_error=='Too many text channels':
                 return await ctx.send(await self.translate(ctx.channel,'errors','toomanytxtchan'))
