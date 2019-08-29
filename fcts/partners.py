@@ -159,13 +159,13 @@ class PartnersCog(commands.Cog):
                         field1 = {'name':tr_guilds.capitalize(),'value':str(guild_nbr)}
                     else:
                         field1 = None
-                    image = (await self.bot.fetch_user(int(partner['target']))).avatar_url.__str__()
+                    image = str(await self.bot.user_avatar_as(await self.bot.fetch_user(int(partner['target']))))
                 except discord.errors.NotFound:
                     title += "ID: "+partner['target']
                     field1 = None
                 except Exception as e:
                     field1 = None
-                    image = (await self.bot.fetch_user(int(partner['target']))).avatar_url.__str__()
+                    image = str(await self.bot.user_avatar_as(await self.bot.fetch_user(int(partner['target']))))
                     await self.bot.cogs["ErrorsCog"].on_error(e,None)
                 field2 = {'name':tr_invite.capitalize(),'value':'[Click here](https://discordapp.com/oauth2/authorize?client_id={}&scope=bot&permissions=2113273087)'.format(partner['target'])}
             else:
