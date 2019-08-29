@@ -244,6 +244,7 @@ Bonne journée !""",
         "bitly_short":"URL raccourcie : {url}",
         "bitly_long":"URL d'origine : {url}",
         "bitly_nobit":"Cette adresse n'est pas un lien bit.ly !",
+        "changelog-notfound":"Impossible de trouver cette version"
         }
 
 infos_2={"membercount-0":"Nombre de membres total",

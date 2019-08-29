@@ -184,8 +184,7 @@ class AdminCog(commands.Cog):
                 lang = 0
             lang = ctx.bot.cogs['LangCog'].languages[lang]
             if lang not in self.update.keys():
-                if lang=='lolcat':
-                    lang = 'en'
+                lang = 'en'
             mentions_str = await self.bot.cogs['ServerCog'].find_staff(guild.id,'update_mentions')
             if mentions_str == None:
                 mentions = []
@@ -204,9 +203,17 @@ class AdminCog(commands.Cog):
                     await ctx.bot.cogs['ErrorsCog'].on_error(e,ctx)
                 else:
                     count += 1
+        await ctx.send("Message envoyé dans {} salons !".format(count))
+        # add changelog in the database
+        cnx = self.bot.cnx_frm
+        cursor = cnx.cursor()
+        version = self.bot.cogs['InfosCog'].bot_version
+        query = "INSERT INTO `changelogs` (`version`, `release_date`, `fr`, `en`, `beta`) VALUES ('{v}', '{r}', '{fr}', '{en}', {b}) ON DUPLICATE KEY UPDATE `fr` = '{fr}', `en` = '{en}';".format(v=version,r=ctx.message.created_at,fr=self.update['fr'].replace("'","\\'"),en=self.update['en'].replace("'","\\'"),b=self.bot.beta)
+        cursor.execute(query)
+        cnx.commit()
+        cursor.close()
         for k in self.update.keys():
             self.update[k] = None
-        await ctx.send("Message envoyé dans {} salons !".format(count))
 
 
     @main_msg.command(name="cogs",hidden=True)

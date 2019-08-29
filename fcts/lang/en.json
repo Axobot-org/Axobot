@@ -316,7 +316,8 @@
         },
         "bitly_short": "Shortened URL: {url}",
         "bitly_long": "Original URL: {url}",
-        "bitly_nobit": "This address is not a bit.ly link!"
+        "bitly_nobit": "This address is not a bit.ly link!",
+        "changelogs-notfound": "Unable to find this version"
     },
     "infos_2": {
         "membercount-0": "Total number of members",

@@ -251,6 +251,7 @@ Has a nice dayz !""",
         "bitly_short":"Quick linq: {url}",
         "bitly_long":"Slow link: {url}",
         "bitly_nobit":"HAHA NOPE, dat's not a bit.ly link!",
+        "changelogs-notfound": "Srry but i cannot find das version"
         }
 
 infos_2={"membercount-0":"Total nmber of membrz",
