@@ -183,7 +183,7 @@ class XPCog(commands.Cog):
             item = random.choice(await self.bot.cogs['LangCog'].tr(msg.channel,'xp','levelup-items'))
         else:
             item = ''
-        await msg.channel.send(text.format_map(self.bot.SafeDict(user=msg.author.mention,level=lvl[0],random=item)))
+        await msg.channel.send(text.format_map(self.bot.SafeDict(user=msg.author.mention,level=lvl[0],random=item,username=msg.author.display_name)))
         
     async def check_cmd(self,msg):
         """Vérifie si un message est une commande"""
