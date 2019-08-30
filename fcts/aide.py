@@ -127,12 +127,12 @@ If the bot can't send the new command format, it will try to send the old one.""
                 embed_colour = discord.Colour(self.help_color)
             if isinstance(pages[0],str):
                 for page in pages:
-                    embed = self.bot.cogs["EmbedCog"].Embed(title=title,desc=page,footer_text=ft.format(prefix),color=embed_colour).update_timestamp().discord_embed()
+                    embed = self.bot.cogs["EmbedCog"].Embed(title=title,desc=page,footer_text=ft.format(prefix),color=embed_colour).update_timestamp()
                     title = ""
                     await destination.send(embed=embed)
             else:
                 fields = [{'name':page[0], 'value':page[1],'inline':False} for page in pages]
-                embed = self.bot.cogs["EmbedCog"].Embed(title=title,footer_text=ft.format(prefix),fields=fields,color=embed_colour).update_timestamp().discord_embed()
+                embed = self.bot.cogs["EmbedCog"].Embed(title=title,footer_text=ft.format(prefix),fields=fields,color=embed_colour).update_timestamp()
                 await destination.send(embed=embed)
         else:
             for page in pages:
