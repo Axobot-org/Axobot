@@ -22,7 +22,8 @@ admin={"change_game-0":"Sélectionnez *play*, *watch*, *listen* ou *stream* suiv
         }
 
 aide={"no-subcmd":"La commande {0.name} n'a aucune sous-commande",
-        "mods":['Modération :','Autres :'],
+        "embed_title":"Liste des commandes disponibles pour {u}",
+        "categories":{"fun":"fun","info":"informations","moderation":"modération","other":"autres","server-settings":"configuration","staff":"staff du bot","users-info":"Infos sur les utilisateurs","unclassed":"non classé","translators":"equipe de traducteurs"},
         "footer":"Entrez {}help commande pour plus d'informations sur une commande",
         "no-desc-cog":"Aucune description pour ce module.",
         "no-desc-cmd":"Aucune description pour cette commande",
@@ -81,7 +82,8 @@ __**La configuration**__
  - `{owner}` affiche le nom du propriétaire du serveur
  - `{member_count}` affiche le nombre actuel de membres
  - `{type}` retourne 'bot' si le membre est un bot, 'membre' sinon
-"""}
+""",
+        "error-give-roles":"Impossible de donner le rôle '{r}' au nouveau membre {u} : erreur de permissions\nVérifiez la hiérarchie des rôles ainsi que ma permission 'Gérer les rôles'"}
 
 cases={"no-user":"Impossible de trouver cet utilisateur",
         "not-found":"Ce casier n'a pas été trouvé :confused:",
@@ -115,9 +117,12 @@ errors={"cooldown":"Vous êtes en cooldown pour cette commande. Veuillez attendr
         "invalidurl":"Url invalide : `{u}`",
         "invalidisbn":"ISBN invalide",
         "invalidemoji":"Emoji invalide",
+        "invalidmsgid":"ID invalide",
         'channotfound':"Le salon {c} est introuvable",
         'DM':"Cette commande est indisponible en Messages Privés",
         "emojinotfound":"Emoji `{e}` introuvable",
+        "msgnotfound":"Message introuvable",
+        "toomanytxtchan":"Vous avez trop de salons textuels accessibles"
         }
 
 find={"user-0":"Nom : {}\nID : {}",
@@ -240,6 +245,7 @@ Bonne journée !""",
         "bitly_short":"URL raccourcie : {url}",
         "bitly_long":"URL d'origine : {url}",
         "bitly_nobit":"Cette adresse n'est pas un lien bit.ly !",
+        "changelog-notfound":"Impossible de trouver cette version"
         }
 
 infos_2={"membercount-0":"Nombre de membres total",
@@ -266,13 +272,15 @@ keywords={"depuis":"depuis",
         "membres":"membres",
         "subcmds":"sous-commandes",
         "ghost":"Fantôme",
-        'unknown':'Inconnu',
-        'added_at':'Ajouté le',
-        'bot':'bot',
-        'member':'membre',
-        'server':'serveur',
-        'servers':'serveurs',
-        'click_here':'Cliquez ici'
+        "unknown":"Inconnu",
+        "added_at":"Ajouté le",
+        "bot":"bot",
+        "member":"membre",
+        "server":"serveur",
+        "servers":"serveurs",
+        "click_here":"Cliquez ici",
+        "category":"catégorie",
+        "version":"version"
         }
 
 kill={"list":["Oh toi, tu vas mourir !",
@@ -507,7 +515,9 @@ roles_react={"already-1-rr":"Vous avez déjà un rôle désigné pour cet émoji
         "role-given":"Le rôle {r} a bien été donné",
         "role-not-in-list":"Ce rôle ne fait pas partie des rôles attribuables",
         "rr-embed":"S'attribuer un rôle",
-        "role-lost":"Le rôle {r} a bien été retiré"
+        "role-lost":"Le rôle {r} a bien été retiré",
+        "not-zbot-msg":"Ce message n'est pas celui de Zbot",
+        "not-zbot-embed":"Ce message ne contient pas d'embed de roles-reactions"
         }
 
 rss={"yt-help":"Pour rechercher une chaîne youtube, vous devez entrer l'identifiant de cette chaîne. Vous la trouverez à la fin de l'url de la chaine, elle peut être soit le nom, soit une suite de caractères aléatoires. \
@@ -785,5 +795,6 @@ xp = {'card-level':'NIVEAU',
         'rr-reload':"{} rôles mis à jour / {} membres scannés",
         'change-global-xp':"Impossible d'éditer l'XP du système global !",
         'change-xp-ok':"L'XP de l'utilisateur {user} a bien été mis à {xp} points !",
-        'no-bot':"Impossible de modifier l'XP d'un bot !"
+        'no-bot':"Impossible de modifier l'XP d'un bot !",
+        'bot-rank':"Les bots ne peuvent pas avoir d'xp"
     }

@@ -20,10 +20,18 @@
     },
     "aide": {
         "no-subcmd": "The command `{0.name}` has no subcommand",
-        "mods": [
-            "Moderation:",
-            "Other:"
-        ],
+        "embed_title": "Avalilable commands for {u}",
+        "categories": {
+            "fun": "fun",
+            "info": "information",
+            "moderation": "moderation",
+            "other": "others",
+            "server-settings": "server settings",
+            "staff": "bot staff",
+            "users-info": "Users information",
+            "unclassed":"Unclassed",
+            "translators": "translation team"
+        },
         "footer": "Type {}help command for more info on a command",
         "no-desc-cog": "No description for this cog.",
         "no-desc-cmd": "No description for this command",
@@ -154,7 +162,8 @@
         "won-card": "Wow! Very nice blurple picture {}! so beautiful that I decided to offer you the card of xp blurple! You can use it by typing the command `{}profile card blurple` {}"
     },
     "bvn": {
-        "aide": "__**Welcome to the join & leave message module**__\n\nThis module is used to configure an automatic message each time a member enters or exits your server.\n\n__** Configuration**__\n\n`1-` To configure the chat room where these messages are written, enter `{p}config change welcome_channel` followed by the channel (you can use its mention as well as its identifier or its full name).\n`2-` To configure a message, enter `{p}config change <welcome|leave> <message>`. For this message you can use some variables:\n - `{user}` mentions the member\n - `{server}` displays the server name\n - `{owner}` displays the server owner name\n - `{member_count}` shows the current number of members\n - `{type}` return 'member' or 'bot'"
+        "aide": "__**Welcome to the join & leave message module**__\n\nThis module is used to configure an automatic message each time a member enters or exits your server.\n\n__** Configuration**__\n\n`1-` To configure the chat room where these messages are written, enter `{p}config change welcome_channel` followed by the channel (you can use its mention as well as its identifier or its full name).\n`2-` To configure a message, enter `{p}config change <welcome|leave> <message>`. For this message you can use some variables:\n - `{user}` mentions the member\n - `{server}` displays the server name\n - `{owner}` displays the server owner name\n - `{member_count}` shows the current number of members\n - `{type}` return 'member' or 'bot'",
+        "error-give-role": "Unable to give role '{r}' to the new member {u}: not enough permissions\nPlease check the roles hierarchy and my permission 'Manage roles'"
     },
     "cases": {
         "no-user": "Unable to find this user :eyes:",
@@ -190,9 +199,12 @@
         "invalidurl": "Invalid url: `{u}`",
         "invalidisbn": "Invalid ISBN",
         "invalidemoji": "Invalid emoji",
+        "invalidmsgid": "Invalid message ID",
         "channotfound": "Channel {c} not found",
         "DM": "This command isn't available in Direct Messages",
-        "emojinotfound": "Emoji `{e}` not found"
+        "emojinotfound": "Emoji `{e}` not found",
+        "msgnotfound": "Unable to find any message with ID {msg}",
+        "toomanytxtchan": "You have too many accessible text channels"
     },
     "find": {
         "user-0": "name: {}\nID: {}",
@@ -306,7 +318,8 @@
         },
         "bitly_short": "Shortened URL: {url}",
         "bitly_long": "Original URL: {url}",
-        "bitly_nobit": "This address is not a bit.ly link!"
+        "bitly_nobit": "This address is not a bit.ly link!",
+        "changelogs-notfound": "Unable to find this version"
     },
     "infos_2": {
         "membercount-0": "Total number of members",
@@ -339,7 +352,9 @@
         "member": "member",
         "server": "server",
         "servers": "servers",
-        "click_here": "Click here"
+        "click_here": "Click here",
+        "category": "category",
+        "version": "version"
     },
     "kill": {
         "list": [
@@ -370,7 +385,7 @@
         ]
     },
     "library": {
-        "book_pres": "Title: {title}\nSubtitle: {subtitle}\nAutor(s): {author}\nPublisher: {publisher}\nPublication date: {publication}\nLanguage: {language}\nPage count: {pages}\n\nISBN : {isbn}",
+        "book_pres": "Title: {title}\nSubtitle: {subtitle}\nAuthor(s): {author}\nPublisher: {publisher}\nPublication date: {publication}\nLanguage: {language}\nPage count: {pages}\n\nISBN : {isbn}",
         "no-found": "Unable to find this book",
         "price": "Price"
     },
@@ -619,7 +634,9 @@
         "role-given": "The role {r} has been given",
         "role-not-in-list": "This role is not part of the attributable roles",
         "rr-embed": "Taking on a role",
-        "role-lost": "The role {r} has been removed from your roles"
+        "role-lost": "The role {r} has been removed from your roles",
+        "not-zbot-msg":"This message is not Zbot's",
+        "not-zbot-embed":"This message does not contain any role-reaction embed"
     },
     "rss": {
         "yt-help": "To search for a youtube channel, you must enter the channel ID. You will find it at the end of the string url, it can be either the name, or a string of random characters.\n*Tip: some channels are already filled in my code. Sometimes you can just put `neil3000` or `Oxisius`* :wink:",
@@ -739,7 +756,7 @@
         "partner_color": "Color of partners embed: {}",
         "partner_role": "Role given to partners: {}",
         "update_mentions": "Roles mentioned in the bot changelog: {}",
-        "verification_role":"Roles removed when a user use the `verify` command: {}"
+        "verification_role": "Roles removed when a user use the `verify` command: {}"
     },
     "stats_infos": {
         "not-found": "Unable to find {N}",
@@ -930,6 +947,7 @@
         "rr-reload": "{} updated roles / {} scanned members",
         "change-global-xp": "Impossible to edit XP of the global system!",
         "change-xp-ok": "The XP of the user {user} has been set to {xp} points!",
-        "no-bot": "Impossible to modify the XP of a bot!"
+        "no-bot": "Impossible to modify the XP of a bot!",
+        "bot-rank":"Bots can't have any xp"
     }
 }

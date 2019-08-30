@@ -14,8 +14,6 @@ importlib.reload(args)
 from libs import bitly_api
 importlib.reload(bitly_api)
 
-bot_version = conf.release
-
 
 class InfosCog(commands.Cog):
     """Here you will find various useful commands to get information about ZBot."""
@@ -23,6 +21,7 @@ class InfosCog(commands.Cog):
     def __init__(self,bot):
         self.bot = bot
         self.file = "infos"
+        self.bot_version = conf.release
         try:
             self.translate = bot.cogs["LangCog"].tr
             self.timecog = bot.cogs["TimeCog"]
@@ -98,7 +97,7 @@ class InfosCog(commands.Cog):
                 except Exception as e:
                     users = bots = 'unknown'
                 total_xp = await self.bot.cogs['XPCog'].bdd_total_xp()
-                d = str(await self.translate(ctx.channel,"infos","stats")).format(bot_v=bot_version,s_count=len_servers,m_count=users,b_count=bots,l_count=self.codelines,lang=langs_list,p_v=version,d_v=discord.__version__,ram=ram_cpu[0],cpu=ram_cpu[1],api=latency,xp=total_xp)
+                d = str(await self.translate(ctx.channel,"infos","stats")).format(bot_v=self.bot_version,s_count=len_servers,m_count=users,b_count=bots,l_count=self.codelines,lang=langs_list,p_v=version,d_v=discord.__version__,ram=ram_cpu[0],cpu=ram_cpu[1],api=latency,xp=total_xp)
             if isinstance(ctx.channel,discord.DMChannel) or ctx.channel.permissions_for(ctx.guild.me).embed_links:
                 embed = ctx.bot.cogs['EmbedCog'].Embed(title=await self.translate(ctx.channel,"infos","stats-title"), color=ctx.bot.cogs['HelpCog'].help_color, time=ctx.message.created_at,desc=d,thumbnail=self.bot.user.avatar_url_as(format="png"))
                 embed.create_footer(ctx.author)
@@ -442,7 +441,7 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
             embed.add_field(name=str(await self.translate(ctx.guild.id,"stats_infos","guild-11.1")).format(len(guild.roles)-1), value=", ".join(roles[:20]))
         else:
             embed.add_field(name=str(await self.translate(ctx.guild.id,"stats_infos","guild-11.2")).format(len(guild.roles)-1), value=", ".join(roles))
-        if guild.premium_subscription_count>0:
+        if isinstance(guild.premium_subscription_count,int) and guild.premium_subscription_count>0:
             embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","guild-13"), value=await self.translate(ctx.guild.id,"stats_infos","guild-13v",b=guild.premium_subscription_count,p=guild.premium_tier))
         embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","guild-14"), value=await self.translate(ctx.guild.id,"stats_infos","guild-14v",
             bit=round(guild.bitrate_limit/1000),
@@ -757,6 +756,32 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
         if url.domain != 'bit.ly':
             return await ctx.send(await self.translate(ctx.channel,'infos','bitly_nobit'))
         await ctx.send(await self.translate(ctx.channel,'infos','bitly_long',url=self.BitlyClient.expand_url(url.url)))
+    
+    @commands.command(name='changelog',aliases=['changelogs'])
+    async def changelog(self,ctx:commands.Context,version:str=None):
+        """Get the changelogs of the bot"""
+        if version==None:
+            if not ctx.bot.beta:
+                query = "SELECT *, CONVERT_TZ(`release_date`, @@session.time_zone, '+00:00') AS `utc_release` FROM `changelogs` WHERE beta=False ORDER BY release_date DESC LIMIT 1"
+            else:
+                query = f"SELECT *, CONVERT_TZ(`release_date`, @@session.time_zone, '+00:00') AS `utc_release` FROM `changelogs` ORDER BY release_date DESC LIMIT 1"
+        else:
+            query = f"SELECT *, CONVERT_TZ(`release_date`, @@session.time_zone, '+00:00') AS `utc_release` FROM `changelogs` WHERE `version`='{version}'"
+            if not ctx.bot.beta:
+                query += " AND `beta`=0"
+        cnx = self.bot.cnx_frm
+        cursor = cnx.cursor(dictionary=True)
+        cursor.execute(query)
+        results = list(cursor)
+        cursor.close()
+        if len(results)==0:
+            await ctx.send(await self.translate(ctx.channel,'infos','changelog-notfound'))
+        elif isinstance(ctx.channel,discord.DMChannel) or ctx.channel.permissions_for(ctx.guild.me).embed_links:
+            v = (await self.translate(ctx.channel,'keywords','version')).capitalize() + ' ' + results[0]['version']
+            emb = ctx.bot.cogs['EmbedCog'].Embed(title=v,desc=results[0][await self.translate(ctx.channel,'current_lang','current')],time=results[0]['utc_release'],color=ctx.bot.cogs['ServerCog'].embed_color)
+            await ctx.send(embed=emb)
+        else:
+            await ctx.send(results[0][await self.translate(ctx.channel,'current_lang','current')])
         
 
 def setup(bot):
