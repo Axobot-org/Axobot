@@ -239,7 +239,7 @@ class RolesReact(commands.Cog):
             if not channel.permissions_for(guild.me).manage_roles:
                 return await channel.send(await self.translate(guild.id,'modo','cant-mute'))
             if role.position >= guild.me.top_role.position:
-                return await channel.send(await self.translate(guild.id,'modo','role_high',r=role_name))
+                return await channel.send(await self.translate(guild.id,'modo','role-high',r=role_name))
         try:
             if give:
                 await user.add_roles(role,reason="Roles reaction")
