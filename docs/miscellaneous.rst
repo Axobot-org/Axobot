@@ -44,6 +44,17 @@ This command is useful for doing something that Discord has but does not yet off
 .. note:: As mentioned above, you must be in a voice channel of your server to use this command. Also it obviously doesn't work outside a server.
 
 
+----------
+Changelogs
+----------
+
+**Syntax:** :code:`changelogs [version]`
+
+If you want to know the bot modification log, what has been changed in the last version or an older one, you can use this command. Introduced in version 3.5.5, it allows access to all bot changelogs from this version. For older versions, you will have to go directly to the channels of the official server!
+
+.. note:: Giving the "`Embed Links <perms.html#embed-links>`_" permission to the bot can be useful if you want to get a better rendering. But it's not mandatory!
+
+
 ----
 Crab
 ----
