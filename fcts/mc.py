@@ -276,7 +276,8 @@ Every information come from the website www.fr-minecraft.net"""
             await self.bot.cogs['ErrorsCog'].on_error(e,None)
             return await self.translate(guild,"mc","serv-error")
         if "error" in r.keys():
-            await print2("(mc-server) Error on: "+url)
+            if r['error'] != 'timed out':
+                await print2("(mc-server) Error on: "+url+"\n   "+r['error'])
             return r["error"]
         players=[]
         try:

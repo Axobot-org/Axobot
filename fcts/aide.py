@@ -1,4 +1,4 @@
-import discord, re, inspect
+import discord, re, inspect, json
 from discord.ext import commands
 
 class HelpCog(commands.Cog):
@@ -16,6 +16,8 @@ class HelpCog(commands.Cog):
             self.translate = bot.cogs["LangCog"].tr
         except:
             pass
+        with open('fcts/help.json','r') as file:
+            self.commands_list = json.load(file)
     
     @commands.Cog.listener()
     async def on_ready(self):
@@ -79,8 +81,10 @@ If the bot can't send the new command format, it will try to send the old one.""
             def repl(obj):
                 return self._mentions_transforms.get(obj.group(0), '')
 
+            title = ""
             if len(commands) == 0:  #aucune commande
                 pages = await self.all_commands(ctx)
+                title = await self.translate(ctx.channel,"aide","embed_title",u=str(ctx.author))
             elif len(commands) == 1:    #Nom de cog/commande unique ?
                 name = self._mention_pattern.sub(repl, commands[0])
                 command = None
@@ -117,10 +121,18 @@ If the bot can't send the new command format, it will try to send the old one.""
             if type(prefix)==list:
                 prefix = prefix[0]
         if destination.permissions_for(me).embed_links:
-            for page in pages:
-                embed = self.bot.cogs["EmbedCog"].Embed(desc=page,footer_text=ft.format(prefix)).update_timestamp().discord_embed()
-                if ctx.guild != None:
-                    embed.colour = ctx.guild.me.color if ctx.guild.me.color != discord.Colour(self.help_color).default() else discord.Colour(self.help_color)
+            if ctx.guild != None:
+                embed_colour = ctx.guild.me.color if ctx.guild.me.color != discord.Colour(self.help_color).default() else discord.Colour(self.help_color)
+            else:
+                embed_colour = discord.Colour(self.help_color)
+            if isinstance(pages[0],str):
+                for page in pages:
+                    embed = self.bot.cogs["EmbedCog"].Embed(title=title,desc=page,footer_text=ft.format(prefix),color=embed_colour).update_timestamp()
+                    title = ""
+                    await destination.send(embed=embed)
+            else:
+                fields = [{'name':page[0], 'value':page[1],'inline':False} for page in pages]
+                embed = self.bot.cogs["EmbedCog"].Embed(title=title,footer_text=ft.format(prefix),fields=fields,color=embed_colour).update_timestamp()
                 await destination.send(embed=embed)
         else:
             for page in pages:
@@ -134,16 +146,9 @@ If the bot can't send the new command format, it will try to send the old one.""
             return cmd.name
 
     async def all_commands(self,ctx:commands.Context):
-        """Create pages for every bot command"""
-        def category(cmd):
-            cog = cmd.cog_name
-            # we insert the zero width space there to give it approximate
-            # last place sorting position.
-            return cog + ':' if cog is not None else '\u200bNo Category:'
-        
+        """Create pages for every bot command"""      
         cmds = sorted([c for c in self.bot.commands],key=self.sort_by_name)
-        modhelp = ""
-        otherhelp = ""
+        categories = {x:list() for x in self.commands_list.keys()}
         for cmd in cmds:
             try:
                 if cmd.hidden==True or cmd.enabled==False:
@@ -156,15 +161,35 @@ If the bot can't send the new command format, it will try to send the old one.""
                 else:
                     continue
             temp = await self.display_cmd(cmd)
-            if cmd.cog_name in ['AdminCog','ServerCog','ModeratorCog','CasesCog','ReloadsCog','TimedCog']:
-                modhelp += "\n"+temp
+            found = False
+            for k,v in self.commands_list.items():
+                if cmd.name in v:
+                    categories[k].append(temp)
+                    found = True
+                    break
+            if not found:
+                categories['unclassed'].append(temp)
+        tr = await self.translate(ctx.channel,"aide","categories")
+        answer = list()
+        for k,v in categories.items():
+            if len(v)==0:
+                continue
+            if len("\n".join(v))>1020:
+                temp = list(v)
+                v = list()
+                i = 1
+                for line in temp:
+                    if len("\n".join(v+[line]))>1020:
+                        title = tr[k]+' - '+str(i) if k in tr.keys() else k+' - '+str(i)
+                        answer.append(("__**"+title.capitalize()+"**__", "\n".join(v)))
+                        v = list()
+                        i += 1
+                    v.append(line)
+                title = tr[k]+' - '+str(i) if k in tr.keys() else k+' - '+str(i)
+                answer.append(("__**"+title.capitalize()+"**__", "\n".join(v)))
             else:
-                otherhelp += "\n"+temp
-        tr = await self.translate(ctx.channel,"aide","mods")
-        if len(modhelp+otherhelp)<1900:
-            return ["__• **{}**__\n{}".format(tr[0],modhelp) + "\n\n__• **{}**__\n{}".format(tr[1],otherhelp)]
-        else:
-            return ["__• **{}**__\n{}".format(tr[0],modhelp) , "\n\n__• **{}**__\n{}".format(tr[1],otherhelp)]
+                answer.append(("__**"+tr[k].capitalize()+"**__", "\n".join(v)))
+        return answer
 
     async def cog_commands(self,ctx:commands.Context,cog:commands.Cog):
         """Create pages for every command of a cog"""
@@ -263,7 +288,13 @@ If the bot can't send the new command format, it will try to send the old one.""
                 except Exception as e:
                     await self.bot.cogs["ErrorsCog"].on_error(e,ctx)
         checks = '\n'.join(checks)
-
+        # Module
+        category = "unclassed"
+        for k,v in self.commands_list.items():
+            if cmd.name in v:
+                category = k
+                break
+        category = (await self.translate(ctx.channel,'keywords','category')).capitalize() + ": " + (await self.translate(ctx.channel,"aide","categories"))[category]
         answer = f"**{prefix}{syntax}\n\n{desc}\n"
         if len(subcmds)>0:
             answer += "\n"+subcmds+"\n"
@@ -273,6 +304,7 @@ If the bot can't send the new command format, it will try to send the old one.""
             answer += enabled
         if len(checks)>0:
             answer += "\n"+checks
+        answer += f"\n\n\n*{category}*"
         return [answer]
 
 

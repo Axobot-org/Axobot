@@ -1,4 +1,4 @@
-import discord, re, string
+import discord, re, string, typing
 from discord.ext import commands
 from urllib.parse import urlparse
 
@@ -140,3 +140,26 @@ class anyEmoji(commands.Converter):
                 return r.group(1)
         print(len(argument))
         raise commands.errors.BadArgument('Invalid emoji: '+argument)
+
+class guildMessage(commands.Converter):
+    def __init__(self):
+        pass
+    
+    async def convert(self,ctx:commands.Context,argument:str) -> discord.Message:
+        if len(argument)!=18 or not argument.isnumeric():
+            raise commands.errors.BadArgument('Invalid message ID: '+argument)
+        if ctx.guild==None:
+            channels = [ctx.channel]
+        else:
+            me = ctx.guild.me
+            channels = [ctx.channel] + [x for x in ctx.guild.text_channels if x.id!=ctx.channel.id and x.permissions_for(me).read_message_history and x.permissions_for(me).read_messages]
+            if len(channels)>50:
+                raise commands.errors.BadArgument('Too many text channels')
+        for channel in channels:
+            try:
+                msg = await channel.fetch_message(int(argument))
+            except:
+                pass
+            else:
+                return msg
+        raise commands.errors.BadArgument('Message "{}" not found.'.format(argument))

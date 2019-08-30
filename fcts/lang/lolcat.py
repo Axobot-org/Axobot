@@ -22,7 +22,18 @@ For much infoZ on de current state ov dis crisis, gonna to my offishial srver: h
         }
 
 aide={"no-subcmd":"Teh kommand `{0.name}` had not sub~~scribe~~commanD",
-        "mods":['Moderashun:','Oderz:'],
+        "embed_title": "Cmds list 4 {u}",
+        "categories": {
+            "fun": "cool things",
+            "info": "usefull things",
+            "moderation": "acute things",
+            "other": "idk, dont ask me plz",
+            "server-settings": "other usefl tihngs",
+            "staff": "bot things",
+            "users-info": "things 'bout cats/people",
+            "unclassed": "random things :shrug:",
+            "translators": "langage things"
+        },
         "footer":"Type {}help cmd 4 mure info abawt an commandZ",
         "no-desc-cog":"No more discripton for dis cogg.",
         "no-desc-cmd":"No descripshun for those c:o2:mmand",
@@ -80,7 +91,8 @@ __** ConfiGrationZ**__
  - `{owner}` displayz teh servr ownr nam
  - `{member_count}` showz the curent nbr oof memberz
  - `{type}` show theh type of the user (bot/member)
-"""}
+""",
+        "error-give-roles":"Srry I wasn't abl 2 give role '{r}' to new cat `{u}`. Pls check hierarchy and 'Manage roles' perms :sad:"}
 
 cases={"no-user":"Unable to find dis usr :eyes:",
         "not-found":"Dis caze was not fund :upside_down:",
@@ -114,9 +126,12 @@ errors={"cooldown":"Yu are on cold-own for dis comandZ :confused: Plize wait {d}
         "invalidurl":"Nope, `{u}` iznt a valid ~~cat~~ link",
         "invalidisbn":"Invalid ISBN",
         "invalidemoji":"INvalid smiley",
+        "invalidmsgid":"InVAlid msg ID",
         'channotfound':"Super chat room {c} don't want 2 be found",
         'DM':"Dat command isn't enabled in PM",
         "emojinotfound":"Emoji `{e}` cannot found been",
+        "msgnotfound": "NoAble 2 find any msg with ID {msg}",
+        "toomanytxtchan": "U have toooo many visibl text channels lmao. Why so much? useless/20. U should seriously think 'bout it dude. Pro-tip :smirk:"
         }
 
 find={"user-0":"naym: {}\nID: {}",
@@ -238,6 +253,7 @@ Has a nice dayz !""",
         "bitly_short":"Quick linq: {url}",
         "bitly_long":"Slow link: {url}",
         "bitly_nobit":"HAHA NOPE, dat's not a bit.ly link!",
+        "changelogs-notfound": "Srry but i cannot find das version"
         }
 
 infos_2={"membercount-0":"Total nmber of membrz",
@@ -264,13 +280,15 @@ keywords={"depuis":"sinze",
         "membres":"memberz",
         "subcmds":"subcommands",
         "ghost":"Goast",
-        'unknown':'No known',
-        'added_at':'Addd at',
-        'bot':'robot',
-        'member':'human',
-        'server':'nice place',
-        'servers':'guilds',
-        'click_here':'BLUE BUTTON TO CLICK'
+        "unknown":"No known",
+        "added_at":"Addd at",
+        "bot":"robot",
+        "member":"human",
+        "server":"nice place",
+        "servers":"guilds",
+        "click_here":"BLUE BUTTON TO CLICK",
+        "category":"box",
+        "version":"vershun"
         }
 
 kill={"list":["Hi ho ! Oh u, u gonna die!",
@@ -497,7 +515,9 @@ roles_react={"already-1-rr":"U already has a designated role 4 this emoji",
         "role-given":"The role {r} has been given",
         "role-not-in-list":"Tish role iz NOT part ov the giveable r0ls",
         "rr-embed":"tAkInG on A ROle",
-        "role-lost":"ThE rolE {r} HAS BEeN reMoVEd fR0M yOUr ROLEs"
+        "role-lost":"ThE rolE {r} HAS BEeN reMoVEd fR0M yOUr ROLEs",
+        "not-zbot-msg":"NOOOOOOO tish msg is not Zbot's. bad dude.",
+        "not-zbot-embed":"This msg dont has any rolereact colorful box"
         }
 
 rss={"yt-help":"To seerch for a youtwube channel, you may enter the channil ID. You will found it at teh and of the strin url, it can be 8ther the nayme, or a strin of randem characteRs. \
@@ -775,5 +795,6 @@ xp = {'card-level':'LVL',
         'rr-reload':"{} updated roles / {} members",
         'change-global-xp':"NOT possible 2 edit XP of the global super mega system!",
         'change-xp-ok':"XP of teh user {user} have been set 2 {xp}xp!",
-        'no-bot':"Impossible 2 modify the XP ov a robot!"
+        'no-bot':"Impossible 2 modify the XP ov a robot!",
+        "bot-rank":"Bots like myself can't have any xp...sad times."
         }

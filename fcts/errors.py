@@ -84,6 +84,13 @@ class ErrorsCog(commands.Cog):
             r = re.search(r'Channel \"([^\"]+)\" not found',raw_error)
             if r!=None:
                 return await ctx.send(await self.translate(ctx.channel,'errors','channotfound',c=r.group(1)))
+            # Message "1243" not found.
+            r = re.search(r'Message \"([^\"]+)\" not found',raw_error)
+            if r!=None:
+                return await ctx.send(await self.translate(ctx.channel,'errors','msgnotfound',msg=r.group(1)))
+            # Too many text channels
+            if raw_error=='Too many text channels':
+                return await ctx.send(await self.translate(ctx.channel,'errors','toomanytxtchan'))
             # Invalid duration: 2d
             r = re.search(r'Invalid duration: ([^\" ]+)',raw_error)
             if r != None:
@@ -112,6 +119,10 @@ class ErrorsCog(commands.Cog):
             r = re.search(r'Invalid emoji: (\S+)',raw_error)
             if r!=None:
                 return await ctx.send(await self.translate(ctx.channel,'errors','invalidemoji'))
+            # Invalid message ID: 007
+            r = re.search(r'Invalid message ID: (\S+)',raw_error)
+            if r!=None:
+                return await ctx.send(await self.translate(ctx.channel,'errors','invalidmsgid'))
             print('errors -',error)
         elif isinstance(error,commands.MissingRequiredArgument):
             await ctx.send(await self.translate(ctx.channel,'errors','missingargument',a=error.param.name,e=random.choice([':eyes:','',':confused:',':thinking:',''])))

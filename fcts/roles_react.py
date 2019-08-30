@@ -13,6 +13,7 @@ class RolesReact(commands.Cog):
         self.guilds_which_have_roles = set()
         self.cache_initialized = False
         self.embed_color = 12118406
+        self.footer_txt = 'ZBot roles reactions'
         try:
             self.translate = bot.cogs['LangCog'].tr
         except:
@@ -37,7 +38,7 @@ class RolesReact(commands.Cog):
             msg = await chan.fetch_message(payload.message_id)
         except:
             return None, None
-        if len(msg.embeds)==0 or msg.embeds[0].footer.text!='ZBot roles reactions' or msg.author.id != self.bot.user.id:
+        if len(msg.embeds)==0 or msg.embeds[0].footer.text!=self.footer_txt or msg.author.id != self.bot.user.id:
             return None, None
         temp = await self.rr_list_role(payload.guild_id, payload.emoji.id if payload.emoji.is_custom_emoji() else payload.emoji.name)
         if len(temp)==0:
@@ -112,7 +113,7 @@ class RolesReact(commands.Cog):
         cursor.close()
         return True
 
-    @commands.group(name="roles_react")
+    @commands.group(name="roles_react",aliases=['role_react'])
     @commands.guild_only()
     async def rr_main(self,ctx):
         """Manage your roles reactions"""
@@ -121,9 +122,10 @@ class RolesReact(commands.Cog):
     
     @rr_main.command(name="add")
     @commands.check(checks.has_manage_guild)
-    async def rr_add(self,ctx,emoji:args.anyEmoji,role:discord.Role,*,description:str=None):
+    async def rr_add(self,ctx,emoji:args.anyEmoji,role:discord.Role,*,description:str=''):
         """Add a role reaction
-        This role will be given when a membre click on a specific reaction"""
+        This role will be given when a membre click on a specific reaction
+        Your description can only be a maximum of 150 characters"""
         try:
             if role.name == '@everyone':
                 raise commands.BadArgument(f'Role "{role.name}" not found')
@@ -134,7 +136,7 @@ class RolesReact(commands.Cog):
             max_rr = self.bot.cogs["ServerCog"].default_opt['roles_react_max_number'] if max_rr==None else max_rr
             if len(l) >= max_rr:
                 return await ctx.send(await self.translate(ctx.guild.id,'roles_react','too-many-rr',l=max_rr))
-            await self.rr_add_role(ctx.guild.id,role.id,emoji,description)
+            await self.rr_add_role(ctx.guild.id,role.id,emoji,description[:150])
         except Exception as e:
             await self.bot.cogs['ErrorsCog'].on_cmd_error(ctx,e)
         else:
@@ -171,7 +173,7 @@ class RolesReact(commands.Cog):
                     emojis.append(k['emoji'])
             else:
                 emojis.append(k['emoji'])
-        return '\n'.join(["{}   <@&{}> ".format(x['emoji'], x['role']) for x in liste]), emojis
+        return '\n'.join(["{}   <@&{}> - *{}*".format(x['emoji'], x['role'], x['description']) for x in liste]), emojis
 
     @rr_main.command(name="list")
     async def rr_list(self,ctx):
@@ -209,7 +211,7 @@ class RolesReact(commands.Cog):
             else:
                 des, emojis = await self.create_list_embed(l,ctx.guild)
                 title = await self.translate(ctx.guild.id,"roles_react",'rr-embed')
-                emb = self.bot.cogs['EmbedCog'].Embed(title=title,desc=des,color=self.embed_color,footer_text='ZBot roles reactions').update_timestamp()
+                emb = self.bot.cogs['EmbedCog'].Embed(title=title,desc=des,color=self.embed_color,footer_text=self.footer_txt).update_timestamp()
                 msg = await ctx.send(embed=emb.discord_embed())
                 for e in emojis:
                     try:
@@ -237,7 +239,7 @@ class RolesReact(commands.Cog):
             if not channel.permissions_for(guild.me).manage_roles:
                 return await channel.send(await self.translate(guild.id,'modo','cant-mute'))
             if role.position >= guild.me.top_role.position:
-                return await channel.send(await self.translate(guild.id,'modo','role_high',r=role_name))
+                return await channel.send(await self.translate(guild.id,'modo','role-high',r=role_name))
         try:
             if give:
                 await user.add_roles(role,reason="Roles reaction")
@@ -248,6 +250,29 @@ class RolesReact(commands.Cog):
         else:
             if not ignore_success:
                 await channel.send(await self.translate(guild.id,'roles_react','role-given' if give else 'role-lost',r=role_name))
+    
+
+    @rr_main.command(name='update')
+    async def rr_update(self,ctx:commands.Context,embed:args.guildMessage,changeDescription:bool=True):
+        """Update a Zbot message to refresh roles/reactions
+        If you don't want to update the embed content, for example if it's a custom embed, then you can use 'False' as a second argument. Zbot will only check the reactions"""
+        if embed.author!=ctx.guild.me:
+            return await ctx.send(await self.translate(ctx.guild,'roles_react','not-zbot-msg'))
+        if len(embed.embeds)!=1 or embed.embeds[0].footer.text!=self.footer_txt:
+            return await ctx.send(await self.translate(ctx.guild,'roles_react','not-zbot-embed'))
+        emb = embed.embeds[0]
+        try:
+            l = await self.rr_list_role(ctx.guild.id)
+        except Exception as e:
+            return await self.bot.cogs['ErrorsCog'].on_cmd_error(ctx,e)
+        desc, emojis = await self.create_list_embed(l,ctx.guild)
+        reacts = [x.emoji for x in embed.reactions]
+        for emoji in emojis:
+            if emoji not in reacts:
+                await embed.add_reaction(emoji)
+        if emb.description != desc and changeDescription:
+            emb.description = desc
+            await embed.edit(embed=emb)
 
 
 def setup(bot):
