@@ -279,7 +279,8 @@ keywords={"depuis":"depuis",
         "server":"serveur",
         "servers":"serveurs",
         "click_here":"Cliquez ici",
-        "category":"catégorie"
+        "category":"catégorie",
+        "version":"version"
         }
 
 kill={"list":["Oh toi, tu vas mourir !",

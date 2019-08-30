@@ -761,17 +761,27 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
     async def changelog(self,ctx:commands.Context,version:str=None):
         """Get the changelogs of the bot"""
         if version==None:
-            query = 'SELECT * FROM `changelogs` ORDER BY release_date DESC LIMIT 1'
+            if not ctx.bot.beta:
+                query = "SELECT * FROM `changelogs` WHERE beta=False ORDER BY release_date DESC LIMIT 1"
+            else:
+                query = f"SELECT * FROM `changelogs` ORDER BY release_date DESC LIMIT 1"
         else:
             query = f"SELECT * FROM `changelogs` WHERE `version`='{version}'"
+            if not ctx.bot.beta:
+                query += " AND `beta`=0"
         cnx = self.bot.cnx_frm
         cursor = cnx.cursor(dictionary=True)
         cursor.execute(query)
         results = list(cursor)
         cursor.close()
         if len(results)==0:
-            return await ctx.send(await self.translate(ctx.channel,'infos','changelog-notfound'))
-        await ctx.send(results[0][await self.translate(ctx.channel,'current_lang','current')])
+            await ctx.send(await self.translate(ctx.channel,'infos','changelog-notfound'))
+        elif isinstance(ctx.channel,discord.DMChannel) or ctx.channel.permissions_for(ctx.guild.me).embed_links:
+            v = (await self.translate(ctx.channel,'keywords','version')).capitalize() + ' ' + results[0]['version']
+            emb = ctx.bot.cogs['EmbedCog'].Embed(title=v,desc=results[0][await self.translate(ctx.channel,'current_lang','current')],time=results[0]['release_date'],color=ctx.bot.cogs['ServerCog'].embed_color)
+            await ctx.send(embed=emb)
+        else:
+            await ctx.send(results[0][await self.translate(ctx.channel,'current_lang','current')])
         
 
 def setup(bot):

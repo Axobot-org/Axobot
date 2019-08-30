@@ -352,7 +352,8 @@
         "server": "server",
         "servers": "servers",
         "click_here": "Click here",
-        "category": "category"
+        "category": "category",
+        "version": "version"
     },
     "kill": {
         "list": [

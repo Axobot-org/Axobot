@@ -286,7 +286,8 @@ keywords={"depuis":"sinze",
         "server":"nice place",
         "servers":"guilds",
         "click_here":"BLUE BUTTON TO CLICK",
-        "category":"box"
+        "category":"box",
+        "version":"vershun"
         }
 
 kill={"list":["Hi ho ! Oh u, u gonna die!",
