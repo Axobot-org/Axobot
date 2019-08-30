@@ -541,6 +541,14 @@ Cette option affecte tous les serveurs"""
         except:
             pass
 
+    @main_msg.command(name="loop_restart")
+    async def loop_restart(self,ctx:commands.Context):
+        """Relance la boucle principale"""
+        try:
+            ctx.bot.cogs["Events"].loop.start()
+        except RuntimeError:
+            await ctx.send("La boucle est déjà lancée :wink:")
+
 
     @main_msg.group(name="server")
     @commands.check(reloads.check_admin)
