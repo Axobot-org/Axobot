@@ -10,6 +10,9 @@ async def is_translator(ctx:commands.Context) -> bool:
         349899849937846273, # Jees1
         ]
 
+async def check_admin(ctx):
+    return await ctx.bot.cogs['AdminCog'].check_if_admin(ctx)
+
 class TranslatorsCog(commands.Cog):
     """Special cog for those who help with the translation of the bot"""
 
@@ -130,6 +133,55 @@ class TranslatorsCog(commands.Cog):
             c = lang_progress*100 / en_progress
             txt = f"Translation of {lang}:\n {round(c,1)}%\n {lang_progress} messages on {en_progress}"
         await ctx.send(txt)
+    
+    async def _fuse_file(self,old:dict,new:str):
+        async def readpath(path:list,o,msg:str):
+            if len(path)==0:
+                return msg
+            else:
+                if len(path)>1:
+                    if path[1].isnumeric():
+                        temp = list()
+                    else:
+                        temp = dict()
+                else:
+                    temp = None
+                if path[0].isnumeric():
+                    if len(o)>int(path[0]):
+                        await readpath(path[1:],o[int(path[0])],msg)
+                    else:
+                        t = await readpath(path[1:],temp,msg)
+                        o.insert(int(path[0]), t)
+                else:
+                    if path[0] in o.keys():
+                        await readpath(path[1:],o[path[0]],msg)
+                    else:
+                        o[path[0]] = await readpath(path[1:],temp,msg)
+                return o
+        for line in new.split('\n'):
+            if len(line.strip())==0:
+                continue
+            await readpath(line.split(' ')[0].split('.'),old,' '.join(line.split(' ')[1:]))
+        return old
+
+            
+
+    @commands.command(name="tr-file")
+    @commands.check(check_admin)
+    async def fuse_file(self,ctx,lang:str):
+        """Merge the current project file
+        with the already-translated file"""
+        if lang not in self.todo.keys():
+            return await ctx.send("Invalid language")
+        try:
+            with open(f'fcts/lang/{lang}.json','r',encoding='utf-8') as old_f:
+                with open(f'translation/{lang}.txt','r',encoding='utf-8') as new_f:
+                    new = await self._fuse_file(json.load(old_f),new_f.read())
+        except FileNotFoundError:
+            return await ctx.send("There is no current project with this language")
+        with open(f'translation/{lang}.json','w',encoding='utf-8') as f:
+            json.dump(new,f, ensure_ascii=False, indent=4, sort_keys=True)
+        await ctx.send('Done!',file=discord.File(f'translation/{lang}.json'))
 
 
 def setup(bot):
