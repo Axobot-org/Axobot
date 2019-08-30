@@ -29,7 +29,8 @@
             "server-settings": "server settings",
             "staff": "bot staff",
             "users-info": "Users information",
-            "unclassed":"Unclassed"
+            "unclassed":"Unclassed",
+            "translators": "translation team"
         },
         "footer": "Type {}help command for more info on a command",
         "no-desc-cog": "No description for this cog.",

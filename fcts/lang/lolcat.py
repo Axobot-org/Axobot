@@ -31,7 +31,8 @@ aide={"no-subcmd":"Teh kommand `{0.name}` had not sub~~scribe~~commanD",
             "server-settings": "other usefl tihngs",
             "staff": "bot things",
             "users-info": "things 'bout cats/people",
-            "unclassed":"random things :shrug:"
+            "unclassed": "random things :shrug:",
+            "translators": "langage things"
         },
         "footer":"Type {}help cmd 4 mure info abawt an commandZ",
         "no-desc-cog":"No more discripton for dis cogg.",
