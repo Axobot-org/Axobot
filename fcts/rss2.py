@@ -66,12 +66,10 @@ class RssCog(commands.Cog):
             self.print = bot.cogs["UtilitiesCog"].print2
         except:
             pass
-        try:
-            requests.get('http://twitrss.me/twitter_user_to_rss/?user=discordapp').json()
-        except:
+        if feedparser.parse('http://twitrss.me/twitter_user_to_rss/?user=Dinnerbone').entries == list():
             self.twitter_api_url = 'http://twitrss.me/mobile_twitter_to_rss/?user='
         else:
-            self.twitter_api_url = 'http://twitrss.me/twitter_to_rss/?user='
+            self.twitter_api_url = 'http://twitrss.me/twitter_user_to_rss/?user='
 
     @commands.Cog.listener()
     async def on_ready(self):
