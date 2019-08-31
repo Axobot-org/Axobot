@@ -40,8 +40,8 @@ class UtilitiesCog(commands.Cog):
             if liste == []:
                 self.list_prefixs[str(guild.id)] = '!'
                 return '!'
-            self.list_prefixs[str(guild.id)] = liste[0][0]
-            return str(liste[0][0])
+            self.list_prefixs[str(guild.id)] = liste[0]
+            return str(liste[0])
 
     def update_prefix(self,ID,prefix):
         try:
