@@ -20,7 +20,7 @@
     },
     "aide": {
         "no-subcmd": "The command `{0.name}` has no subcommand",
-        "embed_title": "Avalilable commands for {u}",
+        "embed_title": "Available commands for {u}",
         "categories": {
             "fun": "fun",
             "info": "information",
