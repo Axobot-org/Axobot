@@ -95,7 +95,7 @@ class TranslatorsCog(commands.Cog):
         try:
             msg = await self.bot.wait_for('message', check=lambda msg: msg.author.id==ctx.author.id and msg.channel.id==ctx.channel.id, timeout=45)
         except asyncio.TimeoutError:
-            await ctx.send("You were too slow. Try again.")
+            return await ctx.send("You were too slow. Try again.")
         if msg.content.lower() == 'pass':
             await ctx.send("This message will be ignored until the next reload of this command")
         else:
