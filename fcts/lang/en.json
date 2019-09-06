@@ -432,7 +432,7 @@
         "entity-help": "This command allows you to obtain information about any Minecraft entity. You can give its full or partial name, in French or English, or even its identifier. Just enter `!mc entity <name>`",
         "block-help": "This command allows you to obtain information on any Minecraft block. You can give its full or partial name, in French or English, or even its identifier. Just enter `!mc block <name>`",
         "item-help": "This command allows you to obtain information on any Minecraft item. You can give its full or partial name, in French or English, or even its identifier. Just enter `!mc item <name>`",
-        "cmd-help": "This command allows you to obtain information about any Minecraft command. All you have to do is type `!mc command <nom>`",
+        "cmd-help": "This command allows you to obtain information about any Minecraft command. All you have to do is type `!mc command <name>`",
         "adv-help": "This command provides information about any advancement of the game Minecraft. Simply enter the name or the identifier of the advancement.",
         "no-entity": "Unable to find this entity",
         "no-block": "Unable to find this block",
