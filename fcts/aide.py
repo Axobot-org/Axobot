@@ -82,10 +82,14 @@ If the bot can't send the new command format, it will try to send the old one.""
                 return self._mentions_transforms.get(obj.group(0), '')
 
             title = ""
+            categ_name = [k for k,v in (await self.translate(ctx.channel,"aide","categories")).items() if v.lower()==" ".join(commands).lower()]
+            if len(categ_name) == 1:
+                temp = [c for c in self.bot.commands if c.name in self.commands_list[categ_name[0]]]
+                pages = await self.all_commands(ctx,sorted(temp,key=self.sort_by_name))
             if len(commands) == 0:  #aucune commande
-                pages = await self.all_commands(ctx)
+                pages = await self.all_commands(ctx,sorted([c for c in self.bot.commands],key=self.sort_by_name))
                 title = await self.translate(ctx.channel,"aide","embed_title",u=str(ctx.author))
-            elif len(commands) == 1:    #Nom de cog/commande unique ?
+            elif len(commands) == 1:    #Nom de commande unique ?
                 name = self._mention_pattern.sub(repl, commands[0])
                 command = None
                 if name in self.bot.cogs:
@@ -145,9 +149,8 @@ If the bot can't send the new command format, it will try to send the old one.""
     def sort_by_name(self,cmd):
             return cmd.name
 
-    async def all_commands(self,ctx:commands.Context):
+    async def all_commands(self,ctx:commands.Context,cmds:list):
         """Create pages for every bot command"""      
-        cmds = sorted([c for c in self.bot.commands],key=self.sort_by_name)
         categories = {x:list() for x in self.commands_list.keys()}
         for cmd in cmds:
             try:
