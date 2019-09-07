@@ -767,13 +767,13 @@ class RssCog(commands.Cog):
         if nom == 'help':
             return await self.translate(guild,"rss","tw-help")
         url = self.twitter_api_url+nom
-        feeds = feedparser.parse(url)
+        feeds = feedparser.parse(url,timeout=5)
         if feeds.entries==[]:
             url = self.twitter_api_url+nom.capitalize()
-            feeds = feedparser.parse(url)
+            feeds = feedparser.parse(url,timeout=5)
             if feeds.entries==[]:
                 url = self.twitter_api_url+nom.lower()
-                feeds = feedparser.parse(url)
+                feeds = feedparser.parse(url,timeout=5)
                 
         tweets_list_official = await self.get_tw_official(nom)
         tweets_ids = [x.id_str for x in tweets_list_official]
@@ -852,7 +852,7 @@ class RssCog(commands.Cog):
 
     async def rss_twitch(self,guild,nom,date=None):
         url = 'https://twitchrss.appspot.com/vod/'+nom
-        feeds = feedparser.parse(url)
+        feeds = feedparser.parse(url,timeout=5)
         if feeds.entries==[]:
             return await self.translate(guild,"rss","nothing")
         if not date:
