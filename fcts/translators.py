@@ -8,6 +8,7 @@ async def is_translator(ctx:commands.Context) -> bool:
         281404141841022976, # Awhikax
         552273019020771358, # Z_Jumper
         349899849937846273, # Jees1
+        264203029279014922, # AFRIKA6 | Max
         ]
 
 async def check_admin(ctx):
@@ -22,12 +23,16 @@ class TranslatorsCog(commands.Cog):
         if not os.path.exists('translation/'):
             os.makedirs('translation/')
         self.translations = {'en':self.load_translation('en'),
-            'fi':self.load_translation('fi')}
+            'fi':self.load_translation('fi'),
+            'de':self.load_translation('de'),
+            'sp':self.load_translation('sp')}
         try:
             self.translate = self.bot.cogs["LangCog"].tr
         except:
             pass
-        self.todo = {'fi':sorted([x for x in self.translations['en'].keys() if x not in self.translations['fi'].keys()])}
+        self.todo = {'fi':sorted([x for x in self.translations['en'].keys() if x not in self.translations['fi'].keys()]),
+                'de':sorted([x for x in self.translations['en'].keys() if x not in self.translations['de'].keys()]),
+                'sp':sorted([x for x in self.translations['en'].keys() if x not in self.translations['sp'].keys()])}
     
     @commands.Cog.listener()
     async def on_ready(self):
