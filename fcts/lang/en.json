@@ -449,7 +449,7 @@
             "textures.minecraft.net": "Texture server (skin & capes)",
             "mojang.com": "Official website"
         },
-        "dimensions": "Width: {d[0]}\nLength: {d[1]}\nHeight: {d[2]}",
+        "dimensions": "Width: {la}\nLength: {lo]}\nHeight: {ha}",
         "entity-fields": [
             "ID",
             "Type",

@@ -381,7 +381,7 @@ mc={"contact-mail":"If U notis an errrror in da info providd, plz contact my per
         'api.mojang.com': "API service givn bay Mojang",
         'textures.minecraft.net':'Texture servr (nice skin & capz)',
         'mojang.com':'Official Ex Website'},
-        "dimensions":"Width: {d[0]}\nLenght: {d[1]}\nHeight: {d[2]}",
+        "dimensions":"Width: {la}\nLenght: {lo}\nHeight: {ha}",
         "item-fields":('ID',"Size ov stack",'Creativ mod tab','Damge points',"Durability points","Toolz able 2 destroy it","Mobs able to drop dis item","Added in da vershun"),
         "entity-fields":('Oh ID','Type','HeartH Points','Atack Pts','Experince Points Releas to Dead','Preferred Biomes',':A:ded in teh version'),
         "block-fields":("ID","Stack size","Creative mod tab","Damage points","Durability","Tool able to destroy it","Mobs able to loot it","Added in the version"),
