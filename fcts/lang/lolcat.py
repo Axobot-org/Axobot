@@ -18,7 +18,7 @@ admin={"change_game-0":"Slect *play*, *watch*, *listen* or *stream* followd by t
         "bug-0":"Bug #{} not findz",
         "emergency":"A emergency situation have just been declared 4 the boat. Those may bee the case when somebody tries to take controll of my code.\n\
 To limit the damagz, I was 4ced to leave all teh servrs I was on imediately, hoping itZ wasn't toooo late.\n\
-For much infoZ on de current state ov dis crisis, gonna to my offishial srver: https://discord.me/z_bot (check teh link for the documentashun if it no longer workz: https://zbot.rtfd.io)"
+For much infoZ on de current state ov dis crisis, gonna to my offishial srver: https://discord.me/zbot (check teh link for the documentashun if it no longer workz: https://zbot.rtfd.io)"
         }
 
 aide={"no-subcmd":"Teh kommand `{0.name}` had not sub~~scribe~~commanD",

@@ -16,7 +16,7 @@
         "msg_2-2": "1 affected member",
         "msg_2-3": "affected members",
         "bug-0": "Bug #{} not found",
-        "emergency": "An emergency situation has just been declared for the bot. This may be the case when someone tries to take control of my code.\nTo limit the damage, I was forced to leave all the servers I was on immediately, hoping it wasn't too late.\nFor more information on the current state of the crisis, go to my official server: https://discord.me/z_bot (check the link from the documentation if it no longer works: https://zbot.rtfd.io)"
+        "emergency": "An emergency situation has just been declared for the bot. This may be the case when someone tries to take control of my code.\nTo limit the damage, I was forced to leave all the servers I was on immediately, hoping it wasn't too late.\nFor more information on the current state of the crisis, go to my official server: https://discord.me/zbot (check the link from the documentation if it no longer works: https://zbot.rtfd.io)"
     },
     "aide": {
         "no-subcmd": "The command `{0.name}` has no subcommand",

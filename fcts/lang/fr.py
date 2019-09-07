@@ -18,7 +18,7 @@ admin={"change_game-0":"Sélectionnez *play*, *watch*, *listen* ou *stream* suiv
         "bug-0":"Le bug n°{} n'a pas été trouvé",
         "emergency":"Une situation d'urgence vient d'être déclarée pour le bot. Cela peut être le cas lorsque quelqu'un tente de prendre le contrôle de mon code.\n\
     Pour limiter les dégâts, j'ai été forcé de quitter immédiatement l'intégralité des serveurs sur lesquels je me trouvais, en espérant qu'il ne soit pas trop tard.\n\
-    Pour plus d'informations sur l'état actuel de la crise, rendez-vous sur mon serveur officiel : https://discord.me/z_bot (vérifiez le lien depuis la documentation si celui-ci ne fonctionne plus : https://zbot.rtfd.io)"
+    Pour plus d'informations sur l'état actuel de la crise, rendez-vous sur mon serveur officiel : https://discord.me/zbot (vérifiez le lien depuis la documentation si celui-ci ne fonctionne plus : https://zbot.rtfd.io)"
         }
 
 aide={"no-subcmd":"La commande {0.name} n'a aucune sous-commande",
