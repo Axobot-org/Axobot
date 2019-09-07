@@ -604,6 +604,8 @@ class XPCog(commands.Cog):
             if user.bot:
                 return await ctx.send(await self.translate(ctx.channel,'xp','bot-rank'))
             if ctx.guild != None:
+                if not await self.bot.cogs['ServerCog'].find_staff(ctx.guild.id,'enable_xp'):
+                    return await ctx.send(await self.translate(ctx.guild.id,'xp','xp-disabled'))
                 xp_used_type = await self.bot.cogs['ServerCog'].find_staff(ctx.guild.id,'xp_type')
             else:
                 xp_used_type = 0
@@ -616,10 +618,16 @@ class XPCog(commands.Cog):
             xp = xp[0]['xp']
             if xp_used_type==0:
                 ranks_nb = await self.bdd_get_nber()
-                rank = (await self.bdd_get_rank(user.id))['rank']
+                try:
+                    rank = (await self.bdd_get_rank(user.id))['rank']
+                except KeyError:
+                    rank = "?"
             else:
                 ranks_nb = await self.bdd_get_nber(ctx.guild.id)
-                rank = (await self.bdd_get_rank(user.id,ctx.guild))['rank']
+                try:
+                    rank = (await self.bdd_get_rank(user.id,ctx.guild))['rank']
+                except KeyError:
+                    rank = "?"
             if ctx.guild==None or ctx.channel.permissions_for(ctx.guild.me).attach_files:
                 await self.send_card(ctx,user,xp,rank,ranks_nb,xp_used_type,levels_info)
             elif ctx.channel.permissions_for(ctx.guild.me).embed_links:
@@ -692,6 +700,8 @@ class XPCog(commands.Cog):
         """Get the list of the highest levels
         Each page has 20 users"""
         if ctx.guild!=None:
+            if not await self.bot.cogs['ServerCog'].find_staff(ctx.guild.id,'enable_xp'):
+                return await ctx.send(await self.translate(ctx.guild.id,'xp','xp-disabled'))
             xp_system_used = await self.bot.cogs['ServerCog'].find_staff(ctx.guild.id,'xp_type')
         else:
             xp_system_used = 0
@@ -725,7 +735,7 @@ class XPCog(commands.Cog):
         else:
             lvl = await self.calc_level(rank['xp'],xp_system_used)
             lvl = lvl[0]
-            your_rank = {'name':"__"+await self.translate(ctx.channel,"xp","top-your")+"__", 'value':"**#{} |** `lvl {}` **|** `xp {}`".format(rank['rank'],lvl,rank['xp'])}
+            your_rank = {'name':"__"+await self.translate(ctx.channel,"xp","top-your")+"__", 'value':"**#{} |** `lvl {}` **|** `xp {}`".format(rank['rank'] if 'rank' in rank.keys() else '?',lvl,rank['xp'])}
         # title
         if Type=='guild' or xp_system_used!=0:
             t = await self.translate(ctx.channel,'xp','top-title-2')

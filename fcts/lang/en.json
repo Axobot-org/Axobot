@@ -74,7 +74,7 @@
             ],
             "can_use_cookie": [
                 "You are an chosen one from Aragorn1202",
-                "This command is on Whitelist"
+                "This command use a whitelist"
             ],
             "has_admin": [
                 "You have 'Administrator' permission",
@@ -948,6 +948,7 @@
         "change-global-xp": "Impossible to edit XP of the global system!",
         "change-xp-ok": "The XP of the user {user} has been set to {xp} points!",
         "no-bot": "Impossible to modify the XP of a bot!",
-        "bot-rank":"Bots can't have any xp"
+        "bot-rank": "Bots can't have any xp",
+        "xp-disabled": "XP is disabled for this server"
     }
 }

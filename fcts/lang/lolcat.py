@@ -796,5 +796,6 @@ xp = {'card-level':'LVL',
         'change-global-xp':"NOT possible 2 edit XP of the global super mega system!",
         'change-xp-ok':"XP of teh user {user} have been set 2 {xp}xp!",
         'no-bot':"Impossible 2 modify the XP ov a robot!",
-        "bot-rank":"Bots like myself can't have any xp...sad times."
+        "bot-rank":"Bots like myself can't have any xp...sad times.",
+        "xp-disabled":"Lmao U didn't even enabled xp there xD"
         }
