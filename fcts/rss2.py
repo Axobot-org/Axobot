@@ -797,7 +797,7 @@ class RssCog(commands.Cog):
                 t = feed['title']
             author = feed['author'].replace('(','').replace(')','')
             rt = None
-            if author.replace('@','') not in url:
+            if author.replace('@','') not in feed['link']:
                 rt = url.split("=")[1]
             obj = self.rssMessage(bot=self.bot,Type='tw',url=feed['link'].replace('mobile.',''),title=t,emojis=self.bot.cogs['EmojiCog'].customEmojis,date=feed['published_parsed'],author=author,retweeted_by=rt,channel=feeds.feed['title'])
             return [obj]
@@ -808,7 +808,7 @@ class RssCog(commands.Cog):
                     break
                 author = feed['author'].replace('(','').replace(')','')
                 rt = None
-                if author.replace('@','') not in url:
+                if author.replace('@','') not in feed['link']:
                     rt = url.split("=")[1]
                 if rt != None:
                     t = feed['title'].replace(rt,'')
