@@ -540,7 +540,7 @@ You can specify a verification limit by adding a number in argument"""
 
     @commands.command(name='embed',hidden=False)
     @commands.check(checks.has_embed_links)
-    async def send_embed(self,ctx,*,arguments):
+    async def send_embed(self,ctx,*,arguments:args.arguments):
         """Send an embed
         Syntax: !embed key1=\"value 1\" key2=\"value 2\"
 
@@ -556,33 +556,18 @@ You can specify a verification limit by adding a number in argument"""
         """
         if ctx.guild!=None and not ctx.channel.permissions_for(ctx.guild.me).embed_links:
             return await ctx.send(await self.translate(ctx.channel,"fun","no-embed-perm"))
-        arguments = arguments.replace("\\\"","|¬017").replace("\\n","\n")
-        arguments = arguments.split("\"")
         k = {'title':"",'content':"",'url':'','footer':"",'image':'','color':ctx.bot.cogs['ServerCog'].embed_color}
-        for e,a in enumerate(arguments):
-            a = a.strip().lower()
-            if len(a)==0:
-                continue
-            if a[-1]=='=':
-                if e==len(arguments)-1:
-                    continue
-                if a=='title=':
-                    k['title'] = arguments[e+1].replace("|¬017","\"")[:255]
-                elif a=='content=':
-                    k['content'] = arguments[e+1].replace("|¬017","\"")
-                elif a=='url=':
-                    k['url'] = arguments[e+1].replace("|¬017","\"")
-                elif a=='footer=':
-                    k['footer'] = arguments[e+1].replace("|¬017","\"")[:90]
-                elif a=='image=':
-                    k['image'] = arguments[e+1].replace("|¬017","\"")
-                elif a=='color=' or a=='colour=':
-                    if arguments[e+1].startswith('#') and len(arguments[e+1])%3==1:
-                        arg = arguments[e+1][1:]
-                        rgb = [int(arg[i:i+2], 16) for i in range(0,len(arg),len(arg)//3)]
-                        k['color'] = discord.Colour(0).from_rgb(rgb[0], rgb[1], rgb[2])
-                    elif arguments[e+1].isnumeric():
-                        k['color'] = discord.Colour(int(arguments[e+1]))
+        for key,value in arguments.items():
+            if key=='title':
+                k['title'] = value[:255]
+            elif key=='content' or key=='url' or key=='image':
+                k[key] = value
+            elif key=='footer':
+                k['footer'] = value[:90]
+            elif key=='color' or key=="colour":
+                c = await args.Color().convert(ctx,value)
+                if c!=None:
+                    k['color'] = c
         emb = ctx.bot.cogs["EmbedCog"].Embed(title=k['title'], desc=k['content'], url=k['url'],footer_text=k['footer'],thumbnail=k['image'],color=k['color']).update_timestamp().set_author(ctx.author)
         try:
             await ctx.send(embed=emb.discord_embed())
