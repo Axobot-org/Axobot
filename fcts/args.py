@@ -163,3 +163,28 @@ class guildMessage(commands.Converter):
             else:
                 return msg
         raise commands.errors.BadArgument('Message "{}" not found.'.format(argument))
+
+class arguments(commands.Converter):
+    def __init__(self):
+        pass
+
+    async def convert(self,ctx:commands.Context,argument:str) -> dict:
+        answer = dict()
+        for result in re.finditer(r'(\w+) ?= ?"((?:[^"\\]*|\\")*)"',argument):
+            answer[result.group(1)] = result.group(2).replace('\\"','"')
+        return answer
+
+class Color(commands.Converter):
+    def __init__(self):
+        pass
+
+    async def convert(self,ctx:commands.Context,argument:str) -> int:
+        if argument.startswith('#') and len(argument)%3==1:
+            arg = argument[1:]
+            rgb = [int(arg[i:i+2], 16) for i in range(0,len(arg),len(arg)//3)]
+            return discord.Colour(0).from_rgb(rgb[0], rgb[1], rgb[2]).value
+        elif argument.isnumeric():
+            return int(argument)
+        else:
+            return None
+        
