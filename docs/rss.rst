@@ -83,6 +83,20 @@ If no identifier is given, the bot will ask you which one to modify.  As for the
 .. warning:: Here again, the bot needs "`Embed Links <perms.html#embed-links>`_" permission!
 
 
+------------------
+Setup a feed embed
+------------------
+
+**Syntax:** :code:`rss use_embed [flow ID] [use embed]` or :code:`rss embed <flow ID> [use embed] <parameters>`
+
+Sometimes people want to have a lot of control over what is happening in the world. Since we are unable to offer it to them, we offer you a great control on the embeds sent by rss flows. The first command allows you to enable the use of embed instead of classic text, the second one allows you to choose a title, a color and a custom footer.
+
+For the first command, if you do not give the feed identifier or a boolean value, the bot will ask you for it. However, you must give it yourself for the second command (you can find it via the `rss list <#see-every-feed>`_ command).
+
+The syntax of the color/text customization parameters is the same as for the `embed <miscellaneous.html#embed>`_ command, i.e. in the form :code:`key = "value"`, with the possible keys "color", "footer" and "title".
+
+
+
 ----------------------
 Delete a followed feed
 ----------------------
@@ -91,7 +105,7 @@ Delete a followed feed
 
 With this command, you can stop following an rss/minecraft flow. And it's also very easy to use. Just one command and *poof*, we shut down the machinery.
 
-The "flow ID" argument is the identifier of the flow (found with the command `rss list<#see-every-feed>`_). If you do not enter this argument, or if the feed can't be found, the bot will open a menu where you can choose which feed to modify.
+The "flow ID" argument is the identifier of the flow (found with the command `rss list <#see-every-feed>`_). If you do not enter this argument, or if the feed can't be found, the bot will open a menu where you can choose which feed to modify.
 
 .. warning:: ZBot needs "`Embed Links <perms.html#embed-links>`_" permission to send the selection list!
 
