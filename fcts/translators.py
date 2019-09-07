@@ -10,6 +10,7 @@ async def is_translator(ctx:commands.Context) -> bool:
         349899849937846273, # Jees1
         264203029279014922, # AFRIKA6 | Max
         428172161715404810, # Just__it
+        601455692162793472, # PlumeDeCrystal
         ]
 
 async def check_admin(ctx):
@@ -26,14 +27,16 @@ class TranslatorsCog(commands.Cog):
         self.translations = {'en':self.load_translation('en'),
             'fi':self.load_translation('fi'),
             'de':self.load_translation('de'),
-            'sp':self.load_translation('sp')}
+            'es':self.load_translation('es'),
+            'it':self.load_translation('it')}
         try:
             self.translate = self.bot.cogs["LangCog"].tr
         except:
             pass
         self.todo = {'fi':sorted([x for x in self.translations['en'].keys() if x not in self.translations['fi'].keys()]),
                 'de':sorted([x for x in self.translations['en'].keys() if x not in self.translations['de'].keys()]),
-                'sp':sorted([x for x in self.translations['en'].keys() if x not in self.translations['sp'].keys()])}
+                'es':sorted([x for x in self.translations['en'].keys() if x not in self.translations['es'].keys()]),
+                'it':sorted([x for x in self.translations['en'].keys() if x not in self.translations['it'].keys()])}
     
     @commands.Cog.listener()
     async def on_ready(self):
@@ -41,7 +44,7 @@ class TranslatorsCog(commands.Cog):
     
     def load_translation(self,lang:str):
         result = dict()
-        if lang not in self.bot.cogs['LangCog'].languages + ['de','sp']:
+        if lang not in ['fr','en','lolcat','fi','de','es','it']:
             return result
         with open(f'fcts/lang/{lang}.json','r') as f:
             data = json.load(f)
