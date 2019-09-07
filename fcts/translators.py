@@ -41,7 +41,7 @@ class TranslatorsCog(commands.Cog):
     
     def load_translation(self,lang:str):
         result = dict()
-        if lang not in self.bot.cogs['LangCog'].languages:
+        if lang not in self.bot.cogs['LangCog'].languages + ['de','sp']:
             return result
         with open(f'fcts/lang/{lang}.json','r') as f:
             data = json.load(f)
