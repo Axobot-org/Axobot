@@ -9,6 +9,7 @@ async def is_translator(ctx:commands.Context) -> bool:
         552273019020771358, # Z_Jumper
         349899849937846273, # Jees1
         264203029279014922, # AFRIKA6 | Max
+        428172161715404810, # Just__it
         ]
 
 async def check_admin(ctx):
