@@ -98,7 +98,7 @@ class RolesReact(commands.Cog):
         cursor.execute(query)
         liste = list()
         for x in cursor:
-            if emoji==None or x['emoji'] == emoji:
+            if emoji==None or x['emoji'] == str(emoji):
                 liste.append(x)
         cursor.close()
         return liste
@@ -173,7 +173,8 @@ class RolesReact(commands.Cog):
                     emojis.append(k['emoji'])
             else:
                 emojis.append(k['emoji'])
-        return '\n'.join(["{}   <@&{}> - *{}*".format(x['emoji'], x['role'], x['description']) for x in liste]), emojis
+        l = ["{}   <@&{}> - *{}*".format(x['emoji'], x['role'], x['description']) if len(x['description'])>0 else "{}   <@&{}>".format(x['emoji'], x['role']) for x in liste]
+        return '\n'.join(l), emojis
 
     @rr_main.command(name="list")
     async def rr_list(self,ctx):
