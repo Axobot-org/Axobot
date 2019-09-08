@@ -17,13 +17,14 @@ class TranslatorsCog(commands.Cog):
         self.file = 'translators'
         if not os.path.exists('translation/'):
             os.makedirs('translation/')
-        self.project_list = ['fr','en','lolcat','fi','de','es','it','br']
+        self.project_list = ['fr','en','lolcat','fi','de','es','it','br','tr']
         self.translations = {'en':self.load_translation('en'),
             'fi':self.load_translation('fi'),
             'de':self.load_translation('de'),
             'es':self.load_translation('es'),
             'it':self.load_translation('it'),
-            'br':self.load_translation('br')}
+            'br':self.load_translation('br'),
+            'tr':self.load_translation('tr')}
         try:
             self.translate = self.bot.cogs["LangCog"].tr
         except:
@@ -32,7 +33,8 @@ class TranslatorsCog(commands.Cog):
                 'de':sorted([x for x in self.translations['en'].keys() if x not in self.translations['de'].keys()]),
                 'es':sorted([x for x in self.translations['en'].keys() if x not in self.translations['es'].keys()]),
                 'it':sorted([x for x in self.translations['en'].keys() if x not in self.translations['it'].keys()]),
-                'br':sorted([x for x in self.translations['en'].keys() if x not in self.translations['br'].keys()])}
+                'br':sorted([x for x in self.translations['en'].keys() if x not in self.translations['br'].keys()]),
+                'tr':sorted([x for x in self.translations['en'].keys() if x not in self.translations['tr'].keys()])}
     
     @commands.Cog.listener()
     async def on_ready(self):
