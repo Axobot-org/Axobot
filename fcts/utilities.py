@@ -40,8 +40,8 @@ class UtilitiesCog(commands.Cog):
             if liste == []:
                 self.list_prefixs[str(guild.id)] = '!'
                 return '!'
-            self.list_prefixs[str(guild.id)] = liste[0][0]
-            return str(liste[0][0])
+            self.list_prefixs[str(guild.id)] = liste[0]
+            return str(liste[0])
 
     def update_prefix(self,ID,prefix):
         try:
@@ -323,6 +323,17 @@ class UtilitiesCog(commands.Cog):
         if parameters==None:
             return False
         return parameters['contributor']
+    
+    async def is_translator(self,user):
+        """Check if a user is a translator"""
+        parameters = None
+        try:
+            parameters = await self.get_db_userinfo(criters=["userID="+str(user.id)],columns=['translator'])
+        except Exception as e:
+            await self.bot.cogs["Errors"].on_error(e,None)
+        if parameters==None:
+            return False
+        return parameters['translator']
     
     async def has_rainbow_card(self,user):
         """Check if a user won the rainbow card"""

@@ -16,11 +16,11 @@
         "msg_2-2": "1 affected member",
         "msg_2-3": "affected members",
         "bug-0": "Bug #{} not found",
-        "emergency": "An emergency situation has just been declared for the bot. This may be the case when someone tries to take control of my code.\nTo limit the damage, I was forced to leave all the servers I was on immediately, hoping it wasn't too late.\nFor more information on the current state of the crisis, go to my official server: https://discord.me/z_bot (check the link from the documentation if it no longer works: https://zbot.rtfd.io)"
+        "emergency": "An emergency situation has just been declared for the bot. This may be the case when someone tries to take control of my code.\nTo limit the damage, I was forced to leave all the servers I was on immediately, hoping it wasn't too late.\nFor more information on the current state of the crisis, go to my official server: https://discord.me/zbot (check the link from the documentation if it no longer works: https://zbot.rtfd.io)"
     },
     "aide": {
         "no-subcmd": "The command `{0.name}` has no subcommand",
-        "embed_title": "Avalilable commands for {u}",
+        "embed_title": "Available commands for {u}",
         "categories": {
             "fun": "fun",
             "info": "information",
@@ -29,7 +29,7 @@
             "server-settings": "server settings",
             "staff": "bot staff",
             "users-info": "Users information",
-            "unclassed":"Unclassed",
+            "unclassed": "Unclassed",
             "translators": "translation team"
         },
         "footer": "Type {}help command for more info on a command",
@@ -74,7 +74,7 @@
             ],
             "can_use_cookie": [
                 "You are an chosen one from Aragorn1202",
-                "This command is on Whitelist"
+                "This command use a whitelist"
             ],
             "has_admin": [
                 "You have 'Administrator' permission",
@@ -163,7 +163,7 @@
     },
     "bvn": {
         "aide": "__**Welcome to the join & leave message module**__\n\nThis module is used to configure an automatic message each time a member enters or exits your server.\n\n__** Configuration**__\n\n`1-` To configure the chat room where these messages are written, enter `{p}config change welcome_channel` followed by the channel (you can use its mention as well as its identifier or its full name).\n`2-` To configure a message, enter `{p}config change <welcome|leave> <message>`. For this message you can use some variables:\n - `{user}` mentions the member\n - `{server}` displays the server name\n - `{owner}` displays the server owner name\n - `{member_count}` shows the current number of members\n - `{type}` return 'member' or 'bot'",
-        "error-give-role": "Unable to give role '{r}' to the new member {u}: not enough permissions\nPlease check the roles hierarchy and my permission 'Manage roles'"
+        "error-give-roles": "Unable to give role '{r}' to the new member {u}: not enough permissions\nPlease check the roles hierarchy and my permission 'Manage roles'"
     },
     "cases": {
         "no-user": "Unable to find this user :eyes:",
@@ -319,7 +319,7 @@
         "bitly_short": "Shortened URL: {url}",
         "bitly_long": "Original URL: {url}",
         "bitly_nobit": "This address is not a bit.ly link!",
-        "changelogs-notfound": "Unable to find this version"
+        "changelog-notfound": "Unable to find this version"
     },
     "infos_2": {
         "membercount-0": "Total number of members",
@@ -408,7 +408,9 @@
         "d-young": "Automod (too recent account)",
         "d-welcome_roles": "Automated action (config welcome_roles)",
         "d-memberchan": "Automated action (config membercount)",
-        "d-unban": "unbanned by {}"
+        "d-unban": "unbanned by {}",
+        "case-reason": "The case #{id} has been edited:\n`Old reason:` {old}\n`New reason:` {new}",
+        "case-del": "The case #{id} has been deleted (concerning {user})"
     },
     "mc": {
         "contact-mail": "If you notice an error in the information provided, please contact me personally, or report the error directly [on the site](https://fr-minecraft.net).",
@@ -432,7 +434,7 @@
         "entity-help": "This command allows you to obtain information about any Minecraft entity. You can give its full or partial name, in French or English, or even its identifier. Just enter `!mc entity <name>`",
         "block-help": "This command allows you to obtain information on any Minecraft block. You can give its full or partial name, in French or English, or even its identifier. Just enter `!mc block <name>`",
         "item-help": "This command allows you to obtain information on any Minecraft item. You can give its full or partial name, in French or English, or even its identifier. Just enter `!mc item <name>`",
-        "cmd-help": "This command allows you to obtain information about any Minecraft command. All you have to do is type `!mc command <nom>`",
+        "cmd-help": "This command allows you to obtain information about any Minecraft command. All you have to do is type `!mc command <name>`",
         "adv-help": "This command provides information about any advancement of the game Minecraft. Simply enter the name or the identifier of the advancement.",
         "no-entity": "Unable to find this entity",
         "no-block": "Unable to find this block",
@@ -449,7 +451,7 @@
             "textures.minecraft.net": "Texture server (skin & capes)",
             "mojang.com": "Official website"
         },
-        "dimensions": "Width: {d[0]}\nLength: {d[1]}\nHeight: {d[2]}",
+        "dimensions": "Width: {la}\nLength: {lo]}\nHeight: {ha}",
         "entity-fields": [
             "ID",
             "Type",
@@ -635,8 +637,8 @@
         "role-not-in-list": "This role is not part of the attributable roles",
         "rr-embed": "Taking on a role",
         "role-lost": "The role {r} has been removed from your roles",
-        "not-zbot-msg":"This message is not Zbot's",
-        "not-zbot-embed":"This message does not contain any role-reaction embed"
+        "not-zbot-msg": "This message is not Zbot's",
+        "not-zbot-embed": "This message does not contain any role-reaction embed"
     },
     "rss": {
         "yt-help": "To search for a youtube channel, you must enter the channel ID. You will find it at the end of the string url, it can be either the name, or a string of random characters.\n*Tip: some channels are already filled in my code. Sometimes you can just put `neil3000` or `Oxisius`* :wink:",
@@ -711,6 +713,7 @@
         "change-emojis": "The emotions for the option \"{}\" are now {}",
         "change-xp": "The xp system used is now {}",
         "change-color": "The color used for the option {} is now {}",
+        "change-xp_rate": "The xp rate is now at {rate}",
         "new_server": "Your server has just been registered for the first time in our database. Congratulations :tada:",
         "see-0": "Enter `!config help` for more details",
         "see-1": "{} server configuration",
@@ -719,7 +722,8 @@
         "opt_title": "Option \"{}\" of server {}",
         "not-found": "The server {} has not yet been registered in the database",
         "need-admin": "You need Administrator permission to execute this command.",
-        "config-list": "List of available options: {text}More info at {link}"
+        "config-list": "List of available options: {text}More info at {link}",
+        "xp_rate_invalid": "The xp rate must be between {min} and {max}"
     },
     "server_desc": {
         "prefix": "Current bot prefix: {}",
@@ -756,7 +760,8 @@
         "partner_color": "Color of partners embed: {}",
         "partner_role": "Role given to partners: {}",
         "update_mentions": "Roles mentioned in the bot changelog: {}",
-        "verification_role": "Roles removed when a user use the `verify` command: {}"
+        "verification_role": "Roles removed when a user use the `verify` command: {}",
+        "xp_rate": "XP earnings modifier: {}"
     },
     "stats_infos": {
         "not-found": "Unable to find {N}",
@@ -948,6 +953,7 @@
         "change-global-xp": "Impossible to edit XP of the global system!",
         "change-xp-ok": "The XP of the user {user} has been set to {xp} points!",
         "no-bot": "Impossible to modify the XP of a bot!",
-        "bot-rank":"Bots can't have any xp"
+        "bot-rank": "Bots can't have any xp",
+        "xp-disabled": "XP is disabled for this server"
     }
 }

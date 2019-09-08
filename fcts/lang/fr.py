@@ -18,7 +18,7 @@ admin={"change_game-0":"Sélectionnez *play*, *watch*, *listen* ou *stream* suiv
         "bug-0":"Le bug n°{} n'a pas été trouvé",
         "emergency":"Une situation d'urgence vient d'être déclarée pour le bot. Cela peut être le cas lorsque quelqu'un tente de prendre le contrôle de mon code.\n\
     Pour limiter les dégâts, j'ai été forcé de quitter immédiatement l'intégralité des serveurs sur lesquels je me trouvais, en espérant qu'il ne soit pas trop tard.\n\
-    Pour plus d'informations sur l'état actuel de la crise, rendez-vous sur mon serveur officiel : https://discord.me/z_bot (vérifiez le lien depuis la documentation si celui-ci ne fonctionne plus : https://zbot.rtfd.io)"
+    Pour plus d'informations sur l'état actuel de la crise, rendez-vous sur mon serveur officiel : https://discord.me/zbot (vérifiez le lien depuis la documentation si celui-ci ne fonctionne plus : https://zbot.rtfd.io)"
         }
 
 aide={"no-subcmd":"La commande {0.name} n'a aucune sous-commande",
@@ -341,6 +341,8 @@ logs={"slowmode-enabled":"Slowmode activé dans le salon {channel} ({seconds}s)"
         "d-welcome_roles":"Action automatique (config welcome_roles)",
         "d-memberchan":"Action automatique (config membercount)",
         "d-unban":"unban par {}",
+        "case-reason":"Le casier #{id} a été édité : \n`Ancienne raison:` {old}\n`Nouvelle raison:` {new}",
+        "case-del":"Le casier #{id} a été supprimé (concernant {user})"
         }
 
 mc={"contact-mail":"Si vous constatez une erreur dans les informations données, merci de me contacter rapidement, ou de rapporter l'erreur directement [sur le site](https://fr-minecraft.net).",
@@ -373,7 +375,7 @@ mc={"contact-mail":"Si vous constatez une erreur dans les informations données,
       'api.mojang.com':"Service d'API fournit par Mojang",
       'textures.minecraft.net':'Serveur de textures (skin & capes)',
       'mojang.com':'Site officiel'},
-        "dimensions":"Largeur: {d[0]}\nLongueur: {d[1]}\nHauteur: {d[2]}",
+        "dimensions":"Largeur: {la}\nLongueur: {lo}\nHauteur: {ha}",
         "entity-fields":('ID','Type','Points de vie','Points d\'attaque',"Points d'expérience lâchées à la mort","Biomes de prédilection","Version d'ajout"),
         "block-fields":("ID","Taille d'un stack","Onglet du mode créatif","Points de dégâts","Points de durabilité","Outil capable de le détruire","Mobs pouvant lâcher cet item","Version d'ajout"),
         "item-fields":('ID',"Taille d'un stack",'Onglet du mode créatif','Points de dégâts',"Points de durabilité","Outil capable de le détruire","Mobs pouvant lâcher cet item","Version d'ajout"),
@@ -451,7 +453,7 @@ modo={"slowmode-0":"Le slowmode est désormais désactivé dans ce salon.",
                 'Combien de côtés possède un carré ?':'4',
                 'Quel est le résultat de 10-6 ?':'4',
                 'Quelle est la première lettre de `Zbot` ?':'z',
-                'Quel est le discriminant situé après votre pseudo discord ?':'_special_userdiscrim',
+                'Quel est le discriminant situé après votre pseudo discord ? (sans le #)':'_special_userdiscrim',
                 "Comment s'appelle le système d'exploitation des téléphones de la marque Apple ?":'iOS',
                 "Comment s'appelle le système d'exploitation des téléphones de la marque Samsung ? ":'Android',
                 "Quel est le nom du pain français connu partout dans le monde ? (un seul mot)":"baguette",
@@ -621,6 +623,7 @@ l'option (`!config change <option> del` fonctionne de même).\nLa liste des opti
         "change-emojis":"Les émojis pour l'option '{}' sont maintenant {}",
         "change-xp":"Le type d'xp utilisé est maintenant {}",
         "change-color":"La couleur utilisée pour l'option {} est maintenant {}",
+        "change-xp_rate":"Le modificateur d'xp est maintenant à {rate}",
         "new_server":"Votre serveur vient d'être enregistré pour la première fois dans notre base de donnée. Félicitations :tada:",
         "see-0":"Entrez `!config help` pour plus de détails",
         "see-1":"Configuration du serveur {}",
@@ -629,7 +632,8 @@ l'option (`!config change <option> del` fonctionne de même).\nLa liste des opti
         "opt_title":"Option '{}' du serveur {}",
         "not-found":"Le serveur {} n'a pas encore été enregistré dans la base de donnée",
         "need-admin":"Vous devez avoir les permissions Administrateur pour exécuter cette commande.",
-        "config-list":"Liste des options disponibles :{text}Plus d'information : {link}"
+        "config-list":"Liste des options disponibles :{text}Plus d'information : {link}",
+        "xp_rate_invalid": "Le modificateur d'xp doit être entre {min} et {max}"
         }
 
 server_desc={"prefix":"Préfixe actuel du bot : {}",
@@ -666,7 +670,8 @@ server_desc={"prefix":"Préfixe actuel du bot : {}",
         "partner_color":"Couleur de l'embed des partenaires : {}",
         "partner_role":"Rôle donné aux partenaires : {}",
         "update_mentions":"Rôles mentionnés lors d'une mise à jour du bot : {}",
-        "verification_role":"Rôles enlevés lorsqu'un joueur s'authentifie avec la commande `verify` : {}"
+        "verification_role":"Rôles enlevés lorsqu'un joueur s'authentifie avec la commande `verify` : {}",
+        "xp_rate":"Modficateur de gains d'xp : {}"
         }
 
 stats_infos={"not-found":"Impossible de trouver {N}",
@@ -796,5 +801,6 @@ xp = {'card-level':'NIVEAU',
         'change-global-xp':"Impossible d'éditer l'XP du système global !",
         'change-xp-ok':"L'XP de l'utilisateur {user} a bien été mis à {xp} points !",
         'no-bot':"Impossible de modifier l'XP d'un bot !",
-        'bot-rank':"Les bots ne peuvent pas avoir d'xp"
+        'bot-rank':"Les bots ne peuvent pas avoir d'xp",
+        "xp-disabled":"L'xp a été désactivé sur ce serveur"
     }

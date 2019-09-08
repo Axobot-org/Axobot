@@ -180,7 +180,7 @@ class CasesCog(commands.Cog):
 
     
 
-    @commands.group(name="cases")
+    @commands.group(name="cases",aliases=['case'])
     @commands.guild_only()
     @commands.cooldown(5, 15, commands.BucketType.user)
     @commands.check(can_edit_case)
@@ -284,9 +284,12 @@ class CasesCog(commands.Cog):
             await ctx.send(await self.translate(ctx.guild.id,"cases","not-found"))
             return
         case = cases[0]
+        old_reason = case.reason
         case.reason = reason
         await self.update_reason(case)
         await ctx.send(str(await self.translate(ctx.guild.id,"cases","reason-edited")).format(case.id))
+        log = await self.translate(ctx.guild.id,"logs","case-reason",old=old_reason,new=case.reason,id=case.id)
+        await self.bot.cogs["Events"].send_logs_per_server(ctx.guild,"case-edit",log,ctx.author)
     
     @case_main.command(name="search")
     @commands.guild_only()
@@ -343,7 +346,7 @@ class CasesCog(commands.Cog):
             c = ["ID="+str(case)]
             if not await self.bot.cogs['AdminCog'].check_if_admin(ctx.author):
                 c.append("guild="+str(ctx.guild.id))
-            cases = await self.get_case(columns=['ID'],criters=c)
+            cases = await self.get_case(columns=['ID','user'],criters=c)
         except Exception as e:
             await self.bot.cogs["ErrorsCog"].on_error(e,None)
             return
@@ -353,6 +356,11 @@ class CasesCog(commands.Cog):
         case = cases[0]
         await self.delete_case(case['ID'])
         await ctx.send(str(await self.translate(ctx.guild.id,"cases","deleted")).format(case['ID']))
+        user = ctx.bot.get_user(case['user'])
+        if user==None:
+            user = case['user']
+        log = await self.translate(ctx.guild.id,"logs","case-del",id=case['ID'],user=str(user))
+        await self.bot.cogs["Events"].send_logs_per_server(ctx.guild,"case-edit",log,ctx.author)
 
 
 def setup(bot):

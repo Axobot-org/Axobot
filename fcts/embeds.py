@@ -62,7 +62,7 @@ class EmbedCog(commands.Cog):
                     emb["color"] = self.color.value
                 else:
                     emb["color"] = self.color
-            if str(self.timestamp) != "":
+            if self.timestamp != discord.Embed.Empty:
                 emb["timestamp"] = str(self.timestamp)
             if self.footer_text != "" or self.footer_url != "":
                 emb["footer"] = {"icon_url":str(self.footer_url),"text":self.footer_text}

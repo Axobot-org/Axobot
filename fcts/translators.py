@@ -4,11 +4,7 @@ import json, os
 
 
 async def is_translator(ctx:commands.Context) -> bool:
-    return ctx.author.id in [279568324260528128, # Z_runner
-        281404141841022976, # Awhikax
-        552273019020771358, # Z_Jumper
-        349899849937846273, # Jees1
-        ]
+    return await ctx.bot.cogs['UtilitiesCog'].is_translator(ctx.author)
 
 async def check_admin(ctx):
     return await ctx.bot.cogs['AdminCog'].check_if_admin(ctx)
@@ -22,12 +18,18 @@ class TranslatorsCog(commands.Cog):
         if not os.path.exists('translation/'):
             os.makedirs('translation/')
         self.translations = {'en':self.load_translation('en'),
-            'fi':self.load_translation('fi')}
+            'fi':self.load_translation('fi'),
+            'de':self.load_translation('de'),
+            'es':self.load_translation('es'),
+            'it':self.load_translation('it')}
         try:
             self.translate = self.bot.cogs["LangCog"].tr
         except:
             pass
-        self.todo = {'fi':sorted([x for x in self.translations['en'].keys() if x not in self.translations['fi'].keys()])}
+        self.todo = {'fi':sorted([x for x in self.translations['en'].keys() if x not in self.translations['fi'].keys()]),
+                'de':sorted([x for x in self.translations['en'].keys() if x not in self.translations['de'].keys()]),
+                'es':sorted([x for x in self.translations['en'].keys() if x not in self.translations['es'].keys()]),
+                'it':sorted([x for x in self.translations['en'].keys() if x not in self.translations['it'].keys()])}
     
     @commands.Cog.listener()
     async def on_ready(self):
@@ -35,7 +37,7 @@ class TranslatorsCog(commands.Cog):
     
     def load_translation(self,lang:str):
         result = dict()
-        if lang not in self.bot.cogs['LangCog'].languages:
+        if lang not in ['fr','en','lolcat','fi','de','es','it']:
             return result
         with open(f'fcts/lang/{lang}.json','r') as f:
             data = json.load(f)
@@ -95,13 +97,16 @@ class TranslatorsCog(commands.Cog):
         try:
             msg = await self.bot.wait_for('message', check=lambda msg: msg.author.id==ctx.author.id and msg.channel.id==ctx.channel.id, timeout=45)
         except asyncio.TimeoutError:
-            await ctx.send("You were too slow. Try again.")
+            return await ctx.send("You were too slow. Try again.")
         if msg.content.lower() == 'pass':
             await ctx.send("This message will be ignored until the next reload of this command")
         else:
             await self.modify_project(lang,key,msg.content)
             await ctx.send(f"New translation:\n :arrow_right: {msg.content}")
-        self.todo[lang].remove(key)
+        try:
+            self.todo[lang].remove(key)
+        except ValueError:
+            pass
     
     @commands.command(name='tr-reload-todo')
     @commands.check(is_translator)
@@ -113,7 +118,6 @@ class TranslatorsCog(commands.Cog):
         await ctx.send("ToDo list for {} has been reloaded".format(lang))
 
     @commands.command(name="tr-status")
-    @commands.check(is_translator)
     async def status(self,ctx,lang:str=None):
         """Get the status of a translation project"""
         if lang==None:

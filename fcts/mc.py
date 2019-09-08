@@ -124,7 +124,7 @@ Every information come from the website www.fr-minecraft.net"""
                 except:
                     pass
         if Entity.Dimensions != [0,0,0]:
-            embed.add_field(name="Dimensions",value=str(await self.translate(ctx.channel,"mc","dimensions")).format(d=Entity.Dimensions))
+            embed.add_field(name="Dimensions",value=await self.translate(ctx.channel,"mc","dimensions",la=Entity.Dimensions[0],lo=Entity.Dimensions[1],ha=Entity.Dimensions[2]))
         try:
             await ctx.send(embed=embed)
         except Exception as e:
