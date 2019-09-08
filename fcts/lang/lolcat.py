@@ -18,7 +18,7 @@ admin={"change_game-0":"Slect *play*, *watch*, *listen* or *stream* followd by t
         "bug-0":"Bug #{} not findz",
         "emergency":"A emergency situation have just been declared 4 the boat. Those may bee the case when somebody tries to take controll of my code.\n\
 To limit the damagz, I was 4ced to leave all teh servrs I was on imediately, hoping itZ wasn't toooo late.\n\
-For much infoZ on de current state ov dis crisis, gonna to my offishial srver: https://discord.me/z_bot (check teh link for the documentashun if it no longer workz: https://zbot.rtfd.io)"
+For much infoZ on de current state ov dis crisis, gonna to my offishial srver: https://discord.me/zbot (check teh link for the documentashun if it no longer workz: https://zbot.rtfd.io)"
         }
 
 aide={"no-subcmd":"Teh kommand `{0.name}` had not sub~~scribe~~commanD",
@@ -253,7 +253,7 @@ Has a nice dayz !""",
         "bitly_short":"Quick linq: {url}",
         "bitly_long":"Slow link: {url}",
         "bitly_nobit":"HAHA NOPE, dat's not a bit.ly link!",
-        "changelogs-notfound": "Srry but i cannot find das version"
+        "changelog-notfound": "Srry but i cannot find das version"
         }
 
 infos_2={"membercount-0":"Total nmber of membrz",
@@ -349,6 +349,8 @@ logs={"slowmode-enabled":"Slwmod enable in {channel} ({seconds}s)",
         "d-welcome_roles":"Automated action (config welcome_roles)",
         "d-memberchan":"Automated action (config membercount)",
         "d-unban":"unbanned by {}",
+        "case-reason": "Da case #{id} have edite:\n`Old reson:` {old}\n`Young reason:` {new}",
+        "case-del": "Teh case #{id} has bee deletd ('bout {user})"
         }
 
 mc={"contact-mail":"If U notis an errrror in da info providd, plz contact my personale, or report teh errer directlly [with the nice website](https://fr-minecraft.net).",
@@ -381,7 +383,7 @@ mc={"contact-mail":"If U notis an errrror in da info providd, plz contact my per
         'api.mojang.com': "API service givn bay Mojang",
         'textures.minecraft.net':'Texture servr (nice skin & capz)',
         'mojang.com':'Official Ex Website'},
-        "dimensions":"Width: {d[0]}\nLenght: {d[1]}\nHeight: {d[2]}",
+        "dimensions":"Width: {la}\nLenght: {lo}\nHeight: {ha}",
         "item-fields":('ID',"Size ov stack",'Creativ mod tab','Damge points',"Durability points","Toolz able 2 destroy it","Mobs able to drop dis item","Added in da vershun"),
         "entity-fields":('Oh ID','Type','HeartH Points','Atack Pts','Experince Points Releas to Dead','Preferred Biomes',':A:ded in teh version'),
         "block-fields":("ID","Stack size","Creative mod tab","Damage points","Durability","Tool able to destroy it","Mobs able to loot it","Added in the version"),
@@ -621,6 +623,7 @@ to modify configuraishun, or `!config del <option>` 2 reset teh option (`!config
         "change-emojis":"Teh emojiz 4 the opshun '{}' are naw {}",
         "change-xp":"Da xp system uzed is naw {}",
         "change-color":"The coulor uzd for the option {} is naw {}",
+        "change-xp_rate": "The xP rate iz now @ {rate}",
         "new_server": "Ur server haz just been written for da furst time in r database. Congratulashuns :tada:",
         "see-0":"Enter `!config help` 4 more details",
         "see-1":"{} server configurashiun",
@@ -629,7 +632,8 @@ to modify configuraishun, or `!config del <option>` 2 reset teh option (`!config
         "opt_title":"Opzion '{}' of srver {}",
         "not-found":"Teh server {} haznt been registered yet in da data board",
         "need-admin":"U need to be a Big Boss (admin) to get this cmd",
-        "config-list": "List ov options cool taht u can use: {text}More info @ {link}"
+        "config-list": "List ov options cool taht u can use: {text}More info @ {link}",
+        "xp_rate_invalid": "The xp rate must :B: between {min} & {max}"
         }
 
 server_desc={"prefix":"Currnt baot prfx: {}",
@@ -666,7 +670,8 @@ server_desc={"prefix":"Currnt baot prfx: {}",
         "partner_color":"Coulor of partners box: {}",
         "partner_role":"Role givn 2 partners: {}",
         "update_mentions":"Roles pinged on teh bot changlog: {}",
-        "verification_role":"Roles removd when smone use !verify itself: {}"
+        "verification_role":"Roles removd when smone use !verify itself: {}",
+        "xp_rate": "XP earnings modifier: {}"
         }
 
 stats_infos={"not-found":"Unable 2 found {N}",
@@ -796,5 +801,6 @@ xp = {'card-level':'LVL',
         'change-global-xp':"NOT possible 2 edit XP of the global super mega system!",
         'change-xp-ok':"XP of teh user {user} have been set 2 {xp}xp!",
         'no-bot':"Impossible 2 modify the XP ov a robot!",
-        "bot-rank":"Bots like myself can't have any xp...sad times."
+        "bot-rank":"Bots like myself can't have any xp...sad times.",
+        "xp-disabled":"Lmao U didn't even enabled xp there xD"
         }

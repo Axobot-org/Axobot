@@ -6,7 +6,7 @@ class tempdelta(commands.Converter):
     def __init__(self):
         pass
     
-    async def convert(self,ctx:commands.Context,argument):
+    async def convert(self,ctx:commands.Context,argument) -> int:
         d = 0
         found = False
         # ctx.invoked_with
@@ -23,7 +23,7 @@ class user(commands.converter.UserConverter):
     def __init__(self):
         pass
     
-    async def convert(self,ctx:commands.Context,argument):
+    async def convert(self,ctx:commands.Context,argument) -> discord.User:
         if argument.isnumeric():
             if ctx.guild != None:
                 res = ctx.guild.get_member(int(argument))
@@ -44,7 +44,7 @@ class infoType(commands.Converter):
     def __init__(self):
         pass
     
-    async def convert(self,ctx:commands.Context,argument):
+    async def convert(self,ctx:commands.Context,argument) -> str:
         if argument in ['member','role','user','textchannel','channel','invite','voicechannel','emoji','category','guild','server']:
             return argument
         else:
@@ -54,7 +54,7 @@ class cardStyle(commands.Converter):
     def __init__(self):
         pass
     
-    async def convert(self,ctx:commands.Context,argument):
+    async def convert(self,ctx:commands.Context,argument) -> str:
         if argument in await ctx.bot.cogs['UtilitiesCog'].allowed_card_styles(ctx.author):
             return argument
         else:
@@ -64,7 +64,7 @@ class LeaderboardType(commands.Converter):
     def __init__(self):
         pass
     
-    async def convert(self,ctx:commands.Context,argument):
+    async def convert(self,ctx:commands.Context,argument) -> str:
         if argument in ['server','guild','serveur','local']:
             if ctx.guild==None:
                 raise commands.errors.BadArgument('Cannot use {} leaderboard type outside a server'.format(argument))
@@ -77,7 +77,7 @@ class Invite(commands.Converter):
     def __init__(self):
         pass
     
-    async def convert(self,ctx:commands.context,argument):
+    async def convert(self,ctx:commands.context,argument) -> typing.Union[str,int]:
         answer = None
         r = re.search(r'https://discordapp\.com/oauth2/authorize\?client_id=(\d{18})&scope=bot',argument)
         if r==None:
@@ -95,7 +95,7 @@ class Guild(commands.Converter):
     def __init__(self):
         pass
     
-    async def convert(self,ctx:commands.Context,argument):
+    async def convert(self,ctx:commands.Context,argument) -> discord.Guild:
         if argument.isnumeric():
             res = ctx.bot.get_guild(int(argument))
             if res != None:
@@ -117,7 +117,7 @@ class url(commands.Converter):
         def __str__(self):
             return f"Url(url='{self.url}', domain='{self.domain}', path='{self.path}', is_https={self.is_https})"
 
-    async def convert(self,ctx:commands.Context,argument):
+    async def convert(self,ctx:commands.Context,argument) -> Url:
         r = re.search(r'(?P<https>https?)://(?:www\.)?(?P<domain>[^/\s]+)(?:/(?P<path>[\S]+))?', argument)
         if r==None:
             raise commands.errors.BadArgument('Invalid url: '+argument)
@@ -127,7 +127,7 @@ class anyEmoji(commands.Converter):
     def __init__(self):
         pass
 
-    async def convert(self,ctx:commands.Context,argument):
+    async def convert(self,ctx:commands.Context,argument) -> typing.Union[str,discord.Emoji]:
         r = re.search(r'<a?:[^:]+:(\d+)>', argument)
         if r==None:
             if all([x not in string.printable for x in argument]):
@@ -163,3 +163,28 @@ class guildMessage(commands.Converter):
             else:
                 return msg
         raise commands.errors.BadArgument('Message "{}" not found.'.format(argument))
+
+class arguments(commands.Converter):
+    def __init__(self):
+        pass
+
+    async def convert(self,ctx:commands.Context,argument:str) -> dict:
+        answer = dict()
+        for result in re.finditer(r'(\w+) ?= ?"((?:[^"\\]*|\\")*)"',argument):
+            answer[result.group(1)] = result.group(2).replace('\\"','"')
+        return answer
+
+class Color(commands.Converter):
+    def __init__(self):
+        pass
+
+    async def convert(self,ctx:commands.Context,argument:str) -> int:
+        if argument.startswith('#') and len(argument)%3==1:
+            arg = argument[1:]
+            rgb = [int(arg[i:i+2], 16) for i in range(0,len(arg),len(arg)//3)]
+            return discord.Colour(0).from_rgb(rgb[0], rgb[1], rgb[2]).value
+        elif argument.isnumeric():
+            return int(argument)
+        else:
+            return None
+        

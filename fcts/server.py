@@ -17,6 +17,7 @@ numb_options = []
 raid_options = ["anti_raid"]
 xp_type_options = ['xp_type']
 color_options = ['partner_color']
+xp_rate_option = ['xp_rate']
 
 class ServerCog(commands.Cog):
     """"Cog in charge of all the bot configuration management for your server. As soon as an option is searched, modified or deleted, this cog will handle the operations."""
@@ -57,6 +58,7 @@ class ServerCog(commands.Cog):
                "enable_xp":1,
                "levelup_msg":'',
                "noxp_channels":'',
+               "xp_rate":1.0,
                "xp_type":0,
                "anti_caps_lock":1,
                "enable_fun":1,
@@ -293,6 +295,8 @@ class ServerCog(commands.Cog):
                 await self.conf_xp_type(ctx,option,value)
             elif option in color_options:
                 await self.conf_color(ctx,option,value)
+            elif option in xp_rate_option:
+                await self.conf_xp_rate(ctx,option,value)
             else:
                 await ctx.send(await self.translate(ctx.guild.id,"server","change-0"))
                 return
@@ -716,10 +720,33 @@ class ServerCog(commands.Cog):
         else:
             return str(discord.Colour(value))
     
+    async def conf_xp_rate(self,ctx,option,value):
+        if value == "scret-desc":
+            return await self.find_staff(ctx.guild.id,option)
+        else:
+            try:
+                value = round(float(value),2)
+            except ValueError:
+                msg = await self.translate(ctx.guild.id,"server","change-6")
+                await ctx.send(msg.format(option))
+                return
+            if value<0.1 or value>3:
+                await ctx.send(await self.translate(ctx.guild.id,'server','xp_rate_invalid',min=0.1,max=3))
+                return
+            await self.modify_server(ctx.guild.id,values=[(option,value)])
+            await ctx.send(await self.translate(ctx.guild.id,"server","change-xp_rate",rate=value))
+            await self.send_embed(ctx.guild,option,value)
+    
+    async def form_xp_rate(self,option,value):
+        if value == None:
+            return self.default_opt[option]
+        else:
+            return value
+    
     @sconfig_main.command(name='list')
     async def sconfig_list(self,ctx):
         """Get the list of every usable option"""
-        options = sorted(roles_options+bool_options+textchan_options+vocchan_options+text_options+prefix_options+emoji_option+numb_options+raid_options+xp_type_options+color_options)
+        options = sorted(roles_options+bool_options+textchan_options+vocchan_options+text_options+prefix_options+emoji_option+numb_options+raid_options+xp_type_options+color_options+xp_rate_option)
         await ctx.send(await self.translate(ctx.guild.id,'server','config-list',text="\n```\n-{}\n```\n".format('\n-'.join(options)),link="<https://zbot.readthedocs.io/en/latest/server.html#list-of-every-option>"))
 
     @sconfig_main.command(name="see")
@@ -771,6 +798,8 @@ class ServerCog(commands.Cog):
                     r = ", ".join(await self.form_xp_type(v))
                 elif i in color_options:
                     r = await self.form_color(i,v)
+                elif i in xp_rate_option:
+                    r = await self.form_xp_rate(i,v)
                 else:
                     continue
                 if len(r) == 0:
@@ -807,6 +836,8 @@ class ServerCog(commands.Cog):
                 r = await self.conf_xp_type(ctx,option,"scret-desc")
             elif option in color_options:
                 r = await self.conf_color(ctx,option,"scret-desc")
+            elif option in xp_rate_option:
+                    r = await self.conf_xp_rate(ctx,option,"scret-desc")
             else:
                 r = None
             if r!=None:

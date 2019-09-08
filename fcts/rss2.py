@@ -1,8 +1,9 @@
 import discord, datetime, time, re, asyncio, mysql, random, typing, importlib, socket, requests, twitter
 from libs import feedparser
 from discord.ext import commands
-from fcts import cryptage, tokens, reloads
+from fcts import reloads, args
 importlib.reload(reloads)
+importlib.reload(args)
 
 
 web_link={'fr-minecraft':'http://fr-minecraft.net/rss.php',
@@ -66,12 +67,10 @@ class RssCog(commands.Cog):
             self.print = bot.cogs["UtilitiesCog"].print2
         except:
             pass
-        try:
-            requests.get('http://twitrss.me/twitter_user_to_rss/?user=discordapp').json()
-        except:
+        if feedparser.parse('http://twitrss.me/twitter_user_to_rss/?user=Dinnerbone').entries == list():
             self.twitter_api_url = 'http://twitrss.me/mobile_twitter_to_rss/?user='
         else:
-            self.twitter_api_url = 'http://twitrss.me/twitter_to_rss/?user='
+            self.twitter_api_url = 'http://twitrss.me/twitter_user_to_rss/?user='
 
     @commands.Cog.listener()
     async def on_ready(self):
@@ -115,6 +114,18 @@ class RssCog(commands.Cog):
             if self.author == None:
                 self.author = channel
         
+        def fill_embed_data(self,flow:dict):
+            self.embed_data = {'color':discord.Colour(0).default(),
+                'footer':'',
+                'title':None}
+            if flow['embed_title'] != '':
+                self.embed_data['title'] = flow['embed_title'][:256]
+            if flow['embed_footer'] != '':
+                self.embed_data['footer'] = flow['embed_footer'][:2048]
+            if flow['embed_color'] != 0:
+                self.embed_data['color'] = flow['embed_color']
+            return
+
         async def fill_mention(self,guild,roles,translate):
             if roles == []:
                 r = await translate(guild.id,"keywords","none")
@@ -145,16 +156,15 @@ class RssCog(commands.Cog):
             if not self.embed:
                 return text
             else:
-                emb = discord.Embed()
-                if self.Type != 'tw':
-                    emb.title = self.title
-                else:
-                    emb.title = self.author
-                emb.description = text
+                emb = self.bot.cogs['EmbedCog'].Embed(desc=text,time=self.date,color=self.embed_data['color'],footer_text=self.embed_data['footer'])
+                if self.embed_data['title']==None:
+                    if self.Type != 'tw':
+                        emb.title = self.title
+                    else:
+                        emb.title = self.author
                 emb.add_field(name='URL',value=self.url)
-                emb.timestamp = self.date
                 if self.image != None:
-                    emb.set_thumbnail(url=self.image)
+                    emb.thumbnail = self.image
                 return emb
 
 
@@ -578,8 +588,12 @@ class RssCog(commands.Cog):
     @rss_main.command(name="use_embed",aliases=['embed'])
     @commands.guild_only()
     @commands.check(can_use_rss)
-    async def change_use_embed(self,ctx,ID:typing.Optional[int]=None,value:bool=None):
-        """Use an embed or not for a flox"""
+    async def change_use_embed(self,ctx,ID:typing.Optional[int]=None,value:bool=None,*,arguments:args.arguments=None):
+        """Use an embed or not for a flow
+        You can also provide arguments to change the color/text of the embed. Followed arguments are usable:
+        - color: color of the embed (hex or decimal value)
+        - title: title override, which will disable the default one (max 256 characters)
+        - footer: small text displayed at the bottom of the embed"""
         try:
             try:
                 flow = await self.askID(ID,ctx)
@@ -610,8 +624,18 @@ class RssCog(commands.Cog):
                     msg = await self.bot.wait_for('message', check=check,timeout=20)
                 except asyncio.TimeoutError:
                     return await ctx.send(await self.translate(ctx.guild.id,"rss","too-long"))
-                value =  commands.core._convert_to_bool(msg.content)
-            await self.update_flow(flow['ID'],[('use_embed',value)])
+                value = commands.core._convert_to_bool(msg.content)
+            values_to_update = [('use_embed',value)]
+            if len(arguments.keys())>0:
+                if 'color' in arguments.keys():
+                    c = await args.Color().convert(ctx,arguments['color'])
+                    if c != None:
+                        values_to_update.append(('embed_color',c))
+                if 'title' in arguments.keys():
+                    values_to_update.append(('embed_title',arguments['title']))
+                if 'footer' in arguments.keys():
+                    values_to_update.append(('embed_footer',arguments['footer']))
+            await self.update_flow(flow['ID'],values_to_update)
             await ctx.send(await self.translate(ctx.guild.id,"rss","use_embed-success",v=value,f=flow['ID']))
         except Exception as e:
             await ctx.send(str(await self.translate(ctx.guild.id,"rss","guild-error")).format(e))
@@ -763,19 +787,22 @@ class RssCog(commands.Cog):
 
 
     async def get_tw_official(self,nom:str,count:int=None):
-        return [x for x in self.twitterAPI.GetUserTimeline(screen_name=nom,exclude_replies=True,trim_user=True,count=count)]
+        try:
+            return [x for x in self.twitterAPI.GetUserTimeline(screen_name=nom,exclude_replies=True,trim_user=True,count=count)]
+        except requests.exceptions.ConnectionError:
+            return []
 
     async def rss_tw(self,guild,nom,date=None):
         if nom == 'help':
             return await self.translate(guild,"rss","tw-help")
         url = self.twitter_api_url+nom
-        feeds = feedparser.parse(url)
+        feeds = feedparser.parse(url,timeout=5)
         if feeds.entries==[]:
             url = self.twitter_api_url+nom.capitalize()
-            feeds = feedparser.parse(url)
+            feeds = feedparser.parse(url,timeout=5)
             if feeds.entries==[]:
                 url = self.twitter_api_url+nom.lower()
-                feeds = feedparser.parse(url)
+                feeds = feedparser.parse(url,timeout=5)
                 
         tweets_list_official = await self.get_tw_official(nom)
         tweets_ids = [x.id_str for x in tweets_list_official]
@@ -799,7 +826,7 @@ class RssCog(commands.Cog):
                 t = feed['title']
             author = feed['author'].replace('(','').replace(')','')
             rt = None
-            if author.replace('@','') not in url:
+            if author.replace('@','') not in feed['link']:
                 rt = url.split("=")[1]
             obj = self.rssMessage(bot=self.bot,Type='tw',url=feed['link'].replace('mobile.',''),title=t,emojis=self.bot.cogs['EmojiCog'].customEmojis,date=feed['published_parsed'],author=author,retweeted_by=rt,channel=feeds.feed['title'])
             return [obj]
@@ -810,7 +837,7 @@ class RssCog(commands.Cog):
                     break
                 author = feed['author'].replace('(','').replace(')','')
                 rt = None
-                if author.replace('@','') not in url:
+                if author.replace('@','') not in feed['link']:
                     rt = url.split("=")[1]
                 if rt != None:
                     t = feed['title'].replace(rt,'')
@@ -854,7 +881,7 @@ class RssCog(commands.Cog):
 
     async def rss_twitch(self,guild,nom,date=None):
         url = 'https://twitchrss.appspot.com/vod/'+nom
-        feeds = feedparser.parse(url)
+        feeds = feedparser.parse(url,timeout=5)
         if feeds.entries==[]:
             return await self.translate(guild,"rss","nothing")
         if not date:
@@ -1070,7 +1097,7 @@ class RssCog(commands.Cog):
                     else:
                         mentions.append(role)
             try:
-                if isinstance(t,discord.Embed):
+                if isinstance(t,(self.bot.cogs['EmbedCog'].Embed,discord.Embed)):
                     await channel.send(" ".join(obj.mentions),embed=t)
                 else:
                     await channel.send(t)
@@ -1098,6 +1125,7 @@ class RssCog(commands.Cog):
                         return False
                     o.format = flow['structure']
                     o.embed = flow['use_embed']
+                    o.fill_embed_data(flow)
                     await o.fill_mention(guild,flow['roles'].split(';'),self.translate)
                     await self.send_rss_msg(o,chan,flow['roles'].split(';'),)
                 await self.update_flow(flow['ID'],[('date',o.date)])

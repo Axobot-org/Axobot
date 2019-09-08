@@ -76,10 +76,13 @@ class LibCog(commands.Cog):
         if book==None:
             return await ctx.send(await self.translate(ctx.channel,'library','no-found'))
         vinfo = book['volumeInfo']
-        real_isbn = "".join([x['identifier'] for x in vinfo['industryIdentifiers'] if x['type']=="ISBN_13"])
-        if len(real_isbn)==0:
-            real_isbn = "".join([x['identifier'] for x in vinfo['industryIdentifiers'] if x['type']=="ISBN_10"])
-        if len(real_isbn)==0:
+        if 'industryIdentifiers' in vinfo.keys():
+            real_isbn = "".join([x['identifier'] for x in vinfo['industryIdentifiers'] if x['type']=="ISBN_13"])
+            if len(real_isbn)==0:
+                real_isbn = "".join([x['identifier'] for x in vinfo['industryIdentifiers'] if x['type']=="ISBN_10"])
+            if len(real_isbn)==0:
+                real_isbn = '?'
+        else:
             real_isbn = '?'
         txt = await self.translate(ctx.channel,'library','book_pres',
             title=vinfo['title'],
@@ -108,7 +111,7 @@ class LibCog(commands.Cog):
             del emb
         else:
             await ctx.send(txt)
-        await self.db_add_search(int(real_isbn),vinfo['title'])
+        await self.db_add_search(int(real_isbn) if real_isbn!='?' else real_isbn, vinfo['title'])
 
 
 

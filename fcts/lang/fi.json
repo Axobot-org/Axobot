@@ -17,6 +17,17 @@
     },
     "aide": {
         "aliases": "Lyhenteet:",
+        "categories": {
+            "fun": "hauska",
+            "info": "tietoa",
+            "moderation": "valvonta",
+            "other": "muut",
+            "server-settings": "palvelin asetukset",
+            "staff": "bot työntekijät",
+            "translators": "kääntäjä tiimi",
+            "unclassed": "Ei kategoriassa",
+            "users-info": "Käyttäjän tietoa"
+        },
         "check-desc": {
             "bot_has_permissions": [
                 "Botilla on riittävästi käyttöoikeuksia",
@@ -43,6 +54,7 @@
                 "Sallittu rooli puuttuu (`mute`)"
             ],
             "can_say": [
+                "Sallittu rooli puuttuu (`say`)",
                 "Sallittu rooli puuttuu (`say`)"
             ],
             "can_slowmode": [
@@ -119,6 +131,7 @@
             ]
         },
         "cmd-not-found": "Komentoa  \"{}\" ei ole nimetty",
+        "embed_title": "Käytettävissä olevat komennot käyttäjälle {u}",
         "footer": "Viestitä {}help komento niin saat lisätietoja tietyistä komennoista",
         "mods": [
             "Valvoja:",
@@ -150,7 +163,8 @@
         "won-card": "Vau! Tosi hieno blurple kuva {}! Niin hieno että päätin antaa sinulle blurple xp kortin! Voit käyttää sitä lähettämällä komennon `{}profile card blurple` {}"
     },
     "bvn": {
-        "aide": "__**Tervetuloa liittymis & lähtö viesti moduuliin**__\nTätä moduulia käytetään konfiguroimaan automaattinen viesti joka kerta kun joku tulee tai lähtee servultasi.\n__** Konfiguraatio**__\n`1-` Jotta voit konfiguroida mihin nämä viestit lähetetään, viestitä `{p}config change welcome_channel` lisättynä kanava.\n`2-` Jotta voit konfiguroida viestin, kirjoita  `{p}config change <welcome|leave> <message>`. Tälle viestille voit käyttää variableja:\n - `{user}` Tägää käyttäjän\n - `{server}` näyttää serverin nimen\n - `{owner}` näyttää serverin omistajan nimen\n- `{member_count}` näyttää tämänhetkisen käyttäjämäärän"
+        "aide": "__**Tervetuloa liittymis & lähtö viesti moduuliin**__\nTätä moduulia käytetään konfiguroimaan automaattinen viesti joka kerta kun joku tulee tai lähtee servultasi.\n__** Konfiguraatio**__\n`1-` Jotta voit konfiguroida mihin nämä viestit lähetetään, viestitä `{p}config change welcome_channel` lisättynä kanava.\n`2-` Jotta voit konfiguroida viestin, kirjoita  `{p}config change <welcome|leave> <message>`. Tälle viestille voit käyttää variableja:\n - `{user}` Tägää käyttäjän\n - `{server}` näyttää serverin nimen\n - `{owner}` näyttää serverin omistajan nimen\n- `{member_count}` näyttää tämänhetkisen käyttäjämäärän",
+        "error-give-role": "Mahdotonta antaa roolia '{r}' uudelle jäsenelle {u}: ei tarpeeksi käyttöoikeuksia Varmista että roolini on ylempänä kuin rooli jota yritän antaa ja että minulla on 'Hallinnoi rooleja' käyttöoikeudet."
     },
     "cases": {
         "cases-0": "{} tapaukset löydetty: ({}-{})",
@@ -184,10 +198,13 @@
         "invalidinvite": "Invalid bot/server invite: `{0}`",
         "invalidisbn": "Virheellinen ISBN",
         "invalidleaderboard": "Invalid leaderboard type",
+        "invalidmsgid": "Pätemätön viesti tunniste",
         "invalidurl": "Virheellinen url: `{u}`",
         "membernotfound": "On mahdotonta löytää käyttäjä `{m}` :confused:",
         "missingargument": "Upsis, argumentti \"{a}\" puuttuu {e}",
+        "msgnotfound": "Mahdotonta löytää viesti tunnisteella {msg}",
         "rolenotfound": "On mahdotonta löytää rooli `{0}`",
+        "toomanytxtchan": "Sinulla on liikaa teksti kanavia",
         "usernotfound": "On mahdotonta löytää käyttäjä `{u}` :confused:"
     },
     "events": {
@@ -292,13 +309,21 @@
         "admins-list": "Järjestelmänvalvojat tälle botille ovat : {}",
         "bitly_long": "Alkuperäinen URL: {url}",
         "bitly_nobit": "Tämä linkki ei ole bit.ly linkki!",
+        "bitly_short": "Lyhennetty URL: {url}",
+        "changelogs-notfound": "Mahdotonta löytää tämä versio",
         "discordlinks": {
+            "Discord": "ToS https://dis.gd/tos",
             "Discord käyttöehdot ToS": "https://dis.gd/tos",
             "Ehdota jotain Discordille ": "https://dis.gd/feedback",
             "Itsebotti artikkeli": "https://support.discordapp.com/hc/articles/115002192352",
             "Käyttöehdot botin tekijöille": "https://discordapp.com/developers/docs/legal",
             "Palvelin tila": "https://dis.gd/status",
-            "Raportoi ongelma/ käyttäjä": "https://dis.gd/report"
+            "Raportoi ongelma/ käyttäjä": "https://dis.gd/report",
+            "Report": "a bug/ a user https://dis.gd/report",
+            "Selfbots": "article https://support.discordapp.com/hc/articles/115002192352",
+            "Servers": "status https://dis.gd/status",
+            "Suggest": "something to Discord https://dis.gd/feedback",
+            "ToS": "for bot devs https://discordapp.com/developers/docs/legal"
         },
         "docs": "Tässä on linkki botin dokumenttiin:",
         "prefix": "Lista kaikista käytettävissä olevista etuliitoista:",
@@ -317,6 +342,7 @@
         "added_at": "Lisätty klo",
         "aucune": "ei yhtään",
         "bot": "botti",
+        "category": "kategoria",
         "click_here": "Paina tästä",
         "depuis": "",
         "dnd": "älä häiritse",
@@ -337,7 +363,8 @@
         "server": "palvelin",
         "servers": "palvelimet",
         "subcmds": "Toissijainen komento",
-        "unknown": "Tuntematon"
+        "unknown": "Tuntematon",
+        "version": "versio"
     },
     "kill": {
         "list": [
@@ -361,8 +388,16 @@
             "{1}, laava kylvyt on kuumia mutta, laava palaa...",
             "{1} yritti roketti hypätä",
             "Sinun ei kannattaisi kuunnella söpöä melodiaa keholaulusta, {1} :musical_note:",
-            "{2}.exe *On lakannut toimimasta*"
+            "{2}.exe *On lakannut toimimasta*",
+            "{1} yritti raketti hyppyä",
+            "Sinun ei kannattaisi kuunnella kaunista melodiaa Lullaby:ltä, {1} 🎵",
+            "{2}.exe *on lopettanut toiminnan*"
         ]
+    },
+    "library": {
+        "book_pres": "Otsikko: {title}\\nAlaotsikko: {subtitle}\\nTekijä(t): {author}\\nJulkaisia: {publisher}\\nJulkaistu: {publication}\\nKieli: {language}\\nSivu määrä: {pages}\\n\\nISBN : {isbn}",
+        "no-found": "Mahdotonta löytää tämä kirja",
+        "price": "Hinta"
     },
     "logs": {
         "ban": "Käyttäjälle {member} on annettu porttikielto (syyllä: {reason} | keissi #{case})",
@@ -387,7 +422,37 @@
         "warn": "{member} on varoitettu: {reason} (tapaus #{case})"
     },
     "mc": {
+        "adv-fields": [
+            "Nimi",
+            "Tunniste",
+            "Tyyppi",
+            "Lisätty versiossa"
+        ],
+        "block-fields": [
+            "Tunniste",
+            "Työväline joka voi rikkoa sen",
+            "Lisätty versiossa",
+            "Vahingoitus pisteet"
+        ],
+        "block-help": "Tämä komento antaa sinun saamaan tietoa mistä tahansa Minecraft palikasta. Voit antaa sen nimen, Ranskaksi tai Englanniksi. Lähetä `!mc block <nimi>`",
+        "cant-embed": "En voi lähettää upotettua linkkiä. Varmista että minulla on \"Upota linkkejä\" käyttöoikeudet.",
+        "cmd-fields": [
+            "Nimu",
+            "Syntaxi",
+            "Esimerkit",
+            "Lisätty versiossa"
+        ],
+        "cmd-help": "Tämä komento antaa mahdollisuuden saada tietoa mistä tahansa Minecraftin komennosta. Sinun täytyy vain lähettää `!mc command <nimi>`",
         "contact-mail": "Jos huomaat virheen annetuissa tiedoissa, ota minuun yhteyttä personaalisesti, tai ota yhteyttä tänne: [sivustolla](https://fr-minecraft.net).",
+        "dimensions": "Leveys: {d[0]}\\nPituus: {d[1]}\\nKorkeus: {d[2]}",
+        "entity-fields": [
+            "Tunniste",
+            "Tyyli",
+            "Terveys Pisteet",
+            "Hyökkäys Pisteet",
+            "Kokemus Pisteet Julkaistu Kuolemaan",
+            "Lisätty versiossa"
+        ],
         "no-api": "Virhe: Mahdotonta yhdistää API:hin",
         "serv-0": "Numero pelaajista",
         "serv-1": "Lista 20 ensimmäisestä pealaajasta yhdistettynä",
