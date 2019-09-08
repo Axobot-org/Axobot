@@ -102,7 +102,7 @@ class TranslatorsCog(commands.Cog):
         await ctx.send("```\n"+value+"\n```")
         await ctx.send(f"How would you translate it in {lang}?\n\n  *Key: {key}*\nType 'pass' to choose another one")
         try:
-            msg = await self.bot.wait_for('message', check=lambda msg: msg.author.id==ctx.author.id and msg.channel.id==ctx.channel.id, timeout=45)
+            msg = await self.bot.wait_for('message', check=lambda msg: msg.author.id==ctx.author.id and msg.channel.id==ctx.channel.id, timeout=90)
         except asyncio.TimeoutError:
             return await ctx.send("You were too slow. Try again.")
         if msg.content.lower() == 'pass':
@@ -121,7 +121,8 @@ class TranslatorsCog(commands.Cog):
         """Reload the to-do list of a language translation"""
         if lang not in self.todo.keys():
             return await ctx.send("Invalid language")
-        self.todo = {'fi':sorted([x for x in self.translations['en'].keys() if x not in self.translations['fi'].keys()])}
+        langs = self.todo.keys()
+        self.todo = {lang:sorted([x for x in self.translations['en'].keys() if x not in self.translations[lang].keys()]) for lang in langs}
         await ctx.send("ToDo list for {} has been reloaded".format(lang))
 
     @commands.command(name="tr-status")
@@ -175,6 +176,24 @@ class TranslatorsCog(commands.Cog):
             await readpath(line.split(' ')[0].split('.'),old,' '.join(line.split(' ')[1:]))
         return old
 
+
+    @commands.command(name='tr-edit')
+    @commands.check(is_translator)
+    async def edit_tr(self,ctx,lang:str,key:str,*,translation:str=None):
+        """Edit a translation"""
+        if lang not in self.translations.keys():
+            return await ctx.send("Invalid language")
+        if not key in self.translations['en'].keys():
+            return await ctx.send("Invalid key")
+        if translation==None:
+            await ctx.send("```\n"+self.translations['en'][key]+"\n```")
+            try:
+                msg = await self.bot.wait_for('message', check=lambda msg: msg.author.id==ctx.author.id and msg.channel.id==ctx.channel.id, timeout=90)
+            except asyncio.TimeoutError:
+                return await ctx.send("You were too slow. Try again.")
+            translation = msg.content
+        await self.modify_project(lang,key,translation)
+        await ctx.send(f"New translation:\n :arrow_right: {translation}")
             
 
     @commands.command(name="tr-file")
