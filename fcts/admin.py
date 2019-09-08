@@ -543,6 +543,7 @@ Cette option affecte tous les serveurs"""
                 pass
 
     @main_msg.command(name="loop_restart")
+    @commands.check(reloads.check_admin)
     async def loop_restart(self,ctx:commands.Context):
         """Relance la boucle principale"""
         try:
