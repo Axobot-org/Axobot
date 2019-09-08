@@ -623,6 +623,7 @@ l'option (`!config change <option> del` fonctionne de même).\nLa liste des opti
         "change-emojis":"Les émojis pour l'option '{}' sont maintenant {}",
         "change-xp":"Le type d'xp utilisé est maintenant {}",
         "change-color":"La couleur utilisée pour l'option {} est maintenant {}",
+        "change-xp_rate":"Le modificateur d'xp est maintenant à {rate}",
         "new_server":"Votre serveur vient d'être enregistré pour la première fois dans notre base de donnée. Félicitations :tada:",
         "see-0":"Entrez `!config help` pour plus de détails",
         "see-1":"Configuration du serveur {}",
@@ -631,7 +632,8 @@ l'option (`!config change <option> del` fonctionne de même).\nLa liste des opti
         "opt_title":"Option '{}' du serveur {}",
         "not-found":"Le serveur {} n'a pas encore été enregistré dans la base de donnée",
         "need-admin":"Vous devez avoir les permissions Administrateur pour exécuter cette commande.",
-        "config-list":"Liste des options disponibles :{text}Plus d'information : {link}"
+        "config-list":"Liste des options disponibles :{text}Plus d'information : {link}",
+        "xp_rate_invalid": "Le modificateur d'xp doit être entre {min} et {max}"
         }
 
 server_desc={"prefix":"Préfixe actuel du bot : {}",
@@ -668,7 +670,8 @@ server_desc={"prefix":"Préfixe actuel du bot : {}",
         "partner_color":"Couleur de l'embed des partenaires : {}",
         "partner_role":"Rôle donné aux partenaires : {}",
         "update_mentions":"Rôles mentionnés lors d'une mise à jour du bot : {}",
-        "verification_role":"Rôles enlevés lorsqu'un joueur s'authentifie avec la commande `verify` : {}"
+        "verification_role":"Rôles enlevés lorsqu'un joueur s'authentifie avec la commande `verify` : {}",
+        "xp_rate":"Modficateur de gains d'xp : {}"
         }
 
 stats_infos={"not-found":"Impossible de trouver {N}",

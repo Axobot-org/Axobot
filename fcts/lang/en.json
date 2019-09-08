@@ -29,7 +29,7 @@
             "server-settings": "server settings",
             "staff": "bot staff",
             "users-info": "Users information",
-            "unclassed":"Unclassed",
+            "unclassed": "Unclassed",
             "translators": "translation team"
         },
         "footer": "Type {}help command for more info on a command",
@@ -163,7 +163,7 @@
     },
     "bvn": {
         "aide": "__**Welcome to the join & leave message module**__\n\nThis module is used to configure an automatic message each time a member enters or exits your server.\n\n__** Configuration**__\n\n`1-` To configure the chat room where these messages are written, enter `{p}config change welcome_channel` followed by the channel (you can use its mention as well as its identifier or its full name).\n`2-` To configure a message, enter `{p}config change <welcome|leave> <message>`. For this message you can use some variables:\n - `{user}` mentions the member\n - `{server}` displays the server name\n - `{owner}` displays the server owner name\n - `{member_count}` shows the current number of members\n - `{type}` return 'member' or 'bot'",
-        "error-give-role": "Unable to give role '{r}' to the new member {u}: not enough permissions\nPlease check the roles hierarchy and my permission 'Manage roles'"
+        "error-give-roles": "Unable to give role '{r}' to the new member {u}: not enough permissions\nPlease check the roles hierarchy and my permission 'Manage roles'"
     },
     "cases": {
         "no-user": "Unable to find this user :eyes:",
@@ -319,7 +319,7 @@
         "bitly_short": "Shortened URL: {url}",
         "bitly_long": "Original URL: {url}",
         "bitly_nobit": "This address is not a bit.ly link!",
-        "changelogs-notfound": "Unable to find this version"
+        "changelog-notfound": "Unable to find this version"
     },
     "infos_2": {
         "membercount-0": "Total number of members",
@@ -637,8 +637,8 @@
         "role-not-in-list": "This role is not part of the attributable roles",
         "rr-embed": "Taking on a role",
         "role-lost": "The role {r} has been removed from your roles",
-        "not-zbot-msg":"This message is not Zbot's",
-        "not-zbot-embed":"This message does not contain any role-reaction embed"
+        "not-zbot-msg": "This message is not Zbot's",
+        "not-zbot-embed": "This message does not contain any role-reaction embed"
     },
     "rss": {
         "yt-help": "To search for a youtube channel, you must enter the channel ID. You will find it at the end of the string url, it can be either the name, or a string of random characters.\n*Tip: some channels are already filled in my code. Sometimes you can just put `neil3000` or `Oxisius`* :wink:",
@@ -713,6 +713,7 @@
         "change-emojis": "The emotions for the option \"{}\" are now {}",
         "change-xp": "The xp system used is now {}",
         "change-color": "The color used for the option {} is now {}",
+        "change-xp_rate": "The xp rate is now at {rate}",
         "new_server": "Your server has just been registered for the first time in our database. Congratulations :tada:",
         "see-0": "Enter `!config help` for more details",
         "see-1": "{} server configuration",
@@ -721,7 +722,8 @@
         "opt_title": "Option \"{}\" of server {}",
         "not-found": "The server {} has not yet been registered in the database",
         "need-admin": "You need Administrator permission to execute this command.",
-        "config-list": "List of available options: {text}More info at {link}"
+        "config-list": "List of available options: {text}More info at {link}",
+        "xp_rate_invalid": "The xp rate must be between {min} and {max}"
     },
     "server_desc": {
         "prefix": "Current bot prefix: {}",
@@ -758,7 +760,8 @@
         "partner_color": "Color of partners embed: {}",
         "partner_role": "Role given to partners: {}",
         "update_mentions": "Roles mentioned in the bot changelog: {}",
-        "verification_role": "Roles removed when a user use the `verify` command: {}"
+        "verification_role": "Roles removed when a user use the `verify` command: {}",
+        "xp_rate": "XP earnings modifier: {}"
     },
     "stats_infos": {
         "not-found": "Unable to find {N}",

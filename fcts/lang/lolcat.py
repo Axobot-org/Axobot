@@ -253,7 +253,7 @@ Has a nice dayz !""",
         "bitly_short":"Quick linq: {url}",
         "bitly_long":"Slow link: {url}",
         "bitly_nobit":"HAHA NOPE, dat's not a bit.ly link!",
-        "changelogs-notfound": "Srry but i cannot find das version"
+        "changelog-notfound": "Srry but i cannot find das version"
         }
 
 infos_2={"membercount-0":"Total nmber of membrz",
@@ -623,6 +623,7 @@ to modify configuraishun, or `!config del <option>` 2 reset teh option (`!config
         "change-emojis":"Teh emojiz 4 the opshun '{}' are naw {}",
         "change-xp":"Da xp system uzed is naw {}",
         "change-color":"The coulor uzd for the option {} is naw {}",
+        "change-xp_rate": "The xP rate iz now @ {rate}",
         "new_server": "Ur server haz just been written for da furst time in r database. Congratulashuns :tada:",
         "see-0":"Enter `!config help` 4 more details",
         "see-1":"{} server configurashiun",
@@ -631,7 +632,8 @@ to modify configuraishun, or `!config del <option>` 2 reset teh option (`!config
         "opt_title":"Opzion '{}' of srver {}",
         "not-found":"Teh server {} haznt been registered yet in da data board",
         "need-admin":"U need to be a Big Boss (admin) to get this cmd",
-        "config-list": "List ov options cool taht u can use: {text}More info @ {link}"
+        "config-list": "List ov options cool taht u can use: {text}More info @ {link}",
+        "xp_rate_invalid": "The xp rate must :B: between {min} & {max}"
         }
 
 server_desc={"prefix":"Currnt baot prfx: {}",
@@ -668,7 +670,8 @@ server_desc={"prefix":"Currnt baot prfx: {}",
         "partner_color":"Coulor of partners box: {}",
         "partner_role":"Role givn 2 partners: {}",
         "update_mentions":"Roles pinged on teh bot changlog: {}",
-        "verification_role":"Roles removd when smone use !verify itself: {}"
+        "verification_role":"Roles removd when smone use !verify itself: {}",
+        "xp_rate": "XP earnings modifier: {}"
         }
 
 stats_infos={"not-found":"Unable 2 found {N}",
