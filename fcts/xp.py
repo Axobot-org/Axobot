@@ -75,7 +75,7 @@ class XPCog(commands.Cog):
         content = msg.clean_content
         if len(content)<self.minimal_size or await self.check_spam(content) or await self.check_cmd(msg):
             return
-        giv_points = await self.calc_xp(msg) * rate
+        giv_points = await self.calc_xp(msg)
         if msg.author.id in self.cache['global'].keys():
             prev_points = self.cache['global'][msg.author.id][1]
         else:
