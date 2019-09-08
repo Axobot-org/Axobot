@@ -795,15 +795,17 @@ class RssCog(commands.Cog):
     async def rss_tw(self,guild,nom,date=None):
         if nom == 'help':
             return await self.translate(guild,"rss","tw-help")
-        url = self.twitter_api_url+nom
-        feeds = feedparser.parse(url,timeout=5)
-        if feeds.entries==[]:
-            url = self.twitter_api_url+nom.capitalize()
-            feeds = feedparser.parse(url,timeout=5)
+        try:
+            url = self.twitter_api_url+nom
+            feeds = feedparser.parse(url,timeout=15)
             if feeds.entries==[]:
-                url = self.twitter_api_url+nom.lower()
-                feeds = feedparser.parse(url,timeout=5)
-                
+                url = self.twitter_api_url+nom.capitalize()
+                feeds = feedparser.parse(url,timeout=15)
+                if feeds.entries==[]:
+                    url = self.twitter_api_url+nom.lower()
+                    feeds = feedparser.parse(url,timeout=15)
+        except socket.timeout:
+            return []
         tweets_list_official = await self.get_tw_official(nom)
         tweets_ids = [x.id_str for x in tweets_list_official]
         try:
