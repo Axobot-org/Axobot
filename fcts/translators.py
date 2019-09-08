@@ -17,6 +17,7 @@ class TranslatorsCog(commands.Cog):
         self.file = 'translators'
         if not os.path.exists('translation/'):
             os.makedirs('translation/')
+        self.project_list = ['fr','en','lolcat','fi','de','es','it','br']
         self.translations = {'en':self.load_translation('en'),
             'fi':self.load_translation('fi'),
             'de':self.load_translation('de'),
@@ -39,7 +40,7 @@ class TranslatorsCog(commands.Cog):
     
     def load_translation(self,lang:str):
         result = dict()
-        if lang not in ['fr','en','lolcat','fi','de','es','it']:
+        if lang not in self.project_list:
             return result
         try:
             with open(f'fcts/lang/{lang}.json','r') as f:
