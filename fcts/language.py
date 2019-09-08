@@ -6,11 +6,8 @@ from fcts.lang import fr, lolcat
 import discord, json
 m_reload(fr)
 m_reload(lolcat)
-fr = {x: getattr(fr,x) for x in dir(fr) if not x.startswith('_')}
-lolcat = {x: getattr(lolcat,x) for x in dir(lolcat) if not x.startswith('_')}
-
-en = None
-fi = None
+#fr = {x: getattr(fr,x) for x in dir(fr) if not x.startswith('_')}
+#lolcat = {x: getattr(lolcat,x) for x in dir(lolcat) if not x.startswith('_')}
 
 
 class LangCog(discord.ext.commands.Cog):
@@ -20,12 +17,10 @@ class LangCog(discord.ext.commands.Cog):
         self.file = "language"
         self.languages = ['fr','en','lolcat','fi']
         self.serv_opts = dict()
-        self.translations = {'fr':fr,
-            'lolcat':lolcat}
-        with open('fcts/lang/en.json','r') as f:
-            self.translations['en'] = json.load(f)
-        with open('fcts/lang/fi.json','r') as f:
-            self.translations['fi'] = json.load(f)
+        self.translations = {}
+        for lang in self.languages:
+            with open(f'fcts/lang/{lang}.json','r') as f:
+                self.translations[lang] = json.load(f)
         for cog in bot.cogs.values():
             if hasattr(cog,'translate'):
                 cog.translate = self.tr
@@ -61,7 +56,7 @@ class LangCog(discord.ext.commands.Cog):
                 lang_opt = 'en'
         if lang_opt == 'lolcat':
             try:
-                result = lolcat[moduleID][messageID]
+                result = self.translations['lolcat'][moduleID][messageID]
             except:
                 await self.msg_not_found(moduleID,messageID,"lolcat")
                 lang_opt = 'en'
@@ -73,7 +68,7 @@ class LangCog(discord.ext.commands.Cog):
                 lang_opt = 'fr'
         if lang_opt == 'fr':
             try:
-                result = fr[moduleID][messageID]
+                result = self.translations['fr'][moduleID][messageID]
             except KeyError:
                 await self.msg_not_found(moduleID,messageID,"fr")
                 result = ""
