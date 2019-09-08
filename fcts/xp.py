@@ -60,21 +60,22 @@ class XPCog(commands.Cog):
         used_xp_type = await self.bot.cogs['ServerCog'].find_staff(msg.guild.id,'xp_type')
         if not ( await self.check_noxp(msg) and await self.bot.cogs['ServerCog'].find_staff(msg.guild.id,'enable_xp') ):
             return
+        rate = await self.bot.cogs['ServerCog'].find_staff(msg.guild.id,'xp_rate')
         if used_xp_type==0:
-            await self.add_xp_0(msg)
+            await self.add_xp_0(msg,rate)
         elif used_xp_type==1:
-            await self.add_xp_1(msg)
+            await self.add_xp_1(msg,rate)
         elif used_xp_type==2:
-            await self.add_xp_2(msg)
+            await self.add_xp_2(msg,rate)
     
-    async def add_xp_0(self,msg):
+    async def add_xp_0(self,msg:discord.Message,rate:float):
         if msg.author.id in self.cache['global'].keys():
             if time.time() - self.cache['global'][msg.author.id][0] < self.cooldown:
                 return
         content = msg.clean_content
         if len(content)<self.minimal_size or await self.check_spam(content) or await self.check_cmd(msg):
             return
-        giv_points = await self.calc_xp(msg)
+        giv_points = await self.calc_xp(msg) * rate
         if msg.author.id in self.cache['global'].keys():
             prev_points = self.cache['global'][msg.author.id][1]
         else:
@@ -93,7 +94,7 @@ class XPCog(commands.Cog):
             await self.send_levelup(msg,new_lvl)
             await self.give_rr(msg.author,new_lvl[0],await self.rr_list_role(msg.guild.id))
     
-    async def add_xp_1(self,msg):
+    async def add_xp_1(self,msg:discord.Message,rate:float):
         if msg.guild.id not in self.cache.keys() or len(self.cache[msg.guild.id])==0:
             await self.bdd_load_cache(msg.guild.id)
         if msg.author.id in self.cache[msg.guild.id].keys():
@@ -101,7 +102,7 @@ class XPCog(commands.Cog):
                 return
         if await self.check_cmd(msg):
             return
-        giv_points = random.randint(15,25)
+        giv_points = random.randint(15,25) * rate
         if msg.author.id in self.cache[msg.guild.id].keys():
             prev_points = self.cache[msg.guild.id][msg.author.id][1]
         else:
@@ -120,7 +121,7 @@ class XPCog(commands.Cog):
             await self.send_levelup(msg,new_lvl)
             await self.give_rr(msg.author,new_lvl[0],await self.rr_list_role(msg.guild.id))
 
-    async def add_xp_2(self,msg):
+    async def add_xp_2(self,msg:discord.Message,rate:float):
         if msg.guild.id not in self.cache.keys() or len(self.cache[msg.guild.id])==0:
             await self.bdd_load_cache(msg.guild.id)
         if msg.author.id in self.cache[msg.guild.id].keys():
@@ -129,7 +130,7 @@ class XPCog(commands.Cog):
         content = msg.clean_content
         if len(content)<self.minimal_size or await self.check_spam(content) or await self.check_cmd(msg):
             return
-        giv_points = await self.calc_xp(msg)
+        giv_points = await self.calc_xp(msg) * rate
         if msg.author.id in self.cache[msg.guild.id].keys():
             prev_points = self.cache[msg.guild.id][msg.author.id][1]
         else:
