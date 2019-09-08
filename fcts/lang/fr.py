@@ -341,6 +341,8 @@ logs={"slowmode-enabled":"Slowmode activé dans le salon {channel} ({seconds}s)"
         "d-welcome_roles":"Action automatique (config welcome_roles)",
         "d-memberchan":"Action automatique (config membercount)",
         "d-unban":"unban par {}",
+        "case-reason":"Le casier #{id} a été édité : \n`Ancienne raison:` {old}\n`Nouvelle raison:` {new}",
+        "case-del":"Le casier #{id} a été supprimé (concernant {user})"
         }
 
 mc={"contact-mail":"Si vous constatez une erreur dans les informations données, merci de me contacter rapidement, ou de rapporter l'erreur directement [sur le site](https://fr-minecraft.net).",

@@ -408,7 +408,9 @@
         "d-young": "Automod (too recent account)",
         "d-welcome_roles": "Automated action (config welcome_roles)",
         "d-memberchan": "Automated action (config membercount)",
-        "d-unban": "unbanned by {}"
+        "d-unban": "unbanned by {}",
+        "case-reason": "The case #{id} has been edited:\n`Old reason:` {old}\n`New reason:` {new}",
+        "case-del": "The case #{id} has been deleted (concerning {user})"
     },
     "mc": {
         "contact-mail": "If you notice an error in the information provided, please contact me personally, or report the error directly [on the site](https://fr-minecraft.net).",

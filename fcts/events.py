@@ -24,7 +24,8 @@ class Events(commands.Cog):
         "clear":16312092,
         "warn":9131818,
         "softban":16720385,
-        "error":16078115}
+        "error":16078115,
+        "case-edit":10197915}
         self.points = 0
         self.table = {'kick':3,
             'ban':7,

@@ -349,6 +349,8 @@ logs={"slowmode-enabled":"Slwmod enable in {channel} ({seconds}s)",
         "d-welcome_roles":"Automated action (config welcome_roles)",
         "d-memberchan":"Automated action (config membercount)",
         "d-unban":"unbanned by {}",
+        "case-reason": "Da case #{id} have edite:\n`Old reson:` {old}\n`Young reason:` {new}",
+        "case-del": "Teh case #{id} has bee deletd ('bout {user})"
         }
 
 mc={"contact-mail":"If U notis an errrror in da info providd, plz contact my personale, or report teh errer directlly [with the nice website](https://fr-minecraft.net).",
