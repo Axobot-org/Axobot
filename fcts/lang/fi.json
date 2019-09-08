@@ -7,13 +7,7 @@
         "watch": "katsoo"
     },
     "admin": {
-        "bug-0": "Bugi #{} ei löytynyt",
-        "change_game-0": "Valitse *play*, *watch*, *listen* tai *stream* seurattu nimellä",
         "emergency": "Hätätilanne on havaittu tälle botille. Tämä saattaa olla koska joku yrittää päästä sisään minun koodiini.\nJotta voidaan välttää sattumia, Minut oli pakotettu lähtemään kaikilta servuilta heti, missä olin toivoen että ei ole liian myöhäistä.\nLisätietoja tästä hätätilaanteesta mene minun servulleni: https://discord.me/z_bot (Katso linkki dokumenttiin jos linkki ei toimi enää: https://zbot.rtfd.io)",
-        "msg_2-0": "Operaatio käynnissä...",
-        "msg_2-1": "Ei vaikuttavia käyttäjiä",
-        "msg_2-2": "1 vaikuttanut käyttäjä",
-        "msg_2-3": "vaikutetut käyttäjät"
     },
     "aide": {
         "aliases": "Lyhenteet:",

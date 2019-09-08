@@ -650,7 +650,7 @@ Cette option affecte tous les serveurs"""
         elif Type in ['stream']:
             await self.bot.change_presence(activity=discord.Activity(type=discord.ActivityType.streaming,name=act,timestamps={'start':time.time()}))
         else:
-            await ctx.send(await self.translate(ctx.guild.id,"admin","change_game-0"))
+            await ctx.send("Sélectionnez *play*, *watch*, *listen* ou *stream* suivi du nom")
         await ctx.message.delete()
     
 
