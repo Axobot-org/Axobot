@@ -1,13 +1,7 @@
 #!/usr/bin/env python
 #coding=utf-8
 
-from importlib import reload as m_reload
-from fcts.lang import fr, lolcat
 import discord, json
-m_reload(fr)
-m_reload(lolcat)
-#fr = {x: getattr(fr,x) for x in dir(fr) if not x.startswith('_')}
-#lolcat = {x: getattr(lolcat,x) for x in dir(lolcat) if not x.startswith('_')}
 
 
 class LangCog(discord.ext.commands.Cog):
@@ -28,7 +22,7 @@ class LangCog(discord.ext.commands.Cog):
 
     async def tr(self,serverID,moduleID,messageID,**args):
         """Renvoie le texte en fonction de la langue"""
-        if type(serverID) == discord.Guild:
+        if isinstance(serverID,discord.Guild):
             serverID = serverID.id
         elif isinstance(serverID,discord.TextChannel):
             serverID = serverID.guild.id
