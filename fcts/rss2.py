@@ -787,7 +787,10 @@ class RssCog(commands.Cog):
 
 
     async def get_tw_official(self,nom:str,count:int=None):
-        return [x for x in self.twitterAPI.GetUserTimeline(screen_name=nom,exclude_replies=True,trim_user=True,count=count)]
+        try:
+            return [x for x in self.twitterAPI.GetUserTimeline(screen_name=nom,exclude_replies=True,trim_user=True,count=count)]
+        except requests.exceptions.ConnectionError:
+            return []
 
     async def rss_tw(self,guild,nom,date=None):
         if nom == 'help':
