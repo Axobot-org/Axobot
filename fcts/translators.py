@@ -4,14 +4,7 @@ import json, os
 
 
 async def is_translator(ctx:commands.Context) -> bool:
-    return ctx.author.id in [279568324260528128, # Z_runner
-        281404141841022976, # Awhikax
-        552273019020771358, # Z_Jumper
-        349899849937846273, # Jees1
-        264203029279014922, # AFRIKA6 | Max
-        428172161715404810, # Just__it
-        601455692162793472, # PlumeDeCrystal
-        ]
+    return ctx.bot.cogs['UtilitiesCog'].is_translator(ctx.author)
 
 async def check_admin(ctx):
     return await ctx.bot.cogs['AdminCog'].check_if_admin(ctx)
