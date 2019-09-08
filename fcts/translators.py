@@ -4,7 +4,7 @@ import json, os
 
 
 async def is_translator(ctx:commands.Context) -> bool:
-    return ctx.bot.cogs['UtilitiesCog'].is_translator(ctx.author)
+    return await ctx.bot.cogs['UtilitiesCog'].is_translator(ctx.author)
 
 async def check_admin(ctx):
     return await ctx.bot.cogs['AdminCog'].check_if_admin(ctx)
@@ -115,7 +115,6 @@ class TranslatorsCog(commands.Cog):
         await ctx.send("ToDo list for {} has been reloaded".format(lang))
 
     @commands.command(name="tr-status")
-    @commands.check(is_translator)
     async def status(self,ctx,lang:str=None):
         """Get the status of a translation project"""
         if lang==None:
