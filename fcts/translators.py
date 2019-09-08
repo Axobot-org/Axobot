@@ -103,7 +103,10 @@ class TranslatorsCog(commands.Cog):
         else:
             await self.modify_project(lang,key,msg.content)
             await ctx.send(f"New translation:\n :arrow_right: {msg.content}")
-        self.todo[lang].remove(key)
+        try:
+            self.todo[lang].remove(key)
+        except ValueError:
+            pass
     
     @commands.command(name='tr-reload-todo')
     @commands.check(is_translator)
