@@ -21,7 +21,8 @@ class TranslatorsCog(commands.Cog):
             'fi':self.load_translation('fi'),
             'de':self.load_translation('de'),
             'es':self.load_translation('es'),
-            'it':self.load_translation('it')}
+            'it':self.load_translation('it'),
+            'br':self.load_translation('br')}
         try:
             self.translate = self.bot.cogs["LangCog"].tr
         except:
@@ -29,7 +30,8 @@ class TranslatorsCog(commands.Cog):
         self.todo = {'fi':sorted([x for x in self.translations['en'].keys() if x not in self.translations['fi'].keys()]),
                 'de':sorted([x for x in self.translations['en'].keys() if x not in self.translations['de'].keys()]),
                 'es':sorted([x for x in self.translations['en'].keys() if x not in self.translations['es'].keys()]),
-                'it':sorted([x for x in self.translations['en'].keys() if x not in self.translations['it'].keys()])}
+                'it':sorted([x for x in self.translations['en'].keys() if x not in self.translations['it'].keys()]),
+                'br':sorted([x for x in self.translations['en'].keys() if x not in self.translations['br'].keys()])}
     
     @commands.Cog.listener()
     async def on_ready(self):
@@ -39,22 +41,26 @@ class TranslatorsCog(commands.Cog):
         result = dict()
         if lang not in ['fr','en','lolcat','fi','de','es','it']:
             return result
-        with open(f'fcts/lang/{lang}.json','r') as f:
-            data = json.load(f)
-        for module, mv in data.items():
-            for key, value in mv.items():
-                if isinstance(value,str):
-                    result[module+'.'+key] = value
-                elif isinstance(value,dict):
-                    for minikey, minivalue in value.items():
-                        if isinstance(minivalue,list):
-                            for e,string in enumerate(minivalue):
-                                result[module+'.'+key+'.'+minikey+'.'+str(e)] = string
-                        else:
-                            result[module+'.'+key+'.'+minikey] = minivalue
-                elif isinstance(value,list):
-                    for e,string in enumerate(value):
-                        result[module+'.'+key+'.'+str(e)] = string
+        try:
+            with open(f'fcts/lang/{lang}.json','r') as f:
+                data = json.load(f)
+        except FileNotFoundError:
+            pass
+        else:
+            for module, mv in data.items():
+                for key, value in mv.items():
+                    if isinstance(value,str):
+                        result[module+'.'+key] = value
+                    elif isinstance(value,dict):
+                        for minikey, minivalue in value.items():
+                            if isinstance(minivalue,list):
+                                for e,string in enumerate(minivalue):
+                                    result[module+'.'+key+'.'+minikey+'.'+str(e)] = string
+                            else:
+                                result[module+'.'+key+'.'+minikey] = minivalue
+                    elif isinstance(value,list):
+                        for e,string in enumerate(value):
+                            result[module+'.'+key+'.'+str(e)] = string
         try:
             temp = self.load_project(lang)
         except FileNotFoundError:
