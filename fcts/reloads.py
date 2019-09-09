@@ -56,7 +56,7 @@ class ReloadsCog(commands.Cog):
                 await errors_cog.on_error(e,ctx)
                 await ctx.send(f'**`ERROR:`** {type(e).__name__} - {e}')
             else:
-                await self.bot.cogs["UtilitiesCog"].print2("Module {} rechargé".format(cog))
+                self.bot.log.info("Module {} rechargé".format(cog))
                 reloaded_cogs.append(cog)
             if cog == 'utilities':
                 await self.bot.cogs['UtilitiesCog'].on_ready()
@@ -72,7 +72,8 @@ class ReloadsCog(commands.Cog):
             return
         try:
             self.bot.load_extension('fcts.'+name)
-            await ctx.send("Cog '{}' ajouté !".format(name))
+            await ctx.send("Module '{}' ajouté !".format(name))
+            self.bot.log.info("Module {} ajouté".format(name))
         except Exception as e:
             await ctx.send(str(e))
 
@@ -84,7 +85,8 @@ class ReloadsCog(commands.Cog):
             return
         try:
             self.bot.unload_extension('fcts.'+name)
-            await ctx.send("Cog '{}' désactivé !".format(name))
+            await ctx.send("Module '{}' désactivé !".format(name))
+            self.bot.log.info("Module {} ajouté".format(name))
         except Exception as e:
             await ctx.send(str(e))
 
