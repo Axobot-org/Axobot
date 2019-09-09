@@ -82,5 +82,8 @@
                 "Debe ser el propietario del bot"
             ]
         }
+    },
+    "current_lang": {
+        "current": "es"
     }
 }

@@ -53,5 +53,8 @@
                 "Um de seus cargos tem autorização para usar este comando (`silenciar`)"
             ]
         }
+    },
+    "current_lang": {
+        "current": "br"
     }
 }

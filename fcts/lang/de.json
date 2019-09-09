@@ -44,5 +44,8 @@
                 "eine deiner rollen erlaubt es dir diesen befehl auszuführen (´warn´)"
             ]
         }
+    },
+    "current_lang": {
+        "current": "de"
     }
 }

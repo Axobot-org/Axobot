@@ -16,5 +16,8 @@
         "categories": {
             "fun": "divertimento"
         }
+    },
+    "current_lang": {
+        "current": "it"
     }
 }
