@@ -336,7 +336,7 @@ You can specify a verification limit by adding a number in argument"""
     async def pibkac(self,ctx):
         await ctx.send(file=await self.utilities.find_img('pibkac.png'))
     
-    @commands.command(name="osekour",hidden=True)
+    @commands.command(name="osekour",hidden=True,aliases=['helpme','ohmygod'])
     @commands.check(is_fun_enabled)
     async def osekour(self,ctx):
         """Does anyone need help?"""
