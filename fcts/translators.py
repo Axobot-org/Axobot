@@ -77,19 +77,22 @@ class TranslatorsCog(commands.Cog):
     
     def load_project(self,lang:str):
         result = dict()
-        with open('translation/'+lang+'.txt','r',encoding='utf-8') as f:
-            for line in f.readlines():
-                temp = line.split(' ')
-                result[temp[0]] = " ".join(temp[1:])
+        with open('translation/'+lang+'-project.json','r',encoding='utf-8') as f:
+            result = json.load(f)
         return result
 
     async def modify_project(self,lang:str,key:str,new:str):
         """Modify a string inside the project file"""
-        with open('translation/'+lang+'.txt','a',encoding='utf-8') as f:
-            f.write(key+' '+new.replace('\n','\\n')+'\n')
+        try:
+            old = self.load_project(lang)
+        except FileNotFoundError:
+            old = dict()
+        old[key] = new
+        with open('translation/'+lang+'-project.json','w',encoding='utf-8') as f:
+            json.dump(old,f, ensure_ascii=False, indent=4, sort_keys=True)
         self.translations[lang][key] = new
 
-    @commands.command(name='translate')
+    @commands.command(name='translate',aliases=['tr'])
     @commands.check(is_translator)
     async def translate_smth(self,ctx,lang:str):
         """Translate a message of the bot
@@ -99,6 +102,9 @@ class TranslatorsCog(commands.Cog):
             return await ctx.send("Invalid language")
         if len(self.todo[lang])==0:
             return await ctx.send("This language is already 100% translated :tada:")
+        await self.ask_a_translation(ctx,lang)
+    
+    async def ask_a_translation(self,ctx:commands.Context,lang:str):
         key = self.todo[lang][0]
         value = self.translations['en'].__getitem__(key)
         await ctx.send("```\n"+value+"\n```")
@@ -109,12 +115,28 @@ class TranslatorsCog(commands.Cog):
             return await ctx.send("You were too slow. Try again.")
         if msg.content.lower() == 'pass':
             await ctx.send("This message will be ignored until the next reload of this command")
+        elif msg.content.lower() == 'stop':
+            await ctx.send("Ok, let's stop here. Thanks for your help!")
+            return False
         else:
             await self.modify_project(lang,key,msg.content)
             await ctx.send(f"New translation:\n :arrow_right: {msg.content}")
         try:
             self.todo[lang].remove(key)
         except ValueError:
+            pass
+        return True
+    
+    @commands.command(name='tr-loop')
+    @commands.check(is_translator)
+    async def translate_smth_loop(self,ctx,lang:str):
+        """Same that !translate, but in a loop so you don't need to type the command
+        Use `stop` to stop translating"""
+        if lang not in self.translations.keys():
+            return await ctx.send("Invalid language")
+        if len(self.todo[lang])==0:
+            return await ctx.send("This language is already 100% translated :tada:")
+        while await self.ask_a_translation(ctx,lang):
             pass
     
     @commands.command(name='tr-reload-todo')
@@ -172,10 +194,10 @@ class TranslatorsCog(commands.Cog):
                     else:
                         o[path[0]] = await readpath(path[1:],temp,msg)
                 return o
-        for line in new.split('\n'):
+        for key, line in new.items():
             if len(line.strip())==0:
                 continue
-            await readpath(line.split(' ')[0].split('.'),old,' '.join(line.split(' ')[1:]))
+            await readpath(key.split('.'),old,' '.join(line.split(' ')))
         return old
 
 
@@ -207,8 +229,8 @@ class TranslatorsCog(commands.Cog):
             return await ctx.send("Invalid language")
         try:
             with open(f'fcts/lang/{lang}.json','r',encoding='utf-8') as old_f:
-                with open(f'translation/{lang}.txt','r',encoding='utf-8') as new_f:
-                    new = await self._fuse_file(json.load(old_f),new_f.read())
+                with open(f'translation/{lang}-project.json','r',encoding='utf-8') as new_f:
+                    new = await self._fuse_file(json.load(old_f),json.load(new_f))
         except FileNotFoundError:
             return await ctx.send("There is no current project with this language")
         with open(f'translation/{lang}.json','w',encoding='utf-8') as f:
