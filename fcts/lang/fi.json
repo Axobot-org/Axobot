@@ -2,7 +2,7 @@
     "activity": {
         "listen": "kuuntelee",
         "play": "soittaa",
-        "rien": "Ei mitään",
+        "nothing": "Ei mitään",
         "stream": "striimaa",
         "watch": "katsoo"
     },
@@ -158,7 +158,8 @@
     },
     "bvn": {
         "aide": "__**Tervetuloa liittymis & lähtö viesti moduuliin**__\nTätä moduulia käytetään konfiguroimaan automaattinen viesti joka kerta kun joku tulee tai lähtee servultasi.\n__** Konfiguraatio**__\n`1-` Jotta voit konfiguroida mihin nämä viestit lähetetään, viestitä `{p}config change welcome_channel` lisättynä kanava.\n`2-` Jotta voit konfiguroida viestin, kirjoita  `{p}config change <welcome|leave> <message>`. Tälle viestille voit käyttää variableja:\n - `{user}` Tägää käyttäjän\n - `{server}` näyttää serverin nimen\n - `{owner}` näyttää serverin omistajan nimen\n- `{member_count}` näyttää tämänhetkisen käyttäjämäärän",
-        "error-give-role": "Mahdotonta antaa roolia '{r}' uudelle jäsenelle {u}: ei tarpeeksi käyttöoikeuksia Varmista että roolini on ylempänä kuin rooli jota yritän antaa ja että minulla on 'Hallinnoi rooleja' käyttöoikeudet."
+        "error-give-role": "Mahdotonta antaa roolia '{r}' uudelle jäsenelle {u}: ei tarpeeksi käyttöoikeuksia Varmista että roolini on ylempänä kuin rooli jota yritän antaa ja että minulla on 'Hallinnoi rooleja' käyttöoikeudet.",
+        "error-give-roles": "Mahdotonta antaa rooli '{r}' uudelle jäsenelle {u}: ei tarpeeksi käyttöoikeuksia Varmista että minulla on 'Hallinnoi Rooleja' käyttöoikeudet ja että minun rooli on annettavan roolin yläpuolella"
     },
     "cases": {
         "cases-0": "{} tapaukset löydetty: ({}-{})",
@@ -304,21 +305,8 @@
         "bitly_long": "Alkuperäinen URL: {url}",
         "bitly_nobit": "Tämä linkki ei ole bit.ly linkki!",
         "bitly_short": "Lyhennetty URL: {url}",
+        "changelog-notfound": "Mahdotonta löytää tämä versio",
         "changelogs-notfound": "Mahdotonta löytää tämä versio",
-        "discordlinks": {
-            "Discord": "ToS https://dis.gd/tos",
-            "Discord käyttöehdot ToS": "https://dis.gd/tos",
-            "Ehdota jotain Discordille ": "https://dis.gd/feedback",
-            "Itsebotti artikkeli": "https://support.discordapp.com/hc/articles/115002192352",
-            "Käyttöehdot botin tekijöille": "https://discordapp.com/developers/docs/legal",
-            "Palvelin tila": "https://dis.gd/status",
-            "Raportoi ongelma/ käyttäjä": "https://dis.gd/report",
-            "Report": "a bug/ a user https://dis.gd/report",
-            "Selfbots": "article https://support.discordapp.com/hc/articles/115002192352",
-            "Servers": "status https://dis.gd/status",
-            "Suggest": "something to Discord https://dis.gd/feedback",
-            "ToS": "for bot devs https://discordapp.com/developers/docs/legal"
-        },
         "docs": "Tässä on linkki botin dokumenttiin:",
         "prefix": "Lista kaikista käytettävissä olevista etuliitoista:",
         "stats": "**Bot versio:** {bot_v} \n**Kaikkien palvelimien numero missä olen:** {s_count} \n**Numero kaikista näkyvistä jäsenistä:** {m_count} ({b_count} **botit**)\n**Numero koodi riveistä:** {l_count}\n**Käytettyjä kieliä:** {lang}\n** {p_v} \n**Versio `discord.py`stä:** {d_v} \n**Ladataan RAMia:** {ram} GB \n**Ladataan CPU:ssa:** {cpu} % \n**API viive aika:** {api} ms\n**Kaikki xp kerätty:** {xp}",
@@ -395,6 +383,8 @@
     },
     "logs": {
         "ban": "Käyttäjälle {member} on annettu porttikielto (syyllä: {reason} | keissi #{case})",
+        "case-del": "The case #{id} has been deleted (concerning {user})",
+        "case-reason": "Tapaus #{id} on muokattu:\\n`Vanha syy:` {old}\\n`Uusi syy:` {new}",
         "clear": "{number} viestiä poistettu kanavalla {channel}",
         "d-autounmute": "automaattinen mykistyksen poisto",
         "d-gived_roles": "Automaattinen tapahtuma (configuraatio annettiin_roolit)",
@@ -420,13 +410,16 @@
             "Nimi",
             "Tunniste",
             "Tyyppi",
+            "Lisätty versiossa",
             "Lisätty versiossa"
         ],
+        "adv-help": "Tämä komento antaa tietoa mistä tahansa edistyksestä pelistä Minecraft. Lähetä edistyksen nimi tai tunniste.",
         "block-fields": [
             "Tunniste",
             "Työväline joka voi rikkoa sen",
             "Lisätty versiossa",
-            "Vahingoitus pisteet"
+            "Vahingoitus pisteet",
+            "Työkalu joka voi rikkoa sen"
         ],
         "block-help": "Tämä komento antaa sinun saamaan tietoa mistä tahansa Minecraft palikasta. Voit antaa sen nimen, Ranskaksi tai Englanniksi. Lähetä `!mc block <nimi>`",
         "cant-embed": "En voi lähettää upotettua linkkiä. Varmista että minulla on \"Upota linkkejä\" käyttöoikeudet.",

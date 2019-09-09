@@ -2,7 +2,7 @@
     "activity": {
         "listen": "listenin",
         "play": "playin",
-        "rien": "nothin",
+        "nothing": "nothin",
         "stream": "streamin",
         "watch": "watchin"
     },
@@ -295,14 +295,14 @@
         "bitly_nobit": "HAHA NOPE, dat's not a bit.ly link!",
         "bitly_short": "Quick linq: {url}",
         "changelog-notfound": "Srry but i cannot find das version",
-        "discordlinks": {
-            "Discord ToS": "https://dis.gd/tos",
-            "Report a bug/ a user": "https://dis.gd/report",
-            "Selfbots article": "https://support.discordapp.com/hc/articles/115002192352",
-            "Servers status": "https://dis.gd/status",
-            "Suggest something to Discord": "https://dis.gd/feedback",
-            "ToS for bot devs": "https://discordapp.com/developers/docs/legal"
-        },
+        "discordlinks": [
+            "Servers status",
+            "Discord ToS",
+            "Report a bug/user",
+            "Suggest something to Discord",
+            "Selfbots article",
+            "ToS for bot devs"
+        ],
         "docs": "Her'z teh link 2 the bot doc:",
         "prefix": "List ov usable prefiXs:",
         "stats": "**Baut vershun:** {bot_v} \n**Nbr ov serverz:** {s_count} \n**Nbr ov visible memberz:** {m_count} ({b_count} **robots**)\n**Nbr ov code lin:** {l_count}\n**Uzd languages:** {lang}\n**Python vershun :** {p_v} \n**Vershun ov teh `discord.py` lyb:** {d_v} \n**Loadin on teh RAM:** {ram} GB \n**Loadin on the CPU:** {cpu} % \n**API latency timz:** {api} ms\n**Nbr of xp won:** {xp}",

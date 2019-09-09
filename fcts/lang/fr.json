@@ -2,7 +2,7 @@
     "activity": {
         "listen": "écoute",
         "play": "joue à",
-        "rien": "rien",
+        "nothing": "rien",
         "stream": "stream",
         "watch": "regarde"
     },
@@ -302,14 +302,14 @@
         "bitly_nobit": "Cette adresse n'est pas un lien bit.ly !",
         "bitly_short": "URL raccourcie : {url}",
         "changelog-notfound": "Impossible de trouver cette version",
-        "discordlinks": {
-            "CGU de Discord": "https://dis.gd/tos",
-            "CGU pour les développeurs de bot": "https://discordapp.com/developers/docs/legal",
-            "Explication des selfbots": "https://support.discordapp.com/hc/articles/115002192352",
-            "Proposer une idée à Discord": "https://dis.gd/feedback",
-            "Rapporter un bug ou un utilisateur": "https://dis.gd/report",
-            "Status des serveurs": "https://dis.gd/status"
-        },
+        "discordlinks": [
+            "Status des serveurs",
+            "CGU de Discord",
+            "Rapporter un bug ou un utilisateur",
+            "Proposer une idée à Discord",
+            "Explication des selfbots",
+            "CGU pour les développeurs de bot"
+        ],
         "docs": "Voici le lien vers la documentation du bot :",
         "prefix": "Liste des préfixes actuellement utilisables :",
         "stats": "**Version du bot :** {bot_v} \n**Nombre de serveurs :** {s_count} \n**Nombre de membres visibles :** {m_count} (dont {b_count} **bots**)\n**Nombre de lignes de code :** {l_count}\n**Langues utilisées :** {lang} \n**Version de Python :** {p_v} \n**Version de la bibliothèque `discord.py` :** {d_v} \n**Charge sur la mémoire vive :** {ram} GB \n**Charge sur le CPU :** {cpu} % \n**Temps de latence de l'api :** {api} ms\n**Nombre total d'xp gagné :** {xp}xp",

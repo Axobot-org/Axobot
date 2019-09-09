@@ -1,3 +1,86 @@
 {
-    
+    "activity": {
+        "play": "juego",
+        "nothing": "nada",
+        "watch": "ver"
+    },
+    "admin": {
+        "bug-0": "Error #{} no encontrado",
+        "change_game-0": "Seleccione *play*, *watch*, *listen* o *stream* seguido del nombre",
+        "emergency": "Se acaba de declarar una situación de emergencia para el bot. Este puede ser el caso cuando alguien intenta tomar el control de mi código.\\nPara limitar el daño, me vi obligado a dejar todos los servidores en los que estaba inmediatamente, esperando que no fuera demasiado tarde.\\nPara más información sobre el estado actual de la crisis, visite mi servidor oficial: https://discord.me/z_bot (consulte el enlace de la documentación si ya no funciona : https://zbot.rtfd.io)",
+        "msg_2-0": "Operación en progreso....",
+        "msg_2-1": "No hay miembros afectados",
+        "msg_2-2": "1 miembro afectado",
+        "msg_2-3": "miembros afectados"
+    },
+    "aide": {
+        "categories": {
+            "info": "información",
+            "moderation": "moderación",
+            "other": "otras",
+            "server-settings": "configuración del servidor",
+            "translators": "equipo de traducción",
+            "users-info": "Información de los usuarios"
+        },
+        "check-desc": {
+            "can_ban": [
+                "Uno de sus roles está autorizado a usar este comando (`ban`)",
+                "Falta el rol permitido (`ban`)"
+            ],
+            "can_clear": [
+                "Uno de sus roles está autorizado a usar este comando (`clear`)",
+                "Falta el rol permitido (`clear`)"
+            ],
+            "can_edit_case": [
+                "Uno de sus roles está autorizado a usar este comando (`warn`)",
+                "Falta el roll permitido (`warn`)"
+            ],
+            "can_kick": [
+                "Uno de sus roles está autorizado a usar este comando (`kick`)",
+                "Falta el roll permitido (`kick`)"
+            ],
+            "can_mute": [
+                "Uno de sus roles está autorizado a usar este comando (`mute`)",
+                "Falta el roll permitido (`mute`)"
+            ],
+            "can_say": [
+                "Uno de sus roles está autorizado a usar este comando (`say`)",
+                "Falta el roll permitido (`say`)"
+            ],
+            "can_slowmode": [
+                "Uno de sus roles está autorizado a usar este comando (`slowmode`)",
+                "Falta el roll permitido (`slowmode`)"
+            ],
+            "can_use_cookie": [
+                "Eres un elegido de Aragorn1202"
+            ],
+            "can_use_rss": [
+                "Tiene permiso de 'Administrador'",
+                "Falta el permiso 'Administrador'"
+            ],
+            "can_warn": [
+                "Uno de sus roles está autorizado a usar este comando (`warn`)",
+                "Falta el roll permitido (`warn`)"
+            ],
+            "check_admin": [
+                "Necesitas ser uno de los administradores del bot",
+                "No eres un administrador del bot"
+            ],
+            "guild_only": [
+                "Sólo se puede utilizar en un servidor",
+                "Sólo se puede utilizar en un servidor"
+            ],
+            "has_admin": [
+                "Tiene permiso de 'Administrador'",
+                "Falta el permiso de 'Administrador'"
+            ],
+            "has_permissions": [
+                "Tiene los suficientes permisos de Discord",
+                "No tiene los correctos permisos de Discord"
+            ],
+            "is_owner": [
+                "Debe ser el propietario del bot"
+            ]
+        }
+    }
 }

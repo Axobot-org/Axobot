@@ -1,3 +1,48 @@
 {
-    
+    "activity": {
+        "listen": "Du hörst",
+        "play": "spielt gerade",
+        "nothing": "Nichts",
+        "watch": "Schaut gerade"
+    },
+    "admin": {
+        "bug-0": "Fehler #{} konnte nicht gefunden werden",
+        "change_game-0": "Wähle spielen, gucken oder anhören aus, gefolgt vom Namen",
+        "emergency": "Der Bot ist gerade in den Notfallmodus gewechselt. Das heißt wahrscheinlich, dass jemand unautorisiertes versucht die Kontrolle zu übernehmen.\\nUm mögliche Schäden zu begrenzen verlasse ich sämtliche Server, auf denen ich bin, in der Hoffnung, dass noch nichts schlimmes passiert ist.\\nWeitere Informationen finden Sie auf meinem offiziellen Discordserver: https://discord.me/zbot (Falls dieser Link nicht mehr funktioniert: https://zbot.rtfd.io)",
+        "msg_2-0": "Operation läuft...",
+        "msg_2-1": "Keine betroffenen Personen",
+        "msg_2-2": "Eine betroffene Person",
+        "msg_2-3": "betroffene Personen"
+    },
+    "aide": {
+        "aliases": "Adressen:",
+        "categories": {
+            "fun": "Spaß",
+            "info": "Informationen",
+            "moderation": "Moderation",
+            "other": "Andere",
+            "server-settings": "Server Einstellungen",
+            "staff": "Bot Team",
+            "translators": "Übersetzungsteam",
+            "unclassed": "nicht klassifiziert",
+            "users-info": "Benutzerinformation"
+        },
+        "check-desc": {
+            "bot_has_permissions": [
+                "Der Bot hat die benötigten Berechtigungen",
+                "!translate de"
+            ],
+            "can_ban": [
+                "eine deiner rollen erlaubt dir diesen befehl auszuführen",
+                "Fehlende erlaubte rolle"
+            ],
+            "can_clear": [
+                "eine deiner rollen erlaubt es dir diesen befehl auszuführen",
+                "Fehlende berechtigung deiner rollen (´clear´)"
+            ],
+            "can_edit_case": [
+                "eine deiner rollen erlaubt es dir diesen befehl auszuführen (´warn´)"
+            ]
+        }
+    }
 }
