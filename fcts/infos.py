@@ -213,7 +213,7 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
     async def member_infos(self,ctx,item,lang,critical_info=False):
         since = await self.translate(ctx.guild.id,"keywords","depuis")
         if item.activity==None:
-            m_activity = str(await self.translate(ctx.guild.id,"activity","rien")).capitalize()
+            m_activity = str(await self.translate(ctx.guild.id,"activity","nothing")).capitalize()
         elif item.activity.type==discord.ActivityType.playing:
             m_activity = str(await self.translate(ctx.guild.id,"activity","play")).capitalize() + " " + item.activity.name
         elif item.activity.type==discord.ActivityType.streaming:
@@ -255,7 +255,7 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
         if len(list_role)>0:
             embed.add_field(name="Roles [{}]".format(len(list_role)), value = ", ".join(list_role), inline=False)
         else:
-            embed.add_field(name="Roles [0]", value = await self.translate(ctx.guild.id,"activity","rien"), inline=False)
+            embed.add_field(name="Roles [0]", value = await self.translate(ctx.guild.id,"activity","nothing"), inline=False)
         if critical_info and not item.bot:
             embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","member-7"), value = await self.bot.cogs['CasesCog'].get_nber(item.id,ctx.guild.id),inline=True)
         if item.bot:
@@ -678,7 +678,9 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
         """Get some useful links about Discord"""
         can_embed = True if isinstance(ctx.channel,discord.DMChannel) else ctx.channel.permissions_for(ctx.guild.me).embed_links
         if can_embed:
-            txt = "\n".join([f'[{k}]({v})' for k,v in (await self.translate(ctx.channel,'infos','discordlinks')).items()])
+            l = await self.translate(ctx.channel,'infos','discordlinks')
+            links = ["https://dis.gd/status","https://dis.gd/tos","https://dis.gd/report","https://dis.gd/feedback","https://support.discordapp.com/hc/articles/115002192352","https://discordapp.com/developers/docs/legal"]
+            txt = "\n".join(['['+l[i]+']('+links[i]+')' for i in range(len(l))])
             em = self.bot.cogs["EmbedCog"].Embed(desc=txt).update_timestamp().create_footer(ctx.author).discord_embed()
             await ctx.send(embed=em)
         else:
