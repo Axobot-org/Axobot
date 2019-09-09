@@ -326,7 +326,7 @@ class Events(commands.Cog):
         if self.bot.beta:
             return
         t = time.time()
-        answers = ['None','None','None']
+        answers = ['None','None','None','None']
         self.bot.log.info("[DBL] Envoi des infos sur le nombre de guildes...")
         guildCount = len(self.bot.guilds)
         session = aiohttp.ClientSession(loop=self.bot.loop)
