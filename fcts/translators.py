@@ -104,18 +104,19 @@ class TranslatorsCog(commands.Cog):
             return await ctx.send("This language is already 100% translated :tada:")
         await self.ask_a_translation(ctx,lang)
     
-    async def ask_a_translation(self,ctx:commands.Context,lang:str):
+    async def ask_a_translation(self,ctx:commands.Context,lang:str,isloop:bool=False):
         key = self.todo[lang][0]
         value = self.translations['en'].__getitem__(key)
         await ctx.send("```\n"+value+"\n```")
         await ctx.send(f"How would you translate it in {lang}?\n\n  *Key: {key}*\nType 'pass' to choose another one")
         try:
-            msg = await self.bot.wait_for('message', check=lambda msg: msg.author.id==ctx.author.id and msg.channel.id==ctx.channel.id, timeout=90)
+            func = lambda msg: (msg.author.id==ctx.author.id or (msg.author.id in [279568324260528128,281404141841022976,552273019020771358] and msg.content.lower()=='stop' and isloop)) and msg.channel.id==ctx.channel.id
+            msg = await self.bot.wait_for('message', check=func, timeout=90)
         except asyncio.TimeoutError:
             return await ctx.send("You were too slow. Try again.")
         if msg.content.lower() == 'pass':
             await ctx.send("This message will be ignored until the next reload of this command")
-        elif msg.content.lower() == 'stop':
+        elif msg.content.lower() == 'stop' and isloop:
             await ctx.send("Ok, let's stop here. Thanks for your help!")
             return False
         else:
@@ -136,7 +137,7 @@ class TranslatorsCog(commands.Cog):
             return await ctx.send("Invalid language")
         if len(self.todo[lang])==0:
             return await ctx.send("This language is already 100% translated :tada:")
-        while await self.ask_a_translation(ctx,lang):
+        while await self.ask_a_translation(ctx,lang,isloop=True):
             pass
     
     @commands.command(name='tr-reload-todo')
