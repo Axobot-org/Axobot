@@ -138,6 +138,9 @@ class TranslatorsCog(commands.Cog):
         if len(self.todo[lang])==0:
             return await ctx.send("This language is already 100% translated :tada:")
         while await self.ask_a_translation(ctx,lang,isloop=True):
+            if len(self.todo[lang])==0:
+                await ctx.send("This language is already 100% translated :tada:")
+                break
             pass
     
     @commands.command(name='tr-reload-todo')
