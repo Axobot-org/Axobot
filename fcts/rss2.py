@@ -291,7 +291,7 @@ class RssCog(commands.Cog):
             await ctx.send(await self.translate(ctx.guild,"rss","fail-add"))
             await self.bot.cogs["ErrorsCog"].on_error(e,ctx)
 
-    @rss_main.command(name="remove")
+    @rss_main.command(name="remove",aliases=['delete'])
     @commands.guild_only()
     @commands.check(can_use_rss)
     async def systeme_rm(self,ctx,ID:int=None):

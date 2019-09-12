@@ -442,7 +442,7 @@ You can specify a verification limit by adding a number in argument"""
     async def thanos(self,ctx):
         await ctx.send(random.choice(await self.translate(ctx.channel,"fun","thanos")).format(ctx.author.mention))
     
-    @commands.command(name="piece",hidden=True)
+    @commands.command(name="piece",hidden=True,aliases=['coin','flip'])
     @commands.check(is_fun_enabled)
     async def piece(self,ctx):
         """Heads or tails?"""
