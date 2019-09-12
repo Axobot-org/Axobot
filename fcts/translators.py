@@ -56,6 +56,7 @@ class TranslatorsCog(commands.Cog):
                         result[module+'.'+key] = value
                     elif isinstance(value,dict):
                         for minikey, minivalue in value.items():
+                            minikey = minikey.replace('.','¬')
                             if isinstance(minivalue,list):
                                 for e,string in enumerate(minivalue):
                                     result[module+'.'+key+'.'+minikey+'.'+str(e)] = string
@@ -193,6 +194,7 @@ class TranslatorsCog(commands.Cog):
                         t = await readpath(path[1:],temp,msg)
                         o.insert(int(path[0]), t)
                 else:
+                    path[0] = path[0].replace('¬','.')
                     if path[0] in o.keys():
                         await readpath(path[1:],o[path[0]],msg)
                     else:
