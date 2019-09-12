@@ -736,7 +736,7 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
                 url = await args.url().convert(ctx,ctx.subcommand_passed)
             except:
                 return
-            if url.domain == 'bit.ly':
+            if url.domain in ['bit.ly','bitly.com','bitly.is']:
                 msg = copy.copy(ctx.message)
                 msg.content = ctx.prefix + 'bitly find '+url.url
                 new_ctx = await self.bot.get_context(msg)
