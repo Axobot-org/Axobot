@@ -390,7 +390,7 @@ class XPCog(commands.Cog):
 
     async def bdd_get_top(self,top:int,guild:discord.Guild=None):
         try:
-            if guild!=None and await self.bot.cogs['ServerCog'].find_staff(guild.id,'xp_type')==2:
+            if guild!=None and await self.bot.cogs['ServerCog'].find_staff(guild.id,'xp_type')!=0:
                 cnx = self.bot.cnx_xp
                 query = ("SELECT * FROM `{}` order by `xp` desc".format(await self.get_table(guild.id)))
             else:
@@ -417,7 +417,7 @@ class XPCog(commands.Cog):
     async def bdd_get_rank(self,userID:int,guild:discord.Guild=None):
         """Get the rank of a user"""
         try:
-            if guild!=None and await self.bot.cogs['ServerCog'].find_staff(guild.id,'xp_type')==2:
+            if guild!=None and await self.bot.cogs['ServerCog'].find_staff(guild.id,'xp_type')!=0:
                 cnx = self.bot.cnx_xp
                 query = ("SELECT `userID`,`xp`, @curRank := @curRank + 1 AS rank FROM `{}` p, (SELECT @curRank := 0) r WHERE `banned`='0' ORDER BY xp desc;".format(await self.get_table(guild.id)))
             else:
