@@ -767,7 +767,7 @@ class XPCog(commands.Cog):
         """Set the XP of a user"""
         if user.bot:
             return await ctx.send(await self.translate(ctx.guild.id,'xp','no-bot'))
-        if await self.bot.cogs['ServerCog'].find_staff(ctx.guild.id,'xp_type') <2:
+        if await self.bot.cogs['ServerCog'].find_staff(ctx.guild.id,'xp_type')==0:
             return await ctx.send(await self.translate(ctx.guild.id,'xp','change-global-xp'))
         try:
             await self.bdd_set_xp(user.id,xp,Type='set',guild=ctx.guild.id)
