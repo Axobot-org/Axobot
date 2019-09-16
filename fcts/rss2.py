@@ -626,7 +626,7 @@ class RssCog(commands.Cog):
                     return await ctx.send(await self.translate(ctx.guild.id,"rss","too-long"))
                 value = commands.core._convert_to_bool(msg.content)
             values_to_update = [('use_embed',value)]
-            if len(arguments.keys())>0:
+            if arguments!=None and len(arguments.keys())>0:
                 if 'color' in arguments.keys():
                     c = await args.Color().convert(ctx,arguments['color'])
                     if c != None:
