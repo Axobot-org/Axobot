@@ -136,8 +136,8 @@ class FunCog(commands.Cog):
     @commands.check(is_fun_enabled)
     async def count(self,ctx,user:typing.Optional[discord.User]=None,limit:int=1000):
         """Count the number of messages sent by the user
-You can specify a verification limit by adding a number in argument"""
-        l = 100000
+You can specify a verification limit by adding a number in argument (up to 1.000.000)"""
+        l = 1000000
         if limit > l:
             await ctx.send(await self.translate(ctx.channel,"fun","count-2",l=l,e=self.bot.cogs['EmojiCog'].customEmojis['wat']))
             return
