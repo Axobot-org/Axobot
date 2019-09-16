@@ -246,6 +246,8 @@ class RolesReact(commands.Cog):
                 await user.add_roles(role,reason="Roles reaction")
             else:
                 await user.remove_roles(role,reason="Roles reaction")
+        except discord.errors.Forbidden:
+            pass
         except Exception as e:
             await self.bot.cogs['ErrorsCog'].on_error(e,None)
         else:
