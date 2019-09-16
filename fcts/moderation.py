@@ -795,7 +795,7 @@ ID corresponds to the Identifier of the message"""
     async def find_verify_question(self,ctx:commands.Context) -> (str,str):
         """Find a question/answer for a verification question"""
         raw_info = await self.translate(ctx.guild,'modo','verify_questions')
-        q = random.choice(raw_info.keys())
+        q = random.choice(raw_info)
         a = q[1]
         q = q[0]
         if a.startswith('_'):
