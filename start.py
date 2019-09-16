@@ -292,27 +292,37 @@ def main():
     
     asyncio.get_event_loop().add_signal_handler(SIGTERM, lambda: asyncio.ensure_future(sigterm_handler(client)))
 
-
     if client.database_online:
-        r=input("Quel bot activer ? (1 release, 2 snapshot, 3 redbot, 4 autre) ")
-        if r=='1':
+        if len(sys.argv)>1 and sys.argv[1] in ['1','2','3','4']:
+            bot_type = sys.argv[1]
+        else:
+            bot_type = input("Quel bot activer ? (1 release, 2 snapshot, 3 redbot, 4 autre) ")
+        if bot_type == '1':
             token = tokens.get_token(client,486896267788812288)
-        elif r=='2':
+        elif bot_type == '2':
             token = tokens.get_token(client,436835675304755200)
             client.beta = True
-        elif r=='3':
+        elif bot_type == '3':
             token = tokens.get_token(client,541740438953132032)
             client.beta = True
-        elif r=='4':
+        elif bot_type == '4':
             token = input("Token?\n> ")
         else:
             return
-        if r in ['1','2']:
-            r3=input("Lancement de la boucle d'events ? (o/n) ")
-            if r3=='o':
+        if bot_type in ['1','2']:
+            # Events loop
+            if len(sys.argv)>2 and sys.argv[2] in ['o','n']:
+                enable_event_loop = sys.argv[2]
+            else:
+                enable_event_loop = input("Lancement de la boucle d'events ? (o/n) ")
+            if enable_event_loop.lower() == 'o':
                 client.cogs['Events'].loop.start()
-            r3=input("Activation des flux RSS ? (o/n) ")
-            if r3!='o':
+            # RSS enabled
+            if len(sys.argv)>3 and sys.argv[3] in ['o','n']:
+                enable_rss = sys.argv[3]
+            else:
+                enable_rss = input("Activation des flux RSS ? (o/n) ")
+            if enable_rss.lower() != 'o':
                 client.rss_enabled = False
     else:
         token = input("Token?\n> ")
