@@ -569,7 +569,7 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
         pref = self.bot.cogs['UtilitiesCog'].find_prefix(s)
         # Rss
         rss_numb = len(await self.bot.cogs['RssCog'].get_guild_flows(s.id))
-        await ctx.send(str(await self.translate(ctx.channel,"find","guild-1")).format(name=s.name,
+        txt = str(await self.translate(ctx.channel,"find","guild-1")).format(name=s.name,
             id=s.id,
             owner=s.owner,ownerid=s.owner.id,
             join=await self.bot.cogs['TimeCog'].date(s.me.joined_at,msglang,year=True,digital=True),
@@ -577,7 +577,15 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
             lang=lang,
             prefix=pref,
             rss=rss_numb,
-            rr=rr_len))
+            rr=rr_len)
+        if ctx.guild==None or ctx.channel.permissions_for(ctx.guild.me).embed_links:
+            if ctx.guild==None:
+                color = None
+            else:
+                color = None if ctx.guild.me.color.value==0 else ctx.guild.me.color
+            await ctx.send(embed = self.bot.cogs['EmbedCog'].Embed(desc=txt,color=color).create_footer(ctx.author))
+        else:
+            await ctx.send(txt)
 
     @find_main.command(name='channel')
     async def find_channel(self,ctx,ID:int):
@@ -585,7 +593,15 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
         if c == None:
             await ctx.send(await self.translate(ctx.channel,"find","chan-0"))
             return
-        await ctx.send(str(await self.translate(ctx.channel,"find","chan-1")).format(c.name,c.id,c.guild.name,c.guild.id))
+        txt = (await self.translate(ctx.channel,"find","chan-1")).format(c.name,c.id,c.guild.name,c.guild.id)
+        if ctx.guild==None or ctx.channel.permissions_for(ctx.guild.me).embed_links:
+            if ctx.guild==None:
+                color = None
+            else:
+                color = None if ctx.guild.me.color.value==0 else ctx.guild.me.color
+            await ctx.send(embed = self.bot.cogs['EmbedCog'].Embed(desc=txt,color=color).create_footer(ctx.author))
+        else:
+            await ctx.send(txt)
     
     @find_main.command(name='role')
     async def find_role(self,ctx,ID:int):
@@ -596,7 +612,15 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
         if c == None:
             await ctx.send(await self.translate(ctx.channel,"find","role-0"))
             return
-        await ctx.send(str(await self.translate(ctx.channel,"find","role-1")).format(c.name,c.id,c.guild.name,c.guild.id,len(c.members),c.colour))
+        txt = (await self.translate(ctx.channel,"find","role-1")).format(c.name,c.id,c.guild.name,c.guild.id,len(c.members),c.colour)
+        if ctx.guild==None or ctx.channel.permissions_for(ctx.guild.me).embed_links:
+            if ctx.guild==None:
+                color = None
+            else:
+                color = None if ctx.guild.me.color.value==0 else ctx.guild.me.color
+            await ctx.send(embed = self.bot.cogs['EmbedCog'].Embed(desc=txt,color=color).create_footer(ctx.author))
+        else:
+            await ctx.send(txt)
     
     @find_main.command(name='rss')
     async def find_rss(self,ctx,ID:int):
@@ -617,7 +641,15 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
         else:
             c = "Unknown ({})".format(flow['channel'])
         d = await self.bot.cogs['TimeCog'].date(flow['date'],digital=True)
-        await ctx.send("ID: {}\nGuild: {}\nChannel: {}\nLink: <{}>\nType: {}\nLast post: {}".format(flow['ID'],g,c,flow['link'],flow['type'],d))
+        txt = "ID: {}\nGuild: {}\nChannel: {}\nLink: <{}>\nType: {}\nLast post: {}".format(flow['ID'],g,c,flow['link'],flow['type'],d)
+        if ctx.guild==None or ctx.channel.permissions_for(ctx.guild.me).embed_links:
+            if ctx.guild==None:
+                color = None
+            else:
+                color = None if ctx.guild.me.color.value==0 else ctx.guild.me.color
+            await ctx.send(embed = self.bot.cogs['EmbedCog'].Embed(desc=txt,color=color).create_footer(ctx.author))
+        else:
+            await ctx.send(txt)
 
     @commands.command(name="membercount",aliases=['member_count'])
     @commands.guild_only()
