@@ -71,7 +71,6 @@ List of every option
 * welcome_roles: List of roles automatically given to members when they join the server. It is necessary that the bot is above the roles in question, and that it has the permission "Manage roles".
 * bot_news: List of channels to which new bot products will be sent. These are the new bugs found as well as the new features added. None by default.
 * modlogs_channel: Channel where all moderation logs (ban, warn, clear...) will be sent.
-* save_roles: Boolean indicating if the bot should restore the roles of a member leaving then rejoining the server. All roles below the ZBot role will be redistributed. :code:`False` by default.
 * poll_channels: List of channels in which the bot will add the reactions 👍 and 👎 to each message
 * enable_xp: Boolean indicating whether the xp system is activated. Default is :code:`True`.
 * levelup_msg: Message to send when someone reaches a new XP level. You can use :code:`{level}` variable to include the reached level, and :code:`{user}` to mention the user (or `{username}` if you only want the name). Default is a random sentence.
