@@ -538,7 +538,15 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
         disp_lang = str()
         for lang in await self.bot.cogs['UtilitiesCog'].get_languages(user):
             disp_lang += '{} ({}%)   '.format(lang[0],round(lang[1]*100))
-        await ctx.send(await self.translate(ctx.channel,"find","user-1",name=str(user)+' <:BOT:544149528761204736>' if user.bot else str(user),id=user.id,servers=", ".join(servers_in),own=", ".join(owners),lang=disp_lang,vote=r,card=xp_card,rangs=" - ".join(perks)))
+        txt = await self.translate(ctx.channel,"find","user-1",name=str(user)+' <:BOT:544149528761204736>' if user.bot else str(user),id=user.id,servers=", ".join(servers_in),own=", ".join(owners),lang=disp_lang,vote=r,card=xp_card,rangs=" - ".join(perks))
+        if ctx.guild==None or ctx.channel.permissions_for(ctx.guild.me).embed_links:
+            if ctx.guild==None:
+                color = None
+            else:
+                color = None if ctx.guild.me.color.value==0 else ctx.guild.me.color
+            await ctx.send(embed = self.bot.cogs['EmbedCog'].Embed(desc=txt,color=color).create_footer(ctx.author))
+        else:
+            await ctx.send(txt)
 
     @find_main.command(name="guild",aliases=['server'])
     async def find_guild(self,ctx,*,guild):
@@ -568,7 +576,9 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
         # Prefix
         pref = self.bot.cogs['UtilitiesCog'].find_prefix(s)
         # Rss
-        rss_numb = len(await self.bot.cogs['RssCog'].get_guild_flows(s.id))
+        rss_len = await self.bot.cogs['ServerCog'].find_staff(s.id,'rss_max_number')
+        rss_len = self.bot.cogs["ServerCog"].default_opt['rss_max_number'] if rss_len==None else rss_len
+        rss_numb = "{}/{}".format(len(await self.bot.cogs['RssCog'].get_guild_flows(s.id)),rss_len)
         txt = str(await self.translate(ctx.channel,"find","guild-1")).format(name=s.name,
             id=s.id,
             owner=s.owner,ownerid=s.owner.id,
