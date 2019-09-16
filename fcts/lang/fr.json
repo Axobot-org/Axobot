@@ -554,23 +554,68 @@
         "unhoisted": "{c} surnoms édités !",
         "unmute-1": "Le membre {} peut à nouveau parler !",
         "verify-role-high": "Oups, il semble que le rôle `\u001c{r}` soit trop haut pour que je puisse le donner. Veuillez placer ce rôle plus bas que le mien, ou placer mon rôle au-dessus.",
-        "verify_questions": {
-            "Combien de côtés possède un carré ?": "4",
-            "Combien font 2+7 ?": "9",
-            "Comment s'appelle le système d'exploitation des téléphones de la marque Apple ?": "iOS",
-            "Comment s'appelle le système d'exploitation des téléphones de la marque Samsung ? ": "Android",
-            "L'émoji :pig: représente : un insecte, légume, animal ?": "animal",
-            "Lequel de ces mots commence par P ? `poussin`, `corbeau`, `hirondelle`": "poussin",
-            "Lequel de ces mots désigne un fruit ? pizza, pomme, dinosaure": "pomme",
-            "Que donne le produit de 2 par 3 ?": "6",
-            "Quel est le discriminant situé après votre pseudo discord ? (sans le #)": "_special_userdiscrim",
-            "Quel est le nom de ce serveur ?": "_special_servername",
-            "Quel est le nom du pain français connu partout dans le monde ? (un seul mot)": "baguette",
-            "Quel est le résultat de 10-6 ?": "4",
-            "Quel est le résultat du produit de deux et cinq ? (en lettres)": "dix",
-            "Quelle est la première lettre de `Zbot` ?": "z",
-            "Quelle forme géométrique possède 3 côtés ?": "triangle"
-        },
+        "verify_questions": [
+            [
+                "Combien de côtés possède un carré ?",
+                "4"
+            ],
+            [
+                "Combien font 2+7 ?",
+                "9"
+            ],
+            [
+                "Comment s'appelle le système d'exploitation des téléphones de la marque Apple ?",
+                "iOS"
+            ],
+            [
+                "Comment s'appelle le système d'exploitation des téléphones de la marque Samsung ? ",
+                "Android"
+            ],
+            [
+                "L'émoji 🐷 représente : un insecte, légume, animal ?",
+                "animal"
+            ],
+            [
+                "Lequel de ces mots commence par P ? `poussin`, `corbeau`, `hirondelle`",
+                "poussin"
+            ],
+            [
+                "Lequel de ces mots désigne un fruit ? pizza, pomme, dinosaure",
+                "pomme"
+            ],
+            [
+                "Que donne le produit de 2 par 3 ?",
+                "6"
+            ],
+            [
+                "Quel est le discriminant situé après votre pseudo discord ? (sans le #)",
+                "_special_userdiscrim"
+            ],
+            [
+                "Quel est le nom de ce serveur ?",
+                "_special_servername"
+            ],
+            [
+                "Quel est le nom du pain français connu partout dans le monde ? (un seul mot)",
+                "baguette"
+            ],
+            [
+                "Quel est le résultat de 10-6 ?",
+                "4"
+            ],
+            [
+                "Quel est le résultat du produit de deux et cinq ? (en lettres)",
+                "dix"
+            ],
+            [
+                "Quelle est la première lettre de `Zbot` ?",
+                "z"
+            ],
+            [
+                "Quelle forme géométrique possède 3 côtés ?",
+                "triangle"
+            ]
+        ],
         "warn-1": "Le membre `{}` a bien reçu son avertissement, avec la raison `{}`",
         "warn-bot": "Je ne peux pas avertir un bot ^^",
         "warn-but-db": "Notre base de donnée étant hors ligne, l'avertisement n'a pas pu être enregistré. Néanmoins le membre a bien reçu son avertissement en MP",

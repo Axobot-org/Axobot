@@ -291,7 +291,8 @@
             "Pro-tip: The bot has a Discord, where you can see the current bugs and vote for the next updates! Use the `about` command to get the invite",
             "Pro-tip: The `prefix` command allows you to have a list of the prefixes currently usable in the server",
             "Did you know? You can give a description of your server that can be used in other servers, via the `description` option of the `config` command",
-            "Did you know? At some special events, it is possible to obtain collector xp cards. Don't forget to follow the news on the official server!"
+            "Did you know? At some special events, it is possible to obtain collector xp cards. Don't forget to follow the news on the official server!",
+            "> This too will pass\n*(do you have the reference?)*"
         ],
         "markdown": "__**Markdown Rules** on *Discord*__\n\n`*italics*` = *italics*\n`__underline__` = __underline__\n`**bold**` = **bold**\n`***bold italics***` = ***bold italics***\n`~~strikeout~~` = ~~strikeout~~\n`__*underline italics*__` = __*underline italics*__\n`__**underline bold**__` = __**underline bold**__\n`__***underline bold italics***__` = __***underline bold italics***__\n`||spoiler||` = ||spoiler||\n> quote = `> quote`\n\\`code\\` = `code`\n \\ to ignore\n\nFor code blocks, cf <https://discord.gg/DGahTNn>"
     },
@@ -458,7 +459,7 @@
         "block-fields": [
             "ID",
             "Stack size",
-            "Creative mod tab",
+            "Creative mode tab",
             "Damage points",
             "Durability",
             "Tool able to destroy it",
@@ -556,21 +557,60 @@
         "role-color": "The role {} has changed color!",
         "unhoisted": "{c} edited nicknames!",
         "missing-manage-nick": "Oops, I'm missing the \"Manage nicknames\" permission!",
-        "verify_questions": {
-            "What is 2+7?": "9",
-            "What does the product of 2 by 3 give?": "6",
-            "Which of these words begins with D? `bathtub`, `crow`, `galion` or `drawing`": "drawing",
-            "How many sides does a triangle have?": "3",
-            "What is the result of 10 minus 5?": "5",
-            "What is the first letter of `Zbot`?": "z",
-            "What is the name of this server?": "_special_servername",
-            "What is the name of the French bread known all over the world? (one word)": "baguette",
-            "What is the opposite color to black?": "white",
-            "What is the fourth cardinal point? North, south, east,...": "west",
-            "What does the emoji :pig: represent? a `fish`, `plant` or `pig`?": "pig",
-            "What geometric shape has 3 sides?": "triangle",
-            "How many seconds are there in a minute?": "60"
-        },
+        "verify_questions": [
+            [
+                "What is 2+7?",
+                "9"
+            ],
+            [
+                "What does the product of 2 by 3 give?",
+                "6"
+            ],
+            [
+                "Which of these words begins with D? `bathtub`, `crow`, `galion` or `drawing`",
+                "drawing"
+            ],
+            [
+                "How many sides does a triangle have?",
+                "3"
+            ],
+            [
+                "What is the result of 10 minus 5?",
+                "5"
+            ],
+            [
+                "What is the first letter of `Zbot`?",
+                "z"
+            ],
+            [
+                "What is the name of this server?",
+                "_special_servername"
+            ],
+            [
+                "What is the name of the French bread known all over the world? (one word)",
+                "baguette"
+            ],
+            [
+                "What is the opposite color to black?",
+                "white"
+            ],
+            [
+                "What is the fourth cardinal point? North, south, east, ...",
+                "west"
+            ],
+            [
+                "What does the emoji ,pig, represent? a `fish`, `plant` or `pig`?",
+                "pig"
+            ],
+            [
+                "What geometric shape has 3 sides?",
+                "triangle"
+            ],
+            [
+                "How many seconds are there in a minute?",
+                "60"
+            ]
+        ],
         "verify-role-high": "Oops, it seems that the role `{r}` is too high for me to give it. Please place this role lower than mine, or place my role above it.",
         "backup-done": "Backup done!"
     },

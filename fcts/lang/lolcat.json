@@ -547,15 +547,36 @@
         "unhoisted": "{c} bad names edited!",
         "unmute-1": "Teh mmber {} canow speek 'gain",
         "verify-role-high": "Oops, that role `{r}` is toooooooo high 4 me 2 give it. Plz place it role lawer than mine, or place my role 'bove it :plz:",
-        "verify_questions": {
-            "How many sides does a triangle have?": "3",
-            "What do 2+7?": "9",
-            "What does the product of 2 by 3 give?": "6",
-            "What is the first letter of `Zbot`?": "z",
-            "What is the name of this server?": "_special_servername",
-            "What is the result of 10 minus 5?": "5",
-            "Which of these words begins with D? `bathtub`, `crow`, `galion` or `drawing`": "drawing"
-        },
+        "verify_questions": [
+            [
+                "How many sides does a triangle have?",
+                "3"
+            ],
+            [
+                "What do 2+7?",
+                "9"
+            ],
+            [
+                "What does the product of 2 by 3 give?",
+                "6"
+            ],
+            [
+                "What is the first letter of `Zbot`?",
+                "z"
+            ],
+            [
+                "What is the name of this server?",
+                "_special_servername"
+            ],
+            [
+                "What is the result of 10 minus 5?",
+                "5"
+            ],
+            [
+                "Which of these words begins with D? `bathtub`, `crow`, `galion` or `drawing`",
+                "drawing"
+            ]
+        ],
         "warn-1": "Nice, membr `{}` haz beeen warnd 4 reezon `{}`",
         "warn-bot": "Nope, cant warn anoder cool boat ^^",
         "warn-but-db": "Our dataz being offline, so ze warning couldnt be savd. Don't worry, this guy did receive his warning in DM :innocent:",
