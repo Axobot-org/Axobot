@@ -1,4 +1,4 @@
-import random, discord, asyncio, datetime
+import random, discord, asyncio, datetime, time
 from discord.ext import commands
 
 class MorpionCog(commands.Cog):
@@ -7,7 +7,7 @@ class MorpionCog(commands.Cog):
         self.bot = bot
         self.entrees_valides = [str(x) for x in range(1,10)]
         self.file = 'morpion'
-        self.in_game = list()
+        self.in_game = dict()
         self.compositions_gagnantes = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]]
         try:
             self.translate = bot.cogs['LangCog'].tr
@@ -17,6 +17,16 @@ class MorpionCog(commands.Cog):
     @commands.Cog.listener()
     async def on_ready(self):
         self.translate = self.bot.cogs['LangCog'].tr
+
+    
+    @commands.command(name="leave-crab")
+    async def leave_crab(self,ctx):
+        """Makes you leave the crab game if you're stuck in it."""
+        if ctx.author.id not in self.in_game.keys():
+            await ctx.send(await self.translate(ctx.channel,'morpion','not-playing'))
+        else:
+            self.in_game.pop(ctx.author.id)
+            await ctx.send(await self.translate(ctx.channel,'morpion','game-removed'))
 
 
     async def qui_commence(self):
@@ -68,9 +78,9 @@ class MorpionCog(commands.Cog):
 The bot plays in red, the user in blue.
 """
         try:
-            if ctx.author.id in self.in_game:
+            if ctx.author.id in self.in_game.keys():
                 return await ctx.send(await self.translate(ctx.channel,'morpion','already-playing'))
-            self.in_game.append(ctx.author.id)
+            self.in_game[ctx.author.id] = time.time()
             grille = [x for x in range(1,10)]
             tour = await self.qui_commence()
             u_begin = await self.translate(ctx.channel,'morpion','user-begin') if tour == True else await self.translate(ctx.channel,'morpion','bot-begin')
@@ -81,6 +91,8 @@ The bot plays in red, the user in blue.
                 return m.channel == ctx.channel and m.author==ctx.author
             display_grille = True
             while await self.test_cases_vides(grille):
+                if ctx.author.id not in self.in_game.keys():
+                    return
             ###
                 if tour == True:   #Si c'est au joueur
                     if display_grille:
@@ -90,7 +102,7 @@ The bot plays in red, the user in blue.
                         msg = await self.bot.wait_for('message', check=check,timeout=50)
                     except asyncio.TimeoutError:
                         await ctx.channel.send(await self.translate(ctx.channel,'morpion','too-late'))
-                        self.in_game.remove(ctx.author.id)
+                        self.in_game.pop(ctx.author.id,None)
                         return
                     saisie = msg.content
                     if msg.content in self.entrees_valides:
@@ -132,7 +144,7 @@ The bot plays in red, the user in blue.
                     break
             ###
             await ctx.send(await self.afficher_grille(grille)+'\n'+resultat.format(ctx.author.mention))
-            self.in_game.remove(ctx.author.id)
+            self.in_game.pop(ctx.author.id,None)
         except Exception as e:
             await self.bot.cogs['ErrorsCog'].on_command_error(ctx,e)
 

@@ -593,7 +593,9 @@
         "too-late": "U was too long! End of the game!",
         "user-begin": "{}, u begin!",
         "win-1": "GG, {} won!",
-        "win-2": "I won! Game over!"
+        "win-2": "I won! Game over!",
+        "not-playing": "U dont have any play in progress",
+        "game-removed": "U have correctly let the game"
     },
     "partners": {
         "added-partner": "Tish partner has bee corectly added",

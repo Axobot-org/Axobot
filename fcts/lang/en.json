@@ -624,7 +624,9 @@
         "pion-2": "Invalid input case",
         "win-1": "Well done, {} won!",
         "win-2": "I won! End of the game!",
-        "already-playing": "You already have a game in progress!"
+        "already-playing": "You already have a game in progress!",
+        "not-playing": "You don't have any game in progress",
+        "game-removed": "You have correctly left the game"
     },
     "partners": {
         "invalid-bot": "Unable to find this bot",
