@@ -134,22 +134,28 @@ class FunCog(commands.Cog):
 
     @commands.command(name="count_msg",hidden=True)
     @commands.check(is_fun_enabled)
-    async def count(self,ctx,user:typing.Optional[discord.User]=None,limit:int=1000):
+    @commands.cooldown(5, 30, type=commands.BucketType.channel)
+    async def count(self,ctx,limit:typing.Optional[int]=1000,user:typing.Optional[discord.User]=None,channel:typing.Optional[discord.TextChannel]=None):
         """Count the number of messages sent by the user
 You can specify a verification limit by adding a number in argument (up to 1.000.000)"""
         l = 1000000
+        if channel==None:
+            channel = ctx.channel
+        if user!=None and user.name.isnumeric() and limit==1000:
+            limit = int(user.name)
+            user = None
         if limit > l:
             await ctx.send(await self.translate(ctx.channel,"fun","count-2",l=l,e=self.bot.cogs['EmojiCog'].customEmojis['wat']))
             return
-        if ctx.guild!=None and not ctx.channel.permissions_for(ctx.guild.me).read_message_history:
-            await ctx.send(await self.translate(ctx.channel,"fun","count-3"))
+        if ctx.guild!=None and not channel.permissions_for(ctx.guild.me).read_message_history:
+            await ctx.send(await self.translate(channel,"fun","count-3"))
             return
         if user==None:
             user = ctx.author
         counter = 0
         tmp = await ctx.send(await self.translate(ctx.channel,'fun','count-0'))
         m = 0
-        async for log in ctx.channel.history(limit=limit):
+        async for log in channel.history(limit=limit):
             m += 1
             if log.author == user:
                 counter += 1
