@@ -80,7 +80,7 @@ class TranslatorsCog(commands.Cog):
         result = dict()
         with open('translation/'+lang+'-project.json','r',encoding='utf-8') as f:
             result = json.load(f)
-        return result
+        return {k:v for k,v in result.items() if v!=None}
 
     async def modify_project(self,lang:str,key:str,new:str):
         """Modify a string inside the project file"""
@@ -117,6 +117,7 @@ class TranslatorsCog(commands.Cog):
             await ctx.send("You were too slow. Try again.")
             return 'timeout'
         if msg.content.lower() == 'pass':
+            await self.modify_project(lang,key,None)
             await ctx.send("This message will be ignored until the next reload of this command")
         elif msg.content.lower() == 'stop' and isloop:
             await ctx.send("Ok, let's stop here. Thanks for your help!")
@@ -246,7 +247,8 @@ class TranslatorsCog(commands.Cog):
         try:
             with open(f'fcts/lang/{lang}.json','r',encoding='utf-8') as old_f:
                 with open(f'translation/{lang}-project.json','r',encoding='utf-8') as new_f:
-                    new = await self._fuse_file(json.load(old_f),json.load(new_f))
+                    new = {k:v for k,v in json.load(new_f).items() if v!=None}
+                    new = await self._fuse_file(json.load(old_f),new)
         except FileNotFoundError:
             return await ctx.send("There is no current project with this language")
         with open(f'translation/{lang}.json','w',encoding='utf-8') as f:
