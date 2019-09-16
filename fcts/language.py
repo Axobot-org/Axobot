@@ -32,7 +32,9 @@ class LangCog(discord.ext.commands.Cog):
             #print(self.serv_opts)
         elif not self.bot.database_online:
             lang_opt = self.bot.cogs['ServerCog'].default_language
-        elif isinstance(serverID,(discord.DMChannel,type(None))):
+        elif serverID==None:
+            lang_opt = self.bot.cogs['ServerCog'].default_language
+        elif isinstance(serverID,discord.DMChannel):
             used_langs = await self.bot.cogs['UtilitiesCog'].get_languages(serverID.recipient,limit=1)
             lang_opt = used_langs[0][0]
         else:
