@@ -111,15 +111,16 @@ class TranslatorsCog(commands.Cog):
         await ctx.send("```\n"+value+"\n```")
         await ctx.send(f"How would you translate it in {lang}?\n\n  *Key: {key}*\nType 'pass' to choose another one")
         try:
-            func = lambda msg: (msg.author.id==ctx.author.id or (msg.author.id in [279568324260528128,281404141841022976,552273019020771358] and msg.content.lower()=='stop' and isloop)) and msg.channel.id==ctx.channel.id
+            func = lambda msg: (msg.author.id==ctx.author.id or (msg.author.id in [279568324260528128,281404141841022976,552273019020771358] and msg.content.lower()=='stop' and isloop)) and msg.channel.id==ctx.channel.id and (not msg.content.startswith(ctx.prefix))
             msg = await self.bot.wait_for('message', check=func, timeout=90)
         except asyncio.TimeoutError:
-            return await ctx.send("You were too slow. Try again.")
+            await ctx.send("You were too slow. Try again.")
+            return 'timeout'
         if msg.content.lower() == 'pass':
             await ctx.send("This message will be ignored until the next reload of this command")
         elif msg.content.lower() == 'stop' and isloop:
             await ctx.send("Ok, let's stop here. Thanks for your help!")
-            return False
+            return 'break'
         else:
             await self.modify_project(lang,key,msg.content)
             await ctx.send(f"New translation:\n :arrow_right: {msg.content}")
@@ -127,7 +128,7 @@ class TranslatorsCog(commands.Cog):
             self.todo[lang].remove(key)
         except ValueError:
             pass
-        return True
+        return 'pass'
     
     @commands.command(name='tr-loop')
     @commands.check(is_translator)
@@ -138,11 +139,20 @@ class TranslatorsCog(commands.Cog):
             return await ctx.send("Invalid language")
         if len(self.todo[lang])==0:
             return await ctx.send("This language is already 100% translated :tada:")
-        while await self.ask_a_translation(ctx,lang,isloop=True):
+        timeouts_count = 0
+        a = await self.ask_a_translation(ctx,lang,isloop=True)
+        while a != 'break':
             if len(self.todo[lang])==0:
                 await ctx.send("This language is already 100% translated :tada:")
                 break
-            pass
+            a = await self.ask_a_translation(ctx,lang,isloop=True)
+            if a == 'timeout':
+                timeouts_count += 1
+            else:
+                timeouts_count = 0
+            if timeouts_count>4:
+                await ctx.send("Ok I stop here. Call me when you're back")
+                break
     
     @commands.command(name='tr-reload-todo')
     @commands.check(is_translator)
