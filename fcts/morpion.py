@@ -3,7 +3,7 @@ from discord.ext import commands
 
 class MorpionCog(commands.Cog):
 
-    def __init__(self,bot):
+    def __init__(self,bot:commands.Bot):
         self.bot = bot
         self.entrees_valides = [str(x) for x in range(1,10)]
         self.file = 'morpion'
@@ -23,7 +23,7 @@ class MorpionCog(commands.Cog):
         """Le joueur est True, l'ordinateur est False"""
         return random.choice([True,False])
 
-    async def afficher_grille(self,grille):
+    async def afficher_grille(self,grille:list):
         """Affiche la grille qui est une liste sous forme de chaine de caractères"""
         affichage_grille = ''
         for k in range(9) :
@@ -37,39 +37,39 @@ class MorpionCog(commands.Cog):
                     affichage_grille += ':large_blue_circle:'
         return affichage_grille
 
-    async def test_place_valide(self,grille,saisie):
+    async def test_place_valide(self,grille:list,saisie:str):
         """Test si la place saisie par le joueur est libre"""
         return False if (str(grille[int(saisie)-1]) == 'X') or (str(grille[int(saisie)-1]) == 'O') else True
 
-    async def remplacer_valeur(self,grille,tour,saisie):
+    async def remplacer_valeur(self,grille:list,tour:bool,saisie:str):
         """Remplace la valeur de celui qui joue"""
         return ['X' if x == int(saisie) else x for x in grille] if tour == True else ['O' if x == int(saisie) else x for x in grille]
 
-    async def test_win(self,grille):
+    async def test_win(self,grille:list):
         """Test s'il y a une position de victoire"""
         for k in range(8) :
             if grille[self.compositions_gagnantes[k][0]] == grille[self.compositions_gagnantes[k][1]] == grille[self.compositions_gagnantes[k][2]] :
                 return True
         return False
 
-    async def resultat_final(self,tour,guild):
+    async def resultat_final(self,tour:bool,channel:discord.TextChannel):
         """Renvoie qui a gagné la partie"""
         if tour:
-            return await self.translate(guild,'morpion','win-2')
-        return await self.translate(guild,'morpion','win-1')
+            return await self.translate(channel,'morpion','win-2')
+        return await self.translate(channel,'morpion','win-1')
 
-    async def test_cases_vides(self,grille):
+    async def test_cases_vides(self,grille:list):
         """Renvoie True s'il reste des cases vides"""
         return grille.count('O') +grille.count('X') != 9
 
     @commands.command(name="crab",aliases=['morpion'])
-    async def main(self,ctx):
+    async def main(self,ctx:commands.Context):
         """A simple mini-game that consists of aligning three chips on a 9-square grid.
 The bot plays in red, the user in blue.
 """
         try:
             if ctx.author.id in self.in_game:
-                return await ctx.send(await self.translate(ctx.guild,'morpion','already-playing'))
+                return await ctx.send(await self.translate(ctx.channel,'morpion','already-playing'))
             self.in_game.append(ctx.author.id)
             grille = [x for x in range(1,10)]
             tour = await self.qui_commence()
@@ -128,7 +128,7 @@ The bot plays in red, the user in blue.
                     display_grille = True
             ###
                 if await self.test_win(grille) == True:
-                    resultat = await self.resultat_final(tour,ctx.guild)
+                    resultat = await self.resultat_final(tour,ctx.channel)
                     break
             ###
             await ctx.send(await self.afficher_grille(grille)+'\n'+resultat.format(ctx.author.mention))
