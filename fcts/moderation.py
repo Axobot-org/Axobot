@@ -682,15 +682,17 @@ You must be an administrator of this server to use this command."""
         try:
             emotes = [structure.format(x,x.name,await date(x.created_at,lang,year=True,hour=False,digital=True),priv if len(x.roles)>0 else '') for x in ctx.guild.emojis if not x.animated]
             emotes += [structure.format(x,x.name,await date(x.created_at,lang,year=True,hour=False,digital=True),priv if len(x.roles)>0 else '') for x in ctx.guild.emojis if x.animated]
+            emotes = emotes
             nbr = len(emotes)
-            fields = list()
-            for i in range(0, nbr, 10):
-                l = list()
-                for x in emotes[i:i+10]:
-                    l.append(x)
-                fields.append({'name':"{}-{}".format(i+1,i+10 if i+10<nbr else nbr), 'value':"\n".join(l), 'inline':False})
-            embed = ctx.bot.cogs['EmbedCog'].Embed(title=title,fields=fields,color=self.bot.cogs["ServerCog"].embed_color).create_footer(ctx.author)
-            await ctx.send(embed=embed.discord_embed())
+            for x in range(0,nbr,50):
+                fields = list()
+                for i in range(x, min(x+50,nbr), 10):
+                    l = list()
+                    for x in emotes[i:i+10]:
+                        l.append(x)
+                    fields.append({'name':"{}-{}".format(i+1,i+10 if i+10<nbr else nbr), 'value':"\n".join(l), 'inline':False})
+                embed = ctx.bot.cogs['EmbedCog'].Embed(title=title,fields=fields,color=self.bot.cogs["ServerCog"].embed_color).create_footer(ctx.author)
+                await ctx.send(embed=embed.discord_embed())
         except Exception as e:
             await ctx.bot.cogs['ErrorsCog'].on_cmd_error(ctx,e)
 
