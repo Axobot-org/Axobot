@@ -118,9 +118,9 @@ class InfosCog(commands.Cog):
         """Get bot latency
         You can also use this command to ping any other server"""
         if ip==None:
-            m = await ctx.send("Pong !")
+            m = await ctx.send("Ping...")
             t = (m.created_at - ctx.message.created_at).total_seconds()
-            await m.edit(content="Pong ! ("+str(round(t*1000))+"ms)")
+            await m.edit(content=":ping_pong:  Pong !\nBot ping: {}ms\nDiscord ping: {}ms".format(round(t*1000),round(self.bot.latency*1000)))
         else:
             asyncio.run_coroutine_threadsafe(self.ping_adress(ctx,ip),asyncio.get_event_loop())
 
