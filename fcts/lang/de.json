@@ -1,18 +1,13 @@
 {
     "activity": {
-        "listen": "Du hörst",
-        "nothing": "Nichts",
-        "play": "spielt gerade",
-        "watch": "Schaut gerade"
+        "listen": "hört",
+        "nothing": "nichts",
+        "play": "spielt",
+        "stream": "streamt",
+        "watch": "guckt"
     },
     "admin": {
-        "bug-0": "Fehler #{} konnte nicht gefunden werden",
-        "change_game-0": "Wähle spielen, gucken oder anhören aus, gefolgt vom Namen",
-        "emergency": "Der Bot ist gerade in den Notfallmodus gewechselt. Das heißt wahrscheinlich, dass jemand unautorisiertes versucht die Kontrolle zu übernehmen.\\nUm mögliche Schäden zu begrenzen verlasse ich sämtliche Server, auf denen ich bin, in der Hoffnung, dass noch nichts schlimmes passiert ist.\\nWeitere Informationen finden Sie auf meinem offiziellen Discordserver: https://discord.me/zbot (Falls dieser Link nicht mehr funktioniert: https://zbot.rtfd.io)",
-        "msg_2-0": "Operation läuft...",
-        "msg_2-1": "Keine betroffenen Personen",
-        "msg_2-2": "Eine betroffene Person",
-        "msg_2-3": "betroffene Personen"
+        "emergency": "Der Bot ist gerade in den Notfallmodus gewechselt. Das heißt wahrscheinlich, dass jemand unautorisiertes versucht die Kontrolle zu übernehmen.\nUm mögliche Schäden zu begrenzen verlasse ich sämtliche Server auf denen ich bin, in der Hoffnung, dass noch nichts schlimmes passiert ist.\nWeitere Informationen finden Sie auf unserem offiziellen Discordserver: https://discord.me/zbot (Falls dieser Link nicht mehr funktioniert: https://zbot.rtfd.io/)"
     },
     "aide": {
         "aliases": "Adressen:",
@@ -23,29 +18,513 @@
             "other": "Andere",
             "server-settings": "Server Einstellungen",
             "staff": "Bot Team",
-            "translators": "Übersetzungsteam",
-            "unclassed": "nicht klassifiziert",
+            "translators": "Übersetzungteam",
+            "unclassed": "Nicht klassifiziert",
             "users-info": "Benutzerinformation"
         },
         "check-desc": {
             "bot_has_permissions": [
-                "Der Bot hat die benötigten Berechtigungen",
-                "!translate de"
+                "Der Bots hat die benötigten Berechtigungen",
+                "Der Bot hat nicht die benötigten Berechtigungen"
             ],
             "can_ban": [
-                "eine deiner rollen erlaubt dir diesen befehl auszuführen",
-                "Fehlende erlaubte rolle"
+                "Eine deiner Rollen besitzt die Berechtigung für diesen Befehl (`ban`)",
+                "Fehlende Berechtigung (`ban`)"
             ],
             "can_clear": [
-                "eine deiner rollen erlaubt es dir diesen befehl auszuführen",
-                "Fehlende berechtigung deiner rollen (´clear´)"
+                "Eine deiner Rollen besitzt die Berechtigung für diesen Befehl (`clear`)",
+                "Fehlende Berechtigung (`clear`)"
             ],
             "can_edit_case": [
-                "eine deiner rollen erlaubt es dir diesen befehl auszuführen (´warn´)"
+                "Eine deiner Rollen besitzt die Berechtigung für diesen Befehl (`warn`)",
+                "Dir fehlt die Rolle (`warn`)"
+            ],
+            "can_kick": [
+                "Eine deiner Rollen besitzt die Berechtigung für diesen Befehl (`kick`)",
+                "Fehlende Berechtigung (`kick`)"
+            ],
+            "can_mute": [
+                "Eine deiner Rollen besitzt die Berechtigung für diesen Befehl (`mute`)",
+                "Fehlende Berechtigung (`mute`)"
+            ],
+            "can_say": [
+                "Eine deiner Rollen besitzt die Berechtigung für diesen Befehl (`say`)",
+                "Fehlende Berechtigung (`say`)"
+            ],
+            "can_slowmode": [
+                "Eine deiner Rollen besitzt die Berechtigung für diesen Befehl (`slowmode`)",
+                "Fehlende Berechtigung (`slowmode`)"
+            ],
+            "can_use_cookie": [
+                "Du wurdest von Aragorn1202 ausgewählt!",
+                "Dieser Befehl ist in der Whitelist"
+            ],
+            "can_use_rss": [
+                "Du hast 'Administrator' Berechtigungen",
+                "'Administrator' Berechtigung fehlt"
+            ],
+            "can_warn": [
+                "Eine deiner Rollen besitzt die Berechtigung für diesen Befehl (`warn`)",
+                "Fehlende Berechtigung (`warn`)"
+            ],
+            "check_admin": [
+                "Dafür musst du ein Bot Administrator sein",
+                "Du bist kein Bot Administrator"
+            ],
+            "guild_only": [
+                "Kann nur auf Servern benutzt werden",
+                "Kann nur auf Servern benutzt werden"
+            ],
+            "has_admin": [
+                "Du hast die 'Administrator' Berechtigung",
+                "'Administrator' Berechtigung fehlt"
+            ],
+            "has_embed_links": [
+                "Du hast die 'Embed links' Berechtigung",
+                "Du musst die 'Embed links' Berechtigung haben"
+            ],
+            "has_manage_guild": [
+                "Du hast die 'Manage Server' Berechtigung",
+                "'Manage Server' Berechtigung fehlt"
+            ],
+            "has_manage_msg": [
+                "Du hast die 'Manage Messages' Berechtigung",
+                "'Manage Messages' Berechtigung fehlt"
+            ],
+            "has_manage_nicknames": [
+                "Du hast die 'Manage Nicknames' Berechtigung",
+                "'Manage Nicknames' Berechtigung fehlt"
+            ],
+            "has_manage_roles": [
+                "Du hast die 'Manage Roles' Berechtigung",
+                "'Manage Roles' Berechtigung fehlt"
+            ],
+            "has_permissions": [
+                "Du hast die benötigten Discordberechtigungen",
+                "Du hast nicht die benötigten Discordberechtigungen"
+            ],
+            "is_fun_enabled": [
+                "Spaßbefehle sind aktiviert",
+                "Spaßbefehle sind momentan deaktiviert"
+            ],
+            "is_owner": [
+                "Dafür musst du der Besitzer des Bots sein",
+                "Du bist nicht der Besitzer des Bots"
+            ],
+            "is_support_staff": [
+                "Du bist ein Mitglied des Botteams",
+                "Dafür musst du ein Mitglied des Botteams sein"
+            ],
+            "is_translator": [
+                "Du bist ein Teil des Übersetzerteams",
+                "Dafür musst du Teil des Übersetzerteams sein"
+            ],
+            "verify_role_exists": [
+                "Eine Verifikationsrolle wurde eingerichtet",
+                "Keine Verifikationsrolle hinzugefügt"
             ]
-        }
+        },
+        "cmd-not-found": "Es gibt keinen \"{}\" Befehl",
+        "embed_title": "Nutzbare Befehle für {u}",
+        "footer": "Gib ''{}help' ein um mehr Infos über unsere Commands zu erhalten",
+        "no-desc-cmd": "Keine Bescheibung für diesen Befehl",
+        "no-desc-cog": "Keine Beschreibung für diese cog.",
+        "no-subcmd": "Der Befehl `{0.name}` hat keine Unterbefehle",
+        "not-enabled": ":warning: Dieser Befehl ist deaktiviert",
+        "subcmd-not-found": "Dieser Befehl hat keinen Unterbefehl namens \"{}\""
+    },
+    "blurple": {
+        "check_fields": [
+            "Gesamte anzahl von Blurple",
+            "Blurple (rgb(114, 137, 218))",
+            "Weiß (rgb(255, 255, 255))",
+            "Dunkel-Blurple (rgb(78, 93, 148))",
+            "Blurple, Weiß, Dunkel-Blurple = Blurple, Weiß und Dunkel-Blurple (respectively) \nSchwarz = Kein Blurple, Weiß oder Dunkel-Blurple",
+            "Großen Dank an **Rocked03** für seinen Code :blue_heart: https://github.com/Rocked03/Blurplefied.git",
+            "Bitte beachte: Discord verringert manchmal die Bildauflösung, weswegen die Prozente manchmal nicht ganz akkurat sein könnten. | Angefordert von {}"
+        ],
+        "check_intro": "{}, starte blurple image analyse (Bitte beachte, dass das eine weile dauern könnte)",
+        "check_invalid": "{}, bitte gib eine nutzbare image URL",
+        "check_resized": "{}, das Bild wurde verkleinert für performance Zwecke ({}s)",
+        "create_footer_1": "Bitte beachte - Der blurplefier ist automatisch, weshalb er möglicherweise nicht die besten Ergebnisse ausgeben könnte. | Angefordert von {}",
+        "create_footer_2": "Bitte beachte - Der blurplefier ist automatisch, weshalb er möglicherweise nicht die besten Ergebnisse ausgeben könnte. Disclaimer: Dieses Bild ist ein GIF, weshalb das Erbebnis nicht das Beste sein könnte, wenn acuh manchmal nicht so körnig. | Angefordert von {}",
+        "create_oops": "{}, whoops! Es tut mir sehr Leid, aber dieses GIF ist zu groß",
+        "create_title": "Blurplefier - mach dein Bild blurple!",
+        "won-card": "Hey, sehr hübsches Blurple Bild {}! so schön, dass du ein paar extra Blurple-XP bekommst! Du kannst diese benutzen indem du `{}profile card blurple` {} eingibts"
+    },
+    "bvn": {
+        "aide": "__**Willkommen zum join & leave message Modul**__\n\nDieses Modul ist da, um Nachrichten zu senden, sobald eine Person den Server verlässt oder betritt.\n\n__** Konfiguration**__\n\n`1-` Um den Chat zu ändern, in dem diese Nachrichten angezeigt werden gib `{p}config change welcome_channel`, gefolgt vom Channelnamen ein.\n`2-` Um eine Nachricht zu bearbeiten gebe `{p}config change <welcome|leave> <message>` ein. Für diese Nachricht gibt es einige Variablen:\n - `{user}` erwähnt das betroffene Mitglied\n - `{server}` zeigt den Servernamen\n - `{owner}` zeigt den Namen des Serverbesitzer an\n - `{member_count}` zeigt die Mitgliederanzahl\n - `{type}` gibt 'Mitglied' oder 'Bot' wieder",
+        "error-give-roles": "Fehler beim Geben der Rolle '{r}' an das neue Mitglied {u}: fehlende Berechtigung\nBitte beachte, dass ich die Berechtigung zum vergeben von Rollen brauche sowie, dass eine meiner Rollen über '{r}' stehen muss!"
+    },
+    "cases": {
+        "cases-0": "{} Grund gefunden: ({}-{})",
+        "deleted": "Der Fall #{} wurde gelöscht!",
+        "list-0": "**Typ:** {T}\n**Moderator:** {M}\n**Datum:** {D}\n**Grund:** *{R}*",
+        "list-1": "**Server:** {G}\n**Typ:** {T}\n**Moderator:** {M}\n**Datum:** {D}\n**Grund:** *{R}*",
+        "list-2": "\n**Zeit:** {D}",
+        "no-user": "Nutzer nicht gefunden :eyes:",
+        "no_database": "Wegen eines Database problems ist dieser Befehl momentan nicht verfügbar",
+        "not-found": "Es wurde nichts gefunden :confused:",
+        "reason-edited": "Die Begründung für den Fall #{} wurde geändert!",
+        "search-0": "**Nutzer:** {U}\n**Typ:** {T}\n**Moderator:** {M}\n**Datum:** {D}\n**Grund:** *{R}*",
+        "search-1": "**Nutzer:** {U}\n**Server:** {G}\n**Typ:** {T}\n**Moderator:** {M}\n**Datum:** {D}\n**Grund:** *{R}*",
+        "title-search": "Fall #{}"
     },
     "current_lang": {
         "current": "de"
+    },
+    "errors": {
+        "DM": "Dieser Befehl ist für Direktnachrichten deaktiviert",
+        "badarguments": "Oops, `{p}` konnte nicht zu \"{t}\" konvertiert werden :confused:",
+        "badarguments-2": "`{p}` ist hier keine {t} Option",
+        "channotfound": "Kanal {c} konnte nicht gefunden werden",
+        "cooldown": "Dieser Command hat einen Cooldown, bitte warte {d} Sekunden, um ihn wieder benutzen zu können",
+        "disabled": "Der Command {c} ist deaktiviert :confused:",
+        "duration": "Die Zeit `{d}` ist nicht möglich",
+        "emojinotfound": "Emoji `{e}` konnte nicht gefunden werden",
+        "invalidcolor": "Die Farbe `{c}` ist fehlerhaft",
+        "invalidemoji": "Fehlerhafter Emoji",
+        "invalidguild": "Dieser Server konnte nicht gefunden werden: `{g}`",
+        "invalidinvite": "Fehlerhafte Bot/Server Einladung: `{i}`",
+        "invalidisbn": "Fehlerhafte ISBN",
+        "invalidleaderboard": "Fehlerhafter leaderboard Typ",
+        "invalidmsgid": "Fehlerhafte Nachricht ID",
+        "invalidurl": "Fehlerhafte url: `{u}`",
+        "membernotfound": "Mitglied `{m}` konnte nicht gefunden werden :confused:",
+        "missingargument": "Oops, das Argument \"{a}\" fehlt {e}",
+        "msgnotfound": "Es konnte keine Nachricht mit der ID gefunden werden {msg}",
+        "rolenotfound": "Die Rolle `{r}` konnte nicht gefunden werden",
+        "toomanytxtchan": "Du hast zu viele Erreichbare Textkanäle",
+        "usernotfound": "Der Nutzer `{u}` konnte nicht gefunden werden :confused:"
+    },
+    "events": {
+        "mp-adv": "Du möchtest mich wohl zu diesem Server einladen, nichtwahr? Jedoch geht jedoch leider nicht über einen einfachen Einladungslink, im Gegenteil: Du musst meinen Link anklicken damit ich deinem Server beitreten kann <https://bot.discord.io/zbot> :wink:"
+    },
+    "find": {
+        "chan-0": "Kanal nicht gefunden",
+        "chan-1": "Name : {}\nID: {}\nServer: {} ({})",
+        "guild-0": "Server nicht gefunden",
+        "guild-1": "Name: {name}\nID: {id}\nBesitzer: {owner} ({ownerid})\nBeigetreten: {join}\nMitglieder: {members} (including {bots} bots)\nSprache: {lang}\nPrefix: `{prefix}`\nRss-Feed Nummer: {rss}\nRollen Belohnungsnummer: {rr}",
+        "help": "Dieser Befehl gibt dir die Möglichkeit Kanäle oder Server zu finden auf/in denen ich bin. Du kannst auch nach Discord-Nutzer Informationen suchen, selbst wenn ich mit ihnen keinen Server teile!\nDie Syntax ist `!find <user|channel|guild> <ID>`",
+        "role-0": "Rolle nicht gefunden",
+        "role-1": "Name: {}\nID: {}\nGuild: {} ({})\nMitgliedsnummer: {}\nFarbe: {}",
+        "user-0": "Name: {}\nID: {}",
+        "user-1": "Name: {name}\nID: {id}\nPerks: {rangs}\nServer: {servers}\nBesitzer von: {own}\nSprachen: {lang}\nGevoted? {vote}\nXP Karte: {card}",
+        "user-2": "Nutzer nicht gefunden"
+    },
+    "fun": {
+        "afk-done": "Du bist jetzt AFK",
+        "afk-no-perm": "Oops, ich kann deinen Nicknamen nicht ändern :confused:",
+        "afk-user-1": "Dieses Mitglied ist AFK, da {}",
+        "afk-user-2": "Dieser Nutzer ist AFK!",
+        "blame-0": "Liste möglicher Namen für **{}**",
+        "calc-0": "Ooop, das hat zu lange gedauert :/",
+        "calc-1": "Die Lösungen der Rechnung `{}` sind `{}`",
+        "calc-2": "Die Lösungen der Rechnung `{c}` sind `{l[0]}` und `{l[1]}`",
+        "calc-3": "Die Lösung der Rechnung `{}` ist `{}`",
+        "calc-4": "Die Rechnung `{}` hat keine Lösung",
+        "calc-5": "Oops, ein Fehler: `{}`",
+        "cant-react": "Ich hab keine Berechtigung für das Hinzufügen von Berechtigungen!",
+        "cant-stream": "Warnung: Du hast nicht die benötigten Berechtigungen für diesen Befehl (Permission \"Stream\").",
+        "cookie": "{} hat <@375598088850505728> eine Packung Kekse geschenkt! {}",
+        "count-0": "Zählt...",
+        "count-1": "Von den letzen {limit} Nachrichten sind {x} von dir ({p}%)",
+        "count-2": "Du willst wohl Discord zerstören! {e} Aus offentsichtlichen Gründen begrenze ich auf {l} Nachrichten",
+        "count-3": "Ooops, ich besitze nicht die Berechtigung diesen Chatverlauf zu lesen",
+        "count-4": "Von den letzen {limit} Nachrichten hat {user} {x} Nachrichten gesendet ({p}%)",
+        "embed-error": "Ein Fehler: `{}`",
+        "fun-list": "Hier ist einer Liste aller Spaß Befehle:",
+        "invalid-city": "Ungultige Stadt :confused:",
+        "markdown": "__**Markdown Regeln** für *Discord*__\n\n`*italics*` = *italics*\n`__underline__` = __underline__\n`**bold**` = **bold**\n`***bold italics***` = ***bold italics***\n`~~strikeout~~` = ~~strikeout~~\n`__*underline italics*__` = __*underline italics*__\n`__**underline bold**__` = __**underline bold**__\n`__***underline bold italics***__` = __***underline bold italics***__\n`||spoiler||` = ||spoiler||\n> quote = `> quote`\n\\`code\\` = `code`\n \\ to ignore\n\nFür Codeblock cf: <https://discord.gg/DGahTNn>",
+        "no-database": "As our database is offline, access to fun commands is restricted to people with permission \"Manage Server\"",
+        "no-embed-perm": "Ich hab keine Rechte für \"Embed links\" :confused:",
+        "no-emoji": "Dieser Emoji wurde nicht gefunden!",
+        "no-fun": "Spaß Befehle wurden auf diesem Server Deaktiviert. Um denn eine Liste von ihnen zu sehen klicke Hier https://zbot.rtfd.io/en/v3/fun.html",
+        "no-reaction": "Fehler beim Hinzufügen der Reaktion, bitte check meine Berechtigungen...",
+        "no-roll": "Keine Wahl gefunden",
+        "no-say": "Es ist mir nicht möglich hier Nachrichten zu versenden",
+        "no-voicechan": "Du musst in einem Sprachkanal sein um diesen Befehl zu benutzen.",
+        "piece-0": [
+            "Zahl!",
+            "Kopf!"
+        ],
+        "piece-1": "Oh nein, die Münze ist auf der Kante gelandet!",
+        "react-0": "Gesuchte Nachricht konnte nicht gefunden werden. Du musst als erstes die ID und dann den Emoji angeben :upside_down:\n Bitte beachte auch, dass den Nachrichtenverlauf lesen können muss!",
+        "thanos": [
+            "{0} wurde von Thanos verschont",
+            "Thanos hat {0} pulverisiert! Für die Allgemeinheit...."
+        ]
+    },
+    "infos": {
+        "admins-list": "Die Administratoren dieses Bots sind: {}",
+        "bitly_long": "Ursprüngliche URL: {url}",
+        "bitly_nobit": "Das ist kein bit.ly Link!",
+        "bitly_short": "Gekürzte URL: {url}",
+        "changelog-notfound": "Diese Version konnte nicht gefunden werden",
+        "docs": "Hier der Link zur Bot Dokumentation:",
+        "prefix": "Anzahl momentan nutzbarer Prefixe:",
+        "stats": "**Bot Version:** {bot_v} \n**Anzahl meiner Server:** {s_count} \n**Number sichtbarer Mitglieder:** {m_count}, ({b_count} **Bots**)\n**Anzahl an Codezeilen:** {l_count}\n**Benutzte Sprachen:** {lang}\n**Python Version :** {p_v} \n**Version des `discord.py` lib:** {d_v} \n**RAM Belastung:** {ram} GB \n**CPU Belastung:** {cpu} % \n**API Verzögerung:** {api} ms\n**Gesamtanzahl gesammelter XP:** {xp}",
+        "stats-title": "**Bot Statistiken**",
+        "text-0": "Hallo! Ich bin {0} !\nIch bin ein Bot der dir vieles ermöglicht: Moderation, Mini-Spiele, ein XP System, Statistiken und viele ander super tolle Befehle!\nUm alle Befehle zu sehen gibt einfach `!help` ein! `!config see` gibt dir eine Liste aller Konfiguratiosmöglichkeiten (Eine Website ist in Arbeit).\n\nAußerdem großen Dank an Awhikax, der mir durch viele Kriesen geholfen hat, Aragorn1202 für all seine Ideen und Adri526 für all seine wunderbaren Logos, Emojis und Profilbilder!\n:globe_with_meridians: Hier ein paar vielleicht nützliche Links: \n:arrow_forward: Mein Discordserver : http://discord.gg/N55zY88\n:arrow_forward: Ein Einladungslink für mich : <https://bot.discord.io/zbot>\n:arrow_forward: Die Bot Dokumentation : <https://zbot.rtfd.io/>\n:arrow_forward: Mein Twitter Account: <https://twitter.com/z_runnerr>\n\nAnsonsten noch einen schönen Tag!"
+    },
+    "infos_2": {
+        "fish-1": "Nummer aller Beendungen",
+        "membercount-0": "Gesamtanzahl aller Mitglieder",
+        "membercount-1": "Anzahl aller Bots",
+        "membercount-2": "Anzahl aller Menschen",
+        "membercount-3": "Anzahl aller Mitglieder, die gerade Online sind"
+    },
+    "keywords": {
+        "added_at": "Hinzugefügt am",
+        "aucune": "keine",
+        "bot": "Bot",
+        "category": "Kategorie",
+        "click_here": "Klick hier",
+        "depuis": "seit",
+        "dnd": "nicht stören",
+        "extreme": "Extrem",
+        "ghost": "Geist",
+        "high": "hoch",
+        "idle": "Abwesend",
+        "low": "niedrig",
+        "medium": "mittel",
+        "member": "Mitglied",
+        "membres": "Mitglieder",
+        "nom": "Name",
+        "non": "Nein",
+        "none": "keine",
+        "offline": "Offline",
+        "online": "Online",
+        "oui": "Ja",
+        "server": "Server",
+        "servers": "Server",
+        "subcmds": "Unterbefehle",
+        "unknown": "Unbekannt",
+        "version": "Version"
+    },
+    "library": {
+        "book_pres": "Titel: {title}\nUntertitel: {subtitle}\nAuthor(s): {author}\nPublisher: {publisher}\nEröffnungsdatum: {publication}\nSprache: {language}\nSeitenanzahl: {pages}\n\nISBN : {isbn}",
+        "no-found": "Dieses Buch konnte nicht gefunden werden",
+        "price": "Preis"
+    },
+    "logs": {
+        "ban": "{member} wurde gebannt (Grund: {reason} | case #{case})",
+        "case-del": "The case #{id} has been deleted (concerning {user})",
+        "case-reason": "The case #{id} has been edited:\n`Old reason:` {old}\n`New reason:` {new}",
+        "clear": "{number} Nachrichten wurden in {channel} gelöscht",
+        "d-autounmute": "autisch entmuted",
+        "d-invite": "Automod (Discord Einladung)",
+        "d-memberchan": "Automatische Aktion (config membercount)",
+        "d-unban": "Entbannt von {}",
+        "d-unmute": "Entmuted von {}",
+        "d-welcome_roles": "Automated Aktion (config welcome_roles)",
+        "d-young": "Automod (zu junger Account)",
+        "kick": "{member} wurde gekickt (Grund: {reason} | case #{case})",
+        "mute-off": "{member} ist jetzt nicht mehr gemuted",
+        "mute-on": "{member} wurde gemuted (Grund: {reason} | case #{case})",
+        "slowmode-disabled": "Slowmode deaktiviert in {channel}",
+        "slowmode-enabled": "Slowmode aktiviert in {channel} ({seconds}s)",
+        "softban": "{member} wurde \"gesoftbanned\" (Grund: {reason} | case #{case})",
+        "tempban": "{member} wurde für {duration} gebannt (Grund: {reason} | case #{case})",
+        "tempmute-on": "{member} wurde für {duration} gemuted (Grund: {reason} | case #{case})",
+        "unban": "{member} wurde entbannt (Grund: {reason})",
+        "warn": "{member} wurde verwarnt: {reason} (case #{case})"
+    },
+    "mc": {
+        "adv-fields": [
+            "Name",
+            "ID",
+            "Typ",
+            "Aktion",
+            "Parent",
+            "Children",
+            "Hinzugefügt in der Version"
+        ],
+        "adv-help": "Dieser Befehl gibt dir die Möglichkeit Informationen über jede Minecraft Errungenschaft zu erhalten.  Gib dafür einfach `!mc advancement <name>` ein.",
+        "block-fields": [
+            "ID",
+            "Stack größe",
+            "Creative mod tab",
+            "Schadenspunkte",
+            "Haltbarkeit",
+            "Werkzeuge zum abbauen",
+            "Mobs, welche dieses Item einsammeln können",
+            "Hinzugefügt in der Version"
+        ],
+        "block-help": "Dieser Befehl gibt dir die Möglichkeit Informationen über jeden Minecraft Block zu erhalten.  Gib dafür einfach `!mc block <name>` ein",
+        "cant-embed": "Embed konnte nicht gefunden werden. Bitte stelle sicher, dass ich die \"Embed links\" Berechtigung habe.",
+        "cmd-fields": [
+            "Name",
+            "Syntax",
+            "Beispiel",
+            "Hinzugefügt in der Version"
+        ],
+        "cmd-help": "Dieser Befehl gibt dir die Möglichkeit Informationen über jeden Minecraft Befehl zu erhalten.  Gib dafür einfach `!mc command <name>` ein.",
+        "contact-mail": "Wenn dir irgendein Fehler oder etwas falsches auffällt wende dich bitte an uns oder melde es direkt [auf der Seite](https://fr-minecraft.net).",
+        "dimensions": "Weite: {d[0]}\nLänge: {d[1]}\nHöhe: {d[2]}",
+        "entity-fields": [
+            "ID",
+            "Typ",
+            "Lebenspunkte",
+            "Angriffspunkte",
+            "Todes XP",
+            "Bevorzugte Biome",
+            "Hinzugefügt in der Version"
+        ],
+        "entity-help": "Dieser Befehl gibt dir die Möglichkeit Informationen über jedes Minecraft Entity zu erhalten. Gib dafür einfach `!mc entity <name>` ein.",
+        "item-fields": [
+            "ID",
+            "Size of a stack",
+            "Kreativmodus Tab",
+            "Schadenspunkte",
+            "Haltbarkeit",
+            "Werkzeuge zum abbauen",
+            "Mobs, die dieses Item droppen könnten",
+            "Hinzugefügt in der Version"
+        ],
+        "item-help": "Dieser Befehl gibt dir die Möglichkeit Informationen über jedes Minecraft Item zu erhalten. Gib dafür einfach `!mc item <name>` ein",
+        "mojang_desc": {
+            "account.mojang.com": "Mojang Account Management Seite",
+            "api.mojang.com": "API-Service von Mojang",
+            "authserver.mojang.com": "Authentication server",
+            "minecraft.net": "Offizielle Seite",
+            "mojang.com": "Offizielle Webseite",
+            "session.minecraft.net": "Mehrspieler Sitzung (veraltet)",
+            "sessionserver.mojang.com": "Authentifizierungsserver",
+            "textures.minecraft.net": "Texture Server (skin & capes)"
+        },
+        "names": [
+            "Block",
+            "Entity",
+            "Item",
+            "Befehl",
+            "Errungenschaft"
+        ],
+        "no-adv": "Errungenschaft konnte nicht gefunden werden",
+        "no-api": "Error: Keine Verbindung zur API möglich",
+        "no-block": "Block konnte nicht gefunden werden",
+        "no-cmd": "Befehl konnte nicht gefunden werden",
+        "no-entity": "Entity konnte nicht gefunden werden",
+        "no-item": "Item konnte nicht gefunden werden",
+        "no-ping": "Error: Es ist nicht möglich diesen Server zu erreichen",
+        "serv-0": "Anzahl Spieler",
+        "serv-1": "Liste der ersten 20 verbundenen Spieler",
+        "serv-2": "Liste aller Spieler, die online sind",
+        "serv-3": "Verzögerung",
+        "serv-error": "Oops, ein unbekannnter Fehler ist aufgetaucht. Bitte versuche es nocheinmal :confused:",
+        "serv-title": "Server Information {}",
+        "success-add": "Eine Nachricht mit allen Serverdetails {} durde zu dem Kanal {}!"
+    },
+    "modo": {
+        "already-mute": "Dieses Mitglied ist schon gemuted!",
+        "already-unmute": "Dieses Mitglied ist nicht gemuted!",
+        "backup-done": "Backup fertig!",
+        "ban": "{} wurde wegen `{}` von diesem Server gebannt",
+        "ban-1": "Wie es scheint ist diese. :thinking:",
+        "ban-list-error": "Oops, es scheint als wenn das zu viele zum anzeige sind :confused:",
+        "ban-list-title-0": "Liste aller gebannter Mitglieder \"{}\"",
+        "ban-list-title-1": "Liste der ersten 45 gebannten Mitlgider \"{}\"",
+        "ban-list-title-2": "Liste der ersten 60 gebannten Mitlgider \"{}\"",
+        "ban-noreason": "Du wurdest gerade von dem Server {} gebannt :confused:",
+        "ban-reason": "Du wurdest gerade von dem Server {} gebannt :confused:\nGrund: {}",
+        "ban-user-here": "Diese Person ist nicht gebannt :upside_down:",
+        "cant-ban": "Berechtigung \"Ban members\" fehlt :confused:",
+        "cant-emoji": "Mir fehlt die `Manage emojis` Berechtigung :confused:",
+        "cant-find-user": "Oops, der Nutzer **{}** konnte nicht gefunden werden",
+        "cant-kick": "Berechtigung \"Kick members\" benötigt :confused:",
+        "cant-mute": "Oops, es scheint als wenn ich nicht genug Berechtigungen habe.... Ich benötige die `Manage roles` Berechtigung.",
+        "cant-pin": "Oops, mir fehlt die Brechtigung Nachrichten anzupinnen",
+        "cant-slowmode": "Oops, mir fehlt die `Manage this channel` Berechtigung :confused:",
+        "caps-lock": "Hey {}, bitte schreibe nicht in capslock!",
+        "clear-0": "{} Nachrichten gelöscht!",
+        "clear-1": "Ich kann nicht so wenige Nachrichten löschen",
+        "clear-nt-found": "Hmm... ich kann diese Nachrichten irgendwie nicht löschen. Discord sagt mir sie würden nicht existieren :thinking:",
+        "em-list": "{} (`:{}:`) hinzugefüg am {} {}",
+        "em-list-title": "Emojis auf diesem Server {}",
+        "em-private": "[Restricted]",
+        "emoji-renamed": "Der Emoji {} wurde umbenannt!",
+        "emoji-valid": "Der Emoji {} wurde modifiziert, sodass ihn nur noch die Rolle `{}` benutzen kann",
+        "error": "Oops, da ist wohl ein Fehler passiert. Versuch es am Besten später nochmal ober kontaktiere den Support",
+        "kick": "Mitglied {} wurde wegen dem Grund `{}` gekickt",
+        "kick-1": "Es scheint so, als wenn diese Person mehr rechte hat als ich :thinking:",
+        "kick-noreason": "Du wurdest geradevon dem Server {} geworfen :confused:",
+        "kick-reason": "Du wurdest geradevon dem Server {} geworfen :confused:\nGrund : {}",
+        "missing-manage-nick": "Oops, mir fehlt die \"Manage nicknames\" Berecht!",
+        "mute-1": "Das Mitglied {} wurde gemuted wegen: `{}`!",
+        "mute-created": "`muted` Rolle wurde erfolgreich erstellt!",
+        "mute-high": "Oops, die `muted` ist zu hoch positioniert für mich... Bitte plaziere eine meiner Rollen über der `muted` Rolle.",
+        "need-manage-messages": "Berechtigung \"Manage Messages\" fehlt :confused:",
+        "need-read-history": "Oops, mir fehlt die \"Read Message History\" Berechtigung :confused: ",
+        "no-bans": "Es gibt keine gebannte Mitglieder",
+        "no-mute": "Oops, es scheint so als ob keine `muted` Rolle existert :confused: Bitte erstelle eine und füge die benötigten Berechtigungen hinzu.",
+        "pin-error": "Oops, ich kann diese Nachricht nicht finden (Error : `{}`)",
+        "pin-error-3": "Oops, nicht möglich diese Nachricht anzupinnen (hast du mehr als 50 angepinnte Nachrichten?). Fehler: `{}`",
+        "react-clear": "Ich konnte die Nachricht leider nicht finden :confused:",
+        "role-color": "Die Farbe der Rolle {} wurde geändert!",
+        "role-high": "Oops, diese Rolle ist zu hoch, als dass ich sie bearbeiten kann. Bitte plaziere eine meiner Rollen über der `{r}` Rolle bevor du es noch einmal probierst :confused:",
+        "slowmode-0": "Slowmode wurde in diesem Kanal deaktiviert.",
+        "slowmode-1": "Slowmode lässt sich nicht höher als sechs Stunden stellen",
+        "slowmode-2": "Der {} Kanal ist jetzt im slowmode. Warte noch {} Sekunden um wieder Nachrichten zu versenden.",
+        "slowmode-3": "Diese Menge ist unpassend",
+        "slowmode-info": "Der slowmode von diesem Kanal liegt momentan bei {} Sekunden",
+        "staff-ban": "Du kannst kein Teammitglied bannen!",
+        "staff-kick": "Du kannst keine Teammitglieder kicken!",
+        "staff-mute": "Du kannst keine Teammitgleider muten",
+        "staff-warn": "Du kannst keine Teammitglieder verwarnen!",
+        "tempban": "{} wurde für {} gebannt, mit der Begründung: `{}`",
+        "tempmute-1": "Das Mitglied {} wurde für `{}` gemuted für {}!",
+        "unban": "Das Mitglied {} ist jetzt nicht mehr gebannt",
+        "unhoisted": "{c} Nickname geändert!",
+        "unmute-1": "{} kann jetzt wieder schreiben.",
+        "verify-role-high": "Oops, es scheint als wenn die Rolle `{r}` zu hoch für mich ist. Bitte plaziere sie unter einer meiner Rollen oder eine meiner Rolle über sie.",
+        "warn-1": "Mitglied `{}` wurde wegen dem Grund `{}` verwarnt",
+        "warn-bot": "Du kannst keine Bots verwarnen ^^",
+        "warn-but-db": "Da unsere Database momentan offline ist konnte diese Warnung nicht gespeichert werden. Sie wurde aber dennoch abgesendet",
+        "warn-mp": "Du hast eine Verwarnung auf dem Server *{}* bekommen: \n{}",
+        "wrong-guild": "Oops, es scheint als wenn dieser Emoji nicht zu diesem Server gehört :thinking:"
+    },
+    "morpion": {
+        "already-playing": "Du kannst nicht zwei Spiele gleichzeitig spielen!",
+        "bot-begin": "Lass uns loslegen, ich bin drann!",
+        "nul": "Unentschieden, keiner gewinnt...",
+        "pion-1": "Da ist schon eine Figur auf diesem Feld!",
+        "pion-2": "Keine passende Antwort",
+        "tip": "\n*Um zu spielen gib einfach eine Zahl zwischen 1 und 9 ein. Ich spiele rot, du blau*",
+        "too-late": "Du hast zu lange gebraucht, Game over!",
+        "user-begin": "{}, du bist frann!",
+        "win-1": "Gut gemacht, {} hat gewonnen!",
+        "win-2": "Ich habe gewonnen!"
+    },
+    "partners": {
+        "added-partner": "Dieser Partner wurde erfolgreich hinzugefügt",
+        "already-added": "Das ist schon dein Partner!",
+        "bot-uptime": "Uptime",
+        "changed-desc": "Die Beschreibung wurde erfolgreich geändert!",
+        "changed-invite": "Die Einladung wurde modifiziert!",
+        "confirm-bot": "Möchtest du den Bot `{}` wirklich von deinen Partnern entfernen?",
+        "confirm-server": "Möchtest du wirklich den Server `{}` von deinen Partnern entfernen?",
+        "del-canceled": "Entfernen abgebrochen",
+        "deleted": "Dieser Partner wurde erfolgreich entfernt",
+        "invalid-bot": "Dieser Bot konnte nicht gefunden werden",
+        "invalid-invite": "Ungültige Einladung",
+        "invalid-partner": "Partner konnte nicht gefunden werden",
+        "missing-manage-guild": "Einladung konnte nicht gefunden werden (mir fehlt die \"Manage server\" Berechtigung)",
+        "missing-reactions": "Berechtigung \"Add reactions\" fehlt :confused:",
+        "no-channel": "Du hast keinen Partnerchannel erstellt",
+        "no-partner": "Du hast keine Partner",
+        "no-partner-2": "Dieser ist kein Partner von deinem",
+        "partners-list": [
+            "Server Partner",
+            "Liste aller Partner",
+            "Liste aller Partner deines Servers"
+        ],
+        "reloaded": "{} Partner wurden neu geladen",
+        "unknown-error": "Ein unbekannte Fehler ist aufgetaucht. Bitte kontaktiere den Support für mehr Informationen",
+        "unknown-server": "Serverpartner konnte nicht gefunden werden"
+    },
+    "perms": {
+        "general": "Allgemeine Berechtigungen",
+        "perms-0": "Mitlgied/Rolle {} konnte nicht gefunden werden",
+        "perms-1": "**\"{}\" Berechtigungen:**\n\n"
     }
 }

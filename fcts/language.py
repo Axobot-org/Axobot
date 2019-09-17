@@ -9,7 +9,7 @@ class LangCog(discord.ext.commands.Cog):
     def __init__(self,bot):
         self.bot = bot
         self.file = "language"
-        self.languages = ['fr','en','lolcat','fi']
+        self.languages = ['fr','en','lolcat','fi','de']
         self.serv_opts = dict()
         self.translations = {}
         for lang in self.languages:
@@ -44,6 +44,12 @@ class LangCog(discord.ext.commands.Cog):
             #print("New langage:",lang_opt)
         if lang_opt not in self.languages:
             lang_opt = self.bot.cogs['ServerCog'].default_language
+        if lang_opt == 'de':
+            try:
+                result = self.translations['de'][moduleID][messageID]
+            except:
+                await self.msg_not_found(moduleID,messageID,"de")
+                lang_opt = 'en'
         if lang_opt == 'fi':
             try:
                 result = self.translations['fi'][moduleID][messageID]
