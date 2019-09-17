@@ -1,9 +1,10 @@
 import discord
 from discord.ext import commands
 
-import time, importlib, sys, traceback, datetime, os, shutil, asyncio, inspect, typing, io, textwrap, copy, operator, requests, random, ast, math, mysql
+import time, importlib, sys, traceback, datetime, os, shutil, asyncio, inspect, typing, io, textwrap, copy, operator, requests, random, ast, math, mysql, json
 from libs import feedparser
 from contextlib import redirect_stdout
+from glob import glob
 from fcts import reloads
 importlib.reload(reloads)
 
@@ -224,6 +225,28 @@ class AdminCog(commands.Cog):
         for k,v in self.bot.cogs.items():
             text +="- {} ({}) \n".format(v.file,k)
         await ctx.send(text)
+    
+    @main_msg.command(name="lang-sort",hidden=True)
+    @commands.check(reloads.check_admin)
+    async def resort_langs(self,ctx:commands.Context,*,lang:str=None):
+        """Trie par ordre alphabétique les fichiers de traduction"""
+        all_files = sorted([x.replace('fcts/lang/','').replace('.json','') for x in glob("fcts/lang/*.json", recursive=False)])
+        if isinstance(lang,str) and ' ' in lang:
+            langs = lang.split(' ')
+        elif lang==None:
+            langs = all_files
+        elif lang in all_files:
+            langs = [lang]
+        else:
+            return await ctx.send('Langue invalide. Liste des langues actuelles : '+" - ".join(all_files))
+        output = 0
+        for l in langs:
+            with open(f'fcts/lang/{l}.json','r') as f:
+                temp = json.load(f)
+            with open(f'fcts/lang/{l}.json','w') as f:
+                json.dump(temp, f,  ensure_ascii=False, indent=4, sort_keys=True)
+            output += 1
+        await ctx.send('{o} fichier{s} trié{s}'.format(o=output,s='' if output<2 else 's'))
 
     @main_msg.command(name="guilds",aliases=['servers'],hidden=True)
     @commands.check(reloads.check_admin)
