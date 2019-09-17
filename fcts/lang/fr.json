@@ -1,8 +1,8 @@
 {
     "activity": {
         "listen": "écoute",
-        "play": "joue à",
         "nothing": "rien",
+        "play": "joue à",
         "stream": "stream",
         "watch": "regarde"
     },
@@ -263,6 +263,7 @@
         ],
         "piece-1": "Raté, c'est tombé sur la tranche !",
         "react-0": "Impossible de trouver le message correspondant. Il faut rentrer l'ID du message en 1er argument, et l'émoji en 2e :upside_down:\n Vérifiez aussi que je possède la permission de lire l'historique des messages !",
+        "say-no-perm": "Vous ne possédez pas la permission d'envoyer des messages dans le salon {channel}",
         "thanos": [
             "{0} a été épargné par Thanos",
             "Thanos a décidé de réduire {0} en cendres. Pour le bien de l'humanité..."
@@ -560,16 +561,8 @@
                 "4"
             ],
             [
-                "Combien font 2+7 ?",
-                "9"
-            ],
-            [
                 "Comment s'appelle le système d'exploitation des téléphones de la marque Apple ?",
                 "iOS"
-            ],
-            [
-                "Comment s'appelle le système d'exploitation des téléphones de la marque Samsung ? ",
-                "Android"
             ],
             [
                 "L'émoji 🐷 représente : un insecte, légume, animal ?",
@@ -584,8 +577,8 @@
                 "pomme"
             ],
             [
-                "Que donne le produit de 2 par 3 ?",
-                "6"
+                "Que donne le produit de 2 par 5 ? (en chiffres)",
+                "10"
             ],
             [
                 "Quel est le discriminant situé après votre pseudo discord ? (sans le #)",
@@ -625,6 +618,8 @@
     "morpion": {
         "already-playing": "Vous avez déjà une partie en cours !",
         "bot-begin": "Allez hop, je commence !",
+        "game-removed": "Vous avez correctement quitté la partie",
+        "not-playing": "Vous n'avez aucune partie en cours",
         "nul": "Match nul, personne n'a gagné...",
         "pion-1": "Il y a déjà un pion sur cette case !",
         "pion-2": "Case saisie invalide !",
@@ -632,9 +627,7 @@
         "too-late": "Vous avez mis trop de temps à vous décider. Fin de la partie !",
         "user-begin": "{}, à toi de commencer !",
         "win-1": "Bien joué, {} a gagné !",
-        "win-2": "J'ai gagné ! Fin du match !",
-        "not-playing": "Vous n'avez aucune partie en cours",
-        "game-removed": "Vous avez correctement quitté la partie"
+        "win-2": "J'ai gagné ! Fin du match !"
     },
     "partners": {
         "added-partner": "Le partenaire a bien été ajouté",

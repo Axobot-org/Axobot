@@ -1,7 +1,7 @@
 {
     "activity": {
-        "play": "juego",
         "nothing": "nada",
+        "play": "juego",
         "watch": "ver"
     },
     "admin": {

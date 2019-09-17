@@ -1,8 +1,8 @@
 {
     "activity": {
         "listen": "Du hörst",
-        "play": "spielt gerade",
         "nothing": "Nichts",
+        "play": "spielt gerade",
         "watch": "Schaut gerade"
     },
     "admin": {

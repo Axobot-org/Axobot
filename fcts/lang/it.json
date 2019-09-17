@@ -1,8 +1,8 @@
 {
     "activity": {
         "listen": "Ascoltando",
-        "play": "Giocando a",
         "nothing": "Nulla",
+        "play": "Giocando a",
         "stream": "trasmettendo",
         "watch": "Guardando"
     },

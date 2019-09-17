@@ -1,8 +1,8 @@
 {
     "activity": {
         "listen": "listenin",
-        "play": "playin",
         "nothing": "nothin",
+        "play": "playin",
         "stream": "streamin",
         "watch": "watchin"
     },
@@ -114,6 +114,10 @@
             "is_support_staff": [
                 "You're a member of the bot staff",
                 "U must be part of the bot staff"
+            ],
+            "is_translator": [
+                "Ur part ov the translators team",
+                "U must :b: part of translators team"
             ],
             "verify_role_exists": [
                 "A verification role hav bee setted up",
@@ -259,31 +263,35 @@
         ],
         "piece-1": "Faild, 't fell on teh edge!",
         "react-0": "Unable 2 find teh correspondin mssage. U must giv teh mesage ID in da furst argumnt, an teh emoji in da secondz :upside_down:\n Also check dat I haz permishun 2 reed msgs hystory!",
+        "say-no-perm": "LMAO dont try 2 cheat and first get perm in {channel} pls",
         "thanos": [
             "{0} wus spard by Thanos",
             "Tahnos decidd 2 reduce {0} to ashes. 4 the gud ov humanity...."
         ],
         "tip-list": [
-            "Did you know that? There are several languages for the bot, including one very fun to test: lolcat",
+            "Did you know? There are several languages for the bot, including one very fun to test: lolcat",
             "Pro-tip: to change the bot language, use the command `config` !",
             "Pro-tip: you will find explanations of each command in the bot documentation, at https://zbot.rtfd.io Maybe even commands you didn't know about!",
-            "Did you know that? The results of the `stats` command hide some servers, such as bot list servers, or internal ones",
-            "Did you know that? This bot was originally designed for a server in a Minecraft community. That's where he made his name, and that's why he has commands on the theme of the game.",
-            "Did you know that? The first version of the bot was written in February 2018, for personal use. At the time there were only two or three easy commands 2 make, like `clear` and `say`",
+            "Did you know? The results of the `stats` command hide some servers, such as bot list servers, or internal ones",
+            "Did you know? This bot was originally designed for a server in a Minecraft community. That's where he made his name, and that's why he has commands on the theme of the game.",
+            "Did you know? The first version of the bot was written in February 2018, for personal use. At the time there were only two or three easy commands 2 make, like `clear` and `say`",
             "Pro-tip: With the `say` command, you can use the emojis from any server where Zbot is, even animated emojis! Just give the emoji as if you were using it yourself",
             "Pro-tip: To use a custom emoji in the `react` command, just give its name. And it works with any emoji!",
             "Pro-tip: With the command `me <text>`, you can make the bot say what you want, with your nickname in front of it! Like, for example, \"*Wumpus likes bananas*\".",
             "Pro-tip: The command `roll Nothing; Nothing; Nothing; Nothing; Nothing; Nothing; Nothing; PAN !` allows you to play Russian roulette! Be careful with that, though, okay?",
             "Pro-tip: If you need help, feel free 2 use the `osekour` command",
-            "Did you know that? Sometimes, the levelup message mentions a random object. To do this, Aragorn1202 had to create a list of 60 of them, including 'a bicorne', 'a cookie' or 'a banana'!",
-            "Did you know that? In the past, Zbot's profile picture was... a creeper.Did you know that? The ZBot Staff is composed of a talented developer Admin, a second admin named after a kibble brand as well as a cat, a Ban hammer and a mushroom!",
-            "Pro-tip: The `say <text>` command is very useful for posting anonymous messages... at least when you have access to it.Pro-tip: The `discordlinks` command will give you all the useful links related to discord!",
-            "Did you know that?  All designs related 2 the bot are made by Adri526#9223, including the huge list of emojis used in the `bigtext` command!",
-            "Did you know that? ZBot takes its name from.... its creator, Z_runner",
+            "Did you know? Sometimes, the levelup message mentions a random object. To do this, Aragorn1202 had to create a list of 60 of them, including 'a bicorne', 'a cookie' or 'a banana'!",
+            "Did you know? In the past, Zbot's profile picture was... a creeper.",
+            "Did you know? The ZBot Staff is composed of a talented developer Admin, a second admin named after a kibble brand as well as a cat, a Ban hammer and a mushroom!",
+            "Pro-tip: The `say <text>` command is very useful for posting anonymous messages... at least when you have access to it.",
+            "Pro-tip: The `discordlinks` command will give you all the useful links related to discord!",
+            "Did you know?  All designs related 2 the bot are made by Adri526#9223, including the huge list of emojis used in the `bigtext` command!",
+            "Did you know? ZBot takes its name from.... its creator, Z_runner",
             "Pro-tip: The bot has a Discord, where you can see the current bugs and vote for the next updates! Use the `about` command to get the invite",
             "Pro-tip: Teh `prefix` command allows you to have a list of the prefixes currently usable in the server",
-            "Did you know that? U can give a description of your server that can be used in other servers, via the `description` option of the `config` command",
-            "Did you know that? @ some special events, itz possible 2 obtain collector xp cards. Don't forget to follow the news on the officially cool server!"
+            "Did you know? U can give a description of your server that can be used in other servers, via the `description` option of the `config` command",
+            "Did you know? @ some special events, itz possible 2 obtain collector xp cards. Don't forget to follow the news on the officially cool server!",
+            "> This too will pass\n*(do you have the reference?)*"
         ],
         "unafk-done": "U'rn't anymore AFK",
         "uninhabited-city": "Tish place have 0 inhabitant :upside_down:",
@@ -575,6 +583,30 @@
             [
                 "Which of these words begins with D? `bathtub`, `crow`, `galion` or `drawing`",
                 "drawing"
+            ],
+            [
+                "What is the name of this server?",
+                "_special_servername"
+            ],
+            [
+                "What does the emoji :dark_sunglasses: represent? `sunglasses`, `twitter logo` or `eggplant`?",
+                "pig"
+            ],
+            [
+                "What is the first letter of `Groot`?",
+                "g"
+            ],
+            [
+                "What does the product 3x3 give?",
+                "9"
+            ],
+            [
+                "Pls write `cat`",
+                "cat"
+            ],
+            [
+                "Pls write `lol`",
+                "lol"
             ]
         ],
         "warn-1": "Nice, membr `{}` haz beeen warnd 4 reezon `{}`",
@@ -586,6 +618,8 @@
     "morpion": {
         "already-playing": "U already are ingame!",
         "bot-begin": "Hop, I'll start!",
+        "game-removed": "U have correctly let the game",
+        "not-playing": "U dont have any play in progress",
         "nul": "Draw, nobody won... rip",
         "pion-1": "There's already a pawn on dat cell!",
         "pion-2": "Invalid input!",
@@ -593,9 +627,7 @@
         "too-late": "U was too long! End of the game!",
         "user-begin": "{}, u begin!",
         "win-1": "GG, {} won!",
-        "win-2": "I won! Game over!",
-        "not-playing": "U dont have any play in progress",
-        "game-removed": "U have correctly let the game"
+        "win-2": "I won! Game over!"
     },
     "partners": {
         "added-partner": "Tish partner has bee corectly added",
@@ -852,7 +884,8 @@
         "change-xp-ok": "XP of teh user {user} have been set 2 {xp}xp!",
         "default_levelup": [
             "Hey, {user} has just reached **level {level}**! Keep this way!",
-            "Crossing to level {level}{user}. Attack and defense increased by 1.Thanks to this level {level}, you can finally use the legendary {random} user {user}",
+            "Crossing to level {level}{user}. Attack and defense increased by 1.",
+            "Thanks to this level {level}, you can finally use the legendary {random} user {user}",
             "Speech level {level}, {user}. Be careful not to scream too loudly.",
             "{user} is flying to the Top 1 with their level {level}!",
             "But, wouldn't it be a new level for {user}? Level {level}!",
@@ -892,8 +925,8 @@
             "this portal gun",
             "this mushroom",
             "this magic wand",
-            " this craft table",
-            " this cow",
+            "this craft table",
+            "this cow",
             "this window",
             "this wallpaper",
             "this emoji",
@@ -927,7 +960,24 @@
             "this French baguette",
             "this cheese",
             "this ball",
-            "tish wool pelota"
+            "tish wool pelota",
+            "this cat",
+            "this cat",
+            "this aieygfiu",
+            "this lugafEO",
+            "this dumb cat",
+            "this cool cat",
+            "this ||LMAO||",
+            "this ||hi dude||",
+            "this amazing cat",
+            "this idkwhat-anddontaskme",
+            "this item",
+            "this... uh idk",
+            "this wool blanket",
+            "those cats",
+            "those soo cuuuuuuute cats",
+            "this random thing",
+            "this cool thing"
         ],
         "low-page": "Oops, I can't display a negative page!",
         "no-bot": "Impossible 2 modify the XP ov a robot!",
