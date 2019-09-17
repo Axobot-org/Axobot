@@ -352,16 +352,19 @@ You can specify a verification limit by adding a number in argument (up to 1.000
     @commands.command(name="say")
     @commands.guild_only()
     @commands.check(can_say)
-    async def say(self,ctx,channel:typing.Optional[discord.TextChannel] = None,*,text):
+    async def say(self,ctx:commands.Context,channel:typing.Optional[discord.TextChannel] = None,*,text):
         """Let the bot say something for you
         You can specify a channel where the bot must send this message. If channel is None, the current channel will be used"""
+        if channel==None:
+            channel = ctx.channel
+        elif not (channel.permissions_for(ctx.author).read_messages and channel.permissions_for(ctx.author).send_messages):
+            await ctx.send(await self.translate(ctx.guild,'fun','say-no-perm',channel=channel.mention))
+            return
         await self.say_function(ctx,channel,text)
     
-    async def say_function(self,ctx,channel,text):
+    async def say_function(self,ctx:commands.Context,channel:discord.TextChannel,text:str):
         try:
             text = await self.bot.cogs["UtilitiesCog"].clear_msg(text,everyone = not ctx.channel.permissions_for(ctx.author).mention_everyone, ctx=ctx)
-            if channel==None:
-                channel = ctx.channel
         except Exception as e:
             await self.bot.cogs['ErrorsCog'].on_error(e,ctx)
             return
@@ -376,6 +379,7 @@ You can specify a verification limit by adding a number in argument (up to 1.000
     @say.error
     async def say_error(self,ctx,error):
         if str(error)!='The check functions for command say failed.':
+            print("DUH",error)
             await self.say_function(ctx,None,ctx.view.buffer.replace(ctx.prefix+ctx.invoked_with,"",1))
 
     @commands.command(name="me",hidden=True)
