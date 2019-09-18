@@ -158,7 +158,10 @@ class RolesReact(commands.Cog):
             role = ctx.guild.get_role(l[0]['role'])
             await ctx.send(await self.translate(ctx.guild.id,'roles_react','rr-removed',r=role,e=emoji))
             if len(l)<2:
-                self.guilds_which_have_roles.remove(ctx.guild.id)
+                try:
+                    self.guilds_which_have_roles.remove(ctx.guild.id)
+                except KeyError:
+                    pass
         
     async def create_list_embed(self,liste:list,guild:discord.Guild) -> (str,list):
         """Create a text with the roles list"""
