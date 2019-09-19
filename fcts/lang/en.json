@@ -22,6 +22,7 @@
             "unclassed": "Unclassed",
             "users-info": "Users information"
         },
+        "checks": "Requirements:",
         "check-desc": {
             "bot_has_permissions": [
                 "The bot has sufficient permissions",
@@ -131,6 +132,7 @@
         "no-desc-cog": "No description for this cog.",
         "no-subcmd": "The command `{0.name}` has no subcommand",
         "not-enabled": ":warning: This command is disabled",
+        "subcmds": "Subcommands:",
         "subcmd-not-found": "This command has no subcommand named \"{}\""
     },
     "blurple": {
@@ -348,7 +350,6 @@
         "oui": "yes",
         "server": "server",
         "servers": "servers",
-        "subcmds": "subcommands",
         "unknown": "Unknown",
         "version": "version"
     },

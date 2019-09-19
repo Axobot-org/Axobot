@@ -235,7 +235,7 @@ If the bot can't send the new command format, it will try to send the old one.""
         # Subcommands
         if type(cmd)==commands.core.Group:
             syntax += " ..."
-            subcmds = "__{}__".format(str(await self.translate(ctx.channel,"keywords","subcmds")).capitalize())
+            subcmds = "__{}__".format(str(await self.translate(ctx.channel,"aide","subcmds")).capitalize())
             sublist = list()
             for x in sorted(cmd.all_commands.values(),key=self.sort_by_name):
                 try:
@@ -254,7 +254,7 @@ If the bot can't send the new command format, it will try to send the old one.""
         # Aliases
         aliases = " - ".join(cmd.aliases)
         if len(aliases)>0:
-            aliases = await self.translate(ctx.channel,"aide","aliases") + " " + aliases
+            aliases = "__" + await self.translate(ctx.channel,"aide","aliases") + "__ " + aliases
         # Is enabled
         enabled = ""
         if not cmd.enabled:
@@ -290,7 +290,7 @@ If the bot can't send the new command format, it will try to send the old one.""
                         print(check_name,str(c))
                 except Exception as e:
                     await self.bot.cogs["ErrorsCog"].on_error(e,ctx)
-        checks = '\n'.join(checks)
+        checks = "__" + await self.translate(ctx.channel,'aide','checks') + "__\n" + '\n'.join(checks)
         # Module
         category = "unclassed"
         for k,v in self.commands_list.items():
@@ -298,11 +298,11 @@ If the bot can't send the new command format, it will try to send the old one.""
                 category = k
                 break
         category = (await self.translate(ctx.channel,'keywords','category')).capitalize() + ": " + (await self.translate(ctx.channel,"aide","categories"))[category]
-        answer = f"**{prefix}{syntax}\n\n{desc}\n"
+        answer = f"**{prefix}{syntax}\n\n{desc}\n\n"
         if len(subcmds)>0:
             answer += "\n"+subcmds+"\n"
         if len(aliases)>0:
-            answer += "\n"+aliases
+            answer += "\n"+aliases+"\n"
         if len(enabled)>0:
             answer += enabled
         if len(checks)>0:

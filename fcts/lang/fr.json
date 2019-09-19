@@ -22,6 +22,7 @@
             "unclassed": "non classé",
             "users-info": "Infos sur les utilisateurs"
         },
+        "checks": "Conditions :",
         "check-desc": {
             "bot_has_permissions": [
                 "Le bot possède les permissions suffisantes",
@@ -131,6 +132,7 @@
         "no-desc-cog": "Aucune description pour ce module.",
         "no-subcmd": "La commande {0.name} n'a aucune sous-commande",
         "not-enabled": ":warning: Cette commande est désactivée",
+        "subcmds": "Sous-commandes :",
         "subcmd-not-found": "Cette commande ne possède aucune sous-commande nommée \"{}\""
     },
     "blurple": {
@@ -348,7 +350,6 @@
         "oui": "oui",
         "server": "serveur",
         "servers": "serveurs",
-        "subcmds": "sous-commandes",
         "unknown": "Inconnu",
         "version": "version"
     },

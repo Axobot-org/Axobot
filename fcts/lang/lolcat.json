@@ -22,6 +22,7 @@
             "unclassed": "random things :shrug:",
             "users-info": "things 'bout cats/people"
         },
+        "checks": "things needd:",
         "check-desc": {
             "bot_has_permissions": [
                 "The bot have enough perms",
@@ -131,6 +132,7 @@
         "no-desc-cog": "No more discripton for dis cogg.",
         "no-subcmd": "Teh kommand `{0.name}` had not sub~~scribe~~commanD",
         "not-enabled": ":warning: This command iz def not enable",
+        "subcmds": "Subcommands:",
         "subcmd-not-found": "Thiz commnd have no sUbcommant newmed \"{}\""
     },
     "blurple": {
@@ -348,7 +350,6 @@
         "oui": "yup",
         "server": "nice place",
         "servers": "guilds",
-        "subcmds": "subcommands",
         "unknown": "No known",
         "version": "vershun"
     },
