@@ -805,28 +805,45 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
     @commands.command(name='changelog',aliases=['changelogs'])
     async def changelog(self,ctx:commands.Context,version:str=None):
         """Get the changelogs of the bot"""
-        if version==None:
+        if version=='list':
+            cnx = self.bot.cnx_frm
             if not ctx.bot.beta:
-                query = "SELECT *, CONVERT_TZ(`release_date`, @@session.time_zone, '+00:00') AS `utc_release` FROM `changelogs` WHERE beta=False ORDER BY release_date DESC LIMIT 1"
+                query = "SELECT `version`, CONVERT_TZ(`release_date`, @@session.time_zone, '+00:00') AS `utc_release` FROM `changelogs` WHERE beta=False ORDER BY release_date"
             else:
-                query = f"SELECT *, CONVERT_TZ(`release_date`, @@session.time_zone, '+00:00') AS `utc_release` FROM `changelogs` ORDER BY release_date DESC LIMIT 1"
+                query = f"SELECT `version`, CONVERT_TZ(`release_date`, @@session.time_zone, '+00:00') AS `utc_release` FROM `changelogs` ORDER BY release_date"
+            cursor = cnx.cursor(dictionary=True)
+            cursor.execute(query)
+            results = list(cursor)
+            cursor.close()
+            desc = "\n".join(reversed(["**v{}:** {}".format(x['version'],x['utc_release']) for x in results]))
+            time = discord.Embed.Empty
+            title = await self.translate(ctx.channel,'infos','changelogs-index')
         else:
-            query = f"SELECT *, CONVERT_TZ(`release_date`, @@session.time_zone, '+00:00') AS `utc_release` FROM `changelogs` WHERE `version`='{version}'"
-            if not ctx.bot.beta:
-                query += " AND `beta`=0"
-        cnx = self.bot.cnx_frm
-        cursor = cnx.cursor(dictionary=True)
-        cursor.execute(query)
-        results = list(cursor)
-        cursor.close()
+            if version==None:
+                if not ctx.bot.beta:
+                    query = "SELECT *, CONVERT_TZ(`release_date`, @@session.time_zone, '+00:00') AS `utc_release` FROM `changelogs` WHERE beta=False ORDER BY release_date DESC LIMIT 1"
+                else:
+                    query = f"SELECT *, CONVERT_TZ(`release_date`, @@session.time_zone, '+00:00') AS `utc_release` FROM `changelogs` ORDER BY release_date DESC LIMIT 1"
+            else:
+                query = f"SELECT *, CONVERT_TZ(`release_date`, @@session.time_zone, '+00:00') AS `utc_release` FROM `changelogs` WHERE `version`='{version}'"
+                if not ctx.bot.beta:
+                    query += " AND `beta`=0"
+            cnx = self.bot.cnx_frm
+            cursor = cnx.cursor(dictionary=True)
+            cursor.execute(query)
+            results = list(cursor)
+            cursor.close()
+            if len(results) > 0:
+                desc = results[0][await self.translate(ctx.channel,'current_lang','current')]
+                time = results[0]['utc_release']
+                title = (await self.translate(ctx.channel,'keywords','version')).capitalize() + ' ' + results[0]['version']
         if len(results)==0:
             await ctx.send(await self.translate(ctx.channel,'infos','changelog-notfound'))
         elif isinstance(ctx.channel,discord.DMChannel) or ctx.channel.permissions_for(ctx.guild.me).embed_links:
-            v = (await self.translate(ctx.channel,'keywords','version')).capitalize() + ' ' + results[0]['version']
-            emb = ctx.bot.cogs['EmbedCog'].Embed(title=v,desc=results[0][await self.translate(ctx.channel,'current_lang','current')],time=results[0]['utc_release'],color=ctx.bot.cogs['ServerCog'].embed_color)
+            emb = ctx.bot.cogs['EmbedCog'].Embed(title=title,desc=desc,time=time,color=ctx.bot.cogs['ServerCog'].embed_color)
             await ctx.send(embed=emb)
         else:
-            await ctx.send(results[0][await self.translate(ctx.channel,'current_lang','current')])
+            await ctx.send(desc)
         
 
 def setup(bot):

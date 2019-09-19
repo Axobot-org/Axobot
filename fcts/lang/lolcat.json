@@ -304,6 +304,7 @@
         "bitly_long": "Slow link: {url}",
         "bitly_nobit": "HAHA NOPE, dat's not a bit.ly link!",
         "bitly_short": "Quick linq: {url}",
+        "changelogs-index": "List of indexed versions",
         "changelog-notfound": "Srry but i cannot find das version",
         "discordlinks": [
             "Servers status",

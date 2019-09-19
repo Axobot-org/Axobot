@@ -304,6 +304,7 @@
         "bitly_long": "Original URL: {url}",
         "bitly_nobit": "This address is not a bit.ly link!",
         "bitly_short": "Shortened URL: {url}",
+        "changelogs-index": "List of indexed versions",
         "changelog-notfound": "Unable to find this version",
         "discordlinks": [
             "Servers status",
