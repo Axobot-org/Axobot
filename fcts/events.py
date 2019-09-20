@@ -326,7 +326,7 @@ class Events(commands.Cog):
         if self.bot.beta:
             return
         t = time.time()
-        answers = ['None','None','None']
+        answers = ['None','None','None','None']
         self.bot.log.info("[DBL] Envoi des infos sur le nombre de guildes...")
         guildCount = len(self.bot.guilds)
         session = aiohttp.ClientSession(loop=self.bot.loop)
@@ -373,6 +373,30 @@ class Events(commands.Cog):
         emb = self.bot.cogs["EmbedCog"].Embed(desc='**Guilds count updated** in {}s ({})'.format(round(time.time()-t,3),'-'.join(answers)),color=7229109).update_timestamp().set_author(self.bot.user)
         await self.bot.cogs["EmbedCog"].send([emb],url="loop")
         self.dbl_last_sending = datetime.datetime.now()
+
+    async def partners_loop(self):
+        """Update partners channels (every 7 hours)"""
+        t = time.time()
+        self.partner_last_check = datetime.datetime.now()
+        channels_list = await self.bot.cogs['ServerCog'].get_server(criters=["`partner_channel`<>''"],columns=['ID','partner_channel','partner_color'])
+        self.bot.log.info("[Partners] Rafraîchissement des salons ({} serveurs prévus)...".format(len(channels_list)))
+        count = [0,0]
+        for guild in channels_list:
+            try:
+                chan = guild['partner_channel'].split(';')[0]
+                if not chan.isnumeric():
+                    continue
+                chan = self.bot.get_channel(int(chan))
+                if chan==None:
+                    continue
+                count[0] += 1
+                count[1] += await self.bot.cogs['PartnersCog'].update_partners(chan,guild['partner_color'])
+            except Exception as e:
+                await self.bot.cogs['ErrorsCog'].on_error(e,None)
+        emb = self.bot.cogs["EmbedCog"].Embed(desc='**Partners channels updated** in {}s ({} channels - {} partners)'.format(round(time.time()-t,3),count[0],count[1]),color=10949630).update_timestamp().set_author(self.bot.user)
+        await self.bot.cogs["EmbedCog"].send([emb],url="loop")
+        
+            
 
     async def partners_loop(self):
         """Update partners channels (every 7 hours)"""
