@@ -248,11 +248,11 @@ def main():
         await utilities.print2('\nBot connecté')
         await utilities.print2("Nom : "+client.user.name)
         await utilities.print2("ID : "+str(client.user.id))
-        serveurs = []
-        for i in client.guilds:
-            serveurs.append(i.name)
-        ihvbsdi="Connecté sur ["+str(len(client.guilds))+"] "+", ".join(serveurs)
-        await utilities.print2(ihvbsdi)
+        if len(client.guilds) < 200:
+            serveurs = [x.name for x in client.guilds]
+            await utilities.print2("Connecté sur ["+str(len(client.guilds))+"] "+", ".join(serveurs))
+        else:
+            await utilities.print2("Connecté sur "+str(len(client.guilds))+" serveurs")
         await utilities.print2(time.strftime("%d/%m  %H:%M:%S"))
         await utilities.print2('------')
         await asyncio.sleep(3)
