@@ -59,9 +59,11 @@ If you want to know the bot modification log, what has been changed in the last 
 Crab
 ----
 
-**Syntax:** :code:`crab` or :code:`morpion`
+**Syntax:** :code:`crab` (alias :code:`morpion`) or :code:`crab leave`
 
 Yes, we did it! A first mini-game for our bot, the crab! You can play against the bot in this fast and simplistic game, just by entering the command and following the instructions (enter a number between 1 and 9 corresponding to the chosen cell). And the best part is that the only special permission required is to use the external emojis!
+
+By using the `leave` argument you can instantly stop a game. This can be useful if you are stuck by a bug and can't join a game for example.
 
 
 -----
