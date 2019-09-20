@@ -25,7 +25,7 @@ author = 'ZRunner'
 # The short X.Y version
 version = '3.5'
 # The full version, including alpha/beta/rc tags
-release = '3.5.6'
+release = '3.5.7'
 
 
 # Example configuration for intersphinx: refer to the Python standard library.
@@ -52,7 +52,6 @@ extensions = [
     "sphinx.ext.viewcode",
     "sphinx.ext.napoleon",
     "sphinxcontrib.asyncio",
-    "sphinx_autodoc_napoleon_typehints",
 ]
 
 # Add any paths that contain templates here, relative to this directory.

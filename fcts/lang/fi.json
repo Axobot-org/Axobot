@@ -1,19 +1,13 @@
 {
     "activity": {
         "listen": "kuuntelee",
+        "nothing": "Ei mitään",
         "play": "soittaa",
-        "rien": "Ei mitään",
         "stream": "striimaa",
         "watch": "katsoo"
     },
     "admin": {
-        "bug-0": "Bugi #{} ei löytynyt",
-        "change_game-0": "Valitse *play*, *watch*, *listen* tai *stream* seurattu nimellä",
-        "emergency": "Hätätilanne on havaittu tälle botille. Tämä saattaa olla koska joku yrittää päästä sisään minun koodiini.\nJotta voidaan välttää sattumia, Minut oli pakotettu lähtemään kaikilta servuilta heti, missä olin toivoen että ei ole liian myöhäistä.\nLisätietoja tästä hätätilaanteesta mene minun servulleni: https://discord.me/z_bot (Katso linkki dokumenttiin jos linkki ei toimi enää: https://zbot.rtfd.io)",
-        "msg_2-0": "Operaatio käynnissä...",
-        "msg_2-1": "Ei vaikuttavia käyttäjiä",
-        "msg_2-2": "1 vaikuttanut käyttäjä",
-        "msg_2-3": "vaikutetut käyttäjät"
+        "emergency": "Hätätilanne on havaittu tälle botille. Tämä saattaa olla koska joku yrittää päästä sisään minun koodiini.\nJotta voidaan välttää sattumia, Minut oli pakotettu lähtemään kaikilta servuilta heti, missä olin toivoen että ei ole liian myöhäistä.\nLisätietoja tästä hätätilaanteesta mene minun servulleni: https://discord.me/z_bot (Katso linkki dokumenttiin jos linkki ei toimi enää: https://zbot.rtfd.io)"
     },
     "aide": {
         "aliases": "Lyhenteet:",
@@ -133,10 +127,6 @@
         "cmd-not-found": "Komentoa  \"{}\" ei ole nimetty",
         "embed_title": "Käytettävissä olevat komennot käyttäjälle {u}",
         "footer": "Viestitä {}help komento niin saat lisätietoja tietyistä komennoista",
-        "mods": [
-            "Valvoja:",
-            "toinen:"
-        ],
         "no-desc-cmd": "Ei lisätietoja tästä komennosta.",
         "no-desc-cog": "Ei lisätietoja tästä cog:stä.",
         "no-subcmd": "komenolla `{0.name}`ei ole toissijaista komentoa",
@@ -164,7 +154,7 @@
     },
     "bvn": {
         "aide": "__**Tervetuloa liittymis & lähtö viesti moduuliin**__\nTätä moduulia käytetään konfiguroimaan automaattinen viesti joka kerta kun joku tulee tai lähtee servultasi.\n__** Konfiguraatio**__\n`1-` Jotta voit konfiguroida mihin nämä viestit lähetetään, viestitä `{p}config change welcome_channel` lisättynä kanava.\n`2-` Jotta voit konfiguroida viestin, kirjoita  `{p}config change <welcome|leave> <message>`. Tälle viestille voit käyttää variableja:\n - `{user}` Tägää käyttäjän\n - `{server}` näyttää serverin nimen\n - `{owner}` näyttää serverin omistajan nimen\n- `{member_count}` näyttää tämänhetkisen käyttäjämäärän",
-        "error-give-role": "Mahdotonta antaa roolia '{r}' uudelle jäsenelle {u}: ei tarpeeksi käyttöoikeuksia Varmista että roolini on ylempänä kuin rooli jota yritän antaa ja että minulla on 'Hallinnoi rooleja' käyttöoikeudet."
+        "error-give-roles": "Mahdotonta antaa rooli '{r}' uudelle jäsenelle {u}: ei tarpeeksi käyttöoikeuksia Varmista että minulla on 'Hallinnoi Rooleja' käyttöoikeudet ja että minun rooli on annettavan roolin yläpuolella"
     },
     "cases": {
         "cases-0": "{} tapaukset löydetty: ({}-{})",
@@ -310,21 +300,15 @@
         "bitly_long": "Alkuperäinen URL: {url}",
         "bitly_nobit": "Tämä linkki ei ole bit.ly linkki!",
         "bitly_short": "Lyhennetty URL: {url}",
-        "changelogs-notfound": "Mahdotonta löytää tämä versio",
-        "discordlinks": {
-            "Discord": "ToS https://dis.gd/tos",
-            "Discord käyttöehdot ToS": "https://dis.gd/tos",
-            "Ehdota jotain Discordille ": "https://dis.gd/feedback",
-            "Itsebotti artikkeli": "https://support.discordapp.com/hc/articles/115002192352",
-            "Käyttöehdot botin tekijöille": "https://discordapp.com/developers/docs/legal",
-            "Palvelin tila": "https://dis.gd/status",
-            "Raportoi ongelma/ käyttäjä": "https://dis.gd/report",
-            "Report": "a bug/ a user https://dis.gd/report",
-            "Selfbots": "article https://support.discordapp.com/hc/articles/115002192352",
-            "Servers": "status https://dis.gd/status",
-            "Suggest": "something to Discord https://dis.gd/feedback",
-            "ToS": "for bot devs https://discordapp.com/developers/docs/legal"
-        },
+        "changelog-notfound": "Mahdotonta löytää tämä versio",
+        "discordlinks": [
+            "Palvelimien tila",
+            "Discord Käyttöehdot",
+            "Raportoi bugi/jäsen",
+            "Ehdota jotain Discordille",
+            "Itsebotti artikkeli",
+            "Käyttöehdot botin tekijöille"
+        ],
         "docs": "Tässä on linkki botin dokumenttiin:",
         "prefix": "Lista kaikista käytettävissä olevista etuliitoista:",
         "stats": "**Bot versio:** {bot_v} \n**Kaikkien palvelimien numero missä olen:** {s_count} \n**Numero kaikista näkyvistä jäsenistä:** {m_count} ({b_count} **botit**)\n**Numero koodi riveistä:** {l_count}\n**Käytettyjä kieliä:** {lang}\n** {p_v} \n**Versio `discord.py`stä:** {d_v} \n**Ladataan RAMia:** {ram} GB \n**Ladataan CPU:ssa:** {cpu} % \n**API viive aika:** {api} ms\n**Kaikki xp kerätty:** {xp}",
@@ -401,9 +385,10 @@
     },
     "logs": {
         "ban": "Käyttäjälle {member} on annettu porttikielto (syyllä: {reason} | keissi #{case})",
+        "case-del": "The case #{id} has been deleted (concerning {user})",
+        "case-reason": "Tapaus #{id} on muokattu:\\n`Vanha syy:` {old}\\n`Uusi syy:` {new}",
         "clear": "{number} viestiä poistettu kanavalla {channel}",
         "d-autounmute": "automaattinen mykistyksen poisto",
-        "d-gived_roles": "Automaattinen tapahtuma (configuraatio annettiin_roolit)",
         "d-invite": "Automaattinen valvoja (Discord kutsu linkki)",
         "d-memberchan": "Automaattinen tapahtuma (configuraatio käyttäjänlaskelma)",
         "d-unban": "unbanned by {}",
@@ -426,14 +411,12 @@
             "Nimi",
             "Tunniste",
             "Tyyppi",
+            "Toiminta",
+            "Aikuinen",
+            "Lapsi",
             "Lisätty versiossa"
         ],
-        "block-fields": [
-            "Tunniste",
-            "Työväline joka voi rikkoa sen",
-            "Lisätty versiossa",
-            "Vahingoitus pisteet"
-        ],
+        "adv-help": "Tämä komento antaa tietoa mistä tahansa edistyksestä pelistä Minecraft. Lähetä edistyksen nimi tai tunniste.",
         "block-help": "Tämä komento antaa sinun saamaan tietoa mistä tahansa Minecraft palikasta. Voit antaa sen nimen, Ranskaksi tai Englanniksi. Lähetä `!mc block <nimi>`",
         "cant-embed": "En voi lähettää upotettua linkkiä. Varmista että minulla on \"Upota linkkejä\" käyttöoikeudet.",
         "cmd-fields": [
@@ -449,25 +432,172 @@
             "Tunniste",
             "Tyyli",
             "Terveys Pisteet",
-            "Hyökkäys Pisteet",
-            "Kokemus Pisteet Julkaistu Kuolemaan",
+            "Hyökkäys Pisteet"
+        ],
+        "entity-help": "Tämä komento antaa sinulle mahdollisuuden saada tietoa mistä tahansa Minecraft entiteetistä. Voit antaa sen täyden tai osittaisen nimen, Ranskaksi tai Englanniksi, tai jopa sen tunnisteen. Lähetä `!mc entity <nimi>`",
+        "item-fields": [
+            "Tunniste",
+            "Koko kasasta",
+            "Luova muoto välilehti",
+            "Vahingoitus pisteet",
+            "Kestävyys pisteet",
+            "Työkalu joka voi rikkoa sen",
+            "Mobit jotka voivat tiputtaa tämän esineen",
             "Lisätty versiossa"
         ],
+        "item-help": "Tämä komento antaa sinulle mahdollisuuden saada tietoa mistä tahansa Minecraft esineestä. Voit antaa sen täyden tai osittaisen nimen, Ranskaksi tai Englanniksi, tai jopa sen tunnisteen. Lähetä `!mc item <nimi>`",
+        "mojang_desc": {
+            "account.mojang.com": "Mojang käyttäjä johtajien sivu",
+            "api.mojang.com": "API palvelu jonka Mojang antaa",
+            "authserver.mojang.com": "Todennus palvelin",
+            "minecraft.net": "Oikea netti sivu",
+            "mojang.com": "Oikea netti sivu",
+            "session.minecraft.net": "Monipeli istunnot",
+            "sessionserver.mojang.com": "Monipeli istunnot"
+        },
+        "names": [
+            "Palikka",
+            "Entiteetti",
+            "Esine",
+            "Komento",
+            "Ennakkosuoritus"
+        ],
+        "no-adv": "Mahdotonta löytää tämä ennakkosuoritus",
         "no-api": "Virhe: Mahdotonta yhdistää API:hin",
+        "no-block": "Mahdotonta löytää tämä palikka",
+        "no-cmd": "Mahdotonta löytää tämä komento",
+        "no-entity": "Mahdotonta löytää tämä entiteetti",
+        "no-item": "Mahdotonta löytää tämä esine",
+        "no-ping": "Virhe: Mahdotonta mainits tätä palvelinta",
         "serv-0": "Numero pelaajista",
         "serv-1": "Lista 20 ensimmäisestä pealaajasta yhdistettynä",
         "serv-2": "Lista paikalla olevista pelaajista",
         "serv-3": "Latency",
         "serv-error": "Ups, tuntematon virhe havaittu. Yritä uudelleen myöhemmin :confused:",
-        "serv-title": "Palvelin tiedot {}"
+        "serv-title": "Palvelin tiedot {}",
+        "success-add": "Viesti palvelimen tiedoista {} on lisätty kanavalle {} !"
     },
     "modo": {
+        "already-mute": "Tämä jäsen on jo mykistetty!",
+        "already-unmute": "Tämä jäsen ei ole mykistetty!",
+        "backup-done": "Varmuuskopio valmis!",
+        "ban": "Jäsen {} annnettiin porttikielto tälle palvelimelle syyllä `{}`",
+        "ban-1": "Näyttää siltä että tämä jäsen on liian korkea että voisin antaa hänelle porttikiellon 🤔",
+        "ban-list-error": "Ups, näyttää siltä että tässä on liian monta jäsentä näytettävänä 😕",
+        "ban-list-title-0": "Lista jäsenistä joilla on porttikielto \"{}\"",
+        "ban-list-title-1": "Lista 45 käyttäjästä joilla on porttikielto tältä palvelimelta \"{}\"",
+        "ban-list-title-2": "Lista 60 käyttäjästä joilla on porttikielto tältä palvelimelta \"{}\"",
+        "ban-noreason": "Sinulle on annettu porttikielto palvelimelta {} 😕",
+        "ban-reason": "Sinulle on annettu porttikielto palvelimelta {}\nSyy : {}",
+        "ban-user-here": "Tällä jäsenellä ei ole porttikieltoa 🙃",
+        "cant-ban": "Käyttöoikeus \"Antaa porttikieltoja jäsenille\" tarvitaan 😕",
+        "cant-emoji": "Ups, minulta puuttuu käyttöoikeus `Hallinnoi hymiöitä` 😕",
+        "cant-find-user": "Ups, ei ole mahdollista löytää käyttäjä **{}**",
+        "cant-kick": "Käyttöoikeus \"Potkia jäseniä\" tarvitaan 😕",
+        "cant-mute": "Ups, näyttää siltä että minulla ei ole tarpeeksi käyttöoikeuksia tohon.... Anna minulle `Hallinnoi rooleja` käyttöoikeudet ennen jatkamista.",
+        "cant-pin": "Ups, minulla ei ole käyttöoikeuksia kiinnittämään viestejä",
         "cant-slowmode": "Oops, I don't have permission to `Manage this channel` :confused:",
+        "caps-lock": "Hei {}, ole varuillaan caps lukosta!",
         "clear-0": "{} viestiä poistettu!",
+        "clear-1": "En voi poistaa nuin vähän viestejä",
+        "clear-nt-found": "Hmm... mahdotonta poistaa näitä viestejä. Discord sanoo minulle että ne ei ole oikeita 🤔",
+        "em-list": "{} (`:{}:`) lisätty {} {}",
+        "em-list-title": "Hymiöt palvelimella {}",
+        "em-private": "[Rajoitettu]",
+        "emoji-renamed": "Hymiö {} on nimetty uudelleen!",
+        "emoji-valid": "Nyt hymiötä {} voi vain käyttää roolit `{}`",
+        "error": "Ups, tuntematon virhe tapahtui. Yritä uudelleen myöhemmin tai ota yhteyttä tukeen",
+        "kick": "{} on potkittu palvelimelta syyllä `{}`",
+        "kick-1": "Näyttää siltä että tämä jäsen on liian korkealla niin en voi potkia häntä ulos 🤔",
+        "kick-noreason": "Sinut on potkittu palvelimelta {} 😕",
+        "kick-reason": "You have just been expelled from the server {} 😕\nSyy : {}",
+        "missing-manage-nick": "Ups, minulta puuttuu \"Hallinnoi nimimerkkejä\" käyttöoikeus!",
+        "mute-1": "{} on mykistetty syyllä `{}`!",
+        "mute-created": "`Mykistetty` rooli tehty!",
+        "mute-high": "Ups, näyttää siltä että `mykistetty` rooli on liian korkealla että voisin antaa sen... Korjaa tämä sillä että laita minun roolini `Mykistetty` roolin yläpuolelle.",
+        "need-manage-messages": "Käyttöoikeus \"Hallinnoi viestejä\" puuttuu 😕",
+        "need-read-history": "Ups, minulta puuttuu \"Lue viestihistoriaa\" käyttöoikeus 😕",
+        "no-bans": "Näyttää siltä että kenelläkään ei ole porttikieltoa",
+        "no-mute": "Ups, näyttää siltä että `mykistetty` rooli ei ole olemassa 😕 Tede yksi ja anna käyttöoikeudet manuallisesti.",
+        "pin-error": "Ups, en voi löytää tota viestiä (Virhe : `{}`)",
+        "pin-error-3": "Ups, mahdotonta kiinnittää tämä viesti (onko sinulla enemmän kuin 50 kiinnitettyä viestiä?). Virhe : `{}`",
+        "react-clear": "En voi löytää tätä viestiä 😕",
+        "role-color": "Rooli {} on vaihtanut väriä!",
+        "role-high": "Ups, tämä rooli on liian korkealla että minä voisin muokata sitä. Siirrä minun roolini `{r}` roolin yli ennen kun yrität uudelleen 😕",
         "slowmode-0": "Tällä kanavalla ei ole enää etanatilaa",
+        "slowmode-1": "Mahdotonta asettaa pituus isommaksi kuin kuusi tuntia",
         "slowmode-2": "{} on nyt etanatilassa. Odota {} sekunttia ennenkun lähetät viestin.",
         "slowmode-3": "Tätä ominaisuutta ei ole",
-        "slowmode-info": "Etanatila tällä kanavalla on {} sekunttia"
+        "slowmode-info": "Etanatila tällä kanavalla on {} sekunttia",
+        "staff-ban": "Et voi antaa porttikieltoa toiselle työntekijälle!",
+        "staff-kick": "Et voi potkia toista työntekijää!",
+        "staff-mute": "Et voi mykistää toista työntekijää",
+        "staff-warn": "Et voi varoittaa toista työntekijää!",
+        "tempban": "Jäsenelle {} on annettu porttikielto tältä palvelimelta  ja sen pituus on {}, syyllä `{}`",
+        "tempmute-1": "Jäsen {} on mykistetty  ja sen pituus on {}, syyllä {}",
+        "unban": "Jäsenellä {} ei ole enään porttikieltoa",
+        "unhoisted": "{c} muokattua nimimerkkiä!",
+        "unmute-1": "Jäsen {} voi taas puhua.",
+        "verify-role-high": "Ups, näyttää siltä että `{r}` on liian korkealla että voisin antaa sen. Laita minun rooli sen yläpuolelle.",
+        "verify_questions": [
+            [
+                "How many seconds are there in a minute?",
+                "60"
+            ],
+            [
+                "How many sides does a triangle have?",
+                "3"
+            ],
+            [
+                "What does the emoji ,pig, represent? a `fish`, `plant` or `pig`?",
+                "porsas"
+            ],
+            [
+                "What does the product of 2 by 3 give?",
+                "6"
+            ],
+            [
+                "What geometric shape has 3 sides?",
+                "Kolmio"
+            ],
+            [
+                "What is 2+7?",
+                "9"
+            ],
+            [
+                "What is the first letter of `Zbot`?",
+                "z"
+            ],
+            [
+                "What is the fourth cardinal point? North, south, east, ...",
+                "länsi"
+            ],
+            [
+                "What is the name of the French bread known all over the world? (one word)",
+                "ruisleipä"
+            ],
+            [
+                "What is the name of this server?",
+                "Srop"
+            ],
+            [
+                "What is the opposite color to black?",
+                "valkoinen"
+            ],
+            [
+                "What is the result of 10 minus 5?",
+                "5"
+            ],
+            [
+                "Which of these words begins with D? `bathtub`, `crow`, `galion` or `drawing`",
+                "piirtää"
+            ]
+        ],
+        "warn-1": "Jäsentä `{}` on varoitettu syyllä `{}`",
+        "warn-bot": "En voi varoittaa bottia ^^",
+        "warn-but-db": "Meidän tietokanta on poissa käytöstä, varoitusta ei voitu tallentaa. Mutta, jäsen sai yksityis viestin",
+        "warn-mp": "Olet saanut varoituksen *{}* palvelimella: \n{}",
+        "wrong-guild": "Ups, näyttää siltä että tämä hymiö ei ole tästä palvelimesta 🤔"
     },
     "morpion": {
         "already-playing": "Sinulla on jo peli menossa!",
@@ -481,9 +611,102 @@
         "win-1": "Hyvin tehty, {} voitti!",
         "win-2": "Minä voitin! Peli päättyi!"
     },
+    "partners": {
+        "added-partner": "Kumppani lisätty",
+        "already-added": "Olet jo lisännyt tämän kumppanin!",
+        "bot-uptime": "Online aika",
+        "changed-desc": "Kuvaus on muokattu!",
+        "changed-invite": "Kutsu on muokattu!",
+        "confirm-bot": "Haluatko varmasti poistaa botin `{}` sinun yhteistyökumppaneista?",
+        "confirm-server": "Haluatko varmasti poistaa palvelimen {} sinun yhteistyökumppaneista?",
+        "del-canceled": "Poistaminen peruutettu",
+        "deleted": "Tämä yhteistykumppani on nyt poistettu sinun listasta",
+        "invalid-bot": "Mahdotonta löytää tämä botti",
+        "invalid-invite": "Pätemätön kutsu",
+        "invalid-partner": "Yhteistyökumppania ei löytynyt",
+        "missing-manage-guild": "Mahdotonta löytää palvelimen kutsu linkit (\"Hallinnoi palvelinta\" käyttöoikeus puuttuu)",
+        "missing-reactions": "Käyttöoikeus \"Lisää hymiöitä puuttuu 😕",
+        "no-channel": "Et asettanut yhteistyökumppani kanavaa",
+        "no-partner": "Sinulla ei ole yhteistyökumppaneita",
+        "no-partner-2": "Ei milläkään palvelimella ole yhteistyötä sinun kanssa",
+        "partners-list": [
+            "Palvelin yhteistyökumppanit",
+            "Listä yhteistyökumppaneista",
+            "Lista palvelimista jossa sinä olet yhteistyökumppani"
+        ],
+        "reloaded": "{} yhteistyökumppanit päivitetty",
+        "unknown-error": "Tuntematon virhe tapahtui. Lisätietoja saat ottamalla yhteyttä tukeen",
+        "unknown-server": "Palvelin yhteistyökumppani ei löytynyt"
+    },
     "perms": {
+        "general": "Yleiset käyttöoikeudet",
         "perms-0": "Jäsen/rooli {} ei löytynyt",
         "perms-1": "**\"{}\" käyttöoikeudet:**\n\n"
+    },
+    "roles_react": {
+        "already-1-rr": "Sinulla on jo rooli tälle hymiölle",
+        "already-dont-have": "Sinulla ei ole tätä roolia",
+        "already-have": "Sinulla on jo tämä rooli",
+        "no-rr": "Tällä hymiöllä ei ole roolia",
+        "not-zbot-embed": "Tällä viestillä ei ole mitään reagoi-rooli upotettua linkkiä",
+        "not-zbot-msg": "Tämä viesti ei ole Zbotin",
+        "role-given": "{r} rooli on annettu",
+        "role-lost": "{r} on otettu pois sinun rooleista",
+        "role-not-in-list": "Tämä rooli ei ole osa listasta",
+        "rr-added": "{r} rooli on lisätty hymiölle {e}",
+        "rr-embed": "Roolit joita voi ottaa",
+        "rr-list": "Lista reagointi rooleista ({n}/{m})",
+        "rr-removed": "{r} roolia ei enään anneta hymiöllä {e}",
+        "too-many-rr": "Olet jo tavoittanut rajan joka on {l} roolia"
+    },
+    "rss": {
+        "change-txt": "Tämän hetken viesti sisältää\n\n```{text}```\nLähetä teksti mitä käytetään kun tehdään uusi viesti. Voit käyttää monia muuttujia, tässä on lista niistä:\n- `{author}`: the author of the post\n- `{channel}`: Discord kanava minne viesti lähetetään\n- `{date}`: lähettämisen aika (UTC)\n- `{link}` tai `{url}`: linkki viestille\n- `{logo}`: hymiö joka esittää viestin tyylin (Twitter, YouTube, jne.)\n- `{mentions}`: lista mainituista rooleista\n- `{title}`: viestin otsikko",
+        "choose-delete": "Valitse virtaus poistolle",
+        "choose-mentions-1": "Valitse virtaus muokkaukselle",
+        "choose-roles": "Mitkä roolit aiotaan mainita?",
+        "delete-success": "Virtaus on onnistuneesti poistettu!",
+        "fail-add": "Virhe tapahtui sinun vastauksen käsittelyssä. Yritä uudelleen myöhemmin, tai ota yhteyttä tukeen (kutsu linkin saat lähettämällä `about` komennon)",
+        "flow-limit": "Suorituskykyjen syystä, et voi seurata enempää kuin {} rss syötettä per palvelin.",
+        "guild-complete": "{} rss suoratoistoa on päivitetty, {} sekunnissa!",
+        "guild-error": "Virhe tapahtui menettelyssä: `{}`\nJos luulet että tämä virhe ei ole sinun, ota yhteyttä tukeen",
+        "guild-loading": "Päivitetään {}",
+        "invalid-flow": "Tämä url on pätemätön (tyhjä tai ei saatavilla) 😕",
+        "invalid-link": "Ups, url osoite on pätemätön tai ei valmis 😕",
+        "list": "*Lähetä numero virtauksesta muokkaukselle*\n\n**Linkki - Tyyli - Kanava - Maininnat**",
+        "list2": "*Lähetä numero virtauksesta poistamiselle*\n\n**Linkki - Tyyli - Kanava**",
+        "mc": "Minecraft",
+        "move-success": "Rss lähetys #{} on liikutettu kanavalle {}!",
+        "no-db": "Tämä ominaisuus on väliaikaisesti poissa käytösta, tietokantamme ei ole tällä hetkellä paikalla. 😕",
+        "no-feed": "Ups, sinulla ei ole mitään rss lähetyksiä joita voisit hallita!",
+        "no-roles": "Mitään roolia ei ole konfiguroitu vielä.",
+        "not-a-role": "Roolia `{}` ei löytynyt. Yritä uudelleen:",
+        "nothing": "En löytänyt mitään tällä haulla 😕",
+        "research-timeout": "Web sivulla kesti liian kauan vastata, minun täytyi keskeyttää prosessi 👀",
+        "roles-0": "Tätä lähetystä on muokattu mainitsemaan roolit {}",
+        "roles-1": "Tätä lähetystä on muokattu että se ei mainitse rooleja",
+        "roles-list": "Tässä on lista rooleista jotka on jo annettu: {}",
+        "success-add": "Rss lähetys tyylillä \"{}\" linkillä <{}> on lisätty kanavalle {} !",
+        "text-success": "Teksti lähetyksestä #{} on muokattu!\n Uusi teksti : \n\n```{}```",
+        "too-long": "Odotit liian kauan, anteeksi ⌛",
+        "tw": "Twitter",
+        "tw-default-flow": "{logo}  | Uusi twiitti käyttäjältä {author}! ({date})\n\n{title}\n\nLinkki: {link}\n\n{mentions}",
+        "tw-form-last": "{logo}  |  Tässä on uusin twiitti käyttäjältä {author}:\nJulkaistu {date}\n\n{title}\n\nLinkki : {url}",
+        "tw-help": "Jos haluat ettiä twitter kanavan, sinun täytyy antaa sen tunniste. Aiot löytää sen url linkin lopussa, yleensä se on käyttäjän nimi. Esimerkiksi, %https://twitter.com/Mc_AsiliS*, sinun täytyy antaa `Mc_AsiliS`.",
+        "twitch": "Twitch",
+        "twitch-default-flow": "{logo}  | Uusi striimi käyttäjältä {author}! ({date})\n\n{title}\n\nLinkki: {link}\n\n{mentions}",
+        "twitch-form-last": "{logo}  | Tässä on viimeisin video käyttäjältä {author}:\n{title}\nJulkaistu {date}\nLinkki : {url}",
+        "use_embed-success": "Ominaisuus on vaihdettu tähän: {v} virralle n°{f}!",
+        "use_embed_false": "Tämä lähetys ei käytä upotettua linkkiä lähettämiseen. Haluatko käyttää upotettua linkkiä? (true/false)",
+        "use_embed_true": "Tämä lähetys ei käytä upotettua linkkiä lähettämiseen. Haluatko käyttää upotettua linkkiä? (true/false)",
+        "web": "Web",
+        "web-default-flow": "{logo}  | Uusi lähetys käyttäjällä {author} ({date}) :\n        {title}\n\n{link}\n\n{mentions}",
+        "web-form-last": "{logo}  |  Tässä on viimeisin lähetys käyttäjältä {author}:\n**{title}**\n*Julkaistu {date}*\nLinkki : {link}",
+        "web-help": "Jos haluat etsiä rss lähetyksen mistä tahansa verkkosivulta, lähetä rss/atom lähetys url paramittarina. Jos lähetys on sopiva, minä aion lähettää sinulle viimeisimmän artikkelin lähetty verkkosivulle. *Vinkki: jotkut rss lähetykset on jo täytettynä minun koodilla. Joskus voit vain laittaa `fr-minecraft` tai `minecraft.net`* 😉",
+        "web-invalid": "Ups, tämå url osoite on pätemätön 😕",
+        "yt": "YouTube",
+        "yt-default-flow": "{logo}  | Uusi video käyttäjältä {author}: **{title}**\nJulkaistu {date}\nLinkki : {link}\n{mentions}",
+        "yt-form-last": "{logo}  | Tässä on viimeisin video käyttäjältä {author}:\n{title}\nJulkaistu {date}\nLinkki : {url}",
+        "yt-help": "Jos haluat etsiä youtube kanavan, sinun täytyy antaa kanava tunniste. Aiot löytää sen url linkin lopussa, se voi olla sen nimi tai jotain kirjaimia/numeroita. *Vinkki: jotkut kanavat on jo täytettynä minun koodilla. Joskus voit vain laittaa `neil3000` tai `0xisius`* 😉"
     },
     "server": {
         "change-0": "Tämä vaihtoehto ei ole olemassa :confused:",
@@ -509,14 +732,17 @@
         "change-text": "Vaihtoehto \"{}\" on nyt korjattu seuraavalla tekstillä: \n```\n{}\n```",
         "change-textchan": "Vaihtoehto \"{}\" on nyt aktivoitu kanaville {}",
         "change-xp": "XP systeemiä on nyt käytössä {}",
+        "change-xp_rate": "Xp korko on nyt {rate}",
         "config-help": "Tätä komentoa yleensä käytetään palvelimen konfigurointiin. Viestittämällä `!config see [option]` sinä aiot saada näyn tämänaikaisesta konfiguraatiosta, ja palvelimen järjestelmänvalvojat voivat viestittää `!config change <option> ominaisuus1, ominaisuus2...` jolla voi muuttaa konfigurointia, tai `!config del <option>` jolla voi asettaa uudelleen vaitoehdon (`!config change <option>` toimii samallain). Lista mahdollisista vaihtoehdoista löytyy täältä: <https://zbot.rtfd.io/en/latest/server.html#list-of-every-option>",
+        "config-list": "Lista saatavilla olevista vaihtoehdoista: {text}Lisätietoja täältä {link}",
         "need-admin": "Tarvitset järjestelmänvalvoja käyttöoikeudet että voit käyttää tätä komentoa.",
         "new_server": "Sinun palvelimesi on juuri rekisteröity meidän databaseen ekaa kertaa. Onnea :tada:",
         "not-found": "Palvelin {} ei ole vielä rekisteröity databaseen",
         "opt_title": "Vaihtoehto \"{}\" palvelimesta {}",
         "see-0": "Viestitä `!config help` saadakseen lisätietoja",
         "see-1": "{} palvelin konfigurointi",
-        "wrong-prefix": "Ups, näyttää siltä että tämä ei ole etuliite :thinking: Jos tämä jatkuu, valitse joku toinen"
+        "wrong-prefix": "Ups, näyttää siltä että tämä ei ole etuliite :thinking: Jos tämä jatkuu, valitse joku toinen",
+        "xp_rate_invalid": "Xp korko voi vain olla {min} ja {max} välillä"
     },
     "server_desc": {
         "anti_caps_lock": "Pitäisikö botin lähettää viesti kun jäsen lähettää liikaa isoja kirjaimia? {}",
@@ -538,16 +764,22 @@
         "mute": "Lista rooleista jotka voivat käyttää komentoa 'mute': {}",
         "muted_role": "Käytetty mykistys rooli : {}",
         "noxp_channels": "Kanavat joilla et voi saada XP:tä: {}",
+        "partner_channel": "Kanava johon yhteistyökumppanit lähetetään: {}",
+        "partner_color": "Väri yhteistyökumppanien upotetusta linkistä: {}",
+        "partner_role": "Rooli joka annetaan yhteistyökumppaneille: {}",
         "poll_channels": "Tässä on lista kanavista joissa kaikkiin viesteihin lisätään reaktiot :thumbsup: ja :thumbsdown: automaattisesti: {}",
         "prefix": "Tämän hetkinen botin etuliite: {}",
         "save_roles": "Pitäisikö roolit tallentua kun jäsen lähtee, jos hän palaa takaisin? {}",
         "say": "Lista rooleista jotka voivat käyttää komentoa 'say' : {}",
         "slowmode": "Lista rooleista jotka voivat käyttää komentoja 'slowmode' ja 'freeze': {}",
+        "update_mentions": "Roolit jotka mainitaan botin muutoslokissa: {}",
+        "verification_role": "Roolit jotka otetaan pois kun jäsen käyttää `verify` komennon: {}",
         "vote_emojis": "Emojit joita käytetään äänestyksissä reaktioina: {}",
         "warn": "Lista rooleista jotka voivat käyttää komentoja 'warn' ja 'cases': {}",
         "welcome": "Viesti joka lähetetään kun jäsen liittyy: {}",
         "welcome_channel": "Lista kanavista johon Tervetuloa ja Heippa viestit lähetetään: {}",
         "welcome_roles": "Lista rooleista jotka annetaan uusille jäsenille: {}",
+        "xp_rate": "XP tulonmuuttaja: {}",
         "xp_type": "XP systeemiä: {} käytetään nyt"
     },
     "stats_infos": {
@@ -611,6 +843,11 @@
         "voicechan-0": "Ääni kanava"
     },
     "users": {
+        "allow_animated_false": "Animoidut xp kortit on tällä hetkellä poissa käytöstä sinulle",
+        "allow_animated_success": "Tämä paramittari on määritelty uudelleen tähän: {}",
+        "allow_animated_true": "Animoidut xp kortit on tällä hetkellä käytöstä sinulle",
+        "allow_auto_unafk_false": "Sinun täytyy poistaa AFK tunniste itse",
+        "allow_auto_unafk_true": "Minä aion poistaa AFK tunnisteen heti kun lähetät viestin",
         "card-desc": "Tässä on esimerkki sinun XP kortistasi. Jos haluat vaihtaa tyyliäsi voit viestittää komennon `profile card <style>` *Sinun XP kortti aikoo päivittyä vain kun ole saanut XP:tä*",
         "changed-0": "Sinun XP kortti käyttää nyt tyyliä: {}",
         "changed-1": "Ups, sisäinen virhe tapahtui pyynnön lähettämisessä. Yritä uudelleen myöhemmin tai ota yhteyttä tukeen.",
@@ -622,6 +859,7 @@
         "1-no-xp": "Sinulla ei ole XP:tä vielä!",
         "2-no-xp": "Tällä jäsenellä ei ole XP:tä!",
         "already-1-rr": "Tälle tasolle on jo rooli konfiguroitu!",
+        "bot-rank": "Botit ei saa yhtään xp:tä",
         "card-level": "TASO",
         "card-rank": "SIJA",
         "change-global-xp": "Ei voi muokata XP:tä maailmanlaajuisesta systeemistä!",
@@ -636,7 +874,28 @@
             "Hei, {user}. Annan sinulle {random} jotta voit pitää tasoa {level}!",
             "Tiedän, {user}. Olet aktiivinen, niin annan sinulle tason {level}!",
             "Kiitä aktivisuuttasi, {user}! Olet päässyt tasolle {level}!",
-            "H U O M I O! {user} O N  J U U R I  P Ä Ä S S Y T  T A S O L L E {level}!"
+            "H U O M I O! {user} O N  J U U R I  P Ä Ä S S Y T  T A S O L L E {level}!",
+            "{user}, minä ajattelen että miten aion säilyttää kaikki sinun xp:eet... Jo nyt tasolla {level}!",
+            "Ehkä sinä voit vihdoin saada sinun sielut takaisin sinun tasolla {level}, {user}?",
+            "Moi, tulin vain sanomaan että {user} on päässyt tasolle {level}!",
+            "Olet nyt tasolla {level}, {user} onko selvä?",
+            "Oho, hups tiputin tason {level} mutta nostin sen ja antoin sen käyttäjälle {user}!",
+            "{user}, on nyt tasolla {level}!",
+            "Hei! Herää {user}! Olet päässyt tasolle {level}!",
+            "{user} on nyt tasolla {level}, koska hän söi keksejä.",
+            "En voinut pitää tätä itselläni, niin tässä se nyt on... {user} pääsi tasolle {level}, onnitelkaa häntä!",
+            "Kiitä tasoa {level} koska {user} on nyt saanut sen!",
+            "Onneksi olkoon {user}, nyt juhlitaan! Olet saanut tason {level}!",
+            "Juokse, {user}!! Zombit yrittävät saada sinun juuri saanutta tasoa {level}!",
+            "{user}, teille tuli juuri postia, olet näköjään saanut tason {level}!",
+            "Onneksi olkoon {user}, olet nyt tasolla {level}. Muista olla kiltisti sille.",
+            "{user}, olen odottanut tätä hetkeä, ja se vihdoin tuli. Olet nyt tasolla {level}!",
+            "{user}, olet juuri päässyt tasolle {level}, miltä tuntuu?",
+            "{user} olet juuri päässyt tasolle {level}!",
+            "{user} olet juuri päässyt tasolle {level}!",
+            "{user} olet juuri päässyt tasolle {level}!",
+            "{user} olet juuri päässyt tasolle {level}!",
+            "{user} olet juuri päässyt tasolle {level}!"
         ],
         "del-user": "<poistettu käyttäjä>",
         "high-page": "Ei ole noin monta sivua!",
@@ -713,6 +972,7 @@
         "top-name": "__Top {}-{} (sivu {}/{}):__",
         "top-title-1": "Maailmanlaajuinen sijoitus",
         "top-title-2": "Palvelin sijoitus",
-        "top-your": "Sinun sija"
+        "top-your": "Sinun sija",
+        "xp-disabled": "XP on poissa käytöstä tällä palvelimella"
     }
 }

@@ -1,9 +1,10 @@
 import discord
 from discord.ext import commands
 
-import time, importlib, sys, traceback, datetime, os, shutil, asyncio, inspect, typing, io, textwrap, copy, operator, requests, random, ast, math, mysql
+import time, importlib, sys, traceback, datetime, os, shutil, asyncio, inspect, typing, io, textwrap, copy, operator, requests, random, ast, math, mysql, json
 from libs import feedparser
 from contextlib import redirect_stdout
+from glob import glob
 from fcts import reloads
 importlib.reload(reloads)
 
@@ -77,8 +78,8 @@ class AdminCog(commands.Cog):
         """Commandes réservées aux administrateurs de ZBot"""
         if ctx.subcommand_passed==None:
             text = "Liste des commandes disponibles :"
-            for cmd in self.main_msg.commands:
-                text+="\n- {} *({})*".format(cmd.name,cmd.help)
+            for cmd in sorted(self.main_msg.commands, key=lambda x:x.name):
+                text+="\n- {} *({})*".format(cmd.name,'...' if cmd.help==None else cmd.help.split('\n')[0])
                 if type(cmd)==commands.core.Group:
                     for cmds in cmd.commands:
                         text+="\n        - {} *({})*".format(cmds.name,cmds.help)
@@ -224,6 +225,28 @@ class AdminCog(commands.Cog):
         for k,v in self.bot.cogs.items():
             text +="- {} ({}) \n".format(v.file,k)
         await ctx.send(text)
+    
+    @main_msg.command(name="lang-sort",hidden=True)
+    @commands.check(reloads.check_admin)
+    async def resort_langs(self,ctx:commands.Context,*,lang:str=None):
+        """Trie par ordre alphabétique les fichiers de traduction"""
+        all_files = sorted([x.replace('fcts/lang/','').replace('.json','') for x in glob("fcts/lang/*.json", recursive=False)])
+        if isinstance(lang,str) and ' ' in lang:
+            langs = lang.split(' ')
+        elif lang==None:
+            langs = all_files
+        elif lang in all_files:
+            langs = [lang]
+        else:
+            return await ctx.send('Langue invalide. Liste des langues actuelles : '+" - ".join(all_files))
+        output = 0
+        for l in langs:
+            with open(f'fcts/lang/{l}.json','r') as f:
+                temp = json.load(f)
+            with open(f'fcts/lang/{l}.json','w') as f:
+                json.dump(temp, f,  ensure_ascii=False, indent=4, sort_keys=True)
+            output += 1
+        await ctx.send('{o} fichier{s} trié{s}'.format(o=output,s='' if output<2 else 's'))
 
     @main_msg.command(name="guilds",aliases=['servers'],hidden=True)
     @commands.check(reloads.check_admin)
@@ -243,18 +266,38 @@ class AdminCog(commands.Cog):
     async def shutdown(self,ctx):
         """Eteint le bot"""
         m = await ctx.send("Nettoyage de l'espace de travail...")
+        await self.cleanup_workspace()
+        await m.edit(content="Bot en voie d'extinction")
+        await self.bot.change_presence(status=discord.Status('offline'))
+        self.bot.log.info("Fermeture du bot")
+        await self.bot.logout()
+        await self.bot.close()
+    
+    async def cleanup_workspace(self):
         for folderName, _, filenames in os.walk('.'):
             for filename in filenames:
                 if filename.endswith('.pyc'):
                     os.unlink(folderName+'/'+filename)
             if  folderName.endswith('__pycache__'):
                 os.rmdir(folderName)
-        await m.edit(content="Bot en voie d'extinction")
-        await self.bot.change_presence(status=discord.Status('offline'))
-        self.bot.log.info("Fermeture du bot")
         self.bot.cnx_frm.close()
-        await self.bot.logout()
-        await self.bot.close()
+        self.bot.cnx_xp.close()
+    
+    @main_msg.command(name='reboot')
+    @commands.check(reloads.check_admin)
+    async def restart_bot(self,ctx):
+        """Relance le bot"""
+        await ctx.send(content="Redémarrage en cours...")
+        await self.cleanup_workspace()
+        args = sys.argv
+        if len(args) == 1:
+            ID = self.bot.user.id
+            args.append('1' if ID==486896267788812288 else '2' if ID==436835675304755200 else '3')
+            args.append('n' if ctx.bot.cogs['Events'].loop.get_task()==None else 'o')
+            args.append('o' if ctx.bot.rss_enabled else 'n')
+        print('ARGS',args)
+        self.bot.log.info("Redémarrage du bot")
+        os.execl(sys.executable, sys.executable, *args)
 
     @main_msg.command(name='reload')
     @commands.check(reloads.check_admin)
@@ -650,7 +693,7 @@ Cette option affecte tous les serveurs"""
         elif Type in ['stream']:
             await self.bot.change_presence(activity=discord.Activity(type=discord.ActivityType.streaming,name=act,timestamps={'start':time.time()}))
         else:
-            await ctx.send(await self.translate(ctx.guild.id,"admin","change_game-0"))
+            await ctx.send("Sélectionnez *play*, *watch*, *listen* ou *stream* suivi du nom")
         await ctx.message.delete()
     
 

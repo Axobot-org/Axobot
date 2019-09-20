@@ -118,9 +118,9 @@ class InfosCog(commands.Cog):
         """Get bot latency
         You can also use this command to ping any other server"""
         if ip==None:
-            m = await ctx.send("Pong !")
+            m = await ctx.send("Ping...")
             t = (m.created_at - ctx.message.created_at).total_seconds()
-            await m.edit(content="Pong ! ("+str(round(t*1000))+"ms)")
+            await m.edit(content=":ping_pong:  Pong !\nBot ping: {}ms\nDiscord ping: {}ms".format(round(t*1000),round(self.bot.latency*1000)))
         else:
             asyncio.run_coroutine_threadsafe(self.ping_adress(ctx,ip),asyncio.get_event_loop())
 
@@ -213,7 +213,7 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
     async def member_infos(self,ctx,item,lang,critical_info=False):
         since = await self.translate(ctx.guild.id,"keywords","depuis")
         if item.activity==None:
-            m_activity = str(await self.translate(ctx.guild.id,"activity","rien")).capitalize()
+            m_activity = str(await self.translate(ctx.guild.id,"activity","nothing")).capitalize()
         elif item.activity.type==discord.ActivityType.playing:
             m_activity = str(await self.translate(ctx.guild.id,"activity","play")).capitalize() + " " + item.activity.name
         elif item.activity.type==discord.ActivityType.streaming:
@@ -255,7 +255,7 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
         if len(list_role)>0:
             embed.add_field(name="Roles [{}]".format(len(list_role)), value = ", ".join(list_role), inline=False)
         else:
-            embed.add_field(name="Roles [0]", value = await self.translate(ctx.guild.id,"activity","rien"), inline=False)
+            embed.add_field(name="Roles [0]", value = await self.translate(ctx.guild.id,"activity","nothing"), inline=False)
         if critical_info and not item.bot:
             embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","member-7"), value = await self.bot.cogs['CasesCog'].get_nber(item.id,ctx.guild.id),inline=True)
         if item.bot:
@@ -406,9 +406,10 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
             a2f = await self.translate(ctx.guild.id,"keywords","non")
         desc = await self.bot.cogs['ServerCog'].find_staff(guild.id,'description')
         embed = discord.Embed(colour=default_color, timestamp=ctx.message.created_at, description=desc)
-        embed.set_author(name="{} '{}'".format(await self.translate(guild.id,"stats_infos","guild-0"),guild.name), icon_url=guild.icon_url)
+        icon_url = guild.icon_url_as(format = "gif" if guild.is_icon_animated() else 'png')
+        embed.set_author(name="{} '{}'".format(await self.translate(guild.id,"stats_infos","guild-0"),guild.name), icon_url=icon_url)
         embed.set_footer(text='Requested by {}'.format(ctx.author.name), icon_url=ctx.author.avatar_url)
-        embed.set_thumbnail(url=guild.icon_url)
+        embed.set_thumbnail(url=icon_url)
 
         embed.add_field(name=str(await self.translate(ctx.guild.id,"keywords","nom")).capitalize(), value=guild.name,inline=True)
         embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","role-0"), value=str(guild.id))
@@ -538,7 +539,15 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
         disp_lang = str()
         for lang in await self.bot.cogs['UtilitiesCog'].get_languages(user):
             disp_lang += '{} ({}%)   '.format(lang[0],round(lang[1]*100))
-        await ctx.send(await self.translate(ctx.channel,"find","user-1",name=str(user) + ' <:BOT:544149528761204736>' if user.bot else '',id=user.id,servers=", ".join(servers_in),own=", ".join(owners),lang=disp_lang,vote=r,card=xp_card,rangs=" - ".join(perks)))
+        txt = await self.translate(ctx.channel,"find","user-1",name=str(user)+' <:BOT:544149528761204736>' if user.bot else str(user),id=user.id,servers=", ".join(servers_in),own=", ".join(owners),lang=disp_lang,vote=r,card=xp_card,rangs=" - ".join(perks))
+        if ctx.guild==None or ctx.channel.permissions_for(ctx.guild.me).embed_links:
+            if ctx.guild==None:
+                color = None
+            else:
+                color = None if ctx.guild.me.color.value==0 else ctx.guild.me.color
+            await ctx.send(embed = self.bot.cogs['EmbedCog'].Embed(desc=txt,color=color).create_footer(ctx.author))
+        else:
+            await ctx.send(txt)
 
     @find_main.command(name="guild",aliases=['server'])
     async def find_guild(self,ctx,*,guild):
@@ -568,8 +577,10 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
         # Prefix
         pref = self.bot.cogs['UtilitiesCog'].find_prefix(s)
         # Rss
-        rss_numb = len(await self.bot.cogs['RssCog'].get_guild_flows(s.id))
-        await ctx.send(str(await self.translate(ctx.channel,"find","guild-1")).format(name=s.name,
+        rss_len = await self.bot.cogs['ServerCog'].find_staff(s.id,'rss_max_number')
+        rss_len = self.bot.cogs["ServerCog"].default_opt['rss_max_number'] if rss_len==None else rss_len
+        rss_numb = "{}/{}".format(len(await self.bot.cogs['RssCog'].get_guild_flows(s.id)),rss_len)
+        txt = str(await self.translate(ctx.channel,"find","guild-1")).format(name=s.name,
             id=s.id,
             owner=s.owner,ownerid=s.owner.id,
             join=await self.bot.cogs['TimeCog'].date(s.me.joined_at,msglang,year=True,digital=True),
@@ -577,7 +588,15 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
             lang=lang,
             prefix=pref,
             rss=rss_numb,
-            rr=rr_len))
+            rr=rr_len)
+        if ctx.guild==None or ctx.channel.permissions_for(ctx.guild.me).embed_links:
+            if ctx.guild==None:
+                color = None
+            else:
+                color = None if ctx.guild.me.color.value==0 else ctx.guild.me.color
+            await ctx.send(embed = self.bot.cogs['EmbedCog'].Embed(desc=txt,color=color).create_footer(ctx.author))
+        else:
+            await ctx.send(txt)
 
     @find_main.command(name='channel')
     async def find_channel(self,ctx,ID:int):
@@ -585,7 +604,15 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
         if c == None:
             await ctx.send(await self.translate(ctx.channel,"find","chan-0"))
             return
-        await ctx.send(str(await self.translate(ctx.channel,"find","chan-1")).format(c.name,c.id,c.guild.name,c.guild.id))
+        txt = (await self.translate(ctx.channel,"find","chan-1")).format(c.name,c.id,c.guild.name,c.guild.id)
+        if ctx.guild==None or ctx.channel.permissions_for(ctx.guild.me).embed_links:
+            if ctx.guild==None:
+                color = None
+            else:
+                color = None if ctx.guild.me.color.value==0 else ctx.guild.me.color
+            await ctx.send(embed = self.bot.cogs['EmbedCog'].Embed(desc=txt,color=color).create_footer(ctx.author))
+        else:
+            await ctx.send(txt)
     
     @find_main.command(name='role')
     async def find_role(self,ctx,ID:int):
@@ -596,7 +623,15 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
         if c == None:
             await ctx.send(await self.translate(ctx.channel,"find","role-0"))
             return
-        await ctx.send(str(await self.translate(ctx.channel,"find","role-1")).format(c.name,c.id,c.guild.name,c.guild.id,len(c.members),c.colour))
+        txt = (await self.translate(ctx.channel,"find","role-1")).format(c.name,c.id,c.guild.name,c.guild.id,len(c.members),c.colour)
+        if ctx.guild==None or ctx.channel.permissions_for(ctx.guild.me).embed_links:
+            if ctx.guild==None:
+                color = None
+            else:
+                color = None if ctx.guild.me.color.value==0 else ctx.guild.me.color
+            await ctx.send(embed = self.bot.cogs['EmbedCog'].Embed(desc=txt,color=color).create_footer(ctx.author))
+        else:
+            await ctx.send(txt)
     
     @find_main.command(name='rss')
     async def find_rss(self,ctx,ID:int):
@@ -617,7 +652,15 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
         else:
             c = "Unknown ({})".format(flow['channel'])
         d = await self.bot.cogs['TimeCog'].date(flow['date'],digital=True)
-        await ctx.send("ID: {}\nGuild: {}\nChannel: {}\nLink: <{}>\nType: {}\nLast post: {}".format(flow['ID'],g,c,flow['link'],flow['type'],d))
+        txt = "ID: {}\nGuild: {}\nChannel: {}\nLink: <{}>\nType: {}\nLast post: {}".format(flow['ID'],g,c,flow['link'],flow['type'],d)
+        if ctx.guild==None or ctx.channel.permissions_for(ctx.guild.me).embed_links:
+            if ctx.guild==None:
+                color = None
+            else:
+                color = None if ctx.guild.me.color.value==0 else ctx.guild.me.color
+            await ctx.send(embed = self.bot.cogs['EmbedCog'].Embed(desc=txt,color=color).create_footer(ctx.author))
+        else:
+            await ctx.send(txt)
 
     @commands.command(name="membercount",aliases=['member_count'])
     @commands.guild_only()
@@ -678,7 +721,9 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
         """Get some useful links about Discord"""
         can_embed = True if isinstance(ctx.channel,discord.DMChannel) else ctx.channel.permissions_for(ctx.guild.me).embed_links
         if can_embed:
-            txt = "\n".join([f'[{k}]({v})' for k,v in (await self.translate(ctx.channel,'infos','discordlinks')).items()])
+            l = await self.translate(ctx.channel,'infos','discordlinks')
+            links = ["https://dis.gd/status","https://dis.gd/tos","https://dis.gd/report","https://dis.gd/feedback","https://support.discordapp.com/hc/articles/115002192352","https://discordapp.com/developers/docs/legal"]
+            txt = "\n".join(['['+l[i]+']('+links[i]+')' for i in range(len(l))])
             em = self.bot.cogs["EmbedCog"].Embed(desc=txt).update_timestamp().create_footer(ctx.author).discord_embed()
             await ctx.send(embed=em)
         else:
@@ -734,7 +779,7 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
                 url = await args.url().convert(ctx,ctx.subcommand_passed)
             except:
                 return
-            if url.domain == 'bit.ly':
+            if url.domain in ['bit.ly','bitly.com','bitly.is']:
                 msg = copy.copy(ctx.message)
                 msg.content = ctx.prefix + 'bitly find '+url.url
                 new_ctx = await self.bot.get_context(msg)
@@ -760,28 +805,45 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
     @commands.command(name='changelog',aliases=['changelogs'])
     async def changelog(self,ctx:commands.Context,version:str=None):
         """Get the changelogs of the bot"""
-        if version==None:
+        if version=='list':
+            cnx = self.bot.cnx_frm
             if not ctx.bot.beta:
-                query = "SELECT *, CONVERT_TZ(`release_date`, @@session.time_zone, '+00:00') AS `utc_release` FROM `changelogs` WHERE beta=False ORDER BY release_date DESC LIMIT 1"
+                query = "SELECT `version`, CONVERT_TZ(`release_date`, @@session.time_zone, '+00:00') AS `utc_release` FROM `changelogs` WHERE beta=False ORDER BY release_date"
             else:
-                query = f"SELECT *, CONVERT_TZ(`release_date`, @@session.time_zone, '+00:00') AS `utc_release` FROM `changelogs` ORDER BY release_date DESC LIMIT 1"
+                query = f"SELECT `version`, CONVERT_TZ(`release_date`, @@session.time_zone, '+00:00') AS `utc_release` FROM `changelogs` ORDER BY release_date"
+            cursor = cnx.cursor(dictionary=True)
+            cursor.execute(query)
+            results = list(cursor)
+            cursor.close()
+            desc = "\n".join(reversed(["**v{}:** {}".format(x['version'],x['utc_release']) for x in results]))
+            time = discord.Embed.Empty
+            title = await self.translate(ctx.channel,'infos','changelogs-index')
         else:
-            query = f"SELECT *, CONVERT_TZ(`release_date`, @@session.time_zone, '+00:00') AS `utc_release` FROM `changelogs` WHERE `version`='{version}'"
-            if not ctx.bot.beta:
-                query += " AND `beta`=0"
-        cnx = self.bot.cnx_frm
-        cursor = cnx.cursor(dictionary=True)
-        cursor.execute(query)
-        results = list(cursor)
-        cursor.close()
+            if version==None:
+                if not ctx.bot.beta:
+                    query = "SELECT *, CONVERT_TZ(`release_date`, @@session.time_zone, '+00:00') AS `utc_release` FROM `changelogs` WHERE beta=False ORDER BY release_date DESC LIMIT 1"
+                else:
+                    query = f"SELECT *, CONVERT_TZ(`release_date`, @@session.time_zone, '+00:00') AS `utc_release` FROM `changelogs` ORDER BY release_date DESC LIMIT 1"
+            else:
+                query = f"SELECT *, CONVERT_TZ(`release_date`, @@session.time_zone, '+00:00') AS `utc_release` FROM `changelogs` WHERE `version`='{version}'"
+                if not ctx.bot.beta:
+                    query += " AND `beta`=0"
+            cnx = self.bot.cnx_frm
+            cursor = cnx.cursor(dictionary=True)
+            cursor.execute(query)
+            results = list(cursor)
+            cursor.close()
+            if len(results) > 0:
+                desc = results[0][await self.translate(ctx.channel,'current_lang','current')]
+                time = results[0]['utc_release']
+                title = (await self.translate(ctx.channel,'keywords','version')).capitalize() + ' ' + results[0]['version']
         if len(results)==0:
             await ctx.send(await self.translate(ctx.channel,'infos','changelog-notfound'))
         elif isinstance(ctx.channel,discord.DMChannel) or ctx.channel.permissions_for(ctx.guild.me).embed_links:
-            v = (await self.translate(ctx.channel,'keywords','version')).capitalize() + ' ' + results[0]['version']
-            emb = ctx.bot.cogs['EmbedCog'].Embed(title=v,desc=results[0][await self.translate(ctx.channel,'current_lang','current')],time=results[0]['utc_release'],color=ctx.bot.cogs['ServerCog'].embed_color)
+            emb = ctx.bot.cogs['EmbedCog'].Embed(title=title,desc=desc,time=time,color=ctx.bot.cogs['ServerCog'].embed_color)
             await ctx.send(embed=emb)
         else:
-            await ctx.send(results[0][await self.translate(ctx.channel,'current_lang','current')])
+            await ctx.send(desc)
         
 
 def setup(bot):

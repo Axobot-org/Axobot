@@ -957,6 +957,8 @@ class EmojiCog(commands.Cog):
 		'wat':'<:whut:485924115199426600>',
 		'red_cross':'<:redcheck:513105827817717762>',
 		'green_check':'<:greencheck:513105826555363348>',
+		'gray_check':'<:graycheck:624354118613336084>',
+		'neutral_check':'<:neutral_check:624596006318899201>',
 		'blurple':"<:blurple:443024761547653140>",
 		'owo':'<:owo:499661437589913621>',
 		'youtube':'<:youtube:447459436982960143>',

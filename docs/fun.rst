@@ -50,11 +50,11 @@ You can access even more names by being on some secret servers! Enter the :code:
 Count messages
 --------------
 
-**Syntax:** :code:`count_msg [user] [limit]`
+**Syntax:** :code:`count_msg [limit] [user] [channel]`
 
 A nice little order that counts the number of messages in the history of this channel posted by someone. The limit corresponds to the number of messages to study in the chat, 1000 by default. And since some very old chats can have a very many many many MANY many messages (yes, 5 times *many*), we have a set limit on the number of messages you wish to search.
 
-If no user is given as parameter, Zbot will count your own messages.
+If no user is given as parameter, Zbot will count your own messages. Same for the channel, if you don't provide any, Zbot uses the current one.
 
 .. warning:: It seems obvious, but the bot needs "`Read message history <perms.html#read-message-history>`_" permission to read the messages history...
 

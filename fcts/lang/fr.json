@@ -1,19 +1,13 @@
 {
     "activity": {
         "listen": "écoute",
+        "nothing": "rien",
         "play": "joue à",
-        "rien": "rien",
         "stream": "stream",
         "watch": "regarde"
     },
     "admin": {
-        "bug-0": "Le bug n°{} n'a pas été trouvé",
-        "change_game-0": "Sélectionnez *play*, *watch*, *listen* ou *stream* suivi du nom",
-        "emergency": "Une situation d'urgence vient d'être déclarée pour le bot. Cela peut être le cas lorsque quelqu'un tente de prendre le contrôle de mon code.\n    Pour limiter les dégâts, j'ai été forcé de quitter immédiatement l'intégralité des serveurs sur lesquels je me trouvais, en espérant qu'il ne soit pas trop tard.\n    Pour plus d'informations sur l'état actuel de la crise, rendez-vous sur mon serveur officiel : https://discord.me/zbot (vérifiez le lien depuis la documentation si celui-ci ne fonctionne plus : https://zbot.rtfd.io)",
-        "msg_2-0": "Opération en cours...",
-        "msg_2-1": "Aucun membre affecté",
-        "msg_2-2": "1 membre affecté",
-        "msg_2-3": "membres affectés"
+        "emergency": "Une situation d'urgence vient d'être déclarée pour le bot. Cela peut être le cas lorsque quelqu'un tente de prendre le contrôle de mon code.\n    Pour limiter les dégâts, j'ai été forcé de quitter immédiatement l'intégralité des serveurs sur lesquels je me trouvais, en espérant qu'il ne soit pas trop tard.\n    Pour plus d'informations sur l'état actuel de la crise, rendez-vous sur mon serveur officiel : https://discord.me/zbot (vérifiez le lien depuis la documentation si celui-ci ne fonctionne plus : https://zbot.rtfd.io)"
     },
     "aide": {
         "aliases": "Alias :",
@@ -28,6 +22,7 @@
             "unclassed": "non classé",
             "users-info": "Infos sur les utilisateurs"
         },
+        "checks": "Conditions :",
         "check-desc": {
             "bot_has_permissions": [
                 "Le bot possède les permissions suffisantes",
@@ -137,6 +132,7 @@
         "no-desc-cog": "Aucune description pour ce module.",
         "no-subcmd": "La commande {0.name} n'a aucune sous-commande",
         "not-enabled": ":warning: Cette commande est désactivée",
+        "subcmds": "Sous-commandes :",
         "subcmd-not-found": "Cette commande ne possède aucune sous-commande nommée \"{}\""
     },
     "blurple": {
@@ -269,6 +265,7 @@
         ],
         "piece-1": "Raté, c'est tombé sur la tranche !",
         "react-0": "Impossible de trouver le message correspondant. Il faut rentrer l'ID du message en 1er argument, et l'émoji en 2e :upside_down:\n Vérifiez aussi que je possède la permission de lire l'historique des messages !",
+        "say-no-perm": "Vous ne possédez pas la permission d'envoyer des messages dans le salon {channel}",
         "thanos": [
             "{0} a été épargné par Thanos",
             "Thanos a décidé de réduire {0} en cendres. Pour le bien de l'humanité..."
@@ -307,15 +304,16 @@
         "bitly_long": "URL d'origine : {url}",
         "bitly_nobit": "Cette adresse n'est pas un lien bit.ly !",
         "bitly_short": "URL raccourcie : {url}",
+        "changelogs-index": "Liste des versions indexées",
         "changelog-notfound": "Impossible de trouver cette version",
-        "discordlinks": {
-            "CGU de Discord": "https://dis.gd/tos",
-            "CGU pour les développeurs de bot": "https://discordapp.com/developers/docs/legal",
-            "Explication des selfbots": "https://support.discordapp.com/hc/articles/115002192352",
-            "Proposer une idée à Discord": "https://dis.gd/feedback",
-            "Rapporter un bug ou un utilisateur": "https://dis.gd/report",
-            "Status des serveurs": "https://dis.gd/status"
-        },
+        "discordlinks": [
+            "Status des serveurs",
+            "CGU de Discord",
+            "Rapporter un bug ou un utilisateur",
+            "Proposer une idée à Discord",
+            "Explication des selfbots",
+            "CGU pour les développeurs de bot"
+        ],
         "docs": "Voici le lien vers la documentation du bot :",
         "prefix": "Liste des préfixes actuellement utilisables :",
         "stats": "**Version du bot :** {bot_v} \n**Nombre de serveurs :** {s_count} \n**Nombre de membres visibles :** {m_count} (dont {b_count} **bots**)\n**Nombre de lignes de code :** {l_count}\n**Langues utilisées :** {lang} \n**Version de Python :** {p_v} \n**Version de la bibliothèque `discord.py` :** {d_v} \n**Charge sur la mémoire vive :** {ram} GB \n**Charge sur le CPU :** {cpu} % \n**Temps de latence de l'api :** {api} ms\n**Nombre total d'xp gagné :** {xp}xp",
@@ -353,7 +351,6 @@
         "oui": "oui",
         "server": "serveur",
         "servers": "serveurs",
-        "subcmds": "sous-commandes",
         "unknown": "Inconnu",
         "version": "version"
     },
@@ -560,23 +557,60 @@
         "unhoisted": "{c} surnoms édités !",
         "unmute-1": "Le membre {} peut à nouveau parler !",
         "verify-role-high": "Oups, il semble que le rôle `\u001c{r}` soit trop haut pour que je puisse le donner. Veuillez placer ce rôle plus bas que le mien, ou placer mon rôle au-dessus.",
-        "verify_questions": {
-            "Combien de côtés possède un carré ?": "4",
-            "Combien font 2+7 ?": "9",
-            "Comment s'appelle le système d'exploitation des téléphones de la marque Apple ?": "iOS",
-            "Comment s'appelle le système d'exploitation des téléphones de la marque Samsung ? ": "Android",
-            "L'émoji :pig: représente : un insecte, légume, animal ?": "animal",
-            "Lequel de ces mots commence par P ? `poussin`, `corbeau`, `hirondelle`": "poussin",
-            "Lequel de ces mots désigne un fruit ? pizza, pomme, dinosaure": "pomme",
-            "Que donne le produit de 2 par 3 ?": "6",
-            "Quel est le discriminant situé après votre pseudo discord ? (sans le #)": "_special_userdiscrim",
-            "Quel est le nom de ce serveur ?": "_special_servername",
-            "Quel est le nom du pain français connu partout dans le monde ? (un seul mot)": "baguette",
-            "Quel est le résultat de 10-6 ?": "4",
-            "Quel est le résultat du produit de deux et cinq ? (en lettres)": "dix",
-            "Quelle est la première lettre de `Zbot` ?": "z",
-            "Quelle forme géométrique possède 3 côtés ?": "triangle"
-        },
+        "verify_questions": [
+            [
+                "Combien de côtés possède un carré ?",
+                "4"
+            ],
+            [
+                "Comment s'appelle le système d'exploitation des téléphones de la marque Apple ?",
+                "iOS"
+            ],
+            [
+                "L'émoji 🐷 représente : un insecte, légume, animal ?",
+                "animal"
+            ],
+            [
+                "Lequel de ces mots commence par P ? `poussin`, `corbeau`, `hirondelle`",
+                "poussin"
+            ],
+            [
+                "Lequel de ces mots désigne un fruit ? pizza, pomme, dinosaure",
+                "pomme"
+            ],
+            [
+                "Que donne le produit de 2 par 5 ? (en chiffres)",
+                "10"
+            ],
+            [
+                "Quel est le discriminant situé après votre pseudo discord ? (sans le #)",
+                "_special_userdiscrim"
+            ],
+            [
+                "Quel est le nom de ce serveur ?",
+                "_special_servername"
+            ],
+            [
+                "Quel est le nom du pain français connu partout dans le monde ? (un seul mot)",
+                "baguette"
+            ],
+            [
+                "Quel est le résultat de 10-6 ?",
+                "4"
+            ],
+            [
+                "Quel est le résultat du produit de deux et cinq ? (en lettres)",
+                "dix"
+            ],
+            [
+                "Quelle est la première lettre de `Zbot` ?",
+                "z"
+            ],
+            [
+                "Quelle forme géométrique possède 3 côtés ?",
+                "triangle"
+            ]
+        ],
         "warn-1": "Le membre `{}` a bien reçu son avertissement, avec la raison `{}`",
         "warn-bot": "Je ne peux pas avertir un bot ^^",
         "warn-but-db": "Notre base de donnée étant hors ligne, l'avertisement n'a pas pu être enregistré. Néanmoins le membre a bien reçu son avertissement en MP",
@@ -586,6 +620,8 @@
     "morpion": {
         "already-playing": "Vous avez déjà une partie en cours !",
         "bot-begin": "Allez hop, je commence !",
+        "game-removed": "Vous avez correctement quitté la partie",
+        "not-playing": "Vous n'avez aucune partie en cours",
         "nul": "Match nul, personne n'a gagné...",
         "pion-1": "Il y a déjà un pion sur cette case !",
         "pion-2": "Case saisie invalide !",
@@ -717,6 +753,7 @@
         "change-textchan": "L'option '{}' a bien été modifiée avec les salons {}",
         "change-xp": "Le type d'xp utilisé est maintenant {}",
         "change-xp_rate": "Le modificateur d'xp est maintenant à {rate}",
+        "change-autoremove_xp": "Le bot enlèvera {xp} points d'xp par jour aux membres inactifs",
         "config-help": "Cette commande sert principalement à configurer votre serveur. En faisant `!config see [option]` vous obtiendrez l'aperçu des configurations actuelles, et les administrateurs du serveur peuvent entrer `!config change <option> valeur1, valeur2...` pour modifier une configuration, ou `!config del <option>` pour réinitialiser l'option (`!config change <option> del` fonctionne de même).\nLa liste des options disponible est accessible à l'adresse <https://zbot.rtfd.io/en/latest/server.html#list-of-every-option>",
         "config-list": "Liste des options disponibles :{text}Plus d'information : {link}",
         "need-admin": "Vous devez avoir les permissions Administrateur pour exécuter cette commande.",
@@ -764,7 +801,8 @@
         "welcome_channel": "Liste des salons dans lesquels envoyer les messages de bienvenue/quit : {}",
         "welcome_roles": "Liste des rôles donnés automatiquement aux nouveaux membres : {}",
         "xp_rate": "Modficateur de gains d'xp : {}",
-        "xp_type": "Type de système d'xp : {}"
+        "xp_type": "Type de système d'xp : {}",
+        "autoremove_xp":"Points d'expériences enlevés chaque jour aux membres inactifs : {}"
     },
     "stats_infos": {
         "categ-0": "Catégorie",

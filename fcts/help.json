@@ -5,7 +5,7 @@
     "users-info": ["perms","profile","rank","top"],
     "other": ["book","camlink","embed","emoji","mc","mojang","react"],
     "fun": ["afk","arapproved","bitly","cookie","crab","fun","hour","say","unafk","vote","weather"],
-    "translators": ["tr-file", "tr-reload-todo", "tr-status","translate"],
+    "translators": ["tr-file", "tr-reload-todo", "tr-status","translate","tr-edit","tr-loop"],
     "staff": ["add_cog","admin","bug","del_cog","eval","execute","find","idea","msg","rss_loop","spoil","test"],
     "unclassed": []
 }

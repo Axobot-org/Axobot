@@ -48,7 +48,7 @@ This command is useful for doing something that Discord has but does not yet off
 Changelogs
 ----------
 
-**Syntax:** :code:`changelogs [version]`
+**Syntax:** :code:`changelogs [version]` or :code:`changelogs list`
 
 If you want to know the bot modification log, what has been changed in the last version or an older one, you can use this command. Introduced in version 3.5.5, it allows access to all bot changelogs from this version. For older versions, you will have to go directly to the channels of the official server!
 

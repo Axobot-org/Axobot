@@ -1,3 +1,23 @@
 {
-    
+    "activity": {
+        "listen": "Ascoltando",
+        "nothing": "Nulla",
+        "play": "Giocando a",
+        "stream": "trasmettendo",
+        "watch": "Guardando"
+    },
+    "admin": {
+        "bug-0": "Bug #{} non trovato",
+        "change_game-0": "```Seleziona *gioca*, *guarda*, *ascolta* o *stream* seguito dal nome",
+        "emergency": "Una situazione di emergenza si è appena verificata. Potrebbe darsi che qualcuno stia provando a prendere il controllo del bot. Per limitare i danni, sono stato obbligato a abbandonare tutti i server in cui ero presente immediatamente, sperando che non sia già troppo tardi. Per maggiori informazioni sullo stato della crisi, vai sul mio server ufficiale:\\nhttps://discord.me/zbot (se non funziona più, usa il link della documentazione: https://zbot.rtfd.io)"
+    },
+    "aide": {
+        "aliases": "!translate it",
+        "categories": {
+            "fun": "divertimento"
+        }
+    },
+    "current_lang": {
+        "current": "it"
+    }
 }

@@ -42,9 +42,11 @@ Every information come from the website www.fr-minecraft.net"""
         for service in data:
             for K,V in service.items():
                 if V == "green":
-                    k = ":white_check_mark: "+K
+                    k = self.bot.cogs['EmojiCog'].customEmojis['green_check']+K
                 elif V == "red":
                     k = self.bot.cogs['EmojiCog'].customEmojis['red_cross']+K
+                elif V == 'yellow':
+                    k = self.bot.cogs['EmojiCog'].customEmojis['neutral_check']+K
                 else:
                     k = self.bot.cogs['EmojiCog'].customEmojis['blurple']+K
                     dm = self.bot.get_user(279568324260528128).dm_channel

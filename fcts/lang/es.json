@@ -1,3 +1,299 @@
 {
-    
+    "activity": {
+        "listen": "escuchando",
+        "play": "jugando",
+        "nothing": "nada",
+        "stream": "transmitiendo",
+        "watch": "viendo"
+    },
+    "admin": {
+        "emergency": "Se acaba de declarar una situación de emergencia para el bot. Este puede ser el caso cuando alguien intenta tomar el control de mi código.\nPara limitar el daño, me vi obligado a dejar todos los servidores en los que estaba inmediatamente, esperando que no fuera demasiado tarde.\nPara más información sobre el estado actual de la crisis, visite mi servidor oficial: https://discord.me/z_bot (consulte el enlace de la documentación si ya no funciona : https://zbot.rtfd.io)"
+    },
+    "aide": {
+        "aliases": "Apodos:",
+        "categories": {
+            "fun": "diversión",
+            "info": "información",
+            "moderation": "moderación",
+            "other": "otras",
+            "server-settings": "configuración del servidor",
+            "staff": "personal del bot",
+            "translators": "equipo de traducción",
+            "unclassed": "Sin clase",
+            "users-info": "Información de los usuarios"
+        },
+        "check-desc": {
+            "bot_has_permissions": [
+                "El bot tiene suficientes permisos",
+                "El bot no tiene suficientes permisos"
+            ],
+            "can_ban": [
+                "Uno de sus roles está autorizado a usar este comando (`ban`)",
+                "Falta el rol permitido (`ban`)"
+            ],
+            "can_clear": [
+                "Uno de sus roles está autorizado a usar este comando (`clear`)",
+                "Falta el rol permitido (`clear`)"
+            ],
+            "can_edit_case": [
+                "Uno de sus roles está autorizado a usar este comando (`warn`)",
+                "Falta el rol permitido (`warn`)"
+            ],
+            "can_kick": [
+                "Uno de sus roles está autorizado a usar este comando (`kick`)",
+                "Falta el rol permitido (`kick`)"
+            ],
+            "can_mute": [
+                "Uno de sus roles está autorizado a usar este comando (`mute`)",
+                "Falta el rol permitido (`mute`)"
+            ],
+            "can_say": [
+                "Uno de sus roles está autorizado a usar este comando (`say`)",
+                "Falta el rol permitido (`say`)"
+            ],
+            "can_slowmode": [
+                "Uno de sus roles está autorizado a usar este comando (`slowmode`)",
+                "Falta el rol permitido (`slowmode`)"
+            ],
+            "can_use_cookie": [
+                "Eres un elegido de Aragorn1202",
+                "Este comando está en una lista blanca"
+            ],
+            "can_use_rss": [
+                "Tienes el permiso 'Administrador'",
+                "Falta el permiso 'Administrador'"
+            ],
+            "can_warn": [
+                "Uno de sus roles está autorizado a usar este comando (`warn`)",
+                "Falta el rol permitido (`warn`)"
+            ],
+            "check_admin": [
+                "Necesitas ser uno de los Administradores del bot",
+                "No eres un Administrador del bot"
+            ],
+            "guild_only": [
+                "Sólo se puede utilizar en un servidor",
+                "Sólo se puede utilizar en un servidor"
+            ],
+            "has_admin": [
+                "Tienes el permiso 'Administrador'",
+                "Falta el permiso 'Administrador'"
+            ],
+            "has_embed_links": [
+                "Tienes el permiso 'Insertar Enlaces'",
+                "Falta el permiso 'Insertar Enlaces'"
+            ],
+            "has_manage_guild": [
+                "Tienes el permiso 'Gestionar Servidor'",
+                "Falta el permiso 'Gestionar Servidor'"
+            ],
+            "has_manage_msg": [
+                "Tienes el permiso 'Gestionar Mensajes'",
+                "Falta el permiso 'Gestionar Mensajes'"
+            ],
+            "has_manage_nicknames": [
+                "Tienes el permiso 'Gestionar Apodos'",
+                "Falta el permiso 'Gestionar Apodos'"
+            ],
+            "has_manage_roles": [
+                "Tienes el permiso 'Gestionar Roles'",
+                "Falta el permiso 'Gestionar Roles'"
+            ],
+            "has_permissions": [
+                "Tienes los suficientes permisos de Discord",
+                "No tienes los permisos de Discordia correctos"
+            ],
+            "is_fun_enabled": [
+                "Los comandos divertidos están activados",
+                "Los comandos divertidos deben estar activados"
+            ],
+            "is_owner": [
+                "Necesitas ser el propietario del bot",
+                "No eres el propietario del bot"
+            ],
+            "is_support_staff": [
+                "Usted es un miembro del personal del bot",
+                "Debes ser parte del personal del bot"
+            ],
+            "is_translator": [
+                "Usted es un miembro del equipo de traductores",
+                "Debes ser parte del equipo de traductores"
+            ],
+            "verify_role_exists": [
+                "Se ha establecido un rol de verificación",
+                "No se ha añadido un rol de verificación"
+            ]
+        },
+        "cmd-not-found": "No hay no comando con nombre \"{}\"",
+        "embed_title": "Comandos disponibles para {u}",
+        "footer": "Escriba {}help command para obtener más información sobre un comando",
+        "no-desc-cmd": "No hay descripción para este comando",
+        "no-desc-cog": "No hay descripción para este módulo.",
+        "no-subcmd": "El comando `{0.name}` no tiene subcomando",
+        "not-enabled": ":warning: Este comando está desactivado",
+        "subcmd-not-found": "Este comando no tiene un subcomando llamado \"{}\""
+    },
+    "blurple": {
+        "check_fields": [
+            "Cantidad total de Blurple",
+            "Blurple (rgb(114, 137, 218))",
+            "Blanco (rgb(255, 255, 255))",
+            "Blurple Oscuro (rgb(78, 93, 148))",
+            "Blurple, Blanco, Blurple Oscuro = Blurple, Blanco, and Blurple Oscuro (respectivamente) \nNegro = No Blurple, Blanco, or Blurple Oscuro",
+            "Un gran gracias a **Rocked03**** por su código  :blue_heart: https://github.com/Rocked03/Blurplefied.git",
+            "Por favor, nota que Discord reduce la calidad de las imágenes, por lo que los porcentajes pueden ser inexactos. | Contenido solicitado por {}"
+        ],
+        "check_intro": "{}, iniciando el blurple análisis de la imagen (Por favor, tenga en cuenta que esto puede tardar un tiempo)",
+        "check_invalid": "{}, por favor enlaza una URL válida de la imagen",
+        "check_resized": "{}, imagen redimensionada más pequeña para facilitar el procesamiento ({}s)",
+        "create_footer_1": "Por favor, nota que este blurplefier  está automatizado y no siempre puede darle el mejor resultado. | Contenido solicitado por {}",
+        "create_footer_2": "Por favor, nota que este blurplefier está automatizado y no siempre puede darle el mejor resultado. Descargo: Esta imagen es un gif, y la calidad no siempre es excelente. SIN EMBARGO, el gif no suele ser tan granuloso como parece en la vista previa | Contenido solicitado por {}",
+        "create_oops": "{}, whoops! Parece que este gif es demasiado grande para subirlo. Si quieres, puedes intentarlo de nuevo con una versión más pequeña de la imagen. ¡Perdón por eso!",
+        "create_title": "Blurplefier - convierta su imagen en blurple!",
+        "won-card": "Wow! Muy bonita foto blurple {}! Tan bonita que decidí ofrecerte la tarjeta de xp blurple! Puedes usarlo escribiendo el comando `{}profile card blurple` {}."
+    },
+    "bvn": {
+        "aide": "__**Bienvenido al módulo de unirse y dejar mensaje**__\n\nEste módulo se utiliza para configurar un mensaje automático cada vez que un miembro entra o sale de su servidor.\n\n__** Configuración**__\n\n`1-` Para configurar la sala de chat donde se escriben estos mensajes, introduzca `{p}config change welcome_channel` seguido del canal (puede utilizar su mención así como su identificador o su nombre completo).\n`2-` Para configurar un mensaje, escriba `{p}config change <welcome|leave> <mensaje>`. Para este mensaje puede utilizar algunas variables:\n - `{user}` menciona al miembro\n - `{server}` muestra el nombre del servidor\n - `{owner}` muestra el nombre del propietario del servidor\n - `{member_count}` muestra el número actual de miembros\n - `{type}` returno 'miembro' o 'bot",
+        "error-give-roles": "Incapacitado de dar el rol '{r}' al nuevo miembro {u}: no hay suficientes permisos\nPor favor, compruebe la jerarquía de roles y mi permiso 'Gestionar roles'."
+    },
+    "cases": {
+        "cases-0": "{} casos encontrado: ({}-{})",
+        "deleted": "¡El caso #{} ha sido borrado!",
+        "list-0": "**Tipo:** {T}\n**Moderador:** {M}\n**Fecha:** {D}\n**Razón:** *{R}*",
+        "list-1": "**Servidor:** {G}\n**Tipo:** {T}\n**Moderador:** {M}\n**Fecha:** {D}\n**Razón:** *{R}*",
+        "list-2": "\n**Duración:** {D}",
+        "no-user": "No se puede encontrar a este usuario :eyes:",
+        "no_database": "Debido a una interrupción temporal de la base de datos, este comando ha sido desactivado",
+        "not-found": "Este caso no fue encontrado :confused:",
+        "reason-edited": "La razón del caso #{} ha sido cambiada!",
+        "search-0": "**Usuario:** {U}\n**Tipo:** {T}\n**Moderador:** {M}\n**Decha:** {D}\n**Razón:** *{R}*",
+        "search-1": "**Usuario:** {U}\n**Gremio:** {G}\n**Tipo:** {T}\n**Moderador:** {M}\n**Fecha:** {D}\n**Razón:** *{R}*",
+        "title-search": "Caso #{}"
+    },
+    "current_lang": {
+        "current": "es"
+    },
+    "errors": {
+        "DM": "Este comando no está disponible en Mensajes Directos",
+        "badarguments": "Oops, incapaz de convertir el parámetro `{p}` a \"{t}\" tipo :confused:",
+        "badarguments-2": "`{p}` no es una opción reconocida {t}",
+        "channotfound": "Canal {c} no encontrado",
+        "cooldown": "Estás en cooldown para este comando :confused: Por favor, espere {d} más segundos....",
+        "disabled": "El comando {c} está desactivado :confused:",
+        "duration": "La duración `{d}` is inválido",
+        "emojinotfound": "Emoji `{e}` no encontrado",
+        "invalidcolor": "Color `{c}` inválido",
+        "invalidemoji": "Emoji no válido",
+        "invalidguild": "Este servidor no se encuentra: `{g}`",
+        "invalidinvite": "Invitación de servidor/bot inválida: `{i}`",
+        "invalidisbn": "ISBN no válido",
+        "invalidleaderboard": "Tipo de tabla de clasificación no válida",
+        "invalidmsgid": "ID de mensaje no válido",
+        "invalidurl": "URL no válida: `{u}`",
+        "membernotfound": "No se puede encontrar al miembro `{m}` :confused:",
+        "missingargument": "Oops, el argumento \"{a}\" falta {e}",
+        "msgnotfound": "No se puede encontrar ningún mensaje con ID {msg}.",
+        "rolenotfound": "No se puede encontrar el rol `{r}`",
+        "toomanytxtchan": "Tienes demasiados canales de texto accesibles",
+        "usernotfound": "No se puede encontrar al usuario `{u}` :confused:"
+    },
+    "events": {
+        "mp-adv": "Probablemente estás tratando de invitarme a este servidor? Si ese es el caso, no puedo unirme a él con una simple invitación. Un administrador debe usar mi propio enlace de invitación, aquí: <https://bot.discord.io/zbot> :wink:"
+    },
+    "find": {
+        "chan-0": "Canal no encontrado",
+        "chan-1": "Nombre : {}\nID: {}\nServidor: {} ({})",
+        "guild-0": "Servidor no encontrado",
+        "guild-1": "Nombre: {name}\nID: {id}\nPropietario: {owner} ({ownerid})\nSe unió a la: {join}\nMiembros: {members} (incluyendo {bots} bots)\nIdioma: {lang}\nPrefijo: `{prefix}`\nNúmero de fuentes rss: {rss}\nRoles recompensa números: {rr}",
+        "help": "Este comando permite de encontrar un servidor o un salón entre todos los servidores en los que se encuentra ZBot. También puede buscar la información de un usuario de Discord, sin importar si comparte un servidor conmigo!\nLa sintaxis es `!find <usuario|canal|gremio> <ID>`",
+        "role-0": "Rol no encontrado",
+        "role-1": "Nombre: {}\nID: {}\nGremio: {} ({})\nNúmero de miembros: {}\nColor: {}",
+        "user-0": "nombre: {}\nID: {}",
+        "user-1": "Nombre: {name}\nID: {id}\nVentajas: {rangs}\nServidores: {servers}\nPropietario de: {own}\nIdiomas: {lang}\n¿Votado? {vote}\nTarjeta de XP: {card}",
+        "user-2": "Usuario no encontrado"
+    },
+    "fun": {
+        "afk-done": "¡Ahora eres AFK!",
+        "afk-no-perm": "Oops, No puedo cambiar tu apodo. :confused:",
+        "afk-user-1": "Este miembro es AFK, porque {}",
+        "afk-user-2": "¡Este miembro es AFK!",
+        "blame-0": "Lista de nombres disponibles para **{}**",
+        "calc-0": "El resultado tarda demasiado en cargarse. :confused:",
+        "calc-1": "Las soluciones del cálculo `{}` son `{}`",
+        "calc-2": "Las soluciones del cálculo `{c}` son `{l[0]}` y `{l[1]}`",
+        "calc-3": "La solución para el cálculo `{}` es `{}`",
+        "calc-4": "El cálculo `{}` no tiene solución.",
+        "calc-5": "Oops, ha ocurrido un error: `{}`",
+        "cant-react": "No tengo suficientes permisos para usar reacciones!",
+        "cant-stream": "Advertencia: No tienes suficientes permisos para hacer un videochat (Permiso \"Transmitiendo\").",
+        "cookie": "{} ofreció una caja de cookies a <@375598088850505728>! {}",
+        "count-0": "Cuenta en curso...",
+        "count-1": "En los últimos {limit} posts, has publicado {x} mensajes ({p}%)",
+        "count-2": "Quieres volar Discord! {e} Por razones de rendimiento, impondré un límite de {l} mensajes.",
+        "count-3": "Oops, no puedo leer la historia de este canal. Por favor, verifique mis permisos....",
+        "count-4": "En los últimos {limit} mensajes, {user} han publicado {x} mensajes ({p}%)",
+        "embed-error": "Ha ocurrido un error: `{}`",
+        "fun-list": "Aquí está la lista de comandos divertidos disponibles:",
+        "invalid-city": "Ciudad inválida :confused:",
+        "markdown": "__**Markdown Rules** en *Discord*__\n\n`*cursiva*` = *cursiva*\n`__subrayar__` = __subrayar__\n`**negrita**` = **negrita**\n`***negrita cursiva***` = ***negrita cursiva***\n`~~strikeout~~` = ~~strikeout~~\n`__*subrayar cursiva*__` = __*subrayar cursiva*__\n`__**subrayar negrita**__` = __**subrayar negrita**__\n`__***subrayar negrita cursiva***__` = __***subrayar negrita cursiva***__\n`||spoiler||` = ||spoiler||\n> cita = `> cita`\n\\`código\\` = `código`\n \\ para ignorar\n\nPara bloques de código, cf <https://discord.gg/DGahTNn>",
+        "no-database": "Como nuestra base de datos está desconectada, el acceso a los comandos de diversión está restringido a personas con permiso \"Gestionar Servidor\"",
+        "no-embed-perm": "No tengo permiso para \"Insertar Enlaces\" :confused:",
+        "no-emoji": "¡Incapaz de encontrar este emoji!",
+        "no-fun": "Los comandos divertidos han sido desactivados en este servidor. Para ver su lista, mira este enlace : https://zbot.rtfd.io/en/v3/fun.html",
+        "no-reaction": "Incapaz de adicionar reacciones. Por favor, verifique mis permisos...",
+        "no-roll": "No se encontró ninguna opción",
+        "no-say": "No se puede enviar mensajes en este canal",
+        "no-voicechan": "Debe estar en un canal de voz para poder usar este comando.",
+        "osekour": [
+            "Espera, estoy terminando de ver mi película.",
+            "¡Ya vamos! Pero, ¿por qué ya no contestas? ¡No finjas muerte!",
+            "Sí, sabemos que hay un incendio, no necesitamos venir: vamos a hacer una barbacoa en la estación de bomberos.",
+            "*Rescue no está disponible en este momento, por favor espere hasta el final del descanso.*",
+            "*Este número no existe. Por favor, inténtelo de nuevo con otro número.*",
+            "*Mantenimiento de la línea actual. Por favor, inténtalo de nuevo en 430 horas.*",
+            "*Su plan de telefonía móvil ha caducado. Puedes comprar uno nuevo por 86,25€.*",
+            "¡Dos volúmenes más de *El Señor de los Anillos* para terminar de leer, y soy todo tuyo!",
+            "Gracias por no molestarnos durante las vacaciones.",
+            "Lo siento, hay más de 3 copos de nieve: estamos atrapados en el garaje.",
+            "Tendremos que esperar hasta el final de nuestra huelga.... ¡¿Estás diciendo que no lo sabes?! Han pasado dos meses desde que empezamos!"
+        ],
+        "piece-0": [
+            "¡Cara!",
+            "¡Cruz!"
+        ],
+        "piece-1": "¡Falló, se cayó en el borde!",
+        "react-0": "No se puede encontrar el mensaje correspondiente. Debe introducir el ID del mensaje en el primer argumento y el emoji en el segundo. :upside_down:\n También verifique que tengo permiso de leer el historial de mensajes.",
+        "say-no-perm": "You do not have permission to send messages in the channel {channel}",
+        "thanos": [
+            "{0} fue salvado por Thanos",
+            "Thanos decidió reducir {0} a cenizas. Por el bien de la humanidad..."
+        ],
+        "tip-list": [
+            "¿Sabías eso? Hay varios idiomas para el bot, incluyendo uno muy divertido: `lolcat`",
+            "Consejo profesional: para modificar el idioma del bot, use el comando `config` !",
+            "Consejo profesional: Encontrarás explicaciones de cada comando en la documentación del bot, en https://zbot.rtfd.io; ¡Quizás incluso comandos que no conocías!",
+            "¿Sabías eso? Los resultados del comando `stats` ocultan algunos servidores, como los servidores de listas de robots, o los servidores internos.",
+            "¿Sabías eso? El bot fue diseñado originalmente para un servidor en una comunidad de Minecraft. Ahí es donde se hizo famoso, y por eso que tiene comandos sobre el tema del juego.",
+            "¿Sabías eso? La primera versión del bot fue escrita en febrero de 2018, para uso privado. En ese momento sólo había dos o tres comandos fáciles de ejecutar, como `clear` y `say`.",
+            "Consejo profesional: Con el comando `say`, puedes usar los emojis desde todos los servidores donde Zbot esté, incluso los emojis animados. Sólo usa el emoji como si lo estuvieras usando tú mismo.",
+            "Consejo profesional: Para usar un emoji personalizado en el comando `react`, sólo tienes que dar su nombre.",
+            "Consejo profesional: Con el comando `me <text>`, puedes hacer que el bot diga lo que quieras, con tu apodo delante! omo por ejemplo, \"*Wumpus le encantan los plátanos*\".",
+            "Consejo profesional: El comando `roll Nada; Nada; Nada; Nada; Nada; Nada; Nada; PAN !` le permite jugar a la ruleta rusa! ¡Cuidado con eso!",
+            "Consejo profesional: Si necesitas ayuda, no te preocupes, puedes usar el comando `osekour`.",
+            "¿Sabías eso? A veces, el mensaje de elevación de nivel menciona un objeto aleatorio. Para ello, Aragorn1202 tuvo que crear una lista de 60 de ellos, incluyendo `a bicorne`, `una cookie` o `un plátano`.",
+            "¿Sabías eso? En el pasado, la foto de perfil de Zbot era... una creeper.",
+            "¿Sabías eso? El equipo de ZBot está compuesto por un talentoso desarrollador administrador, un segundo administrador llamado así por una marca de croquetas, así como un gato, un martillo ban y un hongo.",
+            "Consejo profesional: El comando `say <texto>` es muy útil para publicar mensajes anónimos... por lo menos cuando tienes el derecho de usarlo.",
+            "Consejo profesional: ¡El comando `discordlinks` te dará todos los enlaces útiles relacionados con discord!",
+            "¿Sabías eso?  Todos los diseños relacionados con el bot son realizados por Adri526#9223, incluyendo la gran lista de emojis usados en el comando `bigtext`!",
+            "¿Sabías eso? ZBot toma su nombre de... su creador, Z_runner",
+            "Consejo profesional: El bot tiene un Discord, donde puedes ver los errores actuales y votar por las próximas novedades! Usa el comando `about` para obtener la invitación.",
+            "Consejo profesional: El comando `prefix` le permite tener una lista de los prefijos actualmente utilizables en el servidor.",
+            "¿Sabías eso? Puede dar una descripción de su servidor que puede ser usada en otros servidores, a través de la opción `description` del comando `config`.",
+            "¿Sabías eso? En algunos eventos especiales, es posible obtener tarjetas xp de colección. No olvides seguir las noticias en el servidor oficial!"
+        ],
+        "unafk-done": "Ya no eres más AFK.",
+        "uninhabited-city": "Ciudad deshabitada :confused:",
+        "vote-0": "¡Usted no puede poner más de 20 opciones y menos un número negativo de opciones!"
+    }
 }
