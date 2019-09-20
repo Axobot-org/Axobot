@@ -753,6 +753,7 @@
         "change-textchan": "The \"{}\" option has been modified with the channels {}",
         "change-xp": "The xp system used is now {}",
         "change-xp_rate": "The xp rate is now at {rate}",
+        "change-autoremove_xp": "The bot will remove {xp}xp/day from inactive members",
         "config-help": "This command is mainly used to configure your server. By doing `!config see [option]` you will get an overview of the current configurations, and server administrators can enter `!config change <option> value1, value2...` to modify a configuration, or `!config del <option>` to reset the option (`!config change <option>` works the same way).\nThe list of available options is available at <https://zbot.rtfd.io/en/latest/server.html#list-of-every-option>",
         "config-list": "List of available options: {text}More info at {link}",
         "need-admin": "You need Administrator permission to execute this command.",
@@ -800,7 +801,8 @@
         "welcome_channel": "List of channels where to send welcome/leave messages: {}",
         "welcome_roles": "List of roles automatically given to new members: {}",
         "xp_rate": "XP earnings modifier: {}",
-        "xp_type": "XP system used: {}"
+        "xp_type": "XP system used: {}",
+        "autoremove_xp": "Experience points removed daily from inactive members: {}"
     },
     "stats_infos": {
         "categ-0": "Category",

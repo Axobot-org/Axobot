@@ -753,6 +753,7 @@
         "change-textchan": "The '{}' opshun has been modifid wif teh channelz {}",
         "change-xp": "Da xp system uzed is naw {}",
         "change-xp_rate": "The xP rate iz now @ {rate}",
+        "change-autoremove_xp": "I'll remove {xp} points of xp per day for sleeping usr",
         "config-help": "Dis cmd is mainly usd 2 configur ur srver. By doin `!config see [option]` u will get overview ov teh currnt configuraishun, and supr cool servr masters can enter `!config change <option> val1 , val2, val4...` to modify configuraishun, or `!config del <option>` 2 reset teh option (`!config change <option>` works same).\nTeh list ov options is displayd at <https://zbot.rtfd.io/en/latest/server.html#list-of-every-option>",
         "config-list": "List ov options cool taht u can use: {text}More info @ {link}",
         "need-admin": "U need to be a Big Boss (admin) to get this cmd",
@@ -800,7 +801,8 @@
         "welcome_channel": "Lst of canels whe're to sen wilcume/leivz mesage': {}",
         "welcome_roles": "Lizt from rles otomaticall giveD 2 knew mmbr: {}",
         "xp_rate": "XP earnings modifier: {}",
-        "xp_type": "XP system used: {}"
+        "xp_type": "XP system used: {}",
+        "autoremove_xp": "XP points taken /day to sleeping people: {}"
     },
     "stats_infos": {
         "categ-0": "Categori",

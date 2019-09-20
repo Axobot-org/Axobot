@@ -753,6 +753,7 @@
         "change-textchan": "L'option '{}' a bien été modifiée avec les salons {}",
         "change-xp": "Le type d'xp utilisé est maintenant {}",
         "change-xp_rate": "Le modificateur d'xp est maintenant à {rate}",
+        "change-autoremove_xp": "Le bot enlèvera {xp} points d'xp par jour aux membres inactifs",
         "config-help": "Cette commande sert principalement à configurer votre serveur. En faisant `!config see [option]` vous obtiendrez l'aperçu des configurations actuelles, et les administrateurs du serveur peuvent entrer `!config change <option> valeur1, valeur2...` pour modifier une configuration, ou `!config del <option>` pour réinitialiser l'option (`!config change <option> del` fonctionne de même).\nLa liste des options disponible est accessible à l'adresse <https://zbot.rtfd.io/en/latest/server.html#list-of-every-option>",
         "config-list": "Liste des options disponibles :{text}Plus d'information : {link}",
         "need-admin": "Vous devez avoir les permissions Administrateur pour exécuter cette commande.",
@@ -800,7 +801,8 @@
         "welcome_channel": "Liste des salons dans lesquels envoyer les messages de bienvenue/quit : {}",
         "welcome_roles": "Liste des rôles donnés automatiquement aux nouveaux membres : {}",
         "xp_rate": "Modficateur de gains d'xp : {}",
-        "xp_type": "Type de système d'xp : {}"
+        "xp_type": "Type de système d'xp : {}",
+        "autoremove_xp":"Points d'expériences enlevés chaque jour aux membres inactifs : {}"
     },
     "stats_infos": {
         "categ-0": "Catégorie",
