@@ -141,6 +141,9 @@ You can specify a verification limit by adding a number in argument (up to 1.000
         l = 1000000
         if channel==None:
             channel = ctx.channel
+        if not channel.permissions_for(ctx.author).read_message_history:
+            await ctx.send(await self.translate(ctx.channel,'fun','count-5'))
+            return
         if user!=None and user.name.isnumeric() and limit==1000:
             limit = int(user.name)
             user = None

@@ -234,6 +234,7 @@
         "count-2": "You wanna blow up Discord! {e} For obvious performance reasons, I will impose a limit of {l} messages.",
         "count-3": "Oops, I'm unable to read this channel history. Please check my permissions...",
         "count-4": "On the last {limit} messages, {user} have posted {x} messages ({p}%)",
+        "count-5": "You cannot use this command in a channel where you do not have access to the message history",
         "embed-error": "An error has occurred: `{}`",
         "fun-list": "Here is the list of available fun commands:",
         "invalid-city": "Invalid city :confused:",

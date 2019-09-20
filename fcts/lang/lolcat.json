@@ -234,6 +234,7 @@
         "count-2": "You wanna blow up Discord! {e} For obvious performance reasons, I'm gonna impose limit ov {l} msgz.",
         "count-3": "Oops, Im unable to reed dis channel ystory. Pls check mah perms...",
         "count-4": "On teh last {limit} msgs, {user} had postd {x} things ({p}%)",
+        "count-5": "U cannot use tish cmd at a channel where U do not have access to msg history",
         "embed-error": "A' error went wrong: `{}`",
         "fun-list": "Her iz the list ov available fun commandz:",
         "invalid-city": "Invalid place name :confused:",
