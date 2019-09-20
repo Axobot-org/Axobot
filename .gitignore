@@ -20,3 +20,4 @@ start2.py
 *.log
 ._*
 translation
+docs/_*
