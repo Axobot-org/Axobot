@@ -191,6 +191,23 @@ XP System
 The xp system is a system for evaluating a person's activity on a server using a point system. Each message brings a certain number of points to its author, allowing him to gain in level and to rise in the ranking. To avoid having a too easy system, each level is a bit more difficult to reach than the previous one, and security measures have obviously been taken against spam or cheating.
 
 
+Configure your server
+---------------------
+
+There are several ways to customize your xp system. In particular, you have 4 `configuration options <server.html#config-options>`_, each one modifying a characteristic. And more are to come!
+
+- **Enable/disable xp:** it is possible to enable or disable the entire xp system for your server via the option :code:`enable_xp`. If it is set to 'true' the system is enabled, otherwise it will be 'false'. By default 'true'.
+
+- **Change the levelup message:** the bot automatically uses a long list of random messages for your members' level changes, but you can put a single one written by you via the option :code:`levelup_msg`. It is up to you to use then :code:`{user}` to mention the member, :code:`{level}` for his level and :code:`{username}` for his simple name (without notifications).
+
+- **Select the type of xp:** there are natively three different xp systems at Zbot, modifiable with the option :code:`xp_type`: a :code:`global`, in common with all servers using this system (default), a :code:`local` respecting the same calculations but without synchronization between the servers, and a :code:`mee6-like` which uses the same rules as the famous `MEE6 bot <https://mee6.xyz/?zbot>`_.
+
+- **Change the gain rate of xp:** if you find that your members are not earning xp fast enough (or too fast), or if you want to make a special event xp for a limited time, you can add a gain modifier between x0.1 and x3, which will multiply by its value each point of xp earned. Not usable for the global xp system, of course. Option name: :code:`xp_rate`.
+
+- **Prevent xp in some channels:** although Zbot prevents people from earning xp with its commands, it cannot detect commands from other bots. So you can prevent your members from earning xp in certain channels via the :code:`noxp_channels` option, which contains a list of all channels where your users can't have any experience points.
+
+
+
 Roles rewards
 -------------
 
