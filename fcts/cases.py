@@ -172,7 +172,7 @@ class CasesCog(commands.Cog):
             raise ValueError
         cnx = self.bot.cnx_frm
         cursor = cnx.cursor()
-        query = ("UPDATE `{}` SET `reason` = '{}' WHERE `ID` = {}".format(self.table,case.reason,case.id))
+        query = ("UPDATE `{}` SET `reason` = '{}' WHERE `ID` = {}".format(self.table,case.reason.replace("'","\\\'"),case.id))
         cursor.execute(query)
         cnx.commit()
         return True
@@ -266,7 +266,7 @@ class CasesCog(commands.Cog):
             await self.bot.cogs["ErrorsCog"].on_error(e,None)
     
 
-    @case_main.command(name="reason")
+    @case_main.command(name="reason",aliases=['edit'])
     @commands.guild_only()
     async def reason(self,ctx,case:int,*,reason):
         """Edit the reason of a case"""
