@@ -1,4 +1,4 @@
-import discord, datetime, asyncio, logging, time, aiohttp, json, random
+import discord, datetime, asyncio, logging, time, aiohttp, json, random, shutil
 from discord.ext import commands, tasks
 
 
@@ -15,6 +15,7 @@ class Events(commands.Cog):
         self.file = "events"
         self.dbl_last_sending = datetime.datetime.utcfromtimestamp(0)
         self.partner_last_check = datetime.datetime.utcfromtimestamp(0)
+        self.dbl_last_tr_backup = datetime.datetime.utcfromtimestamp(0)
         self.loop_errors = [0,datetime.datetime.utcfromtimestamp(0)]
         self.embed_colors = {"welcome":5301186,
         "mute":4868682,
@@ -291,13 +292,15 @@ class Events(commands.Cog):
             d = datetime.datetime.now()
             if int(d.second)%20 == 0:
                 await self.check_tasks()
-            if int(d.minute)%20 == 0:
+            elif int(d.minute)%20 == 0:
                 await self.bot.cogs['XPCog'].clear_cards()
                 await self.rss_loop()
-            if int(d.hour)%7 == 1 and d.hour != self.partner_last_check.hour:
+            elif int(d.hour)%7 == 1 and d.hour != self.partner_last_check.hour:
                 await self.partners_loop()
-            if int(d.hour) == 0 and d.day != self.dbl_last_sending.day:
+            elif int(d.hour) == 0 and d.day != self.dbl_last_sending.day:
                 await self.dbl_send_data()
+            elif int(d.hour)%12 == 1 and (d.hour != self.dbl_last_tr_backup.hour or d.day != self.dbl_last_tr_backup.day):
+                await self.translations_backup()
         except Exception as e:
             await self.bot.cogs['ErrorsCog'].on_error(e,None)
             self.loop_errors[0] += 1
@@ -396,6 +399,23 @@ class Events(commands.Cog):
         emb = self.bot.cogs["EmbedCog"].Embed(desc='**Partners channels updated** in {}s ({} channels - {} partners)'.format(round(time.time()-t,3),count[0],count[1]),color=10949630).update_timestamp().set_author(self.bot.user)
         await self.bot.cogs["EmbedCog"].send([emb],url="loop")
         
+    async def translations_backup(self):
+        """Do a backup of the translations files"""
+        from os import remove
+        t = time.time()
+        self.dbl_last_tr_backup = datetime.datetime.now()
+        try:
+            remove('translation-backup.tar')
+        except:
+            pass
+        try:
+           shutil.make_archive('translation-backup','tar','translation')
+        except FileNotFoundError:
+            await self.bot.cogs['ErrorsCog'].senf_err_msg("Translators backup: Unable to find backup folder")
+            return
+        emb = self.bot.cogs["EmbedCog"].Embed(desc='**Translations files backup** completed in {}s'.format(round(time.time()-t,3)),color=10197915).update_timestamp().set_author(self.bot.user)
+        await self.bot.cogs["EmbedCog"].send([emb],url="loop")
+    
             
 
 
