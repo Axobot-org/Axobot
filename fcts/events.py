@@ -106,7 +106,7 @@ class Events(commands.Cog):
         await self.check_mp_adv(msg)
         if msg.channel.recipient.id in [392766377078816789,279568324260528128,552273019020771358]:
             return
-        channel = self.bot.get_channel(488768968891564033)
+        channel = self.bot.get_channel(625320165621497886)
         if channel==None:
             return self.bot.log.warn("[send_mp] Salon de MP introuvable")
         emb = msg.embeds[0] if len(msg.embeds)>0 else None
