@@ -834,7 +834,10 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
             results = list(cursor)
             cursor.close()
             if len(results) > 0:
-                desc = results[0][await self.translate(ctx.channel,'current_lang','current')]
+                used_lang = await self.translate(ctx.channel,'current_lang','current')
+                if used_lang not in results[0].keys():
+                    used_lang = "en"
+                desc = results[0][used_lang]
                 time = results[0]['utc_release']
                 title = (await self.translate(ctx.channel,'keywords','version')).capitalize() + ' ' + results[0]['version']
         if len(results)==0:
