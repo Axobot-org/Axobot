@@ -101,6 +101,8 @@ class EmbedCog(commands.Cog):
         def discord_embed(self):
             if type(self.color)==discord.Colour:
                 color = self.color
+            elif self.color == None:
+                color = discord.Embed.Empty
             else:
                 color = discord.Color(self.color)
             emb = discord.Embed(title=self.title, colour=color, url=self.url, description=self.description, timestamp=self.timestamp)
