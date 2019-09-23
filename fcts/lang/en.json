@@ -200,7 +200,7 @@
         "usernotfound": "Unable to find the user `{u}` :confused:"
     },
     "events": {
-        "mp-adv": "You are probably trying to invite me to this server? If that is the case, I can't join him with a simple invitation. An administrator must use my own invitation link, here: <https://bot.discord.io/zbot> :wink:"
+        "mp-adv": "You are probably trying to invite me to this server? If that is the case, I can't join him with a simple invitation. An administrator must use my own invitation link, here: <https://zrunner.me/invitezbot.htmlm> :wink:"
     },
     "find": {
         "chan-0": "Channel not found",
@@ -319,7 +319,7 @@
         "prefix": "List of currently usable prefixes:",
         "stats": "**Bot version:** {bot_v} \n**Number of servers:** {s_count} \n**Number of visible members:** {m_count} ({b_count} **bots**)\n**Number of code lines:** {l_count}\n**Used languages:** {lang}\n**Python version :** {p_v} \n**Version of the `discord.py` lib:** {d_v} \n**Loading on the RAM:** {ram} GB \n**Loading on the CPU:** {cpu} % \n**API latency time:** {api} ms\n**Total of earned xp:** {xp}",
         "stats-title": "**Bot statistics**",
-        "text-0": "Hello! I'm {0} !\nI'm a bot that allows you to do a lot of things: moderation, mini-games, an xp system, statistics and many other super useful commands (and totally pointless ones)!\nYou can start by typing `!help` in this chat to see the list of available commands, then `!config see` will let you see the configuration options (a website is in preparation).\n\nFor helping me in the creation of the bot, my owner and I would like to thank Awhikax for his support during the various crises, Aragorn1202 for all his ideas and sentences full of good sense, Adri526 for all these beautiful logos, emojis and profile pics, and Pilotnick54 to review and correct my English!\n:globe_with_meridians: Some links may be useful: \n:arrow_forward: My Discord server : http://discord.gg/N55zY88\n:arrow_forward: A link to invite me to another server : <https://bot.discord.io/zbot>\n:arrow_forward: The bot documentation : <https://zbot.rtfd.io/>\n:arrow_forward: My creator's Twitter account : <https://twitter.com/z_runnerr>\n\nHave a nice day!"
+        "text-0": "Hello! I'm {0} !\nI'm a bot that allows you to do a lot of things: moderation, mini-games, an xp system, statistics and many other super useful commands (and totally pointless ones)!\nYou can start by typing `!help` in this chat to see the list of available commands, then `!config see` will let you see the configuration options (a website is in preparation).\n\nFor helping me in the creation of the bot, my owner and I would like to thank Awhikax for his support during the various crises, Aragorn1202 for all his ideas and sentences full of good sense, Adri526 for all these beautiful logos, emojis and profile pics, and Pilotnick54 to review and correct my English!\n:globe_with_meridians: Some links may be useful: \n:arrow_forward: My Discord server : http://discord.gg/N55zY88\n:arrow_forward: A link to invite me to another server : <https://zrunner.me/invitezbot.htmlm>\n:arrow_forward: The bot documentation : <https://zbot.rtfd.io/>\n:arrow_forward: My creator's Twitter account : <https://twitter.com/z_runnerr>\n\nHave a nice day!"
     },
     "infos_2": {
         "fish-1": "Number of fishes",

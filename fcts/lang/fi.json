@@ -198,7 +198,7 @@
         "usernotfound": "On mahdotonta löytää käyttäjä `{u}` :confused:"
     },
     "events": {
-        "mp-adv": "Sinä varmaan yrität kutsua minut tähän palvelimeen? Jos tämä on oikein, en voi liittyä helpolla kutsu linkillä. Järjestelmänvalvojan täytyy käyttää minun omaa kutsu linkkiä, täällä:<https://bot.discord.io/zbot> :wink:"
+        "mp-adv": "Sinä varmaan yrität kutsua minut tähän palvelimeen? Jos tämä on oikein, en voi liittyä helpolla kutsu linkillä. Järjestelmänvalvojan täytyy käyttää minun omaa kutsu linkkiä, täällä:<https://zrunner.me/invitezbot.htmlm> :wink:"
     },
     "find": {
         "chan-0": "kanavaa ei löytynyt",
@@ -313,7 +313,7 @@
         "prefix": "Lista kaikista käytettävissä olevista etuliitoista:",
         "stats": "**Bot versio:** {bot_v} \n**Kaikkien palvelimien numero missä olen:** {s_count} \n**Numero kaikista näkyvistä jäsenistä:** {m_count} ({b_count} **botit**)\n**Numero koodi riveistä:** {l_count}\n**Käytettyjä kieliä:** {lang}\n** {p_v} \n**Versio `discord.py`stä:** {d_v} \n**Ladataan RAMia:** {ram} GB \n**Ladataan CPU:ssa:** {cpu} % \n**API viive aika:** {api} ms\n**Kaikki xp kerätty:** {xp}",
         "stats-title": "**Bot tilastot**",
-        "text-0": "Moi! Olen {0} !\nOlen robotti joka voi tehdä monia asioita: Valvontaa, pieniä pelejä, taso systeemi, tilastoja, ja monia muita hyödyttäviä komentoja (ja myös täysin turhia)!\nVoit aloittaa viestittämällä `!help` tällä kanavalla niin näet kaikki käytettävissä olevat komennot, sitten `!config see` aikoo näyttää konfiguraatio muodot (nettisivua ollaan tekemässä).\nKaikki jotka auttoivat minun tekeimsessä, minun omistaja ja minä haluamme kiittää Adri526, Awhikax, Jees1 (tämän kielen kääntäjä) ja Aragorn1202! Iso kiitos heille.\n\n:globe_with_meridians: Jotain linkkejä jotka voivat auttaa:\n:arrow_forward: Minun Discord palvelin: : http://discord.gg/N55zY88\n:arrow_forward: Linkki kutsua minut toiselle palvelimelle : <https://bot.discord.io/zbot>\n:arrow_forward: Bot dokumentti : <https://zbot.rtfd.io/>\n:arrow_forward: Minun tekijän Twitter : <https://twitter.com/z_runnerr>\n\nHyvää päivän jatkoa!"
+        "text-0": "Moi! Olen {0} !\nOlen robotti joka voi tehdä monia asioita: Valvontaa, pieniä pelejä, taso systeemi, tilastoja, ja monia muita hyödyttäviä komentoja (ja myös täysin turhia)!\nVoit aloittaa viestittämällä `!help` tällä kanavalla niin näet kaikki käytettävissä olevat komennot, sitten `!config see` aikoo näyttää konfiguraatio muodot (nettisivua ollaan tekemässä).\nKaikki jotka auttoivat minun tekeimsessä, minun omistaja ja minä haluamme kiittää Adri526, Awhikax, Jees1 (tämän kielen kääntäjä) ja Aragorn1202! Iso kiitos heille.\n\n:globe_with_meridians: Jotain linkkejä jotka voivat auttaa:\n:arrow_forward: Minun Discord palvelin: : http://discord.gg/N55zY88\n:arrow_forward: Linkki kutsua minut toiselle palvelimelle : <https://zrunner.me/invitezbot.htmlm>\n:arrow_forward: Bot dokumentti : <https://zbot.rtfd.io/>\n:arrow_forward: Minun tekijän Twitter : <https://twitter.com/z_runnerr>\n\nHyvää päivän jatkoa!"
     },
     "infos_2": {
         "fish-1": "Numero kaloista",

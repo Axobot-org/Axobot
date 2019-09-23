@@ -200,7 +200,7 @@
         "usernotfound": "Unabled 2 find teh userZ `{u}` :confused:"
     },
     "events": {
-        "mp-adv": "U're probably trying 2 invite me in dis server? If that's the case, I can't join him with a simple invite. An super-admin must use my own link, just here: <https://bot.discord.io/zbot> :innocent:"
+        "mp-adv": "U're probably trying 2 invite me in dis server? If that's the case, I can't join him with a simple invite. An super-admin must use my own link, just here: <https://zrunner.me/invitezbot.htmlm> :innocent:"
     },
     "find": {
         "chan-0": "chAnnel not foundz",
@@ -319,7 +319,7 @@
         "prefix": "List ov usable prefiXs:",
         "stats": "**Baut vershun:** {bot_v} \n**Nbr ov serverz:** {s_count} \n**Nbr ov visible memberz:** {m_count} ({b_count} **robots**)\n**Nbr ov code lin:** {l_count}\n**Uzd languages:** {lang}\n**Python vershun :** {p_v} \n**Vershun ov teh `discord.py` lyb:** {d_v} \n**Loadin on teh RAM:** {ram} GB \n**Loadin on the CPU:** {cpu} % \n**API latency timz:** {api} ms\n**Nbr of xp won:** {xp}",
         "stats-title": "**Boat statz**",
-        "text-0": "Ho hi hello! I'm {0} !\n\nIm a boat that alow you 2 do a loooooot of tings: modration, mini-gamz, a' xp systèm, stATIstics & many oder super mega *wow* usefull commandz (and totlly pointlesz wanes)! \nU can strt by tipyng `!help` in dis tchat to se the llst for availabl kommands, then `!config see` wil LEtz you see teh configurashun optionz (a website ar in prePARtion)? \n\nOf helpin me in the creetion of the boat, my ownr an I wouLd like to tahnk Awhikax 4 hiz suport durin the variouz cryzes, Aragorn1202 of al her idees and sentencez full for goob sence, Adri526 fr all dese beautifool loGoz, èmojiz nd profil picts, and Pilotnick54 to review an corec mi Anglish!\n\n:globe_with_meridians: Sum linqs can bee usefull: \n:arrow_forward: Me Discord servr plz : http://discord.gg/N55zY88\n:arrow_forward: link to iNVite me to anothr servr : <https://bot.discord.io/zbot>\n:arrow_forward: The :b:ot documentashun : <https://zbot.rtfd.io/>\n:arrow_forward: My creator's Blue Bird 'ccount : <https://twitter.com/z_runnerr>\n\nHas a nice dayz !"
+        "text-0": "Ho hi hello! I'm {0} !\n\nIm a boat that alow you 2 do a loooooot of tings: modration, mini-gamz, a' xp systèm, stATIstics & many oder super mega *wow* usefull commandz (and totlly pointlesz wanes)! \nU can strt by tipyng `!help` in dis tchat to se the llst for availabl kommands, then `!config see` wil LEtz you see teh configurashun optionz (a website ar in prePARtion)? \n\nOf helpin me in the creetion of the boat, my ownr an I wouLd like to tahnk Awhikax 4 hiz suport durin the variouz cryzes, Aragorn1202 of al her idees and sentencez full for goob sence, Adri526 fr all dese beautifool loGoz, èmojiz nd profil picts, and Pilotnick54 to review an corec mi Anglish!\n\n:globe_with_meridians: Sum linqs can bee usefull: \n:arrow_forward: Me Discord servr plz : http://discord.gg/N55zY88\n:arrow_forward: link to iNVite me to anothr servr : <https://zrunner.me/invitezbot.htmlm>\n:arrow_forward: The :b:ot documentashun : <https://zbot.rtfd.io/>\n:arrow_forward: My creator's Blue Bird 'ccount : <https://twitter.com/z_runnerr>\n\nHas a nice dayz !"
     },
     "infos_2": {
         "fish-1": "Nbr of :fish:",

@@ -198,7 +198,7 @@
         "usernotfound": "Der Nutzer `{u}` konnte nicht gefunden werden :confused:"
     },
     "events": {
-        "mp-adv": "Du möchtest mich wohl zu diesem Server einladen, nichtwahr? Jedoch geht jedoch leider nicht über einen einfachen Einladungslink, im Gegenteil: Du musst meinen Link anklicken damit ich deinem Server beitreten kann <https://bot.discord.io/zbot> :wink:"
+        "mp-adv": "Du möchtest mich wohl zu diesem Server einladen, nichtwahr? Jedoch geht jedoch leider nicht über einen einfachen Einladungslink, im Gegenteil: Du musst meinen Link anklicken damit ich deinem Server beitreten kann <https://zrunner.me/invitezbot.htmlm> :wink:"
     },
     "find": {
         "chan-0": "Kanal nicht gefunden",
@@ -265,7 +265,7 @@
         "prefix": "Anzahl momentan nutzbarer Prefixe:",
         "stats": "**Bot Version:** {bot_v} \n**Anzahl meiner Server:** {s_count} \n**Number sichtbarer Mitglieder:** {m_count}, ({b_count} **Bots**)\n**Anzahl an Codezeilen:** {l_count}\n**Benutzte Sprachen:** {lang}\n**Python Version :** {p_v} \n**Version des `discord.py` lib:** {d_v} \n**RAM Belastung:** {ram} GB \n**CPU Belastung:** {cpu} % \n**API Verzögerung:** {api} ms\n**Gesamtanzahl gesammelter XP:** {xp}",
         "stats-title": "**Bot Statistiken**",
-        "text-0": "Hallo! Ich bin {0} !\nIch bin ein Bot der dir vieles ermöglicht: Moderation, Mini-Spiele, ein XP System, Statistiken und viele ander super tolle Befehle!\nUm alle Befehle zu sehen gibt einfach `!help` ein! `!config see` gibt dir eine Liste aller Konfiguratiosmöglichkeiten (Eine Website ist in Arbeit).\n\nAußerdem großen Dank an Awhikax, der mir durch viele Kriesen geholfen hat, Aragorn1202 für all seine Ideen und Adri526 für all seine wunderbaren Logos, Emojis und Profilbilder!\n:globe_with_meridians: Hier ein paar vielleicht nützliche Links: \n:arrow_forward: Mein Discordserver : http://discord.gg/N55zY88\n:arrow_forward: Ein Einladungslink für mich : <https://bot.discord.io/zbot>\n:arrow_forward: Die Bot Dokumentation : <https://zbot.rtfd.io/>\n:arrow_forward: Mein Twitter Account: <https://twitter.com/z_runnerr>\n\nAnsonsten noch einen schönen Tag!"
+        "text-0": "Hallo! Ich bin {0} !\nIch bin ein Bot der dir vieles ermöglicht: Moderation, Mini-Spiele, ein XP System, Statistiken und viele ander super tolle Befehle!\nUm alle Befehle zu sehen gibt einfach `!help` ein! `!config see` gibt dir eine Liste aller Konfiguratiosmöglichkeiten (Eine Website ist in Arbeit).\n\nAußerdem großen Dank an Awhikax, der mir durch viele Kriesen geholfen hat, Aragorn1202 für all seine Ideen und Adri526 für all seine wunderbaren Logos, Emojis und Profilbilder!\n:globe_with_meridians: Hier ein paar vielleicht nützliche Links: \n:arrow_forward: Mein Discordserver : http://discord.gg/N55zY88\n:arrow_forward: Ein Einladungslink für mich : <https://zrunner.me/invitezbot.htmlm>\n:arrow_forward: Die Bot Dokumentation : <https://zbot.rtfd.io/>\n:arrow_forward: Mein Twitter Account: <https://twitter.com/z_runnerr>\n\nAnsonsten noch einen schönen Tag!"
     },
     "infos_2": {
         "fish-1": "Nummer aller Beendungen",
