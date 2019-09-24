@@ -277,7 +277,7 @@ class XPCog(commands.Cog):
                 pass
         return c
 
-    async def get_table(self,guild:int):
+    async def get_table(self,guild:int,createIfNeeded:bool=True):
         """Get the table name of a guild, and create one if no one exist"""
         if guild==None:
             return self.table
@@ -287,9 +287,12 @@ class XPCog(commands.Cog):
             cursor.execute("SELECT 1 FROM `{}` LIMIT 1;".format(guild))
             return guild
         except mysql.connector.errors.ProgrammingError:
-            cursor.execute("CREATE TABLE `{}` LIKE `example`;".format(guild))
-            cursor.execute("SELECT 1 FROM `{}` LIMIT 1;".format(guild))
-            return guild
+            if createIfNeeded:
+                cursor.execute("CREATE TABLE `{}` LIKE `example`;".format(guild))
+                cursor.execute("SELECT 1 FROM `{}` LIMIT 1;".format(guild))
+                return guild
+            else:
+                return None
 
 
     async def bdd_set_xp(self,userID,points,Type='add',guild:int=None):
@@ -366,8 +369,11 @@ class XPCog(commands.Cog):
                 query = ("SELECT `userID`,`xp` FROM `{}` WHERE `banned`=0".format(self.table))
             else:
                 self.bot.log.info("Chargement du cache XP (guild {})".format(guild))
+                table = await self.get_table(guild,False)
+                if table==None:
+                    return list()
                 cnx = self.bot.cnx_xp
-                query = ("SELECT `userID`,`xp` FROM `{}` WHERE `banned`=0".format(await self.get_table(guild)))
+                query = ("SELECT `userID`,`xp` FROM `{}` WHERE `banned`=0".format(table))
             cursor = cnx.cursor(dictionary = True)
             cursor.execute(query)
             liste = list()
