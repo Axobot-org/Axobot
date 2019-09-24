@@ -45,10 +45,35 @@ class Events(commands.Cog):
     async def on_ready(self):
         self.translate = self.bot.cogs["LangCog"].tr
 
+
+    @commands.Cog.listener()
+    async def on_member_update(self,before:discord.Member,after:discord.Member):
+        """Called when a member change something (status, activity, nickame, roles)"""
+        if before.nick != after.nick:
+            cnx = self.bot.cnx_frm
+            cursor = cnx.cursor()
+            ID = round(time.time()/2)
+            query = ("INSERT INTO `usernames_logs` (`ID`,`user`,`old`,`new`,`guild`) VALUES ('{}','{}','{}','{}','{}')".format(ID,before.id,before.nick.replace("'","\\'"),after.nick.replace("'","\\'"),before.guild.id))
+            cursor.execute(query)
+            cnx.commit()
+            cursor.close()
+
+    @commands.Cog.listener()
+    async def on_user_update(self,before:discord.User,after:discord.User):
+        """Called when a user change something (avatar, username, discrim)"""
+        if before.name != after.name:
+            cnx = self.bot.cnx_frm
+            cursor = cnx.cursor()
+            ID = round(time.time()/2)
+            query = ("INSERT INTO `usernames_logs` (`ID`,`user`,`old`,`new`,`guild`) VALUES ('{}','{}','{}','{}','{}')".format(ID,before.id,before.name.replace("'","\\'"),after.name.replace("'","\\'"),0))
+            cursor.execute(query)
+            cnx.commit()
+            cursor.close()
+
+
     async def on_guild_add(self,guild):
         """Called when the bot joins a guild"""
         await self.send_guild_log(guild,"join")
-
 
     async def on_guild_del(self,guild):
         """Called when the bot left a guild"""
