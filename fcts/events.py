@@ -53,7 +53,9 @@ class Events(commands.Cog):
             cnx = self.bot.cnx_frm
             cursor = cnx.cursor()
             ID = round(time.time()/2)
-            query = ("INSERT INTO `usernames_logs` (`ID`,`user`,`old`,`new`,`guild`) VALUES ('{}','{}','{}','{}','{}')".format(ID,before.id,before.nick.replace("'","\\'"),after.nick.replace("'","\\'"),before.guild.id))
+            b = '' if before.nick==None else before.nick.replace("'","\\'")
+            a = '' if after.nick==None else after.nick.replace("'","\\'")
+            query = ("INSERT INTO `usernames_logs` (`ID`,`user`,`old`,`new`,`guild`) VALUES ('{}','{}','{}','{}','{}')".format(ID,before.id,b,a,before.guild.id))
             cursor.execute(query)
             cnx.commit()
             cursor.close()
