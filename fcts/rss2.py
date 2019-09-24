@@ -106,6 +106,8 @@ class RssCog(commands.Cog):
                 self.logo = emojis['reddit']
             elif Type == 'twitch':
                 self.logo = emojis['twitch']
+            elif Type == 'deviant':
+                self.logo = emojis['deviant']
             else:
                 self.logo = ':newspaper:'
             self.channel = channel
@@ -243,6 +245,22 @@ class RssCog(commands.Cog):
                 await ctx.send(embed=obj)
             else:
                 await ctx.send(obj)
+    
+    @rss_main.command(name="deviantart",aliases=['deviant'])
+    async def request_deviant(self,ctx,user):
+        """The last pictures of a DeviantArt user"""
+        if "deviantart.com" in user:
+            user = await self.parse_deviant_url(user)
+        text = await self.rss_deviant(ctx.guild,user)
+        if type(text) == str:
+            await ctx.send(text)
+        else:
+            form = await self.translate(ctx.channel,"rss","deviant-form-last")
+            obj = await text[0].create_msg(await self.translate(ctx.channel,"current_lang","current"),form)
+            if isinstance(obj,discord.Embed):
+                await ctx.send(embed=obj)
+            else:
+                await ctx.send(obj)
 
     @rss_main.command(name="add")
     @commands.guild_only()
@@ -271,6 +289,11 @@ class RssCog(commands.Cog):
             if identifiant != None:
                 Type = 'twitch'
                 display_type = 'twitch'
+        if identifiant == None:
+            identifiant = await self.parse_deviant_url(link)
+            if identifiant != None:
+                Type = 'deviant'
+                display_type = 'deviantart'
         if identifiant != None and not link.startswith("https://"):
             link = "https://"+link
         if identifiant == None and link.startswith("http"):
@@ -286,7 +309,7 @@ class RssCog(commands.Cog):
             ID = await self.add_flow(ctx.guild.id,ctx.channel.id,Type,identifiant)
             await ctx.send(str(await self.translate(ctx.guild,"rss","success-add")).format(display_type,link,ctx.channel.mention))
             self.bot.log.info("RSS feed added into server {} ({} - {})".format(ctx.guild.id,link,ID))
-            await self.send_log("Feed added into server {} ({})".format(ctx.guild.id,ID))
+            await self.send_log("Feed added into server {} ({})".format(ctx.guild.id,ID),ctx.guild)
         except Exception as e:
             await ctx.send(await self.translate(ctx.guild,"rss","fail-add"))
             await self.bot.cogs["ErrorsCog"].on_error(e,ctx)
@@ -347,7 +370,7 @@ class RssCog(commands.Cog):
             return
         await ctx.send(await self.translate(ctx.guild,"rss","delete-success"))
         self.bot.log.info("RSS feed deleted into server {} ({})".format(ctx.guild.id,flow[0]['ID']))
-        await self.send_log("Feed deleted into server {} ({})".format(ctx.guild.id,flow[0]['ID']))
+        await self.send_log("Feed deleted into server {} ({})".format(ctx.guild.id,flow[0]['ID']),ctx.guild)
 
     @rss_main.command(name="list")
     @commands.guild_only()
@@ -722,6 +745,9 @@ class RssCog(commands.Cog):
         r = await self.parse_twitch_url(url)
         if r!=None:
             return True
+        r = await self.parse_deviant_url(url)
+        if r!=None:
+            return True
         try:
             f = feedparser.parse(url)
             _ = f.entries[0]
@@ -748,6 +774,14 @@ class RssCog(commands.Cog):
     
     async def parse_twitch_url(self,url):
         r = r'(?:http.*://)?(?:www.)?(?:twitch.tv/)([^?\s]+)'
+        match = re.search(r,url)
+        if match == None:
+            return None
+        else:
+            return match.group(1)
+    
+    async def parse_deviant_url(self,url):
+        r = r'(?:http.*://)?(?:www.)?(?:deviantart.com/)([^?\s]+)'
         match = re.search(r,url)
         if match == None:
             return None
@@ -988,6 +1022,29 @@ class RssCog(commands.Cog):
             return liste
 
 
+    async def rss_deviant(self,guild,nom,date=None):
+        url = 'https://backend.deviantart.com/rss.xml?q=gallery%3A'+nom
+        feeds = feedparser.parse(url,timeout=5)
+        if feeds.entries==[]:
+            return await self.translate(guild,"rss","nothing")
+        if not date:
+            feed = feeds.entries[0]
+            img_url = feed['media_content'][0]['url']
+            title = re.search(r"DeviantArt: ([^ ]+)'s gallery",feeds.feed['title']).group(1)
+            obj = self.rssMessage(bot=self.bot,Type='deviant',url=feed['link'],title=feed['title'],emojis=self.bot.cogs['EmojiCog'].customEmojis,date=feed['published_parsed'],author=title,image=img_url)
+            return [obj]
+        else:
+            liste = list()
+            for feed in feeds.entries:
+                if datetime.datetime(*feed['published_parsed'][:6]) <= date:
+                    break
+                img_url = feed['media_content'][0]['url']
+                title = re.search(r"DeviantArt: ([^ ]+)'s gallery",feeds.feed['title']).group(1)
+                obj = self.rssMessage(bot=self.bot,Type='deviant',url=feed['link'],title=feed['title'],emojis=self.bot.cogs['EmojiCog'].customEmojis,date=feed['published_parsed'],author=title,image=img_url)
+                liste.append(obj)
+            liste.reverse()
+            return liste
+
 
 
     async def create_id(self,channelID,guildID,Type,link):
@@ -1219,10 +1276,10 @@ class RssCog(commands.Cog):
                 self.bot.log.info(" Boucle rss forcée")
                 await self.main_loop()
     
-    async def send_log(self,text):
+    async def send_log(self,text:str,guild:discord.Guild):
         """Send a log to the logging channel"""
         try:
-            emb = self.bot.cogs["EmbedCog"].Embed(desc="[RSS] "+text,color=5366650).update_timestamp().set_author(self.bot.user)
+            emb = self.bot.cogs["EmbedCog"].Embed(desc="[RSS] "+text,color=5366650,footer_text=guild.name).update_timestamp().set_author(self.bot.user)
             await self.bot.cogs["EmbedCog"].send([emb])
         except Exception as e:
             await self.bot.cogs["ErrorsCog"].on_error(e,None)

@@ -727,7 +727,9 @@
         "yt": "YouTwube",
         "yt-default-flow": "{logo}  | Naw videogramm of {author}: **{title}**\nPublishd on {date}\nLink : {link}\n{mentions}",
         "yt-form-last": "{logo}  | Her the lazt vid from {author}:\n{title}\nPublishd on {date}\nLink : {url}\n",
-        "yt-help": "To seerch for a youtwube channel, you may enter the channil ID. You will found it at teh and of the strin url, it can be 8ther the nayme, or a strin of randem characteRs. *Tip: some channels are already fellid in me code. Sometimez you can just put `neil3000` or `Oxisius`* :wink:"
+        "yt-help": "To seerch for a youtwube channel, you may enter the channil ID. You will found it at teh and of the strin url, it can be 8ther the nayme, or a strin of randem characteRs. *Tip: some channels are already fellid in me code. Sometimez you can just put `neil3000` or `Oxisius`* :wink:",
+        "deviant-default-flow": "{logo}  | New draw bye {author} : **{title}**\nDated on {date}\nURL: {link}\n{mentions}",
+        "deviant-form-last": "{logo}  | Here is da brand new thing of {author}:\n{title}\nDarwn on {date}\nZelda: {url}"
     },
     "server": {
         "change-0": "Dis option doz not exist :confused:",
