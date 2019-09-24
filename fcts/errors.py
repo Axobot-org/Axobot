@@ -158,7 +158,7 @@ class ErrorsCog(commands.Cog):
                 await self.senf_err_msg(f"Internal Error\n{msg}")
             elif ctx.guild == None:
                 await self.senf_err_msg(f"DM | {ctx.channel.recipient.name}\n{msg}")
-            elif ctx.channel.id==488768405629960203:
+            elif ctx.channel.id==625319425465384960:
                 return await ctx.send(ctx.guild.name+" | "+ctx.channel.name+"\n"+msg)
             else:
                 await self.senf_err_msg(ctx.guild.name+" | "+ctx.channel.name+"\n"+msg)
