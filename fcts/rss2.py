@@ -1019,6 +1019,7 @@ class RssCog(commands.Cog):
         liste = list()
         for x in cursor:
             liste.append(x)
+        cursor.close()
         return liste
 
     async def get_guild_flows(self,guildID):
@@ -1030,6 +1031,7 @@ class RssCog(commands.Cog):
         liste = list()
         for x in cursor:
             liste.append(x)
+        cursor.close()
         return liste
 
     async def add_flow(self,guildID,channelID,Type,link):
@@ -1044,6 +1046,7 @@ class RssCog(commands.Cog):
         query = ("INSERT INTO `{}` (`ID`,`guild`,`channel`,`type`,`link`,`structure`) VALUES ('{}','{}','{}','{}','{}','{}')".format(self.table,ID,guildID,channelID,Type,link,form))
         cursor.execute(query)
         cnx.commit()
+        cursor.close()
         return ID
 
     async def remove_flow(self,ID):
@@ -1055,6 +1058,7 @@ class RssCog(commands.Cog):
         query = ("DELETE FROM `{}` WHERE `ID`='{}'".format(self.table,ID))
         cursor.execute(query)
         cnx.commit()
+        cursor.close()
         return True
 
     async def get_all_flows(self):
