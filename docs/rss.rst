@@ -2,7 +2,7 @@
 Rss
 ===
 
-More and more bots offer the feature to follow news feeds, sometimes `rss atom feeds <https://en.wikipedia.org/wiki/RSS>`_,but most often Twitter or YouTube profiles. ZBot allows you to track any rss/atom feed, as well as any Twitter/YouTube channel. For Reddit feeds, you can search for the url of the rss feed, but a command will be created to make your life easier!
+More and more bots offer the feature to follow news feeds, sometimes `rss atom feeds <https://en.wikipedia.org/wiki/RSS>`_,but most often Twitter or YouTube profiles. ZBot allows you to track any rss/atom feed, as well as any Twitter/YouTube/Twitch/DeviantArt channel. For Reddit feeds, you can search for the url of the rss feed, but a command will be created to make your life easier!
 
 With this bot you have two possibilities to follow a feed: manually request the last post, or configure an automatic follow-up in a text channel. In the case of automatic tracking, ZBot will scan all feeds every ten minutes to check for new posts, sending them in if there are any. Just be careful: this automatic tracking costs a lot of resources to the bot, so you are limited to a certain number of automatic feeds (same for rss, twitter, youtube or minecraft) !
 
@@ -11,9 +11,9 @@ With this bot you have two possibilities to follow a feed: manually request the 
 See the last post
 -----------------
 
-**Syntax:** :code:`rss <youtube|twitter|web> <name|link>`
+**Syntax:** :code:`rss <youtube|twitter|twitch|deviant|web> <name|link>`
 
-This command allows you to see the last post of a youtube channel, a user on Twitter, or an rss feed. You can enter :code:`rss <type> help` to get a more complex guide to this command.
+This command allows you to see the last post of a youtube channel, a user on Twitter or Twitch or DeviantArt, or an rss feed. You can enter :code:`rss <type> help` to get a more complex guide to this command.
 
 To go faster, aliases such as 'yt' or 'tw' are available! YouTube channel names or frequently used web links are already listed in the bot database. Remember to check it out!
 
@@ -52,7 +52,7 @@ Mention a role
 
 This rss flow tracking option allows you to notify a role when a new post arrives. The roles mentioned are different between rss flows, which allows you a greater handling. 
 
-The "flow ID" argument is the identifier of the flow (found with the command `rss list<#see-every-feed>`_). If you do not enter this argument, or if the feed can't be found, the bot will open a menu where you can choose which feed to modify. Then another menu will allow you to choose which roles you want to mention.
+The "flow ID" argument is the identifier of the flow (found with the command `rss list <#see-every-feed>`_). If you do not enter this argument, or if the feed can't be found, the bot will open a menu where you can choose which feed to modify. Then another menu will allow you to choose which roles you want to mention.
 
 .. warning:: For this command too, the bot needs "`Embed Links <perms.html#embed-links>`_" permission!
 
