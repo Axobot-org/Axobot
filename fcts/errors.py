@@ -172,7 +172,7 @@ class ErrorsCog(commands.Cog):
 
     async def senf_err_msg(self,msg):
         """Envoie un message dans le salon d'erreur"""
-        salon = self.bot.get_channel(491370492561981474)
+        salon = self.bot.get_channel(626039503714254858)
         if salon == None:
             return False
         await salon.send(msg)
