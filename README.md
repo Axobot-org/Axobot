@@ -21,7 +21,10 @@ ZBot is a multifunction Discord bot, which allows among other things to :
 - search for Minecraft game elements: blocks, entities, advancements, commands...
 - search for a book and manage your library
 
-and many other things, which the list is constantly evolving
+and many other things, which the list is constantly evolving.
+
+Current available languages are French, English, German, Finnish and Lolcat.
+
 
 ## Support and contact
 
