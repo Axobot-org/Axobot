@@ -616,7 +616,11 @@
         "warn-bot": "Je ne peux pas avertir un bot ^^",
         "warn-but-db": "Notre base de donnée étant hors ligne, l'avertisement n'a pas pu être enregistré. Néanmoins le membre a bien reçu son avertissement en MP",
         "warn-mp": "Vous avez reçu un avertissement de la part du serveur *{}* : \n{}",
-        "wrong-guild": "Oups, il semble que cet émoji n'appartienne pas à ce serveur :thinking:"
+        "wrong-guild": "Oups, il semble que cet émoji n'appartienne pas à ce serveur :thinking:",
+        "give_roles-0": "Oups, il semblerai que ce rôle soit trop haut pour que je puisse le donner à qui que ce soit. Veuillez placer mon rôle au-dessus du rôle `{r}`",
+        "give_roles-1": "Le membre {u} est trop haut",
+        "give_roles-2": "-> {c} rôles attribués sur {m} !",
+        "give_roles-3": "Vous ne pouvez pas donner des rôles plus hauts que le vôtre !"
     },
     "morpion": {
         "already-playing": "Vous avez déjà une partie en cours !",

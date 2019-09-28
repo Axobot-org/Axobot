@@ -742,6 +742,39 @@ You must be an administrator of this server to use this command."""
         emb = self.bot.cogs['EmbedCog'].Embed(title=role.name,fields=fields,color=role.color).update_timestamp().create_footer(ctx.author)
         await ctx.send(embed=emb.discord_embed())
 
+    @main_role.command(name="give")
+    @commands.check(checks.has_manage_roles)
+    async def roles_give(self,ctx,role:discord.Role,users:commands.Greedy[typing.Union[discord.Role,discord.Member]]):
+        """Give a role to a list of roles/members
+        Users list may be either members or roles, or even only one member"""
+        if len(users)==0:
+            raise commands.MissingRequiredArgument(self.roles_give.clean_params['users'])
+        if not ctx.guild.me.guild_permissions.manage_roles:
+            return await ctx.send(await self.translate(ctx.guild.id,"modo","cant-mute"))
+        my_position = ctx.guild.me.roles[-1].position
+        if role.position >= my_position:
+            return await ctx.send(await self.translate(ctx.guild.id,"modo","give_roles-0",r=role.name))
+        if role.position >= ctx.author.roles[-1].position:
+            return await ctx.send(await self.translate(ctx.guild.id,"modo","give_roles-3"))
+        answer = list()
+        n_users = set()
+        error_count = 0
+        for item in users:
+            if isinstance(item,discord.Member):
+                n_users.add(item)
+            else:
+                for m in item.members:
+                    n_users.add(m)
+        for user in n_users:
+            if user.roles[-1].position >= my_position:
+                error_count += 1
+                if len("\n".join(answer))<1800:
+                    answer.append(await self.translate(ctx.guild.id,"modo","give_roles-1",u=user))
+            else:
+                await user.add_roles(role,reason="Asked by {}".format(ctx.author))
+        answer.append(await self.translate(ctx.guild.id,"modo","give_roles-2",c=len(n_users)-error_count,m=len(n_users)))
+        await ctx.send("\n".join(answer))
+
 
     @commands.command(name="pin")
     @commands.check(checks.has_manage_msg)

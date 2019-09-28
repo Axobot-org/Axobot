@@ -616,7 +616,11 @@
         "warn-bot": "I can't warn a bot ^^",
         "warn-but-db": "Our database being offline, the warning could not be saved. Nevertheless, the member did receive their warning in DM",
         "warn-mp": "You have received a warning from the *{}* server: \n{}",
-        "wrong-guild": "Oops, it seems this emoji doesn't belong to this server :thinking:"
+        "wrong-guild": "Oops, it seems this emoji doesn't belong to this server :thinking:",
+        "give_roles-0": "Oops, it seems that this role is too high for me to give to anyone. Please place my role above the `{r}` role",
+        "give_roles-1": "Member {u} is too high for me",
+        "give_roles-2": "-> {c} roles assigned out of {m} !",
+        "give_roles-3": "You can't give higher roles than yours!"
     },
     "morpion": {
         "already-playing": "You already have a game in progress!",

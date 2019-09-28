@@ -616,7 +616,11 @@
         "warn-bot": "Nope, cant warn anoder cool boat ^^",
         "warn-but-db": "Our dataz being offline, so ze warning couldnt be savd. Don't worry, this guy did receive his warning in DM :innocent:",
         "warn-mp": "U haz receivd 'warnung from *{}* servr: \n{}",
-        "wrong-guild": "Oooops, it seemz dis emoji dont belang dis server <:owo:499661437589913621>"
+        "wrong-guild": "Oooops, it seemz dis emoji dont belang dis server <:owo:499661437589913621>",
+        "give_roles-0": "Oops, this role iz 2 high 4 me 2 give 2 anyone. Plz place my role above dat `{r}` role",
+        "give_roles-1": "Member {u} is def 2 high 4 me :sad_face:",
+        "give_roles-2": "-> {c} roles gived out of {m} !",
+        "give_roles-3": "You can't give higher roles than yours LMAO!"
     },
     "morpion": {
         "already-playing": "U already are ingame!",
