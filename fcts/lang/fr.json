@@ -662,7 +662,39 @@
     "perms": {
         "general": "Permissions générales",
         "perms-0": "Le membre/rôle {} n'a pas été trouvé",
-        "perms-1": "**Permission de '{}' :**\n\n"
+        "perms-1": "**Permission de '{}' :**\n\n",
+        "perms-list": {
+            "add_reactions": "Ajouter des réactions",
+            "administrator": "Administrateur",
+            "attach_files": "Joindre des fichiers",
+            "ban_members": "Bannir des membres",
+            "change_nickname": "Changer de pseudo",
+            "connect": "Se connecter",
+            "create_instant_invite": "Créer une invitation",
+            "deafen_members": "Mettre en sourdine des membres",
+            "embed_links": "Intégrer des liens",
+            "external_emojis": "Utiliser des émojis externes",
+            "kick_members": "Expulser des membres",
+            "manage_channels": "Gérer les salons",
+            "manage_emojis": "Gérer les émojis",
+            "manage_guild": "Gérer le serveur",
+            "manage_messages": "Gérer les messages",
+            "manage_nicknames": "Gérer les pseudos",
+            "manage_roles": "Gérer les rôles",
+            "manage_webhooks": "Gérer les webhooks",
+            "mention_everyone": "Mentionner tout le monde",
+            "move_members": "Déplacer des membres",
+            "mute_members": "Couper le micro de membres",
+            "priority_speaker": "Voix prioritaire",
+            "read_message_history": "Voir les anciens messages",
+            "read_messages": "Lire les messages",
+            "send_messages": "Envoyer des messages",
+            "send_tts_messages": "Envoyer des messages TTS",
+            "speak": "Parler",
+            "stream": "Passer en direct",
+            "use_voice_activation": "Utiliser la Détection de la voix",
+            "view_audit_log": "Voir les logs du serveur"
+        }
     },
     "roles_react": {
         "already-1-rr": "Vous avez déjà un rôle désigné pour cet émoji",
@@ -807,7 +839,7 @@
         "welcome_roles": "Liste des rôles donnés automatiquement aux nouveaux membres : {}",
         "xp_rate": "Modficateur de gains d'xp : {}",
         "xp_type": "Type de système d'xp : {}",
-        "autoremove_xp":"Points d'expériences enlevés chaque jour aux membres inactifs : {}"
+        "autoremove_xp": "Points d'expériences enlevés chaque jour aux membres inactifs : {}"
     },
     "stats_infos": {
         "categ-0": "Catégorie",
