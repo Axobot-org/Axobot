@@ -616,7 +616,8 @@ class RssCog(commands.Cog):
         You can also provide arguments to change the color/text of the embed. Followed arguments are usable:
         - color: color of the embed (hex or decimal value)
         - title: title override, which will disable the default one (max 256 characters)
-        - footer: small text displayed at the bottom of the embed"""
+        - footer: small text displayed at the bottom of the embed
+        Example : `rss embed 6678466620137 true title="hey u" footer = "Hi \\n i'm a footer"`"""
         try:
             try:
                 flow = await self.askID(ID,ctx)
@@ -634,8 +635,12 @@ class RssCog(commands.Cog):
                 if e!=None:
                     await self.bot.cogs["ErrorsCog"].on_error(e,ctx)
                 return
+            if arguments==None or len(arguments.keys())==0:
+                arguments = None
             flow = flow[0]
-            if value==None:
+            values_to_update = list()
+            txt = list()
+            if value==None and arguments==None:
                 await ctx.send(await self.translate(ctx.guild.id,"rss","use_embed_true" if flow['use_embed'] else 'use_embed_false'))
                 def check(msg):
                     try:
@@ -648,8 +653,13 @@ class RssCog(commands.Cog):
                 except asyncio.TimeoutError:
                     return await ctx.send(await self.translate(ctx.guild.id,"rss","too-long"))
                 value = commands.core._convert_to_bool(msg.content)
-            values_to_update = [('use_embed',value)]
-            if arguments!=None and len(arguments.keys())>0:
+            if value != None and value != flow['use_embed']:
+                values_to_update.append(('use_embed',value))
+                txt.append(await self.translate(ctx.guild.id,"rss","use_embed-success",v=value,f=flow['ID']))
+            elif value == flow['use_embed'] and arguments==None:
+                await ctx.send(await self.translate(ctx.guild.id,"rss","use_embed-same"))
+                return
+            if arguments!=None:
                 if 'color' in arguments.keys():
                     c = await args.Color().convert(ctx,arguments['color'])
                     if c != None:
@@ -658,8 +668,10 @@ class RssCog(commands.Cog):
                     values_to_update.append(('embed_title',arguments['title']))
                 if 'footer' in arguments.keys():
                     values_to_update.append(('embed_footer',arguments['footer']))
-            await self.update_flow(flow['ID'],values_to_update)
-            await ctx.send(await self.translate(ctx.guild.id,"rss","use_embed-success",v=value,f=flow['ID']))
+                txt.append(await self.translate(ctx.guild.id,"rss","embed-json-changed"))
+            if len(values_to_update)>0:
+                await self.update_flow(flow['ID'],values_to_update)
+            await ctx.send("\n".join(txt))
         except Exception as e:
             await ctx.send(str(await self.translate(ctx.guild.id,"rss","guild-error")).format(e))
             await ctx.bot.cogs['ErrorsCog'].on_error(e,ctx)
