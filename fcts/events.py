@@ -52,7 +52,7 @@ class Events(commands.Cog):
         if before.nick != after.nick:
             cnx = self.bot.cnx_frm
             cursor = cnx.cursor()
-            ID = round(time.time()/2)
+            ID = round(time.time()/2) * 10 + random.randrange(0,9)
             b = '' if before.nick==None else before.nick.replace("'","\\'")
             a = '' if after.nick==None else after.nick.replace("'","\\'")
             query = ("INSERT INTO `usernames_logs` (`ID`,`user`,`old`,`new`,`guild`) VALUES ('{}','{}','{}','{}','{}')".format(ID,before.id,b,a,before.guild.id))
@@ -66,7 +66,7 @@ class Events(commands.Cog):
         if before.name != after.name:
             cnx = self.bot.cnx_frm
             cursor = cnx.cursor()
-            ID = round(time.time()/2)
+            ID = round(time.time()/2) * 10 + random.randrange(0,9)
             query = ("INSERT INTO `usernames_logs` (`ID`,`user`,`old`,`new`,`guild`) VALUES ('{}','{}','{}','{}','{}')".format(ID,before.id,before.name.replace("'","\\'"),after.name.replace("'","\\'"),0))
             cursor.execute(query)
             cnx.commit()
