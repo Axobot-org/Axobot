@@ -724,7 +724,7 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
             l = await self.translate(ctx.channel,'infos','discordlinks')
             links = ["https://dis.gd/status","https://dis.gd/tos","https://dis.gd/report","https://dis.gd/feedback","https://support.discordapp.com/hc/articles/115002192352","https://discordapp.com/developers/docs/legal"]
             txt = "\n".join(['['+l[i]+']('+links[i]+')' for i in range(len(l))])
-            em = self.bot.cogs["EmbedCog"].Embed(desc=txt).update_timestamp().create_footer(ctx.author).discord_embed()
+            em = self.bot.cogs["EmbedCog"].Embed(desc=txt).update_timestamp().create_footer(ctx.author)
             await ctx.send(embed=em)
         else:
             txt = "\n".join([f'• {k}: <{v}>' for k,v in (await self.translate(ctx.channel,'infos','discordlinks')).items()])
@@ -834,7 +834,10 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
             results = list(cursor)
             cursor.close()
             if len(results) > 0:
-                desc = results[0][await self.translate(ctx.channel,'current_lang','current')]
+                used_lang = await self.translate(ctx.channel,'current_lang','current')
+                if used_lang not in results[0].keys():
+                    used_lang = "en"
+                desc = results[0][used_lang]
                 time = results[0]['utc_release']
                 title = (await self.translate(ctx.channel,'keywords','version')).capitalize() + ' ' + results[0]['version']
         if len(results)==0:

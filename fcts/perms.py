@@ -45,11 +45,17 @@ class PermsCog(commands.Cog):
             avatar = ctx.guild.icon_url_as(format='png',size=256)
             name = str(target)
         permsl = list()
+        # Get the perms translations
+        perms_translations = await self.translate(ctx.guild.id,'perms','perms-list')
         # Here we check if the value of each permission is True.
         for perm, value in perms:
             if (perm not in self.perms_name['text']+self.perms_name['common_channel'] and isinstance(channel,discord.TextChannel)) or (perm not in self.perms_name['voice']+self.perms_name['common_channel'] and isinstance(channel,discord.VoiceChannel)):
                 continue
-            perm = perm.replace('_',' ').title()
+            #perm = perm.replace('_',' ').title()
+            if perm in perms_translations.keys():
+                perm = perms_translations[perm]
+            else:
+                perm = perm.replace('_',' ').title()
             if value:
                 permsl.append(self.bot.cogs['EmojiCog'].customEmojis['green_check']+perm)
             else:

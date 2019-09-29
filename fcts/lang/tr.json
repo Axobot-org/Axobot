@@ -1,0 +1,133 @@
+{
+    "activity": {
+        "listen": "dinliyor",
+        "nothing": "hiçbir şey",
+        "play": "oynuyor",
+        "stream": "yayınlıyor",
+        "watch": "izliyor"
+    },
+    "admin": {
+        "emergency": "Bot için acil servis durumu anons edildi. Bu olay birileri benim kodumu ele geçirmeye çalışırken olabilir. \nHasarı limitlemek için, içinde bulunduğum sunucuları acilen terketmeye mecbur bırakıldım, umarım o çok geç değildir.\nDaha fazla bilgi için resmi sunucuma gelin:  https://discord.me/zbot (eğer çalışmazsa dökümantasyonları kontrol edin: https://zbot.rtfd.io)"
+    },
+    "aide": {
+        "aliases": "Takma isimler",
+        "categories": {
+            "fun": "eğlence",
+            "moderation": "Moderasyon",
+            "other": "diğerleri",
+            "server-settings": "sunucu ayarları",
+            "staff": "bot yetkilileri",
+            "translators": "çeviri takımı",
+            "unclassed": "Sınıflandırılmamış",
+            "users-info": "Kullanıcılar bilgisi"
+        },
+        "check-desc": {
+            "bot_has_permissions": [
+                "Bot eksik yetkilere sahip",
+                "Bot eksik yetkilere sahip değil"
+            ],
+            "can_ban": [
+                "Rollerinizden birisi (`ban`) komutunu kullanmak için yetkilendirildi",
+                "eksik izinlendirilmiş rol (`ban`)"
+            ],
+            "can_clear": [
+                "Rollerinizden birisi (`clear`) komutunu kullanmak için yetkilendirildi",
+                "eksik izinlendirilmiş rol (`clear`)"
+            ],
+            "can_edit_case": [
+                "Rollerinizden birisi (`warn`) komutunu kullanmak için yetkilendirildi",
+                "eksik izinlendirilmiş rol (`warn`)"
+            ],
+            "can_kick": [
+                "Rollerinizden birisi (`kick`) komutunu kullanmak için yetkilendirildi",
+                "eksik izinlendirilmiş rol (`kick`)"
+            ],
+            "can_mute": [
+                "Rollerinizden birisi (`mute`) komutunu kullanmak için yetkilendirildi",
+                "eksik izinlendirilmiş rol (`mute`)"
+            ],
+            "can_say": [
+                "Rollerinizden birisi (`say`) komutunu kullanmak için yetkilendirildi",
+                "eksik izinlendirilmiş rol (`say`)"
+            ],
+            "can_slowmode": [
+                "Rollerinizden birisi (`slowmode`) komutunu kullanmak için yetkilendirildi",
+                "eksik izinlendirilmiş rol (`slowmode`)"
+            ],
+            "can_use_cookie": [
+                "Aragorn1202 tarafından seçilmiş birisin",
+                "Bu komut beyaz listeyi kullanır"
+            ],
+            "can_use_rss": [
+                "'Administrator' yetkisine sahipsin",
+                "'Administrator' yetkisi eksik"
+            ],
+            "can_warn": [
+                "Rollerinizden birisi (`warn`) komutunu kullanmak için yetkilendirildi",
+                "Eksik izinlendirilmiş rol  (`warn`)"
+            ],
+            "check_admin": [
+                "Bot adminlerinden biri olmak gerek",
+                "Bot admini değilsin"
+            ],
+            "guild_only": [
+                "Sadece bir sunucuda kullanılabilir",
+                "Sadece bir sunucuda kullanılabilir"
+            ],
+            "has_admin": [
+                "'Administrator' yetkisine sahipsin",
+                "'Administrator' yetkisi eksik"
+            ],
+            "has_embed_links": [
+                "'Embed links' yetkisine sahipsin",
+                "'Embed links' yetkisine sahip olman gerek"
+            ],
+            "has_manage_guild": [
+                "'Manage Server' yetkin var",
+                "'Manage Server' yetkisi eksik"
+            ],
+            "has_manage_msg": [
+                "'Manage Messages' yetkisine sahipsin",
+                "'Manage Messages' yetkisi eksik"
+            ],
+            "has_manage_nicknames": [
+                "'Manage Nicknames' yetkisine sahipsin",
+                "'Manage Nicknames' yetkisi eksik"
+            ],
+            "has_manage_roles": [
+                "'Manage Roles' yetkisine sahipsin",
+                "'Manage Roles' yetkisi eksik"
+            ],
+            "has_permissions": [
+                "Eksik Discord yetkilerine sahipsin",
+                "Gerekli Discord izinleriniz yok"
+            ],
+            "is_fun_enabled": [
+                "Eğlence komutları aktif",
+                "Eğlence komutları aktif edilmek zorunda"
+            ],
+            "is_owner": [
+                "Botun sahibi olmak zorundasın",
+                "Botun sahibi değilsin"
+            ],
+            "is_support_staff": [
+                "Botun yetkililerinden birisin",
+                "Botun yetkililerinden biri olmalısın"
+            ],
+            "is_translator": [
+                "Çeviri takımından birisin.",
+                "Çeviri takımının bir parçası olman gerekiyor"
+            ],
+            "verify_role_exists": [
+                "Doğrulama rolü ayarlandı",
+                "Hiçbir doğrulama rolü eklenmedi"
+            ]
+        },
+        "checks": "Gerekliler:",
+        "cmd-not-found": "\"{}\" isimli bir komut yok",
+        "embed_title": "{u} için aktif komutlar",
+        "footer": "Bir komut üzerinde daha fazla bilgi almak için {}help yazın",
+        "no-desc-cmd": "Bu komut için bir açıklama yok",
+        "no-desc-cog": "Bu cog. için bir açıklama yok"
+    }
+}

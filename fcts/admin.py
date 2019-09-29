@@ -82,7 +82,7 @@ class AdminCog(commands.Cog):
                 text+="\n- {} *({})*".format(cmd.name,'...' if cmd.help==None else cmd.help.split('\n')[0])
                 if type(cmd)==commands.core.Group:
                     for cmds in cmd.commands:
-                        text+="\n        - {} *({})*".format(cmds.name,cmds.help)
+                        text+="\n        - {} *({})*".format(cmds.name,cmds.help.split('\n')[0])
             await ctx.send(text)
 
     @main_msg.command(name='god')
@@ -780,8 +780,8 @@ Cette option affecte tous les serveurs"""
             os.remove('backup.tar')
         except:
             pass
-        msg = ":white_check_mark: Sauvegarde terminée en {} secondes !".format(round(time.time()-t,3))
-        await self.print(msg)
+        msg = "Backup completed in {} seconds!".format(round(time.time()-t,3))
+        await self.bot.log.info(msg)
         if ctx != None:
             await message.edit(content=msg)
             

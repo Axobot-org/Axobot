@@ -1,4 +1,4 @@
-import discord, datetime, asyncio, logging, time, aiohttp, json, random
+import discord, datetime, asyncio, logging, time, aiohttp, json, random, shutil
 from discord.ext import commands, tasks
 
 
@@ -15,6 +15,7 @@ class Events(commands.Cog):
         self.file = "events"
         self.dbl_last_sending = datetime.datetime.utcfromtimestamp(0)
         self.partner_last_check = datetime.datetime.utcfromtimestamp(0)
+        self.dbl_last_tr_backup = datetime.datetime.utcfromtimestamp(0)
         self.loop_errors = [0,datetime.datetime.utcfromtimestamp(0)]
         self.embed_colors = {"welcome":5301186,
         "mute":4868682,
@@ -44,10 +45,37 @@ class Events(commands.Cog):
     async def on_ready(self):
         self.translate = self.bot.cogs["LangCog"].tr
 
+
+    @commands.Cog.listener()
+    async def on_member_update(self,before:discord.Member,after:discord.Member):
+        """Called when a member change something (status, activity, nickame, roles)"""
+        if before.nick != after.nick:
+            cnx = self.bot.cnx_frm
+            cursor = cnx.cursor()
+            ID = round(time.time()/2) * 10 + random.randrange(0,9)
+            b = '' if before.nick==None else before.nick.replace("'","\\'")
+            a = '' if after.nick==None else after.nick.replace("'","\\'")
+            query = ("INSERT INTO `usernames_logs` (`ID`,`user`,`old`,`new`,`guild`) VALUES ('{}','{}','{}','{}','{}')".format(ID,before.id,b,a,before.guild.id))
+            cursor.execute(query)
+            cnx.commit()
+            cursor.close()
+
+    @commands.Cog.listener()
+    async def on_user_update(self,before:discord.User,after:discord.User):
+        """Called when a user change something (avatar, username, discrim)"""
+        if before.name != after.name:
+            cnx = self.bot.cnx_frm
+            cursor = cnx.cursor()
+            ID = round(time.time()/2) * 10 + random.randrange(0,9)
+            query = ("INSERT INTO `usernames_logs` (`ID`,`user`,`old`,`new`,`guild`) VALUES ('{}','{}','{}','{}','{}')".format(ID,before.id,before.name.replace("'","\\'"),after.name.replace("'","\\'"),0))
+            cursor.execute(query)
+            cnx.commit()
+            cursor.close()
+
+
     async def on_guild_add(self,guild):
         """Called when the bot joins a guild"""
         await self.send_guild_log(guild,"join")
-
 
     async def on_guild_del(self,guild):
         """Called when the bot left a guild"""
@@ -105,7 +133,7 @@ class Events(commands.Cog):
         await self.check_mp_adv(msg)
         if msg.channel.recipient.id in [392766377078816789,279568324260528128,552273019020771358]:
             return
-        channel = self.bot.get_channel(488768968891564033)
+        channel = self.bot.get_channel(625320165621497886)
         if channel==None:
             return self.bot.log.warn("[send_mp] Salon de MP introuvable")
         emb = msg.embeds[0] if len(msg.embeds)>0 else None
@@ -291,13 +319,15 @@ class Events(commands.Cog):
             d = datetime.datetime.now()
             if int(d.second)%20 == 0:
                 await self.check_tasks()
-            if int(d.minute)%20 == 0:
+            elif int(d.minute)%20 == 0:
                 await self.bot.cogs['XPCog'].clear_cards()
                 await self.rss_loop()
-            if int(d.hour)%7 == 1 and d.hour != self.partner_last_check.hour:
+            elif int(d.hour)%7 == 1 and d.hour != self.partner_last_check.hour:
                 await self.partners_loop()
-            if int(d.hour) == 0 and d.day != self.dbl_last_sending.day:
+            elif int(d.hour) == 0 and d.day != self.dbl_last_sending.day:
                 await self.dbl_send_data()
+            elif int(d.hour)%12 == 1 and (d.hour != self.dbl_last_tr_backup.hour or d.day != self.dbl_last_tr_backup.day):
+                await self.translations_backup()
         except Exception as e:
             await self.bot.cogs['ErrorsCog'].on_error(e,None)
             self.loop_errors[0] += 1
@@ -396,6 +426,23 @@ class Events(commands.Cog):
         emb = self.bot.cogs["EmbedCog"].Embed(desc='**Partners channels updated** in {}s ({} channels - {} partners)'.format(round(time.time()-t,3),count[0],count[1]),color=10949630).update_timestamp().set_author(self.bot.user)
         await self.bot.cogs["EmbedCog"].send([emb],url="loop")
         
+    async def translations_backup(self):
+        """Do a backup of the translations files"""
+        from os import remove
+        t = time.time()
+        self.dbl_last_tr_backup = datetime.datetime.now()
+        try:
+            remove('translation-backup.tar')
+        except:
+            pass
+        try:
+           shutil.make_archive('translation-backup','tar','translation')
+        except FileNotFoundError:
+            await self.bot.cogs['ErrorsCog'].senf_err_msg("Translators backup: Unable to find backup folder")
+            return
+        emb = self.bot.cogs["EmbedCog"].Embed(desc='**Translations files backup** completed in {}s'.format(round(time.time()-t,3)),color=10197915).update_timestamp().set_author(self.bot.user)
+        await self.bot.cogs["EmbedCog"].send([emb],url="loop")
+    
             
 
     async def partners_loop(self):

@@ -200,7 +200,7 @@
         "usernotfound": "Unable to find the user `{u}` :confused:"
     },
     "events": {
-        "mp-adv": "You are probably trying to invite me to this server? If that is the case, I can't join him with a simple invitation. An administrator must use my own invitation link, here: <https://bot.discord.io/zbot> :wink:"
+        "mp-adv": "You are probably trying to invite me to this server? If that is the case, I can't join him with a simple invitation. An administrator must use my own invitation link, here: <https://zrunner.me/invitezbot> :wink:"
     },
     "find": {
         "chan-0": "Channel not found",
@@ -234,6 +234,7 @@
         "count-2": "You wanna blow up Discord! {e} For obvious performance reasons, I will impose a limit of {l} messages.",
         "count-3": "Oops, I'm unable to read this channel history. Please check my permissions...",
         "count-4": "On the last {limit} messages, {user} have posted {x} messages ({p}%)",
+        "count-5": "You cannot use this command in a channel where you do not have access to the message history",
         "embed-error": "An error has occurred: `{}`",
         "fun-list": "Here is the list of available fun commands:",
         "invalid-city": "Invalid city :confused:",
@@ -318,7 +319,7 @@
         "prefix": "List of currently usable prefixes:",
         "stats": "**Bot version:** {bot_v} \n**Number of servers:** {s_count} \n**Number of visible members:** {m_count} ({b_count} **bots**)\n**Number of code lines:** {l_count}\n**Used languages:** {lang}\n**Python version :** {p_v} \n**Version of the `discord.py` lib:** {d_v} \n**Loading on the RAM:** {ram} GB \n**Loading on the CPU:** {cpu} % \n**API latency time:** {api} ms\n**Total of earned xp:** {xp}",
         "stats-title": "**Bot statistics**",
-        "text-0": "Hello! I'm {0} !\nI'm a bot that allows you to do a lot of things: moderation, mini-games, an xp system, statistics and many other super useful commands (and totally pointless ones)!\nYou can start by typing `!help` in this chat to see the list of available commands, then `!config see` will let you see the configuration options (a website is in preparation).\n\nFor helping me in the creation of the bot, my owner and I would like to thank Awhikax for his support during the various crises, Aragorn1202 for all his ideas and sentences full of good sense, Adri526 for all these beautiful logos, emojis and profile pics, and Pilotnick54 to review and correct my English!\n:globe_with_meridians: Some links may be useful: \n:arrow_forward: My Discord server : http://discord.gg/N55zY88\n:arrow_forward: A link to invite me to another server : <https://bot.discord.io/zbot>\n:arrow_forward: The bot documentation : <https://zbot.rtfd.io/>\n:arrow_forward: My creator's Twitter account : <https://twitter.com/z_runnerr>\n\nHave a nice day!"
+        "text-0": "Hello! I'm {0} !\nI'm a bot that allows you to do a lot of things: moderation, mini-games, an xp system, statistics and many other super useful commands (and totally pointless ones)!\nYou can start by typing `!help` in this chat to see the list of available commands, then `!config see` will let you see the configuration options (a website is in preparation).\n\nFor helping me in the creation of the bot, my owner and I would like to thank Awhikax for his support during the various crises, Aragorn1202 for all his ideas and sentences full of good sense, Adri526 for all these beautiful logos, emojis and profile pics, and Pilotnick54 to review and correct my English!\n:globe_with_meridians: Some links may be useful: \n:arrow_forward: My Discord server : http://discord.gg/N55zY88\n:arrow_forward: A link to invite me to another server : <https://zrunner.me/invitezbot>\n:arrow_forward: The bot documentation : <https://zbot.rtfd.io/>\n:arrow_forward: My creator's Twitter account : <https://twitter.com/z_runnerr>\n\nHave a nice day!"
     },
     "infos_2": {
         "fish-1": "Number of fishes",
@@ -615,7 +616,11 @@
         "warn-bot": "I can't warn a bot ^^",
         "warn-but-db": "Our database being offline, the warning could not be saved. Nevertheless, the member did receive their warning in DM",
         "warn-mp": "You have received a warning from the *{}* server: \n{}",
-        "wrong-guild": "Oops, it seems this emoji doesn't belong to this server :thinking:"
+        "wrong-guild": "Oops, it seems this emoji doesn't belong to this server :thinking:",
+        "give_roles-0": "Oops, it seems that this role is too high for me to give to anyone. Please place my role above the `{r}` role",
+        "give_roles-1": "Member {u} is too high for me",
+        "give_roles-2": "-> {c} roles assigned out of {m} !",
+        "give_roles-3": "You can't give higher roles than yours!"
     },
     "morpion": {
         "already-playing": "You already have a game in progress!",
@@ -661,7 +666,39 @@
     "perms": {
         "general": "General permissions",
         "perms-0": "Member/role {} not found",
-        "perms-1": "**\"{}\" permissions:**\n\n"
+        "perms-1": "**\"{}\" permissions:**\n\n",
+        "perms-list": {
+            "add_reactions": "Add reactions",
+            "administrator": "Administrator",
+            "attach_files": "Attach files",
+            "ban_members": "Ban members",
+            "change_nickname": "Change nickname",
+            "connect": "Connect",
+            "create_instant_invite": "Create invite",
+            "deafen_members": "Deafen members",
+            "embed_links": "Embed links",
+            "external_emojis": "Use external emojis",
+            "kick_members": "Kick members",
+            "manage_channels": "Manage channels",
+            "manage_emojis": "Manage emojis",
+            "manage_guild": "Manage server",
+            "manage_messages": "Manage messages",
+            "manage_nicknames": "Manage nickames",
+            "manage_roles": "Manage roles",
+            "manage_webhooks": "Manage webhooks",
+            "mention_everyone": "Mention everyone",
+            "move_members": "Move members",
+            "mute_members": "Mute members",
+            "priority_speaker": "Priority speaker",
+            "read_message_history": "Read message history",
+            "read_messages": "Read messages",
+            "send_messages": "Send messages",
+            "send_tts_messages": "Send TTS messages",
+            "speak": "Speak",
+            "stream": "Go live",
+            "use_voice_activation": "Use voice activity",
+            "view_audit_log": "View audit logs"
+        }
     },
     "roles_react": {
         "already-1-rr": "You already have a designated role for this emoji",
@@ -685,6 +722,7 @@
         "choose-mentions-1": "Please choose the flow to modify",
         "choose-roles": "What roles will be mentioned?",
         "delete-success": "The flow has been successfully deleted!",
+        "embed-json-changed": "The embed of this feed has been modified",
         "fail-add": "An error occurred while processing your response. Please try again later, or contact bot support (enter the command `about` for server link)",
         "flow-limit": "For performance reasons, you cannot track more than {} rss feeds per server.",
         "guild-complete": "{} rss streams have been correctly reloaded, in {} seconds!",
@@ -710,23 +748,26 @@
         "too-long": "You waited too long, sorry :hourglass:",
         "tw": "Twitter",
         "tw-default-flow": "{logo}  | New tweet of {author}! ({date})\n\n{title}\n\nLink: {link}\n\n{mentions}",
-        "tw-form-last": "{logo}  |  Here is the last tweet of {author}:\nWritten on {date}\n\n{title}\n\nLink : {url}",
+        "tw-form-last": "{logo}  |  Here is the last tweet of {author}:\nWritten on {date}\n\n{title}\n\nLink: {url}",
         "tw-help": "To search for a twitter channel, you must enter the identifier of that channel. You will find it at the end of the string url, it usually corresponds to the user's name.\nFor example, for %https://twitter.com/Mc_AsiliS*, you must enter `Mc_AsiliS`.",
         "twitch": "Twitch",
         "twitch-default-flow": "{logo}  | New live by {author}! ({date})\n\n{title}\n\nLink: {link}\n\n{mentions}",
-        "twitch-form-last": "{logo}  | Here is the last video of {author}:\n{title}\nPublished on {date}\nLink : {url}\n",
+        "twitch-form-last": "{logo}  | Here is the last video of {author}:\n{title}\nPublished on {date}\nLink: {url}\n",
         "use_embed-success": "The value has been changed to {v} for flow n°{f}!",
         "use_embed_false": "This feed does not use embed to be sent. Do you want to use an embed for this flow? (true/false)",
+        "use_embed-same": "The use of embeds for this flow has not changed",
         "use_embed_true": "This flow currently uses embeds to be sent. Do you still want to use an embed for this flow? (true/false)",
         "web": "Web",
         "web-default-flow": "{logo}  | New post on {author} ({date}) :\n        {title}\n\n{link}\n\n{mentions}",
-        "web-form-last": "{logo}  |  Here is the last post of {author}:\n**{title}**\n*Written on {date}*\nLink : {link}",
+        "web-form-last": "{logo}  |  Here is the last post of {author}:\n**{title}**\n*Written on {date}*\nLink: {link}",
         "web-help": "To search for an rss feed from any website, simply enter the rss/atom feed url as a parameter. If the feed is valid, I will send you the last article posted on this site.\n*Tip: some rss feeds are already filled in my code. Sometimes you can just put `fr-minecraft` or `minecraft.net`* :wink:",
         "web-invalid": "Oops, this url address is invalid :confused:",
         "yt": "YouTube",
-        "yt-default-flow": "{logo}  | New video of {author}: **{title}**\nPublished on {date}\nLink : {link}\n{mentions}",
-        "yt-form-last": "{logo}  | Here is the last video of {author}:\n{title}\nPublished on {date}\nLink : {url}",
-        "yt-help": "To search for a youtube channel, you must enter the channel ID. You will find it at the end of the string url, it can be either the name, or a string of random characters.\n*Tip: some channels are already filled in my code. Sometimes you can just put `neil3000` or `Oxisius`* :wink:"
+        "yt-default-flow": "{logo}  | New video of {author}: **{title}**\nPublished on {date}\nLink: {link}\n{mentions}",
+        "yt-form-last": "{logo}  | Here is the last video of {author}:\n{title}\nPublished on {date}\nLink: {url}",
+        "yt-help": "To search for a youtube channel, you must enter the channel ID. You will find it at the end of the string url, it can be either the name, or a string of random characters.\n*Tip: some channels are already filled in my code. Sometimes you can just put `neil3000` or `Oxisius`* :wink:",
+        "deviant-default-flow": "{logo}  | New creation by {author} : **{title}**\nPublished on {date}\nLink: {link}\n{mentions}",
+        "deviant-form-last": "{logo}  | Here is the new creation of {author}:\n{title}\nPublished on {date}\nLink: {url}"
     },
     "server": {
         "change-0": "This option does not exist :confused:",

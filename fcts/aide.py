@@ -290,7 +290,9 @@ If the bot can't send the new command format, it will try to send the old one.""
                         print(check_name,str(c))
                 except Exception as e:
                     await self.bot.cogs["ErrorsCog"].on_error(e,ctx)
-        checks = "__" + await self.translate(ctx.channel,'aide','checks') + "__\n" + '\n'.join(checks)
+            checks = "__" + await self.translate(ctx.channel,'aide','checks') + "__\n" + '\n'.join(checks)
+        else:
+            checks = ""
         # Module
         category = "unclassed"
         for k,v in self.commands_list.items():

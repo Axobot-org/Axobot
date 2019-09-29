@@ -19,5 +19,5 @@ start2.py
 # Miscellaneous
 *.log
 ._*
-translation
+translation*
 docs/_*

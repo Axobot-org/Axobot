@@ -170,7 +170,7 @@ class arguments(commands.Converter):
 
     async def convert(self,ctx:commands.Context,argument:str) -> dict:
         answer = dict()
-        for result in re.finditer(r'(\w+) ?= ?"((?:[^"\\]*|\\")*)"',argument):
+        for result in re.finditer(r'(\w+) ?= ?\"((?:[^\"\\]+|\"|\\)+)\"',argument):
             answer[result.group(1)] = result.group(2).replace('\\"','"')
         return answer
 
