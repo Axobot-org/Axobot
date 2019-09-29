@@ -200,7 +200,7 @@
         "usernotfound": "Impossible de trouver l'utilisateur `{u}` :confused:"
     },
     "events": {
-        "mp-adv": "Vous cherchez sans doute à m'inviter sur ce serveur ? Si c'est le cas, je ne peux pas le rejoindre avec une simple invitation. Il faut qu'un administrateur utilise mon propre lien d'invitation, ici : <https://bot.discord.io/zbot> :wink:"
+        "mp-adv": "Vous cherchez sans doute à m'inviter sur ce serveur ? Si c'est le cas, je ne peux pas le rejoindre avec une simple invitation. Il faut qu'un administrateur utilise mon propre lien d'invitation, ici : <https://zrunner.me/invitezbot> :wink:"
     },
     "find": {
         "chan-0": "Salon introuvable",
@@ -234,6 +234,7 @@
         "count-2": "Mais vous voulez faire exploser Discord ! {e} Pour des raisons évidentes de performances, je vais vous imposer une limite à {l} messages.",
         "count-3": "Oups, il m'est impossible de lire l'historique de ce salon. Veuillez vérifier mes permissions...",
         "count-4": "Sur les {limit} derniers messages, {user} en a posté {x} ({p}%)",
+        "count-5": "Vous ne pouvez pas utiliser cette commande dans un salon où vous n'avez pas accès à l'historique des messages",
         "embed-error": "Une erreur est survenue: `{}`",
         "fun-list": "Voici la liste des commandes fun disponibles :",
         "invalid-city": "Nom de ville invalide",
@@ -318,7 +319,7 @@
         "prefix": "Liste des préfixes actuellement utilisables :",
         "stats": "**Version du bot :** {bot_v} \n**Nombre de serveurs :** {s_count} \n**Nombre de membres visibles :** {m_count} (dont {b_count} **bots**)\n**Nombre de lignes de code :** {l_count}\n**Langues utilisées :** {lang} \n**Version de Python :** {p_v} \n**Version de la bibliothèque `discord.py` :** {d_v} \n**Charge sur la mémoire vive :** {ram} GB \n**Charge sur le CPU :** {cpu} % \n**Temps de latence de l'api :** {api} ms\n**Nombre total d'xp gagné :** {xp}xp",
         "stats-title": "**Statistiques du bot**",
-        "text-0": "Bonjour ! Moi c'est {0} !\n\nJe suis un bot qui permet de faire *beaucoup* de choses : de la modération, des mini-jeux, un système d'xp, des statistiques et plein d'autres commandes plus ou moins utiles ! \nVous pouvez commencer par taper `!help` dans ce tchat pour voir la liste des commandes disponibles, puis `!config see` vous permettra de voir les options de configuration (un site web est en préparation). \n\nPour m'avoir aidé dans la création du bot, mon propriétaire et moi souhaitons remercier Awhikax pour son soutien apporté lors des différentes crises, Aragorn1202 pour toutes ses idées et ses phrases pleines de bon sens, Adri526 pour tous ces magnifiques logos, émojis et images de profil, et Pilotnick54 pour relire et corriger mon anglais !\n\n:globe_with_meridians: Quelques liens pourront vous être utiles : \n:arrow_forward: Mon serveur Discord : http://discord.gg/N55zY88\n:arrow_forward: Un lien pour m'inviter dans un autre serveur : <https://bot.discord.io/zbot>\n:arrow_forward: La documentation du bot : <https://zbot.rtfd.io/>\n:arrow_forward: Le compte Twitter de mon créateur : <https://twitter.com/z_runnerr>\n\nBonne journée !"
+        "text-0": "Bonjour ! Moi c'est {0} !\n\nJe suis un bot qui permet de faire *beaucoup* de choses : de la modération, des mini-jeux, un système d'xp, des statistiques et plein d'autres commandes plus ou moins utiles ! \nVous pouvez commencer par taper `!help` dans ce tchat pour voir la liste des commandes disponibles, puis `!config see` vous permettra de voir les options de configuration (un site web est en préparation). \n\nPour m'avoir aidé dans la création du bot, mon propriétaire et moi souhaitons remercier Awhikax pour son soutien apporté lors des différentes crises, Aragorn1202 pour toutes ses idées et ses phrases pleines de bon sens, Adri526 pour tous ces magnifiques logos, émojis et images de profil, et Pilotnick54 pour relire et corriger mon anglais !\n\n:globe_with_meridians: Quelques liens pourront vous être utiles : \n:arrow_forward: Mon serveur Discord : http://discord.gg/N55zY88\n:arrow_forward: Un lien pour m'inviter dans un autre serveur : <https://zrunner.me/invitezbot>\n:arrow_forward: La documentation du bot : <https://zbot.rtfd.io/>\n:arrow_forward: Le compte Twitter de mon créateur : <https://twitter.com/z_runnerr>\n\nBonne journée !"
     },
     "infos_2": {
         "fish-1": "Nombre de poissons trouvés",
@@ -615,7 +616,11 @@
         "warn-bot": "Je ne peux pas avertir un bot ^^",
         "warn-but-db": "Notre base de donnée étant hors ligne, l'avertisement n'a pas pu être enregistré. Néanmoins le membre a bien reçu son avertissement en MP",
         "warn-mp": "Vous avez reçu un avertissement de la part du serveur *{}* : \n{}",
-        "wrong-guild": "Oups, il semble que cet émoji n'appartienne pas à ce serveur :thinking:"
+        "wrong-guild": "Oups, il semble que cet émoji n'appartienne pas à ce serveur :thinking:",
+        "give_roles-0": "Oups, il semblerai que ce rôle soit trop haut pour que je puisse le donner à qui que ce soit. Veuillez placer mon rôle au-dessus du rôle `{r}`",
+        "give_roles-1": "Le membre {u} est trop haut",
+        "give_roles-2": "-> {c} rôles attribués sur {m} !",
+        "give_roles-3": "Vous ne pouvez pas donner des rôles plus hauts que le vôtre !"
     },
     "morpion": {
         "already-playing": "Vous avez déjà une partie en cours !",
@@ -661,7 +666,39 @@
     "perms": {
         "general": "Permissions générales",
         "perms-0": "Le membre/rôle {} n'a pas été trouvé",
-        "perms-1": "**Permission de '{}' :**\n\n"
+        "perms-1": "**Permission de '{}' :**\n\n",
+        "perms-list": {
+            "add_reactions": "Ajouter des réactions",
+            "administrator": "Administrateur",
+            "attach_files": "Joindre des fichiers",
+            "ban_members": "Bannir des membres",
+            "change_nickname": "Changer de pseudo",
+            "connect": "Se connecter",
+            "create_instant_invite": "Créer une invitation",
+            "deafen_members": "Mettre en sourdine des membres",
+            "embed_links": "Intégrer des liens",
+            "external_emojis": "Utiliser des émojis externes",
+            "kick_members": "Expulser des membres",
+            "manage_channels": "Gérer les salons",
+            "manage_emojis": "Gérer les émojis",
+            "manage_guild": "Gérer le serveur",
+            "manage_messages": "Gérer les messages",
+            "manage_nicknames": "Gérer les pseudos",
+            "manage_roles": "Gérer les rôles",
+            "manage_webhooks": "Gérer les webhooks",
+            "mention_everyone": "Mentionner tout le monde",
+            "move_members": "Déplacer des membres",
+            "mute_members": "Couper le micro de membres",
+            "priority_speaker": "Voix prioritaire",
+            "read_message_history": "Voir les anciens messages",
+            "read_messages": "Lire les messages",
+            "send_messages": "Envoyer des messages",
+            "send_tts_messages": "Envoyer des messages TTS",
+            "speak": "Parler",
+            "stream": "Passer en direct",
+            "use_voice_activation": "Utiliser la Détection de la voix",
+            "view_audit_log": "Voir les logs du serveur"
+        }
     },
     "roles_react": {
         "already-1-rr": "Vous avez déjà un rôle désigné pour cet émoji",
@@ -685,6 +722,7 @@
         "choose-mentions-1": "Veuillez choisir le flux à modifier",
         "choose-roles": "Quels seront les rôles à mentionner ?",
         "delete-success": "Le flux a été supprimé avec succès !",
+        "embed-json-changed": "L'embed de ce flux a bien été modifié",
         "fail-add": "Une erreur s'est produite lors du traitement de votre réponse. Merci de réessayer plus tard, ou de contacter le support du bot (entrez la commande `about` pour le lien du serveur)",
         "flow-limit": "Pour des raisons de performances, vous ne pouvez pas suivre plus de {} flux rss par serveur.",
         "guild-complete": "{} flux rss ont correctement été rechargés, en {} secondes !",
@@ -717,6 +755,7 @@
         "twitch-form-last": "{logo}  | Voici la dernière vidéo de {author}:\n{title}\nPubliée le {date}\nLien : {url}\n",
         "use_embed-success": "La valeur a bien été modifiée à {v} pour le flux n°{f} !",
         "use_embed_false": "Ce flux n'utilise pas d'embed pour être envoyé. Voulez-vous utiliser les embeds pour ce flux ? (true/false)",
+        "use_embed-same": "L'utilisation d'embeds pour ce flux n'a pas changé",
         "use_embed_true": "Ce flux utilise actuellement les embeds pour être envoyé. Voulez-vous toujours utiliser les embeds pour ce flux ? (true/false)",
         "web": "Web",
         "web-default-flow": "{logo}  | Nouveau post sur {author} ({date}) :\n    {title}\n\n{link}\n\n{mentions}",
@@ -725,8 +764,10 @@
         "web-invalid": "Oups, cette adresse url est invalide :confused:",
         "yt": "YouTube",
         "yt-default-flow": "{logo}  | Nouvelle vidéo de {author} : **{title}**\nPubliée le {date}\nLien : {link}\n{mentions}",
-        "yt-form-last": "{logo}  | Voici la dernière vidéo de {author}:\n{title}\nPubliée le {date}\nLien : {url}\n",
-        "yt-help": "Pour rechercher une chaîne youtube, vous devez entrer l'identifiant de cette chaîne. Vous la trouverez à la fin de l'url de la chaine, elle peut être soit le nom, soit une suite de caractères aléatoires. *Astuce : certaines chaînes sont déjà renseignées dans mon code. Vous pouvez parfois vous contenter de mettre `neil3000` ou `Oxisius`* :wink:"
+        "yt-form-last": "{logo}  | Voici la dernière vidéo de {author}:\n{title}\nPubliée le {date}\nLien : {url}",
+        "yt-help": "Pour rechercher une chaîne youtube, vous devez entrer l'identifiant de cette chaîne. Vous la trouverez à la fin de l'url de la chaine, elle peut être soit le nom, soit une suite de caractères aléatoires. *Astuce : certaines chaînes sont déjà renseignées dans mon code. Vous pouvez parfois vous contenter de mettre `neil3000` ou `Oxisius`* :wink:",
+        "deviant-default-flow": "{logo}  | Nouvelle création de {author} : **{title}**\nPubliée le {date}\nLien : {link}\n{mentions}",
+        "deviant-form-last": "{logo}  | Voici la dernière création de {author}:\n{title}\nPubliée le {date}\nLien : {url}"
     },
     "server": {
         "change-0": "Cette option n'existe pas :confused:",
@@ -802,7 +843,7 @@
         "welcome_roles": "Liste des rôles donnés automatiquement aux nouveaux membres : {}",
         "xp_rate": "Modficateur de gains d'xp : {}",
         "xp_type": "Type de système d'xp : {}",
-        "autoremove_xp":"Points d'expériences enlevés chaque jour aux membres inactifs : {}"
+        "autoremove_xp": "Points d'expériences enlevés chaque jour aux membres inactifs : {}"
     },
     "stats_infos": {
         "categ-0": "Catégorie",

@@ -18,17 +18,6 @@ class MorpionCog(commands.Cog):
     async def on_ready(self):
         self.translate = self.bot.cogs['LangCog'].tr
 
-    
-    @commands.command(name="leave-crab")
-    async def leave_crab(self,ctx):
-        """Makes you leave the crab game if you're stuck in it."""
-        if ctx.author.id not in self.in_game.keys():
-            await ctx.send(await self.translate(ctx.channel,'morpion','not-playing'))
-        else:
-            self.in_game.pop(ctx.author.id)
-            await ctx.send(await self.translate(ctx.channel,'morpion','game-removed'))
-
-
     async def qui_commence(self):
         """Le joueur est True, l'ordinateur est False"""
         return random.choice([True,False])
@@ -73,11 +62,19 @@ class MorpionCog(commands.Cog):
         return grille.count('O') +grille.count('X') != 9
 
     @commands.command(name="crab",aliases=['morpion'])
-    async def main(self,ctx:commands.Context):
+    async def main(self,ctx:commands.Context,leave:str=None):
         """A simple mini-game that consists of aligning three chips on a 9-square grid.
 The bot plays in red, the user in blue.
+Use 'crab leave' to make you leave the crab game if you're stuck in it.
 """
         try:
+            if leave=='leave':
+                if ctx.author.id not in self.in_game.keys():
+                    await ctx.send(await self.translate(ctx.channel,'morpion','not-playing'))
+                else:
+                    self.in_game.pop(ctx.author.id)
+                    await ctx.send(await self.translate(ctx.channel,'morpion','game-removed'))
+                return
             if ctx.author.id in self.in_game.keys():
                 return await ctx.send(await self.translate(ctx.channel,'morpion','already-playing'))
             self.in_game[ctx.author.id] = time.time()

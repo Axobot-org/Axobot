@@ -8,10 +8,10 @@ class EmbedCog(commands.Cog):
 
     def __init__(self,bot):
         self.bot = bot
-        self.logs = {'classic':"589806375366950913/Vy1Toc--s9MKLwz0S6g0khMgxIJcNO06KvRccpwrSTrTUXXeXkZavYgLhCZ3OuRONKfq",
-            'loop':'589807300546527245/EqhdboEF8H0ysUr7X77ty6NUBNkJa-_nfcNw22aPX9MqvTtvIrvDi88wSFX3IiII0sIE',
-            'members':'584381991919550474/7ocQuqPNPN4n1OlHjNyG8eBeABL9XD-AGbHCk9oURTCL4a9kFb596biFGNNI-A5qzkHt',
-            'beta':'590966608063758365/89JAR_BWffLlMMzNnpwtbcRR8Rp4y0xIB3pCfP724bG5Y65OY02Xy_QvUsgw57kpqv-d'
+        self.logs = {'classic':"625369482587537408/uGh5fJWD6S1XAddNKOGohvyfXWOxPmsodQQPcp7iasagi5kJm8DKfbzmf7-UFb5u3gnd",
+            'loop':'625369730127101964/04KUvJxdb-Dl-BIkIdBydqZIoziBn5qy06YugIO3T4uOUYqMIT4YgoP6C0kv6CrrA8h8',
+            'members':'625369820145123328/6XENir2vqOBpGLIplX96AILOVIW4V_YVyqV8QhbtvVZ7Mcj9gKZpty8aaYF5JrkUCfl-',
+            'beta':'625369903389736960/9xvl-UiQg5_QEekMReMVjf8BtvULzWT1BsU7gG0EulhtPQGc8EoAcc2QoHyVAYKmwlsv'
         }
         self.file = "embeds"
 
@@ -101,6 +101,8 @@ class EmbedCog(commands.Cog):
         def discord_embed(self):
             if type(self.color)==discord.Colour:
                 color = self.color
+            elif self.color == None:
+                color = discord.Embed.Empty
             else:
                 color = discord.Color(self.color)
             emb = discord.Embed(title=self.title, colour=color, url=self.url, description=self.description, timestamp=self.timestamp)
