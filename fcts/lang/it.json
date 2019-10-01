@@ -22,7 +22,6 @@
             "unclassed": "non classificato",
             "users-info": "Informazioni sulle utenti"
         },
-        "checks": "Condizioni :",
         "check-desc": {
             "bot_has_permissions": [
                 "Il robot ha le autorizzazioni sufficiente",
@@ -125,6 +124,7 @@
                 "Nessuno ruolo di verificazione è stato configurato"
             ]
         },
+        "checks": "Condizioni :",
         "cmd-not-found": "Nessuno cotrollo nominato \"{}\"",
         "embed_title": "Lista di cotrolli disponibile per {u}",
         "footer": "Scrivi {}help commande per più informazioni su uno controllo",
@@ -132,8 +132,8 @@
         "no-desc-cog": "Nessuna descrizione per questo modulo.",
         "no-subcmd": "Il controllo {0.name} non ha nessuno sotto controllo",
         "not-enabled": ":warning: Questo controllo è disabile",
-        "subcmds": "Sotti controlli :",
-        "subcmd-not-found": "Questo controllo non ha aucune nessuno sotto controllo identificato \"{}\""
+        "subcmd-not-found": "Questo controllo non ha aucune nessuno sotto controllo identificato \"{}\"",
+        "subcmds": "Sotti controlli :"
     },
     "blurple": {
         "check_fields": [
@@ -305,8 +305,8 @@
         "bitly_long": "URL d'origine : {url}",
         "bitly_nobit": "Cette adresse n'est pas un lien bit.ly !",
         "bitly_short": "URL raccourcie : {url}",
-        "changelogs-index": "Liste des versions indexées",
         "changelog-notfound": "Impossible de trouver cette version",
+        "changelogs-index": "Liste des versions indexées",
         "discordlinks": [
             "Status des serveurs",
             "CGU de Discord",
@@ -686,6 +686,8 @@
         "choose-mentions-1": "Veuillez choisir le flux à modifier",
         "choose-roles": "Quels seront les rôles à mentionner ?",
         "delete-success": "Le flux a été supprimé avec succès !",
+        "deviant-default-flow": "{logo}  | Nouvelle création de {author} : **{title}**\nPubliée le {date}\nLien : {link}\n{mentions}",
+        "deviant-form-last": "{logo}  | Voici la dernière création de {author}:\n{title}\nPubliée le {date}\nLien : {url}",
         "fail-add": "Une erreur s'est produite lors du traitement de votre réponse. Merci de réessayer plus tard, ou de contacter le support du bot (entrez la commande `about` pour le lien du serveur)",
         "flow-limit": "Pour des raisons de performances, vous ne pouvez pas suivre plus de {} flux rss par serveur.",
         "guild-complete": "{} flux rss ont correctement été rechargés, en {} secondes !",
@@ -727,9 +729,7 @@
         "yt": "YouTube",
         "yt-default-flow": "{logo}  | Nouvelle vidéo de {author} : **{title}**\nPubliée le {date}\nLien : {link}\n{mentions}",
         "yt-form-last": "{logo}  | Voici la dernière vidéo de {author}:\n{title}\nPubliée le {date}\nLien : {url}",
-        "yt-help": "Pour rechercher une chaîne youtube, vous devez entrer l'identifiant de cette chaîne. Vous la trouverez à la fin de l'url de la chaine, elle peut être soit le nom, soit une suite de caractères aléatoires. *Astuce : certaines chaînes sont déjà renseignées dans mon code. Vous pouvez parfois vous contenter de mettre `neil3000` ou `Oxisius`* :wink:",
-        "deviant-default-flow": "{logo}  | Nouvelle création de {author} : **{title}**\nPubliée le {date}\nLien : {link}\n{mentions}",
-        "deviant-form-last": "{logo}  | Voici la dernière création de {author}:\n{title}\nPubliée le {date}\nLien : {url}"
+        "yt-help": "Pour rechercher une chaîne youtube, vous devez entrer l'identifiant de cette chaîne. Vous la trouverez à la fin de l'url de la chaine, elle peut être soit le nom, soit une suite de caractères aléatoires. *Astuce : certaines chaînes sont déjà renseignées dans mon code. Vous pouvez parfois vous contenter de mettre `neil3000` ou `Oxisius`* :wink:"
     },
     "server": {
         "change-0": "Cette option n'existe pas :confused:",
@@ -744,6 +744,7 @@
         "change-7": "Cette langue n'est pas disponible. Voici la liste des langues actuellement supportées : {}",
         "change-8": "Ce niveau n'existe pas. Voici la liste des niveaux actuellement disponibles : {}",
         "change-9": "L'émoji `{}` n'a pas été trouvé",
+        "change-autoremove_xp": "Le bot enlèvera {xp} points d'xp par jour aux membres inactifs",
         "change-bool": "L'option '{}' a bien été modifiée avec la valeur *{}*",
         "change-color": "La couleur utilisée pour l'option {} est maintenant {}",
         "change-emojis": "Les émojis pour l'option '{}' sont maintenant {}",
@@ -756,7 +757,6 @@
         "change-textchan": "L'option '{}' a bien été modifiée avec les salons {}",
         "change-xp": "Le type d'xp utilisé est maintenant {}",
         "change-xp_rate": "Le modificateur d'xp est maintenant à {rate}",
-        "change-autoremove_xp": "Le bot enlèvera {xp} points d'xp par jour aux membres inactifs",
         "config-help": "Cette commande sert principalement à configurer votre serveur. En faisant `!config see [option]` vous obtiendrez l'aperçu des configurations actuelles, et les administrateurs du serveur peuvent entrer `!config change <option> valeur1, valeur2...` pour modifier une configuration, ou `!config del <option>` pour réinitialiser l'option (`!config change <option> del` fonctionne de même).\nLa liste des options disponible est accessible à l'adresse <https://zbot.rtfd.io/en/latest/server.html#list-of-every-option>",
         "config-list": "Liste des options disponibles :{text}Plus d'information : {link}",
         "need-admin": "Vous devez avoir les permissions Administrateur pour exécuter cette commande.",
@@ -771,6 +771,7 @@
     "server_desc": {
         "anti_caps_lock": "Le bot doit-il envoyer un message lorsqu'un membre envoie trop de majuscules ? {}",
         "anti_raid": "Niveau de la protection anti-raid : {} \n*([Documentation](https://zbot.rtfd.io/en/latest/moderator.html#anti-raid))*",
+        "autoremove_xp": "Points d'expériences enlevés chaque jour aux membres inactifs : {}",
         "ban": "Liste des rôles qui peuvent utiliser la commande 'ban' : {}",
         "bot_news": "Liste des salons dans lesquels envoyer les news du bot : {}",
         "clear": "Liste des rôles qui peuvent utiliser la commande 'clear' : {}",
@@ -804,8 +805,7 @@
         "welcome_channel": "Liste des salons dans lesquels envoyer les messages de bienvenue/quit : {}",
         "welcome_roles": "Liste des rôles donnés automatiquement aux nouveaux membres : {}",
         "xp_rate": "Modficateur de gains d'xp : {}",
-        "xp_type": "Type de système d'xp : {}",
-        "autoremove_xp":"Points d'expériences enlevés chaque jour aux membres inactifs : {}"
+        "xp_type": "Type de système d'xp : {}"
     },
     "stats_infos": {
         "categ-0": "Catégorie",

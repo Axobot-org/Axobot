@@ -22,7 +22,6 @@
             "unclassed": "random things :shrug:",
             "users-info": "things 'bout cats/people"
         },
-        "checks": "things needd:",
         "check-desc": {
             "bot_has_permissions": [
                 "The bot have enough perms",
@@ -125,6 +124,7 @@
                 "No verification rol has been addd"
             ]
         },
+        "checks": "things needd:",
         "cmd-not-found": "Dere are no comand naymme \"{}\"",
         "embed_title": "Cmds list 4 {u}",
         "footer": "Type {}help cmd 4 mure info abawt an commandZ",
@@ -132,8 +132,8 @@
         "no-desc-cog": "No more discripton for dis cogg.",
         "no-subcmd": "Teh kommand `{0.name}` had not sub~~scribe~~commanD",
         "not-enabled": ":warning: This command iz def not enable",
-        "subcmds": "Subcommands:",
-        "subcmd-not-found": "Thiz commnd have no sUbcommant newmed \"{}\""
+        "subcmd-not-found": "Thiz commnd have no sUbcommant newmed \"{}\"",
+        "subcmds": "Subcommands:"
     },
     "blurple": {
         "check_fields": [
@@ -305,8 +305,8 @@
         "bitly_long": "Slow link: {url}",
         "bitly_nobit": "HAHA NOPE, dat's not a bit.ly link!",
         "bitly_short": "Quick linq: {url}",
-        "changelogs-index": "List of indexed versions",
         "changelog-notfound": "Srry but i cannot find das version",
+        "changelogs-index": "List of indexed versions",
         "discordlinks": [
             "Servers status",
             "Discord ToS",
@@ -526,6 +526,10 @@
         "emoji-renamed": "Teh emotz {} had bin renaamd!",
         "emoji-valid": "Teh emojy {} haz been modified 2 allow only teh roles `{}`",
         "error": "Oooooops, unknown error :scream: Just waiiiit, 'r contact sport",
+        "give_roles-0": "Oops, this role iz 2 high 4 me 2 give 2 anyone. Plz place my role above dat `{r}` role",
+        "give_roles-1": "Member {u} is def 2 high 4 me :sad_face:",
+        "give_roles-2": "-> {c} roles gived out of {m} !",
+        "give_roles-3": "You can't give higher roles than yours LMAO!",
         "kick": "Membr {} haz been kick from dis servr. Just 'cause **{}**",
         "kick-1": "Seemz that this membr iz tooooo high 4 me to kick him out :thinking:",
         "kick-noreason": "U have just been kicked from the servr {} :confused:",
@@ -616,11 +620,7 @@
         "warn-bot": "Nope, cant warn anoder cool boat ^^",
         "warn-but-db": "Our dataz being offline, so ze warning couldnt be savd. Don't worry, this guy did receive his warning in DM :innocent:",
         "warn-mp": "U haz receivd 'warnung from *{}* servr: \n{}",
-        "wrong-guild": "Oooops, it seemz dis emoji dont belang dis server <:owo:499661437589913621>",
-        "give_roles-0": "Oops, this role iz 2 high 4 me 2 give 2 anyone. Plz place my role above dat `{r}` role",
-        "give_roles-1": "Member {u} is def 2 high 4 me :sad_face:",
-        "give_roles-2": "-> {c} roles gived out of {m} !",
-        "give_roles-3": "You can't give higher roles than yours LMAO!"
+        "wrong-guild": "Oooops, it seemz dis emoji dont belang dis server <:owo:499661437589913621>"
     },
     "morpion": {
         "already-playing": "U already are ingame!",
@@ -722,6 +722,8 @@
         "choose-mentions-1": "Pleese chose the flow 2 modify",
         "choose-roles": "Which roles should bee piing?",
         "delete-success": "Teh flow had bein sussellfuccy delet!",
+        "deviant-default-flow": "{logo}  | New draw bye {author} : **{title}**\nDated on {date}\nURL: {link}\n{mentions}",
+        "deviant-form-last": "{logo}  | Here is da brand new thing of {author}:\n{title}\nDarwn on {date}\nZelda: {url}",
         "embed-json-changed": "The embed ov feed have been modifed",
         "fail-add": "An fAtal erroR have occurred whale proczzing ur respond. Plz trye again laterz, r contakt boat suPPORt (entr teh comand `about` 4 srver link)",
         "flow-limit": "Fr pirformunce reesons, U can notz track mor than {} rss feeds per srver.",
@@ -753,9 +755,9 @@
         "twitch": "Twich",
         "twitch-default-flow": "{logo}  | Mew live by {author}! ({date})\n\n{title}\n\nLink: {link}\n\n{mentions}",
         "twitch-form-last": "{logo}  | Hir iz the last video ov {author}:\n{title}\nShown on {date}\nLink : {url}\n",
+        "use_embed-same": "The use of colorful boxes for dat flow has not changd",
         "use_embed-success": "The value has been changed to {v} for flow n°{f}!",
         "use_embed_false": "This feed do not use colored box 2B sent. Do U wants to use a nice box 4 tish flow? (true/false)",
-        "use_embed-same": "The use of colorful boxes for dat flow has not changd",
         "use_embed_true": "This one use currntly embeds to be sent. Do U still wanted 2 use an embed for this flow? (true/false)",
         "web": "Weeb",
         "web-default-flow": "{logo}  | New postz on {author} ({date}):\n        {title}\n\n{link}\n\n{mentions}",
@@ -765,9 +767,7 @@
         "yt": "YouTwube",
         "yt-default-flow": "{logo}  | Naw videogramm of {author}: **{title}**\nPublishd on {date}\nLink : {link}\n{mentions}",
         "yt-form-last": "{logo}  | Her the lazt vid from {author}:\n{title}\nPublishd on {date}\nLink : {url}\n",
-        "yt-help": "To seerch for a youtwube channel, you may enter the channil ID. You will found it at teh and of the strin url, it can be 8ther the nayme, or a strin of randem characteRs. *Tip: some channels are already fellid in me code. Sometimez you can just put `neil3000` or `Oxisius`* :wink:",
-        "deviant-default-flow": "{logo}  | New draw bye {author} : **{title}**\nDated on {date}\nURL: {link}\n{mentions}",
-        "deviant-form-last": "{logo}  | Here is da brand new thing of {author}:\n{title}\nDarwn on {date}\nZelda: {url}"
+        "yt-help": "To seerch for a youtwube channel, you may enter the channil ID. You will found it at teh and of the strin url, it can be 8ther the nayme, or a strin of randem characteRs. *Tip: some channels are already fellid in me code. Sometimez you can just put `neil3000` or `Oxisius`* :wink:"
     },
     "server": {
         "change-0": "Dis option doz not exist :confused:",
@@ -782,6 +782,7 @@
         "change-7": "Dis language is not available. Here is the list of currently supported languages: {}",
         "change-8": "Ups, dis lvl doz nope exist. Heer iz da list ov currrently availaible levelz: {}",
         "change-9": "Ups, da emoji `{}` wasnt findz",
+        "change-autoremove_xp": "I'll remove {xp} points of xp per day for sleeping usr",
         "change-bool": "The '{}' opzion haz been modified wif the value *{}*",
         "change-color": "The coulor uzd for the option {} is naw {}",
         "change-emojis": "Teh emojiz 4 the opshun '{}' are naw {}",
@@ -794,7 +795,6 @@
         "change-textchan": "The '{}' opshun has been modifid wif teh channelz {}",
         "change-xp": "Da xp system uzed is naw {}",
         "change-xp_rate": "The xP rate iz now @ {rate}",
-        "change-autoremove_xp": "I'll remove {xp} points of xp per day for sleeping usr",
         "config-help": "Dis cmd is mainly usd 2 configur ur srver. By doin `!config see [option]` u will get overview ov teh currnt configuraishun, and supr cool servr masters can enter `!config change <option> val1 , val2, val4...` to modify configuraishun, or `!config del <option>` 2 reset teh option (`!config change <option>` works same).\nTeh list ov options is displayd at <https://zbot.rtfd.io/en/latest/server.html#list-of-every-option>",
         "config-list": "List ov options cool taht u can use: {text}More info @ {link}",
         "need-admin": "U need to be a Big Boss (admin) to get this cmd",
@@ -809,6 +809,7 @@
     "server_desc": {
         "anti_caps_lock": "Shuld the baot sent a mssge when a mmBEr sents TOO MANY C:a:PITAL LETERZ ??!!??! {}",
         "anti_raid": "Lev3l of anti-rayderz protect: {} \n*([Dowcumetaton](https://zbot.rtfd.io/en/latest/moderator.html#anti-raid))*",
+        "autoremove_xp": "XP points taken /day to sleeping people: {}",
         "ban": "List for r:o2:les that cawn use this command 'ban': {}",
         "bot_news": "Liist for channnnels were 2 sendz bot nweZ: {}",
         "clear": "Lizt of rawles dat can us teh 'clear' commend: {}",
@@ -842,8 +843,7 @@
         "welcome_channel": "Lst of canels whe're to sen wilcume/leivz mesage': {}",
         "welcome_roles": "Lizt from rles otomaticall giveD 2 knew mmbr: {}",
         "xp_rate": "XP earnings modifier: {}",
-        "xp_type": "XP system used: {}",
-        "autoremove_xp": "XP points taken /day to sleeping people: {}"
+        "xp_type": "XP system used: {}"
     },
     "stats_infos": {
         "categ-0": "Categori",
