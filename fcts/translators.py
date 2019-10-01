@@ -56,7 +56,11 @@ class TranslatorsCog(commands.Cog):
                                 result[module+'.'+key+'.'+minikey] = minivalue
                     elif isinstance(value,list):
                         for e,string in enumerate(value):
-                            result[module+'.'+key+'.'+str(e)] = string
+                            if isinstance(string,list):
+                                for e2,string2 in enumerate(string):
+                                    result[module+'.'+key+'.'+str(e)+'.'+str(e2)] = string2
+                            else:
+                                result[module+'.'+key+'.'+str(e)] = string
         return result
 
     def load_translation(self,lang:str):
@@ -191,7 +195,7 @@ class TranslatorsCog(commands.Cog):
             txt = f"Translation of {lang}:\n {round(c,1)}%\n {lang_progress} messages on {en_progress}"
         await ctx.send(txt)
     
-    async def _fuse_file(self,old:dict,new:str):
+    async def _fuse_file(self,old:dict,new:dict):
         async def readpath(path:list,o,msg:str):
             if len(path)==0:
                 return msg
@@ -269,12 +273,12 @@ class TranslatorsCog(commands.Cog):
             return await ctx.send("Missing a file")
         from io import BytesIO
         with open(f'fcts/lang/en.json','r',encoding='utf-8') as old_f:
-            data_en = self.create_txt_map(json.load(old_f))
+            en_map = self.create_txt_map(json.load(old_f))
         io = BytesIO()
         await ctx.message.attachments[0].save(io)
         data_lang = json.load(io)
-        data_en.update(self.create_txt_map(data_lang))
-        await ctx.send(file= discord.File(BytesIO(json.dumps(data_en).encode('utf-8')),filename=ctx.message.attachments[0].filename))
+        en_map = await self._fuse_file(data_lang,en_map)
+        await ctx.send(file= discord.File(BytesIO(json.dumps(en_map,ensure_ascii=False,indent=4,sort_keys=True).encode('utf-8')),filename=ctx.message.attachments[0].filename))
 
 
 
