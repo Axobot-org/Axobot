@@ -168,8 +168,9 @@ class RolesReact(commands.Cog):
         emojis = list()
         for k in liste:
             if len(k['emoji'])>15 and k['emoji'].isnumeric():
-                temp = await guild.fetch_emoji(int(k['emoji']))
-                if temp != None:
+                try:
+                    temp = await guild.fetch_emoji(int(k['emoji']))
+                except discord.errors.NotFound:
                     emojis.append(temp)
                     k['emoji'] = str(temp)
                 else:
