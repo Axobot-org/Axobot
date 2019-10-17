@@ -208,7 +208,7 @@ class AdminCog(commands.Cog):
         # add changelog in the database
         cnx = self.bot.cnx_frm
         cursor = cnx.cursor()
-        version = self.bot.cogs['InfosCog'].bot_version
+        version = self.bot.cogs['InfoCog'].bot_version
         query = "INSERT INTO `changelogs` (`version`, `release_date`, `fr`, `en`, `beta`) VALUES ('{v}', '{r}', '{fr}', '{en}', {b}) ON DUPLICATE KEY UPDATE `fr` = '{fr}', `en` = '{en}';".format(v=version,r=ctx.message.created_at,fr=self.update['fr'].replace("'","\\'"),en=self.update['en'].replace("'","\\'"),b=self.bot.beta)
         cursor.execute(query)
         cnx.commit()

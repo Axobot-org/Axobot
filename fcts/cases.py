@@ -298,7 +298,7 @@ class CasesCog(commands.Cog):
         if not self.bot.database_online:
             return await ctx.send(await self.translate(ctx.guild.id,'cases','no_database'))
         try:
-            isSupport = await self.bot.cogs['InfosCog'].is_support(ctx)
+            isSupport = await self.bot.cogs['InfoCog'].is_support(ctx)
             c = ["ID="+str(case)]
             if not isSupport:
                 c.append("guild="+str(ctx.guild.id))
