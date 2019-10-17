@@ -33,7 +33,7 @@ class CasesCog(commands.Cog):
         self.table = 'cases_beta' if self.bot.beta else 'cases'
 
     class Case:
-        def __init__(self,bot,guildID,memberID,Type,ModID,Reason,date,duration=-1,caseID=None):
+        def __init__(self,bot,guildID,memberID,Type,ModID,Reason,date,duration=None,caseID=None):
             self.bot = bot
             self.guild = guildID
             self.id = caseID
@@ -74,7 +74,7 @@ class CasesCog(commands.Cog):
 **Moderator:** {}
 **Date:** {}
 **Reason:** *{}*""".format(self.type,u,self.mod,self.date,self.reason)
-            if self.duration>0:
+            if self.duration!=None and self.duration>0:
                 text += "\nDuration: {}".format(await self.bot.cogs['TimeCog'].time_delta(self.duration,lang='en',form='temp'))
             return text
 
@@ -242,8 +242,8 @@ class CasesCog(commands.Cog):
                         else:
                             m = m.mention
                         text = syntax.format(G=g,T=x.type,M=m,R=x.reason,D=await self.bot.cogs['TimeCog'].date(x.date,lang=l,year=True,digital=True))
-                        if x.duration != None:
-                            text += await self.translate(ctx.guild.id,'cases','list-2',D=await self.bot.cogs['TimeCog'].time_delta(x.duration,lang=l,year=False,form='temp'))
+                        if x.duration != None and x.duration>0:
+                            text += await self.translate(ctx.guild.id,'cases','list-2', D = await self.bot.cogs['TimeCog'].time_delta(x.duration,lang=l,year=False,form='temp'))
                         embed.add_field(name="Case #{}".format(x.id),value=text,inline=False)
                         if len(embed.fields)>20:
                             embed.title = str(await self.translate(ctx.guild.id,"cases","cases-0")).format(len(cases),last_case,e+1)
@@ -331,8 +331,6 @@ class CasesCog(commands.Cog):
             await ctx.send(embed=emb.discord_embed())
         except Exception as e:
             await self.bot.cogs["ErrorsCog"].on_error(e,ctx)
-
-        
         
 
     @case_main.command(name="remove",aliases=["clear","delete"])
