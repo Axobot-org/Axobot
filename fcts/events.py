@@ -108,7 +108,7 @@ class Events(commands.Cog):
                 await self.bot.cogs['ErrorsCog'].on_error(e,msg)
             await self.bot.cogs['FunCog'].check_afk(msg)
         if msg.author != self.bot.user:
-            await self.bot.cogs['InfosCog'].emoji_analysis(msg)
+            await self.bot.cogs['InfoCog'].emoji_analysis(msg)
         if "send nudes" in msg.content.lower() and len(msg.content)<13 and random.random()>0.0:
             try:
                 nudes_reacts = [':eyes:',':innocent:',':rolling_eyes:',':confused:',':smirk:']
@@ -358,7 +358,11 @@ class Events(commands.Cog):
         t = time.time()
         answers = ['None','None','None','None']
         self.bot.log.info("[DBL] Envoi des infos sur le nombre de guildes...")
-        guildCount = len(self.bot.guilds)
+        try:
+            guildCount = await self.bot.cogs['InfoCog'].get_guilds_count()
+        except Exception as e:
+            await self.bot.cogs['ErrorsCog'].on_error(e,None)
+            guildCount = len(self.bot.guilds)
         session = aiohttp.ClientSession(loop=self.bot.loop)
         # https://discordbots.org/bot/486896267788812288
         payload = {'server_count': guildCount}
