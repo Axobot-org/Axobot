@@ -96,7 +96,8 @@ class Events(commands.Cog):
             await self.bot.cogs["ErrorsCog"].on_error(e,None)
 
 
-    async def on_new_message(self,msg):
+    async def on_new_message(self, msg:discord.Message):
+        """Called for each new message because it's cool"""
         if msg.guild == None:
             await self.send_mp(msg)
         else:
@@ -115,8 +116,14 @@ class Events(commands.Cog):
                 if msg.guild==None or msg.channel.permissions_for(msg.guild.me).external_emojis:
                     nudes_reacts += ['<:ThinkSmirk:485902639838789635>','<:whut:485924115199426600>','<:thinksmart:513105826530197514>','<:excusemewhat:418154673523130398>','<:blobthinking:499661417012527104>','<a:ano_U:568494122856611850>','<:catsmirk:523929843331498015>','<a:ablobno:537680872820965377>']
                 await msg.channel.send(random.choice(nudes_reacts))
-            except Exception as e:
-                print(e)
+            except:
+                pass
+        elif ("booh" in msg.content.lower() or "halloween" in msg.content.lower() or "witch" in msg.content.lower()) and random.random()<0.05 and self.bot.current_event=="halloween":
+            try:
+                react = random.choice(['🦇','🎃','🕷️']*2+['👀'])
+                await msg.add_reaction(react)
+            except:
+                pass
         if msg.author.bot==False and await self.bot.cogs['AdminCog'].check_if_admin(msg.author) == False and msg.guild!=None:
             cond = True
             if self.bot.database_online:
