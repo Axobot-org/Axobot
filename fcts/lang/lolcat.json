@@ -236,6 +236,7 @@
         "count-4": "On teh last {limit} msgs, {user} had postd {x} things ({p}%)",
         "count-5": "U cannot use tish cmd at a channel where U do not have access to msg history",
         "embed-error": "A' error went wrong: `{}`",
+        "embed-invalid-image": "The url entered as image is invalid",
         "fun-list": "Her iz the list ov available fun commandz:",
         "invalid-city": "Invalid place name :confused:",
         "markdown": "__**Markdown Rules** on *Discord*__\n\n`*italics*` = *italics*\n`__underline__` = __underline__\n`**bold**` = **bold**\n`***bold italics***` = ***bold italics***\n`~~strikeout~~` = ~~strikeout~~\n`__*underline italics*__` = __*underline italics*__\n`__**underline bold**__` = __**underline bold**__\n`__***underline bold italics***__` = __***underline bold italics***__\n`||spoiler||` = ||spoiler||\n> quote = `> quote`\n\\`code\\` = `code`\n\\\\ to ignore\n                \nFor code blocks, cf <https://discord.gg/DGahTNn>",

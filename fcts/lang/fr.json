@@ -236,6 +236,7 @@
         "count-4": "Sur les {limit} derniers messages, {user} en a posté {x} ({p}%)",
         "count-5": "Vous ne pouvez pas utiliser cette commande dans un salon où vous n'avez pas accès à l'historique des messages",
         "embed-error": "Une erreur est survenue: `{}`",
+        "embed-invalid-image": "L'url saisie pour l'image est invalide",
         "fun-list": "Voici la liste des commandes fun disponibles :",
         "invalid-city": "Nom de ville invalide",
         "markdown": "__**Règles du Markdown** sur *Discord*__\n\n`*italique*` = *italique*\n`__souligné__` = __souligné__\n`**gras**` = **gras**\n`***gras italique***` = ***gras italique***\n`~~barré~~` = ~~barré~~\n`__*souligné italique*__` = __*souligné italique*__\n`__**souligné gras**__` = __**souligné gras**__\n`__***souligné gras italique***__` = __***souligné gras italique***__\n`||spoiler||` = ||spoiler||\n> citation = `> citation`\n\\`code\\` = `code`\n\\\\ pour ignorer\n\nPour les blocs de code, cf <https://discord.gg/DGahTNn>",
