@@ -135,10 +135,8 @@ class anyEmoji(commands.Converter):
         else:
             try:
                 return await commands.EmojiConverter().convert(ctx,r.group(1))
-            except Exception as e:
-                print(e)
+            except:
                 return r.group(1)
-        print(len(argument))
         raise commands.errors.BadArgument('Invalid emoji: '+argument)
 
 class guildMessage(commands.Converter):

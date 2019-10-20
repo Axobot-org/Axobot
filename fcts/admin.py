@@ -295,7 +295,6 @@ class AdminCog(commands.Cog):
             args.append('1' if ID==486896267788812288 else '2' if ID==436835675304755200 else '3')
             args.append('n' if ctx.bot.cogs['Events'].loop.get_task()==None else 'o')
             args.append('o' if ctx.bot.rss_enabled else 'n')
-        print('ARGS',args)
         self.bot.log.info("Redémarrage du bot")
         os.execl(sys.executable, sys.executable, *args)
 
