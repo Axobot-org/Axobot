@@ -178,9 +178,8 @@ class CasesCog(commands.Cog):
         return True
 
 
-    
 
-    @commands.group(name="cases",aliases=['case'])
+    @commands.group(name="cases",aliases=['case', 'infractions'])
     @commands.guild_only()
     @commands.cooldown(5, 15, commands.BucketType.user)
     @commands.check(can_edit_case)
