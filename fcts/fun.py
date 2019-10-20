@@ -585,6 +585,8 @@ You can specify a verification limit by adding a number in argument (up to 1.000
         try:
             await ctx.send(embed=emb.discord_embed())
         except Exception as e:
+            if isinstance(e,discord.errors.HTTPException) and "In embed.thumbnail.url: Not a well formed URL" in str(e):
+                return await ctx.send("invalid image")
             await ctx.send(str(await self.translate(ctx.channel,"fun","embed-error")).format(e))
     
 
