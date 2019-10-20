@@ -118,7 +118,7 @@ class Events(commands.Cog):
                 await msg.channel.send(random.choice(nudes_reacts))
             except:
                 pass
-        elif ("booh" in msg.content.lower() or "halloween" in msg.content.lower() or "witch" in msg.content.lower()) and random.random()<0.05 and self.bot.current_event=="halloween":
+        elif (msg.channel.id==635569244507209749 and random.random()<0.3) or (("booh" in msg.content.lower() or "halloween" in msg.content.lower() or "witch" in msg.content.lower()) and random.random()<0.05 and self.bot.current_event=="halloween"):
             try:
                 react = random.choice(['🦇','🎃','🕷️']*2+['👀'])
                 await msg.add_reaction(react)
