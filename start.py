@@ -155,7 +155,7 @@ def get_prefix(bot,msg):
     if msg.guild != None:
         return l+[msg.guild.me.mention+" "]
     else:
-        return l+[bot.user.mention+" "]
+        return l+[bot.user.mention+" ", ""]
 
 
 def main():
