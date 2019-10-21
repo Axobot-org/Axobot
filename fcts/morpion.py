@@ -13,6 +13,7 @@ class MorpionCog(commands.Cog):
             self.translate = bot.cogs['LangCog'].tr
         except:
             pass
+        self.is_halloween = self.bot.current_event=="halloween"
 
     @commands.Cog.listener()
     async def on_ready(self):
@@ -31,9 +32,9 @@ class MorpionCog(commands.Cog):
                 if grille[k] in range(10):
                     affichage_grille += '<:{}>'.format(self.bot.cogs['EmojiCog'].numbEmojis[grille[k]])
                 elif grille[k] == 'O':
-                    affichage_grille += ':red_circle:'
+                    affichage_grille += "🎃" if self.is_halloween else ':red_circle:'
                 else:
-                    affichage_grille += ':large_blue_circle:'
+                    affichage_grille += ":bat:" if self.is_halloween else ':large_blue_circle:'
         return affichage_grille
 
     async def test_place_valide(self,grille:list,saisie:str):

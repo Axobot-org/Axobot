@@ -248,7 +248,7 @@ class ServerCog(commands.Cog):
         if ctx.bot.database_online:
             await self.is_server_exist(ctx.guild.id)
         if ctx.invoked_subcommand is None:
-            msg = await self.translate(ctx.guild,"server","config-help")
+            msg = await self.translate(ctx.guild,"server","config-help", p=(await self.bot.get_prefix(ctx.message))[0])
             await ctx.send(msg.format(ctx.guild.owner.name))
 
     @sconfig_main.command(name="del")

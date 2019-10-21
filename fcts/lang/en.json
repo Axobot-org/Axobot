@@ -22,7 +22,6 @@
             "unclassed": "Unclassed",
             "users-info": "Users information"
         },
-        "checks": "Requirements:",
         "check-desc": {
             "bot_has_permissions": [
                 "The bot has sufficient permissions",
@@ -125,6 +124,7 @@
                 "No verification role has been added"
             ]
         },
+        "checks": "Requirements:",
         "cmd-not-found": "There is no command nammed \"{}\"",
         "embed_title": "Available commands for {u}",
         "footer": "Type {}help command for more info on a command",
@@ -132,8 +132,8 @@
         "no-desc-cog": "No description for this cog.",
         "no-subcmd": "The command `{0.name}` has no subcommand",
         "not-enabled": ":warning: This command is disabled",
-        "subcmds": "Subcommands:",
-        "subcmd-not-found": "This command has no subcommand named \"{}\""
+        "subcmd-not-found": "This command has no subcommand named \"{}\"",
+        "subcmds": "Subcommands:"
     },
     "blurple": {
         "check_fields": [
@@ -236,6 +236,7 @@
         "count-4": "On the last {limit} messages, {user} have posted {x} messages ({p}%)",
         "count-5": "You cannot use this command in a channel where you do not have access to the message history",
         "embed-error": "An error has occurred: `{}`",
+        "embed-invalid-image": "The url entered as image is invalid",
         "fun-list": "Here is the list of available fun commands:",
         "invalid-city": "Invalid city :confused:",
         "markdown": "__**Markdown Rules** on *Discord*__\n\n`*italics*` = *italics*\n`__underline__` = __underline__\n`**bold**` = **bold**\n`***bold italics***` = ***bold italics***\n`~~strikeout~~` = ~~strikeout~~\n`__*underline italics*__` = __*underline italics*__\n`__**underline bold**__` = __**underline bold**__\n`__***underline bold italics***__` = __***underline bold italics***__\n`||spoiler||` = ||spoiler||\n> quote = `> quote`\n\\`code\\` = `code`\n \\ to ignore\n\nFor code blocks, cf <https://discord.gg/DGahTNn>",
@@ -305,8 +306,8 @@
         "bitly_long": "Original URL: {url}",
         "bitly_nobit": "This address is not a bit.ly link!",
         "bitly_short": "Shortened URL: {url}",
-        "changelogs-index": "List of indexed versions",
         "changelog-notfound": "Unable to find this version",
+        "changelogs-index": "List of indexed versions",
         "discordlinks": [
             "Servers status",
             "Discord ToS",
@@ -319,7 +320,7 @@
         "prefix": "List of currently usable prefixes:",
         "stats": "**Bot version:** {bot_v} \n**Number of servers:** {s_count} \n**Number of visible members:** {m_count} ({b_count} **bots**)\n**Number of code lines:** {l_count}\n**Used languages:** {lang}\n**Python version :** {p_v} \n**Version of the `discord.py` lib:** {d_v} \n**Loading on the RAM:** {ram} GB \n**Loading on the CPU:** {cpu} % \n**API latency time:** {api} ms\n**Total of earned xp:** {xp}",
         "stats-title": "**Bot statistics**",
-        "text-0": "Hello! I'm {0} !\nI'm a bot that allows you to do a lot of things: moderation, mini-games, an xp system, statistics and many other super useful commands (and totally pointless ones)!\nYou can start by typing `!help` in this chat to see the list of available commands, then `!config see` will let you see the configuration options (a website is in preparation).\n\nFor helping me in the creation of the bot, my owner and I would like to thank Awhikax for his support during the various crises, Aragorn1202 for all his ideas and sentences full of good sense, Adri526 for all these beautiful logos, emojis and profile pics, and Pilotnick54 to review and correct my English!\n:globe_with_meridians: Some links may be useful: \n:arrow_forward: My Discord server : http://discord.gg/N55zY88\n:arrow_forward: A link to invite me to another server : <https://zrunner.me/invitezbot>\n:arrow_forward: The bot documentation : <https://zbot.rtfd.io/>\n:arrow_forward: My creator's Twitter account : <https://twitter.com/z_runnerr>\n\nHave a nice day!"
+        "text-0": "Hello! I'm {0} !\nI'm a bot that allows you to do a lot of things: moderation, xp system, statistics, partners managment and many other super useful commands (and totally pointless ones)!\nYou can start by typing `!help` in this chat to see the list of available commands, then `!config see` will let you see the configuration options.\n\nMy owner and I would like to thank Awhikax for his support during the various crises, Aragorn1202 for all his ideas and sentences full of good sense, Adri526 for all these beautiful logos, emojis and profile pics, and the whole translators team for their long work!\n\n:globe_with_meridians: Some links may be useful: \n:arrow_forward: My Discord server : http://discord.gg/N55zY88\n:arrow_forward: A link to invite me to another server : <https://zrunner.me/invitezbot>\n:arrow_forward: The bot documentation : <https://zbot.rtfd.io/>\n:arrow_forward: My creator's Twitter account : <https://twitter.com/z_runnerr>\n\nHave a nice day!"
     },
     "infos_2": {
         "fish-1": "Number of fishes",
@@ -526,6 +527,10 @@
         "emoji-renamed": "The emoji {} has been renamed!",
         "emoji-valid": "The emoji {} has been modified to allow only the roles `{}`",
         "error": "Oops, an unknown error occurred. Try again later or contact support",
+        "give_roles-0": "Oops, it seems that this role is too high for me to give to anyone. Please place my role above the `{r}` role",
+        "give_roles-1": "Member {u} is too high for me",
+        "give_roles-2": "-> {c} roles assigned out of {m} !",
+        "give_roles-3": "You can't give higher roles than yours!",
         "kick": "Member {} has been kicked from this server for the reason `{}`",
         "kick-1": "It seems that this member is too high for me to kick him out :thinking:",
         "kick-noreason": "You have just been expelled from the server {} :confused:",
@@ -616,11 +621,7 @@
         "warn-bot": "I can't warn a bot ^^",
         "warn-but-db": "Our database being offline, the warning could not be saved. Nevertheless, the member did receive their warning in DM",
         "warn-mp": "You have received a warning from the *{}* server: \n{}",
-        "wrong-guild": "Oops, it seems this emoji doesn't belong to this server :thinking:",
-        "give_roles-0": "Oops, it seems that this role is too high for me to give to anyone. Please place my role above the `{r}` role",
-        "give_roles-1": "Member {u} is too high for me",
-        "give_roles-2": "-> {c} roles assigned out of {m} !",
-        "give_roles-3": "You can't give higher roles than yours!"
+        "wrong-guild": "Oops, it seems this emoji doesn't belong to this server :thinking:"
     },
     "morpion": {
         "already-playing": "You already have a game in progress!",
@@ -722,6 +723,8 @@
         "choose-mentions-1": "Please choose the flow to modify",
         "choose-roles": "What roles will be mentioned?",
         "delete-success": "The flow has been successfully deleted!",
+        "deviant-default-flow": "{logo}  | New creation by {author} : **{title}**\nPublished on {date}\nLink: {link}\n{mentions}",
+        "deviant-form-last": "{logo}  | Here is the new creation of {author}:\n{title}\nPublished on {date}\nLink: {url}",
         "embed-json-changed": "The embed of this feed has been modified",
         "fail-add": "An error occurred while processing your response. Please try again later, or contact bot support (enter the command `about` for server link)",
         "flow-limit": "For performance reasons, you cannot track more than {} rss feeds per server.",
@@ -753,9 +756,9 @@
         "twitch": "Twitch",
         "twitch-default-flow": "{logo}  | New live by {author}! ({date})\n\n{title}\n\nLink: {link}\n\n{mentions}",
         "twitch-form-last": "{logo}  | Here is the last video of {author}:\n{title}\nPublished on {date}\nLink: {url}\n",
+        "use_embed-same": "The use of embeds for this flow has not changed",
         "use_embed-success": "The value has been changed to {v} for flow n°{f}!",
         "use_embed_false": "This feed does not use embed to be sent. Do you want to use an embed for this flow? (true/false)",
-        "use_embed-same": "The use of embeds for this flow has not changed",
         "use_embed_true": "This flow currently uses embeds to be sent. Do you still want to use an embed for this flow? (true/false)",
         "web": "Web",
         "web-default-flow": "{logo}  | New post on {author} ({date}) :\n        {title}\n\n{link}\n\n{mentions}",
@@ -765,9 +768,7 @@
         "yt": "YouTube",
         "yt-default-flow": "{logo}  | New video of {author}: **{title}**\nPublished on {date}\nLink: {link}\n{mentions}",
         "yt-form-last": "{logo}  | Here is the last video of {author}:\n{title}\nPublished on {date}\nLink: {url}",
-        "yt-help": "To search for a youtube channel, you must enter the channel ID. You will find it at the end of the string url, it can be either the name, or a string of random characters.\n*Tip: some channels are already filled in my code. Sometimes you can just put `neil3000` or `Oxisius`* :wink:",
-        "deviant-default-flow": "{logo}  | New creation by {author} : **{title}**\nPublished on {date}\nLink: {link}\n{mentions}",
-        "deviant-form-last": "{logo}  | Here is the new creation of {author}:\n{title}\nPublished on {date}\nLink: {url}"
+        "yt-help": "To search for a youtube channel, you must enter the channel ID. You will find it at the end of the string url, it can be either the name, or a string of random characters.\n*Tip: some channels are already filled in my code. Sometimes you can just put `neil3000` or `Oxisius`* :wink:"
     },
     "server": {
         "change-0": "This option does not exist :confused:",
@@ -782,6 +783,7 @@
         "change-7": "This language is not available. Here is the list of currently supported languages: {}",
         "change-8": "This level does not exist. Here is the list of the levels currently available: {}",
         "change-9": "The emoji `{}` was not found",
+        "change-autoremove_xp": "The bot will remove {xp}xp/day from inactive members",
         "change-bool": "The \"{}\" option has been modified with the value *{}*",
         "change-color": "The color used for the option {} is now {}",
         "change-emojis": "The emotions for the option \"{}\" are now {}",
@@ -794,8 +796,7 @@
         "change-textchan": "The \"{}\" option has been modified with the channels {}",
         "change-xp": "The xp system used is now {}",
         "change-xp_rate": "The xp rate is now at {rate}",
-        "change-autoremove_xp": "The bot will remove {xp}xp/day from inactive members",
-        "config-help": "This command is mainly used to configure your server. By doing `!config see [option]` you will get an overview of the current configurations, and server administrators can enter `!config change <option> value1, value2...` to modify a configuration, or `!config del <option>` to reset the option (`!config change <option>` works the same way).\nThe list of available options is available at <https://zbot.rtfd.io/en/latest/server.html#list-of-every-option>",
+        "config-help": "This command is mainly used to configure your server. By doing `{p}config see [option]` you will get an overview of the current configurations, and server administrators can enter `{p}config change <option> value1, value2...` to modify a configuration, or `{p}config del <option>` to reset the option (`{p}config change <option>` works the same way).\nThe list of available options is available at <https://zbot.rtfd.io/en/latest/server.html#list-of-every-option>, but an index without any explanation can be found with the command `{p}config list`",
         "config-list": "List of available options: {text}More info at {link}",
         "need-admin": "You need Administrator permission to execute this command.",
         "new_server": "Your server has just been registered for the first time in our database. Congratulations :tada:",
@@ -809,6 +810,7 @@
     "server_desc": {
         "anti_caps_lock": "Should the bot send a message when a member sends too many capital letters? {}",
         "anti_raid": "Level of anti-raid protection: {} \n*([Documentation](https://zbot.rtfd.io/en/latest/moderator.html#anti-raid))*",
+        "autoremove_xp": "Experience points removed daily from inactive members: {}",
         "ban": "List of roles that can use the command \"ban\": {}",
         "bot_news": "List of channels where to send bot news: {}",
         "clear": "List of roles that can use the \"clear\" command: {}",
@@ -842,8 +844,7 @@
         "welcome_channel": "List of channels where to send welcome/leave messages: {}",
         "welcome_roles": "List of roles automatically given to new members: {}",
         "xp_rate": "XP earnings modifier: {}",
-        "xp_type": "XP system used: {}",
-        "autoremove_xp": "Experience points removed daily from inactive members: {}"
+        "xp_type": "XP system used: {}"
     },
     "stats_infos": {
         "categ-0": "Category",

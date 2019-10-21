@@ -15,7 +15,7 @@ from libs import bitly_api
 importlib.reload(bitly_api)
 
 
-class InfosCog(commands.Cog):
+class InfoCog(commands.Cog):
     """Here you will find various useful commands to get information about ZBot."""
 
     def __init__(self,bot):
@@ -69,6 +69,12 @@ class InfosCog(commands.Cog):
             l.append(str(self.bot.get_user(u)))
         await ctx.send(str(await self.translate(ctx.channel,"infos","admins-list")).format(", ".join(l)))
 
+    async def get_guilds_count(self,ignored_guilds:list=None) -> int:
+        """Get the number of guilds where Zbot is"""
+        if ignored_guilds==None:
+            ignored_guilds = [int(x) for x in self.bot.cogs['UtilitiesCog'].config['banned_guilds'].split(";") if len(x)>0] + self.bot.cogs['ReloadsCog'].ignored_guilds
+        return len([x for x in self.bot.guilds if x.id not in ignored_guilds])
+
     @commands.command(name="stats",enabled=True)
     @commands.cooldown(2,60,commands.BucketType.guild)
     async def stats(self,ctx):
@@ -86,7 +92,7 @@ class InfosCog(commands.Cog):
                     b_conf = await self.bot.cogs['UtilitiesCog'].reload()
                 ignored_guilds = [int(x) for x in self.bot.cogs['UtilitiesCog'].config['banned_guilds'].split(";") if len(x)>0]
                 ignored_guilds += self.bot.cogs['ReloadsCog'].ignored_guilds
-                len_servers = len([x for x in ctx.bot.guilds if x.id not in ignored_guilds])
+                len_servers = await self.get_guilds_count(ignored_guilds)
                 langs_list = await self.bot.cogs['ServerCog'].get_languages(ignored_guilds)
                 lang_total = sum([x[1] for x in langs_list])
                 langs_list = ' | '.join(["{}: {}%".format(x[0],round(x[1]/lang_total*100)) for x in langs_list if x[1]>0])
@@ -850,5 +856,5 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
         
 
 def setup(bot):
-    bot.add_cog(InfosCog(bot))
+    bot.add_cog(InfoCog(bot))
     

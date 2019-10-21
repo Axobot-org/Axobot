@@ -1,4 +1,4 @@
-import discord, time, importlib, typing
+import discord, time, importlib, typing, re
 from discord.ext import commands
 from fcts import checks, args
 importlib.reload(checks)
@@ -145,9 +145,14 @@ class RolesReact(commands.Cog):
     
     @rr_main.command(name="remove")
     @commands.check(checks.has_manage_guild)
-    async def rr_remove(self,ctx,emoji:args.anyEmoji):
+    async def rr_remove(self,ctx,emoji):
         """Remove a role react"""
         try:
+            # if emoji is a custom one:
+            old_emoji = emoji
+            r = re.search(r'<a?:[^:]+:(\d+)>',emoji)
+            if r!=None:
+                emoji = r.group(1)
             l = await self.rr_list_role(ctx.guild.id,emoji)
             if len(l)==0:
                 return await ctx.send(await self.translate(ctx.guild.id,'roles_react','no-rr'))
@@ -156,7 +161,7 @@ class RolesReact(commands.Cog):
             await self.bot.cogs['ErrorsCog'].on_cmd_error(ctx,e)
         else:
             role = ctx.guild.get_role(l[0]['role'])
-            await ctx.send(await self.translate(ctx.guild.id,'roles_react','rr-removed',r=role,e=emoji))
+            await ctx.send(await self.translate(ctx.guild.id,'roles_react','rr-removed',r=role,e=old_emoji))
             if len(l)<2:
                 try:
                     self.guilds_which_have_roles.remove(ctx.guild.id)
@@ -168,12 +173,13 @@ class RolesReact(commands.Cog):
         emojis = list()
         for k in liste:
             if len(k['emoji'])>15 and k['emoji'].isnumeric():
-                temp = await guild.fetch_emoji(int(k['emoji']))
-                if temp != None:
+                try:
+                    temp = await guild.fetch_emoji(int(k['emoji']))
+                except discord.errors.NotFound:
+                    emojis.append(k['emoji'])
+                else:
                     emojis.append(temp)
                     k['emoji'] = str(temp)
-                else:
-                    emojis.append(k['emoji'])
             else:
                 emojis.append(k['emoji'])
         l = ["{}   <@&{}> - *{}*".format(x['emoji'], x['role'], x['description']) if len(x['description'])>0 else "{}   <@&{}>".format(x['emoji'], x['role']) for x in liste]

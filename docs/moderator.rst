@@ -84,9 +84,9 @@ This command allows you to expel a member from your server, such as kick. But in
 
 .. warning:: For this command, the bot needs "`Ban members <perms.html#ban-members>`_" permission, and you need to have a role to use the "`kick <#kick>`_" command
 
---------
+---------
 Ban/Unban
---------
+---------
 
 **Syntax:** :code:`ban <user> [duration] [days_to_delete] [reason]`
 
@@ -201,7 +201,7 @@ It is recommended to give this role to all new members via the `welcome_roles` o
 :code:`config change verification_role <role>>` configures the role to be removed from the verified members
 
 
-.. warning:: For this system, the bot **must** have "`Manage Roles<perms.html#manage-roles>`_" permission. The roles to be removed **must** also be lower than the role of Zbot in your server hierarchy (Server Settings > Roles tab).
+.. warning:: For this system, the bot **must** have "`Manage Roles <perms.html#manage-roles>`_" permission. The roles to be removed **must** also be lower than the role of Zbot in your server hierarchy (Server Settings > Roles tab).
 
 
 

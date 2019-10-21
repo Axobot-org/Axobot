@@ -22,7 +22,6 @@
             "unclassed": "non classé",
             "users-info": "Infos sur les utilisateurs"
         },
-        "checks": "Conditions :",
         "check-desc": {
             "bot_has_permissions": [
                 "Le bot possède les permissions suffisantes",
@@ -125,6 +124,7 @@
                 "Aucun rôle de vérification n'a été configuré"
             ]
         },
+        "checks": "Conditions :",
         "cmd-not-found": "Aucune commande nommée \"{}\"",
         "embed_title": "Liste des commandes disponibles pour {u}",
         "footer": "Entrez {}help commande pour plus d'informations sur une commande",
@@ -132,8 +132,8 @@
         "no-desc-cog": "Aucune description pour ce module.",
         "no-subcmd": "La commande {0.name} n'a aucune sous-commande",
         "not-enabled": ":warning: Cette commande est désactivée",
-        "subcmds": "Sous-commandes :",
-        "subcmd-not-found": "Cette commande ne possède aucune sous-commande nommée \"{}\""
+        "subcmd-not-found": "Cette commande ne possède aucune sous-commande nommée \"{}\"",
+        "subcmds": "Sous-commandes :"
     },
     "blurple": {
         "check_fields": [
@@ -236,6 +236,7 @@
         "count-4": "Sur les {limit} derniers messages, {user} en a posté {x} ({p}%)",
         "count-5": "Vous ne pouvez pas utiliser cette commande dans un salon où vous n'avez pas accès à l'historique des messages",
         "embed-error": "Une erreur est survenue: `{}`",
+        "embed-invalid-image": "L'url saisie pour l'image est invalide",
         "fun-list": "Voici la liste des commandes fun disponibles :",
         "invalid-city": "Nom de ville invalide",
         "markdown": "__**Règles du Markdown** sur *Discord*__\n\n`*italique*` = *italique*\n`__souligné__` = __souligné__\n`**gras**` = **gras**\n`***gras italique***` = ***gras italique***\n`~~barré~~` = ~~barré~~\n`__*souligné italique*__` = __*souligné italique*__\n`__**souligné gras**__` = __**souligné gras**__\n`__***souligné gras italique***__` = __***souligné gras italique***__\n`||spoiler||` = ||spoiler||\n> citation = `> citation`\n\\`code\\` = `code`\n\\\\ pour ignorer\n\nPour les blocs de code, cf <https://discord.gg/DGahTNn>",
@@ -305,8 +306,8 @@
         "bitly_long": "URL d'origine : {url}",
         "bitly_nobit": "Cette adresse n'est pas un lien bit.ly !",
         "bitly_short": "URL raccourcie : {url}",
-        "changelogs-index": "Liste des versions indexées",
         "changelog-notfound": "Impossible de trouver cette version",
+        "changelogs-index": "Liste des versions indexées",
         "discordlinks": [
             "Status des serveurs",
             "CGU de Discord",
@@ -319,7 +320,7 @@
         "prefix": "Liste des préfixes actuellement utilisables :",
         "stats": "**Version du bot :** {bot_v} \n**Nombre de serveurs :** {s_count} \n**Nombre de membres visibles :** {m_count} (dont {b_count} **bots**)\n**Nombre de lignes de code :** {l_count}\n**Langues utilisées :** {lang} \n**Version de Python :** {p_v} \n**Version de la bibliothèque `discord.py` :** {d_v} \n**Charge sur la mémoire vive :** {ram} GB \n**Charge sur le CPU :** {cpu} % \n**Temps de latence de l'api :** {api} ms\n**Nombre total d'xp gagné :** {xp}xp",
         "stats-title": "**Statistiques du bot**",
-        "text-0": "Bonjour ! Moi c'est {0} !\n\nJe suis un bot qui permet de faire *beaucoup* de choses : de la modération, des mini-jeux, un système d'xp, des statistiques et plein d'autres commandes plus ou moins utiles ! \nVous pouvez commencer par taper `!help` dans ce tchat pour voir la liste des commandes disponibles, puis `!config see` vous permettra de voir les options de configuration (un site web est en préparation). \n\nPour m'avoir aidé dans la création du bot, mon propriétaire et moi souhaitons remercier Awhikax pour son soutien apporté lors des différentes crises, Aragorn1202 pour toutes ses idées et ses phrases pleines de bon sens, Adri526 pour tous ces magnifiques logos, émojis et images de profil, et Pilotnick54 pour relire et corriger mon anglais !\n\n:globe_with_meridians: Quelques liens pourront vous être utiles : \n:arrow_forward: Mon serveur Discord : http://discord.gg/N55zY88\n:arrow_forward: Un lien pour m'inviter dans un autre serveur : <https://zrunner.me/invitezbot>\n:arrow_forward: La documentation du bot : <https://zbot.rtfd.io/>\n:arrow_forward: Le compte Twitter de mon créateur : <https://twitter.com/z_runnerr>\n\nBonne journée !"
+        "text-0": "Bonjour ! Moi c'est {0} !\n\nJe suis un bot qui permet de faire *beaucoup* de choses : de la modération, un système d'xp, des statistiques, la gestion de partenaires et plein d'autres commandes plus ou moins utiles ! \nVous pouvez commencer par taper `!help` dans ce tchat pour voir la liste des commandes disponibles, puis `!config see` vous permettra de voir les options de configuration (un site web est en préparation). \n\nPour m'avoir aidé dans la création du bot, mon propriétaire et moi souhaitons remercier Awhikax pour son soutien apporté lors des différentes crises, Aragorn1202 pour toutes ses idées et ses phrases pleines de bon sens, Adri526 pour tous ces magnifiques logos, émojis et images de profil, et toute l'équipe de traducteurs poour leur merveilleux travail !\n\n:globe_with_meridians: Quelques liens pourront vous être utiles : \n:arrow_forward: Mon serveur Discord : http://discord.gg/N55zY88\n:arrow_forward: Un lien pour m'inviter dans un autre serveur : <https://zrunner.me/invitezbot>\n:arrow_forward: La documentation du bot : <https://zbot.rtfd.io/>\n:arrow_forward: Le compte Twitter de mon créateur : <https://twitter.com/z_runnerr>\n\nBonne journée !"
     },
     "infos_2": {
         "fish-1": "Nombre de poissons trouvés",
@@ -526,6 +527,10 @@
         "emoji-renamed": "L'émoji {} a bien été renommé !",
         "emoji-valid": "L'émoji {} a été modifié pour n'autoriser que les rôles `{}`",
         "error": "Oups, une erreur inconnue est survenue. Réessayez plus tard ou contactez le support",
+        "give_roles-0": "Oups, il semblerai que ce rôle soit trop haut pour que je puisse le donner à qui que ce soit. Veuillez placer mon rôle au-dessus du rôle `{r}`",
+        "give_roles-1": "Le membre {u} est trop haut",
+        "give_roles-2": "-> {c} rôles attribués sur {m} !",
+        "give_roles-3": "Vous ne pouvez pas donner des rôles plus hauts que le vôtre !",
         "kick": "Le membre {} a bien été expulsé du serveur, avec la raison `{}`",
         "kick-1": "Il semble que ce membre soit trop haut pour que je puisse l'expulser :thinking:",
         "kick-noreason": "Vous venez d'être expulsé du serveur {} :confused:",
@@ -616,11 +621,7 @@
         "warn-bot": "Je ne peux pas avertir un bot ^^",
         "warn-but-db": "Notre base de donnée étant hors ligne, l'avertisement n'a pas pu être enregistré. Néanmoins le membre a bien reçu son avertissement en MP",
         "warn-mp": "Vous avez reçu un avertissement de la part du serveur *{}* : \n{}",
-        "wrong-guild": "Oups, il semble que cet émoji n'appartienne pas à ce serveur :thinking:",
-        "give_roles-0": "Oups, il semblerai que ce rôle soit trop haut pour que je puisse le donner à qui que ce soit. Veuillez placer mon rôle au-dessus du rôle `{r}`",
-        "give_roles-1": "Le membre {u} est trop haut",
-        "give_roles-2": "-> {c} rôles attribués sur {m} !",
-        "give_roles-3": "Vous ne pouvez pas donner des rôles plus hauts que le vôtre !"
+        "wrong-guild": "Oups, il semble que cet émoji n'appartienne pas à ce serveur :thinking:"
     },
     "morpion": {
         "already-playing": "Vous avez déjà une partie en cours !",
@@ -722,6 +723,8 @@
         "choose-mentions-1": "Veuillez choisir le flux à modifier",
         "choose-roles": "Quels seront les rôles à mentionner ?",
         "delete-success": "Le flux a été supprimé avec succès !",
+        "deviant-default-flow": "{logo}  | Nouvelle création de {author} : **{title}**\nPubliée le {date}\nLien : {link}\n{mentions}",
+        "deviant-form-last": "{logo}  | Voici la dernière création de {author}:\n{title}\nPubliée le {date}\nLien : {url}",
         "embed-json-changed": "L'embed de ce flux a bien été modifié",
         "fail-add": "Une erreur s'est produite lors du traitement de votre réponse. Merci de réessayer plus tard, ou de contacter le support du bot (entrez la commande `about` pour le lien du serveur)",
         "flow-limit": "Pour des raisons de performances, vous ne pouvez pas suivre plus de {} flux rss par serveur.",
@@ -753,9 +756,9 @@
         "twitch": "Twitch",
         "twitch-default-flow": "{logo}  | Nouveau live de {author} ! ({date})\n\n{title}\n\nLien : {link}\n\n{mentions}",
         "twitch-form-last": "{logo}  | Voici la dernière vidéo de {author}:\n{title}\nPubliée le {date}\nLien : {url}\n",
+        "use_embed-same": "L'utilisation d'embeds pour ce flux n'a pas changé",
         "use_embed-success": "La valeur a bien été modifiée à {v} pour le flux n°{f} !",
         "use_embed_false": "Ce flux n'utilise pas d'embed pour être envoyé. Voulez-vous utiliser les embeds pour ce flux ? (true/false)",
-        "use_embed-same": "L'utilisation d'embeds pour ce flux n'a pas changé",
         "use_embed_true": "Ce flux utilise actuellement les embeds pour être envoyé. Voulez-vous toujours utiliser les embeds pour ce flux ? (true/false)",
         "web": "Web",
         "web-default-flow": "{logo}  | Nouveau post sur {author} ({date}) :\n    {title}\n\n{link}\n\n{mentions}",
@@ -765,9 +768,7 @@
         "yt": "YouTube",
         "yt-default-flow": "{logo}  | Nouvelle vidéo de {author} : **{title}**\nPubliée le {date}\nLien : {link}\n{mentions}",
         "yt-form-last": "{logo}  | Voici la dernière vidéo de {author}:\n{title}\nPubliée le {date}\nLien : {url}",
-        "yt-help": "Pour rechercher une chaîne youtube, vous devez entrer l'identifiant de cette chaîne. Vous la trouverez à la fin de l'url de la chaine, elle peut être soit le nom, soit une suite de caractères aléatoires. *Astuce : certaines chaînes sont déjà renseignées dans mon code. Vous pouvez parfois vous contenter de mettre `neil3000` ou `Oxisius`* :wink:",
-        "deviant-default-flow": "{logo}  | Nouvelle création de {author} : **{title}**\nPubliée le {date}\nLien : {link}\n{mentions}",
-        "deviant-form-last": "{logo}  | Voici la dernière création de {author}:\n{title}\nPubliée le {date}\nLien : {url}"
+        "yt-help": "Pour rechercher une chaîne youtube, vous devez entrer l'identifiant de cette chaîne. Vous la trouverez à la fin de l'url de la chaine, elle peut être soit le nom, soit une suite de caractères aléatoires. *Astuce : certaines chaînes sont déjà renseignées dans mon code. Vous pouvez parfois vous contenter de mettre `neil3000` ou `Oxisius`* :wink:"
     },
     "server": {
         "change-0": "Cette option n'existe pas :confused:",
@@ -782,6 +783,7 @@
         "change-7": "Cette langue n'est pas disponible. Voici la liste des langues actuellement supportées : {}",
         "change-8": "Ce niveau n'existe pas. Voici la liste des niveaux actuellement disponibles : {}",
         "change-9": "L'émoji `{}` n'a pas été trouvé",
+        "change-autoremove_xp": "Le bot enlèvera {xp} points d'xp par jour aux membres inactifs",
         "change-bool": "L'option '{}' a bien été modifiée avec la valeur *{}*",
         "change-color": "La couleur utilisée pour l'option {} est maintenant {}",
         "change-emojis": "Les émojis pour l'option '{}' sont maintenant {}",
@@ -794,7 +796,6 @@
         "change-textchan": "L'option '{}' a bien été modifiée avec les salons {}",
         "change-xp": "Le type d'xp utilisé est maintenant {}",
         "change-xp_rate": "Le modificateur d'xp est maintenant à {rate}",
-        "change-autoremove_xp": "Le bot enlèvera {xp} points d'xp par jour aux membres inactifs",
         "config-help": "Cette commande sert principalement à configurer votre serveur. En faisant `!config see [option]` vous obtiendrez l'aperçu des configurations actuelles, et les administrateurs du serveur peuvent entrer `!config change <option> valeur1, valeur2...` pour modifier une configuration, ou `!config del <option>` pour réinitialiser l'option (`!config change <option> del` fonctionne de même).\nLa liste des options disponible est accessible à l'adresse <https://zbot.rtfd.io/en/latest/server.html#list-of-every-option>",
         "config-list": "Liste des options disponibles :{text}Plus d'information : {link}",
         "need-admin": "Vous devez avoir les permissions Administrateur pour exécuter cette commande.",
@@ -809,6 +810,7 @@
     "server_desc": {
         "anti_caps_lock": "Le bot doit-il envoyer un message lorsqu'un membre envoie trop de majuscules ? {}",
         "anti_raid": "Niveau de la protection anti-raid : {} \n*([Documentation](https://zbot.rtfd.io/en/latest/moderator.html#anti-raid))*",
+        "autoremove_xp": "Points d'expériences enlevés chaque jour aux membres inactifs : {}",
         "ban": "Liste des rôles qui peuvent utiliser la commande 'ban' : {}",
         "bot_news": "Liste des salons dans lesquels envoyer les news du bot : {}",
         "clear": "Liste des rôles qui peuvent utiliser la commande 'clear' : {}",
@@ -842,8 +844,7 @@
         "welcome_channel": "Liste des salons dans lesquels envoyer les messages de bienvenue/quit : {}",
         "welcome_roles": "Liste des rôles donnés automatiquement aux nouveaux membres : {}",
         "xp_rate": "Modficateur de gains d'xp : {}",
-        "xp_type": "Type de système d'xp : {}",
-        "autoremove_xp": "Points d'expériences enlevés chaque jour aux membres inactifs : {}"
+        "xp_type": "Type de système d'xp : {}"
     },
     "stats_infos": {
         "categ-0": "Catégorie",
@@ -1036,6 +1037,6 @@
         "top-title-1": "Classement global",
         "top-title-2": "Classement du serveur",
         "top-your": "Votre niveau",
-        "xp-disabled": "L'xp a été désactivé sur ce serveur"
+        "xp-disabled": "L'xp a été désactivée sur ce serveur"
     }
 }
