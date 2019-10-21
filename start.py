@@ -17,7 +17,7 @@ def check_libs():
 
 
 if check_libs():
-    import discord, sys, traceback, asyncio, time, logging, os, mysql.connector
+    import discord, sys, traceback, asyncio, time, logging, os, mysql.connector, datetime
     from signal import SIGTERM
     from random import choice
     from discord.ext import commands
@@ -77,6 +77,9 @@ class zbot(commands.bot.BotBase,discord.Client):
         self.xp_enabled = True
         self.rss_enabled = True
         self.others = dict()
+        self.current_event = "halloween" if (datetime.datetime.today().month == 10 and datetime.datetime.today().day >= 11) else \
+                "christmas" if (datetime.datetime.today().month == 12 and datetime.datetime.today().day >= 4) else \
+                "fish" if (datetime.datetime.today().month == 4 and datetime.datetime.today().day ==1) else None
     
     @property
     def cnx_frm(self):
@@ -155,7 +158,7 @@ def get_prefix(bot,msg):
     if msg.guild != None:
         return l+[msg.guild.me.mention+" "]
     else:
-        return l+[bot.user.mention+" "]
+        return l+[bot.user.mention+" ", ""]
 
 
 def main():

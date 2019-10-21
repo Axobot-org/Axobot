@@ -382,7 +382,6 @@ You can specify a verification limit by adding a number in argument (up to 1.000
     @say.error
     async def say_error(self,ctx,error):
         if str(error)!='The check functions for command say failed.':
-            print("DUH",error)
             await self.say_function(ctx,None,ctx.view.buffer.replace(ctx.prefix+ctx.invoked_with,"",1))
 
     @commands.command(name="me",hidden=True)
@@ -585,6 +584,8 @@ You can specify a verification limit by adding a number in argument (up to 1.000
         try:
             await ctx.send(embed=emb.discord_embed())
         except Exception as e:
+            if isinstance(e,discord.errors.HTTPException) and "In embed.thumbnail.url: Not a well formed URL" in str(e):
+                return await ctx.send("invalid image")
             await ctx.send(str(await self.translate(ctx.channel,"fun","embed-error")).format(e))
     
 

@@ -527,7 +527,7 @@ class XPCog(commands.Cog):
             gif = images[0]
             gif.save(image_file_object, format='gif', save_all=True, append_images=images[1:], loop=0, duration=duration[0], subrectangles=True)
             image_file_object.seek(0)
-            print(image_file_object.getbuffer().nbytes)
+            # print(image_file_object.getbuffer().nbytes)
             return discord.File(fp=image_file_object, filename='card.gif')
             # imageio.mimwrite('../cards/global/{}-{}-{}.gif'.format(user.id,xp,rank[0]), images, format="GIF-PIL", duration=duration, subrectangles=True)
             # return discord.File('../cards/global/{}-{}-{}.gif'.format(user.id,xp,rank[0]))

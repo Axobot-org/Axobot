@@ -419,7 +419,7 @@ class UtilitiesCog(commands.Cog):
         for e in range(len(self.bot.cogs['LangCog'].languages)):
             if languages.count(e)>0:
                 disp_lang.append((available_langs[e],round(languages.count(e)/len(languages),2)))
-        disp_lang.sort(key = operator.itemgetter(1))
+        disp_lang.sort(key = operator.itemgetter(1),reverse=True)
         if limit==0:
             return disp_lang
         else:

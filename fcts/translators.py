@@ -40,17 +40,9 @@ class TranslatorsCog(commands.Cog):
     async def on_ready(self):
         self.translate = self.bot.cogs["LangCog"].tr
     
-    def load_translation(self,lang:str):
+    def create_txt_map(self,data:dict) -> dict:
         result = dict()
-        if lang not in self.project_list:
-            return result
-        try:
-            with open(f'fcts/lang/{lang}.json','r') as f:
-                data = json.load(f)
-        except FileNotFoundError:
-            pass
-        else:
-            for module, mv in data.items():
+        for module, mv in data.items():
                 for key, value in mv.items():
                     if isinstance(value,str):
                         result[module+'.'+key] = value
@@ -64,7 +56,24 @@ class TranslatorsCog(commands.Cog):
                                 result[module+'.'+key+'.'+minikey] = minivalue
                     elif isinstance(value,list):
                         for e,string in enumerate(value):
-                            result[module+'.'+key+'.'+str(e)] = string
+                            if isinstance(string,list):
+                                for e2,string2 in enumerate(string):
+                                    result[module+'.'+key+'.'+str(e)+'.'+str(e2)] = string2
+                            else:
+                                result[module+'.'+key+'.'+str(e)] = string
+        return result
+
+    def load_translation(self,lang:str):
+        result = dict()
+        if lang not in self.project_list:
+            return result
+        try:
+            with open(f'fcts/lang/{lang}.json','r') as f:
+                data = json.load(f)
+        except FileNotFoundError:
+            pass
+        else:
+            result = self.create_txt_map(data)
         try:
             temp = self.load_project(lang)
         except FileNotFoundError:
@@ -186,7 +195,7 @@ class TranslatorsCog(commands.Cog):
             txt = f"Translation of {lang}:\n {round(c,1)}%\n {lang_progress} messages on {en_progress}"
         await ctx.send(txt)
     
-    async def _fuse_file(self,old:dict,new:str):
+    async def _fuse_file(self,old:dict,new:dict):
         async def readpath(path:list,o,msg:str):
             if len(path)==0:
                 return msg
@@ -254,6 +263,25 @@ class TranslatorsCog(commands.Cog):
         with open(f'translation/{lang}.json','w',encoding='utf-8') as f:
             json.dump(new,f, ensure_ascii=False, indent=4, sort_keys=True)
         await ctx.send('Done!',file=discord.File(f'translation/{lang}.json'))
+
+
+    @commands.command(name="tr-merge")
+    @commands.check(check_admin)
+    async def merge_files(self,ctx):
+        """Merge a file with the english version"""
+        if len(ctx.message.attachments)==0:
+            return await ctx.send("Missing a file")
+        from io import BytesIO
+        with open(f'fcts/lang/en.json','r',encoding='utf-8') as old_f:
+            en_map = self.create_txt_map(json.load(old_f))
+        io = BytesIO()
+        await ctx.message.attachments[0].save(io)
+        data_lang = json.load(io)
+        en_map = await self._fuse_file(data_lang,en_map)
+        await ctx.send(file= discord.File(BytesIO(json.dumps(en_map,ensure_ascii=False,indent=4,sort_keys=True).encode('utf-8')),filename=ctx.message.attachments[0].filename))
+
+
+
 
 
 def setup(bot):
