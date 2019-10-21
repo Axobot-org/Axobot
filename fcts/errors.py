@@ -133,8 +133,6 @@ class ErrorsCog(commands.Cog):
         elif isinstance(error,commands.errors.NoPrivateMessage):
             await ctx.send(await self.translate(ctx.channel,'errors','DM'))
             return
-        elif "404 NOT FOUND (error code: 10008): Unknown Message" == str(error):
-            return
         else:
             try:
                 raw_error = str(error).replace('@eveyrone','@​everyone').replace('@here','@​here')

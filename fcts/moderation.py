@@ -338,8 +338,10 @@ Or: mute @someone Plz respect me"""
             else:
                 await self.mute_event(user,ctx.author,reason,caseID,f_duration)
                 await ctx.send(str(await self.translate(ctx.guild.id,"modo","tempmute-1")).format(user,reason,f_duration))
-            if ctx.channel.permissions_for(ctx.guild.me).manage_messages:
+            try:
                 await ctx.message.delete()
+            except:
+                pass
         except Exception as e:
             await ctx.send(await self.translate(ctx.guild.id,"modo","error"))
             await self.bot.cogs['ErrorsCog'].on_error(e,ctx)
@@ -449,8 +451,10 @@ Or: mute @someone Plz respect me"""
                     caseID = case.id
                 except Exception as e:
                     await self.bot.cogs['ErrorsCog'].on_error(e,ctx)
-            if ctx.channel.permissions_for(ctx.guild.me).manage_messages:
+            try:
                 await ctx.message.delete()
+            except:
+                pass
             if f_duration==None:
                 await ctx.send(str( await self.translate(ctx.guild.id,"modo","ban")).format(user,reason))
                 log = str(await self.translate(ctx.guild.id,"logs","ban")).format(member=user,reason=reason,case=caseID)
@@ -667,7 +671,10 @@ You must be an administrator of this server to use this command."""
         if not ctx.channel.permissions_for(ctx.guild.me).manage_messages:
             return await ctx.send(await self.translate(ctx.guild.id,'modo','need-manage-messages'))
         await message.clear_reactions()
-        await ctx.message.delete()
+        try:
+            await ctx.message.delete()
+        except:
+            pass
 
     @emoji_group.command(name="list")
     async def emoji_list(self,ctx):
