@@ -846,7 +846,7 @@ ID corresponds to the Identifier of the message"""
                 if isascii(ctx.guild.name):
                     a = ctx.guild.name
                 else:
-                    return self.find_verify_question(ctx)
+                    return await self.find_verify_question(ctx)
             elif a=='_special_userdiscrim':
                 a = ctx.author.discriminator
         return q,a
