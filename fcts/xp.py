@@ -75,6 +75,8 @@ class XPCog(commands.Cog):
         content = msg.clean_content
         if len(content)<self.minimal_size or await self.check_spam(content) or await self.check_cmd(msg):
             return
+        if len(self.cache["global"])==0:
+            await self.bdd_load_cache(-1)
         giv_points = await self.calc_xp(msg)
         if msg.author.id in self.cache['global'].keys():
             prev_points = self.cache['global'][msg.author.id][1]
@@ -714,13 +716,17 @@ class XPCog(commands.Cog):
             xp_system_used = 0
         if xp_system_used==0:
             if Type=='global':
-                ranks = await self.bdd_get_top(20*page)
+                #ranks = await self.bdd_get_top(20*page)
+                ranks = sorted([{'userID':key, 'xp':value[1]} for key,value in self.cache['global'].items()], key=lambda x:x['xp'], reverse=True)
                 max_page = ceil(len(self.cache['global'])/20)
             elif Type=='guild':
                 ranks = await self.bdd_get_top(10000,guild=ctx.guild)
                 max_page = ceil(len(ranks)/20)
         else:
-            ranks = await self.bdd_get_top(20*page,guild=ctx.guild)
+            #ranks = await self.bdd_get_top(20*page,guild=ctx.guild)
+            if not ctx.guild.id in self.cache.keys():
+                await self.bdd_load_cache(ctx.guild.id)
+            ranks = sorted([{'userID':key, 'xp':value[1]} for key,value in self.cache[ctx.guild.id].items()], key=lambda x:x['xp'], reverse=True)
             max_page = ceil(len(ranks)/20)
         if page<1:
             return await ctx.send(await self.translate(ctx.channel,"xp",'low-page'))
