@@ -52,10 +52,12 @@ To get a list of all the role-reactions without wasting time waiting for the bot
 Update your embed
 -----------------
 
-**Syntax:** :code:`roles_react update <message ID> [changeDescription?]`
+**Syntax:** :code:`roles_react update <message ID> [changeDescription?] [emojis list]`
 
 This command is very useful for those who have pinned the embed containing all the reactions of the bot. Instead of deleting and resending the message each time you add or remove a role, simply use the command to have the bot check the roles descriptions and usable reactions.
 
 The second argument 'changeDescription' can be used when you don't want Zbot to change the embed description. In this case it will only update the reactions (adding new ones if needed).
+
+You can also use the third argument, a list of emojis, if you want your embed to contain only specific roles/emojis. Thus you can create different roles-reactions embeds with the same system.
 
 .. note:: Note that there are two criteria for the bot to recognize the embed as its own: it must be sent by itself, and the footer text must be the same as in the official embeds. This means that you can use the `embed` command to send a custom embed, it will still work.
