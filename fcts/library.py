@@ -32,7 +32,7 @@ class LibCog(commands.Cog):
         cnx = self.bot.cnx_frm
         cursor = cnx.cursor()
         current_timestamp = datetime.datetime.utcnow()
-        query = "INSERT INTO `{t}` (`ISBN`,`name`,`count`,`last_update`) VALUES ('{i}',\"{n}\",1,'{l}') ON DUPLICATE KEY UPDATE count = `count` + 1, last_update = '{l}';".format(t=self.tables[0],i=ISBN,n=name,l=current_timestamp)
+        query = "INSERT INTO `{t}` (`ISBN`,`name`,`count`,`added_at`,`last_update`) VALUES ('{i}',\"{n}\",1,'{l}','{l}') ON DUPLICATE KEY UPDATE count = `count` + 1, last_update = '{l}';".format(t=self.tables[0],i=ISBN,n=name,l=current_timestamp)
         cursor.execute(query)
         cnx.commit()
         cursor.close()
