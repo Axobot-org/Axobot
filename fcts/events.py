@@ -456,6 +456,157 @@ class Events(commands.Cog):
     
             
 
+    async def rss_loop(self):
+        if self.bot.cogs['RssCog'].last_update==None or (datetime.datetime.now() - self.bot.cogs['RssCog'].last_update).total_seconds()  > 5*60:
+            self.bot.cogs['RssCog'].last_update = datetime.datetime.now()
+            asyncio.run_coroutine_threadsafe(self.bot.cogs['RssCog'].main_loop(),asyncio.get_running_loop())
+    
+    async def dbl_send_data(self):
+        """Send guilds count to Discord Bots Lists"""
+        if self.bot.beta:
+            return
+        t = time.time()
+        answers = ['None','None','None','None']
+        self.bot.log.info("[DBL] Envoi des infos sur le nombre de guildes...")
+        guildCount = len(self.bot.guilds)
+        session = aiohttp.ClientSession(loop=self.bot.loop)
+        # https://discordbots.org/bot/486896267788812288
+        payload = {'server_count': guildCount}
+        async with session.post('https://discordbots.org/api/bots/486896267788812288/stats',data=payload,headers={'Authorization':str(self.bot.dbl_token)}) as resp:
+            self.bot.log.debug('discordbots.org returned {} for {}'.format(resp.status, payload))
+            answers[0] = resp.status
+        # https://divinediscordbots.com/bot/486896267788812288
+        payload = json.dumps({
+          'server_count': guildCount
+          })
+        headers = {
+              'authorization': self.bot.others['divinediscordbots'],
+              'content-type': 'application/json'
+          }
+        async with session.post('https://divinediscordbots.com/bot/{}/stats'.format(self.bot.user.id), data=payload, headers=headers) as resp:
+              self.bot.log.debug('divinediscordbots statistics returned {} for {}'.format(resp.status, payload))
+              answers[1] = resp.status
+        # https://bots.ondiscord.xyz/bots/486896267788812288
+        payload = json.dumps({
+          'guildCount': guildCount
+          })
+        headers = {
+              'Authorization': self.bot.others['botsondiscord'],
+              'Content-Type': 'application/json'
+          }
+        async with session.post('https://bots.ondiscord.xyz/bot-api/bots/{}/guilds'.format(self.bot.user.id), data=payload, headers=headers) as resp:
+              self.bot.log.debug('BotsOnDiscord returned {} for {}'.format(resp.status, payload))
+              answers[2] = resp.status
+        # https://botlist.space/bot/486896267788812288
+        payload = json.dumps({
+          'server_count': guildCount
+          })
+        headers = {
+              'Authorization': self.bot.others['botlist.space'],
+              'Content-Type': 'application/json'
+          }
+        async with session.post('https://api.botlist.space/v1/bots/{}'.format(self.bot.user.id), data=payload, headers=headers) as resp:
+              self.bot.log.debug('botlist.space returned {} for {}'.format(resp.status, payload))
+              answers[3] = resp.status
+        await session.close()
+        answers = [str(x) for x in answers]
+        emb = self.bot.cogs["EmbedCog"].Embed(desc='**Guilds count updated** in {}s ({})'.format(round(time.time()-t,3),'-'.join(answers)),color=7229109).update_timestamp().set_author(self.bot.user)
+        await self.bot.cogs["EmbedCog"].send([emb],url="loop")
+        self.dbl_last_sending = datetime.datetime.now()
+
+    async def partners_loop(self):
+        """Update partners channels (every 7 hours)"""
+        t = time.time()
+        self.partner_last_check = datetime.datetime.now()
+        channels_list = await self.bot.cogs['ServerCog'].get_server(criters=["`partner_channel`<>''"],columns=['ID','partner_channel','partner_color'])
+        self.bot.log.info("[Partners] Rafraîchissement des salons ({} serveurs prévus)...".format(len(channels_list)))
+        count = [0,0]
+        for guild in channels_list:
+            try:
+                chan = guild['partner_channel'].split(';')[0]
+                if not chan.isnumeric():
+                    continue
+                chan = self.bot.get_channel(int(chan))
+                if chan==None:
+                    continue
+                count[0] += 1
+                count[1] += await self.bot.cogs['PartnersCog'].update_partners(chan,guild['partner_color'])
+            except Exception as e:
+                await self.bot.cogs['ErrorsCog'].on_error(e,None)
+        emb = self.bot.cogs["EmbedCog"].Embed(desc='**Partners channels updated** in {}s ({} channels - {} partners)'.format(round(time.time()-t,3),count[0],count[1]),color=10949630).update_timestamp().set_author(self.bot.user)
+        await self.bot.cogs["EmbedCog"].send([emb],url="loop")
+        
+    async def translations_backup(self):
+        """Do a backup of the translations files"""
+        from os import remove
+        t = time.time()
+        self.dbl_last_tr_backup = datetime.datetime.now()
+        try:
+            remove('translation-backup.tar')
+        except:
+            pass
+        try:
+           shutil.make_archive('translation-backup','tar','translation')
+        except FileNotFoundError:
+            await self.bot.cogs['ErrorsCog'].senf_err_msg("Translators backup: Unable to find backup folder")
+            return
+        emb = self.bot.cogs["EmbedCog"].Embed(desc='**Translations files backup** completed in {}s'.format(round(time.time()-t,3)),color=10197915).update_timestamp().set_author(self.bot.user)
+        await self.bot.cogs["EmbedCog"].send([emb],url="loop")
+    
+            
+
+    async def partners_loop(self):
+        """Update partners channels (every 7 hours)"""
+        t = time.time()
+        self.partner_last_check = datetime.datetime.now()
+        channels_list = await self.bot.cogs['ServerCog'].get_server(criters=["`partner_channel`<>''"],columns=['ID','partner_channel','partner_color'])
+        self.bot.log.info("[Partners] Rafraîchissement des salons ({} serveurs prévus)...".format(len(channels_list)))
+        count = [0,0]
+        for guild in channels_list:
+            try:
+                chan = guild['partner_channel'].split(';')[0]
+                if not chan.isnumeric():
+                    continue
+                chan = self.bot.get_channel(int(chan))
+                if chan==None:
+                    continue
+                count[0] += 1
+                count[1] += await self.bot.cogs['PartnersCog'].update_partners(chan,guild['partner_color'])
+            except Exception as e:
+                await self.bot.cogs['ErrorsCog'].on_error(e,None)
+        emb = self.bot.cogs["EmbedCog"].Embed(desc='**Partners channels updated** in {}s ({} channels - {} partners)'.format(round(time.time()-t,3),count[0],count[1]),color=10949630).update_timestamp().set_author(self.bot.user)
+        await self.bot.cogs["EmbedCog"].send([emb],url="loop")
+        
+            
+
+    async def send_mee6_stats(self):
+        """temporary log to see how many mee6api requests have been done"""
+        stats = self.bot.cogs['XPCog'].mee6_calls
+        t = await self.bot.cogs['TimeCog'].time_delta(round(time.time()-stats[0]))
+        emb = self.bot.cogs["EmbedCog"].Embed(desc='MEE6 api called {} times since {} ({}-{}-{})'.format(sum(stats[1:]),t,stats[1],stats[2],stats[3]))
+        emb.update_timestamp().set_author(self.bot.user)
+        await self.bot.cogs["EmbedCog"].send([emb],url="loop")
+        self.mee6_stats_last = datetime.datetime.now()
+
+    async def partners_loop(self):
+        """Update partners channels (every 7 hours)"""
+        t = time.time()
+        self.partner_last_check = datetime.datetime.now()
+        channels_list = await self.bot.cogs['ServerCog'].get_server(criters=["`partner_channel`<>''"],columns=['ID','partner_channel','partner_color'])
+        self.bot.log.info("[Partners] Rafraîchissement des salons ({} serveurs prévus)...".format(len(channels_list)))
+        count = [0,0]
+        for guild in channels_list:
+            chan = guild['partner_channel'].split(';')[0]
+            if not chan.isnumeric():
+                continue
+            chan = self.bot.get_channel(int(chan))
+            if chan==None:
+                continue
+            count[0] += 1
+            count[1] += await self.bot.cogs['PartnersCog'].update_partners(chan,guild['partner_color'])
+        emb = self.bot.cogs["EmbedCog"].Embed(desc='**Partners channels updated** in {}s ({} channels - {} partners)'.format(round(time.time()-t,3),count[0],count[1]),color=10949630).update_timestamp().set_author(self.bot.user)
+        await self.bot.cogs["EmbedCog"].send([emb],url="loop")
+        
 
 def setup(bot):
     bot.add_cog(Events(bot))

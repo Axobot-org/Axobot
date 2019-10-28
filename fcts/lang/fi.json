@@ -195,7 +195,7 @@
         "membernotfound": "On mahdotonta löytää käyttäjä `{m}` :confused:",
         "missingargument": "Upsis, argumentti \"{a}\" puuttuu {e}",
         "msgnotfound": "Mahdotonta löytää viesti tunnisteella {msg}",
-        "rolenotfound": "On mahdotonta löytää rooli `{0}`",
+        "rolenotfound": "On mahdotonta löytää rooli `{r}`",
         "toomanytxtchan": "Sinulla on liikaa teksti kanavia",
         "usernotfound": "On mahdotonta löytää käyttäjä `{u}` :confused:"
     },

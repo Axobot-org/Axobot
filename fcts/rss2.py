@@ -53,6 +53,7 @@ class RssCog(commands.Cog):
         self.loop_processing = False
         self.last_update = None
         self.twitterAPI = twitter.Api(**bot.others['twitter'])
+        self.twitter_over_capacity = False
         if bot.user != None:
             self.table = 'rss_flow' if bot.user.id==486896267788812288 else 'rss_flow_beta'
         try:
@@ -835,6 +836,12 @@ class RssCog(commands.Cog):
     async def get_tw_official(self,nom:str,count:int=None):
         try:
             return [x for x in self.twitterAPI.GetUserTimeline(screen_name=nom,exclude_replies=True,trim_user=True,count=count)]
+        except twitter.error.TwitterError as e:
+            if e.message[0]['code'] == 130:
+                return e
+            else:
+                await self.bot.get_user(279568324260528128).send("```py\n{}\n``` \n```py\n{}\n```".format(e,e.args))
+                return []
         except requests.exceptions.ConnectionError:
             return []
 
@@ -853,6 +860,8 @@ class RssCog(commands.Cog):
         except socket.timeout:
             return []
         tweets_list_official = await self.get_tw_official(nom)
+        if isinstance(tweets_list_official,twitter.error.TwitterError):
+            return tweets_list_official
         tweets_ids = [x.id_str for x in tweets_list_official]
         try:
             entries = [x for x in feeds.entries if hasattr(x,'link') and x.link.split('/')[-1].replace('?p=v','') in tweets_ids]
@@ -1185,6 +1194,9 @@ class RssCog(commands.Cog):
         try:
             guild = self.bot.get_guild(flow['guild'])
             funct = eval('self.rss_{}'.format(flow['type']))
+            if isinstance(funct,twitter.error.TwitterError):
+                self.twitter_over_capacity = True
+                return False
             objs = await funct(guild,flow['link'],flow['date'])
             if isinstance(objs,(str,type(None),int)) or len(objs) == 0:
                 return True
@@ -1229,6 +1241,8 @@ class RssCog(commands.Cog):
         errors = []
         for flow in liste:
             try:
+                if flow['type'] == 'tw' and self.twitter_over_capacity:
+                    continue
                 if flow['type'] != 'mc':
                     if await self.check_flow(flow):
                         check += 1
@@ -1251,6 +1265,7 @@ class RssCog(commands.Cog):
             self.bot.log.warn("[Rss loop] "+d[1])
         if guildID==None:
             self.loop_processing = False
+        self.twitter_over_capacity = False
 
     async def loop_child(self):
         if not self.bot.database_online:

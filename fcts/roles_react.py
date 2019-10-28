@@ -265,9 +265,10 @@ class RolesReact(commands.Cog):
     
 
     @rr_main.command(name='update')
-    async def rr_update(self,ctx:commands.Context,embed:args.guildMessage,changeDescription:bool=True):
+    async def rr_update(self,ctx:commands.Context,embed:args.guildMessage,changeDescription:typing.Optional[bool]=True,emojis:commands.Greedy[args.anyEmoji]=None):
         """Update a Zbot message to refresh roles/reactions
-        If you don't want to update the embed content, for example if it's a custom embed, then you can use 'False' as a second argument. Zbot will only check the reactions"""
+        If you don't want to update the embed content, for example if it's a custom embed, then you can use 'False' as a second argument. Zbot will only check the reactions
+        Specifying a list of emojis will update the embed only for those emojis, and ignore other roles reactions"""
         if embed.author!=ctx.guild.me:
             return await ctx.send(await self.translate(ctx.guild,'roles_react','not-zbot-msg'))
         if len(embed.embeds)!=1 or embed.embeds[0].footer.text!=self.footer_txt:
@@ -277,6 +278,9 @@ class RolesReact(commands.Cog):
             l = await self.rr_list_role(ctx.guild.id)
         except Exception as e:
             return await self.bot.cogs['ErrorsCog'].on_cmd_error(ctx,e)
+        if emojis!=None:
+            emojis = [str(x.id) if isinstance(x,discord.Emoji) else str(x) for x in emojis]
+            l = [x for x in l if x['emoji'] in emojis]
         desc, emojis = await self.create_list_embed(l,ctx.guild)
         reacts = [x.emoji for x in embed.reactions]
         for emoji in emojis:
@@ -285,6 +289,9 @@ class RolesReact(commands.Cog):
         if emb.description != desc and changeDescription:
             emb.description = desc
             await embed.edit(embed=emb)
+            await ctx.send(await self.translate(ctx.guild,'roles_react','reactions-edited'))
+        else:
+            await ctx.send(await self.translate(ctx.guild,'roles_react','embed-edited'))
 
 
 def setup(bot):

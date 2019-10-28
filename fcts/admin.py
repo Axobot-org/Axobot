@@ -307,9 +307,9 @@ class AdminCog(commands.Cog):
         
     @main_msg.command(name="check_tr")
     @commands.check(reloads.check_admin)
-    async def check_tr(self,ctx,lang='en'):
+    async def check_tr(self,ctx,lang='en',origin="fr"):
         """Vérifie si un fichier de langue est complet"""
-        await self.bot.cogs["LangCog"].check_tr(ctx.channel,lang)
+        await self.bot.cogs["LangCog"].check_tr(ctx.channel,lang,origin)
 
     @main_msg.command(name="backup")
     @commands.check(reloads.check_admin)
