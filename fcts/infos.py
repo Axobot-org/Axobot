@@ -501,7 +501,6 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
                 url = url.replace(".webp",".gif")
             else:
                 url = url.replace(".webp",".png")
-            print(url)
             embed.set_thumbnail(url=url)
             # Guild ID
             embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","inv-6"), value=str(invite.guild.id))
