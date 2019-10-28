@@ -93,13 +93,13 @@ class LangCog(discord.ext.commands.Cog):
         except:
             pass
 
-    async def check_tr(self,channel,lang):
+    async def check_tr(self,channel,lang,origin="fr"):
         liste = list()
         if lang not in self.languages:
             await channel.send("La langue `{}` n'est pas disponible".format(lang))
             return
         count = 0
-        for k,v in dict(self.translations['fr']).items():
+        for k,v in dict(self.translations[origin]).items():
             if not k.startswith("__"):
                 if k not in self.translations[lang].keys():
                     await channel.send("Le module {} n'existe pas en `{}`".format(k,lang))
@@ -110,10 +110,10 @@ class LangCog(discord.ext.commands.Cog):
                         liste.append("module "+k+" - "+i)
                         count += 1
         if count==0:
-            await channel.send("Tout les messages ont correctement été traduits en `{}` !".format(lang))
+            await channel.send(("Tout les messages ont correctement été traduits en `{}` !" if origin=="fr" else "Tout les messages ont correctement été traduits en `{}` depuis la langue `{}` !").format(lang,origin))
         else:
             if len("\n- ".join(liste))>1900:
-                temp = f"{count} messages non traduits en `{lang}` :"
+                temp = f"{count} messages non traduits en `{lang}` :" if origin=="fr" else f"{count} messages non traduits en `{lang}` depuis la langue `{origin}` :"
                 for i in liste:
                     if len(temp+i)>2000:
                         await channel.send(temp)
@@ -121,7 +121,7 @@ class LangCog(discord.ext.commands.Cog):
                     temp += "\n"+i
                 await channel.send(temp)
             elif len(liste)>0:
-                await channel.send("{} messages non traduits en `{}` :\n- {}".format(count,lang,"\n- ".join(liste)))
+                await channel.send(("{0} messages non traduits en `{1}` :\n- {2}" if origin=="fr" else "{0} messages non traduits en `{1}` depuis la langue `{o}` :\n- {2}").format(count,lang,"\n- ".join(liste),o=origin))
             else:
                 await channel.send(">> {} messages non traduits en `{}`".format(count,lang))
 
