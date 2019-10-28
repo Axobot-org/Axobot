@@ -285,6 +285,9 @@ class RolesReact(commands.Cog):
         if emb.description != desc and changeDescription:
             emb.description = desc
             await embed.edit(embed=emb)
+            await ctx.send(await self.translate(ctx.guild,'roles_react','reactions-edited'))
+        else:
+            await ctx.send(await self.translate(ctx.guild,'roles_react','embed-edited'))
 
 
 def setup(bot):
