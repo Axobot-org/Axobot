@@ -14,12 +14,16 @@ The list of options continues to grow as development progresses, that's why a we
 
 .. note:: For the curious, know that all the configuration of each server is entirely saved in a MySQL database file, which makes its use easier than a simple txt or csv file.
 
+.. warn:: Recently, it has become possible to do without the names of the subcommands. Thus :code:`config 2` is equivalent to :code:`config see 2`, and :code:`config xp_rate 1.4` to :code:`config change xp_rate 1.4`.
+
 Watch
 -----
 
-**Syntax:** :code:`config see [option]`
+**Syntax:** :code:`config see [option | page]`
 
 The `see` subcommand allows you to see the value of a configuration, with a mini explanatory sentence. If no option is specified, the entire configuration will be displayed in a single message. Note that the bot can suffer a slight latency since this data is stored in an external database.
+
+The page number is used because the options are too numerous to be displayed on a single screen. They have therefore been grouped by page of 20, accessible via this number (default 1).
 
 A detailed list of all options is available `below <#list-of-every-option>`_ .
 

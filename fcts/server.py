@@ -1,10 +1,11 @@
 #!/usr/bin/env python
 #coding=utf-8
 
-import time, datetime, emoji
+import time, datetime, emoji, copy
 import discord
 from discord.ext import commands
 from fcts import cryptage
+from math import ceil
 
 roles_options = ["clear","slowmode","mute","kick","ban","warn","say","welcome_roles","muted_role",'partner_role','update_mentions','verification_role']
 bool_options = ["enable_xp","anti_caps_lock","enable_fun","help_in_dm"]
@@ -73,7 +74,7 @@ class ServerCog(commands.Cog):
                'partner_role':'',
                'update_mentions':'',
                'verification_role':''}
-        self.optionsList = ["prefix","language","description","clear","slowmode","mute","kick","ban","warn","say","welcome_channel","welcome","leave","welcome_roles","bot_news","poll_channels","partner_channel","modlogs_channel","enable_xp","anti_caps_lock","enable_fun","membercounter","anti_raid","vote_emojis","help_in_dm","muted_role"]
+        self.optionsList = ["prefix","language","description","clear","slowmode","mute","kick","ban","warn","say","welcome_channel","welcome","leave","welcome_roles","bot_news","update_mentions","poll_channels","partner_channel","partner_color","partner_role","modlogs_channel","verification_role","enable_xp","levelup_msg","noxp_channels","xp_rate","xp_type","anti_caps_lock","enable_fun","membercounter","anti_raid","vote_emojis","help_in_dm","muted_role"]
 
     @commands.Cog.listener()
     async def on_ready(self):
@@ -248,8 +249,27 @@ class ServerCog(commands.Cog):
         if ctx.bot.database_online:
             await self.is_server_exist(ctx.guild.id)
         if ctx.invoked_subcommand is None:
-            msg = await self.translate(ctx.guild,"server","config-help", p=(await self.bot.get_prefix(ctx.message))[0])
-            await ctx.send(msg.format(ctx.guild.owner.name))
+            msg = copy.copy(ctx.message)
+            subcommand_passed = ctx.message.content.replace(ctx.prefix+"config ","")
+            if subcommand_passed == None:
+                msg.content = ctx.prefix + "config help"
+            elif subcommand_passed.isnumeric():
+                msg.content = ctx.prefix + "config see " + subcommand_passed
+            elif subcommand_passed.split(" ")[0] in self.optionsList:
+                if len(subcommand_passed.split(" "))==1:
+                    msg.content = ctx.prefix + "config see " + subcommand_passed
+                else:
+                    msg.content = ctx.prefix + "config change " + subcommand_passed
+            else:
+                msg.content = ctx.prefix + "config help"
+            new_ctx = await self.bot.get_context(msg)
+            await self.bot.invoke(new_ctx)
+
+    @sconfig_main.command(name="help")
+    async def sconfig_help(self,ctx):
+        """Get help about this command"""
+        msg = await self.translate(ctx.guild,"server","config-help", p=(await self.bot.get_prefix(ctx.message))[0])
+        await ctx.send(msg.format(ctx.guild.owner.name))
 
     @sconfig_main.command(name="del")
     async def sconfig_del(self,ctx,option):
@@ -760,16 +780,28 @@ class ServerCog(commands.Cog):
     async def send_see(self,guild,channel,option,msg,ctx):
         """Envoie l'embed dans un salon"""
         if option==None:
+            option = "1"
+        if option.isnumeric():
+            page = int(option)
+            if page<1:
+                return await ctx.send(await self.translate(ctx.channel,"xp",'low-page'))
             liste = await self.get_server([],criters=["ID="+str(guild.id)])
             if len(liste)==0:
                 return await channel.send(str(await self.translate(channel.guild,"server","not-found")).format(guild.name))
-            liste=liste[0]
-            embed = self.bot.cogs['EmbedCog'].Embed(title=str(await self.translate(guild.id,"server","see-1")).format(guild.name), color=self.embed_color, desc=str(await self.translate(guild.id,"server","see-0")), time=msg.created_at,thumbnail=guild.icon_url_as(format='png'))
+            temp = [(k,v) for k,v in liste[0].items() if k in self.optionsList]
+            max_page = ceil(len(temp)/20)
+            if page>max_page:
+                return await ctx.send(await self.translate(ctx.channel,"xp",'high-page'))
+            liste = {k:v for k,v in temp[(page-1)*20:page*20] }
+            if len(liste)==0:
+                return await ctx.send("NOPE")
+            title = str(await self.translate(guild.id,"server","see-1")).format(guild.name) + f" ({page}/{max_page})"
+            embed = self.bot.cogs['EmbedCog'].Embed(title=title, color=self.embed_color, desc=str(await self.translate(guild.id,"server","see-0")), time=msg.created_at,thumbnail=guild.icon_url_as(format='png'))
             embed.create_footer(msg.author)
             diff = channel.guild != guild
             for i,v in liste.items():
-                if i not in self.optionsList:
-                    continue
+                #if i not in self.optionsList:
+                #    continue
                 if i in roles_options:
                     r = await self.form_roles(guild,v,diff)
                     r = ", ".join(r)
@@ -795,14 +827,14 @@ class ServerCog(commands.Cog):
                 elif i in emoji_option:
                     r = ", ".join(await self.form_emoji(v))
                 elif i in xp_type_options:
-                    r = ", ".join(await self.form_xp_type(v))
+                    r = await self.form_xp_type(v)
                 elif i in color_options:
                     r = await self.form_color(i,v)
                 elif i in xp_rate_option:
                     r = await self.form_xp_rate(i,v)
                 else:
                     continue
-                if len(r) == 0:
+                if len(str(r)) == 0:
                     r = "Ø"
                 embed.fields.append({'name':i, 'value':r, 'inline':True})
             await channel.send(embed=embed.discord_embed())
@@ -851,7 +883,8 @@ class ServerCog(commands.Cog):
                 if not ctx.channel.permissions_for(ctx.guild.me).embed_links:
                     await ctx.send(await self.translate(ctx.guild.id,"mc","cant-embed"))
                     return
-                embed = ctx.bot.cogs["EmbedCog"].Embed(title=str(await self.translate(ctx.guild.id,"server","opt_title")).format(option,ctx.guild.name), color=self.embed_color, desc=r, time=ctx.message.created_at)
+                title = str(await self.translate(ctx.guild.id,"server","opt_title")).format(option,ctx.guild.name)
+                embed = ctx.bot.cogs["EmbedCog"].Embed(title=title, color=self.embed_color, desc=r, time=ctx.message.created_at)
                 embed.create_footer(ctx.author)
                 await ctx.send(embed=embed.discord_embed())
             except Exception as e:
