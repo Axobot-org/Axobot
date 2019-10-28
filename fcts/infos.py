@@ -1,4 +1,4 @@
-import discord, datetime, sys, psutil, os, aiohttp, importlib, time, asyncio, typing, random, re, copy
+import discord, datetime, sys, psutil, os, aiohttp, importlib, time, asyncio, typing, random, re, copy, requests
 from discord.ext import commands
 from inspect import signature
 from platform   import system as system_name  # Returns the system/OS name
@@ -462,26 +462,63 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
    
     async def invite_info(self,ctx,invite,lang):
         since = await self.translate(ctx.guild.id,"keywords","depuis")
-        embed = discord.Embed(colour=default_color, timestamp=ctx.message.created_at,description=await self.translate(ctx.guild.id,"stats_infos","inv-5"))
+        embed = discord.Embed(colour=default_color, timestamp=ctx.message.created_at)
         embed.set_author(name="{} '{}'".format(await self.translate(ctx.guild.id,"stats_infos","inv-4"),invite.code), icon_url=ctx.guild.icon_url)
-        embed.set_footer(text='Requested by {}'.format(ctx.author.name), icon_url=ctx.author.avatar_url)
-
+        embed.set_footer(text='Requested by {}'.format(ctx.author.name), icon_url=str(await self.bot.user_avatar_as(ctx.author,size=256)))
+        # Try to get the complete invite
+        if invite.guild in self.bot.guilds:
+            try:
+                temp = [x for x in await invite.guild.invites() if x.id == invite.id]
+                if len(temp)>0:
+                    invite = temp[0]
+            except discord.errors.Forbidden:
+                pass
+            except Exception as e:
+                await self.bot.cogs['ErrorsCog'].on_error(e,ctx)
+        # Invite URL
         embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","inv-0"), value=invite.url,inline=True)
-        embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","role-0"), value=str(invite.id))
+        # Inviter
         embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","inv-1"), value=str(invite.inviter) if invite.inviter!= None else await self.translate(ctx.guild,'keywords','unknown'))
-        if invite.max_uses!=None and invite.uses!=None:
+        # Invite uses
+        if invite.max_uses != None and invite.uses != None:
             if invite.max_uses == 0:
                 uses = "{}/∞".format(invite.uses)
             else:
                 uses = "{}/{}".format(invite.uses,invite.max_uses)
             embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","inv-2"), value=uses)
+        # Duration
         if invite.max_age!=None:
             embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","inv-3"), value=str(invite.max_age) if invite.max_age != 0 else "∞")
         if isinstance(invite.channel,(discord.PartialInviteChannel,discord.abc.GuildChannel)):
+            # Guild name
             embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","guild-0"), value=str(invite.guild.name))
+            # Channel name
             embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","textchan-5"), value="#"+str(invite.channel.name))
-            embed.set_thumbnail(url=invite.guild.icon_url)
-            embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","role-0"), value=str(invite.guild.id))
+            # Guild icon
+            url = str(invite.guild.icon_url)
+            r = requests.get(url.replace(".webp",".gif"))
+            if r.ok:
+                url = url.replace(".webp",".gif")
+            else:
+                url = url.replace(".webp",".png")
+            print(url)
+            embed.set_thumbnail(url=url)
+            # Guild ID
+            embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","inv-6"), value=str(invite.guild.id))
+            # Members count
+            embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","inv-7"), value=str(invite.approximate_member_count))
+        # Guild banner
+        if invite.guild.banner_url != None:
+            embed.set_image(url=invite.guild.banner_url)
+        # Guild description
+        if invite.guild.description != None:
+            embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","inv-8"), value=invite.guild.description)
+        # Guild features
+        if len(invite.guild.features)>0:
+            features_tr = await self.translate(ctx.guild.id,"stats_infos","guild-features")
+            features = [features_tr[x] if x in features_tr.keys() else x for x in invite.guild.features]
+            embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","inv-9"), value=" - ".join(features))
+        # Creation date
         if invite.created_at != None:
             embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","member-1"), value = "{} ({} {})".format(await self.timecog.date(invite.created_at,lang=lang,year=True),since,await self.timecog.time_delta(invite.created_at,datetime.datetime.now(),lang=lang,year=True,precision=0,hour=False)), inline=False)
         await ctx.send(embed=embed)
