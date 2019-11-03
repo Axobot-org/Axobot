@@ -920,7 +920,54 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
             await ctx.send(embed=emb)
         else:
             await ctx.send(desc)
-        
+
+    @commands.command(name="usernames",aliases=["username","usrnm"])
+    async def username(self,ctx:commands.Context,*,user:discord.User):
+        """Get the names history of an user"""
+        language = await self.translate(ctx.channel,"current_lang","current")
+        cond = f"user='{user.id}'"
+        if not self.bot.beta:
+            cond += " AND beta=0"
+        query = f"SELECT `old`, `new`, `guild`, CONVERT_TZ(`date`, @@session.time_zone, '+00:00') AS `utc_date` FROM `usernames_logs` WHERE {cond} ORDER BY date DESC"
+        cnx = self.bot.cnx_frm
+        cursor = cnx.cursor(dictionary=True)
+        cursor.execute(query)
+        results = list(cursor)
+        cursor.close()
+        # List creation
+        this_guild = list()
+        global_list = [x for x in results if x['guild']==None]
+        if ctx.guild != None:
+            this_guild = [x for x in results if x['guild']==ctx.guild.id]
+        # title
+        t = await self.translate(ctx.channel,'infos','usernames-title',u=user.name)
+        # Embed creation
+        if ctx.guild == None or ctx.channel.permissions_for(ctx.guild.me).embed_links:
+            date = ""
+            desc = None
+            f = list()
+            if len(global_list)>0:
+                # Usernames part
+                f.append({'name':await self.translate(ctx.channel,'infos','usernames-global'), 'value':"\n".join([x['new'] for x in global_list])})
+                date += await self.bot.cogs['TimeCog'].date([x['utc_date'] for x in global_list][0] ,year=True, lang=language)
+            if len(this_guild)>0:
+            # Nicknames part
+                f.append({'name':await self.translate(ctx.channel,'infos','usernames-local'), 'value':"\n".join([x['new'] for x in this_guild])})
+                date += "\n" + await self.bot.cogs['TimeCog'].date([x['utc_date'] for x in this_guild][0], year=True, lang=language)
+            if len(date)>0:
+                f.append({'name':await self.translate(ctx.channel,'infos','usernames-last-date'), 'value':date})
+            else:
+                desc = 'no u'
+            if ctx.guild != None and ctx.guild.get_member(user.id)!=None and ctx.guild.get_member(user.id).color!=discord.Color(0):
+                c = ctx.guild.get_member    (user.id).color
+            else:
+                c = 1350390
+            emb = self.bot.cogs['EmbedCog'].Embed(title=t,fields=f,desc=desc,color=c)
+            await ctx.send(embed=emb)
+        # Raw text creation
+        else:
+            await ctx.send(results)
+
 
 def setup(bot):
     bot.add_cog(InfoCog(bot))

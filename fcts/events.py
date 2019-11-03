@@ -55,7 +55,7 @@ class Events(commands.Cog):
             ID = round(time.time()/2) * 10 + random.randrange(0,9)
             b = '' if before.nick==None else before.nick.replace("'","\\'")
             a = '' if after.nick==None else after.nick.replace("'","\\'")
-            query = ("INSERT INTO `usernames_logs` (`ID`,`user`,`old`,`new`,`guild`) VALUES ('{}','{}','{}','{}','{}')".format(ID,before.id,b,a,before.guild.id))
+            query = ("INSERT INTO `usernames_logs` (`ID`,`user`,`old`,`new`,`guild`,`beta`) VALUES ('{}','{}','{}','{}','{}',{})".format(ID,before.id,b,a,before.guild.id,self.bot.beta))
             cursor.execute(query)
             cnx.commit()
             cursor.close()
@@ -67,7 +67,7 @@ class Events(commands.Cog):
             cnx = self.bot.cnx_frm
             cursor = cnx.cursor()
             ID = round(time.time()/2) * 10 + random.randrange(0,9)
-            query = ("INSERT INTO `usernames_logs` (`ID`,`user`,`old`,`new`,`guild`) VALUES ('{}','{}','{}','{}','{}')".format(ID,before.id,before.name.replace("'","\\'"),after.name.replace("'","\\'"),0))
+            query = ("INSERT INTO `usernames_logs` (`ID`,`user`,`old`,`new`,`guild`,`beta`) VALUES ('{}','{}','{}','{}','{}',{})".format(ID,before.id,before.name.replace("'","\\'"),after.name.replace("'","\\'"),0,self.bot.beta))
             cursor.execute(query)
             cnx.commit()
             cursor.close()
