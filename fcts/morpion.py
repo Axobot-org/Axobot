@@ -34,7 +34,7 @@ class MorpionCog(commands.Cog):
                 elif grille[k] == 'O':
                     affichage_grille += "🎃" if self.is_halloween else ':red_circle:'
                 else:
-                    affichage_grille += ":bat:" if self.is_halloween else ':large_blue_circle:'
+                    affichage_grille += ":bat:" if self.is_halloween else ':blue_circle:'
         return affichage_grille
 
     async def test_place_valide(self,grille:list,saisie:str):
