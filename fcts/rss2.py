@@ -175,7 +175,8 @@ class RssCog(commands.Cog):
     @commands.cooldown(2,15,commands.BucketType.channel)
     async def rss_main(self,ctx):
         """See the last post of a rss feed"""
-        return
+        if ctx.subcommand_passed==None:
+            await self.bot.cogs['HelpCog'].help_command(ctx,['rss'])
 
     @rss_main.command(name="youtube",aliases=['yt'])
     async def request_yt(self,ctx,ID):
