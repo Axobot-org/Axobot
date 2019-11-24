@@ -383,6 +383,7 @@ class RssCog(commands.Cog):
             return await ctx.send(await self.translate(ctx.guild.id,"rss","no-db"))
         liste = await self.get_guild_flows(ctx.guild.id)
         l = list()
+        translation = await self.translate(ctx.guild.id,"rss","list-result")
         for x in liste:
             c = self.bot.get_channel(x['channel'])
             if c != None:
@@ -400,7 +401,8 @@ class RssCog(commands.Cog):
                     else:
                         r.append(item)
                 r = ", ".join(r)
-            l.append("Type : {}\nSalon : {}\nLien/chaine : {}\nRôle mentionné : {}\nIdentifiant : {}\nDernier post : {}".format(x['type'],c,x['link'],r,x['ID'],x['date']))
+            Type = await self.translate(ctx.guild.id,'rss',x['type'])
+            l.append(translation.format(Type,c,x['link'],r,x['ID'],x['date']))
         embed = discord.Embed(title="Liste des flux rss du serveur {}".format(ctx.guild.name), colour=self.embed_color, timestamp=ctx.message.created_at)
         embed = await self.bot.cogs['UtilitiesCog'].create_footer(embed,ctx.author)
         for x in l:

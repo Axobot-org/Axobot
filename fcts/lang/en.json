@@ -742,6 +742,7 @@
         "invalid-link": "Oops, this url address is invalid or incomplete :confused:",
         "list": "*Type the number of the flow to modify*\n\n**Link - Type - Channel - Mentions**\n",
         "list2": "*Type the number of the flow to delete*\n\n**Link - Type - Channel**\n",
+        "list-result": "Type: {}\nDiscord channel: {}\nURL/Channel: {}\nMentions: {}\nIdentifier: {}\nLast post: {}",
         "mc": "Minecraft",
         "move-success": "The rss feed #{} has been moved in the channel {}!",
         "no-db": "As the database is currently offline, this feature is temporarily disabled :confused:",

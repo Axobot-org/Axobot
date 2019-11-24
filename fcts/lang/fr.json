@@ -742,6 +742,7 @@
         "invalid-link": "Oups, cette adresse url est invalide ou incomplète :confused:",
         "list": "*Entrez le numéro du flux à modifier*\n\n**Lien - Type - Salon - Roles**\n",
         "list2": "*Entrez le numéro du flux à supprimer*\n\n**Lien - Type - Salon**\n",
+        "list-result": "Type : {}\nSalon : {}\nLien/chaine : {}\nRôle mentionné : {}\nIdentifiant : {}\nDernier post : {}",
         "mc": "Minecraft",
         "move-success": "Le flux rss n°{} a bien été bougé dans le salon {} !",
         "no-db": "La base de donnée étant actuellement hors ligne, cette fonctionnalité est temporairement désactivée :confused:",
