@@ -980,7 +980,7 @@ class RssCog(commands.Cog):
         if published!=None and len(feeds.entries)>1:
             while len(feeds.entries)>1 and feeds.entries[0][published] < feeds.entries[1][published]:
                 del feeds.entries[0]
-        if not date or published != 'published_parsed':
+        if not date or published not in ['published_parsed','updated_parsed']:
             feed = feeds.entries[0]
             if published==None:
                 datz = 'Unknown'
@@ -1008,14 +1008,11 @@ class RssCog(commands.Cog):
                 title = '?'
             obj = self.rssMessage(bot=self.bot,Type='web',url=l,title=title,emojis=self.bot.cogs['EmojiCog'].customEmojis,date=datz,author=author,channel=feeds.feed['title'] if 'title' in feeds.feed.keys() else '?')
             return [obj]
-        else:
+        else: # published in ['published_parsed','updated_parsed']
             liste = list()
             for feed in feeds.entries:
-                if published==None:
-                    datz = 'Unknown'
-                else:
-                    datz = feed[published]
-                if feed['published_parsed']==None or (datetime.datetime(*feed['published_parsed'][:6]) - date).total_seconds() < self.min_time_between_posts:
+                datz = feed[published]
+                if feed[published]==None or (datetime.datetime(*feed[published][:6]) - date).total_seconds() < self.min_time_between_posts:
                     break
                 if 'link' in feed.keys():
                     l = feed['link']
