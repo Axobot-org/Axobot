@@ -729,6 +729,7 @@
         "choose-mentions-1": "Please choose the flow to modify",
         "choose-roles": "What roles will be mentioned?",
         "delete-success": "The flow has been successfully deleted!",
+        "deviant": "DeviantArt",
         "deviant-default-flow": "{logo}  | New creation by {author} : **{title}**\nPublished on {date}\nLink: {link}\n{mentions}",
         "deviant-form-last": "{logo}  | Here is the new creation of {author}:\n{title}\nPublished on {date}\nLink: {url}",
         "embed-json-changed": "The embed of this feed has been modified",

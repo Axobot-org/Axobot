@@ -729,6 +729,7 @@
         "choose-mentions-1": "Veuillez choisir le flux à modifier",
         "choose-roles": "Quels seront les rôles à mentionner ?",
         "delete-success": "Le flux a été supprimé avec succès !",
+        "deviant": "DeviantArt",
         "deviant-default-flow": "{logo}  | Nouvelle création de {author} : **{title}**\nPubliée le {date}\nLien : {link}\n{mentions}",
         "deviant-form-last": "{logo}  | Voici la dernière création de {author}:\n{title}\nPubliée le {date}\nLien : {url}",
         "embed-json-changed": "L'embed de ce flux a bien été modifié",
