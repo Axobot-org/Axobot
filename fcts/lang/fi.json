@@ -630,7 +630,7 @@
         "nul": "Tasapeli, kukaan ei voittanut...",
         "pion-1": "Siinä on jo pelinappula!",
         "pion-2": "Pätemätön syöte tapaus",
-        "tip": "\n*Näin peli toimii, kirjoita numero yhden (1) ja yhdeksän (9) välistä, vastaavana valitsevaan tapaukseen. Minä pelaan punaista, sinä sinistä!*",
+        "tip": "\n*Näin peli toimii, kirjoita numero yhden (1) ja yhdeksän (9) välistä, vastaavana valitsevaan tapaukseen. Minä pelaan {symb1}, sinä {symb2}!*",
         "too-late": "Sinulla kesti liian kauan valita. Peli pelattu!",
         "user-begin": "{}, aloita sinä!",
         "win-1": "Hyvin tehty, {} voitti!",

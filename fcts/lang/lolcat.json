@@ -635,7 +635,7 @@
         "nul": "Draw, nobody won... rip",
         "pion-1": "There's already a pawn on dat cell!",
         "pion-2": "Invalid input!",
-        "tip": "\n*To play, simply type a nbr beetween 1 - 9, corresponding 2 teh chosen case. I play the red, U play the blue*",
+        "tip": "\n*To play, simply type a nbr beetween 1 - 9, corresponding 2 teh chosen case. I play the {symb1}, U play the {symb2}*",
         "too-late": "U was too long! End of the game!",
         "user-begin": "{}, u begin!",
         "win-1": "GG, {} won!",
