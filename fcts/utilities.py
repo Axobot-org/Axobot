@@ -357,6 +357,22 @@ class UtilitiesCog(commands.Cog):
             return False
         return parameters['unlocked_blurple']
     
+    async def has_christmas_card(self,user):
+        """Check if a user won the christmas card"""
+        parameters = None
+        try:
+            parameters = await self.get_db_userinfo(criters=["userID="+str(user.id)],columns=['unlocked_christmas'])
+        except Exception as e:
+            await self.bot.cogs["Errors"].on_error(e,None)
+        if parameters==None:
+            parameters = {'unlocked_christmas': False}
+        if not parameters['unlocked_christmas'] and self.bot.current_event=="christmas":
+            points = await self.get_db_userinfo(["events_points"],["userID="+str(user.id)])
+            if points != None and points["events_points"]>50:
+                await self.change_db_userinfo(user.id,'unlocked_christmas',True)
+                parameters['unlocked_christmas'] = True
+        return parameters['unlocked_christmas']
+    
     async def get_xp_style(self,user):
         parameters = None
         try:
@@ -402,6 +418,8 @@ class UtilitiesCog(commands.Cog):
             liste.append('blurple')
         if await self.has_rainbow_card(user):
             liste.append('rainbow')
+        if await self.has_christmas_card(user):
+            liste.append('christmas')
         return sorted(liste2)+sorted(liste)
 
     async def get_languages(self,user,limit=0):
@@ -424,6 +442,24 @@ class UtilitiesCog(commands.Cog):
             return disp_lang
         else:
             return disp_lang[:limit]
+    
+    async def add_user_eventPoint(self,userID:int,points:int,override:bool=False):
+        """Add some events points to a user
+        if override is True, then the number of points will override the old score"""
+        try:
+            cnx = self.bot.cnx_frm
+            cursor = cnx.cursor(dictionary = True)
+            if override:
+                query = ("INSERT INTO `{t}` (`userID`,`events_points`) VALUES ('{u}',{p}) ON DUPLICATE KEY UPDATE events_points = '{p}';".format(t=self.table,u=userID,p=points))
+            else:
+                query = ("INSERT INTO `{t}` (`userID`,`events_points`) VALUES ('{u}',{p}) ON DUPLICATE KEY UPDATE events_points = events_points + '{p}';".format(t=self.table,u=userID,p=points))
+            cursor.execute(query)
+            cnx.commit()
+            cursor.close()
+            return True
+        except Exception as e:
+            await self.bot.cogs['ErrorsCog'].on_error(e,None)
+            return False
 
 
 def setup(bot):
