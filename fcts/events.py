@@ -336,7 +336,7 @@ class Events(commands.Cog):
                 await self.dbl_send_data()
             elif int(d.hour)%12 == 1 and (d.hour != self.dbl_last_tr_backup.hour or d.day != self.dbl_last_tr_backup.day):
                 await self.translations_backup()
-            elif int(d.hour) == 0 and (d.day != self.dbl_last_eventDay_check.day):
+            elif int(d.hour)%12 == 0 and int(d.minute)%45 == 1 and (d.hour != self.dbl_last_eventDay_check.hour or d.day != self.dbl_last_eventDay_check.day):
                 self.bot.updateCurrentEvent()
                 self.dbl_last_eventDay_check = datetime.datetime.today()
         except Exception as e:
