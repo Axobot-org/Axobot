@@ -71,6 +71,10 @@
                 "Il faut être administrateur du bot",
                 "Vous n'êtes pas administrateur du bot"
             ],
+            "database_connected": [
+                "La base de donnée est bien en ligne",
+                "La base de donnée est hors ligne"
+            ],
             "guild_only": [
                 "Utilisable uniquement dans un serveur",
                 "Utilisable uniquement dans un serveur"

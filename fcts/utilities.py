@@ -18,11 +18,14 @@ class UtilitiesCog(commands.Cog):
 
     @commands.Cog.listener()
     async def on_ready(self):
-        await self.reload()
+        await self.get_bot_infos()
 
-    async def reload(self):
-        self.config = (await self.bot.cogs['ServerCog'].get_bot_infos(self.bot.user.id))[0]
-        return self.config
+    async def get_bot_infos(self):
+        config_list = await self.bot.cogs['ServerCog'].get_bot_infos(self.bot.user.id)
+        if len(config_list)>0:
+            self.config = config_list[0]
+            return self.config
+        return None
 
     def find_prefix(self,guild):
         if guild==None or not self.bot.database_online:
@@ -145,23 +148,18 @@ class UtilitiesCog(commands.Cog):
             await self.print2("Unable to delete message "+str(msg))
             pass
 
-    async def get_bot_infos(self):
-        if self.config == None:
-            self.config = (await self.bot.cogs['ServerCog'].get_bot_infos(self.bot.user.id))[0]
-        return self.config
-
     async def global_check(self,ctx):
         """Do a lot of checks before executing a command (rss loop, banned guilds etc)"""
         #if ctx.bot.cogs['RssCog'].last_update==None or (datetime.datetime.now() - ctx.bot.cogs['RssCog'].last_update).total_seconds() > 20*60:
         #    self.bot.cogs['RssCog'].last_update = datetime.datetime.now()
         #    asyncio.run_coroutine_threadsafe(ctx.bot.cogs['RssCog'].main_loop(),asyncio.get_running_loop())
-        if type(ctx)!=commands.context.Context:
+        if type(ctx)!=commands.context.Context or self.config==None:
             return True
         if await self.bot.cogs['AdminCog'].check_if_admin(ctx):
             return True
-        if len(self.config)==0:
-            self.config = await self.get_bot_infos()
-        if len(self.config)==0:
+        elif len(self.config)==0:
+            await self.get_bot_infos()
+        if len(self.config)==0 or self.config==None:
             return True
         if ctx.guild != None:
             if str(ctx.guild.id) in self.config['banned_guilds'].split(";"):
@@ -286,7 +284,7 @@ class UtilitiesCog(commands.Cog):
         try:
             parameters = await self.get_db_userinfo(criters=["userID="+str(user.id)],columns=['premium'])
         except Exception as e:
-            await self.bot.cogs["Errors"].on_error(e,None)
+            await self.bot.cogs["ErrorsCog"].on_error(e,None)
         if parameters==None:
             return False
         return parameters['premium']
@@ -297,7 +295,7 @@ class UtilitiesCog(commands.Cog):
         try:
             parameters = await self.get_db_userinfo(criters=["userID="+str(user.id)],columns=['support'])
         except Exception as e:
-            await self.bot.cogs["Errors"].on_error(e,None)
+            await self.bot.cogs["ErrorsCog"].on_error(e,None)
         if parameters==None:
             return False
         return parameters['support']
@@ -308,7 +306,7 @@ class UtilitiesCog(commands.Cog):
         try:
             parameters = await self.get_db_userinfo(criters=["userID="+str(user.id)],columns=['partner'])
         except Exception as e:
-            await self.bot.cogs["Errors"].on_error(e,None)
+            await self.bot.cogs["ErrorsCog"].on_error(e,None)
         if parameters==None:
             return False
         return parameters['partner']
@@ -319,18 +317,20 @@ class UtilitiesCog(commands.Cog):
         try:
             parameters = await self.get_db_userinfo(criters=["userID="+str(user.id)],columns=['contributor'])
         except Exception as e:
-            await self.bot.cogs["Errors"].on_error(e,None)
+            await self.bot.cogs["ErrorsCog"].on_error(e,None)
         if parameters==None:
             return False
         return parameters['contributor']
     
     async def is_translator(self,user):
         """Check if a user is a translator"""
+        if self.bot.database_online==False:
+            return False
         parameters = None
         try:
             parameters = await self.get_db_userinfo(criters=["userID="+str(user.id)],columns=['translator'])
         except Exception as e:
-            await self.bot.cogs["Errors"].on_error(e,None)
+            await self.bot.cogs["ErrorsCog"].on_error(e,None)
         if parameters==None:
             return False
         return parameters['translator']
@@ -341,7 +341,7 @@ class UtilitiesCog(commands.Cog):
         try:
             parameters = await self.get_db_userinfo(criters=["userID="+str(user.id)],columns=['unlocked_rainbow'])
         except Exception as e:
-            await self.bot.cogs["Errors"].on_error(e,None)
+            await self.bot.cogs["ErrorsCog"].on_error(e,None)
         if parameters==None:
             return False
         return parameters['unlocked_rainbow']
@@ -352,7 +352,7 @@ class UtilitiesCog(commands.Cog):
         try:
             parameters = await self.get_db_userinfo(criters=["userID="+str(user.id)],columns=['unlocked_blurple'])
         except Exception as e:
-            await self.bot.cogs["Errors"].on_error(e,None)
+            await self.bot.cogs["ErrorsCog"].on_error(e,None)
         if parameters==None:
             return False
         return parameters['unlocked_blurple']
@@ -363,7 +363,7 @@ class UtilitiesCog(commands.Cog):
         try:
             parameters = await self.get_db_userinfo(criters=["userID="+str(user.id)],columns=['unlocked_christmas'])
         except Exception as e:
-            await self.bot.cogs["Errors"].on_error(e,None)
+            await self.bot.cogs["ErrorsCog"].on_error(e,None)
         if parameters==None:
             parameters = {'unlocked_christmas': False}
         if not parameters['unlocked_christmas'] and self.bot.current_event=="christmas":
@@ -403,6 +403,8 @@ class UtilitiesCog(commands.Cog):
     async def allowed_card_styles(self,user):
         """Retourne la liste des styles autorisées pour la carte d'xp de cet utilisateur"""
         liste = ['blue','dark','green','grey','orange','purple','red','turquoise','yellow']
+        if not self.bot.database_online:
+            return sorted(liste)
         liste2 = []
         if await self.bot.cogs['AdminCog'].check_if_admin(user):
             liste2.append('admin')
@@ -425,6 +427,8 @@ class UtilitiesCog(commands.Cog):
     async def get_languages(self,user,limit=0):
         """Get the most used languages of an user
         If limit=0, return every languages"""
+        if not self.bot.database_online:
+            return ["en"]
         languages = list()
         disp_lang = list()
         available_langs = self.bot.cogs['LangCog'].languages

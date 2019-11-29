@@ -280,8 +280,11 @@ class AdminCog(commands.Cog):
                     os.unlink(folderName+'/'+filename)
             if  folderName.endswith('__pycache__'):
                 os.rmdir(folderName)
-        self.bot.cnx_frm.close()
-        self.bot.cnx_xp.close()
+        try:
+            self.bot.cnx_frm.close()
+            self.bot.cnx_xp.close()
+        except mysql.connector.errors.ProgrammingError:
+            pass
     
     @main_msg.command(name='reboot')
     @commands.check(reloads.check_admin)

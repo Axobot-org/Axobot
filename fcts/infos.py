@@ -8,9 +8,10 @@ default_color = discord.Color(0x50e3c2)
 
 from docs import conf
 importlib.reload(conf)
-from fcts import reloads, args
+from fcts import reloads, args, checks
 importlib.reload(reloads)
 importlib.reload(args)
+importlib.reload(checks)
 from libs import bitly_api
 importlib.reload(bitly_api)
 
@@ -90,7 +91,9 @@ class InfoCog(commands.Cog):
                 b_conf = self.bot.cogs['UtilitiesCog'].config
                 if b_conf == None:
                     b_conf = await self.bot.cogs['UtilitiesCog'].reload()
-                ignored_guilds = [int(x) for x in self.bot.cogs['UtilitiesCog'].config['banned_guilds'].split(";") if len(x)>0]
+                ignored_guilds = list()
+                if self.bot.database_online:
+                    ignored_guilds = [int(x) for x in self.bot.cogs['UtilitiesCog'].config['banned_guilds'].split(";") if len(x)>0]
                 ignored_guilds += self.bot.cogs['ReloadsCog'].ignored_guilds
                 len_servers = await self.get_guilds_count(ignored_guilds)
                 langs_list = await self.bot.cogs['ServerCog'].get_languages(ignored_guilds)
@@ -102,7 +105,10 @@ class InfoCog(commands.Cog):
                     users,bots = self.get_users_nber(ignored_guilds)
                 except Exception as e:
                     users = bots = 'unknown'
-                total_xp = await self.bot.cogs['XPCog'].bdd_total_xp()
+                if self.bot.database_online:
+                    total_xp = await self.bot.cogs['XPCog'].bdd_total_xp()
+                else:
+                    total_xp = ""
                 d = str(await self.translate(ctx.channel,"infos","stats")).format(bot_v=self.bot_version,s_count=len_servers,m_count=users,b_count=bots,l_count=self.codelines,lang=langs_list,p_v=version,d_v=discord.__version__,ram=ram_cpu[0],cpu=ram_cpu[1],api=latency,xp=total_xp)
             if isinstance(ctx.channel,discord.DMChannel) or ctx.channel.permissions_for(ctx.guild.me).embed_links:
                 embed = ctx.bot.cogs['EmbedCog'].Embed(title=await self.translate(ctx.channel,"infos","stats-title"), color=ctx.bot.cogs['HelpCog'].help_color, time=ctx.message.created_at,desc=d,thumbnail=self.bot.user.avatar_url_as(format="png"))
@@ -807,6 +813,8 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
     async def emoji_analysis(self,msg):
         """Lists the emojis used in a message"""
         try:
+            if not self.bot.database_online:
+                return
             ctx = await self.bot.get_context(msg)
             if ctx.command!=None:
                 return
@@ -876,6 +884,7 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
         await ctx.send(await self.translate(ctx.channel,'infos','bitly_long',url=self.BitlyClient.expand_url(url.url)))
     
     @commands.command(name='changelog',aliases=['changelogs'])
+    @commands.check(checks.database_connected)
     async def changelog(self,ctx:commands.Context,version:str=None):
         """Get the changelogs of the bot"""
         if version=='list':

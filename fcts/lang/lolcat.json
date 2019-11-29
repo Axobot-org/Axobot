@@ -71,6 +71,10 @@
                 "You need 2B one of the bot Admins",
                 "U are not a bot Admin"
             ],
+            "database_connected": [
+                "The db is on",
+                "Teh database iz of"
+            ],
             "guild_only": [
                 "Can only be usd in a server",
                 "Can only be usd in a server"

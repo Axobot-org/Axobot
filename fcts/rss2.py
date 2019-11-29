@@ -1,9 +1,10 @@
 import discord, datetime, time, re, asyncio, mysql, random, typing, importlib, socket, requests, twitter
 from libs import feedparser
 from discord.ext import commands
-from fcts import reloads, args
+from fcts import reloads, args, checks
 importlib.reload(reloads)
 importlib.reload(args)
+importlib.reload(checks)
 
 
 web_link={'fr-minecraft':'http://fr-minecraft.net/rss.php',
@@ -267,10 +268,9 @@ class RssCog(commands.Cog):
     @rss_main.command(name="add")
     @commands.guild_only()
     @commands.check(can_use_rss)
+    @commands.check(checks.database_connected)
     async def system_add(self,ctx,link):
         """Subscribe to a rss feed, displayed on this channel regularly"""
-        if not ctx.bot.database_online:
-            return await ctx.send(await self.translate(ctx.guild.id,"rss","no-db"))
         flow_limit = await self.bot.cogs['ServerCog'].find_staff(ctx.guild.id,'rss_max_number')
         if flow_limit==None:
             flow_limit = self.bot.cogs['ServerCog'].default_opt['rss_max_number']
@@ -318,11 +318,10 @@ class RssCog(commands.Cog):
 
     @rss_main.command(name="remove",aliases=['delete'])
     @commands.guild_only()
+    @commands.check(checks.database_connected)
     @commands.check(can_use_rss)
     async def systeme_rm(self,ctx,ID:int=None):
         """Delete an rss feed from the list"""
-        if not ctx.bot.database_online:
-            return await ctx.send(await self.translate(ctx.guild.id,"rss","no-db"))
         if ID != None:
             flow = await self.get_flow(ID)
             if flow == []:
@@ -376,11 +375,10 @@ class RssCog(commands.Cog):
 
     @rss_main.command(name="list")
     @commands.guild_only()
+    @commands.check(checks.database_connected)
     @commands.check(can_use_rss)
     async def list_flows(self,ctx):
         """Get a list of every rss/Minecraft feed"""
-        if not ctx.bot.database_online:
-            return await ctx.send(await self.translate(ctx.guild.id,"rss","no-db"))
         liste = await self.get_guild_flows(ctx.guild.id)
         l = list()
         translation = await self.translate(ctx.guild.id,"rss","list-result")
@@ -466,10 +464,9 @@ class RssCog(commands.Cog):
     @rss_main.command(name="roles",aliases=['mentions'])
     @commands.guild_only()
     @commands.check(can_use_rss)
+    @commands.check(checks.database_connected)
     async def roles_flows(self,ctx,ID:int=None):
         """Configures a role to be notified when a news is posted"""
-        if not ctx.bot.database_online:
-            return await ctx.send(await self.translate(ctx.guild.id,"rss","no-db"))
         e = None
         try:
             flow = await self.askID(ID,ctx)
@@ -543,6 +540,7 @@ class RssCog(commands.Cog):
     @rss_main.command(name="reload")
     @commands.guild_only()
     @commands.check(can_use_rss)
+    @commands.check(checks.database_connected)
     @commands.cooldown(1,600,commands.BucketType.guild)
     async def reload_guild_flows(self,ctx):
         """Reload every rss feeds from your server"""
@@ -559,6 +557,7 @@ class RssCog(commands.Cog):
     @rss_main.command(name="move")
     @commands.guild_only()
     @commands.check(can_use_rss)
+    @commands.check(checks.database_connected)
     async def move_guild_flow(self,ctx,ID:typing.Optional[int]=None,channel:discord.TextChannel=None):
         """Move a rss feed in another channel"""
         try:
@@ -583,6 +582,7 @@ class RssCog(commands.Cog):
     @rss_main.command(name="text")
     @commands.guild_only()
     @commands.check(can_use_rss)
+    @commands.check(checks.database_connected)
     async def change_text_flow(self,ctx,ID:typing.Optional[int]=None,*,text=None):
         """Change the text of an rss feed"""
         try:
@@ -615,6 +615,7 @@ class RssCog(commands.Cog):
     @rss_main.command(name="use_embed",aliases=['embed'])
     @commands.guild_only()
     @commands.check(can_use_rss)
+    @commands.check(checks.database_connected)
     async def change_use_embed(self,ctx,ID:typing.Optional[int]=None,value:bool=None,*,arguments:args.arguments=None):
         """Use an embed or not for a flow
         You can also provide arguments to change the color/text of the embed. Followed arguments are usable:

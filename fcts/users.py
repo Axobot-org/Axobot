@@ -1,8 +1,9 @@
 import discord, importlib, typing, datetime
 from discord.ext import commands
 
-from fcts import args
+from fcts import args, checks
 importlib.reload(args)
+importlib.reload(checks)
 
 class UsersCog(commands.Cog):
 
@@ -26,6 +27,7 @@ class UsersCog(commands.Cog):
             await self.bot.cogs['HelpCog'].help_command(ctx,['profile'])
     
     @profile_main.command(name='card')
+    @commands.check(checks.database_connected)
     async def profile_card(self,ctx,style:typing.Optional[args.cardStyle]=None):
         """Change your xp card style"""
         if style==None and len(ctx.view.buffer.split(' '))>2:
@@ -49,6 +51,7 @@ class UsersCog(commands.Cog):
                 await ctx.send(await self.translate(ctx.channel,'users','changed-1'))
 
     @profile_main.command(name='animated_card')
+    @commands.check(checks.database_connected)
     async def set_animated_card(self,ctx,allowed:bool=None):
         """Allow your rank card to be animated or not 
         This is only used if you have an animated pfp"""
@@ -69,6 +72,7 @@ class UsersCog(commands.Cog):
                 await ctx.send(await self.translate(ctx.channel,'users','changed-1'))
     
     @profile_main.command(name='auto_unafk')
+    @commands.check(checks.database_connected)
     async def set_auto_unafk(self,ctx,value:bool=None):
         """Automatically remove your AFK mode
         This system will remove your AFK tag as soon as you send a message, but only in the server you sent it"""
