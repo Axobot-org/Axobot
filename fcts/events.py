@@ -2,7 +2,6 @@ import discord, datetime, asyncio, logging, time, aiohttp, json, random, shutil
 from discord.ext import commands, tasks
 
 
-
 class Events(commands.Cog):
     """Cog for the management of major events that do not belong elsewhere. Like when a new server invites the bot."""
 
@@ -51,6 +50,9 @@ class Events(commands.Cog):
     async def on_member_update(self,before:discord.Member,after:discord.Member):
         """Called when a member change something (status, activity, nickame, roles)"""
         if before.nick != after.nick:
+            config_option = await self.bot.cogs['UtilitiesCog'].get_db_userinfo(['allow_usernames_logs'],["userID="+str(before.id)])
+            if config_option != None and config_option['allow_usernames_logs']==False:
+                return
             cnx = self.bot.cnx_frm
             cursor = cnx.cursor()
             ID = round(time.time()/2) * 10 + random.randrange(0,9)
@@ -65,6 +67,9 @@ class Events(commands.Cog):
     async def on_user_update(self,before:discord.User,after:discord.User):
         """Called when a user change something (avatar, username, discrim)"""
         if before.name != after.name:
+            config_option = await self.bot.cogs['UtilitiesCog'].get_db_userinfo(['allow_usernames_logs'],["userID="+str(before.id)])
+            if config_option != None and config_option['allow_usernames_logs']==False:
+                return
             cnx = self.bot.cnx_frm
             cursor = cnx.cursor()
             ID = round(time.time()/2) * 10 + random.randrange(0,9)
