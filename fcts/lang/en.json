@@ -158,6 +158,28 @@
         "create_title": "Blurplefier - makes your image blurple!",
         "won-card": "Wow! Very nice blurple picture {}! so beautiful that I decided to offer you the card of xp blurple! You can use it by typing the command `{}profile card blurple` {}"
     },
+    "bot_events": {
+        "unclassed": "unclassed",
+        "points": "points",
+        "rank-title": "Event points",
+        "rank-global": "Global ranking",
+        "objectives": "Objectives",
+        "rank-total": "Total points",
+        "events-title": {
+            "christmas-2019": "Christmas is coming!"
+        },
+        "events-desc": {
+            "christmas-2019": "Celebrate the arrival of Christmas with this event! For several days, Zbot wears the colours of winter with special emojis for the tic-tac-toe game, a unique avatar and other cool things. \n\nTake the opportunity to collect event points and try to win the 2019 Christmas special xp card! Reminder: xp cards are accessible via my `profile card` command",
+            "nothing": "There are currently no events. Follow the bot news to know the date of the next one!"
+        },
+        "events-price-title": "Prizes to win",
+        "events-prices": {
+            "christmas-2019": {
+                "50": "Unlock the special Christmas 2019!"
+            },
+            "nothing": "There is nothing to gain for this event :confused:"
+        }
+    },
     "bvn": {
         "aide": "__**Welcome to the join & leave message module**__\n\nThis module is used to configure an automatic message each time a member enters or exits your server.\n\n__** Configuration**__\n\n`1-` To configure the chat room where these messages are written, enter `{p}config change welcome_channel` followed by the channel (you can use its mention as well as its identifier or its full name).\n`2-` To configure a message, enter `{p}config change <welcome|leave> <message>`. For this message you can use some variables:\n - `{user}` mentions the member\n - `{server}` displays the server name\n - `{owner}` displays the server owner name\n - `{member_count}` shows the current number of members\n - `{type}` return 'member' or 'bot'",
         "error-give-roles": "Unable to give role '{r}' to the new member {u}: not enough permissions\nPlease check the roles hierarchy and my permission 'Manage roles'"
@@ -953,19 +975,7 @@
         "changed-1": "Oops, an internal error occurred during the processing of the request. Try again later or contact support.",
         "invalid-card": "This style is invalid. Here is the list of styles you can use: {}",
         "list-cards": "Here is the list of available rank cards for you: {}",
-        "missing-attach-files": "Oops, I\"m missing the permission to Attach Files :confused:",
-        "events-title": {
-            "christmas-2019": "Christmas is coming!"
-        },
-        "events-desc": {
-            "christmas-2019": "Celebrate the arrival of Christmas with this event! For several days, Zbot wears the colours of winter with special emojis for the tic-tac-toe game, a unique avatar and other cool things. \n\nTake the opportunity to collect event points and try to win the 2019 Christmas special xp card! Reminder: xp cards are accessible via my `profile card` command",
-            "nothing": "There are currently no events. Follow the bot news to know the date of the next one!"
-        },
-        "events-price-title": "Prizes to win",
-        "events-prices": {
-            "christmas-2019": "At 50 points, unlock the special Christmas 2019 !\nCaution: if you don't get it back fast enough, you will never get it again.",
-            "nothing": "There is nothing to gain for this event :confused:"
-        }
+        "missing-attach-files": "Oops, I\"m missing the permission to Attach Files :confused:"
     },
     "xp": {
         "1-no-xp": "You don't have any xp yet!",

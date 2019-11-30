@@ -246,6 +246,7 @@ class UtilitiesCog(commands.Cog):
         liste = list()
         for x in cursor:
             liste.append(x)
+        cursor.close()
         if len(liste)==1:
             return liste[0]
         elif len(liste)>1:
@@ -466,6 +467,29 @@ class UtilitiesCog(commands.Cog):
         except Exception as e:
             await self.bot.cogs['ErrorsCog'].on_error(e,None)
             return False
+    
+    async def get_eventsPoints_rank(self,userID:int):
+        "Get the ranking of an user"
+        cnx = self.bot.cnx_frm
+        cursor = cnx.cursor(dictionary = True)
+        query = (f"SELECT userID, events_points, FIND_IN_SET( events_points, ( SELECT GROUP_CONCAT( events_points ORDER BY events_points DESC ) FROM {self.table} ) ) AS rank FROM {self.table} WHERE userID = {userID}")
+        cursor.execute(query)
+        liste = list()
+        for x in cursor:
+            liste.append(x)
+        cursor.close()
+        if len(liste)==0:
+            return None
+        return liste[0]
+    
+    async def get_eventsPoints_nbr(self) -> int:
+        cnx = self.bot.cnx_frm
+        cursor = cnx.cursor(dictionary = False)
+        query = f"SELECT COUNT(*) FROM {self.table} WHERE events_points>0"
+        cursor.execute(query)
+        result = list(cursor)[0][0]
+        cursor.close()
+        return result
 
 
 def setup(bot):
