@@ -177,6 +177,7 @@ class XPCog(commands.Cog):
 
     async def send_levelup(self,msg,lvl):
         """Envoie le message de levelup"""
+        await self.bot.cogs["UtilitiesCog"].add_user_eventPoint(msg.author.id,round(lvl[0]/5))
         if msg.guild!=None and not msg.channel.permissions_for(msg.guild.me).send_messages:
             return
         text = await self.bot.cogs['ServerCog'].find_staff(msg.guild.id,'levelup_msg')

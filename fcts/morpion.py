@@ -61,12 +61,6 @@ class MorpionCog(commands.Cog):
                 return True
         return False
 
-    async def resultat_final(self,tour:bool,channel:discord.TextChannel):
-        """Renvoie qui a gagné la partie"""
-        if tour:
-            return await self.translate(channel,'morpion','win-2')
-        return await self.translate(channel,'morpion','win-1')
-
     async def test_cases_vides(self,grille:list):
         """Renvoie True s'il reste des cases vides"""
         return grille.count('O') +grille.count('X') != 9
@@ -93,7 +87,7 @@ Use 'tic-tac-toe leave' to make you leave the game if you're stuck in it.
             u_begin = await self.translate(ctx.channel,'morpion','user-begin') if tour == True else await self.translate(ctx.channel,'morpion','bot-begin')
             emojis = await self.get_emojis()
             await ctx.send(u_begin.format(ctx.author.mention)+await self.translate(ctx.channel,'morpion','tip',symb1=emojis[0],symb2=emojis[1]))
-            resultat = await self.translate(ctx.channel,'morpion','nul')
+            match_nul = True
             def check(m):
                 # return m.content in [str(x) for x in range(1,10)] and m.channel == ctx.channel and m.author==ctx.author
                 return m.channel == ctx.channel and m.author==ctx.author
@@ -150,9 +144,18 @@ Use 'tic-tac-toe leave' to make you leave the game if you're stuck in it.
                     display_grille = True
             ###
                 if await self.test_win(grille) == True:
-                    resultat = await self.resultat_final(tour,ctx.channel)
+                    match_nul = False
                     break
             ###
+            if match_nul:
+                await self.bot.cogs["UtilitiesCog"].add_user_eventPoint(ctx.author.id,1)
+                resultat = await self.translate(ctx.channel,'morpion','nul')
+            else:
+                if tour: # Le bot a gagné
+                    resultat = await self.translate(ctx.channel,'morpion','win-2')
+                else: # L'utilisateur a gagné
+                    resultat = await self.translate(ctx.channel,'morpion','win-1')
+                    await self.bot.cogs["UtilitiesCog"].add_user_eventPoint(ctx.author.id,5)
             await ctx.send(await self.afficher_grille(grille)+'\n'+resultat.format(ctx.author.mention))
             self.in_game.pop(ctx.author.id,None)
         except Exception as e:

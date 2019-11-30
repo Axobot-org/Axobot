@@ -1,4 +1,4 @@
-import discord, importlib, typing, datetime
+import discord, importlib, typing, datetime, json, time
 from discord.ext import commands
 
 from fcts import args, checks
@@ -47,6 +47,12 @@ class UsersCog(commands.Cog):
         else:
             if await ctx.bot.cogs['UtilitiesCog'].change_db_userinfo(ctx.author.id,'xp_style',style):
                 await ctx.send(str(await self.translate(ctx.channel,'users','changed-0')).format(style))
+                last_update = self.get_last_rankcard_update(ctx.author.id)
+                if last_update==None:
+                    await self.bot.cogs["UtilitiesCog"].add_user_eventPoint(ctx.author.id,15)
+                elif last_update < time.time()-86400:
+                    await self.bot.cogs["UtilitiesCog"].add_user_eventPoint(ctx.author.id,2)
+                self.set_last_rankcard_update(ctx.author.id)
             else:
                 await ctx.send(await self.translate(ctx.channel,'users','changed-1'))
 
@@ -92,6 +98,20 @@ class UsersCog(commands.Cog):
             else:
                 await ctx.send(await self.translate(ctx.channel,'users','changed-1'))
 
+
+    def get_last_rankcard_update(self,userID:int):
+        with open("rankcards_update.json",'r') as f:
+            r = json.load(f)
+        if str(userID) in r.keys():
+            return r[str(userID)]
+        return None
+    
+    def set_last_rankcard_update(self,userID:int):
+        with open("rankcards_update.json",'r') as f:
+            old = json.load(f)
+        old[str(userID)] = round(time.time())
+        with open("rankcards_update.json",'w') as f:
+            json.dump(old,f)
 
 def setup(bot):
     bot.add_cog(UsersCog(bot))

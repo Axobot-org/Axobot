@@ -447,10 +447,12 @@ class UtilitiesCog(commands.Cog):
         else:
             return disp_lang[:limit]
     
-    async def add_user_eventPoint(self,userID:int,points:int,override:bool=False):
+    async def add_user_eventPoint(self,userID:int,points:int,override:bool=False,check_event:bool=True):
         """Add some events points to a user
         if override is True, then the number of points will override the old score"""
         try:
+            if check_event and self.bot.current_event==None:
+                return True
             cnx = self.bot.cnx_frm
             cursor = cnx.cursor(dictionary = True)
             if override:
