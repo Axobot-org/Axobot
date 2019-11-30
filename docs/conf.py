@@ -23,9 +23,9 @@ copyright = '2019, ZRunner'
 author = 'ZRunner'
 
 # The short X.Y version
-version = '3.5'
+version = '3.6'
 # The full version, including alpha/beta/rc tags
-release = '3.5.10'
+release = '3.6.0'
 
 
 # Example configuration for intersphinx: refer to the Python standard library.
