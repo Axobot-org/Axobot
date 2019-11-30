@@ -966,12 +966,17 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
             if len(date)>0:
                 f.append({'name':await self.translate(ctx.channel,'infos','usernames-last-date'), 'value':date})
             else:
-                desc = 'no u'
+                desc = await self.translate(ctx.channel,'infos','usernames-empty')
             if ctx.guild != None and ctx.guild.get_member(user.id)!=None and ctx.guild.get_member(user.id).color!=discord.Color(0):
                 c = ctx.guild.get_member    (user.id).color
             else:
                 c = 1350390
-            emb = self.bot.cogs['EmbedCog'].Embed(title=t,fields=f,desc=desc,color=c)
+            allowing_logs = await self.bot.cogs["UtilitiesCog"].get_db_userinfo(["allow_usernames_logs"],["userID="+str(user.id)])
+            if allowing_logs==None or allowing_logs["allow_usernames_logs"]:
+                footer = await self.translate(ctx.channel,'infos','usernames-disallow')
+            else:
+                footer = await self.translate(ctx.channel,'infos','usernames-allow')
+            emb = self.bot.cogs['EmbedCog'].Embed(title=t,fields=f,desc=desc,color=c,footer_text=footer)
             await ctx.send(embed=emb)
         # Raw text creation
         else:

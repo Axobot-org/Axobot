@@ -91,6 +91,8 @@ Usernames history
 
 This command displays the history of all nickname changes of a member. The Discord API does not give this information, so Zbot records each change, therefore it is possible that some nicknames may not be displayed in the list.
 
+If you don't want your names changes to be recorded, you can opt-out by using the `profile config usernames_log <user.html#allow-or-disallow-an-option>`_ command.
+
 ---------------
 Welcome message
 ---------------

@@ -328,7 +328,10 @@
         "usernames-title": "Pseudos de **{u}**",
         "usernames-global": "Historique général",
         "usernames-local": "Historique du serveur",
-        "usernames-last-date": "Dernier changement"
+        "usernames-last-date": "Dernier changement",
+        "usernames-empty": "Aucun changement enregistré",
+        "usernames-disallow": "Vous pouvez vous retirer de l'enregistrement automatique via la commande 'profile'",
+        "usernames-allow": "Vous pouvez réautoriser l'enregistrement automatique via la commande 'profile'"
     },
     "infos_2": {
         "fish-1": "Nombre de poissons trouvés",
@@ -936,11 +939,13 @@
         "voicechan-0": "Salon vocal"
     },
     "users": {
-        "allow_animated_false": "Les cartes d'xp animées ne sont actuellement pas autorisées pour vous",
-        "allow_animated_success": "Ce paramètre a bien été redéfini à {}",
-        "allow_animated_true": "Les cartes d'xp animées sont actuellement autorisées pour vous",
-        "allow_auto_unafk_false": "Vous devez enlever le tag AFK vous-même",
-        "allow_auto_unafk_true": "Je vous enlèverai le tag AFK dès que vous enverrez un message",
+        "animated_card_false": "Vous n'utilisez actuellement pas de carte animée",
+        "config_success": "L'option {opt} a bien été modifiée!",
+        "animated_card_true": "Les cartes d'xp animées pourront être utilisée pour vous (rendu plus lent)",
+        "auto_unafk_false": "Vous devez enlever le tag AFK vous-même",
+        "auto_unafk_true": "Je vous enlèverai le tag AFK dès que vous enverrez un message",
+        "usernames_log_false": "Vous avez désactivé l'enregistrement de vos noms d'utilisateurs ainsi que de vos surnoms",
+        "usernames_log_true": "Vous avez autorisé l'enregistrement de vos noms d'utilisateurs ainsi que de vos surnoms",
         "card-desc": "Voici un exemple de votre carte d'xp. Vous pouvez entrer la commande `profile card <style>` pour changer le style\n*Votre carte d'xp ne se réactualisera que lorsque vous aurez gagné de l'xp*",
         "changed-0": "Votre carte d'xp utilise maintenant le style {}",
         "changed-1": "Oups, une erreur interne est survenue pendant le traitement de la requête. Réessayez plus tard ou contactez le support.",

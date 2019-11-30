@@ -59,7 +59,8 @@ class UsersCog(commands.Cog):
     @profile_main.command(name='animated_card')
     @commands.check(checks.database_connected)
     async def set_animated_card(self,ctx,allowed:bool=None):
-        """Allow your rank card to be animated or not 
+        """DEPRECATED COMMAND
+        Allow your rank card to be animated or not 
         This is only used if you have an animated pfp"""
         if allowed==None:
             allowed = await self.bot.cogs['UtilitiesCog'].get_db_userinfo(['animated_card'],[f'`userID`={ctx.author.id}'])
@@ -80,7 +81,8 @@ class UsersCog(commands.Cog):
     @profile_main.command(name='auto_unafk')
     @commands.check(checks.database_connected)
     async def set_auto_unafk(self,ctx,value:bool=None):
-        """Automatically remove your AFK mode
+        """DEPRECATED COMMAND
+        Automatically remove your AFK mode
         This system will remove your AFK tag as soon as you send a message, but only in the server you sent it"""
         if value==None:
             value = await self.bot.cogs['UtilitiesCog'].get_db_userinfo(['auto_unafk'],[f'`userID`={ctx.author.id}'])
@@ -97,7 +99,41 @@ class UsersCog(commands.Cog):
                 await ctx.send(str(await self.translate(ctx.channel,'users','allow_animated_success')).format(value))
             else:
                 await ctx.send(await self.translate(ctx.channel,'users','changed-1'))
-
+    
+    @profile_main.command(name="config")
+    @commands.check(checks.database_connected)
+    async def user_config(self,ctx:commands.Context,option:str,allow:bool=None):
+        """Modify any config option
+        Here you can (dis)allow one of the users option that Zbot have, which are:
+        - animated_card: Display an animated rank card if your pfp is a git (way slower rendering)
+        - auto_unafk: Automatically remove your AFK mode
+        - usernames_log: Record when you change your username/nickname
+        
+        Value can only be a boolean (true/false)
+        Providing empty value will show you the current value and more details"""
+        options = {"animated_card":"animated_card", "auto_unafk":"auto_unafk", "usernames_log":"allow_usernames_logs"}
+        if option not in options.keys():
+            await ctx.send("no u")
+            return
+        if allow==None:
+            value = await self.bot.cogs['UtilitiesCog'].get_db_userinfo([options[option]],[f'`userID`={ctx.author.id}'])
+            if value==None:
+                value = False
+            else:
+                value = value[options[option]]
+            if ctx.guild==None or ctx.channel.permissions_for(ctx.guild.me).external_emojis:
+                emojis = self.bot.cogs['EmojiCog'].customEmojis['green_check'], self.bot.cogs['EmojiCog'].customEmojis['red_cross']
+            else:
+                emojis = ('✅','❎')
+            if value:
+                await ctx.send(emojis[0]+" "+await self.translate(ctx.channel,'users',option+'_true'))
+            else:
+                await ctx.send(emojis[1]+" "+await self.translate(ctx.channel,'users',option+'_false'))
+        else:
+            if await self.bot.cogs['UtilitiesCog'].change_db_userinfo(ctx.author.id,options[option],allow):
+                await ctx.send(await self.translate(ctx.channel,'users','config_success',opt=option))
+            else:
+                await ctx.send(await self.translate(ctx.channel,'users','changed-1'))
 
     def get_last_rankcard_update(self,userID:int):
         with open("rankcards_update.json",'r') as f:

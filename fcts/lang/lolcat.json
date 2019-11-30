@@ -328,7 +328,10 @@
         "usernames-title": "**{u}** names story",
         "usernames-global": "Gen' stori",
         "usernames-local": "Serv hystori",
-        "usernames-last-date": "Lastetest change"
+        "usernames-last-date": "Lastetest change",
+        "usernames-empty": ":N:o change savd",
+        "usernames-disallow": "U can optout the auto logging with cmd 'profile' (beeew bad guy)",
+        "usernames-allow": "U can anti-optout teh auto logs with da cmd 'profile'"
     },
     "infos_2": {
         "fish-1": "Nbr of :fish:",
@@ -936,11 +939,13 @@
         "voicechan-0": "Singing ch4nnel"
     },
     "users": {
-        "allow_animated_false": "Anamited xp cards are naw disabld for you",
-        "allow_animated_success": "Dat parameter have been redefined 2 {}",
-        "allow_animated_true": "Animated xp cards ar naw enabled 4U",
-        "allow_auto_unafk_false": "U do ur own job, okay?",
-        "allow_auto_unafk_true": "I'll help u, no worries :green_heart:",
+        "animated_card_false": "Anamited xp cards are naw disabld for you",
+        "animated_card_true": "Animated xp cards ar naw enabled 4U",
+        "auto_unafk_false": "U do ur own job, okay?",
+        "auto_unafk_true": "I'll help u, no worries :green_heart:",
+        "config_success": "Dat {opt} option has beez changd!",
+        "usernames_log_false": "U've disallowd the recordering of Ur usr names & nics",
+        "usernames_log_true": "You've enabld the things taht i do with ur usr names & nicks",
         "card-desc": "Here iz example of ur xp card. U can enter teh command `profile card <style>` 2 change the style\n*Ur xp card will only refresh wehn u have won Xp*",
         "changed-0": "Ur xp card naw use the style {}",
         "changed-1": "Oops, a wicked error occurrd during the process ov ur request. Try again later or contact these nice support guys.",

@@ -232,7 +232,7 @@ class UtilitiesCog(commands.Cog):
     async def get_db_userinfo(self,columns=[],criters=["userID>1"],relation="AND",Type=dict):
         """Get every info about a user with the database"""
         await self.bot.wait_until_ready()
-        if type(columns)!=list or type(criters)!=list:
+        if not (isinstance(columns,(list,tuple)) and isinstance(criters,(list,tuple))):
             raise ValueError
         cnx = self.bot.cnx_frm
         cursor = cnx.cursor(dictionary = True)

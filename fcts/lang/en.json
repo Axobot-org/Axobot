@@ -328,7 +328,10 @@
         "usernames-title": "**{u}** names history",
         "usernames-global": "General history",
         "usernames-local": "Server history",
-        "usernames-last-date": "Last change"
+        "usernames-last-date": "Last change",
+        "usernames-empty": "No change recorded",
+        "usernames-disallow": "You can opt out of the automatic recording with the command 'profile'",
+        "usernames-allow": "You can reauthorize the automatic recording with the command 'profile'"
     },
     "infos_2": {
         "fish-1": "Number of fishes",
@@ -936,11 +939,13 @@
         "voicechan-0": "Vocal channel"
     },
     "users": {
-        "allow_animated_false": "Animated xp cards are currently disabled for you",
-        "allow_animated_success": "This parameter has been redefined to {}",
-        "allow_animated_true": "Animated xp cards are currently enabled for you",
-        "allow_auto_unafk_false": "You must remove the AFK tag yourself",
-        "allow_auto_unafk_true": "I'll remove the AFK tag from you as soon as you send a message",
+        "animated_card_false": "You are not currently allowing an animated card. Thanks!",
+        "animated_card_true": "The animated xp cards can be used for you (slower rendering)",
+        "auto_unafk_false": "You must remove the AFK tag yourself",
+        "auto_unafk_true": "I'll remove the AFK tag from you as soon as you send a message",
+        "config_success": "The {opt} option has been changed!",
+        "usernames_log_false": "You have disabled the recording of your user names and nicknames",
+        "usernames_log_true": "You have authorized the recording of your user names and nicknames",
         "card-desc": "Here is an example of your xp card. You can enter the command `profile card <style>` to change the style\n*Your xp card will only refresh when you have won xp*",
         "changed-0": "Your xp card now uses the style {}",
         "changed-1": "Oops, an internal error occurred during the processing of the request. Try again later or contact support.",
