@@ -347,6 +347,8 @@
         "category": "category",
         "click_here": "Click here",
         "depuis": "since",
+        "beginning": "beginning",
+        "end": "end",
         "dnd": "do not disturb",
         "extreme": "extreme",
         "ghost": "Ghost",
@@ -951,7 +953,19 @@
         "changed-1": "Oops, an internal error occurred during the processing of the request. Try again later or contact support.",
         "invalid-card": "This style is invalid. Here is the list of styles you can use: {}",
         "list-cards": "Here is the list of available rank cards for you: {}",
-        "missing-attach-files": "Oops, I\"m missing the permission to Attach Files :confused:"
+        "missing-attach-files": "Oops, I\"m missing the permission to Attach Files :confused:",
+        "events-title": {
+            "christmas-2019": "Christmas is coming!"
+        },
+        "events-desc": {
+            "christmas-2019": "Celebrate the arrival of Christmas with this event! For several days, Zbot wears the colours of winter with special emojis for the tic-tac-toe game, a unique avatar and other cool things. \n\nTake the opportunity to collect event points and try to win the 2019 Christmas special xp card! Reminder: xp cards are accessible via my `profile card` command",
+            "nothing": "There are currently no events. Follow the bot news to know the date of the next one!"
+        },
+        "events-price-title": "Prizes to win",
+        "events-prices": {
+            "christmas-2019": "At 50 points, unlock the special Christmas 2019 !\nCaution: if you don't get it back fast enough, you will never get it again.",
+            "nothing": "There is nothing to gain for this event :confused:"
+        }
     },
     "xp": {
         "1-no-xp": "You don't have any xp yet!",

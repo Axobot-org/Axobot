@@ -342,7 +342,7 @@ class Events(commands.Cog):
             elif int(d.hour)%12 == 1 and (d.hour != self.dbl_last_tr_backup.hour or d.day != self.dbl_last_tr_backup.day):
                 await self.translations_backup()
             elif int(d.hour)%12 == 0 and int(d.minute)%45 == 1 and (d.hour != self.dbl_last_eventDay_check.hour or d.day != self.dbl_last_eventDay_check.day):
-                self.bot.updateCurrentEvent()
+                self.bot.cogs["BotEventsCog"].updateCurrentEvent()
                 self.dbl_last_eventDay_check = datetime.datetime.today()
         except Exception as e:
             await self.bot.cogs['ErrorsCog'].on_error(e,None)

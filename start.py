@@ -17,7 +17,7 @@ def check_libs():
 
 
 if check_libs():
-    import discord, sys, traceback, asyncio, time, logging, os, mysql.connector, datetime
+    import discord, sys, traceback, asyncio, time, logging, os, mysql.connector, datetime, json
     from signal import SIGTERM
     from random import choice
     from discord.ext import commands
@@ -77,13 +77,7 @@ class zbot(commands.bot.BotBase,discord.Client):
         self.xp_enabled = True
         self.rss_enabled = True
         self.others = dict()
-        self.updateCurrentEvent()
-    
-    def updateCurrentEvent(self):
-        self.current_event = "halloween" if (datetime.datetime.today().month == 10 and datetime.datetime.today().day >= 11) else \
-                "christmas" if (datetime.datetime.today().month == 12 and datetime.datetime.today().day >= 4) else \
-                "fish" if (datetime.datetime.today().month == 4 and datetime.datetime.today().day ==1) else None
-    
+        
     @property
     def cnx_frm(self):
         if self._cnx[0][1] + 1260 < round(time.time()): # 21min
@@ -92,6 +86,14 @@ class zbot(commands.bot.BotBase,discord.Client):
             return self._cnx[0][0]
         else:
             return self._cnx[0][0]
+    
+    @property
+    def current_event(self):
+        try:
+            return self.cogs["BotEventsCog"].current_event
+        except Exception as e:
+            await self.cogs["ErrorsCog"].on_error(e)
+            return None
     
     def connect_database_frm(self):
         if len(self.database_keys)>0:
@@ -170,6 +172,7 @@ def main():
     initial_extensions = ['fcts.language',
                       'fcts.admin',
                       'fcts.aide',
+                      'fcts.bot_events',
                       'fcts.bvn',
                       'fcts.cases',
                       'fcts.embeds',

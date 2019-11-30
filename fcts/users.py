@@ -10,7 +10,6 @@ class UsersCog(commands.Cog):
     def __init__(self,bot):
         self.bot = bot
         self.file = 'users'
-        self.table = 'timed'
         try:
             self.translate = bot.cogs['LangCog'].tr
         except:

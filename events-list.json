@@ -1,0 +1,23 @@
+{
+    "christmas-2019" : {
+        "begin": "2019-11-30",
+        "end": "2019-12-25",
+        "type": "christmas",
+        "icon": "https://zrunner.me/cdn/merry_christmas.jpg",
+        "color": 4886759
+    },
+    "april-2020": {
+        "begin": "2020-04-01",
+        "end": "2020-04-01",
+        "type": "fish",
+        "icon": null,
+        "color": 11260705
+    },
+    "halloween-2020": {
+        "begin": "2020-10-11",
+        "end": "2020-10-31",
+        "type": "halloween",
+        "icon": null,
+        "color": 16089635
+    }
+}
