@@ -227,6 +227,31 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
 
     async def member_infos(self,ctx,item,lang,critical_info=False):
         since = await self.translate(ctx.guild.id,"keywords","depuis")
+        embed = discord.Embed(colour=item.color, timestamp=ctx.message.created_at)
+        embed.set_thumbnail(url=item.avatar_url_as(format='gif') if item.is_avatar_animated() else item.avatar_url_as(format='png'))
+        embed.set_author(name=str(item), icon_url=str(item.avatar_url_as(format='png')))
+        embed.set_footer(text='Requested by {}'.format(ctx.author.name), icon_url=str(ctx.author.avatar_url_as(format='png')))
+        # Name
+        embed.add_field(name=str(await self.translate(ctx.guild.id,"keywords","nom")).capitalize(), value=item.name,inline=True)
+        # Nickname
+        embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","member-0"), value=item.nick if item.nick else str(await self.translate(ctx.channel,"keywords","none")).capitalize(),inline=True)
+        # ID
+        embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","role-0"), value=str(item.id))
+        # Roles
+        list_role = list()
+        for role in item.roles:
+            if str(role)!='@everyone':
+                list_role.append(role.mention)
+        # Created at
+        embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","member-1"), value = "{} ({} {})".format(await self.timecog.date(item.created_at,lang=lang,year=True),since,await self.timecog.time_delta(item.created_at,datetime.datetime.now(),lang=lang,year=True,precision=0,hour=False)), inline=False)
+        # Joined at
+        embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","member-2"), value = "{} ({} {})".format(await self.timecog.date(item.joined_at,lang=lang,year=True),since,await self.timecog.time_delta(item.joined_at,datetime.datetime.now(),lang=lang,year=True,precision=0,hour=False)), inline=False)
+        # Join position
+        position = str(sorted(ctx.guild.members, key=lambda m: m.joined_at).index(item) + 1) + "/" + str(len(ctx.guild.members))
+        embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","member-3"), value = position,inline=True)
+        # Status
+        embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","member-4"), value = str(await self.translate(ctx.guild.id,"keywords",str(item.status))).capitalize(),inline=True)
+        # Activity
         if item.activity==None:
             m_activity = str(await self.translate(ctx.guild.id,"activity","nothing")).capitalize()
         elif item.activity.type==discord.ActivityType.playing:
@@ -239,71 +264,67 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
             m_activity = str(await self.translate(ctx.guild.id,"activity","watch")).capitalize() +" " + item.activity.name
         else:
             m_activity="Error"
+        embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","member-5"), value = m_activity,inline=True)
+        # Bot
         if item.bot:
             botb = await self.translate(ctx.guild.id,"keywords","oui")
         else:
             botb = await self.translate(ctx.guild.id,"keywords","non")
+        embed.add_field(name="Bot", value=botb.capitalize())
+        # Administrator
         if item.permissions_in(ctx.channel).administrator:
             admin = await self.translate(ctx.guild.id,"keywords","oui")
         else:
             admin = await self.translate(ctx.guild.id,"keywords","non")
-        list_role = list()
-        for role in item.roles:
-            if str(role)!='@everyone':
-                list_role.append(role.mention)
-        position = str(sorted(ctx.guild.members, key=lambda m: m.joined_at).index(item) + 1) + "/" + str(len(ctx.guild.members))
-        embed = discord.Embed(colour=item.color, timestamp=ctx.message.created_at)
-        embed.set_thumbnail(url=item.avatar_url_as(format='gif') if item.is_avatar_animated() else item.avatar_url_as(format='png'))
-        embed.set_author(name=str(item), icon_url=str(item.avatar_url_as(format='png')))
-        embed.set_footer(text='Requested by {}'.format(ctx.author.name), icon_url=str(ctx.author.avatar_url_as(format='png')))
-
-        embed.add_field(name=str(await self.translate(ctx.guild.id,"keywords","nom")).capitalize(), value=item.name,inline=True)
-        embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","member-0"), value=item.nick if item.nick else str(await self.translate(ctx.channel,"keywords","none")).capitalize(),inline=True)
-        embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","role-0"), value=str(item.id))
-        embed.add_field(name="Bot", value=botb.capitalize())
-        embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","member-1"), value = "{} ({} {})".format(await self.timecog.date(item.created_at,lang=lang,year=True),since,await self.timecog.time_delta(item.created_at,datetime.datetime.now(),lang=lang,year=True,precision=0,hour=False)), inline=False)
-        embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","member-2"), value = "{} ({} {})".format(await self.timecog.date(item.joined_at,lang=lang,year=True),since,await self.timecog.time_delta(item.joined_at,datetime.datetime.now(),lang=lang,year=True,precision=0,hour=False)), inline=False)
-        embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","member-3"), value = position,inline=True)
-        embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","member-4"), value = str(await self.translate(ctx.guild.id,"keywords",str(item.status))).capitalize(),inline=True)
-        embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","member-5"), value = m_activity,inline=True)
         embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","member-6"), value = admin.capitalize(),inline=True)
-        if len(list_role)>0:
-            embed.add_field(name="Roles [{}]".format(len(list_role)), value = ", ".join(list_role), inline=False)
-        else:
-            embed.add_field(name="Roles [0]", value = await self.translate(ctx.guild.id,"activity","nothing"), inline=False)
+        # Infractions count
         if critical_info and not item.bot:
             embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","member-7"), value = await self.bot.cogs['CasesCog'].get_nber(item.id,ctx.guild.id),inline=True)
+        # Guilds count
         if item.bot:
             session = aiohttp.ClientSession(loop=self.bot.loop)
             guilds_count = await self.bot.cogs['PartnersCog'].get_guilds(item.id,session)
             if guilds_count!=None:
                 embed.add_field(name=str(await self.translate(ctx.guild.id,'keywords','servers')).capitalize(),value=guilds_count)
             await session.close()
+        # Roles
+        if len(list_role)>0:
+            embed.add_field(name="Roles [{}]".format(len(list_role)), value = ", ".join(list_role), inline=False)
+        else:
+            embed.add_field(name="Roles [0]", value = await self.translate(ctx.guild.id,"activity","nothing"), inline=False)
         await ctx.send(embed=embed)
 
 
     async def role_infos(self,ctx,item,lang):
+        embed = discord.Embed(colour=item.color, timestamp=ctx.message.created_at)
+        embed.set_author(name=str(item), icon_url=ctx.guild.icon_url)
+        embed.set_footer(text='Requested by {}'.format(ctx.author.name), icon_url=ctx.author.avatar_url)
         since = await self.translate(ctx.guild.id,"keywords","depuis")
+        # Name
+        embed.add_field(name=str(await self.translate(ctx.guild.id,"keywords","nom")).capitalize(), value=item.mention,inline=True)
+        # ID
+        embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","role-0"), value=str(item.id),inline=True)
+        # Color
+        embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","role-1"), value=str(item.color),inline=True)
+        # Mentionnable
         if item.mentionable:
             mentio = await self.translate(ctx.guild.id,"keywords","oui")
         else:
             mentio = await self.translate(ctx.guild.id,"keywords","non")
+        embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","role-2"), value=mentio.capitalize(),inline=True)
+        # Members nbr
+        embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","role-3"), value=len(item.members),inline=True)
+        # Hoisted
         if item.hoist:
             hoist = await self.translate(ctx.guild.id,"keywords","oui")
         else:
             hoist = await self.translate(ctx.guild.id,"keywords","non")
-        embed = discord.Embed(colour=item.color, timestamp=ctx.message.created_at)
-        embed.set_author(name=str(item), icon_url=ctx.guild.icon_url)
-        embed.set_footer(text='Requested by {}'.format(ctx.author.name), icon_url=ctx.author.avatar_url)
- 
-        embed.add_field(name=str(await self.translate(ctx.guild.id,"keywords","nom")).capitalize(), value=item.mention,inline=True)
-        embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","role-0"), value=str(item.id),inline=True)
-        embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","role-1"), value=str(item.color),inline=True)
-        embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","role-2"), value=mentio.capitalize(),inline=True)
-        embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","role-3"), value=len(item.members),inline=True)
         embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","role-4"), value=hoist.capitalize(),inline=True)
+        # Created at
         embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","member-1"), value = "{} ({} {})".format(await self.timecog.date(item.created_at,lang=lang,year=True),since,await self.timecog.time_delta(item.created_at,datetime.datetime.now(),lang=lang,year=True,precision=0,hour=False)), inline=False)
+        # Hierarchy position
         embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","role-5"), value=str(len(ctx.guild.roles) - item.position),inline=True)
+        # Unique member
         if len(item.members)==1:
             embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","role-6"), value=str(item.members[0].mention),inline=True)
         await ctx.send(embed=embed)
@@ -371,27 +392,34 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
         await ctx.send(embed=embed)
 
     async def textChannel_infos(self,ctx,chan,lang):
+        embed = discord.Embed(colour=default_color, timestamp=ctx.message.created_at)
+        embed.set_author(name="{} '{}'".format(await self.translate(ctx.guild.id,"stats_infos","textchan-5"),chan.name), icon_url=ctx.guild.icon_url_as(format='png'))
+        embed.set_footer(text='Requested by {}'.format(ctx.author.name), icon_url=ctx.author.avatar_url_as(format='png'))
         since = await self.translate(ctx.guild.id,"keywords","depuis")
+        # Name
+        embed.add_field(name=str(await self.translate(ctx.guild.id,"keywords","nom")).capitalize(), value=chan.name,inline=True)
+        # ID
+        embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","role-0"), value=str(chan.id))
+        # Category
+        embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","textchan-0"), value=str(chan.category))
+        # NSFW
         if chan.nsfw:
             nsfw = await self.translate(ctx.guild.id,"keywords","oui")
         else:
             nsfw = await self.translate(ctx.guild.id,"keywords","non")
-        embed = discord.Embed(colour=default_color, timestamp=ctx.message.created_at)
-        embed.set_author(name="{} '{}'".format(await self.translate(ctx.guild.id,"stats_infos","textchan-5"),chan.name), icon_url=ctx.guild.icon_url_as(format='png'))
-        embed.set_footer(text='Requested by {}'.format(ctx.author.name), icon_url=ctx.author.avatar_url_as(format='png'))
-
-        embed.add_field(name=str(await self.translate(ctx.guild.id,"keywords","nom")).capitalize(), value=chan.name,inline=True)
-        embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","role-0"), value=str(chan.id))
-        embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","textchan-0"), value=str(chan.category))
         embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","textchan-2"), value=nsfw.capitalize())
+        # Webhooks count
         try:
             web = len(await chan.webhooks())
         except Exception as e:
             await self.bot.cogs['ErrorsCog'].on_error(e,ctx)
             web = await self.translate(ctx.guild.id,"stats_infos","textchan-4")
         embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","textchan-3"), value=str(web))
-        embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","role-3"), value = str(len(chan.members))+"/"+str(len(ctx.guild.members)), inline=False)
+        # Members nber
+        embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","role-3"), value = str(len(chan.members))+"/"+str(len(ctx.guild.members)), inline=True)
+        # Created at
         embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","member-1"), value = "{} ({} {})".format(await self.timecog.date(chan.created_at,lang=lang,year=True),since,await self.timecog.time_delta(chan.created_at,datetime.datetime.now(),lang=lang,year=True,precision=0,hour=False)), inline=False)
+        # Topic
         if chan.permissions_for(ctx.author).read_messages:
             embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","textchan-1"), value = chan.topic if chan.topic not in ['',None] else str(await self.translate(ctx.guild.id,"keywords","aucune")).capitalize(), inline=False)
         await ctx.send(embed=embed)
@@ -401,13 +429,19 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
         embed = discord.Embed(colour=default_color, timestamp=ctx.message.created_at)
         embed.set_author(name="{} '{}'".format(await self.translate(ctx.guild.id,"stats_infos","voicechan-0"),chan.name), icon_url=ctx.guild.icon_url)
         embed.set_footer(text='Requested by {}'.format(ctx.author.name), icon_url=ctx.author.avatar_url)
-
+        # Name
         embed.add_field(name=str(await self.translate(ctx.guild.id,"keywords","nom")).capitalize(), value=chan.name,inline=True)
+        # ID
         embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","role-0"), value=str(chan.id))
+        # Category
         embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","textchan-0"), value=str(chan.category))
+        # Created at
         embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","member-1"), value = "{} ({} {})".format(await self.timecog.date(chan.created_at,lang=lang,year=True),since,await self.timecog.time_delta(chan.created_at,datetime.datetime.now(),lang=lang,year=True,precision=0,hour=False)), inline=False)
+        # Bitrate
         embed.add_field(name="Bitrate",value=str(chan.bitrate/1000)+" kbps")
+        # Members count
         embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","role-3"), value="{}/{}".format(len(chan.members),chan.user_limit if chan.user_limit>0 else "∞"))
+        # Region
         embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","guild-2"), value=str(ctx.guild.region).capitalize())
         await ctx.send(embed=embed)
 
@@ -434,30 +468,21 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
         embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","role-0"), value=str(guild.id))
         # Owner
         embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","guild-1"), value=str(guild.owner))
-        # Voice region
-        embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","guild-2"), value=str(guild.region).capitalize())
         # Created at
         embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","member-1"), value = "{} ({} {})".format(await self.timecog.date(guild.created_at,lang=lang,year=True),since,await self.timecog.time_delta(guild.created_at,datetime.datetime.now(),lang=lang,year=True,precision=0,hour=False)), inline=False)
+        # Voice region
+        embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","guild-2"), value=str(guild.region).capitalize())
         # Member count
         embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","role-3"), value = str(await self.translate(ctx.guild.id,"stats_infos","guild-7")).format(len(guild.members),bot,online))
         # Channel count
         embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","guild-6"), value=str(await self.translate(ctx.guild.id,"stats_infos","guild-3")).format(len(guild.text_channels),len(guild.voice_channels),len(guild.categories)))
-        # Emojis count
-        embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","guild-5"), value="{}/{}".format(len(guild.emojis),guild.emoji_limit))
         # Invite count
         if guild.me.guild_permissions.manage_guild:
             embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","guild-12"), value=str(len(await guild.invites())))
+        # Emojis count
+        embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","guild-5"), value="{}/{}".format(len(guild.emojis),guild.emoji_limit))
         # AFK timeout
         embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","guild-10"), value = str(int(guild.afk_timeout/60))+" minutes")
-        if critical_info:
-            # A2F activation
-            if guild.mfa_level:
-                a2f = await self.translate(ctx.guild.id,"keywords","oui")
-            else:
-                a2f = await self.translate(ctx.guild.id,"keywords","non")
-            embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","guild-8"), value=a2f.capitalize())
-            # Verification level
-            embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","guild-9"), value=str(await self.translate(guild.id,"keywords",str(guild.verification_level))).capitalize())
         # Splash url
         try:
             embed.add_field(name="duh", value=str(await guild.vanity_invite()))
@@ -494,6 +519,15 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
             features_tr = await self.translate(ctx.guild.id,"stats_infos","guild-features")
             features = [features_tr[x] if x in features_tr.keys() else x for x in guild.features]
             embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","inv-9"), value=" - ".join(features))
+        if critical_info:
+            # A2F activation
+            if guild.mfa_level:
+                a2f = await self.translate(ctx.guild.id,"keywords","oui")
+            else:
+                a2f = await self.translate(ctx.guild.id,"keywords","non")
+            embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","guild-8"), value=a2f.capitalize())
+            # Verification level
+            embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","guild-9"), value=str(await self.translate(guild.id,"keywords",str(guild.verification_level))).capitalize())
         await ctx.send(embed=embed)
         
    
