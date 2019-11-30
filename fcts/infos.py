@@ -956,12 +956,12 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
             desc = None
             f = list()
             if len(global_list)>0:
-                # Usernames part
-                f.append({'name':await self.translate(ctx.channel,'infos','usernames-global'), 'value':"\n".join([x['new'] for x in global_list])})
+            # Usernames part
+                f.append({'name':await self.translate(ctx.channel,'infos','usernames-global'), 'value':"\n".join([x['new'] for x in global_list if x['new']!=''])})
                 date += await self.bot.cogs['TimeCog'].date([x['utc_date'] for x in global_list][0] ,year=True, lang=language)
             if len(this_guild)>0:
             # Nicknames part
-                f.append({'name':await self.translate(ctx.channel,'infos','usernames-local'), 'value':"\n".join([x['new'] for x in this_guild])})
+                f.append({'name':await self.translate(ctx.channel,'infos','usernames-local'), 'value':"\n".join([x['new'] for x in this_guild if x['new']!=''])})
                 date += "\n" + await self.bot.cogs['TimeCog'].date([x['utc_date'] for x in this_guild][0], year=True, lang=language)
             if len(date)>0:
                 f.append({'name':await self.translate(ctx.channel,'infos','usernames-last-date'), 'value':date})
