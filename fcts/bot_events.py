@@ -39,12 +39,12 @@ class BotEventsCog(commands.Cog):
         events_desc = await self.translate(ctx.channel,"bot_events","events-desc")
         current_event = str(self.bot.current_event) + "-" + str(datetime.datetime.today().year)
         if current_event in events_desc.keys():
+            try:
+                title = (await self.translate(ctx.channel,"bot_events","events-title"))[current_event]
+            except:
+                title = self.current_event
             if ctx.guild==None or ctx.channel.permissions_for(ctx.guild.me).embed_links:
                 nice_date = self.bot.cogs["TimeCog"].date
-                try:
-                    title = (await self.translate(ctx.channel,"bot_events","events-title"))[current_event]
-                except:
-                    title = self.current_event
                 # Begin/End dates
                 lang = await self.translate(ctx.channel,"current_lang","current")
                 begin = await nice_date(self.current_event_data["begin"],lang,year=True,digital=True,hour=False)
@@ -68,7 +68,8 @@ class BotEventsCog(commands.Cog):
                 #e = discord.Embed().from_dict(emb.to_dict())
                 await ctx.send(embed=emb)
             else:
-                await ctx.send(events_desc[current_event])
+                txt = f"**{title}**:\n\n{events_desc[current_event]}"
+                await ctx.send(txt)
         else:
             await ctx.send(events_desc["nothing"])
     
@@ -119,6 +120,12 @@ class BotEventsCog(commands.Cog):
             fields.append({"name": rank_global, "value": user_rank, "inline":True})
             emb = self.bot.cogs["EmbedCog"].Embed(title=title,fields=fields,color=4254055,author_name=str(ctx.author),author_icon=str(await self.bot.user_avatar_as(ctx.author,32)))
             await ctx.send(embed=emb)
+        else:
+            msg = f"**{title}** ({ctx.author})"
+            if objectives_title != "":
+                msg += "\n\n__{}:__\n{}".format(objectives_title,prices)
+            msg += "\n\n__{}:__ {}\n__{}:__ {}".format(rank_total,str(points),rank_global,user_rank)
+            await ctx.send(msg)
         
 
 def setup(bot):
