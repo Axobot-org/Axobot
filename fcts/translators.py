@@ -17,14 +17,15 @@ class TranslatorsCog(commands.Cog):
         self.file = 'translators'
         if not os.path.exists('translation/'):
             os.makedirs('translation/')
-        self.project_list = ['fr','en','lolcat','fi','de','es','it','br','tr']
+        self.project_list = ['fr','en','lolcat','fi','de','es','it','br','tr','fr2']
         self.translations = {'en':self.load_translation('en'),
             'fi':self.load_translation('fi'),
             'de':self.load_translation('de'),
             'es':self.load_translation('es'),
             'it':self.load_translation('it'),
             'br':self.load_translation('br'),
-            'tr':self.load_translation('tr')}
+            'tr':self.load_translation('tr'),
+            'fr2':self.load_translation('fr2')}
         try:
             self.translate = self.bot.cogs["LangCog"].tr
         except:
@@ -34,7 +35,8 @@ class TranslatorsCog(commands.Cog):
                 'es':sorted([x for x in self.translations['en'].keys() if x not in self.translations['es'].keys()]),
                 'it':sorted([x for x in self.translations['en'].keys() if x not in self.translations['it'].keys()]),
                 'br':sorted([x for x in self.translations['en'].keys() if x not in self.translations['br'].keys()]),
-                'tr':sorted([x for x in self.translations['en'].keys() if x not in self.translations['tr'].keys()])}
+                'tr':sorted([x for x in self.translations['en'].keys() if x not in self.translations['tr'].keys()]),
+                'fr2':sorted([x for x in self.translations['en'].keys() if x not in self.translations['fr2'].keys()])}
     
     @commands.Cog.listener()
     async def on_ready(self):
@@ -221,9 +223,12 @@ class TranslatorsCog(commands.Cog):
                         o[path[0]] = await readpath(path[1:],temp,msg)
                 return o
         for key, line in new.items():
-            if len(line.strip())==0:
-                continue
-            await readpath(key.split('.'),old,' '.join(line.split(' ')))
+            try:
+                if len(line.strip())==0:
+                    continue
+                await readpath(key.split('.'),old,' '.join(line.split(' ')))
+            except AttributeError:
+                pass
         return old
 
 
@@ -269,7 +274,7 @@ class TranslatorsCog(commands.Cog):
     @commands.check(check_admin)
     async def merge_files(self,ctx:commands.Context,lang:str="en"):
         """Merge a file with the english version"""
-        if lang not in self.todo.keys():
+        if not lang in self.project_list:
             return await ctx.send("Invalid language")
         if len(ctx.message.attachments)==0:
             return await ctx.send("Missing a file")
