@@ -267,12 +267,14 @@ class TranslatorsCog(commands.Cog):
 
     @commands.command(name="tr-merge")
     @commands.check(check_admin)
-    async def merge_files(self,ctx):
+    async def merge_files(self,ctx:commands.Context,lang:str="en"):
         """Merge a file with the english version"""
+        if lang not in self.todo.keys():
+            return await ctx.send("Invalid language")
         if len(ctx.message.attachments)==0:
             return await ctx.send("Missing a file")
         from io import BytesIO
-        with open(f'fcts/lang/en.json','r',encoding='utf-8') as old_f:
+        with open(f'fcts/lang/{lang}.json','r',encoding='utf-8') as old_f:
             en_map = self.create_txt_map(json.load(old_f))
         io = BytesIO()
         await ctx.message.attachments[0].save(io)
