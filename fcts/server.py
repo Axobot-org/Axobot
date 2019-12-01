@@ -243,7 +243,6 @@ class ServerCog(commands.Cog):
 
     @commands.group(name='config')
     @commands.guild_only()
-    @commands.cooldown(1,2,commands.BucketType.guild)
     async def sconfig_main(self,ctx):
         """Function for setting the bot on a server"""
         if ctx.bot.database_online:
@@ -266,12 +265,14 @@ class ServerCog(commands.Cog):
             await self.bot.invoke(new_ctx)
 
     @sconfig_main.command(name="help")
+    @commands.cooldown(1,2,commands.BucketType.guild)
     async def sconfig_help(self,ctx):
         """Get help about this command"""
         msg = await self.translate(ctx.guild,"server","config-help", p=(await self.bot.get_prefix(ctx.message))[0])
         await ctx.send(msg.format(ctx.guild.owner.name))
 
     @sconfig_main.command(name="del")
+    @commands.cooldown(1,2,commands.BucketType.guild)
     async def sconfig_del(self,ctx,option):
         """Reset an option to zero"""
         if not (ctx.channel.permissions_for(ctx.author).administrator or await self.bot.cogs["AdminCog"].check_if_god(ctx)):
@@ -281,6 +282,7 @@ class ServerCog(commands.Cog):
         await self.sconfig_del2(ctx,option)
     
     @sconfig_main.command(name="change")
+    @commands.cooldown(1,2,commands.BucketType.guild)
     async def sconfig_change(self,ctx,option,*,value):
         """Allows you to modify an option"""
         if not (ctx.channel.permissions_for(ctx.author).administrator or await self.bot.cogs["AdminCog"].check_if_god(ctx)):
