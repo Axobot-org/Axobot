@@ -92,7 +92,7 @@ class zbot(commands.bot.BotBase,discord.Client):
         try:
             return self.cogs["BotEventsCog"].current_event
         except Exception as e:
-            await self.cogs["ErrorsCog"].on_error(e)
+            self.log.warn(f"[current_event] {e}", exc_info=True)
             return None
     
     def connect_database_frm(self):
