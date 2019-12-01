@@ -52,6 +52,8 @@ class XPCog(commands.Cog):
         self.translate = self.bot.cogs['LangCog'].tr
         self.table = 'xp_beta' if self.bot.beta else 'xp'
         await self.bdd_load_cache(-1)
+        if not self.bot.database_online:
+            self.bot.unload_extension("fcts.xp")
 
     async def add_xp(self,msg):
         """Attribue un certain nombre d'xp à un message"""
@@ -175,6 +177,7 @@ class XPCog(commands.Cog):
 
     async def send_levelup(self,msg,lvl):
         """Envoie le message de levelup"""
+        await self.bot.cogs["UtilitiesCog"].add_user_eventPoint(msg.author.id,round(lvl[0]/5))
         if msg.guild!=None and not msg.channel.permissions_for(msg.guild.me).send_messages:
             return
         text = await self.bot.cogs['ServerCog'].find_staff(msg.guild.id,'levelup_msg')
@@ -300,6 +303,9 @@ class XPCog(commands.Cog):
     async def bdd_set_xp(self,userID,points,Type='add',guild:int=None):
         """Ajoute/reset de l'xp à un utilisateur dans la database"""
         try:
+            if not self.bot.database_online:
+                self.bot.unload_extension("fcts.xp")
+                return None
             if points==0:
                 return True
             if guild==None:
@@ -322,6 +328,9 @@ class XPCog(commands.Cog):
     
     async def bdd_get_xp(self,userID,guild:int):
         try:
+            if not self.bot.database_online:
+                self.bot.unload_extension("fcts.xp")
+                return None
             if guild==None:
                 cnx = self.bot.cnx_frm
             else:
@@ -345,6 +354,9 @@ class XPCog(commands.Cog):
     async def bdd_get_nber(self,guild:int=None):
         """Get the number of ranked users"""
         try:
+            if not self.bot.database_online:
+                self.bot.unload_extension("fcts.xp")
+                return None
             if guild==None:
                 cnx = self.bot.cnx_frm
             else:
@@ -364,6 +376,9 @@ class XPCog(commands.Cog):
 
     async def bdd_load_cache(self,guild:int):
         try:
+            if not self.bot.database_online:
+                self.bot.unload_extension("fcts.xp")
+                return None
             globalS = guild==-1
             if globalS:
                 self.bot.log.info("Chargement du cache XP (global)")
@@ -398,6 +413,9 @@ class XPCog(commands.Cog):
 
     async def bdd_get_top(self,top:int,guild:discord.Guild=None):
         try:
+            if not self.bot.database_online:
+                self.bot.unload_extension("fcts.xp")
+                return None
             if guild!=None and await self.bot.cogs['ServerCog'].find_staff(guild.id,'xp_type')!=0:
                 cnx = self.bot.cnx_xp
                 query = ("SELECT * FROM `{}` order by `xp` desc".format(await self.get_table(guild.id)))
@@ -425,6 +443,9 @@ class XPCog(commands.Cog):
     async def bdd_get_rank(self,userID:int,guild:discord.Guild=None):
         """Get the rank of a user"""
         try:
+            if not self.bot.database_online:
+                self.bot.unload_extension("fcts.xp")
+                return None
             if guild!=None and await self.bot.cogs['ServerCog'].find_staff(guild.id,'xp_type')!=0:
                 cnx = self.bot.cnx_xp
                 query = ("SELECT `userID`,`xp`, @curRank := @curRank + 1 AS rank FROM `{}` p, (SELECT @curRank := 0) r WHERE `banned`='0' ORDER BY xp desc;".format(await self.get_table(guild.id)))
@@ -452,6 +473,9 @@ class XPCog(commands.Cog):
     async def bdd_total_xp(self):
         """Get the total number of earned xp"""
         try:
+            if not self.bot.database_online:
+                self.bot.unload_extension("fcts.xp")
+                return None
             cnx = self.bot.cnx_frm
             cursor = cnx.cursor(dictionary = True)
             query = ("SELECT SUM(xp) FROM `{}`".format(self.table))
@@ -909,4 +933,5 @@ class XPCog(commands.Cog):
 
 
 def setup(bot):
-    bot.add_cog(XPCog(bot))
+    if bot.database_online:
+        bot.add_cog(XPCog(bot))

@@ -63,13 +63,13 @@ async def has_manage_nicknames(ctx):
     """... if someone can change nicknames"""
     return ctx.channel.permissions_for(ctx.author).manage_nicknames or await ctx.bot.cogs['AdminCog'].check_if_god(ctx)
 
-async def has_embed_links(ctx):
+async def has_embed_links(ctx:commands.Context):
     """... if someone can send embeds"""
     if not isinstance(ctx.author,discord.Member):
         return True
     return ctx.channel.permissions_for(ctx.author).embed_links or await ctx.bot.cogs['AdminCog'].check_if_god(ctx)
 
-async def verify_role_exists(ctx):
+async def verify_role_exists(ctx:commands.Context):
     """Check if the verify role exists"""
     if ctx.guild==None:
         return False
@@ -78,3 +78,7 @@ async def verify_role_exists(ctx):
         return False
     roles = [r for r in [ctx.guild.get_role(int(x)) for x in roles_raw.split(';') if x.isnumeric() and len(x)>0] if r!=None]
     return len(roles) > 0
+
+async def database_connected(ctx:commands.Context):
+    "Check if the database is online and accessible"
+    return ctx.bot.database_online

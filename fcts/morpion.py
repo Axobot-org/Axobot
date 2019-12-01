@@ -13,28 +13,37 @@ class MorpionCog(commands.Cog):
             self.translate = bot.cogs['LangCog'].tr
         except:
             pass
-        self.is_halloween = self.bot.current_event=="halloween"
 
     @commands.Cog.listener()
     async def on_ready(self):
         self.translate = self.bot.cogs['LangCog'].tr
 
-    async def qui_commence(self):
+    async def get_emojis(self) -> tuple:
+        if self.bot.current_event == 'halloween':
+            return ("🎃",":bat:")
+        if self.bot.current_event == "christmas":
+            return ("☃️","🎄")
+        if self.bot.current_event == 'fish':
+            return ("🐟","🐠")
+        return (':red_circle:',':blue_circle:')
+
+    async def qui_commence(self) -> bool:
         """Le joueur est True, l'ordinateur est False"""
         return random.choice([True,False])
 
-    async def afficher_grille(self,grille:list):
+    async def afficher_grille(self,grille:list) -> str:
         """Affiche la grille qui est une liste sous forme de chaine de caractères"""
         affichage_grille = ''
+        emojis = await self.get_emojis()
         for k in range(9) :
                 if k%3 == 0 :
                      affichage_grille += '\n'
                 if grille[k] in range(10):
                     affichage_grille += '<:{}>'.format(self.bot.cogs['EmojiCog'].numbEmojis[grille[k]])
                 elif grille[k] == 'O':
-                    affichage_grille += "🎃" if self.is_halloween else ':red_circle:'
+                    affichage_grille += emojis[0]
                 else:
-                    affichage_grille += ":bat:" if self.is_halloween else ':large_blue_circle:'
+                    affichage_grille += emojis[1]
         return affichage_grille
 
     async def test_place_valide(self,grille:list,saisie:str):
@@ -52,21 +61,15 @@ class MorpionCog(commands.Cog):
                 return True
         return False
 
-    async def resultat_final(self,tour:bool,channel:discord.TextChannel):
-        """Renvoie qui a gagné la partie"""
-        if tour:
-            return await self.translate(channel,'morpion','win-2')
-        return await self.translate(channel,'morpion','win-1')
-
     async def test_cases_vides(self,grille:list):
         """Renvoie True s'il reste des cases vides"""
         return grille.count('O') +grille.count('X') != 9
 
-    @commands.command(name="crab",aliases=['morpion'])
+    @commands.command(name="tic-tac-toe",aliases=['morpion','tictactoe'])
     async def main(self,ctx:commands.Context,leave:str=None):
         """A simple mini-game that consists of aligning three chips on a 9-square grid.
 The bot plays in red, the user in blue.
-Use 'crab leave' to make you leave the crab game if you're stuck in it.
+Use 'tic-tac-toe leave' to make you leave the game if you're stuck in it.
 """
         try:
             if leave=='leave':
@@ -82,8 +85,9 @@ Use 'crab leave' to make you leave the crab game if you're stuck in it.
             grille = [x for x in range(1,10)]
             tour = await self.qui_commence()
             u_begin = await self.translate(ctx.channel,'morpion','user-begin') if tour == True else await self.translate(ctx.channel,'morpion','bot-begin')
-            await ctx.send(u_begin.format(ctx.author.mention)+await self.translate(ctx.channel,'morpion','tip'))
-            resultat = await self.translate(ctx.channel,'morpion','nul')
+            emojis = await self.get_emojis()
+            await ctx.send(u_begin.format(ctx.author.mention)+await self.translate(ctx.channel,'morpion','tip',symb1=emojis[0],symb2=emojis[1]))
+            match_nul = True
             def check(m):
                 # return m.content in [str(x) for x in range(1,10)] and m.channel == ctx.channel and m.author==ctx.author
                 return m.channel == ctx.channel and m.author==ctx.author
@@ -111,7 +115,9 @@ Use 'crab leave' to make you leave the crab game if you're stuck in it.
                             await ctx.send(await self.translate(ctx.channel,'morpion','pion-1'))
                             display_grille = False
                             continue
-                    else :
+                    elif msg.content.endswith("leave"):
+                        return
+                    else:
                         await ctx.send(await self.translate(ctx.channel,'morpion','pion-2'))
                         display_grille = False
                         continue
@@ -138,9 +144,18 @@ Use 'crab leave' to make you leave the crab game if you're stuck in it.
                     display_grille = True
             ###
                 if await self.test_win(grille) == True:
-                    resultat = await self.resultat_final(tour,ctx.channel)
+                    match_nul = False
                     break
             ###
+            if match_nul:
+                await self.bot.cogs["UtilitiesCog"].add_user_eventPoint(ctx.author.id,1)
+                resultat = await self.translate(ctx.channel,'morpion','nul')
+            else:
+                if tour: # Le bot a gagné
+                    resultat = await self.translate(ctx.channel,'morpion','win-2')
+                else: # L'utilisateur a gagné
+                    resultat = await self.translate(ctx.channel,'morpion','win-1')
+                    await self.bot.cogs["UtilitiesCog"].add_user_eventPoint(ctx.author.id,5)
             await ctx.send(await self.afficher_grille(grille)+'\n'+resultat.format(ctx.author.mention))
             self.in_game.pop(ctx.author.id,None)
         except Exception as e:

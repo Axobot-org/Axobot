@@ -262,3 +262,26 @@ Tip
 **Syntax:** :code:`tip`
 
 If you want to get some advice on how to use the bot, or just a funny fact, you will surely find what you are looking for here. This command returns a random phrase from a defined list of "Pro-tip" and "Did you know?", to hopefully teach you something!
+
+
+----------
+Bot events
+----------
+
+From time to time, for special events of the year, Zbot has fun organizing an event where some small changes are made to the code. There is for example the tic-tac-toe whose symbols change, or many other small easter eggs of this kind... as well as the possibility to win event points!
+
+To get event points, it is usually enough to use the bot: win games of tic-tac-toe, increase in xp level, or other actions of this kind.
+
+Get info about the current event
+--------------------------------
+
+**Syntax:** :code:`events info`
+
+You can have details about an event via this command. If an event is in progress, you will then have the explanatory summary, start and end dates, as well as any prizes to be won. 
+
+Get your current progress
+-------------------------
+
+**Syntax:** :code:`events rank`
+
+To know your progress in the event, as well as the prices you can recover, this command is the one you need. You'll even get your ranking among all the players in the world!

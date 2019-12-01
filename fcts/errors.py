@@ -148,7 +148,7 @@ class ErrorsCog(commands.Cog):
         await self.on_cmd_error(ctx,error)
 
     @commands.Cog.listener()
-    async def on_error(self,error,ctx):
+    async def on_error(self,error,ctx=None):
         try:
             if isinstance(ctx,discord.Message):
                 ctx = await self.bot.get_context(ctx)

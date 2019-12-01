@@ -49,6 +49,8 @@ class RolesReact(commands.Cog):
 
     @commands.Cog.listener('on_raw_reaction_add')
     async def on_raw_reaction(self,payload:discord.RawReactionActionEvent):
+        if not self.bot.database_online:
+            return
         msg,role = await self.prepare_react(payload)
         if msg != None:
             user = msg.guild.get_member(payload.user_id)
@@ -56,6 +58,8 @@ class RolesReact(commands.Cog):
     
     @commands.Cog.listener('on_raw_reaction_remove')
     async def on_raw_reaction_2(self,payload:discord.RawReactionActionEvent):
+        if not self.bot.database_online:
+            return
         msg,role = await self.prepare_react(payload)
         if msg != None:
             user = msg.guild.get_member(payload.user_id)
@@ -122,6 +126,7 @@ class RolesReact(commands.Cog):
     
     @rr_main.command(name="add")
     @commands.check(checks.has_manage_guild)
+    @commands.check(checks.database_connected)
     async def rr_add(self,ctx,emoji:args.anyEmoji,role:discord.Role,*,description:str=''):
         """Add a role reaction
         This role will be given when a membre click on a specific reaction
@@ -144,6 +149,7 @@ class RolesReact(commands.Cog):
             self.guilds_which_have_roles.add(ctx.guild.id)
     
     @rr_main.command(name="remove")
+    @commands.check(checks.database_connected)
     @commands.check(checks.has_manage_guild)
     async def rr_remove(self,ctx,emoji):
         """Remove a role react"""
@@ -186,6 +192,7 @@ class RolesReact(commands.Cog):
         return '\n'.join(l), emojis
 
     @rr_main.command(name="list")
+    @commands.check(checks.database_connected)
     async def rr_list(self,ctx):
         """List every roles reactions of your server"""
         if not ctx.channel.permissions_for(ctx.guild.me).embed_links:
@@ -203,6 +210,7 @@ class RolesReact(commands.Cog):
             await ctx.send(embed=emb.discord_embed())
     
     @rr_main.command(name="get",aliases=['join'])
+    @commands.check(checks.database_connected)
     async def rr_get(self,ctx:commands.Context,*,role:typing.Optional[discord.Role]):
         """Send the roles embed
         If you don't speficy any role, I will display the whole message with reactions
@@ -230,6 +238,7 @@ class RolesReact(commands.Cog):
                         pass
 
     @rr_main.command(name="leave")
+    @commands.check(checks.database_connected)
     async def rr_leave(self,ctx:commands.Context,role:discord.Role):
         """Leave a role without using reactions"""
         await self.give_remove_role(ctx.author,role,ctx.guild,ctx.channel,give=False)
@@ -265,6 +274,7 @@ class RolesReact(commands.Cog):
     
 
     @rr_main.command(name='update')
+    @commands.check(checks.database_connected)
     async def rr_update(self,ctx:commands.Context,embed:args.guildMessage,changeDescription:typing.Optional[bool]=True,emojis:commands.Greedy[args.anyEmoji]=None):
         """Update a Zbot message to refresh roles/reactions
         If you don't want to update the embed content, for example if it's a custom embed, then you can use 'False' as a second argument. Zbot will only check the reactions

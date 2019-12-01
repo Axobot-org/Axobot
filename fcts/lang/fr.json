@@ -71,6 +71,10 @@
                 "Il faut être administrateur du bot",
                 "Vous n'êtes pas administrateur du bot"
             ],
+            "database_connected": [
+                "La base de donnée est bien en ligne",
+                "La base de donnée est hors ligne"
+            ],
             "guild_only": [
                 "Utilisable uniquement dans un serveur",
                 "Utilisable uniquement dans un serveur"
@@ -153,6 +157,28 @@
         "create_oops": "{}, oups ! Il semble que ce gif est trop gros pour être téléchargé. Si vous voulez, vous pouvez lui donner une autre chance, mais avec une version plus petite de l'image. Désolé !",
         "create_title": "Blurplefier - makes your image blurple!",
         "won-card": "Wow! Magnifique image blurple {}! tellement beau que j'ai décidé de t'offrir la carte d'xp blurple, je suis sûr qu'elles iront bien ensemble ! Tu peux l'utiliser en tapant la commande `{}profile card blurple` {}"
+    },
+    "bot_events": {
+        "unclassed": "Non classé",
+        "points": "points",
+        "rank-title": "Points d'événement",
+        "rank-global": "Classement mondial",
+        "objectives": "Objectifs",
+        "rank-total": "Total des points",
+        "events-title": {
+            "christmas-2019": "Noël en approche !"
+        },
+        "events-desc": {
+            "christmas-2019": "Fêtez l'arrivée de Noël grâce à cet événement ! Pendant plusieurs jours, Zbot se pare des couleurs de l'hiver avec des émojis spéciaux pour le jeu du morpion, un avatar unique ainsi que d'autres choses trop cool. \n\nProfitez-en pour récupérer des points d'événements et tentez de gagner la carte d'xp spécial Noël 2019 ! Pour rappel, les cartes d'xp sont accessibles via ma commande `profile card`",
+            "nothing": "Il n'y a actuellement aucun événement. Suivez les news du bot pour connaître la date du prochain !"
+        },
+        "events-price-title": "Prix à gagner",
+        "events-prices": {
+            "christmas-2019": {
+                "50": "Débloquez la carte d'xp spécial Noël 2019 !"
+            },
+            "nothing": "Il n'y a rien à gagner pour cet événement :confused:"
+        }
     },
     "bvn": {
         "aide": "__**Bienvenue dans le module des message de join et de leave**__\n\nCe module vous sert à configurer un message automatique à chaque fois qu'un membre rentre ou sort de votre serveur.\n\n__**La configuration**__\n\n`1-` Pour configurer le salon où ces messages s'écrivent, entrez `{p}config change welcome_channel` suivi du salon (vous pouvez utiliser aussi bien sa mention que son identifiant ou son nom complet).\n`2-` Pour configurer un message, entrez `{p}config change <welcome|leave> <message>`. Pour ce message vous pouvez utiliser les variables suivantes :\n - `{user}` mentionne le membre\n - `{server}` affiche le nom du serveur\n - `{owner}` affiche le nom du propriétaire du serveur\n - `{member_count}` affiche le nombre actuel de membres\n - `{type}` retourne 'bot' si le membre est un bot, 'membre' sinon\n",
@@ -320,7 +346,14 @@
         "prefix": "Liste des préfixes actuellement utilisables :",
         "stats": "**Version du bot :** {bot_v} \n**Nombre de serveurs :** {s_count} \n**Nombre de membres visibles :** {m_count} (dont {b_count} **bots**)\n**Nombre de lignes de code :** {l_count}\n**Langues utilisées :** {lang} \n**Version de Python :** {p_v} \n**Version de la bibliothèque `discord.py` :** {d_v} \n**Charge sur la mémoire vive :** {ram} GB \n**Charge sur le CPU :** {cpu} % \n**Temps de latence de l'api :** {api} ms\n**Nombre total d'xp gagné :** {xp}xp",
         "stats-title": "**Statistiques du bot**",
-        "text-0": "Bonjour ! Moi c'est {0} !\n\nJe suis un bot qui permet de faire *beaucoup* de choses : de la modération, un système d'xp, des statistiques, la gestion de partenaires et plein d'autres commandes plus ou moins utiles ! \nVous pouvez commencer par taper `!help` dans ce tchat pour voir la liste des commandes disponibles, puis `!config see` vous permettra de voir les options de configuration (un site web est en préparation). \n\nPour m'avoir aidé dans la création du bot, mon propriétaire et moi souhaitons remercier Awhikax pour son soutien apporté lors des différentes crises, Aragorn1202 pour toutes ses idées et ses phrases pleines de bon sens, Adri526 pour tous ces magnifiques logos, émojis et images de profil, et toute l'équipe de traducteurs poour leur merveilleux travail !\n\n:globe_with_meridians: Quelques liens pourront vous être utiles : \n:arrow_forward: Mon serveur Discord : http://discord.gg/N55zY88\n:arrow_forward: Un lien pour m'inviter dans un autre serveur : <https://zrunner.me/invitezbot>\n:arrow_forward: La documentation du bot : <https://zbot.rtfd.io/>\n:arrow_forward: Le compte Twitter de mon créateur : <https://twitter.com/z_runnerr>\n\nBonne journée !"
+        "text-0": "Bonjour ! Moi c'est {0} !\n\nJe suis un bot qui permet de faire *beaucoup* de choses : de la modération, un système d'xp, des statistiques, la gestion de partenaires et plein d'autres commandes plus ou moins utiles ! \nVous pouvez commencer par taper `!help` dans ce tchat pour voir la liste des commandes disponibles, puis `!config see` vous permettra de voir les options de configuration (un site web est en préparation). \n\nPour m'avoir aidé dans la création du bot, mon propriétaire et moi souhaitons remercier Awhikax pour son soutien apporté lors des différentes crises, Aragorn1202 pour toutes ses idées et ses phrases pleines de bon sens, Adri526 pour tous ces magnifiques logos, émojis et images de profil, et toute l'équipe de traducteurs poour leur merveilleux travail !\n\n:globe_with_meridians: Quelques liens pourront vous être utiles : \n:arrow_forward: Mon serveur Discord : http://discord.gg/N55zY88\n:arrow_forward: Un lien pour m'inviter dans un autre serveur : <https://zrunner.me/invitezbot>\n:arrow_forward: La documentation du bot : <https://zbot.rtfd.io/>\n:arrow_forward: Le compte Twitter de mon créateur : <https://twitter.com/z_runnerr>\n\nBonne journée !",
+        "usernames-title": "Pseudos de **{u}**",
+        "usernames-global": "Historique général",
+        "usernames-local": "Historique du serveur",
+        "usernames-last-date": "Dernier changement",
+        "usernames-empty": "Aucun changement enregistré",
+        "usernames-disallow": "Vous pouvez vous retirer de l'enregistrement automatique via la commande 'profile'",
+        "usernames-allow": "Vous pouvez réautoriser l'enregistrement automatique via la commande 'profile'"
     },
     "infos_2": {
         "fish-1": "Nombre de poissons trouvés",
@@ -336,6 +369,8 @@
         "category": "catégorie",
         "click_here": "Cliquez ici",
         "depuis": "depuis",
+        "beginning": "début",
+        "end": "fin",
         "dnd": "ne pas déranger",
         "extreme": "extrême",
         "ghost": "Fantôme",
@@ -631,7 +666,7 @@
         "nul": "Match nul, personne n'a gagné...",
         "pion-1": "Il y a déjà un pion sur cette case !",
         "pion-2": "Case saisie invalide !",
-        "tip": "\n*Pour jouer, il suffit de taper un nombre entre 1 et 9, correspondant à la case choisie. Je joue les rouges, toi les bleus*",
+        "tip": "\n*Pour jouer, il suffit de taper un nombre entre 1 et 9, correspondant à la case choisie. Je joue les {symb1}, toi les {symb2}*",
         "too-late": "Vous avez mis trop de temps à vous décider. Fin de la partie !",
         "user-begin": "{}, à toi de commencer !",
         "win-1": "Bien joué, {} a gagné !",
@@ -725,6 +760,7 @@
         "choose-mentions-1": "Veuillez choisir le flux à modifier",
         "choose-roles": "Quels seront les rôles à mentionner ?",
         "delete-success": "Le flux a été supprimé avec succès !",
+        "deviant": "DeviantArt",
         "deviant-default-flow": "{logo}  | Nouvelle création de {author} : **{title}**\nPubliée le {date}\nLien : {link}\n{mentions}",
         "deviant-form-last": "{logo}  | Voici la dernière création de {author}:\n{title}\nPubliée le {date}\nLien : {url}",
         "embed-json-changed": "L'embed de ce flux a bien été modifié",
@@ -737,6 +773,7 @@
         "invalid-link": "Oups, cette adresse url est invalide ou incomplète :confused:",
         "list": "*Entrez le numéro du flux à modifier*\n\n**Lien - Type - Salon - Roles**\n",
         "list2": "*Entrez le numéro du flux à supprimer*\n\n**Lien - Type - Salon**\n",
+        "list-result": "Type : {}\nSalon : {}\nLien/chaine : {}\nRôle mentionné : {}\nIdentifiant : {}\nDernier post : {}",
         "mc": "Minecraft",
         "move-success": "Le flux rss n°{} a bien été bougé dans le salon {} !",
         "no-db": "La base de donnée étant actuellement hors ligne, cette fonctionnalité est temporairement désactivée :confused:",
@@ -926,11 +963,13 @@
         "voicechan-0": "Salon vocal"
     },
     "users": {
-        "allow_animated_false": "Les cartes d'xp animées ne sont actuellement pas autorisées pour vous",
-        "allow_animated_success": "Ce paramètre a bien été redéfini à {}",
-        "allow_animated_true": "Les cartes d'xp animées sont actuellement autorisées pour vous",
-        "allow_auto_unafk_false": "Vous devez enlever le tag AFK vous-même",
-        "allow_auto_unafk_true": "Je vous enlèverai le tag AFK dès que vous enverrez un message",
+        "animated_card_false": "Vous n'utilisez actuellement pas de carte animée",
+        "config_success": "L'option {opt} a bien été modifiée!",
+        "animated_card_true": "Les cartes d'xp animées pourront être utilisée pour vous (rendu plus lent)",
+        "auto_unafk_false": "Vous devez enlever le tag AFK vous-même",
+        "auto_unafk_true": "Je vous enlèverai le tag AFK dès que vous enverrez un message",
+        "usernames_log_false": "Vous avez désactivé l'enregistrement de vos noms d'utilisateurs ainsi que de vos surnoms",
+        "usernames_log_true": "Vous avez autorisé l'enregistrement de vos noms d'utilisateurs ainsi que de vos surnoms",
         "card-desc": "Voici un exemple de votre carte d'xp. Vous pouvez entrer la commande `profile card <style>` pour changer le style\n*Votre carte d'xp ne se réactualisera que lorsque vous aurez gagné de l'xp*",
         "changed-0": "Votre carte d'xp utilise maintenant le style {}",
         "changed-1": "Oups, une erreur interne est survenue pendant le traitement de la requête. Réessayez plus tard ou contactez le support.",

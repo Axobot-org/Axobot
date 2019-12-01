@@ -69,7 +69,7 @@ class EmbedCog(commands.Cog):
             if self.thumbnail != "":
                 emb["thumbnail"] = {"url":self.thumbnail}
             if self.image != "":
-                emb["image"]  = {"url":"self.image"}
+                emb["image"]  = {"url":self.image}
             if self.author_icon != "" or self.author_name != "" or self.author_url != "":
                 auth = dict()
                 if self.author_name != "":

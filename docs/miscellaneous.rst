@@ -55,17 +55,6 @@ If you want to know the bot modification log, what has been changed in the last 
 .. note:: Giving the "`Embed Links <perms.html#embed-links>`_" permission to the bot can be useful if you want to get a better rendering. But it's not mandatory!
 
 
-----
-Crab
-----
-
-**Syntax:** :code:`crab` (alias :code:`morpion`) or :code:`crab leave`
-
-Yes, we did it! A first mini-game for our bot, the crab! You can play against the bot in this fast and simplistic game, just by entering the command and following the instructions (enter a number between 1 and 9 corresponding to the chosen cell). And the best part is that the only special permission required is to use the external emojis!
-
-By using the `leave` argument you can instantly stop a game. This can be useful if you are stuck by a bug and can't join a game for example.
-
-
 -----
 Embed
 -----
@@ -113,6 +102,17 @@ If you want to talk through the bot, as if it were sending your messages, this c
 .. note:: Note that this command is reserved for certain roles, which you can define in the `configuration section <server.html>`_.
 
 .. warning:: In addition, "`Manage Messages <perms.html#manage-messages>`_" permission is required if you want the bot to delete your message as soon as it has posted its copy.
+
+
+-----------
+Tic-tac-toe
+-----------
+
+**Syntax:** :code:`tic-tac-toe` (alias :code:`morpion`) or :code:`tic-tac-toe leave`
+
+Yes, we did it! A first mini-game for our bot, the crab! You can play against the bot in this fast and simplistic game, just by entering the command and following the instructions (enter a number between 1 and 9 corresponding to the chosen cell). And the best part is that the only special permission required is to use the external emojis!
+
+By using the `leave` argument you can instantly stop a game. This can be useful if you are stuck by a bug and can't join a game for example.
 
 
 ----

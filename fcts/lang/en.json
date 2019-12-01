@@ -71,6 +71,10 @@
                 "You need to be one of the bot Admins",
                 "You are not a bot Admin"
             ],
+            "database_connected": [
+                "The database is online",
+                "The database is offline"
+            ],
             "guild_only": [
                 "Can only be used in a server",
                 "Can only be used in a server"
@@ -153,6 +157,28 @@
         "create_oops": "{}, whoops! It looks like this gif is too big to upload. If you want, you can give it another go, except with a smaller version of the image. Sorry about that!",
         "create_title": "Blurplefier - makes your image blurple!",
         "won-card": "Wow! Very nice blurple picture {}! so beautiful that I decided to offer you the card of xp blurple! You can use it by typing the command `{}profile card blurple` {}"
+    },
+    "bot_events": {
+        "unclassed": "unclassed",
+        "points": "points",
+        "rank-title": "Event points",
+        "rank-global": "Global ranking",
+        "objectives": "Objectives",
+        "rank-total": "Total points",
+        "events-title": {
+            "christmas-2019": "Christmas is coming!"
+        },
+        "events-desc": {
+            "christmas-2019": "Celebrate the arrival of Christmas with this event! For several days, Zbot wears the colours of winter with special emojis for the tic-tac-toe game, a unique avatar and other cool things. \n\nTake the opportunity to collect event points and try to win the 2019 Christmas special xp card! Reminder: xp cards are accessible via my `profile card` command",
+            "nothing": "There are currently no events. Follow the bot news to know the date of the next one!"
+        },
+        "events-price-title": "Prizes to win",
+        "events-prices": {
+            "christmas-2019": {
+                "50": "Unlock the special Christmas 2019!"
+            },
+            "nothing": "There is nothing to gain for this event :confused:"
+        }
     },
     "bvn": {
         "aide": "__**Welcome to the join & leave message module**__\n\nThis module is used to configure an automatic message each time a member enters or exits your server.\n\n__** Configuration**__\n\n`1-` To configure the chat room where these messages are written, enter `{p}config change welcome_channel` followed by the channel (you can use its mention as well as its identifier or its full name).\n`2-` To configure a message, enter `{p}config change <welcome|leave> <message>`. For this message you can use some variables:\n - `{user}` mentions the member\n - `{server}` displays the server name\n - `{owner}` displays the server owner name\n - `{member_count}` shows the current number of members\n - `{type}` return 'member' or 'bot'",
@@ -320,7 +346,14 @@
         "prefix": "List of currently usable prefixes:",
         "stats": "**Bot version:** {bot_v} \n**Number of servers:** {s_count} \n**Number of visible members:** {m_count} ({b_count} **bots**)\n**Number of code lines:** {l_count}\n**Used languages:** {lang}\n**Python version :** {p_v} \n**Version of the `discord.py` lib:** {d_v} \n**Loading on the RAM:** {ram} GB \n**Loading on the CPU:** {cpu} % \n**API latency time:** {api} ms\n**Total of earned xp:** {xp}",
         "stats-title": "**Bot statistics**",
-        "text-0": "Hello! I'm {0} !\nI'm a bot that allows you to do a lot of things: moderation, xp system, statistics, partners managment and many other super useful commands (and totally pointless ones)!\nYou can start by typing `!help` in this chat to see the list of available commands, then `!config see` will let you see the configuration options.\n\nMy owner and I would like to thank Awhikax for his support during the various crises, Aragorn1202 for all his ideas and sentences full of good sense, Adri526 for all these beautiful logos, emojis and profile pics, and the whole translators team for their long work!\n\n:globe_with_meridians: Some links may be useful: \n:arrow_forward: My Discord server : http://discord.gg/N55zY88\n:arrow_forward: A link to invite me to another server : <https://zrunner.me/invitezbot>\n:arrow_forward: The bot documentation : <https://zbot.rtfd.io/>\n:arrow_forward: My creator's Twitter account : <https://twitter.com/z_runnerr>\n\nHave a nice day!"
+        "text-0": "Hello! I'm {0} !\nI'm a bot that allows you to do a lot of things: moderation, xp system, statistics, partners managment and many other super useful commands (and totally pointless ones)!\nYou can start by typing `!help` in this chat to see the list of available commands, then `!config see` will let you see the configuration options.\n\nMy owner and I would like to thank Awhikax for his support during the various crises, Aragorn1202 for all his ideas and sentences full of good sense, Adri526 for all these beautiful logos, emojis and profile pics, and the whole translators team for their long work!\n\n:globe_with_meridians: Some links may be useful: \n:arrow_forward: My Discord server : http://discord.gg/N55zY88\n:arrow_forward: A link to invite me to another server : <https://zrunner.me/invitezbot>\n:arrow_forward: The bot documentation : <https://zbot.rtfd.io/>\n:arrow_forward: My creator's Twitter account : <https://twitter.com/z_runnerr>\n\nHave a nice day!",
+        "usernames-title": "**{u}** names history",
+        "usernames-global": "General history",
+        "usernames-local": "Server history",
+        "usernames-last-date": "Last change",
+        "usernames-empty": "No change recorded",
+        "usernames-disallow": "You can opt out of the automatic recording with the command 'profile'",
+        "usernames-allow": "You can reauthorize the automatic recording with the command 'profile'"
     },
     "infos_2": {
         "fish-1": "Number of fishes",
@@ -336,6 +369,8 @@
         "category": "category",
         "click_here": "Click here",
         "depuis": "since",
+        "beginning": "beginning",
+        "end": "end",
         "dnd": "do not disturb",
         "extreme": "extreme",
         "ghost": "Ghost",
@@ -631,7 +666,7 @@
         "nul": "Draw, no one won...",
         "pion-1": "There's already a pawn on that cell!",
         "pion-2": "Invalid input case",
-        "tip": "\n*To play, simply type a number between 1 and 9, corresponding to the chosen case. I play the red, you play the blue*",
+        "tip": "\n*To play, simply type a number between 1 and 9, corresponding to the chosen case. I play the {symb1}, you play the {symb2}*",
         "too-late": "You took too long to decide. Game over!",
         "user-begin": "{}, you begin!",
         "win-1": "Well done, {} won!",
@@ -725,6 +760,7 @@
         "choose-mentions-1": "Please choose the flow to modify",
         "choose-roles": "What roles will be mentioned?",
         "delete-success": "The flow has been successfully deleted!",
+        "deviant": "DeviantArt",
         "deviant-default-flow": "{logo}  | New creation by {author} : **{title}**\nPublished on {date}\nLink: {link}\n{mentions}",
         "deviant-form-last": "{logo}  | Here is the new creation of {author}:\n{title}\nPublished on {date}\nLink: {url}",
         "embed-json-changed": "The embed of this feed has been modified",
@@ -737,6 +773,7 @@
         "invalid-link": "Oops, this url address is invalid or incomplete :confused:",
         "list": "*Type the number of the flow to modify*\n\n**Link - Type - Channel - Mentions**\n",
         "list2": "*Type the number of the flow to delete*\n\n**Link - Type - Channel**\n",
+        "list-result": "Type: {}\nDiscord channel: {}\nURL/Channel: {}\nMentions: {}\nIdentifier: {}\nLast post: {}",
         "mc": "Minecraft",
         "move-success": "The rss feed #{} has been moved in the channel {}!",
         "no-db": "As the database is currently offline, this feature is temporarily disabled :confused:",
@@ -926,11 +963,13 @@
         "voicechan-0": "Vocal channel"
     },
     "users": {
-        "allow_animated_false": "Animated xp cards are currently disabled for you",
-        "allow_animated_success": "This parameter has been redefined to {}",
-        "allow_animated_true": "Animated xp cards are currently enabled for you",
-        "allow_auto_unafk_false": "You must remove the AFK tag yourself",
-        "allow_auto_unafk_true": "I'll remove the AFK tag from you as soon as you send a message",
+        "animated_card_false": "You are not currently allowing an animated card. Thanks!",
+        "animated_card_true": "The animated xp cards can be used for you (slower rendering)",
+        "auto_unafk_false": "You must remove the AFK tag yourself",
+        "auto_unafk_true": "I'll remove the AFK tag from you as soon as you send a message",
+        "config_success": "The {opt} option has been changed!",
+        "usernames_log_false": "You have disabled the recording of your user names and nicknames",
+        "usernames_log_true": "You have authorized the recording of your user names and nicknames",
         "card-desc": "Here is an example of your xp card. You can enter the command `profile card <style>` to change the style\n*Your xp card will only refresh when you have won xp*",
         "changed-0": "Your xp card now uses the style {}",
         "changed-1": "Oops, an internal error occurred during the processing of the request. Try again later or contact support.",

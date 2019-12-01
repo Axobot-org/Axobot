@@ -54,17 +54,27 @@ If you use the command without argument, the bot will show you an example of a x
 .. note:: Note that to be able to display your card, the bot needs `Attach Files <perms.html#attach-files>`_ permission!
 
 
-Allow animated rank card
-------------------------
+Allow or disallow an option
+---------------------------
 
-**Syntax:** :code:`profile animated_card [true|false]`
+**Syntax:** :code:`profile config <option> [true|false]`
+
+You can allow or disallow one of the configuration options via this command, much like configuring a server. Here is the list of available options
+
+
+Option 'animated_card'
+======================
 
 This option allows you to enable the rendering of your xp card in.gif format if you have an animated profile image. Since the image processing time is much longer, with reduced quality, this option is disabled by default.
 
 
-Automatic unafk
----------------
-
-**Syntax:** :code:`profile auto_unafk [true|false]`
+Option 'auto_unafk'
+===================
 
 This option has been designed for people who don't want to manually type the `unafk` command as soon as they are back. So by activating this system, Zbot will automatically remove the AFK tag from you as soon as you send a message. As simple as that!
+
+
+Option 'usernames_log'
+======================
+
+By default Zbot records when you change your nickname, whether it is your main name or the nickname in a server. This data is then used for the results of the `usernames <infos.html#usernames-history>`_ command, and nowhere else. But for confidentiality reasons you can prevent your future changes from being saved at any time, via this option.
