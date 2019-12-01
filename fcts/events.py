@@ -2,7 +2,6 @@ import discord, datetime, asyncio, logging, time, aiohttp, json, random, shutil
 from discord.ext import commands, tasks
 
 
-
 class Events(commands.Cog):
     """Cog for the management of major events that do not belong elsewhere. Like when a new server invites the bot."""
 
@@ -16,6 +15,7 @@ class Events(commands.Cog):
         self.dbl_last_sending = datetime.datetime.utcfromtimestamp(0)
         self.partner_last_check = datetime.datetime.utcfromtimestamp(0)
         self.dbl_last_tr_backup = datetime.datetime.utcfromtimestamp(0)
+        self.dbl_last_eventDay_check = datetime.datetime.utcfromtimestamp(0)
         self.loop_errors = [0,datetime.datetime.utcfromtimestamp(0)]
         self.embed_colors = {"welcome":5301186,
         "mute":4868682,
@@ -44,18 +44,23 @@ class Events(commands.Cog):
     @commands.Cog.listener()
     async def on_ready(self):
         self.translate = self.bot.cogs["LangCog"].tr
+        if self.bot.database_online:
+            await self.send_sql_statslogs()
 
 
     @commands.Cog.listener()
     async def on_member_update(self,before:discord.Member,after:discord.Member):
         """Called when a member change something (status, activity, nickame, roles)"""
         if before.nick != after.nick:
+            config_option = await self.bot.cogs['UtilitiesCog'].get_db_userinfo(['allow_usernames_logs'],["userID="+str(before.id)])
+            if config_option != None and config_option['allow_usernames_logs']==False:
+                return
             cnx = self.bot.cnx_frm
             cursor = cnx.cursor()
             ID = round(time.time()/2) * 10 + random.randrange(0,9)
             b = '' if before.nick==None else before.nick.replace("'","\\'")
             a = '' if after.nick==None else after.nick.replace("'","\\'")
-            query = ("INSERT INTO `usernames_logs` (`ID`,`user`,`old`,`new`,`guild`) VALUES ('{}','{}','{}','{}','{}')".format(ID,before.id,b,a,before.guild.id))
+            query = ("INSERT INTO `usernames_logs` (`ID`,`user`,`old`,`new`,`guild`,`beta`) VALUES ('{}','{}','{}','{}','{}',{})".format(ID,before.id,b,a,before.guild.id,self.bot.beta))
             cursor.execute(query)
             cnx.commit()
             cursor.close()
@@ -64,10 +69,13 @@ class Events(commands.Cog):
     async def on_user_update(self,before:discord.User,after:discord.User):
         """Called when a user change something (avatar, username, discrim)"""
         if before.name != after.name:
+            config_option = await self.bot.cogs['UtilitiesCog'].get_db_userinfo(['allow_usernames_logs'],["userID="+str(before.id)])
+            if config_option != None and config_option['allow_usernames_logs']==False:
+                return
             cnx = self.bot.cnx_frm
             cursor = cnx.cursor()
             ID = round(time.time()/2) * 10 + random.randrange(0,9)
-            query = ("INSERT INTO `usernames_logs` (`ID`,`user`,`old`,`new`,`guild`) VALUES ('{}','{}','{}','{}','{}')".format(ID,before.id,before.name.replace("'","\\'"),after.name.replace("'","\\'"),0))
+            query = ("INSERT INTO `usernames_logs` (`ID`,`user`,`old`,`new`,`guild`,`beta`) VALUES ('{}','{}','{}','{}','{}',{})".format(ID,before.id,before.name.replace("'","\\'"),after.name.replace("'","\\'"),0,self.bot.beta))
             cursor.execute(query)
             cnx.commit()
             cursor.close()
@@ -92,6 +100,8 @@ class Events(commands.Cog):
                 desc = "Bot **left the server** {} ({}) - {} users".format(guild.name,guild.id,len(guild.members))
             emb = self.bot.cogs["EmbedCog"].Embed(desc=desc,color=self.embed_colors['welcome']).update_timestamp().set_author(self.bot.user)
             await self.bot.cogs["EmbedCog"].send([emb])
+            if self.bot.database_online:
+                await self.send_sql_statslogs()
         except Exception as e:
             await self.bot.cogs["ErrorsCog"].on_error(e,None)
 
@@ -335,6 +345,9 @@ class Events(commands.Cog):
                 await self.dbl_send_data()
             elif int(d.hour)%12 == 1 and (d.hour != self.dbl_last_tr_backup.hour or d.day != self.dbl_last_tr_backup.day):
                 await self.translations_backup()
+            elif int(d.hour)%12 == 0 and int(d.minute)%45 == 1 and (d.hour != self.dbl_last_eventDay_check.hour or d.day != self.dbl_last_eventDay_check.day):
+                self.bot.cogs["BotEventsCog"].updateCurrentEvent()
+                self.dbl_last_eventDay_check = datetime.datetime.today()
         except Exception as e:
             await self.bot.cogs['ErrorsCog'].on_error(e,None)
             self.loop_errors[0] += 1
@@ -453,131 +466,6 @@ class Events(commands.Cog):
             return
         emb = self.bot.cogs["EmbedCog"].Embed(desc='**Translations files backup** completed in {}s'.format(round(time.time()-t,3)),color=10197915).update_timestamp().set_author(self.bot.user)
         await self.bot.cogs["EmbedCog"].send([emb],url="loop")
-    
-            
-
-    async def rss_loop(self):
-        if self.bot.cogs['RssCog'].last_update==None or (datetime.datetime.now() - self.bot.cogs['RssCog'].last_update).total_seconds()  > 5*60:
-            self.bot.cogs['RssCog'].last_update = datetime.datetime.now()
-            asyncio.run_coroutine_threadsafe(self.bot.cogs['RssCog'].main_loop(),asyncio.get_running_loop())
-    
-    async def dbl_send_data(self):
-        """Send guilds count to Discord Bots Lists"""
-        if self.bot.beta:
-            return
-        t = time.time()
-        answers = ['None','None','None','None']
-        self.bot.log.info("[DBL] Envoi des infos sur le nombre de guildes...")
-        guildCount = len(self.bot.guilds)
-        session = aiohttp.ClientSession(loop=self.bot.loop)
-        # https://discordbots.org/bot/486896267788812288
-        payload = {'server_count': guildCount}
-        async with session.post('https://discordbots.org/api/bots/486896267788812288/stats',data=payload,headers={'Authorization':str(self.bot.dbl_token)}) as resp:
-            self.bot.log.debug('discordbots.org returned {} for {}'.format(resp.status, payload))
-            answers[0] = resp.status
-        # https://divinediscordbots.com/bot/486896267788812288
-        payload = json.dumps({
-          'server_count': guildCount
-          })
-        headers = {
-              'authorization': self.bot.others['divinediscordbots'],
-              'content-type': 'application/json'
-          }
-        async with session.post('https://divinediscordbots.com/bot/{}/stats'.format(self.bot.user.id), data=payload, headers=headers) as resp:
-              self.bot.log.debug('divinediscordbots statistics returned {} for {}'.format(resp.status, payload))
-              answers[1] = resp.status
-        # https://bots.ondiscord.xyz/bots/486896267788812288
-        payload = json.dumps({
-          'guildCount': guildCount
-          })
-        headers = {
-              'Authorization': self.bot.others['botsondiscord'],
-              'Content-Type': 'application/json'
-          }
-        async with session.post('https://bots.ondiscord.xyz/bot-api/bots/{}/guilds'.format(self.bot.user.id), data=payload, headers=headers) as resp:
-              self.bot.log.debug('BotsOnDiscord returned {} for {}'.format(resp.status, payload))
-              answers[2] = resp.status
-        # https://botlist.space/bot/486896267788812288
-        payload = json.dumps({
-          'server_count': guildCount
-          })
-        headers = {
-              'Authorization': self.bot.others['botlist.space'],
-              'Content-Type': 'application/json'
-          }
-        async with session.post('https://api.botlist.space/v1/bots/{}'.format(self.bot.user.id), data=payload, headers=headers) as resp:
-              self.bot.log.debug('botlist.space returned {} for {}'.format(resp.status, payload))
-              answers[3] = resp.status
-        await session.close()
-        answers = [str(x) for x in answers]
-        emb = self.bot.cogs["EmbedCog"].Embed(desc='**Guilds count updated** in {}s ({})'.format(round(time.time()-t,3),'-'.join(answers)),color=7229109).update_timestamp().set_author(self.bot.user)
-        await self.bot.cogs["EmbedCog"].send([emb],url="loop")
-        self.dbl_last_sending = datetime.datetime.now()
-
-    async def partners_loop(self):
-        """Update partners channels (every 7 hours)"""
-        t = time.time()
-        self.partner_last_check = datetime.datetime.now()
-        channels_list = await self.bot.cogs['ServerCog'].get_server(criters=["`partner_channel`<>''"],columns=['ID','partner_channel','partner_color'])
-        self.bot.log.info("[Partners] Rafraîchissement des salons ({} serveurs prévus)...".format(len(channels_list)))
-        count = [0,0]
-        for guild in channels_list:
-            try:
-                chan = guild['partner_channel'].split(';')[0]
-                if not chan.isnumeric():
-                    continue
-                chan = self.bot.get_channel(int(chan))
-                if chan==None:
-                    continue
-                count[0] += 1
-                count[1] += await self.bot.cogs['PartnersCog'].update_partners(chan,guild['partner_color'])
-            except Exception as e:
-                await self.bot.cogs['ErrorsCog'].on_error(e,None)
-        emb = self.bot.cogs["EmbedCog"].Embed(desc='**Partners channels updated** in {}s ({} channels - {} partners)'.format(round(time.time()-t,3),count[0],count[1]),color=10949630).update_timestamp().set_author(self.bot.user)
-        await self.bot.cogs["EmbedCog"].send([emb],url="loop")
-        
-    async def translations_backup(self):
-        """Do a backup of the translations files"""
-        from os import remove
-        t = time.time()
-        self.dbl_last_tr_backup = datetime.datetime.now()
-        try:
-            remove('translation-backup.tar')
-        except:
-            pass
-        try:
-           shutil.make_archive('translation-backup','tar','translation')
-        except FileNotFoundError:
-            await self.bot.cogs['ErrorsCog'].senf_err_msg("Translators backup: Unable to find backup folder")
-            return
-        emb = self.bot.cogs["EmbedCog"].Embed(desc='**Translations files backup** completed in {}s'.format(round(time.time()-t,3)),color=10197915).update_timestamp().set_author(self.bot.user)
-        await self.bot.cogs["EmbedCog"].send([emb],url="loop")
-    
-            
-
-    async def partners_loop(self):
-        """Update partners channels (every 7 hours)"""
-        t = time.time()
-        self.partner_last_check = datetime.datetime.now()
-        channels_list = await self.bot.cogs['ServerCog'].get_server(criters=["`partner_channel`<>''"],columns=['ID','partner_channel','partner_color'])
-        self.bot.log.info("[Partners] Rafraîchissement des salons ({} serveurs prévus)...".format(len(channels_list)))
-        count = [0,0]
-        for guild in channels_list:
-            try:
-                chan = guild['partner_channel'].split(';')[0]
-                if not chan.isnumeric():
-                    continue
-                chan = self.bot.get_channel(int(chan))
-                if chan==None:
-                    continue
-                count[0] += 1
-                count[1] += await self.bot.cogs['PartnersCog'].update_partners(chan,guild['partner_color'])
-            except Exception as e:
-                await self.bot.cogs['ErrorsCog'].on_error(e,None)
-        emb = self.bot.cogs["EmbedCog"].Embed(desc='**Partners channels updated** in {}s ({} channels - {} partners)'.format(round(time.time()-t,3),count[0],count[1]),color=10949630).update_timestamp().set_author(self.bot.user)
-        await self.bot.cogs["EmbedCog"].send([emb],url="loop")
-        
-            
 
     async def send_mee6_stats(self):
         """temporary log to see how many mee6api requests have been done"""
@@ -587,25 +475,24 @@ class Events(commands.Cog):
         emb.update_timestamp().set_author(self.bot.user)
         await self.bot.cogs["EmbedCog"].send([emb],url="loop")
         self.mee6_stats_last = datetime.datetime.now()
+    
 
-    async def partners_loop(self):
-        """Update partners channels (every 7 hours)"""
-        t = time.time()
-        self.partner_last_check = datetime.datetime.now()
-        channels_list = await self.bot.cogs['ServerCog'].get_server(criters=["`partner_channel`<>''"],columns=['ID','partner_channel','partner_color'])
-        self.bot.log.info("[Partners] Rafraîchissement des salons ({} serveurs prévus)...".format(len(channels_list)))
-        count = [0,0]
-        for guild in channels_list:
-            chan = guild['partner_channel'].split(';')[0]
-            if not chan.isnumeric():
-                continue
-            chan = self.bot.get_channel(int(chan))
-            if chan==None:
-                continue
-            count[0] += 1
-            count[1] += await self.bot.cogs['PartnersCog'].update_partners(chan,guild['partner_color'])
-        emb = self.bot.cogs["EmbedCog"].Embed(desc='**Partners channels updated** in {}s ({} channels - {} partners)'.format(round(time.time()-t,3),count[0],count[1]),color=10949630).update_timestamp().set_author(self.bot.user)
-        await self.bot.cogs["EmbedCog"].send([emb],url="loop")
+    async def send_sql_statslogs(self):
+        "Send some stats about the current bot stats"
+        cnx = self.bot.cnx_frm
+        cursor = cnx.cursor()
+        query = ("INSERT INTO `log_stats` (`time`, `servers_count`, `members_count`, `bots_count`, `dapi_heartbeat`, `codelines_count`, `earned_xp_total`, `beta`) VALUES (CURRENT_TIMESTAMP, '{server_count}', '{members_count}', '{bots_count}', '{ping}', '{codelines}', '{xp}', '{beta}')".format(
+            server_count = len(self.bot.guilds),
+            members_count = len(self.bot.users),
+            bots_count = len([1 for x in self.bot.users if x.bot]),
+            ping = self.bot.latency,
+            codelines = self.bot.cogs["InfoCog"].codelines,
+            xp = await self.bot.cogs['XPCog'].bdd_total_xp(),
+            beta = 1 if self.bot.beta else 0
+        ))
+        cursor.execute(query)
+        cnx.commit()
+        cursor.close()
         
 
 def setup(bot):

@@ -219,16 +219,16 @@ class PartnersCog(commands.Cog):
                                 pass
 
 
-
     @commands.group(name="partner",aliases=['partners'])
     @commands.guild_only()
+    @commands.check(checks.database_connected)
     async def partner_main(self,ctx):
         """Manage the partners of your server"""
         if ctx.subcommand_passed==None:
             await self.bot.cogs['HelpCog'].help_command(ctx,['partner'])
 
     @partner_main.command(name='add')
-    @commands.check(checks.has_admin)
+    @commands.check(checks.database_connected)
     async def partner_add(self,ctx,invite:args.Invite,*,description=''):
         """Add a partner in your llist"""
         if isinstance(invite,int):
@@ -256,7 +256,7 @@ class PartnersCog(commands.Cog):
         await ctx.send(await self.translate(ctx.guild.id,'partners','added-partner'))
     
     @partner_main.command(name='description',aliases=['desc'])
-    @commands.check(checks.has_admin)
+    @commands.check(checks.database_connected)
     async def partner_desc(self,ctx,ID:int,*,description:str):
         """Add or modify a description for a partner"""
         l = await self.bdd_get_partner(ID,ctx.guild.id)

@@ -2,10 +2,10 @@
     "info": ["about","admins","changelog","discordlinks","docs","help","info","markdown","membercount","ping","prefix","rss","stats","tip"],
     "moderation": ["backup","ban","banlist","cases","clear","kick","mute","set_xp","slowmode","softban","unban","unhoist","unmute","verify","warn"],    
     "server-settings": ["config","emoji","partner","pin","role","roles_react","roles_rewards","welcome"],    
-    "users-info": ["perms","profile","rank","top"],
+    "users-info": ["perms","profile","rank","top","usernames"],
     "other": ["book","camlink","embed","emoji","mc","mojang","react"],
-    "fun": ["afk","arapproved","bitly","cookie","crab","fun","hour","say","unafk","vote","weather"],
-    "translators": ["tr-file", "tr-reload-todo", "tr-status","translate","tr-edit","tr-loop"],
+    "fun": ["afk","arapproved","bitly","cookie","tic-tac-toe","fun","hour","say","unafk","vote","weather"],
+    "translators": ["tr-file", "tr-reload-todo", "tr-status","translate","tr-edit","tr-loop","tr-merge"],
     "staff": ["add_cog","admin","bug","del_cog","eval","execute","find","idea","msg","rss_loop","spoil","test"],
     "unclassed": []
 }
