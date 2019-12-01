@@ -39,16 +39,17 @@ class BotEventsCog(commands.Cog):
         events_desc = await self.translate(ctx.channel,"bot_events","events-desc")
         current_event = str(self.bot.current_event) + "-" + str(datetime.datetime.today().year)
         if current_event in events_desc.keys():
+            # Title
             try:
                 title = (await self.translate(ctx.channel,"bot_events","events-title"))[current_event]
             except:
                 title = self.current_event
-            if ctx.guild==None or ctx.channel.permissions_for(ctx.guild.me).embed_links:
-                nice_date = self.bot.cogs["TimeCog"].date
-                # Begin/End dates
-                lang = await self.translate(ctx.channel,"current_lang","current")
-                begin = await nice_date(self.current_event_data["begin"],lang,year=True,digital=True,hour=False)
-                end = await nice_date(self.current_event_data["end"],lang,year=True,digital=True,hour=False)
+            # Begin/End dates
+            nice_date = self.bot.cogs["TimeCog"].date
+            lang = await self.translate(ctx.channel,"current_lang","current")
+            begin = await nice_date(self.current_event_data["begin"],lang,year=True,digital=True,hour=False)
+            end = await nice_date(self.current_event_data["end"],lang,year=True,digital=True,hour=False)
+            if ctx.guild==None or ctx.channel.permissions_for(ctx.guild.me).embed_links:    
                 fields = [
                     {"name": (await self.translate(ctx.channel,"keywords","beginning")).capitalize(), 
                     "value": begin,
@@ -68,7 +69,9 @@ class BotEventsCog(commands.Cog):
                 #e = discord.Embed().from_dict(emb.to_dict())
                 await ctx.send(embed=emb)
             else:
-                txt = f"**{title}**:\n\n{events_desc[current_event]}"
+                txt = f"**{title}**\n\n{events_desc[current_event]}"
+                txt += "\n\n__{}:__ {}".format((await self.translate(ctx.channel,"keywords","beginning")).capitalize(),begin)
+                txt += "\n__{}:__ {}".format((await self.translate(ctx.channel,"keywords","end")).capitalize(),end)
                 await ctx.send(txt)
         else:
             await ctx.send(events_desc["nothing"])
