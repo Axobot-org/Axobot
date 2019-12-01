@@ -236,6 +236,7 @@
         "count-4": "On the last {limit} messages, {user} have posted {x} messages ({p}%)",
         "count-5": "Et voi käyttää tätä komentoa kanavalla jolla sinulla ei ole oikeuksia katsoa viesti historiaa",
         "embed-error": "Virhe havaittu: `{}`",
+        "embed-invalid-image": "Url linkki joka pitäisi olla kuva linkki, on pätemätön",
         "fun-list": "Tässä on lista kaikista käytettävistä hauska komentoista:",
         "invalid-city": "Pätemätön kaupunki :confused:",
         "markdown": "__**Markdown Rules** on *Discord*__\n\n`*italics*` = *italics*\n`__underline__` = __underline__\n`**bold**` = **bold**\n`***bold italics***` = ***bold italics***\n`~~strikeout~~` = ~~strikeout~~\n`__*underline italics*__` = __*underline italics*__\n`__**underline bold**__` = __**underline bold**__\n`__***underline bold italics***__` = __***underline bold italics***__\n`||spoiler||` = ||spoiler||\n> quote = `> quote`\n\\`code\\` = `code`\n\\ to ignore\n\nFor code blocks, cf <https://discord.gg/DGahTNn>",
@@ -318,7 +319,8 @@
         "docs": "Tässä on linkki botin dokumenttiin:",
         "prefix": "Lista kaikista käytettävissä olevista etuliitoista:",
         "stats": "**Bot versio:** {bot_v} \n**Kaikkien palvelimien numero missä olen:** {s_count} \n**Numero kaikista näkyvistä jäsenistä:** {m_count} ({b_count} **botit**)\n**Numero koodi riveistä:** {l_count}\n**Käytettyjä kieliä:** {lang}\n** {p_v} \n**Versio `discord.py`stä:** {d_v} \n**Ladataan RAMia:** {ram} GB \n**Ladataan CPU:ssa:** {cpu} % \n**API viive aika:** {api} ms\n**Kaikki xp kerätty:** {xp}",
-        "stats-title": "**Bot tilastot**"
+        "stats-title": "**Bot tilastot**",
+        "text-0": "Moi! Olen {0} !\nOlen botti joka antaa sinun tehdä monia asioita: valvontaa, xp järjestelmää, tilastoja, yhteistyö hallintaa ja paljon mahtavia komentoja!\nVoit nähdä käytössä olevat komennot lähettämällä `!help` tälke kanavalle, sitten `!config see` antaa sinun nähdä konfigurointi vaihtoehdot.\n\nMinä ja minun omistaja haluaisimme kiittää Awhikax:ia tuen antamiseen monien kriisien jälkeen, Aragorn1202 kaikista hänen ideoistaan ja sanonnoista täynnä positiivista, Adri526 kaikista mahtavan hienoista logoista, emojeista ja profiili kuvista, ja koko kääntäjätiimiä heidän jatkuvasta työstä!\n\n🌐 Linkkejä jotka voivat olla avuksi: \n▶ Minun Discord palvelimeni : http://discord.gg/N55zY88\n▶ Linkki kutsua minut toiseen palvelimeen : <https://zrunner.me/invitezbot>\n▶ Botin dokumentaatio (ei käännetty) : <https://zbot.rtfd.io/>\n▶ Minun tekijän Twitter käyttäjä : <https://twitter.com/z_runnerr>\n\nHyvää päivän jatkoa!"
     },
     "infos_2": {
         "fish-1": "Numero kaloista",
@@ -689,12 +691,14 @@
             "mention_everyone": "Mainitsea kaikki",
             "move_members": "Siirrä jäseniä",
             "mute_members": "Mykistää jäseniä",
+            "priority_speaker": "Ensisijainen puhuja",
             "read_message_history": "Lukea viestihistoriaa",
             "read_messages": "Lukea viestejä",
             "send_messages": "Lähettää viestejä",
             "send_tts_messages": "Lähettää tekstistä puheeksi viestejä",
             "speak": "Puhua",
             "stream": "Suoratoistaa",
+            "use_voice_activation": "Käyttää puheentunnistusta",
             "view_audit_log": "Katsoa valvontalokia"
         }
     },
@@ -753,6 +757,7 @@
         "twitch": "Twitch",
         "twitch-default-flow": "{logo}  | Uusi striimi käyttäjältä {author}! ({date})\n\n{title}\n\nLinkki: {link}\n\n{mentions}",
         "twitch-form-last": "{logo}  | Tässä on viimeisin video käyttäjältä {author}:\n{title}\nJulkaistu {date}\nLinkki : {url}",
+        "use_embed-same": "Upotettujen linkkejen käyttöön tälle virtaukselle ei ole vaihettu",
         "use_embed-success": "Ominaisuus on vaihdettu tähän: {v} virralle n°{f}!",
         "use_embed_false": "Tämä lähetys ei käytä upotettua linkkiä lähettämiseen. Haluatko käyttää upotettua linkkiä? (true/false)",
         "use_embed_true": "Tämä lähetys ei käytä upotettua linkkiä lähettämiseen. Haluatko käyttää upotettua linkkiä? (true/false)",
