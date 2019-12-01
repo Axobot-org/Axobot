@@ -44,6 +44,8 @@ class Events(commands.Cog):
     @commands.Cog.listener()
     async def on_ready(self):
         self.translate = self.bot.cogs["LangCog"].tr
+        if self.bot.database_online:
+            await self.send_sql_statslogs()
 
 
     @commands.Cog.listener()
@@ -98,6 +100,8 @@ class Events(commands.Cog):
                 desc = "Bot **left the server** {} ({}) - {} users".format(guild.name,guild.id,len(guild.members))
             emb = self.bot.cogs["EmbedCog"].Embed(desc=desc,color=self.embed_colors['welcome']).update_timestamp().set_author(self.bot.user)
             await self.bot.cogs["EmbedCog"].send([emb])
+            if self.bot.database_online:
+                await self.send_sql_statslogs()
         except Exception as e:
             await self.bot.cogs["ErrorsCog"].on_error(e,None)
 
@@ -471,6 +475,24 @@ class Events(commands.Cog):
         emb.update_timestamp().set_author(self.bot.user)
         await self.bot.cogs["EmbedCog"].send([emb],url="loop")
         self.mee6_stats_last = datetime.datetime.now()
+    
+
+    async def send_sql_statslogs(self):
+        "Send some stats about the current bot stats"
+        cnx = self.bot.cnx_frm
+        cursor = cnx.cursor()
+        query = ("INSERT INTO `log_stats` (`time`, `servers_count`, `members_count`, `bots_count`, `dapi_heartbeat`, `codelines_count`, `earned_xp_total`, `beta`) VALUES (CURRENT_TIMESTAMP, '{server_count}', '{members_count}', '{bots_count}', '{ping}', '{codelines}', '{xp}', '{beta}')".format(
+            server_count = len(self.bot.guilds),
+            members_count = len(self.bot.users),
+            bots_count = len([1 for x in self.bot.users if x.bot]),
+            ping = self.bot.latency,
+            codelines = self.bot.cogs["InfoCog"].codelines,
+            xp = await self.bot.cogs['XPCog'].bdd_total_xp(),
+            beta = 1 if self.bot.beta else 0
+        ))
+        cursor.execute(query)
+        cnx.commit()
+        cursor.close()
         
 
 def setup(bot):
