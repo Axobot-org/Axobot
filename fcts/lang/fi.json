@@ -154,6 +154,13 @@
         "create_title": "Blurplefier - tekee sinun kuvasta blurplen!",
         "won-card": "Vau! Tosi hieno blurple kuva {}! Niin hieno että päätin antaa sinulle blurple xp kortin! Voit käyttää sitä lähettämällä komennon `{}profile card blurple` {}"
     },
+    "bot_events": {
+        "events-desc": {
+            "christmas-2019": "Juhli joulun tuloa tällä tapahtumalla! Ristinolla pelillä aikoo olla talven värejä, Zbot saa mahtavan profiili kuvan ja muita hienoja juttuja.\n\nHanki tapahtuma pisteitä ja yritä voittaa vuoden 2019 Erikois Joulu xp kortti! Muista: xp kortit löytyy komennolla `profile card`",
+            "nothing": "Tällä hetkellä ei ole tapahtumia. Seuraa botin uutisia jotta tiedät milloin on seuraava tapahtuma!"
+        },
+        "events-price-title": "Palkintoja joita voi voittaa"
+    },
     "bvn": {
         "aide": "__**Tervetuloa liittymis & lähtö viesti moduuliin**__\nTätä moduulia käytetään konfiguroimaan automaattinen viesti joka kerta kun joku tulee tai lähtee servultasi.\n__** Konfiguraatio**__\n`1-` Jotta voit konfiguroida mihin nämä viestit lähetetään, viestitä `{p}config change welcome_channel` lisättynä kanava.\n`2-` Jotta voit konfiguroida viestin, kirjoita  `{p}config change <welcome|leave> <message>`. Tälle viestille voit käyttää variableja:\n - `{user}` Tägää käyttäjän\n - `{server}` näyttää serverin nimen\n - `{owner}` näyttää serverin omistajan nimen\n- `{member_count}` näyttää tämänhetkisen käyttäjämäärän",
         "error-give-roles": "Mahdotonta antaa rooli '{r}' uudelle jäsenelle {u}: ei tarpeeksi käyttöoikeuksia Varmista että minulla on 'Hallinnoi Rooleja' käyttöoikeudet ja että minun rooli on annettavan roolin yläpuolella"
