@@ -119,7 +119,7 @@ class TranslatorsCog(commands.Cog):
     async def ask_a_translation(self,ctx:commands.Context,lang:str,isloop:bool=False):
         key = self.todo[lang][0]
         value = self.translations['en'].__getitem__(key)
-        await ctx.send("```\n"+value+"\n```")
+        await ctx.send("```\n"+str(value)+"\n```")
         await ctx.send(f"How would you translate it in {lang}?\n\n  *Key: {key}*\nType 'pass' to choose another one")
         try:
             func = lambda msg: (msg.author.id==ctx.author.id or (msg.author.id in [279568324260528128,281404141841022976,552273019020771358] and msg.content.lower()=='stop' and isloop)) and msg.channel.id==ctx.channel.id and (not msg.content.startswith(ctx.prefix))
