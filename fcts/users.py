@@ -40,7 +40,7 @@ class UsersCog(commands.Cog):
                 style = await self.bot.cogs['UtilitiesCog'].get_xp_style(ctx.author)
                 txts = [await self.translate(ctx.channel,'xp','card-level'), await self.translate(ctx.channel,'xp','card-rank')]
                 desc = await self.translate(ctx.channel,'users','card-desc')
-                await ctx.send(desc,file=await self.bot.cogs['XPCog'].create_card(ctx.author,style,25,[1,0],txts,force_static=True))
+                await ctx.send(desc,file=await self.bot.cogs['XPCog'].create_card(ctx.author,style,25,0,[1,0],txts,force_static=True))
             else:
                 await ctx.send(await self.translate(ctx.channel,'users','missing-attach-files'))
         else:

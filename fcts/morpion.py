@@ -155,7 +155,7 @@ Use 'tic-tac-toe leave' to make you leave the game if you're stuck in it.
                     resultat = await self.translate(ctx.channel,'morpion','win-2')
                 else: # L'utilisateur a gagné
                     resultat = await self.translate(ctx.channel,'morpion','win-1')
-                    await self.bot.cogs["UtilitiesCog"].add_user_eventPoint(ctx.author.id,5)
+                    await self.bot.cogs["UtilitiesCog"].add_user_eventPoint(ctx.author.id,4)
             await ctx.send(await self.afficher_grille(grille)+'\n'+resultat.format(ctx.author.mention))
             self.in_game.pop(ctx.author.id,None)
         except Exception as e:

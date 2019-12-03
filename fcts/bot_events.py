@@ -105,7 +105,7 @@ class BotEventsCog(commands.Cog):
             emojis = self.bot.cogs["EmojiCog"].customEmojis["green_check"], self.bot.cogs["EmojiCog"].customEmojis["red_cross"]
             p = list()
             for k,v in prices[current_event].items():
-                emoji = emojis[0] if int(k)<points else emojis[1]
+                emoji = emojis[0] if int(k)<=points else emojis[1]
                 p.append(f"{emoji}{min(points,int(k))}/{k}: {v}")
             prices = "\n".join(p)
             objectives_title = await self.translate(ctx.channel,"bot_events","objectives")
