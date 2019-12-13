@@ -123,7 +123,7 @@ class InfoCog(commands.Cog):
 
     def get_users_nber(self,ignored_guilds):
         members = [x.members for x in self.bot.guilds if x.id not in ignored_guilds]
-        members = [x for x in members for x in x]
+        members = list(set([x for x in members for x in x])) # filter users
         return len(members),len([x for x in members if x.bot])
 
 
