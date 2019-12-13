@@ -24,6 +24,7 @@ class UtilitiesCog(commands.Cog):
         config_list = await self.bot.cogs['ServerCog'].get_bot_infos(self.bot.user.id)
         if len(config_list)>0:
             self.config = config_list[0]
+            self.config.pop('token',None)
             return self.config
         return None
 
