@@ -837,7 +837,7 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
         can_embed = True if isinstance(ctx.channel,discord.DMChannel) else ctx.channel.permissions_for(ctx.guild.me).embed_links
         if can_embed:
             l = await self.translate(ctx.channel,'infos','discordlinks')
-            links = ["https://dis.gd/status","https://dis.gd/tos","https://dis.gd/report","https://dis.gd/feedback","https://support.discordapp.com/hc/articles/115002192352","https://discordapp.com/developers/docs/legal"]
+            links = ["https://dis.gd/status","https://dis.gd/tos","https://dis.gd/report","https://dis.gd/feedback","https://support.discordapp.com/hc/articles/115002192352","https://discordapp.com/developers/docs/legal","https://support.discordapp.com/hc/en-us/articles/206346498-Where-can-I-find-my-User-Server-Message-ID-"]
             txt = "\n".join(['['+l[i]+']('+links[i]+')' for i in range(len(l))])
             em = self.bot.cogs["EmbedCog"].Embed(desc=txt).update_timestamp().create_footer(ctx.author)
             await ctx.send(embed=em)
