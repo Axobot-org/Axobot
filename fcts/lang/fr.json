@@ -159,15 +159,6 @@
         "won-card": "Wow! Magnifique image blurple {}! tellement beau que j'ai décidé de t'offrir la carte d'xp blurple, je suis sûr qu'elles iront bien ensemble ! Tu peux l'utiliser en tapant la commande `{}profile card blurple` {}"
     },
     "bot_events": {
-        "unclassed": "Non classé",
-        "points": "points",
-        "rank-title": "Points d'événement",
-        "rank-global": "Classement mondial",
-        "objectives": "Objectifs",
-        "rank-total": "Total des points",
-        "events-title": {
-            "christmas-2019": "Noël en approche !"
-        },
         "events-desc": {
             "christmas-2019": "Fêtez l'arrivée de Noël grâce à cet événement ! Pendant plusieurs jours, Zbot se pare des couleurs de l'hiver avec des émojis spéciaux pour le jeu du morpion, un avatar unique ainsi que d'autres choses trop cool. \n\nProfitez-en pour récupérer des points d'événements et tentez de gagner la carte d'xp spécial Noël 2019 ! Pour rappel, les cartes d'xp sont accessibles via ma commande `profile card`",
             "nothing": "Il n'y a actuellement aucun événement. Suivez les news du bot pour connaître la date du prochain !"
@@ -178,7 +169,16 @@
                 "50": "Débloquez la carte d'xp spécial Noël 2019 !"
             },
             "nothing": "Il n'y a rien à gagner pour cet événement :confused:"
-        }
+        },
+        "events-title": {
+            "christmas-2019": "Noël en approche !"
+        },
+        "objectives": "Objectifs",
+        "points": "points",
+        "rank-global": "Classement mondial",
+        "rank-title": "Points d'événement",
+        "rank-total": "Total des points",
+        "unclassed": "Non classé"
     },
     "bvn": {
         "aide": "__**Bienvenue dans le module des message de join et de leave**__\n\nCe module vous sert à configurer un message automatique à chaque fois qu'un membre rentre ou sort de votre serveur.\n\n__**La configuration**__\n\n`1-` Pour configurer le salon où ces messages s'écrivent, entrez `{p}config change welcome_channel` suivi du salon (vous pouvez utiliser aussi bien sa mention que son identifiant ou son nom complet).\n`2-` Pour configurer un message, entrez `{p}config change <welcome|leave> <message>`. Pour ce message vous pouvez utiliser les variables suivantes :\n - `{user}` mentionne le membre\n - `{server}` affiche le nom du serveur\n - `{owner}` affiche le nom du propriétaire du serveur\n - `{member_count}` affiche le nombre actuel de membres\n - `{type}` retourne 'bot' si le membre est un bot, 'membre' sinon\n",
@@ -340,20 +340,21 @@
             "Rapporter un bug ou un utilisateur",
             "Proposer une idée à Discord",
             "Explication des selfbots",
-            "CGU pour les développeurs de bot"
+            "CGU pour les développeurs de bot",
+            "Comment trouver un ID"
         ],
         "docs": "Voici le lien vers la documentation du bot :",
         "prefix": "Liste des préfixes actuellement utilisables :",
         "stats": "**Version du bot :** {bot_v} \n**Nombre de serveurs :** {s_count} \n**Nombre de membres visibles :** {m_count} (dont {b_count} **bots**)\n**Nombre de lignes de code :** {l_count}\n**Langues utilisées :** {lang} \n**Version de Python :** {p_v} \n**Version de la bibliothèque `discord.py` :** {d_v} \n**Charge sur la mémoire vive :** {ram} GB \n**Charge sur le CPU :** {cpu} % \n**Temps de latence de l'api :** {api} ms\n**Nombre total d'xp gagné :** {xp}xp",
         "stats-title": "**Statistiques du bot**",
         "text-0": "Bonjour ! Moi c'est {0} !\n\nJe suis un bot qui permet de faire *beaucoup* de choses : de la modération, un système d'xp, des statistiques, la gestion de partenaires et plein d'autres commandes plus ou moins utiles ! \nVous pouvez commencer par taper `!help` dans ce tchat pour voir la liste des commandes disponibles, puis `!config see` vous permettra de voir les options de configuration (un site web est en préparation). \n\nPour m'avoir aidé dans la création du bot, mon propriétaire et moi souhaitons remercier Awhikax pour son soutien apporté lors des différentes crises, Aragorn1202 pour toutes ses idées et ses phrases pleines de bon sens, Adri526 pour tous ces magnifiques logos, émojis et images de profil, et toute l'équipe de traducteurs poour leur merveilleux travail !\n\n:globe_with_meridians: Quelques liens pourront vous être utiles : \n:arrow_forward: Mon serveur Discord : http://discord.gg/N55zY88\n:arrow_forward: Un lien pour m'inviter dans un autre serveur : <https://zrunner.me/invitezbot>\n:arrow_forward: La documentation du bot : <https://zbot.rtfd.io/>\n:arrow_forward: Le compte Twitter de mon créateur : <https://twitter.com/z_runnerr>\n\nBonne journée !",
-        "usernames-title": "Pseudos de **{u}**",
-        "usernames-global": "Historique général",
-        "usernames-local": "Historique du serveur",
-        "usernames-last-date": "Dernier changement",
-        "usernames-empty": "Aucun changement enregistré",
+        "usernames-allow": "Vous pouvez réautoriser l'enregistrement automatique via la commande 'profile'",
         "usernames-disallow": "Vous pouvez vous retirer de l'enregistrement automatique via la commande 'profile'",
-        "usernames-allow": "Vous pouvez réautoriser l'enregistrement automatique via la commande 'profile'"
+        "usernames-empty": "Aucun changement enregistré",
+        "usernames-global": "Historique général",
+        "usernames-last-date": "Dernier changement",
+        "usernames-local": "Historique du serveur",
+        "usernames-title": "Pseudos de **{u}**"
     },
     "infos_2": {
         "fish-1": "Nombre de poissons trouvés",
@@ -365,13 +366,13 @@
     "keywords": {
         "added_at": "Ajouté le",
         "aucune": "aucune",
+        "beginning": "début",
         "bot": "bot",
         "category": "catégorie",
         "click_here": "Cliquez ici",
         "depuis": "depuis",
-        "beginning": "début",
-        "end": "fin",
         "dnd": "ne pas déranger",
+        "end": "fin",
         "extreme": "extrême",
         "ghost": "Fantôme",
         "high": "élevé",
@@ -772,8 +773,8 @@
         "invalid-flow": "Cet url est invalide (flux rss vide ou inaccessible) :confused:",
         "invalid-link": "Oups, cette adresse url est invalide ou incomplète :confused:",
         "list": "*Entrez le numéro du flux à modifier*\n\n**Lien - Type - Salon - Roles**\n",
-        "list2": "*Entrez le numéro du flux à supprimer*\n\n**Lien - Type - Salon**\n",
         "list-result": "Type : {}\nSalon : {}\nLien/chaine : {}\nRôle mentionné : {}\nIdentifiant : {}\nDernier post : {}",
+        "list2": "*Entrez le numéro du flux à supprimer*\n\n**Lien - Type - Salon**\n",
         "mc": "Minecraft",
         "move-success": "Le flux rss n°{} a bien été bougé dans le salon {} !",
         "no-db": "La base de donnée étant actuellement hors ligne, cette fonctionnalité est temporairement désactivée :confused:",
@@ -914,6 +915,20 @@
         "guild-7": "{} dont {} bots ({} connectés)",
         "guild-8": "Authentification à deux facteurs",
         "guild-9": "Niveau de sécurité",
+        "guild-features": {
+            "ANIMATED_ICON": "Icône de serveur animée",
+            "BANNER": "Bannière de serveur custom",
+            "COMMERCE": "Fonctionnalités de commerce",
+            "DISCOVERABLE": "Affiché dans l'onglet Découverte",
+            "FEATURABLE": "Affiché dans l'onglet Activité",
+            "INVITE_SPLASH": "Fond d'écran d'invitation",
+            "NEWS": "Salons de news",
+            "PARTNERED": "Serveur partenaire",
+            "PUBLIC": "Serveur public",
+            "VANITY_URL": "Invitation custom",
+            "VERIFIED": "Serveur vérifié",
+            "VIP_REGIONS": "Régions VIP"
+        },
         "inv-0": "Adresse url",
         "inv-1": "Créateur",
         "inv-2": "Utilisations",
@@ -923,20 +938,6 @@
         "inv-7": "Nombre de membres approximatif",
         "inv-8": "Decription du serveur",
         "inv-9": "Options du serveur",
-        "guild-features": {
-            "INVITE_SPLASH": "Fond d'écran d'invitation",
-            "VIP_REGIONS": "Régions VIP",
-            "VANITY_URL": "Invitation custom",
-            "VERIFIED": "Serveur vérifié",
-            "PARTNERED": "Serveur partenaire",
-            "PUBLIC": "Serveur public",
-            "COMMERCE": "Fonctionnalités de commerce",
-            "NEWS": "Salons de news",
-            "DISCOVERABLE": "Affiché dans l'onglet Découverte",
-            "FEATURABLE": "Affiché dans l'onglet Activité",
-            "ANIMATED_ICON": "Icône de serveur animée",
-            "BANNER": "Bannière de serveur custom"
-        },
         "member-0": "Surnom",
         "member-1": "Créé le",
         "member-2": "A rejoint le",
@@ -964,18 +965,18 @@
     },
     "users": {
         "animated_card_false": "Vous n'utilisez actuellement pas de carte animée",
-        "config_success": "L'option {opt} a bien été modifiée!",
         "animated_card_true": "Les cartes d'xp animées pourront être utilisée pour vous (rendu plus lent)",
         "auto_unafk_false": "Vous devez enlever le tag AFK vous-même",
         "auto_unafk_true": "Je vous enlèverai le tag AFK dès que vous enverrez un message",
-        "usernames_log_false": "Vous avez désactivé l'enregistrement de vos noms d'utilisateurs ainsi que de vos surnoms",
-        "usernames_log_true": "Vous avez autorisé l'enregistrement de vos noms d'utilisateurs ainsi que de vos surnoms",
         "card-desc": "Voici un exemple de votre carte d'xp. Vous pouvez entrer la commande `profile card <style>` pour changer le style\n*Votre carte d'xp ne se réactualisera que lorsque vous aurez gagné de l'xp*",
         "changed-0": "Votre carte d'xp utilise maintenant le style {}",
         "changed-1": "Oups, une erreur interne est survenue pendant le traitement de la requête. Réessayez plus tard ou contactez le support.",
+        "config_success": "L'option {opt} a bien été modifiée!",
         "invalid-card": "Ce style est invalide. Voici la liste des styles que vous pouvez utiliser : {}",
         "list-cards": "Voici la liste des styles que vous pouvez utiliser : {}",
-        "missing-attach-files": "Oups, il me manque la permission d'Attacher des Fichiers :confused:"
+        "missing-attach-files": "Oups, il me manque la permission d'Attacher des Fichiers :confused:",
+        "usernames_log_false": "Vous avez désactivé l'enregistrement de vos noms d'utilisateurs ainsi que de vos surnoms",
+        "usernames_log_true": "Vous avez autorisé l'enregistrement de vos noms d'utilisateurs ainsi que de vos surnoms"
     },
     "xp": {
         "1-no-xp": "Vous ne possédez pas encore d'xp !",

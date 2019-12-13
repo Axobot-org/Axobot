@@ -158,6 +158,28 @@
         "create_title": "Blurplefier - makes your img blurple!",
         "won-card": "WeeeeW very nice blurple pfp {}! so beauty-full that I decided to give U the card of xp blurple! You can use it by typing teh command `{}profile card blurple` {}"
     },
+    "bot_events": {
+        "events-desc": {
+            "christmas-2019": "Celebrate the arrival of Christmas with this event! For several days, Zbot wears the colours of winter with special emojis for the tic-tac-toe game, a unique avatar and other cool things. \n\nTake the opportunity to collect event points and try to win the 2019 Christmas special xp card! Reminder: xp cards are accessible via my `profile card` command",
+            "nothing": "There'r no events rn. Follow my bot news 2 know teh date of the next one!"
+        },
+        "events-price-title": "Prizes 2 win",
+        "events-prices": {
+            "christmas-2019": {
+                "50": "Unlock da special Christmas 2019!"
+            },
+            "nothing": "There's no thing 2 gain 4 this event :confused:"
+        },
+        "events-title": {
+            "christmas-2019": "Christmas iz cming!"
+        },
+        "objectives": "Objectives",
+        "points": "pts",
+        "rank-global": "Glob. rank",
+        "rank-title": "Event pts",
+        "rank-total": "Total pts",
+        "unclassed": "unclassd"
+    },
     "bvn": {
         "aide": "__**Wilcom 2 teh join end leef mesg modul**__\n\nDis modul is usd 2 configur a' automatic mesage each tiem membr enters or exits ur servr.\n\n__** ConfiGrationZ**__\n\n`1-` To configur teh channel wer thees mesagez 're writtn, entr `{p}config change welcome_channel` followd by teh channl ID (U can use it # as wellas its iD or its full nice name).\n`2-` To configure a msg, entr `{p}config change <welcome|leave> <message>`. 4 dis mesage u can uz somm variabl':\n - `{user}` mentionz teh member\n - `{server}` displayz the servr nayme\n - `{owner}` displayz teh servr ownr nam\n - `{member_count}` showz the curent nbr oof memberz\n - `{type}` show theh type of the user (bot/member)\n",
         "error-give-roles": "Srry I wasn't abl 2 give role '{r}' to new cat `{u}`. Pls check hierarchy and 'Manage roles' perms :sad:"
@@ -318,20 +340,21 @@
             "Report a bug/user",
             "Suggest something to Discord",
             "Selfbots article",
-            "ToS for bot devs"
+            "ToS for bot devs",
+            "How 2 find 1 ID"
         ],
         "docs": "Her'z teh link 2 the bot doc:",
         "prefix": "List ov usable prefiXs:",
         "stats": "**Baut vershun:** {bot_v} \n**Nbr ov serverz:** {s_count} \n**Nbr ov visible memberz:** {m_count} ({b_count} **robots**)\n**Nbr ov code lin:** {l_count}\n**Uzd languages:** {lang}\n**Python vershun :** {p_v} \n**Vershun ov teh `discord.py` lyb:** {d_v} \n**Loadin on teh RAM:** {ram} GB \n**Loadin on the CPU:** {cpu} % \n**API latency timz:** {api} ms\n**Nbr of xp won:** {xp}",
         "stats-title": "**Boat statz**",
         "text-0": "Ho hi hello! I'm {0} !\n\nIm a boat that alow you 2 do a loooooot of tings: modration, a' xp systèm, partnre managmnt, stATIstics & many oder super mega *wow* usefull commandz (and totlly pointlesz wanes)! \nU can strt by tipyng `!help` in dis tchat to se the llst for availabl kommands, then `!config see` wil LEtz you see teh configurashun optionz (a website ar in prePARtion)? \n\nOf helpin me in the creetion of the boat, my ownr an I wouLd like to tahnk Awhikax 4 hiz suport durin the variouz cryzes, Aragorn1202 of al her idees and sentencez full for goob sence, Adri526 fr all dese beautifool loGoz, èmojiz nd profil picts, and the whole translators tim 4 they woark!\n\n:globe_with_meridians: Sum linqs can bee usefull: \n:arrow_forward: Me Discord servr plz : http://discord.gg/N55zY88\n:arrow_forward: link to iNVite me to anothr servr : <https://zrunner.me/invitezbot>\n:arrow_forward: The :b:ot documentashun : <https://zbot.rtfd.io/>\n:arrow_forward: My creator's Blue Bird 'ccount : <https://twitter.com/z_runnerr>\n\nHas a nice dayz !",
-        "usernames-title": "**{u}** names story",
-        "usernames-global": "Gen' stori",
-        "usernames-local": "Serv hystori",
-        "usernames-last-date": "Lastetest change",
-        "usernames-empty": ":N:o change savd",
+        "usernames-allow": "U can anti-optout teh auto logs with da cmd 'profile'",
         "usernames-disallow": "U can optout the auto logging with cmd 'profile' (beeew bad guy)",
-        "usernames-allow": "U can anti-optout teh auto logs with da cmd 'profile'"
+        "usernames-empty": ":N:o change savd",
+        "usernames-global": "Gen' stori",
+        "usernames-last-date": "Lastetest change",
+        "usernames-local": "Serv hystori",
+        "usernames-title": "**{u}** names story"
     },
     "infos_2": {
         "fish-1": "Nbr of :fish:",
@@ -343,11 +366,13 @@
     "keywords": {
         "added_at": "Addd at",
         "aucune": "none",
+        "beginning": "beginning",
         "bot": "robot",
         "category": "box",
         "click_here": "BLUE BUTTON TO CLICK",
         "depuis": "sinze",
         "dnd": "donot disturb me",
+        "end": "end",
         "extreme": "Xtrem",
         "ghost": "Goast",
         "high": "high",
@@ -735,8 +760,8 @@
         "choose-delete": "Plz chouse teh flo to delet",
         "choose-mentions-1": "Pleese chose the flow 2 modify",
         "choose-roles": "Which roles should bee piing?",
-        "deviant": "DeviantArt",
         "delete-success": "Teh flow had bein sussellfuccy delet!",
+        "deviant": "DeviantArt",
         "deviant-default-flow": "{logo}  | New draw bye {author} : **{title}**\nDated on {date}\nURL: {link}\n{mentions}",
         "deviant-form-last": "{logo}  | Here is da brand new thing of {author}:\n{title}\nDarwn on {date}\nZelda: {url}",
         "embed-json-changed": "The embed ov feed have been modifed",
@@ -748,8 +773,8 @@
         "invalid-flow": "I can't add dis url (empty or inaccessible rss flew) :confused:",
         "invalid-link": "Oops, dis url ADress is unvalid or outcompletz :confused:",
         "list": "*Tipe teh nbr of the floww 2 modyfi by*\n\n**Zelda - Typez - cHanel - Mentionz**\n",
-        "list2": "*Type teh nmberZ ov the flowz 2 deletz*\n\n**Lnk - Tipe - Chanell**\n",
         "list-result": "Type: {}\nDisc chan: {}\nLink/chan: {}\nPings: {}\nId: {}\nLast thing: {}",
+        "list2": "*Type teh nmberZ ov the flowz 2 deletz*\n\n**Lnk - Tipe - Chanell**\n",
         "mc": "Minekrraft",
         "move-success": "Teh rsss feed #{} haz been movd in the chat {}!",
         "no-db": "As the databaz is auffline, dis feature iz temporarly disabled :confused:",
@@ -890,6 +915,20 @@
         "guild-7": "{} incluwdin {} nice robots ({} connect)",
         "guild-8": "2F authuntificashun",
         "guild-9": "Secure lvl",
+        "guild-features": {
+            "ANIMATED_ICON": "ANIMATED OMEGA COOL OwO server icon",
+            "BANNER": "Custom srv banner",
+            "COMMERCE": "Buy-things features",
+            "DISCOVERABLE": "Showned in the cool Discover tab",
+            "FEATURABLE": "Shownd in da Activity tab",
+            "INVITE_SPLASH": "Inv cstm screen",
+            "NEWS": "News~~paper~~ channel",
+            "PARTNERED": "Partn. serv",
+            "PUBLIC": "Publ. server",
+            "VANITY_URL": "Cstm inv url",
+            "VERIFIED": "Verif. srv",
+            "VIP_REGIONS": "VIP voice reg"
+        },
         "inv-0": "URL lnk",
         "inv-1": "Inviter",
         "inv-2": "Uzz",
@@ -899,20 +938,6 @@
         "inv-7": "Appr. mem. cou.",
         "inv-8": "Serv txt",
         "inv-9": "Serv. kool things",
-        "guild-features": {
-            "INVITE_SPLASH": "Inv cstm screen",
-            "VIP_REGIONS": "VIP voice reg",
-            "VANITY_URL": "Cstm inv url",
-            "VERIFIED": "Verif. srv",
-            "PARTNERED": "Partn. serv",
-            "PUBLIC": "Publ. server",
-            "COMMERCE": "Buy-things features",
-            "NEWS": "News~~paper~~ channel",
-            "DISCOVERABLE": "Showned in the cool Discover tab",
-            "FEATURABLE": "Shownd in da Activity tab",
-            "ANIMATED_ICON": "ANIMATED OMEGA COOL OwO server icon",
-            "BANNER": "Custom srv banner"
-        },
         "member-0": "Lttle nayme",
         "member-1": "Born at",
         "member-2": "New from",
@@ -943,15 +968,15 @@
         "animated_card_true": "Animated xp cards ar naw enabled 4U",
         "auto_unafk_false": "U do ur own job, okay?",
         "auto_unafk_true": "I'll help u, no worries :green_heart:",
-        "config_success": "Dat {opt} option has beez changd!",
-        "usernames_log_false": "U've disallowd the recordering of Ur usr names & nics",
-        "usernames_log_true": "You've enabld the things taht i do with ur usr names & nicks",
         "card-desc": "Here iz example of ur xp card. U can enter teh command `profile card <style>` 2 change the style\n*Ur xp card will only refresh wehn u have won Xp*",
         "changed-0": "Ur xp card naw use the style {}",
         "changed-1": "Oops, a wicked error occurrd during the process ov ur request. Try again later or contact these nice support guys.",
+        "config_success": "Dat {opt} option has beez changd!",
         "invalid-card": "Dat style iz no valid. But yop, her's styles u can use: {}",
         "list-cards": "Her's da list of cards u can use: {}",
-        "missing-attach-files": "Oops, I'm missing the Attach Files perms :upside_down:"
+        "missing-attach-files": "Oops, I'm missing the Attach Files perms :upside_down:",
+        "usernames_log_false": "U've disallowd the recordering of Ur usr names & nics",
+        "usernames_log_true": "You've enabld the things taht i do with ur usr names & nicks"
     },
     "xp": {
         "1-no-xp": "U don't have any xP yet!",

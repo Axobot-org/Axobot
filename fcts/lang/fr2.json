@@ -22,7 +22,6 @@
             "unclassed": "non classé",
             "users-info": "Infos sur les utilisateurs"
         },
-        "checks": "Conditions :",
         "check-desc": {
             "bot_has_permissions": [
                 "C'est bon, j'ai les bonnes perms :wink: !",
@@ -56,13 +55,13 @@
                 "Un de tes rôles peut utiliser cette commande (`slowmode`)",
                 "Tu n'as pas le rôle pour le faire ! (`slowmode`)"
             ],
-            "can_use_cookie": [
-                "Tu es un élu de chez Aragorn1202...",
-                "Cette commande est sur Whitelist uniquement... Et Aragorn ne t'a pas élu ! Au pire, tu peux le MP :wink: !"
-            ],
             "can_use_RSS": [
                 "Tu es admin.",
                 "Désolé mec (ou meuf, jsp), t'as pas la perm pour utiliser la commande (t'es pas admin) !"
+            ],
+            "can_use_cookie": [
+                "Tu es un élu de chez Aragorn1202...",
+                "Cette commande est sur Whitelist uniquement... Et Aragorn ne t'a pas élu ! Au pire, tu peux le MP :wink: !"
             ],
             "can_warn": [
                 "Un de tes rôles peut utiliser cette commande (`warn`)",
@@ -129,6 +128,7 @@
                 "Aucun rôle de vérification n'a été configuré"
             ]
         },
+        "checks": "Conditions :",
         "cmd-not-found": "Aucune commande nommée \"{}\"... Tu as peut-être fait une PhotEuh D'Ortograff ?",
         "embed_title": "Hey ! Voici la liste des commandes disponibles pour {u}",
         "footer": "Entre simplement {}help commande pour plus d'informations sur la fameuse commande",
@@ -136,8 +136,8 @@
         "no-desc-cog": "Aucune description pour ce module.",
         "no-subcmd": "La commande {0.name} n'a aucune sous-commande",
         "not-enabled": ":warning: Cette commande est désactivée ! Ça sert à rien d'essayer !",
-        "subcmds": "Les sous-commandes sont...",
-        "subcmd-not-found": "Cette commande ne possède aucune sous-commande nommée \"{}\"... :thinking: Tu as peut-être fait une PhotEuh D'Ortograff ?"
+        "subcmd-not-found": "Cette commande ne possède aucune sous-commande nommée \"{}\"... :thinking: Tu as peut-être fait une PhotEuh D'Ortograff ?",
+        "subcmds": "Les sous-commandes sont..."
     },
     "blurple": {
         "check_fields": [
@@ -159,15 +159,6 @@
         "won-card": "Wow! Magnifique image blurple {}! tellement beau que j'ai décidé de t'offrir la carte d'xp blurple, je suis sûr qu'elles iront bien ensemble ! Tu peux l'utiliser en tapant la commande `{}profile card blurple` {}"
     },
     "bot_events": {
-        "unclassed": "Pas classé !",
-        "points": "points",
-        "rank-title": "Points de l'événement",
-        "rank-global": "Classement mondial",
-        "objectives": "Objectifs",
-        "rank-total": "Total des points",
-        "events-title": {
-            "christmas-2019": "Noël en approche :snowman2: !"
-        },
         "events-desc": {
             "christmas-2019": "Fête l'arrivée de Noël grâce à cet événement Zbot ! Pendant plusieurs jours, je vais prendre les couleurs de l'hiver avec des émojis spéciaux pour le jeu du morpion, un avatar unique *(le swag)* ainsi que d'autres choses hyper sympas. \n\nProfites-en pour récupérer des points d'événements et tente de gagner la carte d'xp spécial Noël 2019 ! Ah, et oublie pas, les cartes d'xp sont accessibles via ma commande `profile card`.",
             "nothing": "Il n'y a aucun événement en cours :neutral_face:. Suis les news du bot pour connaître la date du prochain !"
@@ -178,7 +169,16 @@
                 "50": "Débloque la carte d'xp Noël 2k19 !"
             },
             "nothing": "Il n'y a rien à gagner pour cet événement :confused:\nFaut qu'on refasse des choses, nous."
-        }
+        },
+        "events-title": {
+            "christmas-2019": "Noël en approche :snowman2: !"
+        },
+        "objectives": "Objectifs",
+        "points": "points",
+        "rank-global": "Classement mondial",
+        "rank-title": "Points de l'événement",
+        "rank-total": "Total des points",
+        "unclassed": "Pas classé !"
     },
     "bvn": {
         "aide": "__**Bienvenue dans le module des message de join et de leave**__\n\nCe module sert à configurer un message automatique à chaque fois qu'un membre rentre ou sort du serv.\n\n__**La config**__\n\n`1-` Pour configurer le salon où ces messages s'écrivent, tape `{p}config change welcome_channel` suivi du salon (tu peux utiliser aussi bien sa mention que son identifiant ou son nom complet).\n`2-` Pour configurer un message, tape `{p}config change <welcome|leave> <message>`. Pour ce message vous pouvez utiliser les variables suivantes :\n - `{user}` mentionne le membre\n - `{server}` affiche le nom du serveur\n - `{owner}` affiche le nom du propriétaire du serveur\n - `{member_count}` affiche le nombre actuel de membres\n - `{type}` retourne 'bot' si le membre est un bot, 'membre' sinon\n",
@@ -331,8 +331,8 @@
         "bitly_long": "URL d'origine : {url}",
         "bitly_nobit": "Cette adresse n'est pas un lien bit.ly !",
         "bitly_short": "URL raccourcie : {url}\nCe sera moins chiant comme ça !",
-        "changelogs-index": "Liste des versions indexées",
         "changelog-notfound": "Impossible de trouver cette version",
+        "changelogs-index": "Liste des versions indexées",
         "discordlinks": [
             "Status des serveurs",
             "CGU de Discord",
@@ -346,13 +346,13 @@
         "stats": "**Version du bot :** {bot_v} \n**Nombre de serveurs :** {s_count} \n**Nombre de membres visibles :** {m_count} (dont {b_count} **bots**)\n**Nombre de lignes de code :** {l_count}\n**Langues utilisées :** {lang} \n**Version de Python :** {p_v} \n**Version de la bibliothèque `discord.py` :** {d_v} \n**Charge sur la mémoire vive :** {ram} GB \n**Charge sur le CPU :** {cpu} % \n**Temps de latence de l'api :** {api} ms\n**Nombre total d'xp gagné :** {xp}xp",
         "stats-title": "**Statistiques du bot**",
         "text-0": "Bonjour ! Moi c'est {0} !\n\nJe suis un bot qui permet de faire *beaucoup* de choses : de la modération, des mini-jeux, un système d'xp, des statistiques et plein d'autres commandes plus ou moins utiles ! \nVous pouvez commencer par taper `!help` dans ce tchat pour voir la liste des commandes disponibles, puis `!config see` vous permettra de voir les options de configuration (un site web est ~~en préparation~~ à deux doigts d'être lancé !). \n\nPour m'avoir aidé dans la création du bot, mon propriétaire et moi souhaitons remercier Awhikax pour son soutien apporté lors des différentes crises, Aragorn1202 pour toutes ses idées et ses phrases pleines de bon sens, Adri526 pour tous ces magnifiques logos, émojis et images de profil, et Pilotnick54 pour relire et corriger mon anglais !\n\n:globe_with_meridians: Quelques liens pourront vous être utiles : \n:arrow_forward: Mon serveur Discord : http://discord.gg/N55zY88\n:arrow_forward: Un lien pour m'inviter dans un autre serveur : <https://zrunner.me/invitezbot>\n:arrow_forward: La documentation du bot : <https://zbot.rtfd.io/>\n:arrow_forward: Le compte Twitter de mon créateur : <https://twitter.com/z_runnerr>\n\nBonne journée !",
-        "usernames-title": "La liste des pseudos de **{u}**",
-        "usernames-global": "Historique général",
-        "usernames-local": "Historique du serveur",
-        "usernames-last-date": "Dernier changement",
-        "usernames-empty": "Aucun changement enregistré :blobconfused:",
+        "usernames-allow": "Tu sais que tu peux te autoriser l'enregistrement automatique via la commande 'profile' ?",
         "usernames-disallow": "Tu sais que tu peux te retirer de l'enregistrement automatique via la commande 'profile' ?",
-        "usernames-allow": "Tu sais que tu peux te autoriser l'enregistrement automatique via la commande 'profile' ?"
+        "usernames-empty": "Aucun changement enregistré :blobconfused:",
+        "usernames-global": "Historique général",
+        "usernames-last-date": "Dernier changement",
+        "usernames-local": "Historique du serveur",
+        "usernames-title": "La liste des pseudos de **{u}**"
     },
     "infos_2": {
         "fish-1": "Nombre de poissons trouvés",
@@ -364,12 +364,12 @@
     "keywords": {
         "added_at": "Ajouté le",
         "aucune": "aucune",
+        "beginning": "début",
         "bot": "bot",
         "category": "catégorie",
         "click_here": "Clique ici !",
         "depuis": "depuis",
         "dnd": "ne pas déranger",
-        "beginning": "début",
         "end": "fin",
         "extreme": "extrême",
         "ghost": "Fantôme",
@@ -561,11 +561,11 @@
         "emoji-renamed": "L'émoji {} a bien été renommé !",
         "emoji-valid": "L'émoji {} a été modifié pour n'autoriser que les rôles `{}`",
         "error": "Oups, une erreur inconnue est survenue. Réessayez plus tard ou contactez le support",
-        "kick": "Le membre {} a bien été expulsé du serveur, avec la raison `{}`",
         "give_roles-0": "Euh... Ce rôle soit trop haut pour que je puisse le donner à qui que ce soit. Faut placer mon rôle au-dessus de `{r}` !",
         "give_roles-1": "{u} est trop haut !",
         "give_roles-2": "-> {c} rôles attribués sur {m} !",
         "give_roles-3": "Tu peux pas donner des rôles plus hauts que le tien !\nRéfléchis :thinking: !",
+        "kick": "Le membre {} a bien été expulsé du serveur, avec la raison `{}`",
         "kick-1": "Il semble que ce membre soit trop haut pour que je puisse l'expulser :thinking:",
         "kick-noreason": "Vous venez d'être expulsé du serveur {} :confused:",
         "kick-reason": "Vous venez d'être expulsé du serveur {} :confused:\nRaison : {}",
@@ -739,9 +739,9 @@
         "already-1-rr": "Tu as déjà un rôle désigné pour cet émoji",
         "already-dont-have": "Tu n'as pas ce rôle !",
         "already-have": "Tu as déjà ce rôle !",
+        "embed-edited": "L'embed et les réactions ont été mises à jour :loading:",
         "no-rr": "Aucun rôle n'est lié à cet émoji",
         "not-zbot-embed": "Ce message ne contient pas d'embed de roles-reactions",
-        "embed-edited": "L'embed et les réactions ont été mises à jour :loading:",
         "not-zbot-msg": "Ce message n'est pas celui de Zbot !",
         "role-given": "Le rôle {r} a bien été donné",
         "role-lost": "Le rôle {r} a bien été retiré",
@@ -818,6 +818,7 @@
         "change-7": "Cette langue n'est pas disponible. Voici la liste des langues actuellement supportées est là *(Encore merci aux traducteurs !)* :\n{}",
         "change-8": "Ce niveau n'existe pas :eyes:. Voici la liste des niveaux actuellement disponibles : {}",
         "change-9": "Je trouve pas l'émoji `{}` ! :eyes:",
+        "change-autoremove_xp": "Le bot enlèvera {xp} points d'xp par jour aux membres inactifs. Quelle punition !",
         "change-bool": "L'option '{}' a bien été modifiée ! Maintenant, elle vaut \"*{}*\"",
         "change-color": "La couleur utilisée pour cette option ({}) est maintenant `{}`.",
         "change-emojis": "Les émojis pour l'option '{}' sont maintenant {}.",
@@ -830,7 +831,6 @@
         "change-textchan": "L'option '{}' a bien été modifiée avec les salons {}.",
         "change-xp": "Le type d'xp utilisé est maintenant un classsement {}. J'espère qu'il préfèreront :grin: !",
         "change-xp_rate": "Le modificateur d'xp est maintenant à {rate}. À vous le niveau 100 !",
-        "change-autoremove_xp": "Le bot enlèvera {xp} points d'xp par jour aux membres inactifs. Quelle punition !",
         "config-help": "Cette commande sert principalement à configurer votre serveur. En faisant `!config see [option]`, tu obtiendrez l'aperçu des configurations actuelles, et les administrateurs du serveur peuvent entrer `!config change <option> valeur1, valeur2...` pour modifier une configuration, ou `!config del <option>` pour réinitialiser l'option (`!config change <option> del` fonctionne de même).\nLa liste des options disponible est accessible à l'adresse <https://zbot.rtfd.io/en/latest/server.html#list-of-every-option>",
         "config-list": "Liste des options disponibles :{text}Plus d'information : {link}",
         "need-admin": "Faut les perms Administrateur pour exécuter cette commande !",
@@ -910,6 +910,20 @@
         "guild-7": "{} dont {} bots ({} connectés)",
         "guild-8": "Authentification à deux facteurs",
         "guild-9": "Niveau de sécurité",
+        "guild-features": {
+            "ANIMATED_ICON": "Icône de serveur animée",
+            "BANNER": "Bannière de serveur custom",
+            "COMMERCE": "Fonctionnalités de commerce",
+            "DISCOVERABLE": "Affiché dans l'onglet Découverte",
+            "FEATURABLE": "Affiché dans l'onglet Activité",
+            "INVITE_SPLASH": "Fond d'écran d'invitation",
+            "NEWS": "Salons de news",
+            "PARTNERED": "Serveur partenaire",
+            "PUBLIC": "Serveur public",
+            "VANITY_URL": "Invitation custom",
+            "VERIFIED": "Serveur vérifié",
+            "VIP_REGIONS": "Régions VIP"
+        },
         "inv-0": "Adresse url",
         "inv-1": "Créateur",
         "inv-2": "Utilisations",
@@ -919,20 +933,6 @@
         "inv-7": "Nombre de membres approximatif",
         "inv-8": "Decription du serveur",
         "inv-9": "Options du serveur",
-        "guild-features": {
-            "INVITE_SPLASH": "Fond d'écran d'invitation",
-            "VIP_REGIONS": "Régions VIP",
-            "VANITY_URL": "Invitation custom",
-            "VERIFIED": "Serveur vérifié",
-            "PARTNERED": "Serveur partenaire",
-            "PUBLIC": "Serveur public",
-            "COMMERCE": "Fonctionnalités de commerce",
-            "NEWS": "Salons de news",
-            "DISCOVERABLE": "Affiché dans l'onglet Découverte",
-            "FEATURABLE": "Affiché dans l'onglet Activité",
-            "ANIMATED_ICON": "Icône de serveur animée",
-            "BANNER": "Bannière de serveur custom"
-        },
         "member-0": "Surnom",
         "member-1": "Créé le",
         "member-2": "A rejoint le",
@@ -961,14 +961,14 @@
     "users": {
         "animated_card_false": "Les cartes d'xp animées ne sont actuellement pas autorisées pour vous",
         "animated_card_true": "Les cartes d'xp animées sont actuellement autorisées pour vous",
-        "usernames_log_false": "T'as désactivé l'enregistrement de vos noms d'utilisateurs ainsi que de vos surnoms",
-        "usernames_log_true": "T'as autorisé l'enregistrement de vos noms d'utilisateurs ainsi que de vos surnoms",
         "card-desc": "Voici un exemple de votre carte d'xp. Tu peux taper la commande `profile card <style>` pour changer le style\n*Ta carte d'xp ne se réactualisera que lorsque tu auras gagné de l'xp.*",
         "changed-0": "Votre carte d'xp utilise maintenant le style {}",
         "changed-1": "Oups, une erreur interne est survenue pendant le traitement de la requête. Réessaye plus tard ou contacte le support.",
         "invalid-card": "Ce style est invalide. Ça, c'est la liste des styles que tu pouvez utiliser : {}",
         "list-cards": "Voici la liste des styles que tu pouvez utiliser : {}",
-        "missing-attach-files": "Oups, il me manque la permission d'Attacher des Fichiers :confused:"
+        "missing-attach-files": "Oups, il me manque la permission d'Attacher des Fichiers :confused:",
+        "usernames_log_false": "T'as désactivé l'enregistrement de vos noms d'utilisateurs ainsi que de vos surnoms",
+        "usernames_log_true": "T'as autorisé l'enregistrement de vos noms d'utilisateurs ainsi que de vos surnoms"
     },
     "xp": {
         "1-no-xp": "Hey ! T'as pas encore d'xp !",
