@@ -148,11 +148,6 @@ class UtilitiesCog(commands.Cog):
             await self.print2("Unable to delete message "+str(msg))
             pass
 
-    async def get_bot_infos(self):
-        if self.config == None:
-            self.config = (await self.bot.cogs['ServerCog'].get_bot_infos(self.bot.user.id))[0]
-        return self.config
-
     async def global_check(self,ctx):
         """Do a lot of checks before executing a command (rss loop, banned guilds etc)"""
         #if ctx.bot.cogs['RssCog'].last_update==None or (datetime.datetime.now() - ctx.bot.cogs['RssCog'].last_update).total_seconds() > 20*60:
@@ -374,7 +369,7 @@ class UtilitiesCog(commands.Cog):
             parameters = {'unlocked_christmas': False}
         if not parameters['unlocked_christmas'] and self.bot.current_event=="christmas":
             points = await self.get_db_userinfo(["events_points"],["userID="+str(user.id)])
-            if points != None and points["events_points"]>50:
+            if points != None and points["events_points"] >= 50:
                 await self.change_db_userinfo(user.id,'unlocked_christmas',True)
                 parameters['unlocked_christmas'] = True
         return parameters['unlocked_christmas']

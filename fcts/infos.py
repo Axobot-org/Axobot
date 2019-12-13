@@ -73,6 +73,8 @@ class InfoCog(commands.Cog):
     async def get_guilds_count(self,ignored_guilds:list=None) -> int:
         """Get the number of guilds where Zbot is"""
         if ignored_guilds==None:
+            if 'banned_guilds' not in self.bot.cogs['UtilitiesCog'].config.keys():
+                await self.bot.cogs['UtilitiesCog'].get_bot_infos()
             ignored_guilds = [int(x) for x in self.bot.cogs['UtilitiesCog'].config['banned_guilds'].split(";") if len(x)>0] + self.bot.cogs['ReloadsCog'].ignored_guilds
         return len([x for x in self.bot.guilds if x.id not in ignored_guilds])
 
