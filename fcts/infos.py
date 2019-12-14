@@ -73,6 +73,8 @@ class InfoCog(commands.Cog):
     async def get_guilds_count(self,ignored_guilds:list=None) -> int:
         """Get the number of guilds where Zbot is"""
         if ignored_guilds==None:
+            if 'banned_guilds' not in self.bot.cogs['UtilitiesCog'].config.keys():
+                await self.bot.cogs['UtilitiesCog'].get_bot_infos()
             ignored_guilds = [int(x) for x in self.bot.cogs['UtilitiesCog'].config['banned_guilds'].split(";") if len(x)>0] + self.bot.cogs['ReloadsCog'].ignored_guilds
         return len([x for x in self.bot.guilds if x.id not in ignored_guilds])
 
@@ -121,7 +123,7 @@ class InfoCog(commands.Cog):
 
     def get_users_nber(self,ignored_guilds):
         members = [x.members for x in self.bot.guilds if x.id not in ignored_guilds]
-        members = [x for x in members for x in x]
+        members = list(set([x for x in members for x in x])) # filter users
         return len(members),len([x for x in members if x.bot])
 
 
@@ -835,7 +837,7 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
         can_embed = True if isinstance(ctx.channel,discord.DMChannel) else ctx.channel.permissions_for(ctx.guild.me).embed_links
         if can_embed:
             l = await self.translate(ctx.channel,'infos','discordlinks')
-            links = ["https://dis.gd/status","https://dis.gd/tos","https://dis.gd/report","https://dis.gd/feedback","https://support.discordapp.com/hc/articles/115002192352","https://discordapp.com/developers/docs/legal"]
+            links = ["https://dis.gd/status","https://dis.gd/tos","https://dis.gd/report","https://dis.gd/feedback","https://support.discordapp.com/hc/articles/115002192352","https://discordapp.com/developers/docs/legal","https://support.discordapp.com/hc/en-us/articles/206346498-Where-can-I-find-my-User-Server-Message-ID-"]
             txt = "\n".join(['['+l[i]+']('+links[i]+')' for i in range(len(l))])
             em = self.bot.cogs["EmbedCog"].Embed(desc=txt).update_timestamp().create_footer(ctx.author)
             await ctx.send(embed=em)

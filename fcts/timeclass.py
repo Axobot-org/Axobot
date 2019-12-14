@@ -158,13 +158,15 @@ class TimeCog(discord.ext.commands.Cog):
                     month = "0"+str(date.month)
                 else:
                     month = str(date.month)
+                separator = "/"
                 if lang == 'fr':
                     df = "{d}/{m}{y}  {h}"
                 elif lang == 'fi':
                     df = "{d}.{m}.{y}  {h}"
+                    separator = "."
                 else:
                     df = "{m}/{d}{y}  {h}"
-                df = df.format(d=jour,m=month,y = "/"+str(date.year) if year else "",h = ":".join(h) if hour else "")
+                df = df.format(d=jour,m=month,y = separator+str(date.year) if year else "",h = ":".join(h) if hour else "")
             else:
                 if lang == 'fr' or lang=='fi':
                     df = "{d} {m} {y}  {h}"

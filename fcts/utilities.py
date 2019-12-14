@@ -24,6 +24,7 @@ class UtilitiesCog(commands.Cog):
         config_list = await self.bot.cogs['ServerCog'].get_bot_infos(self.bot.user.id)
         if len(config_list)>0:
             self.config = config_list[0]
+            self.config.pop('token',None)
             return self.config
         return None
 
@@ -374,7 +375,7 @@ class UtilitiesCog(commands.Cog):
             parameters = {'unlocked_christmas': False}
         if not parameters['unlocked_christmas'] and self.bot.current_event=="christmas":
             points = await self.get_db_userinfo(["events_points"],["userID="+str(user.id)])
-            if points != None and points["events_points"]>50:
+            if points != None and points["events_points"] >= 50:
                 await self.change_db_userinfo(user.id,'unlocked_christmas',True)
                 parameters['unlocked_christmas'] = True
         return parameters['unlocked_christmas']
