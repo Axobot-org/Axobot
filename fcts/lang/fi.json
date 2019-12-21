@@ -71,6 +71,10 @@
                 "Sinun täytyy olla botin ylläpitäjä",
                 "Et ole botin ylläpitäjä"
             ],
+            "database_connected": [
+                "Cancel",
+                "Tietokanta ei ole käytössä"
+            ],
             "guild_only": [
                 "Voidaan vain käyttää palvelimessa",
                 "Voidaan vain käyttää palvelimessa"
@@ -159,7 +163,22 @@
             "christmas-2019": "Juhli joulun tuloa tällä tapahtumalla! Ristinolla pelillä aikoo olla talven värejä, Zbot saa mahtavan profiili kuvan ja muita hienoja juttuja.\n\nHanki tapahtuma pisteitä ja yritä voittaa vuoden 2019 Erikois Joulu xp kortti! Muista: xp kortit löytyy komennolla `profile card`",
             "nothing": "Tällä hetkellä ei ole tapahtumia. Seuraa botin uutisia jotta tiedät milloin on seuraava tapahtuma!"
         },
-        "events-price-title": "Palkintoja joita voi voittaa"
+        "events-price-title": "Palkintoja joita voi voittaa",
+        "events-prices": {
+            "christmas-2019": {
+                "50": "Lunasta vuoden 2019 joulu spesiaali!"
+            },
+            "nothing": "Tällä tapahtumalla ei ole mitään mitä voisi hankkia 😕"
+        },
+        "events-title": {
+            "christmas-2019": "Joulu on tulossa!"
+        },
+        "objectives": "Menestymiset",
+        "points": "pisteet",
+        "rank-global": "Maailmalaajuinen taso",
+        "rank-title": "Tapahtuma pisteet",
+        "rank-total": "Yhteis pisteet",
+        "unclassed": "Sinulla ei ole pisteitä"
     },
     "bvn": {
         "aide": "__**Tervetuloa liittymis & lähtö viesti moduuliin**__\nTätä moduulia käytetään konfiguroimaan automaattinen viesti joka kerta kun joku tulee tai lähtee servultasi.\n__** Konfiguraatio**__\n`1-` Jotta voit konfiguroida mihin nämä viestit lähetetään, viestitä `{p}config change welcome_channel` lisättynä kanava.\n`2-` Jotta voit konfiguroida viestin, kirjoita  `{p}config change <welcome|leave> <message>`. Tälle viestille voit käyttää variableja:\n - `{user}` Tägää käyttäjän\n - `{server}` näyttää serverin nimen\n - `{owner}` näyttää serverin omistajan nimen\n- `{member_count}` näyttää tämänhetkisen käyttäjämäärän",
@@ -321,13 +340,21 @@
             "Raportoi bugi/jäsen",
             "Ehdota jotain Discordille",
             "Itsebotti artikkeli",
-            "Käyttöehdot botin tekijöille"
+            "Käyttöehdot botin tekijöille",
+            "Miten löytää tunniste"
         ],
         "docs": "Tässä on linkki botin dokumenttiin:",
         "prefix": "Lista kaikista käytettävissä olevista etuliitoista:",
         "stats": "**Bot versio:** {bot_v} \n**Kaikkien palvelimien numero missä olen:** {s_count} \n**Numero kaikista näkyvistä jäsenistä:** {m_count} ({b_count} **botit**)\n**Numero koodi riveistä:** {l_count}\n**Käytettyjä kieliä:** {lang}\n** {p_v} \n**Versio `discord.py`stä:** {d_v} \n**Ladataan RAMia:** {ram} GB \n**Ladataan CPU:ssa:** {cpu} % \n**API viive aika:** {api} ms\n**Kaikki xp kerätty:** {xp}",
         "stats-title": "**Bot tilastot**",
-        "text-0": "Moi! Olen {0} !\nOlen botti joka antaa sinun tehdä monia asioita: valvontaa, xp järjestelmää, tilastoja, yhteistyö hallintaa ja paljon mahtavia komentoja!\nVoit nähdä käytössä olevat komennot lähettämällä `!help` tälke kanavalle, sitten `!config see` antaa sinun nähdä konfigurointi vaihtoehdot.\n\nMinä ja minun omistaja haluaisimme kiittää Awhikax:ia tuen antamiseen monien kriisien jälkeen, Aragorn1202 kaikista hänen ideoistaan ja sanonnoista täynnä positiivista, Adri526 kaikista mahtavan hienoista logoista, emojeista ja profiili kuvista, ja koko kääntäjätiimiä heidän jatkuvasta työstä!\n\n🌐 Linkkejä jotka voivat olla avuksi: \n▶ Minun Discord palvelimeni : http://discord.gg/N55zY88\n▶ Linkki kutsua minut toiseen palvelimeen : <https://zrunner.me/invitezbot>\n▶ Botin dokumentaatio (ei käännetty) : <https://zbot.rtfd.io/>\n▶ Minun tekijän Twitter käyttäjä : <https://twitter.com/z_runnerr>\n\nHyvää päivän jatkoa!"
+        "text-0": "Moi! Olen {0} !\nOlen botti joka antaa sinun tehdä monia asioita: valvontaa, xp järjestelmää, tilastoja, yhteistyö hallintaa ja paljon mahtavia komentoja!\nVoit nähdä käytössä olevat komennot lähettämällä `!help` tälke kanavalle, sitten `!config see` antaa sinun nähdä konfigurointi vaihtoehdot.\n\nMinä ja minun omistaja haluaisimme kiittää Awhikax:ia tuen antamiseen monien kriisien jälkeen, Aragorn1202 kaikista hänen ideoistaan ja sanonnoista täynnä positiivista, Adri526 kaikista mahtavan hienoista logoista, emojeista ja profiili kuvista, ja koko kääntäjätiimiä heidän jatkuvasta työstä!\n\n🌐 Linkkejä jotka voivat olla avuksi: \n▶ Minun Discord palvelimeni : http://discord.gg/N55zY88\n▶ Linkki kutsua minut toiseen palvelimeen : <https://zrunner.me/invitezbot>\n▶ Botin dokumentaatio (ei käännetty) : <https://zbot.rtfd.io/>\n▶ Minun tekijän Twitter käyttäjä : <https://twitter.com/z_runnerr>\n\nHyvää päivän jatkoa!",
+        "usernames-allow": "Voit uudelleen valtuuttaa automaattisen kuvaajan komennolla ’profile‘",
+        "usernames-disallow": "Voit hypätä pois automaattisesta kuvaamisesta komennolla ’profile’",
+        "usernames-empty": "Ei vaihtoja kuvattu",
+        "usernames-global": "Yleis historia",
+        "usernames-last-date": "Viimeisin vaihto",
+        "usernames-local": "Palvelin historia",
+        "usernames-title": "**{u}** nimen historia"
     },
     "infos_2": {
         "fish-1": "Numero kaloista",
@@ -339,11 +366,13 @@
     "keywords": {
         "added_at": "Lisätty klo",
         "aucune": "ei yhtään",
+        "beginning": "alkaa",
         "bot": "botti",
         "category": "kategoria",
         "click_here": "Paina tästä",
         "depuis": "",
         "dnd": "älä häiritse",
+        "end": "loppuu",
         "extreme": "äärimmäinen",
         "ghost": "Haamu",
         "high": "ylhäinen",
@@ -713,9 +742,11 @@
         "already-1-rr": "Sinulla on jo rooli tälle hymiölle",
         "already-dont-have": "Sinulla ei ole tätä roolia",
         "already-have": "Sinulla on jo tämä rooli",
+        "embed-edited": "Upotettu linkki ja reaktiot ovat päivitetty",
         "no-rr": "Tällä hymiöllä ei ole roolia",
         "not-zbot-embed": "Tällä viestillä ei ole mitään reagoi-rooli upotettua linkkiä",
         "not-zbot-msg": "Tämä viesti ei ole Zbotin",
+        "reactions-edited": "Reaktiot on päivitetty",
         "role-given": "{r} rooli on annettu",
         "role-lost": "{r} on otettu pois sinun rooleista",
         "role-not-in-list": "Tämä rooli ei ole osa listasta",
@@ -731,6 +762,7 @@
         "choose-mentions-1": "Valitse virtaus muokkaukselle",
         "choose-roles": "Mitkä roolit aiotaan mainita?",
         "delete-success": "Virtaus on onnistuneesti poistettu!",
+        "deviant": "DeviantArt",
         "deviant-default-flow": "{logo}  | Uusi luomus tekijä: {author} : **{title}**\nJulkaistu {date}\nLinkki: {link}\n{mentions}",
         "deviant-form-last": "{logo}  | Tässä uusi luomus tekijältä {author}:\n{title}\nJulkaistu {date}\nLinkki: {url}",
         "embed-json-changed": "Upotettu linkki tällä virtauksella on muokattu",
@@ -742,6 +774,7 @@
         "invalid-flow": "Tämä url on pätemätön (tyhjä tai ei saatavilla) 😕",
         "invalid-link": "Ups, url osoite on pätemätön tai ei valmis 😕",
         "list": "*Lähetä numero virtauksesta muokkaukselle*\n\n**Linkki - Tyyli - Kanava - Maininnat**",
+        "list-result": "Tyyppi: {}\nDiscord kanava: {}\nURL/Kanava: {}\nMaininnat: {}\nIdentiteetti: {}\nViimeisin julkaisu: {}",
         "list2": "*Lähetä numero virtauksesta poistamiselle*\n\n**Linkki - Tyyli - Kanava**",
         "mc": "Minecraft",
         "move-success": "Rss lähetys #{} on liikutettu kanavalle {}!",
@@ -883,12 +916,29 @@
         "guild-7": "{} mukaan lukien {} botit ({} yhdistetty)",
         "guild-8": "Kaksivaiheinen todennus",
         "guild-9": "Turvallisuus taso",
+        "guild-features": {
+            "ANIMATED_ICON": "Animoitu palvelin kuvake",
+            "BANNER": "Erikois palvelin banneri",
+            "DISCOVERABLE": "Näkyy yhteys ikkunassa",
+            "FEATURABLE": "Näkyy Aktiviteetti ikkunassa",
+            "INVITE_SPLASH": "Kutsu taustakuva",
+            "NEWS": "Uutis kanava",
+            "PARTNERED": "Kumppani palvelin",
+            "PUBLIC": "Julkinen palvelin",
+            "VANITY_URL": "Erikois kutsu linkki",
+            "VERIFIED": "Vahvistettu palvelin",
+            "VIP_REGIONS": "VIP ääni oikeudet"
+        },
         "inv-0": "URL linkki",
         "inv-1": "Kutsuja",
         "inv-2": "Käyttöjä",
         "inv-3": "Aikaa jäljellä",
         "inv-4": "Kutsu",
         "inv-5": "Jos tietoa näyttää puuttuvan, valitettavasti se on koska Discord ei kommunikoi sitä",
+        "inv-6": "Palvelin tunniste",
+        "inv-7": "Suurinpiirteen oleva jäsen lasku",
+        "inv-8": "Palvelin kuvaus",
+        "inv-9": "Palvelin ominaisuudet",
         "member-0": "Lempinimi",
         "member-1": "Luotu",
         "member-2": "Liittynyt",
@@ -920,12 +970,19 @@
         "allow_animated_true": "Animoidut xp kortit on tällä hetkellä käytöstä sinulle",
         "allow_auto_unafk_false": "Sinun täytyy poistaa AFK tunniste itse",
         "allow_auto_unafk_true": "Minä aion poistaa AFK tunnisteen heti kun lähetät viestin",
+        "animated_card_false": "Et ole tällä hetkellä hyväksymässä animoitua korttia. Kiitos!",
+        "animated_card_true": "Voit nyt käyttää animoituja xp kortteja  (hitaampi renderaaminen)",
+        "auto_unafk_false": "Sinun täytyy poistaa AFK merkki itse",
+        "auto_unafk_true": "Minä poistan AFK merkin sinulta heti kun lähetät viestin",
         "card-desc": "Tässä on esimerkki sinun XP kortistasi. Jos haluat vaihtaa tyyliäsi voit viestittää komennon `profile card <style>` *Sinun XP kortti aikoo päivittyä vain kun ole saanut XP:tä*",
         "changed-0": "Sinun XP kortti käyttää nyt tyyliä: {}",
         "changed-1": "Ups, sisäinen virhe tapahtui pyynnön lähettämisessä. Yritä uudelleen myöhemmin tai ota yhteyttä tukeen.",
+        "config_success": "{opt} ominaisuus on vaihdettu!",
         "invalid-card": "Tämä tyyli on pätemätön. Tässä on lista tyyleistä joita sinä voit käyttää: {}",
         "list-cards": "Tässä on lista kaikista tyyleistä sinä voit käyttää: {}",
-        "missing-attach-files": "Ups, minulta puuttuu käyttöoikeus: Liitä tiedostoja :confused:"
+        "missing-attach-files": "Ups, minulta puuttuu käyttöoikeus: Liitä tiedostoja :confused:",
+        "usernames_log_false": "Olet laittanut nimimerkkien ja käyttäjänimien kuvaamisen",
+        "usernames_log_true": "Olet hyväksynyt käyttäjänimien ja nimimerkkien kuvaamisen"
     },
     "xp": {
         "1-no-xp": "Sinulla ei ole XP:tä vielä!",
