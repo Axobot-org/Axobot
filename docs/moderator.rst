@@ -234,7 +234,9 @@ Nice command that allows you to do different things with the server roles (other
 
 * :code:`role color <role> <colour>` (alias `role colour`): Changes the color of the given role. The color must be in hexadecimal form, although some common names are accepted (red, blue, gold...). To remove the color, use the name `default`. Please check notes 1. and 2.
 
-* :code:`role list <role>` : List every members who are in a specific role, if this number is under 200. The bot must have "`Embed Links <perms.html#embed-links>`_" permission to display the result. Please check note 2.
+* :code:`role give <role> <user(s) | role(s)>`: Give a role to a list of people. You can target as many users or roles as you want, so for example to target your friends Joe and Jack, plus the Admin role, use :code:`role give superRole Joe Jack Admin`. Please check note 2.
+
+* :code:`role list <role>`: List every members who are in a specific role, if this number is under 200. The bot must have "`Embed Links <perms.html#embed-links>`_" permission to display the result. Please check note 2.
 
 
 .. warning:: (1) The bot need the "`Manage roles <perms.html#manage-roles>`_" permission, also his highest role need to be higher than the role he's trying to edit.
