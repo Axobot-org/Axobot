@@ -762,7 +762,7 @@ You must be an administrator of this server to use this command."""
         if role.position >= my_position:
             return await ctx.send(await self.translate(ctx.guild.id,"modo","give_roles-0",r=role.name))
         if role.position >= ctx.author.roles[-1].position:
-            return await ctx.send(await self.translate(ctx.guild.id,"modo","give_roles-3"))
+            return await ctx.send(await self.translate(ctx.guild.id,"modo","give_roles-higher"))
         answer = list()
         n_users = set()
         error_count = 0
@@ -773,13 +773,36 @@ You must be an administrator of this server to use this command."""
                 for m in item.members:
                     n_users.add(m)
         for user in n_users:
-            if user.roles[-1].position >= my_position:
-                error_count += 1
-                if len("\n".join(answer))<1800:
-                    answer.append(await self.translate(ctx.guild.id,"modo","give_roles-1",u=user))
-            else:
-                await user.add_roles(role,reason="Asked by {}".format(ctx.author))
+            await user.add_roles(role,reason="Asked by {}".format(ctx.author))
         answer.append(await self.translate(ctx.guild.id,"modo","give_roles-2",c=len(n_users)-error_count,m=len(n_users)))
+        await ctx.send("\n".join(answer))
+
+    @main_role.command(name="remove")
+    @commands.check(checks.has_manage_roles)
+    async def roles_remove(self,ctx,role:discord.Role,users:commands.Greedy[typing.Union[discord.Role,discord.Member]]):
+        """Remove a role to a list of roles/members
+        Users list may be either members or roles, or even only one member"""
+        if len(users)==0:
+            raise commands.MissingRequiredArgument(self.roles_remove.clean_params['users'])
+        if not ctx.guild.me.guild_permissions.manage_roles:
+            return await ctx.send(await self.translate(ctx.guild.id,"modo","cant-mute"))
+        my_position = ctx.guild.me.roles[-1].position
+        if role.position >= my_position:
+            return await ctx.send(await self.translate(ctx.guild.id,"modo","give_roles-4",r=role.name))
+        if role.position >= ctx.author.roles[-1].position:
+            return await ctx.send(await self.translate(ctx.guild.id,"modo","give_roles-higher"))
+        answer = list()
+        n_users = set()
+        error_count = 0
+        for item in users:
+            if isinstance(item,discord.Member):
+                n_users.add(item)
+            else:
+                for m in item.members:
+                    n_users.add(m)
+        for user in n_users:
+            await user.remove_roles(role,reason="Asked by {}".format(ctx.author))
+        answer.append(await self.translate(ctx.guild.id,"modo","remove_roles-1",c=len(n_users)-error_count,m=len(n_users)))
         await ctx.send("\n".join(answer))
 
 
