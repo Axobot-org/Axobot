@@ -749,7 +749,7 @@ You must be an administrator of this server to use this command."""
         emb = self.bot.cogs['EmbedCog'].Embed(title=role.name,fields=fields,color=role.color).update_timestamp().create_footer(ctx.author)
         await ctx.send(embed=emb.discord_embed())
 
-    @main_role.command(name="give")
+    @main_role.command(name="give", aliases=["add"])
     @commands.check(checks.has_manage_roles)
     async def roles_give(self,ctx,role:discord.Role,users:commands.Greedy[typing.Union[discord.Role,discord.Member]]):
         """Give a role to a list of roles/members
