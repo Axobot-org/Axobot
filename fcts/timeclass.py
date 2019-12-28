@@ -162,7 +162,7 @@ class TimeCog(discord.ext.commands.Cog):
                 if lang == 'fr':
                     df = "{d}/{m}{y}  {h}"
                 elif lang == 'fi':
-                    df = "{d}.{m}.{y}  {h}"
+                    df = "{d}.{m}{y}  {h}"
                     separator = "."
                 else:
                     df = "{m}/{d}{y}  {h}"
