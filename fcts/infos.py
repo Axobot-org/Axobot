@@ -854,7 +854,7 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
             ctx = await self.bot.get_context(msg)
             if ctx.command!=None:
                 return
-            liste = list(set(re.findall(r'<:[\w-]+:(\d{18})>',msg.content)))
+            liste = list(set(re.findall(r'<a?:[\w-]+:(\d{18})>',msg.content)))
             if len(liste)==0:
                 return
             cnx = self.bot.cnx_frm
