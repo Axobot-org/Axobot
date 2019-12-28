@@ -297,7 +297,7 @@ If the bot can't send the new command format, it will try to send the old one.""
         # Module
         category = "unclassed"
         for k,v in self.commands_list.items():
-            if cmd.name in v:
+            if cmd.name in v or cmd.full_parent_name in v:
                 category = k
                 break
         category = (await self.translate(ctx.channel,'keywords','category')).capitalize() + ": " + (await self.translate(ctx.channel,"aide","categories"))[category]
