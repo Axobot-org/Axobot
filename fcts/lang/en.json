@@ -991,8 +991,8 @@
         "change-xp-ok": "The XP of the user {user} has been set to {xp} points!",
         "default_levelup": [
             "Hey, {user} has just reached **level {level}**! Keep this way!",
-            "Crossing to level {level}{user}. Attack and defense increased by 1.",
-            "Thanks to this level {level}, you can finally use the legendary {random} user {user}",
+            "Crossing to level {level} {user}. Attack and defense increased by 1.",
+            "Thanks to this level {level}, you can finally use {random} of legendary rarity, user {user}",
             "Speech level {level}, {user}. Be careful not to scream too loudly.",
             "{user} is flying to the Top 1 with their level {level}!",
             "But, wouldn't it be a new level for {user}? Level {level}!",
