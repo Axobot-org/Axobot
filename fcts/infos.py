@@ -625,15 +625,17 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
 
     @find_main.command(name="user")
     async def find_user(self,ctx,*,user:discord.User):
+        # Servers list
         servers_in = list()
-        owners = list()
         for s in self.bot.guilds:
             if user in s.members:
-                servers_in.append(s.name)
                 if s.owner==user:
-                    owners.append(s.name)
-        disp_lang = ""
+                    servers_in.append(":crown: "+s.name)
+                else:
+                    servers_in.append("- "+s.name)
+        # XP card
         xp_card = await self.bot.cogs['UtilitiesCog'].get_xp_style(user)
+        # Perks
         perks = list()
         if await self.bot.cogs["AdminCog"].check_if_admin(user):
             perks.append('admin')
@@ -643,74 +645,124 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
             perks.append("contributor")
         if await self.bot.cogs['UtilitiesCog'].is_premium(user):
             perks.append("premium")
+        if await self.bot.cogs['UtilitiesCog'].is_partner(user):
+            perks.append("partner")
+        if await self.bot.cogs['UtilitiesCog'].is_translator(user):
+            perks.append("translator")
+        if len(perks)==0:
+            perks = ["None"]
+        # Has voted
         async with aiohttp.ClientSession() as session:
             async with session.get('https://discordbots.org/api/bots/486896267788812288/check?userId={}'.format(user.id),headers={'Authorization':str(self.bot.dbl_token)}) as r:
                 js = await r.json()
                 if js['voted']:
-                    r = await self.translate(ctx.channel,'keywords','oui')
+                    has_voted = await self.translate(ctx.channel,'keywords','oui')
                 else:
-                    r = await self.translate(ctx.channel,'keywords','non')
-                r = r.capitalize()
-        disp_lang = str()
+                    has_voted = await self.translate(ctx.channel,'keywords','non')
+                has_voted = has_voted.capitalize()
+        # Languages
+        disp_lang = list()
         for lang in await self.bot.cogs['UtilitiesCog'].get_languages(user):
-            disp_lang += '{} ({}%)   '.format(lang[0],round(lang[1]*100))
-        txt = await self.translate(ctx.channel,"find","user-1",name=str(user)+' <:BOT:544149528761204736>' if user.bot else str(user),id=user.id,servers=", ".join(servers_in),own=", ".join(owners),lang=disp_lang,vote=r,card=xp_card,rangs=" - ".join(perks))
+            disp_lang.append('{} ({}%)'.format(lang[0],round(lang[1]*100)))
+        # User name
+        user_name = str(user)+' <:BOT:544149528761204736>' if user.bot else str(user)
+        # ----
         if ctx.guild==None or ctx.channel.permissions_for(ctx.guild.me).embed_links:
             if ctx.guild==None:
                 color = None
             else:
                 color = None if ctx.guild.me.color.value==0 else ctx.guild.me.color
-            await ctx.send(embed = self.bot.cogs['EmbedCog'].Embed(desc=txt,color=color).create_footer(ctx.author))
+            
+            await ctx.send(embed = self.bot.cogs['EmbedCog'].Embed(title=user_name, thumbnail=str(await self.bot.user_avatar_as(user,1024)) ,color=color, fields = [
+                {"name": "ID", "value": user.id},
+                {"name": "Perks", "value": "-".join(perks), "inline":False},
+                {"name": "Servers", "value": "\n".join(servers_in), "inline":True},
+                {"name": "Language", "value": "\n".join(disp_lang), "inline":True},
+                {"name": "XP card", "value": xp_card, "inline":True},
+                {"name": "Has voted?", "value": has_voted, "inline":True},
+            ]).create_footer(ctx.author))
         else:
+            txt = """Name: {}
+ID: {}
+Perks: {}
+Language: {}
+XP card: {}
+Voted? {}
+Servers:
+{}""".format(user_name,
+                user.id,
+                " - ".join(perks),
+                " - ".join(disp_lang),
+                xp_card,
+                has_voted,
+                "\n".join(servers_in)
+                )
             await ctx.send(txt)
 
     @find_main.command(name="guild",aliases=['server'])
     async def find_guild(self,ctx,*,guild):
-        s = None
         if guild.isnumeric():
-            s = ctx.bot.get_guild(int(guild))
+            guild = ctx.bot.get_guild(int(guild))
         else:
             for x in self.bot.guilds:
                 if x.name==guild:
-                    s = x
-        if s == None:
+                    guild = x
+                    break
+        if isinstance(guild,str):
             await ctx.send(await self.translate(ctx.channel,"find","guild-0"))
             return
         msglang = await self.translate(ctx.channel,'current_lang','current')
         # Bots
-        bots = len([x for x in s.members if x.bot])
+        bots = len([x for x in guild.members if x.bot])
         # Lang
-        lang = await ctx.bot.cogs["ServerCog"].find_staff(s.id,'language')
+        lang = await ctx.bot.cogs["ServerCog"].find_staff(guild.id,'language')
         if lang==None:
             lang = 'default'
         else:
             lang = ctx.bot.cogs['LangCog'].languages[lang]
         # Roles rewards
-        rr_len = await self.bot.cogs['ServerCog'].find_staff(s.id,'rr_max_number')
+        rr_len = await self.bot.cogs['ServerCog'].find_staff(guild.id,'rr_max_number')
         rr_len = self.bot.cogs["ServerCog"].default_opt['rr_max_number'] if rr_len==None else rr_len
-        rr_len = '{}/{}'.format(len(await self.bot.cogs['XPCog'].rr_list_role(s.id)),rr_len)
+        rr_len = '{}/{}'.format(len(await self.bot.cogs['XPCog'].rr_list_role(guild.id)),rr_len)
         # Prefix
-        pref = self.bot.cogs['UtilitiesCog'].find_prefix(s)
+        pref = self.bot.cogs['UtilitiesCog'].find_prefix(guild)
+        if "`" not in pref:
+            pref = "`" + pref + "`"
         # Rss
-        rss_len = await self.bot.cogs['ServerCog'].find_staff(s.id,'rss_max_number')
+        rss_len = await self.bot.cogs['ServerCog'].find_staff(guild.id,'rss_max_number')
         rss_len = self.bot.cogs["ServerCog"].default_opt['rss_max_number'] if rss_len==None else rss_len
-        rss_numb = "{}/{}".format(len(await self.bot.cogs['RssCog'].get_guild_flows(s.id)),rss_len)
-        txt = str(await self.translate(ctx.channel,"find","guild-1")).format(name=s.name,
-            id=s.id,
-            owner=s.owner,ownerid=s.owner.id,
-            join=await self.bot.cogs['TimeCog'].date(s.me.joined_at,msglang,year=True,digital=True),
-            members=len(s.members),bots=bots,
-            lang=lang,
-            prefix=pref,
-            rss=rss_numb,
-            rr=rr_len)
+        rss_numb = "{}/{}".format(len(await self.bot.cogs['RssCog'].get_guild_flows(guild.id)), rss_len)
+        # Join date
+        joined_at = await self.bot.cogs['TimeCog'].date(guild.me.joined_at,msglang,year=True,digital=True)
+        # ----
         if ctx.guild==None or ctx.channel.permissions_for(ctx.guild.me).embed_links:
             if ctx.guild==None:
                 color = None
             else:
                 color = None if ctx.guild.me.color.value==0 else ctx.guild.me.color
-            await ctx.send(embed = self.bot.cogs['EmbedCog'].Embed(desc=txt,color=color).create_footer(ctx.author))
+            guild_icon = str(guild.icon_url_as(format = "gif" if guild.is_icon_animated() else 'png'))
+            await ctx.send(embed = self.bot.cogs['EmbedCog'].Embed(title=guild.name, color=color, thumbnail=guild_icon, fields=[
+                {"name": "ID", "value": guild.id},
+                {"name": "Owner", "value": "{} ({})".format(guild.owner, guild.owner.id)},
+                {"name": "Joined at", "value": joined_at},
+                {"name": "Members", "value": len(guild.members), "inline":True},
+                {"name": "Language", "value": lang, "inline":True},
+                {"name": "Prefix", "value": pref, "inline":True},
+                {"name": "RSS feeds count", "value": rss_numb, "inline":True},
+                {"name": "Roles rewards count", "value": rr_len, "inline":True},
+            ]).create_footer(ctx.author))
         else:
+            txt = str(await self.translate(ctx.channel,"find","guild-1")).format(name = guild.name,
+                id = guild.id,
+                owner = guild.owner,
+                ownerid = guild.owner.id,
+                join = joined_at,
+                members = len(guild.members),
+                bots = bots,
+                lang = lang,
+                prefix = pref,
+                rss = rss_numb,
+                rr = rr_len)
             await ctx.send(txt)
 
     @find_main.command(name='channel')
