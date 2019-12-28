@@ -485,7 +485,7 @@ class Events(commands.Cog):
             server_count = len(self.bot.guilds),
             members_count = len(self.bot.users),
             bots_count = len([1 for x in self.bot.users if x.bot]),
-            ping = self.bot.latency,
+            ping = round(self.bot.latency,3),
             codelines = self.bot.cogs["InfoCog"].codelines,
             xp = await self.bot.cogs['XPCog'].bdd_total_xp(),
             beta = 1 if self.bot.beta else 0
