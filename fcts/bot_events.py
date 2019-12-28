@@ -19,6 +19,8 @@ class BotEventsCog(commands.Cog):
         today = datetime.date.today()
         with open("events-list.json",'r') as f:
             events = json.load(f)
+        self.current_event = None
+        self.current_event_data = {}
         for ev_data in events.values():
             ev_data["begin"] = datetime.datetime.strptime(ev_data["begin"], "%Y-%m-%d")
             ev_data["end"] = datetime.datetime.strptime(ev_data["end"], "%Y-%m-%d")
