@@ -540,7 +540,7 @@ class AdminCog(commands.Cog):
     @main_msg.command(name="enable_module")
     @commands.check(reloads.check_admin)
     async def enable_xp(self,ctx,enabling:bool,module:str):
-        """Empêche tous les utilisateurs de gagner de l'xp.
+        """Active ou désactive un module (xp/rss)
 Cette option affecte tous les serveurs"""
         if module=='xp':
             self.bot.xp_enabled = enabling
