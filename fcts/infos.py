@@ -771,34 +771,40 @@ Servers:
         if c == None:
             await ctx.send(await self.translate(ctx.channel,"find","chan-0"))
             return
-        txt = (await self.translate(ctx.channel,"find","chan-1")).format(c.name,c.id,c.guild.name,c.guild.id)
         if ctx.guild==None or ctx.channel.permissions_for(ctx.guild.me).embed_links:
             if ctx.guild==None:
                 color = None
             else:
                 color = None if ctx.guild.me.color.value==0 else ctx.guild.me.color
-            await ctx.send(embed = self.bot.cogs['EmbedCog'].Embed(desc=txt,color=color).create_footer(ctx.author))
+            await ctx.send(embed = self.bot.cogs['EmbedCog'].Embed(title="#"+c.name,color=color,fields=[
+                {"name": "ID", "value": c.id},
+                {"name": "Server", "value": f"{c.guild.name} ({c.guild.id})"}
+            ]).create_footer(ctx.author))
         else:
-            await ctx.send(txt)
+            await ctx.send(await self.translate(ctx.channel,"find","chan-1").format(c.name,c.id,c.guild.name,c.guild.id))
     
     @find_main.command(name='role')
     async def find_role(self,ctx,ID:int):
         every_roles = list()
         for serv in ctx.bot.guilds:
             every_roles += serv.roles
-        c = discord.utils.find(lambda role:role.id==ID,every_roles)
-        if c == None:
+        role = discord.utils.find(lambda role:role.id==ID,every_roles)
+        if role == None:
             await ctx.send(await self.translate(ctx.channel,"find","role-0"))
             return
-        txt = (await self.translate(ctx.channel,"find","role-1")).format(c.name,c.id,c.guild.name,c.guild.id,len(c.members),c.colour)
         if ctx.guild==None or ctx.channel.permissions_for(ctx.guild.me).embed_links:
             if ctx.guild==None:
                 color = None
             else:
                 color = None if ctx.guild.me.color.value==0 else ctx.guild.me.color
-            await ctx.send(embed = self.bot.cogs['EmbedCog'].Embed(desc=txt,color=color).create_footer(ctx.author))
+            await ctx.send(embed = self.bot.cogs['EmbedCog'].Embed(title="@"+role.name,color=color,fields=[
+                {"name": "ID", "value": role.id},
+                {"name": "Server", "value": f"{role.guild.name} ({role.guild.id})"},
+                {"name": "Members", "value": len(role.members), "inline": True},
+                {"name": "Colour", "value": str(role.colour), "inline": True}
+            ]).create_footer(ctx.author))
         else:
-            await ctx.send(txt)
+            await ctx.send(await self.translate(ctx.channel,"find","role-1").format(role.name,role.id,role.guild.name,role.guild.id,len(role.members),role.colour))
     
     @find_main.command(name='rss')
     async def find_rss(self,ctx,ID:int):
@@ -810,24 +816,28 @@ Servers:
         temp = self.bot.get_guild(flow['guild'])
         if temp == None:
             g = "Unknown ({})".format(flow['guild'])
-            
         else:
-            g = "{} `{}`".format(temp.id,temp.name)
+            g = "`{}`\n{}".format(temp.name,temp.id)
             temp = self.bot.get_channel(flow['channel'])
         if temp != None:
-            c = "{} `{}`".format(temp.id,temp.name)
+            c = "`{}`\n{}".format(temp.name,temp.id)
         else:
             c = "Unknown ({})".format(flow['channel'])
         d = await self.bot.cogs['TimeCog'].date(flow['date'],digital=True)
-        txt = "ID: {}\nGuild: {}\nChannel: {}\nLink: <{}>\nType: {}\nLast post: {}".format(flow['ID'],g,c,flow['link'],flow['type'],d)
         if ctx.guild==None or ctx.channel.permissions_for(ctx.guild.me).embed_links:
             if ctx.guild==None:
                 color = None
             else:
                 color = None if ctx.guild.me.color.value==0 else ctx.guild.me.color
-            await ctx.send(embed = self.bot.cogs['EmbedCog'].Embed(desc=txt,color=color).create_footer(ctx.author))
+            await ctx.send(embed = self.bot.cogs['EmbedCog'].Embed(title=f"RSS N°{ID}",color=color,fields=[
+                {"name": "Server", "value": g, "inline": True},
+                {"name": "Channel", "value": c, "inline": True},
+                {"name": "URL", "value": flow['link']},
+                {"name": "Type", "value": flow['type'], "inline": True},
+                {"name": "Last post", "value": d, "inline": True},
+            ]).create_footer(ctx.author))
         else:
-            await ctx.send(txt)
+            await ctx.send("ID: {}\nGuild: {}\nChannel: {}\nLink: <{}>\nType: {}\nLast post: {}".format(flow['ID'],g.replace("\n"," "),c.replace("\n"," "),flow['link'],flow['type'],d))
 
     @commands.command(name="membercount",aliases=['member_count'])
     @commands.guild_only()
