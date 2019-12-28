@@ -69,8 +69,8 @@ class TimeCog(discord.ext.commands.Cog):
                 if not year:
                     d += round(t.years*365)
                 elif year and t.years>0:
-                    text += str(t.years) + 'a ' if lang=='fr' else 'y '
-                text += str(d) + 'j ' if lang=='fr' else 'd '
+                    text += str(t.years)+'a ' if lang=='fr' else str(t.years)+'y '
+                text += str(d)+'j ' if lang=='fr' else str(d)+'d '
             if hour:
                 if t.hours>0:
                     text += str(t.hours)+'h '
