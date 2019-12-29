@@ -220,7 +220,9 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
             elif type(item) == discord.Guild:
                 await self.guild_info(ctx,item,lang,critical)
             elif isinstance(item,discord.user.ClientUser):
-                await  self.member_infos(ctx,ctx.guild.me,lang,critical)
+                await self.member_infos(ctx,ctx.guild.me,lang,critical)
+            elif isinstance(item,args.snowflake().Snowflake):
+                await self.snowflake_infos(ctx,item,lang)
             else:
                 await ctx.send(str(type(item))+" / "+str(item))
         except Exception as e:
@@ -613,6 +615,18 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
         embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","categ-1"), value="{}/{}".format(categ.position+1,len(ctx.guild.categories)))
         embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","guild-6"), value=str(await self.translate(ctx.guild.id,"stats_infos","categ-2")).format(tchan,vchan))
         embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","member-1"), value = "{} ({} {})".format(await self.timecog.date(categ.created_at,lang=lang,year=True),since,await self.timecog.time_delta(categ.created_at,datetime.datetime.now(),lang=lang,year=True,precision=0,hour=False)), inline=False)
+        await ctx.send(embed=embed)
+    
+    async def snowflake_infos(self ,ctx, snowflake: args.snowflake, lang):
+        date = await self.bot.cogs["TimeCog"].date(snowflake.date,lang,year=True)
+        embed = self.bot.cogs["EmbedCog"].Embed(color = default_color, time = ctx.message.created_at, fields = [
+            {"name": await self.translate(ctx.channel,"stats_infos","snowflake-0"), "value": date, "inline": True},
+            {"name": await self.translate(ctx.channel,"stats_infos","snowflake-2"), "value": round(snowflake.date.timestamp()), "inline": True},
+            {"name": await self.translate(ctx.channel,"stats_infos","snowflake-1"), "value": snowflake.binary, "inline": False},
+            {"name": await self.translate(ctx.channel,"stats_infos","snowflake-3"), "value": snowflake.worker_id, "inline": True},
+            {"name": await self.translate(ctx.channel,"stats_infos","snowflake-4"), "value": snowflake.process_id, "inline": True},
+            {"name": await self.translate(ctx.channel,"stats_infos","snowflake-5"), "value": snowflake.increment, "inline": True}
+        ]).create_footer(ctx.author)
         await ctx.send(embed=embed)
 
 

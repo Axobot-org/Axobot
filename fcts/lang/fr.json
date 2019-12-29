@@ -898,7 +898,7 @@
         "emoji-3": "Serveur sur lequel est l'émoji",
         "emoji-4": "Restrictions",
         "emoji-5": "Nombre d'utilisations",
-        "emoji-5v": "{nbr} (1st uz savd : {date})",
+        "emoji-5v": "{nbr} (first saved: {date})",
         "guild-0": "Serveur",
         "guild-1": "Propriétaire",
         "guild-10": "Temps avant d'être AFK",
@@ -963,7 +963,13 @@
         "textchan-4": ":warning: Permissions manquantes",
         "textchan-5": "Salon",
         "user-0": "Sur ce serveur ?",
-        "voicechan-0": "Salon vocal"
+        "voicechan-0": "Salon vocal",
+        "snowflake-0": "Date de création",
+        "snowflake-1": "Nombre binaire",
+        "snowflake-2": "Horodatage",
+        "snowflake-3": "ID du travailleur interne",
+        "snowflake-4": "ID de processus interne",
+        "snowflake-5": "Incrément"
     },
     "users": {
         "animated_card_false": "Vous n'utilisez actuellement pas de carte animée",

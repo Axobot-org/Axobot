@@ -963,7 +963,13 @@
         "textchan-4": ":warning: Missing permissions!",
         "textchan-5": "Channel",
         "user-0": "On this server?",
-        "voicechan-0": "Vocal channel"
+        "voicechan-0": "Vocal channel",
+        "snowflake-0": "Creation date",
+        "snowflake-1": "Binary",
+        "snowflake-2": "Timestamp",
+        "snowflake-3": "Internal worker ID",
+        "snowflake-4": "Internal process ID",
+        "snowflake-5": "Increment"
     },
     "users": {
         "animated_card_false": "You are not currently allowing an animated card. Thanks!",

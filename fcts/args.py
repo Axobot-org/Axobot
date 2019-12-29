@@ -45,8 +45,8 @@ class infoType(commands.Converter):
         pass
     
     async def convert(self,ctx:commands.Context,argument) -> str:
-        if argument in ['member','role','user','textchannel','channel','invite','voicechannel','emoji','category','guild','server']:
-            return argument
+        if argument.lower() in ['member','role','user','textchannel','channel','invite','voicechannel','emoji','category','guild','server','id','snowflake']:
+            return argument.lower()
         else:
             raise commands.errors.BadArgument('Invalid type: '+argument)
 
@@ -186,3 +186,21 @@ class Color(commands.Converter):
         else:
             return None
         
+class snowflake(commands.Converter):
+    def __init__(self):
+        pass
+
+    class Snowflake:
+        def __init__(self,ID:int):
+            self.id = ID
+            self.binary = bin(ID)
+            self.date = discord.utils.snowflake_time(ID)
+            self.increment = int(self.binary[-12:])
+            self.process_id = int(self.binary[-17:-12])
+            self.worker_id = int(self.binary[-22:-17])
+
+
+    async def convert(self,ctx:commands.Context,argument:str) -> int:
+        if len(argument) < 17 or len(argument) > 18 or not argument.isnumeric():
+            return None
+        return self.Snowflake(int(argument))

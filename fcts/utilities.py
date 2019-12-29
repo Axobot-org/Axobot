@@ -85,7 +85,7 @@ class UtilitiesCog(commands.Cog):
             for i in [commands.MemberConverter,commands.RoleConverter,
                     commands.TextChannelConverter,commands.InviteConverter,
                     args.user,commands.VoiceChannelConverter,
-                    commands.EmojiConverter,commands.CategoryChannelConverter]:
+                    commands.EmojiConverter,commands.CategoryChannelConverter,args.snowflake]:
                 try:
                     a = await i().convert(ctx,name)
                     item = a
@@ -137,6 +137,11 @@ class UtilitiesCog(commands.Cog):
                 pass
         elif (Type == 'guild' or Type == "server") and name.isnumeric():
             item = self.bot.get_guild(int(name))
+        elif Type in ["snowflake","id"]:
+            try:
+                item = await args.snowflake().convert(ctx,name)
+            except:
+                pass
         return item
 
     async def find_img(self,name):
