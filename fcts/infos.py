@@ -1057,7 +1057,7 @@ Servers:
         cursor.close()
         # List creation
         this_guild = list()
-        global_list = [x for x in results if x['guild']==None]
+        global_list = [x for x in results if x['guild'] in (None,0)]
         if ctx.guild != None:
             this_guild = [x for x in results if x['guild']==ctx.guild.id]
         # title
@@ -1070,10 +1070,14 @@ Servers:
             if len(global_list)>0:
             # Usernames part
                 f.append({'name':await self.translate(ctx.channel,'infos','usernames-global'), 'value':"\n".join([x['new'] for x in global_list if x['new']!=''])})
+                if global_list[-1]['old'] != '':
+                    f[-1]["value"] += "\n" + global_list[-1]['old']
                 date += await self.bot.cogs['TimeCog'].date([x['utc_date'] for x in global_list][0] ,year=True, lang=language)
             if len(this_guild)>0:
             # Nicknames part
                 f.append({'name':await self.translate(ctx.channel,'infos','usernames-local'), 'value':"\n".join([x['new'] for x in this_guild if x['new']!=''])})
+                if this_guild[-1]['old'] != '':
+                    f[-1]["value"] += "\n" + this_guild[-1]['old']
                 date += "\n" + await self.bot.cogs['TimeCog'].date([x['utc_date'] for x in this_guild][0], year=True, lang=language)
             if len(date)>0:
                 f.append({'name':await self.translate(ctx.channel,'infos','usernames-last-date'), 'value':date})
