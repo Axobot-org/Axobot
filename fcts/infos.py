@@ -58,6 +58,7 @@ class InfoCog(commands.Cog):
                             count += 1
         except Exception as e:
             await self.bot.cogs['ErrorsCog'].on_error(e,None)
+        self.codelines = count
         return count
 
     @commands.command(name='admins')
