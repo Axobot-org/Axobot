@@ -505,7 +505,10 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
             await self.bot.cogs['ErrorsCog'].on_error(e,ctx)
             roles = guild.roles
         roles.reverse()
-        if len(roles)>20:
+        if len(roles) == 0:
+            temp = (await self.translate(ctx.guild.id,"keywords","none")).capitalize()
+            embed.add_field(name=str(await self.translate(ctx.guild.id,"stats_infos","guild-11.2")).format(len(guild.roles)-1), value=temp)
+        elif len(roles)>20:
             embed.add_field(name=str(await self.translate(ctx.guild.id,"stats_infos","guild-11.1")).format(len(guild.roles)-1), value=", ".join(roles[:20]))
         else:
             embed.add_field(name=str(await self.translate(ctx.guild.id,"stats_infos","guild-11.2")).format(len(guild.roles)-1), value=", ".join(roles))
