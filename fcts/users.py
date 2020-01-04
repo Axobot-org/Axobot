@@ -55,50 +55,6 @@ class UsersCog(commands.Cog):
             else:
                 await ctx.send(await self.translate(ctx.channel,'users','changed-1'))
 
-    @profile_main.command(name='animated_card')
-    @commands.check(checks.database_connected)
-    async def set_animated_card(self,ctx,allowed:bool=None):
-        """DEPRECATED COMMAND
-        Allow your rank card to be animated or not 
-        This is only used if you have an animated pfp"""
-        if allowed==None:
-            allowed = await self.bot.cogs['UtilitiesCog'].get_db_userinfo(['animated_card'],[f'`userID`={ctx.author.id}'])
-            if allowed==None:
-                allowed = False
-            else:
-                allowed = allowed['animated_card']
-            if allowed:
-                await ctx.send(await self.translate(ctx.channel,'users','allow_animated_true'))
-            else:
-                await ctx.send(await self.translate(ctx.channel,'users','allow_animated_false'))
-        else:
-            if await self.bot.cogs['UtilitiesCog'].change_db_userinfo(ctx.author.id,'animated_card',allowed):
-                await ctx.send(str(await self.translate(ctx.channel,'users','allow_animated_success')).format(allowed))
-            else:
-                await ctx.send(await self.translate(ctx.channel,'users','changed-1'))
-    
-    @profile_main.command(name='auto_unafk')
-    @commands.check(checks.database_connected)
-    async def set_auto_unafk(self,ctx,value:bool=None):
-        """DEPRECATED COMMAND
-        Automatically remove your AFK mode
-        This system will remove your AFK tag as soon as you send a message, but only in the server you sent it"""
-        if value==None:
-            value = await self.bot.cogs['UtilitiesCog'].get_db_userinfo(['auto_unafk'],[f'`userID`={ctx.author.id}'])
-            if value==None:
-                value = False
-            else:
-                value = value['auto_unafk']
-            if value:
-                await ctx.send(await self.translate(ctx.channel,'users','allow_auto_unafk_true'))
-            else:
-                await ctx.send(await self.translate(ctx.channel,'users','allow_auto_unafk_false'))
-        else:
-            if await self.bot.cogs['UtilitiesCog'].change_db_userinfo(ctx.author.id,'auto_unafk',value):
-                await ctx.send(str(await self.translate(ctx.channel,'users','allow_animated_success')).format(value))
-            else:
-                await ctx.send(await self.translate(ctx.channel,'users','changed-1'))
-    
     @profile_main.command(name="config")
     @commands.check(checks.database_connected)
     async def user_config(self,ctx:commands.Context,option:str,allow:bool=None):
@@ -112,7 +68,7 @@ class UsersCog(commands.Cog):
         Providing empty value will show you the current value and more details"""
         options = {"animated_card":"animated_card", "auto_unafk":"auto_unafk", "usernames_log":"allow_usernames_logs"}
         if option not in options.keys():
-            await ctx.send("no u")
+            await ctx.send(await self.translate(ctx.channel,"users","config_list",options=" - ".join(options.keys())))
             return
         if allow==None:
             value = await self.bot.cogs['UtilitiesCog'].get_db_userinfo([options[option]],[f'`userID`={ctx.author.id}'])
