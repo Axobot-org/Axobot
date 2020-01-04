@@ -644,7 +644,7 @@ Cette option affecte tous les serveurs"""
         server = self.bot.get_guild(356067272730607628)
         if server==None:
             return await ctx.send("Serveur introuvable")
-        channel = server.get_channel(548138866591137802) if self.bot.beta else server.get_channel(488769306524385301)
+        channel = server.get_channel(488769306524385301)
         if channel == None:
             return await ctx.send("Salon introuvable")
         liste = list()
