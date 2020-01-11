@@ -46,8 +46,7 @@ class ReloadsCog(commands.Cog):
             if not cog.startswith("fcts."):
                 fcog = "fcts."+cog
             try:
-                self.bot.unload_extension(fcog)
-                self.bot.load_extension(fcog)
+                self.bot.reload_extension(fcog)
             except ModuleNotFoundError:
                 await ctx.send("Cog {} can't be found".format(cog))
             except commands.errors.ExtensionNotLoaded :
