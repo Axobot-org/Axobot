@@ -511,6 +511,7 @@ class Events(commands.Cog):
         cursor.close()
         emb = self.bot.cogs["EmbedCog"].Embed(desc='**Stats logs** updated',color=5293283).update_timestamp().set_author(self.bot.user)
         await self.bot.cogs["EmbedCog"].send([emb],url="loop")
+        self.statslogs_last_push = datetime.datetime.now()
         
 
 def setup(bot):
