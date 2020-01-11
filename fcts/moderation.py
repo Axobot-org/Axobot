@@ -926,8 +926,32 @@ ID corresponds to the Identifier of the message"""
         You will find there the configuration of your server, every general settings, the list of members with their roles, the list of categories and channels (with their permissions), emotes, and webhooks.
         Please note that audit logs, messages and invites are not used"""
         try:
+            async def get_channel_json(chan) -> dict:
+                chan_js = {'id':chan.id,'name':chan.name,'position':chan.position}
+                if isinstance(chan,discord.TextChannel):
+                    chan_js['type'] = 'TextChannel'
+                    chan_js['description'] = chan.topic
+                elif isinstance(chan,discord.VoiceChannel):
+                    chan_js['type'] = 'VoiceChannel'
+                else:
+                    chan_js['type'] = str(type(chan))
+                perms = list()
+                for iter_obj,iter_perm in chan.overwrites.items():
+                    temp2 = {'id':iter_obj.id}
+                    if isinstance(iter_obj,discord.Member):
+                        temp2['type'] = 'member'
+                    else:
+                        temp2['type'] = 'role'
+                    temp2['permissions'] = dict()
+                    for x in iter(iter_perm):
+                        if x[1] != None:
+                            temp2['permissions'][x[0]] = x[1]
+                    perms.append(temp2)
+                chan_js['permissions_overwrites'] = perms
+                return chan_js
             g = ctx.guild
-            back = {'name':g.name,'id':g.id,'owner':g.owner.id,'voiceregion':str(g.region),'afk_timeout':g.afk_timeout,'afk_channel':g.afk_channel,'icon':str(g.icon_url),'verification_level':str(g.verification_level),'mfa_level':g.mfa_level,'explicit_content_filter':str(g.explicit_content_filter),'default_notifications':str(g.default_notifications),'created_at':int(g.created_at.timestamp())}
+            back = {'name':g.name,'id':g.id,'owner':g.owner.id,'voiceregion':str(g.region),'afk_timeout':g.afk_timeout,'icon':str(g.icon_url),'verification_level':str(g.verification_level),'mfa_level':g.mfa_level,'explicit_content_filter':str(g.explicit_content_filter),'default_notifications':str(g.default_notifications),'created_at':int(g.created_at.timestamp())}
+            back['afk_channel'] = g.afk_channel.id if g.afk_channel!=None else None
             back['system_channel'] = g.system_channel.id if g.system_channel!=None else None
             roles = list()
             for x in g.roles:
@@ -955,28 +979,7 @@ ID corresponds to the Identifier of the message"""
                     temp['permissions_overwrites'] = perms
                 temp['channels'] = list()
                 for chan in l:
-                    chan_js = {'id':chan.id,'name':chan.name,'position':chan.position}
-                    if isinstance(chan,discord.TextChannel):
-                        chan_js['type'] = 'TextChannel'
-                        chan_js['description'] = chan.topic
-                    elif isinstance(chan,discord.VoiceChannel):
-                        chan_js['type'] = 'VoiceChannel'
-                    else:
-                        chan_js['type'] = str(type(chan))
-                    perms = list()
-                    for iter_obj,iter_perm in chan.overwrites.items():
-                        temp2 = {'id':iter_obj.id}
-                        if isinstance(iter_obj,discord.Member):
-                            temp2['type'] = 'member'
-                        else:
-                            temp2['type'] = 'role'
-                        temp2['permissions'] = dict()
-                        for x in iter(iter_perm):
-                            if x[1] != None:
-                                temp2['permissions'][x[0]] = x[1]
-                        perms.append(temp2)
-                    chan_js['permissions_overwrites'] = perms
-                    temp['channels'].append(chan_js)
+                    temp['channels'].append(await get_channel_json(chan))
                 categ.append(temp)
             back['categories'] = categ
             back['emojis'] = dict()
