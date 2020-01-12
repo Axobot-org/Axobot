@@ -1,6 +1,7 @@
 from discord.ext import commands
 import discord, re, datetime, random, json, os, typing, importlib, string, asyncio
 from fcts import checks, args
+
 importlib.reload(checks)
 importlib.reload(args)
 
@@ -915,106 +916,6 @@ ID corresponds to the Identifier of the message"""
                     await self.bot.cogs['ErrorsCog'].on_cmd_error(ctx,e)
             await del_msg(qu_msg)
 
-
-
-    @commands.command(name='backup')
-    @commands.guild_only()
-    @commands.cooldown(2,120, commands.BucketType.guild)
-    @commands.check(checks.has_admin)
-    async def backup_server(self,ctx:commands.Context):
-        """Make and send a backup of this server
-        You will find there the configuration of your server, every general settings, the list of members with their roles, the list of categories and channels (with their permissions), emotes, and webhooks.
-        Please note that audit logs, messages and invites are not used"""
-        try:
-            async def get_channel_json(chan) -> dict:
-                chan_js = {'id':chan.id,'name':chan.name,'position':chan.position}
-                if isinstance(chan,discord.TextChannel):
-                    chan_js['type'] = 'TextChannel'
-                    chan_js['description'] = chan.topic
-                elif isinstance(chan,discord.VoiceChannel):
-                    chan_js['type'] = 'VoiceChannel'
-                else:
-                    chan_js['type'] = str(type(chan))
-                perms = list()
-                for iter_obj,iter_perm in chan.overwrites.items():
-                    temp2 = {'id':iter_obj.id}
-                    if isinstance(iter_obj,discord.Member):
-                        temp2['type'] = 'member'
-                    else:
-                        temp2['type'] = 'role'
-                    temp2['permissions'] = dict()
-                    for x in iter(iter_perm):
-                        if x[1] != None:
-                            temp2['permissions'][x[0]] = x[1]
-                    perms.append(temp2)
-                chan_js['permissions_overwrites'] = perms
-                return chan_js
-            g = ctx.guild
-            back = {'name':g.name,'id':g.id,'owner':g.owner.id,'voiceregion':str(g.region),'afk_timeout':g.afk_timeout,'icon':str(g.icon_url),'verification_level':str(g.verification_level),'mfa_level':g.mfa_level,'explicit_content_filter':str(g.explicit_content_filter),'default_notifications':str(g.default_notifications),'created_at':int(g.created_at.timestamp())}
-            back['afk_channel'] = g.afk_channel.id if g.afk_channel!=None else None
-            back['system_channel'] = g.system_channel.id if g.system_channel!=None else None
-            roles = list()
-            for x in g.roles:
-                roles.append({'id':x.id,'name':x.name,'color':str(x.colour),'position':x.position,'hoist':x.hoist,'mentionable':x.mentionable,'permissions':x.permissions.value})
-            back['roles'] = roles
-            categ = list()
-            for x in g.by_category():
-                c,l = x[0],x[1]
-                if c==None:
-                    temp = {'type':None}
-                else:
-                    temp = {'id':c.id,'name':c.name,'position':c.position,'is_nsfw':c.is_nsfw()}
-                    perms = list()
-                    for iter_obj, iter_perm in c.overwrites.items():
-                        temp2 = {'id':iter_obj.id}
-                        if isinstance(iter_obj,discord.Member):
-                            temp2['type'] = 'member'
-                        else:
-                            temp2['type'] = 'role'
-                        temp2['permissions'] = dict()
-                        for x in iter(iter_perm):
-                            if x[1] != None:
-                                temp2['permissions'][x[0]] = x[1]
-                        perms.append(temp2)
-                    temp['permissions_overwrites'] = perms
-                temp['channels'] = list()
-                for chan in l:
-                    temp['channels'].append(await get_channel_json(chan))
-                categ.append(temp)
-            back['categories'] = categ
-            back['emojis'] = dict()
-            for e in g.emojis:
-                back['emojis'][e.name] = str(e.url)
-            try:
-                banned = dict()
-                for b in await g.bans():
-                    banned[b.user.id] = b.reason
-                back['banned_users'] = banned
-            except discord.errors.Forbidden:
-                pass
-            except Exception as e:
-                await ctx.bot.cogs['ErrorsCog'].on_error(e,ctx)
-            try:
-                webs = list()
-                for w in await g.webhooks():
-                    webs.append({'channel':w.channel_id,'name':w.name,'avatar':str(w.avatar_url),'url':w.url})
-                back['webhooks'] = webs
-            except discord.errors.Forbidden:
-                pass
-            except Exception as e:
-                await ctx.bot.cogs['ErrorsCog'].on_error(e,ctx)
-            back['members'] = list()
-            for memb in g.members:
-                back['members'].append({'id':memb.id,'nickname':memb.nick,'bot':memb.bot,'roles':[x.id for x in memb.roles][1:]})
-            js = json.dumps(back, sort_keys=True, indent=4)
-            directory = 'backup/{}.json'.format(g.id)
-            if not os.path.exists('backup/'):
-                os.makedirs('backup/')
-            with open(directory,'w',encoding='utf-8') as file:
-                file.write(js)
-            await ctx.send(await self.translate(ctx.guild.id,'modo','backup-done'),file=discord.File(directory))
-        except Exception as e:
-            await ctx.bot.cogs['ErrorsCog'].on_cmd_error(ctx,e)
 
 
     async def configure_muted_role(self,guild):

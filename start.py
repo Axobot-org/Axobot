@@ -187,6 +187,7 @@ def main():
                       'fcts.reloads',
                       'fcts.roles_react',
                       'fcts.rss2',
+                      'fcts.s_backup',
                       'fcts.server',
                       'fcts.timeclass',
                       'fcts.translators',
