@@ -362,15 +362,18 @@ class ServerCog(commands.Cog):
             for role in roles:
                 role = role.strip()
                 try:
-                    r = await commands.RoleConverter().convert(ctx,role)
+                    if role=="everyone":
+                        r = ctx.guild.default_role
+                    else:
+                        r = await commands.RoleConverter().convert(ctx,role)
                 except commands.errors.BadArgument:
                     msg = await self.translate(ctx.guild.id,"server","change-3")
-                    await ctx.send(msg.format(role))
+                    await ctx.send(msg.format(role.replace("@everyone","@"+u'\u200b'+"everyone").replace("@here","@"+u'\u200b'+"here")))
                     return
                 if str(r.id) in liste:
                     continue
                 liste.append(str(r.id))
-                liste2.append(r.name)
+                liste2.append(r.name.replace("@everyone","@"+u'\u200b'+"everyone").replace("@here","@"+u'\u200b'+"here"))
             await self.modify_server(ctx.guild.id,values=[(option,";".join(liste))])
             msg = await self.translate(ctx.guild.id,"server","change-role")
             await ctx.send(msg.format(option,", ".join(liste2)))
