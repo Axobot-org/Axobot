@@ -1,5 +1,5 @@
 from discord.ext import commands
-import discord, re, datetime, random, json, os, typing, importlib, string, asyncio
+import discord, re, datetime, random, json, os, typing, importlib, string, asyncio, copy
 from fcts import checks, args
 
 importlib.reload(checks)
@@ -676,6 +676,16 @@ You must be an administrator of this server to use this command."""
             await ctx.message.delete()
         except:
             pass
+    
+    @emoji_group.command(name="info")
+    @commands.check(checks.has_manage_msg)
+    async def emoji_info(self,ctx,emoji:discord.Emoji):
+        """Get info about an emoji
+        This is only an alias or `info emoji`"""
+        msg = copy.copy(ctx.message)
+        msg.content = ctx.prefix + "info emoji " + str(emoji.id)
+        new_ctx = await self.bot.get_context(msg)
+        await self.bot.invoke(new_ctx)
 
     @emoji_group.command(name="list")
     async def emoji_list(self,ctx):
@@ -749,6 +759,16 @@ You must be an administrator of this server to use this command."""
                 fields.append({'name':tr_mbr.capitalize(),'value':txt})
         emb = self.bot.cogs['EmbedCog'].Embed(title=role.name,fields=fields,color=role.color).update_timestamp().create_footer(ctx.author)
         await ctx.send(embed=emb.discord_embed())
+    
+    @main_role.command(name="info")
+    @commands.check(checks.has_manage_msg)
+    async def role_info(self,ctx,role:discord.Role):
+        """Get info about a role
+        This is only an alias or `info role`"""
+        msg = copy.copy(ctx.message)
+        msg.content = ctx.prefix + "info role " + str(role.id)
+        new_ctx = await self.bot.get_context(msg)
+        await self.bot.invoke(new_ctx)
 
     @main_role.command(name="give", aliases=["add"])
     @commands.check(checks.has_manage_roles)
