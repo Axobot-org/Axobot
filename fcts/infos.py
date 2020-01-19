@@ -490,7 +490,7 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
         embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","guild-10"), value = str(int(guild.afk_timeout/60))+" minutes")
         # Splash url
         try:
-            embed.add_field(name="duh", value=str(await guild.vanity_invite()))
+            embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","guild-15"), value=str(await guild.vanity_invite()))
         except Exception as e:
             if isinstance(e,(discord.errors.Forbidden, discord.errors.HTTPException)):
                 pass

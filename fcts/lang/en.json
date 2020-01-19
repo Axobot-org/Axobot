@@ -916,6 +916,7 @@
         "guild-13v": "{b} (tier {p})",
         "guild-14": "Limitations",
         "guild-14v": "Bitrate: {bit}kbps\nFiles size: {fil}MB\nEmojis count: {emo}\nConnected members: {mem}",
+        "guild-15": "Invite url",
         "guild-2": "Region",
         "guild-3": "Text : {} | Vocal : {} ({} categories)",
         "guild-4": "Online members",
