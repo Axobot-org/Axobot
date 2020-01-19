@@ -497,13 +497,17 @@ class Events(commands.Cog):
         "Send some stats about the current bot stats"
         cnx = self.bot.cnx_frm
         cursor = cnx.cursor()
-        query = ("INSERT INTO `log_stats` (`time`, `servers_count`, `members_count`, `bots_count`, `dapi_heartbeat`, `codelines_count`, `earned_xp_total`, `beta`) VALUES (CURRENT_TIMESTAMP, '{server_count}', '{members_count}', '{bots_count}', '{ping}', '{codelines}', '{xp}', '{beta}')".format(
+        rss_feeds = await self.bot.get_cog("RssCog").get_raws_count(True)
+        active_rss_feeds = await self.bot.get_cog("RssCog").get_raws_count()
+        query = ("INSERT INTO `log_stats` (`time`, `servers_count`, `members_count`, `bots_count`, `dapi_heartbeat`, `codelines_count`, `earned_xp_total`, `rss_feeds`, `active_rss_feeds`, `beta`) VALUES (CURRENT_TIMESTAMP, '{server_count}', '{members_count}', '{bots_count}', '{ping}', '{codelines}', '{xp}', '{rss_feeds}', '{active_rss_feeds}','{beta}')".format(
             server_count = len(self.bot.guilds),
             members_count = len(self.bot.users),
             bots_count = len([1 for x in self.bot.users if x.bot]),
             ping = round(self.bot.latency,3),
             codelines = self.bot.cogs["InfoCog"].codelines,
             xp = await self.bot.cogs['XPCog'].bdd_total_xp(),
+            rss_feeds = rss_feeds,
+            active_rss_feeds = active_rss_feeds,
             beta = 1 if self.bot.beta else 0
         ))
         cursor.execute(query)

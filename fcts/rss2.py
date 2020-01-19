@@ -1149,7 +1149,20 @@ class RssCog(commands.Cog):
         liste = list()
         for x in cursor:
             liste.append(x)
+        cursor.close()
         return liste
+    
+    async def get_raws_count(self, get_disabled:bool=False):
+        """Get the number of rss feeds"""
+        cnx = self.bot.cnx_frm
+        cursor = cnx.cursor()
+        query = "SELECT COUNT(*) FROM `{}`".format(self.table)
+        if not get_disabled:
+            query += " WHERE `guild` in (" + ','.join(["'{}'".format(x.id) for x in self.bot.guilds]) + ")"
+        cursor.execute(query)
+        t = list(cursor)[0][0]
+        cursor.close()
+        return t
 
     async def update_flow(self,ID,values=[(None,None)]):
         cnx = self.bot.cnx_frm
@@ -1165,6 +1178,7 @@ class RssCog(commands.Cog):
         query = """UPDATE `{t}` SET {v} WHERE `ID`={id}""".format(t=self.table,v=",".join(v),id=ID)
         cursor.execute(query)
         cnx.commit()
+        cursor.close()
 
     async def send_rss_msg(self,obj,channel,roles):
         if channel != None:
