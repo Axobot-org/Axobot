@@ -37,29 +37,30 @@ class BackupCog(commands.Cog):
 Arguments are:
     - reset: delete everything from the current server
     - delete_old_channels: delete every current channel/category
-    - delete_old_roles: delete every current role"""
+    - delete_old_roles: delete every current role
+    - delete_old_emojis: delete every current emoji
+    - delete_old_webhooks: well, same but with webhooks"""
         # Analyzing arguments
-        valid_args = ["reset","delete_old_channels","delete_old_roles"]
+        valid_args = ["reset","delete_old_channels","delete_old_roles","delete_old_emojis","delete_old_webhooks"]
         arguments = set([a.lower() for a in arguments if a.lower() in valid_args])
         if "reset" in arguments:
-            arguments.add('delete_old_channels')
-            arguments.add('delete_old_roles')
+            arguments.update(set(['delete_old_channels','delete_old_roles','delete_old_emojis','delete_old_webhooks']))
         # Loading backup from file
         try:
             data = json.loads(await ctx.message.attachments[0].read())
         except:
-            await ctx.send("INVALID ATTACHMENT")
+            await ctx.send(await self.translate(ctx.guild,"s_backup","invalid_file"))
             return
         # Applying backup
-        msg = await ctx.send("LOADING")
+        msg = await ctx.send(await self.translate(ctx.guild,"s_backup","loading"))
         try:
             if data["_backup_version"] == 1:
                 problems, logs = await self.BackupLoaderV1().load_backup(ctx,data,arguments)
             else:
-                await ctx.send("INVALID BACKUP VERSION")
+                await ctx.send(await self.translate(ctx.guild,"s_backup","invalid_version"))
                 return
         except Exception as e:
-            await ctx.send("SOMETHING BAD HAPPENED")
+            await ctx.send(await self.translate(ctx.guild,"s_backup","err"))
             await ctx.bot.cogs['ErrorsCog'].on_cmd_error(ctx,e)
             return
         # Formatting and sending logs
@@ -67,10 +68,11 @@ Arguments are:
         if len(logs)>1950:
             # If too many logs, send in a file
             logs = logs.replace("`[O]`","[O]").replace("`[-]`","[-]").replace("`[X]`","[X]")
+            finish_msg = await self.translate(ctx.guild,"s_backup","finished")
             try:
-                await ctx.send(content="FINISHED",file=discord.File(BytesIO(logs.encode()),filename="logs.txt"))
+                await ctx.send(content=finish_msg,file=discord.File(BytesIO(logs.encode()),filename="logs.txt"))
             except discord.errors.NotFound: # if channel was deleted, send in DM
-                await ctx.author.send(content="FINISHED",file=discord.File(BytesIO(logs.encode()),filename="logs.txt"))
+                await ctx.author.send(content=finish_msg,file=discord.File(BytesIO(logs.encode()),filename="logs.txt"))
             try:
                 await msg.delete()
             except: # can happens because deleted channel
@@ -171,7 +173,7 @@ Arguments are:
         back['categories'] = categ
         back['emojis'] = dict()
         for e in g.emojis:
-            back['emojis'][e.name] = str(e.url)
+            back['emojis'][e.name] = {"url": str(e.url), "roles": [x.id for x in e.roles]}
         try:
             banned = dict()
             for b in await g.bans():
@@ -226,35 +228,24 @@ Arguments are:
                 roles_list = {x.id: x for x in ctx.guild.roles}
             else:
                 for role in data["roles"]:
-                    #print("role",role["name"])
                     try:
                         rolename = role["name"].replace("@everyone","@"+u'\u200b'+"everyone").replace("@here","@"+u'\u200b'+"here")
                         action = "edit"
-                        #print(" checkpoint 0.1")
                         r = ctx.guild.get_role(role["id"])
-                        #print(" checkpoint 0.2")
                         if r == None:
-                            #print(" checkpoint 0.3")
                             r = [x for x in ctx.guild.roles if x.name == role["name"]]
                             if len(r) == 0:
-                                #print(" checkpoint 0.4")
                                 action = "create"
                                 try:
                                     r = await ctx.guild.create_role(name=role["name"])
                                 except Exception as e:
                                     pass
-                                    #print("DDDUUUUUUUHHHH",e)
-                                #print(" checkpoint 0.6")
                             else:
-                                #print(" checkpoint 0.5")
                                 r = r[0]
-                                #print(" checkpoint 0.7")
-                        #print(" checkpoint 1")
                         if role["name"] == "@everyone":
                             if r.permissions.value != role["permissions"]:
                                 await r.edit(permissions = discord.Permissions(role["permissions"]))
                         else:
-                            #print(" checkpoint 2")
                             kwargs = dict()
                             if r.name != role["name"]:
                                 kwargs["name"] = role["name"]
@@ -266,8 +257,7 @@ Arguments are:
                                 kwargs["hoist"] = role["hoist"]
                             if r.mentionable != role["mentionable"]:
                                 kwargs["mentionable"] = role["mentionable"]
-                            #print(" checkpoint 3")
-                            if len(kwargs.keys()) > 0 and action=="edit":
+                            if len(kwargs.keys()) > 0:
                                 await r.edit(**kwargs)
                                 if action=="create":
                                     logs.append("  "+symb[2]+" Role {} created".format(rolename))
@@ -278,7 +268,6 @@ Arguments are:
                             else:
                                 logs.append("  "+symb[1]+" No need to change role {}".format(rolename))
                         roles_list[role["id"]] = r
-                        #print(" checkpoint 4")
                     except discord.errors.Forbidden:
                         if action == "create":
                             await r.delete()
@@ -289,9 +278,7 @@ Arguments are:
                         problems[1] += 1
                     else:
                         pass
-                #print(" checkpoint 5")
                 if "delete_old_roles" in args:
-                    #print("role deletion")
                     for role in ctx.guild.roles:
                         if role in roles_list.values():
                             continue
@@ -307,16 +294,19 @@ Arguments are:
                         else:
                             logs.append("  "+symb[2]+" Role {} deleted".format(role.name))
                 for r in data["roles"]:
-                    #print("position",r["name"])
                     if r["id"] in roles_list.keys() and r["position"]>0:
-                        new_pos = min(ctx.guild.me.top_role.position-1, r["position"])
+                        new_pos = min(max(ctx.guild.me.top_role.position-1,1), r["position"])
                         try:
                             await roles_list[r["id"]].edit(position = new_pos)
-                        except:
-                            logs.append("  "+symb[0]+" Unable to move role {} to position {}".format(r["name"],new_pos))
-                            problems[0] += 1
+                        except Exception as e:
+                            if isinstance(e,discord.errors.HTTPException) or (isinstance(e,discord.errors.HTTPException) and hasattr(e,"status") and e.status in (403,400)):
+                                logs.append("  "+symb[0]+" Unable to move role {} to position {}: missing permissions".format(r["name"],new_pos))
+                                problems[0] += 1
+                            else:
+                                logs.append("  "+symb[0]+" Unable to move role {} to position {}: {}".format(r["name"],new_pos,e))
+                                problems[1] += 1
 
-        async def load_categories(self, ctx:commands.Context, logs:list, symb:list, data:dict, args:tuple, channels_list:dict):
+        async def load_categories(self, ctx:commands.Context, problems: list, logs:list, symb:list, data:dict, args:tuple, channels_list:dict):
             if not ctx.guild.me.guild_permissions.manage_channels:
                 logs.append("  "+symb[0]+" Unable to create or update categories: missing permissions")
                 problems[0] += 1
@@ -548,11 +538,110 @@ Arguments are:
                     if len(edition)>0:
                         logs.append("  "+symb[2]+" Updated {} for user {}".format("and".join(edition),member))
 
+        async def load_emojis(self, ctx:commands.Context, problems: list, logs:list, symb:list, data:dict, args:tuple, roles_list:dict):
+            if not ctx.guild.me.guild_permissions.manage_emojis:
+                logs.append("  "+symb[0]+" Unable to create or update emojis: missing permissions")
+                problems[0] += 1
+            else:
+                for emojiname, emojidata in data["emojis"].items():
+                    try:
+                        emoji_name = emojiname.replace("@everyone","@"+u'\u200b'+"everyone").replace("@here","@"+u'\u200b'+"here")
+                        if len([x for x in ctx.guild.emojis if x.name == emojiname]) > 0:
+                            logs.append("  "+symb[1]+" Emoji {} already exists".format(emojiname))
+                            continue
+                        try:
+                            icon = await self.urlToByte(emojidata["url"])
+                        except:
+                            logs.append("  "+symb[0]+" Unable to create emoji {}: the image has probably been deleted from Discord cache".format(emoji_name))
+                            continue
+                        roles = list()
+                        for r in emojidata["roles"]:
+                            try:
+                                _role = roles_list[r]
+                                if 0 < _role.position < ctx.guild.me.top_role.position:
+                                    roles.append(_role)
+                            except KeyError:
+                                pass
+                        if len(roles) == 0:
+                            roles = None
+                        await ctx.guild.create_custom_emoji(name=emojiname, image=icon, roles=roles)
+                    except discord.errors.Forbidden:
+                        logs.append("  "+symb[0]+" Unable to create emoji {}: missing permissions".format(emoji_name))
+                        problems[0] += 1
+                    except Exception as e:
+                        logs.append("  "+symb[0]+" Unable to create emoji {}: {}".format(emoji_name,e))
+                        problems[1] += 1
+                    else:
+                        logs.append("  "+symb[2]+" Emoji {} created".format(emoji_name))
+                if "delete_old_emojis" in args:
+                    for emoji in ctx.guild.emojis:
+                        if emoji.name in data["emojis"].keys():
+                            continue
+                        try:
+                            await emoji.delete()
+                        except discord.errors.Forbidden:
+                            logs.append("  "+symb[0]+" Unable to delete emoji {}: missing permissions".format(emoji.name))
+                            problems[0] += 1
+                        except Exception as e:
+                            if not "404" in str(e):
+                                logs.append("  "+symb[0]+" Unable to delete emoji {}: {}".format(emoji.name,e))
+                                problems[1] += 1
+                        else:
+                            logs.append("  "+symb[2]+" Emoji {} deleted".format(emoji.name))
+
+        async def load_webhooks(self, ctx:commands.Context, problems: list, logs:list, symb:list, data:dict, args:tuple, channels_list:dict):
+            if not ctx.guild.me.guild_permissions.manage_webhooks:
+                logs.append("  "+symb[0]+" Unable to create or update webhooks: missing permissions")
+                problems[0] += 1
+            else:
+                created_webhooks_urls = list()
+                for webhook in data["webhooks"]:
+                    try:
+                        webhookname = webhook["name"].replace("@everyone","@"+u'\u200b'+"everyone").replace("@here","@"+u'\u200b'+"here")
+                        if len([x for x in await ctx.guild.webhooks() if x.url == webhook["url"]]) > 0:
+                            logs.append("  "+symb[1]+" Webhook {} already exists".format(webhookname))
+                            continue
+                        try:
+                            icon = await self.urlToByte(webhook["avatar"])
+                        except:
+                            logs.append("  "+symb[0]+" Unable to get avatar of wbehook {}: the image has probably been deleted from Discord cache".format(webhookname))
+                            icon = None
+                        try:
+                            real_channel = channels_list[webhook["channel"]]
+                        except KeyError:
+                            logs.append("  "+symb[0]+" Unable to create wbehook {}: unable to get the text channel".format(webhookname))
+                            continue
+                        await real_channel.create_webhook(name=webhook["name"], avatar=icon)
+                    except discord.errors.Forbidden:
+                        logs.append("  "+symb[0]+" Unable to create webhook {}: missing permissions".format(webhookname))
+                        problems[0] += 1
+                    except Exception as e:
+                        logs.append("  "+symb[0]+" Unable to create webhook {}: {}".format(webhookname,e))
+                        problems[1] += 1
+                    else:
+                        logs.append("  "+symb[2]+" Webhook {} created".format(webhookname))
+                        created_webhooks_urls.append(webhook["url"])
+                if "delete_old_webhooks" in args:
+                    for web in await ctx.guild.webhooks():
+                        if web.url in created_webhooks_urls:
+                            continue
+                        try:
+                            await web.delete()
+                        except discord.errors.Forbidden:
+                            logs.append("  "+symb[0]+" Unable to delete webhook {}: missing permissions".format(web.name))
+                            problems[0] += 1
+                        except Exception as e:
+                            if not "404" in str(e):
+                                logs.append("  "+symb[0]+" Unable to delete webhook {}: {}".format(web.name,e))
+                                problems[1] += 1
+                        else:
+                            logs.append("  "+symb[2]+" Webhook {} deleted".format(web.name))
+
+
         async def load_backup(self,ctx:commands.Context, data:dict, args:list) -> (list,list):
             "Load a backup in a server, for backups version 1"
             if data.pop('_backup_version',None) != 1:
                 return ([0,1], ["Unknown backup version"])
-            #print("starting")
             symb = ["`[X]`","`[-]`","`[O]`"]
             problems = [0,0]
             logs = list()
@@ -573,23 +662,24 @@ Arguments are:
             # banned_users
             try:
                 banned_users = [x[0].id for x in await ctx.guild.bans()]
-                for user,reason in data["banned_users"].items():
-                    if user in banned_users:
-                        continue
-                    try:
-                        await ctx.guild.ban(discord.Object(user),reason=reason,delete_message_days=0)
-                    except discord.errors.NotFound:
-                        pass
+                users_to_ban = [x for x in data["banned_users"].items() if x[0] not in banned_users]
+                if len(users_to_ban)==0:
+                    logs.append(symb[1]+" No user to ban")
+                else:
+                    for x in users_to_ban:
+                        user,reason = x
+                        try:
+                            await ctx.guild.ban(discord.Object(user),reason=reason,delete_message_days=0)
+                        except discord.errors.NotFound:
+                            pass
+                    logs.append(symb[2]+" Banned users updated ({} users)".format(len(data["banned_users"].keys())))
             except discord.errors.Forbidden:
                 logs.append(symb[0]+" Unable to ban users: missing permissions")
                 problems[0] += 1
             except Exception as e:
                 logs.append(symb[0]+f" Unable to ban users: {e}")
-                problems[1] += 1
-            else:
-                logs.append(symb[2]+" Banned users updated ({} users)".format(len(data["banned_users"].keys())))
+                problems[1] += 1                
             # default_notifications
-            #print("checkpoint 1")
             if ctx.guild.default_notifications.value == data["default_notifications"]:
                 logs.append(symb[1]+" No need to change default notifications")
             else:
@@ -620,15 +710,13 @@ Arguments are:
                 else:
                     logs.append(symb[2]+" Explicit content filter set to "+contentFilter.name)
             # icon
-            #print("checkpoint 2")
             try:
                 icon = None if data['icon']==None else await self.urlToByte(data['icon'])
             except:
                 icon = None
             if icon!=None or data['icon']==None:
                 try:
-                    #print("PLS UNCOMMENT ME DUDE")
-                    # await ctx.guild.edit(icon = icon)
+                    await ctx.guild.edit(icon = icon)
                 except discord.errors.Forbidden:
                     logs.append(symb[0]+" Unable to set server icon: missing permissions")
                     problems[0] += 1
@@ -643,7 +731,6 @@ Arguments are:
                 problems[1] += 1
                 logs.append(symb[0]+" Unable to set server icon: the image has probably been deleted from Discord cache")
             # mfa_level
-            #print("checkpoint 3")
             if ctx.guild.mfa_level != data["mfa_level"]:
                 logs.append(symb[0]+" Unable to change 2FA requirement: only owner can do that")
             else:
@@ -663,7 +750,6 @@ Arguments are:
                 else:
                     logs.append(symb[2]+" Server name set to "+data["name"])
             # verification_level
-            #print("checkpoint 4")
             if ctx.guild.verification_level.value == data["verification_level"]:
                 logs.append(symb[1]+" No need to change verification level")
             else:
@@ -694,29 +780,29 @@ Arguments are:
                 else:
                     logs.append(symb[2]+" Voice region set to "+voicereg.name)
             # roles
-            #print("getting roles")
             logs.append(" - Creating roles")
             roles_list = dict()
-            await self.load_roles(ctx, logs, symb, data, args, roles_list)
+            await self.load_roles(ctx, problems, logs, symb, data, args, roles_list)
             # categories
-            #print("getting categories")
             logs.append(" - Creating categories")
             channels_list = dict()
-            await self.load_categories(ctx, logs, symb, data, args, channels_list)
+            await self.load_categories(ctx, problems, logs, symb, data, args, channels_list)
             # channels
-            #print("getting channels")
             logs.append(" - Creating channels")
-            await self.load_channels(ctx, logs, symb, data, args, channels_list)
+            await self.load_channels(ctx, problems, logs, symb, data, args, channels_list)
             # channels permissions
-            #print("getting perms")
             logs.append(" - Updating categories and channels permissions")
-            await self.load_perms(ctx, logs, symb, data, args, roles_list, channels_list)
+            await self.load_perms(ctx, problems, logs, symb, data, args, roles_list, channels_list)
             # members
-            #print("getting members")
             logs.append(" - Updating members roles and nick")
             await self.load_members(ctx, problems, logs, symb, data, args, roles_list)
+            # emojis
+            logs.append(" - Creating emojis")
+            await self.load_emojis(ctx, problems, logs, symb, data, args, roles_list)
+            # webhooks
+            logs.append(" - Creating webhooks")
+            await self.load_webhooks(ctx, problems, logs, symb, data, args, channels_list)
 
-            #print("finished")
             return problems,logs
 
 def setup(bot):

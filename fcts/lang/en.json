@@ -812,6 +812,13 @@
         "yt-form-last": "{logo}  | Here is the last video of {author}:\n{title}\nPublished on {date}\nLink: {url}",
         "yt-help": "To search for a youtube channel, you must enter the channel ID. You will find it at the end of the string url, it can be either the name, or a string of random characters.\n*Tip: some channels are already filled in my code. Sometimes you can just put `neil3000` or `Oxisius`* :wink:"
     },
+    "s_backup": {
+        "invalid_file": "Please send the backup file in the same message as the command",
+        "loading": "Loading backup in progress... please wait...",
+        "invalid_version": "The backup version is invalid. The file is probably corrupted",
+        "err": "Oops, an internal error occured... wait a few moments or contact support (command `about`) if it happens again",
+        "finished": "Backup applied! Here are the logs"
+    },
     "server": {
         "change-0": "This option does not exist :confused:",
         "change-1": "Oops, an internal error occurred...",

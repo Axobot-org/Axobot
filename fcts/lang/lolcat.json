@@ -563,7 +563,6 @@
         "emoji-renamed": "Teh emotz {} had bin renaamd!",
         "emoji-valid": "Teh emojy {} haz been modified 2 allow only teh roles `{}`",
         "error": "Oooooops, unknown error :scream: Just waiiiit, 'r contact sport",
-        "give_roles-0": "Oops, this role iz 2 high 4 me 2 give 2 anyone. Plz place my role above dat `{r}` role",
         "give_roles-1": "Member {u} is def 2 high 4 me :sad_face:",
         "give_roles-2": "-> {c} roles gived out of {m} !",
         "give_roles-4": "Oops, dat role is 2 high 4 me 2 give or remove 2 anyone. Please place me role above ur `{r}` :plz:",
@@ -812,6 +811,13 @@
         "yt-default-flow": "{logo}  | Naw videogramm of {author}: **{title}**\nPublishd on {date}\nLink : {link}\n{mentions}",
         "yt-form-last": "{logo}  | Her the lazt vid from {author}:\n{title}\nPublishd on {date}\nLink : {url}\n",
         "yt-help": "To seerch for a youtwube channel, you may enter the channil ID. You will found it at teh and of the strin url, it can be 8ther the nayme, or a strin of randem characteRs. *Tip: some channels are already fellid in me code. Sometimez you can just put `neil3000` or `Oxisius`* :wink:"
+    },
+    "s_backup": {
+        "invalid_file": "Plz send dat backup file IN the SAME message as ur cmd duh",
+        "loading": "Loading bkp... plz wait... a bit longer... woah im tired",
+        "invalid_version": "lmao dat backup version iz not valid. ur file's maybe corrupted lol",
+        "err": "Oops, an internal error occured... But doan worry, we'r on teh place: http://asset-5.soupcdn.com/asset/3247/3576_5092_600.jpeg",
+        "finished": "Backup done! Here are some weird things i did 4u"
     },
     "server": {
         "change-0": "Dis option doz not exist :confused:",

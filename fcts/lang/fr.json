@@ -812,6 +812,13 @@
         "yt-form-last": "{logo}  | Voici la dernière vidéo de {author}:\n{title}\nPubliée le {date}\nLien : {url}",
         "yt-help": "Pour rechercher une chaîne youtube, vous devez entrer l'identifiant de cette chaîne. Vous la trouverez à la fin de l'url de la chaine, elle peut être soit le nom, soit une suite de caractères aléatoires. *Astuce : certaines chaînes sont déjà renseignées dans mon code. Vous pouvez parfois vous contenter de mettre `neil3000` ou `Oxisius`* :wink:"
     },
+    "s_backup": {
+        "invalid_file": "Veuillez envoyer le fichier de sauvegarde dans le même message que la commande",
+        "loading": "Chargement de la sauvegarde en cours.... veuillez patienter",
+        "invalid_version": "La version de sauvegarde est invalide. Le fichier est probablement corrompu",
+        "err": "Oups, une erreur interne est survenue... attendez quelques instants ou contactez le support (commande `about`) si cela se reproduit",
+        "finished": "Sauvegarde appliquée ! Voici les logs"
+    },
     "server": {
         "change-0": "Cette option n'existe pas :confused:",
         "change-1": "Oups, une erreur interne est survenue...",
