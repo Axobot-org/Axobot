@@ -28,7 +28,8 @@ class BackupCog(commands.Cog):
     @commands.cooldown(2,120, commands.BucketType.guild)
     @commands.check(checks.has_admin)
     async def main_backup(self,ctx:commands.Context):
-        pass
+        if ctx.subcommand_passed==None:
+            await self.bot.cogs['HelpCog'].help_command(ctx,['backup'])
 
 
     @main_backup.command(name="load")
@@ -298,8 +299,8 @@ Arguments are:
                         new_pos = min(max(ctx.guild.me.top_role.position-1,1), r["position"])
                         try:
                             await roles_list[r["id"]].edit(position = new_pos)
-                        except Exception as e:
-                            if isinstance(e,discord.errors.HTTPException) or (isinstance(e,discord.errors.HTTPException) and hasattr(e,"status") and e.status in (403,400)):
+                        except (discord.errors.HTTPException,discord.errors.Forbidden) as e:
+                            if isinstance(e,discord.errors.Forbidden) or (isinstance(e,discord.errors.HTTPException) and hasattr(e,"status") and e.status in (403,400)):
                                 logs.append("  "+symb[0]+" Unable to move role {} to position {}: missing permissions".format(r["name"],new_pos))
                                 problems[0] += 1
                             else:
