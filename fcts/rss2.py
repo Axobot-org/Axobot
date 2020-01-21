@@ -841,7 +841,9 @@ class RssCog(commands.Cog):
         try:
             return [x for x in self.twitterAPI.GetUserTimeline(screen_name=nom,exclude_replies=True,trim_user=True,count=count)]
         except twitter.error.TwitterError as e:
-            if e.message[0]['code'] == 130:
+            if e.message[0]['code'] == 130: # Over capacity - Corresponds with HTTP 503. Twitter is temporarily over capacity.
+                return e
+            elif e.message[0]['code'] == 34: # Sorry, that page does not exist - Corresponds with HTTP 404. The specified resource was not found. (can also be an internal problem with Twitter)
                 return e
             else:
                 await self.bot.get_user(279568324260528128).send("```py\n{}\n``` \n```py\n{}\n```".format(e,e.args))
