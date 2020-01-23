@@ -72,7 +72,7 @@ class PermsCog(commands.Cog):
                 desc = await self.translate(ctx.guild.id,'perms','general')
             else:
                 desc = channel.mention
-            embed = ctx.bot.cogs['EmbedCog'].Embed(color=col,fields=[f1,f2],desc=desc).create_footer(ctx.author)
+            embed = await ctx.bot.cogs['EmbedCog'].Embed(color=col,fields=[f1,f2],desc=desc).create_footer(ctx)
             embed.author_name = name
             embed.author_icon = avatar
             await ctx.send(embed=embed.discord_embed())

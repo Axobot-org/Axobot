@@ -102,7 +102,7 @@ class FunCog(commands.Cog):
                     for cmds in cmd.commands:
                         text+="\n    - {} *({})*".format(cmds.name,cmds.help)
         if ctx.guild==None or ctx.channel.permissions_for(ctx.guild.me).embed_links:
-            emb = ctx.bot.cogs['EmbedCog'].Embed(title=title,desc=text,color=ctx.bot.cogs['HelpCog'].help_color,time=ctx.message.created_at).create_footer(ctx.author)
+            emb = await ctx.bot.cogs['EmbedCog'].Embed(title=title,desc=text,color=ctx.bot.cogs['HelpCog'].help_color,time=ctx.message.created_at).create_footer(ctx)
             return await ctx.send(embed=emb.discord_embed())
         await ctx.send(title+text)
 

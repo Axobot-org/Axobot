@@ -802,7 +802,6 @@ class ServerCog(commands.Cog):
                 return await ctx.send("NOPE")
             title = str(await self.translate(guild.id,"server","see-1")).format(guild.name) + f" ({page}/{max_page})"
             embed = self.bot.cogs['EmbedCog'].Embed(title=title, color=self.embed_color, desc=str(await self.translate(guild.id,"server","see-0")), time=msg.created_at,thumbnail=guild.icon_url_as(format='png'))
-            embed.create_footer(msg.author)
             diff = channel.guild != guild
             for i,v in liste.items():
                 #if i not in self.optionsList:
@@ -889,8 +888,8 @@ class ServerCog(commands.Cog):
                     await ctx.send(await self.translate(ctx.guild.id,"mc","cant-embed"))
                     return
                 title = str(await self.translate(ctx.guild.id,"server","opt_title")).format(option,ctx.guild.name)
-                embed = ctx.bot.cogs["EmbedCog"].Embed(title=title, color=self.embed_color, desc=r, time=ctx.message.created_at)
-                embed.create_footer(ctx.author)
+                embed = ctx.bot.get_cog("EmbedCog").Embed(title=title, color=self.embed_color, desc=r, time=ctx.message.created_at)
+                await embed.create_footer(ctx)
                 await ctx.send(embed=embed.discord_embed())
             except Exception as e:
                 await self.bot.cogs['ErrorsCog'].on_error(e,ctx)

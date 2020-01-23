@@ -387,6 +387,7 @@
         "offline": "offline",
         "online": "online",
         "oui": "yes",
+        "request_by": "Requested by {user}",
         "server": "server",
         "servers": "servers",
         "unknown": "Unknown",
@@ -813,11 +814,11 @@
         "yt-help": "To search for a youtube channel, you must enter the channel ID. You will find it at the end of the string url, it can be either the name, or a string of random characters.\n*Tip: some channels are already filled in my code. Sometimes you can just put `neil3000` or `Oxisius`* :wink:"
     },
     "s_backup": {
-        "invalid_file": "Please send the backup file in the same message as the command",
-        "loading": "Loading backup in progress... please wait...",
-        "invalid_version": "The backup version is invalid. The file is probably corrupted",
         "err": "Oops, an internal error occured... wait a few moments or contact support (command `about`) if it happens again",
-        "finished": "Backup applied! Here are the logs"
+        "finished": "Backup applied! Here are the logs",
+        "invalid_file": "Please send the backup file in the same message as the command",
+        "invalid_version": "The backup version is invalid. The file is probably corrupted",
+        "loading": "Loading backup in progress... please wait..."
     },
     "server": {
         "change-0": "This option does not exist :confused:",
@@ -964,6 +965,12 @@
         "role-4": "Displayed separately",
         "role-5": "Hierarchical position",
         "role-6": "Unique member with this role",
+        "snowflake-0": "Creation date",
+        "snowflake-1": "Binary",
+        "snowflake-2": "Timestamp",
+        "snowflake-3": "Internal worker ID",
+        "snowflake-4": "Internal process ID",
+        "snowflake-5": "Increment",
         "textchan-0": "Category",
         "textchan-1": "Description",
         "textchan-2": "NSFW",
@@ -971,13 +978,7 @@
         "textchan-4": ":warning: Missing permissions!",
         "textchan-5": "Channel",
         "user-0": "On this server?",
-        "voicechan-0": "Vocal channel",
-        "snowflake-0": "Creation date",
-        "snowflake-1": "Binary",
-        "snowflake-2": "Timestamp",
-        "snowflake-3": "Internal worker ID",
-        "snowflake-4": "Internal process ID",
-        "snowflake-5": "Increment"
+        "voicechan-0": "Vocal channel"
     },
     "users": {
         "animated_card_false": "You are not currently allowing an animated card. Thanks!",

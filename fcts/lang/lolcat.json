@@ -387,6 +387,7 @@
         "offline": "oofline",
         "online": "on-line",
         "oui": "yup",
+        "request_by": "Quest of {user}",
         "server": "nice place",
         "servers": "guilds",
         "unknown": "No known",
@@ -813,11 +814,11 @@
         "yt-help": "To seerch for a youtwube channel, you may enter the channil ID. You will found it at teh and of the strin url, it can be 8ther the nayme, or a strin of randem characteRs. *Tip: some channels are already fellid in me code. Sometimez you can just put `neil3000` or `Oxisius`* :wink:"
     },
     "s_backup": {
-        "invalid_file": "Plz send dat backup file IN the SAME message as ur cmd duh",
-        "loading": "Loading bkp... plz wait... a bit longer... woah im tired",
-        "invalid_version": "lmao dat backup version iz not valid. ur file's maybe corrupted lol",
         "err": "Oops, an internal error occured... But doan worry, we'r on teh place: http://asset-5.soupcdn.com/asset/3247/3576_5092_600.jpeg",
-        "finished": "Backup done! Here are some weird things i did 4u"
+        "finished": "Backup done! Here are some weird things i did 4u",
+        "invalid_file": "Plz send dat backup file IN the SAME message as ur cmd duh",
+        "invalid_version": "lmao dat backup version iz not valid. ur file's maybe corrupted lol",
+        "loading": "Loading bkp... plz wait... a bit longer... woah im tired"
     },
     "server": {
         "change-0": "Dis option doz not exist :confused:",
@@ -964,6 +965,12 @@
         "role-4": "Lonely supeR :a:lon roleZ",
         "role-5": "Hierarchical posishun",
         "role-6": "Lonely userz",
+        "snowflake-0": "Cratiun date",
+        "snowflake-1": "Bin",
+        "snowflake-2": "time",
+        "snowflake-3": "Int. work. id",
+        "snowflake-4": "Int. proc. iD",
+        "snowflake-5": "Random thing",
         "textchan-0": "Catègoryz",
         "textchan-1": "Descripshun",
         "textchan-2": "Nut 4 kIdz (NSFVV)",
@@ -971,13 +978,7 @@
         "textchan-4": ":warning: Mizzing permz !",
         "textchan-5": "Chanel",
         "user-0": "On dis servr?",
-        "voicechan-0": "Singing ch4nnel",
-        "snowflake-0": "Cratiun date",
-        "snowflake-1": "Bin",
-        "snowflake-2": "time",
-        "snowflake-3": "Int. work. id",
-        "snowflake-4": "Int. proc. iD",
-        "snowflake-5": "Random thing"
+        "voicechan-0": "Singing ch4nnel"
     },
     "users": {
         "animated_card_false": "Anamited xp cards are naw disabld for you",

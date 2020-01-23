@@ -174,10 +174,6 @@ class UtilitiesCog(commands.Cog):
                 return False
         return True
 
-    async def create_footer(self,embed,user):
-        embed.set_footer(text="Requested by {}".format(user.name), icon_url=str(user.avatar_url_as(format='png')))
-        return embed
-
     async def get_online_number(self,members):
         online = 0
         for m in members:

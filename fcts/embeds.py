@@ -1,4 +1,4 @@
-import datetime, discord, requests
+import datetime, discord, requests, typing
 from discord.ext import commands
 
 url_base = 'https://discordapp.com/api/webhooks/'
@@ -93,8 +93,11 @@ class EmbedCog(commands.Cog):
             self.author_icon = str(user.avatar_url_as(format='gif',size=256)) if user.is_avatar_animated() else str(user.avatar_url_as(format='png',size=256))
             return self
         
-        def create_footer(self,user):
-            self.footer_text = "Requested by {}".format(user.name)
+        async def create_footer(self, ctx:commands.Context, user: typing.Union[discord.User,discord.Member]=None):
+            # self.footer_text = "Requested by {}".format(user.name)
+            if user==None:
+                user = ctx.author
+            self.footer_text = await ctx.bot.get_cog("LangCog").tr(ctx.channel,"keywords", "request_by", user=user.name)
             self.footer_url = user.avatar_url_as(format='png',size=256)
             return self
 

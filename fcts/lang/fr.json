@@ -387,6 +387,7 @@
         "offline": "hors ligne",
         "online": "en ligne",
         "oui": "oui",
+        "request_by": "Demandé par {user}",
         "server": "serveur",
         "servers": "serveurs",
         "unknown": "Inconnu",
@@ -813,11 +814,11 @@
         "yt-help": "Pour rechercher une chaîne youtube, vous devez entrer l'identifiant de cette chaîne. Vous la trouverez à la fin de l'url de la chaine, elle peut être soit le nom, soit une suite de caractères aléatoires. *Astuce : certaines chaînes sont déjà renseignées dans mon code. Vous pouvez parfois vous contenter de mettre `neil3000` ou `Oxisius`* :wink:"
     },
     "s_backup": {
-        "invalid_file": "Veuillez envoyer le fichier de sauvegarde dans le même message que la commande",
-        "loading": "Chargement de la sauvegarde en cours.... veuillez patienter",
-        "invalid_version": "La version de sauvegarde est invalide. Le fichier est probablement corrompu",
         "err": "Oups, une erreur interne est survenue... attendez quelques instants ou contactez le support (commande `about`) si cela se reproduit",
-        "finished": "Sauvegarde appliquée ! Voici les logs"
+        "finished": "Sauvegarde appliquée ! Voici les logs",
+        "invalid_file": "Veuillez envoyer le fichier de sauvegarde dans le même message que la commande",
+        "invalid_version": "La version de sauvegarde est invalide. Le fichier est probablement corrompu",
+        "loading": "Chargement de la sauvegarde en cours.... veuillez patienter"
     },
     "server": {
         "change-0": "Cette option n'existe pas :confused:",
@@ -964,6 +965,12 @@
         "role-4": "Affiché séparément",
         "role-5": "Position hiérarchique",
         "role-6": "Unique membre possédant ce rôle",
+        "snowflake-0": "Date de création",
+        "snowflake-1": "Nombre binaire",
+        "snowflake-2": "Horodatage",
+        "snowflake-3": "ID du travailleur interne",
+        "snowflake-4": "ID de processus interne",
+        "snowflake-5": "Incrément",
         "textchan-0": "Catégorie",
         "textchan-1": "Description",
         "textchan-2": "NSFW",
@@ -971,13 +978,7 @@
         "textchan-4": ":warning: Permissions manquantes",
         "textchan-5": "Salon",
         "user-0": "Sur ce serveur ?",
-        "voicechan-0": "Salon vocal",
-        "snowflake-0": "Date de création",
-        "snowflake-1": "Nombre binaire",
-        "snowflake-2": "Horodatage",
-        "snowflake-3": "ID du travailleur interne",
-        "snowflake-4": "ID de processus interne",
-        "snowflake-5": "Incrément"
+        "voicechan-0": "Salon vocal"
     },
     "users": {
         "animated_card_false": "Vous n'utilisez actuellement pas de carte animée",

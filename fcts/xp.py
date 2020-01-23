@@ -779,7 +779,7 @@ class XPCog(commands.Cog):
         else:
             t = await self.translate(ctx.channel,'xp','top-title-1')
         if ctx.guild==None or ctx.channel.permissions_for(ctx.guild.me).embed_links:
-            emb = self.bot.cogs['EmbedCog'].Embed(title=t,fields=[{'name':f_name,'value':"\n".join(txt)},your_rank],color=self.embed_color,author_icon=self.bot.user.avatar_url_as(format='png')).create_footer(ctx.author)
+            emb = await self.bot.cogs['EmbedCog'].Embed(title=t,fields=[{'name':f_name,'value':"\n".join(txt)},your_rank],color=self.embed_color,author_icon=self.bot.user.avatar_url_as(format='png')).create_footer(ctx)
             await ctx.send(embed=emb.discord_embed())
         else:
             await ctx.send(f_name+"\n\n"+'\n'.join(txt))
@@ -892,7 +892,7 @@ class XPCog(commands.Cog):
             max_rr = await self.bot.cogs['ServerCog'].find_staff(ctx.guild.id,'rr_max_number')
             max_rr = self.bot.cogs["ServerCog"].default_opt['rr_max_number'] if max_rr==None else max_rr
             title = str(await self.translate(ctx.guild.id,"xp",'rr_list')).format(len(l),max_rr)
-            emb = self.bot.cogs['EmbedCog'].Embed(title=title,desc=des).update_timestamp().create_footer(ctx.author)
+            emb = await self.bot.cogs['EmbedCog'].Embed(title=title,desc=des).update_timestamp().create_footer(ctx)
             await ctx.send(embed=emb.discord_embed())
     
     @rr_main.command(name="remove")
