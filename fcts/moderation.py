@@ -855,10 +855,11 @@ ID corresponds to the Identifier of the message"""
         if not ctx.channel.permissions_for(ctx.guild.me).manage_nicknames:
             return await ctx.send(await self.translate(ctx.guild.id,'modo','missing-manage-nick'))
         if chars==None:
-            accepted_chars = string.ascii_letters + string.digits
             def check(username):
-                while not username[0] in accepted_chars:
+                while username < '0':
                     username = username[1:]
+                    if len(username)==0:
+                        username = "z unhoisted"
                 return username
         else:
             chars = chars.lower()
