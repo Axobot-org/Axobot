@@ -267,9 +267,14 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
             m_activity = str(await self.translate(ctx.guild.id,"activity","listen")).capitalize() + " " + item.activity.name
         elif item.activity.type==discord.ActivityType.watching:
             m_activity = str(await self.translate(ctx.guild.id,"activity","watch")).capitalize() +" " + item.activity.name
+        elif item.activity.type==4: # /!\ WAITING FOR DISCORD.PY V1.3
+            pass
         else:
             m_activity="Error"
-        embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","member-5"), value = m_activity,inline=True)
+        if item.activity==None or item.activity.type != 4:
+            embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","member-5"), value = m_activity,inline=True)
+        else:
+            embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","member-8"), value = item.activity.state, inline=True)
         # Bot
         if item.bot:
             botb = await self.translate(ctx.guild.id,"keywords","oui")

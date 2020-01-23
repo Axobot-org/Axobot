@@ -957,6 +957,7 @@
         "member-5": "Activity",
         "member-6": "Administrator",
         "member-7": "Infractions",
+        "member-8": "Custom activity",
         "not-found": "Unable to find {N}",
         "role-0": "ID",
         "role-1": "Color",
