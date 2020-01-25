@@ -2,7 +2,7 @@ import discord, datetime, time, re, asyncio, mysql, random, typing, importlib, s
 from libs import feedparser
 from discord.ext import commands
 from fcts import reloads, args, checks
-importlib.reload(reloads)
+# importlib.reload(reloads)
 importlib.reload(args)
 importlib.reload(checks)
 
@@ -401,7 +401,7 @@ class RssCog(commands.Cog):
                 r = ", ".join(r)
             Type = await self.translate(ctx.guild.id,'rss',x['type'])
             l.append(translation.format(Type,c,x['link'],r,x['ID'],x['date']))
-        embed = await self.bot.get_cog('EmbedCog').Embed(title="Liste des flux rss du serveur {}".format(ctx.guild.name), color=self.embed_color, time=ctx.message.created_at)
+        embed = self.bot.get_cog('EmbedCog').Embed(title="Liste des flux rss du serveur {}".format(ctx.guild.name), color=self.embed_color, time=ctx.message.created_at)
         await embed.create_footer(ctx)
         for x in l:
             embed.add_field(name="\uFEFF", value=x, inline=False)
