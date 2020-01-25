@@ -63,6 +63,10 @@
                 "Tu es un élu de chez Aragorn1202...",
                 "Cette commande est sur Whitelist uniquement... Et Aragorn ne t'a pas élu ! Au pire, tu peux le MP :wink: !"
             ],
+            "can_use_rss": [
+                "T'as la permission \"Administrateur\"",
+                "La perm \"Administrateur\" est manquante"
+            ],
             "can_warn": [
                 "Un de tes rôles peut utiliser cette commande (`warn`)",
                 "Tu n'as pas le rôle pour le faire ! (`warn`)"
@@ -262,6 +266,7 @@
         "count-4": "Sur les {limit} derniers messages, {user} en a posté {x} ({p}%)",
         "count-5": "Tu peux pas utiliser cette commande dans un salon où t'as pas accès à l'historique des messages... ",
         "embed-error": "Une erreur est survenue: `{}`",
+        "embed-invalid-image": "L'url entrée en tant qu'image est invalide :/",
         "fun-list": "Voici la liste des commandes fun dispos :",
         "invalid-city": "Nom de ville invalide",
         "markdown": "__**Règles du Markdown** sur *Discord*__\n\n`*italique*` = *italique*\n`__souligné__` = __souligné__\n`**gras**` = **gras**\n`***gras italique***` = ***gras italique***\n`~~barré~~` = ~~barré~~\n`__*souligné italique*__` = __*souligné italique*__\n`__**souligné gras**__` = __**souligné gras**__\n`__***souligné gras italique***__` = __***souligné gras italique***__\n`||spoiler||` = ||spoiler||\n> citation = `> citation`\n\\`code\\` = `code`\n\\\\ pour ignorer\n\nPour les blocs de code, cf <https://discord.gg/DGahTNn>",
@@ -339,7 +344,8 @@
             "Rapporter un bug ou un utilisateur",
             "Proposer une idée à Discord",
             "Explication des selfbots",
-            "CGU pour les développeurs de bot"
+            "CGU pour les développeurs de bot",
+            "Comment trouver ton ID ?"
         ],
         "docs": "Voici le lien vers la documentation du bot :",
         "prefix": "Liste des préfixes actuellement utilisables :",
@@ -743,6 +749,7 @@
         "no-rr": "Aucun rôle n'est lié à cet émoji",
         "not-zbot-embed": "Ce message ne contient pas d'embed de roles-reactions",
         "not-zbot-msg": "Ce message n'est pas celui de Zbot !",
+        "reactions-edited": "J'ai bien mis à jour les réactions 👌",
         "role-given": "Le rôle {r} a bien été donné",
         "role-lost": "Le rôle {r} a bien été retiré",
         "role-not-in-list": "Ce rôle ne fait pas partie des rôles attribuables",
@@ -770,6 +777,7 @@
         "invalid-flow": "Cet url est invalide (flux rss vide ou inaccessible) :blobconfused:",
         "invalid-link": "Oups, cette adresse url est invalide ou incomplète :confused:",
         "list": "*Entre le numéro du flux à modifier*\n\n**Lien - Type - Salon - Roles**\n",
+        "list-result": "Type : {}\nSalon discord : {}\nURL/salon : {}\nPings : {}\nID : {}\nDernier post : {}",
         "list2": "*Entre le numéro du flux à supprimer*\n\n**Lien - Type - Salon**\n",
         "mc": "Minecraft",
         "move-success": "Le flux RSS n°{} a bien été envoyé dans le salon {} !",
@@ -792,6 +800,7 @@
         "twitch": "Twitch",
         "twitch-default-flow": "{logo}  | Nouveau live de {author} ! On y va, vite ! ({date})\n\n{title}\n\nLien : {link}\n\n{mentions}",
         "twitch-form-last": "{logo}  | Ta-daaaam ! La dernière vidéo de {author} !\n{title}\nPubliée le {date}\nLien : {url}\n",
+        "use_embed-same": "L'utilisation d'embeds pour ce flux n'a pas changée",
         "use_embed-success": "La valeur a bien été modifiée à {v} pour le flux n°{f} !",
         "use_embed_false": "Ce flux n'utilise pas d'embed pour être envoyé. Ça te dit de les activer ? (true/false)",
         "use_embed_true": "Ce flux utilise actuellement les embeds pour être envoyé. Tu veux les désactiver ? (true/false)",
@@ -961,9 +970,12 @@
     "users": {
         "animated_card_false": "Les cartes d'xp animées ne sont actuellement pas autorisées pour vous",
         "animated_card_true": "Les cartes d'xp animées sont actuellement autorisées pour vous",
+        "auto_unafk_false": "Tu dois enlever ton tag AFK toi-même",
+        "auto_unafk_true": "Je t'enlèverai ton tag AFK dès que tu postera un message",
         "card-desc": "Voici un exemple de votre carte d'xp. Tu peux taper la commande `profile card <style>` pour changer le style\n*Ta carte d'xp ne se réactualisera que lorsque tu auras gagné de l'xp.*",
         "changed-0": "Votre carte d'xp utilise maintenant le style {}",
         "changed-1": "Oups, une erreur interne est survenue pendant le traitement de la requête. Réessaye plus tard ou contacte le support.",
+        "config_success": "L'option {opt} a bien été modif !",
         "invalid-card": "Ce style est invalide. Ça, c'est la liste des styles que tu pouvez utiliser : {}",
         "list-cards": "Voici la liste des styles que tu pouvez utiliser : {}",
         "missing-attach-files": "Oups, il me manque la permission d'Attacher des Fichiers :confused:",
