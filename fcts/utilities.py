@@ -85,7 +85,7 @@ class UtilitiesCog(commands.Cog):
             for i in [commands.MemberConverter,commands.RoleConverter,
                     commands.TextChannelConverter,commands.InviteConverter,
                     args.user,commands.VoiceChannelConverter,
-                    commands.EmojiConverter,commands.CategoryChannelConverter]:
+                    commands.EmojiConverter,commands.CategoryChannelConverter,args.snowflake]:
                 try:
                     a = await i().convert(ctx,name)
                     item = a
@@ -137,6 +137,11 @@ class UtilitiesCog(commands.Cog):
                 pass
         elif (Type == 'guild' or Type == "server") and name.isnumeric():
             item = self.bot.get_guild(int(name))
+        elif Type in ["snowflake","id"]:
+            try:
+                item = await args.snowflake().convert(ctx,name)
+            except:
+                pass
         return item
 
     async def find_img(self,name):
@@ -173,10 +178,6 @@ class UtilitiesCog(commands.Cog):
             if str(ctx.author.id) in self.config['banned_users'].split(";"):
                 return False
         return True
-
-    async def create_footer(self,embed,user):
-        embed.set_footer(text="Requested by {}".format(user.name), icon_url=str(user.avatar_url_as(format='png')))
-        return embed
 
     async def get_online_number(self,members):
         online = 0

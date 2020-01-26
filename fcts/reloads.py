@@ -1,4 +1,3 @@
-import importlib, sys
 from discord.ext import commands
 
 admins_id = [279568324260528128,281404141841022976,552273019020771358]
@@ -46,8 +45,7 @@ class ReloadsCog(commands.Cog):
             if not cog.startswith("fcts."):
                 fcog = "fcts."+cog
             try:
-                self.bot.unload_extension(fcog)
-                self.bot.load_extension(fcog)
+                self.bot.reload_extension(fcog)
             except ModuleNotFoundError:
                 await ctx.send("Cog {} can't be found".format(cog))
             except commands.errors.ExtensionNotLoaded :

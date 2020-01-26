@@ -221,7 +221,8 @@ With this command, you can become the undisputed master of the Emojis and handle
 
 * :code:`emoji clear <message ID>` : instantly removes reactions from a message. This message must be indicated via its identifier, and belong to the same chat as the one where the command is used. The bot must have "`Manage Messages <perms.html#manage-messages>`_" and "`Read Message History <perms.html#read-message-history>`_" permissions.
 
-* :code:`emoji list` : lists all the server's emojects, in an embed, and indicates if some of them are restricted to certain roles. The bot must have "`Embed Links <perms.html#embed-links>`_" permission.
+* :code:`emoji list` : lists all the server's emojis, in an embed, and indicates if some of them are restricted to certain roles. The bot must have "`Embed Links <perms.html#embed-links>`_" permission.
+
 
 
 .. warning:: The bot needs the `Manage Emojis <perms.html#manage-emojis>`_ permission to edit these pretty little pictures. And you, you need Administrator permission to use these commands.
@@ -234,7 +235,11 @@ Nice command that allows you to do different things with the server roles (other
 
 * :code:`role color <role> <colour>` (alias `role colour`): Changes the color of the given role. The color must be in hexadecimal form, although some common names are accepted (red, blue, gold...). To remove the color, use the name `default`. Please check notes 1. and 2.
 
-* :code:`role list <role>` : List every members who are in a specific role, if this number is under 200. The bot must have "`Embed Links <perms.html#embed-links>`_" permission to display the result. Please check note 2.
+* :code:`role give <role> <user(s) | role(s)>`: Give a role to a list of people. You can target as many users or roles as you want, so for example to target your friends Joe and Jack, plus the Admin role, use :code:`role give superRole Joe Jack Admin`. Please check note 2.
+
+* :code:`role remove <role> <user(s) | role(s)>`: Same as above, but instead of giving them, it takes them away. Please check note 2.
+
+* :code:`role list <role>`: List every members who are in a specific role, if this number is under 200. The bot must have "`Embed Links <perms.html#embed-links>`_" permission to display the result. Please check note 2.
 
 
 .. warning:: (1) The bot need the "`Manage roles <perms.html#manage-roles>`_" permission, also his highest role need to be higher than the role he's trying to edit.

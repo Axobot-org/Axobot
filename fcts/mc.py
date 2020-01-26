@@ -85,9 +85,9 @@ Every information come from the website www.fr-minecraft.net"""
             await ctx.send(await self.translate(ctx.channel,"mc","no-block"))
             return
         title = "{} - {}".format((await self.translate(ctx.channel,"mc","names"))[0],Block.Name)
-        embed = discord.Embed(title=title, colour=discord.Colour(int('16BD06',16)), url=Block.Url, timestamp=ctx.message.created_at,description=await self.translate(ctx.channel,'mc','contact-mail'))
+        embed = self.bot.get_cog("EmbedCog").Embed(title=title, colour=discord.Colour(int('16BD06',16)), url=Block.Url, time=ctx.message.created_at, desc=await self.translate(ctx.channel,'mc','contact-mail'))
         embed.set_thumbnail(url=Block.Image)
-        embed = await self.bot.cogs["UtilitiesCog"].create_footer(embed,ctx.author)
+        await embed.create_footer(ctx)
         embed.add_field(name="Nom", value=Block.Name,inline=False)
         l = ("\n".join(Block.ID),Block.Stack,Block.CreativeTab,Block.Damage,Block.Strength,Block.Tool,", ".join(Block.Mobs),Block.Version)
         for e,v in enumerate(await self.translate(ctx.channel,"mc","block-fields")):
@@ -114,9 +114,9 @@ Every information come from the website www.fr-minecraft.net"""
             await ctx.send(await self.translate(ctx.channel,"mc","no-entity"))
             return
         title = "{} - {}".format((await self.translate(ctx.channel,"mc","names"))[1],Entity.Name)
-        embed = discord.Embed(title=title, colour=discord.Colour(int('16BD06',16)), url=Entity.Url, timestamp=ctx.message.created_at,description=await self.translate(ctx.channel,'mc','contact-mail'))
+        embed = self.bot.get_cog("EmbedCog").Embed(title=title, colour=discord.Colour(int('16BD06',16)), url=Entity.Url, time=ctx.message.created_at, desc=await self.translate(ctx.channel,'mc','contact-mail'))
         embed.set_thumbnail(url=Entity.Image)
-        embed = await self.bot.cogs["UtilitiesCog"].create_footer(embed,ctx.author)
+        await embed.create_footer(ctx)
         embed.add_field(name="Nom", value=Entity.Name,inline=False)
         l = (Entity.ID,Entity.Type,Entity.PV,Entity.PA,Entity.XP,", ".join(Entity.Biomes),Entity.Version)
         for e,v in enumerate(await self.translate(ctx.channel,"mc","entity-fields")):
@@ -145,10 +145,10 @@ Every information come from the website www.fr-minecraft.net"""
             await ctx.send(await self.translate(ctx.channel,"mc","no-item"))
             return
         title = "{} - {}".format((await self.translate(ctx.channel,"mc","names"))[2],Item.Name)
-        embed = discord.Embed(title=title, colour=discord.Colour(int('16BD06',16)), url=Item.Url, timestamp=ctx.message.created_at,description=await self.translate(ctx.channel,'mc','contact-mail'))
+        embed = self.bot.get_cog("EmbedCog").Embed(title=title, colour=discord.Colour(int('16BD06',16)), url=Item.Url, time=ctx.message.created_at, desc=await self.translate(ctx.channel,'mc','contact-mail'))
         if Item.Image != None:
             embed.set_thumbnail(url=Item.Image)
-        embed = await self.bot.cogs["UtilitiesCog"].create_footer(embed,ctx.author)
+        await embed.create_footer(ctx)
         embed.add_field(name="Nom", value=Item.Name,inline=False)
         l = ('\n'.join(Item.ID),Item.Stack,Item.CreativeTab,Item.Damage,Item.Strength,Item.Tool,", ".join(Item.Mobs),Item.Version)
         for e,v in enumerate(await self.translate(ctx.channel,"mc","item-fields")):
@@ -175,8 +175,8 @@ Every information come from the website www.fr-minecraft.net"""
             await ctx.send(await self.translate(ctx.channel,"mc","no-cmd"))
             return
         title = "{} - {}".format((await self.translate(ctx.channel,"mc","names"))[3],Cmd.Name)
-        embed = discord.Embed(title=title, colour=discord.Colour(int('16BD06',16)), url=Cmd.Url, timestamp=ctx.message.created_at,description=await self.translate(ctx.channel,'mc','contact-mail'))
-        embed = await self.bot.cogs["UtilitiesCog"].create_footer(embed,ctx.author)
+        embed = self.bot.get_cog("EmbedCog").Embed(title=title, colour=discord.Colour(int('16BD06',16)), url=Cmd.Url, time=ctx.message.created_at, desc=await self.translate(ctx.channel,'mc','contact-mail'))
+        await embed.create_footer(ctx)
         l = (Cmd.Name," ".join(Cmd.Syntax),Cmd.Examples,Cmd.Version)
         for e,v in enumerate(await self.translate(ctx.channel,"mc","cmd-fields")):
             if e==2:
@@ -207,8 +207,8 @@ Every information come from the website www.fr-minecraft.net"""
             await ctx.send(await self.translate(ctx.channel,"mc","no-adv"))
             return
         title = "{} - {}".format((await self.translate(ctx.channel,"mc","names"))[4],Adv.Name)
-        embed = discord.Embed(title=title, colour=discord.Colour(int('16BD06',16)), url=Adv.Url, timestamp=ctx.message.created_at,description=await self.translate(ctx.channel,'mc','contact-mail'))
-        embed = await self.bot.cogs["UtilitiesCog"].create_footer(embed,ctx.author)
+        embed = self.bot.get_cog("EmbedCog").Embed(title=title, color=discord.Colour(int('16BD06',16)), url=Adv.Url, time=ctx.message.created_at, desc=await self.translate(ctx.channel,'mc','contact-mail'))
+        await embed.create_footer(ctx)
         if Adv.Image != None:
             embed.set_thumbnail(url=Adv.Image)
         l = (Adv.Name,Adv.ID,Adv.Type,Adv.Action,Adv.Parent,", ".join(Adv.Children),Adv.Version)   #("Nom","Identifiant","Type","Action","Parent","Enfants","Version d'ajout")

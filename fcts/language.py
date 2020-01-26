@@ -46,37 +46,40 @@ class LangCog(discord.ext.commands.Cog):
             #print("New langage:",lang_opt)
         if lang_opt not in self.languages:
             lang_opt = self.bot.cogs['ServerCog'].default_language
-        if lang_opt == 'de':
+        return await self._get_translation(lang_opt, moduleID, messageID, **args)
+        
+    async def _get_translation(self, lang:str, moduleID:str, messageID:str, **args):
+        if lang == 'de':
             try:
                 result = self.translations['de'][moduleID][messageID]
             except:
                 await self.msg_not_found(moduleID,messageID,"de")
-                lang_opt = 'en'
-        if lang_opt == 'fi':
+                lang = 'en'
+        if lang == 'fi':
             try:
                 result = self.translations['fi'][moduleID][messageID]
             except:
                 await self.msg_not_found(moduleID,messageID,"fi")
-                lang_opt = 'en'
-        if lang_opt == 'lolcat':
+                lang = 'en'
+        if lang == 'lolcat':
             try:
                 result = self.translations['lolcat'][moduleID][messageID]
             except:
                 await self.msg_not_found(moduleID,messageID,"lolcat")
-                lang_opt = 'en'
-        if lang_opt == 'en':
+                lang = 'en'
+        if lang == 'en':
             try:
                 result = self.translations['en'][moduleID][messageID]
             except:
                 await self.msg_not_found(moduleID,messageID,"en")
-                lang_opt = 'fr'
-        if lang_opt == 'fr2':
+                lang = 'fr'
+        if lang == 'fr2':
             try:
                 result = self.translations['fr2'][moduleID][messageID]
             except:
                 await self.msg_not_found(moduleID,messageID,"fr2")
-                lang_opt = 'fr'
-        if lang_opt == 'fr':
+                lang = 'fr'
+        if lang == 'fr':
             try:
                 result = self.translations['fr'][moduleID][messageID]
             except KeyError:

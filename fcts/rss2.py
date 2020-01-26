@@ -2,7 +2,7 @@ import discord, datetime, time, re, asyncio, mysql, random, typing, importlib, s
 from libs import feedparser
 from discord.ext import commands
 from fcts import reloads, args, checks
-importlib.reload(reloads)
+# importlib.reload(reloads)
 importlib.reload(args)
 importlib.reload(checks)
 
@@ -44,7 +44,7 @@ async def can_use_rss(ctx):
 class RssCog(commands.Cog):
     """Cog which deals with everything related to rss flows. Whether it is to add automatic tracking to a stream, or just to see the latest video released by Discord, it is this cog that will be used."""
 
-    def __init__(self,bot):
+    def __init__(self, bot:commands.bot.BotBase):
         self.bot = bot
         self.time_loop = 10
         self.time_between_flows_check = 0.15
@@ -345,8 +345,8 @@ class RssCog(commands.Cog):
                     c = x['channel']
                 MAX = e+1
                 text.append("{}) {} - {} - {}".format(e+1,await self.translate(ctx.guild.id,'rss',x['type']),x['link'],c))
-            embed = discord.Embed(title=await self.translate(ctx.guild.id,"rss","choose-delete"), colour=self.embed_color, description="\n".join(text), timestamp=ctx.message.created_at)
-            embed = await self.bot.cogs['UtilitiesCog'].create_footer(embed,ctx.author)
+            embed = self.bot.get_cog("EmbedCog").Embed(title=await self.translate(ctx.guild.id,"rss","choose-delete"), color=self.embed_color, desc="\n".join(text), time=ctx.message.created_at)
+            await embed.create_footer(ctx)
             emb_msg = await ctx.send(embed=embed)
             def check(msg):
                 if not msg.content.isnumeric():
@@ -401,8 +401,8 @@ class RssCog(commands.Cog):
                 r = ", ".join(r)
             Type = await self.translate(ctx.guild.id,'rss',x['type'])
             l.append(translation.format(Type,c,x['link'],r,x['ID'],x['date']))
-        embed = discord.Embed(title="Liste des flux rss du serveur {}".format(ctx.guild.name), colour=self.embed_color, timestamp=ctx.message.created_at)
-        embed = await self.bot.cogs['UtilitiesCog'].create_footer(embed,ctx.author)
+        embed = self.bot.get_cog('EmbedCog').Embed(title="Liste des flux rss du serveur {}".format(ctx.guild.name), color=self.embed_color, time=ctx.message.created_at)
+        await embed.create_footer(ctx)
         for x in l:
             embed.add_field(name="\uFEFF", value=x, inline=False)
         await ctx.send(embed=embed)
@@ -446,7 +446,7 @@ class RssCog(commands.Cog):
                     r = ", ".join(r)
                 text.append("{}) {} - {} - {} - {}".format(iterator,await self.translate(ctx.guild.id,'rss',x['type']),x['link'],c,r))
                 iterator += 1
-            embed = self.bot.cogs['EmbedCog'].Embed(title=await self.translate(ctx.guild.id,"rss","choose-mentions-1"), color=self.embed_color, desc="\n".join(text), time=ctx.message.created_at).create_footer(ctx.author)
+            embed = await self.bot.get_cog('EmbedCog').Embed(title=await self.translate(ctx.guild.id,"rss","choose-mentions-1"), color=self.embed_color, desc="\n".join(text), time=ctx.message.created_at).create_footer(ctx)
             emb_msg = await ctx.send(embed=embed.discord_embed())
             def check(msg):
                 if not msg.content.isnumeric():
@@ -841,7 +841,9 @@ class RssCog(commands.Cog):
         try:
             return [x for x in self.twitterAPI.GetUserTimeline(screen_name=nom,exclude_replies=True,trim_user=True,count=count)]
         except twitter.error.TwitterError as e:
-            if e.message[0]['code'] == 130:
+            if e.message[0]['code'] == 130: # Over capacity - Corresponds with HTTP 503. Twitter is temporarily over capacity.
+                return e
+            elif e.message[0]['code'] == 34: # Sorry, that page does not exist - Corresponds with HTTP 404. The specified resource was not found. (can also be an internal problem with Twitter)
                 return e
             else:
                 await self.bot.get_user(279568324260528128).send("```py\n{}\n``` \n```py\n{}\n```".format(e,e.args))
@@ -1149,7 +1151,20 @@ class RssCog(commands.Cog):
         liste = list()
         for x in cursor:
             liste.append(x)
+        cursor.close()
         return liste
+    
+    async def get_raws_count(self, get_disabled:bool=False):
+        """Get the number of rss feeds"""
+        cnx = self.bot.cnx_frm
+        cursor = cnx.cursor()
+        query = "SELECT COUNT(*) FROM `{}`".format(self.table)
+        if not get_disabled:
+            query += " WHERE `guild` in (" + ','.join(["'{}'".format(x.id) for x in self.bot.guilds]) + ")"
+        cursor.execute(query)
+        t = list(cursor)[0][0]
+        cursor.close()
+        return t
 
     async def update_flow(self,ID,values=[(None,None)]):
         cnx = self.bot.cnx_frm
@@ -1165,6 +1180,7 @@ class RssCog(commands.Cog):
         query = """UPDATE `{t}` SET {v} WHERE `ID`={id}""".format(t=self.table,v=",".join(v),id=ID)
         cursor.execute(query)
         cnx.commit()
+        cursor.close()
 
     async def send_rss_msg(self,obj,channel,roles):
         if channel != None:
@@ -1199,6 +1215,9 @@ class RssCog(commands.Cog):
                 self.twitter_over_capacity = True
                 return False
             objs = await funct(guild,flow['link'],flow['date'])
+            if isinstance(objs,twitter.TwitterError):
+                await self.bot.get_user(279568324260528128).send(f"[send_rss_msg] twitter error dans `await check_flow(): {objs}`")
+                raise objs
             if isinstance(objs,(str,type(None),int)) or len(objs) == 0:
                 return True
             elif type(objs) == list:

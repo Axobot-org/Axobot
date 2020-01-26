@@ -147,23 +147,20 @@ class zbot(commands.bot.BotBase,discord.Client):
 def get_prefix(bot,msg):
     if bot.database_online:
         try:
-            l = [bot.cogs['UtilitiesCog'].find_prefix(msg.guild)]
+            prefixes = [bot.cogs['UtilitiesCog'].find_prefix(msg.guild)]
         except KeyError:
             try:
                 bot.load_extension('fcts.utilities')
-                l = [bot.cogs['UtilitiesCog'].find_prefix(msg.guild)]
+                prefixes = [bot.cogs['UtilitiesCog'].find_prefix(msg.guild)]
             except Exception as e:
                 bot.log.warn("[get_prefix]",e)
-                l = ['!']
+                prefixes = ['!']
         except Exception as e:
                 bot.log.warn("[get_prefix]",e)
-                l = ['!']
+                prefixes = ['!']
     else:
-        l = ['!']
-    if msg.guild != None:
-        return l+[msg.guild.me.mention+" "]
-    else:
-        return l+[bot.user.mention+" ", ""]
+        prefixes = ['!']
+    return commands.when_mentioned_or(*prefixes)(bot,msg)
 
 
 def main():
@@ -190,6 +187,7 @@ def main():
                       'fcts.reloads',
                       'fcts.roles_react',
                       'fcts.rss2',
+                      'fcts.s_backup',
                       'fcts.server',
                       'fcts.timeclass',
                       'fcts.translators',
