@@ -136,8 +136,7 @@
         "no-desc-cog": "Keine Beschreibung für diese cog.",
         "no-subcmd": "Der Befehl `{0.name}` hat keine Unterbefehle",
         "not-enabled": ":warning: Dieser Befehl ist deaktiviert",
-        "subcmd-not-found": "Dieser Befehl hat keinen Unterbefehl namens \"{}\"",
-        "subcmds": "Unterbefehle:"
+        "subcmd-not-found": "Dieser Befehl hat keinen Unterbefehl namens \"{}\""
     },
     "blurple": {
         "check_fields": [
@@ -389,7 +388,6 @@
         "oui": "Ja",
         "server": "Server",
         "servers": "Server",
-        "subcmds": "Unterbefehle",
         "unknown": "Unbekannt",
         "version": "Version"
     },
@@ -564,10 +562,8 @@
         "emoji-renamed": "Der Emoji {} wurde umbenannt!",
         "emoji-valid": "Der Emoji {} wurde modifiziert, sodass ihn nur noch die Rolle `{}` benutzen kann",
         "error": "Oops, da ist wohl ein Fehler passiert. Versuch es am Besten später nochmal ober kontaktiere den Support",
-        "give_roles-0": "Ups, Die Rolle, die du wem geben willst ist zu hoch für mich. Bitte platziere meine Rolle über die `{r}` Rolle",
         "give_roles-1": "Mitglied {u} ist zu hoch für mich",
         "give_roles-2": "-> {c} Rollen wurden von {m} Rollen gegeben!",
-        "give_roles-3": "Du kannst nicht höhere Rollen geben, als deine sind!",
         "kick": "Mitglied {} wurde wegen dem Grund `{}` gekickt",
         "kick-1": "Es scheint so, als wenn diese Person mehr rechte hat als ich :thinking:",
         "kick-noreason": "Du wurdest geradevon dem Server {} geworfen :confused:",
@@ -901,10 +897,8 @@
         "guild-0": "Gilde",
         "guild-1": "Besitzer",
         "guild-10": "Zeit vor dem AFK sein",
-        "guild-11": [
-            "20 erste Rollen (insgesamt {})",
-            "Rollen Liste (insgesamt {})"
-        ],
+        "guild-11.1": "20 erste Rollen (insgesamt {})",
+        "guild-11.2": "Rollen Liste (insgesamt {})",
         "guild-12": "Anzahl der Einladungen",
         "guild-13": "Anzahl der Boosts",
         "guild-13v": "{b} (Gruppe {p})",
