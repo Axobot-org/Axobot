@@ -130,7 +130,7 @@ Arguments are:
             'name': g.name,
             'id': g.id,
             'owner': g.owner.id,
-            'voiceregion': g.region.value,
+            'voiceregion': str(g.region),
             'afk_timeout': g.afk_timeout,
             'icon': None if len(g.icon_url)==0 else str(g.icon_url),
             'verification_level': g.verification_level.value,
