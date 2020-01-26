@@ -95,7 +95,7 @@ Arguments are:
             await ctx.send(await self.translate(ctx.guild.id,'modo','backup-done'),file=discord.File(directory))
         except Exception as e:
             await ctx.bot.cogs['ErrorsCog'].on_cmd_error(ctx,e)
-    
+
     # --------
 
     async def create_backup(self,ctx:commands.Context) -> str:
@@ -212,7 +212,7 @@ Arguments are:
     class BackupLoaderV1:
         def __init__(self):
             pass
-    
+
         async def urlToByte(self,url:str) -> typing.Optional[bytes]:
             async with aiohttp.ClientSession(timeout=aiohttp.ClientTimeout(total=10)) as session:
                 async with session.get(url) as response:
@@ -221,7 +221,7 @@ Arguments are:
                     else:
                         res = None
             return res
-        
+
         async def load_roles(self, ctx:commands.Context, problems: list, logs:list, symb:list, data:dict, args:tuple,roles_list:dict):
             if not ctx.guild.me.guild_permissions.manage_roles:
                 logs.append("  "+symb[0]+" Unable to create or update roles: missing permissions")
@@ -441,7 +441,7 @@ Arguments are:
                             problems[1] += 1
                         else:
                             logs.append("  "+symb[2]+" Channel {} deleted".format(channel.name))
-        
+
         async def apply_perm(self, item:discord.abc.GuildChannel, perms:list, roles_list:dict):
             for perm in perms:
                 target = None
@@ -766,7 +766,7 @@ Arguments are:
                 else:
                     logs.append(symb[2]+" Verification level set to "+verif_level.name)
             # voiceregion
-            if ctx.guild.region.value == data["voiceregion"]:
+            if str(ctx.guild.region) == data["voiceregion"]:
                 logs.append(symb[1]+" No need to change voice region")
             else:
                 try:
