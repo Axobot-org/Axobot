@@ -14,8 +14,9 @@ class Events(commands.Cog):
         self.file = "events"
         self.dbl_last_sending = datetime.datetime.utcfromtimestamp(0)
         self.partner_last_check = datetime.datetime.utcfromtimestamp(0)
-        self.dbl_last_tr_backup = datetime.datetime.utcfromtimestamp(0)
-        self.dbl_last_eventDay_check = datetime.datetime.utcfromtimestamp(0)
+        self.last_tr_backup = datetime.datetime.utcfromtimestamp(0)
+        self.last_eventDay_check = datetime.datetime.utcfromtimestamp(0)
+        self.statslogs_last_push = datetime.datetime.utcfromtimestamp(0)
         self.loop_errors = [0,datetime.datetime.utcfromtimestamp(0)]
         self.embed_colors = {"welcome":5301186,
         "mute":4868682,
@@ -334,20 +335,28 @@ class Events(commands.Cog):
     async def loop(self):
         try:
             d = datetime.datetime.now()
+            # Timed tasks - every 20s
             if int(d.second)%20 == 0:
                 await self.check_tasks()
+            # Clear old rank cards - every 20min
             elif int(d.minute)%20 == 0:
                 await self.bot.cogs['XPCog'].clear_cards()
                 await self.rss_loop()
+            # Partners reload - every 7h (start from 1am)
             elif int(d.hour)%7 == 1 and d.hour != self.partner_last_check.hour:
                 await self.partners_loop()
+            # Bots lists updates - every day
             elif int(d.hour) == 0 and d.day != self.dbl_last_sending.day:
                 await self.dbl_send_data()
-            elif int(d.hour)%12 == 1 and (d.hour != self.dbl_last_tr_backup.hour or d.day != self.dbl_last_tr_backup.day):
+            # Translation backup - every 12h (start from 1am)
+            elif int(d.hour)%12 == 1 and (d.hour != self.last_tr_backup.hour or d.day != self.last_tr_backup.day):
                 await self.translations_backup()
-            elif int(d.hour)%12 == 0 and int(d.minute)%45 == 1 and (d.hour != self.dbl_last_eventDay_check.hour or d.day != self.dbl_last_eventDay_check.day):
-                self.bot.cogs["BotEventsCog"].updateCurrentEvent()
-                self.dbl_last_eventDay_check = datetime.datetime.today()
+            # Check current event - every 12h (start from 0:45 am)
+            elif int(d.hour)%12 == 0 and int(d.minute)%45 == 0 and (d.hour != self.last_eventDay_check.hour or d.day != self.last_eventDay_check.day):
+                await self.botEventLoop()
+            # Send stats logs - every 2h (start from 0:05 am)
+            elif int(d.hour)%2 == 0 and int(d.minute)%5 == 0 and (d.day != self.statslogs_last_push.day or d.hour != self.statslogs_last_push.hour):
+                await self.send_sql_statslogs()
         except Exception as e:
             await self.bot.cogs['ErrorsCog'].on_error(e,None)
             self.loop_errors[0] += 1
@@ -355,7 +364,7 @@ class Events(commands.Cog):
                 self.loop_errors[0] = 0
                 self.loop_errors[1] = datetime.datetime.now()
             if self.loop_errors[0] > 10:
-                await self.bot.cogs['ErrorsCog'].senf_err_msg(":warning: **Trop d'erreurs : ARRET DE LA BOUCLE PRINCIPALE** :warning:")
+                await self.bot.cogs['ErrorsCog'].senf_err_msg(":warning: **Trop d'erreurs : ARRET DE LA BOUCLE PRINCIPALE** <@279568324260528128> :warning:")
                 self.loop.cancel()
 
     @loop.before_loop
@@ -370,6 +379,13 @@ class Events(commands.Cog):
         if self.bot.cogs['RssCog'].last_update==None or (datetime.datetime.now() - self.bot.cogs['RssCog'].last_update).total_seconds()  > 5*60:
             self.bot.cogs['RssCog'].last_update = datetime.datetime.now()
             asyncio.run_coroutine_threadsafe(self.bot.cogs['RssCog'].main_loop(),asyncio.get_running_loop())
+    
+    async def botEventLoop(self):
+        self.bot.cogs["BotEventsCog"].updateCurrentEvent()
+        e = self.bot.cogs["BotEventsCog"].current_event
+        emb = self.bot.cogs["EmbedCog"].Embed(desc=f'**Bot event** updated (current event is {e})',color=1406147).update_timestamp().set_author(self.bot.user)
+        await self.bot.cogs["EmbedCog"].send([emb],url="loop")
+        self.last_eventDay_check = datetime.datetime.today()
     
     async def dbl_send_data(self):
         """Send guilds count to Discord Bots Lists"""
@@ -454,7 +470,7 @@ class Events(commands.Cog):
         """Do a backup of the translations files"""
         from os import remove
         t = time.time()
-        self.dbl_last_tr_backup = datetime.datetime.now()
+        self.last_tr_backup = datetime.datetime.now()
         try:
             remove('translation-backup.tar')
         except:
@@ -481,13 +497,17 @@ class Events(commands.Cog):
         "Send some stats about the current bot stats"
         cnx = self.bot.cnx_frm
         cursor = cnx.cursor()
-        query = ("INSERT INTO `log_stats` (`time`, `servers_count`, `members_count`, `bots_count`, `dapi_heartbeat`, `codelines_count`, `earned_xp_total`, `beta`) VALUES (CURRENT_TIMESTAMP, '{server_count}', '{members_count}', '{bots_count}', '{ping}', '{codelines}', '{xp}', '{beta}')".format(
+        rss_feeds = await self.bot.get_cog("RssCog").get_raws_count(True)
+        active_rss_feeds = await self.bot.get_cog("RssCog").get_raws_count()
+        query = ("INSERT INTO `log_stats` (`time`, `servers_count`, `members_count`, `bots_count`, `dapi_heartbeat`, `codelines_count`, `earned_xp_total`, `rss_feeds`, `active_rss_feeds`, `beta`) VALUES (CURRENT_TIMESTAMP, '{server_count}', '{members_count}', '{bots_count}', '{ping}', '{codelines}', '{xp}', '{rss_feeds}', '{active_rss_feeds}','{beta}')".format(
             server_count = len(self.bot.guilds),
             members_count = len(self.bot.users),
             bots_count = len([1 for x in self.bot.users if x.bot]),
-            ping = self.bot.latency,
+            ping = round(self.bot.latency,3),
             codelines = self.bot.cogs["InfoCog"].codelines,
             xp = await self.bot.cogs['XPCog'].bdd_total_xp(),
+            rss_feeds = rss_feeds,
+            active_rss_feeds = active_rss_feeds,
             beta = 1 if self.bot.beta else 0
         ))
         cursor.execute(query)
@@ -495,6 +515,7 @@ class Events(commands.Cog):
         cursor.close()
         emb = self.bot.cogs["EmbedCog"].Embed(desc='**Stats logs** updated',color=5293283).update_timestamp().set_author(self.bot.user)
         await self.bot.cogs["EmbedCog"].send([emb],url="loop")
+        self.statslogs_last_push = datetime.datetime.now()
         
 
 def setup(bot):

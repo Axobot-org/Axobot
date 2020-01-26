@@ -136,8 +136,7 @@
         "no-desc-cog": "Ei lisätietoja tästä cog:stä.",
         "no-subcmd": "komenolla `{0.name}`ei ole toissijaista komentoa",
         "not-enabled": ":warning: Tämä komento ei ole käytössä",
-        "subcmd-not-found": "Tällä komennolla ei ole toissijaista komentoa nimetty. \"{}\"",
-        "subcmds": "Toissijaiset komennot"
+        "subcmd-not-found": "Tällä komennolla ei ole toissijaista komentoa nimetty. \"{}\""
     },
     "blurple": {
         "check_fields": [
@@ -389,7 +388,6 @@
         "oui": "kyllä",
         "server": "palvelin",
         "servers": "palvelimet",
-        "subcmds": "Toissijainen komento",
         "unknown": "Tuntematon",
         "version": "versio"
     },
@@ -564,10 +562,8 @@
         "emoji-renamed": "Hymiö {} on nimetty uudelleen!",
         "emoji-valid": "Nyt hymiötä {} voi vain käyttää roolit `{}`",
         "error": "Ups, tuntematon virhe tapahtui. Yritä uudelleen myöhemmin tai ota yhteyttä tukeen",
-        "give_roles-0": "Ups, näyttää siltä että tämä rooli on liian ylhäällä että voisin antaa sen jollekkin. Aseta minun rooli ylemmälle kuin `{r}` rooli",
         "give_roles-1": "Jäsen {u} on liian ylhäällä minulle",
         "give_roles-2": "Srop",
-        "give_roles-3": "Et voi antaa korkeimpia rooleja kuin sinulla!",
         "kick": "{} on potkittu palvelimelta syyllä `{}`",
         "kick-1": "Näyttää siltä että tämä jäsen on liian korkealla niin en voi potkia häntä ulos 🤔",
         "kick-noreason": "Sinut on potkittu palvelimelta {} 😕",
@@ -934,7 +930,6 @@
         "inv-2": "Käyttöjä",
         "inv-3": "Aikaa jäljellä",
         "inv-4": "Kutsu",
-        "inv-5": "Jos tietoa näyttää puuttuvan, valitettavasti se on koska Discord ei kommunikoi sitä",
         "inv-6": "Palvelin tunniste",
         "inv-7": "Suurinpiirteen oleva jäsen lasku",
         "inv-8": "Palvelin kuvaus",
@@ -965,11 +960,6 @@
         "voicechan-0": "Ääni kanava"
     },
     "users": {
-        "allow_animated_false": "Animoidut xp kortit on tällä hetkellä poissa käytöstä sinulle",
-        "allow_animated_success": "Tämä paramittari on määritelty uudelleen tähän: {}",
-        "allow_animated_true": "Animoidut xp kortit on tällä hetkellä käytöstä sinulle",
-        "allow_auto_unafk_false": "Sinun täytyy poistaa AFK tunniste itse",
-        "allow_auto_unafk_true": "Minä aion poistaa AFK tunnisteen heti kun lähetät viestin",
         "animated_card_false": "Et ole tällä hetkellä hyväksymässä animoitua korttia. Kiitos!",
         "animated_card_true": "Voit nyt käyttää animoituja xp kortteja  (hitaampi renderaaminen)",
         "auto_unafk_false": "Sinun täytyy poistaa AFK merkki itse",

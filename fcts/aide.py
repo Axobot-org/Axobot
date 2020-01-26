@@ -87,7 +87,7 @@ If the bot can't send the new command format, it will try to send the old one.""
             if len(categ_name) == 1:
                 temp = [c for c in self.bot.commands if c.name in self.commands_list[categ_name[0]]]
                 pages = await self.all_commands(ctx,sorted(temp,key=self.sort_by_name))
-            if len(commands) == 0:  #aucune commande
+            elif len(commands) == 0:  #aucune commande
                 pages = await self.all_commands(ctx,sorted([c for c in self.bot.commands],key=self.sort_by_name))
                 title = await self.translate(ctx.channel,"aide","embed_title",u=str(ctx.author))
             elif len(commands) == 1:    #Nom de commande unique ?
@@ -297,7 +297,7 @@ If the bot can't send the new command format, it will try to send the old one.""
         # Module
         category = "unclassed"
         for k,v in self.commands_list.items():
-            if cmd.name in v:
+            if cmd.name in v or cmd.full_parent_name in v:
                 category = k
                 break
         category = (await self.translate(ctx.channel,'keywords','category')).capitalize() + ": " + (await self.translate(ctx.channel,"aide","categories"))[category]

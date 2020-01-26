@@ -206,7 +206,7 @@ class RolesReact(commands.Cog):
             max_rr = await self.bot.cogs['ServerCog'].find_staff(ctx.guild.id,'roles_react_max_number')
             max_rr = self.bot.cogs["ServerCog"].default_opt['roles_react_max_number'] if max_rr==None else max_rr
             title = await self.translate(ctx.guild.id,"roles_react",'rr-list',n=len(l),m=max_rr)
-            emb = self.bot.cogs['EmbedCog'].Embed(title=title,desc=des,color=self.embed_color).update_timestamp().create_footer(ctx.author)
+            emb = await self.bot.cogs['EmbedCog'].Embed(title=title,desc=des,color=self.embed_color).update_timestamp().create_footer(ctx)
             await ctx.send(embed=emb.discord_embed())
     
     @rr_main.command(name="get",aliases=['join'])

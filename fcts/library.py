@@ -99,7 +99,7 @@ class LibCog(commands.Cog):
         except:
             thumb = ''
         if ctx.guild == None or ctx.channel.permissions_for(ctx.guild.me).embed_links:
-            emb = self.bot.cogs['EmbedCog'].Embed(title=vinfo['title'],desc=txt,url=vinfo['infoLink'],thumbnail=thumb,color=5301186).create_footer(ctx.author)
+            emb = await self.bot.cogs['EmbedCog'].Embed(title=vinfo['title'],desc=txt,url=vinfo['infoLink'],thumbnail=thumb,color=5301186).create_footer(ctx)
             try:
                 price = [f"{k}: {x['amount']} {x['currencyCode']}" for k,x in book['saleInfo'].items() if k in ['listPrice','retailPrice']]
                 if len(price)>0:

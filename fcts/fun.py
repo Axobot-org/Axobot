@@ -36,8 +36,8 @@ async def can_say(ctx):
         return await ctx.bot.cogs["ServerCog"].staff_finder(ctx.author,"say")
 
 async def can_use_cookie(ctx):
-#                            Z_runner           neil3000            Awhikax           Adri526         Theventreur         Catastrophix        Platon_Neutron      Aragorn1202
-    return ctx.author.id in [279568324260528128,278611007952257034,281404141841022976,409470110131027979,229194747862843392,438372385293336577,286827468445319168,375598088850505728]
+#                            Z_runner           neil3000            Awhikax           Adri526         Theventreur         Catastrophix        Platon_Neutron      megat69            Aragorn1202
+    return ctx.author.id in [279568324260528128,278611007952257034,281404141841022976,409470110131027979,229194747862843392,438372385293336577,286827468445319168,517762101859844106,375598088850505728]
 
 class FunCog(commands.Cog):
     """Add some fun commands, no obvious use. You can disable this module with the 'enable_fun' option (command 'config')"""
@@ -102,7 +102,7 @@ class FunCog(commands.Cog):
                     for cmds in cmd.commands:
                         text+="\n    - {} *({})*".format(cmds.name,cmds.help)
         if ctx.guild==None or ctx.channel.permissions_for(ctx.guild.me).embed_links:
-            emb = ctx.bot.cogs['EmbedCog'].Embed(title=title,desc=text,color=ctx.bot.cogs['HelpCog'].help_color,time=ctx.message.created_at).create_footer(ctx.author)
+            emb = await ctx.bot.cogs['EmbedCog'].Embed(title=title,desc=text,color=ctx.bot.cogs['HelpCog'].help_color,time=ctx.message.created_at).create_footer(ctx)
             return await ctx.send(embed=emb.discord_embed())
         await ctx.send(title+text)
 

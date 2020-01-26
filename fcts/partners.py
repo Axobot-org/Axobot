@@ -366,7 +366,7 @@ class PartnersCog(commands.Cog):
             color = await ctx.bot.cogs['ServerCog'].find_staff(ctx.guild.id,'partner_color')
             if color==None:
                 color = self.bot.cogs['ServerCog'].default_opt['partner_color']
-            emb = ctx.bot.cogs['EmbedCog'].Embed(title=fields_name[0],fields=[{'name':fields_name[1],'value':f[0]},{'name':'​','value':'​'},{'name':fields_name[2],'value':f[1]}],color=color,thumbnail=ctx.guild.icon_url).create_footer(ctx.author).update_timestamp()
+            emb = await ctx.bot.get_cog('EmbedCog').Embed(title=fields_name[0],fields=[{'name':fields_name[1],'value':f[0]},{'name':'​','value':'​'},{'name':fields_name[2],'value':f[1]}],color=color,thumbnail=ctx.guild.icon_url).update_timestamp().create_footer(ctx)
             await ctx.send(embed=emb.discord_embed())
         else:
             await ctx.send(f"__{fields_name[0]}:__\n{f[0]}\n\n__{fields_name[1]}:__\n{f[1]}")
