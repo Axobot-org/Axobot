@@ -125,7 +125,7 @@ class FunCog(commands.Cog):
     async def cookie(self,ctx):
         """COOKIE !!!"""
         if ctx.author.id == 375598088850505728:
-            await ctx.send(file=await self.utilities.find_img("cookie_target.png"))
+            await ctx.send(file=await self.utilities.find_img("cookie_target.gif"))
         else:
             await ctx.send(str(await self.translate(ctx.guild,"fun","cookie")).format(ctx.author.mention,self.bot.cogs['EmojiCog'].customEmojis['cookies_eat']))
 
