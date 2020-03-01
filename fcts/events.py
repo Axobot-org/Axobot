@@ -510,7 +510,11 @@ class Events(commands.Cog):
             active_rss_feeds = active_rss_feeds,
             beta = 1 if self.bot.beta else 0
         ))
-        cursor.execute(query)
+        try:
+            cursor.execute(query)
+        except Exception as e:
+            await self.bot.get_cog("ErrorsCog").senf_err_msg(query)
+            raise e
         cnx.commit()
         cursor.close()
         emb = self.bot.cogs["EmbedCog"].Embed(desc='**Stats logs** updated',color=5293283).update_timestamp().set_author(self.bot.user)
