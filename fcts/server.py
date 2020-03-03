@@ -568,8 +568,10 @@ class ServerCog(commands.Cog):
     async def form_text(self,text):
         if len(text) == 0:
             text = "Ø"
+        elif len(text) > 1000:
+            text = "```\n" + text[:1000] + "...```"
         else:
-            text = "```\n"+text+"```"
+            text = "```\n" + text + "```"
         return text
 
     async def conf_prefix(self,ctx,option,value):
