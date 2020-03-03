@@ -2,7 +2,6 @@ import discord, mysql.connector, importlib, typing
 from discord.ext import commands
 
 from fcts import args, reloads
-importlib.reload(reloads)
 importlib.reload(args)
 
 

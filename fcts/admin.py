@@ -6,7 +6,6 @@ from libs import feedparser
 from contextlib import redirect_stdout
 from glob import glob
 from fcts import reloads
-importlib.reload(reloads)
 
 
 def cleanup_code(content):
