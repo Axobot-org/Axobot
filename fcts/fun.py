@@ -187,7 +187,7 @@ You can specify a verification limit by adding a number in argument (up to 1.000
     @commands.command(name="nope",hidden=True)
     @commands.check(is_fun_enabled)
     async def nope(self,ctx):
-        """Use this when you do not agree with your interlocutor"""
+        """Use this when you do not agree with someone else"""
         await ctx.send(file=await self.utilities.find_img('nope.png'))
         if self.bot.database_online:
             if await self.bot.cogs["ServerCog"].staff_finder(ctx.author,'say'):
