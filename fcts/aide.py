@@ -29,7 +29,7 @@ class HelpCog(commands.Cog):
         """Help on setting up welcome / leave messages"""
         prefix = await self.bot.get_prefix(ctx.message)
         if type(prefix)==list:
-            prefix = prefix[0]
+            prefix = prefix[-1]
         await ctx.send(await self.bot.cogs['LangCog'].tr(ctx.guild,'bvn','aide',p=prefix))
 
 
@@ -124,7 +124,7 @@ If the bot can't send the new command format, it will try to send the old one.""
             ft = await self.translate(ctx.channel,"aide","footer")
             prefix = await self.bot.get_prefix(ctx.message)
             if type(prefix)==list:
-                prefix = prefix[0]
+                prefix = prefix[-1]
         if destination.permissions_for(me).embed_links:
             if ctx.guild != None:
                 embed_colour = ctx.guild.me.color if ctx.guild.me.color != discord.Colour(self.help_color).default() else discord.Colour(self.help_color)
@@ -230,7 +230,7 @@ If the bot can't send the new command format, it will try to send the old one.""
         # Prefix
         prefix = await self.bot.get_prefix(ctx.message)
         if type(prefix)==list:
-            prefix = prefix[0]
+            prefix = prefix[-1]
         # Syntax
         syntax = cmd.qualified_name + "** " + cmd.signature
         # Subcommands

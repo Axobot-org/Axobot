@@ -9,7 +9,7 @@ default_color = discord.Color(0x50e3c2)
 from docs import conf
 importlib.reload(conf)
 from fcts import reloads, args, checks
-importlib.reload(reloads)
+# importlib.reload(reloads)
 importlib.reload(args)
 importlib.reload(checks)
 from libs import bitly_api
@@ -901,7 +901,7 @@ Servers:
         if ctx.invoked_subcommand != None:
             return
         txt = await self.translate(ctx.channel,"infos","prefix")
-        prefix = "\n".join(await ctx.bot.get_prefix(ctx.message))
+        prefix = "\n".join((await ctx.bot.get_prefix(ctx.message))[1:])
         if ctx.guild==None or ctx.channel.permissions_for(ctx.guild.me):
             emb = await ctx.bot.cogs['EmbedCog'].Embed(title=txt,desc=prefix,time=ctx.message.created_at,color=ctx.bot.cogs['HelpCog'].help_color).create_footer(ctx)
             return await ctx.send(embed=emb.discord_embed())

@@ -268,7 +268,7 @@ class ServerCog(commands.Cog):
     @commands.cooldown(1,2,commands.BucketType.guild)
     async def sconfig_help(self,ctx):
         """Get help about this command"""
-        msg = await self.translate(ctx.guild,"server","config-help", p=(await self.bot.get_prefix(ctx.message))[0])
+        msg = await self.translate(ctx.guild,"server","config-help", p=(await self.bot.get_prefix(ctx.message))[-1])
         await ctx.send(msg.format(ctx.guild.owner.name))
 
     @sconfig_main.command(name="del")

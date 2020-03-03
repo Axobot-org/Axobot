@@ -543,7 +543,7 @@ You can specify a verification limit by adding a number in argument (up to 1.000
                     await msg.channel.send(reason)
         if ctx.author.display_name.endswith(' [AFK]'):
             msg = copy.copy(msg)
-            msg.content = (await self.bot.get_prefix(msg))[0] + 'unafk'
+            msg.content = (await self.bot.get_prefix(msg))[-1] + 'unafk'
             new_ctx = await self.bot.get_context(msg)
             await self.bot.invoke(new_ctx)
 
