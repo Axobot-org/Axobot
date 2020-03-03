@@ -1052,8 +1052,11 @@ Servers:
             await ctx.send(desc)
 
     @commands.command(name="usernames",aliases=["username","usrnm"])
-    async def username(self,ctx:commands.Context,*,user:discord.User):
-        """Get the names history of an user"""
+    async def username(self,ctx:commands.Context,*,user:discord.User=None):
+        """Get the names history of an user
+        Default user is you"""
+        if user==None:
+            user = ctx.author
         language = await self.translate(ctx.channel,"current_lang","current")
         cond = f"user='{user.id}'"
         if not self.bot.beta:
@@ -1078,13 +1081,19 @@ Servers:
             f = list()
             if len(global_list)>0:
             # Usernames part
-                f.append({'name':await self.translate(ctx.channel,'infos','usernames-global'), 'value':"\n".join([x['new'] for x in global_list if x['new']!=''])})
+                temp = [x['new'] for x in global_list if x['new']!='']
+                if len(temp) > 30:
+                    temp = temp[:30] + [await self.translate(ctx.channel, 'infos', 'usernames-more', nbr=len(temp)-30)]
+                f.append({'name':await self.translate(ctx.channel,'infos','usernames-global'), 'value':"\n".join(temp)})
                 if global_list[-1]['old'] != '':
                     f[-1]["value"] += "\n" + global_list[-1]['old']
                 date += await self.bot.cogs['TimeCog'].date([x['utc_date'] for x in global_list][0] ,year=True, lang=language)
             if len(this_guild)>0:
             # Nicknames part
-                f.append({'name':await self.translate(ctx.channel,'infos','usernames-local'), 'value':"\n".join([x['new'] for x in this_guild if x['new']!=''])})
+                temp = [x['new'] for x in this_guild if x['new']!='']
+                if len(temp) > 30:
+                    temp = temp[:30] + [await self.translate(ctx.channel, 'infos', 'usernames-more', nbr=len(temp)-30)]
+                f.append({'name':await self.translate(ctx.channel,'infos','usernames-local'), 'value':"\n".join(temp)})
                 if this_guild[-1]['old'] != '':
                     f[-1]["value"] += "\n" + this_guild[-1]['old']
                 date += "\n" + await self.bot.cogs['TimeCog'].date([x['utc_date'] for x in this_guild][0], year=True, lang=language)

@@ -354,6 +354,7 @@
         "usernames-global": "Historique général",
         "usernames-last-date": "Dernier changement",
         "usernames-local": "Historique du serveur",
+        "usernames-more": "Et {nbr} de plus",
         "usernames-title": "Pseudos de **{u}**"
     },
     "infos_2": {
