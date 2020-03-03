@@ -481,17 +481,7 @@ class Events(commands.Cog):
             await self.bot.cogs['ErrorsCog'].senf_err_msg("Translators backup: Unable to find backup folder")
             return
         emb = self.bot.cogs["EmbedCog"].Embed(desc='**Translations files backup** completed in {}s'.format(round(time.time()-t,3)),color=10197915).update_timestamp().set_author(self.bot.user)
-        await self.bot.cogs["EmbedCog"].send([emb],url="loop")
-
-    async def send_mee6_stats(self):
-        """temporary log to see how many mee6api requests have been done"""
-        stats = self.bot.cogs['XPCog'].mee6_calls
-        t = await self.bot.cogs['TimeCog'].time_delta(round(time.time()-stats[0]))
-        emb = self.bot.cogs["EmbedCog"].Embed(desc='MEE6 api called {} times since {} ({}-{}-{})'.format(sum(stats[1:]),t,stats[1],stats[2],stats[3]))
-        emb.update_timestamp().set_author(self.bot.user)
-        await self.bot.cogs["EmbedCog"].send([emb],url="loop")
-        self.mee6_stats_last = datetime.datetime.now()
-    
+        await self.bot.cogs["EmbedCog"].send([emb],url="loop")    
 
     async def send_sql_statslogs(self):
         "Send some stats about the current bot stats"

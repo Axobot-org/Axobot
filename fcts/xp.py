@@ -30,7 +30,6 @@ class XPCog(commands.Cog):
         self.max_xp_per_msg = 60
         self.file = 'xp'
         self.xp_channels_cache = dict()
-        self.mee6_calls = [0,0,0,0]
         bot.add_listener(self.add_xp,'on_message')
         try:
             self.translate = bot.cogs['LangCog'].tr
