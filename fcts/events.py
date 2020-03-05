@@ -392,7 +392,7 @@ class Events(commands.Cog):
         if self.bot.beta:
             return
         t = time.time()
-        answers = ['None','None','None','None']
+        answers = ['None','None','None','None','None']
         self.bot.log.info("[DBL] Envoi des infos sur le nombre de guildes...")
         try:
             guildCount = await self.bot.cogs['InfoCog'].get_guilds_count()
@@ -400,9 +400,9 @@ class Events(commands.Cog):
             await self.bot.cogs['ErrorsCog'].on_error(e,None)
             guildCount = len(self.bot.guilds)
         session = aiohttp.ClientSession(loop=self.bot.loop)
-        # https://discordbots.org/bot/486896267788812288
+        # https://top.gg/bot/486896267788812288
         payload = {'server_count': guildCount}
-        async with session.post('https://discordbots.org/api/bots/486896267788812288/stats',data=payload,headers={'Authorization':str(self.bot.dbl_token)}) as resp:
+        async with session.post('https://top.gg/api/bots/486896267788812288/stats',data=payload,headers={'Authorization':str(self.bot.dbl_token)}) as resp:
             self.bot.log.debug('discordbots.org returned {} for {}'.format(resp.status, payload))
             answers[0] = resp.status
         # https://divinediscordbots.com/bot/486896267788812288
@@ -412,7 +412,7 @@ class Events(commands.Cog):
         headers = {
               'authorization': self.bot.others['divinediscordbots'],
               'content-type': 'application/json'
-          }
+        }
         async with session.post('https://divinediscordbots.com/bot/{}/stats'.format(self.bot.user.id), data=payload, headers=headers) as resp:
               self.bot.log.debug('divinediscordbots statistics returned {} for {}'.format(resp.status, payload))
               answers[1] = resp.status
@@ -423,21 +423,29 @@ class Events(commands.Cog):
         headers = {
               'Authorization': self.bot.others['botsondiscord'],
               'Content-Type': 'application/json'
-          }
+        }
         async with session.post('https://bots.ondiscord.xyz/bot-api/bots/{}/guilds'.format(self.bot.user.id), data=payload, headers=headers) as resp:
               self.bot.log.debug('BotsOnDiscord returned {} for {}'.format(resp.status, payload))
               answers[2] = resp.status
         # https://botlist.space/bot/486896267788812288
         payload = json.dumps({
           'server_count': guildCount
-          })
+        })
         headers = {
               'Authorization': self.bot.others['botlist.space'],
               'Content-Type': 'application/json'
-          }
+        }
         async with session.post('https://api.botlist.space/v1/bots/{}'.format(self.bot.user.id), data=payload, headers=headers) as resp:
               self.bot.log.debug('botlist.space returned {} for {}'.format(resp.status, payload))
               answers[3] = resp.status
+        # https://discord.boats/bot/486896267788812288
+        headers = {
+              'Authorization': self.bot.others['discordboats'],
+              'Content-Type': 'application/json'
+        }
+        async with session.post('https://discord.boats/api/bot/{}'.format(self.bot.user.id), data=payload, headers=headers) as resp:
+              self.bot.log.debug('discord.boats returned {} for {}'.format(resp.status, payload))
+              answers[4] = resp.status
         await session.close()
         answers = [str(x) for x in answers]
         emb = self.bot.cogs["EmbedCog"].Embed(desc='**Guilds count updated** in {}s ({})'.format(round(time.time()-t,3),'-'.join(answers)),color=7229109).update_timestamp().set_author(self.bot.user)

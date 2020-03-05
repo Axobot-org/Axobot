@@ -1,4 +1,4 @@
-import discord, sys, traceback, importlib, datetime, random, re, asyncio, operator
+import discord, sys, traceback, importlib, datetime, random, re, asyncio, operator, aiohttp
 from fcts import args
 from discord.ext import commands
 
@@ -492,7 +492,32 @@ class UtilitiesCog(commands.Cog):
         result = list(cursor)[0][0]
         cursor.close()
         return result
+    
 
+    async def check_votes(self, userid: int) -> list:
+        """check if a user voted on any bots list website"""
+        votes = list()
+        async with aiohttp.ClientSession() as session:
+            # https://top.gg/bot/486896267788812288
+            async with session.get(f'https://top.gg/api/bots/486896267788812288/check?userId={userid}',headers={'Authorization':str(self.bot.dbl_token)}) as r:
+                js = await r.json()
+                if js["voted"]:
+                    votes.append(("Discord Bots List","https://top.gg/"))
+            # https://divinediscordbots.com/bot/486896267788812288
+            headers = {'authorization': self.bot.others['divinediscordbots']}
+            async with session.get('https://divinediscordbots.com/bot/486896267788812288/votes',headers=headers) as r:
+                js = await r.json()
+                if str(userid) in [x['id'] for x in js["votes"]]:
+                    votes.append(("Divine Discord Bot List","https://divinediscordbots.com/"))
+            # https://botlist.space/bot/486896267788812288
+            headers = {'Authorization': self.bot.others['botlist.space']}
+            async with session.get('https://api.botlist.space/v1/bots/486896267788812288/upvotes', headers=headers) as r:
+                js = await r.json()
+                if str(userid) in [x["user"]['id'] for x in js]:
+                    votes.append(("botlist.space","https://botlist.space/"))
+            
+            # async with session.get("https://discord.boats/api/bot/486896267788812288/voted")
+            return votes
 
 def setup(bot):
     bot.add_cog(UtilitiesCog(bot))

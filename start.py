@@ -223,6 +223,7 @@ def main():
             'access_token_key':cryptage.uncrypte(r[11]),
             'access_token_secret':cryptage.uncrypte(r[12])}
         client.others['botlist.space'] = cryptage.uncrypte(r[13])
+        client.others['discordboats'] = cryptage.uncrypte(r[14])
     try:
         cnx = mysql.connector.connect(user=client.database_keys['user'],password=client.database_keys['password'],host=client.database_keys['host'],database=client.database_keys['database1'])
         cnx.close()
