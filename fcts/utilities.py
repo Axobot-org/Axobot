@@ -515,8 +515,12 @@ class UtilitiesCog(commands.Cog):
                 js = await r.json()
                 if str(userid) in [x["user"]['id'] for x in js]:
                     votes.append(("botlist.space","https://botlist.space/"))
-            
-            # async with session.get("https://discord.boats/api/bot/486896267788812288/voted")
+            # https://discord.boats/bot/486896267788812288
+            headers = {'Authorization': self.bot.others['discordboats']}
+            async with session.get(f"https://discord.boats/api/bot/486896267788812288/voted?id={userid}", headers=headers) as r:
+                js = await r.json()
+                if (not js["error"]) and js["voted"]:
+                    votes.append(("Discord Boats","https://discord.boats/"))
             return votes
 
 def setup(bot):
