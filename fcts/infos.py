@@ -656,6 +656,8 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
                     servers_in.append(":crown: "+s.name)
                 else:
                     servers_in.append("- "+s.name)
+        if len(servers_in)==0:
+            servers_in = ["No server"]
         # XP card
         xp_card = await self.bot.cogs['UtilitiesCog'].get_xp_style(user)
         # Perks
@@ -676,7 +678,7 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
             perks = ["None"]
         # Has voted
         async with aiohttp.ClientSession() as session:
-            async with session.get('https://discordbots.org/api/bots/486896267788812288/check?userId={}'.format(user.id),headers={'Authorization':str(self.bot.dbl_token)}) as r:
+            async with session.get('https://top.gg/api/bots/486896267788812288/check?userId={}'.format(user.id),headers={'Authorization':str(self.bot.dbl_token)}) as r:
                 js = await r.json()
                 if js['voted']:
                     has_voted = await self.translate(ctx.channel,'keywords','oui')
@@ -687,6 +689,8 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
         disp_lang = list()
         for lang in await self.bot.cogs['UtilitiesCog'].get_languages(user):
             disp_lang.append('{} ({}%)'.format(lang[0],round(lang[1]*100)))
+        if len(disp_lang)==0:
+            disp_lang = ["Unknown"]
         # User name
         user_name = str(user)+' <:BOT:544149528761204736>' if user.bot else str(user)
         # ----
@@ -731,7 +735,7 @@ Servers:
                 if x.name==guild:
                     guild = x
                     break
-        if isinstance(guild,str):
+        if isinstance(guild,str) or guild==None:
             await ctx.send(await self.translate(ctx.channel,"find","guild-0"))
             return
         msglang = await self.translate(ctx.channel,'current_lang','current')
