@@ -375,7 +375,7 @@ Every information come from the website www.fr-minecraft.net"""
             embed = discord.Embed(title=str(await translate(guild,"mc","serv-title")).format(self.ip), color=discord.Colour(0x417505), timestamp=datetime.datetime.utcfromtimestamp(time.time()))
             embed.set_footer(text="From {}".format(self.api))
             if self.image != None:
-                embed.thumbnail(url=self.image)
+                embed.set_thumbnail(url=self.image)
             embed.add_field(name="Version", value=self.version)
             embed.add_field(name=await translate(guild,"mc","serv-0"), value="{}/{}".format(self.online_players,self.max_players))
             if len(p)>20:
