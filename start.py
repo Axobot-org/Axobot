@@ -3,7 +3,7 @@
 
 def check_libs():
     count = 0
-    for m in ["mysql","discord","frmc_lib","aiohttp","requests","re","asyncio","datetime","time","importlib","traceback","sys","logging","psutil","platform","subprocess",'json','emoji','imageio','geocoder','tzwhere','pytz','dbl','twitter']:
+    for m in ["mysql","discord","frmc_lib","aiohttp","requests","re","asyncio","datetime","time","importlib","traceback","sys","logging","psutil","platform","subprocess",'json','emoji','imageio','geocoder','tzwhere','pytz','twitter']:
         try:
             exec("import "+m)
             exec("del "+m)
@@ -22,7 +22,6 @@ if check_libs():
     from random import choice
     from discord.ext import commands
     from fcts import cryptage, tokens
-    import dbl
 else:
     import sys
     print("Fin de l'exécution")
