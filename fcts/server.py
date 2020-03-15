@@ -560,7 +560,7 @@ class ServerCog(commands.Cog):
             text = await self.find_staff(ctx.guild.id,option)
             return await self.form_text(text)
         else:
-            await self.modify_server(ctx.guild.id,values=[(option,value.replace('"','\"'))])
+            await self.modify_server(ctx.guild.id,values=[(option,value.replace('"','\\"'))])
             msg = await self.translate(ctx.guild.id,"server","change-text")
             await ctx.send(msg.format(option,value))
             await self.send_embed(ctx.guild,option,value)
