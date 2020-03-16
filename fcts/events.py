@@ -231,6 +231,31 @@ class Events(commands.Cog):
                 self.bot.log.warn("[check_user_left] {} (user {}/server {})".format(e,member.id,member.guild.id))
 
 
+    async def task_timer(self, task:dict):
+        if task["guild"] != None:
+            guild = self.bot.get_guild(task['guild'])
+            if guild == None:
+                return
+            channel = guild.get_channel(task["channel"])
+            if channel == None:
+                return
+        else:
+            channel = self.bot.get_channel(task["channel"])
+            if channel == None:
+                return
+        if task["user"] != None:
+            user = self.bot.get_user(task["user"])
+            if user == None:
+                raise discord.errors.NotFound
+            try:
+                f_duration = await self.bot.get_cog('TimeCog').time_delta(task['duration'],lang=await self.translate(channel,'current_lang','current'), form='developed', precision=0)
+                t = (await self.translate(channel, "fun", "reminds-title")).capitalize()
+                emb = self.bot.get_cog("EmbedCog").Embed(title=t, desc=task["message"], color=4886754, time=task["begin"])
+                msg = await self.translate(channel, "fun", "reminds-asked", user=user.mention, duration=f_duration)
+                await channel.send(msg, embed=emb)
+            except Exception as e:
+                raise e
+
 
     async def get_events_from_db(self,all=False,IDonly=False):
         """Renvoie une liste de tous les events qui doivent être exécutés"""
@@ -293,22 +318,34 @@ class Events(commands.Cog):
                 except Exception as e:
                     await self.bot.cogs['ErrorsCog'].on_error(e,None)
                     self.bot.log.error("[unban_task] Impossible d'unban automatiquement : {}".format(e))
+            if task['action']=="timer":
+                try:
+                    await self.task_timer(task)
+                except discord.errors.NotFound:
+                    await self.remove_task(task['ID'])
+                except Exception as e:
+                    await self.bot.cogs['ErrorsCog'].on_error(e,None)
+                    self.bot.log.error("[unban_task] Impossible d'envoyer un timer : {}".format(e))
+                else:
+                    await self.remove_task(task['ID'])
 
 
-    async def add_task(self,guildID,userID,action,duration):
+
+    async def add_task(self, action:str, duration:int, userID: int, guildID:int=None, channelID:int=None, message:str=None):
         """Ajoute une tâche à la liste"""
         tasks = await self.get_events_from_db(all=True)
         for t in tasks:
-            if t['user']==userID and t['guild']==guildID and t['action']==action:
+            if (t['user']==userID and t['guild']==guildID and t['action']==action and t["channel"]==channelID) and t['action']!='timer':
                 return await self.update_duration(t['ID'],duration)
         cnx = self.bot.cnx_frm
         cursor = cnx.cursor()
-        ids = await self.get_events_from_db(all=True,IDonly=True)
-        if len(ids)>0:
-            ID = max([x['ID'] for x in ids])+1
+        if len(tasks)>0:
+            ID = max([x['ID'] for x in tasks])+1
         else:
             ID = 0
-        query = ("INSERT INTO `timed` (`ID`,`guild`,`user`,`action`,`duration`) VALUES ({},{},{},'{}',{})".format(ID,guildID,userID,action,duration))
+        if message != None:
+            message = message.replace('"', "\\")
+        query = ("INSERT INTO `timed` (`ID`,`guild`,`channel`,`user`,`action`,`duration`,`message`) VALUES ({},{},{},{},'{}',{},\"{}\")".format(ID,guildID,channelID, userID, action, duration, message))
         cursor.execute(query)
         cnx.commit()
         return True
