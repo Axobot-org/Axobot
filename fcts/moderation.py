@@ -327,7 +327,7 @@ Or: mute @someone Plz respect me"""
                     case = CasesCog.Case(bot=self.bot,guildID=ctx.guild.id,memberID=user.id,Type="mute",ModID=ctx.author.id,Reason=reason,date=datetime.datetime.now()).create_id(caseIDs)
                 else:
                     case = CasesCog.Case(bot=self.bot,guildID=ctx.guild.id,memberID=user.id,Type="tempmute",ModID=ctx.author.id,Reason=reason,date=datetime.datetime.now(),duration=duration).create_id(caseIDs)
-                    await self.bot.cogs['Events'].add_task(ctx.guild.id,user.id,'mute',duration)
+                    await self.bot.cogs['Events'].add_task('mute',duration,user.id,ctx.guild.id)
                 try:
                     await CasesCog.add_case(case)
                     caseID = case.id
@@ -446,7 +446,7 @@ Or: mute @someone Plz respect me"""
                     case = CasesCog.Case(bot=self.bot,guildID=ctx.guild.id,memberID=user.id,Type="ban",ModID=ctx.author.id,Reason=reason,date=datetime.datetime.now()).create_id(caseIDs)
                 else:
                     case = CasesCog.Case(bot=self.bot,guildID=ctx.guild.id,memberID=user.id,Type="tempban",ModID=ctx.author.id,Reason=reason,date=datetime.datetime.now(),duration=duration).create_id(caseIDs)
-                    await self.bot.cogs['Events'].add_task(ctx.guild.id,user.id,'ban',duration)
+                    await self.bot.cogs['Events'].add_task('ban',duration,user.id,ctx.guild.id)
                 try:
                     await CasesCog.add_case(case)
                     caseID = case.id
