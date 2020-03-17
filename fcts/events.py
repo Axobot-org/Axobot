@@ -250,7 +250,8 @@ class Events(commands.Cog):
             try:
                 f_duration = await self.bot.get_cog('TimeCog').time_delta(task['duration'],lang=await self.translate(channel,'current_lang','current'), form='developed', precision=0)
                 t = (await self.translate(channel, "fun", "reminds-title")).capitalize()
-                emb = self.bot.get_cog("EmbedCog").Embed(title=t, desc=task["message"], color=4886754, time=task["begin"])
+                foot = await self.translate(channel, "fun", "reminds-date")
+                emb = self.bot.get_cog("EmbedCog").Embed(title=t, desc=task["message"], color=4886754, time=task["begin"], footer_text=foot)
                 msg = await self.translate(channel, "fun", "reminds-asked", user=user.mention, duration=f_duration)
                 await channel.send(msg, embed=emb)
             except Exception as e:
@@ -559,3 +560,7 @@ class Events(commands.Cog):
 
 def setup(bot):
     bot.add_cog(Events(bot))
+    try:
+        bot.get_cog("Events").loop.start()
+    except RuntimeError:
+        pass
