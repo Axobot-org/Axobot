@@ -597,6 +597,7 @@
         "remove_roles-1": "-> {c} roles removed on {m}!",
         "role-color": "Teh coulor of role {} haz bee'n changd!",
         "role-high": "Oops, tish role is 2 high for me to change. Move my role above the role `{r}` be4 trying again, thx",
+        "roles-list": "List of srv roles",
         "slowmode-0": "Teh very-cold-mode is now disabld in this nize place.",
         "slowmode-1": "Impossible to set a frequency higher than 6 hourz",
         "slowmode-2": "The {} channl iz naw in very-cold-mode. Wait {} secondz be4 sending a mesage.",

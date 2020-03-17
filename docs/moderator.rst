@@ -241,6 +241,7 @@ Nice command that allows you to do different things with the server roles (other
 
 * :code:`role list <role>`: List every members who are in a specific role, if this number is under 200. The bot must have "`Embed Links <perms.html#embed-links>`_" permission to display the result. Please check note 2.
 
+* :code:`role server-list`: Liste every role of your server, with the members count. The bot must have "`Embed Links <perms.html#embed-links>`_" permission to display the result. Please check note 2.
 
 .. warning:: (1) The bot need the "`Manage roles <perms.html#manage-roles>`_" permission, also his highest role need to be higher than the role he's trying to edit.
     (2) You need to have the "`Manage roles <perms.html#manage-roles>`_" permission (or be an administrator) to use this command. Else, Zbot won't react.

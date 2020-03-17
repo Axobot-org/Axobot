@@ -762,7 +762,7 @@ You must be an administrator of this server to use this command.
             await ctx.bot.cogs['ErrorsCog'].on_cmd_error(ctx,e)
 
 
-    @commands.group(name="role")
+    @commands.group(name="role", aliases=["roles"])
     @commands.guild_only()
     async def main_role(self,ctx):
         """A few commands to manage roles"""
@@ -806,6 +806,32 @@ You must be an administrator of this server to use this command.
                 fields.append({'name':tr_mbr.capitalize(),'value':txt})
         emb = await self.bot.cogs['EmbedCog'].Embed(title=role.name,fields=fields,color=role.color).update_timestamp().create_footer(ctx)
         await ctx.send(embed=emb.discord_embed())
+    
+    @main_role.command(name="server-list",aliases=["glist"])
+    @commands.cooldown(5,30,commands.BucketType.guild)
+    async def role_glist(self, ctx:commands.Context):
+        """Check the list of every role"""
+        if not (await checks.has_manage_roles(ctx) or await checks.has_manage_guild(ctx) or await checks.has_manage_msg(ctx)):
+            return
+        if not ctx.channel.permissions_for(ctx.guild.me).embed_links:
+            return await ctx.send(await self.translate(ctx.guild.id,'fun','no-embed-perm'))
+        tr_mbr = await self.translate(ctx.guild.id,"keywords","membres")
+        title = await self.translate(ctx.guild.id,"modo","roles-list")
+        desc = list()
+        count = 0
+        for role in ctx.guild.roles[1:]:
+            txt = "{} - {} {}".format(role.mention, len(role.members), tr_mbr)
+            if count+len(txt) > 2040:
+                emb = await self.bot.cogs['EmbedCog'].Embed(title=title,desc="\n".join(desc),color=ctx.guild.me.color).update_timestamp().create_footer(ctx)
+                await ctx.send(embed=emb)
+                desc.clear()
+                count = 0
+            desc.append(txt)
+            count += len(txt)+2
+        if count>0:
+            emb = await self.bot.cogs['EmbedCog'].Embed(title=title,desc="\n".join(desc),color=ctx.guild.me.color).update_timestamp().create_footer(ctx)
+            await ctx.send(embed=emb)
+
     
     @main_role.command(name="info")
     @commands.check(checks.has_manage_msg)

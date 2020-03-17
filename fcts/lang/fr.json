@@ -597,6 +597,7 @@
         "remove_roles-1": "-> {c} rôles enlevés sur {m} !",
         "role-color": "Le rôle {} a changé de couleur !",
         "role-high": "Oups, ce rôle est trop haut pour que je puisse le modifier. Merci de déplacer mon rôle au-dessus du rôle `{r}` avant de réessayer :confused:",
+        "roles-list": "Liste des rôles du serveur",
         "slowmode-0": "Le slowmode est désormais désactivé dans ce salon.",
         "slowmode-1": "Impossible de mettre une fréquence supérieure à six heures",
         "slowmode-2": "Le channel {} est désormais en slowmode.\nAttendez {} secondes avant d'envoyer un message.",
