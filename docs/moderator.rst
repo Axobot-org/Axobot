@@ -54,9 +54,9 @@ This command allows you to efficiently delete messages, with a list of possible 
 
 Be careful, all specified settings must be validated for the message to be deleted. For example, if you enter :code:`clear 10 @Z_runner#7515 +i`, the bot will check in the last ten messages if the message comes from Z_runner#7515 AND if the message contains an image. 
 
-If you enter :code:`clear 25 -p +l`, the bot will check in the last 25 messages if the message contains a link AND if the message is not pinned, no matter the author.
+If you enter :code:`clear 25 -p +l`, the bot will clear the last 25 messages if they contains a link AND if they're not pinned, no matter the author.
 
-If you enter :code:`clear 13 -p -i @Z_runner#7515`, the bot will check in the last 13 messages if the message is not pinned AND if the message does not contain any file/image AND if the author is Z_runner#7515.
+If you enter :code:`clear 13 -p -i @Z_runner#7515`, the bot will clear the last 13 messages if they are not pinned AND if they does not contain any file/image AND if the author is Z_runner#7515.
 
 If you enter :code:`clear 1000 @Z_runner#7515 @ZBot beta#4940`, the bot will delete all messages contained in the last 1000 messages of the channel AND written by Z_runner#7515 OR ZBot beta#4940 
 
