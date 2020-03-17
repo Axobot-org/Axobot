@@ -26,7 +26,13 @@ class ModeratorCog(commands.Cog):
     @commands.check(checks.can_slowmode)
     async def slowmode(self,ctx,time=None):
         """Keep your chat cool
-        Slowmode works up to one message every 6h (21600s)"""
+Slowmode works up to one message every 6h (21600s)
+
+..Example slowmode 10
+
+..Example slowmode off
+
+..Doc moderator.html#slowmode"""
         if not ctx.channel.permissions_for(ctx.guild.me).manage_channels:
             await ctx.send(await self.translate(ctx.guild.id,"modo","cant-slowmode"))
             return
@@ -67,7 +73,15 @@ class ModeratorCog(commands.Cog):
             ('-l' or) '+l' : delete if the message (does not) contain any link
             ('-p' or) '+p' : delete if the message is (not) pinned
             ('-i' or) '+i' : delete if the message (does not) contain a Discord invite
-        By default, the bot will not delete pinned messages"""
+        By default, the bot will not delete pinned messages
+
+..Example clear 120
+
+..Example clear 10 @someone
+
+..Example clear 50 +f +l -p
+
+..Doc moderator.html#clear"""
         if not ctx.channel.permissions_for(ctx.guild.me).manage_messages:
             await ctx.send(await self.translate(ctx.guild.id,"modo","need-manage-messages"))
             return
@@ -138,8 +152,9 @@ class ModeratorCog(commands.Cog):
             await ctx.message.delete()
             deleted = await ctx.channel.purge(limit=number, check=check)
             await ctx.send(str(await self.translate(ctx.guild,"modo","clear-0")).format(len(deleted)),delete_after=2.0)
-            log = str(await self.translate(ctx.guild.id,"logs","clear")).format(channel=ctx.channel.mention,number=len(deleted))
-            await self.bot.cogs["Events"].send_logs_per_server(ctx.guild,"clear",log,ctx.author)
+            if len(deleted) > 0:
+                log = str(await self.translate(ctx.guild.id,"logs","clear")).format(channel=ctx.channel.mention,number=len(deleted))
+                await self.bot.cogs["Events"].send_logs_per_server(ctx.guild,"clear",log,ctx.author)
         except Exception as e:
             await self.bot.cogs['ErrorsCog'].on_command_error(ctx,e)
 
@@ -163,7 +178,11 @@ class ModeratorCog(commands.Cog):
     @commands.guild_only()
     @commands.check(checks.can_kick)
     async def kick(self,ctx,user:discord.Member,*,reason="Unspecified"):
-        """Kick a member from this server"""
+        """Kick a member from this server
+
+..Example kick @someone Not nice enough to stay here        
+
+..Doc moderator.html#kick"""
         try:
             if not ctx.channel.permissions_for(ctx.guild.me).kick_members:
                 await ctx.send(await self.translate(ctx.guild.id,"modo","cant-kick"))
@@ -217,7 +236,11 @@ class ModeratorCog(commands.Cog):
     @commands.guild_only()
     @commands.check(checks.can_warn)
     async def warn(self,ctx,user:discord.Member,*,message):
-        """Send a warning to a member."""
+        """Send a warning to a member
+
+..Example warn @someone Please just stop, next one is a mute duh
+
+..Doc moderator.html#warn"""
         try:
             if self.bot.database_online and await self.bot.cogs["ServerCog"].staff_finder(user,"warn"):
                 return await ctx.send(await self.translate(ctx.guild.id,"modo","staff-warn"))
@@ -298,8 +321,12 @@ You can also mute this member for a defined duration, then use the following for
 `XXm` : XX minutes
 `XXh` : XX hours
 `XXd` : XX days
-Example: mute @someone 1d 3h Reason is becuz he's a bad guy
-Or: mute @someone Plz respect me"""
+
+..Example mute @someone 1d 3h Reason is becuz he's a bad guy
+
+..Example mute @someone Plz respect me
+
+..Doc moderator.html#mute"""
         duration = sum(time)
         if duration>0:
             f_duration = await self.bot.cogs['TimeCog'].time_delta(duration,lang=await self.translate(ctx.guild,'current_lang','current'),form='temp',precision=0)
@@ -365,7 +392,9 @@ Or: mute @someone Plz respect me"""
     @commands.check(checks.can_mute)
     async def unmute(self,ctx,user:discord.Member):
         """Unmute someone
-        This will remove the role 'muted' for the targeted member"""
+This will remove the role 'muted' for the targeted member
+
+..Example unmute @someone"""
         role = await self.get_muted_role(ctx.guild)
         if role not in user.roles:
             await ctx.send(await self.translate(ctx.guild.id,"modo","already-unmute"))
@@ -398,7 +427,15 @@ Or: mute @someone Plz respect me"""
     @commands.check(checks.can_ban)
     async def ban(self,ctx,user:args.user,time:commands.Greedy[args.tempdelta],days_to_delete:typing.Optional[int]=0,*,reason="Unspecified"):
         """Ban someone
-        The 'days_to_delete' option represents the number of days worth of messages to delete from the user in the guild, bewteen 0 and 7
+The 'days_to_delete' option represents the number of days worth of messages to delete from the user in the guild, bewteen 0 and 7
+
+..Example ban @someone 3d You're bad
+
+..Example ban someone#1234 7 Spam isn't tolerated here
+
+..Example ban someone_else DM advertising is against Discord ToS!!!
+
+..Doc moderator.html#ban-unban
         """
         try:
             duration = sum(time)
@@ -481,7 +518,11 @@ Or: mute @someone Plz respect me"""
     @commands.guild_only()
     @commands.check(checks.can_ban)
     async def unban(self,ctx,user,*,reason="Unspecified"):
-        """Unban someone"""
+        """Unban someone
+
+..Example !unban 486896267788812288 Nice enough
+
+..Doc moderator.html#ban-unban"""
         try:
             backup = user
             try:
@@ -529,7 +570,11 @@ Or: mute @someone Plz respect me"""
     @commands.check(checks.can_kick)
     async def softban(self,ctx,user:discord.Member,reason="Unspecified"):
         """Kick a member and lets Discord delete all his messages up to 7 days old.
-        Permissions for using this command are the same as for the kick"""
+Permissions for using this command are the same as for the kick
+
+..Example softban @someone No spam pls
+
+..Doc moderator.html#softban"""
         try:
             if not ctx.channel.permissions_for(ctx.guild.me).ban_members:
                 await ctx.send(await self.translate(ctx.guild.id,"modo","cant-ban"))
@@ -584,7 +629,9 @@ Or: mute @someone Plz respect me"""
         """Check the list of currently banned members.
 The 'reasons' parameter is used to display the ban reasons.
 
-You must be an administrator of this server to use this command."""
+You must be an administrator of this server to use this command.
+
+..Doc moderator.html#banlist"""
         if not ctx.channel.permissions_for(ctx.guild.me).ban_members:
                 await ctx.send(await self.translate(ctx.guild.id,"modo","cant-ban"))
                 return
@@ -612,7 +659,7 @@ You must be an administrator of this server to use this command."""
         embed = ctx.bot.cogs['EmbedCog'].Embed(title=str(title).format(ctx.guild.name), color=self.bot.cogs["ServerCog"].embed_color, desc="\n".join(desc), time=ctx.message.created_at)
         await embed.create_footer(ctx)
         try:
-            await ctx.send(embed=embed.discord_embed(),delete_after=10)
+            await ctx.send(embed=embed.discord_embed(),delete_after=15)
         except discord.errors.HTTPException as e:
             if e.code==400:
                 await ctx.send(await self.translate(ctx.guild.id,"modo","ban-list-error"))

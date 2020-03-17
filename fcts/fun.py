@@ -636,7 +636,8 @@ Please use the following format:
 `XXm` : XX minutes
 `XXh` : XX hours
 `XXd` : XX days
-Example: remindme 49d Think about doing my homework"""
+
+..Example remindme 49d Think about doing my homework"""
         duration = sum(duration)
         if duration < 1:
             await ctx.send(await self.translate(ctx.channel, "fun", "reminds-too-short"))
