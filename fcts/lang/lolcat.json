@@ -10,7 +10,8 @@
         "emergency": "A emergency situation have just been declared 4 the boat. Those may bee the case when somebody tries to take controll of my code.\nTo limit the damagz, I was 4ced to leave all teh servrs I was on imediately, hoping itZ wasn't toooo late.\nFor much infoZ on de current state ov dis crisis, gonna to my offishial srver: https://discord.me/zbot (check teh link for the documentashun if it no longer workz: https://zbot.rtfd.io)"
     },
     "aide": {
-        "aliases": "Otherz names:",
+        "aliases": "Otherz names",
+        "description": "Smol text",
         "categories": {
             "fun": "cool things",
             "info": "usefull things",
@@ -128,7 +129,6 @@
                 "No verification rol has been addd"
             ]
         },
-        "checks": "things needd:",
         "cmd-not-found": "Dere are no comand naymme \"{}\"",
         "embed_title": "Cmds list 4 {u}",
         "footer": "Type {}help cmd 4 mure info abawt an commandZ",
@@ -137,7 +137,8 @@
         "no-subcmd": "Teh kommand `{0.name}` had not sub~~scribe~~commanD",
         "not-enabled": ":warning: This command iz def not enable",
         "subcmd-not-found": "Thiz commnd have no sUbcommant newmed \"{}\"",
-        "subcmds": "Subcommands:"
+        "subcmds": "Subcommands",
+        "warning": "Warns"
     },
     "blurple": {
         "check_fields": [
@@ -294,6 +295,12 @@
         "piece-1": "Faild, 't fell on teh edge!",
         "react-0": "Unable 2 find teh correspondin mssage. U must giv teh mesage ID in da furst argumnt, an teh emoji in da secondz :upside_down:\n Also check dat I haz permishun 2 reed msgs hystory!",
         "say-no-perm": "LMAO dont try 2 cheat and first get perm in {channel} pls",
+        "reminds-too-short": "U entered an invalid duration",
+        "reminds-too-long": "Unable 2 set such a long duration .-.",
+        "reminds-saved": "Got it! I'll remind you in {duration} OwO",
+        "reminds-asked": "{user}, u asked me {duration} ago 2 remind you this:",
+        "reminds-title": "Reminder",
+        "reminds-date": "Ask date",
         "thanos": [
             "{0} wus spard by Thanos",
             "Tahnos decidd 2 reduce {0} to ashes. 4 the gud ov humanity...."
@@ -354,6 +361,7 @@
         "usernames-global": "Gen' stori",
         "usernames-last-date": "Lastetest change",
         "usernames-local": "Serv hystori",
+        "usernames-more": "+{nbr} others",
         "usernames-title": "**{u}** names story"
     },
     "infos_2": {
@@ -372,7 +380,9 @@
         "click_here": "BLUE BUTTON TO CLICK",
         "depuis": "sinze",
         "dnd": "donot disturb me",
+        "doc": "Doc",
         "end": "end",
+        "example": "example",
         "extreme": "Xtrem",
         "ghost": "Goast",
         "high": "high",

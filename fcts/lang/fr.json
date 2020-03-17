@@ -10,7 +10,7 @@
         "emergency": "Une situation d'urgence vient d'être déclarée pour le bot. Cela peut être le cas lorsque quelqu'un tente de prendre le contrôle de mon code.\n    Pour limiter les dégâts, j'ai été forcé de quitter immédiatement l'intégralité des serveurs sur lesquels je me trouvais, en espérant qu'il ne soit pas trop tard.\n    Pour plus d'informations sur l'état actuel de la crise, rendez-vous sur mon serveur officiel : https://discord.me/zbot (vérifiez le lien depuis la documentation si celui-ci ne fonctionne plus : https://zbot.rtfd.io)"
     },
     "aide": {
-        "aliases": "Alias :",
+        "aliases": "Alias",
         "categories": {
             "fun": "fun",
             "info": "informations",
@@ -128,8 +128,8 @@
                 "Aucun rôle de vérification n'a été configuré"
             ]
         },
-        "checks": "Conditions :",
         "cmd-not-found": "Aucune commande nommée \"{}\"",
+        "description": "Description",
         "embed_title": "Liste des commandes disponibles pour {u}",
         "footer": "Entrez {}help commande pour plus d'informations sur une commande",
         "no-desc-cmd": "Aucune description pour cette commande",
@@ -137,7 +137,8 @@
         "no-subcmd": "La commande {0.name} n'a aucune sous-commande",
         "not-enabled": ":warning: Cette commande est désactivée",
         "subcmd-not-found": "Cette commande ne possède aucune sous-commande nommée \"{}\"",
-        "subcmds": "Sous-commandes :"
+        "subcmds": "Sous-commandes",
+        "warning": "Avertissements"
     },
     "blurple": {
         "check_fields": [
@@ -299,6 +300,7 @@
         "reminds-saved": "C'est noté ! Je vous le rappelerai dans {duration}",
         "reminds-asked": "{user}, vous m'avez demandé il y a {duration} de vous rappeler ceci :",
         "reminds-title": "Rappel",
+        "reminds-date": "Date de demande",
         "thanos": [
             "{0} a été épargné par Thanos",
             "Thanos a décidé de réduire {0} en cendres. Pour le bien de l'humanité..."
@@ -378,7 +380,9 @@
         "click_here": "Cliquez ici",
         "depuis": "depuis",
         "dnd": "ne pas déranger",
+        "doc": "Documentation",
         "end": "fin",
+        "example": "exemple",
         "extreme": "extrême",
         "ghost": "Fantôme",
         "high": "élevé",

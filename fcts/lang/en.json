@@ -10,7 +10,8 @@
         "emergency": "An emergency situation has just been declared for the bot. This may be the case when someone tries to take control of my code.\nTo limit the damage, I was forced to leave all the servers I was on immediately, hoping it wasn't too late.\nFor more information on the current state of the crisis, go to my official server: https://discord.me/zbot (check the link from the documentation if it no longer works: https://zbot.rtfd.io)"
     },
     "aide": {
-        "aliases": "Aliases:",
+        "aliases": "Aliases",
+        "description": "Description",
         "categories": {
             "fun": "fun",
             "info": "information",
@@ -128,7 +129,6 @@
                 "No verification role has been added"
             ]
         },
-        "checks": "Requirements:",
         "cmd-not-found": "There is no command nammed \"{}\"",
         "embed_title": "Available commands for {u}",
         "footer": "Type {}help command for more info on a command",
@@ -137,7 +137,8 @@
         "no-subcmd": "The command `{0.name}` has no subcommand",
         "not-enabled": ":warning: This command is disabled",
         "subcmd-not-found": "This command has no subcommand named \"{}\"",
-        "subcmds": "Subcommands:"
+        "subcmds": "Subcommands",
+        "warning": "Warnings"
     },
     "blurple": {
         "check_fields": [
@@ -294,6 +295,12 @@
         "piece-1": "Failed, it fell on the edge!",
         "react-0": "Unable to find the corresponding message. You must enter the message ID in the first argument, and the emoji in the second :upside_down:\n Also check that I have permission to read the message history!",
         "say-no-perm": "You do not have permission to send messages in the channel {channel}",
+        "reminds-too-short": "You have entered an invalid duration",
+        "reminds-too-long": "Impossible to set such a long duration",
+        "reminds-saved": "Got it! I'll remind you in {duration}",
+        "reminds-asked": "{user}, you asked me {duration} ago to remind you of this:",
+        "reminds-title": "Reminder",
+        "reminds-date": "Request date",
         "thanos": [
             "{0} was spared by Thanos",
             "Thanos decided to reduce {0} to ashes. For the good of humanity...."
@@ -373,7 +380,9 @@
         "click_here": "Click here",
         "depuis": "since",
         "dnd": "do not disturb",
+        "doc": "Documentation",
         "end": "end",
+        "example": "example",
         "extreme": "extreme",
         "ghost": "Ghost",
         "high": "high",
