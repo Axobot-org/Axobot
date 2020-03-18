@@ -560,7 +560,4 @@ class Events(commands.Cog):
 
 def setup(bot):
     bot.add_cog(Events(bot))
-    try:
-        bot.get_cog("Events").loop.start()
-    except RuntimeError:
-        pass
+    bot.get_cog("Events").loop.start()
