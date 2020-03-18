@@ -344,10 +344,16 @@ class RssCog(commands.Cog):
                 else:
                     c = x['channel']
                 MAX = e+1
+                if len("\n".join(text)) > 1950:
+                    embed = self.bot.get_cog("EmbedCog").Embed(title=await self.translate(ctx.guild.id,"rss","choose-delete"), color=self.embed_color, desc="\n".join(text), time=ctx.message.created_at)
+                    await embed.create_footer(ctx)
+                    emb_msg = await ctx.send(embed=embed)
+                    text = [await self.translate(ctx.guild.id,'rss','list2')]
                 text.append("{}) {} - {} - {}".format(e+1,await self.translate(ctx.guild.id,'rss',x['type']),x['link'],c))
-            embed = self.bot.get_cog("EmbedCog").Embed(title=await self.translate(ctx.guild.id,"rss","choose-delete"), color=self.embed_color, desc="\n".join(text), time=ctx.message.created_at)
-            await embed.create_footer(ctx)
-            emb_msg = await ctx.send(embed=embed)
+            if len(text) > 0:
+                embed = self.bot.get_cog("EmbedCog").Embed(title=await self.translate(ctx.guild.id,"rss","choose-delete"), color=self.embed_color, desc="\n".join(text), time=ctx.message.created_at)
+                await embed.create_footer(ctx)
+                emb_msg = await ctx.send(embed=embed)
             def check(msg):
                 if not msg.content.isnumeric():
                     return False
@@ -400,12 +406,18 @@ class RssCog(commands.Cog):
                         r.append(item)
                 r = ", ".join(r)
             Type = await self.translate(ctx.guild.id,'rss',x['type'])
+            if len(l) > 20:
+                embed = await self.bot.get_cog('EmbedCog').Embed(title="Liste des flux rss du serveur {}".format(ctx.guild.name), color=self.embed_color, time=ctx.message.created_at).create_footer(ctx)
+                for text in l:
+                    embed.add_field(name="\uFEFF", value=text, inline=False)
+                await ctx.send(embed=embed)
+                l.clear()
             l.append(translation.format(Type,c,x['link'],r,x['ID'],x['date']))
-        embed = self.bot.get_cog('EmbedCog').Embed(title="Liste des flux rss du serveur {}".format(ctx.guild.name), color=self.embed_color, time=ctx.message.created_at)
-        await embed.create_footer(ctx)
-        for x in l:
-            embed.add_field(name="\uFEFF", value=x, inline=False)
-        await ctx.send(embed=embed)
+        if len(l) > 0:
+            embed = await self.bot.get_cog('EmbedCog').Embed(title="Liste des flux rss du serveur {}".format(ctx.guild.name), color=self.embed_color, time=ctx.message.created_at).create_footer(ctx)
+            for x in l:
+                embed.add_field(name="\uFEFF", value=x, inline=False)
+            await ctx.send(embed=embed)
 
     async def askID(self,ID,ctx):
         """Demande l'ID d'un flux rss"""
