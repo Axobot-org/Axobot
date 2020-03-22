@@ -67,7 +67,7 @@ Every information come from the website www.fr-minecraft.net"""
         else:
             await ctx.send(text)
 
-    @commands.group(name="mc")
+    @commands.group(name="mc", aliases=["minecraft"])
     @commands.cooldown(5,30,commands.BucketType.user)
     async def mc_main(self,ctx):
         """Search for Minecraft game items/servers"""
