@@ -583,6 +583,7 @@
         "kick-noreason": "U have just been kicked from the servr {} :confused:",
         "kick-reason": "U haz just been KICZed from the servr {} :confused:\nReason : {}",
         "missing-manage-nick": "Oops, I'm missing the cool \"Manage nicknames\" perms! :sad:",
+        "missing-user-perms": "Oops, Ur not pawerful enoogh (either manage roles, manage server or manage messages)",
         "mute-1": "Teh mmber {} haz been silencd for the reezon `{}`!",
         "mute-created": "Successsfully added da `muted` role!",
         "mute-high": "Ooops, 't sEEms dat `muted` rol iz tooo high 4 me to give it... Plz fiX dis problem by plac'ng my role higher than this nice `muted` role.",

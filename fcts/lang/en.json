@@ -583,6 +583,7 @@
         "kick-noreason": "You have just been expelled from the server {} :confused:",
         "kick-reason": "You have just been expelled from the server {} :confused:\nReason : {}",
         "missing-manage-nick": "Oops, I'm missing the \"Manage nicknames\" permission!",
+        "missing-user-perms": "Oops, you're missing permissions (either manage roles, manage server or manage messages)",
         "mute-1": "The member {} has been silenced for the reason `{}`!",
         "mute-created": "Successfully created `muted` role!",
         "mute-high": "Oops, it seems that the `muted` role is too high for me to give it... Please fix this problem by placing my role higher than the `muted` role.",

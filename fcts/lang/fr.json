@@ -583,6 +583,7 @@
         "kick-noreason": "Vous venez d'être expulsé du serveur {} :confused:",
         "kick-reason": "Vous venez d'être expulsé du serveur {} :confused:\nRaison : {}",
         "missing-manage-nick": "Oups, il me manque la permission \"Gérer les pseudos\"",
+        "missing-user-perms": "Oups, il vous manque des permissions (gérer les rôles, gérer le serveur ou gérer les messages)",
         "mute-1": "Le membre {} a bien été réduit au silence pour la raison `{}` !",
         "mute-created": "Rôle `muted` créé avec succès !",
         "mute-high": "Oups, il semble que le rôle `muted` soit trop haut pour que je puisse le donner... Veuillez fixer ce problème en plaçant mon rôle plus haut que le rôle `muted`.",

@@ -787,6 +787,7 @@ You must be an administrator of this server to use this command.
     async def role_list(self,ctx,*,role:discord.Role):
         """Send the list of members in a role"""
         if not (await checks.has_manage_roles(ctx) or await checks.has_manage_guild(ctx) or await checks.has_manage_msg(ctx)):
+            await ctx.send(await self.translate(ctx.guild.id, "modo","missing-user-perms"))
             return
         if not ctx.channel.permissions_for(ctx.guild.me).embed_links:
             return await ctx.send(await self.translate(ctx.guild.id,'fun','no-embed-perm'))
@@ -812,6 +813,7 @@ You must be an administrator of this server to use this command.
     async def role_glist(self, ctx:commands.Context):
         """Check the list of every role"""
         if not (await checks.has_manage_roles(ctx) or await checks.has_manage_guild(ctx) or await checks.has_manage_msg(ctx)):
+            await ctx.send(await self.translate(ctx.guild.id, "modo","missing-user-perms"))
             return
         if not ctx.channel.permissions_for(ctx.guild.me).embed_links:
             return await ctx.send(await self.translate(ctx.guild.id,'fun','no-embed-perm'))
