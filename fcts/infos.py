@@ -688,9 +688,9 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
         #         has_voted = has_voted.capitalize()
         votes = await ctx.bot.get_cog("UtilitiesCog").check_votes(user.id)
         if use_embed:
-            votes = " ".join([f"[{x[0]}]({x[1]})" for x in votes])
+            votes = " - ".join([f"[{x[0]}]({x[1]})" for x in votes])
         else:
-            votes = " ".join([x[0] for x in votes])
+            votes = " - ".join([x[0] for x in votes])
         if len(votes) == 0:
             votes = "Nowhere"
         # Languages
