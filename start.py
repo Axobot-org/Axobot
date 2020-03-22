@@ -168,6 +168,10 @@ def get_prefix(bot,msg):
 def main():
     client = zbot(command_prefix=get_prefix,case_insensitive=True,status=discord.Status('online'))
 
+    log = setup_logger()
+    log.setLevel(logging.DEBUG)
+    log.info("Lancement du bot")
+
     initial_extensions = ['fcts.language',
                       'fcts.admin',
                       'fcts.aide',
@@ -225,11 +229,18 @@ def main():
         client.others['botlist.space'] = cryptage.uncrypte(r[13])
         client.others['discordboats'] = cryptage.uncrypte(r[14])
     try:
-        cnx = mysql.connector.connect(user=client.database_keys['user'],password=client.database_keys['password'],host=client.database_keys['host'],database=client.database_keys['database1'])
+        try:
+            cnx = mysql.connector.connect(user=client.database_keys['user'],password=client.database_keys['password'],host="127.0.0.1",database=client.database_keys['database1'])
+        except mysql.connector.InterfaceError:
+            client.log.warning("Impossible d'accéder à la dabatase locale - tentative via IP")
+            cnx = mysql.connector.connect(user=client.database_keys['user'],password=client.database_keys['password'],host=client.database_keys['host'],database=client.database_keys['database1'])
+        else:
+            client.log.info("Database connectée en vocal")
+            client.database_keys['host'] = '127.0.0.1'
         cnx.close()
     except Exception as e:
-        print("---- ACCES IMPOSSIBLE A LA DATABASE ----")
-        print(e)
+        client.log.error("---- ACCES IMPOSSIBLE A LA DATABASE ----")
+        client.log.error(e)
         client.database_online = False
 
     if client.database_online:
@@ -347,9 +358,7 @@ def main():
     client.add_listener(on_guild_join)
     client.add_listener(on_guild_remove)
     
-    log = setup_logger()
-    log.setLevel(logging.DEBUG)
-    log.info("Lancement du bot")
+    
 
     client.run(token)
 
