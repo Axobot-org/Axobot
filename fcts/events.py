@@ -344,10 +344,13 @@ class Events(commands.Cog):
             ID = max([x['ID'] for x in tasks])+1
         else:
             ID = 0
-        if message != None:
-            message = message.replace('"', "\\")
-        query = ("INSERT INTO `timed` (`ID`,`guild`,`channel`,`user`,`action`,`duration`,`message`) VALUES ({},{},{},{},'{}',{},\"{}\")".format(ID,guildID,channelID, userID, action, duration, message))
-        cursor.execute(query)
+        # if message != None:
+        #     message = message.replace('"', "\\")
+        # query = ("INSERT INTO `timed` (`ID`,`guild`,`channel`,`user`,`action`,`duration`,`message`) VALUES ({},{},{},{},'{}',{},\"{}\")".format(ID,guildID,channelID, userID, action, duration, message))
+        # cursor.execute(query)
+        #  %(username)s
+        query = "INSERT INTO `timed` (`ID`,`guild`,`channel`,`user`,`action`,`duration`,`message`) VALUES (%(ID)s,%(guild)s,%(channel)s,%(user)s,%(action)s,%(duration)s,%(message)s)"
+        cursor.execute(query, {'ID':ID, 'guild':guildID, 'channel':channelID, 'user':userID, 'action':action, 'duration':duration, 'message':message})
         cnx.commit()
         return True
 
