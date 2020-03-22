@@ -501,6 +501,9 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
                 pass
             else:
                 await self.bot.cogs['ErrorsCog'].on_error(e,ctx)
+        # Premium subscriptions count
+        if isinstance(guild.premium_subscription_count,int) and guild.premium_subscription_count>0:
+            embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","guild-13"), value=await self.translate(ctx.guild.id,"stats_infos","guild-13v",b=guild.premium_subscription_count,p=guild.premium_tier))
         # Roles list
         try:
             if ctx.guild==guild:
@@ -518,9 +521,6 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
             embed.add_field(name=str(await self.translate(ctx.guild.id,"stats_infos","guild-11.1")).format(len(guild.roles)-1), value=", ".join(roles[:20]))
         else:
             embed.add_field(name=str(await self.translate(ctx.guild.id,"stats_infos","guild-11.2")).format(len(guild.roles)-1), value=", ".join(roles))
-        # Premium subscriptions count
-        if isinstance(guild.premium_subscription_count,int) and guild.premium_subscription_count>0:
-            embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","guild-13"), value=await self.translate(ctx.guild.id,"stats_infos","guild-13v",b=guild.premium_subscription_count,p=guild.premium_tier))
         # Limitations
         embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","guild-14"), value=await self.translate(ctx.guild.id,"stats_infos","guild-14v",
             bit=round(guild.bitrate_limit/1000),
