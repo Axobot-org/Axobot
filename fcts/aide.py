@@ -1,3 +1,5 @@
+
+
 import discord, re, inspect, json
 from discord.ext import commands
 
@@ -12,6 +14,7 @@ class HelpCog(commands.Cog):
     '@here': '@\u200bhere'}
         self._mention_pattern = re.compile('|'.join(self._mentions_transforms.keys()))
         self.help_color = 8311585
+        self.doc_url = "https://zbot.readthedocs.io/en/latest/"
         try:
             self.translate = bot.cogs["LangCog"].tr
         except:
@@ -26,17 +29,21 @@ class HelpCog(commands.Cog):
     @commands.command(name="welcome",aliases=['bvn','bienvenue','leave'])
     @commands.cooldown(10,30,commands.BucketType.channel)
     async def bvn_help(self,ctx):
-        """Help on setting up welcome / leave messages"""
+        """Help on setting up welcome / leave messages
+
+..Doc infos.html#welcome-message"""
         prefix = await self.bot.get_prefix(ctx.message)
         if type(prefix)==list:
-            prefix = prefix[0]
+            prefix = prefix[-1]
         await ctx.send(await self.bot.cogs['LangCog'].tr(ctx.guild,'bvn','aide',p=prefix))
 
 
     @commands.command(name="about",aliases=["botinfos","botinfo"])
     @commands.cooldown(7,30,commands.BucketType.user)
     async def infos(self,ctx):
-        """Information about the bot"""
+        """Information about the bot
+
+..Doc infos.html#about"""
         msg = await self.bot.cogs['LangCog'].tr(ctx.guild,'infos','text-0')
         await ctx.send(msg.format(ctx.guild.me.mention if ctx.guild!=None else ctx.bot.user.mention))
 
@@ -46,7 +53,9 @@ class HelpCog(commands.Cog):
     @commands.cooldown(1,5,commands.BucketType.user)
     async def help_cmd(self,ctx,*commands : str):
         """Shows this message
-        Enable "Embed Links" permission for better rendering"""
+Enable "Embed Links" permission for better rendering
+
+..Doc infos.html#help"""
         try:
             commands = [x.replace('@everyone','@​everyone').replace('@here','@​here') for x in commands]
             if len(commands) == 0:
@@ -82,6 +91,7 @@ If the bot can't send the new command format, it will try to send the old one.""
             def repl(obj):
                 return self._mentions_transforms.get(obj.group(0), '')
 
+            me = destination.me if type(destination)==discord.DMChannel else destination.guild.me
             title = ""
             categ_name = [k for k,v in (await self.translate(ctx.channel,"aide","categories")).items() if v.lower()==" ".join(commands).lower()]
             if len(categ_name) == 1:
@@ -99,9 +109,10 @@ If the bot can't send the new command format, it will try to send the old one.""
                 else:
                     command = self.bot.all_commands.get(name)
                     if command is None:
+                        name = name.replace("@everyone","@"+u"\u200B"+"everyone").replace("@here","@"+u"\u200B"+"here")
                         await destination.send(str(await self.translate(ctx.channel,"aide","cmd-not-found")).format(name))
                         return
-                    pages = await self.cmd_help(ctx,command)
+                    pages = await self.cmd_help(ctx, command, destination.permissions_for(me).embed_links)
             else:  #nom de sous-commande ?
                 name = self._mention_pattern.sub(repl, commands[0])
                 command = self.bot.all_commands.get(name)
@@ -118,13 +129,12 @@ If the bot can't send the new command format, it will try to send the old one.""
                     except AttributeError:
                         await destination.send(str(await self.translate(ctx.channel,"aide","no-subcmd")).format(command))
                         return
-                pages = await self.cmd_help(ctx,command)
+                pages = await self.cmd_help(ctx, command, destination.permissions_for(me).embed_links)
 
-            me = destination.me if type(destination)==discord.DMChannel else destination.guild.me
             ft = await self.translate(ctx.channel,"aide","footer")
             prefix = await self.bot.get_prefix(ctx.message)
             if type(prefix)==list:
-                prefix = prefix[0]
+                prefix = prefix[-1]
         if destination.permissions_for(me).embed_links:
             if ctx.guild != None:
                 embed_colour = ctx.guild.me.color if ctx.guild.me.color != discord.Colour(self.help_color).default() else discord.Colour(self.help_color)
@@ -136,15 +146,22 @@ If the bot can't send the new command format, it will try to send the old one.""
                     title = ""
                     await destination.send(embed=embed)
             else:
-                fields = [{'name':page[0], 'value':page[1],'inline':False} for page in pages]
+                fields = list()
+                for page in pages:
+                    if len(page)==1:
+                        title = page[0]
+                        continue
+                    fields.append({'name':page[0], 'value':page[1],'inline':False})
                 embed = self.bot.cogs["EmbedCog"].Embed(title=title,footer_text=ft.format(prefix),fields=fields,color=embed_colour).update_timestamp()
                 await destination.send(embed=embed)
         else:
             for page in pages:
-                await destination.send(page)
+                if isinstance(page,str):
+                    await destination.send(page)
+                else:
+                    await destination.send("\n".join(page))
 
     async def display_cmd(self,cmd):
-        #return "**{}**\n\t\t*{}*".format(cmd.name,cmd.short_doc.strip()) if len(cmd.short_doc)>0 else "**{}**".format(cmd.name)
         return "• **{}**\t\t*{}*".format(cmd.name,cmd.short_doc.strip()) if len(cmd.short_doc)>0 else "• **{}**".format(cmd.name)
 
     def sort_by_name(self,cmd):
@@ -222,7 +239,7 @@ If the bot can't send the new command format, it will try to send the old one.""
         pages.append(form.format(cog_name,description,page))
         return pages
     
-    async def cmd_help(self,ctx:commands.Context,cmd:commands.core.Command):
+    async def cmd_help2(self, ctx:commands.Context, cmd:commands.core.Command, useEmbed:bool=True):
         """Create pages for a command explanation"""
         desc = cmd.description.strip() if cmd.description!=None else str(await self.translate(ctx.channel,"aide","no-desc-cmd"))
         if desc=='' and cmd.help!=None:
@@ -230,7 +247,7 @@ If the bot can't send the new command format, it will try to send the old one.""
         # Prefix
         prefix = await self.bot.get_prefix(ctx.message)
         if type(prefix)==list:
-            prefix = prefix[0]
+            prefix = prefix[-1]
         # Syntax
         syntax = cmd.qualified_name + "** " + cmd.signature
         # Subcommands
@@ -312,6 +329,126 @@ If the bot can't send the new command format, it will try to send the old one.""
             answer += "\n"+checks
         answer += f"\n\n\n*{category}*"
         return [answer]
+
+    async def extract_info(self, desc:str):
+        data = [x.strip() for x in desc.split("\n\n")]
+        desc, example, doc = list(), list(), list()
+        for p in data:
+            if p.startswith("..Example "):
+                example.append(p.replace("..Example ",""))
+            elif p.startswith("..Doc "):
+                doc.append(p.replace("..Doc ",""))
+            else:
+                desc.append(p)
+        return (x if len(x)>0 else None for x in ("\n\n".join(desc), example, doc))
+
+    async def cmd_help(self, ctx:commands.Context, cmd:commands.core.Command, useEmbed:bool=True):
+        """Create pages for a command explanation"""
+        desc = cmd.description.strip() if cmd.description!=None else str(await self.translate(ctx.channel,"aide","no-desc-cmd"))
+        if desc=='' and cmd.help!=None:
+            desc = cmd.help.strip()
+        desc, example, doc = await self.extract_info(desc)
+        # Prefix
+        prefix = await self.bot.get_prefix(ctx.message)
+        if type(prefix)==list:
+            prefix = prefix[-1]
+        # Syntax
+        syntax = cmd.qualified_name + "** " + cmd.signature
+        # Subcommands
+        sublist = list()
+        subcmds = ""
+        if type(cmd)==commands.core.Group:
+            syntax += " ..."
+            if not useEmbed:
+                subcmds = "__{}__".format(str(await self.translate(ctx.channel,"aide","subcmds")).capitalize())
+            for x in sorted(cmd.all_commands.values(),key=self.sort_by_name):
+                try:
+                    if x.hidden==False and x.enabled==True and x.name not in sublist and await x.can_run(ctx):
+                        subcmds += "\n• {} {}".format(x.name,"*({})*".format(x.short_doc) if len(x.short_doc)>0 else "")
+                        sublist.append(x.name)
+                except Exception as e:
+                    if not "discord.ext.commands.errors" in str(type(e)):
+                        raise e
+                    else:
+                        continue
+        # Is enabled
+        enabled = list()
+        if not cmd.enabled:
+            enabled.append(await self.translate(ctx.channel,"aide","not-enabled"))
+        # Checks
+        checks = list()
+        if len(cmd.checks)>0:
+            maybe_coro = discord.utils.maybe_coroutine
+            check_msgs = await self.translate(ctx.channel,'aide','check-desc')
+            for c in cmd.checks:
+                try:
+                    if 'guild_only.<locals>.predicate' in str(c):
+                        check_name = 'guild_only'
+                    elif 'is_owner.<locals>.predicate' in str(c):
+                        check_name = 'is_owner'
+                    elif 'bot_has_permissions.<locals>.predicate' in str(c):
+                        check_name = 'bot_has_permissions'
+                    elif '_has_permissions.<locals>.predicate' in str(c):
+                        check_name = 'has_permissions'
+                    else:
+                        check_name = c.__name__
+                    if check_name in check_msgs.keys():
+                        try:
+                            pass_check = await maybe_coro(c,ctx)
+                        except:
+                            pass_check = False
+                        if pass_check:
+                            checks.append(":small_orange_diamond: "+check_msgs[check_name][0])
+                        else:
+                            pass
+                            checks.append('❌ '+check_msgs[check_name][1])
+                    else:
+                        print(check_name,str(c))
+                except Exception as e:
+                    await self.bot.cogs["ErrorsCog"].on_error(e,ctx)
+        # Module
+        category = "unclassed"
+        for k,v in self.commands_list.items():
+            if cmd.name in v or cmd.full_parent_name in v:
+                category = k
+                break
+        category = (await self.translate(ctx.channel,"aide","categories"))[category].capitalize()
+        if useEmbed:
+            answer = list()
+            answer.append([f"**{prefix}{syntax}"])
+            answer.append((await self.translate(ctx.channel,'aide','description'), desc))
+            if example != None:
+                answer.append(((await self.translate(ctx.channel,'keywords','example')).capitalize(), "\n".join(example)))
+            if len(subcmds)>0:
+                answer.append((await self.translate(ctx.channel,'aide','subcmds'), subcmds))
+            if len(cmd.aliases)>0:
+                answer.append((await self.translate(ctx.channel,"aide","aliases"), " - ".join(cmd.aliases)))
+            if len(enabled+checks)>0:
+                t = await self.translate(ctx.channel,"aide","warning")
+                answer.append((t, '\n'.join(enabled+checks)))
+            if doc != None:
+                doc = "\n".join([self.doc_url+x for x in doc])
+                answer.append(((await self.translate(ctx.channel,'keywords','doc')).capitalize(), "[{0}]({0})".format(doc)))
+            answer.append(((await self.translate(ctx.channel,'keywords','category')).capitalize(), category))
+            return answer
+        else:
+            answer = f"**{prefix}{syntax}\n\n{desc}\n\n"
+            if example != None:
+                answer += "\n__"+(await self.translate(ctx.channel,'keywords','example')).capitalize()+"__\n"+"\n".join(example)+"\n"
+            if len(subcmds)>0:
+                answer += "\n"+subcmds+"\n"
+            if len(cmd.aliases)>0:
+                answer += "\n"+"__" + await self.translate(ctx.channel,"aide","aliases") + "__ " + (" - ".join(cmd.aliases)) +"\n"
+            if len(enabled)>0:
+                answer += enabled[0]
+            if len(checks)>0:
+                answer += "\n" + "__" + await self.translate(ctx.channel,"aide","warning") + "__\n" + '\n'.join(checks) + "\n"
+            if doc != None:
+                answer += "\n__" + (await self.translate(ctx.channel,'keywords','doc')).capitalize() + "__\n" + "\n".join([f"<{self.doc_url+x}>" for x in doc])+"\n"
+            answer += "\n\n__{}:__ {}".format((await self.translate(ctx.channel,'keywords','category')).capitalize(), category)
+            while "\n\n\n" in answer:
+                answer = answer.replace("\n\n\n","\n\n")
+            return [answer]
 
 
 

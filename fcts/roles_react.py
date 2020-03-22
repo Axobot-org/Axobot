@@ -209,41 +209,60 @@ class RolesReact(commands.Cog):
             emb = await self.bot.cogs['EmbedCog'].Embed(title=title,desc=des,color=self.embed_color).update_timestamp().create_footer(ctx)
             await ctx.send(embed=emb.discord_embed())
     
-    @rr_main.command(name="get",aliases=['join'])
+    @rr_main.command(name="get",aliases=['display'])
     @commands.check(checks.database_connected)
-    async def rr_get(self,ctx:commands.Context,*,role:typing.Optional[discord.Role]):
+    async def rr_get(self,ctx:commands.Context):
         """Send the roles embed
-        If you don't speficy any role, I will display the whole message with reactions
-        But if you do, then you can have directly one role without waiting for reactions"""
-        if role != None:
-            if not role.id in [x['role'] for x in await self.rr_list_role(ctx.guild.id)]:
-                return await ctx.send(await self.translate(ctx.guild.id,'roles_react','role-not-in-list'))
-            await self.give_remove_role(ctx.author,role,ctx.guild,ctx.channel)
+It will only display the whole message with reactions. Still very cool tho
+
+..Doc roles-reactions.html#get-or-leave-a-role"""
+        if not ctx.channel.permissions_for(ctx.guild.me).embed_links:
+            return await ctx.send(await self.translate(ctx.guild.id,"fun","no-embed-perm"))
+        try:
+            l = await self.rr_list_role(ctx.guild.id)
+        except Exception as e:
+            await self.bot.cogs['ErrorsCog'].on_cmd_error(ctx,e)
         else:
-            if not ctx.channel.permissions_for(ctx.guild.me).embed_links:
-                return await ctx.send(await self.translate(ctx.guild.id,"fun","no-embed-perm"))
-            try:
-                l = await self.rr_list_role(ctx.guild.id)
-            except Exception as e:
-                await self.bot.cogs['ErrorsCog'].on_cmd_error(ctx,e)
-            else:
-                des, emojis = await self.create_list_embed(l,ctx.guild)
-                title = await self.translate(ctx.guild.id,"roles_react",'rr-embed')
-                emb = self.bot.cogs['EmbedCog'].Embed(title=title,desc=des,color=self.embed_color,footer_text=self.footer_txt).update_timestamp()
-                msg = await ctx.send(embed=emb.discord_embed())
-                for e in emojis:
-                    try:
-                        await msg.add_reaction(e)
-                    except:
-                        pass
+            des, emojis = await self.create_list_embed(l,ctx.guild)
+            title = await self.translate(ctx.guild.id,"roles_react",'rr-embed')
+            emb = self.bot.cogs['EmbedCog'].Embed(title=title,desc=des,color=self.embed_color,footer_text=self.footer_txt).update_timestamp()
+            msg = await ctx.send(embed=emb.discord_embed())
+            for e in emojis:
+                try:
+                    await msg.add_reaction(e)
+                except:
+                    pass
+    
+    @rr_main.command(name="join")
+    @commands.check(checks.database_connected)
+    async def rr_join(self,ctx:commands.Context,*,role:discord.Role):
+        """Join a role without using reactions
+Opposite is the subcommand 'leave'
+
+..Example roles_react join Announcements
+
+..Doc roles-reactions.html#get-or-leave-a-role"""
+        if not role.id in [x['role'] for x in await self.rr_list_role(ctx.guild.id)]:
+            await ctx.send(await self.translate(ctx.guild.id,'roles_react','role-not-in-list'))
+            return
+        await self.give_remove_role(ctx.author, role, ctx.guild, ctx.channel)
+
 
     @rr_main.command(name="leave")
     @commands.check(checks.database_connected)
-    async def rr_leave(self,ctx:commands.Context,role:discord.Role):
-        """Leave a role without using reactions"""
+    async def rr_leave(self,ctx:commands.Context,*,role:discord.Role):
+        """Leave a role without using reactions
+Opposite is the subcommand 'join'
+
+..Example roles_react leave Announcements
+
+..Doc roles-reactions.html#get-or-leave-a-role"""
+        if not role.id in [x['role'] for x in await self.rr_list_role(ctx.guild.id)]:
+            await ctx.send(await self.translate(ctx.guild.id,'roles_react','role-not-in-list'))
+            return
         await self.give_remove_role(ctx.author,role,ctx.guild,ctx.channel,give=False)
 
-    async def give_remove_role(self,user:discord.Member,role:discord.Role,guild:discord.Guild,channel:discord.TextChannel,give:bool=True,ignore_success:bool=False,ignore_failure:bool=False):
+    async def give_remove_role(self, user:discord.Member, role:discord.Role, guild:discord.Guild, channel:discord.TextChannel, give:bool=True, ignore_success:bool=False, ignore_failure:bool=False):
         """Add or remove a role to a user if possible"""
         role_name = role.name.replace('@','@'+u"\u200B")
         if not ignore_failure:
@@ -255,7 +274,7 @@ class RolesReact(commands.Cog):
                 if not ignore_success:
                     await channel.send(await self.translate(guild.id,"roles_react","already-dont-have"))
                 return
-            if not channel.permissions_for(guild.me).manage_roles:
+            if not guild.me.guild_permissions.manage_roles:
                 return await channel.send(await self.translate(guild.id,'modo','cant-mute'))
             if role.position >= guild.me.top_role.position:
                 return await channel.send(await self.translate(guild.id,'modo','role-high',r=role_name))

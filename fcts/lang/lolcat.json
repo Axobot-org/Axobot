@@ -10,7 +10,7 @@
         "emergency": "A emergency situation have just been declared 4 the boat. Those may bee the case when somebody tries to take controll of my code.\nTo limit the damagz, I was 4ced to leave all teh servrs I was on imediately, hoping itZ wasn't toooo late.\nFor much infoZ on de current state ov dis crisis, gonna to my offishial srver: https://discord.me/zbot (check teh link for the documentashun if it no longer workz: https://zbot.rtfd.io)"
     },
     "aide": {
-        "aliases": "Otherz names:",
+        "aliases": "Otherz names",
         "categories": {
             "fun": "cool things",
             "info": "usefull things",
@@ -128,8 +128,8 @@
                 "No verification rol has been addd"
             ]
         },
-        "checks": "things needd:",
         "cmd-not-found": "Dere are no comand naymme \"{}\"",
+        "description": "Smol text",
         "embed_title": "Cmds list 4 {u}",
         "footer": "Type {}help cmd 4 mure info abawt an commandZ",
         "no-desc-cmd": "No descripshun for those c:o2:mmand",
@@ -137,7 +137,8 @@
         "no-subcmd": "Teh kommand `{0.name}` had not sub~~scribe~~commanD",
         "not-enabled": ":warning: This command iz def not enable",
         "subcmd-not-found": "Thiz commnd have no sUbcommant newmed \"{}\"",
-        "subcmds": "Subcommands:"
+        "subcmds": "Subcommands",
+        "warning": "Warns"
     },
     "blurple": {
         "check_fields": [
@@ -293,6 +294,12 @@
         ],
         "piece-1": "Faild, 't fell on teh edge!",
         "react-0": "Unable 2 find teh correspondin mssage. U must giv teh mesage ID in da furst argumnt, an teh emoji in da secondz :upside_down:\n Also check dat I haz permishun 2 reed msgs hystory!",
+        "reminds-asked": "{user}, u asked me {duration} ago 2 remind you this:",
+        "reminds-date": "Ask date",
+        "reminds-saved": "Got it! I'll remind you in {duration} OwO",
+        "reminds-title": "Reminder",
+        "reminds-too-long": "Unable 2 set such a long duration .-.",
+        "reminds-too-short": "U entered an invalid duration",
         "say-no-perm": "LMAO dont try 2 cheat and first get perm in {channel} pls",
         "thanos": [
             "{0} wus spard by Thanos",
@@ -347,13 +354,14 @@
         "prefix": "List ov usable prefiXs:",
         "stats": "**Baut vershun:** {bot_v} \n**Nbr ov serverz:** {s_count} \n**Nbr ov visible memberz:** {m_count} ({b_count} **robots**)\n**Nbr ov code lin:** {l_count}\n**Uzd languages:** {lang}\n**Python vershun :** {p_v} \n**Vershun ov teh `discord.py` lyb:** {d_v} \n**Loadin on teh RAM:** {ram} GB \n**Loadin on the CPU:** {cpu} % \n**API latency timz:** {api} ms\n**Nbr of xp won:** {xp}",
         "stats-title": "**Boat statz**",
-        "text-0": "Ho hi hello! I'm {0} !\n\nIm a boat that alow you 2 do a loooooot of tings: modration, a' xp systèm, partnre managmnt, stATIstics & many oder super mega *wow* usefull commandz (and totlly pointlesz wanes)! \nU can strt by tipyng `!help` in dis tchat to se the llst for availabl kommands, then `!config see` wil LEtz you see teh configurashun optionz (a website ar in prePARtion)? \n\nOf helpin me in the creetion of the boat, my ownr an I wouLd like to tahnk Awhikax 4 hiz suport durin the variouz cryzes, Aragorn1202 of al hees idees and sentencez full for goob sence, Adri526 fr all dese beautifool loGoz, èmojiz nd profil picts, and the whole translators tim 4 they woark!\n\n:globe_with_meridians: Sum linqs can bee usefull: \n:arrow_forward: Me Discord servr plz : http://discord.gg/N55zY88\n:arrow_forward: link to iNVite me to anothr servr : <https://zrunner.me/invitezbot>\n:arrow_forward: The :b:ot documentashun : <https://zbot.rtfd.io/>\n:arrow_forward: My creator's Blue Bird 'ccount : <https://twitter.com/z_runnerr>\n\nHas a nice dayz !",
+        "text-0": "Ho hi hello! I'm {0} !\n\nIm a boat that alow you 2 do a loooooot of tings: modration, a' xp systèm, partnre managmnt, stATIstics & many oder super mega *wow* usefull commandz (and totlly pointlesz wanes)! \nU can strt by tipyng `!help` in dis tchat to se the llst for availabl kommands, then `!config see` wil LEtz you see teh configurashun optionz (a website ar in prePARtion)? \n\nOf helpin me in the creetion of the boat, my ownr an I wouLd like to tahnk Awhikax 4 hiz suport durin the variouz cryzes, Aragorn1202 of al hees idees and sentencez full for goob sence, Adri526 fr all dese beautifool loGoz, èmojiz nd profil picts, and the whole translators tim 4 they woark!\n\n:globe_with_meridians: Sum linqs can bee usefull: \n:arrow_forward: Me Discord servr plz : http://discord.gg/N55zY88\n:arrow_forward: link to iNVite me to anothr servr : <https://zrunner.me/invitezbot>\n:arrow_forward: The :b:ot documentashun : <https://zbot.rtfd.io/>\n:arrow_forward: My creator's Blue Bird 'ccount : <https://twitter.com/z_runnerr>\n:arrow_forward: A cute faq: <https://zrunner.me/zbot-faq>\n\nHas a nice dayz !",
         "usernames-allow": "U can anti-optout teh auto logs with da cmd 'profile'",
         "usernames-disallow": "U can optout the auto logging with cmd 'profile' (beeew bad guy)",
         "usernames-empty": ":N:o change savd",
         "usernames-global": "Gen' stori",
         "usernames-last-date": "Lastetest change",
         "usernames-local": "Serv hystori",
+        "usernames-more": "+{nbr} others",
         "usernames-title": "**{u}** names story"
     },
     "infos_2": {
@@ -372,7 +380,9 @@
         "click_here": "BLUE BUTTON TO CLICK",
         "depuis": "sinze",
         "dnd": "donot disturb me",
+        "doc": "Doc",
         "end": "end",
+        "example": "example",
         "extreme": "Xtrem",
         "ghost": "Goast",
         "high": "high",
@@ -573,6 +583,7 @@
         "kick-noreason": "U have just been kicked from the servr {} :confused:",
         "kick-reason": "U haz just been KICZed from the servr {} :confused:\nReason : {}",
         "missing-manage-nick": "Oops, I'm missing the cool \"Manage nicknames\" perms! :sad:",
+        "missing-user-perms": "Oops, Ur not pawerful enoogh (either manage roles, manage server or manage messages)",
         "mute-1": "Teh mmber {} haz been silencd for the reezon `{}`!",
         "mute-created": "Successsfully added da `muted` role!",
         "mute-high": "Ooops, 't sEEms dat `muted` rol iz tooo high 4 me to give it... Plz fiX dis problem by plac'ng my role higher than this nice `muted` role.",
@@ -587,6 +598,7 @@
         "remove_roles-1": "-> {c} roles removed on {m}!",
         "role-color": "Teh coulor of role {} haz bee'n changd!",
         "role-high": "Oops, tish role is 2 high for me to change. Move my role above the role `{r}` be4 trying again, thx",
+        "roles-list": "List of srv roles",
         "slowmode-0": "Teh very-cold-mode is now disabld in this nize place.",
         "slowmode-1": "Impossible to set a frequency higher than 6 hourz",
         "slowmode-2": "The {} channl iz naw in very-cold-mode. Wait {} secondz be4 sending a mesage.",

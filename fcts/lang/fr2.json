@@ -10,7 +10,7 @@
         "emergency": "Une situation d'urgence vient d'être déclarée pour le bot. Cela peut être le cas lorsque quelqu'un tente de prendre le contrôle de mon code.\n    Pour limiter les dégâts, j'ai été forcé de quitter immédiatement l'intégralité des serveurs sur lesquels je me trouvais, en espérant qu'il ne soit pas trop tard.\n    Pour plus d'informations sur l'état actuel de la crise, rendez-vous sur mon serveur officiel : https://discord.me/zbot (vérifiez le lien depuis la documentation si celui-ci ne fonctionne plus : https://zbot.rtfd.io)"
     },
     "aide": {
-        "aliases": "Alias :",
+        "aliases": "Alias",
         "categories": {
             "fun": "fun",
             "info": "informations",
@@ -132,8 +132,8 @@
                 "Aucun rôle de vérification n'a été configuré"
             ]
         },
-        "checks": "Conditions :",
         "cmd-not-found": "Aucune commande nommée \"{}\"... Tu as peut-être fait une PhotEuh D'Ortograff ?",
+        "description": "Description",
         "embed_title": "Hey ! Voici la liste des commandes disponibles pour {u}",
         "footer": "Entre simplement {}help commande pour plus d'informations sur la fameuse commande",
         "no-desc-cmd": "Aucune description pour la commande",
@@ -141,7 +141,8 @@
         "no-subcmd": "La commande {0.name} n'a aucune sous-commande",
         "not-enabled": ":warning: Cette commande est désactivée ! Ça sert à rien d'essayer !",
         "subcmd-not-found": "Cette commande ne possède aucune sous-commande nommée \"{}\"... :thinking: Tu as peut-être fait une PhotEuh D'Ortograff ?",
-        "subcmds": "Les sous-commandes sont..."
+        "subcmds": "Les sous-commandes sont...",
+        "warning": "Avertissements"
     },
     "blurple": {
         "check_fields": [
@@ -297,6 +298,12 @@
         ],
         "piece-1": "Raté, c'est tombé sur la tranche !",
         "react-0": "Impossible de trouver le message correspondant. Il faut rentrer l'ID du message en 1er argument, et l'émoji en 2e :upside_down:\n Vérifie aussi que je possède la perm de lire l'historique des messages !",
+        "reminds-asked": "Hey, {user} ! Tu m'as demandé de te rappeler ça il y a {duration} ! Un trou de mémoire ?",
+        "reminds-date": "Date de demande",
+        "reminds-saved": "Oko 😁 ! Je te le rappellerai dans... Environ... 🕰️ {duration} !\n\n*Si j'oublie pas...*",
+        "reminds-title": "Rappel",
+        "reminds-too-long": "Wolalala 😬 !\n\nJe peux pas te le rappeler dans autant de temps, moi !\n\nTu t'es cru où ?!\n\nJ'ai pas autant de mémoire !",
+        "reminds-too-short": "...\n\nAlors.\n\n\n\n\nÇa, c'est ce qu'on appelle communément **UNE DURÉE INVALIDE !**",
         "say-no-perm": "T'as pas la perm d'envoyer des messages dans {channel}",
         "thanos": [
             "{0} a été épargné par Thanos le divin...",
@@ -351,13 +358,14 @@
         "prefix": "Liste des préfixes actuellement utilisables :",
         "stats": "**Version du bot :** {bot_v} \n**Nombre de serveurs :** {s_count} \n**Nombre de membres visibles :** {m_count} (dont {b_count} **bots**)\n**Nombre de lignes de code :** {l_count}\n**Langues utilisées :** {lang} \n**Version de Python :** {p_v} \n**Version de la bibliothèque `discord.py` :** {d_v} \n**Charge sur la mémoire vive :** {ram} GB \n**Charge sur le CPU :** {cpu} % \n**Temps de latence de l'api :** {api} ms\n**Nombre total d'xp gagné :** {xp}xp",
         "stats-title": "**Statistiques du bot**",
-        "text-0": "Bonjour ! Moi c'est {0} !\n\nJe suis un bot qui permet de faire *beaucoup* de choses : de la modération, des mini-jeux, un système d'xp, des statistiques et plein d'autres commandes plus ou moins utiles ! \nVous pouvez commencer par taper `!help` dans ce tchat pour voir la liste des commandes disponibles, puis `!config see` vous permettra de voir les options de configuration (un site web est ~~en préparation~~ à deux doigts d'être lancé !). \n\nPour m'avoir aidé dans la création du bot, mon propriétaire et moi souhaitons remercier Awhikax pour son soutien apporté lors des différentes crises, Aragorn1202 pour toutes ses idées et ses phrases pleines de bon sens, Adri526 pour tous ces magnifiques logos, émojis et images de profil, et Pilotnick54 pour relire et corriger mon anglais !\n\n:globe_with_meridians: Quelques liens pourront vous être utiles : \n:arrow_forward: Mon serveur Discord : http://discord.gg/N55zY88\n:arrow_forward: Un lien pour m'inviter dans un autre serveur : <https://zrunner.me/invitezbot>\n:arrow_forward: La documentation du bot : <https://zbot.rtfd.io/>\n:arrow_forward: Le compte Twitter de mon créateur : <https://twitter.com/z_runnerr>\n\nBonne journée !",
+        "text-0": "Bonjour ! Moi c'est {0} !\n\nJe suis un bot qui permet de faire *beaucoup* de choses : de la modération, des mini-jeux, un système d'xp, des statistiques et plein d'autres commandes plus ou moins utiles ! \nVous pouvez commencer par taper `!help` dans ce tchat pour voir la liste des commandes disponibles, puis `!config see` vous permettra de voir les options de configuration (un site web est ~~en préparation~~ à deux doigts d'être lancé !). \n\nPour m'avoir aidé dans la création du bot, mon propriétaire et moi souhaitons remercier Awhikax pour son soutien apporté lors des différentes crises, Aragorn1202 pour toutes ses idées et ses phrases pleines de bon sens, Adri526 pour tous ces magnifiques logos, émojis et images de profil, et Pilotnick54 pour relire et corriger mon anglais !\n\n:globe_with_meridians: Quelques liens pourront vous être utiles : \n:arrow_forward: Mon serveur Discord : http://discord.gg/N55zY88\n:arrow_forward: Un lien pour m'inviter dans un autre serveur : <https://zrunner.me/invitezbot>\n:arrow_forward: La documentation du bot : <https://zbot.rtfd.io/>\n:arrow_forward: Le compte Twitter de mon créateur : <https://twitter.com/z_runnerr>\n:arrow_forward: Une petite FAQ : <https://zrunner.me/zbot-faq>\n:arrow_forward: Une FAQ sympa : <https://zrunner.me/zbot-faq>\n\nBonne journée !",
         "usernames-allow": "Tu sais que tu peux te autoriser l'enregistrement automatique via la commande 'profile' ?",
         "usernames-disallow": "Tu sais que tu peux te retirer de l'enregistrement automatique via la commande 'profile' ?",
         "usernames-empty": "Aucun changement enregistré :blobconfused:",
         "usernames-global": "Historique général",
         "usernames-last-date": "Dernier changement",
         "usernames-local": "Historique du serveur",
+        "usernames-more": "Et {nbr} de plus... *Cha fait beaucoup !*",
         "usernames-title": "La liste des pseudos de **{u}**"
     },
     "infos_2": {
@@ -376,7 +384,9 @@
         "click_here": "Clique ici !",
         "depuis": "depuis",
         "dnd": "ne pas déranger",
+        "doc": "Documentention",
         "end": "fin",
+        "example": "exemple",
         "extreme": "extrême",
         "ghost": "Fantôme",
         "high": "élevé",
@@ -391,6 +401,7 @@
         "offline": "hors ligne",
         "online": "en ligne",
         "oui": "oui",
+        "request_by": "Demandé par {user} =B",
         "server": "serveur",
         "servers": "serveurs",
         "unknown": "Inconnu",
@@ -569,11 +580,14 @@
         "error": "Oups, une erreur inconnue est survenue. Réessayez plus tard ou contactez le support",
         "give_roles-1": "{u} est trop haut !",
         "give_roles-2": "-> {c} rôles attribués sur {m} !",
+        "give_roles-4": "Houlà ! On dirait que ce role est *(beaucoup)* trop haut par rapport à moi pour le donner ou le retirer à quelqu'un !\nTu peux placer mon rôle *aU-dEssUs* de `{r}` ?",
+        "give_roles-higher": "*Meeeeec !*\nTu peux pas donner des roles plus haut que le tien, m'enfin !",
         "kick": "Le membre {} a bien été expulsé du serveur, avec la raison `{}`",
         "kick-1": "Il semble que ce membre soit trop haut pour que je puisse l'expulser :thinking:",
         "kick-noreason": "Vous venez d'être expulsé du serveur {} :confused:",
         "kick-reason": "Vous venez d'être expulsé du serveur {} :confused:\nRaison : {}",
         "missing-manage-nick": "Oups, il me manque la permission \"Gérer les pseudos\"",
+        "missing-user-perms": "Wolala 😬 !\nIl te manque des perms (style, manager les roles, le serveur, ou les messages)",
         "mute-1": "Le membre {} a bien été réduit au silence pour la raison `{}` !",
         "mute-created": "Rôle `muted` créé avec succès !",
         "mute-high": "Oups, il semble que le rôle `muted` soit trop haut pour que je puisse le donner... Veuillez fixer ce problème en plaçant mon rôle plus haut que le rôle `muted`.",
@@ -584,8 +598,11 @@
         "pin-error": "Oups, je n'arrive pas à retrouver ce message (Erreur : `{}`)",
         "pin-error-3": "Oups, impossible d'épingler ce message (Avez-vous plus de 50 messages épinglés ?). Erreur : `{}`",
         "react-clear": "Impossible de retrouver ce message :confused:",
+        "remove_roles-0": "Houlà !\nCe rôle est *beuacoup* trop haut par rapport au mien pour l'enlever de n'importe qui.\n\nTu peux placer mon role au-dessus de `{r}` ?",
+        "remove_roles-1": "-> {c} roles retirés sur {m} ! *Phew* 🙃",
         "role-color": "Le rôle {} a changé de couleur !",
         "role-high": "Oups, ce rôle est trop haut pour que je puisse le modifier. Merci de déplacer mon rôle au-dessus du rôle `{r}` avant de réessayer :confused:",
+        "roles-list": "Liste des rôles du Serveur 🧐",
         "slowmode-0": "Le slowmode est désormais désactivé dans ce salon.",
         "slowmode-1": "Impossible de mettre une fréquence supérieure à six heures",
         "slowmode-2": "Le channel {} est désormais en slowmode.\nAttendez {} secondes avant d'envoyer un message.",
@@ -812,6 +829,13 @@
         "yt-form-last": "{logo}  | Ceci est la toute dernière vidéo de {author} ! \n{title}\nPubliée le {date}\nLien : {url}",
         "yt-help": "Pour rechercher une chaîne youtube, vous devez entrer l'identifiant de cette chaîne. Tu la trouveras à la fin de l'url de la chaine, elle peut être soit le nom, soit une suite de caractères aléatoires. *Astuce : certaines chaînes sont déjà renseignées dans mon code. Vous pouvez parfois vous contenter de mettre `neil3000` ou `Oxisius`* :wink:"
     },
+    "s_backup": {
+        "err": "Woooooooooooolah !\n\nOn a eu une erreur interne 🧐 !\nAttends 2-3 minutes ou contacte le support *(lien dans la commande `about`)* si ça arrive à nouveau.",
+        "finished": "Le bacup a été chargé ! Voici les logs :",
+        "invalid_file": "*Mec, c'est gênant de dire ça, mais faut envoyer le fichier de backup dans le même message que la commande...*",
+        "invalid_version": "Bon...\n\nLa version du backup est invalide.\n\nLe fichier est *très* probablement corrompu.",
+        "loading": "Chargement du backup en cours...\n\nMerci de patienter 🧐 !"
+    },
     "server": {
         "change-0": "Hey ! Cette option n'existe pas ! Tu as peut-être fait une fôtt d'Ortograff ? :wink:",
         "change-1": "Aw ! Une erreur interne est survenue... Réessaie ?\nSi ça marche pas, signale-le dans mon Discord. *(Tip : Tape `!about` pour en avoir le lien)*",
@@ -909,6 +933,7 @@
         "guild-13v": "{b} (palier {p})",
         "guild-14": "Limitations",
         "guild-14v": "Bitrate : {bit}kbps\nTaille de fichier : {fil}MB\nNombre d'émojis : {emo}\nNombre de membres connectés : {mem}",
+        "guild-15": "Lien d'invitation",
         "guild-2": "Région",
         "guild-3": "Texte : {} | Vocal : {} ({} catégories)",
         "guild-4": "Membres connectés",
@@ -948,6 +973,7 @@
         "member-5": "Activité",
         "member-6": "Administrateur",
         "member-7": "Nombre d'infractions",
+        "member-8": "Statut custom",
         "not-found": "Impossible de trouver {N}",
         "role-0": "Identifiant",
         "role-1": "Couleur",
@@ -956,6 +982,12 @@
         "role-4": "Affiché séparément",
         "role-5": "Position hiérarchique",
         "role-6": "Unique membre possédant ce rôle",
+        "snowflake-0": "Date de création",
+        "snowflake-1": "Binaire",
+        "snowflake-2": "Horodtage 🧐",
+        "snowflake-3": "Identifiant du `worker` interne 🧐 🧐 🧐",
+        "snowflake-4": "Identifiant dans le processus interne 🧐",
+        "snowflake-5": "Pas",
         "textchan-0": "Catégorie",
         "textchan-1": "Description",
         "textchan-2": "NSFW",
@@ -973,6 +1005,7 @@
         "card-desc": "Voici un exemple de votre carte d'xp. Tu peux taper la commande `profile card <style>` pour changer le style\n*Ta carte d'xp ne se réactualisera que lorsque tu auras gagné de l'xp.*",
         "changed-0": "Votre carte d'xp utilise maintenant le style {}",
         "changed-1": "Oups, une erreur interne est survenue pendant le traitement de la requête. Réessaye plus tard ou contacte le support.",
+        "config_list": "Voici la liste des options possibles 😀 : {options}\nUtilise la commande `help profile config` pour des détails en plus 😉 !",
         "config_success": "L'option {opt} a bien été modif !",
         "invalid-card": "Ce style est invalide. Ça, c'est la liste des styles que tu pouvez utiliser : {}",
         "list-cards": "Voici la liste des styles que tu pouvez utiliser : {}",
