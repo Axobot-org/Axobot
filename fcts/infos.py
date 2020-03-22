@@ -648,6 +648,7 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
 
     @find_main.command(name="user")
     async def find_user(self,ctx,*,user:discord.User):
+        use_embed = ctx.guild==None or ctx.channel.permissions_for(ctx.guild.me).embed_links
         # Servers list
         servers_in = list()
         for s in self.bot.guilds:
@@ -677,14 +678,21 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
         if len(perks)==0:
             perks = ["None"]
         # Has voted
-        async with aiohttp.ClientSession() as session:
-            async with session.get('https://top.gg/api/bots/486896267788812288/check?userId={}'.format(user.id),headers={'Authorization':str(self.bot.dbl_token)}) as r:
-                js = await r.json()
-                if js['voted']:
-                    has_voted = await self.translate(ctx.channel,'keywords','oui')
-                else:
-                    has_voted = await self.translate(ctx.channel,'keywords','non')
-                has_voted = has_voted.capitalize()
+        # async with aiohttp.ClientSession() as session:
+        #     async with session.get('https://top.gg/api/bots/486896267788812288/check?userId={}'.format(user.id),headers={'Authorization':str(self.bot.dbl_token)}) as r:
+        #         js = await r.json()
+        #         if js['voted']:
+        #             has_voted = await self.translate(ctx.channel,'keywords','oui')
+        #         else:
+        #             has_voted = await self.translate(ctx.channel,'keywords','non')
+        #         has_voted = has_voted.capitalize()
+        votes = await ctx.bot.get_cog("UtilitiesCog").check_votes(user.id)
+        if use_embed:
+            votes = " ".join([f"[{x[0]}]({x[1]})" for x in votes])
+        else:
+            votes = " ".join([x[0] for x in votes])
+        if len(votes) == 0:
+            votes = "Nowhere"
         # Languages
         disp_lang = list()
         for lang in await self.bot.cogs['UtilitiesCog'].get_languages(user):
@@ -694,7 +702,7 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
         # User name
         user_name = str(user)+' <:BOT:544149528761204736>' if user.bot else str(user)
         # ----
-        if ctx.guild==None or ctx.channel.permissions_for(ctx.guild.me).embed_links:
+        if use_embed:
             if ctx.guild==None:
                 color = None
             else:
@@ -706,7 +714,7 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
                 {"name": "Servers", "value": "\n".join(servers_in), "inline":True},
                 {"name": "Language", "value": "\n".join(disp_lang), "inline":True},
                 {"name": "XP card", "value": xp_card, "inline":True},
-                {"name": "Has voted?", "value": has_voted, "inline":True},
+                {"name": "Upvoted the bot?", "value": votes, "inline":True},
             ]).create_footer(ctx))
         else:
             txt = """Name: {}
@@ -721,7 +729,7 @@ Servers:
                 " - ".join(perks),
                 " - ".join(disp_lang),
                 xp_card,
-                has_voted,
+                votes,
                 "\n".join(servers_in)
                 )
             await ctx.send(txt)
