@@ -124,13 +124,11 @@ class FunCog(commands.Cog):
     @commands.check(is_fun_enabled)
     async def cookie(self,ctx):
         """COOKIE !!!"""
-                            #Z_runner           neil3000            Awhikax           Adri526         Theventreur         Catastrophix        Platon_Neutron
-        if ctx.author.id in [279568324260528128,278611007952257034,281404141841022976,409470110131027979,229194747862843392,438372385293336577,286827468445319168]:
-            await ctx.send(str(await self.translate(ctx.guild,"fun","cookie")).format(ctx.author.mention,self.bot.cogs['EmojiCog'].customEmojis['cookies_eat']))
-        elif ctx.author.id == 375598088850505728:
-            await ctx.send(file=await self.utilities.find_img("cookie_target.png"))
+        if ctx.author.id == 375598088850505728:
+            await ctx.send(file=await self.utilities.find_img("cookie_target.gif"))
         else:
-            return
+            await ctx.send(str(await self.translate(ctx.guild,"fun","cookie")).format(ctx.author.mention,self.bot.cogs['EmojiCog'].customEmojis['cookies_eat']))
+
 
     @commands.command(name="count_msg",hidden=True)
     @commands.check(is_fun_enabled)
@@ -189,7 +187,7 @@ You can specify a verification limit by adding a number in argument (up to 1.000
     @commands.command(name="nope",hidden=True)
     @commands.check(is_fun_enabled)
     async def nope(self,ctx):
-        """Use this when you do not agree with your interlocutor"""
+        """Use this when you do not agree with someone else"""
         await ctx.send(file=await self.utilities.find_img('nope.png'))
         if self.bot.database_online:
             if await self.bot.cogs["ServerCog"].staff_finder(ctx.author,'say'):
@@ -545,7 +543,7 @@ You can specify a verification limit by adding a number in argument (up to 1.000
                     await msg.channel.send(reason)
         if ctx.author.display_name.endswith(' [AFK]'):
             msg = copy.copy(msg)
-            msg.content = (await self.bot.get_prefix(msg))[0] + 'unafk'
+            msg.content = (await self.bot.get_prefix(msg))[-1] + 'unafk'
             new_ctx = await self.bot.get_context(msg)
             await self.bot.invoke(new_ctx)
 
@@ -630,6 +628,38 @@ You can specify a verification limit by adding a number in argument (up to 1.000
     async def markdown(self,ctx):
         """Get help about markdown in Discord"""
         await ctx.send(await self.translate(ctx.channel,'fun','markdown'))
+    
+    @commands.command(name="remindme", aliases=["remind", "reminds"])
+    @commands.cooldown(5,30,commands.BucketType.channel)
+    @commands.cooldown(5,60,commands.BucketType.user)
+    async def remindme(self, ctx:commands.Context, duration:commands.Greedy[args.tempdelta], *, message):
+        """Ask the bot to remind you of something later
+Please use the following format:
+`XXm` : XX minutes
+`XXh` : XX hours
+`XXd` : XX days
+
+..Example remindme 49d Think about doing my homework"""
+        duration = sum(duration)
+        if duration < 1:
+            await ctx.send(await self.translate(ctx.channel, "fun", "reminds-too-short"))
+            return
+        if duration > 60*60*24*365*2:
+            await ctx.send(await self.translate(ctx.channel, "fun", "reminds-too-long"))
+            return
+        if not self.bot.database_online:
+            await ctx.send(await self.translate(ctx.channel, "rss", "no-db"))
+            return
+        f_duration = await ctx.bot.get_cog('TimeCog').time_delta(duration,lang=await self.translate(ctx.guild,'current_lang','current'), year=True, form='developed', precision=0)
+        try:
+            await ctx.bot.get_cog('Events').add_task("timer", duration, ctx.author.id, ctx.guild.id if ctx.guild else None, ctx.channel.id, message)
+        except Exception as e:
+            await ctx.send(await self.translate(ctx.channel, "server", "change-1"))
+            await ctx.bot.get_cog("ErrorsCog").on_cmd_error(ctx,e)
+        else:
+            await ctx.send(await self.translate(ctx.channel, "fun", "reminds-saved", duration=f_duration))
+
+        
 
     @commands.command(name="vote")
     @commands.cooldown(4, 30, type=commands.BucketType.guild)

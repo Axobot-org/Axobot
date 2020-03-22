@@ -54,9 +54,9 @@ This command allows you to efficiently delete messages, with a list of possible 
 
 Be careful, all specified settings must be validated for the message to be deleted. For example, if you enter :code:`clear 10 @Z_runner#7515 +i`, the bot will check in the last ten messages if the message comes from Z_runner#7515 AND if the message contains an image. 
 
-If you enter :code:`clear 25 -p +l`, the bot will check in the last 25 messages if the message contains a link AND if the message is not pinned, no matter the author.
+If you enter :code:`clear 25 -p +l`, the bot will clear the last 25 messages if they contains a link AND if they're not pinned, no matter the author.
 
-If you enter :code:`clear 13 -p -i @Z_runner#7515`, the bot will check in the last 13 messages if the message is not pinned AND if the message does not contain any file/image AND if the author is Z_runner#7515.
+If you enter :code:`clear 13 -p -i @Z_runner#7515`, the bot will clear the last 13 messages if they are not pinned AND if they does not contain any file/image AND if the author is Z_runner#7515.
 
 If you enter :code:`clear 1000 @Z_runner#7515 @ZBot beta#4940`, the bot will delete all messages contained in the last 1000 messages of the channel AND written by Z_runner#7515 OR ZBot beta#4940 
 
@@ -174,9 +174,9 @@ This option allows you to moderate the entry of your server, with several levels
 
 * 0 (None): no filter
 * 1 (Smooth): kick members with invitations in their nickname
-* 2 (Careful): kick accounts created less than 1min before
-* 3 (High): ban members with invitations in their nickname, and kick accounts created less than 5min before
-* 4 ((╯°□°）╯︵ ┻━┻): ban members created less than 3min before, and kick those created less than 10min before
+* 2 (Careful): kick accounts created less than 5min before
+* 3 (High): ban members with invitations in their nickname, and kick accounts created less than 30min before
+* 4 ((╯°□°）╯︵ ┻━┻): ban members created less than 30min before, and kick those created less than 2h before
 
 .. note:: Note that the levels are cumulative: level 3 will also have the specificities of levels 1 and 2
 
@@ -241,6 +241,7 @@ Nice command that allows you to do different things with the server roles (other
 
 * :code:`role list <role>`: List every members who are in a specific role, if this number is under 200. The bot must have "`Embed Links <perms.html#embed-links>`_" permission to display the result. Please check note 2.
 
+* :code:`role server-list`: Liste every role of your server, with the members count. The bot must have "`Embed Links <perms.html#embed-links>`_" permission to display the result. Please check note 2.
 
 .. warning:: (1) The bot need the "`Manage roles <perms.html#manage-roles>`_" permission, also his highest role need to be higher than the role he's trying to edit.
     (2) You need to have the "`Manage roles <perms.html#manage-roles>`_" permission (or be an administrator) to use this command. Else, Zbot won't react.

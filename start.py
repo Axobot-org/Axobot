@@ -3,7 +3,7 @@
 
 def check_libs():
     count = 0
-    for m in ["mysql","discord","frmc_lib","aiohttp","requests","re","asyncio","datetime","time","importlib","traceback","sys","logging","psutil","platform","subprocess",'json','emoji','imageio','geocoder','tzwhere','pytz','dbl','twitter']:
+    for m in ["mysql","discord","frmc_lib","aiohttp","requests","re","asyncio","datetime","time","importlib","traceback","sys","logging","psutil","platform","subprocess",'json','emoji','imageio','geocoder','tzwhere','pytz','twitter']:
         try:
             exec("import "+m)
             exec("del "+m)
@@ -76,6 +76,7 @@ class zbot(commands.bot.BotBase,discord.Client):
         self._cnx = [[None,0],[None,0]]
         self.xp_enabled = True
         self.rss_enabled = True
+        self.internal_loop_enabled = False
         self.others = dict()
         
     @property
@@ -160,11 +161,17 @@ def get_prefix(bot,msg):
                 prefixes = ['!']
     else:
         prefixes = ['!']
+    if msg.guild==None:
+        prefixes.append(" ")
     return commands.when_mentioned_or(*prefixes)(bot,msg)
 
 
 def main():
     client = zbot(command_prefix=get_prefix,case_insensitive=True,status=discord.Status('online'))
+
+    log = setup_logger()
+    log.setLevel(logging.DEBUG)
+    log.info("Lancement du bot")
 
     initial_extensions = ['fcts.language',
                       'fcts.admin',
@@ -221,12 +228,20 @@ def main():
             'access_token_key':cryptage.uncrypte(r[11]),
             'access_token_secret':cryptage.uncrypte(r[12])}
         client.others['botlist.space'] = cryptage.uncrypte(r[13])
+        client.others['discordboats'] = cryptage.uncrypte(r[14])
     try:
-        cnx = mysql.connector.connect(user=client.database_keys['user'],password=client.database_keys['password'],host=client.database_keys['host'],database=client.database_keys['database1'])
+        try:
+            cnx = mysql.connector.connect(user=client.database_keys['user'],password=client.database_keys['password'],host="127.0.0.1",database=client.database_keys['database1'])
+        except mysql.connector.InterfaceError:
+            client.log.warning("Impossible d'accéder à la dabatase locale - tentative via IP")
+            cnx = mysql.connector.connect(user=client.database_keys['user'],password=client.database_keys['password'],host=client.database_keys['host'],database=client.database_keys['database1'])
+        else:
+            client.log.info("Database connectée en vocal")
+            client.database_keys['host'] = '127.0.0.1'
         cnx.close()
     except Exception as e:
-        print("---- ACCES IMPOSSIBLE A LA DATABASE ----")
-        print(e)
+        client.log.error("---- ACCES IMPOSSIBLE A LA DATABASE ----")
+        client.log.error(e)
         client.database_online = False
 
     if client.database_online:
@@ -324,6 +339,7 @@ def main():
                 enable_event_loop = input("Lancement de la boucle d'events ? (o/n) ")
             if enable_event_loop.lower() == 'o':
                 client.cogs['Events'].loop.start()
+                client.internal_loop_enabled = True
             # RSS enabled
             if len(sys.argv)>3 and sys.argv[3] in ['o','n']:
                 enable_rss = sys.argv[3]
@@ -343,9 +359,7 @@ def main():
     client.add_listener(on_guild_join)
     client.add_listener(on_guild_remove)
     
-    log = setup_logger()
-    log.setLevel(logging.DEBUG)
-    log.info("Lancement du bot")
+    
 
     client.run(token)
 

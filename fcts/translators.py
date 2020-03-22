@@ -144,9 +144,11 @@ class TranslatorsCog(commands.Cog):
     
     @commands.command(name='tr-loop')
     @commands.check(is_translator)
-    async def translate_smth_loop(self,ctx,lang:str):
+    async def translate_smth_loop(self,ctx:commands.Context, lang:str):
         """Same that !translate, but in a loop so you don't need to type the command
-        Use `stop` to stop translating"""
+Use `stop` to stop translating
+
+..Example tr-loop fi"""
         if lang not in self.translations.keys():
             return await ctx.send("Invalid language")
         if len(self.todo[lang])==0:
@@ -168,7 +170,7 @@ class TranslatorsCog(commands.Cog):
     
     @commands.command(name='tr-reload-todo')
     @commands.check(is_translator)
-    async def reload_todo(self,ctx,lang:str):
+    async def reload_todo(self,ctx:commands.Context, lang:str):
         """Reload the to-do list of a language translation"""
         if lang not in self.todo.keys():
             return await ctx.send("Invalid language")
@@ -177,7 +179,8 @@ class TranslatorsCog(commands.Cog):
         await ctx.send("ToDo list for {} has been reloaded".format(lang))
 
     @commands.command(name="tr-status")
-    async def status(self,ctx,lang:str=None):
+    @commands.check(is_translator)
+    async def status(self,ctx:commands.Context, lang:str=None):
         """Get the status of a translation project"""
         if lang==None:
             txt = "General status:"

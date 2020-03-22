@@ -10,7 +10,7 @@
         "emergency": "Une situation d'urgence vient d'être déclarée pour le bot. Cela peut être le cas lorsque quelqu'un tente de prendre le contrôle de mon code.\n    Pour limiter les dégâts, j'ai été forcé de quitter immédiatement l'intégralité des serveurs sur lesquels je me trouvais, en espérant qu'il ne soit pas trop tard.\n    Pour plus d'informations sur l'état actuel de la crise, rendez-vous sur mon serveur officiel : https://discord.me/zbot (vérifiez le lien depuis la documentation si celui-ci ne fonctionne plus : https://zbot.rtfd.io)"
     },
     "aide": {
-        "aliases": "Alias :",
+        "aliases": "Alias",
         "categories": {
             "fun": "fun",
             "info": "informations",
@@ -128,8 +128,8 @@
                 "Aucun rôle de vérification n'a été configuré"
             ]
         },
-        "checks": "Conditions :",
         "cmd-not-found": "Aucune commande nommée \"{}\"",
+        "description": "Description",
         "embed_title": "Liste des commandes disponibles pour {u}",
         "footer": "Entrez {}help commande pour plus d'informations sur une commande",
         "no-desc-cmd": "Aucune description pour cette commande",
@@ -137,7 +137,8 @@
         "no-subcmd": "La commande {0.name} n'a aucune sous-commande",
         "not-enabled": ":warning: Cette commande est désactivée",
         "subcmd-not-found": "Cette commande ne possède aucune sous-commande nommée \"{}\"",
-        "subcmds": "Sous-commandes :"
+        "subcmds": "Sous-commandes",
+        "warning": "Avertissements"
     },
     "blurple": {
         "check_fields": [
@@ -293,6 +294,12 @@
         ],
         "piece-1": "Raté, c'est tombé sur la tranche !",
         "react-0": "Impossible de trouver le message correspondant. Il faut rentrer l'ID du message en 1er argument, et l'émoji en 2e :upside_down:\n Vérifiez aussi que je possède la permission de lire l'historique des messages !",
+        "reminds-asked": "{user}, vous m'avez demandé il y a {duration} de vous rappeler ceci :",
+        "reminds-date": "Date de demande",
+        "reminds-saved": "C'est noté ! Je vous le rappelerai dans {duration}",
+        "reminds-title": "Rappel",
+        "reminds-too-long": "Impossible de mettre une durée aussi longue",
+        "reminds-too-short": "Vous avez saisi une durée invalide",
         "say-no-perm": "Vous ne possédez pas la permission d'envoyer des messages dans le salon {channel}",
         "thanos": [
             "{0} a été épargné par Thanos",
@@ -347,13 +354,14 @@
         "prefix": "Liste des préfixes actuellement utilisables :",
         "stats": "**Version du bot :** {bot_v} \n**Nombre de serveurs :** {s_count} \n**Nombre de membres visibles :** {m_count} (dont {b_count} **bots**)\n**Nombre de lignes de code :** {l_count}\n**Langues utilisées :** {lang} \n**Version de Python :** {p_v} \n**Version de la bibliothèque `discord.py` :** {d_v} \n**Charge sur la mémoire vive :** {ram} GB \n**Charge sur le CPU :** {cpu} % \n**Temps de latence de l'api :** {api} ms\n**Nombre total d'xp gagné :** {xp}xp",
         "stats-title": "**Statistiques du bot**",
-        "text-0": "Bonjour ! Moi c'est {0} !\n\nJe suis un bot qui permet de faire *beaucoup* de choses : de la modération, un système d'xp, des statistiques, la gestion de partenaires et plein d'autres commandes plus ou moins utiles ! \nVous pouvez commencer par taper `!help` dans ce tchat pour voir la liste des commandes disponibles, puis `!config see` vous permettra de voir les options de configuration (un site web est en préparation). \n\nPour m'avoir aidé dans la création du bot, mon propriétaire et moi souhaitons remercier Awhikax pour son soutien apporté lors des différentes crises, Aragorn1202 pour toutes ses idées et ses phrases pleines de bon sens, Adri526 pour tous ces magnifiques logos, émojis et images de profil, et toute l'équipe de traducteurs poour leur merveilleux travail !\n\n:globe_with_meridians: Quelques liens pourront vous être utiles : \n:arrow_forward: Mon serveur Discord : http://discord.gg/N55zY88\n:arrow_forward: Un lien pour m'inviter dans un autre serveur : <https://zrunner.me/invitezbot>\n:arrow_forward: La documentation du bot : <https://zbot.rtfd.io/>\n:arrow_forward: Le compte Twitter de mon créateur : <https://twitter.com/z_runnerr>\n\nBonne journée !",
+        "text-0": "Bonjour ! Moi c'est {0} !\n\nJe suis un bot qui permet de faire *beaucoup* de choses : de la modération, un système d'xp, des statistiques, la gestion de partenaires et plein d'autres commandes plus ou moins utiles ! \nVous pouvez commencer par taper `!help` dans ce tchat pour voir la liste des commandes disponibles, puis `!config see` vous permettra de voir les options de configuration (un site web est en préparation). \n\nPour m'avoir aidé dans la création du bot, mon propriétaire et moi souhaitons remercier Awhikax pour son soutien apporté lors des différentes crises, Aragorn1202 pour toutes ses idées et ses phrases pleines de bon sens, Adri526 pour tous ces magnifiques logos, émojis et images de profil, et toute l'équipe de traducteurs poour leur merveilleux travail !\n\n:globe_with_meridians: Quelques liens pourront vous être utiles : \n:arrow_forward: Mon serveur Discord : http://discord.gg/N55zY88\n:arrow_forward: Un lien pour m'inviter dans un autre serveur : <https://zrunner.me/invitezbot>\n:arrow_forward: La documentation du bot : <https://zbot.rtfd.io/>\n:arrow_forward: Le compte Twitter de mon créateur : <https://twitter.com/z_runnerr>\n:arrow_forward: Une petite FAQ : <https://zrunner.me/zbot-faq>\n\nBonne journée !",
         "usernames-allow": "Vous pouvez réautoriser l'enregistrement automatique via la commande 'profile'",
         "usernames-disallow": "Vous pouvez vous retirer de l'enregistrement automatique via la commande 'profile'",
         "usernames-empty": "Aucun changement enregistré",
         "usernames-global": "Historique général",
         "usernames-last-date": "Dernier changement",
         "usernames-local": "Historique du serveur",
+        "usernames-more": "Et {nbr} de plus",
         "usernames-title": "Pseudos de **{u}**"
     },
     "infos_2": {
@@ -372,7 +380,9 @@
         "click_here": "Cliquez ici",
         "depuis": "depuis",
         "dnd": "ne pas déranger",
+        "doc": "Documentation",
         "end": "fin",
+        "example": "exemple",
         "extreme": "extrême",
         "ghost": "Fantôme",
         "high": "élevé",
@@ -573,6 +583,7 @@
         "kick-noreason": "Vous venez d'être expulsé du serveur {} :confused:",
         "kick-reason": "Vous venez d'être expulsé du serveur {} :confused:\nRaison : {}",
         "missing-manage-nick": "Oups, il me manque la permission \"Gérer les pseudos\"",
+        "missing-user-perms": "Oups, il vous manque des permissions (gérer les rôles, gérer le serveur ou gérer les messages)",
         "mute-1": "Le membre {} a bien été réduit au silence pour la raison `{}` !",
         "mute-created": "Rôle `muted` créé avec succès !",
         "mute-high": "Oups, il semble que le rôle `muted` soit trop haut pour que je puisse le donner... Veuillez fixer ce problème en plaçant mon rôle plus haut que le rôle `muted`.",
@@ -587,6 +598,7 @@
         "remove_roles-1": "-> {c} rôles enlevés sur {m} !",
         "role-color": "Le rôle {} a changé de couleur !",
         "role-high": "Oups, ce rôle est trop haut pour que je puisse le modifier. Merci de déplacer mon rôle au-dessus du rôle `{r}` avant de réessayer :confused:",
+        "roles-list": "Liste des rôles du serveur",
         "slowmode-0": "Le slowmode est désormais désactivé dans ce salon.",
         "slowmode-1": "Impossible de mettre une fréquence supérieure à six heures",
         "slowmode-2": "Le channel {} est désormais en slowmode.\nAttendez {} secondes avant d'envoyer un message.",
@@ -1023,7 +1035,7 @@
             "Tu es désormais niveau {level}, mais justice ne règne pas encore sur la ville, {user}...",
             "A force de mourir, tu passes niveau {level}, {user}. Maintenant, recommence encore ce donjon et bats ce boss.",
             "Vous avez beau être niveau {level} {user}, vous vous ferez encore manger par un cerf. De toute façon, personne ne vous regrettera.",
-            "Hey ! Réveille toi {user} ! Tu passes au niveau {level} ! Hey !",
+            "Hey ! Listen ! Réveille toi {user} ! Tu passes au niveau {level} !",
             "{user} est niveau {level}, à force de manger des champignons.",
             "Tu as beau être niveau {level}, ta princesse est toujours dans un autre château {user}. ",
             "La force est plus puissante en toi {user}, maintenant que tu es niveau {level}.",

@@ -180,7 +180,7 @@ class BlurpleCog(commands.Cog):
                 if ctx.guild!=None and ctx.channel.permissions_for(ctx.guild.me).external_emojis:
                     em = '<:blurpletada:575696286905401345>'
                 await ctx.bot.cogs['UtilitiesCog'].change_db_userinfo(ctx.author.id,'unlocked_blurple',True)
-                await ctx.send(str(await self.translate(ctx.channel,'blurple','won-card')).format(ctx.author.mention,pr[0],em))
+                await ctx.send(str(await self.translate(ctx.channel,'blurple','won-card')).format(ctx.author.mention,pr[-1],em))
 
     @commands.command(aliases=['blurplfy', 'blurplefier'])
     @commands.cooldown(rate=3, per=90, type=BucketType.user)

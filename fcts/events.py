@@ -231,6 +231,32 @@ class Events(commands.Cog):
                 self.bot.log.warn("[check_user_left] {} (user {}/server {})".format(e,member.id,member.guild.id))
 
 
+    async def task_timer(self, task:dict):
+        if task["guild"] != None:
+            guild = self.bot.get_guild(task['guild'])
+            if guild == None:
+                return
+            channel = guild.get_channel(task["channel"])
+            if channel == None:
+                return
+        else:
+            channel = self.bot.get_channel(task["channel"])
+            if channel == None:
+                return
+        if task["user"] != None:
+            user = self.bot.get_user(task["user"])
+            if user == None:
+                raise discord.errors.NotFound
+            try:
+                f_duration = await self.bot.get_cog('TimeCog').time_delta(task['duration'],lang=await self.translate(channel,'current_lang','current'), form='developed', precision=0)
+                t = (await self.translate(channel, "fun", "reminds-title")).capitalize()
+                foot = await self.translate(channel, "fun", "reminds-date")
+                emb = self.bot.get_cog("EmbedCog").Embed(title=t, desc=task["message"], color=4886754, time=task["begin"], footer_text=foot)
+                msg = await self.translate(channel, "fun", "reminds-asked", user=user.mention, duration=f_duration)
+                await channel.send(msg, embed=emb)
+            except Exception as e:
+                raise e
+
 
     async def get_events_from_db(self,all=False,IDonly=False):
         """Renvoie une liste de tous les events qui doivent être exécutés"""
@@ -293,23 +319,38 @@ class Events(commands.Cog):
                 except Exception as e:
                     await self.bot.cogs['ErrorsCog'].on_error(e,None)
                     self.bot.log.error("[unban_task] Impossible d'unban automatiquement : {}".format(e))
+            if task['action']=="timer":
+                try:
+                    await self.task_timer(task)
+                except discord.errors.NotFound:
+                    await self.remove_task(task['ID'])
+                except Exception as e:
+                    await self.bot.cogs['ErrorsCog'].on_error(e,None)
+                    self.bot.log.error("[unban_task] Impossible d'envoyer un timer : {}".format(e))
+                else:
+                    await self.remove_task(task['ID'])
 
 
-    async def add_task(self,guildID,userID,action,duration):
+
+    async def add_task(self, action:str, duration:int, userID: int, guildID:int=None, channelID:int=None, message:str=None):
         """Ajoute une tâche à la liste"""
         tasks = await self.get_events_from_db(all=True)
         for t in tasks:
-            if t['user']==userID and t['guild']==guildID and t['action']==action:
+            if (t['user']==userID and t['guild']==guildID and t['action']==action and t["channel"]==channelID) and t['action']!='timer':
                 return await self.update_duration(t['ID'],duration)
         cnx = self.bot.cnx_frm
         cursor = cnx.cursor()
-        ids = await self.get_events_from_db(all=True,IDonly=True)
-        if len(ids)>0:
-            ID = max([x['ID'] for x in ids])+1
+        if len(tasks)>0:
+            ID = max([x['ID'] for x in tasks])+1
         else:
             ID = 0
-        query = ("INSERT INTO `timed` (`ID`,`guild`,`user`,`action`,`duration`) VALUES ({},{},{},'{}',{})".format(ID,guildID,userID,action,duration))
-        cursor.execute(query)
+        # if message != None:
+        #     message = message.replace('"', "\\")
+        # query = ("INSERT INTO `timed` (`ID`,`guild`,`channel`,`user`,`action`,`duration`,`message`) VALUES ({},{},{},{},'{}',{},\"{}\")".format(ID,guildID,channelID, userID, action, duration, message))
+        # cursor.execute(query)
+        #  %(username)s
+        query = "INSERT INTO `timed` (`ID`,`guild`,`channel`,`user`,`action`,`duration`,`message`) VALUES (%(ID)s,%(guild)s,%(channel)s,%(user)s,%(action)s,%(duration)s,%(message)s)"
+        cursor.execute(query, {'ID':ID, 'guild':guildID, 'channel':channelID, 'user':userID, 'action':action, 'duration':duration, 'message':message})
         cnx.commit()
         return True
 
@@ -374,6 +415,30 @@ class Events(commands.Cog):
         await self.rss_loop()
         self.bot.log.info("[tasks_loop] Lancement de la boucle")
 
+    async def send_sql_statslogs(self):
+        "Send some stats about the current bot stats"
+        cnx = self.bot.cnx_frm
+        cursor = cnx.cursor()
+        rss_feeds = await self.bot.get_cog("RssCog").get_raws_count(True)
+        active_rss_feeds = await self.bot.get_cog("RssCog").get_raws_count()
+        query = ("INSERT INTO `log_stats` (`time`, `servers_count`, `members_count`, `bots_count`, `dapi_heartbeat`, `codelines_count`, `earned_xp_total`, `rss_feeds`, `active_rss_feeds`, `beta`) VALUES (CURRENT_TIMESTAMP, '{server_count}', '{members_count}', '{bots_count}', '{ping}', '{codelines}', '{xp}', '{rss_feeds}', '{active_rss_feeds}','{beta}')".format(
+            server_count = len(self.bot.guilds),
+            members_count = len(self.bot.users),
+            bots_count = len([1 for x in self.bot.users if x.bot]),
+            ping = round(self.bot.latency,3),
+            codelines = self.bot.cogs["InfoCog"].codelines,
+            xp = await self.bot.cogs['XPCog'].bdd_total_xp(),
+            rss_feeds = rss_feeds,
+            active_rss_feeds = active_rss_feeds,
+            beta = 1 if self.bot.beta else 0
+        ))
+        cursor.execute(query)
+        cnx.commit()
+        cursor.close()
+        emb = self.bot.cogs["EmbedCog"].Embed(desc='**Stats logs** updated',color=5293283).update_timestamp().set_author(self.bot.user)
+        await self.bot.cogs["EmbedCog"].send([emb],url="loop")
+        self.statslogs_last_push = datetime.datetime.now()
+        
 
     async def rss_loop(self):
         if self.bot.cogs['RssCog'].last_update==None or (datetime.datetime.now() - self.bot.cogs['RssCog'].last_update).total_seconds()  > 5*60:
@@ -392,7 +457,7 @@ class Events(commands.Cog):
         if self.bot.beta:
             return
         t = time.time()
-        answers = ['None','None','None','None']
+        answers = ['None','None','None','None','None']
         self.bot.log.info("[DBL] Envoi des infos sur le nombre de guildes...")
         try:
             guildCount = await self.bot.cogs['InfoCog'].get_guilds_count()
@@ -400,9 +465,9 @@ class Events(commands.Cog):
             await self.bot.cogs['ErrorsCog'].on_error(e,None)
             guildCount = len(self.bot.guilds)
         session = aiohttp.ClientSession(loop=self.bot.loop)
-        # https://discordbots.org/bot/486896267788812288
+        # https://top.gg/bot/486896267788812288
         payload = {'server_count': guildCount}
-        async with session.post('https://discordbots.org/api/bots/486896267788812288/stats',data=payload,headers={'Authorization':str(self.bot.dbl_token)}) as resp:
+        async with session.post('https://top.gg/api/bots/486896267788812288/stats',data=payload,headers={'Authorization':str(self.bot.dbl_token)}) as resp:
             self.bot.log.debug('discordbots.org returned {} for {}'.format(resp.status, payload))
             answers[0] = resp.status
         # https://divinediscordbots.com/bot/486896267788812288
@@ -412,7 +477,7 @@ class Events(commands.Cog):
         headers = {
               'authorization': self.bot.others['divinediscordbots'],
               'content-type': 'application/json'
-          }
+        }
         async with session.post('https://divinediscordbots.com/bot/{}/stats'.format(self.bot.user.id), data=payload, headers=headers) as resp:
               self.bot.log.debug('divinediscordbots statistics returned {} for {}'.format(resp.status, payload))
               answers[1] = resp.status
@@ -423,21 +488,29 @@ class Events(commands.Cog):
         headers = {
               'Authorization': self.bot.others['botsondiscord'],
               'Content-Type': 'application/json'
-          }
+        }
         async with session.post('https://bots.ondiscord.xyz/bot-api/bots/{}/guilds'.format(self.bot.user.id), data=payload, headers=headers) as resp:
               self.bot.log.debug('BotsOnDiscord returned {} for {}'.format(resp.status, payload))
               answers[2] = resp.status
         # https://botlist.space/bot/486896267788812288
         payload = json.dumps({
           'server_count': guildCount
-          })
+        })
         headers = {
               'Authorization': self.bot.others['botlist.space'],
               'Content-Type': 'application/json'
-          }
+        }
         async with session.post('https://api.botlist.space/v1/bots/{}'.format(self.bot.user.id), data=payload, headers=headers) as resp:
               self.bot.log.debug('botlist.space returned {} for {}'.format(resp.status, payload))
               answers[3] = resp.status
+        # https://discord.boats/bot/486896267788812288
+        headers = {
+              'Authorization': self.bot.others['discordboats'],
+              'Content-Type': 'application/json'
+        }
+        async with session.post('https://discord.boats/api/bot/{}'.format(self.bot.user.id), data=payload, headers=headers) as resp:
+              self.bot.log.debug('discord.boats returned {} for {}'.format(resp.status, payload))
+              answers[4] = resp.status
         await session.close()
         answers = [str(x) for x in answers]
         emb = self.bot.cogs["EmbedCog"].Embed(desc='**Guilds count updated** in {}s ({})'.format(round(time.time()-t,3),'-'.join(answers)),color=7229109).update_timestamp().set_author(self.bot.user)
@@ -481,17 +554,7 @@ class Events(commands.Cog):
             await self.bot.cogs['ErrorsCog'].senf_err_msg("Translators backup: Unable to find backup folder")
             return
         emb = self.bot.cogs["EmbedCog"].Embed(desc='**Translations files backup** completed in {}s'.format(round(time.time()-t,3)),color=10197915).update_timestamp().set_author(self.bot.user)
-        await self.bot.cogs["EmbedCog"].send([emb],url="loop")
-
-    async def send_mee6_stats(self):
-        """temporary log to see how many mee6api requests have been done"""
-        stats = self.bot.cogs['XPCog'].mee6_calls
-        t = await self.bot.cogs['TimeCog'].time_delta(round(time.time()-stats[0]))
-        emb = self.bot.cogs["EmbedCog"].Embed(desc='MEE6 api called {} times since {} ({}-{}-{})'.format(sum(stats[1:]),t,stats[1],stats[2],stats[3]))
-        emb.update_timestamp().set_author(self.bot.user)
-        await self.bot.cogs["EmbedCog"].send([emb],url="loop")
-        self.mee6_stats_last = datetime.datetime.now()
-    
+        await self.bot.cogs["EmbedCog"].send([emb],url="loop")    
 
     async def send_sql_statslogs(self):
         "Send some stats about the current bot stats"
@@ -510,7 +573,11 @@ class Events(commands.Cog):
             active_rss_feeds = active_rss_feeds,
             beta = 1 if self.bot.beta else 0
         ))
-        cursor.execute(query)
+        try:
+            cursor.execute(query)
+        except Exception as e:
+            await self.bot.get_cog("ErrorsCog").senf_err_msg(query)
+            raise e
         cnx.commit()
         cursor.close()
         emb = self.bot.cogs["EmbedCog"].Embed(desc='**Stats logs** updated',color=5293283).update_timestamp().set_author(self.bot.user)
@@ -520,3 +587,8 @@ class Events(commands.Cog):
 
 def setup(bot):
     bot.add_cog(Events(bot))
+    if bot.internal_loop_enabled:
+        try:
+            bot.get_cog("Events").loop.start()
+        except RuntimeError:
+            pass

@@ -9,7 +9,7 @@ default_color = discord.Color(0x50e3c2)
 from docs import conf
 importlib.reload(conf)
 from fcts import reloads, args, checks
-importlib.reload(reloads)
+# importlib.reload(reloads)
 importlib.reload(args)
 importlib.reload(checks)
 from libs import bitly_api
@@ -501,6 +501,9 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
                 pass
             else:
                 await self.bot.cogs['ErrorsCog'].on_error(e,ctx)
+        # Premium subscriptions count
+        if isinstance(guild.premium_subscription_count,int) and guild.premium_subscription_count>0:
+            embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","guild-13"), value=await self.translate(ctx.guild.id,"stats_infos","guild-13v",b=guild.premium_subscription_count,p=guild.premium_tier))
         # Roles list
         try:
             if ctx.guild==guild:
@@ -518,9 +521,6 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
             embed.add_field(name=str(await self.translate(ctx.guild.id,"stats_infos","guild-11.1")).format(len(guild.roles)-1), value=", ".join(roles[:20]))
         else:
             embed.add_field(name=str(await self.translate(ctx.guild.id,"stats_infos","guild-11.2")).format(len(guild.roles)-1), value=", ".join(roles))
-        # Premium subscriptions count
-        if isinstance(guild.premium_subscription_count,int) and guild.premium_subscription_count>0:
-            embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","guild-13"), value=await self.translate(ctx.guild.id,"stats_infos","guild-13v",b=guild.premium_subscription_count,p=guild.premium_tier))
         # Limitations
         embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","guild-14"), value=await self.translate(ctx.guild.id,"stats_infos","guild-14v",
             bit=round(guild.bitrate_limit/1000),
@@ -648,6 +648,7 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
 
     @find_main.command(name="user")
     async def find_user(self,ctx,*,user:discord.User):
+        use_embed = ctx.guild==None or ctx.channel.permissions_for(ctx.guild.me).embed_links
         # Servers list
         servers_in = list()
         for s in self.bot.guilds:
@@ -656,6 +657,8 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
                     servers_in.append(":crown: "+s.name)
                 else:
                     servers_in.append("- "+s.name)
+        if len(servers_in)==0:
+            servers_in = ["No server"]
         # XP card
         xp_card = await self.bot.cogs['UtilitiesCog'].get_xp_style(user)
         # Perks
@@ -675,22 +678,31 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
         if len(perks)==0:
             perks = ["None"]
         # Has voted
-        async with aiohttp.ClientSession() as session:
-            async with session.get('https://discordbots.org/api/bots/486896267788812288/check?userId={}'.format(user.id),headers={'Authorization':str(self.bot.dbl_token)}) as r:
-                js = await r.json()
-                if js['voted']:
-                    has_voted = await self.translate(ctx.channel,'keywords','oui')
-                else:
-                    has_voted = await self.translate(ctx.channel,'keywords','non')
-                has_voted = has_voted.capitalize()
+        # async with aiohttp.ClientSession() as session:
+        #     async with session.get('https://top.gg/api/bots/486896267788812288/check?userId={}'.format(user.id),headers={'Authorization':str(self.bot.dbl_token)}) as r:
+        #         js = await r.json()
+        #         if js['voted']:
+        #             has_voted = await self.translate(ctx.channel,'keywords','oui')
+        #         else:
+        #             has_voted = await self.translate(ctx.channel,'keywords','non')
+        #         has_voted = has_voted.capitalize()
+        votes = await ctx.bot.get_cog("UtilitiesCog").check_votes(user.id)
+        if use_embed:
+            votes = " - ".join([f"[{x[0]}]({x[1]})" for x in votes])
+        else:
+            votes = " - ".join([x[0] for x in votes])
+        if len(votes) == 0:
+            votes = "Nowhere"
         # Languages
         disp_lang = list()
         for lang in await self.bot.cogs['UtilitiesCog'].get_languages(user):
             disp_lang.append('{} ({}%)'.format(lang[0],round(lang[1]*100)))
+        if len(disp_lang)==0:
+            disp_lang = ["Unknown"]
         # User name
         user_name = str(user)+' <:BOT:544149528761204736>' if user.bot else str(user)
         # ----
-        if ctx.guild==None or ctx.channel.permissions_for(ctx.guild.me).embed_links:
+        if use_embed:
             if ctx.guild==None:
                 color = None
             else:
@@ -702,7 +714,7 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
                 {"name": "Servers", "value": "\n".join(servers_in), "inline":True},
                 {"name": "Language", "value": "\n".join(disp_lang), "inline":True},
                 {"name": "XP card", "value": xp_card, "inline":True},
-                {"name": "Has voted?", "value": has_voted, "inline":True},
+                {"name": "Upvoted the bot?", "value": votes, "inline":True},
             ]).create_footer(ctx))
         else:
             txt = """Name: {}
@@ -717,7 +729,7 @@ Servers:
                 " - ".join(perks),
                 " - ".join(disp_lang),
                 xp_card,
-                has_voted,
+                votes,
                 "\n".join(servers_in)
                 )
             await ctx.send(txt)
@@ -731,7 +743,7 @@ Servers:
                 if x.name==guild:
                     guild = x
                     break
-        if isinstance(guild,str):
+        if isinstance(guild,str) or guild==None:
             await ctx.send(await self.translate(ctx.channel,"find","guild-0"))
             return
         msglang = await self.translate(ctx.channel,'current_lang','current')
@@ -901,7 +913,7 @@ Servers:
         if ctx.invoked_subcommand != None:
             return
         txt = await self.translate(ctx.channel,"infos","prefix")
-        prefix = "\n".join(await ctx.bot.get_prefix(ctx.message))
+        prefix = "\n".join((await ctx.bot.get_prefix(ctx.message))[1:])
         if ctx.guild==None or ctx.channel.permissions_for(ctx.guild.me):
             emb = await ctx.bot.cogs['EmbedCog'].Embed(title=txt,desc=prefix,time=ctx.message.created_at,color=ctx.bot.cogs['HelpCog'].help_color).create_footer(ctx)
             return await ctx.send(embed=emb.discord_embed())
@@ -922,7 +934,7 @@ Servers:
         can_embed = True if isinstance(ctx.channel,discord.DMChannel) else ctx.channel.permissions_for(ctx.guild.me).embed_links
         if can_embed:
             l = await self.translate(ctx.channel,'infos','discordlinks')
-            links = ["https://dis.gd/status","https://dis.gd/tos","https://dis.gd/report","https://dis.gd/feedback","https://support.discordapp.com/hc/articles/115002192352","https://discordapp.com/developers/docs/legal","https://support.discordapp.com/hc/en-us/articles/206346498-Where-can-I-find-my-User-Server-Message-ID-"]
+            links = ["https://dis.gd/status","https://dis.gd/tos","https://dis.gd/report","https://dis.gd/feedback","https://support.discordapp.com/hc/en-us/articles/115002192352","https://discordapp.com/developers/docs/legal","https://support.discordapp.com/hc/en-us/articles/206346498-Where-can-I-find-my-User-Server-Message-ID-"]
             txt = "\n".join(['['+l[i]+']('+links[i]+')' for i in range(len(l))])
             em = await self.bot.cogs["EmbedCog"].Embed(desc=txt).update_timestamp().create_footer(ctx)
             await ctx.send(embed=em)
@@ -1052,8 +1064,11 @@ Servers:
             await ctx.send(desc)
 
     @commands.command(name="usernames",aliases=["username","usrnm"])
-    async def username(self,ctx:commands.Context,*,user:discord.User):
-        """Get the names history of an user"""
+    async def username(self,ctx:commands.Context,*,user:discord.User=None):
+        """Get the names history of an user
+        Default user is you"""
+        if user==None:
+            user = ctx.author
         language = await self.translate(ctx.channel,"current_lang","current")
         cond = f"user='{user.id}'"
         if not self.bot.beta:
@@ -1078,13 +1093,19 @@ Servers:
             f = list()
             if len(global_list)>0:
             # Usernames part
-                f.append({'name':await self.translate(ctx.channel,'infos','usernames-global'), 'value':"\n".join([x['new'] for x in global_list if x['new']!=''])})
+                temp = [x['new'] for x in global_list if x['new']!='']
+                if len(temp) > 30:
+                    temp = temp[:30] + [await self.translate(ctx.channel, 'infos', 'usernames-more', nbr=len(temp)-30)]
+                f.append({'name':await self.translate(ctx.channel,'infos','usernames-global'), 'value':"\n".join(temp)})
                 if global_list[-1]['old'] != '':
                     f[-1]["value"] += "\n" + global_list[-1]['old']
                 date += await self.bot.cogs['TimeCog'].date([x['utc_date'] for x in global_list][0] ,year=True, lang=language)
             if len(this_guild)>0:
             # Nicknames part
-                f.append({'name':await self.translate(ctx.channel,'infos','usernames-local'), 'value':"\n".join([x['new'] for x in this_guild if x['new']!=''])})
+                temp = [x['new'] for x in this_guild if x['new']!='']
+                if len(temp) > 30:
+                    temp = temp[:30] + [await self.translate(ctx.channel, 'infos', 'usernames-more', nbr=len(temp)-30)]
+                f.append({'name':await self.translate(ctx.channel,'infos','usernames-local'), 'value':"\n".join(temp)})
                 if this_guild[-1]['old'] != '':
                     f[-1]["value"] += "\n" + this_guild[-1]['old']
                 date += "\n" + await self.bot.cogs['TimeCog'].date([x['utc_date'] for x in this_guild][0], year=True, lang=language)

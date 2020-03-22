@@ -10,7 +10,7 @@
         "emergency": "An emergency situation has just been declared for the bot. This may be the case when someone tries to take control of my code.\nTo limit the damage, I was forced to leave all the servers I was on immediately, hoping it wasn't too late.\nFor more information on the current state of the crisis, go to my official server: https://discord.me/zbot (check the link from the documentation if it no longer works: https://zbot.rtfd.io)"
     },
     "aide": {
-        "aliases": "Aliases:",
+        "aliases": "Aliases",
         "categories": {
             "fun": "fun",
             "info": "information",
@@ -128,8 +128,8 @@
                 "No verification role has been added"
             ]
         },
-        "checks": "Requirements:",
         "cmd-not-found": "There is no command nammed \"{}\"",
+        "description": "Description",
         "embed_title": "Available commands for {u}",
         "footer": "Type {}help command for more info on a command",
         "no-desc-cmd": "No description for this command",
@@ -137,7 +137,8 @@
         "no-subcmd": "The command `{0.name}` has no subcommand",
         "not-enabled": ":warning: This command is disabled",
         "subcmd-not-found": "This command has no subcommand named \"{}\"",
-        "subcmds": "Subcommands:"
+        "subcmds": "Subcommands",
+        "warning": "Warnings"
     },
     "blurple": {
         "check_fields": [
@@ -293,6 +294,12 @@
         ],
         "piece-1": "Failed, it fell on the edge!",
         "react-0": "Unable to find the corresponding message. You must enter the message ID in the first argument, and the emoji in the second :upside_down:\n Also check that I have permission to read the message history!",
+        "reminds-asked": "{user}, you asked me {duration} ago to remind you of this:",
+        "reminds-date": "Request date",
+        "reminds-saved": "Got it! I'll remind you in {duration}",
+        "reminds-title": "Reminder",
+        "reminds-too-long": "Impossible to set such a long duration",
+        "reminds-too-short": "You have entered an invalid duration",
         "say-no-perm": "You do not have permission to send messages in the channel {channel}",
         "thanos": [
             "{0} was spared by Thanos",
@@ -345,15 +352,16 @@
         ],
         "docs": "Here is the link to the bot documentation:",
         "prefix": "List of currently usable prefixes:",
-        "stats": "**Bot version:** {bot_v} \n**Number of servers:** {s_count} \n**Number of visible members:** {m_count} ({b_count} **bots**)\n**Number of code lines:** {l_count}\n**Used languages:** {lang}\n**Python version :** {p_v} \n**Version of the `discord.py` lib:** {d_v} \n**Loading on the RAM:** {ram} GB \n**Loading on the CPU:** {cpu} % \n**API latency time:** {api} ms\n**Total of earned xp:** {xp}",
+        "stats": "**Bot version:** {bot_v} \n**Number of servers:** {s_count} \n**Number of visible members:** {m_count} ({b_count} **bots**)\n**Number of code lines:** {l_count}\n**Used languages:** {lang}\n**Python version :** {p_v} \n**Version of the `discord.py` lib:** {d_v} \n**RAM usage:** {ram} GB \n**CPU usage:** {cpu} % \n**API latency time:** {api} ms\n**Total of earned xp:** {xp}",
         "stats-title": "**Bot statistics**",
-        "text-0": "Hello! I'm {0}!\nI'm a bot that allows you to do a lot of things: moderation, xp system, statistics, partners managment and many other super useful commands (and totally pointless ones)!\nYou can start by typing `!help` in this chat to see the list of available commands, then `!config see` will let you see the configuration options.\n\nMy owner and I would like to thank Awhikax for his support during the various crises, Aragorn1202 for all his ideas and sentences full of good sense, Adri526 for all these beautiful logos, emojis and profile pics, and the whole translators team for their long work!\n\n:globe_with_meridians: Some links may be useful: \n:arrow_forward: My Discord server : http://discord.gg/N55zY88\n:arrow_forward: A link to invite me to another server : <https://zrunner.me/invitezbot>\n:arrow_forward: The bot documentation : <https://zbot.rtfd.io/>\n:arrow_forward: My creator's Twitter account : <https://twitter.com/z_runnerr>\n\nHave a nice day!",
+        "text-0": "Hello! I'm {0}!\nI'm a bot that allows you to do a lot of things: moderation, xp system, statistics, partners managment and many other super useful commands (and totally pointless ones)!\nYou can start by typing `!help` in this chat to see the list of available commands, then `!config see` will let you see the configuration options.\n\nMy owner and I would like to thank Awhikax for his support during the various crises, Aragorn1202 for all his ideas and sentences full of good sense, Adri526 for all these beautiful logos, emojis and profile pics, and the whole translators team for their long work!\n\n:globe_with_meridians: Some links may be useful: \n:arrow_forward: My Discord server : http://discord.gg/N55zY88\n:arrow_forward: A link to invite me to another server : <https://zrunner.me/invitezbot>\n:arrow_forward: The bot documentation : <https://zbot.rtfd.io/>\n:arrow_forward: My creator's Twitter account : <https://twitter.com/z_runnerr>\n:arrow_forward: A short FAQ: <https://zrunner.me/zbot-faq>\n\nHave a nice day!",
         "usernames-allow": "You can reauthorize the automatic recording with the command 'profile'",
         "usernames-disallow": "You can opt out of the automatic recording with the command 'profile'",
         "usernames-empty": "No change recorded",
         "usernames-global": "General history",
         "usernames-last-date": "Last change",
         "usernames-local": "Server history",
+        "usernames-more": "And {nbr} more",
         "usernames-title": "**{u}** names history"
     },
     "infos_2": {
@@ -372,7 +380,9 @@
         "click_here": "Click here",
         "depuis": "since",
         "dnd": "do not disturb",
+        "doc": "Documentation",
         "end": "end",
+        "example": "example",
         "extreme": "extreme",
         "ghost": "Ghost",
         "high": "high",
@@ -573,6 +583,7 @@
         "kick-noreason": "You have just been expelled from the server {} :confused:",
         "kick-reason": "You have just been expelled from the server {} :confused:\nReason : {}",
         "missing-manage-nick": "Oops, I'm missing the \"Manage nicknames\" permission!",
+        "missing-user-perms": "Oops, you're missing permissions (either manage roles, manage server or manage messages)",
         "mute-1": "The member {} has been silenced for the reason `{}`!",
         "mute-created": "Successfully created `muted` role!",
         "mute-high": "Oops, it seems that the `muted` role is too high for me to give it... Please fix this problem by placing my role higher than the `muted` role.",
@@ -587,6 +598,7 @@
         "remove_roles-1": "-> {c} roles removed on {m}!",
         "role-color": "The role {} has changed color!",
         "role-high": "Oops, this role is too high for me to change. Please move my role above the role `{r}` before trying again :confused:",
+        "roles-list": "List of server roles",
         "slowmode-0": "The slowmode is now disabled in this channel.",
         "slowmode-1": "Impossible to set a frequency higher than six hours",
         "slowmode-2": "The {} channel is now in slowmode. Wait {} seconds before sending a message.",
@@ -1023,7 +1035,7 @@
             "You are now level {level}, but justice does not yet rule the city, {user}...",
             "By dint of dying, you've gone beyond level {level}, {user}. Now, do that dungeon again and lower that boss.",
             "You may be a level {level} {user}, but you'll still get eaten by a deer. Anyway, no one will regret you.",
-            "Hey! Wake up {user}! You've gone up to level {level}! Hey!",
+            "Hey! Listen! Wake up {user}! You've gone up to level {level}!",
             "{user} is level {level}, from eating mushrooms.",
             "You may be level {level}, but your princess is still in another castle. ",
             "The force is more powerful in you {user}, now that you are level {level}.",

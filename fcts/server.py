@@ -268,7 +268,7 @@ class ServerCog(commands.Cog):
     @commands.cooldown(1,2,commands.BucketType.guild)
     async def sconfig_help(self,ctx):
         """Get help about this command"""
-        msg = await self.translate(ctx.guild,"server","config-help", p=(await self.bot.get_prefix(ctx.message))[0])
+        msg = await self.translate(ctx.guild,"server","config-help", p=(await self.bot.get_prefix(ctx.message))[-1])
         await ctx.send(msg.format(ctx.guild.owner.name))
 
     @sconfig_main.command(name="del")
@@ -560,7 +560,7 @@ class ServerCog(commands.Cog):
             text = await self.find_staff(ctx.guild.id,option)
             return await self.form_text(text)
         else:
-            await self.modify_server(ctx.guild.id,values=[(option,value.replace('"','\"'))])
+            await self.modify_server(ctx.guild.id,values=[(option,value.replace('"','\\"'))])
             msg = await self.translate(ctx.guild.id,"server","change-text")
             await ctx.send(msg.format(option,value))
             await self.send_embed(ctx.guild,option,value)
@@ -568,8 +568,10 @@ class ServerCog(commands.Cog):
     async def form_text(self,text):
         if len(text) == 0:
             text = "Ø"
+        elif len(text) > 1000:
+            text = "```\n" + text[:1000] + "...```"
         else:
-            text = "```\n"+text+"```"
+            text = "```\n" + text + "```"
         return text
 
     async def conf_prefix(self,ctx,option,value):

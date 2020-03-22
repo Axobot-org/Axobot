@@ -97,31 +97,31 @@ class TimeCog(discord.ext.commands.Cog):
                 text+=" "
             if t.months>1:
                 text += str(t.months)+" "+lib[2]
-            else:
+            elif t.months==1:
                 text += str(t.months)+" "+lib[3]
             text+=" "
             if t.days>1:
                 text += str(t.days)+" "+lib[4]
-            else:
+            elif t.days==1:
                 text += str(t.days)+" "+lib[5]
             text+=" "
             if hour:
                 text+=" "
                 if t.hours>1:
                     text += " "+str(t.hours)+" "+lib[6]
-                else:
+                elif t.hours==1:
                     text += " "+str(t.hours)+" "+lib[7]
                 text+=" "
                 if t.minutes>1:
                     text += str(t.minutes)+" "+lib[8]
-                else:
+                elif t.minutes==1:
                     text += str(t.minutes)+" "+lib[9]
                 text+=" "
                 if t.seconds>1:
                     text += str(t.seconds)+" "+lib[10]
-                else:
+                elif t.seconds==1:
                     text += str(t.seconds)+" "+lib[11]
-        return text
+        return text.strip()
 
 
     async def time_interval(self,tmd,precision=2):
