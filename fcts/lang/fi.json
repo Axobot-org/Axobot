@@ -10,7 +10,7 @@
         "emergency": "Hätätilanne on havaittu tälle botille. Tämä saattaa olla koska joku yrittää päästä sisään minun koodiini.\nJotta voidaan välttää sattumia, Minut oli pakotettu lähtemään kaikilta servuilta heti, missä olin toivoen että ei ole liian myöhäistä.\nLisätietoja tästä hätätilaanteesta mene minun servulleni: https://discord.me/z_bot (Katso linkki dokumenttiin jos linkki ei toimi enää: https://zbot.rtfd.io)"
     },
     "aide": {
-        "aliases": "Lyhenteet:",
+        "aliases": "Lyhenteet",
         "categories": {
             "fun": "hauska",
             "info": "tietoa",
@@ -128,7 +128,6 @@
                 "Vahvistus roolia ei ole asetettu"
             ]
         },
-        "checks": "Vaatimukset:",
         "cmd-not-found": "Komentoa  \"{}\" ei ole nimetty",
         "embed_title": "Käytettävissä olevat komennot käyttäjälle {u}",
         "footer": "Viestitä {}help komento niin saat lisätietoja tietyistä komennoista",
@@ -136,7 +135,8 @@
         "no-desc-cog": "Ei lisätietoja tästä cog:stä.",
         "no-subcmd": "komenolla `{0.name}`ei ole toissijaista komentoa",
         "not-enabled": ":warning: Tämä komento ei ole käytössä",
-        "subcmd-not-found": "Tällä komennolla ei ole toissijaista komentoa nimetty. \"{}\""
+        "subcmd-not-found": "Tällä komennolla ei ole toissijaista komentoa nimetty. \"{}\"",
+        "subcmds": "Toissijaiset komennot"
     },
     "blurple": {
         "check_fields": [
@@ -386,6 +386,7 @@
         "offline": "offline tilassa",
         "online": "paikalla",
         "oui": "kyllä",
+        "request_by": "Komenon käyttäjä {user}",
         "server": "palvelin",
         "servers": "palvelimet",
         "unknown": "Tuntematon",
@@ -564,6 +565,8 @@
         "error": "Ups, tuntematon virhe tapahtui. Yritä uudelleen myöhemmin tai ota yhteyttä tukeen",
         "give_roles-1": "Jäsen {u} on liian ylhäällä minulle",
         "give_roles-2": "Srop",
+        "give_roles-4": "Ups, näyttää siltä että tämä rooli on liian ylhäällä jotta voisin antaa tai ottaa sen keneltä tahansa. Laita minun roolini roolin `{r}` yläpuolelle",
+        "give_roles-higher": "Et voi antaa tai ottaa rooleja jotka ovat sinua ylempänä!",
         "kick": "{} on potkittu palvelimelta syyllä `{}`",
         "kick-1": "Näyttää siltä että tämä jäsen on liian korkealla niin en voi potkia häntä ulos 🤔",
         "kick-noreason": "Sinut on potkittu palvelimelta {} 😕",
@@ -579,6 +582,7 @@
         "pin-error": "Ups, en voi löytää tota viestiä (Virhe : `{}`)",
         "pin-error-3": "Ups, mahdotonta kiinnittää tämä viesti (onko sinulla enemmän kuin 50 kiinnitettyä viestiä?). Virhe : `{}`",
         "react-clear": "En voi löytää tätä viestiä 😕",
+        "remove_roles-0": "Ups, näyttää siltä että tämä rooli on liian ylhäällä jotta voisin ottaa sen keneltä tahansa. Laita minun roolini roolin `{r}` yläpuolelle",
         "role-color": "Rooli {} on vaihtanut väriä!",
         "role-high": "Ups, tämä rooli on liian korkealla että minä voisin muokata sitä. Siirrä minun roolini `{r}` roolin yli ennen kun yrität uudelleen 😕",
         "slowmode-0": "Tällä kanavalla ei ole enää etanatilaa",
@@ -807,6 +811,13 @@
         "yt-form-last": "{logo}  | Tässä on viimeisin video käyttäjältä {author}:\n{title}\nJulkaistu {date}\nLinkki : {url}",
         "yt-help": "Jos haluat etsiä youtube kanavan, sinun täytyy antaa kanava tunniste. Aiot löytää sen url linkin lopussa, se voi olla sen nimi tai jotain kirjaimia/numeroita. *Vinkki: jotkut kanavat on jo täytettynä minun koodilla. Joskus voit vain laittaa `neil3000` tai `0xisius`* 😉"
     },
+    "s_backup": {
+        "err": "Ups, sisällinen virhe tapahtui... odota hetki tai ota yhteyttä tukeen (`about` komento) jos tämä jatkuu",
+        "finished": "Varmuuskopio valmis! Tässä on loki",
+        "invalid_file": "Lähetä minulle varmuuskopio tiedosto samalla viestillä millä käytät komennon",
+        "invalid_version": "Varmuuskopio version on pätemätön. Tiedosto on varmaan rikki",
+        "loading": "Ladataan varmuuskopiota...\nodota hetki..."
+    },
     "server": {
         "change-0": "Tämä vaihtoehto ei ole olemassa :confused:",
         "change-1": "Ups, sisäinen virhe tapahtui...",
@@ -904,6 +915,7 @@
         "guild-13v": "{b} (tier {p})",
         "guild-14": "Limitations",
         "guild-14v": "Bitrate: {bit}kbps\nFiles size: {fil}MB\nEmojis count: {emo}\nConnected members: {mem}",
+        "guild-15": "kutsu linkki",
         "guild-2": "Maa alue",
         "guild-3": "Teksti : {} | Ääni : {} ({} kategoriat)",
         "guild-4": "Paikalla jäsenet",
@@ -942,6 +954,7 @@
         "member-5": "Toiminta",
         "member-6": "Järjestelmänvalvoja",
         "member-7": "Infractions",
+        "member-8": "Erikois aktiviteetti",
         "not-found": "Kyvytöntä löytää {N}",
         "role-0": "Tunniste",
         "role-1": "Väri",
@@ -950,6 +963,12 @@
         "role-4": "Näkyy erikseen muista jäsenistä",
         "role-5": "Arvojärjestyksen asento",
         "role-6": "Ainutlaatuinen jäsen tällä roolilla",
+        "snowflake-0": "Päivämäärä jolloin tehty",
+        "snowflake-1": "Binääri",
+        "snowflake-2": "Aikataulu",
+        "snowflake-3": "Sisäisen työntekijän tunniste",
+        "snowflake-4": "Sisäinen prosessi tunniste",
+        "snowflake-5": "Kasvu",
         "textchan-0": "Kategoria",
         "textchan-1": "Kuvaus",
         "textchan-2": "NSFW",
@@ -967,6 +986,7 @@
         "card-desc": "Tässä on esimerkki sinun XP kortistasi. Jos haluat vaihtaa tyyliäsi voit viestittää komennon `profile card <style>` *Sinun XP kortti aikoo päivittyä vain kun ole saanut XP:tä*",
         "changed-0": "Sinun XP kortti käyttää nyt tyyliä: {}",
         "changed-1": "Ups, sisäinen virhe tapahtui pyynnön lähettämisessä. Yritä uudelleen myöhemmin tai ota yhteyttä tukeen.",
+        "config_list": "Lista mahdollisista vaihtoehdoista: {options}\n\nKäytä `help profile config` komentoa lisätiedoille",
         "config_success": "{opt} ominaisuus on vaihdettu!",
         "invalid-card": "Tämä tyyli on pätemätön. Tässä on lista tyyleistä joita sinä voit käyttää: {}",
         "list-cards": "Tässä on lista kaikista tyyleistä sinä voit käyttää: {}",
