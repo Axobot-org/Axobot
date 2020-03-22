@@ -560,4 +560,8 @@ class Events(commands.Cog):
 
 def setup(bot):
     bot.add_cog(Events(bot))
-    bot.get_cog("Events").loop.start()
+    if bot.internal_loop_enabled:
+        try:
+            bot.get_cog("Events").loop.start()
+        except RuntimeError:
+            pass

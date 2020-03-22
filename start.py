@@ -75,6 +75,7 @@ class zbot(commands.bot.BotBase,discord.Client):
         self._cnx = [[None,0],[None,0]]
         self.xp_enabled = True
         self.rss_enabled = True
+        self.internal_loop_enabled = False
         self.others = dict()
         
     @property
@@ -326,6 +327,7 @@ def main():
                 enable_event_loop = input("Lancement de la boucle d'events ? (o/n) ")
             if enable_event_loop.lower() == 'o':
                 client.cogs['Events'].loop.start()
+                client.internal_loop_enabled = True
             # RSS enabled
             if len(sys.argv)>3 and sys.argv[3] in ['o','n']:
                 enable_rss = sys.argv[3]
