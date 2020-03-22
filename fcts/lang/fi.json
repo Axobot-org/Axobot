@@ -129,6 +129,7 @@
             ]
         },
         "cmd-not-found": "Komentoa  \"{}\" ei ole nimetty",
+        "description": "Kuvaus",
         "embed_title": "Käytettävissä olevat komennot käyttäjälle {u}",
         "footer": "Viestitä {}help komento niin saat lisätietoja tietyistä komennoista",
         "no-desc-cmd": "Ei lisätietoja tästä komennosta.",
@@ -136,7 +137,8 @@
         "no-subcmd": "komenolla `{0.name}`ei ole toissijaista komentoa",
         "not-enabled": ":warning: Tämä komento ei ole käytössä",
         "subcmd-not-found": "Tällä komennolla ei ole toissijaista komentoa nimetty. \"{}\"",
-        "subcmds": "Toissijaiset komennot"
+        "subcmds": "Toissijaiset komennot",
+        "warning": "Varoitukset"
     },
     "blurple": {
         "check_fields": [
@@ -292,6 +294,12 @@
         ],
         "piece-1": "Epäonnistui, se tippu reunaan!",
         "react-0": "En voinut löytää corresponding viestiä. Sinun täytyy lisätä viesti ID ensimmäiseen argumenttiin, ja emoji toiseen:upside_down:\n Katso myös että voin lukea kanavan viesti historiaa!",
+        "reminds-asked": "{user}, pyysit minua muistuttaa sinua {duration} sitten tästä:",
+        "reminds-date": "Pyydetty",
+        "reminds-saved": "Selvä! Muistutan sinua {duration} päästä",
+        "reminds-title": "Musitutus",
+        "reminds-too-long": "Mahdotonta laittaa niin pitkää aikaa",
+        "reminds-too-short": "Olet laittanut pätemättömän ajan",
         "say-no-perm": "Sinulla ei ole käyttöoikeuksia lähettämään viestejä kanavalle {channel}",
         "thanos": [
             "{0} oli jaettu Thanoksen kanssa",
@@ -353,6 +361,7 @@
         "usernames-global": "Yleis historia",
         "usernames-last-date": "Viimeisin vaihto",
         "usernames-local": "Palvelin historia",
+        "usernames-more": "Ja {nbr} lisää",
         "usernames-title": "**{u}** nimen historia"
     },
     "infos_2": {
@@ -371,7 +380,9 @@
         "click_here": "Paina tästä",
         "depuis": "",
         "dnd": "älä häiritse",
+        "doc": "Dokumentaatio",
         "end": "loppuu",
+        "example": "esimerkki",
         "extreme": "äärimmäinen",
         "ghost": "Haamu",
         "high": "ylhäinen",
@@ -572,6 +583,7 @@
         "kick-noreason": "Sinut on potkittu palvelimelta {} 😕",
         "kick-reason": "You have just been expelled from the server {} 😕\nSyy : {}",
         "missing-manage-nick": "Ups, minulta puuttuu \"Hallinnoi nimimerkkejä\" käyttöoikeus!",
+        "missing-user-perms": "Ups, sinulta puuttuu käyttöoikeuksia (joko hallinnoi rooleja, hallinnoi palvelinta tai hallinnoi viestejä)",
         "mute-1": "{} on mykistetty syyllä `{}`!",
         "mute-created": "`Mykistetty` rooli tehty!",
         "mute-high": "Ups, näyttää siltä että `mykistetty` rooli on liian korkealla että voisin antaa sen... Korjaa tämä sillä että laita minun roolini `Mykistetty` roolin yläpuolelle.",
@@ -583,8 +595,10 @@
         "pin-error-3": "Ups, mahdotonta kiinnittää tämä viesti (onko sinulla enemmän kuin 50 kiinnitettyä viestiä?). Virhe : `{}`",
         "react-clear": "En voi löytää tätä viestiä 😕",
         "remove_roles-0": "Ups, näyttää siltä että tämä rooli on liian ylhäällä jotta voisin ottaa sen keneltä tahansa. Laita minun roolini roolin `{r}` yläpuolelle",
+        "remove_roles-1": "-> {c} roolit poistettu!",
         "role-color": "Rooli {} on vaihtanut väriä!",
         "role-high": "Ups, tämä rooli on liian korkealla että minä voisin muokata sitä. Siirrä minun roolini `{r}` roolin yli ennen kun yrität uudelleen 😕",
+        "roles-list": "Lista palvelimen rooleista",
         "slowmode-0": "Tällä kanavalla ei ole enää etanatilaa",
         "slowmode-1": "Mahdotonta asettaa pituus isommaksi kuin kuusi tuntia",
         "slowmode-2": "{} on nyt etanatilassa. Odota {} sekunttia ennenkun lähetät viestin.",
@@ -927,6 +941,7 @@
         "guild-features": {
             "ANIMATED_ICON": "Animoitu palvelin kuvake",
             "BANNER": "Erikois palvelin banneri",
+            "COMMERCE": "Commerce Features",
             "DISCOVERABLE": "Näkyy yhteys ikkunassa",
             "FEATURABLE": "Näkyy Aktiviteetti ikkunassa",
             "INVITE_SPLASH": "Kutsu taustakuva",

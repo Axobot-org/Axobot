@@ -133,6 +133,7 @@
             ]
         },
         "cmd-not-found": "Aucune commande nommée \"{}\"... Tu as peut-être fait une PhotEuh D'Ortograff ?",
+        "description": "Description",
         "embed_title": "Hey ! Voici la liste des commandes disponibles pour {u}",
         "footer": "Entre simplement {}help commande pour plus d'informations sur la fameuse commande",
         "no-desc-cmd": "Aucune description pour la commande",
@@ -140,7 +141,8 @@
         "no-subcmd": "La commande {0.name} n'a aucune sous-commande",
         "not-enabled": ":warning: Cette commande est désactivée ! Ça sert à rien d'essayer !",
         "subcmd-not-found": "Cette commande ne possède aucune sous-commande nommée \"{}\"... :thinking: Tu as peut-être fait une PhotEuh D'Ortograff ?",
-        "subcmds": "Les sous-commandes sont..."
+        "subcmds": "Les sous-commandes sont...",
+        "warning": "Avertissements"
     },
     "blurple": {
         "check_fields": [
@@ -296,6 +298,12 @@
         ],
         "piece-1": "Raté, c'est tombé sur la tranche !",
         "react-0": "Impossible de trouver le message correspondant. Il faut rentrer l'ID du message en 1er argument, et l'émoji en 2e :upside_down:\n Vérifie aussi que je possède la perm de lire l'historique des messages !",
+        "reminds-asked": "Hey, {user} ! Tu m'as demandé de te rappeler ça il y a {duration} ! Un trou de mémoire ?",
+        "reminds-date": "Date de demande",
+        "reminds-saved": "Oko 😁 ! Je te le rappellerai dans... Environ... 🕰️ {duration} !\n\n*Si j'oublie pas...*",
+        "reminds-title": "Rappel",
+        "reminds-too-long": "Wolalala 😬 !\n\nJe peux pas te le rappeler dans autant de temps, moi !\n\nTu t'es cru où ?!\n\nJ'ai pas autant de mémoire !",
+        "reminds-too-short": "...\n\nAlors.\n\n\n\n\nÇa, c'est ce qu'on appelle communément **UNE DURÉE INVALIDE !**",
         "say-no-perm": "T'as pas la perm d'envoyer des messages dans {channel}",
         "thanos": [
             "{0} a été épargné par Thanos le divin...",
@@ -357,6 +365,7 @@
         "usernames-global": "Historique général",
         "usernames-last-date": "Dernier changement",
         "usernames-local": "Historique du serveur",
+        "usernames-more": "Et {nbr} de plus... *Cha fait beaucoup !*",
         "usernames-title": "La liste des pseudos de **{u}**"
     },
     "infos_2": {
@@ -375,7 +384,9 @@
         "click_here": "Clique ici !",
         "depuis": "depuis",
         "dnd": "ne pas déranger",
+        "doc": "Documentention",
         "end": "fin",
+        "example": "exemple",
         "extreme": "extrême",
         "ghost": "Fantôme",
         "high": "élevé",
@@ -576,6 +587,7 @@
         "kick-noreason": "Vous venez d'être expulsé du serveur {} :confused:",
         "kick-reason": "Vous venez d'être expulsé du serveur {} :confused:\nRaison : {}",
         "missing-manage-nick": "Oups, il me manque la permission \"Gérer les pseudos\"",
+        "missing-user-perms": "Wolala 😬 !\nIl te manque des perms (style, manager les roles, le serveur, ou les messages)",
         "mute-1": "Le membre {} a bien été réduit au silence pour la raison `{}` !",
         "mute-created": "Rôle `muted` créé avec succès !",
         "mute-high": "Oups, il semble que le rôle `muted` soit trop haut pour que je puisse le donner... Veuillez fixer ce problème en plaçant mon rôle plus haut que le rôle `muted`.",
@@ -590,6 +602,7 @@
         "remove_roles-1": "-> {c} roles retirés sur {m} ! *Phew* 🙃",
         "role-color": "Le rôle {} a changé de couleur !",
         "role-high": "Oups, ce rôle est trop haut pour que je puisse le modifier. Merci de déplacer mon rôle au-dessus du rôle `{r}` avant de réessayer :confused:",
+        "roles-list": "Liste des rôles du Serveur 🧐",
         "slowmode-0": "Le slowmode est désormais désactivé dans ce salon.",
         "slowmode-1": "Impossible de mettre une fréquence supérieure à six heures",
         "slowmode-2": "Le channel {} est désormais en slowmode.\nAttendez {} secondes avant d'envoyer un message.",
