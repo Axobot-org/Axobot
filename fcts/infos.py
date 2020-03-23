@@ -846,6 +846,7 @@ Servers:
         flow = await self.bot.cogs['RssCog'].get_flow(ID)
         if len(flow)==0:
             await ctx.send("Invalid ID")
+            return
         else:
             flow = flow[0]
         temp = self.bot.get_guild(flow['guild'])
@@ -859,6 +860,8 @@ Servers:
         else:
             c = "Unknown ({})".format(flow['channel'])
         d = await self.bot.cogs['TimeCog'].date(flow['date'],digital=True)
+        if d==None or len(d)==0:
+            d = "never"
         if ctx.guild==None or ctx.channel.permissions_for(ctx.guild.me).embed_links:
             if ctx.guild==None:
                 color = None
