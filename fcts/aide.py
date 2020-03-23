@@ -344,10 +344,12 @@ If the bot can't send the new command format, it will try to send the old one.""
 
     async def cmd_help(self, ctx:commands.Context, cmd:commands.core.Command, useEmbed:bool=True):
         """Create pages for a command explanation"""
-        desc = cmd.description.strip() if cmd.description!=None else str(await self.translate(ctx.channel,"aide","no-desc-cmd"))
+        desc = cmd.description.strip()
         if desc=='' and cmd.help!=None:
             desc = cmd.help.strip()
         desc, example, doc = await self.extract_info(desc)
+        if desc==None:
+            desc = await self.translate(ctx.channel,"aide","no-desc-cmd")
         # Prefix
         prefix = await self.bot.get_prefix(ctx.message)
         if type(prefix)==list:
