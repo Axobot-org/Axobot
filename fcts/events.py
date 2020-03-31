@@ -168,9 +168,9 @@ class Events(commands.Cog):
             _ = await self.bot.fetch_invite(msg.content)
         except:
             return
-        d = datetime.datetime.utcnow() - (await msg.channel.history(limit=2).flatten())[1].created_at
-        if d.total_seconds() > 600:
-            await msg.channel.send(await self.translate(msg.channel,"events","mp-adv"))
+        # d = datetime.datetime.utcnow() - (await msg.channel.history(limit=2).flatten())[1].created_at
+        # if d.total_seconds() > 600:
+        await msg.channel.send(await self.translate(msg.channel,"events","mp-adv"))
 
 
     async def send_logs_per_server(self,guild,Type,message,author=None):
