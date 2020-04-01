@@ -129,12 +129,21 @@ class Events(commands.Cog):
                 await msg.channel.send(random.choice(nudes_reacts))
             except:
                 pass
+        # Halloween event
         elif (msg.channel.id==635569244507209749 and random.random()<0.3) or (("booh" in msg.content.lower() or "halloween" in msg.content.lower() or "witch" in msg.content.lower()) and random.random()<0.05 and self.bot.current_event=="halloween"):
             try:
                 react = random.choice(['🦇','🎃','🕷️']*2+['👀'])
                 await msg.add_reaction(react)
             except:
                 pass
+        # April Fool event
+        elif random.random()<0.15 and self.bot.current_event=="fish":
+            try:
+                react = random.choice(['🐟','🎣', '🐠', '🐡']*4+['👀'])
+                await msg.add_reaction(react)
+            except:
+                pass
+            pass
         if msg.author.bot==False and await self.bot.cogs['AdminCog'].check_if_admin(msg.author) == False and msg.guild!=None:
             cond = True
             if self.bot.database_online:
