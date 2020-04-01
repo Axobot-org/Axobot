@@ -88,9 +88,8 @@ class FunCog(commands.Cog):
                 await ctx.send(await self.translate(ctx.channel,"fun","no-database"))
             return
         title = await self.translate(ctx.channel,"fun","fun-list")
-        if datetime.datetime.today().day==1:
+        if self.bot.current_event=="fish":
             title = ":fish: "+title
-            self.bot.fishes += 1
         text = str()
         for cmd in sorted(self.get_commands(),key=operator.attrgetter('name')):
             if cmd.name in cmds_list and cmd.enabled:
