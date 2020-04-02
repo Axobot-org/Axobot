@@ -651,14 +651,19 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
         use_embed = ctx.guild==None or ctx.channel.permissions_for(ctx.guild.me).embed_links
         # Servers list
         servers_in = list()
+        owned, membered = 0, 0
         for s in self.bot.guilds:
             if user in s.members:
                 if s.owner==user:
                     servers_in.append(":crown: "+s.name)
+                    owned += 1
                 else:
                     servers_in.append("- "+s.name)
+                    membered += 1
         if len(servers_in)==0:
             servers_in = ["No server"]
+        elif len("\n".join(servers_in)) > 1020:
+            servers_in = [f"{owned} serveurs possédés, membre sur {membered} autres serveurs"]
         # XP card
         xp_card = await self.bot.cogs['UtilitiesCog'].get_xp_style(user)
         # Perks

@@ -126,7 +126,7 @@ class zbot(commands.bot.BotBase,discord.Client):
     
     async def user_avatar_as(self,user,size=512):
         """Get the avatar of an user, format gif or png (as webp isn't supported by some browsers)"""
-        if not isinstance(user,(discord.User,discord.Member)):
+        if not isinstance(user,(discord.User,discord.Member,discord.ClientUser)):
             raise ValueError
         try:
             if user.is_avatar_animated():
