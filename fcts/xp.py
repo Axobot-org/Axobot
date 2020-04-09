@@ -806,13 +806,13 @@ class XPCog(commands.Cog):
         if await self.bot.cogs['ServerCog'].find_staff(ctx.guild.id,'xp_type')==0:
             return await ctx.send(await self.translate(ctx.guild.id,'xp','change-global-xp'))
         try:
-            await self.bdd_set_xp(user.id,xp,Type='set',guild=ctx.guild.id)
+            await self.bdd_set_xp(user.id, xp, Type='set', guild=ctx.guild.id)
             await ctx.send(await self.translate(ctx.guild.id,'xp','change-xp-ok',user=str(user),xp=xp))
         except Exception as e:
             await ctx.send(await self.translate(ctx.guild.id,'mc','serv-error'))
             await self.bot.cogs['ErrorsCog'].on_error(e,ctx)
-
-
+        else:
+            self.cache[ctx.guild.id][user.id] = [round(time.time()), xp]
 
     async def gen_rr_id(self):
         return round(time.time()/2)
