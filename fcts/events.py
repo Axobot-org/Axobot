@@ -1,6 +1,6 @@
 import discord, datetime, asyncio, logging, time, aiohttp, json, random, shutil
 from discord.ext import commands, tasks
-
+from fcts.checks import is_fun_enabled
 
 class Events(commands.Cog):
     """Cog for the management of major events that do not belong elsewhere. Like when a new server invites the bot."""
@@ -125,7 +125,7 @@ class Events(commands.Cog):
             try:
                 nudes_reacts = [':eyes:',':innocent:',':rolling_eyes:',':confused:',':smirk:']
                 if msg.guild==None or msg.channel.permissions_for(msg.guild.me).external_emojis:
-                    nudes_reacts += ['<:ThinkSmirk:485902639838789635>','<:whut:485924115199426600>','<:thinksmart:513105826530197514>','<:excusemewhat:418154673523130398>','<:blobthinking:499661417012527104>','<a:ano_U:568494122856611850>','<:catsmirk:523929843331498015>','<a:ablobno:537680872820965377>']
+                    nudes_reacts += ['<:whut:485924115199426600>','<:thinksmart:513105826530197514>','<:excusemewhat:418154673523130398>','<:blobthinking:499661417012527104>','<a:ano_U:568494122856611850>','<:catsmirk:523929843331498015>','<a:ablobno:537680872820965377>']
                 await msg.channel.send(random.choice(nudes_reacts))
             except:
                 pass
@@ -137,7 +137,7 @@ class Events(commands.Cog):
             except:
                 pass
         # April Fool event
-        elif random.random()<0.15 and self.bot.current_event=="fish":
+        elif random.random()<0.1 and self.bot.current_event=="fish" and is_fun_enabled(msg, self.bot.getCog("FunCog")):
             try:
                 react = random.choice(['🐟','🎣', '🐠', '🐡']*4+['👀'])
                 await msg.add_reaction(react)

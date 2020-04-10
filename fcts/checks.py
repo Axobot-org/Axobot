@@ -82,3 +82,25 @@ async def verify_role_exists(ctx:commands.Context):
 async def database_connected(ctx:commands.Context):
     "Check if the database is online and accessible"
     return ctx.bot.database_online
+
+async def is_fun_enabled(ctx,self=None):
+    if self == None:
+        if hasattr(ctx, 'bot'):
+            self = ctx.bot.getCog("FunCog")
+        else:
+            return False
+    if ctx.guild == None:
+        return True
+    if not ctx.bot.database_online and not ctx.guild.channels[0].permissions_for(ctx.author).manage_guild:
+        return False
+    ID = ctx.guild.id
+    if str(ID) not in self.fun_opt.keys():
+        fun = await ctx.bot.cogs["ServerCog"].find_staff(ID,"enable_fun")
+        self.fun_opt[str(ID)] = fun
+    else:
+        fun = self.fun_opt[str(ID)]
+        if fun==None:
+            fun = await ctx.bot.cogs["ServerCog"].find_staff(ID,"enable_fun")
+            if fun!=None:
+                self.fun_opt[str(ID)] = fun
+    return fun == 1 or fun == True

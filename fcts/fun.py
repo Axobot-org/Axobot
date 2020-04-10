@@ -8,26 +8,10 @@ from fcts import emojis, checks, args
 importlib.reload(emojis)
 importlib.reload(checks)
 importlib.reload(args)
+from fcts.checks import is_fun_enabled
 
 cmds_list = ['count_msg','ragequit','pong','run','nope','blame','party','bigtext','shrug','gg','money','pibkac','osekour','me','kill','cat','rekt','thanos','nuke','pikachu','pizza','google','loading','piece','roll','afk']
 
-async def is_fun_enabled(ctx):
-    self = ctx.bot.cogs["FunCog"]
-    if ctx.guild == None:
-        return True
-    if not ctx.bot.database_online and not ctx.guild.channels[0].permissions_for(ctx.author).manage_guild:
-        return False
-    ID = ctx.guild.id
-    if str(ID) not in self.fun_opt.keys():
-        fun = await ctx.bot.cogs["ServerCog"].find_staff(ID,"enable_fun")
-        self.fun_opt[str(ID)] = fun
-    else:
-        fun = self.fun_opt[str(ID)]
-        if fun==None:
-            fun = await ctx.bot.cogs["ServerCog"].find_staff(ID,"enable_fun")
-            if fun!=None:
-                self.fun_opt[str(ID)] = fun
-    return fun == 1 or fun == True
 
 async def can_say(ctx):
     if not ctx.bot.database_online:
