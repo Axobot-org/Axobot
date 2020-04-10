@@ -971,11 +971,14 @@ class EmojiCog(commands.Cog):
 		'loading':'<a:loading:589205493013151770>',
 		'deviant':'<:deviantart:626047669948776448>'}
 
-		r = requests.get("https://www.unicode.org/Public/emoji/11.0/emoji-test.txt")
-		self.unicode_list = list()
-		for x in r.text:
-			if x not in string.printable and x not in self.unicode_list:
-				self.unicode_list.append(x)
+		try:
+			r = requests.get("https://www.unicode.org/Public/emoji/11.0/emoji-test.txt")
+			self.unicode_list = list()
+			for x in r.text:
+				if x not in string.printable and x not in self.unicode_list:
+					self.unicode_list.append(x)
+		except requests.exceptions.ConnectionError:
+			pass
 	
 	async def anti_code(self,text):
 		for k,v in emojiMap.items():
