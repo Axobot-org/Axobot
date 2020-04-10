@@ -34,11 +34,15 @@ class user(commands.converter.UserConverter):
                     res = await ctx.bot.fetch_user(int(argument))
                 except:
                     pass
-            return res
-        try:
-            return await commands.MemberConverter().convert(ctx,argument)
-        except:
-            return await commands.UserConverter().convert(ctx,argument)
+            if res != None:
+                return res
+        else:
+            try:
+                return await commands.MemberConverter().convert(ctx,argument)
+            except:
+                return await commands.UserConverter().convert(ctx,argument)
+        if res == None:
+            raise commands.errors.BadArgument('User "{}" not found'.format(argument))
 
 class infoType(commands.Converter):
     def __init__(self):
