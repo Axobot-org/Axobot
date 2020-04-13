@@ -235,7 +235,7 @@ def main():
             client.log.warning("Impossible d'accéder à la dabatase locale - tentative via IP")
             cnx = mysql.connector.connect(user=client.database_keys['user'],password=client.database_keys['password'],host=client.database_keys['host'],database=client.database_keys['database1'])
         else:
-            client.log.info("Database connectée en vocal")
+            client.log.info("Database connectée en local")
             client.database_keys['host'] = '127.0.0.1'
         cnx.close()
     except Exception as e:
