@@ -972,7 +972,7 @@ class EmojiCog(commands.Cog):
 		'deviant':'<:deviantart:626047669948776448>'}
 
 		try:
-			r = requests.get("https://www.unicode.org/Public/emoji/11.0/emoji-test.txt")
+			r = requests.get("http://www.unicode.org/Public/emoji/13.0/emoji-test.txt")
 			self.unicode_list = list()
 			for x in r.text:
 				if x not in string.printable and x not in self.unicode_list:
