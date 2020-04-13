@@ -1,8 +1,8 @@
 import discord, datetime, sys, psutil, os, aiohttp, importlib, time, asyncio, typing, random, re, copy, requests
 from discord.ext import commands
 from inspect import signature
-from platform   import system as system_name  # Returns the system/OS name
-from subprocess import call   as system_call  # Execute a shell command
+from platform import system as system_name  # Returns the system/OS name
+from subprocess import call as system_call  # Execute a shell command
 
 default_color = discord.Color(0x50e3c2)
 
@@ -51,7 +51,7 @@ class InfoCog(commands.Cog):
                 for line in file.read().split("\n"):
                     if len(line.strip())>2 and line[0]!='#':
                         count += 1
-            for file in [x.file for x in self.bot.cogs.values()]+['args']:
+            for file in [x.file for x in self.bot.cogs.values()]+['args','checks']:
                 with open('fcts/'+file+'.py','r') as file:
                     for line in file.read().split("\n"):
                         if len(line.strip())>2 and line[0]!='#':
