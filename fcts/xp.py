@@ -796,15 +796,17 @@ class XPCog(commands.Cog):
                 done.append(f[0])
     
 
-    @commands.command(name='set_xp')
+    @commands.command(name='set_xp', aliases=["setxp", "set-xp"])
     @commands.guild_only()
     @commands.check(checks.has_admin)
     async def set_xp(self,ctx,xp:int,*,user:args.user):
         """Set the XP of a user"""
         if user.bot:
-            return await ctx.send(await self.translate(ctx.guild.id,'xp','no-bot'))
-        if await self.bot.cogs['ServerCog'].find_staff(ctx.guild.id,'xp_type')==0:
-            return await ctx.send(await self.translate(ctx.guild.id,'xp','change-global-xp'))
+            return await ctx.send(await self.translate(ctx.guild.id, 'xp', 'no-bot'))
+        if await self.bot.cogs['ServerCog'].find_staff(ctx.guild.id,'xp_type') == 0:
+            return await ctx.send(await self.translate(ctx.guild.id, 'xp', 'change-global-xp'))
+        if xp <= 0:
+            return await ctx.send(await self.translate(ctx.guild.id, 'xp', 'negative-xp'))
         try:
             await self.bdd_set_xp(user.id, xp, Type='set', guild=ctx.guild.id)
             await ctx.send(await self.translate(ctx.guild.id,'xp','change-xp-ok',user=str(user),xp=xp))
