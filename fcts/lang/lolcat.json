@@ -339,6 +339,7 @@
         "bitly_long": "Slow link: {url}",
         "bitly_nobit": "HAHA NOPE, dat's not a bit.ly link!",
         "bitly_short": "Quick linq: {url}",
+        "botinvite": "Hers a link 2 invite me 2 'nother warm place: {url}\nDon't hesitate to test my cool `about` cmd 4 + useful links!",
         "changelog-notfound": "Srry but i cannot find das version",
         "changelogs-index": "List of indexed versions",
         "discordlinks": [
@@ -1116,6 +1117,7 @@
             "this cool thing"
         ],
         "low-page": "Oops, I can't display a negative page!",
+        "negative-xp": "Plz dont be such negativ, positiv is lif bro",
         "no-bot": "Impossible 2 modify the XP ov a robot!",
         "no-rr": "None role is configured for this level",
         "rr-added": "Role `{}` haz been added 4 level {} !",

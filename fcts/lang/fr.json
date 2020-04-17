@@ -339,6 +339,7 @@
         "bitly_long": "URL d'origine : {url}",
         "bitly_nobit": "Cette adresse n'est pas un lien bit.ly !",
         "bitly_short": "URL raccourcie : {url}",
+        "botinvite": "Voici un lien pour m'inviter dans un autre serveur : {url}\nN'hésitez pas à tester la commande `about` pour plus de liens utiles !",
         "changelog-notfound": "Impossible de trouver cette version",
         "changelogs-index": "Liste des versions indexées",
         "discordlinks": [
@@ -1116,6 +1117,7 @@
             "ce caillou"
         ],
         "low-page": "Impossible d'afficher un numéro de page négatif !",
+        "negative-xp": "Vous ne pouvez pas mettre un nombre d'xp négatif !",
         "no-bot": "Impossible de modifier l'XP d'un bot !",
         "no-rr": "Aucun rôle n'a été configuré pour ce niveau",
         "rr-added": "Le rôle `{}` a correctement été ajouté pour le niveau {} !",

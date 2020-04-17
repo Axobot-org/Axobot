@@ -339,6 +339,7 @@
         "bitly_long": "Original URL: {url}",
         "bitly_nobit": "This address is not a bit.ly link!",
         "bitly_short": "Shortened URL: {url}",
+        "botinvite": "Here is a link to invite me to another server: {url}\nDon't hesitate to test the `about` command for more useful links!",
         "changelog-notfound": "Unable to find this version",
         "changelogs-index": "List of indexed versions",
         "discordlinks": [
@@ -1116,6 +1117,7 @@
             "this rock"
         ],
         "low-page": "I cannot display a negative page number!",
+        "negative-xp": "You can't put a negative xp number!",
         "no-bot": "Impossible to modify the XP of a bot!",
         "no-rr": "No role has been configured for this level",
         "rr-added": "The role `{}` has been correctly added for level {}!",
