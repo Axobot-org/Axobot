@@ -1,4 +1,4 @@
-import discord, datetime, asyncio, logging, time, aiohttp, json, random, shutil
+import discord, datetime, asyncio, logging, time, aiohttp, json, random, shutil, mysql
 from discord.ext import commands, tasks
 from fcts.checks import is_fun_enabled
 
@@ -56,15 +56,24 @@ class Events(commands.Cog):
             config_option = await self.bot.cogs['UtilitiesCog'].get_db_userinfo(['allow_usernames_logs'],["userID="+str(before.id)])
             if config_option != None and config_option['allow_usernames_logs']==False:
                 return
-            cnx = self.bot.cnx_frm
-            cursor = cnx.cursor()
-            ID = round(time.time()/2) * 10 + random.randrange(0,9)
-            b = '' if before.nick==None else before.nick.replace("'","\\'")
-            a = '' if after.nick==None else after.nick.replace("'","\\'")
-            query = ("INSERT INTO `usernames_logs` (`ID`,`user`,`old`,`new`,`guild`,`beta`) VALUES ('{}','{}','{}','{}','{}',{})".format(ID,before.id,b,a,before.guild.id,self.bot.beta))
+            await self.updade_memberslogs_name(before, after)
+
+    async def updade_memberslogs_name(self, before:discord.Member, after:discord.Member, tries:int=0):
+        if tries>5:
+            return
+        cnx = self.bot.cnx_frm
+        cursor = cnx.cursor()
+        ID = round(time.time()/2) * 10 + random.randrange(0,9)
+        b = '' if before.nick==None else before.nick.replace("'","\\'")
+        a = '' if after.nick==None else after.nick.replace("'","\\'")
+        query = ("INSERT INTO `usernames_logs` (`ID`,`user`,`old`,`new`,`guild`,`beta`) VALUES ('{}','{}','{}','{}','{}',{})".format(ID,before.id,b,a,before.guild.id,self.bot.beta))
+        try:
             cursor.execute(query)
             cnx.commit()
             cursor.close()
+        except mysql.connector.errors.IntegrityError as e:
+            self.bot.log.warn(e)
+            await self.updade_memberslogs_name(before, after, tries+1)
 
     @commands.Cog.listener()
     async def on_user_update(self,before:discord.User,after:discord.User):
