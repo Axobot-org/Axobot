@@ -853,6 +853,9 @@ class RssCog(commands.Cog):
         try:
             return [x for x in self.twitterAPI.GetUserTimeline(screen_name=nom,exclude_replies=True,trim_user=True,count=count)]
         except twitter.error.TwitterError as e:
+            if str(e) == "Not authorized.":
+                self.bot.log.warn(f"[rss] Unable to reach channel {nom}: Not authorized")
+                return []
             try:
                 if e.message[0]['code'] == 130: # Over capacity - Corresponds with HTTP 503. Twitter is temporarily over capacity.
                     return e
