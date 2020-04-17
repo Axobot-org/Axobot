@@ -126,7 +126,17 @@ class InfoCog(commands.Cog):
         members = [x.members for x in self.bot.guilds if x.id not in ignored_guilds]
         members = list(set([x for x in members for x in x])) # filter users
         return len(members),len([x for x in members if x.bot])
-
+    
+    @commands.command(name="botinvite", aliases=["botinv"])
+    async def botinvite(self, ctx:commands.Context):
+        """Get a link to invite me"""
+        try:
+            requests.get("https://zrunner.me/invitezbot", timeout=3)
+        except requests.exceptions.Timeout:
+            url = "https://discordapp.com/oauth2/authorize?client_id=486896267788812288&scope=bot"
+        else:
+            url = "https://zrunner.me/invitezbot"
+        await ctx.send(await self.translate(ctx.channel, "infos", "botinvite", url=url))
 
     @commands.command(name="ping",aliases=['rep'])
     async def rep(self,ctx,ip=None):
