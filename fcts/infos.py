@@ -481,7 +481,7 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
         embed.set_thumbnail(url=icon_url)
         # Guild banner
         if guild.banner != None:
-            embed.set_image(url=guild.banner)
+            embed.set_image(url=guild.banner_url)
         # Name
         embed.add_field(name=str(await self.translate(ctx.guild.id,"keywords","nom")).capitalize(), value=guild.name,inline=True)
         # ID
