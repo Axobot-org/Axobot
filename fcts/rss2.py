@@ -895,9 +895,9 @@ class RssCog(commands.Cog):
         if len(entries)==0:
             return await self.translate(guild,"rss","nothing")
         if len(entries)>1:
-            while feeds.entries[0]['published_parsed'] < feeds.entries[1]['published_parsed']:
-                del feeds.entries[0]
-                if len(feeds.entries)==1:
+            while entries[0]['published_parsed'] < entries[1]['published_parsed']:
+                del entries[0]
+                if len(entries)==1:
                     break
         if not date:
             feed = entries[0]
