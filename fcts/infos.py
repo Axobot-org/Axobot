@@ -937,7 +937,7 @@ Servers:
     @get_prefix.command(name="change")
     @commands.guild_only()
     async def prefix_change(self,ctx,new_prefix):
-        """Change the user prefix"""
+        """Change the used prefix"""
         msg = copy.copy(ctx.message)
         msg.content = ctx.prefix + 'config change prefix '+new_prefix
         new_ctx = await self.bot.get_context(msg)
