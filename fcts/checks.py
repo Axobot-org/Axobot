@@ -86,7 +86,7 @@ async def database_connected(ctx:commands.Context):
 async def is_fun_enabled(ctx,self=None):
     if self == None:
         if hasattr(ctx, 'bot'):
-            self = ctx.bot.getCog("FunCog")
+            self = ctx.bot.get_cog("FunCog")
         else:
             return False
     if ctx.guild == None:
