@@ -240,7 +240,6 @@
     },
     "fun": {
         "afk-done": "Artık AFK'sın",
-        "afk-no-perm": "Hay aksi, adını değiştiremiyorum 😕",
         "afk-user-1": "Bu üye {} nedeniyle AFK",
         "afk-user-2": "Bu kullanıcı AFK!",
         "blame-0": "**{}** için geçerli olan tüm isimlerin listesi",

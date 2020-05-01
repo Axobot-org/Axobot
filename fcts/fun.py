@@ -493,9 +493,9 @@ You can specify a verification limit by adding a number in argument (up to 1.000
         You'll get a nice nickname, because nicknames are cool, aren't they?"""
         try:
             reason = await self.bot.cogs['UtilitiesCog'].clear_msg(reason,ctx.message.mention_everyone,ctx)
+            self.afk_guys[ctx.author.id] = reason
             if (not ctx.author.display_name.endswith(' [AFK]')) and len(ctx.author.display_name)<26:
                 await ctx.author.edit(nick=ctx.author.display_name+" [AFK]")
-            self.afk_guys[ctx.author.id] = reason
             await ctx.send(await self.translate(ctx.guild.id,"fun","afk-done"))
         except discord.errors.Forbidden:
             return await ctx.send(await self.translate(ctx.guild.id,"fun","afk-no-perm"))
@@ -506,25 +506,29 @@ You can specify a verification limit by adding a number in argument (up to 1.000
     async def unafk(self,ctx):
         """Remove you from the AFK system
         Welcome back dude"""
-        try:
-            await ctx.author.edit(nick=ctx.author.display_name.replace(" [AFK]",''))
-            if ctx.author.id in self.afk_guys.keys():
-                del self.afk_guys[ctx.author.id]
-                await ctx.send(await self.translate(ctx.guild.id,"fun","unafk-done"))
-        except discord.errors.Forbidden:
-            return await ctx.send(await self.translate(ctx.guild.id,"fun","afk-no-perm"))
+        if ctx.author.id in self.afk_guys.keys():
+            del self.afk_guys[ctx.author.id]
+            await ctx.send(await self.translate(ctx.guild.id,"fun","unafk-done"))
+            try:
+                await ctx.author.edit(nick=ctx.author.display_name.replace(" [AFK]",''))                
+            except discord.errors.Forbidden:
+                pass
     
     async def check_afk(self,msg:discord.Message):
         """Check if someone pinged is afk"""
         ctx = await self.bot.get_context(msg)
         for member in msg.mentions:
-            if member.display_name.endswith(' [AFK]') and member!=msg.author:
+            c = member.display_name.endswith(' [AFK]') or member.id in self.afk_guys.keys()
+            if c and member!=msg.author:
                 if member.id not in self.afk_guys or len(self.afk_guys[member.id])==0:
                     await msg.channel.send(await self.translate(msg.guild.id,"fun","afk-user-2"))
                 else:
                     reason = await self.bot.cogs['UtilitiesCog'].clear_msg(str(await self.translate(msg.guild.id,"fun","afk-user-1")).format(self.afk_guys[member.id]),everyone=True,ctx=ctx)
                     await msg.channel.send(reason)
-        if ctx.author.display_name.endswith(' [AFK]'):
+        if (not await checks.is_a_cmd(msg, self.bot)) and (ctx.author.display_name.endswith(' [AFK]') or ctx.author.id in self.afk_guys.keys()):
+            auto_enabled = await self.bot.cogs['UtilitiesCog'].get_db_userinfo(["auto_unafk"],[f'`userID`={ctx.author.id}'])
+            if auto_enabled:
+                return
             msg = copy.copy(msg)
             msg.content = (await self.bot.get_prefix(msg))[-1] + 'unafk'
             new_ctx = await self.bot.get_context(msg)

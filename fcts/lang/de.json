@@ -240,7 +240,6 @@
     },
     "fun": {
         "afk-done": "Du bist jetzt AFK",
-        "afk-no-perm": "Oops, ich kann deinen Nicknamen nicht ändern :confused:",
         "afk-user-1": "Dieses Mitglied ist AFK, da {}",
         "afk-user-2": "Dieser Nutzer ist AFK!",
         "blame-0": "Liste möglicher Namen für **{}**",

@@ -243,7 +243,7 @@
     },
     "fun": {
         "afk-done": "Vous êtes maintenant AFK",
-        "afk-no-perm": "Oops, je ne peux pas modifier votre pseudo :confused:",
+        "afk-no-perm": "Oops, je ne peux pas modifier votre pseudo :confused: Je vais essayer de m'en souvenir, mais il se peut que j'oublie que vous êtes AFK",
         "afk-user-1": "Ce membre est AFK, pour la raison {}",
         "afk-user-2": "Ce membre est AFK !",
         "blame-0": "Liste des noms disponibles pour le membre **{}**",

@@ -243,7 +243,7 @@
     },
     "fun": {
         "afk-done": "You are now AFK",
-        "afk-no-perm": "Oops, I cannot change your nickname :confused:",
+        "afk-no-perm": "Oops, I cannot change your nickname :confused: I will try to remember, but I could forget that you're afk",
         "afk-user-1": "This member is AFK, because {}",
         "afk-user-2": "This user is AFK!",
         "blame-0": "List of available names for **{}**",

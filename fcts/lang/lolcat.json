@@ -243,7 +243,7 @@
     },
     "fun": {
         "afk-done": "U'r now AFK",
-        "afk-no-perm": "Oops, I can't change Ur nickname :confused:",
+        "afk-no-perm": "Oops, I can't change Ur nickname :confused: I'll try to remember :/",
         "afk-user-1": "Taht member iz AFK, 'cuz {}",
         "afk-user-2": "This usr is AFK!",
         "blame-0": "Lizt ov availabl namz 4 **{}**",

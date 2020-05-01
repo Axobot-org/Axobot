@@ -243,7 +243,6 @@
     },
     "fun": {
         "afk-done": "Sinä olet nyt AFK:illa",
-        "afk-no-perm": "Ups, en voi vaihtaa nimimerkkiäsi :confused:",
         "afk-user-1": "Tämä jäsen on AFK:illa koska, {}",
         "afk-user-2": "Tämä jäsen on AFK:illa!",
         "blame-0": "Lista kaikista käytettävistä nimistä**{}**:lle",

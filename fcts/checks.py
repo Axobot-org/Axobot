@@ -104,3 +104,11 @@ async def is_fun_enabled(ctx,self=None):
             if fun!=None:
                 self.fun_opt[str(ID)] = fun
     return fun == 1 or fun == True
+
+async def is_a_cmd(msg: discord.Message, bot: commands.Bot) -> bool:
+    "Check if a message is a command"
+    pr = await bot.get_prefix(msg)
+    is_cmd = False
+    for p in pr:
+        is_cmd = is_cmd or msg.content.startswith(p)
+    return is_cmd
