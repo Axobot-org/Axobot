@@ -47,32 +47,46 @@ class PermsCog(commands.Cog):
         permsl = list()
         # Get the perms translations
         perms_translations = await self.translate(ctx.guild.id,'perms','perms-list')
-        # Here we check if the value of each permission is True.
-        for perm, value in perms:
-            if (perm not in self.perms_name['text']+self.perms_name['common_channel'] and isinstance(channel,discord.TextChannel)) or (perm not in self.perms_name['voice']+self.perms_name['common_channel'] and isinstance(channel,discord.VoiceChannel)):
-                continue
-            #perm = perm.replace('_',' ').title()
-            if perm in perms_translations.keys():
-                perm = perms_translations[perm]
+
+        # if perms[""]
+        if perms.administrator:
+            # If the user is admin, we just say it
+            if "administrator" in perms_translations.keys():
+                perm = perms_translations["administrator"]
             else:
-                perm = perm.replace('_',' ').title()
-            if value:
-                permsl.append(self.bot.cogs['EmojiCog'].customEmojis['green_check']+perm)
-            else:
-                permsl.append(self.bot.cogs['EmojiCog'].customEmojis['red_cross']+perm)
+                perm = "Administrator"
+            permsl.append(self.bot.cogs['EmojiCog'].customEmojis['green_check']+perm)
+        else:
+            # Here we check if the value of each permission is True.
+            for perm, value in perms:
+                if (perm not in self.perms_name['text']+self.perms_name['common_channel'] and isinstance(channel,discord.TextChannel)) or (perm not in self.perms_name['voice']+self.perms_name['common_channel'] and isinstance(channel,discord.VoiceChannel)):
+                    continue
+                #perm = perm.replace('_',' ').title()
+                if perm in perms_translations.keys():
+                    perm = perms_translations[perm]
+                else:
+                    perm = perm.replace('_',' ').title()
+                if value:
+                    permsl.append(self.bot.cogs['EmojiCog'].customEmojis['green_check']+perm)
+                else:
+                    permsl.append(self.bot.cogs['EmojiCog'].customEmojis['red_cross']+perm)
         if ctx.channel.permissions_for(ctx.guild.me).embed_links:
             # \uFEFF is a Zero-Width Space, which basically allows us to have an empty field name.
-            sep = int(len(permsl)/2)
-            if len(permsl)%2 == 1:
-                sep+=1
             # And to make it look nice, we wrap it in an Embed.
-            f1 = {'name':'\uFEFF','value':"\n".join(permsl[:sep]),'inline':True}
-            f2 = {'name':'\uFEFF','value':"\n".join(permsl[sep:]),'inline':True}
+            if len(permsl)>10:
+                sep = int(len(permsl)/2)
+                if len(permsl)%2 == 1:
+                    sep+=1
+                f1 = {'name':'\uFEFF','value':"\n".join(permsl[:sep]),'inline':True}
+                f2 = {'name':'\uFEFF','value':"\n".join(permsl[sep:]),'inline':True}
+                fields = [f1,f2]
+            else:
+                fields = [{'name':'\uFEFF','value':"\n".join(permsl),'inline':True}]
             if channel==None:
                 desc = await self.translate(ctx.guild.id,'perms','general')
             else:
                 desc = channel.mention
-            embed = await ctx.bot.cogs['EmbedCog'].Embed(color=col,fields=[f1,f2],desc=desc).create_footer(ctx)
+            embed = await ctx.bot.cogs['EmbedCog'].Embed(color=col,fields=fields,desc=desc).create_footer(ctx)
             embed.author_name = name
             embed.author_icon = avatar
             await ctx.send(embed=embed.discord_embed())
