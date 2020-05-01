@@ -147,7 +147,7 @@ This information on partners is refreshed every 7 hours, starting at 1am (Paris 
 Add a partner
 -------------
 
-**Syntax:**:code:`partner add <invite> [description]`
+**Syntax:** :code:`partner add <invite> [description]`
 
 Allows you to add a server or bot to your partner list. The invitation must be either a server invitation (starting with discord.gg) or a bot invitation (discordapp.com/oauth). This invitation will be used to synchronize the partner, so make sure it does not expire.
 
@@ -155,7 +155,7 @@ Allows you to add a server or bot to your partner list. The invitation must be e
 Change the embed color
 ----------------------
 
-**Syntax:**:code:`partner color <new color>`
+**Syntax:** :code:`partner color <new color>`
 
 Modifies the color of the partner embed, i. e. the color of the bar to the left of the presentations. An alias exists with the subcommand "colour".
 
@@ -163,7 +163,7 @@ Modifies the color of the partner embed, i. e. the color of the bar to the left 
 Modify a description
 --------------------
 
-**Syntax:**:code:`partner description <ID> <new message>`
+**Syntax:** :code:`partner description <ID> <new message>`
 
 Adds or modifies the description of a partner. The identifier must be that of the partnership, obtainable via the command `partners list` or under the embed displayed in the partners' lounge.
 
@@ -171,7 +171,7 @@ Adds or modifies the description of a partner. The identifier must be that of th
 Change a server invite
 ----------------------
 
-**Syntax:**:code:`partner invite <ID> [new invite]`
+**Syntax:** :code:`partner invite <ID> [new invite]`
 
 It often happens that for X reason an invitation becomes invalid. Problem: Zbot uses the partner invitation to synchronize partners with the channel. There is therefore a command to quickly change the invitation of a server. 
 
@@ -181,7 +181,7 @@ It often happens that for X reason an invitation becomes invalid. Problem: Zbot 
 List every partners
 -------------------
 
-**Syntax:**:code:`partners list`
+**Syntax:** :code:`partners list`
 
 Lists all the partners that your server currently has. The bot will display the name of the partner, the type (server or bot), and the date of addition. You will even have the list of servers that have added you as a partner!
 
@@ -191,7 +191,7 @@ Lists all the partners that your server currently has. The bot will display the 
 Reload your list
 ----------------
 
-**Syntax:**:code:`partner reload`
+**Syntax:** :code:`partner reload`
 
 Allows you to remove a partner from the list. You will be asked for a confirmation, to avoid misuse. Once a partner is removed, you must reconfigure it completely if you want to put it back into the channel.
 
@@ -199,6 +199,31 @@ Allows you to remove a partner from the list. You will be asked for a confirmati
 Remove a partner
 ----------------
 
-**Syntax:**:code:`partner remove <ID>`
+**Syntax:** :code:`partner remove <ID>`
 
 Allows you to remove a partner from the list. You will be asked for a confirmation, to avoid misuse. Once a partner is removed, you must reconfigure it completely if you want to put it back into the channel.
+
+-------------
+Server backup
+-------------
+
+Zbot has a system to backup your server, saving your roles, channels, emojis, webhooks, icons, permissions, and much more. You will also find in this file the list of members and their permissions, although Zbot is not able to reinvite members if needed.  
+This backup will avoid the most important damage, those little mistakes that can destroy your server as I myself experienced a few years ago. I hope to be able to save what is important to you.
+
+When you load the backup, the bot may not be able to apply some changes. However, it will give you a complete list of what has and hasn't been changed so that you can fix it yourself.
+
+.. warning:: The bot will need as many permissions as possible, which includes: Manage Roles, Manage Channels, Manage Webhooks, Ban Members, Manage Emojis.
+
+Create a backup
+---------------
+
+**Syntax:** :code:`backup create`
+
+Creates a file containing as much information as possible on your server, within the limit of the permissions granted to the bot. You will have to keep this file carefully, it will be necessary for you when you will want to restore the backup.
+
+Load a backup
+-------------
+
+**Syntax:** :code:`backup load`
+
+Uses the file attached to this message to load a backup, based on the data stored in the file. Be sure to send the file in the same message as the command, so that Zbot can easily find it. If the bot lacks permissions, it will try to skip this step and write it down in the logs. The set of logs is then sent at the end of the procedure.
