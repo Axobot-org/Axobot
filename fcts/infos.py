@@ -911,9 +911,6 @@ Servers:
         (await self.translate(ctx.guild.id,"infos_2","membercount-2"),"{} ({}%)".format(h,int(round(h*100/total,0)))),
         (await self.translate(ctx.guild.id,"infos_2","membercount-1"),"{} ({}%)".format(bots,int(round(bots*100/total,0)))),
         (await self.translate(ctx.guild.id,"infos_2","membercount-3"),"{} ({}%)".format(c_co,int(round(c_co*100/total,0))))]
-        if datetime.datetime.today().day==1:
-            self.bot.fishes += 1
-            l.append((await self.translate(ctx.guild.id,"infos_2","fish-1"),"{} {}".format(random.randrange(100),random.choice([':fish:',':tropical_fish:','']))))
         if ctx.channel.permissions_for(ctx.guild.me).embed_links:
             embed = discord.Embed(colour=ctx.guild.me.color)
             for i in l:

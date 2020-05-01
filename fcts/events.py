@@ -146,7 +146,7 @@ class Events(commands.Cog):
             except:
                 pass
         # April Fool event
-        elif random.random()<0.1 and self.bot.current_event=="fish" and is_fun_enabled(msg, self.bot.getCog("FunCog")):
+        elif random.random()<0.1 and self.bot.current_event=="fish" and is_fun_enabled(msg, self.bot.get_cog("FunCog")):
             try:
                 react = random.choice(['🐟','🎣', '🐠', '🐡']*4+['👀'])
                 await msg.add_reaction(react)
@@ -459,22 +459,13 @@ class Events(commands.Cog):
             await self.bot.cogs['ErrorsCog'].on_error(e,None)
             guildCount = len(self.bot.guilds)
         session = aiohttp.ClientSession(loop=self.bot.loop)
-        # https://top.gg/bot/486896267788812288
-        payload = {'server_count': guildCount}
-        async with session.post('https://top.gg/api/bots/486896267788812288/stats',data=payload,headers={'Authorization':str(self.bot.dbl_token)}) as resp:
-            self.bot.log.debug('discordbots.org returned {} for {}'.format(resp.status, payload))
-            answers[0] = resp.status
-        # https://divinediscordbots.com/bot/486896267788812288
-        payload = json.dumps({
-          'server_count': guildCount
-          })
-        headers = {
-              'authorization': self.bot.others['divinediscordbots'],
-              'content-type': 'application/json'
-        }
-        async with session.post('https://divinediscordbots.com/bot/{}/stats'.format(self.bot.user.id), data=payload, headers=headers) as resp:
-              self.bot.log.debug('divinediscordbots statistics returned {} for {}'.format(resp.status, payload))
-              answers[1] = resp.status
+        try:# https://top.gg/bot/486896267788812288
+            payload = {'server_count': guildCount}
+            async with session.post('https://top.gg/api/bots/486896267788812288/stats',data=payload,headers={'Authorization':str(self.bot.dbl_token)}) as resp:
+                self.bot.log.debug('discordbots.org returned {} for {}'.format(resp.status, payload))
+                answers[0] = resp.status
+        except ConnectionRefusedError:
+            answers[0] = "0"
         # https://bots.ondiscord.xyz/bots/486896267788812288
         payload = json.dumps({
           'guildCount': guildCount
