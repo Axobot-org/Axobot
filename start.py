@@ -161,7 +161,7 @@ def get_prefix(bot,msg):
     else:
         prefixes = ['!']
     if msg.guild==None:
-        prefixes.append(" ")
+        prefixes.append("")
     return commands.when_mentioned_or(*prefixes)(bot,msg)
 
 
