@@ -18,6 +18,7 @@ class Events(commands.Cog):
         self.last_eventDay_check = datetime.datetime.utcfromtimestamp(0)
         self.statslogs_last_push = datetime.datetime.utcfromtimestamp(0)
         self.loop_errors = [0,datetime.datetime.utcfromtimestamp(0)]
+        self.latencies_list = list()
         self.embed_colors = {"welcome":5301186,
         "mute":4868682,
         "kick":16730625,
@@ -36,6 +37,7 @@ class Events(commands.Cog):
             'channel':45,
             'role':60,
             'guild':75}
+        self.statuspage_header = {"Content-Type": "application/json", "Authorization": "OAuth " + self.bot.others["statuspage"]}
         bot.add_listener(self.on_new_message,'on_message')
 
 
@@ -432,6 +434,20 @@ class Events(commands.Cog):
         await asyncio.sleep(2)
         await self.rss_loop()
         self.bot.log.info("[tasks_loop] Lancement de la boucle")
+
+
+    async def status_loop(self, d:datetime.datetime):
+        "Send average latency to zbot.statuspage.io"
+        if self.bot.beta:
+            return
+        self.latencies_list.append(round(self.bot.latency*1000))
+        if d.second == 0:
+            average = round(sum(self.latencies_list)/len(self.latencies_list))
+            params = {"data": {"timestamp": round(d.timestamp()), "value":average}}
+            async with aiohttp.ClientSession(loop=self.bot.loop, headers=self.statuspage_header) as session:
+                async with session.post("https://api.statuspage.io/v1/pages/g9cnphg3mhm9/metrics/x4xs4clhkmz0/data", json=params) as r:
+                    r.raise_for_status()
+                    self.bot.debug(f"StatusPage API returned {r.status} for {params}")
 
 
     async def rss_loop(self):
