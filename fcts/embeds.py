@@ -1,7 +1,7 @@
 import datetime, discord, requests, typing
 from discord.ext import commands
 
-url_base = 'https://discordapp.com/api/webhooks/'
+url_base = 'https://discord.com/api/webhooks/'
 
 class EmbedCog(commands.Cog):
     """Cog for the management of the embeds. No more, no less."""

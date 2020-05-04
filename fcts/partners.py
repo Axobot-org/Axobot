@@ -167,7 +167,7 @@ class PartnersCog(commands.Cog):
                     field1 = None
                     image = str(await self.bot.user_avatar_as(await self.bot.fetch_user(int(partner['target']))))
                     await self.bot.cogs["ErrorsCog"].on_error(e,None)
-                field2 = {'name':tr_invite.capitalize(),'value':'[Click here](https://discordapp.com/oauth2/authorize?client_id={}&scope=bot&permissions=2113273087)'.format(partner['target'])}
+                field2 = {'name':tr_invite.capitalize(),'value':'[Click here](https://discord.com/oauth2/authorize?client_id={}&scope=bot&permissions=2113273087)'.format(partner['target'])}
             else:
                 title = "**{}** ".format(tr_guild.capitalize())
                 try:

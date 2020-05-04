@@ -149,7 +149,7 @@ Add a partner
 
 **Syntax:** :code:`partner add <invite> [description]`
 
-Allows you to add a server or bot to your partner list. The invitation must be either a server invitation (starting with discord.gg) or a bot invitation (discordapp.com/oauth). This invitation will be used to synchronize the partner, so make sure it does not expire.
+Allows you to add a server or bot to your partner list. The invitation must be either a server invitation (starting with discord.gg) or a bot invitation (discord.com/oauth). This invitation will be used to synchronize the partner, so make sure it does not expire.
 
 
 Change the embed color

@@ -194,7 +194,7 @@ class UtilitiesCog(commands.Cog):
         return re.search(ch,text)
 
     async def check_discord_invite(self,text):
-        ch = r"((?:discord\.gg|discordapp.com/invite|discord.me)/.+)"
+        ch = r"((?:discord\.gg|discord(?:app)?.com/invite|discord.me)/.+)"
         return re.search(ch,text)
 
     def sync_check_any_link(self,text):
@@ -202,7 +202,7 @@ class UtilitiesCog(commands.Cog):
         return re.search(ch,text)
 
     def sync_check_discord_invite(self,text):
-        ch = r"((?:discord\.gg|discordapp.com/invite|discord.me)/.+)"
+        ch = r"((?:discord\.gg|discord(?:app)?.com/invite|discord.me)/.+)"
         return re.search(ch,text)
 
     async def clear_msg(self,text:str,everyone=True,ctx=None):

@@ -133,7 +133,7 @@ class InfoCog(commands.Cog):
         try:
             requests.get("https://zrunner.me/invitezbot", timeout=3)
         except requests.exceptions.Timeout:
-            url = "https://discordapp.com/oauth2/authorize?client_id=486896267788812288&scope=bot"
+            url = "https://discord.com/oauth2/authorize?client_id=486896267788812288&scope=bot"
         else:
             url = "https://zrunner.me/invitezbot"
         await ctx.send(await self.translate(ctx.channel, "infos", "botinvite", url=url))
@@ -949,7 +949,7 @@ Servers:
         can_embed = True if isinstance(ctx.channel,discord.DMChannel) else ctx.channel.permissions_for(ctx.guild.me).embed_links
         if can_embed:
             l = await self.translate(ctx.channel,'infos','discordlinks')
-            links = ["https://dis.gd/status","https://dis.gd/tos","https://dis.gd/report","https://dis.gd/feedback","https://support.discordapp.com/hc/en-us/articles/115002192352","https://discordapp.com/developers/docs/legal","https://support.discordapp.com/hc/en-us/articles/206346498-Where-can-I-find-my-User-Server-Message-ID-"]
+            links = ["https://dis.gd/status","https://dis.gd/tos","https://dis.gd/report","https://dis.gd/feedback","https://support.discord.com/hc/en-us/articles/115002192352","https://discord.com/developers/docs/legal","https://support.discord.com/hc/en-us/articles/206346498-Where-can-I-find-my-User-Server-Message-ID-"]
             txt = "\n".join(['['+l[i]+']('+links[i]+')' for i in range(len(l))])
             em = await self.bot.cogs["EmbedCog"].Embed(desc=txt).update_timestamp().create_footer(ctx)
             await ctx.send(embed=em)
