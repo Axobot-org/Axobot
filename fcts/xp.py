@@ -305,9 +305,9 @@ class XPCog(commands.Cog):
             if not self.bot.database_online:
                 self.bot.unload_extension("fcts.xp")
                 return None
-            if points==0:
+            if points < 0:
                 return True
-            if guild==None:
+            if guild == None:
                 cnx = self.bot.cnx_frm
             else:
                 cnx = self.bot.cnx_xp
@@ -805,7 +805,7 @@ class XPCog(commands.Cog):
             return await ctx.send(await self.translate(ctx.guild.id, 'xp', 'no-bot'))
         if await self.bot.cogs['ServerCog'].find_staff(ctx.guild.id,'xp_type') == 0:
             return await ctx.send(await self.translate(ctx.guild.id, 'xp', 'change-global-xp'))
-        if xp <= 0:
+        if xp < 0:
             return await ctx.send(await self.translate(ctx.guild.id, 'xp', 'negative-xp'))
         try:
             await self.bdd_set_xp(user.id, xp, Type='set', guild=ctx.guild.id)
