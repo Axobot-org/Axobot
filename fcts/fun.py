@@ -572,20 +572,6 @@ You can specify a verification limit by adding a number in argument (up to 1.000
             if isinstance(e,discord.errors.HTTPException) and "In embed.thumbnail.url: Not a well formed URL" in str(e):
                 return await ctx.send("invalid image")
             await ctx.send(str(await self.translate(ctx.channel,"fun","embed-error")).format(e))
-    
-
-    @commands.command(name='camlink')
-    @commands.guild_only()
-    async def camlink(self,ctx):
-        """Give an URL to share your screen in a vocal channel
-        You must be in a vocal channel to run this command"""
-        voicestate = ctx.author.voice
-        if voicestate==None:
-            return await ctx.send(await self.translate(ctx.guild.id,'fun','no-voicechan'))
-        txt = f"{voicestate.channel.mention} : https://api.discordapp.com/channels/{ctx.guild.id}/{voicestate.channel.id}"
-        if not voicestate.channel.permissions_for(ctx.author).stream:
-            txt += "\n"+await self.translate(ctx.guild.id,'fun','cant-stream')
-        await ctx.send(txt)
 
 
     async def add_vote(self,msg):
