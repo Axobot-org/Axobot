@@ -74,7 +74,7 @@ Every information come from the website www.fr-minecraft.net"""
         return
 
     @mc_main.command(name="block",aliases=["bloc"])
-    async def mc_block(self,ctx,value='help'):
+    async def mc_block(self,ctx,*,value='help'):
         """Get infos about any block"""
         if value=='help':
             await ctx.send(await self.translate(ctx.channel,"mc","block-help"))
@@ -102,7 +102,7 @@ Every information come from the website www.fr-minecraft.net"""
             await ctx.send(await self.translate(ctx.channel,"mc","no-entity"))
 
     @mc_main.command(name="entity",aliases=["entité","mob"])
-    async def mc_entity(self,ctx,value='help'):
+    async def mc_entity(self,ctx,*,value='help'):
         """Get infos about any entity"""
         if value=='help':
             await ctx.send(await self.translate(ctx.channel,"mc","entity-help"))
@@ -132,7 +132,7 @@ Every information come from the website www.fr-minecraft.net"""
             await ctx.send(await self.translate(ctx.channel,"mc","no-entity"))
     
     @mc_main.command(name="item",aliases=['object'])
-    async def mc_item(self,ctx,value='help'):
+    async def mc_item(self,ctx,*,value='help'):
         """Get infos about any item"""
         if value=='help':
             await ctx.send(await self.translate(ctx.channel,"mc","item-help"))
@@ -162,7 +162,7 @@ Every information come from the website www.fr-minecraft.net"""
             await ctx.send(await self.translate(ctx.channel,"mc","no-entity"))
 
     @mc_main.command(name="command",aliases=["commande","cmd"])
-    async def mc_cmd(self,ctx,value='help'):
+    async def mc_cmd(self,ctx,*,value='help'):
         """Get infos about any command"""
         if value=='help':
             await ctx.send(await self.translate(ctx.channel,"mc","cmd-help"))
@@ -194,7 +194,7 @@ Every information come from the website www.fr-minecraft.net"""
             await ctx.send(await self.translate(ctx.channel,"mc","no-cmd"))
     
     @mc_main.command(name="advancement",aliases=["advc","progrès"])
-    async def mc_advc(self,ctx,value='help'):
+    async def mc_advc(self,ctx,*,value='help'):
         """Get infos about any advancement"""
         if value=='help':
             await ctx.send(await self.translate(ctx.channel,"mc","adv-help"))
