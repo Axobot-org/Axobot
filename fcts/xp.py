@@ -335,14 +335,12 @@ class XPCog(commands.Cog):
                 cnx = self.bot.cnx_frm
             else:
                 cnx = self.bot.cnx_xp
-            query = ("SELECT `xp` FROM `{}` WHERE `userID`={} AND `banned`=0".format(await self.get_table(guild, False),userID))
+            table = await self.get_table(guild, False)
+            if table == None:
+                return None
+            query = ("SELECT `xp` FROM `{}` WHERE `userID`={} AND `banned`=0".format(table,userID))
             cursor = cnx.cursor(dictionary = True)
-            try:
-                cursor.execute(query)
-            except mysql.connector.errors.ProgrammingError as e:
-                if e.errno == 1146:
-                    return None
-                raise e
+            cursor.execute(query)
             liste = list()
             for x in cursor:
                 liste.append(x)
@@ -366,14 +364,12 @@ class XPCog(commands.Cog):
                 cnx = self.bot.cnx_frm
             else:
                 cnx = self.bot.cnx_xp
-            query = ("SELECT COUNT(*) FROM `{}` WHERE `banned`=0".format(await self.get_table(guild+1, False)))
+            table = await self.get_table(guild, False)
+            if table == None:
+                return 0
+            query = ("SELECT COUNT(*) FROM `{}` WHERE `banned`=0".format(table))
             cursor = cnx.cursor(dictionary = False)
-            try:
-                cursor.execute(query)
-            except mysql.connector.errors.ProgrammingError as e:
-                if e.errno == 1146:
-                    return 0
-                raise e
+            cursor.execute(query)
             liste = list()
             for x in cursor:
                 liste.append(x)
@@ -483,7 +479,7 @@ class XPCog(commands.Cog):
                 if (guild!=None and x['userID'] in users) or guild==None:
                     i += 1
                 if x['userID']== userID:
-                    x['rank'] = i
+                    # x['rank'] = i
                     userdata = x
                     break
             cursor.close()
@@ -507,16 +503,16 @@ class XPCog(commands.Cog):
             cursor.close()
             result = round(liste[0]['SUM(xp)'])
 
-            cnx = self.bot.cnx_xp
-            cursor = cnx.cursor()
-            cursor.execute("show tables")
-            tables = [x[0] for x in cursor if x[0].isnumeric()]
-            for table in tables:
-                cursor.execute("SELECT SUM(xp) FROM `{}`".format(table))
-                res = [x for x in cursor]
-                if res[0][0]!=None:
-                    result += round(res[0][0])
-            cursor.close()
+            # cnx = self.bot.cnx_xp
+            # cursor = cnx.cursor()
+            # cursor.execute("show tables")
+            # tables = [x[0] for x in cursor if x[0].isnumeric()]
+            # for table in tables:
+            #     cursor.execute("SELECT SUM(xp) FROM `{}`".format(table))
+            #     res = [x for x in cursor]
+            #     if res[0][0]!=None:
+            #         result += round(res[0][0])
+            # cursor.close()
             return result
         except Exception as e:
             await self.bot.cogs['ErrorsCog'].on_error(e,None)
@@ -761,7 +757,8 @@ class XPCog(commands.Cog):
             xp_system_used = 0
         if xp_system_used==0:
             if Type=='global':
-                #ranks = await self.bdd_get_top(20*page)
+                if len(self.cache["global"])==0:
+                    await self.bdd_load_cache(-1)
                 ranks = sorted([{'userID':key, 'xp':value[1]} for key,value in self.cache['global'].items()], key=lambda x:x['xp'], reverse=True)
                 max_page = ceil(len(self.cache['global'])/20)
             elif Type=='guild':
@@ -801,7 +798,7 @@ class XPCog(commands.Cog):
             t = await self.translate(ctx.channel,'xp','top-title-1')
         if ctx.guild==None or ctx.channel.permissions_for(ctx.guild.me).embed_links:
             emb = await self.bot.cogs['EmbedCog'].Embed(title=t,fields=[{'name':f_name,'value':"\n".join(txt)},your_rank],color=self.embed_color,author_icon=self.bot.user.avatar_url_as(format='png')).create_footer(ctx)
-            await ctx.send(embed=emb.discord_embed())
+            await ctx.send(embed=emb)
         else:
             await ctx.send(f_name+"\n\n"+'\n'.join(txt))
 
