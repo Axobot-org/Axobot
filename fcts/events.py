@@ -17,6 +17,7 @@ class Events(commands.Cog):
         self.last_tr_backup = datetime.datetime.utcfromtimestamp(0)
         self.last_eventDay_check = datetime.datetime.utcfromtimestamp(0)
         self.statslogs_last_push = datetime.datetime.utcfromtimestamp(0)
+        self.last_statusio = datetime.datetime.utcfromtimestamp(0)
         self.loop_errors = [0,datetime.datetime.utcfromtimestamp(0)]
         self.latencies_list = list()
         self.embed_colors = {"welcome":5301186,
@@ -48,6 +49,7 @@ class Events(commands.Cog):
     async def on_ready(self):
         self.translate = self.bot.cogs["LangCog"].tr
         if self.bot.database_online:
+            await asyncio.sleep(0.1)
             await self.send_sql_statslogs()
 
 
@@ -397,20 +399,23 @@ class Events(commands.Cog):
         try:
             d = datetime.datetime.now()
             # Timed tasks - every 20s
-            if int(d.second)%20 == 0:
+            if d.second%20 == 0:
                 await self.check_tasks()
+            # Latency usage - every 30s
+            if d.second%30 == 0:
+                await self.status_loop(d)
             # Clear old rank cards - every 20min
-            elif int(d.minute)%20 == 0:
+            elif d.minute%20 == 0:
                 await self.bot.cogs['XPCog'].clear_cards()
                 await self.rss_loop()
             # Partners reload - every 7h (start from 1am)
-            elif int(d.hour)%7 == 1 and d.hour != self.partner_last_check.hour:
+            elif d.hour%7 == 1 and d.hour != self.partner_last_check.hour:
                 await self.partners_loop()
             # Bots lists updates - every day
-            elif int(d.hour) == 0 and d.day != self.dbl_last_sending.day:
+            elif d.hour == 0 and d.day != self.dbl_last_sending.day:
                 await self.dbl_send_data()
             # Translation backup - every 12h (start from 1am)
-            elif int(d.hour)%12 == 1 and (d.hour != self.last_tr_backup.hour or d.day != self.last_tr_backup.day):
+            elif d.hour%12 == 1 and (d.hour != self.last_tr_backup.hour or d.day != self.last_tr_backup.day):
                 await self.translations_backup()
             # Check current event - every 12h (start from 0:45 am)
             elif int(d.hour)%12 == 0 and int(d.minute)%45 == 0 and (d.hour != self.last_eventDay_check.hour or d.day != self.last_eventDay_check.day):
@@ -441,14 +446,14 @@ class Events(commands.Cog):
         if self.bot.beta:
             return
         self.latencies_list.append(round(self.bot.latency*1000))
-        if d.second == 0:
+        if d.minute % 4 == 0 and d.minute != self.last_statusio.minute:
+            self.last_statusio = d
             average = round(sum(self.latencies_list)/len(self.latencies_list))
             params = {"data": {"timestamp": round(d.timestamp()), "value":average}}
             async with aiohttp.ClientSession(loop=self.bot.loop, headers=self.statuspage_header) as session:
                 async with session.post("https://api.statuspage.io/v1/pages/g9cnphg3mhm9/metrics/x4xs4clhkmz0/data", json=params) as r:
                     r.raise_for_status()
                     self.bot.debug(f"StatusPage API returned {r.status} for {params}")
-
 
     async def rss_loop(self):
         if self.bot.cogs['RssCog'].last_update==None or (datetime.datetime.now() - self.bot.cogs['RssCog'].last_update).total_seconds()  > 5*60:
