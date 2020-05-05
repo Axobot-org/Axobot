@@ -27,7 +27,7 @@ class XPCog(commands.Cog):
         self.minimal_size = 5
         self.spam_rate = 0.20
         self.xp_per_char = 0.11
-        self.max_xp_per_msg = 60
+        self.max_xp_per_msg = 70
         self.file = 'xp'
         self.xp_channels_cache = dict()
         bot.add_listener(self.add_xp,'on_message')
@@ -293,6 +293,7 @@ class XPCog(commands.Cog):
         except mysql.connector.errors.ProgrammingError:
             if createIfNeeded:
                 cursor.execute("CREATE TABLE `{}` LIKE `example`;".format(guild))
+                self.bot.log.info(f"[get_table] XP Table `{guild}` created")
                 cursor.execute("SELECT 1 FROM `{}` LIMIT 1;".format(guild))
                 return guild
             else:
@@ -325,7 +326,7 @@ class XPCog(commands.Cog):
             await self.bot.cogs['ErrorsCog'].on_error(e,None)
             return False
     
-    async def bdd_get_xp(self,userID,guild:int):
+    async def bdd_get_xp(self, userID: int, guild: int):
         try:
             if not self.bot.database_online:
                 self.bot.unload_extension("fcts.xp")
@@ -334,9 +335,14 @@ class XPCog(commands.Cog):
                 cnx = self.bot.cnx_frm
             else:
                 cnx = self.bot.cnx_xp
-            query = ("SELECT `xp` FROM `{}` WHERE `userID`={} AND `banned`=0".format(await self.get_table(guild),userID))
+            query = ("SELECT `xp` FROM `{}` WHERE `userID`={} AND `banned`=0".format(await self.get_table(guild, False),userID))
             cursor = cnx.cursor(dictionary = True)
-            cursor.execute(query)
+            try:
+                cursor.execute(query)
+            except mysql.connector.errors.ProgrammingError as e:
+                if e.errno == 1146:
+                    return None
+                raise e
             liste = list()
             for x in cursor:
                 liste.append(x)
@@ -360,9 +366,14 @@ class XPCog(commands.Cog):
                 cnx = self.bot.cnx_frm
             else:
                 cnx = self.bot.cnx_xp
-            query = ("SELECT COUNT(*) FROM `{}` WHERE `banned`=0".format(await self.get_table(guild)))
+            query = ("SELECT COUNT(*) FROM `{}` WHERE `banned`=0".format(await self.get_table(guild+1, False)))
             cursor = cnx.cursor(dictionary = False)
-            cursor.execute(query)
+            try:
+                cursor.execute(query)
+            except mysql.connector.errors.ProgrammingError as e:
+                if e.errno == 1146:
+                    return 0
+                raise e
             liste = list()
             for x in cursor:
                 liste.append(x)
@@ -418,12 +429,17 @@ class XPCog(commands.Cog):
                 return None
             if guild!=None and await self.bot.cogs['ServerCog'].find_staff(guild.id,'xp_type')!=0:
                 cnx = self.bot.cnx_xp
-                query = ("SELECT * FROM `{}` order by `xp` desc".format(await self.get_table(guild.id)))
+                query = ("SELECT * FROM `{}` order by `xp` desc".format(await self.get_table(guild.id,False)))
             else:
                 cnx = self.bot.cnx_frm
                 query = ("SELECT * FROM `{}` order by `xp` desc".format(self.table))
             cursor = cnx.cursor(dictionary = True)
-            cursor.execute(query)
+            try:
+                cursor.execute(query)
+            except mysql.connector.errors.ProgrammingError as e:
+                if e.errno == 1146:
+                    return list()
+                raise e
             liste = list()
             if guild==None:
                 liste = [x for x in cursor][:top]
@@ -448,12 +464,17 @@ class XPCog(commands.Cog):
                 return None
             if guild!=None and await self.bot.cogs['ServerCog'].find_staff(guild.id,'xp_type')!=0:
                 cnx = self.bot.cnx_xp
-                query = ("SELECT `userID`,`xp`, @curRank := @curRank + 1 AS rank FROM `{}` p, (SELECT @curRank := 0) r WHERE `banned`='0' ORDER BY xp desc;".format(await self.get_table(guild.id)))
+                query = ("SELECT `userID`,`xp`, @curRank := @curRank + 1 AS rank FROM `{}` p, (SELECT @curRank := 0) r WHERE `banned`='0' ORDER BY xp desc;".format(await self.get_table(guild.id, False)))
             else:
                 cnx = self.bot.cnx_frm
                 query = ("SELECT `userID`,`xp`, @curRank := @curRank + 1 AS rank FROM `{}` p, (SELECT @curRank := 0) r WHERE `banned`='0' ORDER BY xp desc;".format(self.table))
             cursor = cnx.cursor(dictionary = True)
-            cursor.execute(query)
+            try:
+                cursor.execute(query)
+            except mysql.connector.errors.ProgrammingError as e:
+                if e.errno == 1146:
+                    return {"rank":0, "xp":0}
+                raise e
             userdata = dict()
             i = 0
             if guild!=None:
@@ -664,7 +685,7 @@ class XPCog(commands.Cog):
             if ctx.guild==None or ctx.channel.permissions_for(ctx.guild.me).attach_files:
                 await self.send_card(ctx,user,xp,rank,ranks_nb,xp_used_type,levels_info)
             elif ctx.channel.permissions_for(ctx.guild.me).embed_links:
-                await self.send_embed(ctx,user,xp,rank,ranks_nb,xp_used_type,levels_info)
+                await self.send_embed(ctx,user,xp,rank,ranks_nb,levels_info,xp_used_type)
             else:
                 await self.send_txt(ctx,user,xp,rank,ranks_nb,levels_info,xp_used_type)
         except Exception as e:
