@@ -370,7 +370,7 @@ class AdminCog(commands.Cog):
 
     @main_msg.command(name="config")
     @commands.check(reloads.check_admin)
-    async def admin_sconfig_see(self,ctx,*,server):
+    async def admin_sconfig_see(self,ctx,server,option=None):
         """Affiche les options d'un serveur"""
         if not ctx.bot.database_online:
             await ctx.send("Impossible d'afficher cette commande, la base de donnée est hors ligne :confused:")
@@ -381,9 +381,9 @@ class AdminCog(commands.Cog):
             guild = discord.utils.get(self.bot.guilds,name=server)
         if guild != None:
             try:
-                await self.bot.cogs["ServerCog"].send_see(guild,ctx.channel,None,ctx.message,None)
+                await self.bot.cogs["ServerCog"].send_see(guild,ctx.channel,option,ctx.message,guild)
             except Exception as e:
-                await self.bot.cogs["Errors"].on_cmd_error(ctx,e)
+                await self.bot.cogs["ErrorsCog"].on_cmd_error(ctx,e)
         else:
             await ctx.send("Serveur introuvable")
 
