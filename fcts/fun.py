@@ -181,7 +181,7 @@ You can specify a verification limit by adding a number in argument (up to 1.000
     async def blame(self,ctx,name):
         """Blame someone
         Use 'blame list' command to see every available name *for you*"""
-        l1 = ['discord','mojang','zbot','google'] # tout le monde
+        l1 = ['discord','mojang','zbot','google','youtube'] # tout le monde
         l2 = ['tronics','patate','neil','reddemoon','aragorn1202','platon'] # frm
         l3 = ['awhikax','aragorn','adri','zrunner'] # zbot
         name = name.lower()
