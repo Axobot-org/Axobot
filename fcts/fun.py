@@ -558,7 +558,7 @@ You can specify a verification limit by adding a number in argument (up to 1.000
             if key=='title':
                 k['title'] = value[:255]
             elif key=='content' or key=='url' or key=='image':
-                k[key] = value
+                k[key] = value.replace("\\n","\n")
             elif key=='footer':
                 k['footer'] = value[:90]
             elif key=='color' or key=="colour":
