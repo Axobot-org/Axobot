@@ -276,6 +276,8 @@ class Events(commands.Cog):
                 emb = self.bot.get_cog("EmbedCog").Embed(title=t, desc=task["message"], color=4886754, time=task["begin"], footer_text=foot)
                 msg = await self.translate(channel, "fun", "reminds-asked", user=user.mention, duration=f_duration)
                 await channel.send(msg, embed=emb)
+            except discord.errors.Forbidden:
+                pass
             except Exception as e:
                 raise e
 
