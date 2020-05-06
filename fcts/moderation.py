@@ -321,6 +321,7 @@ You can also mute this member for a defined duration, then use the following for
 `XXm` : XX minutes
 `XXh` : XX hours
 `XXd` : XX days
+`XXw` : XX weeks
 
 ..Example mute @someone 1d 3h Reason is becuz he's a bad guy
 

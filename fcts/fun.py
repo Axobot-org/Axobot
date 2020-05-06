@@ -611,6 +611,7 @@ Please use the following format:
 `XXm` : XX minutes
 `XXh` : XX hours
 `XXd` : XX days
+`XXw` : XX weeks
 
 ..Example remindme 49d Think about doing my homework"""
         duration = sum(duration)
