@@ -769,6 +769,7 @@
         "rr-embed": "S'attribuer un rôle",
         "rr-list": "Liste des rôles réactions ({n}/{m})",
         "rr-removed": "Le rôle {r} ne peut plus être donné via l'émoji {e}",
+        "rr-removed-2": "L'émoji {e} peut à nouveau donner un rôle",
         "too-many-rr": "Vous avez déjà atteint la limite de {l} rôles"
     },
     "rss": {

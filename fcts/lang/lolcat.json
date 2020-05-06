@@ -769,6 +769,7 @@
         "rr-embed": "tAkInG on A ROle",
         "rr-list": "lIsT 0v REacti0n RoLes ({n}/{m})",
         "rr-removed": "The role {r} can no longer be given via the emoji {e}",
+        "rr-removed-2": "Dat emoji {e} is can again gaving a role",
         "too-many-rr": "You have 'ready reached da limit ov {l} roles"
     },
     "rss": {

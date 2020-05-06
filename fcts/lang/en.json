@@ -769,6 +769,7 @@
         "rr-embed": "Taking on a role",
         "rr-list": "List of reaction roles ({n}/{m})",
         "rr-removed": "The role {r} can no longer be given via the emoji {e}",
+        "rr-removed-2": "The emoji {e} is free again to give a role",
         "too-many-rr": "You have already reached the limit of {l} roles"
     },
     "rss": {
