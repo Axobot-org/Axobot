@@ -185,7 +185,9 @@ class RssCog(commands.Cog):
         if ID in yt_link.keys():
             ID = yt_link[ID]
         if "youtube.com" in ID or "youtu.be" in ID:
-            ID= await self.parse_yt_url(ID)
+            ID = await self.parse_yt_url(ID)
+        if ID == None:
+            return await ctx.send(await self.translate(ctx.channel, "rss", "web-invalid"))
         text = await self.rss_yt(ctx.guild,ID)
         if type(text) == str:
             await ctx.send(text)
