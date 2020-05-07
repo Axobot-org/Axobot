@@ -12,7 +12,7 @@ The `Moderation` section displays every command related to the moderation of a s
 
 .. warning:: The bot and documentation are still in progress. This means that not all the commands in the bot are necessarily present in the doc, and vice versa!
 
-If you want to invite this bot to a server, `just click here <https://discordapp.com/oauth2/authorize?client_id=486896267788812288&scope=bot&permissions=1007021171>`_!
+If you want to invite this bot to a server, `just click here <https://discord.com/oauth2/authorize?client_id=486896267788812288&scope=bot&permissions=1007021171>`_!
 And to join our official support server, `click on this link <https://discord.gg/N55zY88>`_!
 
 .. toctree::

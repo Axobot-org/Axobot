@@ -214,7 +214,6 @@
     },
     "fun": {
         "afk-done": "¡Ahora eres AFK!",
-        "afk-no-perm": "Oops, No puedo cambiar tu apodo. :confused:",
         "afk-user-1": "Este miembro es AFK, porque {}",
         "afk-user-2": "¡Este miembro es AFK!",
         "blame-0": "Lista de nombres disponibles para **{}**",

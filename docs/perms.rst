@@ -73,7 +73,7 @@ Allows the bot to add, rename or delete emojis from the server. Used for: `emoji
 Manage Webhooks
 ---------------
 
-Allows the bot to read, add, modify or delete `webhooks <https://support.discordapp.com/hc/en-us/articles/228383668-Intro-to-Webhooks>`_ . Used for: `infos <infos.html#info>`_
+Allows the bot to read, add, modify or delete `webhooks <https://support.discord.com/hc/en-us/articles/228383668-Intro-to-Webhooks>`_ . Used for: `infos <infos.html#info>`_
 
 
 Read Text Channels & See Voice Channels

@@ -15,6 +15,14 @@ This command sends a short presentation text of the bot, so that you know it a l
 
 .. note:: For this command, ZBot doesn't need any specific permission! Good news, isn't it?
 
+----------
+Bot invite
+----------
+
+**Syntax:** :code:`botinvite` (alias :code:`botinv`)
+
+Shorter than the 'about' command, this one only send an url to invite the bot. And this url will always be working, even if our web server crashes.
+
 ----
 Help
 ----
@@ -35,7 +43,7 @@ Info
 
 This command is probably the most powerful in the information module. It allows you to find information on any item on your server: members, roles, text and voice channels, categories, emojis, invitations, as well as the server itself. Oh and also raw snowflakes (Discord IDs). Some information is even available about users who are not on your server! 
 
-You can enter the name, the mention, or the `identifier <https://support.discordapp.com/hc/en-us/articles/206346498-Where-can-I-find-my-User-Server-Message-ID->`_ of the object to be searched, and if the type of object (member, user, role...) is not specified, the bot will search itself to identify it. Note however that you are obliged to inform the type if your search includes spaces. 
+You can enter the name, the mention, or the `identifier <https://support.discord.com/hc/en-us/articles/206346498-Where-can-I-find-my-User-Server-Message-ID->`_ of the object to be searched, and if the type of object (member, user, role...) is not specified, the bot will search itself to identify it. Note however that you are obliged to inform the type if your search includes spaces. 
 
 .. note:: Some fields may not appear under certain conditions. No need to worry, it's just that Discord didn't send the requested information to the bot. And there's nothing we can do about it ¯\\_(ツ)_/¯
 
@@ -57,7 +65,7 @@ Permissions
 
 **Syntax:** :code:`perms [channel] [user|role]` or :code:`permissions [channel] [user|role]`
 
-This small command allows you to see the list of permissions assigned to a member/role in a particular channel. The channel can be either a text or a voice chat, but if you don't provide any, the bot will select the general permissions as set in the Server Configuration. To inform a member or a role, it is only necessary to enter his exact name, his `ID <https://support.discordapp.com/hc/en-us/articles/206346498-Where-can-I-find-my-User-Server-Message-ID->`_ , or his mention. If no name is given the targeted member will be the one who enters the command.
+This small command allows you to see the list of permissions assigned to a member/role in a particular channel. The channel can be either a text or a voice chat, but if you don't provide any, the bot will select the general permissions as set in the Server Configuration. To inform a member or a role, it is only necessary to enter his exact name, his `ID <https://support.discord.com/hc/en-us/articles/206346498-Where-can-I-find-my-User-Server-Message-ID->`_ , or his mention. If no name is given the targeted member will be the one who enters the command.
 
 .. warning:: The only permission needed to grant the bot is "`Embed Links <perms.html#embed-links>`_".
 

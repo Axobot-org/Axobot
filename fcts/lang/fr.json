@@ -146,7 +146,7 @@
             "Blurple (rgb(114, 137, 218))",
             "Blanc (rgb(255, 255, 255))",
             "Blurple Sombre (rgb(78, 93, 148))",
-            "Blurple, Blanc, Blurple Sombre = Blurple, Blanc, and Blurple Sombre (respectively) \nNoir = ni Blurple, ni Blanc, ni Blurple Sombre",
+            "Blurple, Blanc, Blurple Sombre = Blurple, Blanc, et Blurple Sombre (respectivement) \nNoir = ni Blurple, ni Blanc, ni Blurple Sombre",
             "Un énorme merci à **Rocked03** pour son code :blue_heart: https://github.com/Rocked03/Blurplefied.git",
             "Remarque : Discord réduit la qualité des images, donc les pourcentages peuvent être légèrement imprécis. | Content requested by {}"
         ],
@@ -157,11 +157,13 @@
         "create_footer_2": "Veuillez noter que ce blurplefier est automatisé et qu'il peut donc ne pas toujours vous donner le meilleur résultat. Avertissement : Cette image est un gif, et la qualité n'est pas toujours bonne. TOUTEFOIS, le gif n'est souvent pas aussi granuleux qu'il n'y paraît dans la prévisualisation. | Content requested by {}",
         "create_oops": "{}, oups ! Il semble que ce gif est trop gros pour être téléchargé. Si vous voulez, vous pouvez lui donner une autre chance, mais avec une version plus petite de l'image. Désolé !",
         "create_title": "Blurplefier - makes your image blurple!",
+        "missing-attachment-perm": "Oups, il me manque la permission d'envoyer des images !",
         "won-card": "Wow! Magnifique image blurple {}! tellement beau que j'ai décidé de t'offrir la carte d'xp blurple, je suis sûr qu'elles iront bien ensemble ! Tu peux l'utiliser en tapant la commande `{}profile card blurple` {}"
     },
     "bot_events": {
         "events-desc": {
             "christmas-2019": "Fêtez l'arrivée de Noël grâce à cet événement ! Pendant plusieurs jours, Zbot se pare des couleurs de l'hiver avec des émojis spéciaux pour le jeu du morpion, un avatar unique ainsi que d'autres choses trop cool. \n\nProfitez-en pour récupérer des points d'événements et tentez de gagner la carte d'xp spécial Noël 2019 ! Pour rappel, les cartes d'xp sont accessibles via ma commande `profile card`",
+            "blurple-2020": "Fêtons les 5 ans de Discord pendant l'événement Blurple ! Pour la troisième année consécutive, nous participons à l'événement \"Blurple\", qui consiste à recolorer nos avatars et serveurs avec un maximum de blurple, cette couleur caractéristique de Discord entre le violet et le bleu. Profitez-en pour récupérer des points d'événements et tentez de gagner la carte d'xp spécial Blurple 2020 ! Pour rappel, les cartes d'xp sont accessibles via ma commande `profile card`\n\nPour cet événement, la commande spéciale `blurple` a été activée, n'hésitez pas à l'utiliser pour tenter de gagner des points !",
             "nothing": "Il n'y a actuellement aucun événement. Suivez les news du bot pour connaître la date du prochain !"
         },
         "events-price-title": "Prix à gagner",
@@ -169,17 +171,22 @@
             "christmas-2019": {
                 "50": "Débloquez la carte d'xp spécial Noël 2019 !"
             },
+            "blurple-2020": {
+                "150": "Débloquez la carte d'xp spécial Blurple 2020 !"
+            },
             "nothing": "Il n'y a rien à gagner pour cet événement :confused:"
         },
         "events-title": {
-            "christmas-2019": "Noël en approche !"
+            "christmas-2019": "Noël en approche !",
+            "blurple-2020": "Les 5 ans de Discord !"
         },
         "objectives": "Objectifs",
         "points": "points",
         "rank-global": "Classement mondial",
         "rank-title": "Points d'événement",
         "rank-total": "Total des points",
-        "unclassed": "Non classé"
+        "unclassed": "Non classé",
+        "xp-howto": "Tu peux gagner des points d'événements en remportant des parties de morpion, en utilisant les commandes événementielles quand il y en a, ou en accomplissant divers autres tâches secrètes. N'hésite pas à venir sur le serveur de support pour demander des renseignements !"
     },
     "bvn": {
         "aide": "__**Bienvenue dans le module des message de join et de leave**__\n\nCe module vous sert à configurer un message automatique à chaque fois qu'un membre rentre ou sort de votre serveur.\n\n__**La configuration**__\n\n`1-` Pour configurer le salon où ces messages s'écrivent, entrez `{p}config change welcome_channel` suivi du salon (vous pouvez utiliser aussi bien sa mention que son identifiant ou son nom complet).\n`2-` Pour configurer un message, entrez `{p}config change <welcome|leave> <message>`. Pour ce message vous pouvez utiliser les variables suivantes :\n - `{user}` mentionne le membre\n - `{server}` affiche le nom du serveur\n - `{owner}` affiche le nom du propriétaire du serveur\n - `{member_count}` affiche le nombre actuel de membres\n - `{type}` retourne 'bot' si le membre est un bot, 'membre' sinon\n",
@@ -243,7 +250,7 @@
     },
     "fun": {
         "afk-done": "Vous êtes maintenant AFK",
-        "afk-no-perm": "Oops, je ne peux pas modifier votre pseudo :confused:",
+        "afk-no-perm": "Oops, je ne peux pas modifier votre pseudo :confused: Je vais essayer de m'en souvenir, mais il se peut que j'oublie que vous êtes AFK",
         "afk-user-1": "Ce membre est AFK, pour la raison {}",
         "afk-user-2": "Ce membre est AFK !",
         "blame-0": "Liste des noms disponibles pour le membre **{}**",
@@ -339,6 +346,7 @@
         "bitly_long": "URL d'origine : {url}",
         "bitly_nobit": "Cette adresse n'est pas un lien bit.ly !",
         "bitly_short": "URL raccourcie : {url}",
+        "botinvite": "Voici un lien pour m'inviter dans un autre serveur : {url}\nN'hésitez pas à tester la commande `about` pour plus de liens utiles !",
         "changelog-notfound": "Impossible de trouver cette version",
         "changelogs-index": "Liste des versions indexées",
         "discordlinks": [
@@ -768,6 +776,7 @@
         "rr-embed": "S'attribuer un rôle",
         "rr-list": "Liste des rôles réactions ({n}/{m})",
         "rr-removed": "Le rôle {r} ne peut plus être donné via l'émoji {e}",
+        "rr-removed-2": "L'émoji {e} peut à nouveau donner un rôle",
         "too-many-rr": "Vous avez déjà atteint la limite de {l} rôles"
     },
     "rss": {
@@ -850,6 +859,9 @@
         "change-color": "La couleur utilisée pour l'option {} est maintenant {}",
         "change-emojis": "Les émojis pour l'option '{}' sont maintenant {}",
         "change-lang": "La langue du bot est maintenant en `{}`",
+        "change-levelup_channel": "Les messages de changement de niveaux seront maintenant dans le salon {}",
+        "change-levelup_channel-1": "Les messages de changement de niveaux seront maintenant directement posté dans le salon",
+        "change-levelup_channel-2": "Les messages de changement de niveaux ne seront maintenant plus envoyés",
         "change-prefix": "Le préfixe a bien été remplacé par `{}`",
         "change-prefix-1": "Ce préfixe est trop long pour être utilisé !",
         "change-raid": "Le niveau de sécurité anti-raid est maintenant défini à **{}** ({})",
@@ -860,7 +872,7 @@
         "change-xp_rate": "Le modificateur d'xp est maintenant à {rate}",
         "config-help": "Cette commande sert principalement à configurer votre serveur. En faisant `!config see [option]` vous obtiendrez l'aperçu des configurations actuelles, et les administrateurs du serveur peuvent entrer `!config change <option> valeur1, valeur2...` pour modifier une configuration, ou `!config del <option>` pour réinitialiser l'option (`!config change <option> del` fonctionne de même).\nLa liste des options disponible est accessible à l'adresse <https://zbot.rtfd.io/en/latest/server.html#list-of-every-option>",
         "config-list": "Liste des options disponibles :{text}Plus d'information : {link}",
-        "need-admin": "Vous devez avoir les permissions Administrateur pour exécuter cette commande.",
+        "need-manage-server": "Vous devez avoir les permissions \"Gérer le serveur\" pour exécuter cette commande.",
         "new_server": "Votre serveur vient d'être enregistré pour la première fois dans notre base de donnée. Félicitations :tada:",
         "not-found": "Le serveur {} n'a pas encore été enregistré dans la base de donnée",
         "opt_title": "Option '{}' du serveur {}",
@@ -884,6 +896,7 @@
         "kick": "Liste des rôles qui peuvent utiliser la commande 'kick' : {}",
         "language": "Langue actuelle du bot pour ce serveur : **{}**",
         "leave": "Message envoyé lorsqu'un membre repart : {}",
+        "levelup_channel": "Salon dans lequel sont envoyés les messages de passage de niveau : {}",
         "levelup_msg": "Message envoyé lorsqu'un membre gagne un niveau d'xp : {}",
         "membercounter": "Salon affichant dans son nom le nombre de membres : {}",
         "modlogs_channel": "Salon dans lequel sont envoyés les logs de modération : {}",
@@ -1116,6 +1129,7 @@
             "ce caillou"
         ],
         "low-page": "Impossible d'afficher un numéro de page négatif !",
+        "negative-xp": "Vous ne pouvez pas mettre un nombre d'xp négatif !",
         "no-bot": "Impossible de modifier l'XP d'un bot !",
         "no-rr": "Aucun rôle n'a été configuré pour ce niveau",
         "rr-added": "Le rôle `{}` a correctement été ajouté pour le niveau {} !",

@@ -161,21 +161,27 @@
         "create_footer_2": "Noter que ce blurplefier est automatisé et qu'il peut donc ne pas toujours vous donner le meilleur résultat. Avertissement : Cette image est un gif, et la qualité n'est pas toujours bonne. TOUTEFOIS, le gif n'est souvent pas aussi granuleux qu'il n'y paraît dans la prévisualisation. | Contenu demandé par {}",
         "create_oops": "{}, oups ! Il semble que ce gif est trop gros pour être téléchargé. Si tu veux, vous pouvez lui donner une autre chance, mais avec une version plus petite de l'image. Désolé !",
         "create_title": "Blurplefier - rend ton image *blurple* !",
+        "missing-attachment-perm": "Gnéh !\n\nJ'ai pas les perms pour envoyer des images !",
         "won-card": "Wow! Magnifique image blurple {}! tellement beau que j'ai décidé de t'offrir la carte d'xp blurple, je suis sûr qu'elles iront bien ensemble ! Tu peux l'utiliser en tapant la commande `{}profile card blurple` {}"
     },
     "bot_events": {
         "events-desc": {
+            "blurple-2020": "Discord a 5 ans maintenant, donc faut le célébrer, et pour ça... **BLURPLE EVENT !**\n\nPour la troisième année consécutive, je participe à l'event Blurple, qui consiste à recolorier nos avatars et serveurs avec un *maximum* de blurple, la couleur caractéristique de Discord, entre vioet et bleu.\n\nUtilise cette opportunité pour collecter des points d'évènement et essayer de gagner la carte spéciale d'XP Blurple 2020 !\n*On se rappelle, les cartes d'xp sont accessibles depuis la commande `profile card`.*",
             "christmas-2019": "Fête l'arrivée de Noël grâce à cet événement Zbot ! Pendant plusieurs jours, je vais prendre les couleurs de l'hiver avec des émojis spéciaux pour le jeu du morpion, un avatar unique *(le swag)* ainsi que d'autres choses hyper sympas. \n\nProfites-en pour récupérer des points d'événements et tente de gagner la carte d'xp spécial Noël 2019 ! Ah, et oublie pas, les cartes d'xp sont accessibles via ma commande `profile card`.",
             "nothing": "Il n'y a aucun événement en cours :neutral_face:. Suis les news du bot pour connaître la date du prochain !"
         },
         "events-price-title": "Le super prix délirant de la mort qui tue",
         "events-prices": {
+            "blurple-2020": {
+                "150": "Débloque la carte d'XP spéciale Blurple 2020 !"
+            },
             "christmas-2019": {
                 "50": "Débloque la carte d'xp Noël 2k19 !"
             },
             "nothing": "Il n'y a rien à gagner pour cet événement :confused:\nFaut qu'on refasse des choses, nous."
         },
         "events-title": {
+            "blurple-2020": "**LES 5 ANS DE DISCORD !***",
             "christmas-2019": "Noël en approche :snowman2: !"
         },
         "objectives": "Objectifs",
@@ -247,7 +253,7 @@
     },
     "fun": {
         "afk-done": "Tu es AFK, c'est bon !",
-        "afk-no-perm": "Oops, je ne peux pas modifier ton pseudo :blobconfused:",
+        "afk-no-perm": "Oops, je ne peux pas modifier ton pseudo :blobconfused: J'vais essayer de m'en souvenir quand même",
         "afk-user-1": "Hey ! Il est AFK, pour la raison {}.",
         "afk-user-2": "Il est AFK !",
         "blame-0": "Liste des noms disponibles pour le membre **{}**",
@@ -343,6 +349,7 @@
         "bitly_long": "URL d'origine : {url}",
         "bitly_nobit": "Cette adresse n'est pas un lien bit.ly !",
         "bitly_short": "URL raccourcie : {url}\nCe sera moins chiant comme ça !",
+        "botinvite": "Voixi un lien pour m'inviter vers un autre serveur : {url}\nN'hésite pas à essayer la commande `about` pour des liens plus utiles !",
         "changelog-notfound": "Impossible de trouver cette version",
         "changelogs-index": "Liste des versions indexées",
         "discordlinks": [
@@ -772,6 +779,7 @@
         "rr-embed": "S'attribuer un rôle",
         "rr-list": "Liste des rôles réactions ({n}/{m})",
         "rr-removed": "Le rôle {r} ne peut plus être donné via l'émoji {e}",
+        "rr-removed-2": "L'émoji {e} est à nouveau prêt à donner un rôle",
         "too-many-rr": "Tu as déjà atteint la limite de {l} rôles ! Ça veut dire que tu peux plus en avoir d'autres..."
     },
     "rss": {
@@ -865,6 +873,7 @@
         "config-help": "Cette commande sert principalement à configurer votre serveur. En faisant `!config see [option]`, tu obtiendrez l'aperçu des configurations actuelles, et les administrateurs du serveur peuvent entrer `!config change <option> valeur1, valeur2...` pour modifier une configuration, ou `!config del <option>` pour réinitialiser l'option (`!config change <option> del` fonctionne de même).\nLa liste des options disponible est accessible à l'adresse <https://zbot.rtfd.io/en/latest/server.html#list-of-every-option>",
         "config-list": "Liste des options disponibles :{text}Plus d'information : {link}",
         "need-admin": "Faut les perms Administrateur pour exécuter cette commande !",
+        "need-manage-server": "T'as besoin de la perm \"Gérer le serveur\" pour exécuter cette commande.",
         "new_server": "Ton serv vient d'être enregistré pour la première fois dans ma base de données. Félicitations :tada:",
         "not-found": "Le serveur {} n'a pas encore été enregistré dans la base de données.",
         "opt_title": "Option '{}' du serveur {}",
@@ -1120,6 +1129,7 @@
             "ce caillou"
         ],
         "low-page": "Impossible d'afficher un numéro de page négatif !",
+        "negative-xp": "Mais... Tu peux pas mettre de l'XP négative !",
         "no-bot": "Impossible de modifier l'XP d'un bot !",
         "no-rr": "Aucun rôle n'a été configuré pour ce niveau.",
         "rr-added": "Le rôle `{}` a correctement été ajouté pour le niveau {} !",

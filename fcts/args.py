@@ -10,7 +10,7 @@ class tempdelta(commands.Converter):
         d = 0
         found = False
         # ctx.invoked_with
-        for x in [('y',86400*365),('d',86400),('h',3600),('m',60)]:
+        for x in [('y',86400*365),('w',604800),('d',86400),('h',3600),('m',60)]:
             r = re.search(r'(\d+)'+x[0],argument)
             if r!= None:
                 d += int(r.group(1))*x[1]
@@ -34,11 +34,15 @@ class user(commands.converter.UserConverter):
                     res = await ctx.bot.fetch_user(int(argument))
                 except:
                     pass
-            return res
-        try:
-            return await commands.MemberConverter().convert(ctx,argument)
-        except:
-            return await commands.UserConverter().convert(ctx,argument)
+            if res != None:
+                return res
+        else:
+            try:
+                return await commands.MemberConverter().convert(ctx,argument)
+            except:
+                return await commands.UserConverter().convert(ctx,argument)
+        if res == None:
+            raise commands.errors.BadArgument('User "{}" not found'.format(argument))
 
 class infoType(commands.Converter):
     def __init__(self):

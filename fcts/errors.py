@@ -175,6 +175,11 @@ class ErrorsCog(commands.Cog):
         salon = self.bot.get_channel(626039503714254858)
         if salon == None:
             return False
+        if len(msg)>2000:
+            if msg.endswith("```"):
+                msg = msg[:1997]+"```"
+            else:
+                msg = msg[:2000]
         await salon.send(msg)
         return True
 
