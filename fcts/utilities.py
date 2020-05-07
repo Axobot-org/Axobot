@@ -199,7 +199,7 @@ class UtilitiesCog(commands.Cog):
         return re.search(ch,text)
 
     async def check_discord_invite(self,text):
-        ch = r"((?:discord\.gg|discordapp.com/invite|discord.me)/.+)"
+        ch = r"((?:discord\.gg|discord(?:app)?.com/invite|discord.me)/.+)"
         return re.search(ch,text)
 
     def sync_check_any_link(self,text):
@@ -207,7 +207,7 @@ class UtilitiesCog(commands.Cog):
         return re.search(ch,text)
 
     def sync_check_discord_invite(self,text):
-        ch = r"((?:discord\.gg|discordapp.com/invite|discord.me)/.+)"
+        ch = r"((?:discord\.gg|discord(?:app)?.com/invite|discord.me)/.+)"
         return re.search(ch,text)
 
     async def clear_msg(self,text:str,everyone=True,ctx=None):
@@ -354,16 +354,21 @@ class UtilitiesCog(commands.Cog):
             return False
         return parameters['unlocked_rainbow']
     
-    async def has_blurple_card(self,user):
+    async def has_blurple_card(self,user,year=19):
         """Check if a user won the blurple card"""
         parameters = None
         try:
-            parameters = await self.get_db_userinfo(criters=["userID="+str(user.id)],columns=['unlocked_blurple'])
+            parameters = await self.get_db_userinfo(criters=["userID="+str(user.id)],columns=[f'unlocked_blurple_{year}'])
         except Exception as e:
             await self.bot.cogs["ErrorsCog"].on_error(e,None)
         if parameters==None:
             return False
-        return parameters['unlocked_blurple']
+        if (year==20) and not parameters['unlocked_blurple_20'] and self.bot.current_event=="blurple":
+            points = await self.get_db_userinfo(["events_points"],["userID="+str(user.id)])
+            if points != None and points["events_points"] >= 150:
+                await self.change_db_userinfo(user.id,'unlocked_blurple_20',True)
+                parameters['unlocked_blurple_20'] = True
+        return parameters[f'unlocked_blurple_{year}']
     
     async def has_christmas_card(self,user):
         """Check if a user won the christmas card"""
@@ -424,8 +429,10 @@ class UtilitiesCog(commands.Cog):
             liste2.append('partner')
         if await self.is_premium(user):
             liste2.append('premium')
-        if await self.has_blurple_card(user):
-            liste.append('blurple')
+        if await self.has_blurple_card(user,19):
+            liste.append('blurple19')
+        if await self.has_blurple_card(user,20):
+            liste.append('blurple20')
         if await self.has_rainbow_card(user):
             liste.append('rainbow')
         if await self.has_christmas_card(user):
@@ -503,29 +510,29 @@ class UtilitiesCog(commands.Cog):
         """check if a user voted on any bots list website"""
         votes = list()
         async with aiohttp.ClientSession() as session:
-            # https://top.gg/bot/486896267788812288
-            async with session.get(f'https://top.gg/api/bots/486896267788812288/check?userId={userid}',headers={'Authorization':str(self.bot.dbl_token)}) as r:
-                js = await r.json()
-                if js["voted"]:
-                    votes.append(("Discord Bots List","https://top.gg/"))
-            # https://divinediscordbots.com/bot/486896267788812288
-            headers = {'authorization': self.bot.others['divinediscordbots']}
-            async with session.get('https://divinediscordbots.com/bot/486896267788812288/votes',headers=headers) as r:
-                js = await r.json()
-                if str(userid) in [x['id'] for x in js["votes"]]:
-                    votes.append(("Divine Discord Bot List","https://divinediscordbots.com/"))
-            # https://botlist.space/bot/486896267788812288
-            headers = {'Authorization': self.bot.others['botlist.space']}
-            async with session.get('https://api.botlist.space/v1/bots/486896267788812288/upvotes', headers=headers) as r:
-                js = await r.json()
-                if str(userid) in [x["user"]['id'] for x in js]:
-                    votes.append(("botlist.space","https://botlist.space/"))
-            # https://discord.boats/bot/486896267788812288
-            headers = {'Authorization': self.bot.others['discordboats']}
-            async with session.get(f"https://discord.boats/api/bot/486896267788812288/voted?id={userid}", headers=headers) as r:
-                js = await r.json()
-                if (not js["error"]) and js["voted"]:
-                    votes.append(("Discord Boats","https://discord.boats/"))
+            try: # https://top.gg/bot/486896267788812288
+                async with session.get(f'https://top.gg/api/bots/486896267788812288/check?userId={userid}',headers={'Authorization':str(self.bot.dbl_token)}) as r:
+                    js = await r.json()
+                    if js["voted"]:
+                        votes.append(("Discord Bots List","https://top.gg/"))
+            except Exception as e:
+                await self.bot.get_cog("ErrorsCog").on_error(e,None)
+            try: # https://botlist.space/bot/486896267788812288
+                headers = {'Authorization': self.bot.others['botlist.space']}
+                async with session.get('https://api.botlist.space/v1/bots/486896267788812288/upvotes', headers=headers) as r:
+                    js = await r.json()
+                    if str(userid) in [x["user"]['id'] for x in js]:
+                        votes.append(("botlist.space","https://botlist.space/"))
+            except Exception as e:
+                await self.bot.get_cog("ErrorsCog").on_error(e,None)
+            try: # https://discord.boats/bot/486896267788812288
+                headers = {'Authorization': self.bot.others['discordboats']}
+                async with session.get(f"https://discord.boats/api/bot/486896267788812288/voted?id={userid}", headers=headers) as r:
+                    js = await r.json()
+                    if (not js["error"]) and js["voted"]:
+                        votes.append(("Discord Boats","https://discord.boats/"))
+            except Exception as e:
+                await self.bot.get_cog("ErrorsCog").on_error(e,None)
             return votes
 
 def setup(bot):

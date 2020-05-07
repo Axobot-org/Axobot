@@ -15,6 +15,14 @@
         "color": 11260705,
         "objectives": []
     },
+    "blurple-2020": {
+        "begin": "2020-05-07",
+        "end": "2020-05-13",
+        "type": "blurple",
+        "icon": "https://zrunner.me/cdn/blurple.jpg",
+        "color": 0,
+        "objectives": [150]
+    },
     "halloween-2020": {
         "begin": "2020-10-11",
         "end": "2020-10-31",

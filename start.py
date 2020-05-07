@@ -127,7 +127,7 @@ class zbot(commands.bot.BotBase,discord.Client):
     
     async def user_avatar_as(self,user,size=512):
         """Get the avatar of an user, format gif or png (as webp isn't supported by some browsers)"""
-        if not isinstance(user,(discord.User,discord.Member)):
+        if not isinstance(user,(discord.User,discord.Member,discord.ClientUser)):
             raise ValueError
         try:
             if user.is_avatar_animated():
@@ -162,7 +162,7 @@ def get_prefix(bot,msg):
     else:
         prefixes = ['!']
     if msg.guild==None:
-        prefixes.append(" ")
+        prefixes.append("")
     return commands.when_mentioned_or(*prefixes)(bot,msg)
 
 
@@ -176,6 +176,7 @@ def main():
     initial_extensions = ['fcts.language',
                       'fcts.admin',
                       'fcts.aide',
+                      'fcts.blurple',
                       'fcts.bot_events',
                       'fcts.bvn',
                       'fcts.cases',
@@ -219,7 +220,7 @@ def main():
             r.remove('')
         for e,s in enumerate(['user','password','host','database1','database2']):
             client.database_keys[s] = cryptage.uncrypte(r[e])
-        client.others['divinediscordbots'] = cryptage.uncrypte(r[5])
+        client.others['arcanecenter'] = cryptage.uncrypte(r[5])
         client.others['botsondiscord'] = cryptage.uncrypte(r[6])
         client.others['discordbotsgroup'] = cryptage.uncrypte(r[7])
         client.others['bitly'] = cryptage.uncrypte(r[8])
@@ -229,6 +230,7 @@ def main():
             'access_token_secret':cryptage.uncrypte(r[12])}
         client.others['botlist.space'] = cryptage.uncrypte(r[13])
         client.others['discordboats'] = cryptage.uncrypte(r[14])
+        client.others['statuspage'] = cryptage.uncrypte(r[15])
     try:
         try:
             cnx = mysql.connector.connect(user=client.database_keys['user'],password=client.database_keys['password'],host="127.0.0.1",database=client.database_keys['database1'])
@@ -236,7 +238,7 @@ def main():
             client.log.warning("Impossible d'accéder à la dabatase locale - tentative via IP")
             cnx = mysql.connector.connect(user=client.database_keys['user'],password=client.database_keys['password'],host=client.database_keys['host'],database=client.database_keys['database1'])
         else:
-            client.log.info("Database connectée en vocal")
+            client.log.info("Database connectée en local")
             client.database_keys['host'] = '127.0.0.1'
         cnx.close()
     except Exception as e:

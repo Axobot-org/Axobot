@@ -130,6 +130,7 @@
         },
         "checks": "Gerekliler:",
         "cmd-not-found": "\"{}\" isimli bir komut yok",
+        "description": "Açıklama",
         "embed_title": "{u} için aktif komutlar",
         "footer": "Bir komut üzerinde daha fazla bilgi almak için {}help yazın",
         "no-desc-cmd": "Bu komut için bir açıklama yok",
@@ -137,7 +138,8 @@
         "no-subcmd": "`{0.name}` komutunun alt komutu yok",
         "not-enabled": "⚠️ Bu komut engelli",
         "subcmd-not-found": "Bu komutun \"{}\" adında bir alt komutu yok",
-        "subcmds": "Alt komutlar:"
+        "subcmds": "Alt komutlar:",
+        "warning": "Uyarılar"
     },
     "blurple": {
         "check_fields": [
@@ -240,7 +242,6 @@
     },
     "fun": {
         "afk-done": "Artık AFK'sın",
-        "afk-no-perm": "Hay aksi, adını değiştiremiyorum 😕",
         "afk-user-1": "Bu üye {} nedeniyle AFK",
         "afk-user-2": "Bu kullanıcı AFK!",
         "blame-0": "**{}** için geçerli olan tüm isimlerin listesi",
@@ -291,13 +292,27 @@
         ],
         "piece-1": "Başarısız, kenara düştü!",
         "react-0": "İlgili mesaj bulunamadı. İlk bağımsız değişkene mesaj ID'sini, ikincisinde ise emojiyi girmelisiniz 🙃  Ayrıca mesaj geçmişini okuma iznim olup olmadığını kontrol edin!",
+        "reminds-asked": "{user}, {duration} önce size şunu hatırlatmamı istediniz:",
+        "reminds-date": "İstek tarihi",
+        "reminds-saved": "Anladım! {duration} sonra size hatırlatacağım",
+        "reminds-title": "Hatırlatıcı",
+        "reminds-too-long": "Böyle uzun bir süre ayarlamak imkansız",
+        "reminds-too-short": "Geçersiz bir süre girdiniz",
         "say-no-perm": "{channel} kanalında mesaj gönderme izniniz yok",
         "thanos": [
             "{0} Thanos tarafından canı bağışlandı",
             "Thanos, {0}'i küllere dönüştürmeye karar verdi. İnsanlığın iyiliği için...."
         ],
         "tip-list": [
-            "Biliyor musun? Bot için test edilecek çok eğlenceli bir dil de dahil olmak üzere birkaç dil vardır: lolcat"
+            "Biliyor musun? Bot için test edilecek çok eğlenceli bir dil de dahil olmak üzere birkaç dil vardır: lolcat",
+            "İpucu: bot dilini değiştirmek için, `config` komutunu kullanın!",
+            "İpucu: Yardıma ihtiyacınız varsa, `osekour` komutunu kullanmaktan çekinmeyin",
+            "Biliyor muydun? Bazen, seviye yükseltme mesajı rastgele bir nesneden bahseder. Bunu yapmak için Aragorn1202, 'bir bicorne', 'bir kurabiye' veya 'bir muz' dahil olmak üzere 60'lık bir liste oluşturmak zorunda kaldı!",
+            "Biliyor muydun? Eskiden Zbot'un profil resmi... bir creeperdı.",
+            "Biliyor muydun? ZBot Ekibi yetenekli bir geliştirici Yönetici, bir kibble markasının adını taşımasının yanı sıra bir kedi olan ikinci bir yönetici, bir Ban hammer ve bir mantardan oluşur!",
+            "İpucu: `say <metin>` komutu anonim mesajlar göndermek için çok kullanışlıdır... en azından ona erişiminiz olduğunda.",
+            "İpucu: `discordlinks` komutu size discord ile ilgili tüm faydalı bağlantıları verecektir!",
+            "Biliyor muydun? `bigtext` komutunda kullanılan büyük emoji listesi de dahil olmak üzere bot ile ilgili tüm tasarımlar  Adri526#9223 tarafından yapılmıştır!"
         ]
     }
 }

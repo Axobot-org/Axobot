@@ -209,7 +209,7 @@ This command allows you to force the bot to add reactions to a message, which is
 
 All reactions work, whether they are Discord or server reactions. All you have to do is separate them with a space. Just like magic!
 
-.. note:: To find out how to find the ID of a message, follow `this link <https://support.discordapp.com/hc/en-us/articles/206346498-Where-can-I-find-my-User-Server-Message-ID->`_!
+.. note:: To find out how to find the ID of a message, follow `this link <https://support.discord.com/hc/en-us/articles/206346498-Where-can-I-find-my-User-Server-Message-ID->`_!
 
 .. warning:: To find the message, ZBot must have "`Read Message History <perms.html#read-message-history>`_" permission, and "`Add Reactions <perms.html#add-reactions>`_" permission to add reactions.
 

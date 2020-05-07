@@ -185,7 +185,9 @@ class RssCog(commands.Cog):
         if ID in yt_link.keys():
             ID = yt_link[ID]
         if "youtube.com" in ID or "youtu.be" in ID:
-            ID= await self.parse_yt_url(ID)
+            ID = await self.parse_yt_url(ID)
+        if ID == None:
+            return await ctx.send(await self.translate(ctx.channel, "rss", "web-invalid"))
         text = await self.rss_yt(ctx.guild,ID)
         if type(text) == str:
             await ctx.send(text)
@@ -853,6 +855,9 @@ class RssCog(commands.Cog):
         try:
             return [x for x in self.twitterAPI.GetUserTimeline(screen_name=nom,exclude_replies=True,trim_user=True,count=count)]
         except twitter.error.TwitterError as e:
+            if str(e) == "Not authorized.":
+                self.bot.log.warn(f"[rss] Unable to reach channel {nom}: Not authorized")
+                return []
             try:
                 if e.message[0]['code'] == 130: # Over capacity - Corresponds with HTTP 503. Twitter is temporarily over capacity.
                     return e
@@ -892,9 +897,9 @@ class RssCog(commands.Cog):
         if len(entries)==0:
             return await self.translate(guild,"rss","nothing")
         if len(entries)>1:
-            while feeds.entries[0]['published_parsed'] < feeds.entries[1]['published_parsed']:
-                del feeds.entries[0]
-                if len(feeds.entries)==1:
+            while entries[0]['published_parsed'] < entries[1]['published_parsed']:
+                del entries[0]
+                if len(entries)==1:
                     break
         if not date:
             feed = entries[0]

@@ -1,6 +1,6 @@
-import discord, datetime, asyncio, logging, time, aiohttp, json, random, shutil
+import discord, datetime, asyncio, logging, time, aiohttp, json, random, shutil, mysql
 from discord.ext import commands, tasks
-
+from fcts.checks import is_fun_enabled
 
 class Events(commands.Cog):
     """Cog for the management of major events that do not belong elsewhere. Like when a new server invites the bot."""
@@ -17,7 +17,9 @@ class Events(commands.Cog):
         self.last_tr_backup = datetime.datetime.utcfromtimestamp(0)
         self.last_eventDay_check = datetime.datetime.utcfromtimestamp(0)
         self.statslogs_last_push = datetime.datetime.utcfromtimestamp(0)
+        self.last_statusio = datetime.datetime.utcfromtimestamp(0)
         self.loop_errors = [0,datetime.datetime.utcfromtimestamp(0)]
+        self.latencies_list = list()
         self.embed_colors = {"welcome":5301186,
         "mute":4868682,
         "kick":16730625,
@@ -36,6 +38,7 @@ class Events(commands.Cog):
             'channel':45,
             'role':60,
             'guild':75}
+        self.statuspage_header = {"Content-Type": "application/json", "Authorization": "OAuth " + self.bot.others["statuspage"]}
         bot.add_listener(self.on_new_message,'on_message')
 
 
@@ -46,6 +49,7 @@ class Events(commands.Cog):
     async def on_ready(self):
         self.translate = self.bot.cogs["LangCog"].tr
         if self.bot.database_online:
+            await asyncio.sleep(0.1)
             await self.send_sql_statslogs()
 
 
@@ -56,15 +60,24 @@ class Events(commands.Cog):
             config_option = await self.bot.cogs['UtilitiesCog'].get_db_userinfo(['allow_usernames_logs'],["userID="+str(before.id)])
             if config_option != None and config_option['allow_usernames_logs']==False:
                 return
-            cnx = self.bot.cnx_frm
-            cursor = cnx.cursor()
-            ID = round(time.time()/2) * 10 + random.randrange(0,9)
-            b = '' if before.nick==None else before.nick.replace("'","\\'")
-            a = '' if after.nick==None else after.nick.replace("'","\\'")
-            query = ("INSERT INTO `usernames_logs` (`ID`,`user`,`old`,`new`,`guild`,`beta`) VALUES ('{}','{}','{}','{}','{}',{})".format(ID,before.id,b,a,before.guild.id,self.bot.beta))
+            await self.updade_memberslogs_name(before, after)
+
+    async def updade_memberslogs_name(self, before:discord.Member, after:discord.Member, tries:int=0):
+        if tries>5:
+            return
+        cnx = self.bot.cnx_frm
+        cursor = cnx.cursor()
+        ID = round(time.time()/2) * 10 + random.randrange(0,9)
+        b = '' if before.nick==None else before.nick.replace("'","\\'")
+        a = '' if after.nick==None else after.nick.replace("'","\\'")
+        query = ("INSERT INTO `usernames_logs` (`ID`,`user`,`old`,`new`,`guild`,`beta`) VALUES ('{}','{}','{}','{}','{}',{})".format(ID,before.id,b,a,before.guild.id,self.bot.beta))
+        try:
             cursor.execute(query)
             cnx.commit()
             cursor.close()
+        except mysql.connector.errors.IntegrityError as e:
+            self.bot.log.warn(e)
+            await self.updade_memberslogs_name(before, after, tries+1)
 
     @commands.Cog.listener()
     async def on_user_update(self,before:discord.User,after:discord.User):
@@ -125,16 +138,25 @@ class Events(commands.Cog):
             try:
                 nudes_reacts = [':eyes:',':innocent:',':rolling_eyes:',':confused:',':smirk:']
                 if msg.guild==None or msg.channel.permissions_for(msg.guild.me).external_emojis:
-                    nudes_reacts += ['<:ThinkSmirk:485902639838789635>','<:whut:485924115199426600>','<:thinksmart:513105826530197514>','<:excusemewhat:418154673523130398>','<:blobthinking:499661417012527104>','<a:ano_U:568494122856611850>','<:catsmirk:523929843331498015>','<a:ablobno:537680872820965377>']
+                    nudes_reacts += ['<:whut:485924115199426600>','<:thinksmart:513105826530197514>','<:excusemewhat:418154673523130398>','<:blobthinking:499661417012527104>','<a:ano_U:568494122856611850>','<:catsmirk:523929843331498015>','<a:ablobno:537680872820965377>']
                 await msg.channel.send(random.choice(nudes_reacts))
             except:
                 pass
+        # Halloween event
         elif (msg.channel.id==635569244507209749 and random.random()<0.3) or (("booh" in msg.content.lower() or "halloween" in msg.content.lower() or "witch" in msg.content.lower()) and random.random()<0.05 and self.bot.current_event=="halloween"):
             try:
                 react = random.choice(['🦇','🎃','🕷️']*2+['👀'])
                 await msg.add_reaction(react)
             except:
                 pass
+        # April Fool event
+        elif random.random()<0.1 and self.bot.current_event=="fish" and is_fun_enabled(msg, self.bot.get_cog("FunCog")):
+            try:
+                react = random.choice(['🐟','🎣', '🐠', '🐡']*4+['👀'])
+                await msg.add_reaction(react)
+            except:
+                pass
+            pass
         if msg.author.bot==False and await self.bot.cogs['AdminCog'].check_if_admin(msg.author) == False and msg.guild!=None:
             cond = True
             if self.bot.database_online:
@@ -168,9 +190,9 @@ class Events(commands.Cog):
             _ = await self.bot.fetch_invite(msg.content)
         except:
             return
-        d = datetime.datetime.utcnow() - (await msg.channel.history(limit=2).flatten())[1].created_at
-        if d.total_seconds() > 600:
-            await msg.channel.send(await self.translate(msg.channel,"events","mp-adv"))
+        # d = datetime.datetime.utcnow() - (await msg.channel.history(limit=2).flatten())[1].created_at
+        # if d.total_seconds() > 600:
+        await msg.channel.send(await self.translate(msg.channel,"events","mp-adv"))
 
 
     async def send_logs_per_server(self,guild,Type,message,author=None):
@@ -254,6 +276,8 @@ class Events(commands.Cog):
                 emb = self.bot.get_cog("EmbedCog").Embed(title=t, desc=task["message"], color=4886754, time=task["begin"], footer_text=foot)
                 msg = await self.translate(channel, "fun", "reminds-asked", user=user.mention, duration=f_duration)
                 await channel.send(msg, embed=emb)
+            except discord.errors.Forbidden:
+                pass
             except Exception as e:
                 raise e
 
@@ -377,20 +401,23 @@ class Events(commands.Cog):
         try:
             d = datetime.datetime.now()
             # Timed tasks - every 20s
-            if int(d.second)%20 == 0:
+            if d.second%20 == 0:
                 await self.check_tasks()
+            # Latency usage - every 30s
+            if d.second%30 == 0:
+                await self.status_loop(d)
             # Clear old rank cards - every 20min
-            elif int(d.minute)%20 == 0:
+            elif d.minute%20 == 0:
                 await self.bot.cogs['XPCog'].clear_cards()
                 await self.rss_loop()
             # Partners reload - every 7h (start from 1am)
-            elif int(d.hour)%7 == 1 and d.hour != self.partner_last_check.hour:
+            elif d.hour%7 == 1 and d.hour != self.partner_last_check.hour:
                 await self.partners_loop()
             # Bots lists updates - every day
-            elif int(d.hour) == 0 and d.day != self.dbl_last_sending.day:
+            elif d.hour == 0 and d.day != self.dbl_last_sending.day:
                 await self.dbl_send_data()
             # Translation backup - every 12h (start from 1am)
-            elif int(d.hour)%12 == 1 and (d.hour != self.last_tr_backup.hour or d.day != self.last_tr_backup.day):
+            elif d.hour%12 == 1 and (d.hour != self.last_tr_backup.hour or d.day != self.last_tr_backup.day):
                 await self.translations_backup()
             # Check current event - every 12h (start from 0:45 am)
             elif int(d.hour)%12 == 0 and int(d.minute)%45 == 0 and (d.hour != self.last_eventDay_check.hour or d.day != self.last_eventDay_check.day):
@@ -415,30 +442,20 @@ class Events(commands.Cog):
         await self.rss_loop()
         self.bot.log.info("[tasks_loop] Lancement de la boucle")
 
-    async def send_sql_statslogs(self):
-        "Send some stats about the current bot stats"
-        cnx = self.bot.cnx_frm
-        cursor = cnx.cursor()
-        rss_feeds = await self.bot.get_cog("RssCog").get_raws_count(True)
-        active_rss_feeds = await self.bot.get_cog("RssCog").get_raws_count()
-        query = ("INSERT INTO `log_stats` (`time`, `servers_count`, `members_count`, `bots_count`, `dapi_heartbeat`, `codelines_count`, `earned_xp_total`, `rss_feeds`, `active_rss_feeds`, `beta`) VALUES (CURRENT_TIMESTAMP, '{server_count}', '{members_count}', '{bots_count}', '{ping}', '{codelines}', '{xp}', '{rss_feeds}', '{active_rss_feeds}','{beta}')".format(
-            server_count = len(self.bot.guilds),
-            members_count = len(self.bot.users),
-            bots_count = len([1 for x in self.bot.users if x.bot]),
-            ping = round(self.bot.latency,3),
-            codelines = self.bot.cogs["InfoCog"].codelines,
-            xp = await self.bot.cogs['XPCog'].bdd_total_xp(),
-            rss_feeds = rss_feeds,
-            active_rss_feeds = active_rss_feeds,
-            beta = 1 if self.bot.beta else 0
-        ))
-        cursor.execute(query)
-        cnx.commit()
-        cursor.close()
-        emb = self.bot.cogs["EmbedCog"].Embed(desc='**Stats logs** updated',color=5293283).update_timestamp().set_author(self.bot.user)
-        await self.bot.cogs["EmbedCog"].send([emb],url="loop")
-        self.statslogs_last_push = datetime.datetime.now()
-        
+
+    async def status_loop(self, d:datetime.datetime):
+        "Send average latency to zbot.statuspage.io"
+        if self.bot.beta:
+            return
+        self.latencies_list.append(round(self.bot.latency*1000))
+        if d.minute % 4 == 0 and d.minute != self.last_statusio.minute:
+            self.last_statusio = d
+            average = round(sum(self.latencies_list)/len(self.latencies_list))
+            params = {"data": {"timestamp": round(d.timestamp()), "value":average}}
+            async with aiohttp.ClientSession(loop=self.bot.loop, headers=self.statuspage_header) as session:
+                async with session.post("https://api.statuspage.io/v1/pages/g9cnphg3mhm9/metrics/x4xs4clhkmz0/data", json=params) as r:
+                    r.raise_for_status()
+                    self.bot.log.debug(f"StatusPage API returned {r.status} for {params}")
 
     async def rss_loop(self):
         if self.bot.cogs['RssCog'].last_update==None or (datetime.datetime.now() - self.bot.cogs['RssCog'].last_update).total_seconds()  > 5*60:
@@ -465,52 +482,64 @@ class Events(commands.Cog):
             await self.bot.cogs['ErrorsCog'].on_error(e,None)
             guildCount = len(self.bot.guilds)
         session = aiohttp.ClientSession(loop=self.bot.loop)
-        # https://top.gg/bot/486896267788812288
-        payload = {'server_count': guildCount}
-        async with session.post('https://top.gg/api/bots/486896267788812288/stats',data=payload,headers={'Authorization':str(self.bot.dbl_token)}) as resp:
-            self.bot.log.debug('discordbots.org returned {} for {}'.format(resp.status, payload))
-            answers[0] = resp.status
-        # https://divinediscordbots.com/bot/486896267788812288
-        payload = json.dumps({
-          'server_count': guildCount
-          })
-        headers = {
-              'authorization': self.bot.others['divinediscordbots'],
-              'content-type': 'application/json'
-        }
-        async with session.post('https://divinediscordbots.com/bot/{}/stats'.format(self.bot.user.id), data=payload, headers=headers) as resp:
-              self.bot.log.debug('divinediscordbots statistics returned {} for {}'.format(resp.status, payload))
-              answers[1] = resp.status
-        # https://bots.ondiscord.xyz/bots/486896267788812288
-        payload = json.dumps({
-          'guildCount': guildCount
-          })
-        headers = {
-              'Authorization': self.bot.others['botsondiscord'],
-              'Content-Type': 'application/json'
-        }
-        async with session.post('https://bots.ondiscord.xyz/bot-api/bots/{}/guilds'.format(self.bot.user.id), data=payload, headers=headers) as resp:
-              self.bot.log.debug('BotsOnDiscord returned {} for {}'.format(resp.status, payload))
-              answers[2] = resp.status
-        # https://botlist.space/bot/486896267788812288
-        payload = json.dumps({
-          'server_count': guildCount
-        })
-        headers = {
-              'Authorization': self.bot.others['botlist.space'],
-              'Content-Type': 'application/json'
-        }
-        async with session.post('https://api.botlist.space/v1/bots/{}'.format(self.bot.user.id), data=payload, headers=headers) as resp:
-              self.bot.log.debug('botlist.space returned {} for {}'.format(resp.status, payload))
-              answers[3] = resp.status
-        # https://discord.boats/bot/486896267788812288
-        headers = {
-              'Authorization': self.bot.others['discordboats'],
-              'Content-Type': 'application/json'
-        }
-        async with session.post('https://discord.boats/api/bot/{}'.format(self.bot.user.id), data=payload, headers=headers) as resp:
-              self.bot.log.debug('discord.boats returned {} for {}'.format(resp.status, payload))
-              answers[4] = resp.status
+        try:# https://top.gg/bot/486896267788812288
+            payload = {'server_count': guildCount}
+            async with session.post('https://top.gg/api/bots/486896267788812288/stats',data=payload,headers={'Authorization':str(self.bot.dbl_token)}) as resp:
+                self.bot.log.debug('discordbots.org returned {} for {}'.format(resp.status, payload))
+                answers[0] = resp.status
+        except Exception as e:
+            answers[0] = "0"
+            await self.bot.get_cog("ErrorsCog").on_error(e,None)
+        try: # https://bots.ondiscord.xyz/bots/486896267788812288
+            payload = json.dumps({
+            'guildCount': guildCount
+            })
+            headers = {
+                'Authorization': self.bot.others['botsondiscord'],
+                'Content-Type': 'application/json'
+            }
+            async with session.post('https://bots.ondiscord.xyz/bot-api/bots/{}/guilds'.format(self.bot.user.id), data=payload, headers=headers) as resp:
+                self.bot.log.debug('BotsOnDiscord returned {} for {}'.format(resp.status, payload))
+                answers[1] = resp.status
+        except Exception as e:
+            answers[1] = "0"
+            await self.bot.get_cog("ErrorsCog").on_error(e,None)
+        try: # https://botlist.space/bot/486896267788812288
+            payload = json.dumps({
+            'server_count': guildCount
+            })
+            headers = {
+                'Authorization': self.bot.others['botlist.space'],
+                'Content-Type': 'application/json'
+            }
+            async with session.post('https://api.botlist.space/v1/bots/{}'.format(self.bot.user.id), data=payload, headers=headers) as resp:
+                self.bot.log.debug('botlist.space returned {} for {}'.format(resp.status, payload))
+                answers[2] = resp.status
+        except Exception as e:
+            answers[2] = "0"
+            await self.bot.get_cog("ErrorsCog").on_error(e,None)
+        try: # https://discord.boats/bot/486896267788812288
+            headers = {
+                'Authorization': self.bot.others['discordboats'],
+                'Content-Type': 'application/json'
+            }
+            async with session.post('https://discord.boats/api/bot/{}'.format(self.bot.user.id), data=payload, headers=headers) as resp:
+                self.bot.log.debug('discord.boats returned {} for {}'.format(resp.status, payload))
+                answers[3] = resp.status
+        except Exception as e:
+            answers[3] = "0"
+            await self.bot.get_cog("ErrorsCog").on_error(e,None)
+        try: # https://arcane-center.xyz/bot/486896267788812288
+            headers = {
+                'Authorization': self.bot.others['arcanecenter'],
+                'Content-Type': 'application/json'
+            }
+            async with session.post('https://arcane-botcenter.xyz/api/{}/stats'.format(self.bot.user.id), data=payload, headers=headers) as resp:
+                self.bot.log.debug('Arcane Center returned {} for {}'.format(resp.status, payload))
+                answers[3] = resp.status
+        except Exception as e:
+            answers[3] = "0"
+            await self.bot.get_cog("ErrorsCog").on_error(e,None)
         await session.close()
         answers = [str(x) for x in answers]
         emb = self.bot.cogs["EmbedCog"].Embed(desc='**Guilds count updated** in {}s ({})'.format(round(time.time()-t,3),'-'.join(answers)),color=7229109).update_timestamp().set_author(self.bot.user)

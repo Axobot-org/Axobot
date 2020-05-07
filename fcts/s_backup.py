@@ -28,6 +28,7 @@ class BackupCog(commands.Cog):
     @commands.cooldown(2,120, commands.BucketType.guild)
     @commands.check(checks.has_admin)
     async def main_backup(self,ctx:commands.Context):
+        "..Doc server.html#server-backup"
         if ctx.subcommand_passed==None:
             await self.bot.cogs['HelpCog'].help_command(ctx,['backup'])
 
@@ -40,7 +41,15 @@ Arguments are:
     - delete_old_channels: delete every current channel/category
     - delete_old_roles: delete every current role
     - delete_old_emojis: delete every current emoji
-    - delete_old_webhooks: well, same but with webhooks"""
+    - delete_old_webhooks: well, same but with webhooks
+
+..Example backup load
+
+..Example backup load delete_old_roles delete_old_emojis
+
+..Example backup load reset
+
+..Doc server.html#server-backup"""
         # Analyzing arguments
         valid_args = ["reset","delete_old_channels","delete_old_roles","delete_old_emojis","delete_old_webhooks"]
         arguments = set([a.lower() for a in arguments if a.lower() in valid_args])
@@ -89,7 +98,11 @@ Arguments are:
     async def backup_create(self,ctx:commands.Context):
         """Make and send a backup of this server
         You will find there the configuration of your server, every general settings, the list of members with their roles, the list of categories and channels (with their permissions), emotes, and webhooks.
-        Please note that audit logs, messages and invites are not used"""
+        Please note that audit logs, messages and invites are not used
+
+..Example backup create        
+
+..Doc server.html#server-backup"""
         try:
             directory = await self.create_backup(ctx)
             await ctx.send(await self.translate(ctx.guild.id,'modo','backup-done'),file=discord.File(directory))

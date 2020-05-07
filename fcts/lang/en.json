@@ -157,29 +157,36 @@
         "create_footer_2": "Please note - This blurplefier is automated and therefore may not always give you the best result. Disclaimer: This image is a gif, and the quality does not always turn out great. HOWEVER, the gif is quite often not as grainy as it appears in the preview | Content requested by {}",
         "create_oops": "{}, whoops! It looks like this gif is too big to upload. If you want, you can give it another go, except with a smaller version of the image. Sorry about that!",
         "create_title": "Blurplefier - makes your image blurple!",
+        "missing-attachment-perm": "Oops, I'm missing permission to send images!",
         "won-card": "Wow! Very nice blurple picture {}! so beautiful that I decided to offer you the card of xp blurple! You can use it by typing the command `{}profile card blurple` {}"
     },
     "bot_events": {
         "events-desc": {
             "christmas-2019": "Celebrate the arrival of Christmas with this event! For several days, Zbot wears the colours of winter with special emojis for the tic-tac-toe game, a unique avatar and other cool things. \n\nTake the opportunity to collect event points and try to win the 2019 Christmas special xp card! Reminder: xp cards are accessible via my `profile card` command",
+            "blurple-2020": "Let's celebrate 5 years of Discord during the Blurple event! For the third year in a row, we're participating in the Blurple event, which consists in recoloring our avatars and servers with a maximum of blurple, the characteristic color of Discord between purple and blue. Take advantage of this opportunity to collect event points and try to win the special Blurple 2020 xp card! As a reminder, the xp cards are accessible via my command `profile card`.\n\nFor this event, the special command `blurple` has been activated, don't hesitate to use it to try to win points!",
             "nothing": "There are currently no events. Follow the bot news to know the date of the next one!"
         },
         "events-price-title": "Prizes to win",
         "events-prices": {
             "christmas-2019": {
-                "50": "Unlock the special Christmas 2019!"
+                "50": "Unlock the special Christmas 2019 xp card!"
+            },
+            "blurple-2020": {
+                "150": "Unlock the special Blurple 2020 xp card!"
             },
             "nothing": "There is nothing to gain for this event :confused:"
         },
         "events-title": {
-            "christmas-2019": "Christmas is coming!"
+            "christmas-2019": "Christmas is coming!",
+            "blurple-2020": "The 5 Years of Discord!"
         },
         "objectives": "Objectives",
         "points": "points",
         "rank-global": "Global ranking",
         "rank-title": "Event points",
         "rank-total": "Total points",
-        "unclassed": "unclassed"
+        "unclassed": "unclassed",
+        "xp-howto": "You can earn event points by winning tic-tac-toe games, using event commands when available, or by performing various other secret tasks. Don't hesitate to come to the support server to ask for information!"
     },
     "bvn": {
         "aide": "__**Welcome to the join & leave message module**__\n\nThis module is used to configure an automatic message each time a member enters or exits your server.\n\n__** Configuration**__\n\n`1-` To configure the chat room where these messages are written, enter `{p}config change welcome_channel` followed by the channel (you can use its mention as well as its identifier or its full name).\n`2-` To configure a message, enter `{p}config change <welcome|leave> <message>`. For this message you can use some variables:\n - `{user}` mentions the member\n - `{server}` displays the server name\n - `{owner}` displays the server owner name\n - `{member_count}` shows the current number of members\n - `{type}` return 'member' or 'bot'",
@@ -243,7 +250,7 @@
     },
     "fun": {
         "afk-done": "You are now AFK",
-        "afk-no-perm": "Oops, I cannot change your nickname :confused:",
+        "afk-no-perm": "Oops, I cannot change your nickname :confused: I will try to remember, but I could forget that you're afk",
         "afk-user-1": "This member is AFK, because {}",
         "afk-user-2": "This user is AFK!",
         "blame-0": "List of available names for **{}**",
@@ -339,6 +346,7 @@
         "bitly_long": "Original URL: {url}",
         "bitly_nobit": "This address is not a bit.ly link!",
         "bitly_short": "Shortened URL: {url}",
+        "botinvite": "Here is a link to invite me to another server: {url}\nDon't hesitate to test the `about` command for more useful links!",
         "changelog-notfound": "Unable to find this version",
         "changelogs-index": "List of indexed versions",
         "discordlinks": [
@@ -768,6 +776,7 @@
         "rr-embed": "Taking on a role",
         "rr-list": "List of reaction roles ({n}/{m})",
         "rr-removed": "The role {r} can no longer be given via the emoji {e}",
+        "rr-removed-2": "The emoji {e} is free again to give a role",
         "too-many-rr": "You have already reached the limit of {l} roles"
     },
     "rss": {
@@ -850,6 +859,9 @@
         "change-color": "The color used for the option {} is now {}",
         "change-emojis": "The emotions for the option \"{}\" are now {}",
         "change-lang": "The bot language is now in `{}`",
+        "change-levelup_channel": "Levelup messages will now be sent to {}",
+        "change-levelup_channel-1": "Levelup messages will now be posted directly in the chat",
+        "change-levelup_channel-2": "Levelup messages won't be sent anymore",
         "change-prefix": "The prefix has been successfully replaced by `{}`",
         "change-prefix-1": "This prefix is too long to be used!",
         "change-raid": "The anti-raid security level is now set to **{}** ({})",
@@ -860,7 +872,7 @@
         "change-xp_rate": "The xp rate is now at {rate}",
         "config-help": "This command is mainly used to configure your server. By doing `{p}config see [option]` you will get an overview of the current configurations, and server administrators can enter `{p}config change <option> value1, value2...` to modify a configuration, or `{p}config del <option>` to reset the option (`{p}config change <option>` works the same way).\nThe list of available options is available at <https://zbot.rtfd.io/en/latest/server.html#list-of-every-option>, but an index without any explanation can be found with the command `{p}config list`",
         "config-list": "List of available options: {text}More info at {link}",
-        "need-admin": "You need Administrator permission to execute this command.",
+        "need-manage-server": "You need the \"Manage server\" permission to execute this command.",
         "new_server": "Your server has just been registered for the first time in our database. Congratulations :tada:",
         "not-found": "The server {} has not yet been registered in the database",
         "opt_title": "Option \"{}\" of server {}",
@@ -884,6 +896,7 @@
         "kick": "List of roles that can use the \"kick\" command: {}",
         "language": "Current bot language for this server: **{}**",
         "leave": "Message sent when a member leaves: {}",
+        "levelup_channel": "Channel where levelup messages are sent: {}",
         "levelup_msg": "Message sent when a member earns an xp level: {}",
         "membercounter": "Channel displaying number of members in its name: {}",
         "modlogs_channel": "Channel where to send moderation logs: {}",
@@ -1116,6 +1129,7 @@
             "this rock"
         ],
         "low-page": "I cannot display a negative page number!",
+        "negative-xp": "You can't put a negative xp number!",
         "no-bot": "Impossible to modify the XP of a bot!",
         "no-rr": "No role has been configured for this level",
         "rr-added": "The role `{}` has been correctly added for level {}!",

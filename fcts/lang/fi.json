@@ -157,6 +157,7 @@
         "create_footer_2": "Muista tämä: Tämä muuntaja on automaattinen ja ei välttämättä aina anna parasta tulosta. Varoitus: Tämä kuva on gifi, ja laatu ei aina anna hyvää tulosta.  |  {} lähetti komennon",
         "create_oops": "{}, ups! Näyttää siltä että tämä gifi on liian iso lähettämiseen. Jos haluat, voit yrittää uudestaan, mutta pienemmällä versiolla. Anteeksi tästä!",
         "create_title": "Blurplefier - tekee sinun kuvasta blurplen!",
+        "missing-attachment-perm": "Ups, minulta puuttuu käyttöoikeudet kuvien lähettämiseen!",
         "won-card": "Vau! Tosi hieno blurple kuva {}! Niin hieno että päätin antaa sinulle blurple xp kortin! Voit käyttää sitä lähettämällä komennon `{}profile card blurple` {}"
     },
     "bot_events": {
@@ -166,12 +167,16 @@
         },
         "events-price-title": "Palkintoja joita voi voittaa",
         "events-prices": {
+            "blurple-2020": {
+                "150": "Hanki uusi Blurple 2020 xp kortti!"
+            },
             "christmas-2019": {
                 "50": "Lunasta vuoden 2019 joulu spesiaali!"
             },
             "nothing": "Tällä tapahtumalla ei ole mitään mitä voisi hankkia 😕"
         },
         "events-title": {
+            "blurple-2020": "5 vuotta Discordia!",
             "christmas-2019": "Joulu on tulossa!"
         },
         "objectives": "Menestymiset",
@@ -243,7 +248,7 @@
     },
     "fun": {
         "afk-done": "Sinä olet nyt AFK:illa",
-        "afk-no-perm": "Ups, en voi vaihtaa nimimerkkiäsi :confused:",
+        "afk-no-perm": "Ups, en voi muokata nimimerkkiäsi 😕 yritän muistaa, mutta saatan unohtaa että olet afk tilassa",
         "afk-user-1": "Tämä jäsen on AFK:illa koska, {}",
         "afk-user-2": "Tämä jäsen on AFK:illa!",
         "blame-0": "Lista kaikista käytettävistä nimistä**{}**:lle",
@@ -339,6 +344,7 @@
         "bitly_long": "Alkuperäinen URL: {url}",
         "bitly_nobit": "Tämä linkki ei ole bit.ly linkki!",
         "bitly_short": "Lyhennetty URL: {url}",
+        "botinvite": "Tässä on linkki kutsuakseen minut toiseen palvelimeen: {url}\nÄlä unohda testata `about` komentoa hyödyllisille linkeille!",
         "changelog-notfound": "Mahdotonta löytää tämä versio",
         "changelogs-index": "Lista indeksoiduista versioista",
         "discordlinks": [
@@ -768,6 +774,7 @@
         "rr-embed": "Roolit joita voi ottaa",
         "rr-list": "Lista reagointi rooleista ({n}/{m})",
         "rr-removed": "{r} roolia ei enään anneta hymiöllä {e}",
+        "rr-removed-2": "Emoji {e} on nyt vapaa antamaan roolin uudestaan",
         "too-many-rr": "Olet jo tavoittanut rajan joka on {l} roolia"
     },
     "rss": {
@@ -861,6 +868,7 @@
         "config-help": "Tätä komentoa yleensä käytetään palvelimen konfigurointiin. Viestittämällä `!config see [option]` sinä aiot saada näyn tämänaikaisesta konfiguraatiosta, ja palvelimen järjestelmänvalvojat voivat viestittää `!config change <option> ominaisuus1, ominaisuus2...` jolla voi muuttaa konfigurointia, tai `!config del <option>` jolla voi asettaa uudelleen vaitoehdon (`!config change <option>` toimii samallain). Lista mahdollisista vaihtoehdoista löytyy täältä: <https://zbot.rtfd.io/en/latest/server.html#list-of-every-option>",
         "config-list": "Lista saatavilla olevista vaihtoehdoista: {text}Lisätietoja täältä {link}",
         "need-admin": "Tarvitset järjestelmänvalvoja käyttöoikeudet että voit käyttää tätä komentoa.",
+        "need-manage-server": "Tarvitset ”Hallitse palvelinta” käyttöoikeudet, jotta voit käyttää tätä komentoa.",
         "new_server": "Sinun palvelimesi on juuri rekisteröity meidän databaseen ekaa kertaa. Onnea :tada:",
         "not-found": "Palvelin {} ei ole vielä rekisteröity databaseen",
         "opt_title": "Vaihtoehto \"{}\" palvelimesta {}",
@@ -1116,6 +1124,7 @@
             "tämän kiven"
         ],
         "low-page": "En voi näyttää negatiivista sivu numeroa!",
+        "negative-xp": "Et voi laittaa negatiivista xp numeroa!",
         "no-bot": "Ei voi muokata bottejen XP:tä!",
         "no-rr": "Ei roolia konfiguroitu tälle tasolle",
         "rr-added": "Rooli `{}` on lisätty oikein tasolle {} !",

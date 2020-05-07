@@ -27,7 +27,7 @@ class XPCog(commands.Cog):
         self.minimal_size = 5
         self.spam_rate = 0.20
         self.xp_per_char = 0.11
-        self.max_xp_per_msg = 60
+        self.max_xp_per_msg = 70
         self.file = 'xp'
         self.xp_channels_cache = dict()
         bot.add_listener(self.add_xp,'on_message')
@@ -53,6 +53,18 @@ class XPCog(commands.Cog):
         await self.bdd_load_cache(-1)
         if not self.bot.database_online:
             self.bot.unload_extension("fcts.xp")
+
+    async def get_lvlup_chan(self, msg: discord.Message):
+        value = await self.bot.get_cog("ServerCog").find_staff(msg.guild.id,"levelup_channel")
+        if value == "none":
+            return None
+        if value == "any":
+            return msg.channel
+        try:
+            chan = msg.guild.get_channel(int(value))
+            return chan
+        except discord.errors.NotFound:
+            return None
 
     async def add_xp(self,msg):
         """Attribue un certain nombre d'xp à un message"""
@@ -177,7 +189,10 @@ class XPCog(commands.Cog):
     async def send_levelup(self,msg,lvl):
         """Envoie le message de levelup"""
         await self.bot.cogs["UtilitiesCog"].add_user_eventPoint(msg.author.id,round(lvl[0]/5))
-        if msg.guild!=None and not msg.channel.permissions_for(msg.guild.me).send_messages:
+        if msg.guild == None:
+            return
+        destination = await self.get_lvlup_chan(msg)
+        if destination == None or (not msg.channel.permissions_for(msg.guild.me).send_messages):
             return
         text = await self.bot.cogs['ServerCog'].find_staff(msg.guild.id,'levelup_msg')
         if text==None or len(text)==0:
@@ -188,7 +203,7 @@ class XPCog(commands.Cog):
             item = random.choice(await self.bot.cogs['LangCog'].tr(msg.channel,'xp','levelup-items'))
         else:
             item = ''
-        await msg.channel.send(text.format_map(self.bot.SafeDict(user=msg.author.mention,level=lvl[0],random=item,username=msg.author.display_name)))
+        await destination.send(text.format_map(self.bot.SafeDict(user=msg.author.mention,level=lvl[0],random=item,username=msg.author.display_name)))
         
     async def check_cmd(self,msg):
         """Vérifie si un message est une commande"""
@@ -293,6 +308,7 @@ class XPCog(commands.Cog):
         except mysql.connector.errors.ProgrammingError:
             if createIfNeeded:
                 cursor.execute("CREATE TABLE `{}` LIKE `example`;".format(guild))
+                self.bot.log.info(f"[get_table] XP Table `{guild}` created")
                 cursor.execute("SELECT 1 FROM `{}` LIMIT 1;".format(guild))
                 return guild
             else:
@@ -305,9 +321,9 @@ class XPCog(commands.Cog):
             if not self.bot.database_online:
                 self.bot.unload_extension("fcts.xp")
                 return None
-            if points==0:
+            if points < 0:
                 return True
-            if guild==None:
+            if guild == None:
                 cnx = self.bot.cnx_frm
             else:
                 cnx = self.bot.cnx_xp
@@ -325,7 +341,7 @@ class XPCog(commands.Cog):
             await self.bot.cogs['ErrorsCog'].on_error(e,None)
             return False
     
-    async def bdd_get_xp(self,userID,guild:int):
+    async def bdd_get_xp(self, userID: int, guild: int):
         try:
             if not self.bot.database_online:
                 self.bot.unload_extension("fcts.xp")
@@ -334,7 +350,10 @@ class XPCog(commands.Cog):
                 cnx = self.bot.cnx_frm
             else:
                 cnx = self.bot.cnx_xp
-            query = ("SELECT `xp` FROM `{}` WHERE `userID`={} AND `banned`=0".format(await self.get_table(guild),userID))
+            table = await self.get_table(guild, False)
+            if table == None:
+                return None
+            query = ("SELECT `xp` FROM `{}` WHERE `userID`={} AND `banned`=0".format(table,userID))
             cursor = cnx.cursor(dictionary = True)
             cursor.execute(query)
             liste = list()
@@ -360,7 +379,10 @@ class XPCog(commands.Cog):
                 cnx = self.bot.cnx_frm
             else:
                 cnx = self.bot.cnx_xp
-            query = ("SELECT COUNT(*) FROM `{}` WHERE `banned`=0".format(await self.get_table(guild)))
+            table = await self.get_table(guild, False)
+            if table == None:
+                return 0
+            query = ("SELECT COUNT(*) FROM `{}` WHERE `banned`=0".format(table))
             cursor = cnx.cursor(dictionary = False)
             cursor.execute(query)
             liste = list()
@@ -418,12 +440,17 @@ class XPCog(commands.Cog):
                 return None
             if guild!=None and await self.bot.cogs['ServerCog'].find_staff(guild.id,'xp_type')!=0:
                 cnx = self.bot.cnx_xp
-                query = ("SELECT * FROM `{}` order by `xp` desc".format(await self.get_table(guild.id)))
+                query = ("SELECT * FROM `{}` order by `xp` desc".format(await self.get_table(guild.id,False)))
             else:
                 cnx = self.bot.cnx_frm
                 query = ("SELECT * FROM `{}` order by `xp` desc".format(self.table))
             cursor = cnx.cursor(dictionary = True)
-            cursor.execute(query)
+            try:
+                cursor.execute(query)
+            except mysql.connector.errors.ProgrammingError as e:
+                if e.errno == 1146:
+                    return list()
+                raise e
             liste = list()
             if guild==None:
                 liste = [x for x in cursor][:top]
@@ -448,12 +475,17 @@ class XPCog(commands.Cog):
                 return None
             if guild!=None and await self.bot.cogs['ServerCog'].find_staff(guild.id,'xp_type')!=0:
                 cnx = self.bot.cnx_xp
-                query = ("SELECT `userID`,`xp`, @curRank := @curRank + 1 AS rank FROM `{}` p, (SELECT @curRank := 0) r WHERE `banned`='0' ORDER BY xp desc;".format(await self.get_table(guild.id)))
+                query = ("SELECT `userID`,`xp`, @curRank := @curRank + 1 AS rank FROM `{}` p, (SELECT @curRank := 0) r WHERE `banned`='0' ORDER BY xp desc;".format(await self.get_table(guild.id, False)))
             else:
                 cnx = self.bot.cnx_frm
                 query = ("SELECT `userID`,`xp`, @curRank := @curRank + 1 AS rank FROM `{}` p, (SELECT @curRank := 0) r WHERE `banned`='0' ORDER BY xp desc;".format(self.table))
             cursor = cnx.cursor(dictionary = True)
-            cursor.execute(query)
+            try:
+                cursor.execute(query)
+            except mysql.connector.errors.ProgrammingError as e:
+                if e.errno == 1146:
+                    return {"rank":0, "xp":0}
+                raise e
             userdata = dict()
             i = 0
             if guild!=None:
@@ -462,7 +494,7 @@ class XPCog(commands.Cog):
                 if (guild!=None and x['userID'] in users) or guild==None:
                     i += 1
                 if x['userID']== userID:
-                    x['rank'] = i
+                    # x['rank'] = i
                     userdata = x
                     break
             cursor.close()
@@ -486,16 +518,16 @@ class XPCog(commands.Cog):
             cursor.close()
             result = round(liste[0]['SUM(xp)'])
 
-            cnx = self.bot.cnx_xp
-            cursor = cnx.cursor()
-            cursor.execute("show tables")
-            tables = [x[0] for x in cursor if x[0].isnumeric()]
-            for table in tables:
-                cursor.execute("SELECT SUM(xp) FROM `{}`".format(table))
-                res = [x for x in cursor]
-                if res[0][0]!=None:
-                    result += round(res[0][0])
-            cursor.close()
+            # cnx = self.bot.cnx_xp
+            # cursor = cnx.cursor()
+            # cursor.execute("show tables")
+            # tables = [x[0] for x in cursor if x[0].isnumeric()]
+            # for table in tables:
+            #     cursor.execute("SELECT SUM(xp) FROM `{}`".format(table))
+            #     res = [x for x in cursor]
+            #     if res[0][0]!=None:
+            #         result += round(res[0][0])
+            # cursor.close()
             return result
         except Exception as e:
             await self.bot.cogs['ErrorsCog'].on_error(e,None)
@@ -664,7 +696,7 @@ class XPCog(commands.Cog):
             if ctx.guild==None or ctx.channel.permissions_for(ctx.guild.me).attach_files:
                 await self.send_card(ctx,user,xp,rank,ranks_nb,xp_used_type,levels_info)
             elif ctx.channel.permissions_for(ctx.guild.me).embed_links:
-                await self.send_embed(ctx,user,xp,rank,ranks_nb,xp_used_type,levels_info)
+                await self.send_embed(ctx,user,xp,rank,ranks_nb,levels_info,xp_used_type)
             else:
                 await self.send_txt(ctx,user,xp,rank,ranks_nb,levels_info,xp_used_type)
         except Exception as e:
@@ -740,7 +772,8 @@ class XPCog(commands.Cog):
             xp_system_used = 0
         if xp_system_used==0:
             if Type=='global':
-                #ranks = await self.bdd_get_top(20*page)
+                if len(self.cache["global"])==0:
+                    await self.bdd_load_cache(-1)
                 ranks = sorted([{'userID':key, 'xp':value[1]} for key,value in self.cache['global'].items()], key=lambda x:x['xp'], reverse=True)
                 max_page = ceil(len(self.cache['global'])/20)
             elif Type=='guild':
@@ -780,7 +813,7 @@ class XPCog(commands.Cog):
             t = await self.translate(ctx.channel,'xp','top-title-1')
         if ctx.guild==None or ctx.channel.permissions_for(ctx.guild.me).embed_links:
             emb = await self.bot.cogs['EmbedCog'].Embed(title=t,fields=[{'name':f_name,'value':"\n".join(txt)},your_rank],color=self.embed_color,author_icon=self.bot.user.avatar_url_as(format='png')).create_footer(ctx)
-            await ctx.send(embed=emb.discord_embed())
+            await ctx.send(embed=emb)
         else:
             await ctx.send(f_name+"\n\n"+'\n'.join(txt))
 
@@ -796,23 +829,25 @@ class XPCog(commands.Cog):
                 done.append(f[0])
     
 
-    @commands.command(name='set_xp')
+    @commands.command(name='set_xp', aliases=["setxp", "set-xp"])
     @commands.guild_only()
     @commands.check(checks.has_admin)
     async def set_xp(self,ctx,xp:int,*,user:args.user):
         """Set the XP of a user"""
         if user.bot:
-            return await ctx.send(await self.translate(ctx.guild.id,'xp','no-bot'))
-        if await self.bot.cogs['ServerCog'].find_staff(ctx.guild.id,'xp_type')==0:
-            return await ctx.send(await self.translate(ctx.guild.id,'xp','change-global-xp'))
+            return await ctx.send(await self.translate(ctx.guild.id, 'xp', 'no-bot'))
+        if await self.bot.cogs['ServerCog'].find_staff(ctx.guild.id,'xp_type') == 0:
+            return await ctx.send(await self.translate(ctx.guild.id, 'xp', 'change-global-xp'))
+        if xp < 0:
+            return await ctx.send(await self.translate(ctx.guild.id, 'xp', 'negative-xp'))
         try:
-            await self.bdd_set_xp(user.id,xp,Type='set',guild=ctx.guild.id)
+            await self.bdd_set_xp(user.id, xp, Type='set', guild=ctx.guild.id)
             await ctx.send(await self.translate(ctx.guild.id,'xp','change-xp-ok',user=str(user),xp=xp))
         except Exception as e:
             await ctx.send(await self.translate(ctx.guild.id,'mc','serv-error'))
             await self.bot.cogs['ErrorsCog'].on_error(e,ctx)
-
-
+        else:
+            self.cache[ctx.guild.id][user.id] = [round(time.time()), xp]
 
     async def gen_rr_id(self):
         return round(time.time()/2)

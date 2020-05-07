@@ -157,29 +157,36 @@
         "create_footer_2": "plz note that My dear blurplefier is automated and so may not always give you the best result :heart:. Disclaimer: This img is a gif, and the quality does not always turn out great. HOWEVER, da gif is quite often not as grainy as it appears in the preview lol | Content requested by {}",
         "create_oops": "{}, whoops! It looks like this gif is tooooo big 2 upload. If U want, U can give it another go, but with a smaller version ov the img. Sorry about that!",
         "create_title": "Blurplefier - makes your img blurple!",
+        "missing-attachment-perm": "Oops, I'm missing permission to send images!",
         "won-card": "WeeeeW very nice blurple pfp {}! so beauty-full that I decided to give U the card of xp blurple! You can use it by typing teh command `{}profile card blurple` {}"
     },
     "bot_events": {
         "events-desc": {
             "christmas-2019": "Celebrate the arrival of Christmas with this event! For several days, Zbot wears the colours of winter with special emojis for the tic-tac-toe game, a unique avatar and other cool things. \n\nTake the opportunity to collect event points and try to win the 2019 Christmas special xp card! Reminder: xp cards are accessible via my `profile card` command",
+            "blurple-2020": "Let's celebrate 5 years of Discord during the Blurple event! For the third year in a row, we're participating in the Blurple event, which consists in recoloring our avatars and servers with a maximum of blurple, the characteristic color of Discord between purple and blue. Take advantage of this opportunity to collect event points and try to win the special Blurple 2020 xp card! As a reminder, the xp cards are accessible via my command `profile card`.\n\nFor this event, the special command `blurple` has been activated, don't hesitate to use it to try to win points!",
             "nothing": "There'r no events rn. Follow my bot news 2 know teh date of the next one!"
         },
         "events-price-title": "Prizes 2 win",
         "events-prices": {
             "christmas-2019": {
-                "50": "Unlock da special Christmas 2019!"
+                "50": "Unlock da special Christmas 2019 xp card!"
+            },
+            "blurple-2020": {
+                "150": "Unlock dat special Blurple 2020 xp card!"
             },
             "nothing": "There's no thing 2 gain 4 this event :confused:"
         },
         "events-title": {
-            "christmas-2019": "Christmas iz cming!"
+            "christmas-2019": "Christmas iz cming!",
+            "blurple-2020": "Dat 5 Years ov Discord!"
         },
         "objectives": "Objectives",
         "points": "pts",
         "rank-global": "Glob. rank",
         "rank-title": "Event pts",
         "rank-total": "Total pts",
-        "unclassed": "unclassd"
+        "unclassed": "unclassd",
+        "xp-howto": "You can earn event points by winning tic-tac-toe games, using event commands when available, or by performing various other secret tasks. Don't hesitate to come to the support server to ask for information!"
     },
     "bvn": {
         "aide": "__**Wilcom 2 teh join end leef mesg modul**__\n\nDis modul is usd 2 configur a' automatic mesage each tiem membr enters or exits ur servr.\n\n__** ConfiGrationZ**__\n\n`1-` To configur teh channel wer thees mesagez 're writtn, entr `{p}config change welcome_channel` followd by teh channl ID (U can use it # as wellas its iD or its full nice name).\n`2-` To configure a msg, entr `{p}config change <welcome|leave> <message>`. 4 dis mesage u can uz somm variabl':\n - `{user}` mentionz teh member\n - `{server}` displayz the servr nayme\n - `{owner}` displayz teh servr ownr nam\n - `{member_count}` showz the curent nbr oof memberz\n - `{type}` show theh type of the user (bot/member)\n",
@@ -243,7 +250,7 @@
     },
     "fun": {
         "afk-done": "U'r now AFK",
-        "afk-no-perm": "Oops, I can't change Ur nickname :confused:",
+        "afk-no-perm": "Oops, I can't change Ur nickname :confused: I'll try to remember :/",
         "afk-user-1": "Taht member iz AFK, 'cuz {}",
         "afk-user-2": "This usr is AFK!",
         "blame-0": "Lizt ov availabl namz 4 **{}**",
@@ -339,6 +346,7 @@
         "bitly_long": "Slow link: {url}",
         "bitly_nobit": "HAHA NOPE, dat's not a bit.ly link!",
         "bitly_short": "Quick linq: {url}",
+        "botinvite": "Hers a link 2 invite me 2 'nother warm place: {url}\nDon't hesitate to test my cool `about` cmd 4 + useful links!",
         "changelog-notfound": "Srry but i cannot find das version",
         "changelogs-index": "List of indexed versions",
         "discordlinks": [
@@ -768,6 +776,7 @@
         "rr-embed": "tAkInG on A ROle",
         "rr-list": "lIsT 0v REacti0n RoLes ({n}/{m})",
         "rr-removed": "The role {r} can no longer be given via the emoji {e}",
+        "rr-removed-2": "Dat emoji {e} is can again gaving a role",
         "too-many-rr": "You have 'ready reached da limit ov {l} roles"
     },
     "rss": {
@@ -850,6 +859,9 @@
         "change-color": "The coulor uzd for the option {} is naw {}",
         "change-emojis": "Teh emojiz 4 the opshun '{}' are naw {}",
         "change-lang": "Teh bot lang is naw in `{}`",
+        "change-levelup_channel": "lvlup messages will naw B sent 2 {}",
+        "change-levelup_channel-1": "Levelup msgs will naw be post directly in teh chat",
+        "change-levelup_channel-2": "Levelup msg won't :b: send anymore :sad:",
         "change-prefix": ":cat: The prefiX has been nicely replaced by `{}`",
         "change-prefix-1": "Dis prèfix:x: iz too long 2 be used!",
         "change-raid": "Teh anti-rayd security lvl iz naw set 2 **{}** ({})",
@@ -860,7 +872,7 @@
         "change-xp_rate": "The xP rate iz now @ {rate}",
         "config-help": "Dis cmd is mainly usd 2 configur ur srver. By doin `!config see [option]` u will get overview ov teh currnt configuraishun, and supr cool servr masters can enter `!config change <option> val1 , val2, val4...` to modify configuraishun, or `!config del <option>` 2 reset teh option (`!config change <option>` works same).\nTeh list ov options is displayd at <https://zbot.rtfd.io/en/latest/server.html#list-of-every-option>",
         "config-list": "List ov options cool taht u can use: {text}More info @ {link}",
-        "need-admin": "U need to be a Big Boss (admin) to get this cmd",
+        "need-manage-server": "U need to be a Cool Boss (server manager) to get this cmd",
         "new_server": "Ur server haz just been written for da furst time in r database. Congratulashuns :tada:",
         "not-found": "Teh server {} haznt been registered yet in da data board",
         "opt_title": "Opzion '{}' of srver {}",
@@ -884,6 +896,7 @@
         "kick": "Lizt of roles taht caan use tee 'kick' commad: {}",
         "language": "Cuurent zbot languge 4 dis lolcat: **{}**",
         "leave": "Mesae sen when an meberz leave: {}",
+        "levelup_channel": "Chat were lvlup msgs are sent: {}",
         "levelup_msg": "Cool text sent when a member gets 1 xp lvl: {}",
         "membercounter": "Channel dis-playin nmberz from memberz in iz nayme: {}",
         "modlogs_channel": "Chanel where 2 sent modrashun wOods: {}",
@@ -1116,6 +1129,7 @@
             "this cool thing"
         ],
         "low-page": "Oops, I can't display a negative page!",
+        "negative-xp": "Plz dont be such negativ, positiv is lif bro",
         "no-bot": "Impossible 2 modify the XP ov a robot!",
         "no-rr": "None role is configured for this level",
         "rr-added": "Role `{}` haz been added 4 level {} !",

@@ -1,8 +1,8 @@
 import discord, datetime, sys, psutil, os, aiohttp, importlib, time, asyncio, typing, random, re, copy, requests
 from discord.ext import commands
 from inspect import signature
-from platform   import system as system_name  # Returns the system/OS name
-from subprocess import call   as system_call  # Execute a shell command
+from platform import system as system_name  # Returns the system/OS name
+from subprocess import call as system_call  # Execute a shell command
 
 default_color = discord.Color(0x50e3c2)
 
@@ -51,7 +51,7 @@ class InfoCog(commands.Cog):
                 for line in file.read().split("\n"):
                     if len(line.strip())>2 and line[0]!='#':
                         count += 1
-            for file in [x.file for x in self.bot.cogs.values()]+['args']:
+            for file in [x.file for x in self.bot.cogs.values()]+['args','checks']:
                 with open('fcts/'+file+'.py','r') as file:
                     for line in file.read().split("\n"):
                         if len(line.strip())>2 and line[0]!='#':
@@ -126,7 +126,17 @@ class InfoCog(commands.Cog):
         members = [x.members for x in self.bot.guilds if x.id not in ignored_guilds]
         members = list(set([x for x in members for x in x])) # filter users
         return len(members),len([x for x in members if x.bot])
-
+    
+    @commands.command(name="botinvite", aliases=["botinv"])
+    async def botinvite(self, ctx:commands.Context):
+        """Get a link to invite me"""
+        try:
+            requests.get("https://zrunner.me/invitezbot", timeout=3)
+        except requests.exceptions.Timeout:
+            url = "https://discord.com/oauth2/authorize?client_id=486896267788812288&scope=bot"
+        else:
+            url = "https://zrunner.me/invitezbot"
+        await ctx.send(await self.translate(ctx.channel, "infos", "botinvite", url=url))
 
     @commands.command(name="ping",aliases=['rep'])
     async def rep(self,ctx,ip=None):
@@ -267,8 +277,8 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
             m_activity = str(await self.translate(ctx.guild.id,"activity","listen")).capitalize() + " " + item.activity.name
         elif item.activity.type==discord.ActivityType.watching:
             m_activity = str(await self.translate(ctx.guild.id,"activity","watch")).capitalize() +" " + item.activity.name
-        elif item.activity.type==4: # /!\ WAITING FOR DISCORD.PY V1.3
-            pass
+        elif item.activity.type==discord.ActivityType.custom:
+            m_activity = item.activity.name
         else:
             m_activity="Error"
         if item.activity==None or item.activity.type != 4:
@@ -471,7 +481,7 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
         embed.set_thumbnail(url=icon_url)
         # Guild banner
         if guild.banner != None:
-            embed.set_image(url=guild.banner)
+            embed.set_image(url=guild.banner_url)
         # Name
         embed.add_field(name=str(await self.translate(ctx.guild.id,"keywords","nom")).capitalize(), value=guild.name,inline=True)
         # ID
@@ -651,14 +661,19 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
         use_embed = ctx.guild==None or ctx.channel.permissions_for(ctx.guild.me).embed_links
         # Servers list
         servers_in = list()
+        owned, membered = 0, 0
         for s in self.bot.guilds:
             if user in s.members:
                 if s.owner==user:
                     servers_in.append(":crown: "+s.name)
+                    owned += 1
                 else:
                     servers_in.append("- "+s.name)
+                    membered += 1
         if len(servers_in)==0:
             servers_in = ["No server"]
+        elif len("\n".join(servers_in)) > 1020:
+            servers_in = [f"{owned} serveurs possédés, membre sur {membered} autres serveurs"]
         # XP card
         xp_card = await self.bot.cogs['UtilitiesCog'].get_xp_style(user)
         # Perks
@@ -846,6 +861,7 @@ Servers:
         flow = await self.bot.cogs['RssCog'].get_flow(ID)
         if len(flow)==0:
             await ctx.send("Invalid ID")
+            return
         else:
             flow = flow[0]
         temp = self.bot.get_guild(flow['guild'])
@@ -859,6 +875,8 @@ Servers:
         else:
             c = "Unknown ({})".format(flow['channel'])
         d = await self.bot.cogs['TimeCog'].date(flow['date'],digital=True)
+        if d==None or len(d)==0:
+            d = "never"
         if ctx.guild==None or ctx.channel.permissions_for(ctx.guild.me).embed_links:
             if ctx.guild==None:
                 color = None
@@ -922,7 +940,7 @@ Servers:
     @get_prefix.command(name="change")
     @commands.guild_only()
     async def prefix_change(self,ctx,new_prefix):
-        """Change the user prefix"""
+        """Change the used prefix"""
         msg = copy.copy(ctx.message)
         msg.content = ctx.prefix + 'config change prefix '+new_prefix
         new_ctx = await self.bot.get_context(msg)
@@ -934,7 +952,7 @@ Servers:
         can_embed = True if isinstance(ctx.channel,discord.DMChannel) else ctx.channel.permissions_for(ctx.guild.me).embed_links
         if can_embed:
             l = await self.translate(ctx.channel,'infos','discordlinks')
-            links = ["https://dis.gd/status","https://dis.gd/tos","https://dis.gd/report","https://dis.gd/feedback","https://support.discordapp.com/hc/en-us/articles/115002192352","https://discordapp.com/developers/docs/legal","https://support.discordapp.com/hc/en-us/articles/206346498-Where-can-I-find-my-User-Server-Message-ID-"]
+            links = ["https://dis.gd/status","https://dis.gd/tos","https://dis.gd/report","https://dis.gd/feedback","https://support.discord.com/hc/en-us/articles/115002192352","https://discord.com/developers/docs/legal","https://support.discord.com/hc/en-us/articles/206346498-Where-can-I-find-my-User-Server-Message-ID-"]
             txt = "\n".join(['['+l[i]+']('+links[i]+')' for i in range(len(l))])
             em = await self.bot.cogs["EmbedCog"].Embed(desc=txt).update_timestamp().create_footer(ctx)
             await ctx.send(embed=em)

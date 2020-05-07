@@ -129,13 +129,15 @@
             ]
         },
         "cmd-not-found": "Es gibt keinen \"{}\" Befehl",
+        "description": "Beschreibung",
         "embed_title": "Nutzbare Befehle für {u}",
         "footer": "Gib ''{}help' ein um mehr Infos über unsere Commands zu erhalten",
         "no-desc-cmd": "Keine Bescheibung für diesen Befehl",
         "no-desc-cog": "Keine Beschreibung für diese cog.",
         "no-subcmd": "Der Befehl `{0.name}` hat keine Unterbefehle",
         "not-enabled": ":warning: Dieser Befehl ist deaktiviert",
-        "subcmd-not-found": "Dieser Befehl hat keinen Unterbefehl namens \"{}\""
+        "subcmd-not-found": "Dieser Befehl hat keinen Unterbefehl namens \"{}\"",
+        "subcmds": "Unterbefehle"
     },
     "blurple": {
         "check_fields": [
@@ -240,7 +242,6 @@
     },
     "fun": {
         "afk-done": "Du bist jetzt AFK",
-        "afk-no-perm": "Oops, ich kann deinen Nicknamen nicht ändern :confused:",
         "afk-user-1": "Dieses Mitglied ist AFK, da {}",
         "afk-user-2": "Dieser Nutzer ist AFK!",
         "blame-0": "Liste möglicher Namen für **{}**",

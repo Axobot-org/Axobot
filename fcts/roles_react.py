@@ -167,7 +167,10 @@ class RolesReact(commands.Cog):
             await self.bot.cogs['ErrorsCog'].on_cmd_error(ctx,e)
         else:
             role = ctx.guild.get_role(l[0]['role'])
-            await ctx.send(await self.translate(ctx.guild.id,'roles_react','rr-removed',r=role,e=old_emoji))
+            if role == None:
+                await ctx.send(await self.translate(ctx.guild.id,'roles_react','rr-removed-2',e=old_emoji))
+            else:
+                await ctx.send(await self.translate(ctx.guild.id,'roles_react','rr-removed',r=role,e=old_emoji))
             if len(l)<2:
                 try:
                     self.guilds_which_have_roles.remove(ctx.guild.id)
