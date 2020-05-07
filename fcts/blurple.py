@@ -124,6 +124,7 @@ def _make_color_command(name, fmodifier, parent, **kwargs):
                 r = await convert_image(await image.read(), final_modifier, method,variations)
         await ctx.send(f"{ctx.author.mention}, here's your image!", file=r)
         await old_msg.delete()
+        await self.bot.cogs["UtilitiesCog"].add_user_eventPoint(ctx.author.id, 3)
 
     return command
 
