@@ -175,6 +175,7 @@ def main():
     initial_extensions = ['fcts.language',
                       'fcts.admin',
                       'fcts.aide',
+                      'fcts.blurple',
                       'fcts.bot_events',
                       'fcts.bvn',
                       'fcts.cases',

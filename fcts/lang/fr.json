@@ -146,7 +146,7 @@
             "Blurple (rgb(114, 137, 218))",
             "Blanc (rgb(255, 255, 255))",
             "Blurple Sombre (rgb(78, 93, 148))",
-            "Blurple, Blanc, Blurple Sombre = Blurple, Blanc, and Blurple Sombre (respectively) \nNoir = ni Blurple, ni Blanc, ni Blurple Sombre",
+            "Blurple, Blanc, Blurple Sombre = Blurple, Blanc, et Blurple Sombre (respectivement) \nNoir = ni Blurple, ni Blanc, ni Blurple Sombre",
             "Un énorme merci à **Rocked03** pour son code :blue_heart: https://github.com/Rocked03/Blurplefied.git",
             "Remarque : Discord réduit la qualité des images, donc les pourcentages peuvent être légèrement imprécis. | Content requested by {}"
         ],
@@ -157,11 +157,13 @@
         "create_footer_2": "Veuillez noter que ce blurplefier est automatisé et qu'il peut donc ne pas toujours vous donner le meilleur résultat. Avertissement : Cette image est un gif, et la qualité n'est pas toujours bonne. TOUTEFOIS, le gif n'est souvent pas aussi granuleux qu'il n'y paraît dans la prévisualisation. | Content requested by {}",
         "create_oops": "{}, oups ! Il semble que ce gif est trop gros pour être téléchargé. Si vous voulez, vous pouvez lui donner une autre chance, mais avec une version plus petite de l'image. Désolé !",
         "create_title": "Blurplefier - makes your image blurple!",
+        "missing-attachment-perm": "Oups, il me manque la permission d'envoyer des images !",
         "won-card": "Wow! Magnifique image blurple {}! tellement beau que j'ai décidé de t'offrir la carte d'xp blurple, je suis sûr qu'elles iront bien ensemble ! Tu peux l'utiliser en tapant la commande `{}profile card blurple` {}"
     },
     "bot_events": {
         "events-desc": {
             "christmas-2019": "Fêtez l'arrivée de Noël grâce à cet événement ! Pendant plusieurs jours, Zbot se pare des couleurs de l'hiver avec des émojis spéciaux pour le jeu du morpion, un avatar unique ainsi que d'autres choses trop cool. \n\nProfitez-en pour récupérer des points d'événements et tentez de gagner la carte d'xp spécial Noël 2019 ! Pour rappel, les cartes d'xp sont accessibles via ma commande `profile card`",
+            "blurple-2020": "Fêtons les 5 ans de Discord pendant l'événement Blurple ! Pour la troisième année consécutive, nous participons à l'événement \"Blurple\", qui consiste à recolorer nos avatars et serveurs avec un maximum de blurple, cette couleur caractéristique de Discord entre le violet et le bleu. Profitez-en pour récupérer des points d'événements et tentez de gagner la carte d'xp spécial Blurple 2020 ! Pour rappel, les cartes d'xp sont accessibles via ma commande `profile card`",
             "nothing": "Il n'y a actuellement aucun événement. Suivez les news du bot pour connaître la date du prochain !"
         },
         "events-price-title": "Prix à gagner",
@@ -169,10 +171,14 @@
             "christmas-2019": {
                 "50": "Débloquez la carte d'xp spécial Noël 2019 !"
             },
+            "blurple-2020": {
+                "150": "Débloquez la carte d'xp spécial Blurple 2020 !"
+            },
             "nothing": "Il n'y a rien à gagner pour cet événement :confused:"
         },
         "events-title": {
-            "christmas-2019": "Noël en approche !"
+            "christmas-2019": "Noël en approche !",
+            "blurple-2020": "Les 5 ans de Discord !"
         },
         "objectives": "Objectifs",
         "points": "points",
@@ -862,7 +868,7 @@
         "change-xp_rate": "Le modificateur d'xp est maintenant à {rate}",
         "config-help": "Cette commande sert principalement à configurer votre serveur. En faisant `!config see [option]` vous obtiendrez l'aperçu des configurations actuelles, et les administrateurs du serveur peuvent entrer `!config change <option> valeur1, valeur2...` pour modifier une configuration, ou `!config del <option>` pour réinitialiser l'option (`!config change <option> del` fonctionne de même).\nLa liste des options disponible est accessible à l'adresse <https://zbot.rtfd.io/en/latest/server.html#list-of-every-option>",
         "config-list": "Liste des options disponibles :{text}Plus d'information : {link}",
-        "need-admin": "Vous devez avoir les permissions Administrateur pour exécuter cette commande.",
+        "need-manage-server": "Vous devez avoir les permissions \"Gérer le serveur\" pour exécuter cette commande.",
         "new_server": "Votre serveur vient d'être enregistré pour la première fois dans notre base de donnée. Félicitations :tada:",
         "not-found": "Le serveur {} n'a pas encore été enregistré dans la base de donnée",
         "opt_title": "Option '{}' du serveur {}",

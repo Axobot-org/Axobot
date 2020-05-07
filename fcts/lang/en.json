@@ -157,6 +157,7 @@
         "create_footer_2": "Please note - This blurplefier is automated and therefore may not always give you the best result. Disclaimer: This image is a gif, and the quality does not always turn out great. HOWEVER, the gif is quite often not as grainy as it appears in the preview | Content requested by {}",
         "create_oops": "{}, whoops! It looks like this gif is too big to upload. If you want, you can give it another go, except with a smaller version of the image. Sorry about that!",
         "create_title": "Blurplefier - makes your image blurple!",
+        "missing-attachment-perm": "Oops, I'm missing permission to send images!",
         "won-card": "Wow! Very nice blurple picture {}! so beautiful that I decided to offer you the card of xp blurple! You can use it by typing the command `{}profile card blurple` {}"
     },
     "bot_events": {
@@ -862,7 +863,7 @@
         "change-xp_rate": "The xp rate is now at {rate}",
         "config-help": "This command is mainly used to configure your server. By doing `{p}config see [option]` you will get an overview of the current configurations, and server administrators can enter `{p}config change <option> value1, value2...` to modify a configuration, or `{p}config del <option>` to reset the option (`{p}config change <option>` works the same way).\nThe list of available options is available at <https://zbot.rtfd.io/en/latest/server.html#list-of-every-option>, but an index without any explanation can be found with the command `{p}config list`",
         "config-list": "List of available options: {text}More info at {link}",
-        "need-admin": "You need Administrator permission to execute this command.",
+        "need-manage-server": "You need the \"Manage server\" permission to execute this command.",
         "new_server": "Your server has just been registered for the first time in our database. Congratulations :tada:",
         "not-found": "The server {} has not yet been registered in the database",
         "opt_title": "Option \"{}\" of server {}",

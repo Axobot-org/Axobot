@@ -349,16 +349,21 @@ class UtilitiesCog(commands.Cog):
             return False
         return parameters['unlocked_rainbow']
     
-    async def has_blurple_card(self,user):
+    async def has_blurple_card(self,user,year=19):
         """Check if a user won the blurple card"""
         parameters = None
         try:
-            parameters = await self.get_db_userinfo(criters=["userID="+str(user.id)],columns=['unlocked_blurple'])
+            parameters = await self.get_db_userinfo(criters=["userID="+str(user.id)],columns=[f'unlocked_blurple_{year}'])
         except Exception as e:
             await self.bot.cogs["ErrorsCog"].on_error(e,None)
         if parameters==None:
             return False
-        return parameters['unlocked_blurple']
+        if (year==20) and not parameters['unlocked_blurple_20'] and self.bot.current_event=="blurple":
+            points = await self.get_db_userinfo(["events_points"],["userID="+str(user.id)])
+            if points != None and points["events_points"] >= 150:
+                await self.change_db_userinfo(user.id,'unlocked_blurple_20',True)
+                parameters['unlocked_blurple_20'] = True
+        return parameters[f'unlocked_blurple_{year}']
     
     async def has_christmas_card(self,user):
         """Check if a user won the christmas card"""
@@ -419,8 +424,10 @@ class UtilitiesCog(commands.Cog):
             liste2.append('partner')
         if await self.is_premium(user):
             liste2.append('premium')
-        if await self.has_blurple_card(user):
-            liste.append('blurple')
+        if await self.has_blurple_card(user,19):
+            liste.append('blurple19')
+        if await self.has_blurple_card(user,20):
+            liste.append('blurple20')
         if await self.has_rainbow_card(user):
             liste.append('rainbow')
         if await self.has_christmas_card(user):

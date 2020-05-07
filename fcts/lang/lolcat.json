@@ -157,6 +157,7 @@
         "create_footer_2": "plz note that My dear blurplefier is automated and so may not always give you the best result :heart:. Disclaimer: This img is a gif, and the quality does not always turn out great. HOWEVER, da gif is quite often not as grainy as it appears in the preview lol | Content requested by {}",
         "create_oops": "{}, whoops! It looks like this gif is tooooo big 2 upload. If U want, U can give it another go, but with a smaller version ov the img. Sorry about that!",
         "create_title": "Blurplefier - makes your img blurple!",
+        "missing-attachment-perm": "Oops, I'm missing permission to send images!",
         "won-card": "WeeeeW very nice blurple pfp {}! so beauty-full that I decided to give U the card of xp blurple! You can use it by typing teh command `{}profile card blurple` {}"
     },
     "bot_events": {
@@ -862,7 +863,7 @@
         "change-xp_rate": "The xP rate iz now @ {rate}",
         "config-help": "Dis cmd is mainly usd 2 configur ur srver. By doin `!config see [option]` u will get overview ov teh currnt configuraishun, and supr cool servr masters can enter `!config change <option> val1 , val2, val4...` to modify configuraishun, or `!config del <option>` 2 reset teh option (`!config change <option>` works same).\nTeh list ov options is displayd at <https://zbot.rtfd.io/en/latest/server.html#list-of-every-option>",
         "config-list": "List ov options cool taht u can use: {text}More info @ {link}",
-        "need-admin": "U need to be a Big Boss (admin) to get this cmd",
+        "need-manage-server": "U need to be a Cool Boss (server manager) to get this cmd",
         "new_server": "Ur server haz just been written for da furst time in r database. Congratulashuns :tada:",
         "not-found": "Teh server {} haznt been registered yet in da data board",
         "opt_title": "Opzion '{}' of srver {}",
