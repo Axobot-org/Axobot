@@ -163,17 +163,22 @@
     "bot_events": {
         "events-desc": {
             "christmas-2019": "Celebrate the arrival of Christmas with this event! For several days, Zbot wears the colours of winter with special emojis for the tic-tac-toe game, a unique avatar and other cool things. \n\nTake the opportunity to collect event points and try to win the 2019 Christmas special xp card! Reminder: xp cards are accessible via my `profile card` command",
+            "blurple-2020": "Let's celebrate 5 years of Discord during the Blurple event! For the third year in a row, we're participating in the Blurple event, which consists in recoloring our avatars and servers with a maximum of blurple, the characteristic color of Discord between purple and blue. Take advantage of this opportunity to collect event points and try to win the special Blurple 2020 xp card! As a reminder, the xp cards are accessible via my command `profile card`.",
             "nothing": "There'r no events rn. Follow my bot news 2 know teh date of the next one!"
         },
         "events-price-title": "Prizes 2 win",
         "events-prices": {
             "christmas-2019": {
-                "50": "Unlock da special Christmas 2019!"
+                "50": "Unlock da special Christmas 2019 xp card!"
+            },
+            "blurple-2020": {
+                "150": "Unlock dat special Blurple 2020 xp card!"
             },
             "nothing": "There's no thing 2 gain 4 this event :confused:"
         },
         "events-title": {
-            "christmas-2019": "Christmas iz cming!"
+            "christmas-2019": "Christmas iz cming!",
+            "blurple-2020": "Dat 5 Years ov Discord!"
         },
         "objectives": "Objectives",
         "points": "pts",
