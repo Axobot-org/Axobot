@@ -246,7 +246,9 @@ class ServerCog(commands.Cog):
     @commands.group(name='config')
     @commands.guild_only()
     async def sconfig_main(self,ctx):
-        """Function for setting the bot on a server"""
+        """Function for setting the bot on a server
+
+..Doc server.html#config-options"""
         if ctx.bot.database_online:
             await self.is_server_exist(ctx.guild.id)
         if ctx.invoked_subcommand is None:
