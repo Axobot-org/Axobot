@@ -536,9 +536,9 @@ class Events(commands.Cog):
             }
             async with session.post('https://arcane-botcenter.xyz/api/{}/stats'.format(self.bot.user.id), data=payload, headers=headers) as resp:
                 self.bot.log.debug('Arcane Center returned {} for {}'.format(resp.status, payload))
-                answers[3] = resp.status
+                answers[4] = resp.status
         except Exception as e:
-            answers[3] = "0"
+            answers[4] = "0"
             await self.bot.get_cog("ErrorsCog").on_error(e,None)
         await session.close()
         answers = [str(x) for x in answers]
