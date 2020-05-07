@@ -123,7 +123,8 @@ class BotEventsCog(commands.Cog):
                 fields.append({"name": objectives_title, "value": prices})
             fields.append({"name": rank_total, "value": str(points), "inline":True})
             fields.append({"name": rank_global, "value": user_rank, "inline":True})
-            emb = self.bot.cogs["EmbedCog"].Embed(title=title,fields=fields,color=4254055,author_name=str(ctx.author),author_icon=str(await self.bot.user_avatar_as(ctx.author,32)))
+            desc = await self.translate(ctx.channel, "bot_events", "xp-howto")
+            emb = self.bot.cogs["EmbedCog"].Embed(title=title,desc=desc,fields=fields,color=4254055,author_name=str(ctx.author),author_icon=str(await self.bot.user_avatar_as(ctx.author,32)))
             await ctx.send(embed=emb)
         else:
             msg = f"**{title}** ({ctx.author})"
