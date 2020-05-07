@@ -2,6 +2,7 @@ import asyncio
 import aiohttp
 import json
 import typing
+import json
 
 import discord
 from discord.ext import commands
@@ -70,6 +71,12 @@ def _make_check_command(name, parent, **kwargs):
                 r = await check_image(await image.read(), theme, name)
         answer = "\n".join(["> {}: {}%".format(color["name"],color["ratio"]) for color in r['colors']])
         await ctx.send(f"Results for {ctx.author.mention}:\n"+answer)
+        if r["passed"] and ctx.author.id not in self.cache:
+            await self.bot.cogs["UtilitiesCog"].add_user_eventPoint(ctx.author.id, 40)
+            self.cache.append(ctx.author.id)
+            with open("blurple-cache.json", "w") as f:
+                json.dump(self.cache, f)
+            await ctx.send(f"{ctx.author.mention} you just won 40 event xp thanks to your blurple-liful picture!")
         await old_msg.delete()
 
     return command
@@ -114,7 +121,7 @@ def _make_color_command(name, fmodifier, parent, **kwargs):
         old_msg = await ctx.send("Starting {} for {}...".format(name,ctx.author.mention))
         async with aiohttp.ClientSession() as session:
             async with session.get(str(url)) as image:
-                r = convert_image(await image.read(), final_modifier, method,variations)
+                r = await convert_image(await image.read(), final_modifier, method,variations)
         await ctx.send(f"{ctx.author.mention}, here's your image!", file=r)
         await old_msg.delete()
 
@@ -129,6 +136,8 @@ class Blurplefy(Cog):
             self.translate = self.bot.cogs["LangCog"].tr
         except:
             pass
+        with open("blurple-cache.json", "r") as f:
+            self.cache = json.load(f)
     
     async def get_default_blurplefier(self, ctx):
         return "--blurplefy"
