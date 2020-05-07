@@ -46,7 +46,7 @@ class ThemeConverter(commands.Converter):
 
 
 def _make_check_command(name, parent, **kwargs):
-    @commands.cooldown(1, 60, commands.BucketType.member)
+    @commands.cooldown(2, 60, commands.BucketType.member)
     @commands.cooldown(30, 40, commands.BucketType.guild)
     @parent.command(name, help=f"{name.title()} an image to know if you're cool enough.", **kwargs)
     async def command(self, ctx, theme: ThemeConverter="light", *, who: typing.Union[discord.Member, discord.PartialEmoji, LinkConverter] = None):
@@ -83,8 +83,8 @@ def _make_check_command(name, parent, **kwargs):
 
 
 def _make_color_command(name, fmodifier, parent, **kwargs):
-    @commands.cooldown(1, 120, commands.BucketType.member)
-    @commands.cooldown(15, 60, commands.BucketType.guild)
+    @commands.cooldown(3, 120, commands.BucketType.member)
+    @commands.cooldown(20, 60, commands.BucketType.guild)
     @parent.command(name, help=f"{name.title()} an image.", **kwargs)
     async def command(self, ctx, method: typing.Optional[FlagConverter] = None,
                       variations: commands.Greedy[FlagConverter2] = [None], *,
