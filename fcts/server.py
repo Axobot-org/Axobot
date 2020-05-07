@@ -275,8 +275,8 @@ class ServerCog(commands.Cog):
     @commands.cooldown(1,2,commands.BucketType.guild)
     async def sconfig_del(self,ctx,option):
         """Reset an option to zero"""
-        if not (ctx.channel.permissions_for(ctx.author).administrator or await self.bot.cogs["AdminCog"].check_if_god(ctx)):
-            return await ctx.send(await self.translate(ctx.guild.id,"server","need-admin"))
+        if not (ctx.channel.permissions_for(ctx.author).manage_guild or await self.bot.cogs["AdminCog"].check_if_god(ctx)):
+            return await ctx.send(await self.translate(ctx.guild.id,"server","need-manage-server"))
         if not ctx.bot.database_online:
             return await ctx.send(await self.translate(ctx.guild.id,"cases","no_database"))
         await self.sconfig_del2(ctx,option)
@@ -285,8 +285,8 @@ class ServerCog(commands.Cog):
     @commands.cooldown(1,2,commands.BucketType.guild)
     async def sconfig_change(self,ctx,option,*,value):
         """Allows you to modify an option"""
-        if not (ctx.channel.permissions_for(ctx.author).administrator or await self.bot.cogs["AdminCog"].check_if_god(ctx)):
-            return await ctx.send(await self.translate(ctx.guild.id,"server","need-admin"))
+        if not (ctx.channel.permissions_for(ctx.author).manage_guild or await self.bot.cogs["AdminCog"].check_if_god(ctx)):
+            return await ctx.send(await self.translate(ctx.guild.id,"server","need-manage-server"))
         if not ctx.bot.database_online:
             return await ctx.send(await self.translate(ctx.guild.id,"cases","no_database"))
         if value=='del':
