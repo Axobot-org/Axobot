@@ -54,6 +54,18 @@ class XPCog(commands.Cog):
         if not self.bot.database_online:
             self.bot.unload_extension("fcts.xp")
 
+    async def get_lvlup_chan(self, msg: discord.Message):
+        value = await self.bot.get_cog("ServerCog").find_staff(msg.guild.id,"levelup_channel")
+        if value == "none":
+            return None
+        if value == "any":
+            return msg.channel
+        try:
+            chan = msg.guild.get_channel(int(value))
+            return chan
+        except discord.errors.NotFound:
+            return None
+
     async def add_xp(self,msg):
         """Attribue un certain nombre d'xp à un message"""
         if msg.author.bot or msg.guild==None or not self.bot.xp_enabled:
@@ -93,7 +105,8 @@ class XPCog(commands.Cog):
         await self.bdd_set_xp(msg.author.id, giv_points, 'add')
         self.cache['global'][msg.author.id] = [round(time.time()), prev_points+giv_points]
         new_lvl = await self.calc_level(self.cache['global'][msg.author.id][1],0)
-        if 0 < (await self.calc_level(prev_points,0))[0] < new_lvl[0]:
+        # if 0 < (await self.calc_level(prev_points,0))[0] < new_lvl[0]:
+        if 1:
             await self.send_levelup(msg,new_lvl)
             await self.give_rr(msg.author,new_lvl[0],await self.rr_list_role(msg.guild.id))
     
@@ -177,7 +190,10 @@ class XPCog(commands.Cog):
     async def send_levelup(self,msg,lvl):
         """Envoie le message de levelup"""
         await self.bot.cogs["UtilitiesCog"].add_user_eventPoint(msg.author.id,round(lvl[0]/5))
-        if msg.guild!=None and not msg.channel.permissions_for(msg.guild.me).send_messages:
+        if msg.guild == None:
+            return
+        destination = await self.get_lvlup_chan(msg)
+        if destination == None or (not msg.channel.permissions_for(msg.guild.me).send_messages):
             return
         text = await self.bot.cogs['ServerCog'].find_staff(msg.guild.id,'levelup_msg')
         if text==None or len(text)==0:
@@ -188,7 +204,7 @@ class XPCog(commands.Cog):
             item = random.choice(await self.bot.cogs['LangCog'].tr(msg.channel,'xp','levelup-items'))
         else:
             item = ''
-        await msg.channel.send(text.format_map(self.bot.SafeDict(user=msg.author.mention,level=lvl[0],random=item,username=msg.author.display_name)))
+        await destination.send(text.format_map(self.bot.SafeDict(user=msg.author.mention,level=lvl[0],random=item,username=msg.author.display_name)))
         
     async def check_cmd(self,msg):
         """Vérifie si un message est une commande"""

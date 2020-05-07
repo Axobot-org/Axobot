@@ -78,6 +78,7 @@ List of every option
 * poll_channels: List of channels in which the bot will add the reactions 👍 and 👎 to each message
 * enable_xp: Boolean indicating whether the xp system is activated. Default is :code:`True`.
 * levelup_msg: Message to send when someone reaches a new XP level. You can use :code:`{level}` variable to include the reached level, and :code:`{user}` to mention the user (or `{username}` if you only want the name). Default is a random sentence.
+* levelup_channel: Channel where the bot will send every levelup announcement message. It can be either a text channel, or "none" for no channel (Zbot won't send any levelup channel), or "any" if you want it in the same channel as the message. Default to any.
 * xp_rate: Exp modifier, which multiplies the gain of xp by this number. It must be between 0.1 and 3, rounded to the nearest 1/100.
 * xp_type: Type of XP system to use: :code:`global` if you want to use the accross-server system, common with every other servers which use it, or :code:`local` if you want a more private system. There is also a :code:`mee6-like` system, which uses the same rules as the MEE6 bot, and is also local. Default to :code:`global`.
 * noxp_channels: List of text channels where members will not be able to earn any exp. Not necessary if XP is disabled in your server.
@@ -114,6 +115,8 @@ There are several ways to customize your xp system. In particular, you have 4 `c
 - **Change the gain rate of xp:** if you find that your members are not earning xp fast enough (or too fast), or if you want to make a special event xp for a limited time, you can add a gain modifier between x0.1 and x3, which will multiply by its value each point of xp earned. Not usable for the global xp system, of course. Option name: :code:`xp_rate`.
 
 - **Prevent xp in some channels:** although Zbot prevents people from earning xp with its commands, it cannot detect commands from other bots. So you can prevent your members from earning xp in certain channels via the :code:`noxp_channels` option, which contains a list of all channels where your users can't have any experience points.
+
+- **Select a channel where to send levelup messages:** sometimes levelup messages can be a bit spammy. So you have an option to select a single channel where to send level up messages. It is also possible to disable these messages via the same option. Enter the command :code:`config change levelup_channel` followed by the name of your channel, or "none" to disable the message.
 
 
 

@@ -19,6 +19,7 @@ raid_options = ["anti_raid"]
 xp_type_options = ['xp_type']
 color_options = ['partner_color']
 xp_rate_option = ['xp_rate']
+levelup_channel_option = ["levelup_channel"]
 
 class ServerCog(commands.Cog):
     """"Cog in charge of all the bot configuration management for your server. As soon as an option is searched, modified or deleted, this cog will handle the operations."""
@@ -58,6 +59,7 @@ class ServerCog(commands.Cog):
                "modlogs_channel":"",
                "enable_xp":1,
                "levelup_msg":'',
+               "levelup_channel":'any',
                "noxp_channels":'',
                "xp_rate":1.0,
                "xp_type":0,
@@ -74,7 +76,7 @@ class ServerCog(commands.Cog):
                'partner_role':'',
                'update_mentions':'',
                'verification_role':''}
-        self.optionsList = ["prefix","language","description","clear","slowmode","mute","kick","ban","warn","say","welcome_channel","welcome","leave","welcome_roles","bot_news","update_mentions","poll_channels","partner_channel","partner_color","partner_role","modlogs_channel","verification_role","enable_xp","levelup_msg","noxp_channels","xp_rate","xp_type","anti_caps_lock","enable_fun","membercounter","anti_raid","vote_emojis","help_in_dm","muted_role"]
+        self.optionsList = ["prefix","language","description","clear","slowmode","mute","kick","ban","warn","say","welcome_channel","welcome","leave","welcome_roles","bot_news","update_mentions","poll_channels","partner_channel","partner_color","partner_role","modlogs_channel","verification_role","enable_xp","levelup_msg","levelup_channel","noxp_channels","xp_rate","xp_type","anti_caps_lock","enable_fun","membercounter","anti_raid","vote_emojis","help_in_dm","muted_role"]
 
     @commands.Cog.listener()
     async def on_ready(self):
@@ -319,6 +321,8 @@ class ServerCog(commands.Cog):
                 await self.conf_color(ctx,option,value)
             elif option in xp_rate_option:
                 await self.conf_xp_rate(ctx,option,value)
+            elif option in levelup_channel_option:
+                await self.conf_levelup_chan(ctx,option,value)
             else:
                 await ctx.send(await self.translate(ctx.guild.id,"server","change-0"))
                 return
@@ -768,10 +772,53 @@ class ServerCog(commands.Cog):
         else:
             return value
     
+    async def conf_levelup_chan(self,ctx,option,value):
+        guild = await self.get_guild(ctx)
+        ext = not isinstance(ctx, commands.Context)
+        if value == "scret-desc":
+            chan = await self.find_staff(guild.id,option)
+            return await self.form_levelup_chan(guild, chan, ext)
+        else:
+            if value.lower() in ["any", "tout", "tous", "current", "all", "any channel"]:
+                c = c_id = "any"
+                msg = await self.translate(guild.id,"server","change-levelup_channel-1")
+            elif value.lower() in ["none", "aucun", "disabled", "nowhere"]:
+                c = c_id = "none"
+                msg = await self.translate(guild.id,"server","change-levelup_channel-2")
+            else:
+                chan = value.strip()
+                try:
+                    c = await commands.TextChannelConverter().convert(ctx,chan)
+                except commands.errors.BadArgument:
+                    msg = await self.translate(guild.id,"server","change-5")
+                    await ctx.send(msg.format(chan))
+                    return
+                msg = await self.translate(guild.id,"server","change-levelup_channel")
+                c_id = c.id
+                c = c.mention
+            await self.modify_server(guild.id,values=[(option,c_id)])
+            await ctx.send(msg.format(c))
+            await self.send_embed(guild,option,value)
+    
+    async def form_levelup_chan(self,guild,value,ext=False):
+        if value == "any":
+            return "Any channel"
+        if value == "none":
+            return "Nowhere"
+        if value.isnumeric():
+            g_chan = guild.get_channel(int(value))
+            if g_chan == None:
+                return "<unfindable channel>"
+            elif ext:
+                return "#"+g_chan.name
+            else:
+                return g_chan.mention
+        return ""
+    
     @sconfig_main.command(name='list')
     async def sconfig_list(self,ctx):
         """Get the list of every usable option"""
-        options = sorted(roles_options+bool_options+textchan_options+vocchan_options+text_options+prefix_options+emoji_option+numb_options+raid_options+xp_type_options+color_options+xp_rate_option)
+        options = sorted(self.optionsList)
         await ctx.send(await self.translate(ctx.guild.id,'server','config-list',text="\n```\n-{}\n```\n".format('\n-'.join(options)),link="<https://zbot.readthedocs.io/en/latest/server.html#list-of-every-option>"))
 
     @sconfig_main.command(name="see")
@@ -836,6 +883,8 @@ class ServerCog(commands.Cog):
                     r = await self.form_color(i,v)
                 elif i in xp_rate_option:
                     r = await self.form_xp_rate(i,v)
+                elif i in levelup_channel_option:
+                    r = await self.form_levelup_chan(guild,v,diff)
                 else:
                     continue
                 if len(str(r)) == 0:
@@ -873,7 +922,9 @@ class ServerCog(commands.Cog):
             elif option in color_options:
                 r = await self.conf_color(ctx,option,"scret-desc")
             elif option in xp_rate_option:
-                    r = await self.conf_xp_rate(ctx,option,"scret-desc")
+                r = await self.conf_xp_rate(ctx,option,"scret-desc")
+            elif option in levelup_channel_option:
+                r = await self.conf_levelup_chan(ctx,option,"scret-desc")
             else:
                 r = None
             guild = ctx if isinstance(ctx, discord.Guild) else ctx.guild
