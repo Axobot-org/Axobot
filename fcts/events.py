@@ -455,7 +455,7 @@ class Events(commands.Cog):
             async with aiohttp.ClientSession(loop=self.bot.loop, headers=self.statuspage_header) as session:
                 async with session.post("https://api.statuspage.io/v1/pages/g9cnphg3mhm9/metrics/x4xs4clhkmz0/data", json=params) as r:
                     r.raise_for_status()
-                    self.bot.debug(f"StatusPage API returned {r.status} for {params}")
+                    self.bot.log.debug(f"StatusPage API returned {r.status} for {params}")
 
     async def rss_loop(self):
         if self.bot.cogs['RssCog'].last_update==None or (datetime.datetime.now() - self.bot.cogs['RssCog'].last_update).total_seconds()  > 5*60:
