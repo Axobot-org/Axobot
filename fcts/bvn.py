@@ -20,7 +20,7 @@ class WelcomerCog(commands.Cog):
 
     async def new_member(self,member):
         """Fonction principale appelée lorsqu'un membre rejoint un serveur"""
-        await self.send_log(member,"welcome")
+        # await self.send_log(member,"welcome")
         if self.bot.database_online:
             await self.bot.cogs["ServerCog"].update_memberChannel(member.guild)
             await self.send_msg(member,"welcome")
@@ -35,7 +35,7 @@ class WelcomerCog(commands.Cog):
     
     async def bye_member(self,member):
         """Fonction principale appelée lorsqu'un membre quitte un serveur"""
-        await self.send_log(member,"leave")
+        # await self.send_log(member,"leave")
         if self.bot.database_online:
             await self.bot.cogs["ServerCog"].update_memberChannel(member.guild)
             await self.send_msg(member,"leave")
