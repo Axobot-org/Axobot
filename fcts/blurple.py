@@ -3,12 +3,15 @@ import aiohttp
 import json
 import typing
 import json
+import importlib
 
 import discord
 from discord.ext import commands
 from discord.ext.commands import Cog
 
+from fcts import blurple2
 from fcts.blurple2 import convert_image, check_image
+importlib.reload(blurple2)
 
 
 class LinkConverter(commands.Converter):
@@ -83,7 +86,7 @@ def _make_check_command(name, parent, **kwargs):
 
 
 def _make_color_command(name, fmodifier, parent, **kwargs):
-    @commands.cooldown(3, 120, commands.BucketType.member)
+    @commands.cooldown(6, 120, commands.BucketType.member)
     @commands.cooldown(20, 60, commands.BucketType.guild)
     @parent.command(name, help=f"{name.title()} an image.", **kwargs)
     async def command(self, ctx, method: typing.Optional[FlagConverter] = None,
@@ -119,9 +122,13 @@ def _make_color_command(name, fmodifier, parent, **kwargs):
             final_modifier = fmodifier
 
         old_msg = await ctx.send("Starting {} for {}...".format(name,ctx.author.mention))
-        async with aiohttp.ClientSession() as session:
-            async with session.get(str(url)) as image:
-                r = await convert_image(await image.read(), final_modifier, method,variations)
+        try:
+            async with aiohttp.ClientSession() as session:
+                async with session.get(str(url)) as image:
+                    r = await convert_image(await image.read(), final_modifier, method,variations)
+        except RuntimeError as e:
+            await ctx.send(f"Oops, something went wrong: {e}")
+            return
         await ctx.send(f"{ctx.author.mention}, here's your image!", file=r)
         await old_msg.delete()
         await self.bot.cogs["UtilitiesCog"].add_user_eventPoint(ctx.author.id, 3)
