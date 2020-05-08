@@ -449,13 +449,14 @@ class Events(commands.Cog):
             return
         self.latencies_list.append(round(self.bot.latency*1000))
         if d.minute % 4 == 0 and d.minute != self.last_statusio.minute:
-            self.last_statusio = d
             average = round(sum(self.latencies_list)/len(self.latencies_list))
             params = {"data": {"timestamp": round(d.timestamp()), "value":average}}
             async with aiohttp.ClientSession(loop=self.bot.loop, headers=self.statuspage_header) as session:
                 async with session.post("https://api.statuspage.io/v1/pages/g9cnphg3mhm9/metrics/x4xs4clhkmz0/data", json=params) as r:
                     r.raise_for_status()
-                    self.bot.log.debug(f"StatusPage API returned {r.status} for {params}")
+                    self.bot.log.info(f"StatusPage API returned {r.status} for {params}")
+            self.latencies_list = list()
+            self.last_statusio = d
 
     async def rss_loop(self):
         if self.bot.cogs['RssCog'].last_update==None or (datetime.datetime.now() - self.bot.cogs['RssCog'].last_update).total_seconds()  > 5*60:
