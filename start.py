@@ -22,7 +22,6 @@ if check_libs():
     from random import choice
     from discord.ext import commands
     from fcts import cryptage, tokens
-    import dbl
 else:
     import sys
     print("Fin de l'exécution")
