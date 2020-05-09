@@ -693,6 +693,8 @@ class XPCog(commands.Cog):
                     rank = (await self.bdd_get_rank(user.id,ctx.guild))['rank']
                 except KeyError:
                     rank = "?"
+            if isinstance(rank, float):
+                rank = int(rank)
             if ctx.guild==None or ctx.channel.permissions_for(ctx.guild.me).attach_files:
                 await self.send_card(ctx,user,xp,rank,ranks_nb,xp_used_type,levels_info)
             elif ctx.channel.permissions_for(ctx.guild.me).embed_links:
