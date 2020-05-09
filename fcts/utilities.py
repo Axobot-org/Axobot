@@ -154,10 +154,6 @@ class UtilitiesCog(commands.Cog):
             await self.print2("Unable to delete message "+str(msg))
             pass
 
-    async def get_bot_infos(self):
-        if self.config == None:
-            self.config = (await self.bot.cogs['ServerCog'].get_bot_infos(self.bot.user.id))[0]
-        return self.config
 
     async def global_check(self,ctx):
         """Do a lot of checks before executing a command (rss loop, banned guilds etc)"""

@@ -93,7 +93,7 @@ class InfoCog(commands.Cog):
             async with ctx.channel.typing():
                 b_conf = self.bot.cogs['UtilitiesCog'].config
                 if b_conf == None:
-                    b_conf = await self.bot.cogs['UtilitiesCog'].reload()
+                    b_conf = await self.bot.cogs['UtilitiesCog'].get_bot_infos()
                 ignored_guilds = list()
                 if self.bot.database_online:
                     ignored_guilds = [int(x) for x in self.bot.cogs['UtilitiesCog'].config['banned_guilds'].split(";") if len(x)>0]
