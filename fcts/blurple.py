@@ -63,8 +63,6 @@ def _make_check_command(name, parent, **kwargs):
             else:
                 url = who.avatar_url
 
-        theme = "light"
-
         old_msg = await ctx.send("Starting check for {}...".format(ctx.author.mention))
         async with aiohttp.ClientSession() as session:
             async with session.get(str(url)) as image:
