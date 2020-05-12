@@ -496,6 +496,7 @@ class XPCog(commands.Cog):
                 if x['userID']== userID:
                     # x['rank'] = i
                     userdata = x
+                    userdata["rank"] = round(userdata["rank"])
                     break
             cursor.close()
             return userdata
