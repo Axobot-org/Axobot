@@ -941,7 +941,7 @@
         "guild-13": "Boosts nbr",
         "guild-13v": "{b} (milestone {p})",
         "guild-14": "Limitz",
-        "guild-14v": "Voice: {bit}kbps\nFiles size: {fil}MB\nEmojis nbr: {emo}\nConnected mmbrs: {mem}",
+        "guild-14v": "Voice: {bit}kbps\nFiles size: {fil}MB\nEmojis nbr: {emo}",
         "guild-15": "Inv url",
         "guild-2": "Rejion",
         "guild-3": "Txt : {} | Vcall : {} ({} categoreez)",

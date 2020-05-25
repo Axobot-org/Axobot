@@ -903,7 +903,7 @@
         "guild-13": "Anzahl der Boosts",
         "guild-13v": "{b} (Gruppe {p})",
         "guild-14": "Einschränkungen",
-        "guild-14v": "Bitrate: {bit}kbps\nDateien größe: {fil}MB\nAnzahl Emojis: {emo}\nVerbundene Mitglieder: {mem}",
+        "guild-14v": "Bitrate: {bit}kbps\nDateien größe: {fil}MB\nAnzahl Emojis: {emo}",
         "guild-2": "Region",
         "guild-3": "Text : {} | Vokal : {} ({} Kategorien)",
         "guild-4": "Mitglieder online",

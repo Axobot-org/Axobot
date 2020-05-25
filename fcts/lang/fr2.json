@@ -941,7 +941,7 @@
         "guild-13": "Nombre de boosts",
         "guild-13v": "{b} (palier {p})",
         "guild-14": "Limitations",
-        "guild-14v": "Bitrate : {bit}kbps\nTaille de fichier : {fil}MB\nNombre d'émojis : {emo}\nNombre de membres connectés : {mem}",
+        "guild-14v": "Bitrate : {bit}kbps\nTaille de fichier : {fil}MB\nNombre d'émojis : {emo}",
         "guild-15": "Lien d'invitation",
         "guild-2": "Région",
         "guild-3": "Texte : {} | Vocal : {} ({} catégories)",
