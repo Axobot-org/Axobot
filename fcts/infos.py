@@ -477,7 +477,7 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
         embed.set_footer(text='Requested by {}'.format(ctx.author.name), icon_url=ctx.author.avatar_url)
         # Guild icon
         icon_url = guild.icon_url_as(format = "gif" if guild.is_icon_animated() else 'png')
-        embed.set_author(name="{} '{}'".format(await self.translate(guild.id,"stats_infos","guild-0"),guild.name), icon_url=icon_url)
+        embed.set_author(name="{} '{}'".format(await self.translate(ctx.guild.id,"stats_infos","guild-0"),guild.name), icon_url=icon_url)
         embed.set_thumbnail(url=icon_url)
         # Guild banner
         if guild.banner != None:
@@ -550,7 +550,7 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
                 a2f = await self.translate(ctx.guild.id,"keywords","non")
             embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","guild-8"), value=a2f.capitalize())
             # Verification level
-            embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","guild-9"), value=str(await self.translate(guild.id,"keywords",str(guild.verification_level))).capitalize())
+            embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","guild-9"), value=str(await self.translate(ctx.guild.id,"keywords",str(guild.verification_level))).capitalize())
         await ctx.send(embed=embed)
         
    
