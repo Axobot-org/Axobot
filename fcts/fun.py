@@ -516,6 +516,8 @@ You can specify a verification limit by adding a number in argument (up to 1.000
     
     async def check_afk(self,msg:discord.Message):
         """Check if someone pinged is afk"""
+        if msg.author.bot:
+            return
         ctx = await self.bot.get_context(msg)
         for member in msg.mentions:
             c = member.display_name.endswith(' [AFK]') or member.id in self.afk_guys.keys()
