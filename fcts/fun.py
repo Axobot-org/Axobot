@@ -184,6 +184,7 @@ You can specify a verification limit by adding a number in argument (up to 1.000
         l1 = ['discord','mojang','zbot','google','youtube'] # tout le monde
         l2 = ['tronics','patate','neil','reddemoon','aragorn1202','platon'] # frm
         l3 = ['awhikax','aragorn','adri','zrunner'] # zbot
+        l4 = ['benny'] #benny
         name = name.lower()
         if name in l1:
             await ctx.send(file=await self.utilities.find_img('blame-{}.png'.format(name)))
@@ -192,6 +193,9 @@ You can specify a verification limit by adding a number in argument (up to 1.000
                 await ctx.send(file=await self.utilities.find_img('blame-{}.png'.format(name)))
         elif name in l3:
             if await self.is_on_guild(ctx.author,356067272730607628): # Zbot server
+                await ctx.send(file=await self.utilities.find_img('blame-{}.png'.format(name)))
+        elif name in l4:
+            if await self.is_on_guild(ctx.author,523525264517496834): # Benny Support
                 await ctx.send(file=await self.utilities.find_img('blame-{}.png'.format(name)))
         elif name in ['help','list']:
             liste = l1
