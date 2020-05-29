@@ -55,6 +55,7 @@ class RssCog(commands.Cog):
         self.last_update = None
         self.twitterAPI = twitter.Api(**bot.others['twitter'])
         self.twitter_over_capacity = False
+        self.cache = dict()
         if bot.user != None:
             self.table = 'rss_flow' if bot.user.id==486896267788812288 else 'rss_flow_beta'
         try:
@@ -1234,11 +1235,15 @@ class RssCog(commands.Cog):
     async def check_flow(self,flow):
         try:
             guild = self.bot.get_guild(flow['guild'])
-            funct = eval('self.rss_{}'.format(flow['type']))
-            if isinstance(funct,twitter.error.TwitterError):
-                self.twitter_over_capacity = True
-                return False
-            objs = await funct(guild,flow['link'],flow['date'])
+            if flow['link'] in self.cache.keys():
+                objs = self.cache[flow['link']]
+            else:
+                funct = eval('self.rss_{}'.format(flow['type']))
+                if isinstance(funct,twitter.error.TwitterError):
+                    self.twitter_over_capacity = True
+                    return False
+                objs = await funct(guild,flow['link'],flow['date'])
+                flow['link'] = objs
             if isinstance(objs,twitter.TwitterError):
                 await self.bot.get_user(279568324260528128).send(f"[send_rss_msg] twitter error dans `await check_flow(): {objs}`")
                 raise objs
@@ -1302,7 +1307,7 @@ class RssCog(commands.Cog):
         d = ["**RSS loop done** in {}s ({}/{} flows)".format(round(time.time()-t,3),check,len(liste))]
         if len(errors)>0:
             d.append('{} errors: {}'.format(len(errors),' '.join([str(x) for x in errors])))
-        emb = self.bot.cogs["EmbedCog"].Embed(desc='\n'.join(d),color=1655066).update_timestamp().set_author(self.bot.guilds[0].me)
+        emb = self.bot.cogs["EmbedCog"].Embed(desc='\n'.join(d),color=1655066).update_timestamp().set_author(self.bot.user)
         await self.bot.cogs["EmbedCog"].send([emb],url="loop")
         self.bot.log.debug(d[0])
         if len(errors)>0:
@@ -1310,6 +1315,7 @@ class RssCog(commands.Cog):
         if guildID==None:
             self.loop_processing = False
         self.twitter_over_capacity = False
+        self.cache = dict()
 
     async def loop_child(self):
         if not self.bot.database_online:
