@@ -259,25 +259,24 @@ Every information come from the website www.fr-minecraft.net"""
 
 
     async def create_server_1(self,guild,ip,port=None):
-        print2 = self.bot.cogs['UtilitiesCog'].print2
         if port == None:
             url = "https://api.minetools.eu/ping/"+str(ip)
         else:
             url = "https://api.minetools.eu/ping/"+str(ip)+"/"+str(port)
         try:
             r = requests.get(url,timeout=5).json()
-        except requests.exceptions.ConnectionError:
-            return await self.create_server_2(guild,ip,port)
-        except requests.exceptions.ReadTimeout:
-            return await self.create_server_2(guild,ip,port)
+        # except requests.exceptions.ConnectionError:
+        #     return await self.create_server_2(guild,ip,port)
+        # except requests.exceptions.ReadTimeout:
+        #     return await self.create_server_2(guild,ip,port)
         except Exception as e:
             return await self.create_server_2(guild,ip,port)
-            self.bot.log.warn("[mc-server-1] Erreur sur l'url {} :".format(url))
-            await self.bot.cogs['ErrorsCog'].on_error(e,None)
-            return await self.translate(guild,"mc","serv-error")
+            # self.bot.log.warn("[mc-server-1] Erreur sur l'url {} :".format(url))
+            # await self.bot.cogs['ErrorsCog'].on_error(e,None)
+            # return await self.translate(guild,"mc","serv-error")
         if "error" in r.keys():
             if r['error'] != 'timed out':
-                await print2("(mc-server) Error on: "+url+"\n   "+r['error'])
+                self.bot.log.warn("(mc-server) Error on: "+url+"\n   "+r['error'])
             return r["error"]
         players=[]
         try:
