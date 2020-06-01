@@ -104,9 +104,7 @@ class TimeCog(discord.ext.commands.Cog):
                 text += str(t.days)+" "+lib[4]
             elif t.days==1:
                 text += str(t.days)+" "+lib[5]
-            text+=" "
             if hour:
-                text+=" "
                 if t.hours>1:
                     text += " "+str(t.hours)+" "+lib[6]
                 elif t.hours==1:
