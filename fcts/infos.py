@@ -129,7 +129,9 @@ class InfoCog(commands.Cog):
     
     @commands.command(name="botinvite", aliases=["botinv"])
     async def botinvite(self, ctx:commands.Context):
-        """Get a link to invite me"""
+        """Get a link to invite me
+        
+        ..Doc infos.html#bot-invite"""
         try:
             requests.get("https://zrunner.me/invitezbot", timeout=3)
         except requests.exceptions.Timeout:

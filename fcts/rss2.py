@@ -176,7 +176,9 @@ class RssCog(commands.Cog):
     @commands.group(name="rss")
     @commands.cooldown(2,15,commands.BucketType.channel)
     async def rss_main(self,ctx):
-        """See the last post of a rss feed"""
+        """See the last post of a rss feed
+        
+        ..Doc rss.html#rss"""
         if ctx.subcommand_passed==None:
             await self.bot.cogs['HelpCog'].help_command(ctx,['rss'])
 
@@ -273,7 +275,9 @@ class RssCog(commands.Cog):
     @commands.check(can_use_rss)
     @commands.check(checks.database_connected)
     async def system_add(self,ctx,link):
-        """Subscribe to a rss feed, displayed on this channel regularly"""
+        """Subscribe to a rss feed, displayed on this channel regularly
+        
+        ..Doc rss.html#follow-a-feed"""
         flow_limit = await self.bot.cogs['ServerCog'].find_staff(ctx.guild.id,'rss_max_number')
         if flow_limit==None:
             flow_limit = self.bot.cogs['ServerCog'].default_opt['rss_max_number']
@@ -324,7 +328,9 @@ class RssCog(commands.Cog):
     @commands.check(checks.database_connected)
     @commands.check(can_use_rss)
     async def systeme_rm(self,ctx,ID:int=None):
-        """Delete an rss feed from the list"""
+        """Delete an rss feed from the list
+        
+        ..Doc rss.html#delete-a-followed-feed"""
         if ID != None:
             flow = await self.get_flow(ID)
             if flow == []:
@@ -387,7 +393,9 @@ class RssCog(commands.Cog):
     @commands.check(checks.database_connected)
     @commands.check(can_use_rss)
     async def list_flows(self,ctx):
-        """Get a list of every rss/Minecraft feed"""
+        """Get a list of every rss/Minecraft feed
+        
+        ..Doc rss.html#see-every-feed"""
         liste = await self.get_guild_flows(ctx.guild.id)
         l = list()
         translation = await self.translate(ctx.guild.id,"rss","list-result")
@@ -481,7 +489,9 @@ class RssCog(commands.Cog):
     @commands.check(can_use_rss)
     @commands.check(checks.database_connected)
     async def roles_flows(self,ctx,ID:int=None):
-        """Configures a role to be notified when a news is posted"""
+        """Configures a role to be notified when a news is posted
+        
+        ..Doc rss.html#mention-a-role"""
         e = None
         try:
             flow = await self.askID(ID,ctx)
@@ -558,7 +568,9 @@ class RssCog(commands.Cog):
     @commands.check(checks.database_connected)
     @commands.cooldown(1,600,commands.BucketType.guild)
     async def reload_guild_flows(self,ctx):
-        """Reload every rss feeds from your server"""
+        """Reload every rss feeds from your server
+        
+        ..Doc rss.html#reload-every-feed"""
         try:
             t = time.time()
             msg = await ctx.send(str(await self.translate(ctx.guild.id,"rss","guild-loading")).format(ctx.bot.cogs['EmojiCog'].customEmojis['loading']))
@@ -574,7 +586,9 @@ class RssCog(commands.Cog):
     @commands.check(can_use_rss)
     @commands.check(checks.database_connected)
     async def move_guild_flow(self,ctx,ID:typing.Optional[int]=None,channel:discord.TextChannel=None):
-        """Move a rss feed in another channel"""
+        """Move a rss feed in another channel
+        
+        ..Doc rss.html#move-a-feed"""
         try:
             if channel==None:
                 channel = ctx.channel
@@ -599,7 +613,9 @@ class RssCog(commands.Cog):
     @commands.check(can_use_rss)
     @commands.check(checks.database_connected)
     async def change_text_flow(self,ctx,ID:typing.Optional[int]=None,*,text=None):
-        """Change the text of an rss feed"""
+        """Change the text of an rss feed
+        
+        ..Doc rss.html#change-the-text"""
         try:
             try:
                 flow = await self.askID(ID,ctx)
@@ -637,7 +653,10 @@ class RssCog(commands.Cog):
         - color: color of the embed (hex or decimal value)
         - title: title override, which will disable the default one (max 256 characters)
         - footer: small text displayed at the bottom of the embed
-        Example : `rss embed 6678466620137 true title="hey u" footer = "Hi \\n i'm a footer"`"""
+
+        ..Example rss embed 6678466620137 true title="hey u" footer = "Hi \\n i'm a footer"
+        
+        ..Doc rss.html#setup-a-feed-embed"""
         try:
             try:
                 flow = await self.askID(ID,ctx)
