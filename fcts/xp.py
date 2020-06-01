@@ -656,6 +656,12 @@ class XPCog(commands.Cog):
 
     async def get_xp_bar_color(self,userID:int):
         return (45,180,105)
+    
+    async def get_xp(self, user, guild_id):
+        xp = await self.bdd_get_xp(user.id, guild_id)
+        if xp == None or (isinstance(xp,list) and len(xp)==0):
+            return
+        return xp[0]['xp']
 
     @commands.command(name='rank')
     @commands.bot_has_permissions(send_messages=True)
@@ -675,13 +681,12 @@ class XPCog(commands.Cog):
                 xp_used_type = await self.bot.cogs['ServerCog'].find_staff(ctx.guild.id,'xp_type')
             else:
                 xp_used_type = 0
-            xp = await self.bdd_get_xp(user.id,None if xp_used_type==0 else ctx.guild.id)
-            if xp==None or (isinstance(xp,list) and len(xp)==0):
+            xp = await self.get_xp(user,None if xp_used_type==0 else ctx.guild.id)
+            if xp==None:
                 if ctx.author==user:
                     return await ctx.send(await self.translate(ctx.channel,'xp','1-no-xp'))
                 return await ctx.send(await self.translate(ctx.channel,'xp','2-no-xp'))
             levels_info = None
-            xp = xp[0]['xp']
             if xp_used_type==0:
                 ranks_nb = await self.bdd_get_nber()
                 try:
@@ -844,6 +849,8 @@ class XPCog(commands.Cog):
         if xp < 0:
             return await ctx.send(await self.translate(ctx.guild.id, 'xp', 'negative-xp'))
         try:
+            xp_used_type = await self.bot.cogs['ServerCog'].find_staff(ctx.guild.id,'xp_type')
+            prev_xp = await self.get_xp(user, None if xp_used_type==0 else ctx.guild.id)
             await self.bdd_set_xp(user.id, xp, Type='set', guild=ctx.guild.id)
             await ctx.send(await self.translate(ctx.guild.id,'xp','change-xp-ok',user=str(user),xp=xp))
         except Exception as e:
@@ -851,6 +858,10 @@ class XPCog(commands.Cog):
             await self.bot.cogs['ErrorsCog'].on_error(e,ctx)
         else:
             self.cache[ctx.guild.id][user.id] = [round(time.time()), xp]
+            s = "XP of user {} `{}` edited (from {} to {}) in server `{}`".format(user, user.id, prev_xp, xp, ctx.guild.id)
+            self.bot.log.info(s)
+            emb = self.bot.cogs["EmbedCog"].Embed(desc=s,color=8952255,footer_text=ctx.guild.name).update_timestamp().set_author(self.bot.user)
+            await self.bot.cogs["EmbedCog"].send([emb])
 
     async def gen_rr_id(self):
         return round(time.time()/2)
