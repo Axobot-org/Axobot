@@ -543,9 +543,10 @@ You can specify a verification limit by adding a number in argument (up to 1.000
 
     @commands.command(name='embed',hidden=False)
     @commands.check(checks.has_embed_links)
-    async def send_embed(self,ctx,*,arguments:args.arguments):
+    @commands.guild_only()
+    async def send_embed(self, ctx: commands.Context, *, arguments):
         """Send an embed
-        Syntax: !embed key1=\"value 1\" key2=\"value 2\"
+        Syntax: !embed [channel] key1=\"value 1\" key2=\"value 2\"
 
         Available keys:
             - title: the title of the embed [256 characters]
@@ -554,10 +555,26 @@ You can specify a verification limit by adding a number in argument (up to 1.000
             - footer: a little text at the bottom of the box [90 characters]
             - image: a well-formed url redirects to an image
             - color: the color of the embed bar (#hex or int)
-
         If you want to use quotation marks in the texts, it is possible to escape them thanks to the backslash (`\\"`)
+        
+        You can send the embed to a specific channel by mentionning it at the beginning of the arguments
+
+        ..Example embed #announcements title="Special update!" content="We got an amazing thing for you!\\nPlease check blah blah..." color="#FF0022"
+
+        ..Doc miscellaneous.html?#embed
         """
-        if ctx.guild!=None and not ctx.channel.permissions_for(ctx.guild.me).embed_links:
+        channel = None
+        r = re.search(r'<#(\d+)>', arguments.split(" ")[0])
+        if r != None:
+            arguments = " ".join(arguments.split(" ")[1:])
+            channel = ctx.guild.get_channel(int(r.group(1)))
+        arguments = await args.arguments().convert(ctx, arguments)
+        if len(arguments)==0:
+            raise commands.errors.MissingRequiredArgument(ctx.command.clean_params['arguments'])
+        destination = ctx.channel if channel==None else channel
+        if not destination.permissions_for(ctx.guild.me).send_messages:
+            return await ctx.send(await self.translate(ctx.channel,"fun","embed-invalid-channel"))
+        if not destination.permissions_for(ctx.guild.me).embed_links:
             return await ctx.send(await self.translate(ctx.channel,"fun","no-embed-perm"))
         k = {'title':"",'content':"",'url':'','footer':"",'image':'','color':ctx.bot.cogs['ServerCog'].embed_color}
         for key,value in arguments.items():
@@ -573,11 +590,16 @@ You can specify a verification limit by adding a number in argument (up to 1.000
                     k['color'] = c
         emb = ctx.bot.cogs["EmbedCog"].Embed(title=k['title'], desc=k['content'], url=k['url'],footer_text=k['footer'],thumbnail=k['image'],color=k['color']).update_timestamp().set_author(ctx.author)
         try:
-            await ctx.send(embed=emb.discord_embed())
+            await destination.send(embed=emb.discord_embed())
         except Exception as e:
             if isinstance(e,discord.errors.HTTPException) and "In embed.thumbnail.url: Not a well formed URL" in str(e):
-                return await ctx.send("invalid image")
+                return await ctx.send(await self.translate(ctx.channel, "fun", "embed-invalid-image"))
             await ctx.send(str(await self.translate(ctx.channel,"fun","embed-error")).format(e))
+        if channel != None:
+            try:
+                await ctx.message.delete()
+            except:
+                pass
 
 
     async def add_vote(self,msg):
