@@ -778,6 +778,7 @@ class XPCog(commands.Cog):
             xp_system_used = await self.bot.cogs['ServerCog'].find_staff(ctx.guild.id,'xp_type')
         else:
             xp_system_used = 0
+        xp_system_used = 0 if xp_system_used==None else xp_system_used
         if xp_system_used==0:
             if Type=='global':
                 if len(self.cache["global"])==0:
@@ -970,6 +971,7 @@ class XPCog(commands.Cog):
             c = 0
             rr_list = await self.rr_list_role(ctx.guild.id)
             used_system = await self.bot.cogs['ServerCog'].find_staff(ctx.guild.id,'xp_type')
+            used_system = 0 if used_system==None else used_system
             xps = [{'user':x['userID'],'xp':x['xp'],'level':(await self.calc_level(x['xp'],used_system))[0]} for x in await self.bdd_get_top(ctx.guild.member_count, ctx.guild if used_system>0 else None)]
             for member in xps:
                 m = ctx.guild.get_member(member['user'])
