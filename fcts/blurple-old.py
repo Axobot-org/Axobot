@@ -57,7 +57,7 @@ class BlurpleCog(commands.Cog):
                 for image in link:
                     picture = image.url
 
-        if picture == None:
+        if picture is None:
             picture = ctx.author.avatar_url
 
         try:
@@ -208,7 +208,7 @@ class BlurpleCog(commands.Cog):
                 for image in link:
                     picture = image.url
 
-        if picture == None:
+        if picture is None:
             picture = ctx.author.avatar_url
 
         try:

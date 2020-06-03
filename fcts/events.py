@@ -122,7 +122,7 @@ class Events(commands.Cog):
 
     async def on_new_message(self, msg:discord.Message):
         """Called for each new message because it's cool"""
-        if msg.guild == None:
+        if msg.guild is None:
             await self.send_mp(msg)
         else:
             try:
@@ -208,7 +208,7 @@ class Events(commands.Cog):
         except Exception as e:
             await self.bot.cogs["ErrorsCog"].on_error(e,None)
             return
-        if channel == None:
+        if channel is None:
             return
         emb = self.bot.cogs["EmbedCog"].Embed(desc=message,color=c).update_timestamp()
         if author != None:
@@ -256,18 +256,18 @@ class Events(commands.Cog):
     async def task_timer(self, task:dict):
         if task["guild"] != None:
             guild = self.bot.get_guild(task['guild'])
-            if guild == None:
+            if guild is None:
                 return
             channel = guild.get_channel(task["channel"])
-            if channel == None:
+            if channel is None:
                 return
         else:
             channel = self.bot.get_channel(task["channel"])
-            if channel == None:
+            if channel is None:
                 return
         if task["user"] != None:
             user = self.bot.get_user(task["user"])
-            if user == None:
+            if user is None:
                 raise discord.errors.NotFound
             try:
                 f_duration = await self.bot.get_cog('TimeCog').time_delta(task['duration'],lang=await self.translate(channel,'current_lang','current'), form='developed', precision=0)

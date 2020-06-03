@@ -92,7 +92,7 @@ class InfoCog(commands.Cog):
         try:
             async with ctx.channel.typing():
                 b_conf = self.bot.cogs['UtilitiesCog'].config
-                if b_conf == None:
+                if b_conf is None:
                     b_conf = await self.bot.cogs['UtilitiesCog'].get_bot_infos()
                 ignored_guilds = list()
                 if self.bot.database_online:
@@ -199,8 +199,8 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
                 if name==None or not await self.bot.cogs['AdminCog'].check_if_admin(ctx):
                     item = ctx.guild
                     #return await self.guild_info(ctx,ctx.guild,lang)
-            if item == None:
-                if name == None: # include Type==None bc of line 141
+            if item is None:
+                if name is None: # include Type==None bc of line 141
                     item = ctx.author
                 else:
                     try:
@@ -211,7 +211,7 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
                         return
             critical = ctx.author.guild_permissions.manage_guild or await self.bot.cogs['AdminCog'].check_if_god(ctx)
             #-----
-            if item == None:
+            if item is None:
                 msg = await self.translate(ctx.guild.id,"stats_infos","not-found")
                 await ctx.send(msg.format(N=name))
             elif type(item) == discord.Member:
@@ -820,7 +820,7 @@ Servers:
     @find_main.command(name='channel')
     async def find_channel(self,ctx,ID:int):
         c = self.bot.get_channel(ID)
-        if c == None:
+        if c is None:
             await ctx.send(await self.translate(ctx.channel,"find","chan-0"))
             return
         if ctx.guild==None or ctx.channel.permissions_for(ctx.guild.me).embed_links:
@@ -841,7 +841,7 @@ Servers:
         for serv in ctx.bot.guilds:
             every_roles += serv.roles
         role = discord.utils.find(lambda role:role.id==ID,every_roles)
-        if role == None:
+        if role is None:
             await ctx.send(await self.translate(ctx.channel,"find","role-0"))
             return
         if ctx.guild==None or ctx.channel.permissions_for(ctx.guild.me).embed_links:
@@ -867,7 +867,7 @@ Servers:
         else:
             flow = flow[0]
         temp = self.bot.get_guild(flow['guild'])
-        if temp == None:
+        if temp is None:
             g = "Unknown ({})".format(flow['guild'])
         else:
             g = "`{}`\n{}".format(temp.name,temp.id)
@@ -1104,7 +1104,7 @@ Servers:
         # title
         t = await self.translate(ctx.channel,'infos','usernames-title',u=user.name)
         # Embed creation
-        if ctx.guild == None or ctx.channel.permissions_for(ctx.guild.me).embed_links:
+        if ctx.guild is None or ctx.channel.permissions_for(ctx.guild.me).embed_links:
             date = ""
             desc = None
             f = list()

@@ -154,9 +154,9 @@ class ErrorsCog(commands.Cog):
                 ctx = await self.bot.get_context(ctx)
             tr = traceback.format_exception(type(error), error, error.__traceback__)
             msg = "```python\n{}\n```".format(" ".join(tr))
-            if ctx == None:
+            if ctx is None:
                 await self.senf_err_msg(f"Internal Error\n{msg}")
-            elif ctx.guild == None:
+            elif ctx.guild is None:
                 await self.senf_err_msg(f"DM | {ctx.channel.recipient.name}\n{msg}")
             elif ctx.channel.id==625319425465384960:
                 return await ctx.send(ctx.guild.name+" | "+ctx.channel.name+"\n"+msg)
@@ -173,7 +173,7 @@ class ErrorsCog(commands.Cog):
     async def senf_err_msg(self,msg):
         """Envoie un message dans le salon d'erreur"""
         salon = self.bot.get_channel(626039503714254858)
-        if salon == None:
+        if salon is None:
             return False
         if len(msg)>2000:
             if msg.endswith("```"):

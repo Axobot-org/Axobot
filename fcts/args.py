@@ -31,9 +31,9 @@ class user(commands.converter.UserConverter):
         if argument.isnumeric():
             if ctx.guild != None:
                 res = ctx.guild.get_member(int(argument))
-            if res == None:
+            if res is None:
                 res = ctx.bot.get_user(int(argument))
-            if res == None:
+            if res is None:
                 try:
                     res = await ctx.bot.fetch_user(int(argument))
                 except:
@@ -45,7 +45,7 @@ class user(commands.converter.UserConverter):
                 return await commands.MemberConverter().convert(ctx,argument)
             except:
                 return await commands.UserConverter().convert(ctx,argument)
-        if res == None:
+        if res is None:
             raise commands.errors.BadArgument('User "{}" not found'.format(argument))
 
 class infoType(commands.Converter):

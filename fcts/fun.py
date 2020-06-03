@@ -215,7 +215,7 @@ You can specify a verification limit by adding a number in argument (up to 1.000
     @commands.guild_only()
     @commands.check(is_fun_enabled)
     async def kill(self,ctx,*,name=None):
-        if name == None:
+        if name is None:
             victime = ctx.author.display_name
             ex = ctx.author.display_name.replace(" ","_")
         else:
@@ -225,7 +225,7 @@ You can specify a verification limit by adding a number in argument (up to 1.000
         liste = await self.translate(ctx.channel,"kill","list")
         msg = random.choice(liste)
         tries = 0
-        while '{0}' in msg and name == None and tries<50:
+        while '{0}' in msg and name is None and tries<50:
             msg = random.choice(liste)
             tries += 1
         await ctx.send(msg.format(author,victime,ex))
@@ -607,7 +607,7 @@ You can specify a verification limit by adding a number in argument (up to 1.000
             emojiz = await self.bot.cogs["ServerCog"].find_staff(msg.guild,'vote_emojis')
         else:
             emojiz = None
-        if emojiz == None or len(emojiz) == 0:
+        if emojiz is None or len(emojiz) == 0:
             await msg.add_reaction('👍')
             await msg.add_reaction('👎')
             return

@@ -104,7 +104,7 @@ class EmbedCog(commands.Cog):
         def discord_embed(self):
             if type(self.color)==discord.Colour:
                 color = self.color
-            elif self.color == None:
+            elif self.color is None:
                 color = discord.Embed.Empty
             else:
                 color = discord.Color(self.color)
@@ -119,7 +119,7 @@ class EmbedCog(commands.Cog):
     
 
     async def send(self,embeds,url=None,ctx=None):
-        if url == None:
+        if url is None:
             url = url_base + self.logs['beta'] if self.bot.beta else url_base + self.logs['classic']
         else:
             if url in self.logs.keys():

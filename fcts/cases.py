@@ -41,7 +41,7 @@ class CasesCog(commands.Cog):
             self.mod = ModID
             self.reason = Reason
             self.duration = duration
-            if date == None:
+            if date is None:
                 self.date = "Unknown"
             else:
                 self.date = date
@@ -55,12 +55,12 @@ class CasesCog(commands.Cog):
 
         async def display(self,bot,display_guild=False):
             u = bot.get_user(self.user)
-            if u == None:
+            if u is None:
                 u = self.user
             else:
                 u = u.mention
             g = bot.get_guild(self.guild)
-            if g == None:
+            if g is None:
                 g = self.guild
             else:
                 g = g.name
@@ -221,7 +221,7 @@ class CasesCog(commands.Cog):
             e = -1
             if ctx.channel.permissions_for(ctx.guild.me).embed_links:
                 embed = discord.Embed(title="title", colour=self.bot.cogs['ServerCog'].embed_color, timestamp=ctx.message.created_at)
-                if u == None:
+                if u is None:
                     embed.set_author(name=str(user))
                 else:
                     embed.set_author(name="Cases from "+str(u), url=u.avatar_url_as(format='png'), icon_url=str(u.avatar_url_as(format='png')))
@@ -230,12 +230,12 @@ class CasesCog(commands.Cog):
                     l = await self.translate(ctx.guild.id,"current_lang","current")
                     for e,x in enumerate(cases):
                         g = self.bot.get_guild(x.guild)
-                        if g == None:
+                        if g is None:
                             g = x.guild
                         else:
                             g = g.name
                         m = self.bot.get_user(x.mod)
-                        if m == None:
+                        if m is None:
                             m = x.mod
                         else:
                             m = m.mention

@@ -50,7 +50,7 @@ class WelcomerCog(commands.Cog):
             return
         if msg not in ['',None]:
             ch = await self.bot.cogs['ServerCog'].find_staff(member.guild.id,'welcome_channel')
-            if ch == None:
+            if ch is None:
                 return
             ch = ch.split(';')
             msg = await self.bot.cogs['UtilitiesCog'].clear_msg(msg,ctx=None)
@@ -58,7 +58,7 @@ class WelcomerCog(commands.Cog):
                 if not channel.isnumeric():
                     continue
                 channel = member.guild.get_channel(int(channel))
-                if channel == None:
+                if channel is None:
                     continue
                 botormember = await self.translate(member.guild,"keywords",'bot' if member.bot else 'member')
                 try:
@@ -118,7 +118,7 @@ class WelcomerCog(commands.Cog):
             pass
 
     async def raid_check(self,member):
-        if member.guild == None:
+        if member.guild is None:
             return False
         level = str(await self.bot.cogs['ServerCog'].find_staff(member.guild.id,"anti_raid"))
         if not level.isnumeric() or member.guild.channels[0].permissions_for(member.guild.me).kick_members == False:

@@ -84,7 +84,7 @@ If the bot can't send the new command format, it will try to send the old one.""
                     await self.bot.cogs["UtilitiesCog"].suppr(ctx.message)
                 else:
                     destination = ctx.message.channel
-            if destination == None:
+            if destination is None:
                 await ctx.message.author.create_dm()
                 destination = ctx.message.author.dm_channel
         
@@ -201,12 +201,12 @@ If the bot can't send the new command format, it will try to send the old one.""
                 i = 1
                 for line in temp:
                     if len("\n".join(v+[line]))>1020:
-                        title = tr[k]+' - '+str(i) if k in tr.keys() else k+' - '+str(i)
+                        title = tr[k]+' - '+str(i) if k in tr else k+' - '+str(i)
                         answer.append(("__**"+title.capitalize()+"**__", "\n".join(v)))
                         v = list()
                         i += 1
                     v.append(line)
-                title = tr[k]+' - '+str(i) if k in tr.keys() else k+' - '+str(i)
+                title = tr[k]+' - '+str(i) if k in tr else k+' - '+str(i)
                 answer.append(("__**"+title.capitalize()+"**__", "\n".join(v)))
             else:
                 answer.append(("__**"+tr[k].capitalize()+"**__", "\n".join(v)))
@@ -219,7 +219,7 @@ If the bot can't send the new command format, it will try to send the old one.""
         form = "**{}**\n\n {} \n{}"
         pages = list()
         cog_name = cog.__class__.__name__
-        if description == None:
+        if description is None:
             description = await self.translate(ctx.channel,"aide","no-desc-cog")
         for cmd in sorted([c for c in self.bot.commands],key=self.sort_by_name):
             try:
