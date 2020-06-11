@@ -533,7 +533,7 @@ You can specify a verification limit by adding a number in argument (up to 1.000
                     await msg.channel.send(reason)
         if (not await checks.is_a_cmd(msg, self.bot)) and (ctx.author.display_name.endswith(' [AFK]') or ctx.author.id in self.afk_guys.keys()):
             user_config = await self.bot.cogs['UtilitiesCog'].get_db_userinfo(["auto_unafk"],[f'`userID`={ctx.author.id}'])
-            if not user_config['auto_unafk']:
+            if user_config is None or (not user_config['auto_unafk']):
                 return
             msg = copy.copy(msg)
             msg.content = (await self.bot.get_prefix(msg))[-1] + 'unafk'
