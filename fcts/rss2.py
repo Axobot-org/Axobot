@@ -270,6 +270,15 @@ class RssCog(commands.Cog):
             else:
                 await ctx.send(obj)
 
+
+    async def is_overflow(self, guild: discord.Guild) -> bool:
+        """Check if a guild still has at least a slot
+        True if max number reached"""
+        flow_limit = await self.bot.cogs['ServerCog'].find_staff(guild.id,'rss_max_number')
+        if flow_limit==None:
+            flow_limit = self.bot.cogs['ServerCog'].default_opt['rss_max_number']
+        return len(await self.get_guild_flows(guild.id)) >= flow_limit
+
     @rss_main.command(name="add")
     @commands.guild_only()
     @commands.check(can_use_rss)
@@ -278,10 +287,7 @@ class RssCog(commands.Cog):
         """Subscribe to a rss feed, displayed on this channel regularly
         
         ..Doc rss.html#follow-a-feed"""
-        flow_limit = await self.bot.cogs['ServerCog'].find_staff(ctx.guild.id,'rss_max_number')
-        if flow_limit==None:
-            flow_limit = self.bot.cogs['ServerCog'].default_opt['rss_max_number']
-        if len(await self.get_guild_flows(ctx.guild.id)) >= flow_limit:
+        if await self.is_overflow(ctx.guild):
             await ctx.send(str(await self.translate(ctx.guild.id,"rss","flow-limit")).format(flow_limit))
             return
         identifiant = await self.parse_yt_url(link)
@@ -490,6 +496,7 @@ class RssCog(commands.Cog):
     @commands.check(checks.database_connected)
     async def roles_flows(self,ctx,ID:int=None):
         """Configures a role to be notified when a news is posted
+        Put "None" as ID if you want to remove every mention
         
         ..Doc rss.html#mention-a-role"""
         e = None

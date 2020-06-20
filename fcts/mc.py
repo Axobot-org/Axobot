@@ -243,7 +243,7 @@ Every information come from the website www.fr-minecraft.net"""
             ip,port = i[0],i[1]
         elif port == None:
             port = ''
-        if len(await self.bot.cogs['RssCog'].get_guild_flows(ctx.guild.id)) >= self.bot.cogs['RssCog'].flow_limit:
+        if await self.bot.cogs['RssCog'].is_overflow(ctx.guild):
             await ctx.send(str(await self.translate(ctx.guild.id,"rss","flow-limit")).format(self.bot.cogs['RssCog'].flow_limit))
             return
         try:
