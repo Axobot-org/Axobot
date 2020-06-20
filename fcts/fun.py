@@ -497,7 +497,7 @@ You can specify a verification limit by adding a number in argument (up to 1.000
         You'll get a nice nickname, because nicknames are cool, aren't they?"""
         try:
             reason = await self.bot.cogs['UtilitiesCog'].clear_msg(reason,ctx.message.mention_everyone,ctx)
-            self.afk_guys[ctx.author.id] = reason
+            self.afk_guys[ctx.author.id] = discord.utils.escape_mentions(reason)
             if (not ctx.author.display_name.endswith(' [AFK]')) and len(ctx.author.display_name)<26:
                 await ctx.author.edit(nick=ctx.author.display_name+" [AFK]")
             await ctx.send(await self.translate(ctx.guild.id,"fun","afk-done"))
