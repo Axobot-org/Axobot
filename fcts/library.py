@@ -64,7 +64,8 @@ class LibCog(commands.Cog):
     @commands.group(name="book",aliases=['bookstore'])
     async def book_main(self,ctx):
         """Search for a book and manage your library"""
-        pass
+        if ctx.subcommand_passed==None:
+            await self.bot.cogs['HelpCog'].help_command(ctx,['book'])
     
     @book_main.command(name="search",aliases=["book"])
     async def book_search(self,ctx:commands.Context,ISBN:typing.Optional[ISBN],*,keywords:str=''):
