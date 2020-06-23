@@ -273,7 +273,7 @@ class Events(commands.Cog):
                 f_duration = await self.bot.get_cog('TimeCog').time_delta(task['duration'],lang=await self.translate(channel,'current_lang','current'), form='developed', precision=0)
                 t = (await self.translate(channel, "fun", "reminds-title")).capitalize()
                 foot = await self.translate(channel, "fun", "reminds-date")
-                emb = self.bot.get_cog("EmbedCog").Embed(title=t, desc=task["message"], color=4886754, time=task["begin"], footer_text=foot)
+                emb = self.bot.get_cog("EmbedCog").Embed(title=t, desc=task["message"], color=4886754, time=task["utc_begin"], footer_text=foot)
                 msg = await self.translate(channel, "fun", "reminds-asked", user=user.mention, duration=f_duration)
                 await channel.send(msg, embed=emb)
             except discord.errors.Forbidden:
@@ -290,7 +290,7 @@ class Events(commands.Cog):
             if IDonly:
                 query = ("SELECT `ID` FROM `timed`")
             else:
-                query = ("SELECT * FROM `timed`")
+                query = ("SELECT *, CONVERT_TZ(`begin`, @@session.time_zone, '+00:00') AS `utc_begin` FROM `timed`")
             cursor.execute(query)
             liste = list()
             for x in cursor:
