@@ -369,8 +369,9 @@ You can specify a verification limit by adding a number in argument (up to 1.000
     @commands.check(is_fun_enabled)
     async def me(self,ctx,*,text):
         """No U"""
-        text = await self.bot.cogs["UtilitiesCog"].clear_msg(text,everyone=ctx.message.mention_everyone,ctx=ctx)
-        await ctx.send("*{} {}*".format(ctx.author.display_name,text))
+        text = "*{} {}*".format(ctx.author.display_name,text)
+        text = await self.bot.cogs["UtilitiesCog"].clear_msg(text,everyone=not ctx.message.mention_everyone,ctx=ctx)
+        await ctx.send(text)
         if self.bot.database_online and await self.bot.cogs["ServerCog"].staff_finder(ctx.author,"say"):
             await self.bot.cogs["UtilitiesCog"].suppr(ctx.message)
     
