@@ -562,11 +562,12 @@ class XPCog(commands.Cog):
             pfp = await self.get_raw_image(user.avatar_url_as(format='png',size=256))
             img = await self.bot.loop.run_in_executor(None,self.add_overlay,pfp.resize(size=(282,282)),user,card,xp,rank,txt,colors,levels_info,name_fnt)
             img.save('../cards/global/{}-{}-{}.png'.format(user.id,xp,rank[0]))
+            card.close()
             return discord.File('../cards/global/{}-{}-{}.png'.format(user.id,xp,rank[0]))
 
         else:
             async with aiohttp.ClientSession() as cs:
-                async with cs.get(str(user.avatar_url)) as r:
+                async with cs.get(str(user.avatar_url_as(format='gif',size=256))) as r:
                     response = await r.read()
                     pfp = Image.open(BytesIO(response))
 
@@ -578,16 +579,17 @@ class XPCog(commands.Cog):
                 img = await self.bot.loop.run_in_executor(None,self.add_overlay,frame.resize(size=(282,282)),user,card.copy(),xp,rank,txt,colors,levels_info,name_fnt)
                 img = ImageEnhance.Contrast(img).enhance(1.5).resize((800,265))
                 images.append(img)
-                duration.append(pfp.info['duration']/1000)
+                duration.append(pfp.info['duration'])
                 
             card.close()
 
-            image_file_object = BytesIO()
+            # image_file_object = BytesIO()
             gif = images[0]
-            gif.save(image_file_object, format='gif', save_all=True, append_images=images[1:], loop=0, duration=duration[0], subrectangles=True)
-            image_file_object.seek(0)
-            # print(image_file_object.getbuffer().nbytes)
-            return discord.File(fp=image_file_object, filename='card.gif')
+            filename = '../cards/global/{}-{}-{}.gif'.format(user.id,xp,rank[0])
+            gif.save(filename, format='gif', save_all=True, append_images=images[1:], loop=0, duration=duration, subrectangles=True)
+            # image_file_object.seek(0)
+            # return discord.File(fp=image_file_object, filename='card.gif')
+            return discord.File('../cards/global/{}-{}-{}.gif'.format(user.id,xp,rank[0]))
             # imageio.mimwrite('../cards/global/{}-{}-{}.gif'.format(user.id,xp,rank[0]), images, format="GIF-PIL", duration=duration, subrectangles=True)
             # return discord.File('../cards/global/{}-{}-{}.gif'.format(user.id,xp,rank[0]))
 
@@ -712,7 +714,7 @@ class XPCog(commands.Cog):
     
     async def send_card(self,ctx:commands.context,user:discord.User,xp,rank,ranks_nb,used_system,levels_info=None):
         try:
-            await ctx.send(file=discord.File('../cards/global/{}-{}-{}.{}'.format(user.id,xp,rank,'gif' if user.is_avatar_animated() else 'png')))
+            myfile = discord.File('../cards/global/{}-{}-{}.{}'.format(user.id,xp,rank,'gif' if user.is_avatar_animated() else 'png'))
         except FileNotFoundError:
             style = await self.bot.cogs['UtilitiesCog'].get_xp_style(user)
             txts = [await self.translate(ctx.channel,'xp','card-level'), await self.translate(ctx.channel,'xp','card-rank')]
@@ -722,8 +724,12 @@ class XPCog(commands.Cog):
                     static = not static['animated_card']
                 else:
                     static = True
-            await ctx.send(file=await self.create_card(user,style,xp,used_system,[rank,ranks_nb],txts,force_static=static,levels_info=levels_info))
             self.bot.log.debug("XP card for user {} ({}xp - style {})".format(user.id,xp,style))
+            myfile = await self.create_card(user,style,xp,used_system,[rank,ranks_nb],txts,force_static=static,levels_info=levels_info)
+        try:
+            await ctx.send(file=myfile)
+        except discord.errors.HTTPException:
+            await ctx.send(await self.translate(ctx.channel, "xp", "card-too-large"))
     
     async def send_embed(self,ctx,user,xp,rank,ranks_nb,levels_info,used_system):
         txts = [await self.translate(ctx.channel,'xp','card-level'), await self.translate(ctx.channel,'xp','card-rank')]
