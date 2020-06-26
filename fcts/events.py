@@ -475,7 +475,7 @@ class Events(commands.Cog):
         if self.bot.beta:
             return
         t = time.time()
-        answers = ['None','None','None','None','None']
+        answers = ['None','None','None','None','None', 'None']
         self.bot.log.info("[DBL] Envoi des infos sur le nombre de guildes...")
         try:
             guildCount = await self.bot.cogs['InfoCog'].get_guilds_count()
@@ -540,6 +540,20 @@ class Events(commands.Cog):
                 answers[4] = resp.status
         except Exception as e:
             answers[4] = "0"
+            await self.bot.get_cog("ErrorsCog").on_error(e,None)
+        try: # https://api.discordextremelist.xyz/v2/bot/486896267788812288/stats
+            payload = json.dumps({
+                'guildCount': guildCount
+            })
+            headers = {
+                'Authorization': self.bot.others['discordextremelist'],
+                'Content-Type': 'application/json'
+            }
+            async with session.post('https://api.discordextremelist.xyz/v2/bot/{}/stats'.format(self.bot.user.id), data=payload, headers=headers) as resp:
+                self.bot.log.debug('DiscordExtremeList returned {} for {}'.format(resp.status, payload))
+                answers[5] = resp.status
+        except Exception as e:
+            answers[5] = "0"
             await self.bot.get_cog("ErrorsCog").on_error(e,None)
         await session.close()
         answers = [str(x) for x in answers]
