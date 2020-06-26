@@ -524,6 +524,8 @@ You can specify a verification limit by adding a number in argument (up to 1.000
         if msg.author.bot:
             return
         ctx = await self.bot.get_context(msg)
+        if not await is_fun_enabled(ctx, self):
+            return
         for member in msg.mentions:
             c = (member.nick and member.nick.endswith(' [AFK]')) or member.id in self.afk_guys.keys()
             if c and member!=msg.author:
