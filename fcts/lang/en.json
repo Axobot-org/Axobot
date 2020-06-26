@@ -128,7 +128,7 @@
                 "No verification role has been added"
             ]
         },
-        "cmd-not-found": "There is no command nammed \"{}\"",
+        "cmd-not-found": "There is no command named \"{}\"",
         "description": "Description",
         "embed_title": "Available commands for {u}",
         "footer": "Type {}help command for more info on a command",
@@ -932,7 +932,7 @@
         "guild-13": "Boosts number",
         "guild-13v": "{b} (level {p})",
         "guild-14": "Limitations",
-        "guild-14v": "Bitrate: {bit}kbps\nFiles size: {fil}MB\nEmojis count: {emo}",
+        "guild-14v": "Bitrate: {bit}kbps\nMax files size: {fil}MB\nEmojis count: {emo}",
         "guild-15": "Invite url",
         "guild-2": "Region",
         "guild-3": "Text : {} | Vocal : {} ({} categories)",
