@@ -95,7 +95,7 @@ class FunCog(commands.Cog):
         """Selects an option at random from a given list
         The options must be separated by a semicolon `;`"""
         liste = [x for x in [x.strip() for x in options.split(';')] if len(x)>0]
-        if len(liste)==0:
+        if len(liste) < 2:
             return await ctx.send(await self.translate(ctx.channel,"fun","no-roll"))
         choosen = None
         while choosen==self.last_roll:
