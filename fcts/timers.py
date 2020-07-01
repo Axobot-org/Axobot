@@ -1,6 +1,7 @@
 import discord
 from discord.ext import commands
 import copy
+import datetime
 
 from fcts import args
 
@@ -28,7 +29,7 @@ class TimersCog(commands.Cog):
         new_ctx = await self.bot.get_context(ctx.message)
         await self.bot.invoke(new_ctx)
     
-    
+
     @commands.group(name="reminder", aliases=["remind", "reminds", "rmd"])
     async def remind_main(self, ctx:commands.Context):
         """Ask the bot to remind you of something later
@@ -77,7 +78,38 @@ class TimersCog(commands.Cog):
     async def remind_list(self, ctx:commands.Context):
         """List your pending reminders
         """
-        pass
+        cnx = self.bot.cnx_frm
+        cursor = cnx.cursor(dictionary = True)
+        query = (f"SELECT *, CONVERT_TZ(`begin`, @@session.time_zone, '+00:00') AS `utc_begin` FROM `timed` WHERE user={ctx.author.id} AND action='timer'")
+        cursor.execute(query)
+        if cursor.arraysize == 0:
+            await ctx.send(await self.translate(ctx.channel, "timers", "rmd-empty"))
+            return
+        txt = await self.translate(ctx.channel, "timers", "rmd-item")
+        time_delta = self.bot.get_cog("TimeCog").time_delta
+        lang = await self.translate(ctx.channel, "current_lang", "current")
+        liste = list()
+        for item in cursor:
+            msg = item['message'] if len(item['message'])<=50 else item['message'][:47]+"..."
+            msg = "`"+msg.replace('`', '\\`')+"`"
+            chan = '<#'+str(item['channel'])+'>'
+            end = item["utc_begin"] + datetime.timedelta(seconds=item['duration'])
+            duration = await time_delta(datetime.datetime.utcnow(), end, lang=lang, year=True, form="temp", precision=0)
+            item = txt.format(id=item['ID'], duration=duration, channel=chan, msg=msg)
+            liste.append(item)
+        if ctx.guild is None or ctx.channel.permissions_for(ctx.guild.me).embed_links:
+            if len("\n".join(liste)) > 2000:
+                desc = ""
+                step = 5
+                fields = [{"name":self.bot.zws, "value":"\n".join(liste[i:i+step])} for i in range(0, len(liste), step)][:25]
+            else:
+                desc = "\n".join(liste)
+                fields = None
+            emb = ctx.bot.get_cog("EmbedCog").Embed(title=await self.translate(ctx.channel, "timers", "rmd-title"), desc=desc, fields=fields, color=16108042)
+            await ctx.send(embed=emb)
+        else:
+            t = "**"+await self.translate(ctx.channel, "timers", "rmd-title")+"**\n\n"
+            await ctx.send(t+"\n".join(liste))
 
 
 def setup(bot: commands.Bot):

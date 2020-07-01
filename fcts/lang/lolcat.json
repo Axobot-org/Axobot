@@ -1009,6 +1009,11 @@
         "user-0": "On dis servr?",
         "voicechan-0": "Singing ch4nnel"
     },
+    "timers": {
+        "rmd-item": "ID: `{id}` | In: {duration} | Chan: {channel} | Msg: {msg}",
+        "rmd-empty": "Oops, U don't have any pending reminder lol",
+        "rmd-title": "I'll remind u that becuz ur dumb-dumb :bongocat:"
+    },
     "users": {
         "animated_card_false": "Anamited xp cards are naw disabld for you",
         "animated_card_true": "Animated xp cards ar naw enabled 4U",

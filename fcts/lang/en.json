@@ -999,6 +999,11 @@
         "user-0": "On this server?",
         "voicechan-0": "Vocal channel"
     },
+    "timers": {
+        "rmd-item": "ID: `{id}` | In: {duration} | Channel: {channel} | Message: {msg}",
+        "rmd-empty": "Oops, you don't have any pending reminder...",
+        "rmd-title": "List of your reminders"
+    },
     "users": {
         "animated_card_false": "You are not currently allowing an animated card. Thanks!",
         "animated_card_true": "The animated xp cards can be used for you (slower rendering)",

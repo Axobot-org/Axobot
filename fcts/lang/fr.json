@@ -1009,6 +1009,11 @@
         "user-0": "Sur ce serveur ?",
         "voicechan-0": "Salon vocal"
     },
+    "timers": {
+        "rmd-item": "ID : `{id}` | Dans : {duration} | Salon : {channel} | Message : {msg}",
+        "rmd-empty": "Oups, vous n'avez aucun rappel en cours...",
+        "rmd-title": "Liste de vos rappels"
+    },
     "users": {
         "animated_card_false": "Vous n'utilisez actuellement pas de carte animée",
         "animated_card_true": "Les cartes d'xp animées pourront être utilisée pour vous (rendu plus lent)",
