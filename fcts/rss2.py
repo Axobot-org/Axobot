@@ -815,7 +815,7 @@ class RssCog(commands.Cog):
 
 
     async def parse_yt_url(self,url):
-        r = r'(?:http.*://)?(?:www.)?(?:youtube.com|youtu.be)(?:/channel/|/user/)(.+)'
+        r = r'(?:http.*://)?(?:www.)?(?:youtube.com|youtu.be)(?:(?:/channel/|/user/)(.+)|/[\w-]+$)'
         match = re.search(r,url)
         if match == None:
             return None
