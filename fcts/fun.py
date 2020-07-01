@@ -633,7 +633,7 @@ You can specify a verification limit by adding a number in argument (up to 1.000
         """Get help about markdown in Discord"""
         await ctx.send(await self.translate(ctx.channel,'fun','markdown'))
     
-    @commands.command(name="remindme", aliases=["remind", "reminds"])
+    @commands.command(name="remindme", aliases=["remind", "reminds", "rmd"])
     @commands.cooldown(5,30,commands.BucketType.channel)
     @commands.cooldown(5,60,commands.BucketType.user)
     async def remindme(self, ctx:commands.Context, duration:commands.Greedy[args.tempdelta], *, message):
@@ -644,7 +644,9 @@ Please use the following format:
 `XXd` : XX days
 `XXw` : XX weeks
 
-..Example remindme 49d Think about doing my homework"""
+..Example remindme 49d Think about doing my homework
+
+..Doc miscellaneous.html#reminders"""
         duration = sum(duration)
         if duration < 1:
             await ctx.send(await self.translate(ctx.channel, "fun", "reminds-too-short"))

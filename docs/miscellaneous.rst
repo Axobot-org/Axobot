@@ -80,6 +80,19 @@ The markdown is a set of formatting rules used everywhere, such as on GitHub or 
 
 .. warning:: Warning, this command contains an invitation link to the information server on the code blocks.
 
+
+---------
+Reminders
+---------
+
+**Syntax:** :code:`remindme <duration> <message>` (aliases: reminds, rmd)
+
+If you have some issues with your memory like me, I think you should start using this command. With it, you can ask Zbot to remind you things to do later, between a minute and a few years. Like a `!d bump`, or anything else, up to you. And it also works in DM.
+
+The duration argument is exactly the same as for tempmute/tempban: use :code:`XXw` for weeks, :code:`XXd` for days, :code:`XXh` for hours and :code:`XXm` for minutes (replacing **XX** by the corresponding number, of course!)
+
+.. warning:: Zbot needs "`Embed Links <perms.html#embed-links>`_" permission to send the reminder.
+
 ---
 Say
 ---
