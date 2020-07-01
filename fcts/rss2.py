@@ -601,13 +601,15 @@ class RssCog(commands.Cog):
                 channel = ctx.channel
             try:
                 flow = await self.askID(ID,ctx)
+                e = None
             except Exception as e:
                 flow = []
             if flow==None:
                 return
             if len(flow)==0:
                 await ctx.send(await self.translate(ctx.guild,"rss","fail-add"))
-                await self.bot.cogs["ErrorsCog"].on_error(e,ctx)
+                if e != None:
+                    await self.bot.cogs["ErrorsCog"].on_error(e,ctx)
                 return
             flow = flow[0]
             await self.update_flow(flow['ID'],[('channel',channel.id)])
