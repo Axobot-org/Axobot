@@ -39,7 +39,7 @@ async def check_admin(ctx):
 async def can_use_rss(ctx):
     if ctx.guild==None:
         return False
-    return ctx.channel.permissions_for(ctx.author).administrator or await ctx.bot.cogs["AdminCog"].check_if_admin(ctx)
+    return ctx.channel.permissions_for(ctx.author).manage_guild or await ctx.bot.cogs["AdminCog"].check_if_admin(ctx)
 
 class RssCog(commands.Cog):
     """Cog which deals with everything related to rss flows. Whether it is to add automatic tracking to a stream, or just to see the latest video released by Discord, it is this cog that will be used."""

@@ -6,6 +6,7 @@ More and more bots offer the feature to follow news feeds, sometimes `rss atom f
 
 With this bot you have two possibilities to follow a feed: manually request the last post, or configure an automatic follow-up in a text channel. In the case of automatic tracking, ZBot will scan all feeds every ten minutes to check for new posts, sending them in if there are any. Just be careful: this automatic tracking costs a lot of resources to the bot, so you are limited to a certain number of automatic feeds (same for rss, twitter, youtube or minecraft) !
 
+To manage this plugin (add, edit or remove feeds), you will need at least the Manage Server permission.
 
 -----------------
 See the last post
