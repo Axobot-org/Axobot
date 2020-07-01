@@ -347,7 +347,8 @@
             "Suggest something to Discord",
             "Selfbots article",
             "ToS for bot devs",
-            "How to find an ID"
+            "How to find an ID",
+            "Minimum legal age of use Discord by country"
         ],
         "docs": "Here is the link to the bot documentation:",
         "prefix": "List of currently usable prefixes:",
