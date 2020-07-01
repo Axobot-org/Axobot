@@ -147,7 +147,7 @@ class anyEmoji(commands.Converter):
                 return r.group(1)
         raise commands.errors.BadArgument('Invalid emoji: '+argument)
 
-class guildMessage(commands.Converter):
+class guildMessage(commands.Converter): # Deprecated, now use discord.Message
     def __init__(self):
         pass
     

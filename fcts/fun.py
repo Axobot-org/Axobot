@@ -380,7 +380,7 @@ You can specify a verification limit by adding a number in argument (up to 1.000
     
     @commands.command(name="react")
     @commands.check(can_say)
-    async def react(self,ctx,message:args.guildMessage,*,reactions):
+    async def react(self,ctx,message:discord.Message,*,reactions):
         """Add reaction(s) to a message. Server emojis also work."""
         #try:
         #    msg = await ctx.channel.fetch_message(ID)
@@ -390,7 +390,7 @@ You can specify a verification limit by adding a number in argument (up to 1.000
         for r in reactions.split():
             try:
                 e = await commands.EmojiConverter().convert(ctx,r)
-                await msg.add_reaction(e)
+                await message.add_reaction(e)
             except:
                 try:
                     await message.add_reaction(r)
