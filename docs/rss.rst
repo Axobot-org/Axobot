@@ -48,11 +48,13 @@ If you want to keep an eye on the number of rss/Minecraft feeds registered on yo
 Mention a role
 --------------
 
-**Syntax:** :code:`rss roles [flow ID]`
+**Syntax:** :code:`rss roles [flow ID] [roles]`
 
 This rss flow tracking option allows you to notify a role when a new post arrives. The roles mentioned are different between rss flows, which allows you a greater handling. 
 
 The "flow ID" argument is the identifier of the flow (found with the command `rss list <#see-every-feed>`_). If you do not enter this argument, or if the feed can't be found, the bot will open a menu where you can choose which feed to modify. Then another menu will allow you to choose which roles you want to mention.
+
+The "roles" arguments is the list of roles you want to mention, separated by spaces (if some of them contains spaces, you can use quotations "..." instead). If not specified, Zbot will ask you for the list. You can either use names or IDs, or put "none" to remove every mention.
 
 .. warning:: For this command too, the bot needs "`Embed Links <perms.html#embed-links>`_" permission!
 

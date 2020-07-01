@@ -796,7 +796,7 @@
         "no-db": "As the database is currently offline, this feature is temporarily disabled :confused:",
         "no-feed": "Oops, you don't have any rss feeds to manage!",
         "no-roles": "No role has been configured yet.",
-        "not-a-role": "The role `{}` is not found. Try again:",
+        "not-a-role": "This role can't be found. Try again:",
         "nothing": "I found nothing on this search :confused:",
         "research-timeout": "The web page took too long to answer, I had to interrupt the process :eyes:",
         "roles-0": "This feed has been modified to mention the roles {}",

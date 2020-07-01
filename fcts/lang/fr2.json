@@ -807,7 +807,7 @@
         "no-db": "La base de donnée est pas dispo :owo: !\n\nCette fonctionnalité est donc temporairement désactivée :confused:",
         "no-feed": "Wait :confused:\n\n T'as aucun flux RSS à gérer :grinning: !",
         "no-roles": ":shrug:\n\nT'as configuré aucun rôle !",
-        "not-a-role": "J'ai beau chercher, je trouve pas le rôle `{}`...\nTu réessaies ?",
+        "not-a-role": "J'ai beau chercher, je trouve pas ce rôle...\nTu réessaies ?",
         "nothing": "Je n'ai rien trouvé sur cette recherche :confused:",
         "research-timeout": "La page web a mis trop de temps à répondre, j'ai dû interrompre le processus :eyes:",
         "roles-0": "Ce flux a bien été modifié pour mentionner les rôles {}",

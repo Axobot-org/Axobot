@@ -777,7 +777,6 @@
         "no-db": "Weil die Datenbank gerade offline ist, kommen zeitlich begrenzt keine rss Feeds 😕",
         "no-feed": "Ups, du kannst keine rss Feeds verwalten!",
         "no-roles": "Es wurde noch keine Rolle konfiguriert.",
-        "not-a-role": "Die Rolle `{}` wurde nicht gefunden. Versuche es nochmal:",
         "nothing": "Ich habe nichts bei meiner Suche gefunden 😕",
         "research-timeout": "Die Webseite hat zu lange gebraucht, um zu antworten, also habe ich den Vorgang abgebrochen 👀",
         "roles-0": "Der Feed wurde verändert, dass die Rolle {} erwähnt werden",

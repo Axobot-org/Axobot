@@ -806,7 +806,7 @@
         "no-db": "La base de donnée étant actuellement hors ligne, cette fonctionnalité est temporairement désactivée :confused:",
         "no-feed": "Oups, vous n'avez aucun flux rss à gérer !",
         "no-roles": "Aucun rôle n'a été configuré pour l'instant.",
-        "not-a-role": "Le rôle `{}` est introuvable. Réessayez :",
+        "not-a-role": "Ce rôle est introuvable. Réessayez :",
         "nothing": "Je n'ai rien trouvé sur cette recherche :confused:",
         "research-timeout": "La page web a mis trop de temps à répondre, j'ai dû interrompre le processus :eyes:",
         "roles-0": "Ce flux a bien été modifié pour mentionner les rôles {}",

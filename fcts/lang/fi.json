@@ -802,7 +802,6 @@
         "no-db": "Tämä ominaisuus on väliaikaisesti poissa käytösta, tietokantamme ei ole tällä hetkellä paikalla. 😕",
         "no-feed": "Ups, sinulla ei ole mitään rss lähetyksiä joita voisit hallita!",
         "no-roles": "Mitään roolia ei ole konfiguroitu vielä.",
-        "not-a-role": "Roolia `{}` ei löytynyt. Yritä uudelleen:",
         "nothing": "En löytänyt mitään tällä haulla 😕",
         "research-timeout": "Web sivulla kesti liian kauan vastata, minun täytyi keskeyttää prosessi 👀",
         "roles-0": "Tätä lähetystä on muokattu mainitsemaan roolit {}",

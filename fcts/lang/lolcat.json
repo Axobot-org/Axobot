@@ -806,7 +806,7 @@
         "no-db": "As the databaz is auffline, dis feature iz temporarly disabled :confused:",
         "no-feed": "Oops, u donot hav any rss feds 2 managez plz!",
         "no-roles": "No more role hAVe bean configurated yetz.",
-        "not-a-role": "The rOle `{}` was not finndz. Try against:",
+        "not-a-role": "The rOle was not finndz. Try against:",
         "nothing": "I finnd nothin on this searrch :confused:",
         "research-timeout": "This page took toooo long 2 answer, I had to stop teh process :eyes:",
         "roles-0": "Thes feed have been editd 2 mention the roles {}",

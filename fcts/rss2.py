@@ -436,7 +436,7 @@ class RssCog(commands.Cog):
                 embed.add_field(name="\uFEFF", value=x, inline=False)
             await ctx.send(embed=embed)
 
-    async def askID(self,ID,ctx):
+    async def askID(self, ID, ctx):
         """Demande l'ID d'un flux rss"""
         if ID != None:
             flow = await self.get_flow(ID)
@@ -475,14 +475,20 @@ class RssCog(commands.Cog):
                     r = ", ".join(r)
                 text.append("{}) {} - {} - {} - {}".format(iterator,await self.translate(ctx.guild.id,'rss',x['type']),x['link'],c,r))
                 iterator += 1
-            embed = await self.bot.get_cog('EmbedCog').Embed(title=await self.translate(ctx.guild.id,"rss","choose-mentions-1"), color=self.embed_color, desc="\n".join(text), time=ctx.message.created_at).create_footer(ctx)
-            emb_msg = await ctx.send(embed=embed.discord_embed())
+            if len("\n".join(text)) < 2048:
+                desc = "\n".join(text)
+                fields = None
+            else:
+                desc = text[0].split("\n")[0]
+                fields = [{'name': text[0].split("\n")[-2], 'value': "\n".join(text[i:i+10])} for i in range(1,len(text), 10)]
+            embed = await self.bot.get_cog('EmbedCog').Embed(title=await self.translate(ctx.guild.id,"rss","choose-mentions-1"), color=self.embed_color, desc=desc, fields=fields, time=ctx.message.created_at).create_footer(ctx)
+            emb_msg = await ctx.send(embed=embed)
             def check(msg):
                 if not msg.content.isnumeric():
                     return False
                 return msg.author.id==userID and int(msg.content) in range(1,iterator+1)
             try:
-                msg = await self.bot.wait_for('message',check=check,timeout=20.0)
+                msg = await self.bot.wait_for('message', check = check, timeout = max(10, 1.5*len(text)))
             except asyncio.TimeoutError:
                 await ctx.send(await self.translate(ctx.guild.id,"rss","too-long"))
                 await self.bot.cogs['UtilitiesCog'].suppr(emb_msg)
@@ -490,79 +496,114 @@ class RssCog(commands.Cog):
             flow = await self.get_flow(list_of_IDs[int(msg.content)-1])
         return flow
 
-    @rss_main.command(name="roles",aliases=['mentions'])
+    def parse_output(self, arg):
+        r = re.findall(r'((?<![\\])[\"])((?:.(?!(?<![\\])\1))*.?)\1', arg)
+        if len(r) > 0:
+            flatten = lambda l: [item for sublist in l for item in sublist]
+            params = [[x for x in group if x != '"'] for group in r]
+            return flatten(params)
+        else:
+            return arg.split(" ")
+
+    @rss_main.command(name="roles", aliases=['mentions', 'mention'])
     @commands.guild_only()
     @commands.check(can_use_rss)
     @commands.check(checks.database_connected)
-    async def roles_flows(self,ctx,ID:int=None):
+    async def roles_flows(self, ctx, ID:int=None, *, mentions:typing.Optional[str]):
         """Configures a role to be notified when a news is posted
-        Put "None" as ID if you want to remove every mention
+        If you want to use the @everyone role, please put the server ID instead of the role name.
         
+        ..Example rss mentions
+
+        ..Example rss mentions 6678466620137
+
+        ..Example rss mentions 6678466620137 "Announcements" "Twitch subs"
+
         ..Doc rss.html#mention-a-role"""
-        e = None
         try:
+            # ask for flow ID
             flow = await self.askID(ID,ctx)
         except Exception as e:
             flow = []
-        if flow==None:
+            await self.bot.cogs["ErrorsCog"].on_error(e,ctx)
+        if flow is None:
             return
-        if len(flow)==0:
+        if len(flow) == 0:
             await ctx.send(await self.translate(ctx.guild,"rss","fail-add"))
-            if e !=None:
-                await self.bot.cogs["ErrorsCog"].on_error(e,ctx)
             return
         flow = flow[0]
-        if flow['roles']=='':
-            text = await self.translate(ctx.guild.id,"rss","no-roles")
-        else:
-            r = list()
-            for item in flow['roles'].split(';'):
-                role = discord.utils.get(ctx.guild.roles,id=int(item))
-                if role != None:
-                    r.append(role.mention)
-                else:
-                    r.append(item)
-            r = ", ".join(r)
-            text = str(await self.translate(ctx.guild.id,"rss","roles-list")).format(r)
-        embed = self.bot.cogs['EmbedCog'].Embed(title=await self.translate(ctx.guild.id,"rss","choose-roles"), color=discord.Colour(0x77ea5c), desc=text, time=ctx.message.created_at)
-        emb_msg = await ctx.send(embed=embed.discord_embed())
-        err = await self.translate(ctx.guild.id,"rss",'not-a-role')
-        userID = ctx.author.id
-        def check2(msg):
-            return msg.author.id == userID
-        cond = False
-        while cond==False:
-            try:
-                msg = await self.bot.wait_for('message',check=check2,timeout=30.0)
-                if msg.content.lower() in ['aucun','none','_','del']:
-                    IDs = [None]
-                else:
-                    l = msg.content.split(',')
-                    IDs = list()
-                    Names = list()
-                    for x in l:
-                        x = x.strip()
-                        try:
-                            r = await commands.RoleConverter().convert(ctx,x)
-                            IDs.append(str(r.id))
-                            Names.append(r.name)
-                        except:
-                            await ctx.send(err.format(x))
-                            IDs = []
-                            break
-                if len(IDs) > 0:
-                    cond = True
-            except asyncio.TimeoutError:
-                await ctx.send(await self.translate(ctx.guild.id,"rss","too-long"))
-                await self.bot.cogs['UtilitiesCog'].suppr(emb_msg)
-                return
+        no_role = ['aucun','none','_','del']
+        if mentions is None: # if no roles was specified: we ask for them
+            if flow['roles'] == '':
+                text = await self.translate(ctx.guild.id,"rss","no-roles")
+            else:
+                r = list()
+                for item in flow['roles'].split(';'):
+                    role = discord.utils.get(ctx.guild.roles,id=int(item))
+                    if role != None:
+                        r.append(role.mention)
+                    else:
+                        r.append(item)
+                r = ", ".join(r)
+                text = str(await self.translate(ctx.guild.id,"rss","roles-list")).format(r)
+            # ask for roles
+            embed = self.bot.cogs['EmbedCog'].Embed(title=await self.translate(ctx.guild.id,"rss","choose-roles"), color=discord.Colour(0x77ea5c), desc=text, time=ctx.message.created_at)
+            emb_msg = await ctx.send(embed=embed.discord_embed())
+            err = await self.translate(ctx.guild.id,"find",'role-0')
+            userID = ctx.author.id
+            def check2(msg):
+                return msg.author.id == userID
+            cond = False
+            while cond==False:
+                try:
+                    msg = await self.bot.wait_for('message', check=check2, timeout=30.0)
+                    if msg.content.lower() in no_role: # if no role should be mentionned
+                        IDs = [None]
+                    else:
+                        l = self.parse_output(msg.content)
+                        IDs = list()
+                        Names = list()
+                        for x in l:
+                            x = x.strip()
+                            try:
+                                r = await commands.RoleConverter().convert(ctx,x)
+                                IDs.append(str(r.id))
+                                Names.append(r.name)
+                            except:
+                                await ctx.send(err)
+                                IDs = []
+                                break
+                    if len(IDs) > 0:
+                        cond = True
+                except asyncio.TimeoutError:
+                    await ctx.send(await self.translate(ctx.guild.id,"rss","too-long"))
+                    await self.bot.cogs['UtilitiesCog'].suppr(emb_msg)
+                    return
+        else: # if roles were specified
+            if mentions in no_role: # if no role should be mentionned
+                IDs = [None]
+            else: # we need to parse the output
+                params = self.parse_output(mentions)
+                IDs = list()
+                Names = list()
+                for x in params:
+                    try:
+                        r = await commands.RoleConverter().convert(ctx,x)
+                        IDs.append(str(r.id))
+                        Names.append(r.name)
+                    except commands.errors.BadArgument:
+                        pass
+                if len(IDs) == 0:
+                    await ctx.send(await self.translate(ctx.guild.id,"find",'role-0'))
+                    return
         try:
-            if IDs[0]==None:
+            if IDs[0] is None:
                 await self.update_flow(flow['ID'],values=[('roles','')])
                 await ctx.send(await self.translate(ctx.guild.id,"rss","roles-1"))
             else:
                 await self.update_flow(flow['ID'],values=[('roles',';'.join(IDs))])
-                await ctx.send(str(await self.translate(ctx.guild.id,"rss","roles-0")).format(", ".join(Names)))
+                txt = await self.bot.get_cog("UtilitiesCog").clear_msg(", ".join(Names))
+                await ctx.send(str(await self.translate(ctx.guild.id,"rss","roles-0")).format(txt))
         except Exception as e:
             await ctx.send(await self.translate(ctx.guild,"rss","fail-add"))
             await self.bot.cogs["ErrorsCog"].on_error(e,ctx)
