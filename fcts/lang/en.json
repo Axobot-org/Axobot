@@ -243,6 +243,7 @@
         "afk-no-perm": "Oops, I cannot change your nickname :confused: I will try to remember, but I could forget that you're afk",
         "afk-user-1": "This member is AFK, because {}",
         "afk-user-2": "This user is AFK!",
+        "bbw-too-many": "Oops, the grid is too big for Discord :confused:",
         "blame-0": "List of available names for **{}**",
         "calc-0": "The result takes too long to load:/",
         "calc-1": "The solutions of the calculation `{}` are `{}`",

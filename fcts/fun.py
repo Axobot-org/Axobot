@@ -10,7 +10,7 @@ importlib.reload(checks)
 importlib.reload(args)
 from fcts.checks import is_fun_enabled
 
-cmds_list = ['count_msg','ragequit','pong','run','nope','blame','party','bigtext','shrug','gg','money','pibkac','osekour','me','kill','cat','rekt','thanos','nuke','pikachu','pizza','google','loading','piece','roll','afk']
+cmds_list = ['count_msg','ragequit','pong','run','nope','blame','party','bigtext','shrug','gg','money','pibkac','osekour','me','kill','cat','rekt','thanos','nuke','pikachu','pizza','google','loading','piece','roll','afk', 'bubble-wrap']
 
 
 async def can_say(ctx):
@@ -666,6 +666,26 @@ Please use the following format:
         else:
             await ctx.send(await self.translate(ctx.channel, "fun", "reminds-saved", duration=f_duration))
 
+    @commands.command(name="bubble-wrap", aliases=["papier-bulle", "bbw"], hidden=True)
+    @commands.cooldown(5,30,commands.BucketType.channel)
+    @commands.cooldown(5,60,commands.BucketType.user)
+    async def bubblewrap(self, ctx:commands.Context, width:int=10, height:int=15):
+        """Just bubble wrap. Which pops when you squeeze it. That's all.
+
+        Width should be between 1 and 150, height between 1 and 50.
+
+        ..Example bubble-wrap
+
+        ..Example bbw 7 20
+        """
+        width = min(max(1, width), 150)
+        height = min(max(1, height), 50)
+        p = "||pop||"
+        txt = "\n".join([p*width]*height)
+        if len(txt) > 2000:
+            await ctx.send(await self.translate(ctx.channel, "fun", "bbw-too-many"))
+            return
+        await ctx.send(txt)
         
 
     @commands.command(name="vote")
