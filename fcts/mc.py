@@ -35,10 +35,10 @@ Every information come from the website www.fr-minecraft.net"""
         if can_embed:
             embed = discord.Embed(color=discord.Colour(0x699bf9), timestamp=ctx.message.created_at)
             embed.set_thumbnail(url="https://www.minecraft-france.fr/wp-content/uploads/2020/05/mojang-logo-2.gif")
-            embed.set_author(name="Mojang - Services Status", url="https://api.bowie-co.nz/api/v1/mojang/check", icon_url="https://www.minecraft.net/content/dam/franchise/logos/Mojang-Studios-Logo-Redbox.png")
+            embed.set_author(name="Mojang Studios - Services Status", url="https://api.bowie-co.nz/api/v1/mojang/check", icon_url="https://www.minecraft.net/content/dam/franchise/logos/Mojang-Studios-Logo-Redbox.png")
             embed.set_footer(text="Requested by {}".format(ctx.author.display_name), icon_url=ctx.author.avatar_url_as(format='png',size=512))
         else:
-            text = "Mojang - Services Status (requested by {})".format(ctx.author)
+            text = "Mojang Studios - Services Status (requested by {})".format(ctx.author)
         for K,V in data.items():
             if K == "www.minecraft.net/en-us":
                 K = "minecraft.net"
