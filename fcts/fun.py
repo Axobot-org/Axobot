@@ -633,38 +633,6 @@ You can specify a verification limit by adding a number in argument (up to 1.000
         """Get help about markdown in Discord"""
         await ctx.send(await self.translate(ctx.channel,'fun','markdown'))
     
-    @commands.command(name="remindme", aliases=["remind", "reminds", "rmd"])
-    @commands.cooldown(5,30,commands.BucketType.channel)
-    @commands.cooldown(5,60,commands.BucketType.user)
-    async def remindme(self, ctx:commands.Context, duration:commands.Greedy[args.tempdelta], *, message):
-        """Ask the bot to remind you of something later
-Please use the following format:
-`XXm` : XX minutes
-`XXh` : XX hours
-`XXd` : XX days
-`XXw` : XX weeks
-
-..Example remindme 49d Think about doing my homework
-
-..Doc miscellaneous.html#reminders"""
-        duration = sum(duration)
-        if duration < 1:
-            await ctx.send(await self.translate(ctx.channel, "fun", "reminds-too-short"))
-            return
-        if duration > 60*60*24*365*2:
-            await ctx.send(await self.translate(ctx.channel, "fun", "reminds-too-long"))
-            return
-        if not self.bot.database_online:
-            await ctx.send(await self.translate(ctx.channel, "rss", "no-db"))
-            return
-        f_duration = await ctx.bot.get_cog('TimeCog').time_delta(duration,lang=await self.translate(ctx.guild,'current_lang','current'), year=True, form='developed', precision=0)
-        try:
-            await ctx.bot.get_cog('Events').add_task("timer", duration, ctx.author.id, ctx.guild.id if ctx.guild else None, ctx.channel.id, message)
-        except Exception as e:
-            await ctx.send(await self.translate(ctx.channel, "server", "change-1"))
-            await ctx.bot.get_cog("ErrorsCog").on_cmd_error(ctx,e)
-        else:
-            await ctx.send(await self.translate(ctx.channel, "fun", "reminds-saved", duration=f_duration))
 
     @commands.command(name="bubble-wrap", aliases=["papier-bulle", "bbw"], hidden=True)
     @commands.cooldown(5,30,commands.BucketType.channel)

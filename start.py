@@ -196,6 +196,7 @@ def main():
                       'fcts.s_backup',
                       'fcts.server',
                       'fcts.timeclass',
+                      'fcts.timers',
                       'fcts.translators',
                       'fcts.users',
                       'fcts.utilities',
