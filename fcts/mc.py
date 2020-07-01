@@ -25,8 +25,8 @@ Every information come from the website www.fr-minecraft.net"""
         """Get Mojang server status"""
         desc = await self.translate(ctx.channel,"mc","mojang_desc")
         async with aiohttp.ClientSession() as session:
-            async with session.get('https://status.mojang.com/check') as r:
-                # data = requests.get("https://status.mojang.com/check").json()
+            # async with session.get('https://status.mojang.com/check') as r:
+            async with session.get('https://api.bowie-co.nz/api/v1/mojang/check') as r:
                 data = await r.json()
         if ctx.guild==None:
             can_embed = True
@@ -34,34 +34,35 @@ Every information come from the website www.fr-minecraft.net"""
             can_embed = ctx.channel.permissions_for(ctx.guild.me).embed_links
         if can_embed:
             embed = discord.Embed(color=discord.Colour(0x699bf9), timestamp=ctx.message.created_at)
-            embed.set_thumbnail(url="https://pbs.twimg.com/profile_images/623422129502056448/9ehvGDEy.png")
-            embed.set_author(name="Mojang - Services Status", url="https://status.mojang.com/check", icon_url="https://pbs.twimg.com/profile_images/623422129502056448/9ehvGDEy.png")
+            embed.set_thumbnail(url="https://www.minecraft-france.fr/wp-content/uploads/2020/05/mojang-logo-2.gif")
+            embed.set_author(name="Mojang - Services Status", url="https://api.bowie-co.nz/api/v1/mojang/check", icon_url="https://www.minecraft.net/content/dam/franchise/logos/Mojang-Studios-Logo-Redbox.png")
             embed.set_footer(text="Requested by {}".format(ctx.author.display_name), icon_url=ctx.author.avatar_url_as(format='png',size=512))
         else:
             text = "Mojang - Services Status (requested by {})".format(ctx.author)
-        for service in data:
-            for K,V in service.items():
-                if V == "green":
-                    k = self.bot.cogs['EmojiCog'].customEmojis['green_check']+K
-                elif V == "red":
-                    k = self.bot.cogs['EmojiCog'].customEmojis['red_cross']+K
-                elif V == 'yellow':
-                    k = self.bot.cogs['EmojiCog'].customEmojis['neutral_check']+K
-                else:
-                    k = self.bot.cogs['EmojiCog'].customEmojis['blurple']+K
+        for K,V in data.items():
+            if K == "www.minecraft.net/en-us":
+                K = "minecraft.net"
+            if V == "green":
+                k = self.bot.cogs['EmojiCog'].customEmojis['green_check']+K
+            elif V == "red":
+                k = self.bot.cogs['EmojiCog'].customEmojis['red_cross']+K
+            elif V == 'yellow':
+                k = self.bot.cogs['EmojiCog'].customEmojis['neutral_check']+K
+            else:
+                k = self.bot.cogs['EmojiCog'].customEmojis['blurple']+K
+                dm = self.bot.get_user(279568324260528128).dm_channel
+                if dm == None:
+                    await self.bot.get_user(279568324260528128).create_dm()
                     dm = self.bot.get_user(279568324260528128).dm_channel
-                    if dm == None:
-                        await self.bot.get_user(279568324260528128).create_dm()
-                        dm = self.bot.get_user(279568324260528128).dm_channel
-                    await dm.send("Status mojang inconnu : "+V+" (serveur "+K+")")
-                if K in desc.keys():
-                    v = desc[K]
-                else:
-                    v = ''
-                if can_embed:
-                    embed.add_field(name=k,value=v+self.bot.cogs['EmojiCog'].customEmojis['nothing'], inline=False)
-                else:
-                    text += "\n {} *({})*".format(k,v)
+                await dm.send("Status mojang inconnu : "+V+" (serveur "+K+")")
+            if K in desc.keys():
+                v = desc[K]
+            else:
+                v = ''
+            if can_embed:
+                embed.add_field(name=k,value=v, inline=False)
+            else:
+                text += "\n {} *({})*".format(k,v)
         if can_embed:
             await ctx.send(embed=embed)
         else:
