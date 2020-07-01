@@ -502,7 +502,11 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
         if guild.me.guild_permissions.manage_guild:
             embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","guild-12"), value=str(len(await guild.invites())))
         # Emojis count
-        embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","guild-5"), value="{}/{}".format(len(guild.emojis),guild.emoji_limit))
+        c = [0, 0]
+        for x in guild.emojis:
+            c[1 if x.animated else 0] += 1
+        emojis_txt = "Static: {s}/{l} | Animated: {a}/{l}".format(l=guild.emoji_limit, s=c[0], a=c[1])
+        embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","guild-5"), value=emojis_txt)
         # AFK timeout
         embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","guild-10"), value = str(int(guild.afk_timeout/60))+" minutes")
         # Splash url
