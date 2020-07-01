@@ -22,7 +22,9 @@ Every information come from the website www.fr-minecraft.net"""
     @commands.command(name="mojang",aliases=['mojang_status'])
     @commands.cooldown(5,20,commands.BucketType.user)
     async def mojang_status(self,ctx):
-        """Get Mojang server status"""
+        """Get Mojang server status
+    
+    Data comes from this guy <https://github.com/Darkflame72>, a big thanks to them!"""
         desc = await self.translate(ctx.channel,"mc","mojang_desc")
         async with aiohttp.ClientSession() as session:
             # async with session.get('https://status.mojang.com/check') as r:
