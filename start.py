@@ -76,6 +76,7 @@ class zbot(commands.bot.BotBase,discord.Client):
         self.xp_enabled = True
         self.rss_enabled = True
         self.internal_loop_enabled = False
+        self.zws = "​" # here's a zero width space
         self.others = dict()
         
     @property
