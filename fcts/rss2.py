@@ -191,7 +191,7 @@ class RssCog(commands.Cog):
             ID = await self.parse_yt_url(ID)
         if ID == None:
             return await ctx.send(await self.translate(ctx.channel, "rss", "web-invalid"))
-        text = await self.rss_yt(ctx.guild,ID)
+        text = await self.rss_yt(ctx.channel,ID)
         if type(text) == str:
             await ctx.send(text)
         else:
@@ -207,7 +207,7 @@ class RssCog(commands.Cog):
         """The last video of a Twitch channel"""
         if "twitch.tv" in channel:
             channel = await self.parse_twitch_url(channel)
-        text = await self.rss_twitch(ctx.guild,channel)
+        text = await self.rss_twitch(ctx.channel,channel)
         if type(text) == str:
             await ctx.send(text)
         else:
@@ -224,7 +224,7 @@ class RssCog(commands.Cog):
         if "twitter.com" in name:
             name = await self.parse_tw_url(name)
         try:
-            text = await self.rss_tw(ctx.guild,name)
+            text = await self.rss_tw(ctx.channel,name)
         except Exception as e:
             return await self.bot.cogs['ErrorsCog'].on_error(e,ctx)
         if type(text) == str:
@@ -243,7 +243,7 @@ class RssCog(commands.Cog):
         """The last post on any other rss feed"""
         if link in web_link.keys():
             link = web_link[link]
-        text = await self.rss_web(ctx.guild,link)
+        text = await self.rss_web(ctx.channel,link)
         if type(text) == str:
             await ctx.send(text)
         else:
@@ -890,16 +890,16 @@ class RssCog(commands.Cog):
             return match.group(1)
 
 
-    async def rss_yt(self,guild,identifiant,date=None):
+    async def rss_yt(self,channel,identifiant,date=None):
         if identifiant=='help':
-            return await self.translate(guild,"rss","yt-help")
+            return await self.translate(channel,"rss","yt-help")
         url = 'https://www.youtube.com/feeds/videos.xml?channel_id='+identifiant
         feeds = feedparser.parse(url)
         if feeds.entries==[]:
             url = 'https://www.youtube.com/feeds/videos.xml?user='+identifiant
             feeds = feedparser.parse(url)
             if feeds.entries==[]:
-                return await self.translate(guild,"rss","nothing")
+                return await self.translate(channel,"rss","nothing")
         if not date:
             feed = feeds.entries[0]
             img_url = None
@@ -1003,15 +1003,20 @@ class RssCog(commands.Cog):
             return liste
 
 
-    async def rss_tw(self,guild,nom:str,date=None):
+    async def rss_tw(self,channel,nom:str,date=None):
         if nom == 'help':
-            return await self.translate(guild,"rss","tw-help")
-        posts = self.twitterAPI.GetUserTimeline(screen_name=nom,exclude_replies=True)
+            return await self.translate(channel,"rss","tw-help")
+        try:
+            posts = self.twitterAPI.GetUserTimeline(screen_name=nom,exclude_replies=True)
+        except twitter.error.TwitterError as e:
+            if e.message[0]['code'] == 34:
+                return await self.translate(channel,"rss","nothing")
+            raise e
         if not date:
         # if False:
             # lastpost = self.twitterAPI.GetUserTimeline(screen_name=nom,exclude_replies=True,trim_user=True)
             if len(posts) == 0:
-                return 'aucun msg'
+                return []
             lastpost = posts[0]
             rt = None
             if lastpost.retweeted:
@@ -1079,11 +1084,11 @@ class RssCog(commands.Cog):
                 liste.append(obj)
             return liste
 
-    async def rss_twitch(self,guild,nom,date=None):
+    async def rss_twitch(self,channel,nom,date=None):
         url = 'https://twitchrss.appspot.com/vod/'+nom
         feeds = feedparser.parse(url,timeout=5)
         if feeds.entries==[]:
-            return await self.translate(guild,"rss","nothing")
+            return await self.translate(channel,"rss","nothing")
         if not date:
             feed = feeds.entries[0]
             r = re.search(r'<img src="([^"]+)" />',feed['summary'])
@@ -1106,15 +1111,15 @@ class RssCog(commands.Cog):
             liste.reverse()
             return liste
 
-    async def rss_web(self,guild,url,date=None):
+    async def rss_web(self,channel,url,date=None):
         if url == 'help':
-            return await self.translate(guild,"rss","web-help")
+            return await self.translate(channel,"rss","web-help")
         try:
             feeds = feedparser.parse(url,timeout=5)
         except socket.timeout:
-            return await self.translate(guild,"rss","research-timeout")
+            return await self.translate(channel,"rss","research-timeout")
         if 'bozo_exception' in feeds.keys() or len(feeds.entries)==0:
-            return await self.translate(guild,"rss","web-invalid")
+            return await self.translate(channel,"rss","web-invalid")
         published = None
         for i in ['published_parsed','published','updated_parsed']:
             if i in feeds.entries[0].keys() and feeds.entries[0][i]!=None:
