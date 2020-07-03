@@ -34,7 +34,7 @@ class TimersCog(commands.Cog):
     async def remind_main(self, ctx:commands.Context):
         """Ask the bot to remind you of something later
 
-..Doc miscellaneous.html#reminders"""
+        ..Doc miscellaneous.html#reminders"""
         if ctx.subcommand_passed==None:
             await self.bot.cogs['HelpCog'].help_command(ctx,['reminder'])
     
@@ -52,6 +52,8 @@ class TimersCog(commands.Cog):
         `XXw` : XX weeks
 
         ..Example remindme create 49d Think about doing my homework
+
+        ..Doc miscellaneous.html#create-a-new-reminder
         """
         duration = sum(duration)
         if duration < 1:
@@ -77,6 +79,8 @@ class TimersCog(commands.Cog):
     @commands.cooldown(5,60,commands.BucketType.user)
     async def remind_list(self, ctx:commands.Context):
         """List your pending reminders
+
+        ..Doc miscellaneous.html#list-your-reminders
         """
         cnx = self.bot.cnx_frm
         cursor = cnx.cursor(dictionary = True)
@@ -120,6 +124,10 @@ class TimersCog(commands.Cog):
     async def remind_del(self, ctx:commands.Context, ID:int):
         """Delete a reminder
         ID can be found with the `reminder list` command.
+
+        ..Example rmd delete 253
+
+        ..Doc miscellaneous.html#delete-a-reminder
         """
         cnx = self.bot.cnx_frm
         cursor = cnx.cursor(dictionary = True)
