@@ -966,7 +966,8 @@
             "PUBLIC": "Publ. server",
             "VANITY_URL": "Cstm inv url",
             "VERIFIED": "Verif. srv",
-            "VIP_REGIONS": "VIP voice reg"
+            "VIP_REGIONS": "VIP voice reg",
+            "WELCOME_SCREEN_ENABLED": "Cool screen 4 newbies"
         },
         "inv-0": "URL lnk",
         "inv-1": "Inviter",

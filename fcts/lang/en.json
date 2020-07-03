@@ -955,7 +955,8 @@
             "PUBLIC": "Public server",
             "VANITY_URL": "Custom invite url",
             "VERIFIED": "Verified server",
-            "VIP_REGIONS": "VIP voice regions"
+            "VIP_REGIONS": "VIP voice regions",
+            "WELCOME_SCREEN_ENABLED": "Welcome screen enabled"
         },
         "inv-0": "URL link",
         "inv-1": "Inviter",

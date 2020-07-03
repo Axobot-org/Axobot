@@ -966,7 +966,8 @@
             "PUBLIC": "Serveur public",
             "VANITY_URL": "Invitation custom",
             "VERIFIED": "Serveur vérifié",
-            "VIP_REGIONS": "Régions VIP"
+            "VIP_REGIONS": "Régions VIP",
+            "WELCOME_SCREEN_ENABLED": "Fenêtre de bienvenue activée"
         },
         "inv-0": "Adresse url",
         "inv-1": "Créateur",
