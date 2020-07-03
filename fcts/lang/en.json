@@ -168,8 +168,7 @@
         "events-prices": {
             "nothing": "There is nothing to gain for this event :confused:"
         },
-        "events-title": {
-        },
+        "events-title": {},
         "objectives": "Objectives",
         "points": "points",
         "rank-global": "Global ranking",
@@ -261,8 +260,8 @@
         "count-4": "On the last {limit} messages, {user} have posted {x} messages ({p}%)",
         "count-5": "You cannot use this command in a channel where you do not have access to the message history",
         "embed-error": "An error has occurred: `{}`",
-        "embed-invalid-image": "The url entered as image is invalid",
         "embed-invalid-channel": "Cannot send messages in this channel",
+        "embed-invalid-image": "The url entered as image is invalid",
         "fun-list": "Here is the list of available fun commands:",
         "invalid-city": "Invalid city :confused:",
         "markdown": "__**Markdown Rules** on *Discord*__\n\n`*italics*` = *italics*\n`__underline__` = __underline__\n`**bold**` = **bold**\n`***bold italics***` = ***bold italics***\n`~~strikeout~~` = ~~strikeout~~\n`__*underline italics*__` = __*underline italics*__\n`__**underline bold**__` = __**underline bold**__\n`__***underline bold italics***__` = __***underline bold italics***__\n`||spoiler||` = ||spoiler||\n> quote = `> quote`\n\\`code\\` = `code`\n \\ to ignore\n\nFor code blocks, cf <https://discord.gg/DGahTNn>",
@@ -1000,9 +999,9 @@
         "voicechan-0": "Vocal channel"
     },
     "timers": {
-        "rmd-item": "ID: `{id}` | In: {duration} | Channel: {channel} | Message: {msg}",
         "rmd-deleted": "Reminder #{id} with message `{message}` has successfully been deleted!",
         "rmd-empty": "Oops, you don't have any pending reminder...",
+        "rmd-item": "ID: `{id}` | In: {duration} | Channel: {channel} | Message: {msg}",
         "rmd-title": "List of your reminders"
     },
     "users": {

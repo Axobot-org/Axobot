@@ -162,23 +162,23 @@
     },
     "bot_events": {
         "events-desc": {
-            "christmas-2019": "Fêtez l'arrivée de Noël grâce à cet événement ! Pendant plusieurs jours, Zbot se pare des couleurs de l'hiver avec des émojis spéciaux pour le jeu du morpion, un avatar unique ainsi que d'autres choses trop cool. \n\nProfitez-en pour récupérer des points d'événements et tentez de gagner la carte d'xp spécial Noël 2019 ! Pour rappel, les cartes d'xp sont accessibles via ma commande `profile card`",
             "blurple-2020": "Fêtons les 5 ans de Discord pendant l'événement Blurple ! Pour la troisième année consécutive, nous participons à l'événement \"Blurple\", qui consiste à recolorer nos avatars et serveurs avec un maximum de blurple, cette couleur caractéristique de Discord entre le violet et le bleu. Profitez-en pour récupérer des points d'événements et tentez de gagner la carte d'xp spécial Blurple 2020 ! Pour rappel, les cartes d'xp sont accessibles via ma commande `profile card`\n\nPour cet événement, la commande spéciale `blurple` a été activée, n'hésitez pas à l'utiliser pour tenter de gagner des points !",
+            "christmas-2019": "Fêtez l'arrivée de Noël grâce à cet événement ! Pendant plusieurs jours, Zbot se pare des couleurs de l'hiver avec des émojis spéciaux pour le jeu du morpion, un avatar unique ainsi que d'autres choses trop cool. \n\nProfitez-en pour récupérer des points d'événements et tentez de gagner la carte d'xp spécial Noël 2019 ! Pour rappel, les cartes d'xp sont accessibles via ma commande `profile card`",
             "nothing": "Il n'y a actuellement aucun événement. Suivez les news du bot pour connaître la date du prochain !"
         },
         "events-price-title": "Prix à gagner",
         "events-prices": {
-            "christmas-2019": {
-                "50": "Débloquez la carte d'xp spécial Noël 2019 !"
-            },
             "blurple-2020": {
                 "150": "Débloquez la carte d'xp spécial Blurple 2020 !"
+            },
+            "christmas-2019": {
+                "50": "Débloquez la carte d'xp spécial Noël 2019 !"
             },
             "nothing": "Il n'y a rien à gagner pour cet événement :confused:"
         },
         "events-title": {
-            "christmas-2019": "Noël en approche !",
-            "blurple-2020": "Les 5 ans de Discord !"
+            "blurple-2020": "Les 5 ans de Discord !",
+            "christmas-2019": "Noël en approche !"
         },
         "objectives": "Objectifs",
         "points": "points",
@@ -271,8 +271,8 @@
         "count-4": "Sur les {limit} derniers messages, {user} en a posté {x} ({p}%)",
         "count-5": "Vous ne pouvez pas utiliser cette commande dans un salon où vous n'avez pas accès à l'historique des messages",
         "embed-error": "Une erreur est survenue: `{}`",
-        "embed-invalid-image": "L'url saisie pour l'image est invalide",
         "embed-invalid-channel": "Impossible d'envoyer des messages dans ce salon",
+        "embed-invalid-image": "L'url saisie pour l'image est invalide",
         "fun-list": "Voici la liste des commandes fun disponibles :",
         "invalid-city": "Nom de ville invalide",
         "markdown": "__**Règles du Markdown** sur *Discord*__\n\n`*italique*` = *italique*\n`__souligné__` = __souligné__\n`**gras**` = **gras**\n`***gras italique***` = ***gras italique***\n`~~barré~~` = ~~barré~~\n`__*souligné italique*__` = __*souligné italique*__\n`__**souligné gras**__` = __**souligné gras**__\n`__***souligné gras italique***__` = __***souligné gras italique***__\n`||spoiler||` = ||spoiler||\n> citation = `> citation`\n\\`code\\` = `code`\n\\\\ pour ignorer\n\nPour les blocs de code, cf <https://discord.gg/DGahTNn>",
@@ -1010,9 +1010,9 @@
         "voicechan-0": "Salon vocal"
     },
     "timers": {
-        "rmd-item": "ID : `{id}` | Dans : {duration} | Salon : {channel} | Message : {msg}",
         "rmd-deleted": "Le rappel N°{id} ayant pour message `{message}` a bien été supprimé !",
         "rmd-empty": "Oups, vous n'avez aucun rappel en cours...",
+        "rmd-item": "ID : `{id}` | Dans : {duration} | Salon : {channel} | Message : {msg}",
         "rmd-title": "Liste de vos rappels"
     },
     "users": {
