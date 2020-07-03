@@ -269,7 +269,7 @@ You can specify a verification limit by adding a number in argument (up to 1.000
         contenu = await self.bot.cogs['UtilitiesCog'].clear_msg(text,ctx=ctx)
         text = ""
         Em = self.bot.cogs['EmojiCog']
-        mentions = [x.group(1) for x in re.finditer(r'(<(?:@!?&?|#|a?:[a-zA-Z0-9]+:)\d+>)',ctx.message.content)]
+        mentions = [x.group(1) for x in re.finditer(r'(<(?:@!?&?|#|a?:[a-zA-Z0-9_]+:)\d+>)',ctx.message.content)]
         content = "¬¬".join(contenu.split("\n"))
         for x in mentions:
             content = content.replace(x,'¤¤')
