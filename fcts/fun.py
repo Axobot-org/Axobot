@@ -436,8 +436,9 @@ You can specify a verification limit by adding a number in argument (up to 1.000
     
     @commands.command(name="thanos",hidden=True)
     @commands.check(is_fun_enabled)
-    async def thanos(self,ctx):
-        await ctx.send(random.choice(await self.translate(ctx.channel,"fun","thanos")).format(ctx.author.mention))
+    async def thanos(self, ctx: commands.Context, user: discord.User = None):
+        user = user if user else ctx.author
+        await ctx.send(random.choice(await self.translate(ctx.channel,"fun","thanos")).format(user.mention))
     
     @commands.command(name="piece",hidden=True,aliases=['coin','flip'])
     @commands.check(is_fun_enabled)
