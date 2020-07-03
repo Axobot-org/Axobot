@@ -1011,6 +1011,7 @@
     },
     "timers": {
         "rmd-item": "ID : `{id}` | Dans : {duration} | Salon : {channel} | Message : {msg}",
+        "rmd-deleted": "Le rappel N°{id} ayant pour message `{message}` a bien été supprimé !",
         "rmd-empty": "Oups, vous n'avez aucun rappel en cours...",
         "rmd-title": "Liste de vos rappels"
     },

@@ -1011,6 +1011,7 @@
     },
     "timers": {
         "rmd-item": "ID: `{id}` | In: {duration} | Chan: {channel} | Msg: {msg}",
+        "rmd-deleted": "Rmder #{id} with msg `{message}` had deleted w/ success :owo:",
         "rmd-empty": "Oops, U don't have any pending reminder lol",
         "rmd-title": "I'll remind u that becuz ur dumb-dumb :bongocat:"
     },

@@ -82,7 +82,7 @@ class TimersCog(commands.Cog):
         cursor = cnx.cursor(dictionary = True)
         query = (f"SELECT *, CONVERT_TZ(`begin`, @@session.time_zone, '+00:00') AS `utc_begin` FROM `timed` WHERE user={ctx.author.id} AND action='timer'")
         cursor.execute(query)
-        if cursor.arraysize == 0:
+        if cursor.rowcount == 0:
             await ctx.send(await self.translate(ctx.channel, "timers", "rmd-empty"))
             return
         txt = await self.translate(ctx.channel, "timers", "rmd-item")
@@ -90,6 +90,9 @@ class TimersCog(commands.Cog):
         lang = await self.translate(ctx.channel, "current_lang", "current")
         liste = list()
         for item in cursor:
+            ctx2 = copy.copy(ctx)
+            ctx2.message.content = item["message"]
+            item["message"] = await commands.clean_content(fix_channel_mentions=True).convert(ctx2, item["message"])
             msg = item['message'] if len(item['message'])<=50 else item['message'][:47]+"..."
             msg = "`"+msg.replace('`', '\\`')+"`"
             chan = '<#'+str(item['channel'])+'>'
@@ -97,6 +100,7 @@ class TimersCog(commands.Cog):
             duration = await time_delta(datetime.datetime.utcnow(), end, lang=lang, year=True, form="temp", precision=0)
             item = txt.format(id=item['ID'], duration=duration, channel=chan, msg=msg)
             liste.append(item)
+        cursor.close()
         if ctx.guild is None or ctx.channel.permissions_for(ctx.guild.me).embed_links:
             if len("\n".join(liste)) > 2000:
                 desc = ""
@@ -110,6 +114,28 @@ class TimersCog(commands.Cog):
         else:
             t = "**"+await self.translate(ctx.channel, "timers", "rmd-title")+"**\n\n"
             await ctx.send(t+"\n".join(liste))
+    
+    @remind_main.command(name="delete", aliases=["remove", "del"])
+    @commands.cooldown(5,30,commands.BucketType.user)
+    async def remind_del(self, ctx:commands.Context, ID:int):
+        """Delete a reminder
+        ID can be found with the `reminder list` command.
+        """
+        cnx = self.bot.cnx_frm
+        cursor = cnx.cursor(dictionary = True)
+        query = (f"SELECT ID, message FROM `timed` WHERE user={ctx.author.id} AND action='timer' AND ID={ID}")
+        cursor.execute(query)
+        if cursor.rowcount == 0:
+            await ctx.send(await self.translate(ctx.channel, "timers", "rmd-empty"))
+            return
+        item = list(cursor)[0]
+        cursor.close()
+        ctx2 = copy.copy(ctx)
+        ctx2.message.content = item["message"]
+        item["message"] = (await commands.clean_content(fix_channel_mentions=True).convert(ctx2, item["message"])).replace("`", "\\`")
+        await self.bot.get_cog("Events").remove_task(item["ID"])
+        await ctx.send(await self.translate(ctx.channel, "timers", "rmd-deleted", id=item["ID"], message=item["message"]))
+
 
 
 def setup(bot: commands.Bot):
