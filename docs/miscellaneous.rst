@@ -85,13 +85,32 @@ The markdown is a set of formatting rules used everywhere, such as on GitHub or 
 Reminders
 ---------
 
-**Syntax:** :code:`remindme <duration> <message>` (aliases: reminds, rmd)
-
 If you have some issues with your memory like me, I think you should start using this command. With it, you can ask Zbot to remind you things to do later, between a minute and a few years. Like a `!d bump`, or anything else, up to you. And it also works in DM.
+
+Create a new reminder
+---------------------
+
+**Syntax:** :code:`remindme <duration> <message>` or :code:`reminder create <duration> <message>`
 
 The duration argument is exactly the same as for tempmute/tempban: use :code:`XXw` for weeks, :code:`XXd` for days, :code:`XXh` for hours and :code:`XXm` for minutes (replacing **XX** by the corresponding number, of course!)
 
 .. warning:: Zbot needs "`Embed Links <perms.html#embed-links>`_" permission to send the reminder.
+
+List your reminders
+-------------------
+
+**Syntax:** :code:`reminder list`
+
+Here you will get the full list of pending reminders, waiting for the end of their timers. Nothing but a list, really.
+
+.. note:: Giving the "`Embed Links <perms.html#embed-links>`_" permission to the bot can be useful if you want to get a better rendering.
+
+Delete a reminder
+-----------------
+
+**Syntax:** :code:`reminder delete <ID>`
+
+Used when you want to stop a reminder, so Zbot will completely forget it. The reminder ID can be found with the `reminder list` command (see above).
 
 ---
 Say
