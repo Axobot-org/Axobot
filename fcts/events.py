@@ -254,32 +254,36 @@ class Events(commands.Cog):
 
 
     async def task_timer(self, task:dict):
+        if task["user"] is None:
+            return True
         if task["guild"] != None:
             guild = self.bot.get_guild(task['guild'])
             if guild is None:
-                return
+                return False
             channel = guild.get_channel(task["channel"])
-            if channel is None:
-                return
+            if channel is None: # if channel has been deleted, we send it in DM
+                channel = self.bot.get_user(task["user"])
+                if channel is None:
+                    return False
         else:
             channel = self.bot.get_channel(task["channel"])
             if channel is None:
-                return
-        if task["user"] != None:
-            user = self.bot.get_user(task["user"])
-            if user is None:
-                raise discord.errors.NotFound
-            try:
-                f_duration = await self.bot.get_cog('TimeCog').time_delta(task['duration'],lang=await self.translate(channel,'current_lang','current'), form='developed', precision=0)
-                t = (await self.translate(channel, "fun", "reminds-title")).capitalize()
-                foot = await self.translate(channel, "fun", "reminds-date")
-                emb = self.bot.get_cog("EmbedCog").Embed(title=t, desc=task["message"], color=4886754, time=task["utc_begin"], footer_text=foot)
-                msg = await self.translate(channel, "fun", "reminds-asked", user=user.mention, duration=f_duration)
-                await channel.send(msg, embed=emb)
-            except discord.errors.Forbidden:
-                pass
-            except Exception as e:
-                raise e
+                return False
+        user = self.bot.get_user(task["user"])
+        if user is None:
+            raise discord.errors.NotFound
+        try:
+            f_duration = await self.bot.get_cog('TimeCog').time_delta(task['duration'],lang=await self.translate(channel,'current_lang','current'), form='developed', precision=0)
+            t = (await self.translate(channel, "fun", "reminds-title")).capitalize()
+            foot = await self.translate(channel, "fun", "reminds-date")
+            emb = self.bot.get_cog("EmbedCog").Embed(title=t, desc=task["message"], color=4886754, time=task["utc_begin"], footer_text=foot)
+            msg = await self.translate(channel, "fun", "reminds-asked", user=user.mention, duration=f_duration)
+            await channel.send(msg, embed=emb)
+        except discord.errors.Forbidden:
+            pass
+        except Exception as e:
+            raise e
+        return True
 
 
     async def get_events_from_db(self,all=False,IDonly=False):
@@ -345,14 +349,15 @@ class Events(commands.Cog):
                     self.bot.log.error("[unban_task] Impossible d'unban automatiquement : {}".format(e))
             if task['action']=="timer":
                 try:
-                    await self.task_timer(task)
+                    sent = await self.task_timer(task)
                 except discord.errors.NotFound:
                     await self.remove_task(task['ID'])
                 except Exception as e:
                     await self.bot.cogs['ErrorsCog'].on_error(e,None)
-                    self.bot.log.error("[unban_task] Impossible d'envoyer un timer : {}".format(e))
+                    self.bot.log.error("[timer_task] Impossible d'envoyer un timer : {}".format(e))
                 else:
-                    await self.remove_task(task['ID'])
+                    if sent:
+                        await self.remove_task(task['ID'])
 
 
 
