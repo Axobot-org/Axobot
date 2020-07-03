@@ -53,7 +53,7 @@ class RssCog(commands.Cog):
         self.embed_color = discord.Color(6017876)
         self.loop_processing = False
         self.last_update = None
-        self.twitterAPI = twitter.Api(**bot.others['twitter'])
+        self.twitterAPI = twitter.Api(**bot.others['twitter'], tweet_mode="extended")
         self.twitter_over_capacity = False
         self.cache = dict()
         if bot.user != None:
@@ -486,7 +486,7 @@ class RssCog(commands.Cog):
             def check(msg):
                 if not msg.content.isnumeric():
                     return False
-                return msg.author.id==userID and int(msg.content) in range(1,iterator+1)
+                return msg.author.id==userID and int(msg.content) in range(1,iterator)
             try:
                 msg = await self.bot.wait_for('message', check = check, timeout = max(10, 1.5*len(text)))
             except asyncio.TimeoutError:
@@ -942,7 +942,7 @@ class RssCog(commands.Cog):
         except requests.exceptions.ConnectionError:
             return []
 
-    async def rss_tw(self,guild,nom,date=None):
+    async def rss_tw_old(self,guild,nom,date=None):
         if nom == 'help':
             return await self.translate(guild,"rss","tw-help")
         try:
@@ -1003,22 +1003,45 @@ class RssCog(commands.Cog):
             return liste
 
 
-    async def rss_tw2(self,guild,nom:str,date=None):
+    async def rss_tw(self,guild,nom:str,date=None):
         if nom == 'help':
             return await self.translate(guild,"rss","tw-help")
-        #if not date:
-        if False:
-            lastpost = self.twitterAPI.GetUserTimeline(screen_name=nom,exclude_replies=True,count=1)
-            if len(lastpost)==0:
+        posts = self.twitterAPI.GetUserTimeline(screen_name=nom,exclude_replies=True)
+        if not date:
+        # if False:
+            # lastpost = self.twitterAPI.GetUserTimeline(screen_name=nom,exclude_replies=True,trim_user=True)
+            if len(posts) == 0:
                 return 'aucun msg'
-            lastpost = lastpost[0]
+            lastpost = posts[0]
             rt = None
             if lastpost.retweeted:
                 rt = "retweet"
-            obj = self.rssMessage(bot=self.bot,Type='tw',url=lastpost.urls[0].url,title=lastpost.text,emojis=self.bot.cogs['EmojiCog'].customEmojis,date=datetime.datetime.fromtimestamp(lastpost.created_at_in_seconds),author=lastpost.user.screen_name,retweeted_by=rt,channel=lastpost.user.name)
+            text =  getattr(lastpost, 'full_text', lastpost.text)
+            r = re.search(r"https://t.co/([^\s]+)", text)
+            if r != None:
+                text = text.replace(r.group(0),'')
+                url = r.group(0)
+            else:
+                if lastpost.urls == []:
+                    url = "https://twitter.com/{}/status/{}".format(nom.lower(), lastpost.id)
+                else:
+                    url = lastpost.urls[0].url
+            img = None
+            if lastpost.media: # if exists and is not empty
+                img = lastpost.media[0].media_url_https
+            obj = self.rssMessage(
+                bot=self.bot,
+                Type='tw',
+                url=url,
+                title=text,
+                emojis=self.bot.cogs['EmojiCog'].customEmojis,
+                date=datetime.datetime.fromtimestamp(lastpost.created_at_in_seconds), 
+                author=lastpost.user.screen_name,
+                retweeted_by=rt,
+                channel=lastpost.user.name,
+                image=img)
             return [obj]
         else:
-            posts = self.twitterAPI.GetUserTimeline(screen_name=nom,exclude_replies=True)
             liste = list()
             for post in posts:
                 if (datetime.datetime.fromtimestamp(post.created_at_in_seconds) - date).total_seconds() < self.min_time_between_posts:
@@ -1027,9 +1050,32 @@ class RssCog(commands.Cog):
                 if post.retweeted:
                     rt = "retweet"
                 url = None
-                if len(post.urls)>0:
+                if len(post.urls) > 0:
                     url = post.urls[0].url
-                obj = self.rssMessage(bot=self.bot,Type='tw',url=url,title=post.text,emojis=self.bot.cogs['EmojiCog'].customEmojis,date=datetime.datetime.fromtimestamp(post.created_at_in_seconds),author=post.user.screen_name,retweeted_by=rt,channel=post.user.name)
+                text =  getattr(post, 'full_text', post.text)
+                r = re.search(r"https://t.co/([^\s]+)", text)
+                if r != None:
+                    text = text.replace(r.group(0),'')
+                    url = r.group(0)
+                else:
+                    if post.urls == []:
+                        url = "https://twitter.com/{}/status/{}".format(nom.lower(), post.id)
+                    else:
+                        url = post.urls[0].url
+                img = None
+                if post.media: # if exists and is not empty
+                    img = post.media[0].media_url_https
+                obj = self.rssMessage(
+                    bot=self.bot,
+                    Type='tw',
+                    url=url,
+                    title=text,
+                    emojis=self.bot.cogs['EmojiCog'].customEmojis,
+                    date=datetime.datetime.fromtimestamp(post.created_at_in_seconds),
+                    author=post.user.screen_name,
+                    retweeted_by=rt,
+                    channel=post.user.name,
+                    image=img)
                 liste.append(obj)
             return liste
 
@@ -1103,7 +1149,20 @@ class RssCog(commands.Cog):
                 title = feeds['title']
             else:
                 title = '?'
-            obj = self.rssMessage(bot=self.bot,Type='web',url=l,title=title,emojis=self.bot.cogs['EmojiCog'].customEmojis,date=datz,author=author,channel=feeds.feed['title'] if 'title' in feeds.feed.keys() else '?')
+            img = None
+            r = re.search(r'(http(s?):)([/|.|\w|\s|-])*\.(?:jpe?g|gif|png|webp)', str(feed))
+            if r != None:
+                img = r.group(0)
+            obj = self.rssMessage(
+                bot=self.bot,
+                Type='web',
+                url=l,
+                title=title,
+                emojis=self.bot.cogs['EmojiCog'].customEmojis,
+                date=datz,
+                author=author,
+                channel=feeds.feed['title'] if 'title' in feeds.feed.keys() else '?',
+                image=img)
             return [obj]
         else: # published in ['published_parsed','updated_parsed']
             liste = list()
@@ -1132,7 +1191,20 @@ class RssCog(commands.Cog):
                         title = feeds['title']
                     else:
                         title = '?'
-                    obj = self.rssMessage(bot=self.bot,Type='web',url=l,title=title,emojis=self.bot.cogs['EmojiCog'].customEmojis,date=datz,author=author,channel= feeds.feed['title'])
+                    img = None
+                    r = re.search(r'(http(s?):)([/|.|\w|\s|-])*\.(?:jpe?g|gif|png|webp)', str(feed))
+                    if r != None:
+                        img = r.group(0)
+                    obj = self.rssMessage(
+                        bot=self.bot,
+                        Type='web',
+                        url=l,
+                        title=title,
+                        emojis=self.bot.cogs['EmojiCog'].customEmojis,
+                        date=datz,
+                        author=author,
+                        channel=feeds.feed['title'] if 'title' in feeds.feed.keys() else '?',
+                        image=img)
                     liste.append(obj)
                 except:
                     pass
@@ -1349,11 +1421,12 @@ class RssCog(commands.Cog):
         t = time.time()
         if self.loop_processing:
             return
-        self.bot.log.info("Check RSS lancé")
         if guildID==None:
+            self.bot.log.info("Check RSS lancé")
             self.loop_processing = True
             liste = await self.get_all_flows()
         else:
+            self.bot.log.info(f"Check RSS lancé pour le serveur {guildID}")
             liste = await self.get_guild_flows(guildID)
         check = 0
         errors = []
