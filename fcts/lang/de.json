@@ -137,7 +137,8 @@
         "no-subcmd": "Der Befehl `{0.name}` hat keine Unterbefehle",
         "not-enabled": ":warning: Dieser Befehl ist deaktiviert",
         "subcmd-not-found": "Dieser Befehl hat keinen Unterbefehl namens \"{}\"",
-        "subcmds": "Unterbefehle"
+        "subcmds": "Unterbefehle",
+        "warning": "Warnungen"
     },
     "blurple": {
         "check_fields": [
@@ -156,6 +157,7 @@
         "create_footer_2": "Bitte beachte - Der blurplefier ist automatisch, weshalb er möglicherweise nicht die besten Ergebnisse ausgeben könnte. Disclaimer: Dieses Bild ist ein GIF, weshalb das Erbebnis nicht das Beste sein könnte, wenn acuh manchmal nicht so körnig. | Angefordert von {}",
         "create_oops": "{}, whoops! Es tut mir sehr Leid, aber dieses GIF ist zu groß",
         "create_title": "Blurplefier - mach dein Bild blurple!",
+        "missing-attachment-perm": "Ups... Ich kann keine Bilder senden!",
         "won-card": "Hey, sehr hübsches Blurple Bild {}! so schön, dass du ein paar extra Blurple-XP bekommst! Du kannst diese benutzen indem du `{}profile card blurple` {} eingibts"
     },
     "bot_events": {
@@ -178,7 +180,8 @@
         "rank-global": "Globale Platzierung",
         "rank-title": "Event Punkte",
         "rank-total": "Punkte gesamt",
-        "unclassed": "Du hast noch keine Punkte"
+        "unclassed": "Du hast noch keine Punkte",
+        "xp-howto": "Du kannst Event Punkte beim gewinnen von tic-tac-toe Spielen bekommen, wenn die Event Befehle möglich sind oder beim lösen von geheimen Aufgaben. Komm bitte nicht zum Support Server, um nur nach Event Informationen zu fragen!"
     },
     "bvn": {
         "aide": "__**Willkommen zum join & leave message Modul**__\n\nDieses Modul ist da, um Nachrichten zu senden, sobald eine Person den Server verlässt oder betritt.\n\n__** Konfiguration**__\n\n`1-` Um den Chat zu ändern, in dem diese Nachrichten angezeigt werden gib `{p}config change welcome_channel`, gefolgt vom Channelnamen ein.\n`2-` Um eine Nachricht zu bearbeiten gebe `{p}config change <welcome|leave> <message>` ein. Für diese Nachricht gibt es einige Variablen:\n - `{user}` erwähnt das betroffene Mitglied\n - `{server}` zeigt den Servernamen\n - `{owner}` zeigt den Namen des Serverbesitzer an\n - `{member_count}` zeigt die Mitgliederanzahl\n - `{type}` gibt 'Mitglied' oder 'Bot' wieder",
@@ -242,6 +245,7 @@
     },
     "fun": {
         "afk-done": "Du bist jetzt AFK",
+        "afk-no-perm": "Ups... Ich kann keine Namen ändern 😕 Ich werde versuchen mich zu erinnern aber ich könnte vergessen, dass du afk bist",
         "afk-user-1": "Dieses Mitglied ist AFK, da {}",
         "afk-user-2": "Dieser Nutzer ist AFK!",
         "blame-0": "Liste möglicher Namen für **{}**",
@@ -292,6 +296,8 @@
         ],
         "piece-1": "Oh nein, die Münze ist auf der Kante gelandet!",
         "react-0": "Gesuchte Nachricht konnte nicht gefunden werden. Du musst als erstes die ID und dann den Emoji angeben :upside_down:\n Bitte beachte auch, dass den Nachrichtenverlauf lesen können muss!",
+        "reminds-asked": "{user}, du hast mich vor {duration} gefragt, dass ich dich daran erinnern soll:",
+        "reminds-date": "gefragt um",
         "say-no-perm": "Du hast keine Berechtigungen in diesem Channel {channel} Nachrichten zu senden",
         "thanos": [
             "{0} wurde von Thanos verschont",

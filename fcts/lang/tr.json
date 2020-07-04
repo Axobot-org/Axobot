@@ -158,19 +158,23 @@
         "create_footer_2": "Lütfen dikkat - Bu blurplefier otomatikleştirildi ve böylece size en iyi sonucu vermeyebilir. Uyarı: Bu resim bir GIF, ve kalite daima en iyi olmuyor. ANCAK, gif genellikle önizlemede göründüğü kadar grenli değildir | İçerik {} tarafından istendi.",
         "create_oops": "{}, whoops! Bu gif yüklenemeyecek kadar büyük görünüyor. Eğer istersen, görüntünün daha küçük bir sürümü dışında, başka bir yol verebilirsin. Bunun için üzgünüm!",
         "create_title": "Blurple yapıcı - görselinizi blurple yapar!",
+        "missing-attachment-perm": "Hay aksi, fotoğraf gönderebilme iznim eksik!",
         "won-card": "Wow! Çok iyi bir blurple fotoğraf {}! Sana çok güzel bir xp blurple kartı sunmaya karar verdim! `{}profile card blurple` komutunu yazarak onu kullanabilirsin {}"
     },
     "bot_events": {
         "events-desc": {
+            "blurple-2020": "Blurple etkinliği sırasında Discord'un 5. yılını kutlayalım! Üst üste üçüncü yıl için, avatarlarımızı ve sunucularımızı maksimum blurple ile yeniden renklendirerek, mor ve mavi arasındaki Discord'un karakteristik rengiyle yeniden renklendirmekten oluşan Blurple etkinliğine katılıyoruz. Etkinlik puanlarını toplamak ve özel Blurple 2020 xp kartını kazanmak için bu fırsattan yararlanın! Hatırlatma olarak, xp kartlarına `profile card` komutumla erişilebilir.\n\nBu olay için, `bulanıklaştırma` özel komutu etkinleştirildi, puan kazanmak için kullanmaktan çekinmeyin!",
             "christmas-2019": "Bu etkinlik ile Noel'in gelişini kutlayın! Zbot birkaç gün boyunca tic-tac-toe oyunu, benzersiz bir avatar ve diğer harika şeyler için özel emojiler ile kış renklerini giyiyor.\n\nEtkinlik puanlarını toplama fırsatını yakalayın ve 2019 Noel özel xp kartını kazanmaya çalışın! Hatırlatma: xp kartlarına `profile card` komutum ile erişilebilir.",
             "nothing": "Şu anlık hiç bir etkinlik yok. Bir sonrakinin tarihini öğrenmek için bot haberlerini takip edin!"
         },
         "events-price-title": "Kazanılacak ödülller",
         "events-prices": {
+            "blurple-2020": "{'150': 'Blurple 2020 kartını açın!'}",
             "christmas-2019": "{'50': 'Özel Noel 2019'un kilidini aç!'}",
             "nothing": "Bu etkinlik için kazanılacak hiçbir şey yok 😕"
         },
         "events-title": {
+            "blurple-2020": "Discord'un 5.yılı!",
             "christmas-2019": "Noel geliyor!"
         },
         "objectives": "Hedefler",
@@ -178,7 +182,8 @@
         "rank-global": "Global sıralama",
         "rank-title": "Event puanı",
         "rank-total": "Toplam puan",
-        "unclassed": "Kategorilendirilmemiş"
+        "unclassed": "Kategorilendirilmemiş",
+        "xp-howto": "Tic-tac-toe oyunları kazanarak, mevcut olduğunda etkinlik komutlarını kullanarak veya diğer çeşitli gizli görevleri gerçekleştirerek etkinlik puanları kazanabilirsiniz. Bilgi istemek için destek sunucusuna gelmekten çekinmeyin!"
     },
     "bvn": {
         "aide": "__**Giriş & Çıkış Mesajı Modülüne Hoşgeldiniz**__\n\nBu modül, bir üye sunucunuza her girdiğinde veya sunucudan her çıktığında otomatik bir mesaj göndermek için kullanılır.\n\n__** Yapılandırma**__\n\n`1-` Bu mesajların yazılı olacağı sohbet odasını yapılandırmak için `{p}config change welcome_channel` komutu ardından kanal adını yazın. (kanalı etiketleyebilir, tam adını veya ID'sini yazabilirsiniz ).\n`2-` Bir mesajı yapılandırmak için `{p}config change <welcome|leave> <mesaj>` yazın. Bu mesaj için bazı değişkenleri kullanabilirsiniz:\n - `{user}` üyeyi etiketler\n - `{server}` sunucu adını görüntüler\n - `{owner}` sunucu sahibinin adını görüntüler\n - `{member_count}` geçerli üye sayısını görüntüler\n - `{type}` bir \"üye\" veya \"bot\" olduğunu gösterir",
@@ -242,6 +247,7 @@
     },
     "fun": {
         "afk-done": "Artık AFK'sın",
+        "afk-no-perm": "Hay aksi, Senin takma adını değiştiremiyorum 😕 Hatırlamaya çalışacağım ancak senin afk olduğunu unutabilirim",
         "afk-user-1": "Bu üye {} nedeniyle AFK",
         "afk-user-2": "Bu kullanıcı AFK!",
         "blame-0": "**{}** için geçerli olan tüm isimlerin listesi",
@@ -312,7 +318,19 @@
             "Biliyor muydun? ZBot Ekibi yetenekli bir geliştirici Yönetici, bir kibble markasının adını taşımasının yanı sıra bir kedi olan ikinci bir yönetici, bir Ban hammer ve bir mantardan oluşur!",
             "İpucu: `say <metin>` komutu anonim mesajlar göndermek için çok kullanışlıdır... en azından ona erişiminiz olduğunda.",
             "İpucu: `discordlinks` komutu size discord ile ilgili tüm faydalı bağlantıları verecektir!",
-            "Biliyor muydun? `bigtext` komutunda kullanılan büyük emoji listesi de dahil olmak üzere bot ile ilgili tüm tasarımlar  Adri526#9223 tarafından yapılmıştır!"
+            "Biliyor muydun? `bigtext` komutunda kullanılan büyük emoji listesi de dahil olmak üzere bot ile ilgili tüm tasarımlar  Adri526#9223 tarafından yapılmıştır!",
+            "Özel bir püf nokta: Eğer yardıma ihtiyacın varsa, `osekour` komutunu kullanmaktan çekinme",
+            "Biliyor muydun? Bazen, seviye atlama mesajları rastgele bir obje gönderir. Bunu yapmak için Aragorn1202 'bir bicorne', 'bir kurabiye' veya 'bir muz' dahilinde 60 tanesinin listesini yapması gerekiyordu!",
+            "Biliyor muydun? Önceden Zbot'un profile fotoğrafı bir... creeperdı.",
+            "Biliyor muydun? ZBot yetkili ekibi yetenekli geliştirici yöneticisi, kibble markasının yanı sıra bir kedi, bir Yasaklama çekici ve bir mantarın karışımından oluşmaktadır!",
+            "Özel püf nokta: `say <yazı>` komutu gizli mesajlar yazmak için faydalıdır... en azından ona erişimin olduğu zaman.",
+            "Özel püf nokta: `discordlinks` komutu sana discord ile alakalı faydalı bağlantıların hepsini gönderir!",
+            "Biliyor muydun? `bigtext` komutunda kullanılan büyük emoji listesi de dahil olmak üzere, bot ile ilgili tüm tasarımlar, Adri526#9223 tarafından yapılmıştır!",
+            "Biliyor muydun? ZBot adını.... yaratıcısı Z_runner'dan alıyor",
+            "İpucu: Bot, mevcut hataları görebileceğiniz ve bir sonraki güncellemelere oy verebileceğiniz bir Discord'a sahip! Daveti almak için `about` komutunu kullanın",
+            "İpucu: `prefix` komutu, şu anda sunucuda kullanılabilen prefixlerin bir listesine sahip olmanızı sağlar",
+            "Biliyor muydun? `config` komutunun `description` seçeneği ile sunucunuzun diğer sunucularda kullanılabilecek bir tanımını verebilirsiniz.",
+            "Biliyor muydun? Bazı özel etkinliklerde, koleksiyoncu xp kartları elde etmek mümkündür. Resmî sunucuda haberleri takip etmeyi unutmayın!"
         ]
     }
 }

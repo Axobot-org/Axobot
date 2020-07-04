@@ -189,7 +189,8 @@
         "rank-global": "Classement mondial",
         "rank-title": "Points de l'événement",
         "rank-total": "Total des points",
-        "unclassed": "Pas classé !"
+        "unclassed": "Pas classé !",
+        "xp-howto": "Tu peux gagner des points d'évènement en gagnant des parties de morpion (commande `ttt`), en utilisant la commande d'évent quand elle est dispo, ou en faisant d'autres trucs sympas.\nHésite pas à venir voir le support pour plus d'infos !"
     },
     "bvn": {
         "aide": "__**Bienvenue dans le module des message de join et de leave**__\n\nCe module sert à configurer un message automatique à chaque fois qu'un membre rentre ou sort du serv.\n\n__**La config**__\n\n`1-` Pour configurer le salon où ces messages s'écrivent, tape `{p}config change welcome_channel` suivi du salon (tu peux utiliser aussi bien sa mention que son identifiant ou son nom complet).\n`2-` Pour configurer un message, tape `{p}config change <welcome|leave> <message>`. Pour ce message vous pouvez utiliser les variables suivantes :\n - `{user}` mentionne le membre\n - `{server}` affiche le nom du serveur\n - `{owner}` affiche le nom du propriétaire du serveur\n - `{member_count}` affiche le nombre actuel de membres\n - `{type}` retourne 'bot' si le membre est un bot, 'membre' sinon\n",
@@ -862,6 +863,9 @@
         "change-color": "La couleur utilisée pour cette option ({}) est maintenant `{}`.",
         "change-emojis": "Les émojis pour l'option '{}' sont maintenant {}.",
         "change-lang": "Le bot parle maintenant `{}`. こんにちは！",
+        "change-levelup_channel": "Les messages de levelup seront maintenant envoyés sur {} !",
+        "change-levelup_channel-1": "Les messages de levelup seront postés directement dans le tchat ;) !",
+        "change-levelup_channel-2": "Y'aura plus de messages de levelup, maintenant !",
         "change-prefix": "Le préfixe `!` a bien été remplacé par `{}`",
         "change-prefix-1": "Ce préfixe est *BEAUCOUP* trop long pour être utilisé !",
         "change-raid": "Le niveau de sécurité anti-raid est maintenant défini à **{}** ({}) :wink:",
@@ -897,6 +901,7 @@
         "kick": "Tout ce beau monde peut kick : {}",
         "language": "Langue actuelle du bot pour ce serveur : **{}**",
         "leave": "Message envoyé lorsqu'un membre repart : {}",
+        "levelup_channel": "Salon où j'envoie les messages de levelup : {}",
         "levelup_msg": "Message envoyé lorsqu'un membre gagne un niveau d'xp : {}",
         "membercounter": "Salon affichant dans son nom le nombre de membres : {}",
         "modlogs_channel": "Salon dans lequel sont envoyés les logs de modération : {}",
