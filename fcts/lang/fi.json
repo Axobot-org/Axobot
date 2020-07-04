@@ -252,6 +252,7 @@
         "afk-no-perm": "Ups, en voi muokata nimimerkkiäsi 😕 yritän muistaa, mutta saatan unohtaa että olet afk tilassa",
         "afk-user-1": "Tämä jäsen on AFK:illa koska, {}",
         "afk-user-2": "Tämä jäsen on AFK:illa!",
+        "bbw-too-many": "Ups, määrä on likan iso Discordille 😕",
         "blame-0": "Lista kaikista käytettävistä nimistä**{}**:lle",
         "calc-0": "Vastauksessa kestää liian kauan ladata:/",
         "calc-1": "Laskennan ratkaisut `{}` ovat `{}`",
@@ -269,6 +270,7 @@
         "count-4": "On the last {limit} messages, {user} have posted {x} messages ({p}%)",
         "count-5": "Et voi käyttää tätä komentoa kanavalla jolla sinulla ei ole oikeuksia katsoa viesti historiaa",
         "embed-error": "Virhe havaittu: `{}`",
+        "embed-invalid-channel": "En pysty lähettää viestejä tuolle kanavalle",
         "embed-invalid-image": "Url linkki joka pitäisi olla kuva linkki, on pätemätön",
         "fun-list": "Tässä on lista kaikista käytettävistä hauska komentoista:",
         "invalid-city": "Pätemätön kaupunki :confused:",
@@ -355,7 +357,8 @@
             "Ehdota jotain Discordille",
             "Itsebotti artikkeli",
             "Käyttöehdot botin tekijöille",
-            "Miten löytää tunniste"
+            "Miten löytää tunniste",
+            "Laillinen ikä määrä Discordin käyttöön per maa"
         ],
         "docs": "Tässä on linkki botin dokumenttiin:",
         "prefix": "Lista kaikista käytettävissä olevista etuliitoista:",
@@ -963,7 +966,8 @@
             "PUBLIC": "Julkinen palvelin",
             "VANITY_URL": "Erikois kutsu linkki",
             "VERIFIED": "Vahvistettu palvelin",
-            "VIP_REGIONS": "VIP ääni oikeudet"
+            "VIP_REGIONS": "VIP ääni oikeudet",
+            "WELCOME_SCREEN_ENABLED": "Tervetuloruutu aktivoitu"
         },
         "inv-0": "URL linkki",
         "inv-1": "Kutsuja",
@@ -1006,6 +1010,12 @@
         "user-0": "Tällä palvelimella?",
         "voicechan-0": "Ääni kanava"
     },
+    "timers": {
+        "rmd-deleted": "Muistutus #{id} viestillä `{message}` on poistettu!",
+        "rmd-empty": "Ups, sinulla ei ole odotettavia muistutuksia...",
+        "rmd-item": "Tunniste: `{id}` | {duration} | Kanava: {channel} | Viesti: {msg}",
+        "rmd-title": "Lista muistutuksistasi"
+    },
     "users": {
         "animated_card_false": "Et ole tällä hetkellä hyväksymässä animoitua korttia. Kiitos!",
         "animated_card_true": "Voit nyt käyttää animoituja xp kortteja  (hitaampi renderaaminen)",
@@ -1029,6 +1039,7 @@
         "bot-rank": "Botit ei saa yhtään xp:tä",
         "card-level": "TASO",
         "card-rank": "SIJA",
+        "card-too-large": "Ups, mahdotonta lähettää korttiasi 👀 on mahdollista, että tiedoston tila on liian iso, voit sitten esimerkiksi kytkeä pois animoidun kortin (komento `profile config animated_card false`)",
         "change-global-xp": "Ei voi muokata XP:tä maailmanlaajuisesta systeemistä!",
         "change-xp-ok": "XP käyttäjälle {user} on asetettu {xp} pisteeseen!",
         "default_levelup": [
