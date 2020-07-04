@@ -1082,6 +1082,7 @@ class RssCog(commands.Cog):
                     channel=post.user.name,
                     image=img)
                 liste.append(obj)
+            liste.reverse()
             return liste
 
     async def rss_twitch(self,channel,nom,date=None):
