@@ -10,7 +10,7 @@ importlib.reload(checks)
 importlib.reload(args)
 from fcts.checks import is_fun_enabled
 
-cmds_list = ['count_msg','ragequit','pong','run','nope','blame','party','bigtext','shrug','gg','money','pibkac','osekour','me','kill','cat','rekt','thanos','nuke','pikachu','pizza','google','loading','piece','roll','afk']
+cmds_list = ['count_msg','ragequit','pong','run','nope','blame','party','bigtext','shrug','gg','money','pibkac','osekour','me','kill','cat','rekt','thanos','nuke','pikachu','pizza','google','loading','piece','roll','afk', 'bubble-wrap']
 
 
 async def can_say(ctx):
@@ -94,8 +94,8 @@ class FunCog(commands.Cog):
     async def roll(self,ctx,*,options):
         """Selects an option at random from a given list
         The options must be separated by a semicolon `;`"""
-        liste = [x for x in [x.strip() for x in options.split(';')] if len(x)>0]
-        if len(liste)==0:
+        liste = list(set([x for x in [x.strip() for x in options.split(';')] if len(x)>0]))
+        if len(liste) < 2:
             return await ctx.send(await self.translate(ctx.channel,"fun","no-roll"))
         choosen = None
         while choosen==self.last_roll:
@@ -184,6 +184,7 @@ You can specify a verification limit by adding a number in argument (up to 1.000
         l1 = ['discord','mojang','zbot','google','youtube'] # tout le monde
         l2 = ['tronics','patate','neil','reddemoon','aragorn1202','platon'] # frm
         l3 = ['awhikax','aragorn','adri','zrunner'] # zbot
+        l4 = ['benny'] #benny
         name = name.lower()
         if name in l1:
             await ctx.send(file=await self.utilities.find_img('blame-{}.png'.format(name)))
@@ -193,12 +194,17 @@ You can specify a verification limit by adding a number in argument (up to 1.000
         elif name in l3:
             if await self.is_on_guild(ctx.author,356067272730607628): # Zbot server
                 await ctx.send(file=await self.utilities.find_img('blame-{}.png'.format(name)))
+        elif name in l4:
+            if await self.is_on_guild(ctx.author,523525264517496834): # Benny Support
+                await ctx.send(file=await self.utilities.find_img('blame-{}.png'.format(name)))
         elif name in ['help','list']:
             liste = l1
             if await self.is_on_guild(ctx.author,391968999098810388): # fr-minecraft
                 liste += l2
             if await self.is_on_guild(ctx.author,356067272730607628): # Zbot server
                 liste += l3
+            if await self.is_on_guild(ctx.author,523525264517496834): # Benny Support
+                liste += l4
             txt = "- "+"\n- ".join(sorted(liste))
             title = str(await self.translate(ctx.channel,"fun","blame-0")).format(ctx.author)
             if ctx.guild==None or ctx.channel.permissions_for(ctx.guild.me).embed_links:
@@ -211,7 +217,7 @@ You can specify a verification limit by adding a number in argument (up to 1.000
     @commands.guild_only()
     @commands.check(is_fun_enabled)
     async def kill(self,ctx,*,name=None):
-        if name == None:
+        if name is None:
             victime = ctx.author.display_name
             ex = ctx.author.display_name.replace(" ","_")
         else:
@@ -221,7 +227,7 @@ You can specify a verification limit by adding a number in argument (up to 1.000
         liste = await self.translate(ctx.channel,"kill","list")
         msg = random.choice(liste)
         tries = 0
-        while '{0}' in msg and name == None and tries<50:
+        while '{0}' in msg and name is None and tries<50:
             msg = random.choice(liste)
             tries += 1
         await ctx.send(msg.format(author,victime,ex))
@@ -255,7 +261,6 @@ You can specify a verification limit by adding a number in argument (up to 1.000
         await ctx.send(random.choice(['http://images6.fanpop.com/image/photos/40800000/tummy-rub-kitten-animated-gif-cute-kittens-40838484-380-227.gif',
         'http://25.media.tumblr.com/7774fd7794d99b5998318ebd5438ba21/tumblr_n2r7h35U211rudcwro1_400.gif',
         'https://www.2tout2rien.fr/wp-content/uploads/2014/10/37-pestes-de-chats-mes-bonbons.gif',
-        'https://snowchvojnica.eu/assets/cat.gif',
         'http://coquelico.c.o.pic.centerblog.net/chat-peur.gif',
         'https://tenor.com/view/nope-bye-cat-leave-done-gif-12387359']))
     
@@ -263,10 +268,10 @@ You can specify a verification limit by adding a number in argument (up to 1.000
     @commands.check(is_fun_enabled)
     async def big_text(self,ctx,*,text):
         """If you wish to write bigger"""
-        contenu = await self.bot.cogs['UtilitiesCog'].clear_msg(text,ctx=ctx)
+        contenu = await self.bot.cogs['UtilitiesCog'].clear_msg(text,ctx=ctx,emojis=False)
         text = ""
         Em = self.bot.cogs['EmojiCog']
-        mentions = [x.group(1) for x in re.finditer(r'(<(?:@!?&?|#|a?:[a-zA-Z0-9]+:)\d+>)',ctx.message.content)]
+        mentions = [x.group(1) for x in re.finditer(r'(<(?:@!?&?|#|a?:[a-zA-Z0-9_]+:)\d+>)',ctx.message.content)]
         content = "¬¬".join(contenu.split("\n"))
         for x in mentions:
             content = content.replace(x,'¤¤')
@@ -377,7 +382,7 @@ You can specify a verification limit by adding a number in argument (up to 1.000
     
     @commands.command(name="react")
     @commands.check(can_say)
-    async def react(self,ctx,message:args.guildMessage,*,reactions):
+    async def react(self,ctx,message:discord.Message,*,reactions):
         """Add reaction(s) to a message. Server emojis also work."""
         #try:
         #    msg = await ctx.channel.fetch_message(ID)
@@ -387,7 +392,7 @@ You can specify a verification limit by adding a number in argument (up to 1.000
         for r in reactions.split():
             try:
                 e = await commands.EmojiConverter().convert(ctx,r)
-                await msg.add_reaction(e)
+                await message.add_reaction(e)
             except:
                 try:
                     await message.add_reaction(r)
@@ -433,8 +438,9 @@ You can specify a verification limit by adding a number in argument (up to 1.000
     
     @commands.command(name="thanos",hidden=True)
     @commands.check(is_fun_enabled)
-    async def thanos(self,ctx):
-        await ctx.send(random.choice(await self.translate(ctx.channel,"fun","thanos")).format(ctx.author.mention))
+    async def thanos(self, ctx: commands.Context, user: discord.User = None):
+        mention = user.name if user else ctx.author.mention
+        await ctx.send(random.choice(await self.translate(ctx.channel,"fun","thanos")).format(mention))
     
     @commands.command(name="piece",hidden=True,aliases=['coin','flip'])
     @commands.check(is_fun_enabled)
@@ -510,25 +516,28 @@ You can specify a verification limit by adding a number in argument (up to 1.000
         if ctx.author.id in self.afk_guys.keys():
             del self.afk_guys[ctx.author.id]
             await ctx.send(await self.translate(ctx.guild.id,"fun","unafk-done"))
-            try:
-                await ctx.author.edit(nick=ctx.author.display_name.replace(" [AFK]",''))                
-            except discord.errors.Forbidden:
-                pass
+            if ctx.author.nick and ctx.author.nick.endswith(" [AFK]"):
+                try:
+                    await ctx.author.edit(nick=ctx.author.display_name.replace(" [AFK]",''))                
+                except discord.errors.Forbidden:
+                    pass
     
     async def check_afk(self,msg:discord.Message):
         """Check if someone pinged is afk"""
         if msg.author.bot:
             return
         ctx = await self.bot.get_context(msg)
+        if not await is_fun_enabled(ctx, self):
+            return
         for member in msg.mentions:
-            c = member.display_name.endswith(' [AFK]') or member.id in self.afk_guys.keys()
+            c = (member.nick and member.nick.endswith(' [AFK]')) or member.id in self.afk_guys.keys()
             if c and member!=msg.author:
                 if member.id not in self.afk_guys or len(self.afk_guys[member.id])==0:
                     await msg.channel.send(await self.translate(msg.guild.id,"fun","afk-user-2"))
                 else:
                     reason = await self.bot.cogs['UtilitiesCog'].clear_msg(str(await self.translate(msg.guild.id,"fun","afk-user-1")).format(self.afk_guys[member.id]),everyone=True,ctx=ctx)
                     await msg.channel.send(reason)
-        if (not await checks.is_a_cmd(msg, self.bot)) and (ctx.author.display_name.endswith(' [AFK]') or ctx.author.id in self.afk_guys.keys()):
+        if (not await checks.is_a_cmd(msg, self.bot)) and ((ctx.author.nick and ctx.author.nick.endswith(' [AFK]')) or ctx.author.id in self.afk_guys.keys()):
             user_config = await self.bot.cogs['UtilitiesCog'].get_db_userinfo(["auto_unafk"],[f'`userID`={ctx.author.id}'])
             if user_config is None or (not user_config['auto_unafk']):
                 return
@@ -540,9 +549,10 @@ You can specify a verification limit by adding a number in argument (up to 1.000
 
     @commands.command(name='embed',hidden=False)
     @commands.check(checks.has_embed_links)
-    async def send_embed(self,ctx,*,arguments:args.arguments):
+    @commands.guild_only()
+    async def send_embed(self, ctx: commands.Context, *, arguments):
         """Send an embed
-        Syntax: !embed key1=\"value 1\" key2=\"value 2\"
+        Syntax: !embed [channel] key1=\"value 1\" key2=\"value 2\"
 
         Available keys:
             - title: the title of the embed [256 characters]
@@ -551,10 +561,26 @@ You can specify a verification limit by adding a number in argument (up to 1.000
             - footer: a little text at the bottom of the box [90 characters]
             - image: a well-formed url redirects to an image
             - color: the color of the embed bar (#hex or int)
-
         If you want to use quotation marks in the texts, it is possible to escape them thanks to the backslash (`\\"`)
+        
+        You can send the embed to a specific channel by mentionning it at the beginning of the arguments
+
+        ..Example embed #announcements title="Special update!" content="We got an amazing thing for you!\\nPlease check blah blah..." color="#FF0022"
+
+        ..Doc miscellaneous.html?#embed
         """
-        if ctx.guild!=None and not ctx.channel.permissions_for(ctx.guild.me).embed_links:
+        channel = None
+        r = re.search(r'<#(\d+)>', arguments.split(" ")[0])
+        if r != None:
+            arguments = " ".join(arguments.split(" ")[1:])
+            channel = ctx.guild.get_channel(int(r.group(1)))
+        arguments = await args.arguments().convert(ctx, arguments)
+        if len(arguments)==0:
+            raise commands.errors.MissingRequiredArgument(ctx.command.clean_params['arguments'])
+        destination = ctx.channel if channel==None else channel
+        if not destination.permissions_for(ctx.guild.me).send_messages:
+            return await ctx.send(await self.translate(ctx.channel,"fun","embed-invalid-channel"))
+        if not destination.permissions_for(ctx.guild.me).embed_links:
             return await ctx.send(await self.translate(ctx.channel,"fun","no-embed-perm"))
         k = {'title':"",'content':"",'url':'','footer':"",'image':'','color':ctx.bot.cogs['ServerCog'].embed_color}
         for key,value in arguments.items():
@@ -570,11 +596,16 @@ You can specify a verification limit by adding a number in argument (up to 1.000
                     k['color'] = c
         emb = ctx.bot.cogs["EmbedCog"].Embed(title=k['title'], desc=k['content'], url=k['url'],footer_text=k['footer'],thumbnail=k['image'],color=k['color']).update_timestamp().set_author(ctx.author)
         try:
-            await ctx.send(embed=emb.discord_embed())
+            await destination.send(embed=emb.discord_embed())
         except Exception as e:
             if isinstance(e,discord.errors.HTTPException) and "In embed.thumbnail.url: Not a well formed URL" in str(e):
-                return await ctx.send("invalid image")
+                return await ctx.send(await self.translate(ctx.channel, "fun", "embed-invalid-image"))
             await ctx.send(str(await self.translate(ctx.channel,"fun","embed-error")).format(e))
+        if channel != None:
+            try:
+                await ctx.message.delete()
+            except:
+                pass
 
 
     async def add_vote(self,msg):
@@ -582,7 +613,7 @@ You can specify a verification limit by adding a number in argument (up to 1.000
             emojiz = await self.bot.cogs["ServerCog"].find_staff(msg.guild,'vote_emojis')
         else:
             emojiz = None
-        if emojiz == None or len(emojiz) == 0:
+        if emojiz is None or len(emojiz) == 0:
             await msg.add_reaction('👍')
             await msg.add_reaction('👎')
             return
@@ -605,37 +636,27 @@ You can specify a verification limit by adding a number in argument (up to 1.000
         """Get help about markdown in Discord"""
         await ctx.send(await self.translate(ctx.channel,'fun','markdown'))
     
-    @commands.command(name="remindme", aliases=["remind", "reminds"])
+
+    @commands.command(name="bubble-wrap", aliases=["papier-bulle", "bw"], hidden=True)
     @commands.cooldown(5,30,commands.BucketType.channel)
     @commands.cooldown(5,60,commands.BucketType.user)
-    async def remindme(self, ctx:commands.Context, duration:commands.Greedy[args.tempdelta], *, message):
-        """Ask the bot to remind you of something later
-Please use the following format:
-`XXm` : XX minutes
-`XXh` : XX hours
-`XXd` : XX days
-`XXw` : XX weeks
+    async def bubblewrap(self, ctx:commands.Context, width:int=10, height:int=15):
+        """Just bubble wrap. Which pops when you squeeze it. That's all.
 
-..Example remindme 49d Think about doing my homework"""
-        duration = sum(duration)
-        if duration < 1:
-            await ctx.send(await self.translate(ctx.channel, "fun", "reminds-too-short"))
-            return
-        if duration > 60*60*24*365*2:
-            await ctx.send(await self.translate(ctx.channel, "fun", "reminds-too-long"))
-            return
-        if not self.bot.database_online:
-            await ctx.send(await self.translate(ctx.channel, "rss", "no-db"))
-            return
-        f_duration = await ctx.bot.get_cog('TimeCog').time_delta(duration,lang=await self.translate(ctx.guild,'current_lang','current'), year=True, form='developed', precision=0)
-        try:
-            await ctx.bot.get_cog('Events').add_task("timer", duration, ctx.author.id, ctx.guild.id if ctx.guild else None, ctx.channel.id, message)
-        except Exception as e:
-            await ctx.send(await self.translate(ctx.channel, "server", "change-1"))
-            await ctx.bot.get_cog("ErrorsCog").on_cmd_error(ctx,e)
-        else:
-            await ctx.send(await self.translate(ctx.channel, "fun", "reminds-saved", duration=f_duration))
+        Width should be between 1 and 150, height between 1 and 50.
 
+        ..Example bubble-wrap
+
+        ..Example bbw 7 20
+        """
+        width = min(max(1, width), 150)
+        height = min(max(1, height), 50)
+        p = "||pop||"
+        txt = "\n".join([p*width]*height)
+        if len(txt) > 2000:
+            await ctx.send(await self.translate(ctx.channel, "fun", "bbw-too-many"))
+            return
+        await ctx.send(txt)
         
 
     @commands.command(name="vote")

@@ -186,7 +186,7 @@ class AdminCog(commands.Cog):
             if lang not in self.update.keys():
                 lang = 'en'
             mentions_str = await self.bot.cogs['ServerCog'].find_staff(guild.id,'update_mentions')
-            if mentions_str == None:
+            if mentions_str is None:
                 mentions = []
             else:
                 mentions = []
@@ -338,7 +338,7 @@ class AdminCog(commands.Cog):
         """Cherche une invitation pour un serveur, ou tous"""
         if server != None:
             guild = discord.utils.get(self.bot.guilds, name=server)
-            if guild == None and server.isnumeric():
+            if guild is None and server.isnumeric():
                 guild = discord.utils.get(self.bot.guilds, id=int(server))
             await ctx.author.send(await self.search_invite(guild,server))
         else:
@@ -643,8 +643,8 @@ Cette option affecte tous les serveurs"""
         server = self.bot.get_guild(356067272730607628)
         if server==None:
             return await ctx.send("Serveur introuvable")
-        channel = server.get_channel(548138866591137802) if self.bot.beta else server.get_channel(488769306524385301)
-        if channel == None:
+        channel = server.get_channel(488769306524385301)
+        if channel is None:
             return await ctx.send("Salon introuvable")
         liste = list()
         async for msg in channel.history(limit=500):

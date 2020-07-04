@@ -84,12 +84,12 @@ async def database_connected(ctx:commands.Context):
     return ctx.bot.database_online
 
 async def is_fun_enabled(ctx,self=None):
-    if self == None:
+    if self is None:
         if hasattr(ctx, 'bot'):
             self = ctx.bot.get_cog("FunCog")
         else:
             return False
-    if ctx.guild == None:
+    if ctx.guild is None:
         return True
     if not ctx.bot.database_online and not ctx.guild.channels[0].permissions_for(ctx.author).manage_guild:
         return False

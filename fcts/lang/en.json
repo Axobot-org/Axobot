@@ -128,7 +128,7 @@
                 "No verification role has been added"
             ]
         },
-        "cmd-not-found": "There is no command nammed \"{}\"",
+        "cmd-not-found": "There is no command named \"{}\"",
         "description": "Description",
         "embed_title": "Available commands for {u}",
         "footer": "Type {}help command for more info on a command",
@@ -162,24 +162,13 @@
     },
     "bot_events": {
         "events-desc": {
-            "christmas-2019": "Celebrate the arrival of Christmas with this event! For several days, Zbot wears the colours of winter with special emojis for the tic-tac-toe game, a unique avatar and other cool things. \n\nTake the opportunity to collect event points and try to win the 2019 Christmas special xp card! Reminder: xp cards are accessible via my `profile card` command",
-            "blurple-2020": "Let's celebrate 5 years of Discord during the Blurple event! For the third year in a row, we're participating in the Blurple event, which consists in recoloring our avatars and servers with a maximum of blurple, the characteristic color of Discord between purple and blue. Take advantage of this opportunity to collect event points and try to win the special Blurple 2020 xp card! As a reminder, the xp cards are accessible via my command `profile card`.\n\nFor this event, the special command `blurple` has been activated, don't hesitate to use it to try to win points!",
             "nothing": "There are currently no events. Follow the bot news to know the date of the next one!"
         },
         "events-price-title": "Prizes to win",
         "events-prices": {
-            "christmas-2019": {
-                "50": "Unlock the special Christmas 2019 xp card!"
-            },
-            "blurple-2020": {
-                "150": "Unlock the special Blurple 2020 xp card!"
-            },
             "nothing": "There is nothing to gain for this event :confused:"
         },
-        "events-title": {
-            "christmas-2019": "Christmas is coming!",
-            "blurple-2020": "The 5 Years of Discord!"
-        },
+        "events-title": {},
         "objectives": "Objectives",
         "points": "points",
         "rank-global": "Global ranking",
@@ -253,6 +242,7 @@
         "afk-no-perm": "Oops, I cannot change your nickname :confused: I will try to remember, but I could forget that you're afk",
         "afk-user-1": "This member is AFK, because {}",
         "afk-user-2": "This user is AFK!",
+        "bbw-too-many": "Oops, the grid is too big for Discord :confused:",
         "blame-0": "List of available names for **{}**",
         "calc-0": "The result takes too long to load:/",
         "calc-1": "The solutions of the calculation `{}` are `{}`",
@@ -270,6 +260,7 @@
         "count-4": "On the last {limit} messages, {user} have posted {x} messages ({p}%)",
         "count-5": "You cannot use this command in a channel where you do not have access to the message history",
         "embed-error": "An error has occurred: `{}`",
+        "embed-invalid-channel": "Cannot send messages in this channel",
         "embed-invalid-image": "The url entered as image is invalid",
         "fun-list": "Here is the list of available fun commands:",
         "invalid-city": "Invalid city :confused:",
@@ -356,7 +347,8 @@
             "Suggest something to Discord",
             "Selfbots article",
             "ToS for bot devs",
-            "How to find an ID"
+            "How to find an ID",
+            "Minimum legal age of use Discord by country"
         ],
         "docs": "Here is the link to the bot documentation:",
         "prefix": "List of currently usable prefixes:",
@@ -804,7 +796,7 @@
         "no-db": "As the database is currently offline, this feature is temporarily disabled :confused:",
         "no-feed": "Oops, you don't have any rss feeds to manage!",
         "no-roles": "No role has been configured yet.",
-        "not-a-role": "The role `{}` is not found. Try again:",
+        "not-a-role": "This role can't be found. Try again:",
         "nothing": "I found nothing on this search :confused:",
         "research-timeout": "The web page took too long to answer, I had to interrupt the process :eyes:",
         "roles-0": "This feed has been modified to mention the roles {}",
@@ -939,9 +931,9 @@
         "guild-11.2": "Roles list (total {})",
         "guild-12": "Number of invites",
         "guild-13": "Boosts number",
-        "guild-13v": "{b} (tier {p})",
+        "guild-13v": "{b} (level {p})",
         "guild-14": "Limitations",
-        "guild-14v": "Bitrate: {bit}kbps\nFiles size: {fil}MB\nEmojis count: {emo}\nConnected members: {mem}",
+        "guild-14v": "Bitrate: {bit}kbps\nMax files size: {fil}MB\nEmojis count: {emo}",
         "guild-15": "Invite url",
         "guild-2": "Region",
         "guild-3": "Text : {} | Vocal : {} ({} categories)",
@@ -963,7 +955,8 @@
             "PUBLIC": "Public server",
             "VANITY_URL": "Custom invite url",
             "VERIFIED": "Verified server",
-            "VIP_REGIONS": "VIP voice regions"
+            "VIP_REGIONS": "VIP voice regions",
+            "WELCOME_SCREEN_ENABLED": "Welcome screen enabled"
         },
         "inv-0": "URL link",
         "inv-1": "Inviter",
@@ -1006,6 +999,12 @@
         "user-0": "On this server?",
         "voicechan-0": "Vocal channel"
     },
+    "timers": {
+        "rmd-deleted": "Reminder #{id} with message `{message}` has successfully been deleted!",
+        "rmd-empty": "Oops, you don't have any pending reminder...",
+        "rmd-item": "ID: `{id}` | In: {duration} | Channel: {channel} | Message: {msg}",
+        "rmd-title": "List of your reminders"
+    },
     "users": {
         "animated_card_false": "You are not currently allowing an animated card. Thanks!",
         "animated_card_true": "The animated xp cards can be used for you (slower rendering)",
@@ -1029,6 +1028,7 @@
         "bot-rank": "Bots can't have any xp",
         "card-level": "LEVEL",
         "card-rank": "RANK",
+        "card-too-large": "Oops, impossible to send your card :eyes: it's possible that the generated file is too heavy, you can then for example disable the animation of your card (command `profile config animated_card false`)",
         "change-global-xp": "Impossible to edit XP of the global system!",
         "change-xp-ok": "The XP of the user {user} has been set to {xp} points!",
         "default_levelup": [

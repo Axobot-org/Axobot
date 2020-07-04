@@ -76,6 +76,7 @@ class zbot(commands.bot.BotBase,discord.Client):
         self.xp_enabled = True
         self.rss_enabled = True
         self.internal_loop_enabled = False
+        self.zws = "​" # here's a zero width space
         self.others = dict()
         
     @property
@@ -175,7 +176,6 @@ def main():
     initial_extensions = ['fcts.language',
                       'fcts.admin',
                       'fcts.aide',
-                      'fcts.blurple',
                       'fcts.bot_events',
                       'fcts.bvn',
                       'fcts.cases',
@@ -197,6 +197,7 @@ def main():
                       'fcts.s_backup',
                       'fcts.server',
                       'fcts.timeclass',
+                      'fcts.timers',
                       'fcts.translators',
                       'fcts.users',
                       'fcts.utilities',
@@ -229,7 +230,8 @@ def main():
             'access_token_secret':cryptage.uncrypte(r[12])}
         client.others['botlist.space'] = cryptage.uncrypte(r[13])
         client.others['discordboats'] = cryptage.uncrypte(r[14])
-        client.others['statuspage'] = cryptage.uncrypte(r[15])
+        client.others['discordextremelist'] = cryptage.uncrypte(r[15])
+        client.others['statuspage'] = cryptage.uncrypte(r[16])
     try:
         try:
             cnx = mysql.connector.connect(user=client.database_keys['user'],password=client.database_keys['password'],host="127.0.0.1",database=client.database_keys['database1'])

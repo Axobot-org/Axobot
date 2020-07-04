@@ -64,7 +64,8 @@ class LibCog(commands.Cog):
     @commands.group(name="book",aliases=['bookstore'])
     async def book_main(self,ctx):
         """Search for a book and manage your library"""
-        pass
+        if ctx.subcommand_passed==None:
+            await self.bot.cogs['HelpCog'].help_command(ctx,['book'])
     
     @book_main.command(name="search",aliases=["book"])
     async def book_search(self,ctx:commands.Context,ISBN:typing.Optional[ISBN],*,keywords:str=''):
@@ -98,7 +99,7 @@ class LibCog(commands.Cog):
             thumb = vinfo['imageLinks']['thumbnail']
         except:
             thumb = ''
-        if ctx.guild == None or ctx.channel.permissions_for(ctx.guild.me).embed_links:
+        if ctx.guild is None or ctx.channel.permissions_for(ctx.guild.me).embed_links:
             emb = await self.bot.cogs['EmbedCog'].Embed(title=vinfo['title'],desc=txt,url=vinfo['infoLink'],thumbnail=thumb,color=5301186).create_footer(ctx)
             try:
                 price = [f"{k}: {x['amount']} {x['currencyCode']}" for k,x in book['saleInfo'].items() if k in ['listPrice','retailPrice']]

@@ -351,6 +351,9 @@ async def convert_image(image, modifier, method, variations):
         method_converter = METHODS[method]
     except KeyError:
         raise RuntimeError('Invalid image method.')
+    
+    if image == b'':
+        raise RuntimeError('Invalid image')
 
     variations.sort()
     background_color = None
@@ -401,7 +404,7 @@ async def convert_image(image, modifier, method, variations):
                 if background_color is not None:
                     new_frame = remove_alpha(new_frame, background_color)
 
-                durations.append(frame.info['duration'])
+                durations.append(frame.info.get('duration',100))
                 frames.append(new_frame)
 
             out = io.BytesIO()

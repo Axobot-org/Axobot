@@ -206,7 +206,7 @@ class UtilitiesCog(commands.Cog):
         ch = r"((?:discord\.gg|discord(?:app)?.com/invite|discord.me)/.+)"
         return re.search(ch,text)
 
-    async def clear_msg(self,text:str,everyone=True,ctx=None):
+    async def clear_msg(self,text:str,everyone=True,ctx=None,emojis=True):
         """Remove every mass mention from a text, and add custom emojis"""
         if everyone:
             text = text.replace("@everyone","@"+u"\u200B"+"everyone").replace("@here","@"+u"\u200B"+"here")
@@ -214,21 +214,22 @@ class UtilitiesCog(commands.Cog):
         #    text = text.replace(x.group(0),x.group(1))
         #for x in self.bot.emojis: #  (?<!<|a)(:[^:<]+:)
         #    text = text.replace(':'+x.name+':',str(x))
-        for x in re.finditer(r'(?<!<|a):([^:<]+):',text):
-            try:
-                if ctx!=None:
-                    em = await commands.EmojiConverter().convert(ctx,x.group(1))
-                else:
-                    if x.group(1).isnumeric():
-                        em = self.bot.get_emoji(int(x.group(1)))
+        if emojis:
+            for x in re.finditer(r'(?<!<|a):([^:<]+):',text):
+                try:
+                    if ctx!=None:
+                        em = await commands.EmojiConverter().convert(ctx,x.group(1))
                     else:
-                        em = discord.utils.find(lambda e: e.name==x.group(1), self.bot.emojis)
-            except:
-            #except Exception as e:
-                # print(e)
-                continue
-            if em != None:
-                text = text.replace(x.group(0),"<{}:{}:{}>".format('a' if em.animated else '' , em.name , em.id))
+                        if x.group(1).isnumeric():
+                            em = self.bot.get_emoji(int(x.group(1)))
+                        else:
+                            em = discord.utils.find(lambda e: e.name==x.group(1), self.bot.emojis)
+                except:
+                #except Exception as e:
+                    # print(e)
+                    continue
+                if em != None:
+                    text = text.replace(x.group(0),"<{}:{}:{}>".format('a' if em.animated else '' , em.name , em.id))
         return text
 
 
