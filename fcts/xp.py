@@ -496,6 +496,7 @@ class XPCog(commands.Cog):
                 if x['userID']== userID:
                     # x['rank'] = i
                     userdata = x
+                    userdata["rank"] = round(userdata["rank"])
                     break
             cursor.close()
             return userdata
@@ -561,11 +562,12 @@ class XPCog(commands.Cog):
             pfp = await self.get_raw_image(user.avatar_url_as(format='png',size=256))
             img = await self.bot.loop.run_in_executor(None,self.add_overlay,pfp.resize(size=(282,282)),user,card,xp,rank,txt,colors,levels_info,name_fnt)
             img.save('../cards/global/{}-{}-{}.png'.format(user.id,xp,rank[0]))
+            card.close()
             return discord.File('../cards/global/{}-{}-{}.png'.format(user.id,xp,rank[0]))
 
         else:
             async with aiohttp.ClientSession() as cs:
-                async with cs.get(str(user.avatar_url)) as r:
+                async with cs.get(str(user.avatar_url_as(format='gif',size=256))) as r:
                     response = await r.read()
                     pfp = Image.open(BytesIO(response))
 
@@ -577,16 +579,17 @@ class XPCog(commands.Cog):
                 img = await self.bot.loop.run_in_executor(None,self.add_overlay,frame.resize(size=(282,282)),user,card.copy(),xp,rank,txt,colors,levels_info,name_fnt)
                 img = ImageEnhance.Contrast(img).enhance(1.5).resize((800,265))
                 images.append(img)
-                duration.append(pfp.info['duration']/1000)
+                duration.append(pfp.info['duration'])
                 
             card.close()
 
-            image_file_object = BytesIO()
+            # image_file_object = BytesIO()
             gif = images[0]
-            gif.save(image_file_object, format='gif', save_all=True, append_images=images[1:], loop=0, duration=duration[0], subrectangles=True)
-            image_file_object.seek(0)
-            # print(image_file_object.getbuffer().nbytes)
-            return discord.File(fp=image_file_object, filename='card.gif')
+            filename = '../cards/global/{}-{}-{}.gif'.format(user.id,xp,rank[0])
+            gif.save(filename, format='gif', save_all=True, append_images=images[1:], loop=0, duration=duration, subrectangles=True)
+            # image_file_object.seek(0)
+            # return discord.File(fp=image_file_object, filename='card.gif')
+            return discord.File('../cards/global/{}-{}-{}.gif'.format(user.id,xp,rank[0]))
             # imageio.mimwrite('../cards/global/{}-{}-{}.gif'.format(user.id,xp,rank[0]), images, format="GIF-PIL", duration=duration, subrectangles=True)
             # return discord.File('../cards/global/{}-{}-{}.gif'.format(user.id,xp,rank[0]))
 
@@ -655,6 +658,12 @@ class XPCog(commands.Cog):
 
     async def get_xp_bar_color(self,userID:int):
         return (45,180,105)
+    
+    async def get_xp(self, user, guild_id):
+        xp = await self.bdd_get_xp(user.id, guild_id)
+        if xp == None or (isinstance(xp,list) and len(xp)==0):
+            return
+        return xp[0]['xp']
 
     @commands.command(name='rank')
     @commands.bot_has_permissions(send_messages=True)
@@ -674,13 +683,12 @@ class XPCog(commands.Cog):
                 xp_used_type = await self.bot.cogs['ServerCog'].find_staff(ctx.guild.id,'xp_type')
             else:
                 xp_used_type = 0
-            xp = await self.bdd_get_xp(user.id,None if xp_used_type==0 else ctx.guild.id)
-            if xp==None or (isinstance(xp,list) and len(xp)==0):
+            xp = await self.get_xp(user,None if xp_used_type==0 else ctx.guild.id)
+            if xp==None:
                 if ctx.author==user:
                     return await ctx.send(await self.translate(ctx.channel,'xp','1-no-xp'))
                 return await ctx.send(await self.translate(ctx.channel,'xp','2-no-xp'))
             levels_info = None
-            xp = xp[0]['xp']
             if xp_used_type==0:
                 ranks_nb = await self.bdd_get_nber()
                 try:
@@ -706,7 +714,7 @@ class XPCog(commands.Cog):
     
     async def send_card(self,ctx:commands.context,user:discord.User,xp,rank,ranks_nb,used_system,levels_info=None):
         try:
-            await ctx.send(file=discord.File('../cards/global/{}-{}-{}.{}'.format(user.id,xp,rank,'gif' if user.is_avatar_animated() else 'png')))
+            myfile = discord.File('../cards/global/{}-{}-{}.{}'.format(user.id,xp,rank,'gif' if user.is_avatar_animated() else 'png'))
         except FileNotFoundError:
             style = await self.bot.cogs['UtilitiesCog'].get_xp_style(user)
             txts = [await self.translate(ctx.channel,'xp','card-level'), await self.translate(ctx.channel,'xp','card-rank')]
@@ -716,8 +724,12 @@ class XPCog(commands.Cog):
                     static = not static['animated_card']
                 else:
                     static = True
-            await ctx.send(file=await self.create_card(user,style,xp,used_system,[rank,ranks_nb],txts,force_static=static,levels_info=levels_info))
             self.bot.log.debug("XP card for user {} ({}xp - style {})".format(user.id,xp,style))
+            myfile = await self.create_card(user,style,xp,used_system,[rank,ranks_nb],txts,force_static=static,levels_info=levels_info)
+        try:
+            await ctx.send(file=myfile)
+        except discord.errors.HTTPException:
+            await ctx.send(await self.translate(ctx.channel, "xp", "card-too-large"))
     
     async def send_embed(self,ctx,user,xp,rank,ranks_nb,levels_info,used_system):
         txts = [await self.translate(ctx.channel,'xp','card-level'), await self.translate(ctx.channel,'xp','card-rank')]
@@ -772,6 +784,7 @@ class XPCog(commands.Cog):
             xp_system_used = await self.bot.cogs['ServerCog'].find_staff(ctx.guild.id,'xp_type')
         else:
             xp_system_used = 0
+        xp_system_used = 0 if xp_system_used==None else xp_system_used
         if xp_system_used==0:
             if Type=='global':
                 if len(self.cache["global"])==0:
@@ -843,6 +856,8 @@ class XPCog(commands.Cog):
         if xp < 0:
             return await ctx.send(await self.translate(ctx.guild.id, 'xp', 'negative-xp'))
         try:
+            xp_used_type = await self.bot.cogs['ServerCog'].find_staff(ctx.guild.id,'xp_type')
+            prev_xp = await self.get_xp(user, None if xp_used_type==0 else ctx.guild.id)
             await self.bdd_set_xp(user.id, xp, Type='set', guild=ctx.guild.id)
             await ctx.send(await self.translate(ctx.guild.id,'xp','change-xp-ok',user=str(user),xp=xp))
         except Exception as e:
@@ -850,6 +865,10 @@ class XPCog(commands.Cog):
             await self.bot.cogs['ErrorsCog'].on_error(e,ctx)
         else:
             self.cache[ctx.guild.id][user.id] = [round(time.time()), xp]
+            s = "XP of user {} `{}` edited (from {} to {}) in server `{}`".format(user, user.id, prev_xp, xp, ctx.guild.id)
+            self.bot.log.info(s)
+            emb = self.bot.cogs["EmbedCog"].Embed(desc=s,color=8952255,footer_text=ctx.guild.name).update_timestamp().set_author(self.bot.user)
+            await self.bot.cogs["EmbedCog"].send([emb])
 
     async def gen_rr_id(self):
         return round(time.time()/2)
@@ -958,6 +977,7 @@ class XPCog(commands.Cog):
             c = 0
             rr_list = await self.rr_list_role(ctx.guild.id)
             used_system = await self.bot.cogs['ServerCog'].find_staff(ctx.guild.id,'xp_type')
+            used_system = 0 if used_system==None else used_system
             xps = [{'user':x['userID'],'xp':x['xp'],'level':(await self.calc_level(x['xp'],used_system))[0]} for x in await self.bdd_get_top(ctx.guild.member_count, ctx.guild if used_system>0 else None)]
             for member in xps:
                 m = ctx.guild.get_member(member['user'])

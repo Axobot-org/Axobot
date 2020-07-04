@@ -184,7 +184,8 @@
         "rank-global": "Maailmalaajuinen taso",
         "rank-title": "Tapahtuma pisteet",
         "rank-total": "Yhteis pisteet",
-        "unclassed": "Sinulla ei ole pisteitä"
+        "unclassed": "Sinulla ei ole pisteitä",
+        "xp-howto": "Voit voittaa tapahtuma pisteitä voittamalla risti-nolla pelejä, käyttämällä tapahtuma komentoja kun mahdollista tai tekemällä muita salaisia tehtäviä. Älä pelkää tulevasi tuki palvelimelleni jos haluat lisätietoja."
     },
     "bvn": {
         "aide": "__**Tervetuloa liittymis & lähtö viesti moduuliin**__\nTätä moduulia käytetään konfiguroimaan automaattinen viesti joka kerta kun joku tulee tai lähtee servultasi.\n__** Konfiguraatio**__\n`1-` Jotta voit konfiguroida mihin nämä viestit lähetetään, viestitä `{p}config change welcome_channel` lisättynä kanava.\n`2-` Jotta voit konfiguroida viestin, kirjoita  `{p}config change <welcome|leave> <message>`. Tälle viestille voit käyttää variableja:\n - `{user}` Tägää käyttäjän\n - `{server}` näyttää serverin nimen\n - `{owner}` näyttää serverin omistajan nimen\n- `{member_count}` näyttää tämänhetkisen käyttäjämäärän",
@@ -251,6 +252,7 @@
         "afk-no-perm": "Ups, en voi muokata nimimerkkiäsi 😕 yritän muistaa, mutta saatan unohtaa että olet afk tilassa",
         "afk-user-1": "Tämä jäsen on AFK:illa koska, {}",
         "afk-user-2": "Tämä jäsen on AFK:illa!",
+        "bbw-too-many": "Ups, määrä on likan iso Discordille 😕",
         "blame-0": "Lista kaikista käytettävistä nimistä**{}**:lle",
         "calc-0": "Vastauksessa kestää liian kauan ladata:/",
         "calc-1": "Laskennan ratkaisut `{}` ovat `{}`",
@@ -268,6 +270,7 @@
         "count-4": "On the last {limit} messages, {user} have posted {x} messages ({p}%)",
         "count-5": "Et voi käyttää tätä komentoa kanavalla jolla sinulla ei ole oikeuksia katsoa viesti historiaa",
         "embed-error": "Virhe havaittu: `{}`",
+        "embed-invalid-channel": "En pysty lähettää viestejä tuolle kanavalle",
         "embed-invalid-image": "Url linkki joka pitäisi olla kuva linkki, on pätemätön",
         "fun-list": "Tässä on lista kaikista käytettävistä hauska komentoista:",
         "invalid-city": "Pätemätön kaupunki :confused:",
@@ -354,7 +357,8 @@
             "Ehdota jotain Discordille",
             "Itsebotti artikkeli",
             "Käyttöehdot botin tekijöille",
-            "Miten löytää tunniste"
+            "Miten löytää tunniste",
+            "Laillinen ikä määrä Discordin käyttöön per maa"
         ],
         "docs": "Tässä on linkki botin dokumenttiin:",
         "prefix": "Lista kaikista käytettävissä olevista etuliitoista:",
@@ -857,6 +861,9 @@
         "change-color": "The color used for the option {} is now {}",
         "change-emojis": "Tunteet vaihdoehdolle \"{}\" on nyt {}",
         "change-lang": "Botin kieli on nyt `{}`",
+        "change-levelup_channel": "Tason ylennykset nyt lähetetään kanavalle {}",
+        "change-levelup_channel-1": "Tason ylennykset nyt lähetetään suoraan kanavaan",
+        "change-levelup_channel-2": "Tason ylennyksiä ei enää lähetetä minnekkään",
         "change-prefix": "Etuliite on nyt vaihdettu oikein, nyt etuliite on `{}`",
         "change-prefix-1": "Tätä etuliite on liian pitkä!",
         "change-raid": "Anti-raid suojaus taso on nyt aktivoitu tasolle **{}** ({})",
@@ -892,6 +899,7 @@
         "kick": "Lista rooleista jotka voivat käyttää komentoa 'kick': {}",
         "language": "Tämän hetkinen kieli tälle palvelimelle: **{}**",
         "leave": "Viesti joka lähetetään kun jäsen lähtee: {}",
+        "levelup_channel": "Kanava, johon tason ylennykset lähetetään: {}",
         "levelup_msg": "Viesti joka lähetetään kun jäsen saa uuden tason XP systeemissä: {}",
         "membercounter": "Kanava joka näyttää numeron jäsenistä sen nimessä on: {}",
         "modlogs_channel": "Kanava johon laitetaan valvonta lokit: {}",
@@ -936,7 +944,7 @@
         "guild-13": "Boosts number",
         "guild-13v": "{b} (tier {p})",
         "guild-14": "Limitations",
-        "guild-14v": "Bitrate: {bit}kbps\nFiles size: {fil}MB\nEmojis count: {emo}\nConnected members: {mem}",
+        "guild-14v": "Bitrate: {bit}kbps\nFiles size: {fil}MB\nEmojis count: {emo}",
         "guild-15": "kutsu linkki",
         "guild-2": "Maa alue",
         "guild-3": "Teksti : {} | Ääni : {} ({} kategoriat)",
@@ -958,7 +966,8 @@
             "PUBLIC": "Julkinen palvelin",
             "VANITY_URL": "Erikois kutsu linkki",
             "VERIFIED": "Vahvistettu palvelin",
-            "VIP_REGIONS": "VIP ääni oikeudet"
+            "VIP_REGIONS": "VIP ääni oikeudet",
+            "WELCOME_SCREEN_ENABLED": "Tervetuloruutu aktivoitu"
         },
         "inv-0": "URL linkki",
         "inv-1": "Kutsuja",
@@ -1001,6 +1010,12 @@
         "user-0": "Tällä palvelimella?",
         "voicechan-0": "Ääni kanava"
     },
+    "timers": {
+        "rmd-deleted": "Muistutus #{id} viestillä `{message}` on poistettu!",
+        "rmd-empty": "Ups, sinulla ei ole odotettavia muistutuksia...",
+        "rmd-item": "Tunniste: `{id}` | {duration} | Kanava: {channel} | Viesti: {msg}",
+        "rmd-title": "Lista muistutuksistasi"
+    },
     "users": {
         "animated_card_false": "Et ole tällä hetkellä hyväksymässä animoitua korttia. Kiitos!",
         "animated_card_true": "Voit nyt käyttää animoituja xp kortteja  (hitaampi renderaaminen)",
@@ -1024,6 +1039,7 @@
         "bot-rank": "Botit ei saa yhtään xp:tä",
         "card-level": "TASO",
         "card-rank": "SIJA",
+        "card-too-large": "Ups, mahdotonta lähettää korttiasi 👀 on mahdollista, että tiedoston tila on liian iso, voit sitten esimerkiksi kytkeä pois animoidun kortin (komento `profile config animated_card false`)",
         "change-global-xp": "Ei voi muokata XP:tä maailmanlaajuisesta systeemistä!",
         "change-xp-ok": "XP käyttäjälle {user} on asetettu {xp} pisteeseen!",
         "default_levelup": [

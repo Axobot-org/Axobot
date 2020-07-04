@@ -92,7 +92,7 @@ class InfoCog(commands.Cog):
         try:
             async with ctx.channel.typing():
                 b_conf = self.bot.cogs['UtilitiesCog'].config
-                if b_conf == None:
+                if b_conf is None:
                     b_conf = await self.bot.cogs['UtilitiesCog'].get_bot_infos()
                 ignored_guilds = list()
                 if self.bot.database_online:
@@ -129,7 +129,9 @@ class InfoCog(commands.Cog):
     
     @commands.command(name="botinvite", aliases=["botinv"])
     async def botinvite(self, ctx:commands.Context):
-        """Get a link to invite me"""
+        """Get a link to invite me
+        
+        ..Doc infos.html#bot-invite"""
         try:
             requests.get("https://zrunner.me/invitezbot", timeout=3)
         except requests.exceptions.Timeout:
@@ -197,8 +199,8 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
                 if name==None or not await self.bot.cogs['AdminCog'].check_if_admin(ctx):
                     item = ctx.guild
                     #return await self.guild_info(ctx,ctx.guild,lang)
-            if item == None:
-                if name == None: # include Type==None bc of line 141
+            if item is None:
+                if name is None: # include Type==None bc of line 141
                     item = ctx.author
                 else:
                     try:
@@ -209,7 +211,7 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
                         return
             critical = ctx.author.guild_permissions.manage_guild or await self.bot.cogs['AdminCog'].check_if_god(ctx)
             #-----
-            if item == None:
+            if item is None:
                 msg = await self.translate(ctx.guild.id,"stats_infos","not-found")
                 await ctx.send(msg.format(N=name))
             elif type(item) == discord.Member:
@@ -477,7 +479,7 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
         embed.set_footer(text='Requested by {}'.format(ctx.author.name), icon_url=ctx.author.avatar_url)
         # Guild icon
         icon_url = guild.icon_url_as(format = "gif" if guild.is_icon_animated() else 'png')
-        embed.set_author(name="{} '{}'".format(await self.translate(guild.id,"stats_infos","guild-0"),guild.name), icon_url=icon_url)
+        embed.set_author(name="{} '{}'".format(await self.translate(ctx.guild.id,"stats_infos","guild-0"),guild.name), icon_url=icon_url)
         embed.set_thumbnail(url=icon_url)
         # Guild banner
         if guild.banner != None:
@@ -500,7 +502,11 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
         if guild.me.guild_permissions.manage_guild:
             embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","guild-12"), value=str(len(await guild.invites())))
         # Emojis count
-        embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","guild-5"), value="{}/{}".format(len(guild.emojis),guild.emoji_limit))
+        c = [0, 0]
+        for x in guild.emojis:
+            c[1 if x.animated else 0] += 1
+        emojis_txt = "Static: {s}/{l} | Animated: {a}/{l}".format(l=guild.emoji_limit, s=c[0], a=c[1])
+        embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","guild-5"), value=emojis_txt)
         # AFK timeout
         embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","guild-10"), value = str(int(guild.afk_timeout/60))+" minutes")
         # Splash url
@@ -550,7 +556,7 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
                 a2f = await self.translate(ctx.guild.id,"keywords","non")
             embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","guild-8"), value=a2f.capitalize())
             # Verification level
-            embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","guild-9"), value=str(await self.translate(guild.id,"keywords",str(guild.verification_level))).capitalize())
+            embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","guild-9"), value=str(await self.translate(ctx.guild.id,"keywords",str(guild.verification_level))).capitalize())
         await ctx.send(embed=embed)
         
    
@@ -818,7 +824,7 @@ Servers:
     @find_main.command(name='channel')
     async def find_channel(self,ctx,ID:int):
         c = self.bot.get_channel(ID)
-        if c == None:
+        if c is None:
             await ctx.send(await self.translate(ctx.channel,"find","chan-0"))
             return
         if ctx.guild==None or ctx.channel.permissions_for(ctx.guild.me).embed_links:
@@ -839,7 +845,7 @@ Servers:
         for serv in ctx.bot.guilds:
             every_roles += serv.roles
         role = discord.utils.find(lambda role:role.id==ID,every_roles)
-        if role == None:
+        if role is None:
             await ctx.send(await self.translate(ctx.channel,"find","role-0"))
             return
         if ctx.guild==None or ctx.channel.permissions_for(ctx.guild.me).embed_links:
@@ -865,7 +871,7 @@ Servers:
         else:
             flow = flow[0]
         temp = self.bot.get_guild(flow['guild'])
-        if temp == None:
+        if temp is None:
             g = "Unknown ({})".format(flow['guild'])
         else:
             g = "`{}`\n{}".format(temp.name,temp.id)
@@ -952,7 +958,7 @@ Servers:
         can_embed = True if isinstance(ctx.channel,discord.DMChannel) else ctx.channel.permissions_for(ctx.guild.me).embed_links
         if can_embed:
             l = await self.translate(ctx.channel,'infos','discordlinks')
-            links = ["https://dis.gd/status","https://dis.gd/tos","https://dis.gd/report","https://dis.gd/feedback","https://support.discord.com/hc/en-us/articles/115002192352","https://discord.com/developers/docs/legal","https://support.discord.com/hc/en-us/articles/206346498-Where-can-I-find-my-User-Server-Message-ID-"]
+            links = ["https://dis.gd/status","https://dis.gd/tos","https://dis.gd/report","https://dis.gd/feedback","https://support.discord.com/hc/en-us/articles/115002192352","https://discord.com/developers/docs/legal","https://support.discord.com/hc/en-us/articles/206346498-Where-can-I-find-my-User-Server-Message-ID-","https://support.discord.com/hc/en-us/articles/360040724612"]
             txt = "\n".join(['['+l[i]+']('+links[i]+')' for i in range(len(l))])
             em = await self.bot.cogs["EmbedCog"].Embed(desc=txt).update_timestamp().create_footer(ctx)
             await ctx.send(embed=em)
@@ -1105,7 +1111,7 @@ Servers:
         # title
         t = await self.translate(ctx.channel,'infos','usernames-title',u=user.name)
         # Embed creation
-        if ctx.guild == None or ctx.channel.permissions_for(ctx.guild.me).embed_links:
+        if ctx.guild is None or ctx.channel.permissions_for(ctx.guild.me).embed_links:
             date = ""
             desc = None
             f = list()

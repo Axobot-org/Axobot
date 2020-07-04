@@ -162,23 +162,23 @@
     },
     "bot_events": {
         "events-desc": {
-            "christmas-2019": "Fêtez l'arrivée de Noël grâce à cet événement ! Pendant plusieurs jours, Zbot se pare des couleurs de l'hiver avec des émojis spéciaux pour le jeu du morpion, un avatar unique ainsi que d'autres choses trop cool. \n\nProfitez-en pour récupérer des points d'événements et tentez de gagner la carte d'xp spécial Noël 2019 ! Pour rappel, les cartes d'xp sont accessibles via ma commande `profile card`",
             "blurple-2020": "Fêtons les 5 ans de Discord pendant l'événement Blurple ! Pour la troisième année consécutive, nous participons à l'événement \"Blurple\", qui consiste à recolorer nos avatars et serveurs avec un maximum de blurple, cette couleur caractéristique de Discord entre le violet et le bleu. Profitez-en pour récupérer des points d'événements et tentez de gagner la carte d'xp spécial Blurple 2020 ! Pour rappel, les cartes d'xp sont accessibles via ma commande `profile card`\n\nPour cet événement, la commande spéciale `blurple` a été activée, n'hésitez pas à l'utiliser pour tenter de gagner des points !",
+            "christmas-2019": "Fêtez l'arrivée de Noël grâce à cet événement ! Pendant plusieurs jours, Zbot se pare des couleurs de l'hiver avec des émojis spéciaux pour le jeu du morpion, un avatar unique ainsi que d'autres choses trop cool. \n\nProfitez-en pour récupérer des points d'événements et tentez de gagner la carte d'xp spécial Noël 2019 ! Pour rappel, les cartes d'xp sont accessibles via ma commande `profile card`",
             "nothing": "Il n'y a actuellement aucun événement. Suivez les news du bot pour connaître la date du prochain !"
         },
         "events-price-title": "Prix à gagner",
         "events-prices": {
-            "christmas-2019": {
-                "50": "Débloquez la carte d'xp spécial Noël 2019 !"
-            },
             "blurple-2020": {
                 "150": "Débloquez la carte d'xp spécial Blurple 2020 !"
+            },
+            "christmas-2019": {
+                "50": "Débloquez la carte d'xp spécial Noël 2019 !"
             },
             "nothing": "Il n'y a rien à gagner pour cet événement :confused:"
         },
         "events-title": {
-            "christmas-2019": "Noël en approche !",
-            "blurple-2020": "Les 5 ans de Discord !"
+            "blurple-2020": "Les 5 ans de Discord !",
+            "christmas-2019": "Noël en approche !"
         },
         "objectives": "Objectifs",
         "points": "points",
@@ -253,6 +253,7 @@
         "afk-no-perm": "Oops, je ne peux pas modifier votre pseudo :confused: Je vais essayer de m'en souvenir, mais il se peut que j'oublie que vous êtes AFK",
         "afk-user-1": "Ce membre est AFK, pour la raison {}",
         "afk-user-2": "Ce membre est AFK !",
+        "bbw-too-many": "Oups, la grille est trop grande pour Discord :confused:",
         "blame-0": "Liste des noms disponibles pour le membre **{}**",
         "calc-0": "Le résultat prend trop de temps à charger :/",
         "calc-1": "Les solutions du calcul `{}` sont `{}`",
@@ -270,6 +271,7 @@
         "count-4": "Sur les {limit} derniers messages, {user} en a posté {x} ({p}%)",
         "count-5": "Vous ne pouvez pas utiliser cette commande dans un salon où vous n'avez pas accès à l'historique des messages",
         "embed-error": "Une erreur est survenue: `{}`",
+        "embed-invalid-channel": "Impossible d'envoyer des messages dans ce salon",
         "embed-invalid-image": "L'url saisie pour l'image est invalide",
         "fun-list": "Voici la liste des commandes fun disponibles :",
         "invalid-city": "Nom de ville invalide",
@@ -356,13 +358,14 @@
             "Proposer une idée à Discord",
             "Explication des selfbots",
             "CGU pour les développeurs de bot",
-            "Comment trouver un ID"
+            "Comment trouver un ID",
+            "Âge minimal d'utilisation de Discord par pays"
         ],
         "docs": "Voici le lien vers la documentation du bot :",
         "prefix": "Liste des préfixes actuellement utilisables :",
         "stats": "**Version du bot :** {bot_v} \n**Nombre de serveurs :** {s_count} \n**Nombre de membres visibles :** {m_count} (dont {b_count} **bots**)\n**Nombre de lignes de code :** {l_count}\n**Langues utilisées :** {lang} \n**Version de Python :** {p_v} \n**Version de la bibliothèque `discord.py` :** {d_v} \n**Charge sur la mémoire vive :** {ram} GB \n**Charge sur le CPU :** {cpu} % \n**Temps de latence de l'api :** {api} ms\n**Nombre total d'xp gagné :** {xp}xp",
         "stats-title": "**Statistiques du bot**",
-        "text-0": "Bonjour ! Moi c'est {0} !\n\nJe suis un bot qui permet de faire *beaucoup* de choses : de la modération, un système d'xp, des statistiques, la gestion de partenaires et plein d'autres commandes plus ou moins utiles ! \nVous pouvez commencer par taper `!help` dans ce tchat pour voir la liste des commandes disponibles, puis `!config see` vous permettra de voir les options de configuration (un site web est en préparation). \n\nPour m'avoir aidé dans la création du bot, mon propriétaire et moi souhaitons remercier Awhikax pour son soutien apporté lors des différentes crises, Aragorn1202 pour toutes ses idées et ses phrases pleines de bon sens, Adri526 pour tous ces magnifiques logos, émojis et images de profil, et toute l'équipe de traducteurs poour leur merveilleux travail !\n\n:globe_with_meridians: Quelques liens pourront vous être utiles : \n:arrow_forward: Mon serveur Discord : http://discord.gg/N55zY88\n:arrow_forward: Un lien pour m'inviter dans un autre serveur : <https://zrunner.me/invitezbot>\n:arrow_forward: La documentation du bot : <https://zbot.rtfd.io/>\n:arrow_forward: Le compte Twitter de mon créateur : <https://twitter.com/z_runnerr>\n:arrow_forward: Une petite FAQ : <https://zrunner.me/zbot-faq>\n\nBonne journée !",
+        "text-0": "Bonjour ! Moi c'est {0} !\n\nJe suis un bot qui permet de faire *beaucoup* de choses : de la modération, un système d'xp, des statistiques, la gestion de partenaires et plein d'autres commandes plus ou moins utiles ! \nVous pouvez commencer par taper `!help` dans ce tchat pour voir la liste des commandes disponibles, puis `!config see` vous permettra de voir les options de configuration (un site web est en préparation). \n\nPour m'avoir aidé dans la création du bot, mon propriétaire et moi souhaitons remercier Awhikax pour son soutien apporté lors des différentes crises, Aragorn1202 pour toutes ses idées et ses phrases pleines de bon sens, Adri526 pour tous ces magnifiques logos, émojis et images de profil, et toute l'équipe de traducteurs pour leur merveilleux travail !\n\n:globe_with_meridians: Quelques liens pourront vous être utiles : \n:arrow_forward: Mon serveur Discord : http://discord.gg/N55zY88\n:arrow_forward: Un lien pour m'inviter dans un autre serveur : <https://zrunner.me/invitezbot>\n:arrow_forward: La documentation du bot : <https://zbot.rtfd.io/>\n:arrow_forward: Le compte Twitter de mon créateur : <https://twitter.com/z_runnerr>\n:arrow_forward: Une petite FAQ : <https://zrunner.me/zbot-faq>\n\nBonne journée !",
         "usernames-allow": "Vous pouvez réautoriser l'enregistrement automatique via la commande 'profile'",
         "usernames-disallow": "Vous pouvez vous retirer de l'enregistrement automatique via la commande 'profile'",
         "usernames-empty": "Aucun changement enregistré",
@@ -804,7 +807,7 @@
         "no-db": "La base de donnée étant actuellement hors ligne, cette fonctionnalité est temporairement désactivée :confused:",
         "no-feed": "Oups, vous n'avez aucun flux rss à gérer !",
         "no-roles": "Aucun rôle n'a été configuré pour l'instant.",
-        "not-a-role": "Le rôle `{}` est introuvable. Réessayez :",
+        "not-a-role": "Ce rôle est introuvable. Réessayez :",
         "nothing": "Je n'ai rien trouvé sur cette recherche :confused:",
         "research-timeout": "La page web a mis trop de temps à répondre, j'ai dû interrompre le processus :eyes:",
         "roles-0": "Ce flux a bien été modifié pour mentionner les rôles {}",
@@ -941,7 +944,7 @@
         "guild-13": "Nombre de boosts",
         "guild-13v": "{b} (palier {p})",
         "guild-14": "Limitations",
-        "guild-14v": "Bitrate : {bit}kbps\nTaille de fichier : {fil}MB\nNombre d'émojis : {emo}\nNombre de membres connectés : {mem}",
+        "guild-14v": "Bitrate : {bit}kbps\nTaille de fichier max : {fil}MB\nNombre d'émojis : {emo}",
         "guild-15": "Lien d'invitation",
         "guild-2": "Région",
         "guild-3": "Texte : {} | Vocal : {} ({} catégories)",
@@ -963,7 +966,8 @@
             "PUBLIC": "Serveur public",
             "VANITY_URL": "Invitation custom",
             "VERIFIED": "Serveur vérifié",
-            "VIP_REGIONS": "Régions VIP"
+            "VIP_REGIONS": "Régions VIP",
+            "WELCOME_SCREEN_ENABLED": "Fenêtre de bienvenue activée"
         },
         "inv-0": "Adresse url",
         "inv-1": "Créateur",
@@ -1006,6 +1010,12 @@
         "user-0": "Sur ce serveur ?",
         "voicechan-0": "Salon vocal"
     },
+    "timers": {
+        "rmd-deleted": "Le rappel N°{id} ayant pour message `{message}` a bien été supprimé !",
+        "rmd-empty": "Oups, vous n'avez aucun rappel en cours...",
+        "rmd-item": "ID : `{id}` | Dans : {duration} | Salon : {channel} | Message : {msg}",
+        "rmd-title": "Liste de vos rappels"
+    },
     "users": {
         "animated_card_false": "Vous n'utilisez actuellement pas de carte animée",
         "animated_card_true": "Les cartes d'xp animées pourront être utilisée pour vous (rendu plus lent)",
@@ -1029,6 +1039,7 @@
         "bot-rank": "Les bots ne peuvent pas avoir d'xp",
         "card-level": "NIVEAU",
         "card-rank": "RANG",
+        "card-too-large": "Oups, impossible d'envoyer votre carte :eyes: il est possible que le fichier généré soit trop lourd, vous pouvez alors par exemple désactiver l'animation de votre carte (commande `profile config animated_card false`)",
         "change-global-xp": "Impossible d'éditer l'XP du système global !",
         "change-xp-ok": "L'XP de l'utilisateur {user} a bien été mis à {xp} points !",
         "default_levelup": [

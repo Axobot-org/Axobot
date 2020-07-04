@@ -47,6 +47,16 @@ You can access even more names by being on some secret servers! Enter the :code:
 .. warning:: ZBot needs "`Attach files <perms.html#attach-files>`_" permission to send its message. You're not gonna ask him to be angry without giving him permission to do it?
 
 
+Bubble-wrap
+-----------
+
+**Syntax:** :code:`bubble-wrap [width=10] [height=15]` (aliases: papier-bulle, bbw)
+
+Just bubble wrap. Which pops when you squeeze it. That's all. #Just4Fun
+
+Width should be between 1 and 150, height between 1 and 50.
+
+
 Count messages
 --------------
 

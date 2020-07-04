@@ -162,23 +162,23 @@
     },
     "bot_events": {
         "events-desc": {
-            "christmas-2019": "Celebrate the arrival of Christmas with this event! For several days, Zbot wears the colours of winter with special emojis for the tic-tac-toe game, a unique avatar and other cool things. \n\nTake the opportunity to collect event points and try to win the 2019 Christmas special xp card! Reminder: xp cards are accessible via my `profile card` command",
             "blurple-2020": "Let's celebrate 5 years of Discord during the Blurple event! For the third year in a row, we're participating in the Blurple event, which consists in recoloring our avatars and servers with a maximum of blurple, the characteristic color of Discord between purple and blue. Take advantage of this opportunity to collect event points and try to win the special Blurple 2020 xp card! As a reminder, the xp cards are accessible via my command `profile card`.\n\nFor this event, the special command `blurple` has been activated, don't hesitate to use it to try to win points!",
+            "christmas-2019": "Celebrate the arrival of Christmas with this event! For several days, Zbot wears the colours of winter with special emojis for the tic-tac-toe game, a unique avatar and other cool things. \n\nTake the opportunity to collect event points and try to win the 2019 Christmas special xp card! Reminder: xp cards are accessible via my `profile card` command",
             "nothing": "There'r no events rn. Follow my bot news 2 know teh date of the next one!"
         },
         "events-price-title": "Prizes 2 win",
         "events-prices": {
-            "christmas-2019": {
-                "50": "Unlock da special Christmas 2019 xp card!"
-            },
             "blurple-2020": {
                 "150": "Unlock dat special Blurple 2020 xp card!"
+            },
+            "christmas-2019": {
+                "50": "Unlock da special Christmas 2019 xp card!"
             },
             "nothing": "There's no thing 2 gain 4 this event :confused:"
         },
         "events-title": {
-            "christmas-2019": "Christmas iz cming!",
-            "blurple-2020": "Dat 5 Years ov Discord!"
+            "blurple-2020": "Dat 5 Years ov Discord!",
+            "christmas-2019": "Christmas iz cming!"
         },
         "objectives": "Objectives",
         "points": "pts",
@@ -253,6 +253,7 @@
         "afk-no-perm": "Oops, I can't change Ur nickname :confused: I'll try to remember :/",
         "afk-user-1": "Taht member iz AFK, 'cuz {}",
         "afk-user-2": "This usr is AFK!",
+        "bbw-too-many": "Oops, dat grid's too big 4 Discord :upside_down:",
         "blame-0": "Lizt ov availabl namz 4 **{}**",
         "calc-0": "Nope, result takz too looooooong to load :rofl:",
         "calc-1": "Teh solushuns of the calculation `{}` are `{}`",
@@ -270,6 +271,7 @@
         "count-4": "On teh last {limit} msgs, {user} had postd {x} things ({p}%)",
         "count-5": "U cannot use tish cmd at a channel where U do not have access to msg history",
         "embed-error": "A' error went wrong: `{}`",
+        "embed-invalid-channel": "Cannt send messages in dat chan...",
         "embed-invalid-image": "The url entered as image is invalid",
         "fun-list": "Her iz the list ov available fun commandz:",
         "invalid-city": "Invalid place name :confused:",
@@ -356,7 +358,8 @@
             "Suggest something to Discord",
             "Selfbots article",
             "ToS for bot devs",
-            "How 2 find 1 ID"
+            "How 2 find 1 ID",
+            "Minimum legal Discordian age / places"
         ],
         "docs": "Her'z teh link 2 the bot doc:",
         "prefix": "List ov usable prefiXs:",
@@ -804,7 +807,7 @@
         "no-db": "As the databaz is auffline, dis feature iz temporarly disabled :confused:",
         "no-feed": "Oops, u donot hav any rss feds 2 managez plz!",
         "no-roles": "No more role hAVe bean configurated yetz.",
-        "not-a-role": "The rOle `{}` was not finndz. Try against:",
+        "not-a-role": "The rOle was not finndz. Try against:",
         "nothing": "I finnd nothin on this searrch :confused:",
         "research-timeout": "This page took toooo long 2 answer, I had to stop teh process :eyes:",
         "roles-0": "Thes feed have been editd 2 mention the roles {}",
@@ -941,7 +944,7 @@
         "guild-13": "Boosts nbr",
         "guild-13v": "{b} (milestone {p})",
         "guild-14": "Limitz",
-        "guild-14v": "Voice: {bit}kbps\nFiles size: {fil}MB\nEmojis nbr: {emo}\nConnected mmbrs: {mem}",
+        "guild-14v": "Voice: {bit}kbps\nMax files size: {fil}MB\nEmojis nbr: {emo}",
         "guild-15": "Inv url",
         "guild-2": "Rejion",
         "guild-3": "Txt : {} | Vcall : {} ({} categoreez)",
@@ -963,7 +966,8 @@
             "PUBLIC": "Publ. server",
             "VANITY_URL": "Cstm inv url",
             "VERIFIED": "Verif. srv",
-            "VIP_REGIONS": "VIP voice reg"
+            "VIP_REGIONS": "VIP voice reg",
+            "WELCOME_SCREEN_ENABLED": "Cool screen 4 newbies"
         },
         "inv-0": "URL lnk",
         "inv-1": "Inviter",
@@ -1006,6 +1010,12 @@
         "user-0": "On dis servr?",
         "voicechan-0": "Singing ch4nnel"
     },
+    "timers": {
+        "rmd-deleted": "Rmder #{id} with msg `{message}` had deleted w/ success :owo:",
+        "rmd-empty": "Oops, U don't have any pending reminder lol",
+        "rmd-item": "ID: `{id}` | In: {duration} | Chan: {channel} | Msg: {msg}",
+        "rmd-title": "I'll remind u that becuz ur dumb-dumb :bongocat:"
+    },
     "users": {
         "animated_card_false": "Anamited xp cards are naw disabld for you",
         "animated_card_true": "Animated xp cards ar naw enabled 4U",
@@ -1029,6 +1039,7 @@
         "bot-rank": "Bots like myself can't have any xp...sad times.",
         "card-level": "LVL",
         "card-rank": "SEAT",
+        "card-too-large": "Oops, un'ble 2 send ur card :eyes: maybe ur file is just 2 heavy, maybe u'can just 4 example disable the animation of ur card (command `profile config animated_card false`) idk, i'm not an engineer :shrug:",
         "change-global-xp": "NOT possible 2 edit XP of the global super mega system!",
         "change-xp-ok": "XP of teh user {user} have been set 2 {xp}xp!",
         "default_levelup": [

@@ -25,7 +25,9 @@ class PermsCog(commands.Cog):
     @commands.guild_only()
     async def check_permissions(self, ctx, channel:typing.Optional[typing.Union[discord.TextChannel,discord.VoiceChannel]]=None, *, target:typing.Union[discord.Member,discord.Role]=None):
         """Permissions assigned to a member/role (the user by default)
-        The channel used to view permissions is the channel in which the command is entered."""
+        The channel used to view permissions is the channel in which the command is entered.
+        
+        ..Doc infos.html#permissions"""
         if target==None:
             target = ctx.author
         if isinstance(target,discord.Member):
