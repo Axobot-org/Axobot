@@ -203,6 +203,8 @@ You can specify a verification limit by adding a number in argument (up to 1.000
                 liste += l2
             if await self.is_on_guild(ctx.author,356067272730607628): # Zbot server
                 liste += l3
+            if await self.is_on_guild(ctx.author,523525264517496834): # Benny Support
+                liste += l4
             txt = "- "+"\n- ".join(sorted(liste))
             title = str(await self.translate(ctx.channel,"fun","blame-0")).format(ctx.author)
             if ctx.guild==None or ctx.channel.permissions_for(ctx.guild.me).embed_links:
@@ -266,7 +268,7 @@ You can specify a verification limit by adding a number in argument (up to 1.000
     @commands.check(is_fun_enabled)
     async def big_text(self,ctx,*,text):
         """If you wish to write bigger"""
-        contenu = await self.bot.cogs['UtilitiesCog'].clear_msg(text,ctx=ctx,emoijs=False)
+        contenu = await self.bot.cogs['UtilitiesCog'].clear_msg(text,ctx=ctx,emojis=False)
         text = ""
         Em = self.bot.cogs['EmojiCog']
         mentions = [x.group(1) for x in re.finditer(r'(<(?:@!?&?|#|a?:[a-zA-Z0-9_]+:)\d+>)',ctx.message.content)]
