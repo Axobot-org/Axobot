@@ -602,12 +602,12 @@ class Events(commands.Cog):
         except Exception as e:
             answers[3] = "0"
             await self.bot.get_cog("ErrorsCog").on_error(e,None)
-        try: # https://arcane-botcenter.xyz/bot/486896267788812288
+        try: # https://arcane-center.xyz/bot/486896267788812288
             headers = {
                 'Authorization': self.bot.others['arcanecenter'],
                 'Content-Type': 'application/json'
             }
-            async with session.post('https://arcane-botcenter.xyz/api/{}/stats'.format(self.bot.user.id), data=payload, headers=headers) as resp:
+            async with session.post('https://arcane-center.xyz/api/{}/stats'.format(self.bot.user.id), data=payload, headers=headers) as resp:
                 self.bot.log.debug('Arcane Center returned {} for {}'.format(resp.status, payload))
                 answers[4] = resp.status
         except Exception as e:
