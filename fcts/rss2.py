@@ -1009,7 +1009,7 @@ class RssCog(commands.Cog):
         try:
             posts = self.twitterAPI.GetUserTimeline(screen_name=nom,exclude_replies=True)
         except twitter.error.TwitterError as e:
-            if e.message[0]['code'] == 34:
+            if e.message == "Not authorized." or e.message[0]['code'] == 34:
                 return await self.translate(channel,"rss","nothing")
             raise e
         if not date:
