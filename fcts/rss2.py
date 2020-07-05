@@ -288,6 +288,7 @@ class RssCog(commands.Cog):
         
         ..Doc rss.html#follow-a-feed"""
         if await self.is_overflow(ctx.guild):
+            flow_limit = await self.bot.cogs['ServerCog'].find_staff(ctx.guild.id,'rss_max_number')
             await ctx.send(str(await self.translate(ctx.guild.id,"rss","flow-limit")).format(flow_limit))
             return
         identifiant = await self.parse_yt_url(link)
