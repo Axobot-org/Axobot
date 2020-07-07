@@ -4,7 +4,7 @@
     "server-settings": ["config","emoji","partner","pin","role","roles_react","roles_rewards","welcome"],    
     "users-info": ["perms","profile","rank","top","usernames"],
     "other": ["book","embed","emoji","minecraft","mojang","react","remindme", "reminder"],
-    "fun": ["afk","arapproved","bitly","cookie","events","tic-tac-toe","fun","hour","say","unafk","vote","weather"],
+    "fun": ["afk","arapproved","bitly","cookie","events","nasa","tic-tac-toe","fun","hour","say","unafk","vote","weather"],
     "translators": ["tr-file", "tr-reload-todo", "tr-status","translate","tr-edit","tr-loop","tr-merge"],
     "staff": ["add_cog","admin","bug","del_cog","eval","execute","find","idea","msg","rss_loop","spoil","test"],
     "unclassed": []

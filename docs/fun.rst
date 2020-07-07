@@ -116,6 +116,16 @@ This command is perfect if you want to give the impression of literally swimming
 .. warning:: ZBot needs "`Attach files <perms.html#attach-files>`_" permission to send this gif.
 
 
+NASA
+----
+
+**Syntax:** :code:`nasa`
+
+If you want to see beautiful images from space, this command will suit you perfectly. It uses the official NASA API to get the Astronomy Picture of the Day, as well as a description of this image. Great for putting your head in the stars.
+
+.. warning:: The only permission needed to grant the bot is "`Embed Links <perms.html#embed-links>`_".
+
+
 Nope
 ----
 

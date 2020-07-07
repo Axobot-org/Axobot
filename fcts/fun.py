@@ -33,6 +33,7 @@ class FunCog(commands.Cog):
         self.tz = tzwhere.tzwhere(forceTZ=True)
         self.last_roll = None
         self.afk_guys = dict()
+        self.nasa_pict:dict = None
         try:
             self.translate = self.bot.cogs["LangCog"].tr
         except:
@@ -657,6 +658,31 @@ You can specify a verification limit by adding a number in argument (up to 1.000
             await ctx.send(await self.translate(ctx.channel, "fun", "bbw-too-many"))
             return
         await ctx.send(txt)
+
+    @commands.command(name="nasa")
+    @commands.cooldown(5, 60, commands.BucketType.channel)
+    async def nasa(self, ctx:commands.Context):
+        """Send the Picture of The Day by NASA
+        
+        ..Doc fun.html?#nasa"""
+        def get_date(string):
+            return datetime.datetime.strptime(string, "%Y-%m-%d")
+        if ctx.guild and not ctx.channel.permissions_for(ctx.guild.me).embed_links:
+            await ctx.send(await self.translate(ctx.channel, "fun", "no-embed-perm"))
+            return
+        if self.nasa_pict == None or (datetime.datetime.utcnow-get_date(self.nasa_pict["date"])).total_seconds() > 86400:
+            async with aiohttp.ClientSession() as session:
+                key = self.bot.others["nasa"]
+                async with session.get(f"https://api.nasa.gov/planetary/apod?api_key={key}") as r:
+                    self.nasa_pict = await r.json()
+        emb = self.bot.get_cog("EmbedCog").Embed(
+            title=self.nasa_pict["title"],
+            image=self.nasa_pict["url"],
+            url=self.nasa_pict["hdurl"],
+            desc=self.nasa_pict["explanation"],
+            footer_text="Credits: "+self.nasa_pict.get("copyright", "Not copyrighted"),
+            time=get_date(self.nasa_pict["date"]))
+        await ctx.send(embed=emb)
         
 
     @commands.command(name="vote")
