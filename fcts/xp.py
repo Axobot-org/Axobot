@@ -433,7 +433,7 @@ class XPCog(commands.Cog):
         except Exception as e:
             await self.bot.cogs['ErrorsCog'].on_error(e,None)
 
-    async def bdd_get_top(self,top:int,guild:discord.Guild=None):
+    async def bdd_get_top(self,top:int=None,guild:discord.Guild=None):
         try:
             if not self.bot.database_online:
                 self.bot.unload_extension("fcts.xp")
@@ -452,12 +452,16 @@ class XPCog(commands.Cog):
                     return list()
                 raise e
             liste = list()
-            if guild==None:
-                liste = [x for x in cursor][:top]
+            if guild is None:
+                liste = list(cursor)
+                if top is not None:
+                    liste = liste[:top]
             else:
                 ids = [x.id for x in guild.members]
                 i = 0
-                l2 = [x for x in cursor]
+                l2 = list(cursor)
+                if top is None:
+                    top = len(l2)
                 while len(liste)<top and i<len(l2):
                     if l2[i]['userID'] in ids:
                         liste.append(l2[i])
@@ -978,11 +982,12 @@ class XPCog(commands.Cog):
             rr_list = await self.rr_list_role(ctx.guild.id)
             used_system = await self.bot.cogs['ServerCog'].find_staff(ctx.guild.id,'xp_type')
             used_system = 0 if used_system==None else used_system
-            xps = [{'user':x['userID'],'xp':x['xp'],'level':(await self.calc_level(x['xp'],used_system))[0]} for x in await self.bdd_get_top(ctx.guild.member_count, ctx.guild if used_system>0 else None)]
+            xps = [{'user':x['userID'],'xp':x['xp']} for x in await self.bdd_get_top(top=None, guild=ctx.guild if used_system>0 else None)]
             for member in xps:
                 m = ctx.guild.get_member(member['user'])
-                if m!=None:
-                    c += await self.give_rr(m,member['level'],rr_list,remove=True)
+                if m is not None:
+                    level = (await self.calc_level(member['xp'], used_system))[0]
+                    c += await self.give_rr(m, level, rr_list, remove=True)
             await ctx.send(str(await self.translate(ctx.guild.id,'xp','rr-reload')).format(c,ctx.guild.member_count))
         except Exception as e:
             await self.bot.cogs['ErrorsCog'].on_cmd_error(ctx,e)
