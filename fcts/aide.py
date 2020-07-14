@@ -1,4 +1,4 @@
-import discord, re, inspect, json
+import discord, re, inspect, json, copy
 from discord.ext import commands
 
 class HelpCog(commands.Cog):
@@ -110,7 +110,7 @@ If the bot can't send the new command format, it will try to send the old one.""
                         # name = name.replace("@everyone","@"+u"\u200B"+"everyone").replace("@here","@"+u"\u200B"+"here")
                         ctx2 = copy.copy(ctx)
                         ctx2.message.content = name
-                        name = await commands.clean_content().convert(ctx2, name)
+                        name = await discord.ext.commands.clean_content().convert(ctx2, name)
                         await destination.send(str(await self.translate(ctx.channel,"aide","cmd-not-found")).format(name))
                         return
                     pages = await self.cmd_help(ctx, command, destination.permissions_for(me).embed_links)
