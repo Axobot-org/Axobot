@@ -578,6 +578,9 @@ You can specify a verification limit by adding a number in argument (up to 1.000
         if len(arguments)==0:
             raise commands.errors.MissingRequiredArgument(ctx.command.clean_params['arguments'])
         destination = ctx.channel if channel==None else channel
+        if not (destination.permissions_for(ctx.author).read_messages and destination.permissions_for(ctx.author).send_messages):
+            await ctx.send(await self.translate(ctx.guild,'fun','say-no-perm',channel=destination.mention))
+            return
         if not destination.permissions_for(ctx.guild.me).send_messages:
             return await ctx.send(await self.translate(ctx.channel,"fun","embed-invalid-channel"))
         if not destination.permissions_for(ctx.guild.me).embed_links:
