@@ -264,6 +264,8 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
         # Joined at
         embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","member-2"), value = "{} ({} {})".format(await self.timecog.date(item.joined_at,lang=lang,year=True),since,await self.timecog.time_delta(item.joined_at,datetime.datetime.now(),lang=lang,year=True,precision=0,hour=False)), inline=False)
         # Join position
+        if sum([1 for x in ctx.guild.members if not x.joined_at]) > 0 and ctx.guild.large:
+            await self.bot.request_offline_members(ctx.guild)
         position = str(sorted(ctx.guild.members, key=lambda m: m.joined_at).index(item) + 1) + "/" + str(len(ctx.guild.members))
         embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","member-3"), value = position,inline=True)
         # Status
