@@ -359,7 +359,8 @@
             "Explication des selfbots",
             "CGU pour les développeurs de bot",
             "Comment trouver un ID",
-            "Âge minimal d'utilisation de Discord par pays"
+            "Âge minimal d'utilisation de Discord par pays",
+            "Utilisation prohibée de BetterDiscord"
         ],
         "docs": "Voici le lien vers la documentation du bot :",
         "prefix": "Liste des préfixes actuellement utilisables :",
