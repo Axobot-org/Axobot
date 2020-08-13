@@ -347,7 +347,7 @@ You can specify a verification limit by adding a number in argument (up to 1.000
         You can specify a channel where the bot must send this message. If channel is None, the current channel will be used"""
         if channel==None:
             channel = ctx.channel
-        elif not (channel.permissions_for(ctx.author).read_messages and channel.permissions_for(ctx.author).send_messages):
+        elif not (channel.permissions_for(ctx.author).read_messages and channel.permissions_for(ctx.author).send_messages and channel.guild == ctx.guild):
             await ctx.send(await self.translate(ctx.guild,'fun','say-no-perm',channel=channel.mention))
             return
         await self.say_function(ctx,channel,text)
@@ -385,11 +385,10 @@ You can specify a verification limit by adding a number in argument (up to 1.000
     @commands.check(can_say)
     async def react(self,ctx,message:discord.Message,*,reactions):
         """Add reaction(s) to a message. Server emojis also work."""
-        #try:
-        #    msg = await ctx.channel.fetch_message(ID)
-        #except discord.errors.HTTPException as e:
-        #    await ctx.send(await self.translate(ctx.channel,"fun",'react-0'))
-        #    return
+        channel = message.channel
+        if not (channel.permissions_for(ctx.author).read_messages and channel.permissions_for(ctx.author).add_reactions and (channel.guild==None or channel.guild==ctx.guild)):
+            await ctx.send(await self.translate(ctx.channel,'fun','say-no-perm',channel=channel.mention))
+            return
         for r in reactions.split():
             try:
                 e = await commands.EmojiConverter().convert(ctx,r)
