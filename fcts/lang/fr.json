@@ -766,7 +766,8 @@
             "speak": "Parler",
             "stream": "Passer en direct",
             "use_voice_activation": "Utiliser la Détection de la voix",
-            "view_audit_log": "Voir les logs du serveur"
+            "view_audit_log": "Voir les logs du serveur",
+            "view_guild_insights": "Voir les analyses de serveur"
         }
     },
     "roles_react": {
