@@ -954,6 +954,7 @@
             "ANIMATED_ICON": "Animated server icon",
             "BANNER": "Custom server banner",
             "COMMERCE": "Commerce features",
+            "COMMUNITY": "Community server",
             "DISCOVERABLE": "Displayed in the Discovery tab",
             "FEATURABLE": "Displayed in the Activity tab",
             "INVITE_SPLASH": "Invite custom screen",
