@@ -42,8 +42,15 @@ class HelpCog(commands.Cog):
         """Information about the bot
 
 ..Doc infos.html#about"""
-        msg = await self.bot.cogs['LangCog'].tr(ctx.guild,'infos','text-0')
-        await ctx.send(msg.format(ctx.guild.me.mention if ctx.guild!=None else ctx.bot.user.mention))
+        urls = ""
+        tr = self.bot.get_cog("LangCog").tr
+        for e, url in enumerate(['http://discord.gg/N55zY88', 'https://zrunner.me/invitezbot', 'https://zbot.rtfd.io/', 'https://twitter.com/z_runnerr', 'https://zrunner.me/zbot-faq', 'https://zrunner.me/zbot-privacy.pdf']):
+            urls += "\n:arrow_forward: " + await tr(ctx.channel, 'infos', f'about-{e}') + " <" + url + ">"
+        msg = await tr(ctx.channel,'infos','about-main', mention=ctx.bot.user.mention, links=urls)
+        if ctx.guild==None or ctx.channel.permissions_for(ctx.guild.me).embed_links:
+            await ctx.send(embed=self.bot.get_cog("EmbedCog").Embed(desc=msg, color=16298524))
+        else:
+            await ctx.send(msg)
 
     
 
