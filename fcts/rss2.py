@@ -1013,7 +1013,6 @@ class RssCog(commands.Cog):
                 return await self.translate(channel,"rss","nothing")
             raise e
         if not date:
-        # if False:
             # lastpost = self.twitterAPI.GetUserTimeline(screen_name=nom,exclude_replies=True,trim_user=True)
             if len(posts) == 0:
                 return []
@@ -1022,15 +1021,7 @@ class RssCog(commands.Cog):
             if lastpost.retweeted:
                 rt = "retweet"
             text =  getattr(lastpost, 'full_text', lastpost.text)
-            r = re.search(r"https://t.co/([^\s]+)", text)
-            if r != None:
-                text = text.replace(r.group(0),'')
-                url = r.group(0)
-            else:
-                if lastpost.urls == []:
-                    url = "https://twitter.com/{}/status/{}".format(nom.lower(), lastpost.id)
-                else:
-                    url = lastpost.urls[0].url
+            url = "https://twitter.com/{}/status/{}".format(nom.lower(), lastpost.id)
             img = None
             if lastpost.media: # if exists and is not empty
                 img = lastpost.media[0].media_url_https
