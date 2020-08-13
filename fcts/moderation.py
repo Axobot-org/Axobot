@@ -919,7 +919,7 @@ ID corresponds to the Identifier of the message"""
         try:
             await message.pin()
         except Exception as e:
-            await ctx.send(str(await self.translate(ctx.channel,"modo","pin-error-2")).format(e))
+            await ctx.send(str(await self.translate(ctx.channel,"modo","pin-error-3")).format(e))
             return
     
     @commands.command(name='unhoist')
