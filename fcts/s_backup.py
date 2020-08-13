@@ -104,8 +104,8 @@ Arguments are:
 
 ..Doc server.html#server-backup"""
         try:
-            directory = await self.create_backup(ctx)
-            await ctx.send(await self.translate(ctx.guild.id,'modo','backup-done'),file=discord.File(directory))
+            data = await self.create_backup(ctx)
+            await ctx.send(await self.translate(ctx.guild.id,'modo','backup-done'),file=discord.File(BytesIO(data.encode()), filename=f"backup-{ctx.guild.id}.json"))
         except Exception as e:
             await ctx.bot.cogs['ErrorsCog'].on_cmd_error(ctx,e)
 
@@ -212,13 +212,13 @@ Arguments are:
                 'nickname': memb.nick,
                 'bot': memb.bot,
                 'roles': [x.id for x in memb.roles][1:] })
-        js = json.dumps(back, sort_keys=True, indent=4)
-        directory = 'backup/{}.json'.format(g.id)
-        if not os.path.exists('backup/'):
-            os.makedirs('backup/')
-        with open(directory,'w',encoding='utf-8') as file:
-            file.write(js)
-            return directory
+        return json.dumps(back, sort_keys=True, indent=4)
+        # directory = 'backup/{}.json'.format(g.id)
+        # if not os.path.exists('backup/'):
+        #     os.makedirs('backup/')
+        # with open(directory,'w',encoding='utf-8') as file:
+        #     file.write(js)
+        #     return directory
 
     # ----------
 
