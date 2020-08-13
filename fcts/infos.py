@@ -928,10 +928,13 @@ Servers:
             if str(u.status) != "offline":
                 c_co+=1
         h = total - bots
+        h_p = "< 1" if 0 < h/total < 0.01 else ("> 99" if 1 > h/total > 0.99 else round(h*100/total))
+        b_p = "< 1" if 0 < bots/total < 0.01 else ("> 99" if 1 > bots/total > 0.99 else round(bots*100/total))
+        c_p = "< 1" if 0 < c_co/total < 0.01 else ("> 99" if 1 > c_co/total > 0.99 else round(c_co*100/total))
         l = [(await self.translate(ctx.guild.id,"infos_2","membercount-0"),str(total)),
-        (await self.translate(ctx.guild.id,"infos_2","membercount-2"),"{} ({}%)".format(h,int(round(h*100/total,0)))),
-        (await self.translate(ctx.guild.id,"infos_2","membercount-1"),"{} ({}%)".format(bots,int(round(bots*100/total,0)))),
-        (await self.translate(ctx.guild.id,"infos_2","membercount-3"),"{} ({}%)".format(c_co,int(round(c_co*100/total,0))))]
+        (await self.translate(ctx.guild.id,"infos_2","membercount-2"),"{} ({}%)".format(h, h_p)),
+        (await self.translate(ctx.guild.id,"infos_2","membercount-1"),"{} ({}%)".format(bots,b_p)),
+        (await self.translate(ctx.guild.id,"infos_2","membercount-3"),"{} ({}%)".format(c_co,c_p))]
         if ctx.channel.permissions_for(ctx.guild.me).embed_links:
             embed = discord.Embed(colour=ctx.guild.me.color)
             for i in l:
