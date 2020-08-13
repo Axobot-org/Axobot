@@ -63,7 +63,7 @@ def setup_logger():
     return log
 
 
-class zbot(commands.bot.BotBase,discord.Client):
+class zbot(commands.bot.AutoShardedBot):
 
     def __init__(self,command_prefix=None,case_insensitive=None,status=None,database_online=True,beta=False,dbl_token=""):
         super().__init__(command_prefix=command_prefix,case_insensitive=case_insensitive,status=status)
