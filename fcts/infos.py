@@ -612,7 +612,7 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
         if invite.guild.banner_url != None:
             embed.set_image(url=invite.guild.banner_url)
         # Guild description
-        if invite.guild.description != None:
+        if invite.guild.description != None and len(invite.guild.description) > 0:
             embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","inv-8"), value=invite.guild.description)
         # Guild features
         if len(invite.guild.features)>0:
