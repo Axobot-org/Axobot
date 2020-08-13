@@ -980,6 +980,9 @@ class XPCog(commands.Cog):
                 return await ctx.send(await self.translate(ctx.guild.id,'modo','cant-mute'))
             c = 0
             rr_list = await self.rr_list_role(ctx.guild.id)
+            if len(rr_list) == 0:
+                await ctx.send(await self.translate(ctx.guild, "xp", "no-rr-2"))
+                return
             used_system = await self.bot.cogs['ServerCog'].find_staff(ctx.guild.id,'xp_type')
             used_system = 0 if used_system==None else used_system
             xps = [{'user':x['userID'],'xp':x['xp']} for x in await self.bdd_get_top(top=None, guild=ctx.guild if used_system>0 else None)]

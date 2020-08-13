@@ -1138,6 +1138,7 @@
         "negative-xp": "You can't put a negative xp number!",
         "no-bot": "Impossible to modify the XP of a bot!",
         "no-rr": "No role has been configured for this level",
+        "no-rr-2": "You didn't set any role reward yet!",
         "rr-added": "The role `{}` has been correctly added for level {}!",
         "rr-reload": "{} updated roles / {} scanned members",
         "rr-removed": "No role will be given for level {} anymore",

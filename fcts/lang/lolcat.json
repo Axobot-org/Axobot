@@ -1149,6 +1149,7 @@
         "negative-xp": "Plz dont be such negativ, positiv is lif bro",
         "no-bot": "Impossible 2 modify the XP ov a robot!",
         "no-rr": "None role is configured for this level",
+        "no-rr-2": "U didn't set any role reward yet LOL!",
         "rr-added": "Role `{}` haz been added 4 level {} !",
         "rr-reload": "{} updated roles / {} members",
         "rr-removed": "None role will be givn anymore for level #{}",
