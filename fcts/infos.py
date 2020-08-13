@@ -16,6 +16,9 @@ from libs import bitly_api
 importlib.reload(bitly_api)
 
 
+async def in_support_server(ctx):
+    return ctx.guild != None and ctx.guild.id == 625316773771608074
+
 class InfoCog(commands.Cog):
     """Here you will find various useful commands to get information about ZBot."""
 
@@ -659,6 +662,7 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
 
     @commands.group(name="find")
     @commands.check(reloads.is_support_staff)
+    @commands.check(in_support_server)
     async def find_main(self,ctx):
         """Same as info, but in a lighter version"""
         if ctx.invoked_subcommand is None:
