@@ -13,7 +13,7 @@ textchan_options = ["welcome_channel","bot_news","poll_channels","modlogs_channe
 vocchan_options = ["membercounter"]
 text_options = ["welcome","leave","levelup_msg","description"]
 prefix_options = ['prefix']
-emoji_option = ['vote_emojis']
+emoji_option = ['vote_emojis', 'morpion_emojis']
 numb_options = []
 raid_options = ["anti_raid"]
 xp_type_options = ['xp_type']
@@ -69,6 +69,7 @@ class ServerCog(commands.Cog):
                "membercounter":"",
                "anti_raid":1,
                "vote_emojis":":thumbsup:;:thumbsdown:;",
+               "morpion_emojis":":red_circle:;:blue_circle:;",
                "help_in_dm":0,
                "muted_role":0,
                "partner_channel":'',
@@ -76,7 +77,7 @@ class ServerCog(commands.Cog):
                'partner_role':'',
                'update_mentions':'',
                'verification_role':''}
-        self.optionsList = ["prefix","language","description","clear","slowmode","mute","kick","ban","warn","say","welcome_channel","welcome","leave","welcome_roles","bot_news","update_mentions","poll_channels","partner_channel","partner_color","partner_role","modlogs_channel","verification_role","enable_xp","levelup_msg","levelup_channel","noxp_channels","xp_rate","xp_type","anti_caps_lock","enable_fun","membercounter","anti_raid","vote_emojis","help_in_dm","muted_role"]
+        self.optionsList = ["prefix","language","description","clear","slowmode","mute","kick","ban","warn","say","welcome_channel","welcome","leave","welcome_roles","bot_news","update_mentions","poll_channels","partner_channel","partner_color","partner_role","modlogs_channel","verification_role","enable_xp","levelup_msg","levelup_channel","noxp_channels","xp_rate","xp_type","anti_caps_lock","enable_fun","membercounter","anti_raid","vote_emojis","morpion_emojis","help_in_dm","muted_role"]
         self.membercounter_pending = {}
 
     @commands.Cog.listener()

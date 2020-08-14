@@ -913,6 +913,7 @@
         "levelup_msg": "Cool text sent when a member gets 1 xp lvl: {}",
         "membercounter": "Channel dis-playin nmberz from memberz in iz nayme: {}",
         "modlogs_channel": "Chanel where 2 sent modrashun wOods: {}",
+        "morpion_emojis": "Images usd 2 play tic-tac-toe: {}",
         "mute": "Lis of roles dat kan us the 'mute' commmand: {}",
         "muted_role": "Usd role 2 mute people : {}",
         "noxp_channels": "Chats where xp is for:b:idden: {}",

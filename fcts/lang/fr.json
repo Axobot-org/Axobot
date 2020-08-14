@@ -913,6 +913,7 @@
         "levelup_msg": "Message envoyé lorsqu'un membre gagne un niveau d'xp : {}",
         "membercounter": "Salon affichant dans son nom le nombre de membres : {}",
         "modlogs_channel": "Salon dans lequel sont envoyés les logs de modération : {}",
+        "morpion_emojis": "Emojis utilisé pour jouer au morpion : {}",
         "mute": "Liste des rôles qui peuvent utiliser la commande 'mute' : {}",
         "muted_role": "Rôle utilisé pour rendre les gens muets : {}",
         "noxp_channels": "Salons où il est impossible d'obtenir de l'xp : {}",

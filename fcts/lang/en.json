@@ -902,6 +902,7 @@
         "levelup_msg": "Message sent when a member earns an xp level: {}",
         "membercounter": "Channel displaying number of members in its name: {}",
         "modlogs_channel": "Channel where to send moderation logs: {}",
+        "morpion_emojis": "Emojis used to play tic-tac-toe: {}",
         "mute": "List of roles that can use the \"mute\" command: {}",
         "muted_role": "Used role to mute members: {}",
         "noxp_channels": "Channels where you can't get xp: {}",
