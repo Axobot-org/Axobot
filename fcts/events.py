@@ -19,6 +19,7 @@ class Events(commands.Cog):
         self.statslogs_last_push = datetime.datetime.utcfromtimestamp(0)
         self.last_statusio = datetime.datetime.utcfromtimestamp(0)
         self.loop_errors = [0,datetime.datetime.utcfromtimestamp(0)]
+        self.last_membercounter = datetime.datetime.utcfromtimestamp(0)
         self.latencies_list = list()
         self.embed_colors = {"welcome":5301186,
         "mute":4868682,
@@ -430,6 +431,10 @@ class Events(commands.Cog):
             # Send stats logs - every 2h (start from 0:05 am)
             elif int(d.hour)%2 == 0 and int(d.minute)%5 == 0 and (d.day != self.statslogs_last_push.day or d.hour != self.statslogs_last_push.hour):
                 await self.send_sql_statslogs()
+            # Refresh needed membercounter channels - every 1min
+            elif abs((self.last_membercounter - d).total_seconds()) > 60:
+                await self.bot.get_cog('ServerCog').update_everyMembercounter()
+                self.last_membercounter = d
         except Exception as e:
             await self.bot.cogs['ErrorsCog'].on_error(e,None)
             self.loop_errors[0] += 1

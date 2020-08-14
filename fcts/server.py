@@ -77,6 +77,7 @@ class ServerCog(commands.Cog):
                'update_mentions':'',
                'verification_role':''}
         self.optionsList = ["prefix","language","description","clear","slowmode","mute","kick","ban","warn","say","welcome_channel","welcome","leave","welcome_roles","bot_news","update_mentions","poll_channels","partner_channel","partner_color","partner_role","modlogs_channel","verification_role","enable_xp","levelup_msg","levelup_channel","noxp_channels","xp_rate","xp_type","anti_caps_lock","enable_fun","membercounter","anti_raid","vote_emojis","help_in_dm","muted_role"]
+        self.membercounter_pending = {}
 
     @commands.Cog.listener()
     async def on_ready(self):
@@ -962,20 +963,39 @@ class ServerCog(commands.Cog):
 
 
 
-    async def update_memberChannel(self,guild):
+    async def update_memberChannel(self, guild):
+        # If we already did an update recently: abort
+        if guild.id in self.membercounter_pending.keys():
+            if self.membercounter_pending[guild.id] > time.time():
+                return False
         ch = await self.find_staff(guild.id,"membercounter")
-        if ch not in ['',None]:
+        if ch not in ['', None]:
             ch = guild.get_channel(int(ch))
-            if ch==None:
+            if ch == None:
                 return
             lang = await self.translate(guild.id,"current_lang","current")
             text = "{}{}: {}".format(str(await self.translate(guild.id,"keywords","membres")).capitalize() , " " if lang=='fr' else "" , len(guild.members))
+            if ch.name == text:
+                return
             try:
                 await ch.edit(name=text,reason=await self.translate(guild.id,"logs","d-memberchan"))
+                self.membercounter_pending[guild.id] = round(time.time()) + 5*60 # cooldown 5min
                 return True
             except Exception as e:
                 self.bot.log.debug("[UpdateMemberChannel] "+str(e))
         return False
+    
+    async def update_everyMembercounter(self):
+        if not self.bot.database_online:
+            return
+        i = 0
+        for x in self.bot.guilds:
+            if x.id in self.membercounter_pending.keys() and await self.update_memberChannel(x):
+                i += 1
+                del self.membercounter_pending[x.id]
+        if i > 0:
+            emb = self.bot.get_cog("EmbedCog").Embed(desc=f"[MEMBERCOUNTER] {i} channels refreshed", color=5011628).update_timestamp().set_author(self.bot.user)
+            await self.bot.cogs["EmbedCog"].send([emb], url="loop")
 
     
     
