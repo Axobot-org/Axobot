@@ -31,7 +31,6 @@ class FunCog(commands.Cog):
         self.fun_opt = dict()
         self.file = "fun"
         self.tz = tzwhere.tzwhere(forceTZ=True)
-        self.last_roll = None
         self.afk_guys = dict()
         self.nasa_pict:dict = None
         try:
@@ -94,13 +93,11 @@ class FunCog(commands.Cog):
     @commands.check(is_fun_enabled)
     async def roll(self,ctx,*,options):
         """Selects an option at random from a given list
-        The options must be separated by a semicolon `;`"""
-        liste = list(set([x for x in [x.strip() for x in options.split(';')] if len(x)>0]))
+        The options must be separated by a comma `,`"""
+        liste = list(set([x for x in [x.strip() for x in options.split(',')] if len(x)>0]))
         if len(liste) < 2:
             return await ctx.send(await self.translate(ctx.channel,"fun","no-roll"))
-        choosen = None
-        while choosen==self.last_roll:
-            choosen = random.choice(liste).replace('@everyone','@​everyone').replace('@here','@​here')
+        choosen = random.choice(liste).replace('@everyone','@​everyone').replace('@here','@​here')
         await ctx.send(choosen)
 
     @commands.command(name="cookie",aliases=['cookies'],hidden=True)

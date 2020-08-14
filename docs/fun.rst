@@ -239,9 +239,9 @@ Roll
 
 **Syntax:** :code:`roll <options>`
 
-If you can't agree with your friends, or if you want to leave the decision of a difficult choice to chance, this command will surely delight you. It allows you to select an option randomly from a list of options you provide, separated by semicolons (`;`). And you can put as many choices as you need! 
+If you can't agree with your friends, or if you want to leave the decision of a difficult choice to chance, this command will surely delight you. It allows you to select an option randomly from a list of options you provide, separated by commas (`,`). And you can put as many choices as you need! 
 
-Example: :code:`roll a little; a lot; passionately; madly; not at all!`
+Example: :code:`roll a little, a lot;, passionately, madly, not at all!`
 
 
 Run
