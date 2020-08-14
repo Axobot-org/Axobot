@@ -627,9 +627,9 @@ You can specify a verification limit by adding a number in argument (up to 1.000
             else:
                 await msg.add_reaction(emojilib.emojize(r, use_aliases=True))
                 count +=1
-            if count==0:
-                await msg.add_reaction('👍')
-                await msg.add_reaction('👎')
+        if count==0:
+            await msg.add_reaction('👍')
+            await msg.add_reaction('👎')
 
     @commands.command(name="markdown")
     async def markdown(self,ctx):
