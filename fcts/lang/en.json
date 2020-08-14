@@ -594,6 +594,8 @@
         "mute-1": "The member {} has been silenced for the reason `{}`!",
         "mute-created": "Successfully created `muted` role!",
         "mute-high": "Oops, it seems that the `muted` role is too high for me to give it... Please fix this problem by placing my role higher than the `muted` role.",
+        "mute-notemp": "You have been muted in the server {server} for the reason {reason}",
+        "mute-temp": "You have been muted in the server {server} for the reason {reason}, for a duration of {duration}",
         "need-manage-messages": "Permission \"Manage Messages\" missing :confused:",
         "need-read-history": "Oops, I'm missing the permission to \"Read Message History\" :confused: ",
         "no-bans": "No member seems to be banned from here",

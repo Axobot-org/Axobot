@@ -605,6 +605,8 @@
         "mute-1": "Teh mmber {} haz been silencd for the reezon `{}`!",
         "mute-created": "Successsfully added da `muted` role!",
         "mute-high": "Ooops, 't sEEms dat `muted` rol iz tooo high 4 me to give it... Plz fiX dis problem by plac'ng my role higher than this nice `muted` role.",
+        "mute-notemp": "U've been silenced in teh {server}, cuz of {reason}",
+        "mute-temp": "U can't even speak in dat {server}, cuz of {reason}, 4 long of {duration}",
         "need-manage-messages": "Permishun \"Manage Messages\" missing :confused:",
         "need-read-history": "Oooops, I'm missing the perm 2 \"Read Message History\" :confused: ",
         "no-bans": "No mmber seems to be bannd from here",
