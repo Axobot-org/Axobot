@@ -220,8 +220,8 @@
         "msgnotfound": "Unable to find any message with ID {msg}",
         "rolenotfound": "Unable to find the role `{r}`",
         "toomanytxtchan": "You have too many accessible text channels",
-        "usernotfound": "Unable to find the user `{u}` :confused:",
-        "unknown": "Oops, an error occurred :confused: Try again later, or contact support (command `about`)."
+        "unknown": "Oops, an error occurred :confused: Try again later, or contact support (command `about`).",
+        "usernotfound": "Unable to find the user `{u}` :confused:"
     },
     "events": {
         "mp-adv": "You are probably trying to invite me to this server? If that is the case, I can't join him with a simple invitation. An administrator must use my own invitation link, here: <https://zrunner.me/invitezbot> :wink:"
@@ -334,6 +334,13 @@
         "vote-0": "You can't put more than 20 choices, and even less a negative number of choices!"
     },
     "infos": {
+        "about-0": "My Discord server:",
+        "about-1": "A link to invite me to another server:",
+        "about-2": "The bot documentation:",
+        "about-3": "My creator's Twitter account:",
+        "about-4": "A short FAQ:",
+        "about-5": "The Privacy Policy:",
+        "about-main": "Hello! I'm {mention}!\nI'm a bot that allows you to do a lot of things: moderation, xp system, statistics, partners managment and many other super useful commands (and totally pointless ones)!\nYou can start by typing `!help` in this chat to see the list of available commands, then `!config see` will let you see the configuration options.\n\nMy owner and I would like to thank Awhikax for his support during the various crises, Aragorn1202 for all his ideas and sentences full of good sense, Adri526 for all these beautiful logos, emojis and profile pics, and the whole translators team for their long work!\n\n:globe_with_meridians: Some links may be useful: {links}\n\nHave a nice day!",
         "admins-list": "The administrators of this bot are : {}",
         "bitly_long": "Original URL: {url}",
         "bitly_nobit": "This address is not a bit.ly link!",
@@ -356,13 +363,6 @@
         "prefix": "List of currently usable prefixes:",
         "stats": "**Bot version:** {bot_v} \n**Number of servers:** {s_count} \n**Number of visible members:** {m_count} ({b_count} **bots**)\n**Number of code lines:** {l_count}\n**Used languages:** {lang}\n**Python version :** {p_v} \n**Version of the `discord.py` lib:** {d_v} \n**RAM usage:** {ram} GB \n**CPU usage:** {cpu} % \n**API latency time:** {api} ms\n**Total of earned xp:** {xp}",
         "stats-title": "**Bot statistics**",
-        "about-text": "Hello! I'm {mention}!\nI'm a bot that allows you to do a lot of things: moderation, xp system, statistics, partners managment and many other super useful commands (and totally pointless ones)!\nYou can start by typing `!help` in this chat to see the list of available commands, then `!config see` will let you see the configuration options.\n\nMy owner and I would like to thank Awhikax for his support during the various crises, Aragorn1202 for all his ideas and sentences full of good sense, Adri526 for all these beautiful logos, emojis and profile pics, and the whole translators team for their long work!\n\n:globe_with_meridians: Some links may be useful: {links}\n\nHave a nice day!",
-        "about-0": "My Discord server:",
-        "about-1": "A link to invite me to another server:",
-        "about-2": "The bot documentation:",
-        "about-3": "My creator's Twitter account:",
-        "about-4": "A short FAQ:",
-        "about-5": "The Privacy Policy:",
         "usernames-allow": "You can reauthorize the automatic recording with the command 'profile'",
         "usernames-disallow": "You can opt out of the automatic recording with the command 'profile'",
         "usernames-empty": "No change recorded",

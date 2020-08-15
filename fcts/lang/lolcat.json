@@ -231,8 +231,8 @@
         "msgnotfound": "NoAble 2 find any msg with ID {msg}",
         "rolenotfound": "Unable 2 find ur role (`{r}`)",
         "toomanytxtchan": "U have toooo many visibl text channels lmao. Why so much? useless/20. U should seriously think 'bout it dude. Pro-tip :smirk:",
-        "usernotfound": "Unabled 2 find teh userZ `{u}` :confused:",
-        "unknown": "Ups, somthin' wen't horribly wrong :fearful: pls contact zbot authorities immdiatly"
+        "unknown": "Ups, somthin' wen't horribly wrong :fearful: pls contact zbot authorities immdiatly",
+        "usernotfound": "Unabled 2 find teh userZ `{u}` :confused:"
     },
     "events": {
         "mp-adv": "U're probably trying 2 invite me in dis server? If that's the case, I can't join him with a simple invite. An super-admin must use my own link, just here: <https://zrunner.me/invitezbot> :innocent:"
@@ -345,6 +345,13 @@
         "vote-0": "U can't put moar than 20 choicez, an' even lesss negativ numbr of choicesz!"
     },
     "infos": {
+        "about-0": "Me Discord servr plz:",
+        "about-1": "link to iNVite me to anothr servr:",
+        "about-2": "The :b:ot documentashun:",
+        "about-3": "My creator's Blue Bird 'ccount:",
+        "about-4": "A cute faq:",
+        "about-5": "The YourSecretData Policy:",
+        "about-main": "Ho hi hello! I'm {mention} !\n\nIm a boat that alow you 2 do a loooooot of tings: modration, a' xp systèm, partnre managmnt, stATIstics & many oder super mega *wow* usefull commandz (and totlly pointlesz wanes)! \nU can strt by tipyng `!help` in dis tchat to se the llst for availabl kommands, then `!config see` wil LEtz you see teh configurashun optionz (a website ar in prePARtion)? \n\nOf helpin me in the creetion of the boat, my ownr an I wouLd like to tahnk Awhikax 4 hiz suport durin the variouz cryzes, Aragorn1202 of al hees idees and sentencez full for goob sence, Adri526 fr all dese beautifool loGoz, èmojiz nd profil picts, and the whole translators tim 4 they woark!\n\n:globe_with_meridians: Sum linqs can bee usefull:{links}\n\nHas a nice dayz !",
         "admins-list": "My super-cool admins are : {}",
         "bitly_long": "Slow link: {url}",
         "bitly_nobit": "HAHA NOPE, dat's not a bit.ly link!",
@@ -367,13 +374,6 @@
         "prefix": "List ov usable prefiXs:",
         "stats": "**Baut vershun:** {bot_v} \n**Nbr ov serverz:** {s_count} \n**Nbr ov visible memberz:** {m_count} ({b_count} **robots**)\n**Nbr ov code lin:** {l_count}\n**Uzd languages:** {lang}\n**Python vershun :** {p_v} \n**Vershun ov teh `discord.py` lyb:** {d_v} \n**Loadin on teh RAM:** {ram} GB \n**Loadin on the CPU:** {cpu} % \n**API latency timz:** {api} ms\n**Nbr of xp won:** {xp}",
         "stats-title": "**Boat statz**",
-        "about-text": "Ho hi hello! I'm {mention} !\n\nIm a boat that alow you 2 do a loooooot of tings: modration, a' xp systèm, partnre managmnt, stATIstics & many oder super mega *wow* usefull commandz (and totlly pointlesz wanes)! \nU can strt by tipyng `!help` in dis tchat to se the llst for availabl kommands, then `!config see` wil LEtz you see teh configurashun optionz (a website ar in prePARtion)? \n\nOf helpin me in the creetion of the boat, my ownr an I wouLd like to tahnk Awhikax 4 hiz suport durin the variouz cryzes, Aragorn1202 of al hees idees and sentencez full for goob sence, Adri526 fr all dese beautifool loGoz, èmojiz nd profil picts, and the whole translators tim 4 they woark!\n\n:globe_with_meridians: Sum linqs can bee usefull:{links}\n\nHas a nice dayz !",
-        "about-0": "Me Discord servr plz:",
-        "about-1": "link to iNVite me to anothr servr:",
-        "about-2": "The :b:ot documentashun:",
-        "about-3": "My creator's Blue Bird 'ccount:",
-        "about-4": "A cute faq:",
-        "about-5": "The YourSecretData Policy:",
         "usernames-allow": "U can anti-optout teh auto logs with da cmd 'profile'",
         "usernames-disallow": "U can optout the auto logging with cmd 'profile' (beeew bad guy)",
         "usernames-empty": ":N:o change savd",
