@@ -220,7 +220,8 @@
         "msgnotfound": "Unable to find any message with ID {msg}",
         "rolenotfound": "Unable to find the role `{r}`",
         "toomanytxtchan": "You have too many accessible text channels",
-        "usernotfound": "Unable to find the user `{u}` :confused:"
+        "usernotfound": "Unable to find the user `{u}` :confused:",
+        "unknown": "Oops, an error occurred :confused: Try again later, or contact support (command `about`)."
     },
     "events": {
         "mp-adv": "You are probably trying to invite me to this server? If that is the case, I can't join him with a simple invitation. An administrator must use my own invitation link, here: <https://zrunner.me/invitezbot> :wink:"

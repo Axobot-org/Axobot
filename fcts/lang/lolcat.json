@@ -231,7 +231,8 @@
         "msgnotfound": "NoAble 2 find any msg with ID {msg}",
         "rolenotfound": "Unable 2 find ur role (`{r}`)",
         "toomanytxtchan": "U have toooo many visibl text channels lmao. Why so much? useless/20. U should seriously think 'bout it dude. Pro-tip :smirk:",
-        "usernotfound": "Unabled 2 find teh userZ `{u}` :confused:"
+        "usernotfound": "Unabled 2 find teh userZ `{u}` :confused:",
+        "unknown": "Ups, somthin' wen't horribly wrong :fearful: pls contact zbot authorities immdiatly"
     },
     "events": {
         "mp-adv": "U're probably trying 2 invite me in dis server? If that's the case, I can't join him with a simple invite. An super-admin must use my own link, just here: <https://zrunner.me/invitezbot> :innocent:"

@@ -231,7 +231,8 @@
         "msgnotfound": "Message introuvable",
         "rolenotfound": "Impossible de trouver le rôle `{r}`",
         "toomanytxtchan": "Vous avez trop de salons textuels accessibles",
-        "usernotfound": "Impossible de trouver l'utilisateur `{u}` :confused:"
+        "usernotfound": "Impossible de trouver l'utilisateur `{u}` :confused:",
+        "unknown": "Oups, une erreur est survenue :confused: Réessayez plus tard, ou contactez le support (commande `about`)."
     },
     "events": {
         "mp-adv": "Vous cherchez sans doute à m'inviter sur ce serveur ? Si c'est le cas, je ne peux pas le rejoindre avec une simple invitation. Il faut qu'un administrateur utilise mon propre lien d'invitation, ici : <https://zrunner.me/invitezbot> :wink:"
