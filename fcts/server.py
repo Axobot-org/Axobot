@@ -501,7 +501,7 @@ class ServerCog(commands.Cog):
         guild = await self.get_guild(ctx)
         if value == "scret-desc":
             emojis = await self.find_staff(guild.id,option)
-            return ", ".join(await self.form_emoji(emojis))
+            return ", ".join(await self.form_emoji(emojis, option))
         else:
             emojis = value.split(",")
             liste = list()
@@ -529,12 +529,15 @@ class ServerCog(commands.Cog):
             await ctx.send(msg.format(option,", ".join(liste2)))
             await self.send_embed(ctx.guild,option,value)
 
-    async def form_emoji(self,emojis):
+    async def form_emoji(self, emojis, option):
         if len(emojis) == 0:
-            return [":thumbsup:", ":thumbsdown:"]
+            # return [":thumbsup:", ":thumbsdown:"]
+            emojis = self.default_opt[option]
         emojis = emojis.split(";")
         l_em = list()
         for r in emojis:
+            if len(r) == 0:
+                continue
             if r.isnumeric():
                 d_em = discord.utils.get(self.bot.emojis, id=int(r))
                 if d_em == None:
@@ -880,7 +883,7 @@ class ServerCog(commands.Cog):
                 elif i in raid_options:
                     r = await self.form_raid(v)
                 elif i in emoji_option:
-                    r = ", ".join(await self.form_emoji(v))
+                    r = ", ".join(await self.form_emoji(v, i))
                 elif i in xp_type_options:
                     r = await self.form_xp_type(v)
                 elif i in color_options:
