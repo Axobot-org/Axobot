@@ -669,7 +669,7 @@ You can specify a verification limit by adding a number in argument (up to 1.000
         if ctx.guild and not ctx.channel.permissions_for(ctx.guild.me).embed_links:
             await ctx.send(await self.translate(ctx.channel, "fun", "no-embed-perm"))
             return
-        if self.nasa_pict == None or (datetime.datetime.utcnow-get_date(self.nasa_pict["date"])).total_seconds() > 86400:
+        if self.nasa_pict == None or (datetime.datetime.utcnow()-get_date(self.nasa_pict["date"])).total_seconds() > 86400:
             async with aiohttp.ClientSession() as session:
                 key = self.bot.others["nasa"]
                 async with session.get(f"https://api.nasa.gov/planetary/apod?api_key={key}") as r:
