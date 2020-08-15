@@ -868,6 +868,8 @@ class XPCog(commands.Cog):
             await ctx.send(await self.translate(ctx.guild.id,'mc','serv-error'))
             await self.bot.cogs['ErrorsCog'].on_error(e,ctx)
         else:
+            if ctx.guild.id not in self.cache.keys():
+                await self.bdd_load_cache(ctx.guild.id)
             self.cache[ctx.guild.id][user.id] = [round(time.time()), xp]
             s = "XP of user {} `{}` edited (from {} to {}) in server `{}`".format(user, user.id, prev_xp, xp, ctx.guild.id)
             self.bot.log.info(s)
