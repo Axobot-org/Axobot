@@ -288,7 +288,6 @@ class RssCog(commands.Cog):
         
         ..Doc rss.html#follow-a-feed"""
         if await self.is_overflow(ctx.guild):
-            flow_limit = await self.bot.cogs['ServerCog'].find_staff(ctx.guild.id,'rss_max_number')
             await ctx.send(str(await self.translate(ctx.guild.id,"rss","flow-limit")).format(flow_limit))
             return
         identifiant = await self.parse_yt_url(link)
@@ -1010,11 +1009,12 @@ class RssCog(commands.Cog):
         try:
             posts = self.twitterAPI.GetUserTimeline(screen_name=nom,exclude_replies=True)
         except twitter.error.TwitterError as e:
-            if e.message == "Not authorized." or e.message[0]['code'] == 34:
+            if e.message == "Not authorized.":
+                return await self.translate(channel,"rss","nothing")
+            if e.message[0]['code'] == 34:
                 return await self.translate(channel,"rss","nothing")
             raise e
         if not date:
-        # if False:
             # lastpost = self.twitterAPI.GetUserTimeline(screen_name=nom,exclude_replies=True,trim_user=True)
             if len(posts) == 0:
                 return []
@@ -1023,15 +1023,7 @@ class RssCog(commands.Cog):
             if lastpost.retweeted:
                 rt = "retweet"
             text =  getattr(lastpost, 'full_text', lastpost.text)
-            r = re.search(r"https://t.co/([^\s]+)", text)
-            if r != None:
-                text = text.replace(r.group(0),'')
-                url = r.group(0)
-            else:
-                if lastpost.urls == []:
-                    url = "https://twitter.com/{}/status/{}".format(nom.lower(), lastpost.id)
-                else:
-                    url = lastpost.urls[0].url
+            url = "https://twitter.com/{}/status/{}".format(nom.lower(), lastpost.id)
             img = None
             if lastpost.media: # if exists and is not empty
                 img = lastpost.media[0].media_url_https

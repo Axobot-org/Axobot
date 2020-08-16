@@ -16,6 +16,9 @@ from libs import bitly_api
 importlib.reload(bitly_api)
 
 
+async def in_support_server(ctx):
+    return ctx.guild != None and ctx.guild.id == 625316773771608074
+
 class InfoCog(commands.Cog):
     """Here you will find various useful commands to get information about ZBot."""
 
@@ -139,6 +142,14 @@ class InfoCog(commands.Cog):
         else:
             url = "https://zrunner.me/invitezbot"
         await ctx.send(await self.translate(ctx.channel, "infos", "botinvite", url=url))
+    
+    @commands.command(name="pig", hidden=True)
+    async def pig(self, ctx):
+        """Get bot latency
+        You can also use this command to ping any other server"""
+        m = await ctx.send("Ping...")
+        t = (m.created_at - ctx.message.created_at).total_seconds()
+        await m.edit(content=":pig:  Pong !\nBot ping: {}ms\nDiscord ping: {}ms".format(round(t*1000),round(self.bot.latency*1000)))
 
     @commands.command(name="ping",aliases=['rep'])
     async def rep(self,ctx,ip=None):
@@ -262,7 +273,8 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
         # Created at
         embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","member-1"), value = "{} ({} {})".format(await self.timecog.date(item.created_at,lang=lang,year=True),since,await self.timecog.time_delta(item.created_at,datetime.datetime.now(),lang=lang,year=True,precision=0,hour=False)), inline=False)
         # Joined at
-        embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","member-2"), value = "{} ({} {})".format(await self.timecog.date(item.joined_at,lang=lang,year=True),since,await self.timecog.time_delta(item.joined_at,datetime.datetime.now(),lang=lang,year=True,precision=0,hour=False)), inline=False)
+        delta = abs(item.joined_at - datetime.datetime.now())
+        embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","member-2"), value = "{} ({} {})".format(await self.timecog.date(item.joined_at,lang=lang,year=True),since,await self.timecog.time_delta(item.joined_at,datetime.datetime.now(),lang=lang,year=True,precision=0,hour=delta.total_seconds() < 86400)), inline=False)
         # Join position
         if sum([1 for x in ctx.guild.members if not x.joined_at]) > 0 and ctx.guild.large:
             await self.bot.request_offline_members(ctx.guild)
@@ -612,7 +624,7 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
         if invite.guild.banner_url != None:
             embed.set_image(url=invite.guild.banner_url)
         # Guild description
-        if invite.guild.description != None:
+        if invite.guild.description != None and len(invite.guild.description) > 0:
             embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","inv-8"), value=invite.guild.description)
         # Guild features
         if len(invite.guild.features)>0:
@@ -659,6 +671,7 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
 
     @commands.group(name="find")
     @commands.check(reloads.is_support_staff)
+    @commands.check(in_support_server)
     async def find_main(self,ctx):
         """Same as info, but in a lighter version"""
         if ctx.invoked_subcommand is None:
@@ -915,13 +928,13 @@ Servers:
             if str(u.status) != "offline":
                 c_co+=1
         h = total - bots
+        h_p = "< 1" if 0 < h/total < 0.01 else ("> 99" if 1 > h/total > 0.99 else round(h*100/total))
+        b_p = "< 1" if 0 < bots/total < 0.01 else ("> 99" if 1 > bots/total > 0.99 else round(bots*100/total))
+        c_p = "< 1" if 0 < c_co/total < 0.01 else ("> 99" if 1 > c_co/total > 0.99 else round(c_co*100/total))
         l = [(await self.translate(ctx.guild.id,"infos_2","membercount-0"),str(total)),
-        (await self.translate(ctx.guild.id,"infos_2","membercount-2"),"{} ({}%)".format(h,int(round(h*100/total,0)))),
-        (await self.translate(ctx.guild.id,"infos_2","membercount-1"),"{} ({}%)".format(bots,int(round(bots*100/total,0)))),
-        (await self.translate(ctx.guild.id,"infos_2","membercount-3"),"{} ({}%)".format(c_co,int(round(c_co*100/total,0))))]
-        if datetime.datetime.today().day==1:
-            self.bot.fishes += 1
-            l.append((await self.translate(ctx.guild.id,"infos_2","fish-1"),"{} {}".format(random.randrange(100),random.choice([':fish:',':tropical_fish:','']))))
+        (await self.translate(ctx.guild.id,"infos_2","membercount-2"),"{} ({}%)".format(h, h_p)),
+        (await self.translate(ctx.guild.id,"infos_2","membercount-1"),"{} ({}%)".format(bots,b_p)),
+        (await self.translate(ctx.guild.id,"infos_2","membercount-3"),"{} ({}%)".format(c_co,c_p))]
         if ctx.channel.permissions_for(ctx.guild.me).embed_links:
             embed = discord.Embed(colour=ctx.guild.me.color)
             for i in l:
@@ -960,7 +973,7 @@ Servers:
         can_embed = True if isinstance(ctx.channel,discord.DMChannel) else ctx.channel.permissions_for(ctx.guild.me).embed_links
         if can_embed:
             l = await self.translate(ctx.channel,'infos','discordlinks')
-            links = ["https://dis.gd/status","https://dis.gd/tos","https://dis.gd/report","https://dis.gd/feedback","https://support.discord.com/hc/en-us/articles/115002192352","https://discord.com/developers/docs/legal","https://support.discord.com/hc/en-us/articles/206346498-Where-can-I-find-my-User-Server-Message-ID-","https://support.discord.com/hc/en-us/articles/360040724612"]
+            links = ["https://dis.gd/status","https://dis.gd/tos","https://dis.gd/report","https://dis.gd/feedback","https://support.discord.com/hc/en-us/articles/115002192352","https://discord.com/developers/docs/legal","https://support.discord.com/hc/en-us/articles/206346498-Where-can-I-find-my-User-Server-Message-ID-","https://support.discord.com/hc/en-us/articles/360040724612", " https://twitter.com/discordapp/status/1060411427616444417"]
             txt = "\n".join(['['+l[i]+']('+links[i]+')' for i in range(len(l))])
             em = await self.bot.cogs["EmbedCog"].Embed(desc=txt).update_timestamp().create_footer(ctx)
             await ctx.send(embed=em)

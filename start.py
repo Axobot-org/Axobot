@@ -63,7 +63,7 @@ def setup_logger():
     return log
 
 
-class zbot(commands.bot.BotBase,discord.Client):
+class zbot(commands.bot.AutoShardedBot):
 
     def __init__(self,command_prefix=None,case_insensitive=None,status=None,database_online=True,beta=False,dbl_token=""):
         super().__init__(command_prefix=command_prefix,case_insensitive=case_insensitive,status=status)
@@ -232,6 +232,7 @@ def main():
         client.others['discordboats'] = cryptage.uncrypte(r[14])
         client.others['discordextremelist'] = cryptage.uncrypte(r[15])
         client.others['statuspage'] = cryptage.uncrypte(r[16])
+        client.others['nasa'] = cryptage.uncrypte(r[17])
     try:
         try:
             cnx = mysql.connector.connect(user=client.database_keys['user'],password=client.database_keys['password'],host="127.0.0.1",database=client.database_keys['database1'])

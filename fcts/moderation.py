@@ -361,6 +361,15 @@ You can also mute this member for a defined duration, then use the following for
                     caseID = case.id
                 except Exception as e:
                     await self.bot.cogs['ErrorsCog'].on_error(e,ctx)
+            if user.id not in self.bot.cogs['WelcomerCog'].no_message:
+                try:
+                    if f_duration == None:
+                        await user.send(await self.translate(ctx.guild.id,"modo","mute-notemp", server=ctx.guild.name, reason=reason))
+                    else:
+                        await user.send(await self.translate(ctx.guild.id,"modo","mute-temp", server=ctx.guild.name, reason=reason, duration=f_duration))
+                except Exception as e:
+                    await self.bot.cogs['ErrorsCog'].on_error(e,ctx)
+                    pass
             if f_duration==None:
                 await self.mute_event(user,ctx.author,reason,caseID)
                 await ctx.send(str(await self.translate(ctx.guild.id,"modo","mute-1")).format(user,reason))
@@ -919,7 +928,7 @@ ID corresponds to the Identifier of the message"""
         try:
             await message.pin()
         except Exception as e:
-            await ctx.send(str(await self.translate(ctx.channel,"modo","pin-error-2")).format(e))
+            await ctx.send(str(await self.translate(ctx.channel,"modo","pin-error-3")).format(e))
             return
     
     @commands.command(name='unhoist')

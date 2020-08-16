@@ -18,7 +18,7 @@ class TimersCog(commands.Cog):
     async def on_ready(self):
         self.translate = self.bot.cogs["LangCog"].tr
 
-    @commands.command(name="remindme")
+    @commands.command(name="remindme", aliases=['rmd'])
     @commands.cooldown(5,30,commands.BucketType.channel)
     @commands.cooldown(5,60,commands.BucketType.user)
     async def remindme(self, ctx: commands.Context, *, args):
@@ -30,7 +30,7 @@ class TimersCog(commands.Cog):
         await self.bot.invoke(new_ctx)
     
 
-    @commands.group(name="reminder", aliases=["remind", "reminds", "rmd"])
+    @commands.group(name="reminder", aliases=["remind", "reminds"])
     async def remind_main(self, ctx:commands.Context):
         """Ask the bot to remind you of something later
 

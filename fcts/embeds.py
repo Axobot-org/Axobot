@@ -118,7 +118,7 @@ class EmbedCog(commands.Cog):
             return emb
     
 
-    async def send(self,embeds,url=None,ctx=None):
+    async def send(self,embeds,url=None):
         if url is None:
             url = url_base + self.logs['beta'] if self.bot.beta else url_base + self.logs['classic']
         else:
