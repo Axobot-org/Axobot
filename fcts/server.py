@@ -994,7 +994,8 @@ class ServerCog(commands.Cog):
             return
         i = 0
         for x in self.bot.guilds:
-            if x.id in self.membercounter_pending.keys() and await self.update_memberChannel(x):
+            if x.id in self.membercounter_pending.keys() and self.membercounter_pending[x.id] > time.time():
+                await self.update_memberChannel(x)
                 i += 1
                 del self.membercounter_pending[x.id]
         if i > 0:
