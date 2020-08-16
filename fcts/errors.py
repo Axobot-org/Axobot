@@ -38,7 +38,7 @@ class ErrorsCog(commands.Cog):
 
         # Anything in ignored will return and prevent anything happening.
         if isinstance(error, ignored) and not isinstance(error,actually_not_ignored):
-            if self.bot.beta:
+            if self.bot.beta and ctx.guild:
                 c = str(type(error)).replace("<class '",'').replace("'>",'')
                 await ctx.send('`Ignored error:` [{}] {}'.format(c,error))
             return
