@@ -230,7 +230,7 @@ class PartnersCog(commands.Cog):
     @partner_main.command(name='add')
     @commands.check(checks.database_connected)
     async def partner_add(self,ctx,invite:args.Invite,*,description=''):
-        """Add a partner in your llist"""
+        """Add a partner in your list"""
         if isinstance(invite,int):
             try:
                 item = await self.bot.fetch_user(invite)
@@ -254,6 +254,9 @@ class PartnersCog(commands.Cog):
             description = await self.bot.cogs['EmojiCog'].anti_code(description)
         await self.bdd_set_partner(guildID=ctx.guild.id,partnerID=item.id,partnerType=Type,desc=description)
         await ctx.send(await self.translate(ctx.guild.id,'partners','added-partner'))
+        # logs
+        emb = self.bot.get_cog("EmbedCog").Embed(desc=f"New partner added: {Type} {item.id}", color=10949630, footer_text=ctx.guild.name).update_timestamp().set_author(self.bot.user)
+        await self.bot.cogs["EmbedCog"].send([emb])
     
     @partner_main.command(name='description',aliases=['desc'])
     @commands.check(checks.database_connected)
@@ -319,6 +322,8 @@ class PartnersCog(commands.Cog):
             return await ctx.send(await self.translate(ctx.guild.id,'partners','del-canceled'))
         if await self.bdd_del_partner(l['ID']):
             await ctx.send(await self.translate(ctx.guild.id,'partners','deleted'))
+            emb = self.bot.get_cog("EmbedCog").Embed(desc=f"Partner removed: {l['type']} {l['ID']}", color=10949630, footer_text=ctx.guild.name).update_timestamp().set_author(self.bot.user)
+            await self.bot.cogs["EmbedCog"].send([emb])
         else:
             await ctx.send(await self.translate(ctx.guild.id,'partners','unknown-error'))
         

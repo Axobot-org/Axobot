@@ -257,6 +257,7 @@
         "afk-no-perm": "Oops, je ne peux pas modifier ton pseudo :blobconfused: J'vais essayer de m'en souvenir quand même",
         "afk-user-1": "Hey ! Il est AFK, pour la raison {}.",
         "afk-user-2": "Il est AFK !",
+        "bbw-too-many": "Gneh !\nLa grille est trop grande pour Discord !",
         "blame-0": "Liste des noms disponibles pour le membre **{}**",
         "calc-0": "Le résultat prend trop de temps à charger :loading: :/...",
         "calc-1": "Les solutions du calcul `{}` sont `{}`.",
@@ -274,6 +275,7 @@
         "count-4": "Sur les {limit} derniers messages, {user} en a posté {x} ({p}%)",
         "count-5": "Tu peux pas utiliser cette commande dans un salon où t'as pas accès à l'historique des messages... ",
         "embed-error": "Une erreur est survenue: `{}`",
+        "embed-invalid-channel": "Ptdr je peux pas envoyer des messages dans ce salon",
         "embed-invalid-image": "L'url entrée en tant qu'image est invalide :/",
         "fun-list": "Voici la liste des commandes fun dispos :",
         "invalid-city": "Nom de ville invalide",
@@ -360,13 +362,13 @@
             "Proposer une idée à Discord",
             "Explication des selfbots",
             "CGU pour les développeurs de bot",
-            "Comment trouver ton ID ?"
+            "Comment trouver ton ID ?",
+            "Âge minimum pour utiliser Discord (par pays)"
         ],
         "docs": "Voici le lien vers la documentation du bot :",
         "prefix": "Liste des préfixes actuellement utilisables :",
         "stats": "**Version du bot :** {bot_v} \n**Nombre de serveurs :** {s_count} \n**Nombre de membres visibles :** {m_count} (dont {b_count} **bots**)\n**Nombre de lignes de code :** {l_count}\n**Langues utilisées :** {lang} \n**Version de Python :** {p_v} \n**Version de la bibliothèque `discord.py` :** {d_v} \n**Charge sur la mémoire vive :** {ram} GB \n**Charge sur le CPU :** {cpu} % \n**Temps de latence de l'api :** {api} ms\n**Nombre total d'xp gagné :** {xp}xp",
         "stats-title": "**Statistiques du bot**",
-        "text-0": "Bonjour ! Moi c'est {0} !\n\nJe suis un bot qui permet de faire *beaucoup* de choses : de la modération, des mini-jeux, un système d'xp, des statistiques et plein d'autres commandes plus ou moins utiles ! \nVous pouvez commencer par taper `!help` dans ce tchat pour voir la liste des commandes disponibles, puis `!config see` vous permettra de voir les options de configuration (un site web est ~~en préparation~~ à deux doigts d'être lancé !). \n\nPour m'avoir aidé dans la création du bot, mon propriétaire et moi souhaitons remercier Awhikax pour son soutien apporté lors des différentes crises, Aragorn1202 pour toutes ses idées et ses phrases pleines de bon sens, Adri526 pour tous ces magnifiques logos, émojis et images de profil, et Pilotnick54 pour relire et corriger mon anglais !\n\n:globe_with_meridians: Quelques liens pourront vous être utiles : \n:arrow_forward: Mon serveur Discord : http://discord.gg/N55zY88\n:arrow_forward: Un lien pour m'inviter dans un autre serveur : <https://zrunner.me/invitezbot>\n:arrow_forward: La documentation du bot : <https://zbot.rtfd.io/>\n:arrow_forward: Le compte Twitter de mon créateur : <https://twitter.com/z_runnerr>\n:arrow_forward: Une petite FAQ : <https://zrunner.me/zbot-faq>\n:arrow_forward: Une FAQ sympa : <https://zrunner.me/zbot-faq>\n\nBonne journée !",
         "usernames-allow": "Tu sais que tu peux te autoriser l'enregistrement automatique via la commande 'profile' ?",
         "usernames-disallow": "Tu sais que tu peux te retirer de l'enregistrement automatique via la commande 'profile' ?",
         "usernames-empty": "Aucun changement enregistré :blobconfused:",
@@ -876,7 +878,6 @@
         "change-xp_rate": "Le modificateur d'xp est maintenant à {rate}. À vous le niveau 100 !",
         "config-help": "Cette commande sert principalement à configurer votre serveur. En faisant `!config see [option]`, tu obtiendrez l'aperçu des configurations actuelles, et les administrateurs du serveur peuvent entrer `!config change <option> valeur1, valeur2...` pour modifier une configuration, ou `!config del <option>` pour réinitialiser l'option (`!config change <option> del` fonctionne de même).\nLa liste des options disponible est accessible à l'adresse <https://zbot.rtfd.io/en/latest/server.html#list-of-every-option>",
         "config-list": "Liste des options disponibles :{text}Plus d'information : {link}",
-        "need-admin": "Faut les perms Administrateur pour exécuter cette commande !",
         "need-manage-server": "T'as besoin de la perm \"Gérer le serveur\" pour exécuter cette commande.",
         "new_server": "Ton serv vient d'être enregistré pour la première fois dans ma base de données. Félicitations :tada:",
         "not-found": "Le serveur {} n'a pas encore été enregistré dans la base de données.",
@@ -968,7 +969,8 @@
             "PUBLIC": "Serveur public",
             "VANITY_URL": "Invitation custom",
             "VERIFIED": "Serveur vérifié",
-            "VIP_REGIONS": "Régions VIP"
+            "VIP_REGIONS": "Régions VIP",
+            "WELCOME_SCREEN_ENABLED": "Écran d'accueil activé !"
         },
         "inv-0": "Adresse url",
         "inv-1": "Créateur",
@@ -1011,6 +1013,12 @@
         "user-0": "Sur ce serveur ?",
         "voicechan-0": "Salon vocal"
     },
+    "timers": {
+        "rmd-deleted": "Le rappel #{id} (avec le message `{message}`) a été supprimé avec succès !",
+        "rmd-empty": "Euuuuuh\n\nT'as aucun rappel en suspens !",
+        "rmd-item": "ID : `{id}` | Dans : `{duration}` | Salon : `{channel}` | Message : `{msg}`",
+        "rmd-title": "Liste de tes rappels"
+    },
     "users": {
         "animated_card_false": "Les cartes d'xp animées ne sont actuellement pas autorisées pour vous",
         "animated_card_true": "Les cartes d'xp animées sont actuellement autorisées pour vous",
@@ -1034,6 +1042,7 @@
         "bot-rank": "Les bots ne peuvent pas avoir d'xp. Et c'est bien normal !",
         "card-level": "NIVEAU",
         "card-rank": "RANG",
+        "card-too-large": "Wuuuuuups\n\nImpossible d'envoyer ta carte 👀\n\nIl est possible que le fichier généré soit trop lourd, tu peux par exemple désactiver l'animation de la carte (commande `profile config animated_card false`).",
         "change-global-xp": "Impossible d'éditer l'XP du système global !",
         "change-xp-ok": "L'XP de l'utilisateur {user} a bien été mis à {xp} points ! :thinking:\nÉtait-ce un choix judicieux ?",
         "default_levelup": [

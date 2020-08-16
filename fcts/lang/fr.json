@@ -231,6 +231,7 @@
         "msgnotfound": "Message introuvable",
         "rolenotfound": "Impossible de trouver le rôle `{r}`",
         "toomanytxtchan": "Vous avez trop de salons textuels accessibles",
+        "unknown": "Oups, une erreur est survenue :confused: Réessayez plus tard, ou contactez le support (commande `about`).",
         "usernotfound": "Impossible de trouver l'utilisateur `{u}` :confused:"
     },
     "events": {
@@ -344,6 +345,13 @@
         "vote-0": "Vous ne pouvez pas mettre plus de 20 choix, encore moins un nombre négatif de choix !"
     },
     "infos": {
+        "about-0": "Mon serveur Discord :",
+        "about-1": "Un lien pour m'inviter dans un autre serveur :",
+        "about-2": "La documentation du bot :",
+        "about-3": "Le compte Twitter de mon créateur :",
+        "about-4": "Une petite FAQ :",
+        "about-5": "La Politique de Confidentialité :",
+        "about-main": "Bonjour ! Moi c'est {mention} !\n\nJe suis un bot qui permet de faire *beaucoup* de choses : de la modération, un système d'xp, des statistiques, la gestion de partenaires et plein d'autres commandes plus ou moins utiles ! \nVous pouvez commencer par taper `!help` dans ce tchat pour voir la liste des commandes disponibles, puis `!config see` vous permettra de voir les options de configuration (un site web est en préparation). \n\nPour m'avoir aidé dans la création du bot, mon propriétaire et moi souhaitons remercier Awhikax pour son soutien apporté lors des différentes crises, Aragorn1202 pour toutes ses idées et ses phrases pleines de bon sens, Adri526 pour tous ces magnifiques logos, émojis et images de profil, et toute l'équipe de traducteurs pour leur merveilleux travail !\n\n:globe_with_meridians: Quelques liens pourront vous être utiles : {links}\n\nBonne journée !",
         "admins-list": "Les administrateurs de ce bot sont : {}",
         "bitly_long": "URL d'origine : {url}",
         "bitly_nobit": "Cette adresse n'est pas un lien bit.ly !",
@@ -359,13 +367,13 @@
             "Explication des selfbots",
             "CGU pour les développeurs de bot",
             "Comment trouver un ID",
-            "Âge minimal d'utilisation de Discord par pays"
+            "Âge minimal d'utilisation de Discord par pays",
+            "Utilisation prohibée de BetterDiscord"
         ],
         "docs": "Voici le lien vers la documentation du bot :",
         "prefix": "Liste des préfixes actuellement utilisables :",
         "stats": "**Version du bot :** {bot_v} \n**Nombre de serveurs :** {s_count} \n**Nombre de membres visibles :** {m_count} (dont {b_count} **bots**)\n**Nombre de lignes de code :** {l_count}\n**Langues utilisées :** {lang} \n**Version de Python :** {p_v} \n**Version de la bibliothèque `discord.py` :** {d_v} \n**Charge sur la mémoire vive :** {ram} GB \n**Charge sur le CPU :** {cpu} % \n**Temps de latence de l'api :** {api} ms\n**Nombre total d'xp gagné :** {xp}xp",
         "stats-title": "**Statistiques du bot**",
-        "text-0": "Bonjour ! Moi c'est {0} !\n\nJe suis un bot qui permet de faire *beaucoup* de choses : de la modération, un système d'xp, des statistiques, la gestion de partenaires et plein d'autres commandes plus ou moins utiles ! \nVous pouvez commencer par taper `!help` dans ce tchat pour voir la liste des commandes disponibles, puis `!config see` vous permettra de voir les options de configuration (un site web est en préparation). \n\nPour m'avoir aidé dans la création du bot, mon propriétaire et moi souhaitons remercier Awhikax pour son soutien apporté lors des différentes crises, Aragorn1202 pour toutes ses idées et ses phrases pleines de bon sens, Adri526 pour tous ces magnifiques logos, émojis et images de profil, et toute l'équipe de traducteurs pour leur merveilleux travail !\n\n:globe_with_meridians: Quelques liens pourront vous être utiles : \n:arrow_forward: Mon serveur Discord : http://discord.gg/N55zY88\n:arrow_forward: Un lien pour m'inviter dans un autre serveur : <https://zrunner.me/invitezbot>\n:arrow_forward: La documentation du bot : <https://zbot.rtfd.io/>\n:arrow_forward: Le compte Twitter de mon créateur : <https://twitter.com/z_runnerr>\n:arrow_forward: Une petite FAQ : <https://zrunner.me/zbot-faq>\n\nBonne journée !",
         "usernames-allow": "Vous pouvez réautoriser l'enregistrement automatique via la commande 'profile'",
         "usernames-disallow": "Vous pouvez vous retirer de l'enregistrement automatique via la commande 'profile'",
         "usernames-empty": "Aucun changement enregistré",
@@ -598,6 +606,8 @@
         "mute-1": "Le membre {} a bien été réduit au silence pour la raison `{}` !",
         "mute-created": "Rôle `muted` créé avec succès !",
         "mute-high": "Oups, il semble que le rôle `muted` soit trop haut pour que je puisse le donner... Veuillez fixer ce problème en plaçant mon rôle plus haut que le rôle `muted`.",
+        "mute-notemp": "Vous avez été rendu muet dans le serveur {server} pour la raison {reason}",
+        "mute-temp": "Vous avez été rendu muet dans le serveur {server} pour la raison {reason}, pour une durée de {duration}",
         "need-manage-messages": "Permission \"Gérer les messages\" manquante :confused:",
         "need-read-history": "Oups, il me manque la permission de \"Voir les anciens messages\" :confused: ",
         "no-bans": "Aucun membre ne semble être banni de ce serveur",
@@ -760,7 +770,8 @@
             "speak": "Parler",
             "stream": "Passer en direct",
             "use_voice_activation": "Utiliser la Détection de la voix",
-            "view_audit_log": "Voir les logs du serveur"
+            "view_audit_log": "Voir les logs du serveur",
+            "view_guild_insights": "Voir les analyses de serveur"
         }
     },
     "roles_react": {
@@ -819,7 +830,7 @@
         "tw": "Twitter",
         "tw-default-flow": "{logo}  | Nouveau tweet de {author} ! ({date})\n\n{title}\n\nLien : {link}\n\n{mentions}",
         "tw-form-last": "{logo}  | Voici le dernier tweet de {author}:\nÉcrit le {date}\n\n{title}\n\nLien : {url}\n",
-        "tw-help": "Pour rechercher une chaîne twitter, vous devez entrer l'identifiant de cette chaîne. Vous la trouverez à la fin de l'url de la chaîne, elle correspond généralement au nom de l'utilisateur. Par exemple, pour %https://twitter.com/Mc_AsiliS*, il faut rentrer `Mc_AsiliS`",
+        "tw-help": "Pour rechercher une chaîne twitter, vous devez entrer l'identifiant de cette chaîne. Vous la trouverez à la fin de l'url de la chaîne, elle correspond généralement au nom de l'utilisateur. Par exemple, pour *https://twitter.com/Mc_AsiliS*, il faut rentrer `Mc_AsiliS`",
         "twitch": "Twitch",
         "twitch-default-flow": "{logo}  | Nouveau live de {author} ! ({date})\n\n{title}\n\nLien : {link}\n\n{mentions}",
         "twitch-form-last": "{logo}  | Voici la dernière vidéo de {author}:\n{title}\nPubliée le {date}\nLien : {url}\n",
@@ -903,6 +914,7 @@
         "levelup_msg": "Message envoyé lorsqu'un membre gagne un niveau d'xp : {}",
         "membercounter": "Salon affichant dans son nom le nombre de membres : {}",
         "modlogs_channel": "Salon dans lequel sont envoyés les logs de modération : {}",
+        "morpion_emojis": "Emojis utilisé pour jouer au morpion : {}",
         "mute": "Liste des rôles qui peuvent utiliser la commande 'mute' : {}",
         "muted_role": "Rôle utilisé pour rendre les gens muets : {}",
         "noxp_channels": "Salons où il est impossible d'obtenir de l'xp : {}",
@@ -958,6 +970,7 @@
             "ANIMATED_ICON": "Icône de serveur animée",
             "BANNER": "Bannière de serveur custom",
             "COMMERCE": "Fonctionnalités de commerce",
+            "COMMUNITY": "Serveur communautaire",
             "DISCOVERABLE": "Affiché dans l'onglet Découverte",
             "FEATURABLE": "Affiché dans l'onglet Activité",
             "INVITE_SPLASH": "Fond d'écran d'invitation",
@@ -1143,6 +1156,7 @@
         "negative-xp": "Vous ne pouvez pas mettre un nombre d'xp négatif !",
         "no-bot": "Impossible de modifier l'XP d'un bot !",
         "no-rr": "Aucun rôle n'a été configuré pour ce niveau",
+        "no-rr-2": "Vous n'avez aucun rôle-récompense configuré !",
         "rr-added": "Le rôle `{}` a correctement été ajouté pour le niveau {} !",
         "rr-reload": "{} rôles mis à jour / {} membres scannés",
         "rr-removed": "Plus aucun rôle ne sera donné pour le niveau {}",

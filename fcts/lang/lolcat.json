@@ -231,6 +231,7 @@
         "msgnotfound": "NoAble 2 find any msg with ID {msg}",
         "rolenotfound": "Unable 2 find ur role (`{r}`)",
         "toomanytxtchan": "U have toooo many visibl text channels lmao. Why so much? useless/20. U should seriously think 'bout it dude. Pro-tip :smirk:",
+        "unknown": "Ups, somthin' wen't horribly wrong :fearful: pls contact zbot authorities immdiatly",
         "usernotfound": "Unabled 2 find teh userZ `{u}` :confused:"
     },
     "events": {
@@ -344,6 +345,13 @@
         "vote-0": "U can't put moar than 20 choicez, an' even lesss negativ numbr of choicesz!"
     },
     "infos": {
+        "about-0": "Me Discord servr plz:",
+        "about-1": "link to iNVite me to anothr servr:",
+        "about-2": "The :b:ot documentashun:",
+        "about-3": "My creator's Blue Bird 'ccount:",
+        "about-4": "A cute faq:",
+        "about-5": "The YourSecretData Policy:",
+        "about-main": "Ho hi hello! I'm {mention} !\n\nIm a boat that alow you 2 do a loooooot of tings: modration, a' xp systèm, partnre managmnt, stATIstics & many oder super mega *wow* usefull commandz (and totlly pointlesz wanes)! \nU can strt by tipyng `!help` in dis tchat to se the llst for availabl kommands, then `!config see` wil LEtz you see teh configurashun optionz (a website ar in prePARtion)? \n\nOf helpin me in the creetion of the boat, my ownr an I wouLd like to tahnk Awhikax 4 hiz suport durin the variouz cryzes, Aragorn1202 of al hees idees and sentencez full for goob sence, Adri526 fr all dese beautifool loGoz, èmojiz nd profil picts, and the whole translators tim 4 they woark!\n\n:globe_with_meridians: Sum linqs can bee usefull:{links}\n\nHas a nice dayz !",
         "admins-list": "My super-cool admins are : {}",
         "bitly_long": "Slow link: {url}",
         "bitly_nobit": "HAHA NOPE, dat's not a bit.ly link!",
@@ -359,13 +367,13 @@
             "Selfbots article",
             "ToS for bot devs",
             "How 2 find 1 ID",
-            "Minimum legal Discordian age / places"
+            "Minimum legal Discordian age / places",
+            "Not-good use ov BetterDiscord (like, eww)"
         ],
         "docs": "Her'z teh link 2 the bot doc:",
         "prefix": "List ov usable prefiXs:",
         "stats": "**Baut vershun:** {bot_v} \n**Nbr ov serverz:** {s_count} \n**Nbr ov visible memberz:** {m_count} ({b_count} **robots**)\n**Nbr ov code lin:** {l_count}\n**Uzd languages:** {lang}\n**Python vershun :** {p_v} \n**Vershun ov teh `discord.py` lyb:** {d_v} \n**Loadin on teh RAM:** {ram} GB \n**Loadin on the CPU:** {cpu} % \n**API latency timz:** {api} ms\n**Nbr of xp won:** {xp}",
         "stats-title": "**Boat statz**",
-        "text-0": "Ho hi hello! I'm {0} !\n\nIm a boat that alow you 2 do a loooooot of tings: modration, a' xp systèm, partnre managmnt, stATIstics & many oder super mega *wow* usefull commandz (and totlly pointlesz wanes)! \nU can strt by tipyng `!help` in dis tchat to se the llst for availabl kommands, then `!config see` wil LEtz you see teh configurashun optionz (a website ar in prePARtion)? \n\nOf helpin me in the creetion of the boat, my ownr an I wouLd like to tahnk Awhikax 4 hiz suport durin the variouz cryzes, Aragorn1202 of al hees idees and sentencez full for goob sence, Adri526 fr all dese beautifool loGoz, èmojiz nd profil picts, and the whole translators tim 4 they woark!\n\n:globe_with_meridians: Sum linqs can bee usefull: \n:arrow_forward: Me Discord servr plz : http://discord.gg/N55zY88\n:arrow_forward: link to iNVite me to anothr servr : <https://zrunner.me/invitezbot>\n:arrow_forward: The :b:ot documentashun : <https://zbot.rtfd.io/>\n:arrow_forward: My creator's Blue Bird 'ccount : <https://twitter.com/z_runnerr>\n:arrow_forward: A cute faq: <https://zrunner.me/zbot-faq>\n\nHas a nice dayz !",
         "usernames-allow": "U can anti-optout teh auto logs with da cmd 'profile'",
         "usernames-disallow": "U can optout the auto logging with cmd 'profile' (beeew bad guy)",
         "usernames-empty": ":N:o change savd",
@@ -598,6 +606,8 @@
         "mute-1": "Teh mmber {} haz been silencd for the reezon `{}`!",
         "mute-created": "Successsfully added da `muted` role!",
         "mute-high": "Ooops, 't sEEms dat `muted` rol iz tooo high 4 me to give it... Plz fiX dis problem by plac'ng my role higher than this nice `muted` role.",
+        "mute-notemp": "U've been silenced in teh {server}, cuz of {reason}",
+        "mute-temp": "U can't even speak in dat {server}, cuz of {reason}, 4 long of {duration}",
         "need-manage-messages": "Permishun \"Manage Messages\" missing :confused:",
         "need-read-history": "Oooops, I'm missing the perm 2 \"Read Message History\" :confused: ",
         "no-bans": "No mmber seems to be bannd from here",
@@ -760,7 +770,8 @@
             "speak": "Speak",
             "stream": "Go live",
             "use_voice_activation": "Use voice activity",
-            "view_audit_log": "View audit logs"
+            "view_audit_log": "View audit logs",
+            "view_guild_insights": "View guild insights"
         }
     },
     "roles_react": {
@@ -903,6 +914,7 @@
         "levelup_msg": "Cool text sent when a member gets 1 xp lvl: {}",
         "membercounter": "Channel dis-playin nmberz from memberz in iz nayme: {}",
         "modlogs_channel": "Chanel where 2 sent modrashun wOods: {}",
+        "morpion_emojis": "Images usd 2 play tic-tac-toe: {}",
         "mute": "Lis of roles dat kan us the 'mute' commmand: {}",
         "muted_role": "Usd role 2 mute people : {}",
         "noxp_channels": "Chats where xp is for:b:idden: {}",
@@ -958,6 +970,7 @@
             "ANIMATED_ICON": "ANIMATED OMEGA COOL OwO server icon",
             "BANNER": "Custom srv banner",
             "COMMERCE": "Buy-things features",
+            "COMMUNITY": "BetterTogether server",
             "DISCOVERABLE": "Showned in the cool Discover tab",
             "FEATURABLE": "Shownd in da Activity tab",
             "INVITE_SPLASH": "Inv cstm screen",
@@ -1143,6 +1156,7 @@
         "negative-xp": "Plz dont be such negativ, positiv is lif bro",
         "no-bot": "Impossible 2 modify the XP ov a robot!",
         "no-rr": "None role is configured for this level",
+        "no-rr-2": "U didn't set any role reward yet LOL!",
         "rr-added": "Role `{}` haz been added 4 level {} !",
         "rr-reload": "{} updated roles / {} members",
         "rr-removed": "None role will be givn anymore for level #{}",

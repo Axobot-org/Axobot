@@ -31,8 +31,8 @@ class FunCog(commands.Cog):
         self.fun_opt = dict()
         self.file = "fun"
         self.tz = tzwhere.tzwhere(forceTZ=True)
-        self.last_roll = None
         self.afk_guys = dict()
+        self.nasa_pict:dict = None
         try:
             self.translate = self.bot.cogs["LangCog"].tr
         except:
@@ -93,13 +93,11 @@ class FunCog(commands.Cog):
     @commands.check(is_fun_enabled)
     async def roll(self,ctx,*,options):
         """Selects an option at random from a given list
-        The options must be separated by a semicolon `;`"""
-        liste = list(set([x for x in [x.strip() for x in options.split(';')] if len(x)>0]))
+        The options must be separated by a comma `,`"""
+        liste = list(set([x for x in [x.strip() for x in options.split(',')] if len(x)>0]))
         if len(liste) < 2:
             return await ctx.send(await self.translate(ctx.channel,"fun","no-roll"))
-        choosen = None
-        while choosen==self.last_roll:
-            choosen = random.choice(liste).replace('@everyone','@​everyone').replace('@here','@​here')
+        choosen = random.choice(liste).replace('@everyone','@​everyone').replace('@here','@​here')
         await ctx.send(choosen)
 
     @commands.command(name="cookie",aliases=['cookies'],hidden=True)
@@ -346,7 +344,7 @@ You can specify a verification limit by adding a number in argument (up to 1.000
         You can specify a channel where the bot must send this message. If channel is None, the current channel will be used"""
         if channel==None:
             channel = ctx.channel
-        elif not (channel.permissions_for(ctx.author).read_messages and channel.permissions_for(ctx.author).send_messages):
+        elif not (channel.permissions_for(ctx.author).read_messages and channel.permissions_for(ctx.author).send_messages and channel.guild == ctx.guild):
             await ctx.send(await self.translate(ctx.guild,'fun','say-no-perm',channel=channel.mention))
             return
         await self.say_function(ctx,channel,text)
@@ -384,11 +382,10 @@ You can specify a verification limit by adding a number in argument (up to 1.000
     @commands.check(can_say)
     async def react(self,ctx,message:discord.Message,*,reactions):
         """Add reaction(s) to a message. Server emojis also work."""
-        #try:
-        #    msg = await ctx.channel.fetch_message(ID)
-        #except discord.errors.HTTPException as e:
-        #    await ctx.send(await self.translate(ctx.channel,"fun",'react-0'))
-        #    return
+        channel = message.channel
+        if not (channel.permissions_for(ctx.author).read_messages and channel.permissions_for(ctx.author).add_reactions and (channel.guild==None or channel.guild==ctx.guild)):
+            await ctx.send(await self.translate(ctx.channel,'fun','say-no-perm',channel=channel.mention))
+            return
         for r in reactions.split():
             try:
                 e = await commands.EmojiConverter().convert(ctx,r)
@@ -427,7 +424,7 @@ You can specify a verification limit by adding a number in argument (up to 1.000
     async def lmgtfy(self,ctx,*,search):
         """How to use Google"""
         link = "http://lmgtfy.com/?q="+search.replace("\n","+").replace(" ","+").replace('@eveyrone','@+everyone').replace('@here','@+here')
-        await ctx.send(link)
+        await ctx.send('<'+link+'>')
         await self.bot.cogs['UtilitiesCog'].suppr(ctx.message)
     
     @commands.command(name="loading",hidden=True)
@@ -630,9 +627,62 @@ You can specify a verification limit by adding a number in argument (up to 1.000
             else:
                 await msg.add_reaction(emojilib.emojize(r, use_aliases=True))
                 count +=1
-            if count==0:
-                await msg.add_reaction('👍')
-                await msg.add_reaction('👎')
+        if count==0:
+            await msg.add_reaction('👍')
+            await msg.add_reaction('👎')
+
+    @commands.command(name="markdown")
+    async def markdown(self,ctx):
+        """Get help about markdown in Discord"""
+        await ctx.send(await self.translate(ctx.channel,'fun','markdown'))
+    
+
+    @commands.command(name="bubble-wrap", aliases=["papier-bulle", "bw"], hidden=True)
+    @commands.cooldown(5,30,commands.BucketType.channel)
+    @commands.cooldown(5,60,commands.BucketType.user)
+    async def bubblewrap(self, ctx:commands.Context, width:int=10, height:int=15):
+        """Just bubble wrap. Which pops when you squeeze it. That's all.
+
+        Width should be between 1 and 150, height between 1 and 50.
+
+        ..Example bubble-wrap
+
+        ..Example bbw 7 20
+        """
+        width = min(max(1, width), 150)
+        height = min(max(1, height), 50)
+        p = "||pop||"
+        txt = "\n".join([p*width]*height)
+        if len(txt) > 2000:
+            await ctx.send(await self.translate(ctx.channel, "fun", "bbw-too-many"))
+            return
+        await ctx.send(txt)
+
+    @commands.command(name="nasa")
+    @commands.cooldown(5, 60, commands.BucketType.channel)
+    async def nasa(self, ctx:commands.Context):
+        """Send the Picture of The Day by NASA
+        
+        ..Doc fun.html?#nasa"""
+        def get_date(string):
+            return datetime.datetime.strptime(string, "%Y-%m-%d")
+        if ctx.guild and not ctx.channel.permissions_for(ctx.guild.me).embed_links:
+            await ctx.send(await self.translate(ctx.channel, "fun", "no-embed-perm"))
+            return
+        if self.nasa_pict == None or (datetime.datetime.utcnow()-get_date(self.nasa_pict["date"])).total_seconds() > 86400:
+            async with aiohttp.ClientSession() as session:
+                key = self.bot.others["nasa"]
+                async with session.get(f"https://api.nasa.gov/planetary/apod?api_key={key}") as r:
+                    self.nasa_pict = await r.json()
+        emb = self.bot.get_cog("EmbedCog").Embed(
+            title=self.nasa_pict["title"],
+            image=self.nasa_pict["url"],
+            url=self.nasa_pict["hdurl"],
+            desc=self.nasa_pict["explanation"],
+            footer_text="Credits: "+self.nasa_pict.get("copyright", "Not copyrighted"),
+            time=get_date(self.nasa_pict["date"]))
+        await ctx.send(embed=emb)
+        
 
     @commands.command(name="markdown")
     async def markdown(self,ctx):

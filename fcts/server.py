@@ -13,7 +13,7 @@ textchan_options = ["welcome_channel","bot_news","poll_channels","modlogs_channe
 vocchan_options = ["membercounter"]
 text_options = ["welcome","leave","levelup_msg","description"]
 prefix_options = ['prefix']
-emoji_option = ['vote_emojis']
+emoji_option = ['vote_emojis', 'morpion_emojis']
 numb_options = []
 raid_options = ["anti_raid"]
 xp_type_options = ['xp_type']
@@ -69,6 +69,7 @@ class ServerCog(commands.Cog):
                "membercounter":"",
                "anti_raid":1,
                "vote_emojis":":thumbsup:;:thumbsdown:;",
+               "morpion_emojis":":red_circle:;:blue_circle:;",
                "help_in_dm":0,
                "muted_role":0,
                "partner_channel":'',
@@ -76,7 +77,8 @@ class ServerCog(commands.Cog):
                'partner_role':'',
                'update_mentions':'',
                'verification_role':''}
-        self.optionsList = ["prefix","language","description","clear","slowmode","mute","kick","ban","warn","say","welcome_channel","welcome","leave","welcome_roles","bot_news","update_mentions","poll_channels","partner_channel","partner_color","partner_role","modlogs_channel","verification_role","enable_xp","levelup_msg","levelup_channel","noxp_channels","xp_rate","xp_type","anti_caps_lock","enable_fun","membercounter","anti_raid","vote_emojis","help_in_dm","muted_role"]
+        self.optionsList = ["prefix","language","description","clear","slowmode","mute","kick","ban","warn","say","welcome_channel","welcome","leave","welcome_roles","bot_news","update_mentions","poll_channels","partner_channel","partner_color","partner_role","modlogs_channel","verification_role","enable_xp","levelup_msg","levelup_channel","noxp_channels","xp_rate","xp_type","anti_caps_lock","enable_fun","membercounter","anti_raid","vote_emojis","morpion_emojis","help_in_dm","muted_role"]
+        self.membercounter_pending = {}
 
     @commands.Cog.listener()
     async def on_ready(self):
@@ -499,7 +501,7 @@ class ServerCog(commands.Cog):
         guild = await self.get_guild(ctx)
         if value == "scret-desc":
             emojis = await self.find_staff(guild.id,option)
-            return ", ".join(await self.form_emoji(emojis))
+            return ", ".join(await self.form_emoji(emojis, option))
         else:
             emojis = value.split(",")
             liste = list()
@@ -527,12 +529,15 @@ class ServerCog(commands.Cog):
             await ctx.send(msg.format(option,", ".join(liste2)))
             await self.send_embed(ctx.guild,option,value)
 
-    async def form_emoji(self,emojis):
+    async def form_emoji(self, emojis, option):
         if len(emojis) == 0:
-            return [":thumbsup:", ":thumbsdown:"]
+            # return [":thumbsup:", ":thumbsdown:"]
+            emojis = self.default_opt[option]
         emojis = emojis.split(";")
         l_em = list()
         for r in emojis:
+            if len(r) == 0:
+                continue
             if r.isnumeric():
                 d_em = discord.utils.get(self.bot.emojis, id=int(r))
                 if d_em == None:
@@ -878,7 +883,7 @@ class ServerCog(commands.Cog):
                 elif i in raid_options:
                     r = await self.form_raid(v)
                 elif i in emoji_option:
-                    r = ", ".join(await self.form_emoji(v))
+                    r = ", ".join(await self.form_emoji(v, i))
                 elif i in xp_type_options:
                     r = await self.form_xp_type(v)
                 elif i in color_options:
@@ -962,20 +967,39 @@ class ServerCog(commands.Cog):
 
 
 
-    async def update_memberChannel(self,guild):
+    async def update_memberChannel(self, guild):
+        # If we already did an update recently: abort
+        if guild.id in self.membercounter_pending.keys():
+            if self.membercounter_pending[guild.id] > time.time():
+                return False
         ch = await self.find_staff(guild.id,"membercounter")
-        if ch not in ['',None]:
+        if ch not in ['', None]:
             ch = guild.get_channel(int(ch))
-            if ch==None:
+            if ch == None:
                 return
             lang = await self.translate(guild.id,"current_lang","current")
             text = "{}{}: {}".format(str(await self.translate(guild.id,"keywords","membres")).capitalize() , " " if lang=='fr' else "" , len(guild.members))
+            if ch.name == text:
+                return
             try:
                 await ch.edit(name=text,reason=await self.translate(guild.id,"logs","d-memberchan"))
+                self.membercounter_pending[guild.id] = round(time.time()) + 5*60 # cooldown 5min
                 return True
             except Exception as e:
                 self.bot.log.debug("[UpdateMemberChannel] "+str(e))
         return False
+    
+    async def update_everyMembercounter(self):
+        if not self.bot.database_online:
+            return
+        i = 0
+        for x in self.bot.guilds:
+            if x.id in self.membercounter_pending.keys() and await self.update_memberChannel(x):
+                i += 1
+                del self.membercounter_pending[x.id]
+        if i > 0:
+            emb = self.bot.get_cog("EmbedCog").Embed(desc=f"[MEMBERCOUNTER] {i} channels refreshed", color=5011628).update_timestamp().set_author(self.bot.user)
+            await self.bot.cogs["EmbedCog"].send([emb], url="loop")
 
     
     
