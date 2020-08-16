@@ -178,7 +178,8 @@ class Events(commands.Cog):
         if channel==None:
             return self.bot.log.warn("[send_mp] Salon de MP introuvable")
         emb = msg.embeds[0] if len(msg.embeds)>0 else None
-        text = "__`{} ({} - {})`__\n{}".format(msg.author,msg.channel.recipient,await self.bot.cogs["TimeCog"].date(msg.created_at,digital=True),msg.content)
+        arrow = ":inbox_tray:" if msg.author == msg.channel.recipient else ":outbox_tray:"
+        text = "{} **{}** ({} - {})\n{}".format(arrow, msg.channel.recipient, msg.channel.recipient.id, await self.bot.cogs["TimeCog"].date(msg.created_at,digital=True), msg.content)
         if len(msg.attachments)>0:
             text += "".join(["\n{}".format(x.url) for x in msg.attachments])
         await channel.send(text,embed=emb)
