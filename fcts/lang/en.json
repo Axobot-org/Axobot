@@ -330,6 +330,7 @@
             "> This too will pass\n*(do you have the reference?)*"
         ],
         "unafk-done": "You aren't AFK anymore",
+        "unafk-cant": "You aren't AFK!",
         "uninhabited-city": "Uninhabited city :confused:",
         "vote-0": "You can't put more than 20 choices, and even less a negative number of choices!"
     },

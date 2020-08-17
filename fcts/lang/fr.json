@@ -341,6 +341,7 @@
             "> Cela aussi passera\n*(vous avez la référence ?)*"
         ],
         "unafk-done": "Vous n'êtes maintenant plus AFK",
+        "unafk-cant": "Vous n'êtes pas AFK !",
         "uninhabited-city": "Endroit inhabité",
         "vote-0": "Vous ne pouvez pas mettre plus de 20 choix, encore moins un nombre négatif de choix !"
     },

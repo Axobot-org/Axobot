@@ -341,6 +341,7 @@
             "> This too will pass\n*(do you have the reference?)*"
         ],
         "unafk-done": "U'rn't anymore AFK",
+        "unafk-cant": "U'r aren't AFK!",
         "uninhabited-city": "Tish place have 0 inhabitant :upside_down:",
         "vote-0": "U can't put moar than 20 choicez, an' even lesss negativ numbr of choicesz!"
     },

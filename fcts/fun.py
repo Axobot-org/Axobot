@@ -518,6 +518,8 @@ You can specify a verification limit by adding a number in argument (up to 1.000
                     await ctx.author.edit(nick=ctx.author.display_name.replace(" [AFK]",''))                
                 except discord.errors.Forbidden:
                     pass
+        else:
+            await ctx.send(await self.translate(ctx.guild.id,"fun","unafk-cant"))
     
     async def check_afk(self,msg:discord.Message):
         """Check if someone pinged is afk"""
