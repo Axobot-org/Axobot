@@ -1,4 +1,4 @@
-import discord, datetime, asyncio, logging, time, aiohttp, json, random, shutil, mysql
+import discord, datetime, asyncio, logging, time, aiohttp, json, random, shutil, mysql, psutil
 from discord.ext import commands, tasks
 from fcts.checks import is_fun_enabled
 
@@ -461,11 +461,15 @@ class Events(commands.Cog):
         self.latencies_list.append(round(self.bot.latency*1000))
         if d.minute % 4 == 0 and d.minute != self.last_statusio.minute:
             average = round(sum(self.latencies_list)/len(self.latencies_list))
-            params = {"data": {"timestamp": round(d.timestamp()), "value":average}}
             async with aiohttp.ClientSession(loop=self.bot.loop, headers=self.statuspage_header) as session:
+                params = {"data": {"timestamp": round(d.timestamp()), "value":average}}
                 async with session.post("https://api.statuspage.io/v1/pages/g9cnphg3mhm9/metrics/x4xs4clhkmz0/data", json=params) as r:
                     r.raise_for_status()
-                    self.bot.log.info(f"StatusPage API returned {r.status} for {params}")
+                    self.bot.log.info(f"StatusPage API returned {r.status} for {params} (latency)")
+                params["data"]["value"] = psutil.virtual_memory().available
+                async with session.post("https://api.statuspage.io/v1/pages/g9cnphg3mhm9/metrics/72bmf4nnqbwb/data", json=params) as r:
+                    r.raise_for_status()
+                    self.bot.log.info(f"StatusPage API returned {r.status} for {params} (available RAM)")
             self.latencies_list = list()
             self.last_statusio = d
 
