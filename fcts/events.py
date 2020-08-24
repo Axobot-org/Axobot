@@ -172,7 +172,7 @@ class Events(commands.Cog):
 
     async def send_mp(self,msg):
         await self.check_mp_adv(msg)
-        if msg.channel.recipient.id in [392766377078816789,279568324260528128,552273019020771358]:
+        if msg.channel.recipient.id in [392766377078816789,279568324260528128,552273019020771358,281404141841022976]:
             return
         channel = self.bot.get_channel(625320165621497886)
         if channel==None:
