@@ -458,7 +458,10 @@ class Events(commands.Cog):
         "Send average latency to zbot.statuspage.io"
         if self.bot.beta:
             return
-        self.latencies_list.append(round(self.bot.latency*1000))
+        try:
+            self.latencies_list.append(round(self.bot.latency*1000))
+        except OverflowError: # Usually because latency is infinite
+            self.latencies_list.append(10e6)
         if d.minute % 4 == 0 and d.minute != self.last_statusio.minute:
             average = round(sum(self.latencies_list)/len(self.latencies_list))
             async with aiohttp.ClientSession(loop=self.bot.loop, headers=self.statuspage_header) as session:
