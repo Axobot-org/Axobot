@@ -679,7 +679,7 @@ You can specify a verification limit by adding a number in argument (up to 1.000
         emb = self.bot.get_cog("EmbedCog").Embed(
             title=self.nasa_pict["title"],
             image=self.nasa_pict["url"],
-            url=self.nasa_pict["hdurl"] ,
+            url=self.nasa_pict["hdurl"] if self.nasa_pict["media_type"]=="image" else self.nasa_pict["url"],
             desc=self.nasa_pict["explanation"],
             footer_text="Credits: "+self.nasa_pict.get("copyright", "Not copyrighted"),
             time=get_date(self.nasa_pict["date"]))
