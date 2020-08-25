@@ -363,10 +363,10 @@ You can specify a verification limit by adding a number in argument (up to 1.000
         except:
             pass
 
-    @say.error
-    async def say_error(self,ctx,error):
-        if str(error)!='The check functions for command say failed.':
-            await self.say_function(ctx,None,ctx.view.buffer.replace(ctx.prefix+ctx.invoked_with,"",1))
+    # @say.error
+    # async def say_error(self,ctx,error):
+    #     if str(error) != 'The check functions for command say failed.':
+    #         await self.say_function(ctx,None,ctx.view.buffer.replace(ctx.prefix+ctx.invoked_with,"",1))
 
     @commands.command(name="me",hidden=True)
     @commands.check(is_fun_enabled)
