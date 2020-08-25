@@ -143,10 +143,13 @@ class ServerCog(commands.Cog):
         if not self.bot.database_online or not isinstance(user,discord.Member):
             return False
         staff = str(await self.find_staff(user.guild.id,option)).split(";")
+        staff = [x for x in staff if len(x) > 10 and x.isnumeric()]
+        if len(staff) == 0:
+            return False
         for r in user.roles:
             if str(r.id) in staff:
                 return True
-        return False
+        raise commands.CommandError("User doesn't have required roles")
 
     async def find_staff(self,ID,name):
         """return the value of an option

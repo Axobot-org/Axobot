@@ -42,6 +42,9 @@ class ErrorsCog(commands.Cog):
                 c = str(type(error)).replace("<class '",'').replace("'>",'')
                 await ctx.send('`Ignored error:` [{}] {}'.format(c,error))
             return
+        elif isinstance(error, commands.CommandError) and str(error) == "User doesn't have required roles":
+            await ctx.send(await self.translate(ctx.channel,'errors','notrightroles'))
+            return
         elif isinstance(error,commands.errors.CommandOnCooldown):
             if await self.bot.cogs['AdminCog'].check_if_admin(ctx):
                 await ctx.reinvoke()

@@ -229,6 +229,7 @@
         "membernotfound": "Impossible de trouver le membre `{m}` :confused:",
         "missingargument": "Oups, il manque l'argument \"{a}\" {e}",
         "msgnotfound": "Message introuvable",
+        "notrightroles": "Vous n'avez pas les rôles nécessaires pour cette commande",
         "rolenotfound": "Impossible de trouver le rôle `{r}`",
         "toomanytxtchan": "Vous avez trop de salons textuels accessibles",
         "unknown": "Oups, une erreur est survenue :confused: Réessayez plus tard, ou contactez le support (commande `about`).",
