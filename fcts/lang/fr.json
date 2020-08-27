@@ -453,9 +453,14 @@
         ]
     },
     "library": {
-        "book_pres": "Titre : {title}\nSous-titre : {subtitle}\nAuteur(s) : {author}\nEditeur : {publisher}\nDate de publication : {publication}\nLangue de publication : {language}\nNombre de pages : {pages}\n\nISBN : {isbn}",
         "no-found": "Impossible de trouver un livre correspondant",
-        "price": "Prix"
+        "author": "auteur",
+        "authors": "auteurs",
+        "unknown": "inconnu",
+        "year": "année de publication",
+        "publisher": "éditeur",
+        "language": "langue",
+        "title": "titre"
     },
     "logs": {
         "ban": "{member} a été banni du serveur (raison : {reason} | casier #{case})",

@@ -442,9 +442,14 @@
         ]
     },
     "library": {
-        "book_pres": "Title: {title}\nSubtitle: {subtitle}\nAuthor(s): {author}\nPublisher: {publisher}\nPublication date: {publication}\nLanguage: {language}\nPage count: {pages}\n\nISBN : {isbn}",
         "no-found": "Unable to find this book",
-        "price": "Price"
+        "author": "author",
+        "authors": "authors",
+        "unknown": "unknown",
+        "year": "publication year",
+        "publisher": "publisher",
+        "language": "language",
+        "title": "title"
     },
     "logs": {
         "ban": "{member} has been banned (reason: {reason} | case #{case})",
