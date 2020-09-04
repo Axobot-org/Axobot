@@ -229,6 +229,7 @@
         "membernotfound": "Impossible de trouver le membre `{m}` :confused:",
         "missingargument": "Oups, il manque l'argument \"{a}\" {e}",
         "msgnotfound": "Message introuvable",
+        "notrightroles": "Vous n'avez pas les rôles nécessaires pour cette commande",
         "rolenotfound": "Impossible de trouver le rôle `{r}`",
         "toomanytxtchan": "Vous avez trop de salons textuels accessibles",
         "unknown": "Oups, une erreur est survenue :confused: Réessayez plus tard, ou contactez le support (commande `about`).",
@@ -341,6 +342,7 @@
             "> Cela aussi passera\n*(vous avez la référence ?)*"
         ],
         "unafk-done": "Vous n'êtes maintenant plus AFK",
+        "unafk-cant": "Vous n'êtes pas AFK !",
         "uninhabited-city": "Endroit inhabité",
         "vote-0": "Vous ne pouvez pas mettre plus de 20 choix, encore moins un nombre négatif de choix !"
     },
@@ -451,9 +453,14 @@
         ]
     },
     "library": {
-        "book_pres": "Titre : {title}\nSous-titre : {subtitle}\nAuteur(s) : {author}\nEditeur : {publisher}\nDate de publication : {publication}\nLangue de publication : {language}\nNombre de pages : {pages}\n\nISBN : {isbn}",
         "no-found": "Impossible de trouver un livre correspondant",
-        "price": "Prix"
+        "author": "auteur",
+        "authors": "auteurs",
+        "unknown": "inconnu",
+        "year": "année de publication",
+        "publisher": "éditeur",
+        "language": "langue",
+        "title": "titre"
     },
     "logs": {
         "ban": "{member} a été banni du serveur (raison : {reason} | casier #{case})",

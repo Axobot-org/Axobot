@@ -38,9 +38,12 @@ class ErrorsCog(commands.Cog):
 
         # Anything in ignored will return and prevent anything happening.
         if isinstance(error, ignored) and not isinstance(error,actually_not_ignored):
-            if self.bot.beta:
+            if self.bot.beta and ctx.guild:
                 c = str(type(error)).replace("<class '",'').replace("'>",'')
                 await ctx.send('`Ignored error:` [{}] {}'.format(c,error))
+            return
+        elif isinstance(error, commands.CommandError) and str(error) == "User doesn't have required roles":
+            await ctx.send(await self.translate(ctx.channel,'errors','notrightroles'))
             return
         elif isinstance(error,commands.errors.CommandOnCooldown):
             if await self.bot.cogs['AdminCog'].check_if_admin(ctx):

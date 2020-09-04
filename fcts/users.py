@@ -60,7 +60,7 @@ class UsersCog(commands.Cog):
     async def user_config(self,ctx:commands.Context,option:str,allow:bool=None):
         """Modify any config option
         Here you can (dis)allow one of the users option that Zbot have, which are:
-        - animated_card: Display an animated rank card if your pfp is a git (way slower rendering)
+        - animated_card: Display an animated rank card if your pfp is a gif (way slower rendering)
         - auto_unafk: Automatically remove your AFK mode
         - usernames_log: Record when you change your username/nickname
         

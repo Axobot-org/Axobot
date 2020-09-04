@@ -1,4 +1,4 @@
-import discord, datetime, asyncio, logging, time, aiohttp, json, random, shutil, mysql
+import discord, datetime, asyncio, logging, time, aiohttp, json, random, shutil, mysql, psutil
 from discord.ext import commands, tasks
 from fcts.checks import is_fun_enabled
 
@@ -172,13 +172,14 @@ class Events(commands.Cog):
 
     async def send_mp(self,msg):
         await self.check_mp_adv(msg)
-        if msg.channel.recipient.id in [392766377078816789,279568324260528128,552273019020771358]:
+        if msg.channel.recipient.id in [392766377078816789,279568324260528128,552273019020771358,281404141841022976]:
             return
         channel = self.bot.get_channel(625320165621497886)
         if channel==None:
             return self.bot.log.warn("[send_mp] Salon de MP introuvable")
         emb = msg.embeds[0] if len(msg.embeds)>0 else None
-        text = "__`{} ({} - {})`__\n{}".format(msg.author,msg.channel.recipient,await self.bot.cogs["TimeCog"].date(msg.created_at,digital=True),msg.content)
+        arrow = ":inbox_tray:" if msg.author == msg.channel.recipient else ":outbox_tray:"
+        text = "{} **{}** ({} - {})\n{}".format(arrow, msg.channel.recipient, msg.channel.recipient.id, await self.bot.cogs["TimeCog"].date(msg.created_at,digital=True), msg.content)
         if len(msg.attachments)>0:
             text += "".join(["\n{}".format(x.url) for x in msg.attachments])
         await channel.send(text,embed=emb)
@@ -360,34 +361,6 @@ class Events(commands.Cog):
                     if sent:
                         await self.remove_task(task['ID'])
 
-    async def send_sql_statslogs(self):
-        "Send some stats about the current bot stats"
-        cnx = self.bot.cnx_frm
-        cursor = cnx.cursor()
-        rss_feeds = await self.bot.get_cog("RssCog").get_raws_count(True)
-        active_rss_feeds = await self.bot.get_cog("RssCog").get_raws_count()
-        query = ("INSERT INTO `log_stats` (`time`, `servers_count`, `members_count`, `bots_count`, `dapi_heartbeat`, `codelines_count`, `earned_xp_total`, `rss_feeds`, `active_rss_feeds`, `beta`) VALUES (CURRENT_TIMESTAMP, '{server_count}', '{members_count}', '{bots_count}', '{ping}', '{codelines}', '{xp}', '{rss_feeds}', '{active_rss_feeds}','{beta}')".format(
-            server_count = len(self.bot.guilds),
-            members_count = len(self.bot.users),
-            bots_count = len([1 for x in self.bot.users if x.bot]),
-            ping = round(self.bot.latency,3),
-            codelines = self.bot.cogs["InfoCog"].codelines,
-            xp = await self.bot.cogs['XPCog'].bdd_total_xp(),
-            rss_feeds = rss_feeds,
-            active_rss_feeds = active_rss_feeds,
-            beta = 1 if self.bot.beta else 0
-        ))
-        try:
-            cursor.execute(query)
-        except Exception as e:
-            await self.bot.get_cog("ErrorsCog").senf_err_msg(query)
-            raise e
-        cnx.commit()
-        cursor.close()
-        emb = self.bot.cogs["EmbedCog"].Embed(desc='**Stats logs** updated',color=5293283).update_timestamp().set_author(self.bot.user)
-        await self.bot.cogs["EmbedCog"].send([emb],url="loop")
-        self.statslogs_last_push = datetime.datetime.now()
-        
 
 
     async def add_task(self, action:str, duration:int, userID: int, guildID:int=None, channelID:int=None, message:str=None):
@@ -485,14 +458,21 @@ class Events(commands.Cog):
         "Send average latency to zbot.statuspage.io"
         if self.bot.beta:
             return
-        self.latencies_list.append(round(self.bot.latency*1000))
+        try:
+            self.latencies_list.append(round(self.bot.latency*1000))
+        except OverflowError: # Usually because latency is infinite
+            self.latencies_list.append(10e6)
         if d.minute % 4 == 0 and d.minute != self.last_statusio.minute:
             average = round(sum(self.latencies_list)/len(self.latencies_list))
-            params = {"data": {"timestamp": round(d.timestamp()), "value":average}}
             async with aiohttp.ClientSession(loop=self.bot.loop, headers=self.statuspage_header) as session:
+                params = {"data": {"timestamp": round(d.timestamp()), "value":average}}
                 async with session.post("https://api.statuspage.io/v1/pages/g9cnphg3mhm9/metrics/x4xs4clhkmz0/data", json=params) as r:
                     r.raise_for_status()
-                    self.bot.log.info(f"StatusPage API returned {r.status} for {params}")
+                    self.bot.log.info(f"StatusPage API returned {r.status} for {params} (latency)")
+                params["data"]["value"] = psutil.virtual_memory().available
+                async with session.post("https://api.statuspage.io/v1/pages/g9cnphg3mhm9/metrics/72bmf4nnqbwb/data", json=params) as r:
+                    r.raise_for_status()
+                    self.bot.log.info(f"StatusPage API returned {r.status} for {params} (available RAM)")
             self.latencies_list = list()
             self.last_statusio = d
 
@@ -568,12 +548,12 @@ class Events(commands.Cog):
         except Exception as e:
             answers[3] = "0"
             await self.bot.get_cog("ErrorsCog").on_error(e,None)
-        try: # https://arcane-botcenter.xyz/bot/486896267788812288
+        try: # https://arcane-center.xyz/bot/486896267788812288
             headers = {
                 'Authorization': self.bot.others['arcanecenter'],
                 'Content-Type': 'application/json'
             }
-            async with session.post('https://arcane-botcenter.xyz/api/{}/stats'.format(self.bot.user.id), data=payload, headers=headers) as resp:
+            async with session.post('https://arcane-center.xyz/api/{}/stats'.format(self.bot.user.id), data=payload, headers=headers) as resp:
                 self.bot.log.debug('Arcane Center returned {} for {}'.format(resp.status, payload))
                 answers[4] = resp.status
         except Exception as e:
