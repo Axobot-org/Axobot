@@ -154,7 +154,6 @@ class UtilitiesCog(commands.Cog):
             await self.print2("Unable to delete message "+str(msg))
             pass
 
-
     async def global_check(self,ctx):
         """Do a lot of checks before executing a command (rss loop, banned guilds etc)"""
         #if ctx.bot.cogs['RssCog'].last_update==None or (datetime.datetime.now() - ctx.bot.cogs['RssCog'].last_update).total_seconds() > 20*60:

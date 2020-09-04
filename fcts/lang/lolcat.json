@@ -229,6 +229,7 @@
         "membernotfound": "Unabl to found the membr `{m}` :confused:",
         "missingargument": "Oops, te argumnt \"{a}\" are missin {e}",
         "msgnotfound": "NoAble 2 find any msg with ID {msg}",
+        "notrightroles": "U're not fancy enough to get dat command, GO AWAY DUDE! :reee:",
         "rolenotfound": "Unable 2 find ur role (`{r}`)",
         "toomanytxtchan": "U have toooo many visibl text channels lmao. Why so much? useless/20. U should seriously think 'bout it dude. Pro-tip :smirk:",
         "unknown": "Ups, somthin' wen't horribly wrong :fearful: pls contact zbot authorities immdiatly",
@@ -341,6 +342,7 @@
             "> This too will pass\n*(do you have the reference?)*"
         ],
         "unafk-done": "U'rn't anymore AFK",
+        "unafk-cant": "U'r aren't AFK!",
         "uninhabited-city": "Tish place have 0 inhabitant :upside_down:",
         "vote-0": "U can't put moar than 20 choicez, an' even lesss negativ numbr of choicesz!"
     },
@@ -451,9 +453,14 @@
         ]
     },
     "library": {
-        "book_pres": "Title: {title}\nSub: {subtitle}\nOtaur(s): {author}\nGuy who printed: {publisher}\nBook date in your favorite store: {publication}\nLangu: {language}\nPage count: {pages}\n        \nISBN : {isbn}",
         "no-found": "NOT abL 2 find lol book",
-        "price": "Coststs"
+        "author": "otaur",
+        "authors": "otaurs",
+        "unknown": "not known",
+        "year": "book date in your favorite store",
+        "publisher": "guy who printed",
+        "language": "langu",
+        "title": "title"
     },
     "logs": {
         "ban": "{member} have bin :b:an (reashun: {reason} | caseZ #{case})",

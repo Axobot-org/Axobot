@@ -143,10 +143,13 @@ class ServerCog(commands.Cog):
         if not self.bot.database_online or not isinstance(user,discord.Member):
             return False
         staff = str(await self.find_staff(user.guild.id,option)).split(";")
+        staff = [x for x in staff if len(x) > 10 and x.isnumeric()]
+        if len(staff) == 0:
+            return False
         for r in user.roles:
             if str(r.id) in staff:
                 return True
-        return False
+        raise commands.CommandError("User doesn't have required roles")
 
     async def find_staff(self,ID,name):
         """return the value of an option
@@ -994,7 +997,8 @@ class ServerCog(commands.Cog):
             return
         i = 0
         for x in self.bot.guilds:
-            if x.id in self.membercounter_pending.keys() and await self.update_memberChannel(x):
+            if x.id in self.membercounter_pending.keys() and self.membercounter_pending[x.id] > time.time():
+                await self.update_memberChannel(x)
                 i += 1
                 del self.membercounter_pending[x.id]
         if i > 0:

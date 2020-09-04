@@ -271,13 +271,13 @@ class RssCog(commands.Cog):
                 await ctx.send(obj)
 
 
-    async def is_overflow(self, guild: discord.Guild) -> bool:
+    async def is_overflow(self, guild: discord.Guild) -> (bool, int):
         """Check if a guild still has at least a slot
-        True if max number reached"""
+        True if max number reached, followed by the flow limit"""
         flow_limit = await self.bot.cogs['ServerCog'].find_staff(guild.id,'rss_max_number')
         if flow_limit==None:
             flow_limit = self.bot.cogs['ServerCog'].default_opt['rss_max_number']
-        return len(await self.get_guild_flows(guild.id)) >= flow_limit
+        return len(await self.get_guild_flows(guild.id)) >= flow_limit, flow_limit
 
     @rss_main.command(name="add")
     @commands.guild_only()
@@ -287,7 +287,8 @@ class RssCog(commands.Cog):
         """Subscribe to a rss feed, displayed on this channel regularly
         
         ..Doc rss.html#follow-a-feed"""
-        if await self.is_overflow(ctx.guild):
+        is_over, flow_limit = await self.is_overflow(ctx.guild)
+        if is_over:
             await ctx.send(str(await self.translate(ctx.guild.id,"rss","flow-limit")).format(flow_limit))
             return
         identifiant = await self.parse_yt_url(link)

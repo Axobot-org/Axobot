@@ -218,6 +218,7 @@
         "membernotfound": "Unable to find the member `{m}` :confused:",
         "missingargument": "Oops, the argument \"{a}\" is missing {e}",
         "msgnotfound": "Unable to find any message with ID {msg}",
+        "notrightroles": "You don't have the necessary roles for this command",
         "rolenotfound": "Unable to find the role `{r}`",
         "toomanytxtchan": "You have too many accessible text channels",
         "unknown": "Oops, an error occurred :confused: Try again later, or contact support (command `about`).",
@@ -330,6 +331,7 @@
             "> This too will pass\n*(do you have the reference?)*"
         ],
         "unafk-done": "You aren't AFK anymore",
+        "unafk-cant": "You aren't AFK!",
         "uninhabited-city": "Uninhabited city :confused:",
         "vote-0": "You can't put more than 20 choices, and even less a negative number of choices!"
     },
@@ -440,9 +442,14 @@
         ]
     },
     "library": {
-        "book_pres": "Title: {title}\nSubtitle: {subtitle}\nAuthor(s): {author}\nPublisher: {publisher}\nPublication date: {publication}\nLanguage: {language}\nPage count: {pages}\n\nISBN : {isbn}",
         "no-found": "Unable to find this book",
-        "price": "Price"
+        "author": "author",
+        "authors": "authors",
+        "unknown": "unknown",
+        "year": "publication year",
+        "publisher": "publisher",
+        "language": "language",
+        "title": "title"
     },
     "logs": {
         "ban": "{member} has been banned (reason: {reason} | case #{case})",
@@ -1091,8 +1098,8 @@
             "this shovel",
             "this shotgun",
             "this magic wand",
-            " this craft table",
-            " this cow",
+            "this crafting table",
+            "this cow",
             "this window",
             "this wallpaper",
             "this emoji",
@@ -1126,7 +1133,7 @@
             "this lightsaber",
             "this pyjama",
             "this cookie",
-            "this very",
+            "this umbrella",
             "this dragon",
             "these marshmallows",
             "these croquettes",
