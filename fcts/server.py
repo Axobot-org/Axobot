@@ -187,15 +187,18 @@ class ServerCog(commands.Cog):
         if type(values)!=list:
             raise ValueError
         v = list()
+        v2 = dict()
         cnx = self.bot.cnx_frm
         cursor = cnx.cursor()
-        for x in values:
-            if type(x[1]) == bool:
-                v.append("`{x[0]}`={x[1]}".format(x=x))
-            else:
-                v.append("""`{x[0]}`="{x[1]}" """.format(x=x))
-        query = ("UPDATE `{t}` SET {v} WHERE `ID`='{id}'".format(t=self.table,v=",".join(v),id=ID))
-        cursor.execute(query)
+        for e, x in enumerate(values):
+            v.append(f"{x[0]} = %(v{e})s")
+            v2[f'v{e}'] = x[1]
+        #     if type(x[1]) == bool:
+        #         v.append("`{x[0]}`={x[1]}".format(x=x))
+        #     else:
+        #         v.append("""`{x[0]}`="{x[1]}" """.format(x=x))
+        query = ("UPDATE `{t}` SET {v} WHERE `ID`='{id}'".format(t=self.table, v=",".join(v), id=ID))
+        cursor.execute(query, v2)
         cnx.commit()
         return True
 

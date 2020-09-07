@@ -322,7 +322,7 @@ class RssCog(commands.Cog):
         if not await self.check_rss_url(link):
             return await ctx.send(await self.translate(ctx.guild.id,"rss","invalid-flow"))
         try:
-            ID = await self.add_flow(ctx.guild.id,ctx.channel.id,Type,identifiant)
+                ID = await self.add_flow(ctx.guild.id,ctx.channel.id,Type,identifiant)
             await ctx.send(str(await self.translate(ctx.guild,"rss","success-add")).format(display_type,link,ctx.channel.mention))
             self.bot.log.info("RSS feed added into server {} ({} - {})".format(ctx.guild.id,link,ID))
             await self.send_log("Feed added into server {} ({})".format(ctx.guild.id,ID),ctx.guild)
@@ -1238,7 +1238,7 @@ class RssCog(commands.Cog):
 
 
     async def create_id(self,channelID,guildID,Type,link):
-        numb = str(round(time.time()/2)) + str(random.randint(0,99))
+        numb = str(round(time.time()/2)) + str(random.randint(10,99))
         if Type == 'yt':
             numb = int('10'+numb)
         elif Type == 'tw':
@@ -1281,17 +1281,18 @@ class RssCog(commands.Cog):
         cursor.close()
         return liste
 
-    async def add_flow(self,guildID,channelID,Type,link):
+    async def add_flow(self, guildID:int, channelID:int, _type:str, link:str):
         """Add a flow in the database"""
         cnx = self.bot.cnx_frm
         cursor = cnx.cursor()
         ID = await self.create_id(channelID,guildID,Type,link)
-        if Type == 'mc':
+        if _type == 'mc':
             form = ''
         else:
-            form = await self.translate(guildID,"rss",Type+"-default-flow")
-        query = ("INSERT INTO `{}` (`ID`,`guild`,`channel`,`type`,`link`,`structure`) VALUES ('{}','{}','{}','{}','{}','{}')".format(self.table,ID,guildID,channelID,Type,link,form))
-        cursor.execute(query)
+            form = await self.translate(guildID, "rss", _type+"-default-flow")
+        # query = ("INSERT INTO `{}` (`ID`,`guild`,`channel`,`type`,`link`,`structure`) VALUES ('{}','{}','{}','{}','{}','{}')".format(self.table,ID,guildID,channelID,Type,link,form))
+        query = "INSERT INTO `{}` (`ID`, `guild`,`channel`,`type`,`link`,`structure`) VALUES (%(i),%(g)s,%(c)s,%(t)s,%(l)s,%(f)s)".format(self.table)
+        cursor.execute(query, { 'i': ID, 'g': guildID, 'c': channelID, 't': _type, 'l': link, 'f': form })
         cnx.commit()
         cursor.close()
         return ID

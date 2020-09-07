@@ -68,17 +68,19 @@ class Events(commands.Cog):
             return
         cnx = self.bot.cnx_frm
         cursor = cnx.cursor()
-        ID = round(time.time()/2) * 10 + random.randrange(0,9)
-        b = '' if before.nick==None else before.nick.replace("'","\\'")
-        a = '' if after.nick==None else after.nick.replace("'","\\'")
-        query = ("INSERT INTO `usernames_logs` (`ID`,`user`,`old`,`new`,`guild`,`beta`) VALUES ('{}','{}','{}','{}','{}',{})".format(ID,before.id,b,a,before.guild.id,self.bot.beta))
+        b = '' if before.nick is None else before.nick
+        a = '' if after.nick is None else after.nick
+        guild = before.guild.id if hasattr(before, 'guild') else 0
+        # ID = round(time.time()/2) * 10 + random.randrange(0,9)
+        # query = ("INSERT INTO `usernames_logs` (`ID`,`user`,`old`,`new`,`guild`,`beta`) VALUES ('{}','{}','{}','{}','{}',{})".format(ID,before.id,b,a,before.guild.id,self.bot.beta))
+        query = "INSERT INTO `usernames_logs` (`user`,`old`,`new`,`guild`,`beta`) VALUES (%(u)s,%(o)s,%(n)s,%(g)s,%(b)s)"
         try:
-            cursor.execute(query)
+            cursor.execute(query, { 'u': before.id, 'o': b, 'n': a, 'g': guild, 'b': self.bot.beta })
             cnx.commit()
-            cursor.close()
         except mysql.connector.errors.IntegrityError as e:
             self.bot.log.warn(e)
             await self.updade_memberslogs_name(before, after, tries+1)
+        cursor.close()
 
     @commands.Cog.listener()
     async def on_user_update(self,before:discord.User,after:discord.User):
@@ -87,13 +89,8 @@ class Events(commands.Cog):
             config_option = await self.bot.cogs['UtilitiesCog'].get_db_userinfo(['allow_usernames_logs'],["userID="+str(before.id)])
             if config_option != None and config_option['allow_usernames_logs']==False:
                 return
-            cnx = self.bot.cnx_frm
-            cursor = cnx.cursor()
-            ID = round(time.time()/2) * 10 + random.randrange(0,9)
-            query = ("INSERT INTO `usernames_logs` (`ID`,`user`,`old`,`new`,`guild`,`beta`) VALUES ('{}','{}','{}','{}','{}',{})".format(ID,before.id,before.name.replace("'","\\'"),after.name.replace("'","\\'"),0,self.bot.beta))
-            cursor.execute(query)
-            cnx.commit()
-            cursor.close()
+            # query = ("INSERT INTO `usernames_logs` (`ID`,`user`,`old`,`new`,`guild`,`beta`) VALUES ('{}','{}','{}','{}','{}',{})".format(ID,before.id,before.name.replace("'","\\'"),after.name.replace("'","\\'"),0,self.bot.beta))
+            await self.updade_memberslogs_name(before, after)
 
 
     async def on_guild_add(self,guild):
@@ -375,11 +372,6 @@ class Events(commands.Cog):
             ID = max([x['ID'] for x in tasks])+1
         else:
             ID = 0
-        # if message != None:
-        #     message = message.replace('"', "\\")
-        # query = ("INSERT INTO `timed` (`ID`,`guild`,`channel`,`user`,`action`,`duration`,`message`) VALUES ({},{},{},{},'{}',{},\"{}\")".format(ID,guildID,channelID, userID, action, duration, message))
-        # cursor.execute(query)
-        #  %(username)s
         query = "INSERT INTO `timed` (`ID`,`guild`,`channel`,`user`,`action`,`duration`,`message`) VALUES (%(ID)s,%(guild)s,%(channel)s,%(user)s,%(action)s,%(duration)s,%(message)s)"
         cursor.execute(query, {'ID':ID, 'guild':guildID, 'channel':channelID, 'user':userID, 'action':action, 'duration':duration, 'message':message})
         cnx.commit()

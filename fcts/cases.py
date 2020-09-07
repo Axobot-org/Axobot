@@ -158,8 +158,9 @@ class CasesCog(commands.Cog):
             raise ValueError
         cnx = self.bot.cnx_frm
         cursor = cnx.cursor()
-        query = ("""INSERT INTO `{}` (`ID`, `guild`, `user`, `type`, `mod`, `reason`,`duration`) VALUES ('{}', '{}', '{}', '{}', '{}', '{}','{}')""".format(self.table,case.id,case.guild,case.user,case.type,case.mod,case.reason.replace("'","\\'"),case.duration))
-        cursor.execute(query)
+        # query = ("""INSERT INTO `{}` (`ID`, `guild`, `user`, `type`, `mod`, `reason`,`duration`) VALUES ('{}', '{}', '{}', '{}', '{}', '{}','{}')""".format(self.table,case.id,case.guild,case.user,case.type,case.mod,case.reason.replace("'","\\'"),case.duration))
+        query = "INSERT INTO `{}` (`ID`, `guild`, `user`, `type`, `mod`, `reason`,`duration`) VALUES (%(i)s, %(g)s, %(u)s, %(t)s, %(m)s, %(r)s,%(d)s)".format(self.table)
+        cursor.execute(query, { 'i': case.id, 'g': case.guild, 'u': case.user, 't': case.type, 'm': case.mod, 'r': case.reason, 'd': case.duration })
         cnx.commit()
         return True
 
