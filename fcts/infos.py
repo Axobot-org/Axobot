@@ -619,7 +619,8 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
             # Guild ID
             embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","inv-6"), value=str(invite.guild.id))
             # Members count
-            embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","inv-7"), value=str(invite.approximate_member_count))
+            if invite.approximate_member_count:
+                embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","inv-7"), value=str(invite.approximate_member_count))
         # Guild banner
         if invite.guild.banner_url != None:
             embed.set_image(url=invite.guild.banner_url)
