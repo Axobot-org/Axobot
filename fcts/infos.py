@@ -997,9 +997,10 @@ Servers:
             cnx = self.bot.cnx_frm
             cursor = cnx.cursor()
             current_timestamp = datetime.datetime.fromtimestamp(round(time.time()))
-            query = ["INSERT INTO `{t}` (`ID`,`count`,`last_update`) VALUES ('{i}',1,'{l}') ON DUPLICATE KEY UPDATE count = `count` + 1, last_update = '{l}';".format(t=self.emoji_table,i=x,l=current_timestamp) for x in liste]
-            for q in query:
-                cursor.execute(q)
+            # query = ["INSERT INTO `{t}` (`ID`,`count`,`last_update`) VALUES ('{i}',1,'{l}') ON DUPLICATE KEY UPDATE count = `count` + 1, last_update = '{l}';".format(t=self.emoji_table,i=x,l=current_timestamp) for x in liste]
+            query = "INSERT INTO `{}` (`ID`,`count`,`last_update`) VALUES (%(i)s, 1, %(l)s) ON DUPLICATE KEY UPDATE count = `count` + 1, last_update = %(l)s;".format(self.emoji_table)
+            for data in [{ 'i': x, 'l': current_timestamp } for x in liste]:
+                cursor.execute(query, data)
             cnx.commit()
             cursor.close()
         except Exception as e:

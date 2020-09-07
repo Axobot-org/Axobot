@@ -879,18 +879,19 @@ class XPCog(commands.Cog):
     async def gen_rr_id(self):
         return round(time.time()/2)
 
-    async def rr_add_role(self,guild:int,role:int,level:int):
+    async def rr_add_role(self, guildID:int, roleID:int, level:int):
         """Add a role reward in the database"""
         cnx = self.bot.cnx_frm
         cursor = cnx.cursor(dictionary = True)
         ID = await self.gen_rr_id()
-        query = ("INSERT INTO `roles_rewards` (`ID`,`guild`,`role`,`level`) VALUES ('{i}','{g}','{r}','{l}');".format(i=ID,g=guild,r=role,l=level))
-        cursor.execute(query)
+        # query = ("INSERT INTO `roles_rewards` (`ID`,`guild`,`role`,`level`) VALUES ('{i}','{g}','{r}','{l}');".format(i=ID,g=guildID,r=roleID,l=level))
+        query = "INSERT INTO `roles_rewards` (`ID`,`guild`,`role`,`level`) VALUES (%(i)s,%(g)s,%(r)s,%(l)s);"
+        cursor.execute(query, { 'i': ID, 'g': guildID, 'r': roleID, 'l': level })
         cnx.commit()
         cursor.close()
         return True
     
-    async def rr_list_role(self,guild:int,level:int=-1):
+    async def rr_list_role(self, guild:int, level:int=-1):
         """List role rewards in the database"""
         cnx = self.bot.cnx_frm
         cursor = cnx.cursor(dictionary = True)

@@ -28,13 +28,14 @@ class LibCog(commands.Cog):
         self.translate = self.bot.cogs['LangCog'].tr
 
 
-    async def db_add_search(self,ISBN:int,name:str):
-        name = name.replace('"','\\\"')
+    async def db_add_search(self, ISBN:int, name:str):
+        # name = name.replace('"','\\\"')
         cnx = self.bot.cnx_frm
         cursor = cnx.cursor()
         current_timestamp = datetime.datetime.utcnow()
-        query = "INSERT INTO `{t}` (`ISBN`,`name`,`count`,`added_at`,`last_update`) VALUES ('{i}',\"{n}\",1,'{l}','{l}') ON DUPLICATE KEY UPDATE count = `count` + 1, last_update = '{l}';".format(t=self.tables[0],i=ISBN,n=name,l=current_timestamp)
-        cursor.execute(query)
+        # query = "INSERT INTO `{t}` (`ISBN`,`name`,`count`,`last_update`) VALUES ('{i}',\"{n}\",1) ON DUPLICATE KEY UPDATE count = `count` + 1, last_update = '{l}';".format(t=self.tables[0],i=ISBN,n=name,l=current_timestamp)
+        query = "INSERT INTO `{}` (`ISBN`,`name`,`count`) VALUES (%(i)s, %(n)s, 1) ON DUPLICATE KEY UPDATE count = `count` + 1, last_update = %(l)s;".format(self.tables[0])
+        cursor.execute(query, { 'i': ISBN, 'n': name, 'l': current_timestamp })
         cnx.commit()
         cursor.close()
 
@@ -69,8 +70,8 @@ class LibCog(commands.Cog):
         for key in ['wiki', 'default', 'openl', 'goob']:
             try:
                 i = isbnlib.meta(isbn, service=key)
-            except isbnlib.dev._exceptions.DataNotFoundAtServiceError:
-                pass
+            except (isbnlib.dev._exceptions.DataNotFoundAtServiceError, isbnlib.dev._exceptions.ISBNLibHTTPError):
+                continue
             if i is not None and len(i) > 0:
                 info.update({
                     'title': i['Title'],
