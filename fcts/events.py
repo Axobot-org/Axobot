@@ -260,7 +260,8 @@ class Events(commands.Cog):
             if guild is None:
                 return False
             channel = guild.get_channel(task["channel"])
-            if channel is None: # if channel has been deleted, we send it in DM
+            member = await guild.fetch_member(task["user"])
+            if channel is None or member is None: # if channel has been deleted, or if member left the guild, we send it in DM
                 channel = self.bot.get_user(task["user"])
                 if channel is None:
                     return False
