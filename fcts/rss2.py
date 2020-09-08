@@ -911,7 +911,7 @@ class RssCog(commands.Cog):
         else:
             liste = list()
             for feed in feeds.entries:
-                if datetime.datetime(*feed['published_parsed'][:6]) <= date:
+                if 'published_parsed' not in feed or datetime.datetime(*feed['published_parsed'][:6]) <= date:
                     break
                 img_url = None
                 if 'media_thumbnail' in feed.keys() and len(feed['media_thumbnail'])>0:
