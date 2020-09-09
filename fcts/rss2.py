@@ -66,10 +66,6 @@ class RssCog(commands.Cog):
             self.date = bot.cogs["TimeCog"].date
         except:
             pass
-        try:
-            self.print = bot.cogs["UtilitiesCog"].print2
-        except:
-            pass
         if feedparser.parse('http://twitrss.me/twitter_user_to_rss/?user=Dinnerbone').entries == list():
             self.twitter_api_url = 'http://twitrss.me/mobile_twitter_to_rss/?user='
         else:
@@ -79,7 +75,6 @@ class RssCog(commands.Cog):
     async def on_ready(self):
         self.translate = self.bot.cogs["LangCog"].tr
         self.date = self.bot.cogs["TimeCog"].date
-        self.print = self.bot.cogs["UtilitiesCog"].print2
         self.table = 'rss_flow' if self.bot.user.id==486896267788812288 else 'rss_flow_beta'
 
 
@@ -322,7 +317,7 @@ class RssCog(commands.Cog):
         if not await self.check_rss_url(link):
             return await ctx.send(await self.translate(ctx.guild.id,"rss","invalid-flow"))
         try:
-                ID = await self.add_flow(ctx.guild.id,ctx.channel.id,Type,identifiant)
+            ID = await self.add_flow(ctx.guild.id,ctx.channel.id,Type,identifiant)
             await ctx.send(str(await self.translate(ctx.guild,"rss","success-add")).format(display_type,link,ctx.channel.mention))
             self.bot.log.info("RSS feed added into server {} ({} - {})".format(ctx.guild.id,link,ID))
             await self.send_log("Feed added into server {} ({})".format(ctx.guild.id,ID),ctx.guild)
