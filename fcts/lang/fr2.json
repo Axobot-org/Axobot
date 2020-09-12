@@ -235,6 +235,7 @@
         "msgnotfound": "Ce message s'est perdu quelque part ! J'abandonne les recherches...",
         "rolenotfound": "Impossible de trouver ce p\\*\\*\\*\\* de rôle (`{r}`) !",
         "toomanytxtchan": "Tu as trop de salons textuels accessibles...",
+        "unknown": "Wtf ?\nY'a eu une erreur 😠 😢 😕...\n\nRéessaie plus tard, ou contacte le support (commande `about`).",
         "usernotfound": "Impossible de trouver cet utilisateur `{u}` :blobconfused:"
     },
     "events": {
@@ -348,6 +349,13 @@
         "vote-0": "Tu... Sais que tu peux pas mettre plus de 20 choix, et encore moins un nombre négatif de choix ?"
     },
     "infos": {
+        "about-0": "Mon serveur Discord :",
+        "about-1": "Un lien pour m'inviter sur un autre serv :",
+        "about-2": "La doc*umentation* du bot :",
+        "about-3": "Le Twitter de mon créateur 🧐 :",
+        "about-4": "Une mini *mini* FAQ :",
+        "about-5": "La politique de confidentialité 🥴 :",
+        "about-main": "Salut, je suis {mention} !\n\nJe suis un *super* ||👍|| bot qui te permet de faire un ***énorme*** tas de choses : modération, système d'XP, statistiques, gestion de partenaires, et bien plus (ouais, rien que ça 😂) !\n*Bon, y'a deux-trois trucs complètement useless mais chut* 😂\n\nTu peux taper `!help` dans le chat pour voir la liste des commandes dispo, et `!config see` pour voir la liste des options de configuration sur le serveur.\n\nMon créateur et moi-même ||*hum, hum...* 🧐|| aimerions remercier Awhikax pour son soutien durant différentes crises, Aragorn1202 pour toutes ses idées et phrases pleines de bon sens ||😂|| ||*Sans compter son aide dans le test de la commande de ban xD||, Adri526 pour tous ces magnifiques logos, emojis, et images de profil, et toutes l'équipe de traduction pour leur long travail !\n\n🌐 Quelques liens qui pourraient être utiles : {links}\n\nPasse une excellente journée !",
         "admins-list": "Les administrateurs de ce bot sont : {}",
         "bitly_long": "URL d'origine : {url}",
         "bitly_nobit": "Cette adresse n'est pas un lien bit.ly !",
@@ -363,7 +371,8 @@
             "Explication des selfbots",
             "CGU pour les développeurs de bot",
             "Comment trouver ton ID ?",
-            "Âge minimum pour utiliser Discord (par pays)"
+            "Âge minimum pour utiliser Discord (par pays)",
+            "Utilisation interdite de BetterDiscord"
         ],
         "docs": "Voici le lien vers la documentation du bot :",
         "prefix": "Liste des préfixes actuellement utilisables :",
@@ -446,9 +455,7 @@
         ]
     },
     "library": {
-        "book_pres": "Titre : {title}\nSous-titre : {subtitle}\nAuteur(s) : {author}\nEditeur : {publisher}\nDate de publication : {publication}\nLangue de publication : {language}\nNombre de pages : {pages}\n\nISBN : {isbn}",
-        "no-found": "Impossible de trouver un livre correspondant :rip:",
-        "price": "Prix"
+        "no-found": "Impossible de trouver un livre correspondant :rip:"
     },
     "logs": {
         "ban": "{member} a été banni du serveur (raison : {reason} | casier #{case})",
@@ -599,8 +606,9 @@
         "missing-manage-nick": "Oups, il me manque la permission \"Gérer les pseudos\"",
         "missing-user-perms": "Wolala 😬 !\nIl te manque des perms (style, manager les roles, le serveur, ou les messages)",
         "mute-1": "Le membre {} a bien été réduit au silence pour la raison `{}` !",
-        "mute-created": "Rôle `muted` créé avec succès !",
         "mute-high": "Oups, il semble que le rôle `muted` soit trop haut pour que je puisse le donner... Veuillez fixer ce problème en plaçant mon rôle plus haut que le rôle `muted`.",
+        "mute-notemp": "Tu as été mute sur le serv {server} parce que...\nBen...\n{reason}",
+        "mute-temp": "Tu as été mute sur le serv {server} parce que...\nBen...\n{reason}\n\nEt ça va durer plus ou moins {duration} (sauf si un admin t'unmute)",
         "need-manage-messages": "Permission \"Gérer les messages\" manquante :confused:",
         "need-read-history": "Oups, il me manque la permission de \"Voir les anciens messages\" :confused: ",
         "no-bans": "Aucun membre ne semble être banni de ce serveur",
@@ -763,7 +771,8 @@
             "speak": "Parler",
             "stream": "Passer en direct",
             "use_voice_activation": "Utiliser la Détection de la voix",
-            "view_audit_log": "Voir les logs du serveur"
+            "view_audit_log": "Voir les logs du serveur",
+            "view_guild_insights": "Voir les aperçus de guilde"
         }
     },
     "roles_react": {
@@ -906,6 +915,7 @@
         "levelup_msg": "Message envoyé lorsqu'un membre gagne un niveau d'xp : {}",
         "membercounter": "Salon affichant dans son nom le nombre de membres : {}",
         "modlogs_channel": "Salon dans lequel sont envoyés les logs de modération : {}",
+        "morpion_emojis": "Émojis utilisés pour le morpion : {}",
         "mute": "Liste des rôles qui peuvent utiliser la commande 'mute' : {}",
         "muted_role": "Rôle utilisé pour rendre les gens muets : {}",
         "noxp_channels": "Salons où il est impossible d'obtenir de l'xp : {}",
@@ -961,6 +971,7 @@
             "ANIMATED_ICON": "Icône de serveur animée",
             "BANNER": "Bannière de serveur custom",
             "COMMERCE": "Fonctionnalités de commerce",
+            "COMMUNITY": "Serveur communautaire",
             "DISCOVERABLE": "Affiché dans l'onglet Découverte",
             "FEATURABLE": "Affiché dans l'onglet Activité",
             "INVITE_SPLASH": "Fond d'écran d'invitation",
@@ -1146,6 +1157,7 @@
         "negative-xp": "Mais... Tu peux pas mettre de l'XP négative !",
         "no-bot": "Impossible de modifier l'XP d'un bot !",
         "no-rr": "Aucun rôle n'a été configuré pour ce niveau.",
+        "no-rr-2": "Mais...\nT'as aucun rôle reward pour le moment !",
         "rr-added": "Le rôle `{}` a correctement été ajouté pour le niveau {} !",
         "rr-reload": "Bon.\nIl y a {} rôles mis à jour et {} membres scannés !",
         "rr-removed": "Plus aucun rôle ne sera donné pour le niveau {}. *The sadness ever my old friend...*",
