@@ -1,7 +1,7 @@
 {
     "info": ["about","admins","botinvite","changelog","discordlinks","docs","help","info","markdown","membercount","ping","prefix","rss","stats","tip"],
-    "moderation": ["backup","ban","banlist","cases","clear","kick","mute","set_xp","slowmode","softban","unban","unhoist","unmute","verify","warn"],    
-    "server-settings": ["config","emoji","partner","pin","role","roles_react","roles_rewards","welcome"],    
+    "moderation": ["backup","ban","banlist","cases","clear","destop","kick","mute","set_xp","slowmode","softban","unban","unhoist","unmute","verify","warn"],    
+    "server-settings": ["config","emoji","mute-config","partner","pin","role","roles_react","roles_rewards","welcome"],    
     "users-info": ["perms","profile","rank","top","usernames"],
     "other": ["book","embed","emoji","minecraft","mojang","react","remindme", "reminder"],
     "fun": ["afk","arapproved","bitly","cookie","events","nasa","tic-tac-toe","fun","hour","say","unafk","vote","weather"],
