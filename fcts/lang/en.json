@@ -583,6 +583,8 @@
         "clear-0": "{} messages deleted!",
         "clear-1": "I can't delete so few messages",
         "clear-nt-found": "Hmm... impossible to delete these messages. Discord tells me they don't exist :thinking:",
+        "destop-guild": "This message does not belong to this server",
+        "destop-old": "I can't delete messages older than {days} days!",
         "em-list": "{} (`:{}:`) added on {} {}",
         "em-list-title": "Emojis of the server {}",
         "em-private": "[Restricted]",
