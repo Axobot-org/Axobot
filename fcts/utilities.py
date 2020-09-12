@@ -154,7 +154,6 @@ class UtilitiesCog(commands.Cog):
             await self.print2("Unable to delete message "+str(msg))
             pass
 
-
     async def global_check(self,ctx):
         """Do a lot of checks before executing a command (rss loop, banned guilds etc)"""
         #if ctx.bot.cogs['RssCog'].last_update==None or (datetime.datetime.now() - ctx.bot.cogs['RssCog'].last_update).total_seconds() > 20*60:
@@ -263,11 +262,12 @@ class UtilitiesCog(commands.Cog):
         try:
             cnx = self.bot.cnx_frm
             cursor = cnx.cursor(dictionary = True)
-            if not isinstance(value,(bool,int)):
-                value = "'"+value+"'"
-            query = ("INSERT INTO `{t}` (`userID`,`{k}`) VALUES ('{u}',{v}) ON DUPLICATE KEY UPDATE {k} = {v};".format(t=self.table,u=userID,k=key,v=value))
+            # if not isinstance(value,(bool,int)):
+            #     value = "'"+value+"'"
+            # query = ("INSERT INTO `{t}` (`userID`,`{k}`) VALUES ('{u}',{v}) ON DUPLICATE KEY UPDATE {k} = {v};".format(t=self.table,u=userID,k=key,v=value))
             # INSERT INTO `users` (`userID`,`unlocked_blurple`) VALUES ('279568324260528128','True') ON DUPLICATE KEY UPDATE unlocked_blurple = 'True';
-            cursor.execute(query)
+            query = "INSERT INTO `{t}` (`userID`,`{k}`) VALUES (%(u)s,%(v)s) ON DUPLICATE KEY UPDATE {k} = %(v)s;".format(t=self.table, k=key)
+            cursor.execute(query, { 'u': userID, 'v': value })
             cnx.commit()
             cursor.close()
             return True

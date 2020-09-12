@@ -577,7 +577,7 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
     async def invite_info(self,ctx,invite,lang):
         since = await self.translate(ctx.guild.id,"keywords","depuis")
         embed = discord.Embed(colour=default_color, timestamp=ctx.message.created_at)
-        embed.set_author(name="{} '{}'".format(await self.translate(ctx.guild.id,"stats_infos","inv-4"),invite.code), icon_url=ctx.guild.icon_url)
+        embed.set_author(name="{} '{}'".format(await self.translate(ctx.guild.id,"stats_infos","inv-4"),invite.code), icon_url=invite.guild.icon_url)
         embed.set_footer(text='Requested by {}'.format(ctx.author.name), icon_url=str(await self.bot.user_avatar_as(ctx.author,size=256)))
         # Try to get the complete invite
         if invite.guild in self.bot.guilds:
@@ -610,16 +610,18 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
             embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","textchan-5"), value="#"+str(invite.channel.name))
             # Guild icon
             url = str(invite.guild.icon_url)
-            r = requests.get(url.replace(".webp",".gif"))
-            if r.ok:
-                url = url.replace(".webp",".gif")
-            else:
-                url = url.replace(".webp",".png")
-            embed.set_thumbnail(url=url)
+            if url:
+                r = requests.get(url.replace(".webp",".gif"))
+                if r.ok:
+                    url = url.replace(".webp",".gif")
+                else:
+                    url = url.replace(".webp",".png")
+                embed.set_thumbnail(url=url)
             # Guild ID
             embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","inv-6"), value=str(invite.guild.id))
             # Members count
-            embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","inv-7"), value=str(invite.approximate_member_count))
+            if invite.approximate_member_count:
+                embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","inv-7"), value=str(invite.approximate_member_count))
         # Guild banner
         if invite.guild.banner_url != None:
             embed.set_image(url=invite.guild.banner_url)
@@ -996,9 +998,10 @@ Servers:
             cnx = self.bot.cnx_frm
             cursor = cnx.cursor()
             current_timestamp = datetime.datetime.fromtimestamp(round(time.time()))
-            query = ["INSERT INTO `{t}` (`ID`,`count`,`last_update`) VALUES ('{i}',1,'{l}') ON DUPLICATE KEY UPDATE count = `count` + 1, last_update = '{l}';".format(t=self.emoji_table,i=x,l=current_timestamp) for x in liste]
-            for q in query:
-                cursor.execute(q)
+            # query = ["INSERT INTO `{t}` (`ID`,`count`,`last_update`) VALUES ('{i}',1,'{l}') ON DUPLICATE KEY UPDATE count = `count` + 1, last_update = '{l}';".format(t=self.emoji_table,i=x,l=current_timestamp) for x in liste]
+            query = "INSERT INTO `{}` (`ID`,`count`,`last_update`) VALUES (%(i)s, 1, %(l)s) ON DUPLICATE KEY UPDATE count = `count` + 1, last_update = %(l)s;".format(self.emoji_table)
+            for data in [{ 'i': x, 'l': current_timestamp } for x in liste]:
+                cursor.execute(query, data)
             cnx.commit()
             cursor.close()
         except Exception as e:
