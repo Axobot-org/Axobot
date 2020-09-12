@@ -594,6 +594,8 @@
         "clear-0": "{} messagz deletd!",
         "clear-1": "Ai cann:o2:t delte so few mesages plize",
         "clear-nt-found": "Hmm... unable 2 delete these messages. Discord tell me they don't exist *LOL*",
+        "destop-guild": "Dat msg donot belong to this cozy serv",
+        "destop-old": "I can't delete messages that old! ur crazy duh",
         "em-list": "{} (`:{}:`) addd on {} {}",
         "em-list-title": "Emojis of our super server",
         "em-private": "[Restrictd]",

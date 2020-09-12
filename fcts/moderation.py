@@ -992,6 +992,39 @@ ID corresponds to the Identifier of the message"""
                 pass
         await ctx.send(await self.translate(ctx.guild.id,'modo','unhoisted',c=count))
     
+    @commands.command(name="destop")
+    @commands.guild_only()
+    @commands.check(checks.can_clear)
+    @commands.cooldown(2, 30, commands.BucketType.channel)
+    async def destop(self, ctx:commands.Context, message:discord.Message):
+        """Clear every message between now and another message
+        Message can be either ID or url
+        Limited to 1,000 messages
+        
+        ..Example destop https://discordapp.com/channels/356067272730607628/488769306524385301/740249890201796688
+        
+        ..Doc moderator.html#clear"""
+        if message.guild != ctx.guild:
+            await ctx.send(await self.translate(ctx.guild.id, "modo", "destop-guild"))
+            return
+        if not message.channel.permissions_for(ctx.guild.me).manage_messages:
+            await ctx.send(await self.translate(ctx.guild.id, "modo", "need-manage-messages"))
+            return
+        if not message.channel.permissions_for(ctx.guild.me).read_message_history:
+            await ctx.send(await self.translate(ctx.guild.id, "modo", "need-read-history"))
+            return
+        check = lambda x: not x.pinned
+        if message.created_at < datetime.datetime.now() - datetime.timedelta(days=21):
+            await ctx.send(await self.translate(ctx.guild.id, "modo", "destop-old", days=21))
+            return
+        messages = await message.channel.purge(after=message, limit=1000, oldest_first=False)
+        await message.delete()
+        messages.append(message)
+        txt = (await self.translate(ctx.guild.id, "modo", "clear-0")).format(len(messages))
+        await ctx.send(txt, delete_after=2.0)
+        log = str(await self.translate(ctx.guild.id,"logs","clear")).format(channel=message.channel.mention,number=len(messages))
+        await self.bot.get_cog("Events").send_logs_per_server(ctx.guild, "clear", log, ctx.author)
+    
 
     async def find_verify_question(self,ctx:commands.Context) -> (str,str):
         """Find a question/answer for a verification question"""

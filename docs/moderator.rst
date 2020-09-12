@@ -70,6 +70,10 @@ If you enter :code:`clear 1000 @Z_runner#7515 @ZBot beta#4940`, the bot will del
 
 .. warning:: The permissions "`Manage messages <perms.html#manage-messages>`_" and "`Read messages history <perms.html#read-message-history>`_" are required.
 
+**Syntax:** :code:`destop <message>`
+
+If you don't know how many messages you want to delete, but instead want to delete all of them until a certain message, you can use this command. The "message" argument can be either a message ID (from the same channel) or a message url (from any channel of your server). Permissions needed for users and bot are the same as the clear command.
+
 ----
 Kick
 ----

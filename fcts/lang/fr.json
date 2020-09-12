@@ -594,6 +594,8 @@
         "clear-0": "{} messages supprimés !",
         "clear-1": "Je ne peux pas supprimer si peu de messages",
         "clear-nt-found": "Hum... impossible de supprimer ces messages. Discord me dit qu'ils n'existent pas :thinking:",
+        "destop-guild": "Ce message n'appartient pas à ce serveur",
+        "destop-old": "Je ne peux pas supprimer des messages vieux de plus de {days} jours !",
         "em-list": "{} (`:{}:`) ajouté le {} {}",
         "em-list-title": "Emojis du serveur {}",
         "em-private": "[Restreint]",
