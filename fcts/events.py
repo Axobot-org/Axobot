@@ -68,8 +68,12 @@ class Events(commands.Cog):
             return
         cnx = self.bot.cnx_frm
         cursor = cnx.cursor()
-        b = '' if before.nick is None else before.nick
-        a = '' if after.nick is None else after.nick
+        if isinstance(before, discord.Member):
+            b = '' if before.nick is None else before.nick
+            a = '' if after.nick is None else after.nick
+        else:
+            b = '' if before.name is None else before.name
+            a = '' if after.name is None else after.name
         guild = before.guild.id if hasattr(before, 'guild') else 0
         # ID = round(time.time()/2) * 10 + random.randrange(0,9)
         # query = ("INSERT INTO `usernames_logs` (`ID`,`user`,`old`,`new`,`guild`,`beta`) VALUES ('{}','{}','{}','{}','{}',{})".format(ID,before.id,b,a,before.guild.id,self.bot.beta))
