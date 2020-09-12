@@ -228,8 +228,10 @@
         "membernotfound": "On mahdotonta löytää käyttäjä `{m}` :confused:",
         "missingargument": "Upsis, argumentti \"{a}\" puuttuu {e}",
         "msgnotfound": "Mahdotonta löytää viesti tunnisteella {msg}",
+        "notrightroles": "Sinulla ei ole oikeita rooleja tämän komennon käyttöön",
         "rolenotfound": "On mahdotonta löytää rooli `{r}`",
         "toomanytxtchan": "Sinulla on liikaa teksti kanavia",
+        "unknown": "Ups, tapahtui virhe 😕 Yritä uudelleen myöhemmin, tai ota yhteyttä tukeen (löytyy komennosta `about`).",
         "usernotfound": "On mahdotonta löytää käyttäjä `{u}` :confused:"
     },
     "events": {
@@ -338,11 +340,19 @@
             "Tiesitkö että? Joissain tapahtumissa, on mahdollista saada keräys xp kortteja. Älä unohda seurata uutisia botin tuki palvelimessa!",
             "> Tämä myös aikoo ohittaa\n*(onko sinulla viite siihen?)*"
         ],
+        "unafk-cant": "Et ole AFK tilassa!",
         "unafk-done": "Et ole enää AFK:illa",
         "uninhabited-city": "Asumaton kaupunki :confused:",
         "vote-0": "Sinä voit laittaa enemmän kuin 20 vaihtoehtoa, ja myös vähemmän negatiivisia!"
     },
     "infos": {
+        "about-0": "Minun Discord palvelin:",
+        "about-1": "Kutsu minut toiseen palvelimeen:",
+        "about-2": "Botin dokumentaatio:",
+        "about-3": "Minun tekijäni Twitter käyttäjä:",
+        "about-4": "Lyhyt UKK:",
+        "about-5": "Tietosuojakäytäntö:",
+        "about-main": "Morjens! Olen {mention}!\nOlen botti joka antaa sinun tehdä monia asioita: valvontaa, tasoitusta, tilastoja, kumppanien hallintaa ja monia muita hyödyllisiä komentoja (ja myös turhia)!\nVoit aloittaa kirjoittamalla `!help` tällä kanavalla nähdäksesi kaikki komennot, sitten `!config see` antaa sinun nähdä konfiguraatiot.\nMinun omistaja ja minä haluamme kiittää näitä käyttäjää Awhikax kaikesta avusta monissa hankaluuksissa, käyttäjää Aragorn1202 kaikista ideoista ja ymmärtävistä lauseista, käyttäjää Adri526 kaikista mahtavista logoista, emojeista ja profiili kuvista, ja koko kääntäjä ryhmää isosta työstä!\n\n🌐 Hyödyllisiä linkkejä: {links}\n\nHyvää päivän jatkoa!",
         "admins-list": "Järjestelmänvalvojat tälle botille ovat : {}",
         "bitly_long": "Alkuperäinen URL: {url}",
         "bitly_nobit": "Tämä linkki ei ole bit.ly linkki!",
@@ -358,7 +368,8 @@
             "Itsebotti artikkeli",
             "Käyttöehdot botin tekijöille",
             "Miten löytää tunniste",
-            "Laillinen ikä määrä Discordin käyttöön per maa"
+            "Laillinen ikä määrä Discordin käyttöön per maa",
+            "BetterDiscordin käyttö on kielletty"
         ],
         "docs": "Tässä on linkki botin dokumenttiin:",
         "prefix": "Lista kaikista käytettävissä olevista etuliitoista:",
@@ -441,9 +452,14 @@
         ]
     },
     "library": {
-        "book_pres": "Otsikko: {title}\\nAlaotsikko: {subtitle}\\nTekijä(t): {author}\\nJulkaisia: {publisher}\\nJulkaistu: {publication}\\nKieli: {language}\\nSivu määrä: {pages}\\n\\nISBN : {isbn}",
+        "author": "kirjailija",
+        "authors": "kirjailijat",
+        "language": "kieli",
         "no-found": "Mahdotonta löytää tämä kirja",
-        "price": "Hinta"
+        "publisher": "julkaisija",
+        "title": "nimi",
+        "unknown": "ei tietoa",
+        "year": "julkaisu vuosi"
     },
     "logs": {
         "ban": "Käyttäjälle {member} on annettu porttikielto (syyllä: {reason} | keissi #{case})",
@@ -577,6 +593,8 @@
         "clear-0": "{} viestiä poistettu!",
         "clear-1": "En voi poistaa nuin vähän viestejä",
         "clear-nt-found": "Hmm... mahdotonta poistaa näitä viestejä. Discord sanoo minulle että ne ei ole oikeita 🤔",
+        "destop-guild": "Tämä viesti ei kuulu tälle palvelimelle",
+        "destop-old": "En voi poistaa viestejä, jotka ovat yli {days} päivää vanhoja!",
         "em-list": "{} (`:{}:`) lisätty {} {}",
         "em-list-title": "Hymiöt palvelimella {}",
         "em-private": "[Rajoitettu]",
@@ -594,8 +612,13 @@
         "missing-manage-nick": "Ups, minulta puuttuu \"Hallinnoi nimimerkkejä\" käyttöoikeus!",
         "missing-user-perms": "Ups, sinulta puuttuu käyttöoikeuksia (joko hallinnoi rooleja, hallinnoi palvelinta tai hallinnoi viestejä)",
         "mute-1": "{} on mykistetty syyllä `{}`!",
-        "mute-created": "`Mykistetty` rooli tehty!",
+        "mute-config-err": "Mahdotonta tehdä noin. Varmista onko minulla oikeat käyttöoikeudet ja yritä uudelleen.",
+        "mute-config-success": "Rooli on nyt tehty ja konfiguroitu! ({c} kanavaa ei pystynyt konfiguroida, koska minulla ei ole oikeuksia siihen)",
+        "mute-config-success2": "Rooli on nyt tehty ja konfiguroitu! ({c} kanavaa ei pystynyt konfiguroida, koska minulla ei ole oikeuksia siihen)",
         "mute-high": "Ups, näyttää siltä että `mykistetty` rooli on liian korkealla että voisin antaa sen... Korjaa tämä sillä että laita minun roolini `Mykistetty` roolin yläpuolelle.",
+        "mute-notemp": "Sinut on mykistetty palvelimella {server} syyllä {reason}",
+        "mute-role-created": "`Muted` rooli tehty! Voit käyttää komentoa `{p}mute-config` automaattiselle konfiguroinnille palvelimellasi.",
+        "mute-temp": "Sinut on mykistetty palvelimella {server} syyllä {reason}, sen kesto on {duration}",
         "need-manage-messages": "Käyttöoikeus \"Hallinnoi viestejä\" puuttuu 😕",
         "need-read-history": "Ups, minulta puuttuu \"Lue viestihistoriaa\" käyttöoikeus 😕",
         "no-bans": "Näyttää siltä että kenelläkään ei ole porttikieltoa",
@@ -758,7 +781,8 @@
             "speak": "Puhua",
             "stream": "Suoratoistaa",
             "use_voice_activation": "Käyttää puheentunnistusta",
-            "view_audit_log": "Katsoa valvontalokia"
+            "view_audit_log": "Katsoa valvontalokia",
+            "view_guild_insights": "Nähdä palvelinanalyysit"
         }
     },
     "roles_react": {
@@ -901,6 +925,7 @@
         "levelup_msg": "Viesti joka lähetetään kun jäsen saa uuden tason XP systeemissä: {}",
         "membercounter": "Kanava joka näyttää numeron jäsenistä sen nimessä on: {}",
         "modlogs_channel": "Kanava johon laitetaan valvonta lokit: {}",
+        "morpion_emojis": "Emojit joita käytetään risti-nollassa: {}",
         "mute": "Lista rooleista jotka voivat käyttää komentoa 'mute': {}",
         "muted_role": "Käytetty mykistys rooli : {}",
         "noxp_channels": "Kanavat joilla et voi saada XP:tä: {}",
@@ -956,6 +981,7 @@
             "ANIMATED_ICON": "Animoitu palvelin kuvake",
             "BANNER": "Erikois palvelin banneri",
             "COMMERCE": "Commerce Features",
+            "COMMUNITY": "Yhteisö Palvelin",
             "DISCOVERABLE": "Näkyy yhteys ikkunassa",
             "FEATURABLE": "Näkyy Aktiviteetti ikkunassa",
             "INVITE_SPLASH": "Kutsu taustakuva",
@@ -1141,6 +1167,7 @@
         "negative-xp": "Et voi laittaa negatiivista xp numeroa!",
         "no-bot": "Ei voi muokata bottejen XP:tä!",
         "no-rr": "Ei roolia konfiguroitu tälle tasolle",
+        "no-rr-2": "Et asettanut vielä yhtään rooli palkintoa!",
         "rr-added": "Rooli `{}` on lisätty oikein tasolle {} !",
         "rr-reload": "{} päivitti rooleja / {} skannasi jäsenet",
         "rr-removed": "Ei roolia anneta tasolle {} enään",
