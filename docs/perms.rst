@@ -25,7 +25,7 @@ Allows the bot to change the name, image and region of the server, or get the li
 Manage Roles
 ------------
 
-Allows the bot to create and delete roles, or edit the permissions of roles lower than his own, and to give them to other members. Used for: `mute <moderator.html#mute>`_
+Allows the bot to create and delete roles, or edit the permissions of roles lower than his own, and to give them to other members. Used for: `mute <moderator.html#mute-unmute>`_
 
 
 Manage Channels
@@ -107,7 +107,7 @@ Allows the bot to send a TTS message, i.e. a message that will be read aloud by 
 Manage Messages
 ---------------
 
-Allows the bot to pin or delete any message. Used for: `mute <moderator.html#mute>`_ , `freeze <moderator.html#freeze>`_ , `clear <moderator.html#clear>`_ , `purge <moderator.html#purge>`_ , `fun commands <fun.html>`_
+Allows the bot to pin or delete any message. Used for: `mute <moderator.html#mute-unmute>`_ , `freeze <moderator.html#freeze>`_ , `clear <moderator.html#clear>`_ , `purge <moderator.html#purge>`_ , `fun commands <fun.html>`_
 
 
 Embed Links

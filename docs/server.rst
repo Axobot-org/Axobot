@@ -64,7 +64,7 @@ List of every option
 * description: Description of the server, used for the `info server <infos.html#info>`_ command and potential partners. Default empty.
 * clear: List of roles allowed to use the `clear <moderator.html#clear>`_ command. By default, none.
 * slowmode: List of roles allowed to use the `slowmode <moderator.html#slowmode>`_ and `freeze <moderator.html#freeze>`_ commands. By default, none.
-* mute: List of roles allowed to use the `mute <moderator.html#mute>`_ command. By default, none.
+* mute: List of roles allowed to use the `mute <moderator.html#mute-unmute>`_ command. By default, none.
 * kick: List of roles allowed to use the `kick <moderator.html#kick>`_ command. By default, none.
 * ban: List of roles allowed to use the `ban <moderator.html#ban>`_ command. By default, none.
 * warn: List of roles allowed to use the `warn <moderator.html#warn>`_ and `cases <moderator.html#handling-cases>`_ commands. By default, none.

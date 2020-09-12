@@ -229,6 +229,7 @@
         "membernotfound": "Impossible de trouver le membre `{m}` :confused:",
         "missingargument": "Oups, il manque l'argument \"{a}\" {e}",
         "msgnotfound": "Message introuvable",
+        "notrightroles": "Vous n'avez pas les rôles nécessaires pour cette commande",
         "rolenotfound": "Impossible de trouver le rôle `{r}`",
         "toomanytxtchan": "Vous avez trop de salons textuels accessibles",
         "unknown": "Oups, une erreur est survenue :confused: Réessayez plus tard, ou contactez le support (commande `about`).",
@@ -341,6 +342,7 @@
             "> Cela aussi passera\n*(vous avez la référence ?)*"
         ],
         "unafk-done": "Vous n'êtes maintenant plus AFK",
+        "unafk-cant": "Vous n'êtes pas AFK !",
         "uninhabited-city": "Endroit inhabité",
         "vote-0": "Vous ne pouvez pas mettre plus de 20 choix, encore moins un nombre négatif de choix !"
     },
@@ -451,9 +453,14 @@
         ]
     },
     "library": {
-        "book_pres": "Titre : {title}\nSous-titre : {subtitle}\nAuteur(s) : {author}\nEditeur : {publisher}\nDate de publication : {publication}\nLangue de publication : {language}\nNombre de pages : {pages}\n\nISBN : {isbn}",
         "no-found": "Impossible de trouver un livre correspondant",
-        "price": "Prix"
+        "author": "auteur",
+        "authors": "auteurs",
+        "unknown": "inconnu",
+        "year": "année de publication",
+        "publisher": "éditeur",
+        "language": "langue",
+        "title": "titre"
     },
     "logs": {
         "ban": "{member} a été banni du serveur (raison : {reason} | casier #{case})",
@@ -587,6 +594,8 @@
         "clear-0": "{} messages supprimés !",
         "clear-1": "Je ne peux pas supprimer si peu de messages",
         "clear-nt-found": "Hum... impossible de supprimer ces messages. Discord me dit qu'ils n'existent pas :thinking:",
+        "destop-guild": "Ce message n'appartient pas à ce serveur",
+        "destop-old": "Je ne peux pas supprimer des messages vieux de plus de {days} jours !",
         "em-list": "{} (`:{}:`) ajouté le {} {}",
         "em-list-title": "Emojis du serveur {}",
         "em-private": "[Restreint]",
@@ -604,7 +613,10 @@
         "missing-manage-nick": "Oups, il me manque la permission \"Gérer les pseudos\"",
         "missing-user-perms": "Oups, il vous manque des permissions (gérer les rôles, gérer le serveur ou gérer les messages)",
         "mute-1": "Le membre {} a bien été réduit au silence pour la raison `{}` !",
-        "mute-created": "Rôle `muted` créé avec succès !",
+        "mute-config-err": "Impossible de faire cela. Veuillez vérifier mes permissions dans le serveur et réessayer.",
+        "mute-config-success": "Le rôle a été créé et configuré avec succès ! ({c} salons n'ont pas pu être configurés, par manque de permissions)",
+        "mute-config-success2": "Le rôle a été configuré avec succès ! ({c} salons n'ont pas pu être configurés, par manque de permissions)",
+        "mute-role-created": "Rôle `muted` créé avec succès !\nVous pouvez utiliser la commande `{p}mute-config` pour une configuration automatique dans votre serveur.",
         "mute-high": "Oups, il semble que le rôle `muted` soit trop haut pour que je puisse le donner... Veuillez fixer ce problème en plaçant mon rôle plus haut que le rôle `muted`.",
         "mute-notemp": "Vous avez été rendu muet dans le serveur {server} pour la raison {reason}",
         "mute-temp": "Vous avez été rendu muet dans le serveur {server} pour la raison {reason}, pour une durée de {duration}",

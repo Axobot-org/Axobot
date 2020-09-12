@@ -20,19 +20,27 @@ Warn
 
 This command allows you to warn a member, without really sanctioning him. This member will receive this warning by personal message (if they have not disabled them), and the warning will be stored in his logs.
 
-----
-Mute
-----
+-----------
+Mute/Unmute
+-----------
 
 **Syntax:** :code:`mute <user> [duration] [reason]`
 
 This command mutes a member, preventing them from typing. 
 
-The principle is to assign the *muted* role to the member, in order to distinguish him from the others. Simply configure the server permissions to have the "send messages" option disabled. And even if you don't, the bot will delete messages from recalcitrant mute members! 
+The principle is to assign the *muted* role to the member, in order to distinguish him from the others. Simply configure the permissions to have the "send messages" option disabled in your channels. And if configuring the role is too much work for you, you can ask the bot to try to setup it automatically with the :code:`mute-config` command (see below).
 
 The duration of the tempmute is quite flexible: use :code:`XXd` for days, :code:`XXh` for hours and :code:`XXm` for minutes (replacing **XX** by the corresponding number, of course!)
 
-.. warning:: The muted role must be placed below the bot role, and the bot must have "`Manage roles <perms.html#manage-roles>`_" (to give the role) and "`Manage messages <perms.html#manage-messages>`_" (to delete messages) permissions.
+.. warning:: The muted role must be placed below the bot role, and the bot must have "`Manage roles <perms.html#manage-roles>`_" (to give the role) permission.
+
+**Syntax:** :code:`unmute <user>`
+
+This command unmutes a member, when they already have the muted role. Not necessary when you had specified a duration during the mute, unless you want to stop it prematurely.
+
+**Syntax:** :code:`mute-config`
+
+With this command, Zbot will try to configure automatically the muted role (and create it if needed) with the correct permissions, both in your server and in your channels/categories. Basically, in Discord, the rule is "if a member has any role allowing them to do X, then they will be able to do X, no matter what other roles they have". So Zbot will at first make the muted role disallowing members to send messages in the channels (with the red cross permission), then check every other roles and make sure they don't allow muted members to send messages (so any green check will become a gray tick in the channels permissions).
 
 --------
 Slowmode
@@ -61,6 +69,10 @@ If you enter :code:`clear 13 -p -i @Z_runner#7515`, the bot will clear the last 
 If you enter :code:`clear 1000 @Z_runner#7515 @ZBot beta#4940`, the bot will delete all messages contained in the last 1000 messages of the channel AND written by Z_runner#7515 OR ZBot beta#4940 
 
 .. warning:: The permissions "`Manage messages <perms.html#manage-messages>`_" and "`Read messages history <perms.html#read-message-history>`_" are required.
+
+**Syntax:** :code:`destop <message>`
+
+If you don't know how many messages you want to delete, but instead want to delete all of them until a certain message, you can use this command. The "message" argument can be either a message ID (from the same channel) or a message url (from any channel of your server). Permissions needed for users and bot are the same as the clear command.
 
 ----
 Kick

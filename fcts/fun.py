@@ -363,10 +363,10 @@ You can specify a verification limit by adding a number in argument (up to 1.000
         except:
             pass
 
-    @say.error
-    async def say_error(self,ctx,error):
-        if str(error)!='The check functions for command say failed.':
-            await self.say_function(ctx,None,ctx.view.buffer.replace(ctx.prefix+ctx.invoked_with,"",1))
+    # @say.error
+    # async def say_error(self,ctx,error):
+    #     if str(error) != 'The check functions for command say failed.':
+    #         await self.say_function(ctx,None,ctx.view.buffer.replace(ctx.prefix+ctx.invoked_with,"",1))
 
     @commands.command(name="me",hidden=True)
     @commands.check(is_fun_enabled)
@@ -518,6 +518,8 @@ You can specify a verification limit by adding a number in argument (up to 1.000
                     await ctx.author.edit(nick=ctx.author.display_name.replace(" [AFK]",''))                
                 except discord.errors.Forbidden:
                     pass
+        else:
+            await ctx.send(await self.translate(ctx.guild.id,"fun","unafk-cant"))
     
     async def check_afk(self,msg:discord.Message):
         """Check if someone pinged is afk"""
@@ -669,7 +671,7 @@ You can specify a verification limit by adding a number in argument (up to 1.000
         if ctx.guild and not ctx.channel.permissions_for(ctx.guild.me).embed_links:
             await ctx.send(await self.translate(ctx.channel, "fun", "no-embed-perm"))
             return
-        if self.nasa_pict == None or (datetime.datetime.utcnow()-get_date(self.nasa_pict["date"])).total_seconds() > 86400:
+        if self.nasa_pict == None or 'date' not in self.nasa_pict or (datetime.datetime.utcnow()-get_date(self.nasa_pict["date"])).total_seconds() > 86400:
             async with aiohttp.ClientSession() as session:
                 key = self.bot.others["nasa"]
                 async with session.get(f"https://api.nasa.gov/planetary/apod?api_key={key}") as r:
@@ -677,39 +679,11 @@ You can specify a verification limit by adding a number in argument (up to 1.000
         emb = self.bot.get_cog("EmbedCog").Embed(
             title=self.nasa_pict["title"],
             image=self.nasa_pict["url"],
-            url=self.nasa_pict["hdurl"],
+            url=self.nasa_pict["hdurl"] if self.nasa_pict["media_type"]=="image" else self.nasa_pict["url"],
             desc=self.nasa_pict["explanation"],
             footer_text="Credits: "+self.nasa_pict.get("copyright", "Not copyrighted"),
             time=get_date(self.nasa_pict["date"]))
         await ctx.send(embed=emb)
-        
-
-    @commands.command(name="markdown")
-    async def markdown(self,ctx):
-        """Get help about markdown in Discord"""
-        await ctx.send(await self.translate(ctx.channel,'fun','markdown'))
-    
-
-    @commands.command(name="bubble-wrap", aliases=["papier-bulle", "bw"], hidden=True)
-    @commands.cooldown(5,30,commands.BucketType.channel)
-    @commands.cooldown(5,60,commands.BucketType.user)
-    async def bubblewrap(self, ctx:commands.Context, width:int=10, height:int=15):
-        """Just bubble wrap. Which pops when you squeeze it. That's all.
-
-        Width should be between 1 and 150, height between 1 and 50.
-
-        ..Example bubble-wrap
-
-        ..Example bbw 7 20
-        """
-        width = min(max(1, width), 150)
-        height = min(max(1, height), 50)
-        p = "||pop||"
-        txt = "\n".join([p*width]*height)
-        if len(txt) > 2000:
-            await ctx.send(await self.translate(ctx.channel, "fun", "bbw-too-many"))
-            return
-        await ctx.send(txt)
         
 
     @commands.command(name="vote")

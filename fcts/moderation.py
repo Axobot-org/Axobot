@@ -141,10 +141,10 @@ Slowmode works up to one message every 6h (21600s)
                 if (i == None and invites==2) or (i != None and invites==0):
                     c4 = False
             #return ((m.pinned == pinned) or ((m.attachments != []) == files) or ((r != None) == links)) and m.author in users
-            mentions = [x.id for x in ctx.message.mentions]
+            mentions = re.findall(r'<@!?\d{16,18}>', ctx.message.content)
             if str(ctx.bot.user.id) in ctx.prefix:
                 mentions.remove(ctx.bot.user.id)
-            if mentions != [] and m.author!=None:
+            if mentions != [] and m.author != None:
                 return c1 and c2 and c3 and c4 and m.author.id in mentions
             else:
                 return c1 and c2 and c3 and c4
@@ -288,7 +288,7 @@ Slowmode works up to one message every 6h (21600s)
             return discord.utils.get(guild.roles,name="muted")
         return guild.get_role(opt)
 
-    async def mute_event(self,member,author,reason,caseID:int,duration:str=None):
+    async def mute_event(self, member:discord.Member, author:discord.Member, reason:str, caseID:int, duration:str=None):
         role = await self.get_muted_role(member.guild)
         await member.add_roles(role,reason=reason)
         log = str(await self.translate(member.guild.id,"logs","mute-on" if duration==None else "tempmute-on")).format(member=member,reason=reason,case=caseID,duration=duration)
@@ -302,8 +302,9 @@ Slowmode works up to one message every 6h (21600s)
             await ctx.send(await self.translate(ctx.guild.id,"modo","cant-mute"))
             return False
         if role == None:
-            role = await self.bot.cogs['ModeratorCog'].configure_muted_role(ctx.guild)
-            await ctx.send(await self.translate(ctx.guild.id,"modo","mute-created"))
+            role = await ctx.guild.create_role(name="muted")
+            # await self.bot.cogs['ModeratorCog'].configure_muted_role(ctx.guild, role)
+            await ctx.send(await self.translate(ctx.guild.id,"modo","mute-role-created", p=ctx.prefix))
             return True
         if role.position > ctx.guild.me.roles[-1].position:
             await ctx.send(await self.translate(ctx.guild.id,"modo","mute-high"))
@@ -327,14 +328,20 @@ You can also mute this member for a defined duration, then use the following for
 
 ..Example mute @someone Plz respect me
 
-..Doc moderator.html#mute"""
+..Doc moderator.html#mute-unmute"""
         duration = sum(time)
         if duration>0:
             f_duration = await self.bot.cogs['TimeCog'].time_delta(duration,lang=await self.translate(ctx.guild,'current_lang','current'),form='temp',precision=0)
         else:
             f_duration = None
         try:
-            if self.bot.database_online and await self.bot.cogs["ServerCog"].staff_finder(user,"mute") or user==ctx.guild.me:
+            async def user_can_mute(user): 
+                try:
+                    return await self.bot.cogs["ServerCog"].staff_finder(user,"mute")
+                except commands.errors.CommandError:
+                    pass
+                return False
+            if user==ctx.guild.me or (self.bot.database_online and await user_can_mute(user)):
                 await ctx.send(str(await self.translate(ctx.guild.id,"modo","staff-mute"))+random.choice([':confused:',':upside_down:',self.bot.cogs['EmojiCog'].customEmojis['wat'],':no_mouth:',self.bot.cogs['EmojiCog'].customEmojis['owo'],':thinking:',]))
                 return
             elif not self.bot.database_online and ctx.channel.permissions_for(user).manage_roles:
@@ -400,11 +407,13 @@ You can also mute this member for a defined duration, then use the following for
     @commands.cooldown(5,20, commands.BucketType.guild)
     @commands.guild_only()
     @commands.check(checks.can_mute)
-    async def unmute(self,ctx,user:discord.Member):
+    async def unmute(self, ctx:commands.Context, *, user:discord.Member):
         """Unmute someone
 This will remove the role 'muted' for the targeted member
 
-..Example unmute @someone"""
+..Example unmute @someone
+
+..Doc moderator.html#mute-unmute"""
         role = await self.get_muted_role(ctx.guild)
         if role not in user.roles:
             await ctx.send(await self.translate(ctx.guild.id,"modo","already-unmute"))
@@ -429,6 +438,26 @@ This will remove the role 'muted' for the targeted member
             await ctx.send(await self.translate(ctx.guild.id,"modo","error"))
             await self.bot.cogs['ErrorsCog'].on_error(e,ctx)
 
+    @commands.command(name="mute-config")
+    @commands.cooldown(1,15, commands.BucketType.guild)
+    @commands.guild_only()
+    @commands.has_guild_permissions(manage_roles=True)
+    async def mute_config(self, ctx:commands.Context):
+        """Auto configure the muted role for you
+        Useful if you want to have a base for a properly working muted role
+        Warning: the process may break some things in your server, depending on how you configured your channel permissions.
+
+        ..Doc moderator.html#mute-unmute
+        """
+        role = await self.get_muted_role(ctx.guild)
+        create = role is None
+        role, count = await self.configure_muted_role(ctx.guild, role)
+        if role is None or count >= len(ctx.guild.voice_channels+ctx.guild.text_channels):
+            await ctx.send(await self.translate(ctx.guild.id, "modo", "mute-config-err"))
+        elif create:
+            await ctx.send(await self.translate(ctx.guild.id, "modo", "mute-config-success", c=count))
+        else:
+            await ctx.send(await self.translate(ctx.guild.id, "modo", "mute-config-success2", c=count))
 
 
     @commands.command(name="ban")
@@ -963,6 +992,39 @@ ID corresponds to the Identifier of the message"""
                 pass
         await ctx.send(await self.translate(ctx.guild.id,'modo','unhoisted',c=count))
     
+    @commands.command(name="destop")
+    @commands.guild_only()
+    @commands.check(checks.can_clear)
+    @commands.cooldown(2, 30, commands.BucketType.channel)
+    async def destop(self, ctx:commands.Context, message:discord.Message):
+        """Clear every message between now and another message
+        Message can be either ID or url
+        Limited to 1,000 messages
+        
+        ..Example destop https://discordapp.com/channels/356067272730607628/488769306524385301/740249890201796688
+        
+        ..Doc moderator.html#clear"""
+        if message.guild != ctx.guild:
+            await ctx.send(await self.translate(ctx.guild.id, "modo", "destop-guild"))
+            return
+        if not message.channel.permissions_for(ctx.guild.me).manage_messages:
+            await ctx.send(await self.translate(ctx.guild.id, "modo", "need-manage-messages"))
+            return
+        if not message.channel.permissions_for(ctx.guild.me).read_message_history:
+            await ctx.send(await self.translate(ctx.guild.id, "modo", "need-read-history"))
+            return
+        check = lambda x: not x.pinned
+        if message.created_at < datetime.datetime.now() - datetime.timedelta(days=21):
+            await ctx.send(await self.translate(ctx.guild.id, "modo", "destop-old", days=21))
+            return
+        messages = await message.channel.purge(after=message, limit=1000, oldest_first=False)
+        await message.delete()
+        messages.append(message)
+        txt = (await self.translate(ctx.guild.id, "modo", "clear-0")).format(len(messages))
+        await ctx.send(txt, delete_after=2.0)
+        log = str(await self.translate(ctx.guild.id,"logs","clear")).format(channel=message.channel.mention,number=len(messages))
+        await self.bot.get_cog("Events").send_logs_per_server(ctx.guild, "clear", log, ctx.author)
+    
 
     async def find_verify_question(self,ctx:commands.Context) -> (str,str):
         """Find a question/answer for a verification question"""
@@ -1024,31 +1086,36 @@ ID corresponds to the Identifier of the message"""
 
 
 
-    async def configure_muted_role(self,guild):
+    async def configure_muted_role(self, guild: discord.Guild, role: discord.Role = None):
         """Ajoute le rôle muted au serveur, avec les permissions nécessaires"""
         if not guild.me.guild_permissions.manage_roles:
-            return False
-        try:
+            return None, 0
+        if role is None:
             role = await guild.create_role(name="muted")
+        count = 0
+        try:
             for x in guild.by_category():
-                count = 0
-                category,channelslist = x[0],x[1]
+                category, channelslist = x[0], x[1]
                 for channel in channelslist:
-                    if channel==None:
+                    if channel is None:
                         continue
-                    if len(channel.changed_roles)!=0 and channel.changed_roles!=category.changed_roles:
-                        await channel.set_permissions(role,send_messages=False)
-                        for r in channel.changed_roles:
-                            if r.permissions.send_messages:
-                                obj = channel.overwrites_for(r)
-                                obj.send_messages=None
-                                await channel.set_permissions(r,overwrite=obj)
-                        count += 1
-                await category.set_permissions(role,send_messages=False)
-            await self.bot.cogs['ServerCog'].modify_server(guild.id,values=[('muted_role',role.id)])
-            return role
+                    if len(channel.changed_roles) != 0 and not channel.permissions_synced:
+                        try:
+                            await channel.set_permissions(role, send_messages=False)
+                            for r in channel.changed_roles:
+                                if r.permissions.send_messages:
+                                    obj = channel.overwrites_for(r)
+                                    obj.send_messages = None
+                                    await channel.set_permissions(r, overwrite=obj)
+                        except discord.errors.Forbidden:
+                            count += 1
+                if category is not None and category.permissions_for(guild.me).manage_roles:
+                    await category.set_permissions(role, send_messages=False)
+            await self.bot.cogs['ServerCog'].modify_server(guild.id, values=[('muted_role',role.id)])
+            return role, count
         except Exception as e:
-            await self.bot.cogs['ErrorsCog'].on_error(e,None)
+            await self.bot.cogs['ErrorsCog'].on_error(e, None)
+            return role, len(guild.channels)
 
 
 def setup(bot):

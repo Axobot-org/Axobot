@@ -86,8 +86,8 @@ class RolesReact(commands.Cog):
             emoji = emoji.id
         cursor = cnx.cursor(dictionary = True)
         ID = await self.gen_id()
-        query = ("INSERT INTO `{}` (`ID`,`guild`,`role`,`emoji`,`description`) VALUES ('{i}','{g}','{r}','{e}','{d}');".format(self.table,i=ID,g=guild,r=role,e=emoji,d=desc))
-        cursor.execute(query)
+        query = ("INSERT INTO `{}` (`ID`,`guild`,`role`,`emoji`,`description`) VALUES (%(i)s,%(g)s,%(r)s,%(e)s,%(d)s);".format(self.table))
+        cursor.execute(query, { 'i':ID, 'g':guild, 'r':role, 'e':emoji, 'd':desc })
         cnx.commit()
         cursor.close()
         return True
