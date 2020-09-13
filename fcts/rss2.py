@@ -1280,7 +1280,7 @@ class RssCog(commands.Cog):
         """Add a flow in the database"""
         cnx = self.bot.cnx_frm
         cursor = cnx.cursor()
-        ID = await self.create_id(channelID,guildID,Type,link)
+        ID = await self.create_id(channelID, guildID, _type, link)
         if _type == 'mc':
             form = ''
         else:
