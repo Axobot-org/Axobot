@@ -487,7 +487,13 @@ The 'days_to_delete' option represents the number of days worth of messages to d
                 return
             if user in ctx.guild.members:
                 member = ctx.guild.get_member(user.id)
-                if self.bot.database_online and await self.bot.cogs["ServerCog"].staff_finder(member,"ban") or user==ctx.guild.me:
+                async def user_can_ban(user): 
+                    try:
+                        return await self.bot.cogs["ServerCog"].staff_finder(user,"ban")
+                    except commands.errors.CommandError:
+                        pass
+                    return False
+                if user==ctx.guild.me or (self.bot.database_online and await user_can_ban(member)):
                     await ctx.send(await self.translate(ctx.guild.id,"modo","staff-ban"))
                     return
                 elif not self.bot.database_online and (ctx.channel.permissions_for(member).ban_members or user==ctx.guild.me):
