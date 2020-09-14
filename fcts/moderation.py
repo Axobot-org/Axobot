@@ -187,10 +187,15 @@ Slowmode works up to one message every 6h (21600s)
             if not ctx.channel.permissions_for(ctx.guild.me).kick_members:
                 await ctx.send(await self.translate(ctx.guild.id,"modo","cant-kick"))
                 return
-            if self.bot.database_online:
-                if await self.bot.cogs["ServerCog"].staff_finder(user,"kick") or user==ctx.guild.me:
-                    return await ctx.send(await self.translate(ctx.guild.id,"modo","staff-kick"))
-            elif user==ctx.guild.me or ctx.channel.permissions_for(user).kick_members:
+            async def user_can_kick(user): 
+                try:
+                    return await self.bot.cogs["ServerCog"].staff_finder(user,"kick")
+                except commands.errors.CommandError:
+                    pass
+                return False
+            if user==ctx.guild.me or (self.bot.database_online and await user_can_kick(user)):
+                return await ctx.send(await self.translate(ctx.guild.id,"modo","staff-kick"))
+            elif not self.bot.database_online and ctx.channel.permissions_for(user).kick_members:
                 return await ctx.send(await self.translate(ctx.guild.id,"modo","staff-kick"))
             if user.roles[-1].position >= ctx.guild.me.roles[-1].position:
                 await ctx.send(await self.translate(ctx.guild.id,"modo","kick-1"))
@@ -242,7 +247,13 @@ Slowmode works up to one message every 6h (21600s)
 
 ..Doc moderator.html#warn"""
         try:
-            if self.bot.database_online and await self.bot.cogs["ServerCog"].staff_finder(user,"warn"):
+            async def user_can_warn(user): 
+                try:
+                    return await self.bot.cogs["ServerCog"].staff_finder(user,"warn")
+                except commands.errors.CommandError:
+                    pass
+                return False
+            if user==ctx.guild.me or (self.bot.database_online and await user_can_warn(user)):
                 return await ctx.send(await self.translate(ctx.guild.id,"modo","staff-warn"))
             elif not self.bot.database_online and ctx.channel.permissions_for(user).manage_roles:
                 return await ctx.send(await self.translate(ctx.guild.id,"modo","staff-warn"))
@@ -624,10 +635,15 @@ Permissions for using this command are the same as for the kick
             if not ctx.channel.permissions_for(ctx.guild.me).ban_members:
                 await ctx.send(await self.translate(ctx.guild.id,"modo","cant-ban"))
                 return
-            if self.bot.database_online:
-                if await self.bot.cogs["ServerCog"].staff_finder(user,"kick") or user==ctx.guild.me:
-                    return await ctx.send(await self.translate(ctx.guild.id,"modo","staff-kick"))
-            elif user==ctx.guild.me or ctx.channel.permissions_for(user).kick_members:
+            async def user_can_kick(user): 
+                try:
+                    return await self.bot.cogs["ServerCog"].staff_finder(user,"kick")
+                except commands.errors.CommandError:
+                    pass
+                return False
+            if user==ctx.guild.me or (self.bot.database_online and await user_can_kick(user)):
+                return await ctx.send(await self.translate(ctx.guild.id,"modo","staff-kick"))
+            elif not self.bot.database_online and ctx.channel.permissions_for(user).kick_members:
                 return await ctx.send(await self.translate(ctx.guild.id,"modo","staff-kick"))
             if user.roles[-1].position >= ctx.guild.me.roles[-1].position:
                 await ctx.send(await self.translate(ctx.guild.id,"modo","kick-1"))
