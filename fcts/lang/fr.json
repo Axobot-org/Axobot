@@ -460,6 +460,7 @@
         "year": "année de publication",
         "publisher": "éditeur",
         "language": "langue",
+        "rate-limited": "Impossible de faire une recherche par nom pour le moment. Veuillez réessayer plus tard",
         "title": "titre"
     },
     "logs": {

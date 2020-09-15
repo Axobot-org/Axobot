@@ -98,12 +98,17 @@ class LibCog(commands.Cog):
             await self.bot.cogs['HelpCog'].help_command(ctx,['book'])
     
     @book_main.command(name="search",aliases=["book"])
+    @commands.cooldown(5, 60, commands.BucketType.guild)
     async def book_search(self, ctx:commands.Context, ISBN:typing.Optional[ISBN], *, keywords:str=''):
         """Search from a book from its ISBN or search terms"""
         keywords = keywords.replace('-','')
         while '  ' in keywords:
             keywords = keywords.replace('  ',' ')
-        book = await self.search_book_2(ISBN, keywords)
+        try:
+            book = await self.search_book_2(ISBN, keywords)
+        except isbnlib.dev._exceptions.ISBNLibHTTPError:
+            await ctx.send(await self.translate(ctx.channel, "library", "rate-limited") + " :confused:")
+            return
         if book is None:
             return await ctx.send(await self.translate(ctx.channel,'library','no-found'))
         unknown = await self.translate(ctx.channel, 'library', 'unknown')

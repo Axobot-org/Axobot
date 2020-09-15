@@ -460,6 +460,7 @@
         "year": "book date in your favorite store",
         "publisher": "guy who printed",
         "language": "langu",
+        "rate-limited": "I cant search w/ name for the moment. Plz try again later",
         "title": "title"
     },
     "logs": {

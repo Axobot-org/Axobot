@@ -449,6 +449,7 @@
         "year": "publication year",
         "publisher": "publisher",
         "language": "language",
+        "rate-limited": "Cannot search by name at the moment. Please try again later",
         "title": "title"
     },
     "logs": {
