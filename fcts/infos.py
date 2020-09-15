@@ -224,7 +224,7 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
             #-----
             if item is None:
                 msg = await self.translate(ctx.guild.id,"stats_infos","not-found")
-                await ctx.send(msg.format(N=name))
+                await ctx.send(msg.format(N=name[:1900]))
             elif type(item) == discord.Member:
                 await self.member_infos(ctx,item,lang,critical)
             elif type(item) == discord.Role:
@@ -251,7 +251,7 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
                 await ctx.send(str(type(item))+" / "+str(item))
         except Exception as e:
             await self.bot.cogs["ErrorsCog"].on_error(e,ctx)
-            await ctx.send("`Error`: "+str(e))
+            await ctx.send(await self.translate(ctx.channel,'errors','unknown'))
 
     async def member_infos(self,ctx,item,lang,critical_info=False):
         since = await self.translate(ctx.guild.id,"keywords","depuis")
