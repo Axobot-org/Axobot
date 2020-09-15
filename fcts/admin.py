@@ -198,7 +198,7 @@ class AdminCog(commands.Cog):
                 mentions = [x.mention for x in mentions if x!=None]
             for chan in channels:
                 try:
-                    await chan.send(self.update[lang]+"\n\n"+" ".join(mentions))
+                    await chan.send(self.update[lang]+"\n\n"+" ".join(mentions), allowed_mentions=discord.AllowedMentions(everyone=False))
                 except Exception as e:
                     await ctx.bot.cogs['ErrorsCog'].on_error(e,ctx)
                 else:

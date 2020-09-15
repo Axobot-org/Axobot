@@ -139,7 +139,7 @@ class ErrorsCog(commands.Cog):
             return
         else:
             try:
-                await ctx.send(await self.translate(ctx.channel,'errors','unknown'), allowed_mentions=ALLOWED)
+                await ctx.send(await self.translate(ctx.channel,'errors','unknown'))
             except Exception as newerror:
                 self.bot.log.info("[on_cmd_error] Can't send error on channel {}: {}".format(ctx.channel.id,newerror))
         # All other Errors not returned come here... And we can just print the default TraceBack.

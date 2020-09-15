@@ -217,7 +217,7 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
                     try:
                         item = await find(ctx,name,Type)
                     except:
-                        name = name.replace('@everyone',"@"+u"\u200B"+"everyone").replace("@here","@"+u"\u200B"+"here")
+                        # name = name.replace('@everyone',"@"+u"\u200B"+"everyone").replace("@here","@"+u"\u200B"+"here")
                         await ctx.send(str(await self.translate(ctx.guild.id,"modo","cant-find-user")).format(name))
                         return
             critical = ctx.author.guild_permissions.manage_guild or await self.bot.cogs['AdminCog'].check_if_god(ctx)

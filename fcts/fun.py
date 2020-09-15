@@ -97,7 +97,8 @@ class FunCog(commands.Cog):
         liste = list(set([x for x in [x.strip() for x in options.split(',')] if len(x)>0]))
         if len(liste) < 2:
             return await ctx.send(await self.translate(ctx.channel,"fun","no-roll"))
-        choosen = random.choice(liste).replace('@everyone','@​everyone').replace('@here','@​here')
+        # choosen = random.choice(liste).replace('@everyone','@​everyone').replace('@here','@​here')
+        choosen = random.choice(liste)
         await ctx.send(choosen)
 
     @commands.command(name="cookie",aliases=['cookies'],hidden=True)
@@ -219,7 +220,8 @@ You can specify a verification limit by adding a number in argument (up to 1.000
             victime = ctx.author.display_name
             ex = ctx.author.display_name.replace(" ","_")
         else:
-            victime = name.replace('@everyone','@​everyone').replace('@here','@​here')
+            # victime = name.replace('@everyone','@​everyone').replace('@here','@​here')
+            victime = name
             ex = name.replace(" ","_")
         author = ctx.author.mention
         liste = await self.translate(ctx.channel,"kill","list")
@@ -266,7 +268,8 @@ You can specify a verification limit by adding a number in argument (up to 1.000
     @commands.check(is_fun_enabled)
     async def big_text(self,ctx,*,text):
         """If you wish to write bigger"""
-        contenu = await self.bot.cogs['UtilitiesCog'].clear_msg(text,ctx=ctx,emojis=False)
+        # contenu = await self.bot.cogs['UtilitiesCog'].clear_msg(text,ctx=ctx,emojis=False)
+        contenu = await commands.clean_content().convert(ctx, text)
         text = ""
         Em = self.bot.cogs['EmojiCog']
         mentions = [x.group(1) for x in re.finditer(r'(<(?:@!?&?|#|a?:[a-zA-Z0-9_]+:)\d+>)',ctx.message.content)]
@@ -351,7 +354,7 @@ You can specify a verification limit by adding a number in argument (up to 1.000
     
     async def say_function(self,ctx:commands.Context,channel:discord.TextChannel,text:str):
         try:
-            text = await self.bot.cogs["UtilitiesCog"].clear_msg(text,everyone = not ctx.channel.permissions_for(ctx.author).mention_everyone, ctx=ctx)
+            text = await self.bot.cogs["UtilitiesCog"].clear_msg(text, ctx=ctx)
         except Exception as e:
             await self.bot.cogs['ErrorsCog'].on_error(e,ctx)
             return
@@ -373,7 +376,7 @@ You can specify a verification limit by adding a number in argument (up to 1.000
     async def me(self,ctx,*,text):
         """No U"""
         text = "*{} {}*".format(ctx.author.display_name,text)
-        text = await self.bot.cogs["UtilitiesCog"].clear_msg(text,everyone=not ctx.message.mention_everyone,ctx=ctx)
+        text = await self.bot.cogs["UtilitiesCog"].clear_msg(text,ctx=ctx)
         await ctx.send(text)
         if self.bot.database_online and await self.bot.cogs["ServerCog"].staff_finder(ctx.author,"say"):
             await self.bot.cogs["UtilitiesCog"].suppr(ctx.message)
@@ -423,7 +426,8 @@ You can specify a verification limit by adding a number in argument (up to 1.000
     @commands.check(is_fun_enabled)
     async def lmgtfy(self,ctx,*,search):
         """How to use Google"""
-        link = "http://lmgtfy.com/?q="+search.replace("\n","+").replace(" ","+").replace('@eveyrone','@+everyone').replace('@here','@+here')
+        # link = "http://lmgtfy.com/?q="+search.replace("\n","+").replace(" ","+").replace('@eveyrone','@+everyone').replace('@here','@+here')
+        link = "http://lmgtfy.com/?q="+search.replace("\n","+").replace(" ","+")
         await ctx.send('<'+link+'>')
         await self.bot.cogs['UtilitiesCog'].suppr(ctx.message)
     
@@ -496,8 +500,7 @@ You can specify a verification limit by adding a number in argument (up to 1.000
         """Make you AFK
         You'll get a nice nickname, because nicknames are cool, aren't they?"""
         try:
-            reason = await self.bot.cogs['UtilitiesCog'].clear_msg(reason,ctx.message.mention_everyone,ctx)
-            self.afk_guys[ctx.author.id] = discord.utils.escape_mentions(reason)
+            self.afk_guys[ctx.author.id] = await self.bot.cogs['UtilitiesCog'].clear_msg(reason, ctx=ctx)
             if (not ctx.author.display_name.endswith(' [AFK]')) and len(ctx.author.display_name)<26:
                 await ctx.author.edit(nick=ctx.author.display_name+" [AFK]")
             await ctx.send(await self.translate(ctx.guild.id,"fun","afk-done"))
@@ -534,7 +537,7 @@ You can specify a verification limit by adding a number in argument (up to 1.000
                 if member.id not in self.afk_guys or len(self.afk_guys[member.id])==0:
                     await msg.channel.send(await self.translate(msg.guild.id,"fun","afk-user-2"))
                 else:
-                    reason = await self.bot.cogs['UtilitiesCog'].clear_msg(str(await self.translate(msg.guild.id,"fun","afk-user-1")).format(self.afk_guys[member.id]),everyone=True,ctx=ctx)
+                    reason = await self.bot.cogs['UtilitiesCog'].clear_msg(str(await self.translate(msg.guild.id,"fun","afk-user-1")).format(self.afk_guys[member.id]),ctx=ctx)
                     await msg.channel.send(reason)
         if (not await checks.is_a_cmd(msg, self.bot)) and ((ctx.author.nick and ctx.author.nick.endswith(' [AFK]')) or ctx.author.id in self.afk_guys.keys()):
             user_config = await self.bot.cogs['UtilitiesCog'].get_db_userinfo(["auto_unafk"],[f'`userID`={ctx.author.id}'])

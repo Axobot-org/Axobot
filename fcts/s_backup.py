@@ -243,7 +243,8 @@ Arguments are:
             else:
                 for role in data["roles"]:
                     try:
-                        rolename = role["name"].replace("@everyone","@"+u'\u200b'+"everyone").replace("@here","@"+u'\u200b'+"here")
+                        # rolename = role["name"].replace("@everyone","@"+u'\u200b'+"everyone").replace("@here","@"+u'\u200b'+"here")
+                        rolename = role["name"]
                         action = "edit"
                         r = ctx.guild.get_role(role["id"])
                         if r == None:
@@ -330,7 +331,8 @@ Arguments are:
                     try:
                         if ("id" in categ.keys() and categ["id"] == None):
                             continue
-                        categname = categ["name"].replace("@everyone","@"+u'\u200b'+"everyone").replace("@here","@"+u'\u200b'+"here")
+                        # categname = categ["name"].replace("@everyone","@"+u'\u200b'+"everyone").replace("@here","@"+u'\u200b'+"here")
+                        categname = categ["name"]
                         action = "edit"
                         c = ctx.guild.get_channel(categ["id"])
                         if c == None:
@@ -394,7 +396,8 @@ Arguments are:
                     ]
                 for chan, categ in _channels_to_make:
                     try:
-                        channame = chan["name"].replace("@everyone","@"+u'\u200b'+"everyone").replace("@here","@"+u'\u200b'+"here")
+                        # channame = chan["name"].replace("@everyone","@"+u'\u200b'+"everyone").replace("@here","@"+u'\u200b'+"here")
+                        channame = chan["name"]
                         action = "edit"
                         c = ctx.guild.get_channel(chan["id"])
                         if c == None:
@@ -559,14 +562,14 @@ Arguments are:
             else:
                 for emojiname, emojidata in data["emojis"].items():
                     try:
-                        emoji_name = emojiname.replace("@everyone","@"+u'\u200b'+"everyone").replace("@here","@"+u'\u200b'+"here")
+                        # emoji_name = emojiname.replace("@everyone","@"+u'\u200b'+"everyone").replace("@here","@"+u'\u200b'+"here")
                         if len([x for x in ctx.guild.emojis if x.name == emojiname]) > 0:
                             logs.append("  "+symb[1]+" Emoji {} already exists".format(emojiname))
                             continue
                         try:
                             icon = await self.urlToByte(emojidata["url"])
                         except:
-                            logs.append("  "+symb[0]+" Unable to create emoji {}: the image has probably been deleted from Discord cache".format(emoji_name))
+                            logs.append("  "+symb[0]+" Unable to create emoji {}: the image has probably been deleted from Discord cache".format(emojiname))
                             continue
                         roles = list()
                         for r in emojidata["roles"]:
@@ -580,13 +583,13 @@ Arguments are:
                             roles = None
                         await ctx.guild.create_custom_emoji(name=emojiname, image=icon, roles=roles)
                     except discord.errors.Forbidden:
-                        logs.append("  "+symb[0]+" Unable to create emoji {}: missing permissions".format(emoji_name))
+                        logs.append("  "+symb[0]+" Unable to create emoji {}: missing permissions".format(emojiname))
                         problems[0] += 1
                     except Exception as e:
-                        logs.append("  "+symb[0]+" Unable to create emoji {}: {}".format(emoji_name,e))
+                        logs.append("  "+symb[0]+" Unable to create emoji {}: {}".format(emojiname,e))
                         problems[1] += 1
                     else:
-                        logs.append("  "+symb[2]+" Emoji {} created".format(emoji_name))
+                        logs.append("  "+symb[2]+" Emoji {} created".format(emojiname))
                 if "delete_old_emojis" in args:
                     for emoji in ctx.guild.emojis:
                         if emoji.name in data["emojis"].keys():
@@ -611,7 +614,8 @@ Arguments are:
                 created_webhooks_urls = list()
                 for webhook in data["webhooks"]:
                     try:
-                        webhookname = webhook["name"].replace("@everyone","@"+u'\u200b'+"everyone").replace("@here","@"+u'\u200b'+"here")
+                        # webhookname = webhook["name"].replace("@everyone","@"+u'\u200b'+"everyone").replace("@here","@"+u'\u200b'+"here")
+                        webhookname = webhook["name"]
                         if len([x for x in await ctx.guild.webhooks() if x.url == webhook["url"]]) > 0:
                             logs.append("  "+symb[1]+" Webhook {} already exists".format(webhookname))
                             continue
