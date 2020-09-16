@@ -191,7 +191,7 @@ class ServerCog(commands.Cog):
         cnx = self.bot.cnx_frm
         cursor = cnx.cursor()
         for e, x in enumerate(values):
-            v.append(f"{x[0]} = %(v{e})s")
+            v.append(f"`{x[0]}` = %(v{e})s")
             v2[f'v{e}'] = x[1]
         #     if type(x[1]) == bool:
         #         v.append("`{x[0]}`={x[1]}".format(x=x))
@@ -601,7 +601,7 @@ class ServerCog(commands.Cog):
             text = await self.find_staff(guild.id,option)
             return await self.form_text(text)
         else:
-            await self.modify_server(guild.id,values=[(option,value.replace('"','\\"'))])
+            await self.modify_server(guild.id,values=[(option, value)])
             msg = await self.translate(guild.id,"server","change-text")
             await ctx.send(msg.format(option,value))
             await self.send_embed(guild,option,value)
