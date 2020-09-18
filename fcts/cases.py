@@ -148,6 +148,7 @@ class CasesCog(commands.Cog):
         query = ("DELETE FROM `{}` WHERE `ID`='{}'".format(self.table,ID))
         cursor.execute(query)
         cnx.commit()
+        cursor.close()
         return True
     
     async def add_case(self,case):
@@ -162,6 +163,7 @@ class CasesCog(commands.Cog):
         query = "INSERT INTO `{}` (`ID`, `guild`, `user`, `type`, `mod`, `reason`,`duration`) VALUES (%(i)s, %(g)s, %(u)s, %(t)s, %(m)s, %(r)s,%(d)s)".format(self.table)
         cursor.execute(query, { 'i': case.id, 'g': case.guild, 'u': case.user, 't': case.type, 'm': case.mod, 'r': case.reason, 'd': case.duration })
         cnx.commit()
+        cursor.close()
         return True
 
     async def update_reason(self,case):
@@ -175,6 +177,7 @@ class CasesCog(commands.Cog):
         query = ("UPDATE `{}` SET `reason` = '{}' WHERE `ID` = {}".format(self.table,case.reason.replace("'","\\'"),case.id))
         cursor.execute(query)
         cnx.commit()
+        cursor.close
         return True
 
 
