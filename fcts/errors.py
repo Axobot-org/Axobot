@@ -23,6 +23,7 @@ class ErrorsCog(commands.Cog):
             if r!= None:
                 return r
 
+    @commands.Cog.listener()
     async def on_cmd_error(self,ctx,error):
         """The event triggered when an error is raised while invoking a command."""
         # This prevents any commands with local handlers being handled here in on_command_error.
@@ -145,10 +146,6 @@ class ErrorsCog(commands.Cog):
         # All other Errors not returned come here... And we can just print the default TraceBack.
         self.bot.log.warning('Ignoring exception in command {}:'.format(ctx.message.content))      
         await self.on_error(error,ctx)
-
-    @commands.Cog.listener()
-    async def on_command_error(self, ctx, error):
-        await self.on_cmd_error(ctx,error)
 
     @commands.Cog.listener()
     async def on_error(self,error,ctx=None):
