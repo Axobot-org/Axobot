@@ -361,8 +361,10 @@ You can also mute this member for a defined duration, then use the following for
             await self.bot.cogs['ErrorsCog'].on_error(e,ctx)
             return
         role = await self.get_muted_role(ctx.guild)
-        if not await self.check_mute_context(ctx,role,user):
+        if not await self.check_mute_context(ctx, role, user):
             return
+        if role is None:
+            role = await self.get_muted_role(ctx.guild)
         caseID = "'Unsaved'"
         try:
             reason = await self.bot.cogs["UtilitiesCog"].clear_msg(reason,everyone = not ctx.channel.permissions_for(ctx.author).mention_everyone)
