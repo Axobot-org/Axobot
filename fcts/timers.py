@@ -30,7 +30,7 @@ class TimersCog(commands.Cog):
         await self.bot.invoke(new_ctx)
     
 
-    @commands.group(name="reminder", aliases=["remind", "reminds"])
+    @commands.group(name="reminder", aliases=["remind", "reminds", "reminders"])
     async def remind_main(self, ctx:commands.Context):
         """Ask the bot to remind you of something later
 
@@ -69,7 +69,6 @@ class TimersCog(commands.Cog):
         try:
             await ctx.bot.get_cog('Events').add_task("timer", duration, ctx.author.id, ctx.guild.id if ctx.guild else None, ctx.channel.id, message)
         except Exception as e:
-            await ctx.send(await self.translate(ctx.channel, "server", "change-1"))
             await ctx.bot.get_cog("ErrorsCog").on_cmd_error(ctx,e)
         else:
             await ctx.send(await self.translate(ctx.channel, "fun", "reminds-saved", duration=f_duration))
