@@ -380,6 +380,7 @@ class Events(commands.Cog):
         query = "INSERT INTO `timed` (`ID`,`guild`,`channel`,`user`,`action`,`duration`,`message`) VALUES (%(ID)s,%(guild)s,%(channel)s,%(user)s,%(action)s,%(duration)s,%(message)s)"
         cursor.execute(query, {'ID':ID, 'guild':guildID, 'channel':channelID, 'user':userID, 'action':action, 'duration':duration, 'message':message})
         cnx.commit()
+        cursor.close()
         return True
 
     async def update_duration(self,ID,new_duration):
@@ -389,6 +390,7 @@ class Events(commands.Cog):
         query = ("UPDATE `timed` SET `duration`={} WHERE `ID`={}".format(new_duration,ID))
         cursor.execute(query)
         cnx.commit()
+        cursor.close()
         return True
 
     async def remove_task(self,ID:int):
@@ -398,6 +400,7 @@ class Events(commands.Cog):
         query = ("DELETE FROM `timed` WHERE `timed`.`ID` = {}".format(ID))
         cursor.execute(query)
         cnx.commit()
+        cursor.close()
         return True
 
     @tasks.loop(seconds=1.0)

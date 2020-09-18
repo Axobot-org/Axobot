@@ -113,6 +113,7 @@ class ServerCog(commands.Cog):
         query = ("UPDATE `bot_infos` SET {v} WHERE `ID`='{id}'".format(v=",".join(v),id=botID))
         cursor.execute(query)
         cnx.commit()
+        cursor.close()
         return True
 
     async def get_languages(self,ignored_guilds):
@@ -200,6 +201,7 @@ class ServerCog(commands.Cog):
         query = ("UPDATE `{t}` SET {v} WHERE `ID`='{id}'".format(t=self.table, v=",".join(v), id=ID))
         cursor.execute(query, v2)
         cnx.commit()
+        cursor.close()
         return True
 
     async def delete_option(self,ID,opt):
@@ -247,8 +249,8 @@ class ServerCog(commands.Cog):
         query = ("DELETE FROM `{}` WHERE `ID`='{}'".format(self.table,ID))
         cursor.execute(query)
         cnx.commit()
+        cursor.close()
         return True
-
                  
 
     @commands.group(name='config')
