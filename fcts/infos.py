@@ -149,7 +149,7 @@ class InfoCog(commands.Cog):
         You can also use this command to ping any other server"""
         m = await ctx.send("Ping...")
         t = (m.created_at - ctx.message.created_at).total_seconds()
-        await m.edit(content=":pig:  Pong !\nBot ping: {}ms\nDiscord ping: {}ms".format(round(t*1000),round(self.bot.latency*1000)))
+        await m.edit(content=":pig:  Groink!\nBot ping: {}ms\nDiscord ping: {}ms".format(round(t*1000),round(self.bot.latency*1000)))
 
     @commands.command(name="ping",aliases=['rep'])
     async def rep(self,ctx,ip=None):
