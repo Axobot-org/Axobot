@@ -373,12 +373,8 @@ class Events(commands.Cog):
                 return await self.update_duration(t['ID'],duration)
         cnx = self.bot.cnx_frm
         cursor = cnx.cursor()
-        if len(tasks)>0:
-            ID = max([x['ID'] for x in tasks])+1
-        else:
-            ID = 0
-        query = "INSERT INTO `timed` (`ID`,`guild`,`channel`,`user`,`action`,`duration`,`message`) VALUES (%(ID)s,%(guild)s,%(channel)s,%(user)s,%(action)s,%(duration)s,%(message)s)"
-        cursor.execute(query, {'ID':ID, 'guild':guildID, 'channel':channelID, 'user':userID, 'action':action, 'duration':duration, 'message':message})
+        query = "INSERT INTO `timed` (`guild`,`channel`,`user`,`action`,`duration`,`message`) VALUES (%(guild)s,%(channel)s,%(user)s,%(action)s,%(duration)s,%(message)s)"
+        cursor.execute(query, {'guild':guildID, 'channel':channelID, 'user':userID, 'action':action, 'duration':duration, 'message':message})
         cnx.commit()
         cursor.close()
         return True
