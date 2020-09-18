@@ -325,7 +325,9 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
             await session.close()
         # Roles
         if len(list_role)>0:
-            embed.add_field(name="Roles [{}]".format(len(list_role)), value = ", ".join(list_role), inline=False)
+            c = len(list_role)
+            list_role = list_role[:40]
+            embed.add_field(name=f"Roles [{c}]", value = ", ".join(list_role), inline=False)
         else:
             embed.add_field(name="Roles [0]", value = await self.translate(ctx.guild.id,"activity","nothing"), inline=False)
         await ctx.send(embed=embed)
