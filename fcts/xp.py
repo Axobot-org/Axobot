@@ -36,7 +36,7 @@ class XPCog(commands.Cog):
         except:
             pass
         self.types = ['global','mee6-like','local']
-        if platform.system()=='Darwin':
+        if platform.system() in ['Darwin', 'Linux']:
             verdana_name = 'Verdana.ttf'
         else:
             verdana_name = 'Veranda.ttf'
