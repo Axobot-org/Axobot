@@ -29,7 +29,6 @@ class AdminCog(commands.Cog):
             self.update = {'fr':None,'en':None}
         try:
             self.translate = self.bot.cogs["LangCog"].tr
-            self.print = self.bot.cogs["UtilitiesCog"].print2
             self.utilities = self.bot.cogs["UtilitiesCog"]
         except:
             pass
@@ -39,7 +38,6 @@ class AdminCog(commands.Cog):
     @commands.Cog.listener()
     async def on_ready(self):
         self.translate = self.bot.cogs["LangCog"].tr
-        self.print = self.bot.cogs["UtilitiesCog"].print2
         self.utilities = self.bot.cogs["UtilitiesCog"]
 
     async def check_if_admin(self,ctx):
@@ -761,7 +759,7 @@ Cette option affecte tous les serveurs"""
     async def backup_auto(self,ctx=None):
         """Crée une backup du code"""
         t = time.time()
-        await self.print("("+str(await self.bot.cogs['TimeCog'].date(datetime.datetime.now(),digital=True))+") Backup auto en cours")
+        self.bot.log.info("("+str(await self.bot.cogs['TimeCog'].date(datetime.datetime.now(),digital=True))+") Backup auto en cours")
         message = await ctx.send(":hourglass: Sauvegarde en cours...")
         try:
             os.remove('../backup.tar')
@@ -770,7 +768,7 @@ Cette option affecte tous les serveurs"""
         try:
             archive = shutil.make_archive('backup','tar','..')
         except FileNotFoundError:
-            await self.print("Impossible de trouver le dossier de sauvegarde")
+            self.bot.log.error("Impossible de trouver le dossier de sauvegarde")
             await message.edit("{} Impossible de trouver le dossier de sauvegarde".format(self.bot.cogs['EmojiCog'].customEmojis['red_cross']))
             return
         try:
@@ -783,7 +781,7 @@ Cette option affecte tous les serveurs"""
         except:
             pass
         msg = "Backup completed in {} seconds!".format(round(time.time()-t,3))
-        await self.bot.log.info(msg)
+        self.bot.log.info(msg)
         if ctx != None:
             await message.edit(content=msg)
             
