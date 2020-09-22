@@ -1,4 +1,4 @@
-import discord, datetime, asyncio, logging, time, aiohttp, json, random, shutil, mysql, psutil
+import discord, datetime, asyncio, logging, time, aiohttp, json, random, shutil, mysql, psutil, re
 from discord.ext import commands, tasks
 from fcts.checks import is_fun_enabled
 
@@ -280,7 +280,9 @@ class Events(commands.Cog):
             f_duration = await self.bot.get_cog('TimeCog').time_delta(task['duration'],lang=await self.translate(channel,'current_lang','current'), form='developed', precision=0)
             t = (await self.translate(channel, "fun", "reminds-title")).capitalize()
             foot = await self.translate(channel, "fun", "reminds-date")
-            emb = self.bot.get_cog("EmbedCog").Embed(title=t, desc=task["message"], color=4886754, time=task["utc_begin"], footer_text=foot)
+            imgs = re.findall(r'(https://\S+\.(?:png|jpe?g|webp|gif))', task['message'])
+            img = imgs[0] if len(imgs)==1 else ""
+            emb = self.bot.get_cog("EmbedCog").Embed(title=t, desc=task["message"], color=4886754, time=task["utc_begin"], footer_text=foot, image=img)
             msg = await self.translate(channel, "fun", "reminds-asked", user=user.mention, duration=f_duration)
             await channel.send(msg, embed=emb)
         except discord.errors.Forbidden:
