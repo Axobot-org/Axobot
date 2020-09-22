@@ -1,0 +1,10 @@
+discord.py>=1.4
+aiohttp
+mysql.connector
+git+https://github.com/ZRunner/fr-mc-python-lib
+emoji
+imageio
+geocoder
+tzwhere
+python-twitter>=3.5
+isbnlib
