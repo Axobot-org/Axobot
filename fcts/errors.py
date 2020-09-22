@@ -24,7 +24,7 @@ class ErrorsCog(commands.Cog):
                 return r
 
     @commands.Cog.listener()
-    async def on_cmd_error(self,ctx,error):
+    async def on_command_error(self,ctx,error):
         """The event triggered when an error is raised while invoking a command."""
         # This prevents any commands with local handlers being handled here in on_command_error.
         if hasattr(ctx.command, 'on_error'):
@@ -129,10 +129,10 @@ class ErrorsCog(commands.Cog):
             if r!=None:
                 return await ctx.send(await self.translate(ctx.channel,'errors','invalidmsgid'), allowed_mentions=ALLOWED)
             print('errors -',error)
-        elif isinstance(error,commands.MissingRequiredArgument):
+        elif isinstance(error,commands.errors.MissingRequiredArgument):
             await ctx.send(await self.translate(ctx.channel,'errors','missingargument',a=error.param.name,e=random.choice([':eyes:','',':confused:',':thinking:',''])))
             return
-        elif isinstance(error,commands.DisabledCommand):
+        elif isinstance(error,commands.errors.DisabledCommand):
             await ctx.send(await self.translate(ctx.channel,'errors','disabled',c=ctx.invoked_with))
             return
         elif isinstance(error,commands.errors.NoPrivateMessage):
