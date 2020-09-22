@@ -237,7 +237,7 @@ def main():
     try:
         try:
             cnx = mysql.connector.connect(user=client.database_keys['user'],password=client.database_keys['password'],host="127.0.0.1",database=client.database_keys['database1'])
-        except mysql.connector.InterfaceError:
+        except (mysql.connector.InterfaceError, mysql.connector.ProgrammingError):
             client.log.warning("Impossible d'accéder à la dabatase locale - tentative via IP")
             cnx = mysql.connector.connect(user=client.database_keys['user'],password=client.database_keys['password'],host=client.database_keys['host'],database=client.database_keys['database1'])
         else:
