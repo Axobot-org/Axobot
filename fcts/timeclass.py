@@ -82,13 +82,13 @@ class TimeCog(discord.ext.commands.Cog):
         else:
             text = str()
             if lang == 'fr':
-                lib = ['ans','an','mois','mois','jours','jour','heures','heure','minutes','minute','secondes','seconde']
+                lib = ['ans','an','mois','mois','jours','jour','heures','heure','minutes','minute','secondes','seconde',"il y a moins d'un jour"]
             elif lang == 'lolcat':
-                lib = ['yearz','year','mons','month','dayz','day','hourz','hour','minutz','minut','secondz','secnd']
+                lib = ['yearz','year','mons','month','dayz','day','hourz','hour','minutz','minut','secondz','secnd','less zan 1d ago']
             elif lang=='fi':
-                lib = [ 'Vuotta', 'vuosi', 'kuukautta', 'kuukausi', 'päivää', 'päivä', 'tuntia', 'h', 'minuuttia', 'minute', 'sekuntia', 'toinen']
+                lib = [ 'Vuotta', 'vuosi', 'kuukautta', 'kuukausi', 'päivää', 'päivä', 'tuntia', 'h', 'minuuttia', 'minute', 'sekuntia', 'toinen', 'Alle päivä sitten']
             else:
-                lib = ['years','year','months','month','days','day','hours','hour','minutes','minute','seconds','second']
+                lib = ['years','year','months','month','days','day','hours','hour','minutes','minute','seconds','second', 'less than one day ago']
             if year and t.years != 0:
                 if t.years>1:
                     text += str(t.years)+" "+lib[0]
@@ -119,6 +119,8 @@ class TimeCog(discord.ext.commands.Cog):
                     text += str(t.seconds)+" "+lib[10]
                 elif t.seconds==1:
                     text += str(t.seconds)+" "+lib[11]
+            elif len(text.strip()) == 0:
+                text = lib[12]
         return text.strip()
 
 
