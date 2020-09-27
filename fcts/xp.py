@@ -37,9 +37,11 @@ class XPCog(commands.Cog):
             pass
         self.types = ['global','mee6-like','local']
         try:
-            xp_font = ImageFont.truetype('Verdana.ttf', 24)
-        except OSError
-            xp_font = ImageFont.truetype('Veranda.ttf', 24)
+            verdana_name = 'Verdana.ttf'
+            xp_font = ImageFont.truetype(verdana_name, 24)
+        except OSError:
+            verdana_name = 'Veranda.ttf'
+            xp_font = ImageFont.truetype(verdana_name, 24)
         self.fonts = {'xp_fnt': xp_font,
         'NIVEAU_fnt': ImageFont.truetype(verdana_name, 42),
         'levels_fnt': ImageFont.truetype(verdana_name, 65),
