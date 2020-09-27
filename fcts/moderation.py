@@ -1042,7 +1042,7 @@ ID corresponds to the Identifier of the message"""
             await ctx.send(await self.translate(ctx.guild.id, "modo", "need-read-history"))
             return
         check = lambda x: not x.pinned
-        if message.created_at < datetime.datetime.now() - datetime.timedelta(days=21):
+        if message.created_at < datetime.datetime.utcnow() - datetime.timedelta(days=21):
             await ctx.send(await self.translate(ctx.guild.id, "modo", "destop-old", days=21))
             return
         messages = await message.channel.purge(after=message, limit=1000, oldest_first=False)

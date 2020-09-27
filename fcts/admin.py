@@ -657,9 +657,9 @@ Cette option affecte tous les serveurs"""
                     elif x.emoji == '👎':
                         down = len(users)
                 if len(msg.embeds)>0:
-                    liste.append((up-down,datetime.datetime.now()-msg.created_at,msg.embeds[0].fields[0].value,up,down))
+                    liste.append((up-down,datetime.datetime.utcnow()-msg.created_at,msg.embeds[0].fields[0].value,up,down))
                 else:
-                    liste.append((up-down,datetime.datetime.now()-msg.created_at,msg.content,up,down))
+                    liste.append((up-down,datetime.datetime.utcnow()-msg.created_at,msg.content,up,down))
         liste.sort(reverse=True)
         count = len(liste)
         liste = liste[:number]
