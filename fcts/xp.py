@@ -36,11 +36,11 @@ class XPCog(commands.Cog):
         except:
             pass
         self.types = ['global','mee6-like','local']
-        if platform.system() in ['Darwin', 'Linux']:
-            verdana_name = 'Verdana.ttf'
-        else:
-            verdana_name = 'Veranda.ttf'
-        self.fonts = {'xp_fnt': ImageFont.truetype(verdana_name, 24),
+        try:
+            xp_font = ImageFont.truetype('Verdana.ttf', 24)
+        except OSError
+            xp_font = ImageFont.truetype('Veranda.ttf', 24)
+        self.fonts = {'xp_fnt': xp_font,
         'NIVEAU_fnt': ImageFont.truetype(verdana_name, 42),
         'levels_fnt': ImageFont.truetype(verdana_name, 65),
         'rank_fnt': ImageFont.truetype(verdana_name,29),
