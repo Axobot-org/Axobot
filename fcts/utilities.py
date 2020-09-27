@@ -81,11 +81,10 @@ class UtilitiesCog(commands.Cog):
         item = None
         if type(Type) == str:
             Type = Type.lower()
-        if Type == None:
+        if Type is None:
             for i in [commands.MemberConverter,commands.RoleConverter,
-                    commands.TextChannelConverter,commands.InviteConverter,
-                    args.user,commands.VoiceChannelConverter,
-                    commands.EmojiConverter,commands.CategoryChannelConverter,args.snowflake]:
+                    commands.TextChannelConverter,commands.VoiceChannelConverter,commands.InviteConverter,
+                    args.user, commands.EmojiConverter,commands.CategoryChannelConverter,args.snowflake]:
                 try:
                     a = await i().convert(ctx,name)
                     item = a
@@ -110,7 +109,7 @@ class UtilitiesCog(commands.Cog):
             except:
                 if name.isnumeric():
                     item = await self.bot.fetch_user(int(name))
-        elif Type == 'textchannel' or Type == "channel":
+        elif Type == 'textchannel':
             try:
                 item = await commands.TextChannelConverter().convert(ctx,name)
             except:
@@ -120,11 +119,19 @@ class UtilitiesCog(commands.Cog):
                 item = await commands.InviteConverter().convert(ctx,name)
             except:
                 pass
-        elif Type == 'voicechannel' or Type == 'channel':
+        elif Type == 'voicechannel':
             try:
                 item = await commands.VoiceChannelConverter().convert(ctx,name)
             except:
                 pass
+        elif Type == 'channel':
+            try:
+                item = await commands.TextChannelConverter().convert(ctx,name)
+            except:
+                try:
+                    item = await commands.VoiceChannelConverter().convert(ctx,name)
+                except:
+                    pass
         elif Type == 'emoji':
             try:
                 item = await commands.EmojiConverter().convert(ctx,name)
