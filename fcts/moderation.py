@@ -826,7 +826,7 @@ You must be an administrator of this server to use this command.
                 embed = await ctx.bot.cogs['EmbedCog'].Embed(title=title,fields=fields,color=self.bot.cogs["ServerCog"].embed_color).create_footer(ctx)
                 await ctx.send(embed=embed.discord_embed())
         except Exception as e:
-            await ctx.bot.cogs['ErrorsCog'].on_cmd_error(ctx,e)
+            await ctx.bot.cogs['ErrorsCog'].on_command_error(ctx,e)
 
 
     @commands.group(name="role", aliases=["roles"])
@@ -1109,7 +1109,7 @@ ID corresponds to the Identifier of the message"""
                 try:
                     await ctx.author.remove_roles(*roles,reason="Verified")
                 except Exception as e:
-                    await self.bot.cogs['ErrorsCog'].on_cmd_error(ctx,e)
+                    await self.bot.cogs['ErrorsCog'].on_command_error(ctx,e)
             await del_msg(qu_msg)
 
 
