@@ -382,7 +382,7 @@ class AdminCog(commands.Cog):
             try:
                 await self.bot.cogs["ServerCog"].send_see(guild,ctx.channel,option,ctx.message,guild)
             except Exception as e:
-                await self.bot.cogs["ErrorsCog"].on_cmd_error(ctx,e)
+                await self.bot.cogs["ErrorsCog"].on_command_error(ctx,e)
         else:
             await ctx.send("Serveur introuvable")
 
@@ -398,7 +398,7 @@ class AdminCog(commands.Cog):
             if self.bot.cnx_frm != None and self.bot.cnx_xp != None:
                 await ctx.bot.cogs['UtilitiesCog'].add_check_reaction(ctx.message)
         except Exception as e:
-            await self.bot.cogs['ErrorsCog'].on_cmd_error(ctx,e)
+            await self.bot.cogs['ErrorsCog'].on_command_error(ctx,e)
 
     @main_msg.command(name="emergency")
     @commands.check(reloads.check_admin)
@@ -804,7 +804,7 @@ Cette option affecte tous les serveurs"""
             await channel.send(embed=emb.discord_embed())
             await ctx.bot.cogs['UtilitiesCog'].add_check_reaction(ctx.message)
         except Exception as e:
-            await self.bot.cogs['ErrorsCog'].on_cmd_error(ctx,e)
+            await self.bot.cogs['ErrorsCog'].on_command_error(ctx,e)
     
     @main_bug.command(name='fix')
     async def bug_fix(self,ctx,ID:int,fixed:bool=True):
@@ -829,7 +829,7 @@ Cette option affecte tous les serveurs"""
             await msg.edit(embed=emb)
             await ctx.bot.cogs['UtilitiesCog'].add_check_reaction(ctx.message)
         except Exception as e:
-            await self.bot.cogs['ErrorsCog'].on_cmd_error(ctx,e)
+            await self.bot.cogs['ErrorsCog'].on_command_error(ctx,e)
 
     @commands.group(name="idea",hidden=True)
     @commands.check(reloads.check_admin)
@@ -851,7 +851,7 @@ Cette option affecte tous les serveurs"""
             await self.bot.cogs['FunCog'].add_vote(msg)
             await ctx.bot.cogs['UtilitiesCog'].add_check_reaction(ctx.message)
         except Exception as e:
-            await self.bot.cogs['ErrorsCog'].on_cmd_error(ctx,e)
+            await self.bot.cogs['ErrorsCog'].on_command_error(ctx,e)
 
     @main_idea.command(name='valid')
     async def idea_valid(self,ctx,ID:int,valid:bool=True):
@@ -874,7 +874,7 @@ Cette option affecte tous les serveurs"""
             await msg.edit(embed=emb)
             await ctx.bot.cogs['UtilitiesCog'].add_check_reaction(ctx.message)
         except Exception as e:
-            await self.bot.cogs['ErrorsCog'].on_cmd_error(ctx,e)
+            await self.bot.cogs['ErrorsCog'].on_command_error(ctx,e)
 
 def setup(bot):
     bot.add_cog(AdminCog(bot))

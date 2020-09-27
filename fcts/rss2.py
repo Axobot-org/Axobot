@@ -830,7 +830,7 @@ class RssCog(commands.Cog):
                         txt.append(nothing+notok+' author')
                 await ctx.send("\n".join(txt))
         except Exception as e:
-            await ctx.bot.cogs['ErrorsCog'].on_cmd_error(ctx,e)
+            await ctx.bot.cogs['ErrorsCog'].on_command_error(ctx,e)
 
     async def check_rss_url(self,url):
         r = await self.parse_yt_url(url)

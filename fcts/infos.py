@@ -123,7 +123,7 @@ class InfoCog(commands.Cog):
             else:
                 await ctx.send(d)
         except Exception as e:
-            await ctx.bot.cogs['ErrorsCog'].on_cmd_error(ctx,e)
+            await ctx.bot.cogs['ErrorsCog'].on_command_error(ctx,e)
 
     def get_users_nber(self,ignored_guilds):
         members = [x.members for x in self.bot.guilds if x.id not in ignored_guilds]

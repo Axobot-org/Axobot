@@ -71,7 +71,7 @@ Arguments are:
                 return
         except Exception as e:
             await ctx.send(await self.translate(ctx.guild,"s_backup","err"))
-            await ctx.bot.cogs['ErrorsCog'].on_cmd_error(ctx,e)
+            await ctx.bot.cogs['ErrorsCog'].on_command_error(ctx,e)
             return
         # Formatting and sending logs
         logs = "Found {} problems (including {} permissions issues)\n\n".format(sum(problems),problems[0]) + "\n".join(logs)
@@ -107,7 +107,7 @@ Arguments are:
             data = await self.create_backup(ctx)
             await ctx.send(await self.translate(ctx.guild.id,'modo','backup-done'),file=discord.File(BytesIO(data.encode()), filename=f"backup-{ctx.guild.id}.json"))
         except Exception as e:
-            await ctx.bot.cogs['ErrorsCog'].on_cmd_error(ctx,e)
+            await ctx.bot.cogs['ErrorsCog'].on_command_error(ctx,e)
 
     # --------
 
