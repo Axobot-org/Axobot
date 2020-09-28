@@ -15,6 +15,10 @@ class UtilitiesCog(commands.Cog):
         self.config = {}
         self.table = 'users'
         self.new_pp = False
+        bot.add_check(self.global_check)
+    
+    def cog_unload(self):
+        self.bot.remove_check(self.global_check)
 
     @commands.Cog.listener()
     async def on_ready(self):
@@ -161,24 +165,23 @@ class UtilitiesCog(commands.Cog):
             await self.print2("Unable to delete message "+str(msg))
             pass
 
-    async def global_check(self,ctx):
-        """Do a lot of checks before executing a command (rss loop, banned guilds etc)"""
-        #if ctx.bot.cogs['RssCog'].last_update==None or (datetime.datetime.now() - ctx.bot.cogs['RssCog'].last_update).total_seconds() > 20*60:
-        #    self.bot.cogs['RssCog'].last_update = datetime.datetime.now()
-        #    asyncio.run_coroutine_threadsafe(ctx.bot.cogs['RssCog'].main_loop(),asyncio.get_running_loop())
-        if type(ctx)!=commands.context.Context or self.config==None:
+    async def global_check(self, ctx: commands.Context):
+        """Do a lot of checks before executing a command (banned guilds, system message etc)"""
+        if not isinstance(ctx, commands.context.Context) or self.config is None:
             return True
+        if ctx.message.type != discord.MessageType.default:
+            return False
         if await self.bot.cogs['AdminCog'].check_if_admin(ctx):
             return True
-        elif len(self.config)==0:
+        elif not self.config:
             await self.get_bot_infos()
-        if len(self.config)==0 or self.config==None:
+        if len(self.config) == 0 or self.config is None:
             return True
-        if ctx.guild != None:
+        if ctx.guild is not None:
             if str(ctx.guild.id) in self.config['banned_guilds'].split(";"):
                 return False
-            if str(ctx.author.id) in self.config['banned_users'].split(";"):
-                return False
+        if str(ctx.author.id) in self.config['banned_users'].split(";"):
+            return False
         return True
 
     async def get_online_number(self,members):
