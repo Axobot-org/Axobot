@@ -291,26 +291,6 @@ def main():
             await client.change_presence(activity=discord.Game(name=choice(["entrer !help","something","type !help","type !help"])))
         emb = client.cogs["EmbedCog"].Embed(desc="**{}** is launching !".format(client.user.name),color=8311585).update_timestamp()
         await client.cogs["EmbedCog"].send([emb])
-    
-    async def check_once(ctx):
-        try:
-            return await ctx.bot.cogs['UtilitiesCog'].global_check(ctx)
-        except Exception as e:
-            ctx.bot.log.error("ERROR on global_check:",e,ctx.guild)
-            return True
-
-    async def on_member_join(member):
-        await client.cogs['WelcomerCog'].new_member(member)
-
-    async def on_member_remove(member):
-        await client.cogs['WelcomerCog'].bye_member(member)
-
-    async def on_guild_join(guild):
-        await client.cogs["Events"].on_guild_add(guild)
-
-    async def on_guild_remove(guild):
-        await client.cogs["Events"].on_guild_del(guild)
-
 
 
     async def sigterm_handler(bot):
@@ -358,13 +338,6 @@ def main():
             return
 
     client.add_listener(on_ready)
-    client.add_check(check_once,call_once=True)
-    client.add_listener(on_member_join)
-    client.add_listener(on_member_remove)
-    client.add_listener(on_guild_join)
-    client.add_listener(on_guild_remove)
-    
-    
 
     client.run(token)
 
