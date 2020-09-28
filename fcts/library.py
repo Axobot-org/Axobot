@@ -18,6 +18,7 @@ class LibCog(commands.Cog):
         self.bot = bot
         self.file = 'library'
         self.tables = ['librarystats_beta','library_beta'] if bot.beta else ['librarystats','library']
+        self.cache = dict()
         try:
             self.translate = bot.cogs['LangCog'].tr
         except:
@@ -65,6 +66,9 @@ class LibCog(commands.Cog):
         if isbn is None:
             if keywords is None:
                 raise ValueError
+            info = self.cache.get(keywords, None)
+            if info is not None:
+                return info
             isbn = isbnlib.isbn_from_words(keywords)
         info = dict()
         for key in ['wiki', 'default', 'openl', 'goob']:
@@ -88,7 +92,9 @@ class LibCog(commands.Cog):
             if 'thumbnail' in co:
                 info['cover'] = co['thumbnail']
             info['isbn'] = isbn
-        return None if len(info) == 0 else info
+        info = None if len(info) == 0 else info
+        self.cache[keywords] = info
+        return info
 
 
     @commands.group(name="book",aliases=['bookstore'])
