@@ -17,8 +17,9 @@ class WelcomerCog(commands.Cog):
     async def on_ready(self):
         self.translate = self.bot.cogs['LangCog'].tr
     
-
-    async def new_member(self,member):
+    
+    @commands.Cog.listener()
+    async def on_member_join(self, member:discord.Member):
         """Fonction principale appelée lorsqu'un membre rejoint un serveur"""
         # await self.send_log(member,"welcome")
         if self.bot.database_online:
@@ -32,8 +33,8 @@ class WelcomerCog(commands.Cog):
             await self.check_contributor(member)
         
         
-    
-    async def bye_member(self,member):
+    @commands.Cog.listener()
+    async def on_member_remove(self, member:discord.Member):
         """Fonction principale appelée lorsqu'un membre quitte un serveur"""
         # await self.send_log(member,"leave")
         if self.bot.database_online:
@@ -42,7 +43,8 @@ class WelcomerCog(commands.Cog):
             await self.bot.cogs['Events'].check_user_left(member)
 
 
-    async def send_msg(self,member,Type):
+    async def send_msg(self, member:discord.Member, Type:str):
+        """Envoie un message de bienvenue/départ dans le serveur"""
         msg = await self.bot.cogs['ServerCog'].find_staff(member.guild.id,Type)
         if await self.raid_check(member) or member.id in self.no_message:
             return

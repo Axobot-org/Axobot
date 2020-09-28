@@ -97,15 +97,17 @@ class Events(commands.Cog):
             await self.updade_memberslogs_name(before, after)
 
 
-    async def on_guild_add(self,guild):
+    @commands.Cog.listener()
+    async def on_guild_join(self, guild:discord.Guild):
         """Called when the bot joins a guild"""
         await self.send_guild_log(guild,"join")
 
-    async def on_guild_del(self,guild):
+    @commands.Cog.listener()
+    async def on_guild_remove(self, guild:discord.Guild):
         """Called when the bot left a guild"""
         await self.send_guild_log(guild,"left")
 
-    async def send_guild_log(self,guild,Type):
+    async def send_guild_log(self, guild:discord.Guild, Type:str):
         """Send a log to the logging channel when the bot joins/leave a guild"""
         try:
             if Type == "join":
