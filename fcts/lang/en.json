@@ -1085,7 +1085,7 @@
             "Thanks to the level {level}, you can try to win {random} at the raffle, {user}!",
             "Despite your level {level}, it is dangerous to travel alone {user}! Take {random}!",
             "Level {level} for {user}, {random} is available from the seller!",
-            "Bravo {user}! You are now level {level}! However, it is still necessary to climb to obtain {random} legendary rarity...",
+            "Bravo {user}! You are now level {level}! However, it is still necessary to climb to obtain {random} of legendary rarity...",
             "Houston, we have a problem. {user} has passed level {level}!!!!!",
             "You see, the world is divided into two categories: those who levelup and those who don't levelup. You {user}, you levelup to level {level}!!!!",
             "*May the level {level} be with you, {user}.*"
