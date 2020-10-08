@@ -91,8 +91,11 @@ class UsersCog(commands.Cog):
                 await ctx.send(await self.translate(ctx.channel,'users','changed-1'))
 
     def get_last_rankcard_update(self,userID:int):
-        with open("rankcards_update.json",'r') as f:
-            r = json.load(f)
+        try:
+            with open("rankcards_update.json",'r') as f:
+                r = json.load(f)
+        except FileNotFoundError:
+            return None
         if str(userID) in r.keys():
             return r[str(userID)]
         return None
