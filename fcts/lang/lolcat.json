@@ -979,6 +979,7 @@
         "guild-7": "{} incluwdin {} nice robots ({} connect)",
         "guild-8": "2F authuntificashun",
         "guild-9": "Secure lvl",
+        "guild-16": "Dead: {s}/{l} | Livin': {a}/{l}",
         "guild-features": {
             "ANIMATED_ICON": "ANIMATED OMEGA COOL OwO server icon",
             "BANNER": "Custom srv banner",
