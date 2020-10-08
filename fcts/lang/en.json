@@ -979,6 +979,7 @@
             "INVITE_SPLASH": "Invite custom screen",
             "NEWS": "News channel",
             "PARTNERED": "Partnered server",
+            "PREVIEW_ENABLED": "Preview enabled",
             "PUBLIC": "Public server",
             "VANITY_URL": "Custom invite url",
             "VERIFIED": "Verified server",
