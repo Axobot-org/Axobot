@@ -329,7 +329,7 @@
             "Pro-tip : Avec la commande `say`, vous pouvez utiliser les émojis de n'importe quel serveur où est Zbot, même les émojis animés ! Il suffit de donner l'émoji comme si vous l'utilisez vous-même",
             "Pro-tip : Pour utiliser un émoji custom dans la commande `react`, il suffit de donner son nom. Et cela fonctionne avec n'importe quel émoji !",
             "Pro-tip : Avec la commande `me <texte>`, vous pouvez faire dire au bot ce que vous voulez, avec votre pseudo devant ! Comme par exemple \"*Wumpus aime les bananes*\"",
-            "Pro-tip : La commande `roll Rien ; Rien ; Rien ; Rien ; Rien ; PAN !` vous permet de jouer à la roulette russe ! Faites tout de même attention avec ça, d'accord ?",
+            "Pro-tip : La commande `roll Rien , Rien , Rien , Rien , Rien , PAN !` vous permet de jouer à la roulette russe ! Faites tout de même attention avec ça, d'accord ?",
             "Pro-tip : Si vous avez besoin d'aide, n'hésitez pas à utiliser la commande `osekour`",
             "Le saviez-vous ? Des fois, le message de levelup mentionne un objet aléatoire. Pour ce faire, Aragorn1202 a dû créer une liste de 60 d'entre eux, dont 'un bicorne', 'un cookie' ou 'une banane' !",
             "Le saviez-vous ? Dans le passé, la photo de profil de Zbot était... un creeper.",
