@@ -968,6 +968,7 @@
         "guild-7": "{} including {} bots ({} connected)",
         "guild-8": "Two-factor authentification",
         "guild-9": "Security level",
+        "guild-16": "Static: {s}/{l} | Animated: {a}/{l}",
         "guild-features": {
             "ANIMATED_ICON": "Animated server icon",
             "BANNER": "Custom server banner",
