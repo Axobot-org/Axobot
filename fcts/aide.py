@@ -143,6 +143,10 @@ If the bot can't send the new command format, it will try to send the old one.""
             prefix = await self.bot.get_prefix(ctx.message)
             if type(prefix)==list:
                 prefix = prefix[-1]
+        if len(pages) == 0:
+            await self.bot.get_cog("ErrorsCog").senf_err_msg("Impossible de trouver d'aide pour la commande " + " ".join(commands))
+            await destination.send(str(await self.translate(ctx.channel,"aide","cmd-not-found")).format(" ".join(commands)))
+            return
         if destination.permissions_for(me).embed_links:
             if ctx.guild != None:
                 embed_colour = ctx.guild.me.color if ctx.guild.me.color != discord.Colour(self.help_color).default() else discord.Colour(self.help_color)
