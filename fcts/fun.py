@@ -118,7 +118,7 @@ class FunCog(commands.Cog):
     async def count(self,ctx,limit:typing.Optional[int]=1000,user:typing.Optional[discord.User]=None,channel:typing.Optional[discord.TextChannel]=None):
         """Count the number of messages sent by the user
 You can specify a verification limit by adding a number in argument (up to 1.000.000)"""
-        l = 1000000
+        l = 20000
         if channel==None:
             channel = ctx.channel
         if not channel.permissions_for(ctx.author).read_message_history:
