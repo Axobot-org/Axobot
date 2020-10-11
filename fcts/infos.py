@@ -90,7 +90,7 @@ class InfoCog(commands.Cog):
         version = str(v.major)+"."+str(v.minor)+"."+str(v.micro)
         pid = os.getpid()
         py = psutil.Process(pid)
-        ram_cpu = [round(py.memory_info()[0]/2.**30,3), psutil.cpu_percent()]
+        ram_cpu = [round(py.memory_info()[0]/2.**30,3), py.cpu_percent()]
         latency = round(self.bot.latency*1000,3)
         try:
             async with ctx.channel.typing():
