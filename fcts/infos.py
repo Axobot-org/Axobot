@@ -857,7 +857,7 @@ Servers:
             guild_icon = str(guild.icon_url_as(format = "gif" if guild.is_icon_animated() else 'png'))
             await ctx.send(embed = await self.bot.cogs['EmbedCog'].Embed(title=guild.name, color=color, thumbnail=guild_icon, fields=[
                 {"name": "ID", "value": guild.id},
-                {"name": "Owner", "value": "{} ({})".format(guild.owner, guild.owner.id)},
+                {"name": "Owner", "value": "{} ({})".format(guild.owner, guild.owner_id)},
                 {"name": "Joined at", "value": joined_at},
                 {"name": "Members", "value": len(guild.members), "inline":True},
                 {"name": "Language", "value": lang, "inline":True},
