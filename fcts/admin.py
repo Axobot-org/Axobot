@@ -621,10 +621,10 @@ Cette option affecte tous les serveurs"""
         owner_list = list()
         for guild in self.bot.guilds:
             if len(guild.members)>9:
-                if guild.owner==None or guild.owner.id==None:
+                if guild.owner_id is None:
                     await ctx.send("Oops, askip le propriétaire de {} n'existe pas ._.".format(guild.id))
                     continue
-                owner_list.append(guild.owner.id)
+                owner_list.append(guild.owner_id)
         for member in server.members:
             if member.id in owner_list and role not in member.roles:
                 await ctx.send("Rôle ajouté à "+str(member))
