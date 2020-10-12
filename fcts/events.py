@@ -468,11 +468,11 @@ class Events(commands.Cog):
                 params = {"data": {"timestamp": round(d.timestamp()), "value":average}}
                 async with session.post("https://api.statuspage.io/v1/pages/g9cnphg3mhm9/metrics/x4xs4clhkmz0/data", json=params) as r:
                     r.raise_for_status()
-                    self.bot.log.info(f"StatusPage API returned {r.status} for {params} (latency)")
+                    self.bot.log.debug(f"StatusPage API returned {r.status} for {params} (latency)")
                 params["data"]["value"] = psutil.virtual_memory().available
                 async with session.post("https://api.statuspage.io/v1/pages/g9cnphg3mhm9/metrics/72bmf4nnqbwb/data", json=params) as r:
                     r.raise_for_status()
-                    self.bot.log.info(f"StatusPage API returned {r.status} for {params} (available RAM)")
+                    self.bot.log.debug(f"StatusPage API returned {r.status} for {params} (available RAM)")
             self.latencies_list = list()
             self.last_statusio = d
 
