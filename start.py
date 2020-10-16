@@ -206,7 +206,8 @@ def main():
                       'fcts.translators',
                       'fcts.users',
                       'fcts.utilities',
-                      'fcts.xp',           
+                      'fcts.xp',
+                      'fcts.halloween'
     ]
     # Suppression du fichier debug.log s'il est trop volumineux
     if os.path.exists("debug.log"):
