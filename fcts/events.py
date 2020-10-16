@@ -40,7 +40,6 @@ class Events(commands.Cog):
             'role':60,
             'guild':75}
         self.statuspage_header = {"Content-Type": "application/json", "Authorization": "OAuth " + self.bot.others["statuspage"]}
-        bot.add_listener(self.on_new_message,'on_message')
 
 
     def cog_unload(self):
@@ -124,7 +123,8 @@ class Events(commands.Cog):
             await self.bot.cogs["ErrorsCog"].on_error(e,None)
 
 
-    async def on_new_message(self, msg:discord.Message):
+    @commands.Cog.listener()
+    async def on_message(self, msg:discord.Message):
         """Called for each new message because it's cool"""
         if msg.guild is None:
             await self.send_mp(msg)
@@ -147,7 +147,7 @@ class Events(commands.Cog):
             except:
                 pass
         # Halloween event
-        elif (msg.channel.id==635569244507209749 and random.random()<0.3) or (("booh" in msg.content.lower() or "halloween" in msg.content.lower() or "witch" in msg.content.lower()) and random.random()<0.05 and self.bot.current_event=="halloween"):
+        elif ("booh" in msg.content.lower() or "halloween" in msg.content.lower() or "witch" in msg.content.lower()) and random.random()<0.05 and self.bot.current_event=="halloween":
             try:
                 react = random.choice(['🦇','🎃','🕷️']*2+['👀'])
                 await msg.add_reaction(react)
