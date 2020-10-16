@@ -9,9 +9,9 @@ import discord
 from discord.ext import commands
 from discord.ext.commands import Cog
 
-from fcts import blurple2
-from fcts.blurple2 import convert_image, check_image
-importlib.reload(blurple2)
+from libs import blurple
+from libs.blurple import convert_image, check_image
+importlib.reload(blurple)
 
 
 class LinkConverter(commands.Converter):
