@@ -274,19 +274,17 @@ def main():
     del count
     
     
-    utilities = client.cogs["UtilitiesCog"]
-
     async def on_ready():
-        await utilities.print2('\nBot connecté')
-        await utilities.print2("Nom : "+client.user.name)
-        await utilities.print2("ID : "+str(client.user.id))
+        print('\nBot connecté')
+        print("Nom : "+client.user.name)
+        print("ID : "+str(client.user.id))
         if len(client.guilds) < 200:
             serveurs = [x.name for x in client.guilds]
-            await utilities.print2("Connecté sur ["+str(len(client.guilds))+"] "+", ".join(serveurs))
+            print("Connecté sur ["+str(len(client.guilds))+"] "+", ".join(serveurs))
         else:
-            await utilities.print2("Connecté sur "+str(len(client.guilds))+" serveurs")
-        await utilities.print2(time.strftime("%d/%m  %H:%M:%S"))
-        await utilities.print2('------')
+            print("Connecté sur "+str(len(client.guilds))+" serveurs")
+        print(time.strftime("%d/%m  %H:%M:%S"))
+        print('------')
         await asyncio.sleep(3)
         if not client.database_online:
             await client.change_presence(activity=discord.Activity(type=discord.ActivityType.listening,name=choice(["a signal",'a sign of life','nothing','a signal','a lost database'])))
