@@ -10,7 +10,7 @@ importlib.reload(checks)
 importlib.reload(args)
 from fcts.checks import is_fun_enabled
 
-cmds_list = ['count_msg','ragequit','pong','run','nope','blame','party','bigtext','shrug','gg','money','pibkac','osekour','me','kill','cat','rekt','thanos','nuke','pikachu','pizza','google','loading','piece','roll','afk', 'bubble-wrap']
+cmds_list = ['count_msg','ragequit','pong','run','nope','blame','party','bigtext','shrug','gg','money','pibkac','osekour','me','kill','cat','happy-birthday','rekt','thanos','nuke','pikachu','pizza','google','loading','piece','roll','afk', 'bubble-wrap']
 
 
 async def can_say(ctx):
@@ -263,6 +263,16 @@ You can specify a verification limit by adding a number in argument (up to 1.000
         'https://www.2tout2rien.fr/wp-content/uploads/2014/10/37-pestes-de-chats-mes-bonbons.gif',
         'http://coquelico.c.o.pic.centerblog.net/chat-peur.gif',
         'https://tenor.com/view/nope-bye-cat-leave-done-gif-12387359']))
+    
+    @commands.command(name="happy-birthday", hidden=True, aliases=['birthday', 'hb'])
+    @commands.check(is_fun_enabled)
+    async def birthday_gif(self,ctx):
+        """How many candles this year?"""
+        await ctx.send(random.choice(['https://tenor.com/view/happy-birthday-cat-cute-birthday-cake-second-birthday-gif-16100991',
+        'https://tenor.com/view/happy-birthday-birthday-cake-goat-licking-lick-gif-15968273',
+        'https://tenor.com/view/celebracion-gif-4928008',
+        'https://tenor.com/view/kitty-birthday-birthday-kitty-happy-birthday-happy-birthday-to-you-hbd-gif-13929089',
+        'https://tenor.com/view/happy-birthday-happy-birthday-to-you-hbd-birthday-celebrate-gif-13366300']))
     
     @commands.command(name="bigtext",hidden=True)
     @commands.check(is_fun_enabled)
