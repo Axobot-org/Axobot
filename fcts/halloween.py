@@ -248,7 +248,7 @@ __29 variations: __
         if last_data is None or (datetime.datetime.now() - last_data['last_update']).total_seconds() > 3600:
             points = randint(*self.hourly_reward)
             self.db_add_points(ctx.author.id, points)
-            await self.bot.add_user_eventPoint(ctx.author.id, points)
+            await self.bot.get_cog("UtilitiesCog").add_user_eventPoint(ctx.author.id, points)
             txt = await self.translate(ctx.channel, "halloween", "got-points", pts=points)
         else:
             txt = await self.translate(ctx.channel, "halloween", "too-quick")
