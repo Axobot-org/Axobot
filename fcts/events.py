@@ -284,11 +284,15 @@ class Events(commands.Cog):
             foot = await self.translate(channel, "fun", "reminds-date")
             imgs = re.findall(r'(https://\S+\.(?:png|jpe?g|webp|gif))', task['message'])
             img = imgs[0] if len(imgs)==1 else ""
+            if task['data'] is not None:
+                task['data'] = json.loads(task['data'])
+                if 'msg_url' in task['data']:
+                    task["message"] += "\n\n[{}]({})".format(await self.translate(channel, "fun", "reminds-link"), task['data']['msg_url'])
             emb = self.bot.get_cog("EmbedCog").Embed(title=t, desc=task["message"], color=4886754, time=task["utc_begin"], footer_text=foot, image=img)
             msg = await self.translate(channel, "fun", "reminds-asked", user=user.mention, duration=f_duration)
             await channel.send(msg, embed=emb)
         except discord.errors.Forbidden:
-            pass
+            return False
         except Exception as e:
             raise e
         return True
@@ -369,16 +373,17 @@ class Events(commands.Cog):
 
 
 
-    async def add_task(self, action:str, duration:int, userID: int, guildID:int=None, channelID:int=None, message:str=None):
+    async def add_task(self, action:str, duration:int, userID: int, guildID:int=None, channelID:int=None, message:str=None, data:dict=None):
         """Ajoute une tâche à la liste"""
         tasks = await self.get_events_from_db(all=True)
         for t in tasks:
             if (t['user']==userID and t['guild']==guildID and t['action']==action and t["channel"]==channelID) and t['action']!='timer':
                 return await self.update_duration(t['ID'],duration)
+        data = None if data is None else json.dumps(data)
         cnx = self.bot.cnx_frm
         cursor = cnx.cursor()
-        query = "INSERT INTO `timed` (`guild`,`channel`,`user`,`action`,`duration`,`message`) VALUES (%(guild)s,%(channel)s,%(user)s,%(action)s,%(duration)s,%(message)s)"
-        cursor.execute(query, {'guild':guildID, 'channel':channelID, 'user':userID, 'action':action, 'duration':duration, 'message':message})
+        query = "INSERT INTO `timed` (`guild`,`channel`,`user`,`action`,`duration`,`message`, `data`) VALUES (%(guild)s,%(channel)s,%(user)s,%(action)s,%(duration)s,%(message)s,%(data)s)"
+        cursor.execute(query, {'guild':guildID, 'channel':channelID, 'user':userID, 'action':action, 'duration':duration, 'message':message, 'data':data})
         cnx.commit()
         cursor.close()
         return True

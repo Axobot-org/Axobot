@@ -311,6 +311,7 @@
         "reminds-title": "Reminder",
         "reminds-too-long": "Unable 2 set such a long duration .-.",
         "reminds-too-short": "U entered an invalid duration",
+        "reminds-link": "First msg",
         "say-no-perm": "LMAO dont try 2 cheat and first get perm in {channel} pls",
         "thanos": [
             "{0} wus spard by Thanos",

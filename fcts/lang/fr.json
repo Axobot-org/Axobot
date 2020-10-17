@@ -323,6 +323,7 @@
         "reminds-title": "Rappel",
         "reminds-too-long": "Impossible de mettre une durée aussi longue",
         "reminds-too-short": "Vous avez saisi une durée invalide",
+        "reminds-link": "Message d'origine",
         "say-no-perm": "Vous ne possédez pas la permission d'envoyer des messages dans le salon {channel}",
         "thanos": [
             "{0} a été épargné par Thanos",
