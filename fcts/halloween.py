@@ -133,7 +133,7 @@ def _make_color_command(name, fmodifier, parent, **kwargs):
         try:
             async with aiohttp.ClientSession() as session:
                 async with session.get(str(url)) as image:
-                    r = await convert_image(await image.read(), final_modifier, method, variations)
+                    r = await self.bot.loop.run_in_executor(None, convert_image, await image.read(), final_modifier, method, variations)
         except RuntimeError as e:
             await ctx.send(f"Oops, something went wrong: {e}")
             return
