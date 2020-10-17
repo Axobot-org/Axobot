@@ -63,7 +63,9 @@ class Events(commands.Cog):
             await self.updade_memberslogs_name(before, after)
 
     async def updade_memberslogs_name(self, before:discord.Member, after:discord.Member, tries:int=0):
-        if tries>5:
+        if tries > 5:
+            return
+        if not self.bot.database_online:
             return
         cnx = self.bot.cnx_frm
         cursor = cnx.cursor()

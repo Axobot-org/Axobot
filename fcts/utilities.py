@@ -246,6 +246,8 @@ class UtilitiesCog(commands.Cog):
         await self.bot.wait_until_ready()
         if not (isinstance(columns,(list,tuple)) and isinstance(criters,(list,tuple))):
             raise ValueError
+        if not self.bot.database_online:
+            return None
         cnx = self.bot.cnx_frm
         cursor = cnx.cursor(dictionary = True)
         if columns == []:
@@ -269,12 +271,10 @@ class UtilitiesCog(commands.Cog):
     async def change_db_userinfo(self,userID:int,key:str,value):
         """Change something about a user in the database"""
         try:
+            if not self.bot.database_online:
+                return None
             cnx = self.bot.cnx_frm
             cursor = cnx.cursor(dictionary = True)
-            # if not isinstance(value,(bool,int)):
-            #     value = "'"+value+"'"
-            # query = ("INSERT INTO `{t}` (`userID`,`{k}`) VALUES ('{u}',{v}) ON DUPLICATE KEY UPDATE {k} = {v};".format(t=self.table,u=userID,k=key,v=value))
-            # INSERT INTO `users` (`userID`,`unlocked_blurple`) VALUES ('279568324260528128','True') ON DUPLICATE KEY UPDATE unlocked_blurple = 'True';
             query = "INSERT INTO `{t}` (`userID`,`{k}`) VALUES (%(u)s,%(v)s) ON DUPLICATE KEY UPDATE {k} = %(v)s;".format(t=self.table, k=key)
             cursor.execute(query, { 'u': userID, 'v': value })
             cnx.commit()
