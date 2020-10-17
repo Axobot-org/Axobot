@@ -234,6 +234,13 @@ All reactions work, whether they are Discord or server reactions. All you have t
 .. warning:: To find the message, ZBot must have "`Read Message History <perms.html#read-message-history>`_" permission, and "`Add Reactions <perms.html#add-reactions>`_" permission to add reactions.
 
 
+Reverse
+-------
+
+**Syntax:** :code:`reverse <text>`
+
+If you want to practice working for a top secret organization, or just have fun with friends, you will surely find use for this command. Basically, it simply reverses all the letters in your message, so that the first one is the last one and vice versa. Probably not worth the FBI techniques, but it's a good start, isn't it?
+
 Roll
 ----
 

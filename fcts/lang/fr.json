@@ -111,6 +111,10 @@
                 "Les commandes de fun sont activées",
                 "Les commandes de fun doivent être activées"
             ],
+            "is_halloween": [
+                "L'événement Halloween est en cours, profitez-en !",
+                "Il n'y a aucun événement de type Halloween actuellement"
+            ],
             "is_owner": [
                 "Il faut être le propriétaire du bot",
                 "Vous n'êtes pas le propriétaire du bot"
@@ -160,10 +164,15 @@
         "missing-attachment-perm": "Oups, il me manque la permission d'envoyer des images !",
         "won-card": "Wow! Magnifique image blurple {}! tellement beau que j'ai décidé de t'offrir la carte d'xp blurple, je suis sûr qu'elles iront bien ensemble ! Tu peux l'utiliser en tapant la commande `{}profile card blurple` {}"
     },
+    "halloween": {
+        "got-points": "Bravo ! Vous venez de gagner **{pts} points** d'événement !",
+        "too-quick": "Il est encore trop tôt ! Vous ne pouvez récupérer des points d'événement qu'une fois par heure"
+    },
     "bot_events": {
         "events-desc": {
             "blurple-2020": "Fêtons les 5 ans de Discord pendant l'événement Blurple ! Pour la troisième année consécutive, nous participons à l'événement \"Blurple\", qui consiste à recolorer nos avatars et serveurs avec un maximum de blurple, cette couleur caractéristique de Discord entre le violet et le bleu. Profitez-en pour récupérer des points d'événements et tentez de gagner la carte d'xp spécial Blurple 2020 ! Pour rappel, les cartes d'xp sont accessibles via ma commande `profile card`\n\nPour cet événement, la commande spéciale `blurple` a été activée, n'hésitez pas à l'utiliser pour tenter de gagner des points !",
             "christmas-2019": "Fêtez l'arrivée de Noël grâce à cet événement ! Pendant plusieurs jours, Zbot se pare des couleurs de l'hiver avec des émojis spéciaux pour le jeu du morpion, un avatar unique ainsi que d'autres choses trop cool. \n\nProfitez-en pour récupérer des points d'événements et tentez de gagner la carte d'xp spécial Noël 2019 ! Pour rappel, les cartes d'xp sont accessibles via ma commande `profile card`",
+            "halloween-2020": "Le mois d'octobre est là ! Profitez jusqu'au 1er novembre d'une atmosphère ténébreuse, remplie de chauve-souris, de squelettes et de citrouilles.\nProfitez-en pour redécorer votre serveur aux couleurs d'Halloween avec la commande `halloween hallowify` et ses dérivées, vérifiez que votre avatar soit bien conforme avec la commande `halloween check`, et récupérez des points d'événements toutes les heures avec la commande `halloween collect`.\n\nLes plus courageux d'entre vous réussirons peut-être à débloquer la carte d'xp spécial Halloween 2020, accessible via la commande `profile card` !",
             "nothing": "Il n'y a actuellement aucun événement. Suivez les news du bot pour connaître la date du prochain !"
         },
         "events-price-title": "Prix à gagner",
@@ -173,6 +182,9 @@
             },
             "christmas-2019": {
                 "50": "Débloquez la carte d'xp spécial Noël 2019 !"
+            },
+            "halloween-2020": {
+                "200": "Débloquez la carte d'xp spécial Halloween 2020 ! En prime, un rôle spécial dans notre serveur officiel"
             },
             "nothing": "Il n'y a rien à gagner pour cet événement :confused:"
         },
@@ -311,6 +323,7 @@
         "reminds-title": "Rappel",
         "reminds-too-long": "Impossible de mettre une durée aussi longue",
         "reminds-too-short": "Vous avez saisi une durée invalide",
+        "reminds-link": "Message d'origine",
         "say-no-perm": "Vous ne possédez pas la permission d'envoyer des messages dans le salon {channel}",
         "thanos": [
             "{0} a été épargné par Thanos",
@@ -326,7 +339,7 @@
             "Pro-tip : Avec la commande `say`, vous pouvez utiliser les émojis de n'importe quel serveur où est Zbot, même les émojis animés ! Il suffit de donner l'émoji comme si vous l'utilisez vous-même",
             "Pro-tip : Pour utiliser un émoji custom dans la commande `react`, il suffit de donner son nom. Et cela fonctionne avec n'importe quel émoji !",
             "Pro-tip : Avec la commande `me <texte>`, vous pouvez faire dire au bot ce que vous voulez, avec votre pseudo devant ! Comme par exemple \"*Wumpus aime les bananes*\"",
-            "Pro-tip : La commande `roll Rien ; Rien ; Rien ; Rien ; Rien ; PAN !` vous permet de jouer à la roulette russe ! Faites tout de même attention avec ça, d'accord ?",
+            "Pro-tip : La commande `roll Rien, Rien, Rien, Rien, Rien, PAN !` vous permet de jouer à la roulette russe ! Faites tout de même attention avec ça, d'accord ?",
             "Pro-tip : Si vous avez besoin d'aide, n'hésitez pas à utiliser la commande `osekour`",
             "Le saviez-vous ? Des fois, le message de levelup mentionne un objet aléatoire. Pour ce faire, Aragorn1202 a dû créer une liste de 60 d'entre eux, dont 'un bicorne', 'un cookie' ou 'une banane' !",
             "Le saviez-vous ? Dans le passé, la photo de profil de Zbot était... un creeper.",
@@ -460,6 +473,7 @@
         "year": "année de publication",
         "publisher": "éditeur",
         "language": "langue",
+        "rate-limited": "Impossible de faire une recherche par nom pour le moment. Veuillez réessayer plus tard",
         "title": "titre"
     },
     "logs": {
@@ -978,6 +992,7 @@
         "guild-7": "{} dont {} bots ({} connectés)",
         "guild-8": "Authentification à deux facteurs",
         "guild-9": "Niveau de sécurité",
+        "guild-16": "Statiques : {s}/{l} | Animés : {a}/{l}",
         "guild-features": {
             "ANIMATED_ICON": "Icône de serveur animée",
             "BANNER": "Bannière de serveur custom",
@@ -988,6 +1003,7 @@
             "INVITE_SPLASH": "Fond d'écran d'invitation",
             "NEWS": "Salons de news",
             "PARTNERED": "Serveur partenaire",
+            "PREVIEW_ENABLED": "Preview activées",
             "PUBLIC": "Serveur public",
             "VANITY_URL": "Invitation custom",
             "VERIFIED": "Serveur vérifié",
@@ -1088,7 +1104,7 @@
             "{user} est niveau {level}, à force de manger des champignons.",
             "Tu as beau être niveau {level}, ta princesse est toujours dans un autre château {user}. ",
             "La force est plus puissante en toi {user}, maintenant que tu es niveau {level}.",
-            "A force d'esquiver ces millions de balles infernales, {user} passes niveau {level}.",
+            "A force d'esquiver ces millions de balles infernales, {user} passe niveau {level}.",
             "La résistance au virus de {user} est passée au niveau {level}. Essaie tout de même de ne pas te faire manger par un zombie...",
             "La discrétion de l'assassin {user} a évoluée au niveau {level}. La confrérie compte sur toi.",
             "Félicitations {user}, tu es niveau {level}. Pense à te servir de {random} pour continuer à progresser.",
@@ -1104,7 +1120,7 @@
         "high-page": "Il n'y a pas autant de pages !",
         "levelup-items": [
             "cette épée",
-            " cet arc",
+            "cet arc",
             "cette guitare",
             "cette dague",
             "ce marteau",
@@ -1162,7 +1178,30 @@
             "cette baguette française",
             "ce fromage",
             "ce sac-à-dos",
-            "ce caillou"
+            "ce caillou",
+            "cette ventouse",
+            "cette brique",
+            "ce rouleau de papier toilette",
+            "ce séquoia",
+            "ce canard en plastique",
+            "cette dynamite",
+            "ce poney",
+            "ce robot",
+            "cette raquette de tennis",
+            "ce porte-clé Tour Eiffel",
+            "cet appartement",
+            "ce cristal magique",
+            "cette porte",
+            "cette clé usb",
+            "cette ampoule",
+            "ce grimoire",
+            "cette peluche",
+            "cet ours",
+            "ce bâton",
+            "ce chapeau de paille",
+            "cette coccinelle",
+            "ce parchemin",
+            "ce char d'assaut"
         ],
         "low-page": "Impossible d'afficher un numéro de page négatif !",
         "negative-xp": "Vous ne pouvez pas mettre un nombre d'xp négatif !",

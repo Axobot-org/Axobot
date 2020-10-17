@@ -34,7 +34,7 @@ class ReloadsCog(commands.Cog):
     def __init__(self,bot):
         self.bot = bot
         self.file = "reloads"
-        self.ignored_guilds = [471361000126414848,513087032331993090,500648624204808193,264445053596991498,446425626988249089]
+        self.ignored_guilds = [471361000126414848,513087032331993090,500648624204808193,264445053596991498,446425626988249089,707248438391078978]
     
     async def reload_cogs(self,ctx,cogs):
         errors_cog = self.bot.cogs["ErrorsCog"]

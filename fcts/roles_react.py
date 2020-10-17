@@ -143,7 +143,7 @@ class RolesReact(commands.Cog):
                 return await ctx.send(await self.translate(ctx.guild.id,'roles_react','too-many-rr',l=max_rr))
             await self.rr_add_role(ctx.guild.id,role.id,emoji,description[:150])
         except Exception as e:
-            await self.bot.cogs['ErrorsCog'].on_cmd_error(ctx,e)
+            await self.bot.cogs['ErrorsCog'].on_command_error(ctx,e)
         else:
             await ctx.send(await self.translate(ctx.guild.id,'roles_react','rr-added',r=role.name,e=emoji))
             self.guilds_which_have_roles.add(ctx.guild.id)
@@ -164,7 +164,7 @@ class RolesReact(commands.Cog):
                 return await ctx.send(await self.translate(ctx.guild.id,'roles_react','no-rr'))
             await self.rr_remove_role(l[0]['ID'])
         except Exception as e:
-            await self.bot.cogs['ErrorsCog'].on_cmd_error(ctx,e)
+            await self.bot.cogs['ErrorsCog'].on_command_error(ctx,e)
         else:
             role = ctx.guild.get_role(l[0]['role'])
             if role == None:
@@ -203,7 +203,7 @@ class RolesReact(commands.Cog):
         try:
             l = await self.rr_list_role(ctx.guild.id)
         except Exception as e:
-            await self.bot.cogs['ErrorsCog'].on_cmd_error(ctx,e)
+            await self.bot.cogs['ErrorsCog'].on_command_error(ctx,e)
         else:
             des, _ = await self.create_list_embed(l,ctx.guild)
             max_rr = await self.bot.cogs['ServerCog'].find_staff(ctx.guild.id,'roles_react_max_number')
@@ -224,7 +224,7 @@ It will only display the whole message with reactions. Still very cool tho
         try:
             l = await self.rr_list_role(ctx.guild.id)
         except Exception as e:
-            await self.bot.cogs['ErrorsCog'].on_cmd_error(ctx,e)
+            await self.bot.cogs['ErrorsCog'].on_command_error(ctx,e)
         else:
             des, emojis = await self.create_list_embed(l,ctx.guild)
             title = await self.translate(ctx.guild.id,"roles_react",'rr-embed')
@@ -309,7 +309,7 @@ Opposite is the subcommand 'join'
         try:
             l = await self.rr_list_role(ctx.guild.id)
         except Exception as e:
-            return await self.bot.cogs['ErrorsCog'].on_cmd_error(ctx,e)
+            return await self.bot.cogs['ErrorsCog'].on_command_error(ctx,e)
         if emojis!=None:
             emojis = [str(x.id) if isinstance(x,discord.Emoji) else str(x) for x in emojis]
             l = [x for x in l if x['emoji'] in emojis]
