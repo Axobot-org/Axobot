@@ -4,6 +4,8 @@ import json
 import typing
 import json
 import importlib
+import datetime
+from random import randint
 
 import discord
 from discord.ext import commands
@@ -17,7 +19,8 @@ importlib.reload(halloween)
 class LinkConverter(commands.Converter):
     async def convert(self, ctx, argument):
         if not argument.startswith(('http://', 'https://')):
-            raise commands.errors.BadArgument('Could not convert "{}" into URL'.format(argument))
+            raise commands.errors.BadArgument(
+                'Could not convert "{}" into URL'.format(argument))
 
         for _ in range(10):
             if ctx.message.embeds and ctx.message.embeds[0].thumbnail:
@@ -25,7 +28,8 @@ class LinkConverter(commands.Converter):
 
             await asyncio.sleep(1)
 
-        raise commands.errors.BadArgument('Discord proxy image did not load in time.')
+        raise commands.errors.BadArgument(
+            'Discord proxy image did not load in time.')
 
 
 class FlagConverter(commands.Converter):
@@ -41,10 +45,12 @@ class FlagConverter2(commands.Converter):
             raise commands.errors.BadArgument('Not a valid flag!')
         return argument
 
+
 class ThemeConverter(commands.Converter):
     async def convert(self, ctx, argument):
         if not argument in ["light", "dark"]:
-            raise commands.errors.BadArgument(f'Could not convert "{argument}" into Halloween Theme')
+            raise commands.errors.BadArgument(
+                f'Could not convert "{argument}" into Halloween Theme')
         return argument
 
 
@@ -52,7 +58,7 @@ def _make_check_command(name, parent, **kwargs):
     @commands.cooldown(2, 60, commands.BucketType.member)
     @commands.cooldown(30, 40, commands.BucketType.guild)
     @parent.command(name, help=f"{name.title()} an image to know if you're cool enough.\n\nTheme is either 'light' or 'dark'", **kwargs)
-    async def command(self, ctx, theme: ThemeConverter="light", *, who: typing.Union[discord.Member, discord.PartialEmoji, LinkConverter] = None):
+    async def command(self, ctx, theme: ThemeConverter = "light", *, who: typing.Union[discord.Member, discord.PartialEmoji, LinkConverter] = None):
 
         if ctx.message.attachments:
             url = ctx.message.attachments[0].proxy_url
@@ -70,7 +76,8 @@ def _make_check_command(name, parent, **kwargs):
         async with aiohttp.ClientSession() as session:
             async with session.get(str(url)) as image:
                 r = await check_image(await image.read(), theme, name)
-        answer = "\n".join(["> {}: {}%".format(color["name"],color["ratio"]) for color in r['colors']])
+        answer = "\n".join(
+            ["> {}: {}%".format(color["name"], color["ratio"]) for color in r['colors']])
         await ctx.send(f"Results for {ctx.author.mention}:\n"+answer)
         if r["passed"] and ctx.author.id not in self.cache:
             await self.bot.cogs["UtilitiesCog"].add_user_eventPoint(ctx.author.id, 40)
@@ -91,7 +98,7 @@ def _make_color_command(name, fmodifier, parent, **kwargs):
                       variations: commands.Greedy[FlagConverter2] = [None], *,
                       who: typing.Union[discord.Member, discord.PartialEmoji, LinkConverter] = None):
 
-        if not (ctx.guild==None or ctx.channel.permissions_for(ctx.guild.me).attach_files):
+        if not (ctx.guild is None or ctx.channel.permissions_for(ctx.guild.me).attach_files):
             return await ctx.send(await self.translate(ctx.channel, "blurple", "missing-attachment-perm"))
 
         if method is None:
@@ -119,11 +126,11 @@ def _make_color_command(name, fmodifier, parent, **kwargs):
         else:
             final_modifier = fmodifier
 
-        old_msg = await ctx.send("Starting {} for {}...".format(name,ctx.author.mention))
+        old_msg = await ctx.send("Starting {} for {}...".format(name, ctx.author.mention))
         try:
             async with aiohttp.ClientSession() as session:
                 async with session.get(str(url)) as image:
-                    r = await convert_image(await image.read(), final_modifier, method,variations)
+                    r = await convert_image(await image.read(), final_modifier, method, variations)
         except RuntimeError as e:
             await ctx.send(f"Oops, something went wrong: {e}")
             return
@@ -138,6 +145,7 @@ class Halloween(Cog):
     def __init__(self, bot):
         self.bot = bot
         self.file = "halloween"
+        self.hourly_reward = [5, 20]
         try:
             self.translate = self.bot.cogs["LangCog"].tr
         except:
@@ -149,7 +157,7 @@ class Halloween(Cog):
             with open("halloween-cache.json", "w") as f:
                 f.write('[]')
             self.cache = list()
-    
+
     async def get_default_halloweefier(self, ctx):
         return "--hallowify"
 
@@ -172,6 +180,11 @@ A BIG thanks to the Project Blurple and their original code.
 
 ..Example hw check dark"""
         pass
+    
+    lightfy = _make_color_command('lightfy', 'light', hallow_main)
+    darkfy = _make_color_command('darkfy', 'dark', hallow_main)
+    hallowify = _make_color_command('hallowify', 'hallowify', hallow_main)
+    check = _make_check_command('check', hallow_main)
 
     @hallow_main.command()
     async def help(self, ctx):
@@ -204,12 +217,41 @@ __29 variations: __
 `++halloween-bg` replaces the transparency of your image with a Halloween background
 `++dark-halloween-bg` replaces the transparency of your image with a Dark Halloween background""")
 
-    lightfy = _make_color_command('lightfy', 'light', hallow_main)
-    darkfy = _make_color_command('darkfy', 'dark', hallow_main)
-    hallowify = _make_color_command('hallowify', 'hallowify', hallow_main)
-    check = _make_check_command('check', hallow_main)
+    def db_add_points(self, userid: int, points: int):
+        cnx = self.bot.cnx_frm
+        cursor = cnx.cursor(dictionary=True)
+        query = "INSERT INTO `dailies` (`userID`,`points`) VALUES (%(u)s,%(p)s) ON DUPLICATE KEY UPDATE points = points + %(p)s;"
+        cursor.execute(query, {'u': userid, 'p': points})
+        cnx.commit()
+        cursor.close()
 
-    
+    def db_get_points(self, userid: int) -> int:
+        cnx = self.bot.cnx_frm
+        cursor = cnx.cursor(dictionary=True)
+        query = "SELECT * FROM `dailies` WHERE userid = %(u)s;"
+        cursor.execute(query, {'u': userid})
+        result = list(cursor)
+        cursor.close()
+        return result[0] if len(result) > 0 else None
+
+    @hallow_main.command(name="collect")
+    async def hw_collect(self, ctx: commands.Context):
+        """Get some events points every hour"""
+        last_data = self.db_get_points(ctx.author.id)
+        if last_data is None or (datetime.datetime.now() - last_data['last_update']).total_seconds() > 3600:
+            points = randint(*self.hourly_reward)
+            self.db_add_points(ctx.author.id, points)
+            await self.bot.add_user_eventPoint(ctx.author.id, points)
+            txt = await self.translate(ctx.channel, "halloween", "got-points", pts=points)
+        else:
+            txt = await self.translate(ctx.channel, "halloween", "too-quick")
+        if ctx.guild is None or ctx.channel.permissions_for(ctx.guild.me).embed_links:
+            title = "Halloween event"
+            emb = discord.Embed(title=title, description=txt, color=discord.Color.orange())
+            await ctx.send(embed=emb)
+        else:
+            await ctx.send(txt)
+
 
 def setup(bot):
     bot.add_cog(Halloween(bot))
