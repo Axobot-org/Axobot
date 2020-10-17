@@ -53,6 +53,9 @@ class ThemeConverter(commands.Converter):
                 f'Could not convert "{argument}" into Halloween Theme')
         return argument
 
+async def is_halloween(ctx: commands.Context):
+    """Check if we are in Halloween period"""
+    return ctx.bot.current_event == "halloween"
 
 def _make_check_command(name, parent, **kwargs):
     @commands.cooldown(2, 60, commands.BucketType.member)
@@ -166,9 +169,11 @@ class Halloween(Cog):
         self.translate = self.bot.cogs["LangCog"].tr
 
     @commands.group(name="halloween", aliases=["hw"])
+    @commands.check(is_halloween)
     async def hallow_main(self, ctx):
-        """Hallowify and be happy for the spooky month!
-A BIG thanks to the Project Blurple and their original code.
+        """Hallowify and be happy for the spooky month! Change your avatar color, check if an image is orange enough, and collect event points to unlock a collector Halloween 2020 card!
+        
+A BIG thanks to the Project Blurple and their original code for the colorization part.
 
 ..Example hw hallowify
 
@@ -178,7 +183,9 @@ A BIG thanks to the Project Blurple and their original code.
 
 ..Example halloween check light Zbot
 
-..Example hw check dark"""
+..Example hw check dark
+
+..Example hw collect"""
         pass
     
     lightfy = _make_color_command('lightfy', 'light', hallow_main)
