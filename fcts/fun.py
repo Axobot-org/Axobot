@@ -114,7 +114,9 @@ class FunCog(commands.Cog):
     @commands.command(name="reverse", hidden=True)
     @commands.check(is_fun_enabled)
     async def reverse(self, ctx: commands.Context, *, text:str):
-        """Reverse the letters of a message"""
+        """Reverse the letters of a message
+        
+        ..Doc fun.html#reverse"""
         await ctx.send(text[::-1])
 
     @commands.command(name="count_msg",hidden=True)
