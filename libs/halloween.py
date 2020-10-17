@@ -344,7 +344,7 @@ VARIATIONS = {
 }
 
 
-async def convert_image(image, modifier, method, variations):
+def convert_image(image, modifier, method, variations):
     try:
         modifier_converter = dict(MODIFIERS[modifier])
     except KeyError:
