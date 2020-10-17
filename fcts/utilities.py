@@ -162,8 +162,7 @@ class UtilitiesCog(commands.Cog):
         try:
             await msg.delete()
         except:
-            await self.print2("Unable to delete message "+str(msg))
-            pass
+            print("Unable to delete message "+str(msg))
 
     async def global_check(self, ctx: commands.Context):
         """Do a lot of checks before executing a command (banned guilds, system message etc)"""
@@ -361,7 +360,7 @@ class UtilitiesCog(commands.Cog):
             return False
         return parameters['unlocked_rainbow']
     
-    async def has_blurple_card(self,user,year=19):
+    async def has_blurple_card(self, user: discord.User, year=19):
         """Check if a user won the blurple card"""
         parameters = None
         try:
@@ -377,7 +376,7 @@ class UtilitiesCog(commands.Cog):
                 parameters['unlocked_blurple_20'] = True
         return parameters[f'unlocked_blurple_{year}']
     
-    async def has_christmas_card(self,user):
+    async def has_christmas_card(self, user: discord.User):
         """Check if a user won the christmas card"""
         parameters = None
         try:
@@ -392,6 +391,22 @@ class UtilitiesCog(commands.Cog):
                 await self.change_db_userinfo(user.id,'unlocked_christmas',True)
                 parameters['unlocked_christmas'] = True
         return parameters['unlocked_christmas']
+    
+    async def has_halloween_card(self, user: discord.User, year=20):
+        """Check if a user won the blurple card"""
+        parameters = None
+        try:
+            parameters = await self.get_db_userinfo(criters=["userID="+str(user.id)],columns=[f'unlocked_halloween_{year}'])
+        except Exception as e:
+            await self.bot.cogs["ErrorsCog"].on_error(e, None)
+        if parameters is None:
+            return False
+        if (year == 20) and not parameters['unlocked_halloween_20'] and self.bot.current_event == "halloween":
+            points = await self.get_db_userinfo(["events_points"], ["userID="+str(user.id)])
+            if points != None and points["events_points"] >= 200:
+                await self.change_db_userinfo(user.id, 'unlocked_halloween_20', True)
+                parameters['unlocked_halloween_20'] = True
+        return parameters[f'unlocked_halloween_{year}']
     
     async def get_xp_style(self,user):
         parameters = None
@@ -428,6 +443,8 @@ class UtilitiesCog(commands.Cog):
         liste2 = []
         if await self.bot.cogs['AdminCog'].check_if_admin(user):
             liste2.append('admin')
+        if not self.bot.database_online:
+            return sorted(liste2)+sorted(liste)
         if await self.is_support(user):
             liste2.append('support')
         if await self.is_contributor(user):
@@ -436,14 +453,16 @@ class UtilitiesCog(commands.Cog):
             liste2.append('partner')
         if await self.is_premium(user):
             liste2.append('premium')
-        if await self.has_blurple_card(user,19):
+        if await self.has_blurple_card(user, 19):
             liste.append('blurple19')
-        if await self.has_blurple_card(user,20):
+        if await self.has_blurple_card(user, 20):
             liste.append('blurple20')
         if await self.has_rainbow_card(user):
             liste.append('rainbow')
         if await self.has_christmas_card(user):
             liste.append('christmas')
+        if await self.has_halloween_card(user, 20):
+            liste.append('halloween20')
         return sorted(liste2)+sorted(liste)
 
     async def get_languages(self,user,limit=0):
@@ -473,7 +492,9 @@ class UtilitiesCog(commands.Cog):
         """Add some events points to a user
         if override is True, then the number of points will override the old score"""
         try:
-            if check_event and self.bot.current_event==None:
+            if not self.bot.database_online:
+                return True
+            if check_event and self.bot.current_event == None:
                 return True
             cnx = self.bot.cnx_frm
             cursor = cnx.cursor(dictionary = True)
@@ -491,6 +512,8 @@ class UtilitiesCog(commands.Cog):
     
     async def get_eventsPoints_rank(self,userID:int):
         "Get the ranking of an user"
+        if not self.bot.database_online:
+            return None
         cnx = self.bot.cnx_frm
         cursor = cnx.cursor(dictionary = True)
         query = (f"SELECT userID, events_points, FIND_IN_SET( events_points, ( SELECT GROUP_CONCAT( events_points ORDER BY events_points DESC ) FROM {self.table} ) ) AS rank FROM {self.table} WHERE userID = {userID}")
@@ -504,6 +527,8 @@ class UtilitiesCog(commands.Cog):
         return liste[0]
     
     async def get_eventsPoints_nbr(self) -> int:
+        if not self.bot.database_online:
+            return 0
         cnx = self.bot.cnx_frm
         cursor = cnx.cursor(dictionary = False)
         query = f"SELECT COUNT(*) FROM {self.table} WHERE events_points>0"

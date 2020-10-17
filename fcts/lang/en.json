@@ -160,12 +160,20 @@
         "missing-attachment-perm": "Oops, I'm missing permission to send images!",
         "won-card": "Wow! Very nice blurple picture {}! so beautiful that I decided to offer you the card of xp blurple! You can use it by typing the command `{}profile card blurple` {}"
     },
+    "halloween": {
+        "got-points": "Congratulations! You just won **{pts} event points**!",
+        "too-quick": "It is still too early! You can only retrieve event points once per hour."
+    },
     "bot_events": {
         "events-desc": {
+            "halloween-2020": "October is here! Enjoy until November 1st a dark atmosphere, full of bats, skeletons and pumpkins.\nTake advantage of it to redecorate your server in the colors of Halloween with the command `halloween hallowify` and its derivatives, check that your avatar is compliant with the command `halloween check`, and collect event points every hour with the command `halloween collect`.\n\nPerhaps the bravest of you will succeed in unlocking the special Halloween 2020 xp card, accessible via the `profile card` command!",
             "nothing": "There are currently no events. Follow the bot news to know the date of the next one!"
         },
         "events-price-title": "Prizes to win",
         "events-prices": {
+            "halloween-2020": {
+                "200": "Unlock the special Halloween 2020 xp card! As a bonus, a special role in our official server"
+            },
             "nothing": "There is nothing to gain for this event :confused:"
         },
         "events-title": {},
