@@ -113,6 +113,7 @@ class ServerCog(commands.Cog):
         query = ("UPDATE `bot_infos` SET {v} WHERE `ID`='{id}'".format(v=",".join(v),id=botID))
         cursor.execute(query)
         cnx.commit()
+        cursor.close()
         return True
 
     async def get_languages(self,ignored_guilds):
@@ -191,7 +192,7 @@ class ServerCog(commands.Cog):
         cnx = self.bot.cnx_frm
         cursor = cnx.cursor()
         for e, x in enumerate(values):
-            v.append(f"{x[0]} = %(v{e})s")
+            v.append(f"`{x[0]}` = %(v{e})s")
             v2[f'v{e}'] = x[1]
         #     if type(x[1]) == bool:
         #         v.append("`{x[0]}`={x[1]}".format(x=x))
@@ -200,6 +201,7 @@ class ServerCog(commands.Cog):
         query = ("UPDATE `{t}` SET {v} WHERE `ID`='{id}'".format(t=self.table, v=",".join(v), id=ID))
         cursor.execute(query, v2)
         cnx.commit()
+        cursor.close()
         return True
 
     async def delete_option(self,ID,opt):
@@ -247,8 +249,8 @@ class ServerCog(commands.Cog):
         query = ("DELETE FROM `{}` WHERE `ID`='{}'".format(self.table,ID))
         cursor.execute(query)
         cnx.commit()
+        cursor.close()
         return True
-
                  
 
     @commands.group(name='config')
@@ -398,12 +400,14 @@ class ServerCog(commands.Cog):
                         r = await commands.RoleConverter().convert(ctx,role)
                 except commands.errors.BadArgument:
                     msg = await self.translate(guild.id,"server","change-3")
-                    await ctx.send(msg.format(role.replace("@everyone","@"+u'\u200b'+"everyone").replace("@here","@"+u'\u200b'+"here")))
+                    # await ctx.send(msg.format(role.replace("@everyone","@"+u'\u200b'+"everyone").replace("@here","@"+u'\u200b'+"here")))
+                    await ctx.send(msg.format(role))
                     return
                 if str(r.id) in liste:
                     continue
                 liste.append(str(r.id))
-                liste2.append(r.name.replace("@everyone","@"+u'\u200b'+"everyone").replace("@here","@"+u'\u200b'+"here"))
+                # liste2.append(r.name.replace("@everyone","@"+u'\u200b'+"everyone").replace("@here","@"+u'\u200b'+"here"))
+                liste2.append(r.name)
             await self.modify_server(guild.id,values=[(option,";".join(liste))])
             msg = await self.translate(guild.id,"server","change-role")
             await ctx.send(msg.format(option,", ".join(liste2)))
@@ -599,7 +603,7 @@ class ServerCog(commands.Cog):
             text = await self.find_staff(guild.id,option)
             return await self.form_text(text)
         else:
-            await self.modify_server(guild.id,values=[(option,value.replace('"','\\"'))])
+            await self.modify_server(guild.id,values=[(option, value)])
             msg = await self.translate(guild.id,"server","change-text")
             await ctx.send(msg.format(option,value))
             await self.send_embed(guild,option,value)

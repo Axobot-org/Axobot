@@ -29,7 +29,6 @@ class AdminCog(commands.Cog):
             self.update = {'fr':None,'en':None}
         try:
             self.translate = self.bot.cogs["LangCog"].tr
-            self.print = self.bot.cogs["UtilitiesCog"].print2
             self.utilities = self.bot.cogs["UtilitiesCog"]
         except:
             pass
@@ -39,7 +38,6 @@ class AdminCog(commands.Cog):
     @commands.Cog.listener()
     async def on_ready(self):
         self.translate = self.bot.cogs["LangCog"].tr
-        self.print = self.bot.cogs["UtilitiesCog"].print2
         self.utilities = self.bot.cogs["UtilitiesCog"]
 
     async def check_if_admin(self,ctx):
@@ -198,7 +196,7 @@ class AdminCog(commands.Cog):
                 mentions = [x.mention for x in mentions if x!=None]
             for chan in channels:
                 try:
-                    await chan.send(self.update[lang]+"\n\n"+" ".join(mentions))
+                    await chan.send(self.update[lang]+"\n\n"+" ".join(mentions), allowed_mentions=discord.AllowedMentions(everyone=False))
                 except Exception as e:
                     await ctx.bot.cogs['ErrorsCog'].on_error(e,ctx)
                 else:
@@ -384,7 +382,7 @@ class AdminCog(commands.Cog):
             try:
                 await self.bot.cogs["ServerCog"].send_see(guild,ctx.channel,option,ctx.message,guild)
             except Exception as e:
-                await self.bot.cogs["ErrorsCog"].on_cmd_error(ctx,e)
+                await self.bot.cogs["ErrorsCog"].on_command_error(ctx,e)
         else:
             await ctx.send("Serveur introuvable")
 
@@ -400,7 +398,7 @@ class AdminCog(commands.Cog):
             if self.bot.cnx_frm != None and self.bot.cnx_xp != None:
                 await ctx.bot.cogs['UtilitiesCog'].add_check_reaction(ctx.message)
         except Exception as e:
-            await self.bot.cogs['ErrorsCog'].on_cmd_error(ctx,e)
+            await self.bot.cogs['ErrorsCog'].on_command_error(ctx,e)
 
     @main_msg.command(name="emergency")
     @commands.check(reloads.check_admin)
@@ -623,10 +621,10 @@ Cette option affecte tous les serveurs"""
         owner_list = list()
         for guild in self.bot.guilds:
             if len(guild.members)>9:
-                if guild.owner==None or guild.owner.id==None:
+                if guild.owner_id is None:
                     await ctx.send("Oops, askip le propriétaire de {} n'existe pas ._.".format(guild.id))
                     continue
-                owner_list.append(guild.owner.id)
+                owner_list.append(guild.owner_id)
         for member in server.members:
             if member.id in owner_list and role not in member.roles:
                 await ctx.send("Rôle ajouté à "+str(member))
@@ -659,9 +657,9 @@ Cette option affecte tous les serveurs"""
                     elif x.emoji == '👎':
                         down = len(users)
                 if len(msg.embeds)>0:
-                    liste.append((up-down,datetime.datetime.now()-msg.created_at,msg.embeds[0].fields[0].value,up,down))
+                    liste.append((up-down,datetime.datetime.utcnow()-msg.created_at,msg.embeds[0].fields[0].value,up,down))
                 else:
-                    liste.append((up-down,datetime.datetime.now()-msg.created_at,msg.content,up,down))
+                    liste.append((up-down,datetime.datetime.utcnow()-msg.created_at,msg.content,up,down))
         liste.sort(reverse=True)
         count = len(liste)
         liste = liste[:number]
@@ -761,7 +759,7 @@ Cette option affecte tous les serveurs"""
     async def backup_auto(self,ctx=None):
         """Crée une backup du code"""
         t = time.time()
-        await self.print("("+str(await self.bot.cogs['TimeCog'].date(datetime.datetime.now(),digital=True))+") Backup auto en cours")
+        self.bot.log.info("("+str(await self.bot.cogs['TimeCog'].date(datetime.datetime.now(),digital=True))+") Backup auto en cours")
         message = await ctx.send(":hourglass: Sauvegarde en cours...")
         try:
             os.remove('../backup.tar')
@@ -770,7 +768,7 @@ Cette option affecte tous les serveurs"""
         try:
             archive = shutil.make_archive('backup','tar','..')
         except FileNotFoundError:
-            await self.print("Impossible de trouver le dossier de sauvegarde")
+            self.bot.log.error("Impossible de trouver le dossier de sauvegarde")
             await message.edit("{} Impossible de trouver le dossier de sauvegarde".format(self.bot.cogs['EmojiCog'].customEmojis['red_cross']))
             return
         try:
@@ -783,7 +781,7 @@ Cette option affecte tous les serveurs"""
         except:
             pass
         msg = "Backup completed in {} seconds!".format(round(time.time()-t,3))
-        await self.bot.log.info(msg)
+        self.bot.log.info(msg)
         if ctx != None:
             await message.edit(content=msg)
             
@@ -806,7 +804,7 @@ Cette option affecte tous les serveurs"""
             await channel.send(embed=emb.discord_embed())
             await ctx.bot.cogs['UtilitiesCog'].add_check_reaction(ctx.message)
         except Exception as e:
-            await self.bot.cogs['ErrorsCog'].on_cmd_error(ctx,e)
+            await self.bot.cogs['ErrorsCog'].on_command_error(ctx,e)
     
     @main_bug.command(name='fix')
     async def bug_fix(self,ctx,ID:int,fixed:bool=True):
@@ -831,7 +829,7 @@ Cette option affecte tous les serveurs"""
             await msg.edit(embed=emb)
             await ctx.bot.cogs['UtilitiesCog'].add_check_reaction(ctx.message)
         except Exception as e:
-            await self.bot.cogs['ErrorsCog'].on_cmd_error(ctx,e)
+            await self.bot.cogs['ErrorsCog'].on_command_error(ctx,e)
 
     @commands.group(name="idea",hidden=True)
     @commands.check(reloads.check_admin)
@@ -853,7 +851,7 @@ Cette option affecte tous les serveurs"""
             await self.bot.cogs['FunCog'].add_vote(msg)
             await ctx.bot.cogs['UtilitiesCog'].add_check_reaction(ctx.message)
         except Exception as e:
-            await self.bot.cogs['ErrorsCog'].on_cmd_error(ctx,e)
+            await self.bot.cogs['ErrorsCog'].on_command_error(ctx,e)
 
     @main_idea.command(name='valid')
     async def idea_valid(self,ctx,ID:int,valid:bool=True):
@@ -876,7 +874,7 @@ Cette option affecte tous les serveurs"""
             await msg.edit(embed=emb)
             await ctx.bot.cogs['UtilitiesCog'].add_check_reaction(ctx.message)
         except Exception as e:
-            await self.bot.cogs['ErrorsCog'].on_cmd_error(ctx,e)
+            await self.bot.cogs['ErrorsCog'].on_command_error(ctx,e)
 
 def setup(bot):
     bot.add_cog(AdminCog(bot))

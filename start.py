@@ -66,7 +66,12 @@ def setup_logger():
 class zbot(commands.bot.AutoShardedBot):
 
     def __init__(self,command_prefix=None,case_insensitive=None,status=None,database_online=True,beta=False,dbl_token=""):
-        super().__init__(command_prefix=command_prefix,case_insensitive=case_insensitive,status=status)
+        ALLOWED = discord.AllowedMentions(everyone=False, roles=False)
+        intents = discord.Intents.all()
+        intents.typing = False
+        intents.webhooks = False
+        intents.integrations = False
+        super().__init__(command_prefix=command_prefix, case_insensitive=case_insensitive, status=status, allowed_mentions=ALLOWED, intents=intents)
         self.database_online = database_online
         self.beta = beta
         self.database_keys = dict()
@@ -201,7 +206,8 @@ def main():
                       'fcts.translators',
                       'fcts.users',
                       'fcts.utilities',
-                      'fcts.xp',           
+                      'fcts.xp',
+                      'fcts.halloween'
     ]
     # Suppression du fichier debug.log s'il est trop volumineux
     if os.path.exists("debug.log"):
@@ -236,7 +242,7 @@ def main():
     try:
         try:
             cnx = mysql.connector.connect(user=client.database_keys['user'],password=client.database_keys['password'],host="127.0.0.1",database=client.database_keys['database1'])
-        except mysql.connector.InterfaceError:
+        except (mysql.connector.InterfaceError, mysql.connector.ProgrammingError):
             client.log.warning("Impossible d'accéder à la dabatase locale - tentative via IP")
             cnx = mysql.connector.connect(user=client.database_keys['user'],password=client.database_keys['password'],host=client.database_keys['host'],database=client.database_keys['database1'])
         else:
@@ -268,19 +274,17 @@ def main():
     del count
     
     
-    utilities = client.cogs["UtilitiesCog"]
-
     async def on_ready():
-        await utilities.print2('\nBot connecté')
-        await utilities.print2("Nom : "+client.user.name)
-        await utilities.print2("ID : "+str(client.user.id))
+        print('\nBot connecté')
+        print("Nom : "+client.user.name)
+        print("ID : "+str(client.user.id))
         if len(client.guilds) < 200:
             serveurs = [x.name for x in client.guilds]
-            await utilities.print2("Connecté sur ["+str(len(client.guilds))+"] "+", ".join(serveurs))
+            print("Connecté sur ["+str(len(client.guilds))+"] "+", ".join(serveurs))
         else:
-            await utilities.print2("Connecté sur "+str(len(client.guilds))+" serveurs")
-        await utilities.print2(time.strftime("%d/%m  %H:%M:%S"))
-        await utilities.print2('------')
+            print("Connecté sur "+str(len(client.guilds))+" serveurs")
+        print(time.strftime("%d/%m  %H:%M:%S"))
+        print('------')
         await asyncio.sleep(3)
         if not client.database_online:
             await client.change_presence(activity=discord.Activity(type=discord.ActivityType.listening,name=choice(["a signal",'a sign of life','nothing','a signal','a lost database'])))
@@ -290,26 +294,6 @@ def main():
             await client.change_presence(activity=discord.Game(name=choice(["entrer !help","something","type !help","type !help"])))
         emb = client.cogs["EmbedCog"].Embed(desc="**{}** is launching !".format(client.user.name),color=8311585).update_timestamp()
         await client.cogs["EmbedCog"].send([emb])
-    
-    async def check_once(ctx):
-        try:
-            return await ctx.bot.cogs['UtilitiesCog'].global_check(ctx)
-        except Exception as e:
-            ctx.bot.log.error("ERROR on global_check:",e,ctx.guild)
-            return True
-
-    async def on_member_join(member):
-        await client.cogs['WelcomerCog'].new_member(member)
-
-    async def on_member_remove(member):
-        await client.cogs['WelcomerCog'].bye_member(member)
-
-    async def on_guild_join(guild):
-        await client.cogs["Events"].on_guild_add(guild)
-
-    async def on_guild_remove(guild):
-        await client.cogs["Events"].on_guild_del(guild)
-
 
 
     async def sigterm_handler(bot):
@@ -357,13 +341,6 @@ def main():
             return
 
     client.add_listener(on_ready)
-    client.add_check(check_once,call_once=True)
-    client.add_listener(on_member_join)
-    client.add_listener(on_member_remove)
-    client.add_listener(on_guild_join)
-    client.add_listener(on_guild_remove)
-    
-    
 
     client.run(token)
 

@@ -187,10 +187,15 @@ Slowmode works up to one message every 6h (21600s)
             if not ctx.channel.permissions_for(ctx.guild.me).kick_members:
                 await ctx.send(await self.translate(ctx.guild.id,"modo","cant-kick"))
                 return
-            if self.bot.database_online:
-                if await self.bot.cogs["ServerCog"].staff_finder(user,"kick") or user==ctx.guild.me:
-                    return await ctx.send(await self.translate(ctx.guild.id,"modo","staff-kick"))
-            elif user==ctx.guild.me or ctx.channel.permissions_for(user).kick_members:
+            async def user_can_kick(user): 
+                try:
+                    return await self.bot.cogs["ServerCog"].staff_finder(user,"kick")
+                except commands.errors.CommandError:
+                    pass
+                return False
+            if user==ctx.guild.me or (self.bot.database_online and await user_can_kick(user)):
+                return await ctx.send(await self.translate(ctx.guild.id,"modo","staff-kick"))
+            elif not self.bot.database_online and ctx.channel.permissions_for(user).kick_members:
                 return await ctx.send(await self.translate(ctx.guild.id,"modo","staff-kick"))
             if user.roles[-1].position >= ctx.guild.me.roles[-1].position:
                 await ctx.send(await self.translate(ctx.guild.id,"modo","kick-1"))
@@ -242,7 +247,13 @@ Slowmode works up to one message every 6h (21600s)
 
 ..Doc moderator.html#warn"""
         try:
-            if self.bot.database_online and await self.bot.cogs["ServerCog"].staff_finder(user,"warn"):
+            async def user_can_warn(user): 
+                try:
+                    return await self.bot.cogs["ServerCog"].staff_finder(user,"warn")
+                except commands.errors.CommandError:
+                    pass
+                return False
+            if user==ctx.guild.me or (self.bot.database_online and await user_can_warn(user)):
                 return await ctx.send(await self.translate(ctx.guild.id,"modo","staff-warn"))
             elif not self.bot.database_online and ctx.channel.permissions_for(user).manage_roles:
                 return await ctx.send(await self.translate(ctx.guild.id,"modo","staff-warn"))
@@ -350,7 +361,13 @@ You can also mute this member for a defined duration, then use the following for
             await self.bot.cogs['ErrorsCog'].on_error(e,ctx)
             return
         role = await self.get_muted_role(ctx.guild)
-        if not await self.check_mute_context(ctx,role,user):
+        if not await self.check_mute_context(ctx, role, user):
+            return
+        if role is None:
+            role = await self.get_muted_role(ctx.guild)
+        if role is None:
+            self.bot.log.warn(f"[muted_role] Unable to get role for guild {ctx.guild.id}")
+            await ctx.send(await self.translate(ctx.guild.id, "modo", "no-mute"))
             return
         caseID = "'Unsaved'"
         try:
@@ -487,7 +504,13 @@ The 'days_to_delete' option represents the number of days worth of messages to d
                 return
             if user in ctx.guild.members:
                 member = ctx.guild.get_member(user.id)
-                if self.bot.database_online and await self.bot.cogs["ServerCog"].staff_finder(member,"ban") or user==ctx.guild.me:
+                async def user_can_ban(user): 
+                    try:
+                        return await self.bot.cogs["ServerCog"].staff_finder(user,"ban")
+                    except commands.errors.CommandError:
+                        pass
+                    return False
+                if user==ctx.guild.me or (self.bot.database_online and await user_can_ban(member)):
                     await ctx.send(await self.translate(ctx.guild.id,"modo","staff-ban"))
                     return
                 elif not self.bot.database_online and (ctx.channel.permissions_for(member).ban_members or user==ctx.guild.me):
@@ -618,10 +641,15 @@ Permissions for using this command are the same as for the kick
             if not ctx.channel.permissions_for(ctx.guild.me).ban_members:
                 await ctx.send(await self.translate(ctx.guild.id,"modo","cant-ban"))
                 return
-            if self.bot.database_online:
-                if await self.bot.cogs["ServerCog"].staff_finder(user,"kick") or user==ctx.guild.me:
-                    return await ctx.send(await self.translate(ctx.guild.id,"modo","staff-kick"))
-            elif user==ctx.guild.me or ctx.channel.permissions_for(user).kick_members:
+            async def user_can_kick(user): 
+                try:
+                    return await self.bot.cogs["ServerCog"].staff_finder(user,"kick")
+                except commands.errors.CommandError:
+                    pass
+                return False
+            if user==ctx.guild.me or (self.bot.database_online and await user_can_kick(user)):
+                return await ctx.send(await self.translate(ctx.guild.id,"modo","staff-kick"))
+            elif not self.bot.database_online and ctx.channel.permissions_for(user).kick_members:
                 return await ctx.send(await self.translate(ctx.guild.id,"modo","staff-kick"))
             if user.roles[-1].position >= ctx.guild.me.roles[-1].position:
                 await ctx.send(await self.translate(ctx.guild.id,"modo","kick-1"))
@@ -798,7 +826,7 @@ You must be an administrator of this server to use this command.
                 embed = await ctx.bot.cogs['EmbedCog'].Embed(title=title,fields=fields,color=self.bot.cogs["ServerCog"].embed_color).create_footer(ctx)
                 await ctx.send(embed=embed.discord_embed())
         except Exception as e:
-            await ctx.bot.cogs['ErrorsCog'].on_cmd_error(ctx,e)
+            await ctx.bot.cogs['ErrorsCog'].on_command_error(ctx,e)
 
 
     @commands.group(name="role", aliases=["roles"])
@@ -1014,7 +1042,7 @@ ID corresponds to the Identifier of the message"""
             await ctx.send(await self.translate(ctx.guild.id, "modo", "need-read-history"))
             return
         check = lambda x: not x.pinned
-        if message.created_at < datetime.datetime.now() - datetime.timedelta(days=21):
+        if message.created_at < datetime.datetime.utcnow() - datetime.timedelta(days=21):
             await ctx.send(await self.translate(ctx.guild.id, "modo", "destop-old", days=21))
             return
         messages = await message.channel.purge(after=message, limit=1000, oldest_first=False)
@@ -1081,7 +1109,7 @@ ID corresponds to the Identifier of the message"""
                 try:
                     await ctx.author.remove_roles(*roles,reason="Verified")
                 except Exception as e:
-                    await self.bot.cogs['ErrorsCog'].on_cmd_error(ctx,e)
+                    await self.bot.cogs['ErrorsCog'].on_command_error(ctx,e)
             await del_msg(qu_msg)
 
 

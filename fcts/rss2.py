@@ -830,7 +830,7 @@ class RssCog(commands.Cog):
                         txt.append(nothing+notok+' author')
                 await ctx.send("\n".join(txt))
         except Exception as e:
-            await ctx.bot.cogs['ErrorsCog'].on_cmd_error(ctx,e)
+            await ctx.bot.cogs['ErrorsCog'].on_command_error(ctx,e)
 
     async def check_rss_url(self,url):
         r = await self.parse_yt_url(url)
@@ -1280,13 +1280,13 @@ class RssCog(commands.Cog):
         """Add a flow in the database"""
         cnx = self.bot.cnx_frm
         cursor = cnx.cursor()
-        ID = await self.create_id(channelID,guildID,Type,link)
+        ID = await self.create_id(channelID, guildID, _type, link)
         if _type == 'mc':
             form = ''
         else:
             form = await self.translate(guildID, "rss", _type+"-default-flow")
         # query = ("INSERT INTO `{}` (`ID`,`guild`,`channel`,`type`,`link`,`structure`) VALUES ('{}','{}','{}','{}','{}','{}')".format(self.table,ID,guildID,channelID,Type,link,form))
-        query = "INSERT INTO `{}` (`ID`, `guild`,`channel`,`type`,`link`,`structure`) VALUES (%(i),%(g)s,%(c)s,%(t)s,%(l)s,%(f)s)".format(self.table)
+        query = "INSERT INTO `{}` (`ID`, `guild`,`channel`,`type`,`link`,`structure`) VALUES (%(i)s,%(g)s,%(c)s,%(t)s,%(l)s,%(f)s)".format(self.table)
         cursor.execute(query, { 'i': ID, 'g': guildID, 'c': channelID, 't': _type, 'l': link, 'f': form })
         cnx.commit()
         cursor.close()
@@ -1344,7 +1344,7 @@ class RssCog(commands.Cog):
         cnx.commit()
         cursor.close()
 
-    async def send_rss_msg(self,obj,channel,roles):
+    async def send_rss_msg(self, obj, channel:discord.TextChannel, roles:[str]):
         if channel is not None:
             t = await obj.create_msg(await self.translate(channel.guild,"current_lang","current"))
             mentions = list()
@@ -1352,20 +1352,13 @@ class RssCog(commands.Cog):
                 if item=='':
                     continue
                 role = discord.utils.get(channel.guild.roles,id=int(item))
-                if isinstance(role,discord.Role) and not role.mentionable:
-                    try:
-                        await role.edit(mentionable=True)
-                    except:
-                        pass
-                    else:
-                        mentions.append(role)
+                if role is not None:
+                    mentions.append(role)
             try:
                 if isinstance(t,(self.bot.cogs['EmbedCog'].Embed,discord.Embed)):
-                    await channel.send(" ".join(obj.mentions),embed=t)
+                    await channel.send(" ".join(obj.mentions), embed=t, allowed_mentions=discord.AllowedMentions(everyone=False, roles=True))
                 else:
-                    await channel.send(t)
-                for role in mentions:
-                    await role.edit(mentionable=False)
+                    await channel.send(t, allowed_mentions=discord.AllowedMentions(everyone=False, roles=True))
             except Exception as e:
                 self.bot.log.info("[send_rss_msg] Cannot send message on channel {}: {}".format(channel.id,e))
 

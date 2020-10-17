@@ -1,4 +1,4 @@
-import discord, datetime, asyncio, logging, time, aiohttp, json, random, shutil, mysql, psutil
+import discord, datetime, asyncio, logging, time, aiohttp, json, random, shutil, mysql, psutil, re
 from discord.ext import commands, tasks
 from fcts.checks import is_fun_enabled
 
@@ -40,7 +40,6 @@ class Events(commands.Cog):
             'role':60,
             'guild':75}
         self.statuspage_header = {"Content-Type": "application/json", "Authorization": "OAuth " + self.bot.others["statuspage"]}
-        bot.add_listener(self.on_new_message,'on_message')
 
 
     def cog_unload(self):
@@ -64,7 +63,9 @@ class Events(commands.Cog):
             await self.updade_memberslogs_name(before, after)
 
     async def updade_memberslogs_name(self, before:discord.Member, after:discord.Member, tries:int=0):
-        if tries>5:
+        if tries > 5:
+            return
+        if not self.bot.database_online:
             return
         cnx = self.bot.cnx_frm
         cursor = cnx.cursor()
@@ -97,15 +98,17 @@ class Events(commands.Cog):
             await self.updade_memberslogs_name(before, after)
 
 
-    async def on_guild_add(self,guild):
+    @commands.Cog.listener()
+    async def on_guild_join(self, guild:discord.Guild):
         """Called when the bot joins a guild"""
         await self.send_guild_log(guild,"join")
 
-    async def on_guild_del(self,guild):
+    @commands.Cog.listener()
+    async def on_guild_remove(self, guild:discord.Guild):
         """Called when the bot left a guild"""
         await self.send_guild_log(guild,"left")
 
-    async def send_guild_log(self,guild,Type):
+    async def send_guild_log(self, guild:discord.Guild, Type:str):
         """Send a log to the logging channel when the bot joins/leave a guild"""
         try:
             if Type == "join":
@@ -122,7 +125,8 @@ class Events(commands.Cog):
             await self.bot.cogs["ErrorsCog"].on_error(e,None)
 
 
-    async def on_new_message(self, msg:discord.Message):
+    @commands.Cog.listener()
+    async def on_message(self, msg:discord.Message):
         """Called for each new message because it's cool"""
         if msg.guild is None:
             await self.send_mp(msg)
@@ -145,7 +149,7 @@ class Events(commands.Cog):
             except:
                 pass
         # Halloween event
-        elif (msg.channel.id==635569244507209749 and random.random()<0.3) or (("booh" in msg.content.lower() or "halloween" in msg.content.lower() or "witch" in msg.content.lower()) and random.random()<0.05 and self.bot.current_event=="halloween"):
+        elif ("booh" in msg.content.lower() or "halloween" in msg.content.lower() or "witch" in msg.content.lower()) and random.random()<0.05 and self.bot.current_event=="halloween":
             try:
                 react = random.choice(['🦇','🎃','🕷️']*2+['👀'])
                 await msg.add_reaction(react)
@@ -280,11 +284,17 @@ class Events(commands.Cog):
             f_duration = await self.bot.get_cog('TimeCog').time_delta(task['duration'],lang=await self.translate(channel,'current_lang','current'), form='developed', precision=0)
             t = (await self.translate(channel, "fun", "reminds-title")).capitalize()
             foot = await self.translate(channel, "fun", "reminds-date")
-            emb = self.bot.get_cog("EmbedCog").Embed(title=t, desc=task["message"], color=4886754, time=task["utc_begin"], footer_text=foot)
+            imgs = re.findall(r'(https://\S+\.(?:png|jpe?g|webp|gif))', task['message'])
+            img = imgs[0] if len(imgs)==1 else ""
+            if task['data'] is not None:
+                task['data'] = json.loads(task['data'])
+                if 'msg_url' in task['data']:
+                    task["message"] += "\n\n[{}]({})".format(await self.translate(channel, "fun", "reminds-link"), task['data']['msg_url'])
+            emb = self.bot.get_cog("EmbedCog").Embed(title=t, desc=task["message"], color=4886754, time=task["utc_begin"], footer_text=foot, image=img)
             msg = await self.translate(channel, "fun", "reminds-asked", user=user.mention, duration=f_duration)
             await channel.send(msg, embed=emb)
         except discord.errors.Forbidden:
-            pass
+            return False
         except Exception as e:
             raise e
         return True
@@ -365,21 +375,19 @@ class Events(commands.Cog):
 
 
 
-    async def add_task(self, action:str, duration:int, userID: int, guildID:int=None, channelID:int=None, message:str=None):
+    async def add_task(self, action:str, duration:int, userID: int, guildID:int=None, channelID:int=None, message:str=None, data:dict=None):
         """Ajoute une tâche à la liste"""
         tasks = await self.get_events_from_db(all=True)
         for t in tasks:
             if (t['user']==userID and t['guild']==guildID and t['action']==action and t["channel"]==channelID) and t['action']!='timer':
                 return await self.update_duration(t['ID'],duration)
+        data = None if data is None else json.dumps(data)
         cnx = self.bot.cnx_frm
         cursor = cnx.cursor()
-        if len(tasks)>0:
-            ID = max([x['ID'] for x in tasks])+1
-        else:
-            ID = 0
-        query = "INSERT INTO `timed` (`ID`,`guild`,`channel`,`user`,`action`,`duration`,`message`) VALUES (%(ID)s,%(guild)s,%(channel)s,%(user)s,%(action)s,%(duration)s,%(message)s)"
-        cursor.execute(query, {'ID':ID, 'guild':guildID, 'channel':channelID, 'user':userID, 'action':action, 'duration':duration, 'message':message})
+        query = "INSERT INTO `timed` (`guild`,`channel`,`user`,`action`,`duration`,`message`, `data`) VALUES (%(guild)s,%(channel)s,%(user)s,%(action)s,%(duration)s,%(message)s,%(data)s)"
+        cursor.execute(query, {'guild':guildID, 'channel':channelID, 'user':userID, 'action':action, 'duration':duration, 'message':message, 'data':data})
         cnx.commit()
+        cursor.close()
         return True
 
     async def update_duration(self,ID,new_duration):
@@ -389,6 +397,7 @@ class Events(commands.Cog):
         query = ("UPDATE `timed` SET `duration`={} WHERE `ID`={}".format(new_duration,ID))
         cursor.execute(query)
         cnx.commit()
+        cursor.close()
         return True
 
     async def remove_task(self,ID:int):
@@ -398,6 +407,7 @@ class Events(commands.Cog):
         query = ("DELETE FROM `timed` WHERE `timed`.`ID` = {}".format(ID))
         cursor.execute(query)
         cnx.commit()
+        cursor.close()
         return True
 
     @tasks.loop(seconds=1.0)
@@ -465,11 +475,11 @@ class Events(commands.Cog):
                 params = {"data": {"timestamp": round(d.timestamp()), "value":average}}
                 async with session.post("https://api.statuspage.io/v1/pages/g9cnphg3mhm9/metrics/x4xs4clhkmz0/data", json=params) as r:
                     r.raise_for_status()
-                    self.bot.log.info(f"StatusPage API returned {r.status} for {params} (latency)")
+                    self.bot.log.debug(f"StatusPage API returned {r.status} for {params} (latency)")
                 params["data"]["value"] = psutil.virtual_memory().available
                 async with session.post("https://api.statuspage.io/v1/pages/g9cnphg3mhm9/metrics/72bmf4nnqbwb/data", json=params) as r:
                     r.raise_for_status()
-                    self.bot.log.info(f"StatusPage API returned {r.status} for {params} (available RAM)")
+                    self.bot.log.debug(f"StatusPage API returned {r.status} for {params} (available RAM)")
             self.latencies_list = list()
             self.last_statusio = d
 

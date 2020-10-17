@@ -18,6 +18,7 @@ class LibCog(commands.Cog):
         self.bot = bot
         self.file = 'library'
         self.tables = ['librarystats_beta','library_beta'] if bot.beta else ['librarystats','library']
+        self.cache = dict()
         try:
             self.translate = bot.cogs['LangCog'].tr
         except:
@@ -65,6 +66,9 @@ class LibCog(commands.Cog):
         if isbn is None:
             if keywords is None:
                 raise ValueError
+            info = self.cache.get(keywords, None)
+            if info is not None:
+                return info
             isbn = isbnlib.isbn_from_words(keywords)
         info = dict()
         for key in ['wiki', 'default', 'openl', 'goob']:
@@ -88,7 +92,9 @@ class LibCog(commands.Cog):
             if 'thumbnail' in co:
                 info['cover'] = co['thumbnail']
             info['isbn'] = isbn
-        return None if len(info) == 0 else info
+        info = None if len(info) == 0 else info
+        self.cache[keywords] = info
+        return info
 
 
     @commands.group(name="book",aliases=['bookstore'])
@@ -98,12 +104,17 @@ class LibCog(commands.Cog):
             await self.bot.cogs['HelpCog'].help_command(ctx,['book'])
     
     @book_main.command(name="search",aliases=["book"])
+    @commands.cooldown(5, 60, commands.BucketType.guild)
     async def book_search(self, ctx:commands.Context, ISBN:typing.Optional[ISBN], *, keywords:str=''):
         """Search from a book from its ISBN or search terms"""
         keywords = keywords.replace('-','')
         while '  ' in keywords:
             keywords = keywords.replace('  ',' ')
-        book = await self.search_book_2(ISBN, keywords)
+        try:
+            book = await self.search_book_2(ISBN, keywords)
+        except isbnlib.dev._exceptions.ISBNLibHTTPError:
+            await ctx.send(await self.translate(ctx.channel, "library", "rate-limited") + " :confused:")
+            return
         if book is None:
             return await ctx.send(await self.translate(ctx.channel,'library','no-found'))
         unknown = await self.translate(ctx.channel, 'library', 'unknown')

@@ -15,6 +15,10 @@ class UtilitiesCog(commands.Cog):
         self.config = {}
         self.table = 'users'
         self.new_pp = False
+        bot.add_check(self.global_check)
+    
+    def cog_unload(self):
+        self.bot.remove_check(self.global_check)
 
     @commands.Cog.listener()
     async def on_ready(self):
@@ -81,11 +85,10 @@ class UtilitiesCog(commands.Cog):
         item = None
         if type(Type) == str:
             Type = Type.lower()
-        if Type == None:
+        if Type is None:
             for i in [commands.MemberConverter,commands.RoleConverter,
-                    commands.TextChannelConverter,commands.InviteConverter,
-                    args.user,commands.VoiceChannelConverter,
-                    commands.EmojiConverter,commands.CategoryChannelConverter,args.snowflake]:
+                    commands.TextChannelConverter,commands.VoiceChannelConverter,commands.InviteConverter,
+                    args.user, commands.EmojiConverter,commands.CategoryChannelConverter,args.snowflake]:
                 try:
                     a = await i().convert(ctx,name)
                     item = a
@@ -110,7 +113,7 @@ class UtilitiesCog(commands.Cog):
             except:
                 if name.isnumeric():
                     item = await self.bot.fetch_user(int(name))
-        elif Type == 'textchannel' or Type == "channel":
+        elif Type == 'textchannel':
             try:
                 item = await commands.TextChannelConverter().convert(ctx,name)
             except:
@@ -120,11 +123,19 @@ class UtilitiesCog(commands.Cog):
                 item = await commands.InviteConverter().convert(ctx,name)
             except:
                 pass
-        elif Type == 'voicechannel' or Type == 'channel':
+        elif Type == 'voicechannel':
             try:
                 item = await commands.VoiceChannelConverter().convert(ctx,name)
             except:
                 pass
+        elif Type == 'channel':
+            try:
+                item = await commands.TextChannelConverter().convert(ctx,name)
+            except:
+                try:
+                    item = await commands.VoiceChannelConverter().convert(ctx,name)
+                except:
+                    pass
         elif Type == 'emoji':
             try:
                 item = await commands.EmojiConverter().convert(ctx,name)
@@ -151,27 +162,25 @@ class UtilitiesCog(commands.Cog):
         try:
             await msg.delete()
         except:
-            await self.print2("Unable to delete message "+str(msg))
-            pass
+            print("Unable to delete message "+str(msg))
 
-    async def global_check(self,ctx):
-        """Do a lot of checks before executing a command (rss loop, banned guilds etc)"""
-        #if ctx.bot.cogs['RssCog'].last_update==None or (datetime.datetime.now() - ctx.bot.cogs['RssCog'].last_update).total_seconds() > 20*60:
-        #    self.bot.cogs['RssCog'].last_update = datetime.datetime.now()
-        #    asyncio.run_coroutine_threadsafe(ctx.bot.cogs['RssCog'].main_loop(),asyncio.get_running_loop())
-        if type(ctx)!=commands.context.Context or self.config==None:
+    async def global_check(self, ctx: commands.Context):
+        """Do a lot of checks before executing a command (banned guilds, system message etc)"""
+        if not isinstance(ctx, commands.context.Context) or self.config is None:
             return True
+        if ctx.message.type != discord.MessageType.default:
+            return False
         if await self.bot.cogs['AdminCog'].check_if_admin(ctx):
             return True
-        elif len(self.config)==0:
+        elif not self.config:
             await self.get_bot_infos()
-        if len(self.config)==0 or self.config==None:
+        if len(self.config) == 0 or self.config is None:
             return True
-        if ctx.guild != None:
+        if ctx.guild is not None:
             if str(ctx.guild.id) in self.config['banned_guilds'].split(";"):
                 return False
-            if str(ctx.author.id) in self.config['banned_users'].split(";"):
-                return False
+        if str(ctx.author.id) in self.config['banned_users'].split(";"):
+            return False
         return True
 
     async def get_online_number(self,members):
@@ -205,10 +214,10 @@ class UtilitiesCog(commands.Cog):
         ch = r"((?:discord\.gg|discord(?:app)?.com/invite|discord.me)/.+)"
         return re.search(ch,text)
 
-    async def clear_msg(self,text:str,everyone=True,ctx=None,emojis=True):
+    async def clear_msg(self,text:str,everyone=False,ctx=None,emojis=True):
         """Remove every mass mention from a text, and add custom emojis"""
-        if everyone:
-            text = text.replace("@everyone","@"+u"\u200B"+"everyone").replace("@here","@"+u"\u200B"+"here")
+        # if everyone:
+        #     text = text.replace("@everyone","@"+u"\u200B"+"everyone").replace("@here","@"+u"\u200B"+"here")
         #for x in re.finditer(r'<(a?:[^:]+:)\d+>',text):
         #    text = text.replace(x.group(0),x.group(1))
         #for x in self.bot.emojis: #  (?<!<|a)(:[^:<]+:)
@@ -237,6 +246,8 @@ class UtilitiesCog(commands.Cog):
         await self.bot.wait_until_ready()
         if not (isinstance(columns,(list,tuple)) and isinstance(criters,(list,tuple))):
             raise ValueError
+        if not self.bot.database_online:
+            return None
         cnx = self.bot.cnx_frm
         cursor = cnx.cursor(dictionary = True)
         if columns == []:
@@ -260,12 +271,10 @@ class UtilitiesCog(commands.Cog):
     async def change_db_userinfo(self,userID:int,key:str,value):
         """Change something about a user in the database"""
         try:
+            if not self.bot.database_online:
+                return None
             cnx = self.bot.cnx_frm
             cursor = cnx.cursor(dictionary = True)
-            # if not isinstance(value,(bool,int)):
-            #     value = "'"+value+"'"
-            # query = ("INSERT INTO `{t}` (`userID`,`{k}`) VALUES ('{u}',{v}) ON DUPLICATE KEY UPDATE {k} = {v};".format(t=self.table,u=userID,k=key,v=value))
-            # INSERT INTO `users` (`userID`,`unlocked_blurple`) VALUES ('279568324260528128','True') ON DUPLICATE KEY UPDATE unlocked_blurple = 'True';
             query = "INSERT INTO `{t}` (`userID`,`{k}`) VALUES (%(u)s,%(v)s) ON DUPLICATE KEY UPDATE {k} = %(v)s;".format(t=self.table, k=key)
             cursor.execute(query, { 'u': userID, 'v': value })
             cnx.commit()
@@ -351,7 +360,7 @@ class UtilitiesCog(commands.Cog):
             return False
         return parameters['unlocked_rainbow']
     
-    async def has_blurple_card(self,user,year=19):
+    async def has_blurple_card(self, user: discord.User, year=19):
         """Check if a user won the blurple card"""
         parameters = None
         try:
@@ -367,7 +376,7 @@ class UtilitiesCog(commands.Cog):
                 parameters['unlocked_blurple_20'] = True
         return parameters[f'unlocked_blurple_{year}']
     
-    async def has_christmas_card(self,user):
+    async def has_christmas_card(self, user: discord.User):
         """Check if a user won the christmas card"""
         parameters = None
         try:
@@ -382,6 +391,22 @@ class UtilitiesCog(commands.Cog):
                 await self.change_db_userinfo(user.id,'unlocked_christmas',True)
                 parameters['unlocked_christmas'] = True
         return parameters['unlocked_christmas']
+    
+    async def has_halloween_card(self, user: discord.User, year=20):
+        """Check if a user won the blurple card"""
+        parameters = None
+        try:
+            parameters = await self.get_db_userinfo(criters=["userID="+str(user.id)],columns=[f'unlocked_halloween_{year}'])
+        except Exception as e:
+            await self.bot.cogs["ErrorsCog"].on_error(e, None)
+        if parameters is None:
+            return False
+        if (year == 20) and not parameters['unlocked_halloween_20'] and self.bot.current_event == "halloween":
+            points = await self.get_db_userinfo(["events_points"], ["userID="+str(user.id)])
+            if points != None and points["events_points"] >= 200:
+                await self.change_db_userinfo(user.id, 'unlocked_halloween_20', True)
+                parameters['unlocked_halloween_20'] = True
+        return parameters[f'unlocked_halloween_{year}']
     
     async def get_xp_style(self,user):
         parameters = None
@@ -418,6 +443,8 @@ class UtilitiesCog(commands.Cog):
         liste2 = []
         if await self.bot.cogs['AdminCog'].check_if_admin(user):
             liste2.append('admin')
+        if not self.bot.database_online:
+            return sorted(liste2)+sorted(liste)
         if await self.is_support(user):
             liste2.append('support')
         if await self.is_contributor(user):
@@ -426,14 +453,16 @@ class UtilitiesCog(commands.Cog):
             liste2.append('partner')
         if await self.is_premium(user):
             liste2.append('premium')
-        if await self.has_blurple_card(user,19):
+        if await self.has_blurple_card(user, 19):
             liste.append('blurple19')
-        if await self.has_blurple_card(user,20):
+        if await self.has_blurple_card(user, 20):
             liste.append('blurple20')
         if await self.has_rainbow_card(user):
             liste.append('rainbow')
         if await self.has_christmas_card(user):
             liste.append('christmas')
+        if await self.has_halloween_card(user, 20):
+            liste.append('halloween20')
         return sorted(liste2)+sorted(liste)
 
     async def get_languages(self,user,limit=0):
@@ -463,7 +492,9 @@ class UtilitiesCog(commands.Cog):
         """Add some events points to a user
         if override is True, then the number of points will override the old score"""
         try:
-            if check_event and self.bot.current_event==None:
+            if not self.bot.database_online:
+                return True
+            if check_event and self.bot.current_event == None:
                 return True
             cnx = self.bot.cnx_frm
             cursor = cnx.cursor(dictionary = True)
@@ -481,6 +512,8 @@ class UtilitiesCog(commands.Cog):
     
     async def get_eventsPoints_rank(self,userID:int):
         "Get the ranking of an user"
+        if not self.bot.database_online:
+            return None
         cnx = self.bot.cnx_frm
         cursor = cnx.cursor(dictionary = True)
         query = (f"SELECT userID, events_points, FIND_IN_SET( events_points, ( SELECT GROUP_CONCAT( events_points ORDER BY events_points DESC ) FROM {self.table} ) ) AS rank FROM {self.table} WHERE userID = {userID}")
@@ -494,6 +527,8 @@ class UtilitiesCog(commands.Cog):
         return liste[0]
     
     async def get_eventsPoints_nbr(self) -> int:
+        if not self.bot.database_online:
+            return 0
         cnx = self.bot.cnx_frm
         cursor = cnx.cursor(dictionary = False)
         query = f"SELECT COUNT(*) FROM {self.table} WHERE events_points>0"

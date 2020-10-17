@@ -36,11 +36,13 @@ class XPCog(commands.Cog):
         except:
             pass
         self.types = ['global','mee6-like','local']
-        if platform.system()=='Darwin':
+        try:
             verdana_name = 'Verdana.ttf'
-        else:
+            xp_font = ImageFont.truetype(verdana_name, 24)
+        except OSError:
             verdana_name = 'Veranda.ttf'
-        self.fonts = {'xp_fnt': ImageFont.truetype(verdana_name, 24),
+            xp_font = ImageFont.truetype(verdana_name, 24)
+        self.fonts = {'xp_fnt': xp_font,
         'NIVEAU_fnt': ImageFont.truetype(verdana_name, 42),
         'levels_fnt': ImageFont.truetype(verdana_name, 65),
         'rank_fnt': ImageFont.truetype(verdana_name,29),
@@ -937,7 +939,7 @@ class XPCog(commands.Cog):
                 return await ctx.send(str(await self.translate(ctx.guild.id,'xp','too-many-rr')).format(len(l)))
             await self.rr_add_role(ctx.guild.id,role.id,level)
         except Exception as e:
-            await self.bot.cogs['ErrorsCog'].on_cmd_error(ctx,e)
+            await self.bot.cogs['ErrorsCog'].on_command_error(ctx,e)
         else:
             await ctx.send(str(await self.translate(ctx.guild.id,'xp','rr-added')).format(role.name,level))
     
@@ -949,7 +951,7 @@ class XPCog(commands.Cog):
         try:
             l = await self.rr_list_role(ctx.guild.id)
         except Exception as e:
-            await self.bot.cogs['ErrorsCog'].on_cmd_error(ctx,e)
+            await self.bot.cogs['ErrorsCog'].on_command_error(ctx,e)
         else:
             des = '\n'.join(["• <@&{}> : lvl {}".format(x['role'], x['level']) for x in l])
             max_rr = await self.bot.cogs['ServerCog'].find_staff(ctx.guild.id,'rr_max_number')
@@ -969,7 +971,7 @@ class XPCog(commands.Cog):
                 return await ctx.send(await self.translate(ctx.guild.id,'xp','no-rr'))
             await self.rr_remove_role(l[0]['ID'])
         except Exception as e:
-            await self.bot.cogs['ErrorsCog'].on_cmd_error(ctx,e)
+            await self.bot.cogs['ErrorsCog'].on_command_error(ctx,e)
         else:
             await ctx.send(str(await self.translate(ctx.guild.id,'xp','rr-removed')).format(level))
     
@@ -996,7 +998,7 @@ class XPCog(commands.Cog):
                     c += await self.give_rr(m, level, rr_list, remove=True)
             await ctx.send(str(await self.translate(ctx.guild.id,'xp','rr-reload')).format(c,ctx.guild.member_count))
         except Exception as e:
-            await self.bot.cogs['ErrorsCog'].on_cmd_error(ctx,e)
+            await self.bot.cogs['ErrorsCog'].on_command_error(ctx,e)
     
 
 

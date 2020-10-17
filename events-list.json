@@ -24,8 +24,8 @@
         "objectives": [150]
     },
     "halloween-2020": {
-        "begin": "2020-10-11",
-        "end": "2020-10-31",
+        "begin": "2020-10-17",
+        "end": "2020-11-01",
         "type": "halloween",
         "icon": null,
         "color": 16089635,

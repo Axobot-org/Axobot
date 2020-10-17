@@ -44,6 +44,6 @@ Such content is subject to a **MIT-type license**, which means that you are free
 
 [![Discord Bots](https://discordbots.org/api/widget/486896267788812288.svg)](https://discordbots.org/bot/486896267788812288)
 
-[![Divine Discord Bots](https://divinediscordbots.com/api/widget/486896267788812288.svg)](https://divinediscordbots.com/bot/486896267788812288)
-
 [![Bots on Discord](https://bots.ondiscord.xyz/bots/486896267788812288/embed)](https://bots.ondiscord.xyz/bots/486896267788812288)
+
+[![botlist.space](https://api.botlist.space/widget/486896267788812288/5?rounded=true)](https://botlist.space/bot/486896267788812288?utm_source=bls&utm_medium=widget&utm_campaign=486896267788812288)

@@ -17,8 +17,9 @@ class WelcomerCog(commands.Cog):
     async def on_ready(self):
         self.translate = self.bot.cogs['LangCog'].tr
     
-
-    async def new_member(self,member):
+    
+    @commands.Cog.listener()
+    async def on_member_join(self, member:discord.Member):
         """Fonction principale appelée lorsqu'un membre rejoint un serveur"""
         # await self.send_log(member,"welcome")
         if self.bot.database_online:
@@ -32,8 +33,8 @@ class WelcomerCog(commands.Cog):
             await self.check_contributor(member)
         
         
-    
-    async def bye_member(self,member):
+    @commands.Cog.listener()
+    async def on_member_remove(self, member:discord.Member):
         """Fonction principale appelée lorsqu'un membre quitte un serveur"""
         # await self.send_log(member,"leave")
         if self.bot.database_online:
@@ -42,7 +43,8 @@ class WelcomerCog(commands.Cog):
             await self.bot.cogs['Events'].check_user_left(member)
 
 
-    async def send_msg(self,member,Type):
+    async def send_msg(self, member:discord.Member, Type:str):
+        """Envoie un message de bienvenue/départ dans le serveur"""
         msg = await self.bot.cogs['ServerCog'].find_staff(member.guild.id,Type)
         if await self.raid_check(member) or member.id in self.no_message:
             return
@@ -133,21 +135,21 @@ class WelcomerCog(commands.Cog):
                 await self.kick(member,await self.translate(member.guild.id,"logs","d-invite"))
                 c = True
         if level >= 2:
-            if (datetime.datetime.now() - member.created_at).seconds <= 5*60:
+            if (datetime.datetime.utcnow() - member.created_at).seconds <= 5*60:
                 await self.kick(member,await self.translate(member.guild.id,"logs","d-young"))
                 c = True
         if level >= 3 and can_ban:
             if await self.bot.cogs['UtilitiesCog'].check_discord_invite(member.name) != None:
                 await self.ban(member,await self.translate(member.guild.id,"logs","d-invite"))
                 c = True
-            if (datetime.datetime.now() - member.created_at).seconds <= 30*60:
+            if (datetime.datetime.utcnow() - member.created_at).seconds <= 30*60:
                 await self.kick(member,await self.translate(member.guild.id,"logs","d-young"))
                 c = True
         if level >= 4:
-            if (datetime.datetime.now() - member.created_at).seconds <= 30*60:
+            if (datetime.datetime.utcnow() - member.created_at).seconds <= 30*60:
                 await self.kick(member,await self.translate(member.guild.id,"logs","d-young"))
                 c = True
-            if (datetime.datetime.now() - member.created_at).seconds <= 120*60 and can_ban:
+            if (datetime.datetime.utcnow() - member.created_at).seconds <= 120*60 and can_ban:
                 await self.ban(member,await self.translate(member.guild.id,"logs","d-young"))
                 c = True
         return c
