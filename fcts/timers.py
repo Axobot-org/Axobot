@@ -67,7 +67,8 @@ class TimersCog(commands.Cog):
             return
         f_duration = await ctx.bot.get_cog('TimeCog').time_delta(duration,lang=await self.translate(ctx.guild,'current_lang','current'), year=True, form='developed', precision=0)
         try:
-            await ctx.bot.get_cog('Events').add_task("timer", duration, ctx.author.id, ctx.guild.id if ctx.guild else None, ctx.channel.id, message)
+            d = {'msg_url': ctx.message.jump_url}
+            await ctx.bot.get_cog('Events').add_task("timer", duration, ctx.author.id, ctx.guild.id if ctx.guild else None, ctx.channel.id, message, data=d)
         except Exception as e:
             await ctx.bot.get_cog("ErrorsCog").on_command_error(ctx,e)
         else:

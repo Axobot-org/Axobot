@@ -312,6 +312,7 @@
         "reminds-title": "Reminder",
         "reminds-too-long": "Impossible to set such a long duration",
         "reminds-too-short": "You have entered an invalid duration",
+        "reminds-link": "Original message",
         "say-no-perm": "You do not have permission to send messages in the channel {channel}",
         "thanos": [
             "{0} was spared by Thanos",
