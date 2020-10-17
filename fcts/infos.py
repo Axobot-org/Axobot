@@ -869,7 +869,7 @@ Servers:
             txt = str(await self.translate(ctx.channel,"find","guild-1")).format(name = guild.name,
                 id = guild.id,
                 owner = guild.owner,
-                ownerid = guild.owner.id,
+                ownerid = guild.owner_id,
                 join = joined_at,
                 members = len(guild.members),
                 bots = bots,
