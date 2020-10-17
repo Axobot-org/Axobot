@@ -111,6 +111,10 @@
                 "Fun commands are enabled",
                 "Fun commands must be enabled"
             ],
+            "is_halloween": [
+                "The Halloween event is underway, enjoy it!",
+                "There are no Halloween type events at the moment"
+            ],
             "is_owner": [
                 "You must be the owner of the bot",
                 "You are not the owner of the bot"
