@@ -122,11 +122,13 @@ def f(x, n, d, m, l):
 
 
 def light(x):
-    return tuple(f(x, i, (78, 93, 148), (0.641, 0.716, 1.262), (255, 255, 255)) for i in range(3))
+    # return tuple(f(x, i, (78, 93, 148), (0.641, 0.716, 1.262), (255, 255, 255)) for i in range(3))
+    return tuple(f(x, i, DARK_ORANGE, (1.2, 0.75, 0.42), WHITE) for i in range(3))
 
 
 def dark(x):
-    return tuple(f(x, i, (35, 39, 42), (1.064, 1.074, 1.162), (114, 137, 218)) for i in range(3))
+    # return tuple(f(x, i, (35, 39, 42), (1.064, 1.074, 1.162), (114, 137, 218)) for i in range(3))
+    return tuple(f(x, i, BLACK, (1.2, 1.07, 1.04), ORANGE) for i in range(3))
 
 
 def edge_detect(img, modifier, variation, maximum, minimum):
@@ -336,15 +338,15 @@ VARIATIONS = {
     '++invert': invert_colors,
     '++shift': shift_colors,
     'lightbg++white-bg': (255, 255, 255, 255),
-    'lightbg++halloween-bg': (114, 137, 218, 255),
-    'lightbg++dark-halloween-bg': (78, 93, 148, 255),
-    'darkbg++halloween-bg': (114, 137, 218, 255),
-    'darkbg++dark-halloween-bg': (78, 93, 148, 255),
-    'darkbg++not-quite-black-bg': (35, 39, 42, 255),
+    'lightbg++halloween-bg': ORANGE+(255,),
+    'lightbg++dark-halloween-bg': DARK_ORANGE+(255,),
+    'darkbg++halloween-bg': ORANGE+(255,),
+    'darkbg++dark-halloween-bg': DARK_ORANGE+(255,),
+    'darkbg++not-quite-black-bg': BLACK+(255,),
 }
 
 
-async def convert_image(image, modifier, method, variations):
+def convert_image(image, modifier, method, variations):
     try:
         modifier_converter = dict(MODIFIERS[modifier])
     except KeyError:
@@ -360,7 +362,8 @@ async def convert_image(image, modifier, method, variations):
 
     variations.sort()
     background_color = None
-    base_color_var = (.15, .3, .7, .85)
+    # base_color_var = (.15, .3, .7, .85)
+    base_color_var = (.7, .42, .14, .85)
     for var in variations:
         try:
             variation_converter = VARIATIONS[var]
