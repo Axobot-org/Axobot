@@ -10,7 +10,7 @@ importlib.reload(checks)
 importlib.reload(args)
 from fcts.checks import is_fun_enabled
 
-cmds_list = ['count_msg','ragequit','pong','run','nope','blame','party','bigtext','shrug','gg','money','pibkac','osekour','me','kill','cat','happy-birthday','rekt','thanos','nuke','pikachu','pizza','google','loading','piece','roll','afk', 'bubble-wrap']
+cmds_list = ['count_msg','ragequit','pong','run','nope','blame','party','bigtext','shrug','gg','money','pibkac','osekour','me','kill','cat','happy-birthday','rekt','thanos','nuke','pikachu','pizza','google','loading','piece','roll','afk', 'bubble-wrap','reverse']
 
 
 async def can_say(ctx):
@@ -111,6 +111,11 @@ class FunCog(commands.Cog):
         else:
             await ctx.send(str(await self.translate(ctx.guild,"fun","cookie")).format(ctx.author.mention,self.bot.cogs['EmojiCog'].customEmojis['cookies_eat']))
 
+    @commands.command(name="reverse", hidden=True)
+    @commands.check(is_fun_enabled)
+    async def reverse(self, ctx: commands.Context, *, text:str):
+        """Reverse the letters of a message"""
+        await ctx.send(text[::-1])
 
     @commands.command(name="count_msg",hidden=True)
     @commands.check(is_fun_enabled)
