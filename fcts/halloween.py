@@ -148,7 +148,7 @@ class Halloween(Cog):
     def __init__(self, bot):
         self.bot = bot
         self.file = "halloween"
-        self.hourly_reward = [5, 20]
+        self.hourly_reward = [4, 17]
         try:
             self.translate = self.bot.cogs["LangCog"].tr
         except:
