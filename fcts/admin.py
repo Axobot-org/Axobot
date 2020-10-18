@@ -135,7 +135,7 @@ class AdminCog(commands.Cog):
     async def update_config(self,ctx,send=None):
         """Préparer/lancer un message de mise à jour
         Ajouter 'send' en argument déclenche la procédure pour l'envoyer à tous les serveurs"""
-        if send!=None and send=='send':
+        if send == 'send':
             await self.send_updates(ctx)
             return
         def check(m):
@@ -174,7 +174,7 @@ class AdminCog(commands.Cog):
         count = 0
         for guild in ctx.bot.guilds:
             channels = await ctx.bot.cogs["ServerCog"].find_staff(guild.id,'bot_news')
-            if channels==None or len(channels)==0:
+            if channels is None or len(channels) == 0:
                 continue
             channels = [guild.get_channel(int(x)) for x in channels.split(';') if len(x)>5 and x.isnumeric()]
             lang = await ctx.bot.cogs["ServerCog"].find_staff(guild.id,'language')
@@ -193,14 +193,20 @@ class AdminCog(commands.Cog):
                         mentions.append(guild.get_role(int(r)))
                     except:
                         pass
-                mentions = [x.mention for x in mentions if x!=None]
+                mentions = [x.mention for x in mentions if x is not None]
             for chan in channels:
                 try:
-                    await chan.send(self.update[lang]+"\n\n"+" ".join(mentions), allowed_mentions=discord.AllowedMentions(everyone=False))
+                    await chan.send(self.update[lang]+"\n\n"+" ".join(mentions), allowed_mentions=discord.AllowedMentions(everyone=False, roles=True))
                 except Exception as e:
                     await ctx.bot.cogs['ErrorsCog'].on_error(e,ctx)
                 else:
                     count += 1
+            if guild.id == 356067272730607628:
+                fr_chan = guild.get_channel(494870602146906113)
+                if fr_chan not in channels:
+                    await fr_chan.send(self.update['fr']+"\n\n"+" ".join(mentions), allowed_mentions=discord.AllowedMentions(everyone=False, roles=True))
+                    count += 1
+
         await ctx.send("Message envoyé dans {} salons !".format(count))
         # add changelog in the database
         cnx = self.bot.cnx_frm
