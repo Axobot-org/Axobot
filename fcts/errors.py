@@ -50,6 +50,7 @@ class ErrorsCog(commands.Cog):
             if await self.bot.cogs['AdminCog'].check_if_admin(ctx):
                 await ctx.reinvoke()
                 return
+            d = round(error.retry_after, 2 if error.retry_after < 60 else 0)
             await ctx.send(await self.translate(ctx.channel,'errors','cooldown',d=round(error.retry_after,2)))
             return
         elif isinstance(error,(commands.BadArgument,commands.BadUnionArgument)):
