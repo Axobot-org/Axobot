@@ -524,13 +524,19 @@ You can specify a verification limit by adding a number in argument (up to 1.000
         except discord.errors.Forbidden:
             return await ctx.send(await self.translate(ctx.guild.id,"fun","afk-no-perm"))
     
+    async def user_is_afk(self, user: discord.User) -> bool:
+        cond = user.id in self.afk_guys.keys()
+        if cond:
+            return True
+        return isinstance(user, discord.Member) and user.nick and user.nick.endswith(' [AFK]')
+
     @commands.command(name='unafk')
     @commands.check(is_fun_enabled)
     @commands.guild_only()
     async def unafk(self,ctx):
         """Remove you from the AFK system
         Welcome back dude"""
-        if ctx.author.id in self.afk_guys.keys():
+        if await self.user_is_afk(ctx.author):
             del self.afk_guys[ctx.author.id]
             await ctx.send(await self.translate(ctx.guild.id,"fun","unafk-done"))
             if ctx.author.nick and ctx.author.nick.endswith(" [AFK]"):
@@ -541,7 +547,7 @@ You can specify a verification limit by adding a number in argument (up to 1.000
         else:
             await ctx.send(await self.translate(ctx.guild.id,"fun","unafk-cant"))
     
-    async def check_afk(self,msg:discord.Message):
+    async def check_afk(self, msg: discord.Message):
         """Check if someone pinged is afk"""
         if msg.author.bot:
             return
@@ -549,8 +555,7 @@ You can specify a verification limit by adding a number in argument (up to 1.000
         if not await is_fun_enabled(ctx, self):
             return
         for member in msg.mentions:
-            c = (member.nick and member.nick.endswith(' [AFK]')) or member.id in self.afk_guys.keys()
-            if c and member!=msg.author:
+            if await self.user_is_afk(member) and member!=msg.author:
                 if member.id not in self.afk_guys or len(self.afk_guys[member.id])==0:
                     await msg.channel.send(await self.translate(msg.guild.id,"fun","afk-user-2"))
                 else:
