@@ -1003,11 +1003,12 @@ class ServerCog(commands.Cog):
         if not self.bot.database_online:
             return
         i = 0
+        now = time.time()
         for x in self.bot.guilds:
-            if x.id in self.membercounter_pending.keys() and self.membercounter_pending[x.id] > time.time():
+            if x.id in self.membercounter_pending.keys() and self.membercounter_pending[x.id] < now:
+                del self.membercounter_pending[x.id]
                 await self.update_memberChannel(x)
                 i += 1
-                del self.membercounter_pending[x.id]
         if i > 0:
             emb = self.bot.get_cog("EmbedCog").Embed(desc=f"[MEMBERCOUNTER] {i} channels refreshed", color=5011628).update_timestamp().set_author(self.bot.user)
             await self.bot.cogs["EmbedCog"].send([emb], url="loop")
