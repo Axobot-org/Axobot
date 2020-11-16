@@ -300,9 +300,8 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
         elif item.activity.type==discord.ActivityType.watching:
             m_activity = str(await self.translate(ctx.guild.id,"activity","watch")).capitalize() +" " + item.activity.name
         elif item.activity.type==discord.ActivityType.custom:
-            m_activity = item.activity.name
-            if item.activity.emoji in self.bot.emojis:
-                m_activity = str(item.activity.emoji) + " " + m_activity
+            m_activity = str(item.activity.emoji if item.activity.emoji else '') + " " + (item.activity.name if item.activity.name else '')
+            m_activity = m_activity.strip()
         else:
             m_activity="Error"
         if item.activity==None or item.activity.type != 4:
