@@ -561,14 +561,15 @@ You can specify a verification limit by adding a number in argument (up to 1.000
                 else:
                     reason = await self.bot.cogs['UtilitiesCog'].clear_msg(str(await self.translate(msg.guild.id,"fun","afk-user-1")).format(self.afk_guys[member.id]),ctx=ctx)
                     await msg.channel.send(reason)
-        if (not await checks.is_a_cmd(msg, self.bot)) and ((ctx.author.nick and ctx.author.nick.endswith(' [AFK]')) or ctx.author.id in self.afk_guys.keys()):
-            user_config = await self.bot.cogs['UtilitiesCog'].get_db_userinfo(["auto_unafk"],[f'`userID`={ctx.author.id}'])
-            if user_config is None or (not user_config['auto_unafk']):
-                return
-            msg = copy.copy(msg)
-            msg.content = (await self.bot.get_prefix(msg))[-1] + 'unafk'
-            new_ctx = await self.bot.get_context(msg)
-            await self.bot.invoke(new_ctx)
+        if isinstance(ctx.author, discord.Member) and not await checks.is_a_cmd(msg, self.bot):
+            if (ctx.author.nick and ctx.author.nick.endswith(' [AFK]')) or ctx.author.id in self.afk_guys.keys():
+                user_config = await self.bot.cogs['UtilitiesCog'].get_db_userinfo(["auto_unafk"],[f'`userID`={ctx.author.id}'])
+                if user_config is None or (not user_config['auto_unafk']):
+                    return
+                msg = copy.copy(msg)
+                msg.content = (await self.bot.get_prefix(msg))[-1] + 'unafk'
+                new_ctx = await self.bot.get_context(msg)
+                await self.bot.invoke(new_ctx)
 
 
     @commands.command(name='embed',hidden=False)
