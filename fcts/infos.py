@@ -1179,8 +1179,8 @@ Servers:
                 if len(temp) > 30:
                     temp = temp[:30] + [await self.translate(ctx.channel, 'infos', 'usernames-more', nbr=len(temp)-30)]
                 f.append({'name':await self.translate(ctx.channel,'infos','usernames-global'), 'value':"\n".join(temp)})
-                if global_list[-1]['old'] != '':
-                    f[-1]["value"] += "\n" + global_list[-1]['old']
+                # if global_list[-1]['old'] != '':
+                #     f[-1]["value"] += "\n" + global_list[-1]['old']
                 date += await self.bot.cogs['TimeCog'].date([x['utc_date'] for x in global_list][0] ,year=True, lang=language)
             if len(this_guild)>0:
             # Nicknames part
@@ -1188,8 +1188,8 @@ Servers:
                 if len(temp) > 30:
                     temp = temp[:30] + [await self.translate(ctx.channel, 'infos', 'usernames-more', nbr=len(temp)-30)]
                 f.append({'name':await self.translate(ctx.channel,'infos','usernames-local'), 'value':"\n".join(temp)})
-                if this_guild[-1]['old'] != '':
-                    f[-1]["value"] += "\n" + this_guild[-1]['old']
+                # if this_guild[-1]['old'] != '':
+                #     f[-1]["value"] += "\n" + this_guild[-1]['old']
                 date += "\n" + await self.bot.cogs['TimeCog'].date([x['utc_date'] for x in this_guild][0], year=True, lang=language)
             if len(date)>0:
                 f.append({'name':await self.translate(ctx.channel,'infos','usernames-last-date'), 'value':date})
