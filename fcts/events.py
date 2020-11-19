@@ -433,8 +433,8 @@ class Events(commands.Cog):
             # Translation backup - every 12h (start from 1am)
             elif d.hour%12 == 1 and (d.hour != self.last_tr_backup.hour or d.day != self.last_tr_backup.day):
                 await self.translations_backup()
-            # Check current event - every 12h (start from 0:45 am)
-            elif int(d.hour)%12 == 0 and int(d.minute)%45 == 0 and (d.hour != self.last_eventDay_check.hour or d.day != self.last_eventDay_check.day):
+            # Check current event - every 12h (start from 0:02 am)
+            elif int(d.hour)%12 == 0 and int(d.minute)%2 == 0 and (d.hour != self.last_eventDay_check.hour or d.day != self.last_eventDay_check.day):
                 await self.botEventLoop()
             # Send stats logs - every 2h (start from 0:05 am)
             elif int(d.hour)%2 == 0 and int(d.minute)%5 == 0 and (d.day != self.statslogs_last_push.day or d.hour != self.statslogs_last_push.hour):
