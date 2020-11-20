@@ -1,9 +1,10 @@
 from discord.ext import commands
+from classes import zbot
 
-admins_id = [279568324260528128,281404141841022976,552273019020771358]
+admins_id = {279568324260528128,281404141841022976,552273019020771358}
 
 async def check_admin(ctx):
-    if type(ctx) == commands.Context:
+    if isinstance(ctx, commands.Context):
         user = ctx.author
     else:
         user = ctx
@@ -31,7 +32,7 @@ async def is_support_staff(ctx):
 class ReloadsCog(commands.Cog):
     """Cog to manage the other cogs. Even if all are disabled, this is the last one left."""
 
-    def __init__(self,bot):
+    def __init__(self, bot: zbot):
         self.bot = bot
         self.file = "reloads"
         self.ignored_guilds = [471361000126414848,513087032331993090,500648624204808193,264445053596991498,446425626988249089,707248438391078978]
@@ -89,5 +90,5 @@ class ReloadsCog(commands.Cog):
             await ctx.send(str(e))
 
 
-def setup(bot):
+def setup(bot: zbot):
     bot.add_cog(ReloadsCog(bot))
