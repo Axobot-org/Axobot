@@ -58,29 +58,6 @@ class UtilitiesCog(commands.Cog):
             pass
         self.list_prefixs[str(ID)] = prefix
 
-    async def print2(self,text):
-        try:
-            print(text)
-        except UnicodeEncodeError:
-            text = await self.anti_code(str(text))
-            try:
-                print(text)
-            except UnicodeEncodeError:
-                print(text.encode("ascii","ignore").decode("ascii"))
-
-    async def anti_code(self,text):
-        if type(text)==str:
-            for i,j in [('é','e'),('è','e'),('à','a'),('î','i'),('ê','e'),('ï','i'),('ü','u'),('É','e'),('ë','e'),('–','-'),('“','"'),('’',"'"),('û','u'),('°','°'),('Ç','C'),('ç','c')]:
-                text=text.replace(i,j)
-            return text
-        elif type(text)==list:
-            text2=[]
-            for i,j in [('é','e'),('è','e'),('à','a'),('î','i'),('ê','e'),('ï','i'),('ü','u'),('É','e'),('ë','e'),('–','-'),('“','"'),('’',"'"),('û','u'),('°','°'),('Ç','C'),('ç','c')]:
-                for k in text:
-                    text2.append(k.replace(i,j))
-                    return text2
-
-
     async def find_everything(self,ctx,name,Type=None):
         item = None
         if type(Type) == str:
