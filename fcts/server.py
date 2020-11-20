@@ -988,7 +988,8 @@ class ServerCog(commands.Cog):
             if ch == None:
                 return
             lang = await self.translate(guild.id,"current_lang","current")
-            text = "{}{}: {}".format(str(await self.translate(guild.id,"keywords","membres")).capitalize() , " " if lang=='fr' else "" , len(guild.members))
+            tr = str(await self.translate(guild.id,"keywords","membres")).capitalize()
+            text = "{}{}: {}".format(tr, " " if lang=='fr' else "" , guild.member_count)
             if ch.name == text:
                 return
             try:
