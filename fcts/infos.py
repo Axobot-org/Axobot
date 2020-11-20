@@ -483,7 +483,7 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
             web = await self.translate(ctx.guild.id,"stats_infos","textchan-4")
         embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","textchan-3"), value=str(web))
         # Members nber
-        embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","role-3"), value = str(len(chan.members))+"/"+str(len(ctx.guild.members)), inline=True)
+        embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","role-3"), value = str(len(chan.members))+"/"+str(ctx.guild.member_count), inline=True)
         # Created at
         delta = abs(chan.created_at - datetime.datetime.utcnow())
         created_date = await self.timecog.date(chan.created_at, lang=lang, year=True)
@@ -549,7 +549,7 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
         # Voice region
         embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","guild-2"), value=str(guild.region).capitalize())
         # Member count
-        embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","role-3"), value = str(await self.translate(ctx.guild.id,"stats_infos","guild-7")).format(len(guild.members),bot,online))
+        embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","role-3"), value = str(await self.translate(ctx.guild.id,"stats_infos","guild-7")).format(guild.member_count,bot,online))
         # Channel count
         embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","guild-6"), value=str(await self.translate(ctx.guild.id,"stats_infos","guild-3")).format(len(guild.text_channels),len(guild.voice_channels),len(guild.categories)))
         # Invite count
@@ -858,7 +858,7 @@ Servers:
                 {"name": "ID", "value": guild.id},
                 {"name": "Owner", "value": "{} ({})".format(guild.owner, guild.owner_id)},
                 {"name": "Joined at", "value": joined_at},
-                {"name": "Members", "value": len(guild.members), "inline":True},
+                {"name": "Members", "value": guild.member_count, "inline":True},
                 {"name": "Language", "value": lang, "inline":True},
                 {"name": "Prefix", "value": pref, "inline":True},
                 {"name": "RSS feeds count", "value": rss_numb, "inline":True},
@@ -870,7 +870,7 @@ Servers:
                 owner = guild.owner,
                 ownerid = guild.owner_id,
                 join = joined_at,
-                members = len(guild.members),
+                members = guild.member_count,
                 bots = bots,
                 lang = lang,
                 prefix = pref,
@@ -963,7 +963,7 @@ Servers:
         if ctx.channel.permissions_for(ctx.guild.me).send_messages==False:
             return
         bots = c_co = 0
-        total = len(ctx.guild.members)
+        total = ctx.guild.member_count
         for u in ctx.guild.members:
             if u.bot:
                 bots+=1
