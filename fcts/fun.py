@@ -662,7 +662,11 @@ You can specify a verification limit by adding a number in argument (up to 1.000
     @commands.command(name="markdown")
     async def markdown(self,ctx):
         """Get help about markdown in Discord"""
-        await ctx.send(await self.translate(ctx.channel,'fun','markdown'))
+        txt = await self.translate(ctx.channel,'fun','markdown')
+        if ctx.can_send_embed:
+            await ctx.send(embed=discord.Embed(description=txt))
+        else:
+            await ctx.send(txt)
     
 
     @commands.command(name="bubble-wrap", aliases=["papier-bulle", "bw"], hidden=True)
