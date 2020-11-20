@@ -48,13 +48,18 @@ class RssCog(commands.Cog):
         self.bot = bot
         self.time_loop = 10
         self.time_between_flows_check = 0.15
-        self.min_time_between_posts = 120
+        
         self.file = "rss2"
         self.embed_color = discord.Color(6017876)
         self.loop_processing = False
         self.last_update = None
         self.twitterAPI = twitter.Api(**bot.others['twitter'], tweet_mode="extended")
         self.twitter_over_capacity = False
+        self.min_time_between_posts = {
+            'web': 120,
+            'tw': 15,
+            'yt': 120
+        }
         self.cache = dict()
         if bot.user is not None:
             self.table = 'rss_flow' if bot.user.id==486896267788812288 else 'rss_flow_beta'
@@ -906,7 +911,7 @@ class RssCog(commands.Cog):
         else:
             liste = list()
             for feed in feeds.entries:
-                if 'published_parsed' not in feed or datetime.datetime(*feed['published_parsed'][:6]) <= date:
+                if 'published_parsed' not in feed or (datetime.datetime(*feed['published_parsed'][:6]) - date).total_seconds() <= self.min_time_between_posts['yw']:
                     break
                 img_url = None
                 if 'media_thumbnail' in feed.keys() and len(feed['media_thumbnail'])>0:
@@ -983,7 +988,7 @@ class RssCog(commands.Cog):
         else:
             liste = list()
             for feed in entries:
-                if (datetime.datetime(*feed['published_parsed'][:6]) - date).total_seconds() < self.min_time_between_posts:
+                if (datetime.datetime(*feed['published_parsed'][:6]) - date).total_seconds() < self.min_time_between_posts['tw']:
                     break
                 author = feed['author'].replace('(','').replace(')','')
                 rt = None
@@ -1038,7 +1043,7 @@ class RssCog(commands.Cog):
         else:
             liste = list()
             for post in posts:
-                if (datetime.datetime.fromtimestamp(post.created_at_in_seconds) - date).total_seconds() < self.min_time_between_posts:
+                if (datetime.datetime.fromtimestamp(post.created_at_in_seconds) - date).total_seconds() < self.min_time_between_posts['tw']:
                     break
                 rt = None
                 if post.retweeted:
@@ -1164,7 +1169,7 @@ class RssCog(commands.Cog):
             for feed in feeds.entries:
                 try:
                     datz = feed[published]
-                    if feed[published] is None or (datetime.datetime(*feed[published][:6]) - date).total_seconds() < self.min_time_between_posts:
+                    if feed[published] is None or (datetime.datetime(*feed[published][:6]) - date).total_seconds() < self.min_time_between_posts['web']:
                         break
                     if 'link' in feed.keys():
                         l = feed['link']
