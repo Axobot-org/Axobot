@@ -271,13 +271,16 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
             if str(role)!='@everyone':
                 list_role.append(role.mention)
         # Created at
-        delta = abs(item.created_at - datetime.datetime.utcnow())
+        now = datetime.datetime.utcnow()
+        delta = abs(item.created_at - now)
         created_date = await self.timecog.date(item.created_at, lang=lang, year=True)
         created_since = await self.timecog.time_delta(delta.total_seconds(), lang=lang, year=True, precision=0, hour=delta.total_seconds() < 86400)
+        if item.created_at.day == now.day and item.created_at.month == now.month and item.created_at.year != now.year:
+            created_date = "🎂 " + created_date
         embed.add_field(name=await self.translate(ctx.guild.id, "stats_infos", "member-1"), value = "{} ({} {})".format(created_date, since, created_since), inline=False)
         # Joined at
         if item.joined_at is not None:
-            delta = abs(item.joined_at - datetime.datetime.utcnow())
+            delta = abs(item.joined_at - now)
             join_date = await self.timecog.date(item.joined_at, lang=lang, year=True)
             since_date = await self.timecog.time_delta(delta.total_seconds(), lang=lang, year=True, precision=0, hour=delta.total_seconds() < 86400)
             embed.add_field(name=await self.translate(ctx.guild.id, "stats_infos", "member-2"), value = "{} ({} {})".format(join_date, since, since_date), inline=False)
@@ -398,9 +401,12 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
         # ID
         embed.add_field(name=await self.translate(ctx.guild.id,"stats_infos","role-0"), value=str(item.id))
         # created at
-        delta = abs(item.created_at - datetime.datetime.utcnow())
+        now = datetime.datetime.utcnow()
+        delta = abs(item.created_at - now)
         created_date = await self.timecog.date(item.created_at, lang=lang, year=True)
         created_since = await self.timecog.time_delta(delta.total_seconds(), lang=lang, year=True, precision=0, hour=delta.total_seconds() < 86400)
+        if item.created_at.day == now.day and item.created_at.month == now.month and item.created_at.year != now.year:
+            created_date = "🎂 " + created_date
         embed.add_field(name=await self.translate(ctx.guild.id, "stats_infos", "member-1"), value = "{} ({} {})".format(created_date, since, created_since), inline=False)
         # is bot
         embed.add_field(name="Bot", value=botb.capitalize())
