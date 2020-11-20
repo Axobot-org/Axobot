@@ -278,6 +278,7 @@
         "fun-list": "Her iz the list ov available fun commandz:",
         "invalid-city": "Invalid place name :confused:",
         "markdown": "__**Markdown Rules** on *Discord*__\n\n`*italics*` = *italics*\n`__underline__` = __underline__\n`**bold**` = **bold**\n`***bold italics***` = ***bold italics***\n`~~strikeout~~` = ~~strikeout~~\n`__*underline italics*__` = __*underline italics*__\n`__**underline bold**__` = __**underline bold**__\n`__***underline bold italics***__` = __***underline bold italics***__\n`||spoiler||` = ||spoiler||\n> quote = `> quote`\n\\`code\\` = `code`\n\\\\ to ignore\n                \nFor code blocks, cf <https://discord.gg/DGahTNn>",
+        "nasa-none": "Oops, I can't find gud picts of bautiful stars for now, plz try later :crying_cat_face:",
         "no-database": "As our data ar offline, access to funz commandz iz restricted to guys with permishun \"Manage Server\"",
         "no-embed-perm": "I dont haz permishun 2 \"Embed links\" :confused:",
         "no-emoji": "Unable 2 find tihs emote :eyes:",
