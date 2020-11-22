@@ -1,15 +1,15 @@
 import random
 import discord
 import asyncio
-import datetime
 import time
 import emoji as emojilib
 from discord.ext import commands
+from classes import zbot, MyContext
 
 
 class MorpionCog(commands.Cog):
 
-    def __init__(self, bot: commands.Bot):
+    def __init__(self, bot: zbot):
         self.bot = bot
         self.file = 'morpion'
         self.in_game = dict()
@@ -23,7 +23,7 @@ class MorpionCog(commands.Cog):
         self.translate = self.bot.cogs['LangCog'].tr
 
     @commands.command(name="tic-tac-toe", aliases=['morpion', 'tictactoe', 'ttt'])
-    async def main(self, ctx: commands.Context, leave: str = None):
+    async def main(self, ctx: MyContext, leave: str = None):
         """A simple mini-game that consists of aligning three chips on a 9-square grid.
     The bot plays in red, the user in blue.
     Use 'tic-tac-toe leave' to make you leave the game if you're stuck in it.
@@ -46,7 +46,7 @@ class MorpionCog(commands.Cog):
 
     class Game():
 
-        def __init__(self, ctx: commands.Context, Cog):
+        def __init__(self, ctx: MyContext, Cog):
             self.cog = Cog
             self.ctx = ctx
             self.bot = ctx.bot
@@ -64,12 +64,12 @@ class MorpionCog(commands.Cog):
                 self.emojis = ["🐟", "🐠"]
             if self.ctx.guild:
                 config = await self.bot.get_cog("ServerCog").find_staff(self.ctx.guild.id, "morpion_emojis")
-                if config != None and config != "":
+                if config is not None and config != "":
                     for r in config.split(';'):
                         if r.isnumeric():
                             d_em = discord.utils.get(
                                 self.bot.emojis, id=int(r))
-                            if d_em != None:
+                            if d_em is not None:
                                 self.emojis.append(str(d_em))
                         else:
                             self.emojis.append(

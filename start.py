@@ -10,7 +10,7 @@ def check_libs():
         except ModuleNotFoundError:
             print("Library {} manquante".format(m))
             count +=1
-    if count>0:
+    if count > 0:
         return False
     del count
     return True
@@ -70,7 +70,7 @@ def main():
     # Suppression du fichier debug.log s'il est trop volumineux
     if os.path.exists("debug.log"):
         s = os.path.getsize('debug.log')/1.e9
-        if s>10:
+        if s > 10:
             print("Taille de debug.log supérieure à 10Gb ({}Gb)\n   -> Suppression des logs".format(s))
             os.remove('debug.log')
         del s
@@ -127,7 +127,7 @@ def main():
             print(f'\nFailed to load extension {extension}', file=sys.stderr)
             traceback.print_exc()
             count += 1
-        if count >0:
+        if count  > 0:
             raise Exception("\n{} modules not loaded".format(count))
     del count
     
@@ -161,7 +161,7 @@ def main():
     asyncio.get_event_loop().add_signal_handler(SIGTERM, lambda: asyncio.ensure_future(sigterm_handler(client)))
 
     if client.database_online:
-        if len(sys.argv)>1 and sys.argv[1] in ['1','2','3','4']:
+        if len(sys.argv) > 1 and sys.argv[1] in ['1','2','3','4']:
             bot_type = sys.argv[1]
         else:
             bot_type = input("Quel bot activer ? (1 release, 2 snapshot, 3 redbot, 4 autre) ")
@@ -187,7 +187,7 @@ def main():
                 client.cogs['Events'].loop.start()
                 client.internal_loop_enabled = True
             # RSS enabled
-            if len(sys.argv)>3 and sys.argv[3] in ['o','n']:
+            if len(sys.argv) > 3 and sys.argv[3] in ['o','n']:
                 enable_rss = sys.argv[3]
             else:
                 enable_rss = input("Activation des flux RSS ? (o/n) ")

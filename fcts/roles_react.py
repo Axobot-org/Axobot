@@ -1,16 +1,18 @@
+from typing import Tuple
 import discord
 import time
 import importlib
 import typing
 import re
 from discord.ext import commands
+from classes import zbot, MyContext
 from fcts import checks, args
 importlib.reload(checks)
 importlib.reload(args)
 
 
 class RolesReact(commands.Cog):
-    def __init__(self, bot: commands.Bot):
+    def __init__(self, bot: zbot):
         self.bot = bot
         self.file = 'roles_react'
         self.table = 'roles_react_beta' if bot.beta else 'roles_react'
@@ -28,7 +30,7 @@ class RolesReact(commands.Cog):
         self.translate = self.bot.cogs['LangCog'].tr
         self.table = 'roles_react_beta' if self.bot.beta else 'roles_react'
 
-    async def prepare_react(self, payload: discord.RawReactionActionEvent) -> (discord.Message, discord.Role):
+    async def prepare_react(self, payload: discord.RawReactionActionEvent) -> Tuple[discord.Message, discord.Role]:
         if payload.guild_id is None or payload.user_id == self.bot.user.id:
             return None, None
         if not self.cache_initialized:
@@ -181,7 +183,7 @@ class RolesReact(commands.Cog):
                 except KeyError:
                     pass
 
-    async def create_list_embed(self, liste: list, guild: discord.Guild) -> (str, list):
+    async def create_list_embed(self, liste: list, guild: discord.Guild) -> Tuple[str, list]:
         """Create a text with the roles list"""
         emojis = list()
         for k in liste:
@@ -201,9 +203,9 @@ class RolesReact(commands.Cog):
 
     @rr_main.command(name="list")
     @commands.check(checks.database_connected)
-    async def rr_list(self, ctx):
+    async def rr_list(self, ctx: MyContext):
         """List every roles reactions of your server"""
-        if not ctx.channel.permissions_for(ctx.guild.me).embed_links:
+        if not ctx.can_send_embed:
             return await ctx.send(await self.translate(ctx.guild.id, "fun", "no-embed-perm"))
         try:
             l = await self.rr_list_role(ctx.guild.id)
@@ -219,12 +221,12 @@ class RolesReact(commands.Cog):
 
     @rr_main.command(name="get", aliases=['display'])
     @commands.check(checks.database_connected)
-    async def rr_get(self, ctx: commands.Context):
+    async def rr_get(self, ctx: MyContext):
         """Send the roles embed
 It will only display the whole message with reactions. Still very cool tho
 
 ..Doc roles-reactions.html#get-or-leave-a-role"""
-        if not ctx.channel.permissions_for(ctx.guild.me).embed_links:
+        if not ctx.can_send_embed:
             return await ctx.send(await self.translate(ctx.guild.id, "fun", "no-embed-perm"))
         try:
             l = await self.rr_list_role(ctx.guild.id)
@@ -244,7 +246,7 @@ It will only display the whole message with reactions. Still very cool tho
 
     @rr_main.command(name="join")
     @commands.check(checks.database_connected)
-    async def rr_join(self, ctx: commands.Context, *, role: discord.Role):
+    async def rr_join(self, ctx: MyContext, *, role: discord.Role):
         """Join a role without using reactions
 Opposite is the subcommand 'leave'
 
@@ -258,7 +260,7 @@ Opposite is the subcommand 'leave'
 
     @rr_main.command(name="leave")
     @commands.check(checks.database_connected)
-    async def rr_leave(self, ctx: commands.Context, *, role: discord.Role):
+    async def rr_leave(self, ctx: MyContext, *, role: discord.Role):
         """Leave a role without using reactions
 Opposite is the subcommand 'join'
 
@@ -301,7 +303,7 @@ Opposite is the subcommand 'join'
 
     @rr_main.command(name='update')
     @commands.check(checks.database_connected)
-    async def rr_update(self, ctx: commands.Context, embed: discord.Message, changeDescription: typing.Optional[bool] = True, emojis: commands.Greedy[args.anyEmoji] = None):
+    async def rr_update(self, ctx: MyContext, embed: discord.Message, changeDescription: typing.Optional[bool] = True, emojis: commands.Greedy[args.anyEmoji] = None):
         """Update a Zbot message to refresh roles/reactions
         If you don't want to update the embed content, for example if it's a custom embed, then you can use 'False' as a second argument. Zbot will only check the reactions
         Specifying a list of emojis will update the embed only for those emojis, and ignore other roles reactions"""

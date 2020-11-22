@@ -1,10 +1,11 @@
-#!/usr/bin/env python
-#coding=utf-8
-
-import time, datetime, emoji, copy
+import typing
+from classes import zbot, MyContext
+import time
+import datetime
+import emoji
+import copy
 import discord
 from discord.ext import commands
-from fcts import cryptage
 from math import ceil
 
 roles_options = ["clear","slowmode","mute","kick","ban","warn","say","welcome_roles","muted_role",'partner_role','update_mentions','verification_role']
@@ -24,7 +25,7 @@ levelup_channel_option = ["levelup_channel"]
 class ServerCog(commands.Cog):
     """"Cog in charge of all the bot configuration management for your server. As soon as an option is searched, modified or deleted, this cog will handle the operations."""
 
-    def __init__(self,bot):
+    def __init__(self, bot: zbot):
         self.bot = bot
         self.default_language = 'en'
         self.embed_color = discord.Colour(0x3fb9ef)
@@ -86,7 +87,7 @@ class ServerCog(commands.Cog):
         self.table = 'servers_beta' if self.bot.beta else 'servers'
 
 
-    async def get_bot_infos(self,botID):
+    async def get_bot_infos(self, botID: int):
         """Return every options of the bot"""
         if not self.bot.database_online:
             return list()
@@ -99,7 +100,7 @@ class ServerCog(commands.Cog):
             liste.append(x)
         return liste
     
-    async def edit_bot_infos(self,botID,values=[()]):
+    async def edit_bot_infos(self, botID: int, values=[()]):
         if type(values)!=list:
             raise ValueError
         v = list()
@@ -116,7 +117,7 @@ class ServerCog(commands.Cog):
         cursor.close()
         return True
 
-    async def get_languages(self,ignored_guilds):
+    async def get_languages(self, ignored_guilds: typing.List[int]):
         """Return percentages of languages"""
         if not self.bot.database_online:
             return list()
@@ -135,13 +136,13 @@ class ServerCog(commands.Cog):
             langs.append((l,liste.count(e)))
         return langs
 
-    async def staff_finder(self,user,option):
+    async def staff_finder(self, user: discord.Member, option: str):
         """Check is user is part of a staff"""
         if option not in roles_options:
             raise TypeError
         if await self.bot.cogs['AdminCog'].check_if_god(user):
             return True
-        if not self.bot.database_online or not isinstance(user,discord.Member):
+        if not self.bot.database_online or not isinstance(user, discord.Member):
             return False
         staff = str(await self.find_staff(user.guild.id,option)).split(";")
         staff = [x for x in staff if len(x) > 10 and x.isnumeric()]
@@ -152,12 +153,12 @@ class ServerCog(commands.Cog):
                 return True
         raise commands.CommandError("User doesn't have required roles")
 
-    async def find_staff(self,ID,name):
+    async def find_staff(self, ID: int, name: str) -> typing.Optional[str]:
         """return the value of an option
         Return None if this option doesn't exist or if no value has been set"""
-        if type(ID)==discord.Guild:
+        if isinstance(ID, discord.Guild):
             ID = ID.id
-        elif type(ID)==None or not self.bot.database_online:
+        elif ID is None or not self.bot.database_online:
             return None
         l = await self.get_server([name],criters=["ID="+str(ID)],Type=list)
         if l == []:
@@ -165,7 +166,7 @@ class ServerCog(commands.Cog):
         else:
             return l[0][0]
         
-    async def get_server(self,columns=[],criters=["ID>1"],relation="AND",Type=dict):
+    async def get_server(self, columns=[], criters=["ID > 1"], relation="AND", Type=dict):
         """return every options of a server"""
         await self.bot.wait_until_ready()
         if type(columns)!=list or type(criters)!=list:
@@ -184,7 +185,7 @@ class ServerCog(commands.Cog):
             liste.append(x)
         return liste    
 
-    async def modify_server(self,ID,values=[()]):
+    async def modify_server(self, ID: int, values=[()]):
         if type(values)!=list:
             raise ValueError
         v = list()
@@ -194,17 +195,13 @@ class ServerCog(commands.Cog):
         for e, x in enumerate(values):
             v.append(f"`{x[0]}` = %(v{e})s")
             v2[f'v{e}'] = x[1]
-        #     if type(x[1]) == bool:
-        #         v.append("`{x[0]}`={x[1]}".format(x=x))
-        #     else:
-        #         v.append("""`{x[0]}`="{x[1]}" """.format(x=x))
         query = ("UPDATE `{t}` SET {v} WHERE `ID`='{id}'".format(t=self.table, v=",".join(v), id=ID))
         cursor.execute(query, v2)
         cnx.commit()
         cursor.close()
         return True
 
-    async def delete_option(self,ID,opt):
+    async def delete_option(self, ID: int, opt):
         """reset an option"""
         if opt not in self.default_opt.keys():
             raise ValueError
@@ -215,7 +212,7 @@ class ServerCog(commands.Cog):
             self.bot.cogs['UtilitiesCog'].update_prefix(ID,value)
         return await self.modify_server(ID,values=[(opt,value)])
 
-    async def add_server(self,ID):
+    async def add_server(self, ID: int):
         """add a new server to the db"""
         if type(ID) == str:
             if not ID.isnumeric():
@@ -227,22 +224,21 @@ class ServerCog(commands.Cog):
         cnx.commit()
         return True
 
-    async def is_server_exist(self,ID):
+    async def is_server_exist(self, ID: int):
         """Check if a server is already in the db"""
         i = await self.find_staff(ID,"ID")
-        if i == None:
-            # await self.bot.get_user(279568324260528128).send("Le serveur n°{} vient d'être ajouté dans la base de donnée".format(ID))
+        if i is None:
             g = self.bot.get_guild(ID)
-            if g==None:
+            if g is None:
                 raise Exception("Guild not found")
             emb = self.bot.cogs["EmbedCog"].Embed(desc="New server in the database :tada: `{}` ({})".format(g.name,g.id),color=self.log_color).update_timestamp()
             await self.bot.cogs["EmbedCog"].send([emb])
             return await self.add_server(ID)
         return True
 
-    async def delete_server(self,ID):
+    async def delete_server(self, ID: int):
         """remove a server from the db"""
-        if type(ID)!=int:
+        if not isinstance(ID, int):
             raise ValueError
         cnx = self.bot.cnx_frm
         cursor = cnx.cursor()
@@ -255,7 +251,7 @@ class ServerCog(commands.Cog):
 
     @commands.group(name='config')
     @commands.guild_only()
-    async def sconfig_main(self,ctx):
+    async def sconfig_main(self, ctx: MyContext):
         """Function for setting the bot on a server
 
 ..Doc server.html#config-options"""
@@ -264,7 +260,7 @@ class ServerCog(commands.Cog):
         if ctx.invoked_subcommand is None:
             msg = copy.copy(ctx.message)
             subcommand_passed = ctx.message.content.replace(ctx.prefix+"config ","")
-            if subcommand_passed == None:
+            if subcommand_passed is None:
                 msg.content = ctx.prefix + "config help"
             elif subcommand_passed.isnumeric():
                 msg.content = ctx.prefix + "config see " + subcommand_passed
@@ -279,15 +275,15 @@ class ServerCog(commands.Cog):
             await self.bot.invoke(new_ctx)
 
     @sconfig_main.command(name="help")
-    @commands.cooldown(1,2,commands.BucketType.guild)
-    async def sconfig_help(self,ctx):
+    @commands.cooldown(1, 2, commands.BucketType.guild)
+    async def sconfig_help(self, ctx: MyContext):
         """Get help about this command"""
         msg = await self.translate(ctx.guild,"server","config-help", p=(await self.bot.get_prefix(ctx.message))[-1])
         await ctx.send(msg.format(ctx.guild.owner.name))
 
     @sconfig_main.command(name="del")
-    @commands.cooldown(1,2,commands.BucketType.guild)
-    async def sconfig_del(self,ctx,option):
+    @commands.cooldown(1, 2, commands.BucketType.guild)
+    async def sconfig_del(self, ctx: MyContext, option: str):
         """Reset an option to zero"""
         if not (ctx.channel.permissions_for(ctx.author).manage_guild or await self.bot.cogs["AdminCog"].check_if_god(ctx)):
             return await ctx.send(await self.translate(ctx.guild.id,"server","need-manage-server"))
@@ -296,14 +292,14 @@ class ServerCog(commands.Cog):
         await self.sconfig_del2(ctx,option)
     
     @sconfig_main.command(name="change")
-    @commands.cooldown(1,2,commands.BucketType.guild)
-    async def sconfig_change(self,ctx,option,*,value):
+    @commands.cooldown(1, 2, commands.BucketType.guild)
+    async def sconfig_change(self, ctx: MyContext, option:str, *, value: str):
         """Allows you to modify an option"""
         if not (ctx.channel.permissions_for(ctx.author).manage_guild or await self.bot.cogs["AdminCog"].check_if_god(ctx)):
             return await ctx.send(await self.translate(ctx.guild.id,"server","need-manage-server"))
         if not ctx.bot.database_online:
             return await ctx.send(await self.translate(ctx.guild.id,"cases","no_database"))
-        if value=='del':
+        if value == 'del':
             await self.sconfig_del2(ctx,option)
             return
         try:
@@ -342,7 +338,7 @@ class ServerCog(commands.Cog):
             await self.bot.cogs["ErrorsCog"].on_error(e,ctx)
             await ctx.send(await self.translate(ctx.guild.id,"server","change-1"))
     
-    async def sconfig_del2(self,ctx,option):
+    async def sconfig_del2(self, ctx: MyContext, option: str):
         try:
             t = await self.delete_option(ctx.guild.id,option)
             if t:
@@ -360,7 +356,7 @@ class ServerCog(commands.Cog):
             await self.bot.cogs["ErrorsCog"].on_error(e,ctx)
             await ctx.send(await self.translate(ctx.guild.id,"server","change-1"))
 
-    async def send_embed(self,guild,option,value):
+    async def send_embed(self, guild: discord.Guild, option: str, value: str):
         m = "Changed option in server {}: {} = `{}`".format(guild.id,option,value)
         emb = self.bot.cogs["EmbedCog"].Embed(desc=m,color=self.log_color,footer_text=guild.name).update_timestamp().set_author(guild.me)
         await self.bot.cogs["EmbedCog"].send([emb])
@@ -381,7 +377,7 @@ class ServerCog(commands.Cog):
             guild = self.bot.get_guild(item)
         return guild
 
-    async def conf_roles(self,ctx,option,value):
+    async def conf_roles(self, ctx: MyContext, option: str, value: str):
         guild = await self.get_guild(ctx)
         ext = not isinstance(ctx, commands.Context)
         if value == "scret-desc":
@@ -400,22 +396,20 @@ class ServerCog(commands.Cog):
                         r = await commands.RoleConverter().convert(ctx,role)
                 except commands.errors.BadArgument:
                     msg = await self.translate(guild.id,"server","change-3")
-                    # await ctx.send(msg.format(role.replace("@everyone","@"+u'\u200b'+"everyone").replace("@here","@"+u'\u200b'+"here")))
                     await ctx.send(msg.format(role))
                     return
                 if str(r.id) in liste:
                     continue
                 liste.append(str(r.id))
-                # liste2.append(r.name.replace("@everyone","@"+u'\u200b'+"everyone").replace("@here","@"+u'\u200b'+"here"))
                 liste2.append(r.name)
             await self.modify_server(guild.id,values=[(option,";".join(liste))])
             msg = await self.translate(guild.id,"server","change-role")
             await ctx.send(msg.format(option,", ".join(liste2)))
             await self.send_embed(guild,option,value)
 
-    async def form_roles(self,guild,roles,ext=False):
+    async def form_roles(self, guild: discord.Guild, roles: str, ext: bool=False):
         if not isinstance(roles,int):
-            if (roles==None or len(roles) == 0):
+            if (roles is None or len(roles) == 0):
                 return "Ø"
             roles = roles.split(";")
         else:
@@ -423,7 +417,7 @@ class ServerCog(commands.Cog):
         g_roles = list()
         for r in roles:
             g_role = guild.get_role(int(r))
-            if g_role == None:
+            if g_role is None:
                 g_roles.append("<unfindable role>")
             elif ext:
                 g_roles.append("@"+g_role.name)
@@ -431,7 +425,7 @@ class ServerCog(commands.Cog):
                 g_roles.append(g_role.mention)
         return g_roles
         
-    async def conf_bool(self,ctx,option,value):
+    async def conf_bool(self, ctx: MyContext, option: str, value: str):
         if value == "scret-desc":
             guild = await self.get_guild(ctx)
             v = await self.find_staff(guild.id,option)
@@ -454,14 +448,14 @@ class ServerCog(commands.Cog):
             await ctx.send(msg.format(option,value))
             await self.send_embed(ctx.guild,option,value)
     
-    async def form_bool(self,boolean):
+    async def form_bool(self, boolean):
         if boolean == 1:
             v = True
         else:
             v = False
         return v
     
-    async def conf_textchan(self,ctx,option,value):
+    async def conf_textchan(self, ctx: MyContext, option: str, value: str):
         guild = await self.get_guild(ctx)
         ext = not isinstance(ctx, commands.Context)
         if value == "scret-desc":
@@ -473,7 +467,7 @@ class ServerCog(commands.Cog):
             liste2 = list()
             for chan in chans:
                 chan = chan.strip()
-                if len(chan)==0:
+                if len(chan) == 0:
                     continue
                 try:
                     c = await commands.TextChannelConverter().convert(ctx,chan)
@@ -492,14 +486,14 @@ class ServerCog(commands.Cog):
             await ctx.send(msg.format(option,", ".join(liste2)))
             await self.send_embed(guild,option,value)
 
-    async def form_textchan(self,guild,chans,ext=False):
+    async def form_textchan(self, guild: discord.Guild, chans: str, ext=False):
         if len(chans) == 0:
             return "Ø"
         chans = chans.split(";")
         g_chans = list()
         for r in chans:
             g_chan = guild.get_channel(int(r))
-            if g_chan == None:
+            if g_chan is None:
                 g_chans.append("<unfindable channel>")
             elif ext:
                 g_chans.append("#"+g_chan.name)
@@ -507,7 +501,7 @@ class ServerCog(commands.Cog):
                 g_chans.append(g_chan.mention)
         return g_chans
 
-    async def conf_emoji(self,ctx,option,value):
+    async def conf_emoji(self, ctx: MyContext, option: str, value: str):
         guild = await self.get_guild(ctx)
         if value == "scret-desc":
             emojis = await self.find_staff(guild.id,option)
@@ -518,7 +512,7 @@ class ServerCog(commands.Cog):
             liste2 = list()
             for e in emojis:
                 e = e.strip()
-                if len(e)==0:
+                if len(e) == 0:
                     continue
                 try:
                     e = await commands.EmojiConverter().convert(ctx,e)
@@ -539,9 +533,8 @@ class ServerCog(commands.Cog):
             await ctx.send(msg.format(option,", ".join(liste2)))
             await self.send_embed(ctx.guild,option,value)
 
-    async def form_emoji(self, emojis, option):
+    async def form_emoji(self, emojis: str, option: str):
         if len(emojis) == 0:
-            # return [":thumbsup:", ":thumbsdown:"]
             emojis = self.default_opt[option]
         emojis = emojis.split(";")
         l_em = list()
@@ -550,7 +543,7 @@ class ServerCog(commands.Cog):
                 continue
             if r.isnumeric():
                 d_em = discord.utils.get(self.bot.emojis, id=int(r))
-                if d_em == None:
+                if d_em is None:
                     l_em.append("<unfindable emoji>")
                 else:
                     l_em.append("<:{}:{}>".format(d_em.name,d_em.id))
@@ -558,7 +551,7 @@ class ServerCog(commands.Cog):
                 l_em.append(emoji.emojize(r, use_aliases=True))
         return l_em
 
-    async def conf_vocal(self,ctx,option,value):
+    async def conf_vocal(self, ctx: MyContext, option: str, value: str):
         if value == "scret-desc":
             guild = await self.get_guild(ctx)
             chans = await self.find_staff(guild.id,option)
@@ -584,20 +577,20 @@ class ServerCog(commands.Cog):
             await ctx.send(msg.format(option,", ".join(liste2)))
             await self.send_embed(ctx.guild,option,value)
 
-    async def form_vocal(self,guild,chans):
+    async def form_vocal(self, guild: discord.Guild, chans: str):
         if len(chans) == 0:
             return "Ø"
         chans = chans.split(";")
         g_chans = list()
         for r in chans:
             g_chan = discord.utils.get(guild.voice_channels, id=int(r))
-            if g_chan == None:
+            if g_chan is None:
                 g_chans.append("<unfindable channel>")
             else:
                 g_chans.append(g_chan.mention)
         return g_chans
 
-    async def conf_text(self,ctx,option,value):
+    async def conf_text(self, ctx: MyContext, option: str, value: str):
         guild = await self.get_guild(ctx)
         if value == "scret-desc":
             text = await self.find_staff(guild.id,option)
@@ -608,7 +601,7 @@ class ServerCog(commands.Cog):
             await ctx.send(msg.format(option,value))
             await self.send_embed(guild,option,value)
 
-    async def form_text(self,text):
+    async def form_text(self, text: str):
         if len(text) == 0:
             text = "Ø"
         elif len(text) > 1000:
@@ -617,13 +610,13 @@ class ServerCog(commands.Cog):
             text = "```\n" + text + "```"
         return text
 
-    async def conf_prefix(self,ctx,option,value):
+    async def conf_prefix(self, ctx: MyContext, option: str, value: str):
         if value == "scret-desc":
             guild = await self.get_guild(ctx)
             text = await self.find_staff(guild.id,'prefix')
             return await self.form_prefix(text)
         else:
-            if len(value)>5:
+            if len(value) > 5:
                 await ctx.send(await self.translate(ctx.guild.id,"server","change-prefix-1"))
                 return
             try:
@@ -636,12 +629,12 @@ class ServerCog(commands.Cog):
             await ctx.send(msg.format(value))
             await self.send_embed(ctx.guild,option,value)
 
-    async def form_prefix(self,text):
+    async def form_prefix(self, text: str):
         if len(text) == 0:
             text = "!"
         return '`'+text+'`'
 
-    async def conf_numb(self,ctx,option,value):
+    async def conf_numb(self, ctx: MyContext, option: str, value: str):
         if value == "scret-desc":
             guild = await self.get_guild(ctx)
             return await self.find_staff(guild.id,option)
@@ -653,10 +646,10 @@ class ServerCog(commands.Cog):
                 msg = await self.translate(ctx.guild.id,"server","change-6")
                 await ctx.send(msg.format(option))
 
-    async def conf_lang(self,ctx,option,value):
+    async def conf_lang(self, ctx: MyContext, option: str,value: str):
         if value == "scret-desc":
             guild = await self.get_guild(ctx)
-            if guild == None:
+            if guild is None:
                 return self.default_language
             v = await self.find_staff(guild,option)
             return await self.form_lang(v)
@@ -673,16 +666,16 @@ class ServerCog(commands.Cog):
                 msg = await self.translate(ctx.guild.id,"server","change-7")
                 await ctx.send(msg.format(", ".join(languages)))
 
-    async def form_lang(self,value):
-        if value == None:
+    async def form_lang(self, value: str):
+        if value is None:
             return self.default_language
         else:
             return self.bot.cogs["LangCog"].languages[value]
     
-    async def conf_raid(self,ctx,option,value):
+    async def conf_raid(self, ctx: MyContext, option: str, value: str):
         if value == "scret-desc":
             guild = await self.get_guild(ctx)
-            if guild == None:
+            if guild is None:
                 return self.default_opt['anti_raid']
             v = await self.find_staff(guild,option)
             return await self.form_raid(v)
@@ -703,8 +696,8 @@ class ServerCog(commands.Cog):
                 msg = await self.translate(ctx.guild.id,"server","change-8")
                 await ctx.send(msg.format(", ".join(raids)))
 
-    async def form_raid(self,value):
-        if value == None:
+    async def form_raid(self, value: str):
+        if value is None:
             return self.default_opt['anti_raid']
         else:
             return self.raids_levels[value]
@@ -712,7 +705,7 @@ class ServerCog(commands.Cog):
     async def conf_xp_type(self,ctx,option,value):
         if value == "scret-desc":
             guild = await self.get_guild(ctx)
-            if guild == None:
+            if guild is None:
                 return self.bot.cogs['XPCog'].types[0]
             v = await self.find_staff(guild,option)
             return await self.form_xp_type(v)
@@ -728,16 +721,16 @@ class ServerCog(commands.Cog):
                 msg = await self.translate(ctx.guild.id,"server","change-10")
                 await ctx.send(msg.format(", ".join(available_types)))
 
-    async def form_xp_type(self,value):
-        if value == None:
+    async def form_xp_type(self, value: str):
+        if value is None:
             return self.bot.cogs['XPCog'].types[0]
         else:
             return self.bot.cogs["XPCog"].types[value]
     
-    async def conf_color(self,ctx:commands.context,option,value):
+    async def conf_color(self, ctx: MyContext, option: str, value: str):
         if value == "scret-desc":
             guild = await self.get_guild(ctx)
-            if guild == None:
+            if guild is None:
                 return str(discord.Colour(self.default_opt[option]))
             v = await self.find_staff(guild,option)
             return await self.form_color(option,v)
@@ -753,19 +746,19 @@ class ServerCog(commands.Cog):
                 return
             await self.modify_server(ctx.guild.id,values=[(option,color.value)])
             msg = await self.translate(ctx.guild.id,"server","change-color")
-            if ctx.channel.permissions_for(ctx.guild.me).embed_links:
+            if ctx.can_send_embed:
                 await ctx.send(embed=discord.Embed(description=msg.format(option,color),colour=color))
             else:
                 await ctx.send(msg.format(option,color))
             await self.send_embed(ctx.guild,option,color)
 
-    async def form_color(self,option,value):
-        if value == None:
+    async def form_color(self, option: str, value: str):
+        if value is None:
             return str(discord.Colour(self.default_opt[option]))
         else:
             return str(discord.Colour(value))
     
-    async def conf_xp_rate(self,ctx,option,value):
+    async def conf_xp_rate(self, ctx: MyContext, option: str, value: str):
         if value == "scret-desc":
             guild = await self.get_guild(ctx)
             return await self.find_staff(guild.id,option)
@@ -776,20 +769,20 @@ class ServerCog(commands.Cog):
                 msg = await self.translate(ctx.guild.id,"server","change-6")
                 await ctx.send(msg.format(option))
                 return
-            if value<0.1 or value>3:
+            if value < 0.1 or value > 3:
                 await ctx.send(await self.translate(ctx.guild.id,'server','xp_rate_invalid',min=0.1,max=3))
                 return
             await self.modify_server(ctx.guild.id,values=[(option,value)])
             await ctx.send(await self.translate(ctx.guild.id,"server","change-xp_rate",rate=value))
             await self.send_embed(ctx.guild,option,value)
     
-    async def form_xp_rate(self,option,value):
-        if value == None:
+    async def form_xp_rate(self, option: str, value: str):
+        if value is None:
             return self.default_opt[option]
         else:
             return value
     
-    async def conf_levelup_chan(self,ctx,option,value):
+    async def conf_levelup_chan(self, ctx: MyContext, option: str, value: str):
         guild = await self.get_guild(ctx)
         ext = not isinstance(ctx, commands.Context)
         if value == "scret-desc":
@@ -817,14 +810,14 @@ class ServerCog(commands.Cog):
             await ctx.send(msg.format(c))
             await self.send_embed(guild,option,value)
     
-    async def form_levelup_chan(self,guild,value,ext=False):
+    async def form_levelup_chan(self, guild: discord.Guild, value: str, ext: bool=False):
         if value == "any":
             return "Any channel"
         if value == "none":
             return "Nowhere"
         if value.isnumeric():
             g_chan = guild.get_channel(int(value))
-            if g_chan == None:
+            if g_chan is None:
                 return "<unfindable channel>"
             elif ext:
                 return "#"+g_chan.name
@@ -833,36 +826,36 @@ class ServerCog(commands.Cog):
         return ""
     
     @sconfig_main.command(name='list')
-    async def sconfig_list(self,ctx):
+    async def sconfig_list(self, ctx: MyContext):
         """Get the list of every usable option"""
         options = sorted(self.optionsList)
         await ctx.send(await self.translate(ctx.guild.id,'server','config-list',text="\n```\n-{}\n```\n".format('\n-'.join(options)),link="<https://zbot.readthedocs.io/en/latest/server.html#list-of-every-option>"))
 
     @sconfig_main.command(name="see")
     @commands.cooldown(1,10,commands.BucketType.guild)
-    async def sconfig_see(self,ctx,option=None):
+    async def sconfig_see(self, ctx: MyContext, option=None):
         """Displays the value of an option, or all options if none is specified"""
         if not ctx.bot.database_online:
             return await ctx.send(await self.translate(ctx.guild.id,"cases","no_database"))
         await self.send_see(ctx.guild,ctx.channel,option,ctx.message,ctx)
         
-    async def send_see(self,guild,channel,option,msg,ctx):
+    async def send_see(self, guild: discord.Guild, channel: discord.TextChannel, option: str, msg: discord.Message, ctx: MyContext):
         """Envoie l'embed dans un salon"""
-        if option==None:
+        if option is None:
             option = "1"
         if option.isnumeric():
             page = int(option)
             if page<1:
                 return await ctx.send(await self.translate(channel,"xp",'low-page'))
             liste = await self.get_server([],criters=["ID="+str(guild.id)])
-            if len(liste)==0:
+            if len(liste) == 0:
                 return await channel.send(str(await self.translate(channel.guild,"server","not-found")).format(guild.name))
             temp = [(k,v) for k,v in liste[0].items() if k in self.optionsList]
             max_page = ceil(len(temp)/20)
             if page>max_page:
                 return await ctx.send(await self.translate(channel,"xp",'high-page'))
             liste = {k:v for k,v in temp[(page-1)*20:page*20] }
-            if len(liste)==0:
+            if len(liste) == 0:
                 return await ctx.send("NOPE")
             title = str(await self.translate(channel,"server","see-1")).format(guild.name) + f" ({page}/{max_page})"
             embed = self.bot.cogs['EmbedCog'].Embed(title=title, color=self.embed_color, desc=str(await self.translate(guild.id,"server","see-0")), time=msg.created_at,thumbnail=guild.icon_url_as(format='png'))
@@ -910,42 +903,42 @@ class ServerCog(commands.Cog):
             await channel.send(embed=embed.discord_embed())
             embed.fields.clear()
             return
-        elif ctx != None:
+        elif ctx is not None:
             if option in roles_options:
-                r = await self.conf_roles(ctx,option,'scret-desc')
+                r = await self.conf_roles(ctx, option, 'scret-desc')
                 r = ", ".join(r)
             elif option in bool_options:
-                r = str(await self.conf_bool(ctx,option,'scret-desc'))
+                r = str(await self.conf_bool(ctx, option, 'scret-desc'))
             elif option in textchan_options:
-                r = await self.conf_textchan(ctx,option,'scret-desc')
+                r = await self.conf_textchan(ctx, option, 'scret-desc')
                 r = ", ".join(r)
             elif option in text_options:
-                r = await self.conf_text(ctx,option,'scret-desc')
+                r = await self.conf_text(ctx, option, 'scret-desc')
             elif option in numb_options:
-                r = str(v)
+                r = await self.conf_numb(ctx, option, 'scret-desc')
             elif option in vocchan_options:
-                r = await self.conf_vocal(ctx,option,'scret-desc')
+                r = await self.conf_vocal(ctx, option, 'scret-desc')
                 r = ", ".join(r)
             elif option == "language":
-                r = await self.conf_lang(ctx,option,'scret-desc')
+                r = await self.conf_lang(ctx, option, 'scret-desc')
             elif option in prefix_options:
-                r = await self.conf_prefix(ctx,option,'scret-desc')
+                r = await self.conf_prefix(ctx, option, 'scret-desc')
             elif option in raid_options:
-                r = await self.conf_raid(ctx,option,'scret-desc')
+                r = await self.conf_raid(ctx, option, 'scret-desc')
             elif option in emoji_option:
-                r = await self.conf_emoji(ctx,option,"scret-desc")
+                r = await self.conf_emoji(ctx, option, 'scret-desc')
             elif option in xp_type_options:
-                r = await self.conf_xp_type(ctx,option,"scret-desc")
+                r = await self.conf_xp_type(ctx, option, 'scret-desc')
             elif option in color_options:
-                r = await self.conf_color(ctx,option,"scret-desc")
+                r = await self.conf_color(ctx, option, 'scret-desc')
             elif option in xp_rate_option:
-                r = await self.conf_xp_rate(ctx,option,"scret-desc")
+                r = await self.conf_xp_rate(ctx, option, 'scret-desc')
             elif option in levelup_channel_option:
-                r = await self.conf_levelup_chan(ctx,option,"scret-desc")
+                r = await self.conf_levelup_chan(ctx, option, 'scret-desc')
             else:
                 r = None
             guild = ctx if isinstance(ctx, discord.Guild) else ctx.guild
-            if r!=None:
+            if r is not None:
                 try:
                     r = str(await self.translate(channel,"server_desc",option)).format(r)
                 except Exception as e:
@@ -971,13 +964,13 @@ class ServerCog(commands.Cog):
             
     @sconfig_main.command(name="reset")
     @commands.is_owner()
-    async def admin_delete(self,ctx,ID:int):
+    async def admin_delete(self, ctx: MyContext, ID:int):
         if await self.delete_server(ID):
             await ctx.send("Le serveur n°{} semble avoir correctement été supprimé !".format(ID))
 
 
 
-    async def update_memberChannel(self, guild):
+    async def update_memberChannel(self, guild: discord.Guild):
         # If we already did an update recently: abort
         if guild.id in self.membercounter_pending.keys():
             if self.membercounter_pending[guild.id] > time.time():
@@ -985,7 +978,7 @@ class ServerCog(commands.Cog):
         ch = await self.find_staff(guild.id,"membercounter")
         if ch not in ['', None]:
             ch = guild.get_channel(int(ch))
-            if ch == None:
+            if ch is None:
                 return
             lang = await self.translate(guild.id,"current_lang","current")
             tr = str(await self.translate(guild.id,"keywords","membres")).capitalize()

@@ -1,10 +1,11 @@
 import discord, datetime
 from discord.ext import commands
+from classes import zbot
 
 class WelcomerCog(commands.Cog):
     """Cog which manages the departure and arrival of members in the servers"""
     
-    def __init__(self,bot):
+    def __init__(self, bot: zbot):
         self.bot = bot
         self.file = "bvn"
         self.no_message = [392766377078816789,504269440872087564,552273019020771358]
@@ -48,7 +49,7 @@ class WelcomerCog(commands.Cog):
         msg = await self.bot.cogs['ServerCog'].find_staff(member.guild.id,Type)
         if await self.raid_check(member) or member.id in self.no_message:
             return
-        if await self.bot.cogs['UtilitiesCog'].check_any_link(member.name) != None:
+        if await self.bot.cogs['UtilitiesCog'].check_any_link(member.name) is not None:
             return
         if msg not in ['',None]:
             ch = await self.bot.cogs['ServerCog'].find_staff(member.guild.id,'welcome_channel')
@@ -75,56 +76,56 @@ class WelcomerCog(commands.Cog):
                 except Exception as e:
                     await self.bot.cogs["ErrorsCog"].on_error(e,None)
 
-    async def check_owner_server(self,member):
+    async def check_owner_server(self, member: discord.Member):
         """Vérifie si un nouvel arrivant est un propriétaire de serveur"""
         servers = [x for x in self.bot.guilds if x.owner == member and x.member_count > 10]
-        if len(servers)>0:
+        if len(servers) > 0:
             role = member.guild.get_role(486905171738361876)
-            if role==None:
+            if role is None:
                 self.bot.log.warn('[check_owner_server] Owner role not found')
                 return
             if role not in member.roles:
                 await member.add_roles(role,reason="This user support me")
             
-    async def check_support(self,member):
+    async def check_support(self, member: discord.Member):
         """Vérifie si un nouvel arrivant fait partie du support"""
         if await self.bot.cogs['UtilitiesCog'].is_support(member):
             role = member.guild.get_role(412340503229497361)
-            if role!=None:
+            if role is not None:
                 await member.add_roles(role)
             else:
                 self.bot.log.warn('[check_support] Support role not found')
 
-    async def check_contributor(self,member):
+    async def check_contributor(self, member: discord.Member):
         """Vérifie si un nouvel arrivant est un contributeur"""
         if await self.bot.cogs['UtilitiesCog'].is_contributor(member):
             role = member.guild.get_role(552428810562437126)
-            if role!=None:
+            if role is not None:
                 await member.add_roles(role)
             else:
                 self.bot.log.warn('[check_contributor] Contributor role not found')
 
-    async def give_roles_back(self,member):
+    async def give_roles_back(self, member: discord.Member):
         """Give roles rewards/muted role to new users"""
         used_xp_type = await self.bot.cogs['ServerCog'].find_staff(member.guild.id,'xp_type')
-        xp = await self.bot.cogs['XPCog'].bdd_get_xp(member.id, None if used_xp_type==0 else member.guild.id)
-        if xp != None and len(xp) == 1:
+        xp = await self.bot.cogs['XPCog'].bdd_get_xp(member.id, None if used_xp_type == 0 else member.guild.id)
+        if xp is not None and len(xp) == 1:
             await self.bot.cogs['XPCog'].give_rr(member,(await self.bot.cogs['XPCog'].calc_level(xp[0]['xp'],used_xp_type))[0],await self.bot.cogs['XPCog'].rr_list_role(member.guild.id))
 
 
-    async def kick(self,member,reason):
+    async def kick(self, member: discord.Member, reason: str):
         try:
-            await member.guild.kick(member,reason=reason)
+            await member.guild.kick(member, reason=reason)
         except:
             pass
     
-    async def ban(self,member,reason):
+    async def ban(self, member: discord.Member, reason: str):
         try:
-            await member.guild.ban(member,reason=reason)
+            await member.guild.ban(member, reason=reason)
         except:
             pass
 
-    async def raid_check(self,member):
+    async def raid_check(self, member: discord.Member):
         if member.guild is None:
             return False
         level = str(await self.bot.cogs['ServerCog'].find_staff(member.guild.id,"anti_raid"))
@@ -136,7 +137,7 @@ class WelcomerCog(commands.Cog):
         if level == 0:
             return c
         if level >= 1:
-            if await self.bot.cogs['UtilitiesCog'].check_discord_invite(member.name) != None:
+            if await self.bot.cogs['UtilitiesCog'].check_discord_invite(member.name) is not None:
                 await self.kick(member,await self.translate(member.guild.id,"logs","d-invite"))
                 c = True
         if level >= 2:
@@ -144,7 +145,7 @@ class WelcomerCog(commands.Cog):
                 await self.kick(member,await self.translate(member.guild.id,"logs","d-young"))
                 c = True
         if level >= 3 and can_ban:
-            if await self.bot.cogs['UtilitiesCog'].check_discord_invite(member.name) != None:
+            if await self.bot.cogs['UtilitiesCog'].check_discord_invite(member.name) is not None:
                 await self.ban(member,await self.translate(member.guild.id,"logs","d-invite"))
                 c = True
             if (datetime.datetime.utcnow() - member.created_at).seconds <= 30*60:
@@ -160,15 +161,15 @@ class WelcomerCog(commands.Cog):
         return c
 
 
-    async def give_roles(self,member):
+    async def give_roles(self, member: discord.Member):
         """Give new roles to new users"""
         try:
             roles = str(await self.bot.cogs['ServerCog'].find_staff(member.guild.id,"welcome_roles"))
             for r in roles.split(";"):
-                if (not r.isnumeric()) or len(r)==0:
+                if (not r.isnumeric()) or len(r) == 0:
                     continue
                 role = member.guild.get_role(int(r))
-                if role != None:
+                if role is not None:
                     try:
                         await member.add_roles(role,reason=await self.translate(member.guild.id,"logs","d-welcome_roles"))
                     except discord.errors.Forbidden:
@@ -179,7 +180,7 @@ class WelcomerCog(commands.Cog):
             await self.bot.cogs["ErrorsCog"].on_error(e,None)
 
 
-    async def send_log(self,member,Type):
+    async def send_log(self, member: discord.Member, Type: str):
         """Send a log to the logging channel"""
         if member.id in self.no_message or member.id==self.bot.user.id:
             return

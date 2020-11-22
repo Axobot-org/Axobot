@@ -1,11 +1,27 @@
 import discord
 from discord.ext import commands
 
-import time, importlib, sys, traceback, datetime, os, shutil, asyncio, inspect, typing, io, textwrap, copy, operator, requests, random, ast, math, mysql, json
-from libs import feedparser
+import time
+import sys
+import traceback
+import datetime
+import os
+import shutil
+import asyncio
+import inspect
+import typing
+import io
+import textwrap
+import copy
+import operator
+import requests
+import random
+import mysql
+import json
 from contextlib import redirect_stdout
 from glob import glob
 from fcts import reloads
+from classes import zbot, MyContext
 
 
 def cleanup_code(content):
@@ -19,7 +35,7 @@ def cleanup_code(content):
 class AdminCog(commands.Cog):
     """Here are listed all commands related to the internal administration of the bot. Most of them are not accessible to users, but only to ZBot administrators."""
         
-    def __init__(self, bot):
+    def __init__(self, bot: zbot):
         self.bot = bot
         self.file = "admin"
         self.emergency_time = 5.0
@@ -46,7 +62,7 @@ class AdminCog(commands.Cog):
     async def check_if_god(self,ctx):
         if isinstance(ctx,discord.User):
             return await reloads.check_admin(ctx)
-        elif isinstance(ctx.guild,discord.Guild) and ctx.guild!=None:
+        elif isinstance(ctx.guild,discord.Guild) and ctx.guild is not None:
             return await reloads.check_admin(ctx) and ctx.guild.id in self.god_mode
         else:
             return await reloads.check_admin(ctx)
@@ -73,10 +89,10 @@ class AdminCog(commands.Cog):
     @commands.check(reloads.check_admin)
     async def main_msg(self,ctx):
         """Commandes réservées aux administrateurs de ZBot"""
-        if ctx.subcommand_passed==None:
+        if ctx.subcommand_passed is None:
             text = "Liste des commandes disponibles :"
             for cmd in sorted(self.main_msg.commands, key=lambda x:x.name):
-                text+="\n- {} *({})*".format(cmd.name,'...' if cmd.help==None else cmd.help.split('\n')[0])
+                text+="\n- {} *({})*".format(cmd.name,'...' if cmd.help is None else cmd.help.split('\n')[0])
                 if type(cmd)==commands.core.Group:
                     for cmds in cmd.commands:
                         text+="\n        - {} *({})*".format(cmds.name,cmds.help.split('\n')[0])
@@ -140,6 +156,7 @@ class AdminCog(commands.Cog):
             return
         def check(m):
             return m.author == ctx.author and m.channel == ctx.channel
+        msg = None
         for x in self.update.keys():
             await ctx.send("Message en {} ?".format(x))
             try:
@@ -149,13 +166,15 @@ class AdminCog(commands.Cog):
             if msg.content.lower() in ['none','annuler','stop','oups']:
                 return await ctx.send('Annulé !')
             self.update[x] = msg.content
-        await ctx.bot.cogs['UtilitiesCog'].add_check_reaction(msg)
+        if msg:
+            await ctx.bot.cogs['UtilitiesCog'].add_check_reaction(msg)
     
-    async def send_updates(self,ctx:commands.Context):
+    async def send_updates(self,ctx:MyContext):
         """Lance un message de mise à jour"""
         if None in self.update.values():
             return await ctx.send("Les textes ne sont pas complets !")
         text = "Vos messages contiennent"
+        msg = None
         if max([len(x) for x in self.update.values()]) > 1900//len(self.update.keys()):
             for k,v in self.update.items():
                 text += "\n{}:``\n{}\n```".format(k,v)
@@ -164,6 +183,8 @@ class AdminCog(commands.Cog):
         else:
             text += "\n"+"\n".join(["{}:\n```\n{}\n```".format(k,v) for k,v in self.update.items()])
             msg = await ctx.send(text)
+        if not msg:
+            return
         await ctx.bot.cogs['UtilitiesCog'].add_check_reaction(msg)
         def check(reaction, user):
             return user == ctx.author and reaction.message.id==msg.id
@@ -232,12 +253,12 @@ class AdminCog(commands.Cog):
     
     @main_msg.command(name="lang-sort",hidden=True)
     @commands.check(reloads.check_admin)
-    async def resort_langs(self,ctx:commands.Context,*,lang:str=None):
+    async def resort_langs(self,ctx:MyContext,*,lang:str=None):
         """Trie par ordre alphabétique les fichiers de traduction"""
         all_files = sorted([x.replace('fcts/lang/','').replace('.json','') for x in glob("fcts/lang/*.json", recursive=False)])
         if isinstance(lang,str) and ' ' in lang:
             langs = lang.split(' ')
-        elif lang==None:
+        elif lang is None:
             langs = all_files
         elif lang in all_files:
             langs = [lang]
@@ -259,10 +280,10 @@ class AdminCog(commands.Cog):
         text = str()
         for x in sorted(ctx.bot.guilds, key=operator.attrgetter('me.joined_at')):
             text += "- {} (`{}` - {} membres)\n".format(x.name,x.owner,len(x.members))
-            if len(text)>1900:
+            if len(text) > 1900:
                 await ctx.send(text)
                 text = ""
-        if len(text)>0:
+        if len(text) > 0:
             await ctx.send(text)
 
     @main_msg.command(name='shutdown')
@@ -300,7 +321,7 @@ class AdminCog(commands.Cog):
         if len(args) == 1:
             ID = self.bot.user.id
             args.append('1' if ID==486896267788812288 else '2' if ID==436835675304755200 else '3')
-            args.append('n' if ctx.bot.cogs['Events'].loop.get_task()==None else 'o')
+            args.append('n' if ctx.bot.cogs['Events'].loop.get_task() is None else 'o')
             args.append('o' if ctx.bot.rss_enabled else 'n')
         self.bot.log.info("Redémarrage du bot")
         os.execl(sys.executable, sys.executable, *args)
@@ -341,7 +362,7 @@ class AdminCog(commands.Cog):
     @commands.check(reloads.check_admin)
     async def adm_invites(self,ctx,*,server=None):
         """Cherche une invitation pour un serveur, ou tous"""
-        if server != None:
+        if server is not None:
             guild = discord.utils.get(self.bot.guilds, name=server)
             if guild is None and server.isnumeric():
                 guild = discord.utils.get(self.bot.guilds, id=int(server))
@@ -350,19 +371,19 @@ class AdminCog(commands.Cog):
             liste = list()
             for guild in self.bot.guilds:
                 liste.append(await self.search_invite(guild,guild))
-                if len("\n".join(liste))>1900:
+                if len("\n".join(liste)) > 1900:
                     await ctx.author.send("\n".join(liste))
                     liste = []
-            if len(liste)>0:
+            if len(liste) > 0:
                 await ctx.author.send("\n".join(liste))
         await self.bot.cogs['UtilitiesCog'].suppr(ctx.message)
 
     async def search_invite(self,guild,string):
-        if guild==None:
+        if guild is None:
             return "Le serveur `{}` n'a pas été trouvé".format(string)
         try:
             inv = await guild.invites()
-            if len(inv)>0:
+            if len(inv) > 0:
                 msg = "`{}` - {} ({} membres) ".format(guild.name,inv[0],len(guild.members))
             else:
                 msg = "`{}` - Le serveur ne possède pas d'invitation".format(guild.name)
@@ -384,7 +405,7 @@ class AdminCog(commands.Cog):
             guild = discord.utils.get(self.bot.guilds,id=int(server))
         else:
             guild = discord.utils.get(self.bot.guilds,name=server)
-        if guild != None:
+        if guild is not None:
             try:
                 await self.bot.cogs["ServerCog"].send_see(guild,ctx.channel,option,ctx.message,guild)
             except Exception as e:
@@ -401,7 +422,7 @@ class AdminCog(commands.Cog):
             self.bot.connect_database_frm()
             self.bot.cnx_xp.close()
             self.bot.connect_database_xp()
-            if self.bot.cnx_frm != None and self.bot.cnx_xp != None:
+            if self.bot.cnx_frm is not None and self.bot.cnx_xp is not None:
                 await ctx.bot.cogs['UtilitiesCog'].add_check_reaction(ctx.message)
         except Exception as e:
             await self.bot.cogs['ErrorsCog'].on_command_error(ctx,e)
@@ -414,12 +435,12 @@ class AdminCog(commands.Cog):
         await ctx.send(await self.emergency())
 
     async def emergency(self,level=100):
+        time =round(self.emergency_time - level/100,1)
         for x in reloads.admins_id:
             try:
                 user = self.bot.get_user(x)
-                if user.dm_channel==None:
+                if user.dm_channel is None:
                     await user.create_dm()
-                time = round(self.emergency_time - level/100,1)
                 msg = await user.dm_channel.send("{} La procédure d'urgence vient d'être activée. Si vous souhaitez l'annuler, veuillez cliquer sur la réaction ci-dessous dans les {} secondes qui suivent l'envoi de ce message.".format(self.bot.cogs['EmojiCog'].customEmojis['red_warning'],time))
                 await msg.add_reaction('🛑')
             except Exception as e:
@@ -457,14 +478,13 @@ class AdminCog(commands.Cog):
     @main_msg.command(name="code")
     @commands.check(reloads.check_admin)
     async def show_code(self,ctx,cmd):
-        cmds = self.bot.commands
-        obj = await self.bot.cogs['UtilitiesCog'].set_find(cmds,cmd)
-        if obj != None:
+        obj = self.bot.get_command(cmd)
+        if obj is not None:
             code = inspect.getsource(obj.callback)
-            if len(code)>1950:
+            if len(code) > 1950:
                 liste = str()
                 for line in code.split('\n'):
-                    if len(liste+"\n"+line)>1950:
+                    if len(liste+"\n"+line) > 1950:
                         await ctx.send("```py\n{}\n```".format(liste))
                         liste = str()
                     liste += '\n'+line
@@ -485,9 +505,9 @@ class AdminCog(commands.Cog):
         scog = ctx.bot.cogs['ServerCog']
         try:
             config = await ctx.bot.cogs['UtilitiesCog'].get_bot_infos()
-            if serv!=None and usr!=None:
+            if serv is not None and usr is not None:
                 await ctx.send("Serveur trouvé : {}\nUtilisateur trouvé : {}".format(serv.name,usr))
-            elif serv!=None:
+            elif serv is not None:
                 servs = config['banned_guilds'].split(';')
                 if str(serv.id) in servs:
                     servs.remove(str(serv.id))
@@ -497,7 +517,7 @@ class AdminCog(commands.Cog):
                     servs.append(str(serv.id))
                     await scog.edit_bot_infos(self.bot.user.id,[('banned_guilds',';'.join(servs))])
                     await ctx.send("Le serveur {} a bien été blacklist".format(serv.name))
-            elif usr!=None:
+            elif usr is not None:
                 usrs = config['banned_users'].split(';')
                 if str(usr.id) in usrs:
                     usrs.remove(str(usr.id))
@@ -518,7 +538,7 @@ class AdminCog(commands.Cog):
     async def show_last_logs(self,ctx,lines:typing.Optional[int]=15,*,match=''):
         """Affiche les <lines> derniers logs ayant <match> dedans"""
         try:
-            if lines>1000:
+            if lines > 1000:
                 match = str(lines)
                 lines = 15
             with open('debug.log','r',encoding='utf-8') as file:
@@ -532,7 +552,7 @@ class AdminCog(commands.Cog):
                     continue
                 liste.append(text[-i].replace('`',''))
             for i in liste:
-                if len(msg+i)>1900:
+                if len(msg+i) > 1900:
                     await ctx.send("```css\n{}\n```".format(msg))
                     msg = ""
                 if len(i)<1900:
@@ -563,7 +583,7 @@ Cette option affecte tous les serveurs"""
     
     @main_msg.command(name="flag")
     @commands.check(reloads.check_admin)
-    async def admin_flag(self,ctx:commands.Context,add:str,flag:str,users:commands.Greedy[discord.User]):
+    async def admin_flag(self,ctx:MyContext,add:str,flag:str,users:commands.Greedy[discord.User]):
         """Ajoute ou retire un attribut à un utilisateur
         
         Flag valides : support, premium, contributor, partner, unlocked_rainbow, unlocked_blurple"""
@@ -576,7 +596,7 @@ Cette option affecte tous les serveurs"""
                 return await ctx.send("Flag invalide")
             except Exception as e:
                 return await self.bot.cogs['ErrorsCog'].on_error(e,ctx)
-            if info != None:
+            if info is not None:
                 if info[flag] and add=='add':
                     return await ctx.send(f"L'utilisateur {user} a déjà ce flag")
                 if (not info[flag]) and add=='remove':
@@ -593,7 +613,7 @@ Cette option affecte tous les serveurs"""
 
     @main_msg.command(name="loop_restart")
     @commands.check(reloads.check_admin)
-    async def loop_restart(self,ctx:commands.Context):
+    async def loop_restart(self,ctx:MyContext):
         """Relance la boucle principale"""
         try:
             ctx.bot.cogs["Events"].loop.start()
@@ -617,11 +637,11 @@ Cette option affecte tous les serveurs"""
         """Ajoute le rôle Owner à tout les membres possédant un serveur avec le bot
         Il est nécessaire d'avoir au moins 10 membres pour que le rôle soit ajouté"""
         server = self.bot.get_guild(356067272730607628)
-        if server==None:
+        if server is None:
             await ctx.send("Serveur ZBot introuvable")
             return
         role = server.get_role(486905171738361876)
-        if role==None:
+        if role is None:
             await ctx.send("Rôle Owners introuvable")
             return
         owner_list = list()
@@ -646,7 +666,7 @@ Cette option affecte tous les serveurs"""
         """Donne la liste des 10 meilleures idées"""
         bot_msg = await ctx.send("Chargement des idées...")
         server = self.bot.get_guild(356067272730607628)
-        if server==None:
+        if server is None:
             return await ctx.send("Serveur introuvable")
         channel = server.get_channel(488769306524385301)
         if channel is None:
@@ -662,7 +682,7 @@ Cette option affecte tous les serveurs"""
                         up = len(users)
                     elif x.emoji == '👎':
                         down = len(users)
-                if len(msg.embeds)>0:
+                if len(msg.embeds) > 0:
                     liste.append((up-down,datetime.datetime.utcnow()-msg.created_at,msg.embeds[0].fields[0].value,up,down))
                 else:
                     liste.append((up-down,datetime.datetime.utcnow()-msg.created_at,msg.content,up,down))
@@ -671,14 +691,14 @@ Cette option affecte tous les serveurs"""
         liste = liste[:number]
         title = "Liste des {} meilleures idées (sur {}) :".format(len(liste),count)
         text = str()
-        if ctx.guild!=None:
+        if ctx.guild is not None:
             color = ctx.guild.me.color
         else:
             color = discord.Colour(8311585)
         for x in liste:
             text += "\n**[{} - {}]**  {} ".format(x[3],x[4],x[2])
         try:
-            if ctx.guild==None or ctx.channel.permissions_for(ctx.guild.me).embed_links:
+            if ctx.can_send_embed:
                 emb = ctx.bot.cogs['EmbedCog'].Embed(title=title,desc=text,color=color).update_timestamp()
                 return await bot_msg.edit(content=None,embed=emb.discord_embed())
             await bot_msg.edit(content=title+text)
@@ -788,7 +808,7 @@ Cette option affecte tous les serveurs"""
             pass
         msg = "Backup completed in {} seconds!".format(round(time.time()-t,3))
         self.bot.log.info(msg)
-        if ctx != None:
+        if ctx is not None:
             await message.edit(content=msg)
             
     @commands.group(name='bug',hidden=True)
@@ -802,7 +822,7 @@ Cette option affecte tous les serveurs"""
         """Ajoute un bug à la liste"""
         try:
             channel = ctx.bot.get_channel(548138866591137802) if self.bot.beta else ctx.bot.get_channel(488769283673948175)
-            if channel==None:
+            if channel is None:
                 return await ctx.send("Salon 488769283673948175 introuvable")
             text = bug.split('\n')
             fr,en = text[0].replace('\\n','\n'), text[1].replace('\\n','\n')
@@ -817,7 +837,7 @@ Cette option affecte tous les serveurs"""
         """Marque un bug comme étant fixé"""
         try:
             chan = ctx.bot.get_channel(548138866591137802) if self.bot.beta else ctx.bot.get_channel(488769283673948175)
-            if chan==None:
+            if chan is None:
                 return await ctx.send("Salon introuvable")
             try:
                 msg = await chan.fetch_message(ID)
@@ -848,7 +868,7 @@ Cette option affecte tous les serveurs"""
         """Ajoute une idée à la liste"""
         try:
             channel = ctx.bot.get_channel(548138866591137802) if self.bot.beta else ctx.bot.get_channel(488769306524385301)
-            if channel==None:
+            if channel is None:
                 return await ctx.send("Salon introuvable")
             text = text.split('\n')
             fr,en = text[0].replace('\\n','\n'), text[1].replace('\\n','\n')
@@ -864,7 +884,7 @@ Cette option affecte tous les serveurs"""
         """Marque une idée comme étant ajoutée à la prochaine MàJ"""
         try:
             chan = ctx.bot.get_channel(548138866591137802) if self.bot.beta else ctx.bot.get_channel(488769306524385301)
-            if chan==None:
+            if chan is None:
                 return await ctx.send("Salon introuvable")
             try:
                 msg = await chan.fetch_message(ID)

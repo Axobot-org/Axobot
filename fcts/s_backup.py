@@ -1,5 +1,9 @@
+from classes import zbot, MyContext
 import discord
-import importlib, aiohttp, json, os, typing
+import importlib
+import aiohttp
+import json
+import typing
 from discord.ext import commands
 from io import BytesIO
 
@@ -10,7 +14,7 @@ importlib.reload(checks)
 class BackupCog(commands.Cog):
     """This cog is used to make and apply backups of a Discord server"""
 
-    def __init__(self,bot):
+    def __init__(self, bot: zbot):
         self.bot = bot
         self.file = "s_backup"
         try:
@@ -27,14 +31,14 @@ class BackupCog(commands.Cog):
     @commands.guild_only()
     @commands.cooldown(2,120, commands.BucketType.guild)
     @commands.check(checks.has_admin)
-    async def main_backup(self,ctx:commands.Context):
+    async def main_backup(self,ctx:MyContext):
         "..Doc server.html#server-backup"
-        if ctx.subcommand_passed==None:
+        if ctx.subcommand_passed is None:
             await self.bot.cogs['HelpCog'].help_command(ctx,['backup'])
 
 
     @main_backup.command(name="load")
-    async def backup_load(self,ctx:commands.Context,*arguments):
+    async def backup_load(self,ctx:MyContext,*arguments):
         """Load a backup created with `backup create`
 Arguments are:
     - reset: delete everything from the current server
@@ -75,7 +79,7 @@ Arguments are:
             return
         # Formatting and sending logs
         logs = "Found {} problems (including {} permissions issues)\n\n".format(sum(problems),problems[0]) + "\n".join(logs)
-        if len(logs)>1950:
+        if len(logs) > 1950:
             # If too many logs, send in a file
             logs = logs.replace("`[O]`","[O]").replace("`[-]`","[-]").replace("`[X]`","[X]")
             finish_msg = await self.translate(ctx.guild,"s_backup","finished")
@@ -95,7 +99,7 @@ Arguments are:
                 await ctx.author.send(logs)
 
     @main_backup.command(name="create")
-    async def backup_create(self,ctx:commands.Context):
+    async def backup_create(self,ctx:MyContext):
         """Make and send a backup of this server
         You will find there the configuration of your server, every general settings, the list of members with their roles, the list of categories and channels (with their permissions), emotes, and webhooks.
         Please note that audit logs, messages and invites are not used
@@ -111,7 +115,7 @@ Arguments are:
 
     # --------
 
-    async def create_backup(self,ctx:commands.Context) -> str:
+    async def create_backup(self,ctx:MyContext) -> str:
         async def get_channel_json(chan) -> dict:
             chan_js = {'id':chan.id,'name':chan.name,'position':chan.position}
             if isinstance(chan,discord.TextChannel):
@@ -132,7 +136,7 @@ Arguments are:
                     temp2['type'] = 'role'
                 temp2['permissions'] = dict()
                 for x in iter(iter_perm):
-                    if x[1] != None:
+                    if x[1] is not None:
                         temp2['permissions'][x[0]] = x[1]
                 perms.append(temp2)
             chan_js['permissions_overwrites'] = perms
@@ -145,14 +149,14 @@ Arguments are:
             'owner': g.owner.id,
             'voiceregion': str(g.region),
             'afk_timeout': g.afk_timeout,
-            'icon': None if len(g.icon_url)==0 else str(g.icon_url),
+            'icon': None if len(g.icon_url) == 0 else str(g.icon_url),
             'verification_level': g.verification_level.value,
             'mfa_level': g.mfa_level,
             'explicit_content_filter': g.explicit_content_filter.value,
             'default_notifications': g.default_notifications.value,
             'created_at': int(g.created_at.timestamp()),
-            'afk_channel': g.afk_channel.id if g.afk_channel!=None else None,
-            'system_channel': g.system_channel.id if g.system_channel!=None else None}
+            'afk_channel': g.afk_channel.id if g.afk_channel is not None else None,
+            'system_channel': g.system_channel.id if g.system_channel is not None else None}
         roles = list()
         for x in g.roles:
             roles.append({'id':x.id,'name':x.name,'color':x.colour.value,'position':x.position,'hoist':x.hoist,'mentionable':x.mentionable,'permissions':x.permissions.value})
@@ -160,7 +164,7 @@ Arguments are:
         categ = list()
         for x in g.by_category():
             c,l = x[0],x[1]
-            if c==None:
+            if c is None:
                 temp = {'id': None}
             else:
                 temp = {'id': c.id,
@@ -176,7 +180,7 @@ Arguments are:
                         temp2['type'] = 'role'
                     temp2['permissions'] = dict()
                     for x in iter(iter_perm):
-                        if x[1] != None:
+                        if x[1] is not None:
                             temp2['permissions'][x[0]] = x[1]
                     perms.append(temp2)
                 temp['permissions_overwrites'] = perms
@@ -226,7 +230,7 @@ Arguments are:
         def __init__(self):
             pass
 
-        async def urlToByte(self,url:str) -> typing.Optional[bytes]:
+        async def urlToByte(self, url:str) -> typing.Optional[bytes]:
             async with aiohttp.ClientSession(timeout=aiohttp.ClientTimeout(total=10)) as session:
                 async with session.get(url) as response:
                     if response.status>=200 and response.status<300:
@@ -235,19 +239,19 @@ Arguments are:
                         res = None
             return res
 
-        async def load_roles(self, ctx:commands.Context, problems: list, logs:list, symb:list, data:dict, args:tuple,roles_list:dict):
+        async def load_roles(self, ctx:MyContext, problems: list, logs:list, symb:list, data:dict, args:tuple,roles_list:dict):
             if not ctx.guild.me.guild_permissions.manage_roles:
                 logs.append("  "+symb[0]+" Unable to create or update roles: missing permissions")
                 problems[0] += 1
                 roles_list = {x.id: x for x in ctx.guild.roles}
             else:
                 for role in data["roles"]:
+                    action = "edit"
                     try:
                         # rolename = role["name"].replace("@everyone","@"+u'\u200b'+"everyone").replace("@here","@"+u'\u200b'+"here")
                         rolename = role["name"]
-                        action = "edit"
                         r = ctx.guild.get_role(role["id"])
-                        if r == None:
+                        if r is None:
                             r = [x for x in ctx.guild.roles if x.name == role["name"]]
                             if len(r) == 0:
                                 action = "create"
@@ -309,7 +313,7 @@ Arguments are:
                         else:
                             logs.append("  "+symb[2]+" Role {} deleted".format(role.name))
                 for r in data["roles"]:
-                    if r["id"] in roles_list.keys() and r["position"]>0:
+                    if r["id"] in roles_list.keys() and r["position"] > 0:
                         new_pos = min(max(ctx.guild.me.top_role.position-1,1), r["position"])
                         try:
                             await roles_list[r["id"]].edit(position = new_pos)
@@ -321,21 +325,21 @@ Arguments are:
                                 logs.append("  "+symb[0]+" Unable to move role {} to position {}: {}".format(r["name"],new_pos,e))
                                 problems[1] += 1
 
-        async def load_categories(self, ctx:commands.Context, problems: list, logs:list, symb:list, data:dict, args:tuple, channels_list:dict):
+        async def load_categories(self, ctx:MyContext, problems: list, logs:list, symb:list, data:dict, args:tuple, channels_list:dict):
             if not ctx.guild.me.guild_permissions.manage_channels:
                 logs.append("  "+symb[0]+" Unable to create or update categories: missing permissions")
                 problems[0] += 1
                 channels_list = {x.id: x for x in ctx.guild.channels}
             else:
                 for categ in data["categories"]:
+                    action = "edit"
                     try:
-                        if ("id" in categ.keys() and categ["id"] == None):
+                        if ("id" in categ.keys() and categ["id"] is None):
                             continue
                         # categname = categ["name"].replace("@everyone","@"+u'\u200b'+"everyone").replace("@here","@"+u'\u200b'+"here")
                         categname = categ["name"]
-                        action = "edit"
                         c = ctx.guild.get_channel(categ["id"])
-                        if c == None:
+                        if c is None:
                             c = [x for x in ctx.guild.categories if x.name == categ["name"]]
                             if len(c) == 0:
                                 action = "create"
@@ -384,7 +388,7 @@ Arguments are:
                         else:
                             logs.append("  "+symb[2]+" Category {} deleted".format(categ.name))
 
-        async def load_channels(self, ctx:commands.Context, problems:list, logs:list, symb:list, data:dict, args:tuple, channels_list:dict):
+        async def load_channels(self, ctx:MyContext, problems:list, logs:list, symb:list, data:dict, args:tuple, channels_list:dict):
             if not ctx.guild.me.guild_permissions.manage_channels:
                 logs.append("  "+symb[0]+" Unable to create or update channels: missing permissions")
                 problems[0] += 1
@@ -395,16 +399,16 @@ Arguments are:
                             for ch in category["channels"]
                     ]
                 for chan, categ in _channels_to_make:
+                    action = "edit"
                     try:
                         # channame = chan["name"].replace("@everyone","@"+u'\u200b'+"everyone").replace("@here","@"+u'\u200b'+"here")
                         channame = chan["name"]
-                        action = "edit"
                         c = ctx.guild.get_channel(chan["id"])
-                        if c == None:
+                        if c is None:
                             c = [x for x in ctx.guild.text_channels+ctx.guild.voice_channels if x.name == chan["name"]]
                             if len(c) == 0:
                                 action = "create"
-                                _categ = None if categ==None else channels_list[categ]
+                                _categ = None if categ is None else channels_list[categ]
                                 if chan["type"]=="TextChannel":
                                     c = await ctx.guild.create_text_channel(name=chan["name"],category=_categ)
                                 else:
@@ -465,7 +469,7 @@ Arguments are:
                     target = roles_list[perm["id"]]
                 elif perm["type"] == "user":
                     target = item.guild.get_member(perm["id"])
-                if target == None:
+                if target is None:
                     continue
                 new_perms = discord.PermissionOverwrite(**perm["permissions"])
                 if item.overwrites_for(target) == new_perms:
@@ -475,13 +479,13 @@ Arguments are:
                 except:
                     pass
 
-        async def load_perms(self, ctx:commands.Context, problems:list, logs:list, symb:list, data:dict, args:tuple, roles_list:dict, channels_list:dict):
+        async def load_perms(self, ctx:MyContext, problems:list, logs:list, symb:list, data:dict, args:tuple, roles_list:dict, channels_list:dict):
             if not ctx.guild.me.guild_permissions.manage_roles:
                 logs.append("  "+symb[0]+" Unable to update permissions: missing permissions")
                 problems[0] += 1
             # categories
             for categ in data["categories"]:
-                if "id" in categ.keys() and categ["id"] != None and "permissions_overwrites" in categ.keys():
+                if "id" in categ.keys() and categ["id"] is not None and "permissions_overwrites" in categ.keys():
                     try:
                         real_category = channels_list[categ["id"]]
                         await self.apply_perm(real_category, categ["permissions_overwrites"], roles_list)
@@ -507,7 +511,7 @@ Arguments are:
                     else:
                         logs.append("    "+symb[2]+" Permissions of channel {} set".format(chan["name"]))
 
-        async def load_members(self, ctx:commands.Context, problems: list, logs:list, symb:list, data:dict, args:tuple,roles_list:dict):
+        async def load_members(self, ctx:MyContext, problems: list, logs:list, symb:list, data:dict, args:tuple,roles_list:dict):
             if "members" not in data.keys():
                 return
             change_nicks = True
@@ -522,7 +526,7 @@ Arguments are:
                 problems[0] += 1
             for memb in data["members"]:
                 member = ctx.guild.get_member(memb["id"])
-                if member == None:
+                if member is None:
                     continue
                 try:
                     edition = list()
@@ -537,7 +541,7 @@ Arguments are:
                                 roles.append(_role)
                         except KeyError:
                             pass
-                    if roles != member.roles and change_roles and len(roles)>0:
+                    if roles != member.roles and change_roles and len(roles) > 0:
                         try:
                             await member.add_roles(*roles)
                         except discord.errors.Forbidden:
@@ -552,10 +556,10 @@ Arguments are:
                     logs.append("  "+symb[0]+" Unable to set user {}: {}".format(member,e))
                     problems[1] += 1
                 else:
-                    if len(edition)>0:
+                    if len(edition) > 0:
                         logs.append("  "+symb[2]+" Updated {} for user {}".format("and".join(edition),member))
 
-        async def load_emojis(self, ctx:commands.Context, problems: list, logs:list, symb:list, data:dict, args:tuple, roles_list:dict):
+        async def load_emojis(self, ctx:MyContext, problems: list, logs:list, symb:list, data:dict, args:tuple, roles_list:dict):
             if not ctx.guild.me.guild_permissions.manage_emojis:
                 logs.append("  "+symb[0]+" Unable to create or update emojis: missing permissions")
                 problems[0] += 1
@@ -606,7 +610,7 @@ Arguments are:
                         else:
                             logs.append("  "+symb[2]+" Emoji {} deleted".format(emoji.name))
 
-        async def load_webhooks(self, ctx:commands.Context, problems: list, logs:list, symb:list, data:dict, args:tuple, channels_list:dict):
+        async def load_webhooks(self, ctx:MyContext, problems: list, logs:list, symb:list, data:dict, args:tuple, channels_list:dict):
             if not ctx.guild.me.guild_permissions.manage_webhooks:
                 logs.append("  "+symb[0]+" Unable to create or update webhooks: missing permissions")
                 problems[0] += 1
@@ -656,7 +660,7 @@ Arguments are:
                             logs.append("  "+symb[2]+" Webhook {} deleted".format(web.name))
 
 
-        async def load_backup(self,ctx:commands.Context, data:dict, args:list) -> (list,list):
+        async def load_backup(self,ctx:MyContext, data:dict, args:list) -> typing.Tuple[list,list]:
             "Load a backup in a server, for backups version 1"
             if data.pop('_backup_version',None) != 1:
                 return ([0,1], ["Unknown backup version"])
@@ -681,7 +685,7 @@ Arguments are:
             try:
                 banned_users = [x[0].id for x in await ctx.guild.bans()]
                 users_to_ban = [x for x in data["banned_users"].items() if x[0] not in banned_users]
-                if len(users_to_ban)==0:
+                if len(users_to_ban) == 0:
                     logs.append(symb[1]+" No user to ban")
                 else:
                     for x in users_to_ban:
@@ -729,10 +733,10 @@ Arguments are:
                     logs.append(symb[2]+" Explicit content filter set to "+contentFilter.name)
             # icon
             try:
-                icon = None if data['icon']==None else await self.urlToByte(data['icon'])
+                icon = None if data['icon'] is None else await self.urlToByte(data['icon'])
             except:
                 icon = None
-            if icon!=None or data['icon']==None:
+            if icon is not None or data['icon'] is None:
                 try:
                     await ctx.guild.edit(icon = icon)
                 except discord.errors.Forbidden:
@@ -743,7 +747,7 @@ Arguments are:
                     problems[1] += 1
                 else:
                     logs.append(symb[2]+" Server icon updated")
-            elif data["icon"] == None:
+            elif data["icon"] is None:
                 logs.append(symb[2]+" Server icon deleted")
             else:
                 problems[1] += 1

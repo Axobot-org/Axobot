@@ -22,10 +22,10 @@ async def is_support_staff(ctx):
     except:
         pass
     server = ctx.bot.get_guild(356067272730607628)
-    if server != None:
+    if server is not None:
         member = server.get_member(ctx.author.id)
         role = server.get_role(412340503229497361)
-        if member != None and role != None:
+        if member is not None and role is not None:
             return role in member.roles
     return False
 
@@ -45,6 +45,8 @@ class ReloadsCog(commands.Cog):
         for cog in cogs:
             if not cog.startswith("fcts."):
                 fcog = "fcts."+cog
+            else:
+                fcog = cog
             try:
                 self.bot.reload_extension(fcog)
             except ModuleNotFoundError:
@@ -59,7 +61,7 @@ class ReloadsCog(commands.Cog):
                 reloaded_cogs.append(cog)
             if cog == 'utilities':
                 await self.bot.cogs['UtilitiesCog'].on_ready()
-        if len(reloaded_cogs)>0:
+        if len(reloaded_cogs) > 0:
             await ctx.send("These cogs has successfully reloaded: {}".format(", ".join(reloaded_cogs)))
             ctx.bot.cogs['InfoCog'].codelines = await ctx.bot.cogs['InfoCog'].count_lines_code()
 

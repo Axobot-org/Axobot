@@ -1,19 +1,23 @@
-import discord, datetime, time
+import discord
+import datetime
+import time
+from classes import zbot
 
-
-fr_months=["Janvier","Février","Mars","Avril","Mai","Juin","Juillet","Aout","Septembre","Octobre","Novembre","Décembre"]
-en_months=["January","February","March","April","May","June","July","August","September","October","November","December"]
-fi_months=['tammikuu','helmikuu','maaliskuu','huhtikuu','toukokuu','kesäkuu','heinäkuu','elokuu','syyskuu','lokakuu','marraskuu','joulukuu']
+fr_months = ["Janvier","Février","Mars","Avril","Mai","Juin","Juillet","Aout","Septembre","Octobre","Novembre","Décembre"]
+en_months = ["January","February","March","April","May","June","July","August","September","October","November","December"]
+fi_months = ['tammikuu','helmikuu','maaliskuu','huhtikuu','toukokuu','kesäkuu','heinäkuu','elokuu','syyskuu','lokakuu','marraskuu','joulukuu']
 
 class TimeCog(discord.ext.commands.Cog):
     """This cog handles all manipulations of date, time, and time interval. So cool, and so fast"""
-    def __init__(self,bot):
+    def __init__(self, bot: zbot):
         self.bot = bot
         self.file = "timeclass"
 
     class timedelta:
+        """Representation of a duration between two dates, with the value noted as years/months/days/etc."""
 
-        def __init__(self,years=0,months=0,days=0,hours=0,minutes=0,seconds=0,total_seconds=0,precision=2):
+        def __init__(self, years=0, months=0, days=0, hours=0, minutes=0, seconds=0, total_seconds=0, precision=2):
+            """Initialize the class with the needed values"""
             self.years = years
             self.months = months
             self.days = days
@@ -24,6 +28,7 @@ class TimeCog(discord.ext.commands.Cog):
             self.precision = precision
             
         def set_from_seconds(self):
+            """Set the values from a raw total seconds"""
             t = self.total_seconds
             rest = 0
             years, rest = divmod(t,86400*365)
@@ -42,9 +47,9 @@ class TimeCog(discord.ext.commands.Cog):
             else:
                 self.seconds = round(seconds,self.precision)
 
-    async def time_delta(self,date1,date2=None,lang='en',year=False,hour=True,form='developed',precision=2):
-        """Traduit un intervale de deux temps datetime.datetime en chaine de caractère lisible"""
-        if date2!=None:
+    async def time_delta(self, date1, date2=None, lang='en', year=False, hour=True, form='developed', precision=2):
+        """Translates a two time interval datetime.datetime into a readable character string"""
+        if date2 is not None:
             if type(date2)==datetime.datetime:
                 delta = abs(date2 - date1)
                 t = await self.time_interval(delta,precision)
@@ -68,15 +73,15 @@ class TimeCog(discord.ext.commands.Cog):
                 d = round(t.days+t.months*365/12)
                 if not year:
                     d += round(t.years*365)
-                elif year and t.years>0:
+                elif year and t.years > 0:
                     text += str(t.years)+'a ' if lang=='fr' else str(t.years)+'y '
                 text += str(d)+'j ' if lang=='fr' else str(d)+'d '
             if hour:
-                if t.hours>0:
+                if t.hours > 0:
                     text += str(t.hours)+'h '
-                if t.minutes>0:
+                if t.minutes > 0:
                     text += str(t.minutes)+'m '
-                if t.seconds>0:
+                if t.seconds > 0:
                     text += str(t.seconds)+'s '
             text = text.strip()
         else:
@@ -90,32 +95,32 @@ class TimeCog(discord.ext.commands.Cog):
             else:
                 lib = ['years','year','months','month','days','day','hours','hour','minutes','minute','seconds','second', 'less than one day ago']
             if year and t.years != 0:
-                if t.years>1:
+                if t.years > 1:
                     text += str(t.years)+" "+lib[0]
                 else:
                     text += str(t.years)+" "+lib[1]
                 text+=" "
-            if t.months>1:
+            if t.months > 1:
                 text += str(t.months)+" "+lib[2]
             elif t.months==1:
                 text += str(t.months)+" "+lib[3]
             text+=" "
-            if t.days>1:
+            if t.days > 1:
                 text += str(t.days)+" "+lib[4]
             elif t.days==1:
                 text += str(t.days)+" "+lib[5]
             if hour:
-                if t.hours>1:
+                if t.hours > 1:
                     text += " "+str(t.hours)+" "+lib[6]
                 elif t.hours==1:
                     text += " "+str(t.hours)+" "+lib[7]
                 text+=" "
-                if t.minutes>1:
+                if t.minutes > 1:
                     text += str(t.minutes)+" "+lib[8]
                 elif t.minutes==1:
                     text += str(t.minutes)+" "+lib[9]
                 text+=" "
-                if t.seconds>1:
+                if t.seconds > 1:
                     text += str(t.seconds)+" "+lib[10]
                 elif t.seconds==1:
                     text += str(t.seconds)+" "+lib[11]
@@ -124,19 +129,19 @@ class TimeCog(discord.ext.commands.Cog):
         return text.strip()
 
 
-    async def time_interval(self,tmd,precision=2):
-        """Crée un objet de type timedelta à partir d'un objet datetime.timedelta"""
+    async def time_interval(self, tmd, precision=2):
+        """Creates a timedelta object from a datetime.timedelta object"""
         t = tmd.total_seconds()
         obj = self.timedelta(total_seconds=t,precision=precision)
         obj.set_from_seconds()
         return obj
 
-    async def date(self,date,lang='fr',year=False,hour=True,digital=False):
-        """Traduit un objet de type datetime.datetime en chaine de caractère lisible. Renvoie un str"""
+    async def date(self, date, lang='fr', year=False, hour=True, digital=False) -> str:
+        """Translates a datetime.datetime object into a readable string"""
         if type(date) == time.struct_time:
             date = datetime.datetime(*date[:6])
         if type(date) == datetime.datetime:
-            if len(str(date.day))==1:
+            if len(str(date.day)) == 1:
                 jour="0"+str(date.day)
             else:
                 jour = str(date.day)
@@ -174,7 +179,6 @@ class TimeCog(discord.ext.commands.Cog):
                     df = "{m} {d}, {y}  {h}"
                 df = df.format(d=jour,m=month[date.month-1],y=str(date.year) if year else "",h=":".join(h) if hour else "")
             return df.strip()
-
 
 
 def setup(bot):
