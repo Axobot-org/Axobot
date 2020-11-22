@@ -846,9 +846,9 @@ class _FeedParserMixin:
             # only if all the remaining content is nested underneath it.
             # This means that the divs would be retained in the following:
             #    <div>foo</div><div>bar</div>
-            while pieces and len(pieces)>1 and not pieces[-1].strip():
+            while pieces and len(pieces) > 1 and not pieces[-1].strip():
                 del pieces[-1]
-            while pieces and len(pieces)>1 and not pieces[0].strip():
+            while pieces and len(pieces) > 1 and not pieces[0].strip():
                 del pieces[0]
             if pieces and (pieces[0] == '<div>' or pieces[0].startswith('<div ')) and pieces[-1]=='</div>':
                 depth = 0
@@ -1881,7 +1881,7 @@ class _FeedParserMixin:
 
     def _end_media_credit(self):
         credit = self.pop('credit')
-        if credit != None and len(credit.strip()) != 0:
+        if credit is not None and len(credit.strip()) != 0:
             context = self._getContext()
             context['media_credit'][-1]['content'] = credit
 
@@ -1892,7 +1892,7 @@ class _FeedParserMixin:
 
     def _end_media_restriction(self):
         restriction = self.pop('restriction')
-        if restriction != None and len(restriction.strip()) != 0:
+        if restriction is not None and len(restriction.strip()) != 0:
             context = self._getContext()
             context['media_restriction']['content'] = [cc.strip().lower() for cc in restriction.split(' ')]
 
@@ -1903,7 +1903,7 @@ class _FeedParserMixin:
 
     def _end_media_license(self):
         license = self.pop('license')
-        if license != None and len(license.strip()) != 0:
+        if license is not None and len(license.strip()) != 0:
             context = self._getContext()
             context['media_license']['content'] = license
 
@@ -1921,7 +1921,7 @@ class _FeedParserMixin:
     def _end_media_thumbnail(self):
         url = self.pop('url')
         context = self._getContext()
-        if url != None and len(url.strip()) != 0:
+        if url is not None and len(url.strip()) != 0:
             if 'url' not in context['media_thumbnail'][-1]:
                 context['media_thumbnail'][-1]['url'] = url
 
@@ -1995,7 +1995,7 @@ if _XML_AVAILABLE:
             else:
                 givenprefix = None
             prefix = self._matchnamespaces.get(lowernamespace, givenprefix)
-            if givenprefix and (prefix == None or (prefix == '' and lowernamespace == '')) and givenprefix not in self.namespacesInUse:
+            if givenprefix and (prefix is None or (prefix == '' and lowernamespace == '')) and givenprefix not in self.namespacesInUse:
                 raise UndeclaredNamespace("'%s' is not associated with a namespace" % givenprefix)
             localname = str(localname).lower()
 

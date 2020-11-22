@@ -1,6 +1,15 @@
+from typing import Tuple
 from discord.ext import commands
-import discord, re, datetime, random, json, os, typing, importlib, string, asyncio, copy
+import discord
+import re
+import datetime
+import random
+import typing
+import importlib
+import asyncio
+import copy
 from fcts import checks, args
+from classes import zbot, MyContext
 
 importlib.reload(checks)
 importlib.reload(args)
@@ -8,7 +17,7 @@ importlib.reload(args)
 class ModeratorCog(commands.Cog):
     """Here you will find everything you need to moderate your server. Please note that most of the commands are reserved for certain members only."""
 
-    def __init__(self,bot):
+    def __init__(self, bot: zbot):
         self.bot = bot
         self.file = "moderation"
         try:
@@ -24,7 +33,7 @@ class ModeratorCog(commands.Cog):
     @commands.guild_only()
     @commands.cooldown(1, 3, commands.BucketType.guild)
     @commands.check(checks.can_slowmode)
-    async def slowmode(self,ctx,time=None):
+    async def slowmode(self, ctx: MyContext, time=None):
         """Keep your chat cool
 Slowmode works up to one message every 6h (21600s)
 
@@ -36,11 +45,11 @@ Slowmode works up to one message every 6h (21600s)
         if not ctx.channel.permissions_for(ctx.guild.me).manage_channels:
             await ctx.send(await self.translate(ctx.guild.id,"modo","cant-slowmode"))
             return
-        if time==None:
+        if time is None:
             return await ctx.send(str(await self.translate(ctx.guild.id,"modo","slowmode-info")).format(ctx.channel.slowmode_delay))
         if time.isnumeric():
             time = int(time)
-        if time == 'off' or time==0:
+        if time == 'off' or time == 0:
             #await ctx.bot.http.request(discord.http.Route('PATCH', '/channels/{cid}', cid=ctx.channel.id), json={'rate_limit_per_user':0})
             await ctx.channel.edit(slowmode_delay=0)
             message = await self.translate(ctx.guild.id,"modo","slowmode-0")
@@ -56,7 +65,7 @@ Slowmode works up to one message every 6h (21600s)
                 log = str(await self.translate(ctx.guild.id,"logs","slowmode-enabled")).format(channel=ctx.channel.mention,seconds=time)
                 await self.bot.cogs["Events"].send_logs_per_server(ctx.guild,"slowmode",log,ctx.author)
         else:
-                message = await self.translate(ctx.guild.id,"modo","slowmode-3")
+            message = await self.translate(ctx.guild.id,"modo","slowmode-3")
         await ctx.send(message)
 
 
@@ -64,7 +73,7 @@ Slowmode works up to one message every 6h (21600s)
     @commands.cooldown(4, 30, commands.BucketType.guild)
     @commands.guild_only()
     @commands.check(checks.can_clear)
-    async def clear(self,ctx,number:int,*,params=''):
+    async def clear(self, ctx: MyContext, number:int, *, params=''):
         """Keep your chat clean
         <number> : number of messages to check
         Available parameters :
@@ -91,7 +100,7 @@ Slowmode works up to one message every 6h (21600s)
         if number<1:
             await ctx.send(str(await self.translate(ctx.guild.id,"modo","clear-1"))+" "+self.bot.cogs['EmojiCog'].customEmojis["owo"])
             return
-        if len(params)==0:
+        if len(params) == 0:
             return await self.clear_simple(ctx,number)
         #file
         if "-f" in params:
@@ -127,24 +136,24 @@ Slowmode works up to one message every 6h (21600s)
             r = self.bot.cogs["UtilitiesCog"].sync_check_any_link(m.content)
             c1 = c2 = c3 = c4 = True
             if pinned != 1:
-                if (m.pinned and pinned==0) or (not m.pinned and pinned==2):
+                if (m.pinned and pinned == 0) or (not m.pinned and pinned==2):
                     c1 = False
             else:
                 c1 = not m.pinned
             if files != 1:
-                if (m.attachments != [] and files==0) or (m.attachments==[] and files==2):
+                if (m.attachments != [] and files == 0) or (m.attachments==[] and files==2):
                     c2 = False
             if links != 1:
-                if (r == None and links==2) or (r != None and links==0):
+                if (r is None and links==2) or (r is not None and links == 0):
                     c3 = False
             if invites != 1:
-                if (i == None and invites==2) or (i != None and invites==0):
+                if (i is None and invites==2) or (i is not None and invites == 0):
                     c4 = False
-            #return ((m.pinned == pinned) or ((m.attachments != []) == files) or ((r != None) == links)) and m.author in users
+            #return ((m.pinned == pinned) or ((m.attachments != []) == files) or ((r is not None) == links)) and m.author in users
             mentions = re.findall(r'<@!?\d{16,18}>', ctx.message.content)
             if str(ctx.bot.user.id) in ctx.prefix:
                 mentions.remove(ctx.bot.user.id)
-            if mentions != [] and m.author != None:
+            if mentions != [] and m.author is not None:
                 return c1 and c2 and c3 and c4 and m.author.id in mentions
             else:
                 return c1 and c2 and c3 and c4
@@ -158,7 +167,7 @@ Slowmode works up to one message every 6h (21600s)
         except Exception as e:
             await self.bot.cogs['ErrorsCog'].on_command_error(ctx,e)
 
-    async def clear_simple(self,ctx,number):
+    async def clear_simple(self, ctx: MyContext, number: int):
         def check(m):
             return not m.pinned
         try:
@@ -177,7 +186,7 @@ Slowmode works up to one message every 6h (21600s)
     @commands.cooldown(5, 20, commands.BucketType.guild)
     @commands.guild_only()
     @commands.check(checks.can_kick)
-    async def kick(self,ctx,user:discord.Member,*,reason="Unspecified"):
+    async def kick(self, ctx: MyContext, user:discord.Member, *, reason="Unspecified"):
         """Kick a member from this server
 
 ..Example kick @someone Not nice enough to stay here        
@@ -219,8 +228,8 @@ Slowmode works up to one message every 6h (21600s)
                 try:
                     await CasesCog.add_case(case)
                     caseID = case.id
-                except:
-                    await self.bot.cogs['ErrorsCog'].on_error(e,ctx)
+                except Exception as e:
+                    await self.bot.cogs['ErrorsCog'].on_error(e, ctx)
             try:
                 await ctx.message.delete()
             except:
@@ -240,7 +249,7 @@ Slowmode works up to one message every 6h (21600s)
     @commands.cooldown(5, 20, commands.BucketType.guild)
     @commands.guild_only()
     @commands.check(checks.can_warn)
-    async def warn(self,ctx,user:discord.Member,*,message):
+    async def warn(self, ctx: MyContext, user:discord.Member, *, message):
         """Send a warning to a member
 
 ..Example warn @someone Please just stop, next one is a mute duh
@@ -293,7 +302,7 @@ Slowmode works up to one message every 6h (21600s)
             await ctx.send(await self.translate(ctx.guild.id,"modo","error"))
             await self.bot.cogs['ErrorsCog'].on_error(e,ctx)
 
-    async def get_muted_role(self,guild):
+    async def get_muted_role(self, guild: discord.Guild):
         opt = await self.bot.cogs['ServerCog'].find_staff(guild.id,'muted_role')
         if not isinstance(opt,int):
             return discord.utils.get(guild.roles,name="muted")
@@ -302,17 +311,17 @@ Slowmode works up to one message every 6h (21600s)
     async def mute_event(self, member:discord.Member, author:discord.Member, reason:str, caseID:int, duration:str=None):
         role = await self.get_muted_role(member.guild)
         await member.add_roles(role,reason=reason)
-        log = str(await self.translate(member.guild.id,"logs","mute-on" if duration==None else "tempmute-on")).format(member=member,reason=reason,case=caseID,duration=duration)
+        log = str(await self.translate(member.guild.id,"logs","mute-on" if duration is None else "tempmute-on")).format(member=member,reason=reason,case=caseID,duration=duration)
         await self.bot.cogs["Events"].send_logs_per_server(member.guild,"mute",log,author)
 
-    async def check_mute_context(self,ctx,role,user):
+    async def check_mute_context(self, ctx: MyContext, role: discord.Role, user: discord.Member):
         if role in user.roles:
             await ctx.send(await self.translate(ctx.guild.id,"modo","already-mute"))
             return False
         if not ctx.guild.me.guild_permissions.manage_roles:
             await ctx.send(await self.translate(ctx.guild.id,"modo","cant-mute"))
             return False
-        if role == None:
+        if role is None:
             role = await ctx.guild.create_role(name="muted")
             # await self.bot.cogs['ModeratorCog'].configure_muted_role(ctx.guild, role)
             await ctx.send(await self.translate(ctx.guild.id,"modo","mute-role-created", p=ctx.prefix))
@@ -326,7 +335,7 @@ Slowmode works up to one message every 6h (21600s)
     @commands.cooldown(5,20, commands.BucketType.guild)
     @commands.guild_only()
     @commands.check(checks.can_mute)
-    async def mute(self,ctx,user:discord.Member,time:commands.Greedy[args.tempdelta],*,reason="Unspecified"):
+    async def mute(self, ctx: MyContext, user: discord.Member, time: commands.Greedy[args.tempdelta], *, reason="Unspecified"):
         """Mute someone. 
 When someone is muted, the bot adds the role "muted" to them
 You can also mute this member for a defined duration, then use the following format:
@@ -341,7 +350,7 @@ You can also mute this member for a defined duration, then use the following for
 
 ..Doc moderator.html#mute-unmute"""
         duration = sum(time)
-        if duration>0:
+        if duration > 0:
             f_duration = await self.bot.cogs['TimeCog'].time_delta(duration,lang=await self.translate(ctx.guild,'current_lang','current'),form='temp',precision=0)
         else:
             f_duration = None
@@ -375,7 +384,7 @@ You can also mute this member for a defined duration, then use the following for
             if self.bot.database_online:
                 CasesCog = self.bot.cogs['CasesCog']
                 caseIDs = await CasesCog.get_ids()
-                if f_duration==None:
+                if f_duration is None:
                     case = CasesCog.Case(bot=self.bot,guildID=ctx.guild.id,memberID=user.id,Type="mute",ModID=ctx.author.id,Reason=reason,date=datetime.datetime.now()).create_id(caseIDs)
                 else:
                     case = CasesCog.Case(bot=self.bot,guildID=ctx.guild.id,memberID=user.id,Type="tempmute",ModID=ctx.author.id,Reason=reason,date=datetime.datetime.now(),duration=duration).create_id(caseIDs)
@@ -387,14 +396,14 @@ You can also mute this member for a defined duration, then use the following for
                     await self.bot.cogs['ErrorsCog'].on_error(e,ctx)
             if user.id not in self.bot.cogs['WelcomerCog'].no_message:
                 try:
-                    if f_duration == None:
+                    if f_duration is None:
                         await user.send(await self.translate(ctx.guild.id,"modo","mute-notemp", server=ctx.guild.name, reason=reason))
                     else:
                         await user.send(await self.translate(ctx.guild.id,"modo","mute-temp", server=ctx.guild.name, reason=reason, duration=f_duration))
                 except Exception as e:
                     await self.bot.cogs['ErrorsCog'].on_error(e,ctx)
                     pass
-            if f_duration==None:
+            if f_duration is None:
                 await self.mute_event(user,ctx.author,reason,caseID)
                 await ctx.send(str(await self.translate(ctx.guild.id,"modo","mute-1")).format(user,reason))
             else:
@@ -409,22 +418,22 @@ You can also mute this member for a defined duration, then use the following for
             await self.bot.cogs['ErrorsCog'].on_error(e,ctx)
 
 
-    async def unmute_event(self,guild,user,author):
+    async def unmute_event(self, guild: discord.Guild, user: discord.Member, author: discord.Member):
         role = await self.get_muted_role(guild)
-        if role==None or not role in user.roles:
+        if role is None or not role in user.roles:
             return
-        if author==guild.me:
+        if author == guild.me:
             await user.remove_roles(role,reason=await self.translate(guild.id,"logs","d-autounmute"))
         else:
             await user.remove_roles(role,reason=str(await self.translate(guild.id,"logs","d-unmute")).format(author))
         log = str(await self.translate(guild.id,"logs","mute-off")).format(member=user)
-        await self.bot.cogs["Events"].send_logs_per_server(guild,"mute",log,author)
+        await self.bot.cogs["Events"].send_logs_per_server(guild, "mute", log, author)
 
     @commands.command(name="unmute")
     @commands.cooldown(5,20, commands.BucketType.guild)
     @commands.guild_only()
     @commands.check(checks.can_mute)
-    async def unmute(self, ctx:commands.Context, *, user:discord.Member):
+    async def unmute(self, ctx:MyContext, *, user:discord.Member):
         """Unmute someone
 This will remove the role 'muted' for the targeted member
 
@@ -435,7 +444,7 @@ This will remove the role 'muted' for the targeted member
         if role not in user.roles:
             await ctx.send(await self.translate(ctx.guild.id,"modo","already-unmute"))
             return
-        if role == None:
+        if role is None:
             await ctx.send(await self.translate(ctx.guild.id,"modo","no-mute"))
             return
         if not ctx.channel.permissions_for(ctx.guild.me).manage_roles:
@@ -459,7 +468,7 @@ This will remove the role 'muted' for the targeted member
     @commands.cooldown(1,15, commands.BucketType.guild)
     @commands.guild_only()
     @commands.has_guild_permissions(manage_roles=True)
-    async def mute_config(self, ctx:commands.Context):
+    async def mute_config(self, ctx: MyContext):
         """Auto configure the muted role for you
         Useful if you want to have a base for a properly working muted role
         Warning: the process may break some things in your server, depending on how you configured your channel permissions.
@@ -481,7 +490,7 @@ This will remove the role 'muted' for the targeted member
     @commands.cooldown(5,20, commands.BucketType.guild)
     @commands.guild_only()
     @commands.check(checks.can_ban)
-    async def ban(self,ctx,user:args.user,time:commands.Greedy[args.tempdelta],days_to_delete:typing.Optional[int]=0,*,reason="Unspecified"):
+    async def ban(self,ctx:MyContext,user:args.user,time:commands.Greedy[args.tempdelta],days_to_delete:typing.Optional[int]=0,*,reason="Unspecified"):
         """Ban someone
 The 'days_to_delete' option represents the number of days worth of messages to delete from the user in the guild, bewteen 0 and 7
 
@@ -495,7 +504,7 @@ The 'days_to_delete' option represents the number of days worth of messages to d
         """
         try:
             duration = sum(time)
-            if duration>0:
+            if duration > 0:
                 f_duration = await self.bot.cogs['TimeCog'].time_delta(duration,lang=await self.translate(ctx.guild,'current_lang','current'),form='temp',precision=0)
             else:
                 f_duration = None
@@ -532,7 +541,7 @@ The 'days_to_delete' option represents the number of days worth of messages to d
                 days_to_delete = 0
             reason = await self.bot.cogs["UtilitiesCog"].clear_msg(reason,everyone = not ctx.channel.permissions_for(ctx.author).mention_everyone)
             await ctx.guild.ban(user,reason=reason,delete_message_days=days_to_delete)
-            if f_duration==None:
+            if f_duration is None:
                 self.bot.log.info("L'utilisateur {} a été banni du serveur {} pour la raison {}".format(user.id,ctx.guild.id,reason))
             else:
                 self.bot.log.info("L'utilisateur {} a été banni du serveur {} pour la raison {} pendant {}".format(user.id,ctx.guild.id,reason,f_duration))
@@ -541,7 +550,7 @@ The 'days_to_delete' option represents the number of days worth of messages to d
             if self.bot.database_online:
                 CasesCog = self.bot.cogs['CasesCog']
                 caseIDs = await CasesCog.get_ids()
-                if f_duration==None:
+                if f_duration is None:
                     case = CasesCog.Case(bot=self.bot,guildID=ctx.guild.id,memberID=user.id,Type="ban",ModID=ctx.author.id,Reason=reason,date=datetime.datetime.now()).create_id(caseIDs)
                 else:
                     case = CasesCog.Case(bot=self.bot,guildID=ctx.guild.id,memberID=user.id,Type="tempban",ModID=ctx.author.id,Reason=reason,date=datetime.datetime.now(),duration=duration).create_id(caseIDs)
@@ -555,7 +564,7 @@ The 'days_to_delete' option represents the number of days worth of messages to d
                 await ctx.message.delete()
             except:
                 pass
-            if f_duration==None:
+            if f_duration is None:
                 await ctx.send(str( await self.translate(ctx.guild.id,"modo","ban")).format(user,reason))
                 log = str(await self.translate(ctx.guild.id,"logs","ban")).format(member=user,reason=reason,case=caseID)
             else:
@@ -568,7 +577,7 @@ The 'days_to_delete' option represents the number of days worth of messages to d
             await ctx.send(await self.translate(ctx.guild.id,"modo","error"))
             await self.bot.cogs['ErrorsCog'].on_error(e,ctx)
 
-    async def unban_event(self,guild,user,author):
+    async def unban_event(self, guild: discord.Guild, user: discord.User, author: discord.User):
         if not guild.me.guild_permissions.ban_members:
             return
         await guild.unban(user,reason=str(await self.translate(guild.id,"logs","d-unban")).format(author))
@@ -579,7 +588,7 @@ The 'days_to_delete' option represents the number of days worth of messages to d
     @commands.cooldown(5,20, commands.BucketType.guild)
     @commands.guild_only()
     @commands.check(checks.can_ban)
-    async def unban(self,ctx,user,*,reason="Unspecified"):
+    async def unban(self, ctx: MyContext, user: str, *, reason="Unspecified"):
         """Unban someone
 
 ..Example !unban 486896267788812288 Nice enough
@@ -630,7 +639,7 @@ The 'days_to_delete' option represents the number of days worth of messages to d
     @commands.command(name="softban")
     @commands.guild_only()
     @commands.check(checks.can_kick)
-    async def softban(self,ctx,user:discord.Member,reason="Unspecified"):
+    async def softban(self, ctx: MyContext, user:discord.Member, reason="Unspecified"):
         """Kick a member and lets Discord delete all his messages up to 7 days old.
 Permissions for using this command are the same as for the kick
 
@@ -673,7 +682,7 @@ Permissions for using this command are the same as for the kick
                 try:
                     await CasesCog.add_case(case)
                     caseID = case.id
-                except:
+                except Exception as e:
                     await self.bot.cogs['ErrorsCog'].on_error(e,ctx)
             try:
                 await ctx.message.delete()
@@ -692,7 +701,7 @@ Permissions for using this command are the same as for the kick
     @commands.command(name="banlist")
     @commands.guild_only()
     @commands.check(checks.has_admin)
-    async def banlist(self,ctx,reasons:bool=True):
+    async def banlist(self, ctx: MyContext, reasons:bool=True):
         """Check the list of currently banned members.
 The 'reasons' parameter is used to display the ban reasons.
 
@@ -706,8 +715,9 @@ You must be an administrator of this server to use this command.
             liste = await ctx.guild.bans()
         except:
             await ctx.send(await self.translate(ctx.guild.id,"modo","error"))
+            return
         desc = list()
-        if len(liste)==0:
+        if len(liste) == 0:
             desc.append(await self.translate(ctx.guild.id,"modo","no-bans"))
         if reasons:
             for case in liste[:45]:
@@ -735,15 +745,15 @@ You must be an administrator of this server to use this command.
     @commands.group(name="emoji",aliases=['emojis'])
     @commands.guild_only()
     @commands.cooldown(5,20, commands.BucketType.guild)
-    async def emoji_group(self,ctx):
+    async def emoji_group(self, ctx: MyContext):
         """Manage your emoji
         Administrator permission is required"""
-        if ctx.subcommand_passed==None:
+        if ctx.subcommand_passed is None:
             await self.bot.cogs['HelpCog'].help_command(ctx,['emoji'])
 
     @emoji_group.command(name="rename")
     @commands.check(checks.has_admin)
-    async def emoji_rename(self,ctx,emoji:discord.Emoji,name):
+    async def emoji_rename(self, ctx: MyContext, emoji: discord.Emoji, name: str):
         """Rename an emoji"""
         if emoji.guild != ctx.guild:
             await ctx.send(await self.translate(ctx.guild.id,"modo","wrong-guild"))
@@ -756,7 +766,7 @@ You must be an administrator of this server to use this command.
 
     @emoji_group.command(name="restrict")
     @commands.check(checks.has_admin)
-    async def emoji_restrict(self,ctx,emoji:discord.Emoji,*,roles):
+    async def emoji_restrict(self, ctx: MyContext, emoji: discord.Emoji, *, roles: str):
         """Restrict the use of an emoji to certain roles"""
         if emoji.guild != ctx.guild:
             await ctx.send(await self.translate(ctx.guild.id,"modo","wrong-guild"))
@@ -781,7 +791,7 @@ You must be an administrator of this server to use this command.
 
     @emoji_group.command(name="clear")
     @commands.check(checks.has_manage_msg)
-    async def emoji_clear(self,ctx,message:discord.Message):
+    async def emoji_clear(self, ctx: MyContext, message: discord.Message):
         """Remove all reactions under a message"""
         if not ctx.channel.permissions_for(ctx.guild.me).manage_messages:
             return await ctx.send(await self.translate(ctx.guild.id,'modo','need-manage-messages'))
@@ -793,7 +803,7 @@ You must be an administrator of this server to use this command.
     
     @emoji_group.command(name="info")
     @commands.check(checks.has_manage_msg)
-    async def emoji_info(self,ctx,emoji:discord.Emoji):
+    async def emoji_info(self, ctx: MyContext, emoji: discord.Emoji):
         """Get info about an emoji
         This is only an alias or `info emoji`"""
         msg = copy.copy(ctx.message)
@@ -802,9 +812,9 @@ You must be an administrator of this server to use this command.
         await self.bot.invoke(new_ctx)
 
     @emoji_group.command(name="list")
-    async def emoji_list(self,ctx):
+    async def emoji_list(self, ctx: MyContext):
         """List every emoji of your server"""
-        if not ctx.channel.permissions_for(ctx.guild.me).embed_links:
+        if not ctx.can_send_embed:
             return await ctx.send(await self.translate(ctx.guild.id,"fun","no-embed-perm"))
         structure = await self.translate(ctx.guild.id,"modo","em-list")
         date = ctx.bot.cogs['TimeCog'].date
@@ -812,8 +822,8 @@ You must be an administrator of this server to use this command.
         priv = "**"+await self.translate(ctx.guild.id,"modo","em-private")+"**"
         title = str(await self.translate(ctx.guild.id,"modo","em-list-title")).format(ctx.guild.name)
         try:
-            emotes = [structure.format(x,x.name,await date(x.created_at,lang,year=True,hour=False,digital=True),priv if len(x.roles)>0 else '') for x in ctx.guild.emojis if not x.animated]
-            emotes += [structure.format(x,x.name,await date(x.created_at,lang,year=True,hour=False,digital=True),priv if len(x.roles)>0 else '') for x in ctx.guild.emojis if x.animated]
+            emotes = [structure.format(x,x.name,await date(x.created_at,lang,year=True,hour=False,digital=True),priv if len(x.roles) > 0 else '') for x in ctx.guild.emojis if not x.animated]
+            emotes += [structure.format(x,x.name,await date(x.created_at,lang,year=True,hour=False,digital=True),priv if len(x.roles) > 0 else '') for x in ctx.guild.emojis if x.animated]
             emotes = emotes
             nbr = len(emotes)
             for x in range(0,nbr,50):
@@ -831,14 +841,14 @@ You must be an administrator of this server to use this command.
 
     @commands.group(name="role", aliases=["roles"])
     @commands.guild_only()
-    async def main_role(self,ctx):
+    async def main_role(self, ctx: MyContext):
         """A few commands to manage roles"""
-        if ctx.subcommand_passed==None:
+        if ctx.subcommand_passed is None:
             await self.bot.cogs['HelpCog'].help_command(ctx,['role'])
     
     @main_role.command(name="color",aliases=['colour'])
     @commands.check(checks.has_manage_roles)
-    async def role_color(self,ctx,role:discord.Role,color:discord.Color):
+    async def role_color(self, ctx: MyContext, role: discord.Role, color: discord.Color):
         """Change a color of a role"""
         if not ctx.guild.me.guild_permissions.manage_roles:
             await ctx.send(await self.translate(ctx.guild.id,"modo","cant-mute"))
@@ -851,12 +861,12 @@ You must be an administrator of this server to use this command.
     
     @main_role.command(name="list")
     @commands.cooldown(5,30,commands.BucketType.guild)
-    async def role_list(self,ctx,*,role:discord.Role):
+    async def role_list(self, ctx: MyContext, *, role: discord.Role):
         """Send the list of members in a role"""
         if not (await checks.has_manage_roles(ctx) or await checks.has_manage_guild(ctx) or await checks.has_manage_msg(ctx)):
             await ctx.send(await self.translate(ctx.guild.id, "modo","missing-user-perms"))
             return
-        if not ctx.channel.permissions_for(ctx.guild.me).embed_links:
+        if not ctx.can_send_embed:
             return await ctx.send(await self.translate(ctx.guild.id,'fun','no-embed-perm'))
         tr_nbr = await self.translate(ctx.guild.id,'stats_infos','role-3')
         tr_mbr = await self.translate(ctx.guild.id,"keywords","membres")
@@ -867,22 +877,22 @@ You must be an administrator of this server to use this command.
         if nbr<=200:
             for i in range(nbr):
                 txt += role.members[i].mention+" "
-                if i<nbr-1 and len(txt+role.members[i+1].mention)>1000:
+                if i<nbr-1 and len(txt+role.members[i+1].mention) > 1000:
                     fields.append({'name':tr_mbr.capitalize(),'value':txt})
                     txt = str()
-            if len(txt)>0:
+            if len(txt) > 0:
                 fields.append({'name':tr_mbr.capitalize(),'value':txt})
         emb = await self.bot.cogs['EmbedCog'].Embed(title=role.name,fields=fields,color=role.color).update_timestamp().create_footer(ctx)
         await ctx.send(embed=emb.discord_embed())
     
     @main_role.command(name="server-list",aliases=["glist"])
     @commands.cooldown(5,30,commands.BucketType.guild)
-    async def role_glist(self, ctx:commands.Context):
+    async def role_glist(self, ctx:MyContext):
         """Check the list of every role"""
         if not (await checks.has_manage_roles(ctx) or await checks.has_manage_guild(ctx) or await checks.has_manage_msg(ctx)):
             await ctx.send(await self.translate(ctx.guild.id, "modo","missing-user-perms"))
             return
-        if not ctx.channel.permissions_for(ctx.guild.me).embed_links:
+        if not ctx.can_send_embed:
             return await ctx.send(await self.translate(ctx.guild.id,'fun','no-embed-perm'))
         tr_mbr = await self.translate(ctx.guild.id,"keywords","membres")
         title = await self.translate(ctx.guild.id,"modo","roles-list")
@@ -897,14 +907,14 @@ You must be an administrator of this server to use this command.
                 count = 0
             desc.append(txt)
             count += len(txt)+2
-        if count>0:
+        if count > 0:
             emb = await self.bot.cogs['EmbedCog'].Embed(title=title,desc="\n".join(desc),color=ctx.guild.me.color).update_timestamp().create_footer(ctx)
             await ctx.send(embed=emb)
 
     
     @main_role.command(name="info")
     @commands.check(checks.has_manage_msg)
-    async def role_info(self,ctx,role:discord.Role):
+    async def role_info(self, ctx: MyContext, role:discord.Role):
         """Get info about a role
         This is only an alias or `info role`"""
         msg = copy.copy(ctx.message)
@@ -914,10 +924,10 @@ You must be an administrator of this server to use this command.
 
     @main_role.command(name="give", aliases=["add"])
     @commands.check(checks.has_manage_roles)
-    async def roles_give(self,ctx,role:discord.Role,users:commands.Greedy[typing.Union[discord.Role,discord.Member]]):
+    async def roles_give(self, ctx:MyContext,role:discord.Role,users:commands.Greedy[typing.Union[discord.Role,discord.Member]]):
         """Give a role to a list of roles/members
         Users list may be either members or roles, or even only one member"""
-        if len(users)==0:
+        if len(users) == 0:
             raise commands.MissingRequiredArgument(self.roles_give.clean_params['users'])
         if not ctx.guild.me.guild_permissions.manage_roles:
             return await ctx.send(await self.translate(ctx.guild.id,"modo","cant-mute"))
@@ -942,10 +952,10 @@ You must be an administrator of this server to use this command.
 
     @main_role.command(name="remove")
     @commands.check(checks.has_manage_roles)
-    async def roles_remove(self,ctx,role:discord.Role,users:commands.Greedy[typing.Union[discord.Role,discord.Member]]):
+    async def roles_remove(self,ctx:MyContext,role:discord.Role,users:commands.Greedy[typing.Union[discord.Role,discord.Member]]):
         """Remove a role to a list of roles/members
         Users list may be either members or roles, or even only one member"""
-        if len(users)==0:
+        if len(users) == 0:
             raise commands.MissingRequiredArgument(self.roles_remove.clean_params['users'])
         if not ctx.guild.me.guild_permissions.manage_roles:
             return await ctx.send(await self.translate(ctx.guild.id,"modo","cant-mute"))
@@ -971,10 +981,10 @@ You must be an administrator of this server to use this command.
 
     @commands.command(name="pin")
     @commands.check(checks.has_manage_msg)
-    async def pin_msg(self,ctx,msg:int):
+    async def pin_msg(self, ctx: MyContext, msg: int):
         """Pin a message
 ID corresponds to the Identifier of the message"""
-        if ctx.guild!=None and not ctx.channel.permissions_for(ctx.guild.me).manage_messages:
+        if ctx.guild is not None and not ctx.channel.permissions_for(ctx.guild.me).manage_messages:
             await ctx.send(await self.translate(ctx.channel,"modo","cant-pin"))
             return
         try:
@@ -991,16 +1001,16 @@ ID corresponds to the Identifier of the message"""
     @commands.command(name='unhoist')
     @commands.guild_only()
     @commands.check(checks.has_manage_nicknames)
-    async def unhoist(self,ctx,chars=None):
+    async def unhoist(self, ctx: MyContext, chars: str=None):
         """Remove the special characters from usernames"""
         count = 0
         if not ctx.channel.permissions_for(ctx.guild.me).manage_nicknames:
             return await ctx.send(await self.translate(ctx.guild.id,'modo','missing-manage-nick'))
-        if chars==None:
+        if chars is None:
             def check(username):
                 while username < '0':
                     username = username[1:]
-                    if len(username)==0:
+                    if len(username) == 0:
                         username = "z unhoisted"
                 return username
         else:
@@ -1024,7 +1034,7 @@ ID corresponds to the Identifier of the message"""
     @commands.guild_only()
     @commands.check(checks.can_clear)
     @commands.cooldown(2, 30, commands.BucketType.channel)
-    async def destop(self, ctx:commands.Context, message:discord.Message):
+    async def destop(self, ctx:MyContext, message:discord.Message):
         """Clear every message between now and another message
         Message can be either ID or url
         Limited to 1,000 messages
@@ -1054,7 +1064,7 @@ ID corresponds to the Identifier of the message"""
         await self.bot.get_cog("Events").send_logs_per_server(ctx.guild, "clear", log, ctx.author)
     
 
-    async def find_verify_question(self,ctx:commands.Context) -> (str,str):
+    async def find_verify_question(self, ctx: MyContext) -> Tuple[str, str]:
         """Find a question/answer for a verification question"""
         raw_info = await self.translate(ctx.guild,'modo','verify_questions')
         q = random.choice(raw_info)
@@ -1075,17 +1085,17 @@ ID corresponds to the Identifier of the message"""
     @commands.guild_only()
     @commands.check(checks.verify_role_exists)
     @commands.cooldown(5,120,commands.BucketType.user)
-    async def verify_urself(self,ctx:commands.Context):
+    async def verify_urself(self, ctx: MyContext):
         """Verify yourself and loose the role"""
         roles_raw = await ctx.bot.cogs['ServerCog'].find_staff(ctx.guild.id,"verification_role")
-        roles = [r for r in [ctx.guild.get_role(int(x)) for x in roles_raw.split(';') if x.isnumeric] if r!=None]
+        roles = [r for r in [ctx.guild.get_role(int(x)) for x in roles_raw.split(';') if x.isnumeric] if r is not None]
         if not ctx.guild.me.guild_permissions.manage_roles:
             return await ctx.send(await self.translate(ctx.guild.id,"modo","cant-mute"))
         txt = str()
         for role in roles:
             if role.position > ctx.guild.me.roles[-1].position:
                 txt += await self.translate(ctx.guild.id,"modo","verify-role-high",r=role.name) + "\n"
-        if len(txt)>0:
+        if len(txt) > 0:
             return await ctx.send(txt)
         del txt
 

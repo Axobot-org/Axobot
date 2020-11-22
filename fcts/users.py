@@ -1,13 +1,17 @@
-import discord, importlib, typing, datetime, json, time
 from discord.ext import commands
+import importlib
+import typing
+import json
+import time
 
 from fcts import args, checks
 importlib.reload(args)
 importlib.reload(checks)
+from classes import zbot, MyContext
 
 class UsersCog(commands.Cog):
 
-    def __init__(self,bot):
+    def __init__(self, bot: zbot):
         self.bot = bot
         self.file = 'users'
         try:
@@ -20,22 +24,22 @@ class UsersCog(commands.Cog):
         self.translate = self.bot.cogs['LangCog'].tr
 
     @commands.group(name='profile')
-    async def profile_main(self,ctx):
+    async def profile_main(self, ctx: MyContext):
         """Get and change info about yourself"""
-        if ctx.subcommand_passed==None:
+        if ctx.subcommand_passed is None:
             await self.bot.cogs['HelpCog'].help_command(ctx,['profile'])
     
     @profile_main.command(name='card')
     @commands.check(checks.database_connected)
-    async def profile_card(self,ctx,style:typing.Optional[args.cardStyle]=None):
+    async def profile_card(self, ctx: MyContext, style: typing.Optional[args.cardStyle]=None):
         """Change your xp card style"""
-        if style==None and len(ctx.view.buffer.split(' '))>2:
+        if style is None and len(ctx.view.buffer.split(' '))>2:
             if ctx.view.buffer.split(' ')[2]=='list':
                 await ctx.send(str(await self.translate(ctx.channel,'users','list-cards')).format(', '.join(await ctx.bot.cogs['UtilitiesCog'].allowed_card_styles(ctx.author))))
             else:
                 await ctx.send(str(await self.translate(ctx.channel,'users','invalid-card')).format(', '.join(await ctx.bot.cogs['UtilitiesCog'].allowed_card_styles(ctx.author))))
             return
-        elif style==None:
+        elif style is None:
             if ctx.channel.permissions_for(ctx.me).attach_files:
                 style = await self.bot.cogs['UtilitiesCog'].get_xp_style(ctx.author)
                 txts = [await self.translate(ctx.channel,'xp','card-level'), await self.translate(ctx.channel,'xp','card-rank')]
@@ -47,7 +51,7 @@ class UsersCog(commands.Cog):
             if await ctx.bot.cogs['UtilitiesCog'].change_db_userinfo(ctx.author.id,'xp_style',style):
                 await ctx.send(str(await self.translate(ctx.channel,'users','changed-0')).format(style))
                 last_update = self.get_last_rankcard_update(ctx.author.id)
-                if last_update==None:
+                if last_update is None:
                     await self.bot.cogs["UtilitiesCog"].add_user_eventPoint(ctx.author.id,15)
                 elif last_update < time.time()-86400:
                     await self.bot.cogs["UtilitiesCog"].add_user_eventPoint(ctx.author.id,2)
@@ -57,7 +61,7 @@ class UsersCog(commands.Cog):
 
     @profile_main.command(name="config")
     @commands.check(checks.database_connected)
-    async def user_config(self,ctx:commands.Context,option:str,allow:bool=None):
+    async def user_config(self, ctx: MyContext, option: str, allow: bool=None):
         """Modify any config option
         Here you can (dis)allow one of the users option that Zbot have, which are:
         - animated_card: Display an animated rank card if your pfp is a gif (way slower rendering)
@@ -70,13 +74,13 @@ class UsersCog(commands.Cog):
         if option not in options.keys():
             await ctx.send(await self.translate(ctx.channel,"users","config_list",options=" - ".join(options.keys())))
             return
-        if allow==None:
+        if allow is None:
             value = await self.bot.cogs['UtilitiesCog'].get_db_userinfo([options[option]],[f'`userID`={ctx.author.id}'])
-            if value==None:
+            if value is None:
                 value = False
             else:
                 value = value[options[option]]
-            if ctx.guild==None or ctx.channel.permissions_for(ctx.guild.me).external_emojis:
+            if ctx.guild is None or ctx.channel.permissions_for(ctx.guild.me).external_emojis:
                 emojis = self.bot.cogs['EmojiCog'].customEmojis['green_check'], self.bot.cogs['EmojiCog'].customEmojis['red_cross']
             else:
                 emojis = ('✅','❎')
@@ -90,7 +94,7 @@ class UsersCog(commands.Cog):
             else:
                 await ctx.send(await self.translate(ctx.channel,'users','changed-1'))
 
-    def get_last_rankcard_update(self,userID:int):
+    def get_last_rankcard_update(self, userID: int):
         try:
             with open("rankcards_update.json",'r') as f:
                 r = json.load(f)
@@ -100,7 +104,7 @@ class UsersCog(commands.Cog):
             return r[str(userID)]
         return None
     
-    def set_last_rankcard_update(self,userID:int):
+    def set_last_rankcard_update(self, userID: int):
         with open("rankcards_update.json",'r') as f:
             old = json.load(f)
         old[str(userID)] = round(time.time())

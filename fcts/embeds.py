@@ -1,12 +1,13 @@
 import datetime, discord, requests, typing
 from discord.ext import commands
+from classes import zbot, MyContext
 
 url_base = 'https://discord.com/api/webhooks/'
 
 class EmbedCog(commands.Cog):
     """Cog for the management of the embeds. No more, no less."""
 
-    def __init__(self,bot):
+    def __init__(self, bot: zbot):
         self.bot = bot
         self.logs = {'classic':"625369482587537408/uGh5fJWD6S1XAddNKOGohvyfXWOxPmsodQQPcp7iasagi5kJm8DKfbzmf7-UFb5u3gnd",
             'loop':'625369730127101964/04KUvJxdb-Dl-BIkIdBydqZIoziBn5qy06YugIO3T4uOUYqMIT4YgoP6C0kv6CrrA8h8',
@@ -30,7 +31,7 @@ class EmbedCog(commands.Cog):
             self.author_name = author_name
             self.author_url = author_url
             self.author_icon = author_icon
-            if fields==None:
+            if fields is None:
                 fields = list()
             for e,x in enumerate(fields):
                 if "inline" not in x.keys():
@@ -57,7 +58,7 @@ class EmbedCog(commands.Cog):
                 emb["description"] = self.description
             if self.url != "":
                 emb["url"] = self.url
-            if self.color != None:
+            if self.color is not None:
                 if isinstance(self.color,discord.Colour):
                     emb["color"] = self.color.value
                 else:
@@ -85,24 +86,24 @@ class EmbedCog(commands.Cog):
                 j["embed"] = emb
             return j
         
-        def to_dict(self):
+        def to_dict(self) -> dict:
             return self.json()['embed']
 
-        def set_author(self,user):
+        def set_author(self, user: discord.User):
             self.author_name = user.name
             self.author_icon = str(user.avatar_url_as(format='gif',size=256)) if user.is_avatar_animated() else str(user.avatar_url_as(format='png',size=256))
             return self
         
-        async def create_footer(self, ctx:commands.Context, user: typing.Union[discord.User,discord.Member]=None):
+        async def create_footer(self, ctx:MyContext, user: typing.Union[discord.User,discord.Member]=None):
             # self.footer_text = "Requested by {}".format(user.name)
-            if user==None:
+            if user is None:
                 user = ctx.author
             self.footer_text = await ctx.bot.get_cog("LangCog").tr(ctx.channel,"keywords", "request_by", user=user.name)
             self.footer_url = user.avatar_url_as(format='png',size=256)
             return self
 
         def discord_embed(self):
-            if type(self.color)==discord.Colour:
+            if isinstance(self.color, discord.Colour):
                 color = self.color
             elif self.color is None:
                 color = discord.Embed.Empty
@@ -118,7 +119,7 @@ class EmbedCog(commands.Cog):
             return emb
     
 
-    async def send(self,embeds,url=None):
+    async def send(self, embeds, url: str=None):
         if url is None:
             url = url_base + self.logs['beta'] if self.bot.beta else url_base + self.logs['classic']
         else:
@@ -126,11 +127,11 @@ class EmbedCog(commands.Cog):
                 url = url_base + self.logs[url]
         liste = list()
         for x in embeds:
-            if type(x) == self.Embed:
-                liste.append(x.json()["embed"])
+            if isinstance(x, self.Embed):
+                liste.append(x.to_dict())
             else:
                 liste.append(x["embed"])
-        r = requests.post(url,json={"embeds":liste})
+        r = requests.post(url, json={"embeds":liste})
         try:
             msg = r.json()
             if "error" in msg.keys():

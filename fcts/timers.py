@@ -1,12 +1,12 @@
-import discord
 from discord.ext import commands
 import copy
 import datetime
 
 from fcts import args
+from classes import zbot, MyContext
 
 class TimersCog(commands.Cog):
-    def __init__(self, bot:commands.Bot):
+    def __init__(self, bot: zbot):
         self.bot = bot
         self.file = "timers"
         try:
@@ -21,7 +21,7 @@ class TimersCog(commands.Cog):
     @commands.command(name="remindme", aliases=['rmd'])
     @commands.cooldown(5,30,commands.BucketType.channel)
     @commands.cooldown(5,60,commands.BucketType.user)
-    async def remindme(self, ctx: commands.Context, *, args):
+    async def remindme(self, ctx: MyContext, *, args):
         """Create a new reminder
         This is actually an alias of `reminder create`
         """
@@ -31,18 +31,18 @@ class TimersCog(commands.Cog):
     
 
     @commands.group(name="reminder", aliases=["remind", "reminds", "reminders"])
-    async def remind_main(self, ctx:commands.Context):
+    async def remind_main(self, ctx: MyContext):
         """Ask the bot to remind you of something later
 
         ..Doc miscellaneous.html#reminders"""
-        if ctx.subcommand_passed==None:
+        if ctx.subcommand_passed is None:
             await self.bot.cogs['HelpCog'].help_command(ctx,['reminder'])
     
     
     @remind_main.command(name="create", aliases=["add"])
     @commands.cooldown(5,30,commands.BucketType.channel)
     @commands.cooldown(5,60,commands.BucketType.user)
-    async def remind_create(self, ctx:commands.Context, duration:commands.Greedy[args.tempdelta], *, message):
+    async def remind_create(self, ctx: MyContext, duration: commands.Greedy[args.tempdelta], *, message):
         """Create a new reminder
         
         Please use the following format:
@@ -77,7 +77,7 @@ class TimersCog(commands.Cog):
 
     @remind_main.command(name="list")
     @commands.cooldown(5,60,commands.BucketType.user)
-    async def remind_list(self, ctx:commands.Context):
+    async def remind_list(self, ctx: MyContext):
         """List your pending reminders
 
         ..Doc miscellaneous.html#list-your-reminders
@@ -105,7 +105,7 @@ class TimersCog(commands.Cog):
             item = txt.format(id=item['ID'], duration=duration, channel=chan, msg=msg)
             liste.append(item)
         cursor.close()
-        if ctx.guild is None or ctx.channel.permissions_for(ctx.guild.me).embed_links:
+        if ctx.can_send_embed:
             if len("\n".join(liste)) > 2000:
                 desc = ""
                 step = 5
@@ -120,8 +120,8 @@ class TimersCog(commands.Cog):
             await ctx.send(t+"\n".join(liste))
     
     @remind_main.command(name="delete", aliases=["remove", "del"])
-    @commands.cooldown(5,30,commands.BucketType.user)
-    async def remind_del(self, ctx:commands.Context, ID:int):
+    @commands.cooldown(5, 30, commands.BucketType.user)
+    async def remind_del(self, ctx: MyContext, ID: int):
         """Delete a reminder
         ID can be found with the `reminder list` command.
 

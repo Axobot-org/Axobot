@@ -1,12 +1,19 @@
-import frmc_lib, aiohttp, discord, re, datetime, time, requests
+import frmc_lib
+import aiohttp
+import discord
+import re
+import datetime
+import time
+import requests
 from discord.ext import commands
+from classes import zbot, MyContext
 
 
 class McCog(commands.Cog):
     """Cog gathering all commands related to the Minecraft® game. 
 Every information come from the website www.fr-minecraft.net"""
     
-    def __init__(self,bot):
+    def __init__(self, bot: zbot):
         self.bot = bot
         self.flows = dict()
         self.file = "mc"
@@ -19,9 +26,9 @@ Every information come from the website www.fr-minecraft.net"""
     async def on_ready(self):
         self.translate = self.bot.cogs["LangCog"].tr
 
-    @commands.command(name="mojang",aliases=['mojang_status'])
-    @commands.cooldown(5,20,commands.BucketType.user)
-    async def mojang_status(self,ctx):
+    @commands.command(name="mojang", aliases=['mojang_status'])
+    @commands.cooldown(5, 20, commands.BucketType.user)
+    async def mojang_status(self, ctx: MyContext):
         """Get Mojang server status
     
     Data comes from this guy <https://github.com/Darkflame72>, a big thanks to them!"""
@@ -30,11 +37,7 @@ Every information come from the website www.fr-minecraft.net"""
             # async with session.get('https://status.mojang.com/check') as r:
             async with session.get('https://api.bowie-co.nz/api/v1/mojang/check') as r:
                 data = await r.json()
-        if ctx.guild==None:
-            can_embed = True
-        else:
-            can_embed = ctx.channel.permissions_for(ctx.guild.me).embed_links
-        if can_embed:
+        if ctx.can_send_embed:
             embed = discord.Embed(color=discord.Colour(0x699bf9), timestamp=ctx.message.created_at)
             embed.set_thumbnail(url="https://www.minecraft-france.fr/wp-content/uploads/2020/05/mojang-logo-2.gif")
             embed.set_author(name="Mojang Studios - Services Status", url="https://api.bowie-co.nz/api/v1/mojang/check", icon_url="https://www.minecraft.net/content/dam/franchise/logos/Mojang-Studios-Logo-Redbox.png")
@@ -53,7 +56,7 @@ Every information come from the website www.fr-minecraft.net"""
             else:
                 k = self.bot.cogs['EmojiCog'].customEmojis['blurple']+K
                 dm = self.bot.get_user(279568324260528128).dm_channel
-                if dm == None:
+                if dm is None:
                     await self.bot.get_user(279568324260528128).create_dm()
                     dm = self.bot.get_user(279568324260528128).dm_channel
                 await dm.send("Status mojang inconnu : "+V+" (serveur "+K+")")
@@ -71,14 +74,14 @@ Every information come from the website www.fr-minecraft.net"""
             await ctx.send(text)
 
     @commands.group(name="minecraft", aliases=["mc"])
-    @commands.cooldown(5,30,commands.BucketType.user)
-    async def mc_main(self,ctx):
+    @commands.cooldown(5, 30, commands.BucketType.user)
+    async def mc_main(self, ctx: MyContext):
         """Search for Minecraft game items/servers"""
-        if ctx.subcommand_passed==None:
+        if ctx.subcommand_passed is None:
             await self.bot.cogs['HelpCog'].help_command(ctx,['minecraft'])
 
-    @mc_main.command(name="block",aliases=["bloc"])
-    async def mc_block(self,ctx,*,value='help'):
+    @mc_main.command(name="block", aliases=["bloc"])
+    async def mc_block(self, ctx: MyContext, *, value='help'):
         """Get infos about any block"""
         if value=='help':
             await ctx.send(await self.translate(ctx.channel,"mc","block-help"))
@@ -105,8 +108,8 @@ Every information come from the website www.fr-minecraft.net"""
             await self.bot.cogs['ErrorsCog'].on_error(e,ctx)
             await ctx.send(await self.translate(ctx.channel,"mc","no-entity"))
 
-    @mc_main.command(name="entity",aliases=["entité","mob"])
-    async def mc_entity(self,ctx,*,value='help'):
+    @mc_main.command(name="entity", aliases=["entité","mob"])
+    async def mc_entity(self, ctx: MyContext, *, value='help'):
         """Get infos about any entity"""
         if value=='help':
             await ctx.send(await self.translate(ctx.channel,"mc","entity-help"))
@@ -136,7 +139,7 @@ Every information come from the website www.fr-minecraft.net"""
             await ctx.send(await self.translate(ctx.channel,"mc","no-entity"))
     
     @mc_main.command(name="item",aliases=['object'])
-    async def mc_item(self,ctx,*,value='help'):
+    async def mc_item(self, ctx: MyContext, *, value='help'):
         """Get infos about any item"""
         if value=='help':
             await ctx.send(await self.translate(ctx.channel,"mc","item-help"))
@@ -148,7 +151,7 @@ Every information come from the website www.fr-minecraft.net"""
             return
         title = "{} - {}".format((await self.translate(ctx.channel,"mc","names"))[2],Item.Name)
         embed = self.bot.get_cog("EmbedCog").Embed(title=title, color=discord.Colour(int('16BD06',16)), url=Item.Url, time=ctx.message.created_at, desc=await self.translate(ctx.channel,'mc','contact-mail'))
-        if Item.Image != None:
+        if Item.Image is not None:
             embed.thumbnail(url=Item.Image)
         await embed.create_footer(ctx)
         embed.add_field(name="Nom", value=Item.Name,inline=False)
@@ -166,7 +169,7 @@ Every information come from the website www.fr-minecraft.net"""
             await ctx.send(await self.translate(ctx.channel,"mc","no-entity"))
 
     @mc_main.command(name="command",aliases=["commande","cmd"])
-    async def mc_cmd(self,ctx,*,value='help'):
+    async def mc_cmd(self, ctx: MyContext, *, value='help'):
         """Get infos about any command"""
         if value=='help':
             await ctx.send(await self.translate(ctx.channel,"mc","cmd-help"))
@@ -198,7 +201,7 @@ Every information come from the website www.fr-minecraft.net"""
             await ctx.send(await self.translate(ctx.channel,"mc","no-cmd"))
     
     @mc_main.command(name="advancement",aliases=["advc","progrès"])
-    async def mc_advc(self,ctx,*,value='help'):
+    async def mc_advc(self, ctx: MyContext, *, value='help'):
         """Get infos about any advancement"""
         if value=='help':
             await ctx.send(await self.translate(ctx.channel,"mc","adv-help"))
@@ -211,7 +214,7 @@ Every information come from the website www.fr-minecraft.net"""
         title = "{} - {}".format((await self.translate(ctx.channel,"mc","names"))[4],Adv.Name)
         embed = self.bot.get_cog("EmbedCog").Embed(title=title, color=discord.Colour(int('16BD06',16)), url=Adv.Url, time=ctx.message.created_at, desc=await self.translate(ctx.channel,'mc','contact-mail'))
         await embed.create_footer(ctx)
-        if Adv.Image != None:
+        if Adv.Image is not None:
             embed.thumbnail(url=Adv.Image)
         l = (Adv.Name,Adv.ID,Adv.Type,Adv.Action,Adv.Parent,", ".join(Adv.Children),Adv.Version)   #("Nom","Identifiant","Type","Action","Parent","Enfants","Version d'ajout")
         for e,v in enumerate(await self.translate(ctx.channel,"mc","adv-fields")):
@@ -228,31 +231,31 @@ Every information come from the website www.fr-minecraft.net"""
 
 
     @mc_main.command(name="server")
-    async def mc_server(self,ctx,ip,port:int=None):
+    async def mc_server(self, ctx: MyContext, ip:str, port:int=None):
         """Get infos about any Minecraft server"""
-        if ":" in ip and port==None:
+        if ":" in ip and port is None:
             i = ip.split(":")
-            ip,port = i[0],i[1]
-        obj = await self.create_server_1(ctx.guild,ip,port)
+            ip, port = i[0], i[1]
+        obj = await self.create_server_1(ctx.guild, ip, port)
         await self.send_msg_server(obj,ctx.channel,(ip,port))
 
     @mc_main.command(name="add")
     @commands.guild_only()
-    async def mc_add_server(self,ctx,ip,port:int=None):
+    async def mc_add_server(self, ctx: MyContext, ip, port:int=None):
         """Follow a server's info (regularly displayed on this channel)"""
         if not ctx.bot.database_online:
             return await ctx.send(await self.translate(ctx.guild.id,"cases","no_database"))
-        if ":" in ip and port==None:
+        if ":" in ip and port is None:
             i = ip.split(":")
             ip,port = i[0],i[1]
-        elif port == None:
+        elif port is None:
             port = ''
         is_over, flow_limit = await self.bot.cogs['RssCog'].is_overflow(ctx.guild)
         if is_over:
             await ctx.send(str(await self.translate(ctx.guild.id,"rss","flow-limit")).format(flow_limit))
             return
         try:
-            if port == None:
+            if port is None:
                 display_ip = ip
             else:
                 display_ip = "{}:{}".format(ip,port)
@@ -263,8 +266,8 @@ Every information come from the website www.fr-minecraft.net"""
             await self.bot.cogs["ErrorsCog"].on_error(e,ctx)
 
 
-    async def create_server_1(self,guild,ip,port=None):
-        if port == None:
+    async def create_server_1(self, guild: discord.Guild, ip: str, port=None):
+        if port is None:
             url = "https://api.minetools.eu/ping/"+str(ip)
         else:
             url = "https://api.minetools.eu/ping/"+str(ip)+"/"+str(port)
@@ -275,7 +278,7 @@ Every information come from the website www.fr-minecraft.net"""
         # except requests.exceptions.ReadTimeout:
         #     return await self.create_server_2(guild,ip,port)
         except Exception:
-            return await self.create_server_2(guild,ip,port)
+            return await self.create_server_2(guild, ip, port)
             # self.bot.log.warn("[mc-server-1] Erreur sur l'url {} :".format(url))
             # await self.bot.cogs['ErrorsCog'].on_error(e,None)
             # return await self.translate(guild,"mc","serv-error")
@@ -287,18 +290,18 @@ Every information come from the website www.fr-minecraft.net"""
         try:
             for p in r['players']['sample']:
                 players.append(p['name'])
-                if len(players)>30:
+                if len(players) > 30:
                     break
         except:
             players = []
         if players==[]:
-            if r['players']['online']==0:
-                players = [str(await self.translate(guild,"keywords","none")).capitalize()]
+            if r['players']['online'] == 0:
+                players = [str(await self.translate(guild, "keywords", "none")).capitalize()]
             else:
                 players=['Non disponible']
-        IP = "{}:{}".format(ip,port) if port != None else str(ip)
-        if r["favicon"] != None:
-            img_url = "https://api.minetools.eu/favicon/"+str(ip) + str("/"+str(port) if port != None else '')
+        IP = "{}:{}".format(ip,port) if port is not None else str(ip)
+        if r["favicon"] is not None:
+            img_url = "https://api.minetools.eu/favicon/"+str(ip) + str("/"+str(port) if port is not None else '')
         else:
             img_url = None
         v = r['version']['name']
@@ -308,8 +311,8 @@ Every information come from the website www.fr-minecraft.net"""
         return await self.mcServer(IP,version=v,online_players=o,max_players=m,players=players,img=img_url,ping=l,desc=r['description'],api='api.minetools.eu').clear_desc()
 
 
-    async def create_server_2(self,guild,ip,port):
-        if port == None:
+    async def create_server_2(self, guild: discord.Guild, ip:str, port:str):
+        if port is None:
             url = "https://api.mcsrvstat.us/1/"+str(ip)
         else:
             url = "https://api.mcsrvstat.us/1/"+str(ip)+"/"+str(port)
@@ -340,7 +343,7 @@ Every information come from the website www.fr-minecraft.net"""
             version = r["software"]+" "+r['version']
         else:
             version = r['version']
-        IP = "{}:{}".format(ip,port) if port != None else str(ip)
+        IP = "{}:{}".format(ip,port) if port is not None else str(ip)
         desc = "\n".join(r['motd']['clean'])
         o = r['players']['online']
         m = r['players']['max']
@@ -368,9 +371,9 @@ Every information come from the website www.fr-minecraft.net"""
             self.desc = self.desc.replace("\n             ","\n")
             return self
 
-        async def create_msg(self,guild,translate):
+        async def create_msg(self, guild: discord.Guild, translate):
             if self.players==[]:
-                if self.online_players==0:
+                if self.online_players == 0:
                     p = ["Aucun"]
                 else:
                     p = ['Non disponible']
@@ -378,7 +381,7 @@ Every information come from the website www.fr-minecraft.net"""
                 p = self.players
             embed = discord.Embed(title=str(await translate(guild,"mc","serv-title")).format(self.ip), color=discord.Colour(0x417505), timestamp=datetime.datetime.utcfromtimestamp(time.time()))
             embed.set_footer(text="From {}".format(self.api))
-            if self.image != None:
+            if self.image is not None:
                 embed.set_thumbnail(url=self.image)
             embed.add_field(name="Version", value=self.version)
             embed.add_field(name=await translate(guild,"mc","serv-0"), value="{}/{}".format(self.online_players,self.max_players))
@@ -386,12 +389,12 @@ Every information come from the website www.fr-minecraft.net"""
                 embed.add_field(name=await translate(guild,"mc","serv-1"), value=", ".join(p[:20]))
             else:
                 embed.add_field(name=await translate(guild,"mc","serv-2"), value=", ".join(p))
-            if self.ping != None:
+            if self.ping is not None:
                 embed.add_field(name=await translate(guild,"mc","serv-3"), value=str(self.ping)+" ms")
             embed.add_field(name="Description", value=self.desc,inline=False)
             return embed
 
-    async def send_msg_server(self,obj,channel,ip):
+    async def send_msg_server(self, obj, channel: discord.abc.Messageable, ip: str):
         guild = None if isinstance(channel,discord.DMChannel) else channel.guild
         e = await self.form_msg_server(obj,guild,ip)
         if isinstance(channel,discord.DMChannel) or channel.permissions_for(channel.guild.me).embed_links:
@@ -404,9 +407,9 @@ Every information come from the website www.fr-minecraft.net"""
             msg = None
         return msg
 
-    async def form_msg_server(self,obj,guild,ip):
+    async def form_msg_server(self, obj, guild: discord.Guild, ip: str):
         if type(obj) == str:
-            if ip[1] == None:
+            if ip[1] is None:
                 ip = ip[0]
             else:
                 ip = ip[0]+":"+ip[1]
@@ -414,8 +417,8 @@ Every information come from the website www.fr-minecraft.net"""
         else:
             return await obj.create_msg(guild,self.translate)
 
-    async def find_msg(self,channel:discord.TextChannel,ip:list,ID:str):
-        if channel == None:
+    async def find_msg(self, channel:discord.TextChannel, ip:list, ID:str):
+        if channel is None:
             return None
         if ID.isnumeric():
             try:
@@ -424,12 +427,12 @@ Every information come from the website www.fr-minecraft.net"""
                 pass
         return None
 
-    async def check_flow(self,flow):
+    async def check_flow(self, flow: dict):
         i = flow["link"].split(':')
         if i[1] == '':
             i[1] = None
         guild = self.bot.get_guild(flow['guild'])
-        if guild==None:
+        if guild is None:
             return
         if flow['link'] in self.flows.keys():
             obj = self.flows[flow['link']]
@@ -442,12 +445,12 @@ Every information come from the website www.fr-minecraft.net"""
             self.flows[flow['link']] = obj
         try:
             channel = guild.get_channel(flow['channel'])
-            if channel == None:
+            if channel is None:
                 return
             msg = await self.find_msg(channel,i,flow['structure'])
-            if msg == None:
+            if msg is None:
                 msg = await self.send_msg_server(obj,channel,i)
-                if msg!=None:
+                if msg is not None:
                     await self.bot.cogs['RssCog'].update_flow(flow['ID'],[('structure',str(msg.id)),('date',datetime.datetime.utcnow())])
                 return
             e = await self.form_msg_server(obj,guild,i)

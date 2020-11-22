@@ -1,10 +1,12 @@
-import discord, typing
+import discord
+import typing
 from discord.ext import commands
+from classes import zbot, MyContext
 
 class PermsCog(commands.Cog):
     """Cog with a single command, allowing you to see the permissions of a member or a role in a channel."""
 
-    def __init__(self,bot):
+    def __init__(self, bot: zbot):
         self.bot = bot
         self.file = "perms"
         chan_perms = [key for key,value in discord.Permissions().all_channel() if value]
@@ -23,34 +25,35 @@ class PermsCog(commands.Cog):
 
     @commands.command(name='perms', aliases=['permissions'])
     @commands.guild_only()
-    async def check_permissions(self, ctx, channel:typing.Optional[typing.Union[discord.TextChannel,discord.VoiceChannel]]=None, *, target:typing.Union[discord.Member,discord.Role]=None):
+    async def check_permissions(self, ctx: MyContext, channel:typing.Optional[typing.Union[discord.TextChannel,discord.VoiceChannel]]=None, *, target:typing.Union[discord.Member,discord.Role]=None):
         """Permissions assigned to a member/role (the user by default)
         The channel used to view permissions is the channel in which the command is entered.
         
         ..Doc infos.html#permissions"""
-        if target==None:
+        if target is None:
             target = ctx.author
-        if isinstance(target,discord.Member):
-            if channel==None:
+        if isinstance(target, discord.Member):
+            if channel is None:
                 perms = target.guild_permissions
             else:
                 perms = channel.permissions_for(target)
             col = target.color
             avatar = await self.bot.user_avatar_as(target,size=256)
             name = str(target)
-        elif isinstance(target,discord.Role):
+        elif isinstance(target, discord.Role):
             perms = target.permissions
-            if channel != None:
-                perms.update(**{x[0]:x[1] for x in channel.overwrites_for(ctx.guild.default_role) if x[1]!=None})
-                perms.update(**{x[0]:x[1] for x in channel.overwrites_for(target) if x[1]!=None})
+            if channel is not None:
+                perms.update(**{x[0]:x[1] for x in channel.overwrites_for(ctx.guild.default_role) if x[1] is not None})
+                perms.update(**{x[0]:x[1] for x in channel.overwrites_for(target) if x[1] is not None})
             col = target.color
             avatar = ctx.guild.icon_url_as(format='png',size=256)
             name = str(target)
+        else:
+            return
         permsl = list()
         # Get the perms translations
         perms_translations = await self.translate(ctx.guild.id,'perms','perms-list')
 
-        # if perms[""]
         if perms.administrator:
             # If the user is admin, we just say it
             if "administrator" in perms_translations.keys():
@@ -72,10 +75,10 @@ class PermsCog(commands.Cog):
                     permsl.append(self.bot.cogs['EmojiCog'].customEmojis['green_check']+perm)
                 else:
                     permsl.append(self.bot.cogs['EmojiCog'].customEmojis['red_cross']+perm)
-        if ctx.channel.permissions_for(ctx.guild.me).embed_links:
+        if ctx.can_send_embed:
             # \uFEFF is a Zero-Width Space, which basically allows us to have an empty field name.
             # And to make it look nice, we wrap it in an Embed.
-            if len(permsl)>10:
+            if len(permsl) > 10:
                 sep = int(len(permsl)/2)
                 if len(permsl)%2 == 1:
                     sep+=1
@@ -84,7 +87,7 @@ class PermsCog(commands.Cog):
                 fields = [f1,f2]
             else:
                 fields = [{'name':'\uFEFF','value':"\n".join(permsl),'inline':True}]
-            if channel==None:
+            if channel is None:
                 desc = await self.translate(ctx.guild.id,'perms','general')
             else:
                 desc = channel.mention

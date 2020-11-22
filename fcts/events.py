@@ -1,11 +1,22 @@
-import discord, datetime, asyncio, logging, time, aiohttp, json, random, shutil, mysql, psutil, re
+import discord
+import datetime
+import asyncio
+import time
+import aiohttp
+import json
+import random
+import shutil
+import mysql
+import psutil
+import re
 from discord.ext import commands, tasks
 from fcts.checks import is_fun_enabled
+from classes import zbot
 
 class Events(commands.Cog):
     """Cog for the management of major events that do not belong elsewhere. Like when a new server invites the bot."""
 
-    def __init__(self,bot):
+    def __init__(self, bot: zbot):
         self.bot = bot
         try:
             self.translate = self.bot.cogs["LangCog"].tr
@@ -54,11 +65,11 @@ class Events(commands.Cog):
 
 
     @commands.Cog.listener()
-    async def on_member_update(self,before:discord.Member,after:discord.Member):
+    async def on_member_update(self, before: discord.Member, after: discord.Member):
         """Called when a member change something (status, activity, nickame, roles)"""
         if before.nick != after.nick:
             config_option = await self.bot.cogs['UtilitiesCog'].get_db_userinfo(['allow_usernames_logs'],["userID="+str(before.id)])
-            if config_option != None and config_option['allow_usernames_logs']==False:
+            if config_option is not None and config_option['allow_usernames_logs']==False:
                 return
             await self.updade_memberslogs_name(before, after)
 
@@ -88,27 +99,27 @@ class Events(commands.Cog):
         cursor.close()
 
     @commands.Cog.listener()
-    async def on_user_update(self,before:discord.User,after:discord.User):
+    async def on_user_update(self, before: discord.User, after: discord.User):
         """Called when a user change something (avatar, username, discrim)"""
         if before.name != after.name:
             config_option = await self.bot.cogs['UtilitiesCog'].get_db_userinfo(['allow_usernames_logs'],["userID="+str(before.id)])
-            if config_option != None and config_option['allow_usernames_logs']==False:
+            if config_option is not None and config_option['allow_usernames_logs']==False:
                 return
             # query = ("INSERT INTO `usernames_logs` (`ID`,`user`,`old`,`new`,`guild`,`beta`) VALUES ('{}','{}','{}','{}','{}',{})".format(ID,before.id,before.name.replace("'","\\'"),after.name.replace("'","\\'"),0,self.bot.beta))
             await self.updade_memberslogs_name(before, after)
 
 
     @commands.Cog.listener()
-    async def on_guild_join(self, guild:discord.Guild):
+    async def on_guild_join(self, guild: discord.Guild):
         """Called when the bot joins a guild"""
         await self.send_guild_log(guild,"join")
 
     @commands.Cog.listener()
-    async def on_guild_remove(self, guild:discord.Guild):
+    async def on_guild_remove(self, guild: discord.Guild):
         """Called when the bot left a guild"""
         await self.send_guild_log(guild,"left")
 
-    async def send_guild_log(self, guild:discord.Guild, Type:str):
+    async def send_guild_log(self, guild: discord.Guild, Type: str):
         """Send a log to the logging channel when the bot joins/leave a guild"""
         try:
             if Type == "join":
@@ -126,7 +137,7 @@ class Events(commands.Cog):
 
 
     @commands.Cog.listener()
-    async def on_message(self, msg:discord.Message):
+    async def on_message(self, msg: discord.Message):
         """Called for each new message because it's cool"""
         if msg.guild is None:
             await self.send_mp(msg)
@@ -140,58 +151,58 @@ class Events(commands.Cog):
             await self.bot.cogs['FunCog'].check_afk(msg)
         if msg.author != self.bot.user:
             await self.bot.cogs['InfoCog'].emoji_analysis(msg)
-        if "send nudes" in msg.content.lower() and len(msg.content)<13 and random.random()>0.0:
+        if "send nudes" in msg.content.lower() and len(msg.content)<13 and random.random() > 0.0:
             try:
                 nudes_reacts = [':eyes:',':innocent:',':rolling_eyes:',':confused:',':smirk:']
-                if msg.guild==None or msg.channel.permissions_for(msg.guild.me).external_emojis:
+                if msg.guild is None or msg.channel.permissions_for(msg.guild.me).external_emojis:
                     nudes_reacts += ['<:whut:485924115199426600>','<:thinksmart:513105826530197514>','<:excusemewhat:418154673523130398>','<:blobthinking:499661417012527104>','<a:ano_U:568494122856611850>','<:catsmirk:523929843331498015>','<a:ablobno:537680872820965377>']
                 await msg.channel.send(random.choice(nudes_reacts))
             except:
                 pass
         # Halloween event
-        elif ("booh" in msg.content.lower() or "halloween" in msg.content.lower() or "witch" in msg.content.lower()) and random.random()<0.05 and self.bot.current_event=="halloween":
+        elif ("booh" in msg.content.lower() or "halloween" in msg.content.lower() or "witch" in msg.content.lower()) and random.random() < 0.05 and self.bot.current_event=="halloween":
             try:
                 react = random.choice(['🦇','🎃','🕷️']*2+['👀'])
                 await msg.add_reaction(react)
             except:
                 pass
         # April Fool event
-        elif random.random()<0.1 and self.bot.current_event=="fish" and is_fun_enabled(msg, self.bot.get_cog("FunCog")):
+        elif random.random() < 0.1 and self.bot.current_event=="fish" and is_fun_enabled(msg, self.bot.get_cog("FunCog")):
             try:
                 react = random.choice(['🐟','🎣', '🐠', '🐡']*4+['👀'])
                 await msg.add_reaction(react)
             except:
                 pass
             pass
-        if msg.author.bot==False and await self.bot.cogs['AdminCog'].check_if_admin(msg.author) == False and msg.guild!=None:
+        if msg.author.bot==False and await self.bot.cogs['AdminCog'].check_if_admin(msg.author) == False and msg.guild is not None:
             cond = True
             if self.bot.database_online:
                 cond = str(await self.bot.cogs["ServerCog"].find_staff(msg.guild,"anti_caps_lock")) in ['1','True']
             if cond:
-                if len(msg.content)>0 and sum(1 for c in msg.content if c.isupper())/len(msg.content.replace('|','')) > 0.75 and len(msg.content.replace('|',''))>7 and not msg.channel.permissions_for(msg.author).administrator:
+                if len(msg.content) > 0 and sum(1 for c in msg.content if c.isupper())/len(msg.content.replace('|','')) > 0.75 and len(msg.content.replace('|',''))>7 and not msg.channel.permissions_for(msg.author).administrator:
                     try:
                         await msg.channel.send(str(await self.bot.cogs["LangCog"].tr(msg.guild,"modo","caps-lock")).format(msg.author.mention),delete_after=4.0)
                     except:
                         pass
 
 
-    async def send_mp(self,msg):
+    async def send_mp(self, msg: discord.Message):
         await self.check_mp_adv(msg)
         if msg.channel.recipient.id in [392766377078816789,279568324260528128,552273019020771358,281404141841022976]:
             return
         channel = self.bot.get_channel(625320165621497886)
-        if channel==None:
+        if channel is None:
             return self.bot.log.warn("[send_mp] Salon de MP introuvable")
-        emb = msg.embeds[0] if len(msg.embeds)>0 else None
+        emb = msg.embeds[0] if len(msg.embeds) > 0 else None
         arrow = ":inbox_tray:" if msg.author == msg.channel.recipient else ":outbox_tray:"
         text = "{} **{}** ({} - {})\n{}".format(arrow, msg.channel.recipient, msg.channel.recipient.id, await self.bot.cogs["TimeCog"].date(msg.created_at,digital=True), msg.content)
-        if len(msg.attachments)>0:
+        if len(msg.attachments) > 0:
             text += "".join(["\n{}".format(x.url) for x in msg.attachments])
         await channel.send(text,embed=emb)
 
-    async def check_mp_adv(self,msg):
+    async def check_mp_adv(self, msg: discord.Message):
         """Teste s'il s'agit d'une pub MP"""
-        if msg.author.id==self.bot.user.id or 'discord.gg/' not in msg.content:
+        if msg.author.id == self.bot.user.id or 'discord.gg/' not in msg.content:
             return
         try:
             _ = await self.bot.fetch_invite(msg.content)
@@ -202,7 +213,7 @@ class Events(commands.Cog):
         await msg.channel.send(await self.translate(msg.channel,"events","mp-adv"))
 
 
-    async def send_logs_per_server(self,guild,Type,message,author=None):
+    async def send_logs_per_server(self, guild: discord.Guild, Type:str, message: str, author: discord.User=None):
         """Send a log in a server. Type is used to define the color of the embed"""
         if not self.bot.database_online:
             return
@@ -218,7 +229,7 @@ class Events(commands.Cog):
         if channel is None:
             return
         emb = self.bot.cogs["EmbedCog"].Embed(desc=message,color=c).update_timestamp()
-        if author != None:
+        if author is not None:
             emb.set_author(author)
         try:
             await channel.send(embed=emb.discord_embed())
@@ -227,43 +238,43 @@ class Events(commands.Cog):
 
 
 
-    async def add_points(self,points):
+    async def add_points(self, points: int):
         """Ajoute ou enlève un certain nombre de points au score
         La principale utilité de cette fonction est de pouvoir check le nombre de points à chaque changement"""
         self.points += points
-        if self.points<0:
+        if self.points < 0:
             self.points = 0
 
-    async def add_event(self,event):
+    async def add_event(self, event: str):
         if event == "kick":
             await self.add_points(-self.table['kick'])
         elif event == "ban":
             await self.add_points(-self.table['ban'])
 
 
-    async def check_user_left(self,member):
+    async def check_user_left(self, member: discord.Member):
         """Vérifie si un joueur a été banni ou kick par ZBot"""
         try:
-            async for entry in member.guild.audit_logs(user=member.guild.me,limit=15):
+            async for entry in member.guild.audit_logs(user=member.guild.me, limit=15):
                 if entry.created_at < datetime.datetime.utcnow()-datetime.timedelta(seconds=60):
                     break
-                if entry.action==discord.AuditLogAction.kick and entry.target==member:
+                if entry.action == discord.AuditLogAction.kick and entry.target == member:
                     await self.add_points(self.table['kick'])
                     break
-                elif entry.action==discord.AuditLogAction.ban and entry.target==member:
+                elif entry.action == discord.AuditLogAction.ban and entry.target == member:
                     await self.add_points(self.table['ban'])
                     break
         except discord.Forbidden:
             pass
         except Exception as e:
-            if member.guild.id!=264445053596991498:
-                self.bot.log.warn("[check_user_left] {} (user {}/server {})".format(e,member.id,member.guild.id))
+            if member.guild.id != 264445053596991498:
+                self.bot.log.warn("[check_user_left] {} (user {}/server {})".format(e, member.id, member.guild.id))
 
 
-    async def task_timer(self, task:dict):
+    async def task_timer(self, task: dict):
         if task["user"] is None:
             return True
-        if task["guild"] != None:
+        if task["guild"] is not None:
             guild = self.bot.get_guild(task['guild'])
             if guild is None:
                 return False
@@ -300,7 +311,7 @@ class Events(commands.Cog):
         return True
 
 
-    async def get_events_from_db(self,all=False,IDonly=False):
+    async def get_events_from_db(self, all: bool=False, IDonly: bool=False):
         """Renvoie une liste de tous les events qui doivent être exécutés"""
         try:
             cnx = self.bot.cnx_frm
@@ -317,7 +328,7 @@ class Events(commands.Cog):
                 else:
                     if IDonly or x['begin'].timestamp()+x['duration'] < time.time():
                         liste.append(x)
-            if len(liste)>0:
+            if len(liste) > 0:
                 return liste
             else:
                 return []
@@ -328,17 +339,17 @@ class Events(commands.Cog):
     async def check_tasks(self):
         await self.bot.wait_until_ready()
         tasks = await self.get_events_from_db()
-        if len(tasks)==0:
+        if len(tasks) == 0:
             return
         self.bot.log.debug("[tasks_loop] Itération ({} tâches trouvées)".format(len(tasks)))
         for task in tasks:
             if task['action']=='mute':
                 try:
                     guild = self.bot.get_guild(task['guild'])
-                    if guild==None:
+                    if guild is None:
                         continue
                     user = guild.get_member(task['user'])
-                    if user==None:
+                    if user is None:
                         continue
                     await self.bot.cogs['ModeratorCog'].unmute_event(guild,user,guild.me)
                     await self.remove_task(task['ID'])
@@ -348,7 +359,7 @@ class Events(commands.Cog):
             if task['action']=='ban':
                 try:
                     guild = self.bot.get_guild(task['guild'])
-                    if guild==None:
+                    if guild is None:
                         continue
                     try:
                         user = await self.bot.fetch_user(task['user'])
@@ -390,7 +401,7 @@ class Events(commands.Cog):
         cursor.close()
         return True
 
-    async def update_duration(self,ID,new_duration):
+    async def update_duration(self, ID: int, new_duration: int):
         """Modifie la durée d'une tâche"""
         cnx = self.bot.cnx_frm
         cursor = cnx.cursor()
@@ -400,7 +411,7 @@ class Events(commands.Cog):
         cursor.close()
         return True
 
-    async def remove_task(self,ID:int):
+    async def remove_task(self, ID:int):
         """Enlève une tâche exécutée"""
         cnx = self.bot.cnx_frm
         cursor = cnx.cursor()
@@ -484,7 +495,7 @@ class Events(commands.Cog):
             self.last_statusio = d
 
     async def rss_loop(self):
-        if self.bot.cogs['RssCog'].last_update==None or (datetime.datetime.now() - self.bot.cogs['RssCog'].last_update).total_seconds()  > 5*60:
+        if self.bot.cogs['RssCog'].last_update is None or (datetime.datetime.now() - self.bot.cogs['RssCog'].last_update).total_seconds()  > 5*60:
             self.bot.cogs['RssCog'].last_update = datetime.datetime.now()
             asyncio.run_coroutine_threadsafe(self.bot.cogs['RssCog'].main_loop(),asyncio.get_running_loop())
     
@@ -599,7 +610,7 @@ class Events(commands.Cog):
                 if not chan.isnumeric():
                     continue
                 chan = self.bot.get_channel(int(chan))
-                if chan==None:
+                if chan is None:
                     continue
                 count[0] += 1
                 count[1] += await self.bot.cogs['PartnersCog'].update_partners(chan,guild['partner_color'])

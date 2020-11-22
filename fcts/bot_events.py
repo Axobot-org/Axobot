@@ -2,11 +2,12 @@ import discord
 import datetime
 import json
 from discord.ext import commands
+from classes import zbot, MyContext
 
 
 class BotEventsCog(commands.Cog):
 
-    def __init__(self, bot):
+    def __init__(self, bot: zbot):
         self.bot = bot
         self.file = "bot_events"
         self.current_event = None
@@ -34,13 +35,13 @@ class BotEventsCog(commands.Cog):
                 break
 
     @commands.group(name="events", aliases=["botevents", "botevent", "event"])
-    async def events_main(self, ctx: commands.Context):
+    async def events_main(self, ctx: MyContext):
         """When I'm organizing some events"""
         if ctx.subcommand_passed is None:
             await self.bot.cogs['HelpCog'].help_command(ctx, ['events'])
 
     @events_main.command(name="info")
-    async def event_info(self, ctx: commands.Context):
+    async def event_info(self, ctx: MyContext):
         """Get info about the current event"""
         events_desc = await self.translate(ctx.channel, "bot_events", "events-desc")
         current_event = str(self.bot.current_event) + "-" + \
@@ -56,7 +57,7 @@ class BotEventsCog(commands.Cog):
             lang = await self.translate(ctx.channel, "current_lang", "current")
             begin = await nice_date(self.current_event_data["begin"], lang, year=True, digital=True, hour=False)
             end = await nice_date(self.current_event_data["end"], lang, year=True, digital=True, hour=False)
-            if ctx.guild is None or ctx.channel.permissions_for(ctx.guild.me).embed_links:
+            if ctx.can_send_embed:
                 fields = [
                     {"name": (await self.translate(ctx.channel, "keywords", "beginning")).capitalize(),
                      "value": begin,
@@ -86,7 +87,7 @@ class BotEventsCog(commands.Cog):
             await ctx.send(events_desc["nothing"])
 
     @events_main.command(name="rank")
-    async def events_rank(self, ctx: commands.Context, user: discord.User = None):
+    async def events_rank(self, ctx: MyContext, user: discord.User = None):
         """Watch how many xp you already have
         Events points are reset after each event"""
         current_event = str(self.bot.current_event) + "-" + \
@@ -125,7 +126,7 @@ class BotEventsCog(commands.Cog):
         rank_total = await self.translate(ctx.channel, "bot_events", "rank-total")
         rank_global = await self.translate(ctx.channel, "bot_events", "rank-global")
 
-        if ctx.guild is None or ctx.channel.permissions_for(ctx.guild.me).embed_links:
+        if ctx.can_send_embed:
             fields = list()
             if objectives_title != "":
                 fields.append({"name": objectives_title, "value": prices})

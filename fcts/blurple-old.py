@@ -2,15 +2,12 @@ from discord.ext import commands
 
 import discord
 from discord.ext.commands.cooldowns import BucketType
-import asyncio
 from PIL import Image, ImageEnhance, ImageSequence
 import PIL
 from io import BytesIO
 import io
 import datetime
 import aiohttp
-import copy
-import sys
 import time
 from resizeimage import resizeimage
 import math
@@ -39,13 +36,13 @@ class BlurpleCog(commands.Cog):
     async def blurple_cmd(self,ctx, url = None):
         """Be part of the best birthday of the WORLD, and check if you're enough blurple to be cool!
         You can either give a user or an image URL in argument, or attach an image to your message. Plz don't forget to be cool."""
-        if not (ctx.guild==None or ctx.channel.permissions_for(ctx.guild.me).attach_files):
+        if not (ctx.guild is None or ctx.channel.permissions_for(ctx.guild.me).attach_files):
             return await ctx.send(await self.translate(ctx.channel,"blurple","missing-attachment-perm"))
 
         picture = None
         start = time.time()
         
-        if url != None:
+        if url is not None:
             try:
                 user = await commands.UserConverter().convert(ctx,url)
                 picture = str(user.avatar_url)
@@ -180,7 +177,7 @@ class BlurpleCog(commands.Cog):
             if not await ctx.bot.cogs['UtilitiesCog'].has_blurple_card(ctx.author) and 6<date.day<20 and date.month==5:
                 pr = await self.bot.get_prefix(ctx.message)
                 em = ':tada:'
-                if ctx.guild!=None and ctx.channel.permissions_for(ctx.guild.me).external_emojis:
+                if ctx.guild is not None and ctx.channel.permissions_for(ctx.guild.me).external_emojis:
                     em = '<:blurpletada:575696286905401345>'
                 await ctx.bot.cogs['UtilitiesCog'].change_db_userinfo(ctx.author.id,'unlocked_blurple',True)
                 await ctx.send(str(await self.translate(ctx.channel,'blurple','won-card')).format(ctx.author.mention,pr[-1],em))
@@ -196,7 +193,7 @@ class BlurpleCog(commands.Cog):
     async def create(self,ctx,url):
         picture = None
 
-        if url != None:
+        if url is not None:
             try:
                 user = await commands.UserConverter().convert(ctx,url)
                 picture = str(user.avatar_url)
