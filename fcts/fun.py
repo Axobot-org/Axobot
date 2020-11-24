@@ -329,8 +329,11 @@ You can specify a verification limit by adding a number in argument (up to 1.000
                 text1 = []
         if text1 != []:
             await ctx.channel.send(''.join(text1))
-        if ctx.bot.database_online and await self.bot.cogs["ServerCog"].staff_finder(ctx.author,'say'):
-            await self.bot.cogs["UtilitiesCog"].suppr(ctx.message)
+        try:
+            if ctx.bot.database_online and await self.bot.cogs["ServerCog"].staff_finder(ctx.author,'say'):
+                await self.bot.cogs["UtilitiesCog"].suppr(ctx.message)
+        except commands.CommandError: # user can't use 'say'
+            pass
         self.bot.log.debug("{} used bigtext to say {}".format(ctx.author.id,text))
     
     @commands.command(name="shrug",hidden=True)
