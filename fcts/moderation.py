@@ -742,7 +742,7 @@ You must be an administrator of this server to use this command.
                 await ctx.send(await self.translate(ctx.guild.id,"modo","ban-list-error"))
 
 
-    @commands.group(name="emoji",aliases=['emojis'])
+    @commands.group(name="emoji",aliases=['emojis', 'emote'])
     @commands.guild_only()
     @commands.cooldown(5,20, commands.BucketType.guild)
     async def emoji_group(self, ctx: MyContext):
