@@ -86,6 +86,11 @@ class VoiceChannels(commands.Cog):
             return
         config = list(map(int, config.split(';')))
         if after.channel is not None and after.channel.id in config:
+            if before.channel is not None: # move from another channel which is now empty
+                if (member.guild.id in self.channels.keys()) and (before.channel.id in self.channels[member.guild.id]):
+                    # if they come from an automated channel, we move them back if the channel is now empty
+                    await member.move_to(before.channel)
+                    return
             await self.create_channel(member)
         if (before.channel is not None) and (member.guild.id in self.channels.keys()) and (before.channel.id in self.channels[member.guild.id]):
             await self.delete_channel(before.channel)
