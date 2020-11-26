@@ -64,6 +64,7 @@ def main():
                       'fcts.translators',
                       'fcts.users',
                       'fcts.utilities',
+                      'fcts.voices',
                       'fcts.xp',
                       'fcts.halloween'
     ]
@@ -97,6 +98,7 @@ def main():
         client.others['discordextremelist'] = cryptage.uncrypte(r[15])
         client.others['statuspage'] = cryptage.uncrypte(r[16])
         client.others['nasa'] = cryptage.uncrypte(r[17])
+        client.others['random_api_token'] = cryptage.uncrypte(r[18])
     try:
         try:
             cnx = mysql.connector.connect(user=client.database_keys['user'],password=client.database_keys['password'],host="127.0.0.1",database=client.database_keys['database1'])
