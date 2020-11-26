@@ -8,11 +8,12 @@ import discord
 from discord.ext import commands
 from math import ceil
 
-roles_options = ["clear","slowmode","mute","kick","ban","warn","say","welcome_roles","muted_role",'partner_role','update_mentions','verification_role']
+roles_options = ["clear","slowmode","mute","kick","ban","warn","say","welcome_roles","muted_role",'partner_role','update_mentions','verification_role','voice_roles']
 bool_options = ["enable_xp","anti_caps_lock","enable_fun","help_in_dm"]
 textchan_options = ["welcome_channel","bot_news","poll_channels","modlogs_channel","noxp_channels","partner_channel"]
-vocchan_options = ["membercounter"]
-text_options = ["welcome","leave","levelup_msg","description"]
+vocchan_options = ["membercounter","voice_channel"]
+category_options = ["voice_category"]
+text_options = ["welcome","leave","levelup_msg","description","voice_channel_format"]
 prefix_options = ['prefix']
 emoji_option = ['vote_emojis', 'morpion_emojis']
 numb_options = []
@@ -77,8 +78,12 @@ class ServerCog(commands.Cog):
                "partner_color":10949630,
                'partner_role':'',
                'update_mentions':'',
-               'verification_role':''}
-        self.optionsList = ["prefix","language","description","clear","slowmode","mute","kick","ban","warn","say","welcome_channel","welcome","leave","welcome_roles","bot_news","update_mentions","poll_channels","partner_channel","partner_color","partner_role","modlogs_channel","verification_role","enable_xp","levelup_msg","levelup_channel","noxp_channels","xp_rate","xp_type","anti_caps_lock","enable_fun","membercounter","anti_raid","vote_emojis","morpion_emojis","help_in_dm","muted_role"]
+               'verification_role':'',
+               'voice_roles':'',
+               'voice_channel':'',
+               'voice_category':'',
+               'voice_channel_format':'{random}'}
+        self.optionsList = ["prefix","language","description","clear","slowmode","mute","kick","ban","warn","say","welcome_channel","welcome","leave","welcome_roles","bot_news","update_mentions","poll_channels","partner_channel","partner_color","partner_role","modlogs_channel","verification_role","enable_xp","levelup_msg","levelup_channel","noxp_channels","xp_rate","xp_type","anti_caps_lock","enable_fun","membercounter","anti_raid","vote_emojis","morpion_emojis","help_in_dm","muted_role","voice_roles","voice_channel","voice_category","voice_channel_format"]
         self.membercounter_pending = {}
 
     @commands.Cog.listener()
@@ -163,6 +168,8 @@ class ServerCog(commands.Cog):
         l = await self.get_server([name],criters=["ID="+str(ID)],Type=list)
         if l == []:
             return None
+        elif l[0][0] == '':
+            return self.default_opt[name]
         else:
             return l[0][0]
         
@@ -182,10 +189,15 @@ class ServerCog(commands.Cog):
         cursor.execute(query)
         liste = list()
         for x in cursor:
+            if isinstance(x, dict):
+                for k, v in x.items():
+                    if v == '':
+                        x[k] = self.default_opt[k]
             liste.append(x)
         return liste    
 
     async def modify_server(self, ID: int, values=[()]):
+        """Update a server config in the database"""
         if type(values)!=list:
             raise ValueError
         v = list()
@@ -304,33 +316,35 @@ class ServerCog(commands.Cog):
             return
         try:
             if option in roles_options:
-                await self.conf_roles(ctx,option,value)
+                await self.conf_roles(ctx, option, value)
             elif option in bool_options:
-                await self.conf_bool(ctx,option,value)
+                await self.conf_bool(ctx, option, value)
             elif option in textchan_options:
-                await self.conf_textchan(ctx,option,value)
+                await self.conf_textchan(ctx, option, value)
+            elif option in category_options:
+                await self.conf_category(ctx, option, value)
             elif option in text_options:
-                await self.conf_text(ctx,option,value)
+                await self.conf_text(ctx, option, value)
             elif option in numb_options:
-                await self.conf_numb(ctx,option,value)
+                await self.conf_numb(ctx, option, value)
             elif option in vocchan_options:
-                await self.conf_vocal(ctx,option,value)
+                await self.conf_vocal(ctx, option, value)
             elif option == "language":
-                await self.conf_lang(ctx,option,value)
+                await self.conf_lang(ctx, option, value)
             elif option in prefix_options:
-                await self.conf_prefix(ctx,option,value)
+                await self.conf_prefix(ctx, option, value)
             elif option in raid_options:
-                await self.conf_raid(ctx,option,value)
+                await self.conf_raid(ctx, option, value)
             elif option in emoji_option:
-                await self.conf_emoji(ctx,option,value)
+                await self.conf_emoji(ctx, option, value)
             elif option in xp_type_options:
-                await self.conf_xp_type(ctx,option,value)
+                await self.conf_xp_type(ctx, option, value)
             elif option in color_options:
-                await self.conf_color(ctx,option,value)
+                await self.conf_color(ctx, option, value)
             elif option in xp_rate_option:
-                await self.conf_xp_rate(ctx,option,value)
+                await self.conf_xp_rate(ctx, option, value)
             elif option in levelup_channel_option:
-                await self.conf_levelup_chan(ctx,option,value)
+                await self.conf_levelup_chan(ctx, option, value)
             else:
                 await ctx.send(await self.translate(ctx.guild.id,"server","change-0"))
                 return
@@ -499,6 +513,48 @@ class ServerCog(commands.Cog):
                 g_chans.append("#"+g_chan.name)
             else:
                 g_chans.append(g_chan.mention)
+        return g_chans
+    
+    async def conf_category(self, ctx: MyContext, option: str, value: str):
+        guild = await self.get_guild(ctx)
+        ext = not isinstance(ctx, commands.Context)
+        if value == "scret-desc":
+            chans = await self.find_staff(guild.id,option)
+            return await self.form_category(guild, chans, ext)
+        else:
+            chans = value.split(",")
+            liste = list()
+            liste2 = list()
+            for chan in chans:
+                chan = chan.strip()
+                if len(chan) == 0:
+                    continue
+                try:
+                    c = await commands.CategoryChannelConverter().convert(ctx, chan)
+                except commands.errors.BadArgument:
+                    msg = await self.translate(guild.id,"server","change-12")
+                    await ctx.send(msg.format(chan))
+                    return
+                if str(c.id) in liste:
+                    continue
+                liste.append(str(c.id))
+                liste2.append(c.name)
+            await self.modify_server(guild.id, values=[(option, ";".join(liste))])
+            msg = await self.translate(guild.id, "server", "change-category")
+            await ctx.send(msg.format(option, ", ".join(liste2)))
+            await self.send_embed(guild, option, value)
+    
+    async def form_category(self, guild: discord.Guild, chans: str, ext=False):
+        if len(chans) == 0:
+            return "Ø"
+        chans = chans.split(";")
+        g_chans = list()
+        for r in chans:
+            g_chan = guild.get_channel(int(r))
+            if g_chan is None:
+                g_chans.append("<unfindable channel>")
+            else:
+                g_chans.append(g_chan.name)
         return g_chans
 
     async def conf_emoji(self, ctx: MyContext, option: str, value: str):
@@ -871,6 +927,9 @@ class ServerCog(commands.Cog):
                 elif i in textchan_options:
                     r = await self.form_textchan(guild,v,diff)
                     r = ", ".join(r)
+                elif i in category_options:
+                    r = await self.form_category(guild, v, diff)
+                    r = ', '.join(r)
                 elif i in text_options:
                     #r = await self.form_text(v)
                     r = v if len(v)<500 else v[:500]+"..."
@@ -912,6 +971,9 @@ class ServerCog(commands.Cog):
             elif option in textchan_options:
                 r = await self.conf_textchan(ctx, option, 'scret-desc')
                 r = ", ".join(r)
+            elif option in category_options:
+                r = await self.conf_category(ctx, option, 'scret-desc')
+                r = ', '.join(r)
             elif option in text_options:
                 r = await self.conf_text(ctx, option, 'scret-desc')
             elif option in numb_options:
