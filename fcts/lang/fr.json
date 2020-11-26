@@ -887,6 +887,7 @@
         "change-1": "Oups, une erreur interne est survenue...",
         "change-10": "Ce système d'xp n'existe pas. Voici la liste des systèmes disponibles : {}",
         "change-11": "Cette couleur est invalide",
+        "change-12": "La catégorie {} n'a pas été trouvée",
         "change-2": "La valeur de l'option '{}' a bien été effacée",
         "change-3": "Le rôle '{}' n'a pas été trouvé :confused: (Vérifiez les majuscules et les caractères spéciaux)",
         "change-4": "L'option '{}' attend un paramètre de type booléen (True/False) en valeur :innocent:",
@@ -897,6 +898,7 @@
         "change-9": "L'émoji `{}` n'a pas été trouvé",
         "change-autoremove_xp": "Le bot enlèvera {xp} points d'xp par jour aux membres inactifs",
         "change-bool": "L'option '{}' a bien été modifiée avec la valeur *{}*",
+        "change-category": "L'option '{}' a bien été modifiée avec la catégorie {}",
         "change-color": "La couleur utilisée pour l'option {} est maintenant {}",
         "change-emojis": "Les émojis pour l'option '{}' sont maintenant {}",
         "change-lang": "La langue du bot est maintenant en `{}`",
@@ -955,6 +957,10 @@
         "slowmode": "Liste des rôles qui peuvent utiliser les commandes 'slowmode' et 'freeze' : {}",
         "update_mentions": "Rôles mentionnés lors d'une mise à jour du bot : {}",
         "verification_role": "Rôles enlevés lorsqu'un joueur s'authentifie avec la commande `verify` : {}",
+        "voice_roles": "Rôles donné aux membre en vocal : {}",
+        "voice_channel": "Salon à partir duquel seront créés les salons vocaux automatiques : {}",
+        "voice_category": "Catégorie dans laquelle seront créés les salons vocaux automatiques : {}",
+        "voice_channel_format": "Format des noms des salons vocaux automatiques : {}",
         "vote_emojis": "Emojis utilisés pour les réactions de vote : {}",
         "warn": "Liste des rôles pouvant utiliser les commandes 'warn' et 'case' : {}",
         "welcome": "Message envoyé lorsqu'un membre arrive : {}",
@@ -1073,6 +1079,10 @@
         "missing-attach-files": "Oups, il me manque la permission d'Attacher des Fichiers :confused:",
         "usernames_log_false": "Vous avez désactivé l'enregistrement de vos noms d'utilisateurs ainsi que de vos surnoms",
         "usernames_log_true": "Vous avez autorisé l'enregistrement de vos noms d'utilisateurs ainsi que de vos surnoms"
+    },
+    "voices": {
+        "no-channel": "Il n'y a aucun salon vocal généré dans ce serveur",
+        "deleted": "{i} salons supprimés"
     },
     "xp": {
         "1-no-xp": "Vous ne possédez pas encore d'xp !",

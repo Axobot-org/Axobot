@@ -876,6 +876,7 @@
         "change-1": "Oops, an internal error occurred...",
         "change-10": "This xp system doesn't exist. Here is the list of available systems: {}",
         "change-11": "This colour is invalid",
+        "change-12": "The category {} could not be found",
         "change-2": "The \"{}\" option value has been deleted",
         "change-3": "The role \"{}\" was not found :confused: (Check upper case and special characters)",
         "change-4": "The \"{}\" option expects a boolean (True/False) parameter in value :innocent:",
@@ -886,6 +887,7 @@
         "change-9": "The emoji `{}` was not found",
         "change-autoremove_xp": "The bot will remove {xp}xp/day from inactive members",
         "change-bool": "The \"{}\" option has been modified with the value *{}*",
+        "change-category": "The '{}' option has been modified with the {} category",
         "change-color": "The color used for the option {} is now {}",
         "change-emojis": "The emotions for the option \"{}\" are now {}",
         "change-lang": "The bot language is now in `{}`",
@@ -944,6 +946,10 @@
         "slowmode": "List of roles that can use \"slowmode\" and \"freeze\" commands: {}",
         "update_mentions": "Roles mentioned in the bot changelog: {}",
         "verification_role": "Roles removed when a user use the `verify` command: {}",
+        "voice_roles": "Roles given to members in a vocal channel: {}",
+        "voice_channel": "Channel from which automatic voice chat rooms will be created: {}",
+        "voice_category": "Category in which automatic voice chat rooms will be created: {}",
+        "voice_channel_format": "Format of automatic voice channel names: {}",
         "vote_emojis": "Emojis used for poll reactions: {}",
         "warn": "List of roles that can use commands \"warn\" and \"cases\": {}",
         "welcome": "Message sent when a member arrives: {}",
@@ -1062,6 +1068,10 @@
         "missing-attach-files": "Oops, I\"m missing the permission to Attach Files :confused:",
         "usernames_log_false": "You have disabled the recording of your user names and nicknames",
         "usernames_log_true": "You have authorized the recording of your user names and nicknames"
+    },
+    "voices": {
+        "no-channel": "There are no voice channel generated in this server",
+        "deleted": "{i} deleted channels"
     },
     "xp": {
         "1-no-xp": "You don't have any xp yet!",
