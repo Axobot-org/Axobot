@@ -73,6 +73,14 @@ class VoiceChannels(commands.Cog):
             await member.remove_roles(*roles, reason="Left the voice chat")
         else:
             await member.add_roles(*roles, reason="Joined a voice chat")
+    
+    @commands.Cog.listener()
+    async def on_guild_channel_delete(self, channel: discord.abc.GuildChannel):
+        """Deletes a voice channel in the database when deleted in Discord"""
+        if isinstance(channel, discord.VoiceChannel):
+            self.db_delete_channel(channel)
+        # other cases are not interesting
+        
 
     @commands.Cog.listener()
     async def on_voice_state_update(self, member: discord.Member, before: discord.VoiceState, after: discord.VoiceState):
