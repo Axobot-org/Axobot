@@ -4,7 +4,7 @@ import logging
 import sys
 import time
 import mysql
-from typing import Optional
+from typing import Any, Optional
 
 
 class MyContext(commands.Context):
@@ -162,6 +162,12 @@ class zbot(commands.bot.AutoShardedBot):
     async def get_prefix(self, msg: discord.Message):
         """Get a prefix from a message... what did you expect?"""
         return get_prefix(self, msg)
+    
+    async def get_config(self, guildID: int, option: str) -> Optional[str]:
+        cog = self.get_cog("ServerCog")
+        if cog:
+            return await cog.find_staff(guildID, option)
+        return None
 
 
 def setup_logger():
