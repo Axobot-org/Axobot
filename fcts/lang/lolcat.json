@@ -875,6 +875,7 @@
         "change-1": "Oops, an internal error occurrd...\nBut doan worry, we'r on teh place: http://asset-5.soupcdn.com/asset/3247/3576_5092_600.jpeg",
         "change-10": "Tihs xp system don't exist. Here is teh list ov availble systems: {}",
         "change-11": "This coulor is sadly invalid",
+        "change-12": "Dat {} category couldnt not be found",
         "change-2": "The '{}' opshun value haz been deleted",
         "change-3": "Teh role '{}' waz not findz :innocent: (Check upper caze and special characters)",
         "change-4": "Teh '{}' opshun expects a boolean (True/False) parameter in value :innocent:",
@@ -885,6 +886,7 @@
         "change-9": "Ups, da emoji `{}` wasnt findz",
         "change-autoremove_xp": "I'll remove {xp} points of xp per day for sleeping usr",
         "change-bool": "The '{}' opzion haz been modified wif the value *{}*",
+        "change-category": "ur '{}' option haz been changd with teh {} category",
         "change-color": "The coulor uzd for the option {} is naw {}",
         "change-emojis": "Teh emojiz 4 the opshun '{}' are naw {}",
         "change-lang": "Teh bot lang is naw in `{}`",
@@ -943,6 +945,10 @@
         "slowmode": "Llst of rolz that ca' use 'slowmode' and 'freeze' commmandz: {}",
         "update_mentions": "Roles pinged on teh bot changlog: {}",
         "verification_role": "Roles removd when smone use !verify itself: {}",
+        "voice_roles": "Roles gave to folks speaking together (or alone, I don't minde uwu): {}",
+        "voice_channel": "Chan from which i'll make voice chat rooms with cat magik: {}",
+        "voice_category": "Category in where auto voice chat rooms will be down: {}",
+        "voice_channel_format": "How ur voice channelz will look like: {}",
         "vote_emojis": "Emojiz use 4 powll reacts: {}",
         "warn": "Lizt of rawle thut can emploi commanDz 'warn' end 'cases' pliz: {}",
         "welcome": "Missge snt whem a mber arived :: {}",
@@ -1061,6 +1067,10 @@
         "missing-attach-files": "Oops, I'm missing the Attach Files perms :upside_down:",
         "usernames_log_false": "U've disallowd the recordering of Ur usr names & nics",
         "usernames_log_true": "You've enabld the things taht i do with ur usr names & nicks"
+    },
+    "voices": {
+        "no-channel": "Therz no voice channel that I did in ur server",
+        "deleted": "{i} deleted things :innocent:"
     },
     "xp": {
         "1-no-xp": "U don't have any xP yet!",
