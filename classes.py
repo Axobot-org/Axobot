@@ -4,7 +4,7 @@ import logging
 import sys
 import time
 import mysql
-from typing import Any, Optional
+from typing import Any, Callable, Optional, Coroutine
 
 
 class MyContext(commands.Context):
@@ -176,6 +176,15 @@ class zbot(commands.bot.AutoShardedBot):
         if cog:
             return await cog.find_staff(guildID, option)
         return None
+    
+    @property
+    def _(self) -> Callable[[Any, str, str], Coroutine[Any, Any, str]]:
+        """Translate something"""
+        cog = self.get_cog('LangCog')
+        if cog is None:
+            self.log.error("Unable to load Languages cog")
+            return lambda *args, **kwargs: args[1]
+        return cog.tr
 
 
 def setup_logger():
