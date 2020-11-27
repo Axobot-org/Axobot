@@ -375,6 +375,8 @@
             "Not-good use ov BetterDiscord (like, eww)"
         ],
         "docs": "Her'z teh link 2 the bot doc:",
+        "ping-found": "Pong! (avg ov {tps}ms that I send 2 {url})",
+        "ping-notfound": "UwU I cant ping that",
         "prefix": "List ov usable prefiXs:",
         "stats": "**Baut vershun:** {bot_v} \n**Nbr ov serverz:** {s_count} \n**Nbr ov visible memberz:** {m_count} ({b_count} **robots**)\n**Nbr ov code lin:** {l_count}\n**Uzd languages:** {lang}\n**Python vershun :** {p_v} \n**Vershun ov teh `discord.py` lyb:** {d_v} \n**Loadin on teh RAM:** {ram} GB \n**Loadin on the CPU:** {cpu} % \n**API latency timz:** {api} ms\n**Nbr of xp won:** {xp}",
         "stats-title": "**Boat statz**",

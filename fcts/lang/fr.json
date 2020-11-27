@@ -387,6 +387,8 @@
             "Utilisation prohibée de BetterDiscord"
         ],
         "docs": "Voici le lien vers la documentation du bot :",
+        "ping-found": "Pong ! (moyenne de {tps}ms par 64 bits, envoyés à {url})",
+        "ping-notfound": "Impossible de ping cette adresse",
         "prefix": "Liste des préfixes actuellement utilisables :",
         "stats": "**Version du bot :** {bot_v} \n**Nombre de serveurs :** {s_count} \n**Nombre de membres visibles :** {m_count} (dont {b_count} **bots**)\n**Nombre de lignes de code :** {l_count}\n**Langues utilisées :** {lang} \n**Version de Python :** {p_v} \n**Version de la bibliothèque `discord.py` :** {d_v} \n**Charge sur la mémoire vive :** {ram} GB \n**Charge sur le CPU :** {cpu} % \n**Temps de latence de l'api :** {api} ms\n**Nombre total d'xp gagné :** {xp}xp",
         "stats-title": "**Statistiques du bot**",
