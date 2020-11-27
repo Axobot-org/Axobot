@@ -46,6 +46,8 @@ class WelcomerCog(commands.Cog):
 
     async def send_msg(self, member:discord.Member, Type:str):
         """Envoie un message de bienvenue/départ dans le serveur"""
+        if self.bot.zombie_mode:
+            return
         msg = await self.bot.cogs['ServerCog'].find_staff(member.guild.id,Type)
         if await self.raid_check(member) or member.id in self.no_message:
             return
@@ -86,7 +88,7 @@ class WelcomerCog(commands.Cog):
                 return
             if role not in member.roles:
                 await member.add_roles(role,reason="This user support me")
-            
+
     async def check_support(self, member: discord.Member):
         """Vérifie si un nouvel arrivant fait partie du support"""
         if await self.bot.cogs['UtilitiesCog'].is_support(member):
@@ -179,24 +181,6 @@ class WelcomerCog(commands.Cog):
         except Exception as e:
             await self.bot.cogs["ErrorsCog"].on_error(e,None)
 
-
-    async def send_log(self, member: discord.Member, Type: str):
-        """Send a log to the logging channel"""
-        if member.id in self.no_message or member.id==self.bot.user.id:
-            return
-        if member.guild.id in self.bot.cogs['ReloadsCog'].ignored_guilds:
-            return
-        try:
-            t = "Bot" if member.bot else "Member"
-            if Type == "welcome":
-                desc = "{} {} ({}) joined {} ({})".format(t,member,member.id,member.guild.name,member.guild.id)
-            else:
-                desc = "{} {} ({}) left {} ({})".format(t,member,member.id,member.guild.name,member.guild.id)
-            emb = self.bot.cogs["EmbedCog"].Embed(desc=desc,color=16098851).update_timestamp().set_author(self.bot.user)
-            await self.bot.cogs["EmbedCog"].send([emb],url='members')
-            self.bot.log.info(desc)
-        except Exception as e:
-            await self.bot.cogs["ErrorsCog"].on_error(e,None)
 
 def setup(bot):
     bot.add_cog(WelcomerCog(bot))

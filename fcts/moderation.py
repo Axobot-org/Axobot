@@ -202,7 +202,7 @@ Slowmode works up to one message every 6h (21600s)
                 except commands.errors.CommandError:
                     pass
                 return False
-            if user==ctx.guild.me or (self.bot.database_online and await user_can_kick(user)):
+            if user == ctx.guild.me or (self.bot.database_online and await user_can_kick(user)):
                 return await ctx.send(await self.translate(ctx.guild.id,"modo","staff-kick"))
             elif not self.bot.database_online and ctx.channel.permissions_for(user).kick_members:
                 return await ctx.send(await self.translate(ctx.guild.id,"modo","staff-kick"))
@@ -656,7 +656,7 @@ Permissions for using this command are the same as for the kick
                 except commands.errors.CommandError:
                     pass
                 return False
-            if user==ctx.guild.me or (self.bot.database_online and await user_can_kick(user)):
+            if user == ctx.guild.me or (self.bot.database_online and await user_can_kick(user)):
                 return await ctx.send(await self.translate(ctx.guild.id,"modo","staff-kick"))
             elif not self.bot.database_online and ctx.channel.permissions_for(user).kick_members:
                 return await ctx.send(await self.translate(ctx.guild.id,"modo","staff-kick"))

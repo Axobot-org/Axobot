@@ -325,10 +325,10 @@ You can specify a verification limit by adding a number in argument (up to 1.000
             text1.append(line)
             caract = len("".join(text1))
             if caract > 1970:
-                await ctx.channel.send("".join(text1))
+                await ctx.send("".join(text1))
                 text1 = []
         if text1 != []:
-            await ctx.channel.send(''.join(text1))
+            await ctx.send(''.join(text1))
         try:
             if ctx.bot.database_online and await self.bot.cogs["ServerCog"].staff_finder(ctx.author,'say'):
                 await self.bot.cogs["UtilitiesCog"].suppr(ctx.message)
@@ -384,6 +384,8 @@ You can specify a verification limit by adding a number in argument (up to 1.000
         await self.say_function(ctx,channel,text)
     
     async def say_function(self,ctx:MyContext,channel:discord.TextChannel,text:str):
+        if self.bot.zombie_mode:
+            return
         try:
             text = await self.bot.cogs["UtilitiesCog"].clear_msg(text, ctx=ctx)
         except Exception as e:
@@ -567,6 +569,8 @@ You can specify a verification limit by adding a number in argument (up to 1.000
             return
         ctx = await self.bot.get_context(msg)
         if not await is_fun_enabled(ctx, self):
+            return
+        if self.bot.zombie_mode:
             return
         for member in msg.mentions:
             if await self.user_is_afk(member) and member!=msg.author:

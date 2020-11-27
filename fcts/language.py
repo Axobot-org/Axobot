@@ -103,6 +103,9 @@ class LangCog(discord.ext.commands.Cog):
             pass
 
     async def check_tr(self, channel: discord.TextChannel, lang: str, origin: str="fr"):
+        """Check translations from a language to another"""
+        if self.bot.zombie_mode:
+            return
         liste = list()
         if lang not in self.languages:
             await channel.send("La langue `{}` n'est pas disponible".format(lang))

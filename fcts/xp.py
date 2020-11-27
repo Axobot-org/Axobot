@@ -86,6 +86,8 @@ class XPCog(commands.Cog):
         if not ( await self.check_noxp(msg) and await self.bot.cogs['ServerCog'].find_staff(msg.guild.id,'enable_xp') ):
             return
         rate = await self.bot.cogs['ServerCog'].find_staff(msg.guild.id,'xp_rate')
+        if self.bot.zombie_mode:
+            return
         if used_xp_type == 0:
             await self.add_xp_0(msg,rate)
         elif used_xp_type==1:
@@ -198,6 +200,8 @@ class XPCog(commands.Cog):
 
     async def send_levelup(self, msg: discord.Message, lvl: int):
         """Envoie le message de levelup"""
+        if self.bot.zombie_mode:
+            return
         await self.bot.cogs["UtilitiesCog"].add_user_eventPoint(msg.author.id,round(lvl[0]/5))
         if msg.guild is None:
             return

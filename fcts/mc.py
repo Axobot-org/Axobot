@@ -422,6 +422,8 @@ Every information come from the website www.fr-minecraft.net"""
     async def send_msg_server(self, obj, channel: discord.abc.Messageable, ip: str):
         guild = None if isinstance(channel,discord.DMChannel) else channel.guild
         e = await self.form_msg_server(obj,guild,ip)
+        if self.bot.zombie_mode:
+            return
         if isinstance(channel,discord.DMChannel) or channel.permissions_for(channel.guild.me).embed_links:
             msg = await channel.send(embed=e)
         else:

@@ -139,6 +139,8 @@ class Events(commands.Cog):
     @commands.Cog.listener()
     async def on_message(self, msg: discord.Message):
         """Called for each new message because it's cool"""
+        if self.bot.zombie_mode:
+            return
         if msg.guild is None:
             await self.send_mp(msg)
         else:
@@ -202,6 +204,8 @@ class Events(commands.Cog):
 
     async def check_mp_adv(self, msg: discord.Message):
         """Teste s'il s'agit d'une pub MP"""
+        if self.bot.zombie_mode:
+            return
         if msg.author.id == self.bot.user.id or 'discord.gg/' not in msg.content:
             return
         try:
@@ -215,6 +219,8 @@ class Events(commands.Cog):
 
     async def send_logs_per_server(self, guild: discord.Guild, Type:str, message: str, author: discord.User=None):
         """Send a log in a server. Type is used to define the color of the embed"""
+        if self.bot.zombie_mode:
+            return
         if not self.bot.database_online:
             return
         c = self.embed_colors[Type.lower()]
@@ -271,7 +277,9 @@ class Events(commands.Cog):
                 self.bot.log.warn("[check_user_left] {} (user {}/server {})".format(e, member.id, member.guild.id))
 
 
-    async def task_timer(self, task: dict):
+    async def task_timer(self, task: dict) -> bool:
+        """Send a reminder
+        Returns True if the reminder has been sent"""
         if task["user"] is None:
             return True
         if task["guild"] is not None:
@@ -292,6 +300,8 @@ class Events(commands.Cog):
         if user is None:
             raise discord.errors.NotFound
         try:
+            if self.bot.zombie_mode:
+                return False
             f_duration = await self.bot.get_cog('TimeCog').time_delta(task['duration'],lang=await self.translate(channel,'current_lang','current'), form='developed', precision=0)
             t = (await self.translate(channel, "fun", "reminds-title")).capitalize()
             foot = await self.translate(channel, "fun", "reminds-date")

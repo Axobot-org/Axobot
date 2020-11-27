@@ -274,6 +274,8 @@ Opposite is the subcommand 'join'
 
     async def give_remove_role(self, user: discord.Member, role: discord.Role, guild: discord.Guild, channel: discord.TextChannel, give: bool = True, ignore_success: bool = False, ignore_failure: bool = False):
         """Add or remove a role to a user if possible"""
+        if self.bot.zombie_mode:
+            return
         role_name = role.name.replace('@', '@'+u"\u200B")
         if not ignore_failure:
             if role in user.roles and give:
