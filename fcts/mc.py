@@ -29,46 +29,71 @@ Every information come from the website www.fr-minecraft.net"""
     @commands.command(name="mojang", aliases=['mojang_status'])
     @commands.cooldown(5, 20, commands.BucketType.user)
     async def mojang_status(self, ctx: MyContext):
-        """Get Mojang server status
-    
-    Data comes from this guy <https://github.com/Darkflame72>, a big thanks to them!"""
+        """Get Mojang server status"""
         desc = await self.translate(ctx.channel,"mc","mojang_desc")
         async with aiohttp.ClientSession() as session:
-            # async with session.get('https://status.mojang.com/check') as r:
-            async with session.get('https://api.bowie-co.nz/api/v1/mojang/check') as r:
+            async with session.get('https://status.mojang.com/check') as r:
+            # async with session.get('https://api.bowie-co.nz/api/v1/mojang/check') as r:
                 data = await r.json()
         if ctx.can_send_embed:
             embed = discord.Embed(color=discord.Colour(0x699bf9), timestamp=ctx.message.created_at)
             embed.set_thumbnail(url="https://www.minecraft-france.fr/wp-content/uploads/2020/05/mojang-logo-2.gif")
-            embed.set_author(name="Mojang Studios - Services Status", url="https://api.bowie-co.nz/api/v1/mojang/check", icon_url="https://www.minecraft.net/content/dam/franchise/logos/Mojang-Studios-Logo-Redbox.png")
+            embed.set_author(name="Mojang Studios - Services Status", url="https://status.mojang.com/check", icon_url="https://www.minecraft.net/content/dam/franchise/logos/Mojang-Studios-Logo-Redbox.png")
             embed.set_footer(text="Requested by {}".format(ctx.author.display_name), icon_url=ctx.author.avatar_url_as(format='png',size=512))
         else:
             text = "Mojang Studios - Services Status (requested by {})".format(ctx.author)
-        for K,V in data.items():
-            if K == "www.minecraft.net/en-us":
-                K = "minecraft.net"
-            if V == "green":
-                k = self.bot.cogs['EmojiCog'].customEmojis['green_check']+K
-            elif V == "red":
-                k = self.bot.cogs['EmojiCog'].customEmojis['red_cross']+K
-            elif V == 'yellow':
-                k = self.bot.cogs['EmojiCog'].customEmojis['neutral_check']+K
-            else:
-                k = self.bot.cogs['EmojiCog'].customEmojis['blurple']+K
-                dm = self.bot.get_user(279568324260528128).dm_channel
-                if dm is None:
-                    await self.bot.get_user(279568324260528128).create_dm()
+        if isinstance(data, dict):
+            for K,V in data.items():
+                if K == "www.minecraft.net/en-us":
+                    K = "minecraft.net"
+                if V == "green":
+                    k = self.bot.cogs['EmojiCog'].customEmojis['green_check']+K
+                elif V == "red":
+                    k = self.bot.cogs['EmojiCog'].customEmojis['red_cross']+K
+                elif V == 'yellow':
+                    k = self.bot.cogs['EmojiCog'].customEmojis['neutral_check']+K
+                else:
+                    k = self.bot.cogs['EmojiCog'].customEmojis['blurple']+K
                     dm = self.bot.get_user(279568324260528128).dm_channel
-                await dm.send("Status mojang inconnu : "+V+" (serveur "+K+")")
-            if K in desc.keys():
-                v = desc[K]
-            else:
-                v = ''
-            if can_embed:
-                embed.add_field(name=k,value=v, inline=False)
-            else:
-                text += "\n {} *({})*".format(k,v)
-        if can_embed:
+                    if dm is None:
+                        await self.bot.get_user(279568324260528128).create_dm()
+                        dm = self.bot.get_user(279568324260528128).dm_channel
+                    await dm.send("Status mojang inconnu : "+V+" (serveur "+K+")")
+                if K in desc.keys():
+                    v = desc[K]
+                else:
+                    v = ''
+                if ctx.can_send_embed:
+                    embed.add_field(name=k,value=v, inline=False)
+                else:
+                    text += "\n {} *({})*".format(k,v)
+        else:
+            for item in data:
+                if len(item) != 1:
+                    continue
+                K, V = list(item.items())[0]
+                if V == "green":
+                    k = self.bot.cogs['EmojiCog'].customEmojis['green_check']+K
+                elif V == "red":
+                    k = self.bot.cogs['EmojiCog'].customEmojis['red_cross']+K
+                elif V == 'yellow':
+                    k = self.bot.cogs['EmojiCog'].customEmojis['neutral_check']+K
+                else:
+                    k = self.bot.cogs['EmojiCog'].customEmojis['blurple']+K
+                    dm = self.bot.get_user(279568324260528128).dm_channel
+                    if dm is None:
+                        await self.bot.get_user(279568324260528128).create_dm()
+                        dm = self.bot.get_user(279568324260528128).dm_channel
+                    await dm.send("Status mojang inconnu : "+V+" (serveur "+K+")")
+                if K in desc.keys():
+                    v = desc[K]
+                else:
+                    v = ''
+                if ctx.can_send_embed:
+                    embed.add_field(name=k, value=v, inline=False)
+                else:
+                    text += "\n {} *({})*".format(k, v)
+        if ctx.can_send_embed:
             await ctx.send(embed=embed)
         else:
             await ctx.send(text)
