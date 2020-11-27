@@ -652,10 +652,13 @@ class Events(commands.Cog):
         cursor = cnx.cursor()
         rss_feeds = await self.bot.get_cog("RssCog").get_raws_count(True)
         active_rss_feeds = await self.bot.get_cog("RssCog").get_raws_count()
+        member_count = sum(x.member_count for x in self.bot.guilds)
+        ratio = member_count/len(self.bot.users)
+        approx_bot_count = int(len([1 for x in self.bot.users if x.bot])*ratio)
         query = ("INSERT INTO `log_stats` (`time`, `servers_count`, `members_count`, `bots_count`, `dapi_heartbeat`, `codelines_count`, `earned_xp_total`, `rss_feeds`, `active_rss_feeds`, `beta`) VALUES (CURRENT_TIMESTAMP, '{server_count}', '{members_count}', '{bots_count}', '{ping}', '{codelines}', '{xp}', '{rss_feeds}', '{active_rss_feeds}','{beta}')".format(
             server_count = len(self.bot.guilds),
-            members_count = len(self.bot.users),
-            bots_count = len([1 for x in self.bot.users if x.bot]),
+            members_count = member_count,
+            bots_count = approx_bot_count,
             ping = round(self.bot.latency,3),
             codelines = self.bot.cogs["InfoCog"].codelines,
             xp = await self.bot.cogs['XPCog'].bdd_total_xp(),
