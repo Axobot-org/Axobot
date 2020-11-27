@@ -173,9 +173,9 @@ class InfoCog(commands.Cog):
             t = (m.created_at - ctx.message.created_at).total_seconds()
             await m.edit(content=":ping_pong:  Pong !\nBot ping: {}ms\nDiscord ping: {}ms".format(round(t*1000),round(self.bot.latency*1000)))
         else:
-            asyncio.run_coroutine_threadsafe(self.ping_adress(ctx,ip),asyncio.get_event_loop())
+            asyncio.run_coroutine_threadsafe(self.ping_address(ctx,ip),asyncio.get_event_loop())
 
-    async def ping_adress(self, ctx: MyContext, ip: str):
+    async def ping_address(self, ctx: MyContext, ip: str):
         packages = 40
         wait = 0.3
         try:
@@ -192,9 +192,9 @@ class InfoCog(commands.Cog):
             return
         if result:
             t = (time.time() - t1 - wait*(packages-1))/(packages)*1000
-            await ctx.send("Pong ! (average of {}ms per 64 byte, sent at {})".format(round(t,2), ip))
+            await ctx.send(await self.bot._(ctx.channel, "infos", "ping-found", tps=round(t,2), url=ip))
         else:
-            await ctx.send("Unable to ping this adress")
+            await ctx.send(await self.bot._(ctx.channel, "infos", "ping-notfound"))
         if m is not None:
             await m.delete()
 
