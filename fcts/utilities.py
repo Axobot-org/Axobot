@@ -151,7 +151,11 @@ class UtilitiesCog(commands.Cog):
 
     async def global_check(self, ctx: MyContext):
         """Do a lot of checks before executing a command (banned guilds, system message etc)"""
-        if not isinstance(ctx, commands.context.Context) or self.config is None:
+        if self.bot.zombie_mode:
+            if isinstance(ctx, commands.Context) and ctx.command.name in self.bot.allowed_commands:
+                return True
+            return False
+        if not isinstance(ctx, commands.Context) or self.config is None:
             return True
         if ctx.message.type != discord.MessageType.default:
             return False
@@ -403,6 +407,8 @@ class UtilitiesCog(commands.Cog):
         return parameters['xp_style']
 
     async def add_check_reaction(self, message: discord.Message):
+        if self.bot.zombie_mode:
+            return
         try:
             emoji = discord.utils.get(self.bot.emojis, name='greencheck')
             if emoji:

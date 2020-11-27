@@ -171,6 +171,8 @@ class AdminCog(commands.Cog):
     
     async def send_updates(self,ctx:MyContext):
         """Lance un message de mise à jour"""
+        if self.bot.zombie_mode:
+            return
         if None in self.update.values():
             return await ctx.send("Les textes ne sont pas complets !")
         text = "Vos messages contiennent"
@@ -396,7 +398,7 @@ class AdminCog(commands.Cog):
 
     @main_msg.command(name="config")
     @commands.check(reloads.check_admin)
-    async def admin_sconfig_see(self,ctx,server,option=None):
+    async def admin_sconfig_see(self, ctx: MyContext, server, option=None):
         """Affiche les options d'un serveur"""
         if not ctx.bot.database_online:
             await ctx.send("Impossible d'afficher cette commande, la base de donnée est hors ligne :confused:")
@@ -415,7 +417,7 @@ class AdminCog(commands.Cog):
 
     @main_msg.command(name='db_reload')
     @commands.check(reloads.check_admin)
-    async def db_reload(self,ctx):
+    async def db_reload(self, ctx: MyContext):
         """Reconnecte le bot à la base de donnée"""
         try:
             self.bot.cnx_frm.close()
@@ -429,13 +431,15 @@ class AdminCog(commands.Cog):
 
     @main_msg.command(name="emergency")
     @commands.check(reloads.check_admin)
-    async def emergency_cmd(self,ctx):
+    async def emergency_cmd(self, ctx: MyContext):
         """Déclenche la procédure d'urgence
         A N'UTILISER QU'EN CAS DE BESOIN ABSOLU ! Le bot quittera tout les serveurs après avoir envoyé un mp à chaque propriétaire"""
         await ctx.send(await self.emergency())
 
-    async def emergency(self,level=100):
-        time =round(self.emergency_time - level/100,1)
+    async def emergency(self, level=100):
+        if self.bot.zombie_mode:
+            return
+        time = round(self.emergency_time - level/100,1)
         for x in reloads.admins_id:
             try:
                 user = self.bot.get_user(x)

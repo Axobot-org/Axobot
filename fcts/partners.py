@@ -192,6 +192,8 @@ class PartnersCog(commands.Cog):
                 if len(target_desc) == 0:
                     target_desc = await self.bot.cogs['ServerCog'].find_staff(inv.guild.id,'description')
             emb = self.bot.cogs['EmbedCog'].Embed(title=title,desc=target_desc,fields=[x for x in (field1,field2) if not x is None],color=color,footer_text=str(partner['ID']),thumbnail=image).update_timestamp()
+            if self.bot.zombie_mode:
+                return
             try:
                 msg = await channel.fetch_message(partner['messageID'])
                 await msg.edit(embed=emb.discord_embed())

@@ -1348,6 +1348,8 @@ class RssCog(commands.Cog):
         return t
 
     async def update_flow(self, ID: int, values=[(None,None)]):
+        if self.bot.zombie_mode:
+            return
         cnx = self.bot.cnx_frm
         cursor = cnx.cursor()
         v = list()
@@ -1374,6 +1376,8 @@ class RssCog(commands.Cog):
                 if role is not None:
                     mentions.append(role)
             try:
+                if self.bot.zombie_mode:
+                    return
                 if isinstance(t,(self.bot.cogs['EmbedCog'].Embed,discord.Embed)):
                     await channel.send(" ".join(obj.mentions), embed=t, allowed_mentions=discord.AllowedMentions(everyone=False, roles=True))
                 else:

@@ -30,6 +30,11 @@ class MyContext(commands.Context):
     def can_send_embed(self) -> bool:
         """If the bot has the right permissions to send an embed in the current context"""
         return self.bot_permissions.embed_links
+    
+    async def send(self, *args, **kwargs) -> Optional[discord.Message]:
+        if self.bot.zombie_mode and self.command.name not in self.bot.allowed_commands:
+            return
+        return await super().send(*args, **kwargs)
 
 
 def get_prefix(bot, msg: discord.Message) -> list:
@@ -58,7 +63,7 @@ def get_prefix(bot, msg: discord.Message) -> list:
 class zbot(commands.bot.AutoShardedBot):
     """Bot class, with everything needed to run it"""
 
-    def __init__(self, case_insensitive: bool = None, status: discord.Status = None, database_online: bool = True, beta: bool = False, dbl_token: str = ""):
+    def __init__(self, case_insensitive: bool = None, status: discord.Status = None, database_online: bool = True, beta: bool = False, dbl_token: str = "", zombie_mode: bool = False):
         # defining allowed default mentions
         ALLOWED = discord.AllowedMentions(everyone=False, roles=False)
         # defining intents usage
@@ -80,6 +85,9 @@ class zbot(commands.bot.AutoShardedBot):
         self.internal_loop_enabled: bool = False # if internal loop is enabled
         self.zws = "​"  # here's a zero width space
         self.others = dict() # other misc credentials
+        self.zombie_mode: bool = zombie_mode # if we should listen without sending any message
+    
+    allowed_commands = ("eval", "add_cog", "del_cog")
 
     @property
     def current_event(self) -> Optional[dict]:

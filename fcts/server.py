@@ -897,6 +897,8 @@ class ServerCog(commands.Cog):
         
     async def send_see(self, guild: discord.Guild, channel: discord.TextChannel, option: str, msg: discord.Message, ctx: MyContext):
         """Envoie l'embed dans un salon"""
+        if self.bot.zombie_mode:
+            return
         if option is None:
             option = "1"
         if option.isnumeric():
