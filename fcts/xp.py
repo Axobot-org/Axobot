@@ -410,8 +410,8 @@ class XPCog(commands.Cog):
             if not self.bot.database_online:
                 self.bot.unload_extension("fcts.xp")
                 return
-            globalS = guild==-1
-            if globalS:
+            target_global = (guild == -1)
+            if target_global:
                 self.bot.log.info("Chargement du cache XP (global)")
                 cnx = self.bot.cnx_frm
                 query = ("SELECT `userID`,`xp` FROM `{}` WHERE `banned`=0".format(self.table))
@@ -428,16 +428,16 @@ class XPCog(commands.Cog):
             liste = list()
             for x in cursor:
                 liste.append(x)
-            if globalS:
+            if target_global:
                 if len(self.cache['global'].keys()) == 0:
                     self.cache['global'] = dict()
                 for l in liste:
-                    self.cache['global'][l['userID']] = [round(time.time())-60,l['xp']]
+                    self.cache['global'][l['userID']] = [round(time.time())-60, int(l['xp'])]
             else:
                 if guild not in self.cache.keys():
                     self.cache[guild] = dict()
                 for l in liste:
-                    self.cache[guild][l['userID']] = [round(time.time())-60,l['xp']]
+                    self.cache[guild][l['userID']] = [round(time.time())-60, int(l['xp'])]
             cursor.close()
             return
         except Exception as e:
