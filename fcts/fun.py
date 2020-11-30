@@ -190,8 +190,11 @@ You can specify a verification limit by adding a number in argument (up to 1.000
         """Use this when you do not agree with someone else"""
         await ctx.send(file=await self.utilities.find_img('nope.png'))
         if self.bot.database_online:
-            if await self.bot.cogs["ServerCog"].staff_finder(ctx.author,'say'):
-                await self.utilities.suppr(ctx.message)
+            try:
+                if await self.bot.cogs["ServerCog"].staff_finder(ctx.author,'say'):
+                    await self.utilities.suppr(ctx.message)
+            except commands.CommandError: # user can't use 'say'
+                pass
 
     @commands.command(name="blame",hidden=True)
     @commands.check(is_fun_enabled)
@@ -411,8 +414,11 @@ You can specify a verification limit by adding a number in argument (up to 1.000
         text = "*{} {}*".format(ctx.author.display_name,text)
         text = await self.bot.cogs["UtilitiesCog"].clear_msg(text,ctx=ctx)
         await ctx.send(text)
-        if self.bot.database_online and await self.bot.cogs["ServerCog"].staff_finder(ctx.author,"say"):
-            await self.bot.cogs["UtilitiesCog"].suppr(ctx.message)
+        try:
+            if self.bot.database_online and await self.bot.cogs["ServerCog"].staff_finder(ctx.author,"say"):
+                await self.bot.cogs["UtilitiesCog"].suppr(ctx.message)
+        except commands.CommandError: # user can't use 'say'
+            pass
     
     @commands.command(name="react")
     @commands.check(can_say)
