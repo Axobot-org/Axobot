@@ -1009,7 +1009,7 @@ Servers:
     async def prefix_change(self, ctx: MyContext, new_prefix: str):
         """Change the used prefix"""
         msg = copy.copy(ctx.message)
-        msg.content = ctx.prefix + 'config change prefix '+new_prefix
+        msg.content =  f'{ctx.prefix}config change prefix "{new_prefix}"'
         new_ctx = await self.bot.get_context(msg)
         await self.bot.invoke(new_ctx)
     

@@ -672,7 +672,9 @@ class ServerCog(commands.Cog):
             text = await self.find_staff(guild.id,'prefix')
             return await self.form_prefix(text)
         else:
-            if len(value) > 5:
+            if value.startswith('"') and value.endswith('"'):
+                value = value[1:-1]
+            if len(value) > 10:
                 await ctx.send(await self.translate(ctx.guild.id,"server","change-prefix-1"))
                 return
             try:
