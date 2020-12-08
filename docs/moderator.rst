@@ -231,7 +231,7 @@ With this command, you can become the undisputed master of the Emojis and handle
 
 * :code:`emoji restrict <emoji> <roles>` : restrict the use of an emoji to certain roles. Members who do not have this role will simply not see the emoji in the list. Note that there is no need to mention, just put the identifier or the name.
 
-* :code:`emoji clear <message ID>` : instantly removes reactions from a message. This message must be indicated via its identifier, and belong to the same chat as the one where the command is used. The bot must have "`Manage Messages <perms.html#manage-messages>`_" and "`Read Message History <perms.html#read-message-history>`_" permissions.
+* :code:`emoji clear <message ID> [emoji]` : instantly removes reactions from a message. This message must be indicated via its identifier, and belong to the same chat as the one where the command is used. If no emoji is specified, every reaction will be deleted. The bot must have "`Manage Messages <perms.html#manage-messages>`_" and "`Read Message History <perms.html#read-message-history>`_" permissions.
 
 * :code:`emoji list` : lists all the server's emojis, in an embed, and indicates if some of them are restricted to certain roles. The bot must have "`Embed Links <perms.html#embed-links>`_" permission.
 
