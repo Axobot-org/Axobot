@@ -739,14 +739,20 @@ You must be an administrator of this server to use this command.
     @commands.cooldown(5,20, commands.BucketType.guild)
     async def emoji_group(self, ctx: MyContext):
         """Manage your emoji
-        Administrator permission is required"""
+        Administrator permission is required
+        
+        ..Doc moderator.html#emoji-manager"""
         if ctx.subcommand_passed is None:
             await self.bot.cogs['HelpCog'].help_command(ctx,['emoji'])
 
     @emoji_group.command(name="rename")
     @commands.check(checks.has_admin)
     async def emoji_rename(self, ctx: MyContext, emoji: discord.Emoji, name: str):
-        """Rename an emoji"""
+        """Rename an emoji
+        
+        ..Example emoji rename :cool: supercool
+
+        ..Doc moderator.html#emoji-manager"""
         if emoji.guild != ctx.guild:
             await ctx.send(await self.bot._(ctx.guild.id,"modo","wrong-guild"))
             return
@@ -759,7 +765,13 @@ You must be an administrator of this server to use this command.
     @emoji_group.command(name="restrict")
     @commands.check(checks.has_admin)
     async def emoji_restrict(self, ctx: MyContext, emoji: discord.Emoji, *, roles: str):
-        """Restrict the use of an emoji to certain roles"""
+        """Restrict the use of an emoji to certain roles
+        
+        ..Example emoji restrict :vip: @VIP @Admins
+
+        ..Example emoji restrict :vip: everyone
+
+        ..Doc moderator.html#emoji-manager"""
         if emoji.guild != ctx.guild:
             await ctx.send(await self.bot._(ctx.guild.id,"modo","wrong-guild"))
             return
@@ -783,11 +795,21 @@ You must be an administrator of this server to use this command.
 
     @emoji_group.command(name="clear")
     @commands.check(checks.has_manage_msg)
-    async def emoji_clear(self, ctx: MyContext, message: discord.Message):
-        """Remove all reactions under a message"""
+    async def emoji_clear(self, ctx: MyContext, message: discord.Message, emoji: discord.Emoji = None):
+        """Remove all reactions under a message
+        If you specify an emoji, only reactions with that emoji will be deleted
+        
+        ..Example emoji clear
+        
+        ..Example emoji clear :axoblob:
+        
+        ..Doc moderator.html#emoji-manager"""
         if not ctx.channel.permissions_for(ctx.guild.me).manage_messages:
-            return await ctx.send(await self.bot._(ctx.guild.id,'modo','need-manage-messages'))
-        await message.clear_reactions()
+            return await ctx.send(await self.bot._(ctx.guild.id, 'modo', 'need-manage-messages'))
+        if emoji:
+            await message.clear_reaction(emoji)
+        else:
+            await message.clear_reactions()
         try:
             await ctx.message.delete()
         except:
