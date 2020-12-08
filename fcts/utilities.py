@@ -235,7 +235,7 @@ class UtilitiesCog(commands.Cog):
         if not self.bot.database_online:
             return None
         cnx = self.bot.cnx_frm
-        cursor = cnx.cursor(dictionary=True)
+        cursor = cnx.cursor(dictionary=(Type==dict))
         if columns == []:
             cl = "*"
         else:
