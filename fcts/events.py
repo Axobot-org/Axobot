@@ -457,8 +457,8 @@ class Events(commands.Cog):
             # Check current event - every 12h (start from 0:02 am)
             elif int(d.hour)%12 == 0 and int(d.minute)%2 == 0 and (d.hour != self.last_eventDay_check.hour or d.day != self.last_eventDay_check.day):
                 await self.botEventLoop()
-            # Send stats logs - every 2h (start from 0:05 am)
-            elif int(d.hour)%2 == 0 and int(d.minute)%5 == 0 and (d.day != self.statslogs_last_push.day or d.hour != self.statslogs_last_push.hour):
+            # Send stats logs - every 1h (start from 0:05 am)
+            elif d.minute > 5 and (d.day != self.statslogs_last_push.day or d.hour != self.statslogs_last_push.hour):
                 await self.send_sql_statslogs()
             # Refresh needed membercounter channels - every 1min
             elif abs((self.last_membercounter - d).total_seconds()) > 60:
