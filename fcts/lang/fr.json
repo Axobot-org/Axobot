@@ -212,6 +212,7 @@
         "list-2": "\n**Durée :** {D}",
         "no-user": "Impossible de trouver cet utilisateur",
         "no_database": "En raison d'une panne temporaire de la base de donnée, cette commande a été désactivée",
+        "no-case": "Cet utilisateur n'a aucun casier !",
         "not-found": "Ce casier n'a pas été trouvé :confused:",
         "reason-edited": "La raison du casier n°{} a bien été modifiée !",
         "search-0": "**Membre:** {U}\n**Type:** {T}\n**Moderateur:** {M}\n**Date:** {D}\n**Raison:** *{R}*",

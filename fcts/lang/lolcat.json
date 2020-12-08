@@ -200,6 +200,7 @@
         "list-2": "\n**How long:** {D}",
         "no-user": "Unable to find dis usr :eyes:",
         "no_database": "Dude we'v got an databaz outage, so dis command haz been dizabled",
+        "no-case": "This user never did anythin wrong :upset_cat:",
         "not-found": "Dis caze was not fund :upside_down:",
         "reason-edited": "Teh ryson for case #{} has been changd!",
         "search-0": "**Uzr:** {U}\n**Type:** {T}\n**Mod:** {M}\n**Date:** {D}\n**Reazon:** *{R}*",
