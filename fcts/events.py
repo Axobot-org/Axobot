@@ -214,7 +214,7 @@ class Events(commands.Cog):
             return
         # d = datetime.datetime.utcnow() - (await msg.channel.history(limit=2).flatten())[1].created_at
         # if d.total_seconds() > 600:
-        await msg.channel.send(await self.translate(msg.channel,"events","mp-adv"))
+        await msg.channel.send(await self.bot._(msg.channel,"events","mp-adv"))
 
 
     async def send_logs_per_server(self, guild: discord.Guild, Type:str, message: str, author: discord.User=None):
@@ -302,17 +302,17 @@ class Events(commands.Cog):
         try:
             if self.bot.zombie_mode:
                 return False
-            f_duration = await self.bot.get_cog('TimeCog').time_delta(task['duration'],lang=await self.translate(channel,'current_lang','current'), form='developed', precision=0)
-            t = (await self.translate(channel, "fun", "reminds-title")).capitalize()
-            foot = await self.translate(channel, "fun", "reminds-date")
+            f_duration = await self.bot.get_cog('TimeCog').time_delta(task['duration'],lang=await self.bot._(channel,'current_lang','current'), form='developed', precision=0)
+            t = (await self.bot._(channel, "fun", "reminds-title")).capitalize()
+            foot = await self.bot._(channel, "fun", "reminds-date")
             imgs = re.findall(r'(https://\S+\.(?:png|jpe?g|webp|gif))', task['message'])
             img = imgs[0] if len(imgs)==1 else ""
             if task['data'] is not None:
                 task['data'] = json.loads(task['data'])
                 if 'msg_url' in task['data']:
-                    task["message"] += "\n\n[{}]({})".format(await self.translate(channel, "fun", "reminds-link"), task['data']['msg_url'])
+                    task["message"] += "\n\n[{}]({})".format(await self.bot._(channel, "fun", "reminds-link"), task['data']['msg_url'])
             emb = self.bot.get_cog("EmbedCog").Embed(title=t, desc=task["message"], color=4886754, time=task["utc_begin"], footer_text=foot, image=img)
-            msg = await self.translate(channel, "fun", "reminds-asked", user=user.mention, duration=f_duration)
+            msg = await self.bot._(channel, "fun", "reminds-asked", user=user.mention, duration=f_duration)
             await channel.send(msg, embed=emb)
         except discord.errors.Forbidden:
             return False

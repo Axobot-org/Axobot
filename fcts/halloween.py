@@ -103,7 +103,7 @@ def _make_color_command(name, fmodifier, parent, **kwargs):
                       who: typing.Union[discord.Member, discord.PartialEmoji, LinkConverter] = None):
 
         if not (ctx.guild is None or ctx.channel.permissions_for(ctx.guild.me).attach_files):
-            return await ctx.send(await self.translate(ctx.channel, "blurple", "missing-attachment-perm"))
+            return await ctx.send(await self.bot._(ctx.channel, "blurple", "missing-attachment-perm"))
 
         if method is None:
             method = await self.get_default_halloweefier(ctx)
@@ -250,9 +250,9 @@ __29 variations: __
             points = randint(*self.hourly_reward)
             await self.bot.get_cog("UtilitiesCog").add_user_eventPoint(ctx.author.id, points)
             self.db_add_points(ctx.author.id, points)
-            txt = await self.translate(ctx.channel, "halloween", "got-points", pts=points)
+            txt = await self.bot._(ctx.channel, "halloween", "got-points", pts=points)
         else:
-            txt = await self.translate(ctx.channel, "halloween", "too-quick")
+            txt = await self.bot._(ctx.channel, "halloween", "too-quick")
         if ctx.can_send_embed:
             title = "Halloween event"
             emb = discord.Embed(title=title, description=txt, color=discord.Color.orange())
