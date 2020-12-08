@@ -303,11 +303,19 @@ Opposite is the subcommand 'join'
     async def rr_update(self, ctx: MyContext, embed: discord.Message, changeDescription: typing.Optional[bool] = True, emojis: commands.Greedy[args.anyEmoji] = None):
         """Update a Zbot message to refresh roles/reactions
         If you don't want to update the embed content, for example if it's a custom embed, then you can use 'False' as a second argument. Zbot will only check the reactions
-        Specifying a list of emojis will update the embed only for those emojis, and ignore other roles reactions"""
+        Specifying a list of emojis will update the embed only for those emojis, and ignore other roles reactions
+
+        ..Example roles_react update 707726569430319164 False
+
+        ..Example roles_react update 707726569430319164 True :cool: :vip:
+        
+        ..Doc roles-reactions.html#update-your-embed"""
         if embed.author != ctx.guild.me:
             return await ctx.send(await self.bot._(ctx.guild, 'roles_react', 'not-zbot-msg'))
         if len(embed.embeds) != 1 or embed.embeds[0].footer.text != self.footer_txt:
             return await ctx.send(await self.bot._(ctx.guild, 'roles_react', 'not-zbot-embed'))
+        if not embed.channel.permissions_for(embed.guild.me).add_reactions:
+            return await ctx.send(await self.bot._(ctx.guild, 'fun', "cant-react"))
         emb = embed.embeds[0]
         try:
             l = await self.rr_list_role(ctx.guild.id)
@@ -325,9 +333,9 @@ Opposite is the subcommand 'join'
         if emb.description != desc and changeDescription:
             emb.description = desc
             await embed.edit(embed=emb)
-            await ctx.send(await self.bot._(ctx.guild, 'roles_react', 'reactions-edited'))
-        else:
             await ctx.send(await self.bot._(ctx.guild, 'roles_react', 'embed-edited'))
+        else:
+            await ctx.send(await self.bot._(ctx.guild, 'roles_react', 'reactions-edited'))
 
 
 def setup(bot):
