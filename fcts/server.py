@@ -117,23 +117,29 @@ class ServerCog(commands.Cog):
         cursor.close()
         return True
 
-    async def get_languages(self, ignored_guilds: typing.List[int]):
+    async def get_languages(self, ignored_guilds: typing.List[int], return_dict: bool = False):
         """Return percentages of languages"""
         if not self.bot.database_online:
             return list()
         cnx = self.bot.cnx_frm
         cursor = cnx.cursor(dictionary=True)
-        query = ("SELECT `language`,`ID` FROM `{}` WHERE 1".format(self.table))
+        query = ("SELECT `language`,`ID` FROM `{}`".format(self.table))
         cursor.execute(query)
-        liste,langs = list(), list()
+        liste = list()
         guilds = [x.id for x in self.bot.guilds if x.id not in ignored_guilds]
         for x in cursor:
             if x['ID'] in guilds:
                 liste.append(x['language'])
         for _ in range(len(guilds)-len(liste)):
             liste.append(self.bot.cogs['LangCog'].languages.index(self.default_language))
-        for e,l in enumerate(self.bot.cogs['LangCog'].languages):
-            langs.append((l,liste.count(e)))
+        if return_dict:
+            langs = dict()
+            for e, l in enumerate(self.bot.cogs['LangCog'].languages):
+                langs[l] = liste.count(e)
+        else:
+            langs = list()
+            for e, l in enumerate(self.bot.cogs['LangCog'].languages):
+                langs.append((l, liste.count(e)))
         return langs
 
     async def staff_finder(self, user: discord.Member, option: str):

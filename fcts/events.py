@@ -9,6 +9,7 @@ import shutil
 import mysql
 import psutil
 import re
+import marshal
 from discord.ext import commands, tasks
 from fcts.checks import is_fun_enabled
 from classes import zbot
@@ -82,8 +83,6 @@ class Events(commands.Cog):
             b = '' if before.name is None else before.name
             a = '' if after.name is None else after.name
         guild = before.guild.id if hasattr(before, 'guild') else 0
-        # ID = round(time.time()/2) * 10 + random.randrange(0,9)
-        # query = ("INSERT INTO `usernames_logs` (`ID`,`user`,`old`,`new`,`guild`,`beta`) VALUES ('{}','{}','{}','{}','{}',{})".format(ID,before.id,b,a,before.guild.id,self.bot.beta))
         query = "INSERT INTO `usernames_logs` (`user`,`old`,`new`,`guild`,`beta`) VALUES (%(u)s,%(o)s,%(n)s,%(g)s,%(b)s)"
         try:
             cursor.execute(query, { 'u': before.id, 'o': b, 'n': a, 'g': guild, 'b': self.bot.beta })
@@ -100,7 +99,6 @@ class Events(commands.Cog):
             config_option = await self.bot.cogs['UtilitiesCog'].get_db_userinfo(['allow_usernames_logs'],["userID="+str(before.id)])
             if config_option is not None and config_option['allow_usernames_logs']==False:
                 return
-            # query = ("INSERT INTO `usernames_logs` (`ID`,`user`,`old`,`new`,`guild`,`beta`) VALUES ('{}','{}','{}','{}','{}',{})".format(ID,before.id,before.name.replace("'","\\'"),after.name.replace("'","\\'"),0,self.bot.beta))
             await self.updade_memberslogs_name(before, after)
 
 
@@ -650,19 +648,21 @@ class Events(commands.Cog):
         member_count = sum(x.member_count for x in self.bot.guilds)
         ratio = member_count/len(self.bot.users)
         approx_bot_count = int(len([1 for x in self.bot.users if x.bot])*ratio)
-        query = ("INSERT INTO `log_stats` (`time`, `servers_count`, `members_count`, `bots_count`, `dapi_heartbeat`, `codelines_count`, `earned_xp_total`, `rss_feeds`, `active_rss_feeds`, `beta`) VALUES (CURRENT_TIMESTAMP, '{server_count}', '{members_count}', '{bots_count}', '{ping}', '{codelines}', '{xp}', '{rss_feeds}', '{active_rss_feeds}','{beta}')".format(
-            server_count = len(self.bot.guilds),
-            members_count = member_count,
-            bots_count = approx_bot_count,
-            ping = round(self.bot.latency,3),
-            codelines = self.bot.cogs["InfoCog"].codelines,
-            xp = await self.bot.cogs['XPCog'].bdd_total_xp(),
-            rss_feeds = rss_feeds,
-            active_rss_feeds = active_rss_feeds,
-            beta = 1 if self.bot.beta else 0
-        ))
+        lang_stats = await self.bot.cogs['ServerCog'].get_languages([], return_dict=True)
+        query = "INSERT INTO `log_stats` (`servers_count`, `members_count`, `bots_count`, `dapi_heartbeat`, `codelines_count`, `earned_xp_total`, `rss_feeds`, `active_rss_feeds`, `languages`, `beta`) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
+        data = (len(self.bot.guilds),
+            member_count,
+            approx_bot_count,
+            round(self.bot.latency,3),
+            self.bot.cogs["InfoCog"].codelines,
+            await self.bot.cogs['XPCog'].bdd_total_xp(),
+            rss_feeds,
+            active_rss_feeds,
+            marshal.dumps(lang_stats),
+            int(self.bot.beta),
+        )
         try:
-            cursor.execute(query)
+            cursor.execute(query, data)
         except Exception as e:
             await self.bot.get_cog("ErrorsCog").senf_err_msg(query)
             raise e
