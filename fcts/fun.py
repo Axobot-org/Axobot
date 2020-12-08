@@ -106,8 +106,10 @@ class FunCog(commands.Cog):
         """Selects an option at random from a given list
         The options must be separated by a comma `,`"""
         liste = list(set([x for x in [x.strip() for x in options.split(',')] if len(x) > 0]))
-        if len(liste) < 2:
-            return await ctx.send(await self.translate(ctx.channel,"fun","no-roll"))
+        if len(liste) == 0:
+            return await ctx.send(await self.bot._(ctx.channel,"fun","no-roll"))
+        elif len(liste) == 1:
+            return await ctx.send(await self.bot._(ctx.channel,"fun","not-enough-roll"))
         # choosen = random.choice(liste).replace('@everyone','@​everyone').replace('@here','@​here')
         choosen = random.choice(liste)
         await ctx.send(choosen)
