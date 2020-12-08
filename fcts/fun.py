@@ -374,22 +374,19 @@ You can specify a verification limit by adding a number in argument (up to 1.000
     @commands.command(name="say")
     @commands.guild_only()
     @commands.check(can_say)
-    async def say(self,ctx:MyContext,channel:typing.Optional[discord.TextChannel] = None,*,text):
+    async def say(self,ctx:MyContext,channel:typing.Optional[discord.TextChannel] = None, *, text):
         """Let the bot say something for you
         You can specify a channel where the bot must send this message. If channel is None, the current channel will be used"""
         if channel is None:
             channel = ctx.channel
         elif not (channel.permissions_for(ctx.author).read_messages and channel.permissions_for(ctx.author).send_messages and channel.guild == ctx.guild):
-            await ctx.send(await self.bot._(ctx.guild,'fun','say-no-perm',channel=channel.mention))
+            await ctx.send(await self.bot._(ctx.guild, 'fun', 'say-no-perm', channel=channel.mention))
             return
-        await self.say_function(ctx,channel,text)
-    
-    async def say_function(self, ctx:MyContext, channel:discord.TextChannel, text:str):
         if self.bot.zombie_mode:
             return
         if m := re.search(r"(?:i am|i'm) ([\w\s]+)", text, re.DOTALL | re.IGNORECASE):
             if m.group(1).lower() != "a bot":
-                first_words = ['dumb', 'really dumb', 'stupid', 'gay', 'idiot', 'shit', 'trash']
+                first_words = ['dumb', 'really dumb','stupid', 'gay', 'idiot', 'shit', 'trash']
                 words = list()
                 for w in first_words:
                     words += [w, w+' bot', w.upper()]
@@ -399,20 +396,15 @@ You can specify a verification limit by adding a number in argument (up to 1.000
         try:
             text = await self.bot.cogs["UtilitiesCog"].clear_msg(text, ctx=ctx)
         except Exception as e:
-            await self.bot.cogs['ErrorsCog'].on_error(e,ctx)
+            await self.bot.cogs['ErrorsCog'].on_error(e, ctx)
             return
         try:
             if not channel.permissions_for(ctx.guild.me).send_messages:
-                return await ctx.send(str(await self.bot._(ctx.guild.id,'fun','no-say'))+random.choice([' :confused:','','','']))
+                return await ctx.send(str(await self.bot._(ctx.guild.id, 'fun', 'no-say'))+random.choice([' :confused:', '', '', '']))
             await channel.send(text)
             await self.bot.cogs["UtilitiesCog"].suppr(ctx.message)
         except:
             pass
-
-    # @say.error
-    # async def say_error(self,ctx,error):
-    #     if str(error) != 'The check functions for command say failed.':
-    #         await self.say_function(ctx,None,ctx.view.buffer.replace(ctx.prefix+ctx.invoked_with,"",1))
 
     @commands.command(name="me",hidden=True)
     @commands.check(is_fun_enabled)
