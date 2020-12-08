@@ -842,6 +842,7 @@
         "invalid-flow": "Cet url est invalide (flux rss vide ou inaccessible) :confused:",
         "invalid-link": "Oups, cette adresse url est invalide ou incomplète :confused:",
         "list": "*Entrez le numéro du flux à modifier*\n\n**Lien - Type - Salon - Roles**\n",
+        "list-title": "Liste des flux rss du serveur {server}",
         "list-result": "Type : {}\nSalon : {}\nLien/chaine : {}\nRôle mentionné : {}\nIdentifiant : {}\nDernier post : {}",
         "list2": "*Entrez le numéro du flux à supprimer*\n\n**Lien - Type - Salon**\n",
         "mc": "Minecraft",

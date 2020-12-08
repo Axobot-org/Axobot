@@ -415,6 +415,7 @@ class RssCog(commands.Cog):
         liste = await self.get_guild_flows(ctx.guild.id)
         l = list()
         translation = await self.bot._(ctx.guild.id,"rss","list-result")
+        title = await self.bot._(ctx.guild.id, "rss", "list-title", server=ctx.guild.name)
         for x in liste:
             c = self.bot.get_channel(x['channel'])
             if c is not None:
@@ -434,14 +435,14 @@ class RssCog(commands.Cog):
                 r = ", ".join(r)
             Type = await self.bot._(ctx.guild.id,'rss',x['type'])
             if len(l) > 20:
-                embed = await self.bot.get_cog('EmbedCog').Embed(title="Liste des flux rss du serveur {}".format(ctx.guild.name), color=self.embed_color, time=ctx.message.created_at).create_footer(ctx)
+                embed = await self.bot.get_cog('EmbedCog').Embed(title=title, color=self.embed_color, time=ctx.message.created_at).create_footer(ctx)
                 for text in l:
                     embed.add_field(name="\uFEFF", value=text, inline=False)
                 await ctx.send(embed=embed)
                 l.clear()
             l.append(translation.format(Type,c,x['link'],r,x['ID'],x['date']))
         if len(l) > 0:
-            embed = await self.bot.get_cog('EmbedCog').Embed(title="Liste des flux rss du serveur {}".format(ctx.guild.name), color=self.embed_color, time=ctx.message.created_at).create_footer(ctx)
+            embed = await self.bot.get_cog('EmbedCog').Embed(title=title, color=self.embed_color, time=ctx.message.created_at).create_footer(ctx)
             for x in l:
                 embed.add_field(name="\uFEFF", value=x, inline=False)
             await ctx.send(embed=embed)
