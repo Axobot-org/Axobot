@@ -298,6 +298,7 @@
         "no-fun": "Les commandes fun ont été désactivées sur ce serveur. Pour voir leur liste, regardez https://zbot.rtfd.io/en/v3/fun.html",
         "no-reaction": "Impossible d'ajouter les réactions. Vérifiez mes permissions",
         "no-roll": "Aucun élément trouvé",
+        "not-enough-roll": "Il vous faut au moins deux éléments distincts",
         "no-say": "Impossible d'envoyer un message dans ce salon",
         "no-voicechan": "Vous devez être connecté à un salon vocal pour utiliser cette commande.",
         "osekour": [
