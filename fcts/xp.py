@@ -40,6 +40,7 @@ class XPCog(commands.Cog):
         self.max_xp_per_msg = 70
         self.file = 'xp'
         self.xp_channels_cache = dict()
+        self.sus = None
         bot.add_listener(self.add_xp,'on_message')
         try:
             self.translate = bot.cogs['LangCog'].tr
@@ -86,6 +87,11 @@ class XPCog(commands.Cog):
         if not ( await self.check_noxp(msg) and await self.bot.cogs['ServerCog'].find_staff(msg.guild.id,'enable_xp') ):
             return
         rate = await self.bot.cogs['ServerCog'].find_staff(msg.guild.id,'xp_rate')
+        if self.sus is None:
+            if self.bot.get_cog('UtilitiesCog'):
+                await self.reload_sus()
+            else:
+                self.sus = set()
         if self.bot.zombie_mode:
             return
         if used_xp_type == 0:
@@ -96,6 +102,7 @@ class XPCog(commands.Cog):
             await self.add_xp_2(msg,rate)
     
     async def add_xp_0(self, msg: discord.Message, rate: float):
+        """Global xp type"""
         if msg.author.id in self.cache['global'].keys():
             if time.time() - self.cache['global'][msg.author.id][0] < self.cooldown:
                 return
@@ -117,6 +124,9 @@ class XPCog(commands.Cog):
             except:
                 prev_points = 0
         await self.bdd_set_xp(msg.author.id, giv_points, 'add')
+        # check for sus people
+        if msg.author.id in self.sus:
+            await self.send_sus_msg(msg, giv_points)
         self.cache['global'][msg.author.id] = [round(time.time()), prev_points+giv_points]
         new_lvl = await self.calc_level(self.cache['global'][msg.author.id][1],0)
         if 0 < (await self.calc_level(prev_points,0))[0] < new_lvl[0]:
@@ -124,6 +134,7 @@ class XPCog(commands.Cog):
             await self.give_rr(msg.author,new_lvl[0],await self.rr_list_role(msg.guild.id))
     
     async def add_xp_1(self, msg:discord.Message, rate: float):
+        """MEE6-like xp type"""
         if msg.guild.id not in self.cache.keys() or len(self.cache[msg.guild.id]) == 0:
             await self.bdd_load_cache(msg.guild.id)
         if msg.author.id in self.cache[msg.guild.id].keys():
@@ -144,6 +155,9 @@ class XPCog(commands.Cog):
             except:
                 prev_points = 0
         await self.bdd_set_xp(msg.author.id, giv_points, 'add', msg.guild.id)
+        # check for sus people
+        if msg.author.id in self.sus:
+            await self.send_sus_msg(msg, giv_points)
         self.cache[msg.guild.id][msg.author.id] = [round(time.time()), prev_points+giv_points]
         new_lvl = await self.calc_level(self.cache[msg.guild.id][msg.author.id][1],1)
         if 0 < (await self.calc_level(prev_points,1))[0] < new_lvl[0]:
@@ -151,6 +165,7 @@ class XPCog(commands.Cog):
             await self.give_rr(msg.author,new_lvl[0],await self.rr_list_role(msg.guild.id))
 
     async def add_xp_2(self, msg:discord.Message, rate: float):
+        """Local xp type"""
         if msg.guild.id not in self.cache.keys() or len(self.cache[msg.guild.id]) == 0:
             await self.bdd_load_cache(msg.guild.id)
         if msg.author.id in self.cache[msg.guild.id].keys():
@@ -172,6 +187,9 @@ class XPCog(commands.Cog):
             except:
                 prev_points = 0
         await self.bdd_set_xp(msg.author.id, giv_points, 'add', msg.guild.id)
+        # check for sus people
+        if msg.author.id in self.sus:
+            await self.send_sus_msg(msg, giv_points)
         self.cache[msg.guild.id][msg.author.id] = [round(time.time()), prev_points+giv_points]
         new_lvl = await self.calc_level(self.cache[msg.guild.id][msg.author.id][1],2)
         if 0 < (await self.calc_level(prev_points,2))[0] < new_lvl[0]:
@@ -309,6 +327,29 @@ class XPCog(commands.Cog):
                     await self.bot.cogs['ErrorsCog'].on_error(e,None)
                 pass
         return c
+    
+    async def reload_sus(self):
+        """Check who should be observed for potential xp cheating"""
+        cog = self.bot.get_cog("UtilitiesCog")
+        if cog is None:
+            return
+        result = await cog.get_db_userinfo(['userID'], ['xp_suspect=1'], Type=list)
+        if result is None:
+            return
+        if len(result) > 1:
+            result = [item for sublist in result for item in sublist]
+        self.sus = set(result)
+        self.bot.log.info("Suspects d'xp rechargé (%d suspects)", len(self.sus))
+    
+    async def send_sus_msg(self, msg: discord.Message, xp: int):
+        """Send a message into the sus channel"""
+        chan = self.bot.get_channel(785877971944472597)
+        emb = discord.Embed(
+            title=f"#{msg.channel.name} | {msg.guild.name} | {msg.guild.id}",
+            description=msg.content
+        ).set_footer(text=str(msg.author.id)).set_author(name=str(msg.author), icon_url=msg.author.avatar_url).add_field(name="XP given", value=str(xp))
+        await chan.send(embed=emb)
+
 
     async def get_table(self, guild: int, createIfNeeded: bool=True):
         """Get the table name of a guild, and create one if no one exist"""
@@ -506,6 +547,7 @@ class XPCog(commands.Cog):
                 raise e
             userdata = dict()
             i = 0
+            users = list()
             if guild is not None:
                 users = [x.id for x in guild.members]
             for x in cursor:

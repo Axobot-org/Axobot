@@ -425,7 +425,10 @@ class AdminCog(commands.Cog):
             self.bot.cnx_xp.close()
             self.bot.connect_database_xp()
             if self.bot.cnx_frm is not None and self.bot.cnx_xp is not None:
-                await ctx.bot.cogs['UtilitiesCog'].add_check_reaction(ctx.message)
+                if utils := self.bot.get_cog("UtilitiesCog"):
+                    await utils.add_check_reaction(ctx.message)
+                    if xp := self.bot.get_cog("XPCog"):
+                        await xp.reload_sus()
         except Exception as e:
             await self.bot.cogs['ErrorsCog'].on_command_error(ctx,e)
 
