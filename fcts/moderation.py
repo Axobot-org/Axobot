@@ -594,10 +594,10 @@ The 'days_to_delete' option represents the number of days worth of messages to d
                 if user.isnumeric():
                     try:
                         user = await self.bot.fetch_user(int(user))
-                        del backup
                     except:
                         await ctx.send(str(await self.bot._(ctx.guild.id,"modo","cant-find-user")).format(backup))
                         return
+                    del backup
             if not ctx.channel.permissions_for(ctx.guild.me).ban_members:
                 await ctx.send(await self.bot._(ctx.guild.id,"modo","cant-ban"))
                 return
