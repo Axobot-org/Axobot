@@ -12,6 +12,7 @@ import geocoder
 import aiohttp
 import copy
 import emoji as emojilib
+from difflib import get_close_matches
 from discord.ext import commands
 from tzwhere import tzwhere
 from pytz import timezone
@@ -383,9 +384,18 @@ You can specify a verification limit by adding a number in argument (up to 1.000
             return
         await self.say_function(ctx,channel,text)
     
-    async def say_function(self,ctx:MyContext,channel:discord.TextChannel,text:str):
+    async def say_function(self, ctx:MyContext, channel:discord.TextChannel, text:str):
         if self.bot.zombie_mode:
             return
+        if m := re.search(r"(?:i am|i'm) ([\w\s]+)", text, re.DOTALL | re.IGNORECASE):
+            if m.group(1).lower() != "a bot":
+                first_words = ['dumb', 'really dumb', 'stupid', 'gay', 'idiot', 'shit', 'trash']
+                words = list()
+                for w in first_words:
+                    words += [w, w+' bot', w.upper()]
+                if word := get_close_matches(m.group(1), words, n=1, cutoff=0.8):
+                    await ctx.send(f"Yeah we know you are {word[0]}")
+                    return
         try:
             text = await self.bot.cogs["UtilitiesCog"].clear_msg(text, ctx=ctx)
         except Exception as e:
