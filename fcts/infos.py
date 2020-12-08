@@ -789,6 +789,11 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
             disp_lang = ["Unknown"]
         # User name
         user_name = str(user)+' <:BOT:544149528761204736>' if user.bot else str(user)
+        # XP sus
+        xp_sus = "Unknown"
+        if xpcog := self.bot.get_cog("XPCog"):
+            if xpcog.sus is not None:
+                xp_sus = str(user.id in xpcog.sus)
         # ----
         if use_embed:
             if ctx.guild is None:
@@ -803,6 +808,7 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
                 {"name": "Language", "value": "\n".join(disp_lang), "inline":True},
                 {"name": "XP card", "value": xp_card, "inline":True},
                 {"name": "Upvoted the bot?", "value": votes, "inline":True},
+                {"name": "XP sus?", "value": xp_sus, "inline":True},
             ]).create_footer(ctx))
         else:
             txt = """Name: {}
