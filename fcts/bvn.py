@@ -9,15 +9,7 @@ class WelcomerCog(commands.Cog):
         self.bot = bot
         self.file = "bvn"
         self.no_message = [392766377078816789,504269440872087564,552273019020771358]
-        try:
-            self.translate = bot.cogs['LangCog'].tr
-        except:
-            pass
-    
-    @commands.Cog.listener()
-    async def on_ready(self):
-        self.translate = self.bot.cogs['LangCog'].tr
-    
+
     
     @commands.Cog.listener()
     async def on_member_join(self, member:discord.Member):

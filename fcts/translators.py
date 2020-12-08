@@ -29,10 +29,6 @@ class TranslatorsCog(commands.Cog):
             'br':self.load_translation('br'),
             'tr':self.load_translation('tr'),
             'fr2':self.load_translation('fr2')}
-        try:
-            self.translate = self.bot.cogs["LangCog"].tr
-        except:
-            pass
         self.todo = {'fi':sorted([x for x in self.translations['en'].keys() if x not in self.translations['fi'].keys()]),
                 'de':sorted([x for x in self.translations['en'].keys() if x not in self.translations['de'].keys()]),
                 'es':sorted([x for x in self.translations['en'].keys() if x not in self.translations['es'].keys()]),
@@ -40,10 +36,7 @@ class TranslatorsCog(commands.Cog):
                 'br':sorted([x for x in self.translations['en'].keys() if x not in self.translations['br'].keys()]),
                 'tr':sorted([x for x in self.translations['en'].keys() if x not in self.translations['tr'].keys()]),
                 'fr2':sorted([x for x in self.translations['en'].keys() if x not in self.translations['fr2'].keys()])}
-    
-    @commands.Cog.listener()
-    async def on_ready(self):
-        self.translate = self.bot.cogs["LangCog"].tr
+
     
     def create_txt_map(self, data: dict) -> dict:
         result = dict()

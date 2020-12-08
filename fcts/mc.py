@@ -17,14 +17,6 @@ Every information come from the website www.fr-minecraft.net"""
         self.bot = bot
         self.flows = dict()
         self.file = "mc"
-        try:
-            self.translate = bot.cogs["LangCog"].tr
-        except:
-            pass
-
-    @commands.Cog.listener()
-    async def on_ready(self):
-        self.translate = self.bot.cogs["LangCog"].tr
 
     @commands.command(name="mojang", aliases=['mojang_status'])
     @commands.cooldown(5, 20, commands.BucketType.user)
@@ -442,7 +434,7 @@ Every information come from the website www.fr-minecraft.net"""
                 ip = ip[0]+":"+ip[1]
             return discord.Embed(title=str(await self.bot._(guild,"mc","serv-title")).format(ip), color=discord.Colour(0x417505),description=obj,timestamp=datetime.datetime.utcfromtimestamp(time.time()))
         else:
-            return await obj.create_msg(guild,self.translate)
+            return await obj.create_msg(guild,self.bot._)
 
     async def find_msg(self, channel:discord.TextChannel, ip:list, ID:str):
         if channel is None:

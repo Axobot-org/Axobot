@@ -9,14 +9,6 @@ class TimersCog(commands.Cog):
     def __init__(self, bot: zbot):
         self.bot = bot
         self.file = "timers"
-        try:
-            self.translate = self.bot.cogs["LangCog"].tr
-        except:
-            pass
-    
-    @commands.Cog.listener()
-    async def on_ready(self):
-        self.translate = self.bot.cogs["LangCog"].tr
 
     @commands.command(name="remindme", aliases=['rmd'])
     @commands.cooldown(5,30,commands.BucketType.channel)

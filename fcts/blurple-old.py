@@ -22,14 +22,7 @@ class BlurpleCog(commands.Cog):
     def __init__(self,bot):
         self.bot = bot
         self.file = 'blurple'
-        try:
-            self.translate = self.bot.cogs["LangCog"].tr
-        except:
-            pass
-    
-    @commands.Cog.listener()
-    async def on_ready(self):
-        self.translate = self.bot.cogs["LangCog"].tr
+
 
     @commands.command(name="isblurple",aliases=['blurple'])
     @commands.cooldown(rate=1, per=60, type=BucketType.user)

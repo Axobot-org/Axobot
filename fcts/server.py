@@ -33,10 +33,6 @@ class ServerCog(commands.Cog):
         self.log_color = 1793969
         self.file = "server"
         self.raids_levels = ["None","Smooth","Careful","High","(╯°□°）╯︵ ┻━┻"]
-        try:
-            self.translate = self.bot.cogs["LangCog"].tr
-        except:
-            pass
         self.table = 'servers_beta' if bot.beta else 'servers'
         self.default_opt = {"rr_max_number":7,
                "rss_max_number":10,
@@ -88,7 +84,6 @@ class ServerCog(commands.Cog):
 
     @commands.Cog.listener()
     async def on_ready(self):
-        self.translate = self.bot.cogs["LangCog"].tr
         self.table = 'servers_beta' if self.bot.beta else 'servers'
 
 

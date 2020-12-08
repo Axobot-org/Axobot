@@ -40,7 +40,6 @@ class InfoCog(commands.Cog):
         self.file = "infos"
         self.bot_version = conf.release
         try:
-            self.translate = bot.cogs["LangCog"].tr
             self.timecog = bot.cogs["TimeCog"]
         except:
             pass
@@ -49,7 +48,6 @@ class InfoCog(commands.Cog):
 
     @commands.Cog.listener()
     async def on_ready(self):
-        self.translate = self.bot.cogs["LangCog"].tr
         self.timecog = self.bot.cogs["TimeCog"]
         self.codelines = await self.count_lines_code()
         self.emoji_table = 'emojis_beta' if self.bot.beta else 'emojis'
