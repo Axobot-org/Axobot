@@ -139,19 +139,11 @@ class Blurplefy(Cog):
     def __init__(self, bot: zbot):
         self.bot = bot
         self.file = "blurple"
-        try:
-            self.translate = self.bot.cogs["LangCog"].tr
-        except:
-            pass
         with open("blurple-cache.json", "r") as f:
             self.cache = json.load(f)
     
     async def get_default_blurplefier(self, ctx):
         return "--blurplefy"
-
-    @commands.Cog.listener()
-    async def on_ready(self):
-        self.translate = self.bot.cogs["LangCog"].tr
 
     @commands.group(name="blurple", aliases=["b"])
     async def blurple_main(self, ctx: MyContext):

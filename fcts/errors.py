@@ -13,14 +13,6 @@ class ErrorsCog(commands.Cog):
     def __init__(self, bot: zbot):
         self.bot = bot
         self.file = "errors"
-        try:
-            self.translate = self.bot.cogs["LangCog"].tr
-        except:
-            pass
-    
-    @commands.Cog.listener()
-    async def on_ready(self):
-        self.translate = self.bot.cogs["LangCog"].tr
 
     async def search_err(self, form:list, sentence:str):
         for x in form:

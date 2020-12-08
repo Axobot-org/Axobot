@@ -14,14 +14,6 @@ class UsersCog(commands.Cog):
     def __init__(self, bot: zbot):
         self.bot = bot
         self.file = 'users'
-        try:
-            self.translate = bot.cogs['LangCog'].tr
-        except:
-            pass
-
-    @commands.Cog.listener()
-    async def on_ready(self):
-        self.translate = self.bot.cogs['LangCog'].tr
 
     @commands.group(name='profile')
     async def profile_main(self, ctx: MyContext):

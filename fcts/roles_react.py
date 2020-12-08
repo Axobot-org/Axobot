@@ -20,14 +20,9 @@ class RolesReact(commands.Cog):
         self.cache_initialized = False
         self.embed_color = 12118406
         self.footer_txt = 'ZBot roles reactions'
-        try:
-            self.translate = bot.cogs['LangCog'].tr
-        except:
-            pass
 
     @commands.Cog.listener()
     async def on_ready(self):
-        self.translate = self.bot.cogs['LangCog'].tr
         self.table = 'roles_react_beta' if self.bot.beta else 'roles_react'
 
     async def prepare_react(self, payload: discord.RawReactionActionEvent) -> Tuple[discord.Message, discord.Role]:

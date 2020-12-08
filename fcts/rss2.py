@@ -76,10 +76,6 @@ class RssCog(commands.Cog):
         if bot.user is not None:
             self.table = 'rss_flow' if bot.user.id==486896267788812288 else 'rss_flow_beta'
         try:
-            self.translate = bot.cogs["LangCog"].tr
-        except:
-            pass
-        try:
             self.date = bot.cogs["TimeCog"].date
         except:
             pass
@@ -90,7 +86,6 @@ class RssCog(commands.Cog):
 
     @commands.Cog.listener()
     async def on_ready(self):
-        self.translate = self.bot.cogs["LangCog"].tr
         self.date = self.bot.cogs["TimeCog"].date
         self.table = 'rss_flow' if self.bot.user.id==486896267788812288 else 'rss_flow_beta'
 
@@ -1415,7 +1410,7 @@ class RssCog(commands.Cog):
                     o.format = flow['structure']
                     o.embed = flow['use_embed']
                     o.fill_embed_data(flow)
-                    await o.fill_mention(guild,flow['roles'].split(';'),self.translate)
+                    await o.fill_mention(guild,flow['roles'].split(';'), self.bot._)
                     await self.send_rss_msg(o,chan,flow['roles'].split(';'),)
                 await self.update_flow(flow['ID'],[('date',o.date)])
                 return True

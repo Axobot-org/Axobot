@@ -15,14 +15,9 @@ class PartnersCog(commands.Cog):
         self.bot = bot
         self.file = 'partners'
         self.table = 'partners_beta' if bot.beta else 'partners'
-        try:
-            self.translate = self.bot.cogs["LangCog"].tr
-        except:
-            pass
     
     @commands.Cog.listener()
     async def on_ready(self):
-        self.translate = self.bot.cogs["LangCog"].tr
         self.table = 'partners_beta' if self.bot.beta else 'partners'
     
     async def generate_id(self):

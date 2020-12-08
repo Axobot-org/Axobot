@@ -151,10 +151,6 @@ class Halloween(Cog):
         self.file = "halloween"
         self.hourly_reward = [4, 17]
         try:
-            self.translate = self.bot.cogs["LangCog"].tr
-        except:
-            pass
-        try:
             with open("halloween-cache.json", "r") as f:
                 self.cache = json.load(f)
         except FileNotFoundError:
@@ -164,10 +160,6 @@ class Halloween(Cog):
 
     async def get_default_halloweefier(self, ctx: MyContext):
         return "--hallowify"
-
-    @commands.Cog.listener()
-    async def on_ready(self):
-        self.translate = self.bot.cogs["LangCog"].tr
 
     @commands.group(name="halloween", aliases=["hw"])
     @commands.check(is_halloween)

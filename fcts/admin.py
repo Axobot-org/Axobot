@@ -44,7 +44,6 @@ class AdminCog(commands.Cog):
         else:
             self.update = {'fr':None,'en':None}
         try:
-            self.translate = self.bot.cogs["LangCog"].tr
             self.utilities = self.bot.cogs["UtilitiesCog"]
         except:
             pass
@@ -53,7 +52,6 @@ class AdminCog(commands.Cog):
     
     @commands.Cog.listener()
     async def on_ready(self):
-        self.translate = self.bot.cogs["LangCog"].tr
         self.utilities = self.bot.cogs["UtilitiesCog"]
 
     async def check_if_admin(self,ctx):

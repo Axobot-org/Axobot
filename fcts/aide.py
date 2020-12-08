@@ -21,16 +21,8 @@ class HelpCog(commands.Cog):
             '|'.join(self._mentions_transforms.keys()))
         self.help_color = 8311585
         self.doc_url = "https://zbot.readthedocs.io/en/latest/"
-        try:
-            self.translate = bot.cogs["LangCog"].tr
-        except:
-            pass
         with open('fcts/help.json', 'r') as file:
             self.commands_list = json.load(file)
-
-    @commands.Cog.listener()
-    async def on_ready(self):
-        self.translate = self.bot.cogs["LangCog"].tr
 
     @commands.command(name="welcome", aliases=['bvn', 'bienvenue', 'leave'])
     @commands.cooldown(10, 30, commands.BucketType.channel)

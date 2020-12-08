@@ -23,14 +23,9 @@ class LibCog(commands.Cog):
         self.file = 'library'
         self.tables = ['librarystats_beta', 'library_beta'] if bot.beta else ['librarystats', 'library']
         self.cache = dict()
-        try:
-            self.translate = bot.cogs['LangCog'].tr
-        except:
-            pass
 
     async def on_ready(self):
         self.tables = ['librarystats_beta', 'library_beta'] if self.bot.beta else ['librarystats', 'library']
-        self.translate = self.bot.cogs['LangCog'].tr
 
     async def db_add_search(self, ISBN: int, name: str):
         cnx = self.bot.cnx_frm

@@ -18,10 +18,6 @@ class Events(commands.Cog):
 
     def __init__(self, bot: zbot):
         self.bot = bot
-        try:
-            self.translate = self.bot.cogs["LangCog"].tr
-        except:
-            pass
         self.file = "events"
         self.dbl_last_sending = datetime.datetime.utcfromtimestamp(0)
         self.partner_last_check = datetime.datetime.utcfromtimestamp(0)
@@ -58,7 +54,6 @@ class Events(commands.Cog):
 
     @commands.Cog.listener()
     async def on_ready(self):
-        self.translate = self.bot.cogs["LangCog"].tr
         if self.bot.database_online:
             await asyncio.sleep(0.1)
             await self.send_sql_statslogs()

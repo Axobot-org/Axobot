@@ -13,10 +13,6 @@ class BotEventsCog(commands.Cog):
         self.current_event = None
         self.current_event_data = {}
         self.updateCurrentEvent()
-        try:
-            self.translate = bot.cogs['LangCog'].tr
-        except:
-            pass
 
     def updateCurrentEvent(self):
         today = datetime.date.today()

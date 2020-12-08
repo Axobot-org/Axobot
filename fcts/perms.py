@@ -14,14 +14,7 @@ class PermsCog(commands.Cog):
             'text':[key for key,value in discord.Permissions().text() if value],
             'voice':[key for key,value in discord.Permissions().voice() if value]}
         self.perms_name['common_channel'] = [x for x in chan_perms if x in self.perms_name['general']]
-        try:
-            self.translate = self.bot.cogs["LangCog"].tr
-        except:
-            pass
 
-    @commands.Cog.listener()
-    async def on_ready(self):
-        self.translate = self.bot.cogs["LangCog"].tr
 
     @commands.command(name='perms', aliases=['permissions'])
     @commands.guild_only()

@@ -20,14 +20,6 @@ class ModeratorCog(commands.Cog):
     def __init__(self, bot: zbot):
         self.bot = bot
         self.file = "moderation"
-        try:
-            self.translate = bot.cogs['LangCog'].tr
-        except:
-            pass
-
-    @commands.Cog.listener()
-    async def on_ready(self):
-        self.translate = self.bot.cogs['LangCog'].tr
 
     @commands.command(name="slowmode")
     @commands.guild_only()

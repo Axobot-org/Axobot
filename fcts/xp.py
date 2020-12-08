@@ -42,10 +42,6 @@ class XPCog(commands.Cog):
         self.xp_channels_cache = dict()
         self.sus = None
         bot.add_listener(self.add_xp,'on_message')
-        try:
-            self.translate = bot.cogs['LangCog'].tr
-        except:
-            pass
         self.types = ['global','mee6-like','local']
         try:
             verdana_name = 'Verdana.ttf'
@@ -61,7 +57,6 @@ class XPCog(commands.Cog):
     
     @commands.Cog.listener()
     async def on_ready(self):
-        self.translate = self.bot.cogs['LangCog'].tr
         self.table = 'xp_beta' if self.bot.beta else 'xp'
         await self.bdd_load_cache(-1)
         if not self.bot.database_online:

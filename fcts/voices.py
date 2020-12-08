@@ -12,16 +12,8 @@ class VoiceChannels(commands.Cog):
         self.file = "voices"
         self.names = list()
         self.channels = dict()
-        try:
-            self.translate = bot.cogs['LangCog'].tr
-        except:
-            pass
         self.table = 'voices_chats'
         self.db_get_channels()
-
-    @commands.Cog.listener()
-    async def on_ready(self):
-        self.translate = self.bot.cogs['LangCog'].tr
 
     def db_get_channels(self):
         if not self.bot.database_online:
