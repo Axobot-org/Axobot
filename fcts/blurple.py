@@ -93,7 +93,7 @@ def _make_color_command(name, fmodifier, parent, **kwargs):
                       who: typing.Union[discord.Member, discord.PartialEmoji, LinkConverter] = None):
 
         if not (ctx.guild is None or ctx.channel.permissions_for(ctx.guild.me).attach_files):
-            return await ctx.send(await self.translate(ctx.channel,"blurple","missing-attachment-perm"))
+            return await ctx.send(await self.bot._(ctx.channel,"blurple","missing-attachment-perm"))
 
         if method is None:
             method = await self.get_default_blurplefier(ctx)

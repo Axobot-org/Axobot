@@ -35,21 +35,21 @@ class UsersCog(commands.Cog):
         """Change your xp card style"""
         if style is None and len(ctx.view.buffer.split(' '))>2:
             if ctx.view.buffer.split(' ')[2]=='list':
-                await ctx.send(str(await self.translate(ctx.channel,'users','list-cards')).format(', '.join(await ctx.bot.cogs['UtilitiesCog'].allowed_card_styles(ctx.author))))
+                await ctx.send(str(await self.bot._(ctx.channel,'users','list-cards')).format(', '.join(await ctx.bot.cogs['UtilitiesCog'].allowed_card_styles(ctx.author))))
             else:
-                await ctx.send(str(await self.translate(ctx.channel,'users','invalid-card')).format(', '.join(await ctx.bot.cogs['UtilitiesCog'].allowed_card_styles(ctx.author))))
+                await ctx.send(str(await self.bot._(ctx.channel,'users','invalid-card')).format(', '.join(await ctx.bot.cogs['UtilitiesCog'].allowed_card_styles(ctx.author))))
             return
         elif style is None:
             if ctx.channel.permissions_for(ctx.me).attach_files:
                 style = await self.bot.cogs['UtilitiesCog'].get_xp_style(ctx.author)
-                txts = [await self.translate(ctx.channel,'xp','card-level'), await self.translate(ctx.channel,'xp','card-rank')]
-                desc = await self.translate(ctx.channel,'users','card-desc')
+                txts = [await self.bot._(ctx.channel,'xp','card-level'), await self.bot._(ctx.channel,'xp','card-rank')]
+                desc = await self.bot._(ctx.channel,'users','card-desc')
                 await ctx.send(desc,file=await self.bot.cogs['XPCog'].create_card(ctx.author,style,25,0,[1,0],txts,force_static=True))
             else:
-                await ctx.send(await self.translate(ctx.channel,'users','missing-attach-files'))
+                await ctx.send(await self.bot._(ctx.channel,'users','missing-attach-files'))
         else:
             if await ctx.bot.cogs['UtilitiesCog'].change_db_userinfo(ctx.author.id,'xp_style',style):
-                await ctx.send(str(await self.translate(ctx.channel,'users','changed-0')).format(style))
+                await ctx.send(str(await self.bot._(ctx.channel,'users','changed-0')).format(style))
                 last_update = self.get_last_rankcard_update(ctx.author.id)
                 if last_update is None:
                     await self.bot.cogs["UtilitiesCog"].add_user_eventPoint(ctx.author.id,15)
@@ -57,7 +57,7 @@ class UsersCog(commands.Cog):
                     await self.bot.cogs["UtilitiesCog"].add_user_eventPoint(ctx.author.id,2)
                 self.set_last_rankcard_update(ctx.author.id)
             else:
-                await ctx.send(await self.translate(ctx.channel,'users','changed-1'))
+                await ctx.send(await self.bot._(ctx.channel,'users','changed-1'))
 
     @profile_main.command(name="config")
     @commands.check(checks.database_connected)
@@ -72,7 +72,7 @@ class UsersCog(commands.Cog):
         Providing empty value will show you the current value and more details"""
         options = {"animated_card":"animated_card", "auto_unafk":"auto_unafk", "usernames_log":"allow_usernames_logs"}
         if option not in options.keys():
-            await ctx.send(await self.translate(ctx.channel,"users","config_list",options=" - ".join(options.keys())))
+            await ctx.send(await self.bot._(ctx.channel,"users","config_list",options=" - ".join(options.keys())))
             return
         if allow is None:
             value = await self.bot.cogs['UtilitiesCog'].get_db_userinfo([options[option]],[f'`userID`={ctx.author.id}'])
@@ -85,14 +85,14 @@ class UsersCog(commands.Cog):
             else:
                 emojis = ('✅','❎')
             if value:
-                await ctx.send(emojis[0]+" "+await self.translate(ctx.channel,'users',option+'_true'))
+                await ctx.send(emojis[0]+" "+await self.bot._(ctx.channel,'users',option+'_true'))
             else:
-                await ctx.send(emojis[1]+" "+await self.translate(ctx.channel,'users',option+'_false'))
+                await ctx.send(emojis[1]+" "+await self.bot._(ctx.channel,'users',option+'_false'))
         else:
             if await self.bot.cogs['UtilitiesCog'].change_db_userinfo(ctx.author.id,options[option],allow):
-                await ctx.send(await self.translate(ctx.channel,'users','config_success',opt=option))
+                await ctx.send(await self.bot._(ctx.channel,'users','config_success',opt=option))
             else:
-                await ctx.send(await self.translate(ctx.channel,'users','changed-1'))
+                await ctx.send(await self.bot._(ctx.channel,'users','changed-1'))
 
     def get_last_rankcard_update(self, userID: int):
         try:

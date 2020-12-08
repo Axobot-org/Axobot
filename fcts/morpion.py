@@ -30,13 +30,13 @@ class MorpionCog(commands.Cog):
     """
         if leave == 'leave':
             if ctx.author.id not in self.in_game.keys():
-                await ctx.send(await self.translate(ctx.channel, 'morpion', 'not-playing'))
+                await ctx.send(await self.bot._(ctx.channel, 'morpion', 'not-playing'))
             else:
                 self.in_game.pop(ctx.author.id)
-                await ctx.send(await self.translate(ctx.channel, 'morpion', 'game-removed'))
+                await ctx.send(await self.bot._(ctx.channel, 'morpion', 'game-removed'))
             return
         if ctx.author.id in self.in_game.keys():
-            await ctx.send(await self.translate(ctx.channel, 'morpion', 'already-playing'))
+            await ctx.send(await self.bot._(ctx.channel, 'morpion', 'already-playing'))
             return
         self.in_game[ctx.author.id] = time.time()
         game = self.Game(ctx, self)

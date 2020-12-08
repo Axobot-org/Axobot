@@ -37,7 +37,7 @@ class BlurpleCog(commands.Cog):
         """Be part of the best birthday of the WORLD, and check if you're enough blurple to be cool!
         You can either give a user or an image URL in argument, or attach an image to your message. Plz don't forget to be cool."""
         if not (ctx.guild is None or ctx.channel.permissions_for(ctx.guild.me).attach_files):
-            return await ctx.send(await self.translate(ctx.channel,"blurple","missing-attachment-perm"))
+            return await ctx.send(await self.bot._(ctx.channel,"blurple","missing-attachment-perm"))
 
         picture = None
         start = time.time()
@@ -62,7 +62,7 @@ class BlurpleCog(commands.Cog):
                 async with cs.get(str(picture)) as r:
                     response = await r.read()
         except ValueError:
-            await ctx.send(str(await self.translate(ctx.guild,"blurple","check_invalid")).format(ctx.message.author.mention))
+            await ctx.send(str(await self.bot._(ctx.guild,"blurple","check_invalid")).format(ctx.message.author.mention))
             return
 
         colourbuffer = 25
@@ -70,10 +70,10 @@ class BlurpleCog(commands.Cog):
         try:
             im = Image.open(BytesIO(response))
         except Exception:
-            await ctx.send(str(await self.translate(ctx.guild,"blurple","check_invalid")).format(ctx.message.author.mention))
+            await ctx.send(str(await self.bot._(ctx.guild,"blurple","check_invalid")).format(ctx.message.author.mention))
             return
         
-        await ctx.send(str(await self.translate(ctx.guild,"blurple","check_intro")).format(ctx.message.author.mention))
+        await ctx.send(str(await self.bot._(ctx.guild,"blurple","check_intro")).format(ctx.message.author.mention))
 
         im = im.convert('RGBA')
         imsize = list(im.size)
@@ -88,7 +88,7 @@ class BlurpleCog(commands.Cog):
             imsize = list(im.size)
             impixels = imsize[0]*imsize[1]
             end = time.time()
-            await ctx.send(str(await self.translate(ctx.guild,"blurple","check_resized")).format(ctx.message.author.mention,round(end-start,2)))
+            await ctx.send(str(await self.bot._(ctx.guild,"blurple","check_resized")).format(ctx.message.author.mention,round(end-start,2)))
             start = time.time()
 
         def imager(im):
@@ -158,7 +158,7 @@ class BlurpleCog(commands.Cog):
             percentdblurple = round(((noofdarkblurplepixels/noofpixels)*100), 2)
             percentwhite = round(((noofwhitepixels/noofpixels)*100), 2)
 
-            fields_txt = await self.translate(ctx.guild,"blurple","check_fields")
+            fields_txt = await self.bot._(ctx.guild,"blurple","check_fields")
             embed = discord.Embed(Title = "", colour = 0x7289DA, description=fields_txt[5])
             if blurplenesspercentage>=99.99:
                 embed.add_field(name=fields_txt[0], value=f"{blurplenesspercentage}% :tada:", inline=False)
@@ -180,7 +180,7 @@ class BlurpleCog(commands.Cog):
                 if ctx.guild is not None and ctx.channel.permissions_for(ctx.guild.me).external_emojis:
                     em = '<:blurpletada:575696286905401345>'
                 await ctx.bot.cogs['UtilitiesCog'].change_db_userinfo(ctx.author.id,'unlocked_blurple',True)
-                await ctx.send(str(await self.translate(ctx.channel,'blurple','won-card')).format(ctx.author.mention,pr[-1],em))
+                await ctx.send(str(await self.bot._(ctx.channel,'blurple','won-card')).format(ctx.author.mention,pr[-1],em))
 
     @commands.command(aliases=['blurplfy', 'blurplefier'])
     @commands.cooldown(rate=3, per=90, type=BucketType.user)
@@ -213,21 +213,21 @@ class BlurpleCog(commands.Cog):
                 async with cs.get(str(picture)) as r:
                     response = await r.read()
         except ValueError:
-            await ctx.send(str(await self.translate(ctx.guild,"blurple","check_invalid")).format(ctx.message.author.mention))
+            await ctx.send(str(await self.bot._(ctx.guild,"blurple","check_invalid")).format(ctx.message.author.mention))
             return
 
 
         try:
             im = Image.open(BytesIO(response))
         except Exception:
-            await ctx.send(str(await self.translate(ctx.guild,"blurple","check_invalid")).format(ctx.message.author.mention))
+            await ctx.send(str(await self.bot._(ctx.guild,"blurple","check_invalid")).format(ctx.message.author.mention))
             return
 
         imsize = list(im.size)
         impixels = imsize[0]*imsize[1]
         maxpixelcount = 1562500
 
-        await ctx.send(str(await self.translate(ctx.guild,"blurple","check_intro")).format(ctx.message.author.mention))
+        await ctx.send(str(await self.bot._(ctx.guild,"blurple","check_intro")).format(ctx.message.author.mention))
 
         try:
             _ = im.info["version"]
@@ -323,19 +323,19 @@ class BlurpleCog(commands.Cog):
             else:
                 image = discord.File(fp=image, filename='image.gif')
             try:
-                fields_txt = await self.translate(ctx.guild,"blurple","check_fields")
+                fields_txt = await self.bot._(ctx.guild,"blurple","check_fields")
                 embed = discord.Embed(Title = "", colour = 0x7289DA, description=fields_txt[5])
-                embed.set_author(name=await self.translate(ctx.guild,'blurple','create_title'))
+                embed.set_author(name=await self.bot._(ctx.guild,'blurple','create_title'))
                 if isgif == False:
                     embed.set_image(url="attachment://image.png")
-                    embed.set_footer(text=str(await self.translate(ctx.guild,'blurple','create_footer_1')).format(ctx.author))
+                    embed.set_footer(text=str(await self.bot._(ctx.guild,'blurple','create_footer_1')).format(ctx.author))
                 else:
                     embed.set_image(url="attachment://image.gif")
-                    embed.set_footer(text=str(await self.translate(ctx.guild,'blurple','create_footer_2')).format(ctx.author))
+                    embed.set_footer(text=str(await self.bot._(ctx.guild,'blurple','create_footer_2')).format(ctx.author))
                 embed.set_thumbnail(url=picture)
                 await ctx.send(embed=embed, file=image)
             except Exception:
-                await ctx.send(str(await self.translate(ctx.guild,'blurple','create_footer_2')).format(ctx.author.mention))
+                await ctx.send(str(await self.bot._(ctx.guild,'blurple','create_footer_2')).format(ctx.author.mention))
 
 def setup(bot):
     bot.add_cog(BlurpleCog(bot))

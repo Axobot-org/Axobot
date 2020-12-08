@@ -111,38 +111,38 @@ class LibCog(commands.Cog):
         try:
             book = await self.search_book_2(ISBN, keywords)
         except isbnlib.dev._exceptions.ISBNLibHTTPError:
-            await ctx.send(await self.translate(ctx.channel, "library", "rate-limited") + " :confused:")
+            await ctx.send(await self.bot._(ctx.channel, "library", "rate-limited") + " :confused:")
             return
         if book is None:
-            return await ctx.send(await self.translate(ctx.channel, 'library', 'no-found'))
-        unknown = await self.translate(ctx.channel, 'library', 'unknown')
+            return await ctx.send(await self.bot._(ctx.channel, 'library', 'no-found'))
+        unknown = await self.bot._(ctx.channel, 'library', 'unknown')
         if ctx.can_send_embed:
             thumb = book.get('cover', '')
             emb = await self.bot.get_cog('EmbedCog').Embed(title=book['title'], thumbnail=thumb, color=5301186).create_footer(ctx)
             if 'authors' in book:
-                t = await self.translate(ctx.channel, 'library', 'author' if len(book['authors']) <= 1 else 'authors')
+                t = await self.bot._(ctx.channel, 'library', 'author' if len(book['authors']) <= 1 else 'authors')
                 t = t.capitalize()
                 emb.add_field(t, '\n'.join(book['authors']))
             # Publisher
-            publisher = (await self.translate(ctx.channel, 'library', 'publisher')).capitalize()
+            publisher = (await self.bot._(ctx.channel, 'library', 'publisher')).capitalize()
             emb.add_field(publisher, book.get('publisher', unknown))
             # ISBN
             emb.add_field('ISBN', book['isbn'], True)
             # Publication year
-            publication = (await self.translate(ctx.channel, 'library', 'year')).capitalize()
+            publication = (await self.bot._(ctx.channel, 'library', 'year')).capitalize()
             emb.add_field(publication, book.get('publication', unknown), True)
             # Language
             if 'language' in book:
-                lang = (await self.translate(ctx.channel, 'library', 'language')).capitalize()
+                lang = (await self.bot._(ctx.channel, 'library', 'language')).capitalize()
                 emb.add_field(lang, book['language'], True)
             await ctx.send(embed=emb)
         else:
             auth = '\n'.join(book['authors']) if 'authors' in book else unknown
-            authors = (await self.translate(ctx.channel, 'library', 'author' if len(book['authors']) <= 1 else 'authors')).capitalize()
-            title = (await self.translate(ctx.channel, 'library', 'title')).capitalize()
-            publisher = (await self.translate(ctx.channel, 'library', 'publisher')).capitalize()
-            publication = (await self.translate(ctx.channel, 'library', 'year')).capitalize()
-            lang = (await self.translate(ctx.channel, 'library', 'language')).capitalize()
+            authors = (await self.bot._(ctx.channel, 'library', 'author' if len(book['authors']) <= 1 else 'authors')).capitalize()
+            title = (await self.bot._(ctx.channel, 'library', 'title')).capitalize()
+            publisher = (await self.bot._(ctx.channel, 'library', 'publisher')).capitalize()
+            publication = (await self.bot._(ctx.channel, 'library', 'year')).capitalize()
+            lang = (await self.bot._(ctx.channel, 'library', 'language')).capitalize()
             txt = f"**{title}:** {book.get('title', unknown)}\n**{authors}:** {auth}\n**ISBN:** {book['isbn']}\n**{publisher}:** {book.get('publisher', unknown)}\n**{publication}:** {book.get('publication', unknown)}\n**{lang}:** {book.get('language', unknown)}"
             await ctx.send(txt)
         await self.db_add_search(book['isbn'], book['title'])

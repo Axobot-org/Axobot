@@ -57,22 +57,22 @@ class TimersCog(commands.Cog):
         """
         duration = sum(duration)
         if duration < 1:
-            await ctx.send(await self.translate(ctx.channel, "fun", "reminds-too-short"))
+            await ctx.send(await self.bot._(ctx.channel, "fun", "reminds-too-short"))
             return
         if duration > 60*60*24*365*2:
-            await ctx.send(await self.translate(ctx.channel, "fun", "reminds-too-long"))
+            await ctx.send(await self.bot._(ctx.channel, "fun", "reminds-too-long"))
             return
         if not self.bot.database_online:
-            await ctx.send(await self.translate(ctx.channel, "rss", "no-db"))
+            await ctx.send(await self.bot._(ctx.channel, "rss", "no-db"))
             return
-        f_duration = await ctx.bot.get_cog('TimeCog').time_delta(duration,lang=await self.translate(ctx.guild,'current_lang','current'), year=True, form='developed', precision=0)
+        f_duration = await ctx.bot.get_cog('TimeCog').time_delta(duration,lang=await self.bot._(ctx.guild,'current_lang','current'), year=True, form='developed', precision=0)
         try:
             d = {'msg_url': ctx.message.jump_url}
             await ctx.bot.get_cog('Events').add_task("timer", duration, ctx.author.id, ctx.guild.id if ctx.guild else None, ctx.channel.id, message, data=d)
         except Exception as e:
             await ctx.bot.get_cog("ErrorsCog").on_command_error(ctx,e)
         else:
-            await ctx.send(await self.translate(ctx.channel, "fun", "reminds-saved", duration=f_duration))
+            await ctx.send(await self.bot._(ctx.channel, "fun", "reminds-saved", duration=f_duration))
 
 
     @remind_main.command(name="list")
@@ -87,11 +87,11 @@ class TimersCog(commands.Cog):
         query = (f"SELECT *, CONVERT_TZ(`begin`, @@session.time_zone, '+00:00') AS `utc_begin` FROM `timed` WHERE user={ctx.author.id} AND action='timer'")
         cursor.execute(query)
         if cursor.rowcount == 0:
-            await ctx.send(await self.translate(ctx.channel, "timers", "rmd-empty"))
+            await ctx.send(await self.bot._(ctx.channel, "timers", "rmd-empty"))
             return
-        txt = await self.translate(ctx.channel, "timers", "rmd-item")
+        txt = await self.bot._(ctx.channel, "timers", "rmd-item")
         time_delta = self.bot.get_cog("TimeCog").time_delta
-        lang = await self.translate(ctx.channel, "current_lang", "current")
+        lang = await self.bot._(ctx.channel, "current_lang", "current")
         liste = list()
         for item in cursor:
             ctx2 = copy.copy(ctx)
@@ -113,10 +113,10 @@ class TimersCog(commands.Cog):
             else:
                 desc = "\n".join(liste)
                 fields = None
-            emb = ctx.bot.get_cog("EmbedCog").Embed(title=await self.translate(ctx.channel, "timers", "rmd-title"), desc=desc, fields=fields, color=16108042)
+            emb = ctx.bot.get_cog("EmbedCog").Embed(title=await self.bot._(ctx.channel, "timers", "rmd-title"), desc=desc, fields=fields, color=16108042)
             await ctx.send(embed=emb)
         else:
-            t = "**"+await self.translate(ctx.channel, "timers", "rmd-title")+"**\n\n"
+            t = "**"+await self.bot._(ctx.channel, "timers", "rmd-title")+"**\n\n"
             await ctx.send(t+"\n".join(liste))
     
     @remind_main.command(name="delete", aliases=["remove", "del"])
@@ -134,7 +134,7 @@ class TimersCog(commands.Cog):
         query = (f"SELECT ID, message FROM `timed` WHERE user={ctx.author.id} AND action='timer' AND ID={ID}")
         cursor.execute(query)
         if cursor.rowcount == 0:
-            await ctx.send(await self.translate(ctx.channel, "timers", "rmd-empty"))
+            await ctx.send(await self.bot._(ctx.channel, "timers", "rmd-empty"))
             return
         item = list(cursor)[0]
         cursor.close()
@@ -142,7 +142,7 @@ class TimersCog(commands.Cog):
         ctx2.message.content = item["message"]
         item["message"] = (await commands.clean_content(fix_channel_mentions=True).convert(ctx2, item["message"])).replace("`", "\\`")
         await self.bot.get_cog("Events").remove_task(item["ID"])
-        await ctx.send(await self.translate(ctx.channel, "timers", "rmd-deleted", id=item["ID"], message=item["message"]))
+        await ctx.send(await self.bot._(ctx.channel, "timers", "rmd-deleted", id=item["ID"], message=item["message"]))
 
 
 

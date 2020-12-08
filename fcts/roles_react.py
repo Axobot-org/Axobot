@@ -142,16 +142,16 @@ class RolesReact(commands.Cog):
                 raise commands.BadArgument(f'Role "{role.name}" not found')
             l = await self.rr_list_role(ctx.guild.id, emoji)
             if len(l) > 0:
-                return await ctx.send(await self.translate(ctx.guild.id, 'roles_react', 'already-1-rr'))
+                return await ctx.send(await self.bot._(ctx.guild.id, 'roles_react', 'already-1-rr'))
             max_rr = await self.bot.cogs['ServerCog'].find_staff(ctx.guild.id, 'roles_react_max_number')
             max_rr = self.bot.cogs["ServerCog"].default_opt['roles_react_max_number'] if max_rr is None else max_rr
             if len(l) >= max_rr:
-                return await ctx.send(await self.translate(ctx.guild.id, 'roles_react', 'too-many-rr', l=max_rr))
+                return await ctx.send(await self.bot._(ctx.guild.id, 'roles_react', 'too-many-rr', l=max_rr))
             await self.rr_add_role(ctx.guild.id, role.id, emoji, description[:150])
         except Exception as e:
             await self.bot.cogs['ErrorsCog'].on_command_error(ctx, e)
         else:
-            await ctx.send(await self.translate(ctx.guild.id, 'roles_react', 'rr-added', r=role.name, e=emoji))
+            await ctx.send(await self.bot._(ctx.guild.id, 'roles_react', 'rr-added', r=role.name, e=emoji))
             self.guilds_which_have_roles.add(ctx.guild.id)
 
     @rr_main.command(name="remove")
@@ -167,16 +167,16 @@ class RolesReact(commands.Cog):
                 emoji = r.group(1)
             l = await self.rr_list_role(ctx.guild.id, emoji)
             if len(l) == 0:
-                return await ctx.send(await self.translate(ctx.guild.id, 'roles_react', 'no-rr'))
+                return await ctx.send(await self.bot._(ctx.guild.id, 'roles_react', 'no-rr'))
             await self.rr_remove_role(l[0]['ID'])
         except Exception as e:
             await self.bot.cogs['ErrorsCog'].on_command_error(ctx, e)
         else:
             role = ctx.guild.get_role(l[0]['role'])
             if role is None:
-                await ctx.send(await self.translate(ctx.guild.id, 'roles_react', 'rr-removed-2', e=old_emoji))
+                await ctx.send(await self.bot._(ctx.guild.id, 'roles_react', 'rr-removed-2', e=old_emoji))
             else:
-                await ctx.send(await self.translate(ctx.guild.id, 'roles_react', 'rr-removed', r=role, e=old_emoji))
+                await ctx.send(await self.bot._(ctx.guild.id, 'roles_react', 'rr-removed', r=role, e=old_emoji))
             if len(l) < 2:
                 try:
                     self.guilds_which_have_roles.remove(ctx.guild.id)
@@ -206,7 +206,7 @@ class RolesReact(commands.Cog):
     async def rr_list(self, ctx: MyContext):
         """List every roles reactions of your server"""
         if not ctx.can_send_embed:
-            return await ctx.send(await self.translate(ctx.guild.id, "fun", "no-embed-perm"))
+            return await ctx.send(await self.bot._(ctx.guild.id, "fun", "no-embed-perm"))
         try:
             l = await self.rr_list_role(ctx.guild.id)
         except Exception as e:
@@ -215,7 +215,7 @@ class RolesReact(commands.Cog):
             des, _ = await self.create_list_embed(l, ctx.guild)
             max_rr = await self.bot.cogs['ServerCog'].find_staff(ctx.guild.id, 'roles_react_max_number')
             max_rr = self.bot.cogs["ServerCog"].default_opt['roles_react_max_number'] if max_rr is None else max_rr
-            title = await self.translate(ctx.guild.id, "roles_react", 'rr-list', n=len(l), m=max_rr)
+            title = await self.bot._(ctx.guild.id, "roles_react", 'rr-list', n=len(l), m=max_rr)
             emb = await self.bot.cogs['EmbedCog'].Embed(title=title, desc=des, color=self.embed_color).update_timestamp().create_footer(ctx)
             await ctx.send(embed=emb.discord_embed())
 
@@ -227,14 +227,14 @@ It will only display the whole message with reactions. Still very cool tho
 
 ..Doc roles-reactions.html#get-or-leave-a-role"""
         if not ctx.can_send_embed:
-            return await ctx.send(await self.translate(ctx.guild.id, "fun", "no-embed-perm"))
+            return await ctx.send(await self.bot._(ctx.guild.id, "fun", "no-embed-perm"))
         try:
             l = await self.rr_list_role(ctx.guild.id)
         except Exception as e:
             await self.bot.cogs['ErrorsCog'].on_command_error(ctx, e)
         else:
             des, emojis = await self.create_list_embed(l, ctx.guild)
-            title = await self.translate(ctx.guild.id, "roles_react", 'rr-embed')
+            title = await self.bot._(ctx.guild.id, "roles_react", 'rr-embed')
             emb = self.bot.cogs['EmbedCog'].Embed(
                 title=title, desc=des, color=self.embed_color, footer_text=self.footer_txt).update_timestamp()
             msg = await ctx.send(embed=emb.discord_embed())
@@ -254,7 +254,7 @@ Opposite is the subcommand 'leave'
 
 ..Doc roles-reactions.html#get-or-leave-a-role"""
         if not role.id in [x['role'] for x in await self.rr_list_role(ctx.guild.id)]:
-            await ctx.send(await self.translate(ctx.guild.id, 'roles_react', 'role-not-in-list'))
+            await ctx.send(await self.bot._(ctx.guild.id, 'roles_react', 'role-not-in-list'))
             return
         await self.give_remove_role(ctx.author, role, ctx.guild, ctx.channel)
 
@@ -268,7 +268,7 @@ Opposite is the subcommand 'join'
 
 ..Doc roles-reactions.html#get-or-leave-a-role"""
         if not role.id in [x['role'] for x in await self.rr_list_role(ctx.guild.id)]:
-            await ctx.send(await self.translate(ctx.guild.id, 'roles_react', 'role-not-in-list'))
+            await ctx.send(await self.bot._(ctx.guild.id, 'roles_react', 'role-not-in-list'))
             return
         await self.give_remove_role(ctx.author, role, ctx.guild, ctx.channel, give=False)
 
@@ -280,16 +280,16 @@ Opposite is the subcommand 'join'
         if not ignore_failure:
             if role in user.roles and give:
                 if not ignore_success:
-                    await channel.send(await self.translate(guild.id, "roles_react", "already-have"))
+                    await channel.send(await self.bot._(guild.id, "roles_react", "already-have"))
                 return
             elif not (role in user.roles or give):
                 if not ignore_success:
-                    await channel.send(await self.translate(guild.id, "roles_react", "already-dont-have"))
+                    await channel.send(await self.bot._(guild.id, "roles_react", "already-dont-have"))
                 return
             if not guild.me.guild_permissions.manage_roles:
-                return await channel.send(await self.translate(guild.id, 'modo', 'cant-mute'))
+                return await channel.send(await self.bot._(guild.id, 'modo', 'cant-mute'))
             if role.position >= guild.me.top_role.position:
-                return await channel.send(await self.translate(guild.id, 'modo', 'role-high', r=role_name))
+                return await channel.send(await self.bot._(guild.id, 'modo', 'role-high', r=role_name))
         try:
             if give:
                 await user.add_roles(role, reason="Roles reaction")
@@ -301,7 +301,7 @@ Opposite is the subcommand 'join'
             await self.bot.cogs['ErrorsCog'].on_error(e, None)
         else:
             if not ignore_success:
-                await channel.send(await self.translate(guild.id, 'roles_react', 'role-given' if give else 'role-lost', r=role_name))
+                await channel.send(await self.bot._(guild.id, 'roles_react', 'role-given' if give else 'role-lost', r=role_name))
 
     @rr_main.command(name='update')
     @commands.check(checks.database_connected)
@@ -310,9 +310,9 @@ Opposite is the subcommand 'join'
         If you don't want to update the embed content, for example if it's a custom embed, then you can use 'False' as a second argument. Zbot will only check the reactions
         Specifying a list of emojis will update the embed only for those emojis, and ignore other roles reactions"""
         if embed.author != ctx.guild.me:
-            return await ctx.send(await self.translate(ctx.guild, 'roles_react', 'not-zbot-msg'))
+            return await ctx.send(await self.bot._(ctx.guild, 'roles_react', 'not-zbot-msg'))
         if len(embed.embeds) != 1 or embed.embeds[0].footer.text != self.footer_txt:
-            return await ctx.send(await self.translate(ctx.guild, 'roles_react', 'not-zbot-embed'))
+            return await ctx.send(await self.bot._(ctx.guild, 'roles_react', 'not-zbot-embed'))
         emb = embed.embeds[0]
         try:
             l = await self.rr_list_role(ctx.guild.id)
@@ -330,9 +330,9 @@ Opposite is the subcommand 'join'
         if emb.description != desc and changeDescription:
             emb.description = desc
             await embed.edit(embed=emb)
-            await ctx.send(await self.translate(ctx.guild, 'roles_react', 'reactions-edited'))
+            await ctx.send(await self.bot._(ctx.guild, 'roles_react', 'reactions-edited'))
         else:
-            await ctx.send(await self.translate(ctx.guild, 'roles_react', 'embed-edited'))
+            await ctx.send(await self.bot._(ctx.guild, 'roles_react', 'embed-edited'))
 
 
 def setup(bot):

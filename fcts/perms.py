@@ -52,7 +52,7 @@ class PermsCog(commands.Cog):
             return
         permsl = list()
         # Get the perms translations
-        perms_translations = await self.translate(ctx.guild.id,'perms','perms-list')
+        perms_translations = await self.bot._(ctx.guild.id,'perms','perms-list')
 
         if perms.administrator:
             # If the user is admin, we just say it
@@ -88,7 +88,7 @@ class PermsCog(commands.Cog):
             else:
                 fields = [{'name':'\uFEFF','value':"\n".join(permsl),'inline':True}]
             if channel is None:
-                desc = await self.translate(ctx.guild.id,'perms','general')
+                desc = await self.bot._(ctx.guild.id,'perms','general')
             else:
                 desc = channel.mention
             embed = await ctx.bot.cogs['EmbedCog'].Embed(color=col,fields=fields,desc=desc).create_footer(ctx)
@@ -98,7 +98,7 @@ class PermsCog(commands.Cog):
             # Thanks to Gio for the Command.
         else:
             try:
-                await ctx.send(str(await self.translate(ctx.guild.id,"perms","perms-1")).format(name.replace('@','')) + "\n".join(permsl))
+                await ctx.send(str(await self.bot._(ctx.guild.id,"perms","perms-1")).format(name.replace('@','')) + "\n".join(permsl))
             except:
                 pass
 

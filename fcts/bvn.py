@@ -65,7 +65,7 @@ class WelcomerCog(commands.Cog):
                 channel = member.guild.get_channel(int(channel))
                 if channel is None:
                     continue
-                botormember = await self.translate(member.guild,"keywords",'bot' if member.bot else 'member')
+                botormember = await self.bot._(member.guild,"keywords",'bot' if member.bot else 'member')
                 try:
                     msg = msg.format_map(self.bot.SafeDict(
                         user=member.mention if Type=='welcome' else member.name,
@@ -140,25 +140,25 @@ class WelcomerCog(commands.Cog):
             return c
         if level >= 1:
             if await self.bot.cogs['UtilitiesCog'].check_discord_invite(member.name) is not None:
-                await self.kick(member,await self.translate(member.guild.id,"logs","d-invite"))
+                await self.kick(member,await self.bot._(member.guild.id,"logs","d-invite"))
                 c = True
         if level >= 2:
             if (datetime.datetime.utcnow() - member.created_at).seconds <= 5*60:
-                await self.kick(member,await self.translate(member.guild.id,"logs","d-young"))
+                await self.kick(member,await self.bot._(member.guild.id,"logs","d-young"))
                 c = True
         if level >= 3 and can_ban:
             if await self.bot.cogs['UtilitiesCog'].check_discord_invite(member.name) is not None:
-                await self.ban(member,await self.translate(member.guild.id,"logs","d-invite"))
+                await self.ban(member,await self.bot._(member.guild.id,"logs","d-invite"))
                 c = True
             if (datetime.datetime.utcnow() - member.created_at).seconds <= 30*60:
-                await self.kick(member,await self.translate(member.guild.id,"logs","d-young"))
+                await self.kick(member,await self.bot._(member.guild.id,"logs","d-young"))
                 c = True
         if level >= 4:
             if (datetime.datetime.utcnow() - member.created_at).seconds <= 30*60:
-                await self.kick(member,await self.translate(member.guild.id,"logs","d-young"))
+                await self.kick(member,await self.bot._(member.guild.id,"logs","d-young"))
                 c = True
             if (datetime.datetime.utcnow() - member.created_at).seconds <= 120*60 and can_ban:
-                await self.ban(member,await self.translate(member.guild.id,"logs","d-young"))
+                await self.ban(member,await self.bot._(member.guild.id,"logs","d-young"))
                 c = True
         return c
 
@@ -173,9 +173,9 @@ class WelcomerCog(commands.Cog):
                 role = member.guild.get_role(int(r))
                 if role is not None:
                     try:
-                        await member.add_roles(role,reason=await self.translate(member.guild.id,"logs","d-welcome_roles"))
+                        await member.add_roles(role,reason=await self.bot._(member.guild.id,"logs","d-welcome_roles"))
                     except discord.errors.Forbidden:
-                        await self.bot.cogs['Events'].send_logs_per_server(member.guild,'error',await self.translate(member.guild,'bvn','error-give-roles',r=role.name,u=str(member)), member.guild.me)
+                        await self.bot.cogs['Events'].send_logs_per_server(member.guild,'error',await self.bot._(member.guild,'bvn','error-give-roles',r=role.name,u=str(member)), member.guild.me)
         except discord.errors.NotFound:
             pass
         except Exception as e:
