@@ -16,7 +16,6 @@ import re
 import copy
 import requests
 from discord.ext import commands
-from inspect import signature
 from platform import system as system_name  # Returns the system/OS name
 from subprocess import call as system_call  # Execute a shell command
 
@@ -113,7 +112,8 @@ class InfoCog(commands.Cog):
                     ignored_guilds = [int(x) for x in self.bot.cogs['UtilitiesCog'].config['banned_guilds'].split(";") if len(x) > 0]
                 ignored_guilds += self.bot.cogs['ReloadsCog'].ignored_guilds
                 len_servers = await self.get_guilds_count(ignored_guilds)
-                langs_list = await self.bot.cogs['ServerCog'].get_languages(ignored_guilds)
+                langs_list: list = await self.bot.cogs['ServerCog'].get_languages(ignored_guilds)
+                langs_list.sort(reverse=True, key=lambda x: x[1])
                 lang_total = sum([x[1] for x in langs_list])
                 langs_list = ' | '.join(["{}: {}%".format(x[0],round(x[1]/lang_total*100)) for x in langs_list if x[1] > 0])
                 del lang_total
@@ -228,7 +228,6 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
                     try:
                         item = await find(ctx,name,Type)
                     except:
-                        # name = name.replace('@everyone',"@"+u"\u200B"+"everyone").replace("@here","@"+u"\u200B"+"here")
                         await ctx.send(str(await self.bot._(ctx.guild.id,"modo","cant-find-user")).format(name))
                         return
             critical = ctx.author.guild_permissions.manage_guild or await self.bot.cogs['AdminCog'].check_if_god(ctx)
