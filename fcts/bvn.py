@@ -40,13 +40,13 @@ class WelcomerCog(commands.Cog):
         """Envoie un message de bienvenue/départ dans le serveur"""
         if self.bot.zombie_mode:
             return
-        msg = await self.bot.cogs['ServerCog'].find_staff(member.guild.id,Type)
+        msg = await self.bot.get_config(member.guild.id,Type)
         if await self.raid_check(member) or member.id in self.no_message:
             return
         if await self.bot.cogs['UtilitiesCog'].check_any_link(member.name) is not None:
             return
         if msg not in ['',None]:
-            ch = await self.bot.cogs['ServerCog'].find_staff(member.guild.id,'welcome_channel')
+            ch = await self.bot.get_config(member.guild.id,'welcome_channel')
             if ch is None:
                 return
             ch = ch.split(';')
@@ -101,7 +101,7 @@ class WelcomerCog(commands.Cog):
 
     async def give_roles_back(self, member: discord.Member):
         """Give roles rewards/muted role to new users"""
-        used_xp_type = await self.bot.cogs['ServerCog'].find_staff(member.guild.id,'xp_type')
+        used_xp_type = await self.bot.get_config(member.guild.id,'xp_type')
         xp = await self.bot.cogs['XPCog'].bdd_get_xp(member.id, None if used_xp_type == 0 else member.guild.id)
         if xp is not None and len(xp) == 1:
             await self.bot.cogs['XPCog'].give_rr(member,(await self.bot.cogs['XPCog'].calc_level(xp[0]['xp'],used_xp_type))[0],await self.bot.cogs['XPCog'].rr_list_role(member.guild.id))
@@ -122,7 +122,7 @@ class WelcomerCog(commands.Cog):
     async def raid_check(self, member: discord.Member):
         if member.guild is None:
             return False
-        level = str(await self.bot.cogs['ServerCog'].find_staff(member.guild.id,"anti_raid"))
+        level = str(await self.bot.get_config(member.guild.id,"anti_raid"))
         if not level.isnumeric() or member.guild.channels[0].permissions_for(member.guild.me).kick_members == False:
             return
         c = False
@@ -158,7 +158,7 @@ class WelcomerCog(commands.Cog):
     async def give_roles(self, member: discord.Member):
         """Give new roles to new users"""
         try:
-            roles = str(await self.bot.cogs['ServerCog'].find_staff(member.guild.id,"welcome_roles"))
+            roles = str(await self.bot.get_config(member.guild.id,"welcome_roles"))
             for r in roles.split(";"):
                 if (not r.isnumeric()) or len(r) == 0:
                     continue

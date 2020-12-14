@@ -56,7 +56,7 @@ class MorpionCog(commands.Cog):
             if self.bot.current_event == 'fish':
                 self.emojis = ["🐟", "🐠"]
             if self.ctx.guild:
-                config = await self.bot.get_cog("ServerCog").find_staff(self.ctx.guild.id, "morpion_emojis")
+                config = await self.bot.get_config(self.ctx.guild.id, "morpion_emojis")
                 if config is not None and config != "":
                     for r in config.split(';'):
                         if r.isnumeric():

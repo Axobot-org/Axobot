@@ -538,7 +538,7 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
         since = await self.bot._(ctx.guild.id,"keywords","depuis")
         _, bots, online = await self.bot.get_cog("UtilitiesCog").get_members_repartition(guild.members)
        
-        desc = await self.bot.cogs['ServerCog'].find_staff(guild.id,'description')
+        desc = await self.bot.get_config(guild.id,'description')
         if (desc is None or len(desc) == 0) and guild.description is not None:
             desc = guild.description
         embed = discord.Embed(colour=default_color, timestamp=ctx.message.created_at, description=desc)
@@ -841,13 +841,13 @@ Servers:
         # Bots
         bots = len([x for x in guild.members if x.bot])
         # Lang
-        lang = await ctx.bot.cogs["ServerCog"].find_staff(guild.id,'language')
+        lang = await ctx.bot.get_config(guild.id,'language')
         if lang is None:
             lang = 'default'
         else:
             lang = ctx.bot.cogs['LangCog'].languages[lang]
         # Roles rewards
-        rr_len = await self.bot.cogs['ServerCog'].find_staff(guild.id,'rr_max_number')
+        rr_len = await self.bot.get_config(guild.id,'rr_max_number')
         rr_len = self.bot.cogs["ServerCog"].default_opt['rr_max_number'] if rr_len is None else rr_len
         rr_len = '{}/{}'.format(len(await self.bot.cogs['XPCog'].rr_list_role(guild.id)),rr_len)
         # Prefix
@@ -855,7 +855,7 @@ Servers:
         if "`" not in pref:
             pref = "`" + pref + "`"
         # Rss
-        rss_len = await self.bot.cogs['ServerCog'].find_staff(guild.id,'rss_max_number')
+        rss_len = await self.bot.get_config(guild.id,'rss_max_number')
         rss_len = self.bot.cogs["ServerCog"].default_opt['rss_max_number'] if rss_len is None else rss_len
         rss_numb = "{}/{}".format(len(await self.bot.cogs['RssCog'].get_guild_flows(guild.id)), rss_len)
         # Join date

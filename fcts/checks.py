@@ -87,7 +87,7 @@ async def verify_role_exists(ctx: MyContext) -> bool:
     """Check if the verify role exists"""
     if ctx.guild is None:
         return False
-    roles_raw = await ctx.bot.cogs['ServerCog'].find_staff(ctx.guild.id, "verification_role")
+    roles_raw = await ctx.bot.get_config(ctx.guild.id, "verification_role")
     if roles_raw is None:
         return False
     roles = [r for r in [ctx.guild.get_role(int(x)) for x in roles_raw.split(';') if x.isnumeric() and len(x) > 0] if r is not None]
@@ -111,12 +111,12 @@ async def is_fun_enabled(ctx: MyContext, self=None) -> bool:
         return False
     ID = ctx.guild.id
     if str(ID) not in self.fun_opt.keys():
-        fun = await ctx.bot.cogs["ServerCog"].find_staff(ID, "enable_fun")
+        fun = await ctx.bot.get_config(ID, "enable_fun")
         self.fun_opt[str(ID)] = fun
     else:
         fun = self.fun_opt[str(ID)]
         if fun is None:
-            fun = await ctx.bot.cogs["ServerCog"].find_staff(ID, "enable_fun")
+            fun = await ctx.bot.get_config(ID, "enable_fun")
             if fun is not None:
                 self.fun_opt[str(ID)] = fun
     return fun == 1 or fun == True

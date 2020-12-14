@@ -144,7 +144,7 @@ class PartnersCog(commands.Cog):
         tr_click = await self.bot._(channel.guild.id,'keywords','click_here')
         count = 0
         if color is None:
-            color = await self.bot.cogs['ServerCog'].find_staff(channel.guild.id,'partner_color')
+            color = await self.bot.get_config(channel.guild.id,'partner_color')
         if color is None:
             color = self.bot.cogs['ServerCog'].default_opt['partner_color']
         session = aiohttp.ClientSession(loop=self.bot.loop)
@@ -185,7 +185,7 @@ class PartnersCog(commands.Cog):
                     field1 = None
                 field2 = {'name':tr_invite.capitalize(),'value':'[{}](https://discord.gg/{})'.format(tr_click.capitalize(),partner['target'])}
                 if len(target_desc) == 0:
-                    target_desc = await self.bot.cogs['ServerCog'].find_staff(inv.guild.id,'description')
+                    target_desc = await self.bot.get_config(inv.guild.id,'description')
             emb = self.bot.cogs['EmbedCog'].Embed(title=title,desc=target_desc,fields=[x for x in (field1,field2) if not x is None],color=color,footer_text=str(partner['ID']),thumbnail=image).update_timestamp()
             if self.bot.zombie_mode:
                 return
@@ -208,7 +208,7 @@ class PartnersCog(commands.Cog):
         if isinstance(invite.guild,discord.Guild):
             if guild.id == 356067272730607628 and self.bot.beta:
                 return
-            roles = await self.bot.cogs['ServerCog'].find_staff(guild.id,'partner_role')
+            roles = await self.bot.get_config(guild.id,'partner_role')
             roles = [x for x in [guild.get_role(int(x)) for x in roles.split(';') if len(x) > 0 and x.isnumeric()] if x is not None]
             admins = [x for x in invite.guild.members if x.guild_permissions.administrator]
             for admin in admins:
@@ -371,7 +371,7 @@ class PartnersCog(commands.Cog):
             f[1] = await self.bot._(ctx.guild.id,'partners','no-partner-2')
         fields_name = await self.bot._(ctx.guild.id,'partners','partners-list')
         if ctx.can_send_embed:
-            color = await ctx.bot.cogs['ServerCog'].find_staff(ctx.guild.id,'partner_color')
+            color = await ctx.bot.get_config(ctx.guild.id,'partner_color')
             if color is None:
                 color = self.bot.cogs['ServerCog'].default_opt['partner_color']
             emb = await ctx.bot.get_cog('EmbedCog').Embed(title=fields_name[0],fields=[{'name':fields_name[1],'value':f[0]},{'name':'​','value':'​'},{'name':fields_name[2],'value':f[1]}],color=color,thumbnail=ctx.guild.icon_url).update_timestamp().create_footer(ctx)

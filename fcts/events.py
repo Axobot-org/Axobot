@@ -172,7 +172,7 @@ class Events(commands.Cog):
         if msg.author.bot==False and await self.bot.cogs['AdminCog'].check_if_admin(msg.author) == False and msg.guild is not None:
             cond = True
             if self.bot.database_online:
-                cond = str(await self.bot.cogs["ServerCog"].find_staff(msg.guild,"anti_caps_lock")) in ['1','True']
+                cond = str(await self.bot.get_config(msg.guild,"anti_caps_lock")) in ['1','True']
             if cond:
                 if len(msg.content) > 0 and sum(1 for c in msg.content if c.isupper())/len(msg.content.replace('|','')) > 0.75 and len(msg.content.replace('|',''))>7 and not msg.channel.permissions_for(msg.author).administrator:
                     try:
@@ -218,7 +218,7 @@ class Events(commands.Cog):
             return
         c = self.embed_colors[Type.lower()]
         try:
-            config = str(await self.bot.cogs["ServerCog"].find_staff(guild.id,"modlogs_channel")).split(';')[0]
+            config = str(await self.bot.get_config(guild.id,"modlogs_channel")).split(';')[0]
             if config == "" or config.isnumeric()==False:
                 return
             channel = guild.get_channel(int(config))

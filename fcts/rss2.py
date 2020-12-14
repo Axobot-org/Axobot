@@ -281,7 +281,7 @@ class RssCog(commands.Cog):
     async def is_overflow(self, guild: discord.Guild) -> typing.Tuple[bool, int]:
         """Check if a guild still has at least a slot
         True if max number reached, followed by the flow limit"""
-        flow_limit = await self.bot.cogs['ServerCog'].find_staff(guild.id,'rss_max_number')
+        flow_limit = await self.bot.get_config(guild.id,'rss_max_number')
         if flow_limit is None:
             flow_limit = self.bot.cogs['ServerCog'].default_opt['rss_max_number']
         return len(await self.get_guild_flows(guild.id)) >= flow_limit, flow_limit
