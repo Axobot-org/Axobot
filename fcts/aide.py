@@ -13,7 +13,7 @@ class HelpCog(commands.Cog):
     def __init__(self, bot: zbot):
         self.bot = bot
         self.file = "aide"
-        bot.remove_command("help")
+        self.old_cmd = bot.remove_command("help")
         self._mentions_transforms = {
             '@everyone': '@\u200beveryone',
             '@here': '@\u200bhere'}
@@ -23,6 +23,10 @@ class HelpCog(commands.Cog):
         self.doc_url = "https://zbot.readthedocs.io/en/latest/"
         with open('fcts/help.json', 'r') as file:
             self.commands_list = json.load(file)
+    
+    def cog_unload(self):
+        self.bot.remove_command("help")
+        self.bot.add_command(self.old_cmd)
 
     @commands.command(name="welcome", aliases=['bvn', 'bienvenue', 'leave'])
     @commands.cooldown(10, 30, commands.BucketType.channel)
