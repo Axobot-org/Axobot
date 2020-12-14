@@ -19,9 +19,11 @@ MC
 
 This command is the main command of this module: the one that allows to search the information in the database, or to get those from a Minecraft server. To ask the bot to send the status of a server and to refresh this message regularly, use the `add` subcommand followed by the server ip. The bot will then try to edit the last message about this server, and if it can't, it will send a new one. 
 
-To search in the database, the command is disconcertingly simple: you just have to write the type of your search (entity, block, etc.) followed by its name (partial or total, French or English) or its identifier (numerical or textual). The rest does itself! 
+To search in the database, the command is disconcertingly simple: you just have to write the type of your search (entity, block, mod, etc.) followed by its name (partial or total, French or English) or its identifier (numerical or textual). The rest does itself! 
 
 To see the list of available types, enter the help mc command in the chat. If you don't find what you're looking for, don't worry: this type is probably planned for later!
+
+Mods info come from the `CurseForge API <https://twitchappapi.docs.apiary.io/>`_ (currently managed by Twitch), so Zbot may not be able to find some mods. Please also note that Twitch search is very weird, and may not have the best results. Other data come from the french `fr-minecraft.net <https://fr-minecraft.net>`_ website.
 
 .. warning:: 
     * The bot needs the "`Embed links <perms.html#embed-links>`_" permission to send its search query, as well as "`Read message history <perms.html#read-message-history>`_" and to display the status of a server (enabled with `add` subcommand)
