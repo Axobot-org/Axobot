@@ -1019,15 +1019,14 @@ Servers:
     @commands.command(name="discordlinks",aliases=['discord','discordurls'])
     async def discord_status(self, ctx: MyContext):
         """Get some useful links about Discord"""
-        can_embed = ctx.can_send_embed
-        if can_embed:
-            l = await self.bot._(ctx.channel,'infos','discordlinks')
-            links = ["https://dis.gd/status","https://dis.gd/tos","https://dis.gd/report","https://dis.gd/feedback","https://support.discord.com/hc/en-us/articles/115002192352","https://discord.com/developers/docs/legal","https://support.discord.com/hc/en-us/articles/206346498-Where-can-I-find-my-User-Server-Message-ID-","https://support.discord.com/hc/en-us/articles/360040724612", " https://twitter.com/discordapp/status/1060411427616444417"]
+        l = await self.bot._(ctx.channel,'infos','discordlinks')
+        links = ["https://dis.gd/status","https://dis.gd/tos","https://dis.gd/report","https://dis.gd/feedback","https://support.discord.com/hc/en-us/articles/115002192352","https://discord.com/developers/docs/legal","https://support.discord.com/hc/en-us/articles/206346498-Where-can-I-find-my-User-Server-Message-ID-","https://support.discord.com/hc/en-us/articles/360040724612", " https://twitter.com/discordapp/status/1060411427616444417"]
+        if ctx.can_send_embed:
             txt = "\n".join(['['+l[i]+']('+links[i]+')' for i in range(len(l))])
             em = await self.bot.cogs["EmbedCog"].Embed(desc=txt).update_timestamp().create_footer(ctx)
             await ctx.send(embed=em)
         else:
-            txt = "\n".join([f'• {k}: <{v}>' for k,v in (await self.bot._(ctx.channel,'infos','discordlinks')).items()])
+            txt = "\n".join([f'• {l[i]}: <{links[i]}>' for i in range(len(l))])
             await ctx.send(txt)
     
 
