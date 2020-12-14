@@ -63,7 +63,7 @@ class XPCog(commands.Cog):
             self.bot.unload_extension("fcts.xp")
 
     async def get_lvlup_chan(self, msg: discord.Message):
-        value = await self.bot.get_cog("ServerCog").find_staff(msg.guild.id,"levelup_channel")
+        value = await self.bot.get_config(msg.guild.id,"levelup_channel")
         if value == "none":
             return None
         if value == "any":
@@ -78,10 +78,10 @@ class XPCog(commands.Cog):
         """Attribue un certain nombre d'xp à un message"""
         if msg.author.bot or msg.guild is None or not self.bot.xp_enabled:
             return
-        used_xp_type = await self.bot.cogs['ServerCog'].find_staff(msg.guild.id,'xp_type')
-        if not ( await self.check_noxp(msg) and await self.bot.cogs['ServerCog'].find_staff(msg.guild.id,'enable_xp') ):
+        used_xp_type = await self.bot.get_config(msg.guild.id,'xp_type')
+        if not ( await self.check_noxp(msg) and await self.bot.get_config(msg.guild.id,'enable_xp') ):
             return
-        rate = await self.bot.cogs['ServerCog'].find_staff(msg.guild.id,'xp_rate')
+        rate = await self.bot.get_config(msg.guild.id,'xp_rate')
         if self.sus is None:
             if self.bot.get_cog('UtilitiesCog'):
                 await self.reload_sus()
@@ -200,7 +200,7 @@ class XPCog(commands.Cog):
             if msg.channel.id in self.xp_channels_cache[msg.guild.id]:
                 return False
         else:
-            chans = await self.bot.cogs["ServerCog"].find_staff(msg.guild.id,'noxp_channels')
+            chans = await self.bot.get_config(msg.guild.id,'noxp_channels')
             if chans is not None:
                 chans = [int(x) for x in chans.split(';') if x.isnumeric()]
                 if msg.channel.id in chans:
@@ -221,7 +221,7 @@ class XPCog(commands.Cog):
         destination = await self.get_lvlup_chan(msg)
         if destination is None or (not msg.channel.permissions_for(msg.guild.me).send_messages):
             return
-        text = await self.bot.cogs['ServerCog'].find_staff(msg.guild.id,'levelup_msg')
+        text = await self.bot.get_config(msg.guild.id,'levelup_msg')
         if text is None or len(text) == 0:
             text = random.choice(await self.bot.cogs['LangCog'].tr(msg.channel,'xp','default_levelup'))
             while (not '{random}' in text) and random.random() < 0.8:
@@ -488,7 +488,7 @@ class XPCog(commands.Cog):
             if not self.bot.database_online:
                 self.bot.unload_extension("fcts.xp")
                 return None
-            if guild is not None and await self.bot.cogs['ServerCog'].find_staff(guild.id,'xp_type') != 0:
+            if guild is not None and await self.bot.get_config(guild.id,'xp_type') != 0:
                 cnx = self.bot.cnx_xp
                 query = ("SELECT * FROM `{}` order by `xp` desc".format(await self.get_table(guild.id,False)))
             else:
@@ -527,7 +527,7 @@ class XPCog(commands.Cog):
             if not self.bot.database_online:
                 self.bot.unload_extension("fcts.xp")
                 return None
-            if guild is not None and await self.bot.cogs['ServerCog'].find_staff(guild.id,'xp_type') != 0:
+            if guild is not None and await self.bot.get_config(guild.id,'xp_type') != 0:
                 cnx = self.bot.cnx_xp
                 query = ("SELECT `userID`,`xp`, @curRank := @curRank + 1 AS rank FROM `{}` p, (SELECT @curRank := 0) r WHERE `banned`='0' ORDER BY xp desc;".format(await self.get_table(guild.id, False)))
             else:
@@ -733,9 +733,9 @@ class XPCog(commands.Cog):
             if user.bot:
                 return await ctx.send(await self.bot._(ctx.channel,'xp','bot-rank'))
             if ctx.guild is not None:
-                if not await self.bot.cogs['ServerCog'].find_staff(ctx.guild.id,'enable_xp'):
+                if not await self.bot.get_config(ctx.guild.id,'enable_xp'):
                     return await ctx.send(await self.bot._(ctx.guild.id,'xp','xp-disabled'))
-                xp_used_type = await self.bot.cogs['ServerCog'].find_staff(ctx.guild.id,'xp_type')
+                xp_used_type = await self.bot.get_config(ctx.guild.id,'xp_type')
             else:
                 xp_used_type = 0
             xp = await self.get_xp(user,None if xp_used_type == 0 else ctx.guild.id)
@@ -836,9 +836,9 @@ class XPCog(commands.Cog):
         """Get the list of the highest levels
         Each page has 20 users"""
         if ctx.guild is not None:
-            if not await self.bot.cogs['ServerCog'].find_staff(ctx.guild.id,'enable_xp'):
+            if not await self.bot.get_config(ctx.guild.id,'enable_xp'):
                 return await ctx.send(await self.bot._(ctx.guild.id,'xp','xp-disabled'))
-            xp_system_used = await self.bot.cogs['ServerCog'].find_staff(ctx.guild.id,'xp_type')
+            xp_system_used = await self.bot.get_config(ctx.guild.id,'xp_type')
         else:
             xp_system_used = 0
         xp_system_used = 0 if xp_system_used is None else xp_system_used
@@ -908,12 +908,12 @@ class XPCog(commands.Cog):
         """Set the XP of a user"""
         if user.bot:
             return await ctx.send(await self.bot._(ctx.guild.id, 'xp', 'no-bot'))
-        if await self.bot.cogs['ServerCog'].find_staff(ctx.guild.id,'xp_type') == 0:
+        if await self.bot.get_config(ctx.guild.id,'xp_type') == 0:
             return await ctx.send(await self.bot._(ctx.guild.id, 'xp', 'change-global-xp'))
         if xp < 0:
             return await ctx.send(await self.bot._(ctx.guild.id, 'xp', 'negative-xp'))
         try:
-            xp_used_type = await self.bot.cogs['ServerCog'].find_staff(ctx.guild.id,'xp_type')
+            xp_used_type = await self.bot.get_config(ctx.guild.id,'xp_type')
             prev_xp = await self.get_xp(user, None if xp_used_type == 0 else ctx.guild.id)
             await self.bdd_set_xp(user.id, xp, Type='set', guild=ctx.guild.id)
             await ctx.send(await self.bot._(ctx.guild.id,'xp','change-xp-ok',user=str(user),xp=xp))
@@ -983,7 +983,7 @@ class XPCog(commands.Cog):
             l = await self.rr_list_role(ctx.guild.id)
             if len([x for x in l if x['level']==level]) > 0:
                 return await ctx.send(await self.bot._(ctx.guild.id,'xp','already-1-rr'))
-            max_rr = await self.bot.cogs['ServerCog'].find_staff(ctx.guild.id,'rr_max_number')
+            max_rr = await self.bot.get_config(ctx.guild.id,'rr_max_number')
             max_rr = self.bot.cogs["ServerCog"].default_opt['rr_max_number'] if max_rr is None else max_rr
             if len(l) >= max_rr:
                 return await ctx.send(str(await self.bot._(ctx.guild.id,'xp','too-many-rr')).format(len(l)))
@@ -1004,7 +1004,7 @@ class XPCog(commands.Cog):
             await self.bot.cogs['ErrorsCog'].on_command_error(ctx,e)
         else:
             des = '\n'.join(["• <@&{}> : lvl {}".format(x['role'], x['level']) for x in l])
-            max_rr = await self.bot.cogs['ServerCog'].find_staff(ctx.guild.id,'rr_max_number')
+            max_rr = await self.bot.get_config(ctx.guild.id,'rr_max_number')
             max_rr = self.bot.cogs["ServerCog"].default_opt['rr_max_number'] if max_rr is None else max_rr
             title = str(await self.bot._(ctx.guild.id,"xp",'rr_list')).format(len(l),max_rr)
             emb = await self.bot.cogs['EmbedCog'].Embed(title=title,desc=des).update_timestamp().create_footer(ctx)
@@ -1038,7 +1038,7 @@ class XPCog(commands.Cog):
             if len(rr_list) == 0:
                 await ctx.send(await self.bot._(ctx.guild, "xp", "no-rr-2"))
                 return
-            used_system = await self.bot.cogs['ServerCog'].find_staff(ctx.guild.id,'xp_type')
+            used_system = await self.bot.get_config(ctx.guild.id,'xp_type')
             used_system = 0 if used_system is None else used_system
             xps = [{'user':x['userID'],'xp':x['xp']} for x in await self.bdd_get_top(top=None, guild=ctx.guild if used_system > 0 else None)]
             for member in xps:

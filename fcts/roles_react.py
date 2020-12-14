@@ -138,7 +138,7 @@ class RolesReact(commands.Cog):
             l = await self.rr_list_role(ctx.guild.id, emoji)
             if len(l) > 0:
                 return await ctx.send(await self.bot._(ctx.guild.id, 'roles_react', 'already-1-rr'))
-            max_rr = await self.bot.cogs['ServerCog'].find_staff(ctx.guild.id, 'roles_react_max_number')
+            max_rr = await self.bot.get_config(ctx.guild.id, 'roles_react_max_number')
             max_rr = self.bot.cogs["ServerCog"].default_opt['roles_react_max_number'] if max_rr is None else max_rr
             if len(l) >= max_rr:
                 return await ctx.send(await self.bot._(ctx.guild.id, 'roles_react', 'too-many-rr', l=max_rr))
@@ -208,7 +208,7 @@ class RolesReact(commands.Cog):
             await self.bot.cogs['ErrorsCog'].on_command_error(ctx, e)
         else:
             des, _ = await self.create_list_embed(l, ctx.guild)
-            max_rr = await self.bot.cogs['ServerCog'].find_staff(ctx.guild.id, 'roles_react_max_number')
+            max_rr = await self.bot.get_config(ctx.guild.id, 'roles_react_max_number')
             max_rr = self.bot.cogs["ServerCog"].default_opt['roles_react_max_number'] if max_rr is None else max_rr
             title = await self.bot._(ctx.guild.id, "roles_react", 'rr-list', n=len(l), m=max_rr)
             emb = await self.bot.cogs['EmbedCog'].Embed(title=title, desc=des, color=self.embed_color).update_timestamp().create_footer(ctx)

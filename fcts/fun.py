@@ -661,7 +661,7 @@ You can specify a verification limit by adding a number in argument (up to 1.000
 
     async def add_vote(self,msg):
         if self.bot.database_online and msg.guild is not None:
-            emojiz = await self.bot.cogs["ServerCog"].find_staff(msg.guild,'vote_emojis')
+            emojiz = await self.bot.get_config(msg.guild,'vote_emojis')
         else:
             emojiz = None
         if emojiz is None or len(emojiz) == 0:
@@ -784,7 +784,7 @@ You can specify a verification limit by adding a number in argument (up to 1.000
         if message.guild is None or not self.bot.is_ready() or not self.bot.database_online:
             return
         try:
-            channels = await self.bot.cogs['ServerCog'].find_staff(message.guild.id,'poll_channels')
+            channels = await self.bot.get_config(message.guild.id,'poll_channels')
             if channels is None or len(channels) == 0:
                 return
             if str(message.channel.id) in channels.split(';') and not message.author.bot:

@@ -466,7 +466,7 @@ class UtilitiesCog(commands.Cog):
         available_langs = self.bot.cogs['LangCog'].languages
         for s in self.bot.guilds:
             if user in s.members:
-                lang = await self.bot.cogs["ServerCog"].find_staff(s.id, 'language')
+                lang = await self.bot.get_config(s.id, 'language')
                 if lang is None:
                     lang = available_langs.index(
                         self.bot.cogs['ServerCog'].default_language)

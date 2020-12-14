@@ -295,7 +295,7 @@ Slowmode works up to one message every 6h (21600s)
             await self.bot.cogs['ErrorsCog'].on_error(e,ctx)
 
     async def get_muted_role(self, guild: discord.Guild):
-        opt = await self.bot.cogs['ServerCog'].find_staff(guild.id,'muted_role')
+        opt = await self.bot.get_config(guild.id,'muted_role')
         if not isinstance(opt,int):
             return discord.utils.get(guild.roles,name="muted")
         return guild.get_role(opt)
@@ -1101,7 +1101,7 @@ ID corresponds to the Identifier of the message"""
     @commands.cooldown(5,120,commands.BucketType.user)
     async def verify_urself(self, ctx: MyContext):
         """Verify yourself and loose the role"""
-        roles_raw = await ctx.bot.cogs['ServerCog'].find_staff(ctx.guild.id,"verification_role")
+        roles_raw = await ctx.bot.get_config(ctx.guild.id,"verification_role")
         roles = [r for r in [ctx.guild.get_role(int(x)) for x in roles_raw.split(';') if x.isnumeric] if r is not None]
         if not ctx.guild.me.guild_permissions.manage_roles:
             return await ctx.send(await self.bot._(ctx.guild.id,"modo","cant-mute"))

@@ -174,7 +174,7 @@ class zbot(commands.bot.AutoShardedBot):
     async def get_config(self, guildID: int, option: str) -> Optional[str]:
         cog = self.get_cog("ServerCog")
         if cog:
-            return await cog.find_staff(guildID, option)
+            return await cog.get_option(guildID, option)
         return None
     
     @property

@@ -150,7 +150,7 @@ class ServerCog(commands.Cog):
             return True
         if not self.bot.database_online or not isinstance(user, discord.Member):
             return False
-        staff = str(await self.find_staff(user.guild.id,option)).split(";")
+        staff = str(await self.get_option(user.guild.id,option)).split(";")
         staff = [x for x in staff if len(x) > 10 and x.isnumeric()]
         if len(staff) == 0:
             return False
@@ -159,7 +159,7 @@ class ServerCog(commands.Cog):
                 return True
         raise commands.CommandError("User doesn't have required roles")
 
-    async def find_staff(self, ID: int, name: str) -> typing.Optional[str]:
+    async def get_option(self, ID: int, name: str) -> typing.Optional[str]:
         """return the value of an option
         Return None if this option doesn't exist or if no value has been set"""
         if isinstance(ID, discord.Guild):
@@ -239,7 +239,7 @@ class ServerCog(commands.Cog):
 
     async def is_server_exist(self, ID: int):
         """Check if a server is already in the db"""
-        i = await self.find_staff(ID,"ID")
+        i = await self.get_option(ID,"ID")
         if i is None:
             g = self.bot.get_guild(ID)
             if g is None:
@@ -396,7 +396,7 @@ class ServerCog(commands.Cog):
         guild = await self.get_guild(ctx)
         ext = not isinstance(ctx, commands.Context)
         if value == "scret-desc":
-            roles = await self.find_staff(guild.id,option)
+            roles = await self.get_option(guild.id,option)
             return await self.form_roles(guild, roles, ext)
         else:
             roles = value.split(",")
@@ -443,7 +443,7 @@ class ServerCog(commands.Cog):
     async def conf_bool(self, ctx: MyContext, option: str, value: str):
         if value == "scret-desc":
             guild = await self.get_guild(ctx)
-            v = await self.find_staff(guild.id,option)
+            v = await self.get_option(guild.id,option)
             return await self.form_bool(v)
         else:
             if value.lower() in ["true","vrai","1","oui","yes","activé"]:
@@ -474,7 +474,7 @@ class ServerCog(commands.Cog):
         guild = await self.get_guild(ctx)
         ext = not isinstance(ctx, commands.Context)
         if value == "scret-desc":
-            chans = await self.find_staff(guild.id,option)
+            chans = await self.get_option(guild.id,option)
             return await self.form_textchan(guild, chans, ext)
         else:
             chans = value.split(",")
@@ -520,7 +520,7 @@ class ServerCog(commands.Cog):
         guild = await self.get_guild(ctx)
         ext = not isinstance(ctx, commands.Context)
         if value == "scret-desc":
-            chans = await self.find_staff(guild.id,option)
+            chans = await self.get_option(guild.id,option)
             return await self.form_category(guild, chans, ext)
         else:
             chans = value.split(",")
@@ -561,7 +561,7 @@ class ServerCog(commands.Cog):
     async def conf_emoji(self, ctx: MyContext, option: str, value: str):
         guild = await self.get_guild(ctx)
         if value == "scret-desc":
-            emojis = await self.find_staff(guild.id,option)
+            emojis = await self.get_option(guild.id,option)
             return ", ".join(await self.form_emoji(emojis, option))
         else:
             emojis = value.split(",")
@@ -611,7 +611,7 @@ class ServerCog(commands.Cog):
     async def conf_vocal(self, ctx: MyContext, option: str, value: str):
         if value == "scret-desc":
             guild = await self.get_guild(ctx)
-            chans = await self.find_staff(guild.id,option)
+            chans = await self.get_option(guild.id,option)
             return await self.form_vocal(guild,chans)
         else:
             chans = value.split(",")
@@ -650,7 +650,7 @@ class ServerCog(commands.Cog):
     async def conf_text(self, ctx: MyContext, option: str, value: str):
         guild = await self.get_guild(ctx)
         if value == "scret-desc":
-            text = await self.find_staff(guild.id,option)
+            text = await self.get_option(guild.id,option)
             return await self.form_text(text)
         else:
             await self.modify_server(guild.id,values=[(option, value)])
@@ -670,7 +670,7 @@ class ServerCog(commands.Cog):
     async def conf_prefix(self, ctx: MyContext, option: str, value: str):
         if value == "scret-desc":
             guild = await self.get_guild(ctx)
-            text = await self.find_staff(guild.id,'prefix')
+            text = await self.get_option(guild.id,'prefix')
             return await self.form_prefix(text)
         else:
             if value.startswith('"') and value.endswith('"'):
@@ -696,7 +696,7 @@ class ServerCog(commands.Cog):
     async def conf_numb(self, ctx: MyContext, option: str, value: str):
         if value == "scret-desc":
             guild = await self.get_guild(ctx)
-            return await self.find_staff(guild.id,option)
+            return await self.get_option(guild.id,option)
         else:
             if value.isnumeric():
                 value = eval(value)
@@ -710,7 +710,7 @@ class ServerCog(commands.Cog):
             guild = await self.get_guild(ctx)
             if guild is None:
                 return self.default_language
-            v = await self.find_staff(guild,option)
+            v = await self.get_option(guild,option)
             return await self.form_lang(v)
         else:
             languages = self.bot.cogs["LangCog"].languages
@@ -736,7 +736,7 @@ class ServerCog(commands.Cog):
             guild = await self.get_guild(ctx)
             if guild is None:
                 return self.default_opt['anti_raid']
-            v = await self.find_staff(guild,option)
+            v = await self.get_option(guild,option)
             return await self.form_raid(v)
         else:
             raids = self.raids_levels
@@ -766,7 +766,7 @@ class ServerCog(commands.Cog):
             guild = await self.get_guild(ctx)
             if guild is None:
                 return self.bot.cogs['XPCog'].types[0]
-            v = await self.find_staff(guild,option)
+            v = await self.get_option(guild,option)
             return await self.form_xp_type(v)
         else:
             available_types = self.bot.cogs["XPCog"].types
@@ -791,7 +791,7 @@ class ServerCog(commands.Cog):
             guild = await self.get_guild(ctx)
             if guild is None:
                 return str(discord.Colour(self.default_opt[option]))
-            v = await self.find_staff(guild,option)
+            v = await self.get_option(guild,option)
             return await self.form_color(option,v)
         else:
             try:
@@ -820,7 +820,7 @@ class ServerCog(commands.Cog):
     async def conf_xp_rate(self, ctx: MyContext, option: str, value: str):
         if value == "scret-desc":
             guild = await self.get_guild(ctx)
-            return await self.find_staff(guild.id,option)
+            return await self.get_option(guild.id,option)
         else:
             try:
                 value = round(float(value),2)
@@ -845,7 +845,7 @@ class ServerCog(commands.Cog):
         guild = await self.get_guild(ctx)
         ext = not isinstance(ctx, commands.Context)
         if value == "scret-desc":
-            chan = await self.find_staff(guild.id,option)
+            chan = await self.get_option(guild.id,option)
             return await self.form_levelup_chan(guild, chan, ext)
         else:
             if value.lower() in ["any", "tout", "tous", "current", "all", "any channel"]:
@@ -1042,7 +1042,7 @@ class ServerCog(commands.Cog):
         if guild.id in self.membercounter_pending.keys():
             if self.membercounter_pending[guild.id] > time.time():
                 return False
-        ch = await self.find_staff(guild.id,"membercounter")
+        ch = await self.get_option(guild.id,"membercounter")
         if ch not in ['', None]:
             ch = guild.get_channel(int(ch))
             if ch is None:

@@ -194,17 +194,17 @@ class AdminCog(commands.Cog):
             return await ctx.send('Trop long !')
         count = 0
         for guild in ctx.bot.guilds:
-            channels = await ctx.bot.cogs["ServerCog"].find_staff(guild.id,'bot_news')
+            channels = await ctx.bot.get_config(guild.id,'bot_news')
             if channels is None or len(channels) == 0:
                 continue
             channels = [guild.get_channel(int(x)) for x in channels.split(';') if len(x)>5 and x.isnumeric()]
-            lang = await ctx.bot.cogs["ServerCog"].find_staff(guild.id,'language')
+            lang = await ctx.bot.get_config(guild.id,'language')
             if type(lang)!=int:
                 lang = 0
             lang = ctx.bot.cogs['LangCog'].languages[lang]
             if lang not in self.update.keys():
                 lang = 'en'
-            mentions_str = await self.bot.cogs['ServerCog'].find_staff(guild.id,'update_mentions')
+            mentions_str = await self.bot.get_config(guild.id,'update_mentions')
             if mentions_str is None:
                 mentions = []
             else:
