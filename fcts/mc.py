@@ -6,6 +6,7 @@ import datetime
 import time
 import requests
 from discord.ext import commands
+from urllib.parse import quote
 from classes import zbot, MyContext
 
 
@@ -93,15 +94,24 @@ Every information come from the website www.fr-minecraft.net"""
     @commands.group(name="minecraft", aliases=["mc"])
     @commands.cooldown(5, 30, commands.BucketType.user)
     async def mc_main(self, ctx: MyContext):
-        """Search for Minecraft game items/servers"""
+        """Search for Minecraft game items/servers
+        
+        ..Doc minecraft.html#mc"""
         if ctx.subcommand_passed is None:
             await self.bot.cogs['HelpCog'].help_command(ctx,['minecraft'])
 
     @mc_main.command(name="block", aliases=["bloc"])
     async def mc_block(self, ctx: MyContext, *, value='help'):
-        """Get infos about any block"""
-        if value=='help':
-            await ctx.send(await self.bot._(ctx.channel,"mc","block-help"))
+        """Get info about any block
+        
+        ..Doc minecraft.html#mc
+        
+        ..Example mc block stone"""
+        if value == 'help':
+            await ctx.send(await self.bot._(ctx.channel,"mc","block-help", p=ctx.prefix))
+            return
+        if not ctx.can_send_embed:
+            await ctx.send(await self.bot._(ctx.channel, "mc", "no-embed"))
             return
         try:
             Block = frmc_lib.main(value,'Bloc')
@@ -127,9 +137,16 @@ Every information come from the website www.fr-minecraft.net"""
 
     @mc_main.command(name="entity", aliases=["entité","mob"])
     async def mc_entity(self, ctx: MyContext, *, value='help'):
-        """Get infos about any entity"""
-        if value=='help':
-            await ctx.send(await self.bot._(ctx.channel,"mc","entity-help"))
+        """Get info about any entity
+        
+        ..Doc minecraft.html#mc
+        
+        ..Example mc entity slime"""
+        if value == 'help':
+            await ctx.send(await self.bot._(ctx.channel,"mc","entity-help", p=ctx.prefix))
+            return
+        if not ctx.can_send_embed:
+            await ctx.send(await self.bot._(ctx.channel, "mc", "no-embed"))
             return
         try:
             Entity = frmc_lib.main(value,'Entité')
@@ -157,9 +174,16 @@ Every information come from the website www.fr-minecraft.net"""
     
     @mc_main.command(name="item",aliases=['object'])
     async def mc_item(self, ctx: MyContext, *, value='help'):
-        """Get infos about any item"""
+        """Get info about any item
+        
+        ..Doc minecraft.html#mc
+        
+        ..Example mc item stick"""
         if value=='help':
-            await ctx.send(await self.bot._(ctx.channel,"mc","item-help"))
+            await ctx.send(await self.bot._(ctx.channel,"mc","item-help", p=ctx.prefix))
+            return
+        if not ctx.can_send_embed:
+            await ctx.send(await self.bot._(ctx.channel, "mc", "no-embed"))
             return
         try:
             Item = frmc_lib.main(value,"Item")
@@ -169,7 +193,7 @@ Every information come from the website www.fr-minecraft.net"""
         title = "{} - {}".format((await self.bot._(ctx.channel,"mc","names"))[2],Item.Name)
         embed = self.bot.get_cog("EmbedCog").Embed(title=title, color=discord.Colour(int('16BD06',16)), url=Item.Url, time=ctx.message.created_at, desc=await self.bot._(ctx.channel,'mc','contact-mail'))
         if Item.Image is not None:
-            embed.thumbnail(url=Item.Image)
+            embed.thumbnail = Item.Image
         await embed.create_footer(ctx)
         embed.add_field(name="Nom", value=Item.Name,inline=False)
         l = ('\n'.join(Item.ID),Item.Stack,Item.CreativeTab,Item.Damage,Item.Strength,Item.Tool,", ".join(Item.Mobs),Item.Version)
@@ -187,9 +211,16 @@ Every information come from the website www.fr-minecraft.net"""
 
     @mc_main.command(name="command",aliases=["commande","cmd"])
     async def mc_cmd(self, ctx: MyContext, *, value='help'):
-        """Get infos about any command"""
-        if value=='help':
-            await ctx.send(await self.bot._(ctx.channel,"mc","cmd-help"))
+        """Get info about any command
+        
+        ..Doc minecraft.html#mc
+        
+        ..Example mc cmd execute if"""
+        if value == 'help':
+            await ctx.send(await self.bot._(ctx.channel,"mc","cmd-help", p=ctx.prefix))
+            return
+        if not ctx.can_send_embed:
+            await ctx.send(await self.bot._(ctx.channel, "mc", "no-embed"))
             return
         try:
             Cmd = frmc_lib.main(value,'Commande')
@@ -203,7 +234,12 @@ Every information come from the website www.fr-minecraft.net"""
         for e,v in enumerate(await self.bot._(ctx.channel,"mc","cmd-fields")):
             if e==2:
                 if len(l[e]) > 0:
-                    examples = ["`{}`\n*{}*".format(x[0],x[1]) for x in l[e][:5]]
+                    examples = list()
+                    for ex in l[e]:
+                        s = "`{}`\n*{}*".format(ex[0], ex[1])
+                        if len("\n".join(examples) + s) > 1024:
+                            break
+                        examples.append(s)
                     embed.add_field(name=v,value="\n".join(examples),inline=False)
                 continue
             if l[e] not in [None,'']:
@@ -219,9 +255,12 @@ Every information come from the website www.fr-minecraft.net"""
     
     @mc_main.command(name="advancement",aliases=["advc","progrès"])
     async def mc_advc(self, ctx: MyContext, *, value='help'):
-        """Get infos about any advancement"""
-        if value=='help':
+        """Get info about any advancement"""
+        if value == 'help':
             await ctx.send(await self.bot._(ctx.channel,"mc","adv-help"))
+            return
+        if not ctx.can_send_embed:
+            await ctx.send(await self.bot._(ctx.channel, "mc", "no-embed"))
             return
         try:
             Adv = frmc_lib.main(value,'Progrès')
@@ -232,7 +271,7 @@ Every information come from the website www.fr-minecraft.net"""
         embed = self.bot.get_cog("EmbedCog").Embed(title=title, color=discord.Colour(int('16BD06',16)), url=Adv.Url, time=ctx.message.created_at, desc=await self.bot._(ctx.channel,'mc','contact-mail'))
         await embed.create_footer(ctx)
         if Adv.Image is not None:
-            embed.thumbnail(url=Adv.Image)
+            embed.thumbnail = Adv.Image
         l = (Adv.Name,Adv.ID,Adv.Type,Adv.Action,Adv.Parent,", ".join(Adv.Children),Adv.Version)   #("Nom","Identifiant","Type","Action","Parent","Enfants","Version d'ajout")
         for e,v in enumerate(await self.bot._(ctx.channel,"mc","adv-fields")):
             if l[e] not in [None,'']:
@@ -245,7 +284,59 @@ Every information come from the website www.fr-minecraft.net"""
         except Exception as e:
             await self.bot.cogs['ErrorsCog'].on_error(e,ctx)
             await ctx.send(await self.bot._(ctx.channel,"mc","no-adv"))
-
+    
+    @mc_main.command(name="mod")
+    async def mc_mod(self, ctx: MyContext, *, value: str='help'):
+        """Get info about any mod registered on CurseForge"""
+        if value == 'help':
+            await ctx.send(await self.bot._(ctx.channel, "mc", "mod-help", p=ctx.prefix))
+            return
+        if not ctx.can_send_embed:
+            await ctx.send(await self.bot._(ctx.channel, "mc", "no-embed"))
+            return
+        url = 'https://addons-ecs.forgesvc.net/api/v2/addon/'
+        h = {"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0) Gecko/20100101 Firefox/83.0"}
+        searchurl = url+'search?gameId=432&sectionId=6&sort=0&pageSize=2&searchFilter='+quote(value.lower())
+        await ctx.send(searchurl)
+        async with aiohttp.ClientSession(loop=self.bot.loop, headers=h) as session:
+            async with session.get(searchurl, timeout=10) as resp:
+                search: list = await resp.json()
+            if len(search) == 0:
+                await ctx.send(await self.bot._(ctx.channel, "mc", "no-mod"))
+                return
+        user_lang = await self.bot._(ctx.channel, "current_lang", "current")
+        search = search[0]
+        authors = ", ".join([f"[{x['name']}]({x['url']})" for x in search['authors']])
+        d = search['dateModified'][:-1]
+        d += '0'*(23-len(d))
+        date = await self.bot.get_cog("TimeCog").date(datetime.datetime.fromisoformat(d), user_lang, year=True)
+        versions = set(x['gameVersion'] for x in search['gameVersionLatestFiles'])
+        versions = " - ".join(sorted(versions, reverse=True, key=lambda a: list(map(int, a.split('.')))))
+        l = (
+            search['name'],
+            authors,
+            search['summary'],
+            search['primaryLanguage'],
+            date,
+            versions,
+            int(search['downloadCount']),
+            search['id']
+        )
+        title = "{} - {}".format((await self.bot._(ctx.channel, "mc", "names"))[5], search['name'])
+        embed = self.bot.get_cog("EmbedCog").Embed(
+            title=title, color=discord.Colour(int('16BD06', 16)),
+            url=search['websiteUrl'],
+            time=ctx.message.created_at)
+        await embed.create_footer(ctx)
+        if attachments := search['attachments']:
+            embed.thumbnail = attachments[0]['thumbnailUrl']
+        for e,v in enumerate(await self.bot._(ctx.channel, "mc", "mod-fields")):
+            if l[e] not in [None, '']:
+                try:
+                    embed.add_field(name=v, value=str(l[e]))
+                except:
+                    pass
+        await ctx.send(embed=embed)
 
     @mc_main.command(name="server")
     async def mc_server(self, ctx: MyContext, ip:str, port:int=None):
