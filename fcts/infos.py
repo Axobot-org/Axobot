@@ -31,7 +31,7 @@ importlib.reload(bitly_api)
 async def in_support_server(ctx):
     return ctx.guild is not None and ctx.guild.id == 625316773771608074
 
-class InfoCog(commands.Cog):
+class Info(commands.Cog):
     """Here you will find various useful commands to get information about ZBot."""
 
     def __init__(self, bot: zbot):
@@ -39,7 +39,7 @@ class InfoCog(commands.Cog):
         self.file = "infos"
         self.bot_version = conf.release
         try:
-            self.timecog = bot.cogs["TimeCog"]
+            self.TimeUtils = bot.cogs["TimeUtils"]
         except:
             pass
         self.emoji_table = 'emojis_beta' if self.bot.beta else 'emojis'
@@ -47,7 +47,7 @@ class InfoCog(commands.Cog):
 
     @commands.Cog.listener()
     async def on_ready(self):
-        self.timecog = self.bot.cogs["TimeCog"]
+        self.TimeUtils = self.bot.cogs["TimeUtils"]
         self.codelines = await self.count_lines_code()
         self.emoji_table = 'emojis_beta' if self.bot.beta else 'emojis'
     
@@ -70,7 +70,7 @@ class InfoCog(commands.Cog):
                         if len(line.strip())>2 and line[0]!='#':
                             count += 1
         except Exception as e:
-            await self.bot.cogs['ErrorsCog'].on_error(e,None)
+            await self.bot.cogs['Errors'].on_error(e,None)
         self.codelines = count
         return count
 
@@ -87,9 +87,9 @@ class InfoCog(commands.Cog):
     async def get_guilds_count(self, ignored_guilds:list=None) -> int:
         """Get the number of guilds where Zbot is"""
         if ignored_guilds is None:
-            if 'banned_guilds' not in self.bot.cogs['UtilitiesCog'].config.keys():
-                await self.bot.cogs['UtilitiesCog'].get_bot_infos()
-            ignored_guilds = [int(x) for x in self.bot.cogs['UtilitiesCog'].config['banned_guilds'].split(";") if len(x) > 0] + self.bot.cogs['ReloadsCog'].ignored_guilds
+            if 'banned_guilds' not in self.bot.cogs['Utilities'].config.keys():
+                await self.bot.cogs['Utilities'].get_bot_infos()
+            ignored_guilds = [int(x) for x in self.bot.cogs['Utilities'].config['banned_guilds'].split(";") if len(x) > 0] + self.bot.cogs['Reloads'].ignored_guilds
         return len([x for x in self.bot.guilds if x.id not in ignored_guilds])
 
     @commands.command(name="stats", enabled=True)
@@ -104,37 +104,37 @@ class InfoCog(commands.Cog):
         try:
             async with ctx.channel.typing():
                 ram_cpu = [round(py.memory_info()[0]/2.**30,3), py.cpu_percent(interval=1)]
-                b_conf = self.bot.cogs['UtilitiesCog'].config
+                b_conf = self.bot.cogs['Utilities'].config
                 if b_conf is None:
-                    b_conf = await self.bot.cogs['UtilitiesCog'].get_bot_infos()
+                    b_conf = await self.bot.cogs['Utilities'].get_bot_infos()
                 ignored_guilds = list()
                 if self.bot.database_online:
-                    ignored_guilds = [int(x) for x in self.bot.cogs['UtilitiesCog'].config['banned_guilds'].split(";") if len(x) > 0]
-                ignored_guilds += self.bot.cogs['ReloadsCog'].ignored_guilds
+                    ignored_guilds = [int(x) for x in self.bot.cogs['Utilities'].config['banned_guilds'].split(";") if len(x) > 0]
+                ignored_guilds += self.bot.cogs['Reloads'].ignored_guilds
                 len_servers = await self.get_guilds_count(ignored_guilds)
-                langs_list: list = await self.bot.cogs['ServerCog'].get_languages(ignored_guilds)
+                langs_list: list = await self.bot.cogs['Servers'].get_languages(ignored_guilds)
                 langs_list.sort(reverse=True, key=lambda x: x[1])
                 lang_total = sum([x[1] for x in langs_list])
                 langs_list = ' | '.join(["{}: {}%".format(x[0],round(x[1]/lang_total*100)) for x in langs_list if x[1] > 0])
                 del lang_total
-                #premium_count = await self.bot.cogs['UtilitiesCog'].get_number_premium()
+                #premium_count = await self.bot.cogs['Utilities'].get_number_premium()
                 try:
                     users,bots = self.get_users_nber(ignored_guilds)
                 except Exception as e:
                     users = bots = 'unknown'
                 if self.bot.database_online:
-                    total_xp = await self.bot.cogs['XPCog'].bdd_total_xp()
+                    total_xp = await self.bot.cogs['Xp'].bdd_total_xp()
                 else:
                     total_xp = ""
                 d = str(await self.bot._(ctx.channel,"infos","stats")).format(bot_v=self.bot_version,s_count=len_servers,m_count=users,b_count=bots,l_count=self.codelines,lang=langs_list,p_v=version,d_v=discord.__version__,ram=ram_cpu[0],cpu=ram_cpu[1],api=latency,xp=total_xp)
             if ctx.can_send_embed:
-                embed = ctx.bot.cogs['EmbedCog'].Embed(title=await self.bot._(ctx.channel,"infos","stats-title"), color=ctx.bot.cogs['HelpCog'].help_color, time=ctx.message.created_at,desc=d,thumbnail=self.bot.user.avatar_url_as(format="png"))
+                embed = ctx.bot.cogs['Embeds'].Embed(title=await self.bot._(ctx.channel,"infos","stats-title"), color=ctx.bot.cogs['Help'].help_color, time=ctx.message.created_at,desc=d,thumbnail=self.bot.user.avatar_url_as(format="png"))
                 await embed.create_footer(ctx)
                 await ctx.send(embed=embed.discord_embed())
             else:
                 await ctx.send(d)
         except Exception as e:
-            await ctx.bot.cogs['ErrorsCog'].on_command_error(ctx,e)
+            await ctx.bot.cogs['Errors'].on_command_error(ctx,e)
 
     def get_users_nber(self, ignored_guilds: list):
         members = [x.members for x in self.bot.guilds if x.id not in ignored_guilds]
@@ -178,7 +178,7 @@ class InfoCog(commands.Cog):
         wait = 0.3
         try:
             try:
-                m = await ctx.send("Ping...",file=await self.bot.cogs['UtilitiesCog'].find_img('discord-loading.gif'))
+                m = await ctx.send("Ping...",file=await self.bot.cogs['Utilities'].find_img('discord-loading.gif'))
             except:
                 m = None
             t1 = time.time()
@@ -199,7 +199,7 @@ class InfoCog(commands.Cog):
     @commands.command(name="docs", aliases=['doc','documentation'])
     async def display_doc(self, ctx: MyContext):
         """Get the documentation url"""
-        text = str(self.bot.cogs['EmojiCog'].customEmojis['readthedocs']) + str(await self.bot._(ctx.channel,"infos","docs")) + " https://zbot.rtfd.io"
+        text = str(self.bot.cogs['Emojis'].customEmojis['readthedocs']) + str(await self.bot._(ctx.channel,"infos","docs")) + " https://zbot.rtfd.io"
         if self.bot.beta:
             text += '/en/indev'
         await ctx.send(text)
@@ -216,9 +216,9 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
         try:
             item = None
             lang = await self.bot._(ctx.guild.id,"current_lang","current")
-            find = self.bot.cogs['UtilitiesCog'].find_everything
+            find = self.bot.cogs['Utilities'].find_everything
             if Type in ["guild","server"]:
-                if name is None or not await self.bot.cogs['AdminCog'].check_if_admin(ctx):
+                if name is None or not await self.bot.cogs['Admin'].check_if_admin(ctx):
                     item = ctx.guild
                     #return await self.guild_info(ctx,ctx.guild,lang)
             if item is None:
@@ -230,7 +230,7 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
                     except:
                         await ctx.send(str(await self.bot._(ctx.guild.id,"modo","cant-find-user")).format(name))
                         return
-            critical = ctx.author.guild_permissions.manage_guild or await self.bot.cogs['AdminCog'].check_if_god(ctx)
+            critical = ctx.author.guild_permissions.manage_guild or await self.bot.cogs['Admin'].check_if_god(ctx)
             #-----
             if item is None:
                 msg = await self.bot._(ctx.guild.id,"stats_infos","not-found")
@@ -260,7 +260,7 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
             else:
                 await ctx.send(str(type(item))+" / "+str(item))
         except Exception as e:
-            await self.bot.cogs["ErrorsCog"].on_error(e,ctx)
+            await self.bot.cogs["Errors"].on_error(e,ctx)
             await ctx.send(await self.bot._(ctx.channel,'errors','unknown'))
 
     async def member_infos(self, ctx: MyContext,item: discord.Member, lang: str, critical_info=False):
@@ -283,16 +283,16 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
         # Created at
         now = datetime.datetime.utcnow()
         delta = abs(item.created_at - now)
-        created_date = await self.timecog.date(item.created_at, lang=lang, year=True)
-        created_since = await self.timecog.time_delta(delta.total_seconds(), lang=lang, year=True, precision=0, hour=delta.total_seconds() < 86400)
+        created_date = await self.TimeUtils.date(item.created_at, lang=lang, year=True)
+        created_since = await self.TimeUtils.time_delta(delta.total_seconds(), lang=lang, year=True, precision=0, hour=delta.total_seconds() < 86400)
         if item.created_at.day == now.day and item.created_at.month == now.month and item.created_at.year != now.year:
             created_date = "🎂 " + created_date
         embed.add_field(name=await self.bot._(ctx.guild.id, "stats_infos", "member-1"), value = "{} ({} {})".format(created_date, since, created_since), inline=False)
         # Joined at
         if item.joined_at is not None:
             delta = abs(item.joined_at - now)
-            join_date = await self.timecog.date(item.joined_at, lang=lang, year=True)
-            since_date = await self.timecog.time_delta(delta.total_seconds(), lang=lang, year=True, precision=0, hour=delta.total_seconds() < 86400)
+            join_date = await self.TimeUtils.date(item.joined_at, lang=lang, year=True)
+            since_date = await self.TimeUtils.time_delta(delta.total_seconds(), lang=lang, year=True, precision=0, hour=delta.total_seconds() < 86400)
             embed.add_field(name=await self.bot._(ctx.guild.id, "stats_infos", "member-2"), value = "{} ({} {})".format(join_date, since, since_date), inline=False)
         # Join position
         if sum([1 for x in ctx.guild.members if not x.joined_at]) > 0 and ctx.guild.large:
@@ -335,11 +335,11 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
         embed.add_field(name=await self.bot._(ctx.guild.id,"stats_infos","member-6"), value = admin.capitalize(),inline=True)
         # Infractions count
         if critical_info and not item.bot:
-            embed.add_field(name=await self.bot._(ctx.guild.id,"stats_infos","member-7"), value = await self.bot.cogs['CasesCog'].get_nber(item.id,ctx.guild.id),inline=True)
+            embed.add_field(name=await self.bot._(ctx.guild.id,"stats_infos","member-7"), value = await self.bot.cogs['Cases'].get_nber(item.id,ctx.guild.id),inline=True)
         # Guilds count
         if item.bot:
             session = aiohttp.ClientSession(loop=self.bot.loop)
-            guilds_count = await self.bot.cogs['PartnersCog'].get_guilds(item.id,session)
+            guilds_count = await self.bot.cogs['Partners'].get_guilds(item.id,session)
             if guilds_count is not None:
                 embed.add_field(name=str(await self.bot._(ctx.guild.id,'keywords','servers')).capitalize(),value=guilds_count)
             await session.close()
@@ -380,8 +380,8 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
         embed.add_field(name=await self.bot._(ctx.guild.id,"stats_infos","role-4"), value=hoist.capitalize(),inline=True)
         # Created at
         delta = abs(item.created_at - datetime.datetime.utcnow())
-        created_date = await self.timecog.date(item.created_at, lang=lang, year=True)
-        created_since = await self.timecog.time_delta(delta.total_seconds(), lang=lang, year=True, precision=0, hour=delta.total_seconds() < 86400)
+        created_date = await self.TimeUtils.date(item.created_at, lang=lang, year=True)
+        created_since = await self.TimeUtils.time_delta(delta.total_seconds(), lang=lang, year=True, precision=0, hour=delta.total_seconds() < 86400)
         embed.add_field(name=await self.bot._(ctx.guild.id, "stats_infos", "member-1"), value = "{} ({} {})".format(created_date, since, created_since), inline=False)
         # Hierarchy position
         embed.add_field(name=await self.bot._(ctx.guild.id,"stats_infos","role-5"), value=str(len(ctx.guild.roles) - item.position),inline=True)
@@ -413,8 +413,8 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
         # created at
         now = datetime.datetime.utcnow()
         delta = abs(item.created_at - now)
-        created_date = await self.timecog.date(item.created_at, lang=lang, year=True)
-        created_since = await self.timecog.time_delta(delta.total_seconds(), lang=lang, year=True, precision=0, hour=delta.total_seconds() < 86400)
+        created_date = await self.TimeUtils.date(item.created_at, lang=lang, year=True)
+        created_since = await self.TimeUtils.time_delta(delta.total_seconds(), lang=lang, year=True, precision=0, hour=delta.total_seconds() < 86400)
         if item.created_at.day == now.day and item.created_at.month == now.month and item.created_at.year != now.year:
             created_date = "🎂 " + created_date
         embed.add_field(name=await self.bot._(ctx.guild.id, "stats_infos", "member-1"), value = "{} ({} {})".format(created_date, since, created_since), inline=False)
@@ -424,7 +424,7 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
         embed.add_field(name=await self.bot._(ctx.guild.id,"stats_infos","user-0"), value=on_server.capitalize())
         if item.bot:
             session = aiohttp.ClientSession(loop=self.bot.loop)
-            guilds_count = await self.bot.cogs['PartnersCog'].get_guilds(item.id,session)
+            guilds_count = await self.bot.cogs['Partners'].get_guilds(item.id,session)
             if guilds_count is not None:
                 embed.add_field(name=str(await self.bot._(ctx.guild.id,'keywords','servers')).capitalize(),value=guilds_count)
             await session.close()
@@ -459,8 +459,8 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
         embed.add_field(name=await self.bot._(ctx.guild.id,"stats_infos","emoji-1"), value=manage.capitalize())
         # created at
         delta = abs(item.created_at - datetime.datetime.utcnow())
-        created_date = await self.timecog.date(item.created_at, lang=lang, year=True)
-        created_since = await self.timecog.time_delta(delta.total_seconds(), lang=lang, year=True, precision=0, hour=delta.total_seconds() < 86400)
+        created_date = await self.TimeUtils.date(item.created_at, lang=lang, year=True)
+        created_since = await self.TimeUtils.time_delta(delta.total_seconds(), lang=lang, year=True, precision=0, hour=delta.total_seconds() < 86400)
         embed.add_field(name=await self.bot._(ctx.guild.id, "stats_infos", "member-1"), value = "{} ({} {})".format(created_date, since, created_since), inline=False)
         # allowed roles
         if len(item.roles) > 0:
@@ -470,7 +470,7 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
         if len(infos_uses) > 0:
             infos_uses = infos_uses[0]
             lang = await self.bot._(ctx.channel,'current_lang','current')
-            date = await self.bot.cogs['TimeCog'].date(infos_uses['added_at'],lang,year=True,hour=False)
+            date = await self.bot.cogs['TimeUtils'].date(infos_uses['added_at'],lang,year=True,hour=False)
             embed.add_field(name=await self.bot._(ctx.guild.id,"stats_infos","emoji-5"), value=await self.bot._(ctx.guild.id,"stats_infos","emoji-5v",nbr=infos_uses['count'],date=date))
         await ctx.send(embed=embed)
 
@@ -495,15 +495,15 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
         try:
             web = len(await chan.webhooks())
         except Exception as e:
-            await self.bot.cogs['ErrorsCog'].on_error(e,ctx)
+            await self.bot.cogs['Errors'].on_error(e,ctx)
             web = await self.bot._(ctx.guild.id,"stats_infos","textchan-4")
         embed.add_field(name=await self.bot._(ctx.guild.id,"stats_infos","textchan-3"), value=str(web))
         # Members nber
         embed.add_field(name=await self.bot._(ctx.guild.id,"stats_infos","role-3"), value = str(len(chan.members))+"/"+str(ctx.guild.member_count), inline=True)
         # Created at
         delta = abs(chan.created_at - datetime.datetime.utcnow())
-        created_date = await self.timecog.date(chan.created_at, lang=lang, year=True)
-        created_since = await self.timecog.time_delta(delta.total_seconds(), lang=lang, year=True, precision=0, hour=delta.total_seconds() < 86400)
+        created_date = await self.TimeUtils.date(chan.created_at, lang=lang, year=True)
+        created_since = await self.TimeUtils.time_delta(delta.total_seconds(), lang=lang, year=True, precision=0, hour=delta.total_seconds() < 86400)
         embed.add_field(name=await self.bot._(ctx.guild.id, "stats_infos", "member-1"), value = "{} ({} {})".format(created_date, since, created_since), inline=False)
         # Topic
         if chan.permissions_for(ctx.author).read_messages:
@@ -523,8 +523,8 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
         embed.add_field(name=await self.bot._(ctx.guild.id,"stats_infos","textchan-0"), value=str(chan.category))
         # Created at
         delta = abs(chan.created_at - datetime.datetime.utcnow())
-        created_date = await self.timecog.date(chan.created_at, lang=lang, year=True)
-        created_since = await self.timecog.time_delta(delta.total_seconds(), lang=lang, year=True, precision=0, hour=delta.total_seconds() < 86400)
+        created_date = await self.TimeUtils.date(chan.created_at, lang=lang, year=True)
+        created_since = await self.TimeUtils.time_delta(delta.total_seconds(), lang=lang, year=True, precision=0, hour=delta.total_seconds() < 86400)
         embed.add_field(name=await self.bot._(ctx.guild.id, "stats_infos", "member-1"), value = "{} ({} {})".format(created_date, since, created_since), inline=False)
         # Bitrate
         embed.add_field(name="Bitrate",value=str(chan.bitrate/1000)+" kbps")
@@ -536,7 +536,7 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
 
     async def guild_info(self, ctx:MyContext, guild:discord.Guild, lang:str, critical_info:bool=False):
         since = await self.bot._(ctx.guild.id,"keywords","depuis")
-        _, bots, online = await self.bot.get_cog("UtilitiesCog").get_members_repartition(guild.members)
+        _, bots, online = await self.bot.get_cog("Utilities").get_members_repartition(guild.members)
        
         desc = await self.bot.get_config(guild.id,'description')
         if (desc is None or len(desc) == 0) and guild.description is not None:
@@ -558,8 +558,8 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
         embed.add_field(name=await self.bot._(ctx.guild.id,"stats_infos","guild-1"), value=str(guild.owner))
         # Created at
         delta = abs(guild.created_at - datetime.datetime.utcnow())
-        created_date = await self.timecog.date(guild.created_at, lang=lang, year=True)
-        created_since = await self.timecog.time_delta(delta.total_seconds(), lang=lang, year=True, precision=0, hour=delta.total_seconds() < 86400)
+        created_date = await self.TimeUtils.date(guild.created_at, lang=lang, year=True)
+        created_since = await self.TimeUtils.time_delta(delta.total_seconds(), lang=lang, year=True, precision=0, hour=delta.total_seconds() < 86400)
         embed.add_field(name=await self.bot._(ctx.guild.id, "stats_infos", "member-1"), value = "{} ({} {})".format(created_date, since, created_since), inline=False)
         # Voice region
         embed.add_field(name=await self.bot._(ctx.guild.id,"stats_infos","guild-2"), value=str(guild.region).capitalize())
@@ -586,7 +586,7 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
             if isinstance(e,(discord.errors.Forbidden, discord.errors.HTTPException)):
                 pass
             else:
-                await self.bot.cogs['ErrorsCog'].on_error(e,ctx)
+                await self.bot.cogs['Errors'].on_error(e,ctx)
         # Premium subscriptions count
         if isinstance(guild.premium_subscription_count,int) and guild.premium_subscription_count > 0:
             embed.add_field(name=await self.bot._(ctx.guild.id,"stats_infos","guild-13"), value=await self.bot._(ctx.guild.id,"stats_infos","guild-13v",b=guild.premium_subscription_count,p=guild.premium_tier))
@@ -597,7 +597,7 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
             else:
                 roles = [x.name for x in guild.roles if len(x.members) > 1][1:]
         except Exception as e:
-            await self.bot.cogs['ErrorsCog'].on_error(e,ctx)
+            await self.bot.cogs['Errors'].on_error(e,ctx)
             roles = guild.roles
         roles.reverse()
         if len(roles) == 0:
@@ -644,7 +644,7 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
             except discord.errors.Forbidden:
                 pass
             except Exception as e:
-                await self.bot.cogs['ErrorsCog'].on_error(e,ctx)
+                await self.bot.cogs['Errors'].on_error(e,ctx)
         # Invite URL
         embed.add_field(name=await self.bot._(ctx.guild.id,"stats_infos","inv-0"), value=invite.url,inline=True)
         # Inviter
@@ -691,7 +691,7 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
             embed.add_field(name=await self.bot._(ctx.guild.id,"stats_infos","inv-9"), value=" - ".join(features))
         # Creation date
         if invite.created_at is not None:
-            embed.add_field(name=await self.bot._(ctx.guild.id,"stats_infos","member-1"), value = "{} ({} {})".format(await self.timecog.date(invite.created_at,lang=lang,year=True),since,await self.timecog.time_delta(invite.created_at,datetime.datetime.utcnow(),lang=lang,year=True,precision=0,hour=False)), inline=False)
+            embed.add_field(name=await self.bot._(ctx.guild.id,"stats_infos","member-1"), value = "{} ({} {})".format(await self.TimeUtils.date(invite.created_at,lang=lang,year=True),since,await self.TimeUtils.time_delta(invite.created_at,datetime.datetime.utcnow(),lang=lang,year=True,precision=0,hour=False)), inline=False)
         await ctx.send(embed=embed)
 
     async def category_info(self, ctx: MyContext, categ: discord.CategoryChannel, lang: str):
@@ -711,12 +711,12 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
         embed.add_field(name=await self.bot._(ctx.guild.id,"stats_infos","role-0"), value=str(categ.id))
         embed.add_field(name=await self.bot._(ctx.guild.id,"stats_infos","categ-1"), value="{}/{}".format(categ.position+1,len(ctx.guild.categories)))
         embed.add_field(name=await self.bot._(ctx.guild.id,"stats_infos","guild-6"), value=str(await self.bot._(ctx.guild.id,"stats_infos","categ-2")).format(tchan,vchan))
-        embed.add_field(name=await self.bot._(ctx.guild.id,"stats_infos","member-1"), value = "{} ({} {})".format(await self.timecog.date(categ.created_at,lang=lang,year=True),since,await self.timecog.time_delta(categ.created_at,datetime.datetime.utcnow(),lang=lang,year=True,precision=0,hour=False)), inline=False)
+        embed.add_field(name=await self.bot._(ctx.guild.id,"stats_infos","member-1"), value = "{} ({} {})".format(await self.TimeUtils.date(categ.created_at,lang=lang,year=True),since,await self.TimeUtils.time_delta(categ.created_at,datetime.datetime.utcnow(),lang=lang,year=True,precision=0,hour=False)), inline=False)
         await ctx.send(embed=embed)
     
     async def snowflake_infos(self, ctx: MyContext, snowflake: args.snowflake, lang: str):
-        date = await self.bot.cogs["TimeCog"].date(snowflake.date,lang,year=True)
-        embed = await self.bot.cogs["EmbedCog"].Embed(color = default_color, time = ctx.message.created_at, fields = [
+        date = await self.bot.cogs["TimeUtils"].date(snowflake.date,lang,year=True)
+        embed = await self.bot.cogs["Embeds"].Embed(color = default_color, time = ctx.message.created_at, fields = [
             {"name": await self.bot._(ctx.channel,"stats_infos","snowflake-0"), "value": date, "inline": True},
             {"name": await self.bot._(ctx.channel,"stats_infos","snowflake-2"), "value": round(snowflake.date.timestamp()), "inline": True},
             {"name": await self.bot._(ctx.channel,"stats_infos","snowflake-1"), "value": snowflake.binary, "inline": False},
@@ -754,24 +754,24 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
         elif len("\n".join(servers_in)) > 1020:
             servers_in = [f"{owned} serveurs possédés, membre sur {membered} autres serveurs"]
         # XP card
-        xp_card = await self.bot.cogs['UtilitiesCog'].get_xp_style(user)
+        xp_card = await self.bot.cogs['Utilities'].get_xp_style(user)
         # Perks
         perks = list()
-        if await self.bot.cogs["AdminCog"].check_if_admin(user):
+        if await self.bot.cogs["Admin"].check_if_admin(user):
             perks.append('admin')
-        if await self.bot.cogs['UtilitiesCog'].is_support(user):
+        if await self.bot.cogs['Utilities'].is_support(user):
             perks.append("support")
-        if await self.bot.cogs['UtilitiesCog'].is_contributor(user):
+        if await self.bot.cogs['Utilities'].is_contributor(user):
             perks.append("contributor")
-        if await self.bot.cogs['UtilitiesCog'].is_premium(user):
+        if await self.bot.cogs['Utilities'].is_premium(user):
             perks.append("premium")
-        if await self.bot.cogs['UtilitiesCog'].is_partner(user):
+        if await self.bot.cogs['Utilities'].is_partner(user):
             perks.append("partner")
-        if await self.bot.cogs['UtilitiesCog'].is_translator(user):
+        if await self.bot.cogs['Utilities'].is_translator(user):
             perks.append("translator")
         if len(perks) == 0:
             perks = ["None"]
-        votes = await ctx.bot.get_cog("UtilitiesCog").check_votes(user.id)
+        votes = await ctx.bot.get_cog("Utilities").check_votes(user.id)
         if use_embed:
             votes = " - ".join([f"[{x[0]}]({x[1]})" for x in votes])
         else:
@@ -780,7 +780,7 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
             votes = "Nowhere"
         # Languages
         disp_lang = list()
-        for lang in await self.bot.cogs['UtilitiesCog'].get_languages(user):
+        for lang in await self.bot.cogs['Utilities'].get_languages(user):
             disp_lang.append('{} ({}%)'.format(lang[0],round(lang[1]*100)))
         if len(disp_lang) == 0:
             disp_lang = ["Unknown"]
@@ -788,9 +788,9 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
         user_name = str(user)+' <:BOT:544149528761204736>' if user.bot else str(user)
         # XP sus
         xp_sus = "Unknown"
-        if xpcog := self.bot.get_cog("XPCog"):
-            if xpcog.sus is not None:
-                xp_sus = str(user.id in xpcog.sus)
+        if Xp := self.bot.get_cog("Xp"):
+            if Xp.sus is not None:
+                xp_sus = str(user.id in Xp.sus)
         # ----
         if use_embed:
             if ctx.guild is None:
@@ -798,7 +798,7 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
             else:
                 color = None if ctx.guild.me.color.value == 0 else ctx.guild.me.color
             
-            await ctx.send(embed = await self.bot.cogs['EmbedCog'].Embed(title=user_name, thumbnail=str(await self.bot.user_avatar_as(user,1024)) ,color=color, fields = [
+            await ctx.send(embed = await self.bot.cogs['Embeds'].Embed(title=user_name, thumbnail=str(await self.bot.user_avatar_as(user,1024)) ,color=color, fields = [
                 {"name": "ID", "value": user.id},
                 {"name": "Perks", "value": "-".join(perks), "inline":False},
                 {"name": "Servers", "value": "\n".join(servers_in), "inline":True},
@@ -845,21 +845,21 @@ Servers:
         if lang is None:
             lang = 'default'
         else:
-            lang = ctx.bot.cogs['LangCog'].languages[lang]
+            lang = ctx.bot.cogs['Languages'].languages[lang]
         # Roles rewards
         rr_len = await self.bot.get_config(guild.id,'rr_max_number')
-        rr_len = self.bot.cogs["ServerCog"].default_opt['rr_max_number'] if rr_len is None else rr_len
-        rr_len = '{}/{}'.format(len(await self.bot.cogs['XPCog'].rr_list_role(guild.id)),rr_len)
+        rr_len = self.bot.cogs["Servers"].default_opt['rr_max_number'] if rr_len is None else rr_len
+        rr_len = '{}/{}'.format(len(await self.bot.cogs['Xp'].rr_list_role(guild.id)),rr_len)
         # Prefix
-        pref = self.bot.cogs['UtilitiesCog'].find_prefix(guild)
+        pref = self.bot.cogs['Utilities'].find_prefix(guild)
         if "`" not in pref:
             pref = "`" + pref + "`"
         # Rss
         rss_len = await self.bot.get_config(guild.id,'rss_max_number')
-        rss_len = self.bot.cogs["ServerCog"].default_opt['rss_max_number'] if rss_len is None else rss_len
-        rss_numb = "{}/{}".format(len(await self.bot.cogs['RssCog'].get_guild_flows(guild.id)), rss_len)
+        rss_len = self.bot.cogs["Servers"].default_opt['rss_max_number'] if rss_len is None else rss_len
+        rss_numb = "{}/{}".format(len(await self.bot.cogs['Rss'].get_guild_flows(guild.id)), rss_len)
         # Join date
-        joined_at = await self.bot.cogs['TimeCog'].date(guild.me.joined_at,msglang,year=True,digital=True)
+        joined_at = await self.bot.cogs['TimeUtils'].date(guild.me.joined_at,msglang,year=True,digital=True)
         # ----
         if ctx.can_send_embed:
             if ctx.guild is None:
@@ -867,7 +867,7 @@ Servers:
             else:
                 color = None if ctx.guild.me.color.value == 0 else ctx.guild.me.color
             guild_icon = str(guild.icon_url_as(format = "gif" if guild.is_icon_animated() else 'png'))
-            await ctx.send(embed = await self.bot.cogs['EmbedCog'].Embed(title=guild.name, color=color, thumbnail=guild_icon, fields=[
+            await ctx.send(embed = await self.bot.cogs['Embeds'].Embed(title=guild.name, color=color, thumbnail=guild_icon, fields=[
                 {"name": "ID", "value": guild.id},
                 {"name": "Owner", "value": "{} ({})".format(guild.owner, guild.owner_id)},
                 {"name": "Joined at", "value": joined_at},
@@ -902,7 +902,7 @@ Servers:
                 color = None
             else:
                 color = None if ctx.guild.me.color.value == 0 else ctx.guild.me.color
-            await ctx.send(embed = await self.bot.cogs['EmbedCog'].Embed(title="#"+c.name,color=color,fields=[
+            await ctx.send(embed = await self.bot.cogs['Embeds'].Embed(title="#"+c.name,color=color,fields=[
                 {"name": "ID", "value": c.id},
                 {"name": "Server", "value": f"{c.guild.name} ({c.guild.id})"}
             ]).create_footer(ctx))
@@ -923,7 +923,7 @@ Servers:
                 color = None
             else:
                 color = None if ctx.guild.me.color.value == 0 else ctx.guild.me.color
-            await ctx.send(embed = await self.bot.cogs['EmbedCog'].Embed(title="@"+role.name,color=color,fields=[
+            await ctx.send(embed = await self.bot.cogs['Embeds'].Embed(title="@"+role.name,color=color,fields=[
                 {"name": "ID", "value": role.id},
                 {"name": "Server", "value": f"{role.guild.name} ({role.guild.id})"},
                 {"name": "Members", "value": len(role.members), "inline": True},
@@ -934,7 +934,7 @@ Servers:
     
     @find_main.command(name='rss')
     async def find_rss(self, ctx: MyContext, ID:int):
-        flow = await self.bot.cogs['RssCog'].get_flow(ID)
+        flow = await self.bot.cogs['Rss'].get_flow(ID)
         if len(flow) == 0:
             await ctx.send("Invalid ID")
             return
@@ -950,7 +950,7 @@ Servers:
             c = "`{}`\n{}".format(temp.name,temp.id)
         else:
             c = "Unknown ({})".format(flow['channel'])
-        d = await self.bot.cogs['TimeCog'].date(flow['date'],digital=True)
+        d = await self.bot.cogs['TimeUtils'].date(flow['date'],digital=True)
         if d is None or len(d) == 0:
             d = "never"
         if ctx.can_send_embed:
@@ -958,7 +958,7 @@ Servers:
                 color = None
             else:
                 color = None if ctx.guild.me.color.value == 0 else ctx.guild.me.color
-            await ctx.send(embed = await self.bot.cogs['EmbedCog'].Embed(title=f"RSS N°{ID}",color=color,fields=[
+            await ctx.send(embed = await self.bot.cogs['Embeds'].Embed(title=f"RSS N°{ID}",color=color,fields=[
                 {"name": "Server", "value": g, "inline": True},
                 {"name": "Channel", "value": c, "inline": True},
                 {"name": "URL", "value": flow['link']},
@@ -975,7 +975,7 @@ Servers:
         """Get some digits on the number of server members"""
         if ctx.channel.permissions_for(ctx.guild.me).send_messages == False:
             return
-        total, bots, c_co = await self.bot.get_cog("UtilitiesCog").get_members_repartition(ctx.guild.members)
+        total, bots, c_co = await self.bot.get_cog("Utilities").get_members_repartition(ctx.guild.members)
         h = total - bots
         h_p = "< 1" if 0 < h / total < 0.01 else ("> 99" if 1 > h/total > 0.99 else round(h*100/total))
         b_p = "< 1" if 0 < bots / total < 0.01 else ("> 99" if 1 > bots/total > 0.99 else round(bots*100/total))
@@ -1003,7 +1003,7 @@ Servers:
         txt = await self.bot._(ctx.channel,"infos","prefix")
         prefix = "\n".join((await ctx.bot.get_prefix(ctx.message))[1:])
         if ctx.guild is None or ctx.channel.permissions_for(ctx.guild.me):
-            emb = await ctx.bot.cogs['EmbedCog'].Embed(title=txt,desc=prefix,time=ctx.message.created_at,color=ctx.bot.cogs['HelpCog'].help_color).create_footer(ctx)
+            emb = await ctx.bot.cogs['Embeds'].Embed(title=txt,desc=prefix,time=ctx.message.created_at,color=ctx.bot.cogs['Help'].help_color).create_footer(ctx)
             return await ctx.send(embed=emb.discord_embed())
         await ctx.send(txt+"\n"+prefix)
     
@@ -1023,7 +1023,7 @@ Servers:
         links = ["https://dis.gd/status","https://dis.gd/tos","https://dis.gd/report","https://dis.gd/feedback","https://support.discord.com/hc/en-us/articles/115002192352","https://discord.com/developers/docs/legal","https://support.discord.com/hc/en-us/articles/206346498-Where-can-I-find-my-User-Server-Message-ID-","https://support.discord.com/hc/en-us/articles/360040724612", " https://twitter.com/discordapp/status/1060411427616444417"]
         if ctx.can_send_embed:
             txt = "\n".join(['['+l[i]+']('+links[i]+')' for i in range(len(l))])
-            em = await self.bot.cogs["EmbedCog"].Embed(desc=txt).update_timestamp().create_footer(ctx)
+            em = await self.bot.cogs["Embeds"].Embed(desc=txt).update_timestamp().create_footer(ctx)
             await ctx.send(embed=em)
         else:
             txt = "\n".join([f'• {l[i]}: <{links[i]}>' for i in range(len(l))])
@@ -1050,7 +1050,7 @@ Servers:
             cnx.commit()
             cursor.close()
         except Exception as e:
-            await self.bot.cogs['ErrorsCog'].on_error(e,None)
+            await self.bot.cogs['Errors'].on_error(e,None)
     
     async def get_emojis_info(self, ID: typing.Union[int,list]):
         """Get info about an emoji"""
@@ -1074,7 +1074,7 @@ Servers:
         """Bit.ly website, but in Discord
         Create shortened url and unpack them by using Bitly services"""
         if ctx.subcommand_passed is None:
-            await self.bot.cogs['HelpCog'].help_command(ctx,['bitly'])
+            await self.bot.cogs['Help'].help_command(ctx,['bitly'])
         elif ctx.invoked_subcommand is None and ctx.subcommand_passed is not None:
             try:
                 url = await args.url().convert(ctx,ctx.subcommand_passed)
@@ -1145,7 +1145,7 @@ Servers:
         if len(results) == 0:
             await ctx.send(await self.bot._(ctx.channel,'infos','changelog-notfound'))
         elif ctx.can_send_embed:
-            emb = ctx.bot.cogs['EmbedCog'].Embed(title=title,desc=desc,time=time,color=ctx.bot.cogs['ServerCog'].embed_color)
+            emb = ctx.bot.cogs['Embeds'].Embed(title=title,desc=desc,time=time,color=ctx.bot.cogs['Servers'].embed_color)
             await ctx.send(embed=emb)
         else:
             await ctx.send(desc)
@@ -1186,7 +1186,7 @@ Servers:
                 f.append({'name':await self.bot._(ctx.channel,'infos','usernames-global'), 'value':"\n".join(temp)})
                 # if global_list[-1]['old'] != '':
                 #     f[-1]["value"] += "\n" + global_list[-1]['old']
-                date += await self.bot.cogs['TimeCog'].date([x['utc_date'] for x in global_list][0] ,year=True, lang=language)
+                date += await self.bot.cogs['TimeUtils'].date([x['utc_date'] for x in global_list][0] ,year=True, lang=language)
             if len(this_guild) > 0:
             # Nicknames part
                 temp = [x['new'] for x in this_guild if x['new']!='']
@@ -1195,7 +1195,7 @@ Servers:
                 f.append({'name':await self.bot._(ctx.channel,'infos','usernames-local'), 'value':"\n".join(temp)})
                 # if this_guild[-1]['old'] != '':
                 #     f[-1]["value"] += "\n" + this_guild[-1]['old']
-                date += "\n" + await self.bot.cogs['TimeCog'].date([x['utc_date'] for x in this_guild][0], year=True, lang=language)
+                date += "\n" + await self.bot.cogs['TimeUtils'].date([x['utc_date'] for x in this_guild][0], year=True, lang=language)
             if len(date) > 0:
                 f.append({'name':await self.bot._(ctx.channel,'infos','usernames-last-date'), 'value':date})
             else:
@@ -1204,12 +1204,12 @@ Servers:
                 c = ctx.guild.get_member(user.id).color
             else:
                 c = 1350390
-            allowing_logs = await self.bot.cogs["UtilitiesCog"].get_db_userinfo(["allow_usernames_logs"],["userID="+str(user.id)])
+            allowing_logs = await self.bot.cogs["Utilities"].get_db_userinfo(["allow_usernames_logs"],["userID="+str(user.id)])
             if allowing_logs is None or allowing_logs["allow_usernames_logs"]:
                 footer = await self.bot._(ctx.channel,'infos','usernames-disallow')
             else:
                 footer = await self.bot._(ctx.channel,'infos','usernames-allow')
-            emb = self.bot.cogs['EmbedCog'].Embed(title=t,fields=f,desc=desc,color=c,footer_text=footer)
+            emb = self.bot.cogs['Embeds'].Embed(title=t,fields=f,desc=desc,color=c,footer_text=footer)
             await ctx.send(embed=emb)
         # Raw text creation
         else:
@@ -1217,5 +1217,5 @@ Servers:
 
 
 def setup(bot):
-    bot.add_cog(InfoCog(bot))
+    bot.add_cog(Info(bot))
     

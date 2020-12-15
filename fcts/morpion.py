@@ -7,7 +7,7 @@ from discord.ext import commands
 from classes import zbot, MyContext
 
 
-class MorpionCog(commands.Cog):
+class Morpions(commands.Cog):
 
     def __init__(self, bot: zbot):
         self.bot = bot
@@ -83,7 +83,7 @@ class MorpionCog(commands.Cog):
                     affichage_grille += '\n'
                 if grille[k] in range(10):
                     affichage_grille += '<:{}>'.format(
-                        self.bot.cogs['EmojiCog'].numbEmojis[grille[k]])
+                        self.bot.cogs['Emojis'].numbEmojis[grille[k]])
                 elif grille[k] == 'O':
                     affichage_grille += self.emojis[0]
                 else:
@@ -177,18 +177,18 @@ class MorpionCog(commands.Cog):
                         break
                 ###
                 if match_nul:
-                    await self.bot.cogs["UtilitiesCog"].add_user_eventPoint(ctx.author.id, 1)
+                    await self.bot.cogs["Utilities"].add_user_eventPoint(ctx.author.id, 1)
                     resultat = await self.bot._(ctx.channel, 'morpion', 'nul')
                 else:
                     if tour:  # Le bot a gagné
                         resultat = await self.bot._(ctx.channel, 'morpion', 'win-2')
                     else:  # L'utilisateur a gagné
                         resultat = await self.bot._(ctx.channel, 'morpion', 'win-1')
-                        await self.bot.cogs["UtilitiesCog"].add_user_eventPoint(ctx.author.id, 4)
+                        await self.bot.cogs["Utilities"].add_user_eventPoint(ctx.author.id, 4)
                 await ctx.send(await self.afficher_grille(grille)+'\n'+resultat.format(ctx.author.mention))
             except Exception as e:
-                await self.bot.cogs['ErrorsCog'].on_command_error(ctx, e)
+                await self.bot.cogs['Errors'].on_command_error(ctx, e)
 
 
 def setup(bot):
-    bot.add_cog(MorpionCog(bot))
+    bot.add_cog(Morpions(bot))

@@ -5,7 +5,7 @@ from classes import zbot
 en = None
 fi = None
 
-class LangCog(discord.ext.commands.Cog):
+class Languages(discord.ext.commands.Cog):
 
     def __init__(self, bot: zbot):
         self.bot = bot
@@ -29,19 +29,19 @@ class LangCog(discord.ext.commands.Cog):
             #print("Ex langage:",lang_opt)
             #print(self.serv_opts)
         elif not self.bot.database_online:
-            lang_opt = self.bot.cogs['ServerCog'].default_language
+            lang_opt = self.bot.cogs['Servers'].default_language
         elif serverID is None:
-            lang_opt = self.bot.cogs['ServerCog'].default_language
+            lang_opt = self.bot.cogs['Servers'].default_language
         elif isinstance(serverID,discord.DMChannel):
-            used_langs = await self.bot.cogs['UtilitiesCog'].get_languages(serverID.recipient,limit=1)
+            used_langs = await self.bot.cogs['Utilities'].get_languages(serverID.recipient,limit=1)
             lang_opt = used_langs[0][0]
         else:
-            conf_lang = self.bot.cogs["ServerCog"].conf_lang
+            conf_lang = self.bot.cogs["Servers"].conf_lang
             lang_opt = await conf_lang(serverID,"language","scret-desc")
             self.serv_opts[str(serverID)] = lang_opt
             #print("New langage:",lang_opt)
         if lang_opt not in self.languages:
-            lang_opt = self.bot.cogs['ServerCog'].default_language
+            lang_opt = self.bot.cogs['Servers'].default_language
         return await self._get_translation(lang_opt, moduleID, messageID, **args)
         
     async def _get_translation(self, lang:str, moduleID:str, messageID:str, **args):
@@ -83,7 +83,7 @@ class LangCog(discord.ext.commands.Cog):
                 await self.msg_not_found(moduleID,messageID,"fr")
                 result = ""
             except Exception as e:
-                await self.bot.cogs['ErrorsCog'].on_error(e,None)
+                await self.bot.cogs['Errors'].on_error(e,None)
                 result = ""
         if isinstance(result,str):
             try:
@@ -95,7 +95,7 @@ class LangCog(discord.ext.commands.Cog):
 
     async def msg_not_found(self, moduleID: str, messageID: str, lang: str):
         try:
-            await self.bot.cogs['ErrorsCog'].senf_err_msg("Le message {}.{} n'a pas été trouvé dans la base de donnée! (langue {})".format(moduleID,messageID,lang))
+            await self.bot.cogs['Errors'].senf_err_msg("Le message {}.{} n'a pas été trouvé dans la base de donnée! (langue {})".format(moduleID,messageID,lang))
         except:
             pass
 
@@ -142,4 +142,4 @@ class LangCog(discord.ext.commands.Cog):
 
 
 def setup(bot):
-    bot.add_cog(LangCog(bot))
+    bot.add_cog(Languages(bot))

@@ -10,7 +10,7 @@ from urllib.parse import quote
 from classes import zbot, MyContext
 
 
-class McCog(commands.Cog):
+class Minecraft(commands.Cog):
     """Cog gathering all commands related to the Minecraft® game. 
 Every information come from the website www.fr-minecraft.net"""
     
@@ -40,13 +40,13 @@ Every information come from the website www.fr-minecraft.net"""
                 if K == "www.minecraft.net/en-us":
                     K = "minecraft.net"
                 if V == "green":
-                    k = self.bot.cogs['EmojiCog'].customEmojis['green_check']+K
+                    k = self.bot.cogs['Emojis'].customEmojis['green_check']+K
                 elif V == "red":
-                    k = self.bot.cogs['EmojiCog'].customEmojis['red_cross']+K
+                    k = self.bot.cogs['Emojis'].customEmojis['red_cross']+K
                 elif V == 'yellow':
-                    k = self.bot.cogs['EmojiCog'].customEmojis['neutral_check']+K
+                    k = self.bot.cogs['Emojis'].customEmojis['neutral_check']+K
                 else:
-                    k = self.bot.cogs['EmojiCog'].customEmojis['blurple']+K
+                    k = self.bot.cogs['Emojis'].customEmojis['blurple']+K
                     dm = self.bot.get_user(279568324260528128).dm_channel
                     if dm is None:
                         await self.bot.get_user(279568324260528128).create_dm()
@@ -66,13 +66,13 @@ Every information come from the website www.fr-minecraft.net"""
                     continue
                 K, V = list(item.items())[0]
                 if V == "green":
-                    k = self.bot.cogs['EmojiCog'].customEmojis['green_check']+K
+                    k = self.bot.cogs['Emojis'].customEmojis['green_check']+K
                 elif V == "red":
-                    k = self.bot.cogs['EmojiCog'].customEmojis['red_cross']+K
+                    k = self.bot.cogs['Emojis'].customEmojis['red_cross']+K
                 elif V == 'yellow':
-                    k = self.bot.cogs['EmojiCog'].customEmojis['neutral_check']+K
+                    k = self.bot.cogs['Emojis'].customEmojis['neutral_check']+K
                 else:
-                    k = self.bot.cogs['EmojiCog'].customEmojis['blurple']+K
+                    k = self.bot.cogs['Emojis'].customEmojis['blurple']+K
                     dm = self.bot.get_user(279568324260528128).dm_channel
                     if dm is None:
                         await self.bot.get_user(279568324260528128).create_dm()
@@ -98,7 +98,7 @@ Every information come from the website www.fr-minecraft.net"""
         
         ..Doc minecraft.html#mc"""
         if ctx.subcommand_passed is None:
-            await self.bot.cogs['HelpCog'].help_command(ctx,['minecraft'])
+            await self.bot.cogs['Help'].help_command(ctx,['minecraft'])
 
     @mc_main.command(name="block", aliases=["bloc"])
     async def mc_block(self, ctx: MyContext, *, value='help'):
@@ -119,7 +119,7 @@ Every information come from the website www.fr-minecraft.net"""
             await ctx.send(await self.bot._(ctx.channel,"mc","no-block"))
             return
         title = "{} - {}".format((await self.bot._(ctx.channel,"mc","names"))[0],Block.Name)
-        embed = self.bot.get_cog("EmbedCog").Embed(title=title, color=discord.Colour(int('16BD06',16)), url=Block.Url, time=ctx.message.created_at, desc=await self.bot._(ctx.channel,'mc','contact-mail'), thumbnail=Block.Image)
+        embed = self.bot.get_cog("Embeds").Embed(title=title, color=discord.Colour(int('16BD06',16)), url=Block.Url, time=ctx.message.created_at, desc=await self.bot._(ctx.channel,'mc','contact-mail'), thumbnail=Block.Image)
         await embed.create_footer(ctx)
         embed.add_field(name="Nom", value=Block.Name,inline=False)
         l = ("\n".join(Block.ID),Block.Stack,Block.CreativeTab,Block.Damage,Block.Strength,Block.Tool,", ".join(Block.Mobs),Block.Version)
@@ -132,7 +132,7 @@ Every information come from the website www.fr-minecraft.net"""
         try:
             await ctx.send(embed=embed)
         except Exception as e:
-            await self.bot.cogs['ErrorsCog'].on_error(e,ctx)
+            await self.bot.cogs['Errors'].on_error(e,ctx)
             await ctx.send(await self.bot._(ctx.channel,"mc","no-entity"))
 
     @mc_main.command(name="entity", aliases=["entité","mob"])
@@ -154,7 +154,7 @@ Every information come from the website www.fr-minecraft.net"""
             await ctx.send(await self.bot._(ctx.channel,"mc","no-entity"))
             return
         title = "{} - {}".format((await self.bot._(ctx.channel,"mc","names"))[1],Entity.Name)
-        embed = self.bot.get_cog("EmbedCog").Embed(title=title, color=discord.Colour(int('16BD06',16)), url=Entity.Url, time=ctx.message.created_at, desc=await self.bot._(ctx.channel,'mc','contact-mail'), thumbnail=Entity.Image)
+        embed = self.bot.get_cog("Embeds").Embed(title=title, color=discord.Colour(int('16BD06',16)), url=Entity.Url, time=ctx.message.created_at, desc=await self.bot._(ctx.channel,'mc','contact-mail'), thumbnail=Entity.Image)
         await embed.create_footer(ctx)
         embed.add_field(name="Nom", value=Entity.Name,inline=False)
         l = (Entity.ID,Entity.Type,Entity.PV,Entity.PA,Entity.XP,", ".join(Entity.Biomes),Entity.Version)
@@ -169,7 +169,7 @@ Every information come from the website www.fr-minecraft.net"""
         try:
             await ctx.send(embed=embed)
         except Exception as e:
-            await self.bot.cogs['ErrorsCog'].on_error(e,ctx)
+            await self.bot.cogs['Errors'].on_error(e,ctx)
             await ctx.send(await self.bot._(ctx.channel,"mc","no-entity"))
     
     @mc_main.command(name="item",aliases=['object'])
@@ -191,7 +191,7 @@ Every information come from the website www.fr-minecraft.net"""
             await ctx.send(await self.bot._(ctx.channel,"mc","no-item"))
             return
         title = "{} - {}".format((await self.bot._(ctx.channel,"mc","names"))[2],Item.Name)
-        embed = self.bot.get_cog("EmbedCog").Embed(title=title, color=discord.Colour(int('16BD06',16)), url=Item.Url, time=ctx.message.created_at, desc=await self.bot._(ctx.channel,'mc','contact-mail'))
+        embed = self.bot.get_cog("Embeds").Embed(title=title, color=discord.Colour(int('16BD06',16)), url=Item.Url, time=ctx.message.created_at, desc=await self.bot._(ctx.channel,'mc','contact-mail'))
         if Item.Image is not None:
             embed.thumbnail = Item.Image
         await embed.create_footer(ctx)
@@ -206,7 +206,7 @@ Every information come from the website www.fr-minecraft.net"""
         try:
             await ctx.send(embed=embed)
         except Exception as e:
-            await self.bot.cogs['ErrorsCog'].on_error(e,ctx)
+            await self.bot.cogs['Errors'].on_error(e,ctx)
             await ctx.send(await self.bot._(ctx.channel,"mc","no-entity"))
 
     @mc_main.command(name="command",aliases=["commande","cmd"])
@@ -228,7 +228,7 @@ Every information come from the website www.fr-minecraft.net"""
             await ctx.send(await self.bot._(ctx.channel,"mc","no-cmd"))
             return
         title = "{} - {}".format((await self.bot._(ctx.channel,"mc","names"))[3],Cmd.Name)
-        embed = self.bot.get_cog("EmbedCog").Embed(title=title, color=discord.Colour(int('16BD06',16)), url=Cmd.Url, time=ctx.message.created_at, desc=await self.bot._(ctx.channel,'mc','contact-mail'))
+        embed = self.bot.get_cog("Embeds").Embed(title=title, color=discord.Colour(int('16BD06',16)), url=Cmd.Url, time=ctx.message.created_at, desc=await self.bot._(ctx.channel,'mc','contact-mail'))
         await embed.create_footer(ctx)
         l = (Cmd.Name," ".join(Cmd.Syntax),Cmd.Examples,Cmd.Version)
         for e,v in enumerate(await self.bot._(ctx.channel,"mc","cmd-fields")):
@@ -250,7 +250,7 @@ Every information come from the website www.fr-minecraft.net"""
         try:
             await ctx.send(embed=embed)
         except Exception as e:
-            await self.bot.cogs['ErrorsCog'].on_error(e,ctx)
+            await self.bot.cogs['Errors'].on_error(e,ctx)
             await ctx.send(await self.bot._(ctx.channel,"mc","no-cmd"))
     
     @mc_main.command(name="advancement",aliases=["advc","progrès"])
@@ -268,7 +268,7 @@ Every information come from the website www.fr-minecraft.net"""
             await ctx.send(await self.bot._(ctx.channel,"mc","no-adv"))
             return
         title = "{} - {}".format((await self.bot._(ctx.channel,"mc","names"))[4],Adv.Name)
-        embed = self.bot.get_cog("EmbedCog").Embed(title=title, color=discord.Colour(int('16BD06',16)), url=Adv.Url, time=ctx.message.created_at, desc=await self.bot._(ctx.channel,'mc','contact-mail'))
+        embed = self.bot.get_cog("Embeds").Embed(title=title, color=discord.Colour(int('16BD06',16)), url=Adv.Url, time=ctx.message.created_at, desc=await self.bot._(ctx.channel,'mc','contact-mail'))
         await embed.create_footer(ctx)
         if Adv.Image is not None:
             embed.thumbnail = Adv.Image
@@ -282,7 +282,7 @@ Every information come from the website www.fr-minecraft.net"""
         try:
             await ctx.send(embed=embed)
         except Exception as e:
-            await self.bot.cogs['ErrorsCog'].on_error(e,ctx)
+            await self.bot.cogs['Errors'].on_error(e,ctx)
             await ctx.send(await self.bot._(ctx.channel,"mc","no-adv"))
     
     @mc_main.command(name="mod")
@@ -309,7 +309,7 @@ Every information come from the website www.fr-minecraft.net"""
         authors = ", ".join([f"[{x['name']}]({x['url']})" for x in search['authors']])
         d = search['dateModified'][:-1]
         d += '0'*(23-len(d))
-        date = await self.bot.get_cog("TimeCog").date(datetime.datetime.fromisoformat(d), user_lang, year=True)
+        date = await self.bot.get_cog("TimeUtils").date(datetime.datetime.fromisoformat(d), user_lang, year=True)
         versions = set(x['gameVersion'] for x in search['gameVersionLatestFiles'])
         versions = " - ".join(sorted(versions, reverse=True, key=lambda a: list(map(int, a.split('.')))))
         l = (
@@ -323,7 +323,7 @@ Every information come from the website www.fr-minecraft.net"""
             search['id']
         )
         title = "{} - {}".format((await self.bot._(ctx.channel, "mc", "names"))[5], search['name'])
-        embed = self.bot.get_cog("EmbedCog").Embed(
+        embed = self.bot.get_cog("Embeds").Embed(
             title=title, color=discord.Colour(int('16BD06', 16)),
             url=search['websiteUrl'],
             time=ctx.message.created_at)
@@ -358,7 +358,7 @@ Every information come from the website www.fr-minecraft.net"""
             ip,port = i[0],i[1]
         elif port is None:
             port = ''
-        is_over, flow_limit = await self.bot.cogs['RssCog'].is_overflow(ctx.guild)
+        is_over, flow_limit = await self.bot.cogs['Rss'].is_overflow(ctx.guild)
         if is_over:
             await ctx.send(str(await self.bot._(ctx.guild.id,"rss","flow-limit")).format(flow_limit))
             return
@@ -367,11 +367,11 @@ Every information come from the website www.fr-minecraft.net"""
                 display_ip = ip
             else:
                 display_ip = "{}:{}".format(ip,port)
-            await self.bot.cogs['RssCog'].add_flow(ctx.guild.id,ctx.channel.id,'mc',"{}:{}".format(ip,port))
+            await self.bot.cogs['Rss'].add_flow(ctx.guild.id,ctx.channel.id,'mc',"{}:{}".format(ip,port))
             await ctx.send(str(await self.bot._(ctx.guild,"mc","success-add")).format(display_ip,ctx.channel.mention))
         except Exception as e:
             await ctx.send(await self.bot._(ctx.guild,"rss","fail-add"))
-            await self.bot.cogs["ErrorsCog"].on_error(e,ctx)
+            await self.bot.cogs["Errors"].on_error(e,ctx)
 
 
     async def create_server_1(self, guild: discord.Guild, ip: str, port=None):
@@ -388,7 +388,7 @@ Every information come from the website www.fr-minecraft.net"""
         except Exception:
             return await self.create_server_2(guild, ip, port)
             # self.bot.log.warn("[mc-server-1] Erreur sur l'url {} :".format(url))
-            # await self.bot.cogs['ErrorsCog'].on_error(e,None)
+            # await self.bot.cogs['Errors'].on_error(e,None)
             # return await self.bot._(guild,"mc","serv-error")
         if "error" in r.keys():
             if r['error'] != 'timed out':
@@ -434,7 +434,7 @@ Every information come from the website www.fr-minecraft.net"""
             except Exception as e:
                 if not isinstance(e,requests.exceptions.ReadTimeout):
                     await self.bot.log.error("[mc-server-2] Erreur sur l'url {} :".format(url))
-                await self.bot.cogs['ErrorsCog'].on_error(e,None)
+                await self.bot.cogs['Errors'].on_error(e,None)
                 return await self.bot._(guild,"mc","serv-error")
         if r["debug"]["ping"] == False:
             return await self.bot._(guild,"mc","no-ping")
@@ -550,7 +550,7 @@ Every information come from the website www.fr-minecraft.net"""
             try:
                 obj = await self.create_server_1(guild,i[0],i[1])
             except Exception as e:
-                await self.bot.cogs['ErrorsCog'].on_error(e,None)
+                await self.bot.cogs['Errors'].on_error(e,None)
                 return
             self.flows[flow['link']] = obj
         try:
@@ -561,14 +561,14 @@ Every information come from the website www.fr-minecraft.net"""
             if msg is None:
                 msg = await self.send_msg_server(obj,channel,i)
                 if msg is not None:
-                    await self.bot.cogs['RssCog'].update_flow(flow['ID'],[('structure',str(msg.id)),('date',datetime.datetime.utcnow())])
+                    await self.bot.cogs['Rss'].update_flow(flow['ID'],[('structure',str(msg.id)),('date',datetime.datetime.utcnow())])
                 return
             e = await self.form_msg_server(obj,guild,i)
             await msg.edit(embed=e)
         except Exception as e:
-            await self.bot.cogs['ErrorsCog'].on_error(e,None)
+            await self.bot.cogs['Errors'].on_error(e,None)
 
 
 
 def setup(bot):
-    bot.add_cog(McCog(bot))
+    bot.add_cog(Minecraft(bot))

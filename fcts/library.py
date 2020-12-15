@@ -16,7 +16,7 @@ class ISBN(commands.Converter):
         return isbnlib.get_canonical_isbn(argument)
 
 
-class LibCog(commands.Cog):
+class Library(commands.Cog):
 
     def __init__(self, bot: zbot):
         self.bot = bot
@@ -94,7 +94,7 @@ class LibCog(commands.Cog):
     async def book_main(self, ctx: MyContext):
         """Search for a book and manage your library"""
         if ctx.subcommand_passed is None:
-            await self.bot.cogs['HelpCog'].help_command(ctx, ['book'])
+            await self.bot.cogs['Help'].help_command(ctx, ['book'])
 
     @book_main.command(name="search", aliases=["book"])
     @commands.cooldown(5, 60, commands.BucketType.guild)
@@ -113,7 +113,7 @@ class LibCog(commands.Cog):
         unknown = await self.bot._(ctx.channel, 'library', 'unknown')
         if ctx.can_send_embed:
             thumb = book.get('cover', '')
-            emb = await self.bot.get_cog('EmbedCog').Embed(title=book['title'], thumbnail=thumb, color=5301186).create_footer(ctx)
+            emb = await self.bot.get_cog('Embeds').Embed(title=book['title'], thumbnail=thumb, color=5301186).create_footer(ctx)
             if 'authors' in book:
                 t = await self.bot._(ctx.channel, 'library', 'author' if len(book['authors']) <= 1 else 'authors')
                 t = t.capitalize()
@@ -144,4 +144,4 @@ class LibCog(commands.Cog):
 
 
 def setup(bot):
-    bot.add_cog(LibCog(bot))
+    bot.add_cog(Library(bot))

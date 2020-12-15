@@ -11,7 +11,7 @@ from fcts import checks
 importlib.reload(checks)
 
 
-class BackupCog(commands.Cog):
+class Backups(commands.Cog):
     """This cog is used to make and apply backups of a Discord server"""
 
     def __init__(self, bot: zbot):
@@ -25,7 +25,7 @@ class BackupCog(commands.Cog):
     async def main_backup(self,ctx:MyContext):
         "..Doc server.html#server-backup"
         if ctx.subcommand_passed is None:
-            await self.bot.cogs['HelpCog'].help_command(ctx,['backup'])
+            await self.bot.cogs['Help'].help_command(ctx,['backup'])
 
 
     @main_backup.command(name="load")
@@ -66,7 +66,7 @@ Arguments are:
                 return
         except Exception as e:
             await ctx.send(await self.bot._(ctx.guild,"s_backup","err"))
-            await ctx.bot.cogs['ErrorsCog'].on_command_error(ctx,e)
+            await ctx.bot.cogs['Errors'].on_command_error(ctx,e)
             return
         # Formatting and sending logs
         logs = "Found {} problems (including {} permissions issues)\n\n".format(sum(problems),problems[0]) + "\n".join(logs)
@@ -102,7 +102,7 @@ Arguments are:
             data = await self.create_backup(ctx)
             await ctx.send(await self.bot._(ctx.guild.id,'modo','backup-done'),file=discord.File(BytesIO(data.encode()), filename=f"backup-{ctx.guild.id}.json"))
         except Exception as e:
-            await ctx.bot.cogs['ErrorsCog'].on_command_error(ctx,e)
+            await ctx.bot.cogs['Errors'].on_command_error(ctx,e)
 
     # --------
 
@@ -191,7 +191,7 @@ Arguments are:
         except discord.errors.Forbidden:
             pass
         except Exception as e:
-            await ctx.bot.cogs['ErrorsCog'].on_error(e,ctx)
+            await ctx.bot.cogs['Errors'].on_error(e,ctx)
         try:
             webs = list()
             for w in await g.webhooks():
@@ -200,7 +200,7 @@ Arguments are:
         except discord.errors.Forbidden:
             pass
         except Exception as e:
-            await ctx.bot.cogs['ErrorsCog'].on_error(e,ctx)
+            await ctx.bot.cogs['Errors'].on_error(e,ctx)
         back['members'] = list()
         for memb in g.members:
             back['members'].append({'id': memb.id,
@@ -819,4 +819,4 @@ Arguments are:
             return problems,logs
 
 def setup(bot):
-    bot.add_cog(BackupCog(bot))
+    bot.add_cog(Backups(bot))

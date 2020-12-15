@@ -42,11 +42,11 @@ def get_prefix(bot, msg: discord.Message) -> list:
     Prefix can change based on guild, but the bot mention will always be an option"""
     if bot.database_online:
         try:
-            prefixes = [bot.cogs['UtilitiesCog'].find_prefix(msg.guild)]
+            prefixes = [bot.cogs['Utilities'].find_prefix(msg.guild)]
         except KeyError:
             try:
                 bot.load_extension('fcts.utilities')
-                prefixes = [bot.cogs['UtilitiesCog'].find_prefix(msg.guild)]
+                prefixes = [bot.cogs['Utilities'].find_prefix(msg.guild)]
             except Exception as e:
                 bot.log.warn("[get_prefix]", e)
                 prefixes = ['!']
@@ -93,7 +93,7 @@ class zbot(commands.bot.AutoShardedBot):
     def current_event(self) -> Optional[dict]:
         """Get the current event, from the date"""
         try:
-            return self.cogs["BotEventsCog"].current_event
+            return self.cogs["BotEvents"].current_event
         except Exception as e:
             self.log.warn(f"[current_event] {e}", exc_info=True)
             return None
@@ -161,7 +161,7 @@ class zbot(commands.bot.AutoShardedBot):
             else:
                 return user.avatar_url_as(format='png', size=size)
         except Exception as e:
-            await self.cogs['ErrorsCog'].on_error(e, None)
+            await self.cogs['Errors'].on_error(e, None)
 
     class SafeDict(dict):
         def __missing__(self, key):
@@ -172,7 +172,7 @@ class zbot(commands.bot.AutoShardedBot):
         return get_prefix(self, msg)
     
     async def get_config(self, guildID: int, option: str) -> Optional[str]:
-        cog = self.get_cog("ServerCog")
+        cog = self.get_cog("Servers")
         if cog:
             return await cog.get_option(guildID, option)
         return None
@@ -180,7 +180,7 @@ class zbot(commands.bot.AutoShardedBot):
     @property
     def _(self) -> Callable[[Any, str, str], Coroutine[Any, Any, str]]:
         """Translate something"""
-        cog = self.get_cog('LangCog')
+        cog = self.get_cog('Languages')
         if cog is None:
             self.log.error("Unable to load Languages cog")
             return lambda *args, **kwargs: args[1]
@@ -193,7 +193,7 @@ def setup_logger():
     log = logging.getLogger("runner")
     # on définis un formatteur
     format = logging.Formatter("%(asctime)s %(levelname)s: %(message)s", datefmt="[%d/%m/%Y %H:%M]")
-    # ex du format : [08/11/2018 14:46] WARNING RSSCog fetch_rss_flux l.288 : Cannot get the RSS flux because of the following error: (suivi du traceback)
+    # ex du format : [08/11/2018 14:46] WARNING Rss fetch_rss_flux l.288 : Cannot get the RSS flux because of the following error: (suivi du traceback)
 
     # log vers un fichier
     file_handler = logging.FileHandler("debug.log")

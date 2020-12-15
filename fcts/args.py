@@ -72,7 +72,7 @@ class cardStyle(commands.Converter):
         pass
 
     async def convert(self, ctx: MyContext, argument: str) -> str:
-        if argument in await ctx.bot.cogs['UtilitiesCog'].allowed_card_styles(ctx.author):
+        if argument in await ctx.bot.cogs['Utilities'].allowed_card_styles(ctx.author):
             return argument
         else:
             raise commands.errors.BadArgument('Invalid card style: '+argument)

@@ -7,7 +7,7 @@ fr_months = ["Janvier","Février","Mars","Avril","Mai","Juin","Juillet","Aout","
 en_months = ["January","February","March","April","May","June","July","August","September","October","November","December"]
 fi_months = ['tammikuu','helmikuu','maaliskuu','huhtikuu','toukokuu','kesäkuu','heinäkuu','elokuu','syyskuu','lokakuu','marraskuu','joulukuu']
 
-class TimeCog(discord.ext.commands.Cog):
+class TimeUtils(discord.ext.commands.Cog):
     """This cog handles all manipulations of date, time, and time interval. So cool, and so fast"""
     def __init__(self, bot: zbot):
         self.bot = bot
@@ -182,5 +182,5 @@ class TimeCog(discord.ext.commands.Cog):
 
 
 def setup(bot):
-    bot.add_cog(TimeCog(bot))
+    bot.add_cog(TimeUtils(bot))
 
