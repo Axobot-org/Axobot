@@ -32,12 +32,13 @@ class RolesReact(commands.Cog):
             await self.rr_get_guilds()
         if payload.guild_id not in self.guilds_which_have_roles:
             return None, None
-        chan = self.bot.get_channel(payload.channel_id)
+        chan: discord.TextChannel = self.bot.get_channel(payload.channel_id)
         if chan is None:
             return None, None
         try:
             msg = await chan.fetch_message(payload.message_id)
         except:
+            self.bot.log.warn(f"Could not fetch roles-reactions message {payload.message_id} in guild {payload.guild_id}")
             return None, None
         if len(msg.embeds) == 0 or msg.embeds[0].footer.text != self.footer_txt or msg.author.id != self.bot.user.id:
             return None, None
@@ -65,9 +66,6 @@ class RolesReact(commands.Cog):
             user = msg.guild.get_member(payload.user_id)
             await self.give_remove_role(user, role, msg.guild, msg.channel, False, ignore_success=True)
 
-    async def gen_id(self):
-        return round(time.time()/2)
-
     async def rr_get_guilds(self) -> set:
         """Get the list of guilds which have roles reactions"""
         cnx = self.bot.cnx_frm
@@ -85,7 +83,6 @@ class RolesReact(commands.Cog):
         if isinstance(emoji, discord.Emoji):
             emoji = emoji.id
         cursor = cnx.cursor(dictionary=True)
-        # ID = await self.gen_id()
         query = ("INSERT INTO `{}` (`guild`,`role`,`emoji`,`description`) VALUES (%(g)s,%(r)s,%(e)s,%(d)s);".format(self.table))
         cursor.execute(query, {'g': guild, 'r': role, 'e': emoji, 'd': desc})
         cnx.commit()
