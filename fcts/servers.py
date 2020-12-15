@@ -31,7 +31,7 @@ class Servers(commands.Cog):
         self.default_language = 'en'
         self.embed_color = discord.Colour(0x3fb9ef)
         self.log_color = 1793969
-        self.file = "server"
+        self.file = "servers"
         self.raids_levels = ["None","Smooth","Careful","High","(╯°□°）╯︵ ┻━┻"]
         self.table = 'servers_beta' if bot.beta else 'servers'
         self.default_opt = {"rr_max_number":7,

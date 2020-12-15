@@ -11,7 +11,7 @@ class Morpions(commands.Cog):
 
     def __init__(self, bot: zbot):
         self.bot = bot
-        self.file = 'morpion'
+        self.file = 'morpions'
         self.in_game = dict()
 
 

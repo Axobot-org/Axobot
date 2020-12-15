@@ -17,13 +17,13 @@ Every information come from the website www.fr-minecraft.net"""
     def __init__(self, bot: zbot):
         self.bot = bot
         self.flows = dict()
-        self.file = "mc"
+        self.file = "minecraft"
 
     @commands.command(name="mojang", aliases=['mojang_status'])
     @commands.cooldown(5, 20, commands.BucketType.user)
     async def mojang_status(self, ctx: MyContext):
         """Get Mojang server status"""
-        desc = await self.bot._(ctx.channel,"mc","mojang_desc")
+        desc = await self.bot._(ctx.channel, "mc", "mojang_desc")
         async with aiohttp.ClientSession() as session:
             async with session.get('https://status.mojang.com/check') as r:
             # async with session.get('https://api.bowie-co.nz/api/v1/mojang/check') as r:

@@ -36,7 +36,7 @@ class Info(commands.Cog):
 
     def __init__(self, bot: zbot):
         self.bot = bot
-        self.file = "infos"
+        self.file = "info"
         self.bot_version = conf.release
         try:
             self.TimeUtils = bot.cogs["TimeUtils"]
