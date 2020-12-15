@@ -84,7 +84,7 @@ def _make_check_command(name: str, parent: commands.Group, **kwargs):
             ["> {}: {}%".format(color["name"], color["ratio"]) for color in r['colors']])
         await ctx.send(f"Results for {ctx.author.mention}:\n"+answer)
         if r["passed"] and ctx.author.id not in self.cache:
-            await self.bot.cogs["UtilitiesCog"].add_user_eventPoint(ctx.author.id, 40)
+            await self.bot.cogs["Utilities"].add_user_eventPoint(ctx.author.id, 40)
             self.cache.append(ctx.author.id)
             with open("halloween-cache.json", "w") as f:
                 json.dump(self.cache, f)
@@ -140,7 +140,7 @@ def _make_color_command(name, fmodifier, parent, **kwargs):
             return
         await ctx.send(f"{ctx.author.mention}, here's your image!", file=r)
         await old_msg.delete()
-        await self.bot.cogs["UtilitiesCog"].add_user_eventPoint(ctx.author.id, 3)
+        await self.bot.cogs["Utilities"].add_user_eventPoint(ctx.author.id, 3)
 
     return command
 
@@ -240,7 +240,7 @@ __29 variations: __
         last_data = self.db_get_points(ctx.author.id)
         if last_data is None or (datetime.datetime.now() - last_data['last_update']).total_seconds() > 3600:
             points = randint(*self.hourly_reward)
-            await self.bot.get_cog("UtilitiesCog").add_user_eventPoint(ctx.author.id, points)
+            await self.bot.get_cog("Utilities").add_user_eventPoint(ctx.author.id, points)
             self.db_add_points(ctx.author.id, points)
             txt = await self.bot._(ctx.channel, "halloween", "got-points", pts=points)
         else:

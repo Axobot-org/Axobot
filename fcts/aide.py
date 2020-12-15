@@ -8,7 +8,7 @@ from discord.ext import commands
 from classes import zbot, MyContext
 
 
-class HelpCog(commands.Cog):
+class Help(commands.Cog):
 
     def __init__(self, bot: zbot):
         self.bot = bot
@@ -37,7 +37,7 @@ class HelpCog(commands.Cog):
         prefix = await self.bot.get_prefix(ctx.message)
         if type(prefix) == list:
             prefix = prefix[-1]
-        await ctx.send(await self.bot.cogs['LangCog'].tr(ctx.guild, 'bvn', 'aide', p=prefix))
+        await ctx.send(await self.bot.cogs['Languages'].tr(ctx.guild, 'bvn', 'aide', p=prefix))
 
     @commands.command(name="about", aliases=["botinfos", "botinfo"])
     @commands.cooldown(7, 30, commands.BucketType.user)
@@ -46,12 +46,12 @@ class HelpCog(commands.Cog):
 
 ..Doc infos.html#about"""
         urls = ""
-        tr = self.bot.get_cog("LangCog").tr
+        tr = self.bot.get_cog("Languages").tr
         for e, url in enumerate(['http://discord.gg/N55zY88', 'https://zrunner.me/invitezbot', 'https://zbot.rtfd.io/', 'https://twitter.com/z_runnerr', 'https://zrunner.me/zbot-faq', 'https://zrunner.me/zbot-privacy.pdf']):
             urls += "\n:arrow_forward: " + await tr(ctx.channel, 'infos', f'about-{e}') + " <" + url + ">"
         msg = await tr(ctx.channel, 'infos', 'about-main', mention=ctx.bot.user.mention, links=urls)
         if ctx.can_send_embed:
-            await ctx.send(embed=self.bot.get_cog("EmbedCog").Embed(desc=msg, color=16298524))
+            await ctx.send(embed=self.bot.get_cog("Embeds").Embed(desc=msg, color=16298524))
         else:
             await ctx.send(msg)
 
@@ -71,7 +71,7 @@ Enable "Embed Links" permission for better rendering
         except discord.errors.Forbidden:
             pass
         except Exception as e:
-            await self.bot.cogs["ErrorsCog"].on_error(e, ctx)
+            await self.bot.cogs["Errors"].on_error(e, ctx)
             if len(commands) == 0:
                 await self._default_help_command(ctx)
             else:
@@ -86,7 +86,7 @@ If the bot can't send the new command format, it will try to send the old one.""
                 send_in_dm = False if self.bot.database_online == False else await self.bot.get_config(ctx.guild, 'help_in_dm')
                 if send_in_dm is not None and send_in_dm == 1:
                     destination = ctx.message.author.dm_channel
-                    await self.bot.cogs["UtilitiesCog"].suppr(ctx.message)
+                    await self.bot.cogs["Utilities"].suppr(ctx.message)
                 else:
                     destination = ctx.message.channel
             if destination is None:
@@ -146,7 +146,7 @@ If the bot can't send the new command format, it will try to send the old one.""
             if type(prefix) == list:
                 prefix = prefix[-1]
         if len(pages) == 0:
-            await self.bot.get_cog("ErrorsCog").senf_err_msg("Impossible de trouver d'aide pour la commande " + " ".join(commands))
+            await self.bot.get_cog("Errors").senf_err_msg("Impossible de trouver d'aide pour la commande " + " ".join(commands))
             await destination.send(str(await self.bot._(ctx.channel, "aide", "cmd-not-found")).format(" ".join(commands)))
             return
         if destination.permissions_for(me).embed_links:
@@ -157,7 +157,7 @@ If the bot can't send the new command format, it will try to send the old one.""
                 embed_colour = discord.Colour(self.help_color)
             if isinstance(pages[0], str):
                 for page in pages:
-                    embed = self.bot.cogs["EmbedCog"].Embed(title=title, desc=page, footer_text=ft.format(
+                    embed = self.bot.cogs["Embeds"].Embed(title=title, desc=page, footer_text=ft.format(
                         prefix), color=embed_colour).update_timestamp()
                     title = ""
                     await destination.send(embed=embed)
@@ -169,7 +169,7 @@ If the bot can't send the new command format, it will try to send the old one.""
                         continue
                     fields.append(
                         {'name': page[0], 'value': page[1], 'inline': False})
-                embed = self.bot.cogs["EmbedCog"].Embed(title=title, footer_text=ft.format(
+                embed = self.bot.cogs["Embeds"].Embed(title=title, footer_text=ft.format(
                     prefix), fields=fields, color=embed_colour).update_timestamp()
                 await destination.send(embed=embed)
         else:
@@ -329,7 +329,7 @@ If the bot can't send the new command format, it will try to send the old one.""
                     else:
                         print(check_name, str(c))
                 except Exception as e:
-                    await self.bot.cogs["ErrorsCog"].on_error(e, ctx)
+                    await self.bot.cogs["Errors"].on_error(e, ctx)
             checks = "__" + await self.bot._(ctx.channel, 'aide', 'checks') + "__\n" + '\n'.join(checks)
         else:
             checks = ""
@@ -431,7 +431,7 @@ If the bot can't send the new command format, it will try to send the old one.""
                     else:
                         print(check_name, str(c))
                 except Exception as e:
-                    await self.bot.cogs["ErrorsCog"].on_error(e, ctx)
+                    await self.bot.cogs["Errors"].on_error(e, ctx)
         # Module
         category = "unclassed"
         for k, v in self.commands_list.items():
@@ -518,4 +518,4 @@ If the bot can't send the new command format, it will try to send the old one.""
 
 
 def setup(bot):
-    bot.add_cog(HelpCog(bot))
+    bot.add_cog(Help(bot))

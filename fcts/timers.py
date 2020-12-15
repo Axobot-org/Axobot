@@ -5,7 +5,7 @@ import datetime
 from fcts import args
 from classes import zbot, MyContext
 
-class TimersCog(commands.Cog):
+class Timers(commands.Cog):
     def __init__(self, bot: zbot):
         self.bot = bot
         self.file = "timers"
@@ -28,7 +28,7 @@ class TimersCog(commands.Cog):
 
         ..Doc miscellaneous.html#reminders"""
         if ctx.subcommand_passed is None:
-            await self.bot.cogs['HelpCog'].help_command(ctx,['reminder'])
+            await self.bot.cogs['Help'].help_command(ctx,['reminder'])
     
     
     @remind_main.command(name="create", aliases=["add"])
@@ -57,12 +57,12 @@ class TimersCog(commands.Cog):
         if not self.bot.database_online:
             await ctx.send(await self.bot._(ctx.channel, "rss", "no-db"))
             return
-        f_duration = await ctx.bot.get_cog('TimeCog').time_delta(duration,lang=await self.bot._(ctx.guild,'current_lang','current'), year=True, form='developed', precision=0)
+        f_duration = await ctx.bot.get_cog('TimeUtils').time_delta(duration,lang=await self.bot._(ctx.guild,'current_lang','current'), year=True, form='developed', precision=0)
         try:
             d = {'msg_url': ctx.message.jump_url}
             await ctx.bot.get_cog('Events').add_task("timer", duration, ctx.author.id, ctx.guild.id if ctx.guild else None, ctx.channel.id, message, data=d)
         except Exception as e:
-            await ctx.bot.get_cog("ErrorsCog").on_command_error(ctx,e)
+            await ctx.bot.get_cog("Errors").on_command_error(ctx,e)
         else:
             await ctx.send(await self.bot._(ctx.channel, "fun", "reminds-saved", duration=f_duration))
 
@@ -82,7 +82,7 @@ class TimersCog(commands.Cog):
             await ctx.send(await self.bot._(ctx.channel, "timers", "rmd-empty"))
             return
         txt = await self.bot._(ctx.channel, "timers", "rmd-item")
-        time_delta = self.bot.get_cog("TimeCog").time_delta
+        time_delta = self.bot.get_cog("TimeUtils").time_delta
         lang = await self.bot._(ctx.channel, "current_lang", "current")
         liste = list()
         for item in cursor:
@@ -105,7 +105,7 @@ class TimersCog(commands.Cog):
             else:
                 desc = "\n".join(liste)
                 fields = None
-            emb = ctx.bot.get_cog("EmbedCog").Embed(title=await self.bot._(ctx.channel, "timers", "rmd-title"), desc=desc, fields=fields, color=16108042)
+            emb = ctx.bot.get_cog("Embeds").Embed(title=await self.bot._(ctx.channel, "timers", "rmd-title"), desc=desc, fields=fields, color=16108042)
             await ctx.send(embed=emb)
         else:
             t = "**"+await self.bot._(ctx.channel, "timers", "rmd-title")+"**\n\n"
@@ -139,4 +139,4 @@ class TimersCog(commands.Cog):
 
 
 def setup(bot: commands.Bot):
-    bot.add_cog(TimersCog(bot))
+    bot.add_cog(Timers(bot))

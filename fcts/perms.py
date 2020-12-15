@@ -3,7 +3,7 @@ import typing
 from discord.ext import commands
 from classes import zbot, MyContext
 
-class PermsCog(commands.Cog):
+class Perms(commands.Cog):
     """Cog with a single command, allowing you to see the permissions of a member or a role in a channel."""
 
     def __init__(self, bot: zbot):
@@ -53,7 +53,7 @@ class PermsCog(commands.Cog):
                 perm = perms_translations["administrator"]
             else:
                 perm = "Administrator"
-            permsl.append(self.bot.cogs['EmojiCog'].customEmojis['green_check']+perm)
+            permsl.append(self.bot.cogs['Emojis'].customEmojis['green_check']+perm)
         else:
             # Here we check if the value of each permission is True.
             for perm, value in perms:
@@ -65,9 +65,9 @@ class PermsCog(commands.Cog):
                 else:
                     perm = perm.replace('_',' ').title()
                 if value:
-                    permsl.append(self.bot.cogs['EmojiCog'].customEmojis['green_check']+perm)
+                    permsl.append(self.bot.cogs['Emojis'].customEmojis['green_check']+perm)
                 else:
-                    permsl.append(self.bot.cogs['EmojiCog'].customEmojis['red_cross']+perm)
+                    permsl.append(self.bot.cogs['Emojis'].customEmojis['red_cross']+perm)
         if ctx.can_send_embed:
             # \uFEFF is a Zero-Width Space, which basically allows us to have an empty field name.
             # And to make it look nice, we wrap it in an Embed.
@@ -84,7 +84,7 @@ class PermsCog(commands.Cog):
                 desc = await self.bot._(ctx.guild.id,'perms','general')
             else:
                 desc = channel.mention
-            embed = await ctx.bot.cogs['EmbedCog'].Embed(color=col,fields=fields,desc=desc).create_footer(ctx)
+            embed = await ctx.bot.cogs['Embeds'].Embed(color=col,fields=fields,desc=desc).create_footer(ctx)
             embed.author_name = name
             embed.author_icon = avatar
             await ctx.send(embed=embed.discord_embed())
@@ -97,4 +97,4 @@ class PermsCog(commands.Cog):
 
 
 def setup(bot):
-    bot.add_cog(PermsCog(bot))
+    bot.add_cog(Perms(bot))

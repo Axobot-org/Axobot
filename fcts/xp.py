@@ -25,7 +25,7 @@ from classes import zbot, MyContext
 
 
 
-class XPCog(commands.Cog):
+class Xp(commands.Cog):
 
     def __init__(self, bot: zbot):
         self.bot = bot
@@ -83,7 +83,7 @@ class XPCog(commands.Cog):
             return
         rate = await self.bot.get_config(msg.guild.id,'xp_rate')
         if self.sus is None:
-            if self.bot.get_cog('UtilitiesCog'):
+            if self.bot.get_cog('Utilities'):
                 await self.reload_sus()
             else:
                 self.sus = set()
@@ -215,7 +215,7 @@ class XPCog(commands.Cog):
         """Envoie le message de levelup"""
         if self.bot.zombie_mode:
             return
-        await self.bot.cogs["UtilitiesCog"].add_user_eventPoint(msg.author.id,round(lvl[0]/5))
+        await self.bot.cogs["Utilities"].add_user_eventPoint(msg.author.id,round(lvl[0]/5))
         if msg.guild is None:
             return
         destination = await self.get_lvlup_chan(msg)
@@ -223,11 +223,11 @@ class XPCog(commands.Cog):
             return
         text = await self.bot.get_config(msg.guild.id,'levelup_msg')
         if text is None or len(text) == 0:
-            text = random.choice(await self.bot.cogs['LangCog'].tr(msg.channel,'xp','default_levelup'))
+            text = random.choice(await self.bot.cogs['Languages'].tr(msg.channel,'xp','default_levelup'))
             while (not '{random}' in text) and random.random() < 0.8:
-                text = random.choice(await self.bot.cogs['LangCog'].tr(msg.channel,'xp','default_levelup'))
+                text = random.choice(await self.bot.cogs['Languages'].tr(msg.channel,'xp','default_levelup'))
         if '{random}' in text:
-            item = random.choice(await self.bot.cogs['LangCog'].tr(msg.channel,'xp','levelup-items'))
+            item = random.choice(await self.bot.cogs['Languages'].tr(msg.channel,'xp','levelup-items'))
         else:
             item = ''
         await destination.send(text.format_map(self.bot.SafeDict(user=msg.author.mention,level=lvl[0],random=item,username=msg.author.display_name)))
@@ -305,7 +305,7 @@ class XPCog(commands.Cog):
                 c += 1
             except Exception as e:
                 if self.bot.beta:
-                    await self.bot.cogs['ErrorsCog'].on_error(e,None)
+                    await self.bot.cogs['Errors'].on_error(e,None)
                 pass
         if not remove:
             return c
@@ -319,13 +319,13 @@ class XPCog(commands.Cog):
                 c += 1
             except Exception as e:
                 if self.bot.beta:
-                    await self.bot.cogs['ErrorsCog'].on_error(e,None)
+                    await self.bot.cogs['Errors'].on_error(e,None)
                 pass
         return c
     
     async def reload_sus(self):
         """Check who should be observed for potential xp cheating"""
-        cog = self.bot.get_cog("UtilitiesCog")
+        cog = self.bot.get_cog("Utilities")
         if cog is None:
             return
         result = await cog.get_db_userinfo(['userID'], ['xp_suspect=1'], Type=list)
@@ -388,7 +388,7 @@ class XPCog(commands.Cog):
             cursor.close()
             return True
         except Exception as e:
-            await self.bot.cogs['ErrorsCog'].on_error(e,None)
+            await self.bot.cogs['Errors'].on_error(e,None)
             return False
     
     async def bdd_get_xp(self, userID: int, guild: int):
@@ -417,7 +417,7 @@ class XPCog(commands.Cog):
             cursor.close()
             return liste
         except Exception as e:
-            await self.bot.cogs['ErrorsCog'].on_error(e,None)
+            await self.bot.cogs['Errors'].on_error(e,None)
     
     async def bdd_get_nber(self, guild: int=None):
         """Get the number of ranked users"""
@@ -443,7 +443,7 @@ class XPCog(commands.Cog):
                 return liste[0][0]
             return 0
         except Exception as e:
-            await self.bot.cogs['ErrorsCog'].on_error(e,None)
+            await self.bot.cogs['Errors'].on_error(e,None)
 
     async def bdd_load_cache(self, guild: int):
         try:
@@ -481,7 +481,7 @@ class XPCog(commands.Cog):
             cursor.close()
             return
         except Exception as e:
-            await self.bot.cogs['ErrorsCog'].on_error(e,None)
+            await self.bot.cogs['Errors'].on_error(e,None)
 
     async def bdd_get_top(self, top: int=None, guild: discord.Guild=None):
         try:
@@ -519,7 +519,7 @@ class XPCog(commands.Cog):
             cursor.close()
             return liste
         except Exception as e:
-            await self.bot.cogs['ErrorsCog'].on_error(e,None)
+            await self.bot.cogs['Errors'].on_error(e,None)
         
     async def bdd_get_rank(self, userID: int, guild: discord.Guild=None):
         """Get the rank of a user"""
@@ -556,7 +556,7 @@ class XPCog(commands.Cog):
             cursor.close()
             return userdata
         except Exception as e:
-            await self.bot.cogs['ErrorsCog'].on_error(e,None)
+            await self.bot.cogs['Errors'].on_error(e,None)
 
     async def bdd_total_xp(self):
         """Get the total number of earned xp"""
@@ -586,7 +586,7 @@ class XPCog(commands.Cog):
             # cursor.close()
             return result
         except Exception as e:
-            await self.bot.cogs['ErrorsCog'].on_error(e,None)
+            await self.bot.cogs['Errors'].on_error(e,None)
 
 
     async def get_raw_image(self, url:str):
@@ -765,15 +765,15 @@ class XPCog(commands.Cog):
             else:
                 await self.send_txt(ctx,user,xp,rank,ranks_nb,levels_info,xp_used_type)
         except Exception as e:
-            await self.bot.cogs['ErrorsCog'].on_command_error(ctx,e)
+            await self.bot.cogs['Errors'].on_command_error(ctx,e)
     
     async def send_card(self, ctx: MyContext, user: discord.User, xp, rank, ranks_nb, used_system, levels_info=None):
         try:
             myfile = discord.File('../cards/global/{}-{}-{}.{}'.format(user.id,xp,rank,'gif' if user.is_avatar_animated() else 'png'))
         except FileNotFoundError:
-            style = await self.bot.cogs['UtilitiesCog'].get_xp_style(user)
+            style = await self.bot.cogs['Utilities'].get_xp_style(user)
             txts = [await self.bot._(ctx.channel,'xp','card-level'), await self.bot._(ctx.channel,'xp','card-rank')]
-            static = await self.bot.cogs['UtilitiesCog'].get_db_userinfo(['animated_card'],[f'`userID`={user.id}'])
+            static = await self.bot.cogs['Utilities'].get_db_userinfo(['animated_card'],[f'`userID`={user.id}'])
             if user.is_avatar_animated():
                 if static is not None:
                     static = not static['animated_card']
@@ -794,7 +794,7 @@ class XPCog(commands.Cog):
         fields.append({'name':'XP','value':"{}/{}".format(xp,levels_info[1]),'inline':True})
         fields.append({'name':txts[0],'value':levels_info[0],'inline':True})
         fields.append({'name':txts[1],'value':"{}/{}".format(rank,ranks_nb),'inline':True})
-        emb = self.bot.cogs['EmbedCog'].Embed(fields=fields,color=self.embed_color).set_author(user)
+        emb = self.bot.cogs['Embeds'].Embed(fields=fields,color=self.embed_color).set_author(user)
         await ctx.send(embed=emb.discord_embed())
     
     async def send_txt(self, ctx: MyContext, user: discord.User, xp, rank, ranks_nb, levels_info, used_system):
@@ -820,7 +820,7 @@ class XPCog(commands.Cog):
                 except discord.NotFound:
                     user = await self.bot._(ctx.channel,'xp','del-user')
             if isinstance(user, discord.User):
-                user_name = await self.bot.cogs['UtilitiesCog'].remove_markdown(user.name.replace('|',''))
+                user_name = await self.bot.cogs['Utilities'].remove_markdown(user.name.replace('|',''))
                 if len(user_name) > 18:
                     user_name = user_name[:15]+'...'
             else:
@@ -884,7 +884,7 @@ class XPCog(commands.Cog):
         else:
             t = await self.bot._(ctx.channel,'xp','top-title-1')
         if ctx.can_send_embed:
-            emb = await self.bot.cogs['EmbedCog'].Embed(title=t,fields=[{'name':f_name,'value':"\n".join(txt)},your_rank],color=self.embed_color,author_icon=self.bot.user.avatar_url_as(format='png')).create_footer(ctx)
+            emb = await self.bot.cogs['Embeds'].Embed(title=t,fields=[{'name':f_name,'value':"\n".join(txt)},your_rank],color=self.embed_color,author_icon=self.bot.user.avatar_url_as(format='png')).create_footer(ctx)
             await ctx.send(embed=emb)
         else:
             await ctx.send(f_name+"\n\n"+'\n'.join(txt))
@@ -919,15 +919,15 @@ class XPCog(commands.Cog):
             await ctx.send(await self.bot._(ctx.guild.id,'xp','change-xp-ok',user=str(user),xp=xp))
         except Exception as e:
             await ctx.send(await self.bot._(ctx.guild.id,'mc','serv-error'))
-            await self.bot.cogs['ErrorsCog'].on_error(e,ctx)
+            await self.bot.cogs['Errors'].on_error(e,ctx)
         else:
             if ctx.guild.id not in self.cache.keys():
                 await self.bdd_load_cache(ctx.guild.id)
             self.cache[ctx.guild.id][user.id] = [round(time.time()), xp]
             s = "XP of user {} `{}` edited (from {} to {}) in server `{}`".format(user, user.id, prev_xp, xp, ctx.guild.id)
             self.bot.log.info(s)
-            emb = self.bot.cogs["EmbedCog"].Embed(desc=s,color=8952255,footer_text=ctx.guild.name).update_timestamp().set_author(self.bot.user)
-            await self.bot.cogs["EmbedCog"].send([emb])
+            emb = self.bot.cogs["Embeds"].Embed(desc=s,color=8952255,footer_text=ctx.guild.name).update_timestamp().set_author(self.bot.user)
+            await self.bot.cogs["Embeds"].send([emb])
 
     async def gen_rr_id(self):
         return round(time.time()/2)
@@ -970,7 +970,7 @@ class XPCog(commands.Cog):
     async def rr_main(self, ctx: MyContext):
         """Manage your roles rewards like a boss"""
         if ctx.subcommand_passed is None:
-            await self.bot.cogs['HelpCog'].help_command(ctx,['rr'])
+            await self.bot.cogs['Help'].help_command(ctx,['rr'])
     
     @rr_main.command(name="add")
     @commands.check(checks.has_manage_guild)
@@ -984,12 +984,12 @@ class XPCog(commands.Cog):
             if len([x for x in l if x['level']==level]) > 0:
                 return await ctx.send(await self.bot._(ctx.guild.id,'xp','already-1-rr'))
             max_rr = await self.bot.get_config(ctx.guild.id,'rr_max_number')
-            max_rr = self.bot.cogs["ServerCog"].default_opt['rr_max_number'] if max_rr is None else max_rr
+            max_rr = self.bot.cogs["Servers"].default_opt['rr_max_number'] if max_rr is None else max_rr
             if len(l) >= max_rr:
                 return await ctx.send(str(await self.bot._(ctx.guild.id,'xp','too-many-rr')).format(len(l)))
             await self.rr_add_role(ctx.guild.id,role.id,level)
         except Exception as e:
-            await self.bot.cogs['ErrorsCog'].on_command_error(ctx,e)
+            await self.bot.cogs['Errors'].on_command_error(ctx,e)
         else:
             await ctx.send(str(await self.bot._(ctx.guild.id,'xp','rr-added')).format(role.name,level))
     
@@ -1001,13 +1001,13 @@ class XPCog(commands.Cog):
         try:
             l = await self.rr_list_role(ctx.guild.id)
         except Exception as e:
-            await self.bot.cogs['ErrorsCog'].on_command_error(ctx,e)
+            await self.bot.cogs['Errors'].on_command_error(ctx,e)
         else:
             des = '\n'.join(["• <@&{}> : lvl {}".format(x['role'], x['level']) for x in l])
             max_rr = await self.bot.get_config(ctx.guild.id,'rr_max_number')
-            max_rr = self.bot.cogs["ServerCog"].default_opt['rr_max_number'] if max_rr is None else max_rr
+            max_rr = self.bot.cogs["Servers"].default_opt['rr_max_number'] if max_rr is None else max_rr
             title = str(await self.bot._(ctx.guild.id,"xp",'rr_list')).format(len(l),max_rr)
-            emb = await self.bot.cogs['EmbedCog'].Embed(title=title,desc=des).update_timestamp().create_footer(ctx)
+            emb = await self.bot.cogs['Embeds'].Embed(title=title,desc=des).update_timestamp().create_footer(ctx)
             await ctx.send(embed=emb.discord_embed())
     
     @rr_main.command(name="remove")
@@ -1021,7 +1021,7 @@ class XPCog(commands.Cog):
                 return await ctx.send(await self.bot._(ctx.guild.id,'xp','no-rr'))
             await self.rr_remove_role(l[0]['ID'])
         except Exception as e:
-            await self.bot.cogs['ErrorsCog'].on_command_error(ctx,e)
+            await self.bot.cogs['Errors'].on_command_error(ctx,e)
         else:
             await ctx.send(str(await self.bot._(ctx.guild.id,'xp','rr-removed')).format(level))
     
@@ -1048,10 +1048,10 @@ class XPCog(commands.Cog):
                     c += await self.give_rr(m, level, rr_list, remove=True)
             await ctx.send(str(await self.bot._(ctx.guild.id,'xp','rr-reload')).format(c,ctx.guild.member_count))
         except Exception as e:
-            await self.bot.cogs['ErrorsCog'].on_command_error(ctx,e)
+            await self.bot.cogs['Errors'].on_command_error(ctx,e)
     
 
 
 def setup(bot):
     if bot.database_online:
-        bot.add_cog(XPCog(bot))
+        bot.add_cog(Xp(bot))

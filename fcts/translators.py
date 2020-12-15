@@ -7,12 +7,12 @@ from classes import zbot, MyContext
 
 
 async def is_translator(ctx: MyContext) -> bool:
-    return await ctx.bot.cogs['UtilitiesCog'].is_translator(ctx.author)
+    return await ctx.bot.cogs['Utilities'].is_translator(ctx.author)
 
 async def check_admin(ctx: MyContext):
-    return await ctx.bot.cogs['AdminCog'].check_if_admin(ctx)
+    return await ctx.bot.cogs['Admin'].check_if_admin(ctx)
 
-class TranslatorsCog(commands.Cog):
+class Translations(commands.Cog):
     """Special cog for those who help with the translation of the bot"""
 
     def __init__(self, bot: zbot):
@@ -291,4 +291,4 @@ Use `stop` to stop translating
 
 
 def setup(bot):
-    bot.add_cog(TranslatorsCog(bot))
+    bot.add_cog(Translations(bot))

@@ -4,7 +4,7 @@ from classes import zbot, MyContext
 
 url_base = 'https://discord.com/api/webhooks/'
 
-class EmbedCog(commands.Cog):
+class Embeds(commands.Cog):
     """Cog for the management of the embeds. No more, no less."""
 
     def __init__(self, bot: zbot):
@@ -98,7 +98,7 @@ class EmbedCog(commands.Cog):
             # self.footer_text = "Requested by {}".format(user.name)
             if user is None:
                 user = ctx.author
-            self.footer_text = await ctx.bot.get_cog("LangCog").tr(ctx.channel,"keywords", "request_by", user=user.name)
+            self.footer_text = await ctx.bot.get_cog("Languages").tr(ctx.channel,"keywords", "request_by", user=user.name)
             self.footer_url = user.avatar_url_as(format='png',size=256)
             return self
 
@@ -135,10 +135,10 @@ class EmbedCog(commands.Cog):
         try:
             msg = r.json()
             if "error" in msg.keys():
-                await self.bot.cogs['ErrorsCog'].senf_err_msg("`Erreur webhook {}:` [code {}] {}".format(url,r.status_code,msg))
+                await self.bot.cogs['Errors'].senf_err_msg("`Erreur webhook {}:` [code {}] {}".format(url,r.status_code,msg))
         except:
             return
         
 
 def setup(bot):
-    bot.add_cog(EmbedCog(bot))
+    bot.add_cog(Embeds(bot))

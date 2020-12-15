@@ -11,7 +11,7 @@ from classes import zbot, MyContext
 importlib.reload(args)
 
 
-class UtilitiesCog(commands.Cog):
+class Utilities(commands.Cog):
     """This cog has various useful functions for the rest of the bot."""
 
     def __init__(self, bot: zbot):
@@ -31,7 +31,7 @@ class UtilitiesCog(commands.Cog):
         await self.get_bot_infos()
 
     async def get_bot_infos(self):
-        config_list = await self.bot.cogs['ServerCog'].get_bot_infos(self.bot.user.id)
+        config_list = await self.bot.cogs['Servers'].get_bot_infos(self.bot.user.id)
         if len(config_list) > 0:
             self.config = config_list[0]
             self.config.pop('token', None)
@@ -44,10 +44,10 @@ class UtilitiesCog(commands.Cog):
         if str(guild.id) in self.list_prefixs.keys():
             return self.list_prefixs[str(guild.id)]
         else:
-            cnx = self.bot.cogs['ServerCog'].bot.cnx_frm
+            cnx = self.bot.cogs['Servers'].bot.cnx_frm
             cursor = cnx.cursor(dictionary=True)
             cursor.execute("SELECT `prefix` FROM `{}` WHERE `ID`={}".format(
-                self.bot.cogs["ServerCog"].table, guild.id))
+                self.bot.cogs["Servers"].table, guild.id))
             liste = list()
             for x in cursor:
                 if len(x['prefix']) > 0:
@@ -159,7 +159,7 @@ class UtilitiesCog(commands.Cog):
             return True
         if ctx.message.type != discord.MessageType.default:
             return False
-        if await self.bot.cogs['AdminCog'].check_if_admin(ctx):
+        if await self.bot.cogs['Admin'].check_if_admin(ctx):
             return True
         elif not self.config:
             await self.get_bot_infos()
@@ -269,7 +269,7 @@ class UtilitiesCog(commands.Cog):
             cursor.close()
             return True
         except Exception as e:
-            await self.bot.cogs['ErrorsCog'].on_error(e, None)
+            await self.bot.cogs['Errors'].on_error(e, None)
             return False
 
     async def get_number_premium(self):
@@ -286,7 +286,7 @@ class UtilitiesCog(commands.Cog):
         try:
             parameters = await self.get_db_userinfo(criters=["userID="+str(user.id)], columns=['premium'])
         except Exception as e:
-            await self.bot.cogs["ErrorsCog"].on_error(e, None)
+            await self.bot.cogs["Errors"].on_error(e, None)
         if parameters is None:
             return False
         return parameters['premium']
@@ -297,7 +297,7 @@ class UtilitiesCog(commands.Cog):
         try:
             parameters = await self.get_db_userinfo(criters=["userID="+str(user.id)], columns=['support'])
         except Exception as e:
-            await self.bot.cogs["ErrorsCog"].on_error(e, None)
+            await self.bot.cogs["Errors"].on_error(e, None)
         if parameters is None:
             return False
         return parameters['support']
@@ -308,7 +308,7 @@ class UtilitiesCog(commands.Cog):
         try:
             parameters = await self.get_db_userinfo(criters=["userID="+str(user.id)], columns=['partner'])
         except Exception as e:
-            await self.bot.cogs["ErrorsCog"].on_error(e, None)
+            await self.bot.cogs["Errors"].on_error(e, None)
         if parameters is None:
             return False
         return parameters['partner']
@@ -319,7 +319,7 @@ class UtilitiesCog(commands.Cog):
         try:
             parameters = await self.get_db_userinfo(criters=["userID="+str(user.id)], columns=['contributor'])
         except Exception as e:
-            await self.bot.cogs["ErrorsCog"].on_error(e, None)
+            await self.bot.cogs["Errors"].on_error(e, None)
         if parameters is None:
             return False
         return parameters['contributor']
@@ -332,7 +332,7 @@ class UtilitiesCog(commands.Cog):
         try:
             parameters = await self.get_db_userinfo(criters=["userID="+str(user.id)], columns=['translator'])
         except Exception as e:
-            await self.bot.cogs["ErrorsCog"].on_error(e, None)
+            await self.bot.cogs["Errors"].on_error(e, None)
         if parameters is None:
             return False
         return parameters['translator']
@@ -343,7 +343,7 @@ class UtilitiesCog(commands.Cog):
         try:
             parameters = await self.get_db_userinfo(criters=["userID="+str(user.id)], columns=['unlocked_rainbow'])
         except Exception as e:
-            await self.bot.cogs["ErrorsCog"].on_error(e, None)
+            await self.bot.cogs["Errors"].on_error(e, None)
         if parameters is None:
             return False
         return parameters['unlocked_rainbow']
@@ -354,7 +354,7 @@ class UtilitiesCog(commands.Cog):
         try:
             parameters = await self.get_db_userinfo(criters=["userID="+str(user.id)], columns=[f'unlocked_blurple_{year}'])
         except Exception as e:
-            await self.bot.cogs["ErrorsCog"].on_error(e, None)
+            await self.bot.cogs["Errors"].on_error(e, None)
         if parameters is None:
             return False
         if (year == 20) and not parameters['unlocked_blurple_20'] and self.bot.current_event == "blurple":
@@ -370,7 +370,7 @@ class UtilitiesCog(commands.Cog):
         try:
             parameters = await self.get_db_userinfo(criters=["userID="+str(user.id)], columns=['unlocked_christmas'])
         except Exception as e:
-            await self.bot.cogs["ErrorsCog"].on_error(e, None)
+            await self.bot.cogs["Errors"].on_error(e, None)
         if parameters is None:
             parameters = {'unlocked_christmas': False}
         if not parameters['unlocked_christmas'] and self.bot.current_event == "christmas":
@@ -386,7 +386,7 @@ class UtilitiesCog(commands.Cog):
         try:
             parameters = await self.get_db_userinfo(criters=["userID="+str(user.id)], columns=[f'unlocked_halloween_{year}'])
         except Exception as e:
-            await self.bot.cogs["ErrorsCog"].on_error(e, None)
+            await self.bot.cogs["Errors"].on_error(e, None)
         if parameters is None:
             return False
         if (year == 20) and not parameters['unlocked_halloween_20'] and self.bot.current_event == "halloween":
@@ -401,7 +401,7 @@ class UtilitiesCog(commands.Cog):
         try:
             parameters = await self.get_db_userinfo(criters=["userID="+str(user.id)], columns=['xp_style'])
         except Exception as e:
-            await self.bot.cogs["ErrorsCog"].on_error(e, None)
+            await self.bot.cogs["Errors"].on_error(e, None)
         if parameters is None or parameters['xp_style'] == '':
             return 'dark'
         return parameters['xp_style']
@@ -432,7 +432,7 @@ class UtilitiesCog(commands.Cog):
         if not self.bot.database_online:
             return sorted(liste)
         liste2 = []
-        if await self.bot.cogs['AdminCog'].check_if_admin(user):
+        if await self.bot.cogs['Admin'].check_if_admin(user):
             liste2.append('admin')
         if not self.bot.database_online:
             return sorted(liste2)+sorted(liste)
@@ -463,15 +463,15 @@ class UtilitiesCog(commands.Cog):
             return ["en"]
         languages = list()
         disp_lang = list()
-        available_langs = self.bot.cogs['LangCog'].languages
+        available_langs = self.bot.cogs['Languages'].languages
         for s in self.bot.guilds:
             if user in s.members:
                 lang = await self.bot.get_config(s.id, 'language')
                 if lang is None:
                     lang = available_langs.index(
-                        self.bot.cogs['ServerCog'].default_language)
+                        self.bot.cogs['Servers'].default_language)
                 languages.append(lang)
-        for e in range(len(self.bot.cogs['LangCog'].languages)):
+        for e in range(len(self.bot.cogs['Languages'].languages)):
             if languages.count(e) > 0:
                 disp_lang.append((available_langs[e], round(
                     languages.count(e)/len(languages), 2)))
@@ -502,7 +502,7 @@ class UtilitiesCog(commands.Cog):
             cursor.close()
             return True
         except Exception as e:
-            await self.bot.cogs['ErrorsCog'].on_error(e, None)
+            await self.bot.cogs['Errors'].on_error(e, None)
             return False
 
     async def get_eventsPoints_rank(self, userID: int):
@@ -543,7 +543,7 @@ class UtilitiesCog(commands.Cog):
                     if js["voted"]:
                         votes.append(("Discord Bots List", "https://top.gg/"))
             except Exception as e:
-                await self.bot.get_cog("ErrorsCog").on_error(e, None)
+                await self.bot.get_cog("Errors").on_error(e, None)
             try:  # https://botlist.space/bot/486896267788812288
                 headers = {'Authorization': self.bot.others['botlist.space']}
                 async with session.get('https://api.botlist.space/v1/bots/486896267788812288/upvotes', headers=headers) as r:
@@ -552,7 +552,7 @@ class UtilitiesCog(commands.Cog):
                         votes.append(
                             ("botlist.space", "https://botlist.space/"))
             except Exception as e:
-                await self.bot.get_cog("ErrorsCog").on_error(e, None)
+                await self.bot.get_cog("Errors").on_error(e, None)
             try:  # https://discord.boats/bot/486896267788812288
                 headers = {'Authorization': self.bot.others['discordboats']}
                 async with session.get(f"https://discord.boats/api/bot/486896267788812288/voted?id={userid}", headers=headers) as r:
@@ -561,9 +561,9 @@ class UtilitiesCog(commands.Cog):
                         votes.append(
                             ("Discord Boats", "https://discord.boats/"))
             except Exception as e:
-                await self.bot.get_cog("ErrorsCog").on_error(e, None)
+                await self.bot.get_cog("Errors").on_error(e, None)
             return votes
 
 
 def setup(bot):
-    bot.add_cog(UtilitiesCog(bot))
+    bot.add_cog(Utilities(bot))

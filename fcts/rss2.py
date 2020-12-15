@@ -46,14 +46,14 @@ yt_link={'grand_corbeau':'UCAt_W0Rgr33OePJ8jylkx0A',
 
 
 async def check_admin(ctx: MyContext):
-    return await ctx.bot.cogs['AdminCog'].check_if_admin(ctx)
+    return await ctx.bot.cogs['Admin'].check_if_admin(ctx)
 
 async def can_use_rss(ctx: MyContext):
     if ctx.guild is None:
         return False
-    return ctx.channel.permissions_for(ctx.author).manage_guild or await ctx.bot.cogs["AdminCog"].check_if_admin(ctx)
+    return ctx.channel.permissions_for(ctx.author).manage_guild or await ctx.bot.cogs["Admin"].check_if_admin(ctx)
 
-class RssCog(commands.Cog):
+class Rss(commands.Cog):
     """Cog which deals with everything related to rss flows. Whether it is to add automatic tracking to a stream, or just to see the latest video released by Discord, it is this cog that will be used."""
 
     def __init__(self, bot: zbot):
@@ -76,7 +76,7 @@ class RssCog(commands.Cog):
         if bot.user is not None:
             self.table = 'rss_flow' if bot.user.id==486896267788812288 else 'rss_flow_beta'
         try:
-            self.date = bot.cogs["TimeCog"].date
+            self.date = bot.cogs["TimeUtils"].date
         except:
             pass
         if feedparser.parse('http://twitrss.me/twitter_user_to_rss/?user=Dinnerbone').entries == list():
@@ -86,7 +86,7 @@ class RssCog(commands.Cog):
 
     @commands.Cog.listener()
     async def on_ready(self):
-        self.date = self.bot.cogs["TimeCog"].date
+        self.date = self.bot.cogs["TimeUtils"].date
         self.table = 'rss_flow' if self.bot.user.id==486896267788812288 else 'rss_flow_beta'
 
 
@@ -158,7 +158,7 @@ class RssCog(commands.Cog):
             if Format is None:
                 Format = self.format
             if not isinstance(self.date,str):
-                d = await self.bot.cogs["TimeCog"].date(self.date,lang=language,year=False,hour=True,digital=True)
+                d = await self.bot.cogs["TimeUtils"].date(self.date,lang=language,year=False,hour=True,digital=True)
             else:
                 d = self.date
             Format = Format.replace('\\n','\n')
@@ -168,7 +168,7 @@ class RssCog(commands.Cog):
             if not self.embed:
                 return text
             else:
-                emb = self.bot.cogs['EmbedCog'].Embed(desc=text,time=self.date,color=self.embed_data['color'],footer_text=self.embed_data['footer'])
+                emb = self.bot.cogs['Embeds'].Embed(desc=text,time=self.date,color=self.embed_data['color'],footer_text=self.embed_data['footer'])
                 if self.embed_data['title'] is None:
                     if self.Type != 'tw':
                         emb.title = self.title
@@ -187,7 +187,7 @@ class RssCog(commands.Cog):
         
         ..Doc rss.html#rss"""
         if ctx.subcommand_passed is None:
-            await self.bot.cogs['HelpCog'].help_command(ctx,['rss'])
+            await self.bot.cogs['Help'].help_command(ctx,['rss'])
 
     @rss_main.command(name="youtube",aliases=['yt'])
     async def request_yt(self, ctx: MyContext, ID):
@@ -233,7 +233,7 @@ class RssCog(commands.Cog):
         try:
             text = await self.rss_tw(ctx.channel,name)
         except Exception as e:
-            return await self.bot.cogs['ErrorsCog'].on_error(e,ctx)
+            return await self.bot.cogs['Errors'].on_error(e,ctx)
         if type(text) == str:
             await ctx.send(text)
         else:
@@ -283,7 +283,7 @@ class RssCog(commands.Cog):
         True if max number reached, followed by the flow limit"""
         flow_limit = await self.bot.get_config(guild.id,'rss_max_number')
         if flow_limit is None:
-            flow_limit = self.bot.cogs['ServerCog'].default_opt['rss_max_number']
+            flow_limit = self.bot.cogs['Servers'].default_opt['rss_max_number']
         return len(await self.get_guild_flows(guild.id)) >= flow_limit, flow_limit
 
     @rss_main.command(name="add")
@@ -336,7 +336,7 @@ class RssCog(commands.Cog):
             await self.send_log("Feed added into server {} ({})".format(ctx.guild.id,ID),ctx.guild)
         except Exception as e:
             await ctx.send(await self.bot._(ctx.guild,"rss","fail-add"))
-            await self.bot.cogs["ErrorsCog"].on_error(e,ctx)
+            await self.bot.cogs["Errors"].on_error(e,ctx)
 
     @rss_main.command(name="remove",aliases=['delete'])
     @commands.guild_only()
@@ -370,13 +370,13 @@ class RssCog(commands.Cog):
                     c = x['channel']
                 MAX = e+1
                 if len("\n".join(text)) > 1950:
-                    embed = self.bot.get_cog("EmbedCog").Embed(title=await self.bot._(ctx.guild.id,"rss","choose-delete"), color=self.embed_color, desc="\n".join(text), time=ctx.message.created_at)
+                    embed = self.bot.get_cog("Embeds").Embed(title=await self.bot._(ctx.guild.id,"rss","choose-delete"), color=self.embed_color, desc="\n".join(text), time=ctx.message.created_at)
                     await embed.create_footer(ctx)
                     emb_msg = await ctx.send(embed=embed)
                     text = [await self.bot._(ctx.guild.id,'rss','list2')]
                 text.append("{}) {} - {} - {}".format(e+1,await self.bot._(ctx.guild.id,'rss',x['type']),x['link'],c))
             if len(text) > 0:
-                embed = self.bot.get_cog("EmbedCog").Embed(title=await self.bot._(ctx.guild.id,"rss","choose-delete"), color=self.embed_color, desc="\n".join(text), time=ctx.message.created_at)
+                embed = self.bot.get_cog("Embeds").Embed(title=await self.bot._(ctx.guild.id,"rss","choose-delete"), color=self.embed_color, desc="\n".join(text), time=ctx.message.created_at)
                 await embed.create_footer(ctx)
                 emb_msg = await ctx.send(embed=embed)
             def check(msg):
@@ -387,18 +387,18 @@ class RssCog(commands.Cog):
                 msg = await self.bot.wait_for('message',check=check,timeout=20.0)
             except asyncio.TimeoutError:
                 await ctx.send(await self.bot._(ctx.guild.id,"rss","too-long"))
-                await self.bot.cogs['UtilitiesCog'].suppr(emb_msg)
+                await self.bot.cogs['Utilities'].suppr(emb_msg)
                 return
             flow = await self.get_flow(list_of_IDs[int(msg.content)-1])
         if len(flow) == 0:
             await ctx.send(await self.bot._(ctx.guild,"rss","fail-add"))
-            await self.bot.cogs["ErrorsCog"].on_error(e,ctx)
+            await self.bot.cogs["Errors"].on_error(e,ctx)
             return
         try:
             await self.remove_flow(flow[0]['ID'])
         except Exception as e:
             await ctx.send(await self.bot._(ctx.guild,"rss","fail-add"))
-            await self.bot.cogs["ErrorsCog"].on_error(e,ctx)
+            await self.bot.cogs["Errors"].on_error(e,ctx)
             return
         await ctx.send(await self.bot._(ctx.guild,"rss","delete-success"))
         self.bot.log.info("RSS feed deleted into server {} ({})".format(ctx.guild.id,flow[0]['ID']))
@@ -435,14 +435,14 @@ class RssCog(commands.Cog):
                 r = ", ".join(r)
             Type = await self.bot._(ctx.guild.id,'rss',x['type'])
             if len(l) > 20:
-                embed = await self.bot.get_cog('EmbedCog').Embed(title=title, color=self.embed_color, time=ctx.message.created_at).create_footer(ctx)
+                embed = await self.bot.get_cog('Embeds').Embed(title=title, color=self.embed_color, time=ctx.message.created_at).create_footer(ctx)
                 for text in l:
                     embed.add_field(name="\uFEFF", value=text, inline=False)
                 await ctx.send(embed=embed)
                 l.clear()
             l.append(translation.format(Type,c,x['link'],r,x['ID'],x['date']))
         if len(l) > 0:
-            embed = await self.bot.get_cog('EmbedCog').Embed(title=title, color=self.embed_color, time=ctx.message.created_at).create_footer(ctx)
+            embed = await self.bot.get_cog('Embeds').Embed(title=title, color=self.embed_color, time=ctx.message.created_at).create_footer(ctx)
             for x in l:
                 embed.add_field(name="\uFEFF", value=x, inline=False)
             await ctx.send(embed=embed)
@@ -492,7 +492,7 @@ class RssCog(commands.Cog):
             else:
                 desc = text[0].split("\n")[0]
                 fields = [{'name': text[0].split("\n")[-2], 'value': "\n".join(text[i:i+10])} for i in range(1,len(text), 10)]
-            embed = await self.bot.get_cog('EmbedCog').Embed(title=await self.bot._(ctx.guild.id,"rss","choose-mentions-1"), color=self.embed_color, desc=desc, fields=fields, time=ctx.message.created_at).create_footer(ctx)
+            embed = await self.bot.get_cog('Embeds').Embed(title=await self.bot._(ctx.guild.id,"rss","choose-mentions-1"), color=self.embed_color, desc=desc, fields=fields, time=ctx.message.created_at).create_footer(ctx)
             emb_msg = await ctx.send(embed=embed)
             def check(msg):
                 if not msg.content.isnumeric():
@@ -502,7 +502,7 @@ class RssCog(commands.Cog):
                 msg = await self.bot.wait_for('message', check = check, timeout = max(10, 1.5*len(text)))
             except asyncio.TimeoutError:
                 await ctx.send(await self.bot._(ctx.guild.id,"rss","too-long"))
-                await self.bot.cogs['UtilitiesCog'].suppr(emb_msg)
+                await self.bot.cogs['Utilities'].suppr(emb_msg)
                 return
             flow = await self.get_flow(list_of_IDs[int(msg.content)-1])
         return flow
@@ -536,7 +536,7 @@ class RssCog(commands.Cog):
             flow = await self.askID(ID,ctx)
         except Exception as e:
             flow = []
-            await self.bot.cogs["ErrorsCog"].on_error(e,ctx)
+            await self.bot.cogs["Errors"].on_error(e,ctx)
         if flow is None:
             return
         if len(flow) == 0:
@@ -558,7 +558,7 @@ class RssCog(commands.Cog):
                 r = ", ".join(r)
                 text = str(await self.bot._(ctx.guild.id,"rss","roles-list")).format(r)
             # ask for roles
-            embed = self.bot.cogs['EmbedCog'].Embed(title=await self.bot._(ctx.guild.id,"rss","choose-roles"), color=discord.Colour(0x77ea5c), desc=text, time=ctx.message.created_at)
+            embed = self.bot.cogs['Embeds'].Embed(title=await self.bot._(ctx.guild.id,"rss","choose-roles"), color=discord.Colour(0x77ea5c), desc=text, time=ctx.message.created_at)
             emb_msg = await ctx.send(embed=embed.discord_embed())
             err = await self.bot._(ctx.guild.id,"find",'role-0')
             userID = ctx.author.id
@@ -588,7 +588,7 @@ class RssCog(commands.Cog):
                         cond = True
                 except asyncio.TimeoutError:
                     await ctx.send(await self.bot._(ctx.guild.id,"rss","too-long"))
-                    await self.bot.cogs['UtilitiesCog'].suppr(emb_msg)
+                    await self.bot.cogs['Utilities'].suppr(emb_msg)
                     return
         else: # if roles were specified
             if mentions in no_role: # if no role should be mentionned
@@ -613,11 +613,11 @@ class RssCog(commands.Cog):
                 await ctx.send(await self.bot._(ctx.guild.id,"rss","roles-1"))
             else:
                 await self.update_flow(flow['ID'],values=[('roles',';'.join(IDs))])
-                txt = await self.bot.get_cog("UtilitiesCog").clear_msg(", ".join(Names))
+                txt = await self.bot.get_cog("Utilities").clear_msg(", ".join(Names))
                 await ctx.send(str(await self.bot._(ctx.guild.id,"rss","roles-0")).format(txt))
         except Exception as e:
             await ctx.send(await self.bot._(ctx.guild,"rss","fail-add"))
-            await self.bot.cogs["ErrorsCog"].on_error(e,ctx)
+            await self.bot.cogs["Errors"].on_error(e,ctx)
             return
 
 
@@ -632,11 +632,11 @@ class RssCog(commands.Cog):
         ..Doc rss.html#reload-every-feed"""
         try:
             t = time.time()
-            msg = await ctx.send(str(await self.bot._(ctx.guild.id,"rss","guild-loading")).format(ctx.bot.cogs['EmojiCog'].customEmojis['loading']))
+            msg = await ctx.send(str(await self.bot._(ctx.guild.id,"rss","guild-loading")).format(ctx.bot.cogs['Emojis'].customEmojis['loading']))
             liste = await self.get_guild_flows(ctx.guild.id)
             await self.main_loop(ctx.guild.id)
             await ctx.send(str(await self.bot._(ctx.guild.id,"rss","guild-complete")).format(len(liste),round(time.time()-t,1)))
-            await ctx.bot.cogs['UtilitiesCog'].suppr(msg)
+            await ctx.bot.cogs['Utilities'].suppr(msg)
         except Exception as e:
             await ctx.send(str(await self.bot._(ctx.guild.id,"rss","guild-error")).format(e))
 
@@ -661,7 +661,7 @@ class RssCog(commands.Cog):
             if len(flow) == 0:
                 await ctx.send(await self.bot._(ctx.guild,"rss","fail-add"))
                 if e is not None:
-                    await self.bot.cogs["ErrorsCog"].on_error(e,ctx)
+                    await self.bot.cogs["Errors"].on_error(e,ctx)
                 return
             flow = flow[0]
             await self.update_flow(flow['ID'],[('channel',channel.id)])
@@ -686,7 +686,7 @@ class RssCog(commands.Cog):
                 return
             if len(flow) == 0:
                 await ctx.send(await self.bot._(ctx.guild,"rss","fail-add"))
-                await self.bot.cogs["ErrorsCog"].on_error(e,ctx)
+                await self.bot.cogs["Errors"].on_error(e,ctx)
                 return
             flow = flow[0]
             if text is None:
@@ -702,7 +702,7 @@ class RssCog(commands.Cog):
             await ctx.send(str(await self.bot._(ctx.guild.id,"rss","text-success")).format(flow['ID'],text))
         except Exception as e:
             await ctx.send(str(await self.bot._(ctx.guild.id,"rss","guild-error")).format(e))
-            await ctx.bot.cogs['ErrorsCog'].on_error(e,ctx)
+            await ctx.bot.cogs['Errors'].on_error(e,ctx)
 
     @rss_main.command(name="use_embed",aliases=['embed'])
     @commands.guild_only()
@@ -723,7 +723,7 @@ class RssCog(commands.Cog):
                 flow = await self.askID(ID,ctx)
             except Exception as e:
                 flow = []
-                await self.bot.cogs["ErrorsCog"].on_error(e,ctx)
+                await self.bot.cogs["Errors"].on_error(e,ctx)
             if flow is None:
                 return
             try:
@@ -733,7 +733,7 @@ class RssCog(commands.Cog):
             if len(flow) == 0:
                 await ctx.send(await self.bot._(ctx.guild,"rss","fail-add"))
                 if e is not None:
-                    await self.bot.cogs["ErrorsCog"].on_error(e,ctx)
+                    await self.bot.cogs["Errors"].on_error(e,ctx)
                 return
             if arguments is None or len(arguments.keys()) == 0:
                 arguments = None
@@ -774,7 +774,7 @@ class RssCog(commands.Cog):
             await ctx.send("\n".join(txt))
         except Exception as e:
             await ctx.send(str(await self.bot._(ctx.guild.id,"rss","guild-error")).format(e))
-            await ctx.bot.cogs['ErrorsCog'].on_error(e,ctx)
+            await ctx.bot.cogs['Errors'].on_error(e,ctx)
 
     @rss_main.command(name="test")
     @commands.check(reloads.is_support_staff)
@@ -845,7 +845,7 @@ class RssCog(commands.Cog):
                         txt.append(nothing+notok+' author')
                 await ctx.send("\n".join(txt))
         except Exception as e:
-            await ctx.bot.cogs['ErrorsCog'].on_command_error(ctx,e)
+            await ctx.bot.cogs['Errors'].on_command_error(ctx,e)
 
     async def check_rss_url(self, url):
         r = await self.parse_yt_url(url)
@@ -916,7 +916,7 @@ class RssCog(commands.Cog):
             img_url = None
             if 'media_thumbnail' in feed.keys() and len(feed['media_thumbnail']) > 0:
                 img_url = feed['media_thumbnail'][0]['url']
-            obj = self.rssMessage(bot=self.bot,Type='yt',url=feed['link'],title=feed['title'],emojis=self.bot.cogs['EmojiCog'].customEmojis,date=feed['published_parsed'],author=feed['author'],image=img_url)
+            obj = self.rssMessage(bot=self.bot,Type='yt',url=feed['link'],title=feed['title'],emojis=self.bot.cogs['Emojis'].customEmojis,date=feed['published_parsed'],author=feed['author'],image=img_url)
             return [obj]
         else:
             liste = list()
@@ -926,7 +926,7 @@ class RssCog(commands.Cog):
                 img_url = None
                 if 'media_thumbnail' in feed.keys() and len(feed['media_thumbnail']) > 0:
                     img_url = feed['media_thumbnail'][0]['url']
-                obj = self.rssMessage(bot=self.bot,Type='yt',url=feed['link'],title=feed['title'],emojis=self.bot.cogs['EmojiCog'].customEmojis,date=feed['published_parsed'],author=feed['author'],image=img_url)
+                obj = self.rssMessage(bot=self.bot,Type='yt',url=feed['link'],title=feed['title'],emojis=self.bot.cogs['Emojis'].customEmojis,date=feed['published_parsed'],author=feed['author'],image=img_url)
                 liste.append(obj)
             liste.reverse()
             return liste
@@ -993,7 +993,7 @@ class RssCog(commands.Cog):
             rt = None
             if author.replace('@','') not in feed['link']:
                 rt = url.split("=")[1]
-            obj = self.rssMessage(bot=self.bot,Type='tw',url=feed['link'].replace('mobile.',''),title=t,emojis=self.bot.cogs['EmojiCog'].customEmojis,date=feed['published_parsed'],author=author,retweeted_by=rt,channel=feeds.feed['title'])
+            obj = self.rssMessage(bot=self.bot,Type='tw',url=feed['link'].replace('mobile.',''),title=t,emojis=self.bot.cogs['Emojis'].customEmojis,date=feed['published_parsed'],author=author,retweeted_by=rt,channel=feeds.feed['title'])
             return [obj]
         else:
             liste = list()
@@ -1008,7 +1008,7 @@ class RssCog(commands.Cog):
                     t = feed['title'].replace(rt,'')
                 else:
                     t = feed['title']
-                obj = self.rssMessage(bot=self.bot,Type='tw',url=feed['link'].replace('mobile.',''),title=t,emojis=self.bot.cogs['EmojiCog'].customEmojis,date=feed['published_parsed'],author=author,retweeted_by=rt,channel= feeds.feed['title'])
+                obj = self.rssMessage(bot=self.bot,Type='tw',url=feed['link'].replace('mobile.',''),title=t,emojis=self.bot.cogs['Emojis'].customEmojis,date=feed['published_parsed'],author=author,retweeted_by=rt,channel= feeds.feed['title'])
                 liste.append(obj)
             liste.reverse()
             return liste
@@ -1043,7 +1043,7 @@ class RssCog(commands.Cog):
                 Type='tw',
                 url=url,
                 title=text,
-                emojis=self.bot.cogs['EmojiCog'].customEmojis,
+                emojis=self.bot.cogs['Emojis'].customEmojis,
                 date=datetime.datetime.fromtimestamp(lastpost.created_at_in_seconds), 
                 author=lastpost.user.screen_name,
                 retweeted_by=rt,
@@ -1079,7 +1079,7 @@ class RssCog(commands.Cog):
                     Type='tw',
                     url=url,
                     title=text,
-                    emojis=self.bot.cogs['EmojiCog'].customEmojis,
+                    emojis=self.bot.cogs['Emojis'].customEmojis,
                     date=datetime.datetime.fromtimestamp(post.created_at_in_seconds),
                     author=post.user.screen_name,
                     retweeted_by=rt,
@@ -1100,7 +1100,7 @@ class RssCog(commands.Cog):
             img_url = None
             if r is not None:
                 img_url = r.group(1)
-            obj = self.rssMessage(bot=self.bot,Type='twitch',url=feed['link'],title=feed['title'],emojis=self.bot.cogs['EmojiCog'].customEmojis,date=feed['published_parsed'],author=feeds.feed['title'].replace("'s Twitch video RSS",""),image=img_url)
+            obj = self.rssMessage(bot=self.bot,Type='twitch',url=feed['link'],title=feed['title'],emojis=self.bot.cogs['Emojis'].customEmojis,date=feed['published_parsed'],author=feeds.feed['title'].replace("'s Twitch video RSS",""),image=img_url)
             return [obj]
         else:
             liste = list()
@@ -1111,7 +1111,7 @@ class RssCog(commands.Cog):
                 img_url = None
                 if r is not None:
                     img_url = r.group(1)
-                obj = self.rssMessage(bot=self.bot,Type='twitch',url=feed['link'],title=feed['title'],emojis=self.bot.cogs['EmojiCog'].customEmojis,date=feed['published_parsed'],author=feeds.feed['title'].replace("'s Twitch video RSS",""),image=img_url)
+                obj = self.rssMessage(bot=self.bot,Type='twitch',url=feed['link'],title=feed['title'],emojis=self.bot.cogs['Emojis'].customEmojis,date=feed['published_parsed'],author=feeds.feed['title'].replace("'s Twitch video RSS",""),image=img_url)
                 liste.append(obj)
             liste.reverse()
             return liste
@@ -1168,7 +1168,7 @@ class RssCog(commands.Cog):
                 Type='web',
                 url=l,
                 title=title,
-                emojis=self.bot.cogs['EmojiCog'].customEmojis,
+                emojis=self.bot.cogs['Emojis'].customEmojis,
                 date=datz,
                 author=author,
                 channel=feeds.feed['title'] if 'title' in feeds.feed.keys() else '?',
@@ -1210,7 +1210,7 @@ class RssCog(commands.Cog):
                         Type='web',
                         url=l,
                         title=title,
-                        emojis=self.bot.cogs['EmojiCog'].customEmojis,
+                        emojis=self.bot.cogs['Emojis'].customEmojis,
                         date=datz,
                         author=author,
                         channel=feeds.feed['title'] if 'title' in feeds.feed.keys() else '?',
@@ -1231,7 +1231,7 @@ class RssCog(commands.Cog):
             feed = feeds.entries[0]
             img_url = feed['media_content'][0]['url']
             title = re.search(r"DeviantArt: ([^ ]+)'s gallery",feeds.feed['title']).group(1)
-            obj = self.rssMessage(bot=self.bot,Type='deviant',url=feed['link'],title=feed['title'],emojis=self.bot.cogs['EmojiCog'].customEmojis,date=feed['published_parsed'],author=title,image=img_url)
+            obj = self.rssMessage(bot=self.bot,Type='deviant',url=feed['link'],title=feed['title'],emojis=self.bot.cogs['Emojis'].customEmojis,date=feed['published_parsed'],author=title,image=img_url)
             return [obj]
         else:
             liste = list()
@@ -1240,7 +1240,7 @@ class RssCog(commands.Cog):
                     break
                 img_url = feed['media_content'][0]['url']
                 title = re.search(r"DeviantArt: ([^ ]+)'s gallery",feeds.feed['title']).group(1)
-                obj = self.rssMessage(bot=self.bot,Type='deviant',url=feed['link'],title=feed['title'],emojis=self.bot.cogs['EmojiCog'].customEmojis,date=feed['published_parsed'],author=title,image=img_url)
+                obj = self.rssMessage(bot=self.bot,Type='deviant',url=feed['link'],title=feed['title'],emojis=self.bot.cogs['Emojis'].customEmojis,date=feed['published_parsed'],author=title,image=img_url)
                 liste.append(obj)
             liste.reverse()
             return liste
@@ -1374,7 +1374,7 @@ class RssCog(commands.Cog):
             try:
                 if self.bot.zombie_mode:
                     return
-                if isinstance(t,(self.bot.cogs['EmbedCog'].Embed,discord.Embed)):
+                if isinstance(t,(self.bot.cogs['Embeds'].Embed,discord.Embed)):
                     await channel.send(" ".join(obj.mentions), embed=t, allowed_mentions=discord.AllowedMentions(everyone=False, roles=True))
                 else:
                     await channel.send(t, allowed_mentions=discord.AllowedMentions(everyone=False, roles=True))
@@ -1418,8 +1418,8 @@ class RssCog(commands.Cog):
             else:
                 return True
         except Exception as e:
-            await self.bot.cogs['ErrorsCog'].senf_err_msg("Erreur rss sur le flux {} (type {} - salon {})".format(flow['link'],flow['type'],flow['channel']))
-            await self.bot.cogs['ErrorsCog'].on_error(e,None)
+            await self.bot.cogs['Errors'].senf_err_msg("Erreur rss sur le flux {} (type {} - salon {})".format(flow['link'],flow['type'],flow['channel']))
+            await self.bot.cogs['Errors'].on_error(e,None)
             return False
         
 
@@ -1448,17 +1448,17 @@ class RssCog(commands.Cog):
                     else:
                         errors.append(flow['ID'])
                 else:
-                    await self.bot.cogs['McCog'].check_flow(flow)
+                    await self.bot.cogs['Minecraft'].check_flow(flow)
                     check +=1
             except Exception as e:
-                await self.bot.cogs['ErrorsCog'].on_error(e,None)
+                await self.bot.cogs['Errors'].on_error(e,None)
             await asyncio.sleep(self.time_between_flows_check)
-        self.bot.cogs['McCog'].flows = dict()
+        self.bot.cogs['Minecraft'].flows = dict()
         d = ["**RSS loop done** in {}s ({}/{} flows)".format(round(time.time()-t,3),check,len(liste))]
         if len(errors) > 0:
             d.append('{} errors: {}'.format(len(errors),' '.join([str(x) for x in errors])))
-        emb = self.bot.cogs["EmbedCog"].Embed(desc='\n'.join(d),color=1655066).update_timestamp().set_author(self.bot.user)
-        await self.bot.cogs["EmbedCog"].send([emb],url="loop")
+        emb = self.bot.cogs["Embeds"].Embed(desc='\n'.join(d),color=1655066).update_timestamp().set_author(self.bot.user)
+        await self.bot.cogs["Embeds"].send([emb],url="loop")
         self.bot.log.debug(d[0])
         if len(errors) > 0:
             self.bot.log.warn("[Rss loop] "+d[1])
@@ -1472,7 +1472,7 @@ class RssCog(commands.Cog):
             self.bot.log.warn('Base de donnée hors ligne - check rss annulé')
             return
         self.bot.log.info(" Boucle rss commencée !")
-        await self.bot.cogs["RssCog"].main_loop()
+        await self.bot.cogs["Rss"].main_loop()
         self.bot.log.info(" Boucle rss terminée !")
 
     async def loop(self):
@@ -1506,11 +1506,11 @@ class RssCog(commands.Cog):
     async def send_log(self, text: str, guild: discord.Guild):
         """Send a log to the logging channel"""
         try:
-            emb = self.bot.cogs["EmbedCog"].Embed(desc="[RSS] "+text,color=5366650,footer_text=guild.name).update_timestamp().set_author(self.bot.user)
-            await self.bot.cogs["EmbedCog"].send([emb])
+            emb = self.bot.cogs["Embeds"].Embed(desc="[RSS] "+text,color=5366650,footer_text=guild.name).update_timestamp().set_author(self.bot.user)
+            await self.bot.cogs["Embeds"].send([emb])
         except Exception as e:
-            await self.bot.cogs["ErrorsCog"].on_error(e,None)
+            await self.bot.cogs["Errors"].on_error(e,None)
 
 
 def setup(bot):
-    bot.add_cog(RssCog(bot))
+    bot.add_cog(Rss(bot))

@@ -2,7 +2,7 @@ import discord, datetime
 from discord.ext import commands
 from classes import zbot
 
-class WelcomerCog(commands.Cog):
+class Welcomer(commands.Cog):
     """Cog which manages the departure and arrival of members in the servers"""
     
     def __init__(self, bot: zbot):
@@ -16,7 +16,7 @@ class WelcomerCog(commands.Cog):
         """Fonction principale appelée lorsqu'un membre rejoint un serveur"""
         # await self.send_log(member,"welcome")
         if self.bot.database_online:
-            await self.bot.cogs["ServerCog"].update_memberChannel(member.guild)
+            await self.bot.cogs["Servers"].update_memberChannel(member.guild)
             await self.send_msg(member,"welcome")
             self.bot.loop.create_task(self.give_roles(member))
             await self.give_roles_back(member)
@@ -31,7 +31,7 @@ class WelcomerCog(commands.Cog):
         """Fonction principale appelée lorsqu'un membre quitte un serveur"""
         # await self.send_log(member,"leave")
         if self.bot.database_online:
-            await self.bot.cogs["ServerCog"].update_memberChannel(member.guild)
+            await self.bot.cogs["Servers"].update_memberChannel(member.guild)
             await self.send_msg(member,"leave")
             await self.bot.cogs['Events'].check_user_left(member)
 
@@ -43,14 +43,14 @@ class WelcomerCog(commands.Cog):
         msg = await self.bot.get_config(member.guild.id,Type)
         if await self.raid_check(member) or member.id in self.no_message:
             return
-        if await self.bot.cogs['UtilitiesCog'].check_any_link(member.name) is not None:
+        if await self.bot.cogs['Utilities'].check_any_link(member.name) is not None:
             return
         if msg not in ['',None]:
             ch = await self.bot.get_config(member.guild.id,'welcome_channel')
             if ch is None:
                 return
             ch = ch.split(';')
-            msg = await self.bot.cogs['UtilitiesCog'].clear_msg(msg,ctx=None)
+            msg = await self.bot.cogs['Utilities'].clear_msg(msg,ctx=None)
             for channel in ch:
                 if not channel.isnumeric():
                     continue
@@ -65,10 +65,10 @@ class WelcomerCog(commands.Cog):
                         owner=member.guild.owner.name,
                         member_count=member.guild.member_count,
                         type=botormember))
-                    msg = await self.bot.cogs["UtilitiesCog"].clear_msg(msg,everyone=False)
+                    msg = await self.bot.cogs["Utilities"].clear_msg(msg,everyone=False)
                     await channel.send(msg)
                 except Exception as e:
-                    await self.bot.cogs["ErrorsCog"].on_error(e,None)
+                    await self.bot.cogs["Errors"].on_error(e,None)
 
     async def check_owner_server(self, member: discord.Member):
         """Vérifie si un nouvel arrivant est un propriétaire de serveur"""
@@ -83,7 +83,7 @@ class WelcomerCog(commands.Cog):
 
     async def check_support(self, member: discord.Member):
         """Vérifie si un nouvel arrivant fait partie du support"""
-        if await self.bot.cogs['UtilitiesCog'].is_support(member):
+        if await self.bot.cogs['Utilities'].is_support(member):
             role = member.guild.get_role(412340503229497361)
             if role is not None:
                 await member.add_roles(role)
@@ -92,7 +92,7 @@ class WelcomerCog(commands.Cog):
 
     async def check_contributor(self, member: discord.Member):
         """Vérifie si un nouvel arrivant est un contributeur"""
-        if await self.bot.cogs['UtilitiesCog'].is_contributor(member):
+        if await self.bot.cogs['Utilities'].is_contributor(member):
             role = member.guild.get_role(552428810562437126)
             if role is not None:
                 await member.add_roles(role)
@@ -102,9 +102,9 @@ class WelcomerCog(commands.Cog):
     async def give_roles_back(self, member: discord.Member):
         """Give roles rewards/muted role to new users"""
         used_xp_type = await self.bot.get_config(member.guild.id,'xp_type')
-        xp = await self.bot.cogs['XPCog'].bdd_get_xp(member.id, None if used_xp_type == 0 else member.guild.id)
+        xp = await self.bot.cogs['Xp'].bdd_get_xp(member.id, None if used_xp_type == 0 else member.guild.id)
         if xp is not None and len(xp) == 1:
-            await self.bot.cogs['XPCog'].give_rr(member,(await self.bot.cogs['XPCog'].calc_level(xp[0]['xp'],used_xp_type))[0],await self.bot.cogs['XPCog'].rr_list_role(member.guild.id))
+            await self.bot.cogs['Xp'].give_rr(member,(await self.bot.cogs['Xp'].calc_level(xp[0]['xp'],used_xp_type))[0],await self.bot.cogs['Xp'].rr_list_role(member.guild.id))
 
 
     async def kick(self, member: discord.Member, reason: str):
@@ -131,7 +131,7 @@ class WelcomerCog(commands.Cog):
         if level == 0:
             return c
         if level >= 1:
-            if await self.bot.cogs['UtilitiesCog'].check_discord_invite(member.name) is not None:
+            if await self.bot.cogs['Utilities'].check_discord_invite(member.name) is not None:
                 await self.kick(member,await self.bot._(member.guild.id,"logs","d-invite"))
                 c = True
         if level >= 2:
@@ -139,7 +139,7 @@ class WelcomerCog(commands.Cog):
                 await self.kick(member,await self.bot._(member.guild.id,"logs","d-young"))
                 c = True
         if level >= 3 and can_ban:
-            if await self.bot.cogs['UtilitiesCog'].check_discord_invite(member.name) is not None:
+            if await self.bot.cogs['Utilities'].check_discord_invite(member.name) is not None:
                 await self.ban(member,await self.bot._(member.guild.id,"logs","d-invite"))
                 c = True
             if (datetime.datetime.utcnow() - member.created_at).seconds <= 30*60:
@@ -171,8 +171,8 @@ class WelcomerCog(commands.Cog):
         except discord.errors.NotFound:
             pass
         except Exception as e:
-            await self.bot.cogs["ErrorsCog"].on_error(e,None)
+            await self.bot.cogs["Errors"].on_error(e,None)
 
 
 def setup(bot):
-    bot.add_cog(WelcomerCog(bot))
+    bot.add_cog(Welcomer(bot))

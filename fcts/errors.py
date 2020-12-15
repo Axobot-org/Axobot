@@ -7,7 +7,7 @@ from discord.ext import commands
 from classes import zbot, MyContext
 
 
-class ErrorsCog(commands.Cog):
+class Errors(commands.Cog):
     """General cog for error management."""
 
     def __init__(self, bot: zbot):
@@ -44,7 +44,7 @@ class ErrorsCog(commands.Cog):
             await ctx.send(await self.bot._(ctx.channel,'errors','notrightroles'))
             return
         elif isinstance(error,commands.errors.CommandOnCooldown):
-            if await self.bot.cogs['AdminCog'].check_if_admin(ctx):
+            if await self.bot.cogs['Admin'].check_if_admin(ctx):
                 await ctx.reinvoke()
                 return
             d = round(error.retry_after, 2 if error.retry_after < 60 else 0)
@@ -183,4 +183,4 @@ class ErrorsCog(commands.Cog):
 
 
 def setup(bot):
-    bot.add_cog(ErrorsCog(bot))
+    bot.add_cog(Errors(bot))

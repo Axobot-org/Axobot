@@ -939,7 +939,7 @@ characteres = {':': 582223307944886292,
 		' ': 446782476375949323}
 
 
-class EmojiCog(commands.Cog):
+class Emojis(commands.Cog):
 	"""Cog for managing emojis. No more, no less."""
 	
 	def __init__(self, bot: zbot):
@@ -987,4 +987,4 @@ class EmojiCog(commands.Cog):
 		return text
 		
 def setup(bot):
-	bot.add_cog(EmojiCog(bot))
+	bot.add_cog(Emojis(bot))
