@@ -11,7 +11,7 @@ class TimeUtils(discord.ext.commands.Cog):
     """This cog handles all manipulations of date, time, and time interval. So cool, and so fast"""
     def __init__(self, bot: zbot):
         self.bot = bot
-        self.file = "timeclass"
+        self.file = "timeutils"
 
     class timedelta:
         """Representation of a duration between two dates, with the value noted as years/months/days/etc."""

@@ -7,7 +7,7 @@ class Welcomer(commands.Cog):
     
     def __init__(self, bot: zbot):
         self.bot = bot
-        self.file = "bvn"
+        self.file = "welcomer"
         self.no_message = [392766377078816789,504269440872087564,552273019020771358]
 
     

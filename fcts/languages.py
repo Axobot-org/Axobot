@@ -9,7 +9,7 @@ class Languages(discord.ext.commands.Cog):
 
     def __init__(self, bot: zbot):
         self.bot = bot
-        self.file = "language"
+        self.file = "languages"
         self.languages = ['fr', 'en', 'lolcat', 'fi', 'de', 'fr2']
         self.serv_opts = dict()
         self.translations = {}

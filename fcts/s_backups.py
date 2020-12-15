@@ -16,7 +16,7 @@ class Backups(commands.Cog):
 
     def __init__(self, bot: zbot):
         self.bot = bot
-        self.file = "s_backup"
+        self.file = "s_backups"
 
     @commands.group(name='backup')
     @commands.guild_only()

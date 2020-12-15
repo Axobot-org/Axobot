@@ -17,7 +17,7 @@ class Translations(commands.Cog):
 
     def __init__(self, bot: zbot):
         self.bot = bot
-        self.file = 'translators'
+        self.file = 'translations'
         if not os.path.exists('translation/'):
             os.makedirs('translation/')
         self.project_list = ['fr','en','lolcat','fi','de','es','it','br','tr','fr2']

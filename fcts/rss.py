@@ -61,7 +61,7 @@ class Rss(commands.Cog):
         self.time_loop = 10
         self.time_between_flows_check = 0.15
         
-        self.file = "rss2"
+        self.file = "rss"
         self.embed_color = discord.Color(6017876)
         self.loop_processing = False
         self.last_update = None

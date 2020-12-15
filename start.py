@@ -36,37 +36,36 @@ def main():
     log.setLevel(logging.DEBUG)
     log.info("Lancement du bot")
 
-    initial_extensions = ['fcts.language',
+    initial_extensions = ['fcts.languages',
                       'fcts.admin',
                       'fcts.aide',
                       'fcts.bot_events',
-                      'fcts.bvn',
                       'fcts.cases',
                       'fcts.embeds',
                       'fcts.emojis',
                       'fcts.errors',
                       'fcts.events',
                       'fcts.fun',
-                      'fcts.infos',
+                      'fcts.info',
                       'fcts.library',
-                      'fcts.mc',
+                      'fcts.minecraft',
                       'fcts.moderation',
-                      'fcts.morpion',
+                      'fcts.morpions',
                       'fcts.partners',
                       'fcts.perms',
                       'fcts.reloads',
                       'fcts.roles_react',
-                      'fcts.rss2',
-                      'fcts.s_backup',
-                      'fcts.server',
-                      'fcts.timeclass',
+                      'fcts.rss',
+                      'fcts.s_backups',
+                      'fcts.servers',
                       'fcts.timers',
-                      'fcts.translators',
+                      'fcts.timeutils',
+                      'fcts.translations',
                       'fcts.users',
                       'fcts.utilities',
                       'fcts.voices',
-                      'fcts.xp',
-                      'fcts.halloween'
+                      'fcts.welcomer',
+                      'fcts.xp'
     ]
     # Suppression du fichier debug.log s'il est trop volumineux
     if os.path.exists("debug.log"):

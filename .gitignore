@@ -19,7 +19,7 @@ start2.py
 # Miscellaneous
 *.log
 ._*
-translation*
+translation/*
 docs/_*
 rankcards_update.json
 *-cache.json
