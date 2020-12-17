@@ -187,6 +187,45 @@ class zbot(commands.bot.AutoShardedBot):
         return cog.tr
 
 
+class RankCardsFlag:
+        FLAGS = {
+            1 << 0: "rainbow",
+            1 << 1: "blurple_19",
+            1 << 2: "blurple_20",
+            1 << 3: "christmas_19",
+            1 << 4: "christmas_20",
+            1 << 5: "halloween_20"
+        }
+
+        def flagsToInt(self, flags: list) -> int:
+            r = 0
+            for k, v in self.FLAGS.items():
+                if v in flags:
+                    r |= k
+            return r
+
+        def intToFlags(self, i: int) -> list:
+            return [v for k, v in self.FLAGS.items() if i & k == k]
+
+class UserFlag:
+        FLAGS = {
+            1 << 0: "support",
+            1 << 1: "contributor",
+            1 << 2: "premium",
+            1 << 3: "partner",
+            1 << 4: "translator"
+        }
+
+        def flagsToInt(self, flags: list) -> int:
+            r = 0
+            for k, v in self.FLAGS.items():
+                if v in flags:
+                    r |= k
+            return r
+
+        def intToFlags(self, i: int) -> list:
+            return [v for k, v in self.FLAGS.items() if i & k == k]
+
 def setup_logger():
     """Create the logger module, used for logs"""
     # on chope le premier logger
