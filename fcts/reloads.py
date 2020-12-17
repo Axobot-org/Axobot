@@ -17,10 +17,8 @@ async def check_admin(ctx):
 async def is_support_staff(ctx):
     if ctx.author.id in admins_id:
         return True
-    try:
-        return await ctx.bot.cogs['Utilities'].is_support(ctx.author)
-    except:
-        pass
+    if UsersCog := await ctx.bot.get_cog('Users'):
+        return await UsersCog.has_userflag(ctx.author, 'support')
     server = ctx.bot.get_guild(356067272730607628)
     if server is not None:
         member = server.get_member(ctx.author.id)
