@@ -31,7 +31,7 @@ class Users(commands.Cog):
             await self.bot.cogs["Errors"].on_error(e, None)
         if parameters is None:
             return []
-        return UserFlag.intToFlags(parameters['user_flags'])
+        return UserFlag().intToFlags(parameters['user_flags'])
 
     async def has_userflag(self, user: discord.User, flag: str) -> bool:
         """Check if a user has a specific user flag"""
@@ -52,7 +52,7 @@ class Users(commands.Cog):
             await self.bot.cogs["Errors"].on_error(e, None)
         if parameters is None:
             return False
-        return RankCardsFlag.intToFlags(parameters['rankcards_unlocked'])
+        return RankCardsFlag().intToFlags(parameters['rankcards_unlocked'])
 
     async def has_rankcard(self, user: discord.User, rankcard: str) -> bool:
         """Check if a user has unlocked a specific rank card"""
@@ -72,7 +72,7 @@ class Users(commands.Cog):
     async def profile_card(self, ctx: MyContext, style: typing.Optional[args.cardStyle]=None):
         """Change your xp card style"""
         if style is None and len(ctx.view.buffer.split(' '))>2:
-            if ctx.view.buffer.split(' ')[2]=='list':
+            if ctx.view.buffer.split(' ')[2] == 'list':
                 await ctx.send(str(await self.bot._(ctx.channel,'users','list-cards')).format(', '.join(await ctx.bot.cogs['Utilities'].allowed_card_styles(ctx.author))))
             else:
                 await ctx.send(str(await self.bot._(ctx.channel,'users','invalid-card')).format(', '.join(await ctx.bot.cogs['Utilities'].allowed_card_styles(ctx.author))))
