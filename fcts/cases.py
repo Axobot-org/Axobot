@@ -278,7 +278,7 @@ class Cases(commands.Cog):
         if not self.bot.database_online:
             return await ctx.send(await self.bot._(ctx.guild.id,'cases','no_database'))
         try:
-            isSupport = await self.bot.cogs['Info'].is_support(ctx)
+            isSupport = await reloads.is_support_staff(ctx)
             c = ["ID="+str(case)]
             if not isSupport:
                 c.append("guild="+str(ctx.guild.id))

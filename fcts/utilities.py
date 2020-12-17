@@ -280,63 +280,6 @@ class Utilities(commands.Cog):
         except Exception as e:
             await self.bot.cogs['Errors'].on_error(e, None)
 
-    async def is_premium(self, user: discord.User) -> bool:
-        """Check if a user is premium"""
-        parameters = None
-        try:
-            parameters = await self.get_db_userinfo(criters=["userID="+str(user.id)], columns=['premium'])
-        except Exception as e:
-            await self.bot.cogs["Errors"].on_error(e, None)
-        if parameters is None:
-            return False
-        return parameters['premium']
-
-    async def is_support(self, user: discord.User) -> bool:
-        """Check if a user is support staff"""
-        parameters = None
-        try:
-            parameters = await self.get_db_userinfo(criters=["userID="+str(user.id)], columns=['support'])
-        except Exception as e:
-            await self.bot.cogs["Errors"].on_error(e, None)
-        if parameters is None:
-            return False
-        return parameters['support']
-
-    async def is_partner(self, user: discord.User) -> bool:
-        """Check if a user is support staff"""
-        parameters = None
-        try:
-            parameters = await self.get_db_userinfo(criters=["userID="+str(user.id)], columns=['partner'])
-        except Exception as e:
-            await self.bot.cogs["Errors"].on_error(e, None)
-        if parameters is None:
-            return False
-        return parameters['partner']
-
-    async def is_contributor(self, user: discord.User) -> bool:
-        """Check if a user is a contributor"""
-        parameters = None
-        try:
-            parameters = await self.get_db_userinfo(criters=["userID="+str(user.id)], columns=['contributor'])
-        except Exception as e:
-            await self.bot.cogs["Errors"].on_error(e, None)
-        if parameters is None:
-            return False
-        return parameters['contributor']
-
-    async def is_translator(self, user: discord.User) -> bool:
-        """Check if a user is a translator"""
-        if self.bot.database_online == False:
-            return False
-        parameters = None
-        try:
-            parameters = await self.get_db_userinfo(criters=["userID="+str(user.id)], columns=['translator'])
-        except Exception as e:
-            await self.bot.cogs["Errors"].on_error(e, None)
-        if parameters is None:
-            return False
-        return parameters['translator']
-
     async def has_rainbow_card(self, user: discord.User) -> bool:
         """Check if a user won the rainbow card"""
         parameters = None
@@ -432,17 +375,17 @@ class Utilities(commands.Cog):
         if not self.bot.database_online:
             return sorted(liste)
         liste2 = []
-        if await self.bot.cogs['Admin'].check_if_admin(user):
+        if await self.bot.get_cog('Admin').check_if_admin(user):
             liste2.append('admin')
         if not self.bot.database_online:
             return sorted(liste2)+sorted(liste)
-        if await self.is_support(user):
+        if await self.bot.get_cog('Users').has_userflag(user, 'support'):
             liste2.append('support')
-        if await self.is_contributor(user):
+        if await self.bot.get_cog('Users').has_userflag(user, 'contributor'):
             liste2.append('contributor')
-        if await self.is_partner(user):
+        if await self.bot.get_cog('Users').has_userflag(user, 'partner'):
             liste2.append('partner')
-        if await self.is_premium(user):
+        if await self.bot.get_cog('Users').has_userflag(user, 'premium'):
             liste2.append('premium')
         if await self.has_blurple_card(user, 19):
             liste.append('blurple19')

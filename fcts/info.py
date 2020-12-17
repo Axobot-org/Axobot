@@ -51,11 +51,6 @@ class Info(commands.Cog):
         self.codelines = await self.count_lines_code()
         self.emoji_table = 'emojis_beta' if self.bot.beta else 'emojis'
     
-
-    async def is_support(self, ctx: MyContext):
-        """Check if a user is part of the ZBot team"""
-        return await reloads.is_support_staff(ctx)
-    
     async def count_lines_code(self):
         """Count the number of lines for the whole project"""
         count = 0
@@ -755,22 +750,13 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
             servers_in = [f"{owned} serveurs possédés, membre sur {membered} autres serveurs"]
         # XP card
         xp_card = await self.bot.cogs['Utilities'].get_xp_style(user)
-        # Perks
-        perks = list()
+        # Flags
+        userflags: list = await self.bot.get_cog('Users').get_userflags(user)
         if await self.bot.cogs["Admin"].check_if_admin(user):
-            perks.append('admin')
-        if await self.bot.cogs['Utilities'].is_support(user):
-            perks.append("support")
-        if await self.bot.cogs['Utilities'].is_contributor(user):
-            perks.append("contributor")
-        if await self.bot.cogs['Utilities'].is_premium(user):
-            perks.append("premium")
-        if await self.bot.cogs['Utilities'].is_partner(user):
-            perks.append("partner")
-        if await self.bot.cogs['Utilities'].is_translator(user):
-            perks.append("translator")
-        if len(perks) == 0:
-            perks = ["None"]
+            userflags.append('admin')
+        if len(userflags) == 0:
+            userflags = ["None"]
+        # Votes
         votes = await ctx.bot.get_cog("Utilities").check_votes(user.id)
         if use_embed:
             votes = " - ".join([f"[{x[0]}]({x[1]})" for x in votes])
@@ -800,7 +786,7 @@ Available types: member, role, user, emoji, channel, server, invite, category"""
             
             await ctx.send(embed = await self.bot.cogs['Embeds'].Embed(title=user_name, thumbnail=str(await self.bot.user_avatar_as(user,1024)) ,color=color, fields = [
                 {"name": "ID", "value": user.id},
-                {"name": "Perks", "value": "-".join(perks), "inline":False},
+                {"name": "Flags", "value": "-".join(userflags), "inline":False},
                 {"name": "Servers", "value": "\n".join(servers_in), "inline":True},
                 {"name": "Language", "value": "\n".join(disp_lang), "inline":True},
                 {"name": "XP card", "value": xp_card, "inline":True},
@@ -817,7 +803,7 @@ Voted? {}
 Servers:
 {}""".format(user_name,
                 user.id,
-                " - ".join(perks),
+                " - ".join(userflags),
                 " - ".join(disp_lang),
                 xp_card,
                 votes,

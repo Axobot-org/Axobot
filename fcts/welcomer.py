@@ -83,7 +83,7 @@ class Welcomer(commands.Cog):
 
     async def check_support(self, member: discord.Member):
         """Vérifie si un nouvel arrivant fait partie du support"""
-        if await self.bot.cogs['Utilities'].is_support(member):
+        if await self.bot.get_cog('Users').has_userflag(member, 'support'):
             role = member.guild.get_role(412340503229497361)
             if role is not None:
                 await member.add_roles(role)
@@ -92,7 +92,7 @@ class Welcomer(commands.Cog):
 
     async def check_contributor(self, member: discord.Member):
         """Vérifie si un nouvel arrivant est un contributeur"""
-        if await self.bot.cogs['Utilities'].is_contributor(member):
+        if await self.bot.get_cog('Users').has_userflag(member, 'contributor'):
             role = member.guild.get_role(552428810562437126)
             if role is not None:
                 await member.add_roles(role)
