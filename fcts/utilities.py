@@ -280,65 +280,6 @@ class Utilities(commands.Cog):
         except Exception as e:
             await self.bot.cogs['Errors'].on_error(e, None)
 
-    async def has_rainbow_card(self, user: discord.User) -> bool:
-        """Check if a user won the rainbow card"""
-        parameters = None
-        try:
-            parameters = await self.get_db_userinfo(criters=["userID="+str(user.id)], columns=['unlocked_rainbow'])
-        except Exception as e:
-            await self.bot.cogs["Errors"].on_error(e, None)
-        if parameters is None:
-            return False
-        return parameters['unlocked_rainbow']
-
-    async def has_blurple_card(self, user: discord.User, year: bool=19) -> bool:
-        """Check if a user won the blurple card"""
-        parameters = None
-        try:
-            parameters = await self.get_db_userinfo(criters=["userID="+str(user.id)], columns=[f'unlocked_blurple_{year}'])
-        except Exception as e:
-            await self.bot.cogs["Errors"].on_error(e, None)
-        if parameters is None:
-            return False
-        if (year == 20) and not parameters['unlocked_blurple_20'] and self.bot.current_event == "blurple":
-            points = await self.get_db_userinfo(["events_points"], ["userID="+str(user.id)])
-            if points is not None and points["events_points"] >= 150:
-                await self.change_db_userinfo(user.id, 'unlocked_blurple_20', True)
-                parameters['unlocked_blurple_20'] = True
-        return parameters[f'unlocked_blurple_{year}']
-
-    async def has_christmas_card(self, user: discord.User) -> bool:
-        """Check if a user won the christmas card"""
-        parameters = None
-        try:
-            parameters = await self.get_db_userinfo(criters=["userID="+str(user.id)], columns=['unlocked_christmas'])
-        except Exception as e:
-            await self.bot.cogs["Errors"].on_error(e, None)
-        if parameters is None:
-            parameters = {'unlocked_christmas': False}
-        if not parameters['unlocked_christmas'] and self.bot.current_event == "christmas":
-            points = await self.get_db_userinfo(["events_points"], ["userID="+str(user.id)])
-            if points is not None and points["events_points"] >= 50:
-                await self.change_db_userinfo(user.id, 'unlocked_christmas', True)
-                parameters['unlocked_christmas'] = True
-        return parameters['unlocked_christmas']
-
-    async def has_halloween_card(self, user: discord.User, year: int=20) -> bool:
-        """Check if a user won the blurple card"""
-        parameters = None
-        try:
-            parameters = await self.get_db_userinfo(criters=["userID="+str(user.id)], columns=[f'unlocked_halloween_{year}'])
-        except Exception as e:
-            await self.bot.cogs["Errors"].on_error(e, None)
-        if parameters is None:
-            return False
-        if (year == 20) and not parameters['unlocked_halloween_20'] and self.bot.current_event == "halloween":
-            points = await self.get_db_userinfo(["events_points"], ["userID="+str(user.id)])
-            if points is not None and points["events_points"] >= 200:
-                await self.change_db_userinfo(user.id, 'unlocked_halloween_20', True)
-                parameters['unlocked_halloween_20'] = True
-        return parameters[f'unlocked_halloween_{year}']
-
     async def get_xp_style(self, user: discord.User) -> str:
         parameters = None
         try:
@@ -379,23 +320,25 @@ class Utilities(commands.Cog):
             liste2.append('admin')
         if not self.bot.database_online:
             return sorted(liste2)+sorted(liste)
-        if await self.bot.get_cog('Users').has_userflag(user, 'support'):
+        userflags: list = await self.bot.get_cog('Users').get_userflags(user)
+        if 'support' in userflags:
             liste2.append('support')
-        if await self.bot.get_cog('Users').has_userflag(user, 'contributor'):
+        if 'contributor' in userflags:
             liste2.append('contributor')
-        if await self.bot.get_cog('Users').has_userflag(user, 'partner'):
+        if 'partner' in userflags:
             liste2.append('partner')
-        if await self.bot.get_cog('Users').has_userflag(user, 'premium'):
+        if 'premium' in userflags:
             liste2.append('premium')
-        if await self.has_blurple_card(user, 19):
+        unlocked: list = await self.bot.get_cog('Users').get_rankcards(user)
+        if 'blurple_19' in unlocked:
             liste.append('blurple19')
-        if await self.has_blurple_card(user, 20):
+        if 'blurple_20' in unlocked:
             liste.append('blurple20')
-        if await self.has_rainbow_card(user):
+        if 'rainbow' in unlocked:
             liste.append('rainbow')
-        if await self.has_christmas_card(user):
+        if 'christmas_19' in unlocked:
             liste.append('christmas')
-        if await self.has_halloween_card(user, 20):
+        if 'halloween_20' in unlocked:
             liste.append('halloween20')
         return sorted(liste2)+sorted(liste)
 
