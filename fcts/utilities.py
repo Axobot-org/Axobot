@@ -304,11 +304,6 @@ class Utilities(commands.Cog):
         except:
             pass
 
-    async def remove_markdown(self, txt: str) -> str:
-        for x in ('||', '*', '__', '~~'):
-            txt = txt.replace(x, '')
-        return txt
-
     async def allowed_card_styles(self, user: discord.User):
         """Retourne la liste des styles autorisées pour la carte d'xp de cet utilisateur"""
         liste = ['blue', 'dark', 'green', 'grey', 'orange',

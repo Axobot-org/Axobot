@@ -820,7 +820,7 @@ class Xp(commands.Cog):
                 except discord.NotFound:
                     user = await self.bot._(ctx.channel,'xp','del-user')
             if isinstance(user, discord.User):
-                user_name = await self.bot.cogs['Utilities'].remove_markdown(user.name.replace('|',''))
+                user_name = discord.utils.escape_markdown(user.name)
                 if len(user_name) > 18:
                     user_name = user_name[:15]+'...'
             else:
