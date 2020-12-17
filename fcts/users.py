@@ -1,19 +1,65 @@
+from classes import zbot, MyContext, UserFlag, RankCardsFlag
 from discord.ext import commands
 import importlib
 import typing
 import json
 import time
+import discord
+from typing import List
 
 from fcts import args, checks
 importlib.reload(args)
 importlib.reload(checks)
-from classes import zbot, MyContext
+
 
 class Users(commands.Cog):
 
     def __init__(self, bot: zbot):
         self.bot = bot
         self.file = 'users'
+
+    async def get_userflags(self, user: discord.User) -> List[str]:
+        """Check what user flags has a user"""
+        parameters = None
+        try:
+            if cog := self.bot.get_cog("Utilities"):
+                get_data = cog.get_db_userinfo
+            else:
+                return False
+            parameters = await get_data(criters=["userID="+str(user.id)], columns=['user_flags'])
+        except Exception as e:
+            await self.bot.cogs["Errors"].on_error(e, None)
+        if parameters is None:
+            return []
+        return UserFlag.intToFlags(parameters['user_flags'])
+
+    async def has_userflag(self, user: discord.User, flag: str) -> bool:
+        """Check if a user has a specific user flag"""
+        if flag not in UserFlag.FLAGS.values():
+            return False
+        return flag in await self.get_userflags(user)
+    
+    async def get_rankcards(self, user: discord.User) -> List[str]:
+        """Check what rank cards got unlocked by a user"""
+        parameters = None
+        try:
+            if cog := self.bot.get_cog("Utilities"):
+                get_data = cog.get_db_userinfo
+            else:
+                return False
+            parameters = await get_data(criters=["userID="+str(user.id)], columns=['rankcards_unlocked'])
+        except Exception as e:
+            await self.bot.cogs["Errors"].on_error(e, None)
+        if parameters is None:
+            return False
+        return RankCardsFlag.intToFlags(parameters['rankcards_unlocked'])
+
+    async def has_rankcard(self, user: discord.User, rankcard: str) -> bool:
+        """Check if a user has unlocked a specific rank card"""
+        if rankcard not in RankCardsFlag.FLAGS.values():
+            return False
+        return rankcard in await self.get_rankcards(user)
+
 
     @commands.group(name='profile')
     async def profile_main(self, ctx: MyContext):
