@@ -1175,14 +1175,15 @@ Servers:
         t = await self.bot._(ctx.channel,'infos','usernames-title',u=user.name)
         # Embed creation
         if ctx.can_send_embed:
+            MAX = 28
             date = ""
             desc = None
             f = list()
             if len(global_list) > 0:
             # Usernames part
                 temp = [x['new'] for x in global_list if x['new']!='']
-                if len(temp) > 30:
-                    temp = temp[:30] + [await self.bot._(ctx.channel, 'infos', 'usernames-more', nbr=len(temp)-30)]
+                if len(temp) > MAX:
+                    temp = temp[:MAX] + [await self.bot._(ctx.channel, 'infos', 'usernames-more', nbr=len(temp)-MAX)]
                 f.append({'name':await self.bot._(ctx.channel,'infos','usernames-global'), 'value':"\n".join(temp)})
                 # if global_list[-1]['old'] != '':
                 #     f[-1]["value"] += "\n" + global_list[-1]['old']
@@ -1190,8 +1191,8 @@ Servers:
             if len(this_guild) > 0:
             # Nicknames part
                 temp = [x['new'] for x in this_guild if x['new']!='']
-                if len(temp) > 30:
-                    temp = temp[:30] + [await self.bot._(ctx.channel, 'infos', 'usernames-more', nbr=len(temp)-30)]
+                if len(temp) > MAX:
+                    temp = temp[:MAX] + [await self.bot._(ctx.channel, 'infos', 'usernames-more', nbr=len(temp)-MAX)]
                 f.append({'name':await self.bot._(ctx.channel,'infos','usernames-local'), 'value':"\n".join(temp)})
                 # if this_guild[-1]['old'] != '':
                 #     f[-1]["value"] += "\n" + this_guild[-1]['old']
@@ -1213,7 +1214,21 @@ Servers:
             await ctx.send(embed=emb)
         # Raw text creation
         else:
-            await ctx.send(results)
+            MAX = 25
+            text = ""
+            if len(global_list) > 0:
+                temp = [x['new'] for x in global_list if x['new']!='']
+                if len(temp) > MAX:
+                    temp = temp[:MAX] + [await self.bot._(ctx.channel, 'infos', 'usernames-more', nbr=len(temp)-MAX)]
+                text += "**" + await self.bot._(ctx.channel,'infos','usernames-global') + "**\n" + "\n".join(temp)
+            if len(this_guild) > 0:
+                if len(text) > 0:
+                    text += "\n\n"
+                temp = [x['new'] for x in this_guild if x['new']!='']
+                if len(temp) > MAX:
+                    temp = temp[:MAX] + [await self.bot._(ctx.channel, 'infos', 'usernames-more', nbr=len(temp)-MAX)]
+                text += "**" + await self.bot._(ctx.channel,'infos','usernames-local') + "**\n" + "\n".join(temp)
+            await ctx.send(text)
 
 
 def setup(bot):
