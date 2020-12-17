@@ -55,17 +55,18 @@ class Info(commands.Cog):
         """Count the number of lines for the whole project"""
         count = 0
         try:
-            with open('start.py','r') as file:
-                for line in file.read().split("\n"):
-                    if len(line.strip())>2 and line[0]!='#':
-                        count += 1
-            for file in [x.file for x in self.bot.cogs.values()]+['args','checks']:
-                with open('fcts/'+file+'.py','r') as file:
+            for filename in ['start.py', 'classes.py']:
+                with open(filename, 'r') as file:
                     for line in file.read().split("\n"):
-                        if len(line.strip())>2 and line[0]!='#':
+                        if len(line.strip()) > 2 and line[0] != '#':
+                            count += 1
+            for filename in [x.file for x in self.bot.cogs.values()]+['args', 'checks']:
+                with open('fcts/'+filename+'.py', 'r') as file:
+                    for line in file.read().split("\n"):
+                        if len(line.strip()) > 2 and line[0] != '#':
                             count += 1
         except Exception as e:
-            await self.bot.cogs['Errors'].on_error(e,None)
+            await self.bot.cogs['Errors'].on_error(e, None)
         self.codelines = count
         return count
 
