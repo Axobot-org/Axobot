@@ -20,6 +20,7 @@ class Welcomer(commands.Cog):
             await self.send_msg(member,"welcome")
             self.bot.loop.create_task(self.give_roles(member))
             await self.give_roles_back(member)
+            await self.check_muted(member)
         if member.guild.id==356067272730607628:
             await self.check_owner_server(member)
             await self.check_support(member)
@@ -105,6 +106,19 @@ class Welcomer(commands.Cog):
         xp = await self.bot.cogs['Xp'].bdd_get_xp(member.id, None if used_xp_type == 0 else member.guild.id)
         if xp is not None and len(xp) == 1:
             await self.bot.cogs['Xp'].give_rr(member,(await self.bot.cogs['Xp'].calc_level(xp[0]['xp'],used_xp_type))[0],await self.bot.cogs['Xp'].rr_list_role(member.guild.id))
+    
+    async def check_muted(self, member: discord.Member):
+        """Give the muted role to that user if needed"""
+        modCog = self.bot.get_cog("Moderation")
+        if not modCog or not self.bot.database_online:
+            return
+        if await modCog.is_muted(member.guild.id, member.id):
+            role = await modCog.get_muted_role(member.guild)
+            if role:
+                try:
+                    await member.add_roles(role)
+                except discord.Forbidden:
+                    pass
 
 
     async def kick(self, member: discord.Member, reason: str):

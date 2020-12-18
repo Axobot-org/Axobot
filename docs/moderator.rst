@@ -34,6 +34,8 @@ The duration of the tempmute is quite flexible: use :code:`XXd` for days, :code:
 
 .. warning:: The muted role must be placed below the bot role, and the bot must have "`Manage roles <perms.html#manage-roles>`_" (to give the role) permission.
 
+.. note:: Zbot remembers when a member is muted in your server, and only erases this information when someone uses the !unmute command. So, if a member tries to lose his "muted" role by leaving and joining the server, Zbot will give him back his role, even if you removed it manually (without the command)!
+
 **Syntax:** :code:`unmute <user>`
 
 This command unmutes a member, when they already have the muted role. Not necessary when you had specified a duration during the mute, unless you want to stop it prematurely.
