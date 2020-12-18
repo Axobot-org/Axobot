@@ -215,8 +215,7 @@ Slowmode works up to one message every 6h (21600s)
             caseID = "'Unsaved'"
             if self.bot.database_online:
                 Cases = self.bot.cogs['Cases']
-                caseIDs = await Cases.get_ids()
-                case = Cases.Case(bot=self.bot,guildID=ctx.guild.id,memberID=user.id,Type="kick",ModID=ctx.author.id,Reason=reason,date=datetime.datetime.now()).create_id(caseIDs)
+                case = Cases.Case(bot=self.bot,guildID=ctx.guild.id,memberID=user.id,Type="kick",ModID=ctx.author.id,Reason=reason,date=datetime.datetime.now())
                 try:
                     await Cases.add_case(case)
                     caseID = case.id
@@ -272,8 +271,7 @@ Slowmode works up to one message every 6h (21600s)
             message = await self.bot.cogs["Utilities"].clear_msg(message,everyone = not ctx.channel.permissions_for(ctx.author).mention_everyone)
             if self.bot.database_online:
                 Cases = self.bot.cogs['Cases']
-                caseIDs = await Cases.get_ids()
-                case = Cases.Case(bot=self.bot,guildID=ctx.guild.id,memberID=user.id,Type="warn",ModID=ctx.author.id,Reason=message,date=datetime.datetime.now()).create_id(caseIDs)
+                case = Cases.Case(bot=self.bot,guildID=ctx.guild.id,memberID=user.id,Type="warn",ModID=ctx.author.id,Reason=message,date=datetime.datetime.now())
                 caseID = "'Unsaved'"
                 try:
                     await Cases.add_case(case)
@@ -301,13 +299,24 @@ Slowmode works up to one message every 6h (21600s)
         return guild.get_role(opt)
 
     async def mute_event(self, member:discord.Member, author:discord.Member, reason:str, caseID:int, duration:str=None):
+        """Call when someone should be muted in a guild"""
+        # add the muted role
         role = await self.get_muted_role(member.guild)
         await member.add_roles(role,reason=reason)
+        # send logs in the server modlogs channel
         log = str(await self.bot._(member.guild.id,"logs","mute-on" if duration is None else "tempmute-on")).format(member=member,reason=reason,case=caseID,duration=duration)
         await self.bot.cogs["Events"].send_logs_per_server(member.guild,"mute",log,author)
+        # save in database that the user is muted
+        cnx = self.bot.cnx_frm
+        cursor = cnx.cursor()
+        query = "INSERT IGNORE INTO `mutes` VALUES (%s, %s, CURRENT_TIMESTAMP)"
+        cursor.execute(query, (member.id, member.guild.id))
+        cnx.commit()
+        cursor.close()
 
     async def check_mute_context(self, ctx: MyContext, role: discord.Role, user: discord.Member):
-        if role in user.roles:
+        # if role in user.roles:
+        if await self.is_muted(ctx.guild.id, user.id):
             await ctx.send(await self.bot._(ctx.guild.id,"modo","already-mute"))
             return False
         if not ctx.guild.me.guild_permissions.manage_roles:
@@ -375,11 +384,10 @@ You can also mute this member for a defined duration, then use the following for
             reason = await self.bot.cogs["Utilities"].clear_msg(reason,everyone = not ctx.channel.permissions_for(ctx.author).mention_everyone)
             if self.bot.database_online:
                 Cases = self.bot.cogs['Cases']
-                caseIDs = await Cases.get_ids()
                 if f_duration is None:
-                    case = Cases.Case(bot=self.bot,guildID=ctx.guild.id,memberID=user.id,Type="mute",ModID=ctx.author.id,Reason=reason,date=datetime.datetime.now()).create_id(caseIDs)
+                    case = Cases.Case(bot=self.bot,guildID=ctx.guild.id,memberID=user.id,Type="mute",ModID=ctx.author.id,Reason=reason,date=datetime.datetime.now())
                 else:
-                    case = Cases.Case(bot=self.bot,guildID=ctx.guild.id,memberID=user.id,Type="tempmute",ModID=ctx.author.id,Reason=reason,date=datetime.datetime.now(),duration=duration).create_id(caseIDs)
+                    case = Cases.Case(bot=self.bot,guildID=ctx.guild.id,memberID=user.id,Type="tempmute",ModID=ctx.author.id,Reason=reason,date=datetime.datetime.now(),duration=duration)
                     await self.bot.cogs['Events'].add_task('mute',duration,user.id,ctx.guild.id)
                 try:
                     await Cases.add_case(case)
@@ -411,15 +419,37 @@ You can also mute this member for a defined duration, then use the following for
 
 
     async def unmute_event(self, guild: discord.Guild, user: discord.Member, author: discord.Member):
+        """Call this to unmute someone"""
+        # remove the role
         role = await self.get_muted_role(guild)
         if role is None or not role in user.roles:
-            return
-        if author == guild.me:
+            pass
+        elif author == guild.me:
             await user.remove_roles(role,reason=await self.bot._(guild.id,"logs","d-autounmute"))
         else:
             await user.remove_roles(role,reason=str(await self.bot._(guild.id,"logs","d-unmute")).format(author))
+        # send log in the server modlogs channel
         log = str(await self.bot._(guild.id,"logs","mute-off")).format(member=user)
         await self.bot.cogs["Events"].send_logs_per_server(guild, "mute", log, author)
+        # remove the muted record in the database
+        cnx = self.bot.cnx_frm
+        cursor = cnx.cursor()
+        query = "DELETE IGNORE FROM mutes WHERE userid=%s AND guildid=%s"
+        cursor.execute(query, (user.id, guild.id))
+        cnx.commit()
+        cursor.close()
+    
+    async def is_muted(self, guildID: int, userID: int) -> bool:
+        """Check if a user is currently muted"""
+        if not self.bot.database_online:
+            return False
+        cnx = self.bot.cnx_frm
+        cursor = cnx.cursor(dictionary=True)
+        query = "SELECT COUNT(*) AS count FROM `mutes` WHERE guildid=%s AND userid=%s"
+        cursor.execute(query, (guildID, userID))
+        result: int = list(cursor)[0]['count']
+        cursor.close()
+        return bool(result)
 
     @commands.command(name="unmute")
     @commands.cooldown(5,20, commands.BucketType.guild)
@@ -433,7 +463,8 @@ This will remove the role 'muted' for the targeted member
 
 ..Doc moderator.html#mute-unmute"""
         role = await self.get_muted_role(ctx.guild)
-        if role not in user.roles:
+        # if role not in user.roles:
+        if not await self.is_muted(ctx.guild.id, user.id):
             await ctx.send(await self.bot._(ctx.guild.id,"modo","already-unmute"))
             return
         if role is None:
@@ -541,11 +572,10 @@ The 'days_to_delete' option represents the number of days worth of messages to d
             caseID = "'Unsaved'"
             if self.bot.database_online:
                 Cases = self.bot.cogs['Cases']
-                caseIDs = await Cases.get_ids()
                 if f_duration is None:
-                    case = Cases.Case(bot=self.bot,guildID=ctx.guild.id,memberID=user.id,Type="ban",ModID=ctx.author.id,Reason=reason,date=datetime.datetime.now()).create_id(caseIDs)
+                    case = Cases.Case(bot=self.bot,guildID=ctx.guild.id,memberID=user.id,Type="ban",ModID=ctx.author.id,Reason=reason,date=datetime.datetime.now())
                 else:
-                    case = Cases.Case(bot=self.bot,guildID=ctx.guild.id,memberID=user.id,Type="tempban",ModID=ctx.author.id,Reason=reason,date=datetime.datetime.now(),duration=duration).create_id(caseIDs)
+                    case = Cases.Case(bot=self.bot,guildID=ctx.guild.id,memberID=user.id,Type="tempban",ModID=ctx.author.id,Reason=reason,date=datetime.datetime.now(),duration=duration)
                     await self.bot.cogs['Events'].add_task('ban',duration,user.id,ctx.guild.id)
                 try:
                     await Cases.add_case(case)
@@ -610,8 +640,7 @@ The 'days_to_delete' option represents the number of days worth of messages to d
             caseID = "'Unsaved'"
             if self.bot.database_online:
                 Cases = self.bot.cogs['Cases']
-                caseIDs = await Cases.get_ids()
-                case = Cases.Case(bot=self.bot,guildID=ctx.guild.id,memberID=user.id,Type="unban",ModID=ctx.author.id,Reason=reason,date=datetime.datetime.now()).create_id(caseIDs)
+                case = Cases.Case(bot=self.bot,guildID=ctx.guild.id,memberID=user.id,Type="unban",ModID=ctx.author.id,Reason=reason,date=datetime.datetime.now())
                 try:
                     await Cases.add_case(case)
                     caseID = case.id
@@ -669,8 +698,7 @@ Permissions for using this command are the same as for the kick
             caseID = "'Unsaved'"
             if self.bot.database_online:
                 Cases = self.bot.cogs['Cases']
-                caseIDs = await Cases.get_ids()
-                case = Cases.Case(bot=self.bot,guildID=ctx.guild.id,memberID=user.id,Type="softban",ModID=ctx.author.id,Reason=reason,date=datetime.datetime.now()).create_id(caseIDs)
+                case = Cases.Case(bot=self.bot,guildID=ctx.guild.id,memberID=user.id,Type="softban",ModID=ctx.author.id,Reason=reason,date=datetime.datetime.now())
                 try:
                     await Cases.add_case(case)
                     caseID = case.id
