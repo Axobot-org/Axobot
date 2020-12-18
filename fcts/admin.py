@@ -14,14 +14,12 @@ import io
 import textwrap
 import copy
 import operator
-import requests
-import random
 import mysql
 import json
 from contextlib import redirect_stdout
 from glob import glob
 from fcts import reloads
-from classes import zbot, MyContext
+from classes import zbot, MyContext, UserFlag
 
 
 def cleanup_code(content):
@@ -588,28 +586,31 @@ Cette option affecte tous les serveurs"""
     
     @main_msg.command(name="flag")
     @commands.check(reloads.check_admin)
-    async def admin_flag(self,ctx:MyContext,add:str,flag:str,users:commands.Greedy[discord.User]):
+    async def admin_flag(self, ctx:MyContext, add:str, flag:str, users:commands.Greedy[discord.User]):
         """Ajoute ou retire un attribut à un utilisateur
         
         Flag valides : support, premium, contributor, partner, unlocked_rainbow, unlocked_blurple"""
-        if add not in ['add','remove']:
+        if add not in ['add', 'remove']:
             return await ctx.send("Action invalide")
         for user in users:
-            try:
-                info = await self.bot.cogs['Utilities'].get_db_userinfo(columns=[flag],criters=[f'userID={user.id}'])
-            except mysql.connector.errors.ProgrammingError:
-                return await ctx.send("Flag invalide")
-            except Exception as e:
-                return await self.bot.cogs['Errors'].on_error(e,ctx)
-            if info is not None:
-                if info[flag] and add=='add':
-                    return await ctx.send(f"L'utilisateur {user} a déjà ce flag")
-                if (not info[flag]) and add=='remove':
+            if flag not in UserFlag.FLAGS.values():
+                await ctx.send("Flag invalide")
+                return
+            userflags: list = await self.bot.get_cog("Users").get_userflags(user)
+            if userflags:
+                if flag in userflags and add == 'add':
+                    await ctx.send(f"L'utilisateur {user} a déjà ce flag")
+                    return
+                if flag not in userflags and add == 'remove':
                     return await ctx.send(f"L'utilisateur {user} n'a pas ce flag")
-            await self.bot.cogs['Utilities'].change_db_userinfo(user.id,flag,'1' if add=="add" else '0')
-            if add=="add":
+            if add == "add":
+                userflags.append(flag)
+            else:
+                userflags.remove(flag)
+            await self.bot.cogs['Utilities'].change_db_userinfo(user.id, 'user_flags', UserFlag().flagsToInt(userflags))
+            if add == "add":
                 await ctx.send(f"L'utilisateur {user} a maintenant le flag `{flag}`",delete_after=3.0)
-            elif add=="remove":
+            elif add == "remove":
                 await ctx.send(f"L'utilisateur {user} n'a plus le flag `{flag}`",delete_after=3.0)
             try:
                 await ctx.message.detele()
