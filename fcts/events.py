@@ -106,11 +106,15 @@ class Events(commands.Cog):
     async def on_guild_join(self, guild: discord.Guild):
         """Called when the bot joins a guild"""
         await self.send_guild_log(guild,"join")
+        if guild.owner:
+            await self.check_owner_server(guild.owner)
 
     @commands.Cog.listener()
     async def on_guild_remove(self, guild: discord.Guild):
         """Called when the bot left a guild"""
         await self.send_guild_log(guild,"left")
+        if guild.owner:
+            await self.check_owner_server(guild.owner)
 
     async def send_guild_log(self, guild: discord.Guild, Type: str):
         """Send a log to the logging channel when the bot joins/leave a guild"""
@@ -208,6 +212,24 @@ class Events(commands.Cog):
         # d = datetime.datetime.utcnow() - (await msg.channel.history(limit=2).flatten())[1].created_at
         # if d.total_seconds() > 600:
         await msg.channel.send(await self.bot._(msg.channel,"events","mp-adv"))
+
+    async def check_owner_server(self, owner: discord.User):
+        """Check if a server owner should get/loose the server owner role in support server"""
+        guild = self.bot.get_guild(356067272730607628)
+        if not guild:
+            return
+        member = guild.get_member(owner.id)
+        if not member:
+            return
+        role = guild.get_role(486905171738361876)
+        if not role:
+            self.bot.log.warn('[check_owner_server] Owner role not found')
+            return
+        guilds_owned = [x for x in self.bot.guilds if x.owner ==owner and x.member_count > 10]
+        if len(guilds_owned) > 0 and role not in member.roles:
+            await member.add_roles(role, reason="This user support me")
+        elif len(guilds_owned) == 0 and role in member.roles:
+            await member.remove_roles(role, reason="This user doesn't support me anymore")
 
 
     async def send_logs_per_server(self, guild: discord.Guild, Type:str, message: str, author: discord.User=None):
