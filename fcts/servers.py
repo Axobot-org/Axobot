@@ -9,7 +9,7 @@ from discord.ext import commands
 from math import ceil
 
 roles_options = ["clear","slowmode","mute","kick","ban","warn","say","welcome_roles","muted_role",'partner_role','update_mentions','verification_role','voice_roles']
-bool_options = ["enable_xp","anti_caps_lock","enable_fun","help_in_dm"]
+bool_options = ["enable_xp","anti_caps_lock","enable_fun","help_in_dm","compress_help"]
 textchan_options = ["welcome_channel","bot_news","poll_channels","modlogs_channel","noxp_channels","partner_channel"]
 vocchan_options = ["membercounter","voice_channel"]
 category_options = ["voice_category"]
@@ -78,8 +78,9 @@ class Servers(commands.Cog):
                'voice_roles':'',
                'voice_channel':'',
                'voice_category':'',
-               'voice_channel_format':'{random}'}
-        self.optionsList = ["prefix","language","description","clear","slowmode","mute","kick","ban","warn","say","welcome_channel","welcome","leave","welcome_roles","bot_news","update_mentions","poll_channels","partner_channel","partner_color","partner_role","modlogs_channel","verification_role","enable_xp","levelup_msg","levelup_channel","noxp_channels","xp_rate","xp_type","anti_caps_lock","enable_fun","membercounter","anti_raid","vote_emojis","morpion_emojis","help_in_dm","muted_role","voice_roles","voice_channel","voice_category","voice_channel_format"]
+               'voice_channel_format':'{random}',
+               'compress_help':0}
+        self.optionsList = ["prefix","language","description","clear","slowmode","mute","kick","ban","warn","say","welcome_channel","welcome","leave","welcome_roles","bot_news","update_mentions","poll_channels","partner_channel","partner_color","partner_role","modlogs_channel","verification_role","enable_xp","levelup_msg","levelup_channel","noxp_channels","xp_rate","xp_type","anti_caps_lock","enable_fun","membercounter","anti_raid","vote_emojis","morpion_emojis","help_in_dm","compress_help","muted_role","voice_roles","voice_channel","voice_category","voice_channel_format"]
         self.membercounter_pending = {}
 
     @commands.Cog.listener()

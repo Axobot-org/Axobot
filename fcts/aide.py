@@ -100,14 +100,18 @@ If the bot can't send the new command format, it will try to send the old one.""
                 destination) == discord.DMChannel else destination.guild.me
             title = ""
             categ_name = [k for k, v in (await self.bot._(ctx.channel, "aide", "categories")).items() if v.lower() == " ".join(commands).lower()]
-            if len(categ_name) == 1:
-                temp = [
-                    c for c in self.bot.commands if c.name in self.commands_list[categ_name[0]]]
+            if len(categ_name) == 1: # cog name
+                if categ_name[0] == "unclassed":
+                    referenced_commands = {x for v in self.commands_list.values() for x in v}
+                    temp = [c for c in self.bot.commands if c.name not in referenced_commands]
+                else:
+                    temp = [c for c in self.bot.commands if c.name in self.commands_list[categ_name[0]]]
                 pages = await self.all_commands(ctx, sorted(temp, key=self.sort_by_name))
-            elif len(commands) == 0:  # aucune commande
-                pages = await self.all_commands(ctx, sorted([c for c in self.bot.commands], key=self.sort_by_name))
+            elif len(commands) == 0:  # no command
+                compress = await self.bot.get_config(ctx.guild, 'compress_help')
+                pages = await self.all_commands(ctx, sorted([c for c in self.bot.commands], key=self.sort_by_name), compress=compress)
                 title = await self.bot._(ctx.channel, "aide", "embed_title", u=str(ctx.author))
-            elif len(commands) == 1:  # Nom de commande unique ?
+            elif len(commands) == 1:  # Unique command name?
                 name = self._mention_pattern.sub(repl, commands[0])
                 command = None
                 if name in self.bot.cogs:
@@ -116,14 +120,13 @@ If the bot can't send the new command format, it will try to send the old one.""
                 else:
                     command = self.bot.all_commands.get(name)
                     if command is None:
-                        # name = name.replace("@everyone","@"+u"\u200B"+"everyone").replace("@here","@"+u"\u200B"+"here")
                         ctx2 = copy.copy(ctx)
                         ctx2.message.content = name
                         name = await discord.ext.commands.clean_content().convert(ctx2, name)
                         await destination.send(str(await self.bot._(ctx.channel, "aide", "cmd-not-found")).format(name))
                         return
                     pages = await self.cmd_help(ctx, command, destination.permissions_for(me).embed_links)
-            else:  # nom de sous-commande ?
+            else:  # sub-command name?
                 name = self._mention_pattern.sub(repl, commands[0])
                 command = self.bot.all_commands.get(name)
                 if command is None:
@@ -185,7 +188,7 @@ If the bot can't send the new command format, it will try to send the old one.""
     def sort_by_name(self, cmd: commands.Command) -> str:
         return cmd.name
 
-    async def all_commands(self, ctx: MyContext, cmds: List[commands.Command]):
+    async def all_commands(self, ctx: MyContext, cmds: List[commands.Command], compress: bool = False):
         """Create pages for every bot command"""
         categories = {x: list() for x in self.commands_list.keys()}
         for cmd in cmds:
@@ -210,26 +213,34 @@ If the bot can't send the new command format, it will try to send the old one.""
                 categories['unclassed'].append(temp)
         tr = await self.bot._(ctx.channel, "aide", "categories")
         answer = list()
-        for k, v in categories.items():
-            if len(v) == 0:
-                continue
-            if len("\n".join(v)) > 1020:
-                temp = list(v)
-                v = list()
-                i = 1
-                for line in temp:
-                    if len("\n".join(v+[line])) > 1020:
-                        title = tr[k]+' - ' + \
-                            str(i) if k in tr else k+' - '+str(i)
-                        answer.append(
-                            ("__**"+title.capitalize()+"**__", "\n".join(v)))
-                        v = list()
-                        i += 1
-                    v.append(line)
-                title = tr[k]+' - '+str(i) if k in tr else k+' - '+str(i)
-                answer.append(("__**"+title.capitalize()+"**__", "\n".join(v)))
-            else:
-                answer.append(("__**"+tr[k].capitalize()+"**__", "\n".join(v)))
+        if compress:
+            pass
+            for k, v in categories.items():
+                if len(v) == 0:
+                    continue
+                title = "__**"+tr.get(k, k).capitalize()+"**__"
+                count = await self.bot._(ctx.channel, "aide", "cmd-count", nbr=len(v))
+                answer.append((title, count))
+        else:
+            for k, v in categories.items():
+                if len(v) == 0:
+                    continue
+                if len("\n".join(v)) > 1020:
+                    temp = list(v)
+                    v = list()
+                    i = 1
+                    for line in temp:
+                        if len("\n".join(v+[line])) > 1020:
+                            title = (tr[k]+' - ' + str(i)) if k in tr else (k+' - '+str(i))
+                            answer.append(("__**"+title.capitalize()+"**__", "\n".join(v)))
+                            v = list()
+                            i += 1
+                        v.append(line)
+                    title = (tr[k]+' - ' + str(i)) if k in tr else (k+' - '+str(i))
+                    answer.append(("__**"+title.capitalize()+"**__", "\n".join(v)))
+                else:
+                    title = tr.get(k, k)
+                    answer.append(("__**"+title.capitalize()+"**__", "\n".join(v)))
         return answer
 
     async def cog_commands(self, ctx: MyContext, cog: commands.Cog):

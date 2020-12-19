@@ -89,6 +89,7 @@ List of every option
 * vote_emojis: List of emojis that the bot will have to use when there is a voting message. This case may occur when using the vote command, or in a poll channel.
 * morpion_emojis: List of emojis used to play on tic-tac-toe. Two emojis must be entered: one for the bot, and one for the player. Discord emojis as well as server emojis can work.
 * help_in_dm: Boolean indicating whether the help command message should be sent as a private message, or in the server. If the value is set to :code:`True`, the message will be sent in DM.
+* compress_help: Boolean indicating whether the full help message (without any specified command/module) should show every command or only their count
 * muted_role: Role used to mute your members. If no role is specified, Zbot will check for any role called "muted", and create one if needed, with basic permissions.
 * partner_channel: One channel where every partners of the server will be displayed. Default to None.
 * partner_color: The color of the partners embeds. Can be hex, integer or common english names. Default to #a713fe.
