@@ -7,7 +7,7 @@ from classes import zbot, MyContext
 
 
 async def is_translator(ctx: MyContext) -> bool:
-    return await ctx.bot.get_cog('Utilities').has_userflag(ctx.author, 'translator')
+    return await ctx.bot.get_cog('Users').has_userflag(ctx.author, 'translator')
 
 async def check_admin(ctx: MyContext):
     return await ctx.bot.get_cog('Admin').check_if_admin(ctx)
