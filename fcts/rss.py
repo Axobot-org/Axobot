@@ -346,53 +346,13 @@ class Rss(commands.Cog):
         """Delete an rss feed from the list
         
         ..Doc rss.html#delete-a-followed-feed"""
-        flow = []
-        if ID is not None:
-            flow = await self.get_flow(ID)
-            if flow == []:
-                ID = None
-            elif str(flow[0]['guild']) != str(ctx.guild.id):
-                ID = None
-        if ID is None:
-            userID = ctx.author.id
-            gl = await self.get_guild_flows(ctx.guild.id)
-            if len(gl) == 0:
-                await ctx.send(await self.bot._(ctx.guild.id,"rss","no-feed"))
-                return
-            text = [await self.bot._(ctx.guild.id,'rss','list2')]
-            list_of_IDs = list()
-            for e,x in enumerate(gl):
-                list_of_IDs.append(x['ID'])
-                c = self.bot.get_channel(x['channel'])
-                if c is not None:
-                    c = c.mention
-                else:
-                    c = x['channel']
-                MAX = e+1
-                if len("\n".join(text)) > 1950:
-                    embed = self.bot.get_cog("Embeds").Embed(title=await self.bot._(ctx.guild.id,"rss","choose-delete"), color=self.embed_color, desc="\n".join(text), time=ctx.message.created_at)
-                    await embed.create_footer(ctx)
-                    emb_msg = await ctx.send(embed=embed)
-                    text = [await self.bot._(ctx.guild.id,'rss','list2')]
-                text.append("{}) {} - {} - {}".format(e+1,await self.bot._(ctx.guild.id,'rss',x['type']),x['link'],c))
-            if len(text) > 0:
-                embed = self.bot.get_cog("Embeds").Embed(title=await self.bot._(ctx.guild.id,"rss","choose-delete"), color=self.embed_color, desc="\n".join(text), time=ctx.message.created_at)
-                await embed.create_footer(ctx)
-                emb_msg = await ctx.send(embed=embed)
-            def check(msg):
-                if not msg.content.isnumeric():
-                    return False
-                return msg.author.id==userID and int(msg.content) in range(1,MAX+1)
-            try:
-                msg = await self.bot.wait_for('message',check=check,timeout=20.0)
-            except asyncio.TimeoutError:
-                await ctx.send(await self.bot._(ctx.guild.id,"rss","too-long"))
-                await self.bot.cogs['Utilities'].suppr(emb_msg)
-                return
-            flow = await self.get_flow(list_of_IDs[int(msg.content)-1])
-        if len(flow) == 0:
-            await ctx.send(await self.bot._(ctx.guild,"rss","fail-add"))
-            await self.bot.cogs["Errors"].on_error(e,ctx)
+        flow = await self.askID(ID,
+                                ctx,
+                                await self.bot._(ctx.guild.id, "rss", "choose-delete"),
+                                allow_mc=True,
+                                display_mentions=False
+                                )
+        if flow is None:
             return
         try:
             await self.remove_flow(flow[0]['ID'])
@@ -447,13 +407,16 @@ class Rss(commands.Cog):
                 embed.add_field(name="\uFEFF", value=x, inline=False)
             await ctx.send(embed=embed)
 
-    async def askID(self, ID, ctx: MyContext):
+    async def askID(self, ID, ctx: MyContext, title:str, allow_mc: bool=False, display_mentions: bool=True):
         """Demande l'ID d'un flux rss"""
+        flow = list()
         if ID is not None:
             flow = await self.get_flow(ID)
             if flow == []:
                 ID = None
-            elif str(flow[0]['guild']) != str(ctx.guild.id) or flow[0]['type']=='mc':
+            elif str(flow[0]['guild']) != str(ctx.guild.id):
+                ID = None
+            elif (not allow_mc) and flow[0]['type']=='mc':
                 ID = None
         userID = ctx.author.id
         if ID is None:
@@ -461,50 +424,73 @@ class Rss(commands.Cog):
             if len(gl) == 0:
                 await ctx.send(await self.bot._(ctx.guild.id,"rss","no-feed"))
                 return
-            text = [await self.bot._(ctx.guild.id,'rss','list')]
+            if display_mentions:
+                text = [await self.bot._(ctx.guild.id, 'rss', 'list')]
+            else:
+                text = [await self.bot._(ctx.guild.id, 'rss', 'list2')]
             list_of_IDs = list()
             iterator = 1
+            translations = dict()
             for x in gl:
-                if x['type']=='mc':
+                if (not allow_mc) and x['type'] == 'mc':
                     continue
+                if x['type'] == 'tw' and x['link'].isnumeric():
+                    try:
+                        x['link'] = self.twitterAPI.GetUser(user_id=int(x['link'])).screen_name
+                    except twitter.TwitterError as e:
+                        pass
                 list_of_IDs.append(x['ID'])
                 c = self.bot.get_channel(x['channel'])
                 if c is not None:
                     c = c.mention
                 else:
                     c = x['channel']
-                if x['roles'] == '':
-                    r = await self.bot._(ctx.guild.id,"keywords","none")
+                Type = translations.get(x['type'], await self.bot._(ctx.guild.id,'rss', x['type']))
+                if display_mentions:
+                    if x['roles'] == '':
+                        r = await self.bot._(ctx.guild.id,"keywords","none")
+                    else:
+                        r = list()
+                        for item in x['roles'].split(';'):
+                            role = discord.utils.get(ctx.guild.roles,id=int(item))
+                            if role is not None:
+                                r.append(role.mention)
+                            else:
+                                r.append(item)
+                        r = ", ".join(r)
+                    text.append("{}) {} - {} - {} - {}".format(iterator, Type, x['link'], c, r))
                 else:
-                    r = list()
-                    for item in x['roles'].split(';'):
-                        role = discord.utils.get(ctx.guild.roles,id=int(item))
-                        if role is not None:
-                            r.append(role.mention)
-                        else:
-                            r.append(item)
-                    r = ", ".join(r)
-                text.append("{}) {} - {} - {} - {}".format(iterator,await self.bot._(ctx.guild.id,'rss',x['type']),x['link'],c,r))
+                    text.append("{}) {} - {} - {}".format(iterator, Type, x['link'], c))
                 iterator += 1
             if len("\n".join(text)) < 2048:
                 desc = "\n".join(text)
                 fields = None
             else:
                 desc = text[0].split("\n")[0]
-                fields = [{'name': text[0].split("\n")[-2], 'value': "\n".join(text[i:i+10])} for i in range(1,len(text), 10)]
-            embed = await self.bot.get_cog('Embeds').Embed(title=await self.bot._(ctx.guild.id,"rss","choose-mentions-1"), color=self.embed_color, desc=desc, fields=fields, time=ctx.message.created_at).create_footer(ctx)
+                fields = []
+                field = {'name': text[0].split("\n")[-2], 'value': ''}
+                for line in text[1:]:
+                    if len(field['value'] + line) > 1020:
+                        fields.append(field)
+                        field = {'name': text[0].split("\n")[-2], 'value': ''}
+                    field['value'] += line+"\n"
+                fields.append(field)
+            embed = await self.bot.get_cog('Embeds').Embed(title=title, color=self.embed_color, desc=desc, fields=fields, time=ctx.message.created_at).create_footer(ctx)
             emb_msg = await ctx.send(embed=embed)
             def check(msg):
                 if not msg.content.isnumeric():
                     return False
                 return msg.author.id==userID and int(msg.content) in range(1,iterator)
             try:
-                msg = await self.bot.wait_for('message', check = check, timeout = max(10, 1.5*len(text)))
+                msg = await self.bot.wait_for('message', check = check, timeout = max(20, 1.5*len(text)))
             except asyncio.TimeoutError:
-                await ctx.send(await self.bot._(ctx.guild.id,"rss","too-long"))
+                await ctx.send(await self.bot._(ctx.guild.id, "rss", "too-long"))
                 await self.bot.cogs['Utilities'].suppr(emb_msg)
                 return
             flow = await self.get_flow(list_of_IDs[int(msg.content)-1])
+        if len(flow) == 0:
+            await ctx.send(await self.bot._(ctx.guild, "rss", "fail-add"))
+            return
         return flow
 
     def parse_output(self, arg):
@@ -533,7 +519,9 @@ class Rss(commands.Cog):
         ..Doc rss.html#mention-a-role"""
         try:
             # ask for flow ID
-            flow = await self.askID(ID,ctx)
+            flow = await self.askID(ID,
+                                    ctx,
+                                    await self.bot._(ctx.guild.id,"rss","choose-mentions-1"))
         except Exception as e:
             flow = []
             await self.bot.cogs["Errors"].on_error(e,ctx)
@@ -644,7 +632,7 @@ class Rss(commands.Cog):
     @commands.guild_only()
     @commands.check(can_use_rss)
     @commands.check(checks.database_connected)
-    async def move_guild_flow(self,ctx:MyContext,ID:typing.Optional[int]=None,channel:discord.TextChannel=None):
+    async def move_guild_flow(self, ctx:MyContext, ID:typing.Optional[int]=None, channel:discord.TextChannel=None):
         """Move a rss feed in another channel
         
         ..Doc rss.html#move-a-feed"""
@@ -652,7 +640,9 @@ class Rss(commands.Cog):
             if channel is None:
                 channel = ctx.channel
             try:
-                flow = await self.askID(ID,ctx)
+                flow = await self.askID(ID,
+                                        ctx,
+                                        await self.bot._(ctx.guild.id, "rss", "choose-mentions-1"))
                 e = None
             except Exception as e:
                 flow = []
@@ -679,7 +669,9 @@ class Rss(commands.Cog):
         ..Doc rss.html#change-the-text"""
         try:
             try:
-                flow = await self.askID(ID,ctx)
+                flow = await self.askID(ID,
+                                        ctx,
+                                        await self.bot._(ctx.guild.id, "rss", "choose-mentions-1"))
             except Exception as e:
                 flow = []
             if flow is None:
@@ -719,17 +711,16 @@ class Rss(commands.Cog):
         
         ..Doc rss.html#setup-a-feed-embed"""
         try:
+            e = None
             try:
-                flow = await self.askID(ID,ctx)
+                flow = await self.askID(ID,
+                                        ctx,
+                                        await self.bot._(ctx.guild.id, "rss", "choose-mentions-1"))
             except Exception as e:
                 flow = []
                 await self.bot.cogs["Errors"].on_error(e,ctx)
             if flow is None:
                 return
-            try:
-                e
-            except UnboundLocalError:
-                e = None
             if len(flow) == 0:
                 await ctx.send(await self.bot._(ctx.guild,"rss","fail-add"))
                 if e is not None:
@@ -882,7 +873,12 @@ class Rss(commands.Cog):
         if match is None:
             return None
         else:
-            return match.group(1)
+            name = match.group(1)
+            try:
+                user = self.twitterAPI.GetUser(screen_name=name)
+            except twitter.TwitterError:
+                return None
+            return user.id
     
     async def parse_twitch_url(self, url):
         r = r'(?:http.*://)?(?:www.)?(?:twitch.tv/)([^?\s]+)'
@@ -921,7 +917,7 @@ class Rss(commands.Cog):
         else:
             liste = list()
             for feed in feeds.entries:
-                if 'published_parsed' not in feed or (datetime.datetime(*feed['published_parsed'][:6]) - date).total_seconds() <= self.min_time_between_posts['yw']:
+                if 'published_parsed' not in feed or (datetime.datetime(*feed['published_parsed'][:6]) - date).total_seconds() <= self.min_time_between_posts['yt']:
                     break
                 img_url = None
                 if 'media_thumbnail' in feed.keys() and len(feed['media_thumbnail']) > 0:
@@ -934,7 +930,11 @@ class Rss(commands.Cog):
 
     async def get_tw_official(self, nom:str, count:int=None):
         try:
-            return [x for x in self.twitterAPI.GetUserTimeline(screen_name=nom,exclude_replies=True,trim_user=True,count=count)]
+            if nom.isnumeric():
+                timeline = self.twitterAPI.GetUserTimeline(user_id=int(nom), exclude_replies=True, trim_user=True, count=count)
+            else:
+                timeline = self.twitterAPI.GetUserTimeline(screen_name=nom, exclude_replies=True, trim_user=True, count=count)
+            return [x for x in timeline]
         except twitter.error.TwitterError as e:
             if str(e) == "Not authorized.":
                 self.bot.log.warn(f"[rss] Unable to reach channel {nom}: Not authorized")
@@ -1014,11 +1014,16 @@ class Rss(commands.Cog):
             return liste
 
 
-    async def rss_tw(self, channel: discord.TextChannel, nom: str, date: datetime.datetime=None):
-        if nom == 'help':
+    async def rss_tw(self, channel: discord.TextChannel, name: str, date: datetime.datetime=None):
+        if name == 'help':
             return await self.bot._(channel,"rss","tw-help")
         try:
-            posts = self.twitterAPI.GetUserTimeline(screen_name=nom,exclude_replies=True)
+            if name.isnumeric():
+                posts = self.twitterAPI.GetUserTimeline(user_id=int(name), exclude_replies=True)
+                username = self.twitterAPI.GetUser(user_id=int(name)).screen_name
+            else:
+                posts = self.twitterAPI.GetUserTimeline(screen_name=name, exclude_replies=True)
+                username = name
         except twitter.error.TwitterError as e:
             if e.message == "Not authorized.":
                 return await self.bot._(channel,"rss","nothing")
@@ -1034,7 +1039,7 @@ class Rss(commands.Cog):
             if lastpost.retweeted:
                 rt = "retweet"
             text =  getattr(lastpost, 'full_text', lastpost.text)
-            url = "https://twitter.com/{}/status/{}".format(nom.lower(), lastpost.id)
+            url = "https://twitter.com/{}/status/{}".format(username.lower(), lastpost.id)
             img = None
             if lastpost.media: # if exists and is not empty
                 img = lastpost.media[0].media_url_https
@@ -1058,19 +1063,10 @@ class Rss(commands.Cog):
                 rt = None
                 if post.retweeted:
                     rt = "retweet"
-                url = None
-                if len(post.urls) > 0:
-                    url = post.urls[0].url
-                text =  getattr(post, 'full_text', post.text)
-                r = re.search(r"https://t.co/([^\s]+)", text)
-                if r is not None:
-                    text = text.replace(r.group(0),'')
-                    url = r.group(0)
-                else:
-                    if post.urls == []:
-                        url = "https://twitter.com/{}/status/{}".format(nom.lower(), post.id)
-                    else:
-                        url = post.urls[0].url
+                text = getattr(post, 'full_text', post.text)
+                if r := re.search(r"https://t.co/([^\s]+)", text):
+                    text = text.replace(r.group(0), '')
+                url = "https://twitter.com/{}/status/{}".format(name.lower(), post.id)
                 img = None
                 if post.media: # if exists and is not empty
                     img = post.media[0].media_url_https
