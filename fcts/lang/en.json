@@ -132,6 +132,7 @@
                 "No verification role has been added"
             ]
         },
+        "cmd-count": "{nbr} commands",
         "cmd-not-found": "There is no command named \"{}\"",
         "description": "Description",
         "embed_title": "Available commands for {u}",

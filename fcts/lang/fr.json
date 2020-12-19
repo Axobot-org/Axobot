@@ -132,6 +132,7 @@
                 "Aucun rôle de vérification n'a été configuré"
             ]
         },
+        "cmd-count": "{nbr} commandes",
         "cmd-not-found": "Aucune commande nommée \"{}\"",
         "description": "Description",
         "embed_title": "Liste des commandes disponibles pour {u}",
