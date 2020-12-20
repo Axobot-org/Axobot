@@ -16,7 +16,10 @@ class Timers(commands.Cog):
     async def remindme(self, ctx: MyContext, *, args):
         """Create a new reminder
         This is actually an alias of `reminder create`
-        """
+        
+        ..Example rmd 3h 5min It's pizza time!
+
+        ..Doc miscellaneous.html#create-a-new-reminder"""
         ctx.message.content = ctx.prefix + "reminder create " + args
         new_ctx = await self.bot.get_context(ctx.message)
         await self.bot.invoke(new_ctx)

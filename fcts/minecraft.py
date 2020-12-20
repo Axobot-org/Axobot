@@ -22,7 +22,9 @@ Every information come from the website www.fr-minecraft.net"""
     @commands.command(name="mojang", aliases=['mojang_status'])
     @commands.cooldown(5, 20, commands.BucketType.user)
     async def mojang_status(self, ctx: MyContext):
-        """Get Mojang server status"""
+        """Get Mojang server status
+        
+        ..Doc minecraft.html#mojang"""
         desc = await self.bot._(ctx.channel, "mc", "mojang_desc")
         async with aiohttp.ClientSession() as session:
             async with session.get('https://status.mojang.com/check') as r:
@@ -255,7 +257,11 @@ Every information come from the website www.fr-minecraft.net"""
     
     @mc_main.command(name="advancement",aliases=["advc","progrès"])
     async def mc_advc(self, ctx: MyContext, *, value='help'):
-        """Get info about any advancement"""
+        """Get info about any advancement
+        
+        ..Example mc advc suit up
+
+        ..Doc minecraft.html#mc"""
         if value == 'help':
             await ctx.send(await self.bot._(ctx.channel,"mc","adv-help"))
             return
@@ -287,7 +293,11 @@ Every information come from the website www.fr-minecraft.net"""
     
     @mc_main.command(name="mod")
     async def mc_mod(self, ctx: MyContext, *, value: str='help'):
-        """Get info about any mod registered on CurseForge"""
+        """Get info about any mod registered on CurseForge
+        
+        ..Example mc mod Minecolonies
+        
+        ..Doc minecraft.html#mc"""
         if value == 'help':
             await ctx.send(await self.bot._(ctx.channel, "mc", "mod-help", p=ctx.prefix))
             return
@@ -340,7 +350,11 @@ Every information come from the website www.fr-minecraft.net"""
 
     @mc_main.command(name="server")
     async def mc_server(self, ctx: MyContext, ip:str, port:int=None):
-        """Get infos about any Minecraft server"""
+        """Get infos about any Minecraft server
+
+        ..Example mc server play.gunivers.net
+        
+        ..Doc minecraft.html#mc"""
         if ":" in ip and port is None:
             i = ip.split(":")
             ip, port = i[0], i[1]
@@ -350,7 +364,11 @@ Every information come from the website www.fr-minecraft.net"""
     @mc_main.command(name="add")
     @commands.guild_only()
     async def mc_add_server(self, ctx: MyContext, ip, port:int=None):
-        """Follow a server's info (regularly displayed on this channel)"""
+        """Follow a server's info (regularly displayed on this channel)
+        
+        ..Example mc add mc.hypixel.net
+        
+        ..Doc minecraft.html#mc"""
         if not ctx.bot.database_online:
             return await ctx.send(await self.bot._(ctx.guild.id,"cases","no_database"))
         if ":" in ip and port is None:

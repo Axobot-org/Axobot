@@ -68,7 +68,7 @@ class Library(commands.Cog):
         for key in ['wiki', 'default', 'openl', 'goob']:
             try:
                 i = isbnlib.meta(isbn, service=key)
-            except (isbnlib.dev._exceptions.DataNotFoundAtServiceError, isbnlib.dev._exceptions.ISBNLibHTTPError):
+            except (isbnlib.dev._exceptions.DataNotFoundAtServiceError, isbnlib.dev._exceptions.ISBNLibHTTPError, isbnlib.dev._exceptions.RecordMappingError):
                 continue
             if i is not None and len(i) > 0:
                 info.update({
@@ -92,14 +92,22 @@ class Library(commands.Cog):
 
     @commands.group(name="book", aliases=['bookstore'])
     async def book_main(self, ctx: MyContext):
-        """Search for a book and manage your library"""
+        """Search for a book and manage your library
+        
+        ..Doc miscellaneous.html#book"""
         if ctx.subcommand_passed is None:
             await self.bot.cogs['Help'].help_command(ctx, ['book'])
 
     @book_main.command(name="search", aliases=["book"])
     @commands.cooldown(5, 60, commands.BucketType.guild)
     async def book_search(self, ctx: MyContext, ISBN: typing.Optional[ISBN], *, keywords: str = ''):
-        """Search from a book from its ISBN or search terms"""
+        """Search from a book from its ISBN or search terms
+        
+        ..Example book search Percy Jackson
+
+        ..Example book search 9781119688037
+
+        ..Doc miscellaneous.html#search-by-isbn"""
         keywords = keywords.replace('-', '')
         while '  ' in keywords:
             keywords = keywords.replace('  ', ' ')

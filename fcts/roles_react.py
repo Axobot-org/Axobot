@@ -118,7 +118,9 @@ class RolesReact(commands.Cog):
     @commands.group(name="roles_react", aliases=['role_react'])
     @commands.guild_only()
     async def rr_main(self, ctx):
-        """Manage your roles reactions"""
+        """Manage your roles reactions
+        
+        ..Doc roles-reactions.html"""
         if ctx.subcommand_passed is None:
             await self.bot.cogs['Help'].help_command(ctx, ['roles_react'])
 
@@ -128,7 +130,13 @@ class RolesReact(commands.Cog):
     async def rr_add(self, ctx, emoji: args.anyEmoji, role: discord.Role, *, description: str = ''):
         """Add a role reaction
         This role will be given when a membre click on a specific reaction
-        Your description can only be a maximum of 150 characters"""
+        Your description can only be a maximum of 150 characters
+        
+        ..Example roles_react add :upside_down: "weird users" role for weird members
+        
+        ..Example roles_react add :uwu: lolcats
+        
+        ..Doc roles-reactions.html#add-and-remove-a-reaction"""
         try:
             if role.name == '@everyone':
                 raise commands.BadArgument(f'Role "{role.name}" not found')
@@ -150,7 +158,11 @@ class RolesReact(commands.Cog):
     @commands.check(checks.database_connected)
     @commands.check(checks.has_manage_guild)
     async def rr_remove(self, ctx, emoji):
-        """Remove a role react"""
+        """Remove a role react
+        
+        ..Example roles_react remove :uwu:
+        
+        ..Doc roles-reactions.html#add-and-remove-a-reaction"""
         try:
             # if emoji is a custom one:
             old_emoji = emoji
@@ -196,7 +208,9 @@ class RolesReact(commands.Cog):
     @rr_main.command(name="list")
     @commands.check(checks.database_connected)
     async def rr_list(self, ctx: MyContext):
-        """List every roles reactions of your server"""
+        """List every roles reactions of your server
+        
+        ..Doc roles-reactions.html#list-every-roles-reactions"""
         if not ctx.can_send_embed:
             return await ctx.send(await self.bot._(ctx.guild.id, "fun", "no-embed-perm"))
         try:

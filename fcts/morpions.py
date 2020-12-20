@@ -20,6 +20,8 @@ class Morpions(commands.Cog):
         """A simple mini-game that consists of aligning three chips on a 9-square grid.
     The bot plays in red, the user in blue.
     Use 'tic-tac-toe leave' to make you leave the game if you're stuck in it.
+
+    ..Doc miscellaneous.html#tic-tac-toe
     """
         if leave == 'leave':
             if ctx.author.id not in self.in_game.keys():

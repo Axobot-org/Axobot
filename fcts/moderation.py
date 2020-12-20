@@ -613,7 +613,7 @@ The 'days_to_delete' option represents the number of days worth of messages to d
     async def unban(self, ctx: MyContext, user: str, *, reason="Unspecified"):
         """Unban someone
 
-..Example !unban 486896267788812288 Nice enough
+..Example unban 486896267788812288 Nice enough
 
 ..Doc moderator.html#ban-unban"""
         try:
@@ -847,7 +847,9 @@ You must be an administrator of this server to use this command.
     @commands.check(checks.has_manage_msg)
     async def emoji_info(self, ctx: MyContext, emoji: discord.Emoji):
         """Get info about an emoji
-        This is only an alias or `info emoji`"""
+        This is only an alias or `info emoji`
+        
+        ..Example info :owo:"""
         msg = copy.copy(ctx.message)
         msg.content = ctx.prefix + "info emoji " + str(emoji.id)
         new_ctx = await self.bot.get_context(msg)
@@ -855,7 +857,9 @@ You must be an administrator of this server to use this command.
 
     @emoji_group.command(name="list")
     async def emoji_list(self, ctx: MyContext):
-        """List every emoji of your server"""
+        """List every emoji of your server
+        
+        ..Doc moderator.html#emoji-manager"""
         if not ctx.can_send_embed:
             return await ctx.send(await self.bot._(ctx.guild.id,"fun","no-embed-perm"))
         structure = await self.bot._(ctx.guild.id,"modo","em-list")
@@ -884,14 +888,20 @@ You must be an administrator of this server to use this command.
     @commands.group(name="role", aliases=["roles"])
     @commands.guild_only()
     async def main_role(self, ctx: MyContext):
-        """A few commands to manage roles"""
+        """A few commands to manage roles
+        
+        ..Doc moderator.html#emoji-manager"""
         if ctx.subcommand_passed is None:
             await self.bot.cogs['Help'].help_command(ctx,['role'])
     
     @main_role.command(name="color",aliases=['colour'])
     @commands.check(checks.has_manage_roles)
     async def role_color(self, ctx: MyContext, role: discord.Role, color: discord.Color):
-        """Change a color of a role"""
+        """Change a color of a role
+        
+        ..Example role color "Admin team" red
+
+        ..Doc moderator.html#role-manager"""
         if not ctx.guild.me.guild_permissions.manage_roles:
             await ctx.send(await self.bot._(ctx.guild.id,"modo","cant-mute"))
             return
@@ -904,7 +914,11 @@ You must be an administrator of this server to use this command.
     @main_role.command(name="list")
     @commands.cooldown(5,30,commands.BucketType.guild)
     async def role_list(self, ctx: MyContext, *, role: discord.Role):
-        """Send the list of members in a role"""
+        """Send the list of members in a role
+        
+        ..Example role list "Technical team"
+        
+        ..Doc moderator.html#role-manager"""
         if not (await checks.has_manage_roles(ctx) or await checks.has_manage_guild(ctx) or await checks.has_manage_msg(ctx)):
             await ctx.send(await self.bot._(ctx.guild.id, "modo","missing-user-perms"))
             return
@@ -930,7 +944,11 @@ You must be an administrator of this server to use this command.
     @main_role.command(name="server-list",aliases=["glist"])
     @commands.cooldown(5,30,commands.BucketType.guild)
     async def role_glist(self, ctx:MyContext):
-        """Check the list of every role"""
+        """Check the list of every role
+        
+        ..Example role glist
+        
+        ..Doc moderator.html#role-manager"""
         if not (await checks.has_manage_roles(ctx) or await checks.has_manage_guild(ctx) or await checks.has_manage_msg(ctx)):
             await ctx.send(await self.bot._(ctx.guild.id, "modo","missing-user-perms"))
             return
@@ -958,7 +976,11 @@ You must be an administrator of this server to use this command.
     @commands.check(checks.has_manage_msg)
     async def role_info(self, ctx: MyContext, role:discord.Role):
         """Get info about a role
-        This is only an alias or `info role`"""
+        This is only an alias or `info role`
+        
+        ..Example role info VIP+
+        
+        ..Doc moderator.html#role-manager"""
         msg = copy.copy(ctx.message)
         msg.content = ctx.prefix + "info role " + str(role.id)
         new_ctx = await self.bot.get_context(msg)
@@ -966,9 +988,15 @@ You must be an administrator of this server to use this command.
 
     @main_role.command(name="give", aliases=["add"])
     @commands.check(checks.has_manage_roles)
-    async def roles_give(self, ctx:MyContext,role:discord.Role,users:commands.Greedy[typing.Union[discord.Role,discord.Member]]):
+    async def roles_give(self, ctx:MyContext, role:discord.Role, users:commands.Greedy[typing.Union[discord.Role,discord.Member]]):
         """Give a role to a list of roles/members
-        Users list may be either members or roles, or even only one member"""
+        Users list may be either members or roles, or even only one member
+        
+        ..Example role give Elders everyone
+
+        ..Example role give Slime Theo AsiliS
+        
+        ..Doc moderator.html#role-manager"""
         if len(users) == 0:
             raise commands.MissingRequiredArgument(self.roles_give.clean_params['users'])
         if not ctx.guild.me.guild_permissions.manage_roles:
@@ -994,9 +1022,13 @@ You must be an administrator of this server to use this command.
 
     @main_role.command(name="remove")
     @commands.check(checks.has_manage_roles)
-    async def roles_remove(self,ctx:MyContext,role:discord.Role,users:commands.Greedy[typing.Union[discord.Role,discord.Member]]):
+    async def roles_remove(self, ctx:MyContext, role:discord.Role, users:commands.Greedy[typing.Union[discord.Role,discord.Member]]):
         """Remove a role to a list of roles/members
-        Users list may be either members or roles, or even only one member"""
+        Users list may be either members or roles, or even only one member
+        
+        ..Example role remove VIP @muted
+        
+        ..Doc moderator.html#role-manager"""
         if len(users) == 0:
             raise commands.MissingRequiredArgument(self.roles_remove.clean_params['users'])
         if not ctx.guild.me.guild_permissions.manage_roles:
@@ -1025,7 +1057,9 @@ You must be an administrator of this server to use this command.
     @commands.check(checks.has_manage_msg)
     async def pin_msg(self, ctx: MyContext, msg: int):
         """Pin a message
-ID corresponds to the Identifier of the message"""
+ID corresponds to the Identifier of the message
+
+..Example pin https://discord.com/channels/159962941502783488/201215818724409355/505373568184483851"""
         if ctx.guild is not None and not ctx.channel.permissions_for(ctx.guild.me).manage_messages:
             await ctx.send(await self.bot._(ctx.channel,"modo","cant-pin"))
             return
@@ -1044,7 +1078,13 @@ ID corresponds to the Identifier of the message"""
     @commands.guild_only()
     @commands.check(checks.has_manage_nicknames)
     async def unhoist(self, ctx: MyContext, chars: str=None):
-        """Remove the special characters from usernames"""
+        """Remove the special characters from usernames
+        
+        ..Example unhoist
+        
+        ..Example unhoist 0AZ^_
+        
+        ..Doc moderator.html#unhoist-members"""
         count = 0
         if not ctx.channel.permissions_for(ctx.guild.me).manage_nicknames:
             return await ctx.send(await self.bot._(ctx.guild.id,'modo','missing-manage-nick'))
@@ -1128,7 +1168,9 @@ ID corresponds to the Identifier of the message"""
     @commands.check(checks.verify_role_exists)
     @commands.cooldown(5,120,commands.BucketType.user)
     async def verify_urself(self, ctx: MyContext):
-        """Verify yourself and loose the role"""
+        """Verify yourself and loose the role
+        
+        ..Doc moderator.html#anti-bot-verification"""
         roles_raw = await ctx.bot.get_config(ctx.guild.id,"verification_role")
         roles = [r for r in [ctx.guild.get_role(int(x)) for x in roles_raw.split(';') if x.isnumeric] if r is not None]
         if not ctx.guild.me.guild_permissions.manage_roles:

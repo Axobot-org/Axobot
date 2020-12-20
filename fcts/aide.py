@@ -56,6 +56,12 @@ class Help(commands.Cog):
         """Shows this message
 Enable "Embed Links" permission for better rendering
 
+..Example help
+
+..Example help info
+
+..Example help rss embed
+
 ..Doc infos.html#help"""
         try:
             # commands = [x.replace('@everyone','@​everyone').replace('@here','@​here') for x in commands]

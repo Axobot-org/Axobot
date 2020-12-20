@@ -226,14 +226,22 @@ class Partners(commands.Cog):
     @commands.guild_only()
     @commands.check(checks.database_connected)
     async def partner_main(self, ctx: MyContext):
-        """Manage the partners of your server"""
+        """Manage the partners of your server
+        
+        ..Doc server.html#partners-system"""
         if ctx.subcommand_passed is None:
             await self.bot.cogs['Help'].help_command(ctx,['partner'])
 
     @partner_main.command(name='add')
     @commands.check(checks.database_connected)
     async def partner_add(self, ctx: MyContext, invite:args.Invite, *, description=''):
-        """Add a partner in your list"""
+        """Add a partner in your list
+
+        ..Example partners add https://discord.com/oauth2/authorize?client_id=486896267788812288&scope=bot
+
+        ..Example partners add discord.gg/mee6
+        
+        ..Doc server.html#add-a-partner"""
         if isinstance(invite,int):
             try:
                 item = await self.bot.fetch_user(invite)
@@ -264,7 +272,11 @@ class Partners(commands.Cog):
     @partner_main.command(name='description',aliases=['desc'])
     @commands.check(checks.database_connected)
     async def partner_desc(self, ctx: MyContext, ID:int, *, description:str):
-        """Add or modify a description for a partner"""
+        """Add or modify a description for a partner
+
+        ..Example partner desc 779713982 Very cool bot with tons of features, costs a lot
+        
+        ..Doc server.html#add-a-partner"""
         l = await self.bdd_get_partner(ID,ctx.guild.id)
         if len(l) == 0:
             return await ctx.send(await self.bot._(ctx.guild.id,'partners','invalid-partner'))
@@ -278,7 +290,11 @@ class Partners(commands.Cog):
     @partner_main.command(name='invite')
     async def partner_invite(self, ctx: MyContext, ID:int, new_invite:discord.Invite=None):
         """Get the invite of a guild partner. 
-        If you specify an invite, the partner will be updated with this new invite"""
+        If you specify an invite, the partner will be updated with this new invite
+        
+        ..Example partner invite 795897339 discord.gg/ruyvNYQ
+        
+        ..Doc server.html#change-a-server-invite"""
         l = await self.bdd_get_partner(ID,ctx.guild.id)
         if len(l) == 0 or l[0]['type']!='guild':
             return await ctx.send(await self.bot._(ctx.guild.id,'partners','unknown-server'))
@@ -295,7 +311,11 @@ class Partners(commands.Cog):
     @partner_main.command(name='remove')
     @commands.check(checks.has_admin)
     async def partner_remove(self, ctx: MyContext, ID:int):
-        """Remove a partner from the partners list"""
+        """Remove a partner from the partners list
+
+        ..Example partner remove 800697342
+        
+        ..Doc server.html#remove-a-partner"""
         if not ctx.channel.permissions_for(ctx.guild.me).add_reactions:
             return await ctx.send(await self.bot._(ctx.guild.id,'partners','missing-reactions'))
         l = await self.bdd_get_partner(ID,ctx.guild.id)
@@ -333,7 +353,9 @@ class Partners(commands.Cog):
     @partner_main.command(name='list')
     @commands.check(checks.has_manage_guild)
     async def partner_list(self, ctx: MyContext):
-        """Get the list of every partners"""
+        """Get the list of every partners
+        
+        ..Doc server.html#list-every-partners"""
         f = ['','']
         lang = await self.bot._(ctx.guild.id,'current_lang','current')
         tr_bot = await self.bot._(ctx.guild.id,'keywords','bot')
@@ -383,14 +405,22 @@ class Partners(commands.Cog):
     @commands.check(checks.has_manage_guild)
     async def partner_color(self, ctx: MyContext, color):
         """Change the color of the partners embed
-    It has the same result as `config change partner_color`"""
+    It has the same result as `config change partner_color`
+
+    ..Example partners color yellow
+
+    ..Example partners color #FF00FF
+    
+    ..Doc server.html#change-the-embed-color"""
         await self.bot.cogs['Servers'].conf_color(ctx,'partner_color',str(color))
     
     @partner_main.command(name='reload')
     @commands.check(checks.has_admin)
     @commands.cooldown(1,60,commands.BucketType.guild)
     async def partner_reload(self, ctx: MyContext):
-        """Reload your partners channel"""
+        """Reload your partners channel
+        
+        ..Doc server.html#reload-your-list"""
         msg = await ctx.send(str(await self.bot._(ctx.guild,'rss','guild-loading')).format(self.bot.cogs['Emojis'].customEmojis['loading']))
         channel = await self.bot.cogs['Servers'].get_server(criters=[f"`ID`={ctx.guild.id}"],columns=['partner_channel','partner_color'])
         if len(channel) == 0:
