@@ -20,6 +20,8 @@ class Users(commands.Cog):
 
     async def get_userflags(self, user: discord.User) -> List[str]:
         """Check what user flags has a user"""
+        if not self.bot.database_online:
+            return list()
         parameters = None
         try:
             if cog := self.bot.get_cog("Utilities"):
@@ -41,6 +43,8 @@ class Users(commands.Cog):
     
     async def get_rankcards(self, user: discord.User) -> List[str]:
         """Check what rank cards got unlocked by a user"""
+        if not self.bot.database_online:
+            return list()
         parameters = None
         try:
             if cog := self.bot.get_cog("Utilities"):
@@ -59,7 +63,32 @@ class Users(commands.Cog):
         if rankcard not in RankCardsFlag.FLAGS.values():
             return False
         return rankcard in await self.get_rankcards(user)
-
+    
+    async def get_rankcards_stats(self) -> dict:
+        """Get how many users use any rank card"""
+        if not self.bot.database_online:
+            return dict()
+        try:
+            cnx = self.bot.cnx_frm
+            cursor = cnx.cursor(dictionary=False)
+            query = "SELECT xp_style, Count(*) as count FROM `users` WHERE used_rank=1 GROUP BY xp_style"
+            cursor.execute(query)
+            parameters = list(cursor)
+            cursor.close()
+        except Exception as e:
+            await self.bot.cogs["Errors"].on_error(e, None)
+            return dict()
+        result = {x[0]: x[1] for x in parameters}
+        if '' in result:
+            result['default'] = result.pop('')
+        return result
+    
+    async def used_rank(self, userID: int):
+        """Write in the database that a user used its rank card"""
+        if not self.bot.database_online:
+            return
+        if cog := self.bot.get_cog("Utilities"):
+            await cog.change_db_userinfo(userID, "used_rank", True)
 
     @commands.group(name='profile')
     async def profile_main(self, ctx: MyContext):
@@ -143,8 +172,11 @@ class Users(commands.Cog):
         return None
     
     def set_last_rankcard_update(self, userID: int):
-        with open("rankcards_update.json",'r') as f:
-            old = json.load(f)
+        try:
+            with open("rankcards_update.json",'r') as f:
+                old = json.load(f)
+        except FileNotFoundError:
+            old = dict()
         old[str(userID)] = round(time.time())
         with open("rankcards_update.json",'w') as f:
             json.dump(old,f)
