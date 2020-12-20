@@ -14,11 +14,6 @@ class Help(commands.Cog):
         self.bot = bot
         self.file = "aide"
         self.old_cmd = bot.remove_command("help")
-        self._mentions_transforms = {
-            '@everyone': '@\u200beveryone',
-            '@here': '@\u200bhere'}
-        self._mention_pattern = re.compile(
-            '|'.join(self._mentions_transforms.keys()))
         self.help_color = 8311585
         self.doc_url = "https://zbot.readthedocs.io/en/latest/"
         with open('fcts/help.json', 'r') as file:
@@ -93,13 +88,13 @@ If the bot can't send the new command format, it will try to send the old one.""
                 await ctx.message.author.create_dm()
                 destination = ctx.message.author.dm_channel
 
-            def repl(obj):
-                return self._mentions_transforms.get(obj.group(0), '')
-
             me = destination.me if type(
                 destination) == discord.DMChannel else destination.guild.me
             title = ""
-            categ_name = [k for k, v in (await self.bot._(ctx.channel, "aide", "categories")).items() if v.lower() == " ".join(commands).lower()]
+            if " ".join(commands).lower() in self.commands_list.keys():
+                categ_name = [" ".join(commands).lower()]
+            else:
+                categ_name = [k for k, v in (await self.bot._(ctx.channel, "aide", "categories")).items() if v.lower() == " ".join(commands).lower()]
             if len(categ_name) == 1: # cog name
                 if categ_name[0] == "unclassed":
                     referenced_commands = {x for v in self.commands_list.values() for x in v}
@@ -112,7 +107,7 @@ If the bot can't send the new command format, it will try to send the old one.""
                 pages = await self.all_commands(ctx, sorted([c for c in self.bot.commands], key=self.sort_by_name), compress=compress)
                 title = await self.bot._(ctx.channel, "aide", "embed_title", u=str(ctx.author))
             elif len(commands) == 1:  # Unique command name?
-                name = self._mention_pattern.sub(repl, commands[0])
+                name = commands[0]
                 command = None
                 if name in self.bot.cogs:
                     cog = self.bot.cogs[name]
@@ -127,14 +122,13 @@ If the bot can't send the new command format, it will try to send the old one.""
                         return
                     pages = await self.cmd_help(ctx, command, destination.permissions_for(me).embed_links)
             else:  # sub-command name?
-                name = self._mention_pattern.sub(repl, commands[0])
+                name = commands[0]
                 command = self.bot.all_commands.get(name)
                 if command is None:
                     await destination.send(str(await self.bot._(ctx.channel, "aide", "cmd-not-found")).format(name))
                     return
                 for key in commands[1:]:
                     try:
-                        key = self._mention_pattern.sub(repl, key)
                         command = command.all_commands.get(key)
                         if command is None:
                             await destination.send(str(await self.bot._(ctx.channel, "aide", "subcmd-not-found")).format(key))
@@ -158,20 +152,19 @@ If the bot can't send the new command format, it will try to send the old one.""
                     self.help_color).default() else discord.Colour(self.help_color)
             else:
                 embed_colour = discord.Colour(self.help_color)
-            if isinstance(pages[0], str):
+            if isinstance(pages[0], str): # use description
                 for page in pages:
-                    embed = self.bot.cogs["Embeds"].Embed(title=title, desc=page, footer_text=ft.format(
+                    embed = self.bot.get_cog("Embeds").Embed(title=title, desc=page, footer_text=ft.format(
                         prefix), color=embed_colour).update_timestamp()
                     title = ""
                     await destination.send(embed=embed)
-            else:
+            else: # use fields
                 fields = list()
                 for page in pages:
                     if len(page) == 1:
                         title = page[0]
                         continue
-                    fields.append(
-                        {'name': page[0], 'value': page[1], 'inline': False})
+                    fields.append({'name': page[0], 'value': page[1], 'inline': False})
                 embed = self.bot.cogs["Embeds"].Embed(title=title, footer_text=ft.format(
                     prefix), fields=fields, color=embed_colour).update_timestamp()
                 await destination.send(embed=embed)
@@ -219,7 +212,10 @@ If the bot can't send the new command format, it will try to send the old one.""
                 if len(v) == 0:
                     continue
                 title = "__**"+tr.get(k, k).capitalize()+"**__"
-                count = await self.bot._(ctx.channel, "aide", "cmd-count", nbr=len(v))
+                count = await self.bot._(ctx.channel, "aide", "cmd-count",
+                                         nbr=len(v),
+                                         p=ctx.prefix,
+                                         cog=k)
                 answer.append((title, count))
         else:
             for k, v in categories.items():
