@@ -156,7 +156,9 @@ class Cases(commands.Cog):
     @commands.cooldown(5, 15, commands.BucketType.user)
     @commands.check(can_edit_case)
     async def case_main(self, ctx: MyContext):
-        """Do anything with any user cases"""
+        """Do anything with any user cases
+        
+        ..Doc moderator.html#handling-cases"""
         if ctx.subcommand_passed is None:
             await self.bot.cogs['Help'].help_command(ctx, ['cases'])
 
@@ -165,7 +167,11 @@ class Cases(commands.Cog):
     @commands.cooldown(5, 30, commands.BucketType.user)
     async def see_case(self, ctx: MyContext, *, user:args.user):
         """Get every case of a user
-        This user can have left the server"""
+        This user can have left the server
+
+        ..Example cases list someone#7515
+        
+        ..Doc moderator.html#view-list"""
         if not self.bot.database_online:
             return await ctx.send(await self.bot._(ctx.guild.id,'cases','no_database'))
         await self.see_case_main(ctx,ctx.guild.id,user.id)
@@ -174,11 +180,15 @@ class Cases(commands.Cog):
     @commands.guild_only()
     @commands.check(reloads.is_support_staff)
     async def see_case_2(self, ctx: MyContext, guild: typing.Optional[args.Guild], *, user:args.user):
-        """Get every case of a user on a specific guild
-        This user can have left the server"""
+        """Get every case of a user on a specific guild or on every guilds
+        This user can have left the server
+        
+        ..Example cases glist "ZBot Staff" someone
+        
+        ..Example cases glist someone"""
         if not self.bot.database_online:
             return await ctx.send(await self.bot._(ctx.guild.id,'cases','no_database'))
-        await self.see_case_main(ctx,guild,user.id)
+        await self.see_case_main(ctx,guild.id,user.id)
         
     async def see_case_main(self, ctx: MyContext, guild:discord.Guild, user:discord.User):
         if guild is not None:
@@ -249,7 +259,11 @@ class Cases(commands.Cog):
     @case_main.command(name="reason",aliases=['edit'])
     @commands.guild_only()
     async def reason(self, ctx: MyContext, case:int, *, reason):
-        """Edit the reason of a case"""
+        """Edit the reason of a case
+        
+        ..Example cases reason 95 Was too dumb
+        
+        ..Doc moderator.html#edit-reason"""
         if not self.bot.database_online:
             return await ctx.send(await self.bot._(ctx.guild.id,'cases','no_database'))
         try:
@@ -274,7 +288,11 @@ class Cases(commands.Cog):
     @case_main.command(name="search")
     @commands.guild_only()
     async def search_case(self, ctx: MyContext, case:int):
-        """Search for a specific case in your guild"""
+        """Search for a specific case in your guild
+        
+        ..Example cases search 69
+        
+        ..Doc moderator.html#search-for-a-case"""
         if not self.bot.database_online:
             return await ctx.send(await self.bot._(ctx.guild.id,'cases','no_database'))
         try:
@@ -313,11 +331,15 @@ class Cases(commands.Cog):
             await self.bot.cogs["Errors"].on_error(e,ctx)
         
 
-    @case_main.command(name="remove",aliases=["clear","delete"])
+    @case_main.command(name="remove", aliases=["clear", "delete"])
     @commands.guild_only()
     async def remove(self, ctx: MyContext, case:int):
         """Delete a case forever
-        Warning: "Forever", it's very long. And no backups are done"""
+        Warning: "Forever", it's very long. And no backups are done
+        
+        ..Example cases remove 42
+        
+        ..Doc moderator.html#remove-case"""
         if not self.bot.database_online:
             return await ctx.send(await self.bot._(ctx.guild.id,'cases','no_database'))
         try:

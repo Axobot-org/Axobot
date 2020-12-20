@@ -70,6 +70,8 @@ This command is particularly useful if you want to change the text of an rss flo
 
 If the rss feed ID is not given, the bot will open a menu to select it. And for the text, if you have forgotten it, the bot will also ask you to know it, and will provide you the current text and a list of the usable variables.
 
+.. note:: Available variables are: {channel} {title} {date} {url} {link} {mentions} {logo} {author}
+
 .. warning:: Yo know what? For this command, the bot needs "`Embed Links <perms.html#embed-links>`_" permission!
 
 

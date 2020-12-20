@@ -726,6 +726,12 @@ class Xp(commands.Cog):
     async def rank(self, ctx: MyContext, *, user: args.user=None):
         """Display a user XP.
         If you don't send any user, I'll display your own XP
+
+        ..Example rank
+
+        ..Example rank Z_runner#7515
+
+        ..Doc user.html#check-the-xp-of-someone
         """
         try:
             if user is None:
@@ -839,7 +845,15 @@ class Xp(commands.Cog):
     @commands.cooldown(5,60,commands.BucketType.user)
     async def top(self, ctx: MyContext, page: typing.Optional[int]=1, Type: args.LeaderboardType='global'):
         """Get the list of the highest levels
-        Each page has 20 users"""
+        Each page has 20 users
+
+        ..Example top 3
+
+        ..Example top 7 guild
+
+        ..Example top guild
+        
+        ..Doc user.html#get-the-general-ranking"""
         if ctx.guild is not None:
             if not await self.bot.get_config(ctx.guild.id,'enable_xp'):
                 return await ctx.send(await self.bot._(ctx.guild.id,'xp','xp-disabled'))
@@ -910,7 +924,9 @@ class Xp(commands.Cog):
     @commands.guild_only()
     @commands.check(checks.has_admin)
     async def set_xp(self, ctx: MyContext, xp:int, *, user:args.user):
-        """Set the XP of a user"""
+        """Set the XP of a user
+        
+        ..Example set_xp 3000 @someone"""
         if user.bot:
             return await ctx.send(await self.bot._(ctx.guild.id, 'xp', 'no-bot'))
         if await self.bot.get_config(ctx.guild.id,'xp_type') == 0:
@@ -973,7 +989,9 @@ class Xp(commands.Cog):
     @commands.group(name="roles_rewards", aliases=['rr'])
     @commands.guild_only()
     async def rr_main(self, ctx: MyContext):
-        """Manage your roles rewards like a boss"""
+        """Manage your roles rewards like a boss
+        
+        ..Doc server.html#roles-rewards"""
         if ctx.subcommand_passed is None:
             await self.bot.cogs['Help'].help_command(ctx,['rr'])
     
@@ -981,7 +999,11 @@ class Xp(commands.Cog):
     @commands.check(checks.has_manage_guild)
     async def rr_add(self, ctx: MyContext, level:int, *, role:discord.Role):
         """Add a role reward
-        This role will be given to every member who reaches the level"""
+        This role will be given to every member who reaches the level
+        
+        ..Example rr add 10 Slowly farming
+        
+        ..Doc server.html#roles-rewards"""
         try:
             if role.name == '@everyone':
                 raise commands.BadArgument(f'Role "{role.name}" not found')
@@ -1000,7 +1022,9 @@ class Xp(commands.Cog):
     
     @rr_main.command(name="list")
     async def rr_list(self, ctx: MyContext):
-        """List every roles rewards of your server"""
+        """List every roles rewards of your server
+        
+        ..Doc server.html#roles-rewards"""
         if not ctx.can_send_embed:
             return await ctx.send(await self.bot._(ctx.guild.id,"fun","no-embed-perm"))
         try:
@@ -1019,7 +1043,11 @@ class Xp(commands.Cog):
     @commands.check(checks.has_manage_guild)
     async def rr_remove(self, ctx: MyContext, level:int):
         """Remove a role reward
-        When a member reaches this level, no role will be given anymore"""
+        When a member reaches this level, no role will be given anymore
+        
+        ..Example roles_rewards remove 10
+        
+        ..Doc server.html#roles-rewards"""
         try:
             l = await self.rr_list_role(ctx.guild.id,level)
             if len(l) == 0:
@@ -1034,7 +1062,9 @@ class Xp(commands.Cog):
     @commands.check(checks.has_manage_guild)
     @commands.cooldown(1,300,commands.BucketType.guild)
     async def rr_reload(self, ctx: MyContext):
-        """Refresh roles rewards for the whole server"""
+        """Refresh roles rewards for the whole server
+        
+        ..Doc server.html#roles-rewards"""
         try:
             if not ctx.guild.me.guild_permissions.manage_roles:
                 return await ctx.send(await self.bot._(ctx.guild.id,'modo','cant-mute'))

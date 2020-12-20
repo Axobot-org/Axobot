@@ -72,7 +72,9 @@ class Info(commands.Cog):
 
     @commands.command(name='admins')
     async def admin_list(self, ctx: MyContext):
-        """Get the list of ZBot administrators"""
+        """Get the list of ZBot administrators
+        
+        ..Doc miscellaneous.html#admins"""
         l  = list()
         for u in reloads.admins_id:
             if u==552273019020771358:
@@ -91,7 +93,9 @@ class Info(commands.Cog):
     @commands.command(name="stats", enabled=True)
     @commands.cooldown(2,60,commands.BucketType.guild)
     async def stats(self, ctx: MyContext):
-        """Display some statistics about the bot"""
+        """Display some statistics about the bot
+        
+        ..Doc infos.html#statistics"""
         v = sys.version_info
         version = str(v.major)+"."+str(v.minor)+"."+str(v.micro)
         pid = os.getpid()
@@ -161,7 +165,13 @@ class Info(commands.Cog):
     @commands.command(name="ping",aliases=['rep'])
     async def rep(self, ctx: MyContext, ip=None):
         """Get bot latency
-        You can also use this command to ping any other server"""
+        You can also use this command to ping any other server
+
+        ..Example ping
+
+        ..Example ping google.fr
+        
+        ..Doc infos.html#ping"""
         if ip is None:
             m = await ctx.send("Ping...")
             t = (m.created_at - ctx.message.created_at).total_seconds()
@@ -204,7 +214,17 @@ class Info(commands.Cog):
     @commands.guild_only()
     async def infos(self, ctx: MyContext, Type: typing.Optional[args.infoType]=None, *, name: str=None):
         """Find informations about someone/something
-Available types: member, role, user, emoji, channel, server, invite, category"""
+Available types: member, role, user, emoji, channel, server, invite, category
+
+..Example info role The VIP
+
+..Example info 436835675304755200
+
+..Example info :owo:
+
+..Example info server
+
+.. Doc infos.html#info"""
         if Type is not None and name is None and Type not in ["guild","server"]:
             raise commands.MissingRequiredArgument(self.infos.clean_params['name'])
         if not ctx.can_send_embed:
@@ -959,7 +979,9 @@ Servers:
     @commands.guild_only()
     @commands.bot_has_permissions(send_messages=True)
     async def membercount(self, ctx: MyContext):
-        """Get some digits on the number of server members"""
+        """Get some digits on the number of server members
+        
+        ..Doc infos.html#membercount"""
         if ctx.channel.permissions_for(ctx.guild.me).send_messages == False:
             return
         total, bots, c_co = await self.bot.get_cog("Utilities").get_members_repartition(ctx.guild.members)
@@ -984,7 +1006,9 @@ Servers:
 
     @commands.group(name="prefix")
     async def get_prefix(self, ctx: MyContext):
-        """Show the usable prefix(s) for this server"""
+        """Show the usable prefix(s) for this server
+        
+        ..Doc infos.html#prefix"""
         if ctx.invoked_subcommand is not None:
             return
         txt = await self.bot._(ctx.channel,"infos","prefix")
@@ -997,7 +1021,11 @@ Servers:
     @get_prefix.command(name="change")
     @commands.guild_only()
     async def prefix_change(self, ctx: MyContext, new_prefix: str):
-        """Change the used prefix"""
+        """Change the used prefix
+        
+        ..Example prefix change "Hey Zbot, "
+
+        ..Doc infos.html#prefix"""
         msg = copy.copy(ctx.message)
         msg.content =  f'{ctx.prefix}config change prefix "{new_prefix}"'
         new_ctx = await self.bot.get_context(msg)
@@ -1059,7 +1087,9 @@ Servers:
     @commands.group(name="bitly")
     async def bitly_main(self, ctx: MyContext):
         """Bit.ly website, but in Discord
-        Create shortened url and unpack them by using Bitly services"""
+        Create shortened url and unpack them by using Bitly services
+        
+        ..Doc miscellaneous.html#bitly-urls"""
         if ctx.subcommand_passed is None:
             await self.bot.cogs['Help'].help_command(ctx,['bitly'])
         elif ctx.invoked_subcommand is None and ctx.subcommand_passed is not None:
@@ -1080,12 +1110,20 @@ Servers:
 
     @bitly_main.command(name="create")
     async def bitly_create(self, ctx: MyContext, url: args.url):
-        """Create a shortened url"""
+        """Create a shortened url
+        
+        ..Example bitly create https://fr-minecraft.net
+
+        ..Doc miscellaneous.html#bitly-urls"""
         await ctx.send(await self.bot._(ctx.channel,'infos','bitly_short',url=self.BitlyClient.shorten_url(url.url)))
     
     @bitly_main.command(name="find")
     async def bitly_find(self, ctx: MyContext, url: args.url):
-        """Find the long url from a bitly link"""
+        """Find the long url from a bitly link
+        
+        ..Example bitly find https://bit.ly/2JEHsUf
+        
+        ..Doc miscellaneous.html#bitly-urls"""
         if url.domain != 'bit.ly':
             return await ctx.send(await self.bot._(ctx.channel,'infos','bitly_nobit'))
         await ctx.send(await self.bot._(ctx.channel,'infos','bitly_long',url=self.BitlyClient.expand_url(url.url)))
@@ -1093,7 +1131,13 @@ Servers:
     @commands.command(name='changelog',aliases=['changelogs'])
     @commands.check(checks.database_connected)
     async def changelog(self, ctx: MyContext, version: str=None):
-        """Get the changelogs of the bot"""
+        """Get the changelogs of the bot
+        
+        ..Example changelog
+
+        ..Example changelog 3.7.0
+
+        ..Doc miscellaneous.html#changelogs"""
         if version=='list':
             cnx = self.bot.cnx_frm
             if not ctx.bot.beta:
@@ -1140,7 +1184,9 @@ Servers:
     @commands.command(name="usernames", aliases=["username","usrnm"])
     async def username(self, ctx: MyContext, *, user: discord.User=None):
         """Get the names history of an user
-        Default user is you"""
+        Default user is you
+        
+        ..Doc infos.html#usernames-history"""
         if user is None:
             user = ctx.author
         language = await self.bot._(ctx.channel,"current_lang","current")

@@ -191,7 +191,13 @@ class Rss(commands.Cog):
 
     @rss_main.command(name="youtube",aliases=['yt'])
     async def request_yt(self, ctx: MyContext, ID):
-        """The last video of a YouTube channel"""
+        """The last video of a YouTube channel
+        
+        ..Example rss youtube UCZ5XnGb-3t7jCkXdawN2tkA
+
+        ..Example rss youtube https://www.youtube.com/channel/UCZ5XnGb-3t7jCkXdawN2tkA
+
+        ..Doc rss.html#see-the-last-post"""
         if ID in yt_link.keys():
             ID = yt_link[ID]
         if "youtube.com" in ID or "youtu.be" in ID:
@@ -211,7 +217,13 @@ class Rss(commands.Cog):
     
     @rss_main.command(name="twitch",aliases=['tv'])
     async def request_twitch(self, ctx: MyContext, channel):
-        """The last video of a Twitch channel"""
+        """The last video of a Twitch channel
+        
+        ..Example rss twitch aureliensama
+
+        ..Example rss tv https://www.twitch.tv/aureliensama
+        
+        ..Doc rss.html#see-the-last-post"""
         if "twitch.tv" in channel:
             channel = await self.parse_twitch_url(channel)
         text = await self.rss_twitch(ctx.channel,channel)
@@ -227,7 +239,13 @@ class Rss(commands.Cog):
 
     @rss_main.command(name='twitter',aliases=['tw'])
     async def request_tw(self, ctx: MyContext, name):
-        """The last tweet of a Twitter account"""
+        """The last tweet of a Twitter account
+        
+        ..Example rss twitter https://twitter.com/z_runnerr
+        
+        ..Example rss tw z_runnerr
+        
+        ..Doc rss.html#see-the-last-post"""
         if "twitter.com" in name:
             name = await self.parse_tw_url(name)
         try:
@@ -247,7 +265,11 @@ class Rss(commands.Cog):
 
     @rss_main.command(name="web")
     async def request_web(self, ctx: MyContext, link):
-        """The last post on any other rss feed"""
+        """The last post on any other rss feed
+        
+        ..Example rss web https://fr-minecraft.net/rss.php
+        
+        ..Doc rss.html#see-the-last-post"""
         if link in web_link.keys():
             link = web_link[link]
         text = await self.rss_web(ctx.channel,link)
@@ -263,7 +285,11 @@ class Rss(commands.Cog):
     
     @rss_main.command(name="deviantart",aliases=['deviant'])
     async def request_deviant(self, ctx: MyContext, user):
-        """The last pictures of a DeviantArt user"""
+        """The last pictures of a DeviantArt user
+        
+        ..Example rss deviant https://www.deviantart.com/adri526
+        
+        ..Doc rss.html#see-the-last-post"""
         if "deviantart.com" in user:
             user = await self.parse_deviant_url(user)
         text = await self.rss_deviant(ctx.guild,user)
@@ -292,6 +318,10 @@ class Rss(commands.Cog):
     @commands.check(checks.database_connected)
     async def system_add(self, ctx: MyContext, link):
         """Subscribe to a rss feed, displayed on this channel regularly
+
+        ..Example rss add https://www.deviantart.com/adri526
+
+        ..Example rss add https://www.youtube.com/channel/UCZ5XnGb-3t7jCkXdawN2tkA
         
         ..Doc rss.html#follow-a-feed"""
         is_over, flow_limit = await self.is_overflow(ctx.guild)
@@ -344,7 +374,9 @@ class Rss(commands.Cog):
     @commands.check(can_use_rss)
     async def systeme_rm(self, ctx: MyContext, ID:int=None):
         """Delete an rss feed from the list
-        
+
+        ..Example rss remove
+
         ..Doc rss.html#delete-a-followed-feed"""
         flow = await self.askID(ID,
                                 ctx,
@@ -634,6 +666,14 @@ class Rss(commands.Cog):
     @commands.check(checks.database_connected)
     async def move_guild_flow(self, ctx:MyContext, ID:typing.Optional[int]=None, channel:discord.TextChannel=None):
         """Move a rss feed in another channel
+
+        ..Example rss move
+
+        ..Example rss move 3078731683662
+
+        ..Example rss move #cool-channels
+
+        ..Example rss move 3078731683662 #cool-channels
         
         ..Doc rss.html#move-a-feed"""
         try:
@@ -665,6 +705,14 @@ class Rss(commands.Cog):
     @commands.check(checks.database_connected)
     async def change_text_flow(self, ctx: MyContext, ID: typing.Optional[int]=None, *, text=None):
         """Change the text of an rss feed
+
+        Available variables: {channel} {title} {date} {url} {link} {mentions} {logo} {author}
+
+        ..Example rss text 3078731683662
+
+        ..Example rss text 3078731683662 {logo} | New post of {author} right here: {url}! [{date}]
+
+        ..Example rss text
         
         ..Doc rss.html#change-the-text"""
         try:

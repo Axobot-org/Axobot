@@ -6,6 +6,13 @@ Some commands are difficult to classify in the categories of the site. They are 
 
 Here is the list of these particular commands.
 
+------
+Admins
+------
+
+**Syntax:** :code:`admins`
+
+If you want to quickly know who are the Zbot administrators. Easy to use, quick to read, always up-to-date.
 
 ----------
 Bitly urls

@@ -21,6 +21,10 @@ class Perms(commands.Cog):
     async def check_permissions(self, ctx: MyContext, channel:typing.Optional[typing.Union[discord.TextChannel,discord.VoiceChannel]]=None, *, target:typing.Union[discord.Member,discord.Role]=None):
         """Permissions assigned to a member/role (the user by default)
         The channel used to view permissions is the channel in which the command is entered.
+
+        ..Example perms #announcements everyone
+
+        ..Example perms Zbot
         
         ..Doc infos.html#permissions"""
         if target is None:

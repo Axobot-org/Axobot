@@ -91,6 +91,15 @@ Note that this result may differ from the :code:`config see prefix` command when
 
 ..note:: The subcommand :code:`prefix change` is an alias of :code:`config change prefix`
 
+
+----------
+Statistics
+----------
+
+**Syntax:** :code:`stats`
+
+An easy command to get some stats about the bot. Total XP collected by every user, number of servers using the bot, number of code lines, Python version used, and some other more or less useful facts.
+
 -----------------
 Usernames history
 -----------------
