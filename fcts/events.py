@@ -670,8 +670,9 @@ class Events(commands.Cog):
         member_count = sum(x.member_count for x in self.bot.guilds)
         ratio = member_count/len(self.bot.users)
         approx_bot_count = int(len([1 for x in self.bot.users if x.bot])*ratio)
-        lang_stats = await self.bot.cogs['Servers'].get_languages([], return_dict=True)
-        query = "INSERT INTO `log_stats` (`servers_count`, `members_count`, `bots_count`, `dapi_heartbeat`, `codelines_count`, `earned_xp_total`, `rss_feeds`, `active_rss_feeds`, `languages`, `beta`) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
+        lang_stats = await self.bot.get_cog('Servers').get_languages([], return_dict=True)
+        rankcards_stats = await self.bot.get_cog('Users').get_rankcards_stats()
+        query = "INSERT INTO `log_stats` (`servers_count`, `members_count`, `bots_count`, `dapi_heartbeat`, `codelines_count`, `earned_xp_total`, `rss_feeds`, `active_rss_feeds`, `languages`, `used_rankcards`, `beta`) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
         data = (len(self.bot.guilds),
             member_count,
             approx_bot_count,
@@ -681,6 +682,7 @@ class Events(commands.Cog):
             rss_feeds,
             active_rss_feeds,
             marshal.dumps(lang_stats),
+            marshal.dumps(rankcards_stats),
             int(self.bot.beta),
         )
         try:

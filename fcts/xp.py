@@ -781,6 +781,11 @@ class Xp(commands.Cog):
                     static = True
             self.bot.log.debug("XP card for user {} ({}xp - style {})".format(user.id,xp,style))
             myfile = await self.create_card(user,style,xp,used_system,[rank,ranks_nb],txts,force_static=static,levels_info=levels_info)
+            if UsersCog := self.bot.get_cog("Users"):
+                try:
+                    await UsersCog.used_rank(user.id)
+                except Exception as e:
+                    await self.bot.get_cog("Errors").on_error(e, ctx)
         try:
             await ctx.send(file=myfile)
         except discord.errors.HTTPException:
