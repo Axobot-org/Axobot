@@ -8,7 +8,7 @@ def check_libs():
             exec("import "+m)
             exec("del "+m)
         except ModuleNotFoundError:
-            print("Library {} manquante".format(m))
+            print("Library {} missing".format(m))
             count +=1
     if count > 0:
         return False
@@ -25,7 +25,7 @@ if check_libs():
     from classes import zbot, setup_logger
 else:
     import sys
-    print("Fin de l'exécution")
+    print("End of program")
     sys.exit()
 
 
@@ -34,7 +34,7 @@ def main():
 
     log = setup_logger()
     log.setLevel(logging.DEBUG)
-    log.info("Lancement du bot")
+    log.info("Starting bot")
 
     initial_extensions = ['fcts.languages',
                       'fcts.admin',
@@ -71,7 +71,7 @@ def main():
     if os.path.exists("debug.log"):
         s = os.path.getsize('debug.log')/1.e9
         if s > 10:
-            print("Taille de debug.log supérieure à 10Gb ({}Gb)\n   -> Suppression des logs".format(s))
+            print("Debug.log size greater than 10Gb ({}Gb)\n -> Removing logs".format(s))
             os.remove('debug.log')
         del s
 
@@ -102,14 +102,14 @@ def main():
         try:
             cnx = mysql.connector.connect(user=client.database_keys['user'],password=client.database_keys['password'],host="127.0.0.1",database=client.database_keys['database1'])
         except (mysql.connector.InterfaceError, mysql.connector.ProgrammingError):
-            client.log.warning("Impossible d'accéder à la dabatase locale - tentative via IP")
+            client.log.warning("Unable to access local dabatase - attempt via IP")
             cnx = mysql.connector.connect(user=client.database_keys['user'],password=client.database_keys['password'],host=client.database_keys['host'],database=client.database_keys['database1'])
         else:
-            client.log.info("Database connectée en local")
+            client.log.info("Database connected locally")
             client.database_keys['host'] = '127.0.0.1'
         cnx.close()
     except Exception as e:
-        client.log.error("---- ACCES IMPOSSIBLE A LA DATABASE ----")
+        client.log.error("---- IMPOSSIBLE ACCESS TO THE DATABASE ----")
         client.log.error(e)
         client.database_online = False
 
@@ -129,19 +129,20 @@ def main():
             traceback.print_exc()
             count += 1
         if count  > 0:
-            raise Exception("\n{} modules not loaded".format(count))
+            print("\n{} modules not loaded\nEnd of program".format(count))
+            sys.exit()
     del count
     
     
     async def on_ready():
-        print('\nBot connecté')
-        print("Nom : "+client.user.name)
+        print('\nBot connected')
+        print("Name : "+client.user.name)
         print("ID : "+str(client.user.id))
         if len(client.guilds) < 200:
             serveurs = [x.name for x in client.guilds]
-            print("Connecté sur ["+str(len(client.guilds))+"] "+", ".join(serveurs))
+            print("Connected on ["+str(len(client.guilds))+"] "+", ".join(serveurs))
         else:
-            print("Connecté sur "+str(len(client.guilds))+" serveurs")
+            print("Connected on "+str(len(client.guilds))+" guilds")
         print(time.strftime("%d/%m  %H:%M:%S"))
         print('------')
         await asyncio.sleep(3)
@@ -150,7 +151,7 @@ def main():
         elif client.beta:
             await client.change_presence(activity=discord.Game(name=choice(["SNAPSHOOT","snapshot day","somethin iz brokn"])))
         else:
-            await client.change_presence(activity=discord.Game(name=choice(["entrer !help","something","type !help","type !help"])))
+            await client.change_presence(activity=discord.Game(name=choice(["enter !help","something","type !help","type !help"])))
         emb = client.cogs["Embeds"].Embed(desc="**{}** is launching !".format(client.user.name),color=8311585).update_timestamp()
         await client.cogs["Embeds"].send([emb])
 
@@ -165,7 +166,7 @@ def main():
         if len(sys.argv) > 1 and sys.argv[1] in ['1','2','3','4']:
             bot_type = sys.argv[1]
         else:
-            bot_type = input("Quel bot activer ? (1 release, 2 snapshot, 3 redbot, 4 autre) ")
+            bot_type = input("Which bot to activate? (1 release, 2 snapshot, 3 redbot, 4 autre) ")
         if bot_type == '1':
             token = tokens.get_token(client,486896267788812288)
         elif bot_type == '2':
@@ -178,21 +179,21 @@ def main():
             token = input("Token?\n> ")
         else:
             return
-        if bot_type in ['1','2']:
+        if bot_type in ['1', '2']:
             # Events loop
-            if len(sys.argv)>2 and sys.argv[2] in ['o','n']:
+            if len(sys.argv) > 2 and sys.argv[2] in ['o', 'n', 'y']:
                 enable_event_loop = sys.argv[2]
             else:
-                enable_event_loop = input("Lancement de la boucle d'events ? (o/n) ")
-            if enable_event_loop.lower() == 'o':
+                enable_event_loop = input("Launch of the events loop? (y/n) ")
+            if enable_event_loop.lower() in ('o', 'y'):
                 client.cogs['Events'].loop.start()
                 client.internal_loop_enabled = True
             # RSS enabled
-            if len(sys.argv) > 3 and sys.argv[3] in ['o','n']:
+            if len(sys.argv) > 3 and sys.argv[3] in ['o', 'n', 'y']:
                 enable_rss = sys.argv[3]
             else:
-                enable_rss = input("Activation des flux RSS ? (o/n) ")
-            if enable_rss.lower() != 'o':
+                enable_rss = input("Activation of RSS feeds? (o/n) ")
+            if enable_rss.lower() not in ('o', 'y'):
                 client.rss_enabled = False
     else:
         token = input("Token?\n> ")
