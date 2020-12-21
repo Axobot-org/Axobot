@@ -96,10 +96,34 @@ class Users(commands.Cog):
         if ctx.subcommand_passed is None:
             await self.bot.cogs['Help'].help_command(ctx,['profile'])
     
+    @profile_main.command(name='card-preview')
+    @commands.check(checks.database_connected)
+    @commands.cooldown(3,45,commands.BucketType.user)
+    @commands.cooldown(5,60,commands.BucketType.guild)
+    async def profile_cardpreview(self, ctx: MyContext, style: args.cardStyle):
+        """Get a preview of a card style
+        
+        ..Example profile card-preview red
+
+        ..Doc user.html#change-your-xp-card"""
+        if ctx.bot_permissions.attach_files:
+            txts = [await self.bot._(ctx.channel,'xp','card-level'), await self.bot._(ctx.channel,'xp','card-rank')]
+            desc = await self.bot._(ctx.channel,'users','card-desc')
+            await ctx.send(desc,file=await self.bot.get_cog('Xp').create_card(ctx.author,style,25,0,[1,0],txts,force_static=True))
+        else:
+            await ctx.send(await self.bot._(ctx.channel,'users','missing-attach-files'))
+    
     @profile_main.command(name='card')
     @commands.check(checks.database_connected)
     async def profile_card(self, ctx: MyContext, style: typing.Optional[args.cardStyle]=None):
-        """Change your xp card style"""
+        """Change your xp card style.
+        If no style is specified, the bot will send a preview of the current selected style (dark by default)
+        
+        ..Example profile card
+        
+        ..Example profile card christmas20
+        
+        ..Doc user.html#change-your-xp-card"""
         if style is None and len(ctx.view.buffer.split(' '))>2:
             if ctx.view.buffer.split(' ')[2] == 'list':
                 await ctx.send(str(await self.bot._(ctx.channel,'users','list-cards')).format(', '.join(await ctx.bot.cogs['Utilities'].allowed_card_styles(ctx.author))))
