@@ -220,6 +220,7 @@
         "disabled": "Da {c} cmd is dizabled :confused:",
         "duration": "Invalid timer: `{d}`",
         "emojinotfound": "Emoji `{e}` cannot found been",
+        "invalidcardstyle": "Uhh nope, `{s}` z not a exichtin card styl",
         "invalidcolor": "Ups, I can't find the color `{c}` :confused:",
         "invalidemoji": "INvalid smiley",
         "invalidguild": "Upsi, dat guild don't want to be find: {g}",

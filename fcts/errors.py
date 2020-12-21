@@ -126,6 +126,10 @@ class Errors(commands.Cog):
             r = re.search(r'Invalid message ID: (\S+)',raw_error)
             if r is not None:
                 return await ctx.send(await self.bot._(ctx.channel,'errors','invalidmsgid'), allowed_mentions=ALLOWED)
+            # Invalid card style: aqua
+            r = re.search(r'Invalid card style: (\S+)',raw_error)
+            if r is not None:
+                return await ctx.send(await self.bot._(ctx.channel,'errors','invalidcardstyle', s=r.group(1)), allowed_mentions=ALLOWED)
             self.bot.log.warn('Unknown error type -',error)
         elif isinstance(error,commands.errors.MissingRequiredArgument):
             await ctx.send(await self.bot._(ctx.channel,'errors','missingargument',a=error.param.name,e=random.choice([':eyes:','',':confused:',':thinking:',''])))
