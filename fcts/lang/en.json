@@ -1018,6 +1018,7 @@
             "DISCOVERABLE": "Displayed in the Discovery tab",
             "FEATURABLE": "Displayed in the Activity tab",
             "INVITE_SPLASH": "Invite custom screen",
+            "MEMBER_VERIFICATION_GATE_ENABLED": "Member verification gate enabled",
             "NEWS": "News channel",
             "PARTNERED": "Partnered server",
             "PREVIEW_ENABLED": "Preview enabled",
