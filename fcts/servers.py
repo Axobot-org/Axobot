@@ -604,7 +604,8 @@ class Servers(commands.Cog):
                 if d_em is None:
                     l_em.append("<unfindable emoji>")
                 else:
-                    l_em.append("<:{}:{}>".format(d_em.name,d_em.id))
+                    a = 'a' if d_em.animated else ''
+                    l_em.append("<{}:{}:{}>".format(a, d_em.name, d_em.id))
             else:
                 l_em.append(emoji.emojize(r, use_aliases=True))
         return l_em
