@@ -207,6 +207,8 @@ Slowmode works up to one message every 6h (21600s)
                         await user.send(str(await self.bot._(ctx.guild.id,"modo","kick-noreason")).format(ctx.guild.name))
                     else:
                         await user.send(str(await self.bot._(ctx.guild.id,"modo","kick-reason")).format(ctx.guild.name,reason))
+                except discord.Forbidden:
+                    pass
                 except Exception as e:
                     await self.bot.cogs['Errors'].on_error(e,ctx)
                     pass
@@ -266,7 +268,10 @@ Slowmode works up to one message every 6h (21600s)
         try:
             try:
                 await user.send(str(await self.bot._(ctx.guild.id,"modo","warn-mp")).format(ctx.guild.name,message))
-            except:
+            except discord.Forbidden:
+                    pass
+            except Exception as e:
+                await self.bot.get_cog('Errors').on_error(e,ctx)
                 pass
             message = await self.bot.cogs["Utilities"].clear_msg(message,everyone = not ctx.channel.permissions_for(ctx.author).mention_everyone)
             if self.bot.database_online:
@@ -400,6 +405,8 @@ You can also mute this member for a defined duration, then use the following for
                         await user.send(await self.bot._(ctx.guild.id,"modo","mute-notemp", server=ctx.guild.name, reason=reason))
                     else:
                         await user.send(await self.bot._(ctx.guild.id,"modo","mute-temp", server=ctx.guild.name, reason=reason, duration=f_duration))
+                except discord.Forbidden:
+                    pass
                 except Exception as e:
                     await self.bot.cogs['Errors'].on_error(e,ctx)
                     pass
@@ -557,6 +564,8 @@ The 'days_to_delete' option represents the number of days worth of messages to d
                         await user.send(str(await self.bot._(ctx.guild.id,"modo","ban-noreason")).format(ctx.guild.name))
                     else:
                         await user.send(str(await self.bot._(ctx.guild.id,"modo","ban-reason")).format(ctx.guild.name,reason))
+                except discord.Forbidden:
+                    pass
                 except Exception as e:
                     await self.bot.cogs['Errors'].on_error(e,ctx)
                     pass
@@ -689,6 +698,8 @@ Permissions for using this command are the same as for the kick
                     await user.send(str(await self.bot._(ctx.guild.id,"modo","kick-noreason")).format(ctx.guild.name))
                 else:
                     await user.send(str(await self.bot._(ctx.guild.id,"modo","kick-reason")).format(ctx.guild.name,reason))
+            except discord.Forbidden:
+                    pass
             except Exception as e:
                 await self.bot.cogs['Errors'].on_error(e,ctx)
                 pass
