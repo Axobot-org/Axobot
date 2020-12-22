@@ -1214,7 +1214,7 @@ ID corresponds to the Identifier of the message
             return None, 0
         if role is None:
             role = await guild.create_role(name="muted")
-        count = 0
+        count = 0 # nbr of errors
         try:
             for x in guild.by_category():
                 category, channelslist = x[0], x[1]
@@ -1225,6 +1225,9 @@ ID corresponds to the Identifier of the message
                         try:
                             await channel.set_permissions(role, send_messages=False)
                             for r in channel.changed_roles:
+                                if r.managed and len(r.members) == 1 and r.members[0].bot:
+                                    # if it's an integrated bot role
+                                    continue
                                 if r.permissions.send_messages:
                                     obj = channel.overwrites_for(r)
                                     obj.send_messages = None
@@ -1233,11 +1236,12 @@ ID corresponds to the Identifier of the message
                             count += 1
                 if category is not None and category.permissions_for(guild.me).manage_roles:
                     await category.set_permissions(role, send_messages=False)
-            await self.bot.cogs['Servers'].modify_server(guild.id, values=[('muted_role',role.id)])
-            return role, count
         except Exception as e:
             await self.bot.cogs['Errors'].on_error(e, None)
-            return role, len(guild.channels)
+            count = len(guild.channels)
+        await self.bot.cogs['Servers'].modify_server(guild.id, values=[('muted_role',role.id)])
+        return role, count
+        
 
 
 def setup(bot):
