@@ -119,7 +119,7 @@ class Servers(commands.Cog):
         return True
 
     async def get_languages(self, ignored_guilds: typing.List[int], return_dict: bool = False):
-        """Return percentages of languages"""
+        """Return stats on used languages"""
         if not self.bot.database_online:
             return list()
         cnx = self.bot.cnx_frm
@@ -142,6 +142,31 @@ class Servers(commands.Cog):
             for e, l in enumerate(self.bot.cogs['Languages'].languages):
                 langs.append((l, liste.count(e)))
         return langs
+    
+    async def get_xp_types(self, ignored_guilds: typing.List[int], return_dict: bool = False):
+        """Return stats on used xp types"""
+        if not self.bot.database_online:
+            return list()
+        cnx = self.bot.cnx_frm
+        cursor = cnx.cursor(dictionary=True)
+        query = ("SELECT `xp_type`,`ID` FROM `{}`".format(self.table))
+        cursor.execute(query)
+        liste = list()
+        guilds = [x.id for x in self.bot.guilds if x.id not in ignored_guilds]
+        for x in cursor:
+            if x['ID'] in guilds:
+                liste.append(x['xp_type'])
+        for _ in range(len(guilds)-len(liste)):
+            liste.append(self.default_opt['xp_type'])
+        if return_dict:
+            types = dict()
+            for e, l in enumerate(self.bot.get_cog('Xp').types):
+                types[l] = liste.count(e)
+        else:
+            types = list()
+            for e, l in enumerate(self.bot.get_cog('Xp').types):
+                types.append((l, liste.count(e)))
+        return types
 
     async def staff_finder(self, user: discord.Member, option: str):
         """Check is user is part of a staff"""
