@@ -32,7 +32,7 @@ async def can_say(ctx: MyContext):
         return await ctx.bot.cogs["Servers"].staff_finder(ctx.author,"say")
 
 async def can_use_cookie(ctx: MyContext):
-#                            Z_runner           neil3000            Awhikax           Adri526         Theventreur         Catastrophix        Platon_Neutron      megat69            Aragorn1202
+#                            Z_runner           neil3000            Awhikax           Adri         Theventreur         Catastrophix        Platon_Neutron      megat69            Aragorn1202
     return ctx.author.id in [279568324260528128,278611007952257034,281404141841022976,409470110131027979,229194747862843392,438372385293336577,286827468445319168,517762101859844106,375598088850505728]
 
 class Fun(commands.Cog):
@@ -846,7 +846,7 @@ You can specify a verification limit by adding a number in argument (up to 1.000
     @commands.cooldown(4, 30, type=commands.BucketType.guild)
     async def vote(self,ctx,number:typing.Optional[int] = 0,*,text):
         """Send a message on which anyone can vote through reactions. 
-        A big thank to Adri526 for his emojis specially designed for the bot!
+        A big thank to Adri for his emojis specially designed for the bot!
         
         If no number of choices is given, the emojis will be 👍 and 👎. Otherwise, it will be a series of numbers.
         The text sent by the bot is EXACTLY the one you give, without any more formatting.
