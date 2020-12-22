@@ -1029,6 +1029,7 @@
             "DISCOVERABLE": "Affiché dans l'onglet Découverte",
             "FEATURABLE": "Affiché dans l'onglet Activité",
             "INVITE_SPLASH": "Fond d'écran d'invitation",
+            "MEMBER_VERIFICATION_GATE_ENABLED": "Portail de vérification des membres activé",
             "NEWS": "Salons de news",
             "PARTNERED": "Serveur partenaire",
             "PREVIEW_ENABLED": "Preview activées",
