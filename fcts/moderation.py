@@ -1228,8 +1228,8 @@ ID corresponds to the Identifier of the message
                                 if r.managed and len(r.members) == 1 and r.members[0].bot:
                                     # if it's an integrated bot role
                                     continue
-                                if r.permissions.send_messages:
-                                    obj = channel.overwrites_for(r)
+                                obj = channel.overwrites_for(r)
+                                if obj.send_messages:
                                     obj.send_messages = None
                                     await channel.set_permissions(r, overwrite=obj)
                         except discord.errors.Forbidden:
