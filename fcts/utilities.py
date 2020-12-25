@@ -332,7 +332,9 @@ class Utilities(commands.Cog):
         if 'rainbow' in unlocked:
             liste.append('rainbow')
         if 'christmas_19' in unlocked:
-            liste.append('christmas')
+            liste.append('christmas19')
+        if 'christmas_20' in unlocked:
+            liste.append('christmas20')
         if 'halloween_20' in unlocked:
             liste.append('halloween20')
         return sorted(liste2)+sorted(liste)

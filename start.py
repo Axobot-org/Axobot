@@ -192,7 +192,7 @@ def main():
             if len(sys.argv) > 3 and sys.argv[3] in ['o', 'n', 'y']:
                 enable_rss = sys.argv[3]
             else:
-                enable_rss = input("Activation of RSS feeds? (o/n) ")
+                enable_rss = input("Activation of RSS feeds? (y/n) ")
             if enable_rss.lower() not in ('o', 'y'):
                 client.rss_enabled = False
     else:
