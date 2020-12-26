@@ -33,6 +33,14 @@ You want some good news? If you have permission to use the `say <server.html#lis
 .. warning:: The only permission required is "`Manage messages <perms.html#manage-messages>`_" to possibly delete your own message.
 
 
+Birthdays
+---------
+
+**Syntax:** :code:`birthday` or :code:`happy-birthday` or :code:`hb`
+
+Wanna do a cool party for a birthday? Get a random gif with this simple command! Easy and fun!
+
+
 Blame
 -----
 
@@ -57,6 +65,14 @@ Just bubble wrap. Which pops when you squeeze it. That's all. #Just4Fun
 Width should be between 1 and 150, height between 1 and 50.
 
 
+Cat
+---
+
+**Syntax** :code:`cat`
+
+Just a random cat picture. Nothing else. But they're so cuuuuute.
+
+
 Count messages
 --------------
 
@@ -77,6 +93,14 @@ Congrats
 This is a nice little gif to use when you want to congratulate your friend. And remember to thank Gilderoy Lockhart for his charming smile!
 
 .. warning:: ZBot needs "`Attach files <perms.html#attach-files>`_" permission to send this nice message.
+
+
+Kill
+----
+
+**Syntax:** :code:`kill [name]`
+
+If you want to express your hatred or displeasure towards someone or something, but in a fun way, this command is for you. The bot will take a random death sentence from a long selection and insert the subject of your anger into it to create a simple and effective message. Try it at least once!
 
 
 Lmgtfy

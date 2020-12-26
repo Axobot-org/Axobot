@@ -132,6 +132,7 @@
                 "Aucun rôle de vérification n'a été configuré"
             ]
         },
+        "cmd-count": "{nbr} commandes\n`{p}help {cog}` pour en afficher la liste",
         "cmd-not-found": "Aucune commande nommée \"{}\"",
         "description": "Description",
         "embed_title": "Liste des commandes disponibles pour {u}",
@@ -212,6 +213,7 @@
         "list-2": "\n**Durée :** {D}",
         "no-user": "Impossible de trouver cet utilisateur",
         "no_database": "En raison d'une panne temporaire de la base de donnée, cette commande a été désactivée",
+        "no-case": "Cet utilisateur n'a aucun casier !",
         "not-found": "Ce casier n'a pas été trouvé :confused:",
         "reason-edited": "La raison du casier n°{} a bien été modifiée !",
         "search-0": "**Membre:** {U}\n**Type:** {T}\n**Moderateur:** {M}\n**Date:** {D}\n**Raison:** *{R}*",
@@ -230,6 +232,7 @@
         "disabled": "La commande {c} est désactivée",
         "duration": "La durée `{d}` est invalide",
         "emojinotfound": "Emoji `{e}` introuvable",
+        "invalidcardstyle": "Style de carte invalide : `{s}`",
         "invalidcolor": "La couleur `{c}` est invalide",
         "invalidemoji": "Emoji invalide",
         "invalidguild": "Ce serveur est introuvable : `{g}`",
@@ -290,12 +293,14 @@
         "fun-list": "Voici la liste des commandes fun disponibles :",
         "invalid-city": "Nom de ville invalide",
         "markdown": "__**Règles du Markdown** sur *Discord*__\n\n`*italique*` = *italique*\n`__souligné__` = __souligné__\n`**gras**` = **gras**\n`***gras italique***` = ***gras italique***\n`~~barré~~` = ~~barré~~\n`__*souligné italique*__` = __*souligné italique*__\n`__**souligné gras**__` = __**souligné gras**__\n`__***souligné gras italique***__` = __***souligné gras italique***__\n`||spoiler||` = ||spoiler||\n> citation = `> citation`\n\\`code\\` = `code`\n\\\\ pour ignorer\n\nPour les blocs de code, cf <https://discord.gg/DGahTNn>",
+        "nasa-none": "Oups, impossible de récupérer les informations de la NASA pour le moment. Réessayez dans quelques minutes :confused:",
         "no-database": "Notre base de donnée étant hors ligne, l'accès aux commandes fun est restreint aux personnes ayant la permission de Gérer le Serveur",
         "no-embed-perm": "Je ne possède pas la permission \"Intégrer des liens\" :confused:",
         "no-emoji": "Impossible de trouver cet emoji !",
         "no-fun": "Les commandes fun ont été désactivées sur ce serveur. Pour voir leur liste, regardez https://zbot.rtfd.io/en/v3/fun.html",
         "no-reaction": "Impossible d'ajouter les réactions. Vérifiez mes permissions",
         "no-roll": "Aucun élément trouvé",
+        "not-enough-roll": "Il vous faut au moins deux éléments distincts",
         "no-say": "Impossible d'envoyer un message dans ce salon",
         "no-voicechan": "Vous devez être connecté à un salon vocal pour utiliser cette commande.",
         "osekour": [
@@ -346,7 +351,7 @@
             "Le saviez-vous ? Le Staff de ZBot est Composé d'un Admin développeur talentueux, d'un deuxième admin ayant comme nom une marque de croquette ainsi que d'un chat, un marteau de Ban et un champignon !",
             "Pro-tip : La commande `say <texte>` est très utile pour poster des messages anonymes... du moins quand vous y avez accès.",
             "Pro-tip : La commande `discordlinks` vous donnera tous les liens utiles relatifs à discord !",
-            "Le saviez-vous ?  Tous les designs relatifs au bot sont réalisés par Adri526#9223, dont l'énorme liste d'émojis utilisés dans la commande `bigtext` !",
+            "Le saviez-vous ?  Tous les designs relatifs au bot sont réalisés par Adri#9223, dont l'énorme liste d'émojis utilisés dans la commande `bigtext` !",
             "Le saviez-vous ? ZBot tiens son nom... de son créateur, Z_runner",
             "Pro-tip : Le bot possède un Discord, où vous pourrez voir les bugs actuels et voter pour les prochaines mises à jour ! Utilisez la commande `about` pour en obtenir le lien",
             "Pro-tip : la commande `prefix` permet d'avoir la liste des préfixes actuellement utilisables dans le serveur",
@@ -366,7 +371,7 @@
         "about-3": "Le compte Twitter de mon créateur :",
         "about-4": "Une petite FAQ :",
         "about-5": "La Politique de Confidentialité :",
-        "about-main": "Bonjour ! Moi c'est {mention} !\n\nJe suis un bot qui permet de faire *beaucoup* de choses : de la modération, un système d'xp, des statistiques, la gestion de partenaires et plein d'autres commandes plus ou moins utiles ! \nVous pouvez commencer par taper `!help` dans ce tchat pour voir la liste des commandes disponibles, puis `!config see` vous permettra de voir les options de configuration (un site web est en préparation). \n\nPour m'avoir aidé dans la création du bot, mon propriétaire et moi souhaitons remercier Awhikax pour son soutien apporté lors des différentes crises, Aragorn1202 pour toutes ses idées et ses phrases pleines de bon sens, Adri526 pour tous ces magnifiques logos, émojis et images de profil, et toute l'équipe de traducteurs pour leur merveilleux travail !\n\n:globe_with_meridians: Quelques liens pourront vous être utiles : {links}\n\nBonne journée !",
+        "about-main": "Bonjour ! Moi c'est {mention} !\n\nJe suis un bot qui permet de faire *beaucoup* de choses : de la modération, un système d'xp, des statistiques, la gestion de partenaires et plein d'autres commandes plus ou moins utiles ! \nVous pouvez commencer par taper `!help` dans ce tchat pour voir la liste des commandes disponibles, puis `!config see` vous permettra de voir les options de configuration (un site web est en préparation). \n\nPour m'avoir aidé dans la création du bot, mon propriétaire et moi souhaitons remercier Awhikax pour son soutien apporté lors des différentes crises, Aragorn1202 pour toutes ses idées et ses phrases pleines de bon sens, Adri pour tous ces magnifiques logos, émojis et images de profil, et toute l'équipe de traducteurs pour leur merveilleux travail !\n\n:globe_with_meridians: Quelques liens pourront vous être utiles : {links}\n\nBonne journée !",
         "admins-list": "Les administrateurs de ce bot sont : {}",
         "bitly_long": "URL d'origine : {url}",
         "bitly_nobit": "Cette adresse n'est pas un lien bit.ly !",
@@ -386,6 +391,8 @@
             "Utilisation prohibée de BetterDiscord"
         ],
         "docs": "Voici le lien vers la documentation du bot :",
+        "ping-found": "Pong ! (moyenne de {tps}ms par 64 bits, envoyés à {url})",
+        "ping-notfound": "Impossible de ping cette adresse",
         "prefix": "Liste des préfixes actuellement utilisables :",
         "stats": "**Version du bot :** {bot_v} \n**Nombre de serveurs :** {s_count} \n**Nombre de membres visibles :** {m_count} (dont {b_count} **bots**)\n**Nombre de lignes de code :** {l_count}\n**Langues utilisées :** {lang} \n**Version de Python :** {p_v} \n**Version de la bibliothèque `discord.py` :** {d_v} \n**Charge sur la mémoire vive :** {ram} GB \n**Charge sur le CPU :** {cpu} % \n**Temps de latence de l'api :** {api} ms\n**Nombre total d'xp gagné :** {xp}xp",
         "stats-title": "**Statistiques du bot**",
@@ -520,7 +527,7 @@
             "Mobs pouvant lâcher cet item",
             "Version d'ajout"
         ],
-        "block-help": "Cette commande permet d'obtenir des informations sur n'importe quel bloc de Minecraft. Vous pouvez donner son nom complet ou partiel, en français ou en anglais, ou même son identifiant. Il suffit d'entrer `!mc block <nom>`",
+        "block-help": "Cette commande permet d'obtenir des informations sur n'importe quel bloc de Minecraft. Vous pouvez donner son nom complet ou partiel, en français ou en anglais, ou même son identifiant. Il suffit d'entrer `{p}mc block <nom>`",
         "cant-embed": "Impossible d'envoyez l'embed. Vérifiez que la permission \"Embed links\" est bien activée svp",
         "cmd-fields": [
             "Nom",
@@ -528,7 +535,7 @@
             "Exemples",
             "Version d'ajout"
         ],
-        "cmd-help": "Cette commande permet d'obtenir des informations sur n'importe quelle commande de Minecraft. Il suffit d'entrer `!mc command <nom>`",
+        "cmd-help": "Cette commande permet d'obtenir des informations sur n'importe quelle commande de Minecraft. Il suffit d'entrer `{p}mc command <nom>`",
         "contact-mail": "Si vous constatez une erreur dans les informations données, merci de me contacter rapidement, ou de rapporter l'erreur directement [sur le site](https://fr-minecraft.net).",
         "dimensions": "Largeur: {la}\nLongueur: {lo}\nHauteur: {ha}",
         "entity-fields": [
@@ -540,7 +547,7 @@
             "Biomes de prédilection",
             "Version d'ajout"
         ],
-        "entity-help": "Cette commande permet d'obtenir des informations sur n'importe quelle entité de Minecraft. Vous pouvez donner son nom complet ou partiel, en français ou en anglais, ou même son identifiant. Il suffit d'entrer `!mc entity <nom>`",
+        "entity-help": "Cette commande permet d'obtenir des informations sur n'importe quelle entité de Minecraft. Vous pouvez donner son nom complet ou partiel, en français ou en anglais, ou même son identifiant. Il suffit d'entrer `{p}mc entity <nom>`",
         "item-fields": [
             "ID",
             "Taille d'un stack",
@@ -551,7 +558,18 @@
             "Mobs pouvant lâcher cet item",
             "Version d'ajout"
         ],
-        "item-help": "Cette commande permet d'obtenir des informations sur n'importe quel item de Minecraft. Vous pouvez donner son nom complet ou partiel, en français ou en anglais, ou même son identifiant. Il suffit d'entrer `!mc item <nom>`",
+        "item-help": "Cette commande permet d'obtenir des informations sur n'importe quel item de Minecraft. Vous pouvez donner son nom complet ou partiel, en français ou en anglais, ou même son identifiant. Il suffit d'entrer `{p}mc item <nom>`",
+        "mod-fields": [
+            "Nom",
+            "Auteurs",
+            "Résumé",
+            "Langue principale",
+            "Dernière mise à jour",
+            "Versions du jeu",
+            "Nombre de téléchargements",
+            "ID"
+        ],
+        "mod-help": "Cette commande permet d'obtenir des informations sur un grand nombre de mods Minecraft. Vous pouvez donner son nom complet ou partiel, il suffit d'entrer `{p}mc mod <nom>`. Le mod doit être enregistré sur la plateforme CurseForge pour apparaître",
         "mojang_desc": {
             "account.mojang.com": "Site de gestion des comptes Mojang",
             "api.mojang.com": "Service d'API fournit par Mojang",
@@ -567,14 +585,17 @@
             "Entité",
             "Item",
             "Commande",
-            "Progrès"
+            "Progrès",
+            "Mod"
         ],
         "no-adv": "Progrès introuvable",
         "no-api": "Erreur : Impossible de se connecter à l'API",
         "no-block": "Bloc introuvable",
         "no-cmd": "Commande introuvable",
+        "no-embed": "Impossible d'envoyer le résultat ! Veuillez me donner la permission 'Intégrer les liens' pour que je puisse l'envoyer.",
         "no-entity": "Entité introuvable",
         "no-item": "Item introuvable",
+        "no-mod": "Mod introuvable",
         "no-ping": "Erreur : Impossible de ping ce serveur",
         "serv-0": "Nombre de joueurs",
         "serv-1": "Liste des 20 premiers joueurs connectés",
@@ -837,6 +858,7 @@
         "invalid-flow": "Cet url est invalide (flux rss vide ou inaccessible) :confused:",
         "invalid-link": "Oups, cette adresse url est invalide ou incomplète :confused:",
         "list": "*Entrez le numéro du flux à modifier*\n\n**Lien - Type - Salon - Roles**\n",
+        "list-title": "Liste des flux rss du serveur {server}",
         "list-result": "Type : {}\nSalon : {}\nLien/chaine : {}\nRôle mentionné : {}\nIdentifiant : {}\nDernier post : {}",
         "list2": "*Entrez le numéro du flux à supprimer*\n\n**Lien - Type - Salon**\n",
         "mc": "Minecraft",
@@ -886,6 +908,7 @@
         "change-1": "Oups, une erreur interne est survenue...",
         "change-10": "Ce système d'xp n'existe pas. Voici la liste des systèmes disponibles : {}",
         "change-11": "Cette couleur est invalide",
+        "change-12": "La catégorie {} n'a pas été trouvée",
         "change-2": "La valeur de l'option '{}' a bien été effacée",
         "change-3": "Le rôle '{}' n'a pas été trouvé :confused: (Vérifiez les majuscules et les caractères spéciaux)",
         "change-4": "L'option '{}' attend un paramètre de type booléen (True/False) en valeur :innocent:",
@@ -896,6 +919,7 @@
         "change-9": "L'émoji `{}` n'a pas été trouvé",
         "change-autoremove_xp": "Le bot enlèvera {xp} points d'xp par jour aux membres inactifs",
         "change-bool": "L'option '{}' a bien été modifiée avec la valeur *{}*",
+        "change-category": "L'option '{}' a bien été modifiée avec la catégorie {}",
         "change-color": "La couleur utilisée pour l'option {} est maintenant {}",
         "change-emojis": "Les émojis pour l'option '{}' sont maintenant {}",
         "change-lang": "La langue du bot est maintenant en `{}`",
@@ -954,6 +978,10 @@
         "slowmode": "Liste des rôles qui peuvent utiliser les commandes 'slowmode' et 'freeze' : {}",
         "update_mentions": "Rôles mentionnés lors d'une mise à jour du bot : {}",
         "verification_role": "Rôles enlevés lorsqu'un joueur s'authentifie avec la commande `verify` : {}",
+        "voice_roles": "Rôles donné aux membre en vocal : {}",
+        "voice_channel": "Salon à partir duquel seront créés les salons vocaux automatiques : {}",
+        "voice_category": "Catégorie dans laquelle seront créés les salons vocaux automatiques : {}",
+        "voice_channel_format": "Format des noms des salons vocaux automatiques : {}",
         "vote_emojis": "Emojis utilisés pour les réactions de vote : {}",
         "warn": "Liste des rôles pouvant utiliser les commandes 'warn' et 'case' : {}",
         "welcome": "Message envoyé lorsqu'un membre arrive : {}",
@@ -1001,6 +1029,7 @@
             "DISCOVERABLE": "Affiché dans l'onglet Découverte",
             "FEATURABLE": "Affiché dans l'onglet Activité",
             "INVITE_SPLASH": "Fond d'écran d'invitation",
+            "MEMBER_VERIFICATION_GATE_ENABLED": "Portail de vérification des membres activé",
             "NEWS": "Salons de news",
             "PARTNERED": "Serveur partenaire",
             "PREVIEW_ENABLED": "Preview activées",
@@ -1072,6 +1101,10 @@
         "missing-attach-files": "Oups, il me manque la permission d'Attacher des Fichiers :confused:",
         "usernames_log_false": "Vous avez désactivé l'enregistrement de vos noms d'utilisateurs ainsi que de vos surnoms",
         "usernames_log_true": "Vous avez autorisé l'enregistrement de vos noms d'utilisateurs ainsi que de vos surnoms"
+    },
+    "voices": {
+        "no-channel": "Il n'y a aucun salon vocal généré dans ce serveur",
+        "deleted": "{i} salons supprimés"
     },
     "xp": {
         "1-no-xp": "Vous ne possédez pas encore d'xp !",

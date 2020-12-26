@@ -1,42 +1,37 @@
 import random
 import discord
 import asyncio
-import datetime
 import time
 import emoji as emojilib
 from discord.ext import commands
+from classes import zbot, MyContext
 
 
-class MorpionCog(commands.Cog):
+class Morpions(commands.Cog):
 
-    def __init__(self, bot: commands.Bot):
+    def __init__(self, bot: zbot):
         self.bot = bot
-        self.file = 'morpion'
+        self.file = 'morpions'
         self.in_game = dict()
-        try:
-            self.translate = bot.cogs['LangCog'].tr
-        except:
-            pass
 
-    @commands.Cog.listener()
-    async def on_ready(self):
-        self.translate = self.bot.cogs['LangCog'].tr
 
     @commands.command(name="tic-tac-toe", aliases=['morpion', 'tictactoe', 'ttt'])
-    async def main(self, ctx: commands.Context, leave: str = None):
+    async def main(self, ctx: MyContext, leave: str = None):
         """A simple mini-game that consists of aligning three chips on a 9-square grid.
     The bot plays in red, the user in blue.
     Use 'tic-tac-toe leave' to make you leave the game if you're stuck in it.
+
+    ..Doc miscellaneous.html#tic-tac-toe
     """
         if leave == 'leave':
             if ctx.author.id not in self.in_game.keys():
-                await ctx.send(await self.translate(ctx.channel, 'morpion', 'not-playing'))
+                await ctx.send(await self.bot._(ctx.channel, 'morpion', 'not-playing'))
             else:
                 self.in_game.pop(ctx.author.id)
-                await ctx.send(await self.translate(ctx.channel, 'morpion', 'game-removed'))
+                await ctx.send(await self.bot._(ctx.channel, 'morpion', 'game-removed'))
             return
         if ctx.author.id in self.in_game.keys():
-            await ctx.send(await self.translate(ctx.channel, 'morpion', 'already-playing'))
+            await ctx.send(await self.bot._(ctx.channel, 'morpion', 'already-playing'))
             return
         self.in_game[ctx.author.id] = time.time()
         game = self.Game(ctx, self)
@@ -46,7 +41,7 @@ class MorpionCog(commands.Cog):
 
     class Game():
 
-        def __init__(self, ctx: commands.Context, Cog):
+        def __init__(self, ctx: MyContext, Cog):
             self.cog = Cog
             self.ctx = ctx
             self.bot = ctx.bot
@@ -63,13 +58,13 @@ class MorpionCog(commands.Cog):
             if self.bot.current_event == 'fish':
                 self.emojis = ["🐟", "🐠"]
             if self.ctx.guild:
-                config = await self.bot.get_cog("ServerCog").find_staff(self.ctx.guild.id, "morpion_emojis")
-                if config != None and config != "":
+                config = await self.bot.get_config(self.ctx.guild.id, "morpion_emojis")
+                if config is not None and config != "":
                     for r in config.split(';'):
                         if r.isnumeric():
                             d_em = discord.utils.get(
                                 self.bot.emojis, id=int(r))
-                            if d_em != None:
+                            if d_em is not None:
                                 self.emojis.append(str(d_em))
                         else:
                             self.emojis.append(
@@ -90,7 +85,7 @@ class MorpionCog(commands.Cog):
                     affichage_grille += '\n'
                 if grille[k] in range(10):
                     affichage_grille += '<:{}>'.format(
-                        self.bot.cogs['EmojiCog'].numbEmojis[grille[k]])
+                        self.bot.cogs['Emojis'].numbEmojis[grille[k]])
                 elif grille[k] == 'O':
                     affichage_grille += self.emojis[0]
                 else:
@@ -121,8 +116,8 @@ class MorpionCog(commands.Cog):
             try:
                 grille = [x for x in range(1, 10)]
                 tour = await self.qui_commence()
-                u_begin = await self.cog.translate(ctx.channel, 'morpion', 'user-begin') if tour == True else await self.cog.translate(ctx.channel, 'morpion', 'bot-begin')
-                await ctx.send(u_begin.format(ctx.author.mention)+await self.cog.translate(ctx.channel, 'morpion', 'tip', symb1=self.emojis[0], symb2=self.emojis[1]))
+                u_begin = await self.bot._(ctx.channel, 'morpion', 'user-begin' if tour else 'bot-begin')
+                await ctx.send(u_begin.format(ctx.author.mention)+await self.bot._(ctx.channel, 'morpion', 'tip', symb1=self.emojis[0], symb2=self.emojis[1]))
                 match_nul = True
 
                 def check(m):
@@ -139,7 +134,7 @@ class MorpionCog(commands.Cog):
                         try:
                             msg = await self.bot.wait_for('message', check=check, timeout=50)
                         except asyncio.TimeoutError:
-                            await ctx.channel.send(await self.cog.translate(ctx.channel, 'morpion', 'too-late'))
+                            await ctx.channel.send(await self.bot._(ctx.channel, 'morpion', 'too-late'))
                             return
                         saisie = msg.content
                         if msg.content in self.entrees_valides:
@@ -147,13 +142,13 @@ class MorpionCog(commands.Cog):
                                 grille = await self.remplacer_valeur(grille, tour, saisie)
                                 tour = False
                             else:
-                                await ctx.send(await self.cog.translate(ctx.channel, 'morpion', 'pion-1'))
+                                await ctx.send(await self.bot._(ctx.channel, 'morpion', 'pion-1'))
                                 display_grille = False
                                 continue
                         elif msg.content.endswith("leave"):
                             return
                         else:
-                            await ctx.send(await self.cog.translate(ctx.channel, 'morpion', 'pion-2'))
+                            await ctx.send(await self.bot._(ctx.channel, 'morpion', 'pion-2'))
                             display_grille = False
                             continue
                 ###
@@ -184,18 +179,18 @@ class MorpionCog(commands.Cog):
                         break
                 ###
                 if match_nul:
-                    await self.bot.cogs["UtilitiesCog"].add_user_eventPoint(ctx.author.id, 1)
-                    resultat = await self.cog.translate(ctx.channel, 'morpion', 'nul')
+                    await self.bot.cogs["Utilities"].add_user_eventPoint(ctx.author.id, 1)
+                    resultat = await self.bot._(ctx.channel, 'morpion', 'nul')
                 else:
                     if tour:  # Le bot a gagné
-                        resultat = await self.cog.translate(ctx.channel, 'morpion', 'win-2')
+                        resultat = await self.bot._(ctx.channel, 'morpion', 'win-2')
                     else:  # L'utilisateur a gagné
-                        resultat = await self.cog.translate(ctx.channel, 'morpion', 'win-1')
-                        await self.bot.cogs["UtilitiesCog"].add_user_eventPoint(ctx.author.id, 4)
+                        resultat = await self.bot._(ctx.channel, 'morpion', 'win-1')
+                        await self.bot.cogs["Utilities"].add_user_eventPoint(ctx.author.id, 4)
                 await ctx.send(await self.afficher_grille(grille)+'\n'+resultat.format(ctx.author.mention))
             except Exception as e:
-                await self.bot.cogs['ErrorsCog'].on_command_error(ctx, e)
+                await self.bot.cogs['Errors'].on_command_error(ctx, e)
 
 
 def setup(bot):
-    bot.add_cog(MorpionCog(bot))
+    bot.add_cog(Morpions(bot))

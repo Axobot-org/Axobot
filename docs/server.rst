@@ -14,7 +14,7 @@ The list of options continues to grow as development progresses, that's why a we
 
 .. note:: For the curious, know that all the configuration of each server is entirely saved in a MySQL database file, which makes its use easier than a simple txt or csv file.
 
-.. warn:: Recently, it has become possible to do without the names of the subcommands. Thus :code:`config 2` is equivalent to :code:`config see 2`, and :code:`config xp_rate 1.4` to :code:`config change xp_rate 1.4`.
+.. warning:: Recently, it has become possible to do without the names of the subcommands. Thus :code:`config 2` is equivalent to :code:`config see 2`, and :code:`config xp_rate 1.4` to :code:`config change xp_rate 1.4`.
 
 Watch
 -----
@@ -89,11 +89,17 @@ List of every option
 * vote_emojis: List of emojis that the bot will have to use when there is a voting message. This case may occur when using the vote command, or in a poll channel.
 * morpion_emojis: List of emojis used to play on tic-tac-toe. Two emojis must be entered: one for the bot, and one for the player. Discord emojis as well as server emojis can work.
 * help_in_dm: Boolean indicating whether the help command message should be sent as a private message, or in the server. If the value is set to :code:`True`, the message will be sent in DM.
+* compress_help: Boolean indicating whether the full help message (without any specified command/module) should show every command or only their count
 * muted_role: Role used to mute your members. If no role is specified, Zbot will check for any role called "muted", and create one if needed, with basic permissions.
 * partner_channel: One channel where every partners of the server will be displayed. Default to None.
 * partner_color: The color of the partners embeds. Can be hex, integer or common english names. Default to #a713fe.
 * partner_role: A role given to every administrator of a partner server. Default to None.
 * update_mentions: A list of roles which will be mentioned in each update changelog. You can enable those changelogs with the `bot_news` option. Default to None.
+* verification_role: A role given to (un)verified members
+* voice_roles: List of roles given to people being in a voice channel
+* voice_channel: Channel used by the automated voice channels system (see `below <server.html#voice-channels-managment>`_)
+* voice_category: Category used by the automated voice channels system (see `below <server.html#voice-channels-managment>`_)
+* voice_channel_format: Name format used by the automated voice channels system (see `below <server.html#voice-channels-managment>`_)
 
 
 ---------
@@ -137,7 +143,7 @@ The main command to manage these roles is :code:`roles_rewards` (or its alias :c
 
 * :code:`roles_rewards list` : lists all currently configured roles-rewards, with their corresponding level, as well as the maximum number of roles allowed for your server. The bot must have "`Embed Links <perms.html#embed-links>`_" permission.
 
-.. warning:: For these roles to work properly, the bot **must** have "Manage Roles" permission. The roles to be given or removed **must** also be lower than the role of Zbot in your server hierarchy (Server Settings > Roles tab).
+.. warning:: For these roles to work properly, the bot **must** have "`Manage roles <perms.html#manage-roles>`_" permission. The roles to be given or removed **must** also be lower than the role of Zbot in your server hierarchy (Server Settings > Roles tab).
 
 
 ---------------
@@ -217,7 +223,7 @@ This backup will avoid the most important damage, those little mistakes that can
 
 When you load the backup, the bot may not be able to apply some changes. However, it will give you a complete list of what has and hasn't been changed so that you can fix it yourself.
 
-.. warning:: The bot will need as many permissions as possible, which includes: Manage Roles, Manage Channels, Manage Webhooks, Ban Members, Manage Emojis.
+.. warning:: The bot will need as many permissions as possible, which includes: `Manage roles <perms.html#manage-roles>`_, `Manage channels <perms.html#manage-channels>`_, `Manage webhooks <perms.html#manage-webhooks>`_, `Ban members <perms.html#ban-members>`_, `Manage emojis <perms.html#manage-emojis>`_.
 
 Create a backup
 ---------------
@@ -232,3 +238,35 @@ Load a backup
 **Syntax:** :code:`backup load`
 
 Uses the file attached to this message to load a backup, based on the data stored in the file. Be sure to send the file in the same message as the command, so that Zbot can easily find it. If the bot lacks permissions, it will try to skip this step and write it down in the logs. The set of logs is then sent at the end of the procedure.
+
+
+------------------------
+Voice channels managment
+------------------------
+
+Give a role to voice users
+--------------------------
+
+**Syntax** :code:`config change voice_roles <your roles>`
+
+You can easily give a role to any member joining a voice channel, and revoke it when the member leave the channel. This allows you to create a specific text channel for people talking together, for example.
+
+Create automated voice channels
+-------------------------------
+
+Managing a server isn't easy. You often have too many or not enough channels, especially voice channels. This is why the bot has an automated voice channels management system, which will create new voice channels when needed, and delete them when they aren't used anymore.
+
+To do that, you only need to configure a special voice channel where every member joining it will trigger a new channel creation. This can be achieved with the :code:`config change voice_channel <your channel>` command.
+
+Then, the bot needs to know where it should create these new channels. A simple :code:`config change voice_category <your category>` will ask the bot to create its new channels at the bottom of a specific category.
+
+Zbot will take a random name for each new channel, from a random names API, but you can change the name format with the :code:`config change voice_channel_format <new format>` command. Use the special :code:`{random}` keyword anywhere in it to insert a random name!
+
+.. warning:: Zbot needs the "`Manage channels <perms.html#manage-channels>`_", "`Move members <perms.html#move-members>`_" and "`Connect <perms.html#connect>`_" permissions in the selected category to create these news channels!
+
+Clear your unusued auto channels
+--------------------------------
+
+Zbot will try to delete the channels automatically created once everyone left it. But if, for any reason, you still have some unusued auto voice channels, you can use the super :code:`voice-clean` command to start a big cleanup!
+
+.. note:: Aynone with "`Manage channels <perms.html#manage-channels>`_" permission can use that command!

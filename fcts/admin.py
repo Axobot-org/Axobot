@@ -1,11 +1,25 @@
 import discord
 from discord.ext import commands
 
-import time, importlib, sys, traceback, datetime, os, shutil, asyncio, inspect, typing, io, textwrap, copy, operator, requests, random, ast, math, mysql, json
-from libs import feedparser
+import time
+import sys
+import traceback
+import datetime
+import os
+import shutil
+import asyncio
+import inspect
+import typing
+import io
+import textwrap
+import copy
+import operator
+import mysql
+import json
 from contextlib import redirect_stdout
 from glob import glob
 from fcts import reloads
+from classes import zbot, MyContext, UserFlag
 
 
 def cleanup_code(content):
@@ -16,10 +30,10 @@ def cleanup_code(content):
     # remove `foo`
     return content.strip('` \n')
 
-class AdminCog(commands.Cog):
+class Admin(commands.Cog):
     """Here are listed all commands related to the internal administration of the bot. Most of them are not accessible to users, but only to ZBot administrators."""
         
-    def __init__(self, bot):
+    def __init__(self, bot: zbot):
         self.bot = bot
         self.file = "admin"
         self.emergency_time = 5.0
@@ -28,8 +42,7 @@ class AdminCog(commands.Cog):
         else:
             self.update = {'fr':None,'en':None}
         try:
-            self.translate = self.bot.cogs["LangCog"].tr
-            self.utilities = self.bot.cogs["UtilitiesCog"]
+            self.utilities = self.bot.cogs["Utilities"]
         except:
             pass
         self._last_result = None
@@ -37,8 +50,7 @@ class AdminCog(commands.Cog):
     
     @commands.Cog.listener()
     async def on_ready(self):
-        self.translate = self.bot.cogs["LangCog"].tr
-        self.utilities = self.bot.cogs["UtilitiesCog"]
+        self.utilities = self.bot.cogs["Utilities"]
 
     async def check_if_admin(self,ctx):
         return await reloads.check_admin(ctx)
@@ -46,7 +58,7 @@ class AdminCog(commands.Cog):
     async def check_if_god(self,ctx):
         if isinstance(ctx,discord.User):
             return await reloads.check_admin(ctx)
-        elif isinstance(ctx.guild,discord.Guild) and ctx.guild!=None:
+        elif isinstance(ctx.guild,discord.Guild) and ctx.guild is not None:
             return await reloads.check_admin(ctx) and ctx.guild.id in self.god_mode
         else:
             return await reloads.check_admin(ctx)
@@ -65,18 +77,18 @@ class AdminCog(commands.Cog):
         """Envoie un mp à un membre"""
         try:
             await user.send(message)
-            await ctx.bot.cogs['UtilitiesCog'].add_check_reaction(ctx.message)
+            await ctx.bot.cogs['Utilities'].add_check_reaction(ctx.message)
         except Exception as e:
-            await self.bot.cogs['ErrorsCog'].on_error(e,ctx)
+            await self.bot.cogs['Errors'].on_error(e,ctx)
 
     @commands.group(name='admin',hidden=True)
     @commands.check(reloads.check_admin)
     async def main_msg(self,ctx):
         """Commandes réservées aux administrateurs de ZBot"""
-        if ctx.subcommand_passed==None:
+        if ctx.subcommand_passed is None:
             text = "Liste des commandes disponibles :"
             for cmd in sorted(self.main_msg.commands, key=lambda x:x.name):
-                text+="\n- {} *({})*".format(cmd.name,'...' if cmd.help==None else cmd.help.split('\n')[0])
+                text+="\n- {} *({})*".format(cmd.name,'...' if cmd.help is None else cmd.help.split('\n')[0])
                 if type(cmd)==commands.core.Group:
                     for cmds in cmd.commands:
                         text+="\n        - {} *({})*".format(cmds.name,cmds.help.split('\n')[0])
@@ -127,7 +139,7 @@ class AdminCog(commands.Cog):
         await destination_fr.set_permissions(role_fr, read_messages=True)
         await destination_en.set_permissions(role_en, read_messages=True)
         await msg.edit(content="Terminé !")
-        await ctx.bot.cogs['UtilitiesCog'].add_check_reaction(ctx.message)
+        await ctx.bot.cogs['Utilities'].add_check_reaction(ctx.message)
 
 
     @main_msg.command(name="update",hidden=True)
@@ -140,6 +152,7 @@ class AdminCog(commands.Cog):
             return
         def check(m):
             return m.author == ctx.author and m.channel == ctx.channel
+        msg = None
         for x in self.update.keys():
             await ctx.send("Message en {} ?".format(x))
             try:
@@ -149,13 +162,17 @@ class AdminCog(commands.Cog):
             if msg.content.lower() in ['none','annuler','stop','oups']:
                 return await ctx.send('Annulé !')
             self.update[x] = msg.content
-        await ctx.bot.cogs['UtilitiesCog'].add_check_reaction(msg)
+        if msg:
+            await ctx.bot.cogs['Utilities'].add_check_reaction(msg)
     
-    async def send_updates(self,ctx:commands.Context):
+    async def send_updates(self,ctx:MyContext):
         """Lance un message de mise à jour"""
+        if self.bot.zombie_mode:
+            return
         if None in self.update.values():
             return await ctx.send("Les textes ne sont pas complets !")
         text = "Vos messages contiennent"
+        msg = None
         if max([len(x) for x in self.update.values()]) > 1900//len(self.update.keys()):
             for k,v in self.update.items():
                 text += "\n{}:``\n{}\n```".format(k,v)
@@ -164,7 +181,9 @@ class AdminCog(commands.Cog):
         else:
             text += "\n"+"\n".join(["{}:\n```\n{}\n```".format(k,v) for k,v in self.update.items()])
             msg = await ctx.send(text)
-        await ctx.bot.cogs['UtilitiesCog'].add_check_reaction(msg)
+        if not msg:
+            return
+        await ctx.bot.cogs['Utilities'].add_check_reaction(msg)
         def check(reaction, user):
             return user == ctx.author and reaction.message.id==msg.id
         try:
@@ -173,17 +192,17 @@ class AdminCog(commands.Cog):
             return await ctx.send('Trop long !')
         count = 0
         for guild in ctx.bot.guilds:
-            channels = await ctx.bot.cogs["ServerCog"].find_staff(guild.id,'bot_news')
+            channels = await ctx.bot.get_config(guild.id,'bot_news')
             if channels is None or len(channels) == 0:
                 continue
             channels = [guild.get_channel(int(x)) for x in channels.split(';') if len(x)>5 and x.isnumeric()]
-            lang = await ctx.bot.cogs["ServerCog"].find_staff(guild.id,'language')
+            lang = await ctx.bot.get_config(guild.id,'language')
             if type(lang)!=int:
                 lang = 0
-            lang = ctx.bot.cogs['LangCog'].languages[lang]
+            lang = ctx.bot.cogs['Languages'].languages[lang]
             if lang not in self.update.keys():
                 lang = 'en'
-            mentions_str = await self.bot.cogs['ServerCog'].find_staff(guild.id,'update_mentions')
+            mentions_str = await self.bot.get_config(guild.id,'update_mentions')
             if mentions_str is None:
                 mentions = []
             else:
@@ -198,7 +217,7 @@ class AdminCog(commands.Cog):
                 try:
                     await chan.send(self.update[lang]+"\n\n"+" ".join(mentions), allowed_mentions=discord.AllowedMentions(everyone=False, roles=True))
                 except Exception as e:
-                    await ctx.bot.cogs['ErrorsCog'].on_error(e,ctx)
+                    await ctx.bot.cogs['Errors'].on_error(e,ctx)
                 else:
                     count += 1
             if guild.id == 356067272730607628:
@@ -211,7 +230,7 @@ class AdminCog(commands.Cog):
         # add changelog in the database
         cnx = self.bot.cnx_frm
         cursor = cnx.cursor()
-        version = self.bot.cogs['InfoCog'].bot_version
+        version = self.bot.cogs['Info'].bot_version
         # query = "INSERT INTO `changelogs` (`version`, `release_date`, `fr`, `en`, `beta`) VALUES ('{v}', '{r}', '{fr}', '{en}', {b}) ON DUPLICATE KEY UPDATE `fr` = '{fr}', `en` = '{en}';".format(v=version,r=ctx.message.created_at,fr=self.update['fr'].replace("'","\\'"),en=self.update['en'].replace("'","\\'"),b=self.bot.beta)
         query = "INSERT INTO `changelogs` (`version`, `release_date`, `fr`, `en`, `beta`) VALUES (%(v)s, %(r)s, %(fr)s, %(en)s, %(b)s) ON DUPLICATE KEY UPDATE `fr` = '%(fr)s', `en` = '%(en)s';"
         cursor.execute(query, { 'v': version, 'r': ctx.message.created_at, 'fr': self.update['fr'], 'en': self.update['en'], 'b': self.bot.beta })
@@ -232,12 +251,12 @@ class AdminCog(commands.Cog):
     
     @main_msg.command(name="lang-sort",hidden=True)
     @commands.check(reloads.check_admin)
-    async def resort_langs(self,ctx:commands.Context,*,lang:str=None):
+    async def resort_langs(self,ctx:MyContext,*,lang:str=None):
         """Trie par ordre alphabétique les fichiers de traduction"""
         all_files = sorted([x.replace('fcts/lang/','').replace('.json','') for x in glob("fcts/lang/*.json", recursive=False)])
         if isinstance(lang,str) and ' ' in lang:
             langs = lang.split(' ')
-        elif lang==None:
+        elif lang is None:
             langs = all_files
         elif lang in all_files:
             langs = [lang]
@@ -259,10 +278,10 @@ class AdminCog(commands.Cog):
         text = str()
         for x in sorted(ctx.bot.guilds, key=operator.attrgetter('me.joined_at')):
             text += "- {} (`{}` - {} membres)\n".format(x.name,x.owner,len(x.members))
-            if len(text)>1900:
+            if len(text) > 1900:
                 await ctx.send(text)
                 text = ""
-        if len(text)>0:
+        if len(text) > 0:
             await ctx.send(text)
 
     @main_msg.command(name='shutdown')
@@ -300,7 +319,7 @@ class AdminCog(commands.Cog):
         if len(args) == 1:
             ID = self.bot.user.id
             args.append('1' if ID==486896267788812288 else '2' if ID==436835675304755200 else '3')
-            args.append('n' if ctx.bot.cogs['Events'].loop.get_task()==None else 'o')
+            args.append('n' if ctx.bot.cogs['Events'].loop.get_task() is None else 'o')
             args.append('o' if ctx.bot.rss_enabled else 'n')
         self.bot.log.info("Redémarrage du bot")
         os.execl(sys.executable, sys.executable, *args)
@@ -310,13 +329,13 @@ class AdminCog(commands.Cog):
     async def reload_cog(self, ctx, *, cog: str):
         """Recharge un module"""
         cogs = cog.split(" ")
-        await self.bot.cogs["ReloadsCog"].reload_cogs(ctx,cogs)
+        await self.bot.cogs["Reloads"].reload_cogs(ctx,cogs)
         
     @main_msg.command(name="check_tr")
     @commands.check(reloads.check_admin)
     async def check_tr(self,ctx,lang='en',origin="fr"):
         """Vérifie si un fichier de langue est complet"""
-        await self.bot.cogs["LangCog"].check_tr(ctx.channel,lang,origin)
+        await self.bot.cogs["Languages"].check_tr(ctx.channel,lang,origin)
 
     @main_msg.command(name="backup")
     @commands.check(reloads.check_admin)
@@ -331,7 +350,7 @@ class AdminCog(commands.Cog):
         if self.bot.database_online:
             i = 0
             for x in self.bot.guilds:
-                if await self.bot.cogs["ServerCog"].update_memberChannel(x):
+                if await self.bot.cogs["Servers"].update_memberChannel(x):
                     i += 1
             await ctx.send(f"{i} salons mis à jours !")
         else:
@@ -341,7 +360,7 @@ class AdminCog(commands.Cog):
     @commands.check(reloads.check_admin)
     async def adm_invites(self,ctx,*,server=None):
         """Cherche une invitation pour un serveur, ou tous"""
-        if server != None:
+        if server is not None:
             guild = discord.utils.get(self.bot.guilds, name=server)
             if guild is None and server.isnumeric():
                 guild = discord.utils.get(self.bot.guilds, id=int(server))
@@ -350,19 +369,19 @@ class AdminCog(commands.Cog):
             liste = list()
             for guild in self.bot.guilds:
                 liste.append(await self.search_invite(guild,guild))
-                if len("\n".join(liste))>1900:
+                if len("\n".join(liste)) > 1900:
                     await ctx.author.send("\n".join(liste))
                     liste = []
-            if len(liste)>0:
+            if len(liste) > 0:
                 await ctx.author.send("\n".join(liste))
-        await self.bot.cogs['UtilitiesCog'].suppr(ctx.message)
+        await self.bot.cogs['Utilities'].suppr(ctx.message)
 
     async def search_invite(self,guild,string):
-        if guild==None:
+        if guild is None:
             return "Le serveur `{}` n'a pas été trouvé".format(string)
         try:
             inv = await guild.invites()
-            if len(inv)>0:
+            if len(inv) > 0:
                 msg = "`{}` - {} ({} membres) ".format(guild.name,inv[0],len(guild.members))
             else:
                 msg = "`{}` - Le serveur ne possède pas d'invitation".format(guild.name)
@@ -370,12 +389,12 @@ class AdminCog(commands.Cog):
             msg = "`{}` - Impossible de récupérer l'invitation du serveur (Forbidden)".format(guild.name)
         except Exception as e:
             msg = "`ERROR:` "+str(e)
-            await self.bot.cogs['ErrorsCog'].on_error(e,None)
+            await self.bot.cogs['Errors'].on_error(e,None)
         return msg
 
     @main_msg.command(name="config")
     @commands.check(reloads.check_admin)
-    async def admin_sconfig_see(self,ctx,server,option=None):
+    async def admin_sconfig_see(self, ctx: MyContext, server, option=None):
         """Affiche les options d'un serveur"""
         if not ctx.bot.database_online:
             await ctx.send("Impossible d'afficher cette commande, la base de donnée est hors ligne :confused:")
@@ -384,46 +403,51 @@ class AdminCog(commands.Cog):
             guild = discord.utils.get(self.bot.guilds,id=int(server))
         else:
             guild = discord.utils.get(self.bot.guilds,name=server)
-        if guild != None:
+        if guild is not None:
             try:
-                await self.bot.cogs["ServerCog"].send_see(guild,ctx.channel,option,ctx.message,guild)
+                await self.bot.cogs["Servers"].send_see(guild,ctx.channel,option,ctx.message,guild)
             except Exception as e:
-                await self.bot.cogs["ErrorsCog"].on_command_error(ctx,e)
+                await self.bot.cogs["Errors"].on_command_error(ctx,e)
         else:
             await ctx.send("Serveur introuvable")
 
     @main_msg.command(name='db_reload')
     @commands.check(reloads.check_admin)
-    async def db_reload(self,ctx):
+    async def db_reload(self, ctx: MyContext):
         """Reconnecte le bot à la base de donnée"""
         try:
             self.bot.cnx_frm.close()
             self.bot.connect_database_frm()
             self.bot.cnx_xp.close()
             self.bot.connect_database_xp()
-            if self.bot.cnx_frm != None and self.bot.cnx_xp != None:
-                await ctx.bot.cogs['UtilitiesCog'].add_check_reaction(ctx.message)
+            if self.bot.cnx_frm is not None and self.bot.cnx_xp is not None:
+                if utils := self.bot.get_cog("Utilities"):
+                    await utils.add_check_reaction(ctx.message)
+                    if xp := self.bot.get_cog("Xp"):
+                        await xp.reload_sus()
         except Exception as e:
-            await self.bot.cogs['ErrorsCog'].on_command_error(ctx,e)
+            await self.bot.cogs['Errors'].on_command_error(ctx,e)
 
     @main_msg.command(name="emergency")
     @commands.check(reloads.check_admin)
-    async def emergency_cmd(self,ctx):
+    async def emergency_cmd(self, ctx: MyContext):
         """Déclenche la procédure d'urgence
         A N'UTILISER QU'EN CAS DE BESOIN ABSOLU ! Le bot quittera tout les serveurs après avoir envoyé un mp à chaque propriétaire"""
         await ctx.send(await self.emergency())
 
-    async def emergency(self,level=100):
+    async def emergency(self, level=100):
+        if self.bot.zombie_mode:
+            return
+        time = round(self.emergency_time - level/100,1)
         for x in reloads.admins_id:
             try:
                 user = self.bot.get_user(x)
-                if user.dm_channel==None:
+                if user.dm_channel is None:
                     await user.create_dm()
-                time = round(self.emergency_time - level/100,1)
-                msg = await user.dm_channel.send("{} La procédure d'urgence vient d'être activée. Si vous souhaitez l'annuler, veuillez cliquer sur la réaction ci-dessous dans les {} secondes qui suivent l'envoi de ce message.".format(self.bot.cogs['EmojiCog'].customEmojis['red_warning'],time))
+                msg = await user.dm_channel.send("{} La procédure d'urgence vient d'être activée. Si vous souhaitez l'annuler, veuillez cliquer sur la réaction ci-dessous dans les {} secondes qui suivent l'envoi de ce message.".format(self.bot.cogs['Emojis'].customEmojis['red_warning'],time))
                 await msg.add_reaction('🛑')
             except Exception as e:
-                await self.bot.cogs['ErrorsCog'].on_error(e,None)
+                await self.bot.cogs['Errors'].on_error(e,None)
 
         def check(reaction, user):
             return user.id in reloads.admins_id
@@ -437,34 +461,33 @@ class AdminCog(commands.Cog):
                     continue
                 try:
                     if server.owner not in owners:
-                        await server.owner.send(await self.translate(server,"admin","emergency"))
+                        await server.owner.send(await self.bot._(server,"admin","emergency"))
                         owners.append(server.owner)
                     await server.leave()
                     servers +=1
                 except:
                     continue
             chan = await self.bot.get_channel(500674177548812306)
-            await chan.send("{} Prodédure d'urgence déclenchée : {} serveurs quittés - {} propriétaires prévenus".format(self.bot.cogs['EmojiCog'].customEmojis['red_alert'],servers,len(owners)))
-            return "{}  {} propriétaires de serveurs ont été prévenu ({} serveurs)".format(self.bot.cogs['EmojiCog'].customEmojis['red_alert'],len(owners),servers)
+            await chan.send("{} Prodédure d'urgence déclenchée : {} serveurs quittés - {} propriétaires prévenus".format(self.bot.cogs['Emojis'].customEmojis['red_alert'],servers,len(owners)))
+            return "{}  {} propriétaires de serveurs ont été prévenu ({} serveurs)".format(self.bot.cogs['Emojis'].customEmojis['red_alert'],len(owners),servers)
         for x in reloads.admins_id:
             try:
                 user = self.bot.get_user(x)
                 await user.send("La procédure a été annulée !")
             except Exception as e:
-                await self.bot.cogs['ErrorsCog'].on_error(e,None)
+                await self.bot.cogs['Errors'].on_error(e,None)
         return "Qui a appuyé sur le bouton rouge ? :thinking:"
 
     @main_msg.command(name="code")
     @commands.check(reloads.check_admin)
     async def show_code(self,ctx,cmd):
-        cmds = self.bot.commands
-        obj = await self.bot.cogs['UtilitiesCog'].set_find(cmds,cmd)
-        if obj != None:
+        obj = self.bot.get_command(cmd)
+        if obj is not None:
             code = inspect.getsource(obj.callback)
-            if len(code)>1950:
+            if len(code) > 1950:
                 liste = str()
                 for line in code.split('\n'):
-                    if len(liste+"\n"+line)>1950:
+                    if len(liste+"\n"+line) > 1950:
                         await ctx.send("```py\n{}\n```".format(liste))
                         liste = str()
                     liste += '\n'+line
@@ -482,12 +505,12 @@ class AdminCog(commands.Cog):
             usr = await ctx.bot.fetch_user(ID)
         except:
             usr = None
-        scog = ctx.bot.cogs['ServerCog']
+        scog = ctx.bot.cogs['Servers']
         try:
-            config = await ctx.bot.cogs['UtilitiesCog'].get_bot_infos()
-            if serv!=None and usr!=None:
+            config = await ctx.bot.cogs['Utilities'].get_bot_infos()
+            if serv is not None and usr is not None:
                 await ctx.send("Serveur trouvé : {}\nUtilisateur trouvé : {}".format(serv.name,usr))
-            elif serv!=None:
+            elif serv is not None:
                 servs = config['banned_guilds'].split(';')
                 if str(serv.id) in servs:
                     servs.remove(str(serv.id))
@@ -497,7 +520,7 @@ class AdminCog(commands.Cog):
                     servs.append(str(serv.id))
                     await scog.edit_bot_infos(self.bot.user.id,[('banned_guilds',';'.join(servs))])
                     await ctx.send("Le serveur {} a bien été blacklist".format(serv.name))
-            elif usr!=None:
+            elif usr is not None:
                 usrs = config['banned_users'].split(';')
                 if str(usr.id) in usrs:
                     usrs.remove(str(usr.id))
@@ -509,16 +532,16 @@ class AdminCog(commands.Cog):
                     await ctx.send("L'utilisateur {} a bien été blacklist".format(usr))
             else:
                 await ctx.send("Impossible de trouver cet utilisateur/ce serveur")
-            ctx.bot.cogs['UtilitiesCog'].config = None
+            ctx.bot.cogs['Utilities'].config = None
         except Exception as e:
-            await ctx.bot.cogs['ErrorsCog'].on_command_error(ctx,e)
+            await ctx.bot.cogs['Errors'].on_command_error(ctx,e)
 
     @main_msg.command(name="logs")
     @commands.check(reloads.check_admin)
     async def show_last_logs(self,ctx,lines:typing.Optional[int]=15,*,match=''):
         """Affiche les <lines> derniers logs ayant <match> dedans"""
         try:
-            if lines>1000:
+            if lines > 1000:
                 match = str(lines)
                 lines = 15
             with open('debug.log','r',encoding='utf-8') as file:
@@ -532,14 +555,14 @@ class AdminCog(commands.Cog):
                     continue
                 liste.append(text[-i].replace('`',''))
             for i in liste:
-                if len(msg+i)>1900:
+                if len(msg+i) > 1900:
                     await ctx.send("```css\n{}\n```".format(msg))
                     msg = ""
                 if len(i)<1900:
                     msg += "\n"+i.replace('`','')
             await ctx.send("```css\n{}\n```".format(msg))
         except Exception as e:
-            await self.bot.cogs['ErrorsCog'].on_error(e,ctx)
+            await self.bot.cogs['Errors'].on_error(e,ctx)
 
     @main_msg.command(name="enable_module")
     @commands.check(reloads.check_admin)
@@ -563,28 +586,31 @@ Cette option affecte tous les serveurs"""
     
     @main_msg.command(name="flag")
     @commands.check(reloads.check_admin)
-    async def admin_flag(self,ctx:commands.Context,add:str,flag:str,users:commands.Greedy[discord.User]):
+    async def admin_flag(self, ctx:MyContext, add:str, flag:str, users:commands.Greedy[discord.User]):
         """Ajoute ou retire un attribut à un utilisateur
         
         Flag valides : support, premium, contributor, partner, unlocked_rainbow, unlocked_blurple"""
-        if add not in ['add','remove']:
+        if add not in ['add', 'remove']:
             return await ctx.send("Action invalide")
         for user in users:
-            try:
-                info = await self.bot.cogs['UtilitiesCog'].get_db_userinfo(columns=[flag],criters=[f'userID={user.id}'])
-            except mysql.connector.errors.ProgrammingError:
-                return await ctx.send("Flag invalide")
-            except Exception as e:
-                return await self.bot.cogs['ErrorsCog'].on_error(e,ctx)
-            if info != None:
-                if info[flag] and add=='add':
-                    return await ctx.send(f"L'utilisateur {user} a déjà ce flag")
-                if (not info[flag]) and add=='remove':
+            if flag not in UserFlag.FLAGS.values():
+                await ctx.send("Flag invalide")
+                return
+            userflags: list = await self.bot.get_cog("Users").get_userflags(user)
+            if userflags:
+                if flag in userflags and add == 'add':
+                    await ctx.send(f"L'utilisateur {user} a déjà ce flag")
+                    return
+                if flag not in userflags and add == 'remove':
                     return await ctx.send(f"L'utilisateur {user} n'a pas ce flag")
-            await self.bot.cogs['UtilitiesCog'].change_db_userinfo(user.id,flag,'1' if add=="add" else '0')
-            if add=="add":
+            if add == "add":
+                userflags.append(flag)
+            else:
+                userflags.remove(flag)
+            await self.bot.cogs['Utilities'].change_db_userinfo(user.id, 'user_flags', UserFlag().flagsToInt(userflags))
+            if add == "add":
                 await ctx.send(f"L'utilisateur {user} a maintenant le flag `{flag}`",delete_after=3.0)
-            elif add=="remove":
+            elif add == "remove":
                 await ctx.send(f"L'utilisateur {user} n'a plus le flag `{flag}`",delete_after=3.0)
             try:
                 await ctx.message.detele()
@@ -593,7 +619,7 @@ Cette option affecte tous les serveurs"""
 
     @main_msg.command(name="loop_restart")
     @commands.check(reloads.check_admin)
-    async def loop_restart(self,ctx:commands.Context):
+    async def loop_restart(self,ctx:MyContext):
         """Relance la boucle principale"""
         try:
             ctx.bot.cogs["Events"].loop.start()
@@ -617,11 +643,11 @@ Cette option affecte tous les serveurs"""
         """Ajoute le rôle Owner à tout les membres possédant un serveur avec le bot
         Il est nécessaire d'avoir au moins 10 membres pour que le rôle soit ajouté"""
         server = self.bot.get_guild(356067272730607628)
-        if server==None:
+        if server is None:
             await ctx.send("Serveur ZBot introuvable")
             return
         role = server.get_role(486905171738361876)
-        if role==None:
+        if role is None:
             await ctx.send("Rôle Owners introuvable")
             return
         owner_list = list()
@@ -638,7 +664,7 @@ Cette option affecte tous les serveurs"""
             elif (member.id not in owner_list) and role in member.roles:
                 await ctx.send("Rôle supprimé à "+str(member))
                 await member.remove_roles(role,reason="This user doesn't support me anymore")
-        await ctx.bot.cogs['UtilitiesCog'].add_check_reaction(ctx.message)
+        await ctx.bot.cogs['Utilities'].add_check_reaction(ctx.message)
 
     @main_botserv.command(name="best_ideas")
     @commands.check(reloads.check_admin)
@@ -646,7 +672,7 @@ Cette option affecte tous les serveurs"""
         """Donne la liste des 10 meilleures idées"""
         bot_msg = await ctx.send("Chargement des idées...")
         server = self.bot.get_guild(356067272730607628)
-        if server==None:
+        if server is None:
             return await ctx.send("Serveur introuvable")
         channel = server.get_channel(488769306524385301)
         if channel is None:
@@ -662,7 +688,7 @@ Cette option affecte tous les serveurs"""
                         up = len(users)
                     elif x.emoji == '👎':
                         down = len(users)
-                if len(msg.embeds)>0:
+                if len(msg.embeds) > 0:
                     liste.append((up-down,datetime.datetime.utcnow()-msg.created_at,msg.embeds[0].fields[0].value,up,down))
                 else:
                     liste.append((up-down,datetime.datetime.utcnow()-msg.created_at,msg.content,up,down))
@@ -671,15 +697,15 @@ Cette option affecte tous les serveurs"""
         liste = liste[:number]
         title = "Liste des {} meilleures idées (sur {}) :".format(len(liste),count)
         text = str()
-        if ctx.guild!=None:
+        if ctx.guild is not None:
             color = ctx.guild.me.color
         else:
             color = discord.Colour(8311585)
         for x in liste:
             text += "\n**[{} - {}]**  {} ".format(x[3],x[4],x[2])
         try:
-            if ctx.guild==None or ctx.channel.permissions_for(ctx.guild.me).embed_links:
-                emb = ctx.bot.cogs['EmbedCog'].Embed(title=title,desc=text,color=color).update_timestamp()
+            if ctx.can_send_embed:
+                emb = ctx.bot.cogs['Embeds'].Embed(title=title,desc=text,color=color).update_timestamp()
                 return await bot_msg.edit(content=None,embed=emb.discord_embed())
             await bot_msg.edit(content=title+text)
         except discord.HTTPException:
@@ -724,7 +750,7 @@ Cette option affecte tous les serveurs"""
         try:
             to_compile = f'async def func():\n{textwrap.indent(body, "  ")}'
         except Exception as e:
-            await self.bot.cogs['ErrorsCog'].on_error(e,ctx)
+            await self.bot.cogs['Errors'].on_error(e,ctx)
             return
         try:
             exec(to_compile, env)
@@ -740,7 +766,7 @@ Cette option affecte tous les serveurs"""
             await ctx.send(f'```py\n{value}{traceback.format_exc()}\n```')
         else:
             value = stdout.getvalue()
-            await ctx.bot.cogs['UtilitiesCog'].add_check_reaction(ctx.message)
+            await ctx.bot.cogs['Utilities'].add_check_reaction(ctx.message)
 
             if ret is None:
                 if value:
@@ -760,12 +786,12 @@ Cette option affecte tous les serveurs"""
         new_ctx = await self.bot.get_context(msg)
         #new_ctx.db = ctx.db
         await self.bot.invoke(new_ctx)
-        await ctx.bot.cogs['UtilitiesCog'].add_check_reaction(ctx.message)
+        await ctx.bot.cogs['Utilities'].add_check_reaction(ctx.message)
 
     async def backup_auto(self,ctx=None):
         """Crée une backup du code"""
         t = time.time()
-        self.bot.log.info("("+str(await self.bot.cogs['TimeCog'].date(datetime.datetime.now(),digital=True))+") Backup auto en cours")
+        self.bot.log.info("("+str(await self.bot.cogs['TimeUtils'].date(datetime.datetime.now(),digital=True))+") Backup auto en cours")
         message = await ctx.send(":hourglass: Sauvegarde en cours...")
         try:
             os.remove('../backup.tar')
@@ -775,7 +801,7 @@ Cette option affecte tous les serveurs"""
             archive = shutil.make_archive('backup','tar','..')
         except FileNotFoundError:
             self.bot.log.error("Impossible de trouver le dossier de sauvegarde")
-            await message.edit("{} Impossible de trouver le dossier de sauvegarde".format(self.bot.cogs['EmojiCog'].customEmojis['red_cross']))
+            await message.edit("{} Impossible de trouver le dossier de sauvegarde".format(self.bot.cogs['Emojis'].customEmojis['red_cross']))
             return
         try:
             shutil.move(archive,'..')
@@ -788,7 +814,7 @@ Cette option affecte tous les serveurs"""
             pass
         msg = "Backup completed in {} seconds!".format(round(time.time()-t,3))
         self.bot.log.info(msg)
-        if ctx != None:
+        if ctx is not None:
             await message.edit(content=msg)
             
     @commands.group(name='bug',hidden=True)
@@ -802,22 +828,22 @@ Cette option affecte tous les serveurs"""
         """Ajoute un bug à la liste"""
         try:
             channel = ctx.bot.get_channel(548138866591137802) if self.bot.beta else ctx.bot.get_channel(488769283673948175)
-            if channel==None:
+            if channel is None:
                 return await ctx.send("Salon 488769283673948175 introuvable")
             text = bug.split('\n')
             fr,en = text[0].replace('\\n','\n'), text[1].replace('\\n','\n')
-            emb = self.bot.cogs['EmbedCog'].Embed(title="New bug",fields=[{'name':'Français','value':fr},{'name':'English','value':en}],color=13632027).update_timestamp()
+            emb = self.bot.cogs['Embeds'].Embed(title="New bug",fields=[{'name':'Français','value':fr},{'name':'English','value':en}],color=13632027).update_timestamp()
             await channel.send(embed=emb.discord_embed())
-            await ctx.bot.cogs['UtilitiesCog'].add_check_reaction(ctx.message)
+            await ctx.bot.cogs['Utilities'].add_check_reaction(ctx.message)
         except Exception as e:
-            await self.bot.cogs['ErrorsCog'].on_command_error(ctx,e)
+            await self.bot.cogs['Errors'].on_command_error(ctx,e)
     
     @main_bug.command(name='fix')
     async def bug_fix(self,ctx,ID:int,fixed:bool=True):
         """Marque un bug comme étant fixé"""
         try:
             chan = ctx.bot.get_channel(548138866591137802) if self.bot.beta else ctx.bot.get_channel(488769283673948175)
-            if chan==None:
+            if chan is None:
                 return await ctx.send("Salon introuvable")
             try:
                 msg = await chan.fetch_message(ID)
@@ -833,9 +859,9 @@ Cette option affecte tous les serveurs"""
                 emb.color = discord.Color(13632027)
                 emb.title = "New bug"
             await msg.edit(embed=emb)
-            await ctx.bot.cogs['UtilitiesCog'].add_check_reaction(ctx.message)
+            await ctx.bot.cogs['Utilities'].add_check_reaction(ctx.message)
         except Exception as e:
-            await self.bot.cogs['ErrorsCog'].on_command_error(ctx,e)
+            await self.bot.cogs['Errors'].on_command_error(ctx,e)
 
     @commands.group(name="idea",hidden=True)
     @commands.check(reloads.check_admin)
@@ -848,23 +874,23 @@ Cette option affecte tous les serveurs"""
         """Ajoute une idée à la liste"""
         try:
             channel = ctx.bot.get_channel(548138866591137802) if self.bot.beta else ctx.bot.get_channel(488769306524385301)
-            if channel==None:
+            if channel is None:
                 return await ctx.send("Salon introuvable")
             text = text.split('\n')
             fr,en = text[0].replace('\\n','\n'), text[1].replace('\\n','\n')
-            emb = self.bot.cogs['EmbedCog'].Embed(fields=[{'name':'Français','value':fr},{'name':'English','value':en}],color=16106019).update_timestamp()
+            emb = self.bot.cogs['Embeds'].Embed(fields=[{'name':'Français','value':fr},{'name':'English','value':en}],color=16106019).update_timestamp()
             msg = await channel.send(embed=emb.discord_embed())
-            await self.bot.cogs['FunCog'].add_vote(msg)
-            await ctx.bot.cogs['UtilitiesCog'].add_check_reaction(ctx.message)
+            await self.bot.cogs['Fun'].add_vote(msg)
+            await ctx.bot.cogs['Utilities'].add_check_reaction(ctx.message)
         except Exception as e:
-            await self.bot.cogs['ErrorsCog'].on_command_error(ctx,e)
+            await self.bot.cogs['Errors'].on_command_error(ctx,e)
 
     @main_idea.command(name='valid')
     async def idea_valid(self,ctx,ID:int,valid:bool=True):
         """Marque une idée comme étant ajoutée à la prochaine MàJ"""
         try:
             chan = ctx.bot.get_channel(548138866591137802) if self.bot.beta else ctx.bot.get_channel(488769306524385301)
-            if chan==None:
+            if chan is None:
                 return await ctx.send("Salon introuvable")
             try:
                 msg = await chan.fetch_message(ID)
@@ -878,9 +904,9 @@ Cette option affecte tous les serveurs"""
             else:
                 emb.color = discord.Color(16106019)
             await msg.edit(embed=emb)
-            await ctx.bot.cogs['UtilitiesCog'].add_check_reaction(ctx.message)
+            await ctx.bot.cogs['Utilities'].add_check_reaction(ctx.message)
         except Exception as e:
-            await self.bot.cogs['ErrorsCog'].on_command_error(ctx,e)
+            await self.bot.cogs['Errors'].on_command_error(ctx,e)
 
 def setup(bot):
-    bot.add_cog(AdminCog(bot))
+    bot.add_cog(Admin(bot))

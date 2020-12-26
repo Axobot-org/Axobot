@@ -51,6 +51,8 @@ With this command, you can change the design of your xp card (the one used for t
 
 If you use the command without argument, the bot will show you an example of a xp card with the style you currently have. But if you enter a style name that does not exist, it will give you a list of usable styles *for you*.
 
+You can also use the command :code:`profile card-preview <style>` to get a preview of a specific style with your avatar.
+
 .. note:: Note that to be able to display your card, the bot needs `Attach Files <perms.html#attach-files>`_ permission!
 
 
