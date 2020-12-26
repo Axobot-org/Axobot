@@ -307,7 +307,6 @@ Every information come from the website www.fr-minecraft.net"""
         url = 'https://addons-ecs.forgesvc.net/api/v2/addon/'
         h = {"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0) Gecko/20100101 Firefox/83.0"}
         searchurl = url+'search?gameId=432&sectionId=6&sort=0&pageSize=2&searchFilter='+quote(value.lower())
-        await ctx.send(searchurl)
         async with aiohttp.ClientSession(loop=self.bot.loop, headers=h) as session:
             async with session.get(searchurl, timeout=10) as resp:
                 search: list = await resp.json()
