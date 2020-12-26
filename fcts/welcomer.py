@@ -13,24 +13,33 @@ class Welcomer(commands.Cog):
     
     @commands.Cog.listener()
     async def on_member_join(self, member:discord.Member):
-        """Fonction principale appelée lorsqu'un membre rejoint un serveur"""
-        # await self.send_log(member,"welcome")
+        """Main function called when a member joins a server"""
         if self.bot.database_online:
             await self.bot.cogs["Servers"].update_memberChannel(member.guild)
-            await self.send_msg(member,"welcome")
-            self.bot.loop.create_task(self.give_roles(member))
-            await self.give_roles_back(member)
-            await self.check_muted(member)
-        if member.guild.id==356067272730607628:
-            await self.check_owner_server(member)
-            await self.check_support(member)
-            await self.check_contributor(member)
+            if "MEMBER_VERIFICATION_GATE_ENABLED" not in member.guild.features:
+                await self.send_msg(member,"welcome")
+                self.bot.loop.create_task(self.give_roles(member))
+                await self.give_roles_back(member)
+                await self.check_muted(member)
+                if member.guild.id==356067272730607628:
+                    await self.check_owner_server(member)
+                    await self.check_support(member)
+                    await self.check_contributor(member)
+    
+    @commands.Cog.listener()
+    async def on_member_update(self, before:discord.Member, after:discord.Member):
+        """Main function called when a member got verified in a community server"""
+        if before.pending and not after.pending:
+            if "MEMBER_VERIFICATION_GATE_ENABLED" in after.guild.features:
+                await self.send_msg(after,"welcome")
+                self.bot.loop.create_task(self.give_roles(after))
+                await self.give_roles_back(after)
+                await self.check_muted(after)
         
         
     @commands.Cog.listener()
     async def on_member_remove(self, member:discord.Member):
         """Fonction principale appelée lorsqu'un membre quitte un serveur"""
-        # await self.send_log(member,"leave")
         if self.bot.database_online:
             await self.bot.cogs["Servers"].update_memberChannel(member.guild)
             await self.send_msg(member,"leave")
