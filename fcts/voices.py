@@ -45,7 +45,10 @@ class VoiceChannels(commands.Cog):
         c.execute(f"DELETE FROM {self.table} WHERE guild=%s AND channel=%s", arg)
         cnx.commit()
         c.close()
-        self.channels[channel.guild.id].remove(channel.id)
+        try:
+            self.channels[channel.guild.id].remove(channel.id)
+        except KeyError:
+            return
 
     async def give_roles(self, member: discord.Member, remove=False):
         if not self.bot.database_online:
@@ -84,7 +87,9 @@ class VoiceChannels(commands.Cog):
         config = await self.bot.get_config(member.guild.id, 'voice_channel')
         if config is None:  # if nothing was setup
             return
-        config = list(map(int, config.split(';')))
+        config = [int(x) for x in config.split(';') if x.isnumeric() and len(x)>5]
+        if len(config) == 0:
+            return
         if after.channel is not None and after.channel.id in config:
             if before.channel is not None and len(before.channel.members) == 0: # move from another channel which is now empty
                 if (member.guild.id in self.channels.keys()) and (before.channel.id in self.channels[member.guild.id]):
@@ -105,8 +110,10 @@ class VoiceChannels(commands.Cog):
         category = await self.bot.get_config(member.guild.id, 'voice_category')
         if category is None:  # if nothing was setup
             return
-        category = list(map(int, category.split(';')))[0]
-        voice_category: discord.CategoryChannel = member.guild.get_channel(category)
+        category = [int(x) for x in category.split(';') if x.isnumeric() and len(x)>5]
+        if len(category) == 0:
+            return
+        voice_category: discord.CategoryChannel = member.guild.get_channel(category[0])
         if not isinstance(voice_category, discord.CategoryChannel):
             return
         perms = voice_category.permissions_for(member.guild.me)
