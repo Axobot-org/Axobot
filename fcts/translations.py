@@ -1,20 +1,23 @@
-import discord, asyncio
+import discord
 from discord.ext import commands
-import json, os
+import asyncio
+import json
+import os
+from classes import zbot, MyContext
 
 
-async def is_translator(ctx:commands.Context) -> bool:
-    return await ctx.bot.cogs['UtilitiesCog'].is_translator(ctx.author)
+async def is_translator(ctx: MyContext) -> bool:
+    return await ctx.bot.get_cog('Users').has_userflag(ctx.author, 'translator')
 
-async def check_admin(ctx):
-    return await ctx.bot.cogs['AdminCog'].check_if_admin(ctx)
+async def check_admin(ctx: MyContext):
+    return await ctx.bot.get_cog('Admin').check_if_admin(ctx)
 
-class TranslatorsCog(commands.Cog):
+class Translations(commands.Cog):
     """Special cog for those who help with the translation of the bot"""
 
-    def __init__(self,bot:commands.Bot):
+    def __init__(self, bot: zbot):
         self.bot = bot
-        self.file = 'translators'
+        self.file = 'translations'
         if not os.path.exists('translation/'):
             os.makedirs('translation/')
         self.project_list = ['fr','en','lolcat','fi','de','es','it','br','tr','fr2']
@@ -26,10 +29,6 @@ class TranslatorsCog(commands.Cog):
             'br':self.load_translation('br'),
             'tr':self.load_translation('tr'),
             'fr2':self.load_translation('fr2')}
-        try:
-            self.translate = self.bot.cogs["LangCog"].tr
-        except:
-            pass
         self.todo = {'fi':sorted([x for x in self.translations['en'].keys() if x not in self.translations['fi'].keys()]),
                 'de':sorted([x for x in self.translations['en'].keys() if x not in self.translations['de'].keys()]),
                 'es':sorted([x for x in self.translations['en'].keys() if x not in self.translations['es'].keys()]),
@@ -37,12 +36,9 @@ class TranslatorsCog(commands.Cog):
                 'br':sorted([x for x in self.translations['en'].keys() if x not in self.translations['br'].keys()]),
                 'tr':sorted([x for x in self.translations['en'].keys() if x not in self.translations['tr'].keys()]),
                 'fr2':sorted([x for x in self.translations['en'].keys() if x not in self.translations['fr2'].keys()])}
+
     
-    @commands.Cog.listener()
-    async def on_ready(self):
-        self.translate = self.bot.cogs["LangCog"].tr
-    
-    def create_txt_map(self,data:dict) -> dict:
+    def create_txt_map(self, data: dict) -> dict:
         result = dict()
         for module, mv in data.items():
                 for key, value in mv.items():
@@ -65,7 +61,7 @@ class TranslatorsCog(commands.Cog):
                                 result[module+'.'+key+'.'+str(e)] = string
         return result
 
-    def load_translation(self,lang:str):
+    def load_translation(self, lang: str):
         result = dict()
         if lang not in self.project_list:
             return result
@@ -87,13 +83,13 @@ class TranslatorsCog(commands.Cog):
                     result[k] = v
         return result
     
-    def load_project(self,lang:str):
+    def load_project(self, lang: str):
         result = dict()
         with open('translation/'+lang+'-project.json','r',encoding='utf-8') as f:
             result = json.load(f)
-        return {k:v for k,v in result.items() if v!=None}
+        return {k:v for k,v in result.items() if v is not None}
 
-    async def modify_project(self,lang:str,key:str,new:str):
+    async def modify_project(self, lang: str, key: str, new: str):
         """Modify a string inside the project file"""
         try:
             old = self.load_project(lang)
@@ -106,17 +102,17 @@ class TranslatorsCog(commands.Cog):
 
     @commands.command(name='translate',aliases=['tr'])
     @commands.check(is_translator)
-    async def translate_smth(self,ctx,lang:str):
+    async def translate_smth(self, ctx: MyContext, lang: str):
         """Translate a message of the bot
         Original message is in English
         The text is not immediatly added into the bot and need an update to be in"""
         if lang not in self.translations.keys():
             return await ctx.send("Invalid language")
-        if len(self.todo[lang])==0:
+        if len(self.todo[lang]) == 0:
             return await ctx.send("This language is already 100% translated :tada:")
         await self.ask_a_translation(ctx,lang)
     
-    async def ask_a_translation(self,ctx:commands.Context,lang:str,isloop:bool=False):
+    async def ask_a_translation(self, ctx: MyContext, lang: str, isloop: bool=False):
         key = self.todo[lang][0]
         value = self.translations['en'].__getitem__(key)
         await ctx.send("```\n"+str(value)+"\n```")
@@ -144,19 +140,19 @@ class TranslatorsCog(commands.Cog):
     
     @commands.command(name='tr-loop')
     @commands.check(is_translator)
-    async def translate_smth_loop(self,ctx:commands.Context, lang:str):
+    async def translate_smth_loop(self, ctx: MyContext, lang: str):
         """Same that !translate, but in a loop so you don't need to type the command
 Use `stop` to stop translating
 
 ..Example tr-loop fi"""
         if lang not in self.translations.keys():
             return await ctx.send("Invalid language")
-        if len(self.todo[lang])==0:
+        if len(self.todo[lang]) == 0:
             return await ctx.send("This language is already 100% translated :tada:")
         timeouts_count = 0
         a = await self.ask_a_translation(ctx,lang,isloop=True)
         while a != 'break':
-            if len(self.todo[lang])==0:
+            if len(self.todo[lang]) == 0:
                 await ctx.send("This language is already 100% translated :tada:")
                 break
             a = await self.ask_a_translation(ctx,lang,isloop=True)
@@ -170,7 +166,7 @@ Use `stop` to stop translating
     
     @commands.command(name='tr-reload-todo')
     @commands.check(is_translator)
-    async def reload_todo(self,ctx:commands.Context, lang:str):
+    async def reload_todo(self, ctx: MyContext, lang: str):
         """Reload the to-do list of a language translation"""
         if lang not in self.todo.keys():
             return await ctx.send("Invalid language")
@@ -180,9 +176,9 @@ Use `stop` to stop translating
 
     @commands.command(name="tr-status")
     @commands.check(is_translator)
-    async def status(self,ctx:commands.Context, lang:str=None):
+    async def status(self, ctx: MyContext, lang: str=None):
         """Get the status of a translation project"""
-        if lang==None:
+        if lang is None:
             txt = "General status:"
             en_progress = len(self.translations['en'])
             for l in self.translations.keys():
@@ -200,12 +196,12 @@ Use `stop` to stop translating
             txt = f"Translation of {lang}:\n {round(c,1)}%\n {lang_progress} messages on {en_progress}"
         await ctx.send(txt)
     
-    async def _fuse_file(self,old:dict,new:dict):
+    async def _fuse_file(self, old: dict, new: dict):
         async def readpath(path:list,o,msg:str):
-            if len(path)==0:
+            if len(path) == 0:
                 return msg
             else:
-                if len(path)>1:
+                if len(path) > 1:
                     if path[1].isnumeric():
                         temp = list()
                     else:
@@ -227,7 +223,7 @@ Use `stop` to stop translating
                 return o
         for key, line in new.items():
             try:
-                if len(line.strip())==0:
+                if len(line.strip()) == 0:
                     continue
                 await readpath(key.split('.'),old,' '.join(line.split(' ')))
             except AttributeError:
@@ -237,13 +233,13 @@ Use `stop` to stop translating
 
     @commands.command(name='tr-edit')
     @commands.check(is_translator)
-    async def edit_tr(self,ctx,lang:str,key:str,*,translation:str=None):
+    async def edit_tr(self, ctx: MyContext, lang: str, key: str, *, translation: str=None):
         """Edit a translation"""
         if lang not in self.translations.keys():
             return await ctx.send("Invalid language")
         if not key in self.translations['en'].keys():
             return await ctx.send("Invalid key")
-        if translation==None:
+        if translation is None:
             await ctx.send("```\n"+self.translations['en'][key]+"\n```")
             try:
                 msg = await self.bot.wait_for('message', check=lambda msg: msg.author.id==ctx.author.id and msg.channel.id==ctx.channel.id, timeout=90)
@@ -256,7 +252,7 @@ Use `stop` to stop translating
 
     @commands.command(name="tr-file")
     @commands.check(check_admin)
-    async def fuse_file(self,ctx,lang:str):
+    async def fuse_file(self, ctx: MyContext, lang: str):
         """Merge the current project file
         with the already-translated file"""
         if lang not in self.todo.keys():
@@ -264,7 +260,7 @@ Use `stop` to stop translating
         try:
             with open(f'fcts/lang/{lang}.json','r',encoding='utf-8') as old_f:
                 with open(f'translation/{lang}-project.json','r',encoding='utf-8') as new_f:
-                    new = {k:v for k,v in json.load(new_f).items() if v!=None}
+                    new = {k:v for k,v in json.load(new_f).items() if v is not None}
                     new = await self._fuse_file(json.load(old_f),new)
         except FileNotFoundError:
             return await ctx.send("There is no current project with this language")
@@ -275,11 +271,11 @@ Use `stop` to stop translating
 
     @commands.command(name="tr-merge")
     @commands.check(check_admin)
-    async def merge_files(self,ctx:commands.Context,lang:str="en"):
+    async def merge_files(self, ctx: MyContext, lang: str="en"):
         """Merge a file with the english version"""
         if not lang in self.project_list:
             return await ctx.send("Invalid language")
-        if len(ctx.message.attachments)==0:
+        if len(ctx.message.attachments) == 0:
             return await ctx.send("Missing a file")
         from io import BytesIO
         with open(f'fcts/lang/{lang}.json','r',encoding='utf-8') as old_f:
@@ -295,4 +291,4 @@ Use `stop` to stop translating
 
 
 def setup(bot):
-    bot.add_cog(TranslatorsCog(bot))
+    bot.add_cog(Translations(bot))

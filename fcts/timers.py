@@ -1,48 +1,43 @@
-import discord
 from discord.ext import commands
 import copy
 import datetime
 
 from fcts import args
+from classes import zbot, MyContext
 
-class TimersCog(commands.Cog):
-    def __init__(self, bot:commands.Bot):
+class Timers(commands.Cog):
+    def __init__(self, bot: zbot):
         self.bot = bot
         self.file = "timers"
-        try:
-            self.translate = self.bot.cogs["LangCog"].tr
-        except:
-            pass
-    
-    @commands.Cog.listener()
-    async def on_ready(self):
-        self.translate = self.bot.cogs["LangCog"].tr
 
     @commands.command(name="remindme", aliases=['rmd'])
     @commands.cooldown(5,30,commands.BucketType.channel)
     @commands.cooldown(5,60,commands.BucketType.user)
-    async def remindme(self, ctx: commands.Context, *, args):
+    async def remindme(self, ctx: MyContext, *, args):
         """Create a new reminder
         This is actually an alias of `reminder create`
-        """
+        
+        ..Example rmd 3h 5min It's pizza time!
+
+        ..Doc miscellaneous.html#create-a-new-reminder"""
         ctx.message.content = ctx.prefix + "reminder create " + args
         new_ctx = await self.bot.get_context(ctx.message)
         await self.bot.invoke(new_ctx)
     
 
     @commands.group(name="reminder", aliases=["remind", "reminds", "reminders"])
-    async def remind_main(self, ctx:commands.Context):
+    async def remind_main(self, ctx: MyContext):
         """Ask the bot to remind you of something later
 
         ..Doc miscellaneous.html#reminders"""
-        if ctx.subcommand_passed==None:
-            await self.bot.cogs['HelpCog'].help_command(ctx,['reminder'])
+        if ctx.subcommand_passed is None:
+            await self.bot.cogs['Help'].help_command(ctx,['reminder'])
     
     
     @remind_main.command(name="create", aliases=["add"])
     @commands.cooldown(5,30,commands.BucketType.channel)
     @commands.cooldown(5,60,commands.BucketType.user)
-    async def remind_create(self, ctx:commands.Context, duration:commands.Greedy[args.tempdelta], *, message):
+    async def remind_create(self, ctx: MyContext, duration: commands.Greedy[args.tempdelta], *, message):
         """Create a new reminder
         
         Please use the following format:
@@ -57,27 +52,27 @@ class TimersCog(commands.Cog):
         """
         duration = sum(duration)
         if duration < 1:
-            await ctx.send(await self.translate(ctx.channel, "fun", "reminds-too-short"))
+            await ctx.send(await self.bot._(ctx.channel, "fun", "reminds-too-short"))
             return
         if duration > 60*60*24*365*2:
-            await ctx.send(await self.translate(ctx.channel, "fun", "reminds-too-long"))
+            await ctx.send(await self.bot._(ctx.channel, "fun", "reminds-too-long"))
             return
         if not self.bot.database_online:
-            await ctx.send(await self.translate(ctx.channel, "rss", "no-db"))
+            await ctx.send(await self.bot._(ctx.channel, "rss", "no-db"))
             return
-        f_duration = await ctx.bot.get_cog('TimeCog').time_delta(duration,lang=await self.translate(ctx.guild,'current_lang','current'), year=True, form='developed', precision=0)
+        f_duration = await ctx.bot.get_cog('TimeUtils').time_delta(duration,lang=await self.bot._(ctx.guild,'current_lang','current'), year=True, form='developed', precision=0)
         try:
             d = {'msg_url': ctx.message.jump_url}
             await ctx.bot.get_cog('Events').add_task("timer", duration, ctx.author.id, ctx.guild.id if ctx.guild else None, ctx.channel.id, message, data=d)
         except Exception as e:
-            await ctx.bot.get_cog("ErrorsCog").on_command_error(ctx,e)
+            await ctx.bot.get_cog("Errors").on_command_error(ctx,e)
         else:
-            await ctx.send(await self.translate(ctx.channel, "fun", "reminds-saved", duration=f_duration))
+            await ctx.send(await self.bot._(ctx.channel, "fun", "reminds-saved", duration=f_duration))
 
 
     @remind_main.command(name="list")
     @commands.cooldown(5,60,commands.BucketType.user)
-    async def remind_list(self, ctx:commands.Context):
+    async def remind_list(self, ctx: MyContext):
         """List your pending reminders
 
         ..Doc miscellaneous.html#list-your-reminders
@@ -87,11 +82,11 @@ class TimersCog(commands.Cog):
         query = (f"SELECT *, CONVERT_TZ(`begin`, @@session.time_zone, '+00:00') AS `utc_begin` FROM `timed` WHERE user={ctx.author.id} AND action='timer'")
         cursor.execute(query)
         if cursor.rowcount == 0:
-            await ctx.send(await self.translate(ctx.channel, "timers", "rmd-empty"))
+            await ctx.send(await self.bot._(ctx.channel, "timers", "rmd-empty"))
             return
-        txt = await self.translate(ctx.channel, "timers", "rmd-item")
-        time_delta = self.bot.get_cog("TimeCog").time_delta
-        lang = await self.translate(ctx.channel, "current_lang", "current")
+        txt = await self.bot._(ctx.channel, "timers", "rmd-item")
+        time_delta = self.bot.get_cog("TimeUtils").time_delta
+        lang = await self.bot._(ctx.channel, "current_lang", "current")
         liste = list()
         for item in cursor:
             ctx2 = copy.copy(ctx)
@@ -105,7 +100,7 @@ class TimersCog(commands.Cog):
             item = txt.format(id=item['ID'], duration=duration, channel=chan, msg=msg)
             liste.append(item)
         cursor.close()
-        if ctx.guild is None or ctx.channel.permissions_for(ctx.guild.me).embed_links:
+        if ctx.can_send_embed:
             if len("\n".join(liste)) > 2000:
                 desc = ""
                 step = 5
@@ -113,15 +108,15 @@ class TimersCog(commands.Cog):
             else:
                 desc = "\n".join(liste)
                 fields = None
-            emb = ctx.bot.get_cog("EmbedCog").Embed(title=await self.translate(ctx.channel, "timers", "rmd-title"), desc=desc, fields=fields, color=16108042)
+            emb = ctx.bot.get_cog("Embeds").Embed(title=await self.bot._(ctx.channel, "timers", "rmd-title"), desc=desc, fields=fields, color=16108042)
             await ctx.send(embed=emb)
         else:
-            t = "**"+await self.translate(ctx.channel, "timers", "rmd-title")+"**\n\n"
+            t = "**"+await self.bot._(ctx.channel, "timers", "rmd-title")+"**\n\n"
             await ctx.send(t+"\n".join(liste))
     
     @remind_main.command(name="delete", aliases=["remove", "del"])
-    @commands.cooldown(5,30,commands.BucketType.user)
-    async def remind_del(self, ctx:commands.Context, ID:int):
+    @commands.cooldown(5, 30, commands.BucketType.user)
+    async def remind_del(self, ctx: MyContext, ID: int):
         """Delete a reminder
         ID can be found with the `reminder list` command.
 
@@ -134,7 +129,7 @@ class TimersCog(commands.Cog):
         query = (f"SELECT ID, message FROM `timed` WHERE user={ctx.author.id} AND action='timer' AND ID={ID}")
         cursor.execute(query)
         if cursor.rowcount == 0:
-            await ctx.send(await self.translate(ctx.channel, "timers", "rmd-empty"))
+            await ctx.send(await self.bot._(ctx.channel, "timers", "rmd-empty"))
             return
         item = list(cursor)[0]
         cursor.close()
@@ -142,9 +137,9 @@ class TimersCog(commands.Cog):
         ctx2.message.content = item["message"]
         item["message"] = (await commands.clean_content(fix_channel_mentions=True).convert(ctx2, item["message"])).replace("`", "\\`")
         await self.bot.get_cog("Events").remove_task(item["ID"])
-        await ctx.send(await self.translate(ctx.channel, "timers", "rmd-deleted", id=item["ID"], message=item["message"]))
+        await ctx.send(await self.bot._(ctx.channel, "timers", "rmd-deleted", id=item["ID"], message=item["message"]))
 
 
 
 def setup(bot: commands.Bot):
-    bot.add_cog(TimersCog(bot))
+    bot.add_cog(Timers(bot))

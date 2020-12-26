@@ -14,10 +14,11 @@ from discord.ext.commands import Cog
 from libs import halloween
 from libs.halloween import convert_image, check_image
 importlib.reload(halloween)
+from classes import zbot, MyContext
 
 
 class LinkConverter(commands.Converter):
-    async def convert(self, ctx, argument):
+    async def convert(self, ctx: MyContext, argument: str):
         if not argument.startswith(('http://', 'https://')):
             raise commands.errors.BadArgument(
                 'Could not convert "{}" into URL'.format(argument))
@@ -33,35 +34,35 @@ class LinkConverter(commands.Converter):
 
 
 class FlagConverter(commands.Converter):
-    async def convert(self, ctx, argument):
+    async def convert(self, ctx: MyContext, argument: str):
         if not argument.startswith('--'):
             raise commands.errors.BadArgument('Not a valid flag!')
         return argument
 
 
 class FlagConverter2(commands.Converter):
-    async def convert(self, ctx, argument):
+    async def convert(self, ctx: MyContext, argument: str):
         if not argument.startswith('++'):
             raise commands.errors.BadArgument('Not a valid flag!')
         return argument
 
 
 class ThemeConverter(commands.Converter):
-    async def convert(self, ctx, argument):
+    async def convert(self, ctx: MyContext, argument: str):
         if not argument in ["light", "dark"]:
             raise commands.errors.BadArgument(
                 f'Could not convert "{argument}" into Halloween Theme')
         return argument
 
-async def is_halloween(ctx: commands.Context):
+async def is_halloween(ctx: MyContext):
     """Check if we are in Halloween period"""
     return ctx.bot.current_event == "halloween"
 
-def _make_check_command(name, parent, **kwargs):
+def _make_check_command(name: str, parent: commands.Group, **kwargs):
     @commands.cooldown(2, 60, commands.BucketType.member)
     @commands.cooldown(30, 40, commands.BucketType.guild)
     @parent.command(name, help=f"{name.title()} an image to know if you're cool enough.\n\nTheme is either 'light' or 'dark'", **kwargs)
-    async def command(self, ctx, theme: ThemeConverter = "light", *, who: typing.Union[discord.Member, discord.PartialEmoji, LinkConverter] = None):
+    async def command(self, ctx: MyContext, theme: ThemeConverter = "light", *, who: typing.Union[discord.Member, discord.PartialEmoji, LinkConverter] = None):
 
         if ctx.message.attachments:
             url = ctx.message.attachments[0].proxy_url
@@ -83,7 +84,7 @@ def _make_check_command(name, parent, **kwargs):
             ["> {}: {}%".format(color["name"], color["ratio"]) for color in r['colors']])
         await ctx.send(f"Results for {ctx.author.mention}:\n"+answer)
         if r["passed"] and ctx.author.id not in self.cache:
-            await self.bot.cogs["UtilitiesCog"].add_user_eventPoint(ctx.author.id, 40)
+            await self.bot.cogs["Utilities"].add_user_eventPoint(ctx.author.id, 40)
             self.cache.append(ctx.author.id)
             with open("halloween-cache.json", "w") as f:
                 json.dump(self.cache, f)
@@ -97,12 +98,12 @@ def _make_color_command(name, fmodifier, parent, **kwargs):
     @commands.cooldown(6, 120, commands.BucketType.member)
     @commands.cooldown(20, 60, commands.BucketType.guild)
     @parent.command(name, help=f"{name.title()} an image.", **kwargs)
-    async def command(self, ctx, method: typing.Optional[FlagConverter] = None,
+    async def command(self, ctx: MyContext, method: typing.Optional[FlagConverter] = None,
                       variations: commands.Greedy[FlagConverter2] = [None], *,
                       who: typing.Union[discord.Member, discord.PartialEmoji, LinkConverter] = None):
 
         if not (ctx.guild is None or ctx.channel.permissions_for(ctx.guild.me).attach_files):
-            return await ctx.send(await self.translate(ctx.channel, "blurple", "missing-attachment-perm"))
+            return await ctx.send(await self.bot._(ctx.channel, "blurple", "missing-attachment-perm"))
 
         if method is None:
             method = await self.get_default_halloweefier(ctx)
@@ -139,20 +140,16 @@ def _make_color_command(name, fmodifier, parent, **kwargs):
             return
         await ctx.send(f"{ctx.author.mention}, here's your image!", file=r)
         await old_msg.delete()
-        await self.bot.cogs["UtilitiesCog"].add_user_eventPoint(ctx.author.id, 3)
+        await self.bot.cogs["Utilities"].add_user_eventPoint(ctx.author.id, 3)
 
     return command
 
 
 class Halloween(Cog):
-    def __init__(self, bot):
+    def __init__(self, bot: zbot):
         self.bot = bot
         self.file = "halloween"
         self.hourly_reward = [4, 17]
-        try:
-            self.translate = self.bot.cogs["LangCog"].tr
-        except:
-            pass
         try:
             with open("halloween-cache.json", "r") as f:
                 self.cache = json.load(f)
@@ -161,16 +158,12 @@ class Halloween(Cog):
                 f.write('[]')
             self.cache = list()
 
-    async def get_default_halloweefier(self, ctx):
+    async def get_default_halloweefier(self, ctx: MyContext):
         return "--hallowify"
-
-    @commands.Cog.listener()
-    async def on_ready(self):
-        self.translate = self.bot.cogs["LangCog"].tr
 
     @commands.group(name="halloween", aliases=["hw"])
     @commands.check(is_halloween)
-    async def hallow_main(self, ctx):
+    async def hallow_main(self, ctx: MyContext):
         """Hallowify and be happy for the spooky month! Change your avatar color, check if an image is orange enough, and collect event points to unlock a collector Halloween 2020 card!
         
 A BIG thanks to the Project Blurple and their original code for the colorization part.
@@ -194,7 +187,7 @@ A BIG thanks to the Project Blurple and their original code for the colorization
     check = _make_check_command('check', hallow_main)
 
     @hallow_main.command()
-    async def help(self, ctx):
+    async def help(self, ctx: MyContext):
         "Get some help about hallowify and all of this"
         await ctx.send("""Hey! We're currently in October, which is the month of bats, skeletons and most importantly pumpkins! For a limited time, you can use this command to make your images more halloween-ish, and add some atmosphere to your server!
 
@@ -242,17 +235,17 @@ __29 variations: __
         return result[0] if len(result) > 0 else None
 
     @hallow_main.command(name="collect")
-    async def hw_collect(self, ctx: commands.Context):
+    async def hw_collect(self, ctx: MyContext):
         """Get some events points every hour"""
         last_data = self.db_get_points(ctx.author.id)
         if last_data is None or (datetime.datetime.now() - last_data['last_update']).total_seconds() > 3600:
             points = randint(*self.hourly_reward)
-            await self.bot.get_cog("UtilitiesCog").add_user_eventPoint(ctx.author.id, points)
+            await self.bot.get_cog("Utilities").add_user_eventPoint(ctx.author.id, points)
             self.db_add_points(ctx.author.id, points)
-            txt = await self.translate(ctx.channel, "halloween", "got-points", pts=points)
+            txt = await self.bot._(ctx.channel, "halloween", "got-points", pts=points)
         else:
-            txt = await self.translate(ctx.channel, "halloween", "too-quick")
-        if ctx.guild is None or ctx.channel.permissions_for(ctx.guild.me).embed_links:
+            txt = await self.bot._(ctx.channel, "halloween", "too-quick")
+        if ctx.can_send_embed:
             title = "Halloween event"
             emb = discord.Embed(title=title, description=txt, color=discord.Color.orange())
             await ctx.send(embed=emb)

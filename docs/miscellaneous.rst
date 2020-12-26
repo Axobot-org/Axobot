@@ -6,6 +6,13 @@ Some commands are difficult to classify in the categories of the site. They are 
 
 Here is the list of these particular commands.
 
+------
+Admins
+------
+
+**Syntax:** :code:`admins`
+
+If you want to quickly know who are the Zbot administrators. Easy to use, quick to read, always up-to-date.
 
 ----------
 Bitly urls
@@ -148,4 +155,4 @@ If no number of choices is given, or if this number is 0, the vote will be a yes
 
 For this command the bot needs "`Add Reactions <perms.html#add-reactions>`_" (add reactions to its message), "`Read message history <perms.html#read-message-history>`_" (find its message in the chat room) and "`Manage Messages <perms.html#manage-messages>`_" (delete your message) permissions.
 
-.. note:: A big thank to the member Adri526, for his emojis specially designed for ZBot!
+.. note:: A big thank to the member Adri, for his emojis specially designed for ZBot!

@@ -132,6 +132,7 @@
                 "No verification role has been added"
             ]
         },
+        "cmd-count": "{nbr} commands",
         "cmd-not-found": "There is no command named \"{}\"",
         "description": "Description",
         "embed_title": "Available commands for {u}",
@@ -201,6 +202,7 @@
         "list-2": "\n**Duration:** {D}",
         "no-user": "Unable to find this user :eyes:",
         "no_database": "Due to a temporary database outage, this command has been disabled",
+        "no-case": "This user has no case!",
         "not-found": "This case was not found :confused:",
         "reason-edited": "The reason for case #{} has been changed!",
         "search-0": "**User:** {U}\n**Type:** {T}\n**Moderator:** {M}\n**Date:** {D}\n**Reason:** *{R}*",
@@ -219,6 +221,7 @@
         "disabled": "The command {c} is disabled :confused:",
         "duration": "The duration `{d}` is invalid",
         "emojinotfound": "Emoji `{e}` not found",
+        "invalidcardstyle": "Invalid card style: `{s}`",
         "invalidcolor": "Color `{c}` invalid",
         "invalidemoji": "Invalid emoji",
         "invalidguild": "This server can't be found: `{g}`",
@@ -279,12 +282,14 @@
         "fun-list": "Here is the list of available fun commands:",
         "invalid-city": "Invalid city :confused:",
         "markdown": "__**Markdown Rules** on *Discord*__\n\n`*italics*` = *italics*\n`__underline__` = __underline__\n`**bold**` = **bold**\n`***bold italics***` = ***bold italics***\n`~~strikeout~~` = ~~strikeout~~\n`__*underline italics*__` = __*underline italics*__\n`__**underline bold**__` = __**underline bold**__\n`__***underline bold italics***__` = __***underline bold italics***__\n`||spoiler||` = ||spoiler||\n> quote = `> quote`\n\\`code\\` = `code`\n \\ to ignore\n\nFor code blocks, cf <https://discord.gg/DGahTNn>",
+        "nasa-none": "Oops, I'm unable to retrieve the information from NASA at the moment. Try again in a few minutes :confused:",
         "no-database": "As our database is offline, access to fun commands is restricted to people with permission \"Manage Server\"",
         "no-embed-perm": "I don't have permission to \"Embed links\" :confused:",
         "no-emoji": "Unable to find this emoji!",
         "no-fun": "Fun commands have been disabled on this server. To see their list, look at https://zbot.rtfd.io/en/v3/fun.html",
         "no-reaction": "Unable to add reactions. Please check my permissions...",
         "no-roll": "No choice found",
+        "not-enough-roll": "There must be at least two distinct elements",
         "no-say": "Unable to send any message in this channel",
         "no-voicechan": "You must be in a vocal channel in order to use this command.",
         "osekour": [
@@ -335,7 +340,7 @@
             "Did you know? The ZBot Staff is composed of a talented developer Admin, a second admin named after a kibble brand as well as a cat, a Ban hammer and a mushroom!",
             "Pro-tip: The `say <text>` command is very useful for posting anonymous messages... at least when you have access to it.",
             "Pro-tip: The `discordlinks` command will give you all the useful links related to discord!",
-            "Did you know?  All designs related to the bot are made by Adri526#9223, including the huge list of emojis used in the `bigtext` command!",
+            "Did you know?  All designs related to the bot are made by Adri#9223, including the huge list of emojis used in the `bigtext` command!",
             "Did you know? ZBot takes its name from.... its creator, Z_runner",
             "Pro-tip: The bot has a Discord, where you can see the current bugs and vote for the next updates! Use the `about` command to get the invite",
             "Pro-tip: The `prefix` command allows you to have a list of the prefixes currently usable in the server",
@@ -355,7 +360,7 @@
         "about-3": "My creator's Twitter account:",
         "about-4": "A short FAQ:",
         "about-5": "The Privacy Policy:",
-        "about-main": "Hello! I'm {mention}!\nI'm a bot that allows you to do a lot of things: moderation, xp system, statistics, partners managment and many other super useful commands (and totally pointless ones)!\nYou can start by typing `!help` in this chat to see the list of available commands, then `!config see` will let you see the configuration options.\n\nMy owner and I would like to thank Awhikax for his support during the various crises, Aragorn1202 for all his ideas and sentences full of good sense, Adri526 for all these beautiful logos, emojis and profile pics, and the whole translators team for their long work!\n\n:globe_with_meridians: Some links may be useful: {links}\n\nHave a nice day!",
+        "about-main": "Hello! I'm {mention}!\nI'm a bot that allows you to do a lot of things: moderation, xp system, statistics, partners managment and many other super useful commands (and totally pointless ones)!\nYou can start by typing `!help` in this chat to see the list of available commands, then `!config see` will let you see the configuration options.\n\nMy owner and I would like to thank Awhikax for his support during the various crises, Aragorn1202 for all his ideas and sentences full of good sense, Adri for all these beautiful logos, emojis and profile pics, and the whole translators team for their long work!\n\n:globe_with_meridians: Some links may be useful: {links}\n\nHave a nice day!",
         "admins-list": "The administrators of this bot are : {}",
         "bitly_long": "Original URL: {url}",
         "bitly_nobit": "This address is not a bit.ly link!",
@@ -375,6 +380,8 @@
             "Prohibited use of BetterDiscord"
         ],
         "docs": "Here is the link to the bot documentation:",
+        "ping-found": "Pong! (average of {tps}ms per 64 byte, sent at {url})",
+        "ping-notfound": "Unable to ping this address",
         "prefix": "List of currently usable prefixes:",
         "stats": "**Bot version:** {bot_v} \n**Number of servers:** {s_count} \n**Number of visible members:** {m_count} ({b_count} **bots**)\n**Number of code lines:** {l_count}\n**Used languages:** {lang}\n**Python version :** {p_v} \n**Version of the `discord.py` lib:** {d_v} \n**RAM usage:** {ram} GB \n**CPU usage:** {cpu} % \n**API latency time:** {api} ms\n**Total of earned xp:** {xp}",
         "stats-title": "**Bot statistics**",
@@ -509,7 +516,7 @@
             "Mobs able to loot it",
             "Added in the version"
         ],
-        "block-help": "This command allows you to obtain information on any Minecraft block. You can give its full or partial name, in French or English, or even its identifier. Just enter `!mc block <name>`",
+        "block-help": "This command allows you to obtain information on any Minecraft block. You can give its full or partial name, in French or English, or even its identifier. Just enter `{p}mc block <name>`",
         "cant-embed": "Cannot send embed. Please make sure the \"Embed links\" permission is enabled.",
         "cmd-fields": [
             "Name",
@@ -517,7 +524,7 @@
             "Examples",
             "Added in the version"
         ],
-        "cmd-help": "This command allows you to obtain information about any Minecraft command. All you have to do is type `!mc command <name>`",
+        "cmd-help": "This command allows you to obtain information about any Minecraft command. All you have to do is type `{p}mc command <name>`",
         "contact-mail": "If you notice an error in the information provided, please contact me personally, or report the error directly [on the site](https://fr-minecraft.net).",
         "dimensions": "Width: {la}\nLength: {lo]}\nHeight: {ha}",
         "entity-fields": [
@@ -529,7 +536,7 @@
             "Preferred Biomes",
             "Added in the version"
         ],
-        "entity-help": "This command allows you to obtain information about any Minecraft entity. You can give its full or partial name, in French or English, or even its identifier. Just enter `!mc entity <name>`",
+        "entity-help": "This command allows you to obtain information about any Minecraft entity. You can give its full or partial name, in French or English, or even its identifier. Just enter `{p}mc entity <name>`",
         "item-fields": [
             "ID",
             "Size of a stack",
@@ -540,7 +547,18 @@
             "Mobs able to drop this item",
             "Added in the version"
         ],
-        "item-help": "This command allows you to obtain information on any Minecraft item. You can give its full or partial name, in French or English, or even its identifier. Just enter `!mc item <name>`",
+        "item-help": "This command allows you to obtain information on any Minecraft item. You can give its full or partial name, in French or English, or even its identifier. Just enter `{p}mc item <name>`",
+        "mod-fields": [
+            "Name",
+            "Authors",
+            "Summary",
+            "Primary language",
+            "Last update",
+            "Downloads",
+            "Game versions",
+            "ID"
+        ],
+        "mod-help": "This command provides information about a large number of Minecraft mods. You can give its full or partial name, just enter `{p}mc mod <name>`. The mod must be registered on the CurseForge platform to appear",
         "mojang_desc": {
             "account.mojang.com": "Mojang account management site",
             "api.mojang.com": "API service provided by Mojang",
@@ -556,14 +574,17 @@
             "Entity",
             "Item",
             "Command",
-            "Advancement"
+            "Advancement",
+            "Mod"
         ],
         "no-adv": "Unable to find this advancement",
         "no-api": "Error: Unable to connect to API",
         "no-block": "Unable to find this block",
         "no-cmd": "Unable to find this command",
+        "no-embed": "Unable to send the result! Please give me 'Embed links' permission to send it",
         "no-entity": "Unable to find this entity",
         "no-item": "Unable to find this item",
+        "no-mod": "Unable to find this mod",
         "no-ping": "Error: Unable to ping this server",
         "serv-0": "Number of players",
         "serv-1": "List of the first 20 players connected",
@@ -826,6 +847,7 @@
         "invalid-flow": "This url is invalid (empty or inaccessible rss flow) :confused:",
         "invalid-link": "Oops, this url address is invalid or incomplete :confused:",
         "list": "*Type the number of the flow to modify*\n\n**Link - Type - Channel - Mentions**\n",
+        "list-title": "List of rss feeds from the server {server}",
         "list-result": "Type: {}\nDiscord channel: {}\nURL/Channel: {}\nMentions: {}\nIdentifier: {}\nLast post: {}",
         "list2": "*Type the number of the flow to delete*\n\n**Link - Type - Channel**\n",
         "mc": "Minecraft",
@@ -875,6 +897,7 @@
         "change-1": "Oops, an internal error occurred...",
         "change-10": "This xp system doesn't exist. Here is the list of available systems: {}",
         "change-11": "This colour is invalid",
+        "change-12": "The category {} could not be found",
         "change-2": "The \"{}\" option value has been deleted",
         "change-3": "The role \"{}\" was not found :confused: (Check upper case and special characters)",
         "change-4": "The \"{}\" option expects a boolean (True/False) parameter in value :innocent:",
@@ -885,6 +908,7 @@
         "change-9": "The emoji `{}` was not found",
         "change-autoremove_xp": "The bot will remove {xp}xp/day from inactive members",
         "change-bool": "The \"{}\" option has been modified with the value *{}*",
+        "change-category": "The '{}' option has been modified with the {} category",
         "change-color": "The color used for the option {} is now {}",
         "change-emojis": "The emotions for the option \"{}\" are now {}",
         "change-lang": "The bot language is now in `{}`",
@@ -943,6 +967,10 @@
         "slowmode": "List of roles that can use \"slowmode\" and \"freeze\" commands: {}",
         "update_mentions": "Roles mentioned in the bot changelog: {}",
         "verification_role": "Roles removed when a user use the `verify` command: {}",
+        "voice_roles": "Roles given to members in a vocal channel: {}",
+        "voice_channel": "Channel from which automatic voice chat rooms will be created: {}",
+        "voice_category": "Category in which automatic voice chat rooms will be created: {}",
+        "voice_channel_format": "Format of automatic voice channel names: {}",
         "vote_emojis": "Emojis used for poll reactions: {}",
         "warn": "List of roles that can use commands \"warn\" and \"cases\": {}",
         "welcome": "Message sent when a member arrives: {}",
@@ -990,6 +1018,7 @@
             "DISCOVERABLE": "Displayed in the Discovery tab",
             "FEATURABLE": "Displayed in the Activity tab",
             "INVITE_SPLASH": "Invite custom screen",
+            "MEMBER_VERIFICATION_GATE_ENABLED": "Member verification gate enabled",
             "NEWS": "News channel",
             "PARTNERED": "Partnered server",
             "PREVIEW_ENABLED": "Preview enabled",
@@ -1061,6 +1090,10 @@
         "missing-attach-files": "Oops, I\"m missing the permission to Attach Files :confused:",
         "usernames_log_false": "You have disabled the recording of your user names and nicknames",
         "usernames_log_true": "You have authorized the recording of your user names and nicknames"
+    },
+    "voices": {
+        "no-channel": "There are no voice channel generated in this server",
+        "deleted": "{i} deleted channels"
     },
     "xp": {
         "1-no-xp": "You don't have any xp yet!",

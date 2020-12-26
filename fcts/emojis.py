@@ -3,6 +3,7 @@
 
 import requests, string
 from discord.ext import commands
+from classes import zbot
 
 #https://github.com/ttacon/emoji/blob/master/emoji.go
 
@@ -938,10 +939,10 @@ characteres = {':': 582223307944886292,
 		' ': 446782476375949323}
 
 
-class EmojiCog(commands.Cog):
+class Emojis(commands.Cog):
 	"""Cog for managing emojis. No more, no less."""
 	
-	def __init__(self,bot):
+	def __init__(self, bot: zbot):
 		self.bot = bot
 		self.emojiMap = emojiMap
 		self.file = "emojis"
@@ -980,10 +981,10 @@ class EmojiCog(commands.Cog):
 		except requests.exceptions.ConnectionError:
 			pass
 	
-	async def anti_code(self,text):
+	async def anti_code(self, text: str) -> str:
 		for k,v in emojiMap.items():
 			text=text.replace(v,k)
 		return text
 		
 def setup(bot):
-	bot.add_cog(EmojiCog(bot))
+	bot.add_cog(Emojis(bot))
