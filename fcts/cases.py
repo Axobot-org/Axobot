@@ -132,6 +132,7 @@ class Cases(commands.Cog):
         query = "INSERT INTO `{}` (`guild`, `user`, `type`, `mod`, `reason`,`duration`) VALUES (%(g)s, %(u)s, %(t)s, %(m)s, %(r)s, %(d)s)".format(self.table)
         cursor.execute(query, { 'g': case.guild, 'u': case.user, 't': case.type, 'm': case.mod, 'r': case.reason, 'd': case.duration })
         cnx.commit()
+        case.id = cursor.lastrowid
         cursor.close()
         return True
 
@@ -188,7 +189,7 @@ class Cases(commands.Cog):
         ..Example cases glist someone"""
         if not self.bot.database_online:
             return await ctx.send(await self.bot._(ctx.guild.id,'cases','no_database'))
-        await self.see_case_main(ctx,guild.id,user.id)
+        await self.see_case_main(ctx, guild.id if guild else None, user.id)
         
     async def see_case_main(self, ctx: MyContext, guild:discord.Guild, user:discord.User):
         if guild is not None:
