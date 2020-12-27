@@ -46,7 +46,7 @@ class Timers(commands.Cog):
         `XXd` : XX days
         `XXw` : XX weeks
 
-        ..Example remindme create 49d Think about doing my homework
+        ..Example reminder create 49d Think about doing my homework
 
         ..Doc miscellaneous.html#create-a-new-reminder
         """
