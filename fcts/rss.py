@@ -956,12 +956,15 @@ class Rss(commands.Cog):
         if identifiant=='help':
             return await self.bot._(channel,"rss","yt-help")
         url = 'https://www.youtube.com/feeds/videos.xml?channel_id='+identifiant
-        feeds = feedparser.parse(url)
-        if feeds.entries==[]:
-            url = 'https://www.youtube.com/feeds/videos.xml?user='+identifiant
-            feeds = feedparser.parse(url)
-            if feeds.entries==[]:
-                return await self.bot._(channel,"rss","nothing")
+        try:
+            feeds = feedparser.parse(url, timeout=7)
+            if not feeds.entries:
+                url = 'https://www.youtube.com/feeds/videos.xml?user='+identifiant
+                feeds = feedparser.parse(url, timeout=7)
+                if not feeds.entries:
+                    return await self.bot._(channel,"rss","nothing")
+        except socket.timeout:
+            return []
         if not date:
             feed = feeds.entries[0]
             img_url = None
