@@ -830,7 +830,7 @@
         "too-many-rr": "You have already reached the limit of {l} roles"
     },
     "rss": {
-        "change-txt": "The current message contains  \n```\n{text}\n```\nPlease enter the text to be used when creating a new post. You can use several variables, of which here is the list:\n- `{author}`: the author of the post\n- `{channel}`: the Discord channel in which the message is posted\n- `{date}`: the post date (UTC)\n- `{link}` or `{url}`: a link to the post\n- `{logo}`: an emoji representing the type of post (web, Twitter, YouTube...)\n- `{mentions}`: the list of mentioned roles\n- `{title}`: the title of the post",
+        "change-txt": "The current message contains  \n```\n{text}\n```\nPlease enter the text to be used when creating a new post. You can use several variables, of which here is the list:\n- `{author}`: the author of the post\n- `{channel}`: the channel name (usually the same as author)\n- `{date}`: the post date (UTC)\n- `{link}` or `{url}`: a link to the post\n- `{logo}`: an emoji representing the type of post (web, Twitter, YouTube...)\n- `{mentions}`: the list of mentioned roles\n- `{title}`: the title of the post",
         "choose-delete": "Please choose the flow to delete",
         "choose-mentions-1": "Please choose the flow to modify",
         "choose-roles": "What roles will be mentioned?",

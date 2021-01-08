@@ -829,7 +829,7 @@
         "too-many-rr": "You have 'ready reached da limit ov {l} roles"
     },
     "rss": {
-        "change-txt": "Da current msg contains  \n```\n{text}\n```\nPlz enter teh text 2B usd when creating a new post. U can use a lot ov variables, here iz the list:\n- `{author}`: author of the post\n- `{channel}`: Discord channel in which the message is posted\n- `{date}`: post date (UTC)\n- `{link}` or `{url}`: a link 2 the post\n- `{logo}`: a emoji representing teh type of post (website, BlueBird, RedTriangle...)\n- `{mentions}`: the list ov mentioned roles\n- `{title}`: the titl of da post",
+        "change-txt": "Da current msg contains  \n```\n{text}\n```\nPlz enter teh text 2B usd when creating a new post. U can use a lot ov variables, here iz the list:\n- `{author}`: author of the post\n- `{channel}`: usually same than author, just4fun\n- `{date}`: post date (UTC)\n- `{link}` or `{url}`: a link 2 the post\n- `{logo}`: a emoji representing teh type of post (website, BlueBird, RedTriangle...)\n- `{mentions}`: the list ov mentioned roles\n- `{title}`: the titl of da post",
         "choose-delete": "Plz chouse teh flo to delet",
         "choose-mentions-1": "Pleese chose the flow 2 modify",
         "choose-roles": "Which roles should bee piing?",
