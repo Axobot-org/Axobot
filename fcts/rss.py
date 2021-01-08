@@ -975,6 +975,8 @@ class Rss(commands.Cog):
         else:
             liste = list()
             for feed in feeds.entries:
+                if len(liste)>10:
+                    break
                 if 'published_parsed' not in feed or (datetime.datetime(*feed['published_parsed'][:6]) - date).total_seconds() <= self.min_time_between_posts['yt']:
                     break
                 img_url = None
@@ -1116,6 +1118,8 @@ class Rss(commands.Cog):
         else:
             liste = list()
             for post in posts:
+                if len(liste)>10:
+                    break
                 if (datetime.datetime.fromtimestamp(post.created_at_in_seconds) - date).total_seconds() < self.min_time_between_posts['tw']:
                     break
                 rt = None
@@ -1159,6 +1163,8 @@ class Rss(commands.Cog):
         else:
             liste = list()
             for feed in feeds.entries:
+                if len(liste)>10:
+                    break
                 if datetime.datetime(*feed['published_parsed'][:6]) <= date:
                     break
                 r = re.search(r'<img src="([^"]+)" />',feed['summary'])
@@ -1231,6 +1237,8 @@ class Rss(commands.Cog):
         else: # published in ['published_parsed','updated_parsed']
             liste = list()
             for feed in feeds.entries:
+                if len(liste)>10:
+                    break
                 try:
                     datz = feed[published]
                     if feed[published] is None or (datetime.datetime(*feed[published][:6]) - date).total_seconds() < self.min_time_between_posts['web']:
