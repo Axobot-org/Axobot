@@ -706,7 +706,14 @@ class Rss(commands.Cog):
     async def change_text_flow(self, ctx: MyContext, ID: typing.Optional[int]=None, *, text=None):
         """Change the text of an rss feed
 
-        Available variables: {channel} {title} {date} {url} {link} {mentions} {logo} {author}
+        Available variables:
+        - `{author}`: the author of the post
+        - `{channel}`: the channel name (usually the same as author)
+        - `{date}`: the post date (UTC)
+        - `{link}` or `{url}`: a link to the post
+        - `{logo}`: an emoji representing the type of post (web, Twitter, YouTube...)
+        - `{mentions}`: the list of mentioned roles
+        - `{title}`: the title of the post
 
         ..Example rss text 3078731683662
 
@@ -848,9 +855,9 @@ class Rss(commands.Cog):
                 notok = '<:redcheck:513105827817717762>'
                 nothing = '<:_nothing:446782476375949323>'
                 txt = ['**__Analyse :__**','']
-                yt = await self.parse_yt_url(url)
+                yt = await self.parse_yt_url(feeds.feed['link'])
                 if yt is None:
-                    tw = await self.parse_tw_url(url)
+                    tw = await self.parse_tw_url(feeds.feed['link'])
                     if tw is not None:
                         txt.append("<:twitter:437220693726330881>  "+tw)
                     elif 'link' in feeds.feed.keys():
@@ -960,7 +967,7 @@ class Rss(commands.Cog):
             img_url = None
             if 'media_thumbnail' in feed.keys() and len(feed['media_thumbnail']) > 0:
                 img_url = feed['media_thumbnail'][0]['url']
-            obj = self.rssMessage(bot=self.bot,Type='yt',url=feed['link'],title=feed['title'],emojis=self.bot.cogs['Emojis'].customEmojis,date=feed['published_parsed'],author=feed['author'],image=img_url)
+            obj = self.rssMessage(bot=self.bot,Type='yt',url=feed['link'],title=feed['title'],emojis=self.bot.cogs['Emojis'].customEmojis,date=feed['published_parsed'],author=feed['author'],channel=feed['author'],image=img_url)
             return [obj]
         else:
             liste = list()
@@ -970,7 +977,7 @@ class Rss(commands.Cog):
                 img_url = None
                 if 'media_thumbnail' in feed.keys() and len(feed['media_thumbnail']) > 0:
                     img_url = feed['media_thumbnail'][0]['url']
-                obj = self.rssMessage(bot=self.bot,Type='yt',url=feed['link'],title=feed['title'],emojis=self.bot.cogs['Emojis'].customEmojis,date=feed['published_parsed'],author=feed['author'],image=img_url)
+                obj = self.rssMessage(bot=self.bot,Type='yt',url=feed['link'],title=feed['title'],emojis=self.bot.cogs['Emojis'].customEmojis,date=feed['published_parsed'],author=feed['author'],channel=feed['author'],image=img_url)
                 liste.append(obj)
             liste.reverse()
             return liste
@@ -1144,7 +1151,7 @@ class Rss(commands.Cog):
             img_url = None
             if r is not None:
                 img_url = r.group(1)
-            obj = self.rssMessage(bot=self.bot,Type='twitch',url=feed['link'],title=feed['title'],emojis=self.bot.cogs['Emojis'].customEmojis,date=feed['published_parsed'],author=feeds.feed['title'].replace("'s Twitch video RSS",""),image=img_url)
+            obj = self.rssMessage(bot=self.bot,Type='twitch',url=feed['link'],title=feed['title'],emojis=self.bot.cogs['Emojis'].customEmojis,date=feed['published_parsed'],author=feeds.feed['title'].replace("'s Twitch video RSS",""),image=img_url,channel=nom)
             return [obj]
         else:
             liste = list()
@@ -1155,7 +1162,7 @@ class Rss(commands.Cog):
                 img_url = None
                 if r is not None:
                     img_url = r.group(1)
-                obj = self.rssMessage(bot=self.bot,Type='twitch',url=feed['link'],title=feed['title'],emojis=self.bot.cogs['Emojis'].customEmojis,date=feed['published_parsed'],author=feeds.feed['title'].replace("'s Twitch video RSS",""),image=img_url)
+                obj = self.rssMessage(bot=self.bot,Type='twitch',url=feed['link'],title=feed['title'],emojis=self.bot.cogs['Emojis'].customEmojis,date=feed['published_parsed'],author=feeds.feed['title'].replace("'s Twitch video RSS",""),image=img_url,channel=nom)
                 liste.append(obj)
             liste.reverse()
             return liste
