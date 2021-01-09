@@ -10,3 +10,4 @@ python-twitter>=3.5
 isbnlib
 pytz>=2020.4
 psutil>=5.7
+speedtest-cli

@@ -16,6 +16,7 @@ import copy
 import operator
 import mysql
 import json
+import speedtest
 from contextlib import redirect_stdout
 from glob import glob
 from fcts import reloads
@@ -727,6 +728,36 @@ Cette option affecte tous les serveurs"""
         else:
             await ctx.send("Sélectionnez *play*, *watch*, *listen* ou *stream* suivi du nom")
         await ctx.message.delete()
+    
+    @main_msg.command(name="speedtest")
+    @commands.check(reloads.check_admin)
+    async def speedtest(self, ctx: MyContext, method: str=None):
+        """Fais un speedtest du vps
+        Les méthodes possibles sont: dict, json, csv"""
+        if method is not None and (not hasattr(speedtest.SpeedtestResults, method)):
+            await ctx.send("Méthode invalide")
+            return
+        msg = await ctx.send("Début de l'analyse...")
+        s = speedtest.Speedtest()
+        s.get_servers([])
+        s.get_best_server()
+        s.download()
+        s.upload(pre_allocate=False)
+        if method == None:
+            s.results.share()
+        if method == None:
+            result = s.results.dict()
+            await msg.edit(content=f"{result['server']['sponsor']} - ping {result['server']['latency']}ms\n{result['share']}")
+        elif method == "json":
+            result = s.results.json(pretty=True)
+            # j = json.dumps(result, indent=2)[1:-1].replace('\\"','"')
+            await msg.edit(content=f"```json\n{result}\n```")
+        elif method == "dict":
+            result = s.results.dict()
+            await msg.edit(content=f"```py\n{result}\n```")
+        else:
+            result = getattr(s.results, method)()
+            await msg.edit(content=str(result))
     
 
     @commands.command(name='eval')
