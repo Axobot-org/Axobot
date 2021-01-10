@@ -11,3 +11,4 @@ isbnlib
 pytz>=2020.4
 psutil>=5.7
 speedtest-cli
+feedparser>=6.0
