@@ -1,4 +1,6 @@
 from aiohttp.client import ClientSession
+from aiohttp import client_exceptions
+from feedparser.util import FeedParserDict
 from classes import zbot, MyContext
 import discord
 import datetime
@@ -914,7 +916,7 @@ class Rss(commands.Cog):
         if r is not None:
             return True
         try:
-            f = feedparser.parse(url)
+            f = await self.feed_parse(url, 8)
             _ = f.entries[0]
             return True
         except:
@@ -962,10 +964,19 @@ class Rss(commands.Cog):
         """Asynchronous parsing using cool methods"""
         # if session is provided, we have to not close it
         _session = session or ClientSession()
-        async with async_timeout.timeout(timeout) as cm:
-            async with _session.get(url) as response:
-                html = await response.text()
-                headers = response.raw_headers
+        try:
+            async with async_timeout.timeout(timeout) as cm:
+                async with _session.get(url) as response:
+                    html = await response.text()
+                    headers = response.raw_headers
+        except (client_exceptions.ClientConnectorCertificateError, UnicodeDecodeError, client_exceptions.TooManyRedirects, client_exceptions.ClientConnectorError, client_exceptions.ClientPayloadError):
+            if session is None:
+                await _session.close()
+            return FeedParserDict(entries=[])
+        except asyncio.exceptions.TimeoutError:
+            if session is None:
+                await _session.close()
+            return None
         if session is None:
             await _session.close()
         if cm.expired:
@@ -1208,7 +1219,7 @@ class Rss(commands.Cog):
     async def rss_web(self, channel: discord.TextChannel, url: str, date: datetime.datetime=None, session: ClientSession=None):
         if url == 'help':
             return await self.bot._(channel,"rss","web-help")
-        feeds = await self.feed_parse(url, 7, session)
+        feeds = await self.feed_parse(url, 9, session)
         if feeds is None:
             return await self.bot._(channel,"rss","research-timeout")
         if 'bozo_exception' in feeds.keys() or len(feeds.entries) == 0:
