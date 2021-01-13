@@ -864,8 +864,9 @@ You can specify a verification limit by adding a number in argument (up to 1.000
             m = await ctx.send(text)
             try:
                 await self.add_vote(m)
-            except:
+            except Exception as e:
                 await ctx.send(await self.bot._(ctx.channel,"fun","no-reaction"))
+                await self.bot.get_cog("Errors").on_error(e, ctx)
                 return
         else:
             liste = self.bot.cogs['Emojis'].numbEmojis
