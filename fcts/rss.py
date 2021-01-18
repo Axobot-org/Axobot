@@ -837,7 +837,7 @@ class Rss(commands.Cog):
         """Test if an rss feed is usable"""
         url = url.replace('<','').replace('>','')
         try:
-            feeds = feedparser.parse(url,timeout=8)
+            feeds = await self.feed_parse(url, 8)
             txt = "feeds.keys()\n```py\n{}\n```".format(feeds.keys())
             if 'bozo_exception' in feeds.keys():
                 txt += "\nException ({}): {}".format(feeds['bozo'],str(feeds['bozo_exception']))
@@ -983,20 +983,19 @@ class Rss(commands.Cog):
             # request was cancelled by timeout
             self.bot.info("[RSS] feed_parse got a timeout")
             return None
-        return feedparser.parse(html, response_headers=dict(headers))
+        headers = {k.decode("utf-8").lower(): v.decode("utf-8") for k, v in headers}
+        return feedparser.parse(html, response_headers=headers)
 
 
     async def rss_yt(self, channel: discord.TextChannel, identifiant: str, date=None, session: ClientSession=None):
         if identifiant=='help':
             return await self.bot._(channel,"rss","yt-help")
         url = 'https://www.youtube.com/feeds/videos.xml?channel_id='+identifiant
-        # feeds = feedparser.parse(url, timeout=7)
         feeds = await self.feed_parse(url, 7, session)
         if feeds is None:
             return await self.bot._(channel,"rss","research-timeout")
         if not feeds.entries:
             url = 'https://www.youtube.com/feeds/videos.xml?user='+identifiant
-            # feeds = feedparser.parse(url, timeout=7)
             feeds = await self.feed_parse(url, 7, session)
             if feeds is None:
                 return await self.bot._(channel,"rss","nothing")
@@ -1186,7 +1185,6 @@ class Rss(commands.Cog):
 
     async def rss_twitch(self, channel: discord.TextChannel, nom: str, date: datetime.datetime=None, session: ClientSession=None):
         url = 'https://twitchrss.appspot.com/vod/'+nom
-        # feeds = feedparser.parse(url,timeout=5)
         feeds = await self.feed_parse(url, 5, session)
         if feeds is None:
             return await self.bot._(channel,"rss","research-timeout")
