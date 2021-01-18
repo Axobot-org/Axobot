@@ -143,7 +143,8 @@ class Welcomer(commands.Cog):
             pass
 
     async def raid_check(self, member: discord.Member):
-        if member.guild is None:
+        # if guild is unavailable or the bot left the guild
+        if member.guild is None or member.guild.me is None:
             return False
         level = str(await self.bot.get_config(member.guild.id,"anti_raid"))
         if not level.isnumeric() or member.guild.channels[0].permissions_for(member.guild.me).kick_members == False:
