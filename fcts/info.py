@@ -147,11 +147,14 @@ class Info(commands.Cog):
         
         ..Doc infos.html#bot-invite"""
         try:
-            requests.get("https://zrunner.me/invitezbot", timeout=3)
+            r = requests.get("https://zrunner.me/invitezbot", timeout=3)
         except requests.exceptions.Timeout:
-            url = "https://discord.com/oauth2/authorize?client_id=486896267788812288&scope=bot"
+            url = "<https://discord.com/oauth2/authorize?client_id=486896267788812288&scope=bot>"
         else:
-            url = "https://zrunner.me/invitezbot"
+            if r.status_code < 400:
+                url = "https://zrunner.me/invitezbot"
+            else:
+                url = "<https://discord.com/oauth2/authorize?client_id=486896267788812288&scope=bot>"
         await ctx.send(await self.bot._(ctx.channel, "infos", "botinvite", url=url))
     
     @commands.command(name="pig", hidden=True)
