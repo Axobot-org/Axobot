@@ -58,7 +58,7 @@ You can access even more names by being on some secret servers! Enter the :code:
 Bubble-wrap
 -----------
 
-**Syntax:** :code:`bubble-wrap [width=10] [height=15]` (aliases: papier-bulle, bbw)
+**Syntax:** :code:`bubble-wrap [width=10] [height=15]` (aliases: papier-bulle, bw)
 
 Just bubble wrap. Which pops when you squeeze it. That's all. #Just4Fun
 
