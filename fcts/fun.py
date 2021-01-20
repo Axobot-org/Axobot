@@ -798,7 +798,7 @@ You can specify a verification limit by adding a number in argument (up to 1.000
 
         ..Example bubble-wrap
 
-        ..Example bbw 7 20
+        ..Example bw 7 20
 
         ..Doc fun.html#bubble-wrap
         """
