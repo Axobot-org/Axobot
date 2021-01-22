@@ -410,10 +410,11 @@ class Xp(commands.Cog):
             for x in cursor:
                 liste.append(x)
             if len(liste)==1:
-                if userID in self.cache.keys():
-                    self.cache[userID][1] = liste[0]['xp']
+                g = 'global' if guild is None else guild
+                if userID in self.cache[g].keys():
+                    self.cache[g][userID][1] = liste[0]['xp']
                 else:
-                    self.cache[userID] = [round(time.time())-60,liste[0]['xp']]
+                    self.cache[g][userID] = [round(time.time())-60,liste[0]['xp']]
             cursor.close()
             return liste
         except Exception as e:
@@ -818,6 +819,13 @@ class Xp(commands.Cog):
 **{}** {}/{}""".format(user.name,xp,levels_info[1],txts[0],levels_info[0],txts[1],rank,ranks_nb)
         await ctx.send(msg)
 
+    def convert_average(self, nbr: int) -> str:
+        res = str(nbr)
+        for power, symb in ((9,'G'), (6,'M'), (3,'k')):
+            if nbr >= 10**power:
+                res = str(round(nbr/10**power, 1)) + symb
+                break
+        return res
 
     async def create_top_main(self, ranks, nbr, page, ctx: MyContext, used_system):
         txt = list()
@@ -837,7 +845,8 @@ class Xp(commands.Cog):
             else:
                 user_name = user
             l = await self.calc_level(u['xp'],used_system)
-            txt.append('{} • **{} |** `lvl {}` **|** `xp {}`'.format(i,"__"+user_name+"__" if user==ctx.author else user_name,l[0],u['xp']))
+            xp = self.convert_average(u['xp'])
+            txt.append('{} • **{} |** `lvl {}` **|** `xp {}`'.format(i,"__"+user_name+"__" if user==ctx.author else user_name,l[0],xp))
         return txt,i
 
     @commands.command(name='top')
@@ -896,7 +905,10 @@ class Xp(commands.Cog):
         else:
             lvl = await self.calc_level(rank['xp'],xp_system_used)
             lvl = lvl[0]
-            your_rank = {'name':"__"+await self.bot._(ctx.channel,"xp","top-your")+"__", 'value':"**#{} |** `lvl {}` **|** `xp {}`".format(rank['rank'] if 'rank' in rank.keys() else '?',lvl,rank['xp'])}
+            rk = rank['rank'] if 'rank' in rank.keys() else '?'
+            xp = self.convert_average(rank['xp'])
+            your_rank = {'name':"__"+await self.bot._(ctx.channel,"xp","top-your")+"__", 'value':"**#{} |** `lvl {}` **|** `xp {}`".format(rk, lvl, xp)}
+            del rk
         # title
         if Type == 'guild' or xp_system_used != 0:
             t = await self.bot._(ctx.channel,'xp','top-title-2')
