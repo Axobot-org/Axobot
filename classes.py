@@ -79,7 +79,7 @@ class zbot(commands.bot.AutoShardedBot):
         self.database_keys = dict() # credentials for the database
         self.log = logging.getLogger("runner") # logs module
         self.dbl_token = dbl_token # token for Discord Bot List
-        self._cnx = [[None, 0], [None, 0]] # database connections
+        self._cnx = [[None, 0], [None, 0], [None, 0]] # database connections
         self.xp_enabled: bool = True # if xp is enabled
         self.rss_enabled: bool = True # if rss is enabled
         self.internal_loop_enabled: bool = False # if internal loop is enabled
@@ -133,7 +133,7 @@ class zbot(commands.bot.AutoShardedBot):
         """Connection to the xp database
         Used for guilds using local xp (1 table per guild)"""
         if self._cnx[1][1] + 1260 < round(time.time()):  # 21min
-            self.connect_database_frm()
+            self.connect_database_xp()
             self._cnx[1][1] = round(time.time())
             return self._cnx[1][0]
         else:
@@ -148,6 +148,30 @@ class zbot(commands.bot.AutoShardedBot):
             self._cnx[1][0] = mysql.connector.connect(user=self.database_keys['user'], password=self.database_keys['password'],
                                                       host=self.database_keys['host'], database=self.database_keys['database2'], buffered=True)
             self._cnx[1][1] = round(time.time())
+        else:
+            raise ValueError(dict)
+    
+    @property
+    def cnx_stats(self) -> mysql.connector.connection.MySQLConnection:
+        """Connection to the xp database
+        Used for guilds using local xp (1 table per guild)"""
+        if self._cnx[2][1] + 1260 < round(time.time()):  # 21min
+            self.connect_database_stats()
+            self._cnx[2][1] = round(time.time())
+            return self._cnx[2][0]
+        else:
+            return self._cnx[2][0]
+
+    def connect_database_stats(self):
+        if len(self.database_keys) > 0:
+            if self._cnx[2][0] is not None:
+                self._cnx[2][0].close()
+            self.log.debug('Connection à MySQL (user {})'.format(
+                self.database_keys['user']))
+            self._cnx[2][0] = mysql.connector.connect(user=self.database_keys['user'], password=self.database_keys['password'],
+                                                      host=self.database_keys['host'], database='statsbot',
+                                                      buffered=True)
+            self._cnx[2][1] = round(time.time())
         else:
             raise ValueError(dict)
 

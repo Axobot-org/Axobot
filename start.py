@@ -40,6 +40,7 @@ def main():
                       'fcts.admin',
                       'fcts.aide',
                       'fcts.bot_events',
+                      'fcts.bot_stats',
                       'fcts.cases',
                       'fcts.embeds',
                       'fcts.emojis',
