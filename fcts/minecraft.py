@@ -554,7 +554,7 @@ Every information come from the website www.fr-minecraft.net"""
                 pass
         return None
 
-    async def check_flow(self, flow: dict):
+    async def check_flow(self, flow: dict, send_stats: bool):
         i = flow["link"].split(':')
         if i[1] == '':
             i[1] = None
@@ -579,9 +579,14 @@ Every information come from the website www.fr-minecraft.net"""
                 msg = await self.send_msg_server(obj,channel,i)
                 if msg is not None:
                     await self.bot.cogs['Rss'].update_flow(flow['ID'],[('structure',str(msg.id)),('date',datetime.datetime.utcnow())])
+                    if send_stats:
+                        if statscog := self.bot.get_cog("BotStats"):
+                            statscog.rss_stats['messages'] += 1
                 return
             e = await self.form_msg_server(obj,guild,i)
             await msg.edit(embed=e)
+            if statscog := self.bot.get_cog("BotStats"):
+                statscog.rss_stats['messages'] += 1
         except Exception as e:
             await self.bot.cogs['Errors'].on_error(e,None)
 

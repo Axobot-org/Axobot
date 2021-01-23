@@ -13,8 +13,9 @@ class BotStats(commands.Cog):
     def __init__(self, bot: zbot):
         self.bot = bot
         self.file = 'bot_stats'
-        self.received_events = dict()
+        self.received_events = {'CMD_USE': 0}
         self.commands_uses = dict()
+        self.rss_stats = {'checked': 0, 'messages': 0, 'errors': 0}
         # self.loop.start()
 
     def cog_unload(self):
@@ -49,26 +50,29 @@ class BotStats(commands.Cog):
         # remove seconds and less
         now = datetime.fromtimestamp(now-now % 60, tz=timezone.utc)
         # prepare erquests
-        query = "INSERT INTO zbot VALUES (%s, %s, %s, %s);"
+        query = "INSERT INTO zbot VALUES (%s, %s, %s, %s, %s, %s);"
         cnx = self.bot.cnx_stats
         cursor = cnx.cursor(dictionary=True)
         try:
             # WS events stats
             for k, v in self.received_events.items():
-                cursor.execute(query, (now, 'wsevent.'+k, v, self.bot.beta))
+                cursor.execute(query, (now, 'wsevent.'+k, v, 0, 'event/min', self.bot.beta))
                 self.received_events[k] = 0
             # Commands usages stats
             for k, v in self.commands_uses.items():
-                cursor.execute(query, (now, 'cmd.'+k, v, self.bot.beta))
-                del self.commands_uses[k]
+                cursor.execute(query, (now, 'cmd.'+k, v, 0, 'cmd/min', self.bot.beta))
+            self.commands_uses.clear()
+            # RSS stats
+            for k, v in self.rss_stats.items():
+                cursor.execute(query, (now, 'rss.'+k, v, 0, k, self.bot.beta))
             # Latency - RAM usage - CPU usage
             latency = round(self.bot.latency*1000, 3)
             ram = round(py.memory_info()[0]/2.**30, 3)
             cpu = py.cpu_percent(interval=1)
             cursor.execute(
-                query, (now, 'perf.latency', latency, self.bot.beta))
-            cursor.execute(query, (now, 'perf.ram', ram, self.bot.beta))
-            cursor.execute(query, (now, 'perf.cpu', cpu, self.bot.beta))
+                query, (now, 'perf.latency', latency, 1, 'ms', self.bot.beta))
+            cursor.execute(query, (now, 'perf.ram', ram, 1, '%', self.bot.beta))
+            cursor.execute(query, (now, 'perf.cpu', cpu, 1, '%', self.bot.beta))
             # Push everything
             cnx.commit()
         except Exception as e:
