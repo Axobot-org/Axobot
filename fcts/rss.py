@@ -1461,7 +1461,7 @@ class Rss(commands.Cog):
         cnx.commit()
         cursor.close()
 
-    async def send_rss_msg(self, obj, channel: discord.TextChannel, roles: typing.List[str]):
+    async def send_rss_msg(self, obj, channel: discord.TextChannel, roles: typing.List[str], send_stats):
         if channel is not None:
             t = await obj.create_msg(await self.bot._(channel.guild,"current_lang","current"))
             mentions = list()
@@ -1478,10 +1478,13 @@ class Rss(commands.Cog):
                     await channel.send(" ".join(obj.mentions), embed=t, allowed_mentions=discord.AllowedMentions(everyone=False, roles=True))
                 else:
                     await channel.send(t, allowed_mentions=discord.AllowedMentions(everyone=False, roles=True))
+                if send_stats:
+                    if statscog := self.bot.get_cog("BotStats"):
+                        statscog.rss_stats['messages'] += 1
             except Exception as e:
                 self.bot.log.info("[send_rss_msg] Cannot send message on channel {}: {}".format(channel.id,e))
 
-    async def check_flow(self, flow: dict, session: ClientSession = None):
+    async def check_flow(self, flow: dict, session: ClientSession = None, send_stats: bool=False):
         try:
             guild = self.bot.get_guild(flow['guild'])
             if flow['link'] in self.cache.keys():
@@ -1515,8 +1518,8 @@ class Rss(commands.Cog):
                     o.embed = flow['use_embed']
                     o.fill_embed_data(flow)
                     await o.fill_mention(guild,flow['roles'].split(';'), self.bot._)
-                    await self.send_rss_msg(o,chan,flow['roles'].split(';'),)
-                await self.update_flow(flow['ID'],[('date',o.date)])
+                    await self.send_rss_msg(o,chan,flow['roles'].split(';'), send_stats)
+                await self.update_flow(flow['ID'], [('date',o.date)],)
                 return True
             else:
                 return True
@@ -1541,25 +1544,32 @@ class Rss(commands.Cog):
             liste = await self.get_guild_flows(guildID)
         check = 0
         errors = []
+        if guildID is None:
+            if statscog := self.bot.get_cog("BotStats"):
+                statscog.rss_stats['messages'] = 0
         session = ClientSession()
         for flow in liste:
             try:
                 if flow['type'] == 'tw' and self.twitter_over_capacity:
                     continue
-                if flow['type'] != 'mc':
-                    if await self.check_flow(flow, session):
+                if flow['type'] == 'mc':
+                    await self.bot.get_cog('Minecraft').check_flow(flow, send_stats=(guildID is None))
+                    check +=1
+                else:
+                    if await self.check_flow(flow, session, send_stats=(guildID is None)):
                         check += 1
                     else:
                         errors.append(flow['ID'])
-                else:
-                    await self.bot.cogs['Minecraft'].check_flow(flow)
-                    check +=1
             except Exception as e:
                 await self.bot.cogs['Errors'].on_error(e,None)
             await asyncio.sleep(self.time_between_flows_check)
         await session.close()
         self.bot.cogs['Minecraft'].flows = dict()
         d = ["**RSS loop done** in {}s ({}/{} flows)".format(round(time.time()-t,3),check,len(liste))]
+        if guildID is None:
+            if statscog := self.bot.get_cog("BotStats"):
+                statscog.rss_stats['checked'] = check
+                statscog.rss_stats['errors'] = len(errors)
         if len(errors) > 0:
             d.append('{} errors: {}'.format(len(errors),' '.join([str(x) for x in errors])))
         emb = self.bot.cogs["Embeds"].Embed(desc='\n'.join(d),color=1655066).update_timestamp().set_author(self.bot.user)
