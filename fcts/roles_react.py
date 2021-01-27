@@ -282,7 +282,6 @@ Opposite is the subcommand 'join'
         """Add or remove a role to a user if possible"""
         if self.bot.zombie_mode:
             return
-        role_name = role.name.replace('@', '@'+u"\u200B")
         if not ignore_failure:
             if role in user.roles and give:
                 if not ignore_success:
@@ -295,7 +294,7 @@ Opposite is the subcommand 'join'
             if not guild.me.guild_permissions.manage_roles:
                 return await channel.send(await self.bot._(guild.id, 'modo', 'cant-mute'))
             if role.position >= guild.me.top_role.position:
-                return await channel.send(await self.bot._(guild.id, 'modo', 'role-high', r=role_name))
+                return await channel.send(await self.bot._(guild.id, 'modo', 'role-high', r=role.name))
         try:
             if give:
                 await user.add_roles(role, reason="Roles reaction")
@@ -307,7 +306,7 @@ Opposite is the subcommand 'join'
             await self.bot.cogs['Errors'].on_error(e, None)
         else:
             if not ignore_success:
-                await channel.send(await self.bot._(guild.id, 'roles_react', 'role-given' if give else 'role-lost', r=role_name))
+                await channel.send(await self.bot._(guild.id, 'roles_react', 'role-given' if give else 'role-lost', r=role.name))
 
     @rr_main.command(name='update')
     @commands.check(checks.database_connected)
