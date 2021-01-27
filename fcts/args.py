@@ -235,3 +235,16 @@ class snowflake(commands.Converter):
         if len(argument) < 17 or len(argument) > 18 or not argument.isnumeric():
             return None
         return self.Snowflake(int(argument))
+
+
+
+def litteral(string: str):
+    """A parameter type where the argument should exactly be the given string"""
+    class Litteral(commands.Converter):
+        _str = string
+        async def convert(self, ctx: MyContext, argument: str):
+            if argument == self._str:
+                return argument
+            raise commands.errors.BadArgument(f'Argument {argument} should be exactly {self._str}')
+    return Litteral
+
