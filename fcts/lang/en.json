@@ -808,7 +808,8 @@
             "use_voice_activation": "Use voice activity",
             "view_audit_log": "View audit logs",
             "view_guild_insights": "View guild insights"
-        }
+        },
+        "whatisthat": "What do they mean?"
     },
     "roles_react": {
         "already-1-rr": "You already have a designated role for this emoji",
