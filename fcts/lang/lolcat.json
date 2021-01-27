@@ -807,7 +807,8 @@
             "use_voice_activation": "Use voice activity",
             "view_audit_log": "View audit logs",
             "view_guild_insights": "View guild insights"
-        }
+        },
+        "whatisthat": "click HEEEERE if u wanna know"
     },
     "roles_react": {
         "already-1-rr": "U already has a designated role 4 this emoji",
