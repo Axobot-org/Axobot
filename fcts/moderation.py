@@ -803,7 +803,7 @@ You must be an administrator of this server to use this command.
 
     @emoji_group.command(name="restrict")
     @commands.check(checks.has_admin)
-    async def emoji_restrict(self, ctx: MyContext, emoji: discord.Emoji, *, roles: str):
+    async def emoji_restrict(self, ctx: MyContext, emoji: discord.Emoji, *, roles: commands.Greedy[typing.Union[discord.Role, args.litteral('everyone')]]):
         """Restrict the use of an emoji to certain roles
         
         ..Example emoji restrict :vip: @VIP @Admins
@@ -814,22 +814,15 @@ You must be an administrator of this server to use this command.
         if emoji.guild != ctx.guild:
             await ctx.send(await self.bot._(ctx.guild.id,"modo","wrong-guild"))
             return
-        r = list()
-        if not ctx.channel.permissions_for(ctx.guild.me).manage_emojis:
+        if not ctx.guild.me.guild_permissions.manage_emojis:
             await ctx.send(await self.bot._(ctx.guild.id,"modo","cant-emoji"))
             return
-        for role in roles.split(","):
-            role = role.strip()
+        for e, role in enumerate(roles):
             if role == "everyone":
-                role = "@everyone"
-            try:
-                role = await commands.RoleConverter().convert(ctx,role)
-            except commands.errors.BadArgument:
-                msg = await self.bot._(ctx.guild.id,"server","change-3")
-                await ctx.send(msg.format(role))
-                return
-            r.append(role)
-        await emoji.edit(name=emoji.name,roles=r)
+                roles[e] = ctx.guild.default_role
+        # remove duplicates
+        roles = list(set(roles))
+        await emoji.edit(name=emoji.name, roles=roles)
         await ctx.send(str(await self.bot._(ctx.guild.id,"modo","emoji-valid")).format(emoji,", ".join([x.name for x in r])))
 
     @emoji_group.command(name="clear")
