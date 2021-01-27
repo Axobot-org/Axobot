@@ -50,12 +50,12 @@ class Users(commands.Cog):
             if cog := self.bot.get_cog("Utilities"):
                 get_data = cog.get_db_userinfo
             else:
-                return False
+                return list()
             parameters = await get_data(criters=["userID="+str(user.id)], columns=['rankcards_unlocked'])
         except Exception as e:
             await self.bot.cogs["Errors"].on_error(e, None)
         if parameters is None:
-            return False
+            return list()
         return RankCardsFlag().intToFlags(parameters['rankcards_unlocked'])
 
     async def has_rankcard(self, user: discord.User, rankcard: str) -> bool:
