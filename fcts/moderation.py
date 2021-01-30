@@ -1011,6 +1011,7 @@ You must be an administrator of this server to use this command.
 
     @main_role.command(name="give", aliases=["add"])
     @commands.check(checks.has_manage_roles)
+    @commands.cooldown(1, 30, commands.BucketType.guild)
     async def roles_give(self, ctx:MyContext, role:discord.Role, users:commands.Greedy[typing.Union[discord.Role,discord.Member,args.litteral('everyone')]]):
         """Give a role to a list of roles/members
         Users list may be either members or roles, or even only one member
@@ -1042,13 +1043,14 @@ You must be an administrator of this server to use this command.
                 for m in item.members:
                     if role not in m.roles:
                         n_users.add(m)
-        for user in n_users:
+        for user in n_users[:200]:
             await user.add_roles(role,reason="Asked by {}".format(ctx.author))
         answer.append(await self.bot._(ctx.guild.id,"modo","give_roles-2",c=len(n_users)-error_count,m=len(n_users)))
         await ctx.send("\n".join(answer))
 
     @main_role.command(name="remove")
     @commands.check(checks.has_manage_roles)
+    @commands.cooldown(1, 30, commands.BucketType.guild)
     async def roles_remove(self, ctx:MyContext, role:discord.Role, users:commands.Greedy[typing.Union[discord.Role,discord.Member,args.litteral('everyone')]]):
         """Remove a role to a list of roles/members
         Users list may be either members or roles, or even only one member
@@ -1078,7 +1080,7 @@ You must be an administrator of this server to use this command.
                 for m in item.members:
                     if role in m.roles:
                         n_users.add(m)
-        for user in n_users:
+        for user in n_users[:200]:
             await user.remove_roles(role,reason="Asked by {}".format(ctx.author))
         answer.append(await self.bot._(ctx.guild.id,"modo","remove_roles-1",c=len(n_users)-error_count,m=len(n_users)))
         await ctx.send("\n".join(answer))
