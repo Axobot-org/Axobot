@@ -1068,6 +1068,7 @@
         "textchan-4": ":warning: Missing permissions!",
         "textchan-5": "Channel",
         "user-0": "On this server?",
+        "user-1": "Banned for",
         "voicechan-0": "Vocal channel"
     },
     "timers": {
