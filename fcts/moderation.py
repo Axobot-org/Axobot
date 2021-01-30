@@ -866,12 +866,19 @@ You must be an administrator of this server to use this command.
         await self.bot.invoke(new_ctx)
 
     @emoji_group.command(name="list")
-    async def emoji_list(self, ctx: MyContext):
+    async def emoji_list(self, ctx: MyContext, page: int = 1):
         """List every emoji of your server
+
+        ..Example emojis list
+
+        ..Example emojis list 2
         
         ..Doc moderator.html#emoji-manager"""
         if not ctx.can_send_embed:
             return await ctx.send(await self.bot._(ctx.guild.id,"fun","no-embed-perm"))
+        if page < 1:
+            await ctx.send(await self.bot._(ctx.guild.id, "xp", "low-page"))
+            return
         structure = await self.bot._(ctx.guild.id,"modo","em-list")
         date = ctx.bot.cogs['TimeUtils'].date
         lang = await self.bot._(ctx.guild.id,"current_lang","current")
@@ -880,19 +887,25 @@ You must be an administrator of this server to use this command.
         try:
             emotes = [structure.format(x,x.name,await date(x.created_at,lang,year=True,hour=False,digital=True),priv if len(x.roles) > 0 else '') for x in ctx.guild.emojis if not x.animated]
             emotes += [structure.format(x,x.name,await date(x.created_at,lang,year=True,hour=False,digital=True),priv if len(x.roles) > 0 else '') for x in ctx.guild.emojis if x.animated]
-            emotes = emotes
+            if (page-1)*50 >= len(emotes):
+                await ctx.send(await self.bot._(ctx.guild.id, "xp", "high-page"))
+                return
+            emotes = emotes[(page-1)*50:page*50]
             nbr = len(emotes)
-            for x in range(0,nbr,50):
-                fields = list()
-                for i in range(x, min(x+50,nbr), 10):
-                    l = list()
-                    for x in emotes[i:i+10]:
-                        l.append(x)
-                    fields.append({'name':"{}-{}".format(i+1,i+10 if i+10<nbr else nbr), 'value':"\n".join(l), 'inline':False})
-                embed = await ctx.bot.cogs['Embeds'].Embed(title=title,fields=fields,color=self.bot.cogs["Servers"].embed_color).create_footer(ctx)
-                await ctx.send(embed=embed.discord_embed())
+            fields = list()
+            for i in range(0, min(50, nbr), 10):
+                l = list()
+                for x in emotes[i:i+10]:
+                    l.append(x)
+                t = {'name': "{}-{}".format(i+1, i+10 if i+10 <
+                                            nbr else nbr), 'value': "\n".join(l), 'inline': False}
+                fields.append(t)
+            embed = await ctx.bot.get_cog('Embeds').Embed(title=title,
+                                                       fields=fields,
+                                                       color=self.bot.get_cog('Servers').embed_color).create_footer(ctx)
+            await ctx.send(embed=embed)
         except Exception as e:
-            await ctx.bot.cogs['Errors'].on_command_error(ctx,e)
+            await ctx.bot.get_cog('Errors').on_command_error(ctx,e)
 
 
     @commands.group(name="role", aliases=["roles"])
@@ -998,7 +1011,7 @@ You must be an administrator of this server to use this command.
 
     @main_role.command(name="give", aliases=["add"])
     @commands.check(checks.has_manage_roles)
-    async def roles_give(self, ctx:MyContext, role:discord.Role, users:commands.Greedy[typing.Union[discord.Role,discord.Member]]):
+    async def roles_give(self, ctx:MyContext, role:discord.Role, users:commands.Greedy[typing.Union[discord.Role,discord.Member,args.litteral('everyone')]]):
         """Give a role to a list of roles/members
         Users list may be either members or roles, or even only one member
         
@@ -1020,11 +1033,15 @@ You must be an administrator of this server to use this command.
         n_users = set()
         error_count = 0
         for item in users:
+            if item == "everyone":
+                item = ctx.guild.default_role
             if isinstance(item,discord.Member):
-                n_users.add(item)
+                if role not in item.roles:
+                    n_users.add(item)
             else:
                 for m in item.members:
-                    n_users.add(m)
+                    if role not in m.roles:
+                        n_users.add(m)
         for user in n_users:
             await user.add_roles(role,reason="Asked by {}".format(ctx.author))
         answer.append(await self.bot._(ctx.guild.id,"modo","give_roles-2",c=len(n_users)-error_count,m=len(n_users)))
@@ -1032,7 +1049,7 @@ You must be an administrator of this server to use this command.
 
     @main_role.command(name="remove")
     @commands.check(checks.has_manage_roles)
-    async def roles_remove(self, ctx:MyContext, role:discord.Role, users:commands.Greedy[typing.Union[discord.Role,discord.Member]]):
+    async def roles_remove(self, ctx:MyContext, role:discord.Role, users:commands.Greedy[typing.Union[discord.Role,discord.Member,args.litteral('everyone')]]):
         """Remove a role to a list of roles/members
         Users list may be either members or roles, or even only one member
         
@@ -1052,11 +1069,15 @@ You must be an administrator of this server to use this command.
         n_users = set()
         error_count = 0
         for item in users:
+            if item == "everyone":
+                item = ctx.guild.default_role
             if isinstance(item,discord.Member):
-                n_users.add(item)
+                if role not in item.roles:
+                    n_users.add(item)
             else:
                 for m in item.members:
-                    n_users.add(m)
+                    if role in m.roles:
+                        n_users.add(m)
         for user in n_users:
             await user.remove_roles(role,reason="Asked by {}".format(ctx.author))
         answer.append(await self.bot._(ctx.guild.id,"modo","remove_roles-1",c=len(n_users)-error_count,m=len(n_users)))
