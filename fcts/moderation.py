@@ -511,9 +511,15 @@ This will remove the role 'muted' for the targeted member
         if role is None or count >= len(ctx.guild.voice_channels+ctx.guild.text_channels):
             await ctx.send(await self.bot._(ctx.guild.id, "modo", "mute-config-err"))
         elif create:
-            await ctx.send(await self.bot._(ctx.guild.id, "modo", "mute-config-success", c=count))
+            if count == 0:
+                await ctx.send(await self.bot._(ctx.guild.id, "modo", "mute-config-success-0"))
+            else:
+                await ctx.send(await self.bot._(ctx.guild.id, "modo", "mute-config-success-m", count=count))
         else:
-            await ctx.send(await self.bot._(ctx.guild.id, "modo", "mute-config-success2", c=count))
+            if count == 0:
+                await ctx.send(await self.bot._(ctx.guild.id, "modo", "mute-config-success2-0"))
+            else:
+                await ctx.send(await self.bot._(ctx.guild.id, "modo", "mute-config-success2-m", count=count))
 
 
     @commands.command(name="ban")
