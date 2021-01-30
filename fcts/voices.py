@@ -125,18 +125,26 @@ class VoiceChannels(commands.Cog):
             self.bot.log.info(f"[Voice] Missing \"move_members\" permission on channel \"{member.voice.channel}\"")
             return
         p = len(voice_category.channels)
-        d = dict(discord.Permissions.all())
+        # try to calculate the correct permissions
+        d = member.guild.me.guild_permissions
+        d = {k: v for k, v in dict(d).items() if v}
         over = {
             member: discord.PermissionOverwrite(**d),
-            member.guild.me: discord.PermissionOverwrite(**d)
-            }
+            member.guild.me: discord.PermissionOverwrite(**d)}
+        # remove manage roles cuz DISCOOOOOOOOOOORD
+        over[member].manage_roles = None
+        over[member.guild.me].manage_roles = None
+        # build channel name from config and random
         chan_name = await self.bot.get_config(member.guild.id, 'voice_channel_format')
         args = {'user': str(member)}
         if "{random}" in chan_name:
             args['random'] = await self.get_names()
         chan_name = chan_name.format_map(self.bot.SafeDict(args))
+        # actually create the channel
         new_channel = await voice_category.create_voice_channel(name=chan_name, position=p, overwrites=over)
+        # move user
         await member.move_to(new_channel)
+        # add to database
         self.db_add_channel(new_channel)
 
     async def delete_channel(self, channel: discord.VoiceChannel):
