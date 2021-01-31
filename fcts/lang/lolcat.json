@@ -854,6 +854,7 @@
         "move-success": "Teh rsss feed #{} haz been movd in the chat {}!",
         "no-db": "As the databaz is auffline, dis feature iz temporarly disabled :confused:",
         "no-feed": "Oops, u donot hav any rss feds 2 managez plz!",
+        "no-feed2": "Ur server don't has rss thingy!",
         "no-roles": "No more role hAVe bean configurated yetz.",
         "not-a-role": "The rOle was not finndz. Try against:",
         "nothing": "I finnd nothin on this searrch :confused:",
