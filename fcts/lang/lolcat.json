@@ -277,6 +277,13 @@
         "count-5": "U cannot use tish cmd at a channel where U do not have access to msg history",
         "discordjobs-title": "cool Jobs @Discord",
         "discordjobs-count": "{c} available house",
+        "discordstatus-nothing": "Discord iz workin fine!\nLast big bug waz at {date}",
+        "discordstatus-exists": "UwU Discord broke :sad_trumpet_noise: check more at {title}",
+        "discordstatus-impacts": {
+            "none": "without effect",
+            "minor": "minor",
+            "major": "major"
+        },
         "embed-error": "A' error went wrong: `{}`",
         "embed-invalid-channel": "Cannt send messages in dat chan...",
         "embed-invalid-image": "The url entered as image is invalid",
