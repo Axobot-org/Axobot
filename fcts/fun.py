@@ -840,6 +840,32 @@ You can specify a verification limit by adding a number in argument (up to 1.000
             footer_text="Credits: " + self.nasa_pict.get("copyright", "Not copyrighted"),
             time=get_date(self.nasa_pict["date"]))
         await ctx.send(embed=emb)
+    
+    @commands.command(name="discordjobs", aliases=['discord_jobs', 'jobs.gg'])
+    @commands.cooldown(2, 60, commands.BucketType.channel)
+    async def discordjobs(self, ctx: MyContext):
+        """Get the list of available jobs in Discord"""
+        async with aiohttp.ClientSession() as session:
+            async with session.get("https://api.greenhouse.io/v1/boards/discord/jobs") as r:
+                data = await r.json()
+        jobs = [
+            f"[{x['title']}]({x['absolute_url']})" for x in data['jobs']
+        ]
+        if ctx.can_send_embed:
+            _title = await self.bot._(ctx.channel, "fun", "discordjobs-title")
+            emb = discord.Embed(title=_title, color=7506394, url="https://dis.gd/jobs")
+            if len(jobs) > 30:
+                for i in range(0, len(jobs), 10):
+                    emb.add_field(name="​", value="\n".join(jobs[i:i+10]))
+                emb.description = await self.bot._(ctx.channel, "fun", "discordjobs-count", c=len(jobs))
+            else:
+                emb.description = "\n".join(jobs)
+            try:
+                await ctx.send(embed=emb)
+            except discord.HTTPException:
+                print([len(x['value']) for x in emb.fields])
+        else:
+            await ctx.send("\n".join(jobs[:30]))
         
 
     @commands.command(name="vote")
