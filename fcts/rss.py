@@ -414,9 +414,13 @@ class Rss(commands.Cog):
         
         ..Doc rss.html#see-every-feed"""
         liste = await self.get_guild_flows(ctx.guild.id)
-        l = list()
-        translation = await self.bot._(ctx.guild.id,"rss","list-result")
+        if len(liste) == 0:
+            # no rss feed
+            await ctx.send(await self.bot._(ctx.guild.id, "rss", "no-feed2"))
+            return
         title = await self.bot._(ctx.guild.id, "rss", "list-title", server=ctx.guild.name)
+        translation = await self.bot._(ctx.guild.id,"rss","list-result")
+        l = list()
         for x in liste:
             c = self.bot.get_channel(x['channel'])
             if c is not None:

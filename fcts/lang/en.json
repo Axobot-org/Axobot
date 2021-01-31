@@ -855,6 +855,7 @@
         "move-success": "The rss feed #{} has been moved in the channel {}!",
         "no-db": "As the database is currently offline, this feature is temporarily disabled :confused:",
         "no-feed": "Oops, you don't have any rss feeds to manage!",
+        "no-feed2": "This server has no rss feed!",
         "no-roles": "No role has been configured yet.",
         "not-a-role": "This role can't be found. Try again:",
         "nothing": "I found nothing on this search :confused:",

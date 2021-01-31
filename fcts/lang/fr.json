@@ -868,6 +868,7 @@
         "move-success": "Le flux rss n°{} a bien été bougé dans le salon {} !",
         "no-db": "La base de donnée étant actuellement hors ligne, cette fonctionnalité est temporairement désactivée :confused:",
         "no-feed": "Oups, vous n'avez aucun flux rss à gérer !",
+        "no-feed2": "Ce serveur ne possède aucun flux rss !",
         "no-roles": "Aucun rôle n'a été configuré pour l'instant.",
         "not-a-role": "Ce rôle est introuvable. Réessayez :",
         "nothing": "Je n'ai rien trouvé sur cette recherche :confused:",
