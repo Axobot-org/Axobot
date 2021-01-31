@@ -287,6 +287,8 @@
         "count-3": "Oups, il m'est impossible de lire l'historique de ce salon. Veuillez vérifier mes permissions...",
         "count-4": "Sur les {limit} derniers messages, {user} en a posté {x} ({p}%)",
         "count-5": "Vous ne pouvez pas utiliser cette commande dans un salon où vous n'avez pas accès à l'historique des messages",
+        "discordjobs-title": "Postes disponibles chez Discord",
+        "discordjobs-count": "{c} offres trouvées",
         "embed-error": "Une erreur est survenue: `{}`",
         "embed-invalid-channel": "Impossible d'envoyer des messages dans ce salon",
         "embed-invalid-image": "L'url saisie pour l'image est invalide",
