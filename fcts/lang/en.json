@@ -278,6 +278,13 @@
         "count-5": "You cannot use this command in a channel where you do not have access to the message history",
         "discordjobs-title": "Jobs available at Discord",
         "discordjobs-count": "{c} offers found",
+        "discordstatus-nothing": "Nothing to report at this time!\nThe last known issue was on {date}",
+        "discordstatus-exists": "There is currently one {impact} incident in progress on Discord: {title}",
+        "discordstatus-impacts": {
+            "none": "without effect",
+            "minor": "minor",
+            "major": "major"
+        },
         "embed-error": "An error has occurred: `{}`",
         "embed-invalid-channel": "Cannot send messages in this channel",
         "embed-invalid-image": "The url entered as image is invalid",

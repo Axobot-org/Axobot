@@ -869,6 +869,26 @@ You can specify a verification limit by adding a number in argument (up to 1.000
             await ctx.send(embed=emb)
         else:
             await ctx.send("\n".join(f_jobs[:20]))
+    
+
+    @commands.command(name="discordstatus", aliases=['discord_status', 'status.gg'])
+    @commands.cooldown(2, 60, commands.BucketType.channel)
+    async def discordstatus(self, ctx: MyContext):
+        """Know if Discord currently has a technical issue"""
+        async with aiohttp.ClientSession() as session:
+            async with session.get("https://discordstatus.com/api/v2/incidents.json") as r:
+                data = await r.json()
+        last_incident = data['incidents'][0]
+        if last_incident['resolved_at'] is None:
+            impact = await self.bot._(ctx.channel, "fun", "discordstatus-impacts")
+            impact = impact.get(last_incident['impact'])
+            title = f"[{last_incident['name']}]({last_incident['shortlink']})"
+            await ctx.send(await self.bot._(ctx.channel, "fun", "discordstatus-exists", impact=impact, title=title))
+        else:
+            last_date = datetime.datetime.strptime(last_incident['resolved_at'], '%Y-%m-%dT%H:%M:%S.%f%z')
+            _lang = await self.bot._(ctx.channel,'current_lang','current')
+            last_date = await self.bot.get_cog("TimeUtils").date(last_date, _lang, timezone=True)
+            await ctx.send(await self.bot._(ctx.channel, "fun", "discordstatus-nothing", date=last_date))
         
 
     @commands.command(name="vote")

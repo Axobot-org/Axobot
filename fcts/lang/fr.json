@@ -289,6 +289,13 @@
         "count-5": "Vous ne pouvez pas utiliser cette commande dans un salon où vous n'avez pas accès à l'historique des messages",
         "discordjobs-title": "Postes disponibles chez Discord",
         "discordjobs-count": "{c} offres trouvées",
+        "discordstatus-nothing": "Rien à signaler pour le moment !\nLa dernière panne connue était le {date}",
+        "discordstatus-exists": "Il y a actuellement un incident {impact} en cours sur Discord : {title}",
+        "discordstatus-impacts": {
+            "none": "sans effet",
+            "minor": "mineur",
+            "major": "majeur"
+        },
         "embed-error": "Une erreur est survenue: `{}`",
         "embed-invalid-channel": "Impossible d'envoyer des messages dans ce salon",
         "embed-invalid-image": "L'url saisie pour l'image est invalide",

@@ -136,7 +136,7 @@ class TimeUtils(discord.ext.commands.Cog):
         obj.set_from_seconds()
         return obj
 
-    async def date(self, date, lang='fr', year=False, hour=True, digital=False) -> str:
+    async def date(self, date, lang='fr', year=False, hour=True, digital=False, timezone=False) -> str:
         """Translates a datetime.datetime object into a readable string"""
         if type(date) == time.struct_time:
             date = datetime.datetime(*date[:6])
@@ -178,7 +178,11 @@ class TimeUtils(discord.ext.commands.Cog):
                 else:
                     df = "{m} {d}, {y}  {h}"
                 df = df.format(d=jour,m=month[date.month-1],y=str(date.year) if year else "",h=":".join(h) if hour else "")
-            return df.strip()
+            df = df.strip()
+            # if timezone asked and the date has a timezone
+            if timezone and (date.tzinfo is not None and date.tzinfo.utcoffset(date) is not None):
+                df += " " + date.tzinfo.tzname(None)
+            return df.strip().replace('  ', ' ')
 
 
 def setup(bot):
