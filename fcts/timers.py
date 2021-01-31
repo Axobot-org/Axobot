@@ -60,7 +60,7 @@ class Timers(commands.Cog):
         if not self.bot.database_online:
             await ctx.send(await self.bot._(ctx.channel, "rss", "no-db"))
             return
-        f_duration = await ctx.bot.get_cog('TimeUtils').time_delta(duration,lang=await self.bot._(ctx.guild,'current_lang','current'), year=True, form='developed', precision=0)
+        f_duration = await ctx.bot.get_cog('TimeUtils').time_delta(duration,lang=await self.bot._(ctx.channel,'current_lang','current'), year=True, form='developed', precision=0)
         try:
             d = {'msg_url': ctx.message.jump_url}
             await ctx.bot.get_cog('Events').add_task("timer", duration, ctx.author.id, ctx.guild.id if ctx.guild else None, ctx.channel.id, message, data=d)
