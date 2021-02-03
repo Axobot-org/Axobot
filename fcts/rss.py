@@ -1127,6 +1127,8 @@ class Rss(commands.Cog):
         except twitter.error.TwitterError as e:
             if e.message == "Not authorized.":
                 return await self.bot._(channel,"rss","nothing")
+            if 'Unknown error' in e.message:
+                return await self.bot._(channel,"rss","nothing")
             if e.message[0]['code'] == 34:
                 return await self.bot._(channel,"rss","nothing")
             raise e
