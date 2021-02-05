@@ -10,6 +10,7 @@ import operator
 import typing
 import aiohttp
 import mysql
+import string
 from discord.ext import commands
 from math import ceil
 import numpy as np
@@ -242,6 +243,8 @@ class Xp(commands.Cog):
 
     async def check_spam(self, text: str):
         """Vérifie si un text contient du spam"""
+        if len(text)>0 and (text[0] in string.punctuation or text[1] in string.punctuation):
+            return True
         d = dict()
         for c in text:
             if c in d.keys():
