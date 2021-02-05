@@ -233,6 +233,7 @@
         "missingargument": "Oops, te argumnt \"{a}\" are missin {e}",
         "msgnotfound": "NoAble 2 find any msg with ID {msg}",
         "notrightroles": "U're not fancy enough to get dat command, GO AWAY DUDE! :reee:",
+        "quoteserror": "Oops, u guys did smth wrong with quotes \" Make sur u using tehm correclty",
         "rolenotfound": "Unable 2 find ur role (`{r}`)",
         "toomanytxtchan": "U have toooo many visibl text channels lmao. Why so much? useless/20. U should seriously think 'bout it dude. Pro-tip :smirk:",
         "unknown": "Ups, somthin' wen't horribly wrong :fearful: pls contact zbot authorities immdiatly",

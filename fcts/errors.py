@@ -41,7 +41,10 @@ class Errors(commands.Cog):
                 await ctx.send('`Ignored error:` [{}] {}'.format(c,error))
             return
         elif isinstance(error, commands.CommandError) and str(error) == "User doesn't have required roles":
-            await ctx.send(await self.bot._(ctx.channel,'errors','notrightroles'))
+            await ctx.send(await self.bot._(ctx.channel, 'errors', 'notrightroles'))
+            return
+        elif isinstance(error, commands.ExpectedClosingQuoteError):
+            await ctx.send(await self.bot._(ctx.channel, 'errors', 'quoteserror'))
             return
         elif isinstance(error,commands.errors.CommandOnCooldown):
             if await self.bot.cogs['Admin'].check_if_admin(ctx):
