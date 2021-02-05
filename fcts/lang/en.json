@@ -234,6 +234,7 @@
         "missingargument": "Oops, the argument \"{a}\" is missing {e}",
         "msgnotfound": "Unable to find any message with ID {msg}",
         "notrightroles": "You don't have the necessary roles for this command",
+        "quoteserror": "Oops, a quotation mark error has occurred. Be sure to correctly use the quotes \", so that each open quote will be closed further on",
         "rolenotfound": "Unable to find the role `{r}`",
         "toomanytxtchan": "You have too many accessible text channels",
         "unknown": "Oops, an error occurred :confused: Try again later, or contact support (command `about`).",
