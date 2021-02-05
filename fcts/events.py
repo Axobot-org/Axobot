@@ -161,7 +161,7 @@ class Events(commands.Cog):
         # Halloween event
         elif ("booh" in msg.content.lower() or "halloween" in msg.content.lower() or "witch" in msg.content.lower()) and random.random() < 0.05 and self.bot.current_event=="halloween":
             try:
-                react = random.choice(['🦇','🎃','🕷️']*2+['👀'])
+                react = random.choice(['🦇','🎃','🕷️']*2+['👀' ])
                 await msg.add_reaction(react)
             except:
                 pass
@@ -173,14 +173,19 @@ class Events(commands.Cog):
             except:
                 pass
             pass
-        if msg.author.bot==False and await self.bot.cogs['Admin'].check_if_admin(msg.author) == False and msg.guild is not None:
-            cond = True
+        # if msg.author.bot==False and await self.bot.cogs['Admin'].check_if_admin(msg.author) == False and msg.guild is not None:
+        if not msg.author.bot:
+            cond = False
             if self.bot.database_online:
                 cond = str(await self.bot.get_config(msg.guild,"anti_caps_lock")) in ['1','True']
             if cond:
-                if len(msg.content) > 0 and sum(1 for c in msg.content if c.isupper())/len(msg.content.replace('|','')) > 0.75 and len(msg.content.replace('|',''))>7 and not msg.channel.permissions_for(msg.author).administrator:
+                clean_content = msg.content
+                for rgx_match in (r'\|', r'\*', r'_', r'<a?:\w+:\d+>', r'<(#|@&?!?)\d+>', r'https?://\w+\.\S+'):
+                    clean_content = re.sub(rgx_match, '', clean_content)
+                clean_content = clean_content.replace(' ', '')
+                if len(clean_content) > 0 and sum(1 for c in clean_content if c.isupper())/len(clean_content) > 0.8 and len(clean_content)>7 and not msg.channel.permissions_for(msg.author).administrator:
                     try:
-                        await msg.channel.send(str(await self.bot.cogs["Languages"].tr(msg.guild,"modo","caps-lock")).format(msg.author.mention),delete_after=4.0)
+                        await msg.channel.send(str(await self.bot._(msg.guild, "modo", "caps-lock")).format(msg.author.mention), delete_after=4.0)
                     except:
                         pass
 
