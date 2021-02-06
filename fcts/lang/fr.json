@@ -1071,6 +1071,8 @@
         "member-6": "Administrateur",
         "member-7": "Nombre d'infractions",
         "member-8": "Status custom",
+        "member-9": "Rôles",
+        "member-10": "N'a toujours pas accepté les règles",
         "not-found": "Impossible de trouver {N}",
         "role-0": "Identifiant",
         "role-1": "Couleur",

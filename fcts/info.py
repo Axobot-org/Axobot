@@ -363,12 +363,17 @@ Available types: member, role, user, emoji, channel, server, invite, category
                 embed.add_field(name=str(await self.bot._(ctx.guild.id,'keywords','servers')).capitalize(),value=guilds_count)
             await session.close()
         # Roles
+        _roles = await self.bot._(ctx.guild.id, 'stats_infos', 'member-9') + f' [{len(list_role)}]'
         if len(list_role) > 0:
             c = len(list_role)
             list_role = list_role[:40]
-            embed.add_field(name=f"Roles [{c}]", value = ", ".join(list_role), inline=False)
+            embed.add_field(name=_roles, value = ", ".join(list_role), inline=False)
         else:
-            embed.add_field(name="Roles [0]", value = await self.bot._(ctx.guild.id,"activity","nothing"), inline=False)
+            embed.add_field(name=_roles, value = await self.bot._(ctx.guild.id,"activity","nothing"), inline=False)
+        # member verification gate
+        if item.pending:
+            _waiting = await self.bot._(ctx.guild.id, 'stats_infos', 'member-10')
+            embed.add_field(name=_waiting, value='\u200b', inline=False)
         await ctx.send(embed=embed)
 
 

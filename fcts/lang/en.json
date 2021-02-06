@@ -1058,6 +1058,8 @@
         "member-6": "Administrator",
         "member-7": "Infractions",
         "member-8": "Custom activity",
+        "member-9": "Roles",
+        "member-10": "Still hasn't accepted the rules",
         "not-found": "Unable to find {N}",
         "role-0": "ID",
         "role-1": "Color",
