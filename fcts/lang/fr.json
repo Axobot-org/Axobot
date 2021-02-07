@@ -13,7 +13,7 @@
         "aliases": "Alias",
         "categories": {
             "fun": "fun",
-            "info": "informations",
+            "data": "informations",
             "moderation": "modération",
             "other": "autres",
             "server-settings": "configuration",
