@@ -11,6 +11,7 @@ import mysql
 import random
 import typing
 import importlib
+import html
 import socket
 import requests
 import twitter
@@ -1140,7 +1141,7 @@ class Rss(commands.Cog):
             rt = None
             if lastpost.retweeted:
                 rt = "retweet"
-            text =  getattr(lastpost, 'full_text', lastpost.text)
+            text = html.unescape(getattr(lastpost, 'full_text', lastpost.text))
             url = "https://twitter.com/{}/status/{}".format(username.lower(), lastpost.id)
             img = None
             if lastpost.media: # if exists and is not empty
@@ -1167,7 +1168,7 @@ class Rss(commands.Cog):
                 rt = None
                 if post.retweeted:
                     rt = "retweet"
-                text = getattr(post, 'full_text', post.text)
+                text = html.unescape(getattr(post, 'full_text', post.text))
                 if r := re.search(r"https://t.co/([^\s]+)", text):
                     text = text.replace(r.group(0), '')
                 url = "https://twitter.com/{}/status/{}".format(name.lower(), post.id)
