@@ -1,5 +1,5 @@
 import typing
-from classes import zbot, MyContext
+from utils import zbot, MyContext
 import time
 import datetime
 import emoji

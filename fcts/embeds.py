@@ -1,6 +1,6 @@
 import datetime, discord, requests, typing
 from discord.ext import commands
-from classes import zbot, MyContext
+from utils import zbot, MyContext
 
 url_base = 'https://discord.com/api/webhooks/'
 

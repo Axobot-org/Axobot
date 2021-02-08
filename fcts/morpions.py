@@ -4,7 +4,7 @@ import asyncio
 import time
 import emoji as emojilib
 from discord.ext import commands
-from classes import zbot, MyContext
+from utils import zbot, MyContext
 
 
 class Morpions(commands.Cog):

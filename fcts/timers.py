@@ -3,7 +3,7 @@ import copy
 import datetime
 
 from fcts import args
-from classes import zbot, MyContext
+from utils import zbot, MyContext
 
 class Timers(commands.Cog):
     def __init__(self, bot: zbot):

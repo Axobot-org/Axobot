@@ -20,7 +20,7 @@ import speedtest
 from contextlib import redirect_stdout
 from glob import glob
 from fcts import reloads
-from classes import zbot, MyContext, UserFlag
+from utils import zbot, MyContext, UserFlag
 
 
 def cleanup_code(content):
@@ -567,8 +567,8 @@ class Admin(commands.Cog):
 
     @main_msg.command(name="enable_module")
     @commands.check(reloads.check_admin)
-    async def enable_xp(self,ctx,enabling:bool,module:str):
-        """Active ou désactive un module (xp/rss)
+    async def enable_module(self, ctx: MyContext, module: str, enabling: bool=True):
+        """Active ou désactive un module (xp/rss/alerts)
 Cette option affecte tous les serveurs"""
         if module=='xp':
             self.bot.xp_enabled = enabling

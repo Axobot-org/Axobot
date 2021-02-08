@@ -14,7 +14,7 @@ from discord.ext.commands import Cog
 from libs import halloween
 from libs.halloween import convert_image, check_image
 importlib.reload(halloween)
-from classes import zbot, MyContext
+from utils import zbot, MyContext
 
 
 class LinkConverter(commands.Converter):

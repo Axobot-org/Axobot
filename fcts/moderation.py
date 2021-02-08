@@ -9,7 +9,7 @@ import importlib
 import asyncio
 import copy
 from fcts import checks, args
-from classes import zbot, MyContext
+from utils import zbot, MyContext
 
 importlib.reload(checks)
 importlib.reload(args)

@@ -3,7 +3,7 @@ import re
 import string
 import typing
 from discord.ext import commands
-from classes import MyContext
+from utils import MyContext
 
 
 class tempdelta(commands.Converter):

@@ -4,7 +4,7 @@ import traceback
 import random
 import re
 from discord.ext import commands
-from classes import zbot, MyContext
+from utils import zbot, MyContext
 
 
 class Errors(commands.Cog):

@@ -1,7 +1,7 @@
 import discord
 import typing
 from discord.ext import commands
-from classes import zbot, MyContext
+from utils import zbot, MyContext
 
 class Perms(commands.Cog):
     """Cog with a single command, allowing you to see the permissions of a member or a role in a channel."""

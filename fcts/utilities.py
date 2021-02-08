@@ -6,7 +6,7 @@ import aiohttp
 from fcts import args
 from discord.ext import commands
 from typing import List
-from classes import zbot, MyContext
+from utils import zbot, MyContext
 
 importlib.reload(args)
 

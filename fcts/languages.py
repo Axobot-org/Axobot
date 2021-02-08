@@ -1,6 +1,6 @@
 import discord
 import json
-from classes import zbot
+from utils import zbot
 
 en = None
 fi = None
