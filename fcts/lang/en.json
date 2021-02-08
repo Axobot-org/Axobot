@@ -1085,10 +1085,13 @@
         "voicechan-0": "Vocal channel"
     },
     "timers": {
+        "rmd-cleared": "Your reminders have been deleted!",
+        "rmd-confirm": "Are you sure you want to delete all your reminders? ({count} pending)",
         "rmd-deleted": "Reminder #{id} with message `{message}` has successfully been deleted!",
         "rmd-empty": "Oops, you don't have any pending reminder...",
         "rmd-item": "ID: `{id}` | In: {duration} | Channel: {channel} | Message: {msg}",
-        "rmd-title": "List of your reminders"
+        "rmd-title": "List of your reminders",
+        "rmd-cancelled": "Dropping the process"
     },
     "users": {
         "animated_card_false": "You are not currently allowing an animated card. Thanks!",

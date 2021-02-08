@@ -55,7 +55,7 @@ class Info(commands.Cog):
         """Count the number of lines for the whole project"""
         count = 0
         try:
-            for filename in ['start.py', 'classes.py']:
+            for filename in ['start.py', 'utils.py']:
                 with open(filename, 'r') as file:
                     for line in file.read().split("\n"):
                         if len(line.strip()) > 2 and line[0] != '#':

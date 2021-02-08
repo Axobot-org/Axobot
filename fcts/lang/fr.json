@@ -1098,10 +1098,13 @@
         "voicechan-0": "Salon vocal"
     },
     "timers": {
+        "rmd-cleared": "Vos rappels ont bien été supprimés !",
+        "rmd-confirm": "Êtes-vous sûr de vouloir supprimer tous vos rappels ? ({count} en cours)",
         "rmd-deleted": "Le rappel N°{id} ayant pour message `{message}` a bien été supprimé !",
         "rmd-empty": "Oups, vous n'avez aucun rappel en cours...",
         "rmd-item": "ID : `{id}` | Dans : {duration} | Salon : {channel} | Message : {msg}",
-        "rmd-title": "Liste de vos rappels"
+        "rmd-title": "Liste de vos rappels",
+        "rmd-cancelled": "Abandon de la procédure"
     },
     "users": {
         "animated_card_false": "Vous n'utilisez actuellement pas de carte animée",
