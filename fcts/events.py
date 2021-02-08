@@ -12,7 +12,7 @@ import re
 import marshal
 from discord.ext import commands, tasks
 from fcts.checks import is_fun_enabled
-from classes import zbot
+from utils import zbot
 
 class Events(commands.Cog):
     """Cog for the management of major events that do not belong elsewhere. Like when a new server invites the bot."""
@@ -64,7 +64,7 @@ class Events(commands.Cog):
     async def on_member_update(self, before: discord.Member, after: discord.Member):
         """Called when a member change something (status, activity, nickame, roles)"""
         if before.nick != after.nick:
-            config_option = await self.bot.cogs['Utilities'].get_db_userinfo(['allow_usernames_logs'],["userID="+str(before.id)])
+            config_option = await self.bot.get_cog('Utilities').get_db_userinfo(['allow_usernames_logs'],["userID="+str(before.id)])
             if config_option is not None and config_option['allow_usernames_logs']==False:
                 return
             await self.updade_memberslogs_name(before, after)
@@ -96,7 +96,7 @@ class Events(commands.Cog):
     async def on_user_update(self, before: discord.User, after: discord.User):
         """Called when a user change something (avatar, username, discrim)"""
         if before.name != after.name:
-            config_option = await self.bot.cogs['Utilities'].get_db_userinfo(['allow_usernames_logs'],["userID="+str(before.id)])
+            config_option = await self.bot.get_cog('Utilities').get_db_userinfo(['allow_usernames_logs'],["userID="+str(before.id)])
             if config_option is not None and config_option['allow_usernames_logs']==False:
                 return
             await self.updade_memberslogs_name(before, after)
@@ -125,12 +125,12 @@ class Events(commands.Cog):
             else:
                 self.bot.log.info("Le bot a quitté le serveur {}".format(guild.id))
                 desc = "Bot **left the server** {} ({}) - {} users".format(guild.name,guild.id,len(guild.members))
-            emb = self.bot.cogs["Embeds"].Embed(desc=desc,color=self.embed_colors['welcome']).update_timestamp().set_author(self.bot.user)
-            await self.bot.cogs["Embeds"].send([emb])
+            emb = self.bot.get_cog("Embeds").Embed(desc=desc,color=self.embed_colors['welcome']).update_timestamp().set_author(self.bot.user)
+            await self.bot.get_cog("Embeds").send([emb])
             if self.bot.database_online:
                 await self.send_sql_statslogs()
         except Exception as e:
-            await self.bot.cogs["Errors"].on_error(e,None)
+            await self.bot.get_cog("Errors").on_error(e,None)
 
 
     @commands.Cog.listener()
@@ -142,14 +142,14 @@ class Events(commands.Cog):
             await self.send_mp(msg)
         else:
             try:
-                await self.bot.cogs['Fun'].check_suggestion(msg)
+                await self.bot.get_cog('Fun').check_suggestion(msg)
             except KeyError:
                 pass
             except Exception as e:
-                await self.bot.cogs['Errors'].on_error(e,msg)
-            await self.bot.cogs['Fun'].check_afk(msg)
+                await self.bot.get_cog('Errors').on_error(e,msg)
+            await self.bot.get_cog('Fun').check_afk(msg)
         if msg.author != self.bot.user:
-            await self.bot.cogs['Info'].emoji_analysis(msg)
+            await self.bot.get_cog('Info').emoji_analysis(msg)
         if "send nudes" in msg.content.lower() and len(msg.content)<13 and random.random() > 0.0:
             try:
                 nudes_reacts = [':eyes:',':innocent:',':rolling_eyes:',':confused:',':smirk:']
@@ -161,7 +161,7 @@ class Events(commands.Cog):
         # Halloween event
         elif ("booh" in msg.content.lower() or "halloween" in msg.content.lower() or "witch" in msg.content.lower()) and random.random() < 0.05 and self.bot.current_event=="halloween":
             try:
-                react = random.choice(['🦇','🎃','🕷️']*2+['👀'])
+                react = random.choice(['🦇','🎃','🕷️']*2+['👀' ])
                 await msg.add_reaction(react)
             except:
                 pass
@@ -173,14 +173,19 @@ class Events(commands.Cog):
             except:
                 pass
             pass
-        if msg.author.bot==False and await self.bot.cogs['Admin'].check_if_admin(msg.author) == False and msg.guild is not None:
-            cond = True
+        # if msg.author.bot==False and await self.bot.get_cog('Admin').check_if_admin(msg.author) == False and msg.guild is not None:
+        if not msg.author.bot:
+            cond = False
             if self.bot.database_online:
                 cond = str(await self.bot.get_config(msg.guild,"anti_caps_lock")) in ['1','True']
             if cond:
-                if len(msg.content) > 0 and sum(1 for c in msg.content if c.isupper())/len(msg.content.replace('|','')) > 0.75 and len(msg.content.replace('|',''))>7 and not msg.channel.permissions_for(msg.author).administrator:
+                clean_content = msg.content
+                for rgx_match in (r'\|', r'\*', r'_', r'<a?:\w+:\d+>', r'<(#|@&?!?)\d+>', r'https?://\w+\.\S+'):
+                    clean_content = re.sub(rgx_match, '', clean_content)
+                clean_content = clean_content.replace(' ', '')
+                if len(clean_content) > 0 and sum(1 for c in clean_content if c.isupper())/len(clean_content) > 0.8 and len(clean_content)>7 and not msg.channel.permissions_for(msg.author).administrator:
                     try:
-                        await msg.channel.send(str(await self.bot.cogs["Languages"].tr(msg.guild,"modo","caps-lock")).format(msg.author.mention),delete_after=4.0)
+                        await msg.channel.send(str(await self.bot._(msg.guild, "modo", "caps-lock")).format(msg.author.mention), delete_after=4.0)
                     except:
                         pass
 
@@ -194,7 +199,7 @@ class Events(commands.Cog):
             return self.bot.log.warn("[send_mp] Salon de MP introuvable")
         emb = msg.embeds[0] if len(msg.embeds) > 0 else None
         arrow = ":inbox_tray:" if msg.author == msg.channel.recipient else ":outbox_tray:"
-        text = "{} **{}** ({} - {})\n{}".format(arrow, msg.channel.recipient, msg.channel.recipient.id, await self.bot.cogs["TimeUtils"].date(msg.created_at,digital=True), msg.content)
+        text = "{} **{}** ({} - {})\n{}".format(arrow, msg.channel.recipient, msg.channel.recipient.id, await self.bot.get_cog("TimeUtils").date(msg.created_at,digital=True), msg.content)
         if len(msg.attachments) > 0:
             text += "".join(["\n{}".format(x.url) for x in msg.attachments])
         await channel.send(text,embed=emb)
@@ -245,11 +250,11 @@ class Events(commands.Cog):
                 return
             channel = guild.get_channel(int(config))
         except Exception as e:
-            await self.bot.cogs["Errors"].on_error(e,None)
+            await self.bot.get_cog("Errors").on_error(e,None)
             return
         if channel is None:
             return
-        emb = self.bot.cogs["Embeds"].Embed(desc=message,color=c).update_timestamp()
+        emb = self.bot.get_cog("Embeds").Embed(desc=message,color=c).update_timestamp()
         if author is not None:
             emb.set_author(author)
         try:
@@ -353,12 +358,25 @@ class Events(commands.Cog):
                 else:
                     if IDonly or x['begin'].timestamp()+x['duration'] < time.time():
                         liste.append(x)
+            cursor.close()
             if len(liste) > 0:
                 return liste
             else:
                 return []
         except Exception as e:
-            await self.bot.cogs['Errors'].on_error(e,None)
+            await self.bot.get_cog('Errors').on_error(e,None)
+    
+    async def cancel_unmute(self, userID: int, guildID: int):
+        """Cancel every automatic unmutes for a member"""
+        try:
+            cnx = self.bot.cnx_frm
+            cursor = cnx.cursor(dictionary = True)
+            query = 'DELETE FROM `timed` WHERE action="mute" AND guild=%s AND user=%s;'
+            cursor.execute(query, (guildID, userID))
+            cnx.commit()
+            cursor.close()
+        except Exception as e:
+            await self.bot.get_cog('Errors').on_error(e,None)
 
 
     async def check_tasks(self):
@@ -376,10 +394,10 @@ class Events(commands.Cog):
                     user = guild.get_member(task['user'])
                     if user is None:
                         continue
-                    await self.bot.cogs['Moderation'].unmute_event(guild,user,guild.me)
+                    await self.bot.get_cog('Moderation').unmute_event(guild,user,guild.me)
                     await self.remove_task(task['ID'])
                 except Exception as e:
-                    await self.bot.cogs['Errors'].on_error(e,None)
+                    await self.bot.get_cog('Errors').on_error(e,None)
                     self.bot.log.error("[unmute_task] Impossible d'unmute automatiquement : {}".format(e))
             if task['action']=='ban':
                 try:
@@ -390,12 +408,12 @@ class Events(commands.Cog):
                         user = await self.bot.fetch_user(task['user'])
                     except:
                         continue
-                    await self.bot.cogs['Moderation'].unban_event(guild,user,guild.me)
+                    await self.bot.get_cog('Moderation').unban_event(guild,user,guild.me)
                     await self.remove_task(task['ID'])
                 except discord.errors.NotFound:
                     await self.remove_task(task['ID'])
                 except Exception as e:
-                    await self.bot.cogs['Errors'].on_error(e,None)
+                    await self.bot.get_cog('Errors').on_error(e,None)
                     self.bot.log.error("[unban_task] Impossible d'unban automatiquement : {}".format(e))
             if task['action']=="timer":
                 try:
@@ -403,7 +421,7 @@ class Events(commands.Cog):
                 except discord.errors.NotFound:
                     await self.remove_task(task['ID'])
                 except Exception as e:
-                    await self.bot.cogs['Errors'].on_error(e,None)
+                    await self.bot.get_cog('Errors').on_error(e,None)
                     self.bot.log.error("[timer_task] Impossible d'envoyer un timer : {}".format(e))
                 else:
                     if sent:
@@ -458,7 +476,7 @@ class Events(commands.Cog):
                 await self.status_loop(d)
             # Clear old rank cards - every 20min
             elif d.minute%20 == 0:
-                await self.bot.cogs['Xp'].clear_cards()
+                await self.bot.get_cog('Xp').clear_cards()
                 await self.rss_loop()
             # Partners reload - every 7h (start from 1am)
             elif d.hour%7 == 1 and d.hour != self.partner_last_check.hour:
@@ -480,13 +498,13 @@ class Events(commands.Cog):
                 await self.bot.get_cog('Servers').update_everyMembercounter()
                 self.last_membercounter = d
         except Exception as e:
-            await self.bot.cogs['Errors'].on_error(e,None)
+            await self.bot.get_cog('Errors').on_error(e,None)
             self.loop_errors[0] += 1
             if (datetime.datetime.now() - self.loop_errors[1]).total_seconds() > 120:
                 self.loop_errors[0] = 0
                 self.loop_errors[1] = datetime.datetime.now()
             if self.loop_errors[0] > 10:
-                await self.bot.cogs['Errors'].senf_err_msg(":warning: **Trop d'erreurs : ARRET DE LA BOUCLE PRINCIPALE** <@279568324260528128> :warning:")
+                await self.bot.get_cog('Errors').senf_err_msg(":warning: **Trop d'erreurs : ARRET DE LA BOUCLE PRINCIPALE** <@279568324260528128> :warning:")
                 self.loop.cancel()
 
     @loop.before_loop
@@ -520,15 +538,16 @@ class Events(commands.Cog):
             self.last_statusio = d
 
     async def rss_loop(self):
-        if self.bot.cogs['Rss'].last_update is None or (datetime.datetime.now() - self.bot.cogs['Rss'].last_update).total_seconds()  > 5*60:
-            self.bot.cogs['Rss'].last_update = datetime.datetime.now()
-            asyncio.run_coroutine_threadsafe(self.bot.cogs['Rss'].main_loop(),asyncio.get_running_loop())
+        return
+        # if self.bot.get_cog('Rss').last_update is None or (datetime.datetime.now() - self.bot.get_cog('Rss').last_update).total_seconds()  > 5*60:
+        #     self.bot.get_cog('Rss').last_update = datetime.datetime.now()
+        #     asyncio.run_coroutine_threadsafe(self.bot.get_cog('Rss').main_loop(),asyncio.get_running_loop())
     
     async def botEventLoop(self):
-        self.bot.cogs["BotEvents"].updateCurrentEvent()
-        e = self.bot.cogs["BotEvents"].current_event
-        emb = self.bot.cogs["Embeds"].Embed(desc=f'**Bot event** updated (current event is {e})',color=1406147).update_timestamp().set_author(self.bot.user)
-        await self.bot.cogs["Embeds"].send([emb],url="loop")
+        self.bot.get_cog("BotEvents").updateCurrentEvent()
+        e = self.bot.get_cog("BotEvents").current_event
+        emb = self.bot.get_cog("Embeds").Embed(desc=f'**Bot event** updated (current event is {e})',color=1406147).update_timestamp().set_author(self.bot.user)
+        await self.bot.get_cog("Embeds").send([emb],url="loop")
         self.last_eventDay_check = datetime.datetime.today()
     
     async def dbl_send_data(self):
@@ -539,9 +558,9 @@ class Events(commands.Cog):
         answers = ['None','None','None','None','None', 'None']
         self.bot.log.info("[DBL] Envoi des infos sur le nombre de guildes...")
         try:
-            guildCount = await self.bot.cogs['Info'].get_guilds_count()
+            guildCount = await self.bot.get_cog('Info').get_guilds_count()
         except Exception as e:
-            await self.bot.cogs['Errors'].on_error(e,None)
+            await self.bot.get_cog('Errors').on_error(e,None)
             guildCount = len(self.bot.guilds)
         session = aiohttp.ClientSession(loop=self.bot.loop)
         try:# https://top.gg/bot/486896267788812288
@@ -618,15 +637,15 @@ class Events(commands.Cog):
             await self.bot.get_cog("Errors").on_error(e,None)
         await session.close()
         answers = [str(x) for x in answers]
-        emb = self.bot.cogs["Embeds"].Embed(desc='**Guilds count updated** in {}s ({})'.format(round(time.time()-t,3),'-'.join(answers)),color=7229109).update_timestamp().set_author(self.bot.user)
-        await self.bot.cogs["Embeds"].send([emb],url="loop")
+        emb = self.bot.get_cog("Embeds").Embed(desc='**Guilds count updated** in {}s ({})'.format(round(time.time()-t,3),'-'.join(answers)),color=7229109).update_timestamp().set_author(self.bot.user)
+        await self.bot.get_cog("Embeds").send([emb],url="loop")
         self.dbl_last_sending = datetime.datetime.now()
 
     async def partners_loop(self):
         """Update partners channels (every 7 hours)"""
         t = time.time()
         self.partner_last_check = datetime.datetime.now()
-        channels_list = await self.bot.cogs['Servers'].get_server(criters=["`partner_channel`<>''"],columns=['ID','partner_channel','partner_color'])
+        channels_list = await self.bot.get_cog('Servers').get_server(criters=["`partner_channel`<>''"],columns=['ID','partner_channel','partner_color'])
         self.bot.log.info("[Partners] Rafraîchissement des salons ({} serveurs prévus)...".format(len(channels_list)))
         count = [0,0]
         for guild in channels_list:
@@ -638,11 +657,11 @@ class Events(commands.Cog):
                 if chan is None:
                     continue
                 count[0] += 1
-                count[1] += await self.bot.cogs['Partners'].update_partners(chan,guild['partner_color'])
+                count[1] += await self.bot.get_cog('Partners').update_partners(chan,guild['partner_color'])
             except Exception as e:
-                await self.bot.cogs['Errors'].on_error(e,None)
-        emb = self.bot.cogs["Embeds"].Embed(desc='**Partners channels updated** in {}s ({} channels - {} partners)'.format(round(time.time()-t,3),count[0],count[1]),color=10949630).update_timestamp().set_author(self.bot.user)
-        await self.bot.cogs["Embeds"].send([emb],url="loop")
+                await self.bot.get_cog('Errors').on_error(e,None)
+        emb = self.bot.get_cog("Embeds").Embed(desc='**Partners channels updated** in {}s ({} channels - {} partners)'.format(round(time.time()-t,3),count[0],count[1]),color=10949630).update_timestamp().set_author(self.bot.user)
+        await self.bot.get_cog("Embeds").send([emb],url="loop")
         
     async def translations_backup(self):
         """Do a backup of the translations files"""
@@ -656,10 +675,10 @@ class Events(commands.Cog):
         try:
            shutil.make_archive('translation-backup','tar','translation')
         except FileNotFoundError:
-            await self.bot.cogs['Errors'].senf_err_msg("Translators backup: Unable to find backup folder")
+            await self.bot.get_cog('Errors').senf_err_msg("Translators backup: Unable to find backup folder")
             return
-        emb = self.bot.cogs["Embeds"].Embed(desc='**Translations files backup** completed in {}s'.format(round(time.time()-t,3)),color=10197915).update_timestamp().set_author(self.bot.user)
-        await self.bot.cogs["Embeds"].send([emb],url="loop")    
+        emb = self.bot.get_cog("Embeds").Embed(desc='**Translations files backup** completed in {}s'.format(round(time.time()-t,3)),color=10197915).update_timestamp().set_author(self.bot.user)
+        await self.bot.get_cog("Embeds").send([emb],url="loop")    
 
     async def send_sql_statslogs(self):
         "Send some stats about the current bot stats"
@@ -673,15 +692,17 @@ class Events(commands.Cog):
         lang_stats = await self.bot.get_cog('Servers').get_languages([], return_dict=True)
         rankcards_stats = await self.bot.get_cog('Users').get_rankcards_stats()
         xptypes_stats = await self.bot.get_cog('Servers').get_xp_types([], return_dict=True)
-        query = "INSERT INTO `log_stats` (`servers_count`, `members_count`, `bots_count`, `dapi_heartbeat`, `codelines_count`, `earned_xp_total`, `rss_feeds`, `active_rss_feeds`, `languages`, `used_rankcards`, `xp_types`, `beta`) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
+        supportserver_members = self.bot.get_guild(356067272730607628).member_count
+        query = "INSERT INTO `log_stats` (`servers_count`, `members_count`, `bots_count`, `dapi_heartbeat`, `codelines_count`, `earned_xp_total`, `rss_feeds`, `active_rss_feeds`, `supportserver_members`, `languages`, `used_rankcards`, `xp_types`, `beta`) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
         data = (len(self.bot.guilds),
             member_count,
             approx_bot_count,
             round(self.bot.latency,3),
-            self.bot.cogs["Info"].codelines,
-            await self.bot.cogs['Xp'].bdd_total_xp(),
+            self.bot.get_cog("Info").codelines,
+            await self.bot.get_cog('Xp').bdd_total_xp(),
             rss_feeds,
             active_rss_feeds,
+            supportserver_members,
             marshal.dumps(lang_stats),
             marshal.dumps(rankcards_stats),
             marshal.dumps(xptypes_stats),
@@ -694,8 +715,8 @@ class Events(commands.Cog):
             raise e
         cnx.commit()
         cursor.close()
-        emb = self.bot.cogs["Embeds"].Embed(desc='**Stats logs** updated',color=5293283).update_timestamp().set_author(self.bot.user)
-        await self.bot.cogs["Embeds"].send([emb],url="loop")
+        emb = self.bot.get_cog("Embeds").Embed(desc='**Stats logs** updated',color=5293283).update_timestamp().set_author(self.bot.user)
+        await self.bot.get_cog("Embeds").send([emb],url="loop")
         self.statslogs_last_push = datetime.datetime.now()
         
 

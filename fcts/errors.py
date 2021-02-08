@@ -4,7 +4,7 @@ import traceback
 import random
 import re
 from discord.ext import commands
-from classes import zbot, MyContext
+from utils import zbot, MyContext
 
 
 class Errors(commands.Cog):
@@ -41,10 +41,13 @@ class Errors(commands.Cog):
                 await ctx.send('`Ignored error:` [{}] {}'.format(c,error))
             return
         elif isinstance(error, commands.CommandError) and str(error) == "User doesn't have required roles":
-            await ctx.send(await self.bot._(ctx.channel,'errors','notrightroles'))
+            await ctx.send(await self.bot._(ctx.channel, 'errors', 'notrightroles'))
+            return
+        elif isinstance(error, commands.ExpectedClosingQuoteError):
+            await ctx.send(await self.bot._(ctx.channel, 'errors', 'quoteserror'))
             return
         elif isinstance(error,commands.errors.CommandOnCooldown):
-            if await self.bot.cogs['Admin'].check_if_admin(ctx):
+            if await self.bot.get_cog('Admin').check_if_admin(ctx):
                 await ctx.reinvoke()
                 return
             d = round(error.retry_after, 2 if error.retry_after < 60 else 0)

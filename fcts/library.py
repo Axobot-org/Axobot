@@ -1,9 +1,10 @@
 import aiohttp
 import typing
 import datetime
+import html
 import isbnlib
 from discord.ext import commands
-from classes import zbot, MyContext
+from utils import zbot, MyContext
 
 
 class ISBN(commands.Converter):
@@ -55,6 +56,16 @@ class Library(commands.Cog):
         if language is not None:
             return await self.search_book(isbn, keywords)
         return None
+    
+    async def isbn_from_words(self, keywords: str) -> typing.Optional[str]:
+        """Get the ISBN of a book from some keywords"""
+        url = "https://www.googleapis.com/books/v1/volumes?maxResults=1&q=" + html.escape(keywords.replace(' ', '+'))
+        async with aiohttp.ClientSession() as session:
+            async with session.get(url) as resp:
+                resp = await resp.json()
+        if 'items' in resp.keys():
+            return resp['items'][0]['volumeInfo']['industryIdentifiers'][-1]['identifier']
+        return None
 
     async def search_book_2(self, isbn: str, keywords: str) -> dict:
         if isbn is None:
@@ -63,7 +74,12 @@ class Library(commands.Cog):
             info = self.cache.get(keywords, None)
             if info is not None:
                 return info
-            isbn = isbnlib.isbn_from_words(keywords)
+            try:
+                isbn = isbnlib.isbn_from_words(keywords)
+            except isbnlib.dev._exceptions.ISBNLibHTTPError:
+                isbn = await self.isbn_from_words(keywords)
+            if isbn is None:
+                return
         info = dict()
         for key in ['wiki', 'default', 'openl', 'goob']:
             try:
@@ -96,7 +112,7 @@ class Library(commands.Cog):
         
         ..Doc miscellaneous.html#book"""
         if ctx.subcommand_passed is None:
-            await self.bot.cogs['Help'].help_command(ctx, ['book'])
+            await self.bot.get_cog('Help').help_command(ctx, ['book'])
 
     @book_main.command(name="search", aliases=["book"])
     @commands.cooldown(5, 60, commands.BucketType.guild)

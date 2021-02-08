@@ -92,8 +92,8 @@ Allows the bot to see chats and voice channels. This permission does not allow y
 Text Permissions
 ----------------
 
-Read Messages
--------------
+Read Messages/See channel
+-------------------------
 
 Allows the bot to read messages from a chat, but not the history. In other words, the bot will react to your messages but will not be able to read them again. Remove this permission in a channel to prevent the bot from being there.
 

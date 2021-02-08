@@ -1,4 +1,4 @@
-from classes import zbot, MyContext
+from utils import zbot, MyContext
 import discord
 import importlib
 import aiohttp
@@ -25,7 +25,7 @@ class Backups(commands.Cog):
     async def main_backup(self,ctx:MyContext):
         "..Doc server.html#server-backup"
         if ctx.subcommand_passed is None:
-            await self.bot.cogs['Help'].help_command(ctx,['backup'])
+            await self.bot.get_cog('Help').help_command(ctx,['backup'])
 
 
     @main_backup.command(name="load")
@@ -66,7 +66,7 @@ Arguments are:
                 return
         except Exception as e:
             await ctx.send(await self.bot._(ctx.guild,"s_backup","err"))
-            await ctx.bot.cogs['Errors'].on_command_error(ctx,e)
+            await ctx.bot.get_cog('Errors').on_command_error(ctx,e)
             return
         # Formatting and sending logs
         logs = "Found {} problems (including {} permissions issues)\n\n".format(sum(problems),problems[0]) + "\n".join(logs)
@@ -102,7 +102,7 @@ Arguments are:
             data = await self.create_backup(ctx)
             await ctx.send(await self.bot._(ctx.guild.id,'modo','backup-done'),file=discord.File(BytesIO(data.encode()), filename=f"backup-{ctx.guild.id}.json"))
         except Exception as e:
-            await ctx.bot.cogs['Errors'].on_command_error(ctx,e)
+            await ctx.bot.get_cog('Errors').on_command_error(ctx,e)
 
     # --------
 
@@ -191,7 +191,7 @@ Arguments are:
         except discord.errors.Forbidden:
             pass
         except Exception as e:
-            await ctx.bot.cogs['Errors'].on_error(e,ctx)
+            await ctx.bot.get_cog('Errors').on_error(e,ctx)
         try:
             webs = list()
             for w in await g.webhooks():
@@ -200,7 +200,7 @@ Arguments are:
         except discord.errors.Forbidden:
             pass
         except Exception as e:
-            await ctx.bot.cogs['Errors'].on_error(e,ctx)
+            await ctx.bot.get_cog('Errors').on_error(e,ctx)
         back['members'] = list()
         for memb in g.members:
             back['members'].append({'id': memb.id,

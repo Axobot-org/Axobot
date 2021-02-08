@@ -6,7 +6,7 @@ import aiohttp
 from fcts import args
 from discord.ext import commands
 from typing import List
-from classes import zbot, MyContext
+from utils import zbot, MyContext
 
 importlib.reload(args)
 
@@ -31,7 +31,7 @@ class Utilities(commands.Cog):
         await self.get_bot_infos()
 
     async def get_bot_infos(self):
-        config_list = await self.bot.cogs['Servers'].get_bot_infos(self.bot.user.id)
+        config_list = await self.bot.get_cog('Servers').get_bot_infos(self.bot.user.id)
         if len(config_list) > 0:
             self.config = config_list[0]
             self.config.pop('token', None)
@@ -44,10 +44,10 @@ class Utilities(commands.Cog):
         if str(guild.id) in self.list_prefixs.keys():
             return self.list_prefixs[str(guild.id)]
         else:
-            cnx = self.bot.cogs['Servers'].bot.cnx_frm
+            cnx = self.bot.get_cog('Servers').bot.cnx_frm
             cursor = cnx.cursor(dictionary=True)
             cursor.execute("SELECT `prefix` FROM `{}` WHERE `ID`={}".format(
-                self.bot.cogs["Servers"].table, guild.id))
+                self.bot.get_cog("Servers").table, guild.id))
             liste = list()
             for x in cursor:
                 if len(x['prefix']) > 0:
@@ -159,7 +159,7 @@ class Utilities(commands.Cog):
             return True
         if ctx.message.type != discord.MessageType.default:
             return False
-        if await self.bot.cogs['Admin'].check_if_admin(ctx):
+        if await self.bot.get_cog('Admin').check_if_admin(ctx):
             return True
         elif not self.config:
             await self.get_bot_infos()
@@ -269,7 +269,7 @@ class Utilities(commands.Cog):
             cursor.close()
             return True
         except Exception as e:
-            await self.bot.cogs['Errors'].on_error(e, None)
+            await self.bot.get_cog('Errors').on_error(e, None)
             return False
 
     async def get_number_premium(self):
@@ -278,14 +278,14 @@ class Utilities(commands.Cog):
             params = await self.get_db_userinfo(criters=['Premium=1'])
             return len(params)
         except Exception as e:
-            await self.bot.cogs['Errors'].on_error(e, None)
+            await self.bot.get_cog('Errors').on_error(e, None)
 
     async def get_xp_style(self, user: discord.User) -> str:
         parameters = None
         try:
             parameters = await self.get_db_userinfo(criters=["userID="+str(user.id)], columns=['xp_style'])
         except Exception as e:
-            await self.bot.cogs["Errors"].on_error(e, None)
+            await self.bot.get_cog("Errors").on_error(e, None)
         if parameters is None or parameters['xp_style'] == '':
             return 'dark'
         return parameters['xp_style']
@@ -346,15 +346,15 @@ class Utilities(commands.Cog):
             return ["en"]
         languages = list()
         disp_lang = list()
-        available_langs = self.bot.cogs['Languages'].languages
+        available_langs = self.bot.get_cog('Languages').languages
         for s in self.bot.guilds:
             if user in s.members:
                 lang = await self.bot.get_config(s.id, 'language')
                 if lang is None:
                     lang = available_langs.index(
-                        self.bot.cogs['Servers'].default_language)
+                        self.bot.get_cog('Servers').default_language)
                 languages.append(lang)
-        for e in range(len(self.bot.cogs['Languages'].languages)):
+        for e in range(len(self.bot.get_cog('Languages').languages)):
             if languages.count(e) > 0:
                 disp_lang.append((available_langs[e], round(
                     languages.count(e)/len(languages), 2)))
@@ -385,7 +385,7 @@ class Utilities(commands.Cog):
             cursor.close()
             return True
         except Exception as e:
-            await self.bot.cogs['Errors'].on_error(e, None)
+            await self.bot.get_cog('Errors').on_error(e, None)
             return False
 
     async def get_eventsPoints_rank(self, userID: int):

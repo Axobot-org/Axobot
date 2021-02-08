@@ -22,7 +22,7 @@ if check_libs():
     from random import choice
     from discord.ext import commands
     from fcts import cryptage, tokens
-    from classes import zbot, setup_logger
+    from utils import zbot, setup_logger
 else:
     import sys
     print("End of program")
@@ -40,6 +40,7 @@ def main():
                       'fcts.admin',
                       'fcts.aide',
                       'fcts.bot_events',
+                      'fcts.bot_stats',
                       'fcts.cases',
                       'fcts.embeds',
                       'fcts.emojis',
@@ -152,8 +153,8 @@ def main():
             await client.change_presence(activity=discord.Game(name=choice(["SNAPSHOOT","snapshot day","somethin iz brokn"])))
         else:
             await client.change_presence(activity=discord.Game(name=choice(["enter !help","something","type !help","type !help"])))
-        emb = client.cogs["Embeds"].Embed(desc="**{}** is launching !".format(client.user.name),color=8311585).update_timestamp()
-        await client.cogs["Embeds"].send([emb])
+        emb = client.get_cog("Embeds").Embed(desc="**{}** is launching !".format(client.user.name),color=8311585).update_timestamp()
+        await client.get_cog("Embeds").send([emb])
 
 
     async def sigterm_handler(bot):
@@ -186,7 +187,7 @@ def main():
             else:
                 enable_event_loop = input("Launch of the events loop? (y/n) ")
             if enable_event_loop.lower() in ('o', 'y'):
-                client.cogs['Events'].loop.start()
+                client.get_cog('Events').loop.start()
                 client.internal_loop_enabled = True
             # RSS enabled
             if len(sys.argv) > 3 and sys.argv[3] in ['o', 'n', 'y']:

@@ -1,12 +1,12 @@
 import discord
 from discord.ext import commands
-from classes import MyContext
+from utils import MyContext
 
 
 async def can_mute(ctx: MyContext) -> bool:
     """Check if someone can mute"""
     if ctx.bot.database_online:
-        return await ctx.bot.cogs["Servers"].staff_finder(ctx.author, "mute")
+        return await ctx.bot.get_cog("Servers").staff_finder(ctx.author, "mute")
     else:
         return ctx.channel.permissions_for(ctx.author).manage_roles
 
@@ -14,7 +14,7 @@ async def can_mute(ctx: MyContext) -> bool:
 async def can_warn(ctx: MyContext) -> bool:
     """Check if someone can warn"""
     if ctx.bot.database_online:
-        return await ctx.bot.cogs["Servers"].staff_finder(ctx.author, "warn")
+        return await ctx.bot.get_cog("Servers").staff_finder(ctx.author, "warn")
     else:
         return ctx.channel.permissions_for(ctx.author).manage_roles
 
@@ -22,7 +22,7 @@ async def can_warn(ctx: MyContext) -> bool:
 async def can_kick(ctx: MyContext) -> bool:
     """Check if someone can kick"""
     if ctx.bot.database_online:
-        return await ctx.bot.cogs["Servers"].staff_finder(ctx.author, "kick")
+        return await ctx.bot.get_cog("Servers").staff_finder(ctx.author, "kick")
     else:
         return ctx.channel.permissions_for(ctx.author).kick_members
 
@@ -30,7 +30,7 @@ async def can_kick(ctx: MyContext) -> bool:
 async def can_ban(ctx: MyContext) -> bool:
     """Check if someone can ban"""
     if ctx.bot.database_online:
-        return await ctx.bot.cogs["Servers"].staff_finder(ctx.author, "ban")
+        return await ctx.bot.get_cog("Servers").staff_finder(ctx.author, "ban")
     else:
         return ctx.channel.permissions_for(ctx.author).ban_members
 
@@ -38,7 +38,7 @@ async def can_ban(ctx: MyContext) -> bool:
 async def can_slowmode(ctx: MyContext) -> bool:
     """Check if someone can use slowmode"""
     if ctx.bot.database_online:
-        return await ctx.bot.cogs["Servers"].staff_finder(ctx.author, "slowmode")
+        return await ctx.bot.get_cog("Servers").staff_finder(ctx.author, "slowmode")
     else:
         return ctx.channel.permissions_for(ctx.author).manage_channels
 
@@ -46,41 +46,41 @@ async def can_slowmode(ctx: MyContext) -> bool:
 async def can_clear(ctx: MyContext) -> bool:
     """Check if someone can use clear"""
     if ctx.bot.database_online:
-        return await ctx.bot.cogs["Servers"].staff_finder(ctx.author, "clear")
+        return await ctx.bot.get_cog("Servers").staff_finder(ctx.author, "clear")
     else:
         return ctx.channel.permissions_for(ctx.author).manage_messages
 
 
 async def has_admin(ctx: MyContext) -> bool:
     """Check if someone can see the banlist"""
-    return ctx.channel.permissions_for(ctx.author).administrator or await ctx.bot.cogs["Admin"].check_if_god(ctx)
+    return ctx.channel.permissions_for(ctx.author).administrator or await ctx.bot.get_cog("Admin").check_if_god(ctx)
 
 
 async def has_manage_msg(ctx: MyContext) -> bool:
     """... if someone can pin a message"""
-    return ctx.channel.permissions_for(ctx.author).manage_messages or await ctx.bot.cogs["Admin"].check_if_god(ctx)
+    return ctx.channel.permissions_for(ctx.author).manage_messages or await ctx.bot.get_cog("Admin").check_if_god(ctx)
 
 
 async def has_manage_guild(ctx: MyContext) -> bool:
     """... if someone can manage the server"""
-    return ctx.channel.permissions_for(ctx.author).manage_guild or await ctx.bot.cogs['Admin'].check_if_god(ctx)
+    return ctx.channel.permissions_for(ctx.author).manage_guild or await ctx.bot.get_cog('Admin').check_if_god(ctx)
 
 
 async def has_manage_roles(ctx: MyContext) -> bool:
     """... if someone can manage the roles"""
-    return ctx.channel.permissions_for(ctx.author).manage_roles or await ctx.bot.cogs['Admin'].check_if_god(ctx)
+    return ctx.channel.permissions_for(ctx.author).manage_roles or await ctx.bot.get_cog('Admin').check_if_god(ctx)
 
 
 async def has_manage_nicknames(ctx: MyContext) -> bool:
     """... if someone can change nicknames"""
-    return ctx.channel.permissions_for(ctx.author).manage_nicknames or await ctx.bot.cogs['Admin'].check_if_god(ctx)
+    return ctx.channel.permissions_for(ctx.author).manage_nicknames or await ctx.bot.get_cog('Admin').check_if_god(ctx)
 
 
 async def has_embed_links(ctx: MyContext) -> bool:
     """... if someone can send embeds"""
     if not isinstance(ctx.author, discord.Member):
         return True
-    return ctx.channel.permissions_for(ctx.author).embed_links or await ctx.bot.cogs['Admin'].check_if_god(ctx)
+    return ctx.channel.permissions_for(ctx.author).embed_links or await ctx.bot.get_cog('Admin').check_if_god(ctx)
 
 
 async def verify_role_exists(ctx: MyContext) -> bool:

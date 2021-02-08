@@ -13,7 +13,7 @@
         "aliases": "Aliases",
         "categories": {
             "fun": "fun",
-            "info": "information",
+            "data": "data",
             "moderation": "moderation",
             "other": "others",
             "server-settings": "server settings",
@@ -234,6 +234,7 @@
         "missingargument": "Oops, the argument \"{a}\" is missing {e}",
         "msgnotfound": "Unable to find any message with ID {msg}",
         "notrightroles": "You don't have the necessary roles for this command",
+        "quoteserror": "Oops, a quotation mark error has occurred. Be sure to correctly use the quotes \", so that each open quote will be closed further on",
         "rolenotfound": "Unable to find the role `{r}`",
         "toomanytxtchan": "You have too many accessible text channels",
         "unknown": "Oops, an error occurred :confused: Try again later, or contact support (command `about`).",
@@ -276,6 +277,15 @@
         "count-3": "Oops, I'm unable to read this channel history. Please check my permissions...",
         "count-4": "On the last {limit} messages, {user} has posted {x} messages ({p}%)",
         "count-5": "You cannot use this command in a channel where you do not have access to the message history",
+        "discordjobs-title": "Jobs available at Discord",
+        "discordjobs-count": "{c} offers found",
+        "discordstatus-nothing": "Nothing to report at this time!\nThe last known issue was on {date}",
+        "discordstatus-exists": "There is currently one {impact} incident in progress on Discord: {title}",
+        "discordstatus-impacts": {
+            "none": "without effect",
+            "minor": "minor",
+            "major": "major"
+        },
         "embed-error": "An error has occurred: `{}`",
         "embed-invalid-channel": "Cannot send messages in this channel",
         "embed-invalid-image": "The url entered as image is invalid",
@@ -808,7 +818,8 @@
             "use_voice_activation": "Use voice activity",
             "view_audit_log": "View audit logs",
             "view_guild_insights": "View guild insights"
-        }
+        },
+        "whatisthat": "What do they mean?"
     },
     "roles_react": {
         "already-1-rr": "You already have a designated role for this emoji",
@@ -830,7 +841,7 @@
         "too-many-rr": "You have already reached the limit of {l} roles"
     },
     "rss": {
-        "change-txt": "The current message contains  \n```\n{text}\n```\nPlease enter the text to be used when creating a new post. You can use several variables, of which here is the list:\n- `{author}`: the author of the post\n- `{channel}`: the Discord channel in which the message is posted\n- `{date}`: the post date (UTC)\n- `{link}` or `{url}`: a link to the post\n- `{logo}`: an emoji representing the type of post (web, Twitter, YouTube...)\n- `{mentions}`: the list of mentioned roles\n- `{title}`: the title of the post",
+        "change-txt": "The current message contains  \n```\n{text}\n```\nPlease enter the text to be used when creating a new post. You can use several variables, of which here is the list:\n- `{author}`: the author of the post\n- `{channel}`: the channel name (usually the same as author)\n- `{date}`: the post date (UTC)\n- `{link}` or `{url}`: a link to the post\n- `{logo}`: an emoji representing the type of post (web, Twitter, YouTube...)\n- `{mentions}`: the list of mentioned roles\n- `{title}`: the title of the post",
         "choose-delete": "Please choose the flow to delete",
         "choose-mentions-1": "Please choose the flow to modify",
         "choose-roles": "What roles will be mentioned?",
@@ -854,6 +865,7 @@
         "move-success": "The rss feed #{} has been moved in the channel {}!",
         "no-db": "As the database is currently offline, this feature is temporarily disabled :confused:",
         "no-feed": "Oops, you don't have any rss feeds to manage!",
+        "no-feed2": "This server has no rss feed!",
         "no-roles": "No role has been configured yet.",
         "not-a-role": "This role can't be found. Try again:",
         "nothing": "I found nothing on this search :confused:",
@@ -1046,6 +1058,8 @@
         "member-6": "Administrator",
         "member-7": "Infractions",
         "member-8": "Custom activity",
+        "member-9": "Roles",
+        "member-10": "Still hasn't accepted the rules",
         "not-found": "Unable to find {N}",
         "role-0": "ID",
         "role-1": "Color",
@@ -1067,13 +1081,17 @@
         "textchan-4": ":warning: Missing permissions!",
         "textchan-5": "Channel",
         "user-0": "On this server?",
+        "user-1": "Banned for",
         "voicechan-0": "Vocal channel"
     },
     "timers": {
+        "rmd-cleared": "Your reminders have been deleted!",
+        "rmd-confirm": "Are you sure you want to delete all your reminders? ({count} pending)",
         "rmd-deleted": "Reminder #{id} with message `{message}` has successfully been deleted!",
         "rmd-empty": "Oops, you don't have any pending reminder...",
         "rmd-item": "ID: `{id}` | In: {duration} | Channel: {channel} | Message: {msg}",
-        "rmd-title": "List of your reminders"
+        "rmd-title": "List of your reminders",
+        "rmd-cancelled": "Dropping the process"
     },
     "users": {
         "animated_card_false": "You are not currently allowing an animated card. Thanks!",

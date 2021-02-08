@@ -167,12 +167,12 @@ class BlurpleCog(commands.Cog):
             await ctx.send(embed=embed, file=image)
         if blurplenesspercentage>95 and str(picture)==str(ctx.author.avatar_url):
             date = datetime.datetime.today()
-            if not await ctx.bot.cogs['Utilities'].has_blurple_card(ctx.author) and 6<date.day<20 and date.month==5:
+            if not await ctx.bot.get_cog('Utilities').has_blurple_card(ctx.author) and 6<date.day<20 and date.month==5:
                 pr = await self.bot.get_prefix(ctx.message)
                 em = ':tada:'
                 if ctx.guild is not None and ctx.channel.permissions_for(ctx.guild.me).external_emojis:
                     em = '<:blurpletada:575696286905401345>'
-                await ctx.bot.cogs['Utilities'].change_db_userinfo(ctx.author.id,'unlocked_blurple',True)
+                await ctx.bot.get_cog('Utilities').change_db_userinfo(ctx.author.id,'unlocked_blurple',True)
                 await ctx.send(str(await self.bot._(ctx.channel,'blurple','won-card')).format(ctx.author.mention,pr[-1],em))
 
     @commands.command(aliases=['blurplfy', 'blurplefier'])

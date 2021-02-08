@@ -1,5 +1,5 @@
 from discord.ext import commands
-from classes import zbot
+from utils import zbot
 
 admins_id = {279568324260528128,281404141841022976,552273019020771358}
 
@@ -17,7 +17,7 @@ async def check_admin(ctx):
 async def is_support_staff(ctx):
     if ctx.author.id in admins_id:
         return True
-    if UsersCog := await ctx.bot.get_cog('Users'):
+    if UsersCog := ctx.bot.get_cog('Users'):
         return await UsersCog.has_userflag(ctx.author, 'support')
     server = ctx.bot.get_guild(356067272730607628)
     if server is not None:
@@ -36,7 +36,7 @@ class Reloads(commands.Cog):
         self.ignored_guilds = [471361000126414848,513087032331993090,500648624204808193,264445053596991498,446425626988249089,707248438391078978]
     
     async def reload_cogs(self,ctx,cogs):
-        errors_cog = self.bot.cogs["Errors"]
+        errors_cog = self.bot.get_cog("Errors")
         if len(cogs)==1 and cogs[0]=='all':
             cogs = sorted([x.file for x in self.bot.cogs.values()])
         reloaded_cogs = list()
@@ -58,10 +58,10 @@ class Reloads(commands.Cog):
                 self.bot.log.info("Module {} rechargé".format(cog))
                 reloaded_cogs.append(cog)
             if cog == 'utilities':
-                await self.bot.cogs['Utilities'].on_ready()
+                await self.bot.get_cog('Utilities').on_ready()
         if len(reloaded_cogs) > 0:
             await ctx.send("These cogs has successfully reloaded: {}".format(", ".join(reloaded_cogs)))
-            ctx.bot.cogs['Info'].codelines = await ctx.bot.cogs['Info'].count_lines_code()
+            ctx.bot.get_cog('Info').codelines = await ctx.bot.get_cog('Info').count_lines_code()
 
     @commands.command(name="add_cog",hidden=True)
     @commands.check(check_admin)

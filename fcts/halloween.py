@@ -14,7 +14,7 @@ from discord.ext.commands import Cog
 from libs import halloween
 from libs.halloween import convert_image, check_image
 importlib.reload(halloween)
-from classes import zbot, MyContext
+from utils import zbot, MyContext
 
 
 class LinkConverter(commands.Converter):
@@ -84,7 +84,7 @@ def _make_check_command(name: str, parent: commands.Group, **kwargs):
             ["> {}: {}%".format(color["name"], color["ratio"]) for color in r['colors']])
         await ctx.send(f"Results for {ctx.author.mention}:\n"+answer)
         if r["passed"] and ctx.author.id not in self.cache:
-            await self.bot.cogs["Utilities"].add_user_eventPoint(ctx.author.id, 40)
+            await self.bot.get_cog("Utilities").add_user_eventPoint(ctx.author.id, 40)
             self.cache.append(ctx.author.id)
             with open("halloween-cache.json", "w") as f:
                 json.dump(self.cache, f)
@@ -140,7 +140,7 @@ def _make_color_command(name, fmodifier, parent, **kwargs):
             return
         await ctx.send(f"{ctx.author.mention}, here's your image!", file=r)
         await old_msg.delete()
-        await self.bot.cogs["Utilities"].add_user_eventPoint(ctx.author.id, 3)
+        await self.bot.get_cog("Utilities").add_user_eventPoint(ctx.author.id, 3)
 
     return command
 

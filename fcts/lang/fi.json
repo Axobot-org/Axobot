@@ -13,7 +13,7 @@
         "aliases": "Lyhenteet",
         "categories": {
             "fun": "hauska",
-            "info": "tietoa",
+            "data": "tietoa",
             "moderation": "valvonta",
             "other": "muut",
             "server-settings": "palvelin asetukset",
@@ -111,6 +111,10 @@
                 "Hauska komennot on nyt päällä",
                 "Hauska komennot täytyy olla kytketty päälle"
             ],
+            "is_halloween": [
+                "Halloween tapahtuma on täällä!",
+                "Halloween tapahtumia ei tällä hetkellä ole"
+            ],
             "is_owner": [
                 "Sinun täytyy olla botin omistaja",
                 "Sinä et ole botin omistaja"
@@ -128,6 +132,7 @@
                 "Vahvistus roolia ei ole asetettu"
             ]
         },
+        "cmd-count": "{nbr} komentoa",
         "cmd-not-found": "Komentoa  \"{}\" ei ole nimetty",
         "description": "Kuvaus",
         "embed_title": "Käytettävissä olevat komennot käyttäjälle {u}",
@@ -163,6 +168,7 @@
     "bot_events": {
         "events-desc": {
             "christmas-2019": "Juhli joulun tuloa tällä tapahtumalla! Ristinolla pelillä aikoo olla talven värejä, Zbot saa mahtavan profiili kuvan ja muita hienoja juttuja.\n\nHanki tapahtuma pisteitä ja yritä voittaa vuoden 2019 Erikois Joulu xp kortti! Muista: xp kortit löytyy komennolla `profile card`",
+            "halloween-2020": "Lokakuu on täällä! Nauti tästä 1. Marraskuuhun asti, täynnä lepakoita, skeletoneita ja kurpitsoja. Ota siitä kaikki onni ja korsitele palvelintasi Halloweenin väreillä, komennolla `halloween hallowify`, varmista että profiilisi on mahdollinen käyttöön komennolla `halloween check`, ja hanki tapahtuma pisteitä komennolla `halloween collect`.\n\nEhkä rohkeimmat henkilöt voittavat saamalla Halloween 2020 XP kortin, jonka saa komennolla `profile card`!",
             "nothing": "Tällä hetkellä ei ole tapahtumia. Seuraa botin uutisia jotta tiedät milloin on seuraava tapahtuma!"
         },
         "events-price-title": "Palkintoja joita voi voittaa",
@@ -173,6 +179,7 @@
             "christmas-2019": {
                 "50": "Lunasta vuoden 2019 joulu spesiaali!"
             },
+            "halloween-2020": "{'200': 'Hanki mahtava Halloween 2020 XP kortti! Bonuksena, saat roolin meidän virallisella palvelimella'}",
             "nothing": "Tällä tapahtumalla ei ole mitään mitä voisi hankkia 😕"
         },
         "events-title": {
@@ -197,6 +204,7 @@
         "list-0": "**Type:** {T}\n**Moderator:** {M}\n**Date:** {D}\n**Reason:** *{R}*",
         "list-1": "**Server:** {G}\n**Type:** {T}\n**Moderator:** {M}\n**Date:** {D}\n**Reason:** *{R}*",
         "list-2": "\n**Duration:** {D}",
+        "no-case": "Tällä käyttäjällä ei ole yhtään tapahtumia!",
         "no-user": "Tämä on mahdotonta löytää tämä käyttäjä. :eyes:",
         "no_database": "Jonkun ajan tietokannan alas käynnin takia, tämä komento on pois käytöstä",
         "not-found": "Tätä tapausta ei löydetty :confused:",
@@ -217,6 +225,7 @@
         "disabled": "Komento {c} on poissa käytöstä :confused:",
         "duration": "Aika `{d}` on epäselvä",
         "emojinotfound": "Hymiö `{e}` ei löytynyt",
+        "invalidcardstyle": "Pätemätön kortin tyyli: `{s}`",
         "invalidcolor": "Väri `{0}` epäselvä",
         "invalidemoji": "Virheellinen hymiö",
         "invalidguild": "This server can't be found: `{g}`",
@@ -277,6 +286,7 @@
         "fun-list": "Tässä on lista kaikista käytettävistä hauska komentoista:",
         "invalid-city": "Pätemätön kaupunki :confused:",
         "markdown": "__**Markdown Rules** on *Discord*__\n\n`*italics*` = *italics*\n`__underline__` = __underline__\n`**bold**` = **bold**\n`***bold italics***` = ***bold italics***\n`~~strikeout~~` = ~~strikeout~~\n`__*underline italics*__` = __*underline italics*__\n`__**underline bold**__` = __**underline bold**__\n`__***underline bold italics***__` = __***underline bold italics***__\n`||spoiler||` = ||spoiler||\n> quote = `> quote`\n\\`code\\` = `code`\n\\ to ignore\n\nFor code blocks, cf <https://discord.gg/DGahTNn>",
+        "nasa-none": "Ups, en pysty saamaan tietoja NASAsta tällä hetkellä. Yritä uudelleen muutaman minuutin kuluttua 😕",
         "no-database": "Kun tietokantamme on offline tilassa, mahollisuus hauska komentoihin on vain käyttäjille joilla on käyttöoikeudet \"Hallinnoi palvelinta\"",
         "no-embed-perm": "Minulla ei ole käyttöoikeuksia \"Embed links\" :confused:",
         "no-emoji": "Mahdotonta löytää tämä emoji!",
@@ -285,6 +295,7 @@
         "no-roll": "Ei vaihtoehtoa löydetty",
         "no-say": "En voi lähettää viestiä tälle kanavalle",
         "no-voicechan": "Sinun täytyy olla äänikanavalla jotta tämä komento toimisi.",
+        "not-enough-roll": "Täytyy olla vähintään kaksi vaihtoehtoa",
         "osekour": [
             "Odota, minä olen kohta katsonut elokuvani.",
             "Olemme tulossa! Mutta miksi et vastaa enää? Älä esitä kuollutta!",
@@ -306,6 +317,7 @@
         "react-0": "En voinut löytää corresponding viestiä. Sinun täytyy lisätä viesti ID ensimmäiseen argumenttiin, ja emoji toiseen:upside_down:\n Katso myös että voin lukea kanavan viesti historiaa!",
         "reminds-asked": "{user}, pyysit minua muistuttaa sinua {duration} sitten tästä:",
         "reminds-date": "Pyydetty",
+        "reminds-link": "Alkuperäinen viesti",
         "reminds-saved": "Selvä! Muistutan sinua {duration} päästä",
         "reminds-title": "Musitutus",
         "reminds-too-long": "Mahdotonta laittaa niin pitkää aikaa",
@@ -345,6 +357,10 @@
         "uninhabited-city": "Asumaton kaupunki :confused:",
         "vote-0": "Sinä voit laittaa enemmän kuin 20 vaihtoehtoa, ja myös vähemmän negatiivisia!"
     },
+    "halloween": {
+        "got-points": "Onneksi olkoon! Sait juuri **{pts} tapahtuma pistettä**!",
+        "too-quick": "Olet hieman liian ajoissa! Voit vaan saada tapahtuma pisteitä kerran tunnissa."
+    },
     "infos": {
         "about-0": "Minun Discord palvelin:",
         "about-1": "Kutsu minut toiseen palvelimeen:",
@@ -372,6 +388,8 @@
             "BetterDiscordin käyttö on kielletty"
         ],
         "docs": "Tässä on linkki botin dokumenttiin:",
+        "ping-found": "Pong! (noin {tps}ms per 64 byteä, lähetetty {url})",
+        "ping-notfound": "Mahdotonta pingata tätä osoitetta",
         "prefix": "Lista kaikista käytettävissä olevista etuliitoista:",
         "stats": "**Bot versio:** {bot_v} \n**Kaikkien palvelimien numero missä olen:** {s_count} \n**Numero kaikista näkyvistä jäsenistä:** {m_count} ({b_count} **botit**)\n**Numero koodi riveistä:** {l_count}\n**Käytettyjä kieliä:** {lang}\n** {p_v} \n**Versio `discord.py`stä:** {d_v} \n**Ladataan RAMia:** {ram} GB \n**Ladataan CPU:ssa:** {cpu} % \n**API viive aika:** {api} ms\n**Kaikki xp kerätty:** {xp}",
         "stats-title": "**Bot tilastot**",
@@ -457,6 +475,7 @@
         "language": "kieli",
         "no-found": "Mahdotonta löytää tämä kirja",
         "publisher": "julkaisija",
+        "rate-limited": "En voi etsiä nimellä tällä herkellä. Yritä uudelleen myöhemmin",
         "title": "nimi",
         "unknown": "ei tietoa",
         "year": "julkaisu vuosi"
@@ -537,6 +556,17 @@
             "Lisätty versiossa"
         ],
         "item-help": "Tämä komento antaa sinulle mahdollisuuden saada tietoa mistä tahansa Minecraft esineestä. Voit antaa sen täyden tai osittaisen nimen, Ranskaksi tai Englanniksi, tai jopa sen tunnisteen. Lähetä `!mc item <nimi>`",
+        "mod-fields": [
+            "Nimi",
+            "Tekijät",
+            "Lyhenne",
+            "Normaali kieli",
+            "Viimeisin päivitys",
+            "Lataukset",
+            "Peli versiot",
+            "ID"
+        ],
+        "mod-help": "Tämö komento kertoo tietoa suuresta osasta Minecraftin modeista. Voit joko antaa sen täyden tai osan nimestä, kirjoita vain `{p}mc mod <nimi>`. Modin täytyy olla CurseFrogissa",
         "mojang_desc": {
             "account.mojang.com": "Mojang käyttäjä johtajien sivu",
             "api.mojang.com": "API palvelu jonka Mojang antaa",
@@ -552,14 +582,17 @@
             "Entiteetti",
             "Esine",
             "Komento",
-            "Ennakkosuoritus"
+            "Ennakkosuoritus",
+            "Modi"
         ],
         "no-adv": "Mahdotonta löytää tämä ennakkosuoritus",
         "no-api": "Virhe: Mahdotonta yhdistää API:hin",
         "no-block": "Mahdotonta löytää tämä palikka",
         "no-cmd": "Mahdotonta löytää tämä komento",
+        "no-embed": "En pysty lähettää vastausta! Tarvitsen 'Upottaa Linkkejä' käyttöoikeuden.",
         "no-entity": "Mahdotonta löytää tämä entiteetti",
         "no-item": "Mahdotonta löytää tämä esine",
+        "no-mod": "En löytänyt tuota modia",
         "no-ping": "Virhe: Mahdotonta mainits tätä palvelinta",
         "serv-0": "Numero pelaajista",
         "serv-1": "Lista 20 ensimmäisestä pealaajasta yhdistettynä",
@@ -823,6 +856,7 @@
         "invalid-link": "Ups, url osoite on pätemätön tai ei valmis 😕",
         "list": "*Lähetä numero virtauksesta muokkaukselle*\n\n**Linkki - Tyyli - Kanava - Maininnat**",
         "list-result": "Tyyppi: {}\nDiscord kanava: {}\nURL/Kanava: {}\nMaininnat: {}\nIdentiteetti: {}\nViimeisin julkaisu: {}",
+        "list-title": "Lista rss lähteistä palvelimelta {server}",
         "list2": "*Lähetä numero virtauksesta poistamiselle*\n\n**Linkki - Tyyli - Kanava**",
         "mc": "Minecraft",
         "move-success": "Rss lähetys #{} on liikutettu kanavalle {}!",
@@ -871,6 +905,7 @@
         "change-1": "Ups, sisäinen virhe tapahtui...",
         "change-10": "Tämä XP systeemi ei ole olemassa. Tässä on lista kaikista mahdollisista systeemeistä: {}",
         "change-11": "This colour is invalid",
+        "change-12": "Kategoriaa {} ei löytynyt",
         "change-2": "Vaihtoehto \"{}\" hinta on poistettu",
         "change-3": "Rooli \"{}\" ei löytynyt :confused: (Katso isot kirjaimet ja ulkomaalaiset kirjaimet)",
         "change-4": "Vaihtoehto \"{}\" haluaa boolean (True/False) paramittarin arvosta :innocent:",
@@ -881,6 +916,7 @@
         "change-9": "Emoji `{}` ei löytynyt",
         "change-autoremove_xp": "Botti aikoo nyt poistaa {xp}xp/päivä epäaktiivisilta jäseniltä",
         "change-bool": "Vaihtoehto \"{}\" on nyt aktivioitu hinnalle *{}*",
+        "change-category": "Vaihtoehto '{}' on vaihdettu {} kategorian kanssa",
         "change-color": "The color used for the option {} is now {}",
         "change-emojis": "Tunteet vaihdoehdolle \"{}\" on nyt {}",
         "change-lang": "Botin kieli on nyt `{}`",
@@ -939,6 +975,10 @@
         "slowmode": "Lista rooleista jotka voivat käyttää komentoja 'slowmode' ja 'freeze': {}",
         "update_mentions": "Roolit jotka mainitaan botin muutoslokissa: {}",
         "verification_role": "Roolit jotka otetaan pois kun jäsen käyttää `verify` komennon: {}",
+        "voice_category": "Kategoria, johon uudet automaattiset puhekanavat laitetaan: {}",
+        "voice_channel": "Kanava, josta tehdään uusia automaattisia puhekanavia: {}",
+        "voice_channel_format": "Formaatti automaattisen puhekanavan nimestä: {}",
+        "voice_roles": "Roolit jotka annetaan, kun joku liittyy puhekanavalle: {}",
         "vote_emojis": "Emojit joita käytetään äänestyksissä reaktioina: {}",
         "warn": "Lista rooleista jotka voivat käyttää komentoja 'warn' ja 'cases': {}",
         "welcome": "Viesti joka lähetetään kun jäsen liittyy: {}",
@@ -969,6 +1009,7 @@
         "guild-14": "Limitations",
         "guild-14v": "Bitrate: {bit}kbps\nFiles size: {fil}MB\nEmojis count: {emo}",
         "guild-15": "kutsu linkki",
+        "guild-16": "Paikoillaan: {s}/{l} | Animoitu: {a}/{l}",
         "guild-2": "Maa alue",
         "guild-3": "Teksti : {} | Ääni : {} ({} kategoriat)",
         "guild-4": "Paikalla jäsenet",
@@ -985,8 +1026,10 @@
             "DISCOVERABLE": "Näkyy yhteys ikkunassa",
             "FEATURABLE": "Näkyy Aktiviteetti ikkunassa",
             "INVITE_SPLASH": "Kutsu taustakuva",
+            "MEMBER_VERIFICATION_GATE_ENABLED": "Jäsen verifikaatio aktivoitu",
             "NEWS": "Uutis kanava",
             "PARTNERED": "Kumppani palvelin",
+            "PREVIEW_ENABLED": "Esikatselu käytössä",
             "PUBLIC": "Julkinen palvelin",
             "VANITY_URL": "Erikois kutsu linkki",
             "VERIFIED": "Vahvistettu palvelin",
@@ -1055,6 +1098,10 @@
         "missing-attach-files": "Ups, minulta puuttuu käyttöoikeus: Liitä tiedostoja :confused:",
         "usernames_log_false": "Olet laittanut nimimerkkien ja käyttäjänimien kuvaamisen",
         "usernames_log_true": "Olet hyväksynyt käyttäjänimien ja nimimerkkien kuvaamisen"
+    },
+    "voices": {
+        "deleted": "{i} poistettuja kanavia",
+        "no-channel": "Tällä palvelimella ei ole yhtään puhekanavaa tehtynä"
     },
     "xp": {
         "1-no-xp": "Sinulla ei ole XP:tä vielä!",
@@ -1161,7 +1208,30 @@
             "tämän Ranskan leivän",
             "tämän juuston",
             "tämän repun",
-            "tämän kiven"
+            "tämän kiven",
+            "imukupin",
+            "tiilen",
+            "Vessapaperi rullan",
+            "punapuun",
+            "kumiankan",
+            "dynamiitin",
+            "ponin",
+            "robotin",
+            "tennis verkon",
+            "Eiffel tornin avaimenperän",
+            "asunnon",
+            "maagisen krystallin",
+            "oven",
+            "usb tikun",
+            "valon",
+            "loitsukirjan",
+            "pehmolelun",
+            "karhun",
+            "tikun",
+            "olkihatun",
+            "kupla-auton",
+            "pergamentin",
+            "tankin"
         ],
         "low-page": "En voi näyttää negatiivista sivu numeroa!",
         "negative-xp": "Et voi laittaa negatiivista xp numeroa!",
