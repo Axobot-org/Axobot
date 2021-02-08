@@ -13,7 +13,7 @@
         "aliases": "Alias",
         "categories": {
             "fun": "fun",
-            "info": "informations",
+            "data": "informations",
             "moderation": "modération",
             "other": "autres",
             "server-settings": "configuration",
@@ -245,6 +245,7 @@
         "missingargument": "Oups, il manque l'argument \"{a}\" {e}",
         "msgnotfound": "Message introuvable",
         "notrightroles": "Vous n'avez pas les rôles nécessaires pour cette commande",
+        "quoteserror": "Oups, une erreur de guillemets est survenue. Assurez-vous de bien utiliser les guillemets \", de manière à ce que chaque guillemet ouvert soit fermé plus loin",
         "rolenotfound": "Impossible de trouver le rôle `{r}`",
         "toomanytxtchan": "Vous avez trop de salons textuels accessibles",
         "unknown": "Oups, une erreur est survenue :confused: Réessayez plus tard, ou contactez le support (commande `about`).",
@@ -287,6 +288,15 @@
         "count-3": "Oups, il m'est impossible de lire l'historique de ce salon. Veuillez vérifier mes permissions...",
         "count-4": "Sur les {limit} derniers messages, {user} en a posté {x} ({p}%)",
         "count-5": "Vous ne pouvez pas utiliser cette commande dans un salon où vous n'avez pas accès à l'historique des messages",
+        "discordjobs-title": "Postes disponibles chez Discord",
+        "discordjobs-count": "{c} offres trouvées",
+        "discordstatus-nothing": "Rien à signaler pour le moment !\nLa dernière panne connue était le {date}",
+        "discordstatus-exists": "Il y a actuellement un incident {impact} en cours sur Discord : {title}",
+        "discordstatus-impacts": {
+            "none": "sans effet",
+            "minor": "mineur",
+            "major": "majeur"
+        },
         "embed-error": "Une erreur est survenue: `{}`",
         "embed-invalid-channel": "Impossible d'envoyer des messages dans ce salon",
         "embed-invalid-image": "L'url saisie pour l'image est invalide",
@@ -649,8 +659,10 @@
         "missing-user-perms": "Oups, il vous manque des permissions (gérer les rôles, gérer le serveur ou gérer les messages)",
         "mute-1": "Le membre {} a bien été réduit au silence pour la raison `{}` !",
         "mute-config-err": "Impossible de faire cela. Veuillez vérifier mes permissions dans le serveur et réessayer.",
-        "mute-config-success": "Le rôle a été créé et configuré avec succès ! ({c} salons n'ont pas pu être configurés, par manque de permissions)",
-        "mute-config-success2": "Le rôle a été configuré avec succès ! ({c} salons n'ont pas pu être configurés, par manque de permissions)",
+        "mute-config-success-0": "Le rôle a été créé et configuré avec succès !",
+        "mute-config-success-m": "Le rôle a été créé et configuré avec succès ! ({c} salons n'ont pas pu être configurés, par manque de permissions)",
+        "mute-config-success2-0": "Le rôle a été configuré avec succès !",
+        "mute-config-success2-m": "Le rôle a été configuré avec succès ! ({count} salons n'ont pas pu être configurés, par manque de permissions)",
         "mute-role-created": "Rôle `muted` créé avec succès !\nVous pouvez utiliser la commande `{p}mute-config` pour une configuration automatique dans votre serveur.",
         "mute-high": "Oups, il semble que le rôle `muted` soit trop haut pour que je puisse le donner... Veuillez fixer ce problème en plaçant mon rôle plus haut que le rôle `muted`.",
         "mute-notemp": "Vous avez été rendu muet dans le serveur {server} pour la raison {reason}",
@@ -819,7 +831,8 @@
             "use_voice_activation": "Utiliser la Détection de la voix",
             "view_audit_log": "Voir les logs du serveur",
             "view_guild_insights": "Voir les analyses de serveur"
-        }
+        },
+        "whatisthat": "De quoi s'agit-il ?"
     },
     "roles_react": {
         "already-1-rr": "Vous avez déjà un rôle désigné pour cet émoji",
@@ -841,7 +854,7 @@
         "too-many-rr": "Vous avez déjà atteint la limite de {l} rôles"
     },
     "rss": {
-        "change-txt": "Le message actuel contient \n```\n{text}\n```\nVeuillez entrer le texte à utiliser lors d'un nouveau post. Vous pouvez utiliser plusieurs variables, dont voici la liste :\n- `{author}` : l'auteur du post\n- `{channel}` : le salon Discord dans lequel est posté le message\n- `{date}` : la date du post (UTC)\n- `{link}` ou `{url}` : un lien vers le post\n- `{logo}` : un emoji représentant le type de post (web, Twitter, YouTube...)\n- `{mentions}` : la liste des rôles mentionnés\n- `{title}` : le titre du post",
+        "change-txt": "Le message actuel contient \n```\n{text}\n```\nVeuillez entrer le texte à utiliser lors d'un nouveau post. Vous pouvez utiliser plusieurs variables, dont voici la liste :\n- `{author}` : l'auteur du post\n- `{channel}` : le nom de la chaîne (généralement le même que l'auteur)\n- `{date}` : la date du post (UTC)\n- `{link}` ou `{url}` : un lien vers le post\n- `{logo}` : un emoji représentant le type de post (web, Twitter, YouTube...)\n- `{mentions}` : la liste des rôles mentionnés\n- `{title}` : le titre du post",
         "choose-delete": "Veuillez choisir le flux à supprimer",
         "choose-mentions-1": "Veuillez choisir le flux à modifier",
         "choose-roles": "Quels seront les rôles à mentionner ?",
@@ -865,6 +878,7 @@
         "move-success": "Le flux rss n°{} a bien été bougé dans le salon {} !",
         "no-db": "La base de donnée étant actuellement hors ligne, cette fonctionnalité est temporairement désactivée :confused:",
         "no-feed": "Oups, vous n'avez aucun flux rss à gérer !",
+        "no-feed2": "Ce serveur ne possède aucun flux rss !",
         "no-roles": "Aucun rôle n'a été configuré pour l'instant.",
         "not-a-role": "Ce rôle est introuvable. Réessayez :",
         "nothing": "Je n'ai rien trouvé sur cette recherche :confused:",
@@ -1057,6 +1071,8 @@
         "member-6": "Administrateur",
         "member-7": "Nombre d'infractions",
         "member-8": "Status custom",
+        "member-9": "Rôles",
+        "member-10": "N'a toujours pas accepté les règles",
         "not-found": "Impossible de trouver {N}",
         "role-0": "Identifiant",
         "role-1": "Couleur",
@@ -1078,13 +1094,17 @@
         "textchan-4": ":warning: Permissions manquantes",
         "textchan-5": "Salon",
         "user-0": "Sur ce serveur ?",
+        "user-1": "Banni pour",
         "voicechan-0": "Salon vocal"
     },
     "timers": {
+        "rmd-cleared": "Vos rappels ont bien été supprimés !",
+        "rmd-confirm": "Êtes-vous sûr de vouloir supprimer tous vos rappels ? ({count} en cours)",
         "rmd-deleted": "Le rappel N°{id} ayant pour message `{message}` a bien été supprimé !",
         "rmd-empty": "Oups, vous n'avez aucun rappel en cours...",
         "rmd-item": "ID : `{id}` | Dans : {duration} | Salon : {channel} | Message : {msg}",
-        "rmd-title": "Liste de vos rappels"
+        "rmd-title": "Liste de vos rappels",
+        "rmd-cancelled": "Abandon de la procédure"
     },
     "users": {
         "animated_card_false": "Vous n'utilisez actuellement pas de carte animée",

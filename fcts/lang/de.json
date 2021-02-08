@@ -13,7 +13,7 @@
         "aliases": "Adressen",
         "categories": {
             "fun": "Spaß",
-            "info": "Informationen",
+            "data": "Informationen",
             "moderation": "Moderation",
             "other": "Andere",
             "server-settings": "Server Einstellungen",
@@ -111,6 +111,10 @@
                 "Spaßbefehle sind aktiviert",
                 "Spaßbefehle sind momentan deaktiviert"
             ],
+            "is_halloween": [
+                "Das Halloween Event ist da, viel spaß!",
+                "Es ist grade kein Halloween Event"
+            ],
             "is_owner": [
                 "Dafür musst du der Besitzer des Bots sein",
                 "Du bist nicht der Besitzer des Bots"
@@ -128,6 +132,7 @@
                 "Keine Verifikationsrolle hinzugefügt"
             ]
         },
+        "cmd-count": "{nbr} Befehle",
         "cmd-not-found": "Es gibt keinen \"{}\" Befehl",
         "description": "Beschreibung",
         "embed_title": "Nutzbare Befehle für {u}",
@@ -163,6 +168,7 @@
     "bot_events": {
         "events-desc": {
             "christmas-2019": "Feiere Weihnachten mit diesem Event! Für ein paar Tagen hat Zbot Winterfarben mit speziellen emojis für das Tic-Tac-Toe Spiel, ein einzigartige Benutzerbild und noch mehr coole Sachen!\n\nNutze die Gelegenheit, um Event Punkte zu sammeln und versuche die 2019 limitierte Weihnachts xp card zu gewinnen! Erinnerung: xp cards kann man mit dem profile card Befehl ändern",
+            "halloween-2020": "Es ist Oktober! Viel spaß mit der dunklen Atmosphäre, voll mit Fledermäusen, Skeletten und Kürbissen.\nNutze den Vorteil von der Zeit und mache Bilder mit `halloween hallowify` und schau mit `halloween check` wie gruselig dein Profielbild ist und hol dir jede Stunde mit `halloween collect` ein paar Event Punkte.\n\nVielleicht werden die mutigsten von euch erfolgreich die spezielle rank card freischalten, die man per `profile card` sehen kann! (Bearbeitet",
             "nothing": "Es sind zur Zeit keine Events. Folge den bot news um das Datum für das nächste Event zu erfahren!"
         },
         "events-price-title": "Preise zum gewinnen",

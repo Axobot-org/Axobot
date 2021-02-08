@@ -1,4 +1,4 @@
-from classes import zbot, MyContext, UserFlag, RankCardsFlag
+from utils import zbot, MyContext, UserFlag, RankCardsFlag
 from discord.ext import commands
 import importlib
 import typing
@@ -30,7 +30,7 @@ class Users(commands.Cog):
                 return False
             parameters = await get_data(criters=["userID="+str(user.id)], columns=['user_flags'])
         except Exception as e:
-            await self.bot.cogs["Errors"].on_error(e, None)
+            await self.bot.get_cog("Errors").on_error(e, None)
         if parameters is None:
             return []
         return UserFlag().intToFlags(parameters['user_flags'])
@@ -50,12 +50,12 @@ class Users(commands.Cog):
             if cog := self.bot.get_cog("Utilities"):
                 get_data = cog.get_db_userinfo
             else:
-                return False
+                return list()
             parameters = await get_data(criters=["userID="+str(user.id)], columns=['rankcards_unlocked'])
         except Exception as e:
-            await self.bot.cogs["Errors"].on_error(e, None)
+            await self.bot.get_cog("Errors").on_error(e, None)
         if parameters is None:
-            return False
+            return list()
         return RankCardsFlag().intToFlags(parameters['rankcards_unlocked'])
 
     async def has_rankcard(self, user: discord.User, rankcard: str) -> bool:
@@ -76,7 +76,7 @@ class Users(commands.Cog):
             parameters = list(cursor)
             cursor.close()
         except Exception as e:
-            await self.bot.cogs["Errors"].on_error(e, None)
+            await self.bot.get_cog("Errors").on_error(e, None)
             return dict()
         result = {x[0]: x[1] for x in parameters}
         if '' in result:
@@ -94,7 +94,7 @@ class Users(commands.Cog):
     async def profile_main(self, ctx: MyContext):
         """Get and change info about yourself"""
         if ctx.subcommand_passed is None:
-            await self.bot.cogs['Help'].help_command(ctx,['profile'])
+            await self.bot.get_cog('Help').help_command(ctx,['profile'])
     
     @profile_main.command(name='card-preview')
     @commands.check(checks.database_connected)
@@ -126,26 +126,26 @@ class Users(commands.Cog):
         ..Doc user.html#change-your-xp-card"""
         if style is None and len(ctx.view.buffer.split(' '))>2:
             if ctx.view.buffer.split(' ')[2] == 'list':
-                await ctx.send(str(await self.bot._(ctx.channel,'users','list-cards')).format(', '.join(await ctx.bot.cogs['Utilities'].allowed_card_styles(ctx.author))))
+                await ctx.send(str(await self.bot._(ctx.channel,'users','list-cards')).format(', '.join(await ctx.bot.get_cog('Utilities').allowed_card_styles(ctx.author))))
             else:
-                await ctx.send(str(await self.bot._(ctx.channel,'users','invalid-card')).format(', '.join(await ctx.bot.cogs['Utilities'].allowed_card_styles(ctx.author))))
+                await ctx.send(str(await self.bot._(ctx.channel,'users','invalid-card')).format(', '.join(await ctx.bot.get_cog('Utilities').allowed_card_styles(ctx.author))))
             return
         elif style is None:
             if ctx.channel.permissions_for(ctx.me).attach_files:
-                style = await self.bot.cogs['Utilities'].get_xp_style(ctx.author)
+                style = await self.bot.get_cog('Utilities').get_xp_style(ctx.author)
                 txts = [await self.bot._(ctx.channel,'xp','card-level'), await self.bot._(ctx.channel,'xp','card-rank')]
                 desc = await self.bot._(ctx.channel,'users','card-desc')
-                await ctx.send(desc,file=await self.bot.cogs['Xp'].create_card(ctx.author,style,25,0,[1,0],txts,force_static=True))
+                await ctx.send(desc,file=await self.bot.get_cog('Xp').create_card(ctx.author,style,25,0,[1,0],txts,force_static=True))
             else:
                 await ctx.send(await self.bot._(ctx.channel,'users','missing-attach-files'))
         else:
-            if await ctx.bot.cogs['Utilities'].change_db_userinfo(ctx.author.id,'xp_style',style):
+            if await ctx.bot.get_cog('Utilities').change_db_userinfo(ctx.author.id,'xp_style',style):
                 await ctx.send(str(await self.bot._(ctx.channel,'users','changed-0')).format(style))
                 last_update = self.get_last_rankcard_update(ctx.author.id)
                 if last_update is None:
-                    await self.bot.cogs["Utilities"].add_user_eventPoint(ctx.author.id,15)
+                    await self.bot.get_cog("Utilities").add_user_eventPoint(ctx.author.id,15)
                 elif last_update < time.time()-86400:
-                    await self.bot.cogs["Utilities"].add_user_eventPoint(ctx.author.id,2)
+                    await self.bot.get_cog("Utilities").add_user_eventPoint(ctx.author.id,2)
                 self.set_last_rankcard_update(ctx.author.id)
             else:
                 await ctx.send(await self.bot._(ctx.channel,'users','changed-1'))
@@ -166,13 +166,13 @@ class Users(commands.Cog):
             await ctx.send(await self.bot._(ctx.channel,"users","config_list",options=" - ".join(options.keys())))
             return
         if allow is None:
-            value = await self.bot.cogs['Utilities'].get_db_userinfo([options[option]],[f'`userID`={ctx.author.id}'])
+            value = await self.bot.get_cog('Utilities').get_db_userinfo([options[option]],[f'`userID`={ctx.author.id}'])
             if value is None:
                 value = False
             else:
                 value = value[options[option]]
             if ctx.guild is None or ctx.channel.permissions_for(ctx.guild.me).external_emojis:
-                emojis = self.bot.cogs['Emojis'].customEmojis['green_check'], self.bot.cogs['Emojis'].customEmojis['red_cross']
+                emojis = self.bot.get_cog('Emojis').customEmojis['green_check'], self.bot.get_cog('Emojis').customEmojis['red_cross']
             else:
                 emojis = ('✅','❎')
             if value:
@@ -180,7 +180,7 @@ class Users(commands.Cog):
             else:
                 await ctx.send(emojis[1]+" "+await self.bot._(ctx.channel,'users',option+'_false'))
         else:
-            if await self.bot.cogs['Utilities'].change_db_userinfo(ctx.author.id,options[option],allow):
+            if await self.bot.get_cog('Utilities').change_db_userinfo(ctx.author.id,options[option],allow):
                 await ctx.send(await self.bot._(ctx.channel,'users','config_success',opt=option))
             else:
                 await ctx.send(await self.bot._(ctx.channel,'users','changed-1'))

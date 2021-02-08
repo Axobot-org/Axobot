@@ -3,7 +3,7 @@ import re
 import string
 import typing
 from discord.ext import commands
-from classes import MyContext
+from utils import MyContext
 
 
 class tempdelta(commands.Converter):
@@ -72,7 +72,7 @@ class cardStyle(commands.Converter):
         pass
 
     async def convert(self, ctx: MyContext, argument: str) -> str:
-        if argument in await ctx.bot.cogs['Utilities'].allowed_card_styles(ctx.author):
+        if argument in await ctx.bot.get_cog('Utilities').allowed_card_styles(ctx.author):
             return argument
         else:
             raise commands.errors.BadArgument('Invalid card style: '+argument)
@@ -235,3 +235,16 @@ class snowflake(commands.Converter):
         if len(argument) < 17 or len(argument) > 18 or not argument.isnumeric():
             return None
         return self.Snowflake(int(argument))
+
+
+
+def litteral(string: str):
+    """A parameter type where the argument should exactly be the given string"""
+    class Litteral(commands.Converter):
+        _str = string
+        async def convert(self, ctx: MyContext, argument: str):
+            if argument == self._str:
+                return argument
+            raise commands.errors.BadArgument(f'Argument {argument} should be exactly {self._str}')
+    return Litteral
+

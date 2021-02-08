@@ -2,7 +2,7 @@ import discord
 import datetime
 import json
 from discord.ext import commands
-from classes import zbot, MyContext
+from utils import zbot, MyContext
 
 
 class BotEvents(commands.Cog):
@@ -34,7 +34,7 @@ class BotEvents(commands.Cog):
     async def events_main(self, ctx: MyContext):
         """When I'm organizing some events"""
         if ctx.subcommand_passed is None:
-            await self.bot.cogs['Help'].help_command(ctx, ['events'])
+            await self.bot.get_cog('Help').help_command(ctx, ['events'])
 
     @events_main.command(name="info")
     async def event_info(self, ctx: MyContext):
@@ -49,7 +49,7 @@ class BotEvents(commands.Cog):
             except:
                 title = self.current_event
             # Begin/End dates
-            nice_date = self.bot.cogs["TimeUtils"].date
+            nice_date = self.bot.get_cog("TimeUtils").date
             lang = await self.bot._(ctx.channel, "current_lang", "current")
             begin = await nice_date(self.current_event_data["begin"], lang, year=True, digital=True, hour=False)
             end = await nice_date(self.current_event_data["end"], lang, year=True, digital=True, hour=False)
@@ -70,7 +70,7 @@ class BotEvents(commands.Cog):
                     prices = [f"**{k} {points}:** {v}" for k,
                               v in prices[current_event].items()]
                     fields.append({"name": await self.bot._(ctx.channel, "bot_events", "events-price-title"), "value": "\n".join(prices)})
-                emb = self.bot.cogs["Embeds"].Embed(title=title, desc=events_desc[current_event], fields=fields,
+                emb = self.bot.get_cog("Embeds").Embed(title=title, desc=events_desc[current_event], fields=fields,
                                                       image=self.current_event_data["icon"], color=self.current_event_data["color"])
                 #e = discord.Embed().from_dict(emb.to_dict())
                 await ctx.send(embed=emb)
@@ -94,12 +94,12 @@ class BotEvents(commands.Cog):
             return
         if user is None:
             user = ctx.author
-        user_rank_query = await self.bot.cogs["Utilities"].get_eventsPoints_rank(user.id)
+        user_rank_query = await self.bot.get_cog("Utilities").get_eventsPoints_rank(user.id)
         if user_rank_query is None:
             user_rank = await self.bot._(ctx.channel, "bot_events", "unclassed")
             points = 0
         else:
-            total_ranked = await self.bot.cogs["Utilities"].get_eventsPoints_nbr()
+            total_ranked = await self.bot.get_cog("Utilities").get_eventsPoints_nbr()
             if user_rank_query['rank'] <= total_ranked:
                 user_rank = "{}/{}".format(
                     user_rank_query['rank'], total_ranked)
@@ -109,7 +109,7 @@ class BotEvents(commands.Cog):
         title = await self.bot._(ctx.channel, "bot_events", "rank-title")
         prices = await self.bot._(ctx.channel, "bot_events", "events-prices")
         if current_event in prices.keys():
-            emojis = self.bot.cogs["Emojis"].customEmojis["green_check"], self.bot.cogs["Emojis"].customEmojis["red_cross"]
+            emojis = self.bot.get_cog("Emojis").customEmojis["green_check"], self.bot.get_cog("Emojis").customEmojis["red_cross"]
             p = list()
             for k, v in prices[current_event].items():
                 emoji = emojis[0] if int(k) <= points else emojis[1]
@@ -131,7 +131,7 @@ class BotEvents(commands.Cog):
             fields.append(
                 {"name": rank_global, "value": user_rank, "inline": True})
             desc = await self.bot._(ctx.channel, "bot_events", "xp-howto")
-            emb = self.bot.cogs["Embeds"].Embed(title=title, desc=desc, fields=fields, color=4254055, author_name=str(user), author_icon=str(await self.bot.user_avatar_as(user, 32)))
+            emb = self.bot.get_cog("Embeds").Embed(title=title, desc=desc, fields=fields, color=4254055, author_name=str(user), author_icon=str(await self.bot.user_avatar_as(user, 32)))
             await ctx.send(embed=emb)
         else:
             msg = f"**{title}** ({user})"

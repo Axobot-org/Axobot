@@ -1,6 +1,6 @@
 import datetime, discord, requests, typing
 from discord.ext import commands
-from classes import zbot, MyContext
+from utils import zbot, MyContext
 
 url_base = 'https://discord.com/api/webhooks/'
 
@@ -135,7 +135,7 @@ class Embeds(commands.Cog):
         try:
             msg = r.json()
             if "error" in msg.keys():
-                await self.bot.cogs['Errors'].senf_err_msg("`Erreur webhook {}:` [code {}] {}".format(url,r.status_code,msg))
+                await self.bot.get_cog('Errors').senf_err_msg("`Erreur webhook {}:` [code {}] {}".format(url,r.status_code,msg))
         except:
             return
         

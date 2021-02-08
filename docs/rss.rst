@@ -70,7 +70,16 @@ This command is particularly useful if you want to change the text of an rss flo
 
 If the rss feed ID is not given, the bot will open a menu to select it. And for the text, if you have forgotten it, the bot will also ask you to know it, and will provide you the current text and a list of the usable variables.
 
-.. note:: Available variables are: {channel} {title} {date} {url} {link} {mentions} {logo} {author}
+.. note:: Available variables are:
+
+    - :code:`{author}`: the author of the post
+    - :code:`{channel}`: the channel name (usually the same as author)
+    - :code:`{date}`: the post date (UTC)
+    - :code:`{link}` or :code:`{url}`: a link to the post
+    - :code:`{logo}`: an emoji representing the type of post (web, Twitter, YouTube...)
+    - :code:`{mentions}`: the list of mentioned roles
+    
+    - {title}: the title of the post
 
 .. warning:: Yo know what? For this command, the bot needs "`Embed Links <perms.html#embed-links>`_" permission!
 

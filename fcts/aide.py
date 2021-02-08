@@ -5,7 +5,7 @@ import json
 import copy
 from typing import List
 from discord.ext import commands
-from classes import zbot, MyContext
+from utils import zbot, MyContext
 
 
 class Help(commands.Cog):
@@ -32,7 +32,7 @@ class Help(commands.Cog):
         prefix = await self.bot.get_prefix(ctx.message)
         if type(prefix) == list:
             prefix = prefix[-1]
-        await ctx.send(await self.bot.cogs['Languages'].tr(ctx.guild, 'bvn', 'aide', p=prefix))
+        await ctx.send(await self.bot.get_cog('Languages').tr(ctx.guild, 'bvn', 'aide', p=prefix))
 
     @commands.command(name="about", aliases=["botinfos", "botinfo"])
     @commands.cooldown(7, 30, commands.BucketType.user)
@@ -72,7 +72,7 @@ Enable "Embed Links" permission for better rendering
         except discord.errors.Forbidden:
             pass
         except Exception as e:
-            await self.bot.cogs["Errors"].on_error(e, ctx)
+            await self.bot.get_cog("Errors").on_error(e, ctx)
             if len(commands) == 0:
                 await self._default_help_command(ctx)
             else:
@@ -87,7 +87,7 @@ If the bot can't send the new command format, it will try to send the old one.""
                 send_in_dm = False if self.bot.database_online == False else await self.bot.get_config(ctx.guild, 'help_in_dm')
                 if send_in_dm is not None and send_in_dm == 1:
                     destination = ctx.message.author.dm_channel
-                    await self.bot.cogs["Utilities"].suppr(ctx.message)
+                    await self.bot.get_cog("Utilities").suppr(ctx.message)
                 else:
                     destination = ctx.message.channel
             if destination is None:
@@ -116,7 +116,7 @@ If the bot can't send the new command format, it will try to send the old one.""
                 name = commands[0]
                 command = None
                 if name in self.bot.cogs:
-                    cog = self.bot.cogs[name]
+                    cog = self.bot.get_cog(name)
                     pages = await self.cog_commands(ctx, cog)
                 else:
                     command = self.bot.all_commands.get(name)
@@ -171,7 +171,7 @@ If the bot can't send the new command format, it will try to send the old one.""
                         title = page[0]
                         continue
                     fields.append({'name': page[0], 'value': page[1], 'inline': False})
-                embed = self.bot.cogs["Embeds"].Embed(title=title, footer_text=ft.format(
+                embed = self.bot.get_cog("Embeds").Embed(title=title, footer_text=ft.format(
                     prefix), fields=fields, color=embed_colour).update_timestamp()
                 await destination.send(embed=embed)
         else:
@@ -342,7 +342,7 @@ If the bot can't send the new command format, it will try to send the old one.""
                     else:
                         print(check_name, str(c))
                 except Exception as e:
-                    await self.bot.cogs["Errors"].on_error(e, ctx)
+                    await self.bot.get_cog("Errors").on_error(e, ctx)
             checks = "__" + await self.bot._(ctx.channel, 'aide', 'checks') + "__\n" + '\n'.join(checks)
         else:
             checks = ""
@@ -444,7 +444,7 @@ If the bot can't send the new command format, it will try to send the old one.""
                     else:
                         print(check_name, str(c))
                 except Exception as e:
-                    await self.bot.cogs["Errors"].on_error(e, ctx)
+                    await self.bot.get_cog("Errors").on_error(e, ctx)
         # Module
         category = "unclassed"
         for k, v in self.commands_list.items():

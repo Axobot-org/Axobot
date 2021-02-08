@@ -1,9 +1,11 @@
+import asyncio
+import discord
 from discord.ext import commands
 import copy
 import datetime
 
 from fcts import args
-from classes import zbot, MyContext
+from utils import zbot, MyContext
 
 class Timers(commands.Cog):
     def __init__(self, bot: zbot):
@@ -31,7 +33,7 @@ class Timers(commands.Cog):
 
         ..Doc miscellaneous.html#reminders"""
         if ctx.subcommand_passed is None:
-            await self.bot.cogs['Help'].help_command(ctx,['reminder'])
+            await self.bot.get_cog('Help').help_command(ctx,['reminder'])
     
     
     @remind_main.command(name="create", aliases=["add"])
@@ -46,7 +48,7 @@ class Timers(commands.Cog):
         `XXd` : XX days
         `XXw` : XX weeks
 
-        ..Example remindme create 49d Think about doing my homework
+        ..Example reminder create 49d Think about doing my homework
 
         ..Doc miscellaneous.html#create-a-new-reminder
         """
@@ -60,7 +62,7 @@ class Timers(commands.Cog):
         if not self.bot.database_online:
             await ctx.send(await self.bot._(ctx.channel, "rss", "no-db"))
             return
-        f_duration = await ctx.bot.get_cog('TimeUtils').time_delta(duration,lang=await self.bot._(ctx.guild,'current_lang','current'), year=True, form='developed', precision=0)
+        f_duration = await ctx.bot.get_cog('TimeUtils').time_delta(duration,lang=await self.bot._(ctx.channel,'current_lang','current'), year=True, form='developed', precision=0)
         try:
             d = {'msg_url': ctx.message.jump_url}
             await ctx.bot.get_cog('Events').add_task("timer", duration, ctx.author.id, ctx.guild.id if ctx.guild else None, ctx.channel.id, message, data=d)
@@ -138,7 +140,45 @@ class Timers(commands.Cog):
         item["message"] = (await commands.clean_content(fix_channel_mentions=True).convert(ctx2, item["message"])).replace("`", "\\`")
         await self.bot.get_cog("Events").remove_task(item["ID"])
         await ctx.send(await self.bot._(ctx.channel, "timers", "rmd-deleted", id=item["ID"], message=item["message"]))
-
+    
+    @remind_main.command(name="clear")
+    @commands.cooldown(3, 45, commands.BucketType.user)
+    async def remind_clear(self, ctx: MyContext):
+        """Remove every pending reminder
+        
+        ..Doc miscellaneous.html#clear-every-reminders"""
+        if not (ctx.guild is None or ctx.channel.permissions_for(ctx.guild.me).add_reactions):
+            await ctx.send(await self.bot._(ctx.channel, "fun", "cant-react"))
+            return
+        cnx = self.bot.cnx_frm
+        cursor = cnx.cursor(dictionary=True)
+        query = "SELECT COUNT(*) as count FROM `timed` WHERE action='timer' AND user=%s"
+        cursor.execute(query, (ctx.author.id,))
+        count = list(cursor)[0]['count']
+        if count == 0:
+            await ctx.send(await self.bot._(ctx.channel, "timers", "rmd-empty"))
+            return
+        msg = await ctx.send(await self.bot._(ctx.channel, "timers", "rmd-confirm", count=count))
+        await msg.add_reaction('✅')
+        await msg.add_reaction('❌')
+        
+        def check(reaction: discord.Reaction, user: discord.Member):
+            return user==ctx.author and reaction.message == msg and str(reaction.emoji) in ('✅', '❌')
+        try:
+            reaction, user = await self.bot.wait_for('reaction_add', timeout=30.0, check=check)
+        except asyncio.TimeoutError:
+            cursor.close()
+            await ctx.send(await self.bot._(ctx.channel, 'timers', 'rmd-cancelled'))
+            return
+        if str(reaction.emoji) == '❌':
+            cursor.close()
+            await ctx.send(await self.bot._(ctx.channel, 'timers', 'rmd-cancelled'))
+            return
+        query = "DELETE FROM `timed` WHERE action='timer' AND user=%s"
+        cursor.execute(query, (ctx.author.id,))
+        cnx.commit()
+        cursor.close()
+        await ctx.send(await self.bot._(ctx.channel, 'timers', 'rmd-cleared'))
 
 
 def setup(bot: commands.Bot):

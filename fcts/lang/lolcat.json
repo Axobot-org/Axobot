@@ -13,7 +13,7 @@
         "aliases": "Otherz names",
         "categories": {
             "fun": "cool things",
-            "info": "usefull things",
+            "data": "usefull things",
             "moderation": "acute things",
             "other": "idk, dont ask me plz",
             "server-settings": "other usefl tihngs",
@@ -233,6 +233,7 @@
         "missingargument": "Oops, te argumnt \"{a}\" are missin {e}",
         "msgnotfound": "NoAble 2 find any msg with ID {msg}",
         "notrightroles": "U're not fancy enough to get dat command, GO AWAY DUDE! :reee:",
+        "quoteserror": "Oops, u guys did smth wrong with quotes \" Make sur u using tehm correclty",
         "rolenotfound": "Unable 2 find ur role (`{r}`)",
         "toomanytxtchan": "U have toooo many visibl text channels lmao. Why so much? useless/20. U should seriously think 'bout it dude. Pro-tip :smirk:",
         "unknown": "Ups, somthin' wen't horribly wrong :fearful: pls contact zbot authorities immdiatly",
@@ -275,6 +276,15 @@
         "count-3": "Oops, Im unable to reed dis channel ystory. Pls check mah perms...",
         "count-4": "On teh last {limit} msgs, {user} had postd {x} things ({p}%)",
         "count-5": "U cannot use tish cmd at a channel where U do not have access to msg history",
+        "discordjobs-title": "cool Jobs @Discord",
+        "discordjobs-count": "{c} available house",
+        "discordstatus-nothing": "Discord iz workin fine!\nLast big bug waz at {date}",
+        "discordstatus-exists": "UwU Discord broke :sad_trumpet_noise: check more at {title}",
+        "discordstatus-impacts": {
+            "none": "without effect",
+            "minor": "minor",
+            "major": "major"
+        },
         "embed-error": "A' error went wrong: `{}`",
         "embed-invalid-channel": "Cannt send messages in dat chan...",
         "embed-invalid-image": "The url entered as image is invalid",
@@ -807,7 +817,8 @@
             "use_voice_activation": "Use voice activity",
             "view_audit_log": "View audit logs",
             "view_guild_insights": "View guild insights"
-        }
+        },
+        "whatisthat": "click HEEEERE if u wanna know"
     },
     "roles_react": {
         "already-1-rr": "U already has a designated role 4 this emoji",
@@ -829,7 +840,7 @@
         "too-many-rr": "You have 'ready reached da limit ov {l} roles"
     },
     "rss": {
-        "change-txt": "Da current msg contains  \n```\n{text}\n```\nPlz enter teh text 2B usd when creating a new post. U can use a lot ov variables, here iz the list:\n- `{author}`: author of the post\n- `{channel}`: Discord channel in which the message is posted\n- `{date}`: post date (UTC)\n- `{link}` or `{url}`: a link 2 the post\n- `{logo}`: a emoji representing teh type of post (website, BlueBird, RedTriangle...)\n- `{mentions}`: the list ov mentioned roles\n- `{title}`: the titl of da post",
+        "change-txt": "Da current msg contains  \n```\n{text}\n```\nPlz enter teh text 2B usd when creating a new post. U can use a lot ov variables, here iz the list:\n- `{author}`: author of the post\n- `{channel}`: usually same than author, just4fun\n- `{date}`: post date (UTC)\n- `{link}` or `{url}`: a link 2 the post\n- `{logo}`: a emoji representing teh type of post (website, BlueBird, RedTriangle...)\n- `{mentions}`: the list ov mentioned roles\n- `{title}`: the titl of da post",
         "choose-delete": "Plz chouse teh flo to delet",
         "choose-mentions-1": "Pleese chose the flow 2 modify",
         "choose-roles": "Which roles should bee piing?",
@@ -853,6 +864,7 @@
         "move-success": "Teh rsss feed #{} haz been movd in the chat {}!",
         "no-db": "As the databaz is auffline, dis feature iz temporarly disabled :confused:",
         "no-feed": "Oops, u donot hav any rss feds 2 managez plz!",
+        "no-feed2": "Ur server don't has rss thingy!",
         "no-roles": "No more role hAVe bean configurated yetz.",
         "not-a-role": "The rOle was not finndz. Try against:",
         "nothing": "I finnd nothin on this searrch :confused:",
@@ -1045,6 +1057,8 @@
         "member-6": "Cat MasterZ",
         "member-7": "Infract. nbr",
         "member-8": "Cool thing",
+        "member-9": "Other things",
+        "member-10": "Angry with rules :angryboy:",
         "not-found": "Unable 2 found {N}",
         "role-0": "IDz",
         "role-1": "Colorr",
@@ -1066,13 +1080,17 @@
         "textchan-4": ":warning: Mizzing permz !",
         "textchan-5": "Chanel",
         "user-0": "On dis servr?",
+        "user-1": "left cuz:",
         "voicechan-0": "Singing ch4nnel"
     },
     "timers": {
+        "rmd-cleared": ":deleted:",
+        "rmd-confirm": "U sure u wanna delete 'em all? ({count} small bois)",
         "rmd-deleted": "Rmder #{id} with msg `{message}` had deleted w/ success :owo:",
         "rmd-empty": "Oops, U don't have any pending reminder lol",
         "rmd-item": "ID: `{id}` | In: {duration} | Chan: {channel} | Msg: {msg}",
-        "rmd-title": "I'll remind u that becuz ur dumb-dumb :bongocat:"
+        "rmd-title": "I'll remind u that becuz ur dumb-dumb :bongocat:",
+        "rmd-cancelled": "ok well, cancelled UwU"
     },
     "users": {
         "animated_card_false": "Anamited xp cards are naw disabld for you",
