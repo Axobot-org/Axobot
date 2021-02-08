@@ -1084,10 +1084,13 @@
         "voicechan-0": "Singing ch4nnel"
     },
     "timers": {
+        "rmd-cleared": ":deleted:",
+        "rmd-confirm": "U sure u wanna delete 'em all? ({count} small bois)",
         "rmd-deleted": "Rmder #{id} with msg `{message}` had deleted w/ success :owo:",
         "rmd-empty": "Oops, U don't have any pending reminder lol",
         "rmd-item": "ID: `{id}` | In: {duration} | Chan: {channel} | Msg: {msg}",
-        "rmd-title": "I'll remind u that becuz ur dumb-dumb :bongocat:"
+        "rmd-title": "I'll remind u that becuz ur dumb-dumb :bongocat:",
+        "rmd-cancelled": "ok well, cancelled UwU"
     },
     "users": {
         "animated_card_false": "Anamited xp cards are naw disabld for you",

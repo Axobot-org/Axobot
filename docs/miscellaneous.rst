@@ -117,7 +117,15 @@ Delete a reminder
 
 **Syntax:** :code:`reminder delete <ID>`
 
-Used when you want to stop a reminder, so Zbot will completely forget it. The reminder ID can be found with the `reminder list` command (see above).
+Used when you want to stop a reminder, so Zbot will completely forget it. The reminder ID can be found with the *reminder list* command (see above).
+
+Clear every reminders
+---------------------
+
+**Syntax:** :code:`reminders clear`
+
+If you have too many pending reminders and want to cancel them all, instead of deleting them one by one you can just use that command. For you own sake, the bot will ask you to confirm your choice by a simple reaction to click.
+
 
 ---
 Say
@@ -140,7 +148,7 @@ Tic-tac-toe
 
 Yes, we did it! A first mini-game for our bot, the crab! You can play against the bot in this fast and simplistic game, just by entering the command and following the instructions (enter a number between 1 and 9 corresponding to the chosen cell). And the best part is that the only special permission required is to use the external emojis!
 
-By using the `leave` argument you can instantly stop a game. This can be useful if you are stuck by a bug and can't join a game for example.
+By using the *leave* argument you can instantly stop a game. This can be useful if you are stuck by a bug and can't join a game for example.
 
 
 ----
