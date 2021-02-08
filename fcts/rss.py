@@ -1,7 +1,7 @@
 from aiohttp.client import ClientSession
 from aiohttp import client_exceptions
 from feedparser.util import FeedParserDict
-from classes import zbot, MyContext
+from utils import zbot, MyContext
 import discord
 import datetime
 import time

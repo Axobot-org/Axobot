@@ -3,7 +3,7 @@ from discord.ext import commands
 import asyncio
 import json
 import os
-from classes import zbot, MyContext
+from utils import zbot, MyContext
 
 
 async def is_translator(ctx: MyContext) -> bool:

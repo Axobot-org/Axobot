@@ -12,7 +12,7 @@ import re
 import marshal
 from discord.ext import commands, tasks
 from fcts.checks import is_fun_enabled
-from classes import zbot
+from utils import zbot
 
 class Events(commands.Cog):
     """Cog for the management of major events that do not belong elsewhere. Like when a new server invites the bot."""

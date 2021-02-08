@@ -7,7 +7,7 @@ from discord.ext import commands
 from fcts import args, checks
 importlib.reload(args)
 importlib.reload(checks)
-from classes import zbot, MyContext
+from utils import zbot, MyContext
 
 class Partners(commands.Cog):
 

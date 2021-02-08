@@ -4,7 +4,7 @@ from time import time
 from discord.ext import commands, tasks
 import psutil
 
-from classes import MyContext, zbot
+from utils import MyContext, zbot
 
 
 class BotStats(commands.Cog):

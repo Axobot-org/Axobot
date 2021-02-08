@@ -22,7 +22,7 @@ if check_libs():
     from random import choice
     from discord.ext import commands
     from fcts import cryptage, tokens
-    from classes import zbot, setup_logger
+    from utils import zbot, setup_logger
 else:
     import sys
     print("End of program")

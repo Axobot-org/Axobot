@@ -1,4 +1,4 @@
-from classes import zbot, MyContext
+from utils import zbot, MyContext
 from fcts.checks import is_fun_enabled
 import discord
 import random

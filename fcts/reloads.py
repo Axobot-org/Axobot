@@ -1,5 +1,5 @@
 from discord.ext import commands
-from classes import zbot
+from utils import zbot
 
 admins_id = {279568324260528128,281404141841022976,552273019020771358}
 

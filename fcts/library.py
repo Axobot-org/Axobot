@@ -4,7 +4,7 @@ import datetime
 import html
 import isbnlib
 from discord.ext import commands
-from classes import zbot, MyContext
+from utils import zbot, MyContext
 
 
 class ISBN(commands.Converter):

@@ -1,4 +1,4 @@
-from classes import zbot, MyContext
+from utils import zbot, MyContext
 from libs import bitly_api
 from fcts import reloads, args, checks
 from docs import conf

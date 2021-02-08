@@ -7,7 +7,7 @@ import time
 import requests
 from discord.ext import commands
 from urllib.parse import quote
-from classes import zbot, MyContext
+from utils import zbot, MyContext
 
 
 class Minecraft(commands.Cog):

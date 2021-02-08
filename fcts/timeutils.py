@@ -1,7 +1,7 @@
 import discord
 import datetime
 import time
-from classes import zbot
+from utils import zbot
 
 fr_months = ["Janvier","Février","Mars","Avril","Mai","Juin","Juillet","Aout","Septembre","Octobre","Novembre","Décembre"]
 en_months = ["January","February","March","April","May","June","July","August","September","October","November","December"]
