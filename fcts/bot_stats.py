@@ -16,7 +16,7 @@ class BotStats(commands.Cog):
         self.received_events = {'CMD_USE': 0}
         self.commands_uses = dict()
         self.rss_stats = {'checked': 0, 'messages': 0, 'errors': 0}
-        # self.loop.start()
+        self.loop.start()
 
     def cog_unload(self):
         self.loop.cancel()
@@ -40,9 +40,9 @@ class BotStats(commands.Cog):
     @tasks.loop(minutes=1)
     async def loop(self):
         """Send our stats every minute"""
-        self.bot.log.debug("Stats loop triggered")
-        if not self.bot.database_online:
+        if not (self.bot.alerts_enabled and self.bot.database_online):
             return
+        self.bot.log.debug("Stats loop triggered")
         # get current process for performances logs
         py = psutil.Process(os.getpid())
         # get current time

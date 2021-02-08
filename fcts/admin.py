@@ -582,6 +582,12 @@ Cette option affecte tous les serveurs"""
                 await ctx.send("Les flux RSS sont mainenant activée")
             else:
                 await ctx.send("Les flux RSS sont mainenant désactivée")
+        elif module == 'alerts':
+            self.bot.alerts_enabled = enabling
+            if enabling:
+                await ctx.send("Le système d'alertes est mainenant activé")
+            else:
+                await ctx.send("Le système d'alertes est mainenant désactivé")
         else:
             await ctx.send('Module introuvable')
     
