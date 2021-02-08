@@ -490,6 +490,9 @@ This will remove the role 'muted' for the targeted member
                 await ctx.message.delete()
             except:
                 pass
+            # remove planned automatic unmutes
+            if cog := self.bot.get_cog("Events"):
+                await cog.cancel_unmute(user.id, ctx.guild.id)
         except Exception as e:
             await ctx.send(await self.bot._(ctx.guild.id,"modo","error"))
             await self.bot.cogs['Errors'].on_error(e,ctx)

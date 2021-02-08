@@ -358,10 +358,23 @@ class Events(commands.Cog):
                 else:
                     if IDonly or x['begin'].timestamp()+x['duration'] < time.time():
                         liste.append(x)
+            cursor.close()
             if len(liste) > 0:
                 return liste
             else:
                 return []
+        except Exception as e:
+            await self.bot.cogs['Errors'].on_error(e,None)
+    
+    async def cancel_unmute(self, userID: int, guildID: int):
+        """Cancel every automatic unmutes for a member"""
+        try:
+            cnx = self.bot.cnx_frm
+            cursor = cnx.cursor(dictionary = True)
+            query = 'DELETE FROM `timed` WHERE action="mute" AND guild=%s AND user=%s;'
+            cursor.execute(query, (guildID, userID))
+            cnx.commit()
+            cursor.close()
         except Exception as e:
             await self.bot.cogs['Errors'].on_error(e,None)
 
