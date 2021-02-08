@@ -36,7 +36,7 @@ class Partners(commands.Cog):
             cursor.close()
             return liste
         except Exception as e:
-            await self.bot.cogs['Errors'].on_error(e,None)
+            await self.bot.get_cog('Errors').on_error(e,None)
     
     async def bdd_get_guild(self, guildID: int):
         """Return every partners of a guild"""
@@ -51,7 +51,7 @@ class Partners(commands.Cog):
             cursor.close()
             return liste
         except Exception as e:
-            await self.bot.cogs['Errors'].on_error(e,None)
+            await self.bot.get_cog('Errors').on_error(e,None)
     
     async def bdd_get_partnered(self, invites: list):
         """Return every guilds which has this one as partner"""
@@ -68,7 +68,7 @@ class Partners(commands.Cog):
             cursor.close()
             return liste
         except Exception as e:
-            await self.bot.cogs['Errors'].on_error(e,None)
+            await self.bot.get_cog('Errors').on_error(e,None)
     
     async def bdd_set_partner(self,guildID:int,partnerID:str,partnerType:str,desc:str):
         """Add a partner into a server"""
@@ -83,7 +83,7 @@ class Partners(commands.Cog):
             cursor.close()
             return True
         except Exception as e:
-            await self.bot.cogs['Errors'].on_error(e,None)
+            await self.bot.get_cog('Errors').on_error(e,None)
             return False
     
     async def bdd_edit_partner(self,partnerID:int,target:str=None,desc:str=None,msg:int=None):
@@ -103,7 +103,7 @@ class Partners(commands.Cog):
             cursor.close()
             return True
         except Exception as e:
-            await self.bot.cogs['Errors'].on_error(e,None)
+            await self.bot.get_cog('Errors').on_error(e,None)
             return False
     
     async def bdd_del_partner(self,ID:int):
@@ -117,7 +117,7 @@ class Partners(commands.Cog):
             cursor.close()
             return True
         except Exception as e:
-            await self.bot.cogs['Errors'].on_error(e,None)
+            await self.bot.get_cog('Errors').on_error(e,None)
             return False
     
     async def get_guilds(self,bot:int,session:aiohttp.ClientSession):
@@ -146,7 +146,7 @@ class Partners(commands.Cog):
         if color is None:
             color = await self.bot.get_config(channel.guild.id,'partner_color')
         if color is None:
-            color = self.bot.cogs['Servers'].default_opt['partner_color']
+            color = self.bot.get_cog('Servers').default_opt['partner_color']
         session = aiohttp.ClientSession(loop=self.bot.loop)
         for partner in partners:
             image = ""
@@ -167,7 +167,7 @@ class Partners(commands.Cog):
                 except Exception as e:
                     field1 = None
                     image = str(await self.bot.user_avatar_as(await self.bot.fetch_user(int(partner['target']))))
-                    await self.bot.cogs["Errors"].on_error(e,None)
+                    await self.bot.get_cog("Errors").on_error(e,None)
                 field2 = {'name':tr_invite.capitalize(),'value':'[Click here](https://discord.com/oauth2/authorize?client_id={}&scope=bot&permissions=2113273087)'.format(partner['target'])}
             else:
                 title = "**{}** ".format(tr_guild.capitalize())
@@ -186,7 +186,7 @@ class Partners(commands.Cog):
                 field2 = {'name':tr_invite.capitalize(),'value':'[{}](https://discord.gg/{})'.format(tr_click.capitalize(),partner['target'])}
                 if len(target_desc) == 0:
                     target_desc = await self.bot.get_config(inv.guild.id,'description')
-            emb = self.bot.cogs['Embeds'].Embed(title=title,desc=target_desc,fields=[x for x in (field1,field2) if not x is None],color=color,footer_text=str(partner['ID']),thumbnail=image).update_timestamp()
+            emb = self.bot.get_cog('Embeds').Embed(title=title,desc=target_desc,fields=[x for x in (field1,field2) if not x is None],color=color,footer_text=str(partner['ID']),thumbnail=image).update_timestamp()
             if self.bot.zombie_mode:
                 return
             try:
@@ -198,7 +198,7 @@ class Partners(commands.Cog):
             except Exception as e:
                 msg = await channel.send(embed=emb.discord_embed())
                 await self.bdd_edit_partner(partnerID=partner['ID'],msg=msg.id)
-                await self.bot.cogs['Errors'].on_error(e,None)
+                await self.bot.get_cog('Errors').on_error(e,None)
             count += 1
         await session.close()
         return count
@@ -230,7 +230,7 @@ class Partners(commands.Cog):
         
         ..Doc server.html#partners-system"""
         if ctx.subcommand_passed is None:
-            await self.bot.cogs['Help'].help_command(ctx,['partner'])
+            await self.bot.get_cog('Help').help_command(ctx,['partner'])
 
     @partner_main.command(name='add')
     @commands.check(checks.database_connected)
@@ -262,12 +262,12 @@ class Partners(commands.Cog):
         if str(item.id) in current_list:
             return await ctx.send(await self.bot._(ctx.guild,"partners","already-added"))
         if len(description) > 0:
-            description = await self.bot.cogs['Emojis'].anti_code(description)
+            description = await self.bot.get_cog('Emojis').anti_code(description)
         await self.bdd_set_partner(guildID=ctx.guild.id,partnerID=item.id,partnerType=Type,desc=description)
         await ctx.send(await self.bot._(ctx.guild.id,'partners','added-partner'))
         # logs
         emb = self.bot.get_cog("Embeds").Embed(desc=f"New partner added: {Type} {item.id}", color=10949630, footer_text=ctx.guild.name).update_timestamp().set_author(self.bot.user)
-        await self.bot.cogs["Embeds"].send([emb])
+        await self.bot.get_cog("Embeds").send([emb])
     
     @partner_main.command(name='description',aliases=['desc'])
     @commands.check(checks.database_connected)
@@ -281,7 +281,7 @@ class Partners(commands.Cog):
         if len(l) == 0:
             return await ctx.send(await self.bot._(ctx.guild.id,'partners','invalid-partner'))
         l = l[0]
-        description = await self.bot.cogs['Emojis'].anti_code(description)
+        description = await self.bot.get_cog('Emojis').anti_code(description)
         if await self.bdd_edit_partner(l['ID'],desc=description):
             await ctx.send(await self.bot._(ctx.guild.id,'partners','changed-desc'))
         else:
@@ -346,7 +346,7 @@ class Partners(commands.Cog):
         if await self.bdd_del_partner(l['ID']):
             await ctx.send(await self.bot._(ctx.guild.id,'partners','deleted'))
             emb = self.bot.get_cog("Embeds").Embed(desc=f"Partner removed: {l['type']} {l['ID']}", color=10949630, footer_text=ctx.guild.name).update_timestamp().set_author(self.bot.user)
-            await self.bot.cogs["Embeds"].send([emb])
+            await self.bot.get_cog("Embeds").send([emb])
         else:
             await ctx.send(await self.bot._(ctx.guild.id,'partners','unknown-error'))
         
@@ -364,7 +364,7 @@ class Partners(commands.Cog):
         tr_unknown = await self.bot._(ctx.guild.id,'keywords','unknown')
         tr_owner = await self.bot._(ctx.guild.id,'stats_infos','guild-1')
         for l in await self.bdd_get_guild(ctx.guild.id):
-            date = str(await ctx.bot.cogs['TimeUtils'].date(l['added_at'],lang=lang,year=True,hour=False)).strip()
+            date = str(await ctx.bot.get_cog('TimeUtils').date(l['added_at'],lang=lang,year=True,hour=False)).strip()
             if l['type']=='bot':
                 try:
                     bot = await self.bot.fetch_user(l['target'])
@@ -395,7 +395,7 @@ class Partners(commands.Cog):
         if ctx.can_send_embed:
             color = await ctx.bot.get_config(ctx.guild.id,'partner_color')
             if color is None:
-                color = self.bot.cogs['Servers'].default_opt['partner_color']
+                color = self.bot.get_cog('Servers').default_opt['partner_color']
             emb = await ctx.bot.get_cog('Embeds').Embed(title=fields_name[0],fields=[{'name':fields_name[1],'value':f[0]},{'name':'​','value':'​'},{'name':fields_name[2],'value':f[1]}],color=color,thumbnail=ctx.guild.icon_url).update_timestamp().create_footer(ctx)
             await ctx.send(embed=emb.discord_embed())
         else:
@@ -412,7 +412,7 @@ class Partners(commands.Cog):
     ..Example partners color #FF00FF
     
     ..Doc server.html#change-the-embed-color"""
-        await self.bot.cogs['Servers'].conf_color(ctx,'partner_color',str(color))
+        await self.bot.get_cog('Servers').conf_color(ctx,'partner_color',str(color))
     
     @partner_main.command(name='reload')
     @commands.check(checks.has_admin)
@@ -421,8 +421,8 @@ class Partners(commands.Cog):
         """Reload your partners channel
         
         ..Doc server.html#reload-your-list"""
-        msg = await ctx.send(str(await self.bot._(ctx.guild,'rss','guild-loading')).format(self.bot.cogs['Emojis'].customEmojis['loading']))
-        channel = await self.bot.cogs['Servers'].get_server(criters=[f"`ID`={ctx.guild.id}"],columns=['partner_channel','partner_color'])
+        msg = await ctx.send(str(await self.bot._(ctx.guild,'rss','guild-loading')).format(self.bot.get_cog('Emojis').customEmojis['loading']))
+        channel = await self.bot.get_cog('Servers').get_server(criters=[f"`ID`={ctx.guild.id}"],columns=['partner_channel','partner_color'])
         if len(channel) == 0:
             return await msg.edit(content=await self.bot._(ctx.guild,'partners','no-channel'))
         chan = channel[0]['partner_channel'].split(';')[0]

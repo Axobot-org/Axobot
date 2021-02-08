@@ -42,13 +42,13 @@ Every information come from the website www.fr-minecraft.net"""
                 if K == "www.minecraft.net/en-us":
                     K = "minecraft.net"
                 if V == "green":
-                    k = self.bot.cogs['Emojis'].customEmojis['green_check']+K
+                    k = self.bot.get_cog('Emojis').customEmojis['green_check']+K
                 elif V == "red":
-                    k = self.bot.cogs['Emojis'].customEmojis['red_cross']+K
+                    k = self.bot.get_cog('Emojis').customEmojis['red_cross']+K
                 elif V == 'yellow':
-                    k = self.bot.cogs['Emojis'].customEmojis['neutral_check']+K
+                    k = self.bot.get_cog('Emojis').customEmojis['neutral_check']+K
                 else:
-                    k = self.bot.cogs['Emojis'].customEmojis['blurple']+K
+                    k = self.bot.get_cog('Emojis').customEmojis['blurple']+K
                     dm = self.bot.get_user(279568324260528128).dm_channel
                     if dm is None:
                         await self.bot.get_user(279568324260528128).create_dm()
@@ -68,13 +68,13 @@ Every information come from the website www.fr-minecraft.net"""
                     continue
                 K, V = list(item.items())[0]
                 if V == "green":
-                    k = self.bot.cogs['Emojis'].customEmojis['green_check']+K
+                    k = self.bot.get_cog('Emojis').customEmojis['green_check']+K
                 elif V == "red":
-                    k = self.bot.cogs['Emojis'].customEmojis['red_cross']+K
+                    k = self.bot.get_cog('Emojis').customEmojis['red_cross']+K
                 elif V == 'yellow':
-                    k = self.bot.cogs['Emojis'].customEmojis['neutral_check']+K
+                    k = self.bot.get_cog('Emojis').customEmojis['neutral_check']+K
                 else:
-                    k = self.bot.cogs['Emojis'].customEmojis['blurple']+K
+                    k = self.bot.get_cog('Emojis').customEmojis['blurple']+K
                     dm = self.bot.get_user(279568324260528128).dm_channel
                     if dm is None:
                         await self.bot.get_user(279568324260528128).create_dm()
@@ -100,7 +100,7 @@ Every information come from the website www.fr-minecraft.net"""
         
         ..Doc minecraft.html#mc"""
         if ctx.subcommand_passed is None:
-            await self.bot.cogs['Help'].help_command(ctx,['minecraft'])
+            await self.bot.get_cog('Help').help_command(ctx,['minecraft'])
 
     @mc_main.command(name="block", aliases=["bloc"])
     async def mc_block(self, ctx: MyContext, *, value='help'):
@@ -134,7 +134,7 @@ Every information come from the website www.fr-minecraft.net"""
         try:
             await ctx.send(embed=embed)
         except Exception as e:
-            await self.bot.cogs['Errors'].on_error(e,ctx)
+            await self.bot.get_cog('Errors').on_error(e,ctx)
             await ctx.send(await self.bot._(ctx.channel,"mc","no-entity"))
 
     @mc_main.command(name="entity", aliases=["entité","mob"])
@@ -171,7 +171,7 @@ Every information come from the website www.fr-minecraft.net"""
         try:
             await ctx.send(embed=embed)
         except Exception as e:
-            await self.bot.cogs['Errors'].on_error(e,ctx)
+            await self.bot.get_cog('Errors').on_error(e,ctx)
             await ctx.send(await self.bot._(ctx.channel,"mc","no-entity"))
     
     @mc_main.command(name="item",aliases=['object'])
@@ -208,7 +208,7 @@ Every information come from the website www.fr-minecraft.net"""
         try:
             await ctx.send(embed=embed)
         except Exception as e:
-            await self.bot.cogs['Errors'].on_error(e,ctx)
+            await self.bot.get_cog('Errors').on_error(e,ctx)
             await ctx.send(await self.bot._(ctx.channel,"mc","no-entity"))
 
     @mc_main.command(name="command",aliases=["commande","cmd"])
@@ -252,7 +252,7 @@ Every information come from the website www.fr-minecraft.net"""
         try:
             await ctx.send(embed=embed)
         except Exception as e:
-            await self.bot.cogs['Errors'].on_error(e,ctx)
+            await self.bot.get_cog('Errors').on_error(e,ctx)
             await ctx.send(await self.bot._(ctx.channel,"mc","no-cmd"))
     
     @mc_main.command(name="advancement",aliases=["advc","progrès"])
@@ -288,7 +288,7 @@ Every information come from the website www.fr-minecraft.net"""
         try:
             await ctx.send(embed=embed)
         except Exception as e:
-            await self.bot.cogs['Errors'].on_error(e,ctx)
+            await self.bot.get_cog('Errors').on_error(e,ctx)
             await ctx.send(await self.bot._(ctx.channel,"mc","no-adv"))
     
     @mc_main.command(name="mod")
@@ -375,7 +375,7 @@ Every information come from the website www.fr-minecraft.net"""
             ip,port = i[0],i[1]
         elif port is None:
             port = ''
-        is_over, flow_limit = await self.bot.cogs['Rss'].is_overflow(ctx.guild)
+        is_over, flow_limit = await self.bot.get_cog('Rss').is_overflow(ctx.guild)
         if is_over:
             await ctx.send(str(await self.bot._(ctx.guild.id,"rss","flow-limit")).format(flow_limit))
             return
@@ -384,11 +384,11 @@ Every information come from the website www.fr-minecraft.net"""
                 display_ip = ip
             else:
                 display_ip = "{}:{}".format(ip,port)
-            await self.bot.cogs['Rss'].add_flow(ctx.guild.id,ctx.channel.id,'mc',"{}:{}".format(ip,port))
+            await self.bot.get_cog('Rss').add_flow(ctx.guild.id,ctx.channel.id,'mc',"{}:{}".format(ip,port))
             await ctx.send(str(await self.bot._(ctx.guild,"mc","success-add")).format(display_ip,ctx.channel.mention))
         except Exception as e:
             await ctx.send(await self.bot._(ctx.guild,"rss","fail-add"))
-            await self.bot.cogs["Errors"].on_error(e,ctx)
+            await self.bot.get_cog("Errors").on_error(e,ctx)
 
 
     async def create_server_1(self, guild: discord.Guild, ip: str, port=None):
@@ -405,7 +405,7 @@ Every information come from the website www.fr-minecraft.net"""
         except Exception:
             return await self.create_server_2(guild, ip, port)
             # self.bot.log.warn("[mc-server-1] Erreur sur l'url {} :".format(url))
-            # await self.bot.cogs['Errors'].on_error(e,None)
+            # await self.bot.get_cog('Errors').on_error(e,None)
             # return await self.bot._(guild,"mc","serv-error")
         if "error" in r.keys():
             if r['error'] != 'timed out':
@@ -451,7 +451,7 @@ Every information come from the website www.fr-minecraft.net"""
             except Exception as e:
                 if not isinstance(e,requests.exceptions.ReadTimeout):
                     await self.bot.log.error("[mc-server-2] Erreur sur l'url {} :".format(url))
-                await self.bot.cogs['Errors'].on_error(e,None)
+                await self.bot.get_cog('Errors').on_error(e,None)
                 return await self.bot._(guild,"mc","serv-error")
         if r["debug"]["ping"] == False:
             return await self.bot._(guild,"mc","no-ping")
@@ -567,7 +567,7 @@ Every information come from the website www.fr-minecraft.net"""
             try:
                 obj = await self.create_server_1(guild,i[0],i[1])
             except Exception as e:
-                await self.bot.cogs['Errors'].on_error(e,None)
+                await self.bot.get_cog('Errors').on_error(e,None)
                 return
             self.flows[flow['link']] = obj
         try:
@@ -578,7 +578,7 @@ Every information come from the website www.fr-minecraft.net"""
             if msg is None:
                 msg = await self.send_msg_server(obj,channel,i)
                 if msg is not None:
-                    await self.bot.cogs['Rss'].update_flow(flow['ID'],[('structure',str(msg.id)),('date',datetime.datetime.utcnow())])
+                    await self.bot.get_cog('Rss').update_flow(flow['ID'],[('structure',str(msg.id)),('date',datetime.datetime.utcnow())])
                     if send_stats:
                         if statscog := self.bot.get_cog("BotStats"):
                             statscog.rss_stats['messages'] += 1
@@ -588,7 +588,7 @@ Every information come from the website www.fr-minecraft.net"""
             if statscog := self.bot.get_cog("BotStats"):
                 statscog.rss_stats['messages'] += 1
         except Exception as e:
-            await self.bot.cogs['Errors'].on_error(e,None)
+            await self.bot.get_cog('Errors').on_error(e,None)
 
 
 

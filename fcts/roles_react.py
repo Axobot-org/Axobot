@@ -122,7 +122,7 @@ class RolesReact(commands.Cog):
         
         ..Doc roles-reactions.html"""
         if ctx.subcommand_passed is None:
-            await self.bot.cogs['Help'].help_command(ctx, ['roles_react'])
+            await self.bot.get_cog('Help').help_command(ctx, ['roles_react'])
 
     @rr_main.command(name="add")
     @commands.check(checks.has_manage_guild)
@@ -144,12 +144,12 @@ class RolesReact(commands.Cog):
             if len(l) > 0:
                 return await ctx.send(await self.bot._(ctx.guild.id, 'roles_react', 'already-1-rr'))
             max_rr = await self.bot.get_config(ctx.guild.id, 'roles_react_max_number')
-            max_rr = self.bot.cogs["Servers"].default_opt['roles_react_max_number'] if max_rr is None else max_rr
+            max_rr = self.bot.get_cog("Servers").default_opt['roles_react_max_number'] if max_rr is None else max_rr
             if len(l) >= max_rr:
                 return await ctx.send(await self.bot._(ctx.guild.id, 'roles_react', 'too-many-rr', l=max_rr))
             await self.rr_add_role(ctx.guild.id, role.id, emoji, description[:150])
         except Exception as e:
-            await self.bot.cogs['Errors'].on_command_error(ctx, e)
+            await self.bot.get_cog('Errors').on_command_error(ctx, e)
         else:
             await ctx.send(await self.bot._(ctx.guild.id, 'roles_react', 'rr-added', r=role.name, e=emoji))
             self.guilds_which_have_roles.add(ctx.guild.id)
@@ -174,7 +174,7 @@ class RolesReact(commands.Cog):
                 return await ctx.send(await self.bot._(ctx.guild.id, 'roles_react', 'no-rr'))
             await self.rr_remove_role(l[0]['ID'])
         except Exception as e:
-            await self.bot.cogs['Errors'].on_command_error(ctx, e)
+            await self.bot.get_cog('Errors').on_command_error(ctx, e)
         else:
             role = ctx.guild.get_role(l[0]['role'])
             if role is None:
@@ -216,13 +216,13 @@ class RolesReact(commands.Cog):
         try:
             l = await self.rr_list_role(ctx.guild.id)
         except Exception as e:
-            await self.bot.cogs['Errors'].on_command_error(ctx, e)
+            await self.bot.get_cog('Errors').on_command_error(ctx, e)
         else:
             des, _ = await self.create_list_embed(l, ctx.guild)
             max_rr = await self.bot.get_config(ctx.guild.id, 'roles_react_max_number')
-            max_rr = self.bot.cogs["Servers"].default_opt['roles_react_max_number'] if max_rr is None else max_rr
+            max_rr = self.bot.get_cog("Servers").default_opt['roles_react_max_number'] if max_rr is None else max_rr
             title = await self.bot._(ctx.guild.id, "roles_react", 'rr-list', n=len(l), m=max_rr)
-            emb = await self.bot.cogs['Embeds'].Embed(title=title, desc=des, color=self.embed_color).update_timestamp().create_footer(ctx)
+            emb = await self.bot.get_cog('Embeds').Embed(title=title, desc=des, color=self.embed_color).update_timestamp().create_footer(ctx)
             await ctx.send(embed=emb.discord_embed())
 
     @rr_main.command(name="get", aliases=['display'])
@@ -237,11 +237,11 @@ It will only display the whole message with reactions. Still very cool tho
         try:
             l = await self.rr_list_role(ctx.guild.id)
         except Exception as e:
-            await self.bot.cogs['Errors'].on_command_error(ctx, e)
+            await self.bot.get_cog('Errors').on_command_error(ctx, e)
         else:
             des, emojis = await self.create_list_embed(l, ctx.guild)
             title = await self.bot._(ctx.guild.id, "roles_react", 'rr-embed')
-            emb = self.bot.cogs['Embeds'].Embed(
+            emb = self.bot.get_cog('Embeds').Embed(
                 title=title, desc=des, color=self.embed_color, footer_text=self.footer_txt).update_timestamp()
             msg = await ctx.send(embed=emb.discord_embed())
             for e in emojis:
@@ -303,7 +303,7 @@ Opposite is the subcommand 'join'
         except discord.errors.Forbidden:
             pass
         except Exception as e:
-            await self.bot.cogs['Errors'].on_error(e, None)
+            await self.bot.get_cog('Errors').on_error(e, None)
         else:
             if not ignore_success:
                 await channel.send(await self.bot._(guild.id, 'roles_react', 'role-given' if give else 'role-lost', r=role.name))
@@ -330,7 +330,7 @@ Opposite is the subcommand 'join'
         try:
             l = await self.rr_list_role(ctx.guild.id)
         except Exception as e:
-            return await self.bot.cogs['Errors'].on_command_error(ctx, e)
+            return await self.bot.get_cog('Errors').on_command_error(ctx, e)
         if emojis is not None:
             emojis = [str(x.id) if isinstance(x, discord.Emoji)
                       else str(x) for x in emojis]
