@@ -102,10 +102,15 @@ class Translations(commands.Cog):
 
     @commands.command(name='translate',aliases=['tr'])
     @commands.check(is_translator)
-    async def translate_smth(self, ctx: MyContext, lang: str):
+    async def translate_smth(self, ctx: MyContext, lang: str=None):
         """Translate a message of the bot
         Original message is in English
-        The text is not immediatly added into the bot and need an update to be in"""
+        The text is not immediatly added into the bot and need an update to be in
+        
+        Use no argument to get a help message"""
+        if lang is None:
+            await self.bot.get_cog('Help').help_command(ctx, ['translators'])
+            return
         if lang not in self.translations.keys():
             return await ctx.send("Invalid language")
         if len(self.todo[lang]) == 0:
