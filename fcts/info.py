@@ -427,7 +427,7 @@ Available types: member, role, user, emoji, channel, server, invite, category
         else:
             on_server = await self.bot._(ctx.guild.id,"keywords","non")
             try:
-                banned: str = (await ctx.guild.fetch_ban(item))[1]
+                banned: str = (await ctx.guild.fetch_ban(item)).reason
             except (discord.Forbidden, discord.NotFound):
                 banned = None
         embed = discord.Embed(colour=default_color, timestamp=ctx.message.created_at)
