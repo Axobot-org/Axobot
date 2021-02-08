@@ -42,11 +42,11 @@ def get_prefix(bot, msg: discord.Message) -> list:
     Prefix can change based on guild, but the bot mention will always be an option"""
     if bot.database_online:
         try:
-            prefixes = [bot.cogs['Utilities'].find_prefix(msg.guild)]
+            prefixes = [bot.get_cog('Utilities').find_prefix(msg.guild)]
         except KeyError:
             try:
                 bot.load_extension('fcts.utilities')
-                prefixes = [bot.cogs['Utilities'].find_prefix(msg.guild)]
+                prefixes = [bot.get_cog('Utilities').find_prefix(msg.guild)]
             except Exception as e:
                 bot.log.warn("[get_prefix]", e)
                 prefixes = ['!']
@@ -94,7 +94,7 @@ class zbot(commands.bot.AutoShardedBot):
     def current_event(self) -> Optional[dict]:
         """Get the current event, from the date"""
         try:
-            return self.cogs["BotEvents"].current_event
+            return self.get_cog("BotEvents").current_event
         except Exception as e:
             self.log.warn(f"[current_event] {e}", exc_info=True)
             return None
@@ -186,7 +186,7 @@ class zbot(commands.bot.AutoShardedBot):
             else:
                 return user.avatar_url_as(format='png', size=size)
         except Exception as e:
-            await self.cogs['Errors'].on_error(e, None)
+            await self.get_cog('Errors').on_error(e, None)
 
     class SafeDict(dict):
         def __missing__(self, key):

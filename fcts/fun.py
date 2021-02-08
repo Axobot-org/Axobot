@@ -29,7 +29,7 @@ async def can_say(ctx: MyContext):
     if not ctx.bot.database_online:
         return ctx.channel.permissions_for(ctx.author).administrator
     else:
-        return await ctx.bot.cogs["Servers"].staff_finder(ctx.author,"say")
+        return await ctx.bot.get_cog("Servers").staff_finder(ctx.author,"say")
 
 async def can_use_cookie(ctx: MyContext):
 #                            Z_runner           neil3000            Awhikax           Adri         Theventreur         Catastrophix        Platon_Neutron      megat69            Aragorn1202
@@ -46,7 +46,7 @@ class Fun(commands.Cog):
         self.afk_guys = dict()
         self.nasa_pict:dict = None
         try:
-            self.utilities = self.bot.cogs["Utilities"]
+            self.utilities = self.bot.get_cog("Utilities")
         except:
             pass
 
@@ -55,7 +55,7 @@ class Fun(commands.Cog):
 
     @commands.Cog.listener()
     async def on_ready(self):
-            self.utilities = self.bot.cogs["Utilities"]
+            self.utilities = self.bot.get_cog("Utilities")
 
     async def is_on_guild(self,user,guild):
         if self.bot.user.id == 436835675304755200:
@@ -94,7 +94,7 @@ class Fun(commands.Cog):
                     for cmds in cmd.commands:
                         text+="\n    - {} *({})*".format(cmds.name,cmds.help)
         if ctx.can_send_embed:
-            emb = await ctx.bot.cogs['Embeds'].Embed(title=title,desc=text,color=ctx.bot.cogs['Help'].help_color,time=ctx.message.created_at).create_footer(ctx)
+            emb = await ctx.bot.get_cog('Embeds').Embed(title=title,desc=text,color=ctx.bot.get_cog('Help').help_color,time=ctx.message.created_at).create_footer(ctx)
             return await ctx.send(embed=emb.discord_embed())
         await ctx.send(title+text)
 
@@ -124,7 +124,7 @@ class Fun(commands.Cog):
         if ctx.author.id == 375598088850505728:
             await ctx.send(file=await self.utilities.find_img("cookie-target.gif"))
         else:
-            await ctx.send(str(await self.bot._(ctx.guild,"fun","cookie")).format(ctx.author.mention,self.bot.cogs['Emojis'].customEmojis['cookies_eat']))
+            await ctx.send(str(await self.bot._(ctx.guild,"fun","cookie")).format(ctx.author.mention,self.bot.get_cog('Emojis').customEmojis['cookies_eat']))
 
     @commands.command(name="reverse", hidden=True)
     @commands.check(is_fun_enabled)
@@ -158,7 +158,7 @@ You can specify a verification limit by adding a number in argument (up to 1.000
             limit = int(user.name)
             user = None
         if limit > MAX:
-            await ctx.send(await self.bot._(ctx.channel,"fun","count-2",l=MAX,e=self.bot.cogs['Emojis'].customEmojis['wat']))
+            await ctx.send(await self.bot._(ctx.channel,"fun","count-2",l=MAX,e=self.bot.get_cog('Emojis').customEmojis['wat']))
             return
         if ctx.guild is not None and not channel.permissions_for(ctx.guild.me).read_message_history:
             await ctx.send(await self.bot._(channel,"fun","count-3"))
@@ -211,7 +211,7 @@ You can specify a verification limit by adding a number in argument (up to 1.000
         await ctx.send(file=await self.utilities.find_img('nope.png'))
         if self.bot.database_online:
             try:
-                if await self.bot.cogs["Servers"].staff_finder(ctx.author,'say'):
+                if await self.bot.get_cog("Servers").staff_finder(ctx.author,'say'):
                     await self.utilities.suppr(ctx.message)
             except commands.CommandError: # user can't use 'say'
                 pass
@@ -252,7 +252,7 @@ You can specify a verification limit by adding a number in argument (up to 1.000
             txt = "- "+"\n- ".join(sorted(liste))
             title = str(await self.bot._(ctx.channel,"fun","blame-0")).format(ctx.author)
             if ctx.can_send_embed:
-                emb = self.bot.cogs["Embeds"].Embed(title=title,desc=txt,color=self.bot.cogs["Help"].help_color).update_timestamp()
+                emb = self.bot.get_cog("Embeds").Embed(title=title,desc=txt,color=self.bot.get_cog("Help").help_color).update_timestamp()
                 await ctx.send(embed=emb.discord_embed())
             else:
                 await ctx.send("__{}:__\n\n{}".format(title,txt))
@@ -300,7 +300,7 @@ You can specify a verification limit by adding a number in argument (up to 1.000
         elif r == 3:
             await ctx.send(file=await self.utilities.find_img('parrot.gif'))
         elif r == 4:
-            e = self.bot.cogs['Emojis'].customEmojis['blob_dance']
+            e = self.bot.get_cog('Emojis').customEmojis['blob_dance']
             await ctx.send(e*5)
         elif r == 5:
             await ctx.send(file=await self.utilities.find_img('cameleon.gif'))
@@ -337,10 +337,10 @@ You can specify a verification limit by adding a number in argument (up to 1.000
         ..Example bigtext Hi world! I'm 69?!
         
         ..Doc fun.html#bigtext"""
-        # contenu = await self.bot.cogs['Utilities'].clear_msg(text,ctx=ctx,emojis=False)
+        # contenu = await self.bot.get_cog('Utilities').clear_msg(text,ctx=ctx,emojis=False)
         contenu = await commands.clean_content().convert(ctx, text)
         text = ""
-        Em = self.bot.cogs['Emojis']
+        Em = self.bot.get_cog('Emojis')
         mentions = [x.group(1) for x in re.finditer(r'(<(?:@!?&?|#|a?:[a-zA-Z0-9_]+:)\d+>)',ctx.message.content)]
         content = "¬¬".join(contenu.split("\n"))
         for x in mentions:
@@ -371,8 +371,8 @@ You can specify a verification limit by adding a number in argument (up to 1.000
         if text1 != []:
             await ctx.send(''.join(text1))
         try:
-            if ctx.bot.database_online and await self.bot.cogs["Servers"].staff_finder(ctx.author,'say'):
-                await self.bot.cogs["Utilities"].suppr(ctx.message)
+            if ctx.bot.database_online and await self.bot.get_cog("Servers").staff_finder(ctx.author,'say'):
+                await self.bot.get_cog("Utilities").suppr(ctx.message)
         except commands.CommandError: # user can't use 'say'
             pass
         self.bot.log.debug("{} used bigtext to say {}".format(ctx.author.id,text))
@@ -452,15 +452,15 @@ You can specify a verification limit by adding a number in argument (up to 1.000
                     await ctx.send(f"Yeah we know you are {word[0]}")
                     return
         try:
-            text = await self.bot.cogs["Utilities"].clear_msg(text, ctx=ctx)
+            text = await self.bot.get_cog("Utilities").clear_msg(text, ctx=ctx)
         except Exception as e:
-            await self.bot.cogs['Errors'].on_error(e, ctx)
+            await self.bot.get_cog('Errors').on_error(e, ctx)
             return
         try:
             if not channel.permissions_for(ctx.guild.me).send_messages:
                 return await ctx.send(str(await self.bot._(ctx.guild.id, 'fun', 'no-say'))+random.choice([' :confused:', '', '', '']))
             await channel.send(text)
-            await self.bot.cogs["Utilities"].suppr(ctx.message)
+            await self.bot.get_cog("Utilities").suppr(ctx.message)
         except:
             pass
 
@@ -471,11 +471,11 @@ You can specify a verification limit by adding a number in argument (up to 1.000
         
         ..Doc fun.html#me"""
         text = "*{} {}*".format(ctx.author.display_name,text)
-        text = await self.bot.cogs["Utilities"].clear_msg(text,ctx=ctx)
+        text = await self.bot.get_cog("Utilities").clear_msg(text,ctx=ctx)
         await ctx.send(text)
         try:
-            if self.bot.database_online and await self.bot.cogs["Servers"].staff_finder(ctx.author,"say"):
-                await self.bot.cogs["Utilities"].suppr(ctx.message)
+            if self.bot.database_online and await self.bot.get_cog("Servers").staff_finder(ctx.author,"say"):
+                await self.bot.get_cog("Utilities").suppr(ctx.message)
         except commands.CommandError: # user can't use 'say'
             pass
     
@@ -504,9 +504,9 @@ You can specify a verification limit by adding a number in argument (up to 1.000
                     await ctx.send(await self.bot._(ctx.channel,'fun','no-emoji'))
                     return
                 except Exception as e:
-                    await self.bot.cogs["Errors"].on_error(e,ctx)
+                    await self.bot.get_cog("Errors").on_error(e,ctx)
                     continue
-        await self.bot.cogs["Utilities"].suppr(ctx.message)
+        await self.bot.get_cog("Utilities").suppr(ctx.message)
     
     @commands.command(name="nuke",hidden=True)
     @commands.check(is_fun_enabled)
@@ -540,7 +540,7 @@ You can specify a verification limit by adding a number in argument (up to 1.000
         ..Doc fun.html#lmgtfy"""
         link = "http://lmgtfy.com/?q="+search.replace("\n","+").replace(" ","+")
         await ctx.send('<'+link+'>')
-        await self.bot.cogs['Utilities'].suppr(ctx.message)
+        await self.bot.get_cog('Utilities').suppr(ctx.message)
     
     @commands.command(name="loading",hidden=True)
     @commands.check(is_fun_enabled)
@@ -585,12 +585,12 @@ You can specify a verification limit by adding a number in argument (up to 1.000
                 if r.status == 200:
                     if r.content_type == 'image/png':
                         if ctx.channel.permissions_for(ctx.me).embed_links:
-                            emb = self.bot.cogs['Embeds'].Embed(image="https://welcomer.glitch.me/weather?city="+city,footer_text="From https://welcomer.glitch.me/weather")
+                            emb = self.bot.get_cog('Embeds').Embed(image="https://welcomer.glitch.me/weather?city="+city,footer_text="From https://welcomer.glitch.me/weather")
                             return await ctx.send(embed=emb.discord_embed())
                         else:
                             return await ctx.send("https://welcomer.glitch.me/weather?city="+city)
                     #except Exception as e:
-                    #    await self.bot.cogs['Errors'].on_error(e,ctx)
+                    #    await self.bot.get_cog('Errors').on_error(e,ctx)
         await ctx.send(await self.bot._(ctx.channel,"fun","invalid-city"))
 
     @commands.command(name="hour")
@@ -611,7 +611,7 @@ You can specify a verification limit by adding a number in argument (up to 1.000
             return await ctx.send(await self.bot._(ctx.channel,"fun","uninhabited-city"))
         timeZoneObj = timezone(timeZoneStr)
         d = datetime.datetime.now(timeZoneObj)
-        format_d = await self.bot.cogs['TimeUtils'].date(d,lang=await self.bot._(ctx.channel,"current_lang","current"))
+        format_d = await self.bot.get_cog('TimeUtils').date(d,lang=await self.bot._(ctx.channel,"current_lang","current"))
         await ctx.send("**{}**:\n{} ({})\n ({} - lat: {} - long: {})".format(timeZoneStr,format_d,d.tzname(),g.current_result.address,round(g.json['lat'],2),round(g.json['lng'],2)))
 
     @commands.command(name="tip")
@@ -630,7 +630,7 @@ You can specify a verification limit by adding a number in argument (up to 1.000
         
         ..Doc fun.html#afk"""
         try:
-            self.afk_guys[ctx.author.id] = await self.bot.cogs['Utilities'].clear_msg(reason, ctx=ctx)
+            self.afk_guys[ctx.author.id] = await self.bot.get_cog('Utilities').clear_msg(reason, ctx=ctx)
             if (not ctx.author.display_name.endswith(' [AFK]')) and len(ctx.author.display_name)<26:
                 await ctx.author.edit(nick=ctx.author.display_name+" [AFK]")
             await ctx.send(await self.bot._(ctx.guild.id,"fun","afk-done"))
@@ -676,11 +676,11 @@ You can specify a verification limit by adding a number in argument (up to 1.000
                 if member.id not in self.afk_guys or len(self.afk_guys[member.id]) == 0:
                     await msg.channel.send(await self.bot._(msg.guild.id,"fun","afk-user-2"))
                 else:
-                    reason = await self.bot.cogs['Utilities'].clear_msg(str(await self.bot._(msg.guild.id,"fun","afk-user-1")).format(self.afk_guys[member.id]),ctx=ctx)
+                    reason = await self.bot.get_cog('Utilities').clear_msg(str(await self.bot._(msg.guild.id,"fun","afk-user-1")).format(self.afk_guys[member.id]),ctx=ctx)
                     await msg.channel.send(reason)
         if isinstance(ctx.author, discord.Member) and not await checks.is_a_cmd(msg, self.bot):
             if (ctx.author.nick and ctx.author.nick.endswith(' [AFK]')) or ctx.author.id in self.afk_guys.keys():
-                user_config = await self.bot.cogs['Utilities'].get_db_userinfo(["auto_unafk"],[f'`userID`={ctx.author.id}'])
+                user_config = await self.bot.get_cog('Utilities').get_db_userinfo(["auto_unafk"],[f'`userID`={ctx.author.id}'])
                 if user_config is None or (not user_config['auto_unafk']):
                     return
                 msg = copy.copy(msg)
@@ -727,7 +727,7 @@ You can specify a verification limit by adding a number in argument (up to 1.000
             return await ctx.send(await self.bot._(ctx.channel,"fun","embed-invalid-channel"))
         if not destination.permissions_for(ctx.guild.me).embed_links:
             return await ctx.send(await self.bot._(ctx.channel,"fun","no-embed-perm"))
-        k = {'title':"",'content':"",'url':'','footer':"",'image':'','color':ctx.bot.cogs['Servers'].embed_color}
+        k = {'title':"",'content':"",'url':'','footer':"",'image':'','color':ctx.bot.get_cog('Servers').embed_color}
         for key,value in arguments.items():
             if key=='title':
                 k['title'] = value[:255]
@@ -739,7 +739,7 @@ You can specify a verification limit by adding a number in argument (up to 1.000
                 c = await args.Color().convert(ctx,value)
                 if c is not None:
                     k['color'] = c
-        emb = ctx.bot.cogs["Embeds"].Embed(title=k['title'], desc=k['content'], url=k['url'],footer_text=k['footer'],thumbnail=k['image'],color=k['color']).update_timestamp().set_author(ctx.author)
+        emb = ctx.bot.get_cog("Embeds").Embed(title=k['title'], desc=k['content'], url=k['url'],footer_text=k['footer'],thumbnail=k['image'],color=k['color']).update_timestamp().set_author(ctx.author)
         try:
             await destination.send(embed=emb.discord_embed())
         except Exception as e:
@@ -905,7 +905,7 @@ You can specify a verification limit by adding a number in argument (up to 1.000
         ..Example 3 Do you prefer blue, red or green? Answer below!
         
         ..Doc miscellaneous.html#vote"""
-        text = await ctx.bot.cogs['Utilities'].clear_msg(text,ctx=ctx)
+        text = await ctx.bot.get_cog('Utilities').clear_msg(text,ctx=ctx)
         if ctx.guild is not None:
             if not (ctx.channel.permissions_for(ctx.guild.me).read_message_history and ctx.channel.permissions_for(ctx.guild.me).add_reactions):
                 return await ctx.send(await self.bot._(ctx.channel,"fun","cant-react"))
@@ -918,7 +918,7 @@ You can specify a verification limit by adding a number in argument (up to 1.000
                 await self.bot.get_cog("Errors").on_error(e, ctx)
                 return
         else:
-            liste = self.bot.cogs['Emojis'].numbEmojis
+            liste = self.bot.get_cog('Emojis').numbEmojis
             if number>20 or number < 0:
                 await ctx.send(await self.bot._(ctx.channel,"fun","vote-0"))
                 return
@@ -929,9 +929,9 @@ You can specify a verification limit by adding a number in argument (up to 1.000
                 except discord.errors.NotFound:
                     return
                 except Exception as e:
-                    await self.bot.cogs['Errors'].on_error(e,ctx)
-        await self.bot.cogs['Utilities'].suppr(ctx.message)
-        self.bot.log.debug(await self.bot.cogs['TimeUtils'].date(datetime.datetime.now(),digital=True)+" Vote de {} : {}".format(ctx.author,ctx.message.content))
+                    await self.bot.get_cog('Errors').on_error(e,ctx)
+        await self.bot.get_cog('Utilities').suppr(ctx.message)
+        self.bot.log.debug(await self.bot.get_cog('TimeUtils').date(datetime.datetime.now(),digital=True)+" Vote de {} : {}".format(ctx.author,ctx.message.content))
 
 
     async def check_suggestion(self,message):
@@ -947,7 +947,7 @@ You can specify a verification limit by adding a number in argument (up to 1.000
                 except:
                     pass
         except Exception as e:
-            await self.bot.cogs['Errors'].on_error(e,message)
+            await self.bot.get_cog('Errors').on_error(e,message)
 
 def setup(bot):
     bot.add_cog(Fun(bot))

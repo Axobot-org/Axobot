@@ -57,7 +57,7 @@ class Perms(commands.Cog):
                 perm = perms_translations["administrator"]
             else:
                 perm = "Administrator"
-            permsl.append(self.bot.cogs['Emojis'].customEmojis['green_check']+perm)
+            permsl.append(self.bot.get_cog('Emojis').customEmojis['green_check']+perm)
         else:
             # Here we check if the value of each permission is True.
             for perm, value in perms:
