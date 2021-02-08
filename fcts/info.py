@@ -1279,6 +1279,9 @@ Servers:
                 if len(temp) > MAX:
                     temp = temp[:MAX] + [await self.bot._(ctx.channel, 'infos', 'usernames-more', nbr=len(temp)-MAX)]
                 text += "**" + await self.bot._(ctx.channel,'infos','usernames-local') + "**\n" + "\n".join(temp)
+            if len(text) == 0:
+                # no change known
+                text = await self.bot._(ctx.channel, 'infos', 'usernames-empty')
             await ctx.send(text)
 
 
