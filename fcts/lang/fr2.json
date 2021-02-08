@@ -114,6 +114,10 @@
                 "Les commandes de fun sont activées.",
                 "Les commandes de fun doivent être activées."
             ],
+            "is_halloween": [
+                "L'évènement halloween est là 🎃 ! Amuse-toi bien !",
+                "Il n'y a pas d'évènement Halloween pour le moment"
+            ],
             "is_owner": [
                 "Il faut être le propriétaire du bot !",
                 "T'es pas le proprio du bot..."
@@ -131,6 +135,7 @@
                 "Aucun rôle de vérification n'a été configuré"
             ]
         },
+        "cmd-count": "{nbr} de commandes",
         "cmd-not-found": "Aucune commande nommée \"{}\"... Tu as peut-être fait une PhotEuh D'Ortograff ?",
         "description": "Description",
         "embed_title": "Hey ! Voici la liste des commandes disponibles pour {u}",
@@ -167,6 +172,7 @@
         "events-desc": {
             "blurple-2020": "Discord a 5 ans maintenant, donc faut le célébrer, et pour ça... **BLURPLE EVENT !**\n\nPour la troisième année consécutive, je participe à l'event Blurple, qui consiste à recolorier nos avatars et serveurs avec un *maximum* de blurple, la couleur caractéristique de Discord, entre vioet et bleu.\n\nUtilise cette opportunité pour collecter des points d'évènement et essayer de gagner la carte spéciale d'XP Blurple 2020 !\n*On se rappelle, les cartes d'xp sont accessibles depuis la commande `profile card`.*",
             "christmas-2019": "Fête l'arrivée de Noël grâce à cet événement Zbot ! Pendant plusieurs jours, je vais prendre les couleurs de l'hiver avec des émojis spéciaux pour le jeu du morpion, un avatar unique *(le swag)* ainsi que d'autres choses hyper sympas. \n\nProfites-en pour récupérer des points d'événements et tente de gagner la carte d'xp spécial Noël 2019 ! Ah, et oublie pas, les cartes d'xp sont accessibles via ma commande `profile card`.",
+            "halloween-2020": "Octobre est là !\nAmuse toi jusqu'au premier Novembre avec une atmosphère sombre, pleine de chauve-souris, squelettes, et citrouilles...\n\nC'est aussi le moment de redécorer ton serveur aux couleurs de Halloween avec les commandes `halloween hallowify` et ses dérivées, checker si ton avatar marche avec la commande `halloween check`, et collecter des points chaque heure avec la commande `halloween collect`.\n\nPeut-être que les plus courageux d'entre vous arriveront à débloquer une carte d'XP spéciale Halloween, accessible via la commande `profile card` !",
             "nothing": "Il n'y a aucun événement en cours :neutral_face:. Suis les news du bot pour connaître la date du prochain !"
         },
         "events-price-title": "Le super prix délirant de la mort qui tue",
@@ -177,6 +183,7 @@
             "christmas-2019": {
                 "50": "Débloque la carte d'xp Noël 2k19 !"
             },
+            "halloween-2020": "{'200': 'Débloquez la carte d'XP spéciale Halloween ! En bonus, un rôle spécial sur notre serveur officiel...'}",
             "nothing": "Il n'y a rien à gagner pour cet événement :confused:\nFaut qu'on refasse des choses, nous."
         },
         "events-title": {
@@ -201,6 +208,7 @@
         "list-0": "**Type:** {T}\n**Moderateur:** {M}\n**Date:** {D}\n**Raison:** *{R}*",
         "list-1": "**Serveur:** {G}\n**Type:** {T}\n**Moderateur:** {M}\n**Date:** {D}\n**Raison:** *{R}*",
         "list-2": "\n**Durée :** {D}",
+        "no-case": "Cet utilisateur n'a pas de casier :D",
         "no-user": "Impossible de trouver cet utilisateur",
         "no_database": "En raison d'une panne temporaire de la base de donnée, cette commande a été désactivée",
         "not-found": "Ce casier n'a pas été trouvé :confused:",
@@ -221,6 +229,7 @@
         "disabled": "La commande {c} est désactivée",
         "duration": "La durée `{d}` est pas valide du tout du tout du tout !",
         "emojinotfound": "Je trouve pas l'Émoji `{e}` ! Où il s'est encore planqué ?",
+        "invalidcardstyle": "Heeeeeeeey !\nStyle de carte invalide (`{s}`) !",
         "invalidcolor": "La couleur `{c}` est invalide...",
         "invalidemoji": "Émoji invalide",
         "invalidguild": "Ce serv (`{g}`) est absolument intouvable...",
@@ -232,6 +241,7 @@
         "membernotfound": "Impossible de trouver le membre `{m}` :confused:",
         "missingargument": "Gnaaah ! Il manque l'argument \"{a}\" {e} !",
         "msgnotfound": "Ce message s'est perdu quelque part ! J'abandonne les recherches...",
+        "notrightroles": "Ptdr t'as pas le rôle qu'il faut pour cette commande",
         "rolenotfound": "Impossible de trouver ce p\\*\\*\\*\\* de rôle (`{r}`) !",
         "toomanytxtchan": "Tu as trop de salons textuels accessibles...",
         "unknown": "Wtf ?\nY'a eu une erreur 😠 😢 😕...\n\nRéessaie plus tard, ou contacte le support (commande `about`).",
@@ -280,6 +290,7 @@
         "fun-list": "Voici la liste des commandes fun dispos :",
         "invalid-city": "Nom de ville invalide",
         "markdown": "__**Règles du Markdown** sur *Discord*__\n\n`*italique*` = *italique*\n`__souligné__` = __souligné__\n`**gras**` = **gras**\n`***gras italique***` = ***gras italique***\n`~~barré~~` = ~~barré~~\n`__*souligné italique*__` = __*souligné italique*__\n`__**souligné gras**__` = __**souligné gras**__\n`__***souligné gras italique***__` = __***souligné gras italique***__\n`||spoiler||` = ||spoiler||\n> citation = `> citation`\n\\`code\\` = `code`\n\\\\ pour ignorer\n\nPour les blocs de code, cf <https://discord.gg/DGahTNn>",
+        "nasa-none": "Euuuuuuuh\nAlors\n\nJ'arrive pas à capter les infos de la NASA pour le moment.\nTu peux réessayer dans 2-3 minutes ?",
         "no-database": "Notre base de donnée étant hors ligne, l'accès aux commandes fun est restreint aux personnes ayant la permission de Gérer le Serveur",
         "no-embed-perm": "J'ai pas la perm \"Intégrer des liens\" :confused:",
         "no-emoji": "Impossible de trouver cet emoji !",
@@ -288,6 +299,7 @@
         "no-roll": "Aucun élément trouvé :rip: !",
         "no-say": "Impossible d'envoyer un message dans ce salon...",
         "no-voicechan": "Vous devez être connecté à un salon vocal pour utiliser cette commande.",
+        "not-enough-roll": "Il doit y avoir deux éléments distincts",
         "osekour": [
             "Attends, je finis de regarder mon film",
             "On arrive ! Mais pourquoi tu répondes plus ? Traaaaah, arrête, je sais que t'es pas mort !",
@@ -309,6 +321,7 @@
         "react-0": "Impossible de trouver le message correspondant. Il faut rentrer l'ID du message en 1er argument, et l'émoji en 2e :upside_down:\n Vérifie aussi que je possède la perm de lire l'historique des messages !",
         "reminds-asked": "Hey, {user} ! Tu m'as demandé de te rappeler ça il y a {duration} ! Un trou de mémoire ?",
         "reminds-date": "Date de demande",
+        "reminds-link": "Message original",
         "reminds-saved": "Oko 😁 ! Je te le rappellerai dans... Environ... 🕰️ {duration} !\n\n*Si j'oublie pas...*",
         "reminds-title": "Rappel",
         "reminds-too-long": "Wolalala 😬 !\n\nJe peux pas te le rappeler dans autant de temps, moi !\n\nTu t'es cru où ?!\n\nJ'ai pas autant de mémoire !",
@@ -343,9 +356,14 @@
             "Le saviez-vous ? Lors de certains événements spéciaux, il est possible d'obtenir des cartes d'xp collector. N'oubliez pas de suivre les news via le serveur officiel !",
             "> Cela aussi passera\n*(vous avez la référence ?)*"
         ],
+        "unafk-cant": "Mais... T'es pas AFK 🙄",
         "unafk-done": "Yeeeeeeeeeee ! De retour ! Fini l'AFK !",
         "uninhabited-city": "Endroit inhabité",
         "vote-0": "Tu... Sais que tu peux pas mettre plus de 20 choix, et encore moins un nombre négatif de choix ?"
+    },
+    "halloween": {
+        "got-points": "GG ! Tu as gagné **{pts} points d'évènement** !",
+        "too-quick": "C'est encore trop tôt xD\n\nTu ne peux récupérer tes points d'évènement qu'une fois par heure."
     },
     "infos": {
         "about-0": "Mon serveur Discord :",
@@ -374,6 +392,8 @@
             "Utilisation interdite de BetterDiscord"
         ],
         "docs": "Voici le lien vers la documentation du bot :",
+        "ping-found": "Pong !\nMoyenne de {tps}ms par 64 octets, envoyés à {url}.",
+        "ping-notfound": "Je peux pas ping cette addresse.",
         "prefix": "Liste des préfixes actuellement utilisables :",
         "stats": "**Version du bot :** {bot_v} \n**Nombre de serveurs :** {s_count} \n**Nombre de membres visibles :** {m_count} (dont {b_count} **bots**)\n**Nombre de lignes de code :** {l_count}\n**Langues utilisées :** {lang} \n**Version de Python :** {p_v} \n**Version de la bibliothèque `discord.py` :** {d_v} \n**Charge sur la mémoire vive :** {ram} GB \n**Charge sur le CPU :** {cpu} % \n**Temps de latence de l'api :** {api} ms\n**Nombre total d'xp gagné :** {xp}xp",
         "stats-title": "**Statistiques du bot**",
@@ -454,7 +474,15 @@
         ]
     },
     "library": {
-        "no-found": "Impossible de trouver un livre correspondant :rip:"
+        "author": "auteur",
+        "authors": "auteurs",
+        "language": "langue",
+        "no-found": "Impossible de trouver un livre correspondant :rip:",
+        "publisher": "éditeur",
+        "rate-limited": "Je ne peux pas chercher par nom pour le moment. Réessaie plus tard !",
+        "title": "titre",
+        "unknown": "inconnu",
+        "year": "année de parution"
     },
     "logs": {
         "ban": "{member} a été banni du serveur (raison : {reason} | casier #{case})",
@@ -532,6 +560,17 @@
             "Version d'ajout"
         ],
         "item-help": "Cette commande permet d'obtenir des informations sur n'importe quel item de Minecraft. Vous pouvez donner son nom complet ou partiel, en français ou en anglais, ou même son identifiant. Il suffit d'entrer `!mc item <nom>`",
+        "mod-fields": [
+            "Nom",
+            "Auteurs",
+            "Résumé 🧐",
+            "Langue principale",
+            "Dernière mise-à-jour",
+            "Téléchargements",
+            "Versions du jeu",
+            "ID"
+        ],
+        "mod-help": "Cette commande donne des infos sur un grand nombre de mods Minecraft.\nTu peux donner son nom complet ou partiel, entre simplement `{p}mc mod <nom>`.\nLe mod doit être enregistré sur CurseForge pour apparaître.",
         "mojang_desc": {
             "account.mojang.com": "Site de gestion des comptes Mojang",
             "api.mojang.com": "Service d'API fournit par Mojang",
@@ -547,14 +586,17 @@
             "Entité",
             "Item",
             "Commande",
-            "Progrès"
+            "Progrès",
+            "Mod"
         ],
         "no-adv": "Progrès introuvable",
         "no-api": "Erreur : Impossible de se connecter à l'API",
         "no-block": "Bloc introuvable",
         "no-cmd": "Commande introuvable",
+        "no-embed": "Impossible d'envoyer le résultat ! Donne moi la perm pour '*attacher des liens*' pour que je puisse te l'envoyer.",
         "no-entity": "Entité introuvable",
         "no-item": "Item introuvable",
+        "no-mod": "J'arrive pas à trouver ce mod. ¯\\_(ツ)_/¯",
         "no-ping": "Erreur : Impossible de ping ce serveur",
         "serv-0": "Nombre de joueurs",
         "serv-1": "Liste des 20 premiers joueurs connectés",
@@ -588,6 +630,8 @@
         "clear-0": "{} messages supprimés !",
         "clear-1": "Je ne peux pas supprimer si peu de messages",
         "clear-nt-found": "Hum... impossible de supprimer ces messages. Discord me dit qu'ils n'existent pas :thinking:",
+        "destop-guild": "Ce message n'appartient pas au serveur :D",
+        "destop-old": "Je peux pas supprimer des messages qui ont plus de {days} jours !",
         "em-list": "{} (`:{}:`) ajouté le {} {}",
         "em-list-title": "Emojis du serveur {}",
         "em-private": "[Restreint]",
@@ -605,8 +649,12 @@
         "missing-manage-nick": "Oups, il me manque la permission \"Gérer les pseudos\"",
         "missing-user-perms": "Wolala 😬 !\nIl te manque des perms (style, manager les roles, le serveur, ou les messages)",
         "mute-1": "Le membre {} a bien été réduit au silence pour la raison `{}` !",
+        "mute-config-err": "Euh...\nAlors, je peux pas faire ça.\n\nDonc va checker mes perms sur ce serveur, et ENSUITE tu réessaies.",
+        "mute-config-success": "Le rôle a été créé ET configuré avec succès :D ! ({c} salons ont pas pu êtres configurés, par manque de perms)",
+        "mute-config-success2": "Le rôle a été configuré avec succès :D ! ({c} salons ont pas pu êtres configurés, par manque de perms)",
         "mute-high": "Oups, il semble que le rôle `muted` soit trop haut pour que je puisse le donner... Veuillez fixer ce problème en plaçant mon rôle plus haut que le rôle `muted`.",
         "mute-notemp": "Tu as été mute sur le serv {server} parce que...\nBen...\n{reason}",
+        "mute-role-created": "Rôle `muted` configuré avec succès, chef !\nTu peux utiliser la commande `{p}mute-config` pour une config automatique de ton serveur.",
         "mute-temp": "Tu as été mute sur le serv {server} parce que...\nBen...\n{reason}\n\nEt ça va durer plus ou moins {duration} (sauf si un admin t'unmute)",
         "need-manage-messages": "Permission \"Gérer les messages\" manquante :confused:",
         "need-read-history": "Oups, il me manque la permission de \"Voir les anciens messages\" :confused: ",
@@ -812,6 +860,7 @@
         "invalid-link": "Oups, cette adresse url est invalide ou incomplète :confused:",
         "list": "*Entre le numéro du flux à modifier*\n\n**Lien - Type - Salon - Roles**\n",
         "list-result": "Type : {}\nSalon discord : {}\nURL/salon : {}\nPings : {}\nID : {}\nDernier post : {}",
+        "list-title": "Liste des flux rss du serveur {server}",
         "list2": "*Entre le numéro du flux à supprimer*\n\n**Lien - Type - Salon**\n",
         "mc": "Minecraft",
         "move-success": "Le flux RSS n°{} a bien été envoyé dans le salon {} !",
@@ -860,6 +909,7 @@
         "change-1": "Aw ! Une erreur interne est survenue... Réessaie ?\nSi ça marche pas, signale-le dans mon Discord. *(Tip : Tape `!about` pour en avoir le lien)*",
         "change-10": "Ce système d'xp n'existe pas. Pas la peine d'essayer. Et si tu la connais pas, voici la liste des systèmes disponibles :grin: ! {}",
         "change-11": "Euuuuuh... Cette couleur est invalide !",
+        "change-12": "J'ai pas trouvé la catégorie {}, désolé.",
         "change-2": "La valeur de l'option ('{}') a bien été effacée.",
         "change-3": "Meh ? Je trouve pas le rôle '{}' :blobconfused: (Tu peux vérifier les majuscules et les caractères spéciaux ?)",
         "change-4": "L'option '{}' attend un paramètre de type booléen (True/False) comme valeur :innocent: !",
@@ -870,6 +920,7 @@
         "change-9": "Je trouve pas l'émoji `{}` ! :eyes:",
         "change-autoremove_xp": "Le bot enlèvera {xp} points d'xp par jour aux membres inactifs. Quelle punition !",
         "change-bool": "L'option '{}' a bien été modifiée ! Maintenant, elle vaut \"*{}*\"",
+        "change-category": "L'option '{}' a été modifié avec la catégorie {}.",
         "change-color": "La couleur utilisée pour cette option ({}) est maintenant `{}`.",
         "change-emojis": "Les émojis pour l'option '{}' sont maintenant {}.",
         "change-lang": "Le bot parle maintenant `{}`. こんにちは！",
@@ -928,6 +979,10 @@
         "slowmode": "Liste des rôles qui peuvent utiliser les commandes 'slowmode' et 'freeze' : {}",
         "update_mentions": "Rôles mentionnés lors d'une mise à jour du bot : {}",
         "verification_role": "Rôles enlevés lorsqu'un joueur s'authentifie avec la commande `verify` : {}",
+        "voice_category": "Catégorie dans laquelle les chats vocaux vont être créés : {}",
+        "voice_channel": "Salons à partir duquel les chats vocaux vont être créés : {}",
+        "voice_channel_format": "Format du nom automatic des salons vocaux : {}",
+        "voice_roles": "Rôles donnés aux membres d'un salon vocal : {}",
         "vote_emojis": "Emojis utilisés pour les réactions de vote : {}",
         "warn": "Liste des rôles pouvant utiliser les commandes 'warn' et 'case' : {}",
         "welcome": "Message envoyé lorsqu'un membre arrive : {}",
@@ -958,6 +1013,7 @@
         "guild-14": "Limitations",
         "guild-14v": "Bitrate : {bit}kbps\nTaille de fichier : {fil}MB\nNombre d'émojis : {emo}",
         "guild-15": "Lien d'invitation",
+        "guild-16": "Statique : {s}/{l} | Animé : {a}/{l}",
         "guild-2": "Région",
         "guild-3": "Texte : {} | Vocal : {} ({} catégories)",
         "guild-4": "Membres connectés",
@@ -974,8 +1030,10 @@
             "DISCOVERABLE": "Affiché dans l'onglet Découverte",
             "FEATURABLE": "Affiché dans l'onglet Activité",
             "INVITE_SPLASH": "Fond d'écran d'invitation",
+            "MEMBER_VERIFICATION_GATE_ENABLED": "Portail de vérification des membres activé !",
             "NEWS": "Salons de news",
             "PARTNERED": "Serveur partenaire",
+            "PREVIEW_ENABLED": "Prévisualisation activée !",
             "PUBLIC": "Serveur public",
             "VANITY_URL": "Invitation custom",
             "VERIFIED": "Serveur vérifié",
@@ -1044,6 +1102,10 @@
         "missing-attach-files": "Oups, il me manque la permission d'Attacher des Fichiers :confused:",
         "usernames_log_false": "T'as désactivé l'enregistrement de vos noms d'utilisateurs ainsi que de vos surnoms",
         "usernames_log_true": "T'as autorisé l'enregistrement de vos noms d'utilisateurs ainsi que de vos surnoms"
+    },
+    "voices": {
+        "deleted": "{i} salons se sont pris une bombe nucléaire 👼",
+        "no-channel": "Y'a aucun salon vocal généré sur ce serveur, patate."
     },
     "xp": {
         "1-no-xp": "Hey ! T'as pas encore d'xp !",
@@ -1150,7 +1212,30 @@
             "cette baguette française",
             "ce fromage",
             "ce sac-à-dos",
-            "ce caillou"
+            "ce caillou",
+            "ventouse",
+            "brique",
+            "rouleau de PQ",
+            "séquoia",
+            "canard en plastique",
+            "dynamite",
+            "poney",
+            "robot",
+            "raquette de tennis",
+            "porte-clés Tour Eiffel",
+            "appartement",
+            "cristal magique",
+            "porte",
+            "clé USB",
+            "ampoule",
+            "grimoire",
+            "peluche",
+            "ours",
+            "bâton",
+            "chapeau de paille",
+            "coccinelle",
+            "parchemin",
+            "réservoir"
         ],
         "low-page": "Impossible d'afficher un numéro de page négatif !",
         "negative-xp": "Mais... Tu peux pas mettre de l'XP négative !",
