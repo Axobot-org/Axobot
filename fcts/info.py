@@ -426,10 +426,10 @@ Available types: member, role, user, emoji, channel, server, invite, category
             banned = None
         else:
             on_server = await self.bot._(ctx.guild.id,"keywords","non")
-            try:
-                banned: str = (await ctx.guild.fetch_ban(item)).reason
-            except (discord.Forbidden, discord.NotFound):
-                banned = None
+            # try:
+            #     banned = str((await ctx.guild.fetch_ban(item)).reason)
+            # except (discord.Forbidden, discord.NotFound):
+            #     banned = None
         embed = discord.Embed(colour=default_color, timestamp=ctx.message.created_at)
         embed.set_thumbnail(url=item.avatar_url_as(format='gif') if item.is_avatar_animated() else item.avatar_url_as(format='png'))
         embed.set_author(name=str(item), icon_url=item.avatar_url_as(format='png'))
@@ -458,8 +458,8 @@ Available types: member, role, user, emoji, channel, server, invite, category
                 embed.add_field(name=str(await self.bot._(ctx.guild.id,'keywords','servers')).capitalize(),value=guilds_count)
             await session.close()
         # ban reason
-        if banned:
-            embed.add_field(name=await self.bot._(ctx.guild.id, "stats_infos", "user-1"), value=banned.capitalize())
+        # if banned:
+        #     embed.add_field(name=await self.bot._(ctx.guild.id, "stats_infos", "user-1"), value=banned.capitalize())
         await ctx.send(embed=embed)
 
     async def emoji_infos(self, ctx: MyContext, item: discord.Emoji, lang: str):
