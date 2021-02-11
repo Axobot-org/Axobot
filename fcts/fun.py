@@ -399,6 +399,8 @@ You can specify a verification limit by adding a number in argument (up to 1.000
         await ctx.send(file=await self.utilities.find_img('gg.gif'))
     
     @commands.command(name="money",hidden=True)
+    @commands.cooldown(1, 15, commands.BucketType.user)
+    @commands.cooldown(10, 60, commands.BucketType.guild)
     @commands.check(is_fun_enabled)
     async def money(self,ctx: MyContext):
         """Money gif. Cuz we all love money, don't we?
