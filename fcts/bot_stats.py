@@ -32,8 +32,9 @@ class BotStats(commands.Cog):
     @commands.Cog.listener()
     async def on_command_completion(self, ctx: MyContext):
         """Called when a command is correctly used by someone"""
-        nbr = self.commands_uses.get(ctx.command.name, 0)
-        self.commands_uses[ctx.command.name] = nbr + 1
+        name = ctx.command.full_parent_name.split()[0] if ctx.command.parent is not None else ctx.command.name
+        nbr = self.commands_uses.get(name, 0)
+        self.commands_uses[name] = nbr + 1
         nbr = self.received_events.get('CMD_USE', 0)
         self.received_events['CMD_USE'] = nbr + 1
 
