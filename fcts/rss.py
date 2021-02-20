@@ -186,6 +186,8 @@ class Rss(commands.Cog):
                         emb.title = self.title
                     else:
                         emb.title = self.author
+                else:
+                    emb.title = self.embed_data['title']
                 emb.add_field(name='URL',value=self.url)
                 if self.image is not None:
                     emb.thumbnail = self.image
