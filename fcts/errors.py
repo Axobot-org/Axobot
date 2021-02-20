@@ -149,7 +149,8 @@ class Errors(commands.Cog):
             except Exception as newerror:
                 self.bot.log.info("[on_cmd_error] Can't send error on channel {}: {}".format(ctx.channel.id,newerror))
         # All other Errors not returned come here... And we can just print the default TraceBack.
-        self.bot.log.warning('Ignoring exception in command {}:'.format(ctx.message.content))      
+        self.bot.log.warning('Ignoring exception in command {}:'.format(
+            ctx.message.content), exc_info=(type(error), error, error.__traceback__))      
         await self.on_error(error,ctx)
 
     @commands.Cog.listener()
