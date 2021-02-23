@@ -72,7 +72,7 @@ class BotStats(commands.Cog):
             cpu = py.cpu_percent(interval=1)
             cursor.execute(
                 query, (now, 'perf.latency', latency, 1, 'ms', self.bot.beta))
-            cursor.execute(query, (now, 'perf.ram', ram, 1, '%', self.bot.beta))
+            cursor.execute(query, (now, 'perf.ram', ram, 1, 'Gb', self.bot.beta))
             cursor.execute(query, (now, 'perf.cpu', cpu, 1, '%', self.bot.beta))
             # Push everything
             cnx.commit()
