@@ -120,11 +120,14 @@ class Events(commands.Cog):
         """Send a log to the logging channel when the bot joins/leave a guild"""
         try:
             if Type == "join":
-                self.bot.log.info("Le bot a rejoint le serveur {}".format(guild.id))
-                desc = "Bot **joins the server** {} ({}) - {} users".format(guild.name,guild.id,len(guild.members))
+                self.bot.log.info("Bot joined the server {}".format(guild.id))
+                desc = "Bot **joined the server** {} ({}) - {} users".format(guild.name,guild.id,len(guild.members))
             else:
-                self.bot.log.info("Le bot a quitté le serveur {}".format(guild.id))
-                desc = "Bot **left the server** {} ({}) - {} users".format(guild.name,guild.id,len(guild.members))
+                self.bot.log.info("Bot left the server {}".format(guild.id))
+                if guild.name is None and guild.unavailable:
+                    desc = "Bot **may have left** the server {} (guild unavailable)".format(guild.id)
+                else:
+                    desc = "Bot **left the server** {} ({}) - {} users".format(guild.name,guild.id,len(guild.members))
             emb = self.bot.get_cog("Embeds").Embed(desc=desc,color=self.embed_colors['welcome']).update_timestamp().set_author(self.bot.user)
             await self.bot.get_cog("Embeds").send([emb])
             if self.bot.database_online:

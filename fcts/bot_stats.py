@@ -74,6 +74,13 @@ class BotStats(commands.Cog):
                 query, (now, 'perf.latency', latency, 1, 'ms', self.bot.beta))
             cursor.execute(query, (now, 'perf.ram', ram, 1, 'Gb', self.bot.beta))
             cursor.execute(query, (now, 'perf.cpu', cpu, 1, '%', self.bot.beta))
+            # Unavailable guilds
+            unav, total = 0, 0
+            for g in self.bot.guilds:
+                unav += g.unavailable
+                total += 1
+            cursor.execute(query, (now, 'guilds.unavailable', round(unav/total, 3)*100, 1, '%', self.bot.beta))
+            del unav, total
             # Push everything
             cnx.commit()
         except Exception as e:
