@@ -1,6 +1,7 @@
 from datetime import datetime, timezone
 import os
 from time import time
+from math import isinf
 from discord.ext import commands, tasks
 import psutil
 
@@ -70,8 +71,8 @@ class BotStats(commands.Cog):
             latency = round(self.bot.latency*1000, 3)
             ram = round(py.memory_info()[0]/2.**30, 3)
             cpu = py.cpu_percent(interval=1)
-            cursor.execute(
-                query, (now, 'perf.latency', latency, 1, 'ms', self.bot.beta))
+            if not isinf(latency):
+                cursor.execute(query, (now, 'perf.latency', latency, 1, 'ms', self.bot.beta))
             cursor.execute(query, (now, 'perf.ram', ram, 1, 'Gb', self.bot.beta))
             cursor.execute(query, (now, 'perf.cpu', cpu, 1, '%', self.bot.beta))
             # Unavailable guilds
