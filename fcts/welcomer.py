@@ -135,12 +135,18 @@ class Welcomer(commands.Cog):
             await member.guild.kick(member, reason=reason)
         except:
             pass
+        else:
+            log = str(await self.bot._(member.guild.id,"logs","kick")).format(member=member,reason=reason,case=None)
+            await self.bot.get_cog("Events").send_logs_per_server(member.guild,"kick",log,member.guild.me)
     
     async def ban(self, member: discord.Member, reason: str):
         try:
             await member.guild.ban(member, reason=reason)
         except:
             pass
+        else:
+            log = str(await self.bot._(member.guild.id,"logs","ban")).format(member=member,reason=reason,case=None)
+            await self.bot.get_cog("Events").send_logs_per_server(member.guild,"ban",log,member.guild.me)
 
     async def raid_check(self, member: discord.Member):
         # if guild is unavailable or the bot left the guild
