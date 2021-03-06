@@ -769,7 +769,7 @@ You can specify a verification limit by adding a number in argument (up to 1.000
                 if d_em is not None:
                     await msg.add_reaction(d_em)
                     count +=1
-            else:
+            elif len(r) > 0:
                 await msg.add_reaction(emojilib.emojize(r, use_aliases=True))
                 count +=1
         if count == 0:
