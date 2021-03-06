@@ -3,6 +3,7 @@ import os
 from time import time
 from discord.ext import commands, tasks
 import psutil
+import mysql
 
 from utils import MyContext, zbot
 
@@ -75,6 +76,8 @@ class BotStats(commands.Cog):
             cursor.execute(query, (now, 'perf.cpu', cpu, 1, '%', self.bot.beta))
             # Push everything
             cnx.commit()
+        except mysql.connector.errors.IntegrityError as e: # duplicate primary key
+            self.bot.log.warn(f"Stats loop cancelled: {e}")
         except Exception as e:
             await self.bot.get_cog("Errors").on_error(e)
         # if something goes wrong, we still have to close the cursor
