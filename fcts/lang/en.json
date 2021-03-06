@@ -863,6 +863,7 @@
         "list-title": "List of rss feeds from the server {server}",
         "list-result": "Type: {}\nDiscord channel: {}\nURL/Channel: {}\nMentions: {}\nIdentifier: {}\nLast post: {}",
         "list2": "*Type the number of the flow to delete*\n\n**Link - Type - Channel**\n",
+        "loop-processing": "A check of your RSS feeds is already in progress. Please wait a few minutes",
         "mc": "Minecraft",
         "move-success": "The rss feed #{} has been moved in the channel {}!",
         "no-db": "As the database is currently offline, this feature is temporarily disabled :confused:",

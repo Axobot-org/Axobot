@@ -669,6 +669,10 @@ class Rss(commands.Cog):
         
         ..Doc rss.html#reload-every-feed"""
         try:
+            if self.loop_processing:
+                await ctx.send(await self.bot._(ctx.guild.id, "rss", "loop-processing"))
+                ctx.command.reset_cooldown(ctx)
+                return
             t = time.time()
             msg = await ctx.send(str(await self.bot._(ctx.guild.id,"rss","guild-loading")).format(ctx.bot.get_cog('Emojis').customEmojis['loading']))
             liste = await self.get_guild_flows(ctx.guild.id)
