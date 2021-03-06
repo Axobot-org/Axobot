@@ -95,7 +95,8 @@ class Timers(commands.Cog):
             ctx2.message.content = item["message"]
             item["message"] = await commands.clean_content(fix_channel_mentions=True).convert(ctx2, item["message"])
             msg = item['message'] if len(item['message'])<=50 else item['message'][:47]+"..."
-            msg = "`"+msg.replace('`', '\\`')+"`"
+            msg = discord.utils.escape_markdown(msg).replace("\n", " ")
+            # msg = "\n```\n" + msg.replace("```", "​`​`​`") + "\n```"
             chan = '<#'+str(item['channel'])+'>'
             end = item["utc_begin"] + datetime.timedelta(seconds=item['duration'])
             duration = await time_delta(datetime.datetime.utcnow(), end, lang=lang, year=True, form="temp", precision=0)
