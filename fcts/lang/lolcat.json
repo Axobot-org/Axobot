@@ -860,6 +860,7 @@
         "list-title": "List ov cool followed from here ({server})",
         "list-result": "Type: {}\nDisc chan: {}\nLink/chan: {}\nPings: {}\nId: {}\nLast thing: {}",
         "list2": "*Type teh nmberZ ov the flowz 2 deletz*\n\n**Lnk - Tipe - Chanell**\n",
+        "loop-processing": "Cant u plz WAIT??? Me is BUSY DUH :angrycat:",
         "mc": "Minekrraft",
         "move-success": "Teh rsss feed #{} haz been movd in the chat {}!",
         "no-db": "As the databaz is auffline, dis feature iz temporarly disabled :confused:",
