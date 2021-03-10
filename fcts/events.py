@@ -472,17 +472,17 @@ class Events(commands.Cog):
         try:
             d = datetime.datetime.now()
             # Timed tasks - every 20s
-            if d.second%20 == 0:
+            if d.second%20 == 0 and self.bot.database_online:
                 await self.check_tasks()
             # Latency usage - every 30s
             if d.second%30 == 0:
                 await self.status_loop(d)
             # Clear old rank cards - every 20min
-            elif d.minute%20 == 0:
+            elif d.minute%20 == 0 and self.bot.database_online:
                 await self.bot.get_cog('Xp').clear_cards()
                 await self.rss_loop()
             # Partners reload - every 7h (start from 1am)
-            elif d.hour%7 == 1 and d.hour != self.partner_last_check.hour:
+            elif d.hour%7 == 1 and d.hour != self.partner_last_check.hour and self.bot.database_online:
                 await self.partners_loop()
             # Bots lists updates - every day
             elif d.hour == 0 and d.day != self.dbl_last_sending.day:
@@ -494,10 +494,10 @@ class Events(commands.Cog):
             elif int(d.hour)%12 == 0 and int(d.minute)%2 == 0 and (d.hour != self.last_eventDay_check.hour or d.day != self.last_eventDay_check.day):
                 await self.botEventLoop()
             # Send stats logs - every 1h (start from 0:05 am)
-            elif d.minute > 5 and (d.day != self.statslogs_last_push.day or d.hour != self.statslogs_last_push.hour):
+            elif d.minute > 5 and (d.day != self.statslogs_last_push.day or d.hour != self.statslogs_last_push.hour) and self.bot.database_online:
                 await self.send_sql_statslogs()
             # Refresh needed membercounter channels - every 1min
-            elif abs((self.last_membercounter - d).total_seconds()) > 60:
+            elif abs((self.last_membercounter - d).total_seconds()) > 60 and self.bot.database_online:
                 await self.bot.get_cog('Servers').update_everyMembercounter()
                 self.last_membercounter = d
         except Exception as e:
