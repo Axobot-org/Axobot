@@ -69,7 +69,7 @@ class Servers(commands.Cog):
                "vote_emojis":":thumbsup:;:thumbsdown:;",
                "morpion_emojis":":red_circle:;:blue_circle:;",
                "help_in_dm":0,
-               "muted_role":0,
+               "muted_role":"",
                "partner_channel":'',
                "partner_color":10949630,
                'partner_role':'',
