@@ -199,7 +199,9 @@ class zbot(commands.bot.AutoShardedBot):
     async def get_config(self, guildID: int, option: str) -> Optional[str]:
         cog = self.get_cog("Servers")
         if cog:
-            return await cog.get_option(guildID, option)
+            if self.database_online:
+                return await cog.get_option(guildID, option)
+            return cog.default_opt.get(option, None)
         return None
     
     @property
