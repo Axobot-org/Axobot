@@ -990,6 +990,10 @@ class Rss(commands.Cog):
             if session is None:
                 await _session.close()
             return None
+        except Exception as e:
+            if session is None:
+                await _session.close()
+            raise e
         if session is None:
             await _session.close()
         if cm.expired:
