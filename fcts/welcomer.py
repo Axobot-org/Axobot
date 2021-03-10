@@ -111,6 +111,8 @@ class Welcomer(commands.Cog):
 
     async def give_roles_back(self, member: discord.Member):
         """Give roles rewards/muted role to new users"""
+        if not self.bot.database_online:
+            return
         used_xp_type = await self.bot.get_config(member.guild.id,'xp_type')
         xp = await self.bot.get_cog('Xp').bdd_get_xp(member.id, None if used_xp_type == 0 else member.guild.id)
         if xp is not None and len(xp) == 1:
