@@ -356,7 +356,7 @@ Available types: member, role, user, emoji, channel, server, invite, category
             admin = await self.bot._(ctx.guild.id,"keywords","non")
         embed.add_field(name=await self.bot._(ctx.guild.id,"stats_infos","member-6"), value = admin.capitalize(),inline=True)
         # Infractions count
-        if critical_info and not item.bot:
+        if critical_info and not item.bot and self.bot.database_online:
             embed.add_field(name=await self.bot._(ctx.guild.id,"stats_infos","member-7"), value = await self.bot.get_cog('Cases').get_nber(item.id,ctx.guild.id),inline=True)
         # Guilds count
         if item.bot:
