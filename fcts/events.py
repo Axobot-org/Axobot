@@ -514,7 +514,6 @@ class Events(commands.Cog):
     async def before_loop(self):
         await self.bot.wait_until_ready()
         await asyncio.sleep(2)
-        await self.rss_loop()
         self.bot.log.info("[tasks_loop] Lancement de la boucle")
 
 
@@ -539,12 +538,6 @@ class Events(commands.Cog):
                     self.bot.log.debug(f"StatusPage API returned {r.status} for {params} (available RAM)")
             self.latencies_list = list()
             self.last_statusio = d
-
-    async def rss_loop(self):
-        return
-        # if self.bot.get_cog('Rss').last_update is None or (datetime.datetime.now() - self.bot.get_cog('Rss').last_update).total_seconds()  > 5*60:
-        #     self.bot.get_cog('Rss').last_update = datetime.datetime.now()
-        #     asyncio.run_coroutine_threadsafe(self.bot.get_cog('Rss').main_loop(),asyncio.get_running_loop())
     
     async def botEventLoop(self):
         self.bot.get_cog("BotEvents").updateCurrentEvent()
