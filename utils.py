@@ -7,6 +7,12 @@ import mysql
 from typing import Any, Callable, Optional, Coroutine
 
 
+OUTAGE_REASON = {
+    'fr': "Un des datacenters de notre hébergeur OVH a pris feu, rendant ,inaccessible le serveur et toutes ses données. Une vieille sauvegarde de la base de donnée sera peut-être utilisée ultérieurement. Plus d'informations sur https://zbot.statuspage.io/",
+    'en': "One of the datacenters of our host OVH caught fire, making the server and all its data inaccessible. An old backup of the database may be used later. More information on https://zbot.statuspage.io/"
+}
+
+
 class MyContext(commands.Context):
     """Replacement for the official commands.Context class
     It allows us to add more methods and properties in the whole bot code"""

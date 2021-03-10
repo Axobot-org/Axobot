@@ -4,7 +4,7 @@ from discord.ext import commands
 import copy
 import datetime
 
-from fcts import args
+from fcts import args, checks
 from utils import zbot, MyContext
 
 class Timers(commands.Cog):
@@ -39,6 +39,7 @@ class Timers(commands.Cog):
     @remind_main.command(name="create", aliases=["add"])
     @commands.cooldown(5,30,commands.BucketType.channel)
     @commands.cooldown(5,60,commands.BucketType.user)
+    @commands.check(checks.database_connected)
     async def remind_create(self, ctx: MyContext, duration: commands.Greedy[args.tempdelta], *, message):
         """Create a new reminder
         
@@ -58,9 +59,6 @@ class Timers(commands.Cog):
             return
         if duration > 60*60*24*365*2:
             await ctx.send(await self.bot._(ctx.channel, "fun", "reminds-too-long"))
-            return
-        if not self.bot.database_online:
-            await ctx.send(await self.bot._(ctx.channel, "rss", "no-db"))
             return
         f_duration = await ctx.bot.get_cog('TimeUtils').time_delta(duration,lang=await self.bot._(ctx.channel,'current_lang','current'), year=True, form='developed', precision=0)
         try:
