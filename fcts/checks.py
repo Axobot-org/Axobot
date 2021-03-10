@@ -96,7 +96,9 @@ async def verify_role_exists(ctx: MyContext) -> bool:
 
 async def database_connected(ctx: MyContext) -> bool:
     "Check if the database is online and accessible"
-    return ctx.bot.database_online
+    if ctx.bot.database_online:
+        return True
+    raise commands.CommandError("Database offline")
 
 
 async def is_fun_enabled(ctx: MyContext, self=None) -> bool:
