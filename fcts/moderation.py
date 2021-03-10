@@ -300,7 +300,7 @@ Slowmode works up to one message every 6h (21600s)
     async def get_muted_role(self, guild: discord.Guild):
         opt = await self.bot.get_config(guild.id,'muted_role')
         if not isinstance(opt,int):
-            return discord.utils.get(guild.roles,name="muted")
+            return discord.utils.find(lambda x: x.name.lower() == "muted", guild.roles)
         return guild.get_role(opt)
 
     async def mute_event(self, member:discord.Member, author:discord.Member, reason:str, caseID:int, duration:str=None):
@@ -312,6 +312,8 @@ Slowmode works up to one message every 6h (21600s)
         log = str(await self.bot._(member.guild.id,"logs","mute-on" if duration is None else "tempmute-on")).format(member=member,reason=reason,case=caseID,duration=duration)
         await self.bot.get_cog("Events").send_logs_per_server(member.guild,"mute",log,author)
         # save in database that the user is muted
+        if not self.bot.database_online:
+            return
         cnx = self.bot.cnx_frm
         cursor = cnx.cursor()
         query = "INSERT IGNORE INTO `mutes` VALUES (%s, %s, CURRENT_TIMESTAMP)"
@@ -321,7 +323,7 @@ Slowmode works up to one message every 6h (21600s)
 
     async def check_mute_context(self, ctx: MyContext, role: discord.Role, user: discord.Member):
         # if role in user.roles:
-        if await self.is_muted(ctx.guild.id, user.id):
+        if await self.is_muted(ctx.guild, user, role):
             await ctx.send(await self.bot._(ctx.guild.id,"modo","already-mute"))
             return False
         if not ctx.guild.me.guild_permissions.manage_roles:
@@ -439,6 +441,8 @@ You can also mute this member for a defined duration, then use the following for
         log = str(await self.bot._(guild.id,"logs","mute-off")).format(member=user)
         await self.bot.get_cog("Events").send_logs_per_server(guild, "mute", log, author)
         # remove the muted record in the database
+        if not self.bot.database_online:
+            return
         cnx = self.bot.cnx_frm
         cursor = cnx.cursor()
         query = "DELETE IGNORE FROM mutes WHERE userid=%s AND guildid=%s"
@@ -446,14 +450,16 @@ You can also mute this member for a defined duration, then use the following for
         cnx.commit()
         cursor.close()
     
-    async def is_muted(self, guildID: int, userID: int) -> bool:
+    async def is_muted(self, guild: discord.Guild, user: discord.User, role: typing.Optional[discord.Role]) -> bool:
         """Check if a user is currently muted"""
         if not self.bot.database_online:
-            return False
+            if role is None: return False
+            if not isinstance(user, discord.Member): return False
+            return role in user.roles
         cnx = self.bot.cnx_frm
         cursor = cnx.cursor(dictionary=True)
         query = "SELECT COUNT(*) AS count FROM `mutes` WHERE guildid=%s AND userid=%s"
-        cursor.execute(query, (guildID, userID))
+        cursor.execute(query, (guild.id, user.id))
         result: int = list(cursor)[0]['count']
         cursor.close()
         return bool(result)
@@ -471,7 +477,7 @@ This will remove the role 'muted' for the targeted member
 ..Doc moderator.html#mute-unmute"""
         role = await self.get_muted_role(ctx.guild)
         # if role not in user.roles:
-        if not await self.is_muted(ctx.guild.id, user.id):
+        if not await self.is_muted(ctx.guild, user, role):
             await ctx.send(await self.bot._(ctx.guild.id,"modo","already-unmute"))
             return
         if role is None:

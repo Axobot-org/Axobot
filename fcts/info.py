@@ -1090,6 +1090,8 @@ Servers:
     
     async def get_emojis_info(self, ID: typing.Union[int,list]):
         """Get info about an emoji"""
+        if not self.bot.database_online:
+            return list()
         if isinstance(ID,int):
             query = "Select * from `{}` WHERE `ID`={}".format(self.emoji_table,ID)
         else:
@@ -1203,6 +1205,7 @@ Servers:
             await ctx.send(desc)
 
     @commands.command(name="usernames", aliases=["username","usrnm"])
+    @commands.check(checks.database_connected)
     async def username(self, ctx: MyContext, *, user: discord.User=None):
         """Get the names history of an user
         Default user is you
