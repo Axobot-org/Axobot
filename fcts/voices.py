@@ -15,6 +15,11 @@ class VoiceChannels(commands.Cog):
         self.channels = dict()
         self.table = 'voices_chats'
         self.db_get_channels()
+    
+    @commands.Cog.listener()
+    async def on_ready(self):
+        if not self.bot.database_online:
+            self.bot.unload_extension("fcts.voices")
 
     def db_get_channels(self):
         if not self.bot.database_online:
@@ -188,4 +193,5 @@ class VoiceChannels(commands.Cog):
 
 
 def setup(bot):
-    bot.add_cog(VoiceChannels(bot))
+    if bot.database_online:
+        bot.add_cog(VoiceChannels(bot))
