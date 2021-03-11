@@ -877,7 +877,7 @@ Servers:
         rr_len = self.bot.get_cog("Servers").default_opt['rr_max_number'] if rr_len is None else rr_len
         rr_len = '{}/{}'.format(len(await self.bot.get_cog('Xp').rr_list_role(guild.id)),rr_len)
         # Prefix
-        pref = self.bot.get_cog('Utilities').find_prefix(guild)
+        pref = self.bot.get_prefix(ctx.message)[1]
         if "`" not in pref:
             pref = "`" + pref + "`"
         # Rss
