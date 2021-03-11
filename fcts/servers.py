@@ -221,6 +221,7 @@ class Servers(commands.Cog):
                     if v == '':
                         x[k] = self.default_opt[k]
             liste.append(x)
+        cursor.close()
         return liste    
 
     async def modify_server(self, ID: int, values=[()]):
