@@ -43,7 +43,7 @@ class MyContext(commands.Context):
         return await super().send(*args, **kwargs)
 
 
-def get_prefix(bot, msg: discord.Message) -> list:
+def get_prefix(bot:"zbot", msg: discord.Message) -> list:
     """Get the correct bot prefix from a message
     Prefix can change based on guild, but the bot mention will always be an option"""
     if bot.database_online:
@@ -60,7 +60,10 @@ def get_prefix(bot, msg: discord.Message) -> list:
             bot.log.warn("[get_prefix]", e)
             prefixes = ['!']
     else:
-        prefixes = ['!']
+        if cog := bot.get_cog("Servers"):
+            prefixes = [cog.default_opt.get("prefix")]
+        else:
+            prefixes = ['!']
     if msg.guild is None:
         prefixes.append("")
     return commands.when_mentioned_or(*prefixes)(bot, msg)
