@@ -555,7 +555,7 @@ You can specify a verification limit by adding a number in argument (up to 1.000
     @commands.command(name="thanos",hidden=True)
     @commands.check(is_fun_enabled)
     async def thanos(self, ctx: MyContext, *, name: str = None):
-        """SNAP! Will you be lucky enough ro survive?
+        """SNAP! Will you be lucky enough to survive?
         
         ..Doc fun.html#thanos"""
         name = name or ctx.author.mention
