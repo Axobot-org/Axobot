@@ -61,7 +61,7 @@ class Servers(commands.Cog):
                "noxp_channels":'',
                "xp_rate":1.0,
                "xp_type":0,
-               "anti_caps_lock":1,
+               "anti_caps_lock":0,
                "enable_fun":1,
                "prefix":'!',
                "membercounter":"",
