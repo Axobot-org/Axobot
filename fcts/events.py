@@ -480,7 +480,6 @@ class Events(commands.Cog):
             # Clear old rank cards - every 20min
             elif d.minute%20 == 0 and self.bot.database_online:
                 await self.bot.get_cog('Xp').clear_cards()
-                await self.rss_loop()
             # Partners reload - every 7h (start from 1am)
             elif d.hour%7 == 1 and d.hour != self.partner_last_check.hour and self.bot.database_online:
                 await self.partners_loop()
