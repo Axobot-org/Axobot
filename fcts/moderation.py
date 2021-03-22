@@ -1052,8 +1052,12 @@ You must be an administrator of this server to use this command.
                 for m in item.members:
                     if role not in m.roles:
                         n_users.add(m)
-        for user in n_users[:200]:
+        count = 0
+        for user in n_users:
+            if count > 200:
+                break
             await user.add_roles(role,reason="Asked by {}".format(ctx.author))
+            count += 1
         answer.append(await self.bot._(ctx.guild.id,"modo","give_roles-2",c=len(n_users)-error_count,m=len(n_users)))
         await ctx.send("\n".join(answer))
 
