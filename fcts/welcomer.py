@@ -123,10 +123,7 @@ class Welcomer(commands.Cog):
         modCog = self.bot.get_cog("Moderation")
         if not modCog or not self.bot.database_online:
             return
-        role = modCog.get_muted_role(member.guild)
-        if role is None:
-            return
-        if await modCog.is_muted(member.guild.id, member.id, role):
+        if await modCog.is_muted(member.guild, member, None):
             role = await modCog.get_muted_role(member.guild)
             if role:
                 try:
