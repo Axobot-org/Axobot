@@ -179,10 +179,6 @@ class Errors(commands.Cog):
                 await self.senf_err_msg(ctx.guild.name+" | "+ctx.channel.name+"\n"+msg)
         except Exception as e:
             self.bot.log.warn(f"[on_error] {e}", exc_info=True)
-        try:
-            traceback.print_exception(type(error), error, error.__traceback__, file=sys.stderr)
-        except Exception as e:
-            self.bot.log.warning(f"[on_error] {e}", exc_info=True)
 
 
     async def senf_err_msg(self, msg: str):
