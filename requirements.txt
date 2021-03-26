@@ -1,4 +1,4 @@
-discord.py>=1.5
+discord.py>=1.6
 aiohttp
 mysql-connector-python
 git+https://github.com/ZRunner/fr-mc-python-lib
@@ -8,7 +8,7 @@ geocoder
 tzwhere
 python-twitter>=3.5
 isbnlib
-pytz>=2020.4
-psutil>=5.7
+pytz
+psutil>=5.8
 speedtest-cli
 feedparser>=6.0
