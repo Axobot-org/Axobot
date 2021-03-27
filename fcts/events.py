@@ -580,16 +580,16 @@ class Events(commands.Cog):
         except Exception as e:
             answers[1] = "0"
             await self.bot.get_cog("Errors").on_error(e,None)
-        try: # https://botlist.space/bot/486896267788812288
+        try: # https://discordlist.space/bot/486896267788812288
             payload = json.dumps({
             'server_count': guildCount
             })
             headers = {
-                'Authorization': self.bot.others['botlist.space'],
+                'Authorization': self.bot.others['discordlist.space'],
                 'Content-Type': 'application/json'
             }
-            async with session.post('https://api.botlist.space/v1/bots/{}'.format(self.bot.user.id), data=payload, headers=headers) as resp:
-                self.bot.log.debug('botlist.space returned {} for {}'.format(resp.status, payload))
+            async with session.post('https://api.discordlist.space/v1/bots/{}'.format(self.bot.user.id), data=payload, headers=headers) as resp:
+                self.bot.log.debug('discordlist.space returned {} for {}'.format(resp.status, payload))
                 answers[2] = resp.status
         except Exception as e:
             answers[2] = "0"
