@@ -359,6 +359,9 @@ You can also mute this member for a defined duration, then use the following for
 ..Doc moderator.html#mute-unmute"""
         duration = sum(time)
         if duration > 0:
+            if duration > 60*60*24*365*3: # max 3 years
+                await ctx.send(await self.bot._(ctx.channel, "fun", "reminds-too-long"))
+                return
             f_duration = await self.bot.get_cog('TimeUtils').time_delta(duration,lang=await self.bot._(ctx.guild,'current_lang','current'),form='temp',precision=0)
         else:
             f_duration = None
@@ -550,6 +553,9 @@ The 'days_to_delete' option represents the number of days worth of messages to d
         try:
             duration = sum(time)
             if duration > 0:
+                if duration > 60*60*24*365*20: # max 20 years
+                    await ctx.send(await self.bot._(ctx.channel, "fun", "reminds-too-long"))
+                    return
                 f_duration = await self.bot.get_cog('TimeUtils').time_delta(duration,lang=await self.bot._(ctx.guild,'current_lang','current'),form='temp',precision=0)
             else:
                 f_duration = None
