@@ -92,7 +92,7 @@ def main():
             'consumer_secret':cryptage.uncrypte(r[10]),
             'access_token_key':cryptage.uncrypte(r[11]),
             'access_token_secret':cryptage.uncrypte(r[12])}
-        client.others['botlist.space'] = cryptage.uncrypte(r[13])
+        client.others['discordlist.space'] = cryptage.uncrypte(r[13])
         client.others['discordboats'] = cryptage.uncrypte(r[14])
         client.others['discordextremelist'] = cryptage.uncrypte(r[15])
         client.others['statuspage'] = cryptage.uncrypte(r[16])
