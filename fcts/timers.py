@@ -57,7 +57,7 @@ class Timers(commands.Cog):
         if duration < 1:
             await ctx.send(await self.bot._(ctx.channel, "fun", "reminds-too-short"))
             return
-        if duration > 60*60*24*365*2:
+        if duration > 60*60*24*365*5:
             await ctx.send(await self.bot._(ctx.channel, "fun", "reminds-too-long"))
             return
         f_duration = await ctx.bot.get_cog('TimeUtils').time_delta(duration,lang=await self.bot._(ctx.channel,'current_lang','current'), year=True, form='developed', precision=0)
