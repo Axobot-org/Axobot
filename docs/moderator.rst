@@ -188,9 +188,9 @@ This option allows you to moderate the entry of your server, with several levels
 
 * 0 (None): no filter
 * 1 (Smooth): kick members with invitations in their nickname
-* 2 (Careful): kick accounts created less than 5min before
-* 3 (High): ban members with invitations in their nickname, and kick accounts created less than 30min before
-* 4 ((╯°□°）╯︵ ┻━┻): ban members created less than 30min before, and kick those created less than 2h before
+* 2 (Careful): kick accounts created less than 15min before
+* 3 (High): ban members with invitations in their nickname, and kick accounts created less than 45min before
+* 4 ((╯°□°）╯︵ ┻━┻): ban members created less than 1 hour before, and kick those created less than 2 hours before
 
 .. note:: Note that the levels are cumulative: level 3 will also have the specificities of levels 1 and 2
 
