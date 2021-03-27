@@ -550,7 +550,7 @@ class Events(commands.Cog):
         if self.bot.beta:
             return
         t = time.time()
-        answers = ['None','None','None','None','None', 'None']
+        answers = ['None' for _ in range(4)]
         self.bot.log.info("[DBL] Envoi des infos sur le nombre de guildes...")
         try:
             guildCount = await self.bot.get_cog('Info').get_guilds_count()
@@ -605,17 +605,6 @@ class Events(commands.Cog):
         except Exception as e:
             answers[3] = "0"
             await self.bot.get_cog("Errors").on_error(e,None)
-        try: # https://arcane-center.xyz/bot/486896267788812288
-            headers = {
-                'Authorization': self.bot.others['arcanecenter'],
-                'Content-Type': 'application/json'
-            }
-            async with session.post('https://arcane-center.xyz/api/{}/stats'.format(self.bot.user.id), data=payload, headers=headers) as resp:
-                self.bot.log.debug('Arcane Center returned {} for {}'.format(resp.status, payload))
-                answers[4] = resp.status
-        except Exception as e:
-            answers[4] = "0"
-            await self.bot.get_cog("Errors").on_error(e,None)
         try: # https://api.discordextremelist.xyz/v2/bot/486896267788812288/stats
             payload = json.dumps({
                 'guildCount': guildCount
@@ -628,7 +617,7 @@ class Events(commands.Cog):
                 self.bot.log.debug('DiscordExtremeList returned {} for {}'.format(resp.status, payload))
                 answers[5] = resp.status
         except Exception as e:
-            answers[5] = "0"
+            answers[4] = "0"
             await self.bot.get_cog("Errors").on_error(e,None)
         await session.close()
         answers = [str(x) for x in answers]

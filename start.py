@@ -85,7 +85,6 @@ def main():
             r.remove('')
         for e,s in enumerate(['user','password','host','database1','database2']):
             client.database_keys[s] = cryptage.uncrypte(r[e])
-        client.others['arcanecenter'] = cryptage.uncrypte(r[5])
         client.others['botsondiscord'] = cryptage.uncrypte(r[6])
         client.others['discordbotsgroup'] = cryptage.uncrypte(r[7])
         client.others['bitly'] = cryptage.uncrypte(r[8])
