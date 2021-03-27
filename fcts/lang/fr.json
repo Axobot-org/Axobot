@@ -245,7 +245,7 @@
         "missingargument": "Oups, il manque l'argument \"{a}\" {e}",
         "msgnotfound": "Message introuvable",
         "nodb-1": "La base de donnée étant actuellement hors ligne, cette fonctionnalité est temporairement désactivée :confused:\nRendez-vous sur discord.gg/N55zY88 pour plus d'informations",
-        "nodb-2": "La base de donnée étant actuellement hors ligne, cette fonctionnalité est temporairement désactivée :confused:\n{explications}",
+        "nodb-2": "La base de donnée étant actuellement hors ligne, cette fonctionnalité est temporairement désactivée :confused:\n{reason}",
         "notrightroles": "Vous n'avez pas les rôles nécessaires pour cette commande",
         "quoteserror": "Oups, une erreur de guillemets est survenue. Assurez-vous de bien utiliser les guillemets \", de manière à ce que chaque guillemet ouvert soit fermé plus loin",
         "rolenotfound": "Impossible de trouver le rôle `{r}`",
