@@ -1,4 +1,4 @@
-from typing import Tuple
+from typing import Dict, Optional, Tuple, List, Union
 from discord.ext import commands
 import discord
 import re
@@ -467,6 +467,23 @@ You can also mute this member for a defined duration, then use the following for
         cursor.close()
         return bool(result)
 
+    async def bdd_muted_list(self, guildID: int, reasons: bool = False) -> Union[List[Dict[int, str]], List[int]]:
+        """List muted users for a specific guild
+        Set 'reasons' to True if you want the attached reason"""
+        cnx = self.bot.cnx_frm
+        cursor = cnx.cursor(dictionary=True)
+        if reasons:
+            cases_table = "cases_beta" if self.bot.beta else "cases"
+            query = f'SELECT userid, (SELECT reason FROM {cases_table} WHERE {cases_table}.user=userid AND {cases_table}.guild=guildid AND {cases_table}.type="mute" ORDER BY `{cases_table}`.`created_at` DESC LIMIT 1) as reason FROM `mutes` WHERE guildid=%s'
+            cursor.execute(query, (guildID,))
+            result = {row['userid']: row['reason'] for row in cursor}
+        else:
+            query = 'SELECT userid FROM `mutes` WHERE guildid=%s'
+            cursor.execute(query, (guildID,))
+            result = [row['userid'] for row in cursor]
+        cursor.close()
+        return result
+
     @commands.command(name="unmute")
     @commands.cooldown(5,20, commands.BucketType.guild)
     @commands.guild_only()
@@ -765,8 +782,9 @@ You must be an administrator of this server to use this command.
                 return
         try:
             liste = await ctx.guild.bans()
-        except:
-            await ctx.send(await self.bot._(ctx.guild.id,"modo","error"))
+        except Exception as e:
+            await ctx.send(await self.bot._(ctx.guild.id, "modo", "error"))
+            await self.bot.get_cog["Errors"].on_command_error(ctx, e)
             return
         desc = list()
         if len(liste) == 0:
@@ -792,6 +810,57 @@ You must be an administrator of this server to use this command.
         except discord.errors.HTTPException as e:
             if e.code==400:
                 await ctx.send(await self.bot._(ctx.guild.id,"modo","ban-list-error"))
+
+
+    @commands.command(name="mutelist")
+    @commands.guild_only()
+    @commands.check(checks.can_mute)
+    async def mutelist(self, ctx: MyContext, reasons:bool=True):
+        """Check the list of currently muted members.
+The 'reasons' parameter is used to display the mute reasons.
+
+..Doc moderator.html#mutelist"""
+        try:
+            liste = await self.bdd_muted_list(ctx.guild.id, reasons=reasons)
+        except Exception as e:
+            await ctx.send(await self.bot._(ctx.guild.id, "modo", "error"))
+            await self.bot.get_cog["Errors"].on_command_error(ctx, e)
+            return
+        desc = list()
+        title = await self.bot._(ctx.guild.id, "modo", "mute-list-title-0", guild=ctx.guild.name)
+        if len(liste) == 0:
+            desc.append(await self.bot._(ctx.guild.id, "modo", "no-mutes"))
+        elif reasons:
+            _unknown = (await self.bot._(ctx.guild, "keywords", "unknown")).capitalize()
+            for userid, reason in liste.items():
+                user: Optional[discord.User] = self.bot.get_user(userid)
+                if user is None:
+                    continue
+                if len(desc) >= 45:
+                    break
+                _reason = reason if (
+                    reason is not None and reason != "Unspecified") else _unknown
+                desc.append("{}  *({})*".format(user, _reason))
+            if len(liste) > 45: # overwrite title with limit
+                title = await self.bot._(ctx.guild.id, "modo", "mute-list-title-1", guild=ctx.guild.name)
+        else:
+            for userid in liste[:45]:
+                user: Optional[discord.User] = self.bot.get_user(userid)
+                if user is None:
+                    continue
+                if len(desc) >= 60:
+                    break
+                desc.append(str(user))
+            if len(liste) > 60: # overwrite title with limit
+                title = await self.bot._(ctx.guild.id, "modo", "mute-list-title-2", guild=ctx.guild.name)
+        embed = ctx.bot.get_cog('Embeds').Embed(title=title, color=self.bot.get_cog(
+            "Servers").embed_color, desc="\n".join(desc), time=ctx.message.created_at)
+        await embed.create_footer(ctx)
+        try:
+            await ctx.send(embed=embed  , delete_after=20)
+        except discord.errors.HTTPException as e:
+            if e.code == 400:
+                await ctx.send(await self.bot._(ctx.guild.id, "modo", "ban-list-error"))
 
 
     @commands.group(name="emoji",aliases=['emojis', 'emote'])
