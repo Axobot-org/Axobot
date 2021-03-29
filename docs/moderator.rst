@@ -120,17 +120,17 @@ The persons authorized to use this command are the same as for the `ban <#ban>`_
 
 .. warning:: For both commands to succeed, the bot must have "`Ban members <perms.html#ban-members>`_" permissions (as well as be placed higher than the highest role of the member to ban).
 
--------
-Banlist
--------
+----------------
+Banlist/Mutelist
+----------------
 
-**Syntax:** :code:`banlist`
+**Syntax:** :code:`banlist` *or* :code:`mutelist`
 
-If you ban so many people that you don't remember the exact list, and you have the laziness to look in your server options, this command will be happy to refresh your memory without too much effort.
+If you mute and ban so many people that you don't remember the exact list, and you have the laziness to look in your server options, this command will be happy to refresh your memory without too much effort.
 
-The 'reasons' argument allows you to display or not the reasons for the bans.
+The 'reasons' argument allows you to display or not the reasons for the sanction.
 
-.. note:: Note that this command will be deleted after 15 minutes, because privacy is private, and because we like privacy, it is only available for your server administrators. Ah, and Discord also likes privacy, so the bot can't read this list if he doesn't have permission to "`ban people <perms.html#ban-members>`_".
+.. note:: Note that this command will be deleted after 20 seconds, because privacy is private, and because we like privacy, it is only available for your server administrators for `banlist` and your moderators for `mutelist`. Ah, and Discord also likes privacy, so the bot can't read this list if he doesn't have permission to "`ban people <perms.html#ban-members>`_".
 
 --------------
 Handling cases
