@@ -4,8 +4,9 @@ import asyncio
 import time
 import emoji as emojilib
 from discord.ext import commands
-from utils import zbot, MyContext
 
+from utils import zbot, MyContext
+from fcts.checks import is_ttt_enabled
 
 class Morpions(commands.Cog):
 
@@ -13,9 +14,16 @@ class Morpions(commands.Cog):
         self.bot = bot
         self.file = 'morpions'
         self.in_game = dict()
+        self.types = "disabled", "short", "normal"
 
+    async def get_ttt_mode(self, ctx: MyContext) -> int:
+        """Get the used mode for a specific context"""
+        if ctx.guild is None:
+            return 2
+        return await ctx.bot.get_config(ctx.guild.id, "ttt_display")
 
     @commands.command(name="tic-tac-toe", aliases=['morpion', 'tictactoe', 'ttt'])
+    @commands.check(is_ttt_enabled)
     async def main(self, ctx: MyContext, leave: str = None):
         """A simple mini-game that consists of aligning three chips on a 9-square grid.
     The bot plays in red, the user in blue.
@@ -34,23 +42,24 @@ class Morpions(commands.Cog):
             await ctx.send(await self.bot._(ctx.channel, 'morpion', 'already-playing'))
             return
         self.in_game[ctx.author.id] = time.time()
-        game = self.Game(ctx, self)
-        await game.get_emojis()
+        game = self.Game(ctx, self, await self.get_ttt_mode(ctx))
+        await game.init_emojis()
         await game.start()
         self.in_game.pop(ctx.author.id, None)
 
     class Game():
 
-        def __init__(self, ctx: MyContext, Cog):
+        def __init__(self, ctx: MyContext, Cog, mode: int):
             self.cog = Cog
             self.ctx = ctx
             self.bot = ctx.bot
+            self.mode = mode
             self.emojis = list()
             self.entrees_valides = [str(x) for x in range(1, 10)]
             self.compositions_gagnantes = [[0, 1, 2], [3, 4, 5], [6, 7, 8], [
                 0, 3, 6], [1, 4, 7], [2, 5, 8], [0, 4, 8], [2, 4, 6]]
 
-        async def get_emojis(self):
+        async def init_emojis(self):
             if self.bot.current_event == 'halloween':
                 self.emojis = ["🎃", ":bat:"]
             if self.bot.current_event == "christmas":
@@ -123,16 +132,21 @@ class Morpions(commands.Cog):
                 def check(m):
                     return m.channel == ctx.channel and m.author == ctx.author
                 display_grille = True
+                last_grid = None
                 while await self.test_cases_vides(grille):
                     if ctx.author.id not in self.cog.in_game.keys():
                         return
+                    
                 ###
                     if tour == True:  # Si c'est au joueur
                         if display_grille:
-                            await ctx.send(await self.afficher_grille(grille))
+                            # if needed, clean the messages
+                            if self.mode == 1 and last_grid:
+                                await last_grid.delete()
+                            last_grid = await ctx.send(await self.afficher_grille(grille))
                         display_grille = True
                         try:
-                            msg = await self.bot.wait_for('message', check=check, timeout=50)
+                            msg: discord.Message = await self.bot.wait_for('message', check=check, timeout=50)
                         except asyncio.TimeoutError:
                             await ctx.channel.send(await self.bot._(ctx.channel, 'morpion', 'too-late'))
                             return
@@ -141,6 +155,7 @@ class Morpions(commands.Cog):
                             if await self.test_place_valide(grille, saisie) == True:
                                 grille = await self.remplacer_valeur(grille, tour, saisie)
                                 tour = False
+                                await msg.delete(delay=0.1)
                             else:
                                 await ctx.send(await self.bot._(ctx.channel, 'morpion', 'pion-1'))
                                 display_grille = False
@@ -178,6 +193,9 @@ class Morpions(commands.Cog):
                         match_nul = False
                         break
                 ###
+                # if needed, clean the messages
+                if self.mode == 1 and last_grid:
+                    await last_grid.delete()
                 if match_nul:
                     await self.bot.get_cog("Utilities").add_user_eventPoint(ctx.author.id, 1)
                     resultat = await self.bot._(ctx.channel, 'morpion', 'nul')

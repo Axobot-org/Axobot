@@ -100,6 +100,7 @@ List of every option
 * voice_channel: Channel used by the automated voice channels system (see `below <server.html#voice-channels-managment>`_)
 * voice_category: Category used by the automated voice channels system (see `below <server.html#voice-channels-managment>`_)
 * voice_channel_format: Name format used by the automated voice channels system (see `below <server.html#voice-channels-managment>`_)
+* ttt_display: How to use the tic-tac-toe game. "Disabled" will prevent your users from playing it, "normal" will use it as usual and "short" will avoid spam messages.
 
 
 ---------

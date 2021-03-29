@@ -111,6 +111,14 @@
                 "Fun commands are enabled",
                 "Fun commands must be enabled"
             ],
+            "is_halloween": [
+                "The :ghost: season is therr!",
+                "There are no ghosts at the moment"
+            ],
+            "is_ttt_enabled": [
+                "!ttt iz enabled",
+                "Ewe, !ttt is disabled, use !config for dat"
+            ],
             "is_owner": [
                 "You must be the owner of the bot",
                 "You are not the owner of the bot"
@@ -915,6 +923,7 @@
         "change-10": "Tihs xp system don't exist. Here is teh list ov availble systems: {}",
         "change-11": "This coulor is sadly invalid",
         "change-12": "Dat {} category couldnt not be found",
+        "change-13": "Uh no, dat mod doesnt exist. Pls try one of the followin: {}",
         "change-2": "The '{}' opshun value haz been deleted",
         "change-3": "Teh role '{}' waz not findz :innocent: (Check upper caze and special characters)",
         "change-4": "Teh '{}' opshun expects a boolean (True/False) parameter in value :innocent:",
@@ -938,6 +947,7 @@
         "change-role": "The '{}' option haz been edted with teh following rolz: {}",
         "change-text": "Teh opshun '{}' haz been replacd by the followin txt: \n```\n{}\n```",
         "change-textchan": "The '{}' opshun has been modifid wif teh channelz {}",
+        "change-tttdisplay": "Hey great, !ttt will naw use {} mod<",
         "change-xp": "Da xp system uzed is naw {}",
         "change-xp_rate": "The xP rate iz now @ {rate}",
         "config-help": "Dis cmd is mainly usd 2 configur ur srver. By doin `!config see [option]` u will get overview ov teh currnt configuraishun, and supr cool servr masters can enter `!config change <option> val1 , val2, val4...` to modify configuraishun, or `!config del <option>` 2 reset teh option (`!config change <option>` works same).\nTeh list ov options is displayd at <https://zbot.rtfd.io/en/latest/server.html#list-of-every-option>",
@@ -982,6 +992,7 @@
         "save_roles": "Can role bee save:b: wHen an membr leive, in case him retrns? {}",
         "say": "Lizt of Rawles dat can wuse teh comnd 'say' : {}",
         "slowmode": "Llst of rolz that ca' use 'slowmode' and 'freeze' commmandz: {}",
+        "ttt_display": "How'll use titcattoe: {}",
         "update_mentions": "Roles pinged on teh bot changlog: {}",
         "verification_role": "Roles removd when smone use !verify itself: {}",
         "voice_roles": "Roles gave to folks speaking together (or alone, I don't minde uwu): {}",
