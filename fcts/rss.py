@@ -65,6 +65,7 @@ class Rss(commands.Cog):
         self.bot = bot
         self.time_loop = 20 # min minutes between two rss loops
         self.time_between_flows_check = 0.15 # seconds between two rss checks within a loop
+        self.max_messages = 20 # max messages sent per flow per loop
         
         self.file = "rss"
         self.embed_color = discord.Color(6017876)
@@ -1524,21 +1525,21 @@ class Rss(commands.Cog):
             if isinstance(objs,(str,type(None),int)) or len(objs) == 0:
                 return True
             elif type(objs) == list:
-                for o in objs:
+                for o in objs[:self.max_messages]:
                     guild = self.bot.get_guild(flow['guild'])
                     if guild is None:
-                        self.bot.log.info("[send_rss_msg] Can not send message on server {} (unknown)".format(flow['guild']))
+                        self.bot.log.info("[send_rss_msg] Cannot send message on server {} (unknown)".format(flow['guild']))
                         return False
                     chan = guild.get_channel(flow['channel'])
                     if guild is None:
-                        self.bot.log.info("[send_rss_msg] Can not send message on channel {} (unknown)".format(flow['channel']))
+                        self.bot.log.info("[send_rss_msg] Cannot send message on channel {} (unknown)".format(flow['channel']))
                         return False
                     o.format = flow['structure']
                     o.embed = flow['use_embed']
                     o.fill_embed_data(flow)
-                    await o.fill_mention(guild,flow['roles'].split(';'), self.bot._)
-                    await self.send_rss_msg(o,chan,flow['roles'].split(';'), send_stats)
-                await self.update_flow(flow['ID'], [('date',o.date)],)
+                    await o.fill_mention(guild, flow['roles'].split(';'), self.bot._)
+                    await self.send_rss_msg(o, chan, flow['roles'].split(';'), send_stats)
+                await self.update_flow(flow['ID'], [('date', o.date)],)
                 return True
             else:
                 return True
@@ -1615,16 +1616,6 @@ class Rss(commands.Cog):
     async def before_printer(self):
         """Wait until the bot is ready"""
         await self.bot.wait_until_ready()
-
-    # async def loop(self):
-    #     await self.bot.wait_until_ready()
-    #     await asyncio.sleep(0.5)
-    #     await self.loop_child()
-    #     await asyncio.sleep((int(datetime.datetime.now().minute)%self.time_loop)*60-2)
-    #     while not self.bot.is_closed():
-    #         if int(datetime.datetime.now().minute)%self.time_loop == 0:
-    #             await self.loop_child()
-    #             await asyncio.sleep((int(datetime.datetime.now().minute)%self.time_loop)*60-5)
 
 
     @commands.command(name="rss_loop",hidden=True)
