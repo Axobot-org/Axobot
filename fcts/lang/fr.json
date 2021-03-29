@@ -115,6 +115,10 @@
                 "L'événement Halloween est en cours, profitez-en !",
                 "Il n'y a aucun événement de type Halloween actuellement"
             ],
+            "is_ttt_enabled": [
+                "Le jeu du morpion est activé",
+                "Le jeu du morpion doit être activé sur ce serveur"
+            ],
             "is_owner": [
                 "Il faut être le propriétaire du bot",
                 "Vous n'êtes pas le propriétaire du bot"
@@ -929,6 +933,7 @@
         "change-10": "Ce système d'xp n'existe pas. Voici la liste des systèmes disponibles : {}",
         "change-11": "Cette couleur est invalide",
         "change-12": "La catégorie {} n'a pas été trouvée",
+        "change-13": "Ce mode d'utilisation n'existe pas. Voici la liste des modes disponibles : {}",
         "change-2": "La valeur de l'option '{}' a bien été effacée",
         "change-3": "Le rôle '{}' n'a pas été trouvé :confused: (Vérifiez les majuscules et les caractères spéciaux)",
         "change-4": "L'option '{}' attend un paramètre de type booléen (True/False) en valeur :innocent:",
@@ -952,6 +957,7 @@
         "change-role": "L'option '{}' a bien été modifiée avec les rôles suivants : {}",
         "change-text": "L'option '{}' a bien été remplacée par le texte suivant : \n```\n{}\n```",
         "change-textchan": "L'option '{}' a bien été modifiée avec les salons {}",
+        "change-tttdisplay": "L'utilisation du jeu du morpion est maintenant définie à {}",
         "change-xp": "Le type d'xp utilisé est maintenant {}",
         "change-xp_rate": "Le modificateur d'xp est maintenant à {rate}",
         "config-help": "Cette commande sert principalement à configurer votre serveur. En faisant `!config see [option]` vous obtiendrez l'aperçu des configurations actuelles, et les administrateurs du serveur peuvent entrer `!config change <option> valeur1, valeur2...` pour modifier une configuration, ou `!config del <option>` pour réinitialiser l'option (`!config change <option> del` fonctionne de même).\nLa liste des options disponible est accessible à l'adresse <https://zbot.rtfd.io/en/latest/server.html#list-of-every-option>",
@@ -996,6 +1002,7 @@
         "save_roles": "Les rôles doivent-ils être sauvegardés lorsqu'un membre part, au cas où il revienne ? {}",
         "say": "Liste des rôles qui peuvent utiliser la commande 'say' : {}",
         "slowmode": "Liste des rôles qui peuvent utiliser les commandes 'slowmode' et 'freeze' : {}",
+        "ttt_display": "Mode d'utilisation du morpion : {}",
         "update_mentions": "Rôles mentionnés lors d'une mise à jour du bot : {}",
         "verification_role": "Rôles enlevés lorsqu'un joueur s'authentifie avec la commande `verify` : {}",
         "voice_roles": "Rôles donné aux membre en vocal : {}",

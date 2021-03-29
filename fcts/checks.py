@@ -131,3 +131,9 @@ async def is_a_cmd(msg: discord.Message, bot: commands.Bot) -> bool:
     for p in pr:
         is_cmd = is_cmd or msg.content.startswith(p)
     return is_cmd
+
+async def is_ttt_enabled(ctx: MyContext, self=None) -> bool:
+    if ctx.guild is None:
+        return True
+    mode = await ctx.bot.get_config(ctx.guild.id, "ttt_display")
+    return mode != 0

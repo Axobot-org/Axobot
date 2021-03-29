@@ -150,6 +150,8 @@ Yes, we did it! A first mini-game for our bot, the crab! You can play against th
 
 By using the *leave* argument you can instantly stop a game. This can be useful if you are stuck by a bug and can't join a game for example.
 
+.. note:: If you want to disable the game in your server, or only to reduce the amount of messages sent, you can edit your "ttt_display" `config option <server.html#list-of-every-option>`__
+
 
 ----
 Vote
