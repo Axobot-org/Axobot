@@ -776,7 +776,7 @@ The 'reasons' parameter is used to display the ban reasons.
 
 You must be an administrator of this server to use this command.
 
-..Doc moderator.html#banlist"""
+..Doc moderator.html#banlist-mutelist"""
         if not ctx.channel.permissions_for(ctx.guild.me).ban_members:
                 await ctx.send(await self.bot._(ctx.guild.id,"modo","cant-ban"))
                 return
@@ -819,7 +819,7 @@ You must be an administrator of this server to use this command.
         """Check the list of currently muted members.
 The 'reasons' parameter is used to display the mute reasons.
 
-..Doc moderator.html#mutelist"""
+..Doc moderator.html#banlist-mutelist"""
         try:
             liste = await self.bdd_muted_list(ctx.guild.id, reasons=reasons)
         except Exception as e:
