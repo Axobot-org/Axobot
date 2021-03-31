@@ -316,17 +316,24 @@ class Cases(commands.Cog):
             user = await self.bot.fetch_user(case.user)
             mod = await self.bot.fetch_user(case.mod)
             u = "{} ({})".format(user,user.id)
-            if not isSupport:
-                guild = ctx.guild.name
-                v = await self.bot._(ctx.guild.id,'cases','search-0')
-            else:
-                guild = "{0.name} ({0.id})".format(self.bot.get_guild(case.guild))
-                v = await self.bot._(ctx.guild.id,'cases','search-1')
             title = str(await self.bot._(ctx.guild.id,"cases","title-search")).format(case.id)
             l = await self.bot._(ctx.guild.id,"current_lang","current")
-            v = v.format(G=guild,U=u,T=case.type,M=str(mod),R=case.reason,D=await self.bot.get_cog('TimeUtils').date(case.date,lang=l,year=True,digital=True))
+            # main structure
+            if not isSupport:
+                guild = ctx.guild.name
+                _msg = await self.bot._(ctx.guild.id,'cases','search-0')
+            else: # if support: add guild
+                guild = "{0.name} ({0.id})".format(self.bot.get_guild(case.guild))
+                _msg = await self.bot._(ctx.guild.id,'cases','search-1')
+            # add duration
+            if case.duration is not None and case.duration > 0:
+                _msg += await self.bot._(ctx.guild.id,'cases','list-2', D=await self.bot.get_cog('TimeUtils').time_delta(case.duration,lang=l,year=False,form='temp'))
+            # format date
+            _date = await self.bot.get_cog('TimeUtils').date(case.date,lang=l,year=True,digital=True)
+            # finish message
+            _msg = _msg.format(G=guild,U=u,T=case.type,M=str(mod),R=case.reason,D=_date)
 
-            emb = self.bot.get_cog('Embeds').Embed(title=title,desc=v,color=self.bot.get_cog('Servers').embed_color).update_timestamp().set_author(user)
+            emb = self.bot.get_cog('Embeds').Embed(title=title,desc=_msg,color=self.bot.get_cog('Servers').embed_color).update_timestamp().set_author(user)
             await ctx.send(embed=emb.discord_embed())
         except Exception as e:
             await self.bot.get_cog("Errors").on_error(e,ctx)
