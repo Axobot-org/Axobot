@@ -1132,7 +1132,7 @@ class Rss(commands.Cog):
         if name == 'help':
             return await self.bot._(channel,"rss","tw-help")
         try:
-            if name.isnumeric():
+            if isinstance(name, int) or name.isnumeric():
                 posts = self.twitterAPI.GetUserTimeline(user_id=int(name), exclude_replies=True)
                 username = self.twitterAPI.GetUser(user_id=int(name)).screen_name
             else:
