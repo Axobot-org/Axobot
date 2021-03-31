@@ -7,6 +7,7 @@ import time
 import requests
 from discord.ext import commands
 from urllib.parse import quote
+
 from utils import zbot, MyContext
 
 
@@ -18,6 +19,7 @@ Every information come from the website www.fr-minecraft.net"""
         self.bot = bot
         self.flows = dict()
         self.file = "minecraft"
+        self.uuid_cache = dict()
 
     @commands.command(name="mojang", aliases=['mojang_status'])
     @commands.cooldown(5, 20, commands.BucketType.user)
@@ -347,6 +349,26 @@ Every information come from the website www.fr-minecraft.net"""
                     pass
         await ctx.send(embed=embed)
 
+    @mc_main.command(name="skin")
+    async def mc_skin(self, ctx: MyContext, username):
+        """Get the skin of any Java player
+        
+        ..Example mc skin Notch
+        
+        ..Doc minecraft.html#mc"""
+        if not ctx.can_send_embed:
+            await ctx.send(await self.bot._(ctx.channel, "mc", "no-embed"))
+            return
+        uuid = await self.username_to_uuid(username)
+        if uuid is None:
+            await ctx.send(await self.bot._(ctx.channel, "mc", "player-not-found"))
+            return
+        title = await self.bot._(ctx.channel, "mc", "player-skin-title", player=username)
+        download = await self.bot._(ctx.channel, "mc", "player-skin-download")
+        emb = discord.Embed(title=title, description=f"[{download}](https://crafatar.com/skins/{uuid})")
+        emb.set_image(url=f"https://crafatar.com/renders/body/{uuid}?overlay")
+        await ctx.send(embed=emb)
+
     @mc_main.command(name="server")
     async def mc_server(self, ctx: MyContext, ip:str, port:int=None):
         """Get infos about any Minecraft server
@@ -474,6 +496,20 @@ Every information come from the website www.fr-minecraft.net"""
         m = r['players']['max']
         l = None
         return await self.mcServer(IP,version=version,online_players=o,max_players=m,players=players,img=None,ping=l,desc=desc,api="api.mcsrvstat.us").clear_desc()
+    
+    async def username_to_uuid(self, username: str) -> str:
+        """Convert a minecraft username to its uuid"""
+        if username in self.uuid_cache:
+            return self.uuid_cache[username]
+        url = "https://api.mojang.com/users/profiles/minecraft/"+username
+        async with aiohttp.ClientSession(loop=self.bot.loop) as session:
+            async with session.get(url, timeout=10) as resp:
+                try:
+                    search: dict = await resp.json()
+                    self.uuid_cache[username] = search["id"]
+                except aiohttp.client_exceptions.ContentTypeError:
+                    self.uuid_cache[username] = None
+        return self.uuid_cache[username]
 
     class mcServer:
         def __init__(self,ip,max_players,online_players,players,ping,img,version,api,desc):
