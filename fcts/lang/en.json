@@ -176,6 +176,7 @@
     "bot_events": {
         "events-desc": {
             "halloween-2020": "October is here! Enjoy until November 1st a dark atmosphere, full of bats, skeletons and pumpkins.\nTake advantage of it to redecorate your server in the colors of Halloween with the command `halloween hallowify` and its derivatives, check that your avatar is compliant with the command `halloween check`, and collect event points every hour with the command `halloween collect`.\n\nPerhaps the bravest of you will succeed in unlocking the special Halloween 2020 xp card, accessible via the `profile card` command!",
+            "april-2021": "Today is International Fish Day! All day long, Zbot will be celebrating April 1st with special tic-tac-toe emojis, a unique avatar and other cool stuff. \nTake the opportunity to collect event points and try to win the rainbow xp card! As a reminder, the xp cards are accessible via my `profile card` command",
             "nothing": "There are currently no events. Follow the bot news to know the date of the next one!"
         },
         "events-price-title": "Prizes to win",
@@ -183,9 +184,14 @@
             "halloween-2020": {
                 "200": "Unlock the special Halloween 2020 xp card! As a bonus, a special role in our official server"
             },
+            "april-2021": {
+                "120": "Unlock the rainbow xp card, obtainable only one day a year!"
+            },
             "nothing": "There is nothing to gain for this event :confused:"
         },
-        "events-title": {},
+        "events-title": {
+            "april-2021": "Happy April 1st!"
+        },
         "objectives": "Objectives",
         "points": "points",
         "rank-global": "Global ranking",
