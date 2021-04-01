@@ -126,8 +126,9 @@ class Xp(commands.Cog):
         self.cache['global'][msg.author.id] = [round(time.time()), prev_points+giv_points]
         new_lvl = await self.calc_level(self.cache['global'][msg.author.id][1],0)
         if 0 < (await self.calc_level(prev_points,0))[0] < new_lvl[0]:
-            await self.send_levelup(msg,new_lvl)
+            await self.send_levelup(msg, new_lvl)
             await self.give_rr(msg.author,new_lvl[0],await self.rr_list_role(msg.guild.id))
+            await self.bot.get_cog("Utilities").add_user_eventPoint(msg.author.id, round(new_lvl[0]/5))
     
     async def add_xp_1(self, msg:discord.Message, rate: float):
         """MEE6-like xp type"""
@@ -216,7 +217,6 @@ class Xp(commands.Cog):
         """Envoie le message de levelup"""
         if self.bot.zombie_mode:
             return
-        await self.bot.get_cog("Utilities").add_user_eventPoint(msg.author.id,round(lvl[0]/5))
         if msg.guild is None:
             return
         destination = await self.get_lvlup_chan(msg)
