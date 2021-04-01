@@ -100,12 +100,21 @@ class zbot(commands.bot.AutoShardedBot):
     allowed_commands = ("eval", "add_cog", "del_cog")
 
     @property
-    def current_event(self) -> Optional[dict]:
+    def current_event(self) -> Optional[str]:
         """Get the current event, from the date"""
         try:
             return self.get_cog("BotEvents").current_event
         except Exception as e:
             self.log.warn(f"[current_event] {e}", exc_info=True)
+            return None
+    
+    @property
+    def current_event_data(self) -> Optional[dict]:
+        """Get the current event data, from the date"""
+        try:
+            return self.get_cog("BotEvents").current_event_data
+        except Exception as e:
+            self.log.warn(f"[current_event_data] {e}", exc_info=True)
             return None
 
     async def get_context(self, message: discord.Message, *, cls=MyContext) -> MyContext:

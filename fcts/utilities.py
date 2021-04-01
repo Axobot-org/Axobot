@@ -383,6 +383,10 @@ class Utilities(commands.Cog):
             cursor.execute(query)
             cnx.commit()
             cursor.close()
+            try:
+                await self.bot.get_cog("Users").reload_event_rankcard(userID)
+            except Exception as e:
+                await self.bot.get_cog("Errors").on_error(e, None)
             return True
         except Exception as e:
             await self.bot.get_cog('Errors').on_error(e, None)
