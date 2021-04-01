@@ -169,7 +169,7 @@ class Events(commands.Cog):
             except:
                 pass
         # April Fool event
-        elif random.random() < 0.1 and self.bot.current_event=="fish" and is_fun_enabled(msg, self.bot.get_cog("Fun")):
+        elif random.random() < 0.07 and self.bot.current_event=="fish" and await is_fun_enabled(msg, self.bot.get_cog("Fun")):
             try:
                 react = random.choice(['🐟','🎣', '🐠', '🐡']*4+['👀'])
                 await msg.add_reaction(react)
