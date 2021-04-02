@@ -21,6 +21,7 @@ class BotEvents(commands.Cog):
             events = json.load(f)
         self.current_event = None
         self.current_event_data = {}
+        self.current_event_id = None
         for ev_id, ev_data in events.items():
             ev_data["begin"] = datetime.datetime.strptime(
                 ev_data["begin"], "%Y-%m-%d")
