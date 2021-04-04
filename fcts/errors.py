@@ -168,7 +168,8 @@ class Errors(commands.Cog):
             if isinstance(ctx, discord.Message):
                 ctx = await self.bot.get_context(ctx)
             tr = traceback.format_exception(type(error), error, error.__traceback__)
-            msg = "```python\n{}\n```".format(" ".join(tr))
+            tr = " ".join(tr)[:1950]
+            msg = "```python\n{}\n```".format(tr)
             if ctx is None:
                 await self.senf_err_msg(f"Internal Error\n{msg}")
             elif ctx.guild is None:
