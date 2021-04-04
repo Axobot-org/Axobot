@@ -105,7 +105,7 @@ class Users(commands.Cog):
         if cog := self.bot.get_cog("Utilities"):
             await cog.change_db_userinfo(userID, "used_rank", True)
     
-    async def reload_event_rankcard(self, user: Union[discord.User, int], cards: list = None, points: int = None):
+    async def reload_event_rankcard(self, user: typing.Union[discord.User, int], cards: list = None, points: int = None):
         eventsCog = self.bot.get_cog("BotEvents")
         if eventsCog is None:
             return
