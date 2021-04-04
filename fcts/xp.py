@@ -414,7 +414,7 @@ class Xp(commands.Cog):
                 liste.append(x)
             if len(liste)==1:
                 g = 'global' if guild is None else guild
-                if isinstane(g, int) and g not in self.cache:
+                if isinstance(g, int) and g not in self.cache:
                     await self.bdd_load_cache(g)
                 if userID in self.cache[g].keys():
                     self.cache[g][userID][1] = liste[0]['xp']
