@@ -71,8 +71,7 @@ class Morpions(commands.Cog):
                 if config is not None and config != "":
                     for r in config.split(';'):
                         if r.isnumeric():
-                            d_em = discord.utils.get(
-                                self.bot.emojis, id=int(r))
+                            d_em = discord.utils.get(self.ctx.guild.emojis, id=int(r))
                             if d_em is not None:
                                 self.emojis.append(str(d_em))
                         else:
@@ -89,12 +88,15 @@ class Morpions(commands.Cog):
         async def afficher_grille(self, grille: list) -> str:
             """Affiche la grille qui est une liste sous forme de chaine de caractères"""
             affichage_grille = ''
+            if self.ctx.bot_permissions.external_emojis:
+                emojis = [f'<:{x}>' for x in self.bot.get_cog('Emojis').numbEmojis]
+            else:
+                emojis = [chr(48+i)+chr(8419) for i in range(10)]
             for k in range(9):
                 if k % 3 == 0:
                     affichage_grille += '\n'
                 if grille[k] in range(10):
-                    affichage_grille += '<:{}>'.format(
-                        self.bot.get_cog('Emojis').numbEmojis[grille[k]])
+                    affichage_grille += emojis[grille[k]]
                 elif grille[k] == 'O':
                     affichage_grille += self.emojis[0]
                 else:
