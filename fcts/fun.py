@@ -895,7 +895,7 @@ You can specify a verification limit by adding a number in argument (up to 1.000
 
     @commands.command(name="vote")
     @commands.cooldown(4, 30, type=commands.BucketType.guild)
-    async def vote(self,ctx,number:typing.Optional[int] = 0,*,text):
+    async def vote(self,ctx: MyContext,number:typing.Optional[int] = 0,*,text):
         """Send a message on which anyone can vote through reactions. 
         A big thank to Adri for his emojis specially designed for the bot!
         
@@ -920,14 +920,17 @@ You can specify a verification limit by adding a number in argument (up to 1.000
                 await self.bot.get_cog("Errors").on_error(e, ctx)
                 return
         else:
-            liste = self.bot.get_cog('Emojis').numbEmojis
+            if ctx.bot_permissions.external_emojis:
+                emojis = self.bot.get_cog('Emojis').numbEmojis
+            else:
+                emojis = [chr(48+i)+chr(8419) for i in range(10)]
             if number>20 or number < 0:
                 await ctx.send(await self.bot._(ctx.channel,"fun","vote-0"))
                 return
             m = await ctx.send(text)
             for x in range(1,number+1):
                 try:
-                    await m.add_reaction(liste[x])
+                    await m.add_reaction(emojis[x])
                 except discord.errors.NotFound:
                     return
                 except Exception as e:
