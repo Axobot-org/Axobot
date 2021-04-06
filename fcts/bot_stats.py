@@ -30,6 +30,9 @@ class BotStats(commands.Cog):
             return
         nbr = self.received_events.get(msg['t'], 0)
         self.received_events[msg['t']] = nbr + 1
+        if msg['t'] == "MESSAGE_CREATE" and msg['d']['author']['id'] == str(self.bot.user.id):
+            nbr2 = self.received_events.get('message_sent', 0)
+            self.received_events['message_sent'] = nbr2 + 1
 
     @commands.Cog.listener()
     async def on_command_completion(self, ctx: MyContext):
@@ -86,7 +89,7 @@ class BotStats(commands.Cog):
             # Push everything
             cnx.commit()
         except mysql.connector.errors.IntegrityError as e: # duplicate primary key
-            self.bot.log.warn(f"Stats loop cancelled: {e}")
+            self.bot.log.warn(f"Stats loop iteration cancelled: {e}")
         except Exception as e:
             await self.bot.get_cog("Errors").on_error(e)
         # if something goes wrong, we still have to close the cursor
