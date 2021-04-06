@@ -399,7 +399,8 @@
             "ToS for bot devs",
             "How to find an ID",
             "Minimum legal age of use Discord by country",
-            "Prohibited use of BetterDiscord"
+            "Prohibited use of BetterDiscord",
+            "Every Discord downloads"
         ],
         "docs": "Here is the link to the bot documentation:",
         "ping-found": "Pong! (average of {tps}ms per 64 byte, sent at {url})",

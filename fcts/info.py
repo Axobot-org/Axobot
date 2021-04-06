@@ -1060,7 +1060,7 @@ Servers:
     async def discord_status(self, ctx: MyContext):
         """Get some useful links about Discord"""
         l = await self.bot._(ctx.channel,'infos','discordlinks')
-        links = ["https://dis.gd/status","https://dis.gd/tos","https://dis.gd/report","https://dis.gd/feedback","https://support.discord.com/hc/en-us/articles/115002192352","https://discord.com/developers/docs/legal","https://support.discord.com/hc/en-us/articles/206346498-Where-can-I-find-my-User-Server-Message-ID-","https://support.discord.com/hc/en-us/articles/360040724612", " https://twitter.com/discordapp/status/1060411427616444417"]
+        links = ["https://dis.gd/status","https://dis.gd/tos","https://dis.gd/report","https://dis.gd/feedback","https://support.discord.com/hc/en-us/articles/115002192352","https://discord.com/developers/docs/legal","https://support.discord.com/hc/en-us/articles/206346498-Where-can-I-find-my-User-Server-Message-ID-","https://support.discord.com/hc/en-us/articles/360040724612", " https://twitter.com/discordapp/status/1060411427616444417", "https://support.discord.com/hc/en-us/articles/360035675191"]
         if ctx.can_send_embed:
             txt = "\n".join(['['+l[i]+']('+links[i]+')' for i in range(len(l))])
             em = await self.bot.get_cog("Embeds").Embed(desc=txt).update_timestamp().create_footer(ctx)
