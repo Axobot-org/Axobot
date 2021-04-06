@@ -409,7 +409,8 @@
             "CGU pour les développeurs de bot",
             "Comment trouver un ID",
             "Âge minimal d'utilisation de Discord par pays",
-            "Utilisation prohibée de BetterDiscord"
+            "Utilisation prohibée de BetterDiscord",
+            "Liste des téléchargements Discord"
         ],
         "docs": "Voici le lien vers la documentation du bot :",
         "ping-found": "Pong ! (moyenne de {tps}ms par 64 bits, envoyés à {url})",
