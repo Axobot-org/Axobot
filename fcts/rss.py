@@ -1248,8 +1248,11 @@ class Rss(commands.Cog):
                 published = i
                 break
         if published is not None and len(feeds.entries) > 1:
-            while (len(feeds.entries) > 1)  and (feeds.entries[1][published] is not None) and (feeds.entries[0][published] < feeds.entries[1][published]):
-                del feeds.entries[0]
+            try:
+                while (len(feeds.entries) > 1)  and (feeds.entries[1][published] is not None) and (feeds.entries[0][published] < feeds.entries[1][published]):
+                    del feeds.entries[0]
+            except KeyError:
+                pass
         if not date or published not in ['published_parsed','updated_parsed']:
             feed = feeds.entries[0]
             if published is None:
