@@ -181,7 +181,11 @@ class Info(commands.Cog):
         if ip is None:
             m = await ctx.send("Ping...")
             t = (m.created_at - ctx.message.created_at).total_seconds()
-            await m.edit(content=":ping_pong:  Pong !\nBot ping: {}ms\nDiscord ping: {}ms".format(round(t*1000),round(self.bot.latency*1000)))
+            try:
+                p = round(self.bot.latency*1000)
+            except OverflowError:
+                p = "∞"
+            await m.edit(content=":ping_pong:  Pong !\nBot ping: {}ms\nDiscord ping: {}ms".format(round(t*1000),p))
         else:
             asyncio.run_coroutine_threadsafe(self.ping_address(ctx,ip),asyncio.get_event_loop())
 
