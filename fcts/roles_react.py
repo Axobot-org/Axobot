@@ -37,6 +37,8 @@ class RolesReact(commands.Cog):
             return None, None
         try:
             msg = await chan.fetch_message(payload.message_id)
+        except discord.NotFound: # we don't care about those
+            pass
         except Exception as e:
             self.bot.log.warn(f"Could not fetch roles-reactions message {payload.message_id} in guild {payload.guild_id}: {e}")
             return None, None
