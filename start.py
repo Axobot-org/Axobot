@@ -151,7 +151,7 @@ def main():
         elif client.beta:
             await client.change_presence(activity=discord.Game(name=choice(["SNAPSHOOT","snapshot day","somethin iz brokn"])))
         else:
-            await client.change_presence(activity=discord.Game(name=choice(["enter !help","something","type !help","type !help"])))
+            await client.change_presence(activity=discord.Game(name=choice(["use @Zbot help","something","type !help for the win","type !help","minecraft powaa"])))
         emb = client.get_cog("Embeds").Embed(desc="**{}** is launching !".format(client.user.name),color=8311585).update_timestamp()
         await client.get_cog("Embeds").send([emb])
 
