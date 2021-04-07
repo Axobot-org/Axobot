@@ -798,6 +798,8 @@ class Xp(commands.Cog):
                     await UsersCog.used_rank(user.id)
                 except Exception as e:
                     await self.bot.get_cog("Errors").on_error(e, ctx)
+            if statsCog := self.bot.get_cog("BotStats"):
+                statsCog.xp_cards += 1
         try:
             await ctx.send(file=myfile)
         except discord.errors.HTTPException:

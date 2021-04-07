@@ -18,6 +18,7 @@ class BotStats(commands.Cog):
         self.received_events = {'CMD_USE': 0}
         self.commands_uses = dict()
         self.rss_stats = {'checked': 0, 'messages': 0, 'errors': 0}
+        self.xp_cards = 0
         self.loop.start()
 
     def cog_unload(self):
@@ -71,6 +72,8 @@ class BotStats(commands.Cog):
             # RSS stats
             for k, v in self.rss_stats.items():
                 cursor.execute(query, (now, 'rss.'+k, v, 0, k, self.bot.beta))
+            # XP cards
+            cursor.execute(query, (now, 'xp.generated_cards', self.xp_cards, 0, 'cards/min', self.bot.beta))
             # Latency - RAM usage - CPU usage
             latency = round(self.bot.latency*1000, 3)
             ram = round(py.memory_info()[0]/2.**30, 3)
