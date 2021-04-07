@@ -149,15 +149,16 @@ class Info(commands.Cog):
         """Get a link to invite me
         
         ..Doc infos.html#bot-invite"""
+        raw_oauth = "<" + discord.utils.oauth_url(self.bot.user.id) + ">"
         try:
             r = requests.get("https://zrunner.me/invitezbot", timeout=3)
         except requests.exceptions.Timeout:
-            url = "<https://discord.com/oauth2/authorize?client_id=486896267788812288&scope=bot>"
+            url = raw_oauth
         else:
             if r.status_code < 400:
                 url = "https://zrunner.me/invitezbot"
             else:
-                url = "<https://discord.com/oauth2/authorize?client_id=486896267788812288&scope=bot>"
+                url = raw_oauth
         await ctx.send(await self.bot._(ctx.channel, "infos", "botinvite", url=url))
     
     @commands.command(name="pig", hidden=True)

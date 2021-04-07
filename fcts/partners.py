@@ -168,7 +168,10 @@ class Partners(commands.Cog):
                     field1 = None
                     image = str(await self.bot.user_avatar_as(await self.bot.fetch_user(int(partner['target']))))
                     await self.bot.get_cog("Errors").on_error(e,None)
-                field2 = {'name':tr_invite.capitalize(),'value':'[Click here](https://discord.com/oauth2/authorize?client_id={}&scope=bot&permissions=2113273087)'.format(partner['target'])}
+                perm = discord.Permissions.all()
+                perm.update(administrator=False)
+                oauth_url = discord.utils.oauth_url(partner['target'], perm)
+                field2 = {'name':tr_invite.capitalize(),'value': f'[Click here]({oauth_url})'}
             else:
                 title = "**{}** ".format(tr_guild.capitalize())
                 try:
