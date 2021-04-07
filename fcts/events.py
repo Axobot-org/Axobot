@@ -671,7 +671,7 @@ class Events(commands.Cog):
         rss_feeds = await self.bot.get_cog("Rss").get_raws_count(True)
         active_rss_feeds = await self.bot.get_cog("Rss").get_raws_count()
         if infoCog := self.bot.get_cog("Info"):
-            member_count, bot_count = await infoCog.get_users_nber()
+            member_count, bot_count = infoCog.get_users_nber(list())
         else:
             member_count = len(self.bot.users)
             bot_count = len([1 for x in self.bot.users if x.bot])
