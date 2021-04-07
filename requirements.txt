@@ -1,4 +1,4 @@
-discord.py>=1.6
+discord.py>=1.7
 aiohttp
 mysql-connector-python
 git+https://github.com/ZRunner/fr-mc-python-lib
