@@ -670,9 +670,11 @@ class Events(commands.Cog):
         cursor = cnx.cursor()
         rss_feeds = await self.bot.get_cog("Rss").get_raws_count(True)
         active_rss_feeds = await self.bot.get_cog("Rss").get_raws_count()
-        member_count = sum(x.member_count for x in self.bot.guilds)
-        ratio = member_count/len(self.bot.users)
-        approx_bot_count = int(len([1 for x in self.bot.users if x.bot])*ratio)
+        if infoCog := self.bot.get_cog("Info"):
+            member_count, bot_count = await infoCog.get_users_nber()
+        else:
+            member_count = len(self.bot.users)
+            bot_count = len([1 for x in self.bot.users if x.bot])
         lang_stats = await self.bot.get_cog('Servers').get_languages([], return_dict=True)
         rankcards_stats = await self.bot.get_cog('Users').get_rankcards_stats()
         xptypes_stats = await self.bot.get_cog('Servers').get_xp_types([], return_dict=True)
@@ -680,7 +682,7 @@ class Events(commands.Cog):
         query = "INSERT INTO `log_stats` (`servers_count`, `members_count`, `bots_count`, `dapi_heartbeat`, `codelines_count`, `earned_xp_total`, `rss_feeds`, `active_rss_feeds`, `supportserver_members`, `languages`, `used_rankcards`, `xp_types`, `beta`) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
         data = (len(self.bot.guilds),
             member_count,
-            approx_bot_count,
+            bot_count,
             round(self.bot.latency,3),
             self.bot.get_cog("Info").codelines,
             await self.bot.get_cog('Xp').bdd_total_xp(),
