@@ -152,6 +152,12 @@ Add Reactions
 Allows the bot you to add reactions to a message, whether they are Discord or server emotions. Examples of use: `react <fun.html#react>`__, `vote command <miscellaneous.html#vote>`__, `poll channels <server.html#list-of-every-option>`__
 
 
+Use Slash Commands
+------------------
+
+Allows the user to use bots slash commands. Obviously has no effect on bots.
+
+
 -----------------
 Voice Permissions
 -----------------
@@ -195,3 +201,9 @@ Priority Speaker
 ----------------
 
 Allows users to have their volume higher than the other members in a voice channel. Bots cannot use that for now.
+
+
+Request To Speak
+----------------
+
+Allows users to raise their hands in `stage channels <https://support.discord.com/hc/en-us/articles/1500005513722-Stage-Channels-FAQ>`__. Not used by Zbot.

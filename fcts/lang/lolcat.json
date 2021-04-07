@@ -829,10 +829,12 @@
             "priority_speaker": "Priority speaker",
             "read_message_history": "Read message history",
             "read_messages": "Read messages",
+            "request_to_speak": "Ask to mew",
             "send_messages": "See chann(el)",
             "send_tts_messages": "Send TTS messages",
             "speak": "Speak",
             "stream": "Go live",
+            "use_slash_commands": "Use /cmd",
             "use_voice_activation": "Use voice activity",
             "view_audit_log": "View audit logs",
             "view_guild_insights": "View guild insights"
