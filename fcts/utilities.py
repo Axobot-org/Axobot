@@ -347,13 +347,12 @@ class Utilities(commands.Cog):
         languages = list()
         disp_lang = list()
         available_langs = self.bot.get_cog('Languages').languages
-        for s in self.bot.guilds:
-            if user in s.members:
-                lang = await self.bot.get_config(s.id, 'language')
-                if lang is None:
-                    lang = available_langs.index(
-                        self.bot.get_cog('Servers').default_language)
-                languages.append(lang)
+        for s in user.mutual_guilds:
+            lang = await self.bot.get_config(s.id, 'language')
+            if lang is None:
+                lang = available_langs.index(
+                    self.bot.get_cog('Servers').default_language)
+            languages.append(lang)
         for e in range(len(self.bot.get_cog('Languages').languages)):
             if languages.count(e) > 0:
                 disp_lang.append((available_langs[e], round(
