@@ -2,6 +2,7 @@ from datetime import datetime, timezone
 import os
 from time import time
 from math import isinf
+import typing
 from discord.ext import commands, tasks
 import psutil
 import mysql
@@ -102,6 +103,24 @@ class BotStats(commands.Cog):
     async def before_printer(self):
         """Wait until the bot is ready"""
         await self.bot.wait_until_ready()
+    
+
+    async def get_stats(self, variable: str, minutes: int) -> typing.Union[int, float, str, None]:
+        """Get the sum of a certain variable in the last X minutes"""
+        cnx = self.bot.cnx_stats
+        cursor = cnx.cursor(dictionary=True)
+        cursor.execute('SELECT variable, SUM(value) as value, type FROM `zbot` WHERE variable = %s AND date BETWEEN (DATE_SUB(UTC_TIMESTAMP(),INTERVAL %s MINUTE)) AND UTC_TIMESTAMP() AND beta=%s', (variable, minutes, self.bot.beta))
+        result: list[dict] = list(cursor)
+        cursor.close()
+        if len(result) == 0:
+            return None
+        result = result[0]
+        if result['type'] == 0:
+            return int(result['value'])
+        elif result['type'] == 1:
+            return float(result['value'])
+        else:
+            return result['value']
 
 
 def setup(bot):
