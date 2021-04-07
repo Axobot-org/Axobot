@@ -385,6 +385,7 @@
         "bitly_nobit": "HAHA NOPE, dat's not a bit.ly link!",
         "bitly_short": "Quick linq: {url}",
         "botinvite": "Hers a link 2 invite me 2 'nother warm place: {url}\nDon't hesitate to test my cool `about` cmd 4 + useful links!",
+        "cant-see-channel": "Uhh nope, ur not allowed to see that!",
         "changelog-notfound": "Srry but i cannot find das version",
         "changelogs-index": "List of indexed versions",
         "discordlinks": [

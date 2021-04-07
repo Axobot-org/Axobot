@@ -514,6 +514,9 @@ Available types: member, role, user, emoji, channel, server, invite, category
         await ctx.send(embed=embed)
 
     async def textChannel_infos(self, ctx: MyContext, chan: discord.TextChannel, lang: str):
+        if not chan.permissions_for(ctx.author).view_channel:
+            await ctx.send(await self.bot._(ctx.guild.id, "infos", "cant-see-channel"))
+            return
         embed = discord.Embed(colour=default_color, timestamp=ctx.message.created_at)
         embed.set_author(name="{} '{}'".format(await self.bot._(ctx.guild.id,"stats_infos","textchan-5"),chan.name), icon_url=ctx.guild.icon_url_as(format='png'))
         embed.set_footer(text='Requested by {}'.format(ctx.author.name), icon_url=ctx.author.avatar_url_as(format='png'))
@@ -550,6 +553,9 @@ Available types: member, role, user, emoji, channel, server, invite, category
         await ctx.send(embed=embed)
 
     async def voiceChannel_info(self, ctx: MyContext, chan: discord.VoiceChannel, lang: str):
+        if not chan.permissions_for(ctx.author).view_channel:
+            await ctx.send(await self.bot._(ctx.guild.id, "infos", "cant-see-channel"))
+            return
         since = await self.bot._(ctx.guild.id,"keywords","depuis")
         embed = discord.Embed(colour=default_color, timestamp=ctx.message.created_at)
         embed.set_author(name="{} '{}'".format(await self.bot._(ctx.guild.id,"stats_infos","voicechan-0"),chan.name), icon_url=ctx.guild.icon_url)
@@ -734,6 +740,9 @@ Available types: member, role, user, emoji, channel, server, invite, category
         await ctx.send(embed=embed)
 
     async def category_info(self, ctx: MyContext, categ: discord.CategoryChannel, lang: str):
+        if not categ.permissions_for(ctx.author).view_channel:
+            await ctx.send(await self.bot._(ctx.guild.id, "infos", "cant-see-channel"))
+            return
         since = await self.bot._(ctx.guild.id,"keywords","depuis")
         tchan = 0
         vchan = 0
