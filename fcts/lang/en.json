@@ -834,10 +834,12 @@
             "priority_speaker": "Priority speaker",
             "read_message_history": "Read message history",
             "read_messages": "View channel",
+            "request_to_speak": "Request to speak",
             "send_messages": "Send messages",
             "send_tts_messages": "Send TTS messages",
             "speak": "Speak",
             "stream": "Go live",
+            "use_slash_commands": "Use slash commands",
             "use_voice_activation": "Use voice activity",
             "view_audit_log": "View audit logs",
             "view_guild_insights": "View guild insights"

@@ -844,10 +844,12 @@
             "priority_speaker": "Voix prioritaire",
             "read_message_history": "Voir les anciens messages",
             "read_messages": "Voir le salon",
+            "request_to_speak": "Demander la parole",
             "send_messages": "Envoyer des messages",
             "send_tts_messages": "Envoyer des messages TTS",
             "speak": "Parler",
             "stream": "Passer en direct",
+            "use_slash_commands": "Utiliser les commandes slash",
             "use_voice_activation": "Utiliser la Détection de la voix",
             "view_audit_log": "Voir les logs du serveur",
             "view_guild_insights": "Voir les analyses de serveur"
