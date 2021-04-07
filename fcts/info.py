@@ -106,7 +106,9 @@ class Info(commands.Cog):
         latency = round(self.bot.latency*1000, 3)
         try:
             async with ctx.channel.typing():
+                # RAM/CPU
                 ram_cpu = [round(py.memory_info()[0]/2.**30,3), py.cpu_percent(interval=1)]
+                # Guilds count
                 b_conf = self.bot.get_cog('Utilities').config
                 if b_conf is None:
                     b_conf = await self.bot.get_cog('Utilities').get_bot_infos()
@@ -115,22 +117,41 @@ class Info(commands.Cog):
                     ignored_guilds = [int(x) for x in self.bot.get_cog('Utilities').config['banned_guilds'].split(";") if len(x) > 0]
                 ignored_guilds += self.bot.get_cog('Reloads').ignored_guilds
                 len_servers = await self.get_guilds_count(ignored_guilds)
+                # Languages
                 langs_list: list = await self.bot.get_cog('Servers').get_languages(ignored_guilds)
                 langs_list.sort(reverse=True, key=lambda x: x[1])
                 lang_total = sum([x[1] for x in langs_list])
                 langs_list = ' | '.join(["{}: {}%".format(x[0],round(x[1]/lang_total*100)) for x in langs_list if x[1] > 0])
                 del lang_total
-                #premium_count = await self.bot.get_cog('Utilities').get_number_premium()
+                # Users/bots
                 try:
                     users,bots = self.get_users_nber(ignored_guilds)
                 except Exception as e:
                     users = bots = 'unknown'
+                # Total XP
                 if self.bot.database_online:
                     total_xp = await self.bot.get_cog('Xp').bdd_total_xp()
                 else:
                     total_xp = ""
-                d = str(await self.bot._(ctx.channel,"infos","stats")).format(bot_v=self.bot_version,s_count=len_servers,m_count=users,b_count=bots,l_count=self.codelines,lang=langs_list,p_v=version,d_v=discord.__version__,ram=ram_cpu[0],cpu=ram_cpu[1],api=latency,xp=total_xp)
-            if ctx.can_send_embed:
+                # Commands within 24h
+                cmds_24h = await self.bot.get_cog("BotStats").get_stats("wsevent.CMD_USE", 60*24)
+                # Generating message
+                d = ""
+                for key, var in [
+                    ('bot_version', self.bot_version),
+                    ('servers_count', len_servers),
+                    ('users_count', (users, bots)),
+                    ('codes_lines', self.codelines),
+                    ('languages', langs_list),
+                    ('python_version', version),
+                    ('lib_version', discord.__version__),
+                    ('ram_usage', ram_cpu[0]),
+                    ('cpu_usage', ram_cpu[1]),
+                    ('api_ping', latency),
+                    ('cmds_24h', cmds_24h),
+                    ('total_xp', total_xp)]:
+                    d += await self.bot._(ctx.channel, "infos", "stats."+key, v=var) + "\n"
+            if ctx.can_send_embed: # if we can use embed
                 embed = ctx.bot.get_cog('Embeds').Embed(title=await self.bot._(ctx.channel,"infos","stats-title"), color=ctx.bot.get_cog('Help').help_color, time=ctx.message.created_at,desc=d,thumbnail=self.bot.user.avatar_url_as(format="png"))
                 await embed.create_footer(ctx)
                 await ctx.send(embed=embed.discord_embed())
