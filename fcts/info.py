@@ -1247,21 +1247,23 @@ Servers:
             if len(global_list) > 0:
             # Usernames part
                 temp = [x['new'] for x in global_list if x['new']!='']
-                if len(temp) > MAX:
-                    temp = temp[:MAX] + [await self.bot._(ctx.channel, 'infos', 'usernames-more', nbr=len(temp)-MAX)]
-                f.append({'name':await self.bot._(ctx.channel,'infos','usernames-global'), 'value':"\n".join(temp)})
-                # if global_list[-1]['old'] != '':
-                #     f[-1]["value"] += "\n" + global_list[-1]['old']
-                date += await self.bot.get_cog('TimeUtils').date([x['utc_date'] for x in global_list][0] ,year=True, lang=language)
+                if len(temp) > 0:
+                    if len(temp) > MAX:
+                        temp = temp[:MAX] + [await self.bot._(ctx.channel, 'infos', 'usernames-more', nbr=len(temp)-MAX)]
+                    f.append({'name':await self.bot._(ctx.channel,'infos','usernames-global'), 'value':"\n".join(temp)})
+                    # if global_list[-1]['old'] != '':
+                    #     f[-1]["value"] += "\n" + global_list[-1]['old']
+                    date += await self.bot.get_cog('TimeUtils').date([x['utc_date'] for x in global_list][0] ,year=True, lang=language)
             if len(this_guild) > 0:
             # Nicknames part
                 temp = [x['new'] for x in this_guild if x['new']!='']
-                if len(temp) > MAX:
-                    temp = temp[:MAX] + [await self.bot._(ctx.channel, 'infos', 'usernames-more', nbr=len(temp)-MAX)]
-                f.append({'name':await self.bot._(ctx.channel,'infos','usernames-local'), 'value':"\n".join(temp)})
-                # if this_guild[-1]['old'] != '':
-                #     f[-1]["value"] += "\n" + this_guild[-1]['old']
-                date += "\n" + await self.bot.get_cog('TimeUtils').date([x['utc_date'] for x in this_guild][0], year=True, lang=language)
+                if len(temp) > 0:
+                    if len(temp) > MAX:
+                        temp = temp[:MAX] + [await self.bot._(ctx.channel, 'infos', 'usernames-more', nbr=len(temp)-MAX)]
+                    f.append({'name':await self.bot._(ctx.channel,'infos','usernames-local'), 'value':"\n".join(temp)})
+                    # if this_guild[-1]['old'] != '':
+                    #     f[-1]["value"] += "\n" + this_guild[-1]['old']
+                    date += "\n" + await self.bot.get_cog('TimeUtils').date([x['utc_date'] for x in this_guild][0], year=True, lang=language)
             if len(date) > 0:
                 f.append({'name':await self.bot._(ctx.channel,'infos','usernames-last-date'), 'value':date})
             else:
