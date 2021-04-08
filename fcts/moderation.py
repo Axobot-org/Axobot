@@ -893,7 +893,7 @@ The 'reasons' parameter is used to display the mute reasons.
 
     @emoji_group.command(name="restrict")
     @commands.check(checks.has_admin)
-    async def emoji_restrict(self, ctx: MyContext, emoji: discord.Emoji, *, roles: commands.Greedy[typing.Union[discord.Role, args.litteral('everyone')]]):
+    async def emoji_restrict(self, ctx: MyContext, emoji: discord.Emoji, roles: commands.Greedy[typing.Union[discord.Role, args.litteral('everyone')]]):
         """Restrict the use of an emoji to certain roles
         
         ..Example emoji restrict :vip: @VIP @Admins
