@@ -6,6 +6,8 @@ import aiohttp
 from fcts import args
 from discord.ext import commands
 from typing import List
+from urllib.request import Request, build_opener
+
 from utils import zbot, MyContext
 
 importlib.reload(args)
@@ -142,6 +144,14 @@ class Utilities(commands.Cog):
 
     async def find_img(self, name: str):
         return discord.File("../images/{}".format(name))
+    
+    async def find_url_redirection(self, url: str) -> str:
+        """Find where an url is redirected to"""
+        to = aiohttp.ClientTimeout(total=10, connect=7)
+        async with aiohttp.ClientSession(timeout=to) as session:
+            async with session.get(url, allow_redirects=True) as response:
+                answer = str(response.url)
+        return answer
 
     async def suppr(self, msg: discord.Message):
         try:
