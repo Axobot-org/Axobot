@@ -1,5 +1,6 @@
 from aiohttp.client import ClientSession
 from aiohttp import client_exceptions
+from discord import utils
 from feedparser.util import FeedParserDict
 from utils import zbot, MyContext
 import discord
@@ -1182,8 +1183,13 @@ class Rss(commands.Cog):
                 if post.retweeted:
                     rt = "retweet"
                 text = html.unescape(getattr(post, 'full_text', post.text))
-                if r := re.search(r"https://t.co/([^\s]+)", text):
-                    text = text.replace(r.group(0), '')
+                # remove images links if needed
+                if channel.permissions_for(self.bot.user).embed_links:
+                    find_url = self.bot.get_cog("Utilities").find_url_redirection
+                    for m in re.finditer(r"https://t.co/([^\s]+)", text):
+                        final_url = await find_url(m.group(0))
+                        if "/photo/" in final_url:
+                            text = text.replace(m.group(0), '')
                 url = "https://twitter.com/{}/status/{}".format(name.lower(), post.id)
                 img = None
                 if post.media: # if exists and is not empty
