@@ -20,10 +20,10 @@ class BotStats(commands.Cog):
         self.commands_uses = dict()
         self.rss_stats = {'checked': 0, 'messages': 0, 'errors': 0}
         self.xp_cards = 0
-        self.loop.start()
+        self.loop.start() # pylint: disable=no-member
 
     def cog_unload(self):
-        self.loop.cancel()
+        self.loop.cancel() # pylint: disable=no-member
 
     @commands.Cog.listener()
     async def on_socket_response(self, msg: dict):

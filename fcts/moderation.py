@@ -913,7 +913,7 @@ The 'reasons' parameter is used to display the mute reasons.
         # remove duplicates
         roles = list(set(roles))
         await emoji.edit(name=emoji.name, roles=roles)
-        await ctx.send(str(await self.bot._(ctx.guild.id,"modo","emoji-valid")).format(emoji,", ".join([x.name for x in r])))
+        await ctx.send(str(await self.bot._(ctx.guild.id,"modo","emoji-valid")).format(emoji,", ".join([x.name for x in roles])))
 
     @emoji_group.command(name="clear")
     @commands.check(checks.has_manage_msg)
@@ -1106,7 +1106,7 @@ The 'reasons' parameter is used to display the mute reasons.
         
         ..Doc moderator.html#role-manager"""
         if len(users) == 0:
-            raise commands.MissingRequiredArgument(self.roles_give.clean_params['users'])
+            raise commands.MissingRequiredArgument(ctx.command.clean_params['users'])
         if not ctx.guild.me.guild_permissions.manage_roles:
             return await ctx.send(await self.bot._(ctx.guild.id,"modo","cant-mute"))
         my_position = ctx.guild.me.roles[-1].position
@@ -1114,9 +1114,7 @@ The 'reasons' parameter is used to display the mute reasons.
             return await ctx.send(await self.bot._(ctx.guild.id,"modo","give_roles-4",r=role.name))
         if role.position >= ctx.author.roles[-1].position:
             return await ctx.send(await self.bot._(ctx.guild.id,"modo","give_roles-higher"))
-        answer = list()
-        n_users = set()
-        error_count = 0
+        n_users = set[discord.Member]
         for item in users:
             if item == "everyone":
                 item = ctx.guild.default_role
@@ -1133,8 +1131,8 @@ The 'reasons' parameter is used to display the mute reasons.
                 break
             await user.add_roles(role,reason="Asked by {}".format(ctx.author))
             count += 1
-        answer.append(await self.bot._(ctx.guild.id,"modo","give_roles-2",c=len(n_users)-error_count,m=len(n_users)))
-        await ctx.send("\n".join(answer))
+        answer = await self.bot._(ctx.guild.id,"modo","give_roles-2",c=count,m=len(n_users))
+        await ctx.send(answer)
 
     @main_role.command(name="remove")
     @commands.check(checks.has_manage_roles)
@@ -1147,7 +1145,7 @@ The 'reasons' parameter is used to display the mute reasons.
         
         ..Doc moderator.html#role-manager"""
         if len(users) == 0:
-            raise commands.MissingRequiredArgument(self.roles_remove.clean_params['users'])
+            raise commands.MissingRequiredArgument(ctx.command.clean_params['users'])
         if not ctx.guild.me.guild_permissions.manage_roles:
             return await ctx.send(await self.bot._(ctx.guild.id,"modo","cant-mute"))
         my_position = ctx.guild.me.roles[-1].position
@@ -1155,9 +1153,7 @@ The 'reasons' parameter is used to display the mute reasons.
             return await ctx.send(await self.bot._(ctx.guild.id,"modo","give_roles-4",r=role.name))
         if role.position >= ctx.author.roles[-1].position:
             return await ctx.send(await self.bot._(ctx.guild.id,"modo","give_roles-higher"))
-        answer = list()
-        n_users = set()
-        error_count = 0
+        n_users = set[discord.Member]
         for item in users:
             if item == "everyone":
                 item = ctx.guild.default_role
@@ -1168,10 +1164,14 @@ The 'reasons' parameter is used to display the mute reasons.
                 for m in item.members:
                     if role in m.roles:
                         n_users.add(m)
-        for user in n_users[:200]:
+        count = 0
+        for user in n_users:
+            if count > 200:
+                break
             await user.remove_roles(role,reason="Asked by {}".format(ctx.author))
-        answer.append(await self.bot._(ctx.guild.id,"modo","remove_roles-1",c=len(n_users)-error_count,m=len(n_users)))
-        await ctx.send("\n".join(answer))
+            count += 1
+        answer = await self.bot._(ctx.guild.id,"modo","give_roles-2",c=count,m=len(n_users))
+        await ctx.send(answer)
 
 
     @commands.command(name="pin")
