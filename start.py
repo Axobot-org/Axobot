@@ -20,8 +20,7 @@ if check_libs():
     import discord, sys, traceback, asyncio, time, logging, os, mysql.connector, datetime, json
     from signal import SIGTERM
     from random import choice
-    from discord.ext import commands
-    from fcts import cryptage, tokens
+    from fcts import cryptage, tokens # pylint: disable=no-name-in-module
     from utils import zbot, setup_logger
 else:
     import sys

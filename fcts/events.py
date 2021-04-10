@@ -51,7 +51,7 @@ class Events(commands.Cog):
 
 
     def cog_unload(self):
-        self.loop.cancel()
+        self.loop.cancel() # pylint: disable=no-member
 
     @commands.Cog.listener()
     async def on_ready(self):
@@ -507,7 +507,7 @@ class Events(commands.Cog):
                 self.loop_errors[1] = datetime.datetime.now()
             if self.loop_errors[0] > 10:
                 await self.bot.get_cog('Errors').senf_err_msg(":warning: **Trop d'erreurs : ARRET DE LA BOUCLE PRINCIPALE** <@279568324260528128> :warning:")
-                self.loop.cancel()
+                self.loop.cancel() # pylint: disable=no-member
 
     @loop.before_loop
     async def before_loop(self):

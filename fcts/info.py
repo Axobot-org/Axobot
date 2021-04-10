@@ -258,7 +258,7 @@ Available types: member, role, user, emoji, channel, server, invite, category
 
 .. Doc infos.html#info"""
         if Type is not None and name is None and Type not in ["guild","server"]:
-            raise commands.MissingRequiredArgument(self.infos.clean_params['name'])
+            raise commands.MissingRequiredArgument(ctx.command.clean_params['name'])
         if not ctx.can_send_embed:
             return await ctx.send(await self.bot._(ctx.guild.id,"fun","no-embed-perm"))
         try:

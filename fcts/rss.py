@@ -91,6 +91,7 @@ class Rss(commands.Cog):
         else:
             self.twitter_api_url = 'http://twitrss.me/twitter_user_to_rss/?user='
         # launch rss loop
+        # pylint: disable=no-member
         self.loop_child.change_interval(minutes=self.time_loop)
         self.loop_child.start()
 
@@ -100,6 +101,7 @@ class Rss(commands.Cog):
         self.table = 'rss_flow' if self.bot.user.id==486896267788812288 else 'rss_flow_beta'
     
     def cog_unload(self):
+        # pylint: disable=no-member
         self.loop_child.cancel()
 
     class rssMessage:
@@ -1636,13 +1638,13 @@ class Rss(commands.Cog):
             return await ctx.send("Lol, t'as oublié que la base de donnée était hors ligne "+random.choice(["crétin ?","? Tu ferais mieux de fixer tes bugs","?","? :rofl:","?"]))
         if new_state == "start":
             try:
-                await self.loop_child.start()
+                await self.loop_child.start() # pylint: disable=no-member
             except RuntimeError:
                 await ctx.send("La boucle est déjà en cours !")
             else:
                 await ctx.send("Boucle rss relancée !")
         elif new_state == "stop":
-            await self.loop_child.cancel()
+            await self.loop_child.cancel() # pylint: disable=no-member
             self.bot.log.info(" Boucle rss arrêtée de force par un admin")
             await ctx.send("Boucle rss arrêtée de force !")
         elif new_state == "once":
