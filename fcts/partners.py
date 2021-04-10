@@ -353,7 +353,7 @@ class Partners(commands.Cog):
         else:
             await ctx.send(await self.bot._(ctx.guild.id,'partners','unknown-error'))
         
-    @partner_main.command(name='list')
+    @partner_main.command(name="list")
     @commands.check(checks.has_manage_guild)
     async def partner_list(self, ctx: MyContext):
         """Get the list of every partners
@@ -385,9 +385,9 @@ class Partners(commands.Cog):
                 server = ctx.bot.get_guild(l['guild'])
                 if server is None:
                     server = l['guild']
-                    f[1] += f"{tr_unknown} (ID: {server})"
+                    f[1] += f"{tr_unknown} (ID: {server})\n"
                 else:
-                    f[1] += f"{server.name} ({tr_owner} : {server.owner})"
+                    f[1] += f"{server.name} ({tr_owner} : {server.owner})\n"
         else:
             f[1] = await self.bot._(ctx.guild.id,'partners','missing-manage-guild')
         if len(f[0]) == 0:
