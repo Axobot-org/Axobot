@@ -101,7 +101,7 @@ class Invite(commands.Converter):
     async def convert(self, ctx: MyContext, argument: str) -> typing.Union[str, int]:
         answer = None
         r = re.search(
-            r'https://discordapp\.com/oauth2/authorize\?client_id=(\d{18})&scope=bot', argument)
+            r'^https://discord(?:app)?\.com/(?:api/)?oauth2/authorize\?(?:&?client_id=(\d{18})|&?scope=bot|&?(?:permissions|guild_id|disable_guild_select|redirect_uri)=[^&]+)+$', argument)
         if r is None:
             r = re.search(
                 r'(?:discord\.gg|discordapp\.com/invite)/([^\s/]+)', argument)
