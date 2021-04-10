@@ -366,7 +366,7 @@ class Admin(commands.Cog):
         else:
             liste = list()
             for guild in self.bot.guilds:
-                liste.append(await self.search_invite(guild,guild))
+                liste.append(await self.search_invite(guild))
                 if len("\n".join(liste)) > 1900:
                     await ctx.author.send("\n".join(liste))
                     liste = []
