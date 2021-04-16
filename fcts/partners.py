@@ -1,3 +1,4 @@
+from typing import Optional, Union
 import discord
 import time
 import importlib
@@ -120,28 +121,44 @@ class Partners(commands.Cog):
             await self.bot.get_cog('Errors').on_error(e,None)
             return False
     
-    async def get_guilds(self,bot:int,session:aiohttp.ClientSession):
+    async def get_bot_guilds(self, bot:int, session:aiohttp.ClientSession) -> Optional[int]:
         """Get the guilds count of a bot
-        None if unknown"""
-        async with session.get('https://discordbots.org/api/bots/{}/stats'.format(bot),headers={'Authorization':str(self.bot.dbl_token)}) as resp:
-            ans = await resp.json()
-            if 'server_count' in ans.keys():
-                return ans['server_count']
-            return None
+        None if unknown bot/count not provided"""
+        async with session.get('https://discordbots.org/api/bots/{}/stats'.format(bot), headers={'Authorization':str(self.bot.dbl_token)}) as resp:
+            ans: dict = await resp.json()
+        if 'server_count' in ans:
+            return ans['server_count']
+        return None
+    
+    async def get_bot_owners(self, bot:int, session:aiohttp.ClientSession) -> list[Union[discord.User, int]]:
+        """Get the owners list of a bot
+        Empty list if unknown bot/owners not provided"""
+        async with session.get('https://discordbots.org/api/bots/{}'.format(bot), headers={'Authorization':str(self.bot.dbl_token)}) as resp:
+            ans: dict = await resp.json()
+        owners = list()
+        if 'owners' in ans:
+            for o in ans['owners']:
+                try:
+                    owners.append(await self.bot.fetch_user(o))
+                except discord.NotFound:
+                    owners.append(o)
+        return owners
 
-
-    async def update_partners(self,channel:discord.TextChannel,color:int=None):
+    async def update_partners(self, channel: discord.TextChannel, color: int =None) -> int:
         """Update every partners of a channel"""
-        partners = await self.bdd_get_guild(channel.guild.id)
         if not channel.permissions_for(channel.guild.me).embed_links:
             return 0
-        tr_unknown = await self.bot._(channel.guild.id,'keywords','unknown')
-        tr_guild = await self.bot._(channel.guild.id,'keywords','server')
-        tr_bot = await self.bot._(channel.guild.id,'keywords','bot')
-        tr_members = await self.bot._(channel.guild.id,'stats_infos','role-3')
-        tr_guilds = await self.bot._(channel.guild.id,'keywords','servers')
-        tr_invite = await self.bot._(channel.guild.id,'stats_infos','inv-4')
-        tr_click = await self.bot._(channel.guild.id,'keywords','click_here')
+        partners = await self.bdd_get_guild(channel.guild.id)
+        if len(partners) == 0:
+            return 0
+        tr_unknown = await self.bot._(channel.guild.id, 'keywords', 'unknown')
+        tr_guild = await self.bot._(channel.guild.id, 'keywords', 'server')
+        tr_bot = await self.bot._(channel.guild.id, 'keywords', 'bot')
+        tr_members = await self.bot._(channel.guild.id, 'stats_infos', 'role-3')
+        tr_guilds = await self.bot._(channel.guild.id, 'keywords', 'servers')
+        tr_invite = await self.bot._(channel.guild.id, 'stats_infos', 'inv-4')
+        tr_click = await self.bot._(channel.guild.id, 'keywords', 'click_here')
+        tr_owner = await self.bot._(channel.guild.id, 'stats_infos', 'guild-1')
         count = 0
         if color is None:
             color = await self.bot.get_config(channel.guild.id,'partner_color')
@@ -149,47 +166,15 @@ class Partners(commands.Cog):
             color = self.bot.get_cog('Servers').default_opt['partner_color']
         session = aiohttp.ClientSession(loop=self.bot.loop)
         for partner in partners:
-            image = ""
             target_desc = partner['description']
-            if partner['type']=='bot':
-                title = "**{}** ".format(tr_bot.capitalize())
-                try:
-                    title += str(await self.bot.fetch_user(int(partner['target'])))
-                    guild_nbr = await self.get_guilds(partner['target'],session)
-                    if guild_nbr is not None:
-                        field1 = {'name':tr_guilds.capitalize(),'value':str(guild_nbr)}
-                    else:
-                        field1 = None
-                    image = str(await self.bot.user_avatar_as(await self.bot.fetch_user(int(partner['target']))))
-                except discord.errors.NotFound:
-                    title += "ID: "+partner['target']
-                    field1 = None
-                except Exception as e:
-                    field1 = None
-                    image = str(await self.bot.user_avatar_as(await self.bot.fetch_user(int(partner['target']))))
-                    await self.bot.get_cog("Errors").on_error(e,None)
-                perm = discord.Permissions.all()
-                perm.update(administrator=False)
-                oauth_url = discord.utils.oauth_url(partner['target'], perm)
-                field2 = {'name':tr_invite.capitalize(),'value': f'[Click here]({oauth_url})'}
+            if partner['type'] == 'bot':
+                title, fields, image = await self.update_partner_bot(tr_bot, tr_guilds, tr_invite, tr_owner, session, partner)
             else:
-                title = "**{}** ".format(tr_guild.capitalize())
                 try:
-                    inv = await self.bot.fetch_invite(partner['target'])
-                except discord.errors.NotFound:
+                    title, fields, image, target_desc = await self.update_partner_guild(tr_guild, tr_members, tr_unknown, tr_invite, tr_click, channel, partner, target_desc)
+                except discord.NotFound:
                     continue
-                image = inv.guild.icon_url.__str__()
-                if isinstance(inv,discord.Invite) and not inv.revoked:
-                    title += inv.guild.name
-                    field1 = {'name':tr_members.capitalize(),'value':str(inv.approximate_member_count)}
-                    await self.give_roles(inv,channel.guild)
-                else:
-                    title += tr_unknown
-                    field1 = None
-                field2 = {'name':tr_invite.capitalize(),'value':'[{}](https://discord.gg/{})'.format(tr_click.capitalize(),partner['target'])}
-                if len(target_desc) == 0:
-                    target_desc = await self.bot.get_config(inv.guild.id,'description')
-            emb = self.bot.get_cog('Embeds').Embed(title=title,desc=target_desc,fields=[x for x in (field1,field2) if not x is None],color=color,footer_text=str(partner['ID']),thumbnail=image).update_timestamp()
+            emb = self.bot.get_cog('Embeds').Embed(title=title,desc=target_desc,fields=[f for f in fields if f is not None],color=color,footer_text=str(partner['ID']),thumbnail=image).update_timestamp()
             if self.bot.zombie_mode:
                 return
             try:
@@ -205,6 +190,58 @@ class Partners(commands.Cog):
             count += 1
         await session.close()
         return count
+
+    async def update_partner_bot(self, tr_bot: str, tr_guilds: str, tr_invite: str, tr_owner: str, session: aiohttp.ClientSession, partner: dict):
+        """Update a bot partner embed"""
+        image = ""
+        title = "**{}** ".format(tr_bot.capitalize())
+        fields = list()
+        try:
+            title += str(await self.bot.fetch_user(int(partner['target'])))
+            # guild count field
+            guild_nbr = await self.get_bot_guilds(partner['target'], session)
+            if guild_nbr is not None:
+                fields.append({'name': tr_guilds.capitalize(),
+                              'value': str(guild_nbr)})
+            # owners field
+            owners = await self.get_bot_owners(partner['target'], session)
+            if owners:
+                fields.append({'name': tr_owner.capitalize(),
+                              'value': ", ".join([str(u) for u in owners])})
+            image = str(await self.bot.user_avatar_as(await self.bot.fetch_user(int(partner['target']))))
+        except discord.NotFound:
+            title += "ID: "+partner['target']
+        except Exception as e:
+            image = str(await self.bot.user_avatar_as(await self.bot.fetch_user(int(partner['target']))))
+            await self.bot.get_cog("Errors").on_error(e, None)
+        perm = discord.Permissions.all()
+        perm.update(administrator=False)
+        oauth_url = discord.utils.oauth_url(partner['target'], perm)
+        fields.append({'name': tr_invite.capitalize(),
+                      'value': f'[Click here]({oauth_url})'})
+        return title, fields, image
+
+    async def update_partner_guild(self, tr_guild: str, tr_members: str, tr_unknown: str, tr_invite: str, tr_click: str, channel: discord.TextChannel, partner: dict, target_desc: str):
+        """Update a guild partner embed"""
+        title = "**{}** ".format(tr_guild.capitalize())
+        try:
+            inv = await self.bot.fetch_invite(partner['target'])
+        except discord.errors.NotFound as e:
+            raise e
+        image = str(inv.guild.icon_url)
+        if isinstance(inv, discord.Invite) and not inv.revoked:
+            title += inv.guild.name
+            field1 = {'name': tr_members.capitalize(), 'value': str(
+                inv.approximate_member_count)}
+            await self.give_roles(inv, channel.guild)
+        else:
+            title += tr_unknown
+            field1 = None
+        field2 = {'name': tr_invite.capitalize(
+        ), 'value': '[{}](https://discord.gg/{})'.format(tr_click.capitalize(), partner['target'])}
+        if len(target_desc) == 0:
+            target_desc = await self.bot.get_config(inv.guild.id, 'description')
+        return title, (field1, field2), image, target_desc
 
     async def give_roles(self,invite:discord.Invite,guild:discord.Guild):
         """Give a role to admins of partners"""
