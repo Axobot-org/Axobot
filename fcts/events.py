@@ -30,15 +30,17 @@ class Events(commands.Cog):
         self.last_membercounter = datetime.datetime.utcfromtimestamp(0)
         self.latencies_list = list()
         self.embed_colors = {"welcome":5301186,
-        "mute":4868682,
-        "kick":16730625,
-        "ban":13632027,
-        "slowmode":5671364,
-        "clear":16312092,
-        "warn":9131818,
-        "softban":16720385,
-        "error":16078115,
-        "case-edit":10197915}
+            "mute":4868682,
+            "unmute":8311585,
+            "kick":16730625,
+            "ban":13632027,
+            "unban":8311585,
+            "slowmode":5671364,
+            "clear":16312092,
+            "warn":9131818,
+            "softban":16720385,
+            "error":16078115,
+            "case-edit":10197915}
         self.points = 0
         self.table = {'kick':3,
             'ban':7,
@@ -240,7 +242,7 @@ class Events(commands.Cog):
             await member.remove_roles(role, reason="This user doesn't support me anymore")
 
 
-    async def send_logs_per_server(self, guild: discord.Guild, Type:str, message: str, author: discord.User=None):
+    async def send_logs_per_server(self, guild: discord.Guild, Type:str, message: str, author: discord.User=None, fields: list[dict]=None):
         """Send a log in a server. Type is used to define the color of the embed"""
         if self.bot.zombie_mode:
             return
@@ -257,7 +259,7 @@ class Events(commands.Cog):
             return
         if channel is None:
             return
-        emb = self.bot.get_cog("Embeds").Embed(desc=message,color=c).update_timestamp()
+        emb = self.bot.get_cog("Embeds").Embed(desc=message, color=c, fields=fields).update_timestamp()
         if author is not None:
             emb.set_author(author)
         try:
