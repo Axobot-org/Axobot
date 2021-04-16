@@ -689,6 +689,8 @@
         "no-mutes": "No member seems 2B banned from here",
         "pin-error": "Oops, I ca't found dat msage (Error~~404~~ : `{}`)",
         "pin-error-3": "WoOops, **im**possibl 2 pin dis mesge (doo u hav mor' tahn fYfti pinnd mesages?). Error : `{}`",
+        "raid-kicked": "You have been automatically kicked off the {guild} server by the anti-raid system. Try again in a few days.",
+        "raid-banned": "You have been automatically banned from the {guild} server by the antiraid system.",
         "react-clear": "I can't find dis message :confused:",
         "remove_roles-0": "OoOops, looks like that role is def 2 high 4 me to take it away from anyone. Place me role above teh role `{r}` ;-;",
         "remove_roles-1": "-> {c} roles removed on {m}!",
