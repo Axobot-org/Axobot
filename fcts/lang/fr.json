@@ -521,7 +521,7 @@
         "title": "titre"
     },
     "logs": {
-        "ban": "{member} a été banni du serveur (raison : {reason} | casier #{case})",
+        "ban": "{user} ({userid}) a été banni du serveur",
         "case-del": "Le casier #{id} a été supprimé (concernant {user})",
         "case-reason": "Le casier #{id} a été édité : \n`Ancienne raison:` {old}\n`Nouvelle raison:` {new}",
         "clear": "{number} messages supprimés dans {channel}",
@@ -532,16 +532,14 @@
         "d-unmute": "unmute par {}",
         "d-welcome_roles": "Action automatique (config welcome_roles)",
         "d-young": "Automod (compte trop récent)",
-        "kick": "{member} a été expulsé du serveur (raison : {reason} | casier #{case})",
-        "mute-off": "{member} n'est plus muet",
-        "mute-on": "{member} est maintenant muet (raison : {reason} | casier #{case})",
+        "kick": "{user} ({userid}) a été expulsé du serveur",
+        "unmute": "{user} ({userid}) n'est plus muet",
+        "mute": "{user} ({userid}) est maintenant muet",
         "slowmode-disabled": "Slowmode désactivé dans le salon {channel}",
         "slowmode-enabled": "Slowmode activé dans le salon {channel} ({seconds}s)",
-        "softban": "{member} a été 'softban' (raison : {reason} | casier #{case})",
-        "tempban": "{member} a été banni du serveur pour {duration} (raison : {reason} | casier #{case})",
-        "tempmute-on": "{member} est maintenant muet pour {duration} (raison : {reason} | casier #{case})",
-        "unban": "{member} n'est plus banni de ce serveur (raison : {reason})",
-        "warn": "{member} a reçu un avertissement : {reason} (casier #{case})"
+        "softban": "{user} ({userid}) a été 'softban'",
+        "unban": "{user} ({userid}) n'est plus banni de ce serveur",
+        "warn": "{user} ({userid}) a reçu un avertissement"
     },
     "mc": {
         "adv-fields": [
@@ -721,7 +719,6 @@
         "staff-kick": "Vous ne pouvez pas expulser un autre membre du staff !",
         "staff-mute": "Vous ne pouvez pas empêcher de parler un autre membre du staff ",
         "staff-warn": "Vous ne pouvez pas avertir un autre membre du staff !",
-        "tempban": "Le membre {} a bien été banni du serveur pour {}, avec la raison `{}`",
         "unban-chat": "Le membre {user} ({userid}) n'est plus banni de ce serveur",
         "unhoisted": "{c} surnoms édités !",
         "unmute-chat": "Le membre {user} ({userid}) peut à nouveau parler !",

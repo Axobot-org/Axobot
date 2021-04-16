@@ -218,10 +218,13 @@ Slowmode works up to one message every 6h (21600s)
                 await ctx.message.delete()
             except:
                 pass
+            # optional values
+            opt_case = None if caseID=="'Unsaved'" else caseID
+            opt_reason = None if reason=="Unspecified" else reason
             # send in chat
-            await self.send_chat_answer("kick", user, ctx, None if caseID=="'Unsaved'" else caseID)
-            log = str(await self.bot._(ctx.guild.id,"logs","kick")).format(member=user,reason=reason,case=caseID)
-            await self.bot.get_cog("Events").send_logs_per_server(ctx.guild,"kick",log,ctx.author)
+            await self.send_chat_answer("kick", user, ctx, opt_case)
+            # send in modlogs
+            await self.send_modlogs("kick", user, ctx.author, ctx.guild, opt_case, opt_reason)
         except discord.errors.Forbidden:
             await ctx.send(await self.bot._(ctx.guild.id,"modo","kick-1"))
         except Exception as e:
@@ -267,12 +270,14 @@ Slowmode works up to one message every 6h (21600s)
                 case = Cases.Case(bot=self.bot,guildID=ctx.guild.id,memberID=user.id,Type="warn",ModID=ctx.author.id,Reason=message,date=datetime.datetime.now())
                 await Cases.add_case(case)
                 caseID = case.id
-                log = str(await self.bot._(ctx.guild.id,"logs","warn")).format(member=user,reason=message,case=caseID)
-                await self.bot.get_cog("Events").send_logs_per_server(ctx.guild,"warn",log,ctx.author)
             else:
                 await ctx.send(await self.bot._(ctx.guild.id,'modo','warn-but-db'))
+            # optional values
+            opt_case = None if caseID=="'Unsaved'" else caseID
             # send in chat
-            await self.send_chat_answer("warn", user, ctx, None if caseID=="'Unsaved'" else caseID)
+            await self.send_chat_answer("warn", user, ctx, opt_case)
+            # send in modlogs
+            await self.send_modlogs("warn", user, ctx.author, ctx.guild, opt_case, message)
             try:
                 await ctx.message.delete()
             except:
@@ -292,9 +297,10 @@ Slowmode works up to one message every 6h (21600s)
         # add the muted role
         role = await self.get_muted_role(member.guild)
         await member.add_roles(role,reason=reason)
-        # send logs in the server modlogs channel
-        log = str(await self.bot._(member.guild.id,"logs","mute-on" if duration is None else "tempmute-on")).format(member=member,reason=reason,case=caseID,duration=duration)
-        await self.bot.get_cog("Events").send_logs_per_server(member.guild,"mute",log,author)
+        # send in modlogs
+        opt_case = None if caseID=="'Unsaved'" else caseID
+        opt_reason = None if reason=="Unspecified" else reason
+        await self.send_modlogs("mute", member, author, member.guild, opt_case, opt_reason, duration)
         # save in database that the user is muted
         if not self.bot.database_online:
             return
@@ -388,14 +394,15 @@ You can also mute this member for a defined duration, then use the following for
                     caseID = case.id
                 except Exception as e:
                     await self.bot.get_cog('Errors').on_error(e,ctx)
+            # actually mute
+            await self.mute_event(user,ctx.author,reason,caseID,f_duration)
+            # optional values
+            opt_case = None if caseID=="'Unsaved'" else caseID
+            opt_reason = None if reason=="Unspecified" else reason
             # send DM
-            await self.dm_user(user, "mute", ctx, reason = None if reason=="Unspecified" else reason, duration=f_duration)
+            await self.dm_user(user, "mute", ctx, reason=opt_reason, duration=f_duration)
             # send in chat
-            await self.send_chat_answer("mute", user, ctx, None if caseID=="'Unsaved'" else caseID)
-            if f_duration is None:
-                await self.mute_event(user,ctx.author,reason,caseID)
-            else:
-                await self.mute_event(user,ctx.author,reason,caseID,f_duration)
+            await self.send_chat_answer("mute", user, ctx, opt_case)
             try:
                 await ctx.message.delete()
             except:
@@ -415,9 +422,8 @@ You can also mute this member for a defined duration, then use the following for
             await user.remove_roles(role,reason=await self.bot._(guild.id,"logs","d-autounmute"))
         else:
             await user.remove_roles(role,reason=str(await self.bot._(guild.id,"logs","d-unmute")).format(author))
-        # send log in the server modlogs channel
-        log = str(await self.bot._(guild.id,"logs","mute-off")).format(member=user)
-        await self.bot.get_cog("Events").send_logs_per_server(guild, "mute", log, author)
+        # send in modlogs
+        await self.send_modlogs("unmute", user, author, guild)
         # remove the muted record in the database
         if not self.bot.database_online:
             return
@@ -485,7 +491,7 @@ This will remove the role 'muted' for the targeted member
             await ctx.send(await self.bot._(ctx.guild.id,"modo","mute-high"))
             return
         try:
-            await self.unmute_event(ctx.guild,user,ctx.author)
+            await self.unmute_event(ctx.guild, user, ctx.author)
             # send in chat
             await self.send_chat_answer("unmute", user, ctx)
             try:
@@ -593,20 +599,20 @@ The 'days_to_delete' option represents the number of days worth of messages to d
                     await self.bot.get_cog('Events').add_task('ban',duration,user.id,ctx.guild.id)
                 try:
                     await Cases.add_case(case)
-                    caseID = case.id
+                    caseID = case.id-
                 except Exception as e:
                     await self.bot.get_cog('Errors').on_error(e,ctx)
             try:
                 await ctx.message.delete()
             except:
                 pass
+            # optional values
+            opt_case = None if caseID=="'Unsaved'" else caseID
+            opt_reason = None if reason=="Unspecified" else reason
             # send message in chat
-            await self.send_chat_answer("ban", user, ctx, None if caseID=="'Unsaved'" else caseID)
-            if f_duration is None:
-                log = str(await self.bot._(ctx.guild.id,"logs","ban")).format(member=user,reason=reason,case=caseID)
-            else:
-                log = str(await self.bot._(ctx.guild.id,"logs","tempban")).format(member=user,reason=reason,case=caseID,duration=f_duration)
-            await self.bot.get_cog("Events").send_logs_per_server(ctx.guild,"ban",log,ctx.author)
+            await self.send_chat_answer("ban", user, ctx, opt_case)
+            # send in modlogs
+            await self.send_modlogs("ban", user, ctx.author, ctx.guild, opt_case, opt_reason, f_duration)
         except discord.errors.Forbidden:
             await ctx.send(await self.bot._(ctx.guild.id,"modo","ban-1"))
         except Exception as e:
@@ -616,9 +622,10 @@ The 'days_to_delete' option represents the number of days worth of messages to d
     async def unban_event(self, guild: discord.Guild, user: discord.User, author: discord.User):
         if not guild.me.guild_permissions.ban_members:
             return
-        await guild.unban(user,reason=str(await self.bot._(guild.id,"logs","d-unban")).format(author))
-        log = str(await self.bot._(guild.id,"logs","unban")).format(member=user,reason="automod")
-        await self.bot.get_cog("Events").send_logs_per_server(guild,"ban",log,author)
+        reason = str(await self.bot._(guild.id,"logs","d-unban")).format(author)
+        await guild.unban(user, reason=reason)
+        # send in modlogs
+        await self.send_modlogs("unban", user, author, guild, reason="Automod")
 
     @commands.command(name="unban")
     @commands.cooldown(5,20, commands.BucketType.guild)
@@ -664,9 +671,13 @@ The 'days_to_delete' option represents the number of days worth of messages to d
                 await ctx.message.delete()
             except:
                 pass
-            await self.send_chat_answer("unban", user, ctx, None if caseID=="'Unsaved'" else caseID)
-            log = str(await self.bot._(ctx.guild.id,"logs","unban")).format(member=user,reason=reason,case=caseID)
-            await self.bot.get_cog("Events").send_logs_per_server(ctx.guild,"ban",log,ctx.author)
+            # optional values
+            opt_case = None if caseID=="'Unsaved'" else caseID
+            opt_reason = None if reason=="Unspecified" else reason
+            # send in chat
+            await self.send_chat_answer("unban", user, ctx, opt_case)
+            # send in modlogs
+            await self.send_modlogs("unban", user, ctx.author, ctx.guild, opt_case, opt_reason)
         except Exception as e:
             await ctx.send(await self.bot._(ctx.guild.id,"modo","error"))
             await self.bot.get_cog('Errors').on_error(e,ctx)
@@ -717,10 +728,13 @@ Permissions for using this command are the same as for the kick
                 await ctx.message.delete()
             except:
                 pass
+            # optional values
+            opt_case = None if caseID=="'Unsaved'" else caseID
+            opt_reason = None if reason=="Unspecified" else reason
             # send in chat
-            await self.send_chat_answer("kick", user, ctx, None if caseID=="'Unsaved'" else caseID)
-            log = str(await self.bot._(ctx.guild.id,"logs","softban")).format(member=user,reason=reason,case=caseID)
-            await self.bot.get_cog("Events").send_logs_per_server(ctx.guild,"softban",log,ctx.author)
+            await self.send_chat_answer("kick", user, ctx, opt_case)
+            # send in modlogs
+            await self.send_modlogs("softban", user, ctx.author, ctx.guild, opt_case, opt_reason)
         except discord.errors.Forbidden:
             await ctx.send(await self.bot._(ctx.guild.id,"modo","kick-1"))
         except Exception as e:
@@ -760,7 +774,7 @@ Permissions for using this command are the same as for the kick
             return
         _case = await self.bot._(ctx.guild.id, "keywords", "case")
         if ctx.can_send_embed:
-            color = discord.Color().red()
+            color = discord.Color.red()
             if action in ("unmute", "unban"):
                 if helpCog := self.bot.get_cog("Help"):
                     color = helpCog.help_color
@@ -770,6 +784,24 @@ Permissions for using this command are the same as for the kick
             await ctx.send(embed=emb)
         else:
             await ctx.send(f"{message}\n{_case.capitalize()} #{case}")
+
+    async def send_modlogs(self, action: str, user: discord.User, author: discord.User, guild: discord.Guild, case: int = None, reason: str = None, duration: str = None):
+        if action not in ('warn', 'mute', 'unmute', 'kick', 'ban', 'unban', 'softban'):
+            return
+        message = await self.bot._(user, "logs", action, user=str(user), userid=user.id)
+        fields = list()
+        if case:
+            _case = await self.bot._(guild.id, "keywords", "case")
+            fields.append({'name': _case.capitalize(),
+                          'value': f"#{case}", 'inline': True})
+        if duration:
+            _duration = await self.bot._(user, "keywords", "duration")
+            fields.append({'name': _duration.capitalize(),
+                          'value': duration, 'inline': True})
+        if reason:
+            _reason = await self.bot._(user, "keywords", "reason")
+            fields.append({'name': _reason.capitalize(), 'value': reason})
+        await self.bot.get_cog("Events").send_logs_per_server(guild, action, message, author, fields)
 
     @commands.command(name="banlist")
     @commands.guild_only()
