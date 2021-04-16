@@ -704,6 +704,8 @@
         "no-mutes": "Aucun membre ne sembre être actuellement muet dans ce serveur",
         "pin-error": "Oups, je n'arrive pas à retrouver ce message (Erreur : `{}`)",
         "pin-error-3": "Oups, impossible d'épingler ce message (Avez-vous plus de 50 messages épinglés ?). Erreur : `{}`",
+        "raid-kicked": "Vous avez été automatiquement expulsé du serveur {guild} par l'antiraid. Réessayez dans quelques jours.",
+        "raid-banned": "Vous avez été automatiquement banni du serveur {guild} par l'antiraid.",
         "react-clear": "Impossible de retrouver ce message :confused:",
         "remove_roles-0": "Oups, il semblerai que ce rôle soit trop haut pour que je puisse l'enlever à qui que ce soit. Veuillez placer mon rôle au-dessus du rôle `{r}`",
         "remove_roles-1": "-> {c} rôles enlevés sur {m} !",

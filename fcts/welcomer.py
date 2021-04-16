@@ -51,7 +51,7 @@ class Welcomer(commands.Cog):
         if self.bot.zombie_mode:
             return
         msg = await self.bot.get_config(member.guild.id,Type)
-        if await self.raid_check(member) or member.id in self.no_message:
+        if member.id in self.no_message or (Type == "welcome" and await self.raid_check(member)):
             return
         if await self.bot.get_cog('Utilities').check_any_link(member.name) is not None:
             return
@@ -133,61 +133,80 @@ class Welcomer(commands.Cog):
 
 
     async def kick(self, member: discord.Member, reason: str):
+        # if user is too high
+        if member.roles[-1].position >= member.guild.me.roles[-1].position:
+            return False
+        # try to send a DM but don't mind if we can't
+        try:
+            await member.send(await self.bot._(member, "modo", "raid-kicked", guild=member.guild.name))
+        except (discord.Forbidden, discord.HTTPException):
+            pass
         try:
             await member.guild.kick(member, reason=reason)
         except (discord.Forbidden, discord.HTTPException):
-            pass
+            return False
         else:
             log = str(await self.bot._(member.guild.id,"logs","kick")).format(member=member,reason=reason,case=None)
             await self.bot.get_cog("Events").send_logs_per_server(member.guild,"kick",log,member.guild.me)
-    
+            return True
+
     async def ban(self, member: discord.Member, reason: str):
+        # if user is too high
+        if member.roles[-1].position >= member.guild.me.roles[-1].position:
+            return False
+        # try to send a DM but don't mind if we can't
+        try:
+            await member.send(await self.bot._(member, "modo", "raid-banned", guild=member.guild.name))
+        except (discord.Forbidden, discord.HTTPException):
+            pass
         try:
             await member.guild.ban(member, reason=reason)
         except (discord.Forbidden, discord.HTTPException):
-            pass
+            return False
         else:
             log = str(await self.bot._(member.guild.id,"logs","ban")).format(member=member,reason=reason,case=None)
             await self.bot.get_cog("Events").send_logs_per_server(member.guild,"ban",log,member.guild.me)
+            return True
 
     async def raid_check(self, member: discord.Member):
         # if guild is unavailable or the bot left the guild
         if member.guild is None or member.guild.me is None:
             return False
         level = str(await self.bot.get_config(member.guild.id,"anti_raid"))
+        # if level is unreadable or bot can't kick
         if not level.isnumeric() or member.guild.channels[0].permissions_for(member.guild.me).kick_members == False:
             return
         c = False
         level = int(level)
         can_ban = member.guild.get_member(self.bot.user.id).guild_permissions.ban_members
-        account_created_since = (datetime.datetime.utcnow() - member.created_at).seconds
+        account_created_since = (datetime.datetime.utcnow() - member.created_at).total_seconds()
         # Level 4
         if level >= 4:
             if account_created_since <= 120*60: # kick accounts created less than 2h before
-                await self.kick(member,await self.bot._(member.guild.id,"logs","d-young"))
-                return True
+                if await self.kick(member,await self.bot._(member.guild.id,"logs","d-young")):
+                    return True
             if account_created_since <= 60*60 and can_ban: # ban members created less than 1h before
-                await self.ban(member,await self.bot._(member.guild.id,"logs","d-young"))
-                return True
+                if await self.ban(member,await self.bot._(member.guild.id,"logs","d-young")):
+                    return True
         # Level 3 or more
         if level >= 3 and can_ban:
             # ban members with invitations in their nickname
             if await self.bot.get_cog('Utilities').check_discord_invite(member.name) is not None:
-                await self.ban(member,await self.bot._(member.guild.id,"logs","d-invite"))
-                return True
+                if await self.ban(member,await self.bot._(member.guild.id,"logs","d-invite")):
+                    return True
             if account_created_since <= 45*60: # kick accounts created less than 45min before
-                await self.kick(member,await self.bot._(member.guild.id,"logs","d-young"))
-                return True
+                if await self.kick(member,await self.bot._(member.guild.id,"logs","d-young")):
+                    return True
         # Level 2 or more
         if level >= 2: # kick accounts created less than 15min before
             if account_created_since <= 15*60:
-                await self.kick(member,await self.bot._(member.guild.id,"logs","d-young"))
-                return True
+                if await self.kick(member,await self.bot._(member.guild.id,"logs","d-young")):
+                    return True
         # Level 1 or more
         if level >= 1: # kick members with invitations in their nickname
             if await self.bot.get_cog('Utilities').check_discord_invite(member.name) is not None:
-                await self.kick(member,await self.bot._(member.guild.id,"logs","d-invite"))
-                return True       
+                if await self.kick(member,await self.bot._(member.guild.id,"logs","d-invite")):
+                    return True       
         # Nothing got triggered
         return False
 
