@@ -599,7 +599,7 @@ The 'days_to_delete' option represents the number of days worth of messages to d
                     await self.bot.get_cog('Events').add_task('ban',duration,user.id,ctx.guild.id)
                 try:
                     await Cases.add_case(case)
-                    caseID = case.id-
+                    caseID = case.id
                 except Exception as e:
                     await self.bot.get_cog('Errors').on_error(e,ctx)
             try:
