@@ -1,5 +1,4 @@
 import discord
-import sys
 import traceback
 import random
 import re
