@@ -12,8 +12,8 @@
     "aide": {
         "aliases": "Aliases",
         "categories": {
-            "fun": "fun",
             "data": "data",
+            "fun": "fun",
             "moderation": "moderation",
             "other": "others",
             "server-settings": "server settings",
@@ -115,10 +115,6 @@
                 "The Halloween event is underway, enjoy it!",
                 "There are no Halloween type events at the moment"
             ],
-            "is_ttt_enabled": [
-                "The tic-tac-toe game is enabled",
-                "The tic-tac-toe game must be enabled on this server"
-            ],
             "is_owner": [
                 "You must be the owner of the bot",
                 "You are not the owner of the bot"
@@ -130,6 +126,10 @@
             "is_translator": [
                 "You are part of the translators team",
                 "You must be part of the translators team"
+            ],
+            "is_ttt_enabled": [
+                "The tic-tac-toe game is enabled",
+                "The tic-tac-toe game must be enabled on this server"
             ],
             "verify_role_exists": [
                 "A verification role has been set up",
@@ -169,23 +169,19 @@
         "missing-attachment-perm": "Oops, I'm missing permission to send images!",
         "won-card": "Wow! Very nice blurple picture {}! so beautiful that I decided to offer you the card of xp blurple! You can use it by typing the command `{}profile card blurple` {}"
     },
-    "halloween": {
-        "got-points": "Congratulations! You just won **{pts} event points**!",
-        "too-quick": "It is still too early! You can only retrieve event points once per hour."
-    },
     "bot_events": {
         "events-desc": {
-            "halloween-2020": "October is here! Enjoy until November 1st a dark atmosphere, full of bats, skeletons and pumpkins.\nTake advantage of it to redecorate your server in the colors of Halloween with the command `halloween hallowify` and its derivatives, check that your avatar is compliant with the command `halloween check`, and collect event points every hour with the command `halloween collect`.\n\nPerhaps the bravest of you will succeed in unlocking the special Halloween 2020 xp card, accessible via the `profile card` command!",
             "april-2021": "Today is International Fish Day! All day long, Zbot will be celebrating April 1st with special tic-tac-toe emojis, a unique avatar and other cool stuff. \nTake the opportunity to collect event points and try to win the rainbow xp card! As a reminder, the xp cards are accessible via my `profile card` command",
+            "halloween-2020": "October is here! Enjoy until November 1st a dark atmosphere, full of bats, skeletons and pumpkins.\nTake advantage of it to redecorate your server in the colors of Halloween with the command `halloween hallowify` and its derivatives, check that your avatar is compliant with the command `halloween check`, and collect event points every hour with the command `halloween collect`.\n\nPerhaps the bravest of you will succeed in unlocking the special Halloween 2020 xp card, accessible via the `profile card` command!",
             "nothing": "There are currently no events. Follow the bot news to know the date of the next one!"
         },
         "events-price-title": "Prizes to win",
         "events-prices": {
-            "halloween-2020": {
-                "200": "Unlock the special Halloween 2020 xp card! As a bonus, a special role in our official server"
-            },
             "april-2021": {
                 "120": "Unlock the rainbow xp card, obtainable only one day a year!"
+            },
+            "halloween-2020": {
+                "200": "Unlock the special Halloween 2020 xp card! As a bonus, a special role in our official server"
             },
             "nothing": "There is nothing to gain for this event :confused:"
         },
@@ -210,9 +206,9 @@
         "list-0": "**Type:** {T}\n**Moderator:** {M}\n**Date:** {D}\n**Reason:** *{R}*",
         "list-1": "**Server:** {G}\n**Type:** {T}\n**Moderator:** {M}\n**Date:** {D}\n**Reason:** *{R}*",
         "list-2": "\n**Duration:** {D}",
+        "no-case": "This user has no case!",
         "no-user": "Unable to find this user :eyes:",
         "no_database": "Due to a temporary database outage, this command has been disabled",
-        "no-case": "This user has no case!",
         "not-found": "This case was not found :confused:",
         "reason-edited": "The reason for case #{} has been changed!",
         "search-0": "**User:** {U}\n**Type:** {T}\n**Moderator:** {M}\n**Date:** {D}\n**Reason:** *{R}*",
@@ -289,15 +285,15 @@
         "count-3": "Oops, I'm unable to read this channel history. Please check my permissions...",
         "count-4": "On the last {limit} messages, {user} has posted {x} messages ({p}%)",
         "count-5": "You cannot use this command in a channel where you do not have access to the message history",
-        "discordjobs-title": "Jobs available at Discord",
         "discordjobs-count": "{c} offers found",
-        "discordstatus-nothing": "Nothing to report at this time!\nThe last known issue was on {date}",
+        "discordjobs-title": "Jobs available at Discord",
         "discordstatus-exists": "There is currently one {impact} incident in progress on Discord: {title}",
         "discordstatus-impacts": {
-            "none": "without effect",
+            "major": "major",
             "minor": "minor",
-            "major": "major"
+            "none": "without effect"
         },
+        "discordstatus-nothing": "Nothing to report at this time!\nThe last known issue was on {date}",
         "embed-error": "An error has occurred: `{}`",
         "embed-invalid-channel": "Cannot send messages in this channel",
         "embed-invalid-image": "The url entered as image is invalid",
@@ -311,9 +307,9 @@
         "no-fun": "Fun commands have been disabled on this server. To see their list, look at https://zbot.rtfd.io/en/v3/fun.html",
         "no-reaction": "Unable to add reactions. Please check my permissions...",
         "no-roll": "No choice found",
-        "not-enough-roll": "There must be at least two distinct elements",
         "no-say": "Unable to send any message in this channel",
         "no-voicechan": "You must be in a vocal channel in order to use this command.",
+        "not-enough-roll": "There must be at least two distinct elements",
         "osekour": [
             "Wait, I'm finishing watching my movie.",
             "We're coming! But why don't you answer anymore? Don't fake death!",
@@ -335,11 +331,11 @@
         "react-0": "Unable to find the corresponding message. You must enter the message ID in the first argument, and the emoji in the second :upside_down:\n Also check that I have permission to read the message history!",
         "reminds-asked": "{user}, you asked me {duration} ago to remind you of this:",
         "reminds-date": "Request date",
+        "reminds-link": "Original message",
         "reminds-saved": "Got it! I'll remind you in {duration}",
         "reminds-title": "Reminder",
         "reminds-too-long": "Impossible to set such a long duration",
         "reminds-too-short": "You have entered an invalid duration",
-        "reminds-link": "Original message",
         "say-no-perm": "You do not have permission to send messages in the channel {channel}",
         "thanos": [
             "{0} was spared by Thanos",
@@ -370,10 +366,14 @@
             "Did you know? At some special events, it is possible to obtain collector xp cards. Don't forget to follow the news on the official server!",
             "> This too will pass\n*(do you have the reference?)*"
         ],
-        "unafk-done": "You aren't AFK anymore",
         "unafk-cant": "You aren't AFK!",
+        "unafk-done": "You aren't AFK anymore",
         "uninhabited-city": "Uninhabited city :confused:",
         "vote-0": "You can't put more than 20 choices, and even less a negative number of choices!"
+    },
+    "halloween": {
+        "got-points": "Congratulations! You just won **{pts} event points**!",
+        "too-quick": "It is still too early! You can only retrieve event points once per hour."
     },
     "infos": {
         "about-0": "My Discord server:",
@@ -407,19 +407,19 @@
         "ping-found": "Pong! (average of {tps}ms per 64 byte, sent at {url})",
         "ping-notfound": "Unable to ping this address",
         "prefix": "List of currently usable prefixes:",
-        "stats.bot_version": "**Bot version:** {v}",
-        "stats.servers_count": "**Number of servers:** {v}",
-        "stats.users_count": "**Number of visible members:** {v[0]} ({v[1]} **bots**)",
-        "stats.codes_lines": "**Number of code lines:** {v}",
-        "stats.languages": "**Used languages:** {v}",
-        "stats.python_version": "**Python version:** {v}",
-        "stats.lib_version": "**Version of the `discord.py` lib:** {v}",
-        "stats.ram_usage": "**RAM usage:** {v} GB",
-        "stats.cpu_usage": "**CPU usage:** {v} %",
-        "stats.api_ping": "**API latency:** {v} ms",
-        "stats.cmds_24h": "**Commands processed in 24h:** {v}",
-        "stats.total_xp": "**Total of earned xp:** {v}xp",
         "stats-title": "**Bot statistics**",
+        "stats.api_ping": "**API latency:** {v} ms",
+        "stats.bot_version": "**Bot version:** {v}",
+        "stats.cmds_24h": "**Commands processed in 24h:** {v}",
+        "stats.codes_lines": "**Number of code lines:** {v}",
+        "stats.cpu_usage": "**CPU usage:** {v} %",
+        "stats.languages": "**Used languages:** {v}",
+        "stats.lib_version": "**Version of the `discord.py` lib:** {v}",
+        "stats.python_version": "**Python version:** {v}",
+        "stats.ram_usage": "**RAM usage:** {v} GB",
+        "stats.servers_count": "**Number of servers:** {v}",
+        "stats.total_xp": "**Total of earned xp:** {v}xp",
+        "stats.users_count": "**Number of visible members:** {v[0]} ({v[1]} **bots**)",
         "usernames-allow": "You can reauthorize the automatic recording with the command 'profile'",
         "usernames-disallow": "You can opt out of the automatic recording with the command 'profile'",
         "usernames-empty": "No change recorded",
@@ -441,8 +441,8 @@
         "aucune": "none",
         "beginning": "beginning",
         "bot": "bot",
-        "category": "category",
         "case": "case",
+        "category": "category",
         "click_here": "Click here",
         "depuis": "since",
         "dnd": "do not disturb",
@@ -500,15 +500,15 @@
         ]
     },
     "library": {
-        "no-found": "Unable to find this book",
         "author": "author",
         "authors": "authors",
-        "unknown": "unknown",
-        "year": "publication year",
-        "publisher": "publisher",
         "language": "language",
+        "no-found": "Unable to find this book",
+        "publisher": "publisher",
         "rate-limited": "Cannot search by name at the moment. Please try again later",
-        "title": "title"
+        "title": "title",
+        "unknown": "unknown",
+        "year": "publication year"
     },
     "logs": {
         "ban": "{user} ({userid}) has been banned",
@@ -523,12 +523,12 @@
         "d-welcome_roles": "Automated action (config welcome_roles)",
         "d-young": "Automod (too recent account)",
         "kick": "{user} ({userid}) has been kicked",
-        "unmute": "{user} ({userid}) is no more muted",
         "mute": "{user} ({userid}) is now muted",
         "slowmode-disabled": "Slowmode disabled in {channel}",
         "slowmode-enabled": "Slowmode enabled in {channel} ({seconds}s)",
         "softban": "{user} ({userid}) has been \"softbanned\"",
         "unban": "{user} ({userid}) is no more banned",
+        "unmute": "{user} ({userid}) is no more muted",
         "warn": "{user} ({userid}) has been warned"
     },
     "mc": {
@@ -623,8 +623,8 @@
         "no-mod": "Unable to find this mod",
         "no-ping": "Error: Unable to ping this server",
         "player-not-found": "I coud not find any Minecraft Java player with this username",
-        "player-skin-title": "Skin of the player {player}",
         "player-skin-download": "Click here to download",
+        "player-skin-title": "Skin of the player {player}",
         "serv-0": "Number of players",
         "serv-1": "List of the first 20 players connected",
         "serv-2": "List of online players",
@@ -638,12 +638,12 @@
         "already-unmute": "This member isn't muted!",
         "backup-done": "Backup done!",
         "ban-1": "It seems that this member is too high for me to ban him. :thinking:",
+        "ban-chat": "Member {user} ({userid}) is no more banned",
+        "ban-dm": "You have just been banned from the server {guild} :confused:",
         "ban-list-error": "Oops, it looks like there are too many users to display :confused:",
         "ban-list-title-0": "List of banned members of the server \"{}\"",
         "ban-list-title-1": "List of 45 banned members of the server \"{}\"",
         "ban-list-title-2": "List of 60 banned members of the server \"{}\"",
-        "ban-chat": "Member {user} ({userid}) is no more banned",
-        "ban-dm": "You have just been banned from the server {guild} :confused:",
         "ban-user-here": "This person is not part of the banned members list :upside_down:",
         "cant-ban": "Permission \"Ban members\" needed :confused:",
         "cant-emoji": "Oops, I'm missing the permission `Manage emojis` :confused:",
@@ -668,23 +668,23 @@
         "give_roles-2": "-> {c} roles assigned out of {m}!",
         "give_roles-4": "Oops, it seems that this role is too high for me to give or remove to anyone. Please place my role above the `{r}` role",
         "give_roles-higher": "You can't give or remove roles higher than yours!",
-        "kick-chat": "Member {user} ({userid}) has been kicked from this server",
         "kick-1": "It seems that this member is too high for me to kick him out :thinking:",
+        "kick-chat": "Member {user} ({userid}) has been kicked from this server",
         "kick-dm": "You have just been kicked from the server {guild} :confused:",
         "missing-manage-nick": "Oops, I'm missing the \"Manage nicknames\" permission!",
         "missing-user-perms": "Oops, you're missing permissions (either manage roles, manage server or manage messages)",
+        "mute-chat": "Member {user} ({userid}) has been silenced",
         "mute-config-err": "Impossible to do that. Please check my permissions on the server and try again.",
         "mute-config-success-0": "The role has been successfully created and configured!",
         "mute-config-success-m": "The role has been successfully created and configured! ({c} channels could not be configured, due to lack of permissions)",
         "mute-config-success2-0": "The role has been successfully configured!",
         "mute-config-success2-m": "The role has been successfully configured! ({c} channels could not be configured, due to lack of permissions)",
-        "mute-role-created": "Successfully created `muted` role!\nYou can use the `{p}mute-config` command for automatic configuration in your server.",
+        "mute-dm": "You have been muted in the server {guild}",
         "mute-high": "Oops, it seems that the `muted` role is too high for me to give it... Please fix this problem by placing my role higher than the `muted` role.",
         "mute-list-title-0": "List of muted members of the server \"{guild}\"",
         "mute-list-title-1": "List of 45 muted members of the server \"{guild}\"",
         "mute-list-title-2": "List of 60 muted members of the server \"{guild}\"",
-        "mute-chat": "Member {user} ({userid}) has been silenced",
-        "mute-dm": "You have been muted in the server {guild}",
+        "mute-role-created": "Successfully created `muted` role!\nYou can use the `{p}mute-config` command for automatic configuration in your server.",
         "need-manage-messages": "Permission \"Manage Messages\" missing :confused:",
         "need-read-history": "Oops, I'm missing the permission to \"Read Message History\" :confused: ",
         "no-bans": "No member seems to be banned from here",
@@ -692,8 +692,8 @@
         "no-mutes": "No member seems to be banned from here",
         "pin-error": "Oops, I can't find that message (Error : `{}`)",
         "pin-error-3": "Oops, impossible to pin this message (do you have more than 50 pinned messages?). Error : `{}`",
-        "raid-kicked": "You have been automatically kicked off the {guild} server by the anti-raid system. Try again in a few days.",
         "raid-banned": "You have been automatically banned from the {guild} server by the antiraid system.",
+        "raid-kicked": "You have been automatically kicked off the {guild} server by the anti-raid system. Try again in a few days.",
         "react-clear": "I'm unable to find this message :confused:",
         "remove_roles-0": "Oops, looks like that role is too high up for me to take it away from anyone. Please place my role above the role `{r}`",
         "remove_roles-1": "-> {c} roles removed on {m}!",
@@ -767,9 +767,9 @@
                 "60"
             ]
         ],
-        "warn-chat": "The member {user} ({userid}) has been warned",
         "warn-bot": "I can't warn a bot ^^",
         "warn-but-db": "Our database being offline, the warning could not be saved. Nevertheless, the member did receive their warning in DM",
+        "warn-chat": "The member {user} ({userid}) has been warned",
         "warn-dm": "You have received a warning from the {guild} server",
         "wrong-guild": "Oops, it seems this emoji doesn't belong to this server :thinking:"
     },
@@ -892,8 +892,8 @@
         "invalid-flow": "This url is invalid (empty or inaccessible rss flow) :confused:",
         "invalid-link": "Oops, this url address is invalid or incomplete :confused:",
         "list": "*Type the number of the flow to modify*\n\n**Link - Type - Channel - Mentions**\n",
-        "list-title": "List of rss feeds from the server {server}",
         "list-result": "Type: {}\nDiscord channel: {}\nURL/Channel: {}\nMentions: {}\nIdentifier: {}\nLast post: {}",
+        "list-title": "List of rss feeds from the server {server}",
         "list2": "*Type the number of the flow to delete*\n\n**Link - Type - Channel**\n",
         "loop-processing": "A check of your RSS feeds is already in progress. Please wait a few minutes",
         "mc": "Minecraft",
@@ -1016,10 +1016,10 @@
         "ttt_display": "Usage of the tic-tac-toe: {}",
         "update_mentions": "Roles mentioned in the bot changelog: {}",
         "verification_role": "Roles removed when a user use the `verify` command: {}",
-        "voice_roles": "Roles given to members in a vocal channel: {}",
-        "voice_channel": "Channel from which automatic voice chat rooms will be created: {}",
         "voice_category": "Category in which automatic voice chat rooms will be created: {}",
+        "voice_channel": "Channel from which automatic voice chat rooms will be created: {}",
         "voice_channel_format": "Format of automatic voice channel names: {}",
+        "voice_roles": "Roles given to members in a vocal channel: {}",
         "vote_emojis": "Emojis used for poll reactions: {}",
         "warn": "List of roles that can use commands \"warn\" and \"cases\": {}",
         "welcome": "Message sent when a member arrives: {}",
@@ -1050,6 +1050,7 @@
         "guild-14": "Limitations",
         "guild-14v": "Bitrate: {bit}kbps\nMax files size: {fil}MB\nEmojis count: {emo}",
         "guild-15": "Invite url",
+        "guild-16": "Static: {s}/{l} | Animated: {a}/{l}",
         "guild-2": "Region",
         "guild-3": "Text : {} | Vocal : {} ({} categories)",
         "guild-4": "Online members",
@@ -1058,7 +1059,6 @@
         "guild-7": "{} including {} bots ({} connected)",
         "guild-8": "Two-factor authentification",
         "guild-9": "Security level",
-        "guild-16": "Static: {s}/{l} | Animated: {a}/{l}",
         "guild-features": {
             "ANIMATED_ICON": "Animated server icon",
             "BANNER": "Custom server banner",
@@ -1090,6 +1090,7 @@
         "inv-9": "Server features",
         "member-0": "Nickname",
         "member-1": "Created at",
+        "member-10": "Still hasn't accepted the rules",
         "member-2": "Joined at",
         "member-3": "Arrival position",
         "member-4": "Status",
@@ -1098,7 +1099,6 @@
         "member-7": "Infractions",
         "member-8": "Custom activity",
         "member-9": "Roles",
-        "member-10": "Still hasn't accepted the rules",
         "not-found": "Unable to find {N}",
         "role-0": "ID",
         "role-1": "Color",
@@ -1124,13 +1124,13 @@
         "voicechan-0": "Vocal channel"
     },
     "timers": {
+        "rmd-cancelled": "Dropping the process",
         "rmd-cleared": "Your reminders have been deleted!",
         "rmd-confirm": "Are you sure you want to delete all your reminders? ({count} pending)",
         "rmd-deleted": "Reminder #{id} with message `{message}` has successfully been deleted!",
         "rmd-empty": "Oops, you don't have any pending reminder...",
         "rmd-item": "ID: `{id}` | In: {duration} | Channel: {channel} | Message: {msg}",
-        "rmd-title": "List of your reminders",
-        "rmd-cancelled": "Dropping the process"
+        "rmd-title": "List of your reminders"
     },
     "users": {
         "animated_card_false": "You are not currently allowing an animated card. Thanks!",
@@ -1149,8 +1149,8 @@
         "usernames_log_true": "You have authorized the recording of your user names and nicknames"
     },
     "voices": {
-        "no-channel": "There are no voice channel generated in this server",
-        "deleted": "{i} deleted channels"
+        "deleted": "{i} deleted channels",
+        "no-channel": "There are no voice channel generated in this server"
     },
     "xp": {
         "1-no-xp": "You don't have any xp yet!",

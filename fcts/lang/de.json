@@ -12,8 +12,8 @@
     "aide": {
         "aliases": "Adressen",
         "categories": {
-            "fun": "Spaß",
             "data": "Informationen",
+            "fun": "Spaß",
             "moderation": "Moderation",
             "other": "Andere",
             "server-settings": "Server Einstellungen",
@@ -176,6 +176,7 @@
             "christmas-2019": {
                 "50": "Schalte die spezielle weihnachts rank card 2019 frei!"
             },
+            "halloween-2020": "{'200': 'schalte die Halloween 2020 xp Karte frei! Außerdem bekommst du noch eine besondere Rolle in unserem offiziellen Server'}",
             "nothing": "Es gibt nichts bei diesem Event zu holen 😕"
         },
         "events-title": {
@@ -199,6 +200,7 @@
         "list-0": "**Typ:** {T}\n**Moderator:** {M}\n**Datum:** {D}\n**Grund:** *{R}*",
         "list-1": "**Server:** {G}\n**Typ:** {T}\n**Moderator:** {M}\n**Datum:** {D}\n**Grund:** *{R}*",
         "list-2": "\n**Zeit:** {D}",
+        "no-case": "Dieser Nutzer hat keine Verstöße!",
         "no-user": "Nutzer nicht gefunden :eyes:",
         "no_database": "Wegen eines Database problems ist dieser Befehl momentan nicht verfügbar",
         "not-found": "Es wurde nichts gefunden :confused:",
@@ -219,6 +221,7 @@
         "disabled": "Der Command {c} ist deaktiviert :confused:",
         "duration": "Die Zeit `{d}` ist nicht möglich",
         "emojinotfound": "Emoji `{e}` konnte nicht gefunden werden",
+        "invalidcardstyle": "Ungültiger Karten Stil: `{s}`",
         "invalidcolor": "Die Farbe `{c}` ist fehlerhaft",
         "invalidemoji": "Fehlerhafter Emoji",
         "invalidguild": "Dieser Server konnte nicht gefunden werden: `{g}`",
@@ -230,8 +233,11 @@
         "membernotfound": "Mitglied `{m}` konnte nicht gefunden werden :confused:",
         "missingargument": "Oops, das Argument \"{a}\" fehlt {e}",
         "msgnotfound": "Es konnte keine Nachricht mit der ID gefunden werden {msg}",
+        "notrightroles": "Du hast nicht die nötigen Berechtigungen um den Befehl auszuführen",
+        "quoteserror": "Ups, ein Anführungszeichen Fehler ist aufgetreten. Schau nochmal nach ob du die Anführungszeichen “ richtig benutzt hast, sodass beide Anführungszeichen später geschlossen sind",
         "rolenotfound": "Die Rolle `{r}` konnte nicht gefunden werden",
         "toomanytxtchan": "Du hast zu viele Erreichbare Textkanäle",
+        "unknown": "Ups, ein Fehler ist aufgetreten 😕 Versuche es später nochmal oder kontaktiere den Support (command `about`).",
         "usernotfound": "Der Nutzer `{u}` konnte nicht gefunden werden :confused:"
     },
     "events": {
@@ -254,6 +260,7 @@
         "afk-no-perm": "Ups... Ich kann keine Namen ändern 😕 Ich werde versuchen mich zu erinnern aber ich könnte vergessen, dass du afk bist",
         "afk-user-1": "Dieses Mitglied ist AFK, da {}",
         "afk-user-2": "Dieser Nutzer ist AFK!",
+        "bbw-too-many": "Ups, der Text ist zu groß für Discord 😕",
         "blame-0": "Liste möglicher Namen für **{}**",
         "calc-0": "Ooop, das hat zu lange gedauert :/",
         "calc-1": "Die Lösungen der Rechnung `{}` sind `{}`",
@@ -270,11 +277,22 @@
         "count-3": "Ooops, ich besitze nicht die Berechtigung diesen Chatverlauf zu lesen",
         "count-4": "Von den letzen {limit} Nachrichten hat {user} {x} Nachrichten gesendet ({p}%)",
         "count-5": ".",
+        "discordjobs-count": "{c} Angebote gefunden",
+        "discordjobs-title": "verfügbare Jobs bei Discord",
+        "discordstatus-exists": "Es gibt gerade ein {impact} Problem bei Discord: {title}",
+        "discordstatus-impacts": {
+            "major": "größer",
+            "minor": "kleiner",
+            "none": "ohne Effekte"
+        },
+        "discordstatus-nothing": "Es wurde nichts gefunden!\nDas letzte bekannte Problem war am {date}",
         "embed-error": "Ein Fehler: `{}`",
+        "embed-invalid-channel": "Kann keine Nachricht in diesen Kanal senden",
         "embed-invalid-image": "Die Url stellte sich als ungültig heraus",
         "fun-list": "Hier ist einer Liste aller Spaß Befehle:",
         "invalid-city": "Ungultige Stadt :confused:",
         "markdown": "__**Markdown Regeln** für *Discord*__\n\n`*italics*` = *italics*\n`__underline__` = __underline__\n`**bold**` = **bold**\n`***bold italics***` = ***bold italics***\n`~~strikeout~~` = ~~strikeout~~\n`__*underline italics*__` = __*underline italics*__\n`__**underline bold**__` = __**underline bold**__\n`__***underline bold italics***__` = __***underline bold italics***__\n`||spoiler||` = ||spoiler||\n> quote = `> quote`\n\\`code\\` = `code`\n \\ to ignore\n\nFür Codeblock cf: <https://discord.gg/DGahTNn>",
+        "nasa-none": "Ups, Ich kann keine Informationen von der Nasa bekommen. Versuche es nochmal in ein paar Minuten 😕",
         "no-database": "As our database is offline, access to fun commands is restricted to people with permission \"Manage Server\"",
         "no-embed-perm": "Ich hab keine Rechte für \"Embed links\" :confused:",
         "no-emoji": "Dieser Emoji wurde nicht gefunden!",
@@ -283,6 +301,7 @@
         "no-roll": "Keine Wahl gefunden",
         "no-say": "Es ist mir nicht möglich hier Nachrichten zu versenden",
         "no-voicechan": "Du musst in einem Sprachkanal sein um diesen Befehl zu benutzen.",
+        "not-enough-roll": "Es müssen mindestens zwei verschiedene Sachen sein",
         "osekour": [
             "Warte, Ich schaue eben den Film zuende.",
             "Wir kommen! Aber warum antwortest du nicht? Stelle dich nicht tot!",
@@ -304,6 +323,11 @@
         "react-0": "Gesuchte Nachricht konnte nicht gefunden werden. Du musst als erstes die ID und dann den Emoji angeben :upside_down:\n Bitte beachte auch, dass den Nachrichtenverlauf lesen können muss!",
         "reminds-asked": "{user}, du hast mich vor {duration} gefragt, dass ich dich daran erinnern soll:",
         "reminds-date": "gefragt um",
+        "reminds-link": "Originale Nachricht",
+        "reminds-saved": "Habs! Ich werde dich in {duration} erinnern",
+        "reminds-title": "Erinnerung",
+        "reminds-too-long": "Es ist nicht möglich es auf eine so lange Zeit zu setzen",
+        "reminds-too-short": "Du hast eine ungültige Zeit eingegeben",
         "say-no-perm": "Du hast keine Berechtigungen in diesem Channel {channel} Nachrichten zu senden",
         "thanos": [
             "{0} wurde von Thanos verschont",
@@ -334,11 +358,23 @@
             "Hast du schon gewusst, dass es möglich ist, bei speziellen Events, Punkte zu sammeln, um xp Cards freizuschalten. Vergiss nicht die Zbot news auf deinem Server zu aktivierten!",
             "> Tue das, um zu überspringen\n*(hast du die Referenzen dafür?)*"
         ],
+        "unafk-cant": "Du bist nicht AFK!",
         "unafk-done": "Du bist nicht mehr AFK",
         "uninhabited-city": "Unbewohnte Stadt 😕",
         "vote-0": "Du kannst nicht mehr, als 20 Möglichkeiten oder eine negative Zahl angeben!"
     },
+    "halloween": {
+        "got-points": "Herzlichen Glückwunsch! Du hast gerade **{pts} Event Punkte** gewonnen!",
+        "too-quick": "Es ist noch zu früh! Du kannst nur einmal pro Stunde Event Punkte abholen."
+    },
     "infos": {
+        "about-0": "Mein Discord Server:",
+        "about-1": "Der Link um mich auf einen anderen Server einzuladen:",
+        "about-2": "Die Bot Dokumententation",
+        "about-3": "Twitter Account von meinem Ersteller:",
+        "about-4": "Ein kurzes FAQ:",
+        "about-5": "Die Datenschutzbestimmungen:",
+        "about-main": "Hallo! Ich bin {mention}!\nIch bin ein Bot, der dir viele Sachen erlaubt wie zum Beispiel: Moderation, xp System, Statistiken, Partner Management und vieles mehr (und auch unnötige Sachen)!\nDu kannst anfangen, indem du `!help` in den Chat eingibst um eine Liste aller Befehle zu sehen, dann `!config see` um die möglichen Konfigurations Optionen zu sehen.\n\nMein Besitzer und ich würden gerne Awhikax für seinen support während allen möglichen Kriesen danken, Aragorn1202 für all seine Ideen danken und Adri für all die schönen Logos, Emojis und Profil Bildern danken und den ganzen Übersetzern für die lange Arbeit danken!\n\n🌐 Einige Links könnten noch nützlich sein : {links}\n\nHab einen schönen Tag!",
         "admins-list": "Die Administratoren dieses Bots sind: {}",
         "bitly_long": "Ursprüngliche URL: {url}",
         "bitly_nobit": "Das ist kein bit.ly Link!",
@@ -356,7 +392,6 @@
         ],
         "docs": "Hier der Link zur Bot Dokumentation:",
         "prefix": "Anzahl momentan nutzbarer Prefixe:",
-        "stats": "**Bot Version:** {bot_v} \n**Anzahl meiner Server:** {s_count} \n**Number sichtbarer Mitglieder:** {m_count}, ({b_count} **Bots**)\n**Anzahl an Codezeilen:** {l_count}\n**Benutzte Sprachen:** {lang}\n**Python Version :** {p_v} \n**Version des `discord.py` lib:** {d_v} \n**RAM Belastung:** {ram} GB \n**CPU Belastung:** {cpu} % \n**API Verzögerung:** {api} ms\n**Gesamtanzahl gesammelter XP:** {xp}",
         "stats-title": "**Bot Statistiken**",
         "usernames-allow": "Du kannst mit dem `profile` Befehl die automatische Aufzeichnung erneut Autorisierten",
         "usernames-disallow": "Du kannst mit dem `profile` Befehl die automatische Aufzeichnung einstellen",
@@ -431,12 +466,10 @@
         ]
     },
     "library": {
-        "book_pres": "Titel: {title}\nUntertitel: {subtitle}\nAuthor(s): {author}\nPublisher: {publisher}\nEröffnungsdatum: {publication}\nSprache: {language}\nSeitenanzahl: {pages}\n\nISBN : {isbn}",
-        "no-found": "Dieses Buch konnte nicht gefunden werden",
-        "price": "Preis"
+        "no-found": "Dieses Buch konnte nicht gefunden werden"
     },
     "logs": {
-        "ban": "{member} wurde gebannt (Grund: {reason} | case #{case})",
+        "ban": "{user} ({userid}) wurde gebannt",
         "case-del": "The case #{id} has been deleted (concerning {user})",
         "case-reason": "The case #{id} has been edited:\n`Old reason:` {old}\n`New reason:` {new}",
         "clear": "{number} Nachrichten wurden in {channel} gelöscht",
@@ -447,16 +480,14 @@
         "d-unmute": "Entmuted von {}",
         "d-welcome_roles": "Automated Aktion (config welcome_roles)",
         "d-young": "Automod (zu junger Account)",
-        "kick": "{member} wurde gekickt (Grund: {reason} | case #{case})",
-        "mute-off": "{member} ist jetzt nicht mehr gemuted",
-        "mute-on": "{member} wurde gemuted (Grund: {reason} | case #{case})",
+        "kick": "{user} ({userid}) wurde gekickt",
+        "mute": "{user} ({userid}) wurde gemuted",
         "slowmode-disabled": "Slowmode deaktiviert in {channel}",
         "slowmode-enabled": "Slowmode aktiviert in {channel} ({seconds}s)",
-        "softban": "{member} wurde \"gesoftbanned\" (Grund: {reason} | case #{case})",
-        "tempban": "{member} wurde für {duration} gebannt (Grund: {reason} | case #{case})",
-        "tempmute-on": "{member} wurde für {duration} gemuted (Grund: {reason} | case #{case})",
-        "unban": "{member} wurde entbannt (Grund: {reason})",
-        "warn": "{member} wurde verwarnt: {reason} (case #{case})"
+        "softban": "{user} ({userid}) wurde \"gesoftbanned\"",
+        "unban": "{user} ({userid}) wurde entbannt",
+        "unmute": "{user} ({userid}) ist jetzt nicht mehr gemuted",
+        "warn": "{user} ({userid}) wurde verwarnt"
     },
     "mc": {
         "adv-fields": [
@@ -547,14 +578,11 @@
         "already-mute": "Dieses Mitglied ist schon gemuted!",
         "already-unmute": "Dieses Mitglied ist nicht gemuted!",
         "backup-done": "Backup fertig!",
-        "ban": "{} wurde wegen `{}` von diesem Server gebannt",
         "ban-1": "Wie es scheint ist diese. :thinking:",
         "ban-list-error": "Oops, es scheint als wenn das zu viele zum anzeige sind :confused:",
         "ban-list-title-0": "Liste aller gebannter Mitglieder \"{}\"",
         "ban-list-title-1": "Liste der ersten 45 gebannten Mitlgider \"{}\"",
         "ban-list-title-2": "Liste der ersten 60 gebannten Mitlgider \"{}\"",
-        "ban-noreason": "Du wurdest gerade von dem Server {} gebannt :confused:",
-        "ban-reason": "Du wurdest gerade von dem Server {} gebannt :confused:\nGrund: {}",
         "ban-user-here": "Diese Person ist nicht gebannt :upside_down:",
         "cant-ban": "Berechtigung \"Ban members\" fehlt :confused:",
         "cant-emoji": "Mir fehlt die `Manage emojis` Berechtigung :confused:",
@@ -575,13 +603,8 @@
         "error": "Oops, da ist wohl ein Fehler passiert. Versuch es am Besten später nochmal ober kontaktiere den Support",
         "give_roles-1": "Mitglied {u} ist zu hoch für mich",
         "give_roles-2": "-> {c} Rollen wurden von {m} Rollen gegeben!",
-        "kick": "Mitglied {} wurde wegen dem Grund `{}` gekickt",
         "kick-1": "Es scheint so, als wenn diese Person mehr rechte hat als ich :thinking:",
-        "kick-noreason": "Du wurdest geradevon dem Server {} geworfen :confused:",
-        "kick-reason": "Du wurdest geradevon dem Server {} geworfen :confused:\nGrund : {}",
         "missing-manage-nick": "Oops, mir fehlt die \"Manage nicknames\" Berecht!",
-        "mute-1": "Das Mitglied {} wurde gemuted wegen: `{}`!",
-        "mute-created": "`muted` Rolle wurde erfolgreich erstellt!",
         "mute-high": "Oops, die `muted` ist zu hoch positioniert für mich... Bitte plaziere eine meiner Rollen über der `muted` Rolle.",
         "need-manage-messages": "Berechtigung \"Manage Messages\" fehlt :confused:",
         "need-read-history": "Oops, mir fehlt die \"Read Message History\" Berechtigung :confused: ",
@@ -601,11 +624,7 @@
         "staff-kick": "Du kannst keine Teammitglieder kicken!",
         "staff-mute": "Du kannst keine Teammitgleider muten",
         "staff-warn": "Du kannst keine Teammitglieder verwarnen!",
-        "tempban": "{} wurde für {} gebannt, mit der Begründung: `{}`",
-        "tempmute-1": "Das Mitglied {} wurde für `{}` gemuted für {}!",
-        "unban": "Das Mitglied {} ist jetzt nicht mehr gebannt",
         "unhoisted": "{c} Nickname geändert!",
-        "unmute-1": "{} kann jetzt wieder schreiben.",
         "verify-role-high": "Oops, es scheint als wenn die Rolle `{r}` zu hoch für mich ist. Bitte plaziere sie unter einer meiner Rollen oder eine meiner Rolle über sie.",
         "verify_questions": [
             [
@@ -661,10 +680,8 @@
                 "60"
             ]
         ],
-        "warn-1": "Mitglied `{}` wurde wegen dem Grund `{}` verwarnt",
         "warn-bot": "Du kannst keine Bots verwarnen ^^",
         "warn-but-db": "Da unsere Database momentan offline ist konnte diese Warnung nicht gespeichert werden. Sie wurde aber dennoch abgesendet",
-        "warn-mp": "Du hast eine Verwarnung auf dem Server *{}* bekommen: \n{}",
         "wrong-guild": "Oops, es scheint als wenn dieser Emoji nicht zu diesem Server gehört :thinking:"
     },
     "morpion": {
@@ -783,7 +800,6 @@
         "list2": "*Schreibe die Nummer von dem Flow, der gelöscht werden soll*\n\n**Link - Nachricht - Kanal**",
         "mc": "Minecraft",
         "move-success": "Der rss Feed #{} wurde in den Kanal {} gemacht!",
-        "no-db": "Weil die Datenbank gerade offline ist, kommen zeitlich begrenzt keine rss Feeds 😕",
         "no-feed": "Ups, du kannst keine rss Feeds verwalten!",
         "no-roles": "Es wurde noch keine Rolle konfiguriert.",
         "nothing": "Ich habe nichts bei meiner Suche gefunden 😕",
@@ -806,8 +822,8 @@
         "use_embed_false": "Der Feed nutzt keine Einbettungen zum senden. Willst du hier einbetten? (true/false)",
         "use_embed_true": "Hier werden aktuell Einbettungen zum senden genutzt. Willst du hier immernoch Einbettungen nutzen? (true/false)",
         "web": "Web",
-        "web-default-flow": "{logo} | Neuer Post von {author} ({date}):\n             {title}\n\n{link}\n\n{mentions}",
-        "web-form-last": "{logo} | Hier ist der neuste Post von {author}:\n**{title}**\n*Geschrieben am {date}*\nLink: {link}",
+        "web-default-flow": "{logo} | Neuer Post von {channel} ({date}):\n             {title}\n\n{link}\n\n{mentions}",
+        "web-form-last": "{logo} | Hier ist der neuste Post von {channel}:\n**{title}**\n*Geschrieben am {date}*\nLink: {link}",
         "web-help": "Um ein rss Feed von einer Webseite zu suchen musst du die rss/atom Feed url, als ein Parameter angeben. Wenn der Feed gültig ist, werde ich den letzten Artikel der Webseite posten.\n*Tipp: ein paar rss Feeds sind schon in meinem Code. Manchmal kannst du einfach `fr-minecraft` oder `minecraft.net` nehmen* 😉",
         "web-invalid": "Ups, diese url Adresse ist ungültig 😕",
         "yt": "YouTube",
@@ -924,11 +940,9 @@
             "BANNER": "Benutzerdefinierter Server-Banner",
             "COMMERCE": "Commerce-Funktionen",
             "DISCOVERABLE": "Wird in der Entdeckungs-Registerkarte angezeigt",
-            "FEATURABLE": "Wird in der Aktions-Registerkarte angezeigt",
             "INVITE_SPLASH": "Benutzerdefiniertes Einladungshintergrundbild",
             "NEWS": "News Kanal",
             "PARTNERED": "Partner Server",
-            "PUBLIC": "öffentlicher Server",
             "VANITY_URL": "Benutzerdefinierte Einladungs url",
             "VERIFIED": "Verifizierter Server",
             "VIP_REGIONS": "VIP Sprachregion"

@@ -12,8 +12,8 @@
     "aide": {
         "aliases": "Alias",
         "categories": {
-            "fun": "fun",
             "data": "informations",
+            "fun": "fun",
             "moderation": "modération",
             "other": "autres",
             "server-settings": "configuration",
@@ -115,10 +115,6 @@
                 "L'événement Halloween est en cours, profitez-en !",
                 "Il n'y a aucun événement de type Halloween actuellement"
             ],
-            "is_ttt_enabled": [
-                "Le jeu du morpion est activé",
-                "Le jeu du morpion doit être activé sur ce serveur"
-            ],
             "is_owner": [
                 "Il faut être le propriétaire du bot",
                 "Vous n'êtes pas le propriétaire du bot"
@@ -130,6 +126,10 @@
             "is_translator": [
                 "Vous faites bien partie de l'équipe de traducteurs",
                 "Vous devez faire partie de l'équipe de traducteurs"
+            ],
+            "is_ttt_enabled": [
+                "Le jeu du morpion est activé",
+                "Le jeu du morpion doit être activé sur ce serveur"
             ],
             "verify_role_exists": [
                 "Un rôle de vérification est configuré",
@@ -169,20 +169,19 @@
         "missing-attachment-perm": "Oups, il me manque la permission d'envoyer des images !",
         "won-card": "Wow! Magnifique image blurple {}! tellement beau que j'ai décidé de t'offrir la carte d'xp blurple, je suis sûr qu'elles iront bien ensemble ! Tu peux l'utiliser en tapant la commande `{}profile card blurple` {}"
     },
-    "halloween": {
-        "got-points": "Bravo ! Vous venez de gagner **{pts} points** d'événement !",
-        "too-quick": "Il est encore trop tôt ! Vous ne pouvez récupérer des points d'événement qu'une fois par heure"
-    },
     "bot_events": {
         "events-desc": {
+            "april-2021": "Aujourd'hui, c'est la journée internationale des poissons ! Pendant toute la journée, Zbot fêtera le 1er avril avec des émojis spéciaux pour le jeu du morpion, un avatar unique ainsi que d'autres choses trop cool. \n\nProfitez-en pour récupérer des points d'événements et tentez de gagner la carte d'xp rainbow ! Pour rappel, les cartes d'xp sont accessibles via ma commande `profile card`",
             "blurple-2020": "Fêtons les 5 ans de Discord pendant l'événement Blurple ! Pour la troisième année consécutive, nous participons à l'événement \"Blurple\", qui consiste à recolorer nos avatars et serveurs avec un maximum de blurple, cette couleur caractéristique de Discord entre le violet et le bleu. Profitez-en pour récupérer des points d'événements et tentez de gagner la carte d'xp spécial Blurple 2020 ! Pour rappel, les cartes d'xp sont accessibles via ma commande `profile card`\n\nPour cet événement, la commande spéciale `blurple` a été activée, n'hésitez pas à l'utiliser pour tenter de gagner des points !",
             "christmas-2019": "Fêtez l'arrivée de Noël grâce à cet événement ! Pendant plusieurs jours, Zbot se pare des couleurs de l'hiver avec des émojis spéciaux pour le jeu du morpion, un avatar unique ainsi que d'autres choses trop cool. \n\nProfitez-en pour récupérer des points d'événements et tentez de gagner la carte d'xp spécial Noël 2019 ! Pour rappel, les cartes d'xp sont accessibles via ma commande `profile card`",
             "halloween-2020": "Le mois d'octobre est là ! Profitez jusqu'au 1er novembre d'une atmosphère ténébreuse, remplie de chauve-souris, de squelettes et de citrouilles.\nProfitez-en pour redécorer votre serveur aux couleurs d'Halloween avec la commande `halloween hallowify` et ses dérivées, vérifiez que votre avatar soit bien conforme avec la commande `halloween check`, et récupérez des points d'événements toutes les heures avec la commande `halloween collect`.\n\nLes plus courageux d'entre vous réussirons peut-être à débloquer la carte d'xp spécial Halloween 2020, accessible via la commande `profile card` !",
-            "april-2021": "Aujourd'hui, c'est la journée internationale des poissons ! Pendant toute la journée, Zbot fêtera le 1er avril avec des émojis spéciaux pour le jeu du morpion, un avatar unique ainsi que d'autres choses trop cool. \n\nProfitez-en pour récupérer des points d'événements et tentez de gagner la carte d'xp rainbow ! Pour rappel, les cartes d'xp sont accessibles via ma commande `profile card`",
             "nothing": "Il n'y a actuellement aucun événement. Suivez les news du bot pour connaître la date du prochain !"
         },
         "events-price-title": "Prix à gagner",
         "events-prices": {
+            "april-2021": {
+                "120": "Débloquez la carte d'xp multicolore, obtenable qu'un seul jour par an !"
+            },
             "blurple-2020": {
                 "150": "Débloquez la carte d'xp spécial Blurple 2020 !"
             },
@@ -192,15 +191,12 @@
             "halloween-2020": {
                 "200": "Débloquez la carte d'xp spécial Halloween 2020 ! En prime, un rôle spécial dans notre serveur officiel"
             },
-            "april-2021": {
-                "120": "Débloquez la carte d'xp multicolore, obtenable qu'un seul jour par an !"
-            },
             "nothing": "Il n'y a rien à gagner pour cet événement :confused:"
         },
         "events-title": {
+            "april-2021": "Joyeux 1er avril !",
             "blurple-2020": "Les 5 ans de Discord !",
-            "christmas-2019": "Noël en approche !",
-            "april-2021": "Joyeux 1er avril !"
+            "christmas-2019": "Noël en approche !"
         },
         "objectives": "Objectifs",
         "points": "points",
@@ -220,9 +216,9 @@
         "list-0": "**Type:** {T}\n**Moderateur:** {M}\n**Date:** {D}\n**Raison:** *{R}*",
         "list-1": "**Serveur:** {G}\n**Type:** {T}\n**Moderateur:** {M}\n**Date:** {D}\n**Raison:** *{R}*",
         "list-2": "\n**Durée :** {D}",
+        "no-case": "Cet utilisateur n'a aucun casier !",
         "no-user": "Impossible de trouver cet utilisateur",
         "no_database": "En raison d'une panne temporaire de la base de donnée, cette commande a été désactivée",
-        "no-case": "Cet utilisateur n'a aucun casier !",
         "not-found": "Ce casier n'a pas été trouvé :confused:",
         "reason-edited": "La raison du casier n°{} a bien été modifiée !",
         "search-0": "**Membre:** {U}\n**Type:** {T}\n**Moderateur:** {M}\n**Date:** {D}\n**Raison:** *{R}*",
@@ -299,15 +295,15 @@
         "count-3": "Oups, il m'est impossible de lire l'historique de ce salon. Veuillez vérifier mes permissions...",
         "count-4": "Sur les {limit} derniers messages, {user} en a posté {x} ({p}%)",
         "count-5": "Vous ne pouvez pas utiliser cette commande dans un salon où vous n'avez pas accès à l'historique des messages",
-        "discordjobs-title": "Postes disponibles chez Discord",
         "discordjobs-count": "{c} offres trouvées",
-        "discordstatus-nothing": "Rien à signaler pour le moment !\nLa dernière panne connue était le {date}",
+        "discordjobs-title": "Postes disponibles chez Discord",
         "discordstatus-exists": "Il y a actuellement un incident {impact} en cours sur Discord : {title}",
         "discordstatus-impacts": {
-            "none": "sans effet",
+            "major": "majeur",
             "minor": "mineur",
-            "major": "majeur"
+            "none": "sans effet"
         },
+        "discordstatus-nothing": "Rien à signaler pour le moment !\nLa dernière panne connue était le {date}",
         "embed-error": "Une erreur est survenue: `{}`",
         "embed-invalid-channel": "Impossible d'envoyer des messages dans ce salon",
         "embed-invalid-image": "L'url saisie pour l'image est invalide",
@@ -321,9 +317,9 @@
         "no-fun": "Les commandes fun ont été désactivées sur ce serveur. Pour voir leur liste, regardez https://zbot.rtfd.io/en/v3/fun.html",
         "no-reaction": "Impossible d'ajouter les réactions. Vérifiez mes permissions",
         "no-roll": "Aucun élément trouvé",
-        "not-enough-roll": "Il vous faut au moins deux éléments distincts",
         "no-say": "Impossible d'envoyer un message dans ce salon",
         "no-voicechan": "Vous devez être connecté à un salon vocal pour utiliser cette commande.",
+        "not-enough-roll": "Il vous faut au moins deux éléments distincts",
         "osekour": [
             "Attends, je finis de regarder mon film",
             "On arrive ! Mais pourquoi ne répondez-vous plus ? Ne simulez pas la mort !",
@@ -345,11 +341,11 @@
         "react-0": "Impossible de trouver le message correspondant. Il faut rentrer l'ID du message en 1er argument, et l'émoji en 2e :upside_down:\n Vérifiez aussi que je possède la permission de lire l'historique des messages !",
         "reminds-asked": "{user}, vous m'avez demandé il y a {duration} de vous rappeler ceci :",
         "reminds-date": "Date de demande",
+        "reminds-link": "Message d'origine",
         "reminds-saved": "C'est noté ! Je vous le rappelerai dans {duration}",
         "reminds-title": "Rappel",
         "reminds-too-long": "Impossible de mettre une durée aussi longue",
         "reminds-too-short": "Vous avez saisi une durée invalide",
-        "reminds-link": "Message d'origine",
         "say-no-perm": "Vous ne possédez pas la permission d'envoyer des messages dans le salon {channel}",
         "thanos": [
             "{0} a été épargné par Thanos",
@@ -380,10 +376,14 @@
             "Le saviez-vous ? Lors de certains événements spéciaux, il est possible d'obtenir des cartes d'xp collector. N'oubliez pas de suivre les news via le serveur officiel !",
             "> Cela aussi passera\n*(vous avez la référence ?)*"
         ],
-        "unafk-done": "Vous n'êtes maintenant plus AFK",
         "unafk-cant": "Vous n'êtes pas AFK !",
+        "unafk-done": "Vous n'êtes maintenant plus AFK",
         "uninhabited-city": "Endroit inhabité",
         "vote-0": "Vous ne pouvez pas mettre plus de 20 choix, encore moins un nombre négatif de choix !"
+    },
+    "halloween": {
+        "got-points": "Bravo ! Vous venez de gagner **{pts} points** d'événement !",
+        "too-quick": "Il est encore trop tôt ! Vous ne pouvez récupérer des points d'événement qu'une fois par heure"
     },
     "infos": {
         "about-0": "Mon serveur Discord :",
@@ -417,19 +417,19 @@
         "ping-found": "Pong ! (moyenne de {tps}ms par 64 bits, envoyés à {url})",
         "ping-notfound": "Impossible de ping cette adresse",
         "prefix": "Liste des préfixes actuellement utilisables :",
-        "stats.bot_version": "**Version du bot :** {v}",
-        "stats.servers_count": "**Nombre de serveurs :** {v}",
-        "stats.users_count": "**Nombre de membres visibles :** {v[0]} (dont {v[1]} **bots**)",
-        "stats.codes_lines": "**Nombre de lignes de code :** {v}",
-        "stats.languages": "**Langues utilisées :** {v}",
-        "stats.python_version": "**Version de Python :** {v}",
-        "stats.lib_version": "**Version de la bibliothèque `discord.py` :** {v}",
-        "stats.ram_usage": "**Charge sur la mémoire vive :** {v} GB",
-        "stats.cpu_usage": "**Charge sur le CPU :** {v} %",
-        "stats.api_ping": "**Temps de latence de l'api :** {v} ms",
-        "stats.cmds_24h": "**Commandes traitées en 24h :** {v}",
-        "stats.total_xp": "**Nombre total d'xp gagné :** {v}xp",
         "stats-title": "**Statistiques du bot**",
+        "stats.api_ping": "**Temps de latence de l'api :** {v} ms",
+        "stats.bot_version": "**Version du bot :** {v}",
+        "stats.cmds_24h": "**Commandes traitées en 24h :** {v}",
+        "stats.codes_lines": "**Nombre de lignes de code :** {v}",
+        "stats.cpu_usage": "**Charge sur le CPU :** {v} %",
+        "stats.languages": "**Langues utilisées :** {v}",
+        "stats.lib_version": "**Version de la bibliothèque `discord.py` :** {v}",
+        "stats.python_version": "**Version de Python :** {v}",
+        "stats.ram_usage": "**Charge sur la mémoire vive :** {v} GB",
+        "stats.servers_count": "**Nombre de serveurs :** {v}",
+        "stats.total_xp": "**Nombre total d'xp gagné :** {v}xp",
+        "stats.users_count": "**Nombre de membres visibles :** {v[0]} (dont {v[1]} **bots**)",
         "usernames-allow": "Vous pouvez réautoriser l'enregistrement automatique via la commande 'profile'",
         "usernames-disallow": "Vous pouvez vous retirer de l'enregistrement automatique via la commande 'profile'",
         "usernames-empty": "Aucun changement enregistré",
@@ -510,15 +510,15 @@
         ]
     },
     "library": {
-        "no-found": "Impossible de trouver un livre correspondant",
         "author": "auteur",
         "authors": "auteurs",
-        "unknown": "inconnu",
-        "year": "année de publication",
-        "publisher": "éditeur",
         "language": "langue",
+        "no-found": "Impossible de trouver un livre correspondant",
+        "publisher": "éditeur",
         "rate-limited": "Impossible de faire une recherche par nom pour le moment. Veuillez réessayer plus tard",
-        "title": "titre"
+        "title": "titre",
+        "unknown": "inconnu",
+        "year": "année de publication"
     },
     "logs": {
         "ban": "{user} ({userid}) a été banni du serveur",
@@ -533,12 +533,12 @@
         "d-welcome_roles": "Action automatique (config welcome_roles)",
         "d-young": "Automod (compte trop récent)",
         "kick": "{user} ({userid}) a été expulsé du serveur",
-        "unmute": "{user} ({userid}) n'est plus muet",
         "mute": "{user} ({userid}) est maintenant muet",
         "slowmode-disabled": "Slowmode désactivé dans le salon {channel}",
         "slowmode-enabled": "Slowmode activé dans le salon {channel} ({seconds}s)",
         "softban": "{user} ({userid}) a été 'softban'",
         "unban": "{user} ({userid}) n'est plus banni de ce serveur",
+        "unmute": "{user} ({userid}) n'est plus muet",
         "warn": "{user} ({userid}) a reçu un avertissement"
     },
     "mc": {
@@ -633,8 +633,8 @@
         "no-mod": "Mod introuvable",
         "no-ping": "Erreur : Impossible de ping ce serveur",
         "player-not-found": "Aucun joueur Minecraft Java avec ce pseudo ne semble exister",
-        "player-skin-title": "Skin du joueur {player}",
         "player-skin-download": "Cliquez ici pour télécharger",
+        "player-skin-title": "Skin du joueur {player}",
         "serv-0": "Nombre de joueurs",
         "serv-1": "Liste des 20 premiers joueurs connectés",
         "serv-2": "Liste des joueurs connectés",
@@ -648,12 +648,12 @@
         "already-unmute": "Ce membre n'est pas muet !",
         "backup-done": "Sauvegarde terminée !",
         "ban-1": "Il semble que ce membre soit trop haut pour que je puisse le bannir :thinking:",
+        "ban-chat": "Le membre {user} ({userid}) a bien été banni du serveur",
+        "ban-dm": "Vous venez d'être banni du serveur {guild} :confused:",
         "ban-list-error": "Oups, il y a trop de membres à afficher :confused:",
         "ban-list-title-0": "Liste des membres bannis du serveur '{}'",
         "ban-list-title-1": "Liste des 45 premiers membres bannis du serveur '{}'",
         "ban-list-title-2": "Liste des 60 premiers membres bannis du serveur '{}'",
-        "ban-chat": "Le membre {user} ({userid}) a bien été banni du serveur",
-        "ban-dm": "Vous venez d'être banni du serveur {guild} :confused:",
         "ban-user-here": "Cette personne ne fait pas partie des membres bannis :upside_down:",
         "cant-ban": "Permission 'Ban members' manquante :confused:",
         "cant-emoji": "Oups, il me manque la permission `Gérer les émojis` :confused:",
@@ -683,18 +683,18 @@
         "kick-dm": "Vous venez d'être expulsé du serveur {guild} :confused:",
         "missing-manage-nick": "Oups, il me manque la permission \"Gérer les pseudos\"",
         "missing-user-perms": "Oups, il vous manque des permissions (gérer les rôles, gérer le serveur ou gérer les messages)",
+        "mute-chat": "Le membre {user} ({userid}) a bien été réduit au silence !",
         "mute-config-err": "Impossible de faire cela. Veuillez vérifier mes permissions dans le serveur et réessayer.",
         "mute-config-success-0": "Le rôle a été créé et configuré avec succès !",
         "mute-config-success-m": "Le rôle a été créé et configuré avec succès ! ({c} salons n'ont pas pu être configurés, par manque de permissions)",
         "mute-config-success2-0": "Le rôle a été configuré avec succès !",
         "mute-config-success2-m": "Le rôle a été configuré avec succès ! ({count} salons n'ont pas pu être configurés, par manque de permissions)",
-        "mute-role-created": "Rôle `muted` créé avec succès !\nVous pouvez utiliser la commande `{p}mute-config` pour une configuration automatique dans votre serveur.",
+        "mute-dm": "Vous avez été rendu muet dans le serveur {guild}",
         "mute-high": "Oups, il semble que le rôle `muted` soit trop haut pour que je puisse le donner... Veuillez fixer ce problème en plaçant mon rôle plus haut que le rôle `muted`.",
         "mute-list-title-0": "Liste des membres muets du serveur '{guild}'",
         "mute-list-title-1": "Liste des 45 premiers membres muets du serveur '{guild}'",
         "mute-list-title-2": "Liste des 60 premiers membres muets du serveur '{guild}'",
-        "mute-chat": "Le membre {user} ({userid}) a bien été réduit au silence !",
-        "mute-dm": "Vous avez été rendu muet dans le serveur {guild}",
+        "mute-role-created": "Rôle `muted` créé avec succès !\nVous pouvez utiliser la commande `{p}mute-config` pour une configuration automatique dans votre serveur.",
         "need-manage-messages": "Permission \"Gérer les messages\" manquante :confused:",
         "need-read-history": "Oups, il me manque la permission de \"Voir les anciens messages\" :confused: ",
         "no-bans": "Aucun membre ne semble être banni de ce serveur",
@@ -702,8 +702,8 @@
         "no-mutes": "Aucun membre ne sembre être actuellement muet dans ce serveur",
         "pin-error": "Oups, je n'arrive pas à retrouver ce message (Erreur : `{}`)",
         "pin-error-3": "Oups, impossible d'épingler ce message (Avez-vous plus de 50 messages épinglés ?). Erreur : `{}`",
-        "raid-kicked": "Vous avez été automatiquement expulsé du serveur {guild} par l'antiraid. Réessayez dans quelques jours.",
         "raid-banned": "Vous avez été automatiquement banni du serveur {guild} par l'antiraid.",
+        "raid-kicked": "Vous avez été automatiquement expulsé du serveur {guild} par l'antiraid. Réessayez dans quelques jours.",
         "react-clear": "Impossible de retrouver ce message :confused:",
         "remove_roles-0": "Oups, il semblerai que ce rôle soit trop haut pour que je puisse l'enlever à qui que ce soit. Veuillez placer mon rôle au-dessus du rôle `{r}`",
         "remove_roles-1": "-> {c} rôles enlevés sur {m} !",
@@ -779,8 +779,8 @@
         ],
         "warn-bot": "Je ne peux pas avertir un bot ^^",
         "warn-but-db": "Notre base de donnée étant hors ligne, l'avertisement n'a pas pu être enregistré. Néanmoins le membre a bien reçu son avertissement en MP",
-        "warn-dm": "Vous avez reçu un avertissement de la part du serveur {guild}",
         "warn-chat": "Le membre {user} ({userid}) a bien reçu son avertissement",
+        "warn-dm": "Vous avez reçu un avertissement de la part du serveur {guild}",
         "wrong-guild": "Oups, il semble que cet émoji n'appartienne pas à ce serveur :thinking:"
     },
     "morpion": {
@@ -902,8 +902,8 @@
         "invalid-flow": "Cet url est invalide (flux rss vide ou inaccessible) :confused:",
         "invalid-link": "Oups, cette adresse url est invalide ou incomplète :confused:",
         "list": "*Entrez le numéro du flux à modifier*\n\n**Lien - Type - Salon - Roles**\n",
-        "list-title": "Liste des flux rss du serveur {server}",
         "list-result": "Type : {}\nSalon : {}\nLien/chaine : {}\nRôle mentionné : {}\nIdentifiant : {}\nDernier post : {}",
+        "list-title": "Liste des flux rss du serveur {server}",
         "list2": "*Entrez le numéro du flux à supprimer*\n\n**Lien - Type - Salon**\n",
         "loop-processing": "Une vérification de vos flux RSS est déjà en cours. Veuillez patienter quelques minutes",
         "mc": "Minecraft",
@@ -1026,10 +1026,10 @@
         "ttt_display": "Mode d'utilisation du morpion : {}",
         "update_mentions": "Rôles mentionnés lors d'une mise à jour du bot : {}",
         "verification_role": "Rôles enlevés lorsqu'un joueur s'authentifie avec la commande `verify` : {}",
-        "voice_roles": "Rôles donné aux membre en vocal : {}",
-        "voice_channel": "Salon à partir duquel seront créés les salons vocaux automatiques : {}",
         "voice_category": "Catégorie dans laquelle seront créés les salons vocaux automatiques : {}",
+        "voice_channel": "Salon à partir duquel seront créés les salons vocaux automatiques : {}",
         "voice_channel_format": "Format des noms des salons vocaux automatiques : {}",
+        "voice_roles": "Rôles donné aux membre en vocal : {}",
         "vote_emojis": "Emojis utilisés pour les réactions de vote : {}",
         "warn": "Liste des rôles pouvant utiliser les commandes 'warn' et 'case' : {}",
         "welcome": "Message envoyé lorsqu'un membre arrive : {}",
@@ -1060,6 +1060,7 @@
         "guild-14": "Limitations",
         "guild-14v": "Bitrate : {bit}kbps\nTaille de fichier max : {fil}MB\nNombre d'émojis : {emo}",
         "guild-15": "Lien d'invitation",
+        "guild-16": "Statiques : {s}/{l} | Animés : {a}/{l}",
         "guild-2": "Région",
         "guild-3": "Texte : {} | Vocal : {} ({} catégories)",
         "guild-4": "Membres connectés",
@@ -1068,7 +1069,6 @@
         "guild-7": "{} dont {} bots ({} connectés)",
         "guild-8": "Authentification à deux facteurs",
         "guild-9": "Niveau de sécurité",
-        "guild-16": "Statiques : {s}/{l} | Animés : {a}/{l}",
         "guild-features": {
             "ANIMATED_ICON": "Icône de serveur animée",
             "BANNER": "Bannière de serveur custom",
@@ -1099,6 +1099,7 @@
         "inv-9": "Options du serveur",
         "member-0": "Surnom",
         "member-1": "Créé le",
+        "member-10": "N'a toujours pas accepté les règles",
         "member-2": "A rejoint le",
         "member-3": "Position d'arrivée",
         "member-4": "Statut",
@@ -1107,7 +1108,6 @@
         "member-7": "Nombre d'infractions",
         "member-8": "Status custom",
         "member-9": "Rôles",
-        "member-10": "N'a toujours pas accepté les règles",
         "not-found": "Impossible de trouver {N}",
         "role-0": "Identifiant",
         "role-1": "Couleur",
@@ -1133,13 +1133,13 @@
         "voicechan-0": "Salon vocal"
     },
     "timers": {
+        "rmd-cancelled": "Abandon de la procédure",
         "rmd-cleared": "Vos rappels ont bien été supprimés !",
         "rmd-confirm": "Êtes-vous sûr de vouloir supprimer tous vos rappels ? ({count} en cours)",
         "rmd-deleted": "Le rappel N°{id} ayant pour message `{message}` a bien été supprimé !",
         "rmd-empty": "Oups, vous n'avez aucun rappel en cours...",
         "rmd-item": "ID : `{id}` | Dans : {duration} | Salon : {channel} | Message : {msg}",
-        "rmd-title": "Liste de vos rappels",
-        "rmd-cancelled": "Abandon de la procédure"
+        "rmd-title": "Liste de vos rappels"
     },
     "users": {
         "animated_card_false": "Vous n'utilisez actuellement pas de carte animée",
@@ -1158,8 +1158,8 @@
         "usernames_log_true": "Vous avez autorisé l'enregistrement de vos noms d'utilisateurs ainsi que de vos surnoms"
     },
     "voices": {
-        "no-channel": "Il n'y a aucun salon vocal généré dans ce serveur",
-        "deleted": "{i} salons supprimés"
+        "deleted": "{i} salons supprimés",
+        "no-channel": "Il n'y a aucun salon vocal généré dans ce serveur"
     },
     "xp": {
         "1-no-xp": "Vous ne possédez pas encore d'xp !",

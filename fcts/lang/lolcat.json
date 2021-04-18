@@ -12,8 +12,8 @@
     "aide": {
         "aliases": "Otherz names",
         "categories": {
-            "fun": "cool things",
             "data": "usefull things",
+            "fun": "cool things",
             "moderation": "acute things",
             "other": "idk, dont ask me plz",
             "server-settings": "other usefl tihngs",
@@ -115,10 +115,6 @@
                 "The :ghost: season is therr!",
                 "There are no ghosts at the moment"
             ],
-            "is_ttt_enabled": [
-                "!ttt iz enabled",
-                "Ewe, !ttt is disabled, use !config for dat"
-            ],
             "is_owner": [
                 "You must be the owner of the bot",
                 "You are not the owner of the bot"
@@ -130,6 +126,10 @@
             "is_translator": [
                 "Ur part ov the translators team",
                 "U must :b: part of translators team"
+            ],
+            "is_ttt_enabled": [
+                "!ttt iz enabled",
+                "Ewe, !ttt is disabled, use !config for dat"
             ],
             "verify_role_exists": [
                 "A verification role hav bee setted up",
@@ -207,9 +207,9 @@
         "list-0": "**Type:** {T}\n**mod:** {M}\n**Date:** {D}\n**Txt:** *{R}*",
         "list-1": "**Srvr:** {G}\n**Type:** {T}\n**Modz:** {M}\n**date:** {D}\n**Reason:** *{R}*",
         "list-2": "\n**How long:** {D}",
+        "no-case": "This user never did anythin wrong :upset_cat:",
         "no-user": "Unable to find dis usr :eyes:",
         "no_database": "Dude we'v got an databaz outage, so dis command haz been dizabled",
-        "no-case": "This user never did anythin wrong :upset_cat:",
         "not-found": "Dis caze was not fund :upside_down:",
         "reason-edited": "Teh ryson for case #{} has been changd!",
         "search-0": "**Uzr:** {U}\n**Type:** {T}\n**Mod:** {M}\n**Date:** {D}\n**Reazon:** *{R}*",
@@ -286,15 +286,15 @@
         "count-3": "Oops, Im unable to reed dis channel ystory. Pls check mah perms...",
         "count-4": "On teh last {limit} msgs, {user} had postd {x} things ({p}%)",
         "count-5": "U cannot use tish cmd at a channel where U do not have access to msg history",
-        "discordjobs-title": "cool Jobs @Discord",
         "discordjobs-count": "{c} available house",
-        "discordstatus-nothing": "Discord iz workin fine!\nLast big bug waz at {date}",
+        "discordjobs-title": "cool Jobs @Discord",
         "discordstatus-exists": "UwU Discord broke :sad_trumpet_noise: check more at {title}",
         "discordstatus-impacts": {
-            "none": "without effect",
+            "major": "major",
             "minor": "minor",
-            "major": "major"
+            "none": "without effect"
         },
+        "discordstatus-nothing": "Discord iz workin fine!\nLast big bug waz at {date}",
         "embed-error": "A' error went wrong: `{}`",
         "embed-invalid-channel": "Cannt send messages in dat chan...",
         "embed-invalid-image": "The url entered as image is invalid",
@@ -308,9 +308,9 @@
         "no-fun": "Fun comands haz beeen disabld on dis server. 2 C their list, look at https://zbot.rtfd.io/en/v3/fun.html",
         "no-reaction": "Unable 2 add reactions. Plz check mah perms...",
         "no-roll": "Hmm I don't see any choice lol",
-        "not-enough-roll": "U should seriusly learn 2 count to 2, 't can be useful :bongocat:",
         "no-say": "Unable 2 send any message in tish channel",
         "no-voicechan": "Wait, U forgot teh vocal channel? :eyes:",
+        "not-enough-roll": "U should seriusly learn 2 count to 2, 't can be useful :bongocat:",
         "osekour": [
             "Oh hum wait, Im finshin watchin mi movi.",
             "We r comin! But wy donot yu answr anymor? Do'nt fak ded dude!",
@@ -332,11 +332,11 @@
         "react-0": "Unable 2 find teh correspondin mssage. U must giv teh mesage ID in da furst argumnt, an teh emoji in da secondz :upside_down:\n Also check dat I haz permishun 2 reed msgs hystory!",
         "reminds-asked": "{user}, u asked me {duration} ago 2 remind you this:",
         "reminds-date": "Ask date",
+        "reminds-link": "First msg",
         "reminds-saved": "Got it! I'll remind you in {duration} OwO",
         "reminds-title": "Reminder",
         "reminds-too-long": "Unable 2 set such a long duration .-.",
         "reminds-too-short": "U entered an invalid duration",
-        "reminds-link": "First msg",
         "say-no-perm": "LMAO dont try 2 cheat and first get perm in {channel} pls",
         "thanos": [
             "{0} wus spard by Thanos",
@@ -367,8 +367,8 @@
             "Did you know? @ some special events, itz possible 2 obtain collector xp cards. Don't forget to follow the news on the officially cool server!",
             "> This too will pass\n*(do you have the reference?)*"
         ],
-        "unafk-done": "U'rn't anymore AFK",
         "unafk-cant": "U'r aren't AFK!",
+        "unafk-done": "U'rn't anymore AFK",
         "uninhabited-city": "Tish place have 0 inhabitant :upside_down:",
         "vote-0": "U can't put moar than 20 choicez, an' even lesss negativ numbr of choicesz!"
     },
@@ -404,19 +404,19 @@
         "ping-found": "Pong! (avg ov {tps}ms that I send 2 {url})",
         "ping-notfound": "UwU I cant ping that",
         "prefix": "List ov usable prefiXs:",
-        "stats.bot_version": "**Baut vershun:** {v}",
-        "stats.servers_count": "**Nbr ov serverz:** {v}",
-        "stats.users_count": "**Nbr ov visible memberz:** {v[0]} ({v[1]} **robots**)",
-        "stats.codes_lines": "**Nbr ov code lin:** {v}",
-        "stats.languages": "**Uzd languages:** {v}",
-        "stats.python_version": "**Python versoon :** {v}",
-        "stats.lib_version": "**Verson of teh `discord.py` thingy:** {v}",
-        "stats.ram_usage": "**Memory thingy:** {v} GB",
-        "stats.cpu_usage": "**Computer pressure:** {v} %",
-        "stats.api_ping": "**How much is discord buzy:** {v} ms",
-        "stats.cmds_24h": "**How much people uze me:** {v}",
-        "stats.total_xp": "**xp won by ppl:** {v}xp",
         "stats-title": "**Boat statz**",
+        "stats.api_ping": "**How much is discord buzy:** {v} ms",
+        "stats.bot_version": "**Baut vershun:** {v}",
+        "stats.cmds_24h": "**How much people uze me:** {v}",
+        "stats.codes_lines": "**Nbr ov code lin:** {v}",
+        "stats.cpu_usage": "**Computer pressure:** {v} %",
+        "stats.languages": "**Uzd languages:** {v}",
+        "stats.lib_version": "**Verson of teh `discord.py` thingy:** {v}",
+        "stats.python_version": "**Python versoon :** {v}",
+        "stats.ram_usage": "**Memory thingy:** {v} GB",
+        "stats.servers_count": "**Nbr ov serverz:** {v}",
+        "stats.total_xp": "**xp won by ppl:** {v}xp",
+        "stats.users_count": "**Nbr ov visible memberz:** {v[0]} ({v[1]} **robots**)",
         "usernames-allow": "U can anti-optout teh auto logs with da cmd 'profile'",
         "usernames-disallow": "U can optout the auto logging with cmd 'profile' (beeew bad guy)",
         "usernames-empty": ":N:o change savd",
@@ -497,15 +497,15 @@
         ]
     },
     "library": {
-        "no-found": "NOT abL 2 find lol book",
         "author": "otaur",
         "authors": "otaurs",
-        "unknown": "not known",
-        "year": "book date in your favorite store",
-        "publisher": "guy who printed",
         "language": "langu",
+        "no-found": "NOT abL 2 find lol book",
+        "publisher": "guy who printed",
         "rate-limited": "I cant search w/ name for the moment. Plz try again later",
-        "title": "title"
+        "title": "title",
+        "unknown": "not known",
+        "year": "book date in your favorite store"
     },
     "logs": {
         "ban": "{user} ({userid}) have bin :b:an",
@@ -520,12 +520,12 @@
         "d-welcome_roles": "Automated action (config welcome_roles)",
         "d-young": "Automod (too recent account)",
         "kick": "{user} ({userid}) had been kik",
-        "unmute": "{user} ({userid}) is not more mutd",
         "mute": "{user} ({userid}) Is know mwuted",
         "slowmode-disabled": "Shlowmode disabld in {channel}",
         "slowmode-enabled": "Slwmod enable in {channel} ({seconds}s)",
         "softban": "{user} ({userid}) had beeen 'softBAnnnnned'",
         "unban": "{user} ({userid}) iz no mor band",
+        "unmute": "{user} ({userid}) is not more mutd",
         "warn": "{user} ({userid}) had been warner"
     },
     "mc": {
@@ -620,8 +620,8 @@
         "no-mod": "Cant find dat mod owo",
         "no-ping": "Error: Una:b:le 2 ping dis servr",
         "player-not-found": "Uh ohh, no player found!",
-        "player-skin-title": "How {player} look like:",
         "player-skin-download": "Weird link u may not wanna touch",
+        "player-skin-title": "How {player} look like:",
         "serv-0": "Numbr of playerz",
         "serv-1": "List ov teh first tweny connected plyerz",
         "serv-2": "List of nice online people",
@@ -635,12 +635,12 @@
         "already-unmute": "This mber iznt muted!",
         "backup-done": "i wrote some things on tihs file. Don'ut ask me what plz.",
         "ban-1": "Maaaw... 'seems dat dis member iz too high 4 me to ban him :thinking:",
+        "ban-chat": "Mber {user} ({userid}) has been banned fr0m dis cool servr.",
+        "ban-dm": "U haz just been bannd fr0m the servr {guild} :confused:",
         "ban-list-error": "Oops, seems like ther are 2 many usr to display :confused:",
         "ban-list-title-0": "List of bannd membrs ov this nice place '{}'",
         "ban-list-title-1": "List of 45 bannd membrs ov this nice place '{}'",
         "ban-list-title-2": "List of 60 bannd membrs ov this nice place '{}'",
-        "ban-chat": "Mber {user} ({userid}) has been banned fr0m dis cool servr.",
-        "ban-dm": "U haz just been bannd fr0m the servr {guild} :confused:",
         "ban-user-here": "Dis nice guy iz not part of teh bannd members list :upside_down:",
         "cant-ban": "Perm 'Ban members' needd :confused:",
         "cant-emoji": "Oooops, I'm missng teh perm `Manage emojis` <:owo:499661437589913621>",
@@ -665,8 +665,8 @@
         "give_roles-2": "-> {c} roles gived out of {m} !",
         "give_roles-4": "Oops, dat role is 2 high 4 me 2 give or remove 2 anyone. Please place me role above ur `{r}` :plz:",
         "give_roles-higher": "U can't give / remove roles higher than urs LMAO!",
-        "kick-chat": "Membr {user} ({userid}) haz been kick from dis servr",
         "kick-1": "Seemz that this membr iz tooooo high 4 me to kick him out :thinking:",
+        "kick-chat": "Membr {user} ({userid}) haz been kick from dis servr",
         "kick-dm": "U have just been kicked from the servr {guild} :confused:",
         "missing-manage-nick": "Oops, I'm missing the cool \"Manage nicknames\" perms! :sad:",
         "missing-user-perms": "Oops, Ur not pawerful enoogh (either manage roles, manage server or manage messages)",
@@ -676,12 +676,12 @@
         "mute-config-success-m": "Teh role have been successffully created & configured! ({c} channels couldnotbeconfigured, cuz I lack of perms)",
         "mute-config-success2-0": "The mouted role iz now correcty setup!",
         "mute-config-success2-m": "The mouted role iz now correcty setup! ({c} chats cannut be configured, cuz of a bruh lacking of perms)",
-        "mute-role-created": "Successsfully added da `muted` role! U can naw use `{p}mute-config` cmd to ask me 2 config it meself",
+        "mute-dm": "U've been silenced in teh {guild} :sadcat:",
         "mute-high": "Ooops, 't sEEms dat `muted` rol iz tooo high 4 me to give it... Plz fiX dis problem by plac'ng my role higher than this nice `muted` role.",
         "mute-list-title-0": "List ov mutd people in serv \"{guild}\"",
         "mute-list-title-1": "List ov a few (45) muted members of ur server \"{guild}\"",
         "mute-list-title-2": "Lits ov 60 muted members of dat guild \"{guild}\"",
-        "mute-dm": "U've been silenced in teh {guild} :sadcat:",
+        "mute-role-created": "Successsfully added da `muted` role! U can naw use `{p}mute-config` cmd to ask me 2 config it meself",
         "need-manage-messages": "Permishun \"Manage Messages\" missing :confused:",
         "need-read-history": "Oooops, I'm missing the perm 2 \"Read Message History\" :confused: ",
         "no-bans": "No mmber seems to be bannd from here",
@@ -689,8 +689,8 @@
         "no-mutes": "No member seems 2B banned from here",
         "pin-error": "Oops, I ca't found dat msage (Error~~404~~ : `{}`)",
         "pin-error-3": "WoOops, **im**possibl 2 pin dis mesge (doo u hav mor' tahn fYfti pinnd mesages?). Error : `{}`",
-        "raid-kicked": "You have been automatically kicked off the {guild} server by the anti-raid system. Try again in a few days.",
         "raid-banned": "You have been automatically banned from the {guild} server by the antiraid system.",
+        "raid-kicked": "You have been automatically kicked off the {guild} server by the anti-raid system. Try again in a few days.",
         "react-clear": "I can't find dis message :confused:",
         "remove_roles-0": "OoOops, looks like that role is def 2 high 4 me to take it away from anyone. Place me role above teh role `{r}` ;-;",
         "remove_roles-1": "-> {c} roles removed on {m}!",
@@ -889,8 +889,8 @@
         "invalid-flow": "I can't add dis url (empty or inaccessible rss flew) :confused:",
         "invalid-link": "Oops, dis url ADress is unvalid or outcompletz :confused:",
         "list": "*Tipe teh nbr of the floww 2 modyfi by*\n\n**Zelda - Typez - cHanel - Mentionz**\n",
-        "list-title": "List ov cool followed from here ({server})",
         "list-result": "Type: {}\nDisc chan: {}\nLink/chan: {}\nPings: {}\nId: {}\nLast thing: {}",
+        "list-title": "List ov cool followed from here ({server})",
         "list2": "*Type teh nmberZ ov the flowz 2 deletz*\n\n**Lnk - Tipe - Chanell**\n",
         "loop-processing": "Cant u plz WAIT??? Me is BUSY DUH :angrycat:",
         "mc": "Minekrraft",
@@ -1013,10 +1013,10 @@
         "ttt_display": "How'll use titcattoe: {}",
         "update_mentions": "Roles pinged on teh bot changlog: {}",
         "verification_role": "Roles removd when smone use !verify itself: {}",
-        "voice_roles": "Roles gave to folks speaking together (or alone, I don't minde uwu): {}",
-        "voice_channel": "Chan from which i'll make voice chat rooms with cat magik: {}",
         "voice_category": "Category in where auto voice chat rooms will be down: {}",
+        "voice_channel": "Chan from which i'll make voice chat rooms with cat magik: {}",
         "voice_channel_format": "How ur voice channelz will look like: {}",
+        "voice_roles": "Roles gave to folks speaking together (or alone, I don't minde uwu): {}",
         "vote_emojis": "Emojiz use 4 powll reacts: {}",
         "warn": "Lizt of rawle thut can emploi commanDz 'warn' end 'cases' pliz: {}",
         "welcome": "Missge snt whem a mber arived :: {}",
@@ -1047,6 +1047,7 @@
         "guild-14": "Limitz",
         "guild-14v": "Voice: {bit}kbps\nMax files size: {fil}MB\nEmojis nbr: {emo}",
         "guild-15": "Inv url",
+        "guild-16": "Dead: {s}/{l} | Livin': {a}/{l}",
         "guild-2": "Rejion",
         "guild-3": "Txt : {} | Vcall : {} ({} categoreez)",
         "guild-4": "Green pple",
@@ -1055,7 +1056,6 @@
         "guild-7": "{} incluwdin {} nice robots ({} connect)",
         "guild-8": "2F authuntificashun",
         "guild-9": "Secure lvl",
-        "guild-16": "Dead: {s}/{l} | Livin': {a}/{l}",
         "guild-features": {
             "ANIMATED_ICON": "ANIMATED OMEGA COOL OwO server icon",
             "BANNER": "Custom srv banner",
@@ -1087,6 +1087,7 @@
         "inv-9": "Serv. kool things",
         "member-0": "Lttle nayme",
         "member-1": "Born at",
+        "member-10": "Angry with rules :angryboy:",
         "member-2": "New from",
         "member-3": "Arrivald pose",
         "member-4": "Statu",
@@ -1095,7 +1096,6 @@
         "member-7": "Infract. nbr",
         "member-8": "Cool thing",
         "member-9": "Other things",
-        "member-10": "Angry with rules :angryboy:",
         "not-found": "Unable 2 found {N}",
         "role-0": "IDz",
         "role-1": "Colorr",
@@ -1121,13 +1121,13 @@
         "voicechan-0": "Singing ch4nnel"
     },
     "timers": {
+        "rmd-cancelled": "ok well, cancelled UwU",
         "rmd-cleared": ":deleted:",
         "rmd-confirm": "U sure u wanna delete 'em all? ({count} small bois)",
         "rmd-deleted": "Rmder #{id} with msg `{message}` had deleted w/ success :owo:",
         "rmd-empty": "Oops, U don't have any pending reminder lol",
         "rmd-item": "ID: `{id}` | In: {duration} | Chan: {channel} | Msg: {msg}",
-        "rmd-title": "I'll remind u that becuz ur dumb-dumb :bongocat:",
-        "rmd-cancelled": "ok well, cancelled UwU"
+        "rmd-title": "I'll remind u that becuz ur dumb-dumb :bongocat:"
     },
     "users": {
         "animated_card_false": "Anamited xp cards are naw disabld for you",
@@ -1146,8 +1146,8 @@
         "usernames_log_true": "You've enabld the things taht i do with ur usr names & nicks"
     },
     "voices": {
-        "no-channel": "Therz no voice channel that I did in ur server",
-        "deleted": "{i} deleted things :innocent:"
+        "deleted": "{i} deleted things :innocent:",
+        "no-channel": "Therz no voice channel that I did in ur server"
     },
     "xp": {
         "1-no-xp": "U don't have any xP yet!",
