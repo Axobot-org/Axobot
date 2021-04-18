@@ -1189,7 +1189,7 @@ class Rss(commands.Cog):
                     rt = "retweet"
                 text = html.unescape(getattr(post, 'full_text', post.text))
                 # remove images links if needed
-                if channel.permissions_for(self.bot.user).embed_links:
+                if channel.permissions_for(channel.guild.me).embed_links:
                     find_url = self.bot.get_cog("Utilities").find_url_redirection
                     for m in re.finditer(r"https://t.co/([^\s]+)", text):
                         final_url = await find_url(m.group(0))
@@ -1525,14 +1525,21 @@ class Rss(commands.Cog):
     async def check_flow(self, flow: dict, session: ClientSession = None, send_stats: bool=False):
         try:
             guild = self.bot.get_guild(flow['guild'])
+            if guild is None:
+                self.bot.log.info("[send_rss_msg] Cannot send message on server {} (unknown guild)".format(flow['guild']))
+                return False
+            chan: discord.TextChannel = guild.get_channel(flow['channel'])
+            if chan is None:
+                self.bot.log.info("[send_rss_msg] Cannot send message on channel {} (unknown channel)".format(flow['channel']))
+                return False
             if flow['link'] in self.cache.keys():
                 objs = self.cache[flow['link']]
             else:
                 funct = getattr(self, f"rss_{flow['type']}")
                 if flow["type"] == "tw":
-                    objs = await funct(guild,flow['link'], flow['date'])
+                    objs = await funct(chan,flow['link'], flow['date'])
                 else:
-                    objs = await funct(guild,flow['link'], flow['date'], session=session)
+                    objs = await funct(chan,flow['link'], flow['date'], session=session)
                 if isinstance(objs,twitter.error.TwitterError):
                     self.twitter_over_capacity = True
                     return False
@@ -1544,16 +1551,8 @@ class Rss(commands.Cog):
                 return True
             elif type(objs) == list:
                 for o in objs[:self.max_messages]:
-                    guild: discord.Guild = self.bot.get_guild(flow['guild'])
-                    if guild is None:
-                        self.bot.log.info("[send_rss_msg] Cannot send message on server {} (unknown)".format(flow['guild']))
-                        return False
-                    chan: discord.TextChannel = guild.get_channel(flow['channel'])
-                    if chan is None:
-                        self.bot.log.info("[send_rss_msg] Cannot send message on channel {} (unknown)".format(flow['channel']))
-                        return False
                     # if we can't post messages: abort
-                    if not chan.permissions_for(self.bot.user).send_messages:
+                    if not chan.permissions_for(guild.me).send_messages:
                         return
                     o.format = flow['structure']
                     o.embed = flow['use_embed']
