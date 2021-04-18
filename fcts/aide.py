@@ -78,7 +78,7 @@ Enable "Embed Links" permission for better rendering
             else:
                 await self._default_help_command(ctx, commands)
 
-    async def help_command(self, ctx, commands=()):
+    async def help_command(self, ctx: MyContext, commands=()):
         """Main command for the creation of the help message
 If the bot can't send the new command format, it will try to send the old one."""
         async with ctx.channel.typing():
@@ -108,6 +108,8 @@ If the bot can't send the new command format, it will try to send the old one.""
                 else:
                     temp = [c for c in self.bot.commands if c.name in self.commands_list[categ_name[0]]]
                 pages = await self.all_commands(ctx, sorted(temp, key=self.sort_by_name))
+                if len(pages) == 0 and ctx.guild is None:
+                    pages = [await self.bot._(ctx.channel, "aide", "cog-empty-dm")]
             elif len(commands) == 0:  # no command
                 compress = await self.bot.get_config(ctx.guild, 'compress_help')
                 pages = await self.all_commands(ctx, sorted([c for c in self.bot.commands], key=self.sort_by_name), compress=compress)
