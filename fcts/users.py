@@ -64,6 +64,21 @@ class Users(commands.Cog):
             return False
         return rankcard in await self.get_rankcards(user)
     
+    async def set_rankcard(self, user: discord.User, style: str, add: True):
+        """Add or remove a rank card style for a user"""
+        if style not in RankCardsFlag.FLAGS.values():
+            raise ValueError("Unknown card style")
+        rankcards: list = await self.get_rankcards(user)
+        if style in rankcards and add:
+            return
+        if style not in rankcards and not add:
+            return
+        if add:
+            rankcards.append(style)
+        else:
+            rankcards.remove(style)
+        await self.bot.get_cog('Utilities').change_db_userinfo(user.id, 'rankcards_unlocked', RankCardsFlag().flagsToInt(rankcards))
+    
     async def get_rankcards_stats(self) -> dict:
         """Get how many users use any rank card"""
         if not self.bot.database_online:
@@ -89,6 +104,24 @@ class Users(commands.Cog):
             return
         if cog := self.bot.get_cog("Utilities"):
             await cog.change_db_userinfo(userID, "used_rank", True)
+    
+    async def reload_event_rankcard(self, user: typing.Union[discord.User, int], cards: list = None, points: int = None):
+        eventsCog = self.bot.get_cog("BotEvents")
+        if eventsCog is None:
+            return
+        if eventsCog.current_event_id != "april-2021":
+            return
+        if isinstance(user, int):
+            user = self.bot.get_user(user)
+            if user is None:
+                return
+        if cards is None:
+            cards = await self.get_rankcards(user)
+        if points is None:
+            points = await self.bot.get_cog("Utilities").get_eventsPoints_rank(user.id)
+            points = 0 if (points is None) else points["events_points"]
+        if "rainbow" not in cards and points >= self.bot.current_event_data["objectives"][-1]:
+            await self.set_rankcard(user, "rainbow", True)
 
     @commands.group(name='profile')
     async def profile_main(self, ctx: MyContext):

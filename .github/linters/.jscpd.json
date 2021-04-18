@@ -1,0 +1,11 @@
+{
+    "threshold": 9,
+    "reporters": [
+      "consoleFull"
+    ],
+    "ignore": [
+      "**/__snapshots__/**",
+      "**/*-old.*"
+    ],
+    "absolute": true
+  }

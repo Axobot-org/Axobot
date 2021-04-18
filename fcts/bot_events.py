@@ -10,8 +10,9 @@ class BotEvents(commands.Cog):
     def __init__(self, bot: zbot):
         self.bot = bot
         self.file = "bot_events"
-        self.current_event = None
-        self.current_event_data = {}
+        self.current_event: str = None
+        self.current_event_data: dict = {}
+        self.current_event_id: str = None
         self.updateCurrentEvent()
 
     def updateCurrentEvent(self):
@@ -20,7 +21,8 @@ class BotEvents(commands.Cog):
             events = json.load(f)
         self.current_event = None
         self.current_event_data = {}
-        for ev_data in events.values():
+        self.current_event_id = None
+        for ev_id, ev_data in events.items():
             ev_data["begin"] = datetime.datetime.strptime(
                 ev_data["begin"], "%Y-%m-%d")
             ev_data["end"] = datetime.datetime.strptime(
@@ -28,6 +30,7 @@ class BotEvents(commands.Cog):
             if ev_data["begin"].date() <= today and ev_data["end"].date() > today:
                 self.current_event = ev_data["type"]
                 self.current_event_data = ev_data
+                self.current_event_id = ev_id
                 break
 
     @commands.group(name="events", aliases=["botevents", "botevent", "event"])
@@ -40,8 +43,7 @@ class BotEvents(commands.Cog):
     async def event_info(self, ctx: MyContext):
         """Get info about the current event"""
         events_desc = await self.bot._(ctx.channel, "bot_events", "events-desc")
-        current_event = str(self.bot.current_event) + "-" + \
-            str(datetime.datetime.today().year)
+        current_event = self.current_event_id
         if current_event in events_desc.keys():
             # Title
             try:
@@ -86,8 +88,7 @@ class BotEvents(commands.Cog):
     async def events_rank(self, ctx: MyContext, user: discord.User = None):
         """Watch how many xp you already have
         Events points are reset after each event"""
-        current_event = str(self.bot.current_event) + "-" + \
-            str(datetime.datetime.today().year)
+        current_event = self.current_event_id
         events_desc = await self.bot._(ctx.channel, "bot_events", "events-desc")
         if not current_event in events_desc.keys():
             await ctx.send(events_desc["nothing"])

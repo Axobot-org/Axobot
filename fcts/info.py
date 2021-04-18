@@ -85,9 +85,12 @@ class Info(commands.Cog):
     async def get_guilds_count(self, ignored_guilds:list=None) -> int:
         """Get the number of guilds where Zbot is"""
         if ignored_guilds is None:
-            if 'banned_guilds' not in self.bot.get_cog('Utilities').config.keys():
-                await self.bot.get_cog('Utilities').get_bot_infos()
-            ignored_guilds = [int(x) for x in self.bot.get_cog('Utilities').config['banned_guilds'].split(";") if len(x) > 0] + self.bot.get_cog('Reloads').ignored_guilds
+            if self.bot.database_online:
+                if 'banned_guilds' not in self.bot.get_cog('Utilities').config.keys():
+                    await self.bot.get_cog('Utilities').get_bot_infos()
+                ignored_guilds = [int(x) for x in self.bot.get_cog('Utilities').config['banned_guilds'].split(";") if len(x) > 0] + self.bot.get_cog('Reloads').ignored_guilds
+            else:
+                return len(self.bot.guilds)
         return len([x for x in self.bot.guilds if x.id not in ignored_guilds])
 
     @commands.command(name="stats", enabled=True)
@@ -103,7 +106,9 @@ class Info(commands.Cog):
         latency = round(self.bot.latency*1000, 3)
         try:
             async with ctx.channel.typing():
+                # RAM/CPU
                 ram_cpu = [round(py.memory_info()[0]/2.**30,3), py.cpu_percent(interval=1)]
+                # Guilds count
                 b_conf = self.bot.get_cog('Utilities').config
                 if b_conf is None:
                     b_conf = await self.bot.get_cog('Utilities').get_bot_infos()
@@ -112,22 +117,41 @@ class Info(commands.Cog):
                     ignored_guilds = [int(x) for x in self.bot.get_cog('Utilities').config['banned_guilds'].split(";") if len(x) > 0]
                 ignored_guilds += self.bot.get_cog('Reloads').ignored_guilds
                 len_servers = await self.get_guilds_count(ignored_guilds)
+                # Languages
                 langs_list: list = await self.bot.get_cog('Servers').get_languages(ignored_guilds)
                 langs_list.sort(reverse=True, key=lambda x: x[1])
                 lang_total = sum([x[1] for x in langs_list])
                 langs_list = ' | '.join(["{}: {}%".format(x[0],round(x[1]/lang_total*100)) for x in langs_list if x[1] > 0])
                 del lang_total
-                #premium_count = await self.bot.get_cog('Utilities').get_number_premium()
+                # Users/bots
                 try:
                     users,bots = self.get_users_nber(ignored_guilds)
                 except Exception as e:
                     users = bots = 'unknown'
+                # Total XP
                 if self.bot.database_online:
                     total_xp = await self.bot.get_cog('Xp').bdd_total_xp()
                 else:
                     total_xp = ""
-                d = str(await self.bot._(ctx.channel,"infos","stats")).format(bot_v=self.bot_version,s_count=len_servers,m_count=users,b_count=bots,l_count=self.codelines,lang=langs_list,p_v=version,d_v=discord.__version__,ram=ram_cpu[0],cpu=ram_cpu[1],api=latency,xp=total_xp)
-            if ctx.can_send_embed:
+                # Commands within 24h
+                cmds_24h = await self.bot.get_cog("BotStats").get_stats("wsevent.CMD_USE", 60*24)
+                # Generating message
+                d = ""
+                for key, var in [
+                    ('bot_version', self.bot_version),
+                    ('servers_count', len_servers),
+                    ('users_count', (users, bots)),
+                    ('codes_lines', self.codelines),
+                    ('languages', langs_list),
+                    ('python_version', version),
+                    ('lib_version', discord.__version__),
+                    ('ram_usage', ram_cpu[0]),
+                    ('cpu_usage', ram_cpu[1]),
+                    ('api_ping', latency),
+                    ('cmds_24h', cmds_24h),
+                    ('total_xp', total_xp)]:
+                    d += await self.bot._(ctx.channel, "infos", "stats."+key, v=var) + "\n"
+            if ctx.can_send_embed: # if we can use embed
                 embed = ctx.bot.get_cog('Embeds').Embed(title=await self.bot._(ctx.channel,"infos","stats-title"), color=ctx.bot.get_cog('Help').help_color, time=ctx.message.created_at,desc=d,thumbnail=self.bot.user.avatar_url_as(format="png"))
                 await embed.create_footer(ctx)
                 await ctx.send(embed=embed.discord_embed())
@@ -146,15 +170,16 @@ class Info(commands.Cog):
         """Get a link to invite me
         
         ..Doc infos.html#bot-invite"""
+        raw_oauth = "<" + discord.utils.oauth_url(self.bot.user.id) + ">"
         try:
             r = requests.get("https://zrunner.me/invitezbot", timeout=3)
         except requests.exceptions.Timeout:
-            url = "<https://discord.com/oauth2/authorize?client_id=486896267788812288&scope=bot>"
+            url = raw_oauth
         else:
             if r.status_code < 400:
                 url = "https://zrunner.me/invitezbot"
             else:
-                url = "<https://discord.com/oauth2/authorize?client_id=486896267788812288&scope=bot>"
+                url = raw_oauth
         await ctx.send(await self.bot._(ctx.channel, "infos", "botinvite", url=url))
     
     @commands.command(name="pig", hidden=True)
@@ -178,7 +203,11 @@ class Info(commands.Cog):
         if ip is None:
             m = await ctx.send("Ping...")
             t = (m.created_at - ctx.message.created_at).total_seconds()
-            await m.edit(content=":ping_pong:  Pong !\nBot ping: {}ms\nDiscord ping: {}ms".format(round(t*1000),round(self.bot.latency*1000)))
+            try:
+                p = round(self.bot.latency*1000)
+            except OverflowError:
+                p = "∞"
+            await m.edit(content=":ping_pong:  Pong !\nBot ping: {}ms\nDiscord ping: {}ms".format(round(t*1000),p))
         else:
             asyncio.run_coroutine_threadsafe(self.ping_address(ctx,ip),asyncio.get_event_loop())
 
@@ -229,7 +258,7 @@ Available types: member, role, user, emoji, channel, server, invite, category
 
 .. Doc infos.html#info"""
         if Type is not None and name is None and Type not in ["guild","server"]:
-            raise commands.MissingRequiredArgument(self.infos.clean_params['name'])
+            raise commands.MissingRequiredArgument(ctx.command.clean_params['name'])
         if not ctx.can_send_embed:
             return await ctx.send(await self.bot._(ctx.guild.id,"fun","no-embed-perm"))
         try:
@@ -353,7 +382,7 @@ Available types: member, role, user, emoji, channel, server, invite, category
             admin = await self.bot._(ctx.guild.id,"keywords","non")
         embed.add_field(name=await self.bot._(ctx.guild.id,"stats_infos","member-6"), value = admin.capitalize(),inline=True)
         # Infractions count
-        if critical_info and not item.bot:
+        if critical_info and not item.bot and self.bot.database_online:
             embed.add_field(name=await self.bot._(ctx.guild.id,"stats_infos","member-7"), value = await self.bot.get_cog('Cases').get_nber(item.id,ctx.guild.id),inline=True)
         # Guilds count
         if item.bot:
@@ -507,6 +536,9 @@ Available types: member, role, user, emoji, channel, server, invite, category
         await ctx.send(embed=embed)
 
     async def textChannel_infos(self, ctx: MyContext, chan: discord.TextChannel, lang: str):
+        if not chan.permissions_for(ctx.author).view_channel:
+            await ctx.send(await self.bot._(ctx.guild.id, "infos", "cant-see-channel"))
+            return
         embed = discord.Embed(colour=default_color, timestamp=ctx.message.created_at)
         embed.set_author(name="{} '{}'".format(await self.bot._(ctx.guild.id,"stats_infos","textchan-5"),chan.name), icon_url=ctx.guild.icon_url_as(format='png'))
         embed.set_footer(text='Requested by {}'.format(ctx.author.name), icon_url=ctx.author.avatar_url_as(format='png'))
@@ -543,6 +575,9 @@ Available types: member, role, user, emoji, channel, server, invite, category
         await ctx.send(embed=embed)
 
     async def voiceChannel_info(self, ctx: MyContext, chan: discord.VoiceChannel, lang: str):
+        if not chan.permissions_for(ctx.author).view_channel:
+            await ctx.send(await self.bot._(ctx.guild.id, "infos", "cant-see-channel"))
+            return
         since = await self.bot._(ctx.guild.id,"keywords","depuis")
         embed = discord.Embed(colour=default_color, timestamp=ctx.message.created_at)
         embed.set_author(name="{} '{}'".format(await self.bot._(ctx.guild.id,"stats_infos","voicechan-0"),chan.name), icon_url=ctx.guild.icon_url)
@@ -727,6 +762,9 @@ Available types: member, role, user, emoji, channel, server, invite, category
         await ctx.send(embed=embed)
 
     async def category_info(self, ctx: MyContext, categ: discord.CategoryChannel, lang: str):
+        if not categ.permissions_for(ctx.author).view_channel:
+            await ctx.send(await self.bot._(ctx.guild.id, "infos", "cant-see-channel"))
+            return
         since = await self.bot._(ctx.guild.id,"keywords","depuis")
         tchan = 0
         vchan = 0
@@ -773,14 +811,13 @@ Available types: member, role, user, emoji, channel, server, invite, category
         # Servers list
         servers_in = list()
         owned, membered = 0, 0
-        for s in self.bot.guilds:
-            if user in s.members:
-                if s.owner==user:
-                    servers_in.append(":crown: "+s.name)
-                    owned += 1
-                else:
-                    servers_in.append("- "+s.name)
-                    membered += 1
+        for s in user.mutual_guilds:
+            if s.owner==user:
+                servers_in.append(":crown: "+s.name)
+                owned += 1
+            else:
+                servers_in.append("- "+s.name)
+                membered += 1
         if len(servers_in) == 0:
             servers_in = ["No server"]
         elif len("\n".join(servers_in)) > 1020:
@@ -874,7 +911,11 @@ Servers:
         rr_len = self.bot.get_cog("Servers").default_opt['rr_max_number'] if rr_len is None else rr_len
         rr_len = '{}/{}'.format(len(await self.bot.get_cog('Xp').rr_list_role(guild.id)),rr_len)
         # Prefix
-        pref = self.bot.get_cog('Utilities').find_prefix(guild)
+        class FakeMsg:
+            pass
+        fake_msg = FakeMsg
+        fake_msg.guild = guild
+        pref = (await self.bot.get_prefix(fake_msg))[2]
         if "`" not in pref:
             pref = "`" + pref + "`"
         # Rss
@@ -1053,7 +1094,7 @@ Servers:
     async def discord_status(self, ctx: MyContext):
         """Get some useful links about Discord"""
         l = await self.bot._(ctx.channel,'infos','discordlinks')
-        links = ["https://dis.gd/status","https://dis.gd/tos","https://dis.gd/report","https://dis.gd/feedback","https://support.discord.com/hc/en-us/articles/115002192352","https://discord.com/developers/docs/legal","https://support.discord.com/hc/en-us/articles/206346498-Where-can-I-find-my-User-Server-Message-ID-","https://support.discord.com/hc/en-us/articles/360040724612", " https://twitter.com/discordapp/status/1060411427616444417"]
+        links = ["https://dis.gd/status","https://dis.gd/tos","https://dis.gd/report","https://dis.gd/feedback","https://support.discord.com/hc/en-us/articles/115002192352","https://discord.com/developers/docs/legal","https://support.discord.com/hc/en-us/articles/206346498-Where-can-I-find-my-User-Server-Message-ID-","https://support.discord.com/hc/en-us/articles/360040724612", " https://twitter.com/discordapp/status/1060411427616444417", "https://support.discord.com/hc/en-us/articles/360035675191"]
         if ctx.can_send_embed:
             txt = "\n".join(['['+l[i]+']('+links[i]+')' for i in range(len(l))])
             em = await self.bot.get_cog("Embeds").Embed(desc=txt).update_timestamp().create_footer(ctx)
@@ -1087,6 +1128,8 @@ Servers:
     
     async def get_emojis_info(self, ID: typing.Union[int,list]):
         """Get info about an emoji"""
+        if not self.bot.database_online:
+            return list()
         if isinstance(ID,int):
             query = "Select * from `{}` WHERE `ID`={}".format(self.emoji_table,ID)
         else:
@@ -1200,6 +1243,7 @@ Servers:
             await ctx.send(desc)
 
     @commands.command(name="usernames", aliases=["username","usrnm"])
+    @commands.check(checks.database_connected)
     async def username(self, ctx: MyContext, *, user: discord.User=None):
         """Get the names history of an user
         Default user is you
@@ -1233,21 +1277,23 @@ Servers:
             if len(global_list) > 0:
             # Usernames part
                 temp = [x['new'] for x in global_list if x['new']!='']
-                if len(temp) > MAX:
-                    temp = temp[:MAX] + [await self.bot._(ctx.channel, 'infos', 'usernames-more', nbr=len(temp)-MAX)]
-                f.append({'name':await self.bot._(ctx.channel,'infos','usernames-global'), 'value':"\n".join(temp)})
-                # if global_list[-1]['old'] != '':
-                #     f[-1]["value"] += "\n" + global_list[-1]['old']
-                date += await self.bot.get_cog('TimeUtils').date([x['utc_date'] for x in global_list][0] ,year=True, lang=language)
+                if len(temp) > 0:
+                    if len(temp) > MAX:
+                        temp = temp[:MAX] + [await self.bot._(ctx.channel, 'infos', 'usernames-more', nbr=len(temp)-MAX)]
+                    f.append({'name':await self.bot._(ctx.channel,'infos','usernames-global'), 'value':"\n".join(temp)})
+                    # if global_list[-1]['old'] != '':
+                    #     f[-1]["value"] += "\n" + global_list[-1]['old']
+                    date += await self.bot.get_cog('TimeUtils').date([x['utc_date'] for x in global_list][0] ,year=True, lang=language)
             if len(this_guild) > 0:
             # Nicknames part
                 temp = [x['new'] for x in this_guild if x['new']!='']
-                if len(temp) > MAX:
-                    temp = temp[:MAX] + [await self.bot._(ctx.channel, 'infos', 'usernames-more', nbr=len(temp)-MAX)]
-                f.append({'name':await self.bot._(ctx.channel,'infos','usernames-local'), 'value':"\n".join(temp)})
-                # if this_guild[-1]['old'] != '':
-                #     f[-1]["value"] += "\n" + this_guild[-1]['old']
-                date += "\n" + await self.bot.get_cog('TimeUtils').date([x['utc_date'] for x in this_guild][0], year=True, lang=language)
+                if len(temp) > 0:
+                    if len(temp) > MAX:
+                        temp = temp[:MAX] + [await self.bot._(ctx.channel, 'infos', 'usernames-more', nbr=len(temp)-MAX)]
+                    f.append({'name':await self.bot._(ctx.channel,'infos','usernames-local'), 'value':"\n".join(temp)})
+                    # if this_guild[-1]['old'] != '':
+                    #     f[-1]["value"] += "\n" + this_guild[-1]['old']
+                    date += "\n" + await self.bot.get_cog('TimeUtils').date([x['utc_date'] for x in this_guild][0], year=True, lang=language)
             if len(date) > 0:
                 f.append({'name':await self.bot._(ctx.channel,'infos','usernames-last-date'), 'value':date})
             else:

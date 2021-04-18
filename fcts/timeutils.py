@@ -184,6 +184,7 @@ class TimeUtils(discord.ext.commands.Cog):
                 df += " " + date.tzinfo.tzname(None)
             return df.strip().replace('  ', ' ')
 
+
 def setup(bot):
     bot.add_cog(TimeUtils(bot))
 

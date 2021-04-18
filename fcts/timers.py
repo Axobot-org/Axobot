@@ -4,7 +4,7 @@ from discord.ext import commands
 import copy
 import datetime
 
-from fcts import args
+from fcts import args, checks
 from utils import zbot, MyContext
 
 class Timers(commands.Cog):
@@ -39,6 +39,7 @@ class Timers(commands.Cog):
     @remind_main.command(name="create", aliases=["add"])
     @commands.cooldown(5,30,commands.BucketType.channel)
     @commands.cooldown(5,60,commands.BucketType.user)
+    @commands.check(checks.database_connected)
     async def remind_create(self, ctx: MyContext, duration: commands.Greedy[args.tempdelta], *, message):
         """Create a new reminder
         
@@ -56,11 +57,8 @@ class Timers(commands.Cog):
         if duration < 1:
             await ctx.send(await self.bot._(ctx.channel, "fun", "reminds-too-short"))
             return
-        if duration > 60*60*24*365*2:
+        if duration > 60*60*24*365*5:
             await ctx.send(await self.bot._(ctx.channel, "fun", "reminds-too-long"))
-            return
-        if not self.bot.database_online:
-            await ctx.send(await self.bot._(ctx.channel, "rss", "no-db"))
             return
         f_duration = await ctx.bot.get_cog('TimeUtils').time_delta(duration,lang=await self.bot._(ctx.channel,'current_lang','current'), year=True, form='developed', precision=0)
         try:
@@ -95,7 +93,8 @@ class Timers(commands.Cog):
             ctx2.message.content = item["message"]
             item["message"] = await commands.clean_content(fix_channel_mentions=True).convert(ctx2, item["message"])
             msg = item['message'] if len(item['message'])<=50 else item['message'][:47]+"..."
-            msg = "`"+msg.replace('`', '\\`')+"`"
+            msg = discord.utils.escape_markdown(msg).replace("\n", " ")
+            # msg = "\n```\n" + msg.replace("```", "​`​`​`") + "\n```"
             chan = '<#'+str(item['channel'])+'>'
             end = item["utc_begin"] + datetime.timedelta(seconds=item['duration'])
             duration = await time_delta(datetime.datetime.utcnow(), end, lang=lang, year=True, form="temp", precision=0)

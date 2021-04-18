@@ -1,6 +1,12 @@
 # ZBot V3 - A Discord Bot
 
-[![Discord server](https://discordapp.com/api/guilds/356067272730607628/embed.png)](https://discord.gg/N55zY88) [![Discord bot](https://discordbots.org/api/widget/status/486896267788812288.svg)](https://zrunner.me/invitezbot) [![discord.py](https://img.shields.io/badge/Discord.py-rewrite-brightgreen.svg)](https://github.com/Rapptz/discord.py) [![Docs status](https://readthedocs.org/projects/zbot/badge/?version=latest)](http://zbot.readthedocs.io) ![Issues](https://img.shields.io/github/issues/ZRunner/ZBot.svg) ![Last commit](https://img.shields.io/github/last-commit/ZRunner/ZBot.svg) [![Translated help](https://img.shields.io/badge/Translation%20help-DeepL-blue.svg)](https://www.deepl.com)
+[![Discord server](https://discordapp.com/api/guilds/356067272730607628/embed.png)](https://discord.gg/N55zY88)
+[![Discord bot](https://discordbots.org/api/widget/status/486896267788812288.svg)](https://zrunner.me/invitezbot)
+[![discord.py](https://img.shields.io/badge/Discord.py-rewrite-brightgreen.svg)](https://github.com/Rapptz/discord.py)
+[![Docs status](https://readthedocs.org/projects/zbot/badge/?version=latest)](http://zbot.readthedocs.io)
+![Issues](https://img.shields.io/github/issues/ZRunner/ZBot.svg?label=Opened+issues)
+![Last commit](https://img.shields.io/github/last-commit/ZRunner/ZBot.svg?label=Last+commit+on+stable)
+[![Translated help](https://img.shields.io/badge/Translation%20help-DeepL-blue.svg)](https://www.deepl.com)
 
 Welcome to the ZBot bot documentation, a Discord bot coded in Python 3 by a small French developer, **Z_runner**. You will find in the documentation all the explanations on each of the usable commands, as well as the list of the last additions and some code examples. The documentation is currently in English but the bot is available in several languages, including its main language, French.
 
@@ -46,4 +52,4 @@ Such content is subject to a **MIT-type license**, which means that you are free
 
 [![Bots on Discord](https://bots.ondiscord.xyz/bots/486896267788812288/embed)](https://bots.ondiscord.xyz/bots/486896267788812288)
 
-[![botlist.space](https://api.botlist.space/widget/486896267788812288/5?rounded=true)](https://botlist.space/bot/486896267788812288?utm_source=bls&utm_medium=widget&utm_campaign=486896267788812288)
+[![discordlist.space](https://api.discordlist.space/widget/486896267788812288/5?rounded=true)](https://discordlist.space/bot/486896267788812288?utm_source=bls&utm_medium=widget&utm_campaign=486896267788812288)

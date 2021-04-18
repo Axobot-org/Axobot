@@ -30,15 +30,17 @@ class Events(commands.Cog):
         self.last_membercounter = datetime.datetime.utcfromtimestamp(0)
         self.latencies_list = list()
         self.embed_colors = {"welcome":5301186,
-        "mute":4868682,
-        "kick":16730625,
-        "ban":13632027,
-        "slowmode":5671364,
-        "clear":16312092,
-        "warn":9131818,
-        "softban":16720385,
-        "error":16078115,
-        "case-edit":10197915}
+            "mute":4868682,
+            "unmute":8311585,
+            "kick":16730625,
+            "ban":13632027,
+            "unban":8311585,
+            "slowmode":5671364,
+            "clear":16312092,
+            "warn":9131818,
+            "softban":16720385,
+            "error":16078115,
+            "case-edit":10197915}
         self.points = 0
         self.table = {'kick':3,
             'ban':7,
@@ -51,7 +53,7 @@ class Events(commands.Cog):
 
 
     def cog_unload(self):
-        self.loop.cancel()
+        self.loop.cancel() # pylint: disable=no-member
 
     @commands.Cog.listener()
     async def on_ready(self):
@@ -120,11 +122,14 @@ class Events(commands.Cog):
         """Send a log to the logging channel when the bot joins/leave a guild"""
         try:
             if Type == "join":
-                self.bot.log.info("Le bot a rejoint le serveur {}".format(guild.id))
-                desc = "Bot **joins the server** {} ({}) - {} users".format(guild.name,guild.id,len(guild.members))
+                self.bot.log.info("Bot joined the server {}".format(guild.id))
+                desc = "Bot **joined the server** {} ({}) - {} users".format(guild.name,guild.id,len(guild.members))
             else:
-                self.bot.log.info("Le bot a quitté le serveur {}".format(guild.id))
-                desc = "Bot **left the server** {} ({}) - {} users".format(guild.name,guild.id,len(guild.members))
+                self.bot.log.info("Bot left the server {}".format(guild.id))
+                if guild.name is None and guild.unavailable:
+                    desc = "Bot **may have left** the server {} (guild unavailable)".format(guild.id)
+                else:
+                    desc = "Bot **left the server** {} ({}) - {} users".format(guild.name,guild.id,len(guild.members))
             emb = self.bot.get_cog("Embeds").Embed(desc=desc,color=self.embed_colors['welcome']).update_timestamp().set_author(self.bot.user)
             await self.bot.get_cog("Embeds").send([emb])
             if self.bot.database_online:
@@ -166,7 +171,7 @@ class Events(commands.Cog):
             except:
                 pass
         # April Fool event
-        elif random.random() < 0.1 and self.bot.current_event=="fish" and is_fun_enabled(msg, self.bot.get_cog("Fun")):
+        elif random.random() < 0.07 and self.bot.current_event=="fish" and await is_fun_enabled(msg, self.bot.get_cog("Fun")):
             try:
                 react = random.choice(['🐟','🎣', '🐠', '🐡']*4+['👀'])
                 await msg.add_reaction(react)
@@ -237,7 +242,7 @@ class Events(commands.Cog):
             await member.remove_roles(role, reason="This user doesn't support me anymore")
 
 
-    async def send_logs_per_server(self, guild: discord.Guild, Type:str, message: str, author: discord.User=None):
+    async def send_logs_per_server(self, guild: discord.Guild, Type:str, message: str, author: discord.User=None, fields: list[dict]=None):
         """Send a log in a server. Type is used to define the color of the embed"""
         if self.bot.zombie_mode:
             return
@@ -254,7 +259,7 @@ class Events(commands.Cog):
             return
         if channel is None:
             return
-        emb = self.bot.get_cog("Embeds").Embed(desc=message,color=c).update_timestamp()
+        emb = self.bot.get_cog("Embeds").Embed(desc=message, color=c, fields=fields).update_timestamp()
         if author is not None:
             emb.set_author(author)
         try:
@@ -469,17 +474,16 @@ class Events(commands.Cog):
         try:
             d = datetime.datetime.now()
             # Timed tasks - every 20s
-            if d.second%20 == 0:
+            if d.second%20 == 0 and self.bot.database_online:
                 await self.check_tasks()
             # Latency usage - every 30s
             if d.second%30 == 0:
                 await self.status_loop(d)
             # Clear old rank cards - every 20min
-            elif d.minute%20 == 0:
+            elif d.minute%20 == 0 and self.bot.database_online:
                 await self.bot.get_cog('Xp').clear_cards()
-                await self.rss_loop()
             # Partners reload - every 7h (start from 1am)
-            elif d.hour%7 == 1 and d.hour != self.partner_last_check.hour:
+            elif d.hour%7 == 1 and d.hour != self.partner_last_check.hour and self.bot.database_online:
                 await self.partners_loop()
             # Bots lists updates - every day
             elif d.hour == 0 and d.day != self.dbl_last_sending.day:
@@ -491,10 +495,10 @@ class Events(commands.Cog):
             elif int(d.hour)%12 == 0 and int(d.minute)%2 == 0 and (d.hour != self.last_eventDay_check.hour or d.day != self.last_eventDay_check.day):
                 await self.botEventLoop()
             # Send stats logs - every 1h (start from 0:05 am)
-            elif d.minute > 5 and (d.day != self.statslogs_last_push.day or d.hour != self.statslogs_last_push.hour):
+            elif d.minute > 5 and (d.day != self.statslogs_last_push.day or d.hour != self.statslogs_last_push.hour) and self.bot.database_online:
                 await self.send_sql_statslogs()
             # Refresh needed membercounter channels - every 1min
-            elif abs((self.last_membercounter - d).total_seconds()) > 60:
+            elif abs((self.last_membercounter - d).total_seconds()) > 60 and self.bot.database_online:
                 await self.bot.get_cog('Servers').update_everyMembercounter()
                 self.last_membercounter = d
         except Exception as e:
@@ -505,13 +509,12 @@ class Events(commands.Cog):
                 self.loop_errors[1] = datetime.datetime.now()
             if self.loop_errors[0] > 10:
                 await self.bot.get_cog('Errors').senf_err_msg(":warning: **Trop d'erreurs : ARRET DE LA BOUCLE PRINCIPALE** <@279568324260528128> :warning:")
-                self.loop.cancel()
+                self.loop.cancel() # pylint: disable=no-member
 
     @loop.before_loop
     async def before_loop(self):
         await self.bot.wait_until_ready()
         await asyncio.sleep(2)
-        await self.rss_loop()
         self.bot.log.info("[tasks_loop] Lancement de la boucle")
 
 
@@ -536,12 +539,6 @@ class Events(commands.Cog):
                     self.bot.log.debug(f"StatusPage API returned {r.status} for {params} (available RAM)")
             self.latencies_list = list()
             self.last_statusio = d
-
-    async def rss_loop(self):
-        return
-        # if self.bot.get_cog('Rss').last_update is None or (datetime.datetime.now() - self.bot.get_cog('Rss').last_update).total_seconds()  > 5*60:
-        #     self.bot.get_cog('Rss').last_update = datetime.datetime.now()
-        #     asyncio.run_coroutine_threadsafe(self.bot.get_cog('Rss').main_loop(),asyncio.get_running_loop())
     
     async def botEventLoop(self):
         self.bot.get_cog("BotEvents").updateCurrentEvent()
@@ -555,7 +552,7 @@ class Events(commands.Cog):
         if self.bot.beta:
             return
         t = time.time()
-        answers = ['None','None','None','None','None', 'None']
+        answers = ['None' for _ in range(5)]
         self.bot.log.info("[DBL] Envoi des infos sur le nombre de guildes...")
         try:
             guildCount = await self.bot.get_cog('Info').get_guilds_count()
@@ -585,16 +582,16 @@ class Events(commands.Cog):
         except Exception as e:
             answers[1] = "0"
             await self.bot.get_cog("Errors").on_error(e,None)
-        try: # https://botlist.space/bot/486896267788812288
+        try: # https://discordlist.space/bot/486896267788812288
             payload = json.dumps({
             'server_count': guildCount
             })
             headers = {
-                'Authorization': self.bot.others['botlist.space'],
+                'Authorization': self.bot.others['discordlist.space'],
                 'Content-Type': 'application/json'
             }
-            async with session.post('https://api.botlist.space/v1/bots/{}'.format(self.bot.user.id), data=payload, headers=headers) as resp:
-                self.bot.log.debug('botlist.space returned {} for {}'.format(resp.status, payload))
+            async with session.post('https://api.discordlist.space/v1/bots/{}'.format(self.bot.user.id), data=payload, headers=headers) as resp:
+                self.bot.log.debug('discordlist.space returned {} for {}'.format(resp.status, payload))
                 answers[2] = resp.status
         except Exception as e:
             answers[2] = "0"
@@ -610,17 +607,6 @@ class Events(commands.Cog):
         except Exception as e:
             answers[3] = "0"
             await self.bot.get_cog("Errors").on_error(e,None)
-        try: # https://arcane-center.xyz/bot/486896267788812288
-            headers = {
-                'Authorization': self.bot.others['arcanecenter'],
-                'Content-Type': 'application/json'
-            }
-            async with session.post('https://arcane-center.xyz/api/{}/stats'.format(self.bot.user.id), data=payload, headers=headers) as resp:
-                self.bot.log.debug('Arcane Center returned {} for {}'.format(resp.status, payload))
-                answers[4] = resp.status
-        except Exception as e:
-            answers[4] = "0"
-            await self.bot.get_cog("Errors").on_error(e,None)
         try: # https://api.discordextremelist.xyz/v2/bot/486896267788812288/stats
             payload = json.dumps({
                 'guildCount': guildCount
@@ -631,9 +617,9 @@ class Events(commands.Cog):
             }
             async with session.post('https://api.discordextremelist.xyz/v2/bot/{}/stats'.format(self.bot.user.id), data=payload, headers=headers) as resp:
                 self.bot.log.debug('DiscordExtremeList returned {} for {}'.format(resp.status, payload))
-                answers[5] = resp.status
+                answers[4] = resp.status
         except Exception as e:
-            answers[5] = "0"
+            answers[4] = "0"
             await self.bot.get_cog("Errors").on_error(e,None)
         await session.close()
         answers = [str(x) for x in answers]
@@ -686,9 +672,11 @@ class Events(commands.Cog):
         cursor = cnx.cursor()
         rss_feeds = await self.bot.get_cog("Rss").get_raws_count(True)
         active_rss_feeds = await self.bot.get_cog("Rss").get_raws_count()
-        member_count = sum(x.member_count for x in self.bot.guilds)
-        ratio = member_count/len(self.bot.users)
-        approx_bot_count = int(len([1 for x in self.bot.users if x.bot])*ratio)
+        if infoCog := self.bot.get_cog("Info"):
+            member_count, bot_count = infoCog.get_users_nber(list())
+        else:
+            member_count = len(self.bot.users)
+            bot_count = len([1 for x in self.bot.users if x.bot])
         lang_stats = await self.bot.get_cog('Servers').get_languages([], return_dict=True)
         rankcards_stats = await self.bot.get_cog('Users').get_rankcards_stats()
         xptypes_stats = await self.bot.get_cog('Servers').get_xp_types([], return_dict=True)
@@ -696,7 +684,7 @@ class Events(commands.Cog):
         query = "INSERT INTO `log_stats` (`servers_count`, `members_count`, `bots_count`, `dapi_heartbeat`, `codelines_count`, `earned_xp_total`, `rss_feeds`, `active_rss_feeds`, `supportserver_members`, `languages`, `used_rankcards`, `xp_types`, `beta`) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
         data = (len(self.bot.guilds),
             member_count,
-            approx_bot_count,
+            bot_count,
             round(self.bot.latency,3),
             self.bot.get_cog("Info").codelines,
             await self.bot.get_cog('Xp').bdd_total_xp(),

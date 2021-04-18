@@ -12,8 +12,8 @@
     "aide": {
         "aliases": "Takma isimler",
         "categories": {
-            "fun": "eğlence",
             "data": "bilgi",
+            "fun": "eğlence",
             "moderation": "Moderasyon",
             "other": "diğerleri",
             "server-settings": "sunucu ayarları",

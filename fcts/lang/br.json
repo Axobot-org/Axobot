@@ -18,8 +18,8 @@
     "aide": {
         "aliases": "Apelidos:",
         "categories": {
-            "fun": "diversão",
             "data": "informação",
+            "fun": "diversão",
             "moderation": "moderação",
             "other": "outros",
             "server-settings": "configurações o servidor",

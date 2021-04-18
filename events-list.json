@@ -30,5 +30,13 @@
         "icon": null,
         "color": 16089635,
         "objectives": []
+    },
+    "april-2021": {
+        "begin": "2021-04-01",
+        "end": "2021-04-02",
+        "type": "fish",
+        "icon": null,
+        "color": 11260705,
+        "objectives": [120]
     }
 }
