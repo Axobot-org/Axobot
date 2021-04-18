@@ -204,7 +204,7 @@ Slowmode works up to one message every 6h (21600s)
             # send DM
             await self.dm_user(user, "kick", ctx, reason = None if reason=="Unspecified" else reason)
             reason = await self.bot.get_cog("Utilities").clear_msg(reason,everyone = not ctx.channel.permissions_for(ctx.author).mention_everyone)
-            await ctx.guild.kick(user,reason=reason)
+            await ctx.guild.kick(user,reason=reason[:512])
             caseID = "'Unsaved'"
             if self.bot.database_online:
                 Cases = self.bot.get_cog('Cases')
@@ -296,7 +296,7 @@ Slowmode works up to one message every 6h (21600s)
         """Call when someone should be muted in a guild"""
         # add the muted role
         role = await self.get_muted_role(member.guild)
-        await member.add_roles(role,reason=reason)
+        await member.add_roles(role,reason=reason[:512])
         # send in modlogs
         opt_case = None if caseID=="'Unsaved'" else caseID
         opt_reason = None if reason=="Unspecified" else reason
@@ -583,7 +583,7 @@ The 'days_to_delete' option represents the number of days worth of messages to d
             if not days_to_delete in range(8):
                 days_to_delete = 0
             reason = await self.bot.get_cog("Utilities").clear_msg(reason,everyone = not ctx.channel.permissions_for(ctx.author).mention_everyone)
-            await ctx.guild.ban(user,reason=reason,delete_message_days=days_to_delete)
+            await ctx.guild.ban(user,reason=reason[:512],delete_message_days=days_to_delete)
             if f_duration is None:
                 self.bot.log.info("L'utilisateur {} a été banni du serveur {} pour la raison {}".format(user.id,ctx.guild.id,reason))
             else:
@@ -623,7 +623,7 @@ The 'days_to_delete' option represents the number of days worth of messages to d
         if not guild.me.guild_permissions.ban_members:
             return
         reason = str(await self.bot._(guild.id,"logs","d-unban")).format(author)
-        await guild.unban(user, reason=reason)
+        await guild.unban(user, reason=reason[:512])
         # send in modlogs
         await self.send_modlogs("unban", user, author, guild, reason="Automod")
 
@@ -657,7 +657,7 @@ The 'days_to_delete' option represents the number of days worth of messages to d
                 await ctx.send(await self.bot._(ctx.guild.id,"modo","ban-user-here"))
                 return
             reason = await self.bot.get_cog("Utilities").clear_msg(reason,everyone = not ctx.channel.permissions_for(ctx.author).mention_everyone)
-            await ctx.guild.unban(user,reason=reason)
+            await ctx.guild.unban(user,reason=reason[:512])
             caseID = "'Unsaved'"
             if self.bot.database_online:
                 Cases = self.bot.get_cog('Cases')
@@ -713,7 +713,7 @@ Permissions for using this command are the same as for the kick
             await self.dm_user(user, "kick", ctx, reason = None if reason=="Unspecified" else reason)
 
             reason = await self.bot.get_cog("Utilities").clear_msg(reason,everyone = not ctx.channel.permissions_for(ctx.author).mention_everyone)
-            await ctx.guild.ban(user,reason=reason,delete_message_days=7)
+            await ctx.guild.ban(user,reason=reason[:512],delete_message_days=7)
             await user.unban()
             caseID = "'Unsaved'"
             if self.bot.database_online:
@@ -753,9 +753,13 @@ Permissions for using this command are the same as for the kick
             color = helpCog.help_color
         emb = discord.Embed(description=message, colour=color)
         if duration:
+            if len(duration) > 1020:
+                duration = duration[:1020] + "..."
             _duration = await self.bot._(user, "keywords", "duration")
             emb.add_field(name=_duration.capitalize(), value=duration)
         if reason:
+            if len(reason) > 1020:
+                reason = reason[:1020] + "..."
             _reason = await self.bot._(user, "keywords", "reason")
             emb.add_field(name=_reason.capitalize(),
                           value=reason, inline=False)
@@ -796,9 +800,13 @@ Permissions for using this command are the same as for the kick
                           'value': f"#{case}", 'inline': True})
         if duration:
             _duration = await self.bot._(user, "keywords", "duration")
+            if len(duration) > 1020:
+                duration = duration[:1020] + "..."
             fields.append({'name': _duration.capitalize(),
                           'value': duration, 'inline': True})
         if reason:
+            if len(reason) > 1020:
+                reason = reason[:1020] + "..."
             _reason = await self.bot._(user, "keywords", "reason")
             fields.append({'name': _reason.capitalize(), 'value': reason})
         await self.bot.get_cog("Events").send_logs_per_server(guild, action, message, author, fields)
