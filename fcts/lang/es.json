@@ -12,8 +12,8 @@
     "aide": {
         "aliases": "Apodos:",
         "categories": {
-            "fun": "diversión",
             "data": "información",
+            "fun": "diversión",
             "moderation": "moderación",
             "other": "otras",
             "server-settings": "configuración del servidor",
