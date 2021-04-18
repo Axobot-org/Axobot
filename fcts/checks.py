@@ -96,7 +96,9 @@ async def verify_role_exists(ctx: MyContext) -> bool:
 
 async def database_connected(ctx: MyContext) -> bool:
     "Check if the database is online and accessible"
-    return ctx.bot.database_online
+    if ctx.bot.database_online:
+        return True
+    raise commands.CommandError("Database offline")
 
 
 async def is_fun_enabled(ctx: MyContext, self=None) -> bool:
@@ -107,16 +109,16 @@ async def is_fun_enabled(ctx: MyContext, self=None) -> bool:
             return False
     if ctx.guild is None:
         return True
-    if not ctx.bot.database_online and not ctx.guild.channels[0].permissions_for(ctx.author).manage_guild:
+    if not self.bot.database_online and not ctx.guild.channels[0].permissions_for(ctx.author).manage_guild:
         return False
     ID = ctx.guild.id
     if str(ID) not in self.fun_opt.keys():
-        fun = await ctx.bot.get_config(ID, "enable_fun")
+        fun = await self.bot.get_config(ID, "enable_fun")
         self.fun_opt[str(ID)] = fun
     else:
         fun = self.fun_opt[str(ID)]
         if fun is None:
-            fun = await ctx.bot.get_config(ID, "enable_fun")
+            fun = await self.bot.get_config(ID, "enable_fun")
             if fun is not None:
                 self.fun_opt[str(ID)] = fun
     return fun == 1 or fun == True
@@ -129,3 +131,9 @@ async def is_a_cmd(msg: discord.Message, bot: commands.Bot) -> bool:
     for p in pr:
         is_cmd = is_cmd or msg.content.startswith(p)
     return is_cmd
+
+async def is_ttt_enabled(ctx: MyContext, self=None) -> bool:
+    if ctx.guild is None:
+        return True
+    mode = await ctx.bot.get_config(ctx.guild.id, "ttt_display")
+    return mode != 0

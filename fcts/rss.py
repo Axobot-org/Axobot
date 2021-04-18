@@ -65,6 +65,7 @@ class Rss(commands.Cog):
         self.bot = bot
         self.time_loop = 20 # min minutes between two rss loops
         self.time_between_flows_check = 0.15 # seconds between two rss checks within a loop
+        self.max_messages = 20 # max messages sent per flow per loop
         
         self.file = "rss"
         self.embed_color = discord.Color(6017876)
@@ -89,6 +90,7 @@ class Rss(commands.Cog):
         else:
             self.twitter_api_url = 'http://twitrss.me/twitter_user_to_rss/?user='
         # launch rss loop
+        # pylint: disable=no-member
         self.loop_child.change_interval(minutes=self.time_loop)
         self.loop_child.start()
 
@@ -98,6 +100,7 @@ class Rss(commands.Cog):
         self.table = 'rss_flow' if self.bot.user.id==486896267788812288 else 'rss_flow_beta'
     
     def cog_unload(self):
+        # pylint: disable=no-member
         self.loop_child.cancel()
 
     class rssMessage:
@@ -174,16 +177,20 @@ class Rss(commands.Cog):
             Format = Format.replace('\\n','\n')
             if self.rt_by is not None:
                 self.author = "{} (retweeted by @{})".format(self.author,self.rt_by)
-            text = Format.format_map(self.bot.SafeDict(channel=self.channel,title=self.title,date=d,url=self.url,link=self.url,mentions=", ".join(self.mentions),logo=self.logo,author=self.author))
+            _channel = discord.utils.escape_markdown(self.channel)
+            _author = discord.utils.escape_markdown(self.author)
+            text = Format.format_map(self.bot.SafeDict(channel=_channel,title=self.title,date=d,url=self.url,link=self.url,mentions=", ".join(self.mentions),logo=self.logo,author=_author))
             if not self.embed:
                 return text
             else:
-                emb = self.bot.get_cog('Embeds').Embed(desc=text,time=self.date,color=self.embed_data['color'],footer_text=self.embed_data['footer'])
+                emb = self.bot.get_cog('Embeds').Embed(desc=text,color=self.embed_data['color'],footer_text=self.embed_data['footer'])
                 if self.embed_data['title'] is None:
                     if self.Type != 'tw':
                         emb.title = self.title
                     else:
                         emb.title = self.author
+                else:
+                    emb.title = self.embed_data['title']
                 emb.add_field(name='URL',value=self.url)
                 if self.image is not None:
                     emb.thumbnail = self.image
@@ -282,7 +289,11 @@ class Rss(commands.Cog):
         ..Doc rss.html#see-the-last-post"""
         if link in web_link.keys():
             link = web_link[link]
-        text = await self.rss_web(ctx.channel,link)
+        try:
+            text = await self.rss_web(ctx.channel,link)
+        except client_exceptions.InvalidURL:
+            await ctx.send(await self.bot._(ctx.channel, "rss", "invalid-link"))
+            return
         if type(text) == str:
             await ctx.send(text)
         else:
@@ -320,15 +331,6 @@ class Rss(commands.Cog):
         flow_limit = await self.bot.get_config(guild.id,'rss_max_number')
         if flow_limit is None:
             flow_limit = self.bot.get_cog('Servers').default_opt['rss_max_number']
-        return len(await self.get_guild_flows(guild.id)) >= flow_limit, flow_limit
-
-
-    async def is_overflow(self, guild: discord.Guild) -> typing.Tuple[bool, int]:
-        """Check if a guild still has at least a slot
-        True if max number reached, followed by the flow limit"""
-        flow_limit = await self.bot.get_config(guild.id,'rss_max_number')
-        if flow_limit is None:
-            flow_limit = self.bot.cogs['Servers'].default_opt['rss_max_number']
         return len(await self.get_guild_flows(guild.id)) >= flow_limit, flow_limit
 
     @rss_main.command(name="add")
@@ -676,6 +678,10 @@ class Rss(commands.Cog):
         
         ..Doc rss.html#reload-every-feed"""
         try:
+            if self.loop_processing:
+                await ctx.send(await self.bot._(ctx.guild.id, "rss", "loop-processing"))
+                ctx.command.reset_cooldown(ctx)
+                return
             t = time.time()
             msg = await ctx.send(str(await self.bot._(ctx.guild.id,"rss","guild-loading")).format(ctx.bot.get_cog('Emojis').customEmojis['loading']))
             liste = await self.get_guild_flows(ctx.guild.id)
@@ -975,6 +981,14 @@ class Rss(commands.Cog):
             return None
         else:
             return match.group(1)
+    
+    async def parse_deviant_url(self, url):
+        r = r'(?:http.*://)?(?:www.)?(?:deviantart.com/)([^?\s]+)'
+        match = re.search(r,url)
+        if match is None:
+            return None
+        else:
+            return match.group(1)
 
     async def feed_parse(self, url: str, timeout: int, session: ClientSession = None) -> feedparser.FeedParserDict:
         """Asynchronous parsing using cool methods"""
@@ -993,6 +1007,36 @@ class Rss(commands.Cog):
             if session is None:
                 await _session.close()
             return None
+        if session is None:
+            await _session.close()
+        if cm.expired:
+            # request was cancelled by timeout
+            self.bot.info("[RSS] feed_parse got a timeout")
+            return None
+        headers = {k.decode("utf-8").lower(): v.decode("utf-8") for k, v in headers}
+        return feedparser.parse(html, response_headers=headers)
+
+    async def feed_parse(self, url: str, timeout: int, session: ClientSession = None) -> feedparser.FeedParserDict:
+        """Asynchronous parsing using cool methods"""
+        # if session is provided, we have to not close it
+        _session = session or ClientSession()
+        try:
+            async with async_timeout.timeout(timeout) as cm:
+                async with _session.get(url) as response:
+                    html = await response.text()
+                    headers = response.raw_headers
+        except (client_exceptions.ClientConnectorCertificateError, UnicodeDecodeError, client_exceptions.TooManyRedirects, client_exceptions.ClientConnectorError, client_exceptions.ClientPayloadError):
+            if session is None:
+                await _session.close()
+            return FeedParserDict(entries=[])
+        except asyncio.exceptions.TimeoutError:
+            if session is None:
+                await _session.close()
+            return None
+        except Exception as e:
+            if session is None:
+                await _session.close()
+            raise e
         if session is None:
             await _session.close()
         if cm.expired:
@@ -1130,7 +1174,7 @@ class Rss(commands.Cog):
         if name == 'help':
             return await self.bot._(channel,"rss","tw-help")
         try:
-            if name.isnumeric():
+            if isinstance(name, int) or name.isnumeric():
                 posts = self.twitterAPI.GetUserTimeline(user_id=int(name), exclude_replies=True)
                 username = self.twitterAPI.GetUser(user_id=int(name)).screen_name
             else:
@@ -1180,8 +1224,13 @@ class Rss(commands.Cog):
                 if post.retweeted:
                     rt = "retweet"
                 text = html.unescape(getattr(post, 'full_text', post.text))
-                if r := re.search(r"https://t.co/([^\s]+)", text):
-                    text = text.replace(r.group(0), '')
+                # remove images links if needed
+                if channel.permissions_for(channel.guild.me).embed_links:
+                    find_url = self.bot.get_cog("Utilities").find_url_redirection
+                    for m in re.finditer(r"https://t.co/([^\s]+)", text):
+                        final_url = await find_url(m.group(0))
+                        if "/photo/" in final_url:
+                            text = text.replace(m.group(0), '')
                 url = "https://twitter.com/{}/status/{}".format(name.lower(), post.id)
                 img = None
                 if post.media: # if exists and is not empty
@@ -1246,8 +1295,11 @@ class Rss(commands.Cog):
                 published = i
                 break
         if published is not None and len(feeds.entries) > 1:
-            while (len(feeds.entries) > 1)  and (feeds.entries[1][published] is not None) and (feeds.entries[0][published] < feeds.entries[1][published]):
-                del feeds.entries[0]
+            try:
+                while (len(feeds.entries) > 1)  and (feeds.entries[1][published] is not None) and (feeds.entries[0][published] < feeds.entries[1][published]):
+                    del feeds.entries[0]
+            except KeyError:
+                pass
         if not date or published not in ['published_parsed','updated_parsed']:
             feed = feeds.entries[0]
             if published is None:
@@ -1479,7 +1531,7 @@ class Rss(commands.Cog):
         cnx.commit()
         cursor.close()
 
-    async def send_rss_msg(self, obj, channel: discord.TextChannel, roles: typing.List[str], send_stats):
+    async def send_rss_msg(self, obj: "rssMessage", channel: discord.TextChannel, roles: typing.List[str], send_stats):
         if channel is not None:
             t = await obj.create_msg(await self.bot._(channel.guild,"current_lang","current"))
             mentions = list()
@@ -1499,20 +1551,31 @@ class Rss(commands.Cog):
                 if send_stats:
                     if statscog := self.bot.get_cog("BotStats"):
                         statscog.rss_stats['messages'] += 1
+            except discord.HTTPException as e:
+                self.bot.log.info("[send_rss_msg] Cannot send message on channel {}: {}".format(channel.id,e))
+                await self.bot.get_cog("Errors").on_error(e)
+                await self.bot.get_cog("Errors").senf_err_msg(str(t.to_dict()) if hasattr(t, "to_dict") else str(t))
             except Exception as e:
                 self.bot.log.info("[send_rss_msg] Cannot send message on channel {}: {}".format(channel.id,e))
 
     async def check_flow(self, flow: dict, session: ClientSession = None, send_stats: bool=False):
         try:
             guild = self.bot.get_guild(flow['guild'])
+            if guild is None:
+                self.bot.log.info("[send_rss_msg] Cannot send message on server {} (unknown guild)".format(flow['guild']))
+                return False
+            chan: discord.TextChannel = guild.get_channel(flow['channel'])
+            if chan is None:
+                self.bot.log.info("[send_rss_msg] Cannot send message on channel {} (unknown channel)".format(flow['channel']))
+                return True
             if flow['link'] in self.cache.keys():
                 objs = self.cache[flow['link']]
             else:
                 funct = getattr(self, f"rss_{flow['type']}")
                 if flow["type"] == "tw":
-                    objs = await funct(guild,flow['link'], flow['date'])
+                    objs = await funct(chan,flow['link'], flow['date'])
                 else:
-                    objs = await funct(guild,flow['link'], flow['date'], session=session)
+                    objs = await funct(chan,flow['link'], flow['date'], session=session)
                 if isinstance(objs,twitter.error.TwitterError):
                     self.twitter_over_capacity = True
                     return False
@@ -1523,21 +1586,16 @@ class Rss(commands.Cog):
             if isinstance(objs,(str,type(None),int)) or len(objs) == 0:
                 return True
             elif type(objs) == list:
-                for o in objs:
-                    guild = self.bot.get_guild(flow['guild'])
-                    if guild is None:
-                        self.bot.log.info("[send_rss_msg] Can not send message on server {} (unknown)".format(flow['guild']))
-                        return False
-                    chan = guild.get_channel(flow['channel'])
-                    if guild is None:
-                        self.bot.log.info("[send_rss_msg] Can not send message on channel {} (unknown)".format(flow['channel']))
-                        return False
+                for o in objs[:self.max_messages]:
+                    # if we can't post messages: abort
+                    if not chan.permissions_for(guild.me).send_messages:
+                        return
                     o.format = flow['structure']
                     o.embed = flow['use_embed']
                     o.fill_embed_data(flow)
-                    await o.fill_mention(guild,flow['roles'].split(';'), self.bot._)
-                    await self.send_rss_msg(o,chan,flow['roles'].split(';'), send_stats)
-                await self.update_flow(flow['ID'], [('date',o.date)],)
+                    await o.fill_mention(guild, flow['roles'].split(';'), self.bot._)
+                    await self.send_rss_msg(o, chan, flow['roles'].split(';'), send_stats)
+                await self.update_flow(flow['ID'], [('date', o.date)],)
                 return True
             else:
                 return True
@@ -1615,16 +1673,6 @@ class Rss(commands.Cog):
         """Wait until the bot is ready"""
         await self.bot.wait_until_ready()
 
-    # async def loop(self):
-    #     await self.bot.wait_until_ready()
-    #     await asyncio.sleep(0.5)
-    #     await self.loop_child()
-    #     await asyncio.sleep((int(datetime.datetime.now().minute)%self.time_loop)*60-2)
-    #     while not self.bot.is_closed():
-    #         if int(datetime.datetime.now().minute)%self.time_loop == 0:
-    #             await self.loop_child()
-    #             await asyncio.sleep((int(datetime.datetime.now().minute)%self.time_loop)*60-5)
-
 
     @commands.command(name="rss_loop",hidden=True)
     @commands.check(check_admin)
@@ -1635,13 +1683,13 @@ class Rss(commands.Cog):
             return await ctx.send("Lol, t'as oublié que la base de donnée était hors ligne "+random.choice(["crétin ?","? Tu ferais mieux de fixer tes bugs","?","? :rofl:","?"]))
         if new_state == "start":
             try:
-                await self.loop_child.start()
+                await self.loop_child.start() # pylint: disable=no-member
             except RuntimeError:
                 await ctx.send("La boucle est déjà en cours !")
             else:
                 await ctx.send("Boucle rss relancée !")
         elif new_state == "stop":
-            await self.loop_child.cancel()
+            await self.loop_child.cancel() # pylint: disable=no-member
             self.bot.log.info(" Boucle rss arrêtée de force par un admin")
             await ctx.send("Boucle rss arrêtée de force !")
         elif new_state == "once":

@@ -120,17 +120,17 @@ The persons authorized to use this command are the same as for the `ban <#ban>`_
 
 .. warning:: For both commands to succeed, the bot must have "`Ban members <perms.html#ban-members>`_" permissions (as well as be placed higher than the highest role of the member to ban).
 
--------
-Banlist
--------
+----------------
+Banlist/Mutelist
+----------------
 
-**Syntax:** :code:`banlist`
+**Syntax:** :code:`banlist` *or* :code:`mutelist`
 
-If you ban so many people that you don't remember the exact list, and you have the laziness to look in your server options, this command will be happy to refresh your memory without too much effort.
+If you mute and ban so many people that you don't remember the exact list, and you have the laziness to look in your server options, this command will be happy to refresh your memory without too much effort.
 
-The 'reasons' argument allows you to display or not the reasons for the bans.
+The 'reasons' argument allows you to display or not the reasons for the sanction.
 
-.. note:: Note that this command will be deleted after 15 minutes, because privacy is private, and because we like privacy, it is only available for your server administrators. Ah, and Discord also likes privacy, so the bot can't read this list if he doesn't have permission to "`ban people <perms.html#ban-members>`_".
+.. note:: Note that this command will be deleted after 20 seconds, because privacy is private, and because we like privacy, it is only available for your server administrators for `banlist` and your moderators for `mutelist`. Ah, and Discord also likes privacy, so the bot can't read this list if he doesn't have permission to "`ban people <perms.html#ban-members>`_".
 
 --------------
 Handling cases
@@ -188,9 +188,9 @@ This option allows you to moderate the entry of your server, with several levels
 
 * 0 (None): no filter
 * 1 (Smooth): kick members with invitations in their nickname
-* 2 (Careful): kick accounts created less than 5min before
-* 3 (High): ban members with invitations in their nickname, and kick accounts created less than 30min before
-* 4 ((╯°□°）╯︵ ┻━┻): ban members created less than 30min before, and kick those created less than 2h before
+* 2 (Careful): kick accounts created less than 15min before
+* 3 (High): ban members with invitations in their nickname, and kick accounts created less than 45min before
+* 4 ((╯°□°）╯︵ ┻━┻): ban members created less than 1 hour before, and kick those created less than 2 hours before
 
 .. note:: Note that the levels are cumulative: level 3 will also have the specificities of levels 1 and 2
 

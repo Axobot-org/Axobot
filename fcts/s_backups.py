@@ -23,7 +23,9 @@ class Backups(commands.Cog):
     @commands.cooldown(2,120, commands.BucketType.guild)
     @commands.check(checks.has_admin)
     async def main_backup(self,ctx:MyContext):
-        "..Doc server.html#server-backup"
+        """Make and apply backups of your server
+
+        ..Doc server.html#server-backup"""
         if ctx.subcommand_passed is None:
             await self.bot.get_cog('Help').help_command(ctx,['backup'])
 

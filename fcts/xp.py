@@ -126,12 +126,13 @@ class Xp(commands.Cog):
         self.cache['global'][msg.author.id] = [round(time.time()), prev_points+giv_points]
         new_lvl = await self.calc_level(self.cache['global'][msg.author.id][1],0)
         if 0 < (await self.calc_level(prev_points,0))[0] < new_lvl[0]:
-            await self.send_levelup(msg,new_lvl)
+            await self.send_levelup(msg, new_lvl)
             await self.give_rr(msg.author,new_lvl[0],await self.rr_list_role(msg.guild.id))
+            await self.bot.get_cog("Utilities").add_user_eventPoint(msg.author.id, round(new_lvl[0]/5))
     
     async def add_xp_1(self, msg:discord.Message, rate: float):
         """MEE6-like xp type"""
-        if msg.guild.id not in self.cache.keys() or len(self.cache[msg.guild.id]) == 0:
+        if msg.guild.id not in self.cache.keys():
             await self.bdd_load_cache(msg.guild.id)
         if msg.author.id in self.cache[msg.guild.id].keys():
             if time.time() - self.cache[msg.guild.id][msg.author.id][0] < 60:
@@ -162,7 +163,7 @@ class Xp(commands.Cog):
 
     async def add_xp_2(self, msg:discord.Message, rate: float):
         """Local xp type"""
-        if msg.guild.id not in self.cache.keys() or len(self.cache[msg.guild.id]) == 0:
+        if msg.guild.id not in self.cache.keys():
             await self.bdd_load_cache(msg.guild.id)
         if msg.author.id in self.cache[msg.guild.id].keys():
             if time.time() - self.cache[msg.guild.id][msg.author.id][0] < self.cooldown:
@@ -216,7 +217,6 @@ class Xp(commands.Cog):
         """Envoie le message de levelup"""
         if self.bot.zombie_mode:
             return
-        await self.bot.get_cog("Utilities").add_user_eventPoint(msg.author.id,round(lvl[0]/5))
         if msg.guild is None:
             return
         destination = await self.get_lvlup_chan(msg)
@@ -414,6 +414,8 @@ class Xp(commands.Cog):
                 liste.append(x)
             if len(liste)==1:
                 g = 'global' if guild is None else guild
+                if isinstance(g, int) and g not in self.cache:
+                    await self.bdd_load_cache(g)
                 if userID in self.cache[g].keys():
                     self.cache[g][userID][1] = liste[0]['xp']
                 else:
@@ -796,6 +798,8 @@ class Xp(commands.Cog):
                     await UsersCog.used_rank(user.id)
                 except Exception as e:
                     await self.bot.get_cog("Errors").on_error(e, ctx)
+            if statsCog := self.bot.get_cog("BotStats"):
+                statsCog.xp_cards += 1
         try:
             await ctx.send(file=myfile)
         except discord.errors.HTTPException:

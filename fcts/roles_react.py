@@ -37,6 +37,8 @@ class RolesReact(commands.Cog):
             return None, None
         try:
             msg = await chan.fetch_message(payload.message_id)
+        except discord.NotFound: # we don't care about those
+            return None, None
         except Exception as e:
             self.bot.log.warn(f"Could not fetch roles-reactions message {payload.message_id} in guild {payload.guild_id}: {e}")
             return None, None
@@ -52,19 +54,25 @@ class RolesReact(commands.Cog):
     async def on_raw_reaction(self, payload: discord.RawReactionActionEvent):
         if not self.bot.database_online:
             return
-        msg, role = await self.prepare_react(payload)
-        if msg is not None:
-            user = msg.guild.get_member(payload.user_id)
-            await self.give_remove_role(user, role, msg.guild, msg.channel, True, ignore_success=True)
+        try:
+            msg, role = await self.prepare_react(payload)
+            if msg is not None:
+                user = msg.guild.get_member(payload.user_id)
+                await self.give_remove_role(user, role, msg.guild, msg.channel, True, ignore_success=True)
+        except Exception as e:
+            await self.bot.get_cog("Errors").on_error(e)
 
     @commands.Cog.listener('on_raw_reaction_remove')
     async def on_raw_reaction_2(self, payload: discord.RawReactionActionEvent):
         if not self.bot.database_online:
             return
-        msg, role = await self.prepare_react(payload)
-        if msg is not None:
-            user = msg.guild.get_member(payload.user_id)
-            await self.give_remove_role(user, role, msg.guild, msg.channel, False, ignore_success=True)
+        try:
+            msg, role = await self.prepare_react(payload)
+            if msg is not None:
+                user = msg.guild.get_member(payload.user_id)
+                await self.give_remove_role(user, role, msg.guild, msg.channel, False, ignore_success=True)
+        except Exception as e:
+            await self.bot.get_cog("Errors").on_error(e)
 
     async def rr_get_guilds(self) -> set:
         """Get the list of guilds which have roles reactions"""

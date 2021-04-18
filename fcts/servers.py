@@ -22,6 +22,7 @@ xp_type_options = ['xp_type']
 color_options = ['partner_color']
 xp_rate_option = ['xp_rate']
 levelup_channel_option = ["levelup_channel"]
+ttt_display_option = ["ttt_display"]
 
 class Servers(commands.Cog):
     """"Cog in charge of all the bot configuration management for your server. As soon as an option is searched, modified or deleted, this cog will handle the operations."""
@@ -61,7 +62,7 @@ class Servers(commands.Cog):
                "noxp_channels":'',
                "xp_rate":1.0,
                "xp_type":0,
-               "anti_caps_lock":1,
+               "anti_caps_lock":0,
                "enable_fun":1,
                "prefix":'!',
                "membercounter":"",
@@ -69,7 +70,7 @@ class Servers(commands.Cog):
                "vote_emojis":":thumbsup:;:thumbsdown:;",
                "morpion_emojis":":red_circle:;:blue_circle:;",
                "help_in_dm":0,
-               "muted_role":0,
+               "muted_role":"",
                "partner_channel":'',
                "partner_color":10949630,
                'partner_role':'',
@@ -79,8 +80,9 @@ class Servers(commands.Cog):
                'voice_channel':'',
                'voice_category':'',
                'voice_channel_format':'{random}',
-               'compress_help':0}
-        self.optionsList = ["prefix","language","description","clear","slowmode","mute","kick","ban","warn","say","welcome_channel","welcome","leave","welcome_roles","bot_news","update_mentions","poll_channels","partner_channel","partner_color","partner_role","modlogs_channel","verification_role","enable_xp","levelup_msg","levelup_channel","noxp_channels","xp_rate","xp_type","anti_caps_lock","enable_fun","membercounter","anti_raid","vote_emojis","morpion_emojis","help_in_dm","compress_help","muted_role","voice_roles","voice_channel","voice_category","voice_channel_format"]
+               'compress_help':0,
+               'ttt_display': 2}
+        self.optionsList = ["prefix","language","description","clear","slowmode","mute","kick","ban","warn","say","welcome_channel","welcome","leave","welcome_roles","bot_news","update_mentions","poll_channels","partner_channel","partner_color","partner_role","modlogs_channel","verification_role","enable_xp","levelup_msg","levelup_channel","noxp_channels","xp_rate","xp_type","anti_caps_lock","enable_fun","membercounter","anti_raid","vote_emojis","morpion_emojis","help_in_dm","compress_help","muted_role","voice_roles","voice_channel","voice_category","voice_channel_format","ttt_display"]
         self.membercounter_pending = {}
 
     @commands.Cog.listener()
@@ -221,6 +223,7 @@ class Servers(commands.Cog):
                     if v == '':
                         x[k] = self.default_opt[k]
             liste.append(x)
+        cursor.close()
         return liste    
 
     async def modify_server(self, ID: int, values=[()]):
@@ -372,6 +375,8 @@ class Servers(commands.Cog):
                 await self.conf_xp_rate(ctx, option, value)
             elif option in levelup_channel_option:
                 await self.conf_levelup_chan(ctx, option, value)
+            elif option in ttt_display_option:
+                await self.conf_tttdisplay(ctx, option, value)
             else:
                 await ctx.send(await self.bot._(ctx.guild.id,"server","change-0"))
                 return
@@ -911,6 +916,32 @@ class Servers(commands.Cog):
                 return g_chan.mention
         return ""
     
+    async def conf_tttdisplay(self, ctx: MyContext, option: str, value: int):
+        if value == "scret-desc":
+            guild = await self.get_guild(ctx)
+            if guild is None:
+                return self.bot.get_cog('Morpions').types[0]
+            v = await self.get_option(guild, option)
+            return await self.form_tttdisplay(v)
+        else:
+            available_types: list = self.bot.get_cog("Morpions").types
+            value = value.lower()
+            if value in available_types:
+                v = available_types.index(value)
+                await self.modify_server(ctx.guild.id,values=[(option,v)])
+                msg = await self.bot._(ctx.guild.id,"server","change-tttdisplay")
+                await ctx.send(msg.format(value))
+                await self.send_embed(ctx.guild,option,value)
+            else:
+                msg = await self.bot._(ctx.guild.id,"server","change-13")
+                await ctx.send(msg.format(", ".join(available_types)))
+
+    async def form_tttdisplay(self, value: int):
+        if value is None:
+            return self.bot.get_cog('Morpions').types[0].capitalize()
+        else:
+            return self.bot.get_cog("Morpions").types[value].capitalize()
+    
     @sconfig_main.command(name='list')
     async def sconfig_list(self, ctx: MyContext):
         """Get the list of every usable option"""
@@ -986,6 +1017,8 @@ class Servers(commands.Cog):
                     r = await self.form_xp_rate(i,v)
                 elif i in levelup_channel_option:
                     r = await self.form_levelup_chan(guild,v,diff)
+                elif i in ttt_display_option:
+                    r = await self.form_tttdisplay(v)
                 else:
                     continue
                 if len(str(r)) == 0:
@@ -1029,6 +1062,8 @@ class Servers(commands.Cog):
                 r = await self.conf_xp_rate(ctx, option, 'scret-desc')
             elif option in levelup_channel_option:
                 r = await self.conf_levelup_chan(ctx, option, 'scret-desc')
+            elif option in ttt_display_option:
+                r = await self.conf_tttdisplay(ctx, option, 'scret-desc')
             else:
                 r = None
             guild = ctx if isinstance(ctx, discord.Guild) else ctx.guild

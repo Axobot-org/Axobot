@@ -7,6 +7,12 @@ import mysql
 from typing import Any, Callable, Optional, Coroutine
 
 
+OUTAGE_REASON = {
+    'fr': "Un des datacenters de notre hébergeur OVH a pris feu, rendant ,inaccessible le serveur et toutes ses données. Une vieille sauvegarde de la base de donnée sera peut-être utilisée ultérieurement. Plus d'informations sur https://zbot.statuspage.io/",
+    'en': "One of the datacenters of our host OVH caught fire, making the server and all its data inaccessible. An old backup of the database may be used later. More information on https://zbot.statuspage.io/"
+}
+
+
 class MyContext(commands.Context):
     """Replacement for the official commands.Context class
     It allows us to add more methods and properties in the whole bot code"""
@@ -37,7 +43,7 @@ class MyContext(commands.Context):
         return await super().send(*args, **kwargs)
 
 
-def get_prefix(bot, msg: discord.Message) -> list:
+def get_prefix(bot:"zbot", msg: discord.Message) -> list:
     """Get the correct bot prefix from a message
     Prefix can change based on guild, but the bot mention will always be an option"""
     if bot.database_online:
@@ -54,7 +60,10 @@ def get_prefix(bot, msg: discord.Message) -> list:
             bot.log.warn("[get_prefix]", e)
             prefixes = ['!']
     else:
-        prefixes = ['!']
+        if cog := bot.get_cog("Servers"):
+            prefixes = [cog.default_opt.get("prefix")]
+        else:
+            prefixes = ['!']
     if msg.guild is None:
         prefixes.append("")
     return commands.when_mentioned_or(*prefixes)(bot, msg)
@@ -91,12 +100,21 @@ class zbot(commands.bot.AutoShardedBot):
     allowed_commands = ("eval", "add_cog", "del_cog")
 
     @property
-    def current_event(self) -> Optional[dict]:
+    def current_event(self) -> Optional[str]:
         """Get the current event, from the date"""
         try:
             return self.get_cog("BotEvents").current_event
         except Exception as e:
             self.log.warn(f"[current_event] {e}", exc_info=True)
+            return None
+    
+    @property
+    def current_event_data(self) -> Optional[dict]:
+        """Get the current event data, from the date"""
+        try:
+            return self.get_cog("BotEvents").current_event_data
+        except Exception as e:
+            self.log.warn(f"[current_event_data] {e}", exc_info=True)
             return None
 
     async def get_context(self, message: discord.Message, *, cls=MyContext) -> MyContext:
@@ -199,7 +217,9 @@ class zbot(commands.bot.AutoShardedBot):
     async def get_config(self, guildID: int, option: str) -> Optional[str]:
         cog = self.get_cog("Servers")
         if cog:
-            return await cog.get_option(guildID, option)
+            if self.database_online:
+                return await cog.get_option(guildID, option)
+            return cog.default_opt.get(option, None)
         return None
     
     @property

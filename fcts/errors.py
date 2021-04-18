@@ -1,5 +1,4 @@
 import discord
-import sys
 import traceback
 import random
 import re
@@ -42,6 +41,15 @@ class Errors(commands.Cog):
             return
         elif isinstance(error, commands.CommandError) and str(error) == "User doesn't have required roles":
             await ctx.send(await self.bot._(ctx.channel, 'errors', 'notrightroles'))
+            return
+        elif isinstance(error, commands.CommandError) and str(error) == "Database offline":
+            from utils import OUTAGE_REASON
+            if OUTAGE_REASON:
+                lang = await self.bot._(ctx.channel, 'current_lang', 'current')
+                r = OUTAGE_REASON.get(lang, OUTAGE_REASON['en'])
+                await ctx.send(await self.bot._(ctx.channel, 'errors', 'nodb-2', reason=r))
+            else:
+                await ctx.send(await self.bot._(ctx.channel, 'errors', 'nodb-1'))
             return
         elif isinstance(error, commands.ExpectedClosingQuoteError):
             await ctx.send(await self.bot._(ctx.channel, 'errors', 'quoteserror'))
@@ -158,7 +166,8 @@ class Errors(commands.Cog):
             if isinstance(ctx, discord.Message):
                 ctx = await self.bot.get_context(ctx)
             tr = traceback.format_exception(type(error), error, error.__traceback__)
-            msg = "```python\n{}\n```".format(" ".join(tr))
+            tr = " ".join(tr)[:1950]
+            msg = "```python\n{}\n```".format(tr)
             if ctx is None:
                 await self.senf_err_msg(f"Internal Error\n{msg}")
             elif ctx.guild is None:
@@ -167,12 +176,9 @@ class Errors(commands.Cog):
                 return await ctx.send(ctx.guild.name+" | "+ctx.channel.name+"\n"+msg)
             else:
                 await self.senf_err_msg(ctx.guild.name+" | "+ctx.channel.name+"\n"+msg)
+            self.bot.log.warn(f"[on_error] {error}", exc_info=True)
         except Exception as e:
             self.bot.log.warn(f"[on_error] {e}", exc_info=True)
-        try:
-            traceback.print_exception(type(error), error, error.__traceback__, file=sys.stderr)
-        except Exception as e:
-            self.bot.log.warning(f"[on_error] {e}", exc_info=True)
 
 
     async def senf_err_msg(self, msg: str):

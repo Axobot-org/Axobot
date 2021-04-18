@@ -20,8 +20,7 @@ if check_libs():
     import discord, sys, traceback, asyncio, time, logging, os, mysql.connector, datetime, json
     from signal import SIGTERM
     from random import choice
-    from discord.ext import commands
-    from fcts import cryptage, tokens
+    from fcts import cryptage, tokens # pylint: disable=no-name-in-module
     from utils import zbot, setup_logger
 else:
     import sys
@@ -85,7 +84,6 @@ def main():
             r.remove('')
         for e,s in enumerate(['user','password','host','database1','database2']):
             client.database_keys[s] = cryptage.uncrypte(r[e])
-        client.others['arcanecenter'] = cryptage.uncrypte(r[5])
         client.others['botsondiscord'] = cryptage.uncrypte(r[6])
         client.others['discordbotsgroup'] = cryptage.uncrypte(r[7])
         client.others['bitly'] = cryptage.uncrypte(r[8])
@@ -93,7 +91,7 @@ def main():
             'consumer_secret':cryptage.uncrypte(r[10]),
             'access_token_key':cryptage.uncrypte(r[11]),
             'access_token_secret':cryptage.uncrypte(r[12])}
-        client.others['botlist.space'] = cryptage.uncrypte(r[13])
+        client.others['discordlist.space'] = cryptage.uncrypte(r[13])
         client.others['discordboats'] = cryptage.uncrypte(r[14])
         client.others['discordextremelist'] = cryptage.uncrypte(r[15])
         client.others['statuspage'] = cryptage.uncrypte(r[16])
@@ -152,7 +150,7 @@ def main():
         elif client.beta:
             await client.change_presence(activity=discord.Game(name=choice(["SNAPSHOOT","snapshot day","somethin iz brokn"])))
         else:
-            await client.change_presence(activity=discord.Game(name=choice(["enter !help","something","type !help","type !help"])))
+            await client.change_presence(activity=discord.Game(name=choice(["use @Zbot help","something","type !help for the win","type !help","minecraft powaa"])))
         emb = client.get_cog("Embeds").Embed(desc="**{}** is launching !".format(client.user.name),color=8311585).update_timestamp()
         await client.get_cog("Embeds").send([emb])
 

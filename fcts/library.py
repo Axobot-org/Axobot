@@ -135,13 +135,14 @@ class Library(commands.Cog):
         if book is None:
             return await ctx.send(await self.bot._(ctx.channel, 'library', 'no-found'))
         unknown = await self.bot._(ctx.channel, 'library', 'unknown')
+        authors = [x for x in book.get('authors', list()) if x] # filter empty string and other weird things
         if ctx.can_send_embed:
             thumb = book.get('cover', '')
             emb = await self.bot.get_cog('Embeds').Embed(title=book['title'], thumbnail=thumb, color=5301186).create_footer(ctx)
-            if 'authors' in book:
-                t = await self.bot._(ctx.channel, 'library', 'author' if len(book['authors']) <= 1 else 'authors')
+            if authors:
+                t = await self.bot._(ctx.channel, 'library', 'author' if len(authors) <= 1 else 'authors')
                 t = t.capitalize()
-                emb.add_field(t, '\n'.join(book['authors']))
+                emb.add_field(t, '\n'.join(authors))
             # Publisher
             publisher = (await self.bot._(ctx.channel, 'library', 'publisher')).capitalize()
             emb.add_field(publisher, book.get('publisher', unknown))
@@ -156,8 +157,8 @@ class Library(commands.Cog):
                 emb.add_field(lang, book['language'], True)
             await ctx.send(embed=emb)
         else:
-            auth = '\n'.join(book['authors']) if 'authors' in book else unknown
-            authors = (await self.bot._(ctx.channel, 'library', 'author' if len(book['authors']) <= 1 else 'authors')).capitalize()
+            auth = '\n'.join(authors) if authors else unknown
+            authors = (await self.bot._(ctx.channel, 'library', 'author' if len(authors) <= 1 else 'authors')).capitalize()
             title = (await self.bot._(ctx.channel, 'library', 'title')).capitalize()
             publisher = (await self.bot._(ctx.channel, 'library', 'publisher')).capitalize()
             publication = (await self.bot._(ctx.channel, 'library', 'year')).capitalize()

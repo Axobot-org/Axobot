@@ -6,6 +6,8 @@ import aiohttp
 from fcts import args
 from discord.ext import commands
 from typing import List
+from urllib.request import Request, build_opener
+
 from utils import zbot, MyContext
 
 importlib.reload(args)
@@ -142,6 +144,14 @@ class Utilities(commands.Cog):
 
     async def find_img(self, name: str):
         return discord.File("../images/{}".format(name))
+    
+    async def find_url_redirection(self, url: str) -> str:
+        """Find where an url is redirected to"""
+        to = aiohttp.ClientTimeout(total=10, connect=7)
+        async with aiohttp.ClientSession(timeout=to) as session:
+            async with session.get(url, allow_redirects=True) as response:
+                answer = str(response.url)
+        return answer
 
     async def suppr(self, msg: discord.Message):
         try:
@@ -347,13 +357,12 @@ class Utilities(commands.Cog):
         languages = list()
         disp_lang = list()
         available_langs = self.bot.get_cog('Languages').languages
-        for s in self.bot.guilds:
-            if user in s.members:
-                lang = await self.bot.get_config(s.id, 'language')
-                if lang is None:
-                    lang = available_langs.index(
-                        self.bot.get_cog('Servers').default_language)
-                languages.append(lang)
+        for s in user.mutual_guilds:
+            lang = await self.bot.get_config(s.id, 'language')
+            if lang is None:
+                lang = available_langs.index(
+                    self.bot.get_cog('Servers').default_language)
+            languages.append(lang)
         for e in range(len(self.bot.get_cog('Languages').languages)):
             if languages.count(e) > 0:
                 disp_lang.append((available_langs[e], round(
@@ -383,6 +392,10 @@ class Utilities(commands.Cog):
             cursor.execute(query)
             cnx.commit()
             cursor.close()
+            try:
+                await self.bot.get_cog("Users").reload_event_rankcard(userID)
+            except Exception as e:
+                await self.bot.get_cog("Errors").on_error(e, None)
             return True
         except Exception as e:
             await self.bot.get_cog('Errors').on_error(e, None)
@@ -427,13 +440,13 @@ class Utilities(commands.Cog):
                         votes.append(("Discord Bots List", "https://top.gg/"))
             except Exception as e:
                 await self.bot.get_cog("Errors").on_error(e, None)
-            try:  # https://botlist.space/bot/486896267788812288
-                headers = {'Authorization': self.bot.others['botlist.space']}
-                async with session.get('https://api.botlist.space/v1/bots/486896267788812288/upvotes', headers=headers) as r:
+            try:  # https://discordlist.space/bot/486896267788812288
+                headers = {'Authorization': self.bot.others['discordlist.space']}
+                async with session.get('https://api.discordlist.space/v1/bots/486896267788812288/upvotes', headers=headers) as r:
                     js = await r.json()
                     if str(userid) in [x["user"]['id'] for x in js]:
                         votes.append(
-                            ("botlist.space", "https://botlist.space/"))
+                            ("discordlist.space", "https://discordlist.space/"))
             except Exception as e:
                 await self.bot.get_cog("Errors").on_error(e, None)
             try:  # https://discord.boats/bot/486896267788812288
