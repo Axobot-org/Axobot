@@ -1531,7 +1531,7 @@ class Rss(commands.Cog):
             chan: discord.TextChannel = guild.get_channel(flow['channel'])
             if chan is None:
                 self.bot.log.info("[send_rss_msg] Cannot send message on channel {} (unknown channel)".format(flow['channel']))
-                return False
+                return True
             if flow['link'] in self.cache.keys():
                 objs = self.cache[flow['link']]
             else:
