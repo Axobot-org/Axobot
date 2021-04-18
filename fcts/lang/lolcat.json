@@ -138,6 +138,7 @@
         },
         "cmd-count": "{nbr} itemz",
         "cmd-not-found": "Dere are no comand naymme \"{}\"",
+        "cog-empty-dm": "Uhh no, dat box has no cmd for here :/ try in ur serv",
         "description": "Smol text",
         "embed_title": "Cmds list 4 {u}",
         "footer": "Type {}help cmd 4 mure info abawt an commandZ",

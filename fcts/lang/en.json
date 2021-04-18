@@ -138,6 +138,7 @@
         },
         "cmd-count": "{nbr} commands",
         "cmd-not-found": "There is no command named \"{}\"",
+        "cog-empty-dm": "No command of this category is available in DM!",
         "description": "Description",
         "embed_title": "Available commands for {u}",
         "footer": "Type {}help command for more info on a command",
