@@ -183,7 +183,7 @@ class Rss(commands.Cog):
             if not self.embed:
                 return text
             else:
-                emb = self.bot.get_cog('Embeds').Embed(desc=text,time=self.date,color=self.embed_data['color'],footer_text=self.embed_data['footer'])
+                emb = self.bot.get_cog('Embeds').Embed(desc=text,color=self.embed_data['color'],footer_text=self.embed_data['footer'])
                 if self.embed_data['title'] is None:
                     if self.Type != 'tw':
                         emb.title = self.title
@@ -1495,7 +1495,7 @@ class Rss(commands.Cog):
         cnx.commit()
         cursor.close()
 
-    async def send_rss_msg(self, obj, channel: discord.TextChannel, roles: typing.List[str], send_stats):
+    async def send_rss_msg(self, obj: "rssMessage", channel: discord.TextChannel, roles: typing.List[str], send_stats):
         if channel is not None:
             t = await obj.create_msg(await self.bot._(channel.guild,"current_lang","current"))
             mentions = list()
