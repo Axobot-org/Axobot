@@ -1,6 +1,5 @@
 from aiohttp.client import ClientSession
 from aiohttp import client_exceptions
-from discord import utils
 from feedparser.util import FeedParserDict
 from utils import zbot, MyContext
 import discord
@@ -290,7 +289,11 @@ class Rss(commands.Cog):
         ..Doc rss.html#see-the-last-post"""
         if link in web_link.keys():
             link = web_link[link]
-        text = await self.rss_web(ctx.channel,link)
+        try:
+            text = await self.rss_web(ctx.channel,link)
+        except client_exceptions.InvalidURL:
+            await ctx.send(await self.bot._(ctx.channel, "rss", "invalid-link"))
+            return
         if type(text) == str:
             await ctx.send(text)
         else:
