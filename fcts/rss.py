@@ -1515,6 +1515,10 @@ class Rss(commands.Cog):
                 if send_stats:
                     if statscog := self.bot.get_cog("BotStats"):
                         statscog.rss_stats['messages'] += 1
+            except discord.HTTPException as e:
+                self.bot.log.info("[send_rss_msg] Cannot send message on channel {}: {}".format(channel.id,e))
+                await self.bot.get_cog("Errors").on_error(e)
+                await self.bot.get_cog("Errors").senf_err_msg(str(t.to_dict()) if hasattr(t, "to_dict") else str(t))
             except Exception as e:
                 self.bot.log.info("[send_rss_msg] Cannot send message on channel {}: {}".format(channel.id,e))
 
@@ -1540,14 +1544,17 @@ class Rss(commands.Cog):
                 return True
             elif type(objs) == list:
                 for o in objs[:self.max_messages]:
-                    guild = self.bot.get_guild(flow['guild'])
+                    guild: discord.Guild = self.bot.get_guild(flow['guild'])
                     if guild is None:
                         self.bot.log.info("[send_rss_msg] Cannot send message on server {} (unknown)".format(flow['guild']))
                         return False
-                    chan = guild.get_channel(flow['channel'])
-                    if guild is None:
+                    chan: discord.TextChannel = guild.get_channel(flow['channel'])
+                    if chan is None:
                         self.bot.log.info("[send_rss_msg] Cannot send message on channel {} (unknown)".format(flow['channel']))
                         return False
+                    # if we can't post messages: abort
+                    if not chan.permissions_for(self.bot.user).send_messages:
+                        return
                     o.format = flow['structure']
                     o.embed = flow['use_embed']
                     o.fill_embed_data(flow)
