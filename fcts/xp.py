@@ -132,7 +132,7 @@ class Xp(commands.Cog):
     
     async def add_xp_1(self, msg:discord.Message, rate: float):
         """MEE6-like xp type"""
-        if msg.guild.id not in self.cache.keys() or len(self.cache[msg.guild.id]) == 0:
+        if msg.guild.id not in self.cache.keys():
             await self.bdd_load_cache(msg.guild.id)
         if msg.author.id in self.cache[msg.guild.id].keys():
             if time.time() - self.cache[msg.guild.id][msg.author.id][0] < 60:
@@ -163,7 +163,7 @@ class Xp(commands.Cog):
 
     async def add_xp_2(self, msg:discord.Message, rate: float):
         """Local xp type"""
-        if msg.guild.id not in self.cache.keys() or len(self.cache[msg.guild.id]) == 0:
+        if msg.guild.id not in self.cache.keys():
             await self.bdd_load_cache(msg.guild.id)
         if msg.author.id in self.cache[msg.guild.id].keys():
             if time.time() - self.cache[msg.guild.id][msg.author.id][0] < self.cooldown:
