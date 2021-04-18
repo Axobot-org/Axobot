@@ -146,8 +146,7 @@ class Welcomer(commands.Cog):
         except (discord.Forbidden, discord.HTTPException):
             return False
         else:
-            log = str(await self.bot._(member.guild.id,"logs","kick")).format(member=member,reason=reason,case=None)
-            await self.bot.get_cog("Events").send_logs_per_server(member.guild,"kick",log,member.guild.me)
+            await self.bot.get_cog("Moderation").send_modlogs("kick", member, self.bot.user, member.guild, reason=reason)
             return True
 
     async def ban(self, member: discord.Member, reason: str):
