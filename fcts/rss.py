@@ -333,6 +333,15 @@ class Rss(commands.Cog):
             flow_limit = self.bot.get_cog('Servers').default_opt['rss_max_number']
         return len(await self.get_guild_flows(guild.id)) >= flow_limit, flow_limit
 
+
+    async def is_overflow(self, guild: discord.Guild) -> typing.Tuple[bool, int]:
+        """Check if a guild still has at least a slot
+        True if max number reached, followed by the flow limit"""
+        flow_limit = await self.bot.get_config(guild.id,'rss_max_number')
+        if flow_limit is None:
+            flow_limit = self.bot.get_cog('Servers').default_opt['rss_max_number']
+        return len(await self.get_guild_flows(guild.id)) >= flow_limit, flow_limit
+
     @rss_main.command(name="add")
     @commands.guild_only()
     @commands.check(can_use_rss)
@@ -981,40 +990,6 @@ class Rss(commands.Cog):
             return None
         else:
             return match.group(1)
-    
-    async def parse_deviant_url(self, url):
-        r = r'(?:http.*://)?(?:www.)?(?:deviantart.com/)([^?\s]+)'
-        match = re.search(r,url)
-        if match is None:
-            return None
-        else:
-            return match.group(1)
-
-    async def feed_parse(self, url: str, timeout: int, session: ClientSession = None) -> feedparser.FeedParserDict:
-        """Asynchronous parsing using cool methods"""
-        # if session is provided, we have to not close it
-        _session = session or ClientSession()
-        try:
-            async with async_timeout.timeout(timeout) as cm:
-                async with _session.get(url) as response:
-                    html = await response.text()
-                    headers = response.raw_headers
-        except (client_exceptions.ClientConnectorCertificateError, UnicodeDecodeError, client_exceptions.TooManyRedirects, client_exceptions.ClientConnectorError, client_exceptions.ClientPayloadError):
-            if session is None:
-                await _session.close()
-            return FeedParserDict(entries=[])
-        except asyncio.exceptions.TimeoutError:
-            if session is None:
-                await _session.close()
-            return None
-        if session is None:
-            await _session.close()
-        if cm.expired:
-            # request was cancelled by timeout
-            self.bot.info("[RSS] feed_parse got a timeout")
-            return None
-        headers = {k.decode("utf-8").lower(): v.decode("utf-8") for k, v in headers}
-        return feedparser.parse(html, response_headers=headers)
 
     async def feed_parse(self, url: str, timeout: int, session: ClientSession = None) -> feedparser.FeedParserDict:
         """Asynchronous parsing using cool methods"""

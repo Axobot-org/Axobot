@@ -148,9 +148,13 @@ class Utilities(commands.Cog):
     async def find_url_redirection(self, url: str) -> str:
         """Find where an url is redirected to"""
         to = aiohttp.ClientTimeout(total=10, connect=7)
-        async with aiohttp.ClientSession(timeout=to) as session:
-            async with session.get(url, allow_redirects=True) as response:
-                answer = str(response.url)
+        answer = url
+        try:
+            async with aiohttp.ClientSession(timeout=to) as session:
+               async with session.get(url, allow_redirects=True) as response:
+                    answer = str(response.url)
+        except aiohttp.ClientConnectorError as e:
+            return "https://" + e.args[0].host
         return answer
 
     async def suppr(self, msg: discord.Message):
