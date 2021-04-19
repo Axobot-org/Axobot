@@ -141,6 +141,7 @@
         "cog-empty-dm": "No command of this category is available in DM!",
         "description": "Description",
         "embed_title": "Available commands for {u}",
+        "embed_title_dm": "Available commands in DM",
         "footer": "Type {}help command for more info on a command",
         "no-desc-cmd": "No description for this command",
         "no-desc-cog": "No description for this cog.",

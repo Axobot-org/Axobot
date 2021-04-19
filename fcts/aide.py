@@ -15,6 +15,7 @@ class Help(commands.Cog):
         self.file = "aide"
         self.old_cmd = bot.remove_command("help")
         self.help_color = 8311585
+        self.help_color_DM = 14090153
         self.doc_url = "https://zbot.readthedocs.io/en/latest/"
         with open('fcts/help.json', 'r') as file:
             self.commands_list = json.load(file)
@@ -113,7 +114,10 @@ If the bot can't send the new command format, it will try to send the old one.""
             elif len(commands) == 0:  # no command
                 compress = await self.bot.get_config(ctx.guild, 'compress_help')
                 pages = await self.all_commands(ctx, sorted([c for c in self.bot.commands], key=self.sort_by_name), compress=compress)
-                title = await self.bot._(ctx.channel, "aide", "embed_title", u=str(ctx.author))
+                if ctx.guild is None:
+                    title = await self.bot._(ctx.channel, "aide", "embed_title_dm")
+                else:
+                    title = await self.bot._(ctx.channel, "aide", "embed_title", u=str(ctx.author))
             elif len(commands) == 1:  # Unique command name?
                 name = commands[0]
                 command = None
@@ -156,10 +160,9 @@ If the bot can't send the new command format, it will try to send the old one.""
             return
         if destination.permissions_for(me).embed_links:
             if ctx.guild is not None:
-                embed_colour = ctx.guild.me.color if ctx.guild.me.color != discord.Colour(
-                    self.help_color).default() else discord.Colour(self.help_color)
+                embed_colour = ctx.guild.me.color if ctx.guild.me.color != discord.Colour.default() else discord.Colour(self.help_color)
             else:
-                embed_colour = discord.Colour(self.help_color)
+                embed_colour = discord.Colour(self.help_color_DM)
             if isinstance(pages[0], str): # use description
                 for page in pages:
                     embed = self.bot.get_cog("Embeds").Embed(title=title, desc=page, footer_text=ft.format(
