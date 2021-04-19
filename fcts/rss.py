@@ -1542,6 +1542,7 @@ class Rss(commands.Cog):
                     objs = await funct(chan,flow['link'], flow['date'], session=session)
                 if isinstance(objs,twitter.error.TwitterError):
                     self.twitter_over_capacity = True
+                    self.bot.warn("[send_rss_msg] Twitter over capacity detected")
                     return False
                 flow['link'] = objs
             if isinstance(objs,twitter.TwitterError):
@@ -1567,7 +1568,7 @@ class Rss(commands.Cog):
             await self.bot.get_cog('Errors').senf_err_msg("Erreur rss sur le flux {} (type {} - salon {})".format(flow['link'],flow['type'],flow['channel']))
             await self.bot.get_cog('Errors').on_error(e,None)
             return False
-        
+
 
     async def main_loop(self, guildID: int=None):
         if not self.bot.rss_enabled:
