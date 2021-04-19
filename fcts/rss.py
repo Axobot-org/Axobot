@@ -1554,7 +1554,7 @@ class Rss(commands.Cog):
                 for o in objs[:self.max_messages]:
                     # if we can't post messages: abort
                     if not chan.permissions_for(guild.me).send_messages:
-                        return
+                        return True
                     o.format = flow['structure']
                     o.embed = flow['use_embed']
                     o.fill_embed_data(flow)
