@@ -144,7 +144,7 @@ class Utilities(commands.Cog):
 
     async def find_img(self, name: str):
         return discord.File("../images/{}".format(name))
-    
+
     async def find_url_redirection(self, url: str) -> str:
         """Find where an url is redirected to"""
         to = aiohttp.ClientTimeout(total=10, connect=7)
@@ -155,6 +155,8 @@ class Utilities(commands.Cog):
                     answer = str(response.url)
         except aiohttp.ClientConnectorError as e:
             return "https://" + e.args[0].host
+        except aiohttp.ClientResponseError as e:
+            return str(e.args[0].real_url)
         return answer
 
     async def suppr(self, msg: discord.Message):
