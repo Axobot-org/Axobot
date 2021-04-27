@@ -1,3 +1,4 @@
+import asyncio
 import discord
 import importlib
 import re
@@ -157,6 +158,8 @@ class Utilities(commands.Cog):
             return "https://" + e.args[0].host
         except aiohttp.ClientResponseError as e:
             return str(e.args[0].real_url)
+        except (asyncio.exceptions.TimeoutError, aiohttp.ServerTimeoutError):
+            return url
         return answer
 
     async def suppr(self, msg: discord.Message):
