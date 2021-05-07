@@ -991,6 +991,7 @@
         "ban": "List of roles that can use the command \"ban\": {}",
         "bot_news": "List of channels where to send bot news: {}",
         "clear": "List of roles that can use the \"clear\" command: {}",
+        "compress_help": "Should the display of the `help` command be compressed? {}",
         "description": "Server description:\n {}",
         "enable_fun": "Are the commands listed in the `!fun` command enabled? {}",
         "enable_xp": "Should the xp system be enabled? {}",

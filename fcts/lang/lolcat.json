@@ -990,6 +990,7 @@
         "clear": "Lizt of rawles dat can us teh 'clear' commend: {}",
         "description": "Server description:\n {}",
         "enable_fun": "R teh c0mmands lysteb in te `!fun` comand enubld? {}",
+        "compress_help": "Shuld teh help cmd be smoller? {}",
         "enable_xp": "Shald teh xperiense systèm be enabld? {}",
         "help_in_dm": "Sent help mess:a:ge on Prvte Msage? {}",
         "hunter": "Lyst for al cat roums in wich teh gamz *Hunter* are actved: {}",

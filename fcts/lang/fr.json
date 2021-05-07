@@ -1001,6 +1001,7 @@
         "ban": "Liste des rôles qui peuvent utiliser la commande 'ban' : {}",
         "bot_news": "Liste des salons dans lesquels envoyer les news du bot : {}",
         "clear": "Liste des rôles qui peuvent utiliser la commande 'clear' : {}",
+        "compress_help": "L'affichage de la commande `help` doit-il être compressé ? {}",
         "description": "Description du serveur :\n {}",
         "enable_fun": "Les commandes répertoriées dans la commande `!fun` sont-elles activées ? {}",
         "enable_xp": "Le système d'xp doit-il être activé ? {}",
