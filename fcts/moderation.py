@@ -768,6 +768,9 @@ Permissions for using this command are the same as for the kick
         except discord.Forbidden:
             pass
         except Exception as e:
+            if isinstance(e, discord.HTTPException) and e.code == 50007:
+                # "Cannot send message to this user"
+                return
             await self.bot.get_cog('Errors').on_error(e, ctx)
             pass
     
