@@ -148,6 +148,7 @@ class Blurplefy(Cog):
         except FileNotFoundError:
             with open("blurple-cache.json", "w") as f:
                 json.dump(list(), f)
+            self.cache = list()
     
     async def get_default_blurplefier(self, ctx):
         return "--blurplefy"
@@ -231,15 +232,15 @@ __29 variations: __
         """Get some events points every 3 hours"""
         last_data = self.db_get_points(ctx.author.id)
         cooldown = 3600*3
-        remaining_time: int = -cooldown if last_data is None else (datetime.datetime.now() - last_data['last_update']).total_seconds() - cooldown
-        if remaining_time > 0:
+        time_since_available: int = 0 if last_data is None else (datetime.datetime.now() - last_data['last_update']).total_seconds() - cooldown
+        if time_since_available >= 0:
             points = randint(*self.hourly_reward)
             await self.bot.get_cog("Utilities").add_user_eventPoint(ctx.author.id, points)
             self.db_add_points(ctx.author.id, points)
             txt = await self.bot._(ctx.channel, "halloween", "got-points", pts=points)
         else:
             lang = await self.bot._(ctx.channel, "current_lang", "current")
-            remaining = await self.bot.get_cog("TimeUtils").time_delta(-remaining_time, lang=lang)
+            remaining = await self.bot.get_cog("TimeUtils").time_delta(-time_since_available, lang=lang)
             txt = await self.bot._(ctx.channel, "blurple", "too-quick", time=remaining)
         if ctx.can_send_embed:
             title = "Blurple event"
