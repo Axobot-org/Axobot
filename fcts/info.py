@@ -387,7 +387,7 @@ Available types: member, role, user, emoji, channel, server, invite, category
         # Guilds count
         if item.bot:
             session = aiohttp.ClientSession(loop=self.bot.loop)
-            guilds_count = await self.bot.get_cog('Partners').get_guilds(item.id,session)
+            guilds_count = await self.bot.get_cog('Partners').get_bot_guilds(item.id,session)
             if guilds_count is not None:
                 embed.add_field(name=str(await self.bot._(ctx.guild.id,'keywords','servers')).capitalize(),value=guilds_count)
             await session.close()
@@ -482,7 +482,7 @@ Available types: member, role, user, emoji, channel, server, invite, category
         embed.add_field(name=await self.bot._(ctx.guild.id,"stats_infos","user-0"), value=on_server.capitalize())
         if item.bot:
             session = aiohttp.ClientSession(loop=self.bot.loop)
-            guilds_count = await self.bot.get_cog('Partners').get_guilds(item.id,session)
+            guilds_count = await self.bot.get_cog('Partners').get_bot_guilds(item.id,session)
             if guilds_count is not None:
                 embed.add_field(name=str(await self.bot._(ctx.guild.id,'keywords','servers')).capitalize(),value=guilds_count)
             await session.close()
