@@ -1158,7 +1158,7 @@ The 'reasons' parameter is used to display the mute reasons.
             return await ctx.send(await self.bot._(ctx.guild.id,"modo","give_roles-4",r=role.name))
         if role.position >= ctx.author.roles[-1].position:
             return await ctx.send(await self.bot._(ctx.guild.id,"modo","give_roles-higher"))
-        n_users = set[discord.Member]
+        n_users: set[discord.Member] = set()
         for item in users:
             if item == "everyone":
                 item = ctx.guild.default_role
@@ -1197,7 +1197,7 @@ The 'reasons' parameter is used to display the mute reasons.
             return await ctx.send(await self.bot._(ctx.guild.id,"modo","give_roles-4",r=role.name))
         if role.position >= ctx.author.roles[-1].position:
             return await ctx.send(await self.bot._(ctx.guild.id,"modo","give_roles-higher"))
-        n_users = set[discord.Member]
+        n_users: set[discord.Member] = set()
         for item in users:
             if item == "everyone":
                 item = ctx.guild.default_role
