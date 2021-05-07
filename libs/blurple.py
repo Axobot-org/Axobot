@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 
-import colorsys
 import io
-import json
 import math
 
 import discord
