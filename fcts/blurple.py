@@ -139,15 +139,19 @@ class Blurplefy(Cog):
     def __init__(self, bot: zbot):
         self.bot = bot
         self.file = "blurple"
-        with open("blurple-cache.json", "r") as f:
-            self.cache = json.load(f)
+        try:
+            with open("blurple-cache.json", "r") as f:
+                self.cache: list[int] = json.load(f)
+        except FileNotFoundError:
+            with open("blurple-cache.json", "w") as f:
+                json.dump(list(), f)
     
     async def get_default_blurplefier(self, ctx):
         return "--blurplefy"
 
     @commands.group(name="blurple", aliases=["b"])
     async def blurple_main(self, ctx: MyContext):
-        """Blurplefy and be happy for the 5th Discord birthday!
+        """Blurplefy and be happy for the 6th Discord birthday!
 A BIG thanks to the Project Blurple and their help.
 
 Original code: https://github.com/project-blurple/blurplefier
@@ -163,12 +167,13 @@ Online editor: https://projectblurple.com/paint
 ..Example blurple check light Zbot
 
 ..Example b check dark"""
-        pass
+        if ctx.subcommand_passed is None:
+            await self.bot.get_cog('Help').help_command(ctx, ['blurple'])
 
     @blurple_main.command()
     async def help(self, ctx: MyContext):
         "Get some help about blurplefy and all of this"
-        await ctx.send("""Hey! We're currently celebrating 5 years of Discord! And for the third year in a row, we're taking part in the "Blurple" event, which consists in recoloring our avatars and servers with a maximum of blurple, that characteristic color of Discord between purple and blue.
+        await ctx.send("""Hey! We're currently celebrating 6 years of Discord! And for the third year in a row, we're taking part in the "Blurple" event, which consists in recoloring our avatars and servers with a maximum of blurple, that characteristic color of Discord between purple and blue.
 
 For that, you have here some commands to blurplefy you. Notably the `blurplefy` command, which allows you to modify an image (by default your avatar or that of a friend) by changing its colors. Or why not `darkfy`, for a darker version. As well as `check`, to check that your image is up to Blurple:tm: standards.
 
