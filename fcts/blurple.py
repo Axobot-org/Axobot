@@ -1,4 +1,6 @@
 import asyncio
+import datetime
+from random import randint
 import aiohttp
 import json
 import typing
@@ -139,6 +141,7 @@ class Blurplefy(Cog):
     def __init__(self, bot: zbot):
         self.bot = bot
         self.file = "blurple"
+        self.hourly_reward = [4, 20]
         try:
             with open("blurple-cache.json", "r") as f:
                 self.cache: list[int] = json.load(f)
@@ -169,6 +172,11 @@ Online editor: https://projectblurple.com/paint
 ..Example b check dark"""
         if ctx.subcommand_passed is None:
             await self.bot.get_cog('Help').help_command(ctx, ['blurple'])
+    
+    lightfy = _make_color_command('lightfy', 'light', blurple_main)
+    darkfy = _make_color_command('darkfy', 'dark', blurple_main)
+    blurplefy = _make_color_command('blurplefy', 'blurplefy', blurple_main)
+    check = _make_check_command('check', blurple_main)
 
     @blurple_main.command()
     async def help(self, ctx: MyContext):
@@ -201,10 +209,44 @@ __29 variations: __
 `++blurple-bg` replaces the transparency of your image with a Blurple background
 `++dark-blurple-bg` replaces the transparency of your image with a Dark Blurple background""")
 
-    lightfy = _make_color_command('lightfy', 'light', blurple_main)
-    darkfy = _make_color_command('darkfy', 'dark', blurple_main)
-    blurplefy = _make_color_command('blurplefy', 'blurplefy', blurple_main)
-    check = _make_check_command('check', blurple_main)
+    def db_add_points(self, userid: int, points: int):
+        cnx = self.bot.cnx_frm
+        cursor = cnx.cursor(dictionary=True)
+        query = "INSERT INTO `dailies` (`userID`,`points`) VALUES (%(u)s,%(p)s) ON DUPLICATE KEY UPDATE points = points + %(p)s;"
+        cursor.execute(query, {'u': userid, 'p': points})
+        cnx.commit()
+        cursor.close()
+
+    def db_get_points(self, userid: int) -> dict:
+        cnx = self.bot.cnx_frm
+        cursor = cnx.cursor(dictionary=True)
+        query = "SELECT * FROM `dailies` WHERE userid = %(u)s;"
+        cursor.execute(query, {'u': userid})
+        result = list(cursor)
+        cursor.close()
+        return result[0] if len(result) > 0 else None
+
+    @blurple_main.command(name="collect")
+    async def bp_collect(self, ctx: MyContext):
+        """Get some events points every 3 hours"""
+        last_data = self.db_get_points(ctx.author.id)
+        cooldown = 3600*3
+        remaining_time: int = -cooldown if last_data is None else (datetime.datetime.now() - last_data['last_update']).total_seconds() - cooldown
+        if remaining_time > 0:
+            points = randint(*self.hourly_reward)
+            await self.bot.get_cog("Utilities").add_user_eventPoint(ctx.author.id, points)
+            self.db_add_points(ctx.author.id, points)
+            txt = await self.bot._(ctx.channel, "halloween", "got-points", pts=points)
+        else:
+            lang = await self.bot._(ctx.channel, "current_lang", "current")
+            remaining = await self.bot.get_cog("TimeUtils").time_delta(-remaining_time, lang=lang)
+            txt = await self.bot._(ctx.channel, "blurple", "too-quick", time=remaining)
+        if ctx.can_send_embed:
+            title = "Blurple event"
+            emb = discord.Embed(title=title, description=txt, color=discord.Color(int("7289DA",16)))
+            await ctx.send(embed=emb)
+        else:
+            await ctx.send(txt)
 
     
 

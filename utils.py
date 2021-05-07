@@ -239,7 +239,8 @@ class RankCardsFlag:
             1 << 2: "blurple_20",
             1 << 3: "christmas_19",
             1 << 4: "christmas_20",
-            1 << 5: "halloween_20"
+            1 << 5: "halloween_20",
+            1 << 6: "blurple_21"
         }
 
         def flagsToInt(self, flags: list) -> int:

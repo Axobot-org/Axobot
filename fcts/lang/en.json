@@ -169,12 +169,14 @@
         "create_oops": "{}, whoops! It looks like this gif is too big to upload. If you want, you can give it another go, except with a smaller version of the image. Sorry about that!",
         "create_title": "Blurplefier - makes your image blurple!",
         "missing-attachment-perm": "Oops, I'm missing permission to send images!",
+        "too-quick": "It's still too early! You will only be able to collect event points in {time}!",
         "won-card": "Wow! Very nice blurple picture {}! so beautiful that I decided to offer you the card of xp blurple! You can use it by typing the command `{}profile card blurple` {}"
     },
     "bot_events": {
         "events-desc": {
             "april-2021": "Today is International Fish Day! All day long, Zbot will be celebrating April 1st with special tic-tac-toe emojis, a unique avatar and other cool stuff. \nTake the opportunity to collect event points and try to win the rainbow xp card! As a reminder, the xp cards are accessible via my `profile card` command",
             "halloween-2020": "October is here! Enjoy until November 1st a dark atmosphere, full of bats, skeletons and pumpkins.\nTake advantage of it to redecorate your server in the colors of Halloween with the command `halloween hallowify` and its derivatives, check that your avatar is compliant with the command `halloween check`, and collect event points every hour with the command `halloween collect`.\n\nPerhaps the bravest of you will succeed in unlocking the special Halloween 2020 xp card, accessible via the `profile card` command!",
+            "blurple-2021": "Let's celebrate 6 years of Discord during the Blurple event! For the fourth year in a row, we're participating in the \"Blurple\" event, which consists of re-coloring our avatars and servers with as much blurple as possible, that characteristic Discord color between purple and blue. Take advantage of this to collect event points and try to win the special Blurple 2021 xp card! As a reminder, the xp cards are accessible via my `profile card` command.\n\nFor this event, the special `blurple` command has been activated, so don't hesitate to use it to try to win points!",
             "nothing": "There are currently no events. Follow the bot news to know the date of the next one!"
         },
         "events-price-title": "Prizes to win",
@@ -185,10 +187,15 @@
             "halloween-2020": {
                 "200": "Unlock the special Halloween 2020 xp card! As a bonus, a special role in our official server"
             },
+            "blurple-2021": {
+                "200": "Unlock the special Blurple 2021 xp card!",
+                "500": "A special role to claim in the official Zbot server"
+            },
             "nothing": "There is nothing to gain for this event :confused:"
         },
         "events-title": {
-            "april-2021": "Happy April 1st!"
+            "april-2021": "Happy April 1st!",
+            "blurple-2021": "Discord is now 6!"
         },
         "objectives": "Objectives",
         "points": "points",
