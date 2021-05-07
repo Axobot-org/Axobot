@@ -225,7 +225,7 @@ __29 variations: __
         cnx.commit()
         cursor.close()
 
-    def db_get_points(self, userid: int) -> int:
+    def db_get_points(self, userid: int) -> dict:
         cnx = self.bot.cnx_frm
         cursor = cnx.cursor(dictionary=True)
         query = "SELECT * FROM `dailies` WHERE userid = %(u)s;"
