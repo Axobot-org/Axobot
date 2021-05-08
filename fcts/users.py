@@ -120,7 +120,7 @@ class Users(commands.Cog):
         if points is None:
             points = await self.bot.get_cog("Utilities").get_eventsPoints_rank(user.id)
             points = 0 if (points is None) else points["events_points"]
-        if "blurple_21" not in cards and points >= self.bot.current_event_data["objectives"][-1]:
+        if "blurple_21" not in cards and points >= self.bot.current_event_data["objectives"][0]:
             await self.set_rankcard(user, "blurple_21", True)
 
     @commands.group(name='profile')
