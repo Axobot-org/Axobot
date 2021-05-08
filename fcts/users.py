@@ -120,7 +120,7 @@ class Users(commands.Cog):
         if points is None:
             points = await self.bot.get_cog("Utilities").get_eventsPoints_rank(user.id)
             points = 0 if (points is None) else points["events_points"]
-        if "rainbow" not in cards and points >= self.bot.current_event_data["objectives"][-1]:
+        if "blurple_21" not in cards and points >= self.bot.current_event_data["objectives"][-1]:
             await self.set_rankcard(user, "blurple_21", True)
 
     @commands.group(name='profile')
@@ -158,10 +158,15 @@ class Users(commands.Cog):
         
         ..Doc user.html#change-your-xp-card"""
         if style is None and len(ctx.view.buffer.split(' '))>2:
+            available_cards = ', '.join(await ctx.bot.get_cog('Utilities').allowed_card_styles(ctx.author))
             if ctx.view.buffer.split(' ')[2] == 'list':
-                await ctx.send(str(await self.bot._(ctx.channel,'users','list-cards')).format(', '.join(await ctx.bot.get_cog('Utilities').allowed_card_styles(ctx.author))))
+                try:
+                    await self.reload_event_rankcard(ctx.author.id)
+                except Exception as e:
+                    await self.bot.get_cog("Errors").on_error(e, None)
+                await ctx.send(str(await self.bot._(ctx.channel,'users','list-cards')).format(available_cards))
             else:
-                await ctx.send(str(await self.bot._(ctx.channel,'users','invalid-card')).format(', '.join(await ctx.bot.get_cog('Utilities').allowed_card_styles(ctx.author))))
+                await ctx.send(str(await self.bot._(ctx.channel,'users','invalid-card')).format(available_cards))
             return
         elif style is None:
             if ctx.channel.permissions_for(ctx.me).attach_files:
