@@ -1481,7 +1481,7 @@ class Rss(commands.Cog):
                     objs = await funct(chan,flow['link'], flow['date'], session=session)
                 if isinstance(objs,twitter.error.TwitterError):
                     self.twitter_over_capacity = True
-                    self.bot.warn("[send_rss_msg] Twitter over capacity detected")
+                    self.bot.log.warn("[send_rss_msg] Twitter over capacity detected")
                     return False
                 flow['link'] = objs
             if isinstance(objs,twitter.TwitterError):
