@@ -1,3 +1,4 @@
+import asyncio
 import discord
 import importlib
 import re
@@ -144,7 +145,7 @@ class Utilities(commands.Cog):
 
     async def find_img(self, name: str):
         return discord.File("../images/{}".format(name))
-    
+
     async def find_url_redirection(self, url: str) -> str:
         """Find where an url is redirected to"""
         to = aiohttp.ClientTimeout(total=10, connect=7)
@@ -155,6 +156,10 @@ class Utilities(commands.Cog):
                     answer = str(response.url)
         except aiohttp.ClientConnectorError as e:
             return "https://" + e.args[0].host
+        except aiohttp.ClientResponseError as e:
+            return str(e.args[0].real_url)
+        except (asyncio.exceptions.TimeoutError, aiohttp.ServerTimeoutError):
+            return url
         return answer
 
     async def suppr(self, msg: discord.Message):
@@ -351,6 +356,8 @@ class Utilities(commands.Cog):
             liste.append('christmas20')
         if 'halloween_20' in unlocked:
             liste.append('halloween20')
+        if 'blurple_21' in unlocked:
+            liste.append('blurple21')
         return sorted(liste2)+sorted(liste)
 
     async def get_languages(self, user: discord.User, limit: int=0):

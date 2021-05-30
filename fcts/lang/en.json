@@ -141,6 +141,7 @@
         "cog-empty-dm": "No command of this category is available in DM!",
         "description": "Description",
         "embed_title": "Available commands for {u}",
+        "embed_title_dm": "Available commands in DM",
         "footer": "Type {}help command for more info on a command",
         "no-desc-cmd": "No description for this command",
         "no-desc-cog": "No description for this cog.",
@@ -168,6 +169,7 @@
         "create_oops": "{}, whoops! It looks like this gif is too big to upload. If you want, you can give it another go, except with a smaller version of the image. Sorry about that!",
         "create_title": "Blurplefier - makes your image blurple!",
         "missing-attachment-perm": "Oops, I'm missing permission to send images!",
+        "too-quick": "It's still too early! You will only be able to collect event points in {time}!",
         "won-card": "Wow! Very nice blurple picture {}! so beautiful that I decided to offer you the card of xp blurple! You can use it by typing the command `{}profile card blurple` {}"
     },
     "halloween": {
@@ -178,6 +180,7 @@
         "events-desc": {
             "april-2021": "Today is International Fish Day! All day long, Zbot will be celebrating April 1st with special tic-tac-toe emojis, a unique avatar and other cool stuff. \nTake the opportunity to collect event points and try to win the rainbow xp card! As a reminder, the xp cards are accessible via my `profile card` command",
             "halloween-2020": "October is here! Enjoy until November 1st a dark atmosphere, full of bats, skeletons and pumpkins.\nTake advantage of it to redecorate your server in the colors of Halloween with the command `halloween hallowify` and its derivatives, check that your avatar is compliant with the command `halloween check`, and collect event points every hour with the command `halloween collect`.\n\nPerhaps the bravest of you will succeed in unlocking the special Halloween 2020 xp card, accessible via the `profile card` command!",
+            "blurple-2021": "Let's celebrate 6 years of Discord during the Blurple event! For the fourth year in a row, we're participating in the \"Blurple\" event, which consists of re-coloring our avatars and servers with as much blurple as possible, that characteristic Discord color between purple and blue. Take advantage of this to collect event points and try to win the special Blurple 2021 xp card! As a reminder, the xp cards are accessible via my `profile card` command.\n\nFor this event, the special `blurple` command has been activated, so don't hesitate to use it to try to win points!",
             "nothing": "There are currently no events. Follow the bot news to know the date of the next one!"
         },
         "events-price-title": "Prizes to win",
@@ -188,10 +191,15 @@
             "halloween-2020": {
                 "200": "Unlock the special Halloween 2020 xp card! As a bonus, a special role in our official server"
             },
+            "blurple-2021": {
+                "200": "Unlock the special Blurple 2021 xp card!",
+                "500": "A special role to claim in the official Zbot server"
+            },
             "nothing": "There is nothing to gain for this event :confused:"
         },
         "events-title": {
-            "april-2021": "Happy April 1st!"
+            "april-2021": "Happy April 1st!",
+            "blurple-2021": "Discord is now 6!"
         },
         "objectives": "Objectives",
         "points": "points",
@@ -391,7 +399,7 @@
         "about-3": "My creator's Twitter account:",
         "about-4": "A short FAQ:",
         "about-5": "The Privacy Policy:",
-        "about-main": "Hello! I'm {mention}!\nI'm a bot that allows you to do a lot of things: moderation, xp system, statistics, partners managment and many other super useful commands (and totally pointless ones)!\nYou can start by typing `!help` in this chat to see the list of available commands, then `!config see` will let you see the configuration options.\n\nMy owner and I would like to thank Awhikax for his support during the various crises, Aragorn1202 for all his ideas and sentences full of good sense, Adri for all these beautiful logos, emojis and profile pics, and the whole translators team for their long work!\n\n:globe_with_meridians: Some links may be useful: {links}\n\nHave a nice day!",
+        "about-main": "Hello! I'm {mention}!\nI'm a bot that allows you to do a lot of things: moderation, xp system, statistics, partners managment and many other super useful commands (and totally pointless ones)!\nYou can start by typing `!help` in this chat to see the list of available commands, then `!config see` will let you see the configuration options.\n\nMy owner (Z_runner) and I would like to thank Awhikax for his support during the various crises, Aragorn1202 for all his ideas and sentences full of good sense, Adri for all these beautiful logos, emojis and profile pics, and the whole translators team for their long work!\n\n:globe_with_meridians: Some links may be useful: {links}\n\nHave a nice day!",
         "admins-list": "The administrators of this bot are : {}",
         "bitly_long": "Original URL: {url}",
         "bitly_nobit": "This address is not a bit.ly link!",
@@ -647,7 +655,7 @@
         "already-unmute": "This member isn't muted!",
         "backup-done": "Backup done!",
         "ban-1": "It seems that this member is too high for me to ban him. :thinking:",
-        "ban-chat": "Member {user} ({userid}) is no more banned",
+        "ban-chat": "Member {user} ({userid}) is now banned",
         "ban-dm": "You have just been banned from the server {guild} :confused:",
         "ban-list-error": "Oops, it looks like there are too many users to display :confused:",
         "ban-list-title-0": "List of banned members of the server \"{}\"",
@@ -702,7 +710,7 @@
         "pin-error": "Oops, I can't find that message (Error : `{}`)",
         "pin-error-3": "Oops, impossible to pin this message (do you have more than 50 pinned messages?). Error : `{}`",
         "raid-banned": "You have been automatically banned from the {guild} server by the antiraid system.",
-        "raid-kicked": "You have been automatically kicked off the {guild} server by the anti-raid system. Try again in a few days.",
+        "raid-kicked": "You have been automatically kicked out of the {guild} server by the anti-raid system. Try again in a few days.",
         "react-clear": "I'm unable to find this message :confused:",
         "remove_roles-0": "Oops, looks like that role is too high up for me to take it away from anyone. Please place my role above the role `{r}`",
         "remove_roles-1": "-> {c} roles removed on {m}!",
@@ -999,6 +1007,7 @@
         "ban": "List of roles that can use the command \"ban\": {}",
         "bot_news": "List of channels where to send bot news: {}",
         "clear": "List of roles that can use the \"clear\" command: {}",
+        "compress_help": "Should the display of the `help` command be compressed? {}",
         "description": "Server description:\n {}",
         "enable_fun": "Are the commands listed in the `!fun` command enabled? {}",
         "enable_xp": "Should the xp system be enabled? {}",
@@ -1200,7 +1209,7 @@
             "The assassin's discretion {user} has evolved to the level {level}. The brotherhood is counting on you.",
             "Congratulations {user}, you are level {level}. Remember to use this {random} to keep improving.",
             "Thanks to the level {level}, you can try to win this {random} at the raffle, {user}!",
-            "Despite your level {level}, it is dangerous to travel alone {user}! Take {random}!",
+            "Despite your level {level}, it is dangerous to travel alone {user}! Take this {random}!",
             "Level {level} for {user}, this {random} is available from the seller!",
             "Bravo {user}! You are now level {level}! However, it is still necessary to climb to obtain this legendary {random}...",
             "Houston, we have a problem. {user} has passed level {level}!!!!!",

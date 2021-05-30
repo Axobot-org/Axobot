@@ -141,6 +141,7 @@
         "cog-empty-dm": "Aucune commande de ce module n'est disponible en MP !",
         "description": "Description",
         "embed_title": "Liste des commandes disponibles pour {u}",
+        "embed_title_dm": "Liste des commandes disponibles en MP",
         "footer": "Entrez {}help commande pour plus d'informations sur une commande",
         "no-desc-cmd": "Aucune description pour cette commande",
         "no-desc-cog": "Aucune description pour ce module.",
@@ -168,6 +169,7 @@
         "create_oops": "{}, oups ! Il semble que ce gif est trop gros pour être téléchargé. Si vous voulez, vous pouvez lui donner une autre chance, mais avec une version plus petite de l'image. Désolé !",
         "create_title": "Blurplefier - makes your image blurple!",
         "missing-attachment-perm": "Oups, il me manque la permission d'envoyer des images !",
+        "too-quick": "Il est encore trop tôt ! Vous ne pourrez récupérer des points d'événement que dans {time} !",
         "won-card": "Wow! Magnifique image blurple {}! tellement beau que j'ai décidé de t'offrir la carte d'xp blurple, je suis sûr qu'elles iront bien ensemble ! Tu peux l'utiliser en tapant la commande `{}profile card blurple` {}"
     },
     "halloween": {
@@ -180,6 +182,7 @@
             "blurple-2020": "Fêtons les 5 ans de Discord pendant l'événement Blurple ! Pour la troisième année consécutive, nous participons à l'événement \"Blurple\", qui consiste à recolorer nos avatars et serveurs avec un maximum de blurple, cette couleur caractéristique de Discord entre le violet et le bleu. Profitez-en pour récupérer des points d'événements et tentez de gagner la carte d'xp spécial Blurple 2020 ! Pour rappel, les cartes d'xp sont accessibles via ma commande `profile card`\n\nPour cet événement, la commande spéciale `blurple` a été activée, n'hésitez pas à l'utiliser pour tenter de gagner des points !",
             "christmas-2019": "Fêtez l'arrivée de Noël grâce à cet événement ! Pendant plusieurs jours, Zbot se pare des couleurs de l'hiver avec des émojis spéciaux pour le jeu du morpion, un avatar unique ainsi que d'autres choses trop cool. \n\nProfitez-en pour récupérer des points d'événements et tentez de gagner la carte d'xp spécial Noël 2019 ! Pour rappel, les cartes d'xp sont accessibles via ma commande `profile card`",
             "halloween-2020": "Le mois d'octobre est là ! Profitez jusqu'au 1er novembre d'une atmosphère ténébreuse, remplie de chauve-souris, de squelettes et de citrouilles.\nProfitez-en pour redécorer votre serveur aux couleurs d'Halloween avec la commande `halloween hallowify` et ses dérivées, vérifiez que votre avatar soit bien conforme avec la commande `halloween check`, et récupérez des points d'événements toutes les heures avec la commande `halloween collect`.\n\nLes plus courageux d'entre vous réussirons peut-être à débloquer la carte d'xp spécial Halloween 2020, accessible via la commande `profile card` !",
+            "blurple-2021": "Fêtons les 6 ans de Discord pendant l'événement Blurple ! Pour la quatrième année consécutive, nous participons à l'événement \"Blurple\", qui consiste à recolorer nos avatars et serveurs avec un maximum de blurple, cette couleur caractéristique de Discord entre le violet et le bleu. Profitez-en pour récupérer des points d'événements et tentez de gagner la carte d'xp spécial Blurple 2021 ! Pour rappel, les cartes d'xp sont accessibles via ma commande `profile card`\n\nPour cet événement, la commande spéciale `blurple` a été activée, n'hésitez pas à l'utiliser pour tenter de gagner des points !",
             "nothing": "Il n'y a actuellement aucun événement. Suivez les news du bot pour connaître la date du prochain !"
         },
         "events-price-title": "Prix à gagner",
@@ -196,12 +199,17 @@
             "halloween-2020": {
                 "200": "Débloquez la carte d'xp spécial Halloween 2020 ! En prime, un rôle spécial dans notre serveur officiel"
             },
+            "blurple-2021": {
+                "200": "Débloquez la carte d'xp spécial Blurple 2021 !",
+                "500": "Un rôle spécial à réclamer dans le serveur officiel de Zbot"
+            },
             "nothing": "Il n'y a rien à gagner pour cet événement :confused:"
         },
         "events-title": {
             "april-2021": "Joyeux 1er avril !",
             "blurple-2020": "Les 5 ans de Discord !",
-            "christmas-2019": "Noël en approche !"
+            "christmas-2019": "Noël en approche !",
+            "blurple-2021": "Les 6 ans de Discord !"
         },
         "objectives": "Objectifs",
         "points": "points",
@@ -401,7 +409,7 @@
         "about-3": "Le compte Twitter de mon créateur :",
         "about-4": "Une petite FAQ :",
         "about-5": "La Politique de Confidentialité :",
-        "about-main": "Bonjour ! Moi c'est {mention} !\n\nJe suis un bot qui permet de faire *beaucoup* de choses : de la modération, un système d'xp, des statistiques, la gestion de partenaires et plein d'autres commandes plus ou moins utiles ! \nVous pouvez commencer par taper `!help` dans ce tchat pour voir la liste des commandes disponibles, puis `!config see` vous permettra de voir les options de configuration (un site web est en préparation). \n\nPour m'avoir aidé dans la création du bot, mon propriétaire et moi souhaitons remercier Awhikax pour son soutien apporté lors des différentes crises, Aragorn1202 pour toutes ses idées et ses phrases pleines de bon sens, Adri pour tous ces magnifiques logos, émojis et images de profil, et toute l'équipe de traducteurs pour leur merveilleux travail !\n\n:globe_with_meridians: Quelques liens pourront vous être utiles : {links}\n\nBonne journée !",
+        "about-main": "Bonjour ! Moi c'est {mention} !\n\nJe suis un bot qui permet de faire *beaucoup* de choses : de la modération, un système d'xp, des statistiques, la gestion de partenaires et plein d'autres commandes plus ou moins utiles ! \nVous pouvez commencer par taper `!help` dans ce tchat pour voir la liste des commandes disponibles, puis `!config see` vous permettra de voir les options de configuration (un site web est en préparation). \n\nPour m'avoir aidé dans la création du bot, mon propriétaire (Z_runner) et moi souhaitons remercier Awhikax pour son soutien apporté lors des différentes crises, Aragorn1202 pour toutes ses idées et ses phrases pleines de bon sens, Adri pour tous ces magnifiques logos, émojis et images de profil, et toute l'équipe de traducteurs pour leur merveilleux travail !\n\n:globe_with_meridians: Quelques liens pourront vous être utiles : {links}\n\nBonne journée !",
         "admins-list": "Les administrateurs de ce bot sont : {}",
         "bitly_long": "URL d'origine : {url}",
         "bitly_nobit": "Cette adresse n'est pas un lien bit.ly !",
@@ -1009,6 +1017,7 @@
         "ban": "Liste des rôles qui peuvent utiliser la commande 'ban' : {}",
         "bot_news": "Liste des salons dans lesquels envoyer les news du bot : {}",
         "clear": "Liste des rôles qui peuvent utiliser la commande 'clear' : {}",
+        "compress_help": "L'affichage de la commande `help` doit-il être compressé ? {}",
         "description": "Description du serveur :\n {}",
         "enable_fun": "Les commandes répertoriées dans la commande `!fun` sont-elles activées ? {}",
         "enable_xp": "Le système d'xp doit-il être activé ? {}",

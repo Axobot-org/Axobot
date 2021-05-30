@@ -158,7 +158,8 @@ class Morpions(commands.Cog):
                             if await self.test_place_valide(grille, saisie) == True:
                                 grille = await self.remplacer_valeur(grille, tour, saisie)
                                 tour = False
-                                await msg.delete(delay=0.1)
+                                if self.mode == 1:
+                                    await msg.delete(delay=0.1)
                             else:
                                 await ctx.send(await self.bot._(ctx.channel, 'morpion', 'pion-1'))
                                 display_grille = False
