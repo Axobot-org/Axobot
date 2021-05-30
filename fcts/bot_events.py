@@ -27,7 +27,7 @@ class BotEvents(commands.Cog):
                 ev_data["begin"], "%Y-%m-%d")
             ev_data["end"] = datetime.datetime.strptime(
                 ev_data["end"], "%Y-%m-%d")
-            if ev_data["begin"].date() <= today and ev_data["end"].date() > today:
+            if ev_data["begin"].date() <= today and ev_data["end"].date() >= today:
                 self.current_event = ev_data["type"]
                 self.current_event_data = ev_data
                 self.current_event_id = ev_id
