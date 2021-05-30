@@ -71,7 +71,7 @@ class Rss(commands.Cog):
         self.embed_color = discord.Color(6017876)
         self.loop_processing = False
         self.last_update = None
-        self.twitterAPI = twitter.Api(**bot.others['twitter'], tweet_mode="extended")
+        self.twitterAPI = twitter.Api(**bot.others['twitter'], tweet_mode="extended", timeout=15)
         self.twitter_over_capacity = False
         self.min_time_between_posts = {
             'web': 120,
@@ -506,7 +506,7 @@ class Rss(commands.Cog):
                     try:
                         x['link'] = self.twitterAPI.GetUser(user_id=int(x['link'])).screen_name
                     except twitter.TwitterError as e:
-                        pass
+                        self.bot.log.debug(f"[rss:askID] Twitter error: {e}")
                 list_of_IDs.append(x['ID'])
                 c = self.bot.get_channel(x['channel'])
                 if c is not None:
@@ -1084,67 +1084,6 @@ class Rss(commands.Cog):
         except requests.exceptions.ConnectionError:
             return []
 
-    async def rss_tw_old(self, guild: discord.Guild, nom: str, date: datetime.datetime=None):
-        if nom == 'help':
-            return await self.bot._(guild,"rss","tw-help")
-        try:
-            url = self.twitter_api_url+nom
-            feeds = feedparser.parse(url,timeout=15)
-            if feeds.entries==[]:
-                url = self.twitter_api_url+nom.capitalize()
-                feeds = feedparser.parse(url,timeout=15)
-                if feeds.entries==[]:
-                    url = self.twitter_api_url+nom.lower()
-                    feeds = feedparser.parse(url,timeout=15)
-        except socket.timeout:
-            return []
-        tweets_list_official = await self.get_tw_official(nom)
-        if isinstance(tweets_list_official,twitter.error.TwitterError):
-            return tweets_list_official
-        tweets_ids = [x.id_str for x in tweets_list_official]
-        try:
-            entries = [x for x in feeds.entries if hasattr(x,'link') and x.link.split('/')[-1].replace('?p=v','') in tweets_ids]
-        except:
-            entries = []
-        if len(entries) == 0:
-            return await self.bot._(guild,"rss","nothing")
-        if len(entries) > 1:
-            while entries[0]['published_parsed'] < entries[1]['published_parsed']:
-                del entries[0]
-                if len(entries)==1:
-                    break
-        if not date:
-            feed = entries[0]
-            r = re.search(r"(pic.twitter.com/[^\s]+)",feed['title'])
-            if r is not None:
-                t = feed['title'].replace(r.group(1),'')
-            else:
-                t = feed['title']
-            author = feed['author'].replace('(','').replace(')','')
-            rt = None
-            if author.replace('@','') not in feed['link']:
-                rt = url.split("=")[1]
-            obj = self.rssMessage(bot=self.bot,Type='tw',url=feed['link'].replace('mobile.',''),title=t,emojis=self.bot.get_cog('Emojis').customEmojis,date=feed['published_parsed'],author=author,retweeted_by=rt,channel=feeds.feed['title'])
-            return [obj]
-        else:
-            liste = list()
-            for feed in entries:
-                if (datetime.datetime(*feed['published_parsed'][:6]) - date).total_seconds() < self.min_time_between_posts['tw']:
-                    break
-                author = feed['author'].replace('(','').replace(')','')
-                rt = None
-                if author.replace('@','') not in feed['link']:
-                    rt = url.split("=")[1]
-                if rt is not None:
-                    t = feed['title'].replace(rt,'')
-                else:
-                    t = feed['title']
-                obj = self.rssMessage(bot=self.bot,Type='tw',url=feed['link'].replace('mobile.',''),title=t,emojis=self.bot.get_cog('Emojis').customEmojis,date=feed['published_parsed'],author=author,retweeted_by=rt,channel= feeds.feed['title'])
-                liste.append(obj)
-            liste.reverse()
-            return liste
-
-
     async def rss_tw(self, channel: discord.TextChannel, name: str, date: datetime.datetime=None):
         if name == 'help':
             return await self.bot._(channel,"rss","tw-help")
@@ -1553,6 +1492,7 @@ class Rss(commands.Cog):
                     objs = await funct(chan,flow['link'], flow['date'], session=session)
                 if isinstance(objs,twitter.error.TwitterError):
                     self.twitter_over_capacity = True
+                    self.bot.log.warn("[send_rss_msg] Twitter over capacity detected")
                     return False
                 flow['link'] = objs
             if isinstance(objs,twitter.TwitterError):
@@ -1564,7 +1504,7 @@ class Rss(commands.Cog):
                 for o in objs[:self.max_messages]:
                     # if we can't post messages: abort
                     if not chan.permissions_for(guild.me).send_messages:
-                        return
+                        return True
                     o.format = flow['structure']
                     o.embed = flow['use_embed']
                     o.fill_embed_data(flow)
@@ -1578,7 +1518,7 @@ class Rss(commands.Cog):
             await self.bot.get_cog('Errors').senf_err_msg("Erreur rss sur le flux {} (type {} - salon {})".format(flow['link'],flow['type'],flow['channel']))
             await self.bot.get_cog('Errors').on_error(e,None)
             return False
-        
+
 
     async def main_loop(self, guildID: int=None):
         if not self.bot.rss_enabled:

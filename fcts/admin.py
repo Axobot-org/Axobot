@@ -588,7 +588,7 @@ Cette option affecte tous les serveurs"""
     async def admin_flag(self, ctx:MyContext, add:str, flag:str, users:commands.Greedy[discord.User]):
         """Ajoute ou retire un attribut à un utilisateur
         
-        Flag valides : support, premium, contributor, partner, unlocked_rainbow, unlocked_blurple"""
+        Flag valides : support, premium, contributor, partner"""
         if add not in ['add', 'remove']:
             return await ctx.send("Action invalide")
         for user in users:

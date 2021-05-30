@@ -767,6 +767,11 @@ Permissions for using this command are the same as for the kick
             await user.send(embed=emb)
         except discord.Forbidden:
             pass
+        except discord.HTTPException as e:
+            if e.code == 50007:
+                # "Cannot send message to this user"
+                return
+            await self.bot.get_cog('Errors').on_error(e, ctx)
         except Exception as e:
             await self.bot.get_cog('Errors').on_error(e, ctx)
             pass
@@ -1158,7 +1163,7 @@ The 'reasons' parameter is used to display the mute reasons.
             return await ctx.send(await self.bot._(ctx.guild.id,"modo","give_roles-4",r=role.name))
         if role.position >= ctx.author.roles[-1].position:
             return await ctx.send(await self.bot._(ctx.guild.id,"modo","give_roles-higher"))
-        n_users = set[discord.Member]
+        n_users: set[discord.Member] = set()
         for item in users:
             if item == "everyone":
                 item = ctx.guild.default_role
@@ -1197,7 +1202,7 @@ The 'reasons' parameter is used to display the mute reasons.
             return await ctx.send(await self.bot._(ctx.guild.id,"modo","give_roles-4",r=role.name))
         if role.position >= ctx.author.roles[-1].position:
             return await ctx.send(await self.bot._(ctx.guild.id,"modo","give_roles-higher"))
-        n_users = set[discord.Member]
+        n_users: set[discord.Member] = set()
         for item in users:
             if item == "everyone":
                 item = ctx.guild.default_role

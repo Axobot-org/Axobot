@@ -38,5 +38,13 @@
         "icon": null,
         "color": 11260705,
         "objectives": [120]
+    },
+    "blurple-2021": {
+        "begin": "2021-05-07",
+        "end": "2021-05-13",
+        "type": "blurple",
+        "icon": "https://zrunner.me/cdn/blurple_2021.png",
+        "color": 7506394,
+        "objectives": [200, 500]
     }
 }

@@ -1,9 +1,16 @@
 #!/usr/bin/env python
 #coding=utf-8
 
+# check python version
+import sys
+py_version = sys.version_info
+if py_version.major != 3 or py_version.minor < 9:
+    print("You must use at least Python 3.9!", file=sys.stderr)
+    sys.exit(1)
+
 def check_libs():
     count = 0
-    for m in ["mysql","discord","frmc_lib","aiohttp","requests","re","asyncio","datetime","time","importlib","traceback","sys","logging","psutil","platform","subprocess",'json','emoji','imageio','geocoder','tzwhere','pytz','twitter','isbnlib']:
+    for m in ["mysql","discord","frmc_lib","aiohttp","requests","re","asyncio","datetime","time","importlib","traceback","logging","psutil","platform","subprocess",'json','emoji','imageio','geocoder','tzwhere','pytz','twitter','isbnlib']:
         try:
             exec("import "+m)
             exec("del "+m)
