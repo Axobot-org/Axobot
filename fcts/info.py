@@ -239,7 +239,7 @@ class Info(commands.Cog):
         """Get the documentation url"""
         text = str(self.bot.get_cog('Emojis').customEmojis['readthedocs']) + str(await self.bot._(ctx.channel,"infos","docs")) + " https://zbot.rtfd.io"
         if self.bot.beta:
-            text += '/en/indev'
+            text += '/en/develop'
         await ctx.send(text)
 
     @commands.command(name='info',aliases=['infos'])
