@@ -43,7 +43,7 @@ If you can't use Discord and you really need to contact me, you can [send me an 
 
 ## LICENSE
 
-Such content is subject to a **MIT-type license**, which means that you are free to reuse such content for commercial or non-commercial purposes, provided that "**the copyright notice and the permission notice is included in all copies or substantial portions of the Software**". For more information, refer to the [LICENSE](https://github.com/ZRunner/ZBot/blob/v3/LICENSE) file in the source code.
+Such content is subject to a **MIT-type license**, which means that you are free to reuse such content for commercial or non-commercial purposes, provided that "**the copyright notice and the permission notice is included in all copies or substantial portions of the Software**". For more information, refer to the [LICENSE](https://github.com/ZRunner/ZBot/blob/main/LICENSE) file in the source code.
 
 
 ## Discord Bots Lists
