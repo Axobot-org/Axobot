@@ -440,7 +440,7 @@ class Utilities(commands.Cog):
         cursor.close()
         return result
 
-    async def check_votes(self, userid: int) -> list:
+    async def check_votes(self, userid: int) -> list[tuple[str, str]]:
         """check if a user voted on any bots list website"""
         votes = list()
         async with aiohttp.ClientSession() as session:
@@ -452,10 +452,10 @@ class Utilities(commands.Cog):
             except Exception as e:
                 await self.bot.get_cog("Errors").on_error(e, None)
             try:  # https://discordlist.space/bot/486896267788812288
-                headers = {'Authorization': self.bot.others['discordlist.space']}
-                async with session.get('https://api.discordlist.space/v1/bots/486896267788812288/upvotes', headers=headers) as r:
+                headers = {'Authorization': 'Bot ' + self.bot.others['discordlist.space']}
+                async with session.get('https://api.discordlist.space/v2/bots/486896267788812288/upvotes', headers=headers) as r:
                     js = await r.json()
-                    if str(userid) in [x["user"]['id'] for x in js]:
+                    if str(userid) in [x['id'] for x in js['users']]:
                         votes.append(
                             ("discordlist.space", "https://discordlist.space/"))
             except Exception as e:
