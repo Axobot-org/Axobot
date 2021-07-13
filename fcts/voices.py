@@ -78,37 +78,43 @@ class VoiceChannels(commands.Cog):
     @commands.Cog.listener()
     async def on_guild_channel_delete(self, channel: discord.abc.GuildChannel):
         """Deletes a voice channel in the database when deleted in Discord"""
-        if isinstance(channel, discord.VoiceChannel):
-            self.db_delete_channel(channel)
-        # other cases are not interesting
+        try:
+            if isinstance(channel, discord.VoiceChannel):
+                self.db_delete_channel(channel)
+            # other cases are not interesting
+        except Exception as e:
+            await self.bot.get_cog("Errors").on_error(e)
         
 
     @commands.Cog.listener()
     async def on_voice_state_update(self, member: discord.Member, before: discord.VoiceState, after: discord.VoiceState):
         """Check if a member joined/left a voice channel"""
-        if before.channel == after.channel:
-            return
-        if not self.bot.database_online:
-            return
-        config = await self.bot.get_config(member.guild.id, 'voice_channel')
-        if config is None:  # if nothing was setup
-            return
-        config = [int(x) for x in config.split(';') if x.isnumeric() and len(x)>5]
-        if len(config) == 0:
-            return
-        if after.channel is not None and after.channel.id in config:
-            if before.channel is not None and len(before.channel.members) == 0: # move from another channel which is now empty
-                if (member.guild.id in self.channels.keys()) and (before.channel.id in self.channels[member.guild.id]):
-                    # if they come from an automated channel, we move them back if the channel is now empty
-                    await member.move_to(before.channel)
-                    return
-            await self.create_channel(member)
-        if (before.channel is not None) and (member.guild.id in self.channels.keys()) and (before.channel.id in self.channels[member.guild.id]):
-            await self.delete_channel(before.channel)
-        if after.channel is None:
-            await self.give_roles(member, remove=True)
-        if before.channel is None:
-            await self.give_roles(member)
+        try:
+            if before.channel == after.channel:
+                return
+            if not self.bot.database_online:
+                return
+            config = await self.bot.get_config(member.guild.id, 'voice_channel')
+            if config is None:  # if nothing was setup
+                return
+            config = [int(x) for x in config.split(';') if x.isnumeric() and len(x)>5]
+            if len(config) == 0:
+                return
+            if after.channel is not None and after.channel.id in config:
+                if before.channel is not None and len(before.channel.members) == 0: # move from another channel which is now empty
+                    if (member.guild.id in self.channels.keys()) and (before.channel.id in self.channels[member.guild.id]):
+                        # if they come from an automated channel, we move them back if the channel is now empty
+                        await member.move_to(before.channel)
+                        return
+                await self.create_channel(member)
+            if (before.channel is not None) and (member.guild.id in self.channels.keys()) and (before.channel.id in self.channels[member.guild.id]):
+                await self.delete_channel(before.channel)
+            if after.channel is None:
+                await self.give_roles(member, remove=True)
+            if before.channel is None:
+                await self.give_roles(member)
+        except Exception as e:
+            await self.bot.get_cog("Errors").on_error(e)
 
     async def create_channel(self, member: discord.Member):
         """Create a new voice channel
