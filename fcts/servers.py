@@ -66,7 +66,7 @@ class Servers(commands.Cog):
                "enable_fun":1,
                "prefix":'!',
                "membercounter":"",
-               "anti_raid":1,
+               "anti_raid":0,
                "vote_emojis":":thumbsup:;:thumbsdown:;",
                "morpion_emojis":":red_circle:;:blue_circle:;",
                "help_in_dm":0,
