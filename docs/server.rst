@@ -25,7 +25,7 @@ The `see` subcommand allows you to see the value of a configuration, with a mini
 
 The page number is used because the options are too numerous to be displayed on a single screen. They have therefore been grouped by page of 20, accessible via this number (default 1).
 
-A detailed list of all options is available `below <#list-of-every-option>`_ .
+A detailed list of all options is available `below <#list-of-every-option>`__ .
 
 .. warning:: To display this command correctly, ZBot only needs Embed links permission.
 
@@ -61,16 +61,16 @@ List of every option
 
 * prefix: Character string that will be the bot prefix, for all commands, beginning with the validation message. The prefix must be between 1 and 5 characters long. By default, :code:`!`.
 * language: Language of the bot. Currently only the languages :code:`fr` (French), :code:`en` (English), :code:`fi` (Finnish) and :code:`de` (German) are available (also you can use :code:`lolcat` or :code:`fr2` for more fun). The change takes place as soon as the order is validated by the system. Default :code:`fr`.
-* description: Description of the server, used for the `info server <infos.html#info>`_ command and potential partners. Default empty.
-* clear: List of roles allowed to use the `clear <moderator.html#clear>`_ command. By default, none.
-* slowmode: List of roles allowed to use the `slowmode <moderator.html#slowmode>`_ and `freeze <moderator.html#freeze>`_ commands. By default, none.
-* mute: List of roles allowed to use the `mute <moderator.html#mute-unmute>`_ command. By default, none.
-* kick: List of roles allowed to use the `kick <moderator.html#kick>`_ command. By default, none.
-* ban: List of roles allowed to use the `ban <moderator.html#ban>`_ command. By default, none.
-* warn: List of roles allowed to use the `warn <moderator.html#warn>`_ and `cases <moderator.html#handling-cases>`_ commands. By default, none.
+* description: Description of the server, used for the `info server <infos.html#info>`__ command and potential partners. Default empty.
+* clear: List of roles allowed to use the `clear <moderator.html#clear>`__ command. By default, none.
+* slowmode: List of roles allowed to use the `slowmode <moderator.html#slowmode>`__ and `freeze <moderator.html#freeze>`__ commands. By default, none.
+* mute: List of roles allowed to use the `mute <moderator.html#mute-unmute>`__ command. By default, none.
+* kick: List of roles allowed to use the `kick <moderator.html#kick>`__ command. By default, none.
+* ban: List of roles allowed to use the `ban <moderator.html#ban>`__ command. By default, none.
+* warn: List of roles allowed to use the `warn <moderator.html#warn>`__ and `cases <moderator.html#handling-cases>`__ commands. By default, none.
 * say: List of roles allowed to use the `say` command. By default, none.
 * welcome_channel: List of channels where messages when a member joins/leaves the server will be sent. By default, none.
-* welcome: Message sent when a member joins your server. Some variables are usable, enter the `welcome <infos.html#welcome>`_ command to see them.
+* welcome: Message sent when a member joins your server. Some variables are usable, enter the `welcome <infos.html#welcome>`__ command to see them.
 * leave: Message sent when a member leave your server. Some variables are usable, the same as for the welcome message.
 * welcome_roles: List of roles automatically given to members when they join the server. It is necessary that the bot is above the roles in question, and that it has the permission "Manage roles".
 * bot_news: List of channels to which new bot products will be sent. These are the new bugs found as well as the new features added. None by default.
@@ -85,7 +85,7 @@ List of every option
 * anti_caps_lock: Boolean indicating whether the bot should send a warning message when a message with too much capitalization is sent. Default is True.
 * enable_fun: Boolean indicating if the fun part (documentation in preparation) is activated. If so, all commands in this section will be available. Default is :code:`True`.
 * membercounter: A voice salon whose name displays the number of members on the server
-* anti_raid: Anti-raid protection with some useful features. More information `here <moderator.html#anti-raid>`_. Default level: 0
+* anti_raid: Anti-raid protection with some useful features. More information `here <moderator.html#anti-raid>`__. Default level: 0
 * vote_emojis: List of emojis that the bot will have to use when there is a voting message. This case may occur when using the vote command, or in a poll channel.
 * morpion_emojis: List of emojis used to play on tic-tac-toe. Two emojis must be entered: one for the bot, and one for the player. Discord emojis as well as server emojis can work.
 * help_in_dm: Boolean indicating whether the help command message should be sent as a private message, or in the server. If the value is set to :code:`True`, the message will be sent in DM.
@@ -97,9 +97,9 @@ List of every option
 * update_mentions: A list of roles which will be mentioned in each update changelog. You can enable those changelogs with the `bot_news` option. Default to None.
 * verification_role: A role given to (un)verified members
 * voice_roles: List of roles given to people being in a voice channel
-* voice_channel: Channel used by the automated voice channels system (see `below <server.html#voice-channels-managment>`_)
-* voice_category: Category used by the automated voice channels system (see `below <server.html#voice-channels-managment>`_)
-* voice_channel_format: Name format used by the automated voice channels system (see `below <server.html#voice-channels-managment>`_)
+* voice_channel: Channel used by the automated voice channels system (see `below <server.html#voice-channels-managment>`__)
+* voice_category: Category used by the automated voice channels system (see `below <server.html#voice-channels-managment>`__)
+* voice_channel_format: Name format used by the automated voice channels system (see `below <server.html#voice-channels-managment>`__)
 * ttt_display: How to use the tic-tac-toe game. "Disabled" will prevent your users from playing it, "normal" will use it as usual and "short" will avoid spam messages.
 
 
@@ -113,13 +113,13 @@ The xp system is a system for evaluating a person's activity on a server using a
 Configure your server
 ---------------------
 
-There are several ways to customize your xp system. In particular, you have 4 `configuration options <server.html#config-options>`_, each one modifying a characteristic. And more are to come!
+There are several ways to customize your xp system. In particular, you have 4 `configuration options <server.html#config-options>`__, each one modifying a characteristic. And more are to come!
 
 - **Enable/disable xp:** it is possible to enable or disable the entire xp system for your server via the option :code:`enable_xp`. If it is set to 'true' the system is enabled, otherwise it will be 'false'. By default 'true'.
 
 - **Change the levelup message:** the bot automatically uses a long list of random messages for your members' level changes, but you can put a single one written by you via the option :code:`levelup_msg`. It is up to you to use then :code:`{user}` to mention the member, :code:`{level}` for his level and :code:`{username}` for his simple name (without notifications).
 
-- **Select the type of xp:** there are natively three different xp systems at Zbot, modifiable with the option :code:`xp_type`: a :code:`global`, in common with all servers using this system (default), a :code:`local` respecting the same calculations but without synchronization between the servers, and a :code:`mee6-like` which uses the same rules as the famous `MEE6 bot <https://mee6.xyz/?zbot>`_.
+- **Select the type of xp:** there are natively three different xp systems at Zbot, modifiable with the option :code:`xp_type`: a :code:`global`, in common with all servers using this system (default), a :code:`local` respecting the same calculations but without synchronization between the servers, and a :code:`mee6-like` which uses the same rules as the famous `MEE6 bot <https://mee6.xyz/?zbot>`__.
 
 - **Change the gain rate of xp:** if you find that your members are not earning xp fast enough (or too fast), or if you want to make a special event xp for a limited time, you can add a gain modifier between x0.1 and x3, which will multiply by its value each point of xp earned. Not usable for the global xp system, of course. Option name: :code:`xp_rate`.
 
@@ -142,9 +142,9 @@ The main command to manage these roles is :code:`roles_rewards` (or its alias :c
 
 * :code:`roles_rewards reload` : reload all roles, to check that each member has the right roles. If a member has excess role-reward, they will be removed; similarly, if a member misses certain roles, they will be assigned to him.
 
-* :code:`roles_rewards list` : lists all currently configured roles-rewards, with their corresponding level, as well as the maximum number of roles allowed for your server. The bot must have "`Embed Links <perms.html#embed-links>`_" permission.
+* :code:`roles_rewards list` : lists all currently configured roles-rewards, with their corresponding level, as well as the maximum number of roles allowed for your server. The bot must have "`Embed Links <perms.html#embed-links>`__" permission.
 
-.. warning:: For these roles to work properly, the bot **must** have "`Manage roles <perms.html#manage-roles>`_" permission. The roles to be given or removed **must** also be lower than the role of Zbot in your server hierarchy (Server Settings > Roles tab).
+.. warning:: For these roles to work properly, the bot **must** have "`Manage roles <perms.html#manage-roles>`__" permission. The roles to be given or removed **must** also be lower than the role of Zbot in your server hierarchy (Server Settings > Roles tab).
 
 
 ---------------
@@ -197,7 +197,7 @@ List every partners
 
 Lists all the partners that your server currently has. The bot will display the name of the partner, the type (server or bot), and the date of addition. You will even have the list of servers that have added you as a partner!
 
-.. warning:: For a better display of the list, it is recommended to give "`Embed Links <perms.html#embed-links>`_" permission to the bot.
+.. warning:: For a better display of the list, it is recommended to give "`Embed Links <perms.html#embed-links>`__" permission to the bot.
 
 
 Reload your list
@@ -224,7 +224,7 @@ This backup will avoid the most important damage, those little mistakes that can
 
 When you load the backup, the bot may not be able to apply some changes. However, it will give you a complete list of what has and hasn't been changed so that you can fix it yourself.
 
-.. warning:: The bot will need as many permissions as possible, which includes: `Manage roles <perms.html#manage-roles>`_, `Manage channels <perms.html#manage-channels>`_, `Manage webhooks <perms.html#manage-webhooks>`_, `Ban members <perms.html#ban-members>`_, `Manage emojis <perms.html#manage-emojis>`_.
+.. warning:: The bot will need as many permissions as possible, which includes: `Manage roles <perms.html#manage-roles>`__, `Manage channels <perms.html#manage-channels>`__, `Manage webhooks <perms.html#manage-webhooks>`__, `Ban members <perms.html#ban-members>`__, `Manage emojis <perms.html#manage-emojis>`__.
 
 Create a backup
 ---------------
@@ -263,11 +263,11 @@ Then, the bot needs to know where it should create these new channels. A simple 
 
 Zbot will take a random name for each new channel, from a random names API, but you can change the name format with the :code:`config change voice_channel_format <new format>` command. Use the special :code:`{random}` keyword anywhere in it to insert a random name!
 
-.. warning:: Zbot needs the "`Manage channels <perms.html#manage-channels>`_", "`Move members <perms.html#move-members>`_" and "`Connect <perms.html#connect>`_" permissions in the selected category to create these news channels!
+.. warning:: Zbot needs the "`Manage channels <perms.html#manage-channels>`__", "`Move members <perms.html#move-members>`__" and "`Connect <perms.html#connect>`__" permissions in the selected category to create these news channels!
 
 Clear your unusued auto channels
 --------------------------------
 
 Zbot will try to delete the channels automatically created once everyone left it. But if, for any reason, you still have some unusued auto voice channels, you can use the super :code:`voice-clean` command to start a big cleanup!
 
-.. note:: Aynone with "`Manage channels <perms.html#manage-channels>`_" permission can use that command!
+.. note:: Aynone with "`Manage channels <perms.html#manage-channels>`__" permission can use that command!
