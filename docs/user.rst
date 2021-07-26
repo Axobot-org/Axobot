@@ -20,7 +20,7 @@ Check the XP of someone
 
 This command is used to view the number of xp, rank and level of a member. You can select this member either by mentioning it or by using his name or ID. If no user is given, your own XP will be displayed.
 
-.. note:: The bot sends the format adapted to its permissions: if it can `send files <perms.html#attach-files>`_, it will display the xp card. If it can `send embeds <perms.html#embed-links>`_, it will display it in an embed, and otherwise by text.
+.. note:: The bot sends the format adapted to its permissions: if it can `send files <perms.html#attach-files>`__, it will display the xp card. If it can `send embeds <perms.html#embed-links>`__, it will display it in an embed, and otherwise by text.
 
 
 Get the general ranking
@@ -32,7 +32,7 @@ If you want to know who is at the top of the ranking, or who is following you so
 
 If you give the argument `guild` (or `server`, as you want), the top will only display users who are on the current server, instead of all bot users.
 
-.. note:: The bot can send this message without special permission, but don't hesitate to give him permission to `send embeds <perms.html#embed-links>`_ to make the result more aesthetic!
+.. note:: The bot can send this message without special permission, but don't hesitate to give him permission to `send embeds <perms.html#embed-links>`__ to make the result more aesthetic!
 
 
 ---------
@@ -53,7 +53,7 @@ If you use the command without argument, the bot will show you an example of a x
 
 You can also use the command :code:`profile card-preview <style>` to get a preview of a specific style with your avatar.
 
-.. note:: Note that to be able to display your card, the bot needs `Attach Files <perms.html#attach-files>`_ permission!
+.. note:: Note that to be able to display your card, the bot needs `Attach Files <perms.html#attach-files>`__ permission!
 
 
 Allow or disallow an option
@@ -79,4 +79,4 @@ This option has been designed for people who don't want to manually type the `un
 Option 'usernames_log'
 ======================
 
-By default Zbot records when you change your nickname, whether it is your main name or the nickname in a server. This data is then used for the results of the `usernames <infos.html#usernames-history>`_ command, and nowhere else. But for confidentiality reasons you can prevent your future changes from being saved at any time, via this option.
+By default Zbot records when you change your nickname, whether it is your main name or the nickname in a server. This data is then used for the results of the `usernames <infos.html#usernames-history>`__ command, and nowhere else. But for confidentiality reasons you can prevent your future changes from being saved at any time, via this option.
