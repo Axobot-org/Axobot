@@ -56,7 +56,7 @@ class Servers(commands.Cog):
                "save_roles":0,
                "poll_channels":"",
                "modlogs_channel":"",
-               "enable_xp":1,
+               "enable_xp":0,
                "levelup_msg":'',
                "levelup_channel":'any',
                "noxp_channels":'',
