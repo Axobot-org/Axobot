@@ -59,7 +59,7 @@ class Errors(commands.Cog):
                 await ctx.reinvoke()
                 return
             d = round(error.retry_after, 2 if error.retry_after < 60 else 0)
-            await ctx.send(await self.bot._(ctx.channel,'errors','cooldown',d=round(error.retry_after,2)))
+            await ctx.send(await self.bot._(ctx.channel,'errors','cooldown',d=d))
             return
         elif isinstance(error,(commands.BadArgument,commands.BadUnionArgument)):
             ALLOWED = discord.AllowedMentions(everyone=False, users=False, roles=False)
