@@ -221,7 +221,7 @@ class Info(commands.Cog):
                 m = None
             t1 = time.time()
             param = '-n' if system_name().lower()=='windows' else '-c'
-            command = ['ping', param, str(packages),'-i',str(wait), ip]
+            command = ['ping', param, str(packages), '-i', str(wait), ip, '-q']
             result = system_call(command) == 0
         except Exception as e:
             await ctx.send("`Error:` {}".format(e))

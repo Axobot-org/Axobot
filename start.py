@@ -24,7 +24,7 @@ def check_libs():
 
 
 if check_libs():
-    import discord, sys, traceback, asyncio, time, logging, os, mysql.connector, datetime, json
+    import discord, sys, traceback, asyncio, time, logging, os, mysql.connector
     from signal import SIGTERM
     from random import choice
     from fcts import cryptage, tokens # pylint: disable=no-name-in-module
