@@ -631,7 +631,7 @@
         "no-item": "Unable to find this item",
         "no-mod": "Unable to find this mod",
         "no-ping": "Error: Unable to ping this server",
-        "player-not-found": "I coud not find any Minecraft Java player with this username",
+        "player-not-found": "I could not find any Minecraft Java player with this username",
         "player-skin-download": "Click here to download",
         "player-skin-title": "Skin of the player {player}",
         "serv-0": "Number of players",
