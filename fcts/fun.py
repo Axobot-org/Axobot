@@ -1,4 +1,4 @@
-from utils import zbot, MyContext
+from utils import flatten_list, zbot, MyContext
 from fcts.checks import is_fun_enabled
 import discord
 import random
@@ -31,9 +31,10 @@ async def can_say(ctx: MyContext):
     else:
         return await ctx.bot.get_cog("Servers").staff_finder(ctx.author,"say")
 
-async def can_use_cookie(ctx: MyContext):
-#                            Z_runner           neil3000            Awhikax           Adri         Theventreur         Catastrophix        Platon_Neutron      megat69            Aragorn1202
-    return ctx.author.id in [279568324260528128,278611007952257034,281404141841022976,409470110131027979,229194747862843392,438372385293336577,286827468445319168,517762101859844106,375598088850505728]
+async def can_use_cookie(ctx: MyContext) -> bool:
+    allowed_users = await ctx.bot.db_query("SELECT userID FROM frm.users WHERE user_flags & 32 = 32", astuple=True)
+    allowed_users = flatten_list(allowed_users)
+    return ctx.author.id in allowed_users
 
 class Fun(commands.Cog):
     """Add some fun commands, no obvious use. You can disable this module with the 'enable_fun' option (command 'config')"""
