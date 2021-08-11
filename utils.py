@@ -4,7 +4,7 @@ import logging
 import sys
 import time
 import mysql
-from typing import Any, Callable, Optional, Coroutine
+from typing import Any, Callable, Optional, Coroutine, Union
 
 
 OUTAGE_REASON = {
@@ -193,6 +193,33 @@ class zbot(commands.bot.AutoShardedBot):
             self._cnx[2][1] = round(time.time())
         else:
             raise ValueError(dict)
+    
+    async def db_query(self, query: str, args: Union[tuple, dict]=None, *, fetchone: bool=False, returnrowcount: bool=False, astuple: bool=False) -> Union[int, list[dict], dict]:
+        """Do any query to the bot database
+        If SELECT, it will return a list of results, or only the first result (if fetchone)
+        For any other query, it will return the affected row ID if returnrowscount, or the amount of affected rows (if returnrowscount)"""
+        cursor = self.cnx_frm.cursor(dictionary=(not astuple))
+        args = () if args is None else args
+        try:
+            cursor.execute(query, args)
+            if query.startswith("SELECT"):
+                _type = tuple if astuple else dict
+                if fetchone:
+                    v = cursor.fetchone()
+                    result = _type() if v is None else _type(v)
+                else:
+                    result = list(map(_type, cursor.fetchall()))
+            else:
+                self.cnx_frm.commit()
+                if returnrowcount:
+                    result = cursor.rowcount
+                else:
+                    result = cursor.lastrowid
+        except Exception as e:
+            cursor.close()
+            raise e
+        cursor.close()
+        return result
 
     async def user_avatar_as(self, user: discord.User, size: int = 512) -> discord.Asset:
         """Get the avatar of an user, format gif or png (as webp isn't supported by some browsers)"""
@@ -259,7 +286,8 @@ class UserFlag:
             1 << 1: "contributor",
             1 << 2: "premium",
             1 << 3: "partner",
-            1 << 4: "translator"
+            1 << 4: "translator",
+            1 << 5: "cookie"
         }
 
         def flagsToInt(self, flags: list) -> int:
@@ -271,6 +299,9 @@ class UserFlag:
 
         def intToFlags(self, i: int) -> list:
             return [v for k, v in self.FLAGS.items() if i & k == k]
+
+def flatten_list(first_list: list) -> list:
+    return [item for sublist in first_list for item in sublist]
 
 def setup_logger():
     """Create the logger module, used for logs"""
