@@ -614,7 +614,7 @@ You can specify a verification limit by adding a number in argument (up to 1.000
             return await ctx.send(await self.bot._(ctx.channel,"fun","uninhabited-city"))
         timeZoneObj = timezone(timeZoneStr)
         d = datetime.datetime.now(timeZoneObj)
-        format_d = await self.bot.get_cog('TimeUtils').date(d,lang=await self.bot._(ctx.channel,"current_lang","current"))
+        format_d = await self.bot.get_cog('TimeUtils').date(d,lang=await self.bot._(ctx.channel,'_used_locale'))
         await ctx.send("**{}**:\n{} ({})\n ({} - lat: {} - long: {})".format(timeZoneStr,format_d,d.tzname(),g.current_result.address,round(g.json['lat'],2),round(g.json['lng'],2)))
 
     @commands.command(name="tip")
@@ -889,7 +889,7 @@ You can specify a verification limit by adding a number in argument (up to 1.000
             await ctx.send(await self.bot._(ctx.channel, "fun", "discordstatus-exists", impact=impact, title=title))
         else:
             last_date = datetime.datetime.strptime(last_incident['resolved_at'], '%Y-%m-%dT%H:%M:%S.%f%z')
-            _lang = await self.bot._(ctx.channel,'current_lang','current')
+            _lang = await self.bot._(ctx.channel,'_used_locale')
             last_date = await self.bot.get_cog("TimeUtils").date(last_date, _lang, timezone=True)
             await ctx.send(await self.bot._(ctx.channel, "fun", "discordstatus-nothing", date=last_date))
         

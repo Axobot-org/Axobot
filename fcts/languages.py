@@ -1,4 +1,5 @@
 import discord
+import i18n
 import json
 from utils import zbot
 
@@ -16,9 +17,14 @@ class Languages(discord.ext.commands.Cog):
         for lang in self.languages:
             with open(f'fcts/lang/{lang}.json','r') as f:
                 self.translations[lang] = json.load(f)
+        
+        i18n.set('filename_format', '{locale}.{format}')
+        i18n.set('file_format', 'json')
+        i18n.load_path.clear()
+        i18n.load_path.append('./fcts/lang2')
 
 
-    async def tr(self, serverID, moduleID: str, messageID: str, **args):
+    async def tr(self, serverID, messageID: str, **args):
         """Renvoie le texte en fonction de la langue"""
         if isinstance(serverID,discord.Guild):
             serverID = serverID.id
@@ -42,9 +48,17 @@ class Languages(discord.ext.commands.Cog):
             #print("New langage:",lang_opt)
         if lang_opt not in self.languages:
             lang_opt = self.bot.get_cog('Servers').default_language
-        return await self._get_translation(lang_opt, moduleID, messageID, **args)
-        
-    async def _get_translation(self, lang:str, moduleID:str, messageID:str, **args):
+        return await self._get_translation(lang_opt, messageID, **args)
+    
+    async def _get_translation(self, locale: str, messageID: str, **args):
+        if messageID == '_used_locale':
+            return locale
+        translation = i18n.t(messageID, locale=locale, **args)
+        if translation == messageID:
+            await self.msg_not_found(messageID, locale)
+        return translation
+
+    async def _get_translation_old(self, lang:str, moduleID:str, messageID:str, **args):
         result = None
         if lang == 'de':
             try:
@@ -93,9 +107,9 @@ class Languages(discord.ext.commands.Cog):
         else:
             return result
 
-    async def msg_not_found(self, moduleID: str, messageID: str, lang: str):
+    async def msg_not_found(self, messageID: str, lang: str):
         try:
-            await self.bot.get_cog('Errors').senf_err_msg("Le message {}.{} n'a pas été trouvé dans la base de donnée! (langue {})".format(moduleID,messageID,lang))
+            await self.bot.get_cog('Errors').senf_err_msg("Le message {} n'a pas été trouvé dans la base de donnée! (langue {})".format(messageID,lang))
         except:
             pass
 

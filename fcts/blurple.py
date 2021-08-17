@@ -239,7 +239,7 @@ __29 variations: __
             self.db_add_points(ctx.author.id, points)
             txt = await self.bot._(ctx.channel, "halloween", "got-points", pts=points)
         else:
-            lang = await self.bot._(ctx.channel, "current_lang", "current")
+            lang = await self.bot._(ctx.channel, '_used_locale')
             remaining = await self.bot.get_cog("TimeUtils").time_delta(-time_since_available, lang=lang)
             txt = await self.bot._(ctx.channel, "blurple", "too-quick", time=remaining)
         if ctx.can_send_embed:
