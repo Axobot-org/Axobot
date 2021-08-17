@@ -45,7 +45,7 @@ class Errors(commands.Cog):
         elif isinstance(error, commands.CommandError) and str(error) == "Database offline":
             from utils import OUTAGE_REASON
             if OUTAGE_REASON:
-                lang = await self.bot._(ctx.channel, 'current_lang', 'current')
+                lang = await self.bot._(ctx.channel, '_used_locale')
                 r = OUTAGE_REASON.get(lang, OUTAGE_REASON['en'])
                 await ctx.send(await self.bot._(ctx.channel, 'errors', 'nodb-2', reason=r))
             else:

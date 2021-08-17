@@ -352,7 +352,7 @@ You can also mute this member for a defined duration, then use the following for
             if duration > 60*60*24*365*3: # max 3 years
                 await ctx.send(await self.bot._(ctx.channel, "fun", "reminds-too-long"))
                 return
-            f_duration: str = await self.bot.get_cog('TimeUtils').time_delta(duration,lang=await self.bot._(ctx.guild,'current_lang','current'),form='temp',precision=0)
+            f_duration: str = await self.bot.get_cog('TimeUtils').time_delta(duration,lang=await self.bot._(ctx.guild,'_used_locale'),form='temp',precision=0)
         else:
             f_duration = None
         try:
@@ -555,7 +555,7 @@ The 'days_to_delete' option represents the number of days worth of messages to d
                 if duration > 60*60*24*365*20: # max 20 years
                     await ctx.send(await self.bot._(ctx.channel, "fun", "reminds-too-long"))
                     return
-                f_duration = await self.bot.get_cog('TimeUtils').time_delta(duration,lang=await self.bot._(ctx.guild,'current_lang','current'),form='temp',precision=0)
+                f_duration = await self.bot.get_cog('TimeUtils').time_delta(duration,lang=await self.bot._(ctx.guild,'_used_locale'),form='temp',precision=0)
             else:
                 f_duration = None
             if not ctx.channel.permissions_for(ctx.guild.me).ban_members:
@@ -1014,7 +1014,7 @@ The 'reasons' parameter is used to display the mute reasons.
             return
         structure = await self.bot._(ctx.guild.id,"modo","em-list")
         date = ctx.bot.get_cog('TimeUtils').date
-        lang = await self.bot._(ctx.guild.id,"current_lang","current")
+        lang = await self.bot._(ctx.guild.id,'_used_locale')
         priv = "**"+await self.bot._(ctx.guild.id,"modo","em-private")+"**"
         title = str(await self.bot._(ctx.guild.id,"modo","em-list-title")).format(ctx.guild.name)
         try:

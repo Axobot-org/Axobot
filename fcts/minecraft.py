@@ -305,7 +305,7 @@ Every information come from the website www.fr-minecraft.net"""
             if len(search) == 0:
                 await ctx.send(await self.bot._(ctx.channel, "mc", "no-mod"))
                 return
-        user_lang = await self.bot._(ctx.channel, "current_lang", "current")
+        user_lang = await self.bot._(ctx.channel, '_used_locale')
         search = search[0]
         authors = ", ".join(
             [f"[{x['name']}]({x['url']})" for x in search['authors']])

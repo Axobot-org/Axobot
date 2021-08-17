@@ -327,7 +327,7 @@ class Events(commands.Cog):
         try:
             if self.bot.zombie_mode:
                 return False
-            f_duration = await self.bot.get_cog('TimeUtils').time_delta(task['duration'],lang=await self.bot._(channel,'current_lang','current'), form='developed', precision=0)
+            f_duration = await self.bot.get_cog('TimeUtils').time_delta(task['duration'],lang=await self.bot._(channel,'_used_locale'), form='developed', precision=0)
             t = (await self.bot._(channel, "fun", "reminds-title")).capitalize()
             foot = await self.bot._(channel, "fun", "reminds-date")
             imgs = re.findall(r'(https://\S+\.(?:png|jpe?g|webp|gif))', task['message'])

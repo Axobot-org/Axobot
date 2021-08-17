@@ -226,7 +226,7 @@ class Rss(commands.Cog):
             await ctx.send(text)
         else:
             form = await self.bot._(ctx.channel,"rss","yt-form-last")
-            obj = await text[0].create_msg(await self.bot._(ctx.channel,"current_lang","current"),form)
+            obj = await text[0].create_msg(await self.bot._(ctx.channel,'_used_locale'),form)
             if isinstance(obj,discord.Embed):
                 await ctx.send(embed=obj)
             else:
@@ -248,7 +248,7 @@ class Rss(commands.Cog):
             await ctx.send(text)
         else:
             form = await self.bot._(ctx.channel,"rss","twitch-form-last")
-            obj = await text[0].create_msg(await self.bot._(ctx.channel,"current_lang","current"),form)
+            obj = await text[0].create_msg(await self.bot._(ctx.channel,'_used_locale'),form)
             if isinstance(obj,discord.Embed):
                 await ctx.send(embed=obj)
             else:
@@ -274,7 +274,7 @@ class Rss(commands.Cog):
         else:
             form = await self.bot._(ctx.channel,"rss","tw-form-last")
             for single in text[:5]:
-                obj = await single.create_msg(await self.bot._(ctx.channel,"current_lang","current"),form)
+                obj = await single.create_msg(await self.bot._(ctx.channel,'_used_locale'),form)
                 if isinstance(obj,discord.Embed):
                     await ctx.send(embed=obj)
                 else:
@@ -298,7 +298,7 @@ class Rss(commands.Cog):
             await ctx.send(text)
         else:
             form = await self.bot._(ctx.channel,"rss","web-form-last")
-            obj = await text[0].create_msg(await self.bot._(ctx.channel,"current_lang","current"),form)
+            obj = await text[0].create_msg(await self.bot._(ctx.channel,'_used_locale'),form)
             if isinstance(obj,discord.Embed):
                 await ctx.send(embed=obj)
             else:
@@ -318,7 +318,7 @@ class Rss(commands.Cog):
             await ctx.send(text)
         else:
             form = await self.bot._(ctx.channel,"rss","deviant-form-last")
-            obj = await text[0].create_msg(await self.bot._(ctx.channel,"current_lang","current"),form)
+            obj = await text[0].create_msg(await self.bot._(ctx.channel,'_used_locale'),form)
             if isinstance(obj,discord.Embed):
                 await ctx.send(embed=obj)
             else:
@@ -1436,7 +1436,7 @@ class Rss(commands.Cog):
 
     async def send_rss_msg(self, obj: "rssMessage", channel: discord.TextChannel, roles: typing.List[str], send_stats):
         if channel is not None:
-            t = await obj.create_msg(await self.bot._(channel.guild,"current_lang","current"))
+            t = await obj.create_msg(await self.bot._(channel.guild,'_used_locale'))
             mentions = list()
             for item in roles:
                 if item=='':

@@ -60,7 +60,7 @@ class Timers(commands.Cog):
         if duration > 60*60*24*365*5:
             await ctx.send(await self.bot._(ctx.channel, "fun", "reminds-too-long"))
             return
-        f_duration = await ctx.bot.get_cog('TimeUtils').time_delta(duration,lang=await self.bot._(ctx.channel,'current_lang','current'), year=True, form='developed', precision=0)
+        f_duration = await ctx.bot.get_cog('TimeUtils').time_delta(duration,lang=await self.bot._(ctx.channel,'_used_locale'), year=True, form='developed', precision=0)
         try:
             d = {'msg_url': ctx.message.jump_url}
             await ctx.bot.get_cog('Events').add_task("timer", duration, ctx.author.id, ctx.guild.id if ctx.guild else None, ctx.channel.id, message, data=d)
@@ -86,7 +86,7 @@ class Timers(commands.Cog):
             return
         txt = await self.bot._(ctx.channel, "timers", "rmd-item")
         time_delta = self.bot.get_cog("TimeUtils").time_delta
-        lang = await self.bot._(ctx.channel, "current_lang", "current")
+        lang = await self.bot._(ctx.channel, '_used_locale')
         liste = list()
         for item in cursor:
             ctx2 = copy.copy(ctx)

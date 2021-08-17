@@ -218,7 +218,7 @@ class Cases(commands.Cog):
                     embed.set_author(name="Cases from "+str(u), icon_url=str(u.avatar_url_as(format='png')))
                 embed.set_footer(text="Requested by {}".format(ctx.author), icon_url=str(ctx.author.avatar_url_as(format='png')))
                 if len(cases) > 0:
-                    l = await self.bot._(ctx.guild.id,"current_lang","current")
+                    l = await self.bot._(ctx.guild.id,'_used_locale')
                     for x in cases:
                         e -= 1
                         g = self.bot.get_guild(x.guild)
@@ -317,7 +317,7 @@ class Cases(commands.Cog):
             mod = await self.bot.fetch_user(case.mod)
             u = "{} ({})".format(user,user.id)
             title = str(await self.bot._(ctx.guild.id,"cases","title-search")).format(case.id)
-            l = await self.bot._(ctx.guild.id,"current_lang","current")
+            l = await self.bot._(ctx.guild.id,'_used_locale')
             # main structure
             if not isSupport:
                 guild = ctx.guild.name

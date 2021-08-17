@@ -52,7 +52,7 @@ class BotEvents(commands.Cog):
                 title = self.current_event
             # Begin/End dates
             nice_date = self.bot.get_cog("TimeUtils").date
-            lang = await self.bot._(ctx.channel, "current_lang", "current")
+            lang = await self.bot._(ctx.channel, '_used_locale')
             begin = await nice_date(self.current_event_data["begin"], lang, year=True, digital=True, hour=False)
             end = await nice_date(self.current_event_data["end"], lang, year=True, digital=True, hour=False)
             if ctx.can_send_embed:

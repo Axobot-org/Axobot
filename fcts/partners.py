@@ -397,7 +397,7 @@ class Partners(commands.Cog):
         
         ..Doc server.html#list-every-partners"""
         f = ['','']
-        lang = await self.bot._(ctx.guild.id,'current_lang','current')
+        lang = await self.bot._(ctx.guild.id,'_used_locale')
         tr_bot = await self.bot._(ctx.guild.id,'keywords','bot')
         tr_guild = await self.bot._(ctx.guild.id,'keywords','server')
         tr_added = await self.bot._(ctx.guild.id,'keywords','added_at')
