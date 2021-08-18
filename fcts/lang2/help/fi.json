@@ -1,0 +1,143 @@
+{
+    "fi": {
+        "aliases": "Lyhenteet",
+        "categories": {
+            "data": "tietoa",
+            "fun": "hauska",
+            "moderation": "valvonta",
+            "other": "muut",
+            "server-settings": "palvelin asetukset",
+            "staff": "bot työntekijät",
+            "translators": "kääntäjä tiimi",
+            "unclassed": "Ei kategoriassa",
+            "users-info": "Käyttäjän tietoa"
+        },
+        "check-desc": {
+            "bot_has_permissions": [
+                "Botilla on riittävästi käyttöoikeuksia",
+                "Botilla ei ole riittävästi käyttöoikeuksia"
+            ],
+            "can_ban": [
+                "Yksi sinun rooleista voi käyttää komentoa (`ban`)",
+                "Sallittu rooli puuttuu (`ban`)"
+            ],
+            "can_clear": [
+                "Yksi sinun rooleista voi käyttää komentoa (`clear`)",
+                "Sallittu rooli puuttuu (`clear`)"
+            ],
+            "can_edit_case": [
+                "Yksi sinun rooleista voi käyttää komentoa (`warn`)",
+                "Sallittu rooli puuttuu (`warn`)"
+            ],
+            "can_kick": [
+                "Yksi sinun rooleista voi käyttää komentoa (`kick`)",
+                "Sallittu rooli puuttuu (`kick`)"
+            ],
+            "can_mute": [
+                "Yksi sinun rooleista voi käyttää komentoa (`mute`)",
+                "Sallittu rooli puuttuu (`mute`)"
+            ],
+            "can_say": [
+                "Sallittu rooli puuttuu (`say`)",
+                "Sallittu rooli puuttuu (`say`)"
+            ],
+            "can_slowmode": [
+                "Yksi sinun rooleista voi käyttää komentoa (`slowmode`)",
+                "Sallittu rooli puuttuu (`slowmode`)"
+            ],
+            "can_use_cookie": [
+                "Olet yksi valituista jotka Aragorn1202 on valinnut.",
+                "Tämä komento on käytössä"
+            ],
+            "can_use_rss": [
+                "Sinulla on 'Järjestelmänvalvoja' käyttöoikeus",
+                "'Järjestelmänvalvoja' käyttöoikeus puuttuu"
+            ],
+            "can_warn": [
+                "Yksi sinun rooleista voi käyttää komentoa (`warn`)",
+                "Sallittu rooli puuttuu (`warn`)"
+            ],
+            "check_admin": [
+                "Sinun täytyy olla botin ylläpitäjä",
+                "Et ole botin ylläpitäjä"
+            ],
+            "database_connected": [
+                "Cancel",
+                "Tietokanta ei ole käytössä"
+            ],
+            "guild_only": [
+                "Voidaan vain käyttää palvelimessa",
+                "Voidaan vain käyttää palvelimessa"
+            ],
+            "has_admin": [
+                "Sinulla on 'Järjestelmänvalvoja' käyttöoikeus",
+                "'Järjestelmänvalvoja' käyttöoikeus puuttuu"
+            ],
+            "has_embed_links": [
+                "Sinulla on 'Upota linkkejä' käyttöoikeus",
+                "Sinulla täytyy olla 'Upota linkkejä' käyttöoikeus"
+            ],
+            "has_manage_guild": [
+                "Sinulla on 'Hallinnoi palvelinta' käyttöoikeus",
+                "'Hallinnoi palvelinta' käyttöoikeus puuttuu"
+            ],
+            "has_manage_msg": [
+                "Sinulla on 'Hallinnoi viestejä' käyttöoikeus",
+                "'Hallinnoi viestejä' käyttöoikeus puuttuu"
+            ],
+            "has_manage_nicknames": [
+                "Sinulla on 'Hallinnoi nimimerkkejä' käyttöoikeus",
+                "'Hallinnoi nimimerkkejä' käyttöoikeus puuttuu"
+            ],
+            "has_manage_roles": [
+                "Sinulla on 'Hallinnoi rooleja' käyttöoikeus",
+                "'Hallinnoi rooleja' käyttooikeus puuttuu"
+            ],
+            "has_permissions": [
+                "Sinulla on riittävästi käyttöoikeuksia",
+                "Sinulla ei ole riittävästi käyttöoikeuksia"
+            ],
+            "is_fun_enabled": [
+                "Hauska komennot on nyt päällä",
+                "Hauska komennot täytyy olla kytketty päälle"
+            ],
+            "is_halloween": [
+                "Halloween tapahtuma on täällä!",
+                "Halloween tapahtumia ei tällä hetkellä ole"
+            ],
+            "is_owner": [
+                "Sinun täytyy olla botin omistaja",
+                "Sinä et ole botin omistaja"
+            ],
+            "is_support_staff": [
+                "Sinä olet jäsen botin järjestelmänvalvojista",
+                "Sinun täytyy olla jäsen botin järjestelmänvalvojista"
+            ],
+            "is_translator": [
+                "Olet osa kääntäjien tiimiä",
+                "Sinun on oltava osa kääntäjätiimiä"
+            ],
+            "is_ttt_enabled": [
+                "Ristinolla peli on käytössä",
+                "Ristinolla peli täytyy laittaa käyttöön tällä palvelimella"
+            ],
+            "verify_role_exists": [
+                "Vahvistus rooli on asetettu",
+                "Vahvistus roolia ei ole asetettu"
+            ]
+        },
+        "cmd-count": "%{nbr} komentoa",
+        "cmd-not-found": "Komentoa  \"%{cmd}\" ei ole nimetty",
+        "description": "Kuvaus",
+        "embed_title": "Käytettävissä olevat komennot käyttäjälle %{u}",
+        "embed_title_dm": "Yksityisviesteissä toimivat komennot",
+        "footer": "Viestitä {}help komento niin saat lisätietoja tietyistä komennoista",
+        "no-desc-cmd": "Ei lisätietoja tästä komennosta.",
+        "no-desc-cog": "Ei lisätietoja tästä cog:stä.",
+        "no-subcmd": "komenolla `%{cmd}`ei ole toissijaista komentoa",
+        "not-enabled": ":warning: Tämä komento ei ole käytössä",
+        "subcmd-not-found": "Tällä komennolla ei ole toissijaista komentoa nimetty. \"%{name}\"",
+        "subcmds": "Toissijaiset komennot",
+        "warning": "Varoitukset"
+    }
+}
