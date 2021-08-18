@@ -164,7 +164,7 @@ def main():
 
     async def sigterm_handler(bot):
         print("SIGTERM received. Disconnecting...")
-        await bot.logout()
+        await bot.close()
     
     asyncio.get_event_loop().add_signal_handler(SIGTERM, lambda: asyncio.ensure_future(sigterm_handler(client)))
 
