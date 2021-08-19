@@ -453,7 +453,7 @@ class Admin(commands.Cog):
                     continue
                 try:
                     if server.owner not in owners:
-                        await server.owner.send(await self.bot._(server,"admin","emergency"))
+                        await server.owner.send(await self.bot._(server,"admin.emergency"))
                         owners.append(server.owner)
                     await server.leave()
                     servers +=1
