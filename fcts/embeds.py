@@ -98,7 +98,7 @@ class Embeds(commands.Cog):
             # self.footer_text = "Requested by {}".format(user.name)
             if user is None:
                 user = ctx.author
-            self.footer_text = await ctx.bot.get_cog("Languages").tr(ctx.channel,"keywords", "request_by", user=user.name)
+            self.footer_text = await ctx.bot._(ctx.channel, "misc.request_by", user=user.name)
             self.footer_url = user.avatar_url_as(format='png',size=256)
             return self
 

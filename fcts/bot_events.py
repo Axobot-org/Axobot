@@ -126,7 +126,7 @@ class BotEvents(commands.Cog):
         events_desc = data[lang]['events-desc']
 
         if not current_event in events_desc.keys():
-            await ctx.send(events_desc["nothing"])
+            await ctx.send(await self.bot._(ctx.channel, "bot_events.nothing-desc"))
             return
         if user is None:
             user = ctx.author
