@@ -1,0 +1,14 @@
+{
+    "fr2": {
+        "nothing-desc": "Il n'y a aucun événement en cours :neutral_face: Suis les news du bot pour connaître la date du prochain !",
+        "events-price-title": "Le super prix délirant de la mort qui tue",
+        "nothing-prices": "Il n'y a rien à gagner pour cet événement :confused:\nFaut qu'on refasse des choses, nous.",
+        "objectives": "Objectifs",
+        "points": "points",
+        "rank-global": "Classement mondial",
+        "rank-title": "Points de l'événement",
+        "rank-total": "Total des points",
+        "unclassed": "Pas classé !",
+        "xp-howto": "Tu peux gagner des points d'évènement en gagnant des parties de morpion (commande `ttt`), en utilisant la commande d'évent quand elle est dispo, ou en faisant d'autres trucs sympas.\nHésite pas à venir voir le support pour plus d'infos !"
+    }
+}
