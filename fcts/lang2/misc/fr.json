@@ -1,0 +1,43 @@
+{
+    "fr": {
+        "added_at": "Ajouté le",
+        "beginning": "début",
+        "bot": "bot",
+        "case": "casier",
+        "category": "catégorie",
+        "click_here": "Cliquez ici",
+        "since": "depuis",
+        "dnd": "ne pas déranger",
+        "doc": "Documentation",
+        "duration": "durée",
+        "end": "fin",
+        "example": "exemple",
+        "extreme": "extrême",
+        "ghost": "Fantôme",
+        "high": "élevé",
+        "idle": "inactif",
+        "low": "faible",
+        "medium": "moyen",
+        "member": "membre",
+        "membres": "membres",
+        "name": "nom",
+        "no": "non",
+        "none": "aucun",
+        "offline": "hors ligne",
+        "online": "en ligne",
+        "yes": "oui",
+        "reason": "raison",
+        "request_by": "Demandé par %{user}",
+        "server": "serveur",
+        "servers": "serveurs",
+        "unknown": "Inconnu",
+        "version": "version",
+        "activity": {
+            "listen": "écoute",
+            "nothing": "rien",
+            "play": "joue à",
+            "stream": "stream",
+            "watch": "regarde"
+        }
+    }
+}
