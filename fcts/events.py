@@ -328,16 +328,16 @@ class Events(commands.Cog):
             if self.bot.zombie_mode:
                 return False
             f_duration = await self.bot.get_cog('TimeUtils').time_delta(task['duration'],lang=await self.bot._(channel,'_used_locale'), form='developed', precision=0)
-            t = (await self.bot._(channel, "fun", "reminds-title")).capitalize()
-            foot = await self.bot._(channel, "fun", "reminds-date")
+            t = (await self.bot._(channel, "timers.rmd.embed-title")).capitalize()
+            foot = await self.bot._(channel, "timers.rmd.embed-date")
             imgs = re.findall(r'(https://\S+\.(?:png|jpe?g|webp|gif))', task['message'])
             img = imgs[0] if len(imgs)==1 else ""
             if task['data'] is not None:
                 task['data'] = json.loads(task['data'])
                 if 'msg_url' in task['data']:
-                    task["message"] += "\n\n[{}]({})".format(await self.bot._(channel, "fun", "reminds-link"), task['data']['msg_url'])
+                    task["message"] += "\n\n[{}]({})".format(await self.bot._(channel, "timers.rmd.embed-link"), task['data']['msg_url'])
             emb = self.bot.get_cog("Embeds").Embed(title=t, desc=task["message"], color=4886754, time=task["utc_begin"], footer_text=foot, image=img)
-            msg = await self.bot._(channel, "fun", "reminds-asked", user=user.mention, duration=f_duration)
+            msg = await self.bot._(channel, "timers.rmd.embed-asked", user=user.mention, duration=f_duration)
             await channel.send(msg, embed=emb)
         except discord.errors.Forbidden:
             return False

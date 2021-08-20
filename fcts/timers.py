@@ -55,10 +55,10 @@ class Timers(commands.Cog):
         """
         duration = sum(duration)
         if duration < 1:
-            await ctx.send(await self.bot._(ctx.channel, "fun", "reminds-too-short"))
+            await ctx.send(await self.bot._(ctx.channel, "timers.rmd.too-short"))
             return
         if duration > 60*60*24*365*5:
-            await ctx.send(await self.bot._(ctx.channel, "fun", "reminds-too-long"))
+            await ctx.send(await self.bot._(ctx.channel, "timers.rmd.too-long"))
             return
         f_duration = await ctx.bot.get_cog('TimeUtils').time_delta(duration,lang=await self.bot._(ctx.channel,'_used_locale'), year=True, form='developed', precision=0)
         try:
@@ -67,7 +67,7 @@ class Timers(commands.Cog):
         except Exception as e:
             await ctx.bot.get_cog("Errors").on_command_error(ctx,e)
         else:
-            await ctx.send(await self.bot._(ctx.channel, "fun", "reminds-saved", duration=f_duration))
+            await ctx.send(await self.bot._(ctx.channel, "timers.rmd.saved", duration=f_duration))
 
 
     @remind_main.command(name="list")
@@ -82,9 +82,9 @@ class Timers(commands.Cog):
         query = (f"SELECT *, CONVERT_TZ(`begin`, @@session.time_zone, '+00:00') AS `utc_begin` FROM `timed` WHERE user={ctx.author.id} AND action='timer'")
         cursor.execute(query)
         if cursor.rowcount == 0:
-            await ctx.send(await self.bot._(ctx.channel, "timers", "rmd-empty"))
+            await ctx.send(await self.bot._(ctx.channel, "timers.rmd.empty"))
             return
-        txt = await self.bot._(ctx.channel, "timers", "rmd-item")
+        txt = await self.bot._(ctx.channel, "timers.rmd.item")
         time_delta = self.bot.get_cog("TimeUtils").time_delta
         lang = await self.bot._(ctx.channel, '_used_locale')
         liste = list()
@@ -109,10 +109,10 @@ class Timers(commands.Cog):
             else:
                 desc = "\n".join(liste)
                 fields = None
-            emb = ctx.bot.get_cog("Embeds").Embed(title=await self.bot._(ctx.channel, "timers", "rmd-title"), desc=desc, fields=fields, color=16108042)
+            emb = ctx.bot.get_cog("Embeds").Embed(title=await self.bot._(ctx.channel, "timers.rmd.title"), desc=desc, fields=fields, color=16108042)
             await ctx.send(embed=emb)
         else:
-            t = "**"+await self.bot._(ctx.channel, "timers", "rmd-title")+"**\n\n"
+            t = "**"+await self.bot._(ctx.channel, "timers.rmd.title")+"**\n\n"
             await ctx.send(t+"\n".join(liste))
     
     @remind_main.command(name="delete", aliases=["remove", "del"])
@@ -130,7 +130,7 @@ class Timers(commands.Cog):
         query = (f"SELECT ID, message FROM `timed` WHERE user={ctx.author.id} AND action='timer' AND ID={ID}")
         cursor.execute(query)
         if cursor.rowcount == 0:
-            await ctx.send(await self.bot._(ctx.channel, "timers", "rmd-empty"))
+            await ctx.send(await self.bot._(ctx.channel, "timers.rmd.empty"))
             return
         item = list(cursor)[0]
         cursor.close()
@@ -138,7 +138,7 @@ class Timers(commands.Cog):
         ctx2.message.content = item["message"]
         item["message"] = (await commands.clean_content(fix_channel_mentions=True).convert(ctx2, item["message"])).replace("`", "\\`")
         await self.bot.get_cog("Events").remove_task(item["ID"])
-        await ctx.send(await self.bot._(ctx.channel, "timers", "rmd-deleted", id=item["ID"], message=item["message"]))
+        await ctx.send(await self.bot._(ctx.channel, "timers.rmd.deleted", id=item["ID"], message=item["message"]))
     
     @remind_main.command(name="clear")
     @commands.cooldown(3, 45, commands.BucketType.user)
@@ -147,7 +147,7 @@ class Timers(commands.Cog):
         
         ..Doc miscellaneous.html#clear-every-reminders"""
         if not (ctx.guild is None or ctx.channel.permissions_for(ctx.guild.me).add_reactions):
-            await ctx.send(await self.bot._(ctx.channel, "fun", "cant-react"))
+            await ctx.send(await self.bot._(ctx.channel, "fun.cant-react"))
             return
         cnx = self.bot.cnx_frm
         cursor = cnx.cursor(dictionary=True)
@@ -155,9 +155,9 @@ class Timers(commands.Cog):
         cursor.execute(query, (ctx.author.id,))
         count = list(cursor)[0]['count']
         if count == 0:
-            await ctx.send(await self.bot._(ctx.channel, "timers", "rmd-empty"))
+            await ctx.send(await self.bot._(ctx.channel, "timers.rmd.empty"))
             return
-        msg = await ctx.send(await self.bot._(ctx.channel, "timers", "rmd-confirm", count=count))
+        msg = await ctx.send(await self.bot._(ctx.channel, "timers.rmd.confirm", count=count))
         await msg.add_reaction('✅')
         await msg.add_reaction('❌')
         
@@ -167,17 +167,17 @@ class Timers(commands.Cog):
             reaction, user = await self.bot.wait_for('reaction_add', timeout=30.0, check=check)
         except asyncio.TimeoutError:
             cursor.close()
-            await ctx.send(await self.bot._(ctx.channel, 'timers', 'rmd-cancelled'))
+            await ctx.send(await self.bot._(ctx.channel, "timers.rmd.cancelled"))
             return
         if str(reaction.emoji) == '❌':
             cursor.close()
-            await ctx.send(await self.bot._(ctx.channel, 'timers', 'rmd-cancelled'))
+            await ctx.send(await self.bot._(ctx.channel, "timers.rmd.cancelled"))
             return
         query = "DELETE FROM `timed` WHERE action='timer' AND user=%s"
         cursor.execute(query, (ctx.author.id,))
         cnx.commit()
         cursor.close()
-        await ctx.send(await self.bot._(ctx.channel, 'timers', 'rmd-cleared'))
+        await ctx.send(await self.bot._(ctx.channel, "timers.rmd.cleared"))
 
 
 def setup(bot: commands.Bot):
