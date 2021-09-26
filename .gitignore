@@ -9,6 +9,7 @@ fcts/requirements
 fcts/secret.py
 backup/*
 start2.py
+env/
 
 # Mac folders
 .DS_Store
