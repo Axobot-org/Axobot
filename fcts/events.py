@@ -221,7 +221,7 @@ class Events(commands.Cog):
             return
         # d = datetime.datetime.utcnow() - (await msg.channel.history(limit=2).flatten())[1].created_at
         # if d.total_seconds() > 600:
-        await msg.channel.send(await self.bot._(msg.channel,"events","mp-adv"))
+        await msg.channel.send(await self.bot._(msg.channel,"events.mp-adv"))
 
     async def check_owner_server(self, owner: discord.User):
         """Check if a server owner should get/loose the server owner role in support server"""
