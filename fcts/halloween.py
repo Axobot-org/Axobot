@@ -242,9 +242,9 @@ __29 variations: __
             points = randint(*self.hourly_reward)
             await self.bot.get_cog("Utilities").add_user_eventPoint(ctx.author.id, points)
             self.db_add_points(ctx.author.id, points)
-            txt = await self.bot._(ctx.channel, "halloween", "got-points", pts=points)
+            txt = await self.bot._(ctx.channel, "halloween.daily.got-points", pts=points)
         else:
-            txt = await self.bot._(ctx.channel, "halloween", "too-quick")
+            txt = await self.bot._(ctx.channel, "halloween.daily.too-quick")
         if ctx.can_send_embed:
             title = "Halloween event"
             emb = discord.Embed(title=title, description=txt, color=discord.Color.orange())

@@ -1,0 +1,8 @@
+{
+    "fi": {
+        "daily": {
+            "got-points": "Onneksi olkoon! Sait juuri **{pts} tapahtuma pistettä**!",
+            "too-quick": "Olet hieman liian ajoissa! Voit vaan saada tapahtuma pisteitä kerran tunnissa."
+        }
+    }
+}

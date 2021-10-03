@@ -237,7 +237,7 @@ __29 variations: __
             points = randint(*self.hourly_reward)
             await self.bot.get_cog("Utilities").add_user_eventPoint(ctx.author.id, points)
             self.db_add_points(ctx.author.id, points)
-            txt = await self.bot._(ctx.channel, "halloween", "got-points", pts=points)
+            txt = await self.bot._(ctx.channel, "halloween.daily.got-points", pts=points)
         else:
             lang = await self.bot._(ctx.channel, '_used_locale')
             remaining = await self.bot.get_cog("TimeUtils").time_delta(-time_since_available, lang=lang)
