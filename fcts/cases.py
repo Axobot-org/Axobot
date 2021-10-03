@@ -6,7 +6,7 @@ from fcts import args, reloads
 importlib.reload(args)
 
 
-async def can_edit_case(ctx):
+async def can_edit_case(ctx: MyContext):
         if await ctx.bot.get_cog('Admin').check_if_admin(ctx.author):
             return True
         if ctx.bot.database_online:
@@ -22,7 +22,7 @@ class Cases(commands.Cog):
         self.file = "cases"
         if bot.user is not None:
             self.table = 'cases_beta' if bot.beta else 'cases'
-    
+
     @commands.Cog.listener()
     async def on_ready(self):
         self.table = 'cases_beta' if self.bot.beta else 'cases'
@@ -37,36 +37,40 @@ class Cases(commands.Cog):
             self.mod = ModID
             self.reason = Reason
             self.duration = duration
-            if date is None:
-                self.date = "Unknown"
-            else:
-                self.date = date
+            self.date = date
 
-        async def display(self, display_guild: bool=False):
-            u = self.bot.get_user(self.user)
+        async def display(self, display_guild: bool=False) -> str:
+            u: discord.User = self.bot.get_user(self.user)
             if u is None:
                 u = self.user
             else:
                 u = u.mention
-            g = self.bot.get_guild(self.guild)
+            g: discord.Guild = self.bot.get_guild(self.guild)
             if g is None:
                 g = self.guild
             else:
                 g = g.name
-            text = "**Case {}**".format(self.id)
+            text = await self.bot._(self.guild, "cases.title-search", ID=self.id)
+            # add guild name if needed
             if display_guild:
-                text += "\n**Guild:** {}".format(g)
-            text += """
-**Type:** {}
-**User:** {}
-**Moderator:** {}
-**Date:** {}
-**Reason:** *{}*""".format(self.type,u,self.mod,self.date,self.reason)
+                text += await self.bot._(self.guild, "cases.display.guild", data=g)
+            # add fields
+            for key, value in (
+                ("type", self.type),
+                ("user", u),
+                ("moderator", self.mod),
+                ("date", self.date or self.bot._(self.guild, "misc.unknown")),
+                ("reason", self.reason)):
+                text += await self.bot._(self.guild, "cases.display."+key, data=value)
+            # add duration if exists
             if self.duration is not None and self.duration > 0:
-                text += "\nDuration: {}".format(await self.bot.get_cog('TimeUtils').time_delta(self.duration,lang='en',form='temp'))
+                cog = await self.bot.get_cog('TimeUtils')
+                if cog is not None:
+                    lang = await self.bot._(self.guild, "_used_locale")
+                    text += await self.bot._(self.guild, "cases.display.duration", data=cog.time_delta(self.duration,lang=lang,form='temp'))
             return text
 
-    async def get_case(self, columns=[], criters=["1"], relation="AND"):
+    async def get_case(self, columns=[], criters=["1"], relation="AND") -> typing.Optional[list[Case]]:
         """return every cases"""
         if not self.bot.database_online:
             return None
@@ -89,7 +93,7 @@ class Cases(commands.Cog):
             for x in cursor:
                 liste.append(x)
         return liste
-    
+
     async def get_nber(self, userID:int, guildID:int):
         """Get the number of users infractions"""
         try:
@@ -120,7 +124,7 @@ class Cases(commands.Cog):
         cnx.commit()
         cursor.close()
         return True
-    
+
     async def add_case(self, case):
         """add a new case to the db"""
         if not self.bot.database_online:
@@ -174,9 +178,9 @@ class Cases(commands.Cog):
         
         ..Doc moderator.html#view-list"""
         if not self.bot.database_online:
-            return await ctx.send(await self.bot._(ctx.guild.id,'cases','no_database'))
+            return await ctx.send(await self.bot._(ctx.guild.id,'cases.no_database'))
         await self.see_case_main(ctx,ctx.guild.id,user.id)
-    
+
     @case_main.command(name="glist")
     @commands.guild_only()
     @commands.check(reloads.is_support_staff)
@@ -188,15 +192,15 @@ class Cases(commands.Cog):
         
         ..Example cases glist someone"""
         if not self.bot.database_online:
-            return await ctx.send(await self.bot._(ctx.guild.id,'cases','no_database'))
+            return await ctx.send(await self.bot._(ctx.guild.id,'cases.no_database'))
         await self.see_case_main(ctx, guild.id if guild else None, user.id)
         
     async def see_case_main(self, ctx: MyContext, guild:discord.Guild, user:discord.User):
         if guild is not None:
             criters = ["`user`='{}'".format(user),"guild='{}'".format(guild)]
-            syntax = await self.bot._(ctx.guild,'cases','list-0')  
+            syntax: str = await self.bot._(ctx.guild,'cases.list-0')  
         else:
-            syntax = await self.bot._(ctx.guild,'cases','list-1')
+            syntax: str = await self.bot._(ctx.guild,'cases.list-1')
             criters = ["`user`='{}'".format(user)]
         try:
             MAX_CASES = 60
@@ -207,7 +211,7 @@ class Cases(commands.Cog):
             u = self.bot.get_user(user)
             e = -1
             if len(cases) == 0:
-                await ctx.send(await self.bot._(ctx.guild.id, "cases", "no-case"))
+                await ctx.send(await self.bot._(ctx.guild.id, "cases.no-case"))
                 return
             if ctx.can_send_embed:
                 last_case = e = total_nbr if len(cases) > 0 else 0
@@ -221,33 +225,33 @@ class Cases(commands.Cog):
                     l = await self.bot._(ctx.guild.id,'_used_locale')
                     for x in cases:
                         e -= 1
-                        g = self.bot.get_guild(x.guild)
+                        g: discord.Guild = self.bot.get_guild(x.guild)
                         if g is None:
                             g = x.guild
                         else:
                             g = g.name
-                        m = self.bot.get_user(x.mod)
+                        m: discord.Member = self.bot.get_user(x.mod)
                         if m is None:
                             m = x.mod
                         else:
                             m = m.mention
                         text = syntax.format(G=g,T=x.type,M=m,R=x.reason,D=await self.bot.get_cog('TimeUtils').date(x.date,lang=l,year=True,digital=True))
                         if x.duration is not None and x.duration > 0:
-                            text += await self.bot._(ctx.guild.id,'cases','list-2', D = await self.bot.get_cog('TimeUtils').time_delta(x.duration,lang=l,year=False,form='temp'))
-                        embed.add_field(name="Case #{}".format(x.id), value=text, inline=False)
+                            text += "\n" + await self.bot._(ctx.guild.id,'cases.display.duration', data=await self.bot.get_cog('TimeUtils').time_delta(x.duration,lang=l,year=False,form='temp'))
+                        embed.add_field(name=await self.bot._(ctx.guild.id, "cases.title-search", ID=x.id), value=text, inline=False)
                         if len(embed.fields) == 20:
-                            embed.title = str(await self.bot._(ctx.guild.id,"cases","cases-0")).format(total_nbr, e+1, last_case)
+                            embed.title = await self.bot._(ctx.guild.id,"cases.cases-0", nbr=total_nbr, start=e+1, end=last_case)
                             await ctx.send(embed=embed)
                             embed.clear_fields()
                             last_case = e
                 if len(embed.fields) > 0:
-                    embed.title = str(await self.bot._(ctx.guild.id,"cases","cases-0")).format(total_nbr, e+1, last_case)
+                    embed.title = await self.bot._(ctx.guild.id,"cases.cases-0", nbr=total_nbr, start=e+1, end=last_case)
                     await ctx.send(embed=embed)
             else:
                 if len(cases) > 0:
-                    text = str(await self.bot._(ctx.guild.id,"cases","cases-0")).format(total_nbr, 1, total_nbr)+"\n"
-                    for e,x in enumerate(cases):
-                        text += "```{}\n```".format(await x.display(True).replace('*',''))
+                    text = await self.bot._(ctx.guild.id,"cases.cases-0", nbr=total_nbr, start=1, end=total_nbr) + "\n"
+                    for e, x in enumerate(cases):
+                        text += "```{}\n```".format((await x.display(True)).replace('*',''))
                         if len(text) > 1800:
                             await ctx.send(text)
                             text = ""
@@ -266,7 +270,7 @@ class Cases(commands.Cog):
         
         ..Doc moderator.html#edit-reason"""
         if not self.bot.database_online:
-            return await ctx.send(await self.bot._(ctx.guild.id,'cases','no_database'))
+            return await ctx.send(await self.bot._(ctx.guild.id,'cases.no_database'))
         try:
             c = ["ID="+str(case)]
             if not await self.bot.get_cog('Admin').check_if_admin(ctx.author):
@@ -276,14 +280,14 @@ class Cases(commands.Cog):
             await self.bot.get_cog("Errors").on_error(e,None)
             return
         if len(cases)!=1:
-            await ctx.send(await self.bot._(ctx.guild.id,"cases","not-found"))
+            await ctx.send(await self.bot._(ctx.guild.id,"cases.not-found"))
             return
         case = cases[0]
         old_reason = case.reason
         case.reason = reason
         await self.update_reason(case)
-        await ctx.send(str(await self.bot._(ctx.guild.id,"cases","reason-edited")).format(case.id))
-        log = await self.bot._(ctx.guild.id,"logs","case-reason",old=old_reason,new=case.reason,id=case.id)
+        await ctx.send(await self.bot._(ctx.guild.id,"cases.reason-edited", ID=case.id))
+        log = await self.bot._(ctx.guild.id,"logs.case-reason",old=old_reason,new=case.reason,id=case.id)
         await self.bot.get_cog("Events").send_logs_per_server(ctx.guild,"case-edit",log,ctx.author)
     
     @case_main.command(name="search")
@@ -295,7 +299,7 @@ class Cases(commands.Cog):
         
         ..Doc moderator.html#search-for-a-case"""
         if not self.bot.database_online:
-            return await ctx.send(await self.bot._(ctx.guild.id,'cases','no_database'))
+            return await ctx.send(await self.bot._(ctx.guild.id,'cases.no_database'))
         try:
             isSupport = await reloads.is_support_staff(ctx)
             c = ["ID="+str(case)]
@@ -306,28 +310,28 @@ class Cases(commands.Cog):
             await self.bot.get_cog("Errors").on_error(e,ctx)
             return
         if len(cases)!=1:
-            await ctx.send(await self.bot._(ctx.guild.id,"cases","not-found"))
+            await ctx.send(await self.bot._(ctx.guild.id,"cases.not-found"))
             return
         if not ctx.can_send_embed:
-            await ctx.send(await self.bot._(ctx.guild.id,"mc","cant-embed"))
+            await ctx.send(await self.bot._(ctx.guild.id,"minecraft.cant-embed"))
             return
         try:
             case = cases[0]
             user = await self.bot.fetch_user(case.user)
             mod = await self.bot.fetch_user(case.mod)
             u = "{} ({})".format(user,user.id)
-            title = str(await self.bot._(ctx.guild.id,"cases","title-search")).format(case.id)
-            l = await self.bot._(ctx.guild.id,'_used_locale')
+            title = await self.bot._(ctx.guild.id,"cases.title-search", ID=case.id)
+            l = await self.bot._(ctx.guild.id, '_used_locale')
             # main structure
             if not isSupport:
                 guild = ctx.guild.name
-                _msg = await self.bot._(ctx.guild.id,'cases','search-0')
+                _msg = await self.bot._(ctx.guild.id,'cases.search-0')
             else: # if support: add guild
                 guild = "{0.name} ({0.id})".format(self.bot.get_guild(case.guild))
-                _msg = await self.bot._(ctx.guild.id,'cases','search-1')
+                _msg = await self.bot._(ctx.guild.id,'cases.search-1')
             # add duration
             if case.duration is not None and case.duration > 0:
-                _msg += await self.bot._(ctx.guild.id,'cases','list-2', D=await self.bot.get_cog('TimeUtils').time_delta(case.duration,lang=l,year=False,form='temp'))
+                _msg += await self.bot._(ctx.guild.id,'cases.display.duration', data=await self.bot.get_cog('TimeUtils').time_delta(case.duration,lang=l,year=False,form='temp'))
             # format date
             _date = await self.bot.get_cog('TimeUtils').date(case.date,lang=l,year=True,digital=True)
             # finish message
@@ -349,7 +353,7 @@ class Cases(commands.Cog):
         
         ..Doc moderator.html#remove-case"""
         if not self.bot.database_online:
-            return await ctx.send(await self.bot._(ctx.guild.id,'cases','no_database'))
+            return await ctx.send(await self.bot._(ctx.guild.id,'cases.no_database'))
         try:
             c = ["ID="+str(case)]
             if not await self.bot.get_cog('Admin').check_if_admin(ctx.author):
@@ -359,15 +363,15 @@ class Cases(commands.Cog):
             await self.bot.get_cog("Errors").on_error(e,None)
             return
         if len(cases)!=1:
-            await ctx.send(await self.bot._(ctx.guild.id,"cases","not-found"))
+            await ctx.send(await self.bot._(ctx.guild.id,"cases.not-found"))
             return
         case = cases[0]
         await self.delete_case(case['ID'])
-        await ctx.send(str(await self.bot._(ctx.guild.id,"cases","deleted")).format(case['ID']))
+        await ctx.send(await self.bot._(ctx.guild.id,"cases.deleted", ID=case['ID']))
         user = ctx.bot.get_user(case['user'])
         if user is None:
             user = case['user']
-        log = await self.bot._(ctx.guild.id,"logs","case-del",id=case['ID'],user=str(user))
+        log = await self.bot._(ctx.guild.id,"logs.case-del",id=case['ID'],user=str(user))
         await self.bot.get_cog("Events").send_logs_per_server(ctx.guild,"case-edit",log,ctx.author)
 
 
