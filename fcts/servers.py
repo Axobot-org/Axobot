@@ -330,7 +330,7 @@ class Servers(commands.Cog):
         if not (ctx.channel.permissions_for(ctx.author).manage_guild or await self.bot.get_cog("Admin").check_if_god(ctx)):
             return await ctx.send(await self.bot._(ctx.guild.id,"server","need-manage-server"))
         if not ctx.bot.database_online:
-            return await ctx.send(await self.bot._(ctx.guild.id,"cases","no_database"))
+            return await ctx.send(await self.bot._(ctx.guild.id,"cases.no_database"))
         await self.sconfig_del2(ctx,option)
     
     @sconfig_main.command(name="change")
@@ -340,7 +340,7 @@ class Servers(commands.Cog):
         if not (ctx.channel.permissions_for(ctx.author).manage_guild or await self.bot.get_cog("Admin").check_if_god(ctx)):
             return await ctx.send(await self.bot._(ctx.guild.id,"server","need-manage-server"))
         if not ctx.bot.database_online:
-            return await ctx.send(await self.bot._(ctx.guild.id,"cases","no_database"))
+            return await ctx.send(await self.bot._(ctx.guild.id,"cases.no_database"))
         if value == 'del':
             await self.sconfig_del2(ctx,option)
             return
@@ -953,7 +953,7 @@ class Servers(commands.Cog):
     async def sconfig_see(self, ctx: MyContext, option=None):
         """Displays the value of an option, or all options if none is specified"""
         if not ctx.bot.database_online:
-            return await ctx.send(await self.bot._(ctx.guild.id,"cases","no_database"))
+            return await ctx.send(await self.bot._(ctx.guild.id,"cases.no_database"))
         await self.send_see(ctx.guild,ctx.channel,option,ctx.message,ctx)
         
     async def send_see(self, guild: discord.Guild, channel: discord.TextChannel, option: str, msg: discord.Message, ctx: MyContext):

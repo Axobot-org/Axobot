@@ -385,7 +385,7 @@ Every information come from the website www.fr-minecraft.net"""
 
         ..Doc minecraft.html#mc"""
         if not ctx.bot.database_online:
-            return await ctx.send(await self.bot._(ctx.guild.id, "cases", "no_database"))
+            return await ctx.send(await self.bot._(ctx.guild.id, "cases.no_database"))
         if ":" in ip and port is None:
             i = ip.split(":")
             ip, port = i[0], i[1]
