@@ -1,0 +1,25 @@
+{
+    "fr": {
+        "ban": "{user} ({userid}) a été banni du serveur",
+        "case-del": "Le casier #{id} a été supprimé (concernant {user})",
+        "case-reason": "Le casier #{id} a été édité : \n`Ancienne raison:` {old}\n`Nouvelle raison:` {new}",
+        "clear": "{number} messages supprimés dans {channel}",
+        "reason": {
+            "autounmute": "unmute automatique",
+            "invite": "Automod (invitation Discord)",
+            "memberchan": "Action automatique (config membercount)",
+            "unban": "unban par {user}",
+            "unmute": "unmute par {user}",
+            "welcome_roles": "Action automatique (config welcome_roles)",
+            "young": "Automod (compte trop récent)"
+        },
+        "kick": "{user} ({userid}) a été expulsé du serveur",
+        "mute": "{user} ({userid}) est maintenant muet",
+        "slowmode-disabled": "Slowmode désactivé dans le salon {channel}",
+        "slowmode-enabled": "Slowmode activé dans le salon {channel} ({seconds}s)",
+        "softban": "{user} ({userid}) a été 'softban'",
+        "unban": "{user} ({userid}) n'est plus banni de ce serveur",
+        "unmute": "{user} ({userid}) n'est plus muet",
+        "warn": "{user} ({userid}) a reçu un avertissement"
+    }
+}

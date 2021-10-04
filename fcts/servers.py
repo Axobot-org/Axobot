@@ -1115,7 +1115,7 @@ class Servers(commands.Cog):
             if ch.name == text:
                 return
             try:
-                await ch.edit(name=text,reason=await self.bot._(guild.id,"logs","d-memberchan"))
+                await ch.edit(name=text, reason=await self.bot._(guild.id,"logs.reason.memberchan"))
                 self.membercounter_pending[guild.id] = round(time.time()) + 5*60 # cooldown 5min
                 return True
             except Exception as e:

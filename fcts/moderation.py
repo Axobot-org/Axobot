@@ -45,7 +45,7 @@ Slowmode works up to one message every 6h (21600s)
             #await ctx.bot.http.request(discord.http.Route('PATCH', '/channels/{cid}', cid=ctx.channel.id), json={'rate_limit_per_user':0})
             await ctx.channel.edit(slowmode_delay=0)
             message = await self.bot._(ctx.guild.id,"modo","slowmode-0")
-            log = str(await self.bot._(ctx.guild.id,"logs","slowmode-disabled")).format(channel=ctx.channel.mention)
+            log = await self.bot._(ctx.guild.id,"logs.slowmode-disabled", channel=ctx.channel.mention)
             await self.bot.get_cog("Events").send_logs_per_server(ctx.guild,"slowmode",log,ctx.author)
         elif type(time)==int:
             if time>21600:
@@ -54,7 +54,7 @@ Slowmode works up to one message every 6h (21600s)
                 #await ctx.bot.http.request(discord.http.Route('PATCH', '/channels/{cid}', cid=ctx.channel.id), json={'rate_limit_per_user':time})
                 await ctx.channel.edit(slowmode_delay=time)
                 message = str(await self.bot._(ctx.guild.id,"modo","slowmode-2")).format(ctx.channel.mention,time)
-                log = str(await self.bot._(ctx.guild.id,"logs","slowmode-enabled")).format(channel=ctx.channel.mention,seconds=time)
+                log = await self.bot._(ctx.guild.id,"logs.slowmode-enabled", channel=ctx.channel.mention,seconds=time)
                 await self.bot.get_cog("Events").send_logs_per_server(ctx.guild,"slowmode",log,ctx.author)
         else:
             message = await self.bot._(ctx.guild.id,"modo","slowmode-3")
@@ -154,7 +154,7 @@ Slowmode works up to one message every 6h (21600s)
             deleted = await ctx.channel.purge(limit=number, check=check)
             await ctx.send(str(await self.bot._(ctx.guild,"modo","clear-0")).format(len(deleted)),delete_after=2.0)
             if len(deleted) > 0:
-                log = str(await self.bot._(ctx.guild.id,"logs","clear")).format(channel=ctx.channel.mention,number=len(deleted))
+                log = await self.bot._(ctx.guild.id,"logs.clear", channel=ctx.channel.mention, number=len(deleted))
                 await self.bot.get_cog("Events").send_logs_per_server(ctx.guild,"clear",log,ctx.author)
         except Exception as e:
             await self.bot.get_cog('Errors').on_command_error(ctx,e)
@@ -166,7 +166,7 @@ Slowmode works up to one message every 6h (21600s)
             await ctx.message.delete()
             deleted = await ctx.channel.purge(limit=number, check=check)
             await ctx.send(str(await self.bot._(ctx.guild,"modo","clear-0")).format(len(deleted)),delete_after=2.0)
-            log = str(await self.bot._(ctx.guild.id,"logs","clear")).format(channel=ctx.channel.mention,number=len(deleted))
+            log = await self.bot._(ctx.guild.id,"logs.clear", channel=ctx.channel.mention, number=len(deleted))
             await self.bot.get_cog("Events").send_logs_per_server(ctx.guild,"clear",log,ctx.author)
         except discord.errors.NotFound:
             await ctx.send(await self.bot._(ctx.guild,"modo","clear-nt-found"))
@@ -419,9 +419,9 @@ You can also mute this member for a defined duration, then use the following for
         if role is None or not role in user.roles:
             pass
         elif author == guild.me:
-            await user.remove_roles(role,reason=await self.bot._(guild.id,"logs","d-autounmute"))
+            await user.remove_roles(role,reason=await self.bot._(guild.id,"logs.reason.autounmute"))
         else:
-            await user.remove_roles(role,reason=str(await self.bot._(guild.id,"logs","d-unmute")).format(author))
+            await user.remove_roles(role,reason=await self.bot._(guild.id,"logs.reason.unmute", user=author))
         # send in modlogs
         await self.send_modlogs("unmute", user, author, guild)
         # remove the muted record in the database
@@ -622,7 +622,7 @@ The 'days_to_delete' option represents the number of days worth of messages to d
     async def unban_event(self, guild: discord.Guild, user: discord.User, author: discord.User):
         if not guild.me.guild_permissions.ban_members:
             return
-        reason = str(await self.bot._(guild.id,"logs","d-unban")).format(author)
+        reason = await self.bot._(guild.id,"logs.reason.unban", user=author)
         await guild.unban(user, reason=reason[:512])
         # send in modlogs
         await self.send_modlogs("unban", user, author, guild, reason="Automod")
@@ -1312,7 +1312,7 @@ ID corresponds to the Identifier of the message
         messages.append(message)
         txt = (await self.bot._(ctx.guild.id, "modo", "clear-0")).format(len(messages))
         await ctx.send(txt, delete_after=2.0)
-        log = str(await self.bot._(ctx.guild.id,"logs","clear")).format(channel=message.channel.mention,number=len(messages))
+        log = await self.bot._(ctx.guild.id,"logs.clear", channel=message.channel.mention, number=len(messages))
         await self.bot.get_cog("Events").send_logs_per_server(ctx.guild, "clear", log, ctx.author)
     
 
