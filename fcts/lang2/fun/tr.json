@@ -1,0 +1,87 @@
+{
+    "tr": {
+        "afk": {
+            "afk-done": "Artık AFK'sın",
+            "no-perm": "Hay aksi, Senin takma adını değiştiremiyorum 😕 Hatırlamaya çalışacağım ancak senin afk olduğunu unutabilirim",
+            "afk-user-reason": "Bu üye {reason} nedeniyle AFK",
+            "afk-user-noreason": "Bu kullanıcı AFK!"
+        },
+        "blame-0": "**{user}** için geçerli olan tüm isimlerin listesi",
+        "cant-react": "Tepki göndermek için yeterli iznim yok!",
+        "cookie": "{user}, <@375598088850505728> 'e bir kutu kurabiye ısmarladı! {emoji}",
+        "count": {
+            "counting": "Sayım devam ediyor...",
+            "result-you": "Son {limit} gönderide, sen {x} mesaj gönderdin ({p}%)",
+            "too-much": "Discord'u havaya uçurmak istiyorsun! {e} Açık performans nedenlerinden ötürü, {l} mesaj sınırı getireceğim.",
+            "missing-perms": "Hay aksi, Bu kanal geçmişini okuyamıyorum. Lütfen izinlerimi kontrol et...",
+            "result-user": "Son {limit} mesajda, {user} {x} mesaj gönderdi ({p}%)",
+            "forbidden": "Bu komutu, mesaj geçmişine erişiminizin olmadığı bir kanalda kullanamazsınız"
+        },
+        "error": "Bir hata oluştu: `{err}`",
+        "embed-invalid-image": "Resim olarak girilen URL geçersiz",
+        "fun-list": "Kullanılabilir eğlence komutlarının listesi:",
+        "invalid-city": "Geçersiz şehir 😕",
+        "markdown": "__*Discord'daki* **İşaretleme Kuralları**__\n\n`*italik*` = *italik*\n`__altıçizili__` = __altıçizili__\n`**kalın**` = **kalın**\n`***kalın italik***` = ***kalın italik***\n`~~üstüçizili~~` = ~~üstüçizili~~\n`__*altıçizili italik*__` = __*altıçizili italik*__\n`__**altıçizili kalın**__` = __**altıçizili kalın**__\n`__***altıçizili kalın italik***__` = __***altıçizili kalın italik***__\n`||spoiler||` = ||spoiler||\n> alıntı = `> alıntı`\n\\`kod\\` = `kod`\n yoksaymak için \\\n\nKod blokları için <https://discord.gg/DGahTNn>",
+        "no-database": "Veritabanımız çevrimdışı olduğundan, eğlence komutlarına erişim \"Sunucuyu Yönet\" iznine sahip kişilerle sınırlıdır",
+        "no-embed-perm": "\"Bağlantı Yerleştir\" iznim yok 😕",
+        "no-emoji": "Bu emoji bulunamadı!",
+        "no-fun": "Bu sunucuda eğlence komutları devre dışı bırakıldı. Listelerini görmek için https://zbot.rtfd.io/en/v3/fun.html adresine bakın",
+        "no-reaction": "Tepki eklenemiyor. Lütfen izinlerimi kontrol et...",
+        "no-roll": "Seçenek bulunamadı",
+        "no-say": "Bu kanalda herhangi bir mesaj gönderilemiyor",
+        "no-voicechan": "Bu komutu kullanabilmek için bir vokal kanalında olmalısınız.",
+        "osekour": [
+            "Bekle, filmimi izlemeyi bitiriyorum.",
+            "Geliyoruz! Ama neden artık cevap vermiyorsun? Sahte ölüm yapma!",
+            "Grevimizin sonuna kadar beklememiz gerekecek... Bilmediğini mi söylüyorsun?! Başladığımızdan bu yana iki ay geçti!",
+            "*Kurtarma şu anda kullanılamıyor, lütfen mola sonuna kadar bekleyin*",
+            "*Bu sayı mevcut değil. Lütfen başka bir numarayla tekrar deneyin.*",
+            "*Mevcut hat bakımda. Lütfen 430 saat içerisinde tekrar deneyin.*",
+            "*Mobil planınızın süresi doldu. 86,25€ karşılığında bir tane satın alabilirsiniz*",
+            "Yüzüklerin Efendisi'ni okumayı bitirmek için iki cilt daha, ve ben seninim!",
+            "Tatillerde bizi rahatsız etmediğin için teşekkür ederim",
+            "Üzgünüz, 3'ten fazla kar tanesi var: garajda sıkıştık",
+            "Grevimizin sonuna kadar beklememiz gerekecek... Bilmediğini mi söylüyorsun?! Başladığımızdan bu yana iki ay geçti!"
+        ],
+        "piece-0": [
+            "Kuyruklar!",
+            "Kafalar!"
+        ],
+        "piece-1": "Başarısız, kenara düştü!",
+        "react-0": "İlgili mesaj bulunamadı. İlk bağımsız değişkene mesaj ID'sini, ikincisinde ise emojiyi girmelisiniz 🙃  Ayrıca mesaj geçmişini okuma iznim olup olmadığını kontrol edin!",
+        "reminds-asked": "{user}, {duration} önce size şunu hatırlatmamı istediniz:",
+        "reminds-date": "İstek tarihi",
+        "reminds-saved": "Anladım! {duration} sonra size hatırlatacağım",
+        "reminds-title": "Hatırlatıcı",
+        "reminds-too-long": "Böyle uzun bir süre ayarlamak imkansız",
+        "reminds-too-short": "Geçersiz bir süre girdiniz",
+        "say-no-perm": "{channel} kanalında mesaj gönderme izniniz yok",
+        "thanos": [
+            "{0} Thanos tarafından canı bağışlandı",
+            "Thanos, {0}'i küllere dönüştürmeye karar verdi. İnsanlığın iyiliği için...."
+        ],
+        "tip-list": [
+            "Biliyor musun? Bot için test edilecek çok eğlenceli bir dil de dahil olmak üzere birkaç dil vardır: lolcat",
+            "İpucu: bot dilini değiştirmek için, `config` komutunu kullanın!",
+            "İpucu: Yardıma ihtiyacınız varsa, `osekour` komutunu kullanmaktan çekinmeyin",
+            "Biliyor muydun? Bazen, seviye yükseltme mesajı rastgele bir nesneden bahseder. Bunu yapmak için Aragorn1202, 'bir bicorne', 'bir kurabiye' veya 'bir muz' dahil olmak üzere 60'lık bir liste oluşturmak zorunda kaldı!",
+            "Biliyor muydun? Eskiden Zbot'un profil resmi... bir creeperdı.",
+            "Biliyor muydun? ZBot Ekibi yetenekli bir geliştirici Yönetici, bir kibble markasının adını taşımasının yanı sıra bir kedi olan ikinci bir yönetici, bir Ban hammer ve bir mantardan oluşur!",
+            "İpucu: `say <metin>` komutu anonim mesajlar göndermek için çok kullanışlıdır... en azından ona erişiminiz olduğunda.",
+            "İpucu: `discordlinks` komutu size discord ile ilgili tüm faydalı bağlantıları verecektir!",
+            "Biliyor muydun? `bigtext` komutunda kullanılan büyük emoji listesi de dahil olmak üzere bot ile ilgili tüm tasarımlar  Adri#9223 tarafından yapılmıştır!",
+            "Özel bir püf nokta: Eğer yardıma ihtiyacın varsa, `osekour` komutunu kullanmaktan çekinme",
+            "Biliyor muydun? Bazen, seviye atlama mesajları rastgele bir obje gönderir. Bunu yapmak için Aragorn1202 'bir bicorne', 'bir kurabiye' veya 'bir muz' dahilinde 60 tanesinin listesini yapması gerekiyordu!",
+            "Biliyor muydun? Önceden Zbot'un profile fotoğrafı bir... creeperdı.",
+            "Biliyor muydun? ZBot yetkili ekibi yetenekli geliştirici yöneticisi, kibble markasının yanı sıra bir kedi, bir Yasaklama çekici ve bir mantarın karışımından oluşmaktadır!",
+            "Özel püf nokta: `say <yazı>` komutu gizli mesajlar yazmak için faydalıdır... en azından ona erişimin olduğu zaman.",
+            "Özel püf nokta: `discordlinks` komutu sana discord ile alakalı faydalı bağlantıların hepsini gönderir!",
+            "Biliyor muydun? `bigtext` komutunda kullanılan büyük emoji listesi de dahil olmak üzere, bot ile ilgili tüm tasarımlar, Adri#9223 tarafından yapılmıştır!",
+            "Biliyor muydun? ZBot adını.... yaratıcısı Z_runner'dan alıyor",
+            "İpucu: Bot, mevcut hataları görebileceğiniz ve bir sonraki güncellemelere oy verebileceğiniz bir Discord'a sahip! Daveti almak için `about` komutunu kullanın",
+            "İpucu: `prefix` komutu, şu anda sunucuda kullanılabilen prefixlerin bir listesine sahip olmanızı sağlar",
+            "Biliyor muydun? `config` komutunun `description` seçeneği ile sunucunuzun diğer sunucularda kullanılabilecek bir tanımını verebilirsiniz.",
+            "Biliyor muydun? Bazı özel etkinliklerde, koleksiyoncu xp kartları elde etmek mümkündür. Resmî sunucuda haberleri takip etmeyi unutmayın!"
+        ]
+    }
+}

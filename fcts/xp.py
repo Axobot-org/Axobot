@@ -1045,7 +1045,7 @@ class Xp(commands.Cog):
         
         ..Doc server.html#roles-rewards"""
         if not ctx.can_send_embed:
-            return await ctx.send(await self.bot._(ctx.guild.id,"fun","no-embed-perm"))
+            return await ctx.send(await self.bot._(ctx.guild.id,"fun.no-embed-perm"))
         try:
             l = await self.rr_list_role(ctx.guild.id)
         except Exception as e:

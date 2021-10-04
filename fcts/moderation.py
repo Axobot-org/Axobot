@@ -1008,7 +1008,7 @@ The 'reasons' parameter is used to display the mute reasons.
         
         ..Doc moderator.html#emoji-manager"""
         if not ctx.can_send_embed:
-            return await ctx.send(await self.bot._(ctx.guild.id,"fun","no-embed-perm"))
+            return await ctx.send(await self.bot._(ctx.guild.id,"fun.no-embed-perm"))
         if page < 1:
             await ctx.send(await self.bot._(ctx.guild.id, "xp", "low-page"))
             return
@@ -1079,7 +1079,7 @@ The 'reasons' parameter is used to display the mute reasons.
             await ctx.send(await self.bot._(ctx.guild.id, "modo","missing-user-perms"))
             return
         if not ctx.can_send_embed:
-            return await ctx.send(await self.bot._(ctx.guild.id,'fun','no-embed-perm'))
+            return await ctx.send(await self.bot._(ctx.guild.id,"fun.no-embed-perm"))
         tr_nbr = await self.bot._(ctx.guild.id,'stats_infos','role-3')
         tr_mbr = await self.bot._(ctx.guild.id,"keywords","membres")
         txt = str()
@@ -1109,7 +1109,7 @@ The 'reasons' parameter is used to display the mute reasons.
             await ctx.send(await self.bot._(ctx.guild.id, "modo","missing-user-perms"))
             return
         if not ctx.can_send_embed:
-            return await ctx.send(await self.bot._(ctx.guild.id,'fun','no-embed-perm'))
+            return await ctx.send(await self.bot._(ctx.guild.id,"fun.no-embed-perm"))
         tr_mbr = await self.bot._(ctx.guild.id,"keywords","membres")
         title = await self.bot._(ctx.guild.id,"modo","roles-list")
         desc = list()
