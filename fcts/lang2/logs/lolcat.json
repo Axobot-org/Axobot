@@ -1,0 +1,25 @@
+{
+    "lolcat": {
+        "ban": "{user} ({userid}) have bin :b:an",
+        "case-del": "Teh case #{id} has bee deletd ('bout {user})",
+        "case-reason": "Da case #{id} have edite:\n`Old reson:` {old}\n`Young reason:` {new}",
+        "clear": "{number} dletd mesage for {channel}",
+        "reason": {
+            "autounmute": "automatic unmute",
+            "invite": "Automod (Discord invite)",
+            "memberchan": "Automated action (config membercount)",
+            "unban": "unbanned by {user}",
+            "unmute": "unmuted by {user}",
+            "welcome_roles": "Automated action (config welcome_roles)",
+            "young": "Automod (too recent account)"
+        },
+        "kick": "{user} ({userid}) had been kik",
+        "mute": "{user} ({userid}) Is know mwuted",
+        "slowmode-disabled": "Shlowmode disabld in {channel}",
+        "slowmode-enabled": "Slwmod enable in {channel} ({seconds}s)",
+        "softban": "{user} ({userid}) had beeen 'softBAnnnnned'",
+        "unban": "{user} ({userid}) iz no mor band",
+        "unmute": "{user} ({userid}) is not more mutd",
+        "warn": "{user} ({userid}) had been warner"
+    }
+}

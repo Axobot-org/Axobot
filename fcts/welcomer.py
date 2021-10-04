@@ -163,7 +163,7 @@ class Welcomer(commands.Cog):
         except (discord.Forbidden, discord.HTTPException):
             return False
         else:
-            log = str(await self.bot._(member.guild.id,"logs","ban")).format(member=member,reason=reason,case=None)
+            log = str(await self.bot._(member.guild.id,"logs.ban")).format(member=member,reason=reason,case=None)
             await self.bot.get_cog("Events").send_logs_per_server(member.guild,"ban",log,member.guild.me)
             return True
 
@@ -182,29 +182,29 @@ class Welcomer(commands.Cog):
         # Level 4
         if level >= 4:
             if account_created_since <= 120*60: # kick accounts created less than 2h before
-                if await self.kick(member,await self.bot._(member.guild.id,"logs","d-young")):
+                if await self.kick(member,await self.bot._(member.guild.id,"logs.reason.young")):
                     return True
             if account_created_since <= 60*60 and can_ban: # ban members created less than 1h before
-                if await self.ban(member,await self.bot._(member.guild.id,"logs","d-young")):
+                if await self.ban(member,await self.bot._(member.guild.id,"logs.reason.young")):
                     return True
         # Level 3 or more
         if level >= 3 and can_ban:
             # ban members with invitations in their nickname
             if await self.bot.get_cog('Utilities').check_discord_invite(member.name) is not None:
-                if await self.ban(member,await self.bot._(member.guild.id,"logs","d-invite")):
+                if await self.ban(member,await self.bot._(member.guild.id,"logs.reason.invite")):
                     return True
             if account_created_since <= 45*60: # kick accounts created less than 45min before
-                if await self.kick(member,await self.bot._(member.guild.id,"logs","d-young")):
+                if await self.kick(member,await self.bot._(member.guild.id,"logs.reason.young")):
                     return True
         # Level 2 or more
         if level >= 2: # kick accounts created less than 15min before
             if account_created_since <= 15*60:
-                if await self.kick(member,await self.bot._(member.guild.id,"logs","d-young")):
+                if await self.kick(member,await self.bot._(member.guild.id,"logs.reason.young")):
                     return True
         # Level 1 or more
         if level >= 1: # kick members with invitations in their nickname
             if await self.bot.get_cog('Utilities').check_discord_invite(member.name) is not None:
-                if await self.kick(member,await self.bot._(member.guild.id,"logs","d-invite")):
+                if await self.kick(member,await self.bot._(member.guild.id,"logs.reason.invite")):
                     return True       
         # Nothing got triggered
         return False
@@ -220,7 +220,7 @@ class Welcomer(commands.Cog):
                 role = member.guild.get_role(int(r))
                 if role is not None:
                     try:
-                        await member.add_roles(role,reason=await self.bot._(member.guild.id,"logs","d-welcome_roles"))
+                        await member.add_roles(role,reason=await self.bot._(member.guild.id,"logs.reason.welcome_roles"))
                     except discord.errors.Forbidden:
                         await self.bot.get_cog('Events').send_logs_per_server(member.guild,'error',await self.bot._(member.guild,'bvn','error-give-roles',r=role.name,u=str(member)), member.guild.me)
         except discord.errors.NotFound:
