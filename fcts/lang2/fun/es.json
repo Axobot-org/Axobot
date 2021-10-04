@@ -1,0 +1,82 @@
+{
+    "es": {
+        "afk": {
+            "afk-done": "¡Ahora eres AFK!",
+            "afk-user-reason": "Este miembro es AFK, porque {reason}",
+            "afk-user-noreason": "¡Este miembro es AFK!",
+            "unafk-done": "Ya no eres más AFK."
+        },
+        "blame-0": "Lista de nombres disponibles para **{user}**",
+        "cant-react": "No tengo suficientes permisos para usar reacciones!",
+        "cookie": "{user} ofreció una caja de cookies a <@375598088850505728>! {emoji}",
+        "count": {
+            "counting": "Cuenta en curso...",
+            "result-you": "En los últimos {limit} posts, has publicado {x} mensajes ({p}%)",
+            "too-much": "Quieres volar Discord! {e} Por razones de rendimiento, impondré un límite de {l} mensajes.",
+            "missing-perms": "Oops, no puedo leer la historia de este canal. Por favor, verifique mis permisos....",
+            "result-user": "En los últimos {limit} mensajes, {user} han publicado {x} mensajes ({p}%)"
+        },
+        "error": "Ha ocurrido un error: `{err}`",
+        "fun-list": "Aquí está la lista de comandos divertidos disponibles:",
+        "invalid-city": "Ciudad inválida :confused:",
+        "markdown": "__**Markdown Rules** en *Discord*__\n\n`*cursiva*` = *cursiva*\n`__subrayar__` = __subrayar__\n`**negrita**` = **negrita**\n`***negrita cursiva***` = ***negrita cursiva***\n`~~strikeout~~` = ~~strikeout~~\n`__*subrayar cursiva*__` = __*subrayar cursiva*__\n`__**subrayar negrita**__` = __**subrayar negrita**__\n`__***subrayar negrita cursiva***__` = __***subrayar negrita cursiva***__\n`||spoiler||` = ||spoiler||\n> cita = `> cita`\n\\`código\\` = `código`\n \\ para ignorar\n\nPara bloques de código, cf <https://discord.gg/DGahTNn>",
+        "no-database": "Como nuestra base de datos está desconectada, el acceso a los comandos de diversión está restringido a personas con permiso \"Gestionar Servidor\"",
+        "no-embed-perm": "No tengo permiso para \"Insertar Enlaces\" :confused:",
+        "no-emoji": "¡Incapaz de encontrar este emoji!",
+        "no-fun": "Los comandos divertidos han sido desactivados en este servidor. Para ver su lista, mira este enlace : https://zbot.rtfd.io/en/v3/fun.html",
+        "no-reaction": "Incapaz de adicionar reacciones. Por favor, verifique mis permisos...",
+        "no-roll": "No se encontró ninguna opción",
+        "no-say": "No se puede enviar mensajes en este canal",
+        "no-voicechan": "Debe estar en un canal de voz para poder usar este comando.",
+        "osekour": [
+            "Espera, estoy terminando de ver mi película.",
+            "¡Ya vamos! Pero, ¿por qué ya no contestas? ¡No finjas muerte!",
+            "Sí, sabemos que hay un incendio, no necesitamos venir: vamos a hacer una barbacoa en la estación de bomberos.",
+            "*Rescue no está disponible en este momento, por favor espere hasta el final del descanso.*",
+            "*Este número no existe. Por favor, inténtelo de nuevo con otro número.*",
+            "*Mantenimiento de la línea actual. Por favor, inténtalo de nuevo en 430 horas.*",
+            "*Su plan de telefonía móvil ha caducado. Puedes comprar uno nuevo por 86,25€.*",
+            "¡Dos volúmenes más de *El Señor de los Anillos* para terminar de leer, y soy todo tuyo!",
+            "Gracias por no molestarnos durante las vacaciones.",
+            "Lo siento, hay más de 3 copos de nieve: estamos atrapados en el garaje.",
+            "Tendremos que esperar hasta el final de nuestra huelga.... ¡¿Estás diciendo que no lo sabes?! Han pasado dos meses desde que empezamos!"
+        ],
+        "piece-0": [
+            "¡Cara!",
+            "¡Cruz!"
+        ],
+        "piece-1": "¡Falló, se cayó en el borde!",
+        "react-0": "No se puede encontrar el mensaje correspondiente. Debe introducir el ID del mensaje en el primer argumento y el emoji en el segundo. :upside_down:\n También verifique que tengo permiso de leer el historial de mensajes.",
+        "say-no-perm": "You do not have permission to send messages in the channel {channel}",
+        "thanos": [
+            "{0} fue salvado por Thanos",
+            "Thanos decidió reducir {0} a cenizas. Por el bien de la humanidad..."
+        ],
+        "tip-list": [
+            "¿Sabías eso? Hay varios idiomas para el bot, incluyendo uno muy divertido: `lolcat`",
+            "Consejo profesional: para modificar el idioma del bot, use el comando `config` !",
+            "Consejo profesional: Encontrarás explicaciones de cada comando en la documentación del bot, en https://zbot.rtfd.io; ¡Quizás incluso comandos que no conocías!",
+            "¿Sabías eso? Los resultados del comando `stats` ocultan algunos servidores, como los servidores de listas de robots, o los servidores internos.",
+            "¿Sabías eso? El bot fue diseñado originalmente para un servidor en una comunidad de Minecraft. Ahí es donde se hizo famoso, y por eso que tiene comandos sobre el tema del juego.",
+            "¿Sabías eso? La primera versión del bot fue escrita en febrero de 2018, para uso privado. En ese momento sólo había dos o tres comandos fáciles de ejecutar, como `clear` y `say`.",
+            "Consejo profesional: Con el comando `say`, puedes usar los emojis desde todos los servidores donde Zbot esté, incluso los emojis animados. Sólo usa el emoji como si lo estuvieras usando tú mismo.",
+            "Consejo profesional: Para usar un emoji personalizado en el comando `react`, sólo tienes que dar su nombre.",
+            "Consejo profesional: Con el comando `me <text>`, puedes hacer que el bot diga lo que quieras, con tu apodo delante! omo por ejemplo, \"*Wumpus le encantan los plátanos*\".",
+            "Consejo profesional: El comando `roll Nada, Nada, Nada, Nada, Nada, Nada, Nada, PAN !` le permite jugar a la ruleta rusa! ¡Cuidado con eso!",
+            "Consejo profesional: Si necesitas ayuda, no te preocupes, puedes usar el comando `osekour`.",
+            "¿Sabías eso? A veces, el mensaje de elevación de nivel menciona un objeto aleatorio. Para ello, Aragorn1202 tuvo que crear una lista de 60 de ellos, incluyendo `a bicorne`, `una cookie` o `un plátano`.",
+            "¿Sabías eso? En el pasado, la foto de perfil de Zbot era... una creeper.",
+            "¿Sabías eso? El equipo de ZBot está compuesto por un talentoso desarrollador administrador, un segundo administrador llamado así por una marca de croquetas, así como un gato, un martillo ban y un hongo.",
+            "Consejo profesional: El comando `say <texto>` es muy útil para publicar mensajes anónimos... por lo menos cuando tienes el derecho de usarlo.",
+            "Consejo profesional: ¡El comando `discordlinks` te dará todos los enlaces útiles relacionados con discord!",
+            "¿Sabías eso?  Todos los diseños relacionados con el bot son realizados por Adri#9223, incluyendo la gran lista de emojis usados en el comando `bigtext`!",
+            "¿Sabías eso? ZBot toma su nombre de... su creador, Z_runner",
+            "Consejo profesional: El bot tiene un Discord, donde puedes ver los errores actuales y votar por las próximas novedades! Usa el comando `about` para obtener la invitación.",
+            "Consejo profesional: El comando `prefix` le permite tener una lista de los prefijos actualmente utilizables en el servidor.",
+            "¿Sabías eso? Puede dar una descripción de su servidor que puede ser usada en otros servidores, a través de la opción `description` del comando `config`.",
+            "¿Sabías eso? En algunos eventos especiales, es posible obtener tarjetas xp de colección. No olvides seguir las noticias en el servidor oficial!"
+        ],
+        "uninhabited-city": "Ciudad deshabitada :confused:",
+        "vote-0": "¡Usted no puede poner más de 20 opciones y menos un número negativo de opciones!"
+    }
+}

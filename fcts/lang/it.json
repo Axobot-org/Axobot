@@ -173,34 +173,6 @@
         "unknown": "sconosciuto",
         "version": "verzione"
     },
-    "kill": {
-        "list": [
-            "Oh tu, andrai morire !",
-            "***BOUM !*** {1} è chaduto in una trappola posata sul {0} !",
-            "Per fortuna, la terra ha attuta la caduta di {1} !",
-            "{0} ha urlato \"Fus Roh Dah\" mentre {1} era viccino di una scogliera...",
-            "Eh non, tu ne peux pas arreter les balles avec tes mains {1} :shrug:",
-            "Il faut être __dans__ l’ascenseur {1}, pas __au-dessus__...",
-            "{1} est resté trop près des enceintes lors d'un concert de heavy metal.",
-            "Rester à moins de 10m d'une explosion atomique, ce n'était pas une bonne idée {1}...",
-            "Non ! Les doubles sauts ne sont pas possibles {1} !",
-            "{1} a imité Icare... splash.",
-            "C'est bien d'avoir un pistolet à portails {1}, encore faut il ne pas en ouvrir un au dessus des piques....",
-            "{1} est mort. Paix à son âme... :sneezing_face:",
-            "{0} a tué {1}",
-            "{1} a été shot par {0}",
-            "Bye {1} ! :ghost:",
-            "{1} a vu tomber une enclume volante... sur sa tête :head_bandage:",
-            "{1} part se suicider après que {0} ai coupé sa connexion",
-            "Attention {1} ! Le feu, ça brûle :fire:",
-            "{1} est parti sans pelle lors d'une attaque zombie",
-            "{1} a tenté de faire un calin à un creeper",
-            "{1}, les bains de lave sont chauds, mais la lave, ça brûle...",
-            "{1} a tenté un rocket jump",
-            "Il ne fallait pas écouter la jolie mélodie de la Lullaby, {1} :musical_note:",
-            "{2}.exe *a cessé de fonctionner*"
-        ]
-    },
     "xp": {
         "levelup-items": [
             "questa spada",
