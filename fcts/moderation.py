@@ -797,7 +797,7 @@ Permissions for using this command are the same as for the kick
     async def send_modlogs(self, action: str, user: discord.User, author: discord.User, guild: discord.Guild, case: int = None, reason: str = None, duration: str = None):
         if action not in ('warn', 'mute', 'unmute', 'kick', 'ban', 'unban', 'softban'):
             return
-        message = await self.bot._(user, "logs", action, user=str(user), userid=user.id)
+        message = await self.bot._(user, "logs."+action, user=str(user), userid=user.id)
         fields = list()
         if case:
             _case = await self.bot._(guild.id, "keywords", "case")
