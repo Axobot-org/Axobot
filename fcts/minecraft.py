@@ -8,14 +8,14 @@ import requests
 from discord.ext import commands
 from urllib.parse import quote
 
-from utils import zbot, MyContext
+from utils import Zbot, MyContext
 
 
 class Minecraft(commands.Cog):
     """Cog gathering all commands related to the Minecraft® game. 
 Every information come from the website www.fr-minecraft.net"""
 
-    def __init__(self, bot: zbot):
+    def __init__(self, bot: Zbot):
         self.bot = bot
         self.flows = dict()
         self.file = "minecraft"
@@ -40,7 +40,7 @@ Every information come from the website www.fr-minecraft.net"""
             embed.set_author(name="Mojang Studios - Services Status", url="https://status.mojang.com/check",
                              icon_url="https://www.minecraft.net/content/dam/franchise/logos/Mojang-Studios-Logo-Redbox.png")
             embed.set_footer(text="Requested by {}".format(
-                ctx.author.display_name), icon_url=ctx.author.avatar_url_as(format='png', size=512))
+                ctx.author.display_name), icon_url=ctx.author.display_avatar.replace(format="png", size=512))
         else:
             text = "Mojang Studios - Services Status (requested by {})".format(
                 ctx.author)
@@ -610,7 +610,7 @@ Every information come from the website www.fr-minecraft.net"""
             if msg is None:
                 msg = await self.send_msg_server(obj, channel, i)
                 if msg is not None:
-                    await self.bot.get_cog('Rss').update_flow(flow['ID'], [('structure', str(msg.id)), ('date', datetime.datetime.utcnow())])
+                    await self.bot.get_cog('Rss').update_flow(flow['ID'], [('structure', str(msg.id)), ('date', self.bot.utcnow())])
                     if send_stats:
                         if statscog := self.bot.get_cog("BotStats"):
                             statscog.rss_stats['messages'] += 1

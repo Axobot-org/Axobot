@@ -1,4 +1,4 @@
-from utils import zbot, MyContext
+from utils import Zbot, MyContext
 import discord
 import importlib
 import aiohttp
@@ -14,7 +14,7 @@ importlib.reload(checks)
 class Backups(commands.Cog):
     """This cog is used to make and apply backups of a Discord server"""
 
-    def __init__(self, bot: zbot):
+    def __init__(self, bot: Zbot):
         self.bot = bot
         self.file = "s_backups"
 
@@ -142,7 +142,7 @@ Arguments are:
             'owner': g.owner.id,
             'voiceregion': str(g.region),
             'afk_timeout': g.afk_timeout,
-            'icon': None if len(g.icon_url) == 0 else str(g.icon_url),
+            'icon': None if len(g.icon.url) == 0 else g.icon.url,
             'verification_level': g.verification_level.value,
             'mfa_level': g.mfa_level,
             'explicit_content_filter': g.explicit_content_filter.value,
@@ -197,7 +197,7 @@ Arguments are:
         try:
             webs = list()
             for w in await g.webhooks():
-                webs.append({'channel':w.channel_id,'name':w.name,'avatar':str(w.avatar_url),'url':w.url})
+                webs.append({'channel':w.channel_id,'name':w.name,'avatar':w.avatar.url,'url':w.url})
             back['webhooks'] = webs
         except discord.errors.Forbidden:
             pass

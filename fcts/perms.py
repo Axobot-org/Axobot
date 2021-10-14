@@ -1,12 +1,12 @@
 import discord
 import typing
 from discord.ext import commands
-from utils import zbot, MyContext
+from utils import Zbot, MyContext
 
 class Perms(commands.Cog):
     """Cog with a single command, allowing you to see the permissions of a member or a role in a channel."""
 
-    def __init__(self, bot: zbot):
+    def __init__(self, bot: Zbot):
         self.bot = bot
         self.file = "perms"
         chan_perms = [key for key,value in discord.Permissions().all_channel() if value]
@@ -35,7 +35,7 @@ class Perms(commands.Cog):
             else:
                 perms = channel.permissions_for(target)
             col = target.color
-            avatar = await self.bot.user_avatar_as(target,size=256)
+            avatar = target.display_avatar.replace(static_format="png", size=256)
             name = str(target)
         elif isinstance(target, discord.Role):
             perms = target.permissions
@@ -43,7 +43,7 @@ class Perms(commands.Cog):
                 perms.update(**{x[0]:x[1] for x in channel.overwrites_for(ctx.guild.default_role) if x[1] is not None})
                 perms.update(**{x[0]:x[1] for x in channel.overwrites_for(target) if x[1] is not None})
             col = target.color
-            avatar = ctx.guild.icon_url_as(format='png',size=256)
+            avatar = ctx.guild.icon.replace(format='png', size=256)
             name = str(target)
         else:
             return

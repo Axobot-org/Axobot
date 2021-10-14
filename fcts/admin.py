@@ -20,7 +20,7 @@ import speedtest
 from contextlib import redirect_stdout
 from glob import glob
 from fcts import reloads
-from utils import zbot, MyContext, UserFlag
+from utils import Zbot, MyContext, UserFlag
 
 
 def cleanup_code(content: str):
@@ -34,7 +34,7 @@ def cleanup_code(content: str):
 class Admin(commands.Cog):
     """Here are listed all commands related to the internal administration of the bot. Most of them are not accessible to users, but only to ZBot administrators."""
         
-    def __init__(self, bot: zbot):
+    def __init__(self, bot: Zbot):
         self.bot = bot
         self.file = "admin"
         self.emergency_time = 5.0
@@ -293,9 +293,8 @@ class Admin(commands.Cog):
         await m.edit(content="Bot en voie d'extinction")
         await self.bot.change_presence(status=discord.Status('offline'))
         self.bot.log.info("Fermeture du bot")
-        await self.bot.logout()
         await self.bot.close()
-    
+
     async def cleanup_workspace(self):
         for folderName, _, filenames in os.walk('.'):
             for filename in filenames:
@@ -688,9 +687,9 @@ Cette option affecte tous les serveurs"""
                     elif x.emoji == '👎':
                         down = len(users)
                 if len(msg.embeds) > 0:
-                    liste.append((up-down,datetime.datetime.utcnow()-msg.created_at,msg.embeds[0].fields[0].value,up,down))
+                    liste.append((up-down,ctx.bot.utcnow()-msg.created_at,msg.embeds[0].fields[0].value,up,down))
                 else:
-                    liste.append((up-down,datetime.datetime.utcnow()-msg.created_at,msg.content,up,down))
+                    liste.append((up-down,ctx.bot.utcnow()-msg.created_at,msg.content,up,down))
         liste.sort(reverse=True)
         count = len(liste)
         liste = liste[:number]

@@ -1,7 +1,7 @@
 from aiohttp.client import ClientSession
 from aiohttp import client_exceptions
 from feedparser.util import FeedParserDict
-from utils import zbot, MyContext
+from utils import Zbot, MyContext
 import discord
 import datetime
 import time
@@ -61,7 +61,7 @@ async def can_use_rss(ctx: MyContext):
 class Rss(commands.Cog):
     """Cog which deals with everything related to rss flows. Whether it is to add automatic tracking to a stream, or just to see the latest video released by Discord, it is this cog that will be used."""
 
-    def __init__(self, bot: zbot):
+    def __init__(self, bot: Zbot):
         self.bot = bot
         self.time_loop = 20 # min minutes between two rss loops
         self.time_between_flows_check = 0.15 # seconds between two rss checks within a loop
@@ -85,12 +85,7 @@ class Rss(commands.Cog):
             self.date = bot.get_cog("TimeUtils").date
         except:
             pass
-        if feedparser.parse('http://twitrss.me/twitter_user_to_rss/?user=Dinnerbone').entries == list():
-            self.twitter_api_url = 'http://twitrss.me/mobile_twitter_to_rss/?user='
-        else:
-            self.twitter_api_url = 'http://twitrss.me/twitter_user_to_rss/?user='
         # launch rss loop
-        # pylint: disable=no-member
         self.loop_child.change_interval(minutes=self.time_loop)
         self.loop_child.start()
 
@@ -104,7 +99,7 @@ class Rss(commands.Cog):
         self.loop_child.cancel()
 
     class rssMessage:
-        def __init__(self,bot:zbot,Type,url,title,emojis,date=datetime.datetime.now(),author=None,Format=None,channel=None,retweeted_by=None,image=None):
+        def __init__(self,bot:Zbot,Type,url,title,emojis,date=datetime.datetime.now(),author=None,Format=None,channel=None,retweeted_by=None,image=None):
             self.bot = bot
             self.Type = Type
             self.url = url

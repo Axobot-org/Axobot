@@ -9,7 +9,7 @@ import importlib
 import asyncio
 import copy
 from fcts import checks, args
-from utils import zbot, MyContext
+from utils import Zbot, MyContext
 
 importlib.reload(checks)
 importlib.reload(args)
@@ -17,7 +17,7 @@ importlib.reload(args)
 class Moderation(commands.Cog):
     """Here you will find everything you need to moderate your server. Please note that most of the commands are reserved for certain members only."""
 
-    def __init__(self, bot: zbot):
+    def __init__(self, bot: Zbot):
         self.bot = bot
         self.file = "moderation"
 
@@ -1304,7 +1304,7 @@ ID corresponds to the Identifier of the message
             await ctx.send(await self.bot._(ctx.guild.id, "modo", "need-read-history"))
             return
         check = lambda x: not x.pinned
-        if message.created_at < datetime.datetime.utcnow() - datetime.timedelta(days=21):
+        if message.created_at < ctx.bot.utcnow() - datetime.timedelta(days=21):
             await ctx.send(await self.bot._(ctx.guild.id, "modo", "destop-old", days=21))
             return
         messages = await message.channel.purge(after=message, limit=1000, oldest_first=False)
