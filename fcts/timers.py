@@ -5,10 +5,10 @@ import copy
 import datetime
 
 from fcts import args, checks
-from utils import zbot, MyContext
+from utils import Zbot, MyContext
 
 class Timers(commands.Cog):
-    def __init__(self, bot: zbot):
+    def __init__(self, bot: Zbot):
         self.bot = bot
         self.file = "timers"
 
@@ -97,7 +97,7 @@ class Timers(commands.Cog):
             # msg = "\n```\n" + msg.replace("```", "​`​`​`") + "\n```"
             chan = '<#'+str(item['channel'])+'>'
             end = item["utc_begin"] + datetime.timedelta(seconds=item['duration'])
-            duration = await time_delta(datetime.datetime.utcnow(), end, lang=lang, year=True, form="temp", precision=0)
+            duration = await time_delta(ctx.bot.utcnow(), end, lang=lang, year=True, form="temp", precision=0)
             item = txt.format(id=item['ID'], duration=duration, channel=chan, msg=msg)
             liste.append(item)
         cursor.close()

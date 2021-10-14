@@ -1,4 +1,4 @@
-discord.py>=1.7
+git+https://github.com/Rapptz/discord.py.git
 aiohttp
 mysql-connector-python
 git+https://github.com/ZRunner/fr-mc-python-lib

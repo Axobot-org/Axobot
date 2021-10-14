@@ -7,13 +7,13 @@ from discord.ext import commands, tasks
 import psutil
 import mysql
 
-from utils import MyContext, zbot
+from utils import MyContext, Zbot
 
 
 class BotStats(commands.Cog):
     """Hey, I'm a test cog! Happy to meet you :wave:"""
 
-    def __init__(self, bot: zbot):
+    def __init__(self, bot: Zbot):
         self.bot = bot
         self.file = 'bot_stats'
         self.received_events = {'CMD_USE': 0}

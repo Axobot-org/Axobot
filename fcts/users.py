@@ -1,4 +1,4 @@
-from utils import zbot, MyContext, UserFlag, RankCardsFlag
+from utils import Zbot, MyContext, UserFlag, RankCardsFlag
 from discord.ext import commands
 import importlib
 import typing
@@ -14,7 +14,7 @@ importlib.reload(checks)
 
 class Users(commands.Cog):
 
-    def __init__(self, bot: zbot):
+    def __init__(self, bot: Zbot):
         self.bot = bot
         self.file = 'users'
 

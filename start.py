@@ -28,7 +28,7 @@ if check_libs():
     from signal import SIGTERM
     from random import choice
     from fcts import cryptage, tokens # pylint: disable=no-name-in-module
-    from utils import zbot, setup_logger
+    from utils import Zbot, setup_logger
 else:
     import sys
     print("End of program")
@@ -36,7 +36,7 @@ else:
 
 
 def main():
-    client = zbot(case_insensitive=True,status=discord.Status('online'))
+    client = Zbot(case_insensitive=True,status=discord.Status('online'))
 
     log = setup_logger()
     log.setLevel(logging.DEBUG)
@@ -164,7 +164,7 @@ def main():
 
     async def sigterm_handler(bot):
         print("SIGTERM received. Disconnecting...")
-        await bot.logout()
+        await bot.close()
     
     asyncio.get_event_loop().add_signal_handler(SIGTERM, lambda: asyncio.ensure_future(sigterm_handler(client)))
 

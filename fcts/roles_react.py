@@ -5,14 +5,14 @@ import importlib
 import typing
 import re
 from discord.ext import commands
-from utils import zbot, MyContext
+from utils import Zbot, MyContext
 from fcts import checks, args
 importlib.reload(checks)
 importlib.reload(args)
 
 
 class RolesReact(commands.Cog):
-    def __init__(self, bot: zbot):
+    def __init__(self, bot: Zbot):
         self.bot = bot
         self.file = 'roles_react'
         self.table = 'roles_react_beta' if bot.beta else 'roles_react'

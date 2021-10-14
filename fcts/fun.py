@@ -1,4 +1,4 @@
-from utils import zbot, MyContext
+from utils import Zbot, MyContext
 from fcts.checks import is_fun_enabled
 import discord
 import random
@@ -38,7 +38,7 @@ async def can_use_cookie(ctx: MyContext):
 class Fun(commands.Cog):
     """Add some fun commands, no obvious use. You can disable this module with the 'enable_fun' option (command 'config')"""
 
-    def __init__(self, bot: zbot):
+    def __init__(self, bot: Zbot):
         self.bot = bot
         self.fun_opt = dict()
         self.file = "fun"

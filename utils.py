@@ -1,3 +1,4 @@
+import datetime
 import discord
 from discord.ext import commands
 import logging
@@ -16,6 +17,8 @@ OUTAGE_REASON = {
 class MyContext(commands.Context):
     """Replacement for the official commands.Context class
     It allows us to add more methods and properties in the whole bot code"""
+
+    bot: 'Zbot'
 
     @property
     def bot_permissions(self) -> discord.Permissions:
@@ -43,7 +46,7 @@ class MyContext(commands.Context):
         return await super().send(*args, **kwargs)
 
 
-def get_prefix(bot:"zbot", msg: discord.Message) -> list:
+def get_prefix(bot:"Zbot", msg: discord.Message) -> list:
     """Get the correct bot prefix from a message
     Prefix can change based on guild, but the bot mention will always be an option"""
     if bot.database_online:
@@ -69,7 +72,7 @@ def get_prefix(bot:"zbot", msg: discord.Message) -> list:
     return commands.when_mentioned_or(*prefixes)(bot, msg)
 
 
-class zbot(commands.bot.AutoShardedBot):
+class Zbot(commands.bot.AutoShardedBot):
     """Bot class, with everything needed to run it"""
 
     def __init__(self, case_insensitive: bool = None, status: discord.Status = None, database_online: bool = True, beta: bool = False, dbl_token: str = "", zombie_mode: bool = False):
@@ -194,26 +197,14 @@ class zbot(commands.bot.AutoShardedBot):
         else:
             raise ValueError(dict)
 
-    async def user_avatar_as(self, user: discord.User, size: int = 512) -> discord.Asset:
-        """Get the avatar of an user, format gif or png (as webp isn't supported by some browsers)"""
-        if not isinstance(user, (discord.User, discord.Member, discord.ClientUser)):
-            raise ValueError
-        try:
-            if user.is_avatar_animated():
-                return user.avatar_url_as(format='gif', size=size)
-            else:
-                return user.avatar_url_as(format='png', size=size)
-        except Exception as e:
-            await self.get_cog('Errors').on_error(e, None)
-
     class SafeDict(dict):
         def __missing__(self, key):
             return '{' + key + '}'
 
-    async def get_prefix(self, msg: discord.Message):
+    async def get_prefix(self, message: discord.Message):
         """Get a prefix from a message... what did you expect?"""
-        return get_prefix(self, msg)
-    
+        return get_prefix(self, message)
+
     async def get_config(self, guildID: int, option: str) -> Optional[str]:
         cog = self.get_cog("Servers")
         if cog:
@@ -221,7 +212,11 @@ class zbot(commands.bot.AutoShardedBot):
                 return await cog.get_option(guildID, option)
             return cog.default_opt.get(option, None)
         return None
-    
+
+    def utcnow(self) -> datetime.datetime:
+        """Get the current date and time with UTC timezone"""
+        return datetime.datetime.now(datetime.timezone.utc)
+
     @property
     def _(self) -> Callable[[Any, str, str], Coroutine[Any, Any, str]]:
         """Translate something"""

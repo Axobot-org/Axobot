@@ -2,12 +2,12 @@ import discord
 import datetime
 import json
 from discord.ext import commands
-from utils import zbot, MyContext
+from utils import Zbot, MyContext
 
 
 class BotEvents(commands.Cog):
 
-    def __init__(self, bot: zbot):
+    def __init__(self, bot: Zbot):
         self.bot = bot
         self.file = "bot_events"
         self.current_event: str = None
@@ -132,7 +132,7 @@ class BotEvents(commands.Cog):
             fields.append(
                 {"name": rank_global, "value": user_rank, "inline": True})
             desc = await self.bot._(ctx.channel, "bot_events", "xp-howto")
-            emb = self.bot.get_cog("Embeds").Embed(title=title, desc=desc, fields=fields, color=4254055, author_name=str(user), author_icon=str(await self.bot.user_avatar_as(user, 32)))
+            emb = self.bot.get_cog("Embeds").Embed(title=title, desc=desc, fields=fields, color=4254055, author_name=str(user), author_icon=str(user.display_avatar.replace(static_format="png", size=32)))
             await ctx.send(embed=emb)
         else:
             msg = f"**{title}** ({user})"

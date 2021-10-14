@@ -12,6 +12,8 @@ import time
 from resizeimage import resizeimage
 import math
 
+from utils import MyContext
+
 BLURPLE = (114, 137, 218, 255)
 DARK_BLURPLE = (78, 93, 148, 255)
 WHITE = (255, 255, 255, 255)
@@ -26,7 +28,7 @@ class BlurpleCog(commands.Cog):
 
     @commands.command(name="isblurple",aliases=['blurple'])
     @commands.cooldown(rate=1, per=60, type=BucketType.user)
-    async def blurple_cmd(self,ctx, url = None):
+    async def blurple_cmd(self, ctx: MyContext, url: str = None):
         """Be part of the best birthday of the WORLD, and check if you're enough blurple to be cool!
         You can either give a user or an image URL in argument, or attach an image to your message. Plz don't forget to be cool."""
         if not (ctx.guild is None or ctx.channel.permissions_for(ctx.guild.me).attach_files):
@@ -38,7 +40,7 @@ class BlurpleCog(commands.Cog):
         if url is not None:
             try:
                 user = await commands.UserConverter().convert(ctx,url)
-                picture = str(user.avatar_url)
+                picture = user.display_avatar.url
             except Exception:
                 picture = url
         else:
@@ -48,11 +50,11 @@ class BlurpleCog(commands.Cog):
                     picture = image.url
 
         if picture is None:
-            picture = ctx.author.avatar_url
+            picture = ctx.author.display_avatar.url
 
         try:
             async with aiohttp.ClientSession() as cs:
-                async with cs.get(str(picture)) as r:
+                async with cs.get(picture) as r:
                     response = await r.read()
         except ValueError:
             await ctx.send(str(await self.bot._(ctx.guild,"blurple","check_invalid")).format(ctx.message.author.mention))
@@ -165,7 +167,7 @@ class BlurpleCog(commands.Cog):
             embed.set_image(url="attachment://image.png")
             embed.set_thumbnail(url=picture)
             await ctx.send(embed=embed, file=image)
-        if blurplenesspercentage>95 and str(picture)==str(ctx.author.avatar_url):
+        if blurplenesspercentage>95 and str(picture)==str(ctx.author.display_avatar):
             date = datetime.datetime.today()
             if not await ctx.bot.get_cog('Utilities').has_blurple_card(ctx.author) and 6<date.day<20 and date.month==5:
                 pr = await self.bot.get_prefix(ctx.message)
@@ -189,7 +191,7 @@ class BlurpleCog(commands.Cog):
         if url is not None:
             try:
                 user = await commands.UserConverter().convert(ctx,url)
-                picture = str(user.avatar_url)
+                picture = str(user.display_avatar)
             except Exception:
                 picture = url
         else:
@@ -199,7 +201,7 @@ class BlurpleCog(commands.Cog):
                     picture = image.url
 
         if picture is None:
-            picture = ctx.author.avatar_url
+            picture = ctx.author.display_avatar
 
         try:
             async with aiohttp.ClientSession() as cs:

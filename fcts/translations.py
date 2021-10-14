@@ -3,7 +3,7 @@ from discord.ext import commands
 import asyncio
 import json
 import os
-from utils import zbot, MyContext
+from utils import Zbot, MyContext
 
 
 async def is_translator(ctx: MyContext) -> bool:
@@ -15,7 +15,7 @@ async def check_admin(ctx: MyContext):
 class Translations(commands.Cog):
     """Special cog for those who help with the translation of the bot"""
 
-    def __init__(self, bot: zbot):
+    def __init__(self, bot: Zbot):
         self.bot = bot
         self.file = 'translations'
         if not os.path.exists('translation/'):
