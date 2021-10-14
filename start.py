@@ -9,8 +9,9 @@ if py_version.major != 3 or py_version.minor < 9:
     sys.exit(1)
 
 def check_libs():
+    """Check if the required libraries are installed and can be imported"""
     count = 0
-    for m in ["mysql","discord","frmc_lib","aiohttp","requests","re","asyncio","datetime","time","importlib","traceback","logging","psutil","platform","subprocess",'json','emoji','imageio','geocoder','tzwhere','pytz','twitter','isbnlib']:
+    for m in ["mysql","discord","frmc_lib","aiohttp","requests",'emoji','imageio','geocoder','tzwhere','pytz','twitter','isbnlib']:
         try:
             exec("import "+m)
             exec("del "+m)
@@ -24,13 +25,12 @@ def check_libs():
 
 
 if check_libs():
-    import discord, sys, traceback, asyncio, time, logging, os, mysql.connector, datetime, json
+    import discord, traceback, asyncio, time, logging, os, mysql.connector
     from signal import SIGTERM
     from random import choice
     from fcts import cryptage, tokens # pylint: disable=no-name-in-module
     from utils import Zbot, setup_logger
 else:
-    import sys
     print("End of program")
     sys.exit()
 
@@ -138,8 +138,8 @@ def main():
             print("\n{} modules not loaded\nEnd of program".format(count))
             sys.exit()
     del count
-    
-    
+
+
     async def on_ready():
         print('\nBot connected')
         print("Name : "+client.user.name)
@@ -165,7 +165,7 @@ def main():
     async def sigterm_handler(bot):
         print("SIGTERM received. Disconnecting...")
         await bot.close()
-    
+
     asyncio.get_event_loop().add_signal_handler(SIGTERM, lambda: asyncio.ensure_future(sigterm_handler(client)))
 
     if client.database_online:
