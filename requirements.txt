@@ -1,7 +1,7 @@
-git+https://github.com/Rapptz/discord.py.git
+discord.py @ git+https://github.com/Rapptz/discord.py.git
 aiohttp
 mysql-connector-python
-git+https://github.com/ZRunner/fr-mc-python-lib
+frmc-lib @ git+https://github.com/ZRunner/fr-mc-python-lib.git
 emoji
 imageio
 geocoder

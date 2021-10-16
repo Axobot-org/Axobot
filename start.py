@@ -8,32 +8,28 @@ if py_version.major != 3 or py_version.minor < 9:
     print("You must use at least Python 3.9!", file=sys.stderr)
     sys.exit(1)
 
+import pkg_resources
+
 def check_libs():
     """Check if the required libraries are installed and can be imported"""
-    count = 0
-    for m in ["mysql","discord","frmc_lib","aiohttp","requests",'emoji','imageio','geocoder','tzwhere','pytz','twitter','isbnlib']:
-        try:
-            exec("import "+m)
-            exec("del "+m)
-        except ModuleNotFoundError:
-            print("Library {} missing".format(m))
-            count +=1
-    if count > 0:
-        return False
-    del count
-    return True
+    with open("requirements.txt", 'r') as file:
+        packages = pkg_resources.parse_requirements(file.readlines())
+    pkg_resources.working_set.resolve(packages)
 
 
-if check_libs():
-    import discord, traceback, asyncio, time, logging, os, mysql.connector
-    from signal import SIGTERM
-    from random import choice
-    from fcts import cryptage, tokens # pylint: disable=no-name-in-module
-    from utils import Zbot, setup_logger
-else:
-    print("End of program")
-    sys.exit()
+check_libs()
 
+import discord
+import traceback
+import asyncio
+import time
+import logging
+import os
+import mysql.connector
+from signal import SIGTERM
+from random import choice
+from fcts import cryptage, tokens # pylint: disable=no-name-in-module
+from utils import Zbot, setup_logger
 
 def main():
     client = Zbot(case_insensitive=True,status=discord.Status('online'))
