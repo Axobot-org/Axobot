@@ -172,15 +172,12 @@
         "too-quick": "It's still too early! You will only be able to collect event points in {time}!",
         "won-card": "Wow! Very nice blurple picture {}! so beautiful that I decided to offer you the card of xp blurple! You can use it by typing the command `{}profile card blurple` {}"
     },
-    "halloween": {
-        "got-points": "Congratulations! You just won **{pts} event points**!",
-        "too-quick": "It is still too early! You can only retrieve event points once per hour."
-    },
     "bot_events": {
         "events-desc": {
             "april-2021": "Today is International Fish Day! All day long, Zbot will be celebrating April 1st with special tic-tac-toe emojis, a unique avatar and other cool stuff. \nTake the opportunity to collect event points and try to win the rainbow xp card! As a reminder, the xp cards are accessible via my `profile card` command",
             "halloween-2020": "October is here! Enjoy until November 1st a dark atmosphere, full of bats, skeletons and pumpkins.\nTake advantage of it to redecorate your server in the colors of Halloween with the command `halloween hallowify` and its derivatives, check that your avatar is compliant with the command `halloween check`, and collect event points every hour with the command `halloween collect`.\n\nPerhaps the bravest of you will succeed in unlocking the special Halloween 2020 xp card, accessible via the `profile card` command!",
             "blurple-2021": "Let's celebrate 6 years of Discord during the Blurple event! For the fourth year in a row, we're participating in the \"Blurple\" event, which consists of re-coloring our avatars and servers with as much blurple as possible, that characteristic Discord color between purple and blue. Take advantage of this to collect event points and try to win the special Blurple 2021 xp card! As a reminder, the xp cards are accessible via my `profile card` command.\n\nFor this event, the special `blurple` command has been activated, so don't hesitate to use it to try to win points!",
+            "halloween-2021": "October is here! Enjoy until November 1st a dark atmosphere, full of bats, skeletons and pumpkins.\nTake advantage of it to redecorate your server in the colors of Halloween with the command `halloween hallowify` and its derivatives, check that your avatar is compliant with the command `halloween check`, and collect event points every hour with the command `halloween collect`.\n\nPerhaps the bravest of you will succeed in unlocking the special Halloween 2021 xp card, accessible via the `profile card` command!",
             "nothing": "There are currently no events. Follow the bot news to know the date of the next one!"
         },
         "events-price-title": "Prizes to win",
@@ -195,11 +192,15 @@
                 "200": "Unlock the special Blurple 2021 xp card!",
                 "500": "A special role to claim in the official Zbot server"
             },
+            "halloween-2021": {
+                "150": "Unlock the special Halloween 2021 xp card! As a bonus, a special role in our official server"
+            },
             "nothing": "There is nothing to gain for this event :confused:"
         },
         "events-title": {
             "april-2021": "Happy April 1st!",
-            "blurple-2021": "Discord is now 6!"
+            "blurple-2021": "Discord is now 6!",
+            "halloween-2021": "Halloween 2021 :bat:"
         },
         "objectives": "Objectives",
         "points": "points",
@@ -222,7 +223,6 @@
         "no-case": "This user has no case!",
         "no-user": "Unable to find this user :eyes:",
         "no_database": "Due to a temporary database outage, this command has been disabled",
-        "no-case": "This user has no case!",
         "not-found": "This case was not found :confused:",
         "reason-edited": "The reason for case #{} has been changed!",
         "search-0": "**User:** {U}\n**Type:** {T}\n**Moderator:** {M}\n**Date:** {D}\n**Reason:** *{R}*",
@@ -321,7 +321,6 @@
         "no-fun": "Fun commands have been disabled on this server. To see their list, look at https://zbot.rtfd.io/en/v3/fun.html",
         "no-reaction": "Unable to add reactions. Please check my permissions...",
         "no-roll": "No choice found",
-        "not-enough-roll": "There must be at least two distinct elements",
         "no-say": "Unable to send any message in this channel",
         "no-voicechan": "You must be in a vocal channel in order to use this command.",
         "not-enough-roll": "There must be at least two distinct elements",
@@ -351,7 +350,6 @@
         "reminds-title": "Reminder",
         "reminds-too-long": "Impossible to set such a long duration",
         "reminds-too-short": "You have entered an invalid duration",
-        "reminds-link": "Original message",
         "say-no-perm": "You do not have permission to send messages in the channel {channel}",
         "thanos": [
             "{0} was spared by Thanos",
@@ -384,7 +382,6 @@
         ],
         "unafk-cant": "You aren't AFK!",
         "unafk-done": "You aren't AFK anymore",
-        "unafk-cant": "You aren't AFK!",
         "uninhabited-city": "Uninhabited city :confused:",
         "vote-0": "You can't put more than 20 choices, and even less a negative number of choices!"
     },
@@ -909,7 +906,6 @@
         "invalid-flow": "This url is invalid (empty or inaccessible rss flow) :confused:",
         "invalid-link": "Oops, this url address is invalid or incomplete :confused:",
         "list": "*Type the number of the flow to modify*\n\n**Link - Type - Channel - Mentions**\n",
-        "list-title": "List of rss feeds from the server {server}",
         "list-result": "Type: {}\nDiscord channel: {}\nURL/Channel: {}\nMentions: {}\nIdentifier: {}\nLast post: {}",
         "list-title": "List of rss feeds from the server {server}",
         "list2": "*Type the number of the flow to delete*\n\n**Link - Type - Channel**\n",
@@ -1078,7 +1074,6 @@
         "guild-7": "{} including {} bots ({} connected)",
         "guild-8": "Two-factor authentification",
         "guild-9": "Security level",
-        "guild-16": "Static: {s}/{l} | Animated: {a}/{l}",
         "guild-features": {
             "ANIMATED_ICON": "Animated server icon",
             "BANNER": "Custom server banner",
@@ -1150,8 +1145,7 @@
         "rmd-deleted": "Reminder #{id} with message `{message}` has successfully been deleted!",
         "rmd-empty": "Oops, you don't have any pending reminder...",
         "rmd-item": "ID: `{id}` | In: {duration} | Channel: {channel} | Message: {msg}",
-        "rmd-title": "List of your reminders",
-        "rmd-cancelled": "Dropping the process"
+        "rmd-title": "List of your reminders"
     },
     "users": {
         "animated_card_false": "You are not currently allowing an animated card. Thanks!",

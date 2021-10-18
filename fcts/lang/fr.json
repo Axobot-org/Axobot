@@ -172,10 +172,6 @@
         "too-quick": "Il est encore trop tôt ! Vous ne pourrez récupérer des points d'événement que dans {time} !",
         "won-card": "Wow! Magnifique image blurple {}! tellement beau que j'ai décidé de t'offrir la carte d'xp blurple, je suis sûr qu'elles iront bien ensemble ! Tu peux l'utiliser en tapant la commande `{}profile card blurple` {}"
     },
-    "halloween": {
-        "got-points": "Bravo ! Vous venez de gagner **{pts} points** d'événement !",
-        "too-quick": "Il est encore trop tôt ! Vous ne pouvez récupérer des points d'événement qu'une fois par heure"
-    },
     "bot_events": {
         "events-desc": {
             "april-2021": "Aujourd'hui, c'est la journée internationale des poissons ! Pendant toute la journée, Zbot fêtera le 1er avril avec des émojis spéciaux pour le jeu du morpion, un avatar unique ainsi que d'autres choses trop cool. \n\nProfitez-en pour récupérer des points d'événements et tentez de gagner la carte d'xp rainbow ! Pour rappel, les cartes d'xp sont accessibles via ma commande `profile card`",
@@ -183,6 +179,7 @@
             "christmas-2019": "Fêtez l'arrivée de Noël grâce à cet événement ! Pendant plusieurs jours, Zbot se pare des couleurs de l'hiver avec des émojis spéciaux pour le jeu du morpion, un avatar unique ainsi que d'autres choses trop cool. \n\nProfitez-en pour récupérer des points d'événements et tentez de gagner la carte d'xp spécial Noël 2019 ! Pour rappel, les cartes d'xp sont accessibles via ma commande `profile card`",
             "halloween-2020": "Le mois d'octobre est là ! Profitez jusqu'au 1er novembre d'une atmosphère ténébreuse, remplie de chauve-souris, de squelettes et de citrouilles.\nProfitez-en pour redécorer votre serveur aux couleurs d'Halloween avec la commande `halloween hallowify` et ses dérivées, vérifiez que votre avatar soit bien conforme avec la commande `halloween check`, et récupérez des points d'événements toutes les heures avec la commande `halloween collect`.\n\nLes plus courageux d'entre vous réussirons peut-être à débloquer la carte d'xp spécial Halloween 2020, accessible via la commande `profile card` !",
             "blurple-2021": "Fêtons les 6 ans de Discord pendant l'événement Blurple ! Pour la quatrième année consécutive, nous participons à l'événement \"Blurple\", qui consiste à recolorer nos avatars et serveurs avec un maximum de blurple, cette couleur caractéristique de Discord entre le violet et le bleu. Profitez-en pour récupérer des points d'événements et tentez de gagner la carte d'xp spécial Blurple 2021 ! Pour rappel, les cartes d'xp sont accessibles via ma commande `profile card`\n\nPour cet événement, la commande spéciale `blurple` a été activée, n'hésitez pas à l'utiliser pour tenter de gagner des points !",
+            "halloween-2021": "Le mois d'octobre est là ! Profitez jusqu'au 1er novembre d'une atmosphère ténébreuse, remplie de chauve-souris, de squelettes et de citrouilles.\nProfitez-en pour redécorer votre serveur aux couleurs d'Halloween avec la commande `halloween hallowify` et ses dérivées, vérifiez que votre avatar soit bien conforme avec la commande `halloween check`, et récupérez des points d'événements toutes les heures avec la commande `halloween collect`.\n\nLes plus courageux d'entre vous réussirons peut-être à débloquer la carte d'xp spécial Halloween 2021, accessible via la commande `profile card` !",
             "nothing": "Il n'y a actuellement aucun événement. Suivez les news du bot pour connaître la date du prochain !"
         },
         "events-price-title": "Prix à gagner",
@@ -203,13 +200,17 @@
                 "200": "Débloquez la carte d'xp spécial Blurple 2021 !",
                 "500": "Un rôle spécial à réclamer dans le serveur officiel de Zbot"
             },
+            "halloween-2021": {
+                "150": "Débloquez la carte d'xp spécial Halloween 2021 ! En prime, un rôle spécial dans notre serveur officiel"
+            },
             "nothing": "Il n'y a rien à gagner pour cet événement :confused:"
         },
         "events-title": {
             "april-2021": "Joyeux 1er avril !",
             "blurple-2020": "Les 5 ans de Discord !",
             "christmas-2019": "Noël en approche !",
-            "blurple-2021": "Les 6 ans de Discord !"
+            "blurple-2021": "Les 6 ans de Discord !",
+            "halloween-2021": "Halloween 2021 !"
         },
         "objectives": "Objectifs",
         "points": "points",
@@ -229,7 +230,6 @@
         "list-0": "**Type:** {T}\n**Moderateur:** {M}\n**Date:** {D}\n**Raison:** *{R}*",
         "list-1": "**Serveur:** {G}\n**Type:** {T}\n**Moderateur:** {M}\n**Date:** {D}\n**Raison:** *{R}*",
         "list-2": "\n**Durée :** {D}",
-        "no-case": "Cet utilisateur n'a aucun casier !",
         "no-user": "Impossible de trouver cet utilisateur",
         "no_database": "En raison d'une panne temporaire de la base de donnée, cette commande a été désactivée",
         "no-case": "Cet utilisateur n'a aucun casier !",
@@ -331,7 +331,6 @@
         "no-fun": "Les commandes fun ont été désactivées sur ce serveur. Pour voir leur liste, regardez https://zbot.rtfd.io/en/v3/fun.html",
         "no-reaction": "Impossible d'ajouter les réactions. Vérifiez mes permissions",
         "no-roll": "Aucun élément trouvé",
-        "not-enough-roll": "Il vous faut au moins deux éléments distincts",
         "no-say": "Impossible d'envoyer un message dans ce salon",
         "no-voicechan": "Vous devez être connecté à un salon vocal pour utiliser cette commande.",
         "not-enough-roll": "Il vous faut au moins deux éléments distincts",
@@ -361,7 +360,6 @@
         "reminds-title": "Rappel",
         "reminds-too-long": "Impossible de mettre une durée aussi longue",
         "reminds-too-short": "Vous avez saisi une durée invalide",
-        "reminds-link": "Message d'origine",
         "say-no-perm": "Vous ne possédez pas la permission d'envoyer des messages dans le salon {channel}",
         "thanos": [
             "{0} a été épargné par Thanos",
@@ -394,7 +392,6 @@
         ],
         "unafk-cant": "Vous n'êtes pas AFK !",
         "unafk-done": "Vous n'êtes maintenant plus AFK",
-        "unafk-cant": "Vous n'êtes pas AFK !",
         "uninhabited-city": "Endroit inhabité",
         "vote-0": "Vous ne pouvez pas mettre plus de 20 choix, encore moins un nombre négatif de choix !"
     },
@@ -919,7 +916,6 @@
         "invalid-flow": "Cet url est invalide (flux rss vide ou inaccessible) :confused:",
         "invalid-link": "Oups, cette adresse url est invalide ou incomplète :confused:",
         "list": "*Entrez le numéro du flux à modifier*\n\n**Lien - Type - Salon - Roles**\n",
-        "list-title": "Liste des flux rss du serveur {server}",
         "list-result": "Type : {}\nSalon : {}\nLien/chaine : {}\nRôle mentionné : {}\nIdentifiant : {}\nDernier post : {}",
         "list-title": "Liste des flux rss du serveur {server}",
         "list2": "*Entrez le numéro du flux à supprimer*\n\n**Lien - Type - Salon**\n",
@@ -1088,7 +1084,6 @@
         "guild-7": "{} dont {} bots ({} connectés)",
         "guild-8": "Authentification à deux facteurs",
         "guild-9": "Niveau de sécurité",
-        "guild-16": "Statiques : {s}/{l} | Animés : {a}/{l}",
         "guild-features": {
             "ANIMATED_ICON": "Icône de serveur animée",
             "BANNER": "Bannière de serveur custom",
@@ -1159,8 +1154,7 @@
         "rmd-deleted": "Le rappel N°{id} ayant pour message `{message}` a bien été supprimé !",
         "rmd-empty": "Oups, vous n'avez aucun rappel en cours...",
         "rmd-item": "ID : `{id}` | Dans : {duration} | Salon : {channel} | Message : {msg}",
-        "rmd-title": "Liste de vos rappels",
-        "rmd-cancelled": "Abandon de la procédure"
+        "rmd-title": "Liste de vos rappels"
     },
     "users": {
         "animated_card_false": "Vous n'utilisez actuellement pas de carte animée",

@@ -207,5 +207,5 @@ def main():
     client.run(token)
 
 
-if check_libs() and __name__ == "__main__":
+if __name__ == "__main__":
     main()

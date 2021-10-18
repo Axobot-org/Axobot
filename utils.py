@@ -228,64 +228,65 @@ class Zbot(commands.bot.AutoShardedBot):
 
 
 class RankCardsFlag:
-        FLAGS = {
-            1 << 0: "rainbow",
-            1 << 1: "blurple_19",
-            1 << 2: "blurple_20",
-            1 << 3: "christmas_19",
-            1 << 4: "christmas_20",
-            1 << 5: "halloween_20",
-            1 << 6: "blurple_21"
-        }
+    FLAGS = {
+        1 << 0: "rainbow",
+        1 << 1: "blurple_19",
+        1 << 2: "blurple_20",
+        1 << 3: "christmas_19",
+        1 << 4: "christmas_20",
+        1 << 5: "halloween_20",
+        1 << 6: "blurple_21",
+        1 << 7: "halloween_21"
+    }
 
-        def flagsToInt(self, flags: list) -> int:
-            r = 0
-            for k, v in self.FLAGS.items():
-                if v in flags:
-                    r |= k
-            return r
+    def flagsToInt(self, flags: list) -> int:
+        r = 0
+        for k, v in self.FLAGS.items():
+            if v in flags:
+                r |= k
+        return r
 
-        def intToFlags(self, i: int) -> list:
-            return [v for k, v in self.FLAGS.items() if i & k == k]
+    def intToFlags(self, i: int) -> list:
+        return [v for k, v in self.FLAGS.items() if i & k == k]
 
 class UserFlag:
-        FLAGS = {
-            1 << 0: "support",
-            1 << 1: "contributor",
-            1 << 2: "premium",
-            1 << 3: "partner",
-            1 << 4: "translator"
-        }
+    FLAGS = {
+        1 << 0: "support",
+        1 << 1: "contributor",
+        1 << 2: "premium",
+        1 << 3: "partner",
+        1 << 4: "translator"
+    }
 
-        def flagsToInt(self, flags: list) -> int:
-            r = 0
-            for k, v in self.FLAGS.items():
-                if v in flags:
-                    r |= k
-            return r
+    def flagsToInt(self, flags: list) -> int:
+        r = 0
+        for k, v in self.FLAGS.items():
+            if v in flags:
+                r |= k
+        return r
 
-        def intToFlags(self, i: int) -> list:
-            return [v for k, v in self.FLAGS.items() if i & k == k]
+    def intToFlags(self, i: int) -> list:
+        return [v for k, v in self.FLAGS.items() if i & k == k]
 
 def setup_logger():
     """Create the logger module, used for logs"""
     # on chope le premier logger
     log = logging.getLogger("runner")
     # on définis un formatteur
-    format = logging.Formatter("%(asctime)s %(levelname)s: %(message)s", datefmt="[%d/%m/%Y %H:%M]")
+    log_format = logging.Formatter("%(asctime)s %(levelname)s: %(message)s", datefmt="[%d/%m/%Y %H:%M]")
     # ex du format : [08/11/2018 14:46] WARNING Rss fetch_rss_flux l.288 : Cannot get the RSS flux because of the following error: (suivi du traceback)
 
     # log vers un fichier
     file_handler = logging.FileHandler("debug.log")
     # tous les logs de niveau DEBUG et supérieur sont evoyés dans le fichier
     file_handler.setLevel(logging.DEBUG)
-    file_handler.setFormatter(format)
+    file_handler.setFormatter(log_format)
 
     # log vers la console
     stream_handler = logging.StreamHandler(sys.stdout)
     # tous les logs de niveau INFO et supérieur sont evoyés dans le fichier
     stream_handler.setLevel(logging.INFO)
-    stream_handler.setFormatter(format)
+    stream_handler.setFormatter(log_format)
 
     # supposons que tu veuille collecter les erreurs sur ton site d'analyse d'erreurs comme sentry
     #sentry_handler = x
