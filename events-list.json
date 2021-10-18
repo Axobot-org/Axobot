@@ -29,7 +29,7 @@
         "type": "halloween",
         "icon": null,
         "color": 16089635,
-        "objectives": []
+        "objectives": [200]
     },
     "april-2021": {
         "begin": "2021-04-01",
@@ -46,5 +46,13 @@
         "icon": "https://zrunner.me/cdn/blurple_2021.png",
         "color": 7506394,
         "objectives": [200, 500]
+    },
+    "halloween-2021": {
+        "begin": "2021-10-20",
+        "end": "2021-11-01",
+        "type": "halloween",
+        "icon": null,
+        "color": 16089635,
+        "objectives": [150]
     }
 }
