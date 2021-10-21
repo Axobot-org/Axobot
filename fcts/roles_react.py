@@ -58,6 +58,8 @@ class RolesReact(commands.Cog):
             msg, role = await self.prepare_react(payload)
             if msg is not None:
                 user = msg.guild.get_member(payload.user_id)
+                if user is None:
+                    return
                 await self.give_remove_role(user, role, msg.guild, msg.channel, True, ignore_success=True)
         except Exception as e:
             await self.bot.get_cog("Errors").on_error(e)
@@ -70,6 +72,8 @@ class RolesReact(commands.Cog):
             msg, role = await self.prepare_react(payload)
             if msg is not None:
                 user = msg.guild.get_member(payload.user_id)
+                if user is None:
+                    return
                 await self.give_remove_role(user, role, msg.guild, msg.channel, False, ignore_success=True)
         except Exception as e:
             await self.bot.get_cog("Errors").on_error(e)
