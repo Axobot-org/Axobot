@@ -22,7 +22,7 @@ class Languages(discord.ext.commands.Cog):
         """Renvoie le texte en fonction de la langue"""
         if isinstance(serverID,discord.Guild):
             serverID = serverID.id
-        elif isinstance(serverID,discord.TextChannel):
+        elif hasattr(serverID, "guild") and isinstance(serverID.guild, discord.Guild): # guild channels and threads
             serverID = serverID.guild.id
         if str(serverID) in self.serv_opts.keys():
             lang_opt = self.serv_opts[str(serverID)]
