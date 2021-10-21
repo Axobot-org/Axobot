@@ -215,6 +215,8 @@ class Admin(commands.Cog):
                         pass
                 mentions = [x.mention for x in mentions if x is not None]
             for chan in channels:
+                if chan is None:
+                    continue
                 try:
                     await chan.send(self.update[lang]+"\n\n"+" ".join(mentions), allowed_mentions=discord.AllowedMentions(everyone=False, roles=True))
                 except Exception as e:
