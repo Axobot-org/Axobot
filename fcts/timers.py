@@ -97,7 +97,7 @@ class Timers(commands.Cog):
             # msg = "\n```\n" + msg.replace("```", "​`​`​`") + "\n```"
             chan = '<#'+str(item['channel'])+'>'
             end = item["utc_begin"] + datetime.timedelta(seconds=item['duration'])
-            duration = await time_delta(ctx.bot.utcnow(), end, lang=lang, year=True, form="temp", precision=0)
+            duration = await time_delta(ctx.bot.utcnow() if end.tzinfo else datetime.datetime.utcnow(), end, lang=lang, year=True, form="temp", precision=0)
             item = txt.format(id=item['ID'], duration=duration, channel=chan, msg=msg)
             liste.append(item)
         cursor.close()
