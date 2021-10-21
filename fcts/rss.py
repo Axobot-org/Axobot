@@ -172,8 +172,8 @@ class Rss(commands.Cog):
             Format = Format.replace('\\n','\n')
             if self.rt_by is not None:
                 self.author = "{} (retweeted by @{})".format(self.author,self.rt_by)
-            _channel = discord.utils.escape_markdown(self.channel)
-            _author = discord.utils.escape_markdown(self.author)
+            _channel = discord.utils.escape_markdown(self.channel) if self.channel else "?"
+            _author = discord.utils.escape_markdown(self.author) if self.author else "?"
             text = Format.format_map(self.bot.SafeDict(channel=_channel,title=self.title,date=d,url=self.url,link=self.url,mentions=", ".join(self.mentions),logo=self.logo,author=_author))
             if not self.embed:
                 return text
