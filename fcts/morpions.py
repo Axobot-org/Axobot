@@ -33,13 +33,13 @@ class Morpions(commands.Cog):
     """
         if leave == 'leave':
             if ctx.author.id not in self.in_game.keys():
-                await ctx.send(await self.bot._(ctx.channel, 'morpion', 'not-playing'))
+                await ctx.send(await self.bot._(ctx.channel, 'morpion.not-playing'))
             else:
                 self.in_game.pop(ctx.author.id)
-                await ctx.send(await self.bot._(ctx.channel, 'morpion', 'game-removed'))
+                await ctx.send(await self.bot._(ctx.channel, 'morpion.game-removed'))
             return
         if ctx.author.id in self.in_game.keys():
-            await ctx.send(await self.bot._(ctx.channel, 'morpion', 'already-playing'))
+            await ctx.send(await self.bot._(ctx.channel, 'morpion.already-playing'))
             return
         self.in_game[ctx.author.id] = time.time()
         game = self.Game(ctx, self, await self.get_ttt_mode(ctx))
@@ -127,8 +127,8 @@ class Morpions(commands.Cog):
             try:
                 grille = [x for x in range(1, 10)]
                 tour = await self.qui_commence()
-                u_begin = await self.bot._(ctx.channel, 'morpion', 'user-begin' if tour else 'bot-begin')
-                await ctx.send(u_begin.format(ctx.author.mention)+await self.bot._(ctx.channel, 'morpion', 'tip', symb1=self.emojis[0], symb2=self.emojis[1]))
+                u_begin = await self.bot._(ctx.channel, 'morpion.user-begin' if tour else 'morpion.bot-begin')
+                await ctx.send(u_begin.format(ctx.author.mention)+await self.bot._(ctx.channel, 'morpion.tip', symb1=self.emojis[0], symb2=self.emojis[1]))
                 match_nul = True
 
                 def check(m):
@@ -150,7 +150,7 @@ class Morpions(commands.Cog):
                         try:
                             msg: discord.Message = await self.bot.wait_for('message', check=check, timeout=50)
                         except asyncio.TimeoutError:
-                            await ctx.channel.send(await self.bot._(ctx.channel, 'morpion', 'too-late'))
+                            await ctx.channel.send(await self.bot._(ctx.channel, 'morpion.too-late'))
                             return
                         saisie = msg.content
                         if msg.content in self.entrees_valides:
@@ -160,13 +160,13 @@ class Morpions(commands.Cog):
                                 if self.mode == 1:
                                     await msg.delete(delay=0.1)
                             else:
-                                await ctx.send(await self.bot._(ctx.channel, 'morpion', 'pion-1'))
+                                await ctx.send(await self.bot._(ctx.channel, 'morpion.pion-1'))
                                 display_grille = False
                                 continue
                         elif msg.content.endswith("leave"):
                             return
                         else:
-                            await ctx.send(await self.bot._(ctx.channel, 'morpion', 'pion-2'))
+                            await ctx.send(await self.bot._(ctx.channel, 'morpion.pion-2'))
                             display_grille = False
                             continue
                 ###
@@ -201,14 +201,14 @@ class Morpions(commands.Cog):
                     await last_grid.delete()
                 if match_nul:
                     await self.bot.get_cog("Utilities").add_user_eventPoint(ctx.author.id, 1)
-                    resultat = await self.bot._(ctx.channel, 'morpion', 'nul')
+                    resultat = await self.bot._(ctx.channel, 'morpion.nul')
                 else:
                     if tour:  # Le bot a gagné
-                        resultat = await self.bot._(ctx.channel, 'morpion', 'win-2')
+                        resultat = await self.bot._(ctx.channel, 'morpion.win-bot')
                     else:  # L'utilisateur a gagné
-                        resultat = await self.bot._(ctx.channel, 'morpion', 'win-1')
+                        resultat = await self.bot._(ctx.channel, 'morpion.win-user', user=ctx.author.mention)
                         await self.bot.get_cog("Utilities").add_user_eventPoint(ctx.author.id, 4)
-                await ctx.send(await self.afficher_grille(grille)+'\n'+resultat.format(ctx.author.mention))
+                await ctx.send(await self.afficher_grille(grille)+'\n'+resultat)
             except Exception as e:
                 await self.bot.get_cog('Errors').on_command_error(ctx, e)
 
