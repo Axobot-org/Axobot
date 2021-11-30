@@ -277,7 +277,7 @@ Available types: member, role, user, emoji, channel, server, invite, category
                     try:
                         item = await find(ctx,name,Type)
                     except:
-                        await ctx.send(str(await self.bot._(ctx.guild.id,"modo.cant-find-user")).format(name))
+                        await ctx.send(await self.bot._(ctx.guild.id,"moderation.cant-find-user", user=name))
                         return
             critical = ctx.author.guild_permissions.manage_guild or await self.bot.get_cog('Admin').check_if_god(ctx)
             #-----

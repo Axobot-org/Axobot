@@ -1086,7 +1086,7 @@ class Xp(commands.Cog):
         ..Doc server.html#roles-rewards"""
         try:
             if not ctx.guild.me.guild_permissions.manage_roles:
-                return await ctx.send(await self.bot._(ctx.guild.id,'modo','cant-mute'))
+                return await ctx.send(await self.bot._(ctx.guild.id,'moderation.mute.cant-mute'))
             c = 0
             rr_list = await self.rr_list_role(ctx.guild.id)
             if len(rr_list) == 0:

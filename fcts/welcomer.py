@@ -138,7 +138,7 @@ class Welcomer(commands.Cog):
             return False
         # try to send a DM but don't mind if we can't
         try:
-            await member.send(await self.bot._(member, "modo", "raid-kicked", guild=member.guild.name))
+            await member.send(await self.bot._(member, "moderation.raid-kicked", guild=member.guild.name))
         except (discord.Forbidden, discord.HTTPException):
             pass
         try:
@@ -155,7 +155,7 @@ class Welcomer(commands.Cog):
             return False
         # try to send a DM but don't mind if we can't
         try:
-            await member.send(await self.bot._(member, "modo", "raid-banned", guild=member.guild.name))
+            await member.send(await self.bot._(member, "moderation.raid-banned", guild=member.guild.name))
         except (discord.Forbidden, discord.HTTPException):
             pass
         try:

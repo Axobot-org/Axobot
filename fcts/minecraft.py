@@ -437,7 +437,7 @@ Every information come from the website www.fr-minecraft.net"""
             players = []
         if players == []:
             if r['players']['online'] == 0:
-                players = [str(await self.bot._(guild, "keywords", "none")).capitalize()]
+                players = [str(await self.bot._(guild, "misc.none")).capitalize()]
             else:
                 players = ['Non disponible']
         IP = "{}:{}".format(ip, port) if port is not None else str(ip)
@@ -478,7 +478,7 @@ Every information come from the website www.fr-minecraft.net"""
             players = []
         if players == []:
             if r['players']['online'] == 0:
-                players = [str(await self.bot._(guild, "keywords", "none")).capitalize()]
+                players = [str(await self.bot._(guild, "misc.none")).capitalize()]
             else:
                 players = ['Non disponible']
         if "software" in r.keys():

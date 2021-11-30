@@ -190,7 +190,7 @@ class Events(commands.Cog):
                 clean_content = clean_content.replace(' ', '')
                 if len(clean_content) > 0 and sum(1 for c in clean_content if c.isupper())/len(clean_content) > 0.8 and len(clean_content)>7 and not msg.channel.permissions_for(msg.author).administrator:
                     try:
-                        await msg.channel.send(str(await self.bot._(msg.guild, "modo", "caps-lock")).format(msg.author.mention), delete_after=4.0)
+                        await msg.channel.send(await self.bot._(msg.guild, "moderation.caps-lock", user=msg.author.mention), delete_after=4.0)
                     except:
                         pass
 
