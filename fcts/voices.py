@@ -183,7 +183,7 @@ class VoiceChannels(commands.Cog):
         
         ..Doc server.html#voice-channels-managment"""
         if not ctx.guild.id in self.channels.keys() or len(self.channels[ctx.guild.id]) == 0:
-            await ctx.send(await self.bot._(ctx.guild.id, "voices", "no-channel"))
+            await ctx.send(await self.bot._(ctx.guild.id, "voices.no-channel"))
             return
         i = 0
         temp = list()
@@ -195,7 +195,7 @@ class VoiceChannels(commands.Cog):
                 i += 1
         for chan in temp:
             self.db_delete_channel(chan)
-        await ctx.send(await self.bot._(ctx.guild.id, "voices", "deleted", i=i))
+        await ctx.send(await self.bot._(ctx.guild.id, "voices.deleted", count=i))
 
 
 def setup(bot):

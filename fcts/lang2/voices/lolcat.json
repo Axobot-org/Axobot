@@ -1,0 +1,9 @@
+{
+    "lolcat": {
+        "deleted": {
+            "one": "1 deleted chan ._.",
+            "many": "%{count} deleted things :innocent:"
+        },
+        "no-channel": "Therz no voice channel that I did in ur server"
+    }
+}
