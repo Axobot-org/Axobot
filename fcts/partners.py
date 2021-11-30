@@ -154,11 +154,11 @@ class Partners(commands.Cog):
         tr_unknown = await self.bot._(channel.guild.id, 'keywords', 'unknown')
         tr_guild = await self.bot._(channel.guild.id, 'keywords', 'server')
         tr_bot = await self.bot._(channel.guild.id, 'keywords', 'bot')
-        tr_members = await self.bot._(channel.guild.id, 'stats_infos', 'role-3')
+        tr_members = await self.bot._(channel.guild.id, 'info.info.role-3')
         tr_guilds = await self.bot._(channel.guild.id, 'keywords', 'servers')
-        tr_invite = await self.bot._(channel.guild.id, 'stats_infos', 'inv-4')
+        tr_invite = await self.bot._(channel.guild.id, 'info.info.inv-4')
         tr_click = await self.bot._(channel.guild.id, 'keywords', 'click_here')
-        tr_owner = await self.bot._(channel.guild.id, 'stats_infos', 'guild-1')
+        tr_owner = await self.bot._(channel.guild.id, 'info.info.guild-1')
         count = 0
         if color is None:
             color = await self.bot.get_config(channel.guild.id,'partner_color')
@@ -340,7 +340,7 @@ class Partners(commands.Cog):
             return await ctx.send(await self.bot._(ctx.guild.id,'partners','unknown-server'))
         l = l[0]
         if new_invite is None:
-            return await ctx.send('{}: discord.gg/{}'.format(await self.bot._(ctx.guild.id,'stats_infos','inv-4'),l['target']))
+            return await ctx.send('{}: discord.gg/{}'.format(await self.bot._(ctx.guild.id,'info.info.inv-4'),l['target']))
         if not await checks.has_admin(ctx):
             return
         if await self.bdd_edit_partner(l['ID'],target=new_invite.code):
@@ -402,7 +402,7 @@ class Partners(commands.Cog):
         tr_guild = await self.bot._(ctx.guild.id,'keywords','server')
         tr_added = await self.bot._(ctx.guild.id,'keywords','added_at')
         tr_unknown = await self.bot._(ctx.guild.id,'keywords','unknown')
-        tr_owner = await self.bot._(ctx.guild.id,'stats_infos','guild-1')
+        tr_owner = await self.bot._(ctx.guild.id,'info.info.guild-1')
         for l in await self.bdd_get_guild(ctx.guild.id):
             date = str(await ctx.bot.get_cog('TimeUtils').date(l['added_at'],lang=lang,year=True,hour=False)).strip()
             if l['type']=='bot':

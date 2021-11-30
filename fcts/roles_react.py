@@ -300,9 +300,9 @@ Opposite is the subcommand 'join'
                     await channel.send(await self.bot._(guild.id, "roles_react", "already-dont-have"))
                 return
             if not guild.me.guild_permissions.manage_roles:
-                return await channel.send(await self.bot._(guild.id, 'modo', 'cant-mute'))
+                return await channel.send(await self.bot._(guild.id, 'moderation.mute.cant-mute'))
             if role.position >= guild.me.top_role.position:
-                return await channel.send(await self.bot._(guild.id, 'modo', 'role-high', r=role.name))
+                return await channel.send(await self.bot._(guild.id, 'moderation.role.too-high', r=role.name))
         try:
             if give:
                 await user.add_roles(role, reason="Roles reaction")
