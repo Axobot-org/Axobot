@@ -140,11 +140,11 @@ class Users(commands.Cog):
 
         ..Doc user.html#change-your-xp-card"""
         if ctx.bot_permissions.attach_files:
-            txts = [await self.bot._(ctx.channel,'xp','card-level'), await self.bot._(ctx.channel,'xp','card-rank')]
-            desc = await self.bot._(ctx.channel,'users','card-desc')
+            txts = [await self.bot._(ctx.channel, 'xp.card-level'), await self.bot._(ctx.channel, 'xp.card-rank')]
+            desc = await self.bot._(ctx.channel, 'users.card-desc')
             await ctx.send(desc,file=await self.bot.get_cog('Xp').create_card(ctx.author,style,25,0,[1,0],txts,force_static=True))
         else:
-            await ctx.send(await self.bot._(ctx.channel,'users','missing-attach-files'))
+            await ctx.send(await self.bot._(ctx.channel, 'users.missing-attach-files'))
     
     @profile_main.command(name='card')
     @commands.check(checks.database_connected)
@@ -164,21 +164,21 @@ class Users(commands.Cog):
                     await self.reload_event_rankcard(ctx.author.id)
                 except Exception as e:
                     await self.bot.get_cog("Errors").on_error(e, None)
-                await ctx.send(str(await self.bot._(ctx.channel,'users','list-cards')).format(available_cards))
+                await ctx.send(await self.bot._(ctx.channel, 'users.list-cards', cards=available_cards))
             else:
-                await ctx.send(str(await self.bot._(ctx.channel,'users','invalid-card')).format(available_cards))
+                await ctx.send(await self.bot._(ctx.channel, 'users.invalid-card', cards=available_cards))
             return
         elif style is None:
             if ctx.channel.permissions_for(ctx.me).attach_files:
                 style = await self.bot.get_cog('Utilities').get_xp_style(ctx.author)
-                txts = [await self.bot._(ctx.channel,'xp','card-level'), await self.bot._(ctx.channel,'xp','card-rank')]
-                desc = await self.bot._(ctx.channel,'users','card-desc')
+                txts = [await self.bot._(ctx.channel, 'xp.card-level'), await self.bot._(ctx.channel, 'xp.card-rank')]
+                desc = await self.bot._(ctx.channel, 'users.card-desc')
                 await ctx.send(desc,file=await self.bot.get_cog('Xp').create_card(ctx.author,style,25,0,[1,0],txts,force_static=True))
             else:
-                await ctx.send(await self.bot._(ctx.channel,'users','missing-attach-files'))
+                await ctx.send(await self.bot._(ctx.channel, 'users.missing-attach-files'))
         else:
             if await ctx.bot.get_cog('Utilities').change_db_userinfo(ctx.author.id,'xp_style',style):
-                await ctx.send(str(await self.bot._(ctx.channel,'users','changed-0')).format(style))
+                await ctx.send(await self.bot._(ctx.channel, 'users.changed-card', style=style))
                 last_update = self.get_last_rankcard_update(ctx.author.id)
                 if last_update is None:
                     await self.bot.get_cog("Utilities").add_user_eventPoint(ctx.author.id,15)
@@ -186,7 +186,7 @@ class Users(commands.Cog):
                     await self.bot.get_cog("Utilities").add_user_eventPoint(ctx.author.id,2)
                 self.set_last_rankcard_update(ctx.author.id)
             else:
-                await ctx.send(await self.bot._(ctx.channel,'users','changed-1'))
+                await ctx.send(await self.bot._(ctx.channel, 'users.changed-error'))
 
     @profile_main.command(name="config")
     @commands.check(checks.database_connected)
@@ -201,7 +201,7 @@ class Users(commands.Cog):
         Providing empty value will show you the current value and more details"""
         options = {"animated_card":"animated_card", "auto_unafk":"auto_unafk", "usernames_log":"allow_usernames_logs"}
         if option not in options.keys():
-            await ctx.send(await self.bot._(ctx.channel,"users","config_list",options=" - ".join(options.keys())))
+            await ctx.send(await self.bot._(ctx.channel, "users.config_list", options=" - ".join(options.keys())))
             return
         if allow is None:
             value = await self.bot.get_cog('Utilities').get_db_userinfo([options[option]],[f'`userID`={ctx.author.id}'])
@@ -214,14 +214,14 @@ class Users(commands.Cog):
             else:
                 emojis = ('✅','❎')
             if value:
-                await ctx.send(emojis[0]+" "+await self.bot._(ctx.channel,'users',option+'_true'))
+                await ctx.send(emojis[0]+" "+await self.bot._(ctx.channel, f'users.set_config.{option}.true'))
             else:
-                await ctx.send(emojis[1]+" "+await self.bot._(ctx.channel,'users',option+'_false'))
+                await ctx.send(emojis[1]+" "+await self.bot._(ctx.channel, f'users.set_config.{option}.false'))
         else:
             if await self.bot.get_cog('Utilities').change_db_userinfo(ctx.author.id,options[option],allow):
-                await ctx.send(await self.bot._(ctx.channel,'users','config_success',opt=option))
+                await ctx.send(await self.bot._(ctx.channel, 'users.config_success', opt=option))
             else:
-                await ctx.send(await self.bot._(ctx.channel,'users','changed-1'))
+                await ctx.send(await self.bot._(ctx.channel, 'users.changed-error'))
 
     def get_last_rankcard_update(self, userID: int):
         try:
