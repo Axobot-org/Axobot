@@ -1,0 +1,9 @@
+{
+    "en": {
+        "deleted": {
+            "one": "1 deleted channel",
+            "many": "%{count} deleted channels"
+        },
+        "no-channel": "There are no voice channel generated in this server"
+    }
+}
