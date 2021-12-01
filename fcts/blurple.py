@@ -69,7 +69,7 @@ def _make_check_command(name, parent, **kwargs):
             else:
                 url = who.avatar_url
 
-        old_msg = await ctx.send("Starting check for {}...".format(ctx.author.mention))
+        old_msg = await ctx.send(await ctx.bot._(ctx.channel, "blurple.check_intro", user=ctx.author.mention))
         async with aiohttp.ClientSession() as session:
             async with session.get(str(url)) as image:
                 r = await check_image(await image.read(), theme, name)
@@ -95,7 +95,7 @@ def _make_color_command(name, fmodifier, parent, **kwargs):
                       who: typing.Union[discord.Member, discord.PartialEmoji, LinkConverter] = None):
 
         if not (ctx.guild is None or ctx.channel.permissions_for(ctx.guild.me).attach_files):
-            return await ctx.send(await self.bot._(ctx.channel,"blurple","missing-attachment-perm"))
+            return await ctx.send(await self.bot._(ctx.channel,"blurple.missing-attachment-perm"))
 
         if method is None:
             method = await self.get_default_blurplefier(ctx)
@@ -122,15 +122,15 @@ def _make_color_command(name, fmodifier, parent, **kwargs):
         else:
             final_modifier = fmodifier
 
-        old_msg = await ctx.send("Starting {} for {}...".format(name,ctx.author.mention))
+        old_msg = await ctx.send(await ctx.bot._(ctx.channel, 'blurple.blurplefy.starting', name=name, user=ctx.author.mention))
         try:
             async with aiohttp.ClientSession() as session:
                 async with session.get(str(url)) as image:
                     r = await convert_image(await image.read(), final_modifier, method,variations)
         except RuntimeError as e:
-            await ctx.send(f"Oops, something went wrong: {e}")
+            await ctx.send(await ctx.bot._(ctx.channel, 'blurple.unknown-err', err=str(e)))
             return
-        await ctx.send(f"{ctx.author.mention}, here's your image!", file=r)
+        await ctx.send(await ctx.bot._(ctx.channel, 'blurple.blurplefy.success', user=ctx.author.mention), file=r)
         await old_msg.delete()
         await self.bot.get_cog("Utilities").add_user_eventPoint(ctx.author.id, 3)
 
@@ -241,9 +241,9 @@ __29 variations: __
         else:
             lang = await self.bot._(ctx.channel, '_used_locale')
             remaining = await self.bot.get_cog("TimeUtils").time_delta(-time_since_available, lang=lang)
-            txt = await self.bot._(ctx.channel, "blurple", "too-quick", time=remaining)
+            txt = await self.bot._(ctx.channel, "blurple.collect.too-quick", time=remaining)
         if ctx.can_send_embed:
-            title = "Blurple event"
+            title = await self.bot._(ctx.channel, 'blurple.collect.title')
             emb = discord.Embed(title=title, description=txt, color=discord.Color(int("7289DA",16)))
             await ctx.send(embed=emb)
         else:
