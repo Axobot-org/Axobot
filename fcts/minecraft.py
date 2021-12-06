@@ -21,7 +21,7 @@ Every information come from the website www.fr-minecraft.net"""
         self.file = "minecraft"
         self.uuid_cache = dict()
 
-    @commands.command(name="mojang", aliases=['mojang_status'])
+    @commands.command(name="mojang", aliases=['mojang_status'], enabled=False)
     @commands.cooldown(5, 20, commands.BucketType.user)
     async def mojang_status(self, ctx: MyContext):
         """Get Mojang server status
