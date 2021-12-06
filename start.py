@@ -63,7 +63,7 @@ def main():
                       'fcts.servers',
                       'fcts.timers',
                       'fcts.timeutils',
-                      'fcts.translations',
+                    #   'fcts.translations',
                       'fcts.users',
                       'fcts.utilities',
                       'fcts.voices',
