@@ -571,8 +571,8 @@ You can specify a verification limit by adding a number in argument (up to 1.000
             await ctx.send(await self.bot._(ctx.channel,"fun","piece-1"))
         else:
             await ctx.send(random.choice(await self.bot._(ctx.channel,"fun","piece-0")))
-    
-    @commands.command(name="weather",aliases=['météo'])
+
+    @commands.command(name="weather",aliases=['météo'], enabled=False)
     @commands.cooldown(4, 30, type=commands.BucketType.guild)
     async def weather(self, ctx:MyContext, *, city:str):
         """Get the weather of a city
