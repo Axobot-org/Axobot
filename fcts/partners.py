@@ -246,21 +246,23 @@ class Partners(commands.Cog):
 
     async def give_roles(self,invite:discord.Invite,guild:discord.Guild):
         """Give a role to admins of partners"""
-        if isinstance(invite.guild,discord.Guild):
-            if guild.id == 356067272730607628 and self.bot.beta:
-                return
-            roles = await self.bot.get_config(guild.id,'partner_role')
-            roles = [x for x in [guild.get_role(int(x)) for x in roles.split(';') if len(x) > 0 and x.isnumeric()] if x is not None]
-            admins = [x for x in invite.guild.members if x.guild_permissions.administrator]
-            for admin in admins:
-                if admin in guild.members:
-                    member = guild.get_member(admin.id)
-                    for role in roles:
-                        if role not in member.roles:
-                            try:
-                                await member.add_roles(role)
-                            except:
-                                pass
+        if not isinstance(invite.guild,discord.Guild):
+            return
+        if guild.id == 356067272730607628 and self.bot.beta:
+            return
+        roles = await self.bot.get_config(guild.id,'partner_role')
+        roles = (guild.get_role(int(x)) for x in roles.split(';') if len(x) > 0 and x.isnumeric())
+        roles = (x for x in roles if x is not None)
+        admins = [x for x in invite.guild.members if not x.bot and x.guild_permissions.administrator]
+        for admin in admins:
+            if admin in guild.members:
+                member = guild.get_member(admin.id)
+                for role in roles:
+                    if role not in member.roles:
+                        try:
+                            await member.add_roles(role)
+                        except (discord.HTTPException, discord.Forbidden):
+                            pass
 
 
     @commands.group(name="partner",aliases=['partners'])
