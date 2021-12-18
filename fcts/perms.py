@@ -48,30 +48,26 @@ class Perms(commands.Cog):
         else:
             return
         permsl = list()
-        # Get the perms translations
-        perms_translations = await self.bot._(ctx.guild.id,'perms','perms-list')
 
         if perms.administrator:
             # If the user is admin, we just say it
-            if "administrator" in perms_translations.keys():
-                perm = perms_translations["administrator"]
-            else:
-                perm = "Administrator"
-            permsl.append(self.bot.get_cog('Emojis').customEmojis['green_check']+perm)
+            perm_tr = await self.bot._(ctx.guild.id, "permissions.list.administrator")
+            if "permissions.list." in perm_tr: # unsuccessful translation
+                perm_tr = "Administrator"
+            permsl.append(self.bot.get_cog('Emojis').customEmojis['green_check'] + perm_tr)
         else:
             # Here we check if the value of each permission is True.
-            for perm, value in perms:
-                if (perm not in self.perms_name['text']+self.perms_name['common_channel'] and isinstance(channel,discord.TextChannel)) or (perm not in self.perms_name['voice']+self.perms_name['common_channel'] and isinstance(channel,discord.VoiceChannel)):
+            for perm_id, value in perms:
+                if (perm_id not in self.perms_name['text']+self.perms_name['common_channel'] and isinstance(channel,discord.TextChannel)) or (perm_id not in self.perms_name['voice']+self.perms_name['common_channel'] and isinstance(channel,discord.VoiceChannel)):
                     continue
                 #perm = perm.replace('_',' ').title()
-                if perm in perms_translations.keys():
-                    perm = perms_translations[perm]
-                else:
-                    perm = perm.replace('_',' ').title()
+                perm_tr = await self.bot._(ctx.guild.id, "permissions.list."+perm_id)
+                if "permissions.list." in perm_tr: # unsuccessful translation
+                    perm_tr = perm_id.replace('_',' ').title()
                 if value:
-                    permsl.append(self.bot.get_cog('Emojis').customEmojis['green_check']+perm)
+                    permsl.append(self.bot.get_cog('Emojis').customEmojis['green_check'] + perm_tr)
                 else:
-                    permsl.append(self.bot.get_cog('Emojis').customEmojis['red_cross']+perm)
+                    permsl.append(self.bot.get_cog('Emojis').customEmojis['red_cross'] + perm_tr)
         if ctx.can_send_embed:
             # \uFEFF is a Zero-Width Space, which basically allows us to have an empty field name.
             # And to make it look nice, we wrap it in an Embed.
@@ -85,10 +81,10 @@ class Perms(commands.Cog):
             else:
                 fields = [{'name':'\uFEFF', 'value':"\n".join(permsl),'inline':True}]
             if channel is None:
-                desc = await self.bot._(ctx.guild.id,'perms','general')
+                desc = await self.bot._(ctx.guild.id, "permissions.general")
             else:
                 desc = channel.mention
-            _whatisthat = await self.bot._(ctx.guild.id, "perms", "whatisthat")
+            _whatisthat = await self.bot._(ctx.guild.id, "permissions.whatisthat")
             fields.append({
                 'name': '\uFEFF',
                 'value': f'[{_whatisthat}](https://zbot.readthedocs.io/en/latest/perms.html)',
@@ -101,7 +97,7 @@ class Perms(commands.Cog):
             # Thanks to Gio for the Command.
         else:
             try:
-                txt = str(await self.bot._(ctx.guild.id,"perms","perms-1")).format(name) + "\n".join(permsl)
+                txt = await self.bot._(ctx.guild.id,"permissions.title", name=name) + "\n".join(permsl)
                 allowed_mentions = discord.AllowedMentions.none()
                 await ctx.send(txt, allowed_mentions=allowed_mentions)
             except:
