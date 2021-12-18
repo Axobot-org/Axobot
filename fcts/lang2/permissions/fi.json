@@ -1,0 +1,38 @@
+{
+    "fi": {
+        "general": "Yleiset käyttöoikeudet",
+        "title": "**\"%{name}\" käyttöoikeudet:**\n\n",
+        "list": {
+            "add_reactions": "Lisätä reaktioita",
+            "administrator": "Järjestelmänvalvoja",
+            "attach_files": "Liitä tiedostoja",
+            "ban_members": "Anna porttikieltoja jäsenille",
+            "change_nickname": "Vaihtaa nimimerkkiä",
+            "connect": "Yhdistää",
+            "create_instant_invite": "Luoda kutsuja",
+            "deafen_members": "Poistaa ääniä jäseniltä",
+            "embed_links": "Upota linkkejä",
+            "external_emojis": "Käyttää ulkoisia hymiöitä",
+            "kick_members": "Erottaa jäseniä",
+            "manage_channels": "Hallinnoi kanavia",
+            "manage_emojis": "Hallinnoi hymiöitä",
+            "manage_guild": "Hallinnoi palvelinta",
+            "manage_messages": "Hallinnoi viestejä",
+            "manage_nicknames": "Hallinoi nimimerkkejä",
+            "manage_roles": "Hallinnoi rooleja",
+            "manage_webhooks": "Hallinnoi webhookeja",
+            "move_members": "Siirrä jäseniä",
+            "mute_members": "Mykistää jäseniä",
+            "priority_speaker": "Ensisijainen puhuja",
+            "read_message_history": "Lukea viestihistoriaa",
+            "send_messages": "Lähettää viestejä",
+            "send_tts_messages": "Lähettää tekstistä puheeksi viestejä",
+            "speak": "Puhua",
+            "stream": "Suoratoistaa",
+            "use_voice_activation": "Käyttää puheentunnistusta",
+            "view_audit_log": "Katsoa valvontalokia",
+            "view_guild_insights": "Nähdä palvelinanalyysit"
+        },
+        "whatisthat": "Mitä tarkoitat?"
+    }
+}
