@@ -461,7 +461,7 @@ class Partners(commands.Cog):
         """Reload your partners channel
         
         ..Doc server.html#reload-your-list"""
-        msg = await ctx.send(str(await self.bot._(ctx.guild,'rss','guild-loading')).format(self.bot.get_cog('Emojis').customEmojis['loading']))
+        msg = await ctx.send(await self.bot._(ctx.guild, "rss.guild-loading", emoji=self.bot.get_cog('Emojis').customEmojis['loading']))
         channel = await self.bot.get_cog('Servers').get_server(criters=[f"`ID`={ctx.guild.id}"],columns=['partner_channel','partner_color'])
         if len(channel) == 0:
             return await msg.edit(content=await self.bot._(ctx.guild,'partners','no-channel'))

@@ -393,7 +393,7 @@ Every information come from the website www.fr-minecraft.net"""
             port = ''
         is_over, flow_limit = await self.bot.get_cog('Rss').is_overflow(ctx.guild)
         if is_over:
-            await ctx.send(str(await self.bot._(ctx.guild.id, "rss", "flow-limit")).format(flow_limit))
+            await ctx.send(await self.bot._(ctx.guild.id, "rss.flow-limit", limit=flow_limit))
             return
         try:
             if port is None:
@@ -403,7 +403,7 @@ Every information come from the website www.fr-minecraft.net"""
             await self.bot.get_cog('Rss').add_flow(ctx.guild.id, ctx.channel.id, 'mc', "{}:{}".format(ip, port))
             await ctx.send(await self.bot._(ctx.guild, "minecraft.success-add", ip=display_ip, channel=ctx.channel.mention))
         except Exception as e:
-            await ctx.send(await self.bot._(ctx.guild, "rss", "fail-add"))
+            await ctx.send(await self.bot._(ctx.guild, "rss.fail-add"))
             await self.bot.get_cog("Errors").on_error(e, ctx)
 
     async def create_server_1(self, guild: discord.Guild, ip: str, port=None):
