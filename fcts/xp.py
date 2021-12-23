@@ -958,7 +958,7 @@ class Xp(commands.Cog):
             await self.bdd_set_xp(user.id, xp, Type='set', guild=ctx.guild.id)
             await ctx.send(await self.bot._(ctx.guild.id,'xp','change-xp-ok',user=str(user),xp=xp))
         except Exception as e:
-            await ctx.send(await self.bot._(ctx.guild.id,'mc','serv-error'))
+            await ctx.send(await self.bot._(ctx.guild.id, "minecraft.serv-error"))
             await self.bot.get_cog('Errors').on_error(e,ctx)
         else:
             if ctx.guild.id not in self.cache.keys():

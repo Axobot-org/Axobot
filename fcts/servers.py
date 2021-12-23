@@ -1076,7 +1076,7 @@ class Servers(commands.Cog):
                 r = await self.bot._(channel,"server","change-0")
             try:
                 if not channel.permissions_for(channel.guild.me).embed_links:
-                    await channel.send(await self.bot._(channel.id,"mc","cant-embed"))
+                    await channel.send(await self.bot._(channel.id, "minecraft.cant-embed"))
                     return
                 title = str(await self.bot._(channel,"server","opt_title")).format(option,guild.name)
                 if hasattr(ctx, "message"):
