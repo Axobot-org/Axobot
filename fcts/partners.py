@@ -77,7 +77,6 @@ class Partners(commands.Cog):
             ID = await self.generate_id()
             cnx = self.bot.cnx_frm
             cursor = cnx.cursor(dictionary = True)
-            # query = ("INSERT INTO `{table}` (`ID`,`guild`,`target`,`type`,`description`) VALUES ('{id}','{guild}','{target}','{type}','{desc}');".format(table=self.table,id=ID,guild=guildID,target=partnerID,type=partnerType,desc=desc.replace("'","\\'")))
             query = "INSERT INTO `{}` (`ID`,`guild`,`target`,`type`,`description`) VALUES (%(i)s,%(g)s,%(ta)s,%(ty)s,%(d)s);".format(self.table)
             cursor.execute(query, { 'i': ID, 'g': guildID, 'ta': partnerID, 'ty': partnerType, 'd': desc })
             cnx.commit()
@@ -288,23 +287,23 @@ class Partners(commands.Cog):
                 if item.bot==False:
                     raise Exception
             except:
-                return await ctx.send(await self.bot._(ctx.guild.id,'partners','invalid-bot'))
+                return await ctx.send(await self.bot._(ctx.guild.id, "partners.invalid-bot"))
             Type = 'bot'
         elif isinstance(invite,str):
             try:
                 item = await self.bot.fetch_invite(invite)
             except discord.errors.NotFound:
-                return await ctx.send(await self.bot._(ctx.guild.id,'partners','invalid-invite'))
+                return await ctx.send(await self.bot._(ctx.guild.id, "partners.invalid-invite"))
             Type = 'guild'
         else:
             return
         current_list = [x['target'] for x in await self.bdd_get_guild(ctx.guild.id)]
         if str(item.id) in current_list:
-            return await ctx.send(await self.bot._(ctx.guild,"partners","already-added"))
+            return await ctx.send(await self.bot._(ctx.guild, "partners.already-added"))
         if len(description) > 0:
             description = await self.bot.get_cog('Emojis').anti_code(description)
         await self.bdd_set_partner(guildID=ctx.guild.id,partnerID=item.id,partnerType=Type,desc=description)
-        await ctx.send(await self.bot._(ctx.guild.id,'partners','added-partner'))
+        await ctx.send(await self.bot._(ctx.guild.id, "partners.added-partner"))
         # logs
         emb = self.bot.get_cog("Embeds").Embed(desc=f"New partner added: {Type} {item.id}", color=10949630, footer_text=ctx.guild.name).update_timestamp().set_author(self.bot.user)
         await self.bot.get_cog("Embeds").send([emb])
@@ -319,13 +318,13 @@ class Partners(commands.Cog):
         ..Doc server.html#add-a-partner"""
         l = await self.bdd_get_partner(ID,ctx.guild.id)
         if len(l) == 0:
-            return await ctx.send(await self.bot._(ctx.guild.id,'partners','invalid-partner'))
+            return await ctx.send(await self.bot._(ctx.guild.id, "partners.invalid-partner"))
         l = l[0]
         description = await self.bot.get_cog('Emojis').anti_code(description)
         if await self.bdd_edit_partner(l['ID'],desc=description):
-            await ctx.send(await self.bot._(ctx.guild.id,'partners','changed-desc'))
+            await ctx.send(await self.bot._(ctx.guild.id, "partners.changed-desc"))
         else:
-            await ctx.send(await self.bot._(ctx.guild.id,'partners','unknown-error'))
+            await ctx.send(await self.bot._(ctx.guild.id, "partners.unknown-error"))
 
     @partner_main.command(name='invite')
     async def partner_invite(self, ctx: MyContext, ID:int, new_invite:discord.Invite=None):
@@ -337,16 +336,16 @@ class Partners(commands.Cog):
         ..Doc server.html#change-a-server-invite"""
         l = await self.bdd_get_partner(ID,ctx.guild.id)
         if len(l) == 0 or l[0]['type']!='guild':
-            return await ctx.send(await self.bot._(ctx.guild.id,'partners','unknown-server'))
+            return await ctx.send(await self.bot._(ctx.guild.id, "partners.unknown-server"))
         l = l[0]
         if new_invite is None:
             return await ctx.send('{}: discord.gg/{}'.format(await self.bot._(ctx.guild.id,'info.info.inv-4'),l['target']))
         if not await checks.has_admin(ctx):
             return
         if await self.bdd_edit_partner(l['ID'],target=new_invite.code):
-            await ctx.send(await self.bot._(ctx.guild.id,'partners','changed-invite'))
+            await ctx.send(await self.bot._(ctx.guild.id, "partners.changed-invite"))
         else:
-            await ctx.send(await self.bot._(ctx.guild.id,'partners','unknown-error'))
+            await ctx.send(await self.bot._(ctx.guild.id, "partners.unknown-error"))
 
     @partner_main.command(name='remove')
     @commands.check(checks.has_admin)
@@ -357,23 +356,23 @@ class Partners(commands.Cog):
         
         ..Doc server.html#remove-a-partner"""
         if not ctx.channel.permissions_for(ctx.guild.me).add_reactions:
-            return await ctx.send(await self.bot._(ctx.guild.id,'partners','missing-reactions'))
+            return await ctx.send(await self.bot._(ctx.guild.id, "partners.missing-reactions"))
         l = await self.bdd_get_partner(ID,ctx.guild.id)
         if len(l) == 0:
-            return await ctx.send(await self.bot._(ctx.guild.id,'partners','invalid-partner'))
+            return await ctx.send(await self.bot._(ctx.guild.id, "partners.invalid-partner"))
         l = l[0]
         if l['type']=='bot':
             try:
                 bot = await self.bot.fetch_user(l['target'])
             except:
                 bot = l['target']
-            msg = await ctx.send((await self.bot._(ctx.guild.id,'partners','confirm-bot')).format(bot))
+            msg = await ctx.send(await self.bot._(ctx.guild.id, "partners.confirm-bot", bot=bot))
         elif l['type']=='guild':
             try:
                 server = (await self.bot.fetch_invite(l['target'])).guild.name
             except:
                 server = l['target']
-            msg = await ctx.send((await self.bot._(ctx.guild.id,'partners','confirm-server')).format(server))
+            msg = await ctx.send(await self.bot._(ctx.guild.id, "partners.confirm-server", server=server))
         else:
             return
         await msg.add_reaction('✅')
@@ -382,13 +381,13 @@ class Partners(commands.Cog):
         try:
             await ctx.bot.wait_for('reaction_add', timeout=10.0, check=check)
         except asyncio.TimeoutError:
-            return await ctx.send(await self.bot._(ctx.guild.id,'partners','del-canceled'))
+            return await ctx.send(await self.bot._(ctx.guild.id, "partners.del-canceled"))
         if await self.bdd_del_partner(l['ID']):
-            await ctx.send(await self.bot._(ctx.guild.id,'partners','deleted'))
+            await ctx.send(await self.bot._(ctx.guild.id, "partners.deleted"))
             emb = self.bot.get_cog("Embeds").Embed(desc=f"Partner removed: {l['type']} {l['ID']}", color=10949630, footer_text=ctx.guild.name).update_timestamp().set_author(self.bot.user)
             await self.bot.get_cog("Embeds").send([emb])
         else:
-            await ctx.send(await self.bot._(ctx.guild.id,'partners','unknown-error'))
+            await ctx.send(await self.bot._(ctx.guild.id, "partners.unknown-error"))
         
     @partner_main.command(name="list")
     @commands.check(checks.has_manage_guild)
@@ -426,12 +425,12 @@ class Partners(commands.Cog):
                 else:
                     f[1] += f"{server.name} ({tr_owner} : {server.owner})\n"
         else:
-            f[1] = await self.bot._(ctx.guild.id,'partners','missing-manage-guild')
+            f[1] = await self.bot._(ctx.guild.id, "partners.missing-manage-guild")
         if len(f[0]) == 0:
-            f[0] = await self.bot._(ctx.guild.id,'partners','no-partner')
+            f[0] = await self.bot._(ctx.guild.id, "partners.no-partner")
         if len(f[1]) == 0:
-            f[1] = await self.bot._(ctx.guild.id,'partners','no-partner-2')
-        fields_name = await self.bot._(ctx.guild.id,'partners','partners-list')
+            f[1] = await self.bot._(ctx.guild.id, "partners.no-partner-2")
+        fields_name = await self.bot._(ctx.guild.id, "partners.partners-list")
         if ctx.can_send_embed:
             color = await ctx.bot.get_config(ctx.guild.id,'partner_color')
             if color is None:
@@ -464,15 +463,15 @@ class Partners(commands.Cog):
         msg = await ctx.send(await self.bot._(ctx.guild, "rss.guild-loading", emoji=self.bot.get_cog('Emojis').customEmojis['loading']))
         channel = await self.bot.get_cog('Servers').get_server(criters=[f"`ID`={ctx.guild.id}"],columns=['partner_channel','partner_color'])
         if len(channel) == 0:
-            return await msg.edit(content=await self.bot._(ctx.guild,'partners','no-channel'))
-        chan = channel[0]['partner_channel'].split(';')[0]
+            return await msg.edit(content=await self.bot._(ctx.guild, "partners.no-channel"))
+        chan: str = channel[0]['partner_channel'].split(';')[0]
         if not chan.isnumeric():
-            return await msg.edit(content=await self.bot._(ctx.guild,'partners','no-channel'))
+            return await msg.edit(content=await self.bot._(ctx.guild, "partners.no-channel"))
         chan = ctx.guild.get_channel(int(chan))
         if chan is None:
-            return await msg.edit(content=await self.bot._(ctx.guild,'partners','no-channel'))
+            return await msg.edit(content=await self.bot._(ctx.guild, "partners.no-channel"))
         count = await self.update_partners(chan,channel[0]['partner_color'])
-        await msg.edit(content=str(await self.bot._(ctx.guild,'partners','reloaded')).format(count))
+        await msg.edit(content=await self.bot._(ctx.guild, "partners.reloaded", count=count))
 
 
 
