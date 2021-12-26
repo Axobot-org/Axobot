@@ -1,0 +1,21 @@
+{
+    "fi": {
+        "already-1-rr": "Sinulla on jo rooli tälle hymiölle",
+        "already-dont-have": "Sinulla ei ole tätä roolia",
+        "already-have": "Sinulla on jo tämä rooli",
+        "embed-edited": "Upotettu linkki ja reaktiot ovat päivitetty",
+        "no-rr": "Tällä hymiöllä ei ole roolia",
+        "not-zbot-embed": "Tällä viestillä ei ole mitään reagoi-rooli upotettua linkkiä",
+        "not-zbot-msg": "Tämä viesti ei ole Zbotin",
+        "reactions-edited": "Reaktiot on päivitetty",
+        "role-given": "%{r} rooli on annettu",
+        "role-lost": "%{r} on otettu pois sinun rooleista",
+        "role-not-in-list": "Tämä rooli ei ole osa listasta",
+        "rr-added": "%{r} rooli on lisätty hymiölle %{e}",
+        "rr-embed": "Roolit joita voi ottaa",
+        "rr-list": "Lista reagointi rooleista (%{n}/%{m})",
+        "rr-removed": "%{r} roolia ei enään anneta hymiöllä %{e}",
+        "rr-removed-2": "Emoji %{e} on nyt vapaa antamaan roolin uudestaan",
+        "too-many-rr": "Olet jo tavoittanut rajan joka on %{l} roolia"
+    }
+}

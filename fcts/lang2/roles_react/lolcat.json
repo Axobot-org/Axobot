@@ -1,0 +1,21 @@
+{
+    "lolcat": {
+        "already-1-rr": "U already has a designated role 4 this emoji",
+        "already-dont-have": "U don'ut have this role",
+        "already-have": "yOu AlReADY HAVE ThIS rOLE",
+        "embed-edited": "Teh embed & reactions have bee succccessssffuly update",
+        "no-rr": "NO role is related to this emoji",
+        "not-zbot-embed": "This msg dont has any rolereact colorful box",
+        "not-zbot-msg": "NOOOOOOO tish msg is not Zbot's. bad dude.",
+        "reactions-edited": "The react has been rightly updat :check:",
+        "role-given": "The role %{r} has been given",
+        "role-lost": "ThE rolE %{r} HAS BEeN reMoVEd fR0M yOUr ROLEs",
+        "role-not-in-list": "Tish role iz NOT part ov the giveable r0ls",
+        "rr-added": "Da role %{r} has been added for the emoji %{e}",
+        "rr-embed": "tAkInG on A ROle",
+        "rr-list": "lIsT 0v REacti0n RoLes (%{n}/%{m})",
+        "rr-removed": "The role %{r} can no longer be given via the emoji %{e}",
+        "rr-removed-2": "Dat emoji %{e} is can again gaving a role",
+        "too-many-rr": "You have 'ready reached da limit ov %{l} roles"
+    }
+}
