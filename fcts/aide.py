@@ -33,7 +33,7 @@ class Help(commands.Cog):
         prefix = await self.bot.get_prefix(ctx.message)
         if type(prefix) == list:
             prefix = prefix[-1]
-        await ctx.send(await self.bot.get_cog('Languages').tr(ctx.guild, 'welcome', 'aide', p=prefix))
+        await ctx.send(await self.bot.get_cog('Languages').tr(ctx.guild, "welcome.help", p=prefix))
 
     @commands.command(name="about", aliases=["botinfos", "botinfo"])
     @commands.cooldown(7, 30, commands.BucketType.user)

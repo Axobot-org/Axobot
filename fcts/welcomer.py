@@ -222,7 +222,7 @@ class Welcomer(commands.Cog):
                     try:
                         await member.add_roles(role,reason=await self.bot._(member.guild.id,"logs.reason.welcome_roles"))
                     except discord.errors.Forbidden:
-                        await self.bot.get_cog('Events').send_logs_per_server(member.guild,'error',await self.bot._(member.guild,'bvn','error-give-roles',r=role.name,u=str(member)), member.guild.me)
+                        await self.bot.get_cog('Events').send_logs_per_server(member.guild,'error',await self.bot._(member.guild, "welcome.error-give-roles",r=role.name, u=str(member)), member.guild.me)
         except discord.errors.NotFound:
             pass
         except Exception as e:
