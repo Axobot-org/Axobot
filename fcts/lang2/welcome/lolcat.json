@@ -1,0 +1,6 @@
+{
+    "lolcat": {
+        "help": "__**Wilcom 2 teh join end leef mesg modul**__\n\nDis modul is usd 2 configur a' automatic mesage each tiem membr enters or exits ur servr.\n\n__** ConfiGrationZ**__\n\n`1-` To configur teh channel wer thees mesagez 're writtn, entr `%{p}config change welcome_channel` followd by teh channl ID (U can use it # as wellas its iD or its full nice name).\n`2-` To configure a msg, entr `%{p}config change <welcome|leave> <message>`. 4 dis mesage u can uz somm variabl':\n - `{user}` mentionz teh member\n - `{server}` displayz the servr nayme\n - `{owner}` displayz teh servr ownr nam\n - `{member_count}` showz the curent nbr oof memberz\n - `{type}` show theh type of the user (bot/member)\n",
+        "error-give-roles": "Srry I wasn't abl 2 give role '%{r}' to new cat `%{u}`. Pls check hierarchy and 'Manage roles' perms :sad:"
+    }
+}

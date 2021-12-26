@@ -1,0 +1,6 @@
+{
+    "en": {
+        "help": "__**Welcome to the join & leave message module**__\n\nThis module is used to configure an automatic message each time a member enters or exits your server.\n\n__** Configuration**__\n\n`1-` To configure the chat room where these messages are written, enter `%{p}config change welcome_channel` followed by the channel (you can use its mention as well as its identifier or its full name).\n`2-` To configure a message, enter `%{p}config change <welcome|leave> <message>`. For this message you can use some variables:\n - `{user}` mentions the member\n - `{server}` displays the server name\n - `{owner}` displays the server owner name\n - `{member_count}` shows the current number of members\n - `{type}` return 'member' or 'bot'",
+        "error-give-roles": "Unable to give role '%{r}' to the new member %{u}: not enough permissions\nPlease check the roles hierarchy and my permission 'Manage roles'"
+    }
+}
