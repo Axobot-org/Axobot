@@ -252,7 +252,7 @@ class zbot(commands.bot.AutoShardedBot):
         return None
     
     @property
-    def _(self) -> Callable[[Any, str, str], Coroutine[Any, Any, str]]:
+    def _(self) -> Callable[[Any, str], Coroutine[Any, Any, str]]:
         """Translate something"""
         cog = self.get_cog('Languages')
         if cog is None:
