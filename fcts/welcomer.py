@@ -86,7 +86,7 @@ class Welcomer(commands.Cog):
         if len(servers) > 0:
             role = member.guild.get_role(486905171738361876)
             if role is None:
-                self.bot.log.warn('[check_owner_server] Owner role not found')
+                self.bot.log.warning('[check_owner_server] Owner role not found')
                 return
             if role not in member.roles:
                 await member.add_roles(role,reason="This user support me")
@@ -98,7 +98,7 @@ class Welcomer(commands.Cog):
             if role is not None:
                 await member.add_roles(role)
             else:
-                self.bot.log.warn('[check_support] Support role not found')
+                self.bot.log.warning('[check_support] Support role not found')
 
     async def check_contributor(self, member: discord.Member):
         """Vérifie si un nouvel arrivant est un contributeur"""
@@ -107,7 +107,7 @@ class Welcomer(commands.Cog):
             if role is not None:
                 await member.add_roles(role)
             else:
-                self.bot.log.warn('[check_contributor] Contributor role not found')
+                self.bot.log.warning('[check_contributor] Contributor role not found')
 
     async def give_roles_back(self, member: discord.Member):
         """Give roles rewards/muted role to new users"""

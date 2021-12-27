@@ -3,8 +3,6 @@ import i18n
 import json
 from utils import zbot
 
-en = None
-fi = None
 
 class Languages(discord.ext.commands.Cog):
 
@@ -13,16 +11,11 @@ class Languages(discord.ext.commands.Cog):
         self.file = "languages"
         self.languages = ['fr', 'en', 'lolcat', 'fi', 'de', 'fr2']
         self.serv_opts = dict()
-        self.translations = {}
-        for lang in self.languages:
-            with open(f'fcts/lang/{lang}.json','r') as f:
-                self.translations[lang] = json.load(f)
-        
         i18n.set('filename_format', '{locale}.{format}')
         i18n.set('file_format', 'json')
+        i18n.translations.container.clear()
         i18n.load_path.clear()
         i18n.load_path.append('./fcts/lang2')
-
 
     async def tr(self, serverID, messageID: str, **args):
         """Renvoie le texte en fonction de la langue"""
@@ -57,55 +50,6 @@ class Languages(discord.ext.commands.Cog):
         if translation == messageID:
             await self.msg_not_found(messageID, locale)
         return translation
-
-    async def _get_translation_old(self, lang:str, moduleID:str, messageID:str, **args):
-        result = None
-        if lang == 'de':
-            try:
-                result = self.translations['de'][moduleID][messageID]
-            except:
-                await self.msg_not_found(moduleID,messageID,"de")
-                lang = 'en'
-        if lang == 'fi':
-            try:
-                result = self.translations['fi'][moduleID][messageID]
-            except:
-                await self.msg_not_found(moduleID,messageID,"fi")
-                lang = 'en'
-        if lang == 'lolcat':
-            try:
-                result = self.translations['lolcat'][moduleID][messageID]
-            except:
-                await self.msg_not_found(moduleID,messageID,"lolcat")
-                lang = 'en'
-        if lang == 'en':
-            try:
-                result = self.translations['en'][moduleID][messageID]
-            except:
-                await self.msg_not_found(moduleID,messageID,"en")
-                lang = 'fr'
-        if lang == 'fr2':
-            try:
-                result = self.translations['fr2'][moduleID][messageID]
-            except:
-                await self.msg_not_found(moduleID,messageID,"fr2")
-                lang = 'fr'
-        if lang == 'fr':
-            try:
-                result = self.translations['fr'][moduleID][messageID]
-            except KeyError:
-                await self.msg_not_found(moduleID,messageID,"fr")
-                result = ""
-            except Exception as e:
-                await self.bot.get_cog('Errors').on_error(e,None)
-                result = ""
-        if isinstance(result,str):
-            try:
-                return result.format_map(self.bot.SafeDict(args))
-            except ValueError:
-                return result
-        else:
-            return result
 
     async def msg_not_found(self, messageID: str, lang: str):
         try:

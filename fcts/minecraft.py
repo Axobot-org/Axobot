@@ -419,12 +419,12 @@ Every information come from the website www.fr-minecraft.net"""
         #     return await self.create_server_2(guild,ip,port)
         except Exception:
             return await self.create_server_2(guild, ip, port)
-            # self.bot.log.warn("[mc-server-1] Erreur sur l'url {} :".format(url))
+            # self.bot.log.warning("[mc-server-1] Erreur sur l'url {} :".format(url))
             # await self.bot.get_cog('Errors').on_error(e,None)
             # return await self.bot._(guild, "minecraft.serv-error")
         if "error" in r.keys():
             if r['error'] != 'timed out':
-                self.bot.log.warn("(mc-server) Error on: " +
+                self.bot.log.warning("(mc-server) Error on: " +
                                   url+"\n   "+r['error'])
             return r["error"]
         players = []

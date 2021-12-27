@@ -1,3 +1,4 @@
+import sys
 import discord
 import traceback
 import random
@@ -141,12 +142,12 @@ class Errors(commands.Cog):
             r = re.search(r'Invalid card style: (\S+)',raw_error)
             if r is not None:
                 return await ctx.send(await self.bot._(ctx.channel,'errors.invalidcardstyle', s=r.group(1)), allowed_mentions=ALLOWED)
-            self.bot.log.warn('Unknown error type -',error)
+            self.bot.log.warning('Unknown error type -',error)
         elif isinstance(error,commands.errors.MissingRequiredArgument):
             await ctx.send(await self.bot._(ctx.channel,'errors.missingargument',a=error.param.name,e=random.choice([':eyes:','',':confused:',':thinking:',''])))
             return
         elif isinstance(error,commands.errors.DisabledCommand):
-            await ctx.send(await self.bot._(ctx.channel,'errors.disabled',c=ctx.invoked_with))
+            await ctx.send(await self.bot._(ctx.channel,'errors.disabled', c=ctx.invoked_with))
             return
         elif isinstance(error,commands.errors.NoPrivateMessage):
             await ctx.send(await self.bot._(ctx.channel,'errors.DM'))
@@ -157,11 +158,15 @@ class Errors(commands.Cog):
             except Exception as newerror:
                 self.bot.log.info("[on_cmd_error] Can't send error on channel {}: {}".format(ctx.channel.id,newerror))
         # All other Errors not returned come here... And we can just print the default TraceBack.
-        self.bot.log.warning('Ignoring exception in command {}:'.format(ctx.message.content))      
+        self.bot.log.warning('Ignoring exception in command {}:'.format(ctx.message.content))    
         await self.on_error(error,ctx)
 
     @commands.Cog.listener()
     async def on_error(self, error: Exception, ctx=None):
+        if sys.exc_info()[0] is None:
+            exc_info = (type(error), error, error.__traceback__)
+        else:
+            exc_info = sys.exc_info()
         try:
             if isinstance(ctx, discord.Message):
                 ctx = await self.bot.get_context(ctx)
@@ -173,12 +178,12 @@ class Errors(commands.Cog):
             elif ctx.guild is None:
                 await self.senf_err_msg(f"DM | {ctx.channel.recipient.name}\n{msg}")
             elif ctx.channel.id == 625319425465384960:
-                return await ctx.send(ctx.guild.name+" | "+ctx.channel.name+"\n"+msg)
+                await ctx.send(ctx.guild.name+" | "+ctx.channel.name+"\n"+msg)
             else:
                 await self.senf_err_msg(ctx.guild.name+" | "+ctx.channel.name+"\n"+msg)
-            self.bot.log.warn(f"[on_error] {error}", exc_info=True)
+            self.bot.log.warning(f"[on_error] {error}", exc_info=exc_info)
         except Exception as e:
-            self.bot.log.warn(f"[on_error] {e}", exc_info=True)
+            self.bot.log.warning(f"[on_error] {e}", exc_info=exc_info)
 
 
     async def senf_err_msg(self, msg: str):

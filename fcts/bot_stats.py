@@ -93,7 +93,7 @@ class BotStats(commands.Cog):
             # Push everything
             cnx.commit()
         except mysql.connector.errors.IntegrityError as e: # duplicate primary key
-            self.bot.log.warn(f"Stats loop iteration cancelled: {e}")
+            self.bot.log.warning(f"Stats loop iteration cancelled: {e}")
         except Exception as e:
             await self.bot.get_cog("Errors").on_error(e)
         # if something goes wrong, we still have to close the cursor

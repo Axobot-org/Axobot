@@ -1110,7 +1110,7 @@ class Servers(commands.Cog):
             if ch is None:
                 return
             lang = await self.bot._(guild.id,'_used_locale')
-            tr = str(await self.bot._(guild.id,"keywords","membres")).capitalize()
+            tr = str(await self.bot._(guild.id, "misc.membres")).capitalize()
             text = "{}{}: {}".format(tr, " " if lang=='fr' else "" , guild.member_count)
             if ch.name == text:
                 return

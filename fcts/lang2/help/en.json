@@ -124,6 +124,10 @@
             "verify_role_exists": [
                 "A verification role has been set up",
                 "No verification role has been added"
+            ],
+            "in_support_server": [
+                "You are in the bot support server",
+                "You can only use this command in the support server"
             ]
         },
         "cmd-count": "%{nbr} commands\n`%{p}help %{cog}` to get the list",
@@ -139,6 +143,6 @@
         "not-enabled": ":warning: This command is disabled",
         "subcmd-not-found": "This command has no subcommand named \"%{name}\"",
         "subcmds": "Subcommands",
-        "warning": "Warnings"
+        "warning": "Prerequisites"
     }
 }

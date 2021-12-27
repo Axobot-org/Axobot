@@ -150,13 +150,13 @@ class Partners(commands.Cog):
         partners = await self.bdd_get_guild(channel.guild.id)
         if len(partners) == 0:
             return 0
-        tr_unknown = await self.bot._(channel.guild.id, 'keywords', 'unknown')
-        tr_guild = await self.bot._(channel.guild.id, 'keywords', 'server')
-        tr_bot = await self.bot._(channel.guild.id, 'keywords', 'bot')
+        tr_unknown = await self.bot._(channel.guild.id, "misc.unknown")
+        tr_guild = await self.bot._(channel.guild.id, "misc.server")
+        tr_bot = await self.bot._(channel.guild.id, "misc.bot")
         tr_members = await self.bot._(channel.guild.id, 'info.info.role-3')
-        tr_guilds = await self.bot._(channel.guild.id, 'keywords', 'servers')
+        tr_guilds = await self.bot._(channel.guild.id, "misc.servers")
         tr_invite = await self.bot._(channel.guild.id, 'info.info.inv-4')
-        tr_click = await self.bot._(channel.guild.id, 'keywords', 'click_here')
+        tr_click = await self.bot._(channel.guild.id, "misc.click_here")
         tr_owner = await self.bot._(channel.guild.id, 'info.info.guild-1')
         count = 0
         if color is None:
@@ -397,10 +397,10 @@ class Partners(commands.Cog):
         ..Doc server.html#list-every-partners"""
         f = ['','']
         lang = await self.bot._(ctx.guild.id,'_used_locale')
-        tr_bot = await self.bot._(ctx.guild.id,'keywords','bot')
-        tr_guild = await self.bot._(ctx.guild.id,'keywords','server')
-        tr_added = await self.bot._(ctx.guild.id,'keywords','added_at')
-        tr_unknown = await self.bot._(ctx.guild.id,'keywords','unknown')
+        tr_bot = await self.bot._(ctx.guild.id, "misc.bot")
+        tr_guild = await self.bot._(ctx.guild.id, "misc.server")
+        tr_added = await self.bot._(ctx.guild.id, "misc.added_at")
+        tr_unknown = await self.bot._(ctx.guild.id, "misc.unknown")
         tr_owner = await self.bot._(ctx.guild.id,'info.info.guild-1')
         for l in await self.bdd_get_guild(ctx.guild.id):
             date = str(await ctx.bot.get_cog('TimeUtils').date(l['added_at'],lang=lang,year=True,hour=False)).strip()
