@@ -35,7 +35,8 @@
                 "one": "Ce flux a bien été modifié pour mentionner le rôle %{roles}",
                 "many": "Ce flux a bien été modifié pour mentionner les rôles %{roles}"
             },
-            "list": "Voici la liste des rôles déjà mentionnés : %{roles}"
+            "list": "Voici la liste des rôles déjà mentionnés : %{roles}",
+            "cant-find": "Rôle introuvable"
         },
         "success-add": "Le flux rss de type '%{type}' avec le lien <%{url}> a bien été ajouté dans le salon %{channel} !",
         "text-success": "Le texte du flux n°%{id} a bien été modifié ! Nouveau texte : \n```\n%{text}\n```",

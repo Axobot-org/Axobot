@@ -223,18 +223,6 @@ class zbot(commands.bot.AutoShardedBot):
         cursor.close()
         return result
 
-    async def user_avatar_as(self, user: discord.User, size: int = 512) -> discord.Asset:
-        """Get the avatar of an user, format gif or png (as webp isn't supported by some browsers)"""
-        if not isinstance(user, (discord.User, discord.Member, discord.ClientUser)):
-            raise ValueError
-        try:
-            if user.is_avatar_animated():
-                return user.avatar_url_as(format='gif', size=size)
-            else:
-                return user.avatar_url_as(format='png', size=size)
-        except Exception as e:
-            await self.get_cog('Errors').on_error(e, None)
-
     class SafeDict(dict):
         def __missing__(self, key):
             return '{' + key + '}'

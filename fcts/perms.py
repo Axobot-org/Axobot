@@ -35,7 +35,7 @@ class Perms(commands.Cog):
             else:
                 perms = channel.permissions_for(target)
             col = target.color
-            avatar = await self.bot.user_avatar_as(target,size=256)
+            avatar = target.avatar_url_as(static_format="png", size=256)
             name = str(target)
         elif isinstance(target, discord.Role):
             perms = target.permissions

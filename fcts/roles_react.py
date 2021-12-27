@@ -228,7 +228,7 @@ class RolesReact(commands.Cog):
             des, _ = await self.create_list_embed(l, ctx.guild)
             max_rr = await self.bot.get_config(ctx.guild.id, 'roles_react_max_number')
             max_rr = self.bot.get_cog("Servers").default_opt['roles_react_max_number'] if max_rr is None else max_rr
-            title = await self.bot._(ctx.guild.id, "roles_react", 'rr-list', n=len(l), m=max_rr)
+            title = await self.bot._(ctx.guild.id, "roles_react.rr-list", n=len(l), m=max_rr)
             emb = await self.bot.get_cog('Embeds').Embed(title=title, desc=des, color=self.embed_color).update_timestamp().create_footer(ctx)
             await ctx.send(embed=emb.discord_embed())
 
@@ -247,7 +247,7 @@ It will only display the whole message with reactions. Still very cool tho
             await self.bot.get_cog('Errors').on_command_error(ctx, e)
         else:
             des, emojis = await self.create_list_embed(l, ctx.guild)
-            title = await self.bot._(ctx.guild.id, "roles_react", 'rr-embed')
+            title = await self.bot._(ctx.guild.id, "roles_react.rr-embed")
             emb = self.bot.get_cog('Embeds').Embed(
                 title=title, desc=des, color=self.embed_color, footer_text=self.footer_txt).update_timestamp()
             msg = await ctx.send(embed=emb.discord_embed())

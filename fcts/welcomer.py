@@ -67,7 +67,7 @@ class Welcomer(commands.Cog):
                 channel = member.guild.get_channel(int(channel))
                 if channel is None:
                     continue
-                botormember = await self.bot._(member.guild,"keywords",'bot' if member.bot else 'member')
+                botormember = await self.bot._(member.guild,"misc.bot" if member.bot else "misc.member")
                 try:
                     msg = msg.format_map(self.bot.SafeDict(
                         user=member.mention if Type=='welcome' else member.name,

@@ -85,10 +85,6 @@ class Rss(commands.Cog):
             self.date = bot.get_cog("TimeUtils").date
         except:
             pass
-        if feedparser.parse('http://twitrss.me/twitter_user_to_rss/?user=Dinnerbone').entries == list():
-            self.twitter_api_url = 'http://twitrss.me/mobile_twitter_to_rss/?user='
-        else:
-            self.twitter_api_url = 'http://twitrss.me/twitter_user_to_rss/?user='
         # launch rss loop
         # pylint: disable=no-member
         self.loop_child.change_interval(minutes=self.time_loop)
@@ -605,7 +601,6 @@ class Rss(commands.Cog):
             # ask for roles
             embed = self.bot.get_cog('Embeds').Embed(title=await self.bot._(ctx.guild.id, "rss.choose-roles"), color=discord.Colour(0x77ea5c), desc=text, time=ctx.message.created_at)
             emb_msg = await ctx.send(embed=embed.discord_embed())
-            err = await self.bot._(ctx.guild.id,"find",'role-0')
             userID = ctx.author.id
             def check2(msg):
                 return msg.author.id == userID
@@ -625,8 +620,8 @@ class Rss(commands.Cog):
                                 r = await commands.RoleConverter().convert(ctx,x)
                                 IDs.append(str(r.id))
                                 Names.append(r.name)
-                            except:
-                                await ctx.send(err)
+                            except c:
+                                await ctx.send(await self.bot._(ctx.guild.id, "rss.roles.cant-find"))
                                 IDs = []
                                 break
                     if len(IDs) > 0:
@@ -650,7 +645,7 @@ class Rss(commands.Cog):
                     except commands.errors.BadArgument:
                         pass
                 if len(IDs) == 0:
-                    await ctx.send(await self.bot._(ctx.guild.id,"find",'role-0'))
+                    await ctx.send(await self.bot._(ctx.guild.id,"rss.roles.cant-find"))
                     return
         try:
             if IDs[0] is None:
