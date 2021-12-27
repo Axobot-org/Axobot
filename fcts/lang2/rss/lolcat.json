@@ -35,7 +35,8 @@
                 "one": "Thes feed has been edit 2 mention teh role %{roles}",
                 "many": "Thes feed have been editd 2 mention the roles %{roles}"
             },
-            "list": "Her iz teh lis for rolez alreedy indicatd: %{roles}"
+            "list": "Her iz teh lis for rolez alreedy indicatd: %{roles}",
+            "cant-find": "Err nope, cant find dat role"
         },
         "success-add": "Teh rss feed for type '%{type}' with lik <%{url}> have bein prperly addded in the cannel %{channel} !",
         "text-success": "Teh text of the feed #%{id} haz been modified!\n New cute text : \n```\n%{text}\n```",

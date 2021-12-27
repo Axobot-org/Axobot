@@ -35,7 +35,8 @@
                 "one": "This feed has been modified to mention the role %{roles}",
                 "many": "This feed has been modified to mention the roles %{roles}"
             },
-            "list": "Here is the list of roles already notified: %{roles}"
+            "list": "Here is the list of roles already notified: %{roles}",
+            "cant-find": "I can't find this role"
         },
         "success-add": "The rss feed of type \"%{type}\" with link <%{url}> has been properly added in the channel %{channel}!",
         "text-success": "The text of the feed #%{id} has been modified!\n New text : \n```\n%{text}\n```",

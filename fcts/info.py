@@ -315,7 +315,7 @@ Available types: member, role, user, emoji, channel, server, invite, category
     async def member_infos(self, ctx: MyContext,item: discord.Member, lang: str, critical_info=False):
         since = await self.bot._(ctx.guild.id,"misc.since")
         embed = discord.Embed(colour=item.color, timestamp=ctx.message.created_at)
-        embed.set_thumbnail(url=item.avatar_url_as(format='gif') if item.is_avatar_animated() else item.avatar_url_as(format='png'))
+        embed.set_thumbnail(url=item.avatar_url_as(static_format='png'))
         embed.set_author(name=str(item), icon_url=str(item.avatar_url_as(format='png')))
         embed.set_footer(text='Requested by {}'.format(ctx.author.name), icon_url=str(ctx.author.avatar_url_as(format='png')))
         # Name
@@ -683,9 +683,10 @@ Available types: member, role, user, emoji, channel, server, invite, category
             emo=guild.emoji_limit,
             mem=guild.max_presences))
         # Features
-        if guild.features != []:
-            features_tr = await self.bot._(ctx.guild.id,"info.info.guild-features")
-            features = [features_tr[x] if x in features_tr.keys() else x for x in guild.features]
+        if len(guild.features) > 0:
+            tr = lambda x: self.bot._(ctx.guild.id,"info.info.guild-features."+x)
+            features: list[str] = [await tr(x) for x in guild.features]
+            features = [f.split('.')[-1] if '.' in f else f for f in features]
             embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.inv-9"), value=" - ".join(features))
         if critical_info:
             # A2F activation
@@ -703,7 +704,7 @@ Available types: member, role, user, emoji, channel, server, invite, category
         since = await self.bot._(ctx.guild.id,"misc.since")
         embed = discord.Embed(colour=default_color, timestamp=ctx.message.created_at)
         embed.set_author(name="{} '{}'".format(await self.bot._(ctx.guild.id,"info.info.inv-4"),invite.code), icon_url=invite.guild.icon_url)
-        embed.set_footer(text='Requested by {}'.format(ctx.author.name), icon_url=str(await self.bot.user_avatar_as(ctx.author,size=256)))
+        embed.set_footer(text='Requested by {}'.format(ctx.author.name), icon_url=ctx.author.avatar_url_as(static_format="png", size=256))
         # Try to get the complete invite
         if invite.guild in self.bot.guilds:
             try:
@@ -861,7 +862,7 @@ Available types: member, role, user, emoji, channel, server, invite, category
             else:
                 color = None if ctx.guild.me.color.value == 0 else ctx.guild.me.color
             
-            await ctx.send(embed = await self.bot.get_cog('Embeds').Embed(title=user_name, thumbnail=str(await self.bot.user_avatar_as(user,1024)) ,color=color, fields = [
+            await ctx.send(embed = await self.bot.get_cog('Embeds').Embed(title=user_name, thumbnail=user.avatar_url_as(static_format="png", size=1024) ,color=color, fields = [
                 {"name": "ID", "value": user.id},
                 {"name": "Flags", "value": "-".join(userflags), "inline":False},
                 {"name": "Servers", "value": "\n".join(servers_in), "inline":True},

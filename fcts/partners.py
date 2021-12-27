@@ -207,11 +207,11 @@ class Partners(commands.Cog):
             if owners:
                 fields.append({'name': tr_owner.capitalize(),
                               'value': ", ".join([str(u) for u in owners])})
-            image = str(await self.bot.user_avatar_as(await self.bot.fetch_user(int(partner['target']))))
+            image = (await self.bot.fetch_user(int(partner['target']))).avatar_url_as(static_format="png")
         except discord.NotFound:
             title += "ID: "+partner['target']
         except Exception as e:
-            image = str(await self.bot.user_avatar_as(await self.bot.fetch_user(int(partner['target']))))
+            image = (await self.bot.fetch_user(int(partner['target']))).avatar_url_as(static_format="png")
             await self.bot.get_cog("Errors").on_error(e, None)
         perm = discord.Permissions.all()
         perm.update(administrator=False)
