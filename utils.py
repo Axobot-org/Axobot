@@ -56,10 +56,10 @@ def get_prefix(bot:"zbot", msg: discord.Message) -> list:
                 bot.load_extension('fcts.utilities')
                 prefixes = [bot.get_cog('Utilities').find_prefix(msg.guild)]
             except Exception as e:
-                bot.log.warn("[get_prefix]", e)
+                bot.log.warning("[get_prefix]", e)
                 prefixes = ['!']
         except Exception as e:
-            bot.log.warn("[get_prefix]", e)
+            bot.log.warning("[get_prefix]", e)
             prefixes = ['!']
     else:
         if cog := bot.get_cog("Servers"):
@@ -107,7 +107,7 @@ class zbot(commands.bot.AutoShardedBot):
         try:
             return self.get_cog("BotEvents").current_event
         except Exception as e:
-            self.log.warn(f"[current_event] {e}", exc_info=True)
+            self.log.warning(f"[current_event] {e}", exc_info=True)
             return None
     
     @property
@@ -116,7 +116,7 @@ class zbot(commands.bot.AutoShardedBot):
         try:
             return self.get_cog("BotEvents").current_event_data
         except Exception as e:
-            self.log.warn(f"[current_event_data] {e}", exc_info=True)
+            self.log.warning(f"[current_event_data] {e}", exc_info=True)
             return None
 
     async def get_context(self, message: discord.Message, *, cls=MyContext) -> MyContext:
@@ -320,7 +320,7 @@ def setup_logger():
 
     # log.debug("message de debug osef")
     # log.info("message moins osef")
-    # log.warn("y'a un problème")
+    # log.warning("y'a un problème")
     # log.error("y'a un gros problème")
     # log.critical("y'a un énorme problème")
 

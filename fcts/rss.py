@@ -149,7 +149,7 @@ class Rss(commands.Cog):
 
         async def fill_mention(self, guild: discord.Guild, roles: typing.List[str], translate):
             if roles == []:
-                r = await translate(guild.id,"keywords","none")
+                r = await translate(guild.id, "misc.none")
             else:
                 r = list()
                 for item in roles:
@@ -436,7 +436,7 @@ class Rss(commands.Cog):
             else:
                 c = x['channel']
             if x['roles'] == '':
-                r = await self.bot._(ctx.guild.id,"keywords","none")
+                r = await self.bot._(ctx.guild.id, "misc.none")
             else:
                 r = list()
                 for item in x['roles'].split(';'):
@@ -501,7 +501,7 @@ class Rss(commands.Cog):
                 Type = translations.get(x['type'], await self.bot._(ctx.guild.id,"rss."+x['type']))
                 if display_mentions:
                     if x['roles'] == '':
-                        r = await self.bot._(ctx.guild.id,"keywords","none")
+                        r = await self.bot._(ctx.guild.id, "misc.none")
                     else:
                         r = list()
                         for item in x['roles'].split(';'):
@@ -1052,7 +1052,7 @@ class Rss(commands.Cog):
             return [x for x in timeline]
         except twitter.error.TwitterError as e:
             if str(e) == "Not authorized.":
-                self.bot.log.warn(f"[rss] Unable to reach channel {nom}: Not authorized")
+                self.bot.log.warning(f"[rss] Unable to reach channel {nom}: Not authorized")
                 return []
             try:
                 if e.message[0]['code'] == 130: # Over capacity - Corresponds with HTTP 503. Twitter is temporarily over capacity.
@@ -1476,7 +1476,7 @@ class Rss(commands.Cog):
                     objs = await funct(chan,flow['link'], flow['date'], session=session)
                 if isinstance(objs,twitter.error.TwitterError):
                     self.twitter_over_capacity = True
-                    self.bot.log.warn("[send_rss_msg] Twitter over capacity detected")
+                    self.bot.log.warning("[send_rss_msg] Twitter over capacity detected")
                     return False
                 flow['link'] = objs
             if isinstance(objs,twitter.TwitterError):
@@ -1551,7 +1551,7 @@ class Rss(commands.Cog):
         await self.bot.get_cog("Embeds").send([emb],url="loop")
         self.bot.log.debug(d[0])
         if len(errors) > 0:
-            self.bot.log.warn("[Rss loop] "+d[1])
+            self.bot.log.warning("[Rss loop] "+d[1])
         if guildID is None:
             self.loop_processing = False
         self.twitter_over_capacity = False
@@ -1560,7 +1560,7 @@ class Rss(commands.Cog):
     @tasks.loop(minutes=20)
     async def loop_child(self):
         if not self.bot.database_online:
-            self.bot.log.warn('Base de donnée hors ligne - check rss annulé')
+            self.bot.log.warning('Base de donnée hors ligne - check rss annulé')
             return
         self.bot.log.info(" Boucle rss commencée !")
         t1 = time.time()

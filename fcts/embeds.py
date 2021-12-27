@@ -68,9 +68,9 @@ class Embeds(commands.Cog):
             if self.footer_text != "" or self.footer_url != "":
                 emb["footer"] = {"icon_url":str(self.footer_url),"text":self.footer_text}
             if self.thumbnail != "":
-                emb["thumbnail"] = {"url":self.thumbnail}
+                emb["thumbnail"] = {"url": str(self.thumbnail)}
             if self.image != "":
-                emb["image"]  = {"url":self.image}
+                emb["image"]  = {"url": str(self.image)}
             if self.author_icon != "" or self.author_name != "" or self.author_url != "":
                 auth = dict()
                 if self.author_name != "":

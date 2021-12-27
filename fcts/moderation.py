@@ -374,7 +374,7 @@ You can also mute this member for a defined duration, then use the following for
         if role is None:
             role = await self.get_muted_role(ctx.guild)
         if role is None:
-            self.bot.log.warn(f"[muted_role] Unable to get role for guild {ctx.guild.id}")
+            self.bot.log.warning(f"[muted_role] Unable to get role for guild {ctx.guild.id}")
             await ctx.send(await self.bot._(ctx.guild.id, "moderation.no-mute"))
             return
         caseID = "'Unsaved'"

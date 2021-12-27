@@ -353,12 +353,12 @@ If the bot can't send the new command format, it will try to send the old one.""
                             pass_check = False
                         if pass_check:
                             checks.append(
-                                ":small_orange_diamond: "+check_msg_tr[0])
+                                ":small_blue_diamond: "+check_msg_tr[0])
                         else:
                             pass
                             checks.append('❌ '+check_msg_tr[1])
                     else:
-                        self.bot.log.warn(check_name, str(c))
+                        self.bot.log.warning(f"No description for help check {check_name} ({c})")
                 except Exception as e:
                     await self.bot.get_cog("Errors").on_error(e, ctx)
         # Module

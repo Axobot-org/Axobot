@@ -124,6 +124,10 @@
             "verify_role_exists": [
                 "Un rôle de vérification est configuré",
                 "Aucun rôle de vérification n'a été configuré"
+            ],
+            "in_support_server": [
+                "Vous êtes bien dans le serveur de support du bot",
+                "Vous ne pouvez l'utiliser que dans le serveur de support"
             ]
         },
         "cmd-count": "%{nbr} commandes\n`%{p}help %{cog}` pour en afficher la liste",

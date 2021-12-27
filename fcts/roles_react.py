@@ -39,7 +39,7 @@ class RolesReact(commands.Cog):
         except discord.NotFound: # we don't care about those
             return None, None
         except Exception as e:
-            self.bot.log.warn(f"Could not fetch roles-reactions message {payload.message_id} in guild {payload.guild_id}: {e}")
+            self.bot.log.warning(f"Could not fetch roles-reactions message {payload.message_id} in guild {payload.guild_id}: {e}")
             return None, None
         if len(msg.embeds) == 0 or msg.embeds[0].footer.text != self.footer_txt or msg.author.id != self.bot.user.id:
             return None, None

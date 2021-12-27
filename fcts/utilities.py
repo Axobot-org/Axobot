@@ -455,7 +455,9 @@ class Utilities(commands.Cog):
                 headers = {'Authorization': 'Bot ' + self.bot.others['discordlist.space']}
                 async with session.get('https://api.discordlist.space/v2/bots/486896267788812288/upvotes', headers=headers) as r:
                     js = await r.json()
-                    if str(userid) in [x['id'] for x in js['users']]:
+                    if 'errors' in js:
+                        raise Exception(f"discordlist.space raised the following exceptions: {js['errors']}")
+                    elif str(userid) in [x['id'] for x in js['users']]:
                         votes.append(
                             ("discordlist.space", "https://discordlist.space/"))
             except Exception as e:

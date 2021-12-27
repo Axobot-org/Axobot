@@ -90,7 +90,7 @@ class Events(commands.Cog):
             cursor.execute(query, { 'u': before.id, 'o': b, 'n': a, 'g': guild, 'b': self.bot.beta })
             cnx.commit()
         except mysql.connector.errors.IntegrityError as e:
-            self.bot.log.warn(e)
+            self.bot.log.warning(e)
             await self.updade_memberslogs_name(before, after, tries+1)
         cursor.close()
 
@@ -201,7 +201,7 @@ class Events(commands.Cog):
             return
         channel = self.bot.get_channel(625320165621497886)
         if channel is None:
-            return self.bot.log.warn("[send_mp] Salon de MP introuvable")
+            return self.bot.log.warning("[send_mp] Salon de MP introuvable")
         emb = msg.embeds[0] if len(msg.embeds) > 0 else None
         arrow = ":inbox_tray:" if msg.author == msg.channel.recipient else ":outbox_tray:"
         text = "{} **{}** ({} - {})\n{}".format(arrow, msg.channel.recipient, msg.channel.recipient.id, await self.bot.get_cog("TimeUtils").date(msg.created_at,digital=True), msg.content)
@@ -233,7 +233,7 @@ class Events(commands.Cog):
             return
         role = guild.get_role(486905171738361876)
         if not role:
-            self.bot.log.warn('[check_owner_server] Owner role not found')
+            self.bot.log.warning('[check_owner_server] Owner role not found')
             return
         guilds_owned = [x for x in self.bot.guilds if x.owner ==owner and x.member_count > 10]
         if len(guilds_owned) > 0 and role not in member.roles:
@@ -299,7 +299,7 @@ class Events(commands.Cog):
             pass
         except Exception as e:
             if member.guild.id != 264445053596991498:
-                self.bot.log.warn("[check_user_left] {} (user {}/server {})".format(e, member.id, member.guild.id))
+                self.bot.log.warning("[check_user_left] {} (user {}/server {})".format(e, member.id, member.guild.id))
 
 
     async def task_timer(self, task: dict) -> bool:
