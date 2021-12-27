@@ -965,14 +965,14 @@ class Servers(commands.Cog):
         if option.isnumeric():
             page = int(option)
             if page<1:
-                return await ctx.send(await self.bot._(channel,"xp",'low-page'))
+                return await ctx.send(await self.bot._(channel, "xp.low-page"))
             liste = await self.get_server([],criters=["ID="+str(guild.id)])
             if len(liste) == 0:
                 return await channel.send(await self.bot._(channel.guild, "server.not-found", guild=guild.name))
             temp = [(k,v) for k,v in liste[0].items() if k in self.optionsList]
             max_page = ceil(len(temp)/20)
             if page>max_page:
-                return await ctx.send(await self.bot._(channel,"xp",'high-page'))
+                return await ctx.send(await self.bot._(channel, "xp.high-page"))
             liste = {k:v for k,v in temp[(page-1)*20:page*20] }
             if len(liste) == 0:
                 return await ctx.send("NOPE")
