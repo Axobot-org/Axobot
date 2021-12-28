@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+# pylint: skip-file
 #
 # Configuration file for the Sphinx documentation builder.
 #
@@ -29,7 +30,6 @@ release = '3.7.4'
 
 
 # Example configuration for intersphinx: refer to the Python standard library.
-import re
 intersphinx_mapping = {
     "python": ("https://docs.python.org/3.7", None),
     "requests": ("http://docs.python-requests.org/en/master", None),
