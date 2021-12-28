@@ -109,7 +109,7 @@ class Servers(commands.Cog):
         cnx = self.bot.cnx_frm
         cursor = cnx.cursor()
         for x in values:
-            if type(x) == bool:
+            if isinstance(x, bool):
                 v.append("`{x[0]}`={x[1]}".format(x=x))
             else:
                 v.append("""`{x[0]}`="{x[1]}" """.format(x=x))
@@ -255,7 +255,7 @@ class Servers(commands.Cog):
 
     async def add_server(self, ID: int):
         """add a new server to the db"""
-        if type(ID) == str:
+        if isinstance(ID, str):
             if not ID.isnumeric():
                 raise ValueError
         cnx = self.bot.cnx_frm

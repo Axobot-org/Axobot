@@ -71,75 +71,73 @@ class Utilities(commands.Cog):
 
     async def find_everything(self, ctx: MyContext, name: str, Type: str=None):
         item = None
-        if type(Type) == str:
+        if isinstance(Type, str):
             Type = Type.lower()
         if Type is None:
             for i in [commands.MemberConverter, commands.RoleConverter,
                       commands.TextChannelConverter, commands.VoiceChannelConverter, commands.InviteConverter,
                       args.user, commands.EmojiConverter, commands.CategoryChannelConverter, args.snowflake]:
                 try:
-                    a = await i().convert(ctx, name)
-                    item = a
-                    if item is not None:
+                    if item := await i().convert(ctx, name):
                         return item
-                except:
+                except commands.ConversionError:
                     pass
             return None
-        elif Type == 'member':
+        if Type == 'member':
             try:
                 item = await commands.MemberConverter().convert(ctx, name)
-            except:
+            except commands.ConversionError:
                 pass
         elif Type == 'role':
             try:
                 item = await commands.RoleConverter().convert(ctx, name)
-            except:
+            except commands.ConversionError:
                 pass
         elif Type == 'user':
             try:
                 item = await commands.UserConverter().convert(ctx, name)
-            except:
+            except commands.ConversionError:
                 if name.isnumeric():
                     item = await self.bot.fetch_user(int(name))
         elif Type == 'textchannel':
             try:
                 item = await commands.TextChannelConverter().convert(ctx, name)
-            except:
+            except commands.ConversionError:
                 pass
         elif Type == 'invite':
             try:
                 item = await commands.InviteConverter().convert(ctx, name)
-            except:
+            except commands.ConversionError:
                 pass
         elif Type == 'voicechannel':
             try:
                 item = await commands.VoiceChannelConverter().convert(ctx, name)
-            except:
+            except commands.ConversionError:
                 pass
         elif Type == 'channel':
             try:
                 item = await commands.TextChannelConverter().convert(ctx, name)
-            except:
+            except commands.ConversionError:
                 try:
                     item = await commands.VoiceChannelConverter().convert(ctx, name)
-                except:
+                except commands.ConversionError:
                     pass
         elif Type == 'emoji':
             try:
                 item = await commands.EmojiConverter().convert(ctx, name)
-            except:
+            except commands.ConversionError:
                 pass
         elif Type == 'category':
             try:
                 item = await commands.CategoryChannelConverter().convert(ctx, name)
-            except:
+            except commands.ConversionError:
                 pass
         elif (Type == 'guild' or Type == "server") and name.isnumeric():
             item = self.bot.get_guild(int(name))
         elif Type in ["snowflake", "id"]:
             try:
                 item = await args.snowflake().convert(ctx, name)
-            except:
+            except commands.ConversionError:
                 pass
         return item
 
@@ -148,16 +146,15 @@ class Utilities(commands.Cog):
 
     async def find_url_redirection(self, url: str) -> str:
         """Find where an url is redirected to"""
-        to = aiohttp.ClientTimeout(total=10, connect=7)
-        answer = url
+        timeout = aiohttp.ClientTimeout(total=10, connect=7)
         try:
-            async with aiohttp.ClientSession(timeout=to) as session:
-               async with session.get(url, allow_redirects=True) as response:
+            async with aiohttp.ClientSession(timeout=timeout) as session:
+                async with session.get(url, allow_redirects=True) as response:
                     answer = str(response.url)
-        except aiohttp.ClientConnectorError as e:
-            return "https://" + e.args[0].host
-        except aiohttp.ClientResponseError as e:
-            return str(e.args[0].real_url)
+        except aiohttp.ClientConnectorError as err:
+            return "https://" + err.args[0].host
+        except aiohttp.ClientResponseError as err:
+            return str(err.args[0].real_url)
         except (asyncio.exceptions.TimeoutError, aiohttp.ServerTimeoutError):
             return url
         return answer
@@ -226,19 +223,20 @@ class Utilities(commands.Cog):
                     if ctx is not None:
                         em = await commands.EmojiConverter().convert(ctx, x.group(1))
                     else:
-                        if x.group(1).isnumeric():
-                            em = self.bot.get_emoji(int(x.group(1)))
+                        emoji_id = x.group(1)
+                        if emoji_id.isnumeric():
+                            em = self.bot.get_emoji(int(emoji_id))
                         else:
                             em = discord.utils.find(
-                                lambda e: e.name == x.group(1), self.bot.emojis)
-                except:
+                                lambda e, id=emoji_id: e.name == id, self.bot.emojis)
+                except commands.ConversionError:
                     continue
                 if em is not None:
                     text = text.replace(x.group(0), "<{}:{}:{}>".format(
                         'a' if em.animated else '', em.name, em.id))
         return text
 
-    async def get_db_userinfo(self, columns=[], criters=["userID > 1"], relation="AND", Type=dict):
+    async def get_db_userinfo(self, columns=[], criters=["userID > 1"], relation="AND", return_type=dict):
         """Get every info about a user with the database"""
         await self.bot.wait_until_ready()
         if not (isinstance(columns, (list, tuple)) and isinstance(criters, (list, tuple))):
@@ -246,7 +244,7 @@ class Utilities(commands.Cog):
         if not self.bot.database_online:
             return None
         cnx = self.bot.cnx_frm
-        cursor = cnx.cursor(dictionary=(Type==dict))
+        cursor = cnx.cursor(dictionary=(return_type==dict))
         if columns == []:
             cl = "*"
         else:

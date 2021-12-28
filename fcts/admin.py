@@ -90,7 +90,7 @@ class Admin(commands.Cog):
             text = "Liste des commandes disponibles :"
             for cmd in sorted(ctx.command.commands, key=lambda x:x.name):
                 text+="\n- {} *({})*".format(cmd.name,'...' if cmd.help is None else cmd.help.split('\n')[0])
-                if type(cmd)==commands.core.Group:
+                if isinstance(cmd, commands.core.Group):
                     for cmds in cmd.commands:
                         text+="\n        - {} *({})*".format(cmds.name,cmds.help.split('\n')[0])
             await ctx.send(text)

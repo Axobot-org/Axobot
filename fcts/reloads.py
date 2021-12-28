@@ -8,7 +8,7 @@ async def check_admin(ctx):
         user = ctx.author
     else:
         user = ctx
-    if type(user) == str and user.isnumeric():
+    if isinstance(user, str) and user.isnumeric():
         user = int(user)
     elif type(user) != int:
         user = user.id

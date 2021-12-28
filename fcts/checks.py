@@ -121,7 +121,7 @@ async def is_fun_enabled(ctx: MyContext, self=None) -> bool:
             fun = await self.bot.get_config(ID, "enable_fun")
             if fun is not None:
                 self.fun_opt[str(ID)] = fun
-    return fun == 1 or fun == True
+    return bool(fun)
 
 
 async def is_a_cmd(msg: discord.Message, bot: commands.Bot) -> bool:

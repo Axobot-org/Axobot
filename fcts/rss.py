@@ -65,7 +65,7 @@ class Rss(commands.Cog):
         self.time_loop = 20 # min minutes between two rss loops
         self.time_between_flows_check = 0.15 # seconds between two rss checks within a loop
         self.max_messages = 20 # max messages sent per flow per loop
-        
+
         self.file = "rss"
         self.embed_color = discord.Color(6017876)
         self.loop_processing = False
@@ -80,13 +80,10 @@ class Rss(commands.Cog):
         self.cache = dict()
         if bot.user is not None:
             self.table = 'rss_flow' if bot.user.id==486896267788812288 else 'rss_flow_beta'
-        try:
-            self.date = bot.get_cog("TimeUtils").date
-        except:
-            pass
+        self.date = bot.get_cog("TimeUtils").date
         # launch rss loop
-        self.loop_child.change_interval(minutes=self.time_loop)
-        self.loop_child.start()
+        self.loop_child.change_interval(minutes=self.time_loop) # pylint: disable=no-member
+        self.loop_child.start() # pylint: disable=no-member
 
     @commands.Cog.listener()
     async def on_ready(self):
@@ -105,14 +102,14 @@ class Rss(commands.Cog):
             self.title = title
             self.embed = False # WARNING COOKIES WARNINNG
             self.image = image
-            if type(date) == datetime.datetime:
+            if isinstance(date, datetime.datetime):
                 self.date = date
-            elif type(date) == time.struct_time:
+            elif isinstance(date, time.struct_time):
                 self.date = datetime.datetime(*date[:6])
             elif isinstance(date, str):
                 self.date = date
             else:
-                date = None
+                self.date = None
             self.author = author
             self.format = Format
             if Type == 'yt':
@@ -147,11 +144,11 @@ class Rss(commands.Cog):
 
         async def fill_mention(self, guild: discord.Guild, roles: typing.List[str], translate):
             if roles == []:
-                r = await translate(guild.id, "misc.none")
+                self.mentions = await translate(guild.id, "misc.none")
             else:
                 r = list()
                 for item in roles:
-                    if item=='':
+                    if len(item) == 0:
                         continue
                     role = discord.utils.get(guild.roles,id=int(item))
                     if role is not None:
@@ -211,7 +208,7 @@ class Rss(commands.Cog):
         ..Doc rss.html#see-the-last-post"""
         if ID in yt_link.keys():
             ID = yt_link[ID]
-        if "youtube.com" in ID or "youtu.be" in ID:
+        if re.match(r'https://(?:www\.)(?:youtube\.com|youtu\.be)/', ID):
             ID = await self.parse_yt_url(ID)
         if ID is None:
             return await ctx.send(await self.bot._(ctx.channel, "rss.web-invalid"))
@@ -235,7 +232,7 @@ class Rss(commands.Cog):
         ..Example rss tv https://www.twitch.tv/aureliensama
         
         ..Doc rss.html#see-the-last-post"""
-        if "twitch.tv" in channel:
+        if re.match(r'https://(?:www\.)twitch.tv/', channel):
             channel = await self.parse_twitch_url(channel)
         text = await self.rss_twitch(ctx.channel,channel)
         if isinstance(text, str):
@@ -257,7 +254,7 @@ class Rss(commands.Cog):
         ..Example rss tw z_runnerr
         
         ..Doc rss.html#see-the-last-post"""
-        if "twitter.com" in name:
+        if re.match(r'https://(?:www\.)twitter.com/', name):
             name = await self.parse_tw_url(name)
         try:
             text = await self.rss_tw(ctx.channel,name)
@@ -305,7 +302,7 @@ class Rss(commands.Cog):
         ..Example rss deviant https://www.deviantart.com/adri526
         
         ..Doc rss.html#see-the-last-post"""
-        if "deviantart.com" in user:
+        if re.match(r'https://(?:www\.)deviantart.com/', user):
             user = await self.parse_deviant_url(user)
         text = await self.rss_deviant(ctx.guild,user)
         if isinstance(text, str):
@@ -603,7 +600,7 @@ class Rss(commands.Cog):
             def check2(msg):
                 return msg.author.id == userID
             cond = False
-            while cond==False:
+            while not cond:
                 try:
                     msg = await self.bot.wait_for('message', check=check2, timeout=30.0)
                     if msg.content.lower() in no_role: # if no role should be mentionned
@@ -937,7 +934,7 @@ class Rss(commands.Cog):
 
 
     async def parse_yt_url(self, url):
-        r = r'(?:http.*://)?(?:www.)?(?:youtube.com|youtu.be)(?:(?:/channel/|/user/)(.+)|/[\w-]+$)'
+        r = r'(?:https?://)?(?:www.)?(?:youtube.com|youtu.be)(?:(?:/channel/|/user/)(.+)|/[\w-]+$)'
         match = re.search(r,url)
         if match is None:
             return None
@@ -1223,7 +1220,7 @@ class Rss(commands.Cog):
             else:
                 title = '?'
             img = None
-            r = re.search(r'(http(s?):)([/|.|\w|\s|-])*\.(?:jpe?g|gif|png|webp)', str(feed))
+            r = re.search(r'(http(s?):)([/|.\w\s-])*\.(?:jpe?g|gif|png|webp)', str(feed))
             if r is not None:
                 img = r.group(0)
             obj = self.rssMessage(
@@ -1267,7 +1264,7 @@ class Rss(commands.Cog):
                     else:
                         title = '?'
                     img = None
-                    r = re.search(r'(http(s?):)([/|.|\w|\s|-])*\.(?:jpe?g|gif|png|webp)', str(feed))
+                    r = re.search(r'(http(s?):)([/|.\w\s-])*\.(?:jpe?g|gif|png|webp)', str(feed))
                     if r is not None:
                         img = r.group(0)
                     obj = self.rssMessage(

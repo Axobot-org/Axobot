@@ -309,11 +309,11 @@ class BlurpleCog(commands.Cog):
             return image_file_object
 
         async with aiohttp.ClientSession() as _:
-            if isgif == False:
+            if not isgif:
                 image = await self.bot.loop.run_in_executor(None, imager, im)
             else:
                 image = await self.bot.loop.run_in_executor(None, gifimager, im, gifloop)
-            if isgif == False:
+            if not isgif:
                 image = discord.File(fp=image, filename='image.png')
             else:
                 image = discord.File(fp=image, filename='image.gif')
@@ -321,7 +321,7 @@ class BlurpleCog(commands.Cog):
                 fields_txt = await self.bot._(ctx.guild,"blurple","check_fields")
                 embed = discord.Embed(Title = "", colour = 0x7289DA, description=fields_txt[5])
                 embed.set_author(name=await self.bot._(ctx.guild,'blurple','create_title'))
-                if isgif == False:
+                if not isgif:
                     embed.set_image(url="attachment://image.png")
                     embed.set_footer(text=str(await self.bot._(ctx.guild,'blurple','create_footer_1')).format(ctx.author))
                 else:

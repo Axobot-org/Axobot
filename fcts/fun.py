@@ -91,7 +91,7 @@ class Fun(commands.Cog):
                     text+="\n- {} *({})*".format(cmd.name,cmd.help.split('\n')[0])
                 else:
                     text+="\n- {}".format(cmd.name)
-                if type(cmd)==commands.core.Group:
+                if isinstance(cmd, commands.core.Group):
                     for cmds in cmd.commands:
                         text+="\n    - {} *({})*".format(cmds.name,cmds.help)
         if ctx.can_send_embed:
