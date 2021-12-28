@@ -9,7 +9,7 @@ import importlib
 import asyncio
 import copy
 from fcts import checks, args
-from utils import zbot, MyContext
+from utils import Zbot, MyContext
 
 importlib.reload(checks)
 importlib.reload(args)
@@ -17,7 +17,7 @@ importlib.reload(args)
 class Moderation(commands.Cog):
     """Here you will find everything you need to moderate your server. Please note that most of the commands are reserved for certain members only."""
 
-    def __init__(self, bot: zbot):
+    def __init__(self, bot: Zbot):
         self.bot = bot
         self.file = "moderation"
 
@@ -206,7 +206,7 @@ Slowmode works up to one message every 6h (21600s)
             caseID = "'Unsaved'"
             if self.bot.database_online:
                 Cases = self.bot.get_cog('Cases')
-                case = Cases.Case(bot=self.bot,guildID=ctx.guild.id,memberID=user.id,Type="kick",ModID=ctx.author.id,Reason=reason,date=datetime.datetime.now())
+                case = Cases.Case(bot=self.bot,guildID=ctx.guild.id,memberID=user.id,Type="kick",ModID=ctx.author.id,Reason=reason,date=ctx.bot.utcnow())
                 try:
                     await Cases.add_case(case)
                     caseID = case.id
@@ -265,7 +265,7 @@ Slowmode works up to one message every 6h (21600s)
             caseID = "'Unsaved'"
             if self.bot.database_online:
                 Cases = self.bot.get_cog('Cases')
-                case = Cases.Case(bot=self.bot,guildID=ctx.guild.id,memberID=user.id,Type="warn",ModID=ctx.author.id,Reason=message,date=datetime.datetime.now())
+                case = Cases.Case(bot=self.bot,guildID=ctx.guild.id,memberID=user.id,Type="warn",ModID=ctx.author.id,Reason=message,date=ctx.bot.utcnow())
                 await Cases.add_case(case)
                 caseID = case.id
             else:
@@ -361,7 +361,8 @@ You can also mute this member for a defined duration, then use the following for
                     pass
                 return False
             if user==ctx.guild.me or (self.bot.database_online and await user_can_mute(user)):
-                await ctx.send(str(await self.bot._(ctx.guild.id, "moderation.staff-mute"))+random.choice([':confused:',':upside_down:',self.bot.get_cog('Emojis').customEmojis['wat'],':no_mouth:',self.bot.get_cog('Emojis').customEmojis['owo'],':thinking:',]))
+                emoji = random.choice([':confused:',':upside_down:',self.bot.get_cog('Emojis').customEmojis['wat'],':no_mouth:',self.bot.get_cog('Emojis').customEmojis['owo'],':thinking:',])
+                await ctx.send((await self.bot._(ctx.guild.id, "moderation.staff-mute"))+emoji)
                 return
             elif not self.bot.database_online and ctx.channel.permissions_for(user).manage_roles:
                 return await ctx.send(await self.bot._(ctx.guild.id, "moderation.warn.cant-staff"))
@@ -383,9 +384,9 @@ You can also mute this member for a defined duration, then use the following for
             if self.bot.database_online:
                 Cases = self.bot.get_cog('Cases')
                 if f_duration is None:
-                    case = Cases.Case(bot=self.bot,guildID=ctx.guild.id,memberID=user.id,Type="mute",ModID=ctx.author.id,Reason=reason,date=datetime.datetime.now())
+                    case = Cases.Case(bot=self.bot,guildID=ctx.guild.id,memberID=user.id,Type="mute",ModID=ctx.author.id,Reason=reason,date=ctx.bot.utcnow())
                 else:
-                    case = Cases.Case(bot=self.bot,guildID=ctx.guild.id,memberID=user.id,Type="tempmute",ModID=ctx.author.id,Reason=reason,date=datetime.datetime.now(),duration=duration)
+                    case = Cases.Case(bot=self.bot,guildID=ctx.guild.id,memberID=user.id,Type="tempmute",ModID=ctx.author.id,Reason=reason,date=ctx.bot.utcnow(),duration=duration)
                     await self.bot.get_cog('Events').add_task('mute',duration,user.id,ctx.guild.id)
                 try:
                     await Cases.add_case(case)
@@ -585,9 +586,9 @@ The 'days_to_delete' option represents the number of days worth of messages to d
             if self.bot.database_online:
                 Cases = self.bot.get_cog('Cases')
                 if f_duration is None:
-                    case = Cases.Case(bot=self.bot,guildID=ctx.guild.id,memberID=user.id,Type="ban",ModID=ctx.author.id,Reason=reason,date=datetime.datetime.now())
+                    case = Cases.Case(bot=self.bot,guildID=ctx.guild.id,memberID=user.id,Type="ban",ModID=ctx.author.id,Reason=reason,date=ctx.bot.utcnow())
                 else:
-                    case = Cases.Case(bot=self.bot,guildID=ctx.guild.id,memberID=user.id,Type="tempban",ModID=ctx.author.id,Reason=reason,date=datetime.datetime.now(),duration=duration)
+                    case = Cases.Case(bot=self.bot,guildID=ctx.guild.id,memberID=user.id,Type="tempban",ModID=ctx.author.id,Reason=reason,date=ctx.bot.utcnow(),duration=duration)
                     await self.bot.get_cog('Events').add_task('ban',duration,user.id,ctx.guild.id)
                 try:
                     await Cases.add_case(case)
@@ -653,7 +654,7 @@ The 'days_to_delete' option represents the number of days worth of messages to d
             caseID = "'Unsaved'"
             if self.bot.database_online:
                 Cases = self.bot.get_cog('Cases')
-                case = Cases.Case(bot=self.bot,guildID=ctx.guild.id,memberID=user.id,Type="unban",ModID=ctx.author.id,Reason=reason,date=datetime.datetime.now())
+                case = Cases.Case(bot=self.bot,guildID=ctx.guild.id,memberID=user.id,Type="unban",ModID=ctx.author.id,Reason=reason,date=ctx.bot.utcnow())
                 try:
                     await Cases.add_case(case)
                     caseID = case.id
@@ -710,7 +711,7 @@ Permissions for using this command are the same as for the kick
             caseID = "'Unsaved'"
             if self.bot.database_online:
                 Cases = self.bot.get_cog('Cases')
-                case = Cases.Case(bot=self.bot,guildID=ctx.guild.id,memberID=user.id,Type="softban",ModID=ctx.author.id,Reason=reason,date=datetime.datetime.now())
+                case = Cases.Case(bot=self.bot,guildID=ctx.guild.id,memberID=user.id,Type="softban",ModID=ctx.author.id,Reason=reason,date=ctx.bot.utcnow())
                 try:
                     await Cases.add_case(case)
                     caseID = case.id
@@ -1296,7 +1297,7 @@ ID corresponds to the Identifier of the message
             await ctx.send(await self.bot._(ctx.guild.id, "moderation.need-read-history"))
             return
         check = lambda x: not x.pinned
-        if message.created_at < datetime.datetime.utcnow() - datetime.timedelta(days=21):
+        if message.created_at < ctx.bot.utcnow() - datetime.timedelta(days=21):
             await ctx.send(await self.bot._(ctx.guild.id, "moderation.destop.too-old", days=21))
             return
         messages = await message.channel.purge(after=message, limit=1000, oldest_first=False)

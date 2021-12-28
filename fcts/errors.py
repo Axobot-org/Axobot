@@ -4,13 +4,13 @@ import traceback
 import random
 import re
 from discord.ext import commands
-from utils import zbot, MyContext
+from utils import Zbot, MyContext
 
 
 class Errors(commands.Cog):
     """General cog for error management."""
 
-    def __init__(self, bot: zbot):
+    def __init__(self, bot: Zbot):
         self.bot = bot
         self.file = "errors"
 

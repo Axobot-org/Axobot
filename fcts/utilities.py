@@ -9,7 +9,7 @@ from discord.ext import commands
 from typing import List
 from urllib.request import Request, build_opener
 
-from utils import zbot, MyContext
+from utils import Zbot, MyContext
 
 importlib.reload(args)
 
@@ -17,7 +17,7 @@ importlib.reload(args)
 class Utilities(commands.Cog):
     """This cog has various useful functions for the rest of the bot."""
 
-    def __init__(self, bot: zbot):
+    def __init__(self, bot: Zbot):
         self.bot = bot
         self.list_prefixs = dict()
         self.file = "utilities"
@@ -220,12 +220,6 @@ class Utilities(commands.Cog):
 
     async def clear_msg(self, text: str, everyone: bool=False, ctx: MyContext=None, emojis: bool=True):
         """Remove every mass mention from a text, and add custom emojis"""
-        # if everyone:
-        #     text = text.replace("@everyone","@"+u"\u200B"+"everyone").replace("@here","@"+u"\u200B"+"here")
-        # for x in re.finditer(r'<(a?:[^:]+:)\d+>',text):
-        #    text = text.replace(x.group(0),x.group(1))
-        # for x in self.bot.emojis: #  (?<!<|a)(:[^:<]+:)
-        #    text = text.replace(':'+x.name+':',str(x))
         if emojis:
             for x in re.finditer(r'(?<!<|a):([^:<]+):', text):
                 try:
@@ -238,8 +232,6 @@ class Utilities(commands.Cog):
                             em = discord.utils.find(
                                 lambda e: e.name == x.group(1), self.bot.emojis)
                 except:
-                    # except Exception as e:
-                    # print(e)
                     continue
                 if em is not None:
                     text = text.replace(x.group(0), "<{}:{}:{}>".format(
@@ -358,6 +350,8 @@ class Utilities(commands.Cog):
             liste.append('halloween20')
         if 'blurple_21' in unlocked:
             liste.append('blurple21')
+        if 'halloween_21' in unlocked:
+            liste.append('halloween21')
         return sorted(liste2)+sorted(liste)
 
     async def get_languages(self, user: discord.User, limit: int=0):
@@ -452,14 +446,15 @@ class Utilities(commands.Cog):
             except Exception as e:
                 await self.bot.get_cog("Errors").on_error(e, None)
             try:  # https://discordlist.space/bot/486896267788812288
-                headers = {'Authorization': 'Bot ' + self.bot.others['discordlist.space']}
-                async with session.get('https://api.discordlist.space/v2/bots/486896267788812288/upvotes', headers=headers) as r:
-                    js = await r.json()
-                    if 'errors' in js:
-                        raise Exception(f"discordlist.space raised the following exceptions: {js['errors']}")
-                    elif str(userid) in [x['id'] for x in js['users']]:
-                        votes.append(
-                            ("discordlist.space", "https://discordlist.space/"))
+                headers = {'Authorization': self.bot.others['discordlist.space']}
+                async with session.get(f'https://api.discordlist.space/v2/bots/486896267788812288/upvotes/status/{userid}', headers=headers) as r:
+                    if r.status != 404:
+                        js = await r.json()
+                        if 'errors' in js:
+                            raise Exception(f"discordlist.space raised the following exceptions: {js['errors']}")
+                        elif js["upvoted"]:
+                            votes.append(
+                                ("discordlist.space", "https://discordlist.space/"))
             except Exception as e:
                 await self.bot.get_cog("Errors").on_error(e, None)
             try:  # https://discord.boats/bot/486896267788812288

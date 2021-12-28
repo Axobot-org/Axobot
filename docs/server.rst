@@ -115,7 +115,7 @@ Configure your server
 
 There are several ways to customize your xp system. In particular, you have 4 `configuration options <server.html#config-options>`__, each one modifying a characteristic. And more are to come!
 
-- **Enable/disable xp:** it is possible to enable or disable the entire xp system for your server via the option :code:`enable_xp`. If it is set to 'true' the system is enabled, otherwise it will be 'false'. By default 'true'.
+- **Enable/disable xp:** it is possible to enable or disable the entire xp system for your server via the option :code:`enable_xp`. If it is set to 'true' the system is enabled, otherwise it will be 'false'. By default 'false'.
 
 - **Change the levelup message:** the bot automatically uses a long list of random messages for your members' level changes, but you can put a single one written by you via the option :code:`levelup_msg`. It is up to you to use then :code:`{user}` to mention the member, :code:`{level}` for his level and :code:`{username}` for his simple name (without notifications).
 

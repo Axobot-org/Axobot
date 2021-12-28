@@ -3,8 +3,8 @@
     "moderation": ["backup","ban","banlist","cases","clear","destop","kick","mute","mutelist","set_xp","slowmode","softban","unban","unhoist","unmute","verify","voice-clean","warn"],    
     "server-settings": ["config","mute-config","partner","pin","role","roles_react","roles_rewards","welcome"],    
     "users-info": ["perms","profile","rank","top","usernames"],
-    "other": ["book","discordjobs","discordstatus","embed","emoji","minecraft","mojang","react","remindme", "reminder"],
-    "fun": ["afk","arapproved","bitly","cookie","events","nasa","tic-tac-toe","fun","hour","say","unafk","vote","weather"],
+    "other": ["book","discordjobs","discordstatus","embed","emoji","minecraft","react","remindme", "reminder"],
+    "fun": ["afk","arapproved","bitly","cookie","events","nasa","tic-tac-toe","fun","hour","say","unafk","vote"],
     "translators": ["tr-file", "tr-reload-todo", "tr-status","translate","tr-edit","tr-loop","tr-merge"],
     "staff": ["add_cog","admin","bug","del_cog","eval","execute","find","idea","msg","rss_loop","spoil","test"],
     "unclassed": []

@@ -1,11 +1,11 @@
-import discord, datetime
+import discord
 from discord.ext import commands
-from utils import zbot
+from utils import Zbot
 
 class Welcomer(commands.Cog):
     """Cog which manages the departure and arrival of members in the servers"""
     
-    def __init__(self, bot: zbot):
+    def __init__(self, bot: Zbot):
         self.bot = bot
         self.file = "welcomer"
         self.no_message = [392766377078816789,504269440872087564,552273019020771358]
@@ -178,7 +178,7 @@ class Welcomer(commands.Cog):
         c = False
         level = int(level)
         can_ban = member.guild.get_member(self.bot.user.id).guild_permissions.ban_members
-        account_created_since = (datetime.datetime.utcnow() - member.created_at).total_seconds()
+        account_created_since = (self.bot.utcnow() - member.created_at).total_seconds()
         # Level 4
         if level >= 4:
             if account_created_since <= 120*60: # kick accounts created less than 2h before
