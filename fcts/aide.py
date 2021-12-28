@@ -31,7 +31,7 @@ class Help(commands.Cog):
 
 ..Doc infos.html#welcome-message"""
         prefix = await self.bot.get_prefix(ctx.message)
-        if type(prefix) == list:
+        if isinstance(prefix, list):
             prefix = prefix[-1]
         await ctx.send(await self.bot._(ctx.guild, "welcome.help", p=prefix))
 
@@ -84,7 +84,7 @@ If the bot can't send the new command format, it will try to send the old one.""
         async with ctx.channel.typing():
             destination: discord.TextChannel = None
             if ctx.guild is not None:
-                send_in_dm = False if self.bot.database_online == False else await self.bot.get_config(ctx.guild, 'help_in_dm')
+                send_in_dm = False if not self.bot.database_online else await self.bot.get_config(ctx.guild, 'help_in_dm')
                 if send_in_dm is not None and send_in_dm == 1:
                     destination = ctx.message.author.dm_channel
                     await self.bot.get_cog("Utilities").suppr(ctx.message)
@@ -154,7 +154,7 @@ If the bot can't send the new command format, it will try to send the old one.""
 
             ft = await self.bot._(ctx.channel, "help.footer")
             prefix = await self.bot.get_prefix(ctx.message)
-            if type(prefix) == list:
+            if isinstance(prefix, list):
                 prefix = prefix[-1]
         if len(pages) == 0:
             await self.bot.get_cog("Errors").senf_err_msg("Impossible de trouver d'aide pour la commande " + " ".join(commands))
@@ -199,9 +199,9 @@ If the bot can't send the new command format, it will try to send the old one.""
         categories = {x: list() for x in self.commands_list.keys()}
         for cmd in cmds:
             try:
-                if cmd.hidden == True or cmd.enabled == False:
+                if cmd.hidden or not cmd.enabled:
                     continue
-                if (await cmd.can_run(ctx)) == False:
+                if not await cmd.can_run(ctx):
                     continue
             except Exception as e:
                 if not "discord.ext.commands.errors" in str(type(e)):
@@ -219,7 +219,6 @@ If the bot can't send the new command format, it will try to send the old one.""
                 categories['unclassed'].append(temp)
         answer = list()
         if compress:
-            pass
             for k, v in categories.items():
                 if len(v) == 0:
                     continue
@@ -264,7 +263,7 @@ If the bot can't send the new command format, it will try to send the old one.""
             description = await self.bot._(ctx.channel, "help.no-desc-cog")
         for cmd in sorted([c for c in self.bot.commands], key=self.sort_by_name):
             try:
-                if (await cmd.can_run(ctx)) == False or cmd.hidden == True or cmd.enabled == False or cmd.cog_name != cog_name:
+                if (not await cmd.can_run(ctx)) or cmd.hidden or (not cmd.enabled) or cmd.cog_name != cog_name:
                     continue
             except Exception as e:
                 if not "discord.ext.commands.errors" in str(type(e)):
@@ -302,28 +301,26 @@ If the bot can't send the new command format, it will try to send the old one.""
             desc = await self.bot._(ctx.channel, "help.no-desc-cmd")
         # Prefix
         prefix = await self.bot.get_prefix(ctx.message)
-        if type(prefix) == list:
+        if isinstance(prefix, list):
             prefix = prefix[-1]
         # Syntax
         syntax = cmd.qualified_name + "** " + cmd.signature
         # Subcommands
         sublist = list()
         subcmds = ""
-        if type(cmd) == commands.core.Group:
+        if isinstance(cmd, commands.core.Group):
             syntax += " ..."
             if not useEmbed:
                 subcmds = "__{}__".format(str(await self.bot._(ctx.channel, "help.subcmds")).capitalize())
             for x in sorted(cmd.all_commands.values(), key=self.sort_by_name):
                 try:
-                    if x.hidden == False and x.enabled == True and x.name not in sublist and await x.can_run(ctx):
+                    if (not x.hidden) and x.enabled and x.name not in sublist and await x.can_run(ctx):
                         subcmds += "\n• {} {}".format(x.name, "*({})*".format(
                             x.short_doc) if len(x.short_doc) > 0 else "")
                         sublist.append(x.name)
                 except Exception as e:
-                    if not "discord.ext.commands.errors" in str(type(e)):
+                    if "discord.ext.commands.errors" not in str(type(e)):
                         raise e
-                    else:
-                        continue
         # Is enabled
         enabled = list()
         if not cmd.enabled:
@@ -354,7 +351,6 @@ If the bot can't send the new command format, it will try to send the old one.""
                             checks.append(
                                 ":small_blue_diamond: "+check_msg_tr[0])
                         else:
-                            pass
                             checks.append('❌ '+check_msg_tr[1])
                     else:
                         self.bot.log.warning(f"No description for help check {check_name} ({c})")

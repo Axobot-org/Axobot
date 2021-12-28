@@ -105,11 +105,11 @@ class Morpions(commands.Cog):
 
         async def test_place_valide(self, grille: list, saisie: str):
             """Test si la place saisie par le joueur est libre"""
-            return False if (str(grille[int(saisie)-1]) == 'X') or (str(grille[int(saisie)-1]) == 'O') else True
+            return not (str(grille[int(saisie)-1]) == 'X') or (str(grille[int(saisie)-1]) == 'O')
 
         async def remplacer_valeur(self, grille: list, tour: bool, saisie: str):
             """Remplace la valeur de celui qui joue"""
-            return ['X' if x == int(saisie) else x for x in grille] if tour == True else ['O' if x == int(saisie) else x for x in grille]
+            return ['X' if x == int(saisie) else x for x in grille] if tour else ['O' if x == int(saisie) else x for x in grille]
 
         async def test_win(self, grille: list):
             """Test s'il y a une position de victoire"""
@@ -140,7 +140,7 @@ class Morpions(commands.Cog):
                         return
                     
                 ###
-                    if tour == True:  # Si c'est au joueur
+                    if tour:  # Si c'est au joueur
                         if display_grille:
                             # if needed, clean the messages
                             if self.mode == 1 and last_grid:
@@ -154,7 +154,7 @@ class Morpions(commands.Cog):
                             return
                         saisie = msg.content
                         if msg.content in self.entrees_valides:
-                            if await self.test_place_valide(grille, saisie) == True:
+                            if await self.test_place_valide(grille, saisie):
                                 grille = await self.remplacer_valeur(grille, tour, saisie)
                                 tour = False
                                 if self.mode == 1:
@@ -176,14 +176,13 @@ class Morpions(commands.Cog):
                         # Test si joueur va gagner ou si bot peut gagner
                         for k in range(1, 10):
                             for i in [True, False]:
-                                grille_copie = grille
                                 grille_copie = await self.remplacer_valeur(grille, i, k)
-                                if await self.test_win(grille_copie) == True:
+                                if await self.test_win(grille_copie):
                                     saisie = k
                                     break
                         # Test si la saisie est valide
                         if str(saisie) in self.entrees_valides:
-                            if await self.test_place_valide(grille, saisie) == True:
+                            if await self.test_place_valide(grille, saisie):
                                 grille = await self.remplacer_valeur(grille, tour, saisie)
                                 tour = True
                             else:
@@ -192,7 +191,7 @@ class Morpions(commands.Cog):
                             continue
                         display_grille = True
                 ###
-                    if await self.test_win(grille) == True:
+                    if await self.test_win(grille):
                         match_nul = False
                         break
                 ###
@@ -209,8 +208,8 @@ class Morpions(commands.Cog):
                         resultat = await self.bot._(ctx.channel, 'morpion.win-user', user=ctx.author.mention)
                         await self.bot.get_cog("Utilities").add_user_eventPoint(ctx.author.id, 4)
                 await ctx.send(await self.afficher_grille(grille)+'\n'+resultat)
-            except Exception as e:
-                await self.bot.get_cog('Errors').on_command_error(ctx, e)
+            except Exception as err:
+                await self.bot.get_cog('Errors').on_command_error(ctx, err)
 
 
 def setup(bot):

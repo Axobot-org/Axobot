@@ -567,7 +567,7 @@ Every information come from the website www.fr-minecraft.net"""
         return msg
 
     async def form_msg_server(self, obj, guild: discord.Guild, ip: str):
-        if type(obj) == str:
+        if isinstance(obj, str):
             if ip[1] is None:
                 ip = ip[0]
             else:

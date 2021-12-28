@@ -50,7 +50,7 @@ class TimeUtils(discord.ext.commands.Cog):
     async def time_delta(self, date1, date2=None, lang='en', year=False, hour=True, form='developed', precision=2):
         """Translates a two time interval datetime.datetime into a readable character string"""
         if date2 is not None:
-            if type(date2)==datetime.datetime:
+            if isinstance(date2, datetime.datetime):
                 delta = abs(date2 - date1)
                 t = await self.time_interval(delta,precision)
             else:
@@ -138,9 +138,9 @@ class TimeUtils(discord.ext.commands.Cog):
 
     async def date(self, date, lang='fr', year=False, hour=True, digital=False, timezone=False) -> str:
         """Translates a datetime.datetime object into a readable string"""
-        if type(date) == time.struct_time:
+        if isinstance(date, time.struct_time):
             date = datetime.datetime(*date[:6])
-        if type(date) == datetime.datetime:
+        if isinstance(date, datetime.datetime):
             if len(str(date.day)) == 1:
                 jour="0"+str(date.day)
             else:

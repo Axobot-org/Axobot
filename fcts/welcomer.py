@@ -173,7 +173,7 @@ class Welcomer(commands.Cog):
             return False
         level = str(await self.bot.get_config(member.guild.id,"anti_raid"))
         # if level is unreadable or bot can't kick
-        if not level.isnumeric() or member.guild.channels[0].permissions_for(member.guild.me).kick_members == False:
+        if not level.isnumeric() or not member.guild.channels[0].permissions_for(member.guild.me).kick_members:
             return
         c = False
         level = int(level)

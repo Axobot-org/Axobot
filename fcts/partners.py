@@ -288,7 +288,7 @@ class Partners(commands.Cog):
         if isinstance(invite,int):
             try:
                 item = await self.bot.fetch_user(invite)
-                if item.bot==False:
+                if not item.bot:
                     raise Exception
             except:
                 return await ctx.send(await self.bot._(ctx.guild.id, "partners.invalid-bot"))

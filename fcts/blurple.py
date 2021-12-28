@@ -4,7 +4,6 @@ from random import randint
 import aiohttp
 import json
 import typing
-import json
 import importlib
 
 import discord

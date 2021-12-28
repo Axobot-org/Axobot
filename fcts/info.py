@@ -109,9 +109,6 @@ class Info(commands.Cog):
                 # RAM/CPU
                 ram_cpu = [round(py.memory_info()[0]/2.**30,3), py.cpu_percent(interval=1)]
                 # Guilds count
-                b_conf = self.bot.get_cog('Utilities').config
-                if b_conf is None:
-                    b_conf = await self.bot.get_cog('Utilities').get_bot_infos()
                 ignored_guilds = list()
                 if self.bot.database_online:
                     ignored_guilds = [int(x) for x in self.bot.get_cog('Utilities').config['banned_guilds'].split(";") if len(x) > 0]
@@ -284,23 +281,23 @@ Available types: member, role, user, emoji, channel, server, invite, category
             if item is None:
                 msg = await self.bot._(ctx.guild.id, "info.not-found", N=name[:1900])
                 await ctx.send(msg)
-            elif type(item) == discord.Member:
+            elif isinstance(item, discord.Member):
                 await self.member_infos(ctx,item,lang,critical)
-            elif type(item) == discord.Role:
+            elif isinstance(item, discord.Role):
                 await self.role_infos(ctx,item,lang)
-            elif type(item) == discord.User:
+            elif isinstance(item, discord.User):
                 await self.user_infos(ctx,item,lang)
-            elif type(item) == discord.Emoji:
+            elif isinstance(item, discord.Emoji):
                 await self.emoji_infos(ctx,item,lang)
-            elif type(item) == discord.TextChannel:
+            elif isinstance(item, discord.TextChannel):
                 await self.textChannel_infos(ctx,item,lang)
-            elif type(item) == discord.VoiceChannel:
+            elif isinstance(item, discord.VoiceChannel):
                 await self.voiceChannel_info(ctx,item,lang)
-            elif type(item) == discord.Invite:
+            elif isinstance(item, discord.Invite):
                 await self.invite_info(ctx,item,lang)
-            elif type(item) == discord.CategoryChannel:
+            elif isinstance(item, discord.CategoryChannel):
                 await self.category_info(ctx,item,lang)
-            elif type(item) == discord.Guild:
+            elif isinstance(item, discord.Guild):
                 await self.guild_info(ctx,item,lang,critical)
             elif isinstance(item,discord.user.ClientUser):
                 await self.member_infos(ctx,ctx.guild.me,lang,critical)
@@ -395,7 +392,6 @@ Available types: member, role, user, emoji, channel, server, invite, category
         # Roles
         _roles = await self.bot._(ctx.guild.id, 'info.info.member-9') + f' [{len(list_role)}]'
         if len(list_role) > 0:
-            c = len(list_role)
             list_role = list_role[:40]
             embed.add_field(name=_roles, value = ", ".join(list_role), inline=False)
         else:
@@ -773,9 +769,9 @@ Available types: member, role, user, emoji, channel, server, invite, category
         tchan = 0
         vchan = 0
         for channel in categ.channels:
-            if type(channel)==discord.TextChannel:
+            if isinstance(channel, discord.TextChannel):
                 tchan += 1
-            elif type(channel) == discord.VoiceChannel:
+            elif isinstance(channel, discord.VoiceChannel):
                 vchan +=1
         embed = discord.Embed(colour=default_color, timestamp=ctx.message.created_at)
         embed.set_author(name="{} '{}'".format(await self.bot._(ctx.guild.id,"info.info.categ-0"),categ.name), icon_url=ctx.guild.icon)
@@ -1043,7 +1039,7 @@ Servers:
         """Get some digits on the number of server members
         
         ..Doc infos.html#membercount"""
-        if ctx.channel.permissions_for(ctx.guild.me).send_messages == False:
+        if not ctx.channel.permissions_for(ctx.guild.me).send_messages:
             return
         total, bots, c_co = await self.bot.get_cog("Utilities").get_members_repartition(ctx.guild.members)
         h = total - bots

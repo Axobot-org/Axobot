@@ -67,7 +67,7 @@ class Events(commands.Cog):
         """Called when a member change something (status, activity, nickame, roles)"""
         if before.nick != after.nick:
             config_option = await self.bot.get_cog('Utilities').get_db_userinfo(['allow_usernames_logs'],["userID="+str(before.id)])
-            if config_option is not None and config_option['allow_usernames_logs']==False:
+            if config_option is not None and config_option['allow_usernames_logs'] is False:
                 return
             await self.updade_memberslogs_name(before, after)
 
@@ -99,7 +99,7 @@ class Events(commands.Cog):
         """Called when a user change something (avatar, username, discrim)"""
         if before.name != after.name:
             config_option = await self.bot.get_cog('Utilities').get_db_userinfo(['allow_usernames_logs'],["userID="+str(before.id)])
-            if config_option is not None and config_option['allow_usernames_logs']==False:
+            if config_option is not None and config_option['allow_usernames_logs'] is False:
                 return
             await self.updade_memberslogs_name(before, after)
 
@@ -178,7 +178,6 @@ class Events(commands.Cog):
             except:
                 pass
             pass
-        # if msg.author.bot==False and await self.bot.get_cog('Admin').check_if_admin(msg.author) == False and msg.guild is not None:
         if not msg.author.bot:
             cond = False
             if self.bot.database_online:
@@ -256,7 +255,7 @@ class Events(commands.Cog):
         c = self.embed_colors[Type.lower()]
         try:
             config = str(await self.bot.get_config(guild.id,"modlogs_channel")).split(';')[0]
-            if config == "" or config.isnumeric()==False:
+            if config == "" or not config.isnumeric():
                 return
             channel = guild.get_channel(int(config))
         except Exception as e:

@@ -767,7 +767,6 @@ Permissions for using this command are the same as for the kick
             await self.bot.get_cog('Errors').on_error(e, ctx)
         except Exception as e:
             await self.bot.get_cog('Errors').on_error(e, ctx)
-            pass
     
     async def send_chat_answer(self, action: str, user: discord.User, ctx: MyContext, case: int = None):
         if action in ('warn', 'mute', 'unmute', 'kick', 'ban', 'unban'):

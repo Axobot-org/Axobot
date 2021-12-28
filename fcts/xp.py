@@ -331,7 +331,7 @@ class Xp(commands.Cog):
         cog = self.bot.get_cog("Utilities")
         if cog is None:
             return
-        result = await cog.get_db_userinfo(['userID'], ['xp_suspect=1'], Type=list)
+        result = await cog.get_db_userinfo(['userID'], ['xp_suspect=1'], return_type=list)
         if result is None:
             return
         if len(result) > 1:
