@@ -2,7 +2,7 @@ import discord
 import datetime
 import json
 from discord.ext import commands
-from utils import zbot, MyContext
+from utils import Zbot, MyContext
 
 data = {
     "fr": {
@@ -33,10 +33,9 @@ data = {
     }
 }
 
-
 class BotEvents(commands.Cog):
 
-    def __init__(self, bot: zbot):
+    def __init__(self, bot: Zbot):
         self.bot = bot
         self.file = "bot_events"
         self.current_event: str = None

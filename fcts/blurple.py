@@ -14,7 +14,7 @@ from discord.ext.commands import Cog
 from libs import blurple
 from libs.blurple import convert_image, check_image
 importlib.reload(blurple)
-from utils import zbot, MyContext
+from utils import Zbot, MyContext
 
 
 class LinkConverter(commands.Converter):
@@ -60,14 +60,14 @@ def _make_check_command(name, parent, **kwargs):
         if ctx.message.attachments:
             url = ctx.message.attachments[0].proxy_url
         elif who is None:
-            url = ctx.author.avatar_url
+            url = ctx.author.display_avatar.url
         else:
             if isinstance(who, str):  # LinkConverter
                 url = who
             elif isinstance(who, discord.PartialEmoji):
                 url = who.url
             else:
-                url = who.avatar_url
+                url = who.display_avatar.url
 
         old_msg = await ctx.send(await ctx.bot._(ctx.channel, "blurple.check_intro", user=ctx.author.mention))
         async with aiohttp.ClientSession() as session:
@@ -105,14 +105,14 @@ def _make_color_command(name, fmodifier, parent, **kwargs):
         if ctx.message.attachments:
             url = ctx.message.attachments[0].proxy_url
         elif who is None:
-            url = ctx.author.avatar_url
+            url = ctx.author.display_avatar.url
         else:
             if isinstance(who, str):  # LinkConverter
                 url = who
             elif isinstance(who, discord.PartialEmoji):
                 url = who.url
             else:
-                url = who.avatar_url
+                url = who.display_avatar.url
 
         if fmodifier == 'blurplefy':
             final_modifier = "light"
@@ -138,7 +138,7 @@ def _make_color_command(name, fmodifier, parent, **kwargs):
 
 
 class Blurplefy(Cog):
-    def __init__(self, bot: zbot):
+    def __init__(self, bot: Zbot):
         self.bot = bot
         self.file = "blurple"
         self.hourly_reward = [4, 20]

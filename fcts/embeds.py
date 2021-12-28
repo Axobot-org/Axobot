@@ -1,13 +1,16 @@
-import datetime, discord, requests, typing
+import datetime
+import discord
+import requests
+import typing
 from discord.ext import commands
-from utils import zbot, MyContext
+from utils import Zbot, MyContext
 
 url_base = 'https://discord.com/api/webhooks/'
 
 class Embeds(commands.Cog):
     """Cog for the management of the embeds. No more, no less."""
 
-    def __init__(self, bot: zbot):
+    def __init__(self, bot: Zbot):
         self.bot = bot
         self.logs = {'classic':"625369482587537408/uGh5fJWD6S1XAddNKOGohvyfXWOxPmsodQQPcp7iasagi5kJm8DKfbzmf7-UFb5u3gnd",
             'loop':'625369730127101964/04KUvJxdb-Dl-BIkIdBydqZIoziBn5qy06YugIO3T4uOUYqMIT4YgoP6C0kv6CrrA8h8',
@@ -91,7 +94,7 @@ class Embeds(commands.Cog):
 
         def set_author(self, user: discord.User):
             self.author_name = user.name
-            self.author_icon = user.avatar_url_as(static_format="png", size=256)
+            self.author_icon = user.avatar.with_static_format("png").with_size(256)
             return self
         
         async def create_footer(self, ctx:MyContext, user: typing.Union[discord.User,discord.Member]=None):
@@ -99,7 +102,7 @@ class Embeds(commands.Cog):
             if user is None:
                 user = ctx.author
             self.footer_text = await ctx.bot._(ctx.channel, "misc.request_by", user=user.name)
-            self.footer_url = user.avatar_url_as(format='png',size=256)
+            self.footer_url = user.display_avatar.replace(format="png", size=256)
             return self
 
         def discord_embed(self):

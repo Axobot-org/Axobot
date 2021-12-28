@@ -1,9 +1,9 @@
-from utils import zbot, MyContext
+import datetime
+from utils import Zbot, MyContext
 from libs import bitly_api
 from fcts import reloads, args, checks
 from docs import conf
 import discord
-import datetime
 import sys
 import psutil
 import os
@@ -34,7 +34,7 @@ async def in_support_server(ctx):
 class Info(commands.Cog):
     """Here you will find various useful commands to get information about ZBot."""
 
-    def __init__(self, bot: zbot):
+    def __init__(self, bot: Zbot):
         self.bot = bot
         self.file = "info"
         self.bot_version = conf.release
@@ -153,7 +153,7 @@ class Info(commands.Cog):
                     str_args = {f'v{i}': var[i] for i in range(len(var))} if isinstance(var, (tuple, list)) else {'v': var}
                     d += await self.bot._(ctx.channel, "info.stats."+key, **str_args) + "\n"
             if ctx.can_send_embed: # if we can use embed
-                embed = ctx.bot.get_cog('Embeds').Embed(title=await self.bot._(ctx.channel,"info.stats.title"), color=ctx.bot.get_cog('Help').help_color, time=ctx.message.created_at,desc=d,thumbnail=self.bot.user.avatar_url_as(format="png"))
+                embed = ctx.bot.get_cog('Embeds').Embed(title=await self.bot._(ctx.channel,"info.stats.title"), color=ctx.bot.get_cog('Help').help_color, time=ctx.message.created_at,desc=d,thumbnail=self.bot.user.display_avatar.with_static_format("png"))
                 await embed.create_footer(ctx)
                 await ctx.send(embed=embed.discord_embed())
             else:
@@ -258,7 +258,7 @@ Available types: member, role, user, emoji, channel, server, invite, category
 ..Example info server
 
 .. Doc infos.html#info"""
-        if Type is not None and name is None and Type not in ["guild","server"]:
+        if Type is not None and name is None and Type not in {"guild", "server"}:
             raise commands.MissingRequiredArgument(ctx.command.clean_params['name'])
         if not ctx.can_send_embed:
             return await ctx.send(await self.bot._(ctx.guild.id,"fun.no-embed-perm"))
@@ -312,12 +312,12 @@ Available types: member, role, user, emoji, channel, server, invite, category
             await self.bot.get_cog("Errors").on_error(e,ctx)
             await ctx.send(await self.bot._(ctx.channel,'errors.unknown'))
 
-    async def member_infos(self, ctx: MyContext,item: discord.Member, lang: str, critical_info=False):
+    async def member_infos(self, ctx: MyContext, item: discord.Member, lang: str, critical_info=False):
         since = await self.bot._(ctx.guild.id,"misc.since")
         embed = discord.Embed(colour=item.color, timestamp=ctx.message.created_at)
-        embed.set_thumbnail(url=item.avatar_url_as(static_format='png'))
-        embed.set_author(name=str(item), icon_url=str(item.avatar_url_as(format='png')))
-        embed.set_footer(text='Requested by {}'.format(ctx.author.name), icon_url=str(ctx.author.avatar_url_as(format='png')))
+        embed.set_thumbnail(url=item.display_avatar.with_static_format("png"))
+        embed.set_author(name=str(item), icon_url=str(item.display_avatar.with_format("png")))
+        embed.set_footer(text='Requested by {}'.format(ctx.author.name), icon_url=str(ctx.author.display_avatar.with_format("png")))
         # Name
         embed.add_field(name=str(await self.bot._(ctx.guild.id,"misc.name")).capitalize(), value=item.name,inline=True)
         # Nickname
@@ -330,7 +330,7 @@ Available types: member, role, user, emoji, channel, server, invite, category
             if str(role)!='@everyone':
                 list_role.append(role.mention)
         # Created at
-        now = datetime.datetime.utcnow()
+        now = ctx.bot.utcnow()
         delta = abs(item.created_at - now)
         created_date = await self.TimeUtils.date(item.created_at, lang=lang, year=True)
         created_since = await self.TimeUtils.time_delta(delta.total_seconds(), lang=lang, year=True, precision=0, hour=delta.total_seconds() < 86400)
@@ -349,7 +349,7 @@ Available types: member, role, user, emoji, channel, server, invite, category
         position = str(sorted(ctx.guild.members, key=lambda m: m.joined_at).index(item) + 1) + "/" + str(len(ctx.guild.members))
         embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.member-3"), value = position,inline=True)
         # Status
-        embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.member-4"), value = str(await self.bot._(ctx.guild.id,f"misc.{item.status}")).capitalize(),inline=True)
+        embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.member-4"), value = (await self.bot._(ctx.guild.id,f"misc.{item.status}")).capitalize(),inline=True)
         # Activity
         if item.activity is None:
             m_activity = str(await self.bot._(ctx.guild.id,"misc.activity.nothing")).capitalize()
@@ -377,7 +377,7 @@ Available types: member, role, user, emoji, channel, server, invite, category
             botb = await self.bot._(ctx.guild.id,"misc.no")
         embed.add_field(name="Bot", value=botb.capitalize())
         # Administrator
-        if item.permissions_in(ctx.channel).administrator:
+        if ctx.channel.permissions_for(item).administrator:
             admin = await self.bot._(ctx.guild.id,"misc.yes")
         else:
             admin = await self.bot._(ctx.guild.id,"misc.no")
@@ -409,8 +409,8 @@ Available types: member, role, user, emoji, channel, server, invite, category
 
     async def role_infos(self, ctx: MyContext, item: discord.Role, lang: str):
         embed = discord.Embed(colour=item.color, timestamp=ctx.message.created_at)
-        embed.set_author(name=str(item), icon_url=ctx.guild.icon_url)
-        embed.set_footer(text='Requested by {}'.format(ctx.author.name), icon_url=ctx.author.avatar_url)
+        embed.set_author(name=str(item), icon_url=ctx.guild.icon)
+        embed.set_footer(text='Requested by {}'.format(ctx.author.name), icon_url=ctx.author.display_avatar)
         since = await self.bot._(ctx.guild.id,"misc.since")
         # Name
         embed.add_field(name=str(await self.bot._(ctx.guild.id,"misc.name")).capitalize(), value=item.mention,inline=True)
@@ -423,25 +423,25 @@ Available types: member, role, user, emoji, channel, server, invite, category
             mentio = await self.bot._(ctx.guild.id,"misc.yes")
         else:
             mentio = await self.bot._(ctx.guild.id,"misc.no")
-        embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.role-2"), value=mentio.capitalize(),inline=True)
+        embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.role-2"), value=mentio.capitalize(), inline=True)
         # Members nbr
-        embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.role-3"), value=len(item.members),inline=True)
+        embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.role-3"), value=len(item.members), inline=True)
         # Hoisted
         if item.hoist:
             hoist = await self.bot._(ctx.guild.id,"misc.yes")
         else:
             hoist = await self.bot._(ctx.guild.id,"misc.no")
-        embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.role-4"), value=hoist.capitalize(),inline=True)
+        embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.role-4"), value=hoist.capitalize(), inline=True)
         # Created at
-        delta = abs(item.created_at - datetime.datetime.utcnow())
+        delta = abs(item.created_at - ctx.bot.utcnow())
         created_date = await self.TimeUtils.date(item.created_at, lang=lang, year=True)
         created_since = await self.TimeUtils.time_delta(delta.total_seconds(), lang=lang, year=True, precision=0, hour=delta.total_seconds() < 86400)
         embed.add_field(name=await self.bot._(ctx.guild.id, "info.info.member-1"), value = "{} ({} {})".format(created_date, since, created_since), inline=False)
         # Hierarchy position
-        embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.role-5"), value=str(len(ctx.guild.roles) - item.position),inline=True)
+        embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.role-5"), value=str(len(ctx.guild.roles) - item.position), inline=True)
         # Unique member
         if len(item.members)==1:
-            embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.role-6"), value=str(item.members[0].mention),inline=True)
+            embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.role-6"), value=item.members[0].mention, inline=True)
         await ctx.send(embed=embed)
 
 
@@ -461,16 +461,16 @@ Available types: member, role, user, emoji, channel, server, invite, category
             # except (discord.Forbidden, discord.NotFound):
             #     banned = None
         embed = discord.Embed(colour=default_color, timestamp=ctx.message.created_at)
-        embed.set_thumbnail(url=item.avatar_url_as(format='gif') if item.is_avatar_animated() else item.avatar_url_as(format='png'))
-        embed.set_author(name=str(item), icon_url=item.avatar_url_as(format='png'))
-        embed.set_footer(text='Requested by {}'.format(ctx.author.name), icon_url=ctx.author.avatar_url_as(format='png'))
+        embed.set_thumbnail(url=item.display_avatar.with_static_format("png"))
+        embed.set_author(name=str(item), icon_url=item.display_avatar.with_format("png"))
+        embed.set_footer(text='Requested by {}'.format(ctx.author.name), icon_url=ctx.author.display_avatar.with_format("png"))
 
         # name
         embed.add_field(name=str(await self.bot._(ctx.guild.id,"misc.name")).capitalize(), value=item.name,inline=True)
         # ID
         embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.role-0"), value=str(item.id))
         # created at
-        now = datetime.datetime.utcnow()
+        now = ctx.bot.utcnow()
         delta = abs(item.created_at - now)
         created_date = await self.TimeUtils.date(item.created_at, lang=lang, year=True)
         created_since = await self.TimeUtils.time_delta(delta.total_seconds(), lang=lang, year=True, precision=0, hour=delta.total_seconds() < 86400)
@@ -505,7 +505,7 @@ Available types: member, role, user, emoji, channel, server, invite, category
         embed = discord.Embed(colour=default_color, timestamp=ctx.message.created_at)
         embed.set_thumbnail(url=item.url)
         embed.set_author(name="Emoji '{}'".format(item.name), icon_url=item.url)
-        embed.set_footer(text='Requested by {}'.format(ctx.author.name), icon_url=ctx.author.avatar_url_as(format='png'))
+        embed.set_footer(text='Requested by {}'.format(ctx.author.name), icon_url=ctx.author.display_avatar.with_format("png"))
         # name
         embed.add_field(name=str(await self.bot._(ctx.guild.id,"misc.name")).capitalize(), value=item.name,inline=True)
         # id
@@ -520,7 +520,7 @@ Available types: member, role, user, emoji, channel, server, invite, category
         # managed
         embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.emoji-1"), value=manage.capitalize())
         # created at
-        delta = abs(item.created_at - datetime.datetime.utcnow())
+        delta = abs(item.created_at - ctx.bot.utcnow())
         created_date = await self.TimeUtils.date(item.created_at, lang=lang, year=True)
         created_since = await self.TimeUtils.time_delta(delta.total_seconds(), lang=lang, year=True, precision=0, hour=delta.total_seconds() < 86400)
         embed.add_field(name=await self.bot._(ctx.guild.id, "info.info.member-1"), value = "{} ({} {})".format(created_date, since, created_since), inline=False)
@@ -541,8 +541,8 @@ Available types: member, role, user, emoji, channel, server, invite, category
             await ctx.send(await self.bot._(ctx.guild.id, "info.cant-see-channel"))
             return
         embed = discord.Embed(colour=default_color, timestamp=ctx.message.created_at)
-        embed.set_author(name="{} '{}'".format(await self.bot._(ctx.guild.id,"info.info.textchan-5"),chan.name), icon_url=ctx.guild.icon_url_as(format='png'))
-        embed.set_footer(text='Requested by {}'.format(ctx.author.name), icon_url=ctx.author.avatar_url_as(format='png'))
+        embed.set_author(name="{} '{}'".format(await self.bot._(ctx.guild.id,"info.info.textchan-5"),chan.name), icon_url=ctx.guild.icon.with_format('png'))
+        embed.set_footer(text='Requested by {}'.format(ctx.author.name), icon_url=ctx.author.display_avatar.with_format("png"))
         since = await self.bot._(ctx.guild.id,"misc.since")
         # Name
         embed.add_field(name=str(await self.bot._(ctx.guild.id,"misc.name")).capitalize(), value=chan.name,inline=True)
@@ -566,7 +566,7 @@ Available types: member, role, user, emoji, channel, server, invite, category
         # Members nber
         embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.role-3"), value = str(len(chan.members))+"/"+str(ctx.guild.member_count), inline=True)
         # Created at
-        delta = abs(chan.created_at - datetime.datetime.utcnow())
+        delta = abs(chan.created_at - ctx.bot.utcnow())
         created_date = await self.TimeUtils.date(chan.created_at, lang=lang, year=True)
         created_since = await self.TimeUtils.time_delta(delta.total_seconds(), lang=lang, year=True, precision=0, hour=delta.total_seconds() < 86400)
         embed.add_field(name=await self.bot._(ctx.guild.id, "info.info.member-1"), value = "{} ({} {})".format(created_date, since, created_since), inline=False)
@@ -581,8 +581,8 @@ Available types: member, role, user, emoji, channel, server, invite, category
             return
         since = await self.bot._(ctx.guild.id,"misc.since")
         embed = discord.Embed(colour=default_color, timestamp=ctx.message.created_at)
-        embed.set_author(name="{} '{}'".format(await self.bot._(ctx.guild.id,"info.info.voicechan-0"),chan.name), icon_url=ctx.guild.icon_url)
-        embed.set_footer(text='Requested by {}'.format(ctx.author.name), icon_url=ctx.author.avatar_url)
+        embed.set_author(name="{} '{}'".format(await self.bot._(ctx.guild.id,"info.info.voicechan-0"),chan.name), icon_url=ctx.guild.icon)
+        embed.set_footer(text='Requested by {}'.format(ctx.author.name), icon_url=ctx.author.display_avatar)
         # Name
         embed.add_field(name=str(await self.bot._(ctx.guild.id,"misc.name")).capitalize(), value=chan.name,inline=True)
         # ID
@@ -590,7 +590,7 @@ Available types: member, role, user, emoji, channel, server, invite, category
         # Category
         embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.textchan-0"), value=str(chan.category))
         # Created at
-        delta = abs(chan.created_at - datetime.datetime.utcnow())
+        delta = abs(chan.created_at - ctx.bot.utcnow())
         created_date = await self.TimeUtils.date(chan.created_at, lang=lang, year=True)
         created_since = await self.TimeUtils.time_delta(delta.total_seconds(), lang=lang, year=True, precision=0, hour=delta.total_seconds() < 86400)
         embed.add_field(name=await self.bot._(ctx.guild.id, "info.info.member-1"), value = "{} ({} {})".format(created_date, since, created_since), inline=False)
@@ -611,14 +611,14 @@ Available types: member, role, user, emoji, channel, server, invite, category
         if (desc is None or len(desc) == 0) and guild.description is not None:
             desc = guild.description
         embed = discord.Embed(colour=default_color, timestamp=ctx.message.created_at, description=desc)
-        embed.set_footer(text='Requested by {}'.format(ctx.author.name), icon_url=ctx.author.avatar_url)
+        embed.set_footer(text='Requested by {}'.format(ctx.author.name), icon_url=ctx.author.display_avatar)
         # Guild icon
-        icon_url = guild.icon_url_as(format = "gif" if guild.is_icon_animated() else 'png')
+        icon_url = guild.icon.with_static_format("png")
         embed.set_author(name="{} '{}'".format(await self.bot._(ctx.guild.id,"info.info.guild-0"),guild.name), icon_url=icon_url)
         embed.set_thumbnail(url=icon_url)
         # Guild banner
         if guild.banner is not None:
-            embed.set_image(url=guild.banner_url)
+            embed.set_image(url=guild.banner)
         # Name
         embed.add_field(name=str(await self.bot._(ctx.guild.id,"misc.name")).capitalize(), value=guild.name,inline=True)
         # ID
@@ -626,7 +626,7 @@ Available types: member, role, user, emoji, channel, server, invite, category
         # Owner
         embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.guild-1"), value=str(guild.owner))
         # Created at
-        delta = abs(guild.created_at - datetime.datetime.utcnow())
+        delta = abs(guild.created_at - ctx.bot.utcnow())
         created_date = await self.TimeUtils.date(guild.created_at, lang=lang, year=True)
         created_since = await self.TimeUtils.time_delta(delta.total_seconds(), lang=lang, year=True, precision=0, hour=delta.total_seconds() < 86400)
         embed.add_field(name=await self.bot._(ctx.guild.id, "info.info.member-1"), value = "{} ({} {})".format(created_date, since, created_since), inline=False)
@@ -672,7 +672,7 @@ Available types: member, role, user, emoji, channel, server, invite, category
         if len(roles) == 0:
             temp = (await self.bot._(ctx.guild.id,"misc.none")).capitalize()
             embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.guild-11.2", c=len(guild.roles)-1), value=temp)
-        elif len(roles)>20:
+        elif len(roles) > 20:
             embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.guild-11.1", c=len(guild.roles)-1), value=", ".join(roles[:20]))
         else:
             embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.guild-11.2", c=len(guild.roles)-1), value=", ".join(roles))
@@ -703,8 +703,8 @@ Available types: member, role, user, emoji, channel, server, invite, category
     async def invite_info(self, ctx: MyContext, invite: discord.Invite, lang: str):
         since = await self.bot._(ctx.guild.id,"misc.since")
         embed = discord.Embed(colour=default_color, timestamp=ctx.message.created_at)
-        embed.set_author(name="{} '{}'".format(await self.bot._(ctx.guild.id,"info.info.inv-4"),invite.code), icon_url=invite.guild.icon_url)
-        embed.set_footer(text='Requested by {}'.format(ctx.author.name), icon_url=ctx.author.avatar_url_as(static_format="png", size=256))
+        embed.set_author(name="{} '{}'".format(await self.bot._(ctx.guild.id,"info.info.inv-4"),invite.code), icon_url=invite.guild.icon)
+        embed.set_footer(text='Requested by {}'.format(ctx.author.name), icon_url=ctx.author.display_avatar.replace(static_format="png", size=256))
         # Try to get the complete invite
         if invite.guild in self.bot.guilds:
             try:
@@ -735,7 +735,7 @@ Available types: member, role, user, emoji, channel, server, invite, category
             # Channel name
             embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.textchan-5"), value="#"+str(invite.channel.name))
             # Guild icon
-            url = str(invite.guild.icon_url)
+            url = str(invite.guild.icon)
             if url:
                 r = requests.get(url.replace(".webp",".gif"))
                 if r.ok:
@@ -749,8 +749,8 @@ Available types: member, role, user, emoji, channel, server, invite, category
             if invite.approximate_member_count:
                 embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.inv-7"), value=str(invite.approximate_member_count))
         # Guild banner
-        if invite.guild.banner_url is not None:
-            embed.set_image(url=invite.guild.banner_url)
+        if invite.guild.banner is not None:
+            embed.set_image(url=invite.guild.banner)
         # Guild description
         if invite.guild.description is not None and len(invite.guild.description) > 0:
             embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.inv-8"), value=invite.guild.description)
@@ -762,7 +762,7 @@ Available types: member, role, user, emoji, channel, server, invite, category
             embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.inv-9"), value=" - ".join(features))
         # Creation date
         if invite.created_at is not None:
-            embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.member-1"), value = "{} ({} {})".format(await self.TimeUtils.date(invite.created_at,lang=lang,year=True),since,await self.TimeUtils.time_delta(invite.created_at,datetime.datetime.utcnow(),lang=lang,year=True,precision=0,hour=False)), inline=False)
+            embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.member-1"), value = "{} ({} {})".format(await self.TimeUtils.date(invite.created_at,lang=lang,year=True),since,await self.TimeUtils.time_delta(invite.created_at,ctx.bot.utcnow(),lang=lang,year=True,precision=0,hour=False)), inline=False)
         await ctx.send(embed=embed)
 
     async def category_info(self, ctx: MyContext, categ: discord.CategoryChannel, lang: str):
@@ -778,14 +778,14 @@ Available types: member, role, user, emoji, channel, server, invite, category
             elif type(channel) == discord.VoiceChannel:
                 vchan +=1
         embed = discord.Embed(colour=default_color, timestamp=ctx.message.created_at)
-        embed.set_author(name="{} '{}'".format(await self.bot._(ctx.guild.id,"info.info.categ-0"),categ.name), icon_url=ctx.guild.icon_url)
-        embed.set_footer(text='Requested by {}'.format(ctx.author.name), icon_url=ctx.author.avatar_url)
+        embed.set_author(name="{} '{}'".format(await self.bot._(ctx.guild.id,"info.info.categ-0"),categ.name), icon_url=ctx.guild.icon)
+        embed.set_footer(text='Requested by {}'.format(ctx.author.name), icon_url=ctx.author.display_avatar)
 
         embed.add_field(name=str(await self.bot._(ctx.guild.id,"misc.name")).capitalize(), value=categ.name,inline=True)
         embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.role-0"), value=str(categ.id))
         embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.categ-1"), value="{}/{}".format(categ.position+1,len(ctx.guild.categories)))
         embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.guild-6"), value=await self.bot._(ctx.guild.id,"info.info.categ-2", txt=tchan, voc=vchan))
-        embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.member-1"), value = "{} ({} {})".format(await self.TimeUtils.date(categ.created_at,lang=lang,year=True),since,await self.TimeUtils.time_delta(categ.created_at,datetime.datetime.utcnow(),lang=lang,year=True,precision=0,hour=False)), inline=False)
+        embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.member-1"), value = "{} ({} {})".format(await self.TimeUtils.date(categ.created_at,lang=lang,year=True),since,await self.TimeUtils.time_delta(categ.created_at,ctx.bot.utcnow(),lang=lang,year=True,precision=0,hour=False)), inline=False)
         await ctx.send(embed=embed)
     
     async def snowflake_infos(self, ctx: MyContext, snowflake: args.snowflake, lang: str):
@@ -862,7 +862,7 @@ Available types: member, role, user, emoji, channel, server, invite, category
             else:
                 color = None if ctx.guild.me.color.value == 0 else ctx.guild.me.color
             
-            await ctx.send(embed = await self.bot.get_cog('Embeds').Embed(title=user_name, thumbnail=user.avatar_url_as(static_format="png", size=1024) ,color=color, fields = [
+            await ctx.send(embed = await self.bot.get_cog('Embeds').Embed(title=user_name, thumbnail=str(user.display_avatar.replace(static_format="png", size=1024)) ,color=color, fields = [
                 {"name": "ID", "value": user.id},
                 {"name": "Flags", "value": "-".join(userflags), "inline":False},
                 {"name": "Servers", "value": "\n".join(servers_in), "inline":True},
@@ -934,7 +934,7 @@ Servers:
                 color = None
             else:
                 color = None if ctx.guild.me.color.value == 0 else ctx.guild.me.color
-            guild_icon = str(guild.icon_url_as(format = "gif" if guild.is_icon_animated() else 'png'))
+            guild_icon = str(guild.icon.with_static_format("png"))
             await ctx.send(embed = await self.bot.get_cog('Embeds').Embed(title=guild.name, color=color, thumbnail=guild_icon, fields=[
                 {"name": "ID", "value": guild.id},
                 {"name": "Owner", "value": "{} ({})".format(guild.owner, guild.owner_id)},
@@ -961,7 +961,7 @@ Servers:
 
     @find_main.command(name='channel')
     async def find_channel(self, ctx: MyContext, ID:int):
-        c: discord.abc.GuildChannel = self.bot.get_channel(ID)
+        c = self.bot.get_channel(ID)
         if c is None:
             await ctx.send("Salon introuvable")
             return
@@ -982,7 +982,7 @@ Servers:
         every_roles = list()
         for serv in ctx.bot.guilds:
             every_roles += serv.roles
-        role: discord.Role = discord.utils.find(lambda role:role.id==ID,every_roles)
+        role: discord.Role = discord.utils.find(lambda role: role.id==ID, every_roles)
         if role is None:
             await ctx.send("Rôle introuvable")
             return

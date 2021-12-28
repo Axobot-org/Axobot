@@ -4,14 +4,14 @@ import importlib
 import typing
 import re
 from discord.ext import commands
-from utils import zbot, MyContext
+from utils import Zbot, MyContext
 from fcts import checks, args
 importlib.reload(checks)
 importlib.reload(args)
 
 
 class RolesReact(commands.Cog):
-    def __init__(self, bot: zbot):
+    def __init__(self, bot: Zbot):
         self.bot = bot
         self.file = 'roles_react'
         self.table = 'roles_react_beta' if bot.beta else 'roles_react'
@@ -57,6 +57,8 @@ class RolesReact(commands.Cog):
             msg, role = await self.prepare_react(payload)
             if msg is not None:
                 user = msg.guild.get_member(payload.user_id)
+                if user is None:
+                    return
                 await self.give_remove_role(user, role, msg.guild, msg.channel, True, ignore_success=True)
         except Exception as e:
             await self.bot.get_cog("Errors").on_error(e)
@@ -69,6 +71,8 @@ class RolesReact(commands.Cog):
             msg, role = await self.prepare_react(payload)
             if msg is not None:
                 user = msg.guild.get_member(payload.user_id)
+                if user is None:
+                    return
                 await self.give_remove_role(user, role, msg.guild, msg.channel, False, ignore_success=True)
         except Exception as e:
             await self.bot.get_cog("Errors").on_error(e)

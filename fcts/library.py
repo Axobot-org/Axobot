@@ -1,10 +1,9 @@
 import aiohttp
 import typing
-import datetime
 import html
 import isbnlib
 from discord.ext import commands
-from utils import zbot, MyContext
+from utils import Zbot, MyContext
 
 
 class ISBN(commands.Converter):
@@ -19,7 +18,7 @@ class ISBN(commands.Converter):
 
 class Library(commands.Cog):
 
-    def __init__(self, bot: zbot):
+    def __init__(self, bot: Zbot):
         self.bot = bot
         self.file = 'library'
         self.tables = ['librarystats_beta', 'library_beta'] if bot.beta else ['librarystats', 'library']
@@ -31,7 +30,7 @@ class Library(commands.Cog):
     async def db_add_search(self, ISBN: int, name: str):
         cnx = self.bot.cnx_frm
         cursor = cnx.cursor()
-        current_timestamp = datetime.datetime.utcnow()
+        current_timestamp = self.bot.utcnow()
         query = "INSERT INTO `{}` (`ISBN`,`name`,`count`) VALUES (%(i)s, %(n)s, 1) ON DUPLICATE KEY UPDATE count = `count` + 1, last_update = %(l)s;".format(self.tables[0])
         cursor.execute(query, {'i': ISBN, 'n': name, 'l': current_timestamp})
         cnx.commit()

@@ -1,4 +1,4 @@
-from utils import zbot, MyContext, UserFlag, RankCardsFlag
+from utils import Zbot, MyContext, UserFlag, RankCardsFlag
 from discord.ext import commands
 import importlib
 import typing
@@ -14,7 +14,7 @@ importlib.reload(checks)
 
 class Users(commands.Cog):
 
-    def __init__(self, bot: zbot):
+    def __init__(self, bot: Zbot):
         self.bot = bot
         self.file = 'users'
 
@@ -109,7 +109,7 @@ class Users(commands.Cog):
         eventsCog = self.bot.get_cog("BotEvents")
         if eventsCog is None:
             return
-        if eventsCog.current_event_id != "blurple-2021":
+        if eventsCog.current_event_id != "halloween-2021":
             return
         if isinstance(user, int):
             user = self.bot.get_user(user)
@@ -120,8 +120,8 @@ class Users(commands.Cog):
         if points is None:
             points = await self.bot.get_cog("Utilities").get_eventsPoints_rank(user.id)
             points = 0 if (points is None) else points["events_points"]
-        if "blurple_21" not in cards and points >= self.bot.current_event_data["objectives"][0]:
-            await self.set_rankcard(user, "blurple_21", True)
+        if "halloween_21" not in cards and points >= self.bot.current_event_data["objectives"][0]:
+            await self.set_rankcard(user, "halloween_21", True)
 
     @commands.group(name='profile')
     async def profile_main(self, ctx: MyContext):

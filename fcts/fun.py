@@ -1,4 +1,4 @@
-from utils import flatten_list, zbot, MyContext
+from utils import flatten_list, Zbot, MyContext
 from fcts.checks import is_fun_enabled
 import discord
 import random
@@ -39,7 +39,7 @@ async def can_use_cookie(ctx: MyContext) -> bool:
 class Fun(commands.Cog):
     """Add some fun commands, no obvious use. You can disable this module with the 'enable_fun' option (command 'config')"""
 
-    def __init__(self, bot: zbot):
+    def __init__(self, bot: Zbot):
         self.bot = bot
         self.fun_opt = dict()
         self.file = "fun"
@@ -937,8 +937,6 @@ You can specify a verification limit by adding a number in argument (up to 1.000
                 except Exception as e:
                     await self.bot.get_cog('Errors').on_error(e,ctx)
         await self.bot.get_cog('Utilities').suppr(ctx.message)
-        self.bot.log.debug(await self.bot.get_cog('TimeUtils').date(datetime.datetime.now(),digital=True)+" Vote de {} : {}".format(ctx.author,ctx.message.content))
-
 
     async def check_suggestion(self,message):
         if message.guild is None or not self.bot.is_ready() or not self.bot.database_online:

@@ -1,7 +1,7 @@
 from aiohttp.client import ClientSession
 from aiohttp import client_exceptions
 from feedparser.util import FeedParserDict
-from utils import zbot, MyContext
+from utils import Zbot, MyContext
 import discord
 import datetime
 import time
@@ -12,7 +12,6 @@ import random
 import typing
 import importlib
 import html
-import socket
 import requests
 import twitter
 import async_timeout
@@ -61,7 +60,7 @@ async def can_use_rss(ctx: MyContext):
 class Rss(commands.Cog):
     """Cog which deals with everything related to rss flows. Whether it is to add automatic tracking to a stream, or just to see the latest video released by Discord, it is this cog that will be used."""
 
-    def __init__(self, bot: zbot):
+    def __init__(self, bot: Zbot):
         self.bot = bot
         self.time_loop = 20 # min minutes between two rss loops
         self.time_between_flows_check = 0.15 # seconds between two rss checks within a loop
@@ -86,7 +85,6 @@ class Rss(commands.Cog):
         except:
             pass
         # launch rss loop
-        # pylint: disable=no-member
         self.loop_child.change_interval(minutes=self.time_loop)
         self.loop_child.start()
 
@@ -100,7 +98,7 @@ class Rss(commands.Cog):
         self.loop_child.cancel()
 
     class rssMessage:
-        def __init__(self,bot:zbot,Type,url,title,emojis,date=datetime.datetime.now(),author=None,Format=None,channel=None,retweeted_by=None,image=None):
+        def __init__(self,bot:Zbot,Type,url,title,emojis,date=datetime.datetime.now(),author=None,Format=None,channel=None,retweeted_by=None,image=None):
             self.bot = bot
             self.Type = Type
             self.url = url
@@ -173,8 +171,8 @@ class Rss(commands.Cog):
             Format = Format.replace('\\n','\n')
             if self.rt_by is not None:
                 self.author = "{} (retweeted by @{})".format(self.author,self.rt_by)
-            _channel = discord.utils.escape_markdown(self.channel)
-            _author = discord.utils.escape_markdown(self.author)
+            _channel = discord.utils.escape_markdown(self.channel) if self.channel else "?"
+            _author = discord.utils.escape_markdown(self.author) if self.author else "?"
             text = Format.format_map(self.bot.SafeDict(channel=_channel,title=self.title,date=d,url=self.url,link=self.url,mentions=", ".join(self.mentions),logo=self.logo,author=_author))
             if not self.embed:
                 return text
@@ -620,7 +618,7 @@ class Rss(commands.Cog):
                                 r = await commands.RoleConverter().convert(ctx,x)
                                 IDs.append(str(r.id))
                                 Names.append(r.name)
-                            except c:
+                            except:
                                 await ctx.send(await self.bot._(ctx.guild.id, "rss.roles.cant-find"))
                                 IDs = []
                                 break
@@ -1153,7 +1151,7 @@ class Rss(commands.Cog):
         feeds = await self.feed_parse(url, 5, session)
         if feeds is None:
             return await self.bot._(channel, "rss.research-timeout")
-        if feeds.entries==[]:
+        if len(feeds.entries) == 0:
             return await self.bot._(channel, "rss.nothing")
         if not date:
             feed = feeds.entries[0]
@@ -1166,7 +1164,7 @@ class Rss(commands.Cog):
         else:
             liste = list()
             for feed in feeds.entries:
-                if len(liste)>10:
+                if len(liste) > 10:
                     break
                 if datetime.datetime(*feed['published_parsed'][:6]) <= date:
                     break
@@ -1294,7 +1292,7 @@ class Rss(commands.Cog):
         feeds = await self.feed_parse(url, 5, session)
         if feeds is None:
             return await self.bot._(guild, "rss.research-timeout")
-        if feeds.entries==[]:
+        if len(feeds.entries) == 0:
             return await self.bot._(guild, "rss.nothing")
         if not date:
             feed = feeds.entries[0]
@@ -1368,7 +1366,7 @@ class Rss(commands.Cog):
         if _type == 'mc':
             form = ''
         else:
-            form = await self.bot._(guildID, "rss."+_type+"-default-flow")
+            form = await self.bot._(guildID, f"rss.{_type}-default-flow")
         query = "INSERT INTO `{}` (`ID`, `guild`,`channel`,`type`,`link`,`structure`) VALUES (%(i)s,%(g)s,%(c)s,%(t)s,%(l)s,%(f)s)".format(self.table)
         cursor.execute(query, { 'i': ID, 'g': guildID, 'c': channelID, 't': _type, 'l': link, 'f': form })
         cnx.commit()

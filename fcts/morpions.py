@@ -4,13 +4,13 @@ import asyncio
 import time
 import emoji as emojilib
 from discord.ext import commands
+from utils import Zbot, MyContext
 
-from utils import zbot, MyContext
 from fcts.checks import is_ttt_enabled
 
 class Morpions(commands.Cog):
 
-    def __init__(self, bot: zbot):
+    def __init__(self, bot: Zbot):
         self.bot = bot
         self.file = 'morpions'
         self.in_game = dict()

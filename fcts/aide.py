@@ -5,12 +5,12 @@ import json
 import copy
 from typing import List
 from discord.ext import commands
-from utils import zbot, MyContext
+from utils import Zbot, MyContext
 
 
 class Help(commands.Cog):
 
-    def __init__(self, bot: zbot):
+    def __init__(self, bot: Zbot):
         self.bot = bot
         self.file = "aide"
         self.old_cmd = bot.remove_command("help")
@@ -42,10 +42,9 @@ class Help(commands.Cog):
 
 ..Doc infos.html#about"""
         urls = ""
-        tr = self.bot.get_cog("Languages").tr
         for e, url in enumerate(['http://discord.gg/N55zY88', 'https://zrunner.me/invitezbot', 'https://zbot.rtfd.io/', 'https://twitter.com/z_runnerr', 'https://zrunner.me/zbot-faq', 'https://zrunner.me/zbot-privacy.pdf']):
-            urls += "\n:arrow_forward: " + await tr(ctx.channel, 'info', f'about-{e}') + " <" + url + ">"
-        msg = await tr(ctx.channel, 'info', 'about-main', mention=ctx.bot.user.mention, links=urls)
+            urls += "\n:arrow_forward: " + await self.bot._(ctx.channel, f"info.about-{e}") + " <" + url + ">"
+        msg = await self.bot._(ctx.channel, "info.about-main", mention=ctx.bot.user.mention, links=urls)
         if ctx.can_send_embed:
             await ctx.send(embed=self.bot.get_cog("Embeds").Embed(desc=msg, color=16298524))
         else:

@@ -1,12 +1,11 @@
 import discord
 import i18n
-import json
-from utils import zbot
+from utils import Zbot
 
 
 class Languages(discord.ext.commands.Cog):
 
-    def __init__(self, bot: zbot):
+    def __init__(self, bot: Zbot):
         self.bot = bot
         self.file = "languages"
         self.languages = ['fr', 'en', 'lolcat', 'fi', 'de', 'fr2']
