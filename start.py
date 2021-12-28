@@ -126,7 +126,7 @@ def main():
     for extension in initial_extensions:
         try:
             client.load_extension(extension)
-        except:
+        except discord.DiscordException:
             print(f'\nFailed to load extension {extension}', file=sys.stderr)
             traceback.print_exc()
             count += 1
