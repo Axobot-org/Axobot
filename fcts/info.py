@@ -348,6 +348,9 @@ Available types: member, role, user, emoji, channel, server, invite, category
         # Status
         embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.member-4"), value = (await self.bot._(ctx.guild.id,f"misc.{item.status}")).capitalize(),inline=True)
         # Activity
+        if item.activity.type == discord.ActivityType.custom and item.activity.emoji is None and item.activity.name is None:
+            # that's just a bug from discord apparently
+            item.activity = None
         if item.activity is None:
             m_activity = str(await self.bot._(ctx.guild.id,"misc.activity.nothing")).capitalize()
         elif item.activity.type==discord.ActivityType.playing:
@@ -359,7 +362,8 @@ Available types: member, role, user, emoji, channel, server, invite, category
         elif item.activity.type==discord.ActivityType.watching:
             m_activity = str(await self.bot._(ctx.guild.id,"misc.activity.watch")).capitalize() +" " + item.activity.name
         elif item.activity.type==discord.ActivityType.custom:
-            m_activity = str(item.activity.emoji if item.activity.emoji else '') + " " + (item.activity.name if item.activity.name else '')
+            emoji = str(item.activity.emoji if item.activity.emoji else '')
+            m_activity = emoji + " " + (item.activity.name if item.activity.name else '')
             m_activity = m_activity.strip()
         else:
             m_activity="Error"
