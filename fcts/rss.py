@@ -615,7 +615,7 @@ class Rss(commands.Cog):
                                 r = await commands.RoleConverter().convert(ctx,x)
                                 IDs.append(str(r.id))
                                 Names.append(r.name)
-                            except:
+                            except commands.ConversionError:
                                 await ctx.send(await self.bot._(ctx.guild.id, "rss.roles.cant-find"))
                                 IDs = []
                                 break

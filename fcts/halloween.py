@@ -1,20 +1,19 @@
 import asyncio
-import aiohttp
+import datetime
+import importlib
 import json
 import typing
-import json
-import importlib
-import datetime
 from random import randint
 
+import aiohttp
 import discord
 from discord.ext import commands
 from discord.ext.commands import Cog
-
 from libs import halloween
-from libs.halloween import convert_image, check_image
+from libs.halloween import check_image, convert_image
+
 importlib.reload(halloween)
-from utils import Zbot, MyContext
+from utils import MyContext, Zbot
 
 
 class LinkConverter(commands.Converter):
@@ -165,7 +164,7 @@ class Halloween(Cog):
     @commands.check(is_halloween)
     async def hallow_main(self, ctx: MyContext):
         """Hallowify and be happy for the spooky month! Change your avatar color, check if an image is orange enough, and collect event points to unlock a collector Halloween 2020 card!
-        
+
 A BIG thanks to the Project Blurple and their original code for the colorization part.
 
 ..Example hw hallowify

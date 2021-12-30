@@ -7,12 +7,11 @@ importlib.reload(args)
 
 
 async def can_edit_case(ctx: MyContext):
-        if await ctx.bot.get_cog('Admin').check_if_admin(ctx.author):
-            return True
-        if ctx.bot.database_online:
-            return await ctx.bot.get_cog("Servers").staff_finder(ctx.author,"warn")
-        else:
-            return False
+    if await ctx.bot.get_cog('Admin').check_if_admin(ctx.author):
+        return True
+    if ctx.bot.database_online:
+        return await ctx.bot.get_cog("Servers").staff_finder(ctx.author,"warn")
+    return False
 
 class Cases(commands.Cog):
     """This part of the bot allows you to manage all your members' cases, to delete or edit them"""
@@ -212,7 +211,6 @@ class Cases(commands.Cog):
             cases = cases[-MAX_CASES:]
             cases.reverse()
             u = self.bot.get_user(user)
-            e = -1
             if len(cases) == 0:
                 await ctx.send(await self.bot._(ctx.guild.id, "cases.no-case"))
                 return

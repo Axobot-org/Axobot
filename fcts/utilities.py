@@ -7,7 +7,6 @@ import aiohttp
 from fcts import args
 from discord.ext import commands
 from typing import List
-from urllib.request import Request, build_opener
 
 from utils import Zbot, MyContext
 
@@ -62,11 +61,8 @@ class Utilities(commands.Cog):
             return str(liste[0])
 
     def update_prefix(self, ID: int, prefix: str):
-        try:
-            self.bot.log.debug(
-                "Prefix updated for guild {} : changed to {}".format(ID, prefix))
-        except:
-            pass
+        self.bot.log.debug(
+            "Prefix updated for guild %s : changed to %s", ID, prefix)
         self.list_prefixs[str(ID)] = prefix
 
     async def find_everything(self, ctx: MyContext, name: str, Type: str=None):
@@ -160,10 +156,11 @@ class Utilities(commands.Cog):
         return answer
 
     async def suppr(self, msg: discord.Message):
+        """Silently delete a message"""
         try:
             await msg.delete()
-        except:
-            print("Unable to delete message "+str(msg))
+        except discord.HTTPException:
+            self.bot.log.warning("Unable to delete message %s", str(msg))
 
     async def global_check(self, ctx: MyContext):
         """Do a lot of checks before executing a command (banned guilds, system message etc)"""
@@ -310,7 +307,7 @@ class Utilities(commands.Cog):
                 await message.add_reaction('\u2705')
         except discord.Forbidden:
             await message.channel.send(":ok:")
-        except:
+        except discord.DiscordException:
             pass
 
     async def allowed_card_styles(self, user: discord.User):

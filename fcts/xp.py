@@ -309,7 +309,6 @@ class Xp(commands.Cog):
             except Exception as e:
                 if self.bot.beta:
                     await self.bot.get_cog('Errors').on_error(e,None)
-                pass
         if not remove:
             return c
         for role in [x for x in rr_list if x['level']>level and x['role'] in has_roles]:
@@ -323,7 +322,6 @@ class Xp(commands.Cog):
             except Exception as e:
                 if self.bot.beta:
                     await self.bot.get_cog('Errors').on_error(e,None)
-                pass
         return c
     
     async def reload_sus(self):
