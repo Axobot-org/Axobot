@@ -100,16 +100,20 @@ class Invite(commands.Converter):
 
     async def convert(self, ctx: MyContext, argument: str) -> typing.Union[str, int]:
         answer = None
-        r = re.search(
-            r'^https://discord(?:app)?\.com/(?:api/)?oauth2/authorize\?(?:&?client_id=(\d{18})|&?scope=bot|&?(?:permissions|guild_id|disable_guild_select|redirect_uri)=[^&]+)+$', argument)
-        if r is None:
-            r = re.search(
+        r_invite = re.search(
+            r'^https://discord(?:app)?\.com/(?:api/)?oauth2/authorize\?(?:&?client_id=(\d{18})|&?scope=([a-z\.\+]+?)|&'
+            r'?(?:permissions|guild_id|disable_guild_select|redirect_uri)=[^&]+)+$',
+            argument)
+        if r_invite is None:
+            r_invite = re.search(
                 r'(?:discord\.gg|discordapp\.com/invite)/([^\s/]+)', argument)
-            if r is not None:
-                answer = r.group(1)
+            if r_invite is not None:
+                answer = r_invite.group(1)
         else:
-            answer = int(r.group(1))
-        if r is None or answer is None:
+            scopes = r_invite.group(2).split('+')
+            if 'bot' in scopes:
+                answer = int(r_invite.group(1))
+        if r_invite is None or answer is None:
             raise commands.errors.BadArgument('Invalid invite: '+argument)
         return answer
 
