@@ -80,14 +80,12 @@ class Rss(commands.Cog):
         self.cache = dict()
         if bot.user is not None:
             self.table = 'rss_flow' if bot.user.id==486896267788812288 else 'rss_flow_beta'
-        self.date = bot.get_cog("TimeUtils").date
         # launch rss loop
         self.loop_child.change_interval(minutes=self.time_loop) # pylint: disable=no-member
         self.loop_child.start() # pylint: disable=no-member
 
     @commands.Cog.listener()
     async def on_ready(self):
-        self.date = self.bot.get_cog("TimeUtils").date
         self.table = 'rss_flow' if self.bot.user.id==486896267788812288 else 'rss_flow_beta'
     
     def cog_unload(self):
