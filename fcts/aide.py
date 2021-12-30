@@ -1,5 +1,4 @@
 import discord
-import re
 import inspect
 import json
 import copy
@@ -52,7 +51,8 @@ class Help(commands.Cog):
 
     @commands.command(name="help")
     @commands.cooldown(1, 5, commands.BucketType.user)
-    async def help_cmd(self, ctx: MyContext, *commands: str):
+    @commands.cooldown(10, 30, commands.BucketType.guild)
+    async def help_cmd(self, ctx: MyContext, *args: str):
         """Shows this message
 Enable "Embed Links" permission for better rendering
 
@@ -64,19 +64,19 @@ Enable "Embed Links" permission for better rendering
 
 ..Doc infos.html#help"""
         try:
-            # commands = [x.replace('@everyone','@​everyone').replace('@here','@​here') for x in commands]
-            if len(commands) == 0:
+            # args = [x.replace('@everyone','@​everyone').replace('@here','@​here') for x in args]
+            if len(args) == 0:
                 await self.help_command(ctx)
             else:
-                await self.help_command(ctx, commands)
+                await self.help_command(ctx, args)
         except discord.errors.Forbidden:
             pass
         except Exception as e:
             await self.bot.get_cog("Errors").on_error(e, ctx)
-            if len(commands) == 0:
+            if len(args) == 0:
                 await self._default_help_command(ctx)
             else:
-                await self._default_help_command(ctx, commands)
+                await self._default_help_command(ctx, args)
 
     async def help_command(self, ctx: MyContext, commands=()):
         """Main command for the creation of the help message
