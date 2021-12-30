@@ -175,9 +175,8 @@ class Events(commands.Cog):
             try:
                 react = random.choice(['🐟','🎣', '🐠', '🐡']*4+['👀'])
                 await msg.add_reaction(react)
-            except:
+            except discord.HTTPException:
                 pass
-            pass
         if not msg.author.bot:
             cond = False
             if self.bot.database_online:

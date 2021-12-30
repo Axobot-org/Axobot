@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 
-import colorsys
 import io
-import json
 import math
 
 import discord
@@ -356,7 +354,7 @@ def convert_image(image, modifier, method, variations):
         method_converter = METHODS[method]
     except KeyError:
         raise RuntimeError('Invalid image method.')
-    
+
     if image == b'':
         raise RuntimeError('Invalid image')
 
