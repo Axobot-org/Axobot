@@ -977,7 +977,7 @@ class Rss(commands.Cog):
                 async with _session.get(url) as response:
                     html = await response.text()
                     headers = response.raw_headers
-        except (client_exceptions.ClientConnectorCertificateError, UnicodeDecodeError, client_exceptions.TooManyRedirects, client_exceptions.ClientConnectorError, client_exceptions.ClientPayloadError):
+        except (UnicodeDecodeError, client_exceptions.ClientError):
             if session is None:
                 await _session.close()
             return FeedParserDict(entries=[])
