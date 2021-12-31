@@ -407,7 +407,10 @@ class Events(commands.Cog):
                     user = guild.get_member(task['user'])
                     if user is None:
                         continue
-                    await self.bot.get_cog('Moderation').unmute_event(guild,user,guild.me)
+                    try:
+                        await self.bot.get_cog('Moderation').unmute_event(guild,user,guild.me)
+                    except discord.Forbidden:
+                        continue
                     await self.remove_task(task['ID'])
                 except Exception as e:
                     await self.bot.get_cog('Errors').on_error(e,None)
