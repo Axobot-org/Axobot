@@ -76,8 +76,9 @@ class Zbot(commands.bot.AutoShardedBot):
     """Bot class, with everything needed to run it"""
 
     def __init__(self, case_insensitive: bool = None, status: discord.Status = None, database_online: bool = True, beta: bool = False, dbl_token: str = "", zombie_mode: bool = False):
+        # pylint: disable=assigning-non-slot
         # defining allowed default mentions
-        ALLOWED = discord.AllowedMentions(everyone=False, roles=False)
+        allowed_mentions = discord.AllowedMentions(everyone=False, roles=False)
         # defining intents usage
         intents = discord.Intents.all()
         intents.typing = False
@@ -85,8 +86,8 @@ class Zbot(commands.bot.AutoShardedBot):
         intents.integrations = False
         # we now initialize the bot class
         super().__init__(command_prefix=get_prefix, case_insensitive=case_insensitive,
-                         status=status, allowed_mentions=ALLOWED, intents=intents)
-        self.database_online = database_online # if the mysql database works
+                         status=status, allowed_mentions=allowed_mentions, intents=intents, enable_debug_events=True)
+        self.database_online = database_online  # if the mysql database works
         self.beta = beta # if the bot is in beta mode
         self.database_keys = dict() # credentials for the database
         self.log = logging.getLogger("runner") # logs module
