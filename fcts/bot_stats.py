@@ -9,6 +9,14 @@ import mysql
 
 from utils import MyContext, Zbot
 
+try:
+    import orjson # type: ignore
+except ModuleNotFoundError:
+    import json
+    json_loads = json.loads
+else:
+    json_loads = orjson.loads
+
 
 class BotStats(commands.Cog):
     """Hey, I'm a test cog! Happy to meet you :wave:"""
@@ -26,8 +34,9 @@ class BotStats(commands.Cog):
         self.loop.cancel() # pylint: disable=no-member
 
     @commands.Cog.listener()
-    async def on_socket_response(self, msg: dict):
+    async def on_socket_raw_receive(self, msg: str):
         """Count when a websocket event is received"""
+        msg: dict = json_loads(msg)
         if msg['t'] is None:
             return
         nbr = self.received_events.get(msg['t'], 0)
@@ -85,17 +94,17 @@ class BotStats(commands.Cog):
             cursor.execute(query, (now, 'perf.cpu', cpu, 1, '%', self.bot.beta))
             # Unavailable guilds
             unav, total = 0, 0
-            for g in self.bot.guilds:
-                unav += g.unavailable
+            for guild in self.bot.guilds:
+                unav += guild.unavailable
                 total += 1
             cursor.execute(query, (now, 'guilds.unavailable', round(unav/total, 3)*100, 1, '%', self.bot.beta))
             del unav, total
             # Push everything
             cnx.commit()
-        except mysql.connector.errors.IntegrityError as e: # duplicate primary key
-            self.bot.log.warning(f"Stats loop iteration cancelled: {e}")
-        except Exception as e:
-            await self.bot.get_cog("Errors").on_error(e)
+        except mysql.connector.errors.IntegrityError as err: # duplicate primary key
+            self.bot.log.warning(f"Stats loop iteration cancelled: {err}")
+        except Exception as err:
+            await self.bot.get_cog("Errors").on_error(err)
         # if something goes wrong, we still have to close the cursor
         cursor.close()
 
@@ -103,7 +112,7 @@ class BotStats(commands.Cog):
     async def before_printer(self):
         """Wait until the bot is ready"""
         await self.bot.wait_until_ready()
-    
+
 
     async def get_stats(self, variable: str, minutes: int) -> typing.Union[int, float, str, None]:
         """Get the sum of a certain variable in the last X minutes"""
