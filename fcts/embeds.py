@@ -1,4 +1,5 @@
 import datetime
+from json.decoder import JSONDecodeError
 import discord
 import requests
 import typing
@@ -44,10 +45,10 @@ class Embeds(commands.Cog):
                 if "value" not in x.keys():
                     fields[e]["value"] = "No value"
             self.fields = fields
-        
+
         def add_field(self,name="No name",value="No value",inline=False):
             self.fields.append({'name':name,'value':value,'inline':inline})
-        
+
         def update_timestamp(self):
             self.timestamp = datetime.datetime.utcnow()
             return self
@@ -88,7 +89,7 @@ class Embeds(commands.Cog):
             if emb != {}:
                 j["embed"] = emb
             return j
-        
+
         def to_dict(self) -> dict:
             return self.json()['embed']
 
@@ -96,7 +97,7 @@ class Embeds(commands.Cog):
             self.author_name = user.name
             self.author_icon = user.avatar.with_static_format("png").with_size(256)
             return self
-        
+
         async def create_footer(self, ctx:MyContext, user: typing.Union[discord.User,discord.Member]=None):
             # self.footer_text = "Requested by {}".format(user.name)
             if user is None:
@@ -120,29 +121,31 @@ class Embeds(commands.Cog):
             for x in self.fields:
                 emb.add_field(name=x["name"],value=x["value"],inline=x["inline"])
             return emb
-    
+
 
     async def send(self, embeds, url: str=None):
+        """Send a list of embeds to a discord channel"""
         if url is None:
             url = url_base + self.logs['beta'] if self.bot.beta else url_base + self.logs['classic']
         else:
             if url in self.logs.keys():
                 url = url_base + self.logs[url]
         liste = list()
-        for x in embeds:
-            if isinstance(x, self.Embed):
-                liste.append(x.to_dict())
+        for embed in embeds:
+            if isinstance(embed, self.Embed):
+                liste.append(embed.to_dict())
             else:
-                liste.append(x["embed"])
-        r = requests.post(url, json={"embeds":liste})
+                liste.append(embed["embed"])
+        resp = requests.post(url, json={"embeds":liste})
         try:
-            msg = r.json()
-            if "error" in msg.keys():
-                await self.bot.get_cog('Errors').senf_err_msg("`Erreur webhook {}:` [code {}] {}".format(url,r.status_code,msg))
-        except Exception:
-            self.bot.log.error("Something went wrong while sending embed to %s", url, exc_info=True)
+            msg = resp.json()
+        except JSONDecodeError:
             return
-        
+        else:
+            if "error" in msg.keys():
+                await self.bot.get_cog('Errors').senf_err_msg("`Erreur webhook {}:` [code {}] {}".format(url,resp.status_code,msg))
+
+
 
 def setup(bot):
     bot.add_cog(Embeds(bot))
