@@ -7,26 +7,6 @@ from utils import Zbot
 
 #https://github.com/ttacon/emoji/blob/master/emoji.go
 
-def e_to_u(emoji):
-    try:
-        r = emojiMap[emoji]
-    except:
-        r = None
-    return r
-
-def u_to_e(code):
-    for k,v in emojiMap.items():
-        if v==code:
-            return k
-    return None
-
-def del_emoji(text):
-    for v in emojiMap.values():
-        text=text.replace(v,'')
-    return text
-
-
-
 emojiMap={
 
 	":capricorn:":                    "\U00002651",

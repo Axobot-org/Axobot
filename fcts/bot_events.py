@@ -80,7 +80,7 @@ class BotEvents(commands.Cog):
             # Title
             try:
                 title = data[lang]['events-title']
-            except:
+            except KeyError:
                 title = self.current_event
             # Begin/End dates
             nice_date = self.bot.get_cog("TimeUtils").date

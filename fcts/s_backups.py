@@ -82,7 +82,7 @@ Arguments are:
                 await ctx.author.send(content=finish_msg,file=discord.File(BytesIO(logs.encode()),filename="logs.txt"))
             try:
                 await msg.delete()
-            except: # can happens because deleted channel
+            except (discord.NotFound, discord.Forbidden): # can happens because deleted channel
                 pass
         else:
             # Else, we just edit the message with logs
