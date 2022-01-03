@@ -139,7 +139,8 @@ class Embeds(commands.Cog):
             msg = r.json()
             if "error" in msg.keys():
                 await self.bot.get_cog('Errors').senf_err_msg("`Erreur webhook {}:` [code {}] {}".format(url,r.status_code,msg))
-        except:
+        except Exception:
+            self.bot.log.error("Something went wrong while sending embed to %s", url, exc_info=True)
             return
         
 

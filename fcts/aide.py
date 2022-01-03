@@ -345,7 +345,7 @@ If the bot can't send the new command format, it will try to send the old one.""
                     if 'help.check-desc' not in check_msg_tr:
                         try:
                             pass_check = await maybe_coro(c, ctx)
-                        except:
+                        except Exception:
                             pass_check = False
                         if pass_check:
                             checks.append(
