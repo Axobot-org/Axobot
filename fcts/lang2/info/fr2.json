@@ -13,8 +13,10 @@
         "bitly_short": "URL raccourcie : %{url}\nCe sera moins chiant comme ça !",
         "botinvite": "Voixi un lien pour m'inviter vers un autre serveur : %{url}\nN'hésite pas à essayer la commande `about` pour des liens plus utiles !",
         "cant-see-channel": "Ups ! J'ai l'impression que tu n'as pas les perms pour voir ce salon. Demande à un modo !",
-        "changelog-notfound": "Impossible de trouver cette version",
-        "changelogs-index": "Liste des versions indexées",
+        "changelogs": {
+            "notfound": "Impossible de trouver cette version",
+            "index": "Liste des versions indexées"
+        },
         "discordlinks": [
             "Status des serveurs",
             "CGU de Discord",

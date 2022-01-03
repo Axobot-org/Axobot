@@ -11,8 +11,10 @@
         "bitly_long": "Ursprüngliche URL: %{url}",
         "bitly_nobit": "Das ist kein bit.ly Link!",
         "bitly_short": "Gekürzte URL: %{url}",
-        "changelog-notfound": "Diese Version konnte nicht gefunden werden",
-        "changelogs-index": "Liste der indizierten Versionen",
+        "changelogs": {
+            "notfound": "Diese Version konnte nicht gefunden werden",
+            "index": "Liste der indizierten Versionen"
+        },
         "discordlinks": [
             "Server Status",
             "Discord ToS",
