@@ -170,7 +170,7 @@ class Utilities(commands.Cog):
             return False
         if not isinstance(ctx, commands.Context) or self.config is None:
             return True
-        if ctx.message.type != discord.MessageType.default:
+        if ctx.message.type not in {discord.MessageType.default, discord.MessageType.reply}:
             return False
         if await self.bot.get_cog('Admin').check_if_admin(ctx):
             return True
