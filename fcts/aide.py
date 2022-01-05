@@ -29,9 +29,7 @@ class Help(commands.Cog):
         """Help on setting up welcome / leave messages
 
 ..Doc infos.html#welcome-message"""
-        prefix = await self.bot.get_prefix(ctx.message)
-        if isinstance(prefix, list):
-            prefix = prefix[-1]
+        prefix = await self.bot.prefix_manager.get_prefix(ctx.guild)
         await ctx.send(await self.bot._(ctx.guild, "welcome.help", p=prefix))
 
     @commands.command(name="about", aliases=["botinfos", "botinfo"])
@@ -153,9 +151,7 @@ If the bot can't send the new command format, it will try to send the old one.""
                 pages = await self.cmd_help(ctx, command, destination.permissions_for(me).embed_links)
 
             ft = await self.bot._(ctx.channel, "help.footer")
-            prefix = await self.bot.get_prefix(ctx.message)
-            if isinstance(prefix, list):
-                prefix = prefix[-1]
+            prefix = await self.bot.prefix_manager.get_prefix(ctx.guild)
         if len(pages) == 0:
             await self.bot.get_cog("Errors").senf_err_msg("Impossible de trouver d'aide pour la commande " + " ".join(commands))
             await destination.send(await self.bot._(ctx.channel, "help.cmd-not-found", cmd=" ".join(commands)))
@@ -167,19 +163,18 @@ If the bot can't send the new command format, it will try to send the old one.""
                 embed_colour = discord.Colour(self.help_color_DM)
             if isinstance(pages[0], str): # use description
                 for page in pages:
-                    embed = self.bot.get_cog("Embeds").Embed(title=title, desc=page, footer_text=ft.format(
-                        prefix), color=embed_colour).update_timestamp()
+                    embed = discord.Embed(title=title, description=page, color=embed_colour, timestamp=self.bot.utcnow())
+                    embed.set_footer(text=ft.format(prefix))
                     title = ""
                     await destination.send(embed=embed)
             else: # use fields
-                fields = list()
+                embed = discord.Embed(title=title, color=embed_colour, timestamp=self.bot.utcnow())
+                embed.set_footer(text=ft.format(prefix))
                 for page in pages:
                     if len(page) == 1:
                         title = page[0]
                         continue
-                    fields.append({'name': page[0], 'value': page[1], 'inline': False})
-                embed = self.bot.get_cog("Embeds").Embed(title=title, footer_text=ft.format(
-                    prefix), fields=fields, color=embed_colour).update_timestamp()
+                    embed.add_field(name=page[0], value=page[1], inline=False)
                 await destination.send(embed=embed)
         else:
             for page in pages:
