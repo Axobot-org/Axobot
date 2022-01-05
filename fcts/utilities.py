@@ -18,7 +18,6 @@ class Utilities(commands.Cog):
 
     def __init__(self, bot: Zbot):
         self.bot = bot
-        self.list_prefixs = dict()
         self.file = "utilities"
         self.config = {}
         self.table = 'users'
@@ -39,31 +38,6 @@ class Utilities(commands.Cog):
             self.config.pop('token', None)
             return self.config
         return None
-
-    def find_prefix(self, guild: discord.Guild):
-        if guild is None or not self.bot.database_online:
-            return '!'
-        if str(guild.id) in self.list_prefixs.keys():
-            return self.list_prefixs[str(guild.id)]
-        else:
-            cnx = self.bot.get_cog('Servers').bot.cnx_frm
-            cursor = cnx.cursor(dictionary=True)
-            cursor.execute("SELECT `prefix` FROM `{}` WHERE `ID`={}".format(
-                self.bot.get_cog("Servers").table, guild.id))
-            liste = list()
-            for x in cursor:
-                if len(x['prefix']) > 0:
-                    liste.append(x['prefix'])
-            if liste == []:
-                self.list_prefixs[str(guild.id)] = '!'
-                return '!'
-            self.list_prefixs[str(guild.id)] = liste[0]
-            return str(liste[0])
-
-    def update_prefix(self, ID: int, prefix: str):
-        self.bot.log.debug(
-            "Prefix updated for guild %s : changed to %s", ID, prefix)
-        self.list_prefixs[str(ID)] = prefix
 
     async def find_everything(self, ctx: MyContext, name: str, Type: str=None):
         item = None
