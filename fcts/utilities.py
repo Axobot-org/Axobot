@@ -207,46 +207,35 @@ class Utilities(commands.Cog):
                         'a' if em.animated else '', em.name, em.id))
         return text
 
-    async def get_db_userinfo(self, columns=[], criters=["userID > 1"], relation="AND", return_type=dict):
+    async def get_db_userinfo(self, columns=None, criters=["userID > 1"], relation: str="AND"):
         """Get every info about a user with the database"""
         await self.bot.wait_until_ready()
         if not (isinstance(columns, (list, tuple)) and isinstance(criters, (list, tuple))):
             raise ValueError
         if not self.bot.database_online:
             return None
-        cnx = self.bot.cnx_frm
-        cursor = cnx.cursor(dictionary=(return_type==dict))
-        if columns == []:
-            cl = "*"
+        if columns is None or len(columns) == 0:
+            select_part = "*"
         else:
-            cl = "`"+"`,`".join(columns)+"`"
+            select_part = "`"+"`,`".join(columns)+"`"
         relation = " "+relation+" "
-        query = ("SELECT {} FROM `{}` WHERE {}".format(
-            cl, self.table, relation.join(criters)))
-        cursor.execute(query)
-        liste = list()
-        for x in cursor:
-            liste.append(x)
-        cursor.close()
+        query = f"SELECT {select_part} FROM `{self.table}` WHERE {relation.join(criters)}"
+        async with self.bot.db_query(query) as query_results:
+            liste = list(query_results)
         if len(liste) == 1:
             return liste[0]
-        elif len(liste) > 1:
+        if len(liste) > 1:
             return liste
-        else:
-            return None
+        return None
 
     async def change_db_userinfo(self, userID: int, key: str, value):
         """Change something about a user in the database"""
         try:
             if not self.bot.database_online:
                 return None
-            cnx = self.bot.cnx_frm
-            cursor = cnx.cursor(dictionary=True)
-            query = "INSERT INTO `{t}` (`userID`,`{k}`) VALUES (%(u)s,%(v)s) ON DUPLICATE KEY UPDATE {k} = %(v)s;".format(
-                t=self.table, k=key)
-            cursor.execute(query, {'u': userID, 'v': value})
-            cnx.commit()
-            cursor.close()
+            query = f"INSERT INTO `{self.table}` (`userID`,`{key}`) VALUES (%(u)s,%(v)s) ON DUPLICATE KEY UPDATE {key} = %(v)s;"
+            async with self.bot.db_query(query, {'u': userID, 'v': value}):
+                pass
             return True
         except Exception as e:
             await self.bot.get_cog('Errors').on_error(e, None)
@@ -355,53 +344,38 @@ class Utilities(commands.Cog):
                 return True
             if check_event and self.bot.current_event is None:
                 return True
-            cnx = self.bot.cnx_frm
-            cursor = cnx.cursor(dictionary=True)
             if override:
                 query = ("INSERT INTO `{t}` (`userID`,`events_points`) VALUES ('{u}',{p}) ON DUPLICATE KEY UPDATE events_points = '{p}';".format(
                     t=self.table, u=userID, p=points))
             else:
                 query = ("INSERT INTO `{t}` (`userID`,`events_points`) VALUES ('{u}',{p}) ON DUPLICATE KEY UPDATE events_points = events_points + '{p}';".format(
                     t=self.table, u=userID, p=points))
-            cursor.execute(query)
-            cnx.commit()
-            cursor.close()
+            async with self.bot.db_query(query):
+                pass
             try:
                 await self.bot.get_cog("Users").reload_event_rankcard(userID)
-            except Exception as e:
-                await self.bot.get_cog("Errors").on_error(e, None)
+            except Exception as err:
+                await self.bot.get_cog("Errors").on_error(err, None)
             return True
-        except Exception as e:
-            await self.bot.get_cog('Errors').on_error(e, None)
+        except Exception as err:
+            await self.bot.get_cog('Errors').on_error(err, None)
             return False
 
-    async def get_eventsPoints_rank(self, userID: int):
+    async def get_eventsPoints_rank(self, user_id: int):
         "Get the ranking of an user"
         if not self.bot.database_online:
             return None
-        cnx = self.bot.cnx_frm
-        cursor = cnx.cursor(dictionary=True)
         query = (
-            f"SELECT userID, events_points, FIND_IN_SET( events_points, ( SELECT GROUP_CONCAT( events_points ORDER BY events_points DESC ) FROM {self.table} ) ) AS rank FROM {self.table} WHERE userID = {userID}")
-        cursor.execute(query)
-        liste = list()
-        for x in cursor:
-            liste.append(x)
-        cursor.close()
-        if len(liste) == 0:
-            return None
-        return liste[0]
+            f"SELECT userID, events_points, FIND_IN_SET( events_points, ( SELECT GROUP_CONCAT( events_points ORDER BY events_points DESC ) FROM {self.table} ) ) AS rank FROM {self.table} WHERE userID = {user_id}")
+        async with self.bot.db_query(query, fetchone=True) as query_results:
+            return query_results
 
     async def get_eventsPoints_nbr(self) -> int:
         if not self.bot.database_online:
             return 0
-        cnx = self.bot.cnx_frm
-        cursor = cnx.cursor(dictionary=False)
-        query = f"SELECT COUNT(*) FROM {self.table} WHERE events_points > 0"
-        cursor.execute(query)
-        result = list(cursor)[0][0]
-        cursor.close()
-        return result
+        query = f"SELECT COUNT(*) as count FROM {self.table} WHERE events_points > 0"
+        async with self.bot.db_query(query, fetchone=True) as query_results:
+            return query_results['count']
 
     async def check_votes(self, userid: int) -> list[tuple[str, str]]:
         """check if a user voted on any bots list website"""

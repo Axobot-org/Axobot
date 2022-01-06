@@ -231,13 +231,11 @@ class Admin(commands.Cog):
 
         await ctx.send("Message envoyé dans {} salons !".format(count))
         # add changelog in the database
-        cnx = self.bot.cnx_frm
-        cursor = cnx.cursor()
         version = self.bot.get_cog('Info').bot_version
         query = "INSERT INTO `changelogs` (`version`, `release_date`, `fr`, `en`, `beta`) VALUES (%(v)s, %(r)s, %(fr)s, %(en)s, %(b)s) ON DUPLICATE KEY UPDATE `fr` = '%(fr)s', `en` = '%(en)s';"
-        cursor.execute(query, { 'v': version, 'r': ctx.message.created_at, 'fr': self.update['fr'], 'en': self.update['en'], 'b': self.bot.beta })
-        cnx.commit()
-        cursor.close()
+        args = { 'v': version, 'r': ctx.message.created_at, 'fr': self.update['fr'], 'en': self.update['en'], 'b': self.bot.beta }
+        async with self.bot.db_query(query, args):
+            pass
         for k in self.update.keys():
             self.update[k] = None
 
@@ -250,7 +248,7 @@ class Admin(commands.Cog):
         for k,v in self.bot.cogs.items():
             text +="- {} ({}) \n".format(v.file,k)
         await ctx.send(text)
-    
+
     @main_msg.command(name="lang-sort",hidden=True)
     @commands.check(reloads.check_admin)
     async def resort_langs(self, ctx:MyContext, *, lang:str=None):
@@ -290,27 +288,24 @@ class Admin(commands.Cog):
     @commands.check(reloads.check_admin)
     async def shutdown(self, ctx: MyContext):
         """Eteint le bot"""
-        m = await ctx.send("Nettoyage de l'espace de travail...")
+        msg = await ctx.send("Nettoyage de l'espace de travail...")
         await self.cleanup_workspace()
-        await m.edit(content="Bot en voie d'extinction")
+        await msg.edit(content="Bot en voie d'extinction")
         await self.bot.change_presence(status=discord.Status('offline'))
         self.bot.log.info("Fermeture du bot")
         await self.bot.close()
 
     async def cleanup_workspace(self):
-        for folderName, _, filenames in os.walk('.'):
+        "Delete python cache files and close database connexions"
+        for folder_name, _, filenames in os.walk('.'):
             for filename in filenames:
                 if filename.endswith('.pyc'):
-                    os.unlink(folderName+'/'+filename)
-            if  folderName.endswith('__pycache__'):
-                os.rmdir(folderName)
+                    os.unlink(folder_name+'/'+filename)
+            if  folder_name.endswith('__pycache__'):
+                os.rmdir(folder_name)
         if self.bot.database_online:
-            try:
-                self.bot.cnx_frm.close()
-                self.bot.cnx_xp.close()
-            except mysql.connector.errors.ProgrammingError:
-                pass
-    
+            self.bot.close_database_cnx()
+
     @main_msg.command(name='reboot')
     @commands.check(reloads.check_admin)
     async def restart_bot(self, ctx: MyContext):
@@ -414,7 +409,9 @@ class Admin(commands.Cog):
             self.bot.connect_database_frm()
             self.bot.cnx_xp.close()
             self.bot.connect_database_xp()
-            if self.bot.cnx_frm is not None and self.bot.cnx_xp is not None:
+            self.bot.cnx_stats.close()
+            self.bot.connect_database_stats()
+            if self.bot.cnx_frm is not None and self.bot.cnx_xp is not None and self.bot.cnx_stats is not None:
                 if utils := self.bot.get_cog("Utilities"):
                     await utils.add_check_reaction(ctx.message)
                     if xp := self.bot.get_cog("Xp"):

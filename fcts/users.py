@@ -78,33 +78,29 @@ class Users(commands.Cog):
         else:
             rankcards.remove(style)
         await self.bot.get_cog('Utilities').change_db_userinfo(user.id, 'rankcards_unlocked', RankCardsFlag().flagsToInt(rankcards))
-    
+
     async def get_rankcards_stats(self) -> dict:
         """Get how many users use any rank card"""
         if not self.bot.database_online:
             return dict()
         try:
-            cnx = self.bot.cnx_frm
-            cursor = cnx.cursor(dictionary=False)
             query = "SELECT xp_style, Count(*) as count FROM `users` WHERE used_rank=1 GROUP BY xp_style"
-            cursor.execute(query)
-            parameters = list(cursor)
-            cursor.close()
-        except Exception as e:
-            await self.bot.get_cog("Errors").on_error(e, None)
+            async with self.bot.db_query(query, astuple=True) as query_results:
+                result = {x[0]: x[1] for x in query_results}
+        except Exception as err:
+            await self.bot.get_cog("Errors").on_error(err, None)
             return dict()
-        result = {x[0]: x[1] for x in parameters}
         if '' in result:
             result['default'] = result.pop('')
         return result
-    
+
     async def used_rank(self, userID: int):
         """Write in the database that a user used its rank card"""
         if not self.bot.database_online:
             return
         if cog := self.bot.get_cog("Utilities"):
             await cog.change_db_userinfo(userID, "used_rank", True)
-    
+
     async def reload_event_rankcard(self, user: typing.Union[discord.User, int], cards: list = None, points: int = None):
         eventsCog = self.bot.get_cog("BotEvents")
         if eventsCog is None:

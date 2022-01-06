@@ -209,33 +209,27 @@ __29 variations: __
 `++blurple-bg` replaces the transparency of your image with a Blurple background
 `++dark-blurple-bg` replaces the transparency of your image with a Dark Blurple background""")
 
-    def db_add_points(self, userid: int, points: int):
-        cnx = self.bot.cnx_frm
-        cursor = cnx.cursor(dictionary=True)
+    async def db_add_points(self, userid: int, points: int):
         query = "INSERT INTO `dailies` (`userID`,`points`) VALUES (%(u)s,%(p)s) ON DUPLICATE KEY UPDATE points = points + %(p)s;"
-        cursor.execute(query, {'u': userid, 'p': points})
-        cnx.commit()
-        cursor.close()
+        async with self.bot.db_query(query, {'u': userid, 'p': points}):
+            pass
 
-    def db_get_points(self, userid: int) -> dict:
-        cnx = self.bot.cnx_frm
-        cursor = cnx.cursor(dictionary=True)
+    async def db_get_points(self, userid: int) -> dict:
         query = "SELECT * FROM `dailies` WHERE userid = %(u)s;"
-        cursor.execute(query, {'u': userid})
-        result = list(cursor)
-        cursor.close()
-        return result[0] if len(result) > 0 else None
+        async with self.bot.db_query(query, {'u': userid}, fetchone=True) as query_results:
+            result = query_results or None
+        return result
 
     @blurple_main.command(name="collect")
     async def bp_collect(self, ctx: MyContext):
         """Get some events points every 3 hours"""
-        last_data = self.db_get_points(ctx.author.id)
+        last_data = await self.db_get_points(ctx.author.id)
         cooldown = 3600*3
         time_since_available: int = 0 if last_data is None else (datetime.datetime.now() - last_data['last_update']).total_seconds() - cooldown
         if time_since_available >= 0:
             points = randint(*self.hourly_reward)
             await self.bot.get_cog("Utilities").add_user_eventPoint(ctx.author.id, points)
-            self.db_add_points(ctx.author.id, points)
+            await self.db_add_points(ctx.author.id, points)
             txt = await self.bot._(ctx.channel, "halloween.daily.got-points", pts=points)
         else:
             lang = await self.bot._(ctx.channel, '_used_locale')

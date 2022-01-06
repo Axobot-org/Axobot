@@ -1,11 +1,17 @@
 import datetime
-import discord
-from discord.ext import commands
 import logging
 import sys
 import time
+from typing import Any, Callable, Coroutine, Optional
+
+import discord
 import mysql
-from typing import Any, Callable, Optional, Coroutine, Union
+from discord.ext import commands
+from mysql.connector.connection import MySQLConnection
+from mysql.connector.errors import ProgrammingError
+
+from libs.database import create_database_query
+from libs.prefix_manager import PrefixManager
 
 
 OUTAGE_REASON = {
@@ -39,34 +45,17 @@ class MyContext(commands.Context):
     def can_send_embed(self) -> bool:
         """If the bot has the right permissions to send an embed in the current context"""
         return self.bot_permissions.embed_links
-    
+
     async def send(self, *args, **kwargs) -> Optional[discord.Message]:
         if self.bot.zombie_mode and self.command.name not in self.bot.allowed_commands:
             return
         return await super().send(*args, **kwargs)
 
 
-def get_prefix(bot:"Zbot", msg: discord.Message) -> list:
+async def get_prefix(bot:"Zbot", msg: discord.Message) -> list:
     """Get the correct bot prefix from a message
     Prefix can change based on guild, but the bot mention will always be an option"""
-    if bot.database_online:
-        try:
-            prefixes = [bot.get_cog('Utilities').find_prefix(msg.guild)]
-        except KeyError:
-            try:
-                bot.load_extension('fcts.utilities')
-                prefixes = [bot.get_cog('Utilities').find_prefix(msg.guild)]
-            except Exception as e:
-                bot.log.warning("[get_prefix]", e)
-                prefixes = ['!']
-        except Exception as e:
-            bot.log.warning("[get_prefix]", e)
-            prefixes = ['!']
-    else:
-        if cog := bot.get_cog("Servers"):
-            prefixes = [cog.default_opt.get("prefix")]
-        else:
-            prefixes = ['!']
+    prefixes = [await bot.prefix_manager.get_prefix(msg.guild)]
     if msg.guild is None:
         prefixes.append("")
     return commands.when_mentioned_or(*prefixes)(bot, msg)
@@ -100,7 +89,8 @@ class Zbot(commands.bot.AutoShardedBot):
         self.zws = "​"  # here's a zero width space
         self.others = dict() # other misc credentials
         self.zombie_mode: bool = zombie_mode # if we should listen without sending any message
-    
+        self.prefix_manager = PrefixManager(self)
+
     allowed_commands = ("eval", "add_cog", "del_cog")
 
     @property
@@ -108,17 +98,17 @@ class Zbot(commands.bot.AutoShardedBot):
         """Get the current event, from the date"""
         try:
             return self.get_cog("BotEvents").current_event
-        except Exception as e:
-            self.log.warning(f"[current_event] {e}", exc_info=True)
+        except Exception as err:
+            self.log.warning("[current_event] %s", err, exc_info=True)
             return None
-    
+
     @property
     def current_event_data(self) -> Optional[dict]:
         """Get the current event data, from the date"""
         try:
             return self.get_cog("BotEvents").current_event_data
-        except Exception as e:
-            self.log.warning(f"[current_event_data] {e}", exc_info=True)
+        except Exception as err:
+            self.log.warning("[current_event_data] %s", err, exc_info=True)
             return None
 
     async def get_context(self, message: discord.Message, *, cls=MyContext) -> MyContext:
@@ -129,109 +119,100 @@ class Zbot(commands.bot.AutoShardedBot):
         return await super().get_context(message, cls=cls)
 
     @property
-    def cnx_frm(self) -> mysql.connector.connection.MySQLConnection:
+    def cnx_frm(self) -> MySQLConnection:
         """Connection to the default database
         Used for almost everything"""
         if self._cnx[0][1] + 1260 < round(time.time()):  # 21min
             self.connect_database_frm()
             self._cnx[0][1] = round(time.time())
             return self._cnx[0][0]
-        else:
-            return self._cnx[0][0]
+        return self._cnx[0][0]
 
     def connect_database_frm(self):
         if len(self.database_keys) > 0:
             if self._cnx[0][0] is not None:
                 self._cnx[0][0].close()
-            self.log.debug('Connection à MySQL (user {})'.format(
-                self.database_keys['user']))
-            self._cnx[0][0] = mysql.connector.connect(user=self.database_keys['user'], password=self.database_keys['password'], host=self.database_keys['host'],
-                                                      database=self.database_keys['database1'], buffered=True, charset='utf8mb4', collation='utf8mb4_unicode_ci')
+            self.log.debug('Connection à MySQL (user %s)', self.database_keys['user'])
+            self._cnx[0][0] = mysql.connector.connect(user=self.database_keys['user'],
+                password=self.database_keys['password'],
+                host=self.database_keys['host'],
+                database=self.database_keys['database1'],
+                buffered=True,
+                charset='utf8mb4',
+                collation='utf8mb4_unicode_ci')
             self._cnx[0][1] = round(time.time())
         else:
             raise ValueError(dict)
 
+    def close_database_cnx(self):
+        "Close any opened database connection"
+        try:
+            self.cnx_frm.close()
+        except ProgrammingError:
+            pass
+        try:
+            self.cnx_xp.close()
+        except ProgrammingError:
+            pass
+        try:
+            self.cnx_stats.close()
+        except ProgrammingError:
+            pass
+
     @property
-    def cnx_xp(self) -> mysql.connector.connection.MySQLConnection:
+    def cnx_xp(self) -> MySQLConnection:
         """Connection to the xp database
         Used for guilds using local xp (1 table per guild)"""
         if self._cnx[1][1] + 1260 < round(time.time()):  # 21min
             self.connect_database_xp()
             self._cnx[1][1] = round(time.time())
             return self._cnx[1][0]
-        else:
-            return self._cnx[1][0]
+        return self._cnx[1][0]
 
     def connect_database_xp(self):
         if len(self.database_keys) > 0:
             if self._cnx[1][0] is not None:
                 self._cnx[1][0].close()
-            self.log.debug('Connection à MySQL (user {})'.format(
-                self.database_keys['user']))
-            self._cnx[1][0] = mysql.connector.connect(user=self.database_keys['user'], password=self.database_keys['password'],
-                                                      host=self.database_keys['host'], database=self.database_keys['database2'], buffered=True)
+            self.log.debug('Connection à MySQL (user %s)',
+                           self.database_keys['user'])
+            self._cnx[1][0] = mysql.connector.connect(user=self.database_keys['user'],
+                password=self.database_keys['password'],
+                host=self.database_keys['host'],
+                database=self.database_keys['database2'],
+                buffered=True)
             self._cnx[1][1] = round(time.time())
         else:
             raise ValueError(dict)
-    
+
     @property
-    def cnx_stats(self) -> mysql.connector.connection.MySQLConnection:
+    def cnx_stats(self) -> MySQLConnection:
         """Connection to the xp database
         Used for guilds using local xp (1 table per guild)"""
         if self._cnx[2][1] + 1260 < round(time.time()):  # 21min
             self.connect_database_stats()
             self._cnx[2][1] = round(time.time())
             return self._cnx[2][0]
-        else:
-            return self._cnx[2][0]
+        return self._cnx[2][0]
 
     def connect_database_stats(self):
         if len(self.database_keys) > 0:
             if self._cnx[2][0] is not None:
                 self._cnx[2][0].close()
-            self.log.debug('Connection à MySQL (user {})'.format(
-                self.database_keys['user']))
+            self.log.debug('Connection à MySQL (user %s)', self.database_keys['user'])
             self._cnx[2][0] = mysql.connector.connect(user=self.database_keys['user'], password=self.database_keys['password'],
                                                       host=self.database_keys['host'], database='statsbot',
                                                       buffered=True)
             self._cnx[2][1] = round(time.time())
         else:
             raise ValueError(dict)
-    
-    async def db_query(self, query: str, args: Union[tuple, dict]=None, *, fetchone: bool=False, returnrowcount: bool=False, astuple: bool=False) -> Union[int, list[dict], dict]:
-        """Do any query to the bot database
-        If SELECT, it will return a list of results, or only the first result (if fetchone)
-        For any other query, it will return the affected row ID if returnrowscount, or the amount of affected rows (if returnrowscount)"""
-        cursor = self.cnx_frm.cursor(dictionary=(not astuple))
-        args = () if args is None else args
-        try:
-            cursor.execute(query, args)
-            if query.startswith("SELECT"):
-                _type = tuple if astuple else dict
-                if fetchone:
-                    v = cursor.fetchone()
-                    result = _type() if v is None else _type(v)
-                else:
-                    result = list(map(_type, cursor.fetchall()))
-            else:
-                self.cnx_frm.commit()
-                if returnrowcount:
-                    result = cursor.rowcount
-                else:
-                    result = cursor.lastrowid
-        except Exception as e:
-            cursor.close()
-            raise e
-        cursor.close()
-        return result
+
+    @property
+    def db_query(self):
+        return create_database_query(self.cnx_frm)
 
     class SafeDict(dict):
         def __missing__(self, key):
             return '{' + key + '}'
-
-    async def get_prefix(self, message: discord.Message):
-        """Get a prefix from a message... what did you expect?"""
-        return get_prefix(self, message)
 
     async def get_config(self, guildID: int, option: str) -> Optional[str]:
         cog = self.get_cog("Servers")

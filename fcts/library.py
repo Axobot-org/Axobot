@@ -27,14 +27,11 @@ class Library(commands.Cog):
     async def on_ready(self):
         self.tables = ['librarystats_beta', 'library_beta'] if self.bot.beta else ['librarystats', 'library']
 
-    async def db_add_search(self, ISBN: int, name: str):
-        cnx = self.bot.cnx_frm
-        cursor = cnx.cursor()
+    async def db_add_search(self, isbn: int, name: str):
         current_timestamp = self.bot.utcnow()
         query = "INSERT INTO `{}` (`ISBN`,`name`,`count`) VALUES (%(i)s, %(n)s, 1) ON DUPLICATE KEY UPDATE count = `count` + 1, last_update = %(l)s;".format(self.tables[0])
-        cursor.execute(query, {'i': ISBN, 'n': name, 'l': current_timestamp})
-        cnx.commit()
-        cursor.close()
+        async with self.bot.db_query(query, {'i': isbn, 'n': name, 'l': current_timestamp}):
+            pass
 
     async def search_book(self, isbn: int, keywords: str, language: str = None) -> dict:
         """Search a book from its ISBN"""
@@ -75,7 +72,7 @@ class Library(commands.Cog):
                 return info
             try:
                 isbn = isbnlib.isbn_from_words(keywords)
-            except isbnlib.dev._exceptions.ISBNLibHTTPError:
+            except isbnlib.ISBNLibException:
                 isbn = await self.isbn_from_words(keywords)
             if isbn is None:
                 return
@@ -83,7 +80,7 @@ class Library(commands.Cog):
         for key in ['wiki', 'default', 'openl', 'goob']:
             try:
                 i = isbnlib.meta(isbn, service=key)
-            except (isbnlib.dev._exceptions.DataNotFoundAtServiceError, isbnlib.dev._exceptions.ISBNLibHTTPError, isbnlib.dev._exceptions.RecordMappingError):
+            except isbnlib.ISBNLibException:
                 continue
             if i is not None and len(i) > 0:
                 info.update({
@@ -115,7 +112,7 @@ class Library(commands.Cog):
 
     @book_main.command(name="search", aliases=["book"])
     @commands.cooldown(5, 60, commands.BucketType.guild)
-    async def book_search(self, ctx: MyContext, ISBN: typing.Optional[ISBN], *, keywords: str = ''):
+    async def book_search(self, ctx: MyContext, isbn: typing.Optional[ISBN], *, keywords: str = ''):
         """Search from a book from its ISBN or search terms
         
         ..Example book search Percy Jackson
@@ -127,7 +124,7 @@ class Library(commands.Cog):
         while '  ' in keywords:
             keywords = keywords.replace('  ', ' ')
         try:
-            book = await self.search_book_2(ISBN, keywords)
+            book = await self.search_book_2(isbn, keywords)
         except isbnlib.dev._exceptions.ISBNLibHTTPError:
             await ctx.send(await self.bot._(ctx.channel, "library.rate-limited") + " :confused:")
             return

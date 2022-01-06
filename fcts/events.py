@@ -57,6 +57,7 @@ class Events(commands.Cog):
 
     @commands.Cog.listener()
     async def on_ready(self):
+        "Send a first log on connect"
         if self.bot.database_online:
             await asyncio.sleep(0.1)
             await self.send_sql_statslogs()
@@ -76,23 +77,21 @@ class Events(commands.Cog):
             return
         if not self.bot.database_online:
             return
-        cnx = self.bot.cnx_frm
-        cursor = cnx.cursor()
         if isinstance(before, discord.Member):
-            b = '' if before.nick is None else before.nick
-            a = '' if after.nick is None else after.nick
+            before_nick = '' if before.nick is None else before.nick
+            after_nick = '' if after.nick is None else after.nick
         else:
-            b = '' if before.name is None else before.name
-            a = '' if after.name is None else after.name
+            before_nick = '' if before.name is None else before.name
+            after_nick = '' if after.name is None else after.name
         guild = before.guild.id if hasattr(before, 'guild') else 0
         query = "INSERT INTO `usernames_logs` (`user`,`old`,`new`,`guild`,`beta`) VALUES (%(u)s,%(o)s,%(n)s,%(g)s,%(b)s)"
+        query_args = { 'u': before.id, 'o': before_nick, 'n': after_nick, 'g': guild, 'b': self.bot.beta }
         try:
-            cursor.execute(query, { 'u': before.id, 'o': b, 'n': a, 'g': guild, 'b': self.bot.beta })
-            cnx.commit()
+            async with self.bot.db_query(query, query_args):
+                pass
         except mysql.connector.errors.IntegrityError as e:
             self.bot.log.warning(e)
             await self.updade_memberslogs_name(before, after, tries+1)
-        cursor.close()
 
     @commands.Cog.listener()
     async def on_user_update(self, before: discord.User, after: discord.User):
@@ -354,40 +353,31 @@ class Events(commands.Cog):
         return True
 
 
-    async def get_events_from_db(self, all: bool=False, IDonly: bool=False):
+    async def get_events_from_db(self, get_all: bool=False, id_only: bool=False):
         """Renvoie une liste de tous les events qui doivent être exécutés"""
         try:
-            cnx = self.bot.cnx_frm
-            cursor = cnx.cursor(dictionary = True)
-            if IDonly:
+            if id_only:
                 query = ("SELECT `ID` FROM `timed`")
             else:
                 query = ("SELECT *, CONVERT_TZ(`begin`, @@session.time_zone, '+00:00') AS `utc_begin` FROM `timed`")
-            cursor.execute(query)
             liste = list()
-            for x in cursor:
-                if all:
-                    liste.append(x)
-                else:
-                    if IDonly or x['begin'].timestamp()+x['duration'] < time.time():
-                        liste.append(x)
-            cursor.close()
-            if len(liste) > 0:
-                return liste
-            else:
-                return []
-        except Exception as e:
-            await self.bot.get_cog('Errors').on_error(e,None)
-    
-    async def cancel_unmute(self, userID: int, guildID: int):
+            async with self.bot.db_query(query) as query_results:
+                for row in query_results:
+                    if get_all:
+                        liste.append(row)
+                    else:
+                        if id_only or row['begin'].timestamp()+row['duration'] < time.time():
+                            liste.append(row)
+            return liste
+        except Exception as err:
+            await self.bot.get_cog('Errors').on_error(err,None)
+
+    async def cancel_unmute(self, user_id: int, guild_id: int):
         """Cancel every automatic unmutes for a member"""
         try:
-            cnx = self.bot.cnx_frm
-            cursor = cnx.cursor(dictionary = True)
             query = 'DELETE FROM `timed` WHERE action="mute" AND guild=%s AND user=%s;'
-            cursor.execute(query, (guildID, userID))
-            cnx.commit()
-            cursor.close()
+            async with self.bot.db_query(query, (guild_id, user_id)):
+                pass
         except Exception as e:
             await self.bot.get_cog('Errors').on_error(e,None)
 
@@ -447,37 +437,29 @@ class Events(commands.Cog):
 
     async def add_task(self, action:str, duration:int, userID: int, guildID:int=None, channelID:int=None, message:str=None, data:dict=None):
         """Ajoute une tâche à la liste"""
-        tasks = await self.get_events_from_db(all=True)
-        for t in tasks:
-            if (t['user']==userID and t['guild']==guildID and t['action']==action and t["channel"]==channelID) and t['action']!='timer':
-                return await self.update_duration(t['ID'],duration)
+        tasks_list = await self.get_events_from_db(get_all=True)
+        for task in tasks_list:
+            if (task['user']==userID and task['guild']==guildID and task['action']==action and task["channel"]==channelID) and task['action']!='timer':
+                return await self.update_duration(task['ID'],duration)
         data = None if data is None else json.dumps(data)
-        cnx = self.bot.cnx_frm
-        cursor = cnx.cursor()
         query = "INSERT INTO `timed` (`guild`,`channel`,`user`,`action`,`duration`,`message`, `data`) VALUES (%(guild)s,%(channel)s,%(user)s,%(action)s,%(duration)s,%(message)s,%(data)s)"
-        cursor.execute(query, {'guild':guildID, 'channel':channelID, 'user':userID, 'action':action, 'duration':duration, 'message':message, 'data':data})
-        cnx.commit()
-        cursor.close()
+        query_args = {'guild':guildID, 'channel':channelID, 'user':userID, 'action':action, 'duration':duration, 'message':message, 'data':data}
+        async with self.bot.db_query(query, query_args):
+            pass
         return True
 
-    async def update_duration(self, ID: int, new_duration: int):
+    async def update_duration(self, task_id: int, new_duration: int):
         """Modifie la durée d'une tâche"""
-        cnx = self.bot.cnx_frm
-        cursor = cnx.cursor()
-        query = ("UPDATE `timed` SET `duration`={} WHERE `ID`={}".format(new_duration,ID))
-        cursor.execute(query)
-        cnx.commit()
-        cursor.close()
+        query = ("UPDATE `timed` SET `duration`={} WHERE `ID`={}".format(new_duration, task_id))
+        async with self.bot.db_query(query):
+            pass
         return True
 
-    async def remove_task(self, ID:int):
+    async def remove_task(self, task_id:int):
         """Enlève une tâche exécutée"""
-        cnx = self.bot.cnx_frm
-        cursor = cnx.cursor()
-        query = ("DELETE FROM `timed` WHERE `timed`.`ID` = {}".format(ID))
-        cursor.execute(query)
-        cnx.commit()
-        cursor.close()
+        query = ("DELETE FROM `timed` WHERE `timed`.`ID` = {}".format(task_id))
+        async with self.bot.db_query(query):
+            pass
         return True
 
     @tasks.loop(seconds=1.0)
@@ -679,8 +661,6 @@ class Events(commands.Cog):
 
     async def send_sql_statslogs(self):
         "Send some stats about the current bot stats"
-        cnx = self.bot.cnx_frm
-        cursor = cnx.cursor()
         rss_feeds = await self.bot.get_cog("Rss").get_raws_count(True)
         active_rss_feeds = await self.bot.get_cog("Rss").get_raws_count()
         if infoCog := self.bot.get_cog("Info"):
@@ -708,16 +688,16 @@ class Events(commands.Cog):
             int(self.bot.beta),
         )
         try:
-            cursor.execute(query, data)
+            async with self.bot.db_query(query, data):
+                pass
         except Exception as e:
             await self.bot.get_cog("Errors").senf_err_msg(query)
             raise e
-        cnx.commit()
-        cursor.close()
-        emb = self.bot.get_cog("Embeds").Embed(desc='**Stats logs** updated',color=5293283).update_timestamp().set_author(self.bot.user)
-        await self.bot.get_cog("Embeds").send([emb],url="loop")
+        emb = discord.Embed(description='**Stats logs** updated', color=5293283)
+        emb.set_author(name=self.bot.user, icon_url=self.bot.user.avatar)
+        await self.bot.get_cog("Embeds").send([emb], url="loop")
         self.statslogs_last_push = datetime.datetime.now()
-        
+
 
 def setup(bot):
     bot.add_cog(Events(bot))

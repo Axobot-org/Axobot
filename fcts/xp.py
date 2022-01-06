@@ -329,11 +329,11 @@ class Xp(commands.Cog):
         cog = self.bot.get_cog("Utilities")
         if cog is None:
             return
-        result = await cog.get_db_userinfo(['userID'], ['xp_suspect=1'], return_type=list)
-        if result is None:
+        result = await cog.get_db_userinfo(['userID'], ['xp_suspect=1'])
+        if result is None or len(result) == 0:
             return
         if len(result) > 1:
-            result = [item for sublist in result for item in sublist]
+            result = [item['userID'] for item in result]
         self.sus = set(result)
         self.bot.log.info("Suspects d'xp rechargé (%d suspects)", len(self.sus))
     
@@ -501,10 +501,10 @@ class Xp(commands.Cog):
             cursor = cnx.cursor(dictionary = True)
             try:
                 cursor.execute(query)
-            except mysql.connector.errors.ProgrammingError as e:
-                if e.errno == 1146:
+            except mysql.connector.errors.ProgrammingError as err:
+                if err.errno == 1146:
                     return list()
-                raise e
+                raise err
             liste = list()
             if guild is None:
                 liste = list(cursor)
@@ -522,9 +522,9 @@ class Xp(commands.Cog):
                     i += 1
             cursor.close()
             return liste
-        except Exception as e:
-            await self.bot.get_cog('Errors').on_error(e,None)
-        
+        except Exception as err:
+            await self.bot.get_cog('Errors').on_error(err,None)
+
     async def bdd_get_rank(self, userID: int, guild: discord.Guild=None):
         """Get the rank of a user"""
         try:
@@ -568,15 +568,9 @@ class Xp(commands.Cog):
             if not self.bot.database_online:
                 self.bot.unload_extension("fcts.xp")
                 return None
-            cnx = self.bot.cnx_frm
-            cursor = cnx.cursor(dictionary = True)
-            query = ("SELECT SUM(xp) FROM `{}`".format(self.table))
-            cursor.execute(query)
-            liste = list()
-            for x in cursor:
-                liste.append(x)
-            cursor.close()
-            result = round(liste[0]['SUM(xp)'])
+            query = f"SELECT SUM(xp) as total FROM `{self.table}`"
+            async with self.bot.db_query(query, fetchone=True) as query_results:
+                result = round(query_results['total'])
 
             # cnx = self.bot.cnx_xp
             # cursor = cnx.cursor()
@@ -972,35 +966,27 @@ class Xp(commands.Cog):
 
     async def rr_add_role(self, guildID:int, roleID:int, level:int):
         """Add a role reward in the database"""
-        cnx = self.bot.cnx_frm
-        cursor = cnx.cursor(dictionary = True)
         ID = await self.gen_rr_id()
         query = "INSERT INTO `roles_rewards` (`ID`,`guild`,`role`,`level`) VALUES (%(i)s,%(g)s,%(r)s,%(l)s);"
-        cursor.execute(query, { 'i': ID, 'g': guildID, 'r': roleID, 'l': level })
-        cnx.commit()
-        cursor.close()
+        async with self.bot.db_query(query, { 'i': ID, 'g': guildID, 'r': roleID, 'l': level }):
+            pass
         return True
-    
+
     async def rr_list_role(self, guild:int, level:int=-1):
         """List role rewards in the database"""
-        cnx = self.bot.cnx_frm
-        cursor = cnx.cursor(dictionary = True)
-        query = ("SELECT * FROM `roles_rewards` WHERE guild={g} ORDER BY level;".format(g=guild)) if level < 0 else ("SELECT * FROM `roles_rewards` WHERE guild={g} AND level={l} ORDER BY level;".format(g=guild,l=level))
-        cursor.execute(query)
-        liste = list()
-        for x in cursor:
-            liste.append(x)
-        cursor.close()
+        if level < 0:
+            query = f"SELECT * FROM `roles_rewards` WHERE guild={guild} ORDER BY level;"
+        else:
+            query = f"SELECT * FROM `roles_rewards` WHERE guild={guild} AND level={level} ORDER BY level;"
+        async with self.bot.db_query(query) as query_results:
+            liste = list(query_results)
         return liste
-    
+
     async def rr_remove_role(self, ID:int):
         """Remove a role reward from the database"""
-        cnx = self.bot.cnx_frm
-        cursor = cnx.cursor(dictionary = True)
         query = ("DELETE FROM `roles_rewards` WHERE `ID`={};".format(ID))
-        cursor.execute(query)
-        cnx.commit()
-        cursor.close()
+        async with self.bot.db_query(query):
+            pass
         return True
 
     @commands.group(name="roles_rewards", aliases=['rr'])
@@ -1011,7 +997,7 @@ class Xp(commands.Cog):
         ..Doc server.html#roles-rewards"""
         if ctx.subcommand_passed is None:
             await self.bot.get_cog('Help').help_command(ctx,['rr'])
-    
+
     @rr_main.command(name="add")
     @commands.check(checks.has_manage_guild)
     async def rr_add(self, ctx: MyContext, level:int, *, role:discord.Role):
@@ -1036,7 +1022,7 @@ class Xp(commands.Cog):
             await self.bot.get_cog('Errors').on_command_error(ctx,e)
         else:
             await ctx.send(await self.bot._(ctx.guild.id, "xp.rr-added", role=role.name,level=level))
-    
+
     @rr_main.command(name="list")
     async def rr_list(self, ctx: MyContext):
         """List every roles rewards of your server
@@ -1055,7 +1041,7 @@ class Xp(commands.Cog):
             title = await self.bot._(ctx.guild.id,"xp.rr_list", c=len(l), max=max_rr)
             emb = await self.bot.get_cog('Embeds').Embed(title=title,desc=des).update_timestamp().create_footer(ctx)
             await ctx.send(embed=emb.discord_embed())
-    
+
     @rr_main.command(name="remove")
     @commands.check(checks.has_manage_guild)
     async def rr_remove(self, ctx: MyContext, level:int):
@@ -1074,7 +1060,7 @@ class Xp(commands.Cog):
             await self.bot.get_cog('Errors').on_command_error(ctx,e)
         else:
             await ctx.send(await self.bot._(ctx.guild.id, "xp.rr-removed", level=level))
-    
+
     @rr_main.command(name="reload")
     @commands.check(checks.has_manage_guild)
     @commands.cooldown(1,300,commands.BucketType.guild)
@@ -1101,7 +1087,6 @@ class Xp(commands.Cog):
             await ctx.send(await self.bot._(ctx.guild.id, "xp.rr-reload", role_count=c,member_count=ctx.guild.member_count))
         except Exception as e:
             await self.bot.get_cog('Errors').on_command_error(ctx,e)
-    
 
 
 def setup(bot):

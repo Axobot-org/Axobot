@@ -40,7 +40,7 @@ class Info(commands.Cog):
         self.bot_version = conf.release
         try:
             self.TimeUtils = bot.get_cog("TimeUtils")
-        except:
+        except KeyError:
             pass
         self.emoji_table = 'emojis_beta' if self.bot.beta else 'emojis'
         self.BitlyClient = bitly_api.Bitly(login='zrunner',api_key=self.bot.others['bitly'])
@@ -915,11 +915,7 @@ Servers:
         rr_len = self.bot.get_cog("Servers").default_opt['rr_max_number'] if rr_len is None else rr_len
         rr_len = '{}/{}'.format(len(await self.bot.get_cog('Xp').rr_list_role(guild.id)),rr_len)
         # Prefix
-        class FakeMsg:
-            pass
-        fake_msg = FakeMsg
-        fake_msg.guild = guild
-        pref = (await self.bot.get_prefix(fake_msg))[2]
+        pref = await self.bot.prefix_manager.get_prefix(guild)
         if "`" not in pref:
             pref = "`" + pref + "`"
         # Rss
@@ -1119,17 +1115,14 @@ Servers:
             liste = list(set(re.findall(r'<a?:[\w-]+:(\d{18})>',msg.content)))
             if len(liste) == 0:
                 return
-            cnx = self.bot.cnx_frm
-            cursor = cnx.cursor()
             current_timestamp = datetime.datetime.fromtimestamp(round(time.time()))
             query = "INSERT INTO `{}` (`ID`,`count`,`last_update`) VALUES (%(i)s, 1, %(l)s) ON DUPLICATE KEY UPDATE count = `count` + 1, last_update = %(l)s;".format(self.emoji_table)
             for data in [{ 'i': x, 'l': current_timestamp } for x in liste]:
-                cursor.execute(query, data)
-            cnx.commit()
-            cursor.close()
+                async with self.bot.db_query(query, data):
+                    pass
         except Exception as e:
             await self.bot.get_cog('Errors').on_error(e,None)
-    
+
     async def get_emojis_info(self, ID: typing.Union[int,list]):
         """Get info about an emoji"""
         if not self.bot.database_online:
@@ -1138,22 +1131,19 @@ Servers:
             query = "Select * from `{}` WHERE `ID`={}".format(self.emoji_table,ID)
         else:
             query = "Select * from `{}` WHERE {}".format(self.emoji_table,"OR".join([f'`ID`={x}' for x in ID]))
-        cnx = self.bot.cnx_frm
-        cursor = cnx.cursor(dictionary = True)
-        cursor.execute(query)
         liste = list()
-        for x in cursor:
-            x['emoji'] = self.bot.get_emoji(x['ID'])
-            liste.append(x)
-        cursor.close()
+        async with self.bot.db_query(query) as query_results:
+            for x in query_results:
+                x['emoji'] = self.bot.get_emoji(x['ID'])
+                liste.append(x)
         return liste
-    
+
 
     @commands.group(name="bitly")
     async def bitly_main(self, ctx: MyContext):
         """Bit.ly website, but in Discord
         Create shortened url and unpack them by using Bitly services
-        
+
         ..Doc miscellaneous.html#bitly-urls"""
         if ctx.subcommand_passed is None:
             await self.bot.get_cog('Help').help_command(ctx,['bitly'])
@@ -1197,22 +1187,19 @@ Servers:
     @commands.check(checks.database_connected)
     async def changelog(self, ctx: MyContext, version: str=None):
         """Get the changelogs of the bot
-        
+
         ..Example changelog
 
         ..Example changelog 3.7.0
 
         ..Doc miscellaneous.html#changelogs"""
         if version=='list':
-            cnx = self.bot.cnx_frm
             if not ctx.bot.beta:
                 query = "SELECT `version`, CONVERT_TZ(`release_date`, @@session.time_zone, '+00:00') AS `utc_release` FROM `changelogs` WHERE beta=False ORDER BY release_date"
             else:
                 query = f"SELECT `version`, CONVERT_TZ(`release_date`, @@session.time_zone, '+00:00') AS `utc_release` FROM `changelogs` ORDER BY release_date"
-            cursor = cnx.cursor(dictionary=True)
-            cursor.execute(query)
-            results = list(cursor)
-            cursor.close()
+            async with self.bot.db_query(query) as query_results:
+                results = query_results
             desc = "\n".join(reversed(["**v{}:** {}".format(x['version'],x['utc_release']) for x in results]))
             time = discord.Embed.Empty
             title = await self.bot._(ctx.channel,'info.changelogs.index')
@@ -1226,11 +1213,8 @@ Servers:
                 query = f"SELECT *, CONVERT_TZ(`release_date`, @@session.time_zone, '+00:00') AS `utc_release` FROM `changelogs` WHERE `version`='{version}'"
                 if not ctx.bot.beta:
                     query += " AND `beta`=0"
-            cnx = self.bot.cnx_frm
-            cursor = cnx.cursor(dictionary=True)
-            cursor.execute(query)
-            results = list(cursor)
-            cursor.close()
+            async with self.bot.db_query(query) as query_results:
+                results = query_results
             if len(results) > 0:
                 used_lang = await self.bot._(ctx.channel,'_used_locale')
                 if used_lang not in results[0].keys():
@@ -1260,11 +1244,7 @@ Servers:
         if not self.bot.beta:
             cond += " AND beta=0"
         query = f"SELECT `old`, `new`, `guild`, CONVERT_TZ(`date`, @@session.time_zone, '+00:00') AS `utc_date` FROM `usernames_logs` WHERE {cond} ORDER BY date DESC"
-        cnx = self.bot.cnx_frm
-        cursor = cnx.cursor(dictionary=True)
-        cursor.execute(query)
-        results = list(cursor)
-        cursor.close()
+        results = self.bot.db_query(query)
         # List creation
         this_guild = list()
         global_list = [x for x in results if x['guild'] in (None,0)]

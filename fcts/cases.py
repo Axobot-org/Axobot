@@ -72,90 +72,79 @@ class Cases(commands.Cog):
                     text += await self.bot._(self.guild, "cases.display.duration", data=cog.time_delta(self.duration,lang=lang,form='temp'))
             return text
 
-    async def get_case(self, columns=[], criters=["1"], relation="AND") -> typing.Optional[list[Case]]:
+    async def get_case(self, columns=None, criters=None, relation="AND") -> typing.Optional[list[Case]]:
         """return every cases"""
         if not self.bot.database_online:
             return None
-        if type(columns)!=list or type(criters)!=list:
+        if columns is None:
+            columns = []
+        if criters is None:
+            criters = ["1"]
+        if not isinstance(columns, list) or not isinstance(criters, list):
             raise ValueError
-        cnx = self.bot.cnx_frm
-        cursor = cnx.cursor(dictionary=True)
-        if columns == []:
+        if len(columns) == 0:
             cl = "*"
         else:
             cl = "`"+"`,`".join(columns)+"`"
         relation = " "+relation+" "
         query = ("SELECT {} FROM `{}` WHERE {}".format(cl,self.table,relation.join(criters)))
-        cursor.execute(query)
         liste = list()
-        if len(columns) == 0:
-            for x in cursor:
-                liste.append(self.Case(bot=self.bot,guildID=x['guild'],caseID=x['ID'],memberID=x['user'],Type=x['type'],ModID=x['mod'],date=x['created_at'],Reason=x['reason'],duration=x['duration']))
-        else:
-            for x in cursor:
-                liste.append(x)
+        async with self.bot.db_query(query) as query_results:
+            if len(columns) == 0:
+                for elem in query_results:
+                    case = self.Case(bot=self.bot, guildID=elem['guild'], caseID=elem['ID'], memberID=elem['user'],
+                                     Type=elem['type'], ModID=elem['mod'], date=elem['created_at'], Reason=elem['reason'],
+                                     duration=elem['duration'])
+                    liste.append(case)
+            else:
+                for elem in query_results:
+                    liste.append(elem)
         return liste
 
-    async def get_nber(self, userID:int, guildID:int):
+    async def get_nber(self, user_id:int, guild_id:int):
         """Get the number of users infractions"""
         try:
-            cnx = self.bot.cnx_frm
-            cursor = cnx.cursor(dictionary = False)
-            query = ("SELECT COUNT(*) FROM `{}` WHERE `user`={} AND `guild`={} AND `type`!='unban'".format(self.table,userID,guildID))
-            cursor.execute(query)
-            liste = list()
-            for x in cursor:
-                liste.append(x)
-            cursor.close()
-            if liste is not None and len(liste)==1:
-                return liste[0][0]
+            query = ("SELECT COUNT(*) FROM `{}` WHERE `user`={} AND `guild`={} AND `type`!='unban'".format(self.table, user_id, guild_id))
+            async with self.bot.db_query(query) as query_results:
+                if len(query_results) == 1:
+                    return query_results[0][0]
             return 0
-        except Exception as e:
-            await self.bot.get_cog('Errors').on_error(e,None)
+        except Exception as err:
+            await self.bot.get_cog('Errors').on_error(err,None)
 
-    async def delete_case(self, ID: int):
+    async def delete_case(self, case_id: int):
         """delete a case from the db"""
         if not self.bot.database_online:
             return None
-        if type(ID)!=int:
+        if not isinstance(case_id, int):
             raise ValueError
-        cnx = self.bot.cnx_frm
-        cursor = cnx.cursor()
-        query = ("DELETE FROM `{}` WHERE `ID`='{}'".format(self.table,ID))
-        cursor.execute(query)
-        cnx.commit()
-        cursor.close()
+        query = ("DELETE FROM `{}` WHERE `ID`='{}'".format(self.table, case_id))
+        async with self.bot.db_query(query):
+            pass
         return True
 
     async def add_case(self, case):
         """add a new case to the db"""
         if not self.bot.database_online:
             return None
-        if type(case) != self.Case:
+        if not isinstance(case, self.Case):
             raise ValueError
-        cnx = self.bot.cnx_frm
-        cursor = cnx.cursor()
         query = "INSERT INTO `{}` (`guild`, `user`, `type`, `mod`, `reason`,`duration`) VALUES (%(g)s, %(u)s, %(t)s, %(m)s, %(r)s, %(d)s)".format(self.table)
-        cursor.execute(query, { 'g': case.guild, 'u': case.user, 't': case.type, 'm': case.mod, 'r': case.reason, 'd': case.duration })
-        cnx.commit()
-        case.id = cursor.lastrowid
-        cursor.close()
+        query_args = { 'g': case.guild, 'u': case.user, 't': case.type, 'm': case.mod, 'r': case.reason, 'd': case.duration }
+        async with self.bot.db_query(query, query_args) as last_row_id:
+            case.id = last_row_id
         return True
 
     async def update_reason(self, case):
-        if not self.bot.database_online:
-            return None
         """update infos of a case"""
-        if type(case) != self.Case:
+        if not self.bot.database_online:
+            return False
+        if not isinstance(case, self.Case):
             raise ValueError
-        cnx = self.bot.cnx_frm
-        cursor = cnx.cursor()
-        query = ("UPDATE `{}` SET `reason` = '{}' WHERE `ID` = {}".format(self.table,case.reason.replace("'","\\'"),case.id))
-        cursor.execute(query)
-        cnx.commit()
-        cursor.close
+        query = ("UPDATE `{}` SET `reason` = %s WHERE `ID` = %s".format(self.table))
+        async with self.bot.db_query(query, (case.reason, case.id)):
+            pass
         return True
-
 
 
     @commands.group(name="cases",aliases=['case', 'infractions'])
