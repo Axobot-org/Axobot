@@ -23,7 +23,7 @@ import discord
 import traceback
 import asyncio
 import time
-import logging
+import json
 import os
 import mysql.connector
 from signal import SIGTERM
@@ -102,16 +102,22 @@ def main():
         client.others['random_api_token'] = cryptage.uncrypte(r[18])
     try:
         try:
-            cnx = mysql.connector.connect(user=client.database_keys['user'],password=client.database_keys['password'],host="127.0.0.1",database=client.database_keys['database1'])
+            cnx = mysql.connector.connect(user=client.database_keys['user'],
+                                          password=client.database_keys['password'],
+                                          host="127.0.0.1",
+                                          database=client.database_keys['database1'])
         except (mysql.connector.InterfaceError, mysql.connector.ProgrammingError):
             client.log.warning("Unable to access local dabatase - attempt via IP")
-            cnx = mysql.connector.connect(user=client.database_keys['user'],password=client.database_keys['password'],host=client.database_keys['host'],database=client.database_keys['database1'])
+            cnx = mysql.connector.connect(user=client.database_keys['user'],
+                                          password=client.database_keys['password'],
+                                          host=client.database_keys['host'],
+                                          database=client.database_keys['database1'])
         else:
             client.log.info("Database connected locally")
             client.database_keys['host'] = '127.0.0.1'
         cnx.close()
     except Exception as e:
-        client.log.error("---- IMPOSSIBLE ACCESS TO THE DATABASE ----")
+        client.log.error("---- UNABLE TO REACH THE DATABASE ----")
         client.log.error(e)
         client.database_online = False
 
@@ -148,13 +154,16 @@ def main():
         print(time.strftime("%d/%m  %H:%M:%S"))
         print('------')
         await asyncio.sleep(3)
+        with open("status_list.json", 'r') as status_file:
+            status_list = json.load(status_file)
         if not client.database_online:
-            await client.change_presence(activity=discord.Activity(type=discord.ActivityType.listening,name=choice(["a signal",'a sign of life','nothing','a signal','a lost database'])))
+            activity = discord.Activity(type=discord.ActivityType.listening,name=choice(status_list['no-db']))
+            await client.change_presence(activity=activity)
         elif client.beta:
-            await client.change_presence(activity=discord.Game(name=choice(["SNAPSHOOT","snapshot day","somethin iz brokn"])))
+            await client.change_presence(activity=discord.Game(name=choice(status_list['beta'])))
         else:
-            await client.change_presence(activity=discord.Game(name=choice(["use @Zbot help","something","type !help for the win","type !help","minecraft powaa"])))
-        emb = client.get_cog("Embeds").Embed(desc="**{}** is launching !".format(client.user.name),color=8311585).update_timestamp()
+            await client.change_presence(activity=discord.Game(name=choice(status_list['release'])))
+        emb = discord.Embed(description=f"**{client.user.name}** is launching !", color=8311585, timestamp=client.utcnow())
         await client.get_cog("Embeds").send([emb])
 
 
