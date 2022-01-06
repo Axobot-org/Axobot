@@ -1,29 +1,33 @@
-from utils import flatten_list, Zbot, MyContext
-from fcts.checks import is_fun_enabled
-import discord
-import random
-import operator
-import string
-import importlib
-import re
-import typing
-import datetime
-import geocoder
-import aiohttp
 import copy
-import emoji as emojilib
+import datetime
+import importlib
+import operator
+import random
+import re
+import string
+import typing
 from difflib import get_close_matches
-from discord.ext import commands
-from tzwhere import tzwhere
-from pytz import timezone
+from typing import Optional
 
-from fcts import emojis, checks, args
+import aiohttp
+import discord
+import emoji as emojilib
+import geocoder
+from discord.ext import commands
+from pytz import timezone
+from timezonefinder import TimezoneFinder
+from utils import MyContext, Zbot, flatten_list
+
+from fcts import args, checks, emojis
+from fcts.checks import is_fun_enabled
+
 importlib.reload(emojis)
 importlib.reload(checks)
 importlib.reload(args)
 
-cmds_list = ['count_msg', 'ragequit', 'pong', 'run', 'nope', 'blame', 'party', 'bigtext', 'shrug', 'gg', 'money', 'pibkac', 'osekour', 'me', 'kill',
-             'cat', 'happy-birthday', 'rekt', 'thanos', 'nuke', 'pikachu', 'pizza', 'google', 'loading', 'piece', 'roll', 'afk', 'bubble-wrap', 'reverse']
+cmds_list = ['count_msg', 'ragequit', 'pong', 'run', 'nope', 'blame', 'party', 'bigtext', 'shrug', 'gg', 'money', 'pibkac',
+             'osekour', 'me', 'kill', 'cat', 'happy-birthday', 'rekt', 'thanos', 'nuke', 'pikachu', 'pizza', 'google',
+             'loading', 'piece', 'roll', 'afk', 'bubble-wrap', 'reverse']
 
 
 async def can_say(ctx: MyContext):
@@ -44,7 +48,7 @@ class Fun(commands.Cog):
         self.bot = bot
         self.fun_opt = dict()
         self.file = "fun"
-        self.tz = tzwhere.tzwhere(forceTZ=True)
+        self.tf = TimezoneFinder()
         self.afk_guys = dict()
         self.nasa_pict:dict = None
         try:
@@ -604,15 +608,15 @@ You can specify a verification limit by adding a number in argument (up to 1.000
         """Get the hour of a city
 
         ..Example hour Paris
-        
+
         ..Doc miscellaneous.html#hour-weather"""
         if city.lower() in ['mee6','mee6land']:
             return await ctx.send('**Mee6Land/MEE6**:\nEverytime (NoWhere)\n (Mee6Land - lat: unknown - long: unknown)')
         g = geocoder.arcgis(city)
         if not g.ok:
             return await ctx.send(await self.bot._(ctx.channel,"fun.invalid-city"))
-        timeZoneStr = self.tz.tzNameAt(g.json['lat'],g.json['lng'],forceTZ=True)
-        if timeZoneStr=='uninhabited':
+        timeZoneStr: Optional[str] = self.tf.timezone_at_land(lat=g.json['lat'], lng=g.json['lng'])
+        if timeZoneStr is None:
             return await ctx.send(await self.bot._(ctx.channel,"fun.uninhabited-city"))
         timeZoneObj = timezone(timeZoneStr)
         d = datetime.datetime.now(timeZoneObj)

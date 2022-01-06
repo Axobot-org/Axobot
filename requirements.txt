@@ -6,7 +6,7 @@ python-i18n @ git+https://github.com/ZRunner/python-i18n/
 emoji
 imageio
 geocoder
-tzwhere
+timezonefinder
 python-twitter>=3.5
 isbnlib
 pytz
