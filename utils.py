@@ -281,8 +281,8 @@ class UserFlag:
 def flatten_list(first_list: list) -> list:
     return [item for sublist in first_list for item in sublist]
 
-def setup_logger():
-    """Create the logger module, used for logs"""
+def setup_bot_logger():
+    """Create the logger module for the bot, used for logs"""
     # on chope le premier logger
     log = logging.getLogger("runner")
     # on définis un formatteur
@@ -316,4 +316,23 @@ def setup_logger():
     log.addHandler(stream_handler)
     #log.addHandler(sentry_handler)
 
+    log.setLevel(logging.DEBUG)
+    return log
+
+def setup_database_logger():
+    "Create the logger module for database access"
+    log = logging.getLogger("database")
+    log_format = logging.Formatter("%(asctime)s %(levelname)s: [SQL] %(message)s", datefmt="[%d/%m/%Y %H:%M]")
+    file_handler = logging.FileHandler("sql-debug.log")
+
+    file_handler.setLevel(logging.DEBUG)
+    file_handler.setFormatter(log_format)
+
+    stream_handler = logging.StreamHandler(sys.stdout)
+    stream_handler.setLevel(logging.DEBUG)
+    stream_handler.setFormatter(log_format)
+
+    log.addHandler(file_handler)
+    log.addHandler(stream_handler)
+    log.setLevel(logging.INFO)
     return log

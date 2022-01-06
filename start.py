@@ -29,13 +29,13 @@ import mysql.connector
 from signal import SIGTERM
 from random import choice
 from fcts import cryptage, tokens # pylint: disable=no-name-in-module
-from utils import Zbot, setup_logger
+from utils import Zbot, setup_bot_logger, setup_database_logger
 
 def main():
     client = Zbot(case_insensitive=True,status=discord.Status('online'))
 
-    log = setup_logger()
-    log.setLevel(logging.DEBUG)
+    setup_database_logger()
+    log = setup_bot_logger()
     log.info("Starting bot")
 
     initial_extensions = ['fcts.languages',
