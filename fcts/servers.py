@@ -24,7 +24,8 @@ levelup_channel_option = ["levelup_channel"]
 ttt_display_option = ["ttt_display"]
 
 class Servers(commands.Cog):
-    """"Cog in charge of all the bot configuration management for your server. As soon as an option is searched, modified or deleted, this cog will handle the operations."""
+    """"Cog in charge of all the bot configuration management for your server. As soon as an option
+    is searched, modified or deleted, this cog will handle the operations."""
 
     def __init__(self, bot: Zbot):
         self.bot = bot
@@ -93,80 +94,64 @@ class Servers(commands.Cog):
         """Return every options of the bot"""
         if not self.bot.database_online:
             return list()
-        cnx = self.bot.cnx_frm
-        cursor = cnx.cursor(dictionary=True)
         query = ("SELECT * FROM `bot_infos` WHERE `ID`={}".format(botID))
-        cursor.execute(query)
-        liste = list()
-        for x in cursor:
-            liste.append(x)
+        async with self.bot.db_query(query) as query_results:
+            liste = list(query_results)
         return liste
-    
-    async def edit_bot_infos(self, botID: int, values=[()]):
-        if type(values)!=list:
+
+    async def edit_bot_infos(self, bot_id: int, values=[()]):
+        if not isinstance(values, list):
             raise ValueError
-        v = list()
-        cnx = self.bot.cnx_frm
-        cursor = cnx.cursor()
-        for x in values:
-            if isinstance(x, bool):
-                v.append("`{x[0]}`={x[1]}".format(x=x))
-            else:
-                v.append("""`{x[0]}`="{x[1]}" """.format(x=x))
-        query = ("UPDATE `bot_infos` SET {v} WHERE `ID`='{id}'".format(v=",".join(v),id=botID))
-        cursor.execute(query)
-        cnx.commit()
-        cursor.close()
+        set_query = ', '.join('{}=%s'.format(val[0]) for val in values)
+        query = f"UPDATE `bot_infos` SET {set_query} WHERE `ID`='{bot_id}'"
+        async with self.bot.db_query(query, (val[1] for val in values)):
+            pass
         return True
 
     async def get_languages(self, ignored_guilds: typing.List[int], return_dict: bool = False):
         """Return stats on used languages"""
         if not self.bot.database_online:
             return list()
-        cnx = self.bot.cnx_frm
-        cursor = cnx.cursor(dictionary=True)
         query = ("SELECT `language`,`ID` FROM `{}`".format(self.table))
-        cursor.execute(query)
         liste = list()
-        guilds = [x.id for x in self.bot.guilds if x.id not in ignored_guilds]
-        for x in cursor:
-            if x['ID'] in guilds:
-                liste.append(x['language'])
+        guilds = {x.id for x in self.bot.guilds if x.id not in ignored_guilds}
+        async with self.bot.db_query(query) as query_results:
+            for row in query_results:
+                if row['ID'] in guilds:
+                    liste.append(row['language'])
         for _ in range(len(guilds)-len(liste)):
             liste.append(self.bot.get_cog('Languages').languages.index(self.default_language))
         if return_dict:
             langs = dict()
-            for e, l in enumerate(self.bot.get_cog('Languages').languages):
-                langs[l] = liste.count(e)
+            for e, lang in enumerate(self.bot.get_cog('Languages').languages):
+                langs[lang] = liste.count(e)
         else:
             langs = list()
-            for e, l in enumerate(self.bot.get_cog('Languages').languages):
-                langs.append((l, liste.count(e)))
+            for e, lang in enumerate(self.bot.get_cog('Languages').languages):
+                langs.append((lang, liste.count(e)))
         return langs
-    
+
     async def get_xp_types(self, ignored_guilds: typing.List[int], return_dict: bool = False):
         """Return stats on used xp types"""
         if not self.bot.database_online:
             return list()
-        cnx = self.bot.cnx_frm
-        cursor = cnx.cursor(dictionary=True)
         query = ("SELECT `xp_type`,`ID` FROM `{}`".format(self.table))
-        cursor.execute(query)
         liste = list()
-        guilds = [x.id for x in self.bot.guilds if x.id not in ignored_guilds]
-        for x in cursor:
-            if x['ID'] in guilds:
-                liste.append(x['xp_type'])
+        guilds = {x.id for x in self.bot.guilds if x.id not in ignored_guilds}
+        async with self.bot.db_query(query) as query_results:
+            for row in query_results:
+                if row['ID'] in guilds:
+                    liste.append(row['xp_type'])
         for _ in range(len(guilds)-len(liste)):
             liste.append(self.default_opt['xp_type'])
         if return_dict:
             types = dict()
-            for e, l in enumerate(self.bot.get_cog('Xp').types):
-                types[l] = liste.count(e)
+            for e, name in enumerate(self.bot.get_cog('Xp').types):
+                types[name] = liste.count(e)
         else:
             types = list()
-            for e, l in enumerate(self.bot.get_cog('Xp').types):
-                types.append((l, liste.count(e)))
+            for e, name in enumerate(self.bot.get_cog('Xp').types):
+                types.append((name, liste.count(e)))
         return types
 
     async def staff_finder(self, user: discord.Member, option: str):
@@ -193,53 +178,43 @@ class Servers(commands.Cog):
             ID = ID.id
         elif ID is None or not self.bot.database_online:
             return None
-        l = await self.get_server([name],criters=["ID="+str(ID)],Type=list)
-        if l == []:
+        l = await self.get_server([name],criters=["ID="+str(ID)],return_type=list)
+        if len(l) == 0:
             return None
         elif l[0][0] == '':
             return self.default_opt[name]
         else:
             return l[0][0]
-        
-    async def get_server(self, columns=[], criters=["ID > 1"], relation="AND", Type=dict):
+
+    async def get_server(self, columns=[], criters=["ID > 1"], relation="AND", return_type=dict):
         """return every options of a server"""
         await self.bot.wait_until_ready()
-        if type(columns)!=list or type(criters)!=list:
+        if not isinstance(columns, list) or not isinstance(criters, list):
             raise ValueError
-        cnx = self.bot.cnx_frm
-        cursor = cnx.cursor(dictionary = (Type==dict))
-        if columns == []:
+        if len(columns) == 0:
             cl = "*"
         else:
             cl = "`"+"`,`".join(columns)+"`"
         relation = " "+relation+" "
-        query = ("SELECT {} FROM `{}` WHERE {}".format(cl,self.table,relation.join(criters)))
-        cursor.execute(query)
+        query = ("SELECT {} FROM `{}` WHERE {}".format(cl, self.table, relation.join(criters)))
         liste = list()
-        for x in cursor:
-            if isinstance(x, dict):
-                for k, v in x.items():
-                    if v == '':
-                        x[k] = self.default_opt[k]
-            liste.append(x)
-        cursor.close()
+        async with self.bot.db_query(query, astuple=(return_type!=dict)) as query_results:
+            for row in query_results:
+                if isinstance(row, dict):
+                    for k, v in row.items():
+                        if v == '':
+                            row[k] = self.default_opt[k]
+                liste.append(row)
         return liste    
 
-    async def modify_server(self, ID: int, values=[()]):
+    async def modify_server(self, guild_id: int, values=[()]):
         """Update a server config in the database"""
-        if type(values)!=list:
+        if not isinstance(values, list):
             raise ValueError
-        v = list()
-        v2 = dict()
-        cnx = self.bot.cnx_frm
-        cursor = cnx.cursor()
-        for e, x in enumerate(values):
-            v.append(f"`{x[0]}` = %(v{e})s")
-            v2[f'v{e}'] = x[1]
-        query = ("UPDATE `{t}` SET {v} WHERE `ID`='{id}'".format(t=self.table, v=",".join(v), id=ID))
-        cursor.execute(query, v2)
-        cnx.commit()
-        cursor.close()
+        set_query = ', '.join('{}=%s'.format(val[0]) for val in values)
+        query = f"UPDATE `{self.table}` SET {set_query} WHERE `ID`={guild_id}"
+        async with self.bot.db_query(query, (val[1] for val in values)):
+            pass
         return True
 
     async def delete_option(self, ID: int, opt):
@@ -250,7 +225,7 @@ class Servers(commands.Cog):
         if opt == 'language':
             await self.bot.get_cog('Languages').change_cache(ID,value)
         elif opt == 'prefix':
-            self.bot.get_cog('Utilities').update_prefix(ID,value)
+            await self.bot.prefix_manager.update_prefix(ID,value)
         return await self.modify_server(ID,values=[(opt,value)])
 
     async def add_server(self, ID: int):
@@ -258,37 +233,33 @@ class Servers(commands.Cog):
         if isinstance(ID, str):
             if not ID.isnumeric():
                 raise ValueError
-        cnx = self.bot.cnx_frm
-        cursor = cnx.cursor()
-        query = ("INSERT INTO `{}` (`ID`) VALUES ('{}')".format(self.table,ID))
-        cursor.execute(query)
-        cnx.commit()
+        query = "INSERT INTO `{}` (`ID`) VALUES ('{}')".format(self.table,ID)
+        async with self.bot.db_query(query):
+            pass
         return True
 
     async def is_server_exist(self, ID: int):
         """Check if a server is already in the db"""
         i = await self.get_option(ID,"ID")
         if i is None:
-            g = self.bot.get_guild(ID)
-            if g is None:
+            guild = self.bot.get_guild(ID)
+            if guild is None:
                 raise Exception("Guild not found")
-            emb = self.bot.get_cog("Embeds").Embed(desc="New server in the database :tada: `{}` ({})".format(g.name,g.id),color=self.log_color).update_timestamp()
+            emb_desc = f"New server in the database :tada: `{guild.name}` ({guild.id})"
+            emb = discord.Embed(description=emb_desc, color=self.log_color, timestamp=self.bot.utcnow())
             await self.bot.get_cog("Embeds").send([emb])
             return await self.add_server(ID)
         return True
 
-    async def delete_server(self, ID: int):
+    async def delete_server(self, guild_id: int):
         """remove a server from the db"""
-        if not isinstance(ID, int):
+        if not isinstance(guild_id, int):
             raise ValueError
-        cnx = self.bot.cnx_frm
-        cursor = cnx.cursor()
-        query = ("DELETE FROM `{}` WHERE `ID`='{}'".format(self.table,ID))
-        cursor.execute(query)
-        cnx.commit()
-        cursor.close()
+        query = f"DELETE FROM `{self.table}` WHERE `ID`='{guild_id}'"
+        async with self.bot.db_query(query):
+            pass
         return True
-                 
+
 
     @commands.group(name='config')
     @commands.guild_only()
@@ -319,7 +290,7 @@ class Servers(commands.Cog):
     @commands.cooldown(1, 2, commands.BucketType.guild)
     async def sconfig_help(self, ctx: MyContext):
         """Get help about this command"""
-        msg = await self.bot._(ctx.guild, "server.config-help", p=(await self.bot.get_prefix(ctx.message))[-1])
+        msg = await self.bot._(ctx.guild, "server.config-help", p=await self.bot.prefix_manager.get_prefix(ctx.guild))
         await ctx.send(msg.format(ctx.guild.owner.name))
 
     @sconfig_main.command(name="del")
@@ -711,10 +682,11 @@ class Servers(commands.Cog):
                 return
             try:
                 await self.modify_server(ctx.guild.id,values=[('prefix',value)])
-            except:
+            except Exception as e:
+                self.bot.log.warning("Error while editing prefix", exc_info=True)
                 await ctx.send(await self.bot._(ctx.guild.id,"server.edit-error.prefix.invalid"))
                 return
-            self.bot.get_cog('Utilities').update_prefix(ctx.guild.id,value)
+            await self.bot.prefix_manager.update_prefix(ctx.guild.id,value)
             msg = await self.bot._(ctx.guild.id, "server.edit-success.prefix", val=value)
             await ctx.send(msg)
             await self.send_embed(ctx.guild, option, value)

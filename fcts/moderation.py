@@ -301,12 +301,9 @@ Slowmode works up to one message every 6h (21600s)
         # save in database that the user is muted
         if not self.bot.database_online:
             return
-        cnx = self.bot.cnx_frm
-        cursor = cnx.cursor()
         query = "INSERT IGNORE INTO `mutes` VALUES (%s, %s, CURRENT_TIMESTAMP)"
-        cursor.execute(query, (member.id, member.guild.id))
-        cnx.commit()
-        cursor.close()
+        async with self.bot.db_query(query, (member.id, member.guild.id)):
+            pass
 
     async def check_mute_context(self, ctx: MyContext, role: discord.Role, user: discord.Member):
         if await self.is_muted(ctx.guild, user, role):
@@ -423,42 +420,35 @@ You can also mute this member for a defined duration, then use the following for
         # remove the muted record in the database
         if not self.bot.database_online:
             return
-        cnx = self.bot.cnx_frm
-        cursor = cnx.cursor()
         query = "DELETE IGNORE FROM mutes WHERE userid=%s AND guildid=%s"
-        cursor.execute(query, (user.id, guild.id))
-        cnx.commit()
-        cursor.close()
+        async with self.bot.db_query(query, (user.id, guild.id)):
+            pass
 
     async def is_muted(self, guild: discord.Guild, user: discord.User, role: Optional[discord.Role]) -> bool:
         """Check if a user is currently muted"""
         if not self.bot.database_online:
-            if role is None: return False
-            if not isinstance(user, discord.Member): return False
+            if role is None:
+                return False
+            if not isinstance(user, discord.Member):
+                return False
             return role in user.roles
-        cnx = self.bot.cnx_frm
-        cursor = cnx.cursor(dictionary=True)
         query = "SELECT COUNT(*) AS count FROM `mutes` WHERE guildid=%s AND userid=%s"
-        cursor.execute(query, (guild.id, user.id))
-        result: int = list(cursor)[0]['count']
-        cursor.close()
+        async with self.bot.db_query(query, (guild.id, user.id)) as query_results:
+            result: int = query_results[0]['count']
         return bool(result)
 
-    async def bdd_muted_list(self, guildID: int, reasons: bool = False) -> Union[List[Dict[int, str]], List[int]]:
+    async def bdd_muted_list(self, guild_id: int, reasons: bool = False) -> Union[List[Dict[int, str]], List[int]]:
         """List muted users for a specific guild
         Set 'reasons' to True if you want the attached reason"""
-        cnx = self.bot.cnx_frm
-        cursor = cnx.cursor(dictionary=True)
         if reasons:
             cases_table = "cases_beta" if self.bot.beta else "cases"
             query = f'SELECT userid, (SELECT reason FROM {cases_table} WHERE {cases_table}.user=userid AND {cases_table}.guild=guildid AND {cases_table}.type="mute" ORDER BY `{cases_table}`.`created_at` DESC LIMIT 1) as reason FROM `mutes` WHERE guildid=%s'
-            cursor.execute(query, (guildID,))
-            result = {row['userid']: row['reason'] for row in cursor}
+            async with self.bot.db_query(query, (guild_id,)) as query_results:
+                result = {row['userid']: row['reason'] for row in query_results}
         else:
             query = 'SELECT userid FROM `mutes` WHERE guildid=%s'
-            cursor.execute(query, (guildID,))
-            result = [row['userid'] for row in cursor]
-        cursor.close()
+            async with self.bot.db_query(query, (guild_id,)) as query_results:
+                result = [row['userid'] for row in query_results]
         return result
 
     @commands.command(name="unmute")

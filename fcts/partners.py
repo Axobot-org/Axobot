@@ -27,70 +27,50 @@ class Partners(commands.Cog):
     async def bdd_get_partner(self, partnerID: int, guildID: int):
         """Return a partner based on its ID"""
         try:
-            cnx = self.bot.cnx_frm
-            cursor = cnx.cursor(dictionary = True)
             query = ("SELECT * FROM `{}` WHERE `ID`={} AND `guild`={}".format(self.table,partnerID,guildID))
-            cursor.execute(query)
-            liste = list()
-            for x in cursor:
-                liste.append(x)
-            cursor.close()
+            async with self.bot.db_query(query) as query_results:
+                liste = list(query_results)
             return liste
-        except Exception as e:
-            await self.bot.get_cog('Errors').on_error(e,None)
+        except Exception as err:
+            await self.bot.get_cog('Errors').on_error(err,None)
     
     async def bdd_get_guild(self, guildID: int):
         """Return every partners of a guild"""
         try:
-            cnx = self.bot.cnx_frm
-            cursor = cnx.cursor(dictionary = True)
             query = ("SELECT * FROM `{}` WHERE `guild`={}".format(self.table,guildID))
-            cursor.execute(query)
-            liste = list()
-            for x in cursor:
-                liste.append(x)
-            cursor.close()
+            async with self.bot.db_query(query) as query_results:
+                liste = list(query_results)
             return liste
-        except Exception as e:
-            await self.bot.get_cog('Errors').on_error(e,None)
+        except Exception as err:
+            await self.bot.get_cog('Errors').on_error(err,None)
     
     async def bdd_get_partnered(self, invites: list):
         """Return every guilds which has this one as partner"""
         try:
             if len(invites) == 0:
                 return list()
-            cnx = self.bot.cnx_frm
-            cursor = cnx.cursor(dictionary = True)
             query = ("SELECT * FROM `{}` WHERE `type`='guild' AND ({})".format(self.table," OR ".join([f"`target`='{x.code}'" for x in invites])))
-            cursor.execute(query)
-            liste = list()
-            for x in cursor:
-                liste.append(x)
-            cursor.close()
+            async with self.bot.db_query(query) as query_results:
+                liste = list(query_results)
             return liste
-        except Exception as e:
-            await self.bot.get_cog('Errors').on_error(e,None)
+        except Exception as err:
+            await self.bot.get_cog('Errors').on_error(err,None)
     
     async def bdd_set_partner(self,guildID:int,partnerID:str,partnerType:str,desc:str):
         """Add a partner into a server"""
         try:
             ID = await self.generate_id()
-            cnx = self.bot.cnx_frm
-            cursor = cnx.cursor(dictionary = True)
             query = "INSERT INTO `{}` (`ID`,`guild`,`target`,`type`,`description`) VALUES (%(i)s,%(g)s,%(ta)s,%(ty)s,%(d)s);".format(self.table)
-            cursor.execute(query, { 'i': ID, 'g': guildID, 'ta': partnerID, 'ty': partnerType, 'd': desc })
-            cnx.commit()
-            cursor.close()
+            async with self.bot.db_query(query, { 'i': ID, 'g': guildID, 'ta': partnerID, 'ty': partnerType, 'd': desc }):
+                pass
             return True
-        except Exception as e:
-            await self.bot.get_cog('Errors').on_error(e,None)
+        except Exception as err:
+            await self.bot.get_cog('Errors').on_error(err,None)
             return False
     
     async def bdd_edit_partner(self,partnerID:int,target:str=None,desc:str=None,msg:int=None):
         """Modify a partner"""
         try:
-            cnx = self.bot.cnx_frm
-            cursor = cnx.cursor(dictionary = True)
             query = ""
             if target is not None:
                 query += ("UPDATE `{table}` SET `target` = \"{target}\" WHERE `ID` = {id};".format(table=self.table,target=target,id=partnerID))
@@ -98,23 +78,19 @@ class Partners(commands.Cog):
                 query += ("UPDATE `{table}` SET `description` = \"{desc}\" WHERE `ID` = {id};".format(table=self.table,desc=desc.replace('"','\"'),id=partnerID))
             if msg is not None:
                 query += ("UPDATE `{table}` SET `messageID` = \"{msg}\" WHERE `ID` = {id};".format(table=self.table,msg=msg,id=partnerID))
-            cursor.execute(query)
-            cnx.commit()
-            cursor.close()
+            async with self.bot.db_query(query):
+                pass
             return True
-        except Exception as e:
-            await self.bot.get_cog('Errors').on_error(e,None)
+        except Exception as err:
+            await self.bot.get_cog('Errors').on_error(err,None)
             return False
     
     async def bdd_del_partner(self,ID:int):
         """Delete a partner from a guild list"""
         try:
-            cnx = self.bot.cnx_frm
-            cursor = cnx.cursor(dictionary = True)
             query = ("DELETE FROM `{}` WHERE `ID` = {}".format(self.table,ID))
-            cursor.execute(query)
-            cnx.commit()
-            cursor.close()
+            async with self.bot.db_query(query):
+                pass
             return True
         except Exception as e:
             await self.bot.get_cog('Errors').on_error(e,None)

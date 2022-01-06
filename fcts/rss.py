@@ -1331,103 +1331,69 @@ class Rss(commands.Cog):
         return mysql.connector.connect(user=self.bot.database_keys['user'],password=self.bot.database_keys['password'],host=self.bot.database_keys['host'],database=self.bot.database_keys['database'])
 
     async def get_flow(self, ID: int):
-        cnx = self.bot.cnx_frm
-        cursor = cnx.cursor(dictionary = True)
         query = ("SELECT * FROM `{}` WHERE `ID`='{}'".format(self.table,ID))
-        cursor.execute(query)
-        liste = list()
-        for x in cursor:
-            liste.append(x)
-        cursor.close()
+        async with self.bot.db_query(query) as query_results:
+            liste = list(query_results)
         return liste
 
     async def get_guild_flows(self, guildID: int):
         """Get every flow of a guild"""
-        cnx = self.bot.cnx_frm
-        cursor = cnx.cursor(dictionary = True)
         query = ("SELECT * FROM `{}` WHERE `guild`='{}'".format(self.table,guildID))
-        cursor.execute(query)
-        liste = list()
-        for x in cursor:
-            liste.append(x)
-        cursor.close()
+        async with self.bot.db_query(query) as query_results:
+            liste = list(query_results)
         return liste
 
     async def add_flow(self, guildID:int, channelID:int, _type:str, link:str):
         """Add a flow in the database"""
-        cnx = self.bot.cnx_frm
-        cursor = cnx.cursor()
         ID = await self.create_id(_type)
         if _type == 'mc':
             form = ''
         else:
             form = await self.bot._(guildID, f"rss.{_type}-default-flow")
         query = "INSERT INTO `{}` (`ID`, `guild`,`channel`,`type`,`link`,`structure`) VALUES (%(i)s,%(g)s,%(c)s,%(t)s,%(l)s,%(f)s)".format(self.table)
-        cursor.execute(query, { 'i': ID, 'g': guildID, 'c': channelID, 't': _type, 'l': link, 'f': form })
-        cnx.commit()
-        cursor.close()
+        async with self.bot.db_query(query, { 'i': ID, 'g': guildID, 'c': channelID, 't': _type, 'l': link, 'f': form }):
+            pass
         return ID
 
     async def remove_flow(self, ID: int):
         """Remove a flow from the database"""
         if not isinstance(ID, int):
             raise ValueError
-        cnx = self.bot.cnx_frm
-        cursor = cnx.cursor()
         query = ("DELETE FROM `{}` WHERE `ID`='{}'".format(self.table,ID))
-        cursor.execute(query)
-        cnx.commit()
-        cursor.close()
+        async with self.bot.db_query(query):
+            pass
         return True
 
     async def get_all_flows(self):
         """Get every flow of the database"""
-        cnx = self.bot.cnx_frm
-        cursor = cnx.cursor(dictionary = True)
         query = ("SELECT * FROM `{}` WHERE `guild` in ({})".format(self.table,','.join(["'{}'".format(x.id) for x in self.bot.guilds])))
-        cursor.execute(query)
-        liste = list()
-        for x in cursor:
-            liste.append(x)
-        cursor.close()
+        async with self.bot.db_query(query) as query_results:
+            liste = list(query_results)
         return liste
-    
+
     async def get_raws_count(self, get_disabled:bool=False):
         """Get the number of rss feeds"""
-        cnx = self.bot.cnx_frm
-        cursor = cnx.cursor()
-        query = "SELECT COUNT(*) FROM `{}`".format(self.table)
+        query = "SELECT COUNT(*) as count FROM `{}`".format(self.table)
         if not get_disabled:
             query += " WHERE `guild` in (" + ','.join(["'{}'".format(x.id) for x in self.bot.guilds]) + ")"
-        cursor.execute(query)
-        t = list(cursor)[0][0]
-        cursor.close()
+        async with self.bot.db_query(query, fetchone=True) as query_results:
+            t = query_results['count']
         return t
 
-    async def update_flow(self, ID: int, values=[(None,None)]):
+    async def update_flow(self, id: int, values=[(None,None)]):
         if self.bot.zombie_mode:
             return
-        cnx = self.bot.cnx_frm
-        cursor = cnx.cursor()
-        v = list()
-        for x in values:
-            if isinstance(x[1],(bool,int)):
-                v.append("""`{x[0]}`={x[1]}""".format(x=x))
-            elif isinstance(x[1],(datetime.datetime,float)) or x[0]=='roles':
-                v.append("""`{x[0]}`=\"{x[1]}\"""".format(x=x))
-            else:
-                v.append("`{}`=\"{}\"".format(x[0],x[1].replace('"','\\"')))
-        query = """UPDATE `{t}` SET {v} WHERE `ID`={id}""".format(t=self.table,v=",".join(v),id=ID)
-        cursor.execute(query)
-        cnx.commit()
-        cursor.close()
+        set_query = ', '.join('{}=%s'.format(val[0]) for val in values)
+        query = """UPDATE `{t}` SET {v} WHERE `ID`={id}""".format(t=self.table, v=set_query, id=id)
+        async with self.bot.db_query(query, (val[1] for val in values)):
+            pass
 
     async def send_rss_msg(self, obj: "rssMessage", channel: discord.TextChannel, roles: typing.List[str], send_stats):
         if channel is not None:
             t = await obj.create_msg(await self.bot._(channel.guild,'_used_locale'))
             mentions = list()
             for item in roles:
-                if item=='':
+                if item == '':
                     continue
                 role = discord.utils.get(channel.guild.roles,id=int(item))
                 if role is not None:

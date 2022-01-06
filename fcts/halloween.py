@@ -217,31 +217,24 @@ __29 variations: __
 `++halloween-bg` replaces the transparency of your image with a Halloween background
 `++dark-halloween-bg` replaces the transparency of your image with a Dark Halloween background""")
 
-    def db_add_points(self, userid: int, points: int):
-        cnx = self.bot.cnx_frm
-        cursor = cnx.cursor(dictionary=True)
+    async def db_add_points(self, userid: int, points: int):
         query = "INSERT INTO `dailies` (`userID`,`points`) VALUES (%(u)s,%(p)s) ON DUPLICATE KEY UPDATE points = points + %(p)s;"
-        cursor.execute(query, {'u': userid, 'p': points})
-        cnx.commit()
-        cursor.close()
+        async with self.bot.db_query(query, {'u': userid, 'p': points}):
+            pass
 
-    def db_get_points(self, userid: int) -> dict:
-        cnx = self.bot.cnx_frm
-        cursor = cnx.cursor(dictionary=True)
+    async def db_get_points(self, userid: int) -> dict:
         query = "SELECT * FROM `dailies` WHERE userid = %(u)s;"
-        cursor.execute(query, {'u': userid})
-        result = list(cursor)
-        cursor.close()
-        return result[0] if len(result) > 0 else None
+        async with self.bot.db_query(query, {'u': userid}) as query_results:
+            return query_results[0] if len(query_results) > 0 else None
 
     @hallow_main.command(name="collect")
     async def hw_collect(self, ctx: MyContext):
         """Get some events points every hour"""
-        last_data = self.db_get_points(ctx.author.id)
+        last_data = await self.db_get_points(ctx.author.id)
         if last_data is None or (datetime.datetime.now() - last_data['last_update']).total_seconds() > 3600:
             points = randint(*self.hourly_reward)
             await self.bot.get_cog("Utilities").add_user_eventPoint(ctx.author.id, points)
-            self.db_add_points(ctx.author.id, points)
+            await self.db_add_points(ctx.author.id, points)
             txt = await self.bot._(ctx.channel, "halloween.daily.got-points", pts=points)
         else:
             txt = await self.bot._(ctx.channel, "halloween.daily.too-quick")

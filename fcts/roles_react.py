@@ -74,56 +74,46 @@ class RolesReact(commands.Cog):
                 if user is None:
                     return
                 await self.give_remove_role(user, role, msg.guild, msg.channel, False, ignore_success=True)
-        except Exception as e:
-            await self.bot.get_cog("Errors").on_error(e)
+        except Exception as err:
+            await self.bot.get_cog("Errors").on_error(err)
 
     async def rr_get_guilds(self) -> set:
         """Get the list of guilds which have roles reactions"""
-        cnx = self.bot.cnx_frm
-        cursor = cnx.cursor(dictionary=True)
         query = "SELECT `guild` FROM `{}`;".format(self.table)
-        cursor.execute(query)
-        self.guilds_which_have_roles = set([x['guild'] for x in cursor])
-        cursor.close()
+        async with self.bot.db_query(query) as query_results:
+            self.guilds_which_have_roles = {[x['guild'] for x in query_results]}
         self.cache_initialized = True
         return self.guilds_which_have_roles
 
     async def rr_add_role(self, guild: int, role: int, emoji: str, desc: str):
         """Add a role reaction in the database"""
-        cnx = self.bot.cnx_frm
         if isinstance(emoji, discord.Emoji):
             emoji = emoji.id
-        cursor = cnx.cursor(dictionary=True)
         query = ("INSERT INTO `{}` (`guild`,`role`,`emoji`,`description`) VALUES (%(g)s,%(r)s,%(e)s,%(d)s);".format(self.table))
-        cursor.execute(query, {'g': guild, 'r': role, 'e': emoji, 'd': desc})
-        cnx.commit()
-        cursor.close()
+        async with self.bot.db_query(query, {'g': guild, 'r': role, 'e': emoji, 'd': desc}):
+            pass
         return True
 
     async def rr_list_role(self, guild: int, emoji: str = None):
         """List role reaction in the database"""
-        cnx = self.bot.cnx_frm
         if isinstance(emoji, discord.Emoji):
             emoji = emoji.id
-        cursor = cnx.cursor(dictionary=True)
-        query = "SELECT * FROM `{}` WHERE guild={} ORDER BY added_at;".format(
-            self.table, guild) if emoji is None else "SELECT * FROM `{}` WHERE guild={} AND emoji='{}' ORDER BY added_at;".format(self.table, guild, emoji)
-        cursor.execute(query)
+        if emoji is None:
+            query = "SELECT * FROM `{}` WHERE guild={} ORDER BY added_at;".format(self.table, guild)
+        else:
+            query = "SELECT * FROM `{}` WHERE guild={} AND emoji='{}' ORDER BY added_at;".format(self.table, guild, emoji)
         liste = list()
-        for x in cursor:
-            if emoji is None or x['emoji'] == str(emoji):
-                liste.append(x)
-        cursor.close()
+        async with self.bot.db_query(query) as query_results:
+            for row in query_results:
+                if emoji is None or row['emoji'] == str(emoji):
+                    liste.append(row)
         return liste
 
-    async def rr_remove_role(self, ID: int):
+    async def rr_remove_role(self, rr_id: int):
         """Remove a role reaction from the database"""
-        cnx = self.bot.cnx_frm
-        cursor = cnx.cursor(dictionary=True)
-        query = ("DELETE FROM `{}` WHERE `ID`={};".format(self.table, ID))
-        cursor.execute(query)
-        cnx.commit()
-        cursor.close()
+        query = ("DELETE FROM `{}` WHERE `ID`={};".format(self.table, rr_id))
+        async with self.bot.db_query(query):
+            pass
         return True
 
     @commands.group(name="roles_react", aliases=['role_react'])

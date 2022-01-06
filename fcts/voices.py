@@ -12,51 +12,47 @@ class VoiceChannels(commands.Cog):
         self.bot = bot
         self.file = "voices"
         self.names = list()
-        self.channels = dict()
+        self.channels: dict[int, list[int]] = dict()
         self.table = 'voices_chats'
-        self.db_get_channels()
-    
+        self.bot.loop.run_until_complete(self.db_get_channels())
+
     @commands.Cog.listener()
     async def on_ready(self):
+        "if the database is still offline when the bot is ready, remove that cog"
         if not self.bot.database_online:
             self.bot.unload_extension("fcts.voices")
 
-    def db_get_channels(self):
+    async def db_get_channels(self):
+        "Refresh the channels cache"
         if not self.bot.database_online:
             return
-        cnx = self.bot.cnx_frm
-        c = cnx.cursor(dictionary = True)
-        t = '' if self.bot.beta else 'NOT '
-        c.execute(f'SELECT * FROM {self.table} WHERE {t}BETA')
-        for row in c:
-            guild = int(row['guild'])
-            ch = int(row['channel'])
-            self.channels[guild] = self.channels.get(guild, list()) + [ch]
-        c.close()
+        beta_condition = '' if self.bot.beta else 'NOT '
+        async with self.bot.db_query(f'SELECT * FROM {self.table} WHERE {beta_condition}BETA') as query_results:
+            for row in query_results:
+                guild = int(row['guild'])
+                channel = int(row['channel'])
+                self.channels[guild] = self.channels.get(guild, list()) + [channel]
 
-    def db_add_channel(self, channel: discord.VoiceChannel):
-        cnx = self.bot.cnx_frm
-        c = cnx.cursor(dictionary = True)
+    async def db_add_channel(self, channel: discord.VoiceChannel):
+        "Add a newly created channel to the database and cache"
         arg = (channel.guild.id, channel.id, self.bot.beta)
-        c.execute(f"INSERT INTO `{self.table}` (`guild`,`channel`,`beta`) VALUES (%s, %s, %s)", arg)
-        cnx.commit()
-        c.close()
+        async with self.bot.db_query(f"INSERT INTO `{self.table}` (`guild`,`channel`,`beta`) VALUES (%s, %s, %s)", arg):
+            pass
         prev = self.channels.get(channel.guild.id, list())
         self.channels[channel.guild.id] = prev + [channel.id]
 
-    def db_delete_channel(self, channel: discord.VoiceChannel):
-        cnx = self.bot.cnx_frm
-        c = cnx.cursor(dictionary = True)
+    async def db_delete_channel(self, channel: discord.VoiceChannel):
+        "Delete a voice channel from the database and cache"
         arg = (channel.guild.id, channel.id)
-        c.execute(f"DELETE FROM {self.table} WHERE guild=%s AND channel=%s", arg)
-        cnx.commit()
-        c.close()
+        async with self.bot.db_query(f"DELETE FROM {self.table} WHERE guild=%s AND channel=%s", arg):
+            pass
         try:
             self.channels[channel.guild.id].remove(channel.id)
         except KeyError:
             return
 
     async def give_roles(self, member: discord.Member, remove=False):
+        "Give roles to a member joining/leaving a voice channel"
         if not self.bot.database_online:
             return
         if not member.guild.me.guild_permissions.manage_roles:
@@ -74,17 +70,17 @@ class VoiceChannels(commands.Cog):
             await member.remove_roles(*roles, reason="Left the voice chat")
         else:
             await member.add_roles(*roles, reason="Joined a voice chat")
-    
+
     @commands.Cog.listener()
     async def on_guild_channel_delete(self, channel: discord.abc.GuildChannel):
         """Deletes a voice channel in the database when deleted in Discord"""
         try:
             if isinstance(channel, discord.VoiceChannel):
-                self.db_delete_channel(channel)
+                await self.db_delete_channel(channel)
             # other cases are not interesting
-        except Exception as e:
-            await self.bot.get_cog("Errors").on_error(e)
-        
+        except Exception as err:
+            await self.bot.get_cog("Errors").on_error(err)
+
 
     @commands.Cog.listener()
     async def on_voice_state_update(self, member: discord.Member, before: discord.VoiceState, after: discord.VoiceState):
@@ -113,8 +109,8 @@ class VoiceChannels(commands.Cog):
                 await self.give_roles(member, remove=True)
             if before.channel is None:
                 await self.give_roles(member)
-        except Exception as e:
-            await self.bot.get_cog("Errors").on_error(e)
+        except Exception as err:
+            await self.bot.get_cog("Errors").on_error(err)
 
     async def create_channel(self, member: discord.Member):
         """Create a new voice channel
@@ -157,13 +153,13 @@ class VoiceChannels(commands.Cog):
         # move user
         await member.move_to(new_channel)
         # add to database
-        self.db_add_channel(new_channel)
+        await self.db_add_channel(new_channel)
 
     async def delete_channel(self, channel: discord.VoiceChannel):
         """Delete an unusued channel if no one is in"""
         if len(channel.members) == 0 and channel.permissions_for(channel.guild.me).manage_channels:
             await channel.delete(reason="Unusued")
-            self.db_delete_channel(channel)
+            await self.db_delete_channel(channel)
 
     async def get_names(self):
         if len(self.names) != 0:
@@ -194,7 +190,7 @@ class VoiceChannels(commands.Cog):
                 temp.append(d_chan)
                 i += 1
         for chan in temp:
-            self.db_delete_channel(chan)
+            await self.db_delete_channel(chan)
         await ctx.send(await self.bot._(ctx.guild.id, "voices.deleted", count=i))
 
 

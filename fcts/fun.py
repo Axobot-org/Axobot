@@ -22,7 +22,8 @@ importlib.reload(emojis)
 importlib.reload(checks)
 importlib.reload(args)
 
-cmds_list = ['count_msg','ragequit','pong','run','nope','blame','party','bigtext','shrug','gg','money','pibkac','osekour','me','kill','cat','happy-birthday','rekt','thanos','nuke','pikachu','pizza','google','loading','piece','roll','afk', 'bubble-wrap','reverse']
+cmds_list = ['count_msg', 'ragequit', 'pong', 'run', 'nope', 'blame', 'party', 'bigtext', 'shrug', 'gg', 'money', 'pibkac', 'osekour', 'me', 'kill',
+             'cat', 'happy-birthday', 'rekt', 'thanos', 'nuke', 'pikachu', 'pizza', 'google', 'loading', 'piece', 'roll', 'afk', 'bubble-wrap', 'reverse']
 
 
 async def can_say(ctx: MyContext):
@@ -32,8 +33,8 @@ async def can_say(ctx: MyContext):
         return await ctx.bot.get_cog("Servers").staff_finder(ctx.author,"say")
 
 async def can_use_cookie(ctx: MyContext) -> bool:
-    allowed_users = await ctx.bot.db_query("SELECT userID FROM frm.users WHERE user_flags & 32 = 32", astuple=True)
-    allowed_users = flatten_list(allowed_users)
+    async with ctx.bot.db_query("SELECT userID FROM frm.users WHERE user_flags & 32 = 32", astuple=True) as query_results:
+        allowed_users = flatten_list(query_results)
     return ctx.author.id in allowed_users
 
 class Fun(commands.Cog):
@@ -688,7 +689,7 @@ You can specify a verification limit by adding a number in argument (up to 1.000
                 if user_config is None or (not user_config['auto_unafk']):
                     return
                 msg = copy.copy(msg)
-                msg.content = (await self.bot.get_prefix(msg))[-1] + 'unafk'
+                msg.content = await self.bot.prefix_manager.get_prefix(ctx.guild) + 'unafk'
                 new_ctx = await self.bot.get_context(msg)
                 await self.bot.invoke(new_ctx)
 
