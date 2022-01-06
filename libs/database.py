@@ -1,5 +1,7 @@
-from typing import Union
+import logging
 from types import GeneratorType
+from typing import Union
+
 from mysql.connector.connection import MySQLConnection, MySQLCursor
 
 
@@ -24,6 +26,9 @@ def create_database_query(cnx_frm: MySQLConnection):
             self.cursor: MySQLCursor = cnx_frm.cursor(
                 dictionary=(not self.astuple)
             )
+
+            query_for_logs = self.query % self.args
+            logging.getLogger("database").debug("%s", query_for_logs)
 
             self.cursor.execute(self.query, self.args)
             if self.query.startswith("SELECT"):
