@@ -131,7 +131,7 @@
             ]
         },
         "cmd-count": "%{nbr} commands\n`%{p}help %{cog}` to get the list",
-        "cmd-not-found": "There is no command named \"{cmd}\"",
+        "cmd-not-found": "There is no command named \"%{cmd}\"",
         "cog-empty-dm": "No command of this category is available in DM!",
         "description": "Description",
         "embed_title": "Available commands for %{u}",
