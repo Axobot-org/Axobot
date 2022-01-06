@@ -132,7 +132,7 @@ class Embeds(commands.Cog):
                 url = url_base + self.logs[url]
         liste = list()
         for embed in embeds:
-            if isinstance(embed, self.Embed):
+            if isinstance(embed, (self.Embed, discord.Embed)):
                 liste.append(embed.to_dict())
             else:
                 liste.append(embed["embed"])
