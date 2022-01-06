@@ -162,7 +162,7 @@ class BlurpleCog(commands.Cog):
         if blurplenesspercentage>95 and str(picture)==str(ctx.author.display_avatar):
             date = datetime.datetime.today()
             if not await ctx.bot.get_cog('Utilities').has_blurple_card(ctx.author) and 6<date.day<20 and date.month==5:
-                pr = await self.bot.get_prefix(ctx.message)
+                pr = await self.bot.prefix_manager.get_prefix(ctx.guild)
                 em = ':tada:'
                 if ctx.guild is not None and ctx.channel.permissions_for(ctx.guild.me).external_emojis:
                     em = '<:blurpletada:575696286905401345>'
