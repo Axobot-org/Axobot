@@ -1,7 +1,9 @@
+import argparse
 import datetime
 import logging
 import sys
 import time
+from logging.handlers import RotatingFileHandler
 from typing import Any, Callable, Coroutine, Optional
 
 import discord
@@ -10,9 +12,9 @@ from discord.ext import commands
 from mysql.connector.connection import MySQLConnection
 from mysql.connector.errors import ProgrammingError
 
+from fcts import cryptage, tokens
 from libs.database import create_database_query
 from libs.prefix_manager import PrefixManager
-
 
 OUTAGE_REASON = {
     'fr': "Un des datacenters de notre hébergeur OVH a pris feu, rendant ,inaccessible le serveur et toutes ses données. Une vieille sauvegarde de la base de donnée sera peut-être utilisée ultérieurement. Plus d'informations sur https://zbot.statuspage.io/",
@@ -85,7 +87,7 @@ class Zbot(commands.bot.AutoShardedBot):
         self.xp_enabled: bool = True # if xp is enabled
         self.rss_enabled: bool = True # if rss is enabled
         self.alerts_enabled: bool = True # if alerts system is enabled
-        self.internal_loop_enabled: bool = False # if internal loop is enabled
+        self.internal_loop_enabled: bool = True # if internal loop is enabled
         self.zws = "​"  # here's a zero width space
         self.others = dict() # other misc credentials
         self.zombie_mode: bool = zombie_mode # if we should listen without sending any message
@@ -132,7 +134,8 @@ class Zbot(commands.bot.AutoShardedBot):
         if len(self.database_keys) > 0:
             if self._cnx[0][0] is not None:
                 self._cnx[0][0].close()
-            self.log.debug('Connection à MySQL (user %s)', self.database_keys['user'])
+            self.log.debug('Connecting to MySQL (user %s, database "%s")',
+                           self.database_keys['user'], self.database_keys['database1'])
             self._cnx[0][0] = mysql.connector.connect(user=self.database_keys['user'],
                 password=self.database_keys['password'],
                 host=self.database_keys['host'],
@@ -173,8 +176,8 @@ class Zbot(commands.bot.AutoShardedBot):
         if len(self.database_keys) > 0:
             if self._cnx[1][0] is not None:
                 self._cnx[1][0].close()
-            self.log.debug('Connection à MySQL (user %s)',
-                           self.database_keys['user'])
+            self.log.debug('Connecting to MySQL (user %s, database "%s")',
+                           self.database_keys['user'], self.database_keys['database2'])
             self._cnx[1][0] = mysql.connector.connect(user=self.database_keys['user'],
                 password=self.database_keys['password'],
                 host=self.database_keys['host'],
@@ -198,8 +201,10 @@ class Zbot(commands.bot.AutoShardedBot):
         if len(self.database_keys) > 0:
             if self._cnx[2][0] is not None:
                 self._cnx[2][0].close()
-            self.log.debug('Connection à MySQL (user %s)', self.database_keys['user'])
-            self._cnx[2][0] = mysql.connector.connect(user=self.database_keys['user'], password=self.database_keys['password'],
+            self.log.debug(
+                'Connecting to MySQL (user %s, database "statsbot")', self.database_keys['user'])
+            self._cnx[2][0] = mysql.connector.connect(user=self.database_keys['user'],
+                                                      password=self.database_keys['password'],
                                                       host=self.database_keys['host'], database='statsbot',
                                                       buffered=True)
             self._cnx[2][1] = round(time.time())
@@ -287,10 +292,10 @@ def setup_bot_logger():
     log = logging.getLogger("runner")
     # on définis un formatteur
     log_format = logging.Formatter("%(asctime)s %(levelname)s: %(message)s", datefmt="[%d/%m/%Y %H:%M]")
-    # ex du format : [08/11/2018 14:46] WARNING Rss fetch_rss_flux l.288 : Cannot get the RSS flux because of the following error: (suivi du traceback)
+    # ex du format : [08/11/2018 14:46] WARNING: Rss fetch_rss_flux l.288 : Cannot get the RSS flux because of the following error: (suivi du traceback)
 
     # log vers un fichier
-    file_handler = logging.FileHandler("debug.log")
+    file_handler = RotatingFileHandler("logs/debug.log", maxBytes=1e6, backupCount=2, delay=True)
     # tous les logs de niveau DEBUG et supérieur sont evoyés dans le fichier
     file_handler.setLevel(logging.DEBUG)
     file_handler.setFormatter(log_format)
@@ -306,12 +311,6 @@ def setup_bot_logger():
     #sentry_handler.setLevel(logging.ERROR)  # on veut voir que les erreurs et au delà, pas en dessous
     #sentry_handler.setFormatter(format)
 
-    # log.debug("message de debug osef")
-    # log.info("message moins osef")
-    # log.warning("y'a un problème")
-    # log.error("y'a un gros problème")
-    # log.critical("y'a un énorme problème")
-
     log.addHandler(file_handler)
     log.addHandler(stream_handler)
     #log.addHandler(sentry_handler)
@@ -323,16 +322,126 @@ def setup_database_logger():
     "Create the logger module for database access"
     log = logging.getLogger("database")
     log_format = logging.Formatter("%(asctime)s %(levelname)s: [SQL] %(message)s", datefmt="[%d/%m/%Y %H:%M]")
-    file_handler = logging.FileHandler("sql-debug.log")
+    file_handler = RotatingFileHandler("logs/sql-debug.log", maxBytes=2e6, backupCount=2, delay=True)
 
     file_handler.setLevel(logging.DEBUG)
     file_handler.setFormatter(log_format)
 
     stream_handler = logging.StreamHandler(sys.stdout)
-    stream_handler.setLevel(logging.DEBUG)
+    stream_handler.setLevel(logging.INFO)
     stream_handler.setFormatter(log_format)
 
     log.addHandler(file_handler)
     log.addHandler(stream_handler)
-    log.setLevel(logging.INFO)
+    log.setLevel(logging.DEBUG)
     return log
+
+def setup_start_parser():
+    "Create a parser for the command-line interface"
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--token', '-t', help="The bot token to use", required=True)
+    parser.add_argument('--no-main-loop', help="Deactivate the bot main loop",
+                        action="store_false", dest="event_loop")
+    parser.add_argument('--no-rss', help="Disable any RSS feature (loop and commands)",
+                        action="store_false", dest="rss_features")
+
+    return parser
+
+def parse_crypted_file(bot: Zbot):
+    "Parse the secret file containing all types of tokens and private things"
+    with open('fcts/requirements', 'r') as file:
+        lines = file.read().split('\n')
+    # remove comments, empty lines and all
+    for line in lines:
+        if line.startswith("//") or line == '':
+            lines.remove(line)
+    while '' in lines:
+        lines.remove('')
+    # database
+    for i, line in enumerate(['user', 'password', 'host', 'database1', 'database2']):
+        bot.database_keys[line] = cryptage.uncrypte(lines[i])
+    # misc APIs
+    bot.others['botsondiscord'] = cryptage.uncrypte(lines[6])
+    bot.others['discordbotsgroup'] = cryptage.uncrypte(lines[7])
+    bot.others['bitly'] = cryptage.uncrypte(lines[8])
+    bot.others['twitter'] = {'consumer_key': cryptage.uncrypte(lines[9]),
+                             'consumer_secret': cryptage.uncrypte(lines[10]),
+                             'access_token_key': cryptage.uncrypte(lines[11]),
+                             'access_token_secret': cryptage.uncrypte(lines[12])}
+    bot.others['discordlist.space'] = cryptage.uncrypte(lines[13])
+    bot.others['discordboats'] = cryptage.uncrypte(lines[14])
+    bot.others['discordextremelist'] = cryptage.uncrypte(lines[15])
+    bot.others['statuspage'] = cryptage.uncrypte(lines[16])
+    bot.others['nasa'] = cryptage.uncrypte(lines[17])
+    bot.others['random_api_token'] = cryptage.uncrypte(lines[18])
+    bot.dbl_token = tokens.get_dbl_token()
+
+def load_sql_connection(bot: Zbot):
+    "Load the connection to the database, preferably in local mode"
+    try:
+        try:
+            cnx = mysql.connector.connect(user=bot.database_keys['user'],
+                                          password=bot.database_keys['password'],
+                                          host="127.0.0.1",
+                                          database=bot.database_keys['database1'])
+        except (mysql.connector.InterfaceError, mysql.connector.ProgrammingError):
+            bot.log.warning("Unable to access local dabatase - attempt via IP")
+            cnx = mysql.connector.connect(user=bot.database_keys['user'],
+                                          password=bot.database_keys['password'],
+                                          host=bot.database_keys['host'],
+                                          database=bot.database_keys['database1'])
+        else:
+            bot.log.info("Database connected locally")
+            bot.database_keys['host'] = '127.0.0.1'
+        cnx.close()
+    except Exception as err:
+        bot.log.error("---- UNABLE TO REACH THE DATABASE ----")
+        bot.log.error(err)
+        bot.database_online = False
+
+def load_cogs(bot: Zbot):
+    "Load the bot modules"
+    initial_extensions = ['fcts.languages',
+                      'fcts.admin',
+                      'fcts.aide',
+                      'fcts.bot_events',
+                      'fcts.bot_stats',
+                      'fcts.cases',
+                      'fcts.embeds',
+                      'fcts.emojis',
+                      'fcts.errors',
+                      'fcts.events',
+                      'fcts.fun',
+                      'fcts.info',
+                      'fcts.library',
+                      'fcts.minecraft',
+                      'fcts.moderation',
+                      'fcts.morpions',
+                      'fcts.partners',
+                      'fcts.perms',
+                      'fcts.reloads',
+                      'fcts.roles_react',
+                      'fcts.rss',
+                      'fcts.s_backups',
+                      'fcts.servers',
+                      'fcts.timers',
+                      'fcts.timeutils',
+                    #   'fcts.translations',
+                      'fcts.users',
+                      'fcts.utilities',
+                      'fcts.voices',
+                      'fcts.welcomer',
+                      'fcts.xp'
+    ]
+
+    # Here we load our extensions(cogs) listed above in [initial_extensions]
+    count = 0
+    for extension in initial_extensions:
+        try:
+            bot.load_extension(extension)
+        except discord.DiscordException:
+            bot.log.critical('Failed to load extension %s', extension, exc_info=True)
+            count += 1
+        if count  > 0:
+            bot.log.critical("%s modules not loaded\nEnd of program", count)
+            sys.exit()
