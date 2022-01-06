@@ -1,18 +1,21 @@
-import discord
-import datetime
 import asyncio
-import time
-import aiohttp
+import datetime
 import json
+import marshal
 import random
+import re
 import shutil
+import time
+
+import aiohttp
+import discord
 import mysql
 import psutil
-import re
-import marshal
 from discord.ext import commands, tasks
-from fcts.checks import is_fun_enabled
 from utils import Zbot
+
+from fcts.checks import is_fun_enabled
+
 
 class Events(commands.Cog):
     """Cog for the management of major events that do not belong elsewhere. Like when a new server invites the bot."""
@@ -50,6 +53,8 @@ class Events(commands.Cog):
             'role':60,
             'guild':75}
         self.statuspage_header = {"Content-Type": "application/json", "Authorization": "OAuth " + self.bot.others["statuspage"]}
+        if self.bot.internal_loop_enabled:
+            self.loop.start() # pylint: disable=no-member
 
 
     def cog_unload(self):
@@ -464,36 +469,38 @@ class Events(commands.Cog):
 
     @tasks.loop(seconds=1.0)
     async def loop(self):
+        if not self.bot.internal_loop_enabled:
+            return
         try:
-            d = datetime.datetime.now()
+            now = datetime.datetime.now()
             # Timed tasks - every 20s
-            if d.second%20 == 0 and self.bot.database_online:
+            if now.second%20 == 0 and self.bot.database_online:
                 await self.check_tasks()
             # Latency usage - every 30s
-            if d.second%30 == 0:
-                await self.status_loop(d)
+            if now.second%30 == 0:
+                await self.status_loop(now)
             # Clear old rank cards - every 20min
-            elif d.minute%20 == 0 and self.bot.database_online:
+            elif now.minute%20 == 0 and self.bot.database_online:
                 await self.bot.get_cog('Xp').clear_cards()
             # Partners reload - every 7h (start from 1am)
-            elif d.hour%7 == 1 and d.hour != self.partner_last_check.hour and self.bot.database_online:
+            elif now.hour%7 == 1 and now.hour != self.partner_last_check.hour and self.bot.database_online:
                 await self.partners_loop()
             # Bots lists updates - every day
-            elif d.hour == 0 and d.day != self.dbl_last_sending.day:
+            elif now.hour == 0 and now.day != self.dbl_last_sending.day:
                 await self.dbl_send_data()
             # Translation backup - every 12h (start from 1am)
-            elif d.hour%12 == 1 and (d.hour != self.last_tr_backup.hour or d.day != self.last_tr_backup.day):
+            elif now.hour%12 == 1 and (now.hour != self.last_tr_backup.hour or now.day != self.last_tr_backup.day):
                 await self.translations_backup()
             # Check current event - every 12h (start from 0:02 am)
-            elif int(d.hour)%12 == 0 and int(d.minute)%2 == 0 and (d.hour != self.last_eventDay_check.hour or d.day != self.last_eventDay_check.day):
+            elif int(now.hour)%12 == 0 and int(now.minute)%2 == 0 and (now.hour != self.last_eventDay_check.hour or now.day != self.last_eventDay_check.day):
                 await self.botEventLoop()
             # Send stats logs - every 1h (start from 0:05 am)
-            elif d.minute > 5 and (d.day != self.statslogs_last_push.day or d.hour != self.statslogs_last_push.hour) and self.bot.database_online:
+            elif now.minute > 5 and (now.day != self.statslogs_last_push.day or now.hour != self.statslogs_last_push.hour) and self.bot.database_online:
                 await self.send_sql_statslogs()
             # Refresh needed membercounter channels - every 1min
-            elif abs((self.last_membercounter - d).total_seconds()) > 60 and self.bot.database_online:
+            elif abs((self.last_membercounter - now).total_seconds()) > 60 and self.bot.database_online:
                 await self.bot.get_cog('Servers').update_everyMembercounter()
-                self.last_membercounter = d
+                self.last_membercounter = now
         except Exception as e:
             await self.bot.get_cog('Errors').on_error(e,None)
             self.loop_errors[0] += 1
@@ -701,8 +708,4 @@ class Events(commands.Cog):
 
 def setup(bot):
     bot.add_cog(Events(bot))
-    if bot.internal_loop_enabled:
-        try:
-            bot.get_cog("Events").loop.start()
-        except RuntimeError:
-            pass
+
