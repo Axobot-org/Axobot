@@ -13,6 +13,10 @@
             "users-info": "things 'bout cats/people"
         },
         "check-desc": {
+            "bot_can_embed": [
+                "Me has the perm to send cool msg",
+                "You must allow me 2 send nicer msg (embeds)"
+            ],
             "bot_has_permissions": [
                 "The bot have enough perms",
                 "The bot donot've sufficient perms"

@@ -13,6 +13,10 @@
             "users-info": "Infos sur les utilisateurs"
         },
         "check-desc": {
+            "bot_can_embed": [
+                "Le bot possède la permission d'envoyer des contenus riches (embeds)",
+                "Vous devez autoriser le bot à envoyer des contenus riches (embeds)"
+            ],
             "bot_has_permissions": [
                 "Le bot possède les permissions suffisantes",
                 "Le bot ne possède pas les permissions suffisantes"

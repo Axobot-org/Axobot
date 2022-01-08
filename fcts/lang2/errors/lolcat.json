@@ -3,6 +3,7 @@
         "DM": "Dat command isn't enabled in PM",
         "badarguments": "W0ops, unabled 2 convrt teh `%{p}` parameterz to \"%{t}\" tipe :confused:",
         "badarguments-2": "`%{p}` iznt a true %{t} option",
+        "cannotembed": "Oops, I need the perm to send rich msg (embeds) for dat command!!",
         "channotfound": "Super chat room %{c} don't want 2 be found",
         "cooldown": "Yu are on cold-own for dis comandZ :confused: Plize wait %{d} moRe secs...",
         "disabled": "Da %{c} cmd is dizabled :confused:",

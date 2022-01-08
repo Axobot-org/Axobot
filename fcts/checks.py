@@ -83,6 +83,17 @@ async def has_embed_links(ctx: MyContext) -> bool:
     return ctx.channel.permissions_for(ctx.author).embed_links or await ctx.bot.get_cog('Admin').check_if_god(ctx)
 
 
+class CannotSendEmbed(commands.CommandError):
+    "Raised when the bot needs the embed links permission to work"
+    def __init__(self):
+        super().__init__("The bot must have the 'embed links' permission")
+
+async def bot_can_embed(ctx: MyContext) -> bool:
+    "Check if the bot can send embeds"
+    if ctx.bot_permissions.embed_links:
+        return True
+    raise CannotSendEmbed()
+
 async def verify_role_exists(ctx: MyContext) -> bool:
     """Check if the verify role exists"""
     if ctx.guild is None:
