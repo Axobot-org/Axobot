@@ -104,10 +104,10 @@ class Cases(commands.Cog):
     async def get_nber(self, user_id:int, guild_id:int):
         """Get the number of users infractions"""
         try:
-            query = ("SELECT COUNT(*) FROM `{}` WHERE `user`={} AND `guild`={} AND `type`!='unban'".format(self.table, user_id, guild_id))
-            async with self.bot.db_query(query) as query_results:
+            query = ("SELECT COUNT(*) as count FROM `{}` WHERE `user`={} AND `guild`={} AND `type`!='unban'".format(self.table, user_id, guild_id))
+            async with self.bot.db_query(query, fetchone=True) as query_results:
                 if len(query_results) == 1:
-                    return query_results[0][0]
+                    return query_results['count']
             return 0
         except Exception as err:
             await self.bot.get_cog('Errors').on_error(err,None)
