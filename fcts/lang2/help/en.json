@@ -13,6 +13,10 @@
             "users-info": "Users information"
         },
         "check-desc": {
+            "bot_can_embed": [
+                "Bot has the permission to send embeds",
+                "You must allow the bot to send embeds"
+            ],
             "bot_has_permissions": [
                 "The bot has sufficient permissions",
                 "The bot does not have sufficient permissions"

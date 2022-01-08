@@ -3,6 +3,7 @@
         "DM": "Cette commande est indisponible en Messages Privés",
         "badarguments": "Oups, impossible de convertir le paramètre `%{p}` en type \"%{t}\" :confused:",
         "badarguments-2": "`%{p}` n'est pas de type %{t}",
+        "cannotembed": "Oups, il me manqye la permission d'envoyer des contenus riches (embeds) pour exécuter cette commande !",
         "channotfound": "Le salon %{c} est introuvable",
         "cooldown": "Vous êtes en cooldown pour cette commande. Veuillez attendre encore %{d} secondes...",
         "disabled": "La commande %{c} est désactivée",

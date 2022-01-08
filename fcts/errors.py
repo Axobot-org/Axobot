@@ -5,6 +5,7 @@ import random
 import re
 from discord.ext import commands
 from utils import Zbot, MyContext
+from fcts import checks
 
 
 class Errors(commands.Cog):
@@ -152,13 +153,16 @@ class Errors(commands.Cog):
         elif isinstance(error,commands.errors.NoPrivateMessage):
             await ctx.send(await self.bot._(ctx.channel,'errors.DM'))
             return
+        elif isinstance(error, checks.CannotSendEmbed):
+            await ctx.send(await self.bot._(ctx.channel,'errors.cannotembed'))
+            return
         else:
             try:
                 await ctx.send(await self.bot._(ctx.channel,'errors.unknown'))
             except Exception as newerror:
                 self.bot.log.info("[on_cmd_error] Can't send error on channel {}: {}".format(ctx.channel.id,newerror))
         # All other Errors not returned come here... And we can just print the default TraceBack.
-        self.bot.log.warning('Ignoring exception in command {}:'.format(ctx.message.content))    
+        self.bot.log.warning('Ignoring exception in command {}:'.format(ctx.message.content))
         await self.on_error(error,ctx)
 
     @commands.Cog.listener()
