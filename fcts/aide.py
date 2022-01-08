@@ -172,7 +172,7 @@ If the bot can't send the new command format, it will try to send the old one.""
                 embed.set_footer(text=ft.format(prefix))
                 for page in pages:
                     if len(page) == 1:
-                        title = page[0]
+                        embed.title = page[0]
                         continue
                     embed.add_field(name=page[0], value=page[1], inline=False)
                 await destination.send(embed=embed)
