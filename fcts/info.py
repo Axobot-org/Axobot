@@ -1,23 +1,26 @@
-import datetime
-from utils import Zbot, MyContext
-from libs import bitly_api
-from fcts import reloads, args, checks
-from docs import conf
-import discord
-import sys
-import psutil
-import os
-import aiohttp
-import importlib
-import time
 import asyncio
-import typing
-import re
 import copy
-import requests
-from discord.ext import commands
+import datetime
+import importlib
+import os
+import re
+import sys
+import time
+import typing
 from platform import system as system_name  # Returns the system/OS name
 from subprocess import call as system_call  # Execute a shell command
+
+import aiohttp
+import discord
+import psutil
+import requests
+from discord.ext import commands
+from discord.ext.commands.converter import run_converters
+from docs import conf
+from libs import bitly_api
+from utils import MyContext, Zbot
+
+from fcts import args, checks, reloads
 
 default_color = discord.Color(0x50e3c2)
 
@@ -50,7 +53,7 @@ class Info(commands.Cog):
         self.TimeUtils = self.bot.get_cog("TimeUtils")
         self.codelines = await self.count_lines_code()
         self.emoji_table = 'emojis_beta' if self.bot.beta else 'emojis'
-    
+
     async def count_lines_code(self):
         """Count the number of lines for the whole project"""
         count = 0
@@ -104,69 +107,69 @@ class Info(commands.Cog):
         pid = os.getpid()
         py = psutil.Process(pid)
         latency = round(self.bot.latency*1000, 3)
-        try:
-            async with ctx.channel.typing():
-                # RAM/CPU
-                ram_cpu = [round(py.memory_info()[0]/2.**30,3), py.cpu_percent(interval=1)]
-                # Guilds count
-                ignored_guilds = list()
-                if self.bot.database_online:
-                    ignored_guilds = [int(x) for x in self.bot.get_cog('Utilities').config['banned_guilds'].split(";") if len(x) > 0]
-                ignored_guilds += self.bot.get_cog('Reloads').ignored_guilds
-                len_servers = await self.get_guilds_count(ignored_guilds)
-                # Languages
-                langs_list: list = await self.bot.get_cog('Servers').get_languages(ignored_guilds)
-                langs_list.sort(reverse=True, key=lambda x: x[1])
-                lang_total = sum([x[1] for x in langs_list])
-                langs_list = ' | '.join(["{}: {}%".format(x[0],round(x[1]/lang_total*100)) for x in langs_list if x[1] > 0])
-                del lang_total
-                # Users/bots
-                try:
-                    users,bots = self.get_users_nber(ignored_guilds)
-                except Exception as e:
-                    users = bots = 'unknown'
-                # Total XP
-                if self.bot.database_online:
-                    total_xp = await self.bot.get_cog('Xp').bdd_total_xp()
-                else:
-                    total_xp = ""
-                # Commands within 24h
-                cmds_24h = await self.bot.get_cog("BotStats").get_stats("wsevent.CMD_USE", 60*24)
-                # Generating message
-                d = ""
-                for key, var in [
-                    ('bot_version', self.bot_version),
-                    ('servers_count', len_servers),
-                    ('users_count', (users, bots)),
-                    ('codes_lines', self.codelines),
-                    ('languages', langs_list),
-                    ('python_version', version),
-                    ('lib_version', discord.__version__),
-                    ('ram_usage', ram_cpu[0]),
-                    ('cpu_usage', ram_cpu[1]),
-                    ('api_ping', latency),
-                    ('cmds_24h', cmds_24h),
-                    ('total_xp', total_xp)]:
-                    str_args = {f'v{i}': var[i] for i in range(len(var))} if isinstance(var, (tuple, list)) else {'v': var}
-                    d += await self.bot._(ctx.channel, "info.stats."+key, **str_args) + "\n"
-            if ctx.can_send_embed: # if we can use embed
-                embed = ctx.bot.get_cog('Embeds').Embed(title=await self.bot._(ctx.channel,"info.stats.title"), color=ctx.bot.get_cog('Help').help_color, time=ctx.message.created_at,desc=d,thumbnail=self.bot.user.display_avatar.with_static_format("png"))
-                await embed.create_footer(ctx)
-                await ctx.send(embed=embed.discord_embed())
+        async with ctx.channel.typing():
+            # RAM/CPU
+            ram_cpu = [round(py.memory_info()[0]/2.**30,3), py.cpu_percent(interval=1)]
+            # Guilds count
+            ignored_guilds = list()
+            if self.bot.database_online:
+                ignored_guilds = [int(x) for x in self.bot.get_cog('Utilities').config['banned_guilds'].split(";") if len(x) > 0]
+            ignored_guilds += self.bot.get_cog('Reloads').ignored_guilds
+            len_servers = await self.get_guilds_count(ignored_guilds)
+            # Languages
+            langs_list: list = await self.bot.get_cog('Servers').get_languages(ignored_guilds)
+            langs_list.sort(reverse=True, key=lambda x: x[1])
+            lang_total = sum([x[1] for x in langs_list])
+            langs_list = ' | '.join(["{}: {}%".format(x[0],round(x[1]/lang_total*100)) for x in langs_list if x[1] > 0])
+            del lang_total
+            # Users/bots
+            try:
+                users,bots = self.get_users_nber(ignored_guilds)
+            except Exception as e:
+                users = bots = 'unknown'
+            # Total XP
+            if self.bot.database_online:
+                total_xp = await self.bot.get_cog('Xp').bdd_total_xp()
             else:
-                await ctx.send(d)
-        except Exception as e:
-            await ctx.bot.get_cog('Errors').on_command_error(ctx,e)
+                total_xp = ""
+            # Commands within 24h
+            cmds_24h = await self.bot.get_cog("BotStats").get_stats("wsevent.CMD_USE", 60*24)
+            # Generating message
+            d = ""
+            for key, var in [
+                ('bot_version', self.bot_version),
+                ('servers_count', len_servers),
+                ('users_count', (users, bots)),
+                ('codes_lines', self.codelines),
+                ('languages', langs_list),
+                ('python_version', version),
+                ('lib_version', discord.__version__),
+                ('ram_usage', ram_cpu[0]),
+                ('cpu_usage', ram_cpu[1]),
+                ('api_ping', latency),
+                ('cmds_24h', cmds_24h),
+                ('total_xp', total_xp)]:
+                str_args = {f'v{i}': var[i] for i in range(len(var))} if isinstance(var, (tuple, list)) else {'v': var}
+                d += await self.bot._(ctx.channel, "info.stats."+key, **str_args) + "\n"
+        if ctx.can_send_embed: # if we can use embed
+            title = await self.bot._(ctx.channel,"info.stats.title")
+            color = ctx.bot.get_cog('Help').help_color
+            embed = discord.Embed(title=title, color=color, timestamp=ctx.message.created_at, description=d)
+            embed.set_thumbnail(url=self.bot.user.display_avatar.with_static_format("png"))
+            embed.set_footer(text=ctx.author, icon_url=ctx.author.display_avatar)
+            await ctx.send(embed=embed)
+        else:
+            await ctx.send(d)
 
     def get_users_nber(self, ignored_guilds: list):
         members = [x.members for x in self.bot.guilds if x.id not in ignored_guilds]
         members = list(set([x for x in members for x in x])) # filter users
         return len(members),len([x for x in members if x.bot])
-    
+
     @commands.command(name="botinvite", aliases=["botinv"])
     async def botinvite(self, ctx:MyContext):
         """Get a link to invite me
-        
+
         ..Doc infos.html#bot-invite"""
         raw_oauth = "<" + discord.utils.oauth_url(self.bot.user.id) + ">"
         try:
@@ -179,14 +182,14 @@ class Info(commands.Cog):
             else:
                 url = raw_oauth
         await ctx.send(await self.bot._(ctx.channel, "info.botinvite", url=url))
-    
+
     @commands.command(name="pig", hidden=True)
     async def pig(self, ctx: MyContext):
         """Get bot latency
         You can also use this command to ping any other server"""
-        m = await ctx.send("Pig...")
-        t = (m.created_at - ctx.message.created_at).total_seconds()
-        await m.edit(content=":pig:  Groink!\nBot ping: {}ms\nDiscord ping: {}ms".format(round(t*1000),round(self.bot.latency*1000)))
+        msg = await ctx.send("Pig...")
+        delta = (msg.created_at - ctx.message.created_at).total_seconds()
+        await msg.edit(content=f":pig:  Groink!\nBot ping: {delta*1000:.0f}ms\nDiscord ping: {self.bot.latency*1000:.0f}ms")
 
     @commands.command(name="ping",aliases=['rep'])
     async def rep(self, ctx: MyContext, ip=None):
@@ -196,7 +199,7 @@ class Info(commands.Cog):
         ..Example ping
 
         ..Example ping google.fr
-        
+
         ..Doc infos.html#ping"""
         if ip is None:
             m = await ctx.send("Ping...")
@@ -235,14 +238,20 @@ class Info(commands.Cog):
     @commands.command(name="docs", aliases=['doc','documentation'])
     async def display_doc(self, ctx: MyContext):
         """Get the documentation url"""
-        text = str(self.bot.get_cog('Emojis').customEmojis['readthedocs']) + str(await self.bot._(ctx.channel,"info.docs")) + " https://zbot.rtfd.io"
+        text = self.bot.get_cog('Emojis').customEmojis['readthedocs'] + await self.bot._(ctx.channel,"info.docs") + \
+            " https://zbot.rtfd.io"
         if self.bot.beta:
             text += '/en/develop'
         await ctx.send(text)
 
-    @commands.command(name='info',aliases=['infos'])
+    async def display_critical(self, ctx: MyContext):
+        return ctx.author.guild_permissions.manage_guild or await self.bot.get_cog('Admin').check_if_god(ctx)
+
+    @commands.group(name='info')
     @commands.guild_only()
-    async def infos(self, ctx: MyContext, Type: typing.Optional[args.infoType]=None, *, name: str=None):
+    @commands.check(checks.bot_can_embed)
+    # async def info_main(self, ctx: MyContext, Type: typing.Optional[args.infoType]=None, *, name: str=None):
+    async def info_main(self, ctx: MyContext):
         """Find informations about someone/something
 Available types: member, role, user, emoji, channel, server, invite, category
 
@@ -254,142 +263,122 @@ Available types: member, role, user, emoji, channel, server, invite, category
 
 ..Example info server
 
-.. Doc infos.html#info"""
-        if Type is not None and name is None and Type not in {"guild", "server"}:
-            raise commands.MissingRequiredArgument(ctx.command.clean_params['name'])
-        if not ctx.can_send_embed:
-            return await ctx.send(await self.bot._(ctx.guild.id,"fun.no-embed-perm"))
-        try:
-            item = None
-            lang = await self.bot._(ctx.guild.id,"_used_locale")
-            find = self.bot.get_cog('Utilities').find_everything
-            if Type in ["guild","server"]:
-                if name is None or not await self.bot.get_cog('Admin').check_if_admin(ctx):
-                    item = ctx.guild
-                    #return await self.guild_info(ctx,ctx.guild,lang)
-            if item is None:
-                if name is None: # include Type is None bc of line 141
-                    item = ctx.author
-                else:
-                    try:
-                        item = await find(ctx,name,Type)
-                    except:
-                        await ctx.send(await self.bot._(ctx.guild.id,"moderation.cant-find-user", user=name))
-                        return
-            critical = ctx.author.guild_permissions.manage_guild or await self.bot.get_cog('Admin').check_if_god(ctx)
-            #-----
-            if item is None:
-                msg = await self.bot._(ctx.guild.id, "info.not-found", N=name[:1900])
-                await ctx.send(msg)
-            elif isinstance(item, discord.Member):
-                await self.member_infos(ctx,item,lang,critical)
-            elif isinstance(item, discord.Role):
-                await self.role_infos(ctx,item,lang)
-            elif isinstance(item, discord.User):
-                await self.user_infos(ctx,item,lang)
-            elif isinstance(item, discord.Emoji):
-                await self.emoji_infos(ctx,item,lang)
-            elif isinstance(item, discord.TextChannel):
-                await self.textChannel_infos(ctx,item,lang)
-            elif isinstance(item, discord.VoiceChannel):
-                await self.voiceChannel_info(ctx,item,lang)
-            elif isinstance(item, discord.Invite):
-                await self.invite_info(ctx,item,lang)
-            elif isinstance(item, discord.CategoryChannel):
-                await self.category_info(ctx,item,lang)
-            elif isinstance(item, discord.Guild):
-                await self.guild_info(ctx,item,lang,critical)
-            elif isinstance(item,discord.user.ClientUser):
-                await self.member_infos(ctx,ctx.guild.me,lang,critical)
-            elif isinstance(item,args.snowflake().Snowflake):
-                await self.snowflake_infos(ctx,item,lang)
-            else:
-                await ctx.send(str(type(item))+" / "+str(item))
-        except Exception as e:
-            await self.bot.get_cog("Errors").on_error(e,ctx)
-            await ctx.send(await self.bot._(ctx.channel,'errors.unknown'))
+..Doc infos.html#info"""
+        if not ctx.invoked_subcommand and ctx.subcommand_passed:
+            # try to convert ourselves because we are obviously a smart bot
+            arg = ctx.message.content.replace(ctx.prefix+ctx.invoked_with, "").lstrip()
+            # force the conversion order
+            order = ('member', 'role', 'emoji', 'text-channel', 'voice-channel', 'category', 'user', 'invite', 'id')
+            commands_list: list[commands.Command] = sorted(
+                ctx.command.commands, key=lambda x: order.index(x.name) if x.name in order else 100)
 
-    async def member_infos(self, ctx: MyContext, item: discord.Member, lang: str, critical_info=False):
+            for cmd in commands_list:
+                # if no conversion needed, that's probably not what we are looking for
+                if not cmd.clean_params:
+                    continue
+                # get the needed parameter
+                param_name = list(cmd.clean_params.keys())[0]
+                param = cmd.clean_params[param_name]
+                # convert it
+                try:
+                    converted_value = await run_converters(ctx, param.annotation, arg, param)
+                except commands.BadArgument:
+                    # conversion failed, that's not the right subcommand
+                    continue
+                else:
+                    if converted_value is not None:
+                        # all is right, execute and return
+                        await cmd(ctx, converted_value)
+                        return
+            # we failed
+            await ctx.send(await self.bot._(ctx.guild.id, "info.not-found", N=arg[:1900]))
+
+    @info_main.command(name="member")
+    async def member_infos(self, ctx: MyContext, member: discord.Member):
+        lang = await self.bot._(ctx.guild.id,"_used_locale")
+        critical_info = await self.display_critical(ctx)
         since = await self.bot._(ctx.guild.id,"misc.since")
-        embed = discord.Embed(colour=item.color, timestamp=ctx.message.created_at)
-        embed.set_thumbnail(url=item.display_avatar.with_static_format("png"))
-        embed.set_author(name=str(item), icon_url=str(item.display_avatar.with_format("png")))
+        embed = discord.Embed(colour=member.color, timestamp=ctx.message.created_at)
+        embed.set_thumbnail(url=member.display_avatar.with_static_format("png"))
+        embed.set_author(name=str(member), icon_url=str(member.display_avatar.with_format("png")))
         embed.set_footer(text='Requested by {}'.format(ctx.author.name), icon_url=str(ctx.author.display_avatar.with_format("png")))
         # Name
-        embed.add_field(name=str(await self.bot._(ctx.guild.id,"misc.name")).capitalize(), value=item.name,inline=True)
+        embed.add_field(name=str(await self.bot._(ctx.guild.id,"misc.name")).capitalize(), value=member.name,inline=True)
         # Nickname
-        embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.member-0"), value=item.nick if item.nick else str(await self.bot._(ctx.channel,"misc.none")).capitalize(),inline=True)
+        embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.member-0"), value=member.nick if member.nick else str(await self.bot._(ctx.channel,"misc.none")).capitalize(),inline=True)
         # ID
-        embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.role-0"), value=str(item.id))
+        embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.role-0"), value=str(member.id))
         # Roles
         list_role = list()
-        for role in item.roles:
+        for role in member.roles:
             if str(role)!='@everyone':
                 list_role.append(role.mention)
         # Created at
         now = ctx.bot.utcnow()
-        delta = abs(item.created_at - now)
-        created_date = await self.TimeUtils.date(item.created_at, lang=lang, year=True)
+        delta = abs(member.created_at - now)
+        created_date = await self.TimeUtils.date(member.created_at, lang=lang, year=True)
         created_since = await self.TimeUtils.time_delta(delta.total_seconds(), lang=lang, year=True, precision=0, hour=delta.total_seconds() < 86400)
-        if item.created_at.day == now.day and item.created_at.month == now.month and item.created_at.year != now.year:
+        if member.created_at.day == now.day and member.created_at.month == now.month and member.created_at.year != now.year:
             created_date = "🎂 " + created_date
         embed.add_field(name=await self.bot._(ctx.guild.id, "info.info.member-1"), value = "{} ({} {})".format(created_date, since, created_since), inline=False)
         # Joined at
-        if item.joined_at is not None:
-            delta = abs(item.joined_at - now)
-            join_date = await self.TimeUtils.date(item.joined_at, lang=lang, year=True)
+        if member.joined_at is not None:
+            delta = abs(member.joined_at - now)
+            join_date = await self.TimeUtils.date(member.joined_at, lang=lang, year=True)
             since_date = await self.TimeUtils.time_delta(delta.total_seconds(), lang=lang, year=True, precision=0, hour=delta.total_seconds() < 86400)
             embed.add_field(name=await self.bot._(ctx.guild.id, "info.info.member-2"), value = "{} ({} {})".format(join_date, since, since_date), inline=False)
         # Join position
         if sum([1 for x in ctx.guild.members if not x.joined_at]) > 0 and ctx.guild.large:
-            await self.bot.request_offline_members(ctx.guild)
-        position = str(sorted(ctx.guild.members, key=lambda m: m.joined_at).index(item) + 1) + "/" + str(len(ctx.guild.members))
-        embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.member-3"), value = position,inline=True)
+            await ctx.guild.chunk()
+        position = str(sorted(ctx.guild.members, key=lambda m: m.joined_at).index(member) + 1) + "/" + str(len(ctx.guild.members))
+        embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.member-3"), value=position, inline=True)
         # Status
-        embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.member-4"), value = (await self.bot._(ctx.guild.id,f"misc.{item.status}")).capitalize(),inline=True)
+        status_value = (await self.bot._(ctx.guild.id,f"misc.{member.status}")).capitalize()
+        embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.member-4"), value=status_value, inline=True)
         # Activity
-        if item.activity.type == discord.ActivityType.custom and item.activity.emoji is None and item.activity.name is None:
+        if member.activity is not None and (member.activity.type == discord.ActivityType.custom and
+                member.activity.emoji is None and member.activity.name is None):
             # that's just a bug from discord apparently
-            item.activity = None
-        if item.activity is None:
-            m_activity = str(await self.bot._(ctx.guild.id,"misc.activity.nothing")).capitalize()
-        elif item.activity.type==discord.ActivityType.playing:
-            m_activity = str(await self.bot._(ctx.guild.id,"misc.activity.play")).capitalize() + " " + item.activity.name
-        elif item.activity.type==discord.ActivityType.streaming:
-            m_activity = str(await self.bot._(ctx.guild.id,"misc.activity.stream")).capitalize() + " (" + item.activity.name + ")"
-        elif item.activity.type==discord.ActivityType.listening:
-            m_activity = str(await self.bot._(ctx.guild.id,"misc.activity.listen")).capitalize() + " " + item.activity.name
-        elif item.activity.type==discord.ActivityType.watching:
-            m_activity = str(await self.bot._(ctx.guild.id,"misc.activity.watch")).capitalize() +" " + item.activity.name
-        elif item.activity.type==discord.ActivityType.custom:
-            emoji = str(item.activity.emoji if item.activity.emoji else '')
-            m_activity = emoji + " " + (item.activity.name if item.activity.name else '')
+            member.activity = None
+        if member.activity is None:
+            m_activity = str(await self.bot._(ctx.guild.id, "misc.activity.nothing")).capitalize()
+        elif member.activity.type == discord.ActivityType.playing:
+            m_activity = str(await self.bot._(ctx.guild.id, "misc.activity.play")).capitalize() + " " + member.activity.name
+        elif member.activity.type == discord.ActivityType.streaming:
+            m_activity = str(await self.bot._(ctx.guild.id, "misc.activity.stream")).capitalize() + f" ({member.activity.name})"
+        elif member.activity.type == discord.ActivityType.listening:
+            m_activity = str(await self.bot._(ctx.guild.id, "misc.activity.listen")).capitalize() + " " + member.activity.name
+        elif member.activity.type == discord.ActivityType.watching:
+            m_activity = str(await self.bot._(ctx.guild.id, "misc.activity.watch")).capitalize() +" " + member.activity.name
+        elif member.activity.type == discord.ActivityType.custom:
+            emoji = str(member.activity.emoji if member.activity.emoji else '')
+            m_activity = emoji + " " + (member.activity.name if member.activity.name else '')
             m_activity = m_activity.strip()
         else:
             m_activity="Error"
-        if item.activity is None or item.activity.type != 4:
+        if member.activity is None or member.activity.type != 4:
             embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.member-5"), value = m_activity,inline=True)
         else:
-            embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.member-8"), value = item.activity.state, inline=True)
+            embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.member-8"), value = member.activity.state, inline=True)
         # Bot
-        if item.bot:
+        if member.bot:
             botb = await self.bot._(ctx.guild.id,"misc.yes")
         else:
             botb = await self.bot._(ctx.guild.id,"misc.no")
         embed.add_field(name="Bot", value=botb.capitalize())
         # Administrator
-        if ctx.channel.permissions_for(item).administrator:
+        if ctx.channel.permissions_for(member).administrator:
             admin = await self.bot._(ctx.guild.id,"misc.yes")
         else:
             admin = await self.bot._(ctx.guild.id,"misc.no")
         embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.member-6"), value = admin.capitalize(),inline=True)
         # Infractions count
-        if critical_info and not item.bot and self.bot.database_online:
-            embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.member-7"), value = await self.bot.get_cog('Cases').get_nber(item.id,ctx.guild.id),inline=True)
+        if critical_info and not member.bot and self.bot.database_online:
+            embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.member-7"), value = await self.bot.get_cog('Cases').get_nber(member.id,ctx.guild.id),inline=True)
         # Guilds count
-        if item.bot:
+        if member.bot:
             session = aiohttp.ClientSession(loop=self.bot.loop)
-            guilds_count = await self.bot.get_cog('Partners').get_bot_guilds(item.id,session)
+            guilds_count = await self.bot.get_cog('Partners').get_bot_guilds(member.id,session)
             if guilds_count is not None:
                 embed.add_field(name=str(await self.bot._(ctx.guild.id,'misc.servers')).capitalize(),value=guilds_count)
             await session.close()
@@ -401,57 +390,59 @@ Available types: member, role, user, emoji, channel, server, invite, category
         else:
             embed.add_field(name=_roles, value = await self.bot._(ctx.guild.id,"activity","nothing"), inline=False)
         # member verification gate
-        if item.pending:
+        if member.pending:
             _waiting = await self.bot._(ctx.guild.id, 'info.info.member-10')
             embed.add_field(name=_waiting, value='\u200b', inline=False)
         await ctx.send(embed=embed)
 
-
-    async def role_infos(self, ctx: MyContext, item: discord.Role, lang: str):
-        embed = discord.Embed(colour=item.color, timestamp=ctx.message.created_at)
-        embed.set_author(name=str(item), icon_url=ctx.guild.icon)
+    @info_main.command(name="role")
+    async def role_infos(self, ctx: MyContext, role: discord.Role):
+        lang = await self.bot._(ctx.guild.id,"_used_locale")
+        embed = discord.Embed(colour=role.color, timestamp=ctx.message.created_at)
+        embed.set_author(name=str(role), icon_url=ctx.guild.icon)
         embed.set_footer(text='Requested by {}'.format(ctx.author.name), icon_url=ctx.author.display_avatar)
         since = await self.bot._(ctx.guild.id,"misc.since")
         # Name
-        embed.add_field(name=str(await self.bot._(ctx.guild.id,"misc.name")).capitalize(), value=item.mention,inline=True)
+        embed.add_field(name=str(await self.bot._(ctx.guild.id,"misc.name")).capitalize(), value=role.mention,inline=True)
         # ID
-        embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.role-0"), value=str(item.id),inline=True)
+        embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.role-0"), value=str(role.id),inline=True)
         # Color
-        embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.role-1"), value=str(item.color),inline=True)
+        embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.role-1"), value=str(role.color),inline=True)
         # Mentionnable
-        if item.mentionable:
+        if role.mentionable:
             mentio = await self.bot._(ctx.guild.id,"misc.yes")
         else:
             mentio = await self.bot._(ctx.guild.id,"misc.no")
         embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.role-2"), value=mentio.capitalize(), inline=True)
         # Members nbr
-        embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.role-3"), value=len(item.members), inline=True)
+        embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.role-3"), value=len(role.members), inline=True)
         # Hoisted
-        if item.hoist:
+        if role.hoist:
             hoist = await self.bot._(ctx.guild.id,"misc.yes")
         else:
             hoist = await self.bot._(ctx.guild.id,"misc.no")
         embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.role-4"), value=hoist.capitalize(), inline=True)
         # Created at
-        delta = abs(item.created_at - ctx.bot.utcnow())
-        created_date = await self.TimeUtils.date(item.created_at, lang=lang, year=True)
+        delta = abs(role.created_at - ctx.bot.utcnow())
+        created_date = await self.TimeUtils.date(role.created_at, lang=lang, year=True)
         created_since = await self.TimeUtils.time_delta(delta.total_seconds(), lang=lang, year=True, precision=0, hour=delta.total_seconds() < 86400)
         embed.add_field(name=await self.bot._(ctx.guild.id, "info.info.member-1"), value = "{} ({} {})".format(created_date, since, created_since), inline=False)
         # Hierarchy position
-        embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.role-5"), value=str(len(ctx.guild.roles) - item.position), inline=True)
+        embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.role-5"), value=str(len(ctx.guild.roles) - role.position), inline=True)
         # Unique member
-        if len(item.members)==1:
-            embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.role-6"), value=item.members[0].mention, inline=True)
+        if len(role.members)==1:
+            embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.role-6"), value=role.members[0].mention, inline=True)
         await ctx.send(embed=embed)
 
-
-    async def user_infos(self, ctx: MyContext, item: discord.User, lang: str):
+    @info_main.command(name="user")
+    async def user_infos(self, ctx: MyContext, user: discord.User):
+        lang = await self.bot._(ctx.guild.id,"_used_locale")
         since = await self.bot._(ctx.guild.id,"misc.since")
-        if item.bot:
+        if user.bot:
             botb = await self.bot._(ctx.guild.id,"misc.yes")
         else:
             botb = await self.bot._(ctx.guild.id,"misc.no")
-        if item in ctx.guild.members:
+        if user in ctx.guild.members:
             on_server = await self.bot._(ctx.guild.id,"misc.yes")
             banned = None
         else:
@@ -461,29 +452,29 @@ Available types: member, role, user, emoji, channel, server, invite, category
             # except (discord.Forbidden, discord.NotFound):
             #     banned = None
         embed = discord.Embed(colour=default_color, timestamp=ctx.message.created_at)
-        embed.set_thumbnail(url=item.display_avatar.with_static_format("png"))
-        embed.set_author(name=str(item), icon_url=item.display_avatar.with_format("png"))
+        embed.set_thumbnail(url=user.display_avatar.with_static_format("png"))
+        embed.set_author(name=str(user), icon_url=user.display_avatar.with_format("png"))
         embed.set_footer(text='Requested by {}'.format(ctx.author.name), icon_url=ctx.author.display_avatar.with_format("png"))
 
         # name
-        embed.add_field(name=str(await self.bot._(ctx.guild.id,"misc.name")).capitalize(), value=item.name,inline=True)
+        embed.add_field(name=str(await self.bot._(ctx.guild.id,"misc.name")).capitalize(), value=user.name,inline=True)
         # ID
-        embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.role-0"), value=str(item.id))
+        embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.role-0"), value=str(user.id))
         # created at
         now = ctx.bot.utcnow()
-        delta = abs(item.created_at - now)
-        created_date = await self.TimeUtils.date(item.created_at, lang=lang, year=True)
+        delta = abs(user.created_at - now)
+        created_date = await self.TimeUtils.date(user.created_at, lang=lang, year=True)
         created_since = await self.TimeUtils.time_delta(delta.total_seconds(), lang=lang, year=True, precision=0, hour=delta.total_seconds() < 86400)
-        if item.created_at.day == now.day and item.created_at.month == now.month and item.created_at.year != now.year:
+        if user.created_at.day == now.day and user.created_at.month == now.month and user.created_at.year != now.year:
             created_date = "🎂 " + created_date
         embed.add_field(name=await self.bot._(ctx.guild.id, "info.info.member-1"), value = "{} ({} {})".format(created_date, since, created_since), inline=False)
         # is bot
         embed.add_field(name="Bot", value=botb.capitalize())
         # is in server
         embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.user-0"), value=on_server.capitalize())
-        if item.bot:
+        if user.bot:
             session = aiohttp.ClientSession(loop=self.bot.loop)
-            guilds_count = await self.bot.get_cog('Partners').get_bot_guilds(item.id,session)
+            guilds_count = await self.bot.get_cog('Partners').get_bot_guilds(user.id,session)
             if guilds_count is not None:
                 embed.add_field(name=str(await self.bot._(ctx.guild.id,'misc.servers')).capitalize(),value=guilds_count)
             await session.close()
@@ -492,43 +483,45 @@ Available types: member, role, user, emoji, channel, server, invite, category
         #     embed.add_field(name=await self.bot._(ctx.guild.id, "info.info.user-1"), value=banned.capitalize())
         await ctx.send(embed=embed)
 
-    async def emoji_infos(self, ctx: MyContext, item: discord.Emoji, lang: str):
+    @info_main.command(name="emoji")
+    async def emoji_infos(self, ctx: MyContext, emoji: discord.Emoji):
+        lang = await self.bot._(ctx.guild.id,"_used_locale")
         since = await self.bot._(ctx.guild.id,"misc.since")
-        if item.animated:
+        if emoji.animated:
             animate = await self.bot._(ctx.guild.id,"misc.yes")
         else:
             animate = await self.bot._(ctx.guild.id,"misc.no")
-        if item.managed:
+        if emoji.managed:
             manage = await self.bot._(ctx.guild.id,"misc.yes")
         else:
             manage = await self.bot._(ctx.guild.id,"misc.no")
         embed = discord.Embed(colour=default_color, timestamp=ctx.message.created_at)
-        embed.set_thumbnail(url=item.url)
-        embed.set_author(name="Emoji '{}'".format(item.name), icon_url=item.url)
+        embed.set_thumbnail(url=emoji.url)
+        embed.set_author(name="Emoji '{}'".format(emoji.name), icon_url=emoji.url)
         embed.set_footer(text='Requested by {}'.format(ctx.author.name), icon_url=ctx.author.display_avatar.with_format("png"))
         # name
-        embed.add_field(name=str(await self.bot._(ctx.guild.id,"misc.name")).capitalize(), value=item.name,inline=True)
+        embed.add_field(name=str(await self.bot._(ctx.guild.id,"misc.name")).capitalize(), value=emoji.name,inline=True)
         # id
-        embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.role-0"), value=str(item.id))
+        embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.role-0"), value=str(emoji.id))
         # animated
         embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.emoji-0"), value=animate.capitalize())
         # guild name
-        if item.guild != ctx.guild:
-            embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.emoji-3"), value=item.guild.name)
+        if emoji.guild != ctx.guild:
+            embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.emoji-3"), value=emoji.guild.name)
         # string
-        embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.emoji-2"), value="`<:{}:{}>`".format(item.name,item.id))
+        embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.emoji-2"), value="`<:{}:{}>`".format(emoji.name,emoji.id))
         # managed
         embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.emoji-1"), value=manage.capitalize())
         # created at
-        delta = abs(item.created_at - ctx.bot.utcnow())
-        created_date = await self.TimeUtils.date(item.created_at, lang=lang, year=True)
+        delta = abs(emoji.created_at - ctx.bot.utcnow())
+        created_date = await self.TimeUtils.date(emoji.created_at, lang=lang, year=True)
         created_since = await self.TimeUtils.time_delta(delta.total_seconds(), lang=lang, year=True, precision=0, hour=delta.total_seconds() < 86400)
         embed.add_field(name=await self.bot._(ctx.guild.id, "info.info.member-1"), value = "{} ({} {})".format(created_date, since, created_since), inline=False)
         # allowed roles
-        if len(item.roles) > 0:
-            embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.emoji-4"), value=" ".join([x.mention for x in item.roles]))
+        if len(emoji.roles) > 0:
+            embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.emoji-4"), value=" ".join([x.mention for x in emoji.roles]))
         # uses
-        infos_uses = await self.get_emojis_info(item.id)
+        infos_uses = await self.get_emojis_info(emoji.id)
         if len(infos_uses) > 0:
             infos_uses = infos_uses[0]
             lang = await self.bot._(ctx.channel,'_used_locale')
@@ -536,77 +529,86 @@ Available types: member, role, user, emoji, channel, server, invite, category
             embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.emoji-5"), value=await self.bot._(ctx.guild.id,"info.info.emoji-5v",nbr=infos_uses['count'],date=date))
         await ctx.send(embed=embed)
 
-    async def textChannel_infos(self, ctx: MyContext, chan: discord.TextChannel, lang: str):
-        if not chan.permissions_for(ctx.author).view_channel:
+    @info_main.command(name="text-channel")
+    async def textChannel_infos(self, ctx: MyContext, channel: discord.TextChannel):
+        if not channel.permissions_for(ctx.author).view_channel:
             await ctx.send(await self.bot._(ctx.guild.id, "info.cant-see-channel"))
             return
+        lang = await self.bot._(ctx.guild.id,"_used_locale")
         embed = discord.Embed(colour=default_color, timestamp=ctx.message.created_at)
-        embed.set_author(name="{} '{}'".format(await self.bot._(ctx.guild.id,"info.info.textchan-5"),chan.name), icon_url=ctx.guild.icon.with_format('png'))
+        embed.set_author(name="{} '{}'".format(await self.bot._(ctx.guild.id,"info.info.textchan-5"),channel.name), icon_url=ctx.guild.icon.with_format('png'))
         embed.set_footer(text='Requested by {}'.format(ctx.author.name), icon_url=ctx.author.display_avatar.with_format("png"))
         since = await self.bot._(ctx.guild.id,"misc.since")
         # Name
-        embed.add_field(name=str(await self.bot._(ctx.guild.id,"misc.name")).capitalize(), value=chan.name,inline=True)
+        embed.add_field(name=str(await self.bot._(ctx.guild.id,"misc.name")).capitalize(), value=channel.name,inline=True)
         # ID
-        embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.role-0"), value=str(chan.id))
+        embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.role-0"), value=str(channel.id))
         # Category
-        embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.textchan-0"), value=str(chan.category))
+        embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.textchan-0"), value=str(channel.category))
         # NSFW
-        if chan.nsfw:
+        if channel.nsfw:
             nsfw = await self.bot._(ctx.guild.id,"misc.yes")
         else:
             nsfw = await self.bot._(ctx.guild.id,"misc.no")
         embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.textchan-2"), value=nsfw.capitalize())
         # Webhooks count
         try:
-            web = len(await chan.webhooks())
+            web = len(await channel.webhooks())
         except Exception as e:
             await self.bot.get_cog('Errors').on_error(e,ctx)
             web = await self.bot._(ctx.guild.id,"info.info.textchan-4")
         embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.textchan-3"), value=str(web))
         # Members nber
-        embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.role-3"), value = str(len(chan.members))+"/"+str(ctx.guild.member_count), inline=True)
+        embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.role-3"), value = str(len(channel.members))+"/"+str(ctx.guild.member_count), inline=True)
         # Created at
-        delta = abs(chan.created_at - ctx.bot.utcnow())
-        created_date = await self.TimeUtils.date(chan.created_at, lang=lang, year=True)
+        delta = abs(channel.created_at - ctx.bot.utcnow())
+        created_date = await self.TimeUtils.date(channel.created_at, lang=lang, year=True)
         created_since = await self.TimeUtils.time_delta(delta.total_seconds(), lang=lang, year=True, precision=0, hour=delta.total_seconds() < 86400)
         embed.add_field(name=await self.bot._(ctx.guild.id, "info.info.member-1"), value = "{} ({} {})".format(created_date, since, created_since), inline=False)
         # Topic
-        if chan.permissions_for(ctx.author).read_messages:
-            embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.textchan-1"), value = chan.topic if chan.topic not in ['',None] else str(await self.bot._(ctx.guild.id,"misc.none")).capitalize(), inline=False)
+        if channel.permissions_for(ctx.author).read_messages:
+            embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.textchan-1"), value = channel.topic if channel.topic not in ['',None] else str(await self.bot._(ctx.guild.id,"misc.none")).capitalize(), inline=False)
         await ctx.send(embed=embed)
 
-    async def voiceChannel_info(self, ctx: MyContext, chan: discord.VoiceChannel, lang: str):
-        if not chan.permissions_for(ctx.author).view_channel:
+    @info_main.command(name="voice-channel")
+    async def voiceChannel_info(self, ctx: MyContext, channel: discord.VoiceChannel):
+        if not channel.permissions_for(ctx.author).view_channel:
             await ctx.send(await self.bot._(ctx.guild.id, "info.cant-see-channel"))
             return
+        lang = await self.bot._(ctx.guild.id,"_used_locale")
         since = await self.bot._(ctx.guild.id,"misc.since")
         embed = discord.Embed(colour=default_color, timestamp=ctx.message.created_at)
-        embed.set_author(name="{} '{}'".format(await self.bot._(ctx.guild.id,"info.info.voicechan-0"),chan.name), icon_url=ctx.guild.icon)
+        embed.set_author(name="{} '{}'".format(await self.bot._(ctx.guild.id,"info.info.voicechan-0"),channel.name), icon_url=ctx.guild.icon)
         embed.set_footer(text='Requested by {}'.format(ctx.author.name), icon_url=ctx.author.display_avatar)
         # Name
-        embed.add_field(name=str(await self.bot._(ctx.guild.id,"misc.name")).capitalize(), value=chan.name,inline=True)
+        embed.add_field(name=str(await self.bot._(ctx.guild.id,"misc.name")).capitalize(), value=channel.name,inline=True)
         # ID
-        embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.role-0"), value=str(chan.id))
+        embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.role-0"), value=str(channel.id))
         # Category
-        embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.textchan-0"), value=str(chan.category))
+        embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.textchan-0"), value=str(channel.category))
         # Created at
-        delta = abs(chan.created_at - ctx.bot.utcnow())
-        created_date = await self.TimeUtils.date(chan.created_at, lang=lang, year=True)
+        delta = abs(channel.created_at - ctx.bot.utcnow())
+        created_date = await self.TimeUtils.date(channel.created_at, lang=lang, year=True)
         created_since = await self.TimeUtils.time_delta(delta.total_seconds(), lang=lang, year=True, precision=0, hour=delta.total_seconds() < 86400)
         embed.add_field(name=await self.bot._(ctx.guild.id, "info.info.member-1"), value = "{} ({} {})".format(created_date, since, created_since), inline=False)
         # Bitrate
-        embed.add_field(name="Bitrate",value=str(chan.bitrate/1000)+" kbps")
+        embed.add_field(name="Bitrate",value=str(channel.bitrate/1000)+" kbps")
         # Members count
-        embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.role-3"), value="{}/{}".format(len(chan.members),chan.user_limit if chan.user_limit > 0 else "∞"))
+        embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.role-3"), value="{}/{}".format(len(channel.members),channel.user_limit if channel.user_limit > 0 else "∞"))
         # Region
-        if chan.rtc_region is not None:
-            embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.guild-2"), value=str(chan.rtc_region).capitalize())
+        if channel.rtc_region is not None:
+            embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.guild-2"), value=str(channel.rtc_region).capitalize())
         await ctx.send(embed=embed)
 
-    async def guild_info(self, ctx:MyContext, guild:discord.Guild, lang:str, critical_info:bool=False):
+    @info_main.command(name="guild", aliases=["server"])
+    @commands.guild_only()
+    async def guild_info(self, ctx: MyContext):
+        lang = await self.bot._(ctx.guild.id,"_used_locale")
+        critical_info = await self.display_critical(ctx)
+        guild = ctx.guild
         since = await self.bot._(ctx.guild.id,"misc.since")
         _, bots, online = await self.bot.get_cog("Utilities").get_members_repartition(guild.members)
-       
+
         desc = await self.bot.get_config(guild.id,'description')
         if (desc is None or len(desc) == 0) and guild.description is not None:
             desc = guild.description
@@ -698,9 +700,10 @@ Available types: member, role, user, emoji, channel, server, invite, category
             # Verification level
             embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.guild-9"), value=str(await self.bot._(ctx.guild.id,f"misc.{guild.verification_level}")).capitalize())
         await ctx.send(embed=embed)
-        
-   
-    async def invite_info(self, ctx: MyContext, invite: discord.Invite, lang: str):
+
+    @info_main.command(name="invite")
+    async def invite_info(self, ctx: MyContext, invite: discord.Invite):
+        lang = await self.bot._(ctx.guild.id,"_used_locale")
         since = await self.bot._(ctx.guild.id,"misc.since")
         embed = discord.Embed(colour=default_color, timestamp=ctx.message.created_at)
         embed.set_author(name="{} '{}'".format(await self.bot._(ctx.guild.id,"info.info.inv-4"),invite.code), icon_url=invite.guild.icon)
@@ -765,39 +768,43 @@ Available types: member, role, user, emoji, channel, server, invite, category
             embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.member-1"), value = "{} ({} {})".format(await self.TimeUtils.date(invite.created_at,lang=lang,year=True),since,await self.TimeUtils.time_delta(invite.created_at,ctx.bot.utcnow(),lang=lang,year=True,precision=0,hour=False)), inline=False)
         await ctx.send(embed=embed)
 
-    async def category_info(self, ctx: MyContext, categ: discord.CategoryChannel, lang: str):
-        if not categ.permissions_for(ctx.author).view_channel:
+    @info_main.command(name="category")
+    async def category_info(self, ctx: MyContext, category: discord.CategoryChannel):
+        if not category.permissions_for(ctx.author).view_channel:
             await ctx.send(await self.bot._(ctx.guild.id, "info.cant-see-channel"))
             return
+        lang = await self.bot._(ctx.guild.id,"_used_locale")
         since = await self.bot._(ctx.guild.id,"misc.since")
         tchan = 0
         vchan = 0
-        for channel in categ.channels:
+        for channel in category.channels:
             if isinstance(channel, discord.TextChannel):
                 tchan += 1
             elif isinstance(channel, discord.VoiceChannel):
                 vchan +=1
         embed = discord.Embed(colour=default_color, timestamp=ctx.message.created_at)
-        embed.set_author(name="{} '{}'".format(await self.bot._(ctx.guild.id,"info.info.categ-0"),categ.name), icon_url=ctx.guild.icon)
+        embed.set_author(name="{} '{}'".format(await self.bot._(ctx.guild.id,"info.info.categ-0"),category.name), icon_url=ctx.guild.icon)
         embed.set_footer(text='Requested by {}'.format(ctx.author.name), icon_url=ctx.author.display_avatar)
 
-        embed.add_field(name=str(await self.bot._(ctx.guild.id,"misc.name")).capitalize(), value=categ.name,inline=True)
-        embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.role-0"), value=str(categ.id))
-        embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.categ-1"), value="{}/{}".format(categ.position+1,len(ctx.guild.categories)))
+        embed.add_field(name=str(await self.bot._(ctx.guild.id,"misc.name")).capitalize(), value=category.name,inline=True)
+        embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.role-0"), value=str(category.id))
+        embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.categ-1"), value="{}/{}".format(category.position+1,len(ctx.guild.categories)))
         embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.guild-6"), value=await self.bot._(ctx.guild.id,"info.info.categ-2", txt=tchan, voc=vchan))
-        embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.member-1"), value = "{} ({} {})".format(await self.TimeUtils.date(categ.created_at,lang=lang,year=True),since,await self.TimeUtils.time_delta(categ.created_at,ctx.bot.utcnow(),lang=lang,year=True,precision=0,hour=False)), inline=False)
+        embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.member-1"), value = "{} ({} {})".format(await self.TimeUtils.date(category.created_at,lang=lang,year=True),since,await self.TimeUtils.time_delta(category.created_at,ctx.bot.utcnow(),lang=lang,year=True,precision=0,hour=False)), inline=False)
         await ctx.send(embed=embed)
-    
-    async def snowflake_infos(self, ctx: MyContext, snowflake: args.snowflake, lang: str):
+
+    @info_main.command(name="id", aliases=["snowflake"])
+    async def snowflake_infos(self, ctx: MyContext, snowflake: args.snowflake):
+        lang = await self.bot._(ctx.guild.id,"_used_locale")
         date = await self.bot.get_cog("TimeUtils").date(snowflake.date,lang,year=True)
-        embed = await self.bot.get_cog("Embeds").Embed(color = default_color, time = ctx.message.created_at, fields = [
-            {"name": await self.bot._(ctx.channel,"info.info.snowflake-0"), "value": date, "inline": True},
-            {"name": await self.bot._(ctx.channel,"info.info.snowflake-2"), "value": round(snowflake.date.timestamp()), "inline": True},
-            {"name": await self.bot._(ctx.channel,"info.info.snowflake-1"), "value": snowflake.binary, "inline": False},
-            {"name": await self.bot._(ctx.channel,"info.info.snowflake-3"), "value": snowflake.worker_id, "inline": True},
-            {"name": await self.bot._(ctx.channel,"info.info.snowflake-4"), "value": snowflake.process_id, "inline": True},
-            {"name": await self.bot._(ctx.channel,"info.info.snowflake-5"), "value": snowflake.increment, "inline": True}
-        ]).create_footer(ctx)
+        embed = discord.Embed(color=default_color, timestamp=ctx.message.created_at)
+        embed.add_field(name=await self.bot._(ctx.channel,"info.info.snowflake-0"), value=date)
+        embed.add_field(name=await self.bot._(ctx.channel,"info.info.snowflake-2"), value=round(snowflake.date.timestamp()))
+        embed.add_field(name=await self.bot._(ctx.channel,"info.info.snowflake-1"), value=snowflake.binary, inline=False)
+        embed.add_field(name=await self.bot._(ctx.channel,"info.info.snowflake-3"), value=snowflake.worker_id)
+        embed.add_field(name=await self.bot._(ctx.channel,"info.info.snowflake-4"), value=snowflake.process_id)
+        embed.add_field(name=await self.bot._(ctx.channel,"info.info.snowflake-5"), value=snowflake.increment)
+        embed.set_footer(text=ctx.author, icon_url=ctx.author.display_avatar)
         await ctx.send(embed=embed)
 
 
@@ -807,7 +814,9 @@ Available types: member, role, user, emoji, channel, server, invite, category
     async def find_main(self, ctx: MyContext):
         """Same as info, but in a lighter version"""
         if ctx.invoked_subcommand is None:
-            await ctx.send("Cette commande permet de retrouver un serveur ou un salon parmi tout les serveurs sur lequel est le bot. Vous pouvez aussi rechercher les informations d'un utilisateur Discord, peu importe si il partage un serveur avec moi !\nLa syntaxe est `!find <user|channel|guild> <ID>`")
+            await ctx.send("Cette commande permet de retrouver un serveur ou un salon parmi tout les serveurs sur lequel est le"
+            " bot. Vous pouvez aussi rechercher les informations d'un utilisateur Discord, peu importe si il partage un serveur"
+            " avec moi !\nLa syntaxe est `!find <user|channel|guild> <ID>`")
 
     @find_main.command(name="user")
     async def find_user(self, ctx: MyContext, *, user:discord.User):
@@ -972,7 +981,7 @@ Servers:
             ]).create_footer(ctx))
         else:
             await ctx.send("Nom : {}\nID : {}\nServeur : {} ({})".format(c.name,c.id,c.guild.name,c.guild.id))
-    
+
     @find_main.command(name='role')
     async def find_role(self, ctx: MyContext, ID:int):
         every_roles = list()
@@ -1064,7 +1073,7 @@ Servers:
     @commands.group(name="prefix")
     async def get_prefix(self, ctx: MyContext):
         """Show the usable prefix(s) for this server
-        
+
         ..Doc infos.html#prefix"""
         if ctx.invoked_subcommand is not None:
             return
@@ -1074,12 +1083,12 @@ Servers:
             emb = await ctx.bot.get_cog('Embeds').Embed(title=txt,desc=prefix,time=ctx.message.created_at,color=ctx.bot.get_cog('Help').help_color).create_footer(ctx)
             return await ctx.send(embed=emb.discord_embed())
         await ctx.send(txt+"\n"+prefix)
-    
+
     @get_prefix.command(name="change")
     @commands.guild_only()
     async def prefix_change(self, ctx: MyContext, *, new_prefix: str):
         """Change the used prefix
-        
+
         ..Example prefix change "Hey Zbot, "
 
         ..Doc infos.html#prefix"""
@@ -1102,7 +1111,7 @@ Servers:
         else:
             txt = "\n".join([f'• {l[i]}: <{links[i]}>' for i in range(len(l))])
             await ctx.send(txt)
-    
+
 
     async def emoji_analysis(self, msg: discord.Message):
         """Lists the emojis used in a message"""
@@ -1127,10 +1136,10 @@ Servers:
         """Get info about an emoji"""
         if not self.bot.database_online:
             return list()
-        if isinstance(ID,int):
-            query = "Select * from `{}` WHERE `ID`={}".format(self.emoji_table,ID)
+        if isinstance(ID, int):
+            query = "SELECT * from `{}` WHERE `ID`={}".format(self.emoji_table,ID)
         else:
-            query = "Select * from `{}` WHERE {}".format(self.emoji_table,"OR".join([f'`ID`={x}' for x in ID]))
+            query = "SELECT * from `{}` WHERE {}".format(self.emoji_table,"OR".join([f'`ID`={x}' for x in ID]))
         liste = list()
         async with self.bot.db_query(query) as query_results:
             for x in query_results:
