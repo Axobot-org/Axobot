@@ -9,6 +9,7 @@ from discord.ext import commands
 from urllib.parse import quote
 
 from utils import Zbot, MyContext
+from fcts import checks
 
 
 class Minecraft(commands.Cog):
@@ -343,6 +344,7 @@ Every information come from the website www.fr-minecraft.net"""
         await self.send_embed(ctx, embed)
 
     @mc_main.command(name="skin")
+    @commands.check(checks.bot_can_embed)
     async def mc_skin(self, ctx: MyContext, username):
         """Get the skin of any Java player
 
