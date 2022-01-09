@@ -1,9 +1,11 @@
-import aiohttp
-import typing
 import html
+import typing
+
+import aiohttp
+import discord
 import isbnlib
 from discord.ext import commands
-from utils import Zbot, MyContext
+from utils import MyContext, Zbot
 
 
 class ISBN(commands.Converter):
@@ -52,7 +54,7 @@ class Library(commands.Cog):
         if language is not None:
             return await self.search_book(isbn, keywords)
         return None
-    
+
     async def isbn_from_words(self, keywords: str) -> typing.Optional[str]:
         """Get the ISBN of a book from some keywords"""
         url = "https://www.googleapis.com/books/v1/volumes?maxResults=1&q=" + html.escape(keywords.replace(' ', '+'))
@@ -133,24 +135,26 @@ class Library(commands.Cog):
         unknown = await self.bot._(ctx.channel, 'library.unknown')
         authors = [x for x in book.get('authors', list()) if x] # filter empty string and other weird things
         if ctx.can_send_embed:
-            thumb = book.get('cover', '')
-            emb = await self.bot.get_cog('Embeds').Embed(title=book['title'], thumbnail=thumb, color=5301186).create_footer(ctx)
+            emb = discord.Embed(title=book['title'], color=5301186)
+            emb.set_thumbnail(url=book.get('cover', ''))
+            emb.set_footer(text=ctx.author, icon_url=ctx.author.display_avatar)
+
             if authors:
                 t = await self.bot._(ctx.channel, 'library.author' if len(authors) <= 1 else 'authors')
                 t = t.capitalize()
-                emb.add_field(t, '\n'.join(authors))
+                emb.add_field(name=t, value='\n'.join(authors)  )
             # Publisher
             publisher = (await self.bot._(ctx.channel, 'library.publisher')).capitalize()
-            emb.add_field(publisher, book.get('publisher', unknown))
+            emb.add_field(name=publisher, value=book.get('publisher', unknown))
             # ISBN
-            emb.add_field('ISBN', book['isbn'], True)
+            emb.add_field(name='ISBN', value=book['isbn'], inline=False)
             # Publication year
             publication = (await self.bot._(ctx.channel, 'library.year')).capitalize()
-            emb.add_field(publication, book.get('publication', unknown), True)
+            emb.add_field(name=publication, value=book.get('publication', unknown))
             # Language
             if 'language' in book:
                 lang = (await self.bot._(ctx.channel, 'library.language')).capitalize()
-                emb.add_field(lang, book['language'], True)
+                emb.add_field(name=lang, value=book['language'])
             await ctx.send(embed=emb)
         else:
             auth = '\n'.join(authors) if authors else unknown

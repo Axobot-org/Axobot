@@ -296,8 +296,8 @@ class Cases(commands.Cog):
             if not isSupport:
                 c.append("guild="+str(ctx.guild.id))
             cases = await self.get_case(criters=c)
-        except Exception as e:
-            await self.bot.get_cog("Errors").on_error(e,ctx)
+        except Exception as err:
+            await self.bot.get_cog("Errors").on_error(err,ctx)
             return
         if len(cases)!=1:
             await ctx.send(await self.bot._(ctx.guild.id,"cases.not-found"))
@@ -327,11 +327,12 @@ class Cases(commands.Cog):
             # finish message
             _msg = _msg.format(G=guild,U=u,T=case.type,M=str(mod),R=case.reason,D=_date)
 
-            emb = self.bot.get_cog('Embeds').Embed(title=title,desc=_msg,color=self.bot.get_cog('Servers').embed_color).update_timestamp().set_author(user)
-            await ctx.send(embed=emb.discord_embed())
-        except Exception as e:
-            await self.bot.get_cog("Errors").on_error(e,ctx)
-        
+            emb = discord.Embed(title=title, description=_msg, color=self.bot.get_cog('Servers').embed_color, timestamp=ctx.message.created_at)
+            emb.set_author(name=user, icon_url=user.display_avatar)
+            await ctx.send(embed=emb)
+        except Exception as err:
+            await self.bot.get_cog("Errors").on_error(err,ctx)
+
 
     @case_main.command(name="remove", aliases=["clear", "delete"])
     @commands.guild_only()
@@ -349,10 +350,10 @@ class Cases(commands.Cog):
             if not await self.bot.get_cog('Admin').check_if_admin(ctx.author):
                 c.append("guild="+str(ctx.guild.id))
             cases = await self.get_case(columns=['ID','user'],criters=c)
-        except Exception as e:
-            await self.bot.get_cog("Errors").on_error(e,None)
+        except Exception as err:
+            await self.bot.get_cog("Errors").on_error(err,None)
             return
-        if len(cases)!=1:
+        if len(cases) != 1:
             await ctx.send(await self.bot._(ctx.guild.id,"cases.not-found"))
             return
         case = cases[0]

@@ -87,25 +87,26 @@ class BotEvents(commands.Cog):
             begin = await nice_date(self.current_event_data["begin"], lang, year=True, digital=True, hour=False)
             end = await nice_date(self.current_event_data["end"], lang, year=True, digital=True, hour=False)
             if ctx.can_send_embed:
-                fields = [
-                    {"name": (await self.bot._(ctx.channel, "misc.beginning")).capitalize(),
-                     "value": begin,
-                     "inline": True
-                     },
-                    {"name": (await self.bot._(ctx.channel, "misc.end")).capitalize(),
-                     "value": end,
-                     "inline": True
-                     }]
+                emb = discord.Embed(title=title, description=event_desc, color=self.current_event_data["color"])
+                emb.set_image(url=self.current_event_data["icon"])
+                emb.add_field(
+                    name=(await self.bot._(ctx.channel, "misc.beginning")).capitalize(),
+                    value=begin
+                )
+                emb.add_field(
+                    name=(await self.bot._(ctx.channel, "misc.end")).capitalize(),
+                    value=end
+                )
                 # Prices to win
                 prices = data[lang]['events-prices']
                 if current_event in prices:
                     points = await self.bot._(ctx.channel, "bot_events.points")
                     prices = [f"**{k} {points}:** {v}" for k,
                               v in prices[current_event].items()]
-                    fields.append({"name": await self.bot._(ctx.channel, "bot_events.events-price-title"), "value": "\n".join(prices)})
-                emb = self.bot.get_cog("Embeds").Embed(title=title, desc=event_desc, fields=fields,
-                                                      image=self.current_event_data["icon"], color=self.current_event_data["color"])
-                #e = discord.Embed().from_dict(emb.to_dict())
+                    emb.add_field(
+                        name=await self.bot._(ctx.channel, "bot_events.events-price-title"),
+                        value="\n".join(prices)
+                    )
                 await ctx.send(embed=emb)
             else:
                 txt = f"**{title}**\n\n{event_desc}"
@@ -158,15 +159,14 @@ class BotEvents(commands.Cog):
         rank_global = await self.bot._(ctx.channel, "bot_events.rank-global")
 
         if ctx.can_send_embed:
-            fields = list()
-            if objectives_title != "":
-                fields.append({"name": objectives_title, "value": prices})
-            fields.append(
-                {"name": rank_total, "value": str(points), "inline": True})
-            fields.append(
-                {"name": rank_global, "value": user_rank, "inline": True})
             desc = await self.bot._(ctx.channel, "bot_events.xp-howto")
-            emb = self.bot.get_cog("Embeds").Embed(title=title, desc=desc, fields=fields, color=4254055, author_name=str(user), author_icon=user.avatar_url_as(static_format="png", size=32))
+            emb = discord.Embed(title=title, description=desc, color=4254055)
+            user: discord.User
+            emb.set_author(name=user, icon_url=user.display_avatar.replace(static_format="png", size=32))
+            if objectives_title != "":
+                emb.add_field(name=objectives_title, value=prices, inline=False)
+            emb.add_field(name=rank_total, value=str(points))
+            emb.add_field(name=rank_global, value=user_rank)
             await ctx.send(embed=emb)
         else:
             msg = f"**{title}** ({user})"

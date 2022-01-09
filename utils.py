@@ -8,6 +8,7 @@ from typing import Any, Callable, Coroutine, Optional
 
 import discord
 import mysql
+import requests
 from discord.ext import commands
 from mysql.connector.connection import MySQLConnection
 from mysql.connector.errors import ProgrammingError
@@ -239,6 +240,14 @@ class Zbot(commands.bot.AutoShardedBot):
             self.log.error("Unable to load Languages cog")
             return lambda *args, **kwargs: args[1]
         return cog.tr
+
+    async def send_embed(self, embeds: list[discord.Embed], url:str=None):
+        """Send a list of embeds to a discord channel"""
+        if cog := self.get_cog('Embeds'):
+            await cog.send(embeds, url)
+        elif url is not None and url.startswith('https://'):
+            embeds = (embed.to_dict() for embed in embeds)
+            requests.post(url, json={"embeds": embeds})
 
 
 class RankCardsFlag:

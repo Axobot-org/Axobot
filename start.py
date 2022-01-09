@@ -59,7 +59,7 @@ def main():
         else:
             await client.change_presence(activity=discord.Game(name=choice(status_list['release'])))
         emb = discord.Embed(description=f"**{client.user.name}** is launching !", color=8311585, timestamp=client.utcnow())
-        await client.get_cog("Embeds").send([emb])
+        await client.send_embed([emb])
 
     parse_crypted_file(client)
     load_sql_connection(client)

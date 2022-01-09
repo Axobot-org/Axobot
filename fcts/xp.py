@@ -796,18 +796,18 @@ class Xp(commands.Cog):
             await ctx.send(file=myfile)
         except discord.errors.HTTPException:
             await ctx.send(await self.bot._(ctx.channel, "xp.card-too-large"))
-    
+
     async def send_embed(self, ctx: MyContext, user: discord.User, xp, rank, ranks_nb, levels_info, used_system):
         txts = [await self.bot._(ctx.channel, "xp.card-level"), await self.bot._(ctx.channel, "xp.card-rank")]
         if levels_info is None:
             levels_info = await self.calc_level(xp,used_system)
-        fields = list()
-        fields.append({'name':'XP','value':"{}/{}".format(xp,levels_info[1]),'inline':True})
-        fields.append({'name':txts[0],'value':levels_info[0],'inline':True})
-        fields.append({'name':txts[1],'value':"{}/{}".format(rank,ranks_nb),'inline':True})
-        emb = self.bot.get_cog('Embeds').Embed(fields=fields,color=self.embed_color).set_author(user)
-        await ctx.send(embed=emb.discord_embed())
-    
+        emb = discord.Embed(color=self.embed_color)
+        emb.set_author(name=user, icon_url=user.display_avatar)
+        emb.add_field(name='XP', value="{}/{}".format(xp,levels_info[1]))
+        emb.add_field(name=txts[0], value=levels_info[0])
+        emb.add_field(name=txts[1], value="{}/{}".format(rank,ranks_nb))
+        await ctx.send(embed=emb)
+
     async def send_txt(self, ctx: MyContext, user: discord.User, xp, rank, ranks_nb, levels_info, used_system):
         txts = [await self.bot._(ctx.channel, "xp.card-level"), await self.bot._(ctx.channel, "xp.card-rank")]
         if levels_info is None:
@@ -906,7 +906,7 @@ class Xp(commands.Cog):
             lvl = lvl[0]
             rk = rank['rank'] if 'rank' in rank.keys() else '?'
             xp = self.convert_average(rank['xp'])
-            your_rank = {'name':"__"+await self.bot._(ctx.channel, "xp.top-your")+"__", 'value':"**#{} |** `lvl {}` **|** `xp {}`".format(rk, lvl, xp)}
+            your_rank = {'name':"__"+await self.bot._(ctx.channel, "xp.top-your")+"__", 'value':"**#{} |** `lvl {}` **|** `xp {}`".format(rk, lvl, xp)}
             del rk
         # title
         if Type == 'guild' or xp_system_used != 0:
@@ -914,7 +914,10 @@ class Xp(commands.Cog):
         else:
             t = await self.bot._(ctx.channel, "xp.top-title-1")
         if ctx.can_send_embed:
-            emb = await self.bot.get_cog('Embeds').Embed(title=t,fields=[{'name':f_name,'value':"\n".join(txt)},your_rank],color=self.embed_color,author_icon=self.bot.user.display_avatar.with_format("png")).create_footer(ctx)
+            emb = discord.Embed(title=t, color=self.embed_color)
+            emb.add_field(name=f_name, value="\n".join(txt), inline=False)
+            emb.add_field(**your_rank)
+            emb.set_footer(text=ctx.author, icon_url=ctx.author.display_avatar)
             await ctx.send(embed=emb)
         else:
             await ctx.send(f_name+"\n\n"+'\n'.join(txt))
@@ -929,7 +932,7 @@ class Xp(commands.Cog):
                 os.remove(f[3])
             else:
                 done.append(f[0])
-    
+
 
     @commands.command(name='set_xp', aliases=["setxp", "set-xp"])
     @commands.guild_only()
@@ -958,8 +961,10 @@ class Xp(commands.Cog):
             self.cache[ctx.guild.id][user.id] = [round(time.time()), xp]
             s = "XP of user {} `{}` edited (from {} to {}) in server `{}`".format(user, user.id, prev_xp, xp, ctx.guild.id)
             self.bot.log.info(s)
-            emb = self.bot.get_cog("Embeds").Embed(desc=s,color=8952255,footer_text=ctx.guild.name).update_timestamp().set_author(self.bot.user)
-            await self.bot.get_cog("Embeds").send([emb])
+            emb = discord.Embed(description=s,color=8952255, timestamp=self.bot.utcnow())
+            emb.set_footer(ctx.guild.name)
+            emb.set_author(self.bot.user, icon_url=self.bot.user.avatar)
+            await self.bot.send_embed([emb])
 
     async def gen_rr_id(self):
         return round(time.time()/2)
@@ -1038,8 +1043,9 @@ class Xp(commands.Cog):
             max_rr = await self.bot.get_config(ctx.guild.id,'rr_max_number')
             max_rr = self.bot.get_cog("Servers").default_opt['rr_max_number'] if max_rr is None else max_rr
             title = await self.bot._(ctx.guild.id,"xp.rr_list", c=len(l), max=max_rr)
-            emb = await self.bot.get_cog('Embeds').Embed(title=title,desc=des).update_timestamp().create_footer(ctx)
-            await ctx.send(embed=emb.discord_embed())
+            emb = discord.Embed(title=title, description=des, timestamp=ctx.message.created_at)
+            emb.set_footer(text=ctx.author, icon_url=ctx.author.display_avatar)
+            await ctx.send(embed=emb)
 
     @rr_main.command(name="remove")
     @commands.check(checks.has_manage_guild)

@@ -121,21 +121,24 @@ Every information come from the website www.fr-minecraft.net"""
             await ctx.send(await self.bot._(ctx.channel, "minecraft.no-embed"))
             return
         try:
-            Block = frmc_lib.main(value, 'Bloc')
-        except:
+            block = frmc_lib.main(value, 'Bloc')
+        except frmc_lib.ItemNotFoundError:
             await ctx.send(await self.bot._(ctx.channel, "minecraft.no-block"))
             return
-        title = "{} - {}".format((await self.bot._(ctx.channel, "minecraft.names"))[0], Block.Name)
-        embed = self.bot.get_cog("Embeds").Embed(title=title, color=discord.Colour(int('16BD06', 16)), url=Block.Url, time=ctx.message.created_at, desc=await self.bot._(ctx.channel, "minecraft.contact-mail"), thumbnail=Block.Image)
-        await embed.create_footer(ctx)
-        embed.add_field(name="Nom", value=Block.Name, inline=False)
-        l = ("\n".join(Block.ID), Block.Stack, Block.CreativeTab, Block.Damage,
-             Block.Strength, Block.Tool, ", ".join(Block.Mobs), Block.Version)
+        title = "{} - {}".format((await self.bot._(ctx.channel, "minecraft.names"))[0], block.Name)
+        embed = discord.Embed(title=title, color=discord.Colour(int('16BD06', 16)), url=block.Url,
+            timestamp=ctx.message.created_at, description=await self.bot._(ctx.channel, "minecraft.contact-mail"))
+        if block.Image:
+            embed.set_thumbnail(url=block.Image)
+        embed.set_footer(text=ctx.author, icon_url=ctx.author.display_avatar)
+        embed.add_field(name="Nom", value=block.Name, inline=False)
+        l = ("\n".join(block.ID), block.Stack, block.CreativeTab, block.Damage,
+             block.Strength, block.Tool, ", ".join(block.Mobs), block.Version)
         for e, v in enumerate(await self.bot._(ctx.channel, "minecraft.block-fields")):
             if l[e] not in [None, '']:
                 try:
                     embed.add_field(name=v, value=l[e])
-                except:
+                except IndexError:
                     pass
         await self.send_embed(ctx, embed)
 
@@ -153,24 +156,26 @@ Every information come from the website www.fr-minecraft.net"""
             await ctx.send(await self.bot._(ctx.channel, "minecraft.no-embed"))
             return
         try:
-            Entity = frmc_lib.main(value, 'Entité')
-        except:
+            entity = frmc_lib.main(value, 'Entité')
+        except frmc_lib.ItemNotFoundError:
             await ctx.send(await self.bot._(ctx.channel, "minecraft.no-entity"))
             return
-        title = "{} - {}".format((await self.bot._(ctx.channel, "minecraft.names"))[1], Entity.Name)
-        embed = self.bot.get_cog("Embeds").Embed(title=title, color=discord.Colour(int('16BD06', 16)), url=Entity.Url, time=ctx.message.created_at, desc=await self.bot._(ctx.channel, "minecraft.contact-mail"), thumbnail=Entity.Image)
-        await embed.create_footer(ctx)
-        embed.add_field(name="Nom", value=Entity.Name, inline=False)
-        l = (Entity.ID, Entity.Type, Entity.PV, Entity.PA,
-             Entity.XP, ", ".join(Entity.Biomes), Entity.Version)
+        title = "{} - {}".format((await self.bot._(ctx.channel, "minecraft.names"))[1], entity.Name)
+        embed = discord.Embed(title=title, color=int('16BD06', 16), url=entity.Url, timestamp=ctx.message.created_at, description=await self.bot._(ctx.channel, "minecraft.contact-mail"))
+        if entity.Image:
+            embed.set_thumbnail(url=entity.Image)
+        embed.set_footer(text=ctx.author, icon_url=ctx.author.display_avatar)
+        embed.add_field(name="Nom", value=entity.Name, inline=False)
+        l = (entity.ID, entity.Type, entity.PV, entity.PA,
+             entity.XP, ", ".join(entity.Biomes), entity.Version)
         for e, v in enumerate(await self.bot._(ctx.channel, "minecraft.entity-fields")):
             if l[e] not in [None, '']:
                 try:
                     embed.add_field(name=v, value=l[e])
-                except:
+                except IndexError:
                     pass
-        if Entity.Dimensions != [0, 0, 0]:
-            embed.add_field(name="Dimensions", value=await self.bot._(ctx.channel, "minecraft.dimensions", la=Entity.Dimensions[0], lo=Entity.Dimensions[1], ha=Entity.Dimensions[2]))
+        if entity.Dimensions != [0, 0, 0]:
+            embed.add_field(name="Dimensions", value=await self.bot._(ctx.channel, "minecraft.dimensions", la=entity.Dimensions[0], lo=entity.Dimensions[1], ha=entity.Dimensions[2]))
         await self.send_embed(ctx, embed)
 
     @mc_main.command(name="item", aliases=['object'])
@@ -187,23 +192,23 @@ Every information come from the website www.fr-minecraft.net"""
             await ctx.send(await self.bot._(ctx.channel, "minecraft.no-embed"))
             return
         try:
-            Item = frmc_lib.main(value, "Item")
-        except:
+            item = frmc_lib.main(value, "Item")
+        except frmc_lib.ItemNotFoundError:
             await ctx.send(await self.bot._(ctx.channel, "minecraft.no-item"))
             return
-        title = "{} - {}".format((await self.bot._(ctx.channel, "minecraft.names"))[2], Item.Name)
-        embed = self.bot.get_cog("Embeds").Embed(title=title, color=discord.Colour(int('16BD06', 16)), url=Item.Url, time=ctx.message.created_at, desc=await self.bot._(ctx.channel, "minecraft.contact-mail"))
-        if Item.Image is not None:
-            embed.thumbnail = Item.Image
-        await embed.create_footer(ctx)
-        embed.add_field(name="Nom", value=Item.Name, inline=False)
-        l = ('\n'.join(Item.ID), Item.Stack, Item.CreativeTab, Item.Damage,
-             Item.Strength, Item.Tool, ", ".join(Item.Mobs), Item.Version)
+        title = "{} - {}".format((await self.bot._(ctx.channel, "minecraft.names"))[2], item.Name)
+        embed = discord.Embed(title=title, color=int('16BD06', 16), url=item.Url, timestamp=ctx.message.created_at, description=await self.bot._(ctx.channel, "minecraft.contact-mail"))
+        if item.Image is not None:
+            embed.set_thumbnail(url=item.Image)
+        embed.set_footer(text=ctx.author, icon_url=ctx.author.display_avatar)
+        embed.add_field(name="Nom", value=item.Name, inline=False)
+        l = ('\n'.join(item.ID), item.Stack, item.CreativeTab, item.Damage,
+             item.Strength, item.Tool, ", ".join(item.Mobs), item.Version)
         for e, v in enumerate(await self.bot._(ctx.channel, "minecraft.item-fields")):
             if l[e] not in [None, '']:
                 try:
                     embed.add_field(name=v, value=l[e])
-                except:
+                except IndexError:
                     pass
         await self.send_embed(ctx, embed)
 
@@ -221,14 +226,14 @@ Every information come from the website www.fr-minecraft.net"""
             await ctx.send(await self.bot._(ctx.channel, "minecraft.no-embed"))
             return
         try:
-            Cmd = frmc_lib.main(value, 'Commande')
-        except:
+            cmd = frmc_lib.main(value, 'Commande')
+        except frmc_lib.ItemNotFoundError:
             await ctx.send(await self.bot._(ctx.channel, "minecraft.no-cmd"))
             return
-        title = "{} - {}".format((await self.bot._(ctx.channel, "minecraft.names"))[3], Cmd.Name)
-        embed = self.bot.get_cog("Embeds").Embed(title=title, color=discord.Colour(int('16BD06', 16)), url=Cmd.Url, time=ctx.message.created_at, desc=await self.bot._(ctx.channel, "minecraft.contact-mail"))
-        await embed.create_footer(ctx)
-        l = (Cmd.Name, " ".join(Cmd.Syntax), Cmd.Examples, Cmd.Version)
+        title = "{} - {}".format((await self.bot._(ctx.channel, "minecraft.names"))[3], cmd.Name)
+        embed = discord.Embed(title=title, color=int('16BD06', 16), url=cmd.Url, timestamp=ctx.message.created_at, description=await self.bot._(ctx.channel, "minecraft.contact-mail"))
+        embed.set_footer(text=ctx.author, icon_url=ctx.author.display_avatar)
+        l = (cmd.Name, " ".join(cmd.Syntax), cmd.Examples, cmd.Version)
         for e, v in enumerate(await self.bot._(ctx.channel, "minecraft.cmd-fields")):
             if e == 2:
                 if len(l[e]) > 0:
@@ -244,7 +249,7 @@ Every information come from the website www.fr-minecraft.net"""
             if l[e] not in [None, '']:
                 try:
                     embed.add_field(name=v, value=l[e])
-                except:
+                except IndexError:
                     pass
         await self.send_embed(ctx, embed)
 
@@ -262,23 +267,23 @@ Every information come from the website www.fr-minecraft.net"""
             await ctx.send(await self.bot._(ctx.channel, "minecraft.no-embed"))
             return
         try:
-            Adv = frmc_lib.main(value, 'Progrès')
-        except:
+            adv = frmc_lib.main(value, 'Progrès')
+        except frmc_lib.ItemNotFoundError:
             await ctx.send(await self.bot._(ctx.channel, "minecraft.no-adv"))
             return
-        title = "{} - {}".format((await self.bot._(ctx.channel, "minecraft.names"))[4], Adv.Name)
-        embed = self.bot.get_cog("Embeds").Embed(title=title, color=discord.Colour(int('16BD06', 16)), url=Adv.Url, time=ctx.message.created_at, desc=await self.bot._(ctx.channel, "minecraft.contact-mail"))
-        await embed.create_footer(ctx)
-        if Adv.Image is not None:
-            embed.thumbnail = Adv.Image
+        title = "{} - {}".format((await self.bot._(ctx.channel, "minecraft.names"))[4], adv.Name)
+        embed = discord.Embed(title=title, color=int('16BD06', 16), url=adv.Url, timestamp=ctx.message.created_at, description=await self.bot._(ctx.channel, "minecraft.contact-mail"))
+        embed.set_footer(text=ctx.author, icon_url=ctx.author.display_avatar)
+        if adv.Image is not None:
+            embed.set_thumbnail(url=adv.Image)
         # ("Nom","Identifiant","Type","Action","Parent","Enfants","Version d'ajout")
-        l = (Adv.Name, Adv.ID, Adv.Type, Adv.Action,
-             Adv.Parent, ", ".join(Adv.Children), Adv.Version)
+        l = (adv.Name, adv.ID, adv.Type, adv.Action,
+             adv.Parent, ", ".join(adv.Children), adv.Version)
         for e, v in enumerate(await self.bot._(ctx.channel, "minecraft.adv-fields")):
             if l[e] not in [None, '']:
                 try:
                     embed.add_field(name=v, value=l[e])
-                except:
+                except IndexError:
                     pass
         await self.send_embed(ctx, embed)
 
@@ -328,18 +333,18 @@ Every information come from the website www.fr-minecraft.net"""
             search['id']
         )
         title = "{} - {}".format((await self.bot._(ctx.channel, "minecraft.names"))[5], search['name'])
-        embed = self.bot.get_cog("Embeds").Embed(
-            title=title, color=discord.Colour(int('16BD06', 16)),
+        embed = discord.Embed(
+            title=title, color=int('16BD06', 16),
             url=search['websiteUrl'],
-            time=ctx.message.created_at)
-        await embed.create_footer(ctx)
+            timestamp=ctx.message.created_at)
+        embed.set_footer(text=ctx.author, icon_url=ctx.author.display_avatar)
         if attachments := search['attachments']:
-            embed.thumbnail = attachments[0]['thumbnailUrl']
+            embed.set_thumbnail(url=attachments[0]['thumbnailUrl'])
         for e, v in enumerate(await self.bot._(ctx.channel, "minecraft.mod-fields")):
             if l[e] not in [None, '']:
                 try:
                     embed.add_field(name=v, value=str(l[e]))
-                except:
+                except IndexError:
                     pass
         await self.send_embed(ctx, embed)
 
@@ -435,13 +440,13 @@ Every information come from the website www.fr-minecraft.net"""
                 players.append(p['name'])
                 if len(players) > 30:
                     break
-        except:
+        except KeyError:
             players = []
         if players == []:
             if r['players']['online'] == 0:
                 players = [str(await self.bot._(guild, "misc.none")).capitalize()]
             else:
-                players = ['Non disponible']
+                players = [await self.bot._(guild, "minecraft.no-player-list")]
         IP = "{}:{}".format(ip, port) if port is not None else str(ip)
         if r["favicon"] is not None:
             img_url = "https://api.minetools.eu/favicon/" + \
@@ -482,7 +487,7 @@ Every information come from the website www.fr-minecraft.net"""
             if r['players']['online'] == 0:
                 players = [str(await self.bot._(guild, "misc.none")).capitalize()]
             else:
-                players = ['Non disponible']
+                players = [await self.bot._(guild, "minecraft.no-player-list")]
         if "software" in r.keys():
             version = r["software"]+" "+r['version']
         else:
@@ -534,7 +539,7 @@ Every information come from the website www.fr-minecraft.net"""
                 if self.online_players == 0:
                     p = ["Aucun"]
                 else:
-                    p = ['Non disponible']
+                    p = [await translate(guild, "minecraft.no-player-list")]
             else:
                 p = self.players
             embed = discord.Embed(title=await translate(guild, "minecraft.serv-title", ip=self.ip), color=discord.Colour(0x417505), timestamp=datetime.datetime.utcfromtimestamp(time.time()))
@@ -542,13 +547,13 @@ Every information come from the website www.fr-minecraft.net"""
             if self.image is not None:
                 embed.set_thumbnail(url=self.image)
             embed.add_field(name="Version", value=self.version)
-            embed.add_field(name=await translate(guild, "mc", "serv-0"), value="{}/{}".format(self.online_players, self.max_players))
+            embed.add_field(name=await translate(guild, "minecraft.serv-0"), value="{}/{}".format(self.online_players, self.max_players))
             if len(p) > 20:
-                embed.add_field(name=await translate(guild, "mc", "serv-1"), value=", ".join(p[:20]))
+                embed.add_field(name=await translate(guild, "minecraft.serv-1"), value=", ".join(p[:20]))
             else:
-                embed.add_field(name=await translate(guild, "mc", "serv-2"), value=", ".join(p))
+                embed.add_field(name=await translate(guild, "minecraft.serv-2"), value=", ".join(p))
             if self.ping is not None:
-                embed.add_field(name=await translate(guild, "mc", "serv-3"), value=str(self.ping)+" ms")
+                embed.add_field(name=await translate(guild, "minecraft.serv-3"), value=str(self.ping)+" ms")
             embed.add_field(name="Description", value=self.desc, inline=False)
             return embed
 
@@ -584,7 +589,7 @@ Every information come from the website www.fr-minecraft.net"""
         if ID.isnumeric():
             try:
                 return await channel.fetch_message(int(ID))
-            except:
+            except (discord.Forbidden, discord.NotFound):
                 pass
         return None
 

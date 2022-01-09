@@ -238,17 +238,17 @@ class Servers(commands.Cog):
             pass
         return True
 
-    async def is_server_exist(self, ID: int):
+    async def is_server_exist(self, guild_id: int):
         """Check if a server is already in the db"""
-        i = await self.get_option(ID,"ID")
+        i = await self.get_option(guild_id, "ID")
         if i is None:
-            guild = self.bot.get_guild(ID)
+            guild = self.bot.get_guild(guild_id)
             if guild is None:
                 raise Exception("Guild not found")
             emb_desc = f"New server in the database :tada: `{guild.name}` ({guild.id})"
             emb = discord.Embed(description=emb_desc, color=self.log_color, timestamp=self.bot.utcnow())
-            await self.bot.get_cog("Embeds").send([emb])
-            return await self.add_server(ID)
+            await self.bot.send_embed([emb])
+            return await self.add_server(guild_id)
         return True
 
     async def delete_server(self, guild_id: int):
@@ -353,7 +353,7 @@ class Servers(commands.Cog):
         except Exception as e:
             await self.bot.get_cog("Errors").on_error(e,ctx)
             await ctx.send(await self.bot._(ctx.guild.id, "server.internal-error"))
-    
+
     async def sconfig_del2(self, ctx: MyContext, option: str):
         try:
             t = await self.delete_option(ctx.guild.id,option)
@@ -362,21 +362,24 @@ class Servers(commands.Cog):
             else:
                 msg = await self.bot._(ctx.guild.id, "server.internal-error")
             await ctx.send(msg)
-            m = "Reset option in server {}: {}".format(ctx.guild.id,option)
-            emb = self.bot.get_cog("Embeds").Embed(desc=m,color=self.log_color).update_timestamp().set_author(ctx.guild.me)
-            await self.bot.get_cog("Embeds").send([emb])
-            self.bot.log.debug(m)
+            msg = "Reset option in server {}: {}".format(ctx.guild.id,option)
+            emb = discord.Embed(description=msg, color=self.log_color, timestamp=self.bot.utcnow())
+            emb.set_author(name=self.bot.user, icon_url=self.bot.user.avatar)
+            await self.bot.send_embed([emb])
+            self.bot.log.debug(msg)
         except ValueError:
             await ctx.send(await self.bot._(ctx.guild.id, "server.option-notfound"))
-        except Exception as e:
-            await self.bot.get_cog("Errors").on_error(e,ctx)
+        except Exception as err:
+            await self.bot.get_cog("Errors").on_error(err,ctx)
             await ctx.send(await self.bot._(ctx.guild.id, "server.internal-error"))
 
     async def send_embed(self, guild: discord.Guild, option: str, value: str):
-        m = "Changed option in server {}: {} = `{}`".format(guild.id,option,value)
-        emb = self.bot.get_cog("Embeds").Embed(desc=m,color=self.log_color,footer_text=guild.name).update_timestamp().set_author(guild.me)
-        await self.bot.get_cog("Embeds").send([emb])
-        self.bot.log.debug(m)
+        msg = "Changed option in server {}: {} = `{}`".format(guild.id,option,value)
+        emb = discord.Embed(description=msg, color=self.log_color, timestamp=self.bot.utcnow())
+        emb.set_footer(text=guild.name)
+        emb.set_author(name=self.bot.user, icon_url=self.bot.user.avatar)
+        await self.bot.send_embed([emb])
+        self.bot.log.debug(msg)
 
 
     async def get_guild(self, item) -> discord.Guild:
@@ -948,7 +951,9 @@ class Servers(commands.Cog):
             if len(liste) == 0:
                 return await ctx.send("NOPE")
             title = await self.bot._(channel, "server.see-title", guild=guild.name) + f" ({page}/{max_page})"
-            embed = self.bot.get_cog('Embeds').Embed(title=title, color=self.embed_color, desc=str(await self.bot._(guild.id, "server.see-0")), time=msg.created_at,thumbnail=guild.icon.with_static_format('png'))
+            embed = discord.Embed(title=title, color=self.embed_color,
+                                  description=await self.bot._(guild.id, "server.see-0"), timestamp=msg.created_at)
+            embed.set_thumbnail(url=guild.icon.with_static_format('png'))
             diff = channel.guild != guild
             for i,v in liste.items():
                 #if i not in self.optionsList:
@@ -994,9 +999,8 @@ class Servers(commands.Cog):
                     continue
                 if len(str(r)) == 0:
                     r = "Ø"
-                embed.fields.append({'name':i, 'value':r, 'inline':True})
-            await channel.send(embed=embed.discord_embed())
-            embed.fields.clear()
+                embed.add_field(name=i, value=r)
+            await channel.send(embed=embed)
             return
         elif ctx is not None:
             if option in roles_options:
@@ -1054,20 +1058,19 @@ class Servers(commands.Cog):
                     t = ctx.message.created_at
                 else:
                     t = ctx.bot.utcnow()
-                embed = self.bot.get_cog("Embeds").Embed(title=title, color=self.embed_color, desc=r, time=t)
+                embed = discord.Embed(title=title, color=self.embed_color, description=r, timestamp=t)
                 if isinstance(ctx, commands.Context):
-                    await embed.create_footer(ctx)
-                await channel.send(embed=embed.discord_embed())
+                    embed.set_footer(text=ctx.author, icon_url=ctx.author.display_avatar)
+                await channel.send(embed=embed)
             except Exception as e:
                 await self.bot.get_cog('Errors').on_error(e,ctx if isinstance(ctx, commands.Context) else None)
 
-            
+
     @sconfig_main.command(name="reset")
     @commands.is_owner()
     async def admin_delete(self, ctx: MyContext, ID:int):
         if await self.delete_server(ID):
             await ctx.send("Le serveur n°{} semble avoir correctement été supprimé !".format(ID))
-
 
 
     async def update_memberChannel(self, guild: discord.Guild):
@@ -1092,7 +1095,7 @@ class Servers(commands.Cog):
             except Exception as e:
                 self.bot.log.debug("[UpdateMemberChannel] "+str(e))
         return False
-    
+
     async def update_everyMembercounter(self):
         if not self.bot.database_online:
             return
@@ -1104,10 +1107,10 @@ class Servers(commands.Cog):
                 await self.update_memberChannel(x)
                 i += 1
         if i > 0:
-            emb = self.bot.get_cog("Embeds").Embed(desc=f"[MEMBERCOUNTER] {i} channels refreshed", color=5011628).update_timestamp().set_author(self.bot.user)
-            await self.bot.get_cog("Embeds").send([emb], url="loop")
+            emb = discord.Embed(description=f"[MEMBERCOUNTER] {i} channels refreshed", color=5011628, timestamp=self.bot.utcnow())
+            emb.set_author(name=self.bot.user, icon_url=self.bot.user.avatar)
+            await self.bot.send_embed([emb], url="loop")
 
-    
-    
+
 def setup(bot):
     bot.add_cog(Servers(bot))

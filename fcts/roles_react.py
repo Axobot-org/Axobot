@@ -211,19 +211,20 @@ class RolesReact(commands.Cog):
     @commands.check(checks.bot_can_embed)
     async def rr_list(self, ctx: MyContext):
         """List every roles reactions of your server
-        
+
         ..Doc roles-reactions.html#list-every-roles-reactions"""
         try:
-            l = await self.rr_list_role(ctx.guild.id)
-        except Exception as e:
-            await self.bot.get_cog('Errors').on_command_error(ctx, e)
+            roles_list = await self.rr_list_role(ctx.guild.id)
+        except Exception as err:
+            await self.bot.get_cog('Errors').on_command_error(ctx, err)
         else:
-            des, _ = await self.create_list_embed(l, ctx.guild)
+            des, _ = await self.create_list_embed(roles_list, ctx.guild)
             max_rr = await self.bot.get_config(ctx.guild.id, 'roles_react_max_number')
             max_rr = self.bot.get_cog("Servers").default_opt['roles_react_max_number'] if max_rr is None else max_rr
-            title = await self.bot._(ctx.guild.id, "roles_react.rr-list", n=len(l), m=max_rr)
-            emb = await self.bot.get_cog('Embeds').Embed(title=title, desc=des, color=self.embed_color).update_timestamp().create_footer(ctx)
-            await ctx.send(embed=emb.discord_embed())
+            title = await self.bot._(ctx.guild.id, "roles_react.rr-list", n=len(roles_list), m=max_rr)
+            emb = discord.Embed(title=title, description=des, color=self.embed_color, timestamp=ctx.message.created_at)
+            emb.set_footer(text=ctx.author, icon_url=ctx.author.display_avatar)
+            await ctx.send(embed=emb)
 
     @rr_main.command(name="get", aliases=['display'])
     @commands.check(checks.database_connected)
@@ -234,19 +235,19 @@ It will only display the whole message with reactions. Still very cool tho
 
 ..Doc roles-reactions.html#get-or-leave-a-role"""
         try:
-            l = await self.rr_list_role(ctx.guild.id)
-        except Exception as e:
-            await self.bot.get_cog('Errors').on_command_error(ctx, e)
+            roles_list = await self.rr_list_role(ctx.guild.id)
+        except Exception as err:
+            await self.bot.get_cog('Errors').on_command_error(ctx, err)
         else:
-            des, emojis = await self.create_list_embed(l, ctx.guild)
+            des, emojis = await self.create_list_embed(roles_list, ctx.guild)
             title = await self.bot._(ctx.guild.id, "roles_react.rr-embed")
-            emb = self.bot.get_cog('Embeds').Embed(
-                title=title, desc=des, color=self.embed_color, footer_text=self.footer_txt).update_timestamp()
-            msg = await ctx.send(embed=emb.discord_embed())
-            for e in emojis:
+            emb = discord.Embed(title=title, description=des, color=self.embed_color, timestamp=ctx.message.created_at)
+            emb.set_footer(text=self.footer_txt)
+            msg = await ctx.send(embed=emb)
+            for err in emojis:
                 try:
-                    await msg.add_reaction(e)
-                except:
+                    await msg.add_reaction(err)
+                except (discord.Forbidden, discord.NotFound):
                     pass
 
     @rr_main.command(name="join")
