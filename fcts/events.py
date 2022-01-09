@@ -148,7 +148,7 @@ class Events(commands.Cog):
         """Called for each new message because it's cool"""
         if self.bot.zombie_mode:
             return
-        if msg.guild is None:
+        if msg.guild is None and not msg.flags.ephemeral:
             await self.send_mp(msg)
         else:
             try:
