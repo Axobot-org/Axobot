@@ -5,7 +5,7 @@ import copy
 import datetime
 
 from fcts import args, checks
-from libs.classes import Zbot, MyContext
+from libs.classes import Zbot, MyContext, ConfirmView
 
 class Timers(commands.Cog):
     def __init__(self, bot: Zbot):
@@ -135,7 +135,7 @@ class Timers(commands.Cog):
         await ctx.send(await self.bot._(ctx.channel, "timers.rmd.deleted", id=item["ID"], message=item["message"]))
 
     @remind_main.command(name="clear")
-    @commands.cooldown(3, 45, commands.BucketType.user)
+    @commands.cooldown(3, 60, commands.BucketType.user)
     async def remind_clear(self, ctx: MyContext):
         """Remove every pending reminder
 
@@ -149,24 +149,22 @@ class Timers(commands.Cog):
             if count == 0:
                 await ctx.send(await self.bot._(ctx.channel, "timers.rmd.empty"))
                 return
-        msg = await ctx.send(await self.bot._(ctx.channel, "timers.rmd.confirm", count=count))
-        await msg.add_reaction('✅')
-        await msg.add_reaction('❌')
 
-        def check(reaction: discord.Reaction, user: discord.Member):
-            return user == ctx.author and reaction.message == msg and str(reaction.emoji) in ('✅', '❌')
-        try:
-            reaction, _ = await self.bot.wait_for('reaction_add', timeout=30.0, check=check)
-        except asyncio.TimeoutError:
+        confirm_view = ConfirmView(self.bot, ctx.channel,
+            validation=lambda inter: inter.user==ctx.author,
+            timeout=20)
+        await confirm_view.init()
+        await ctx.send(await self.bot._(ctx.channel, "timers.rmd.confirm", count=count), view=confirm_view)
+
+        await confirm_view.wait()
+        if confirm_view.value is None:
             await ctx.send(await self.bot._(ctx.channel, "timers.rmd.cancelled"))
             return
-        if str(reaction.emoji) == '❌':
-            await ctx.send(await self.bot._(ctx.channel, "timers.rmd.cancelled"))
-            return
-        query = "DELETE FROM `timed` WHERE action='timer' AND user=%s"
-        async with self.bot.db_query(query, (ctx.author.id,)):
-            pass
-        await ctx.send(await self.bot._(ctx.channel, "timers.rmd.cleared"))
+        if confirm_view.value:
+            query = "DELETE FROM `timed` WHERE action='timer' AND user=%s"
+            async with self.bot.db_query(query, (ctx.author.id,)):
+                pass
+            await ctx.send(await self.bot._(ctx.channel, "timers.rmd.cleared"))
 
 
 def setup(bot: commands.Bot):
