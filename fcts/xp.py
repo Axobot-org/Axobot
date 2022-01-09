@@ -1024,12 +1024,11 @@ class Xp(commands.Cog):
             await ctx.send(await self.bot._(ctx.guild.id, "xp.rr-added", role=role.name,level=level))
 
     @rr_main.command(name="list")
+    @commands.check(checks.bot_can_embed)
     async def rr_list(self, ctx: MyContext):
         """List every roles rewards of your server
         
         ..Doc server.html#roles-rewards"""
-        if not ctx.can_send_embed:
-            return await ctx.send(await self.bot._(ctx.guild.id,"fun.no-embed-perm"))
         try:
             l = await self.rr_list_role(ctx.guild.id)
         except Exception as e:

@@ -90,7 +90,7 @@ class CannotSendEmbed(commands.CommandError):
 
 async def bot_can_embed(ctx: MyContext) -> bool:
     "Check if the bot can send embeds"
-    if ctx.bot_permissions.embed_links:
+    if ctx.can_send_embed:
         return True
     raise CannotSendEmbed()
 

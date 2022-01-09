@@ -208,12 +208,11 @@ class RolesReact(commands.Cog):
 
     @rr_main.command(name="list")
     @commands.check(checks.database_connected)
+    @commands.check(checks.bot_can_embed)
     async def rr_list(self, ctx: MyContext):
         """List every roles reactions of your server
         
         ..Doc roles-reactions.html#list-every-roles-reactions"""
-        if not ctx.can_send_embed:
-            return await ctx.send(await self.bot._(ctx.guild.id, "fun.no-embed-perm"))
         try:
             l = await self.rr_list_role(ctx.guild.id)
         except Exception as e:
@@ -228,13 +227,12 @@ class RolesReact(commands.Cog):
 
     @rr_main.command(name="get", aliases=['display'])
     @commands.check(checks.database_connected)
+    @commands.check(checks.bot_can_embed)
     async def rr_get(self, ctx: MyContext):
         """Send the roles embed
 It will only display the whole message with reactions. Still very cool tho
 
 ..Doc roles-reactions.html#get-or-leave-a-role"""
-        if not ctx.can_send_embed:
-            return await ctx.send(await self.bot._(ctx.guild.id, "fun.no-embed-perm"))
         try:
             l = await self.rr_list_role(ctx.guild.id)
         except Exception as e:

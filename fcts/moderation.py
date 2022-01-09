@@ -978,6 +978,7 @@ The 'reasons' parameter is used to display the mute reasons.
         await self.bot.invoke(new_ctx)
 
     @emoji_group.command(name="list")
+    @commands.check(checks.bot_can_embed)
     async def emoji_list(self, ctx: MyContext, page: int = 1):
         """List every emoji of your server
 
@@ -986,8 +987,6 @@ The 'reasons' parameter is used to display the mute reasons.
         ..Example emojis list 2
 
         ..Doc moderator.html#emoji-manager"""
-        if not ctx.can_send_embed:
-            return await ctx.send(await self.bot._(ctx.guild.id,"fun.no-embed-perm"))
         if page < 1:
             await ctx.send(await self.bot._(ctx.guild.id, "xp.low-page"))
             return
@@ -1077,6 +1076,7 @@ The 'reasons' parameter is used to display the mute reasons.
         await ctx.send(embed=emb.discord_embed())
 
     @main_role.command(name="server-list",aliases=["glist"])
+    @commands.check(checks.bot_can_embed)
     @commands.cooldown(5,30,commands.BucketType.guild)
     async def role_glist(self, ctx:MyContext):
         """Check the list of every role
@@ -1087,8 +1087,6 @@ The 'reasons' parameter is used to display the mute reasons.
         if not (await checks.has_manage_roles(ctx) or await checks.has_manage_guild(ctx) or await checks.has_manage_msg(ctx)):
             await ctx.send(await self.bot._(ctx.guild.id, "moderation.missing-user-perms"))
             return
-        if not ctx.can_send_embed:
-            return await ctx.send(await self.bot._(ctx.guild.id,"fun.no-embed-perm"))
         tr_mbr = await self.bot._(ctx.guild.id,"misc.membres")
         title = await self.bot._(ctx.guild.id, "moderation.roles.list")
         desc = list()

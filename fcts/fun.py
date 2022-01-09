@@ -821,6 +821,7 @@ You can specify a verification limit by adding a number in argument (up to 1.000
         await ctx.send(txt)
 
     @commands.command(name="nasa")
+    @commands.check(checks.bot_can_embed)
     @commands.cooldown(5, 60, commands.BucketType.channel)
     async def nasa(self, ctx: MyContext):
         """Send the Picture of The Day by NASA
@@ -828,9 +829,6 @@ You can specify a verification limit by adding a number in argument (up to 1.000
         ..Doc fun.html#nasa"""
         def get_date(string):
             return datetime.datetime.strptime(string, "%Y-%m-%d")
-        if ctx.guild and not ctx.can_send_embed:
-            await ctx.send(await self.bot._(ctx.channel, "fun.no-embed-perm"))
-            return
         if self.nasa_pict is None or 'date' not in self.nasa_pict or (datetime.datetime.utcnow()-get_date(self.nasa_pict["date"])).total_seconds() > 86400:
             async with aiohttp.ClientSession() as session:
                 key = self.bot.others["nasa"]
