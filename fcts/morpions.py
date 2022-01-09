@@ -4,7 +4,7 @@ import asyncio
 import time
 import emoji as emojilib
 from discord.ext import commands
-from utils import Zbot, MyContext
+from libs.classes import Zbot, MyContext
 
 from fcts.checks import is_ttt_enabled
 

@@ -4,7 +4,7 @@ import discord
 import requests
 import typing
 from discord.ext import commands
-from utils import Zbot, MyContext
+from libs.classes import Zbot, MyContext
 
 url_base = 'https://discord.com/api/webhooks/'
 

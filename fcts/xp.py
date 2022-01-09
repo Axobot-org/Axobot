@@ -22,7 +22,7 @@ from math import sqrt
 from fcts import args, checks
 importlib.reload(args)
 importlib.reload(checks)
-from utils import Zbot, MyContext
+from libs.classes import Zbot, MyContext
 
 
 

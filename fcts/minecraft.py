@@ -8,7 +8,7 @@ import requests
 from discord.ext import commands
 from urllib.parse import quote
 
-from utils import Zbot, MyContext
+from libs.classes import Zbot, MyContext
 from fcts import checks
 
 

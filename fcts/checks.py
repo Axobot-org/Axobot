@@ -1,6 +1,6 @@
 import discord
 from discord.ext import commands
-from utils import MyContext
+from libs.classes import MyContext
 
 
 async def can_mute(ctx: MyContext) -> bool:

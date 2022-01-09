@@ -1,6 +1,6 @@
 import discord
 from discord.ext import commands
-from utils import Zbot
+from libs.classes import Zbot
 
 class Welcomer(commands.Cog):
     """Cog which manages the departure and arrival of members in the servers"""

@@ -1,7 +1,7 @@
 from aiohttp.client import ClientSession
 from aiohttp import client_exceptions
 from feedparser.util import FeedParserDict
-from utils import Zbot, MyContext
+from libs.classes import Zbot, MyContext
 import discord
 import datetime
 import time
@@ -596,7 +596,7 @@ class Rss(commands.Cog):
                     else:
                         r.append(item)
                 r = ", ".join(r)
-                text = await self.bot._(ctx.guild.id,"rss.roles.list", roles=r)
+                text = await self.bot._(ctx.guild.id,"rss.role.list", roles=r)
             # ask for roles
             embed = discord.Embed(title=await self.bot._(ctx.guild.id, "rss.choose-roles"), color=discord.Colour(0x77ea5c), description=text, timestamp=ctx.message.created_at)
             emb_msg = await ctx.send(embed=embed)

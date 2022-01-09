@@ -4,7 +4,7 @@ import json
 import copy
 from typing import List
 from discord.ext import commands
-from utils import Zbot, MyContext
+from libs.classes import Zbot, MyContext
 
 
 class Help(commands.Cog):

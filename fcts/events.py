@@ -12,7 +12,7 @@ import discord
 import mysql
 import psutil
 from discord.ext import commands, tasks
-from utils import Zbot
+from libs.classes import Zbot
 
 from fcts.checks import is_fun_enabled
 

@@ -2,7 +2,7 @@ import discord
 import datetime
 import json
 from discord.ext import commands
-from utils import Zbot, MyContext
+from libs.classes import Zbot, MyContext
 
 data = {
     "fr": {

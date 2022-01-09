@@ -8,7 +8,7 @@ import importlib
 import asyncio
 import copy
 from fcts import checks, args
-from utils import Zbot, MyContext
+from libs.classes import Zbot, MyContext
 
 importlib.reload(checks)
 importlib.reload(args)
@@ -1086,7 +1086,7 @@ The 'reasons' parameter is used to display the mute reasons.
             await ctx.send(await self.bot._(ctx.guild.id, "moderation.missing-user-perms"))
             return
         tr_mbr = await self.bot._(ctx.guild.id,"misc.membres")
-        title = await self.bot._(ctx.guild.id, "moderation.roles.list")
+        title = await self.bot._(ctx.guild.id, "moderation.role.list")
         desc = list()
         count = 0
         for role in ctx.guild.roles[1:]:

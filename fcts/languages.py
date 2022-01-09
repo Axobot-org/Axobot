@@ -1,6 +1,6 @@
 import discord
 import i18n
-from utils import Zbot
+from libs.classes import Zbot
 
 
 class Languages(discord.ext.commands.Cog):

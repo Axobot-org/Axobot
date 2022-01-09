@@ -16,7 +16,8 @@ import geocoder
 from discord.ext import commands
 from pytz import timezone
 from timezonefinder import TimezoneFinder
-from utils import MyContext, Zbot, flatten_list
+from libs.classes import MyContext, Zbot
+from utils import flatten_list
 
 from fcts import args, checks, emojis
 from fcts.checks import is_fun_enabled

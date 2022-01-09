@@ -2,7 +2,7 @@ from typing import TYPE_CHECKING
 import discord
 
 if TYPE_CHECKING:
-    from utils import Zbot
+    from libs.classes import Zbot
 
 
 class PrefixManager:
