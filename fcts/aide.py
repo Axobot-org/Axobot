@@ -85,7 +85,7 @@ If the bot can't send the new command format, it will try to send the old one.""
                 send_in_dm = False if not self.bot.database_online else await self.bot.get_config(ctx.guild, 'help_in_dm')
                 if send_in_dm is not None and send_in_dm == 1:
                     destination = ctx.message.author.dm_channel
-                    await self.bot.get_cog("Utilities").suppr(ctx.message)
+                    await ctx.message.delete(delay=0)
                 else:
                     destination = ctx.message.channel
             if destination is None:

@@ -53,7 +53,7 @@ class Welcomer(commands.Cog):
         msg = await self.bot.get_config(member.guild.id,Type)
         if member.id in self.no_message or (Type == "welcome" and await self.raid_check(member)):
             return
-        if await self.bot.get_cog('Utilities').check_any_link(member.name) is not None:
+        if self.bot.get_cog('Utilities').sync_check_any_link(member.name) is not None:
             return
         if msg not in ['',None]:
             ch = await self.bot.get_config(member.guild.id,'welcome_channel')
@@ -190,7 +190,7 @@ class Welcomer(commands.Cog):
         # Level 3 or more
         if level >= 3 and can_ban:
             # ban members with invitations in their nickname
-            if await self.bot.get_cog('Utilities').check_discord_invite(member.name) is not None:
+            if self.bot.get_cog('Utilities').sync_check_discord_invite(member.name) is not None:
                 if await self.ban(member,await self.bot._(member.guild.id,"logs.reason.invite")):
                     return True
             if account_created_since <= 45*60: # kick accounts created less than 45min before
@@ -203,7 +203,7 @@ class Welcomer(commands.Cog):
                     return True
         # Level 1 or more
         if level >= 1: # kick members with invitations in their nickname
-            if await self.bot.get_cog('Utilities').check_discord_invite(member.name) is not None:
+            if self.bot.get_cog('Utilities').sync_check_discord_invite(member.name) is not None:
                 if await self.kick(member,await self.bot._(member.guild.id,"logs.reason.invite")):
                     return True       
         # Nothing got triggered
