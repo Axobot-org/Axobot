@@ -69,39 +69,30 @@ class Perms(commands.Cog):
                 else:
                     permsl.append(self.bot.get_cog('Emojis').customEmojis['red_cross'] + perm_tr)
         if ctx.can_send_embed:
-            # \uFEFF is a Zero-Width Space, which basically allows us to have an empty field name.
-            # And to make it look nice, we wrap it in an Embed.
-            if len(permsl) > 10:
-                sep = int(len(permsl)/2)
-                if len(permsl)%2 == 1:
-                    sep+=1
-                f1 = {'name':'\uFEFF', 'value':"\n".join(permsl[:sep]),'inline':True}
-                f2 = {'name':'\uFEFF', 'value':"\n".join(permsl[sep:]),'inline':True}
-                fields = [f1,f2]
-            else:
-                fields = [{'name':'\uFEFF', 'value':"\n".join(permsl),'inline':True}]
             if channel is None:
                 desc = await self.bot._(ctx.guild.id, "permissions.general")
             else:
                 desc = channel.mention
+            embed = discord.Embed(color=col, description=desc)
+            if len(permsl) > 10:
+                sep = int(len(permsl)/2)
+                if len(permsl)%2 == 1:
+                    sep+=1
+                embed.add_field(name=self.bot.zws, value="\n".join(permsl[:sep]))
+                embed.add_field(name=self.bot.zws, value="\n".join(permsl[sep:]))
+            else:
+                embed.add_field(name=self.bot.zws, value="\n".join(permsl))
+
             _whatisthat = await self.bot._(ctx.guild.id, "permissions.whatisthat")
-            fields.append({
-                'name': '\uFEFF',
-                'value': f'[{_whatisthat}](https://zbot.readthedocs.io/en/latest/perms.html)',
-                'inline': False
-            })
-            embed = await ctx.bot.get_cog('Embeds').Embed(color=col, fields=fields, desc=desc).create_footer(ctx)
-            embed.author_name = name
-            embed.author_icon = avatar
-            await ctx.send(embed=embed.discord_embed())
-            # Thanks to Gio for the Command.
+            embed.add_field(name=self.bot.zws, value=f'[{_whatisthat}](https://zbot.readthedocs.io/en/latest/perms.html)',
+                            inline=False)
+            embed.set_author(name=name, icon_url=avatar)
+            embed.set_footer(text=ctx.author, icon_url=ctx.author.display_avatar)
+            await ctx.send(embed=embed)
         else:
-            try:
-                txt = await self.bot._(ctx.guild.id,"permissions.title", name=name) + "\n".join(permsl)
-                allowed_mentions = discord.AllowedMentions.none()
-                await ctx.send(txt, allowed_mentions=allowed_mentions)
-            except:
-                pass
+            txt = await self.bot._(ctx.guild.id,"permissions.title", name=name) + "\n".join(permsl)
+            allowed_mentions = discord.AllowedMentions.none()
+            await ctx.send(txt, allowed_mentions=allowed_mentions)
 
 
 def setup(bot):

@@ -149,17 +149,22 @@ class Partners(commands.Cog):
                     title, fields, image, target_desc = await self.update_partner_guild(tr_guild, tr_members, tr_unknown, tr_invite, tr_click, channel, partner, target_desc)
                 except discord.NotFound:
                     continue
-            emb = self.bot.get_cog('Embeds').Embed(title=title,desc=target_desc,fields=[f for f in fields if f is not None],color=color,footer_text=str(partner['ID']),thumbnail=image).update_timestamp()
+            emb = discord.Embed(title=title, description=target_desc, color=color, timestamp=self.bot.utcnow())
+            emb.set_footer(text=partner['ID'])
+            emb.set_thumbnail(url=image)
+            for field in fields:
+                if field:
+                    emb.add_field(**field)
             if self.bot.zombie_mode:
                 return
             try:
                 msg = await channel.fetch_message(partner['messageID'])
-                await msg.edit(embed=emb.discord_embed())
+                await msg.edit(embed=emb)
             except discord.errors.NotFound:
-                msg = await channel.send(embed=emb.discord_embed())
+                msg = await channel.send(embed=emb)
                 await self.bdd_edit_partner(partnerID=partner['ID'],msg=msg.id)
             except Exception as e:
-                msg = await channel.send(embed=emb.discord_embed())
+                msg = await channel.send(embed=emb)
                 await self.bdd_edit_partner(partnerID=partner['ID'],msg=msg.id)
                 await self.bot.get_cog('Errors').on_error(e,None)
             count += 1
@@ -266,15 +271,15 @@ class Partners(commands.Cog):
                 item = await self.bot.fetch_user(invite)
                 if not item.bot:
                     raise Exception
-            except:
+            except discord.NotFound:
                 return await ctx.send(await self.bot._(ctx.guild.id, "partners.invalid-bot"))
-            Type = 'bot'
+            partner_type = 'bot'
         elif isinstance(invite,str):
             try:
                 item = await self.bot.fetch_invite(invite)
             except discord.errors.NotFound:
                 return await ctx.send(await self.bot._(ctx.guild.id, "partners.invalid-invite"))
-            Type = 'guild'
+            partner_type = 'guild'
         else:
             return
         current_list = [x['target'] for x in await self.bdd_get_guild(ctx.guild.id)]
@@ -282,12 +287,14 @@ class Partners(commands.Cog):
             return await ctx.send(await self.bot._(ctx.guild, "partners.already-added"))
         if len(description) > 0:
             description = await self.bot.get_cog('Emojis').anti_code(description)
-        await self.bdd_set_partner(guildID=ctx.guild.id,partnerID=item.id,partnerType=Type,desc=description)
+        await self.bdd_set_partner(guildID=ctx.guild.id,partnerID=item.id,partnerType=partner_type,desc=description)
         await ctx.send(await self.bot._(ctx.guild.id, "partners.added-partner"))
         # logs
-        emb = self.bot.get_cog("Embeds").Embed(desc=f"New partner added: {Type} {item.id}", color=10949630, footer_text=ctx.guild.name).update_timestamp().set_author(self.bot.user)
-        await self.bot.get_cog("Embeds").send([emb])
-    
+        emb = discord.Embed(description=f"New partner added: {partner_type} {item.id}", color=10949630, timestamp=self.bot.utcnow())
+        emb.set_footer(text=ctx.guild.name)
+        emb.set_author(name=self.bot.user, icon_url=self.bot.user.avatar)
+        await self.bot.send_embed([emb])
+
     @partner_main.command(name='description',aliases=['desc'])
     @commands.check(checks.database_connected)
     async def partner_desc(self, ctx: MyContext, ID:int, *, description:str):
@@ -344,13 +351,13 @@ class Partners(commands.Cog):
         if l['type']=='bot':
             try:
                 bot = await self.bot.fetch_user(l['target'])
-            except:
+            except discord.NotFound:
                 bot = l['target']
             msg = await ctx.send(await self.bot._(ctx.guild.id, "partners.confirm-bot", bot=bot))
         elif l['type']=='guild':
             try:
                 server = (await self.bot.fetch_invite(l['target'])).guild.name
-            except:
+            except discord.NotFound:
                 server = l['target']
             msg = await ctx.send(await self.bot._(ctx.guild.id, "partners.confirm-server", server=server))
         else:
@@ -364,11 +371,13 @@ class Partners(commands.Cog):
             return await ctx.send(await self.bot._(ctx.guild.id, "partners.del-canceled"))
         if await self.bdd_del_partner(l['ID']):
             await ctx.send(await self.bot._(ctx.guild.id, "partners.deleted"))
-            emb = self.bot.get_cog("Embeds").Embed(desc=f"Partner removed: {l['type']} {l['ID']}", color=10949630, footer_text=ctx.guild.name).update_timestamp().set_author(self.bot.user)
-            await self.bot.get_cog("Embeds").send([emb])
+            emb = discord.Embed(description=f"Partner removed: {l['type']} {l['ID']}", color=10949630, timestamp=self.bot.utcnow())
+            emb.set_footer(text=ctx.guild.name)
+            emb.set_author(name=self.bot.user, icon_url=self.bot.user.avatar)
+            await self.bot.send_embed([emb])
         else:
             await ctx.send(await self.bot._(ctx.guild.id, "partners.unknown-error"))
-        
+
     @partner_main.command(name="list")
     @commands.check(checks.has_manage_guild)
     async def partner_list(self, ctx: MyContext):
@@ -415,8 +424,13 @@ class Partners(commands.Cog):
             color = await ctx.bot.get_config(ctx.guild.id,'partner_color')
             if color is None:
                 color = self.bot.get_cog('Servers').default_opt['partner_color']
-            emb = await ctx.bot.get_cog('Embeds').Embed(title=fields_name[0],fields=[{'name':fields_name[1],'value':f[0]},{'name':'​','value':'​'},{'name':fields_name[2],'value':f[1]}],color=color,thumbnail=ctx.guild.icon).update_timestamp().create_footer(ctx)
-            await ctx.send(embed=emb.discord_embed())
+            emb = discord.Embed(title=fields_name[0], color=color, timestamp=self.bot.utcnow())
+            emb.set_thumbnail(url=ctx.guild.icon)
+            emb.add_field(name=fields_name[1], value=f[0], inline=False)
+            emb.add_field(name=self.bot.zws, value=self.bot.zws, inline=False)
+            emb.add_field(name=fields_name[2], value=f[1], inline=False)
+            emb.set_footer(text=ctx.author, icon_url=ctx.author.display_avatar)
+            await ctx.send(embed=emb)
         else:
             await ctx.send(f"__{fields_name[0]}:__\n{f[0]}\n\n__{fields_name[1]}:__\n{f[1]}")
 

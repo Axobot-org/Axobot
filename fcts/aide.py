@@ -43,7 +43,7 @@ class Help(commands.Cog):
             urls += "\n:arrow_forward: " + await self.bot._(ctx.channel, f"info.about-{e}") + " <" + url + ">"
         msg = await self.bot._(ctx.channel, "info.about-main", mention=ctx.bot.user.mention, links=urls)
         if ctx.can_send_embed:
-            await ctx.send(embed=self.bot.get_cog("Embeds").Embed(desc=msg, color=16298524))
+            await ctx.send(embed=discord.Embed(description=msg, color=16298524))
         else:
             await ctx.send(msg)
 

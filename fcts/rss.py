@@ -172,7 +172,8 @@ class Rss(commands.Cog):
             if not self.embed:
                 return text
             else:
-                emb = self.bot.get_cog('Embeds').Embed(desc=text,color=self.embed_data['color'],footer_text=self.embed_data['footer'])
+                emb = discord.Embed(description=text, color=self.embed_data['color'])
+                emb.set_footer(text=self.embed_data['footer'])
                 if self.embed_data['title'] is None:
                     if self.Type != 'tw':
                         emb.title = self.title
@@ -180,9 +181,9 @@ class Rss(commands.Cog):
                         emb.title = self.author
                 else:
                     emb.title = self.embed_data['title']
-                emb.add_field(name='URL',value=self.url)
+                emb.add_field(name='URL', value=self.url)
                 if self.image is not None:
-                    emb.thumbnail = self.image
+                    emb.set_thumbnail(url=self.image)
                 return emb
 
 
@@ -398,9 +399,9 @@ class Rss(commands.Cog):
             return
         try:
             await self.remove_flow(flow[0]['ID'])
-        except Exception as e:
+        except Exception as err:
             await ctx.send(await self.bot._(ctx.guild, "rss.fail-add"))
-            await self.bot.get_cog("Errors").on_error(e,ctx)
+            await self.bot.get_cog("Errors").on_error(err,ctx)
             return
         await ctx.send(await self.bot._(ctx.guild, "rss.delete-success"))
         self.bot.log.info("RSS feed deleted into server {} ({})".format(ctx.guild.id,flow[0]['ID']))
@@ -412,45 +413,47 @@ class Rss(commands.Cog):
     @commands.check(can_use_rss)
     async def list_flows(self, ctx: MyContext):
         """Get a list of every rss/Minecraft feed
-        
+
         ..Doc rss.html#see-every-feed"""
-        liste = await self.get_guild_flows(ctx.guild.id)
-        if len(liste) == 0:
+        flows_list = await self.get_guild_flows(ctx.guild.id)
+        if len(flows_list) == 0:
             # no rss feed
             await ctx.send(await self.bot._(ctx.guild.id, "rss.no-feed2"))
             return
         title = await self.bot._(ctx.guild.id, "rss.list-title", server=ctx.guild.name)
         translation = await self.bot._(ctx.guild.id, "rss.list-result")
-        l = list()
-        for x in liste:
-            c = self.bot.get_channel(x['channel'])
-            if c is not None:
-                c = c.mention
+        flows_to_display = list()
+        for flow in flows_list:
+            channel = self.bot.get_channel(flow['channel'])
+            if channel is not None:
+                channel = channel.mention
             else:
-                c = x['channel']
-            if x['roles'] == '':
-                r = await self.bot._(ctx.guild.id, "misc.none")
+                channel = flow['channel']
+            if flow['roles'] == '':
+                role = await self.bot._(ctx.guild.id, "misc.none")
             else:
-                r = list()
-                for item in x['roles'].split(';'):
+                role = list()
+                for item in flow['roles'].split(';'):
                     role = discord.utils.get(ctx.guild.roles,id=int(item))
                     if role is not None:
-                        r.append(role.mention)
+                        role.append(role.mention)
                     else:
-                        r.append(item)
-                r = ", ".join(r)
-            Type = await self.bot._(ctx.guild.id,"rss."+x['type'])
-            if len(l) > 20:
-                embed = await self.bot.get_cog('Embeds').Embed(title=title, color=self.embed_color, time=ctx.message.created_at).create_footer(ctx)
-                for text in l:
-                    embed.add_field(name="\uFEFF", value=text, inline=False)
+                        role.append(item)
+                role = ", ".join(role)
+            flow_type = await self.bot._(ctx.guild.id,"rss."+flow['type'])
+            if len(flows_to_display) > 20:
+                embed = discord.Embed(title=title, color=self.embed_color, timestamp=ctx.message.created_at)
+                embed.set_footer(text=ctx.author, icon_url=ctx.author.display_avatar)
+                for text in flows_to_display:
+                    embed.add_field(name=self.bot.zws, value=text, inline=False)
                 await ctx.send(embed=embed)
-                l.clear()
-            l.append(translation.format(Type,c,x['link'],r,x['ID'],x['date']))
-        if len(l) > 0:
-            embed = await self.bot.get_cog('Embeds').Embed(title=title, color=self.embed_color, time=ctx.message.created_at).create_footer(ctx)
-            for x in l:
-                embed.add_field(name="\uFEFF", value=x, inline=False)
+                flows_to_display.clear()
+            flows_to_display.append(translation.format(flow_type,channel,flow['link'],role,flow['ID'],flow['date']))
+        if len(flows_to_display) > 0:
+            embed = discord.Embed(title=title, color=self.embed_color, timestamp=ctx.message.created_at)
+            embed.set_footer(text=ctx.author, icon_url=ctx.author.display_avatar)
+            for flow in flows_to_display:
+                embed.add_field(name=self.bot.zws, value=flow, inline=False)
             await ctx.send(embed=embed)
 
     async def askID(self, ID, ctx: MyContext, title:str, allow_mc: bool=False, display_mentions: bool=True):
@@ -510,7 +513,7 @@ class Rss(commands.Cog):
                 iterator += 1
             if len("\n".join(text)) < 2048:
                 desc = "\n".join(text)
-                fields = None
+                fields = ()
             else:
                 desc = text[0].split("\n")[0]
                 fields = []
@@ -521,9 +524,12 @@ class Rss(commands.Cog):
                         field = {'name': text[0].split("\n")[-2], 'value': ''}
                     field['value'] += line+"\n"
                 fields.append(field)
-            embed = await self.bot.get_cog('Embeds').Embed(title=title, color=self.embed_color, desc=desc, fields=fields, time=ctx.message.created_at).create_footer(ctx)
+            embed = discord.Embed(title=title, color=self.embed_color, description=desc, timestamp=ctx.message.created_at)
+            embed.set_footer(text=ctx.author, icon_url=ctx.author.display_avatar)
+            for field in fields:
+                embed.add_field(**field)
             emb_msg = await ctx.send(embed=embed)
-            def check(msg):
+            def check(msg: discord.Message):
                 if not msg.content.isnumeric():
                     return False
                 return msg.author.id==userID and int(msg.content) in range(1,iterator)
@@ -592,15 +598,14 @@ class Rss(commands.Cog):
                 r = ", ".join(r)
                 text = await self.bot._(ctx.guild.id,"rss.roles.list", roles=r)
             # ask for roles
-            embed = self.bot.get_cog('Embeds').Embed(title=await self.bot._(ctx.guild.id, "rss.choose-roles"), color=discord.Colour(0x77ea5c), desc=text, time=ctx.message.created_at)
-            emb_msg = await ctx.send(embed=embed.discord_embed())
-            userID = ctx.author.id
-            def check2(msg):
-                return msg.author.id == userID
+            embed = discord.Embed(title=await self.bot._(ctx.guild.id, "rss.choose-roles"), color=discord.Colour(0x77ea5c), description=text, timestamp=ctx.message.created_at)
+            emb_msg = await ctx.send(embed=embed)
+
             cond = False
             while not cond:
                 try:
-                    msg = await self.bot.wait_for('message', check=check2, timeout=30.0)
+                    msg: discord.Message = await self.bot.wait_for('message',
+                        check=lambda msg: msg.author==ctx.author, timeout=30.0)
                     if msg.content.lower() in no_role: # if no role should be mentionned
                         IDs = [None]
                     else:
@@ -1401,7 +1406,7 @@ class Rss(commands.Cog):
             try:
                 if self.bot.zombie_mode:
                     return
-                if isinstance(t,(self.bot.get_cog('Embeds').Embed,discord.Embed)):
+                if isinstance(t, discord.Embed):
                     await channel.send(" ".join(obj.mentions), embed=t, allowed_mentions=discord.AllowedMentions(everyone=False, roles=True))
                 else:
                     await channel.send(t, allowed_mentions=discord.AllowedMentions(everyone=False, roles=True))
@@ -1506,8 +1511,9 @@ class Rss(commands.Cog):
                 statscog.rss_stats['errors'] = len(errors)
         if len(errors) > 0:
             d.append('{} errors: {}'.format(len(errors),' '.join([str(x) for x in errors])))
-        emb = self.bot.get_cog("Embeds").Embed(desc='\n'.join(d),color=1655066).update_timestamp().set_author(self.bot.user)
-        await self.bot.get_cog("Embeds").send([emb],url="loop")
+        emb = discord.Embed(description='\n'.join(d), color=1655066, timestamp=self.bot.utcnow())
+        emb.set_author(name=self.bot.user, icon_url=self.bot.user.avatar)
+        await self.bot.send_embed([emb], url="loop")
         self.bot.log.debug(d[0])
         if len(errors) > 0:
             self.bot.log.warning("[Rss loop] "+d[1])
@@ -1559,12 +1565,14 @@ class Rss(commands.Cog):
                 await self.main_loop()
         else:
             await ctx.send("Option `new_start` invalide - choisissez start, stop ou once")
-    
+
     async def send_log(self, text: str, guild: discord.Guild):
         """Send a log to the logging channel"""
         try:
-            emb = self.bot.get_cog("Embeds").Embed(desc="[RSS] "+text,color=5366650,footer_text=guild.name).update_timestamp().set_author(self.bot.user)
-            await self.bot.get_cog("Embeds").send([emb])
+            emb = discord.Embed(description="[RSS] "+text, color=5366650, timestamp=self.bot.utcnow())
+            emb.set_footer(text=guild.name)
+            emb.set_author(name=self.bot.user, icon_url=self.bot.user.avatar)
+            await self.bot.send_embed([emb])
         except Exception as e:
             await self.bot.get_cog("Errors").on_error(e,None)
 

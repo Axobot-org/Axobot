@@ -877,15 +877,18 @@ Available types: member, role, user, emoji, channel, server, invite, category
             else:
                 color = None if ctx.guild.me.color.value == 0 else ctx.guild.me.color
 
-            await ctx.send(embed = await self.bot.get_cog('Embeds').Embed(title=user_name, thumbnail=str(user.display_avatar.replace(static_format="png", size=1024)) ,color=color, fields = [
-                {"name": "ID", "value": user.id},
-                {"name": "Flags", "value": "-".join(userflags), "inline":False},
-                {"name": "Servers", "value": "\n".join(servers_in), "inline":True},
-                {"name": "Language", "value": "\n".join(disp_lang), "inline":True},
-                {"name": "XP card", "value": xp_card, "inline":True},
-                {"name": "Upvoted the bot?", "value": votes, "inline":True},
-                {"name": "XP sus?", "value": xp_sus, "inline":True},
-            ]).create_footer(ctx))
+            embed = discord.Embed(title=user_name, color=color)
+            embed.set_thumbnail(url=user.display_avatar.replace(static_format="png", size=1024))
+            embed.add_field(name="ID", value=user.id)
+            embed.add_field(name="Flags", value="-".join(userflags), inline=False)
+            embed.add_field(name="Servers", value="\n".join(servers_in))
+            embed.add_field(name="Language", value="\n".join(disp_lang))
+            embed.add_field(name="XP card", value=xp_card)
+            embed.add_field(name="Upvoted the bot?", value=votes)
+            embed.add_field(name="XP sus?", value=xp_sus)
+            embed.set_footer(text=f'Requested by {ctx.author.name}', icon_url=ctx.author.display_avatar)
+
+            await ctx.send(embed=embed)
         else:
             txt = """Name: {}
 ID: {}
@@ -904,13 +907,13 @@ Servers:
                 )
             await ctx.send(txt)
 
-    @find_main.command(name="guild",aliases=['server'])
+    @find_main.command(name="guild", aliases=['server'])
     async def find_guild(self, ctx: MyContext, *, guild: str):
         if guild.isnumeric():
-            guild = ctx.bot.get_guild(int(guild))
+            guild: discord.Guild = ctx.bot.get_guild(int(guild))
         else:
             for x in self.bot.guilds:
-                if x.name==guild:
+                if x.name == guild:
                     guild = x
                     break
         if isinstance(guild, str) or guild is None:
@@ -945,19 +948,20 @@ Servers:
                 color = None
             else:
                 color = None if ctx.guild.me.color.value == 0 else ctx.guild.me.color
-            guild_icon = str(guild.icon.with_static_format("png"))
-            await ctx.send(embed = await self.bot.get_cog('Embeds').Embed(title=guild.name, color=color, thumbnail=guild_icon, fields=[
-                {"name": "ID", "value": guild.id},
-                {"name": "Owner", "value": "{} ({})".format(guild.owner, guild.owner_id)},
-                {"name": "Joined at", "value": joined_at},
-                {"name": "Members", "value": guild.member_count, "inline":True},
-                {"name": "Language", "value": lang, "inline":True},
-                {"name": "Prefix", "value": pref, "inline":True},
-                {"name": "RSS feeds count", "value": rss_numb, "inline":True},
-                {"name": "Roles rewards count", "value": rr_len, "inline":True},
-            ]).create_footer(ctx))
+            emb = discord.Embed(title=guild.name, color=color)
+            emb.set_thumbnail(url=guild.icon.with_static_format("png"))
+            emb.add_field(name="ID", value=guild.id)
+            emb.add_field(name="Owner", value=f"{guild.owner} ({guild.owner_id})", inline=False)
+            emb.add_field(name="Joined at", value=joined_at, inline=False)
+            emb.add_field(name="Members", value=f"{guild.member_count} (including {bots} bots)")
+            emb.add_field(name="Language", value=lang)
+            emb.add_field(name="Prefix", value=pref)
+            emb.add_field(name="RSS feeds count", value=rss_numb)
+            emb.add_field(name="Roles rewards count", value=rr_len)
+            emb.set_footer(text=ctx.author, icon_url=ctx.author.display_avatar)
+            await ctx.send(embed=emb)
         else:
-            txt = "Nom : {name}\nID : {id}\nPropriétaire : {owner} ({ownerid})\nRejoint le : {join}\nMembres : {members} (dont {bots} bots)\nLangue : {lang}\nPréfixe : `{prefix}`\nNombre de flux rss : {rss}\nNombre de roles-rewards : {rr}".format(name = guild.name,
+            txt = "Name: {name}\nID: {id}\nOwner: {owner} ({ownerid})\nJoined at: {join}\nMembers: {members} (including {bots} bots)\nLanguage: {lang}\nPrefix: `{prefix}`\nRSS feeds count: {rss}\nRoles rewards count: {rr}".format(name = guild.name,
                 id = guild.id,
                 owner = guild.owner,
                 ownerid = guild.owner_id,
@@ -974,17 +978,18 @@ Servers:
     async def find_channel(self, ctx: MyContext, ID:int):
         c = self.bot.get_channel(ID)
         if c is None:
-            await ctx.send("Salon introuvable")
+            await ctx.send("Unknonwn channel")
             return
         if ctx.can_send_embed:
             if ctx.guild is None:
                 color = None
             else:
                 color = None if ctx.guild.me.color.value == 0 else ctx.guild.me.color
-            await ctx.send(embed = await self.bot.get_cog('Embeds').Embed(title="#"+c.name,color=color,fields=[
-                {"name": "ID", "value": c.id},
-                {"name": "Server", "value": f"{c.guild.name} ({c.guild.id})"}
-            ]).create_footer(ctx))
+            emb = discord.Embed(title="#"+c.name, color=color)
+            emb.add_field(name="ID", value=c.id)
+            emb.add_field(name="Server", value=f"{c.guild.name} ({c.guild.id})", inline=False)
+            emb.set_footer(text=ctx.author, icon_url=ctx.author.display_avatar)
+            await ctx.send(embed=emb)
         else:
             await ctx.send("Nom : {}\nID : {}\nServeur : {} ({})".format(c.name,c.id,c.guild.name,c.guild.id))
 
@@ -1002,15 +1007,16 @@ Servers:
                 color = None
             else:
                 color = None if ctx.guild.me.color.value == 0 else ctx.guild.me.color
-            await ctx.send(embed = await self.bot.get_cog('Embeds').Embed(title="@"+role.name,color=color,fields=[
-                {"name": "ID", "value": role.id},
-                {"name": "Server", "value": f"{role.guild.name} ({role.guild.id})"},
-                {"name": "Members", "value": len(role.members), "inline": True},
-                {"name": "Colour", "value": str(role.colour), "inline": True}
-            ]).create_footer(ctx))
+            emb = discord.Embed(title="@"+role.name, color=color)
+            emb.add_field(name="ID", value=role.id)
+            emb.add_field(name="Server", value=f"{role.guild.name} ({role.guild.id})", inline=False)
+            emb.add_field(name="Members", value=len(role.members))
+            emb.add_field(name="Colour", value=str(role.colour))
+            emb.set_footer(text=ctx.author, icon_url=ctx.author.display_avatar)
+            await ctx.send(embed=emb)
         else:
-            await ctx.send("Nom : {}\nID : {}\nServeur : {} ({})\nNombre de membres : {}\nCouleur : {}".format(role.name,role.id,role.guild.name,role.guild.id,len(role.members),role.colour))
-    
+            await ctx.send("Name: {}\nID: {}\nServer: {} ({})\nMembers: {}\nColor: {}".format(role.name,role.id,role.guild.name,role.guild.id,len(role.members),role.colour))
+
     @find_main.command(name='rss')
     async def find_rss(self, ctx: MyContext, ID:int):
         flow = await self.bot.get_cog('Rss').get_flow(ID)
@@ -1037,13 +1043,14 @@ Servers:
                 color = None
             else:
                 color = None if ctx.guild.me.color.value == 0 else ctx.guild.me.color
-            await ctx.send(embed = await self.bot.get_cog('Embeds').Embed(title=f"RSS N°{ID}",color=color,fields=[
-                {"name": "Server", "value": g, "inline": True},
-                {"name": "Channel", "value": c, "inline": True},
-                {"name": "URL", "value": flow['link']},
-                {"name": "Type", "value": flow['type'], "inline": True},
-                {"name": "Last post", "value": d, "inline": True},
-            ]).create_footer(ctx))
+            emb = discord.Embed(title=f"RSS N°{ID}", color=color)
+            emb.add_field(name="Server", value=g)
+            emb.add_field(name="Channel", value=c)
+            emb.add_field(name="URL", value=flow['link'], inline=False)
+            emb.add_field(name="Type", value=flow['type'])
+            emb.add_field(name="Last post", value=d)
+            emb.set_footer(text=ctx.author, icon_url=ctx.author.display_avatar)
+            await ctx.send(embed=emb)
         else:
             await ctx.send("ID: {}\nGuild: {}\nChannel: {}\nLink: <{}>\nType: {}\nLast post: {}".format(flow['ID'],g.replace("\n"," "),c.replace("\n"," "),flow['link'],flow['type'],d))
 
@@ -1086,9 +1093,12 @@ Servers:
         txt = await self.bot._(ctx.channel,"info.prefix")
         prefix = "\n".join((await ctx.bot.get_prefix(ctx.message))[1:])
         if ctx.guild is None or ctx.channel.permissions_for(ctx.guild.me):
-            emb = await ctx.bot.get_cog('Embeds').Embed(title=txt,desc=prefix,time=ctx.message.created_at,color=ctx.bot.get_cog('Help').help_color).create_footer(ctx)
-            return await ctx.send(embed=emb.discord_embed())
-        await ctx.send(txt+"\n"+prefix)
+            emb = discord.Embed(title=txt, description=prefix, timestamp=ctx.message.created_at,
+                color=ctx.bot.get_cog('Help').help_color)
+            emb.set_footer(text=ctx.author, icon_url=ctx.author.display_avatar)
+            await ctx.send(embed=emb)
+        else:
+            await ctx.send(txt+"\n"+prefix)
 
     @get_prefix.command(name="change")
     @commands.guild_only()
@@ -1104,7 +1114,7 @@ Servers:
         msg.content =  f'{ctx.prefix}config change prefix "{new_prefix}"'
         new_ctx = await self.bot.get_context(msg)
         await self.bot.invoke(new_ctx)
-    
+
     @commands.command(name="discordlinks",aliases=['discord','discordurls'])
     async def discord_status(self, ctx: MyContext):
         """Get some useful links about Discord"""
@@ -1112,7 +1122,8 @@ Servers:
         links = ["https://dis.gd/status","https://dis.gd/tos","https://dis.gd/report","https://dis.gd/feedback","https://support.discord.com/hc/en-us/articles/115002192352","https://discord.com/developers/docs/legal","https://support.discord.com/hc/en-us/articles/206346498-Where-can-I-find-my-User-Server-Message-ID-","https://support.discord.com/hc/en-us/articles/360040724612", " https://twitter.com/discordapp/status/1060411427616444417", "https://support.discord.com/hc/en-us/articles/360035675191"]
         if ctx.can_send_embed:
             txt = "\n".join(['['+l[i]+']('+links[i]+')' for i in range(len(l))])
-            em = await self.bot.get_cog("Embeds").Embed(desc=txt).update_timestamp().create_footer(ctx)
+            em = discord.Embed(description=txt)
+            em.set_footer(text=ctx.author, icon_url=ctx.author.display_avatar)
             await ctx.send(embed=em)
         else:
             txt = "\n".join([f'• {l[i]}: <{links[i]}>' for i in range(len(l))])
@@ -1240,7 +1251,7 @@ Servers:
         if len(results) == 0:
             await ctx.send(await self.bot._(ctx.channel,'info.changelog.notfound'))
         elif ctx.can_send_embed:
-            emb = ctx.bot.get_cog('Embeds').Embed(title=title,desc=desc,time=time,color=ctx.bot.get_cog('Servers').embed_color)
+            emb = discord.Embed(title=title, description=desc, timestamp=time, color=ctx.bot.get_cog('Servers').embed_color)
             await ctx.send(embed=emb)
         else:
             await ctx.send(desc)
@@ -1250,7 +1261,7 @@ Servers:
     async def username(self, ctx: MyContext, *, user: discord.User=None):
         """Get the names history of an user
         Default user is you
-        
+
         ..Doc infos.html#usernames-history"""
         if user is None:
             user = ctx.author
@@ -1259,12 +1270,12 @@ Servers:
         if not self.bot.beta:
             cond += " AND beta=0"
         query = f"SELECT `old`, `new`, `guild`, CONVERT_TZ(`date`, @@session.time_zone, '+00:00') AS `utc_date` FROM `usernames_logs` WHERE {cond} ORDER BY date DESC"
-        results = self.bot.db_query(query)
-        # List creation
-        this_guild = list()
-        global_list = [x for x in results if x['guild'] in (None,0)]
-        if ctx.guild is not None:
-            this_guild = [x for x in results if x['guild']==ctx.guild.id]
+        async with self.bot.db_query(query) as results:
+            # List creation
+            this_guild = list()
+            global_list = [x for x in results if x['guild'] in (None,0)]
+            if ctx.guild is not None:
+                this_guild = [x for x in results if x['guild']==ctx.guild.id]
         # title
         t = await self.bot._(ctx.channel,'info.usernames.title',u=user.name)
         # Embed creation
@@ -1272,29 +1283,27 @@ Servers:
             MAX = 28
             date = ""
             desc = None
-            f = list()
+            fields = list()
             if len(global_list) > 0:
             # Usernames part
                 temp = [x['new'] for x in global_list if x['new']!='']
                 if len(temp) > 0:
                     if len(temp) > MAX:
                         temp = temp[:MAX] + [await self.bot._(ctx.channel, 'info.usernames.more', nbr=len(temp)-MAX)]
-                    f.append({'name':await self.bot._(ctx.channel,'info.usernames.global'), 'value':"\n".join(temp)})
-                    # if global_list[-1]['old'] != '':
-                    #     f[-1]["value"] += "\n" + global_list[-1]['old']
-                    date += await self.bot.get_cog('TimeUtils').date([x['utc_date'] for x in global_list][0] ,year=True, lang=language)
+                    fields.append({'name':await self.bot._(ctx.channel,'info.usernames.global'), 'value':"\n".join(temp)})
+                    date += "General: <t:{}>".format(round(global_list[0]['utc_date'].timestamp()))
+                    # date += await self.bot.get_cog('TimeUtils').date([x['utc_date'] for x in global_list][0] ,year=True, lang=language)
             if len(this_guild) > 0:
             # Nicknames part
                 temp = [x['new'] for x in this_guild if x['new']!='']
                 if len(temp) > 0:
                     if len(temp) > MAX:
                         temp = temp[:MAX] + [await self.bot._(ctx.channel, 'info.usernames.more', nbr=len(temp)-MAX)]
-                    f.append({'name':await self.bot._(ctx.channel,'info.usernames.local'), 'value':"\n".join(temp)})
-                    # if this_guild[-1]['old'] != '':
-                    #     f[-1]["value"] += "\n" + this_guild[-1]['old']
-                    date += "\n" + await self.bot.get_cog('TimeUtils').date([x['utc_date'] for x in this_guild][0], year=True, lang=language)
+                    fields.append({'name':await self.bot._(ctx.channel,'info.usernames.local'), 'value':"\n".join(temp)})
+                    date += "\nServer: <t:{}>".format(round(this_guild[0]['utc_date'].timestamp()))
+                    # date += "\n" + await self.bot.get_cog('TimeUtils').date([x['utc_date'] for x in this_guild][0], year=True, lang=language)
             if len(date) > 0:
-                f.append({'name':await self.bot._(ctx.channel,'info.usernames.last-date'), 'value':date})
+                fields.append({'name':await self.bot._(ctx.channel,'info.usernames.last-date'), 'value':date})
             else:
                 desc = await self.bot._(ctx.channel,'info.usernames.empty')
             if ctx.guild is not None and ctx.guild.get_member(user.id) is not None and ctx.guild.get_member(user.id).color!=discord.Color(0):
@@ -1306,7 +1315,10 @@ Servers:
                 footer = await self.bot._(ctx.channel,'info.usernames.disallow')
             else:
                 footer = await self.bot._(ctx.channel,'info.usernames.allow')
-            emb = self.bot.get_cog('Embeds').Embed(title=t,fields=f,desc=desc,color=c,footer_text=footer)
+            emb = discord.Embed(title=t, description=desc, color=c)
+            emb.set_footer(text=footer)
+            for field in fields:
+                emb.add_field(**field)
             await ctx.send(embed=emb)
         # Raw text creation
         else:

@@ -702,8 +702,8 @@ Cette option affecte tous les serveurs"""
             text += "\n**[{} - {}]**  {} ".format(x[3],x[4],x[2])
         try:
             if ctx.can_send_embed:
-                emb = ctx.bot.get_cog('Embeds').Embed(title=title,desc=text,color=color).update_timestamp()
-                return await bot_msg.edit(content=None,embed=emb.discord_embed())
+                emb = discord.Embed(title=title, description=text, color=color, timestamp=self.bot.utcnow())
+                return await bot_msg.edit(content=None,embed=emb)
             await bot_msg.edit(content=title+text)
         except discord.HTTPException:
             await ctx.send("Le message est trop long pour être envoyé !")
@@ -842,13 +842,12 @@ Cette option affecte tous les serveurs"""
         msg = "Backup completed in {} seconds!".format(round(time.time()-t,3))
         self.bot.log.info(msg)
         await message.edit(content=msg)
-            
+
     @commands.group(name='bug',hidden=True)
     @commands.check(reloads.check_admin)
     async def main_bug(self, ctx: MyContext):
         """Gère la liste des bugs"""
-        pass
-    
+
     @main_bug.command(name='add')
     async def bug_add(self, ctx: MyContext,* ,bug: str):
         """Ajoute un bug à la liste"""
@@ -857,25 +856,27 @@ Cette option affecte tous les serveurs"""
             if channel is None:
                 return await ctx.send("Salon 488769283673948175 introuvable")
             text = bug.split('\n')
-            fr,en = text[0].replace('\\n','\n'), text[1].replace('\\n','\n')
-            emb = self.bot.get_cog('Embeds').Embed(title="New bug",fields=[{'name':'Français','value':fr},{'name':'English','value':en}],color=13632027).update_timestamp()
-            await channel.send(embed=emb.discord_embed())
+            fr_text, en_text = text[0].replace('\\n','\n'), text[1].replace('\\n','\n')
+            emb = discord.Embed(title="New bug", timestamp=self.bot.utcnow())
+            emb.add_field(name='Français', value=fr_text, inline=False)
+            emb.add_field(name='English', value=en_text, inline=False)
+            await channel.send(embed=emb)
             await ctx.bot.get_cog('Utilities').add_check_reaction(ctx.message)
-        except Exception as e:
-            await self.bot.get_cog('Errors').on_command_error(ctx,e)
-    
+        except Exception as err:
+            await self.bot.get_cog('Errors').on_command_error(ctx,err)
+
     @main_bug.command(name='fix')
-    async def bug_fix(self, ctx: MyContext, ID:int, fixed:bool=True):
+    async def bug_fix(self, ctx: MyContext, msg_id: int, fixed:bool=True):
         """Marque un bug comme étant fixé"""
         try:
             chan = ctx.bot.get_channel(548138866591137802) if self.bot.beta else ctx.bot.get_channel(488769283673948175)
             if chan is None:
                 return await ctx.send("Salon introuvable")
             try:
-                msg = await chan.fetch_message(ID)
-            except Exception as e:
-                return await ctx.send("`Error:` {}".format(e))
-            if len(msg.embeds)!=1:
+                msg = await chan.fetch_message(msg_id)
+            except Exception as err:
+                return await ctx.send("`Error:` {}".format(err))
+            if len(msg.embeds) != 1:
                 return await ctx.send("Nombre d'embeds invalide")
             emb = msg.embeds[0]
             if fixed:
@@ -886,15 +887,14 @@ Cette option affecte tous les serveurs"""
                 emb.title = "New bug"
             await msg.edit(embed=emb)
             await ctx.bot.get_cog('Utilities').add_check_reaction(ctx.message)
-        except Exception as e:
-            await self.bot.get_cog('Errors').on_command_error(ctx,e)
+        except Exception as err:
+            await self.bot.get_cog('Errors').on_command_error(ctx,err)
 
     @commands.group(name="idea",hidden=True)
     @commands.check(reloads.check_admin)
     async def main_idea(self, ctx: MyContext):
         """Ajouter une idée dans le salon des idées, en français et anglais"""
-        pass
-    
+
     @main_idea.command(name='add')
     async def idea_add(self, ctx: MyContext, *, text):
         """Ajoute une idée à la liste"""
@@ -903,23 +903,25 @@ Cette option affecte tous les serveurs"""
             if channel is None:
                 return await ctx.send("Salon introuvable")
             text = text.split('\n')
-            fr,en = text[0].replace('\\n','\n'), text[1].replace('\\n','\n')
-            emb = self.bot.get_cog('Embeds').Embed(fields=[{'name':'Français','value':fr},{'name':'English','value':en}],color=16106019).update_timestamp()
-            msg = await channel.send(embed=emb.discord_embed())
+            fr_text, en_text = text[0].replace('\\n','\n'), text[1].replace('\\n','\n')
+            emb = discord.Embed(color=16106019, timestamp=self.bot.utcnow())
+            emb.add_field(name='Français', value=fr_text)
+            emb.add_field(name='English', value=en_text)
+            msg = await channel.send(embed=emb)
             await self.bot.get_cog('Fun').add_vote(msg)
             await ctx.bot.get_cog('Utilities').add_check_reaction(ctx.message)
-        except Exception as e:
-            await self.bot.get_cog('Errors').on_command_error(ctx,e)
+        except Exception as err:
+            await self.bot.get_cog('Errors').on_command_error(ctx,err)
 
     @main_idea.command(name='valid')
-    async def idea_valid(self, ctx: MyContext, ID:int, valid:bool=True):
+    async def idea_valid(self, ctx: MyContext, msg_id:int, valid:bool=True):
         """Marque une idée comme étant ajoutée à la prochaine MàJ"""
         try:
             chan = ctx.bot.get_channel(548138866591137802) if self.bot.beta else ctx.bot.get_channel(488769306524385301)
             if chan is None:
                 return await ctx.send("Salon introuvable")
             try:
-                msg = await chan.fetch_message(ID)
+                msg = await chan.fetch_message(msg_id)
             except Exception as e:
                 return await ctx.send("`Error:` {}".format(e))
             if len(msg.embeds)!=1:

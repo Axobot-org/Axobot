@@ -94,8 +94,8 @@ class Events(commands.Cog):
         try:
             async with self.bot.db_query(query, query_args):
                 pass
-        except mysql.connector.errors.IntegrityError as e:
-            self.bot.log.warning(e)
+        except mysql.connector.errors.IntegrityError as err:
+            self.bot.log.warning(err)
             await self.updade_memberslogs_name(before, after, tries+1)
 
     @commands.Cog.listener()
@@ -122,10 +122,10 @@ class Events(commands.Cog):
         if guild.owner:
             await self.check_owner_server(guild.owner)
 
-    async def send_guild_log(self, guild: discord.Guild, Type: str):
+    async def send_guild_log(self, guild: discord.Guild, log_type: str):
         """Send a log to the logging channel when the bot joins/leave a guild"""
         try:
-            if Type == "join":
+            if log_type == "join":
                 self.bot.log.info("Bot joined the server {}".format(guild.id))
                 desc = "Bot **joined the server** {} ({}) - {} users".format(guild.name,guild.id,len(guild.members))
             else:
@@ -134,12 +134,13 @@ class Events(commands.Cog):
                     desc = "Bot **may have left** the server {} (guild unavailable)".format(guild.id)
                 else:
                     desc = "Bot **left the server** {} ({}) - {} users".format(guild.name,guild.id,len(guild.members))
-            emb = self.bot.get_cog("Embeds").Embed(desc=desc,color=self.embed_colors['welcome']).update_timestamp().set_author(self.bot.user)
-            await self.bot.get_cog("Embeds").send([emb])
+            emb = discord.Embed(description=desc, color=self.embed_colors['welcome'])
+            emb.set_author(name=self.bot.user, icon_url=self.bot.user.avatar)
+            await self.bot.send_embed([emb])
             if self.bot.database_online:
                 await self.send_sql_statslogs()
-        except Exception as e:
-            await self.bot.get_cog("Errors").on_error(e,None)
+        except Exception as err:
+            await self.bot.get_cog("Errors").on_error(err,None)
 
 
     @commands.Cog.listener()
@@ -249,29 +250,31 @@ class Events(commands.Cog):
             await member.remove_roles(role, reason="This user doesn't support me anymore")
 
 
-    async def send_logs_per_server(self, guild: discord.Guild, Type:str, message: str, author: discord.User=None, fields: list[dict]=None):
+    async def send_logs_per_server(self, guild: discord.Guild, log_type:str, message: str, author: discord.User=None, fields: list[dict]=None):
         """Send a log in a server. Type is used to define the color of the embed"""
         if self.bot.zombie_mode:
             return
         if not self.bot.database_online:
             return
-        c = self.embed_colors[Type.lower()]
+        color = self.embed_colors[log_type.lower()]
         try:
-            config = str(await self.bot.get_config(guild.id,"modlogs_channel")).split(';')[0]
+            config = str(await self.bot.get_config(guild.id,"modlogs_channel")).split(';', maxsplit=1)[0]
             if config == "" or not config.isnumeric():
                 return
             channel = guild.get_channel(int(config))
-        except Exception as e:
-            await self.bot.get_cog("Errors").on_error(e,None)
+        except Exception as err:
+            await self.bot.get_cog("Errors").on_error(err,None)
             return
         if channel is None:
             return
-        emb = self.bot.get_cog("Embeds").Embed(desc=message, color=c, fields=fields).update_timestamp()
+        emb = discord.Embed(description=message, color=color)
+        for field in fields:
+            emb.add_field(**field)
         if author is not None:
-            emb.set_author(author)
+            emb.set_author(name=author, icon_url=author.display_avatar)
         try:
-            await channel.send(embed=emb.discord_embed())
-        except:
+            await channel.send(embed=emb)
+        except discord.Forbidden:
             pass
 
 
@@ -389,11 +392,11 @@ class Events(commands.Cog):
 
     async def check_tasks(self):
         await self.bot.wait_until_ready()
-        tasks = await self.get_events_from_db()
-        if len(tasks) == 0:
+        tasks_list = await self.get_events_from_db()
+        if len(tasks_list) == 0:
             return
-        self.bot.log.debug("[tasks_loop] Itération ({} tâches trouvées)".format(len(tasks)))
-        for task in tasks:
+        self.bot.log.debug("[tasks_loop] Itération ({} tâches trouvées)".format(len(tasks_list)))
+        for task in tasks_list:
             if task['action']=='mute':
                 try:
                     guild = self.bot.get_guild(task['guild'])
@@ -539,14 +542,15 @@ class Events(commands.Cog):
                     self.bot.log.debug(f"StatusPage API returned {r.status} for {params} (available RAM)")
             self.latencies_list = list()
             self.last_statusio = d
-    
+
     async def botEventLoop(self):
         self.bot.get_cog("BotEvents").updateCurrentEvent()
         e = self.bot.get_cog("BotEvents").current_event
-        emb = self.bot.get_cog("Embeds").Embed(desc=f'**Bot event** updated (current event is {e})',color=1406147).update_timestamp().set_author(self.bot.user)
-        await self.bot.get_cog("Embeds").send([emb],url="loop")
+        emb = discord.Embed(description=f'**Bot event** updated (current event is {e})', color=1406147)
+        emb.set_author(name=self.bot.user, icon_url=self.bot.user.avatar)
+        await self.bot.send_embed([emb], url="loop")
         self.last_eventDay_check = datetime.datetime.today()
-    
+
     async def dbl_send_data(self):
         """Send guilds count to Discord Bots Lists"""
         if self.bot.beta:
@@ -556,8 +560,8 @@ class Events(commands.Cog):
         self.bot.log.info("[DBL] Envoi des infos sur le nombre de guildes...")
         try:
             guildCount = await self.bot.get_cog('Info').get_guilds_count()
-        except Exception as e:
-            await self.bot.get_cog('Errors').on_error(e,None)
+        except Exception as err:
+            await self.bot.get_cog('Errors').on_error(err,None)
             guildCount = len(self.bot.guilds)
         session = aiohttp.ClientSession(loop=self.bot.loop)
         try:# https://top.gg/bot/486896267788812288
@@ -565,9 +569,9 @@ class Events(commands.Cog):
             async with session.post('https://top.gg/api/bots/486896267788812288/stats',data=payload,headers={'Authorization':str(self.bot.dbl_token)}) as resp:
                 self.bot.log.debug('discordbots.org returned {} for {}'.format(resp.status, payload))
                 answers[0] = resp.status
-        except Exception as e:
+        except Exception as err:
             answers[0] = "0"
-            await self.bot.get_cog("Errors").on_error(e,None)
+            await self.bot.get_cog("Errors").on_error(err,None)
         try: # https://bots.ondiscord.xyz/bots/486896267788812288
             payload = json.dumps({
             'guildCount': guildCount
@@ -579,9 +583,9 @@ class Events(commands.Cog):
             async with session.post('https://bots.ondiscord.xyz/bot-api/bots/{}/guilds'.format(self.bot.user.id), data=payload, headers=headers) as resp:
                 self.bot.log.debug('BotsOnDiscord returned {} for {}'.format(resp.status, payload))
                 answers[1] = resp.status
-        except Exception as e:
+        except Exception as err:
             answers[1] = "0"
-            await self.bot.get_cog("Errors").on_error(e,None)
+            await self.bot.get_cog("Errors").on_error(err,None)
         try: # https://discordlist.space/bot/486896267788812288
             payload = json.dumps({
                 'serverCount': guildCount
@@ -593,9 +597,9 @@ class Events(commands.Cog):
             async with session.post('https://api.discordlist.space/v2/bots/{}'.format(self.bot.user.id), data=payload, headers=headers) as resp:
                 self.bot.log.debug('discordlist.space returned {} for {}'.format(resp.status, payload))
                 answers[2] = resp.status
-        except Exception as e:
+        except Exception as err:
             answers[2] = "0"
-            await self.bot.get_cog("Errors").on_error(e,None)
+            await self.bot.get_cog("Errors").on_error(err,None)
         try: # https://discord.boats/bot/486896267788812288
             headers = {
                 'Authorization': self.bot.others['discordboats'],
@@ -604,9 +608,9 @@ class Events(commands.Cog):
             async with session.post('https://discord.boats/api/bot/{}'.format(self.bot.user.id), data=payload, headers=headers) as resp:
                 self.bot.log.debug('discord.boats returned {} for {}'.format(resp.status, payload))
                 answers[3] = resp.status
-        except Exception as e:
+        except Exception as err:
             answers[3] = "0"
-            await self.bot.get_cog("Errors").on_error(e,None)
+            await self.bot.get_cog("Errors").on_error(err,None)
         try: # https://api.discordextremelist.xyz/v2/bot/486896267788812288/stats
             payload = json.dumps({
                 'guildCount': guildCount
@@ -618,13 +622,15 @@ class Events(commands.Cog):
             async with session.post('https://api.discordextremelist.xyz/v2/bot/{}/stats'.format(self.bot.user.id), data=payload, headers=headers) as resp:
                 self.bot.log.debug('DiscordExtremeList returned {} for {}'.format(resp.status, payload))
                 answers[4] = resp.status
-        except Exception as e:
+        except Exception as err:
             answers[4] = "0"
-            await self.bot.get_cog("Errors").on_error(e,None)
+            await self.bot.get_cog("Errors").on_error(err,None)
         await session.close()
-        answers = [str(x) for x in answers]
-        emb = self.bot.get_cog("Embeds").Embed(desc='**Guilds count updated** in {}s ({})'.format(round(time.time()-t,3),'-'.join(answers)),color=7229109).update_timestamp().set_author(self.bot.user)
-        await self.bot.get_cog("Embeds").send([emb],url="loop")
+        answers = '-'.join(str(x) for x in answers)
+        delta_time = round(time.time()-t,3)
+        emb = discord.Embed(description=f'**Guilds count updated** in {delta_time}s ({answers})', color=7229109)
+        emb.set_author(name=self.bot.user, icon_url=self.bot.user.avatar)
+        await self.bot.send_embed([emb], url="loop")
         self.dbl_last_sending = datetime.datetime.now()
 
     async def partners_loop(self):
@@ -644,11 +650,15 @@ class Events(commands.Cog):
                     continue
                 count[0] += 1
                 count[1] += await self.bot.get_cog('Partners').update_partners(chan,guild['partner_color'])
-            except Exception as e:
-                await self.bot.get_cog('Errors').on_error(e,None)
-        emb = self.bot.get_cog("Embeds").Embed(desc='**Partners channels updated** in {}s ({} channels - {} partners)'.format(round(time.time()-t,3),count[0],count[1]),color=10949630).update_timestamp().set_author(self.bot.user)
-        await self.bot.get_cog("Embeds").send([emb],url="loop")
-        
+            except Exception as err:
+                await self.bot.get_cog('Errors').on_error(err,None)
+        delta_time = round(time.time()-t,3)
+        emb = discord.Embed(
+            description=f'**Partners channels updated** in {delta_time}s ({count[0]} channels - {count[1]} partners)',
+            color=10949630)
+        emb.set_author(name=self.bot.user, icon_url=self.bot.user.avatar)
+        await self.bot.send_embed([emb], url="loop")
+
     async def translations_backup(self):
         """Do a backup of the translations files"""
         from os import remove
@@ -659,12 +669,14 @@ class Events(commands.Cog):
         except:
             pass
         try:
-           shutil.make_archive('translation-backup','tar','translation')
+            shutil.make_archive('translation-backup','tar','translation')
         except FileNotFoundError:
             await self.bot.get_cog('Errors').senf_err_msg("Translators backup: Unable to find backup folder")
             return
-        emb = self.bot.get_cog("Embeds").Embed(desc='**Translations files backup** completed in {}s'.format(round(time.time()-t,3)),color=10197915).update_timestamp().set_author(self.bot.user)
-        await self.bot.get_cog("Embeds").send([emb],url="loop")    
+        delta_time = round(time.time()-t,3)
+        emb = discord.Embed(description=f'**Translations files backup** completed in {delta_time}s', color=10197915)
+        emb.set_author(name=self.bot.user, icon_url=self.bot.user.avatar)
+        await self.bot.send_embed([emb], url="loop")
 
     async def send_sql_statslogs(self):
         "Send some stats about the current bot stats"
@@ -697,15 +709,14 @@ class Events(commands.Cog):
         try:
             async with self.bot.db_query(query, data):
                 pass
-        except Exception as e:
+        except Exception as err:
             await self.bot.get_cog("Errors").senf_err_msg(query)
-            raise e
+            raise err
         emb = discord.Embed(description='**Stats logs** updated', color=5293283)
         emb.set_author(name=self.bot.user, icon_url=self.bot.user.avatar)
-        await self.bot.get_cog("Embeds").send([emb], url="loop")
+        await self.bot.send_embed([emb], url="loop")
         self.statslogs_last_push = datetime.datetime.now()
 
 
 def setup(bot):
     bot.add_cog(Events(bot))
-

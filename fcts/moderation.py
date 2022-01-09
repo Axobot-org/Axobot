@@ -831,12 +831,13 @@ You must be an administrator of this server to use this command.
                 title = await self.bot._(ctx.guild.id, "moderation.ban.list-title-2")
             else:
                 title = await self.bot._(ctx.guild.id, "moderation.ban.list-title-0")
-        embed = ctx.bot.get_cog('Embeds').Embed(title=title.format(ctx.guild.name), color=self.bot.get_cog("Servers").embed_color, desc="\n".join(desc), time=ctx.message.created_at)
-        await embed.create_footer(ctx)
+        embed = discord.Embed(title=title.format(ctx.guild.name), color=self.bot.get_cog("Servers").embed_color,
+                              description="\n".join(desc), timestamp=ctx.message.created_at)
+        embed.set_footer(text=ctx.author, icon_url=ctx.author.display_avatar)
         try:
-            await ctx.send(embed=embed.discord_embed(),delete_after=15)
+            await ctx.send(embed=embed, delete_after=15)
         except discord.errors.HTTPException as e:
-            if e.code==400:
+            if e.code == 400:
                 await ctx.send(await self.bot._(ctx.guild.id, "moderation.ban.list-error"))
 
 
@@ -881,11 +882,11 @@ The 'reasons' parameter is used to display the mute reasons.
                 desc.append(str(user))
             if len(liste) > 60: # overwrite title with limit
                 title = await self.bot._(ctx.guild.id, "moderation.mute.list-title-2", guild=ctx.guild.name)
-        embed = ctx.bot.get_cog('Embeds').Embed(title=title, color=self.bot.get_cog(
-            "Servers").embed_color, desc="\n".join(desc), time=ctx.message.created_at)
-        await embed.create_footer(ctx)
+        embed = discord.Embed(title=title, color=self.bot.get_cog("Servers").embed_color,
+                              description="\n".join(desc), timestamp=ctx.message.created_at)
+        embed.set_footer(text=ctx.author, icon_url=ctx.author.display_avatar)
         try:
-            await ctx.send(embed=embed  , delete_after=20)
+            await ctx.send(embed=embed, delete_after=20)
         except discord.errors.HTTPException as e:
             if e.code == 400:
                 await ctx.send(await self.bot._(ctx.guild.id, "moderation.ban.list-error"))
@@ -1003,17 +1004,14 @@ The 'reasons' parameter is used to display the mute reasons.
                 return
             emotes = emotes[(page-1)*50:page*50]
             nbr = len(emotes)
-            fields = list()
+            embed = discord.Embed(title=title, color=self.bot.get_cog('Servers').embed_color)
             for i in range(0, min(50, nbr), 10):
-                l = list()
-                for x in emotes[i:i+10]:
-                    l.append(x)
-                t = {'name': "{}-{}".format(i+1, i+10 if i+10 <
-                                            nbr else nbr), 'value': "\n".join(l), 'inline': False}
-                fields.append(t)
-            embed = await ctx.bot.get_cog('Embeds').Embed(title=title,
-                                                       fields=fields,
-                                                       color=self.bot.get_cog('Servers').embed_color).create_footer(ctx)
+                emotes_list = list()
+                for emote in emotes[i:i+10]:
+                    emotes_list.append(emote)
+                field_name = "{}-{}".format(i+1, i+10 if i+10 < nbr else nbr)
+                embed.add_field(name=field_name, value="\n".join(emotes_list), inline=False)
+            embed.set_footer(text=ctx.author, icon_url=ctx.author.display_avatar)
             await ctx.send(embed=embed)
         except Exception as e:
             await ctx.bot.get_cog('Errors').on_command_error(ctx,e)
@@ -1061,19 +1059,19 @@ The 'reasons' parameter is used to display the mute reasons.
         tr_nbr = await self.bot._(ctx.guild.id,'info.info.role-3')
         tr_mbr = await self.bot._(ctx.guild.id,"misc.membres")
         txt = str()
-        fields = list()
-        fields.append({'name':tr_nbr.capitalize(),'value':str(len(role.members))})
+        emb = discord.Embed(title=role.name, color=role.color, timestamp=ctx.message.created_at)
+        emb.add_field(name=tr_nbr.capitalize(), value=len(role.members), inline=False)
         nbr = len(role.members)
-        if nbr<=200:
+        if nbr <= 200:
             for i in range(nbr):
                 txt += role.members[i].mention+" "
                 if i<nbr-1 and len(txt+role.members[i+1].mention) > 1000:
-                    fields.append({'name':tr_mbr.capitalize(),'value':txt})
+                    emb.add_field(name=tr_mbr.capitalize(), value=txt)
                     txt = str()
             if len(txt) > 0:
-                fields.append({'name':tr_mbr.capitalize(),'value':txt})
-        emb = await self.bot.get_cog('Embeds').Embed(title=role.name,fields=fields,color=role.color).update_timestamp().create_footer(ctx)
-        await ctx.send(embed=emb.discord_embed())
+                emb.add_field(name=tr_mbr.capitalize(), value=txt)
+        emb.set_footer(text=ctx.author, icon_url=ctx.author.display_avatar)
+        await ctx.send(embed=emb)
 
     @main_role.command(name="server-list",aliases=["glist"])
     @commands.check(checks.bot_can_embed)
@@ -1094,14 +1092,16 @@ The 'reasons' parameter is used to display the mute reasons.
         for role in ctx.guild.roles[1:]:
             txt = "{} - {} {}".format(role.mention, len(role.members), tr_mbr)
             if count+len(txt) > 2040:
-                emb = await self.bot.get_cog('Embeds').Embed(title=title,desc="\n".join(desc),color=ctx.guild.me.color).update_timestamp().create_footer(ctx)
+                emb = discord.Embed(title=title, description="\n".join(desc), color=ctx.guild.me.color, timestamp=ctx.message.created_at)
+                emb.set_footer(text=ctx.author, icon_url=ctx.author.display_avatar)
                 await ctx.send(embed=emb)
                 desc.clear()
                 count = 0
             desc.append(txt)
             count += len(txt)+2
         if count > 0:
-            emb = await self.bot.get_cog('Embeds').Embed(title=title,desc="\n".join(desc),color=ctx.guild.me.color).update_timestamp().create_footer(ctx)
+            emb = discord.Embed(title=title, description="\n".join(desc), color=ctx.guild.me.color, timestamp=ctx.message.created_at)
+            emb.set_footer(text=ctx.author, icon_url=ctx.author.display_avatar)
             await ctx.send(embed=emb)
 
 

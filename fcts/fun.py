@@ -56,12 +56,12 @@ class Fun(commands.Cog):
         except:
             pass
 
-    async def cache_update(self,id,value):
+    async def cache_update(self, id, value):
         self.fun_opt[str(id)] = value
 
     @commands.Cog.listener()
     async def on_ready(self):
-            self.utilities = self.bot.get_cog("Utilities")
+        self.utilities = self.bot.get_cog("Utilities")
 
     async def is_on_guild(self,user,guild):
         if self.bot.user.id == 436835675304755200:
@@ -72,11 +72,9 @@ class Fun(commands.Cog):
         if server is not None:
             return user in server.members
         return False
-    
-    
 
     @commands.command(name='fun')
-    async def main(self,ctx: MyContext):
+    async def main(self, ctx: MyContext):
         """Get a list of all fun commands
         
         ..Doc fun.html"""
@@ -100,8 +98,9 @@ class Fun(commands.Cog):
                     for cmds in cmd.commands:
                         text+="\n    - {} *({})*".format(cmds.name,cmds.help)
         if ctx.can_send_embed:
-            emb = await ctx.bot.get_cog('Embeds').Embed(title=title,desc=text,color=ctx.bot.get_cog('Help').help_color,time=ctx.message.created_at).create_footer(ctx)
-            return await ctx.send(embed=emb.discord_embed())
+            emb = discord.Embed(title=title, description=text, color=ctx.bot.get_cog('Help').help_color, timestamp=ctx.message.created_at)
+            emb.set_footer(text=ctx.author, icon_url=ctx.author.display_avatar)
+            return await ctx.send(embed=emb)
         await ctx.send(title+text)
 
     @commands.command(name='roll',hidden=True)
@@ -125,7 +124,7 @@ class Fun(commands.Cog):
     @commands.command(name="cookie",aliases=['cookies'],hidden=True)
     @commands.check(can_use_cookie)
     @commands.check(is_fun_enabled)
-    async def cookie(self,ctx: MyContext):
+    async def cookie(self, ctx: MyContext):
         """COOKIE !!!"""
         if ctx.author.id == 375598088850505728:
             await ctx.send(file=await self.utilities.find_img("cookie-target.gif"))
@@ -187,7 +186,7 @@ You can specify a verification limit by adding a number in argument (up to 1.000
 
     @commands.command(name="ragequit",hidden=True)
     @commands.check(is_fun_enabled)
-    async def ragequit(self,ctx: MyContext):
+    async def ragequit(self, ctx: MyContext):
         """To use when you get angry - limited to certain members
 
         ..Doc fun.html#ragequit"""
@@ -195,7 +194,7 @@ You can specify a verification limit by adding a number in argument (up to 1.000
 
     @commands.command(name="run",hidden=True)
     @commands.check(is_fun_enabled)
-    async def run(self,ctx: MyContext):
+    async def run(self, ctx: MyContext):
         """"Just... run... very... fast
         
         ..Doc fun.html#run"""
@@ -203,7 +202,7 @@ You can specify a verification limit by adding a number in argument (up to 1.000
 
     @commands.command(name="pong",hidden=True)
     @commands.check(is_fun_enabled)
-    async def pong(self,ctx: MyContext):
+    async def pong(self, ctx: MyContext):
         """Ping !
         
         ..Doc fun.html#pong"""
@@ -211,7 +210,7 @@ You can specify a verification limit by adding a number in argument (up to 1.000
 
     @commands.command(name="nope",hidden=True)
     @commands.check(is_fun_enabled)
-    async def nope(self,ctx: MyContext):
+    async def nope(self, ctx: MyContext):
         """Use this when you do not agree with someone else
         
         ..Doc fun.html#nope"""
@@ -225,7 +224,7 @@ You can specify a verification limit by adding a number in argument (up to 1.000
 
     @commands.command(name="blame",hidden=True)
     @commands.check(is_fun_enabled)
-    async def blame(self,ctx,name):
+    async def blame(self, ctx: MyContext, name: str):
         """Blame someone
         Use 'blame list' command to see every available name *for you*
         
@@ -257,17 +256,17 @@ You can specify a verification limit by adding a number in argument (up to 1.000
             if await self.is_on_guild(ctx.author,523525264517496834): # Benny Support
                 liste += l4
             txt = "- "+"\n- ".join(sorted(liste))
-            title = await self.bot._(ctx.channel,"fun.blame-0",user=ctx.author)
+            title = await self.bot._(ctx.channel, "fun.blame-0", user=ctx.author)
             if ctx.can_send_embed:
-                emb = self.bot.get_cog("Embeds").Embed(title=title,desc=txt,color=self.bot.get_cog("Help").help_color).update_timestamp()
-                await ctx.send(embed=emb.discord_embed())
+                emb = discord.Embed(title=title, description=txt, color=self.bot.get_cog("Help").help_color)
+                await ctx.send(embed=emb)
             else:
                 await ctx.send("__{}:__\n\n{}".format(title,txt))
 
     @commands.command(name="kill",hidden=True)
     @commands.guild_only()
     @commands.check(is_fun_enabled)
-    async def kill(self,ctx,*,name=None):
+    async def kill(self, ctx: MyContext, * , name: str=None):
         """Just try to kill someone with a fun message
         
         ..Example kill herobrine
@@ -290,12 +289,12 @@ You can specify a verification limit by adding a number in argument (up to 1.000
 
     @commands.command(name="arapproved",aliases=['arapprouved'],hidden=True)
     @commands.check(lambda ctx: ctx.author.id in [375598088850505728,279568324260528128])
-    async def arapproved(self,ctx: MyContext):
+    async def arapproved(self, ctx: MyContext):
         await ctx.send(file=await self.utilities.find_img("arapproved.png"))
 
     @commands.command(name='party',hidden=True)
     @commands.check(is_fun_enabled)
-    async def party(self,ctx: MyContext):
+    async def party(self, ctx: MyContext):
         """Sends a random image to make the server happier
         
         ..Doc fun.html#party"""
@@ -314,7 +313,7 @@ You can specify a verification limit by adding a number in argument (up to 1.000
 
     @commands.command(name="cat",hidden=True)
     @commands.check(is_fun_enabled)
-    async def cat_gif(self,ctx: MyContext):
+    async def cat_gif(self, ctx: MyContext):
         """Wow... So cuuuute !
         
         ..Doc fun.html#cat"""
@@ -326,7 +325,7 @@ You can specify a verification limit by adding a number in argument (up to 1.000
     
     @commands.command(name="happy-birthday", hidden=True, aliases=['birthday', 'hb'])
     @commands.check(is_fun_enabled)
-    async def birthday_gif(self,ctx: MyContext):
+    async def birthday_gif(self, ctx: MyContext):
         """How many candles this year?
         
         ..Doc fun.html#birthdays"""
@@ -338,7 +337,7 @@ You can specify a verification limit by adding a number in argument (up to 1.000
     
     @commands.command(name="bigtext",hidden=True)
     @commands.check(is_fun_enabled)
-    async def big_text(self,ctx,*,text):
+    async def big_text(self, ctx: MyContext, *, text: str):
         """If you wish to write bigger
 
         ..Example bigtext Hi world! I'm 69?!
@@ -386,7 +385,7 @@ You can specify a verification limit by adding a number in argument (up to 1.000
     
     @commands.command(name="shrug",hidden=True)
     @commands.check(is_fun_enabled)
-    async def shrug(self,ctx: MyContext):
+    async def shrug(self, ctx: MyContext):
         """Don't you know? Neither do I
         
         ..Doc fun.html#shrug"""
@@ -394,12 +393,12 @@ You can specify a verification limit by adding a number in argument (up to 1.000
     
     @commands.command(name="rekt",hidden=True)
     @commands.check(is_fun_enabled)
-    async def rekt(self,ctx: MyContext):
+    async def rekt(self, ctx: MyContext):
         await ctx.send(file=await self.utilities.find_img('rekt.jpg'))
 
     @commands.command(name="gg",hidden=True)
     @commands.check(is_fun_enabled)
-    async def gg(self,ctx: MyContext):
+    async def gg(self, ctx: MyContext):
         """Congrats! You just found something!
         
         ..Doc fun.html#congrats"""
@@ -409,7 +408,7 @@ You can specify a verification limit by adding a number in argument (up to 1.000
     @commands.cooldown(1, 15, commands.BucketType.user)
     @commands.cooldown(10, 60, commands.BucketType.guild)
     @commands.check(is_fun_enabled)
-    async def money(self,ctx: MyContext):
+    async def money(self, ctx: MyContext):
         """Money gif. Cuz we all love money, don't we?
         
         ..Doc fun.html#money"""
@@ -417,7 +416,7 @@ You can specify a verification limit by adding a number in argument (up to 1.000
     
     @commands.command(name="pibkac",hidden=True)
     @commands.check(is_fun_enabled)
-    async def pibkac(self,ctx: MyContext):
+    async def pibkac(self, ctx: MyContext):
         """Where comes that bug from?
         
         ..Doc fun.html#pibkac"""
@@ -425,7 +424,7 @@ You can specify a verification limit by adding a number in argument (up to 1.000
     
     @commands.command(name="osekour",hidden=True,aliases=['helpme','ohmygod'])
     @commands.check(is_fun_enabled)
-    async def osekour(self,ctx: MyContext):
+    async def osekour(self, ctx: MyContext):
         """Does anyone need help?
         
         ..Doc fun.html#heeelp"""
@@ -435,7 +434,7 @@ You can specify a verification limit by adding a number in argument (up to 1.000
     @commands.command(name="say")
     @commands.guild_only()
     @commands.check(can_say)
-    async def say(self,ctx:MyContext,channel:typing.Optional[discord.TextChannel] = None, *, text):
+    async def say(self, ctx:MyContext, channel:typing.Optional[discord.TextChannel] = None, *, text):
         """Let the bot say something for you
         You can specify a channel where the bot must send this message. If channel is None, the current channel will be used
         
@@ -473,9 +472,9 @@ You can specify a verification limit by adding a number in argument (up to 1.000
         except:
             pass
 
-    @commands.command(name="me",hidden=True)
+    @commands.command(name="me", hidden=True)
     @commands.check(is_fun_enabled)
-    async def me(self,ctx,*,text):
+    async def me(self, ctx: MyContext, *, text: str):
         """No U
         
         ..Doc fun.html#me"""
@@ -487,7 +486,7 @@ You can specify a verification limit by adding a number in argument (up to 1.000
                 await self.bot.get_cog("Utilities").suppr(ctx.message)
         except commands.CommandError: # user can't use 'say'
             pass
-    
+
     @commands.command(name="react")
     @commands.check(can_say)
     async def react(self, ctx:MyContext, message:discord.Message, *, reactions):
@@ -516,31 +515,31 @@ You can specify a verification limit by adding a number in argument (up to 1.000
                     await self.bot.get_cog("Errors").on_error(e,ctx)
                     continue
         await self.bot.get_cog("Utilities").suppr(ctx.message)
-    
+
     @commands.command(name="nuke",hidden=True)
     @commands.check(is_fun_enabled)
-    async def nuke(self,ctx: MyContext):
+    async def nuke(self, ctx: MyContext):
         """BOOOM
         
         ..Doc fun.html#nuke"""
         await ctx.send(file=await self.utilities.find_img('nuke.gif'))
-    
+
     @commands.command(name="pikachu",hidden=True)
     @commands.check(is_fun_enabled)
-    async def pikachu(self,ctx: MyContext):
+    async def pikachu(self, ctx: MyContext):
         """Pika-pika ?
         
         ..Doc fun.html#pikachu"""
         await ctx.send(file=await self.utilities.find_img(random.choice(['cookie-pikachu.gif','pika1.gif'])))
-    
+
     @commands.command(name="pizza",hidden=True)
     @commands.check(is_fun_enabled)
-    async def pizza(self,ctx: MyContext):
+    async def pizza(self, ctx: MyContext):
         """Hey, do U want some pizza?
         
         ..Doc fun.html#pizza"""
         await ctx.send(file=await self.utilities.find_img('pizza.gif'))
-    
+
     @commands.command(name="google", hidden=True, aliases=['lmgtfy'])
     @commands.check(is_fun_enabled)
     async def lmgtfy(self,ctx,*,search):
@@ -550,15 +549,15 @@ You can specify a verification limit by adding a number in argument (up to 1.000
         link = "http://lmgtfy.com/?q="+search.replace("\n","+").replace(" ","+")
         await ctx.send('<'+link+'>')
         await self.bot.get_cog('Utilities').suppr(ctx.message)
-    
+
     @commands.command(name="loading",hidden=True)
     @commands.check(is_fun_enabled)
-    async def loading(self,ctx: MyContext):
+    async def loading(self, ctx: MyContext):
         """time goes by soooo slowly...
         
         ..Doc fun.html#loading"""
         await ctx.send(file=await self.utilities.find_img('loading.gif'))
-    
+
     @commands.command(name="thanos",hidden=True)
     @commands.check(is_fun_enabled)
     async def thanos(self, ctx: MyContext, *, name: str = None):
@@ -567,10 +566,10 @@ You can specify a verification limit by adding a number in argument (up to 1.000
         ..Doc fun.html#thanos"""
         name = name or ctx.author.mention
         await ctx.send(random.choice(await self.bot._(ctx.channel,"fun.thanos")).format(name))
-    
+
     @commands.command(name="piece",hidden=True,aliases=['coin','flip'])
     @commands.check(is_fun_enabled)
-    async def piece(self,ctx: MyContext):
+    async def piece(self, ctx: MyContext):
         """Heads or tails?
         
         ..Doc fun.html#piece"""
@@ -578,15 +577,15 @@ You can specify a verification limit by adding a number in argument (up to 1.000
             await ctx.send(await self.bot._(ctx.channel,"fun.piece-1"))
         else:
             await ctx.send(random.choice(await self.bot._(ctx.channel,"fun.piece-0")))
-    
-    @commands.command(name="weather",aliases=['météo'])
+
+    @commands.command(name="weather",aliases=['météo'], enabled=False)
     @commands.cooldown(4, 30, type=commands.BucketType.guild)
     async def weather(self, ctx:MyContext, *, city:str):
         """Get the weather of a city
         You need to provide the city name in english
 
         ..Example weather Tokyo
-        
+
         ..Doc miscellaneous.html#hour-weather"""
         city = city.replace(" ","%20")
         async with aiohttp.ClientSession() as session:
@@ -594,12 +593,12 @@ You can specify a verification limit by adding a number in argument (up to 1.000
                 if r.status == 200:
                     if r.content_type == 'image/png':
                         if ctx.channel.permissions_for(ctx.me).embed_links:
-                            emb = self.bot.get_cog('Embeds').Embed(image="https://welcomer.glitch.me/weather?city="+city,footer_text="From https://welcomer.glitch.me/weather")
-                            return await ctx.send(embed=emb.discord_embed())
+                            emb = discord.Embed()
+                            emb.set_image(url="https://welcomer.glitch.me/weather?city="+city)
+                            emb.set_footer(text="From https://welcomer.glitch.me/weather")
+                            return await ctx.send(embed=emb)
                         else:
                             return await ctx.send("https://welcomer.glitch.me/weather?city="+city)
-                    #except Exception as e:
-                    #    await self.bot.get_cog('Errors').on_error(e,ctx)
         await ctx.send(await self.bot._(ctx.channel,"fun.invalid-city"))
 
     @commands.command(name="hour")
@@ -624,7 +623,7 @@ You can specify a verification limit by adding a number in argument (up to 1.000
         await ctx.send("**{}**:\n{} ({})\n ({} - lat: {} - long: {})".format(timeZoneStr,format_d,d.tzname(),g.current_result.address,round(g.json['lat'],2),round(g.json['lng'],2)))
 
     @commands.command(name="tip")
-    async def tip(self,ctx:MyContext):
+    async def tip(self, ctx:MyContext):
         """Send a tip, a fun fact or something else
         
         ..Doc fun.html#tip"""
@@ -633,7 +632,7 @@ You can specify a verification limit by adding a number in argument (up to 1.000
     @commands.command(name='afk')
     @commands.check(is_fun_enabled)
     @commands.guild_only()
-    async def afk(self,ctx,*,reason=""):
+    async def afk(self, ctx: MyContext, *, reason=""):
         """Make you AFK
         You'll get a nice nickname, because nicknames are cool, aren't they?
         
@@ -655,7 +654,7 @@ You can specify a verification limit by adding a number in argument (up to 1.000
     @commands.command(name='unafk')
     @commands.check(is_fun_enabled)
     @commands.guild_only()
-    async def unafk(self,ctx: MyContext):
+    async def unafk(self, ctx: MyContext):
         """Remove you from the AFK system
         Welcome back dude
         
@@ -748,9 +747,12 @@ You can specify a verification limit by adding a number in argument (up to 1.000
                 c = await args.Color().convert(ctx,value)
                 if c is not None:
                     k['color'] = c
-        emb = ctx.bot.get_cog("Embeds").Embed(title=k['title'], desc=k['content'], url=k['url'],footer_text=k['footer'],thumbnail=k['image'],color=k['color']).update_timestamp().set_author(ctx.author)
+        emb = discord.Embed(title=k['title'], description=k['content'], url=k['url'], color=k['color'])
+        emb.set_author(name=ctx.author, icon_url=ctx.author.display_avatar)
+        emb.set_thumbnail(url=k['image'])
+        emb.set_footer(text=k['footer'])
         try:
-            await destination.send(embed=emb.discord_embed())
+            await destination.send(embed=emb)
         except Exception as e:
             if isinstance(e,discord.errors.HTTPException) and "In embed.thumbnail.url: Not a well formed URL" in str(e):
                 return await ctx.send(await self.bot._(ctx.channel, "fun.embed-invalid-image"))
@@ -762,7 +764,7 @@ You can specify a verification limit by adding a number in argument (up to 1.000
                 pass
 
 
-    async def add_vote(self,msg):
+    async def add_vote(self, msg: discord.Message):
         if self.bot.database_online and msg.guild is not None:
             emojiz = await self.bot.get_config(msg.guild,'vote_emojis')
         else:
@@ -825,10 +827,10 @@ You can specify a verification limit by adding a number in argument (up to 1.000
     @commands.cooldown(5, 60, commands.BucketType.channel)
     async def nasa(self, ctx: MyContext):
         """Send the Picture of The Day by NASA
-        
+
         ..Doc fun.html#nasa"""
         def get_date(string):
-            return datetime.datetime.strptime(string, "%Y-%m-%d")
+            return datetime.datetime.strptime(string, "%Y-%m-%d").replace(tzinfo=datetime.timezone.utc)
         if self.nasa_pict is None or 'date' not in self.nasa_pict or (datetime.datetime.utcnow()-get_date(self.nasa_pict["date"])).total_seconds() > 86400:
             async with aiohttp.ClientSession() as session:
                 key = self.bot.others["nasa"]
@@ -839,22 +841,22 @@ You can specify a verification limit by adding a number in argument (up to 1.000
         if self.nasa_pict is None:
             await ctx.send(await self.bot._(ctx.channel, "fun.nasa-none"))
             return
-        emb = self.bot.get_cog("Embeds").Embed(
+        emb = discord.Embed(
             title=self.nasa_pict["title"],
-            image=self.nasa_pict["url"],
             url=self.nasa_pict["hdurl"] if self.nasa_pict["media_type"]=="image" else self.nasa_pict["url"],
-            desc=self.nasa_pict["explanation"],
-            footer_text="Credits: " + self.nasa_pict.get("copyright", "Not copyrighted"),
-            time=get_date(self.nasa_pict["date"]))
+            description=self.nasa_pict["explanation"],
+            timestamp=get_date(self.nasa_pict["date"]))
+        emb.set_image(url=self.nasa_pict['url'])
+        emb.set_footer(text="Credits: " + self.nasa_pict.get("copyright", "Not copyrighted"))
         await ctx.send(embed=emb)
-    
+
     @commands.command(name="discordjobs", aliases=['discord_jobs', 'jobs.gg'])
     @commands.cooldown(2, 60, commands.BucketType.channel)
     async def discordjobs(self, ctx: MyContext, *, query: str = None):
         """Get the list of available jobs in Discord
-        
+
         ..Example discordjobs
-        
+
         ..Example discordjobs marketing"""
         async with aiohttp.ClientSession() as session:
             async with session.get("https://api.greenhouse.io/v1/boards/discord/jobs") as r:
@@ -872,11 +874,11 @@ You can specify a verification limit by adding a number in argument (up to 1.000
             emb = discord.Embed(title=_title, color=7506394, url="https://dis.gd/jobs")
             emb.description = await self.bot._(ctx.channel, "fun.discordjobs-count", c=len(f_jobs))
             for i in range(0, len(f_jobs), 10):
-                   emb.add_field(name="​", value="\n".join(f_jobs[i:i+10]))
+                emb.add_field(name="​", value="\n".join(f_jobs[i:i+10]))
             await ctx.send(embed=emb)
         else:
             await ctx.send("\n".join(f_jobs[:20]))
-    
+
 
     @commands.command(name="discordstatus", aliases=['discord_status', 'status.gg'])
     @commands.cooldown(2, 60, commands.BucketType.channel)
@@ -895,12 +897,12 @@ You can specify a verification limit by adding a number in argument (up to 1.000
             _lang = await self.bot._(ctx.channel,'_used_locale')
             last_date = await self.bot.get_cog("TimeUtils").date(last_date, _lang, timezone=True)
             await ctx.send(await self.bot._(ctx.channel, "fun.discordstatus-nothing", date=last_date))
-        
+
 
     @commands.command(name="vote")
     @commands.cooldown(4, 30, type=commands.BucketType.guild)
-    async def vote(self,ctx: MyContext,number:typing.Optional[int] = 0,*,text):
-        """Send a message on which anyone can vote through reactions. 
+    async def vote(self, ctx: MyContext, number:typing.Optional[int] = 0, *, text):
+        """Send a message on which anyone can vote through reactions.
         A big thank to Adri for his emojis specially designed for the bot!
         
         If no number of choices is given, the emojis will be 👍 and 👎. Otherwise, it will be a series of numbers.
@@ -941,7 +943,7 @@ You can specify a verification limit by adding a number in argument (up to 1.000
                     await self.bot.get_cog('Errors').on_error(e,ctx)
         await self.bot.get_cog('Utilities').suppr(ctx.message)
 
-    async def check_suggestion(self,message):
+    async def check_suggestion(self, message: discord.Message):
         if message.guild is None or not self.bot.is_ready() or not self.bot.database_online:
             return
         try:
