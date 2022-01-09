@@ -90,6 +90,7 @@
         "no-item": "Item introuvable",
         "no-mod": "Mod introuvable",
         "no-ping": "Erreur : Impossible de ping ce serveur",
+        "no-player-list": "Non disponible",
         "player-not-found": "Aucun joueur Minecraft Java avec ce pseudo ne semble exister",
         "player-skin-download": "Cliquez ici pour télécharger",
         "player-skin-title": "Skin du joueur %{player}",
