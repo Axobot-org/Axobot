@@ -3,7 +3,7 @@ import aiohttp
 from discord.ext import commands
 
 from fcts import checks
-from utils import Zbot, MyContext
+from libs.classes import Zbot, MyContext
 
 
 class VoiceChannels(commands.Cog):

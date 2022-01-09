@@ -1,6 +1,6 @@
 import discord, importlib, typing
 from discord.ext import commands
-from utils import Zbot, MyContext
+from libs.classes import Zbot, MyContext
 
 from fcts import args, reloads
 importlib.reload(args)

@@ -1,4 +1,4 @@
-from utils import Zbot, MyContext
+from libs.classes import Zbot, MyContext
 import discord
 import importlib
 import aiohttp

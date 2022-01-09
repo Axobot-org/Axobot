@@ -13,7 +13,7 @@ from discord.ext.commands import Cog
 from libs import blurple
 from libs.blurple import convert_image, check_image
 importlib.reload(blurple)
-from utils import Zbot, MyContext
+from libs.classes import Zbot, MyContext
 
 
 class LinkConverter(commands.Converter):

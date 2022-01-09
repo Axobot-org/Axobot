@@ -7,7 +7,7 @@ from discord.ext import commands, tasks
 import psutil
 import mysql
 
-from utils import MyContext, Zbot
+from libs.classes import MyContext, Zbot
 
 try:
     import orjson # type: ignore

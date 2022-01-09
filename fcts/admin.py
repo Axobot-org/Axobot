@@ -18,7 +18,7 @@ from glob import glob
 import discord
 import speedtest
 from discord.ext import commands
-from utils import MyContext, UserFlag, Zbot, ConfirmView
+from libs.classes import MyContext, UserFlag, Zbot, ConfirmView
 
 from fcts import reloads
 

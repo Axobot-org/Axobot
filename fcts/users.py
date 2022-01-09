@@ -1,4 +1,4 @@
-from utils import Zbot, MyContext, UserFlag, RankCardsFlag
+from libs.classes import Zbot, MyContext, UserFlag, RankCardsFlag
 from discord.ext import commands
 import importlib
 import typing

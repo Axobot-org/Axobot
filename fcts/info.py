@@ -18,7 +18,7 @@ from discord.ext import commands
 from discord.ext.commands.converter import run_converters
 from docs import conf
 from libs import bitly_api
-from utils import MyContext, Zbot
+from libs.classes import MyContext, Zbot
 
 from fcts import args, checks, reloads
 

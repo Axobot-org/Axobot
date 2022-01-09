@@ -10,7 +10,7 @@ from discord.ext import commands
 from discord.ext.commands.cooldowns import BucketType
 from PIL import Image, ImageEnhance, ImageSequence
 from resizeimage import resizeimage
-from utils import MyContext
+from libs.classes import MyContext
 
 BLURPLE = (114, 137, 218, 255)
 DARK_BLURPLE = (78, 93, 148, 255)

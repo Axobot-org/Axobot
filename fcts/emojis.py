@@ -3,7 +3,7 @@
 
 import requests, string
 from discord.ext import commands
-from utils import Zbot
+from libs.classes import Zbot
 
 #https://github.com/ttacon/emoji/blob/master/emoji.go
 
