@@ -40,7 +40,7 @@ class Info(commands.Cog):
     def __init__(self, bot: Zbot):
         self.bot = bot
         self.file = "info"
-        self.bot_version = conf.release
+        self.bot_version = conf.release + ('a' if bot.beta else '')
         try:
             self.TimeUtils = bot.get_cog("TimeUtils")
         except KeyError:
