@@ -90,6 +90,7 @@
         "no-item": "Unable to find this item",
         "no-mod": "Unable to find this mod",
         "no-ping": "Error: Unable to ping this server",
+        "no-player-list": "Not available",
         "player-not-found": "I could not find any Minecraft Java player with this username",
         "player-skin-download": "Click here to download",
         "player-skin-title": "Skin of the player %{player}",
