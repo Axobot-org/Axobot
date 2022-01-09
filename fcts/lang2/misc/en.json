@@ -2,12 +2,24 @@
     "en": {
         "added_at": "Added at",
         "beginning": "beginning",
+        "btn": {
+            "confirm": {
+                "label": "Confirm",
+                "answer": "Confirmed"
+            },
+            "cancel": {
+                "label": "Cancel",
+                "answer": "Cancelled"
+            },
+            "delete": {
+                "label": "Delete",
+                "answer": "Deleted!"
+            }
+        },
         "bot": "bot",
-        "cancel-btn": "Cancel",
         "case": "case",
         "category": "category",
         "click_here": "Click here",
-        "confirm-btn": "Confirm",
         "since": "since",
         "dnd": "do not disturb",
         "doc": "Documentation",

@@ -3,12 +3,24 @@
         "added_at": "Addd at",
         "aucune": "none",
         "beginning": "beginning",
+        "btn": {
+            "confirm": {
+                "label": "CLICK HERE 2 FIRE",
+                "answer": "OK roger!"
+            },
+            "cancel": {
+                "label": "nope forget that",
+                "answer": "'k that thing is no more"
+            },
+            "delete": {
+                "label": "Trash that",
+                "answer": "its been trashed chief!"
+            }
+        },
         "bot": "robot",
-        "cancel-btn": "nope forget that",
         "case": "case",
         "category": "box",
         "click_here": "BLUE BUTTON TO CLICK",
-        "confirm-btn": "CLICK HERE 2 FIRE",
         "depuis": "sinze",
         "dnd": "donot disturb me",
         "doc": "Doc",
