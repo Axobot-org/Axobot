@@ -4,7 +4,7 @@ import logging
 import sys
 import time
 from logging.handlers import RotatingFileHandler
-from typing import Any, Callable, Coroutine, Optional
+from typing import Any, Callable, Coroutine, Optional, Union
 
 import discord
 import mysql
@@ -220,11 +220,11 @@ class Zbot(commands.bot.AutoShardedBot):
         def __missing__(self, key):
             return '{' + key + '}'
 
-    async def get_config(self, guildID: int, option: str) -> Optional[str]:
+    async def get_config(self, guild_id: int, option: str) -> Optional[str]:
         cog = self.get_cog("Servers")
         if cog:
             if self.database_online:
-                return await cog.get_option(guildID, option)
+                return await cog.get_option(guild_id, option)
             return cog.default_opt.get(option, None)
         return None
 
@@ -249,6 +249,34 @@ class Zbot(commands.bot.AutoShardedBot):
             embeds = (embed.to_dict() for embed in embeds)
             requests.post(url, json={"embeds": embeds})
 
+
+class ConfirmView(discord.ui.View):
+    "A simple view used to confirm an action"
+
+    def __init__(self, bot: Zbot, confirm_text: str, cancel_text: str, ephemeral: bool=True):
+        super().__init__()
+        self.bot = bot
+        self.value: bool = None
+        self.ephemeral = ephemeral
+        # discord.ui.button(label=confirm_text, style=discord.ButtonStyle.green)(self.confirm)
+        confirm_btn = discord.ui.Button(label=confirm_text, style=discord.ButtonStyle.green)
+        confirm_btn.callback = self.confirm
+        self.add_item(confirm_btn)
+        cancel_btn = discord.ui.Button(label=cancel_text, style=discord.ButtonStyle.grey)
+        cancel_btn.callback = self.cancel
+        self.add_item(cancel_btn)
+
+    async def confirm(self, _button: discord.ui.Button, interaction: discord.Interaction):
+        "Confirm the action when clicking"
+        await interaction.response.send_message('Confirming', ephemeral=self.ephemeral)
+        self.value = True
+        self.stop()
+
+    async def cancel(self, _button: discord.ui.Button, interaction: discord.Interaction):
+        "Cancel the action when clicking"
+        await interaction.response.send_message('Cancelling', ephemeral=self.ephemeral)
+        self.value = False
+        self.stop()
 
 class RankCardsFlag:
     FLAGS = {
