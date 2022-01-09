@@ -50,7 +50,8 @@ class MyContext(commands.Context):
 class Zbot(commands.bot.AutoShardedBot):
     """Bot class, with everything needed to run it"""
 
-    def __init__(self, case_insensitive: bool = None, status: discord.Status = None, database_online: bool = True, beta: bool = False, dbl_token: str = "", zombie_mode: bool = False):
+    def __init__(self, case_insensitive: bool = None, status: discord.Status = None, database_online: bool = True, \
+            beta: bool = False, dbl_token: str = "", zombie_mode: bool = False):
         # pylint: disable=assigning-non-slot
         # defining allowed default mentions
         allowed_mentions = discord.AllowedMentions(everyone=False, roles=False)
@@ -84,7 +85,7 @@ class Zbot(commands.bot.AutoShardedBot):
         """Get the current event, from the date"""
         try:
             return self.get_cog("BotEvents").current_event
-        except Exception as err:
+        except Exception as err: # pylint: disable=broad-except
             self.log.warning("[current_event] %s", err, exc_info=True)
             return None
 
@@ -93,7 +94,7 @@ class Zbot(commands.bot.AutoShardedBot):
         """Get the current event data, from the date"""
         try:
             return self.get_cog("BotEvents").current_event_data
-        except Exception as err:
+        except Exception as err: # pylint: disable=broad-except
             self.log.warning("[current_event_data] %s", err, exc_info=True)
             return None
 
@@ -115,6 +116,7 @@ class Zbot(commands.bot.AutoShardedBot):
         return self._cnx[0][0]
 
     def connect_database_frm(self):
+        "Create a connection to the default database"
         if len(self.database_keys) > 0:
             if self._cnx[0][0] is not None:
                 self._cnx[0][0].close()
@@ -157,6 +159,7 @@ class Zbot(commands.bot.AutoShardedBot):
         return self._cnx[1][0]
 
     def connect_database_xp(self):
+        "Create a connection to the xp database"
         if len(self.database_keys) > 0:
             if self._cnx[1][0] is not None:
                 self._cnx[1][0].close()
@@ -182,6 +185,7 @@ class Zbot(commands.bot.AutoShardedBot):
         return self._cnx[2][0]
 
     def connect_database_stats(self):
+        "Create a connection to the stats database"
         if len(self.database_keys) > 0:
             if self._cnx[2][0] is not None:
                 self._cnx[2][0].close()
@@ -204,6 +208,7 @@ class Zbot(commands.bot.AutoShardedBot):
             return '{' + key + '}'
 
     async def get_config(self, guild_id: int, option: str) -> Optional[str]:
+        "Get a configuration option for a specific guild"
         cog = self.get_cog("Servers")
         if cog:
             if self.database_online:
@@ -236,32 +241,62 @@ class Zbot(commands.bot.AutoShardedBot):
 class ConfirmView(discord.ui.View):
     "A simple view used to confirm an action"
 
-    def __init__(self, bot: Zbot, confirm_text: str, cancel_text: str, ephemeral: bool=True):
-        super().__init__()
-        self.bot = bot
+    def __init__(self, bot: Zbot, ctx, validation: Callable[[discord.Interaction], bool], ephemeral: bool=True, timeout: int=60):
+        super().__init__(timeout=timeout)
         self.value: bool = None
+        self.bot = bot
+        self.ctx = ctx
+        self.validation = validation
         self.ephemeral = ephemeral
-        # discord.ui.button(label=confirm_text, style=discord.ButtonStyle.green)(self.confirm)
-        confirm_btn = discord.ui.Button(label=confirm_text, style=discord.ButtonStyle.green)
+
+    async def init(self):
+        "Initialize buttons with translations"
+        confirm_label = await self.bot._(self.ctx, "misc.btn.confirm.label")
+        confirm_btn = discord.ui.Button(label=confirm_label, style=discord.ButtonStyle.green)
         confirm_btn.callback = self.confirm
         self.add_item(confirm_btn)
-        cancel_btn = discord.ui.Button(label=cancel_text, style=discord.ButtonStyle.grey)
+        cancel_label = await self.bot._(self.ctx, "misc.btn.cancel.label")
+        cancel_btn = discord.ui.Button(label=cancel_label, style=discord.ButtonStyle.grey)
         cancel_btn.callback = self.cancel
         self.add_item(cancel_btn)
 
-    async def confirm(self, _button: discord.ui.Button, interaction: discord.Interaction):
+    async def confirm(self, interaction: discord.Interaction):
         "Confirm the action when clicking"
-        await interaction.response.send_message('Confirming', ephemeral=self.ephemeral)
+        if not self.validation(interaction):
+            return
+        await interaction.response.send_message(await self.bot._(self.ctx, "misc.btn.confirm.answer"), ephemeral=self.ephemeral)
         self.value = True
         self.stop()
 
-    async def cancel(self, _button: discord.ui.Button, interaction: discord.Interaction):
+    async def cancel(self, interaction: discord.Interaction):
         "Cancel the action when clicking"
-        await interaction.response.send_message('Cancelling', ephemeral=self.ephemeral)
+        if not self.validation(interaction):
+            return
+        await interaction.response.send_message(await self.bot._(self.ctx, "misc.btn.cancel.answer"), ephemeral=self.ephemeral)
         self.value = False
         self.stop()
 
+class DeleteView(discord.ui.View):
+    "A simple view used to delete a bot message after reading it"
+
+    def __init__(self, message: discord.Message, delete_text: str, validation: Callable[[discord.Interaction], bool], \
+            timeout: int=60):
+        super().__init__(timeout=timeout)
+        self.message = message
+        self.validation = validation
+        delete_btn = discord.ui.Button(label=delete_text, style=discord.ButtonStyle.green)
+        delete_btn.callback = self.delete
+        self.add_item(delete_btn)
+
+    async def delete(self, _button: discord.ui.Button, interaction: discord.Interaction):
+        "Delete the message when clicking"
+        if not self.validation(interaction):
+            return
+        await self.message.delete(delay=0)
+        self.stop()
+
 class RankCardsFlag:
+    "Flags used for unlocked rank cards"
     FLAGS = {
         1 << 0: "rainbow",
         1 << 1: "blurple_19",
@@ -274,16 +309,19 @@ class RankCardsFlag:
     }
 
     def flagsToInt(self, flags: list) -> int:
-        r = 0
-        for k, v in self.FLAGS.items():
-            if v in flags:
-                r |= k
-        return r
+        "Convert a list of flags to its integer value"
+        result = 0
+        for flag, value in self.FLAGS.items():
+            if value in flags:
+                result |= flag
+        return result
 
     def intToFlags(self, i: int) -> list:
+        "Convert an integer value to its list of flags"
         return [v for k, v in self.FLAGS.items() if i & k == k]
 
 class UserFlag:
+    "Flags used for user permissions/roles"
     FLAGS = {
         1 << 0: "support",
         1 << 1: "contributor",
@@ -294,11 +332,13 @@ class UserFlag:
     }
 
     def flagsToInt(self, flags: list) -> int:
-        r = 0
-        for k, v in self.FLAGS.items():
-            if v in flags:
-                r |= k
-        return r
+        "Convert a list of flags to its integer value"
+        result = 0
+        for flag, value in self.FLAGS.items():
+            if value in flags:
+                result |= flag
+        return result
 
     def intToFlags(self, i: int) -> list:
+        "Convert an integer value to its list of flags"
         return [v for k, v in self.FLAGS.items() if i & k == k]

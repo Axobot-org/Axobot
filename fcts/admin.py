@@ -188,21 +188,19 @@ class Admin(commands.Cog):
         if None in self.update.values():
             return await ctx.send("Les textes ne sont pas complets !")
         text = "Vos messages contiennent"
-        msg = None
-        confirm_view = ConfirmView(self.bot,
-            self.bot._(ctx.channel, "misc.confirm-btn"),
-            self.bot._(ctx.channel, "misc.cancel-btn"),
+        confirm_view = ConfirmView(
+            self.bot, ctx.channel,
+            validation=lambda inter: inter.user == ctx.author,
             ephemeral=False)
+        await confirm_view.init()
         if max([len(x) for x in self.update.values()]) > 1900//len(self.update.keys()):
             for lang, value in self.update.items():
                 text += f"\n{lang}:```\n{value}\n```"
-                msg = await ctx.send(text, view=confirm_view)
+                await ctx.send(text, view=confirm_view)
                 text = ''
         else:
             text += "\n"+"\n".join([f"{lang}:\n```\n{value}\n```" for lang, value in self.update.items()])
-            msg = await ctx.send(text, view=confirm_view)
-        if not msg:
-            return
+            await ctx.send(text, view=confirm_view)
 
         await confirm_view.wait()
         if confirm_view.value is None:

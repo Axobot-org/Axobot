@@ -2,12 +2,24 @@
     "fr": {
         "added_at": "Ajouté le",
         "beginning": "début",
+        "btn": {
+            "confirm": {
+                "label": "Confirmer",
+                "answer": "Choix confirmé"
+            },
+            "cancel": {
+                "label": "Annuler",
+                "answer": "Choix annulé"
+            },
+            "delete": {
+                "label": "Supprimer",
+                "answer": "Supprimé !"
+            }
+        },
         "bot": "bot",
-        "cancel-btn": "Annuler",
         "case": "casier",
         "category": "catégorie",
         "click_here": "Cliquez ici",
-        "confirm-btn": "Confirmer",
         "since": "depuis",
         "dnd": "ne pas déranger",
         "doc": "Documentation",
