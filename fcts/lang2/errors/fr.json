@@ -9,6 +9,7 @@
         "disabled": "La commande %{c} est désactivée",
         "duration": "La durée `%{d}` est invalide",
         "emojinotfound": "Emoji `%{e}` introuvable",
+        "guildnotfound": "Serveur %{guild} introuvable",
         "invalidcardstyle": "Style de carte invalide : `%{s}`",
         "invalidcolor": "La couleur `%{c}` est invalide",
         "invalidemoji": "Emoji invalide",

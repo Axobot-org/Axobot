@@ -9,6 +9,7 @@
         "disabled": "The command %{c} is disabled :confused:",
         "duration": "The duration `%{d}` is invalid",
         "emojinotfound": "Emoji `%{e}` not found",
+        "guildnotfound": "Guild %{guild} not found",
         "invalidcardstyle": "Invalid card style: `%{s}`",
         "invalidcolor": "Color `%{c}` invalid",
         "invalidemoji": "Invalid emoji",
