@@ -537,7 +537,7 @@ class Rss(commands.Cog):
                 msg = await self.bot.wait_for('message', check = check, timeout = max(20, 1.5*len(text)))
             except asyncio.TimeoutError:
                 await ctx.send(await self.bot._(ctx.guild.id, "rss.too-long"))
-                await self.bot.get_cog('Utilities').suppr(emb_msg)
+                await emb_msg.delete(delay=0)
                 return
             flow = await self.get_flow(list_of_IDs[int(msg.content)-1])
         if len(flow) == 0:
@@ -626,7 +626,7 @@ class Rss(commands.Cog):
                         cond = True
                 except asyncio.TimeoutError:
                     await ctx.send(await self.bot._(ctx.guild.id, "rss.too-long"))
-                    await self.bot.get_cog('Utilities').suppr(emb_msg)
+                    await emb_msg.delete(delay=0)
                     return
         else: # if roles were specified
             if mentions in no_role: # if no role should be mentionned
@@ -678,7 +678,7 @@ class Rss(commands.Cog):
             liste = await self.get_guild_flows(ctx.guild.id)
             await self.main_loop(ctx.guild.id)
             await ctx.send(await self.bot._(ctx.guild.id,"rss.guild-complete", count=len(liste),time=round(time.time()-t,1)))
-            await ctx.bot.get_cog('Utilities').suppr(msg)
+            await msg.delete(delay=0)
         except Exception as e:
             await ctx.send(await self.bot._(ctx.guild.id,"rss.guild-error", err=e))
 

@@ -218,7 +218,7 @@ You can specify a verification limit by adding a number in argument (up to 1.000
         if self.bot.database_online:
             try:
                 if await self.bot.get_cog("Servers").staff_finder(ctx.author,'say'):
-                    await self.utilities.suppr(ctx.message)
+                    await ctx.message.delete(delay=0)
             except commands.CommandError: # user can't use 'say'
                 pass
 
@@ -378,7 +378,7 @@ You can specify a verification limit by adding a number in argument (up to 1.000
             await ctx.send(''.join(text1))
         try:
             if ctx.bot.database_online and await self.bot.get_cog("Servers").staff_finder(ctx.author,'say'):
-                await self.bot.get_cog("Utilities").suppr(ctx.message)
+                await ctx.message.delete(delay=0)
         except commands.CommandError: # user can't use 'say'
             pass
         self.bot.log.debug("{} used bigtext to say {}".format(ctx.author.id,text))
@@ -468,7 +468,7 @@ You can specify a verification limit by adding a number in argument (up to 1.000
             if not channel.permissions_for(ctx.guild.me).send_messages:
                 return await ctx.send(str(await self.bot._(ctx.guild.id, 'fun', 'no-say'))+random.choice([' :confused:', '', '', '']))
             await channel.send(text)
-            await self.bot.get_cog("Utilities").suppr(ctx.message)
+            await ctx.message.delete(delay=0)
         except:
             pass
 
@@ -483,7 +483,7 @@ You can specify a verification limit by adding a number in argument (up to 1.000
         await ctx.send(text)
         try:
             if self.bot.database_online and await self.bot.get_cog("Servers").staff_finder(ctx.author,"say"):
-                await self.bot.get_cog("Utilities").suppr(ctx.message)
+                await ctx.message.delete(delay=0)
         except commands.CommandError: # user can't use 'say'
             pass
 
@@ -514,7 +514,7 @@ You can specify a verification limit by adding a number in argument (up to 1.000
                 except Exception as e:
                     await self.bot.get_cog("Errors").on_error(e,ctx)
                     continue
-        await self.bot.get_cog("Utilities").suppr(ctx.message)
+        await ctx.message.delete(delay=0)
 
     @commands.command(name="nuke",hidden=True)
     @commands.check(is_fun_enabled)
@@ -548,7 +548,7 @@ You can specify a verification limit by adding a number in argument (up to 1.000
         ..Doc fun.html#lmgtfy"""
         link = "http://lmgtfy.com/?q="+search.replace("\n","+").replace(" ","+")
         await ctx.send('<'+link+'>')
-        await self.bot.get_cog('Utilities').suppr(ctx.message)
+        await ctx.message.delete(delay=0)
 
     @commands.command(name="loading",hidden=True)
     @commands.check(is_fun_enabled)
@@ -941,7 +941,7 @@ You can specify a verification limit by adding a number in argument (up to 1.000
                     return
                 except Exception as e:
                     await self.bot.get_cog('Errors').on_error(e,ctx)
-        await self.bot.get_cog('Utilities').suppr(ctx.message)
+        await ctx.message.delete(delay=0)
 
     async def check_suggestion(self, message: discord.Message):
         if message.guild is None or not self.bot.is_ready() or not self.bot.database_online:

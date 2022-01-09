@@ -1,14 +1,15 @@
 import asyncio
-import discord
 import importlib
-import re
 import operator
-import aiohttp
-from fcts import args
-from discord.ext import commands
-from typing import List
+import re
+from typing import List, Optional
 
-from utils import Zbot, MyContext
+import aiohttp
+import discord
+from discord.ext import commands
+from utils import MyContext, Zbot
+
+from fcts import args
 
 importlib.reload(args)
 
@@ -39,78 +40,6 @@ class Utilities(commands.Cog):
             return self.config
         return None
 
-    async def find_everything(self, ctx: MyContext, name: str, Type: str=None):
-        item = None
-        if isinstance(Type, str):
-            Type = Type.lower()
-        if Type is None:
-            for i in [commands.MemberConverter, commands.RoleConverter,
-                      commands.TextChannelConverter, commands.VoiceChannelConverter, commands.InviteConverter,
-                      args.user, commands.EmojiConverter, commands.CategoryChannelConverter, args.snowflake]:
-                try:
-                    if item := await i().convert(ctx, name):
-                        return item
-                except commands.ConversionError:
-                    pass
-            return None
-        if Type == 'member':
-            try:
-                item = await commands.MemberConverter().convert(ctx, name)
-            except commands.ConversionError:
-                pass
-        elif Type == 'role':
-            try:
-                item = await commands.RoleConverter().convert(ctx, name)
-            except commands.ConversionError:
-                pass
-        elif Type == 'user':
-            try:
-                item = await commands.UserConverter().convert(ctx, name)
-            except commands.ConversionError:
-                if name.isnumeric():
-                    item = await self.bot.fetch_user(int(name))
-        elif Type == 'textchannel':
-            try:
-                item = await commands.TextChannelConverter().convert(ctx, name)
-            except commands.ConversionError:
-                pass
-        elif Type == 'invite':
-            try:
-                item = await commands.InviteConverter().convert(ctx, name)
-            except commands.ConversionError:
-                pass
-        elif Type == 'voicechannel':
-            try:
-                item = await commands.VoiceChannelConverter().convert(ctx, name)
-            except commands.ConversionError:
-                pass
-        elif Type == 'channel':
-            try:
-                item = await commands.TextChannelConverter().convert(ctx, name)
-            except commands.ConversionError:
-                try:
-                    item = await commands.VoiceChannelConverter().convert(ctx, name)
-                except commands.ConversionError:
-                    pass
-        elif Type == 'emoji':
-            try:
-                item = await commands.EmojiConverter().convert(ctx, name)
-            except commands.ConversionError:
-                pass
-        elif Type == 'category':
-            try:
-                item = await commands.CategoryChannelConverter().convert(ctx, name)
-            except commands.ConversionError:
-                pass
-        elif (Type == 'guild' or Type == "server") and name.isnumeric():
-            item = self.bot.get_guild(int(name))
-        elif Type in ["snowflake", "id"]:
-            try:
-                item = await args.snowflake().convert(ctx, name)
-            except commands.ConversionError:
-                pass
-        return item
-
     async def find_img(self, name: str):
         return discord.File("../images/{}".format(name))
 
@@ -128,13 +57,6 @@ class Utilities(commands.Cog):
         except (asyncio.exceptions.TimeoutError, aiohttp.ServerTimeoutError):
             return url
         return answer
-
-    async def suppr(self, msg: discord.Message):
-        """Silently delete a message"""
-        try:
-            await msg.delete()
-        except discord.HTTPException:
-            self.bot.log.warning("Unable to delete message %s", str(msg))
 
     async def global_check(self, ctx: MyContext):
         """Do a lot of checks before executing a command (banned guilds, system message etc)"""
@@ -158,7 +80,7 @@ class Utilities(commands.Cog):
         if str(ctx.author.id) in self.config['banned_users'].split(";"):
             return False
         return True
-    
+
     async def get_members_repartition(self, members: List[discord.Member]):
         """Get number of total/online/bots members in a selection"""
         bots = online = total = 0
@@ -170,21 +92,15 @@ class Utilities(commands.Cog):
             total += 1
         return total, bots, online
 
-    async def check_any_link(self, text: str):
-        ch = r"(https?://?(?:[-\w.]|(?:%[\da-fA-F]{2}))+|discord.gg/[^\s]+)"
-        return re.search(ch, text)
-
-    async def check_discord_invite(self, text: str):
-        ch = r"((?:discord\.gg|discord(?:app)?.com/invite|discord.me)/.+)"
-        return re.search(ch, text)
-
     def sync_check_any_link(self, text: str):
-        ch = r"(https?://?(?:[-\w.]|(?:%[\da-fA-F]{2}))+|discord.gg/[^\s]+)"
-        return re.search(ch, text)
+        "Check if a text contains a http url"
+        pattern = r"(https?://?(?:[-\w.]|(?:%[\da-fA-F]{2}))+|discord.gg/[^\s]+)"
+        return re.search(pattern, text)
 
     def sync_check_discord_invite(self, text: str):
-        ch = r"((?:discord\.gg|discord(?:app)?.com/invite|discord.me)/.+)"
-        return re.search(ch, text)
+        "Check if a text contains a discord invite url"
+        pattern = r"((?:discord\.gg|discord(?:app)?.com/invite|discord.me)/.+)"
+        return re.search(pattern, text)
 
     async def clear_msg(self, text: str, everyone: bool=False, ctx: MyContext=None, emojis: bool=True):
         """Remove every mass mention from a text, and add custom emojis"""
@@ -228,13 +144,13 @@ class Utilities(commands.Cog):
             return liste
         return None
 
-    async def change_db_userinfo(self, userID: int, key: str, value):
+    async def change_db_userinfo(self, user_id: int, key: str, value):
         """Change something about a user in the database"""
         try:
             if not self.bot.database_online:
                 return None
             query = f"INSERT INTO `{self.table}` (`userID`,`{key}`) VALUES (%(u)s,%(v)s) ON DUPLICATE KEY UPDATE {key} = %(v)s;"
-            async with self.bot.db_query(query, {'u': userID, 'v': value}):
+            async with self.bot.db_query(query, {'u': user_id, 'v': value}):
                 pass
             return True
         except Exception as e:
@@ -258,20 +174,6 @@ class Utilities(commands.Cog):
         if parameters is None or parameters['xp_style'] == '':
             return 'dark'
         return parameters['xp_style']
-
-    async def add_check_reaction(self, message: discord.Message):
-        if self.bot.zombie_mode:
-            return
-        try:
-            emoji = discord.utils.get(self.bot.emojis, name='greencheck')
-            if emoji:
-                await message.add_reaction(emoji)
-            else:
-                await message.add_reaction('\u2705')
-        except discord.Forbidden:
-            await message.channel.send(":ok:")
-        except discord.DiscordException:
-            pass
 
     async def allowed_card_styles(self, user: discord.User):
         """Retourne la liste des styles autorisées pour la carte d'xp de cet utilisateur"""
@@ -319,24 +221,23 @@ class Utilities(commands.Cog):
             return ["en"]
         languages = list()
         disp_lang = list()
-        available_langs = self.bot.get_cog('Languages').languages
-        for s in user.mutual_guilds:
-            lang = await self.bot.get_config(s.id, 'language')
+        available_langs: list[str] = self.bot.get_cog('Languages').languages
+        for guild in user.mutual_guilds:
+            lang: Optional[int] = await self.bot.get_config(guild.id, 'language')
             if lang is None:
                 lang = available_langs.index(
                     self.bot.get_cog('Servers').default_language)
             languages.append(lang)
-        for e in range(len(self.bot.get_cog('Languages').languages)):
-            if languages.count(e) > 0:
-                disp_lang.append((available_langs[e], round(
-                    languages.count(e)/len(languages), 2)))
+        for i in range(len(self.bot.get_cog('Languages').languages)):
+            if languages.count(i) > 0:
+                disp_lang.append((available_langs[i], round(
+                    languages.count(i)/len(languages), 2)))
         disp_lang.sort(key=operator.itemgetter(1), reverse=True)
         if limit == 0:
             return disp_lang
-        else:
-            return disp_lang[:limit]
+        return disp_lang[:limit]
 
-    async def add_user_eventPoint(self, userID: int, points: int, override: bool = False, check_event: bool = True):
+    async def add_user_eventPoint(self, user_id: int, points: int, override: bool = False, check_event: bool = True):
         """Add some events points to a user
         if override is True, then the number of points will override the old score"""
         try:
@@ -346,14 +247,14 @@ class Utilities(commands.Cog):
                 return True
             if override:
                 query = ("INSERT INTO `{t}` (`userID`,`events_points`) VALUES ('{u}',{p}) ON DUPLICATE KEY UPDATE events_points = '{p}';".format(
-                    t=self.table, u=userID, p=points))
+                    t=self.table, u=user_id, p=points))
             else:
                 query = ("INSERT INTO `{t}` (`userID`,`events_points`) VALUES ('{u}',{p}) ON DUPLICATE KEY UPDATE events_points = events_points + '{p}';".format(
-                    t=self.table, u=userID, p=points))
+                    t=self.table, u=user_id, p=points))
             async with self.bot.db_query(query):
                 pass
             try:
-                await self.bot.get_cog("Users").reload_event_rankcard(userID)
+                await self.bot.get_cog("Users").reload_event_rankcard(user_id)
             except Exception as err:
                 await self.bot.get_cog("Errors").on_error(err, None)
             return True
