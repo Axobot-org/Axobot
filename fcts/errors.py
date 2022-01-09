@@ -104,6 +104,10 @@ class Errors(commands.Cog):
             r = re.search(r'(?<=Message \")(.+)(?=\" not found)',raw_error)
             if r is not None:
                 return await ctx.send(await self.bot._(ctx.channel,'errors.msgnotfound',msg=r.group(1)), allowed_mentions=ALLOWED)
+            # Guild "1243" not found.
+            r = re.search(r'(?<=Guild \")(.+)(?=\" not found)',raw_error)
+            if r is not None:
+                return await ctx.send(await self.bot._(ctx.channel,'errors.guildnotfound',guild=r.group(1)), allowed_mentions=ALLOWED)
             # Too many text channels
             if raw_error=='Too many text channels':
                 return await ctx.send(await self.bot._(ctx.channel,'errors.toomanytxtchan'), allowed_mentions=ALLOWED)
@@ -160,9 +164,9 @@ class Errors(commands.Cog):
             try:
                 await ctx.send(await self.bot._(ctx.channel,'errors.unknown'))
             except Exception as newerror:
-                self.bot.log.info("[on_cmd_error] Can't send error on channel {}: {}".format(ctx.channel.id,newerror))
+                self.bot.log.info(f"[on_cmd_error] Can't send error on channel {ctx.channel.id}: {newerror}")
         # All other Errors not returned come here... And we can just print the default TraceBack.
-        self.bot.log.warning('Ignoring exception in command {}:'.format(ctx.message.content))
+        self.bot.log.warning(f'Ignoring exception in command {ctx.message.content}:')
         await self.on_error(error,ctx)
 
     @commands.Cog.listener()

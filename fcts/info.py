@@ -292,6 +292,9 @@ Available types: member, role, user, emoji, channel, server, invite, category
                         return
             # we failed
             await ctx.send(await self.bot._(ctx.guild.id, "info.not-found", N=arg[:1900]))
+        elif not ctx.subcommand_passed:
+            # no given parameter
+            await self.bot.get_cog('Help').help_command(ctx, ['info'])
 
     @info_main.command(name="member")
     async def member_infos(self, ctx: MyContext, member: discord.Member):
@@ -606,6 +609,9 @@ Available types: member, role, user, emoji, channel, server, invite, category
         lang = await self.bot._(ctx.guild.id,"_used_locale")
         critical_info = await self.display_critical(ctx)
         guild = ctx.guild
+        if guild_id := ctx.message.content.split("guild", 1)[1]:
+            if await self.bot.get_cog('Admin').check_if_admin(ctx):
+                guild = await commands.GuildConverter().convert(ctx, guild_id.lstrip())
         since = await self.bot._(ctx.guild.id,"misc.since")
         _, bots, online = await self.bot.get_cog("Utilities").get_members_repartition(guild.members)
 
@@ -870,7 +876,7 @@ Available types: member, role, user, emoji, channel, server, invite, category
                 color = None
             else:
                 color = None if ctx.guild.me.color.value == 0 else ctx.guild.me.color
-            
+
             await ctx.send(embed = await self.bot.get_cog('Embeds').Embed(title=user_name, thumbnail=str(user.display_avatar.replace(static_format="png", size=1024)) ,color=color, fields = [
                 {"name": "ID", "value": user.id},
                 {"name": "Flags", "value": "-".join(userflags), "inline":False},
