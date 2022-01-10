@@ -8,7 +8,7 @@ import importlib
 import asyncio
 import copy
 from fcts import checks, args
-from libs.classes import Zbot, MyContext
+from libs.classes import Zbot, MyContext, DeleteView
 
 importlib.reload(checks)
 importlib.reload(args)
@@ -816,7 +816,7 @@ You must be an administrator of this server to use this command.
             return
         desc = list()
         if len(liste) == 0:
-            desc.append(await self.bot._(ctx.guild.id, "moderation.bans.no-bans"))
+            desc.append(await self.bot._(ctx.guild.id, "moderation.ban.no-bans"))
         if reasons:
             for case in liste[:45]:
                 desc.append("{}  *({})*".format(case[1],case[0]))
@@ -834,11 +834,10 @@ You must be an administrator of this server to use this command.
         embed = discord.Embed(title=title.format(ctx.guild.name), color=self.bot.get_cog("Servers").embed_color,
                               description="\n".join(desc), timestamp=ctx.message.created_at)
         embed.set_footer(text=ctx.author, icon_url=ctx.author.display_avatar)
-        try:
-            await ctx.send(embed=embed, delete_after=15)
-        except discord.errors.HTTPException as e:
-            if e.code == 400:
-                await ctx.send(await self.bot._(ctx.guild.id, "moderation.ban.list-error"))
+        delete_view = DeleteView(await self.bot._(ctx.guild.id, "misc.btn.delete.label"),
+            validation=lambda inter: inter.user==ctx.author,
+                timeout=60*3)
+        await ctx.send(embed=embed, view=delete_view)
 
 
     @commands.command(name="mutelist")
