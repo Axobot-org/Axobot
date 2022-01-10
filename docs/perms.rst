@@ -4,7 +4,7 @@ Permissions
 
 The permissions given to members is an important part in the configuration of a server. The same is also true for bots. This page is intended to show you each of the permissions necessary for the bot, as well as explain why they are necessary. All this in order to avoid putting unnecessary permissions on the bot, which it turn will keep your server clean and safe.
 
-.. warning:: Never *never* **never NEVER** never *(yes, 5 times never)* put a bot with administration permissions. It has already happened once that the bot's security key is stolen, which allows the thief to take full control of the bot, such as deleting your channels or banning your members. Even though safety has been completely redesigned since this incident, zero risk is not possible. Even bots like Mee6 are not immune from carelessness (as a MEE6 staff, I know what I'm saying).
+.. warning:: Never *never* **never NEVER** never *(yes, 5 times never)* put a bot with administration permissions. It has already happened once that the bot's security key is stolen, which allows the thief to take full control of the bot, such as deleting your channels or banning your members. Even though safety has been completely redesigned since this incident, zero risk is not possible. See `this official note from Discord <https://discord.com/moderation/1500000176222-201:-Permissions-on-Discord#A-Note-About-the-Administrator-Permission>`__ for more information.
 
 -------------------
 General Permissions
