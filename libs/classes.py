@@ -279,20 +279,19 @@ class ConfirmView(discord.ui.View):
 class DeleteView(discord.ui.View):
     "A simple view used to delete a bot message after reading it"
 
-    def __init__(self, message: discord.Message, delete_text: str, validation: Callable[[discord.Interaction], bool], \
+    def __init__(self, delete_text: str, validation: Callable[[discord.Interaction], bool], \
             timeout: int=60):
         super().__init__(timeout=timeout)
-        self.message = message
         self.validation = validation
-        delete_btn = discord.ui.Button(label=delete_text, style=discord.ButtonStyle.green)
+        delete_btn = discord.ui.Button(label=delete_text, style=discord.ButtonStyle.red, emoji='🗑')
         delete_btn.callback = self.delete
         self.add_item(delete_btn)
 
-    async def delete(self, _button: discord.ui.Button, interaction: discord.Interaction):
+    async def delete(self, interaction: discord.Interaction):
         "Delete the message when clicking"
         if not self.validation(interaction):
             return
-        await self.message.delete(delay=0)
+        await interaction.message.delete(delay=0)
         self.stop()
 
 class RankCardsFlag:
