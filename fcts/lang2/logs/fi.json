@@ -13,13 +13,13 @@
             "welcome_roles": "Automated action (config welcome_roles)",
             "young": "Automaattinen valvoja (liian uusi käyttäjä)"
         },
-        "kick": "{user} ({userid}) on potkittu",
-        "mute": "{user} ({userid}) on nyt mykistetty",
+        "kick": "%{user} (%{userid}) on potkittu",
+        "mute": "%{user} (%{userid}) on nyt mykistetty",
         "slowmode-disabled": "Hidastusmuoto on kytketty pois kanavalla {channel}",
         "slowmode-enabled": "Hidastusmuoto on kytketty päälle kanavalla {channel} ({seconds}s)",
-        "softban": "{user} ({userid}) on väliäikaisesti potkittu",
+        "softban": "%{user} (%{userid}) on väliäikaisesti potkittu",
         "unban": "Käyttäjällä {user} ({userid}) ei ole enää porttikieltoa",
-        "unmute": "{user} ({userid}) ei ole enään mykistetty",
-        "warn": "{user} ({userid}) on varoitettu"
+        "unmute": "%{user} (%{userid}) ei ole enään mykistetty",
+        "warn": "%{user} (%{userid}) on varoitettu"
     }
 }
