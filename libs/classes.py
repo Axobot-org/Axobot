@@ -44,6 +44,10 @@ class MyContext(commands.Context):
     async def send(self, *args, **kwargs) -> Optional[discord.Message]:
         if self.bot.zombie_mode and self.command.name not in self.bot.allowed_commands:
             return
+        if self.message.type == discord.MessageType.reply and self.message.reference:
+            kwargs["allowed_mentions"] = kwargs.get("allowed_mentions", self.bot.allowed_mentions)
+            kwargs["allowed_mentions"].replied_user = False
+            return await super().send(reference=self.message.reference, *args, **kwargs)
         return await super().send(*args, **kwargs)
 
 
