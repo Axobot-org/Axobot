@@ -330,11 +330,12 @@ Available types: member, role, user, emoji, channel, server, invite, category
             join_date = await self.TimeUtils.date(member.joined_at, lang=lang, year=True)
             since_date = await self.TimeUtils.time_delta(delta.total_seconds(), lang=lang, year=True, precision=0, hour=delta.total_seconds() < 86400)
             embed.add_field(name=await self.bot._(ctx.guild.id, "info.info.member-2"), value = "{} ({} {})".format(join_date, since, since_date), inline=False)
-        # Join position
-        if sum([1 for x in ctx.guild.members if not x.joined_at]) > 0 and ctx.guild.large:
-            await ctx.guild.chunk()
-        position = str(sorted(ctx.guild.members, key=lambda m: m.joined_at).index(member) + 1) + "/" + str(len(ctx.guild.members))
-        embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.member-3"), value=position, inline=True)
+        if member.guild.member_count < 1e4:
+            # Join position
+            if sum([1 for x in ctx.guild.members if not x.joined_at]) > 0 and ctx.guild.large:
+                await ctx.guild.chunk()
+            position = str(sorted(ctx.guild.members, key=lambda m: m.joined_at).index(member) + 1) + "/" + str(len(ctx.guild.members))
+            embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.member-3"), value=position, inline=True)
         # Status
         status_value = (await self.bot._(ctx.guild.id,f"misc.{member.status}")).capitalize()
         embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.member-4"), value=status_value, inline=True)
