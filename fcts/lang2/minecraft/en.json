@@ -17,6 +17,7 @@
             "Damage points",
             "Durability",
             "Tool able to destroy it",
+            "TNT resistance",
             "Mobs able to loot it",
             "Added in the version"
         ],
@@ -58,8 +59,8 @@
             "Summary",
             "Primary language",
             "Last update",
-            "Downloads",
             "Game versions",
+            "Downloads",
             "ID"
         ],
         "mod-help": "This command provides information about a large number of Minecraft mods. You can give its full or partial name, just enter `%{p}mc mod <name>`. The mod must be registered on the CurseForge platform to appear",

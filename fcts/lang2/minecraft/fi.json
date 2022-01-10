@@ -58,8 +58,8 @@
             "Lyhenne",
             "Normaali kieli",
             "Viimeisin päivitys",
-            "Lataukset",
             "Peli versiot",
+            "Lataukset",
             "ID"
         ],
         "mod-help": "Tämö komento kertoo tietoa suuresta osasta Minecraftin modeista. Voit joko antaa sen täyden tai osan nimestä, kirjoita vain `%{p}mc mod <nimi>`. Modin täytyy olla CurseFrogissa",

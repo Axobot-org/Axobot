@@ -58,8 +58,8 @@
             "Résumé 🧐",
             "Langue principale",
             "Dernière mise-à-jour",
-            "Téléchargements",
             "Versions du jeu",
+            "Téléchargements",
             "ID"
         ],
         "mod-help": "Cette commande donne des infos sur un grand nombre de mods Minecraft.\nTu peux donner son nom complet ou partiel, entre simplement `%{p}mc mod <nom>`.\nLe mod doit être enregistré sur CurseForge pour apparaître.",
