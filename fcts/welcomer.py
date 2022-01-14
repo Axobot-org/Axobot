@@ -175,7 +175,6 @@ class Welcomer(commands.Cog):
         # if level is unreadable or bot can't kick
         if not level.isnumeric() or not member.guild.channels[0].permissions_for(member.guild.me).kick_members:
             return
-        c = False
         level = int(level)
         can_ban = member.guild.get_member(self.bot.user.id).guild_permissions.ban_members
         account_created_since = (self.bot.utcnow() - member.created_at).total_seconds()

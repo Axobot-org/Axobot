@@ -448,13 +448,8 @@ Available types: member, role, user, emoji, channel, server, invite, category
             botb = await self.bot._(ctx.guild.id,"misc.no")
         if user in ctx.guild.members:
             on_server = await self.bot._(ctx.guild.id,"misc.yes")
-            banned = None
         else:
             on_server = await self.bot._(ctx.guild.id,"misc.no")
-            # try:
-            #     banned = str((await ctx.guild.fetch_ban(item)).reason)
-            # except (discord.Forbidden, discord.NotFound):
-            #     banned = None
         embed = discord.Embed(colour=default_color, timestamp=ctx.message.created_at)
         embed.set_thumbnail(url=user.display_avatar.with_static_format("png"))
         embed.set_author(name=str(user), icon_url=user.display_avatar.with_format("png"))
@@ -482,9 +477,6 @@ Available types: member, role, user, emoji, channel, server, invite, category
             if guilds_count is not None:
                 embed.add_field(name=str(await self.bot._(ctx.guild.id,'misc.servers')).capitalize(),value=guilds_count)
             await session.close()
-        # ban reason
-        # if banned:
-        #     embed.add_field(name=await self.bot._(ctx.guild.id, "info.info.user-1"), value=banned.capitalize())
         await ctx.send(embed=embed)
 
     @info_main.command(name="emoji")
@@ -728,7 +720,7 @@ Available types: member, role, user, emoji, channel, server, invite, category
         # Invite URL
         embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.inv-0"), value=invite.url,inline=True)
         # Inviter
-        embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.inv-1"), value=str(invite.inviter) if invite.inviter!= None else await self.bot._(ctx.guild,'misc.unknown'))
+        embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.inv-1"), value=str(invite.inviter) if invite.inviter is not None else await self.bot._(ctx.guild,'misc.unknown'))
         # Invite uses
         if invite.max_uses is not None and invite.uses is not None:
             if invite.max_uses == 0:
@@ -1266,7 +1258,6 @@ Servers:
         ..Doc infos.html#usernames-history"""
         if user is None:
             user = ctx.author
-        language = await self.bot._(ctx.channel,'_used_locale')
         cond = f"user='{user.id}'"
         if not self.bot.beta:
             cond += " AND beta=0"

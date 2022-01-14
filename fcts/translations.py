@@ -82,11 +82,10 @@ class Translations(commands.Cog):
                 if k not in did:
                     result[k] = v
         return result
-    
+
     def load_project(self, lang: str):
-        result = dict()
-        with open('translation/'+lang+'-project.json','r',encoding='utf-8') as f:
-            result = json.load(f)
+        with open('translation/'+lang+'-project.json','r',encoding='utf-8') as file:
+            result: dict = json.load(file)
         return {k:v for k,v in result.items() if v is not None}
 
     async def modify_project(self, lang: str, key: str, new: str):
@@ -96,8 +95,8 @@ class Translations(commands.Cog):
         except FileNotFoundError:
             old = dict()
         old[key] = new
-        with open('translation/'+lang+'-project.json','w',encoding='utf-8') as f:
-            json.dump(old,f, ensure_ascii=False, indent=4, sort_keys=True)
+        with open('translation/'+lang+'-project.json','w',encoding='utf-8') as file:
+            json.dump(old,file, ensure_ascii=False, indent=4, sort_keys=True)
         self.translations[lang][key] = new
 
     @commands.command(name='translate',aliases=['tr'])
