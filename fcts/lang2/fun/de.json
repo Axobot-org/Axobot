@@ -2,33 +2,33 @@
     "de": {
         "afk": {
             "afk-done": "Du bist jetzt AFK",
-            "afk-user-reason": "Dieses Mitglied ist AFK, da {reason}",
+            "afk-user-reason": "Dieses Mitglied ist AFK, da %{reason}",
             "afk-user-noreason": "Dieser Nutzer ist AFK!",
             "no-perm": "Ups... Ich kann keine Namen ändern 😕 Ich werde versuchen mich zu erinnern aber ich könnte vergessen, dass du afk bist",
             "unafk-cant": "Du bist nicht AFK!",
             "unafk-done": "Du bist nicht mehr AFK"
         },
         "bbw-too-many": "Ups, der Text ist zu groß für Discord 😕",
-        "blame-0": "Liste möglicher Namen für **{user}**",
+        "blame-0": "Liste möglicher Namen für **%{user}**",
         "cant-react": "Ich hab keine Berechtigung für das Hinzufügen von Berechtigungen!",
-        "cookie": "{user} hat <@375598088850505728> eine Packung Kekse geschenkt! {emoji}",
+        "cookie": "{user} hat <@375598088850505728> eine Packung Kekse geschenkt! %{emoji}",
         "count": {
             "counting": "Zählt...",
-            "result-you": "Von den letzen {limit} Nachrichten sind {x} von dir ({p}%)",
-            "too-much": "Du willst wohl Discord zerstören! {e} Aus offentsichtlichen Gründen begrenze ich auf {l} Nachrichten",
+            "result-you": "Von den letzen %{limit} Nachrichten sind %{x} von dir (%{p}%)",
+            "too-much": "Du willst wohl Discord zerstören! %{e} Aus offentsichtlichen Gründen begrenze ich auf %{l} Nachrichten",
             "missing-perms": "Ooops, ich besitze nicht die Berechtigung diesen Chatverlauf zu lesen",
-            "result-user": "Von den letzen {limit} Nachrichten hat {user} {x} Nachrichten gesendet ({p}%)"
+            "result-user": "Von den letzen %{limit} Nachrichten hat %{user} %{x} Nachrichten gesendet (%{p}%)"
         },
-        "discordjobs-count": "{c} Angebote gefunden",
+        "discordjobs-count": "%{c} Angebote gefunden",
         "discordjobs-title": "verfügbare Jobs bei Discord",
-        "discordstatus-exists": "Es gibt gerade ein {impact} Problem bei Discord: {title}",
+        "discordstatus-exists": "Es gibt gerade ein %{impact} Problem bei Discord: %{title}",
         "discordstatus-impacts": {
             "major": "größer",
             "minor": "kleiner",
             "none": "ohne Effekte"
         },
-        "discordstatus-nothing": "Es wurde nichts gefunden!\nDas letzte bekannte Problem war am {date}",
-        "error": "Ein Fehler: `{err}`",
+        "discordstatus-nothing": "Es wurde nichts gefunden!\nDas letzte bekannte Problem war am %{date}",
+        "error": "Ein Fehler: `%{err}`",
         "embed-invalid-channel": "Kann keine Nachricht in diesen Kanal senden",
         "embed-invalid-image": "Die Url stellte sich als ungültig heraus",
         "fun-list": "Hier ist einer Liste aller Spaß Befehle:",
@@ -89,14 +89,14 @@
         ],
         "piece-1": "Oh nein, die Münze ist auf der Kante gelandet!",
         "react-0": "Gesuchte Nachricht konnte nicht gefunden werden. Du musst als erstes die ID und dann den Emoji angeben :upside_down:\n Bitte beachte auch, dass den Nachrichtenverlauf lesen können muss!",
-        "reminds-asked": "{user}, du hast mich vor {duration} gefragt, dass ich dich daran erinnern soll:",
+        "reminds-asked": "%{user}, du hast mich vor %{duration} gefragt, dass ich dich daran erinnern soll:",
         "reminds-date": "gefragt um",
         "reminds-link": "Originale Nachricht",
-        "reminds-saved": "Habs! Ich werde dich in {duration} erinnern",
+        "reminds-saved": "Habs! Ich werde dich in %{duration} erinnern",
         "reminds-title": "Erinnerung",
         "reminds-too-long": "Es ist nicht möglich es auf eine so lange Zeit zu setzen",
         "reminds-too-short": "Du hast eine ungültige Zeit eingegeben",
-        "say-no-perm": "Du hast keine Berechtigungen in diesem Channel {channel} Nachrichten zu senden",
+        "say-no-perm": "Du hast keine Berechtigungen in diesem Channel %{channel} Nachrichten zu senden",
         "thanos": [
             "{0} wurde von Thanos verschont",
             "Thanos hat {0} pulverisiert! Für die Allgemeinheit...."

@@ -875,7 +875,7 @@ You can specify a verification limit by adding a number in argument (up to 1.000
             emb = discord.Embed(title=_title, color=7506394, url="https://dis.gd/jobs")
             emb.description = await self.bot._(ctx.channel, "fun.discordjobs-count", c=len(f_jobs))
             for i in range(0, len(f_jobs), 10):
-                emb.add_field(name="​", value="\n".join(f_jobs[i:i+10]))
+                emb.add_field(name=self.bot.zws, value="\n".join(f_jobs[i:i+10]))
             await ctx.send(embed=emb)
         else:
             await ctx.send("\n".join(f_jobs[:20]))
@@ -895,8 +895,7 @@ You can specify a verification limit by adding a number in argument (up to 1.000
             await ctx.send(await self.bot._(ctx.channel, "fun.discordstatus-exists", impact=impact, title=title))
         else:
             last_date = datetime.datetime.strptime(last_incident['resolved_at'], '%Y-%m-%dT%H:%M:%S.%f%z')
-            _lang = await self.bot._(ctx.channel,'_used_locale')
-            last_date = await self.bot.get_cog("TimeUtils").date(last_date, _lang, timezone=True)
+            last_date = f"<t:{round(last_date.timestamp())}:F>"
             await ctx.send(await self.bot._(ctx.channel, "fun.discordstatus-nothing", date=last_date))
 
 
