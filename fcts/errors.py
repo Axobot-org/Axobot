@@ -15,11 +15,6 @@ class Errors(commands.Cog):
         self.bot = bot
         self.file = "errors"
 
-    async def search_err(self, form:list, sentence:str):
-        for x in form:
-            r = re.search(x,sentence)
-            if r!= None:
-                return r
 
     @commands.Cog.listener()
     async def on_command_error(self, ctx: MyContext, error: Exception):

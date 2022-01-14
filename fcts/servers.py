@@ -846,7 +846,7 @@ class Servers(commands.Cog):
             return self.default_opt[option]
         else:
             return value
-    
+
     async def conf_levelup_chan(self, ctx: MyContext, option: str, value: str):
         guild = await self.get_guild(ctx)
         ext = not isinstance(ctx, commands.Context)
@@ -855,10 +855,10 @@ class Servers(commands.Cog):
             return await self.form_levelup_chan(guild, chan, ext)
         else:
             if value.lower() in {"any", "tout", "tous", "current", "all", "any channel"}:
-                c = c_id = "any"
+                c_id = "any"
                 msg = await self.bot._(guild.id,"server.edit-success.levelup_channel.any")
             elif value.lower() in {"none", "aucun", "disabled", "nowhere"}:
-                c = c_id = "none"
+                c_id = "none"
                 msg = await self.bot._(guild.id,"server.edit-success.levelup_channel-none")
             else:
                 chan = value.strip()
@@ -870,11 +870,10 @@ class Servers(commands.Cog):
                     return
                 msg = await self.bot._(guild.id, "server.edit-success.levelup_channel.chan", val=c.mention)
                 c_id = c.id
-                c = c.mention
             await self.modify_server(guild.id,values=[(option,c_id)])
             await ctx.send(msg)
             await self.send_embed(guild, option, value)
-    
+
     async def form_levelup_chan(self, guild: discord.Guild, value: str, ext: bool=False):
         if value == "any":
             return "Any channel"

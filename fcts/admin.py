@@ -746,9 +746,9 @@ Cette option affecte tous les serveurs"""
         s.get_best_server()
         s.download()
         s.upload(pre_allocate=False)
-        if method == None:
+        if method is None:
             s.results.share()
-        if method == None:
+        if method is None:
             result = s.results.dict()
             await msg.edit(content=f"{result['server']['sponsor']} - ping {result['server']['latency']}ms\n{result['share']}")
         elif method == "json":
