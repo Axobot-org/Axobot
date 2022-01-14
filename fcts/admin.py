@@ -351,12 +351,6 @@ class Admin(commands.Cog):
         """Vérifie si un fichier de langue est complet"""
         await self.bot.get_cog("Languages").check_tr(ctx.channel,lang,origin)
 
-    @main_msg.command(name="backup")
-    @commands.check(reloads.check_admin)
-    async def adm_backup(self, ctx: MyContext):
-        """Exécute une sauvegarde complète du code"""
-        await self.backup_auto(ctx)
-
     @main_msg.command(name="membercounter")
     @commands.check(reloads.check_admin)
     async def membercounter(self, ctx: MyContext):
@@ -820,34 +814,6 @@ Cette option affecte tous les serveurs"""
         new_ctx = await self.bot.get_context(msg)
         await self.bot.invoke(new_ctx)
         await self.add_success_reaction(ctx.message)
-
-    async def backup_auto(self, ctx: MyContext=None):
-        """Crée une backup du code"""
-        t = time.time()
-        self.bot.log.info("("+str(await self.bot.get_cog('TimeUtils').date(datetime.datetime.now(),digital=True))+") Backup auto en cours")
-        message = await ctx.send(":hourglass: Sauvegarde en cours...")
-        try:
-            os.remove('../backup.tar')
-        except:
-            pass
-        try:
-            archive = shutil.make_archive('backup','tar','..')
-        except FileNotFoundError:
-            self.bot.log.error("Impossible de trouver le dossier de sauvegarde")
-            await message.edit("{} Impossible de trouver le dossier de sauvegarde".format(self.bot.get_cog('Emojis').customEmojis['red_cross']))
-            return
-        try:
-            shutil.move(archive,'..')
-        except shutil.Error:
-            os.remove('../backup.tar')
-            shutil.move(archive,'..')
-        try:
-            os.remove('backup.tar')
-        except:
-            pass
-        msg = "Backup completed in {} seconds!".format(round(time.time()-t,3))
-        self.bot.log.info(msg)
-        await message.edit(content=msg)
 
     @commands.group(name='bug',hidden=True)
     @commands.check(reloads.check_admin)
