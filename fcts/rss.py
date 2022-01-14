@@ -937,7 +937,7 @@ class Rss(commands.Cog):
 
 
     async def parse_yt_url(self, url):
-        r = r'(?:https?://)?(?:www.)?(?:youtube.com|youtu.be)(?:(?:/channel/|/user/)(.+)|/[\w-]+$)'
+        r = r'(?:https?://)?(?:www.)?(?:youtube.com|youtu.be)(?:(?:/channel/|/user/|/c/)(.+)|/[\w-]+$)'
         match = re.search(r,url)
         if match is None:
             return None
@@ -956,7 +956,7 @@ class Rss(commands.Cog):
             except twitter.TwitterError:
                 return None
             return user.id
-    
+
     async def parse_twitch_url(self, url):
         r = r'(?:http.*://)?(?:www.)?(?:twitch.tv/)([^?\s]+)'
         match = re.search(r,url)
@@ -964,7 +964,7 @@ class Rss(commands.Cog):
             return None
         else:
             return match.group(1)
-    
+
     async def parse_deviant_url(self, url):
         r = r'(?:http.*://)?(?:www.)?(?:deviantart.com/)([^?\s]+)'
         match = re.search(r,url)
