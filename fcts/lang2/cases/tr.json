@@ -1,15 +1,15 @@
 {
     "tr": {
-        "cases-0": "{nbr} bulunan olaylar: ({start}-{end})",
-        "deleted": "#{ID} olayı silindi!",
+        "cases-0": "%{nbr} bulunan olaylar: (%{start}-%{end})",
+        "deleted": "#%{ID} olayı silindi!",
         "list-0": "**Kullanıcı:** {U}\n**Sunucu:** {G}\n**Tür** {T}\n**Moderatör:** {M}\n**Tarih** {D}\n**Neden** *{R}*",
         "list-1": "**Sunucu:** {G}\n**Tür** {T}\n**Moderatör:** {M}\n**Tarih:** {D}\n**Neden** *{R}*",
         "no-user": "Bu kullanıcı bulunamıyor 👀",
         "no_database": "Geçici bir veritabanı kesintisi nedeniyle, bu komut devredışı bırakıldı",
         "not-found": "Bu olay bulunamadı 😕",
-        "reason-edited": "#{ID} olayı için olan neden değiştirildi!",
+        "reason-edited": "#%{ID} olayı için olan neden değiştirildi!",
         "search-0": "**Kullanıcı** {U}\n**Tür:** {T}\n**Moderatör:** {M}\n**Tarih:** {D}\n**Neden:** *{R}*",
         "search-1": "**Kulanıcı:** {U}\n**Sunucu:** {G}\n**Tür:** {T}\n**Moderatör:** {M}\n**Tarih:** {D}\n**Neden:** *{R}*",
-        "title-search": "Olay #{ID}"
+        "title-search": "Olay #%{ID}"
     }
 }
