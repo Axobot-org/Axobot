@@ -119,6 +119,7 @@ def parse_crypted_file(bot: "Zbot"):
     bot.others['statuspage'] = cryptage.uncrypte(lines[16])
     bot.others['nasa'] = cryptage.uncrypte(lines[17])
     bot.others['random_api_token'] = cryptage.uncrypte(lines[18])
+    bot.others['google_api'] = cryptage.uncrypte(lines[19])
     bot.dbl_token = tokens.get_dbl_token()
 
 def load_sql_connection(bot: "Zbot"):

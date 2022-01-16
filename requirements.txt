@@ -13,3 +13,4 @@ pytz
 psutil>=5.8
 speedtest-cli
 feedparser>=6.0
+google-api-python-client

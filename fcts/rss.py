@@ -1,23 +1,27 @@
-from aiohttp.client import ClientSession
-from aiohttp import client_exceptions
-from feedparser.util import FeedParserDict
-from libs.classes import Zbot, MyContext
-import discord
-import datetime
-import time
-import re
 import asyncio
-import mysql
-import random
-import typing
-import importlib
+import datetime
 import html
+import importlib
+import random
+import re
+import time
+import typing
+
+import async_timeout
+import discord
+import feedparser
+import mysql
 import requests
 import twitter
-import async_timeout
-import feedparser
+from aiohttp import client_exceptions
+from aiohttp.client import ClientSession
 from discord.ext import commands, tasks
-from fcts import reloads, args, checks
+from feedparser.util import FeedParserDict
+from libs.classes import MyContext, Zbot
+from libs.rss_youtube import YoutubeRSS
+
+from fcts import args, checks, reloads
+
 # importlib.reload(reloads)
 importlib.reload(args)
 importlib.reload(checks)
@@ -33,20 +37,6 @@ reddit_link={'minecraft':'https://www.reddit.com/r/Minecraft',
              'reddit':'https://www.reddit.com/r/news',
              'discord':'https://www.reddit.com/r/discordapp'
              }
-
-yt_link={'grand_corbeau':'UCAt_W0Rgr33OePJ8jylkx0A',
-         'mojang':'UC1sELGmy5jp5fQUugmuYlXQ',
-         'frm':'frminecraft',
-         'fr-minecraft':'frminecraft',
-         'freebuild':'UCFl41Y9Hf-BtZBn7LGPHNAQ',
-         'fb':'UCFl41Y9Hf-BtZBn7LGPHNAQ',
-         'aurelien_sama':'AurelienSama',
-         'asilis':'UC2_9zcNSfEBecm3yaojexXw',
-         'leirof':'UCimA2SBz78Mj-TQ2n4TmEVw',
-         'gunivers':'UCtQb5O95cCGp9iquLjY9O1g',
-         'platon_neutron':'UC2xPiOqjQ-nZeCka_ZNCtCQ',
-         'aragorn1202':'UCjDG6KLKOm6_8ax--zgeB6Q'
-         }
 
 
 async def check_admin(ctx: MyContext):
@@ -70,7 +60,10 @@ class Rss(commands.Cog):
         self.embed_color = discord.Color(6017876)
         self.loop_processing = False
         self.last_update = None
+
+        self.youtube_rss = YoutubeRSS(self.bot)
         self.twitterAPI = twitter.Api(**bot.others['twitter'], tweet_mode="extended", timeout=15)
+
         self.twitter_over_capacity = False
         self.min_time_between_posts = {
             'web': 120,
@@ -87,7 +80,7 @@ class Rss(commands.Cog):
     @commands.Cog.listener()
     async def on_ready(self):
         self.table = 'rss_flow' if self.bot.user.id==486896267788812288 else 'rss_flow_beta'
-    
+
     def cog_unload(self):
         # pylint: disable=no-member
         self.loop_child.cancel()
@@ -160,7 +153,7 @@ class Rss(commands.Cog):
             if msg_format is None:
                 msg_format = self.format
             if isinstance(self.date, datetime.datetime):
-                date = f"<t:{self.date.timestamp():.0f}:d> <t:{self.date.timestamp():.0f}:t>"
+                date = f"<t:{self.date.timestamp():.0f}:d> <t:{self.date.timestamp():.0f}:T>"
             else:
                 date = self.date
             msg_format = msg_format.replace('\\n','\n')
@@ -193,27 +186,31 @@ class Rss(commands.Cog):
     @commands.cooldown(2,15,commands.BucketType.channel)
     async def rss_main(self, ctx: MyContext):
         """See the last post of a rss feed
-        
+
         ..Doc rss.html#rss"""
         if ctx.subcommand_passed is None:
             await self.bot.get_cog('Help').help_command(ctx,['rss'])
 
     @rss_main.command(name="youtube",aliases=['yt'])
-    async def request_yt(self, ctx: MyContext, ID):
+    async def request_yt(self, ctx: MyContext, channel):
         """The last video of a YouTube channel
-        
+
         ..Example rss youtube UCZ5XnGb-3t7jCkXdawN2tkA
 
         ..Example rss youtube https://www.youtube.com/channel/UCZ5XnGb-3t7jCkXdawN2tkA
 
         ..Doc rss.html#see-the-last-post"""
-        if ID in yt_link.keys():
-            ID = yt_link[ID]
-        if re.match(r'https://(?:www\.)(?:youtube\.com|youtu\.be)/', ID):
-            ID = await self.parse_yt_url(ID)
-        if ID is None:
-            return await ctx.send(await self.bot._(ctx.channel, "rss.web-invalid"))
-        text = await self.rss_yt(ctx.channel,ID)
+        if self.youtube_rss.is_youtube_url(channel):
+            # apparently it's a youtube.com link
+            channel = await self.youtube_rss.get_chanel_by_any_url(channel)
+        if channel is not None and not await self.youtube_rss.is_valid_channel(channel):
+            # argument is not a channel name or ID, but it may be a custom name
+            channel = self.youtube_rss.get_channel_by_custom_url(channel)
+        if channel is None:
+            # we couldn't get the ID based on user input
+            await ctx.send(await self.bot._(ctx.channel, "rss.web-invalid"))
+            return
+        text = await self.rss_yt(ctx.channel,channel)
         if isinstance(text, str):
             await ctx.send(text)
         else:
@@ -223,15 +220,15 @@ class Rss(commands.Cog):
                 await ctx.send(embed=obj)
             else:
                 await ctx.send(obj)
-    
+
     @rss_main.command(name="twitch",aliases=['tv'])
     async def request_twitch(self, ctx: MyContext, channel):
         """The last video of a Twitch channel
-        
+
         ..Example rss twitch aureliensama
 
         ..Example rss tv https://www.twitch.tv/aureliensama
-        
+
         ..Doc rss.html#see-the-last-post"""
         if re.match(r'https://(?:www\.)twitch.tv/', channel):
             channel = await self.parse_twitch_url(channel)
@@ -249,18 +246,18 @@ class Rss(commands.Cog):
     @rss_main.command(name='twitter',aliases=['tw'])
     async def request_tw(self, ctx: MyContext, name):
         """The last tweet of a Twitter account
-        
+
         ..Example rss twitter https://twitter.com/z_runnerr
-        
+
         ..Example rss tw z_runnerr
-        
+
         ..Doc rss.html#see-the-last-post"""
         if re.match(r'https://(?:www\.)twitter.com/', name):
             name = await self.parse_tw_url(name)
         try:
             text = await self.rss_tw(ctx.channel,name)
-        except Exception as e:
-            return await self.bot.get_cog('Errors').on_error(e,ctx)
+        except Exception as err:
+            return await self.bot.get_cog('Errors').on_error(err,ctx)
         if isinstance(text, str):
             await ctx.send(text)
         else:
@@ -275,9 +272,9 @@ class Rss(commands.Cog):
     @rss_main.command(name="web")
     async def request_web(self, ctx: MyContext, link):
         """The last post on any other rss feed
-        
+
         ..Example rss web https://fr-minecraft.net/rss.php
-        
+
         ..Doc rss.html#see-the-last-post"""
         if link in web_link.keys():
             link = web_link[link]
@@ -295,13 +292,13 @@ class Rss(commands.Cog):
                 await ctx.send(embed=obj)
             else:
                 await ctx.send(obj)
-    
+
     @rss_main.command(name="deviantart",aliases=['deviant'])
     async def request_deviant(self, ctx: MyContext, user):
         """The last pictures of a DeviantArt user
-        
+
         ..Example rss deviant https://www.deviantart.com/adri526
-        
+
         ..Doc rss.html#see-the-last-post"""
         if re.match(r'https://(?:www\.)deviantart.com/', user):
             user = await self.parse_deviant_url(user)
@@ -335,45 +332,45 @@ class Rss(commands.Cog):
         ..Example rss add https://www.deviantart.com/adri526
 
         ..Example rss add https://www.youtube.com/channel/UCZ5XnGb-3t7jCkXdawN2tkA
-        
+
         ..Doc rss.html#follow-a-feed"""
         is_over, flow_limit = await self.is_overflow(ctx.guild)
         if is_over:
             await ctx.send(await self.bot._(ctx.guild.id,"rss.flow-limit", limit=flow_limit))
             return
-        identifiant = await self.parse_yt_url(link)
-        Type = None
+        identifiant = await self.youtube_rss.get_chanel_by_any_url(link)
+        flow_type = None
         if identifiant is not None:
-            Type = 'yt'
+            flow_type = 'yt'
             display_type = 'youtube'
         if identifiant is None:
             identifiant = await self.parse_tw_url(link)
             if identifiant is not None:
-                Type = 'tw'
+                flow_type = 'tw'
                 display_type = 'twitter'
         if identifiant is None:
             identifiant = await self.parse_twitch_url(link)
             if identifiant is not None:
-                Type = 'twitch'
+                flow_type = 'twitch'
                 display_type = 'twitch'
         if identifiant is None:
             identifiant = await self.parse_deviant_url(link)
             if identifiant is not None:
-                Type = 'deviant'
+                flow_type = 'deviant'
                 display_type = 'deviantart'
         if identifiant is not None and not link.startswith("https://"):
             link = "https://"+link
         if identifiant is None and link.startswith("http"):
             identifiant = link
-            Type = "web"
+            flow_type = "web"
             display_type = 'website'
         elif not link.startswith("http"):
             await ctx.send(await self.bot._(ctx.guild, "rss.invalid-link"))
             return
-        if Type is None or not await self.check_rss_url(link):
+        if flow_type is None or not await self.check_rss_url(link):
             return await ctx.send(await self.bot._(ctx.guild.id, "rss.invalid-flow"))
         try:
-            ID = await self.add_flow(ctx.guild.id,ctx.channel.id,Type,identifiant)
+            ID = await self.add_flow(ctx.guild.id,ctx.channel.id,flow_type,identifiant)
             await ctx.send(await self.bot._(ctx.guild,"rss.success-add", type=display_type, url=link, channel=ctx.channel.mention))
             self.bot.log.info("RSS feed added into server {} ({} - {})".format(ctx.guild.id,link,ID))
             await self.send_log("Feed added into server {} ({})".format(ctx.guild.id,ID),ctx.guild)
@@ -879,7 +876,7 @@ class Rss(commands.Cog):
                 notok = '<:redcheck:513105827817717762>'
                 nothing = '<:_nothing:446782476375949323>'
                 txt = ['**__Analyse :__**','']
-                yt = await self.parse_yt_url(feeds.feed['link'])
+                yt = await self.youtube_rss.get_chanel_by_any_url(feeds.feed['link'])
                 if yt is None:
                     tw = await self.parse_tw_url(feeds.feed['link'])
                     if tw is not None:
@@ -918,7 +915,7 @@ class Rss(commands.Cog):
             await ctx.bot.get_cog('Errors').on_command_error(ctx,e)
 
     async def check_rss_url(self, url):
-        r = await self.parse_yt_url(url)
+        r = self.youtube_rss.is_youtube_url(url)
         if r is not None:
             return True
         r = await self.parse_tw_url(url)
@@ -937,14 +934,6 @@ class Rss(commands.Cog):
         except:
             return False
 
-
-    async def parse_yt_url(self, url):
-        r = r'(?:https?://)?(?:www.)?(?:youtube.com|youtu.be)(?:(?:/channel/|/user/|/c/)(.+)|/[\w-]+$)'
-        match = re.search(r,url)
-        if match is None:
-            return None
-        else:
-            return match.group(1)
 
     async def parse_tw_url(self, url):
         r = r'(?:http.*://)?(?:www.)?(?:twitter.com/)([^?\s]+)'
