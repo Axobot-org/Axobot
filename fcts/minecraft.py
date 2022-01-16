@@ -302,28 +302,28 @@ Every information come from the website www.fr-minecraft.net"""
             await ctx.send(await self.bot._(ctx.channel, "minecraft.no-embed"))
             return
         url = 'https://addons-ecs.forgesvc.net/api/v2/addon/'
-        h = {
+        header = {
             "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0) Gecko/20100101 Firefox/83.0"}
         searchurl = url+'search?gameId=432&sectionId=6&sort=0&pageSize=2&searchFilter=' + \
             quote(value.lower())
-        async with aiohttp.ClientSession(loop=self.bot.loop, headers=h) as session:
+        async with aiohttp.ClientSession(loop=self.bot.loop, headers=header) as session:
             async with session.get(searchurl, timeout=10) as resp:
                 search: list = await resp.json()
             if len(search) == 0:
                 await ctx.send(await self.bot._(ctx.channel, "minecraft.no-mod"))
                 return
-        user_lang = await self.bot._(ctx.channel, '_used_locale')
         search = search[0]
         authors = ", ".join(
             [f"[{x['name']}]({x['url']})" for x in search['authors']])
-        d = search['dateModified'][:-1]
-        d += '0'*(23-len(d))
-        date = await self.bot.get_cog("TimeUtils").date(datetime.datetime.fromisoformat(d), user_lang, year=True)
+        raw_date = search['dateModified'][:-1]
+        raw_date += '0'*(23-len(raw_date))
+        date = datetime.datetime.fromisoformat(raw_date).replace(tzinfo=datetime.timezone.utc)
+        date = f"<t:{date.timestamp():.0f}>"
         versions = set(x['gameVersion']
                        for x in search['gameVersionLatestFiles'])
         versions = " - ".join(sorted(versions, reverse=True,
                               key=lambda a: list(map(int, a.split('.')))))
-        l = (
+        data = (
             search['name'],
             authors,
             search['summary'],
@@ -341,10 +341,10 @@ Every information come from the website www.fr-minecraft.net"""
         embed.set_footer(text=ctx.author, icon_url=ctx.author.display_avatar)
         if attachments := search['attachments']:
             embed.set_thumbnail(url=attachments[0]['thumbnailUrl'])
-        for e, v in enumerate(await self.bot._(ctx.channel, "minecraft.mod-fields")):
-            if l[e] not in [None, '']:
+        for i, field in enumerate(await self.bot._(ctx.channel, "minecraft.mod-fields")):
+            if data[i]:
                 try:
-                    embed.add_field(name=v, value=str(l[e]), inline=False)
+                    embed.add_field(name=field, value=str(data[i]), inline=False)
                 except IndexError:
                     pass
         await self.send_embed(ctx, embed)

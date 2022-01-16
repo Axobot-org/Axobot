@@ -212,7 +212,8 @@ class Events(commands.Cog):
             return self.bot.log.warning("[send_mp] Salon de MP introuvable")
         emb = msg.embeds[0] if len(msg.embeds) > 0 else None
         arrow = ":inbox_tray:" if msg.author == msg.channel.recipient else ":outbox_tray:"
-        text = "{} **{}** ({} - {})\n{}".format(arrow, msg.channel.recipient, msg.channel.recipient.id, await self.bot.get_cog("TimeUtils").date(msg.created_at,digital=True), msg.content)
+        date_ = f"<t:{msg.created_at.timestamp():.0f}>"
+        text = "{} **{}** ({} - {})\n{}".format(arrow, msg.channel.recipient, msg.channel.recipient.id, date_, msg.content)
         if len(msg.attachments) > 0:
             text += "".join(["\n{}".format(x.url) for x in msg.attachments])
         await channel.send(text,embed=emb)
@@ -337,7 +338,7 @@ class Events(commands.Cog):
         try:
             if self.bot.zombie_mode:
                 return False
-            f_duration = await self.bot.get_cog('TimeUtils').time_delta(task['duration'],lang=await self.bot._(channel,'_used_locale'), form='developed', precision=0)
+            f_duration = await self.bot.get_cog('TimeUtils').time_delta(task['duration'],lang=await self.bot._(channel,'_used_locale'), form='developed')
 
             if task['data'] is not None:
                 task['data'] = json.loads(task['data'])
