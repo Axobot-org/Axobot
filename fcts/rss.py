@@ -109,7 +109,7 @@ class Rss(commands.Cog):
             else:
                 self.date = None
             self.author = author
-            self.format = Format
+            self.format: str = Format
             if Type == 'yt':
                 self.logo = emojis['youtube']
             elif Type == 'tw':
@@ -156,19 +156,21 @@ class Rss(commands.Cog):
                 self.mentions = r
             return self
 
-        async def create_msg(self, language, Format=None):
-            if Format is None:
-                Format = self.format
-            if not isinstance(self.date,str):
-                d = await self.bot.get_cog("TimeUtils").date(self.date,lang=language,year=False,hour=True,digital=True)
+        async def create_msg(self, msg_format: str=None):
+            if msg_format is None:
+                msg_format = self.format
+            if isinstance(self.date, datetime.datetime):
+                date = f"<t:{self.date.timestamp():.0f}:d> <t:{self.date.timestamp():.0f}:t>"
             else:
-                d = self.date
-            Format = Format.replace('\\n','\n')
+                date = self.date
+            msg_format = msg_format.replace('\\n','\n')
             if self.rt_by is not None:
                 self.author = "{} (retweeted by @{})".format(self.author,self.rt_by)
             _channel = discord.utils.escape_markdown(self.channel) if self.channel else "?"
             _author = discord.utils.escape_markdown(self.author) if self.author else "?"
-            text = Format.format_map(self.bot.SafeDict(channel=_channel,title=self.title,date=d,url=self.url,link=self.url,mentions=", ".join(self.mentions),logo=self.logo,author=_author))
+            text = msg_format.format_map(self.bot.SafeDict(channel=_channel, title=self.title, date=date, url=self.url,
+                                                       link=self.url, mentions=", ".join(self.mentions), logo=self.logo,
+                                                       author=_author))
             if not self.embed:
                 return text
             else:
@@ -216,7 +218,7 @@ class Rss(commands.Cog):
             await ctx.send(text)
         else:
             form = await self.bot._(ctx.channel, "rss.yt-form-last")
-            obj = await text[0].create_msg(await self.bot._(ctx.channel,'_used_locale'),form)
+            obj = await text[0].create_msg(form)
             if isinstance(obj,discord.Embed):
                 await ctx.send(embed=obj)
             else:
@@ -238,7 +240,7 @@ class Rss(commands.Cog):
             await ctx.send(text)
         else:
             form = await self.bot._(ctx.channel, "rss.twitch-form-last")
-            obj = await text[0].create_msg(await self.bot._(ctx.channel,'_used_locale'),form)
+            obj = await text[0].create_msg(form)
             if isinstance(obj,discord.Embed):
                 await ctx.send(embed=obj)
             else:
@@ -264,7 +266,7 @@ class Rss(commands.Cog):
         else:
             form = await self.bot._(ctx.channel, "rss.tw-form-last")
             for single in text[:5]:
-                obj = await single.create_msg(await self.bot._(ctx.channel,'_used_locale'),form)
+                obj = await single.create_msg(form)
                 if isinstance(obj,discord.Embed):
                     await ctx.send(embed=obj)
                 else:
@@ -288,7 +290,7 @@ class Rss(commands.Cog):
             await ctx.send(text)
         else:
             form = await self.bot._(ctx.channel, "rss.web-form-last")
-            obj = await text[0].create_msg(await self.bot._(ctx.channel,'_used_locale'),form)
+            obj = await text[0].create_msg(form)
             if isinstance(obj,discord.Embed):
                 await ctx.send(embed=obj)
             else:
@@ -308,7 +310,7 @@ class Rss(commands.Cog):
             await ctx.send(text)
         else:
             form = await self.bot._(ctx.channel, "rss.deviant-form-last")
-            obj = await text[0].create_msg(await self.bot._(ctx.channel,'_used_locale'),form)
+            obj = await text[0].create_msg(form)
             if isinstance(obj,discord.Embed):
                 await ctx.send(embed=obj)
             else:
@@ -1395,7 +1397,7 @@ class Rss(commands.Cog):
 
     async def send_rss_msg(self, obj: "rssMessage", channel: discord.TextChannel, roles: typing.List[str], send_stats):
         if channel is not None:
-            t = await obj.create_msg(await self.bot._(channel.guild,'_used_locale'))
+            t = await obj.create_msg()
             mentions = list()
             for item in roles:
                 if item == '':
@@ -1406,10 +1408,11 @@ class Rss(commands.Cog):
             try:
                 if self.bot.zombie_mode:
                     return
+                allowed_mentions = discord.AllowedMentions(everyone=False, roles=True)
                 if isinstance(t, discord.Embed):
-                    await channel.send(" ".join(obj.mentions), embed=t, allowed_mentions=discord.AllowedMentions(everyone=False, roles=True))
+                    await channel.send(" ".join(obj.mentions), embed=t, allowed_mentions=allowed_mentions)
                 else:
-                    await channel.send(t, allowed_mentions=discord.AllowedMentions(everyone=False, roles=True))
+                    await channel.send(t, allowed_mentions=allowed_mentions)
                 if send_stats:
                     if statscog := self.bot.get_cog("BotStats"):
                         statscog.rss_stats['messages'] += 1

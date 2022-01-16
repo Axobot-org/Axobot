@@ -385,14 +385,13 @@ class Partners(commands.Cog):
         
         ..Doc server.html#list-every-partners"""
         f = ['','']
-        lang = await self.bot._(ctx.guild.id,'_used_locale')
         tr_bot = await self.bot._(ctx.guild.id, "misc.bot")
         tr_guild = await self.bot._(ctx.guild.id, "misc.server")
         tr_added = await self.bot._(ctx.guild.id, "misc.added_at")
         tr_unknown = await self.bot._(ctx.guild.id, "misc.unknown")
         tr_owner = await self.bot._(ctx.guild.id,'info.info.guild-1')
         for l in await self.bdd_get_guild(ctx.guild.id):
-            date = str(await ctx.bot.get_cog('TimeUtils').date(l['added_at'],lang=lang,year=True,hour=False)).strip()
+            date = f"<t:{l['added_at'].timestamp():.0f}:D>"
             if l['type']=='bot':
                 try:
                     bot = await self.bot.fetch_user(l['target'])

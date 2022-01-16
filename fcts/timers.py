@@ -61,7 +61,7 @@ class Timers(commands.Cog):
         if duration > 60*60*24*365*5:
             await ctx.send(await self.bot._(ctx.channel, "timers.rmd.too-long"))
             return
-        f_duration = await ctx.bot.get_cog('TimeUtils').time_delta(duration,lang=await self.bot._(ctx.channel,'_used_locale'), year=True, form='developed', precision=0)
+        f_duration = await ctx.bot.get_cog('TimeUtils').time_delta(duration,lang=await self.bot._(ctx.channel,'_used_locale'), year=True, form='developed')
         try:
             d = {'msg_url': ctx.message.jump_url}
             await ctx.bot.get_cog('Events').add_task("timer", duration, ctx.author.id, ctx.guild.id if ctx.guild else None, ctx.channel.id, message, data=d)
@@ -97,7 +97,7 @@ class Timers(commands.Cog):
             # msg = "\n```\n" + msg.replace("```", "​`​`​`") + "\n```"
             chan = '<#'+str(item['channel'])+'>'
             end = item["utc_begin"] + datetime.timedelta(seconds=item['duration'])
-            duration = await time_delta(ctx.bot.utcnow() if end.tzinfo else datetime.datetime.utcnow(), end, lang=lang, year=True, form="temp", precision=0)
+            duration = await time_delta(ctx.bot.utcnow() if end.tzinfo else datetime.datetime.utcnow(), end, lang=lang, year=True, form="short")
             item = txt.format(id=item['ID'], duration=duration, channel=chan, msg=msg)
             liste.append(item)
         if ctx.can_send_embed:
