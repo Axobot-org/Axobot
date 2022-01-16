@@ -24,4 +24,4 @@ translation/*
 docs/_*
 rankcards_update.json
 *-cache.json
-env
+*.tar
