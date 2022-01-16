@@ -328,7 +328,7 @@ def options():
         help = 'display this help info and exit',
         action = 'help')
 
-    args = parser.parse_args("--custom-url discord --app-key AIzaSyCX3ID3FSDs9gGQDDvbMwA5Mh72uJMdZhw".split())
+    args = parser.parse_args()
 
     if args.app_key is None:
         args.app_key = os.getenv('YOUTUBE_DATA_APP_KEY')
