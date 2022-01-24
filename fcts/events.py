@@ -134,7 +134,7 @@ class Events(commands.Cog):
                     desc = "Bot **may have left** the server {} (guild unavailable)".format(guild.id)
                 else:
                     desc = "Bot **left the server** {} ({}) - {} users".format(guild.name,guild.id,len(guild.members))
-            emb = discord.Embed(description=desc, color=self.embed_colors['welcome'])
+            emb = discord.Embed(description=desc, color=self.embed_colors['welcome'], timestamp=self.bot.utcnow())
             emb.set_author(name=self.bot.user, icon_url=self.bot.user.avatar)
             await self.bot.send_embed([emb])
             if self.bot.database_online:
@@ -252,7 +252,7 @@ class Events(commands.Cog):
 
 
     async def send_logs_per_server(self, guild: discord.Guild, log_type:str, message: str, author: discord.User=None, fields: list[dict]=None):
-        """Send a log in a server. Type is used to define the color of the embed"""
+        """Send a log in a server. `log_type` is used to define the color of the embed"""
         if self.bot.zombie_mode:
             return
         if not self.bot.database_online:
@@ -268,7 +268,7 @@ class Events(commands.Cog):
             return
         if channel is None:
             return
-        emb = discord.Embed(description=message, color=color)
+        emb = discord.Embed(description=message, color=color, timestamp=self.bot.utcnow())
         for field in fields:
             emb.add_field(**field)
         if author is not None:
@@ -547,7 +547,7 @@ class Events(commands.Cog):
     async def botEventLoop(self):
         self.bot.get_cog("BotEvents").updateCurrentEvent()
         e = self.bot.get_cog("BotEvents").current_event
-        emb = discord.Embed(description=f'**Bot event** updated (current event is {e})', color=1406147)
+        emb = discord.Embed(description=f'**Bot event** updated (current event is {e})', color=1406147, timestamp=self.bot.utcnow())
         emb.set_author(name=self.bot.user, icon_url=self.bot.user.avatar)
         await self.bot.send_embed([emb], url="loop")
         self.last_eventDay_check = datetime.datetime.today()
@@ -629,7 +629,7 @@ class Events(commands.Cog):
         await session.close()
         answers = '-'.join(str(x) for x in answers)
         delta_time = round(time.time()-t,3)
-        emb = discord.Embed(description=f'**Guilds count updated** in {delta_time}s ({answers})', color=7229109)
+        emb = discord.Embed(description=f'**Guilds count updated** in {delta_time}s ({answers})', color=7229109, timestamp=self.bot.utcnow())
         emb.set_author(name=self.bot.user, icon_url=self.bot.user.avatar)
         await self.bot.send_embed([emb], url="loop")
         self.dbl_last_sending = datetime.datetime.now()
@@ -656,7 +656,8 @@ class Events(commands.Cog):
         delta_time = round(time.time()-t,3)
         emb = discord.Embed(
             description=f'**Partners channels updated** in {delta_time}s ({count[0]} channels - {count[1]} partners)',
-            color=10949630)
+            color=10949630,
+            timestamp=self.bot.utcnow())
         emb.set_author(name=self.bot.user, icon_url=self.bot.user.avatar)
         await self.bot.send_embed([emb], url="loop")
 
@@ -675,7 +676,7 @@ class Events(commands.Cog):
             await self.bot.get_cog('Errors').senf_err_msg("Translators backup: Unable to find backup folder")
             return
         delta_time = round(time.time()-t,3)
-        emb = discord.Embed(description=f'**Translations files backup** completed in {delta_time}s', color=10197915)
+        emb = discord.Embed(description=f'**Translations files backup** completed in {delta_time}s', color=10197915, timestamp=self.bot.utcnow())
         emb.set_author(name=self.bot.user, icon_url=self.bot.user.avatar)
         await self.bot.send_embed([emb], url="loop")
 
@@ -713,7 +714,7 @@ class Events(commands.Cog):
         except Exception as err:
             await self.bot.get_cog("Errors").senf_err_msg(query)
             raise err
-        emb = discord.Embed(description='**Stats logs** updated', color=5293283)
+        emb = discord.Embed(description='**Stats logs** updated', color=5293283, timestamp=self.bot.utcnow())
         emb.set_author(name=self.bot.user, icon_url=self.bot.user.avatar)
         await self.bot.send_embed([emb], url="loop")
         self.statslogs_last_push = datetime.datetime.now()
