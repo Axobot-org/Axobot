@@ -3,6 +3,7 @@ import datetime
 import json
 from discord.ext import commands
 from libs.classes import Zbot, MyContext
+from libs.formatutils import FormatUtils
 
 data = {
     "fr": {
@@ -83,7 +84,7 @@ class BotEvents(commands.Cog):
             except KeyError:
                 title = self.current_event
             # Begin/End dates
-            nice_date = self.bot.get_cog("TimeUtils").date
+            nice_date = FormatUtils.date
             begin = await nice_date(self.current_event_data["begin"], lang, year=True, digital=True, hour=False)
             end = await nice_date(self.current_event_data["end"], lang, year=True, digital=True, hour=False)
             if ctx.can_send_embed:

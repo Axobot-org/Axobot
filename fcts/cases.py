@@ -3,6 +3,7 @@ from discord.ext import commands
 from libs.classes import Zbot, MyContext
 
 from fcts import args, reloads
+from libs.formatutils import FormatUtils
 importlib.reload(args)
 
 
@@ -53,10 +54,9 @@ class Case:
             text += await self.bot._(self.guild, "cases.display."+key, data=value)
         # add duration if exists
         if self.duration is not None and self.duration > 0:
-            cog = await self.bot.get_cog('TimeUtils')
-            if cog is not None:
-                lang = await self.bot._(self.guild, "_used_locale")
-                text += await self.bot._(self.guild, "cases.display.duration", data=cog.time_delta(self.duration,lang=lang,form="short"))
+            lang = await self.bot._(self.guild, "_used_locale")
+            duration_ = await FormatUtils.time_delta(self.duration,lang=lang,form="short")
+            text += await self.bot._(self.guild, "cases.display.duration", data=duration_)
         return text
 
 
@@ -229,7 +229,7 @@ class Cases(commands.Cog):
                         date_ = f"<t:{case.date.timestamp():.0f}>"
                         text = syntax.format(G=guild, T=case.type, M=mod, R=case.reason, D=date_)
                         if case.duration is not None and case.duration > 0:
-                            text += "\n" + await self.bot._(ctx.guild.id,'cases.display.duration', data=await self.bot.get_cog('TimeUtils').time_delta(case.duration,lang=l,year=False,form="short"))
+                            text += "\n" + await self.bot._(ctx.guild.id,'cases.display.duration', data=await FormatUtils.time_delta(case.duration,lang=l,year=False,form="short"))
                         embed.add_field(name=await self.bot._(ctx.guild.id, "cases.title-search", ID=case.id), value=text, inline=False)
                         if len(embed.fields) == 20:
                             embed.title = await self.bot._(ctx.guild.id,"cases.cases-0", nbr=total_nbr, start=e+1, end=last_case)
@@ -323,7 +323,7 @@ class Cases(commands.Cog):
                 _msg = await self.bot._(ctx.guild.id,'cases.search-1')
             # add duration
             if case.duration is not None and case.duration > 0:
-                _msg += "\n" + await self.bot._(ctx.guild.id,'cases.display.duration', data=await self.bot.get_cog('TimeUtils').time_delta(case.duration,lang=l,year=False,form="short"))
+                _msg += "\n" + await self.bot._(ctx.guild.id,'cases.display.duration', data=await FormatUtils.time_delta(case.duration,lang=l,year=False,form="short"))
             # format date
             _date = f"<t:{case.date.timestamp():.0f}>"
             # finish message

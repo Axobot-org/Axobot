@@ -17,6 +17,7 @@ from discord.ext import commands
 from pytz import timezone
 from timezonefinder import TimezoneFinder
 from libs.classes import MyContext, Zbot
+from libs.formatutils import FormatUtils
 from utils import flatten_list
 
 from fcts import args, checks, emojis
@@ -620,7 +621,7 @@ You can specify a verification limit by adding a number in argument (up to 1.000
             return await ctx.send(await self.bot._(ctx.channel,"fun.uninhabited-city"))
         timeZoneObj = timezone(timeZoneStr)
         d = datetime.datetime.now(timeZoneObj)
-        format_d = await self.bot.get_cog('TimeUtils').date(d,lang=await self.bot._(ctx.channel,'_used_locale'))
+        format_d = await FormatUtils.date(d,lang=await self.bot._(ctx.channel,'_used_locale'))
         await ctx.send("**{}**:\n{} ({})\n ({} - lat: {} - long: {})".format(timeZoneStr,format_d,d.tzname(),g.current_result.address,round(g.json['lat'],2),round(g.json['lng'],2)))
 
     @commands.command(name="tip")
