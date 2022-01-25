@@ -2,6 +2,7 @@ import asyncio
 import copy
 import datetime
 import importlib
+import locale
 import os
 import re
 import sys
@@ -19,6 +20,7 @@ from discord.ext.commands.converter import run_converters
 from docs import conf
 from libs import bitly_api
 from libs.classes import MyContext, Zbot
+from utils import count_code_lines
 
 from fcts import args, checks, reloads
 
@@ -50,27 +52,9 @@ class Info(commands.Cog):
 
     @commands.Cog.listener()
     async def on_ready(self):
-        self.codelines = await self.count_lines_code()
+        self.codelines = await count_code_lines()
         self.emoji_table = 'emojis_beta' if self.bot.beta else 'emojis'
 
-    async def count_lines_code(self):
-        """Count the number of lines for the whole project"""
-        count = 0
-        try:
-            for filename in ['start.py', 'utils.py']:
-                with open(filename, 'r') as file:
-                    for line in file.read().split("\n"):
-                        if len(line.strip()) > 2 and line[0] != '#':
-                            count += 1
-            for filename in [x.file for x in self.bot.cogs.values()]+['args', 'checks']:
-                with open('fcts/'+filename+'.py', 'r') as file:
-                    for line in file.read().split("\n"):
-                        if len(line.strip()) > 2 and line[0] != '#':
-                            count += 1
-        except Exception as e:
-            await self.bot.get_cog('Errors').on_error(e, None)
-        self.codelines = count
-        return count
 
     @commands.command(name='admins')
     async def admin_list(self, ctx: MyContext):
@@ -105,7 +89,7 @@ class Info(commands.Cog):
         version = str(v.major)+"."+str(v.minor)+"."+str(v.micro)
         pid = os.getpid()
         py = psutil.Process(pid)
-        latency = round(self.bot.latency*1000, 3)
+        latency = round(self.bot.latency*1000, 2)
         async with ctx.channel.typing():
             # RAM/CPU
             ram_cpu = [round(py.memory_info()[0]/2.**30,3), py.cpu_percent(interval=1)]
@@ -137,9 +121,9 @@ class Info(commands.Cog):
             d = ""
             for key, var in [
                 ('bot_version', self.bot_version),
-                ('servers_count', len_servers),
-                ('users_count', (users, bots)),
-                ('codes_lines', self.codelines),
+                ('servers_count', f"{len_servers:n}"),
+                ('users_count', (f"{users:n}", f"{bots:n}")),
+                ('codes_lines', f"{self.codelines:n}"),
                 ('languages', langs_list),
                 ('python_version', version),
                 ('lib_version', discord.__version__),
@@ -147,7 +131,7 @@ class Info(commands.Cog):
                 ('cpu_usage', ram_cpu[1]),
                 ('api_ping', latency),
                 ('cmds_24h', cmds_24h),
-                ('total_xp', total_xp)]:
+                ('total_xp', f"{total_xp:n} ")]:
                 str_args = {f'v{i}': var[i] for i in range(len(var))} if isinstance(var, (tuple, list)) else {'v': var}
                 d += await self.bot._(ctx.channel, "info.stats."+key, **str_args) + "\n"
         if ctx.can_send_embed: # if we can use embed
@@ -1337,5 +1321,6 @@ Servers:
 
 
 def setup(bot):
+    locale.setlocale(locale.LC_ALL, '')
     bot.add_cog(Info(bot))
     
