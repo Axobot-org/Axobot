@@ -1,5 +1,6 @@
 from discord.ext import commands
-from libs.classes import Zbot
+from libs.classes import MyContext, Zbot
+from utils import count_code_lines
 
 admins_id = {279568324260528128,281404141841022976,552273019020771358}
 
@@ -35,7 +36,7 @@ class Reloads(commands.Cog):
         self.file = "reloads"
         self.ignored_guilds = [471361000126414848,513087032331993090,500648624204808193,264445053596991498,446425626988249089,707248438391078978]
     
-    async def reload_cogs(self,ctx,cogs):
+    async def reload_cogs(self, ctx: MyContext, cogs: list[str]):
         errors_cog = self.bot.get_cog("Errors")
         if len(cogs)==1 and cogs[0]=='all':
             cogs = sorted([x.file for x in self.bot.cogs.values()])
@@ -61,7 +62,8 @@ class Reloads(commands.Cog):
                 await self.bot.get_cog('Utilities').on_ready()
         if len(reloaded_cogs) > 0:
             await ctx.send("These cogs has successfully reloaded: {}".format(", ".join(reloaded_cogs)))
-            ctx.bot.get_cog('Info').codelines = await ctx.bot.get_cog('Info').count_lines_code()
+            if info_cog := self.bot.get_cog("Info"):
+                info_cog.codelines = await count_code_lines()
 
     @commands.command(name="add_cog",hidden=True)
     @commands.check(check_admin)

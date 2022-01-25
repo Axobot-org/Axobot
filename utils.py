@@ -1,5 +1,7 @@
 import argparse
+import glob
 import logging
+import os
 import sys
 from logging.handlers import RotatingFileHandler
 from typing import TYPE_CHECKING
@@ -191,3 +193,19 @@ def load_cogs(bot: "Zbot"):
         if count  > 0:
             bot.log.critical("%s modules not loaded\nEnd of program", count)
             sys.exit()
+
+async def count_code_lines():
+    """Count lines of Python code in the current folder
+    
+    Comments and empty lines are ignored."""
+    count = 0
+    path = os.path.dirname(__file__)+'/**/*.py'
+    for filename in glob.iglob(path, recursive=True):
+        if '/env/' in filename or not filename.endswith('.py'):
+            continue
+        with open(filename, 'r') as file:
+            for line in file.read().split("\n"):
+                cleaned_line = line.strip()
+                if len(cleaned_line) > 2 and not cleaned_line.startswith('#'):
+                    count += 1
+    return count
