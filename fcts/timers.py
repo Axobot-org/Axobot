@@ -6,6 +6,7 @@ from discord.ext import commands
 from libs.classes import ConfirmView, MyContext, Zbot
 
 from fcts import args, checks
+from libs.formatutils import FormatUtils
 
 
 class Timers(commands.Cog):
@@ -61,7 +62,7 @@ class Timers(commands.Cog):
         if duration > 60*60*24*365*5:
             await ctx.send(await self.bot._(ctx.channel, "timers.rmd.too-long"))
             return
-        f_duration = await ctx.bot.get_cog('TimeUtils').time_delta(duration,lang=await self.bot._(ctx.channel,'_used_locale'), year=True, form='developed')
+        f_duration = await FormatUtils.time_delta(duration,lang=await self.bot._(ctx.channel,'_used_locale'), year=True, form='developed')
         try:
             d = {'msg_url': ctx.message.jump_url}
             await ctx.bot.get_cog('Events').add_task("timer", duration, ctx.author.id, ctx.guild.id if ctx.guild else None, ctx.channel.id, message, data=d)
@@ -85,7 +86,6 @@ class Timers(commands.Cog):
                 return
             result = query_results
         txt = await self.bot._(ctx.channel, "timers.rmd.item")
-        time_delta = self.bot.get_cog("TimeUtils").time_delta
         lang = await self.bot._(ctx.channel, '_used_locale')
         liste = list()
         for item in result:
@@ -94,10 +94,9 @@ class Timers(commands.Cog):
             item["message"] = await commands.clean_content(fix_channel_mentions=True).convert(ctx2, item["message"])
             msg = item['message'] if len(item['message'])<=50 else item['message'][:47]+"..."
             msg = discord.utils.escape_markdown(msg).replace("\n", " ")
-            # msg = "\n```\n" + msg.replace("```", "​`​`​`") + "\n```"
             chan = '<#'+str(item['channel'])+'>'
             end = item["utc_begin"] + datetime.timedelta(seconds=item['duration'])
-            duration = await time_delta(ctx.bot.utcnow() if end.tzinfo else datetime.datetime.utcnow(), end, lang=lang, year=True, form="short")
+            duration = await FormatUtils.time_delta(ctx.bot.utcnow() if end.tzinfo else datetime.datetime.utcnow(), end, lang=lang, year=True, form="short")
             item = txt.format(id=item['ID'], duration=duration, channel=chan, msg=msg)
             liste.append(item)
         if ctx.can_send_embed:

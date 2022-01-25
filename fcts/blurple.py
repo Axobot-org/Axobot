@@ -12,6 +12,7 @@ from discord.ext.commands import Cog
 
 from libs import blurple
 from libs.blurple import convert_image, check_image
+from libs.formatutils import FormatUtils
 importlib.reload(blurple)
 from libs.classes import Zbot, MyContext
 
@@ -233,7 +234,7 @@ __29 variations: __
             txt = await self.bot._(ctx.channel, "halloween.daily.got-points", pts=points)
         else:
             lang = await self.bot._(ctx.channel, '_used_locale')
-            remaining = await self.bot.get_cog("TimeUtils").time_delta(-time_since_available, lang=lang)
+            remaining = await FormatUtils.time_delta(-time_since_available, lang=lang)
             txt = await self.bot._(ctx.channel, "blurple.collect.too-quick", time=remaining)
         if ctx.can_send_embed:
             title = await self.bot._(ctx.channel, 'blurple.collect.title')

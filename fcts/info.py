@@ -20,6 +20,7 @@ from discord.ext.commands.converter import run_converters
 from docs import conf
 from libs import bitly_api
 from libs.classes import MyContext, Zbot
+from libs.formatutils import FormatUtils
 from utils import count_code_lines
 
 from fcts import args, checks, reloads
@@ -45,10 +46,6 @@ class Info(commands.Cog):
         self.bot_version = conf.release + ('a' if bot.beta else '')
         self.emoji_table = 'emojis_beta' if self.bot.beta else 'emojis'
         self.BitlyClient = bitly_api.Bitly(login='zrunner',api_key=self.bot.others['bitly'])
-
-    @property
-    def timeutils(self):
-        return self.bot.get_cog("TimeUtils")
 
     @commands.Cog.listener()
     async def on_ready(self):
@@ -303,7 +300,7 @@ Available types: member, role, user, emoji, channel, server, invite, category
         now = ctx.bot.utcnow()
         delta = abs(member.created_at - now)
         created_date = f"<t:{member.created_at.timestamp():.0f}>"
-        created_since = await self.timeutils.time_delta(delta.total_seconds(), lang=lang, year=True, hour=delta.total_seconds() < 86400)
+        created_since = await FormatUtils.time_delta(delta.total_seconds(), lang=lang, year=True, hour=delta.total_seconds() < 86400)
         if member.created_at.day == now.day and member.created_at.month == now.month and member.created_at.year != now.year:
             created_date = "🎂 " + created_date
         embed.add_field(name=await self.bot._(ctx.guild.id, "info.info.member-1"), value = "{} ({} {})".format(created_date, since, created_since), inline=False)
@@ -311,7 +308,7 @@ Available types: member, role, user, emoji, channel, server, invite, category
         if member.joined_at is not None:
             delta = abs(member.joined_at - now)
             join_date = f"<t:{member.joined_at.timestamp():.0f}>"
-            since_date = await self.timeutils.time_delta(delta.total_seconds(), lang=lang, year=True, hour=delta.total_seconds() < 86400)
+            since_date = await FormatUtils.time_delta(delta.total_seconds(), lang=lang, year=True, hour=delta.total_seconds() < 86400)
             embed.add_field(name=await self.bot._(ctx.guild.id, "info.info.member-2"), value = "{} ({} {})".format(join_date, since, since_date), inline=False)
         if member.guild.member_count < 1e4:
             # Join position
@@ -412,7 +409,7 @@ Available types: member, role, user, emoji, channel, server, invite, category
         # Created at
         delta = abs(role.created_at - ctx.bot.utcnow())
         created_date = f"<t:{role.created_at.timestamp():.0f}>"
-        created_since = await self.timeutils.time_delta(delta.total_seconds(), lang=lang, year=True, hour=delta.total_seconds() < 86400)
+        created_since = await FormatUtils.time_delta(delta.total_seconds(), lang=lang, year=True, hour=delta.total_seconds() < 86400)
         embed.add_field(name=await self.bot._(ctx.guild.id, "info.info.member-1"), value = "{} ({} {})".format(created_date, since, created_since), inline=False)
         # Hierarchy position
         embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.role-5"), value=str(len(ctx.guild.roles) - role.position), inline=True)
@@ -446,7 +443,7 @@ Available types: member, role, user, emoji, channel, server, invite, category
         now = ctx.bot.utcnow()
         delta = abs(user.created_at - now)
         created_date = f"<t:{user.created_at.timestamp():.0f}>"
-        created_since = await self.timeutils.time_delta(delta.total_seconds(), lang=lang, year=True, hour=delta.total_seconds() < 86400)
+        created_since = await FormatUtils.time_delta(delta.total_seconds(), lang=lang, year=True, hour=delta.total_seconds() < 86400)
         if user.created_at.day == now.day and user.created_at.month == now.month and user.created_at.year != now.year:
             created_date = "🎂 " + created_date
         embed.add_field(name=await self.bot._(ctx.guild.id, "info.info.member-1"), value = "{} ({} {})".format(created_date, since, created_since), inline=False)
@@ -495,7 +492,7 @@ Available types: member, role, user, emoji, channel, server, invite, category
         # created at
         delta = abs(emoji.created_at - ctx.bot.utcnow())
         created_date = f"<t:{emoji.created_at.timestamp():.0f}>"
-        created_since = await self.timeutils.time_delta(delta.total_seconds(), lang=lang, year=True, hour=delta.total_seconds() < 86400)
+        created_since = await FormatUtils.time_delta(delta.total_seconds(), lang=lang, year=True, hour=delta.total_seconds() < 86400)
         embed.add_field(name=await self.bot._(ctx.guild.id, "info.info.member-1"), value = "{} ({} {})".format(created_date, since, created_since), inline=False)
         # allowed roles
         if len(emoji.roles) > 0:
@@ -543,7 +540,7 @@ Available types: member, role, user, emoji, channel, server, invite, category
         # Created at
         delta = abs(channel.created_at - ctx.bot.utcnow())
         created_date = f"<t:{channel.created_at.timestamp():.0f}>"
-        created_since = await self.timeutils.time_delta(delta.total_seconds(), lang=lang, year=True, hour=delta.total_seconds() < 86400)
+        created_since = await FormatUtils.time_delta(delta.total_seconds(), lang=lang, year=True, hour=delta.total_seconds() < 86400)
         embed.add_field(name=await self.bot._(ctx.guild.id, "info.info.member-1"), value = "{} ({} {})".format(created_date, since, created_since), inline=False)
         # Topic
         if channel.permissions_for(ctx.author).read_messages:
@@ -569,7 +566,7 @@ Available types: member, role, user, emoji, channel, server, invite, category
         # Created at
         delta = abs(channel.created_at - ctx.bot.utcnow())
         created_date = f"<t:{channel.created_at.timestamp():.0f}>"
-        created_since = await self.timeutils.time_delta(delta.total_seconds(), lang=lang, year=True, hour=delta.total_seconds() < 86400)
+        created_since = await FormatUtils.time_delta(delta.total_seconds(), lang=lang, year=True, hour=delta.total_seconds() < 86400)
         embed.add_field(name=await self.bot._(ctx.guild.id, "info.info.member-1"), value = "{} ({} {})".format(created_date, since, created_since), inline=False)
         # Bitrate
         embed.add_field(name="Bitrate",value=str(channel.bitrate/1000)+" kbps")
@@ -613,7 +610,7 @@ Available types: member, role, user, emoji, channel, server, invite, category
         # Created at
         delta = abs(guild.created_at - ctx.bot.utcnow())
         created_date = f"<t:{guild.created_at.timestamp():.0f}>"
-        created_since = await self.timeutils.time_delta(delta.total_seconds(), lang=lang, year=True, hour=delta.total_seconds() < 86400)
+        created_since = await FormatUtils.time_delta(delta.total_seconds(), lang=lang, year=True, hour=delta.total_seconds() < 86400)
         embed.add_field(name=await self.bot._(ctx.guild.id, "info.info.member-1"), value = "{} ({} {})".format(created_date, since, created_since), inline=False)
         # Voice region
         embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.guild-2"), value=str(guild.region).capitalize())
@@ -749,7 +746,7 @@ Available types: member, role, user, emoji, channel, server, invite, category
         # Creation date
         if invite.created_at is not None:
             created_at = f"<t:{invite.created_at.timestamp():.0f}>"
-            delta = await self.timeutils.time_delta(invite.created_at,ctx.bot.utcnow(),lang=lang,year=True,hour=False)
+            delta = await FormatUtils.time_delta(invite.created_at,ctx.bot.utcnow(),lang=lang,year=True,hour=False)
             embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.member-1"), value = "{} ({} {})".format(created_at,since,delta), inline=False)
         await ctx.send(embed=embed)
 
@@ -776,7 +773,7 @@ Available types: member, role, user, emoji, channel, server, invite, category
         embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.categ-1"), value="{}/{}".format(category.position+1,len(ctx.guild.categories)))
         embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.guild-6"), value=await self.bot._(ctx.guild.id,"info.info.categ-2", txt=tchan, voc=vchan))
         created_at = f"<t:{category.created_at.timestamp():.0f}>"
-        delta = await self.timeutils.time_delta(category.created_at,ctx.bot.utcnow(),lang=lang,year=True,hour=False)
+        delta = await FormatUtils.time_delta(category.created_at,ctx.bot.utcnow(),lang=lang,year=True,hour=False)
         embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.member-1"), value = "{} ({} {})".format(created_at,since,delta), inline=False)
         await ctx.send(embed=embed)
 

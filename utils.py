@@ -173,7 +173,6 @@ def load_cogs(bot: "Zbot"):
                       'fcts.s_backups',
                       'fcts.servers',
                       'fcts.timers',
-                      'fcts.timeutils',
                     #   'fcts.translations',
                       'fcts.users',
                       'fcts.utilities',

@@ -3,7 +3,7 @@ import time
 from typing import Union
 
 import discord
-from babel import dates
+from babel import dates, numbers
 from libs.classes import Zbot
 
 
@@ -27,14 +27,12 @@ class TIMEDELTA_UNITS:
     second = 1
 
 
-class TimeUtils(discord.ext.commands.Cog):
-    """This cog handles all manipulations of date, time, and time interval. So cool, and so fast"""
+class FormatUtils:
+    """This class handles all language-specific formatting of date, time, time interval, numbers and other"""
 
-    def __init__(self, bot: Zbot):
-        self.bot = bot
-        self.file = "timeutils"
 
-    async def time_delta(self, date1: Union[datetime, int], date2: datetime = None,
+    @staticmethod
+    async def time_delta(date1: Union[datetime, int], date2: datetime = None,
                          lang: str = 'en', year: bool = False, hour: bool = True, form='developed'):
         """Translates a two time interval datetime into a readable character string
 
@@ -97,7 +95,8 @@ class TimeUtils(discord.ext.commands.Cog):
         return result.strip()
 
 
-    async def date(self, date: Union[datetime, time.struct_time], lang: str = 'fr',
+    @staticmethod
+    async def date(date: Union[datetime, time.struct_time], lang: str = 'fr',
                    year: bool = False, hour: bool = True, digital: bool = False) -> str:
         """Translates a datetime object into a readable string"""
         if isinstance(date, time.struct_time):
@@ -125,6 +124,10 @@ class TimeUtils(discord.ext.commands.Cog):
 
         return result
 
+    
+    @staticmethod
+    async def format_nbr(number: Union[int, float], lang: str) -> str:
+        "Format any number in the given language"
+        locale = get_locale(lang)
+        return numbers.format_decimal(number, locale=locale)
 
-def setup(bot):
-    bot.add_cog(TimeUtils(bot))

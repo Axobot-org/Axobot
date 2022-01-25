@@ -9,6 +9,7 @@ import asyncio
 import copy
 from fcts import checks, args
 from libs.classes import Zbot, MyContext, DeleteView
+from libs.formatutils import FormatUtils
 
 importlib.reload(checks)
 importlib.reload(args)
@@ -344,7 +345,7 @@ You can also mute this member for a defined duration, then use the following for
             if duration > 60*60*24*365*3: # max 3 years
                 await ctx.send(await self.bot._(ctx.channel, "timers.rmd.too-long"))
                 return
-            f_duration: str = await self.bot.get_cog('TimeUtils').time_delta(duration,lang=await self.bot._(ctx.guild,'_used_locale'),form="short")
+            f_duration: str = await FormatUtils.time_delta(duration,lang=await self.bot._(ctx.guild,'_used_locale'),form="short")
         else:
             f_duration = None
         try:
@@ -535,7 +536,7 @@ The 'days_to_delete' option represents the number of days worth of messages to d
                 if duration > 60*60*24*365*20: # max 20 years
                     await ctx.send(await self.bot._(ctx.channel, "timers.rmd.too-long"))
                     return
-                f_duration = await self.bot.get_cog('TimeUtils').time_delta(duration,lang=await self.bot._(ctx.guild,'_used_locale'),form="short")
+                f_duration = await FormatUtils.time_delta(duration,lang=await self.bot._(ctx.guild,'_used_locale'),form="short")
             else:
                 f_duration = None
             if not ctx.channel.permissions_for(ctx.guild.me).ban_members:
@@ -991,7 +992,7 @@ The 'reasons' parameter is used to display the mute reasons.
             await ctx.send(await self.bot._(ctx.guild.id, "xp.low-page"))
             return
         structure = await self.bot._(ctx.guild.id, "moderation.emoji.list")
-        date = ctx.bot.get_cog('TimeUtils').date
+        date = FormatUtils.date
         lang = await self.bot._(ctx.guild.id,'_used_locale')
         priv = "**"+await self.bot._(ctx.guild.id, "moderation.emoji.private")+"**"
         title = await self.bot._(ctx.guild.id, "moderation.emoji.list-title", guild=ctx.guild.name)

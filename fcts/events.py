@@ -15,6 +15,7 @@ from discord.ext import commands, tasks
 from libs.classes import Zbot
 
 from fcts.checks import is_fun_enabled
+from libs.formatutils import FormatUtils
 
 
 class Events(commands.Cog):
@@ -338,7 +339,7 @@ class Events(commands.Cog):
         try:
             if self.bot.zombie_mode:
                 return False
-            f_duration = await self.bot.get_cog('TimeUtils').time_delta(task['duration'],lang=await self.bot._(channel,'_used_locale'), form='developed')
+            f_duration = await FormatUtils.time_delta(task['duration'],lang=await self.bot._(channel,'_used_locale'), form='developed')
 
             if task['data'] is not None:
                 task['data'] = json.loads(task['data'])
