@@ -114,21 +114,25 @@ class Info(commands.Cog):
                 total_xp = ""
             # Commands within 24h
             cmds_24h = await self.bot.get_cog("BotStats").get_stats("wsevent.CMD_USE", 60*24)
+            # number formatter
+            lang = await self.bot._(ctx.guild.id,"_used_locale")
+            async def n_format(nbr):
+                return await FormatUtils.format_nbr(nbr, lang)
             # Generating message
             d = ""
             for key, var in [
                 ('bot_version', self.bot_version),
-                ('servers_count', f"{len_servers:n}"),
-                ('users_count', (f"{users:n}", f"{bots:n}")),
-                ('codes_lines', f"{self.codelines:n}"),
+                ('servers_count', await n_format(len_servers)),
+                ('users_count', (await n_format(users), await n_format(bots))),
+                ('codes_lines', await n_format(self.codelines)),
                 ('languages', langs_list),
                 ('python_version', version),
                 ('lib_version', discord.__version__),
-                ('ram_usage', ram_cpu[0]),
-                ('cpu_usage', ram_cpu[1]),
-                ('api_ping', latency),
-                ('cmds_24h', cmds_24h),
-                ('total_xp', f"{total_xp:n} ")]:
+                ('ram_usage', await n_format(ram_cpu[0])),
+                ('cpu_usage', await n_format(ram_cpu[1])),
+                ('api_ping', await n_format(latency)),
+                ('cmds_24h', await n_format(cmds_24h)),
+                ('total_xp', await n_format(total_xp)+" ")]:
                 str_args = {f'v{i}': var[i] for i in range(len(var))} if isinstance(var, (tuple, list)) else {'v': var}
                 d += await self.bot._(ctx.channel, "info.stats."+key, **str_args) + "\n"
         if ctx.can_send_embed: # if we can use embed
