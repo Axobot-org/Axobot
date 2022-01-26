@@ -569,7 +569,7 @@ class Events(commands.Cog):
         try:# https://top.gg/bot/486896267788812288
             payload = {'server_count': guildCount}
             async with session.post('https://top.gg/api/bots/486896267788812288/stats',data=payload,headers={'Authorization':str(self.bot.dbl_token)}) as resp:
-                self.bot.log.debug('discordbots.org returned {} for {}'.format(resp.status, payload))
+                self.bot.log.debug('top.gg returned {} for {}'.format(resp.status, payload))
                 answers[0] = resp.status
         except Exception as err:
             answers[0] = "0"
