@@ -754,7 +754,6 @@ class Rss(commands.Cog):
                 return
             if len(flow) == 0:
                 await ctx.send(await self.bot._(ctx.guild, "rss.fail-add"))
-                await self.bot.get_cog("Errors").on_error(e,ctx)
                 return
             flow = flow[0]
             if text is None:
