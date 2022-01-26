@@ -99,7 +99,7 @@ class Partners(commands.Cog):
     async def get_bot_guilds(self, bot:int, session:aiohttp.ClientSession) -> Optional[int]:
         """Get the guilds count of a bot
         None if unknown bot/count not provided"""
-        async with session.get('https://discordbots.org/api/bots/{}/stats'.format(bot), headers={'Authorization':str(self.bot.dbl_token)}) as resp:
+        async with session.get('https://top.gg/api/bots/{}/stats'.format(bot), headers={'Authorization':str(self.bot.dbl_token)}) as resp:
             ans: dict = await resp.json()
         if 'server_count' in ans:
             return ans['server_count']
@@ -108,7 +108,7 @@ class Partners(commands.Cog):
     async def get_bot_owners(self, bot:int, session:aiohttp.ClientSession) -> list[Union[discord.User, int]]:
         """Get the owners list of a bot
         Empty list if unknown bot/owners not provided"""
-        async with session.get('https://discordbots.org/api/bots/{}'.format(bot), headers={'Authorization':str(self.bot.dbl_token)}) as resp:
+        async with session.get('https://top.gg/api/bots/{}'.format(bot), headers={'Authorization':str(self.bot.dbl_token)}) as resp:
             ans: dict = await resp.json()
         owners = list()
         if 'owners' in ans:

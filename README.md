@@ -1,7 +1,7 @@
 # ZBot V3 - A Discord Bot
 
 [![Discord server](https://discordapp.com/api/guilds/356067272730607628/embed.png)](https://discord.gg/N55zY88)
-[![Discord bot](https://discordbots.org/api/widget/status/486896267788812288.svg)](https://zrunner.me/invitezbot)
+[![Discord bot](https://top.gg/api/widget/status/486896267788812288.svg)](https://zrunner.me/invitezbot)
 [![discord.py](https://img.shields.io/badge/Discord.py-2.0-brightgreen.svg)](https://github.com/Rapptz/discord.py)
 [![Docs status](https://readthedocs.org/projects/zbot/badge/?version=latest)](http://zbot.readthedocs.io)
 ![Issues](https://img.shields.io/github/issues/ZRunner/ZBot.svg?label=Opened+issues)
@@ -48,7 +48,7 @@ Such content is subject to a **MIT-type license**, which means that you are free
 
 ## Discord Bots Lists
 
-[![Discord Bots](https://discordbots.org/api/widget/486896267788812288.svg)](https://discordbots.org/bot/486896267788812288)
+[![Discord Bots](https://top.gg/api/widget/486896267788812288.svg)](https://top.gg/bot/486896267788812288)
 
 [![Bots on Discord](https://bots.ondiscord.xyz/bots/486896267788812288/embed)](https://bots.ondiscord.xyz/bots/486896267788812288)
 
