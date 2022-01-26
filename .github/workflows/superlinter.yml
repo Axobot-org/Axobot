@@ -37,7 +37,7 @@ jobs:
       
       # install required NodeJS packages
       - name: npm install
-      - run: npm install textlint-rule-no-dead-link
+        run: npm install textlint-rule-no-dead-link
 
       # Runs the Super-Linter action
       - name: Run Super-Linter
