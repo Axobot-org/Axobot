@@ -10,7 +10,7 @@ import discord
 import mysql
 from discord.ext import commands
 
-from fcts import cryptage, tokens
+from fcts import cryptage, tokens  # pylint: disable=no-name-in-module
 
 if TYPE_CHECKING:
     from libs.classes import Zbot
