@@ -15,3 +15,5 @@ speedtest-cli
 feedparser>=6.0
 google-api-python-client
 babel
+cachingutils
+typing_extensions>=4.0
