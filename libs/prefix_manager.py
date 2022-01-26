@@ -1,5 +1,7 @@
 from typing import TYPE_CHECKING
+
 import discord
+from cachingutils import LRUCache
 
 if TYPE_CHECKING:
     from libs.classes import Zbot
@@ -10,7 +12,7 @@ class PrefixManager:
 
     def __init__(self, bot: 'Zbot'):
         self.bot = bot
-        self.prefix_cache: dict[int, str] = dict()
+        self.cache: LRUCache[int, str] = LRUCache(max_size=1000, timeout=3600)
 
     async def get_prefix(self, guild: discord.Guild) -> str:
         "Find the prefix attached to a guild"
@@ -18,8 +20,8 @@ class PrefixManager:
         if guild is None:
             return '!'
         # if prefix is in cache
-        if guild.id in self.prefix_cache.keys():
-            return self.prefix_cache[guild.id]
+        if cached := self.cache.get(guild.id):
+            return cached
         # if bot is not fully loaded
         if not self.bot.is_ready():
             await self.bot.wait_until_ready()
@@ -31,7 +33,7 @@ class PrefixManager:
         # get the prefix from the database
         prefix = await self.fetch_prefix(guild.id)
         # cache it
-        self.prefix_cache[guild.id] = prefix
+        self.cache[guild.id] = prefix
         # and return
         return prefix
 
@@ -60,4 +62,4 @@ class PrefixManager:
         "Update a prefix for a guild"
         self.bot.log.debug(
             "Prefix updated for guild %s : changed to %s", guild_id, prefix)
-        self.prefix_cache[guild_id] = prefix
+        self.cache[guild_id] = prefix

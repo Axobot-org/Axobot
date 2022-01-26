@@ -1,6 +1,7 @@
 import re
 
 import aiohttp
+from cachingutils import acached, cached
 
 from libs.classes import Zbot
 from libs.youtube_search import Service
@@ -22,10 +23,12 @@ class YoutubeRSS:
         matches = re.match(self.url_pattern, string)
         return bool(matches)
 
+    @acached(timeout=3600, include_posargs=[2])
     async def _is_valid_channel_id(self, session: aiohttp.ClientSession, name: str):
         async with session.get("https://www.youtube.com/channel/"+name) as resp:
             return resp.status < 400
 
+    @acached(timeout=3600, include_posargs=[2])
     async def _is_valid_channel_name(self, session: aiohttp.ClientSession, name: str):
         async with session.get("https://www.youtube.com/user/"+name) as resp:
             return resp.status < 400
@@ -38,6 +41,7 @@ class YoutubeRSS:
             return await self._is_valid_channel_id(session, name) \
                 or await self._is_valid_channel_name(session, name)
 
+    @acached(timeout=86400)
     async def get_chanel_by_any_url(self, url: str):
         "Find a channel ID from any youtube URL"
         match = re.search(self.url_pattern, url)
@@ -57,8 +61,10 @@ class YoutubeRSS:
             return identifier
         return None
 
+    @cached(timeout=86400*2) # 2-days cache because we use it really really often
     def get_channel_by_custom_url(self, custom_name: str):
         return self.search_service.find_channel_by_custom_url(custom_name)
 
+    @cached(timeout=86400)
     def get_channel_by_user_name(self, username: str):
         return self.search_service.find_channel_by_user_name(username)
