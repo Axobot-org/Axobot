@@ -32,4 +32,3 @@ jobs:
           VALIDATE_PYTHON_FLAKE8: false
           VALIDATE_YAML: false
           VALIDATE_GITLEAKS: false
-          PYTHON_PYLINT_CONFIG_FILE: ../../.pylintrc
