@@ -892,7 +892,7 @@ You can specify a verification limit by adding a number in argument (up to 1.000
         last_incident = data['incidents'][0]
         if last_incident['resolved_at'] is None:
             impact = await self.bot._(ctx.channel, "fun.discordstatus-impacts."+last_incident['impact'])
-            title = f"[{last_incident['name']}]({last_incident['shortlink']})"
+            title = f"**{last_incident['name']}** (<{last_incident['shortlink']}>)"
             await ctx.send(await self.bot._(ctx.channel, "fun.discordstatus-exists", impact=impact, title=title))
         else:
             last_date = datetime.datetime.strptime(last_incident['resolved_at'], '%Y-%m-%dT%H:%M:%S.%f%z')
