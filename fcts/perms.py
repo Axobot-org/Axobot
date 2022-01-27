@@ -43,7 +43,7 @@ class Perms(commands.Cog):
                 perms.update(**{x[0]:x[1] for x in channel.overwrites_for(ctx.guild.default_role) if x[1] is not None})
                 perms.update(**{x[0]:x[1] for x in channel.overwrites_for(target) if x[1] is not None})
             col = target.color
-            avatar = ctx.guild.icon.replace(format='png', size=256)
+            avatar = ctx.guild.icon.replace(format='png', size=256) if ctx.guild.icon else discord.embeds.EmptyEmbed
             name = str(target)
         else:
             return
