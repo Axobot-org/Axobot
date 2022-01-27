@@ -151,7 +151,8 @@ class Partners(commands.Cog):
                     continue
             emb = discord.Embed(title=title, description=target_desc, color=color, timestamp=self.bot.utcnow())
             emb.set_footer(text=partner['ID'])
-            emb.set_thumbnail(url=image)
+            if image:
+                emb.set_thumbnail(url=image)
             for field in fields:
                 if field:
                     emb.add_field(**field)
@@ -208,9 +209,9 @@ class Partners(commands.Cog):
         title = "**{}** ".format(tr_guild.capitalize())
         try:
             inv = await self.bot.fetch_invite(partner['target'])
-        except discord.errors.NotFound as e:
-            raise e
-        image = str(inv.guild.icon)
+        except discord.NotFound as err:
+            raise err
+        image = str(inv.guild.icon) if inv.guild.icon else None
         if isinstance(inv, discord.Invite) and not inv.revoked:
             title += inv.guild.name
             field1 = {'name': tr_members.capitalize(), 'value': str(
@@ -424,7 +425,8 @@ class Partners(commands.Cog):
             if color is None:
                 color = self.bot.get_cog('Servers').default_opt['partner_color']
             emb = discord.Embed(title=fields_name[0], color=color, timestamp=self.bot.utcnow())
-            emb.set_thumbnail(url=ctx.guild.icon)
+            if ctx.guild.icon:
+                emb.set_thumbnail(url=ctx.guild.icon)
             emb.add_field(name=fields_name[1], value=f[0], inline=False)
             emb.add_field(name=self.bot.zws, value=self.bot.zws, inline=False)
             emb.add_field(name=fields_name[2], value=f[1], inline=False)

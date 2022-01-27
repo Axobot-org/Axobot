@@ -685,7 +685,7 @@ class Servers(commands.Cog):
                 return
             try:
                 await self.modify_server(ctx.guild.id,values=[('prefix',value)])
-            except Exception as e:
+            except Exception:
                 self.bot.log.warning("Error while editing prefix", exc_info=True)
                 await ctx.send(await self.bot._(ctx.guild.id,"server.edit-error.prefix.invalid"))
                 return
@@ -952,7 +952,8 @@ class Servers(commands.Cog):
             title = await self.bot._(channel, "server.see-title", guild=guild.name) + f" ({page}/{max_page})"
             embed = discord.Embed(title=title, color=self.embed_color,
                                   description=await self.bot._(guild.id, "server.see-0"), timestamp=msg.created_at)
-            embed.set_thumbnail(url=guild.icon.with_static_format('png'))
+            if guild.icon:
+                embed.set_thumbnail(url=guild.icon.with_static_format('png'))
             diff = channel.guild != guild
             for i,v in liste.items():
                 #if i not in self.optionsList:
