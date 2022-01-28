@@ -86,7 +86,7 @@ class Rss(commands.Cog):
         self.loop_child.cancel()
 
     class rssMessage:
-        def __init__(self,bot:Zbot,Type,url,title,emojis,date=datetime.datetime.now(),author=None,Format=None,channel=None,retweeted_by=None,image=None):
+        def __init__(self,bot:Zbot,Type,url,title,emojis,date=datetime.datetime.now(),author=None,Format=None,channel=None,retweeted_from=None,image=None):
             self.bot = bot
             self.Type = Type
             self.url = url
@@ -117,10 +117,10 @@ class Rss(commands.Cog):
                 self.logo = ':newspaper:'
             self.channel = channel
             self.mentions = []
-            self.rt_by = retweeted_by
+            self.rt_from = retweeted_from
             if self.author is None:
                 self.author = channel
-        
+
         def fill_embed_data(self, flow: dict):
             self.embed_data = {'color':discord.Colour(0).default(),
                 'footer':'',
@@ -157,8 +157,8 @@ class Rss(commands.Cog):
             else:
                 date = self.date
             msg_format = msg_format.replace('\\n','\n')
-            if self.rt_by is not None:
-                self.author = "{} (retweeted by @{})".format(self.author,self.rt_by)
+            if self.rt_from is not None:
+                self.author = "{} (retweeted from @{})".format(self.author,self.rt_from)
             _channel = discord.utils.escape_markdown(self.channel) if self.channel else "?"
             _author = discord.utils.escape_markdown(self.author) if self.author else "?"
             text = msg_format.format_map(self.bot.SafeDict(channel=_channel, title=self.title, date=date, url=self.url,
@@ -252,7 +252,7 @@ class Rss(commands.Cog):
         ..Example rss tw z_runnerr
 
         ..Doc rss.html#see-the-last-post"""
-        if re.match(r'https://(?:www\.)twitter.com/', name):
+        if re.match(r'https://(?:www\.)?twitter\.com/', name):
             name = await self.parse_tw_url(name)
         try:
             text = await self.rss_tw(ctx.channel,name)
@@ -935,7 +935,7 @@ class Rss(commands.Cog):
 
 
     async def parse_tw_url(self, url):
-        r = r'(?:http.*://)?(?:www.)?(?:twitter.com/)([^?\s]+)'
+        r = r'(?:http.*://)?(?:www\.)?(?:twitter\.com/)([^?\s]+)'
         match = re.search(r,url)
         if match is None:
             return None
@@ -948,7 +948,7 @@ class Rss(commands.Cog):
             return user.id
 
     async def parse_twitch_url(self, url):
-        r = r'(?:http.*://)?(?:www.)?(?:twitch.tv/)([^?\s]+)'
+        r = r'(?:http.*://)?(?:www\.)?(?:twitch\.tv/)([^?\s]+)'
         match = re.search(r,url)
         if match is None:
             return None
@@ -956,7 +956,7 @@ class Rss(commands.Cog):
             return match.group(1)
 
     async def parse_deviant_url(self, url):
-        r = r'(?:http.*://)?(?:www.)?(?:deviantart.com/)([^?\s]+)'
+        r = r'(?:http.*://)?(?:www\.)?(?:deviantart\.com/)([^?\s]+)'
         match = re.search(r,url)
         if match is None:
             return None
@@ -1080,9 +1080,10 @@ class Rss(commands.Cog):
                 return []
             lastpost = posts[0]
             rt = None
-            if lastpost.retweeted:
-                rt = "retweet"
             text = html.unescape(getattr(lastpost, 'full_text', lastpost.text))
+            if lastpost.retweeted:
+                if possible_rt := re.search(r'^RT @([\w-]+):', text):
+                    rt = possible_rt.group(1)
             url = "https://twitter.com/{}/status/{}".format(username.lower(), lastpost.id)
             img = None
             if lastpost.media: # if exists and is not empty
@@ -1095,7 +1096,7 @@ class Rss(commands.Cog):
                 emojis=self.bot.get_cog('Emojis').customEmojis,
                 date=datetime.datetime.fromtimestamp(lastpost.created_at_in_seconds), 
                 author=lastpost.user.screen_name,
-                retweeted_by=rt,
+                retweeted_from=rt,
                 channel=lastpost.user.name,
                 image=img)
             return [obj]
@@ -1129,7 +1130,7 @@ class Rss(commands.Cog):
                     emojis=self.bot.get_cog('Emojis').customEmojis,
                     date=datetime.datetime.fromtimestamp(post.created_at_in_seconds),
                     author=post.user.screen_name,
-                    retweeted_by=rt,
+                    retweeted_from=rt,
                     channel=post.user.name,
                     image=img)
                 liste.append(obj)
