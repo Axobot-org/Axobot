@@ -31,8 +31,12 @@ class Languages(discord.ext.commands.Cog):
         elif serverID is None:
             lang_opt = self.bot.get_cog('Servers').default_language
         elif isinstance(serverID,discord.DMChannel):
-            used_langs = await self.bot.get_cog('Utilities').get_languages(serverID.recipient,limit=1)
-            lang_opt = used_langs[0][0]
+            recipient = await self.bot.get_recipient(serverID)
+            if recipient is None:
+                lang_opt = self.bot.get_cog('Servers').default_language
+            else:
+                used_langs = await self.bot.get_cog('Utilities').get_languages(recipient, limit=1)
+                lang_opt = used_langs[0][0]
         else:
             conf_lang = self.bot.get_cog("Servers").conf_lang
             lang_opt = await conf_lang(serverID,"language","scret-desc")

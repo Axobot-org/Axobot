@@ -220,6 +220,17 @@ class Zbot(commands.bot.AutoShardedBot):
             return cog.default_opt.get(option, None)
         return None
 
+    async def get_recipient(self, channel: discord.DMChannel) -> Optional[discord.User]:
+        """Get the recipient of the given DM channel
+
+        This method is required because most of the time Discord doesn't properly give that info"""
+        if not isinstance(channel, discord.DMChannel):
+            return None
+        if channel.recipient is None:
+            # recipient couldn't be loaded
+            channel = await self.fetch_channel(channel.id)
+        return channel.recipient
+
     def utcnow(self) -> datetime.datetime:
         """Get the current date and time with UTC timezone"""
         return datetime.datetime.now(datetime.timezone.utc)
