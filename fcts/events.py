@@ -200,21 +200,20 @@ class Events(commands.Cog):
 
 
     async def send_mp(self, msg: discord.Message):
+        "Send DM logs to the super secret internal channel"
         await self.check_mp_adv(msg)
-        if msg.channel.recipient is None:
-            # recipient couldn't be loaded
-            msg.channel = await self.bot.fetch_channel(msg.channel.id)
-            if msg.channel.recipient is None:
-                return
-        if msg.channel.recipient.id in [392766377078816789,279568324260528128,552273019020771358,281404141841022976]:
+        recipient = await self.bot.get_recipient(msg.channel)
+        if recipient is None:
+            return
+        if recipient.id in {392766377078816789,279568324260528128,552273019020771358,281404141841022976}:
             return
         channel = self.bot.get_channel(625320165621497886)
         if channel is None:
             return self.bot.log.warning("[send_mp] Salon de MP introuvable")
         emb = msg.embeds[0] if len(msg.embeds) > 0 else None
-        arrow = ":inbox_tray:" if msg.author == msg.channel.recipient else ":outbox_tray:"
+        arrow = ":inbox_tray:" if msg.author == recipient else ":outbox_tray:"
         date_ = f"<t:{msg.created_at.timestamp():.0f}>"
-        text = "{} **{}** ({} - {})\n{}".format(arrow, msg.channel.recipient, msg.channel.recipient.id, date_, msg.content)
+        text = "{} **{}** ({} - {})\n{}".format(arrow, recipient, recipient.id, date_, msg.content)
         if len(msg.attachments) > 0:
             text += "".join(["\n{}".format(x.url) for x in msg.attachments])
         await channel.send(text,embed=emb)
