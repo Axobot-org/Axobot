@@ -120,8 +120,10 @@ class Rss(commands.Cog):
             self.rt_from = retweeted_from
             if self.author is None:
                 self.author = channel
+            self.embed_data: dict[str, typing.Any]
 
         def fill_embed_data(self, flow: dict):
+            "Fill any interesting value to send in an embed"
             self.embed_data = {'color':discord.Colour(0).default(),
                 'footer':'',
                 'title':None}
@@ -131,7 +133,6 @@ class Rss(commands.Cog):
                 self.embed_data['footer'] = flow['embed_footer'][:2048]
             if flow['embed_color'] != 0:
                 self.embed_data['color'] = flow['embed_color']
-            return
 
         async def fill_mention(self, guild: discord.Guild, roles: typing.List[str], translate):
             if roles == []:
