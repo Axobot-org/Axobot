@@ -4,6 +4,7 @@ name: Lint Code Base
 on:
   schedule:
     - cron: '0 0 * * 1'
+    - cron: '0 0 * * 4'
 
 jobs:
   # Set the job key. The key is displayed as the job name
