@@ -413,12 +413,11 @@ class Admin(commands.Cog):
             self.bot.cnx_stats.close()
             self.bot.connect_database_stats()
             if self.bot.cnx_frm is not None and self.bot.cnx_xp is not None and self.bot.cnx_stats is not None:
-                if utils := self.bot.get_cog("Utilities"):
-                    await utils.add_check_reaction(ctx.message)
-                    if xp := self.bot.get_cog("Xp"):
-                        await xp.reload_sus()
-        except Exception as e:
-            await self.bot.get_cog('Errors').on_command_error(ctx,e)
+                await ctx.message.add_reaction('✅')
+                if xp := self.bot.get_cog("Xp"):
+                    await xp.reload_sus()
+        except Exception as err:
+            await self.bot.get_cog('Errors').on_command_error(ctx,err)
 
     @main_msg.command(name="emergency")
     @commands.check(reloads.check_admin)
