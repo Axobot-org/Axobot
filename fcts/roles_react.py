@@ -81,7 +81,7 @@ class RolesReact(commands.Cog):
         """Get the list of guilds which have roles reactions"""
         query = "SELECT `guild` FROM `{}`;".format(self.table)
         async with self.bot.db_query(query) as query_results:
-            self.guilds_which_have_roles = {[x['guild'] for x in query_results]}
+            self.guilds_which_have_roles = {x['guild'] for x in query_results}
         self.cache_initialized = True
         return self.guilds_which_have_roles
 
