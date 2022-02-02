@@ -5,19 +5,16 @@ import importlib
 import random
 import re
 import time
-import typing
+from typing import Optional
 
-import async_timeout
 import discord
-import feedparser
 import mysql
 import requests
 import twitter
-from aiohttp import client_exceptions
-from aiohttp.client import ClientSession
+from aiohttp import ClientSession, client_exceptions
 from discord.ext import commands, tasks
-from feedparser.util import FeedParserDict
 from libs.classes import MyContext, Zbot
+from libs.rss_general import RssMessage, feed_parse
 from libs.rss_youtube import YoutubeRSS
 
 from fcts import args, checks, reloads
@@ -25,6 +22,7 @@ from fcts import args, checks, reloads
 # importlib.reload(reloads)
 importlib.reload(args)
 importlib.reload(checks)
+
 
 
 web_link={'fr-minecraft':'http://fr-minecraft.net/rss.php',
@@ -46,6 +44,7 @@ async def can_use_rss(ctx: MyContext):
     if ctx.guild is None:
         return False
     return ctx.channel.permissions_for(ctx.author).manage_guild or await ctx.bot.get_cog("Admin").check_if_admin(ctx)
+
 
 class Rss(commands.Cog):
     """Cog which deals with everything related to rss flows. Whether it is to add automatic tracking to a stream, or just to see the latest video released by Discord, it is this cog that will be used."""
@@ -85,103 +84,6 @@ class Rss(commands.Cog):
         # pylint: disable=no-member
         self.loop_child.cancel()
 
-    class rssMessage:
-        def __init__(self,bot:Zbot,Type,url,title,emojis,date=datetime.datetime.now(),author=None,Format=None,channel=None,retweeted_from=None,image=None):
-            self.bot = bot
-            self.Type = Type
-            self.url = url
-            self.title = title
-            self.embed = False # WARNING COOKIES WARNINNG
-            self.image = image
-            if isinstance(date, datetime.datetime):
-                self.date = date
-            elif isinstance(date, time.struct_time):
-                self.date = datetime.datetime(*date[:6])
-            elif isinstance(date, str):
-                self.date = date
-            else:
-                self.date = None
-            self.author = author
-            self.format: str = Format
-            if Type == 'yt':
-                self.logo = emojis['youtube']
-            elif Type == 'tw':
-                self.logo = emojis['twitter']
-            elif Type == 'reddit':
-                self.logo = emojis['reddit']
-            elif Type == 'twitch':
-                self.logo = emojis['twitch']
-            elif Type == 'deviant':
-                self.logo = emojis['deviant']
-            else:
-                self.logo = ':newspaper:'
-            self.channel = channel
-            self.mentions = []
-            self.rt_from = retweeted_from
-            if self.author is None:
-                self.author = channel
-            self.embed_data: dict[str, typing.Any]
-
-        def fill_embed_data(self, flow: dict):
-            "Fill any interesting value to send in an embed"
-            self.embed_data = {'color':discord.Colour(0).default(),
-                'footer':'',
-                'title':None}
-            if flow['embed_title'] != '':
-                self.embed_data['title'] = flow['embed_title'][:256]
-            if flow['embed_footer'] != '':
-                self.embed_data['footer'] = flow['embed_footer'][:2048]
-            if flow['embed_color'] != 0:
-                self.embed_data['color'] = flow['embed_color']
-
-        async def fill_mention(self, guild: discord.Guild, roles: typing.List[str], translate):
-            if roles == []:
-                self.mentions = await translate(guild.id, "misc.none")
-            else:
-                r = list()
-                for item in roles:
-                    if len(item) == 0:
-                        continue
-                    role = discord.utils.get(guild.roles,id=int(item))
-                    if role is not None:
-                        r.append(role.mention)
-                    else:
-                        r.append(item)
-                self.mentions = r
-            return self
-
-        async def create_msg(self, msg_format: str=None):
-            if msg_format is None:
-                msg_format = self.format
-            if isinstance(self.date, datetime.datetime):
-                date = f"<t:{self.date.timestamp():.0f}:d> <t:{self.date.timestamp():.0f}:T>"
-            else:
-                date = self.date
-            msg_format = msg_format.replace('\\n','\n')
-            if self.rt_from is not None:
-                self.author = "{} (retweeted from @{})".format(self.author,self.rt_from)
-            _channel = discord.utils.escape_markdown(self.channel) if self.channel else "?"
-            _author = discord.utils.escape_markdown(self.author) if self.author else "?"
-            text = msg_format.format_map(self.bot.SafeDict(channel=_channel, title=self.title, date=date, url=self.url,
-                                                       link=self.url, mentions=", ".join(self.mentions), logo=self.logo,
-                                                       author=_author))
-            if not self.embed:
-                return text
-            else:
-                emb = discord.Embed(description=text, color=self.embed_data['color'])
-                emb.set_footer(text=self.embed_data['footer'])
-                if self.embed_data['title'] is None:
-                    if self.Type != 'tw':
-                        emb.title = self.title
-                    else:
-                        emb.title = self.author
-                else:
-                    emb.title = self.embed_data['title']
-                emb.add_field(name='URL', value=self.url)
-                if self.image is not None:
-                    emb.set_thumbnail(url=self.image)
-                return emb
-
 
     @commands.group(name="rss")
     @commands.cooldown(2,15,commands.BucketType.channel)
@@ -211,7 +113,7 @@ class Rss(commands.Cog):
             # we couldn't get the ID based on user input
             await ctx.send(await self.bot._(ctx.channel, "rss.web-invalid"))
             return
-        text = await self.rss_yt(ctx.channel,channel)
+        text = await self.youtube_rss.get_feed(ctx.channel, channel)
         if isinstance(text, str):
             await ctx.send(text)
         else:
@@ -315,7 +217,7 @@ class Rss(commands.Cog):
                 await ctx.send(obj)
 
 
-    async def is_overflow(self, guild: discord.Guild) -> typing.Tuple[bool, int]:
+    async def is_overflow(self, guild: discord.Guild) -> tuple[bool, int]:
         """Check if a guild still has at least a slot
         True if max number reached, followed by the flow limit"""
         flow_limit = await self.bot.get_config(guild.id,'rss_max_number')
@@ -558,7 +460,7 @@ class Rss(commands.Cog):
     @commands.guild_only()
     @commands.check(can_use_rss)
     @commands.check(checks.database_connected)
-    async def roles_flows(self, ctx: MyContext, ID:int=None, *, mentions:typing.Optional[str]):
+    async def roles_flows(self, ctx: MyContext, ID:int=None, *, mentions: Optional[str]):
         """Configures a role to be notified when a news is posted
         If you want to use the @everyone role, please put the server ID instead of the role name.
         
@@ -686,7 +588,7 @@ class Rss(commands.Cog):
     @commands.guild_only()
     @commands.check(can_use_rss)
     @commands.check(checks.database_connected)
-    async def move_guild_flow(self, ctx:MyContext, ID:typing.Optional[int]=None, channel:discord.TextChannel=None):
+    async def move_guild_flow(self, ctx:MyContext, ID:Optional[int]=None, channel:discord.TextChannel=None):
         """Move a rss feed in another channel
 
         ..Example rss move
@@ -725,7 +627,7 @@ class Rss(commands.Cog):
     @commands.guild_only()
     @commands.check(can_use_rss)
     @commands.check(checks.database_connected)
-    async def change_text_flow(self, ctx: MyContext, ID: typing.Optional[int]=None, *, text=None):
+    async def change_text_flow(self, ctx: MyContext, ID: Optional[int]=None, *, text=None):
         """Change the text of an rss feed
 
         Available variables:
@@ -776,7 +678,7 @@ class Rss(commands.Cog):
     @commands.guild_only()
     @commands.check(can_use_rss)
     @commands.check(checks.database_connected)
-    async def change_use_embed(self,ctx:MyContext,ID:typing.Optional[int]=None,value:bool=None,*,arguments:args.arguments=None):
+    async def change_use_embed(self,ctx:MyContext,ID:Optional[int]=None,value:bool=None,*,arguments:args.arguments=None):
         """Use an embed or not for a flow
         You can also provide arguments to change the color/text of the embed. Followed arguments are usable:
         - color: color of the embed (hex or decimal value)
@@ -849,7 +751,7 @@ class Rss(commands.Cog):
         """Test if an rss feed is usable"""
         url = url.replace('<','').replace('>','')
         try:
-            feeds = await self.feed_parse(url, 8)
+            feeds = await feed_parse(self.bot, url, 8)
             txt = "feeds.keys()\n```py\n{}\n```".format(feeds.keys())
             if 'bozo_exception' in feeds.keys():
                 txt += "\nException ({}): {}".format(feeds['bozo'],str(feeds['bozo_exception']))
@@ -928,7 +830,7 @@ class Rss(commands.Cog):
         if r is not None:
             return True
         try:
-            f = await self.feed_parse(url, 8)
+            f = await feed_parse(self.bot, url, 8)
             _ = f.entries[0]
             return True
         except:
@@ -963,74 +865,6 @@ class Rss(commands.Cog):
             return None
         else:
             return match.group(1)
-
-    async def feed_parse(self, url: str, timeout: int, session: ClientSession = None) -> feedparser.FeedParserDict:
-        """Asynchronous parsing using cool methods"""
-        # if session is provided, we have to not close it
-        _session = session or ClientSession()
-        try:
-            async with async_timeout.timeout(timeout) as cm:
-                async with _session.get(url) as response:
-                    html = await response.text()
-                    headers = response.raw_headers
-        except (UnicodeDecodeError, client_exceptions.ClientError):
-            if session is None:
-                await _session.close()
-            return FeedParserDict(entries=[])
-        except asyncio.exceptions.TimeoutError:
-            if session is None:
-                await _session.close()
-            return None
-        except Exception as e:
-            if session is None:
-                await _session.close()
-            raise e
-        if session is None:
-            await _session.close()
-        if cm.expired:
-            # request was cancelled by timeout
-            self.bot.log.info("[RSS] feed_parse got a timeout")
-            return None
-        headers = {k.decode("utf-8").lower(): v.decode("utf-8") for k, v in headers}
-        return feedparser.parse(html, response_headers=headers)
-
-
-    async def rss_yt(self, channel: discord.TextChannel, identifiant: str, date=None, session: ClientSession=None):
-        if identifiant == 'help':
-            return await self.bot._(channel, "rss.yt-help")
-        url = 'https://www.youtube.com/feeds/videos.xml?channel_id='+identifiant
-        feeds = await self.feed_parse(url, 7, session)
-        if feeds is None:
-            return await self.bot._(channel, "rss.research-timeout")
-        if not feeds.entries:
-            url = 'https://www.youtube.com/feeds/videos.xml?user='+identifiant
-            feeds = await self.feed_parse(url, 7, session)
-            if feeds is None:
-                return await self.bot._(channel, "rss.nothing")
-            if not feeds.entries:
-                return await self.bot._(channel, "rss.nothing")
-        if not date:
-            feed = feeds.entries[0]
-            img_url = None
-            if 'media_thumbnail' in feed.keys() and len(feed['media_thumbnail']) > 0:
-                img_url = feed['media_thumbnail'][0]['url']
-            obj = self.rssMessage(bot=self.bot,Type='yt',url=feed['link'],title=feed['title'],emojis=self.bot.get_cog('Emojis').customEmojis,date=feed['published_parsed'],author=feed['author'],channel=feed['author'],image=img_url)
-            return [obj]
-        else:
-            liste = list()
-            for feed in feeds.entries:
-                if len(liste) > 10:
-                    break
-                if 'published_parsed' not in feed or (datetime.datetime(*feed['published_parsed'][:6]) - date).total_seconds() <= self.min_time_between_posts['yt']:
-                    break
-                img_url = None
-                if 'media_thumbnail' in feed.keys() and len(feed['media_thumbnail']) > 0:
-                    img_url = feed['media_thumbnail'][0]['url']
-                obj = self.rssMessage(bot=self.bot,Type='yt',url=feed['link'],title=feed['title'],emojis=self.bot.get_cog('Emojis').customEmojis,date=feed['published_parsed'],author=feed['author'],channel=feed['author'],image=img_url)
-                liste.append(obj)
-            liste.reverse()
-            return liste
-
 
     async def get_tw_official(self, nom:str, count:int=None):
         try:
@@ -1089,7 +923,7 @@ class Rss(commands.Cog):
             img = None
             if lastpost.media: # if exists and is not empty
                 img = lastpost.media[0].media_url_https
-            obj = self.rssMessage(
+            obj = RssMessage(
                 bot=self.bot,
                 Type='tw',
                 url=url,
@@ -1123,7 +957,7 @@ class Rss(commands.Cog):
                 img = None
                 if post.media: # if exists and is not empty
                     img = post.media[0].media_url_https
-                obj = self.rssMessage(
+                obj = RssMessage(
                     bot=self.bot,
                     Type='tw',
                     url=url,
@@ -1140,7 +974,7 @@ class Rss(commands.Cog):
 
     async def rss_twitch(self, channel: discord.TextChannel, nom: str, date: datetime.datetime=None, session: ClientSession=None):
         url = 'https://twitchrss.appspot.com/vod/'+nom
-        feeds = await self.feed_parse(url, 5, session)
+        feeds = await feed_parse(self.bot, url, 5, session)
         if feeds is None:
             return await self.bot._(channel, "rss.research-timeout")
         if len(feeds.entries) == 0:
@@ -1151,7 +985,7 @@ class Rss(commands.Cog):
             img_url = None
             if r is not None:
                 img_url = r.group(1)
-            obj = self.rssMessage(bot=self.bot,Type='twitch',url=feed['link'],title=feed['title'],emojis=self.bot.get_cog('Emojis').customEmojis,date=feed['published_parsed'],author=feeds.feed['title'].replace("'s Twitch video RSS",""),image=img_url,channel=nom)
+            obj = RssMessage(bot=self.bot,Type='twitch',url=feed['link'],title=feed['title'],emojis=self.bot.get_cog('Emojis').customEmojis,date=feed['published_parsed'],author=feeds.feed['title'].replace("'s Twitch video RSS",""),image=img_url,channel=nom)
             return [obj]
         else:
             liste = list()
@@ -1164,7 +998,7 @@ class Rss(commands.Cog):
                 img_url = None
                 if r is not None:
                     img_url = r.group(1)
-                obj = self.rssMessage(bot=self.bot,Type='twitch',url=feed['link'],title=feed['title'],emojis=self.bot.get_cog('Emojis').customEmojis,date=feed['published_parsed'],author=feeds.feed['title'].replace("'s Twitch video RSS",""),image=img_url,channel=nom)
+                obj = RssMessage(bot=self.bot,Type='twitch',url=feed['link'],title=feed['title'],emojis=self.bot.get_cog('Emojis').customEmojis,date=feed['published_parsed'],author=feeds.feed['title'].replace("'s Twitch video RSS",""),image=img_url,channel=nom)
                 liste.append(obj)
             liste.reverse()
             return liste
@@ -1172,7 +1006,7 @@ class Rss(commands.Cog):
     async def rss_web(self, channel: discord.TextChannel, url: str, date: datetime.datetime=None, session: ClientSession=None):
         if url == 'help':
             return await self.bot._(channel, "rss.web-help")
-        feeds = await self.feed_parse(url, 9, session)
+        feeds = await feed_parse(self.bot, url, 9, session)
         if feeds is None:
             return await self.bot._(channel, "rss.research-timeout")
         if 'bozo_exception' in feeds.keys() or len(feeds.entries) == 0:
@@ -1218,7 +1052,7 @@ class Rss(commands.Cog):
             r = re.search(r'(http(s?):)([/|.\w\s-])*\.(?:jpe?g|gif|png|webp)', str(feed))
             if r is not None:
                 img = r.group(0)
-            obj = self.rssMessage(
+            obj = RssMessage(
                 bot=self.bot,
                 Type='web',
                 url=l,
@@ -1262,7 +1096,7 @@ class Rss(commands.Cog):
                     r = re.search(r'(http(s?):)([/|.\w\s-])*\.(?:jpe?g|gif|png|webp)', str(feed))
                     if r is not None:
                         img = r.group(0)
-                    obj = self.rssMessage(
+                    obj = RssMessage(
                         bot=self.bot,
                         Type='web',
                         url=l,
@@ -1281,7 +1115,7 @@ class Rss(commands.Cog):
 
     async def rss_deviant(self, guild: discord.Guild, nom: str, date: datetime.datetime=None, session: ClientSession=None):
         url = 'https://backend.deviantart.com/rss.xml?q=gallery%3A'+nom
-        feeds = await self.feed_parse(url, 5, session)
+        feeds = await feed_parse(self.bot, url, 5, session)
         if feeds is None:
             return await self.bot._(guild, "rss.research-timeout")
         if len(feeds.entries) == 0:
@@ -1290,7 +1124,7 @@ class Rss(commands.Cog):
             feed = feeds.entries[0]
             img_url = feed['media_content'][0]['url']
             title = re.search(r"DeviantArt: ([^ ]+)'s gallery",feeds.feed['title']).group(1)
-            obj = self.rssMessage(bot=self.bot,Type='deviant',url=feed['link'],title=feed['title'],emojis=self.bot.get_cog('Emojis').customEmojis,date=feed['published_parsed'],author=title,image=img_url)
+            obj = RssMessage(bot=self.bot,Type='deviant',url=feed['link'],title=feed['title'],emojis=self.bot.get_cog('Emojis').customEmojis,date=feed['published_parsed'],author=title,image=img_url)
             return [obj]
         else:
             liste = list()
@@ -1299,7 +1133,7 @@ class Rss(commands.Cog):
                     break
                 img_url = feed['media_content'][0]['url']
                 title = re.search(r"DeviantArt: ([^ ]+)'s gallery",feeds.feed['title']).group(1)
-                obj = self.rssMessage(bot=self.bot,Type='deviant',url=feed['link'],title=feed['title'],emojis=self.bot.get_cog('Emojis').customEmojis,date=feed['published_parsed'],author=title,image=img_url)
+                obj = RssMessage(bot=self.bot,Type='deviant',url=feed['link'],title=feed['title'],emojis=self.bot.get_cog('Emojis').customEmojis,date=feed['published_parsed'],author=title,image=img_url)
                 liste.append(obj)
             liste.reverse()
             return liste
@@ -1385,7 +1219,7 @@ class Rss(commands.Cog):
         async with self.bot.db_query(query, (val[1] for val in values)):
             pass
 
-    async def send_rss_msg(self, obj: "rssMessage", channel: discord.TextChannel, roles: typing.List[str], send_stats):
+    async def send_rss_msg(self, obj: "RssMessage", channel: discord.TextChannel, roles: list[str], send_stats):
         if channel is not None:
             t = await obj.create_msg()
             mentions = list()
@@ -1426,12 +1260,14 @@ class Rss(commands.Cog):
             if flow['link'] in self.cache.keys():
                 objs = self.cache[flow['link']]
             else:
-                funct = getattr(self, f"rss_{flow['type']}")
-                if flow["type"] == "tw":
-                    objs = await funct(chan,flow['link'], flow['date'])
+                if flow['type'] == "yt":
+                    objs = await self.youtube_rss.get_feed(chan, flow['link'], flow['date'], session)
+                elif flow['type'] == "tw":
+                    objs = await self.rss_tw(chan,flow['link'], flow['date'])
                 else:
+                    funct = getattr(self, f"rss_{flow['type']}")
                     objs = await funct(chan,flow['link'], flow['date'], session=session)
-                if isinstance(objs,twitter.error.TwitterError):
+                if isinstance(objs, twitter.error.TwitterError):
                     self.twitter_over_capacity = True
                     self.bot.log.warning("[send_rss_msg] Twitter over capacity detected")
                     return False
