@@ -6,7 +6,6 @@ import io
 import json
 import operator
 import os
-import shutil
 import sys
 import textwrap
 import time
@@ -47,7 +46,17 @@ class Admin(commands.Cog):
         except KeyError:
             pass
         self._last_result = None
+        self._upvote_emojis = ()
         self.god_mode = []
+    
+    @property
+    def upvote_emojis(self):
+        if not self._upvote_emojis:
+            self._upvote_emojis = (
+                self.bot.get_emoji(938416027274993674),
+                self.bot.get_emoji(938416007549186049)
+            )
+        return self._upvote_emojis
 
     @commands.Cog.listener()
     async def on_ready(self):
@@ -486,7 +495,7 @@ class Admin(commands.Cog):
                 await ctx.send("```py\n{}\n```".format(code))
         else:
             await ctx.send("Commande `{}` introuvable".format(cmd))
-    
+
     @main_msg.command(name="ignore")
     @commands.check(reloads.check_admin)
     async def add_ignoring(self, ctx: MyContext, ID:int):
@@ -663,6 +672,28 @@ Cette option affecte tous les serveurs"""
                 await member.remove_roles(role,reason="This user doesn't support me anymore")
         await self.add_success_reaction(ctx.message)
 
+    async def _get_ideas_list(self, channel: discord.TextChannel) -> list[tuple[int, datetime.timedelta, str, int, int]]:
+        "Get ideas from the ideas channel"
+        now = self.bot.utcnow()
+        liste = list()
+        async for msg in channel.history(limit=500):
+            if len(msg.reactions) > 0:
+                upvotes = 0
+                downvotes = 0
+                for reaction in msg.reactions:
+                    users = [x for x in await x.users().flatten() if not x.bot]
+                    if reaction.emoji in ('👍', self.upvote_emojis[0]):
+                        upvotes = len(users)
+                    if reaction.emoji in ('👎', self.upvote_emojis[1]):
+                        downvotes = len(users)
+                duration = now-msg.created_at
+                if len(msg.embeds) > 0:
+                    liste.append((upvotes-downvotes,duration,msg.embeds[0].fields[0].value,upvotes,downvotes))
+                else:
+                    liste.append((upvotes-downvotes,duration,msg.content,upvotes,downvotes))
+        liste.sort(reverse=True)
+        return liste
+
     @main_botserv.command(name="best_ideas")
     @commands.check(reloads.check_admin)
     async def best_ideas(self, ctx: MyContext, number:int=10):
@@ -674,22 +705,7 @@ Cette option affecte tous les serveurs"""
         channel = server.get_channel(488769306524385301)
         if channel is None:
             return await ctx.send("Salon introuvable")
-        liste = list()
-        async for msg in channel.history(limit=500):
-            if len(msg.reactions) > 0:
-                up = 0
-                down = 0
-                for x in msg.reactions:
-                    users = [x for x in await x.users().flatten() if not x.bot]
-                    if x.emoji == '👍':
-                        up = len(users)
-                    elif x.emoji == '👎':
-                        down = len(users)
-                if len(msg.embeds) > 0:
-                    liste.append((up-down,ctx.bot.utcnow()-msg.created_at,msg.embeds[0].fields[0].value,up,down))
-                else:
-                    liste.append((up-down,ctx.bot.utcnow()-msg.created_at,msg.content,up,down))
-        liste.sort(reverse=True)
+        liste = await self._get_ideas_list(channel)
         count = len(liste)
         liste = liste[:number]
         title = "Liste des {} meilleures idées (sur {}) :".format(len(liste),count)
@@ -698,8 +714,8 @@ Cette option affecte tous les serveurs"""
             color = ctx.guild.me.color
         else:
             color = discord.Colour(8311585)
-        for x in liste:
-            text += "\n**[{} - {}]**  {} ".format(x[3],x[4],x[2])
+        for reaction in liste:
+            text += "\n**[{} - {}]**  {} ".format(reaction[3],reaction[4],reaction[2])
         try:
             if ctx.can_send_embed:
                 emb = discord.Embed(title=title, description=text, color=color, timestamp=self.bot.utcnow())
@@ -724,7 +740,7 @@ Cette option affecte tous les serveurs"""
         else:
             await ctx.send("Sélectionnez *play*, *watch*, *listen* ou *stream* suivi du nom")
         await ctx.message.delete()
-    
+
     @main_msg.command(name="speedtest")
     @commands.check(reloads.check_admin)
     async def speedtest(self, ctx: MyContext, method: str=None):
@@ -754,7 +770,7 @@ Cette option affecte tous les serveurs"""
         else:
             result = getattr(s.results, method)()
             await msg.edit(content=str(result))
-    
+
 
     @commands.command(name='eval')
     @commands.check(reloads.check_admin)
@@ -801,7 +817,7 @@ Cette option affecte tous les serveurs"""
             else:
                 self._last_result = ret
                 await ctx.send(f'```py\n{value}{ret}\n```')
-    
+
     @commands.command(name='execute',hidden=True)
     @commands.check(reloads.check_admin)
     async def sudo(self, ctx: MyContext, who: typing.Union[discord.Member, discord.User], *, command: str):
@@ -861,18 +877,23 @@ Cette option affecte tous les serveurs"""
         """Ajouter une idée dans le salon des idées, en français et anglais"""
 
     @main_idea.command(name='add')
-    async def idea_add(self, ctx: MyContext, *, text):
+    async def idea_add(self, ctx: MyContext, *, text: str):
         """Ajoute une idée à la liste"""
         channel = ctx.bot.get_channel(929864644678549534) if self.bot.beta else ctx.bot.get_channel(488769306524385301)
         if channel is None:
             return await ctx.send("Salon introuvable")
         text = text.split('\n')
-        fr_text, en_text = text[0].replace('\\n','\n'), text[1].replace('\\n','\n')
+        try:
+            fr_text, en_text = text[0].replace('\\n','\n'), text[1].replace('\\n','\n')
+        except IndexError:
+            await ctx.send("Il manque le texte anglais")
+            return
         emb = discord.Embed(color=16106019, timestamp=self.bot.utcnow())
-        emb.add_field(name='Français', value=fr_text)
-        emb.add_field(name='English', value=en_text)
+        emb.add_field(name='Français', value=fr_text, inline=False)
+        emb.add_field(name='English', value=en_text, inline=False)
         msg = await channel.send(embed=emb)
-        await self.bot.get_cog('Fun').add_vote(msg)
+        for emoji in self.upvote_emojis:
+            await msg.add_reaction(emoji)
         await self.add_success_reaction(ctx.message)
 
     @main_idea.command(name='valid')
