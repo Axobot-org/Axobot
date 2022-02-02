@@ -1,10 +1,19 @@
+from __future__ import annotations
+
+import datetime as dt
 import re
+from typing import TYPE_CHECKING, Union
 
 import aiohttp
+import discord
 from cachingutils import acached, cached
 
-from libs.classes import Zbot
 from libs.youtube_search import Service
+
+from libs.rss_general import RssMessage, feed_parse
+
+if TYPE_CHECKING:
+    from libs.classes import Zbot
 
 
 class YoutubeRSS:
@@ -12,6 +21,7 @@ class YoutubeRSS:
 
     def __init__(self, bot: Zbot):
         self.bot = bot
+        self.min_time_between_posts = 120
         self.search_service = Service(5, bot.others['google_api'])
         self.url_pattern = re.compile(
             r'(?:https?://)?(?:www.)?(?:youtube.com|youtu.be)(?:(?:/channel/|/user/|/c/)(.+)|/[\w-]+$)')
@@ -68,3 +78,39 @@ class YoutubeRSS:
     @cached(timeout=86400)
     def get_channel_by_user_name(self, username: str):
         return self.search_service.find_channel_by_user_name(username)
+
+    async def get_feed(self, channel: discord.TextChannel, identifiant: str, date: dt.datetime=None, session: aiohttp.ClientSession=None) -> Union[str, list[RssMessage]]:
+        if identifiant == 'help':
+            return await self.bot._(channel, "rss.yt-help")
+        url = 'https://www.youtube.com/feeds/videos.xml?channel_id='+identifiant
+        feeds = await feed_parse(self.bot, url, 7, session)
+        if feeds is None:
+            return await self.bot._(channel, "rss.research-timeout")
+        if not feeds.entries:
+            url = 'https://www.youtube.com/feeds/videos.xml?user='+identifiant
+            feeds = await feed_parse(self.bot, url, 7, session)
+            if feeds is None:
+                return await self.bot._(channel, "rss.nothing")
+            if not feeds.entries:
+                return await self.bot._(channel, "rss.nothing")
+        if not date:
+            feed = feeds.entries[0]
+            img_url = None
+            if 'media_thumbnail' in feed.keys() and len(feed['media_thumbnail']) > 0:
+                img_url = feed['media_thumbnail'][0]['url']
+            obj = RssMessage(bot=self.bot,Type='yt',url=feed['link'],title=feed['title'],emojis=self.bot.get_cog('Emojis').customEmojis,date=feed['published_parsed'],author=feed['author'],channel=feed['author'],image=img_url)
+            return [obj]
+        else:
+            liste = list()
+            for feed in feeds.entries:
+                if len(liste) > 10:
+                    break
+                if 'published_parsed' not in feed or (dt.datetime(*feed['published_parsed'][:6]) - date).total_seconds() <= self.min_time_between_posts:
+                    break
+                img_url = None
+                if 'media_thumbnail' in feed.keys() and len(feed['media_thumbnail']) > 0:
+                    img_url = feed['media_thumbnail'][0]['url']
+                obj = RssMessage(bot=self.bot,Type='yt',url=feed['link'],title=feed['title'],emojis=self.bot.get_cog('Emojis').customEmojis,date=feed['published_parsed'],author=feed['author'],channel=feed['author'],image=img_url)
+                liste.append(obj)
+            liste.reverse()
+            return liste
