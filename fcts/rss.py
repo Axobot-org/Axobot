@@ -713,7 +713,7 @@ class Rss(commands.Cog):
                 await ctx.send(await self.bot._(ctx.guild.id,"rss.use_embed_" + ("true" if flow['use_embed'] else "false")))
                 def check(msg):
                     try:
-                        _ = commands.core._convert_to_bool(msg.content)
+                        _ = commands.converter._convert_to_bool(msg.content)
                     except:
                         return False
                     return msg.author==ctx.author and msg.channel==ctx.channel
@@ -721,7 +721,7 @@ class Rss(commands.Cog):
                     msg = await self.bot.wait_for('message', check=check,timeout=20)
                 except asyncio.TimeoutError:
                     return await ctx.send(await self.bot._(ctx.guild.id, "rss.too-long"))
-                value = commands.core._convert_to_bool(msg.content)
+                value = commands.converter._convert_to_bool(msg.content)
             if value is not None and value != flow['use_embed']:
                 values_to_update.append(('use_embed',value))
                 txt.append(await self.bot._(ctx.guild.id,"rss.use_embed-success", v=value, id=flow['ID']))
