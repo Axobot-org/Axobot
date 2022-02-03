@@ -15,6 +15,7 @@ from aiohttp import ClientSession, client_exceptions
 from discord.ext import commands, tasks
 from libs.classes import MyContext, Zbot
 from libs.rss_general import RssMessage, feed_parse
+from libs.rss_twitter import TwitterRSS
 from libs.rss_youtube import YoutubeRSS
 
 from fcts import args, checks, reloads
@@ -61,13 +62,11 @@ class Rss(commands.Cog):
         self.last_update = None
 
         self.youtube_rss = YoutubeRSS(self.bot)
-        self.twitterAPI = twitter.Api(**bot.others['twitter'], tweet_mode="extended", timeout=15)
+        self.twitter_rss = TwitterRSS(self.bot)
 
         self.twitter_over_capacity = False
         self.min_time_between_posts = {
-            'web': 120,
-            'tw': 15,
-            'yt': 120
+            'web': 120
         }
         self.cache = dict()
         if bot.user is not None:
@@ -156,9 +155,9 @@ class Rss(commands.Cog):
 
         ..Doc rss.html#see-the-last-post"""
         if re.match(r'https://(?:www\.)?twitter\.com/', name):
-            name = await self.parse_tw_url(name)
+            name = await self.twitter_rss.get_userid_from_url(name)
         try:
-            text = await self.rss_tw(ctx.channel,name)
+            text = await self.twitter_rss.get_feed(ctx.channel,name)
         except Exception as err:
             return await self.bot.get_cog('Errors').on_error(err,ctx)
         if isinstance(text, str):
@@ -247,7 +246,7 @@ class Rss(commands.Cog):
             flow_type = 'yt'
             display_type = 'youtube'
         if identifiant is None:
-            identifiant = await self.parse_tw_url(link)
+            identifiant = await self.twitter_rss.get_userid_from_url(link)
             if identifiant is not None:
                 flow_type = 'tw'
                 display_type = 'twitter'
@@ -387,7 +386,7 @@ class Rss(commands.Cog):
                     continue
                 if x['type'] == 'tw' and x['link'].isnumeric():
                     try:
-                        x['link'] = self.twitterAPI.GetUser(user_id=int(x['link'])).screen_name
+                        x['link'] = (await self.twitter_rss.get_user_from_id(int(x['link']))).screen_name
                     except twitter.TwitterError as e:
                         self.bot.log.debug(f"[rss:askID] Twitter error: {e}")
                 list_of_IDs.append(x['ID'])
@@ -780,7 +779,7 @@ class Rss(commands.Cog):
                 txt = ['**__Analyse :__**','']
                 yt = await self.youtube_rss.get_chanel_by_any_url(feeds.feed['link'])
                 if yt is None:
-                    tw = await self.parse_tw_url(feeds.feed['link'])
+                    tw = await self.twitter_rss.is_twitter_url(feeds.feed['link'])
                     if tw is not None:
                         txt.append("<:twitter:437220693726330881>  "+tw)
                     elif 'link' in feeds.feed.keys():
@@ -820,7 +819,7 @@ class Rss(commands.Cog):
         r = self.youtube_rss.is_youtube_url(url)
         if r is not None:
             return True
-        r = await self.parse_tw_url(url)
+        r = await self.twitter_rss.is_twitter_url(url)
         if r is not None:
             return True
         r = await self.parse_twitch_url(url)
@@ -836,19 +835,6 @@ class Rss(commands.Cog):
         except:
             return False
 
-
-    async def parse_tw_url(self, url):
-        r = r'(?:http.*://)?(?:www\.)?(?:twitter\.com/)([^?\s]+)'
-        match = re.search(r,url)
-        if match is None:
-            return None
-        else:
-            name = match.group(1)
-            try:
-                user = self.twitterAPI.GetUser(screen_name=name)
-            except twitter.TwitterError:
-                return None
-            return user.id
 
     async def parse_twitch_url(self, url):
         r = r'(?:http.*://)?(?:www\.)?(?:twitch\.tv/)([^?\s]+)'
@@ -866,111 +852,6 @@ class Rss(commands.Cog):
         else:
             return match.group(1)
 
-    async def get_tw_official(self, nom:str, count:int=None):
-        try:
-            if nom.isnumeric():
-                timeline = self.twitterAPI.GetUserTimeline(user_id=int(nom), exclude_replies=True, trim_user=True, count=count)
-            else:
-                timeline = self.twitterAPI.GetUserTimeline(screen_name=nom, exclude_replies=True, trim_user=True, count=count)
-            return [x for x in timeline]
-        except twitter.error.TwitterError as e:
-            if str(e) == "Not authorized.":
-                self.bot.log.warning(f"[rss] Unable to reach channel {nom}: Not authorized")
-                return []
-            try:
-                if e.message[0]['code'] == 130: # Over capacity - Corresponds with HTTP 503. Twitter is temporarily over capacity.
-                    return e
-                elif e.message[0]['code'] == 131: # Internal error - Corresponds with HTTP 500. An unknown internal error occurred.
-                    return e
-                elif e.message[0]['code'] == 34: # Sorry, that page does not exist - Corresponds with HTTP 404. The specified resource was not found. (can also be an internal problem with Twitter)
-                    return e
-            except:
-                pass
-            await self.bot.get_user(279568324260528128).send("```py\n{}\n``` \n```py\n{}\n```".format(e,e.args))
-            return []
-        except requests.exceptions.ConnectionError:
-            return []
-
-    async def rss_tw(self, channel: discord.TextChannel, name: str, date: datetime.datetime=None):
-        if name == 'help':
-            return await self.bot._(channel, "rss.tw-help")
-        try:
-            if isinstance(name, int) or name.isnumeric():
-                posts = self.twitterAPI.GetUserTimeline(user_id=int(name), exclude_replies=True)
-                username = self.twitterAPI.GetUser(user_id=int(name)).screen_name
-            else:
-                posts = self.twitterAPI.GetUserTimeline(screen_name=name, exclude_replies=True)
-                username = name
-        except twitter.error.TwitterError as e:
-            if e.message == "Not authorized.":
-                return await self.bot._(channel, "rss.nothing")
-            if 'Unknown error' in e.message:
-                return await self.bot._(channel, "rss.nothing")
-            if e.message[0]['code'] == 34:
-                return await self.bot._(channel, "rss.nothing")
-            raise e
-        if not date:
-            # lastpost = self.twitterAPI.GetUserTimeline(screen_name=nom,exclude_replies=True,trim_user=True)
-            if len(posts) == 0:
-                return []
-            lastpost = posts[0]
-            rt = None
-            text = html.unescape(getattr(lastpost, 'full_text', lastpost.text))
-            if lastpost.retweeted:
-                if possible_rt := re.search(r'^RT @([\w-]+):', text):
-                    rt = possible_rt.group(1)
-            url = "https://twitter.com/{}/status/{}".format(username.lower(), lastpost.id)
-            img = None
-            if lastpost.media: # if exists and is not empty
-                img = lastpost.media[0].media_url_https
-            obj = RssMessage(
-                bot=self.bot,
-                Type='tw',
-                url=url,
-                title=text,
-                emojis=self.bot.get_cog('Emojis').customEmojis,
-                date=datetime.datetime.fromtimestamp(lastpost.created_at_in_seconds), 
-                author=lastpost.user.screen_name,
-                retweeted_from=rt,
-                channel=lastpost.user.name,
-                image=img)
-            return [obj]
-        else:
-            liste = list()
-            for post in posts:
-                if len(liste)>10:
-                    break
-                if (datetime.datetime.fromtimestamp(post.created_at_in_seconds) - date).total_seconds() < self.min_time_between_posts['tw']:
-                    break
-                rt = None
-                if post.retweeted:
-                    rt = "retweet"
-                text = html.unescape(getattr(post, 'full_text', post.text))
-                # remove images links if needed
-                if channel.permissions_for(channel.guild.me).embed_links:
-                    find_url = self.bot.get_cog("Utilities").find_url_redirection
-                    for m in re.finditer(r"https://t.co/([^\s]+)", text):
-                        final_url = await find_url(m.group(0))
-                        if "/photo/" in final_url:
-                            text = text.replace(m.group(0), '')
-                url = "https://twitter.com/{}/status/{}".format(name.lower(), post.id)
-                img = None
-                if post.media: # if exists and is not empty
-                    img = post.media[0].media_url_https
-                obj = RssMessage(
-                    bot=self.bot,
-                    Type='tw',
-                    url=url,
-                    title=text,
-                    emojis=self.bot.get_cog('Emojis').customEmojis,
-                    date=datetime.datetime.fromtimestamp(post.created_at_in_seconds),
-                    author=post.user.screen_name,
-                    retweeted_from=rt,
-                    channel=post.user.name,
-                    image=img)
-                liste.append(obj)
-            liste.reverse()
-            return liste
 
     async def rss_twitch(self, channel: discord.TextChannel, nom: str, date: datetime.datetime=None, session: ClientSession=None):
         url = 'https://twitchrss.appspot.com/vod/'+nom
@@ -1263,7 +1144,7 @@ class Rss(commands.Cog):
                 if flow['type'] == "yt":
                     objs = await self.youtube_rss.get_feed(chan, flow['link'], flow['date'], session)
                 elif flow['type'] == "tw":
-                    objs = await self.rss_tw(chan,flow['link'], flow['date'])
+                    objs = await self.twitter_rss.get_feed(chan,flow['link'], flow['date'])
                 else:
                     funct = getattr(self, f"rss_{flow['type']}")
                     objs = await funct(chan,flow['link'], flow['date'], session=session)
