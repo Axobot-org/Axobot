@@ -1,6 +1,5 @@
 import asyncio
 import datetime
-import html
 import importlib
 import random
 import re
@@ -9,7 +8,6 @@ from typing import Optional
 
 import discord
 import mysql
-import requests
 import twitter
 from aiohttp import ClientSession, client_exceptions
 from discord.ext import commands, tasks
