@@ -98,7 +98,7 @@ class YoutubeRSS:
             img_url = None
             if 'media_thumbnail' in feed.keys() and len(feed['media_thumbnail']) > 0:
                 img_url = feed['media_thumbnail'][0]['url']
-            obj = RssMessage(bot=self.bot,Type='yt',url=feed['link'],title=feed['title'],emojis=self.bot.get_cog('Emojis').customEmojis,date=feed['published_parsed'],author=feed['author'],channel=feed['author'],image=img_url)
+            obj = RssMessage(bot=self.bot,Type='yt',url=feed['link'],title=feed['title'],emojis=self.bot.get_cog('Emojis').customs,date=feed['published_parsed'],author=feed['author'],channel=feed['author'],image=img_url)
             return [obj]
         else:
             liste = list()
@@ -110,7 +110,7 @@ class YoutubeRSS:
                 img_url = None
                 if 'media_thumbnail' in feed.keys() and len(feed['media_thumbnail']) > 0:
                     img_url = feed['media_thumbnail'][0]['url']
-                obj = RssMessage(bot=self.bot,Type='yt',url=feed['link'],title=feed['title'],emojis=self.bot.get_cog('Emojis').customEmojis,date=feed['published_parsed'],author=feed['author'],channel=feed['author'],image=img_url)
+                obj = RssMessage(bot=self.bot,Type='yt',url=feed['link'],title=feed['title'],emojis=self.bot.get_cog('Emojis').customs,date=feed['published_parsed'],author=feed['author'],channel=feed['author'],image=img_url)
                 liste.append(obj)
             liste.reverse()
             return liste

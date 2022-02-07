@@ -89,7 +89,7 @@ class Morpions(commands.Cog):
             """Affiche la grille qui est une liste sous forme de chaine de caractères"""
             affichage_grille = ''
             if self.ctx.bot_permissions.external_emojis:
-                emojis = [f'<:{x}>' for x in self.bot.get_cog('Emojis').numbEmojis]
+                emojis = [f'<:{x}>' for x in self.bot.get_cog('Emojis').numbers]
             else:
                 emojis = [chr(48+i)+chr(8419) for i in range(10)]
             for k in range(9):

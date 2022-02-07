@@ -54,7 +54,7 @@ class Perms(commands.Cog):
             perm_tr = await self.bot._(ctx.guild.id, "permissions.list.administrator")
             if "permissions.list." in perm_tr: # unsuccessful translation
                 perm_tr = "Administrator"
-            permsl.append(self.bot.get_cog('Emojis').customEmojis['green_check'] + perm_tr)
+            permsl.append(self.bot.get_cog('Emojis').customs['green_check'] + perm_tr)
         else:
             # Here we check if the value of each permission is True.
             for perm_id, value in perms:
@@ -65,9 +65,9 @@ class Perms(commands.Cog):
                 if "permissions.list." in perm_tr: # unsuccessful translation
                     perm_tr = perm_id.replace('_',' ').title()
                 if value:
-                    permsl.append(self.bot.get_cog('Emojis').customEmojis['green_check'] + perm_tr)
+                    permsl.append(self.bot.get_cog('Emojis').customs['green_check'] + perm_tr)
                 else:
-                    permsl.append(self.bot.get_cog('Emojis').customEmojis['red_cross'] + perm_tr)
+                    permsl.append(self.bot.get_cog('Emojis').customs['red_cross'] + perm_tr)
         if ctx.can_send_embed:
             if channel is None:
                 desc = await self.bot._(ctx.guild.id, "permissions.general")

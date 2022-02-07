@@ -444,7 +444,7 @@ class Admin(commands.Cog):
                 user = self.bot.get_user(x)
                 if user.dm_channel is None:
                     await user.create_dm()
-                msg = await user.dm_channel.send("{} La procédure d'urgence vient d'être activée. Si vous souhaitez l'annuler, veuillez cliquer sur la réaction ci-dessous dans les {} secondes qui suivent l'envoi de ce message.".format(self.bot.get_cog('Emojis').customEmojis['red_warning'],time))
+                msg = await user.dm_channel.send("{} La procédure d'urgence vient d'être activée. Si vous souhaitez l'annuler, veuillez cliquer sur la réaction ci-dessous dans les {} secondes qui suivent l'envoi de ce message.".format(self.bot.get_cog('Emojis').customs['red_warning'],time))
                 await msg.add_reaction('🛑')
             except Exception as e:
                 await self.bot.get_cog('Errors').on_error(e,None)
@@ -468,8 +468,8 @@ class Admin(commands.Cog):
                 except:
                     continue
             chan = await self.bot.get_channel(500674177548812306)
-            await chan.send("{} Prodédure d'urgence déclenchée : {} serveurs quittés - {} propriétaires prévenus".format(self.bot.get_cog('Emojis').customEmojis['red_alert'],servers,len(owners)))
-            return "{}  {} propriétaires de serveurs ont été prévenu ({} serveurs)".format(self.bot.get_cog('Emojis').customEmojis['red_alert'],len(owners),servers)
+            await chan.send("{} Prodédure d'urgence déclenchée : {} serveurs quittés - {} propriétaires prévenus".format(self.bot.get_cog('Emojis').customs['red_alert'],servers,len(owners)))
+            return "{}  {} propriétaires de serveurs ont été prévenu ({} serveurs)".format(self.bot.get_cog('Emojis').customs['red_alert'],len(owners),servers)
         for x in reloads.admins_id:
             try:
                 user = self.bot.get_user(x)
