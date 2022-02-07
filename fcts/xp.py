@@ -963,7 +963,7 @@ class Xp(commands.Cog):
             self.bot.log.info(s)
             emb = discord.Embed(description=s,color=8952255, timestamp=self.bot.utcnow())
             emb.set_footer(ctx.guild.name)
-            emb.set_author(self.bot.user, icon_url=self.bot.user.avatar)
+            emb.set_author(self.bot.user, icon_url=self.bot.user.display_avatar)
             await self.bot.send_embed([emb])
 
     async def gen_rr_id(self):

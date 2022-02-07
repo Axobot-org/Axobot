@@ -293,7 +293,7 @@ class Partners(commands.Cog):
         # logs
         emb = discord.Embed(description=f"New partner added: {partner_type} {item.id}", color=10949630, timestamp=self.bot.utcnow())
         emb.set_footer(text=ctx.guild.name)
-        emb.set_author(name=self.bot.user, icon_url=self.bot.user.avatar)
+        emb.set_author(name=self.bot.user, icon_url=self.bot.user.display_avatar)
         await self.bot.send_embed([emb])
 
     @partner_main.command(name='description',aliases=['desc'])
@@ -374,7 +374,7 @@ class Partners(commands.Cog):
             await ctx.send(await self.bot._(ctx.guild.id, "partners.deleted"))
             emb = discord.Embed(description=f"Partner removed: {l['type']} {l['ID']}", color=10949630, timestamp=self.bot.utcnow())
             emb.set_footer(text=ctx.guild.name)
-            emb.set_author(name=self.bot.user, icon_url=self.bot.user.avatar)
+            emb.set_author(name=self.bot.user, icon_url=self.bot.user.display_avatar)
             await self.bot.send_embed([emb])
         else:
             await ctx.send(await self.bot._(ctx.guild.id, "partners.unknown-error"))
