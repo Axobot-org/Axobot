@@ -146,7 +146,7 @@ class BotEvents(commands.Cog):
         title = await self.bot._(ctx.channel, "bot_events.rank-title")
         prices = await self.bot._(ctx.channel, "bot_events.events-prices")
         if current_event in prices.keys():
-            emojis = self.bot.get_cog("Emojis").customEmojis["green_check"], self.bot.get_cog("Emojis").customEmojis["red_cross"]
+            emojis = self.bot.get_cog("Emojis").customs["green_check"], self.bot.get_cog("Emojis").customs["red_cross"]
             p = list()
             for k, v in prices[current_event].items():
                 emoji = emojis[0] if int(k) <= points else emojis[1]

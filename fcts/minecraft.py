@@ -52,14 +52,14 @@ Every information come from the website www.fr-minecraft.net"""
                 key = "minecraft.net"
             if value == "green":
                 k = self.bot.get_cog(
-                    'Emojis').customEmojis['green_check'] + key
+                    'Emojis').customs['green_check'] + key
             elif value == "red":
-                k = self.bot.get_cog('Emojis').customEmojis['red_cross'] + key
+                k = self.bot.get_cog('Emojis').customs['red_cross'] + key
             elif value == 'yellow':
                 k = self.bot.get_cog(
-                    'Emojis').customEmojis['neutral_check'] + key
+                    'Emojis').customs['neutral_check'] + key
             else:
-                k = self.bot.get_cog('Emojis').customEmojis['blurple'] + key
+                k = self.bot.get_cog('Emojis').customs['blurple'] + key
                 dm = self.bot.get_user(279568324260528128).dm_channel
                 if dm is None:
                     await self.bot.get_user(279568324260528128).create_dm()

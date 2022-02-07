@@ -206,7 +206,7 @@ class Users(commands.Cog):
             else:
                 value = value[options[option]]
             if ctx.guild is None or ctx.channel.permissions_for(ctx.guild.me).external_emojis:
-                emojis = self.bot.get_cog('Emojis').customEmojis['green_check'], self.bot.get_cog('Emojis').customEmojis['red_cross']
+                emojis = self.bot.get_cog('Emojis').customs['green_check'], self.bot.get_cog('Emojis').customs['red_cross']
             else:
                 emojis = ('✅','❎')
             if value:

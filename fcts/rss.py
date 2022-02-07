@@ -573,7 +573,7 @@ class Rss(commands.Cog):
                 ctx.command.reset_cooldown(ctx)
                 return
             t = time.time()
-            msg = await ctx.send(await self.bot._(ctx.guild.id,"rss.guild-loading", emoji=ctx.bot.get_cog('Emojis').customEmojis['loading']))
+            msg = await ctx.send(await self.bot._(ctx.guild.id,"rss.guild-loading", emoji=ctx.bot.get_cog('Emojis').customs['loading']))
             liste = await self.get_guild_flows(ctx.guild.id)
             await self.main_loop(ctx.guild.id)
             await ctx.send(await self.bot._(ctx.guild.id,"rss.guild-complete", count=len(liste),time=round(time.time()-t,1)))
@@ -864,7 +864,7 @@ class Rss(commands.Cog):
             img_url = None
             if r is not None:
                 img_url = r.group(1)
-            obj = RssMessage(bot=self.bot,Type='twitch',url=feed['link'],title=feed['title'],emojis=self.bot.get_cog('Emojis').customEmojis,date=feed['published_parsed'],author=feeds.feed['title'].replace("'s Twitch video RSS",""),image=img_url,channel=nom)
+            obj = RssMessage(bot=self.bot,Type='twitch',url=feed['link'],title=feed['title'],emojis=self.bot.get_cog('Emojis').customs,date=feed['published_parsed'],author=feeds.feed['title'].replace("'s Twitch video RSS",""),image=img_url,channel=nom)
             return [obj]
         else:
             liste = list()
@@ -877,7 +877,7 @@ class Rss(commands.Cog):
                 img_url = None
                 if r is not None:
                     img_url = r.group(1)
-                obj = RssMessage(bot=self.bot,Type='twitch',url=feed['link'],title=feed['title'],emojis=self.bot.get_cog('Emojis').customEmojis,date=feed['published_parsed'],author=feeds.feed['title'].replace("'s Twitch video RSS",""),image=img_url,channel=nom)
+                obj = RssMessage(bot=self.bot,Type='twitch',url=feed['link'],title=feed['title'],emojis=self.bot.get_cog('Emojis').customs,date=feed['published_parsed'],author=feeds.feed['title'].replace("'s Twitch video RSS",""),image=img_url,channel=nom)
                 liste.append(obj)
             liste.reverse()
             return liste
@@ -936,7 +936,7 @@ class Rss(commands.Cog):
                 Type='web',
                 url=l,
                 title=title,
-                emojis=self.bot.get_cog('Emojis').customEmojis,
+                emojis=self.bot.get_cog('Emojis').customs,
                 date=datz,
                 author=author,
                 channel=feeds.feed['title'] if 'title' in feeds.feed.keys() else '?',
@@ -980,7 +980,7 @@ class Rss(commands.Cog):
                         Type='web',
                         url=l,
                         title=title,
-                        emojis=self.bot.get_cog('Emojis').customEmojis,
+                        emojis=self.bot.get_cog('Emojis').customs,
                         date=datz,
                         author=author,
                         channel=feeds.feed['title'] if 'title' in feeds.feed.keys() else '?',
@@ -1003,7 +1003,7 @@ class Rss(commands.Cog):
             feed = feeds.entries[0]
             img_url = feed['media_content'][0]['url']
             title = re.search(r"DeviantArt: ([^ ]+)'s gallery",feeds.feed['title']).group(1)
-            obj = RssMessage(bot=self.bot,Type='deviant',url=feed['link'],title=feed['title'],emojis=self.bot.get_cog('Emojis').customEmojis,date=feed['published_parsed'],author=title,image=img_url)
+            obj = RssMessage(bot=self.bot,Type='deviant',url=feed['link'],title=feed['title'],emojis=self.bot.get_cog('Emojis').customs,date=feed['published_parsed'],author=title,image=img_url)
             return [obj]
         else:
             liste = list()
@@ -1012,7 +1012,7 @@ class Rss(commands.Cog):
                     break
                 img_url = feed['media_content'][0]['url']
                 title = re.search(r"DeviantArt: ([^ ]+)'s gallery",feeds.feed['title']).group(1)
-                obj = RssMessage(bot=self.bot,Type='deviant',url=feed['link'],title=feed['title'],emojis=self.bot.get_cog('Emojis').customEmojis,date=feed['published_parsed'],author=title,image=img_url)
+                obj = RssMessage(bot=self.bot,Type='deviant',url=feed['link'],title=feed['title'],emojis=self.bot.get_cog('Emojis').customs,date=feed['published_parsed'],author=title,image=img_url)
                 liste.append(obj)
             liste.reverse()
             return liste

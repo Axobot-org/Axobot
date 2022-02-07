@@ -131,7 +131,7 @@ class Fun(commands.Cog):
         if ctx.author.id == 375598088850505728:
             await ctx.send(file=await self.utilities.find_img("cookie-target.gif"))
         else:
-            emoji = self.bot.get_cog('Emojis').customEmojis['cookies_eat']
+            emoji = self.bot.get_cog('Emojis').customs['cookies_eat']
             await ctx.send(await self.bot._(ctx.guild,"fun.cookie", user=ctx.author.mention, emoji=emoji))
 
     @commands.command(name="reverse", hidden=True)
@@ -166,7 +166,7 @@ You can specify a verification limit by adding a number in argument (up to 1.000
             limit = int(user.name)
             user = None
         if limit > MAX:
-            await ctx.send(await self.bot._(ctx.channel,"fun.count.too-much",l=MAX,e=self.bot.get_cog('Emojis').customEmojis['wat']))
+            await ctx.send(await self.bot._(ctx.channel,"fun.count.too-much",l=MAX,e=self.bot.get_cog('Emojis').customs['wat']))
             return
         if ctx.guild is not None and not channel.permissions_for(ctx.guild.me).read_message_history:
             await ctx.send(await self.bot._(channel,"fun.count.missing-perms"))
@@ -308,7 +308,7 @@ You can specify a verification limit by adding a number in argument (up to 1.000
         elif r == 3:
             await ctx.send(file=await self.utilities.find_img('parrot.gif'))
         elif r == 4:
-            e = self.bot.get_cog('Emojis').customEmojis['blob_dance']
+            e = self.bot.get_cog('Emojis').customs['blob_dance']
             await ctx.send(e*5)
         elif r == 5:
             await ctx.send(file=await self.utilities.find_img('cameleon.gif'))
@@ -317,33 +317,33 @@ You can specify a verification limit by adding a number in argument (up to 1.000
     @commands.check(is_fun_enabled)
     async def cat_gif(self, ctx: MyContext):
         """Wow... So cuuuute !
-        
+
         ..Doc fun.html#cat"""
         await ctx.send(random.choice(['http://images6.fanpop.com/image/photos/40800000/tummy-rub-kitten-animated-gif-cute-kittens-40838484-380-227.gif',
         'http://25.media.tumblr.com/7774fd7794d99b5998318ebd5438ba21/tumblr_n2r7h35U211rudcwro1_400.gif',
         'https://www.2tout2rien.fr/wp-content/uploads/2014/10/37-pestes-de-chats-mes-bonbons.gif',
         'http://coquelico.c.o.pic.centerblog.net/chat-peur.gif',
         'https://tenor.com/view/nope-bye-cat-leave-done-gif-12387359']))
-    
+
     @commands.command(name="happy-birthday", hidden=True, aliases=['birthday', 'hb'])
     @commands.check(is_fun_enabled)
     async def birthday_gif(self, ctx: MyContext):
         """How many candles this year?
-        
+
         ..Doc fun.html#birthdays"""
         await ctx.send(random.choice(['https://tenor.com/view/happy-birthday-cat-cute-birthday-cake-second-birthday-gif-16100991',
         'https://tenor.com/view/happy-birthday-birthday-cake-goat-licking-lick-gif-15968273',
         'https://tenor.com/view/celebracion-gif-4928008',
         'https://tenor.com/view/kitty-birthday-birthday-kitty-happy-birthday-happy-birthday-to-you-hbd-gif-13929089',
         'https://tenor.com/view/happy-birthday-happy-birthday-to-you-hbd-birthday-celebrate-gif-13366300']))
-    
+
     @commands.command(name="bigtext",hidden=True)
     @commands.check(is_fun_enabled)
     async def big_text(self, ctx: MyContext, *, text: str):
         """If you wish to write bigger
 
         ..Example bigtext Hi world! I'm 69?!
-        
+
         ..Doc fun.html#bigtext"""
         # contenu = await self.bot.get_cog('Utilities').clear_msg(text,ctx=ctx,emojis=False)
         contenu = await commands.clean_content().convert(ctx, text)
@@ -384,15 +384,15 @@ You can specify a verification limit by adding a number in argument (up to 1.000
         except commands.CommandError: # user can't use 'say'
             pass
         self.bot.log.debug("{} used bigtext to say {}".format(ctx.author.id,text))
-    
+
     @commands.command(name="shrug",hidden=True)
     @commands.check(is_fun_enabled)
     async def shrug(self, ctx: MyContext):
         """Don't you know? Neither do I
-        
+
         ..Doc fun.html#shrug"""
         await ctx.send(file=await self.utilities.find_img('shrug.gif'))
-    
+
     @commands.command(name="rekt",hidden=True)
     @commands.check(is_fun_enabled)
     async def rekt(self, ctx: MyContext):
@@ -928,7 +928,7 @@ You can specify a verification limit by adding a number in argument (up to 1.000
                 return
         else:
             if ctx.bot_permissions.external_emojis:
-                emojis = self.bot.get_cog('Emojis').numbEmojis
+                emojis = self.bot.get_cog('Emojis').numbers
             else:
                 emojis = [chr(48+i)+chr(8419) for i in range(10)]
             if number>20 or number < 0:
