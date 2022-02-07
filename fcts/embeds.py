@@ -94,7 +94,7 @@ class Embeds(commands.Cog):
 
         def set_author(self, user: discord.User):
             self.author_name = user.name
-            self.author_icon = user.avatar.with_static_format("png")
+            self.author_icon = user.display_avatar.with_static_format("png")
             return self
         
         async def create_footer(self, ctx:MyContext, user: typing.Union[discord.User,discord.Member]=None):
