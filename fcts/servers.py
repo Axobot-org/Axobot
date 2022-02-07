@@ -7,6 +7,8 @@ import discord
 from discord.ext import commands
 from math import ceil
 
+from cachingutils import LRUCache
+
 roles_options = ["clear","slowmode","mute","kick","ban","warn","say","welcome_roles","muted_role",'partner_role','update_mentions','verification_role','voice_roles']
 bool_options = ["enable_xp","anti_caps_lock","enable_fun","help_in_dm","compress_help"]
 textchan_options = ["welcome_channel","bot_news","poll_channels","modlogs_channel","noxp_channels","partner_channel"]
@@ -33,8 +35,8 @@ class Servers(commands.Cog):
         self.embed_color = discord.Colour(0x3fb9ef)
         self.log_color = 1793969
         self.file = "servers"
+        self.cache: LRUCache = LRUCache(max_size=10000, timeout=3600)
         self.raids_levels = ["None","Smooth","Careful","High","(╯°□°）╯︵ ┻━┻"]
-        self.table = 'servers_beta' if bot.beta else 'servers'
         self.default_opt = {"rr_max_number":7,
                "rss_max_number":10,
                "roles_react_max_number":20,
@@ -85,10 +87,9 @@ class Servers(commands.Cog):
         self.optionsList = ["prefix","language","description","clear","slowmode","mute","kick","ban","warn","say","welcome_channel","welcome","leave","welcome_roles","bot_news","update_mentions","poll_channels","partner_channel","partner_color","partner_role","modlogs_channel","verification_role","enable_xp","levelup_msg","levelup_channel","noxp_channels","xp_rate","xp_type","anti_caps_lock","enable_fun","membercounter","anti_raid","vote_emojis","morpion_emojis","help_in_dm","compress_help","muted_role","voice_roles","voice_channel","voice_category","voice_channel_format","ttt_display"]
         self.membercounter_pending = {}
 
-    @commands.Cog.listener()
-    async def on_ready(self):
-        self.table = 'servers_beta' if self.bot.beta else 'servers'
-
+    @property
+    def table(self):
+        return 'servers_beta' if self.bot.beta else 'servers'
 
     async def get_bot_infos(self, botID: int):
         """Return every options of the bot"""
@@ -171,20 +172,24 @@ class Servers(commands.Cog):
                 return True
         raise commands.CommandError("User doesn't have required roles")
 
-    async def get_option(self, ID: int, name: str) -> typing.Optional[str]:
+    async def get_option(self, guild_id: int, name: str) -> typing.Optional[str]:
         """return the value of an option
         Return None if this option doesn't exist or if no value has been set"""
-        if isinstance(ID, discord.Guild):
-            ID = ID.id
-        elif ID is None or not self.bot.database_online:
+        if isinstance(guild_id, discord.Guild):
+            guild_id = guild_id.id
+        elif guild_id is None or not self.bot.database_online:
             return None
-        l = await self.get_server([name],criters=["ID="+str(ID)],return_type=list)
-        if len(l) == 0:
-            return None
-        elif l[0][0] == '':
-            return self.default_opt[name]
+        if (cached := self.cache.get((guild_id, name))) is not None:
+            return cached
+        sql_result = await self.get_server([name],criters=["ID="+str(guild_id)],return_type=list)
+        if len(sql_result) == 0:
+            value = None
+        elif sql_result[0][0] == '':
+            value = self.default_opt[name]
         else:
-            return l[0][0]
+            value = sql_result[0][0]
+        self.cache[(guild_id, name)] = value
+        return value
 
     async def get_server(self, columns=[], criters=["ID > 1"], relation="AND", return_type=dict):
         """return every options of a server"""
@@ -215,25 +220,27 @@ class Servers(commands.Cog):
         query = f"UPDATE `{self.table}` SET {set_query} WHERE `ID`={guild_id}"
         async with self.bot.db_query(query, (val[1] for val in values)):
             pass
+        for value in values:
+            self.cache[(guild_id, value[0])] = value[1]
         return True
 
-    async def delete_option(self, ID: int, opt):
-        """reset an option"""
+    async def delete_option(self, guild_id: int, opt):
+        """Reset an option"""
         if opt not in self.default_opt.keys():
             raise ValueError
         value = self.default_opt[opt]
         if opt == 'language':
-            await self.bot.get_cog('Languages').change_cache(ID,value)
+            await self.bot.get_cog('Languages').change_cache(guild_id,value)
         elif opt == 'prefix':
-            await self.bot.prefix_manager.update_prefix(ID,value)
-        return await self.modify_server(ID,values=[(opt,value)])
+            await self.bot.prefix_manager.update_prefix(guild_id,value)
+        return await self.modify_server(guild_id,values=[(opt,value)])
 
-    async def add_server(self, ID: int):
+    async def add_server(self, guild_id: int):
         """add a new server to the db"""
-        if isinstance(ID, str):
-            if not ID.isnumeric():
+        if isinstance(guild_id, str):
+            if not guild_id.isnumeric():
                 raise ValueError
-        query = "INSERT INTO `{}` (`ID`) VALUES ('{}')".format(self.table,ID)
+        query = "INSERT INTO `{}` (`ID`) VALUES ('{}')".format(self.table,guild_id)
         async with self.bot.db_query(query):
             pass
         return True
