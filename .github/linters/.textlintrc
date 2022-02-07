@@ -3,13 +3,6 @@
     "comments": true
   },
   "rules": {
-    "no-dead-link": {
-      "ignore": [
-        "https://zrunner.me/invitezbot",
-        "http://zbot.readthedocs.io",
-        "https://discord.gg/*"
-      ]
-    },
     "terminology": {
       "exclude": ["web[- ]?site(s)?"]
     }
