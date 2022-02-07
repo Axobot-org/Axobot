@@ -4,13 +4,13 @@ from libs.classes import Zbot
 
 class Welcomer(commands.Cog):
     """Cog which manages the departure and arrival of members in the servers"""
-    
+
     def __init__(self, bot: Zbot):
         self.bot = bot
         self.file = "welcomer"
         self.no_message = [392766377078816789,504269440872087564,552273019020771358]
 
-    
+
     @commands.Cog.listener()
     async def on_member_join(self, member:discord.Member):
         """Main function called when a member joins a server"""
@@ -25,7 +25,7 @@ class Welcomer(commands.Cog):
                     await self.check_owner_server(member)
                     await self.check_support(member)
                     await self.check_contributor(member)
-    
+
     @commands.Cog.listener()
     async def on_member_update(self, before:discord.Member, after:discord.Member):
         """Main function called when a member got verified in a community server"""
@@ -35,8 +35,8 @@ class Welcomer(commands.Cog):
                 self.bot.loop.create_task(self.give_roles(after))
                 await self.give_roles_back(after)
                 await self.check_muted(after)
-        
-        
+
+
     @commands.Cog.listener()
     async def on_member_remove(self, member:discord.Member):
         """Fonction principale appelée lorsqu'un membre quitte un serveur"""
@@ -117,7 +117,7 @@ class Welcomer(commands.Cog):
         xp = await self.bot.get_cog('Xp').bdd_get_xp(member.id, None if used_xp_type == 0 else member.guild.id)
         if xp is not None and len(xp) == 1:
             await self.bot.get_cog('Xp').give_rr(member,(await self.bot.get_cog('Xp').calc_level(xp[0]['xp'],used_xp_type))[0],await self.bot.get_cog('Xp').rr_list_role(member.guild.id))
-    
+
     async def check_muted(self, member: discord.Member):
         """Give the muted role to that user if needed"""
         modCog = self.bot.get_cog("Moderation")
@@ -180,10 +180,10 @@ class Welcomer(commands.Cog):
         account_created_since = (self.bot.utcnow() - member.created_at).total_seconds()
         # Level 4
         if level >= 4:
-            if account_created_since <= 120*60: # kick accounts created less than 2h before
+            if account_created_since <= 86400: # kick accounts created less than 1d before
                 if await self.kick(member,await self.bot._(member.guild.id,"logs.reason.young")):
                     return True
-            if account_created_since <= 60*60 and can_ban: # ban members created less than 1h before
+            if account_created_since <= 3600*12 and can_ban: # ban members created less than 1h before
                 if await self.ban(member,await self.bot._(member.guild.id,"logs.reason.young")):
                     return True
         # Level 3 or more
@@ -192,19 +192,19 @@ class Welcomer(commands.Cog):
             if self.bot.get_cog('Utilities').sync_check_discord_invite(member.name) is not None:
                 if await self.ban(member,await self.bot._(member.guild.id,"logs.reason.invite")):
                     return True
-            if account_created_since <= 45*60: # kick accounts created less than 45min before
+            if account_created_since <= 3600*12: # kick accounts created less than 45min before
                 if await self.kick(member,await self.bot._(member.guild.id,"logs.reason.young")):
                     return True
         # Level 2 or more
         if level >= 2: # kick accounts created less than 15min before
-            if account_created_since <= 15*60:
+            if account_created_since <= 3600*2:
                 if await self.kick(member,await self.bot._(member.guild.id,"logs.reason.young")):
                     return True
         # Level 1 or more
         if level >= 1: # kick members with invitations in their nickname
             if self.bot.get_cog('Utilities').sync_check_discord_invite(member.name) is not None:
                 if await self.kick(member,await self.bot._(member.guild.id,"logs.reason.invite")):
-                    return True       
+                    return True 
         # Nothing got triggered
         return False
 
