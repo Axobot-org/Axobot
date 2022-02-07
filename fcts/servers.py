@@ -364,7 +364,7 @@ class Servers(commands.Cog):
             await ctx.send(msg)
             msg = "Reset option in server {}: {}".format(ctx.guild.id,option)
             emb = discord.Embed(description=msg, color=self.log_color, timestamp=self.bot.utcnow())
-            emb.set_author(name=self.bot.user, icon_url=self.bot.user.avatar)
+            emb.set_author(name=self.bot.user, icon_url=self.bot.user.display_avatar)
             await self.bot.send_embed([emb])
             self.bot.log.debug(msg)
         except ValueError:
@@ -377,7 +377,7 @@ class Servers(commands.Cog):
         msg = "Changed option in server {}: {} = `{}`".format(guild.id,option,value)
         emb = discord.Embed(description=msg, color=self.log_color, timestamp=self.bot.utcnow())
         emb.set_footer(text=guild.name)
-        emb.set_author(name=self.bot.user, icon_url=self.bot.user.avatar)
+        emb.set_author(name=self.bot.user, icon_url=self.bot.user.display_avatar)
         await self.bot.send_embed([emb])
         self.bot.log.debug(msg)
 
@@ -1108,7 +1108,7 @@ class Servers(commands.Cog):
                 i += 1
         if i > 0:
             emb = discord.Embed(description=f"[MEMBERCOUNTER] {i} channels refreshed", color=5011628, timestamp=self.bot.utcnow())
-            emb.set_author(name=self.bot.user, icon_url=self.bot.user.avatar)
+            emb.set_author(name=self.bot.user, icon_url=self.bot.user.display_avatar)
             await self.bot.send_embed([emb], url="loop")
 
 

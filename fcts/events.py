@@ -136,7 +136,7 @@ class Events(commands.Cog):
                 else:
                     desc = "Bot **left the server** {} ({}) - {} users".format(guild.name,guild.id,len(guild.members))
             emb = discord.Embed(description=desc, color=self.embed_colors['welcome'], timestamp=self.bot.utcnow())
-            emb.set_author(name=self.bot.user, icon_url=self.bot.user.avatar)
+            emb.set_author(name=self.bot.user, icon_url=self.bot.user.display_avatar)
             await self.bot.send_embed([emb])
             if self.bot.database_online:
                 await self.send_sql_statslogs()
@@ -548,7 +548,7 @@ class Events(commands.Cog):
         self.bot.get_cog("BotEvents").updateCurrentEvent()
         e = self.bot.get_cog("BotEvents").current_event
         emb = discord.Embed(description=f'**Bot event** updated (current event is {e})', color=1406147, timestamp=self.bot.utcnow())
-        emb.set_author(name=self.bot.user, icon_url=self.bot.user.avatar)
+        emb.set_author(name=self.bot.user, icon_url=self.bot.user.display_avatar)
         await self.bot.send_embed([emb], url="loop")
         self.last_eventDay_check = datetime.datetime.today()
 
@@ -630,7 +630,7 @@ class Events(commands.Cog):
         answers = '-'.join(str(x) for x in answers)
         delta_time = round(time.time()-t,3)
         emb = discord.Embed(description=f'**Guilds count updated** in {delta_time}s ({answers})', color=7229109, timestamp=self.bot.utcnow())
-        emb.set_author(name=self.bot.user, icon_url=self.bot.user.avatar)
+        emb.set_author(name=self.bot.user, icon_url=self.bot.user.display_avatar)
         await self.bot.send_embed([emb], url="loop")
         self.dbl_last_sending = datetime.datetime.now()
 
@@ -658,7 +658,7 @@ class Events(commands.Cog):
             description=f'**Partners channels updated** in {delta_time}s ({count[0]} channels - {count[1]} partners)',
             color=10949630,
             timestamp=self.bot.utcnow())
-        emb.set_author(name=self.bot.user, icon_url=self.bot.user.avatar)
+        emb.set_author(name=self.bot.user, icon_url=self.bot.user.display_avatar)
         await self.bot.send_embed([emb], url="loop")
 
     async def translations_backup(self):
@@ -677,7 +677,7 @@ class Events(commands.Cog):
             return
         delta_time = round(time.time()-t,3)
         emb = discord.Embed(description=f'**Translations files backup** completed in {delta_time}s', color=10197915, timestamp=self.bot.utcnow())
-        emb.set_author(name=self.bot.user, icon_url=self.bot.user.avatar)
+        emb.set_author(name=self.bot.user, icon_url=self.bot.user.display_avatar)
         await self.bot.send_embed([emb], url="loop")
 
     async def send_sql_statslogs(self):
@@ -715,7 +715,7 @@ class Events(commands.Cog):
             await self.bot.get_cog("Errors").senf_err_msg(query)
             raise err
         emb = discord.Embed(description='**Stats logs** updated', color=5293283, timestamp=self.bot.utcnow())
-        emb.set_author(name=self.bot.user, icon_url=self.bot.user.avatar)
+        emb.set_author(name=self.bot.user, icon_url=self.bot.user.display_avatar)
         await self.bot.send_embed([emb], url="loop")
         self.statslogs_last_push = datetime.datetime.now()
 
