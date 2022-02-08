@@ -149,7 +149,7 @@ class Welcomer(commands.Cog):
             await self.bot.get_cog("Moderation").send_modlogs("kick", member, self.bot.user, member.guild, reason=reason)
             return True
 
-    async def ban(self, member: discord.Member, reason: str):
+    async def ban(self, member: discord.Member, reason: str, duration: int = None):
         # if user is too high
         if member.roles[-1].position >= member.guild.me.roles[-1].position:
             return False
@@ -163,6 +163,8 @@ class Welcomer(commands.Cog):
         except (discord.Forbidden, discord.HTTPException):
             return False
         else:
+            if duration:
+                await self.bot.get_cog('Events').add_task('ban', duration, member.id, member.guild.id)
             log = str(await self.bot._(member.guild.id,"logs.ban")).format(member=member,reason=reason,case=None)
             await self.bot.get_cog("Events").send_logs_per_server(member.guild,"ban",log,member.guild.me)
             return True
@@ -183,14 +185,17 @@ class Welcomer(commands.Cog):
             if account_created_since <= 86400: # kick accounts created less than 1d before
                 if await self.kick(member,await self.bot._(member.guild.id,"logs.reason.young")):
                     return True
-            if account_created_since <= 3600*12 and can_ban: # ban members created less than 1h before
-                if await self.ban(member,await self.bot._(member.guild.id,"logs.reason.young")):
+            if account_created_since <= 3600 and can_ban: # ban (2w) members created less than 1h before
+                if await self.ban(member, await self.bot._(member.guild.id,"logs.reason.young"), 86400*14):
+                    return True
+            elif account_created_since <= 3600*3 and can_ban: # ban (1w) members created less than 3h before
+                if await self.ban(member, await self.bot._(member.guild.id,"logs.reason.young"), 86400*7):
                     return True
         # Level 3 or more
         if level >= 3 and can_ban:
-            # ban members with invitations in their nickname
+            # ban (1w) members with invitations in their nickname
             if self.bot.get_cog('Utilities').sync_check_discord_invite(member.name) is not None:
-                if await self.ban(member,await self.bot._(member.guild.id,"logs.reason.invite")):
+                if await self.ban(member, await self.bot._(member.guild.id,"logs.reason.invite"), 86400*7):
                     return True
             if account_created_since <= 3600*12: # kick accounts created less than 45min before
                 if await self.kick(member,await self.bot._(member.guild.id,"logs.reason.young")):
