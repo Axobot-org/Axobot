@@ -382,7 +382,7 @@ You can also mute this member for a defined duration, then use the following for
                     case = Cases.Case(bot=self.bot,guildID=ctx.guild.id,memberID=user.id,Type="mute",ModID=ctx.author.id,Reason=reason,date=ctx.bot.utcnow())
                 else:
                     case = Cases.Case(bot=self.bot,guildID=ctx.guild.id,memberID=user.id,Type="tempmute",ModID=ctx.author.id,Reason=reason,date=ctx.bot.utcnow(),duration=duration)
-                    await self.bot.get_cog('Events').add_task('mute',duration,user.id,ctx.guild.id)
+                    await self.bot.task_handler.add_task('mute',duration,user.id,ctx.guild.id)
                 try:
                     await Cases.add_case(case)
                     caseID = case.id
@@ -486,8 +486,7 @@ This will remove the role 'muted' for the targeted member
             except:
                 pass
             # remove planned automatic unmutes
-            if cog := self.bot.get_cog("Events"):
-                await cog.cancel_unmute(user.id, ctx.guild.id)
+            await self.bot.task_handler.cancel_unmute(user.id, ctx.guild.id)
         except Exception as e:
             await ctx.send(await self.bot._(ctx.guild.id, "moderation.error"))
             await self.bot.get_cog('Errors').on_error(e,ctx)
@@ -573,7 +572,7 @@ The 'days_to_delete' option represents the number of days worth of messages to d
                     case = Cases.Case(bot=self.bot,guildID=ctx.guild.id,memberID=user.id,Type="ban",ModID=ctx.author.id,Reason=reason,date=ctx.bot.utcnow())
                 else:
                     case = Cases.Case(bot=self.bot,guildID=ctx.guild.id,memberID=user.id,Type="tempban",ModID=ctx.author.id,Reason=reason,date=ctx.bot.utcnow(),duration=duration)
-                    await self.bot.get_cog('Events').add_task('ban',duration,user.id,ctx.guild.id)
+                    await self.bot.task_handler.add_task('ban',duration,user.id,ctx.guild.id)
                 try:
                     await Cases.add_case(case)
                     case_id = case.id

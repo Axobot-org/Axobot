@@ -13,6 +13,7 @@ from utils import get_prefix
 
 from libs.database import create_database_query
 from libs.prefix_manager import PrefixManager
+from libs.tasks_handler import TaskHandler
 
 
 class MyContext(commands.Context):
@@ -81,6 +82,7 @@ class Zbot(commands.bot.AutoShardedBot):
         self.others = dict() # other misc credentials
         self.zombie_mode: bool = zombie_mode # if we should listen without sending any message
         self.prefix_manager = PrefixManager(self)
+        self.task_handler = TaskHandler(self)
 
     allowed_commands = ("eval", "add_cog", "del_cog")
 

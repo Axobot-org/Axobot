@@ -65,7 +65,7 @@ class Timers(commands.Cog):
         f_duration = await FormatUtils.time_delta(duration,lang=await self.bot._(ctx.channel,'_used_locale'), year=True, form='developed')
         try:
             d = {'msg_url': ctx.message.jump_url}
-            await ctx.bot.get_cog('Events').add_task("timer", duration, ctx.author.id, ctx.guild.id if ctx.guild else None, ctx.channel.id, message, data=d)
+            await ctx.bot.task_handler.add_task("timer", duration, ctx.author.id, ctx.guild.id if ctx.guild else None, ctx.channel.id, message, data=d)
         except Exception as e:
             await ctx.bot.get_cog("Errors").on_command_error(ctx,e)
         else:
@@ -130,8 +130,10 @@ class Timers(commands.Cog):
             item = query_results
         ctx2 = copy.copy(ctx)
         ctx2.message.content = item["message"]
-        item["message"] = (await commands.clean_content(fix_channel_mentions=True).convert(ctx2, item["message"])).replace("`", "\\`")
-        await self.bot.get_cog("Events").remove_task(item["ID"])
+        item["message"] = (
+            await commands.clean_content(fix_channel_mentions=True).convert(ctx2, item["message"])
+            ).replace("`", "\\`")
+        await self.bot.task_handler.remove_task(item["ID"])
         await ctx.send(await self.bot._(ctx.channel, "timers.rmd.deleted", id=item["ID"], message=item["message"]))
 
     @remind_main.command(name="clear")
