@@ -712,7 +712,7 @@ class Servers(commands.Cog):
             return await self.get_option(guild.id,option)
         else:
             if value.isnumeric():
-                value = eval(value)
+                value = int(value)
                 await self.send_embed(ctx.guild, option, value)
             else:
                 msg = await self.bot._(ctx.guild.id, "server.edit-error.numeric", name=option)
