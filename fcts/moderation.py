@@ -559,18 +559,14 @@ The 'days_to_delete' option represents the number of days worth of messages to d
                 if member.roles[-1].position >= ctx.guild.me.roles[-1].position:
                     await ctx.send(await self.bot._(ctx.guild.id, "moderation.ban.too-high"))
                     return
-            # send DM
-            await self.dm_user(user, "ban", ctx, reason = None if reason=="Unspecified" else reason)
-            if not days_to_delete in range(8):
+                # send DM only if the user is still in the server
+                await self.dm_user(user, "ban", ctx, reason = None if reason=="Unspecified" else reason)
+            if days_to_delete not in range(8):
                 days_to_delete = 0
             reason = await self.bot.get_cog("Utilities").clear_msg(reason,everyone = not ctx.channel.permissions_for(ctx.author).mention_everyone)
             await ctx.guild.ban(user,reason=reason[:512],delete_message_days=days_to_delete)
-            if f_duration is None:
-                self.bot.log.info("L'utilisateur {} a été banni du serveur {} pour la raison {}".format(user.id,ctx.guild.id,reason))
-            else:
-                self.bot.log.info("L'utilisateur {} a été banni du serveur {} pour la raison {} pendant {}".format(user.id,ctx.guild.id,reason,f_duration))
             await self.bot.get_cog('Events').add_event('ban')
-            caseID = "'Unsaved'"
+            case_id = "'Unsaved'"
             if self.bot.database_online:
                 Cases = self.bot.get_cog('Cases')
                 if f_duration is None:
@@ -580,15 +576,15 @@ The 'days_to_delete' option represents the number of days worth of messages to d
                     await self.bot.get_cog('Events').add_task('ban',duration,user.id,ctx.guild.id)
                 try:
                     await Cases.add_case(case)
-                    caseID = case.id
-                except Exception as e:
-                    await self.bot.get_cog('Errors').on_error(e,ctx)
+                    case_id = case.id
+                except Exception as err:
+                    await self.bot.get_cog('Errors').on_error(err,ctx)
             try:
                 await ctx.message.delete()
             except:
                 pass
             # optional values
-            opt_case = None if caseID=="'Unsaved'" else caseID
+            opt_case = None if case_id=="'Unsaved'" else case_id
             opt_reason = None if reason=="Unspecified" else reason
             # send message in chat
             await self.send_chat_answer("ban", user, ctx, opt_case)
@@ -596,9 +592,9 @@ The 'days_to_delete' option represents the number of days worth of messages to d
             await self.send_modlogs("ban", user, ctx.author, ctx.guild, opt_case, opt_reason, f_duration)
         except discord.errors.Forbidden:
             await ctx.send(await self.bot._(ctx.guild.id, "moderation.ban.too-high"))
-        except Exception as e:
+        except Exception as err:
             await ctx.send(await self.bot._(ctx.guild.id, "moderation.error"))
-            await self.bot.get_cog('Errors').on_error(e,ctx)
+            await self.bot.get_cog('Errors').on_error(err,ctx)
 
     async def unban_event(self, guild: discord.Guild, user: discord.User, author: discord.User):
         if not guild.me.guild_permissions.ban_members:
