@@ -164,7 +164,7 @@ class Welcomer(commands.Cog):
             return False
         else:
             if duration:
-                await self.bot.get_cog('Events').add_task('ban', duration, member.id, member.guild.id)
+                await self.bot.task_handler.add_task('ban', duration, member.id, member.guild.id)
             log = str(await self.bot._(member.guild.id,"logs.ban")).format(member=member,reason=reason,case=None)
             await self.bot.get_cog("Events").send_logs_per_server(member.guild,"ban",log,member.guild.me)
             return True
