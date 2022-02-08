@@ -421,7 +421,7 @@ class Events(commands.Cog):
                         continue
                     try:
                         user = await self.bot.fetch_user(task['user'])
-                    except:
+                    except discord.DiscordException:
                         continue
                     await self.bot.get_cog('Moderation').unban_event(guild,user,guild.me)
                     await self.remove_task(task['ID'])
