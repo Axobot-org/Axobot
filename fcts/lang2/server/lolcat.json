@@ -26,9 +26,9 @@
             "category": "ur '%{opt}' option haz been changd with teh %{val} category",
             "color": "The coulor uzd for the option %{opt} is naw %{val}",
             "emojis": "Teh emojiz 4 the opshun '%{opt}' are naw %{val}",
-            "lang": "Teh bot lang is naw in %{lang}",
+            "lang": "Teh bot lang is naw in %{val}",
             "levelup_channel": {
-                "chan": "lvlup messages will naw B sent 2 %{chan}",
+                "chan": "lvlup messages will naw B sent 2 %{val}",
                 "any": "Levelup msgs will naw be post directly in teh chat",
                 "none": "Levelup msg won't :b: send anymore :sad:"
             },

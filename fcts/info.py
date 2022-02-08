@@ -505,7 +505,6 @@ Available types: member, role, user, emoji, channel, server, invite, category
         infos_uses = await self.get_emojis_info(emoji.id)
         if len(infos_uses) > 0:
             infos_uses = infos_uses[0]
-            lang = await self.bot._(ctx.channel,'_used_locale')
             date = f"<t:{infos_uses['added_at'].timestamp():.0f}:D>"
             embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.emoji-5"), value=await self.bot._(ctx.guild.id,"info.info.emoji-5v",nbr=infos_uses['count'],date=date))
         await ctx.send(embed=embed)
@@ -782,7 +781,6 @@ Available types: member, role, user, emoji, channel, server, invite, category
 
     @info_main.command(name="id", aliases=["snowflake"])
     async def snowflake_infos(self, ctx: MyContext, snowflake: args.snowflake):
-        lang = await self.bot._(ctx.guild.id,"_used_locale")
         date = f"<t:{snowflake.date.timestamp():.0f}>"
         embed = discord.Embed(color=default_color, timestamp=ctx.message.created_at)
         embed.add_field(name=await self.bot._(ctx.channel,"info.info.snowflake-0"), value=date)
@@ -900,7 +898,6 @@ Servers:
         if isinstance(guild, str) or guild is None:
             await ctx.send("Serveur introuvable")
             return
-        msglang = await self.bot._(ctx.channel,'_used_locale')
         # Bots
         bots = len([x for x in guild.members if x.bot])
         # Lang

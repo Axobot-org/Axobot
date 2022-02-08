@@ -309,7 +309,7 @@ class Servers(commands.Cog):
         if not ctx.bot.database_online:
             return await ctx.send(await self.bot._(ctx.guild.id,"cases.no_database"))
         await self.sconfig_del2(ctx, option)
-    
+
     @sconfig_main.command(name="change")
     @commands.cooldown(1, 2, commands.BucketType.guild)
     async def sconfig_change(self, ctx: MyContext, option:str, *, value: str):
