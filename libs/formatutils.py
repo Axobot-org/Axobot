@@ -2,10 +2,7 @@ from datetime import timedelta, datetime
 import time
 from typing import Union
 
-import discord
 from babel import dates, numbers
-from libs.classes import Zbot
-
 
 def get_locale(lang: str):
     "Get a i18n locale from a given bot language"
@@ -82,7 +79,7 @@ class FormatUtils:
                 result += dates.format_timedelta(timedelta(seconds=seconds_hours), granularity="hour", **kwargs) + " "
                 # we remove hours
                 delta %= TIMEDELTA_UNITS.hour
-            if delta > TIMEDELTA_UNITS.minute:
+            if delta >= TIMEDELTA_UNITS.minute:
                 # we calculate trunked value in seconds (to avoid babel rounding it)
                 seconds_minutes = delta // TIMEDELTA_UNITS.minute * TIMEDELTA_UNITS.minute
                 # then format
@@ -90,10 +87,10 @@ class FormatUtils:
                 # we remove minutes
                 delta %= TIMEDELTA_UNITS.minute
             # then format
-            result += dates.format_timedelta(timedelta(seconds=delta), granularity="second", **kwargs)
+            if delta > 0:
+                result += dates.format_timedelta(timedelta(seconds=delta), granularity="second", **kwargs)
 
         return result.strip()
-
 
     @staticmethod
     async def date(date: Union[datetime, time.struct_time], lang: str = 'fr',
@@ -124,10 +121,8 @@ class FormatUtils:
 
         return result
 
-    
     @staticmethod
     async def format_nbr(number: Union[int, float], lang: str) -> str:
         "Format any number in the given language"
         locale = get_locale(lang)
         return numbers.format_decimal(number, locale=locale)
-
