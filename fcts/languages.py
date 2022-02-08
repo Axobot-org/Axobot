@@ -8,7 +8,7 @@ class Languages(discord.ext.commands.Cog):
     def __init__(self, bot: Zbot):
         self.bot = bot
         self.file = "languages"
-        self.languages = ['fr', 'en', 'lolcat', 'fi', 'de', 'fr2']
+        self.languages = ('fr', 'en', 'lolcat', 'fi', 'de', 'fr2')
         self.serv_opts = dict()
         i18n.set('filename_format', '{locale}.{format}')
         i18n.set('file_format', 'json')
@@ -38,8 +38,7 @@ class Languages(discord.ext.commands.Cog):
                 used_langs = await self.bot.get_cog('Utilities').get_languages(recipient, limit=1)
                 lang_opt = used_langs[0][0]
         else:
-            conf_lang = self.bot.get_cog("Servers").conf_lang
-            lang_opt = await conf_lang(serverID,"language","scret-desc")
+            lang_opt = self.languages[await self.bot.get_config(serverID, "language")]
             self.serv_opts[str(serverID)] = lang_opt
             #print("New langage:",lang_opt)
         if lang_opt not in self.languages:
