@@ -7,7 +7,6 @@ import re
 import string
 import typing
 from difflib import get_close_matches
-from typing import Optional
 
 import aiohttp
 import discord
@@ -48,7 +47,6 @@ class Fun(commands.Cog):
 
     def __init__(self, bot: Zbot):
         self.bot = bot
-        self.fun_opt = dict()
         self.file = "fun"
         self.tf = TimezoneFinder()
         self.afk_guys = dict()
@@ -57,9 +55,6 @@ class Fun(commands.Cog):
             self.utilities = self.bot.get_cog("Utilities")
         except:
             pass
-
-    async def cache_update(self, id, value):
-        self.fun_opt[str(id)] = value
 
     @commands.Cog.listener()
     async def on_ready(self):
@@ -616,7 +611,7 @@ You can specify a verification limit by adding a number in argument (up to 1.000
         g = geocoder.arcgis(city)
         if not g.ok:
             return await ctx.send(await self.bot._(ctx.channel,"fun.invalid-city"))
-        timeZoneStr: Optional[str] = self.tf.timezone_at_land(lat=g.json['lat'], lng=g.json['lng'])
+        timeZoneStr: typing.Optional[str] = self.tf.timezone_at_land(lat=g.json['lat'], lng=g.json['lng'])
         if timeZoneStr is None:
             return await ctx.send(await self.bot._(ctx.channel,"fun.uninhabited-city"))
         timeZoneObj = timezone(timeZoneStr)
