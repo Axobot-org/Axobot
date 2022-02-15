@@ -1309,7 +1309,7 @@ class Rss(commands.Cog):
             return await self.bot._(guild,"rss","nothing")
         if not date:
             feed = feeds.entries[0]
-            img_url = feed['media_content'][0]['url']
+            img_url = feed['media_content'][0]['url'] if "media_content" in feed else None
             title = re.search(r"DeviantArt: ([^ ]+)'s gallery",feeds.feed['title']).group(1)
             obj = self.rssMessage(bot=self.bot,Type='deviant',url=feed['link'],title=feed['title'],emojis=self.bot.get_cog('Emojis').customEmojis,date=feed['published_parsed'],author=title,image=img_url)
             return [obj]
@@ -1318,7 +1318,7 @@ class Rss(commands.Cog):
             for feed in feeds.entries:
                 if datetime.datetime(*feed['published_parsed'][:6]) <= date:
                     break
-                img_url = feed['media_content'][0]['url']
+                img_url = feed['media_content'][0]['url'] if "media_content" in feed else None
                 title = re.search(r"DeviantArt: ([^ ]+)'s gallery",feeds.feed['title']).group(1)
                 obj = self.rssMessage(bot=self.bot,Type='deviant',url=feed['link'],title=feed['title'],emojis=self.bot.get_cog('Emojis').customEmojis,date=feed['published_parsed'],author=title,image=img_url)
                 liste.append(obj)
