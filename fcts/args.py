@@ -130,32 +130,29 @@ class Guild(commands.Converter):
         raise commands.errors.BadArgument('Invalid guild: '+argument)
 
 
-class url(commands.Converter):
-    def __init__(self):
-        pass
+class URL:
+    "Convert argument to a valid URL"
 
-    class Url:
-        def __init__(self, regex_exp: re.Match):
-            self.domain = regex_exp.group('domain')
-            self.path = regex_exp.group('path')
-            self.is_https = regex_exp.group('https') == 'https'
-            self.url = regex_exp.group(0)
+    def __init__(self, regex_exp: re.Match):
+        self.domain: str = regex_exp.group('domain')
+        self.path: str = regex_exp.group('path')
+        self.is_https: bool = regex_exp.group('https') == 'https'
+        self.url: str = regex_exp.group(0)
 
-        def __str__(self):
-            return f"Url(url='{self.url}', domain='{self.domain}', path='{self.path}', is_https={self.is_https})"
+    def __str__(self):
+        return f"Url(url='{self.url}', domain='{self.domain}', path='{self.path}', is_https={self.is_https})"
 
-    async def convert(self, ctx: MyContext, argument: str) -> Url:
+    @classmethod
+    async def convert(cls, _ctx: MyContext, argument: str) -> "URL":
         r = re.search(
             r'(?P<https>https?)://(?:www\.)?(?P<domain>[^/\s]+)(?:/(?P<path>[\S]+))?', argument)
         if r is None:
             raise commands.errors.BadArgument('Invalid url: '+argument)
-        return self.Url(r)
+        return cls(r)
 
 
 class anyEmoji(commands.Converter):
-    def __init__(self):
-        pass
-
+    "Convert argument to any emoji, either custom or unicode"
     async def convert(self, ctx: MyContext, argument: str) -> typing.Union[str, discord.Emoji]:
         r = re.search(r'<a?:[^:]+:(\d+)>', argument)
         if r is None:
@@ -169,36 +166,8 @@ class anyEmoji(commands.Converter):
         raise commands.errors.BadArgument('Invalid emoji: '+argument)
 
 
-class guildMessage(commands.Converter):  # Deprecated, now use discord.Message
-    def __init__(self):
-        pass
-
-    async def convert(self, ctx: MyContext, argument: str) -> discord.Message:
-        if len(argument) != 18 or not argument.isnumeric():
-            raise commands.errors.BadArgument('Invalid message ID: '+argument)
-        if ctx.guild is None:
-            channels = [ctx.channel]
-        else:
-            me = ctx.guild.me
-            channels = [ctx.channel] + [x for x in ctx.guild.text_channels if x.id !=
-                                        ctx.channel.id and x.permissions_for(me).read_message_history and x.permissions_for(me).read_messages]
-            if len(channels) > 50:
-                raise commands.errors.BadArgument('Too many text channels')
-        for channel in channels:
-            try:
-                msg = await channel.fetch_message(int(argument))
-            except:
-                pass
-            else:
-                return msg
-        raise commands.errors.BadArgument(
-            'Message "{}" not found.'.format(argument))
-
-
 class arguments(commands.Converter):
-    def __init__(self):
-        pass
-
+    "Convert arguments to a foo=bar dictionary"
     async def convert(self, ctx: MyContext, argument: str) -> dict:
         answer = dict()
         for result in re.finditer(r'(\w+) ?= ?\"((?:[^\"\\]|\\\"|\\)+)\"', argument):
@@ -207,9 +176,7 @@ class arguments(commands.Converter):
 
 
 class Color(commands.Converter):
-    def __init__(self):
-        pass
-
+    "Convert arguments to a valid color (hexa or decimal)"
     async def convert(self, ctx: MyContext, argument: str) -> int:
         if argument.startswith('#') and len(argument) % 3 == 1:
             arg = argument[1:]
@@ -223,9 +190,7 @@ class Color(commands.Converter):
 
 
 class snowflake(commands.Converter):
-    def __init__(self):
-        pass
-
+    "Convert arguments to a discord Snowflake"
     class Snowflake:
         def __init__(self, ID: int):
             self.id = ID
@@ -241,11 +206,20 @@ class snowflake(commands.Converter):
         return self.Snowflake(int(argument))
 
 
+class serverlog(commands.Converter):
+    "Convert arguments to a server log type"
+    async def convert(self, ctx: MyContext, argument: str) -> str:
+        from fcts.serverlogs import ServerLogs # pylint: disable=import-outside-toplevel
 
-def litteral(string: str):
+        if argument in ServerLogs.available_logs:
+            return argument
+        raise commands.BadArgument(f'"{argument}" is not a valid server log type')
+
+
+def litteral(word: str):
     """A parameter type where the argument should exactly be the given string"""
     class Litteral(commands.Converter):
-        _str = string
+        _str = word
         async def convert(self, ctx: MyContext, argument: str):
             if argument == self._str:
                 return argument
