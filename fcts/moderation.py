@@ -15,7 +15,8 @@ importlib.reload(checks)
 importlib.reload(args)
 
 class Moderation(commands.Cog):
-    """Here you will find everything you need to moderate your server. Please note that most of the commands are reserved for certain members only."""
+    """Here you will find everything you need to moderate your server.
+    Please note that most of the commands are reserved for certain members only."""
 
     def __init__(self, bot: Zbot):
         self.bot = bot
