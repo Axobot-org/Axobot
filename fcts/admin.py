@@ -806,7 +806,7 @@ Cette option affecte tous les serveurs"""
                 ret = await func()
         except Exception as e:
             value = stdout.getvalue()
-            await ctx.send(f'```py\n{value}{traceback.format_exc()}\n```')
+            await ctx.send(f'```py\n{value}{traceback.format_exc()[:1990]}\n```')
         else:
             value = stdout.getvalue()
             await self.add_success_reaction(ctx.message)
