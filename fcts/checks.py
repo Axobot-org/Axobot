@@ -123,16 +123,7 @@ async def is_fun_enabled(ctx: MyContext, self=None) -> bool:
     if not self.bot.database_online and not ctx.guild.channels[0].permissions_for(ctx.author).manage_guild:
         return False
     ID = ctx.guild.id
-    if str(ID) not in self.fun_opt.keys():
-        fun = await self.bot.get_config(ID, "enable_fun")
-        self.fun_opt[str(ID)] = fun
-    else:
-        fun = self.fun_opt[str(ID)]
-        if fun is None:
-            fun = await self.bot.get_config(ID, "enable_fun")
-            if fun is not None:
-                self.fun_opt[str(ID)] = fun
-    return bool(fun)
+    return bool(await self.bot.get_config(ID, "enable_fun"))
 
 
 async def is_a_cmd(msg: discord.Message, bot: commands.Bot) -> bool:
