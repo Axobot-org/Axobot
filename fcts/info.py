@@ -45,7 +45,7 @@ class Info(commands.Cog):
         self.file = "info"
         self.bot_version = conf.release + ('a' if bot.beta else '')
         self.emoji_table = 'emojis_beta' if self.bot.beta else 'emojis'
-        self.BitlyClient = bitly_api.Bitly(login='zrunner',api_key=self.bot.others['bitly'])
+        self.BitlyClient = bitly_api.Bitly(api_key=self.bot.others['bitly'])
 
     @commands.Cog.listener()
     async def on_ready(self):
@@ -1154,7 +1154,7 @@ Servers:
             await self.bot.get_cog('Help').help_command(ctx,['bitly'])
         elif ctx.invoked_subcommand is None and ctx.subcommand_passed is not None:
             try:
-                url = await args.url().convert(ctx,ctx.subcommand_passed)
+                url = await args.URL.convert(ctx,ctx.subcommand_passed)
             except:
                 return
             if url.domain in ['bit.ly','bitly.com','bitly.is']:
@@ -1168,26 +1168,28 @@ Servers:
                 new_ctx = await self.bot.get_context(msg)
                 await self.bot.invoke(new_ctx)
 
-    @bitly_main.command(name="create")
-    async def bitly_create(self, ctx: MyContext, url: args.url):
+    @bitly_main.command(name="create", aliases=["shorten"])
+    async def bitly_create(self, ctx: MyContext, url: args.URL):
         """Create a shortened url
-        
+
         ..Example bitly create https://fr-minecraft.net
 
         ..Doc miscellaneous.html#bitly-urls"""
-        await ctx.send(await self.bot._(ctx.channel,'info.bitly_short',url=self.BitlyClient.shorten_url(url.url)))
-    
-    @bitly_main.command(name="find")
-    async def bitly_find(self, ctx: MyContext, url: args.url):
+        if url.domain == 'bit.ly':
+            return await ctx.send(await self.bot._(ctx.channel,'info.bitly_already_shortened'))
+        await ctx.send(await self.bot._(ctx.channel,'info.bitly_short', url=self.BitlyClient.shorten_url(url.url)))
+
+    @bitly_main.command(name="find", aliases=['expand'])
+    async def bitly_find(self, ctx: MyContext, url: args.URL):
         """Find the long url from a bitly link
-        
+
         ..Example bitly find https://bit.ly/2JEHsUf
-        
+
         ..Doc miscellaneous.html#bitly-urls"""
         if url.domain != 'bit.ly':
             return await ctx.send(await self.bot._(ctx.channel,'info.bitly_nobit'))
-        await ctx.send(await self.bot._(ctx.channel,'info.bitly_long',url=self.BitlyClient.expand_url(url.url)))
-    
+        await ctx.send(await self.bot._(ctx.channel,'info.bitly_long', url=self.BitlyClient.expand_url(url.url)))
+
     @commands.command(name='changelog',aliases=['changelogs'])
     @commands.check(checks.database_connected)
     async def changelog(self, ctx: MyContext, version: str=None):
