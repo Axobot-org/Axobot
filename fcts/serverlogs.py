@@ -15,9 +15,7 @@ class ServerLogs(commands.Cog):
         "member_nick",
         "member_avatar",
         "message_update",
-        "message_delete",
-        "role",
-        "emoji"
+        "message_delete"
     }
 
     def __init__(self, bot: Zbot):
@@ -100,7 +98,8 @@ class ServerLogs(commands.Cog):
             # display logs enabled for this channel only
             title = await self.bot._(ctx.guild.id, "serverlogs.list.channel", channel='#'+channel.name)
             if channel_logs := await self.db_get_from_channel(ctx.guild.id, ctx.channel.id):
-                embed = discord.Embed(title=title, description='\n'.join('- '+l for l in sorted(channel_logs)))
+                actual_logs = ('- '+l for l in sorted(channel_logs) if l in self.available_logs)
+                embed = discord.Embed(title=title, description='\n'.join(actual_logs))
             else: # error msg
                 cmd = await self.bot.prefix_manager.get_prefix(ctx.guild) + "modlogs enable"
                 embed = discord.Embed(title=title, description=await self.bot._(ctx.guild.id, "serverlogs.list.none", cmd=cmd))
@@ -110,15 +109,14 @@ class ServerLogs(commands.Cog):
             guild_title = await self.bot._(ctx.guild.id, "serverlogs.list.guild")
             embed = discord.Embed()
             embed.add_field(name=global_title, value='\n'.join('- '+l for l in sorted(self.available_logs)))
-            if guild_logs := await self.db_get_from_guild(ctx.guild.id):
+            if (guild_logs := await self.db_get_from_guild(ctx.guild.id)) and \
+                    sum(len(values) for values in guild_logs.values()) > 0:
                 # flatten and sort enabled logs
-                guild_logs = sorted(set(x for v in guild_logs.values() for x in v))
+                guild_logs = sorted(set(x for v in guild_logs.values() for x in v if x in self.available_logs))
                 embed.add_field(name=guild_title, value='\n'.join('- '+l for l in sorted(guild_logs)))
             else: # error msg
                 cmd = await self.bot.prefix_manager.get_prefix(ctx.guild) + "modlogs enable"
-                embed = discord.Embed(
-                    title=guild_title,
-                    description=await self.bot._(ctx.guild.id, "serverlogs.list.none", cmd=cmd))
+                embed.add_field(name=guild_title, value=await self.bot._(ctx.guild.id, "serverlogs.list.none", cmd=cmd))
         embed.color = discord.Color.blue()
         await ctx.send(embed=embed)
 
@@ -212,6 +210,49 @@ class ServerLogs(commands.Cog):
             emb.add_field(name="Created at", value=f"<t:{msg.created_at.timestamp():.0f}>")
             emb.add_field(name="Message Author", value=f"{msg.author} ({msg.author.id})")
             await self.send_logs(msg.guild, channel_ids, emb)
+
+    @commands.Cog.listener()
+    async def on_member_update(self, before: discord.Member, after: discord.Member):
+        """Triggered when a member is updated
+        Corresponding logs: member_roles, member_nick, member_avatar"""
+        # member roles
+        if before.roles != after.roles and (channel_ids := await self.is_log_enabled(before.guild.id, "member_roles")):
+            added_roles = [role for role in after.roles if role not in before.roles]
+            removed_roles = [role for role in before.roles if role not in after.roles]
+            emb = discord.Embed(
+                description=f"**Member {before.mention} updated**",
+                color=discord.Color.blurple()
+            )
+            if removed_roles:
+                emb.add_field(name="Roles removed", value=' '.join(r.mention for r in removed_roles), inline=False)
+            if added_roles:
+                emb.add_field(name="Roles added", value=' '.join(r.mention for r in added_roles), inline=False)
+            emb.set_author(name=str(after), icon_url=after.avatar or after.default_avatar)
+            await self.send_logs(after.guild, channel_ids, emb)
+        # member nick
+        if before.nick != after.nick and (channel_ids := await self.is_log_enabled(before.guild.id, "member_nick")):
+            emb = discord.Embed(
+                description=f"**Member {before.mention} ({before.id}) updated**",
+                color=discord.Color.blurple()
+            )
+            before_txt = "None" if before.nick is None else discord.utils.escape_markdown(before.nick)
+            after_txt = "None" if after.nick is None else discord.utils.escape_markdown(after.nick)
+            emb.add_field(name="Nickname edited", value=f"{before_txt} -> {after_txt}")
+            emb.set_author(name=str(after), icon_url=after.avatar or after.default_avatar)
+            await self.send_logs(after.guild, channel_ids, emb)
+        # member avatar
+        if before.guild_avatar != after.guild_avatar and (
+                channel_ids := await self.is_log_enabled(before.guild.id, "member_avatar")
+        ):
+            emb = discord.Embed(
+                description=f"**Member {before.mention} ({before.id}) updated**",
+                color=discord.Color.blurple()
+            )
+            before_txt = "None" if before.guild_avatar is None else f"[Before]({before.guild_avatar})"
+            after_txt = "None" if after.guild_avatar is None else f"[After]{after.guild_avatar}"
+            emb.add_field(name="Server avatar edited", value=f"{before_txt} -> {after_txt}")
+            emb.set_author(name=str(after), icon_url=after.avatar or after.default_avatar)
+            await self.send_logs(after.guild, channel_ids, emb)
 
 
 def setup(bot):
