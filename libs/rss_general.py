@@ -15,34 +15,34 @@ if TYPE_CHECKING:
     from libs.classes import Zbot
 
 async def feed_parse(bot: Zbot, url: str, timeout: int, session: ClientSession = None) -> Optional[feedparser.FeedParserDict]:
-        """Asynchronous parsing using cool methods"""
-        # if session is provided, we have to not close it
-        _session = session or ClientSession()
-        try:
-            async with async_timeout.timeout(timeout) as cm:
-                async with _session.get(url) as response:
-                    html = await response.text()
-                    headers = response.raw_headers
-        except (UnicodeDecodeError, client_exceptions.ClientError):
-            if session is None:
-                await _session.close()
-            return FeedParserDict(entries=[])
-        except asyncio.exceptions.TimeoutError:
-            if session is None:
-                await _session.close()
-            return None
-        except Exception as e:
-            if session is None:
-                await _session.close()
-            raise e
+    """Asynchronous parsing using cool methods"""
+    # if session is provided, we have to not close it
+    _session = session or ClientSession()
+    try:
+        async with async_timeout.timeout(timeout) as cm:
+            async with _session.get(url) as response:
+                html = await response.text()
+                headers = response.raw_headers
+    except (UnicodeDecodeError, client_exceptions.ClientError):
         if session is None:
             await _session.close()
-        if cm.expired:
-            # request was cancelled by timeout
-            bot.log.info("[RSS] feed_parse got a timeout")
-            return None
-        headers = {k.decode("utf-8").lower(): v.decode("utf-8") for k, v in headers}
-        return feedparser.parse(html, response_headers=headers)
+        return FeedParserDict(entries=[])
+    except asyncio.exceptions.TimeoutError:
+        if session is None:
+            await _session.close()
+        return None
+    except Exception as e:
+        if session is None:
+            await _session.close()
+        raise e
+    if session is None:
+        await _session.close()
+    if cm.expired:
+        # request was cancelled by timeout
+        bot.log.info("[RSS] feed_parse got a timeout")
+        return None
+    headers = {k.decode("utf-8").lower(): v.decode("utf-8") for k, v in headers}
+    return feedparser.parse(html, response_headers=headers)
 
 
 class RssMessage:
