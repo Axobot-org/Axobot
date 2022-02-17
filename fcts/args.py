@@ -211,7 +211,7 @@ class serverlog(commands.Converter):
     async def convert(self, ctx: MyContext, argument: str) -> str:
         from fcts.serverlogs import ServerLogs # pylint: disable=import-outside-toplevel
 
-        if argument in ServerLogs.available_logs:
+        if argument in ServerLogs.available_logs or argument == 'all':
             return argument
         raise commands.BadArgument(f'"{argument}" is not a valid server log type')
 
