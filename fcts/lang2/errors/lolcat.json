@@ -18,6 +18,7 @@
         "invalidisbn": "Invalid ISBN",
         "invalidleaderboard": "Not found levels table type",
         "invalidmsgid": "InVAlid msg ID",
+        "invalidserverlog": "Unknow server log thingy",
         "invalidurl": "Nope, `%{u}` iznt a valid ~~cat~~ link",
         "membernotfound": "Unabl to found the membr `%{m}` :confused:",
         "missingargument": "Oops, te argumnt \"%{a}\" are missin %{e}",
