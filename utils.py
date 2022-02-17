@@ -171,6 +171,7 @@ def load_cogs(bot: "Zbot"):
                       'fcts.roles_react',
                       'fcts.rss',
                       'fcts.s_backups',
+                      'fcts.serverlogs',
                       'fcts.servers',
                       'fcts.timers',
                     #   'fcts.translations',
