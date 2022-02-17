@@ -1,0 +1,15 @@
+{
+    "en": {
+        "list": {
+            "all": "List of available logs",
+            "guild": "List of logs used in this server",
+            "channel": "List of logs used in %{channel}",
+            "none": "No log is used here. Use `%{cmd}` to start getting logs"
+        },
+        "enabled": "Logs of type %{kind} will now be sent to this channel",
+        "disabled": "Logs of type %{kind} will no longer be sent to this channel",
+        "embed-warning": "To send logs, the bot needs the \"Embed links\" permission!",
+        "none-added": "This channel is already subscribed to all these logs!",
+        "none-removed": "This channel was already subscribed to none of these logs!"
+    }
+}
