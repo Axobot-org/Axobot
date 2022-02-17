@@ -131,11 +131,11 @@ class Fun(commands.Cog):
 
     @commands.command(name="reverse", hidden=True)
     @commands.check(is_fun_enabled)
-    async def reverse(self, ctx: MyContext, *, text:str):
+    async def reverse(self, ctx: MyContext, *, text: str):
         """Reverse the letters of a message
-        
+
         ..Doc fun.html#reverse"""
-        await ctx.send(text[::-1])
+        await ctx.send(text[::-1], allowed_mentions=discord.AllowedMentions.none())
 
     @commands.command(name="count_msg",hidden=True)
     @commands.check(is_fun_enabled)
