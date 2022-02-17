@@ -65,7 +65,7 @@
         "no-database": "Notre base de donnée étant hors ligne, l'accès aux commandes fun est restreint aux personnes ayant la permission de Gérer le Serveur",
         "no-embed-perm": "Je ne possède pas la permission \"Intégrer des liens\" :confused:",
         "no-emoji": "Impossible de trouver cet emoji !",
-        "no-fun": "Les commandes fun ont été désactivées sur ce serveur. Pour voir leur liste, regardez https://zbot.rtfd.io/en/v3/fun.html",
+        "no-fun": "Les commandes fun ont été désactivées sur ce serveur. Pour voir leur liste, regardez https://zbot.rtfd.io/en/latest/fun.html",
         "no-reaction": "Impossible d'ajouter les réactions. Vérifiez mes permissions",
         "no-roll": "Aucun élément trouvé",
         "no-say": "Impossible d'envoyer un message dans ce salon",

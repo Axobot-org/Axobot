@@ -65,7 +65,7 @@
         "no-database": "As our data ar offline, access to funz commandz iz restricted to guys with permishun \"Manage Server\"",
         "no-embed-perm": "I dont haz permishun 2 \"Embed links\" :confused:",
         "no-emoji": "Unable 2 find tihs emote :eyes:",
-        "no-fun": "Fun comands haz beeen disabld on dis server. 2 C their list, look at https://zbot.rtfd.io/en/v3/fun.html",
+        "no-fun": "Fun comands haz beeen disabld on dis server. 2 C their list, look at https://zbot.rtfd.io/en/latest/fun.html",
         "no-reaction": "Unable 2 add reactions. Plz check mah perms...",
         "no-roll": "Hmm I don't see any choice lol",
         "no-say": "Unable 2 send any message in tish channel",

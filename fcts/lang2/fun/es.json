@@ -23,7 +23,7 @@
         "no-database": "Como nuestra base de datos está desconectada, el acceso a los comandos de diversión está restringido a personas con permiso \"Gestionar Servidor\"",
         "no-embed-perm": "No tengo permiso para \"Insertar Enlaces\" :confused:",
         "no-emoji": "¡Incapaz de encontrar este emoji!",
-        "no-fun": "Los comandos divertidos han sido desactivados en este servidor. Para ver su lista, mira este enlace : https://zbot.rtfd.io/en/v3/fun.html",
+        "no-fun": "Los comandos divertidos han sido desactivados en este servidor. Para ver su lista, mira este enlace : https://zbot.rtfd.io/en/latest/fun.html",
         "no-reaction": "Incapaz de adicionar reacciones. Por favor, verifique mis permisos...",
         "no-roll": "No se encontró ninguna opción",
         "no-say": "No se puede enviar mensajes en este canal",
