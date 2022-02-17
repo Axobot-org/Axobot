@@ -65,7 +65,7 @@
         "no-database": "As our database is offline, access to fun commands is restricted to people with permission \"Manage Server\"",
         "no-embed-perm": "I don't have permission to \"Embed links\" :confused:",
         "no-emoji": "Unable to find this emoji!",
-        "no-fun": "Fun commands have been disabled on this server. To see their list, look at https://zbot.rtfd.io/en/v3/fun.html",
+        "no-fun": "Fun commands have been disabled on this server. To see their list, look at https://zbot.rtfd.io/en/latest/fun.html",
         "no-reaction": "Unable to add reactions. Please check my permissions...",
         "no-roll": "No choice found",
         "no-say": "Unable to send any message in this channel",

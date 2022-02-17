@@ -1,4 +1,4 @@
-# ZBot V3 - A Discord Bot
+# ZBot V4 - A Discord Bot
 
 [![discord.py](https://img.shields.io/badge/Discord.py-2.0-brightgreen.svg)](https://github.com/Rapptz/discord.py)
 [![Docs status](https://readthedocs.org/projects/zbot/badge/?version=latest)](https://zbot.readthedocs.io)

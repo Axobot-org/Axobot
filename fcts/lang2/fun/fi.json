@@ -65,7 +65,7 @@
         "no-database": "Kun tietokantamme on offline tilassa, mahollisuus hauska komentoihin on vain käyttäjille joilla on käyttöoikeudet \"Hallinnoi palvelinta\"",
         "no-embed-perm": "Minulla ei ole käyttöoikeuksia \"Embed links\" :confused:",
         "no-emoji": "Mahdotonta löytää tämä emoji!",
-        "no-fun": "Hauska komennot ovat kytketty pois käytöstä tällä serverillä. Näet listan niistä täältä: https://zbot.rtfd.io/en/v3/fun.html",
+        "no-fun": "Hauska komennot ovat kytketty pois käytöstä tällä serverillä. Näet listan niistä täältä: https://zbot.rtfd.io/en/latest/fun.html",
         "no-reaction": "Mahdotonta lisätä reaktioita. Katso minun käyttöoikeudet...",
         "no-roll": "Ei vaihtoehtoa löydetty",
         "no-say": "En voi lähettää viestiä tälle kanavalle",
