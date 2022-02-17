@@ -213,6 +213,7 @@ If the bot can't send the new command format, it will try to send the old one.""
             if not found:
                 categories['unclassed'].append(temp)
         answer = list()
+        prefix = await self.bot.prefix_manager.get_prefix(ctx.guild)
         if compress:
             for k, v in categories.items():
                 if len(v) == 0:
@@ -221,7 +222,7 @@ If the bot can't send the new command format, it will try to send the old one.""
                 title = "__**"+tr.capitalize()+"**__"
                 count = await self.bot._(ctx.channel, "help.cmd-count",
                                          nbr=len(v),
-                                         p=ctx.prefix,
+                                         p=prefix,
                                          cog=k)
                 answer.append((title, count))
         else:
