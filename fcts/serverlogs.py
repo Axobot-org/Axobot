@@ -14,8 +14,11 @@ class ServerLogs(commands.Cog):
         "member_roles",
         "member_nick",
         "member_avatar",
+        "member_join",
+        "member_leave", # TODO
         "message_update",
-        "message_delete"
+        "message_delete",
+        "role_creation"
     }
 
     def __init__(self, bot: Zbot):
@@ -212,6 +215,22 @@ class ServerLogs(commands.Cog):
             await self.send_logs(msg.guild, channel_ids, emb)
 
     @commands.Cog.listener()
+    async def on_raw_bulk_message_delete(self, payload: discord.RawBulkMessageDeleteEvent):
+        """Triggered when a bunch of  messages are deleted
+        Corresponding log: message_delete"""
+        if not payload.guild_id:
+            return
+        if channel_ids := await self.is_log_enabled(payload.guild_id, "message_delete"):
+            guild = self.bot.get_guild(payload.guild_id)
+            if not guild:
+                return
+            emb = discord.Embed(
+                description=f"**{len(payload.message_ids)} messages deleted in <#{payload.channel_id}>**",
+                colour=discord.Color.red()
+            )
+            await self.send_logs(guild, channel_ids, emb)
+
+    @commands.Cog.listener()
     async def on_member_update(self, before: discord.Member, after: discord.Member):
         """Triggered when a member is updated
         Corresponding logs: member_roles, member_nick, member_avatar"""
@@ -224,9 +243,9 @@ class ServerLogs(commands.Cog):
                 color=discord.Color.blurple()
             )
             if removed_roles:
-                emb.add_field(name="Roles removed", value=' '.join(r.mention for r in removed_roles), inline=False)
+                emb.add_field(name="Roles granted", value=' '.join(r.mention for r in removed_roles), inline=False)
             if added_roles:
-                emb.add_field(name="Roles added", value=' '.join(r.mention for r in added_roles), inline=False)
+                emb.add_field(name="Roles revoked", value=' '.join(r.mention for r in added_roles), inline=False)
             emb.set_author(name=str(after), icon_url=after.avatar or after.default_avatar)
             await self.send_logs(after.guild, channel_ids, emb)
         # member nick
@@ -253,6 +272,56 @@ class ServerLogs(commands.Cog):
             emb.add_field(name="Server avatar edited", value=f"{before_txt} -> {after_txt}")
             emb.set_author(name=str(after), icon_url=after.avatar or after.default_avatar)
             await self.send_logs(after.guild, channel_ids, emb)
+
+    @commands.Cog.listener()
+    async def on_member_join(self, member: discord.Member):
+        """Triggered when a member joins a guild
+        Corresponding log: member_join"""
+        if channel_ids := await self.is_log_enabled(member.guild.id, "member_join"):
+            emb = discord.Embed(
+                description=f"**{member.mention} ({member.id}) joined your server**",
+                colour=discord.Color.green()
+            )
+            emb.set_author(name=str(member), icon_url=member.display_avatar)
+            emb.add_field(name="Account created at", value=f"<t:{member.created_at}>", inline=False)
+            specs = []
+            if member.pending:
+                specs.append("pending verification")
+            if member.public_flags.verified_bot():
+                specs.append("verified bot")
+            elif member.bot:
+                specs.append("bot")
+            if member.public_flags.staff():
+                specs.append("Discord staff")
+            if specs:
+                emb.add_field(name="Specificities", value=", ".join(specs), inline=False)
+            await self.send_logs(member.guild, channel_ids, emb)
+
+    @commands.Cog.listener()
+    async def on_guild_role_create(self, role: discord.Role):
+        """Triggered when a role is created in a guild
+        Corresponding log: role_creation"""
+        if channel_ids := await self.is_log_enabled(role.guild.id, "role_creation"):
+            emb = discord.Embed(
+                description="**New role created**",
+                colour=discord.Color.green()
+            )
+            emb.add_field(name="Name", value=role.name, inline=False)
+            emb.add_field(name="Color", value=str(role.color))
+            specs = []
+            if role.permissions.administrator:
+                specs.append("Administrator permission")
+            if role.is_bot_managed():
+                specs.append("Managed by a bot")
+            if role.is_integration():
+                specs.append("Integrated by an app")
+            if role.is_premium_subscriber():
+                specs.append("Nitro boosts role")
+            if role.hoist:
+                specs.append("Hoisted")
+            if specs:
+                emb.add_field(name="Specificities", value=", ".join(specs), inline=False)
+            await self.send_logs(role.guild, channel_ids, emb)
 
 
 def setup(bot):
