@@ -29,6 +29,12 @@ A translation of the Zbot Privacy Policy has been added to `this page <privacy.h
    fun
    miscellaneous
 
+.. toctree::
+   :maxdepth: 1
+   :caption: Our articles:
+
+   scam-detector
+
 
 Indices and tables
 ==================
