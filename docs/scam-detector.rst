@@ -1,5 +1,5 @@
 ==================
-ZBot scam detector
+Zbot scam detector
 ==================
 
 As Discord becomes an increasingly important social network, attracting hundreds of new users worldwide every day, it is naturally subject to more and more phishing and other scams. Developers are already reacting to this plague, such as by buying a cybersecurity company or adding new auto-moderation and reporting features, but scams are becoming more sophisticated and affecting many users all the time.
@@ -102,7 +102,7 @@ Final note
 
 This is how the current scam detection system was built. It will most certainly evolve in the future, to adapt to new scam methods and constantly improve, but I hope to have at least made this system a bit less opaque for our users, without being too technical. If you have any questions about this, feel free to contact us on our support server (link in the homepage of this documentation or via the command ’about’).
 
-I would like to thank my AI teacher from ’CY Tech <https://cytech.cyu.fr/>’_ for listening to me for a long time and enlightening me on the best tracks to follow, this wonderful ’tutorial on SMS spam detection <https://learn.vonage.com/blog/2020/11/19/sms-spam-detection-with-machine-learning-in-python/#>’__ which served as a basis for testing, Awhikax (co-admin of the bot) for the URLs scoring system, and all the documentation, blogs, tutorials and videos on the Internet which could help me and will help me to create this so complex system by myself. And, of course, all the users who will share their opinions and help me in one way or another!
+I would like to thank my AI teacher from `CY Tech <https://cytech.cyu.fr/>`_ for listening to me for a long time and enlightening me on the best tracks to follow, this wonderful `tutorial on SMS spam detection <https://learn.vonage.com/blog/2020/11/19/sms-spam-detection-with-machine-learning-in-python/#>`__ which served as a basis for testing, Awhikax (co-admin of the bot) for the URLs scoring system, and all the documentation, blogs, tutorials and videos on the Internet which could help me and will help me to create this so complex system by myself. And, of course, all the users who will share their opinions and help me in one way or another!
 
 
 *Stay safe!*
