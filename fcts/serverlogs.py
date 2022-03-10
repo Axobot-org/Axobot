@@ -1,3 +1,4 @@
+import asyncio
 from typing import Optional
 import discord
 from cachingutils import LRUCache
@@ -15,7 +16,9 @@ class ServerLogs(commands.Cog):
         "member_nick",
         "member_avatar",
         "member_join",
-        "member_leave", # TODO
+        "member_leave",
+        "member_ban",
+        "member_unban",
         "message_update",
         "message_delete",
         "role_creation"
@@ -69,18 +72,16 @@ class ServerLogs(commands.Cog):
         "Add logs to a channel"
         query = "INSERT INTO serverlogs (guild, channel, kind) VALUES (%(g)s, %(c)s, %(k)s) ON DUPLICATE KEY UPDATE guild=%(g)s"
         async with self.bot.db_query(query, {'g': guild, 'c': channel, 'k': kind}) as query_result:
-            if guild in self.cache:
+            if query_result > 0 and guild in self.cache:
                 if channel in self.cache[guild]:
                     self.cache[guild][channel].append(kind)
-                else:
-                    self.cache[guild] = {channel: [kind]}
             return query_result > 0
 
     async def db_remove(self, guild: int, channel: int, kind: str) -> bool:
         "Remove logs from a channel"
         query = "DELETE FROM serverlogs WHERE guild = %s AND channel = %s AND kind = %s"
         async with self.bot.db_query(query, (guild, channel, kind), returnrowcount=True) as query_result:
-            if guild in self.cache and channel in self.cache[guild]:
+            if query_result > 0 and guild in self.cache and channel in self.cache[guild]:
                 self.cache[guild][channel] = [x for x in self.cache[guild][channel] if x != kind]
             return query_result > 0
 
@@ -181,8 +182,8 @@ class ServerLogs(commands.Cog):
                 guild = msg.cached_message.guild
                 link = msg.cached_message.jump_url
             else:
-                if 'author' in msg.data:
-                    author = self.bot.get_user(msg.data.get('author'))
+                if 'author' in msg.data and (author_id := msg.data.get('author').get('id')):
+                    author = self.bot.get_user(int(author_id))
                 guild = self.bot.get_guild(msg.guild_id)
                 link = f"https://discord.com/channels/{msg.guild_id}/{msg.channel_id}/{msg.message_id}"
             new_content = msg.data.get('content')
@@ -273,6 +274,19 @@ class ServerLogs(commands.Cog):
             emb.set_author(name=str(after), icon_url=after.avatar or after.default_avatar)
             await self.send_logs(after.guild, channel_ids, emb)
 
+    async def get_member_specs(self, member: discord.Member) -> list[str]:
+        "Get specific things to note for a member"
+        specs = []
+        if member.pending:
+            specs.append("pending verification")
+        if member.public_flags.verified_bot():
+            specs.append("verified bot")
+        elif member.bot:
+            specs.append("bot")
+        if member.public_flags.staff():
+            specs.append("Discord staff")
+        return specs
+
     @commands.Cog.listener()
     async def on_member_join(self, member: discord.Member):
         """Triggered when a member joins a guild
@@ -284,18 +298,69 @@ class ServerLogs(commands.Cog):
             )
             emb.set_author(name=str(member), icon_url=member.display_avatar)
             emb.add_field(name="Account created at", value=f"<t:{member.created_at}>", inline=False)
-            specs = []
-            if member.pending:
-                specs.append("pending verification")
-            if member.public_flags.verified_bot():
-                specs.append("verified bot")
-            elif member.bot:
-                specs.append("bot")
-            if member.public_flags.staff():
-                specs.append("Discord staff")
-            if specs:
+            if specs := await self.get_member_specs(member):
                 emb.add_field(name="Specificities", value=", ".join(specs), inline=False)
             await self.send_logs(member.guild, channel_ids, emb)
+
+    @commands.Cog.listener()
+    async def on_member_remove(self, member: discord.Member):
+        """Triggered when a member leaves a guild
+        Corresponding log: member_leave"""
+        if channel_ids := await self.is_log_enabled(member.guild.id, "member_remove"):
+            emb = discord.Embed(
+                description=f"**{member.mention} ({member.id}) left your server**",
+                colour=discord.Color.orange()
+            )
+            emb.set_author(name=str(member), icon_url=member.display_avatar)
+            emb.add_field(name="Account created at", value=f"<t:{member.created_at}>", inline=False)
+            if member.joined_at:
+                emb.add_field(name="Joined your server at", value=f"<t:{member.joined_at}> (<t:{member.joined_at}:R>)",
+                              inline=False)
+            if specs := await self.get_member_specs(member):
+                emb.add_field(name="Specificities", value=", ".join(specs), inline=False)
+            emb.add_field(name=f"Roles ({len(member.roles)})", value=" ".join(r.mention for r in member.roles[::-1][:20]))
+            await self.send_logs(member.guild, channel_ids, emb)
+
+    @commands.Cog.listener()
+    async def on_member_ban(self, guild: discord.Guild, user: discord.User):
+        """Triggered when a member is banned from a server
+        Corresponding log: member_ban"""
+        if channel_ids := await self.is_log_enabled(guild.id, "member_ban"):
+            emb = discord.Embed(
+                description=f"**{user.mention} ({user.id}) has been banned**",
+                colour=discord.Color.red()
+            )
+            emb.set_author(name=str(user), icon_url=user.display_avatar)
+            # if we have access to audit logs, just wait a bit to make sure the ban is logged
+            if guild.me.guild_permissions.view_audit_log:
+                await asyncio.sleep(3)
+                async for entry in guild.audit_logs(limit=5, action=discord.AuditLogAction.ban):
+                    if entry.target.id == user.id:
+                        emb.add_field(name="Banned by", value=f"**{entry.user.mention}** ({entry.user.id})")
+                        emb.add_field(name="With reason", value=entry.reason or "No reason specified")
+                        break
+            await self.send_logs(guild, channel_ids, emb)
+
+    @commands.Cog.listener()
+    async def on_member_unban(self, guild: discord.Guild, user: discord.User):
+        """Triggered when a user is unbanned from a server
+        Corresponding log: member_unban"""
+        if channel_ids := await self.is_log_enabled(guild.id, "member_unban"):
+            emb = discord.Embed(
+                description=f"**{user.mention} ({user.id}) has been unbanned**",
+                colour=discord.Color.green()
+            )
+            emb.set_author(name=str(user), icon_url=user.display_avatar)
+            # if we have access to audit logs, just wait a bit to make sure the unban is logged
+            if guild.me.guild_permissions.view_audit_log:
+                await asyncio.sleep(3)
+                async for entry in guild.audit_logs(limit=5, action=discord.AuditLogAction.unban):
+                    if entry.target.id == user.id:
+                        emb.add_field(name="Unbanned by", value=f"**{entry.user.mention}** ({entry.user.id})")
+                        emb.add_field(name="With reason", value=entry.reason or "No reason specified")
+                        break
+            await self.send_logs(guild, channel_ids, emb)
+
 
     @commands.Cog.listener()
     async def on_guild_role_create(self, role: discord.Role):
