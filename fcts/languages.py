@@ -16,29 +16,40 @@ class Languages(discord.ext.commands.Cog):
         i18n.load_path.clear()
         i18n.load_path.append('./fcts/lang2')
 
-    async def tr(self, server_id, string_id: str, **args):
+    async def tr(self, source, string_id: str, **args):
         """Renvoie le texte en fonction de la langue"""
-        if isinstance(server_id, discord.Guild):
-            server_id = server_id.id
-        elif isinstance(server_id, discord.TextChannel):
-            server_id = server_id.guild.id
-        if server_id in self.serv_opts.keys():
-            lang_opt = self.serv_opts[server_id]
-        elif not self.bot.database_online:
+        if isinstance(source, discord.Guild):
+            # get ID from guild
+            source = source.id
+        elif isinstance(source, (discord.TextChannel, discord.Thread)):
+            # get ID from text channel
+            source = source.guild.id
+
+        if isinstance(source, (discord.Member, discord.User)):
+            # get lang from user
+            used_langs = await self.bot.get_cog('Utilities').get_languages(source, limit=1)
+            lang_opt = used_langs[0][0]
+        elif source in self.serv_opts.keys():
+            # get lang from cache
+            lang_opt = self.serv_opts[source]
+        elif not self.bot.database_online or source is None:
+            # get default lang
             lang_opt = self.bot.get_cog('Servers').default_language
-        elif server_id is None:
             lang_opt = self.bot.get_cog('Servers').default_language
-        elif isinstance(server_id,discord.DMChannel):
-            recipient = await self.bot.get_recipient(server_id)
+        elif isinstance(source, discord.DMChannel):
+            # get lang from DM channel
+            recipient = await self.bot.get_recipient(source)
             if recipient is None:
                 lang_opt = self.bot.get_cog('Servers').default_language
             else:
                 used_langs = await self.bot.get_cog('Utilities').get_languages(recipient, limit=1)
                 lang_opt = used_langs[0][0]
         else:
-            lang_opt = self.languages[await self.bot.get_config(server_id, "language")]
-            self.serv_opts[server_id] = lang_opt
+            # get lang from server ID
+            lang_opt = self.languages[await self.bot.get_config(source, "language")]
+            self.serv_opts[source] = lang_opt
         if lang_opt not in self.languages:
+            # if lang not known: fallback to default
             lang_opt = self.bot.get_cog('Servers').default_language
         return await self._get_translation(lang_opt, string_id, **args)
 
