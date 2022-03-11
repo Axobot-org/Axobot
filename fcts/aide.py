@@ -69,8 +69,8 @@ Enable "Embed Links" permission for better rendering
                 await self.help_command(ctx, args)
         except discord.errors.Forbidden:
             pass
-        except Exception as e:
-            await self.bot.get_cog("Errors").on_error(e, ctx)
+        except Exception as err:
+            await self.bot.get_cog("Errors").on_error(err, ctx)
             if len(args) == 0:
                 await self._default_help_command(ctx)
             else:
@@ -80,7 +80,7 @@ Enable "Embed Links" permission for better rendering
         """Main command for the creation of the help message
 If the bot can't send the new command format, it will try to send the old one."""
         async with ctx.channel.typing():
-            destination: discord.TextChannel = None
+            destination: discord.abc.Messageable = None
             if ctx.guild is not None:
                 send_in_dm = False if not self.bot.database_online else await self.bot.get_config(ctx.guild, 'help_in_dm')
                 if send_in_dm is not None and send_in_dm == 1:
@@ -92,8 +92,7 @@ If the bot can't send the new command format, it will try to send the old one.""
                 await ctx.message.author.create_dm()
                 destination = ctx.message.author.dm_channel
 
-            me = destination.me if type(
-                destination) == discord.DMChannel else destination.guild.me
+            me = destination.me if isinstance(destination, discord.DMChannel) else destination.guild.me
             title = ""
 
             if " ".join(commands).lower() in self.commands_list.keys():

@@ -278,7 +278,7 @@ Opposite is the subcommand 'join'
             return
         await self.give_remove_role(ctx.author, role, ctx.guild, ctx.channel, give=False)
 
-    async def give_remove_role(self, user: discord.Member, role: discord.Role, guild: discord.Guild, channel: discord.TextChannel, give: bool = True, ignore_success: bool = False, ignore_failure: bool = False):
+    async def give_remove_role(self, user: discord.Member, role: discord.Role, guild: discord.Guild, channel: typing.Union[discord.TextChannel, discord.Thread], give: bool = True, ignore_success: bool = False, ignore_failure: bool = False):
         """Add or remove a role to a user if possible"""
         if self.bot.zombie_mode:
             return

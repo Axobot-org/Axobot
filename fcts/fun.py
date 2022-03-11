@@ -433,7 +433,7 @@ You can specify a verification limit by adding a number in argument (up to 1.000
     @commands.command(name="say")
     @commands.guild_only()
     @commands.check(can_say)
-    async def say(self, ctx:MyContext, channel:typing.Optional[discord.TextChannel] = None, *, text):
+    async def say(self, ctx:MyContext, channel:typing.Optional[typing.Union[discord.TextChannel, discord.Thread]] = None, *, text):
         """Let the bot say something for you
         You can specify a channel where the bot must send this message. If channel is None, the current channel will be used
 
