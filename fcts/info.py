@@ -694,7 +694,8 @@ Available types: member, role, user, emoji, channel, server, invite, category
                 a2f = await self.bot._(ctx.guild.id,"keywords","non")
             embed.add_field(name=await self.bot._(ctx.guild.id,"stats_infos","guild-8"), value=a2f.capitalize())
             # Verification level
-            embed.add_field(name=await self.bot._(ctx.guild.id,"stats_infos","guild-9"), value=str(await self.bot._(ctx.guild.id,"keywords",str(guild.verification_level))).capitalize())
+            if verification_lvl := str(await self.bot._(ctx.guild.id,"keywords",str(guild.verification_level))).capitalize():
+                embed.add_field(name=await self.bot._(ctx.guild.id,"stats_infos","guild-9"), value=verification_lvl)
         await ctx.send(embed=embed)
         
    
