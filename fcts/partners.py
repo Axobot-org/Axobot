@@ -16,11 +16,11 @@ class Partners(commands.Cog):
         self.bot = bot
         self.file = 'partners'
         self.table = 'partners_beta' if bot.beta else 'partners'
-    
+
     @commands.Cog.listener()
     async def on_ready(self):
         self.table = 'partners_beta' if self.bot.beta else 'partners'
-    
+
     async def generate_id(self):
         return round(time.time()/2)
 
@@ -33,7 +33,7 @@ class Partners(commands.Cog):
             return liste
         except Exception as err:
             await self.bot.get_cog('Errors').on_error(err,None)
-    
+
     async def bdd_get_guild(self, guildID: int):
         """Return every partners of a guild"""
         try:
@@ -43,7 +43,7 @@ class Partners(commands.Cog):
             return liste
         except Exception as err:
             await self.bot.get_cog('Errors').on_error(err,None)
-    
+
     async def bdd_get_partnered(self, invites: list):
         """Return every guilds which has this one as partner"""
         try:
@@ -55,7 +55,7 @@ class Partners(commands.Cog):
             return liste
         except Exception as err:
             await self.bot.get_cog('Errors').on_error(err,None)
-    
+
     async def bdd_set_partner(self,guildID:int,partnerID:str,partnerType:str,desc:str):
         """Add a partner into a server"""
         try:
@@ -84,7 +84,7 @@ class Partners(commands.Cog):
         except Exception as err:
             await self.bot.get_cog('Errors').on_error(err,None)
             return False
-    
+
     async def bdd_del_partner(self,ID:int):
         """Delete a partner from a guild list"""
         try:
@@ -95,7 +95,7 @@ class Partners(commands.Cog):
         except Exception as e:
             await self.bot.get_cog('Errors').on_error(e,None)
             return False
-    
+
     async def get_bot_guilds(self, bot:int, session:aiohttp.ClientSession) -> Optional[int]:
         """Get the guilds count of a bot
         None if unknown bot/count not provided"""
@@ -104,7 +104,7 @@ class Partners(commands.Cog):
         if 'server_count' in ans:
             return ans['server_count']
         return None
-    
+
     async def get_bot_owners(self, bot:int, session:aiohttp.ClientSession) -> list[Union[discord.User, int]]:
         """Get the owners list of a bot
         Empty list if unknown bot/owners not provided"""
@@ -250,9 +250,10 @@ class Partners(commands.Cog):
     @commands.group(name="partner",aliases=['partners'])
     @commands.guild_only()
     @commands.check(checks.database_connected)
+    @commands.check(checks.has_manage_guild)
     async def partner_main(self, ctx: MyContext):
         """Manage the partners of your server
-        
+
         ..Doc server.html#partners-system"""
         if ctx.subcommand_passed is None:
             await self.bot.get_cog('Help').help_command(ctx,['partner'])
@@ -265,7 +266,7 @@ class Partners(commands.Cog):
         ..Example partners add https://discord.com/oauth2/authorize?client_id=486896267788812288&scope=bot
 
         ..Example partners add discord.gg/mee6
-        
+
         ..Doc server.html#add-a-partner"""
         if isinstance(invite,int):
             try:
