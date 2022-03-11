@@ -936,7 +936,7 @@ class Servers(commands.Cog):
             return await ctx.send(await self.bot._(ctx.guild.id,"cases.no_database"))
         await self.send_see(ctx.guild,ctx.channel,option,ctx.message,ctx)
         
-    async def send_see(self, guild: discord.Guild, channel: discord.TextChannel, option: str, msg: discord.Message, ctx: MyContext):
+    async def send_see(self, guild: discord.Guild, channel: typing.Union[discord.TextChannel, discord.Thread], option: str, msg: discord.Message, ctx: MyContext):
         """Envoie l'embed dans un salon"""
         if self.bot.zombie_mode:
             return
