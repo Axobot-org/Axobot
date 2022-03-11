@@ -1,7 +1,19 @@
-import discord
 import typing
+
+import discord
 from discord.ext import commands
-from libs.classes import Zbot, MyContext
+from libs.classes import MyContext, Zbot
+
+AcceptableChannelTypes = typing.Optional[typing.Union[
+    discord.TextChannel,
+    discord.VoiceChannel,
+    discord.CategoryChannel,
+    discord.Thread
+]]
+AcceptableTargetTypes = typing.Optional[typing.Union[
+    discord.Member,
+    discord.Role
+]]
 
 class Perms(commands.Cog):
     """Cog with a single command, allowing you to see the permissions of a member or a role in a channel."""
@@ -15,17 +27,16 @@ class Perms(commands.Cog):
             'voice':[key for key,value in discord.Permissions().voice() if value]}
         self.perms_name['common_channel'] = [x for x in chan_perms if x in self.perms_name['general']]
 
-
     @commands.command(name='perms', aliases=['permissions'])
     @commands.guild_only()
-    async def check_permissions(self, ctx: MyContext, channel:typing.Optional[typing.Union[discord.TextChannel,discord.VoiceChannel, discord.CategoryChannel]]=None, *, target:typing.Union[discord.Member,discord.Role]=None):
+    async def check_permissions(self, ctx: MyContext, channel:AcceptableChannelTypes=None, *, target:AcceptableTargetTypes=None):
         """Permissions assigned to a member/role (the user by default)
         The channel used to view permissions is the channel in which the command is entered.
 
         ..Example perms #announcements everyone
 
         ..Example perms Zbot
-        
+
         ..Doc infos.html#permissions"""
         if target is None:
             target = ctx.author
@@ -38,10 +49,10 @@ class Perms(commands.Cog):
             avatar = target.display_avatar.replace(static_format="png", size=256)
             name = str(target)
         elif isinstance(target, discord.Role):
-            perms = target.permissions
-            if channel is not None:
-                perms.update(**{x[0]:x[1] for x in channel.overwrites_for(ctx.guild.default_role) if x[1] is not None})
-                perms.update(**{x[0]:x[1] for x in channel.overwrites_for(target) if x[1] is not None})
+            if channel is None:
+                perms = target.permissions
+            else:
+                perms = channel.permissions_for(target)
             col = target.color
             avatar = ctx.guild.icon.replace(format='png', size=256) if ctx.guild.icon else discord.embeds.EmptyEmbed
             name = str(target)
@@ -58,7 +69,7 @@ class Perms(commands.Cog):
         else:
             # Here we check if the value of each permission is True.
             for perm_id, value in perms:
-                if (perm_id not in self.perms_name['text']+self.perms_name['common_channel'] and isinstance(channel,discord.TextChannel)) or (perm_id not in self.perms_name['voice']+self.perms_name['common_channel'] and isinstance(channel,discord.VoiceChannel)):
+                if (perm_id not in self.perms_name['text']+self.perms_name['common_channel'] and isinstance(channel,discord.abc.Messageable)) or (perm_id not in self.perms_name['voice']+self.perms_name['common_channel'] and isinstance(channel,discord.VoiceChannel)):
                     continue
                 #perm = perm.replace('_',' ').title()
                 perm_tr = await self.bot._(ctx.guild.id, "permissions.list."+perm_id)
