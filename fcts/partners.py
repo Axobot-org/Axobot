@@ -278,6 +278,7 @@ class Partners(commands.Cog):
 
     @partner_main.command(name='add')
     @commands.check(checks.database_connected)
+    @commands.check(checks.has_admin)
     async def partner_add(self, ctx: MyContext, invite:args.Invite, *, description=''):
         """Add a partner in your list
 
@@ -315,6 +316,7 @@ class Partners(commands.Cog):
     
     @partner_main.command(name='description',aliases=['desc'])
     @commands.check(checks.database_connected)
+    @commands.check(checks.has_admin)
     async def partner_desc(self, ctx: MyContext, ID:int, *, description:str):
         """Add or modify a description for a partner
 
@@ -332,6 +334,7 @@ class Partners(commands.Cog):
             await ctx.send(await self.bot._(ctx.guild.id,'partners','unknown-error'))
 
     @partner_main.command(name='invite')
+    @commands.check(checks.has_manage_guild)
     async def partner_invite(self, ctx: MyContext, ID:int, new_invite:discord.Invite=None):
         """Get the invite of a guild partner. 
         If you specify an invite, the partner will be updated with this new invite
@@ -446,7 +449,7 @@ class Partners(commands.Cog):
             await ctx.send(f"__{fields_name[0]}:__\n{f[0]}\n\n__{fields_name[1]}:__\n{f[1]}")
 
     @partner_main.command(name="color",aliases=['colour'])
-    @commands.check(checks.has_manage_guild)
+    @commands.check(checks.has_admin)
     async def partner_color(self, ctx: MyContext, color):
         """Change the color of the partners embed
     It has the same result as `config change partner_color`
@@ -459,7 +462,7 @@ class Partners(commands.Cog):
         await self.bot.get_cog('Servers').conf_color(ctx,'partner_color',str(color))
     
     @partner_main.command(name='reload')
-    @commands.check(checks.has_admin)
+    @commands.check(checks.has_manage_guild)
     @commands.cooldown(1,60,commands.BucketType.guild)
     async def partner_reload(self, ctx: MyContext):
         """Reload your partners channel
