@@ -101,7 +101,7 @@ class TaskHandler:
             guild = self.bot.get_guild(task['guild'])
             if guild is None:
                 return False
-            channel = guild.get_channel(task["channel"])
+            channel = guild.get_channel(task["channel"]) or guild.get_thread(task["channel"])
             member = await guild.fetch_member(task["user"])
             # if channel has been deleted, or if member left the guild, we send it in DM
             if channel is None or member is None:
@@ -125,7 +125,7 @@ class TaskHandler:
             if task['data'] is not None:
                 task['data'] = json.loads(task['data'])
             msg = await self.bot._(channel, "timers.rmd.embed-asked", user=user.mention, duration=f_duration)
-            if channel.permissions_for(guild.me).embed_links:
+            if isinstance(channel, discord.User) or channel.permissions_for(guild.me).embed_links:
                 if 'msg_url' in task['data']:
                     task["message"] += "\n\n[{}]({})".format(
                         await self.bot._(channel, "timers.rmd.embed-link"),
