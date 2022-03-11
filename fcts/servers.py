@@ -1,13 +1,15 @@
-import typing
-from libs.classes import Zbot, MyContext
-import time
-import emoji
 import copy
-import discord
-from discord.ext import commands
+import time
+import typing
 from math import ceil
 
+import discord
+import emoji
 from cachingutils import LRUCache
+from discord.ext import commands
+from libs.classes import MyContext, Zbot
+
+from fcts import checks
 
 roles_options = ["clear","slowmode","mute","kick","ban","warn","say","welcome_roles","muted_role",'partner_role','update_mentions','verification_role','voice_roles']
 bool_options = ["enable_xp","anti_caps_lock","enable_fun","help_in_dm","compress_help"]
@@ -302,20 +304,18 @@ class Servers(commands.Cog):
 
     @sconfig_main.command(name="del")
     @commands.cooldown(1, 2, commands.BucketType.guild)
+    @commands.check(checks.has_manage_guild)
     async def sconfig_del(self, ctx: MyContext, option: str):
         """Reset an option to zero"""
-        if not (ctx.channel.permissions_for(ctx.author).manage_guild or await self.bot.get_cog("Admin").check_if_god(ctx)):
-            return await ctx.send(await self.bot._(ctx.guild.id, "server.need-manage-server"))
         if not ctx.bot.database_online:
             return await ctx.send(await self.bot._(ctx.guild.id,"cases.no_database"))
         await self.sconfig_del2(ctx, option)
 
     @sconfig_main.command(name="change")
     @commands.cooldown(1, 2, commands.BucketType.guild)
+    @commands.check(checks.has_manage_guild)
     async def sconfig_change(self, ctx: MyContext, option:str, *, value: str):
         """Allows you to modify an option"""
-        if not (ctx.channel.permissions_for(ctx.author).manage_guild or await self.bot.get_cog("Admin").check_if_god(ctx)):
-            return await ctx.send(await self.bot._(ctx.guild.id, "server.need-manage-server"))
         if not ctx.bot.database_online:
             return await ctx.send(await self.bot._(ctx.guild.id,"cases.no_database"))
         if value == 'del':
