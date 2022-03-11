@@ -407,7 +407,7 @@ Every information come from the website www.fr-minecraft.net"""
             if port is None:
                 display_ip = ip
             else:
-                display_ip = "{}:{}".format(ip, port)
+                display_ip = f"{ip}:{port}"
             await self.bot.get_cog('Rss').add_flow(ctx.guild.id, ctx.channel.id, 'mc', "{}:{}".format(ip, port))
             await ctx.send(await self.bot._(ctx.guild, "minecraft.success-add", ip=display_ip, channel=ctx.channel.mention))
         except Exception as e:
@@ -448,7 +448,7 @@ Every information come from the website www.fr-minecraft.net"""
                 players = [str(await self.bot._(guild, "misc.none")).capitalize()]
             else:
                 players = [await self.bot._(guild, "minecraft.no-player-list")]
-        IP = "{}:{}".format(ip, port) if port is not None else str(ip)
+        IP = f"{ip}:{port}" if port is not None else str(ip)
         if r["favicon"] is not None:
             img_url = "https://api.minetools.eu/favicon/" + \
                 str(ip) + str("/"+str(port) if port is not None else '')
@@ -493,7 +493,7 @@ Every information come from the website www.fr-minecraft.net"""
             version = r["software"]+" "+r['version']
         else:
             version = r['version']
-        IP = "{}:{}".format(ip, port) if port is not None else str(ip)
+        IP = f"{ip}:{port}" if port is not None else str(ip)
         desc = "\n".join(r['motd']['clean'])
         o = r['players']['online']
         m = r['players']['max']
@@ -579,7 +579,7 @@ Every information come from the website www.fr-minecraft.net"""
             if ip[1] is None:
                 ip = ip[0]
             else:
-                ip = ip[0]+":"+ip[1]
+                ip = f"{ip[0]}:{ip[1]}"
             return discord.Embed(title=await self.bot._(guild, "minecraft.serv-title", ip=ip), color=discord.Colour(0x417505), description=obj, timestamp=datetime.datetime.utcfromtimestamp(time.time()))
         else:
             return await obj.create_msg(guild, self.bot._)
