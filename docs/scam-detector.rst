@@ -1,3 +1,5 @@
+:og:description: Zbot has a very cool and unique scam detection feature. This article explains how that massive thing technically works.
+
 ==================
 Zbot scam detector
 ==================
