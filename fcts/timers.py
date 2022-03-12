@@ -4,9 +4,9 @@ import datetime
 import discord
 from discord.ext import commands
 from libs.classes import ConfirmView, MyContext, Zbot
+from libs.formatutils import FormatUtils
 
 from fcts import args, checks
-from libs.formatutils import FormatUtils
 
 
 class Timers(commands.Cog):
@@ -20,11 +20,11 @@ class Timers(commands.Cog):
     async def remindme(self, ctx: MyContext, *, args):
         """Create a new reminder
         This is actually an alias of `reminder create`
-        
+
         ..Example rmd 3h 5min It's pizza time!
 
         ..Doc miscellaneous.html#create-a-new-reminder"""
-        ctx.message.content = ctx.prefix + "reminder create " + args
+        ctx.message.content = ctx.prefix + ("reminder " if args.startswith('create') else "reminder create ") + args
         new_ctx = await self.bot.get_context(ctx.message)
         await self.bot.invoke(new_ctx)
 
@@ -44,7 +44,7 @@ class Timers(commands.Cog):
     @commands.check(checks.database_connected)
     async def remind_create(self, ctx: MyContext, duration: commands.Greedy[args.tempdelta], *, message):
         """Create a new reminder
-        
+
         Please use the following format:
         `XXm` : XX minutes
         `XXh` : XX hours
@@ -66,8 +66,8 @@ class Timers(commands.Cog):
         try:
             d = {'msg_url': ctx.message.jump_url}
             await ctx.bot.task_handler.add_task("timer", duration, ctx.author.id, ctx.guild.id if ctx.guild else None, ctx.channel.id, message, data=d)
-        except Exception as e:
-            await ctx.bot.get_cog("Errors").on_command_error(ctx,e)
+        except Exception as err:
+            await ctx.bot.get_cog("Errors").on_command_error(ctx, err)
         else:
             await ctx.send(await self.bot._(ctx.channel, "timers.rmd.saved", duration=f_duration))
 
