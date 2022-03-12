@@ -187,6 +187,8 @@ class ServerLogs(commands.Cog):
                 guild = self.bot.get_guild(msg.guild_id)
                 link = f"https://discord.com/channels/{msg.guild_id}/{msg.channel_id}/{msg.message_id}"
             new_content = msg.data.get('content')
+            if new_content is None and msg.data['flags'] & 32:
+                return
             emb = discord.Embed(
                 description=f"**[Message]({link}) updated in <#{msg.channel_id}>**",
                 colour=discord.Color.light_gray())
