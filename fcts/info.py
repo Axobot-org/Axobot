@@ -617,8 +617,6 @@ Available types: member, role, user, emoji, channel, server, invite, category
         created_date = f"<t:{guild.created_at.timestamp():.0f}>"
         created_since = await FormatUtils.time_delta(delta.total_seconds(), lang=lang, year=True, hour=delta.total_seconds() < 86400)
         embed.add_field(name=await self.bot._(ctx.guild.id, "info.info.member-1"), value = "{} ({} {})".format(created_date, since, created_since), inline=False)
-        # Voice region
-        embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.guild-2"), value=str(guild.region).capitalize())
         # Member count
         embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.role-3"), value=await self.bot._(ctx.guild.id,"info.info.guild-7", c=guild.member_count, b=bots, o=online))
         # Channel count
