@@ -1,7 +1,8 @@
-import discord
 import re
 import string
 import typing
+
+import discord
 from discord.ext import commands
 from libs.classes import MyContext
 
@@ -11,21 +12,21 @@ class tempdelta(commands.Converter):
         pass
 
     async def convert(self, ctx: MyContext, argument: str) -> int:
-        d = 0
+        duration = 0
         found = False
         # ctx.invoked_with
-        for x in [('y', 86400*365), ('w', 604800), ('d', 86400), ('h', 3600), ('m', 60), ('min', 60)]:
-            r = re.search(r'^(\d+)'+x[0]+'$', argument)
+        for symbol, coef in [('y', 86400*365), ('w', 604800), ('d', 86400), ('h', 3600), ('m', 60), ('min', 60)]:
+            r = re.search(r'^(\d+)'+symbol+'$', argument)
             if r is not None:
-                d += int(r.group(1))*x[1]
+                duration += int(r.group(1))*coef
                 found = True
         r = re.search(r'^(\d+)h(\d+)m?$', argument)
         if r is not None:
-            d += int(r.group(1))*3600 + int(r.group(2))*60
+            duration += int(r.group(1))*3600 + int(r.group(2))*60
             found = True
         if not found:
             raise commands.errors.BadArgument('Invalid duration: '+argument)
-        return d
+        return duration
 
 
 class user(commands.converter.UserConverter):
@@ -209,7 +210,8 @@ class snowflake(commands.Converter):
 class serverlog(commands.Converter):
     "Convert arguments to a server log type"
     async def convert(self, ctx: MyContext, argument: str) -> str:
-        from fcts.serverlogs import ServerLogs # pylint: disable=import-outside-toplevel
+        from fcts.serverlogs import \
+            ServerLogs  # pylint: disable=import-outside-toplevel
 
         if argument in ServerLogs.available_logs or argument == 'all':
             return argument
