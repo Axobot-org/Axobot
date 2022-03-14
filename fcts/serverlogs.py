@@ -1,8 +1,8 @@
 import asyncio
-from typing import Optional
+
 import discord
 from cachingutils import LRUCache
-from discord.ext import commands
+from discord.ext import commands, tasks
 from libs.classes import MyContext, Zbot
 
 from fcts.args import serverlog
@@ -28,24 +28,28 @@ class ServerLogs(commands.Cog):
         self.bot = bot
         self.file = "serverlogs"
         self.cache: LRUCache[int, dict[int, list[str]]] = LRUCache(max_size=10000, timeout=3600*4)
+        self.to_send: dict[discord.TextChannel, list[discord.Embed]] = {}
+        self.auditlogs_timeout = 3 # seconds
+        self.send_logs_task.start() # pylint: disable=no-member
 
 
-    async def is_log_enabled(self, guild: int, log: str) -> Optional[list[int]]:
+    async def is_log_enabled(self, guild: int, log: str) -> list[int]:
         "Check if a log kind is enabled for a guild, and return the corresponding logs channel ID"
         guild_logs = await self.db_get_from_guild(guild)
-        res = list()
+        res: list[int] = []
         for channel, event in guild_logs.items():
             if log in event:
                 res.append(channel)
         return res
 
-    async def send_logs(self, guild: discord.Guild, channel_ids: list[int], embed: discord.Embed):
+    async def validate_logs(self, guild: discord.Guild, channel_ids: list[int], embed: discord.Embed):
         "Send a log embed to the corresponding modlogs channels"
         for channel_id in channel_ids:
             if channel := guild.get_channel(channel_id):
-                perms = channel.permissions_for(guild.me)
-                if perms.send_messages and perms.embed_links:
-                    await channel.send(embed=embed)
+                if channel in self.to_send:
+                    self.to_send[channel].append(embed)
+                else:
+                    self.to_send[channel] = [embed]
 
     async def db_get_from_channel(self, guild: int, channel: int) -> list[str]:
         "Get enabled logs for a channel"
@@ -84,6 +88,20 @@ class ServerLogs(commands.Cog):
             if query_result > 0 and guild in self.cache and channel in self.cache[guild]:
                 self.cache[guild][channel] = [x for x in self.cache[guild][channel] if x != kind]
             return query_result > 0
+
+
+    @tasks.loop(seconds=30)
+    async def send_logs_task(self):
+        "Send ready logs every 1min to avoid rate limits"
+        for channel, embeds in dict(self.to_send).items():
+            perms = channel.permissions_for(channel.guild.me)
+            if perms.send_messages and perms.embed_links:
+                await channel.send(embeds=embeds)
+                self.to_send.pop(channel)
+
+    @send_logs_task.before_loop
+    async def before_logs_task(self):
+        await self.bot.wait_until_ready()
 
 
     @commands.group(name="modlogs")
@@ -199,7 +217,7 @@ class ServerLogs(commands.Cog):
             if author:
                 emb.set_author(name=str(author), icon_url=author.display_avatar)
                 emb.add_field(name="Message Author", value=f"{author} ({author.id})")
-            await self.send_logs(guild, channel_ids, emb)
+            await self.validate_logs(guild, channel_ids, emb)
 
     @commands.Cog.listener()
     async def on_message_delete(self, msg: discord.Message):
@@ -215,7 +233,7 @@ class ServerLogs(commands.Cog):
             emb.set_author(name=str(msg.author), icon_url=msg.author.display_avatar)
             emb.add_field(name="Created at", value=f"<t:{msg.created_at.timestamp():.0f}>")
             emb.add_field(name="Message Author", value=f"{msg.author} ({msg.author.id})")
-            await self.send_logs(msg.guild, channel_ids, emb)
+            await self.validate_logs(msg.guild, channel_ids, emb)
 
     @commands.Cog.listener()
     async def on_raw_bulk_message_delete(self, payload: discord.RawBulkMessageDeleteEvent):
@@ -231,7 +249,7 @@ class ServerLogs(commands.Cog):
                 description=f"**{len(payload.message_ids)} messages deleted in <#{payload.channel_id}>**",
                 colour=discord.Color.red()
             )
-            await self.send_logs(guild, channel_ids, emb)
+            await self.validate_logs(guild, channel_ids, emb)
 
     @commands.Cog.listener()
     async def on_member_update(self, before: discord.Member, after: discord.Member):
@@ -246,11 +264,20 @@ class ServerLogs(commands.Cog):
                 color=discord.Color.blurple()
             )
             if removed_roles:
-                emb.add_field(name="Roles granted", value=' '.join(r.mention for r in removed_roles), inline=False)
+                emb.add_field(name="Roles revoked", value=' '.join(r.mention for r in removed_roles), inline=False)
             if added_roles:
-                emb.add_field(name="Roles revoked", value=' '.join(r.mention for r in added_roles), inline=False)
+                emb.add_field(name="Roles granted", value=' '.join(r.mention for r in added_roles), inline=False)
             emb.set_author(name=str(after), icon_url=after.avatar or after.default_avatar)
-            await self.send_logs(after.guild, channel_ids, emb)
+            # if we have access to audit logs, just wait a bit to make sure the ban is logged
+            if before.guild.me.guild_permissions.view_audit_log:
+                now = self.bot.utcnow()
+                await asyncio.sleep(self.auditlogs_timeout)
+                async for entry in before.guild.audit_logs(limit=5, action=discord.AuditLogAction.member_role_update,
+                                                           oldest_first=False):
+                    if entry.target.id == before.id and (entry.created_at - now).total_seconds() < 5:
+                        emb.add_field(name="Roles edited by", value=f"**{entry.user.mention}** ({entry.user.id})")
+                        break
+            await self.validate_logs(after.guild, channel_ids, emb)
         # member nick
         if before.nick != after.nick and (channel_ids := await self.is_log_enabled(before.guild.id, "member_nick")):
             emb = discord.Embed(
@@ -261,7 +288,7 @@ class ServerLogs(commands.Cog):
             after_txt = "None" if after.nick is None else discord.utils.escape_markdown(after.nick)
             emb.add_field(name="Nickname edited", value=f"{before_txt} -> {after_txt}")
             emb.set_author(name=str(after), icon_url=after.avatar or after.default_avatar)
-            await self.send_logs(after.guild, channel_ids, emb)
+            await self.validate_logs(after.guild, channel_ids, emb)
         # member avatar
         if before.guild_avatar != after.guild_avatar and (
                 channel_ids := await self.is_log_enabled(before.guild.id, "member_avatar")
@@ -274,18 +301,18 @@ class ServerLogs(commands.Cog):
             after_txt = "None" if after.guild_avatar is None else f"[After]{after.guild_avatar}"
             emb.add_field(name="Server avatar edited", value=f"{before_txt} -> {after_txt}")
             emb.set_author(name=str(after), icon_url=after.avatar or after.default_avatar)
-            await self.send_logs(after.guild, channel_ids, emb)
+            await self.validate_logs(after.guild, channel_ids, emb)
 
     async def get_member_specs(self, member: discord.Member) -> list[str]:
         "Get specific things to note for a member"
         specs = []
         if member.pending:
             specs.append("pending verification")
-        if member.public_flags.verified_bot():
+        if member.public_flags.verified_bot:
             specs.append("verified bot")
         elif member.bot:
             specs.append("bot")
-        if member.public_flags.staff():
+        if member.public_flags.staff:
             specs.append("Discord staff")
         return specs
 
@@ -299,10 +326,10 @@ class ServerLogs(commands.Cog):
                 colour=discord.Color.green()
             )
             emb.set_author(name=str(member), icon_url=member.display_avatar)
-            emb.add_field(name="Account created at", value=f"<t:{member.created_at}>", inline=False)
+            emb.add_field(name="Account created at", value=f"<t:{member.created_at.timestamp():.0f}>", inline=False)
             if specs := await self.get_member_specs(member):
                 emb.add_field(name="Specificities", value=", ".join(specs), inline=False)
-            await self.send_logs(member.guild, channel_ids, emb)
+            await self.validate_logs(member.guild, channel_ids, emb)
 
     @commands.Cog.listener()
     async def on_member_remove(self, member: discord.Member):
@@ -314,14 +341,15 @@ class ServerLogs(commands.Cog):
                 colour=discord.Color.orange()
             )
             emb.set_author(name=str(member), icon_url=member.display_avatar)
-            emb.add_field(name="Account created at", value=f"<t:{member.created_at}>", inline=False)
+            emb.add_field(name="Account created at", value=f"<t:{member.created_at.timestamp():.0f}>", inline=False)
             if member.joined_at:
-                emb.add_field(name="Joined your server at", value=f"<t:{member.joined_at}> (<t:{member.joined_at}:R>)",
+                emb.add_field(name="Joined your server at",
+                              value=f"<t:{member.joined_at.timestamp():.0f}> (<t:{member.joined_at.timestamp():.0f}:R>)",
                               inline=False)
             if specs := await self.get_member_specs(member):
                 emb.add_field(name="Specificities", value=", ".join(specs), inline=False)
             emb.add_field(name=f"Roles ({len(member.roles)})", value=" ".join(r.mention for r in member.roles[::-1][:20]))
-            await self.send_logs(member.guild, channel_ids, emb)
+            await self.validate_logs(member.guild, channel_ids, emb)
 
     @commands.Cog.listener()
     async def on_member_ban(self, guild: discord.Guild, user: discord.User):
@@ -335,13 +363,14 @@ class ServerLogs(commands.Cog):
             emb.set_author(name=str(user), icon_url=user.display_avatar)
             # if we have access to audit logs, just wait a bit to make sure the ban is logged
             if guild.me.guild_permissions.view_audit_log:
-                await asyncio.sleep(3)
-                async for entry in guild.audit_logs(limit=5, action=discord.AuditLogAction.ban):
-                    if entry.target.id == user.id:
+                now = self.bot.utcnow()
+                await asyncio.sleep(self.auditlogs_timeout)
+                async for entry in guild.audit_logs(limit=5, action=discord.AuditLogAction.ban, oldest_first=False):
+                    if entry.target.id == user.id and (entry.created_at - now).total_seconds() < 5:
                         emb.add_field(name="Banned by", value=f"**{entry.user.mention}** ({entry.user.id})")
                         emb.add_field(name="With reason", value=entry.reason or "No reason specified")
                         break
-            await self.send_logs(guild, channel_ids, emb)
+            await self.validate_logs(guild, channel_ids, emb)
 
     @commands.Cog.listener()
     async def on_member_unban(self, guild: discord.Guild, user: discord.User):
@@ -355,13 +384,14 @@ class ServerLogs(commands.Cog):
             emb.set_author(name=str(user), icon_url=user.display_avatar)
             # if we have access to audit logs, just wait a bit to make sure the unban is logged
             if guild.me.guild_permissions.view_audit_log:
-                await asyncio.sleep(3)
-                async for entry in guild.audit_logs(limit=5, action=discord.AuditLogAction.unban):
-                    if entry.target.id == user.id:
+                now = self.bot.utcnow()
+                await asyncio.sleep(self.auditlogs_timeout)
+                async for entry in guild.audit_logs(limit=5, action=discord.AuditLogAction.unban, oldest_first=False):
+                    if entry.target.id == user.id and (entry.created_at - now).total_seconds() < 5:
                         emb.add_field(name="Unbanned by", value=f"**{entry.user.mention}** ({entry.user.id})")
                         emb.add_field(name="With reason", value=entry.reason or "No reason specified")
                         break
-            await self.send_logs(guild, channel_ids, emb)
+            await self.validate_logs(guild, channel_ids, emb)
 
 
     @commands.Cog.listener()
@@ -388,7 +418,7 @@ class ServerLogs(commands.Cog):
                 specs.append("Hoisted")
             if specs:
                 emb.add_field(name="Specificities", value=", ".join(specs), inline=False)
-            await self.send_logs(role.guild, channel_ids, emb)
+            await self.validate_logs(role.guild, channel_ids, emb)
 
 
 def setup(bot):
