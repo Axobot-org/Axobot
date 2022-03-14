@@ -1,6 +1,6 @@
-discord.py @ git+https://github.com/Rapptz/discord.py.git
+discord.py @ git+git://github.com/Rapptz/discord.py.git@38e6dc4f27d70ce22d088fbe605c2da0a31f228d
 aiohttp
-mysql-connector-python
+mysql-connector-python>=8.0
 frmc-lib @ git+https://github.com/ZRunner/fr-mc-python-lib.git@v1.0.6
 python-i18n @ git+https://github.com/ZRunner/python-i18n/
 emoji
@@ -14,6 +14,6 @@ psutil>=5.8
 speedtest-cli
 feedparser>=6.0
 google-api-python-client
-babel
-cachingutils
+Babel>=2.9
+cachingutils>=1.0
 typing_extensions>=4.0
