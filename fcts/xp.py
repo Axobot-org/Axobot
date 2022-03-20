@@ -103,7 +103,7 @@ class Xp(commands.Cog):
             if time.time() - self.cache['global'][msg.author.id][0] < self.cooldown:
                 return
         content = msg.clean_content
-        if len(content)<self.minimal_size or await self.check_spam(content) or await self.check_cmd(msg):
+        if len(content)<self.minimal_size or await self.check_spam(content) or await self.bot.potential_command(msg):
             return
         if len(self.cache["global"]) == 0:
             await self.bdd_load_cache(-1)
@@ -137,7 +137,7 @@ class Xp(commands.Cog):
         if msg.author.id in self.cache[msg.guild.id].keys():
             if time.time() - self.cache[msg.guild.id][msg.author.id][0] < 60:
                 return
-        if await self.check_cmd(msg):
+        if await self.bot.potential_command(msg):
             return
         giv_points = random.randint(15,25) * rate
         if msg.author.id in self.cache[msg.guild.id].keys():
@@ -169,7 +169,7 @@ class Xp(commands.Cog):
             if time.time() - self.cache[msg.guild.id][msg.author.id][0] < self.cooldown:
                 return
         content = msg.clean_content
-        if len(content)<self.minimal_size or await self.check_spam(content) or await self.check_cmd(msg):
+        if len(content)<self.minimal_size or await self.check_spam(content) or await self.bot.potential_command(msg):
             return
         giv_points = await self.calc_xp(msg) * rate
         if msg.author.id in self.cache[msg.guild.id].keys():
@@ -232,14 +232,6 @@ class Xp(commands.Cog):
         else:
             item = ''
         await destination.send(text.format_map(self.bot.SafeDict(user=msg.author.mention,level=lvl[0],random=item,username=msg.author.display_name)))
-        
-    async def check_cmd(self, msg: discord.Message):
-        """Vérifie si un message est une commande"""
-        pr = await self.bot.get_prefix(msg)
-        is_cmd = False
-        for p in pr:
-            is_cmd = is_cmd or msg.content.startswith(p)
-        return is_cmd
 
     async def check_spam(self, text: str):
         """Vérifie si un text contient du spam"""
