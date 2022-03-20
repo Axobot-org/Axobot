@@ -1,10 +1,11 @@
-import discord
+import copy
 import inspect
 import json
-import copy
 from typing import List
+
+import discord
 from discord.ext import commands
-from libs.classes import Zbot, MyContext
+from libs.classes import MyContext, Zbot
 
 
 class Help(commands.Cog):
