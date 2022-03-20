@@ -22,7 +22,7 @@
         "internal-error": "Oops, an internal error occurrd...\nBut doan worry, we'r on teh place: https://memegenerator.net/img/instances/61333990.jpg",
         "value-deleted": "The '%{option}' opshun value haz been deleted",
         "edit-success": {
-            "boolean": "The '%{opt}' opzion haz been modified wif the value *%{val}*",
+            "boolean": "The '%{opt}' opzion haz been modified 2 the value *%{val}*",
             "category": "ur '%{opt}' option haz been changd with teh %{val} category",
             "color": "The coulor uzd for the option %{opt} is naw %{val}",
             "emojis": "Teh emojiz 4 the opshun '%{opt}' are naw %{val}",
@@ -50,6 +50,7 @@
         "see-title": "%{guild} server configurashiun",
         "server_desc": {
             "anti_caps_lock": "Shuld the baot sent a mssge when a mmBEr sents TOO MANY C:a:PITAL LETERZ ??!!??! %{value}",
+            "anti_scam": "Internet is dangerouz. Make sur 2 check where ur clickin. am I not right? %{value}",
             "anti_raid": "Lev3l of anti-rayderz protect: %{value} \n*([Dowcumetaton](https://zbot.rtfd.io/en/latest/moderator.html#anti-raid))*",
             "autoremove_xp": "XP points taken /day to sleeping people: %{value}",
             "ban": "List for r:o2:les that cawn use this command 'ban': %{value}",

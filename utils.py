@@ -152,6 +152,7 @@ def load_cogs(bot: "Zbot"):
     initial_extensions = ['fcts.languages',
                       'fcts.admin',
                       'fcts.aide',
+                      'fcts.antiscam',
                       'fcts.bot_events',
                       'fcts.bot_stats',
                       'fcts.cases',
