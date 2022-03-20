@@ -254,6 +254,14 @@ class Zbot(commands.bot.AutoShardedBot):
             embeds = (embed.to_dict() for embed in embeds)
             requests.post(url, json={"embeds": embeds})
 
+    async def potential_command(self, message: discord.Message):
+        "Check if a message is potentially a bot command"
+        prefixes = await self.get_prefix(message)
+        is_cmd = False
+        for prefix in prefixes:
+            is_cmd = is_cmd or message.content.startswith(prefix)
+        return is_cmd
+
 
 class ConfirmView(discord.ui.View):
     "A simple view used to confirm an action"
