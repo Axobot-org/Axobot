@@ -25,3 +25,4 @@ docs/_*
 rankcards_update.json
 *-cache.json
 *.tar
+libs/*/data/

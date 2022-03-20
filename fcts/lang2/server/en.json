@@ -22,7 +22,7 @@
         "internal-error": "Oops, an internal error occurred...",
         "value-deleted": "The \"%{option}\" option value has been deleted",
         "edit-success": {
-            "boolean": "The \"%{opt}\" option has been modified with the value *%{name}*",
+            "boolean": "The \"%{opt}\" option has been set to *%{val}*",
             "category": "The '%{opt}' option has been modified with the %{val} category",
             "color": "The color used for the option %{opt} is now %{val}",
             "emoji": "The emojis for the option \"%{opt}\" are now %{val}",
@@ -49,7 +49,8 @@
         "see-0": "Enter `!config help` for more details",
         "see-title": "%{guild} server configuration",
         "server_desc": {
-            "anti_caps_lock": "Should the bot send a message when a member sends too many capital letters? %{value}",
+            "anti_caps_lock": "Should I send a message when a member sends too many capital letters? %{value}",
+            "anti_scam": "Should I check for malicious messages and delete them? %{value}",
             "anti_raid": "Level of anti-raid protection: %{value} \n*([Documentation](https://zbot.rtfd.io/en/latest/moderator.html#anti-raid))*",
             "autoremove_xp": "Experience points removed daily from inactive members: %{value}",
             "ban": "List of roles that can use the command \"ban\": %{value}",

@@ -22,7 +22,7 @@
         "internal-error": "Oups, une erreur interne est survenue...",
         "value-deleted": "La valeur de l'option '%{option}' a bien été effacée",
         "edit-success": {
-            "boolean": "L'option '%{opt}' a bien été modifiée avec la valeur *%{val}*",
+            "boolean": "L'option '%{opt}' a bien mise à *%{val}*",
             "category": "L'option '%{opt}' a bien été modifiée avec la catégorie %{val}",
             "color": "La couleur utilisée pour l'option %{opt} est maintenant %{val}",
             "emojis": "Les émojis pour l'option '%{opt}' sont maintenant %{val}",
@@ -49,7 +49,8 @@
         "see-0": "Entrez `!config help` pour plus de détails",
         "see-title": "Configuration du serveur %{guild}",
         "server_desc": {
-            "anti_caps_lock": "Le bot doit-il envoyer un message lorsqu'un membre envoie trop de majuscules ? %{value}",
+            "anti_caps_lock": "Dois-je envoyer un message d'avertissement lorsqu'un membre envoie trop de majuscules ? %{value}",
+            "anti_scam": "Dois-je lire tous les messages pour détecter et supprimer les messages dangereux ? %{value}",
             "anti_raid": "Niveau de la protection anti-raid : %{value} \n*([Documentation](https://zbot.rtfd.io/en/latest/moderator.html#anti-raid))*",
             "autoremove_xp": "Points d'expériences enlevés chaque jour aux membres inactifs : %{value}",
             "ban": "Liste des rôles qui peuvent utiliser la commande 'ban' : %{value}",
