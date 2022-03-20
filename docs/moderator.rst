@@ -216,11 +216,40 @@ It is recommended to give this role to all new members via the `welcome_roles` o
 
 **List of commands:**
 :code:`verify`: ask a question to check the member
-:code:`config change verification_role <role>>` configures the role to be removed from the verified members
+:code:`config change verification_role <role>` configures the role to be removed from the verified members
 
 
 .. warning:: For this system, the bot **must** have "`Manage Roles <perms.html#manage-roles>`__" permission. The roles to be removed **must** also be lower than the role of Zbot in your server hierarchy (Server Settings > Roles tab).
 
+
+-----------
+Server logs
+-----------
+
+To help you moderate your server and keep track of what's going on, Zbot has a logging system somewhat similar to the Discord one. You can decide to track one or more types of "events" in a channel, and Zbot will send a message there whenever something new happens. For example, it is possible to have a log at every ban or unban, or when a member changes role, etc.
+
+.. note:: The bot has very few different types of logs at the moment, but there are plans to add many more in the next updates!
+
+How to setup logs
+-----------------
+
+You can enable one or more logs types in a channel by using the :code:`modlogs enable <logs>` in the channel you want them to appear in. In the same way, use :code:`modlogs disable <logs>` to disable a kind of logs in the current channel. Please note that you can use the keyword "all" as a log type to enable or disable all at the same time.
+
+To see in Discord which logs exists and which ones you have enabled in your server, use the command :code:`modlogs list`. You can also use this command followed by a channel mention or ID to see which logs are enabled in a specific channel.
+
+Types of logs
+-------------
+
+* **member_roles:** A member gets or loses roles
+* **member_nick:** A member has its nickname changed
+* **member_avatar:** A member changes its guild avatar
+* **member_join:** A member joins your server
+* **member_leave:** A member leaves your server
+* **member_ban:** A user is banned from your server
+* **member_unban:** A user is unbanned from your server
+* **message_update:** A message is edited
+* **message_delete:** A message is deleted
+* **role_creation:** A role is created
 
 
 --------------
