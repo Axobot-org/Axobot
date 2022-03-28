@@ -201,18 +201,19 @@ class BotEvents(commands.Cog):
         else:
             msg = f"**{title}** ({user})"
             if objectives_title != "":
-                msg += "\n\n__{}:__\n{}".format(objectives_title, prices)
-            msg += "\n\n__{}:__ {}\n__{}:__ {}".format(
-                rank_total, str(points), rank_global, user_rank)
+                msg += f"\n\n__{objectives_title}:__\n{prices}"
+            msg += f"\n\n__{rank_total}:__ {points}\n__{rank_global}:__ {user_rank}"
             await ctx.send(msg)
 
 
     async def db_add_dailies(self, userid: int, points: int):
+        "Add dailies points to a user"
         query = "INSERT INTO `dailies` (`userID`,`points`) VALUES (%(u)s,%(p)s) ON DUPLICATE KEY UPDATE points = points + %(p)s;"
         async with self.bot.db_query(query, {'u': userid, 'p': points}):
             pass
 
     async def db_get_dailies(self, userid: int) -> Optional[dict]:
+        "Get dailies info about a user"
         query = "SELECT * FROM `dailies` WHERE userid = %(u)s;"
         async with self.bot.db_query(query, {'u': userid}) as query_results:
             return query_results[0] if len(query_results) > 0 else None
@@ -220,6 +221,9 @@ class BotEvents(commands.Cog):
     @commands.command(name="fish")
     async def fish(self, ctx: MyContext):
         "Try to catch a fish and get some event points!"
+        if not self.current_event or self.current_event_data['type'] != "fish":
+            await ctx.send(await self.bot._(ctx.channel, "bot_events.nothing-desc"))
+            return
         last_data = await self.db_get_dailies(ctx.author.id)
         cooldown = 3600/2 # 30min
         time_since_available: int = 0 if last_data is None else (
