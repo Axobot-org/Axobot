@@ -3,7 +3,7 @@
         "afk": {
             "afk-done": "You are now AFK",
             "no-perm": "Oops, I cannot change your nickname :confused: I will try to remember, but I could forget that you're afk",
-            "afk-user-reason": "This member is AFK, because %{reason}",
+            "afk-user-reason": "This member is AFK! Reason: %{reason}",
             "afk-user-noreason": "This user is AFK!",
             "unafk-cant": "You aren't AFK!",
             "unafk-done": "You aren't AFK anymore"
