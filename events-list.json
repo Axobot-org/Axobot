@@ -54,5 +54,13 @@
         "icon": null,
         "color": 16089635,
         "objectives": [150]
+    },
+    "april-2022": {
+        "begin": "2022-04-01",
+        "end": "2022-04-02",
+        "type": "fish",
+        "icon": null,
+        "color": 16733391,
+        "objectives": [200]
     }
 }
