@@ -385,7 +385,7 @@ class Events(commands.Cog):
             self.last_statusio = d
 
     async def botEventLoop(self):
-        self.bot.get_cog("BotEvents").updateCurrentEvent()
+        self.bot.get_cog("BotEvents").update_current_event()
         e = self.bot.get_cog("BotEvents").current_event
         emb = discord.Embed(description=f'**Bot event** updated (current event is {e})', color=1406147, timestamp=self.bot.utcnow())
         emb.set_author(name=self.bot.user, icon_url=self.bot.user.display_avatar)
