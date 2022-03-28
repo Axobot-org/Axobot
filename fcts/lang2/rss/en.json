@@ -60,6 +60,7 @@
         "yt": "YouTube",
         "yt-default-flow": "{logo}  | New video of {author}: **{title}**\nPublished on {date}\nLink: {link}\n{mentions}",
         "yt-form-last": "{logo}  | Here is the last video of {author}:\n{title}\nPublished on {date}\nLink: {url}",
-        "yt-help": "To search for a youtube channel, you must enter the channel ID. You will find it at the end of the string url, it can be either the name, or a string of random characters.\n*Tip: some channels are already filled in my code. Sometimes you can just put `neil3000` or `Oxisius`* :wink:"
+        "yt-help": "To search for a youtube channel, you must enter the channel ID. You will find it at the end of the string url, it can be either the name, or a string of random characters.\n*Tip: some channels are already filled in my code. Sometimes you can just put `neil3000` or `Oxisius`* :wink:",
+        "yt-invalid": "Oops, I couldn't find any YouTube channel with this ID!"
     }
 }

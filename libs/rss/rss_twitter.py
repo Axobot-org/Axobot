@@ -9,7 +9,7 @@ import discord
 import twitter
 from cachingutils import acached
 
-from libs.rss_general import RssMessage
+from .rss_general import RssMessage
 
 if TYPE_CHECKING:
     from libs.classes import Zbot
