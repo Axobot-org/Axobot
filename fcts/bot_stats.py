@@ -63,10 +63,10 @@ class BotStats(commands.Cog):
         # get current process for performances logs
         py = psutil.Process(os.getpid())
         # get current time
-        now = time()
+        now = self.bot.utcnow()
         # remove seconds and less
-        now = datetime.fromtimestamp(now-now % 60, tz=timezone.utc)
-        # prepare erquests
+        now = now.replace(second=0, microsecond=0)
+        # prepare requests
         query = "INSERT INTO zbot VALUES (%s, %s, %s, %s, %s, %s);"
         cnx = self.bot.cnx_stats
         cursor = cnx.cursor(dictionary=True)
