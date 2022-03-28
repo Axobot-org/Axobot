@@ -50,7 +50,7 @@ class RssMessage:
         self.bot = bot
         self.Type = Type
         self.url = url
-        self.title = title
+        self.title = title if len(title) < 300 else title[:299]+'…'
         self.embed = False # WARNING COOKIES WARNINNG
         self.image = image
         if isinstance(date, datetime.datetime):
@@ -61,7 +61,7 @@ class RssMessage:
             self.date = date
         else:
             self.date = None
-        self.author = author
+        self.author = author if author is None or len(author) < 100 else author[:99]+'…'
         self.format: str = Format
         if Type == 'yt':
             self.logo = emojis['youtube']

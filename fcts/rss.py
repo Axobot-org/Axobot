@@ -12,9 +12,7 @@ import twitter
 from aiohttp import ClientSession, client_exceptions
 from discord.ext import commands, tasks
 from libs.classes import MyContext, Zbot
-from libs.rss_general import RssMessage, feed_parse
-from libs.rss_twitter import TwitterRSS
-from libs.rss_youtube import YoutubeRSS
+from libs.rss import RssMessage, feed_parse, TwitterRSS, YoutubeRSS
 
 from fcts import args, checks, reloads
 
@@ -108,7 +106,7 @@ class Rss(commands.Cog):
             channel = self.youtube_rss.get_channel_by_custom_url(channel)
         if channel is None:
             # we couldn't get the ID based on user input
-            await ctx.send(await self.bot._(ctx.channel, "rss.web-invalid"))
+            await ctx.send(await self.bot._(ctx.channel, "rss.yt-invalid"))
             return
         text = await self.youtube_rss.get_feed(ctx.channel, channel)
         if isinstance(text, str):

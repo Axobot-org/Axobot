@@ -10,7 +10,7 @@ from cachingutils import acached, cached
 
 from libs.youtube_search import Service
 
-from libs.rss_general import RssMessage, feed_parse
+from .rss_general import RssMessage, feed_parse
 
 if TYPE_CHECKING:
     from libs.classes import Zbot
