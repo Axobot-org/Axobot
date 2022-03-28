@@ -141,3 +141,29 @@ class RssMessage:
             if self.image is not None:
                 emb.set_thumbnail(url=self.image)
             return emb
+
+class FeedSelectView(discord.ui.View):
+    "Used to ask to select an rss feed"
+    def __init__(self, feeds: list[dict[str, Any]]):
+        super().__init__()
+        options = self.build_options(feeds)
+        self.select = discord.ui.Select(placeholder='Choose a RSS feed', min_values=1, max_values=1, options=options)
+        self.select.callback = self.callback
+        self.add_item(self.select)
+        self.feeds: list[int] = None
+
+    def build_options(self, feeds: list[dict[str, Any]]) -> list[discord.SelectOption]:
+        "Build the options list for Discord"
+        res = []
+        for feed in feeds:
+            label = f"{feed['tr_type']} - {feed['name']}"
+            res.append(discord.SelectOption(value=feed['ID'], label=label))
+        return res
+
+    async def callback(self, interaction: discord.Interaction):
+        "Called when the dropdown menu has been validated by the user"
+        self.feeds = self.select.values
+        print("received", self.select.values)
+        # await interaction.delete_original_message()
+        await interaction.response.defer()
+        self.stop()

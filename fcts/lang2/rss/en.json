@@ -4,7 +4,10 @@
         "choose-delete": "Please choose the flow to delete",
         "choose-mentions-1": "Please choose the flow to modify",
         "choose-roles": "What roles will be mentioned?",
-        "delete-success": "The flow has been successfully deleted!",
+        "delete-success": {
+            "one": "The flow has been successfully deleted!",
+            "many": "%{count} flows have been successfully deleted!"
+        },
         "deviant": "DeviantArt",
         "deviant-default-flow": "{logo}  | New creation by {author} : **{title}**\nPublished on {date}\nLink: {link}\n{mentions}",
         "deviant-form-last": "{logo}  | Here is the new creation of {author}:\n{title}\nPublished on {date}\nLink: {url}",
