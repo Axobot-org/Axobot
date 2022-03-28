@@ -1,35 +1,45 @@
-import discord
 import datetime
 import json
+
+import discord
 from discord.ext import commands
-from libs.classes import Zbot, MyContext
-from libs.formatutils import FormatUtils
+from libs.classes import MyContext, Zbot
 
 data = {
     "fr": {
         "events-desc": {
-            "april-2021": "Aujourd'hui, c'est la journée internationale des poissons ! Pendant toute la journée, Zbot fêtera le 1er avril avec des émojis spéciaux pour le jeu du morpion, un avatar unique ainsi que d'autres choses trop cool. \n\nProfitez-en pour récupérer des points d'événements et tentez de gagner la carte d'xp rainbow ! Pour rappel, les cartes d'xp sont accessibles via ma commande `profile card`"
+            "april-2021": "Aujourd'hui, c'est la journée internationale des poissons ! Pendant toute la journée, Zbot fêtera le 1er avril avec des émojis spéciaux pour le jeu du morpion, un avatar unique ainsi que d'autres choses trop cool. \n\nProfitez-en pour récupérer des points d'événements et tentez de gagner la carte d'xp rainbow ! Pour rappel, les cartes d'xp sont accessibles via ma commande `profile card`",
+            "april-2022": "Aujourd'hui, c'est la journée internationale des poissons ! Pendant toute la journée, Zbot fêtera le 1er avril avec des émojis spéciaux pour le jeu du morpion, des commandes uniques ainsi que d'autres choses trop cool. \n\nProfitez-en pour récupérer des points d'événements et tentez de gagner la carte d'xp rainbow ! Pour rappel, les cartes d'xp sont accessibles via ma commande `profile card`"
         },
         "events-price": {
             "april-2021": {
                 "120": "Débloquez la carte d'xp multicolore, obtenable qu'un seul jour par an !"
+            },
+            "april-2022": {
+                "200": "Débloquez la carte d'xp sous-marine, obtenable pendant seulement 24h !"
             }
         },
         "events-title": {
-            "april-2021": "Joyeux 1er avril !"
+            "april-2021": "Joyeux 1er avril !",
+            "april-2022": "Joyeux 1er avril !"
         }
     },
     "en": {
         "events-desc": {
-            "april-2021": "Today is International Fish Day! All day long, Zbot will be celebrating April 1st with special tic-tac-toe emojis, a unique avatar and other cool stuff. \nTake the opportunity to collect event points and try to win the rainbow xp card! As a reminder, the xp cards are accessible via my `profile card` command"
+            "april-2021": "Today is International Fish Day! All day long, Zbot will be celebrating April 1st with special tic-tac-toe emojis, a unique avatar and other cool stuff. \nTake the opportunity to collect event points and try to win the rainbow xp card! As a reminder, the xp cards are accessible via my `profile card` command",
+            "april-2022": "Today is International Fish Day! Throughout the day, Zbot will be celebrating April 1 with special tic-tac-toe emojis, unique commands and other cool stuff. \n\nTake the opportunity to collect event points and try to win the rainbow xp card! As a reminder, the xp cards are accessible via my `profile card` command"
         },
         "events-price": {
             "april-2021": {
                 "120": "Unlock the rainbow xp card, obtainable only one day a year!"
+            },
+            "april-2022": {
+                "200": "Unlock the submarine xp card, obtainable only for 24h!"
             }
         },
         "events-title": {
-            "april-2021": "Happy April 1st!"
+            "april-2021": "Happy April 1st!",
+            "april-2022": "Happy April 1st!"
         }
     }
 }
@@ -42,25 +52,35 @@ class BotEvents(commands.Cog):
         self.current_event: str = None
         self.current_event_data: dict = {}
         self.current_event_id: str = None
-        self.updateCurrentEvent()
 
-    def updateCurrentEvent(self):
+        self.coming_event: str = None
+        self.coming_event_data: dict = {}
+        self.coming_event_id: str = None
+        self.update_current_event()
+
+    def update_current_event(self):
+        "Update class attributes with the new/incoming bot events if needed"
         today = datetime.date.today()
-        with open("events-list.json", 'r') as f:
-            events = json.load(f)
+        with open("events-list.json", 'r', encoding='utf-8') as file:
+            events = json.load(file)
         self.current_event = None
         self.current_event_data = {}
         self.current_event_id = None
         for ev_id, ev_data in events.items():
             ev_data["begin"] = datetime.datetime.strptime(
-                ev_data["begin"], "%Y-%m-%d")
+                ev_data["begin"], "%Y-%m-%d").replace(tzinfo=datetime.timezone.utc)
             ev_data["end"] = datetime.datetime.strptime(
-                ev_data["end"], "%Y-%m-%d")
-            if ev_data["begin"].date() <= today and ev_data["end"].date() >= today:
+                ev_data["end"], "%Y-%m-%d").replace(tzinfo=datetime.timezone.utc)
+
+            if ev_data["begin"].date() <= today <= ev_data["end"].date():
                 self.current_event = ev_data["type"]
                 self.current_event_data = ev_data
                 self.current_event_id = ev_id
                 break
+            elif ev_data["begin"].date() - datetime.timedelta(days=1) <= today <= ev_data["end"].date():
+                self.coming_event = ev_data["type"]
+                self.coming_event_data = ev_data
+                self.coming_event_id = ev_id
 
     @commands.group(name="events", aliases=["botevents", "botevent", "event"])
     async def events_main(self, ctx: MyContext):
@@ -84,9 +104,8 @@ class BotEvents(commands.Cog):
             except KeyError:
                 title = self.current_event
             # Begin/End dates
-            nice_date = FormatUtils.date
-            begin = await nice_date(self.current_event_data["begin"], lang, year=True, digital=True, hour=False)
-            end = await nice_date(self.current_event_data["end"], lang, year=True, digital=True, hour=False)
+            begin = f"<t:{self.current_event_data['begin'].timestamp():.0f}>"
+            end = f"<t:{self.current_event_data['end'].timestamp():.0f}>"
             if ctx.can_send_embed:
                 emb = discord.Embed(title=title, description=event_desc, color=self.current_event_data["color"])
                 emb.set_image(url=self.current_event_data["icon"])
@@ -110,10 +129,15 @@ class BotEvents(commands.Cog):
                     )
                 await ctx.send(embed=emb)
             else:
-                txt = f"**{title}**\n\n{event_desc}"
-                txt += "\n\n__{}:__ {}".format((await self.bot._(ctx.channel, "misc.beginning")).capitalize(), begin)
-                txt += "\n__{}:__ {}".format((await self.bot._(ctx.channel, "misc.end")).capitalize(), end)
+                txt = f"""**{title}**\n\n{event_desc}
+                
+                __{(await self.bot._(ctx.channel, "misc.beginning")).capitalize()}:__ {begin}
+                __{(await self.bot._(ctx.channel, "misc.end")).capitalize()}:__ {end}
+                """
                 await ctx.send(txt)
+        elif self.coming_event_data:
+            date = f"<t:{self.coming_event_data['begin'].timestamp():.0f}>"
+            await ctx.send(await self.bot._(ctx.channel, "bot_events.soon", date=date))
         else:
             await ctx.send(await self.bot._(ctx.channel, "bot_events.nothing-desc"))
 
