@@ -79,6 +79,10 @@ class YoutubeRSS:
     def get_channel_by_user_name(self, username: str):
         return self.search_service.find_channel_by_user_name(username)
 
+    @cached(timeout=86400)
+    def get_channel_name_by_id(self, channel_id: str):
+        return self.search_service.query_channel_title(channel_id)
+
     async def get_feed(self, channel: discord.TextChannel, identifiant: str, date: dt.datetime=None, session: aiohttp.ClientSession=None) -> Union[str, list[RssMessage]]:
         if identifiant == 'help':
             return await self.bot._(channel, "rss.yt-help")

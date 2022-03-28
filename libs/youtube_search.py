@@ -198,6 +198,24 @@ class Service:
                 return item['snippet']['customUrl']
         return None
 
+    def query_channel_title(self, channel_id: str) -> Optional[str]:
+        "Search for a custom URL from a given channel identifier"
+        resp = self.youtube.channels().list(  # pylint: disable=no-member
+            id=channel_id,
+            part='snippet',
+            fields='items(snippet(title))',
+            maxResults=1
+        ).execute()
+
+        # stev: 'items' may be absent
+        items = resp.get('items', [])
+        assert len(items) <= 1
+
+        for item in items:
+            if 'title' in item['snippet']:
+                return item['snippet']['title']
+        return None
+
 
 def service_func(func):
     "Handle Google errors while requesting an information"
@@ -268,6 +286,19 @@ class Act:
 
         if custom_name is not None:
             print(custom_name)
+
+    @staticmethod
+    @service_func
+    def query_channel_title(opts: Namespace):
+        "Find a custom channel name from its identifier and print the result"
+        service = Service(
+            opts.max_results,
+            opts.app_key)
+
+        title: Optional[str] = service.query_channel_title(opts.channel_url)
+
+        if title is not None:
+            print(title)
 
 
 def options():
