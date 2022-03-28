@@ -1,7 +1,7 @@
 {
     "fr": {
         "daily": {
-            "got-points": "Bravo ! Vous venez de gagner **{pts} points** d'événement !",
+            "got-points": "Bravo ! Vous venez de gagner **%{pts} points** d'événement !",
             "too-quick": "Il est encore trop tôt ! Vous ne pouvez récupérer des points d'événement qu'une fois par heure"
         }
     }
