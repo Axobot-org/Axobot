@@ -8,7 +8,10 @@ from fcts import checks
 
 def is_immune(member: discord.Member) -> bool:
     "Check if a member is immune to the anti-scam feature"
-    return member.bot or member.guild_permissions.administrator or member.guild_permissions.manage_messages or member.guild_permissions.manage_guild
+    return (member.bot
+            or member.guild_permissions.administrator
+            or member.guild_permissions.manage_messages
+            or member.guild_permissions.manage_guild)
 
 class AntiScam(commands.Cog):
     "Anti scam feature which read every message and detect if they are malicious"
@@ -55,7 +58,7 @@ class AntiScam(commands.Cog):
     @commands.Cog.listener()
     async def on_message(self, msg: discord.Message):
         "Check any message for scam dangerousity"
-        if not msg.guild or len(msg.content) < 10 or is_immune(msg) or await self.bot.potential_command(msg):
+        if not msg.guild or len(msg.content) < 10 or is_immune(msg.author) or await self.bot.potential_command(msg):
             return
         await self.bot.wait_until_ready()
         if not await self.bot.get_config(msg.guild.id, "anti_scam"):
