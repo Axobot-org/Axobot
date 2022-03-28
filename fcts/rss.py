@@ -15,6 +15,7 @@ from libs.classes import MyContext, Zbot
 from libs.rss import RssMessage, feed_parse, TwitterRSS, YoutubeRSS
 
 from fcts import args, checks, reloads
+from libs.rss.rss_general import FeedSelectView
 
 # importlib.reload(reloads)
 importlib.reload(args)
@@ -286,23 +287,19 @@ class Rss(commands.Cog):
         ..Example rss remove
 
         ..Doc rss.html#delete-a-followed-feed"""
-        flow = await self.askID(ID,
+        flows = await self.ask_rss_id(ID,
                                 ctx,
                                 await self.bot._(ctx.guild.id, "rss.choose-delete"),
-                                allow_mc=True,
-                                display_mentions=False
+                                include_mc=True
                                 )
-        if flow is None:
+        if flows is None:
             return
-        try:
-            await self.remove_flow(flow[0]['ID'])
-        except Exception as err:
-            await ctx.send(await self.bot._(ctx.guild, "rss.fail-add"))
-            await self.bot.get_cog("Errors").on_error(err,ctx)
-            return
-        await ctx.send(await self.bot._(ctx.guild, "rss.delete-success"))
-        self.bot.log.info("RSS feed deleted into server {} ({})".format(ctx.guild.id,flow[0]['ID']))
-        await self.send_log("Feed deleted into server {} ({})".format(ctx.guild.id,flow[0]['ID']),ctx.guild)
+        for flow in flows:
+            await self.remove_flow(flow['ID'])
+        await ctx.send(await self.bot._(ctx.guild, "rss.delete-success", count=len(flows)))
+        ids = ', '.join(flow['ID'] for flow in flows)
+        self.bot.log.info(f"RSS feed deleted into server {ctx.guild.id} ({ids})")
+        await self.send_log(f"Feed deleted into server {ctx.guild.id} ({ids})", ctx.guild)
 
     @rss_main.command(name="list")
     @commands.guild_only()
@@ -326,6 +323,7 @@ class Rss(commands.Cog):
                 channel = channel.mention
             else:
                 channel = flow['channel']
+            # flow mentions
             if flow['roles'] == '':
                 role = await self.bot._(ctx.guild.id, "misc.none")
             else:
@@ -338,6 +336,16 @@ class Rss(commands.Cog):
                         role.append(item)
                 role = ", ".join(role)
             flow_type = await self.bot._(ctx.guild.id,"rss."+flow['type'])
+            # flow name
+            flow_name = flow['link']
+            if flow['type'] == 'tw' and flow['link'].isnumeric():
+                try:
+                    flow_name = (await self.twitter_rss.get_user_from_id(int(flow['link']))).screen_name
+                except twitter.TwitterError as err:
+                    self.bot.log.debug(f"[rss:askID] Twitter error: {err}")
+            elif flow['type'] == 'yt' and (channel_name := self.youtube_rss.get_channel_name_by_id(flow['link'])):
+                flow_name = channel_name
+            # send embed
             if len(flows_to_display) > 20:
                 embed = discord.Embed(title=title, color=self.embed_color, timestamp=ctx.message.created_at)
                 embed.set_footer(text=ctx.author, icon_url=ctx.author.display_avatar)
@@ -345,7 +353,7 @@ class Rss(commands.Cog):
                     embed.add_field(name=self.bot.zws, value=text, inline=False)
                 await ctx.send(embed=embed)
                 flows_to_display.clear()
-            flows_to_display.append(translation.format(flow_type,channel,flow['link'],role,flow['ID'],flow['date']))
+            flows_to_display.append(translation.format(flow_type,channel,flow_name,role,flow['ID'],flow['date']))
         if len(flows_to_display) > 0:
             embed = discord.Embed(title=title, color=self.embed_color, timestamp=ctx.message.created_at)
             embed.set_footer(text=ctx.author, icon_url=ctx.author.display_avatar)
@@ -353,19 +361,58 @@ class Rss(commands.Cog):
                 embed.add_field(name=self.bot.zws, value=flow, inline=False)
             await ctx.send(embed=embed)
 
-    async def askID(self, ID, ctx: MyContext, title:str, allow_mc: bool=False, display_mentions: bool=True):
+    async def ask_rss_id(self, input_id: Optional[int], ctx: MyContext, title:str, include_mc: bool=False):
+        "Ask the user to select a feed ID"
+        selection = []
+        if input_id is not None:
+            selection = await self.get_flow(input_id)
+            if not selection or str(selection[0]['guild']) != str(ctx.guild.id):
+                input_id = None
+            elif (not include_mc) and selection[0]['type']=='mc':
+                input_id = None
+        if input_id is None:
+            guild_feeds = await self.get_guild_flows(ctx.guild.id)
+            if len(guild_feeds) == 0:
+                await ctx.send(await self.bot._(ctx.guild.id, "rss.no-feed"))
+                return
+            if not include_mc:
+                guild_feeds = [f for f in guild_feeds if f['type']!='mc']
+            for feed in guild_feeds:
+                feed['tr_type'] = await self.bot._(ctx.guild.id, "rss."+feed['type'])
+                feed['name'] = feed['link']
+                if feed['type'] == 'tw' and feed['link'].isnumeric():
+                    try:
+                        feed['name'] = (await self.twitter_rss.get_user_from_id(int(feed['link']))).screen_name
+                    except twitter.TwitterError as err:
+                        self.bot.log.debug(f"[rss:askID] Twitter error: {err}")
+                elif feed['type'] == 'yt' and (channel_name := self.youtube_rss.get_channel_name_by_id(feed['link'])):
+                    feed['name'] = channel_name
+            view = FeedSelectView(guild_feeds)
+            await ctx.send(title, view=view)
+            await view.wait()
+            if view.feeds is None:
+                await ctx.send("rip")
+                return
+            await ctx.send(str(view.feeds))
+            selection = view.feeds
+        if len(selection) == 0:
+            await ctx.send(await self.bot._(ctx.guild, "rss.fail-add"))
+            return
+        return selection
+
+    async def ask_rss_id_old(self, input_id: Optional[int], ctx: MyContext, title:str, allow_mc: bool=False, display_mentions: bool=True):
         """Demande l'ID d'un flux rss"""
         flow = list()
-        if ID is not None:
-            flow = await self.get_flow(ID)
+        if input_id is not None:
+            flow = await self.get_flow(input_id)
             if flow == []:
-                ID = None
+                input_id = None
             elif str(flow[0]['guild']) != str(ctx.guild.id):
-                ID = None
+                input_id = None
             elif (not allow_mc) and flow[0]['type']=='mc':
-                ID = None
-        userID = ctx.author.id
-        if ID is None:
+                input_id = None
+        userid = ctx.author.id
+        if input_id is None:
             gl = await self.get_guild_flows(ctx.guild.id)
             if len(gl) == 0:
                 await ctx.send(await self.bot._(ctx.guild.id, "rss.no-feed"))
@@ -374,7 +421,7 @@ class Rss(commands.Cog):
                 text = [await self.bot._(ctx.guild.id, "rss.list")]
             else:
                 text = [await self.bot._(ctx.guild.id, "rss.list2")]
-            list_of_IDs = list()
+            list_of_ids = list()
             iterator = 1
             translations = dict()
             for x in gl:
@@ -383,9 +430,9 @@ class Rss(commands.Cog):
                 if x['type'] == 'tw' and x['link'].isnumeric():
                     try:
                         x['link'] = (await self.twitter_rss.get_user_from_id(int(x['link']))).screen_name
-                    except twitter.TwitterError as e:
-                        self.bot.log.debug(f"[rss:askID] Twitter error: {e}")
-                list_of_IDs.append(x['ID'])
+                    except twitter.TwitterError as err:
+                        self.bot.log.debug(f"[rss:askID] Twitter error: {err}")
+                list_of_ids.append(x['ID'])
                 c = self.bot.get_channel(x['channel'])
                 if c is not None:
                     c = c.mention
@@ -429,14 +476,14 @@ class Rss(commands.Cog):
             def check(msg: discord.Message):
                 if not msg.content.isnumeric():
                     return False
-                return msg.author.id==userID and int(msg.content) in range(1,iterator)
+                return msg.author.id==userid and int(msg.content) in range(1,iterator)
             try:
                 msg = await self.bot.wait_for('message', check = check, timeout = max(20, 1.5*len(text)))
             except asyncio.TimeoutError:
                 await ctx.send(await self.bot._(ctx.guild.id, "rss.too-long"))
                 await emb_msg.delete(delay=0)
                 return
-            flow = await self.get_flow(list_of_IDs[int(msg.content)-1])
+            flow = await self.get_flow(list_of_ids[int(msg.content)-1])
         if len(flow) == 0:
             await ctx.send(await self.bot._(ctx.guild, "rss.fail-add"))
             return
@@ -468,7 +515,7 @@ class Rss(commands.Cog):
         ..Doc rss.html#mention-a-role"""
         try:
             # ask for flow ID
-            flow = await self.askID(ID,
+            flow = await self.ask_rss_id(ID,
                                     ctx,
                                     await self.bot._(ctx.guild.id, "rss.choose-mentions-1"))
         except Exception as e:
@@ -599,7 +646,7 @@ class Rss(commands.Cog):
             if channel is None:
                 channel = ctx.channel
             try:
-                flow = await self.askID(ID,
+                flow = await self.ask_rss_id(ID,
                                         ctx,
                                         await self.bot._(ctx.guild.id, "rss.choose-mentions-1"))
                 e = None
@@ -643,7 +690,7 @@ class Rss(commands.Cog):
         ..Doc rss.html#change-the-text"""
         try:
             try:
-                flow = await self.askID(ID,
+                flow = await self.ask_rss_id(ID,
                                         ctx,
                                         await self.bot._(ctx.guild.id, "rss.choose-mentions-1"))
             except Exception as e:
@@ -686,7 +733,7 @@ class Rss(commands.Cog):
         try:
             e = None
             try:
-                flow = await self.askID(ID,
+                flow = await self.ask_rss_id(ID,
                                         ctx,
                                         await self.bot._(ctx.guild.id, "rss.choose-mentions-1"))
             except Exception as e:

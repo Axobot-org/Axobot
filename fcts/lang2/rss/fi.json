@@ -4,7 +4,6 @@
         "choose-delete": "Valitse virtaus poistolle",
         "choose-mentions-1": "Valitse virtaus muokkaukselle",
         "choose-roles": "Mitkä roolit aiotaan mainita?",
-        "delete-success": "Virtaus on onnistuneesti poistettu!",
         "deviant": "DeviantArt",
         "deviant-default-flow": "{logo}  | Uusi luomus tekijä: {author} : **{title}**\nJulkaistu {date}\nLinkki: {link}\n{mentions}",
         "deviant-form-last": "{logo}  | Tässä uusi luomus tekijältä {author}:\n{title}\nJulkaistu {date}\nLinkki: {url}",

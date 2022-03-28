@@ -3,7 +3,6 @@
         "choose-delete": "Bitte wähle das aus, was gelöscht werden soll",
         "choose-mentions-1": "Bitte wähle das aus, was verändert werden soll",
         "choose-roles": "Welche Rollen sollen erwähnt werden?",
-        "delete-success": "Der Flow wurde erfolgreich gelöscht!",
         "deviant": "AbweichendeKunst",
         "deviant-default-flow": "{logo} | Neue Kreation von {author} : **{title}**\nVeröffentlicht am {date}\nLink: {link}\n{mentions}",
         "deviant-form-last": "{logo} | Hier ist die neuste Kreation von {author}:\n{title}\nVeröffentlicht am {date}\nLink: {url}",
