@@ -1,3 +1,4 @@
+import importlib
 from discord.ext import commands
 from libs.classes import MyContext, Zbot
 from utils import count_code_lines
@@ -49,14 +50,20 @@ class Reloads(commands.Cog):
             try:
                 self.bot.reload_extension(fcog)
             except ModuleNotFoundError:
-                await ctx.send("Cog {} can't be found".format(cog))
+                await ctx.send(f"Cog {cog} can't be found")
             except commands.errors.ExtensionNotLoaded :
-                await ctx.send("Cog {} was never loaded".format(cog))
-            except Exception as e:
-                await errors_cog.on_error(e,ctx)
-                await ctx.send(f'**`ERROR:`** {type(e).__name__} - {e}')
+                try:
+                    flib = importlib.import_module(cog)
+                    importlib.reload(flib)
+                except ModuleNotFoundError:
+                    await ctx.send(f"Cog {cog} was never loaded")
+                else:
+                    await ctx.send(f"Lib {cog} reloaded")
+            except Exception as err:
+                await errors_cog.on_error(err,ctx)
+                await ctx.send(f'**`ERROR:`** {type(err).__name__} - {err}')
             else:
-                self.bot.log.info("Module {} rechargé".format(cog))
+                self.bot.log.info(f"Module {cog} rechargé")
                 reloaded_cogs.append(cog)
             if cog == 'utilities':
                 await self.bot.get_cog('Utilities').on_ready()
