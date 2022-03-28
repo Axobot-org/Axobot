@@ -1,9 +1,12 @@
 import datetime
 import json
+from random import randint
+from typing import Optional
 
 import discord
 from discord.ext import commands
 from libs.classes import MyContext, Zbot
+from libs.formatutils import FormatUtils
 
 data = {
     "fr": {
@@ -45,10 +48,12 @@ data = {
 }
 
 class BotEvents(commands.Cog):
+    "Cog related to special bot events (like Halloween and Christmas)"
 
     def __init__(self, bot: Zbot):
         self.bot = bot
         self.file = "bot_events"
+        self.hourly_reward = [3, 19]
         self.current_event: str = None
         self.current_event_data: dict = {}
         self.current_event_id: str = None
@@ -200,6 +205,40 @@ class BotEvents(commands.Cog):
             msg += "\n\n__{}:__ {}\n__{}:__ {}".format(
                 rank_total, str(points), rank_global, user_rank)
             await ctx.send(msg)
+
+
+    async def db_add_dailies(self, userid: int, points: int):
+        query = "INSERT INTO `dailies` (`userID`,`points`) VALUES (%(u)s,%(p)s) ON DUPLICATE KEY UPDATE points = points + %(p)s;"
+        async with self.bot.db_query(query, {'u': userid, 'p': points}):
+            pass
+
+    async def db_get_dailies(self, userid: int) -> Optional[dict]:
+        query = "SELECT * FROM `dailies` WHERE userid = %(u)s;"
+        async with self.bot.db_query(query, {'u': userid}) as query_results:
+            return query_results[0] if len(query_results) > 0 else None
+
+    @commands.command(name="fish")
+    async def fish(self, ctx: MyContext):
+        "Try to catch a fish and get some event points!"
+        last_data = await self.db_get_dailies(ctx.author.id)
+        cooldown = 3600/2 # 30min
+        time_since_available: int = 0 if last_data is None else (
+            datetime.datetime.now() - last_data['last_update']).total_seconds() - cooldown
+        if time_since_available >= 0:
+            points = randint(*self.hourly_reward)
+            await self.bot.get_cog("Utilities").add_user_eventPoint(ctx.author.id, points)
+            await self.db_add_dailies(ctx.author.id, points)
+            txt = await self.bot._(ctx.channel, "halloween.daily.got-points", pts=points)
+        else:
+            lang = await self.bot._(ctx.channel, '_used_locale')
+            remaining = await FormatUtils.time_delta(-time_since_available, lang=lang)
+            txt = await self.bot._(ctx.channel, "blurple.collect.too-quick", time=remaining)
+        if ctx.can_send_embed:
+            title = "Fish event"
+            emb = discord.Embed(title=title, description=txt, color=16733391)
+            await ctx.send(embed=emb)
+        else:
+            await ctx.send(txt)
 
 
 def setup(bot):
