@@ -3,7 +3,7 @@ from __future__ import annotations
 import asyncio
 import datetime
 import time
-from typing import TYPE_CHECKING, Any, Optional
+from typing import TYPE_CHECKING, Any, Optional, Union
 
 import async_timeout
 import discord
@@ -11,7 +11,9 @@ import feedparser
 from aiohttp import ClientSession, client_exceptions
 from feedparser.util import FeedParserDict
 
+
 if TYPE_CHECKING:
+    from fcts.emojis import Emojis
     from libs.classes import Zbot
 
 async def feed_parse(bot: Zbot, url: str, timeout: int, session: ClientSession = None) -> Optional[feedparser.FeedParserDict]:
@@ -44,9 +46,24 @@ async def feed_parse(bot: Zbot, url: str, timeout: int, session: ClientSession =
     headers = {k.decode("utf-8").lower(): v.decode("utf-8") for k, v in headers}
     return feedparser.parse(html, response_headers=headers)
 
+def get_emoji(cog: 'Emojis', feed_type: str) -> Union[discord.Emoji, str]:
+    if feed_type == 'tw':
+        return cog.get_emoji('twitter')
+    elif feed_type == 'yt':
+        return cog.get_emoji('youtube')
+    elif feed_type == 'twitch':
+        return cog.get_emoji('twitch')
+    elif feed_type == 'reddit':
+        return cog.get_emoji('reddit')
+    elif feed_type == 'mc':
+        return cog.get_emoji('minecraft')
+    elif feed_type == 'deviant':
+        return cog.get_emoji('deviant')
+    else:
+        return "📰"    
 
 class RssMessage:
-    def __init__(self,bot:Zbot,Type,url,title,emojis,date=datetime.datetime.now(),author=None,Format=None,channel=None,retweeted_from=None,image=None):
+    def __init__(self,bot:Zbot,Type:str,url:str,title:str,date=datetime.datetime.now(),author=None,Format=None,channel=None,retweeted_from=None,image=None):
         self.bot = bot
         self.Type = Type
         self.url = url
@@ -63,18 +80,9 @@ class RssMessage:
             self.date = None
         self.author = author if author is None or len(author) < 100 else author[:99]+'…'
         self.format: str = Format
-        if Type == 'yt':
-            self.logo = emojis['youtube']
-        elif Type == 'tw':
-            self.logo = emojis['twitter']
-        elif Type == 'reddit':
-            self.logo = emojis['reddit']
-        elif Type == 'twitch':
-            self.logo = emojis['twitch']
-        elif Type == 'deviant':
-            self.logo = emojis['deviant']
-        else:
-            self.logo = ':newspaper:'
+        self.logo = get_emoji(bot.get_cog('Emojis'), self.Type)
+        if isinstance(self.logo, discord.Emoji):
+            self.logo = str(self.logo)
         self.channel = channel
         self.mentions = []
         self.rt_from = retweeted_from
