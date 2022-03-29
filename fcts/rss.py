@@ -16,7 +16,7 @@ from libs.formatutils import FormatUtils
 from libs.rss import RssMessage, feed_parse, TwitterRSS, YoutubeRSS
 
 from fcts import args, checks, reloads
-from libs.rss.rss_general import FeedSelectView
+from libs.rss.rss_general import FeedSelectView, get_emoji
 
 # importlib.reload(reloads)
 importlib.reload(args)
@@ -396,20 +396,7 @@ class Rss(commands.Cog):
                 elif feed['type'] == 'yt' and (channel_name := self.youtube_rss.get_channel_name_by_id(feed['link'])):
                     feed['name'] = channel_name
                 # emoji
-                if feed['type'] == 'tw':
-                    feed['emoji'] = await self.bot.get_cog("Emojis").get_emoji('twitter')
-                elif feed['type'] == 'yt':
-                    feed['emoji'] = await self.bot.get_cog("Emojis").get_emoji('youtube')
-                elif feed['type'] == 'twitch':
-                    feed['emoji'] = await self.bot.get_cog("Emojis").get_emoji('twitch')
-                elif feed['type'] == 'reddit':
-                    feed['emoji'] = await self.bot.get_cog("Emojis").get_emoji('reddit')
-                elif feed['type'] == 'mc':
-                    feed['emoji'] = await self.bot.get_cog("Emojis").get_emoji('minecraft')
-                elif feed['type'] == 'deviant':
-                    feed['emoji'] = await self.bot.get_cog("Emojis").get_emoji('deviant')
-                else:
-                    feed['emoji'] = "📰"    
+                feed['emoji'] = get_emoji(self.bot.get_cog('Emojis'), feed['type'])
             view = FeedSelectView(guild_feeds)
             await ctx.send(title, view=view)
             await view.wait()
@@ -849,7 +836,7 @@ class Rss(commands.Cog):
                 if yt is None:
                     tw = await self.twitter_rss.is_twitter_url(feeds.feed['link'])
                     if tw is not None:
-                        txt.append("<:twitter:437220693726330881>  "+tw)
+                        txt.append("<:twitter:958325391196585984>  "+tw)
                     elif 'link' in feeds.feed.keys():
                         txt.append(":newspaper:  <"+feeds.feed['link']+'>')
                     else:
@@ -934,7 +921,7 @@ class Rss(commands.Cog):
             img_url = None
             if r is not None:
                 img_url = r.group(1)
-            obj = RssMessage(bot=self.bot,Type='twitch',url=feed['link'],title=feed['title'],emojis=self.bot.get_cog('Emojis').customs,date=feed['published_parsed'],author=feeds.feed['title'].replace("'s Twitch video RSS",""),image=img_url,channel=nom)
+            obj = RssMessage(bot=self.bot,Type='twitch',url=feed['link'],title=feed['title'],date=feed['published_parsed'],author=feeds.feed['title'].replace("'s Twitch video RSS",""),image=img_url,channel=nom)
             return [obj]
         else:
             liste = list()
@@ -947,7 +934,7 @@ class Rss(commands.Cog):
                 img_url = None
                 if r is not None:
                     img_url = r.group(1)
-                obj = RssMessage(bot=self.bot,Type='twitch',url=feed['link'],title=feed['title'],emojis=self.bot.get_cog('Emojis').customs,date=feed['published_parsed'],author=feeds.feed['title'].replace("'s Twitch video RSS",""),image=img_url,channel=nom)
+                obj = RssMessage(bot=self.bot,Type='twitch',url=feed['link'],title=feed['title'],date=feed['published_parsed'],author=feeds.feed['title'].replace("'s Twitch video RSS",""),image=img_url,channel=nom)
                 liste.append(obj)
             liste.reverse()
             return liste
@@ -1006,7 +993,6 @@ class Rss(commands.Cog):
                 Type='web',
                 url=l,
                 title=title,
-                emojis=self.bot.get_cog('Emojis').customs,
                 date=datz,
                 author=author,
                 channel=feeds.feed['title'] if 'title' in feeds.feed.keys() else '?',
@@ -1050,7 +1036,6 @@ class Rss(commands.Cog):
                         Type='web',
                         url=l,
                         title=title,
-                        emojis=self.bot.get_cog('Emojis').customs,
                         date=datz,
                         author=author,
                         channel=feeds.feed['title'] if 'title' in feeds.feed.keys() else '?',
@@ -1073,7 +1058,7 @@ class Rss(commands.Cog):
             feed = feeds.entries[0]
             img_url = feed['media_content'][0]['url'] if "media_content" in feed else None
             title = re.search(r"DeviantArt: ([^ ]+)'s gallery",feeds.feed['title']).group(1)
-            obj = RssMessage(bot=self.bot,Type='deviant',url=feed['link'],title=feed['title'],emojis=self.bot.get_cog('Emojis').customs,date=feed['published_parsed'],author=title,image=img_url)
+            obj = RssMessage(bot=self.bot,Type='deviant',url=feed['link'],title=feed['title'],date=feed['published_parsed'],author=title,image=img_url)
             return [obj]
         else:
             liste = list()
@@ -1082,7 +1067,7 @@ class Rss(commands.Cog):
                     break
                 img_url = feed['media_content'][0]['url'] if "media_content" in feed else None
                 title = re.search(r"DeviantArt: ([^ ]+)'s gallery",feeds.feed['title']).group(1)
-                obj = RssMessage(bot=self.bot,Type='deviant',url=feed['link'],title=feed['title'],emojis=self.bot.get_cog('Emojis').customs,date=feed['published_parsed'],author=title,image=img_url)
+                obj = RssMessage(bot=self.bot,Type='deviant',url=feed['link'],title=feed['title'],date=feed['published_parsed'],author=title,image=img_url)
                 liste.append(obj)
             liste.reverse()
             return liste
