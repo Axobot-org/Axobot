@@ -291,7 +291,8 @@ class Rss(commands.Cog):
         flows = await self.ask_rss_id(ID,
                                 ctx,
                                 await self.bot._(ctx.guild.id, "rss.choose-delete"),
-                                include_mc=True
+                                include_mc=True,
+                                max_count=None
                                 )
         if flows is None:
             return
@@ -362,7 +363,7 @@ class Rss(commands.Cog):
                 embed.add_field(name=self.bot.zws, value=flow, inline=False)
             await ctx.send(embed=embed)
 
-    async def ask_rss_id(self, input_id: Optional[int], ctx: MyContext, title:str, include_mc: bool=False) -> Optional[list[int]]:
+    async def ask_rss_id(self, input_id: Optional[int], ctx: MyContext, title:str, include_mc: bool=False, max_count:int=1) -> Optional[list[int]]:
         "Ask the user to select a feed ID"
         selection = []
         if input_id is not None:
@@ -397,12 +398,11 @@ class Rss(commands.Cog):
                     feed['name'] = channel_name
                 # emoji
                 feed['emoji'] = get_emoji(self.bot.get_cog('Emojis'), feed['type'])
-            view = FeedSelectView(guild_feeds)
+            view = FeedSelectView(guild_feeds, max_count or len(guild_feeds))
             await ctx.send(title, view=view)
             await view.wait()
             if view.feeds is None:
                 return
-            await ctx.send(str(view.feeds))
             try:
                 selection = list(map(int, view.feeds))
             except ValueError:
@@ -658,22 +658,20 @@ class Rss(commands.Cog):
             if channel is None:
                 channel = ctx.channel
             try:
-                flow = await self.ask_rss_id(ID,
-                                        ctx,
-                                        await self.bot._(ctx.guild.id, "rss.choose-mentions-1"))
+                flows = await self.ask_rss_id(ID, ctx, await self.bot._(ctx.guild.id, "rss.choose-mentions-1"), max_count=None)
                 e = None
             except Exception as e:
-                flow = []
-            if flow is None:
+                flows = []
+            if flows is None:
                 return
-            if len(flow) == 0:
+            if len(flows) == 0:
                 await ctx.send(await self.bot._(ctx.guild, "rss.fail-add"))
                 if e is not None:
                     await self.bot.get_cog("Errors").on_error(e,ctx)
                 return
-            flow = flow[0]
-            await self.update_flow(flow['ID'],[('channel',channel.id)])
-            await ctx.send(await self.bot._(ctx.guild.id,"rss.move-success", id=flow['ID'], channel=channel.mention))
+            for flow in flows:
+                await self.update_flow(flow,[('channel',channel.id)])
+            await ctx.send(await self.bot._(ctx.guild.id,"rss.move-success", count=len(flows), channel=channel.mention))
         except Exception as e:
             await ctx.send(await self.bot._(ctx.guild.id,"rss.guild-error", err=e))
 

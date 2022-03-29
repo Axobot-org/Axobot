@@ -25,7 +25,10 @@
         "list2": "*Type teh nmberZ ov the flowz 2 deletz*\n\n**Lnk - Tipe - Chanell**\n",
         "loop-processing": "Cant u plz WAIT??? Me is BUSY DUH :angrycat:",
         "mc": "Minekrraft",
-        "move-success": "Teh rsss feed #%{id} haz been movd in the chat %{channel}!",
+        "move-success": {
+            "one": "1 rss feed haz been movd in the chat %{channel}!",
+            "many": "%{count} rss feeds has been movd in the chat %{channel}!"
+        },
         "no-feed": "Oops, u donot hav any rss feds 2 managez plz!",
         "no-feed2": "Ur server don't has rss thingy!",
         "no-roles": "No more role hAVe bean configurated yetz.",

@@ -17,7 +17,6 @@
         "list-result": "Nachricht: {}\nDiscord Kanal: {}\nURL/Kanal: {}\nErwähnungen: {}\nIdentifizierung: {}\nletzter Post: {}",
         "list2": "*Schreibe die Nummer von dem Flow, der gelöscht werden soll*\n\n**Link - Nachricht - Kanal**",
         "mc": "Minecraft",
-        "move-success": "Der rss Feed #%{id} wurde in den Kanal %{channel} gemacht!",
         "no-feed": "Ups, du kannst keine rss Feeds verwalten!",
         "no-roles": "Es wurde noch keine Rolle konfiguriert.",
         "nothing": "Ich habe nichts bei meiner Suche gefunden 😕",
