@@ -1,6 +1,8 @@
 import string
 
 import requests
+import discord
+from typing import Optional
 from discord.ext import commands
 from libs.classes import Zbot
 
@@ -959,7 +961,8 @@ class Emojis(commands.Cog):
                         'red_warning': '<a:red_warning:499687652073668608>',
                         'readthedocs': '<:readthedocs:484841075001786368>',
                         'loading': '<a:loading:589205493013151770>',
-                        'deviant': '<:deviantart:626047669948776448>'}
+                        'deviant': '<:deviantart:626047669948776448>',
+                        'minecraft': '<:minecraft:958305433439834152>'}
 
         try:
             resp = requests.get(
@@ -976,7 +979,17 @@ class Emojis(commands.Cog):
         for name, unicode in emojiMap.items():
             text = text.replace(unicode, name)
         return text
-
+    
+    async def get_emoji(self, name: str) -> Optional[discord.Emoji]:
+        ids = {
+            "youtube": 447459436982960143,
+            "twitter": 437220693726330881,
+            "reddit": 447462065204887573,
+            "twitch": 544192114440011792,
+            "deviant": 626047669948776448,
+            "minecraft": 958305433439834152
+        }
+        return self.bot.get_emoji(ids[name])
 
 def setup(bot):
     bot.add_cog(Emojis(bot))
