@@ -25,7 +25,10 @@
         "list2": "*Entrez le numéro du flux à supprimer*\n\n**Lien - Type - Salon**\n",
         "loop-processing": "Une vérification de vos flux RSS est déjà en cours. Veuillez patienter quelques minutes",
         "mc": "Minecraft",
-        "move-success": "Le flux rss n°%{id} a bien été bougé dans le salon %{channel} !",
+        "move-success": {
+            "one": "Votre flux rss a bien été déplacé dans le salon %{channel} !",
+            "many": "%{count} flux rss ont été déplacés dans le salon %{channel} !"
+        },
         "no-feed": "Oups, vous n'avez aucun flux rss à gérer !",
         "no-feed2": "Ce serveur ne possède aucun flux rss !",
         "no-roles": "Aucun rôle n'a été configuré pour l'instant.",

@@ -20,7 +20,6 @@
         "list-title": "Lista rss lähteistä palvelimelta %{server}",
         "list2": "*Lähetä numero virtauksesta poistamiselle*\n\n**Linkki - Tyyli - Kanava**",
         "mc": "Minecraft",
-        "move-success": "Rss lähetys #{} on liikutettu kanavalle {}!",
         "no-feed": "Ups, sinulla ei ole mitään rss lähetyksiä joita voisit hallita!",
         "no-feed2": "Tällä palvelimella ei ole yhtään rss lähdettä!",
         "no-roles": "Mitään roolia ei ole konfiguroitu vielä.",

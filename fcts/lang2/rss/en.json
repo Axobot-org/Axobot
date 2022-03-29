@@ -1,12 +1,12 @@
 {
     "en": {
         "change-txt": "The current message contains  \n```\n%{text}\n```\nPlease enter the text to be used when creating a new post. You can use several variables, of which here is the list:\n- `{author}`: the author of the post\n- `{channel}`: the channel name (usually the same as author)\n- `{date}`: the post date (UTC)\n- `{link}` or `{url}`: a link to the post\n- `{logo}`: an emoji representing the type of post (web, Twitter, YouTube...)\n- `{mentions}`: the list of mentioned roles\n- `{title}`: the title of the post",
-        "choose-delete": "Please choose the flow to delete",
-        "choose-mentions-1": "Please choose the flow to modify",
+        "choose-delete": "Please choose the feeds to delete",
+        "choose-mentions-1": "Please choose the feeds to modify",
         "choose-roles": "What roles will be mentioned?",
         "delete-success": {
-            "one": "The flow has been successfully deleted!",
-            "many": "%{count} flows have been successfully deleted!"
+            "one": "The feed has been successfully deleted!",
+            "many": "%{count} feeds have been successfully deleted!"
         },
         "deviant": "DeviantArt",
         "deviant-default-flow": "{logo}  | New creation by {author} : **{title}**\nPublished on {date}\nLink: {link}\n{mentions}",
@@ -17,15 +17,18 @@
         "guild-complete": "%{count} rss streams have been correctly reloaded, in %{time} seconds!",
         "guild-error": "An error occurred during the procedure: `%{err}`\nIf you think this error is not your own, you can report it to support",
         "guild-loading": "Reloading %{emoji}",
-        "invalid-flow": "This url is invalid (empty or inaccessible rss flow) :confused:",
+        "invalid-flow": "This url is invalid (empty or inaccessible rss feeds) :confused:",
         "invalid-link": "Oops, this url address is invalid or incomplete :confused:",
-        "list": "*Type the number of the flow to modify*\n\n**Link - Type - Channel - Mentions**\n",
+        "list": "*Type the number of the feeds to modify*\n\n**Link - Type - Channel - Mentions**\n",
         "list-result": "Type: {}\nDiscord channel: {}\nURL/Channel: {}\nMentions: {}\nIdentifier: {}\nLast post: {}",
         "list-title": "List of rss feeds from the server %{server}",
-        "list2": "*Type the number of the flow to delete*\n\n**Link - Type - Channel**\n",
+        "list2": "*Type the number of the feeds to delete*\n\n**Link - Type - Channel**\n",
         "loop-processing": "A check of your RSS feeds is already in progress. Please wait a few minutes",
         "mc": "Minecraft",
-        "move-success": "The rss feed #%{id} has been moved in the channel %{channel}!",
+        "move-success": {
+            "one": "One RSS feed has been moved in the channel %{channel}!",
+            "many": "%{count} RSS feeds have been moved to the channel %{channel}!"
+        },
         "no-feed": "Oops, you don't have any rss feeds to manage!",
         "no-feed2": "This server has no rss feed!",
         "no-roles": "No role has been configured yet.",

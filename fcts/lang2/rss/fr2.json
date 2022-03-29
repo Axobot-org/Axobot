@@ -21,7 +21,6 @@
         "list2": "*Entre le numéro du flux à supprimer*\n\n**Lien - Type - Salon**\n",
         "loop-processing": "Une check de vos flux RSS est déjà en cours. Veuillez attendre quelques minutes.",
         "mc": "Minecraft",
-        "move-success": "Le flux RSS n°%{id} a bien été redirigé dans le salon %{channel} !",
         "no-feed": "Wait :confused:\n\n T'as aucun flux RSS à gérer :grinning: !",
         "no-feed2": "Ce serv à aucun flux RSS",
         "no-roles": ":shrug:\n\nT'as configuré aucun rôle !",
