@@ -157,13 +157,15 @@ class FeedSelectView(discord.ui.View):
         res = []
         for feed in feeds:
             label = f"{feed['tr_type']} - {feed['name']}"
-            res.append(discord.SelectOption(value=feed['ID'], label=label))
+            desc = f"{feed['tr_channel']} - Last post: {feed['tr_lastpost']}"
+            res.append(discord.SelectOption(value=feed['ID'], label=label, description=desc, emoji=feed['emoji']))
         return res
 
     async def callback(self, interaction: discord.Interaction):
         "Called when the dropdown menu has been validated by the user"
         self.feeds = self.select.values
         print("received", self.select.values)
-        # await interaction.delete_original_message()
         await interaction.response.defer()
+        self.select.disabled = True
+        await interaction.edit_original_message(view=self)
         self.stop()

@@ -12,6 +12,7 @@ import twitter
 from aiohttp import ClientSession, client_exceptions
 from discord.ext import commands, tasks
 from libs.classes import MyContext, Zbot
+from libs.formatutils import FormatUtils
 from libs.rss import RssMessage, feed_parse, TwitterRSS, YoutubeRSS
 
 from fcts import args, checks, reloads
@@ -378,7 +379,14 @@ class Rss(commands.Cog):
             if not include_mc:
                 guild_feeds = [f for f in guild_feeds if f['type']!='mc']
             for feed in guild_feeds:
+                # better type format
                 feed['tr_type'] = await self.bot._(ctx.guild.id, "rss."+feed['type'])
+                feed['tr_lastpost'] = await FormatUtils.date(feed['date'], lang=await self.bot._(ctx.channel,'_used_locale'), year=True, digital=True)
+                if channel := ctx.guild.get_channel(feed['channel']):
+                    feed['tr_channel'] = "#"+channel.name
+                else:
+                    feed['tr_channel'] = "#deleted"
+                # better name format (for Twitter/YouTube ID)
                 feed['name'] = feed['link']
                 if feed['type'] == 'tw' and feed['link'].isnumeric():
                     try:
@@ -387,6 +395,21 @@ class Rss(commands.Cog):
                         self.bot.log.debug(f"[rss:askID] Twitter error: {err}")
                 elif feed['type'] == 'yt' and (channel_name := self.youtube_rss.get_channel_name_by_id(feed['link'])):
                     feed['name'] = channel_name
+                # emoji
+                if feed['type'] == 'tw':
+                    feed['emoji'] = await self.bot.get_cog("Emojis").get_emoji('twitter')
+                elif feed['type'] == 'yt':
+                    feed['emoji'] = await self.bot.get_cog("Emojis").get_emoji('youtube')
+                elif feed['type'] == 'twitch':
+                    feed['emoji'] = await self.bot.get_cog("Emojis").get_emoji('twitch')
+                elif feed['type'] == 'reddit':
+                    feed['emoji'] = await self.bot.get_cog("Emojis").get_emoji('reddit')
+                elif feed['type'] == 'mc':
+                    feed['emoji'] = await self.bot.get_cog("Emojis").get_emoji('minecraft')
+                elif feed['type'] == 'deviant':
+                    feed['emoji'] = await self.bot.get_cog("Emojis").get_emoji('deviant')
+                else:
+                    feed['emoji'] = "📰"    
             view = FeedSelectView(guild_feeds)
             await ctx.send(title, view=view)
             await view.wait()
