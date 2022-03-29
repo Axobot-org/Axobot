@@ -367,11 +367,13 @@ class Rss(commands.Cog):
         "Ask the user to select a feed ID"
         selection = []
         if input_id is not None:
-            selection = await self.get_flow(input_id)
-            if not selection or str(selection[0]['guild']) != str(ctx.guild.id):
+            input_flow = await self.get_flow(input_id)
+            if not input_flow or str(input_flow['guild']) != str(ctx.guild.id):
                 input_id = None
-            elif (not include_mc) and selection[0]['type']=='mc':
+            elif (not include_mc) and input_flow['type']=='mc':
                 input_id = None
+            else:
+                selection = [input_flow['ID']]
         if input_id is None:
             guild_feeds = await self.get_guild_flows(ctx.guild.id)
             if len(guild_feeds) == 0:
@@ -416,13 +418,15 @@ class Rss(commands.Cog):
         """Demande l'ID d'un flux rss"""
         flow = list()
         if input_id is not None:
-            flow = await self.get_flow(input_id)
-            if flow == []:
+            input_flow = await self.get_flow(input_id)
+            if input_flow is None:
                 input_id = None
-            elif str(flow[0]['guild']) != str(ctx.guild.id):
+            elif str(input_flow['guild']) != str(ctx.guild.id):
                 input_id = None
-            elif (not allow_mc) and flow[0]['type']=='mc':
+            elif (not allow_mc) and input_flow['type']=='mc':
                 input_id = None
+            else:
+                flow = [input_flow]
         userid = ctx.author.id
         if input_id is None:
             gl = await self.get_guild_flows(ctx.guild.id)
@@ -495,7 +499,7 @@ class Rss(commands.Cog):
                 await ctx.send(await self.bot._(ctx.guild.id, "rss.too-long"))
                 await emb_msg.delete(delay=0)
                 return
-            flow = await self.get_flow(list_of_ids[int(msg.content)-1])
+            flow = [await self.get_flow(list_of_ids[int(msg.content)-1])]
         if len(flow) == 0:
             await ctx.send(await self.bot._(ctx.guild, "rss.fail-add"))
             return
@@ -700,17 +704,17 @@ class Rss(commands.Cog):
         ..Doc rss.html#change-the-text"""
         try:
             try:
-                flow = await self.ask_rss_id(ID,
+                flows = await self.ask_rss_id(ID,
                                         ctx,
                                         await self.bot._(ctx.guild.id, "rss.choose-mentions-1"))
             except Exception as e:
-                flow = []
-            if flow is None:
+                flows = []
+            if flows is None:
                 return
-            if len(flow) == 0:
+            if len(flows) == 0:
                 await ctx.send(await self.bot._(ctx.guild, "rss.fail-add"))
                 return
-            flow = flow[0]
+            flow = await self.get_flow(flows[0])
             if text is None:
                 await ctx.send(await self.bot._(ctx.guild.id, "rss.change-txt", text=flow['structure']))
                 def check(msg: discord.Message):
@@ -743,22 +747,22 @@ class Rss(commands.Cog):
         try:
             e = None
             try:
-                flow = await self.ask_rss_id(ID,
+                flows = await self.ask_rss_id(ID,
                                         ctx,
                                         await self.bot._(ctx.guild.id, "rss.choose-mentions-1"))
             except Exception as e:
-                flow = []
+                flows = []
                 await self.bot.get_cog("Errors").on_error(e,ctx)
-            if flow is None:
+            if flows is None:
                 return
-            if len(flow) == 0:
+            if len(flows) == 0:
                 await ctx.send(await self.bot._(ctx.guild, "rss.fail-add"))
                 if e is not None:
                     await self.bot.get_cog("Errors").on_error(e,ctx)
                 return
             if arguments is None or len(arguments.keys()) == 0:
                 arguments = None
-            flow = flow[0]
+            flow = await self.get_flow(flows[0])
             values_to_update = list()
             txt = list()
             if value is None and arguments is None:
@@ -1093,11 +1097,11 @@ class Rss(commands.Cog):
     def connect(self):
         return mysql.connector.connect(user=self.bot.database_keys['user'],password=self.bot.database_keys['password'],host=self.bot.database_keys['host'],database=self.bot.database_keys['database'])
 
-    async def get_flow(self, ID: int):
+    async def get_flow(self, ID: int) -> Optional[dict]:
         query = ("SELECT * FROM `{}` WHERE `ID`='{}'".format(self.table,ID))
         async with self.bot.db_query(query) as query_results:
             liste = list(query_results)
-        return liste
+        return liste[0] if len(liste) > 0 else None
 
     async def get_guild_flows(self, guildID: int):
         """Get every flow of a guild"""
