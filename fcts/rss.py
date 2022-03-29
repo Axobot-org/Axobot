@@ -295,9 +295,9 @@ class Rss(commands.Cog):
         if flows is None:
             return
         for flow in flows:
-            await self.remove_flow(flow['ID'])
+            await self.remove_flow(flow)
         await ctx.send(await self.bot._(ctx.guild, "rss.delete-success", count=len(flows)))
-        ids = ', '.join(flow['ID'] for flow in flows)
+        ids = ', '.join(map(str, flows))
         self.bot.log.info(f"RSS feed deleted into server {ctx.guild.id} ({ids})")
         await self.send_log(f"Feed deleted into server {ctx.guild.id} ({ids})", ctx.guild)
 
@@ -361,7 +361,7 @@ class Rss(commands.Cog):
                 embed.add_field(name=self.bot.zws, value=flow, inline=False)
             await ctx.send(embed=embed)
 
-    async def ask_rss_id(self, input_id: Optional[int], ctx: MyContext, title:str, include_mc: bool=False):
+    async def ask_rss_id(self, input_id: Optional[int], ctx: MyContext, title:str, include_mc: bool=False) -> Optional[list[int]]:
         "Ask the user to select a feed ID"
         selection = []
         if input_id is not None:
@@ -391,10 +391,12 @@ class Rss(commands.Cog):
             await ctx.send(title, view=view)
             await view.wait()
             if view.feeds is None:
-                await ctx.send("rip")
                 return
             await ctx.send(str(view.feeds))
-            selection = view.feeds
+            try:
+                selection = list(map(int, view.feeds))
+            except ValueError:
+                selection = []  
         if len(selection) == 0:
             await ctx.send(await self.bot._(ctx.guild, "rss.fail-add"))
             return
