@@ -954,7 +954,7 @@ class Emojis(commands.Cog):
                         'blurple': "<:blurple:443024761547653140>",
                         'owo': '<:owo:499661437589913621>',
                         'youtube': '<:youtube:447459436982960143>',
-                        'twitter': '<:twitter:437220693726330881>',
+                        'twitter': '<:twitter:958325391196585984>',
                         'reddit': '<:reddit:447462065204887573>',
                         'twitch': '<:twitch:544192114440011792>',
                         'red_alert': '<a:red_alert:499690261107048458>',
@@ -980,10 +980,10 @@ class Emojis(commands.Cog):
             text = text.replace(unicode, name)
         return text
     
-    async def get_emoji(self, name: str) -> Optional[discord.Emoji]:
+    def get_emoji(self, name: str) -> Optional[discord.Emoji]:
         ids = {
             "youtube": 447459436982960143,
-            "twitter": 437220693726330881,
+            "twitter": 958325391196585984,
             "reddit": 447462065204887573,
             "twitch": 544192114440011792,
             "deviant": 626047669948776448,
