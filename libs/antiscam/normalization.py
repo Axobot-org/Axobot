@@ -8,7 +8,7 @@ from nltk.corpus import stopwords
 
 RE_EMAIL = re.compile(r'[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+')
 RE_WEB = re.compile(
-    r'https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#= ]{1,256}\.[ a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)')
+    r'https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#= ]{1,256}\.[ a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&/=]*)')
 RE_MONEY = re.compile(r'£|\$|€')
 RE_PHONE = re.compile(
     r'\D((?:(?:\+|00)33|0)\s*[\d](?:[\s.-]*\d{2}){4}|(?:0|\+?44)\s?(?:\d\s?){9,10}\d)(?!\d)')

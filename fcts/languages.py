@@ -35,7 +35,6 @@ class Languages(discord.ext.commands.Cog):
         elif not self.bot.database_online or source is None:
             # get default lang
             lang_opt = self.bot.get_cog('Servers').default_language
-            lang_opt = self.bot.get_cog('Servers').default_language
         elif isinstance(source, discord.DMChannel):
             # get lang from DM channel
             recipient = await self.bot.get_recipient(source)
