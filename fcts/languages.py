@@ -1,105 +1,72 @@
 import discord
-import json
-from utils import Zbot
+import i18n
+from libs.classes import Zbot
+
 
 class Languages(discord.ext.commands.Cog):
 
     def __init__(self, bot: Zbot):
         self.bot = bot
         self.file = "languages"
-        self.languages = ['fr', 'en', 'lolcat', 'fi', 'de', 'fr2']
-        self.serv_opts = dict()
-        self.translations = {}
-        for lang in self.languages:
-            with open(f'fcts/lang/{lang}.json','r') as f:
-                self.translations[lang] = json.load(f)
+        self.languages = ('fr', 'en', 'lolcat', 'fi', 'de', 'fr2')
+        self.serv_opts: dict[int, str] = dict()
+        i18n.set('filename_format', '{locale}.{format}')
+        i18n.set('file_format', 'json')
+        i18n.translations.container.clear()
+        i18n.load_path.clear()
+        i18n.load_path.append('./fcts/lang2')
 
-
-    async def tr(self, serverID, moduleID: str, messageID: str, **args):
+    async def tr(self, source, string_id: str, **args):
         """Renvoie le texte en fonction de la langue"""
-        if isinstance(serverID,discord.Guild):
-            serverID = serverID.id
-        elif hasattr(serverID, "guild") and isinstance(serverID.guild, discord.Guild): # guild channels and threads
-            serverID = serverID.guild.id
-        if str(serverID) in self.serv_opts.keys():
-            lang_opt = self.serv_opts[str(serverID)]
-            #print("Ex langage:",lang_opt)
-            #print(self.serv_opts)
-        elif not self.bot.database_online:
+        if isinstance(source, discord.Guild):
+            # get ID from guild
+            source = source.id
+        elif isinstance(source, (discord.TextChannel, discord.Thread)):
+            # get ID from text channel
+            source = source.guild.id
+
+        if isinstance(source, (discord.Member, discord.User)):
+            # get lang from user
+            used_langs = await self.bot.get_cog('Utilities').get_languages(source, limit=1)
+            lang_opt = used_langs[0][0]
+        elif source in self.serv_opts.keys():
+            # get lang from cache
+            lang_opt = self.serv_opts[source]
+        elif not self.bot.database_online or source is None:
+            # get default lang
             lang_opt = self.bot.get_cog('Servers').default_language
-        elif serverID is None:
             lang_opt = self.bot.get_cog('Servers').default_language
-        elif isinstance(serverID,discord.DMChannel):
-            if serverID.recipient is None:
-                # recipient couldn't be loaded
-                serverID: discord.DMChannel = await self.bot.fetch_channel(serverID.id)
-                if serverID.recipient is None:
-                    lang_opt = self.bot.get_cog('Servers').default_language
-            if serverID.recipient is not None:
-                used_langs = await self.bot.get_cog('Utilities').get_languages(serverID.recipient,limit=1)
+        elif isinstance(source, discord.DMChannel):
+            # get lang from DM channel
+            recipient = await self.bot.get_recipient(source)
+            if recipient is None:
+                lang_opt = self.bot.get_cog('Servers').default_language
+            else:
+                used_langs = await self.bot.get_cog('Utilities').get_languages(recipient, limit=1)
                 lang_opt = used_langs[0][0]
         else:
-            conf_lang = self.bot.get_cog("Servers").conf_lang
-            lang_opt = await conf_lang(serverID,"language","scret-desc")
-            self.serv_opts[str(serverID)] = lang_opt
-            #print("New langage:",lang_opt)
+            # get lang from server ID
+            lang_opt = self.languages[await self.bot.get_config(source, "language")]
+            self.serv_opts[source] = lang_opt
         if lang_opt not in self.languages:
+            # if lang not known: fallback to default
             lang_opt = self.bot.get_cog('Servers').default_language
-        return await self._get_translation(lang_opt, moduleID, messageID, **args)
+        return await self._get_translation(lang_opt, string_id, **args)
 
-    async def _get_translation(self, lang:str, moduleID:str, messageID:str, **args):
-        result = None
-        if lang == 'de':
-            try:
-                result = self.translations['de'][moduleID][messageID]
-            except:
-                await self.msg_not_found(moduleID,messageID,"de")
-                lang = 'en'
-        if lang == 'fi':
-            try:
-                result = self.translations['fi'][moduleID][messageID]
-            except:
-                await self.msg_not_found(moduleID,messageID,"fi")
-                lang = 'en'
-        if lang == 'lolcat':
-            try:
-                result = self.translations['lolcat'][moduleID][messageID]
-            except:
-                await self.msg_not_found(moduleID,messageID,"lolcat")
-                lang = 'en'
-        if lang == 'en':
-            try:
-                result = self.translations['en'][moduleID][messageID]
-            except:
-                await self.msg_not_found(moduleID,messageID,"en")
-                lang = 'fr'
-        if lang == 'fr2':
-            try:
-                result = self.translations['fr2'][moduleID][messageID]
-            except:
-                await self.msg_not_found(moduleID,messageID,"fr2")
-                lang = 'fr'
-        if lang == 'fr':
-            try:
-                result = self.translations['fr'][moduleID][messageID]
-            except KeyError:
-                await self.msg_not_found(moduleID,messageID,"fr")
-                result = ""
-            except Exception as e:
-                await self.bot.get_cog('Errors').on_error(e,None)
-                result = ""
-        if isinstance(result,str):
-            try:
-                return result.format_map(self.bot.SafeDict(args))
-            except ValueError:
-                return result
-        else:
-            return result
+    async def _get_translation(self, locale: str, string_id: str, **args):
+        if string_id == '_used_locale':
+            return locale
+        translation = i18n.t(string_id, locale=locale, **args)
+        if translation == string_id:
+            await self.msg_not_found(string_id, locale)
+        return translation
 
-    async def msg_not_found(self, moduleID: str, messageID: str, lang: str):
+    async def msg_not_found(self, string_id: str, lang: str):
+        "Signal to the dev that a translation is missing"
         try:
-            await self.bot.get_cog('Errors').senf_err_msg("Le message {}.{} n'a pas été trouvé dans la base de donnée! (langue {})".format(moduleID,messageID,lang))
-        except:
+            await self.bot.get_cog('Errors').senf_err_msg(
+                "Le message {} n'a pas été trouvé dans la base de donnée! (langue {})".format(string_id, lang))
+        except: # pylint: disable=bare-except
             pass
 
     async def check_tr(self, channel: discord.TextChannel, lang: str, origin: str="fr"):
@@ -137,11 +104,11 @@ class Languages(discord.ext.commands.Cog):
             else:
                 await channel.send(">> {} messages non traduits en `{}`".format(count,lang))
 
-    async def change_cache(self,serverID,new_lang):
+    async def change_cache(self, server_id: int, new_lang: str):
         #print("change_cache:",new_lang)
         if new_lang in self.languages:
             #print("changement effectué")
-            self.serv_opts[str(serverID)] = new_lang
+            self.serv_opts[server_id] = new_lang
 
 
 def setup(bot):

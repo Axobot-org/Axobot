@@ -1,18 +1,26 @@
-import typing
-from utils import Zbot, MyContext
-import time
-import emoji
 import copy
-import discord
-from discord.ext import commands
+import time
+import typing
 from math import ceil
 
-roles_options = ["clear","slowmode","mute","kick","ban","warn","say","welcome_roles","muted_role",'partner_role','update_mentions','verification_role','voice_roles']
-bool_options = ["enable_xp","anti_caps_lock","enable_fun","help_in_dm","compress_help"]
-textchan_options = ["welcome_channel","bot_news","poll_channels","modlogs_channel","noxp_channels","partner_channel"]
-vocchan_options = ["membercounter","voice_channel"]
+import discord
+import emoji
+from cachingutils import LRUCache
+from discord.ext import commands
+from libs.classes import MyContext, Zbot
+
+from fcts import checks
+
+roles_options = ["clear", "slowmode", "mute", "kick", "ban", "warn", "say", "welcome_roles",
+                 "muted_role", 'partner_role', 'update_mentions', 'verification_role', 'voice_roles']
+bool_options = ["enable_xp", "anti_caps_lock", "enable_fun",
+                "help_in_dm", "compress_help", "anti_scam"]
+textchan_options = ["welcome_channel", "bot_news", "poll_channels",
+                    "modlogs_channel", "noxp_channels", "partner_channel"]
+vocchan_options = ["membercounter", "voice_channel"]
 category_options = ["voice_category"]
-text_options = ["welcome","leave","levelup_msg","description","voice_channel_format"]
+text_options = ["welcome", "leave", "levelup_msg",
+                "description", "voice_channel_format"]
 prefix_options = ['prefix']
 emoji_option = ['vote_emojis', 'morpion_emojis']
 numb_options = []
@@ -24,7 +32,8 @@ levelup_channel_option = ["levelup_channel"]
 ttt_display_option = ["ttt_display"]
 
 class Servers(commands.Cog):
-    """"Cog in charge of all the bot configuration management for your server. As soon as an option is searched, modified or deleted, this cog will handle the operations."""
+    """"Cog in charge of all the bot configuration management for your server. As soon as an option
+    is searched, modified or deleted, this cog will handle the operations."""
 
     def __init__(self, bot: Zbot):
         self.bot = bot
@@ -32,8 +41,8 @@ class Servers(commands.Cog):
         self.embed_color = discord.Colour(0x3fb9ef)
         self.log_color = 1793969
         self.file = "servers"
+        self.cache: LRUCache = LRUCache(max_size=10000, timeout=3600)
         self.raids_levels = ["None","Smooth","Careful","High","(╯°□°）╯︵ ┻━┻"]
-        self.table = 'servers_beta' if bot.beta else 'servers'
         self.default_opt = {"rr_max_number":7,
                "rss_max_number":10,
                "roles_react_max_number":20,
@@ -55,7 +64,7 @@ class Servers(commands.Cog):
                "save_roles":0,
                "poll_channels":"",
                "modlogs_channel":"",
-               "enable_xp":1,
+               "enable_xp":0,
                "levelup_msg":'',
                "levelup_channel":'any',
                "noxp_channels":'',
@@ -65,7 +74,7 @@ class Servers(commands.Cog):
                "enable_fun":1,
                "prefix":'!',
                "membercounter":"",
-               "anti_raid":1,
+               "anti_raid":0,
                "vote_emojis":":thumbsup:;:thumbsdown:;",
                "morpion_emojis":":red_circle:;:blue_circle:;",
                "help_in_dm":0,
@@ -80,93 +89,77 @@ class Servers(commands.Cog):
                'voice_category':'',
                'voice_channel_format':'{random}',
                'compress_help':0,
-               'ttt_display': 2}
-        self.optionsList = ["prefix","language","description","clear","slowmode","mute","kick","ban","warn","say","welcome_channel","welcome","leave","welcome_roles","bot_news","update_mentions","poll_channels","partner_channel","partner_color","partner_role","modlogs_channel","verification_role","enable_xp","levelup_msg","levelup_channel","noxp_channels","xp_rate","xp_type","anti_caps_lock","enable_fun","membercounter","anti_raid","vote_emojis","morpion_emojis","help_in_dm","compress_help","muted_role","voice_roles","voice_channel","voice_category","voice_channel_format","ttt_display"]
+               'ttt_display': 2,
+               'anti_scam': 0}
+        self.optionsList = ["prefix","language","description","clear","slowmode","mute","kick","ban","warn","say","welcome_channel","welcome","leave","welcome_roles","anti_scam","poll_channels","partner_channel","partner_color","partner_role","modlogs_channel","verification_role","enable_xp","levelup_msg","levelup_channel","noxp_channels","xp_rate","xp_type","anti_caps_lock","enable_fun","membercounter","anti_raid","vote_emojis","morpion_emojis","help_in_dm","compress_help","muted_role","voice_roles","voice_channel","voice_category","voice_channel_format","ttt_display","bot_news","update_mentions"]
         self.membercounter_pending = {}
 
-    @commands.Cog.listener()
-    async def on_ready(self):
-        self.table = 'servers_beta' if self.bot.beta else 'servers'
-
+    @property
+    def table(self):
+        return 'servers_beta' if self.bot.beta else 'servers'
 
     async def get_bot_infos(self, botID: int):
         """Return every options of the bot"""
         if not self.bot.database_online:
             return list()
-        cnx = self.bot.cnx_frm
-        cursor = cnx.cursor(dictionary=True)
         query = ("SELECT * FROM `bot_infos` WHERE `ID`={}".format(botID))
-        cursor.execute(query)
-        liste = list()
-        for x in cursor:
-            liste.append(x)
+        async with self.bot.db_query(query) as query_results:
+            liste = list(query_results)
         return liste
-    
-    async def edit_bot_infos(self, botID: int, values=[()]):
-        if type(values)!=list:
+
+    async def edit_bot_infos(self, bot_id: int, values=[()]):
+        if not isinstance(values, list):
             raise ValueError
-        v = list()
-        cnx = self.bot.cnx_frm
-        cursor = cnx.cursor()
-        for x in values:
-            if type(x) == bool:
-                v.append("`{x[0]}`={x[1]}".format(x=x))
-            else:
-                v.append("""`{x[0]}`="{x[1]}" """.format(x=x))
-        query = ("UPDATE `bot_infos` SET {v} WHERE `ID`='{id}'".format(v=",".join(v),id=botID))
-        cursor.execute(query)
-        cnx.commit()
-        cursor.close()
+        set_query = ', '.join('{}=%s'.format(val[0]) for val in values)
+        query = f"UPDATE `bot_infos` SET {set_query} WHERE `ID`='{bot_id}'"
+        async with self.bot.db_query(query, (val[1] for val in values)):
+            pass
         return True
 
     async def get_languages(self, ignored_guilds: typing.List[int], return_dict: bool = False):
         """Return stats on used languages"""
         if not self.bot.database_online:
             return list()
-        cnx = self.bot.cnx_frm
-        cursor = cnx.cursor(dictionary=True)
         query = ("SELECT `language`,`ID` FROM `{}`".format(self.table))
-        cursor.execute(query)
         liste = list()
-        guilds = [x.id for x in self.bot.guilds if x.id not in ignored_guilds]
-        for x in cursor:
-            if x['ID'] in guilds:
-                liste.append(x['language'])
+        guilds = {x.id for x in self.bot.guilds if x.id not in ignored_guilds}
+        async with self.bot.db_query(query) as query_results:
+            for row in query_results:
+                if row['ID'] in guilds:
+                    liste.append(row['language'])
         for _ in range(len(guilds)-len(liste)):
             liste.append(self.bot.get_cog('Languages').languages.index(self.default_language))
         if return_dict:
             langs = dict()
-            for e, l in enumerate(self.bot.get_cog('Languages').languages):
-                langs[l] = liste.count(e)
+            for e, lang in enumerate(self.bot.get_cog('Languages').languages):
+                langs[lang] = liste.count(e)
         else:
             langs = list()
-            for e, l in enumerate(self.bot.get_cog('Languages').languages):
-                langs.append((l, liste.count(e)))
+            for e, lang in enumerate(self.bot.get_cog('Languages').languages):
+                langs.append((lang, liste.count(e)))
         return langs
-    
+
     async def get_xp_types(self, ignored_guilds: typing.List[int], return_dict: bool = False):
         """Return stats on used xp types"""
         if not self.bot.database_online:
             return list()
-        cnx = self.bot.cnx_frm
-        cursor = cnx.cursor(dictionary=True)
         query = ("SELECT `xp_type`,`ID` FROM `{}`".format(self.table))
-        cursor.execute(query)
         liste = list()
-        guilds = [x.id for x in self.bot.guilds if x.id not in ignored_guilds]
-        for x in cursor:
-            if x['ID'] in guilds:
-                liste.append(x['xp_type'])
+        guilds = {x.id for x in self.bot.guilds if x.id not in ignored_guilds}
+        async with self.bot.db_query(query) as query_results:
+            for row in query_results:
+                if row['ID'] in guilds:
+                    liste.append(row['xp_type'])
         for _ in range(len(guilds)-len(liste)):
             liste.append(self.default_opt['xp_type'])
         if return_dict:
             types = dict()
-            for e, l in enumerate(self.bot.get_cog('Xp').types):
-                types[l] = liste.count(e)
+            for e, name in enumerate(self.bot.get_cog('Xp').types):
+                types[name] = liste.count(e)
         else:
             types = list()
-            for e, l in enumerate(self.bot.get_cog('Xp').types):
-                types.append((l, liste.count(e)))
+            for e, name in enumerate(self.bot.get_cog('Xp').types):
+                types.append((name, liste.count(e)))
         return types
 
     async def staff_finder(self, user: discord.Member, option: str):
@@ -186,109 +179,101 @@ class Servers(commands.Cog):
                 return True
         raise commands.CommandError("User doesn't have required roles")
 
-    async def get_option(self, ID: int, name: str) -> typing.Optional[str]:
+    async def get_option(self, guild_id: int, name: str) -> typing.Optional[str]:
         """return the value of an option
         Return None if this option doesn't exist or if no value has been set"""
-        if isinstance(ID, discord.Guild):
-            ID = ID.id
-        elif ID is None or not self.bot.database_online:
+        if isinstance(guild_id, discord.Guild):
+            guild_id = guild_id.id
+        elif guild_id is None or not self.bot.database_online:
             return None
-        l = await self.get_server([name],criters=["ID="+str(ID)],Type=list)
-        if l == []:
-            return None
-        elif l[0][0] == '':
-            return self.default_opt[name]
+        if (cached := self.cache.get((guild_id, name))) is not None:
+            return cached
+        sql_result = await self.get_server([name],criters=["ID="+str(guild_id)],return_type=list)
+        if len(sql_result) == 0:
+            value = None
+        elif sql_result[0][0] == '':
+            value = self.default_opt[name]
         else:
-            return l[0][0]
-        
-    async def get_server(self, columns=[], criters=["ID > 1"], relation="AND", Type=dict):
+            value = sql_result[0][0]
+        self.cache[(guild_id, name)] = value
+        return value
+
+    async def get_server(self, columns=[], criters=["ID > 1"], relation="AND", return_type=dict):
         """return every options of a server"""
         await self.bot.wait_until_ready()
-        if type(columns)!=list or type(criters)!=list:
+        if not isinstance(columns, list) or not isinstance(criters, list):
             raise ValueError
-        cnx = self.bot.cnx_frm
-        cursor = cnx.cursor(dictionary = (Type==dict))
-        if columns == []:
+        if len(columns) == 0:
             cl = "*"
         else:
             cl = "`"+"`,`".join(columns)+"`"
         relation = " "+relation+" "
-        query = ("SELECT {} FROM `{}` WHERE {}".format(cl,self.table,relation.join(criters)))
-        cursor.execute(query)
+        query = ("SELECT {} FROM `{}` WHERE {}".format(cl, self.table, relation.join(criters)))
         liste = list()
-        for x in cursor:
-            if isinstance(x, dict):
-                for k, v in x.items():
-                    if v == '':
-                        x[k] = self.default_opt[k]
-            liste.append(x)
-        cursor.close()
+        async with self.bot.db_query(query, astuple=(return_type!=dict)) as query_results:
+            for row in query_results:
+                if isinstance(row, dict):
+                    for k, v in row.items():
+                        if v == '':
+                            row[k] = self.default_opt[k]
+                liste.append(row)
         return liste    
 
-    async def modify_server(self, ID: int, values=[()]):
+    async def modify_server(self, guild_id: int, values=[()]):
         """Update a server config in the database"""
-        if type(values)!=list:
+        if not isinstance(values, list):
             raise ValueError
-        v = list()
-        v2 = dict()
-        cnx = self.bot.cnx_frm
-        cursor = cnx.cursor()
-        for e, x in enumerate(values):
-            v.append(f"`{x[0]}` = %(v{e})s")
-            v2[f'v{e}'] = x[1]
-        query = ("UPDATE `{t}` SET {v} WHERE `ID`='{id}'".format(t=self.table, v=",".join(v), id=ID))
-        cursor.execute(query, v2)
-        cnx.commit()
-        cursor.close()
+        set_query = ', '.join('{}=%s'.format(val[0]) for val in values)
+        query = f"UPDATE `{self.table}` SET {set_query} WHERE `ID`={guild_id}"
+        async with self.bot.db_query(query, (val[1] for val in values)):
+            pass
+        for value in values:
+            self.cache[(guild_id, value[0])] = value[1]
         return True
 
-    async def delete_option(self, ID: int, opt):
-        """reset an option"""
+    async def delete_option(self, guild_id: int, opt):
+        """Reset an option"""
         if opt not in self.default_opt.keys():
             raise ValueError
         value = self.default_opt[opt]
         if opt == 'language':
-            await self.bot.get_cog('Languages').change_cache(ID,value)
+            await self.bot.get_cog('Languages').change_cache(guild_id,value)
         elif opt == 'prefix':
-            self.bot.get_cog('Utilities').update_prefix(ID,value)
-        return await self.modify_server(ID,values=[(opt,value)])
+            await self.bot.prefix_manager.update_prefix(guild_id,value)
+        return await self.modify_server(guild_id,values=[(opt,value)])
 
-    async def add_server(self, ID: int):
+    async def add_server(self, guild_id: int):
         """add a new server to the db"""
-        if type(ID) == str:
-            if not ID.isnumeric():
+        if isinstance(guild_id, str):
+            if not guild_id.isnumeric():
                 raise ValueError
-        cnx = self.bot.cnx_frm
-        cursor = cnx.cursor()
-        query = ("INSERT INTO `{}` (`ID`) VALUES ('{}')".format(self.table,ID))
-        cursor.execute(query)
-        cnx.commit()
+        query = "INSERT INTO `{}` (`ID`) VALUES ('{}')".format(self.table,guild_id)
+        async with self.bot.db_query(query):
+            pass
         return True
 
-    async def is_server_exist(self, ID: int):
+    async def is_server_exist(self, guild_id: int):
         """Check if a server is already in the db"""
-        i = await self.get_option(ID,"ID")
+        i = await self.get_option(guild_id, "ID")
         if i is None:
-            g = self.bot.get_guild(ID)
-            if g is None:
+            guild = self.bot.get_guild(guild_id)
+            if guild is None:
                 raise Exception("Guild not found")
-            emb = self.bot.get_cog("Embeds").Embed(desc="New server in the database :tada: `{}` ({})".format(g.name,g.id),color=self.log_color).update_timestamp()
-            await self.bot.get_cog("Embeds").send([emb])
-            return await self.add_server(ID)
+            emb_desc = f"New server in the database :tada: `{guild.name}` ({guild.id})"
+            emb = discord.Embed(description=emb_desc, color=self.log_color, timestamp=self.bot.utcnow())
+            await self.bot.send_embed([emb])
+            return await self.add_server(guild_id)
         return True
 
-    async def delete_server(self, ID: int):
+    async def delete_server(self, guild_id: int):
         """remove a server from the db"""
-        if not isinstance(ID, int):
+        if not isinstance(guild_id, int):
             raise ValueError
-        cnx = self.bot.cnx_frm
-        cursor = cnx.cursor()
-        query = ("DELETE FROM `{}` WHERE `ID`='{}'".format(self.table,ID))
-        cursor.execute(query)
-        cnx.commit()
-        cursor.close()
+        query = f"DELETE FROM `{self.table}` WHERE `ID`='{guild_id}'"
+        async with self.bot.db_query(query):
+            pass
         return True
-                 
+
 
     @commands.group(name='config')
     @commands.guild_only()
@@ -319,29 +304,27 @@ class Servers(commands.Cog):
     @commands.cooldown(1, 2, commands.BucketType.guild)
     async def sconfig_help(self, ctx: MyContext):
         """Get help about this command"""
-        msg = await self.bot._(ctx.guild,"server","config-help", p=(await self.bot.get_prefix(ctx.message))[-1])
+        msg = await self.bot._(ctx.guild, "server.config-help", p=await self.bot.prefix_manager.get_prefix(ctx.guild))
         await ctx.send(msg.format(ctx.guild.owner.name))
 
     @sconfig_main.command(name="del")
     @commands.cooldown(1, 2, commands.BucketType.guild)
+    @commands.check(checks.has_manage_guild)
     async def sconfig_del(self, ctx: MyContext, option: str):
         """Reset an option to zero"""
-        if not (ctx.channel.permissions_for(ctx.author).manage_guild or await self.bot.get_cog("Admin").check_if_god(ctx)):
-            return await ctx.send(await self.bot._(ctx.guild.id,"server","need-manage-server"))
         if not ctx.bot.database_online:
-            return await ctx.send(await self.bot._(ctx.guild.id,"cases","no_database"))
-        await self.sconfig_del2(ctx,option)
-    
+            return await ctx.send(await self.bot._(ctx.guild.id,"cases.no_database"))
+        await self.sconfig_del2(ctx, option)
+
     @sconfig_main.command(name="change")
     @commands.cooldown(1, 2, commands.BucketType.guild)
+    @commands.check(checks.has_manage_guild)
     async def sconfig_change(self, ctx: MyContext, option:str, *, value: str):
         """Allows you to modify an option"""
-        if not (ctx.channel.permissions_for(ctx.author).manage_guild or await self.bot.get_cog("Admin").check_if_god(ctx)):
-            return await ctx.send(await self.bot._(ctx.guild.id,"server","need-manage-server"))
         if not ctx.bot.database_online:
-            return await ctx.send(await self.bot._(ctx.guild.id,"cases","no_database"))
+            return await ctx.send(await self.bot._(ctx.guild.id,"cases.no_database"))
         if value == 'del':
-            await self.sconfig_del2(ctx,option)
+            await self.sconfig_del2(ctx, option)
             return
         try:
             if option in roles_options:
@@ -377,35 +360,38 @@ class Servers(commands.Cog):
             elif option in ttt_display_option:
                 await self.conf_tttdisplay(ctx, option, value)
             else:
-                await ctx.send(await self.bot._(ctx.guild.id,"server","change-0"))
+                await ctx.send(await self.bot._(ctx.guild.id, "server.option-notfound"))
                 return
         except Exception as e:
             await self.bot.get_cog("Errors").on_error(e,ctx)
-            await ctx.send(await self.bot._(ctx.guild.id,"server","change-1"))
-    
+            await ctx.send(await self.bot._(ctx.guild.id, "server.internal-error"))
+
     async def sconfig_del2(self, ctx: MyContext, option: str):
         try:
             t = await self.delete_option(ctx.guild.id,option)
             if t:
-                msg = await self.bot._(ctx.guild.id,"server","change-2")
+                msg = await self.bot._(ctx.guild.id, "server.value-deleted", option=option)
             else:
-                msg = await self.bot._(ctx.guild.id,"server","change-1")
-            await ctx.send(msg.format(option))
-            m = "Reset option in server {}: {}".format(ctx.guild.id,option)
-            emb = self.bot.get_cog("Embeds").Embed(desc=m,color=self.log_color).update_timestamp().set_author(ctx.guild.me)
-            await self.bot.get_cog("Embeds").send([emb])
-            self.bot.log.debug(m)
+                msg = await self.bot._(ctx.guild.id, "server.internal-error")
+            await ctx.send(msg)
+            msg = "Reset option in server {}: {}".format(ctx.guild.id,option)
+            emb = discord.Embed(description=msg, color=self.log_color, timestamp=self.bot.utcnow())
+            emb.set_author(name=self.bot.user, icon_url=self.bot.user.display_avatar)
+            await self.bot.send_embed([emb])
+            self.bot.log.debug(msg)
         except ValueError:
-            await ctx.send(await self.bot._(ctx.guild.id,"server","change-0"))
-        except Exception as e:
-            await self.bot.get_cog("Errors").on_error(e,ctx)
-            await ctx.send(await self.bot._(ctx.guild.id,"server","change-1"))
+            await ctx.send(await self.bot._(ctx.guild.id, "server.option-notfound"))
+        except Exception as err:
+            await self.bot.get_cog("Errors").on_error(err,ctx)
+            await ctx.send(await self.bot._(ctx.guild.id, "server.internal-error"))
 
     async def send_embed(self, guild: discord.Guild, option: str, value: str):
-        m = "Changed option in server {}: {} = `{}`".format(guild.id,option,value)
-        emb = self.bot.get_cog("Embeds").Embed(desc=m,color=self.log_color,footer_text=guild.name).update_timestamp().set_author(guild.me)
-        await self.bot.get_cog("Embeds").send([emb])
-        self.bot.log.debug(m)
+        msg = "Changed option in server {}: {} = `{}`".format(guild.id,option,value)
+        emb = discord.Embed(description=msg, color=self.log_color, timestamp=self.bot.utcnow())
+        emb.set_footer(text=guild.name)
+        emb.set_author(name=self.bot.user, icon_url=self.bot.user.display_avatar)
+        await self.bot.send_embed([emb])
+        self.bot.log.debug(msg)
 
 
     async def get_guild(self, item) -> discord.Guild:
@@ -435,22 +421,22 @@ class Servers(commands.Cog):
             for role in roles:
                 role = role.strip()
                 try:
-                    if role=="everyone":
+                    if role == "everyone":
                         r = guild.default_role
                     else:
                         r = await commands.RoleConverter().convert(ctx,role)
                 except commands.errors.BadArgument:
-                    msg = await self.bot._(guild.id,"server","change-3")
-                    await ctx.send(msg.format(role))
+                    msg = await self.bot._(guild.id, "server.edit-error.role", name=role)
+                    await ctx.send(msg)
                     return
                 if str(r.id) in liste:
                     continue
                 liste.append(str(r.id))
-                liste2.append(r.name)
+                liste2.append(r.mention)
             await self.modify_server(guild.id,values=[(option,";".join(liste))])
-            msg = await self.bot._(guild.id,"server","change-role")
-            await ctx.send(msg.format(option,", ".join(liste2)))
-            await self.send_embed(guild,option,value)
+            msg = await self.bot._(guild.id, "server.edit-success.role", opt=option, val=", ".join(liste2))
+            await ctx.send(msg)
+            await self.send_embed(guild, option, value)
 
     async def form_roles(self, guild: discord.Guild, roles: str, ext: bool=False):
         if not isinstance(roles,int):
@@ -476,22 +462,22 @@ class Servers(commands.Cog):
             v = await self.get_option(guild.id,option)
             return await self.form_bool(v)
         else:
-            if value.lower() in ["true","vrai","1","oui","yes","activé"]:
+            if value.lower() in {"true","vrai","1","oui","yes","activé"}:
                 value = True
                 v = 1
-            elif value.lower() in ["false","faux","non","no","désactivé","wrong",'0']:
+            elif value.lower() in {"false","faux","non","no","désactivé","wrong",'0'}:
                 value = False
                 v = 0
             else:
-                msg = await self.bot._(ctx.guild.id,"server","change-4")
-                await ctx.send(msg.format(option))
+                msg = await self.bot._(ctx.guild.id, "server.edit-error.boolean", name=option)
+                await ctx.send(msg)
                 return
             if option == "enable_fun":
                 await self.bot.get_cog("Fun").cache_update(ctx.guild.id,v)
             await self.modify_server(ctx.guild.id,values=[(option,v)])
-            msg = await self.bot._(ctx.guild.id,"server","change-bool")
-            await ctx.send(msg.format(option,value))
-            await self.send_embed(ctx.guild,option,value)
+            msg = await self.bot._(ctx.guild.id, "server.edit-success.boolean", opt=option, val=value)
+            await ctx.send(msg)
+            await self.send_embed(ctx.guild, option, value)
     
     async def form_bool(self, boolean):
         if boolean == 1:
@@ -517,8 +503,8 @@ class Servers(commands.Cog):
                 try:
                     c = await commands.TextChannelConverter().convert(ctx,chan)
                 except commands.errors.BadArgument:
-                    msg = await self.bot._(guild.id,"server","change-5")
-                    await ctx.send(msg.format(chan))
+                    msg = await self.bot._(guild.id, "server.edit-error.channel", channel=chan)
+                    await ctx.send(msg)
                     return
                 if str(c.id) in liste:
                     continue
@@ -527,9 +513,9 @@ class Servers(commands.Cog):
             await self.modify_server(guild.id,values=[(option,";".join(liste))])
             if option=='noxp_channels':
                 self.bot.get_cog('Xp').xp_channels_cache[guild.id] = [int(x) for x in liste]
-            msg = await self.bot._(guild.id,"server","change-textchan")
-            await ctx.send(msg.format(option,", ".join(liste2)))
-            await self.send_embed(guild,option,value)
+            msg = await self.bot._(guild.id, "server.edit-success.channel", opt=option, val=", ".join(liste2))
+            await ctx.send(msg)
+            await self.send_embed(guild, option, value)
 
     async def form_textchan(self, guild: discord.Guild, chans: str, ext=False):
         if len(chans) == 0:
@@ -563,16 +549,16 @@ class Servers(commands.Cog):
                 try:
                     c = await commands.CategoryChannelConverter().convert(ctx, chan)
                 except commands.errors.BadArgument:
-                    msg = await self.bot._(guild.id,"server","change-12")
-                    await ctx.send(msg.format(chan))
+                    msg = await self.bot._(guild.id, "server.edit-error.category", name=chan)
+                    await ctx.send(msg)
                     return
                 if str(c.id) in liste:
                     continue
                 liste.append(str(c.id))
                 liste2.append(c.name)
             await self.modify_server(guild.id, values=[(option, ";".join(liste))])
-            msg = await self.bot._(guild.id, "server", "change-category")
-            await ctx.send(msg.format(option, ", ".join(liste2)))
+            msg = await self.bot._(guild.id, "server.edit-success.category", opt=option, val=", ".join(liste2))
+            await ctx.send(msg)
             await self.send_embed(guild, option, value)
     
     async def form_category(self, guild: discord.Guild, chans: str, ext=False):
@@ -605,8 +591,8 @@ class Servers(commands.Cog):
                     e = await commands.EmojiConverter().convert(ctx,e)
                 except commands.errors.BadArgument:
                     if e not in self.bot.get_cog("Emojis").unicode_list:
-                        msg = await self.bot._(ctx.guild.id,"server","change-9")
-                        await ctx.send(msg.format(e))
+                        msg = await self.bot._(ctx.guild.id, "server.edit-error.emoji", emoji=e)
+                        await ctx.send(msg)
                         return
                     if emoji.demojize(e) not in liste:
                         liste.append(emoji.demojize(e))
@@ -616,9 +602,9 @@ class Servers(commands.Cog):
                         liste.append(str(e.id))
                         liste2.append("<:{}:{}>".format(e.name,e.id))
             await self.modify_server(ctx.guild.id,values=[(option,";".join(liste))])
-            msg = await self.bot._(ctx.guild.id,"server","change-emojis")
-            await ctx.send(msg.format(option,", ".join(liste2)))
-            await self.send_embed(ctx.guild,option,value)
+            msg = await self.bot._(ctx.guild.id, "server.edit-success.emojis", opt=option, val=", ".join(liste2))
+            await ctx.send(msg)
+            await self.send_embed(ctx.guild, option, value)
 
     async def form_emoji(self, emojis: str, option: str):
         if len(emojis) == 0:
@@ -653,17 +639,17 @@ class Servers(commands.Cog):
                 try:
                     c = await commands.VoiceChannelConverter().convert(ctx,chan)
                 except commands.errors.BadArgument:
-                    msg = await self.bot._(ctx.guild.id,"server","change-5")
-                    await ctx.send(msg.format(chan))
+                    msg = await self.bot._(ctx.guild.id, "server.edit-error.channel", channel=chan)
+                    await ctx.send(msg)
                     return
                 if str(c.id) in liste:
                     continue
                 liste.append(str(c.id))
                 liste2.append(c.mention)
             await self.modify_server(ctx.guild.id,values=[(option,";".join(liste))])
-            msg = await self.bot._(ctx.guild.id,"server","change-textchan")
-            await ctx.send(msg.format(option,", ".join(liste2)))
-            await self.send_embed(ctx.guild,option,value)
+            msg = await self.bot._(ctx.guild.id, "server.edit-success.channel", opt=option, val=", ".join(liste2))
+            await ctx.send(msg)
+            await self.send_embed(ctx.guild, option, value)
 
     async def form_vocal(self, guild: discord.Guild, chans: str):
         if len(chans) == 0:
@@ -685,9 +671,9 @@ class Servers(commands.Cog):
             return await self.form_text(text)
         else:
             await self.modify_server(guild.id,values=[(option, value)])
-            msg = await self.bot._(guild.id,"server","change-text")
-            await ctx.send(msg.format(option,value))
-            await self.send_embed(guild,option,value)
+            msg = await self.bot._(guild.id, "server.edit-success.text", opt=option, val=value)
+            await ctx.send(msg)
+            await self.send_embed(guild, option, value)
 
     async def form_text(self, text: str):
         if len(text) == 0:
@@ -707,17 +693,18 @@ class Servers(commands.Cog):
             if value.startswith('"') and value.endswith('"'):
                 value = value[1:-1]
             if len(value) > 10:
-                await ctx.send(await self.bot._(ctx.guild.id,"server","change-prefix-1"))
+                await ctx.send(await self.bot._(ctx.guild.id, "server.edit-error.prefix.long"))
                 return
             try:
                 await self.modify_server(ctx.guild.id,values=[('prefix',value)])
-            except:
-                await ctx.send(await self.bot._(ctx.guild.id,"server","wrong-prefix"))
+            except Exception:
+                self.bot.log.warning("Error while editing prefix", exc_info=True)
+                await ctx.send(await self.bot._(ctx.guild.id,"server.edit-error.prefix.invalid"))
                 return
-            self.bot.get_cog('Utilities').update_prefix(ctx.guild.id,value)
-            msg = await self.bot._(ctx.guild.id,"server","change-prefix")
-            await ctx.send(msg.format(value))
-            await self.send_embed(ctx.guild,option,value)
+            await self.bot.prefix_manager.update_prefix(ctx.guild.id,value)
+            msg = await self.bot._(ctx.guild.id, "server.edit-success.prefix", val=value)
+            await ctx.send(msg)
+            await self.send_embed(ctx.guild, option, value)
 
     async def form_prefix(self, text: str):
         if len(text) == 0:
@@ -730,10 +717,10 @@ class Servers(commands.Cog):
             return await self.get_option(guild.id,option)
         else:
             if value.isnumeric():
-                value = eval(value)
-                await self.send_embed(ctx.guild,option,value)
+                value = int(value)
+                await self.send_embed(ctx.guild, option, value)
             else:
-                msg = await self.bot._(ctx.guild.id,"server","change-6")
+                msg = await self.bot._(ctx.guild.id, "server.edit-error.numeric", name=option)
                 await ctx.send(msg.format(option))
 
     async def conf_lang(self, ctx: MyContext, option: str,value: str):
@@ -749,12 +736,12 @@ class Servers(commands.Cog):
                 v = languages.index(value)
                 await self.modify_server(ctx.guild.id,values=[(option,v)])
                 await self.bot.get_cog('Languages').change_cache(ctx.guild.id,value)
-                msg = await self.bot._(ctx.guild.id,"server","change-lang")
-                await ctx.send(msg.format(value))
-                await self.send_embed(ctx.guild,option,value)
+                msg = await self.bot._(ctx.guild.id, "server.edit-success.lang", val=value)
+                await ctx.send(msg)
+                await self.send_embed(ctx.guild, option, value)
             else:
-                msg = await self.bot._(ctx.guild.id,"server","change-7")
-                await ctx.send(msg.format(", ".join(languages)))
+                msg = await self.bot._(ctx.guild.id,"server.edit-error.lang", list=", ".join(languages))
+                await ctx.send(msg)
 
     async def form_lang(self, value: str):
         if value is None:
@@ -779,12 +766,12 @@ class Servers(commands.Cog):
             if value in raids:
                 v = raids.index(value)
                 await self.modify_server(ctx.guild.id,values=[(option,v)])
-                msg = await self.bot._(ctx.guild.id,"server","change-raid")
-                await ctx.send(msg.format(value,raids.index(value)))
-                await self.send_embed(ctx.guild,option,value)
+                msg = await self.bot._(ctx.guild.id, "server.edit-success.raid", name=value, index=raids.index(value))
+                await ctx.send(msg)
+                await self.send_embed(ctx.guild, option, value)
             else:
-                msg = await self.bot._(ctx.guild.id,"server","change-8")
-                await ctx.send(msg.format(", ".join(raids)))
+                msg = await self.bot._(ctx.guild.id,"server.edit-error.anti_raid", list=", ".join(raids))
+                await ctx.send(msg)
 
     async def form_raid(self, value: str):
         if value is None:
@@ -792,7 +779,7 @@ class Servers(commands.Cog):
         else:
             return self.raids_levels[value]
     
-    async def conf_xp_type(self,ctx,option,value):
+    async def conf_xp_type(self, ctx: MyContext, option: str, value: str):
         if value == "scret-desc":
             guild = await self.get_guild(ctx)
             if guild is None:
@@ -804,12 +791,12 @@ class Servers(commands.Cog):
             if value in available_types:
                 v = available_types.index(value)
                 await self.modify_server(ctx.guild.id,values=[(option,v)])
-                msg = await self.bot._(ctx.guild.id,"server","change-xp")
-                await ctx.send(msg.format(value))
-                await self.send_embed(ctx.guild,option,value)
+                msg = await self.bot._(ctx.guild.id, "server.edit-success.xp", val=value)
+                await ctx.send(msg)
+                await self.send_embed(ctx.guild, option, value)
             else:
-                msg = await self.bot._(ctx.guild.id,"server","change-10")
-                await ctx.send(msg.format(", ".join(available_types)))
+                msg = await self.bot._(ctx.guild.id, "server.edit-error.xp", list=", ".join(available_types))
+                await ctx.send(msg)
 
     async def form_xp_type(self, value: str):
         if value is None:
@@ -831,15 +818,15 @@ class Servers(commands.Cog):
                 else:
                     color = await commands.ColourConverter().convert(ctx,value)
             except commands.errors.BadArgument:
-                msg = await self.bot._(ctx.guild.id,"server","change-11")
-                await ctx.send(msg.format(value))
+                msg = await self.bot._(ctx.guild.id, "server.edit-error.color")
+                await ctx.send(msg)
                 return
             await self.modify_server(ctx.guild.id,values=[(option,color.value)])
-            msg = await self.bot._(ctx.guild.id,"server","change-color")
+            msg = await self.bot._(ctx.guild.id, "server.edit-success.color", opt=option, val=color)
             if ctx.can_send_embed:
-                await ctx.send(embed=discord.Embed(description=msg.format(option,color),colour=color))
+                await ctx.send(embed=discord.Embed(description=msg, colour=color))
             else:
-                await ctx.send(msg.format(option,color))
+                await ctx.send(msg)
             await self.send_embed(ctx.guild,option,color)
 
     async def form_color(self, option: str, value: str):
@@ -856,22 +843,22 @@ class Servers(commands.Cog):
             try:
                 value = round(float(value),2)
             except ValueError:
-                msg = await self.bot._(ctx.guild.id,"server","change-6")
-                await ctx.send(msg.format(option))
+                msg = await self.bot._(ctx.guild.id, "server.edit-error.numeric", name=option)
+                await ctx.send(msg)
                 return
             if value < 0.1 or value > 3:
-                await ctx.send(await self.bot._(ctx.guild.id,'server','xp_rate_invalid',min=0.1,max=3))
+                await ctx.send(await self.bot._(ctx.guild.id, "server.edit-error.xp_rate", min=0.1, max=3))
                 return
             await self.modify_server(ctx.guild.id,values=[(option,value)])
-            await ctx.send(await self.bot._(ctx.guild.id,"server","change-xp_rate",rate=value))
-            await self.send_embed(ctx.guild,option,value)
+            await ctx.send(await self.bot._(ctx.guild.id, "server.edit-success.xp_rate",val=value))
+            await self.send_embed(ctx.guild, option, value)
     
     async def form_xp_rate(self, option: str, value: str):
         if value is None:
             return self.default_opt[option]
         else:
             return value
-    
+
     async def conf_levelup_chan(self, ctx: MyContext, option: str, value: str):
         guild = await self.get_guild(ctx)
         ext = not isinstance(ctx, commands.Context)
@@ -879,27 +866,26 @@ class Servers(commands.Cog):
             chan = await self.get_option(guild.id,option)
             return await self.form_levelup_chan(guild, chan, ext)
         else:
-            if value.lower() in ["any", "tout", "tous", "current", "all", "any channel"]:
-                c = c_id = "any"
-                msg = await self.bot._(guild.id,"server","change-levelup_channel-1")
-            elif value.lower() in ["none", "aucun", "disabled", "nowhere"]:
-                c = c_id = "none"
-                msg = await self.bot._(guild.id,"server","change-levelup_channel-2")
+            if value.lower() in {"any", "tout", "tous", "current", "all", "any channel"}:
+                c_id = "any"
+                msg = await self.bot._(guild.id,"server.edit-success.levelup_channel.any")
+            elif value.lower() in {"none", "aucun", "disabled", "nowhere"}:
+                c_id = "none"
+                msg = await self.bot._(guild.id,"server.edit-success.levelup_channel-none")
             else:
                 chan = value.strip()
                 try:
                     c = await commands.TextChannelConverter().convert(ctx,chan)
                 except commands.errors.BadArgument:
-                    msg = await self.bot._(guild.id,"server","change-5")
-                    await ctx.send(msg.format(chan))
+                    msg = await self.bot._(guild.id, "server.edit-error.channel", channel=chan)
+                    await ctx.send(msg)
                     return
-                msg = await self.bot._(guild.id,"server","change-levelup_channel")
+                msg = await self.bot._(guild.id, "server.edit-success.levelup_channel.chan", val=c.mention)
                 c_id = c.id
-                c = c.mention
             await self.modify_server(guild.id,values=[(option,c_id)])
-            await ctx.send(msg.format(c))
-            await self.send_embed(guild,option,value)
-    
+            await ctx.send(msg)
+            await self.send_embed(guild, option, value)
+
     async def form_levelup_chan(self, guild: discord.Guild, value: str, ext: bool=False):
         if value == "any":
             return "Any channel"
@@ -928,12 +914,12 @@ class Servers(commands.Cog):
             if value in available_types:
                 v = available_types.index(value)
                 await self.modify_server(ctx.guild.id,values=[(option,v)])
-                msg = await self.bot._(ctx.guild.id,"server","change-tttdisplay")
-                await ctx.send(msg.format(value))
-                await self.send_embed(ctx.guild,option,value)
+                msg = await self.bot._(ctx.guild.id, "server.edit-success.tttdisplay", val=value)
+                await ctx.send(msg)
+                await self.send_embed(ctx.guild, option, value)
             else:
-                msg = await self.bot._(ctx.guild.id,"server","change-13")
-                await ctx.send(msg.format(", ".join(available_types)))
+                msg = await self.bot._(ctx.guild.id, "server.edit-error.tttdisplay", list=", ".join(available_types))
+                await ctx.send(msg)
 
     async def form_tttdisplay(self, value: int):
         if value is None:
@@ -945,17 +931,17 @@ class Servers(commands.Cog):
     async def sconfig_list(self, ctx: MyContext):
         """Get the list of every usable option"""
         options = sorted(self.optionsList)
-        await ctx.send(await self.bot._(ctx.guild.id,'server','config-list',text="\n```\n-{}\n```\n".format('\n-'.join(options)),link="<https://zbot.readthedocs.io/en/latest/server.html#list-of-every-option>"))
+        await ctx.send(await self.bot._(ctx.guild.id, "server.config-list",text="\n```\n-{}\n```\n".format('\n-'.join(options)), link="<https://zbot.readthedocs.io/en/latest/server.html#list-of-every-option>"))
 
     @sconfig_main.command(name="see")
     @commands.cooldown(1,10,commands.BucketType.guild)
     async def sconfig_see(self, ctx: MyContext, option=None):
         """Displays the value of an option, or all options if none is specified"""
         if not ctx.bot.database_online:
-            return await ctx.send(await self.bot._(ctx.guild.id,"cases","no_database"))
+            return await ctx.send(await self.bot._(ctx.guild.id,"cases.no_database"))
         await self.send_see(ctx.guild,ctx.channel,option,ctx.message,ctx)
         
-    async def send_see(self, guild: discord.Guild, channel: discord.TextChannel, option: str, msg: discord.Message, ctx: MyContext):
+    async def send_see(self, guild: discord.Guild, channel: typing.Union[discord.TextChannel, discord.Thread], option: str, msg: discord.Message, ctx: MyContext):
         """Envoie l'embed dans un salon"""
         if self.bot.zombie_mode:
             return
@@ -964,19 +950,22 @@ class Servers(commands.Cog):
         if option.isnumeric():
             page = int(option)
             if page<1:
-                return await ctx.send(await self.bot._(channel,"xp",'low-page'))
+                return await ctx.send(await self.bot._(channel, "xp.low-page"))
             liste = await self.get_server([],criters=["ID="+str(guild.id)])
             if len(liste) == 0:
-                return await channel.send(str(await self.bot._(channel.guild,"server","not-found")).format(guild.name))
+                return await channel.send(await self.bot._(channel.guild, "server.not-found", guild=guild.name))
             temp = [(k,v) for k,v in liste[0].items() if k in self.optionsList]
             max_page = ceil(len(temp)/20)
-            if page>max_page:
-                return await ctx.send(await self.bot._(channel,"xp",'high-page'))
+            if page > max_page:
+                return await ctx.send(await self.bot._(channel, "xp.high-page"))
             liste = {k:v for k,v in temp[(page-1)*20:page*20] }
             if len(liste) == 0:
                 return await ctx.send("NOPE")
-            title = str(await self.bot._(channel,"server","see-1")).format(guild.name) + f" ({page}/{max_page})"
-            embed = self.bot.get_cog('Embeds').Embed(title=title, color=self.embed_color, desc=str(await self.bot._(guild.id,"server","see-0")), time=msg.created_at,thumbnail=guild.icon.with_static_format('png'))
+            title = await self.bot._(channel, "server.see-title", guild=guild.name) + f" ({page}/{max_page})"
+            embed = discord.Embed(title=title, color=self.embed_color,
+                                  description=await self.bot._(guild.id, "server.see-0"), timestamp=msg.created_at)
+            if guild.icon:
+                embed.set_thumbnail(url=guild.icon.with_static_format('png'))
             diff = channel.guild != guild
             for i,v in liste.items():
                 #if i not in self.optionsList:
@@ -1022,9 +1011,8 @@ class Servers(commands.Cog):
                     continue
                 if len(str(r)) == 0:
                     r = "Ø"
-                embed.fields.append({'name':i, 'value':r, 'inline':True})
-            await channel.send(embed=embed.discord_embed())
-            embed.fields.clear()
+                embed.add_field(name=i, value=r)
+            await channel.send(embed=embed)
             return
         elif ctx is not None:
             if option in roles_options:
@@ -1068,34 +1056,33 @@ class Servers(commands.Cog):
             guild = ctx if isinstance(ctx, discord.Guild) else ctx.guild
             if r is not None:
                 try:
-                    r = str(await self.bot._(channel,"server_desc",option)).format(r)
+                    r = await self.bot._(channel, f"server.server_desc.{option}", value=r)
                 except Exception as e:
                     pass
             else:
-                r = await self.bot._(channel,"server","change-0")
+                r = await self.bot._(channel, "server.option-notfound")
             try:
                 if not channel.permissions_for(channel.guild.me).embed_links:
-                    await channel.send(await self.bot._(channel.id,"mc","cant-embed"))
+                    await channel.send(await self.bot._(channel.id, "minecraft.cant-embed"))
                     return
-                title = str(await self.bot._(channel,"server","opt_title")).format(option,guild.name)
+                title = await self.bot._(channel, "server.opt_title", opt=option, guild=guild.name)
                 if hasattr(ctx, "message"):
                     t = ctx.message.created_at
                 else:
                     t = ctx.bot.utcnow()
-                embed = self.bot.get_cog("Embeds").Embed(title=title, color=self.embed_color, desc=r, time=t)
+                embed = discord.Embed(title=title, color=self.embed_color, description=r, timestamp=t)
                 if isinstance(ctx, commands.Context):
-                    await embed.create_footer(ctx)
-                await channel.send(embed=embed.discord_embed())
+                    embed.set_footer(text=ctx.author, icon_url=ctx.author.display_avatar)
+                await channel.send(embed=embed)
             except Exception as e:
                 await self.bot.get_cog('Errors').on_error(e,ctx if isinstance(ctx, commands.Context) else None)
 
-            
+
     @sconfig_main.command(name="reset")
     @commands.is_owner()
     async def admin_delete(self, ctx: MyContext, ID:int):
         if await self.delete_server(ID):
             await ctx.send("Le serveur n°{} semble avoir correctement été supprimé !".format(ID))
-
 
 
     async def update_memberChannel(self, guild: discord.Guild):
@@ -1108,19 +1095,19 @@ class Servers(commands.Cog):
             ch = guild.get_channel(int(ch))
             if ch is None:
                 return
-            lang = await self.bot._(guild.id,"current_lang","current")
-            tr = str(await self.bot._(guild.id,"keywords","membres")).capitalize()
+            lang = await self.bot._(guild.id,'_used_locale')
+            tr = str(await self.bot._(guild.id, "misc.membres")).capitalize()
             text = "{}{}: {}".format(tr, " " if lang=='fr' else "" , guild.member_count)
             if ch.name == text:
                 return
             try:
-                await ch.edit(name=text,reason=await self.bot._(guild.id,"logs","d-memberchan"))
+                await ch.edit(name=text, reason=await self.bot._(guild.id,"logs.reason.memberchan"))
                 self.membercounter_pending[guild.id] = round(time.time()) + 5*60 # cooldown 5min
                 return True
             except Exception as e:
                 self.bot.log.debug("[UpdateMemberChannel] "+str(e))
         return False
-    
+
     async def update_everyMembercounter(self):
         if not self.bot.database_online:
             return
@@ -1132,10 +1119,10 @@ class Servers(commands.Cog):
                 await self.update_memberChannel(x)
                 i += 1
         if i > 0:
-            emb = self.bot.get_cog("Embeds").Embed(desc=f"[MEMBERCOUNTER] {i} channels refreshed", color=5011628).update_timestamp().set_author(self.bot.user)
-            await self.bot.get_cog("Embeds").send([emb], url="loop")
+            emb = discord.Embed(description=f"[MEMBERCOUNTER] {i} channels refreshed", color=5011628, timestamp=self.bot.utcnow())
+            emb.set_author(name=self.bot.user, icon_url=self.bot.user.display_avatar)
+            await self.bot.send_embed([emb], url="loop")
 
-    
-    
+
 def setup(bot):
     bot.add_cog(Servers(bot))

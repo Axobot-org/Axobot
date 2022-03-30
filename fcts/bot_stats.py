@@ -1,16 +1,14 @@
-from datetime import datetime, timezone
 import os
-from time import time
-from math import isinf
 import typing
-from discord.ext import commands, tasks
-import psutil
-import mysql
+from math import isinf
 
+import mysql
+import psutil
+from discord.ext import commands, tasks
 from libs.classes import MyContext, Zbot
 
 try:
-    import orjson # type: ignore
+    import orjson  # type: ignore
 except ModuleNotFoundError:
     import json
     json_loads = json.loads

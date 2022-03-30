@@ -15,7 +15,6 @@ from discord.ext import commands, tasks
 from libs.classes import Zbot
 
 from fcts.checks import is_fun_enabled
-from utils import Zbot
 
 
 class Events(commands.Cog):
@@ -98,7 +97,6 @@ class Events(commands.Cog):
         except mysql.connector.errors.IntegrityError as err:
             self.bot.log.warning(err)
             await self.updade_memberslogs_name(before, after, tries+1)
-        cursor.close()
 
     @commands.Cog.listener()
     async def on_user_update(self, before: discord.User, after: discord.User):

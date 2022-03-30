@@ -12,8 +12,6 @@ from PIL import Image, ImageEnhance, ImageSequence
 from resizeimage import resizeimage
 from libs.classes import MyContext
 
-from utils import MyContext
-
 BLURPLE = (114, 137, 218, 255)
 DARK_BLURPLE = (78, 93, 148, 255)
 WHITE = (255, 255, 255, 255)

@@ -29,7 +29,6 @@ class tempdelta(commands.Converter):
         return duration
 
 
-
 class user(commands.converter.UserConverter):
     def __init__(self):
         pass
