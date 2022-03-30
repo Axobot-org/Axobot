@@ -1,9 +1,11 @@
+import sys
 import discord
 import traceback
 import random
 import re
 from discord.ext import commands
-from utils import Zbot, MyContext
+from libs.classes import Zbot, MyContext
+from fcts import checks
 
 
 class Errors(commands.Cog):
@@ -13,11 +15,6 @@ class Errors(commands.Cog):
         self.bot = bot
         self.file = "errors"
 
-    async def search_err(self, form:list, sentence:str):
-        for x in form:
-            r = re.search(x,sentence)
-            if r!= None:
-                return r
 
     @commands.Cog.listener()
     async def on_command_error(self, ctx: MyContext, error: Exception):
@@ -40,26 +37,26 @@ class Errors(commands.Cog):
                 await ctx.send('`Ignored error:` [{}] {}'.format(c,error))
             return
         elif isinstance(error, commands.CommandError) and str(error) == "User doesn't have required roles":
-            await ctx.send(await self.bot._(ctx.channel, 'errors', 'notrightroles'))
+            await ctx.send(await self.bot._(ctx.channel, 'errors.notrightroles'))
             return
         elif isinstance(error, commands.CommandError) and str(error) == "Database offline":
             from utils import OUTAGE_REASON
             if OUTAGE_REASON:
-                lang = await self.bot._(ctx.channel, 'current_lang', 'current')
+                lang = await self.bot._(ctx.channel, '_used_locale')
                 r = OUTAGE_REASON.get(lang, OUTAGE_REASON['en'])
-                await ctx.send(await self.bot._(ctx.channel, 'errors', 'nodb-2', reason=r))
+                await ctx.send(await self.bot._(ctx.channel, 'errors.nodb-2', reason=r))
             else:
-                await ctx.send(await self.bot._(ctx.channel, 'errors', 'nodb-1'))
+                await ctx.send(await self.bot._(ctx.channel, 'errors.nodb-1'))
             return
         elif isinstance(error, commands.ExpectedClosingQuoteError):
-            await ctx.send(await self.bot._(ctx.channel, 'errors', 'quoteserror'))
+            await ctx.send(await self.bot._(ctx.channel, 'errors.quoteserror'))
             return
         elif isinstance(error,commands.errors.CommandOnCooldown):
             if await self.bot.get_cog('Admin').check_if_admin(ctx):
                 await ctx.reinvoke()
                 return
             d = round(error.retry_after, 2 if error.retry_after < 60 else 0)
-            await ctx.send(await self.bot._(ctx.channel,'errors','cooldown',d=round(error.retry_after,2)))
+            await ctx.send(await self.bot._(ctx.channel,'errors.cooldown',d=d))
             return
         elif isinstance(error,(commands.BadArgument,commands.BadUnionArgument)):
             ALLOWED = discord.AllowedMentions(everyone=False, users=False, roles=False)
@@ -69,99 +66,114 @@ class Errors(commands.Cog):
             if r is None:
                 r = re.search(r'Converting to \"(?P<type>[^\"]+)\" failed for parameter \"(?P<arg>[^.\n]+)\"',raw_error)
             if r is not None:
-                return await ctx.send(await self.bot._(ctx.channel,'errors','badarguments',p=r.group('arg'),t=r.group('type')), allowed_mentions=ALLOWED)
+                return await ctx.send(await self.bot._(ctx.channel,'errors.badarguments',p=r.group('arg'),t=r.group('type')), allowed_mentions=ALLOWED)
             # zzz is not a recognised boolean option
             r = re.search(r'(?P<arg>[^\"]+) is not a recognised (?P<type>[^.\n]+) option',raw_error)
             if r is not None:
-                return await ctx.send(await self.bot._(ctx.channel,'errors','badarguments-2',p=r.group('arg'),t=r.group('type')), allowed_mentions=ALLOWED)
+                return await ctx.send(await self.bot._(ctx.channel,'errors.badarguments-2',p=r.group('arg'),t=r.group('type')), allowed_mentions=ALLOWED)
             # Member "Z_runner" not found
             r = re.search(r'(?<=Member \")(.+)(?=\" not found)',raw_error)
             if r is not None:
-                return await ctx.send(await self.bot._(ctx.channel,'errors','membernotfound',m=r.group(1)), allowed_mentions=ALLOWED)
+                return await ctx.send(await self.bot._(ctx.channel,'errors.membernotfound',m=r.group(1)), allowed_mentions=ALLOWED)
             # User "Z_runner" not found
             r = re.search(r'(?<=User \")(.+)(?=\" not found)',raw_error)
             if r is not None:
-                return await ctx.send(await self.bot._(ctx.channel,'errors','usernotfound',u=r.group(1)), allowed_mentions=ALLOWED)
+                return await ctx.send(await self.bot._(ctx.channel,'errors.usernotfound',u=r.group(1)), allowed_mentions=ALLOWED)
             # Role "Admin" not found
             r = re.search(r'(?<=Role \")(.+)(?=\" not found)',raw_error)
             if r is not None:
-                return await ctx.send(await self.bot._(ctx.channel,'errors','rolenotfound',r=r.group(1)), allowed_mentions=ALLOWED)
+                return await ctx.send(await self.bot._(ctx.channel,'errors.rolenotfound',r=r.group(1)), allowed_mentions=ALLOWED)
             # Emoji ":shock:" not found
             r = re.search(r'(?<=Emoji \")(.+)(?=\" not found)',raw_error)
             if r is not None:
-                return await ctx.send(await self.bot._(ctx.channel,'errors','emojinotfound',e=r.group(1)), allowed_mentions=ALLOWED)
+                return await ctx.send(await self.bot._(ctx.channel,'errors.emojinotfound',e=r.group(1)), allowed_mentions=ALLOWED)
              # Colour "blue" is invalid
             r = re.search(r'(?<=Colour \")(.+)(?=\" is invalid)',raw_error)
             if r is not None:
-                return await ctx.send(await self.bot._(ctx.channel,'errors','invalidcolor',c=r.group(1)), allowed_mentions=ALLOWED)
+                return await ctx.send(await self.bot._(ctx.channel,'errors.invalidcolor',c=r.group(1)), allowed_mentions=ALLOWED)
             # Channel "twitter" not found.
             r = re.search(r'(?<=Channel \")(.+)(?=\" not found)',raw_error)
             if r is not None:
-                return await ctx.send(await self.bot._(ctx.channel,'errors','channotfound',c=r.group(1)), allowed_mentions=ALLOWED)
+                return await ctx.send(await self.bot._(ctx.channel,'errors.channotfound',c=r.group(1)), allowed_mentions=ALLOWED)
             # Message "1243" not found.
             r = re.search(r'(?<=Message \")(.+)(?=\" not found)',raw_error)
             if r is not None:
-                return await ctx.send(await self.bot._(ctx.channel,'errors','msgnotfound',msg=r.group(1)), allowed_mentions=ALLOWED)
+                return await ctx.send(await self.bot._(ctx.channel,'errors.msgnotfound',msg=r.group(1)), allowed_mentions=ALLOWED)
+            # Guild "1243" not found.
+            r = re.search(r'(?<=Guild \")(.+)(?=\" not found)',raw_error)
+            if r is not None:
+                return await ctx.send(await self.bot._(ctx.channel,'errors.guildnotfound',guild=r.group(1)), allowed_mentions=ALLOWED)
             # Too many text channels
             if raw_error=='Too many text channels':
-                return await ctx.send(await self.bot._(ctx.channel,'errors','toomanytxtchan'), allowed_mentions=ALLOWED)
+                return await ctx.send(await self.bot._(ctx.channel,'errors.toomanytxtchan'), allowed_mentions=ALLOWED)
             # Invalid duration: 2d
             r = re.search(r'Invalid duration: (\S+)',raw_error)
             if r is not None:
-                return await ctx.send(await self.bot._(ctx.channel,'errors','duration',d=r.group(1)), allowed_mentions=ALLOWED)
+                return await ctx.send(await self.bot._(ctx.channel,'errors.duration',d=r.group(1)), allowed_mentions=ALLOWED)
             # Invalid invite: nope
             r = re.search(r'Invalid invite: (\S+)',raw_error)
             if r is not None:
-                return await ctx.send(await self.bot._(ctx.channel,'errors','invalidinvite',i=r.group(1)), allowed_mentions=ALLOWED)
+                return await ctx.send(await self.bot._(ctx.channel,'errors.invalidinvite',i=r.group(1)), allowed_mentions=ALLOWED)
             # Invalid guild: test
             r = re.search(r'Invalid guild: (\S+)',raw_error)
             if r is not None:
-                return await ctx.send(await self.bot._(ctx.channel,'errors','invalidguild',g=r.group(1)), allowed_mentions=ALLOWED)
+                return await ctx.send(await self.bot._(ctx.channel,'errors.invalidguild',g=r.group(1)), allowed_mentions=ALLOWED)
             # Invalid url: nou
             r = re.search(r'Invalid url: (\S+)',raw_error)
             if r is not None:
-                return await ctx.send(await self.bot._(ctx.channel,'errors','invalidurl',u=r.group(1)), allowed_mentions=ALLOWED)
+                return await ctx.send(await self.bot._(ctx.channel,'errors.invalidurl',u=r.group(1)), allowed_mentions=ALLOWED)
             # Invalid leaderboard type: lol
             r = re.search(r'Invalid leaderboard type: (\S+)',raw_error)
             if r is not None:
-                return await ctx.send(await self.bot._(ctx.channel,'errors','invalidleaderboard'), allowed_mentions=ALLOWED)
+                return await ctx.send(await self.bot._(ctx.channel,'errors.invalidleaderboard'), allowed_mentions=ALLOWED)
             # Invalid ISBN: lol
             r = re.search(r'Invalid ISBN: (\S+)',raw_error)
             if r is not None:
-                return await ctx.send(await self.bot._(ctx.channel,'errors','invalidisbn'), allowed_mentions=ALLOWED)
+                return await ctx.send(await self.bot._(ctx.channel,'errors.invalidisbn'), allowed_mentions=ALLOWED)
             # Invalid emoji: lmao
             r = re.search(r'Invalid emoji: (\S+)',raw_error)
             if r is not None:
-                return await ctx.send(await self.bot._(ctx.channel,'errors','invalidemoji'), allowed_mentions=ALLOWED)
+                return await ctx.send(await self.bot._(ctx.channel,'errors.invalidemoji'), allowed_mentions=ALLOWED)
             # Invalid message ID: 007
             r = re.search(r'Invalid message ID: (\S+)',raw_error)
             if r is not None:
-                return await ctx.send(await self.bot._(ctx.channel,'errors','invalidmsgid'), allowed_mentions=ALLOWED)
+                return await ctx.send(await self.bot._(ctx.channel,'errors.invalidmsgid'), allowed_mentions=ALLOWED)
             # Invalid card style: aqua
             r = re.search(r'Invalid card style: (\S+)',raw_error)
             if r is not None:
-                return await ctx.send(await self.bot._(ctx.channel,'errors','invalidcardstyle', s=r.group(1)), allowed_mentions=ALLOWED)
-            self.bot.log.warn('Unknown error type -',error)
+                return await ctx.send(await self.bot._(ctx.channel,'errors.invalidcardstyle', s=r.group(1)), allowed_mentions=ALLOWED)
+             # Invalid server log type
+            r = re.search(r'Invalid server log type',raw_error)
+            if r is not None:
+                return await ctx.send(await self.bot._(ctx.channel,'errors.invalidserverlog'), allowed_mentions=ALLOWED)
+            self.bot.log.warning('Unknown error type -',error)
         elif isinstance(error,commands.errors.MissingRequiredArgument):
-            await ctx.send(await self.bot._(ctx.channel,'errors','missingargument',a=error.param.name,e=random.choice([':eyes:','',':confused:',':thinking:',''])))
+            await ctx.send(await self.bot._(ctx.channel,'errors.missingargument',a=error.param.name,e=random.choice([':eyes:','',':confused:',':thinking:',''])))
             return
         elif isinstance(error,commands.errors.DisabledCommand):
-            await ctx.send(await self.bot._(ctx.channel,'errors','disabled',c=ctx.invoked_with))
+            await ctx.send(await self.bot._(ctx.channel,'errors.disabled', c=ctx.invoked_with))
             return
         elif isinstance(error,commands.errors.NoPrivateMessage):
-            await ctx.send(await self.bot._(ctx.channel,'errors','DM'))
+            await ctx.send(await self.bot._(ctx.channel,'errors.DM'))
+            return
+        elif isinstance(error, checks.CannotSendEmbed):
+            await ctx.send(await self.bot._(ctx.channel,'errors.cannotembed'))
             return
         else:
             try:
-                await ctx.send(await self.bot._(ctx.channel,'errors','unknown'))
+                await ctx.send(await self.bot._(ctx.channel,'errors.unknown'))
             except Exception as newerror:
-                self.bot.log.info("[on_cmd_error] Can't send error on channel {}: {}".format(ctx.channel.id,newerror))
+                self.bot.log.info(f"[on_cmd_error] Can't send error on channel {ctx.channel.id}: {newerror}")
         # All other Errors not returned come here... And we can just print the default TraceBack.
-        self.bot.log.warning('Ignoring exception in command {}:'.format(ctx.message.content))      
+        self.bot.log.warning(f'Ignoring exception in command {ctx.message.content}:')
         await self.on_error(error,ctx)
 
     @commands.Cog.listener()
     async def on_error(self, error: Exception, ctx=None):
+        if sys.exc_info()[0] is None:
+            exc_info = (type(error), error, error.__traceback__)
+        else:
+            exc_info = sys.exc_info()
         try:
             if isinstance(ctx, discord.Message):
                 ctx = await self.bot.get_context(ctx)
@@ -171,14 +183,15 @@ class Errors(commands.Cog):
             if ctx is None:
                 await self.senf_err_msg(f"Internal Error\n{msg}")
             elif ctx.guild is None:
-                await self.senf_err_msg(f"DM | {ctx.channel.recipient.name}\n{msg}")
+                recipient = await self.bot.get_recipient(ctx.channel)
+                await self.senf_err_msg(f"DM | {recipient}\n{msg}")
             elif ctx.channel.id == 625319425465384960:
-                return await ctx.send(ctx.guild.name+" | "+ctx.channel.name+"\n"+msg)
+                await ctx.send(ctx.guild.name+" | "+ctx.channel.name+"\n"+msg)
             else:
                 await self.senf_err_msg(ctx.guild.name+" | "+ctx.channel.name+"\n"+msg)
-            self.bot.log.warn(f"[on_error] {error}", exc_info=True)
+            self.bot.log.warning(f"[on_error] {error}", exc_info=exc_info)
         except Exception as e:
-            self.bot.log.warn(f"[on_error] {e}", exc_info=True)
+            self.bot.log.warning(f"[on_error] {e}", exc_info=exc_info)
 
 
     async def senf_err_msg(self, msg: str):

@@ -4,7 +4,6 @@ from random import randint
 import aiohttp
 import json
 import typing
-import json
 import importlib
 
 import discord
@@ -13,8 +12,9 @@ from discord.ext.commands import Cog
 
 from libs import blurple
 from libs.blurple import convert_image, check_image
+from libs.formatutils import FormatUtils
 importlib.reload(blurple)
-from utils import Zbot, MyContext
+from libs.classes import Zbot, MyContext
 
 
 class LinkConverter(commands.Converter):
@@ -69,7 +69,7 @@ def _make_check_command(name, parent, **kwargs):
             else:
                 url = who.display_avatar.url
 
-        old_msg = await ctx.send("Starting check for {}...".format(ctx.author.mention))
+        old_msg = await ctx.send(await ctx.bot._(ctx.channel, "blurple.check_intro", user=ctx.author.mention))
         async with aiohttp.ClientSession() as session:
             async with session.get(str(url)) as image:
                 r = await check_image(await image.read(), theme, name)
@@ -95,7 +95,7 @@ def _make_color_command(name, fmodifier, parent, **kwargs):
                       who: typing.Union[discord.Member, discord.PartialEmoji, LinkConverter] = None):
 
         if not (ctx.guild is None or ctx.channel.permissions_for(ctx.guild.me).attach_files):
-            return await ctx.send(await self.bot._(ctx.channel,"blurple","missing-attachment-perm"))
+            return await ctx.send(await self.bot._(ctx.channel,"blurple.missing-attachment-perm"))
 
         if method is None:
             method = await self.get_default_blurplefier(ctx)
@@ -122,15 +122,15 @@ def _make_color_command(name, fmodifier, parent, **kwargs):
         else:
             final_modifier = fmodifier
 
-        old_msg = await ctx.send("Starting {} for {}...".format(name,ctx.author.mention))
+        old_msg = await ctx.send(await ctx.bot._(ctx.channel, 'blurple.blurplefy.starting', name=name, user=ctx.author.mention))
         try:
             async with aiohttp.ClientSession() as session:
                 async with session.get(str(url)) as image:
                     r = await convert_image(await image.read(), final_modifier, method,variations)
         except RuntimeError as e:
-            await ctx.send(f"Oops, something went wrong: {e}")
+            await ctx.send(await ctx.bot._(ctx.channel, 'blurple.unknown-err', err=str(e)))
             return
-        await ctx.send(f"{ctx.author.mention}, here's your image!", file=r)
+        await ctx.send(await ctx.bot._(ctx.channel, 'blurple.blurplefy.success', user=ctx.author.mention), file=r)
         await old_msg.delete()
         await self.bot.get_cog("Utilities").add_user_eventPoint(ctx.author.id, 3)
 
@@ -210,40 +210,34 @@ __29 variations: __
 `++blurple-bg` replaces the transparency of your image with a Blurple background
 `++dark-blurple-bg` replaces the transparency of your image with a Dark Blurple background""")
 
-    def db_add_points(self, userid: int, points: int):
-        cnx = self.bot.cnx_frm
-        cursor = cnx.cursor(dictionary=True)
+    async def db_add_points(self, userid: int, points: int):
         query = "INSERT INTO `dailies` (`userID`,`points`) VALUES (%(u)s,%(p)s) ON DUPLICATE KEY UPDATE points = points + %(p)s;"
-        cursor.execute(query, {'u': userid, 'p': points})
-        cnx.commit()
-        cursor.close()
+        async with self.bot.db_query(query, {'u': userid, 'p': points}):
+            pass
 
-    def db_get_points(self, userid: int) -> dict:
-        cnx = self.bot.cnx_frm
-        cursor = cnx.cursor(dictionary=True)
+    async def db_get_points(self, userid: int) -> dict:
         query = "SELECT * FROM `dailies` WHERE userid = %(u)s;"
-        cursor.execute(query, {'u': userid})
-        result = list(cursor)
-        cursor.close()
-        return result[0] if len(result) > 0 else None
+        async with self.bot.db_query(query, {'u': userid}, fetchone=True) as query_results:
+            result = query_results or None
+        return result
 
     @blurple_main.command(name="collect")
     async def bp_collect(self, ctx: MyContext):
         """Get some events points every 3 hours"""
-        last_data = self.db_get_points(ctx.author.id)
+        last_data = await self.db_get_points(ctx.author.id)
         cooldown = 3600*3
         time_since_available: int = 0 if last_data is None else (datetime.datetime.now() - last_data['last_update']).total_seconds() - cooldown
         if time_since_available >= 0:
             points = randint(*self.hourly_reward)
             await self.bot.get_cog("Utilities").add_user_eventPoint(ctx.author.id, points)
-            self.db_add_points(ctx.author.id, points)
-            txt = await self.bot._(ctx.channel, "halloween", "got-points", pts=points)
+            await self.db_add_points(ctx.author.id, points)
+            txt = await self.bot._(ctx.channel, "halloween.daily.got-points", pts=points)
         else:
-            lang = await self.bot._(ctx.channel, "current_lang", "current")
-            remaining = await self.bot.get_cog("TimeUtils").time_delta(-time_since_available, lang=lang)
-            txt = await self.bot._(ctx.channel, "blurple", "too-quick", time=remaining)
+            lang = await self.bot._(ctx.channel, '_used_locale')
+            remaining = await FormatUtils.time_delta(-time_since_available, lang=lang)
+            txt = await self.bot._(ctx.channel, "blurple.collect.too-quick", time=remaining)
         if ctx.can_send_embed:
-            title = "Blurple event"
+            title = await self.bot._(ctx.channel, 'blurple.collect.title')
             emb = discord.Embed(title=title, description=txt, color=discord.Color(int("7289DA",16)))
             await ctx.send(embed=emb)
         else:

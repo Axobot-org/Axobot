@@ -22,7 +22,7 @@ from math import sqrt
 from fcts import args, checks
 importlib.reload(args)
 importlib.reload(checks)
-from utils import Zbot, MyContext
+from libs.classes import Zbot, MyContext
 
 
 
@@ -103,7 +103,7 @@ class Xp(commands.Cog):
             if time.time() - self.cache['global'][msg.author.id][0] < self.cooldown:
                 return
         content = msg.clean_content
-        if len(content)<self.minimal_size or await self.check_spam(content) or await self.check_cmd(msg):
+        if len(content)<self.minimal_size or await self.check_spam(content) or await self.bot.potential_command(msg):
             return
         if len(self.cache["global"]) == 0:
             await self.bdd_load_cache(-1)
@@ -137,7 +137,7 @@ class Xp(commands.Cog):
         if msg.author.id in self.cache[msg.guild.id].keys():
             if time.time() - self.cache[msg.guild.id][msg.author.id][0] < 60:
                 return
-        if await self.check_cmd(msg):
+        if await self.bot.potential_command(msg):
             return
         giv_points = random.randint(15,25) * rate
         if msg.author.id in self.cache[msg.guild.id].keys():
@@ -169,7 +169,7 @@ class Xp(commands.Cog):
             if time.time() - self.cache[msg.guild.id][msg.author.id][0] < self.cooldown:
                 return
         content = msg.clean_content
-        if len(content)<self.minimal_size or await self.check_spam(content) or await self.check_cmd(msg):
+        if len(content)<self.minimal_size or await self.check_spam(content) or await self.bot.potential_command(msg):
             return
         giv_points = await self.calc_xp(msg) * rate
         if msg.author.id in self.cache[msg.guild.id].keys():
@@ -224,22 +224,14 @@ class Xp(commands.Cog):
             return
         text = await self.bot.get_config(msg.guild.id,'levelup_msg')
         if text is None or len(text) == 0:
-            text = random.choice(await self.bot.get_cog('Languages').tr(msg.channel,'xp','default_levelup'))
+            text = random.choice(await self.bot._(msg.channel, "xp.default_levelup"))
             while (not '{random}' in text) and random.random() < 0.8:
-                text = random.choice(await self.bot.get_cog('Languages').tr(msg.channel,'xp','default_levelup'))
+                text = random.choice(await self.bot._(msg.channel, "xp.default_levelup"))
         if '{random}' in text:
-            item = random.choice(await self.bot.get_cog('Languages').tr(msg.channel,'xp','levelup-items'))
+            item = random.choice(await self.bot._(msg.channel, "xp.levelup-items"))
         else:
             item = ''
         await destination.send(text.format_map(self.bot.SafeDict(user=msg.author.mention,level=lvl[0],random=item,username=msg.author.display_name)))
-        
-    async def check_cmd(self, msg: discord.Message):
-        """Vérifie si un message est une commande"""
-        pr = await self.bot.get_prefix(msg)
-        is_cmd = False
-        for p in pr:
-            is_cmd = is_cmd or msg.content.startswith(p)
-        return is_cmd
 
     async def check_spam(self, text: str):
         """Vérifie si un text contient du spam"""
@@ -309,7 +301,6 @@ class Xp(commands.Cog):
             except Exception as e:
                 if self.bot.beta:
                     await self.bot.get_cog('Errors').on_error(e,None)
-                pass
         if not remove:
             return c
         for role in [x for x in rr_list if x['level']>level and x['role'] in has_roles]:
@@ -323,7 +314,6 @@ class Xp(commands.Cog):
             except Exception as e:
                 if self.bot.beta:
                     await self.bot.get_cog('Errors').on_error(e,None)
-                pass
         return c
     
     async def reload_sus(self):
@@ -331,11 +321,11 @@ class Xp(commands.Cog):
         cog = self.bot.get_cog("Utilities")
         if cog is None:
             return
-        result = await cog.get_db_userinfo(['userID'], ['xp_suspect=1'], Type=list)
-        if result is None:
+        result = await cog.get_db_userinfo(['userID'], ['xp_suspect=1'])
+        if result is None or len(result) == 0:
             return
         if len(result) > 1:
-            result = [item for sublist in result for item in sublist]
+            result = [item['userID'] for item in result]
         self.sus = set(result)
         self.bot.log.info("Suspects d'xp rechargé (%d suspects)", len(self.sus))
     
@@ -503,10 +493,10 @@ class Xp(commands.Cog):
             cursor = cnx.cursor(dictionary = True)
             try:
                 cursor.execute(query)
-            except mysql.connector.errors.ProgrammingError as e:
-                if e.errno == 1146:
+            except mysql.connector.errors.ProgrammingError as err:
+                if err.errno == 1146:
                     return list()
-                raise e
+                raise err
             liste = list()
             if guild is None:
                 liste = list(cursor)
@@ -524,9 +514,9 @@ class Xp(commands.Cog):
                     i += 1
             cursor.close()
             return liste
-        except Exception as e:
-            await self.bot.get_cog('Errors').on_error(e,None)
-        
+        except Exception as err:
+            await self.bot.get_cog('Errors').on_error(err,None)
+
     async def bdd_get_rank(self, userID: int, guild: discord.Guild=None):
         """Get the rank of a user"""
         try:
@@ -570,15 +560,9 @@ class Xp(commands.Cog):
             if not self.bot.database_online:
                 self.bot.unload_extension("fcts.xp")
                 return None
-            cnx = self.bot.cnx_frm
-            cursor = cnx.cursor(dictionary = True)
-            query = ("SELECT SUM(xp) FROM `{}`".format(self.table))
-            cursor.execute(query)
-            liste = list()
-            for x in cursor:
-                liste.append(x)
-            cursor.close()
-            result = round(liste[0]['SUM(xp)'])
+            query = f"SELECT SUM(xp) as total FROM `{self.table}`"
+            async with self.bot.db_query(query, fetchone=True) as query_results:
+                result = round(query_results['total'])
 
             # cnx = self.bot.cnx_xp
             # cursor = cnx.cursor()
@@ -743,18 +727,18 @@ class Xp(commands.Cog):
             if user is None:
                 user = ctx.author
             if user.bot:
-                return await ctx.send(await self.bot._(ctx.channel,'xp','bot-rank'))
+                return await ctx.send(await self.bot._(ctx.channel, "xp.bot-rank"))
             if ctx.guild is not None:
                 if not await self.bot.get_config(ctx.guild.id,'enable_xp'):
-                    return await ctx.send(await self.bot._(ctx.guild.id,'xp','xp-disabled'))
+                    return await ctx.send(await self.bot._(ctx.guild.id, "xp.xp-disabled"))
                 xp_used_type = await self.bot.get_config(ctx.guild.id,'xp_type')
             else:
                 xp_used_type = 0
             xp = await self.get_xp(user,None if xp_used_type == 0 else ctx.guild.id)
             if xp is None:
                 if ctx.author==user:
-                    return await ctx.send(await self.bot._(ctx.channel,'xp','1-no-xp'))
-                return await ctx.send(await self.bot._(ctx.channel,'xp','2-no-xp'))
+                    return await ctx.send(await self.bot._(ctx.channel, "xp.1-no-xp"))
+                return await ctx.send(await self.bot._(ctx.channel, "xp.2-no-xp"))
             levels_info = None
             if xp_used_type == 0:
                 ranks_nb = await self.bdd_get_nber()
@@ -784,7 +768,7 @@ class Xp(commands.Cog):
             myfile = discord.File('../cards/global/{}-{}-{}.{}'.format(user.id,xp,rank,'gif' if user.display_avatar.is_animated() else 'png'))
         except FileNotFoundError:
             style = await self.bot.get_cog('Utilities').get_xp_style(user)
-            txts = [await self.bot._(ctx.channel,'xp','card-level'), await self.bot._(ctx.channel,'xp','card-rank')]
+            txts = [await self.bot._(ctx.channel, "xp.card-level"), await self.bot._(ctx.channel, "xp.card-rank")]
             static = await self.bot.get_cog('Utilities').get_db_userinfo(['animated_card'],[f'`userID`={user.id}'])
             if user.display_avatar.is_animated():
                 if static is not None:
@@ -803,21 +787,21 @@ class Xp(commands.Cog):
         try:
             await ctx.send(file=myfile)
         except discord.errors.HTTPException:
-            await ctx.send(await self.bot._(ctx.channel, "xp", "card-too-large"))
-    
+            await ctx.send(await self.bot._(ctx.channel, "xp.card-too-large"))
+
     async def send_embed(self, ctx: MyContext, user: discord.User, xp, rank, ranks_nb, levels_info, used_system):
-        txts = [await self.bot._(ctx.channel,'xp','card-level'), await self.bot._(ctx.channel,'xp','card-rank')]
+        txts = [await self.bot._(ctx.channel, "xp.card-level"), await self.bot._(ctx.channel, "xp.card-rank")]
         if levels_info is None:
             levels_info = await self.calc_level(xp,used_system)
-        fields = list()
-        fields.append({'name':'XP','value':"{}/{}".format(xp,levels_info[1]),'inline':True})
-        fields.append({'name':txts[0],'value':levels_info[0],'inline':True})
-        fields.append({'name':txts[1],'value':"{}/{}".format(rank,ranks_nb),'inline':True})
-        emb = self.bot.get_cog('Embeds').Embed(fields=fields,color=self.embed_color).set_author(user)
-        await ctx.send(embed=emb.discord_embed())
-    
+        emb = discord.Embed(color=self.embed_color)
+        emb.set_author(name=user, icon_url=user.display_avatar)
+        emb.add_field(name='XP', value="{}/{}".format(xp,levels_info[1]))
+        emb.add_field(name=txts[0], value=levels_info[0])
+        emb.add_field(name=txts[1], value="{}/{}".format(rank,ranks_nb))
+        await ctx.send(embed=emb)
+
     async def send_txt(self, ctx: MyContext, user: discord.User, xp, rank, ranks_nb, levels_info, used_system):
-        txts = [await self.bot._(ctx.channel,'xp','card-level'), await self.bot._(ctx.channel,'xp','card-rank')]
+        txts = [await self.bot._(ctx.channel, "xp.card-level"), await self.bot._(ctx.channel, "xp.card-rank")]
         if levels_info is None:
             levels_info = await self.calc_level(xp,used_system)
         msg = """__**{}**__
@@ -844,7 +828,7 @@ class Xp(commands.Cog):
                 try:
                     user = await self.bot.fetch_user(u['user'])
                 except discord.NotFound:
-                    user = await self.bot._(ctx.channel,'xp','del-user')
+                    user = await self.bot._(ctx.channel, "xp.del-user")
             if isinstance(user, discord.User):
                 user_name = discord.utils.escape_markdown(user.name)
                 if len(user_name) > 18:
@@ -872,7 +856,7 @@ class Xp(commands.Cog):
         ..Doc user.html#get-the-general-ranking"""
         if ctx.guild is not None:
             if not await self.bot.get_config(ctx.guild.id,'enable_xp'):
-                return await ctx.send(await self.bot._(ctx.guild.id,'xp','xp-disabled'))
+                return await ctx.send(await self.bot._(ctx.guild.id, "xp.xp-disabled"))
             xp_system_used = await self.bot.get_config(ctx.guild.id,'xp_type')
         else:
             xp_system_used = 0
@@ -893,9 +877,9 @@ class Xp(commands.Cog):
             ranks = sorted([{'userID':key, 'xp':value[1]} for key,value in self.cache[ctx.guild.id].items()], key=lambda x:x['xp'], reverse=True)
             max_page = ceil(len(ranks)/20)
         if page < 1:
-            return await ctx.send(await self.bot._(ctx.channel,"xp",'low-page'))
+            return await ctx.send(await self.bot._(ctx.channel, "xp.low-page"))
         elif page > max_page:
-            return await ctx.send(await self.bot._(ctx.channel,"xp",'high-page'))
+            return await ctx.send(await self.bot._(ctx.channel, "xp.high-page"))
         ranks = ranks[(page-1)*20:]
         ranks = [{'user':x['userID'],'xp':x['xp']} for x in ranks]
         nbr = 20
@@ -904,25 +888,28 @@ class Xp(commands.Cog):
             nbr -= 1
             txt, i = await self.create_top_main(ranks,nbr,page,ctx,xp_system_used)
             await asyncio.sleep(0.2)
-        f_name = str(await self.bot._(ctx.channel,'xp','top-name')).format((page-1)*20+1,i,page,max_page)
+        f_name = await self.bot._(ctx.channel, "xp.top-name", min=(page-1)*20+1, max=i, page=page, total=max_page)
         # author
         rank = await self.bdd_get_rank(ctx.author.id,ctx.guild if (Type=='guild' or xp_system_used != 0) else None)
         if len(rank) == 0:
-            your_rank = {'name':"__"+await self.bot._(ctx.channel,"xp","top-your")+"__",'value':await self.bot._(ctx.guild,"xp","1-no-xp")}
+            your_rank = {'name':"__"+await self.bot._(ctx.channel, "xp.top-your")+"__",'value':await self.bot._(ctx.guild, "xp.1-no-xp")}
         else:
             lvl = await self.calc_level(rank['xp'],xp_system_used)
             lvl = lvl[0]
             rk = rank['rank'] if 'rank' in rank.keys() else '?'
             xp = self.convert_average(rank['xp'])
-            your_rank = {'name':"__"+await self.bot._(ctx.channel,"xp","top-your")+"__", 'value':"**#{} |** `lvl {}` **|** `xp {}`".format(rk, lvl, xp)}
+            your_rank = {'name':"__"+await self.bot._(ctx.channel, "xp.top-your")+"__", 'value':"**#{} |** `lvl {}` **|** `xp {}`".format(rk, lvl, xp)}
             del rk
         # title
         if Type == 'guild' or xp_system_used != 0:
-            t = await self.bot._(ctx.channel,'xp','top-title-2')
+            t = await self.bot._(ctx.channel, "xp.top-title-2")
         else:
-            t = await self.bot._(ctx.channel,'xp','top-title-1')
+            t = await self.bot._(ctx.channel, "xp.top-title-1")
         if ctx.can_send_embed:
-            emb = await self.bot.get_cog('Embeds').Embed(title=t,fields=[{'name':f_name,'value':"\n".join(txt)},your_rank],color=self.embed_color,author_icon=self.bot.user.display_avatar.with_format("png")).create_footer(ctx)
+            emb = discord.Embed(title=t, color=self.embed_color)
+            emb.add_field(name=f_name, value="\n".join(txt), inline=False)
+            emb.add_field(**your_rank)
+            emb.set_footer(text=ctx.author, icon_url=ctx.author.display_avatar)
             await ctx.send(embed=emb)
         else:
             await ctx.send(f_name+"\n\n"+'\n'.join(txt))
@@ -937,7 +924,7 @@ class Xp(commands.Cog):
                 os.remove(f[3])
             else:
                 done.append(f[0])
-    
+
 
     @commands.command(name='set_xp', aliases=["setxp", "set-xp"])
     @commands.guild_only()
@@ -947,18 +934,18 @@ class Xp(commands.Cog):
         
         ..Example set_xp 3000 @someone"""
         if user.bot:
-            return await ctx.send(await self.bot._(ctx.guild.id, 'xp', 'no-bot'))
+            return await ctx.send(await self.bot._(ctx.guild.id, "xp.no-bot"))
         if await self.bot.get_config(ctx.guild.id,'xp_type') == 0:
-            return await ctx.send(await self.bot._(ctx.guild.id, 'xp', 'change-global-xp'))
+            return await ctx.send(await self.bot._(ctx.guild.id, "xp.change-global-xp"))
         if xp < 0:
-            return await ctx.send(await self.bot._(ctx.guild.id, 'xp', 'negative-xp'))
+            return await ctx.send(await self.bot._(ctx.guild.id, "xp.negative-xp"))
         try:
             xp_used_type = await self.bot.get_config(ctx.guild.id,'xp_type')
             prev_xp = await self.get_xp(user, None if xp_used_type == 0 else ctx.guild.id)
             await self.bdd_set_xp(user.id, xp, Type='set', guild=ctx.guild.id)
-            await ctx.send(await self.bot._(ctx.guild.id,'xp','change-xp-ok',user=str(user),xp=xp))
+            await ctx.send(await self.bot._(ctx.guild.id, "xp.change-xp-ok", user=str(user), xp=xp))
         except Exception as e:
-            await ctx.send(await self.bot._(ctx.guild.id,'mc','serv-error'))
+            await ctx.send(await self.bot._(ctx.guild.id, "minecraft.serv-error"))
             await self.bot.get_cog('Errors').on_error(e,ctx)
         else:
             if ctx.guild.id not in self.cache.keys():
@@ -966,43 +953,37 @@ class Xp(commands.Cog):
             self.cache[ctx.guild.id][user.id] = [round(time.time()), xp]
             s = "XP of user {} `{}` edited (from {} to {}) in server `{}`".format(user, user.id, prev_xp, xp, ctx.guild.id)
             self.bot.log.info(s)
-            emb = self.bot.get_cog("Embeds").Embed(desc=s,color=8952255,footer_text=ctx.guild.name).update_timestamp().set_author(self.bot.user)
-            await self.bot.get_cog("Embeds").send([emb])
+            emb = discord.Embed(description=s,color=8952255, timestamp=self.bot.utcnow())
+            emb.set_footer(ctx.guild.name)
+            emb.set_author(self.bot.user, icon_url=self.bot.user.display_avatar)
+            await self.bot.send_embed([emb])
 
     async def gen_rr_id(self):
         return round(time.time()/2)
 
     async def rr_add_role(self, guildID:int, roleID:int, level:int):
         """Add a role reward in the database"""
-        cnx = self.bot.cnx_frm
-        cursor = cnx.cursor(dictionary = True)
         ID = await self.gen_rr_id()
         query = "INSERT INTO `roles_rewards` (`ID`,`guild`,`role`,`level`) VALUES (%(i)s,%(g)s,%(r)s,%(l)s);"
-        cursor.execute(query, { 'i': ID, 'g': guildID, 'r': roleID, 'l': level })
-        cnx.commit()
-        cursor.close()
+        async with self.bot.db_query(query, { 'i': ID, 'g': guildID, 'r': roleID, 'l': level }):
+            pass
         return True
-    
+
     async def rr_list_role(self, guild:int, level:int=-1):
         """List role rewards in the database"""
-        cnx = self.bot.cnx_frm
-        cursor = cnx.cursor(dictionary = True)
-        query = ("SELECT * FROM `roles_rewards` WHERE guild={g} ORDER BY level;".format(g=guild)) if level < 0 else ("SELECT * FROM `roles_rewards` WHERE guild={g} AND level={l} ORDER BY level;".format(g=guild,l=level))
-        cursor.execute(query)
-        liste = list()
-        for x in cursor:
-            liste.append(x)
-        cursor.close()
+        if level < 0:
+            query = f"SELECT * FROM `roles_rewards` WHERE guild={guild} ORDER BY level;"
+        else:
+            query = f"SELECT * FROM `roles_rewards` WHERE guild={guild} AND level={level} ORDER BY level;"
+        async with self.bot.db_query(query) as query_results:
+            liste = list(query_results)
         return liste
-    
+
     async def rr_remove_role(self, ID:int):
         """Remove a role reward from the database"""
-        cnx = self.bot.cnx_frm
-        cursor = cnx.cursor(dictionary = True)
         query = ("DELETE FROM `roles_rewards` WHERE `ID`={};".format(ID))
-        cursor.execute(query)
-        cnx.commit()
-        cursor.close()
+        async with self.bot.db_query(query):
+            pass
         return True
 
     @commands.group(name="roles_rewards", aliases=['rr'])
@@ -1013,7 +994,7 @@ class Xp(commands.Cog):
         ..Doc server.html#roles-rewards"""
         if ctx.subcommand_passed is None:
             await self.bot.get_cog('Help').help_command(ctx,['rr'])
-    
+
     @rr_main.command(name="add")
     @commands.check(checks.has_manage_guild)
     async def rr_add(self, ctx: MyContext, level:int, *, role:discord.Role):
@@ -1028,24 +1009,23 @@ class Xp(commands.Cog):
                 raise commands.BadArgument(f'Role "{role.name}" not found')
             l = await self.rr_list_role(ctx.guild.id)
             if len([x for x in l if x['level']==level]) > 0:
-                return await ctx.send(await self.bot._(ctx.guild.id,'xp','already-1-rr'))
+                return await ctx.send(await self.bot._(ctx.guild.id, "xp.already-1-rr"))
             max_rr = await self.bot.get_config(ctx.guild.id,'rr_max_number')
             max_rr = self.bot.get_cog("Servers").default_opt['rr_max_number'] if max_rr is None else max_rr
             if len(l) >= max_rr:
-                return await ctx.send(str(await self.bot._(ctx.guild.id,'xp','too-many-rr')).format(len(l)))
+                return await ctx.send(await self.bot._(ctx.guild.id, "xp.too-many-rr", c=len(l)))
             await self.rr_add_role(ctx.guild.id,role.id,level)
         except Exception as e:
             await self.bot.get_cog('Errors').on_command_error(ctx,e)
         else:
-            await ctx.send(str(await self.bot._(ctx.guild.id,'xp','rr-added')).format(role.name,level))
-    
+            await ctx.send(await self.bot._(ctx.guild.id, "xp.rr-added", role=role.name,level=level))
+
     @rr_main.command(name="list")
+    @commands.check(checks.bot_can_embed)
     async def rr_list(self, ctx: MyContext):
         """List every roles rewards of your server
         
         ..Doc server.html#roles-rewards"""
-        if not ctx.can_send_embed:
-            return await ctx.send(await self.bot._(ctx.guild.id,"fun","no-embed-perm"))
         try:
             l = await self.rr_list_role(ctx.guild.id)
         except Exception as e:
@@ -1054,10 +1034,11 @@ class Xp(commands.Cog):
             des = '\n'.join(["• <@&{}> : lvl {}".format(x['role'], x['level']) for x in l])
             max_rr = await self.bot.get_config(ctx.guild.id,'rr_max_number')
             max_rr = self.bot.get_cog("Servers").default_opt['rr_max_number'] if max_rr is None else max_rr
-            title = str(await self.bot._(ctx.guild.id,"xp",'rr_list')).format(len(l),max_rr)
-            emb = await self.bot.get_cog('Embeds').Embed(title=title,desc=des).update_timestamp().create_footer(ctx)
-            await ctx.send(embed=emb.discord_embed())
-    
+            title = await self.bot._(ctx.guild.id,"xp.rr_list", c=len(l), max=max_rr)
+            emb = discord.Embed(title=title, description=des, timestamp=ctx.message.created_at)
+            emb.set_footer(text=ctx.author, icon_url=ctx.author.display_avatar)
+            await ctx.send(embed=emb)
+
     @rr_main.command(name="remove")
     @commands.check(checks.has_manage_guild)
     async def rr_remove(self, ctx: MyContext, level:int):
@@ -1070,13 +1051,13 @@ class Xp(commands.Cog):
         try:
             l = await self.rr_list_role(ctx.guild.id,level)
             if len(l) == 0:
-                return await ctx.send(await self.bot._(ctx.guild.id,'xp','no-rr'))
+                return await ctx.send(await self.bot._(ctx.guild.id, "xp.no-rr"))
             await self.rr_remove_role(l[0]['ID'])
         except Exception as e:
             await self.bot.get_cog('Errors').on_command_error(ctx,e)
         else:
-            await ctx.send(str(await self.bot._(ctx.guild.id,'xp','rr-removed')).format(level))
-    
+            await ctx.send(await self.bot._(ctx.guild.id, "xp.rr-removed", level=level))
+
     @rr_main.command(name="reload")
     @commands.check(checks.has_manage_guild)
     @commands.cooldown(1,300,commands.BucketType.guild)
@@ -1086,11 +1067,11 @@ class Xp(commands.Cog):
         ..Doc server.html#roles-rewards"""
         try:
             if not ctx.guild.me.guild_permissions.manage_roles:
-                return await ctx.send(await self.bot._(ctx.guild.id,'modo','cant-mute'))
+                return await ctx.send(await self.bot._(ctx.guild.id,'moderation.mute.cant-mute'))
             c = 0
             rr_list = await self.rr_list_role(ctx.guild.id)
             if len(rr_list) == 0:
-                await ctx.send(await self.bot._(ctx.guild, "xp", "no-rr-2"))
+                await ctx.send(await self.bot._(ctx.guild, "xp.no-rr-2"))
                 return
             used_system = await self.bot.get_config(ctx.guild.id,'xp_type')
             used_system = 0 if used_system is None else used_system
@@ -1100,10 +1081,9 @@ class Xp(commands.Cog):
                 if m is not None:
                     level = (await self.calc_level(member['xp'], used_system))[0]
                     c += await self.give_rr(m, level, rr_list, remove=True)
-            await ctx.send(str(await self.bot._(ctx.guild.id,'xp','rr-reload')).format(c,ctx.guild.member_count))
+            await ctx.send(await self.bot._(ctx.guild.id, "xp.rr-reload", role_count=c,member_count=ctx.guild.member_count))
         except Exception as e:
             await self.bot.get_cog('Errors').on_command_error(ctx,e)
-    
 
 
 def setup(bot):

@@ -1,0 +1,21 @@
+{
+    "en": {
+        "already-1-rr": "You already have a designated role for this emoji",
+        "already-dont-have": "You don't have this role",
+        "already-have": "You already have this role",
+        "embed-edited": "The embed and reactions have been successfully updated",
+        "no-rr": "No role is related to this emoji",
+        "not-zbot-embed": "This message does not contain any role-reaction embed",
+        "not-zbot-msg": "This message is not Zbot's",
+        "reactions-edited": "The reactions have been correctly updated",
+        "role-given": "The role %{r} has been given",
+        "role-lost": "The role %{r} has been removed from your roles",
+        "role-not-in-list": "This role is not part of the attributable roles",
+        "rr-added": "The role %{r} has been added for the emoji %{e}",
+        "rr-embed": "Taking on a role",
+        "rr-list": "List of reaction roles (%{n}/%{m})",
+        "rr-removed": "The role %{r} can no longer be given via the emoji %{e}",
+        "rr-removed-2": "The emoji %{e} is free again to give a role",
+        "too-many-rr": "You have already reached the limit of %{l} roles"
+    }
+}

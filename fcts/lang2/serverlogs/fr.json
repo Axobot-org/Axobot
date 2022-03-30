@@ -1,0 +1,15 @@
+{
+    "fr": {
+        "list": {
+            "all": "Liste des logs utilisables",
+            "guild": "Liste des logs utilisés dans ce serveur",
+            "channel": "Liste des logs utilisés dans %{channel}",
+            "none": "Aucun log n'est utilisé ici. Utilise `%{cmd}` pour commencer à obtenir des logs"
+        },
+        "enabled": "Les logs de type %{kind} seront désormais envoyés dans ce salon",
+        "disabled": "Les logs de type %{kind} ne seront plus envoyés dans ce salon",
+        "embed-warning": "Pour envoyer les logs, le bot a besoin de la permission \"Intégrer les liens\" !",
+        "none-added": "Ce salon est déjà abonné à tous ces logs !",
+        "none-removed": "Ce salon n'était déjà abonné à aucun de ces logs !"
+    }
+}

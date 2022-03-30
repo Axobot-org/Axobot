@@ -1,0 +1,152 @@
+{
+    "fr": {
+        "aliases": "Alias",
+        "categories": {
+            "data": "informations",
+            "fun": "fun",
+            "moderation": "modération",
+            "other": "autres",
+            "server-settings": "configuration",
+            "staff": "staff du bot",
+            "translators": "equipe de traducteurs",
+            "unclassed": "non classé",
+            "users-info": "Infos sur les utilisateurs"
+        },
+        "check-desc": {
+            "bot_can_embed": [
+                "Le bot possède la permission d'envoyer des contenus riches (embeds)",
+                "Vous devez autoriser le bot à envoyer des contenus riches (embeds)"
+            ],
+            "bot_has_permissions": [
+                "Le bot possède les permissions suffisantes",
+                "Le bot ne possède pas les permissions suffisantes"
+            ],
+            "can_ban": [
+                "L'un de vos rôles est autorisé à utiliser cette commande (`ban`)",
+                "Rôle autorisé manquant (`ban`)"
+            ],
+            "can_clear": [
+                "L'un de vos rôles est autorisé à utiliser cette commande (`clear`)",
+                "Rôle autorisé manquant (`clear`)"
+            ],
+            "can_edit_case": [
+                "L'un de vos rôles est autorisé à utiliser cette commande (`warn`)",
+                "Rôle autorisé manquant (`warn`)"
+            ],
+            "can_kick": [
+                "L'un de vos rôles est autorisé à utiliser cette commande (`kick`)",
+                "Rôle autorisé manquant (`kick`)"
+            ],
+            "can_mute": [
+                "L'un de vos rôles est autorisé à utiliser cette commande (`mute`)",
+                "Rôle autorisé manquant (`mute`)"
+            ],
+            "can_say": [
+                "L'un de vos rôles est autorisé à utiliser cette commande (`say`)",
+                "Rôle autorisé manquant (`say`)"
+            ],
+            "can_slowmode": [
+                "L'un de vos rôles est autorisé à utiliser cette commande (`slowmode`)",
+                "Rôle autorisé manquant (`slowmode`)"
+            ],
+            "can_use_cookie": [
+                "Vous êtes un élu de chez Aragorn1202",
+                "Cette commande est sur Whitelist"
+            ],
+            "can_use_rss": [
+                "Vous avez la permission 'Administrateur'",
+                "Permission 'Administrateur' manquante"
+            ],
+            "can_warn": [
+                "L'un de vos rôles est autorisé à utiliser cette commande (`warn`)",
+                "Rôle autorisé manquant (`warn`)"
+            ],
+            "check_admin": [
+                "Il faut être administrateur du bot",
+                "Vous n'êtes pas administrateur du bot"
+            ],
+            "database_connected": [
+                "La base de donnée est bien en ligne",
+                "La base de donnée est hors ligne"
+            ],
+            "guild_only": [
+                "Utilisable uniquement dans un serveur",
+                "Utilisable uniquement dans un serveur"
+            ],
+            "has_admin": [
+                "Vous avez la permission 'Administrateur'",
+                "Permission 'Administrateur' manquante"
+            ],
+            "has_embed_links": [
+                "Vous avez la permission \"Intégrer des liens\"",
+                "Vous devez avoir la permission \"Intégrer des liens\""
+            ],
+            "has_manage_guild": [
+                "Vous avez la permission 'Gérer le serveur'",
+                "Permission 'Gérer le serveur' manquante"
+            ],
+            "has_manage_msg": [
+                "Vous avez la permission 'Gérer les messages'",
+                "Permission 'Gérer les messages' manquante"
+            ],
+            "has_manage_nicknames": [
+                "Vous avez la permission 'Gérer les pseudos'",
+                "Permission 'Gérer les pseudos' manquante"
+            ],
+            "has_manage_roles": [
+                "Vous avez la permission 'Gérer les rôles'",
+                "Permission 'Gérer les rôles' manquante"
+            ],
+            "has_permissions": [
+                "Vous avez les permissions Discord suffisantes",
+                "Vous n'avez pas les permissions Discord suffisantes"
+            ],
+            "is_fun_enabled": [
+                "Les commandes de fun sont activées",
+                "Les commandes de fun doivent être activées"
+            ],
+            "is_halloween": [
+                "L'événement Halloween est en cours, profitez-en !",
+                "Il n'y a aucun événement de type Halloween actuellement"
+            ],
+            "is_owner": [
+                "Il faut être le propriétaire du bot",
+                "Vous n'êtes pas le propriétaire du bot"
+            ],
+            "is_support_staff": [
+                "Vous faites partie du staff du bot",
+                "Vous devez faire partie du staff du bot"
+            ],
+            "is_translator": [
+                "Vous faites bien partie de l'équipe de traducteurs",
+                "Vous devez faire partie de l'équipe de traducteurs"
+            ],
+            "is_ttt_enabled": [
+                "Le jeu du morpion est activé",
+                "Le jeu du morpion doit être activé sur ce serveur"
+            ],
+            "verify_role_exists": [
+                "Un rôle de vérification est configuré",
+                "Aucun rôle de vérification n'a été configuré"
+            ],
+            "in_support_server": [
+                "Vous êtes bien dans le serveur de support du bot",
+                "Vous ne pouvez l'utiliser que dans le serveur de support"
+            ]
+        },
+        "cmd-count": "%{nbr} commandes\n`%{p}help %{cog}` pour en afficher la liste",
+        "cmd-not-found": "Aucune commande nommée \"%{cmd}\"",
+        "cog-empty-dm": "Aucune commande de ce module n'est disponible en MP !",
+        "description": "Description",
+        "embed_title": "Liste des commandes disponibles pour %{u}",
+        "embed_title_dm": "Liste des commandes disponibles en MP",
+        "footer": "Entrez {}help commande pour plus d'informations sur une commande",
+        "no-desc-cmd": "Aucune description pour cette commande",
+        "no-desc-cog": "Aucune description pour ce module.",
+        "no-subcmd": "La commande %{cmd} n'a aucune sous-commande",
+        "not-enabled": ":warning: Cette commande est désactivée",
+        "subcmd-not-found": "Cette commande ne possède aucune sous-commande nommée \"%{name}\"",
+        "subcmds": "Sous-commandes",
+        "warning": "Avertissements"
+    }
+}

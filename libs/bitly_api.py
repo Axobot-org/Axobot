@@ -3,12 +3,14 @@
 
 
 import json
+from typing import Any, Optional
+from urllib.parse import urlparse
+
 import requests
+from cachingutils import cached
 
-from urllib.parse import urlencode, urlparse
-
-BITLY_API_VERSION = 'v3'
-BITLY_SERVICE_URL = 'http://api.bit.ly/%s/' %BITLY_API_VERSION
+BITLY_API_VERSION = 'v4'
+BITLY_SERVICE_URL = 'https://api-ssl.bitly.com/%s/' %BITLY_API_VERSION
 
 class ShortenerServiceError(Exception):
     pass
@@ -17,24 +19,30 @@ class ShortenerServiceError(Exception):
 class BaseShortener():
     """Base class for the url shorteners in the lib"""
 
-    def __init__(self, api_key):
+    def __init__(self, api_key: str):
         self.api_key = api_key
-        self.headers = None
+        self.headers = {"Authorization": f"Bearer {api_key}"}
 
-    def _do_http_request(self, request_url, data=None, headers=None):
-
+    def _do_http_request(self, request_url: str, data: dict=None, headers: dict=None):
         if headers:
-            self.headers = dict(self.headers.items() + headers.items())
+            headers = self.headers | headers
+        else:
+            headers = self.headers
 
         try:
             if data:
-                response = requests.post(request_url, data=data, headers=self.headers)
+                response = requests.post(request_url, json=data, headers=headers)
             else:
-                response = requests.get(request_url, headers=self.headers)
-            return (response.headers, response.content)
+                response = requests.get(request_url, headers=headers)
+            return response.status_code, response.content
 
-        except requests.exceptions.HTTPError as e:  # pylint: disable=invalid-name
-            raise ShortenerServiceError(e)
+        except requests.exceptions.HTTPError as err:
+            raise ShortenerServiceError(err) from err
+
+    def request(self, action: str, data: dict) -> tuple[int, dict[str, Any]]:
+        "Make a request to the API"
+        status, response = self._do_http_request(BITLY_SERVICE_URL+action, data)
+        return status, json.loads(response)
 
 
 class BitlyError(ShortenerServiceError):
@@ -42,125 +50,50 @@ class BitlyError(ShortenerServiceError):
 
 
 class Bitly(BaseShortener):
-    def __init__(self, login, api_key):
+    "Client class used to shorten and expand URLs using bit.ly API"
+    def __init__(self, api_key: str):
         BaseShortener.__init__(self, api_key)
-        self.login = login
-        self.default_request_params = {
-            'format': 'json',
-            'login':  self.login,
-            'apiKey': self.api_key,
-        }
 
-    def _get_request_url(self, action, params):
-        request_params = self.default_request_params
-        request_params.update(params)
+    # pylint: disable=no-self-use
+    def _get_error_from_response(self, response: dict[str, Any]) -> Optional[str]:
+        """The exact nature of the error is obtained from the 'message' json attribute"""
+        return response.get('message')
 
-        encoded_params = urlencode(request_params)
-        return "%s%s?%s" % (BITLY_SERVICE_URL, action, encoded_params)
-
-    def _is_response_success(self, response):  # pylint: disable=no-self-use
-        """A successful response will contain:
-        a) status_code as 200
-        b) status_txt as OK
-        """
-        return (response.get('status_code') == 200 and
-                response.get('status_txt') == 'OK')
-
-    # pylint: disable=inconsistent-return-statements,no-self-use
-    def _get_error_from_response(self, response):
-        """The exact nature of the error can be obtained from the following
-        parameters in the response:
-
-        a) status_code:
-             403: Rate Limited.
-             503: Unknown Error or Temporaty Unavailability.
-             500: Any other invalid request/response.
-
-        b) status_txt:
-             MISSING_ARG_%s to denote a missing URL parameter,
-             INVALID_%s to denote an invalid value in a request parameter,
-        where %s is substituted with the name of the request parameter.
-
-        Note that all valid responses in json and xml format will carry an HTTP
-        Response Status Code of 200. This means that invalid, malformed or
-        rate-limited json and xml requests may still return an HTTP response
-        status code of 200.
-
-        Some examples of error responses extracted from the ApiDocument:
-        > json { "status_code": 403, "status_txt": "RATE_LIMIT_EXCEEDED", "data" : null }
-        > json { "status_code": 500, "status_txt": "INVALID_URI", "data" : null }
-        > json { "status_code": 500, "status_txt": "MISSING_ARG_LOGIN", "data" : null }
-        > json { "status_code": 503, "status_txt": "UNKNOWN_ERROR", "data" : null }
-        """
-
-        if response.get('status_code') in (403, 500, 503):
-            return response.get('status_txt', 'UNKNOWN_ERROR')
-
-        if response.get('status_code') == 200:
-            return ('Unknown Error occurred. This could be due to invalid,'
-                    ' malformed or rate-limited json')
-
-    def shorten_url(self, long_url, domain='bit.ly'):  # pylint: disable=arguments-differ
+    @cached(timeout=86400)
+    def shorten_url(self, long_url: str, domain: str='bit.ly'):  # pylint: disable=arguments-differ
+        "Shorten a given URL to a bit.ly url"
         params = {
-            'uri':long_url,
-            'domain':domain
+            'long_url': long_url,
+            'domain': domain
         }
 
-        request_url = self._get_request_url('shorten', params)
-        headers, response = self._do_http_request(request_url)  # pylint: disable=unused-variable
-        response = json.loads(response)
+        status, response = self.request('shorten', params)
 
-        if not self._is_response_success(response):
+        if status >= 400:
             msg = self._get_error_from_response(response)
             raise BitlyError('Error occurred while shortening url %s: %s' % (long_url, msg))
 
-        data_dict = response.get('data')
-        short_url = data_dict.get('url')
+        short_url: str = response.get('link')
         if not short_url:
             raise BitlyError('Error occurred while shortening url %s' %long_url)
         return short_url
 
-
-    def expand_url(self, short_url):
-        # Extract hash from short_url
-        url_path = urlparse(short_url)
+    @cached(timeout=86400)
+    def expand_url(self, short_url: str):
+        "Extract a full URL from a given shortened url"
+        # Extract info from short_url
+        parsed_url = urlparse(short_url)
         params = {
-            'hash':url_path.path[1:]
+            'bitlink_id': parsed_url.hostname + parsed_url.path
         }
 
-        request_url = self._get_request_url('expand', params)
-        headers, response = self._do_http_request(request_url)  # pylint: disable=unused-variable
-        response = json.loads(response)
+        status, response = self.request('expand', params)
 
-        if not self._is_response_success(response):
+        if status >= 400:
             msg = self._get_error_from_response(response)
             raise BitlyError('Error occurred while expanding url %s: %s' % (short_url, msg))
 
-        data_dict = response.get('data')
-        data_dict = data_dict.get('expand')
-        long_url = data_dict[0].get('long_url')
+        long_url = response.get('long_url')
         if not long_url:
             raise BitlyError('Error occurred while expanding url %s' %short_url)
         return long_url
-
-    def validate(self, login=None, api_key=None):
-        if not login:
-            login = self.login
-        if not api_key:
-            api_key = self.api_key
-
-        params = {
-            'x_login':login,
-            'x_apiKey':api_key,
-        }
-
-        request_url = self._get_request_url('validate', params)
-        headers, response = self._do_http_request(request_url)  # pylint: disable=unused-variable
-        response = json.loads(response)
-
-        if not self._is_response_success(response):
-            msg = self._get_error_from_response(response)
-            raise BitlyError('Error occurred while validating account %s: %s' % (self.login, msg))
-
-        data = response.get('data')
-        return data.get('valid')

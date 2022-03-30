@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+# pylint: skip-file
 #
 # Configuration file for the Sphinx documentation builder.
 #
@@ -19,17 +20,16 @@ sys.path.insert(0, os.path.abspath('.'))
 # -- Project information -----------------------------------------------------
 
 project = 'ZBot'
-copyright = '2019 - 2021, ZRunner'
+copyright = '2019 - 2022, ZRunner'
 author = 'ZRunner'
 
 # The short X.Y version
-version = '3.7'
+version = '4.0'
 # The full version, including alpha/beta/rc tags
-release = '3.7.4'
+release = '4.0.0'
 
 
 # Example configuration for intersphinx: refer to the Python standard library.
-import re
 intersphinx_mapping = {
     "python": ("https://docs.python.org/3.7", None),
     "requests": ("http://docs.python-requests.org/en/master", None),
@@ -47,6 +47,7 @@ intersphinx_mapping = {
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = [
+    "sphinxext.opengraph",
     "sphinx.ext.autodoc",
     "sphinx.ext.intersphinx",
     "sphinx.ext.viewcode",

@@ -1,20 +1,19 @@
 import asyncio
-import aiohttp
+import datetime
+import importlib
 import json
 import typing
-import json
-import importlib
-import datetime
 from random import randint
 
+import aiohttp
 import discord
 from discord.ext import commands
 from discord.ext.commands import Cog
-
 from libs import halloween
-from libs.halloween import convert_image, check_image
+from libs.halloween import check_image, convert_image
+
 importlib.reload(halloween)
-from utils import Zbot, MyContext
+from libs.classes import MyContext, Zbot
 
 
 class LinkConverter(commands.Converter):
@@ -165,7 +164,7 @@ class Halloween(Cog):
     @commands.check(is_halloween)
     async def hallow_main(self, ctx: MyContext):
         """Hallowify and be happy for the spooky month! Change your avatar color, check if an image is orange enough, and collect event points to unlock a collector Halloween 2021 card!
-        
+
 A BIG thanks to the Project Blurple and their original code for the colorization part.
 
 ..Example hw hallowify
@@ -180,7 +179,7 @@ A BIG thanks to the Project Blurple and their original code for the colorization
 
 ..Example hw collect"""
         if ctx.subcommand_passed is None:
-            await self.bot.get_cog('Help').help_command(ctx,['halloween'])
+            await self.bot.get_cog('Help').help_command(ctx, ['halloween'])
 
     lightfy = _make_color_command('lightfy', 'light', hallow_main)
     darkfy = _make_color_command('darkfy', 'dark', hallow_main)
@@ -218,34 +217,19 @@ __29 variations: __
 `++halloween-bg` replaces the transparency of your image with a Halloween background
 `++dark-halloween-bg` replaces the transparency of your image with a Dark Halloween background""")
 
-    def db_add_points(self, userid: int, points: int):
-        cnx = self.bot.cnx_frm
-        cursor = cnx.cursor(dictionary=True)
-        query = "INSERT INTO `dailies` (`userID`,`points`) VALUES (%(u)s,%(p)s) ON DUPLICATE KEY UPDATE points = points + %(p)s;"
-        cursor.execute(query, {'u': userid, 'p': points})
-        cnx.commit()
-        cursor.close()
-
-    def db_get_points(self, userid: int) -> dict:
-        cnx = self.bot.cnx_frm
-        cursor = cnx.cursor(dictionary=True)
-        query = "SELECT * FROM `dailies` WHERE userid = %(u)s;"
-        cursor.execute(query, {'u': userid})
-        result = list(cursor)
-        cursor.close()
-        return result[0] if len(result) > 0 else None
 
     @hallow_main.command(name="collect")
     async def hw_collect(self, ctx: MyContext):
         """Get some events points every hour"""
-        last_data = self.db_get_points(ctx.author.id)
+        events_cog = self.bot.get_cog("BotEvents")
+        last_data: typing.Optional[dict] = await events_cog.db_get_points(ctx.author.id)
         if last_data is None or (datetime.datetime.now() - last_data['last_update']).total_seconds() > 3600:
             points = randint(*self.hourly_reward)
             await self.bot.get_cog("Utilities").add_user_eventPoint(ctx.author.id, points)
-            self.db_add_points(ctx.author.id, points)
-            txt = await self.bot._(ctx.channel, "halloween", "got-points", pts=points)
+            await events_cog.db_add_points(ctx.author.id, points)
+            txt = await self.bot._(ctx.channel, "halloween.daily.got-points", pts=points)
         else:
-            txt = await self.bot._(ctx.channel, "halloween", "too-quick")
+            txt = await self.bot._(ctx.channel, "halloween.daily.too-quick")
         if ctx.can_send_embed:
             title = "Halloween event"
             emb = discord.Embed(title=title, description=txt, color=discord.Color.orange())

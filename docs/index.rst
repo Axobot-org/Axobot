@@ -1,3 +1,5 @@
+:og:description: Welcome to the official Zbot documentation, containing every and any info you'll ever need about this Discord bot!
+
 .. ZBot documentation master file, created by
    sphinx-quickstart on Mon Aug  6 23:45:24 2018.
    You can adapt this file completely to your liking, but it should at least
@@ -28,6 +30,12 @@ A translation of the Zbot Privacy Policy has been added to `this page <privacy.h
    roles-reactions
    fun
    miscellaneous
+
+.. toctree::
+   :maxdepth: 1
+   :caption: Our articles:
+
+   scam-detector
 
 
 Indices and tables

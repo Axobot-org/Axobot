@@ -1,16 +1,16 @@
 import discord
 from discord.ext import commands
-from utils import Zbot
+from libs.classes import Zbot
 
 class Welcomer(commands.Cog):
     """Cog which manages the departure and arrival of members in the servers"""
-    
+
     def __init__(self, bot: Zbot):
         self.bot = bot
         self.file = "welcomer"
         self.no_message = [392766377078816789,504269440872087564,552273019020771358]
 
-    
+
     @commands.Cog.listener()
     async def on_member_join(self, member:discord.Member):
         """Main function called when a member joins a server"""
@@ -25,7 +25,7 @@ class Welcomer(commands.Cog):
                     await self.check_owner_server(member)
                     await self.check_support(member)
                     await self.check_contributor(member)
-    
+
     @commands.Cog.listener()
     async def on_member_update(self, before:discord.Member, after:discord.Member):
         """Main function called when a member got verified in a community server"""
@@ -35,8 +35,8 @@ class Welcomer(commands.Cog):
                 self.bot.loop.create_task(self.give_roles(after))
                 await self.give_roles_back(after)
                 await self.check_muted(after)
-        
-        
+
+
     @commands.Cog.listener()
     async def on_member_remove(self, member:discord.Member):
         """Fonction principale appelée lorsqu'un membre quitte un serveur"""
@@ -53,7 +53,7 @@ class Welcomer(commands.Cog):
         msg = await self.bot.get_config(member.guild.id,Type)
         if member.id in self.no_message or (Type == "welcome" and await self.raid_check(member)):
             return
-        if await self.bot.get_cog('Utilities').check_any_link(member.name) is not None:
+        if self.bot.get_cog('Utilities').sync_check_any_link(member.name) is not None:
             return
         if msg not in ['',None]:
             ch = await self.bot.get_config(member.guild.id,'welcome_channel')
@@ -67,7 +67,7 @@ class Welcomer(commands.Cog):
                 channel = member.guild.get_channel(int(channel))
                 if channel is None:
                     continue
-                botormember = await self.bot._(member.guild,"keywords",'bot' if member.bot else 'member')
+                botormember = await self.bot._(member.guild,"misc.bot" if member.bot else "misc.member")
                 try:
                     msg = msg.format_map(self.bot.SafeDict(
                         user=member.mention if Type=='welcome' else member.name,
@@ -86,7 +86,7 @@ class Welcomer(commands.Cog):
         if len(servers) > 0:
             role = member.guild.get_role(486905171738361876)
             if role is None:
-                self.bot.log.warn('[check_owner_server] Owner role not found')
+                self.bot.log.warning('[check_owner_server] Owner role not found')
                 return
             if role not in member.roles:
                 await member.add_roles(role,reason="This user support me")
@@ -98,7 +98,7 @@ class Welcomer(commands.Cog):
             if role is not None:
                 await member.add_roles(role)
             else:
-                self.bot.log.warn('[check_support] Support role not found')
+                self.bot.log.warning('[check_support] Support role not found')
 
     async def check_contributor(self, member: discord.Member):
         """Vérifie si un nouvel arrivant est un contributeur"""
@@ -107,7 +107,7 @@ class Welcomer(commands.Cog):
             if role is not None:
                 await member.add_roles(role)
             else:
-                self.bot.log.warn('[check_contributor] Contributor role not found')
+                self.bot.log.warning('[check_contributor] Contributor role not found')
 
     async def give_roles_back(self, member: discord.Member):
         """Give roles rewards/muted role to new users"""
@@ -117,7 +117,7 @@ class Welcomer(commands.Cog):
         xp = await self.bot.get_cog('Xp').bdd_get_xp(member.id, None if used_xp_type == 0 else member.guild.id)
         if xp is not None and len(xp) == 1:
             await self.bot.get_cog('Xp').give_rr(member,(await self.bot.get_cog('Xp').calc_level(xp[0]['xp'],used_xp_type))[0],await self.bot.get_cog('Xp').rr_list_role(member.guild.id))
-    
+
     async def check_muted(self, member: discord.Member):
         """Give the muted role to that user if needed"""
         modCog = self.bot.get_cog("Moderation")
@@ -138,7 +138,7 @@ class Welcomer(commands.Cog):
             return False
         # try to send a DM but don't mind if we can't
         try:
-            await member.send(await self.bot._(member, "modo", "raid-kicked", guild=member.guild.name))
+            await member.send(await self.bot._(member, "moderation.raid-kicked", guild=member.guild.name))
         except (discord.Forbidden, discord.HTTPException):
             pass
         try:
@@ -149,13 +149,13 @@ class Welcomer(commands.Cog):
             await self.bot.get_cog("Moderation").send_modlogs("kick", member, self.bot.user, member.guild, reason=reason)
             return True
 
-    async def ban(self, member: discord.Member, reason: str):
+    async def ban(self, member: discord.Member, reason: str, duration: int = None):
         # if user is too high
         if member.roles[-1].position >= member.guild.me.roles[-1].position:
             return False
         # try to send a DM but don't mind if we can't
         try:
-            await member.send(await self.bot._(member, "modo", "raid-banned", guild=member.guild.name))
+            await member.send(await self.bot._(member, "moderation.raid-banned", guild=member.guild.name))
         except (discord.Forbidden, discord.HTTPException):
             pass
         try:
@@ -163,7 +163,9 @@ class Welcomer(commands.Cog):
         except (discord.Forbidden, discord.HTTPException):
             return False
         else:
-            log = str(await self.bot._(member.guild.id,"logs","ban")).format(member=member,reason=reason,case=None)
+            if duration:
+                await self.bot.task_handler.add_task('ban', duration, member.id, member.guild.id)
+            log = str(await self.bot._(member.guild.id,"logs.ban")).format(member=member,reason=reason,case=None)
             await self.bot.get_cog("Events").send_logs_per_server(member.guild,"ban",log,member.guild.me)
             return True
 
@@ -173,39 +175,41 @@ class Welcomer(commands.Cog):
             return False
         level = str(await self.bot.get_config(member.guild.id,"anti_raid"))
         # if level is unreadable or bot can't kick
-        if not level.isnumeric() or member.guild.channels[0].permissions_for(member.guild.me).kick_members == False:
+        if not level.isnumeric() or not member.guild.channels[0].permissions_for(member.guild.me).kick_members:
             return
-        c = False
         level = int(level)
         can_ban = member.guild.get_member(self.bot.user.id).guild_permissions.ban_members
         account_created_since = (self.bot.utcnow() - member.created_at).total_seconds()
         # Level 4
         if level >= 4:
-            if account_created_since <= 120*60: # kick accounts created less than 2h before
-                if await self.kick(member,await self.bot._(member.guild.id,"logs","d-young")):
+            if account_created_since <= 86400: # kick accounts created less than 1d before
+                if await self.kick(member,await self.bot._(member.guild.id,"logs.reason.young")):
                     return True
-            if account_created_since <= 60*60 and can_ban: # ban members created less than 1h before
-                if await self.ban(member,await self.bot._(member.guild.id,"logs","d-young")):
+            if account_created_since <= 3600 and can_ban: # ban (2w) members created less than 1h before
+                if await self.ban(member, await self.bot._(member.guild.id,"logs.reason.young"), 86400*14):
+                    return True
+            elif account_created_since <= 3600*3 and can_ban: # ban (1w) members created less than 3h before
+                if await self.ban(member, await self.bot._(member.guild.id,"logs.reason.young"), 86400*7):
                     return True
         # Level 3 or more
         if level >= 3 and can_ban:
-            # ban members with invitations in their nickname
-            if await self.bot.get_cog('Utilities').check_discord_invite(member.name) is not None:
-                if await self.ban(member,await self.bot._(member.guild.id,"logs","d-invite")):
+            # ban (1w) members with invitations in their nickname
+            if self.bot.get_cog('Utilities').sync_check_discord_invite(member.name) is not None:
+                if await self.ban(member, await self.bot._(member.guild.id,"logs.reason.invite"), 86400*7):
                     return True
-            if account_created_since <= 45*60: # kick accounts created less than 45min before
-                if await self.kick(member,await self.bot._(member.guild.id,"logs","d-young")):
+            if account_created_since <= 3600*12: # kick accounts created less than 45min before
+                if await self.kick(member,await self.bot._(member.guild.id,"logs.reason.young")):
                     return True
         # Level 2 or more
         if level >= 2: # kick accounts created less than 15min before
-            if account_created_since <= 15*60:
-                if await self.kick(member,await self.bot._(member.guild.id,"logs","d-young")):
+            if account_created_since <= 3600*2:
+                if await self.kick(member,await self.bot._(member.guild.id,"logs.reason.young")):
                     return True
         # Level 1 or more
         if level >= 1: # kick members with invitations in their nickname
-            if await self.bot.get_cog('Utilities').check_discord_invite(member.name) is not None:
-                if await self.kick(member,await self.bot._(member.guild.id,"logs","d-invite")):
-                    return True       
+            if self.bot.get_cog('Utilities').sync_check_discord_invite(member.name) is not None:
+                if await self.kick(member,await self.bot._(member.guild.id,"logs.reason.invite")):
+                    return True 
         # Nothing got triggered
         return False
 
@@ -220,9 +224,9 @@ class Welcomer(commands.Cog):
                 role = member.guild.get_role(int(r))
                 if role is not None:
                     try:
-                        await member.add_roles(role,reason=await self.bot._(member.guild.id,"logs","d-welcome_roles"))
+                        await member.add_roles(role,reason=await self.bot._(member.guild.id,"logs.reason.welcome_roles"))
                     except discord.errors.Forbidden:
-                        await self.bot.get_cog('Events').send_logs_per_server(member.guild,'error',await self.bot._(member.guild,'bvn','error-give-roles',r=role.name,u=str(member)), member.guild.me)
+                        await self.bot.get_cog('Events').send_logs_per_server(member.guild,'error',await self.bot._(member.guild, "welcome.error-give-roles",r=role.name, u=str(member)), member.guild.me)
         except discord.errors.NotFound:
             pass
         except Exception as e:

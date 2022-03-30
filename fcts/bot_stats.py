@@ -7,7 +7,7 @@ from discord.ext import commands, tasks
 import psutil
 import mysql
 
-from utils import MyContext, Zbot
+from libs.classes import MyContext, Zbot
 
 try:
     import orjson # type: ignore
@@ -63,10 +63,10 @@ class BotStats(commands.Cog):
         # get current process for performances logs
         py = psutil.Process(os.getpid())
         # get current time
-        now = time()
+        now = self.bot.utcnow()
         # remove seconds and less
-        now = datetime.fromtimestamp(now-now % 60, tz=timezone.utc)
-        # prepare erquests
+        now = now.replace(second=0, microsecond=0)
+        # prepare requests
         query = "INSERT INTO zbot VALUES (%s, %s, %s, %s, %s, %s);"
         cnx = self.bot.cnx_stats
         cursor = cnx.cursor(dictionary=True)
@@ -102,7 +102,7 @@ class BotStats(commands.Cog):
             # Push everything
             cnx.commit()
         except mysql.connector.errors.IntegrityError as err: # duplicate primary key
-            self.bot.log.warn(f"Stats loop iteration cancelled: {err}")
+            self.bot.log.warning(f"Stats loop iteration cancelled: {err}")
         except Exception as err:
             await self.bot.get_cog("Errors").on_error(err)
         # if something goes wrong, we still have to close the cursor

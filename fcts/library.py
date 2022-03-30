@@ -1,9 +1,11 @@
-import aiohttp
-import typing
 import html
+import typing
+
+import aiohttp
+import discord
 import isbnlib
 from discord.ext import commands
-from utils import Zbot, MyContext
+from libs.classes import MyContext, Zbot
 
 
 class ISBN(commands.Converter):
@@ -27,14 +29,11 @@ class Library(commands.Cog):
     async def on_ready(self):
         self.tables = ['librarystats_beta', 'library_beta'] if self.bot.beta else ['librarystats', 'library']
 
-    async def db_add_search(self, ISBN: int, name: str):
-        cnx = self.bot.cnx_frm
-        cursor = cnx.cursor()
+    async def db_add_search(self, isbn: int, name: str):
         current_timestamp = self.bot.utcnow()
         query = "INSERT INTO `{}` (`ISBN`,`name`,`count`) VALUES (%(i)s, %(n)s, 1) ON DUPLICATE KEY UPDATE count = `count` + 1, last_update = %(l)s;".format(self.tables[0])
-        cursor.execute(query, {'i': ISBN, 'n': name, 'l': current_timestamp})
-        cnx.commit()
-        cursor.close()
+        async with self.bot.db_query(query, {'i': isbn, 'n': name, 'l': current_timestamp}):
+            pass
 
     async def search_book(self, isbn: int, keywords: str, language: str = None) -> dict:
         """Search a book from its ISBN"""
@@ -55,7 +54,7 @@ class Library(commands.Cog):
         if language is not None:
             return await self.search_book(isbn, keywords)
         return None
-    
+
     async def isbn_from_words(self, keywords: str) -> typing.Optional[str]:
         """Get the ISBN of a book from some keywords"""
         url = "https://www.googleapis.com/books/v1/volumes?maxResults=1&q=" + html.escape(keywords.replace(' ', '+'))
@@ -75,7 +74,7 @@ class Library(commands.Cog):
                 return info
             try:
                 isbn = isbnlib.isbn_from_words(keywords)
-            except isbnlib.dev._exceptions.ISBNLibHTTPError:
+            except isbnlib.ISBNLibException:
                 isbn = await self.isbn_from_words(keywords)
             if isbn is None:
                 return
@@ -83,7 +82,7 @@ class Library(commands.Cog):
         for key in ['wiki', 'default', 'openl', 'goob']:
             try:
                 i = isbnlib.meta(isbn, service=key)
-            except (isbnlib.dev._exceptions.DataNotFoundAtServiceError, isbnlib.dev._exceptions.ISBNLibHTTPError, isbnlib.dev._exceptions.RecordMappingError):
+            except isbnlib.ISBNLibException:
                 continue
             if i is not None and len(i) > 0:
                 info.update({
@@ -115,7 +114,7 @@ class Library(commands.Cog):
 
     @book_main.command(name="search", aliases=["book"])
     @commands.cooldown(5, 60, commands.BucketType.guild)
-    async def book_search(self, ctx: MyContext, ISBN: typing.Optional[ISBN], *, keywords: str = ''):
+    async def book_search(self, ctx: MyContext, isbn: typing.Optional[ISBN], *, keywords: str = ''):
         """Search from a book from its ISBN or search terms
         
         ..Example book search Percy Jackson
@@ -127,41 +126,43 @@ class Library(commands.Cog):
         while '  ' in keywords:
             keywords = keywords.replace('  ', ' ')
         try:
-            book = await self.search_book_2(ISBN, keywords)
+            book = await self.search_book_2(isbn, keywords)
         except isbnlib.dev._exceptions.ISBNLibHTTPError:
-            await ctx.send(await self.bot._(ctx.channel, "library", "rate-limited") + " :confused:")
+            await ctx.send(await self.bot._(ctx.channel, "library.rate-limited") + " :confused:")
             return
         if book is None:
-            return await ctx.send(await self.bot._(ctx.channel, 'library', 'no-found'))
-        unknown = await self.bot._(ctx.channel, 'library', 'unknown')
+            return await ctx.send(await self.bot._(ctx.channel, 'library.none-found'))
+        unknown = await self.bot._(ctx.channel, 'library.unknown')
         authors = [x for x in book.get('authors', list()) if x] # filter empty string and other weird things
         if ctx.can_send_embed:
-            thumb = book.get('cover', '')
-            emb = await self.bot.get_cog('Embeds').Embed(title=book['title'], thumbnail=thumb, color=5301186).create_footer(ctx)
+            emb = discord.Embed(title=book['title'], color=5301186)
+            emb.set_thumbnail(url=book.get('cover', ''))
+            emb.set_footer(text=ctx.author, icon_url=ctx.author.display_avatar)
+
             if authors:
-                t = await self.bot._(ctx.channel, 'library', 'author' if len(authors) <= 1 else 'authors')
+                t = await self.bot._(ctx.channel, 'library.author' if len(authors) <= 1 else 'authors')
                 t = t.capitalize()
-                emb.add_field(t, '\n'.join(authors))
+                emb.add_field(name=t, value='\n'.join(authors)  )
             # Publisher
-            publisher = (await self.bot._(ctx.channel, 'library', 'publisher')).capitalize()
-            emb.add_field(publisher, book.get('publisher', unknown))
+            publisher = (await self.bot._(ctx.channel, 'library.publisher')).capitalize()
+            emb.add_field(name=publisher, value=book.get('publisher', unknown))
             # ISBN
-            emb.add_field('ISBN', book['isbn'], True)
+            emb.add_field(name='ISBN', value=book['isbn'], inline=False)
             # Publication year
-            publication = (await self.bot._(ctx.channel, 'library', 'year')).capitalize()
-            emb.add_field(publication, book.get('publication', unknown), True)
+            publication = (await self.bot._(ctx.channel, 'library.year')).capitalize()
+            emb.add_field(name=publication, value=book.get('publication', unknown))
             # Language
             if 'language' in book:
-                lang = (await self.bot._(ctx.channel, 'library', 'language')).capitalize()
-                emb.add_field(lang, book['language'], True)
+                lang = (await self.bot._(ctx.channel, 'library.language')).capitalize()
+                emb.add_field(name=lang, value=book['language'])
             await ctx.send(embed=emb)
         else:
             auth = '\n'.join(authors) if authors else unknown
-            authors = (await self.bot._(ctx.channel, 'library', 'author' if len(authors) <= 1 else 'authors')).capitalize()
-            title = (await self.bot._(ctx.channel, 'library', 'title')).capitalize()
-            publisher = (await self.bot._(ctx.channel, 'library', 'publisher')).capitalize()
-            publication = (await self.bot._(ctx.channel, 'library', 'year')).capitalize()
-            lang = (await self.bot._(ctx.channel, 'library', 'language')).capitalize()
+            authors = (await self.bot._(ctx.channel, 'library.author' if len(authors) <= 1 else 'authors')).capitalize()
+            title = (await self.bot._(ctx.channel, 'library.title')).capitalize()
+            publisher = (await self.bot._(ctx.channel, 'library.publisher')).capitalize()
+            publication = (await self.bot._(ctx.channel, 'library.year')).capitalize()
+            lang = (await self.bot._(ctx.channel, 'library.language')).capitalize()
             txt = f"**{title}:** {book.get('title', unknown)}\n**{authors}:** {auth}\n**ISBN:** {book['isbn']}\n**{publisher}:** {book.get('publisher', unknown)}\n**{publication}:** {book.get('publication', unknown)}\n**{lang}:** {book.get('language', unknown)}"
             await ctx.send(txt)
         await self.db_add_search(book['isbn'], book['title'])

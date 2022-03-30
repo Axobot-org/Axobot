@@ -1,16 +1,16 @@
-from discord.ext import commands
+import datetime
+import io
+import math
+import time
+from io import BytesIO
 
+import aiohttp
 import discord
+from discord.ext import commands
 from discord.ext.commands.cooldowns import BucketType
 from PIL import Image, ImageEnhance, ImageSequence
-import PIL
-from io import BytesIO
-import io
-import datetime
-import aiohttp
-import time
 from resizeimage import resizeimage
-import math
+from libs.classes import MyContext
 
 from utils import MyContext
 
@@ -35,8 +35,7 @@ class BlurpleCog(commands.Cog):
             return await ctx.send(await self.bot._(ctx.channel,"blurple","missing-attachment-perm"))
 
         picture = None
-        start = time.time()
-        
+
         if url is not None:
             try:
                 user = await commands.UserConverter().convert(ctx,url)
@@ -67,7 +66,7 @@ class BlurpleCog(commands.Cog):
         except Exception:
             await ctx.send(str(await self.bot._(ctx.guild,"blurple","check_invalid")).format(ctx.message.author.mention))
             return
-        
+
         await ctx.send(str(await self.bot._(ctx.guild,"blurple","check_intro")).format(ctx.message.author.mention))
 
         im = im.convert('RGBA')
@@ -75,7 +74,6 @@ class BlurpleCog(commands.Cog):
         impixels = imsize[0]*imsize[1]
         maxpixelcount = 1562500
 
-        end = time.time()
         start = time.time()
         if impixels > maxpixelcount:
             downsizefraction = math.sqrt(maxpixelcount/impixels)
@@ -84,7 +82,6 @@ class BlurpleCog(commands.Cog):
             impixels = imsize[0]*imsize[1]
             end = time.time()
             await ctx.send(str(await self.bot._(ctx.guild,"blurple","check_resized")).format(ctx.message.author.mention,round(end-start,2)))
-            start = time.time()
 
         def imager(im):
             global noofblurplepixels
@@ -97,11 +94,10 @@ class BlurpleCog(commands.Cog):
             nooftotalpixels = 0
             global noofpixels
             noofpixels = 0
-            
+
             img = im.load()
 
             for x in range(imsize[0]):
-                i = 1
                 for y in range(imsize[1]):
                     pixel = img[x,y]
                     check = 1
@@ -143,9 +139,7 @@ class BlurpleCog(commands.Cog):
             return image_file_object
 
         async with aiohttp.ClientSession() as _:
-            start = time.time()
             image = await self.bot.loop.run_in_executor(None, imager, im)
-            end = time.time()
             image = discord.File(fp=image, filename='image.png')
 
             blurplenesspercentage = round(((nooftotalpixels/noofpixels)*100), 2)
@@ -154,7 +148,7 @@ class BlurpleCog(commands.Cog):
             percentwhite = round(((noofwhitepixels/noofpixels)*100), 2)
 
             fields_txt = await self.bot._(ctx.guild,"blurple","check_fields")
-            embed = discord.Embed(Title = "", colour = 0x7289DA, description=fields_txt[5])
+            embed = discord.Embed(title = "", colour = 0x7289DA, description=fields_txt[5])
             if blurplenesspercentage>=99.99:
                 embed.add_field(name=fields_txt[0], value=f"{blurplenesspercentage}% :tada:", inline=False)
             else:
@@ -170,7 +164,7 @@ class BlurpleCog(commands.Cog):
         if blurplenesspercentage>95 and str(picture)==str(ctx.author.display_avatar):
             date = datetime.datetime.today()
             if not await ctx.bot.get_cog('Utilities').has_blurple_card(ctx.author) and 6<date.day<20 and date.month==5:
-                pr = await self.bot.get_prefix(ctx.message)
+                pr = await self.bot.prefix_manager.get_prefix(ctx.guild)
                 em = ':tada:'
                 if ctx.guild is not None and ctx.channel.permissions_for(ctx.guild.me).external_emojis:
                     em = '<:blurpletada:575696286905401345>'
@@ -183,7 +177,7 @@ class BlurpleCog(commands.Cog):
         """Be even more cool, and blurpelize your avatar for this coolest birthday of the century.
         You can either give a user or an image URL in argument, or attach an image to your message. Plz don't forget to be cool."""
         await self.create(ctx,url)
-    
+
 
     async def create(self,ctx,url):
         picture = None
@@ -265,7 +259,7 @@ class BlurpleCog(commands.Cog):
             image_file_object.seek(0)
             return image_file_object
 
-        def gifimager(im, gifloop):
+        def gifimager(im, _gifloop):
             frames = [frame.copy() for frame in ImageSequence.Iterator(im)]
             newgif = []
 
@@ -309,19 +303,19 @@ class BlurpleCog(commands.Cog):
             return image_file_object
 
         async with aiohttp.ClientSession() as _:
-            if isgif == False:
+            if not isgif:
                 image = await self.bot.loop.run_in_executor(None, imager, im)
             else:
                 image = await self.bot.loop.run_in_executor(None, gifimager, im, gifloop)
-            if isgif == False:
+            if not isgif:
                 image = discord.File(fp=image, filename='image.png')
             else:
                 image = discord.File(fp=image, filename='image.gif')
             try:
                 fields_txt = await self.bot._(ctx.guild,"blurple","check_fields")
-                embed = discord.Embed(Title = "", colour = 0x7289DA, description=fields_txt[5])
+                embed = discord.Embed(title = "", colour = 0x7289DA, description=fields_txt[5])
                 embed.set_author(name=await self.bot._(ctx.guild,'blurple','create_title'))
-                if isgif == False:
+                if not isgif:
                     embed.set_image(url="attachment://image.png")
                     embed.set_footer(text=str(await self.bot._(ctx.guild,'blurple','create_footer_1')).format(ctx.author))
                 else:

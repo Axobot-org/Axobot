@@ -36,7 +36,7 @@ For the first case, the 'get' command will display a list of available roles wit
 If you know exactly which role to get/remove, it is faster to use the 'join' and 'leave' subcommands followed by the role in question. You can give either the name of the role or its ID as a parameter. Note that it is not possible by this means to obtain or loose a role which is not in the list of reaction roles.
 
 
-.. warning:: For the **first** command, the bot needs "`Embed Links <perms.html#embed-links>`_" and "`Add Reactions <perms.html#add-reactions>`_" permissions for this command
+.. warning:: For the **first** command, the bot needs "`Embed Links <perms.html#embed-links>`__" and "`Add Reactions <perms.html#add-reactions>`__" permissions for this command
 
 --------------------------
 List every roles-reactions
@@ -56,7 +56,7 @@ Update your embed
 
 This command is very useful for those who have pinned the embed containing all the reactions of the bot. Instead of deleting and resending the message each time you add or remove a role, simply use the command to have the bot check the roles descriptions and usable reactions.
 
-The second argument 'changeDescription' can be used when you don't want Zbot to change the embed description. In this case it will only update the reactions (adding new ones if needed).
+The second argument 'changeDescription' can be used when you don't want Zbot to change the embed description, and is "True" by default. If you set it to "False", it will only update the reactions (ie. adding new ones if needed).
 
 You can also use the third argument, a list of emojis, if you want your embed to contain only specific roles/emojis. Thus you can create different roles-reactions embeds with the same system.
 
