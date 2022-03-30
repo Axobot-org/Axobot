@@ -1,3 +1,5 @@
+:og:description: A translated version of the Zbot privacy policy
+
 ==============
 Privacy Policy
 ==============

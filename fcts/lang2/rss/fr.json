@@ -1,0 +1,72 @@
+{
+    "fr": {
+        "change-txt": "Le message actuel contient \n```\n%{text}\n```\nVeuillez entrer le texte à utiliser lors d'un nouveau post. Vous pouvez utiliser plusieurs variables, dont voici la liste :\n- `{author}` : l'auteur du post\n- `{channel}` : le nom de la chaîne (généralement le même que l'auteur)\n- `{date}` : la date du post (UTC)\n- `{link}` ou `{url}` : un lien vers le post\n- `{logo}` : un emoji représentant le type de post (web, Twitter, YouTube...)\n- `{mentions}` : la liste des rôles mentionnés\n- `{title}` : le titre du post",
+        "choose-delete": "Veuillez choisir le flux à supprimer",
+        "choose-mentions-1": "Veuillez choisir le flux à modifier",
+        "choose-roles": "Quels seront les rôles à mentionner ?",
+        "delete-success": {
+            "one": "Le flux a été supprimé avec succès !",
+            "many": "%{count} flux ont été supprimé avec succès !"
+        },
+        "deviant": "DeviantArt",
+        "deviant-default-flow": "{logo}  | Nouvelle création de {author} : **{title}**\nPubliée le {date}\nLien : {link}\n{mentions}",
+        "deviant-form-last": "{logo}  | Voici la dernière création de {author}:\n{title}\nPubliée le {date}\nLien : {url}",
+        "embed-json-changed": "L'embed de ce flux a bien été modifié",
+        "fail-add": "Une erreur s'est produite lors du traitement de votre réponse. Merci de réessayer plus tard, ou de contacter le support du bot (entrez la commande `about` pour le lien du serveur)",
+        "flow-limit": "Pour des raisons de performances, vous ne pouvez pas suivre plus de %{limit} flux rss par serveur.",
+        "guild-complete": "%{count} flux rss ont correctement été rechargés, en %{time} secondes !",
+        "guild-error": "Une erreur est survenue pendant la procédure : `%{err}`\nSi vous pensez que cette erreur ne vient pas de vous, vous pouvez en avertir le support",
+        "guild-loading": "Rechargement en cours %{emoji}",
+        "invalid-flow": "Cet url est invalide (flux rss vide ou inaccessible) :confused:",
+        "invalid-link": "Oups, cette adresse url est invalide ou incomplète :confused:",
+        "list": "*Entrez le numéro du flux à modifier*\n\n**Lien - Type - Salon - Roles**\n",
+        "list-result": "Type : {}\nSalon : {}\nLien/chaine : {}\nRôle mentionné : {}\nIdentifiant : {}\nDernier post : {}",
+        "list-title": "Liste des flux rss du serveur %{server}",
+        "list2": "*Entrez le numéro du flux à supprimer*\n\n**Lien - Type - Salon**\n",
+        "loop-processing": "Une vérification de vos flux RSS est déjà en cours. Veuillez patienter quelques minutes",
+        "mc": "Minecraft",
+        "move-success": {
+            "one": "Votre flux rss a bien été déplacé dans le salon %{channel} !",
+            "many": "%{count} flux rss ont été déplacés dans le salon %{channel} !"
+        },
+        "no-feed": "Oups, vous n'avez aucun flux rss à gérer !",
+        "no-feed2": "Ce serveur ne possède aucun flux rss !",
+        "no-roles": "Aucun rôle n'a été configuré pour l'instant.",
+        "not-a-role": "Ce rôle est introuvable. Réessayez :",
+        "nothing": "Je n'ai rien trouvé sur cette recherche :confused:",
+        "research-timeout": "La page web a mis trop de temps à répondre, j'ai dû interrompre le processus :eyes:",
+        "roles": {
+            "edit-success": {
+                "zero": "Ce flux a bien été modifié pour ne mentionner aucun rôle",
+                "one": "Ce flux a bien été modifié pour mentionner le rôle %{roles}",
+                "many": "Ce flux a bien été modifié pour mentionner les rôles %{roles}"
+            },
+            "list": "Voici la liste des rôles déjà mentionnés : %{roles}",
+            "cant-find": "Rôle introuvable"
+        },
+        "success-add": "Le flux rss de type '%{type}' avec le lien <%{url}> a bien été ajouté dans le salon %{channel} !",
+        "text-success": "Le texte du flux n°%{id} a bien été modifié ! Nouveau texte : \n```\n%{text}\n```",
+        "too-long": "Vous avez trop attendu, désolé :hourglass:",
+        "tw": "Twitter",
+        "tw-default-flow": "{logo}  | Nouveau tweet de {author} ! ({date})\n\n{title}\n\nLien : {link}\n\n{mentions}",
+        "tw-form-last": "{logo}  | Voici le dernier tweet de {author}:\nÉcrit le {date}\n\n{title}\n\nLien : {url}\n",
+        "tw-help": "Pour rechercher une chaîne twitter, vous devez entrer l'identifiant de cette chaîne. Vous la trouverez à la fin de l'url de la chaîne, elle correspond généralement au nom de l'utilisateur. Par exemple, pour *https://twitter.com/Mc_AsiliS*, il faut rentrer `Mc_AsiliS`",
+        "twitch": "Twitch",
+        "twitch-default-flow": "{logo}  | Nouveau live de {author} ! ({date})\n\n{title}\n\nLien : {link}\n\n{mentions}",
+        "twitch-form-last": "{logo}  | Voici la dernière vidéo de {author}:\n{title}\nPubliée le {date}\nLien : {url}\n",
+        "use_embed-same": "L'utilisation d'embeds pour ce flux n'a pas changé",
+        "use_embed-success": "La valeur a bien été modifiée à %{v} pour le flux n°%{id} !",
+        "use_embed_false": "Ce flux n'utilise pas d'embed pour être envoyé. Voulez-vous utiliser les embeds pour ce flux ? (true/false)",
+        "use_embed_true": "Ce flux utilise actuellement les embeds pour être envoyé. Voulez-vous toujours utiliser les embeds pour ce flux ? (true/false)",
+        "web": "Web",
+        "web-default-flow": "{logo}  | Nouveau post sur {channel} ({date}) :\n    {title}\n\n{link}\n\n{mentions}",
+        "web-form-last": "{logo}  | Voici le dernier post de {channel}:\n**{title}**\n*Ecrit le {date}*\nLien : {link}",
+        "web-help": "Pour rechercher un flux rss à partir de n'importe quel site web, il suffit d'entrer l'url du flux rss/atom en paramètre. Si le flux est valide, je vous renverrai le dernier article posté sur ce site. *Astuce : certains flux rss sont déjà renseignées dans mon code. Vous pouvez parfois vous contenter de mettre `fr-minecraft` ou `minecraft.net`* :wink:",
+        "web-invalid": "Oups, cette adresse url est invalide :confused:",
+        "yt": "YouTube",
+        "yt-default-flow": "{logo}  | Nouvelle vidéo de {author} : **{title}**\nPubliée le {date}\nLien : {link}\n{mentions}",
+        "yt-form-last": "{logo}  | Voici la dernière vidéo de {author}:\n{title}\nPubliée le {date}\nLien : {url}",
+        "yt-help": "Pour rechercher une chaîne youtube, vous devez entrer l'identifiant de cette chaîne. Vous la trouverez à la fin de l'url de la chaine, elle peut être soit le nom, soit une suite de caractères aléatoires. *Astuce : certaines chaînes sont déjà renseignées dans mon code. Vous pouvez parfois vous contenter de mettre `neil3000` ou `Oxisius`* :wink:",
+        "yt-invalid": "Oups, impossible de trouver une chaîne YouTube avec cet ID !"
+    }
+}

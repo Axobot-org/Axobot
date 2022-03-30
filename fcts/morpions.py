@@ -4,7 +4,7 @@ import asyncio
 import time
 import emoji as emojilib
 from discord.ext import commands
-from utils import Zbot, MyContext
+from libs.classes import Zbot, MyContext
 
 from fcts.checks import is_ttt_enabled
 
@@ -33,13 +33,13 @@ class Morpions(commands.Cog):
     """
         if leave == 'leave':
             if ctx.author.id not in self.in_game.keys():
-                await ctx.send(await self.bot._(ctx.channel, 'morpion', 'not-playing'))
+                await ctx.send(await self.bot._(ctx.channel, 'morpion.not-playing'))
             else:
                 self.in_game.pop(ctx.author.id)
-                await ctx.send(await self.bot._(ctx.channel, 'morpion', 'game-removed'))
+                await ctx.send(await self.bot._(ctx.channel, 'morpion.game-removed'))
             return
         if ctx.author.id in self.in_game.keys():
-            await ctx.send(await self.bot._(ctx.channel, 'morpion', 'already-playing'))
+            await ctx.send(await self.bot._(ctx.channel, 'morpion.already-playing'))
             return
         self.in_game[ctx.author.id] = time.time()
         game = self.Game(ctx, self, await self.get_ttt_mode(ctx))
@@ -89,7 +89,7 @@ class Morpions(commands.Cog):
             """Affiche la grille qui est une liste sous forme de chaine de caractères"""
             affichage_grille = ''
             if self.ctx.bot_permissions.external_emojis:
-                emojis = [f'<:{x}>' for x in self.bot.get_cog('Emojis').numbEmojis]
+                emojis = [f'<:{x}>' for x in self.bot.get_cog('Emojis').numbers]
             else:
                 emojis = [chr(48+i)+chr(8419) for i in range(10)]
             for k in range(9):
@@ -105,11 +105,11 @@ class Morpions(commands.Cog):
 
         async def test_place_valide(self, grille: list, saisie: str):
             """Test si la place saisie par le joueur est libre"""
-            return False if (str(grille[int(saisie)-1]) == 'X') or (str(grille[int(saisie)-1]) == 'O') else True
+            return not (str(grille[int(saisie)-1]) == 'X') or (str(grille[int(saisie)-1]) == 'O')
 
         async def remplacer_valeur(self, grille: list, tour: bool, saisie: str):
             """Remplace la valeur de celui qui joue"""
-            return ['X' if x == int(saisie) else x for x in grille] if tour == True else ['O' if x == int(saisie) else x for x in grille]
+            return ['X' if x == int(saisie) else x for x in grille] if tour else ['O' if x == int(saisie) else x for x in grille]
 
         async def test_win(self, grille: list):
             """Test s'il y a une position de victoire"""
@@ -127,8 +127,8 @@ class Morpions(commands.Cog):
             try:
                 grille = [x for x in range(1, 10)]
                 tour = await self.qui_commence()
-                u_begin = await self.bot._(ctx.channel, 'morpion', 'user-begin' if tour else 'bot-begin')
-                await ctx.send(u_begin.format(ctx.author.mention)+await self.bot._(ctx.channel, 'morpion', 'tip', symb1=self.emojis[0], symb2=self.emojis[1]))
+                u_begin = await self.bot._(ctx.channel, 'morpion.user-begin' if tour else 'morpion.bot-begin')
+                await ctx.send(u_begin.format(ctx.author.mention)+await self.bot._(ctx.channel, 'morpion.tip', symb1=self.emojis[0], symb2=self.emojis[1]))
                 match_nul = True
 
                 def check(m):
@@ -140,7 +140,7 @@ class Morpions(commands.Cog):
                         return
                     
                 ###
-                    if tour == True:  # Si c'est au joueur
+                    if tour:  # Si c'est au joueur
                         if display_grille:
                             # if needed, clean the messages
                             if self.mode == 1 and last_grid:
@@ -150,23 +150,23 @@ class Morpions(commands.Cog):
                         try:
                             msg: discord.Message = await self.bot.wait_for('message', check=check, timeout=50)
                         except asyncio.TimeoutError:
-                            await ctx.channel.send(await self.bot._(ctx.channel, 'morpion', 'too-late'))
+                            await ctx.channel.send(await self.bot._(ctx.channel, 'morpion.too-late'))
                             return
                         saisie = msg.content
                         if msg.content in self.entrees_valides:
-                            if await self.test_place_valide(grille, saisie) == True:
+                            if await self.test_place_valide(grille, saisie):
                                 grille = await self.remplacer_valeur(grille, tour, saisie)
                                 tour = False
                                 if self.mode == 1:
                                     await msg.delete(delay=0.1)
                             else:
-                                await ctx.send(await self.bot._(ctx.channel, 'morpion', 'pion-1'))
+                                await ctx.send(await self.bot._(ctx.channel, 'morpion.pion-1'))
                                 display_grille = False
                                 continue
                         elif msg.content.endswith("leave"):
                             return
                         else:
-                            await ctx.send(await self.bot._(ctx.channel, 'morpion', 'pion-2'))
+                            await ctx.send(await self.bot._(ctx.channel, 'morpion.pion-2'))
                             display_grille = False
                             continue
                 ###
@@ -176,14 +176,13 @@ class Morpions(commands.Cog):
                         # Test si joueur va gagner ou si bot peut gagner
                         for k in range(1, 10):
                             for i in [True, False]:
-                                grille_copie = grille
                                 grille_copie = await self.remplacer_valeur(grille, i, k)
-                                if await self.test_win(grille_copie) == True:
+                                if await self.test_win(grille_copie):
                                     saisie = k
                                     break
                         # Test si la saisie est valide
                         if str(saisie) in self.entrees_valides:
-                            if await self.test_place_valide(grille, saisie) == True:
+                            if await self.test_place_valide(grille, saisie):
                                 grille = await self.remplacer_valeur(grille, tour, saisie)
                                 tour = True
                             else:
@@ -192,7 +191,7 @@ class Morpions(commands.Cog):
                             continue
                         display_grille = True
                 ###
-                    if await self.test_win(grille) == True:
+                    if await self.test_win(grille):
                         match_nul = False
                         break
                 ###
@@ -201,16 +200,16 @@ class Morpions(commands.Cog):
                     await last_grid.delete()
                 if match_nul:
                     await self.bot.get_cog("Utilities").add_user_eventPoint(ctx.author.id, 1)
-                    resultat = await self.bot._(ctx.channel, 'morpion', 'nul')
+                    resultat = await self.bot._(ctx.channel, 'morpion.nul')
                 else:
                     if tour:  # Le bot a gagné
-                        resultat = await self.bot._(ctx.channel, 'morpion', 'win-2')
+                        resultat = await self.bot._(ctx.channel, 'morpion.win-bot')
                     else:  # L'utilisateur a gagné
-                        resultat = await self.bot._(ctx.channel, 'morpion', 'win-1')
+                        resultat = await self.bot._(ctx.channel, 'morpion.win-user', user=ctx.author.mention)
                         await self.bot.get_cog("Utilities").add_user_eventPoint(ctx.author.id, 4)
-                await ctx.send(await self.afficher_grille(grille)+'\n'+resultat.format(ctx.author.mention))
-            except Exception as e:
-                await self.bot.get_cog('Errors').on_command_error(ctx, e)
+                await ctx.send(await self.afficher_grille(grille)+'\n'+resultat)
+            except Exception as err:
+                await self.bot.get_cog('Errors').on_command_error(ctx, err)
 
 
 def setup(bot):

@@ -1,0 +1,37 @@
+{
+    "de": {
+        "added_at": "Hinzugefügt am",
+        "beginning": "Anfang",
+        "bot": "Bot",
+        "category": "Kategorie",
+        "click_here": "Klick hier",
+        "since": "seit",
+        "dnd": "nicht stören",
+        "end": "Ende",
+        "extreme": "Extrem",
+        "ghost": "Geist",
+        "high": "hoch",
+        "idle": "Abwesend",
+        "low": "niedrig",
+        "medium": "mittel",
+        "member": "Mitglied",
+        "membres": "Mitglieder",
+        "name": "Name",
+        "no": "Nein",
+        "none": "keine",
+        "offline": "Offline",
+        "online": "Online",
+        "yes": "Ja",
+        "server": "Server",
+        "servers": "Server",
+        "unknown": "Unbekannt",
+        "version": "Version",
+        "activity": {
+            "listen": "hört",
+            "nothing": "nichts",
+            "play": "spielt",
+            "stream": "streamt",
+            "watch": "guckt"
+        }
+    }
+}

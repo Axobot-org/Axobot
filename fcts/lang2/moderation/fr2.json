@@ -1,0 +1,172 @@
+{
+    "fr2": {
+        "ban": {
+            "too-high": "Il semble que ce membre soit trop haut pour que je puisse le bannir :thinking:",
+            "list-error": "Waaaaaaaaaaaaait, il y a *BEAUCOUP* trop de membres à afficher :confused:",
+            "list-title-0": "Liste des membres bannis du serveur '{}'",
+            "list-title-1": "Liste des 45 premiers membres bannis du serveur '{}'",
+            "list-title-2": "Liste des 60 premiers membres bannis du serveur '{}'",
+            "no-bans": "Aucun membre ne semble être banni de ce serveur",
+            "user-not-banned": "Cette personne ne fait pas partie des membres bannis :upside_down:",
+            "cant-ban": "Permission 'Ban members' manquante :confused:",
+            "staff-ban": "Vous ne pouvez pas bannir un autre membre du staff !"
+        },
+        "ban-dm": "Tu viens juste d'être ban de %{guild} 😕",
+        "cant-find-user": "Oups, impossible de trouver l'utilisateur **%{user}**",
+        "cant-pin": "Oups, je ne dispose pas de la permission d'épingler des messages",
+        "caps-lock": ":eyes: %{user}, attention aux majuscules ! Ça peut être choquant pour certains ! :stuck_out_tongue_winking_eye:",
+        "clear": {
+            "done": {
+                "one": "1 message supprimé !",
+                "many": "%{count} messages supprimés !"
+            },
+            "too-few": "Je ne peux pas supprimer si peu de messages",
+            "not-found": "Hum... impossible de supprimer ces messages. Discord me dit qu'ils n'existent pas :thinking:"
+        },
+        "destop":{
+            "no-guild": "Ce message n'appartient pas au serveur :D",
+            "too-old": "Je peux pas supprimer des messages qui ont plus de %{days} jours !"
+        },
+        "emoji": {
+            "cant-emoji": "Oups, il me manque la permission `Gérer les émojis` :confused:",
+            "list": "{} (`:{}:`) ajouté le {} {}",
+            "list-title": "Emojis du serveur %{guild}",
+            "private": "[Restreint]",
+            "renamed": "L'émoji %{emoji} a bien été renommé !",
+            "emoji-valid": "L'émoji %{name} a été modifié pour n'autoriser que les rôles `%{roles}`",
+            "wrong-guild": "Oups, il semble que cet émoji n'appartienne pas à ce serveur :thinking:"
+        },
+        "error": "Oups, une erreur inconnue est survenue. Réessayez plus tard ou contactez le support",
+        "kick": {
+            "no-perm": "Permission 'Kick members' manquante :confused:",
+            "too-high": "Il semble que ce membre soit trop haut pour que je puisse l'expulser :thinking:",
+            "cant-staff": "Vous ne pouvez pas expulser un autre membre du staff !"
+        },
+        "kick-chat": "%{user} (%{userid}) a été kick de ce serveur.",
+        "kick-dm": "Tu viens juste d'être kick de %{guild} 😕",
+        "missing-manage-nick": "Oups, il me manque la permission \"Gérer les pseudos\"",
+        "missing-user-perms": "Wolala 😬 !\nIl te manque des perms (style, manager les roles, le serveur, ou les messages)",
+        "mute": {
+            "already-mute": "Ce membre est déjà muet !",
+            "already-unmute": "Ce membre n'est pas muet !",
+            "cant-mute": "Oups, il semble que je ne possède pas les permissions suffisantes pour cela... Veuillez m'attribuer la permission `gérer les rôles` avant de continuer.",
+            "mute-config-err": "Euh...\nAlors, je peux pas faire ça.\n\nDonc va checker mes perms sur ce serveur, et ENSUITE tu réessaies.",
+            "mute-config-success": {
+                "zero": "Ce rôle a été créé et configuré avec succès !",
+                "other": "Ce rôle a été créé et configuré avec succès ! (%{count} salons n'ont pas pu être configurés, par contre. J'avais pas les perms 😓)"
+            },
+            "mute-config-success2": {
+                "zero": "Ce rôle a été configuré avec succès !",
+                "other": "Ce rôle a été configuré avec succès ! *(Bon, j'ai pas pu configurer %{count} salons, parce qu'il me manquait des perms 😓)*"
+            },
+            "mute-high": "Oups, il semble que le rôle `muted` soit trop haut pour que je puisse le donner... Veuillez fixer ce problème en plaçant mon rôle plus haut que le rôle `muted`.",
+            "list-title-0": "Liste des membres mute sur *%{guild}*",
+            "list-title-1": "Liste de 45 membres mute sur *%{guild}*",
+            "list-title-2": "Liste de 60 membres mute sur *%{guild}*",
+            "role-created": "Rôle `muted` configuré avec succès, chef !\nTu peux utiliser la commande `%{p}mute-config` pour une config automatique de ton serveur.",
+            "no-mute": "Oups, il semble que le rôle `muted` n'existe pas :confused: Veuillez le créer et lui attribuer les permissions manuellement.",
+            "no-mutes": "J'ai pas l'impression que quiconque soit mute, ici ¯\\_(ツ)_/¯",
+            "staff-mute": "Vous ne pouvez pas empêcher de parler un autre membre du staff "
+        },
+        "mute-chat": "%{user} (%{userid}) vient d'être mute.",
+        "mute-dm": "Tu as été mute sur *%{guild}*",
+        "need-manage-messages": "Permission \"Gérer les messages\" manquante :confused:",
+        "need-read-history": "Oups, il me manque la permission de \"Voir les anciens messages\" :confused: ",
+        "pin": {
+            "error-notfound": "Oups, je n'arrive pas à retrouver ce message (Erreur : `%{err}`)",
+            "error-toomuch": "Oups, impossible d'épingler ce message (Avez-vous plus de 50 messages épinglés ?). Erreur : `%{err}`"
+        },
+        "raid-banned": "Tu as été auto-ban de *%{guild}* par le système anti-raid du serveur.",
+        "raid-kicked": "Tu as été auto-kick de *%{guild}* par le système anti-raid du serveur. Réessaie dans deux-trois jours.",
+        "react-clear": "Impossible de retrouver ce message :confused:",
+        "role": {
+            "color-success": "Le rôle %{role} a changé de couleur !",
+            "give-success": {
+                "zero": "-> Aucun rôle n'a été attribué sur les %{m} !",
+                "one": "-> 1 rôle attribué sur %{m} !",
+                "many": "-> %{count} rôles attribués sur %{m} !"
+            },
+            "give-too-high": "Houlà ! On dirait que ce role est *(beaucoup)* trop haut par rapport à moi pour le donner ou le retirer à quelqu'un !\nTu peux placer mon rôle *aU-dEssUs* de `%{r}` ?",
+            "give-roles-higher": "*Meeeeec !*\nTu peux pas donner des roles plus haut que le tien, m'enfin !",
+            "too-high": "Oups, ce rôle est trop haut pour que je puisse le modifier. Merci de déplacer mon rôle au-dessus du rôle `%{r}` avant de réessayer :confused:",
+            "list": "Liste des rôles du Serveur 🧐"
+        },
+        "slowmode": {
+            "disabled": "Le slowmode est désormais désactivé dans ce salon.",
+            "too-long": "Impossible de mettre une fréquence supérieure à six heures",
+            "enabled": "Le channel %{channel} est désormais en slowmode.\nAttendez %{s} secondes avant d'envoyer un message.",
+            "invalid": "Cette valeur est invalide",
+            "info": "Le slowmode de ce salon est actuellement à %{s} secondes",
+            "no-perm": "Oups, je n'ai pas la permission de `Gérer le salon` :confused:"
+        },
+        "unban-chat": "%{user} (%{userid}) n'est plus banni du serv 🎆",
+        "unhoisted": {
+            "zero": "Aucun surnom n'a été édité !",
+            "one": "1 surnom édité !!",
+            "many": "%{count} surnoms édités !"
+        },
+        "unmute-chat": "%{user} (%{userid}) a été dé-mute",
+        "verify-role-high": "Oups, il semble que le rôle `%{r}` soit trop haut pour que je puisse le donner. Veuillez placer ce rôle plus bas que le mien, ou placer mon rôle au-dessus.",
+        "verify_questions": [
+            [
+                "Combien de côtés possède un carré ?",
+                "4"
+            ],
+            [
+                "Comment s'appelle le système d'exploitation des téléphones de la marque Apple ?",
+                "iOS"
+            ],
+            [
+                "L'émoji 🐷 représente : un insecte, légume, animal ?",
+                "animal"
+            ],
+            [
+                "Lequel de ces mots commence par P ? `poussin`, `corbeau`, `hirondelle`",
+                "poussin"
+            ],
+            [
+                "Lequel de ces mots désigne un fruit ? pizza, pomme, dinosaure",
+                "pomme"
+            ],
+            [
+                "Que donne le produit de 2 par 5 ? (en chiffres)",
+                "10"
+            ],
+            [
+                "Quel est le discriminant situé après votre pseudo discord ? (sans le #)",
+                "_special_userdiscrim"
+            ],
+            [
+                "Quel est le nom de ce serveur ?",
+                "_special_servername"
+            ],
+            [
+                "Quel est le nom du pain français connu partout dans le monde ? (un seul mot)",
+                "baguette"
+            ],
+            [
+                "Quel est le résultat de 10-6 ?",
+                "4"
+            ],
+            [
+                "Quel est le résultat du produit de deux et cinq ? (en lettres)",
+                "dix"
+            ],
+            [
+                "Quelle est la première lettre de `Zbot` ?",
+                "z"
+            ],
+            [
+                "Quelle forme géométrique possède 3 côtés ?",
+                "triangle"
+            ]
+        ],
+        "warn": {
+            "cant-staff": "Vous ne pouvez pas avertir un autre membre du staff !",
+            "cant-bot": "Je ne peux pas avertir un bot :sweat_smile:",
+            "warn-but-db": "Notre base de donnée étant hors ligne, l'avertisement n'a pas pu être enregistré. *Mais* le membre a bien reçu son avertissement en MP"
+        },
+        "warn-chat": "%{user} (%{userid}) a été warn !",
+        "warn-dm": "Tu as reçu un warn de *%{guild}*"
+    }
+}

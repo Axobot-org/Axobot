@@ -1,0 +1,33 @@
+{
+    "en": {
+        "added-partner": "This partner has been successfully added",
+        "already-added": "You have already added this partner!",
+        "bot-uptime": "Uptime",
+        "changed-desc": "The description has been modified!",
+        "changed-invite": "The invitation has been modified!",
+        "confirm-bot": "Do you really want to remove the bot `%{bot}` from your partners?",
+        "confirm-server": "Do you really want to delete the server `%{server}` from your partners?",
+        "del-canceled": "Deletion cancelled",
+        "deleted": "This partner has been successfully deleted from your list",
+        "invalid-bot": "Unable to find this bot",
+        "invalid-invite": "Invalid invite",
+        "invalid-partner": "Partner not found",
+        "missing-manage-guild": "Unable to find server invites (missing \"Manage server\" permission)",
+        "missing-reactions": "Permission \"Add reactions\" missing :confused:",
+        "no-channel": "You didn't set any partner channel",
+        "no-partner": "You don't have any partners",
+        "no-partner-2": "No server has a partnership with you",
+        "partners-list": [
+            "Server partners",
+            "List of your partners",
+            "List of servers with you as a partner"
+        ],
+        "reloaded": {
+            "zero": "You don't seem to have any partner",
+            "one": "1 partner has been reloaded",
+            "many": "%{count} partners have been reloaded"
+        },
+        "unknown-error": "An unknown error occurred. Please contact support for more information",
+        "unknown-server": "Server partner not found"
+    }
+}

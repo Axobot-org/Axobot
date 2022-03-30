@@ -1,0 +1,10 @@
+{
+    "fr2": {
+        "backup-done": "Sauvegarde terminée !",
+        "err": "Woooooooooooolah !\n\nOn a eu une erreur interne 🧐 !\nAttends 2-3 minutes ou contacte le support *(lien dans la commande `about`)* si ça arrive à nouveau.",
+        "finished": "Le bacup a été chargé ! Voici les logs :",
+        "invalid_file": "*Mec, c'est gênant de dire ça, mais faut envoyer le fichier de backup dans le même message que la commande...*",
+        "invalid_version": "Bon...\n\nLa version de la backup est invalide.\n\nLe fichier est *très* probablement corrompu.",
+        "loading": "Chargement de la backup en cours...\n\nMerci de patienter 🧐 !"
+    }
+}

@@ -1,4 +1,4 @@
-from utils import Zbot, MyContext
+from libs.classes import Zbot, MyContext
 import discord
 import importlib
 import aiohttp
@@ -56,18 +56,18 @@ Arguments are:
         try:
             data = json.loads(await ctx.message.attachments[0].read())
         except:
-            await ctx.send(await self.bot._(ctx.guild,"s_backup","invalid_file"))
+            await ctx.send(await self.bot._(ctx.guild, "s_backup.invalid_file"))
             return
         # Applying backup
-        msg = await ctx.send(await self.bot._(ctx.guild,"s_backup","loading"))
+        msg = await ctx.send(await self.bot._(ctx.guild, "s_backup.loading"))
         try:
             if data["_backup_version"] == 1:
                 problems, logs = await self.BackupLoaderV1().load_backup(ctx,data,arguments)
             else:
-                await ctx.send(await self.bot._(ctx.guild,"s_backup","invalid_version"))
+                await ctx.send(await self.bot._(ctx.guild, "s_backup.invalid_version"))
                 return
         except Exception as e:
-            await ctx.send(await self.bot._(ctx.guild,"s_backup","err"))
+            await ctx.send(await self.bot._(ctx.guild, "s_backup.err"))
             await ctx.bot.get_cog('Errors').on_command_error(ctx,e)
             return
         # Formatting and sending logs
@@ -75,14 +75,14 @@ Arguments are:
         if len(logs) > 1950:
             # If too many logs, send in a file
             logs = logs.replace("`[O]`","[O]").replace("`[-]`","[-]").replace("`[X]`","[X]")
-            finish_msg = await self.bot._(ctx.guild,"s_backup","finished")
+            finish_msg = await self.bot._(ctx.guild, "s_backup.finished")
             try:
                 await ctx.send(content=finish_msg,file=discord.File(BytesIO(logs.encode()),filename="logs.txt"))
             except discord.errors.NotFound: # if channel was deleted, send in DM
                 await ctx.author.send(content=finish_msg,file=discord.File(BytesIO(logs.encode()),filename="logs.txt"))
             try:
                 await msg.delete()
-            except: # can happens because deleted channel
+            except (discord.NotFound, discord.Forbidden): # can happens because deleted channel
                 pass
         else:
             # Else, we just edit the message with logs
@@ -102,7 +102,7 @@ Arguments are:
 ..Doc server.html#server-backup"""
         try:
             data = await self.create_backup(ctx)
-            await ctx.send(await self.bot._(ctx.guild.id,'modo','backup-done'),file=discord.File(BytesIO(data.encode()), filename=f"backup-{ctx.guild.id}.json"))
+            await ctx.send(await self.bot._(ctx.guild.id, "s_backup.backup-done"),file=discord.File(BytesIO(data.encode()), filename=f"backup-{ctx.guild.id}.json"))
         except Exception as e:
             await ctx.bot.get_cog('Errors').on_command_error(ctx,e)
 
@@ -142,7 +142,7 @@ Arguments are:
             'owner': g.owner.id,
             'voiceregion': str(g.region),
             'afk_timeout': g.afk_timeout,
-            'icon': None if len(g.icon.url) == 0 else g.icon.url,
+            'icon': None if g.icon else g.icon.url,
             'verification_level': g.verification_level.value,
             'mfa_level': g.mfa_level,
             'explicit_content_filter': g.explicit_content_filter.value,

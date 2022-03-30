@@ -1,0 +1,16 @@
+{
+    "de": {
+        "cases-0": "%{nbr} Grund gefunden: (%{start}-%{end})",
+        "deleted": "Der Fall #%{ID} wurde gelöscht!",
+        "list-0": "**Typ:** {T}\n**Moderator:** {M}\n**Datum:** {D}\n**Grund:** *{R}*",
+        "list-1": "**Server:** {G}\n**Typ:** {T}\n**Moderator:** {M}\n**Datum:** {D}\n**Grund:** *{R}*",
+        "no-case": "Dieser Nutzer hat keine Verstöße!",
+        "no-user": "Nutzer nicht gefunden :eyes:",
+        "no_database": "Wegen eines Database problems ist dieser Befehl momentan nicht verfügbar",
+        "not-found": "Es wurde nichts gefunden :confused:",
+        "reason-edited": "Die Begründung für den Fall #%{ID} wurde geändert!",
+        "search-0": "**Nutzer:** {U}\n**Typ:** {T}\n**Moderator:** {M}\n**Datum:** {D}\n**Grund:** *{R}*",
+        "search-1": "**Nutzer:** {U}\n**Server:** {G}\n**Typ:** {T}\n**Moderator:** {M}\n**Datum:** {D}\n**Grund:** *{R}*",
+        "title-search": "Fall #%{ID}"
+    }
+}

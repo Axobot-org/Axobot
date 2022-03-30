@@ -1,0 +1,8 @@
+{
+    "en": {
+        "daily": {
+            "got-points": "Congratulations! You just won **%{pts} event points**!",
+            "too-quick": "It is still too early! You can only retrieve event points once per hour."
+        }
+    }
+}

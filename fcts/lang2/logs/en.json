@@ -1,0 +1,25 @@
+{
+    "en": {
+        "ban": "%{user} (%{userid}) has been banned",
+        "case-del": "The case #{id} has been deleted (concerning {user})",
+        "case-reason": "The case #{id} has been edited:\n`Old reason:` {old}\n`New reason:` {new}",
+        "clear": "{number} deleted messages in {channel}",
+        "reason": {
+            "autounmute": "automatic unmute",
+            "invite": "Automod (Discord invite)",
+            "memberchan": "Automated action (config membercount)",
+            "unban": "unbanned by {user}",
+            "unmute": "unmuted by {user}",
+            "welcome_roles": "Automated action (config welcome_roles)",
+            "young": "Automod (too recent account)"
+        },
+        "kick": "%{user} (%{userid}) has been kicked",
+        "mute": "%{user} (%{userid}) is now muted",
+        "slowmode-disabled": "Slowmode disabled in {channel}",
+        "slowmode-enabled": "Slowmode enabled in {channel} ({seconds}s)",
+        "softban": "%{user} (%{userid}) has been \"softbanned\"",
+        "unban": "%{user} (%{userid}) is no more banned",
+        "unmute": "%{user} (%{userid}) is no more muted",
+        "warn": "%{user} (%{userid}) has been warned"
+    }
+}

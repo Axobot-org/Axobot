@@ -1,15 +1,15 @@
 import asyncio
-import discord
 import importlib
-import re
 import operator
-import aiohttp
-from fcts import args
-from discord.ext import commands
-from typing import List
-from urllib.request import Request, build_opener
+import re
+from typing import List, Optional
 
-from utils import Zbot, MyContext
+import aiohttp
+import discord
+from discord.ext import commands
+from libs.classes import MyContext, Zbot
+
+from fcts import args
 
 importlib.reload(args)
 
@@ -19,7 +19,6 @@ class Utilities(commands.Cog):
 
     def __init__(self, bot: Zbot):
         self.bot = bot
-        self.list_prefixs = dict()
         self.file = "utilities"
         self.config = {}
         self.table = 'users'
@@ -41,132 +40,23 @@ class Utilities(commands.Cog):
             return self.config
         return None
 
-    def find_prefix(self, guild: discord.Guild):
-        if guild is None or not self.bot.database_online:
-            return '!'
-        if str(guild.id) in self.list_prefixs.keys():
-            return self.list_prefixs[str(guild.id)]
-        else:
-            cnx = self.bot.get_cog('Servers').bot.cnx_frm
-            cursor = cnx.cursor(dictionary=True)
-            cursor.execute("SELECT `prefix` FROM `{}` WHERE `ID`={}".format(
-                self.bot.get_cog("Servers").table, guild.id))
-            liste = list()
-            for x in cursor:
-                if len(x['prefix']) > 0:
-                    liste.append(x['prefix'])
-            if liste == []:
-                self.list_prefixs[str(guild.id)] = '!'
-                return '!'
-            self.list_prefixs[str(guild.id)] = liste[0]
-            return str(liste[0])
-
-    def update_prefix(self, ID: int, prefix: str):
-        try:
-            self.bot.log.debug(
-                "Prefix updated for guild {} : changed to {}".format(ID, prefix))
-        except:
-            pass
-        self.list_prefixs[str(ID)] = prefix
-
-    async def find_everything(self, ctx: MyContext, name: str, Type: str=None):
-        item = None
-        if type(Type) == str:
-            Type = Type.lower()
-        if Type is None:
-            for i in [commands.MemberConverter, commands.RoleConverter,
-                      commands.TextChannelConverter, commands.VoiceChannelConverter, commands.InviteConverter,
-                      args.user, commands.EmojiConverter, commands.CategoryChannelConverter, args.snowflake]:
-                try:
-                    a = await i().convert(ctx, name)
-                    item = a
-                    if item is not None:
-                        return item
-                except:
-                    pass
-            return None
-        elif Type == 'member':
-            try:
-                item = await commands.MemberConverter().convert(ctx, name)
-            except:
-                pass
-        elif Type == 'role':
-            try:
-                item = await commands.RoleConverter().convert(ctx, name)
-            except:
-                pass
-        elif Type == 'user':
-            try:
-                item = await commands.UserConverter().convert(ctx, name)
-            except:
-                if name.isnumeric():
-                    item = await self.bot.fetch_user(int(name))
-        elif Type == 'textchannel':
-            try:
-                item = await commands.TextChannelConverter().convert(ctx, name)
-            except:
-                pass
-        elif Type == 'invite':
-            try:
-                item = await commands.InviteConverter().convert(ctx, name)
-            except:
-                pass
-        elif Type == 'voicechannel':
-            try:
-                item = await commands.VoiceChannelConverter().convert(ctx, name)
-            except:
-                pass
-        elif Type == 'channel':
-            try:
-                item = await commands.TextChannelConverter().convert(ctx, name)
-            except:
-                try:
-                    item = await commands.VoiceChannelConverter().convert(ctx, name)
-                except:
-                    pass
-        elif Type == 'emoji':
-            try:
-                item = await commands.EmojiConverter().convert(ctx, name)
-            except:
-                pass
-        elif Type == 'category':
-            try:
-                item = await commands.CategoryChannelConverter().convert(ctx, name)
-            except:
-                pass
-        elif (Type == 'guild' or Type == "server") and name.isnumeric():
-            item = self.bot.get_guild(int(name))
-        elif Type in ["snowflake", "id"]:
-            try:
-                item = await args.snowflake().convert(ctx, name)
-            except:
-                pass
-        return item
-
     async def find_img(self, name: str):
         return discord.File("../images/{}".format(name))
 
     async def find_url_redirection(self, url: str) -> str:
         """Find where an url is redirected to"""
-        to = aiohttp.ClientTimeout(total=10, connect=7)
-        answer = url
+        timeout = aiohttp.ClientTimeout(total=10, connect=7)
         try:
-            async with aiohttp.ClientSession(timeout=to) as session:
-               async with session.get(url, allow_redirects=True) as response:
+            async with aiohttp.ClientSession(timeout=timeout) as session:
+                async with session.get(url, allow_redirects=True) as response:
                     answer = str(response.url)
-        except aiohttp.ClientConnectorError as e:
-            return "https://" + e.args[0].host
-        except aiohttp.ClientResponseError as e:
-            return str(e.args[0].real_url)
+        except aiohttp.ClientConnectorError as err:
+            return "https://" + err.args[0].host
+        except aiohttp.ClientResponseError as err:
+            return str(err.args[0].real_url)
         except (asyncio.exceptions.TimeoutError, aiohttp.ServerTimeoutError):
             return url
         return answer
-
-    async def suppr(self, msg: discord.Message):
-        try:
-            await msg.delete()
-        except:
-            print("Unable to delete message "+str(msg))
 
     async def global_check(self, ctx: MyContext):
         """Do a lot of checks before executing a command (banned guilds, system message etc)"""
@@ -176,7 +66,7 @@ class Utilities(commands.Cog):
             return False
         if not isinstance(ctx, commands.Context) or self.config is None:
             return True
-        if ctx.message.type != discord.MessageType.default:
+        if ctx.message.type not in {discord.MessageType.default, discord.MessageType.reply}:
             return False
         if await self.bot.get_cog('Admin').check_if_admin(ctx):
             return True
@@ -190,7 +80,7 @@ class Utilities(commands.Cog):
         if str(ctx.author.id) in self.config['banned_users'].split(";"):
             return False
         return True
-    
+
     async def get_members_repartition(self, members: List[discord.Member]):
         """Get number of total/online/bots members in a selection"""
         bots = online = total = 0
@@ -202,90 +92,66 @@ class Utilities(commands.Cog):
             total += 1
         return total, bots, online
 
-    async def check_any_link(self, text: str):
-        ch = r"(https?://?(?:[-\w.]|(?:%[\da-fA-F]{2}))+|discord.gg/[^\s]+)"
-        return re.search(ch, text)
-
-    async def check_discord_invite(self, text: str):
-        ch = r"((?:discord\.gg|discord(?:app)?.com/invite|discord.me)/.+)"
-        return re.search(ch, text)
-
     def sync_check_any_link(self, text: str):
-        ch = r"(https?://?(?:[-\w.]|(?:%[\da-fA-F]{2}))+|discord.gg/[^\s]+)"
-        return re.search(ch, text)
+        "Check if a text contains a http url"
+        pattern = r"(https?://?(?:[-\w.]|(?:%[\da-fA-F]{2}))+|discord.gg/[^\s]+)"
+        return re.search(pattern, text)
 
     def sync_check_discord_invite(self, text: str):
-        ch = r"((?:discord\.gg|discord(?:app)?.com/invite|discord.me)/.+)"
-        return re.search(ch, text)
+        "Check if a text contains a discord invite url"
+        pattern = r"((?:discord\.gg|discord(?:app)?.com/invite|discord.me)/.+)"
+        return re.search(pattern, text)
 
     async def clear_msg(self, text: str, everyone: bool=False, ctx: MyContext=None, emojis: bool=True):
         """Remove every mass mention from a text, and add custom emojis"""
-        # if everyone:
-        #     text = text.replace("@everyone","@"+u"\u200B"+"everyone").replace("@here","@"+u"\u200B"+"here")
-        # for x in re.finditer(r'<(a?:[^:]+:)\d+>',text):
-        #    text = text.replace(x.group(0),x.group(1))
-        # for x in self.bot.emojis: #  (?<!<|a)(:[^:<]+:)
-        #    text = text.replace(':'+x.name+':',str(x))
         if emojis:
             for x in re.finditer(r'(?<!<|a):([^:<]+):', text):
                 try:
                     if ctx is not None:
                         em = await commands.EmojiConverter().convert(ctx, x.group(1))
                     else:
-                        if x.group(1).isnumeric():
-                            em = self.bot.get_emoji(int(x.group(1)))
+                        emoji_id = x.group(1)
+                        if emoji_id.isnumeric():
+                            em = self.bot.get_emoji(int(emoji_id))
                         else:
                             em = discord.utils.find(
-                                lambda e: e.name == x.group(1), self.bot.emojis)
-                except:
-                    # except Exception as e:
-                    # print(e)
+                                lambda e, id=emoji_id: e.name == id, self.bot.emojis)
+                except commands.ConversionError:
                     continue
                 if em is not None:
                     text = text.replace(x.group(0), "<{}:{}:{}>".format(
                         'a' if em.animated else '', em.name, em.id))
         return text
 
-    async def get_db_userinfo(self, columns=[], criters=["userID > 1"], relation="AND", Type=dict):
+    async def get_db_userinfo(self, columns=None, criters=["userID > 1"], relation: str="AND"):
         """Get every info about a user with the database"""
         await self.bot.wait_until_ready()
         if not (isinstance(columns, (list, tuple)) and isinstance(criters, (list, tuple))):
             raise ValueError
         if not self.bot.database_online:
             return None
-        cnx = self.bot.cnx_frm
-        cursor = cnx.cursor(dictionary=(Type==dict))
-        if columns == []:
-            cl = "*"
+        if columns is None or len(columns) == 0:
+            select_part = "*"
         else:
-            cl = "`"+"`,`".join(columns)+"`"
+            select_part = "`"+"`,`".join(columns)+"`"
         relation = " "+relation+" "
-        query = ("SELECT {} FROM `{}` WHERE {}".format(
-            cl, self.table, relation.join(criters)))
-        cursor.execute(query)
-        liste = list()
-        for x in cursor:
-            liste.append(x)
-        cursor.close()
+        query = f"SELECT {select_part} FROM `{self.table}` WHERE {relation.join(criters)}"
+        async with self.bot.db_query(query) as query_results:
+            liste = list(query_results)
         if len(liste) == 1:
             return liste[0]
-        elif len(liste) > 1:
+        if len(liste) > 1:
             return liste
-        else:
-            return None
+        return None
 
-    async def change_db_userinfo(self, userID: int, key: str, value):
+    async def change_db_userinfo(self, user_id: int, key: str, value):
         """Change something about a user in the database"""
         try:
             if not self.bot.database_online:
                 return None
-            cnx = self.bot.cnx_frm
-            cursor = cnx.cursor(dictionary=True)
-            query = "INSERT INTO `{t}` (`userID`,`{k}`) VALUES (%(u)s,%(v)s) ON DUPLICATE KEY UPDATE {k} = %(v)s;".format(
-                t=self.table, k=key)
-            cursor.execute(query, {'u': userID, 'v': value})
-            cnx.commit()
-            cursor.close()
+            query = f"INSERT INTO `{self.table}` (`userID`,`{key}`) VALUES (%(u)s,%(v)s) ON DUPLICATE KEY UPDATE {key} = %(v)s;"
+            async with self.bot.db_query(query, {'u': user_id, 'v': value}):
+                pass
             return True
         except Exception as e:
             await self.bot.get_cog('Errors').on_error(e, None)
@@ -308,20 +174,6 @@ class Utilities(commands.Cog):
         if parameters is None or parameters['xp_style'] == '':
             return 'dark'
         return parameters['xp_style']
-
-    async def add_check_reaction(self, message: discord.Message):
-        if self.bot.zombie_mode:
-            return
-        try:
-            emoji = discord.utils.get(self.bot.emojis, name='greencheck')
-            if emoji:
-                await message.add_reaction(emoji)
-            else:
-                await message.add_reaction('\u2705')
-        except discord.Forbidden:
-            await message.channel.send(":ok:")
-        except:
-            pass
 
     async def allowed_card_styles(self, user: discord.User):
         """Retourne la liste des styles autorisées pour la carte d'xp de cet utilisateur"""
@@ -369,24 +221,23 @@ class Utilities(commands.Cog):
             return ["en"]
         languages = list()
         disp_lang = list()
-        available_langs = self.bot.get_cog('Languages').languages
-        for s in user.mutual_guilds:
-            lang = await self.bot.get_config(s.id, 'language')
+        available_langs: list[str] = self.bot.get_cog('Languages').languages
+        for guild in user.mutual_guilds:
+            lang: Optional[int] = await self.bot.get_config(guild.id, 'language')
             if lang is None:
                 lang = available_langs.index(
                     self.bot.get_cog('Servers').default_language)
             languages.append(lang)
-        for e in range(len(self.bot.get_cog('Languages').languages)):
-            if languages.count(e) > 0:
-                disp_lang.append((available_langs[e], round(
-                    languages.count(e)/len(languages), 2)))
+        for i in range(len(self.bot.get_cog('Languages').languages)):
+            if languages.count(i) > 0:
+                disp_lang.append((available_langs[i], round(
+                    languages.count(i)/len(languages), 2)))
         disp_lang.sort(key=operator.itemgetter(1), reverse=True)
         if limit == 0:
             return disp_lang
-        else:
-            return disp_lang[:limit]
+        return disp_lang[:limit]
 
-    async def add_user_eventPoint(self, userID: int, points: int, override: bool = False, check_event: bool = True):
+    async def add_user_eventPoint(self, user_id: int, points: int, override: bool = False, check_event: bool = True):
         """Add some events points to a user
         if override is True, then the number of points will override the old score"""
         try:
@@ -394,55 +245,40 @@ class Utilities(commands.Cog):
                 return True
             if check_event and self.bot.current_event is None:
                 return True
-            cnx = self.bot.cnx_frm
-            cursor = cnx.cursor(dictionary=True)
             if override:
                 query = ("INSERT INTO `{t}` (`userID`,`events_points`) VALUES ('{u}',{p}) ON DUPLICATE KEY UPDATE events_points = '{p}';".format(
-                    t=self.table, u=userID, p=points))
+                    t=self.table, u=user_id, p=points))
             else:
                 query = ("INSERT INTO `{t}` (`userID`,`events_points`) VALUES ('{u}',{p}) ON DUPLICATE KEY UPDATE events_points = events_points + '{p}';".format(
-                    t=self.table, u=userID, p=points))
-            cursor.execute(query)
-            cnx.commit()
-            cursor.close()
+                    t=self.table, u=user_id, p=points))
+            async with self.bot.db_query(query):
+                pass
             try:
-                await self.bot.get_cog("Users").reload_event_rankcard(userID)
-            except Exception as e:
-                await self.bot.get_cog("Errors").on_error(e, None)
+                await self.bot.get_cog("Users").reload_event_rankcard(user_id)
+            except Exception as err:
+                await self.bot.get_cog("Errors").on_error(err, None)
             return True
-        except Exception as e:
-            await self.bot.get_cog('Errors').on_error(e, None)
+        except Exception as err:
+            await self.bot.get_cog('Errors').on_error(err, None)
             return False
 
-    async def get_eventsPoints_rank(self, userID: int):
+    async def get_eventsPoints_rank(self, user_id: int):
         "Get the ranking of an user"
         if not self.bot.database_online:
             return None
-        cnx = self.bot.cnx_frm
-        cursor = cnx.cursor(dictionary=True)
         query = (
-            f"SELECT userID, events_points, FIND_IN_SET( events_points, ( SELECT GROUP_CONCAT( events_points ORDER BY events_points DESC ) FROM {self.table} ) ) AS rank FROM {self.table} WHERE userID = {userID}")
-        cursor.execute(query)
-        liste = list()
-        for x in cursor:
-            liste.append(x)
-        cursor.close()
-        if len(liste) == 0:
-            return None
-        return liste[0]
+            f"SELECT userID, events_points, FIND_IN_SET( events_points, ( SELECT GROUP_CONCAT( events_points ORDER BY events_points DESC ) FROM {self.table} ) ) AS rank FROM {self.table} WHERE userID = {user_id}")
+        async with self.bot.db_query(query, fetchone=True) as query_results:
+            return query_results
 
     async def get_eventsPoints_nbr(self) -> int:
         if not self.bot.database_online:
             return 0
-        cnx = self.bot.cnx_frm
-        cursor = cnx.cursor(dictionary=False)
-        query = f"SELECT COUNT(*) FROM {self.table} WHERE events_points > 0"
-        cursor.execute(query)
-        result = list(cursor)[0][0]
-        cursor.close()
-        return result
+        query = f"SELECT COUNT(*) as count FROM {self.table} WHERE events_points > 0"
+        async with self.bot.db_query(query, fetchone=True) as query_results:
+            return query_results['count']
 
-    async def check_votes(self, userid: int) -> list:
+    async def check_votes(self, userid: int) -> list[tuple[str, str]]:
         """check if a user voted on any bots list website"""
         votes = list()
         async with aiohttp.ClientSession() as session:
@@ -458,7 +294,9 @@ class Utilities(commands.Cog):
                 async with session.get(f'https://api.discordlist.space/v2/bots/486896267788812288/upvotes/status/{userid}', headers=headers) as r:
                     if r.status != 404:
                         js = await r.json()
-                        if js["upvoted"]:
+                        if 'errors' in js:
+                            raise Exception(f"discordlist.space raised the following exceptions: {js['errors']}")
+                        elif js["upvoted"]:
                             votes.append(
                                 ("discordlist.space", "https://discordlist.space/"))
             except Exception as e:

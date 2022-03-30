@@ -1,0 +1,20 @@
+{
+    "de": {
+        "already-1-rr": "Du hast schon eine vorgesehene Rolle für dieses Emoji",
+        "already-dont-have": "Du hast nicht diese Rolle",
+        "already-have": "Du hast schon diese Rolle",
+        "embed-edited": "Das eingebettete und die Reaktionen sind mit Erfolg geupdated worden",
+        "no-rr": "Es ist keine Rolle mit diesem Emoji verbunden",
+        "not-zbot-embed": "Diese Nachricht enthält keine eingebettete Rollen-Reaktion",
+        "not-zbot-msg": "Diese Nachricht ist nicht von Zbot",
+        "reactions-edited": "Die Reaktionen wurden mit Erfolg geupdated",
+        "role-given": "Die Rolle %{r} wurde gegeben",
+        "role-lost": "Die Rolle %{r} wurde von deinen Rollen weggenommen",
+        "role-not-in-list": "Diese Rolle ist nicht Teil von den Unterstützten Rollen",
+        "rr-added": "Die Rolle %{r} wurde mit dem Emoji %{e} verbunden",
+        "rr-embed": "Eine Rolle nehmen",
+        "rr-list": "Liste der Rollen-Reaktionen (%{n}/%{m})",
+        "rr-removed": "Die Rolle %{r} kann nicht länger mit dem Emoji %{e} gegeben werden",
+        "too-many-rr": "Du hast schon alle Rollen %{l}, die man sich nehmen kann"
+    }
+}

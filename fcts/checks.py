@@ -1,6 +1,6 @@
 import discord
 from discord.ext import commands
-from utils import MyContext
+from libs.classes import MyContext
 
 
 async def can_mute(ctx: MyContext) -> bool:
@@ -83,6 +83,17 @@ async def has_embed_links(ctx: MyContext) -> bool:
     return ctx.channel.permissions_for(ctx.author).embed_links or await ctx.bot.get_cog('Admin').check_if_god(ctx)
 
 
+class CannotSendEmbed(commands.CommandError):
+    "Raised when the bot needs the embed links permission to work"
+    def __init__(self):
+        super().__init__("The bot must have the 'embed links' permission")
+
+async def bot_can_embed(ctx: MyContext) -> bool:
+    "Check if the bot can send embeds"
+    if ctx.can_send_embed:
+        return True
+    raise CannotSendEmbed()
+
 async def verify_role_exists(ctx: MyContext) -> bool:
     """Check if the verify role exists"""
     if ctx.guild is None:
@@ -112,16 +123,8 @@ async def is_fun_enabled(ctx: MyContext, self=None) -> bool:
     if not self.bot.database_online and not ctx.guild.channels[0].permissions_for(ctx.author).manage_guild:
         return False
     ID = ctx.guild.id
-    if str(ID) not in self.fun_opt.keys():
-        fun = await self.bot.get_config(ID, "enable_fun")
-        self.fun_opt[str(ID)] = fun
-    else:
-        fun = self.fun_opt[str(ID)]
-        if fun is None:
-            fun = await self.bot.get_config(ID, "enable_fun")
-            if fun is not None:
-                self.fun_opt[str(ID)] = fun
-    return fun == 1 or fun == True
+    return bool(await self.bot.get_config(ID, "enable_fun"))
+
 
 
 async def is_a_cmd(msg: discord.Message, bot: commands.Bot) -> bool:

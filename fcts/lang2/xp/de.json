@@ -1,0 +1,16 @@
+{
+    "de": {
+        "1-no-xp": "Du hast noch kein xp!",
+        "2-no-xp": "Dieses Mitglied hat noch kein xp!",
+        "already-1-rr": "Für dieses Level gibt es schon eine Rolle!",
+        "bot-rank": "Bots können kein xp haben",
+        "card-level": "LEVEL",
+        "card-rank": "RANK",
+        "change-global-xp": "Es ist nicht möglich, das globale xp System zu verändern!",
+        "change-xp-ok": "Das xp von dem Nutzer %{user} wurde zu %{xp} gesetzt!",
+        "default_levelup": [
+            "Hey, {user} hat gerade **Level {level}** erreicht! Mach weiter so!",
+            "Bei dem erreichen von **Level {level}** hat {user} einen Angriffs- und Verteidigungspunkte erhalten."
+        ]
+    }
+}

@@ -1,0 +1,31 @@
+{
+    "fi": {
+        "added-partner": "Kumppani lisätty",
+        "already-added": "Olet jo lisännyt tämän kumppanin!",
+        "bot-uptime": "Online aika",
+        "changed-desc": "Kuvaus on muokattu!",
+        "changed-invite": "Kutsu on muokattu!",
+        "confirm-bot": "Haluatko varmasti poistaa botin `%{bot}` sinun yhteistyökumppaneista?",
+        "confirm-server": "Haluatko varmasti poistaa palvelimen %{server} sinun yhteistyökumppaneista?",
+        "del-canceled": "Poistaminen peruutettu",
+        "deleted": "Tämä yhteistykumppani on nyt poistettu sinun listasta",
+        "invalid-bot": "Mahdotonta löytää tämä botti",
+        "invalid-invite": "Pätemätön kutsu",
+        "invalid-partner": "Yhteistyökumppania ei löytynyt",
+        "missing-manage-guild": "Mahdotonta löytää palvelimen kutsu linkit (\"Hallinnoi palvelinta\" käyttöoikeus puuttuu)",
+        "missing-reactions": "Käyttöoikeus \"Lisää hymiöitä puuttuu 😕",
+        "no-channel": "Et asettanut yhteistyökumppani kanavaa",
+        "no-partner": "Sinulla ei ole yhteistyökumppaneita",
+        "no-partner-2": "Ei milläkään palvelimella ole yhteistyötä sinun kanssa",
+        "partners-list": [
+            "Palvelin yhteistyökumppanit",
+            "Listä yhteistyökumppaneista",
+            "Lista palvelimista jossa sinä olet yhteistyökumppani"
+        ],
+        "reloaded": {
+            "many": "%{count} yhteistyökumppanit päivitetty"
+        },
+        "unknown-error": "Tuntematon virhe tapahtui. Lisätietoja saat ottamalla yhteyttä tukeen",
+        "unknown-server": "Palvelin yhteistyökumppani ei löytynyt"
+    }
+}

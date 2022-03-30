@@ -1,24 +1,24 @@
-import discord
-from discord.ext import commands
-
-import time
-import sys
-import traceback
-import datetime
-import os
-import shutil
 import asyncio
-import inspect
-import typing
-import io
-import textwrap
 import copy
-import operator
-import mysql
+import datetime
+import inspect
+import io
 import json
-import speedtest
+import operator
+import os
+import sys
+import textwrap
+import time
+import traceback
+import typing
 from contextlib import redirect_stdout
 from glob import glob
+
+import discord
+import speedtest
+from discord.ext import commands
+from libs.classes import MyContext, UserFlag, Zbot, ConfirmView
+
 from fcts import reloads
 from utils import Zbot, MyContext, UserFlag
 
@@ -33,7 +33,7 @@ def cleanup_code(content: str):
 
 class Admin(commands.Cog):
     """Here are listed all commands related to the internal administration of the bot. Most of them are not accessible to users, but only to ZBot administrators."""
-        
+
     def __init__(self, bot: Zbot):
         self.bot = bot
         self.file = "admin"
@@ -44,26 +44,51 @@ class Admin(commands.Cog):
             self.update = {'fr':None,'en':None}
         try:
             self.utilities = self.bot.get_cog("Utilities")
-        except:
+        except KeyError:
             pass
         self._last_result = None
+        self._upvote_emojis = ()
         self.god_mode = []
     
+    @property
+    def upvote_emojis(self):
+        if not self._upvote_emojis:
+            self._upvote_emojis = (
+                self.bot.get_emoji(938416027274993674),
+                self.bot.get_emoji(938416007549186049)
+            )
+        return self._upvote_emojis
+
     @commands.Cog.listener()
     async def on_ready(self):
         self.utilities = self.bot.get_cog("Utilities")
 
     async def check_if_admin(self, ctx: MyContext):
         return await reloads.check_admin(ctx)
-    
-    async def check_if_god(self,ctx):
+
+    async def check_if_god(self, ctx: typing.Union[discord.User, discord.Guild, MyContext]):
+        "Check if a user is in God mode for a given context"
         if isinstance(ctx, discord.User):
             return await reloads.check_admin(ctx)
-        elif isinstance(ctx.guild,discord.Guild) and ctx.guild is not None:
+        elif isinstance(ctx.guild, discord.Guild) and ctx.guild is not None:
             return await reloads.check_admin(ctx) and ctx.guild.id in self.god_mode
         else:
             return await reloads.check_admin(ctx)
 
+    async def add_success_reaction(self, msg: discord.Message):
+        "Add a check reaction to a message"
+        if self.bot.zombie_mode:
+            return
+        try:
+            emoji = self.bot.get_emoji(625426328275124296)
+            if emoji:
+                await msg.add_reaction(emoji)
+            else:
+                await msg.add_reaction('\u2705')
+        except discord.Forbidden:
+            await msg.channel.send(":ok:")
+        except discord.DiscordException:
+            pass
 
     @commands.command(name='spoil',hidden=True)
     @commands.check(reloads.check_admin)
@@ -78,7 +103,7 @@ class Admin(commands.Cog):
         """Envoie un mp à un membre"""
         try:
             await user.send(message)
-            await ctx.bot.get_cog('Utilities').add_check_reaction(ctx.message)
+            await self.add_success_reaction(ctx.message)
         except Exception as e:
             await self.bot.get_cog('Errors').on_error(e,ctx)
 
@@ -90,7 +115,7 @@ class Admin(commands.Cog):
             text = "Liste des commandes disponibles :"
             for cmd in sorted(ctx.command.commands, key=lambda x:x.name):
                 text+="\n- {} *({})*".format(cmd.name,'...' if cmd.help is None else cmd.help.split('\n')[0])
-                if type(cmd)==commands.core.Group:
+                if isinstance(cmd, commands.core.Group):
                     for cmds in cmd.commands:
                         text+="\n        - {} *({})*".format(cmds.name,cmds.help.split('\n')[0])
             await ctx.send(text)
@@ -140,7 +165,7 @@ class Admin(commands.Cog):
         await destination_fr.set_permissions(role_fr, read_messages=True)
         await destination_en.set_permissions(role_en, read_messages=True)
         await msg.edit(content="Terminé !")
-        await ctx.bot.get_cog('Utilities').add_check_reaction(ctx.message)
+        await self.add_success_reaction(ctx.message)
 
 
     @main_msg.command(name="update",hidden=True)
@@ -164,8 +189,8 @@ class Admin(commands.Cog):
                 return await ctx.send('Annulé !')
             self.update[x] = msg.content
         if msg:
-            await ctx.bot.get_cog('Utilities').add_check_reaction(msg)
-    
+            await self.add_success_reaction(msg)
+
     async def send_updates(self, ctx:MyContext):
         """Lance un message de mise à jour"""
         if self.bot.zombie_mode:
@@ -173,24 +198,26 @@ class Admin(commands.Cog):
         if None in self.update.values():
             return await ctx.send("Les textes ne sont pas complets !")
         text = "Vos messages contiennent"
-        msg = None
+        confirm_view = ConfirmView(
+            self.bot, ctx.channel,
+            validation=lambda inter: inter.user == ctx.author,
+            ephemeral=False)
+        await confirm_view.init()
         if max([len(x) for x in self.update.values()]) > 1900//len(self.update.keys()):
-            for k,v in self.update.items():
-                text += "\n{}:``\n{}\n```".format(k,v)
-                msg = await ctx.send(text)
+            for lang, value in self.update.items():
+                text += f"\n{lang}:```\n{value}\n```"
+                await ctx.send(text, view=confirm_view)
                 text = ''
         else:
-            text += "\n"+"\n".join(["{}:\n```\n{}\n```".format(k,v) for k,v in self.update.items()])
-            msg = await ctx.send(text)
-        if not msg:
+            text += "\n"+"\n".join([f"{lang}:\n```\n{value}\n```" for lang, value in self.update.items()])
+            await ctx.send(text, view=confirm_view)
+
+        await confirm_view.wait()
+        if confirm_view.value is None:
+            await ctx.send("Trop long !")
             return
-        await ctx.bot.get_cog('Utilities').add_check_reaction(msg)
-        def check(reaction, user):
-            return user == ctx.author and reaction.message.id==msg.id
-        try:
-            await self.bot.wait_for('reaction_add', timeout=30.0, check=check)
-        except asyncio.TimeoutError:
-            return await ctx.send('Trop long !')
+        if not confirm_view.value:
+            return
         count = 0
         for guild in ctx.bot.guilds:
             channels = await ctx.bot.get_config(guild.id,'bot_news')
@@ -198,7 +225,7 @@ class Admin(commands.Cog):
                 continue
             channels = [guild.get_channel(int(x)) for x in channels.split(';') if len(x)>5 and x.isnumeric()]
             lang = await ctx.bot.get_config(guild.id,'language')
-            if type(lang)!=int:
+            if not isinstance(lang, int):
                 lang = 0
             lang = ctx.bot.get_cog('Languages').languages[lang]
             if lang not in self.update.keys():
@@ -231,13 +258,11 @@ class Admin(commands.Cog):
 
         await ctx.send("Message envoyé dans {} salons !".format(count))
         # add changelog in the database
-        cnx = self.bot.cnx_frm
-        cursor = cnx.cursor()
         version = self.bot.get_cog('Info').bot_version
         query = "INSERT INTO `changelogs` (`version`, `release_date`, `fr`, `en`, `beta`) VALUES (%(v)s, %(r)s, %(fr)s, %(en)s, %(b)s) ON DUPLICATE KEY UPDATE `fr` = '%(fr)s', `en` = '%(en)s';"
-        cursor.execute(query, { 'v': version, 'r': ctx.message.created_at, 'fr': self.update['fr'], 'en': self.update['en'], 'b': self.bot.beta })
-        cnx.commit()
-        cursor.close()
+        args = { 'v': version, 'r': ctx.message.created_at, 'fr': self.update['fr'], 'en': self.update['en'], 'b': self.bot.beta }
+        async with self.bot.db_query(query, args):
+            pass
         for k in self.update.keys():
             self.update[k] = None
 
@@ -250,7 +275,7 @@ class Admin(commands.Cog):
         for k,v in self.bot.cogs.items():
             text +="- {} ({}) \n".format(v.file,k)
         await ctx.send(text)
-    
+
     @main_msg.command(name="lang-sort",hidden=True)
     @commands.check(reloads.check_admin)
     async def resort_langs(self, ctx:MyContext, *, lang:str=None):
@@ -290,27 +315,24 @@ class Admin(commands.Cog):
     @commands.check(reloads.check_admin)
     async def shutdown(self, ctx: MyContext):
         """Eteint le bot"""
-        m = await ctx.send("Nettoyage de l'espace de travail...")
+        msg = await ctx.send("Nettoyage de l'espace de travail...")
         await self.cleanup_workspace()
-        await m.edit(content="Bot en voie d'extinction")
+        await msg.edit(content="Bot en voie d'extinction")
         await self.bot.change_presence(status=discord.Status('offline'))
         self.bot.log.info("Fermeture du bot")
         await self.bot.close()
 
     async def cleanup_workspace(self):
-        for folderName, _, filenames in os.walk('.'):
+        "Delete python cache files and close database connexions"
+        for folder_name, _, filenames in os.walk('.'):
             for filename in filenames:
                 if filename.endswith('.pyc'):
-                    os.unlink(folderName+'/'+filename)
-            if  folderName.endswith('__pycache__'):
-                os.rmdir(folderName)
+                    os.unlink(folder_name+'/'+filename)
+            if  folder_name.endswith('__pycache__'):
+                os.rmdir(folder_name)
         if self.bot.database_online:
-            try:
-                self.bot.cnx_frm.close()
-                self.bot.cnx_xp.close()
-            except mysql.connector.errors.ProgrammingError:
-                pass
-    
+            self.bot.close_database_cnx()
+
     @main_msg.command(name='reboot')
     @commands.check(reloads.check_admin)
     async def restart_bot(self, ctx: MyContext):
@@ -339,12 +361,6 @@ class Admin(commands.Cog):
         """Vérifie si un fichier de langue est complet"""
         await self.bot.get_cog("Languages").check_tr(ctx.channel,lang,origin)
 
-    @main_msg.command(name="backup")
-    @commands.check(reloads.check_admin)
-    async def adm_backup(self, ctx: MyContext):
-        """Exécute une sauvegarde complète du code"""
-        await self.backup_auto(ctx)
-
     @main_msg.command(name="membercounter")
     @commands.check(reloads.check_admin)
     async def membercounter(self, ctx: MyContext):
@@ -360,20 +376,10 @@ class Admin(commands.Cog):
 
     @main_msg.command(name="get_invites",aliases=['invite'])
     @commands.check(reloads.check_admin)
-    async def adm_invites(self, ctx: MyContext, *, server: typing.Optional[discord.Guild] = None):
-        """Cherche une invitation pour un serveur, ou tous"""
-        if server is not None:
-            await ctx.author.send(await self.search_invite(server))
-        else:
-            liste = list()
-            for guild in self.bot.guilds:
-                liste.append(await self.search_invite(guild))
-                if len("\n".join(liste)) > 1900:
-                    await ctx.author.send("\n".join(liste))
-                    liste = []
-            if len(liste) > 0:
-                await ctx.author.send("\n".join(liste))
-        await self.bot.get_cog('Utilities').suppr(ctx.message)
+    async def adm_invites(self, ctx: MyContext, *, server: typing.Optional[discord.Guild]):
+        """Cherche une invitation pour un serveur"""
+        await ctx.author.send(await self.search_invite(server))
+        await ctx.message.delete(delay=0)
 
     async def search_invite(self, guild: typing.Optional[discord.Guild]) -> str:
         if guild is None:
@@ -414,13 +420,14 @@ class Admin(commands.Cog):
             self.bot.connect_database_frm()
             self.bot.cnx_xp.close()
             self.bot.connect_database_xp()
-            if self.bot.cnx_frm is not None and self.bot.cnx_xp is not None:
-                if utils := self.bot.get_cog("Utilities"):
-                    await utils.add_check_reaction(ctx.message)
-                    if xp := self.bot.get_cog("Xp"):
-                        await xp.reload_sus()
-        except Exception as e:
-            await self.bot.get_cog('Errors').on_command_error(ctx,e)
+            self.bot.cnx_stats.close()
+            self.bot.connect_database_stats()
+            if self.bot.cnx_frm is not None and self.bot.cnx_xp is not None and self.bot.cnx_stats is not None:
+                await ctx.message.add_reaction('✅')
+                if xp := self.bot.get_cog("Xp"):
+                    await xp.reload_sus()
+        except Exception as err:
+            await self.bot.get_cog('Errors').on_command_error(ctx,err)
 
     @main_msg.command(name="emergency")
     @commands.check(reloads.check_admin)
@@ -438,7 +445,7 @@ class Admin(commands.Cog):
                 user = self.bot.get_user(x)
                 if user.dm_channel is None:
                     await user.create_dm()
-                msg = await user.dm_channel.send("{} La procédure d'urgence vient d'être activée. Si vous souhaitez l'annuler, veuillez cliquer sur la réaction ci-dessous dans les {} secondes qui suivent l'envoi de ce message.".format(self.bot.get_cog('Emojis').customEmojis['red_warning'],time))
+                msg = await user.dm_channel.send("{} La procédure d'urgence vient d'être activée. Si vous souhaitez l'annuler, veuillez cliquer sur la réaction ci-dessous dans les {} secondes qui suivent l'envoi de ce message.".format(self.bot.get_cog('Emojis').customs['red_warning'],time))
                 await msg.add_reaction('🛑')
             except Exception as e:
                 await self.bot.get_cog('Errors').on_error(e,None)
@@ -455,15 +462,15 @@ class Admin(commands.Cog):
                     continue
                 try:
                     if server.owner not in owners:
-                        await server.owner.send(await self.bot._(server,"admin","emergency"))
+                        await server.owner.send(await self.bot._(server,"admin.emergency"))
                         owners.append(server.owner)
                     await server.leave()
                     servers +=1
                 except:
                     continue
             chan = await self.bot.get_channel(500674177548812306)
-            await chan.send("{} Prodédure d'urgence déclenchée : {} serveurs quittés - {} propriétaires prévenus".format(self.bot.get_cog('Emojis').customEmojis['red_alert'],servers,len(owners)))
-            return "{}  {} propriétaires de serveurs ont été prévenu ({} serveurs)".format(self.bot.get_cog('Emojis').customEmojis['red_alert'],len(owners),servers)
+            await chan.send("{} Prodédure d'urgence déclenchée : {} serveurs quittés - {} propriétaires prévenus".format(self.bot.get_cog('Emojis').customs['red_alert'],servers,len(owners)))
+            return "{}  {} propriétaires de serveurs ont été prévenu ({} serveurs)".format(self.bot.get_cog('Emojis').customs['red_alert'],len(owners),servers)
         for x in reloads.admins_id:
             try:
                 user = self.bot.get_user(x)
@@ -489,7 +496,7 @@ class Admin(commands.Cog):
                 await ctx.send("```py\n{}\n```".format(code))
         else:
             await ctx.send("Commande `{}` introuvable".format(cmd))
-    
+
     @main_msg.command(name="ignore")
     @commands.check(reloads.check_admin)
     async def add_ignoring(self, ctx: MyContext, ID:int):
@@ -664,7 +671,29 @@ Cette option affecte tous les serveurs"""
             elif (member.id not in owner_list) and role in member.roles:
                 await ctx.send("Rôle supprimé à "+str(member))
                 await member.remove_roles(role,reason="This user doesn't support me anymore")
-        await ctx.bot.get_cog('Utilities').add_check_reaction(ctx.message)
+        await self.add_success_reaction(ctx.message)
+
+    async def _get_ideas_list(self, channel: discord.TextChannel) -> list[tuple[int, datetime.timedelta, str, int, int]]:
+        "Get ideas from the ideas channel"
+        now = self.bot.utcnow()
+        liste = list()
+        async for msg in channel.history(limit=500):
+            if len(msg.reactions) > 0:
+                upvotes = 0
+                downvotes = 0
+                for reaction in msg.reactions:
+                    users = [x for x in await x.users().flatten() if not x.bot]
+                    if reaction.emoji in ('👍', self.upvote_emojis[0]):
+                        upvotes = len(users)
+                    if reaction.emoji in ('👎', self.upvote_emojis[1]):
+                        downvotes = len(users)
+                duration = now-msg.created_at
+                if len(msg.embeds) > 0:
+                    liste.append((upvotes-downvotes,duration,msg.embeds[0].fields[0].value,upvotes,downvotes))
+                else:
+                    liste.append((upvotes-downvotes,duration,msg.content,upvotes,downvotes))
+        liste.sort(reverse=True)
+        return liste
 
     @main_botserv.command(name="best_ideas")
     @commands.check(reloads.check_admin)
@@ -677,22 +706,7 @@ Cette option affecte tous les serveurs"""
         channel = server.get_channel(488769306524385301)
         if channel is None:
             return await ctx.send("Salon introuvable")
-        liste = list()
-        async for msg in channel.history(limit=500):
-            if len(msg.reactions) > 0:
-                up = 0
-                down = 0
-                for x in msg.reactions:
-                    users = [x for x in await x.users().flatten() if not x.bot]
-                    if x.emoji == '👍':
-                        up = len(users)
-                    elif x.emoji == '👎':
-                        down = len(users)
-                if len(msg.embeds) > 0:
-                    liste.append((up-down,ctx.bot.utcnow()-msg.created_at,msg.embeds[0].fields[0].value,up,down))
-                else:
-                    liste.append((up-down,ctx.bot.utcnow()-msg.created_at,msg.content,up,down))
-        liste.sort(reverse=True)
+        liste = await self._get_ideas_list(channel)
         count = len(liste)
         liste = liste[:number]
         title = "Liste des {} meilleures idées (sur {}) :".format(len(liste),count)
@@ -701,12 +715,12 @@ Cette option affecte tous les serveurs"""
             color = ctx.guild.me.color
         else:
             color = discord.Colour(8311585)
-        for x in liste:
-            text += "\n**[{} - {}]**  {} ".format(x[3],x[4],x[2])
+        for reaction in liste:
+            text += "\n**[{} - {}]**  {} ".format(reaction[3],reaction[4],reaction[2])
         try:
             if ctx.can_send_embed:
-                emb = ctx.bot.get_cog('Embeds').Embed(title=title,desc=text,color=color).update_timestamp()
-                return await bot_msg.edit(content=None,embed=emb.discord_embed())
+                emb = discord.Embed(title=title, description=text, color=color, timestamp=self.bot.utcnow())
+                return await bot_msg.edit(content=None,embed=emb)
             await bot_msg.edit(content=title+text)
         except discord.HTTPException:
             await ctx.send("Le message est trop long pour être envoyé !")
@@ -727,7 +741,7 @@ Cette option affecte tous les serveurs"""
         else:
             await ctx.send("Sélectionnez *play*, *watch*, *listen* ou *stream* suivi du nom")
         await ctx.message.delete()
-    
+
     @main_msg.command(name="speedtest")
     @commands.check(reloads.check_admin)
     async def speedtest(self, ctx: MyContext, method: str=None):
@@ -742,9 +756,9 @@ Cette option affecte tous les serveurs"""
         s.get_best_server()
         s.download()
         s.upload(pre_allocate=False)
-        if method == None:
+        if method is None:
             s.results.share()
-        if method == None:
+        if method is None:
             result = s.results.dict()
             await msg.edit(content=f"{result['server']['sponsor']} - ping {result['server']['latency']}ms\n{result['share']}")
         elif method == "json":
@@ -757,7 +771,7 @@ Cette option affecte tous les serveurs"""
         else:
             result = getattr(s.results, method)()
             await msg.edit(content=str(result))
-    
+
 
     @commands.command(name='eval')
     @commands.check(reloads.check_admin)
@@ -783,7 +797,7 @@ Cette option affecte tous les serveurs"""
             await self.bot.get_cog('Errors').on_error(e,ctx)
             return
         try:
-            exec(to_compile, env)
+            exec(to_compile, env) # pylint: disable=exec-used
         except Exception as e:
             return await ctx.send(f'```py\n{e.__class__.__name__}: {e}\n```')
 
@@ -793,10 +807,10 @@ Cette option affecte tous les serveurs"""
                 ret = await func()
         except Exception as e:
             value = stdout.getvalue()
-            await ctx.send(f'```py\n{value}{traceback.format_exc()}\n```')
+            await ctx.send(f'```py\n{value}{traceback.format_exc()[:1990]}\n```')
         else:
             value = stdout.getvalue()
-            await ctx.bot.get_cog('Utilities').add_check_reaction(ctx.message)
+            await self.add_success_reaction(ctx.message)
 
             if ret is None:
                 if value:
@@ -804,7 +818,7 @@ Cette option affecte tous les serveurs"""
             else:
                 self._last_result = ret
                 await ctx.send(f'```py\n{value}{ret}\n```')
-    
+
     @commands.command(name='execute',hidden=True)
     @commands.check(reloads.check_admin)
     async def sudo(self, ctx: MyContext, who: typing.Union[discord.Member, discord.User], *, command: str):
@@ -814,128 +828,94 @@ Cette option affecte tous les serveurs"""
         msg.author = who
         msg.content = ctx.prefix + command
         new_ctx = await self.bot.get_context(msg)
-        #new_ctx.db = ctx.db
         await self.bot.invoke(new_ctx)
-        await ctx.bot.get_cog('Utilities').add_check_reaction(ctx.message)
+        await self.add_success_reaction(ctx.message)
 
-    async def backup_auto(self, ctx: MyContext=None):
-        """Crée une backup du code"""
-        t = time.time()
-        self.bot.log.info("("+str(await self.bot.get_cog('TimeUtils').date(datetime.datetime.now(),digital=True))+") Backup auto en cours")
-        message = await ctx.send(":hourglass: Sauvegarde en cours...")
-        try:
-            os.remove('../backup.tar')
-        except:
-            pass
-        try:
-            archive = shutil.make_archive('backup','tar','..')
-        except FileNotFoundError:
-            self.bot.log.error("Impossible de trouver le dossier de sauvegarde")
-            await message.edit("{} Impossible de trouver le dossier de sauvegarde".format(self.bot.get_cog('Emojis').customEmojis['red_cross']))
-            return
-        try:
-            shutil.move(archive,'..')
-        except shutil.Error:
-            os.remove('../backup.tar')
-            shutil.move(archive,'..')
-        try:
-            os.remove('backup.tar')
-        except:
-            pass
-        msg = "Backup completed in {} seconds!".format(round(time.time()-t,3))
-        self.bot.log.info(msg)
-        await message.edit(content=msg)
-            
     @commands.group(name='bug',hidden=True)
     @commands.check(reloads.check_admin)
     async def main_bug(self, ctx: MyContext):
         """Gère la liste des bugs"""
-        pass
-    
+
     @main_bug.command(name='add')
     async def bug_add(self, ctx: MyContext,* ,bug: str):
         """Ajoute un bug à la liste"""
-        try:
-            channel = ctx.bot.get_channel(548138866591137802) if self.bot.beta else ctx.bot.get_channel(488769283673948175)
-            if channel is None:
-                return await ctx.send("Salon 488769283673948175 introuvable")
-            text = bug.split('\n')
-            fr,en = text[0].replace('\\n','\n'), text[1].replace('\\n','\n')
-            emb = self.bot.get_cog('Embeds').Embed(title="New bug",fields=[{'name':'Français','value':fr},{'name':'English','value':en}],color=13632027).update_timestamp()
-            await channel.send(embed=emb.discord_embed())
-            await ctx.bot.get_cog('Utilities').add_check_reaction(ctx.message)
-        except Exception as e:
-            await self.bot.get_cog('Errors').on_command_error(ctx,e)
-    
+        channel = ctx.bot.get_channel(929864644678549534) if self.bot.beta else ctx.bot.get_channel(488769283673948175)
+        if channel is None:
+            return await ctx.send("Salon 488769283673948175 introuvable")
+        text = bug.split('\n')
+        fr_text, en_text = text[0].replace('\\n','\n'), text[1].replace('\\n','\n')
+        emb = discord.Embed(title="New bug", timestamp=self.bot.utcnow(), color=13632027)
+        emb.add_field(name='Français', value=fr_text, inline=False)
+        emb.add_field(name='English', value=en_text, inline=False)
+        await channel.send(embed=emb)
+        await self.add_success_reaction(ctx.message)
+
     @main_bug.command(name='fix')
-    async def bug_fix(self, ctx: MyContext, ID:int, fixed:bool=True):
+    async def bug_fix(self, ctx: MyContext, msg_id: int, fixed:bool=True):
         """Marque un bug comme étant fixé"""
+        chan = ctx.bot.get_channel(929864644678549534) if self.bot.beta else ctx.bot.get_channel(488769283673948175)
+        if chan is None:
+            return await ctx.send("Salon introuvable")
         try:
-            chan = ctx.bot.get_channel(548138866591137802) if self.bot.beta else ctx.bot.get_channel(488769283673948175)
-            if chan is None:
-                return await ctx.send("Salon introuvable")
-            try:
-                msg = await chan.fetch_message(ID)
-            except Exception as e:
-                return await ctx.send("`Error:` {}".format(e))
-            if len(msg.embeds)!=1:
-                return await ctx.send("Nombre d'embeds invalide")
-            emb = msg.embeds[0]
-            if fixed:
-                emb.color = discord.Color(10146593)
-                emb.title = "New bug [fixed soon]"
-            else:
-                emb.color = discord.Color(13632027)
-                emb.title = "New bug"
-            await msg.edit(embed=emb)
-            await ctx.bot.get_cog('Utilities').add_check_reaction(ctx.message)
-        except Exception as e:
-            await self.bot.get_cog('Errors').on_command_error(ctx,e)
+            msg = await chan.fetch_message(msg_id)
+        except discord.DiscordException as err:
+            return await ctx.send(f"`Error:` {err}")
+        if len(msg.embeds) != 1:
+            return await ctx.send("Nombre d'embeds invalide")
+        emb = msg.embeds[0]
+        if fixed:
+            emb.color = discord.Color(10146593)
+            emb.title = "New bug [fixed soon]"
+        else:
+            emb.color = discord.Color(13632027)
+            emb.title = "New bug"
+        await msg.edit(embed=emb)
+        await self.add_success_reaction(ctx.message)
 
     @commands.group(name="idea",hidden=True)
     @commands.check(reloads.check_admin)
     async def main_idea(self, ctx: MyContext):
         """Ajouter une idée dans le salon des idées, en français et anglais"""
-        pass
-    
+
     @main_idea.command(name='add')
-    async def idea_add(self, ctx: MyContext, *, text):
+    async def idea_add(self, ctx: MyContext, *, text: str):
         """Ajoute une idée à la liste"""
+        channel = ctx.bot.get_channel(929864644678549534) if self.bot.beta else ctx.bot.get_channel(488769306524385301)
+        if channel is None:
+            return await ctx.send("Salon introuvable")
+        text = text.split('\n')
         try:
-            channel = ctx.bot.get_channel(548138866591137802) if self.bot.beta else ctx.bot.get_channel(488769306524385301)
-            if channel is None:
-                return await ctx.send("Salon introuvable")
-            text = text.split('\n')
-            fr,en = text[0].replace('\\n','\n'), text[1].replace('\\n','\n')
-            emb = self.bot.get_cog('Embeds').Embed(fields=[{'name':'Français','value':fr},{'name':'English','value':en}],color=16106019).update_timestamp()
-            msg = await channel.send(embed=emb.discord_embed())
-            await self.bot.get_cog('Fun').add_vote(msg)
-            await ctx.bot.get_cog('Utilities').add_check_reaction(ctx.message)
-        except Exception as e:
-            await self.bot.get_cog('Errors').on_command_error(ctx,e)
+            fr_text, en_text = text[0].replace('\\n','\n'), text[1].replace('\\n','\n')
+        except IndexError:
+            await ctx.send("Il manque le texte anglais")
+            return
+        emb = discord.Embed(color=16106019, timestamp=self.bot.utcnow())
+        emb.add_field(name='Français', value=fr_text, inline=False)
+        emb.add_field(name='English', value=en_text, inline=False)
+        msg = await channel.send(embed=emb)
+        for emoji in self.upvote_emojis:
+            await msg.add_reaction(emoji)
+        await self.add_success_reaction(ctx.message)
 
     @main_idea.command(name='valid')
-    async def idea_valid(self, ctx: MyContext, ID:int, valid:bool=True):
+    async def idea_valid(self, ctx: MyContext, msg_id:int, valid:bool=True):
         """Marque une idée comme étant ajoutée à la prochaine MàJ"""
+        chan = ctx.bot.get_channel(929864644678549534) if self.bot.beta else ctx.bot.get_channel(488769306524385301)
+        if chan is None:
+            return await ctx.send("Salon introuvable")
         try:
-            chan = ctx.bot.get_channel(548138866591137802) if self.bot.beta else ctx.bot.get_channel(488769306524385301)
-            if chan is None:
-                return await ctx.send("Salon introuvable")
-            try:
-                msg = await chan.fetch_message(ID)
-            except Exception as e:
-                return await ctx.send("`Error:` {}".format(e))
-            if len(msg.embeds)!=1:
-                return await ctx.send("Nombre d'embeds invalide")
-            emb = msg.embeds[0]
-            if valid:
-                emb.color = discord.Color(10146593)
-            else:
-                emb.color = discord.Color(16106019)
-            await msg.edit(embed=emb)
-            await ctx.bot.get_cog('Utilities').add_check_reaction(ctx.message)
-        except Exception as e:
-            await self.bot.get_cog('Errors').on_command_error(ctx,e)
+            msg = await chan.fetch_message(msg_id)
+        except discord.DiscordException as err:
+            return await ctx.send(f"`Error:` {err}")
+        if len(msg.embeds)!=1:
+            return await ctx.send("Nombre d'embeds invalide")
+        emb = msg.embeds[0]
+        if valid:
+            emb.color = discord.Color(10146593)
+        else:
+            emb.color = discord.Color(16106019)
+        await msg.edit(embed=emb)
+        await self.add_success_reaction(ctx.message)
 
 def setup(bot):
     bot.add_cog(Admin(bot))

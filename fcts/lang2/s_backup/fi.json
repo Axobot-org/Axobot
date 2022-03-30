@@ -1,0 +1,10 @@
+{
+    "fi": {
+        "backup-done": "Varmuuskopio valmis!",
+        "err": "Ups, sisällinen virhe tapahtui... odota hetki tai ota yhteyttä tukeen (`about` komento) jos tämä jatkuu",
+        "finished": "Varmuuskopio valmis! Tässä on loki",
+        "invalid_file": "Lähetä minulle varmuuskopio tiedosto samalla viestillä millä käytät komennon",
+        "invalid_version": "Varmuuskopio version on pätemätön. Tiedosto on varmaan rikki",
+        "loading": "Ladataan varmuuskopiota...\nodota hetki..."
+    }
+}

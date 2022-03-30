@@ -1,0 +1,15 @@
+{
+    "en": {
+        "nothing-desc": "There are currently no events. Follow the bot news to know the date of the next one!",
+        "events-price-title": "Prizes to win",
+        "nothing-prices": "There is nothing to gain for this event :confused:",
+        "objectives": "Objectives",
+        "points": "points",
+        "rank-global": "Global ranking",
+        "rank-title": "Event points",
+        "rank-total": "Total points",
+        "soon": "An event is coming soon! Watch for information as it will begin on %{date}",
+        "unclassed": "unclassed",
+        "xp-howto": "You can earn event points by winning tic-tac-toe games, using event commands when available, or by performing various other secret tasks. Don't hesitate to come to the support server to ask for information!"
+    }
+}

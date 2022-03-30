@@ -1,0 +1,26 @@
+{
+    "fr2": {
+        "set_config": {
+            "animated_card": {
+                "false": "Les cartes d'xp animées ne sont actuellement pas autorisées pour vous",
+                "true": "Les cartes d'xp animées sont actuellement autorisées pour vous"
+            },
+            "auto_unafk": {
+                "false": "Tu dois enlever ton tag AFK toi-même",
+                "true": "Je t'enlèverai ton tag AFK dès que tu postera un message"
+            },
+            "usernames_log": {
+                "false": "T'as désactivé l'enregistrement de vos noms d'utilisateurs ainsi que de vos surnoms",
+                "true": "T'as autorisé l'enregistrement de vos noms d'utilisateurs ainsi que de vos surnoms"
+            }
+        },
+        "card-desc": "Voici un exemple de votre carte d'xp. Tu peux taper la commande `profile card <style>` pour changer le style\n*Ta carte d'xp ne se réactualisera que lorsque tu auras gagné de l'xp.*",
+        "changed-card": "Votre carte d'xp utilise maintenant le style %{style}",
+        "changed-error": "Oups, une erreur interne est survenue pendant le traitement de la requête. Réessaye plus tard ou contacte le support.",
+        "config_list": "Voici la liste des options possibles 😀 : %{options}\nUtilise la commande `help profile config` pour des détails en plus 😉 !",
+        "config_success": "L'option %{opt} a bien été modif !",
+        "invalid-card": "Ce style est invalide. Ça, c'est la liste des styles que tu pouvez utiliser : %{cards}",
+        "list-cards": "Voici la liste des styles que tu pouvez utiliser : %{cards}",
+        "missing-attach-files": "Oups, il me manque la permission d'Attacher des Fichiers :confused:"
+    }
+}
