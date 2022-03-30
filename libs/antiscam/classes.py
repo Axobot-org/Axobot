@@ -105,7 +105,7 @@ class PredictionResult:
         }
 
     def to_string(self, categories: dict):
-        probas = '\n    - '.join(f'{categories[c]}: {round(p,3)}' for c, p in self.probabilities.items())
+        probas = '\n    - '.join(f'{categories[c]}: {round(p*100, 1)}%' for c, p in self.probabilities.items())
         return f"""Result: {categories[self.result]}
 
 Probabilities:
