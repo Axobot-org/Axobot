@@ -908,44 +908,6 @@ class Rss(commands.Cog):
             return None
         else:
             return match.group(1)
-    
-    async def parse_deviant_url(self, url):
-        r = r'(?:http.*://)?(?:www.)?(?:deviantart.com/)([^?\s]+)'
-        match = re.search(r,url)
-        if match is None:
-            return None
-        else:
-            return match.group(1)
-
-    async def feed_parse(self, url: str, timeout: int, session: ClientSession = None) -> feedparser.FeedParserDict:
-        """Asynchronous parsing using cool methods"""
-        # if session is provided, we have to not close it
-        _session = session or ClientSession()
-        try:
-            async with async_timeout.timeout(timeout) as cm:
-                async with _session.get(url) as response:
-                    html = await response.text()
-                    headers = response.raw_headers
-        except (client_exceptions.ClientConnectorCertificateError, UnicodeDecodeError, client_exceptions.TooManyRedirects, client_exceptions.ClientConnectorError, client_exceptions.ClientPayloadError):
-            if session is None:
-                await _session.close()
-            return FeedParserDict(entries=[])
-        except asyncio.exceptions.TimeoutError:
-            if session is None:
-                await _session.close()
-            return None
-        except Exception as e:
-            if session is None:
-                await _session.close()
-            raise e
-        if session is None:
-            await _session.close()
-        if cm.expired:
-            # request was cancelled by timeout
-            self.bot.info("[RSS] feed_parse got a timeout")
-            return None
-        headers = {k.decode("utf-8").lower(): v.decode("utf-8") for k, v in headers}
-        return feedparser.parse(html, response_headers=headers)
 
 
     async def rss_twitch(self, channel: discord.TextChannel, nom: str, date: datetime.datetime=None, session: ClientSession=None):
@@ -1175,18 +1137,6 @@ class Rss(commands.Cog):
         async with self.bot.db_query(query) as query_results:
             liste = list(query_results)
         return liste
-    
-    async def get_raws_count(self, get_disabled:bool=False):
-        """Get the number of rss feeds"""
-        cnx = self.bot.cnx_frm
-        cursor = cnx.cursor()
-        query = "SELECT COUNT(*) FROM `{}`".format(self.table)
-        if not get_disabled:
-            query += " WHERE `guild` in (" + ','.join(["'{}'".format(x.id) for x in self.bot.guilds]) + ")"
-        cursor.execute(query)
-        t = list(cursor)[0][0]
-        cursor.close()
-        return t
 
     async def get_raws_count(self, get_disabled:bool=False):
         """Get the number of rss feeds"""
