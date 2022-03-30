@@ -12,12 +12,12 @@ import re
 import marshal
 from discord.ext import commands, tasks
 from fcts.checks import is_fun_enabled
-from utils import zbot
+from utils import Zbot
 
 class Events(commands.Cog):
     """Cog for the management of major events that do not belong elsewhere. Like when a new server invites the bot."""
 
-    def __init__(self, bot: zbot):
+    def __init__(self, bot: Zbot):
         self.bot = bot
         self.file = "events"
         self.dbl_last_sending = datetime.datetime.utcfromtimestamp(0)
@@ -197,6 +197,11 @@ class Events(commands.Cog):
 
     async def send_mp(self, msg: discord.Message):
         await self.check_mp_adv(msg)
+        if msg.channel.recipient is None:
+            # recipient couldn't be loaded
+            msg.channel = await self.bot.fetch_channel(msg.channel.id)
+            if msg.channel.recipient is None:
+                return
         if msg.channel.recipient.id in [392766377078816789,279568324260528128,552273019020771358,281404141841022976]:
             return
         channel = self.bot.get_channel(625320165621497886)
@@ -287,7 +292,7 @@ class Events(commands.Cog):
         """Vérifie si un joueur a été banni ou kick par ZBot"""
         try:
             async for entry in member.guild.audit_logs(user=member.guild.me, limit=15):
-                if entry.created_at < datetime.datetime.utcnow()-datetime.timedelta(seconds=60):
+                if entry.created_at < self.bot.utcnow()-datetime.timedelta(seconds=60):
                     break
                 if entry.action == discord.AuditLogAction.kick and entry.target == member:
                     await self.add_points(self.table['kick'])
@@ -399,7 +404,10 @@ class Events(commands.Cog):
                     user = guild.get_member(task['user'])
                     if user is None:
                         continue
-                    await self.bot.get_cog('Moderation').unmute_event(guild,user,guild.me)
+                    try:
+                        await self.bot.get_cog('Moderation').unmute_event(guild,user,guild.me)
+                    except discord.Forbidden:
+                        continue
                     await self.remove_task(task['ID'])
                 except Exception as e:
                     await self.bot.get_cog('Errors').on_error(e,None)
@@ -584,13 +592,13 @@ class Events(commands.Cog):
             await self.bot.get_cog("Errors").on_error(e,None)
         try: # https://discordlist.space/bot/486896267788812288
             payload = json.dumps({
-            'server_count': guildCount
+                'serverCount': guildCount
             })
             headers = {
                 'Authorization': self.bot.others['discordlist.space'],
                 'Content-Type': 'application/json'
             }
-            async with session.post('https://api.discordlist.space/v1/bots/{}'.format(self.bot.user.id), data=payload, headers=headers) as resp:
+            async with session.post('https://api.discordlist.space/v2/bots/{}'.format(self.bot.user.id), data=payload, headers=headers) as resp:
                 self.bot.log.debug('discordlist.space returned {} for {}'.format(resp.status, payload))
                 answers[2] = resp.status
         except Exception as e:

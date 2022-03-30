@@ -1,13 +1,10 @@
 import discord
 import json
-from utils import zbot
-
-en = None
-fi = None
+from utils import Zbot
 
 class Languages(discord.ext.commands.Cog):
 
-    def __init__(self, bot: zbot):
+    def __init__(self, bot: Zbot):
         self.bot = bot
         self.file = "languages"
         self.languages = ['fr', 'en', 'lolcat', 'fi', 'de', 'fr2']
@@ -22,7 +19,7 @@ class Languages(discord.ext.commands.Cog):
         """Renvoie le texte en fonction de la langue"""
         if isinstance(serverID,discord.Guild):
             serverID = serverID.id
-        elif isinstance(serverID,discord.TextChannel):
+        elif hasattr(serverID, "guild") and isinstance(serverID.guild, discord.Guild): # guild channels and threads
             serverID = serverID.guild.id
         if str(serverID) in self.serv_opts.keys():
             lang_opt = self.serv_opts[str(serverID)]
@@ -33,8 +30,14 @@ class Languages(discord.ext.commands.Cog):
         elif serverID is None:
             lang_opt = self.bot.get_cog('Servers').default_language
         elif isinstance(serverID,discord.DMChannel):
-            used_langs = await self.bot.get_cog('Utilities').get_languages(serverID.recipient,limit=1)
-            lang_opt = used_langs[0][0]
+            if serverID.recipient is None:
+                # recipient couldn't be loaded
+                serverID: discord.DMChannel = await self.bot.fetch_channel(serverID.id)
+                if serverID.recipient is None:
+                    lang_opt = self.bot.get_cog('Servers').default_language
+            if serverID.recipient is not None:
+                used_langs = await self.bot.get_cog('Utilities').get_languages(serverID.recipient,limit=1)
+                lang_opt = used_langs[0][0]
         else:
             conf_lang = self.bot.get_cog("Servers").conf_lang
             lang_opt = await conf_lang(serverID,"language","scret-desc")
@@ -43,7 +46,7 @@ class Languages(discord.ext.commands.Cog):
         if lang_opt not in self.languages:
             lang_opt = self.bot.get_cog('Servers').default_language
         return await self._get_translation(lang_opt, moduleID, messageID, **args)
-        
+
     async def _get_translation(self, lang:str, moduleID:str, messageID:str, **args):
         result = None
         if lang == 'de':

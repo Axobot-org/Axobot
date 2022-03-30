@@ -1,4 +1,4 @@
-from utils import zbot, MyContext
+from utils import Zbot, MyContext
 from fcts.checks import is_fun_enabled
 import discord
 import random
@@ -32,13 +32,23 @@ async def can_say(ctx: MyContext):
         return await ctx.bot.get_cog("Servers").staff_finder(ctx.author,"say")
 
 async def can_use_cookie(ctx: MyContext):
-#                            Z_runner           neil3000            Awhikax           Adri         Theventreur         Catastrophix        Platon_Neutron      megat69            Aragorn1202
-    return ctx.author.id in [279568324260528128,278611007952257034,281404141841022976,409470110131027979,229194747862843392,438372385293336577,286827468445319168,517762101859844106,375598088850505728]
+    return ctx.author.id in [
+        279568324260528128, # Z_runner
+        278611007952257034, # neil3000
+        281404141841022976, # Awhikax
+        409470110131027979, # Adri
+        229194747862843392, # Theventreur
+        438372385293336577, # Catastrophix
+        286827468445319168, # Platon_Neutron
+        517762101859844106, # megat69
+        375598088850505728, # Aragorn1202
+        474255004358672395 # Clarity
+    ]
 
 class Fun(commands.Cog):
     """Add some fun commands, no obvious use. You can disable this module with the 'enable_fun' option (command 'config')"""
 
-    def __init__(self, bot: zbot):
+    def __init__(self, bot: Zbot):
         self.bot = bot
         self.fun_opt = dict()
         self.file = "fun"
@@ -571,8 +581,8 @@ You can specify a verification limit by adding a number in argument (up to 1.000
             await ctx.send(await self.bot._(ctx.channel,"fun","piece-1"))
         else:
             await ctx.send(random.choice(await self.bot._(ctx.channel,"fun","piece-0")))
-    
-    @commands.command(name="weather",aliases=['météo'])
+
+    @commands.command(name="weather",aliases=['météo'], enabled=False)
     @commands.cooldown(4, 30, type=commands.BucketType.guild)
     async def weather(self, ctx:MyContext, *, city:str):
         """Get the weather of a city
@@ -884,7 +894,7 @@ You can specify a verification limit by adding a number in argument (up to 1.000
         if last_incident['resolved_at'] is None:
             impact = await self.bot._(ctx.channel, "fun", "discordstatus-impacts")
             impact = impact.get(last_incident['impact'])
-            title = f"[{last_incident['name']}]({last_incident['shortlink']})"
+            title = f"{last_incident['name']} ({last_incident['shortlink']})"
             await ctx.send(await self.bot._(ctx.channel, "fun", "discordstatus-exists", impact=impact, title=title))
         else:
             last_date = datetime.datetime.strptime(last_incident['resolved_at'], '%Y-%m-%dT%H:%M:%S.%f%z')

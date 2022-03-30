@@ -9,7 +9,7 @@ from discord.ext import commands
 from typing import List
 from urllib.request import Request, build_opener
 
-from utils import zbot, MyContext
+from utils import Zbot, MyContext
 
 importlib.reload(args)
 
@@ -17,7 +17,7 @@ importlib.reload(args)
 class Utilities(commands.Cog):
     """This cog has various useful functions for the rest of the bot."""
 
-    def __init__(self, bot: zbot):
+    def __init__(self, bot: Zbot):
         self.bot = bot
         self.list_prefixs = dict()
         self.file = "utilities"
@@ -358,6 +358,8 @@ class Utilities(commands.Cog):
             liste.append('halloween20')
         if 'blurple_21' in unlocked:
             liste.append('blurple21')
+        if 'halloween_21' in unlocked:
+            liste.append('halloween21')
         return sorted(liste2)+sorted(liste)
 
     async def get_languages(self, user: discord.User, limit: int=0):
@@ -453,11 +455,12 @@ class Utilities(commands.Cog):
                 await self.bot.get_cog("Errors").on_error(e, None)
             try:  # https://discordlist.space/bot/486896267788812288
                 headers = {'Authorization': self.bot.others['discordlist.space']}
-                async with session.get('https://api.discordlist.space/v1/bots/486896267788812288/upvotes', headers=headers) as r:
-                    js = await r.json()
-                    if str(userid) in [x["user"]['id'] for x in js]:
-                        votes.append(
-                            ("discordlist.space", "https://discordlist.space/"))
+                async with session.get(f'https://api.discordlist.space/v2/bots/486896267788812288/upvotes/status/{userid}', headers=headers) as r:
+                    if r.status != 404:
+                        js = await r.json()
+                        if js["upvoted"]:
+                            votes.append(
+                                ("discordlist.space", "https://discordlist.space/"))
             except Exception as e:
                 await self.bot.get_cog("Errors").on_error(e, None)
             try:  # https://discord.boats/bot/486896267788812288

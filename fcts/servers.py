@@ -1,7 +1,6 @@
 import typing
-from utils import zbot, MyContext
+from utils import Zbot, MyContext
 import time
-import datetime
 import emoji
 import copy
 import discord
@@ -27,7 +26,7 @@ ttt_display_option = ["ttt_display"]
 class Servers(commands.Cog):
     """"Cog in charge of all the bot configuration management for your server. As soon as an option is searched, modified or deleted, this cog will handle the operations."""
 
-    def __init__(self, bot: zbot):
+    def __init__(self, bot: Zbot):
         self.bot = bot
         self.default_language = 'en'
         self.embed_color = discord.Colour(0x3fb9ef)
@@ -977,7 +976,7 @@ class Servers(commands.Cog):
             if len(liste) == 0:
                 return await ctx.send("NOPE")
             title = str(await self.bot._(channel,"server","see-1")).format(guild.name) + f" ({page}/{max_page})"
-            embed = self.bot.get_cog('Embeds').Embed(title=title, color=self.embed_color, desc=str(await self.bot._(guild.id,"server","see-0")), time=msg.created_at,thumbnail=guild.icon_url_as(format='png'))
+            embed = self.bot.get_cog('Embeds').Embed(title=title, color=self.embed_color, desc=str(await self.bot._(guild.id,"server","see-0")), time=msg.created_at,thumbnail=guild.icon.with_static_format('png'))
             diff = channel.guild != guild
             for i,v in liste.items():
                 #if i not in self.optionsList:
@@ -1082,7 +1081,7 @@ class Servers(commands.Cog):
                 if hasattr(ctx, "message"):
                     t = ctx.message.created_at
                 else:
-                    t = datetime.datetime.utcnow()
+                    t = ctx.bot.utcnow()
                 embed = self.bot.get_cog("Embeds").Embed(title=title, color=self.embed_color, desc=r, time=t)
                 if isinstance(ctx, commands.Context):
                     await embed.create_footer(ctx)

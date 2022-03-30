@@ -22,13 +22,13 @@ from math import sqrt
 from fcts import args, checks
 importlib.reload(args)
 importlib.reload(checks)
-from utils import zbot, MyContext
+from utils import Zbot, MyContext
 
 
 
 class Xp(commands.Cog):
 
-    def __init__(self, bot: zbot):
+    def __init__(self, bot: Zbot):
         self.bot = bot
         self.cache = {'global':{}}
         self.levels = [0]
@@ -345,7 +345,7 @@ class Xp(commands.Cog):
         emb = discord.Embed(
             title=f"#{msg.channel.name} | {msg.guild.name} | {msg.guild.id}",
             description=msg.content
-        ).set_footer(text=str(msg.author.id)).set_author(name=str(msg.author), icon_url=msg.author.avatar_url).add_field(name="XP given", value=str(xp))
+        ).set_footer(text=str(msg.author.id)).set_author(name=str(msg.author), icon_url=msg.author.display_avatar.url).add_field(name="XP given", value=str(xp))
         await chan.send(embed=emb)
 
 
@@ -607,7 +607,7 @@ class Xp(commands.Cog):
         elif align == 'right':
             return x-w,y-h/2
 
-    async def create_card(self, user, style, xp, used_system:int, rank=[1,0], txt=['NIVEAU','RANG'], force_static=False, levels_info=None):
+    async def create_card(self, user: discord.User, style, xp, used_system:int, rank=[1,0], txt=['NIVEAU','RANG'], force_static=False, levels_info=None):
         """Crée la carte d'xp pour un utilisateur"""
         card = Image.open("../cards/model/{}.png".format(style))
         bar_colors = await self.get_xp_bar_color(user.id)
@@ -619,8 +619,8 @@ class Xp(commands.Cog):
         
         name_fnt = ImageFont.truetype('Roboto-Medium.ttf', 40)
 
-        if not user.is_avatar_animated() or force_static:
-            pfp = await self.get_raw_image(user.avatar_url_as(format='png',size=256))
+        if not user.display_avatar.is_animated() or force_static:
+            pfp = await self.get_raw_image(user.display_avatar.replace(format="png", size=256))
             img = await self.bot.loop.run_in_executor(None,self.add_overlay,pfp.resize(size=(282,282)),user,card,xp,rank,txt,colors,levels_info,name_fnt)
             img.save('../cards/global/{}-{}-{}.png'.format(user.id,xp,rank[0]))
             card.close()
@@ -628,7 +628,7 @@ class Xp(commands.Cog):
 
         else:
             async with aiohttp.ClientSession() as cs:
-                async with cs.get(str(user.avatar_url_as(format='gif',size=256))) as r:
+                async with cs.get(str(user.display_avatar.replace(format='gif',size=256))) as r:
                     response = await r.read()
                     pfp = Image.open(BytesIO(response))
 
@@ -641,7 +641,7 @@ class Xp(commands.Cog):
                 img = ImageEnhance.Contrast(img).enhance(1.5).resize((800,265))
                 images.append(img)
                 duration.append(pfp.info['duration'])
-                
+
             card.close()
 
             # image_file_object = BytesIO()
@@ -781,12 +781,12 @@ class Xp(commands.Cog):
     
     async def send_card(self, ctx: MyContext, user: discord.User, xp, rank, ranks_nb, used_system, levels_info=None):
         try:
-            myfile = discord.File('../cards/global/{}-{}-{}.{}'.format(user.id,xp,rank,'gif' if user.is_avatar_animated() else 'png'))
+            myfile = discord.File('../cards/global/{}-{}-{}.{}'.format(user.id,xp,rank,'gif' if user.display_avatar.is_animated() else 'png'))
         except FileNotFoundError:
             style = await self.bot.get_cog('Utilities').get_xp_style(user)
             txts = [await self.bot._(ctx.channel,'xp','card-level'), await self.bot._(ctx.channel,'xp','card-rank')]
             static = await self.bot.get_cog('Utilities').get_db_userinfo(['animated_card'],[f'`userID`={user.id}'])
-            if user.is_avatar_animated():
+            if user.display_avatar.is_animated():
                 if static is not None:
                     static = not static['animated_card']
                 else:
@@ -922,7 +922,7 @@ class Xp(commands.Cog):
         else:
             t = await self.bot._(ctx.channel,'xp','top-title-1')
         if ctx.can_send_embed:
-            emb = await self.bot.get_cog('Embeds').Embed(title=t,fields=[{'name':f_name,'value':"\n".join(txt)},your_rank],color=self.embed_color,author_icon=self.bot.user.avatar_url_as(format='png')).create_footer(ctx)
+            emb = await self.bot.get_cog('Embeds').Embed(title=t,fields=[{'name':f_name,'value':"\n".join(txt)},your_rank],color=self.embed_color,author_icon=self.bot.user.display_avatar.with_format("png")).create_footer(ctx)
             await ctx.send(embed=emb)
         else:
             await ctx.send(f_name+"\n\n"+'\n'.join(txt))

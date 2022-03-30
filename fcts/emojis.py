@@ -3,7 +3,7 @@
 
 import requests, string
 from discord.ext import commands
-from utils import zbot
+from utils import Zbot
 
 #https://github.com/ttacon/emoji/blob/master/emoji.go
 
@@ -942,7 +942,7 @@ characteres = {':': 582223307944886292,
 class Emojis(commands.Cog):
 	"""Cog for managing emojis. No more, no less."""
 	
-	def __init__(self, bot: zbot):
+	def __init__(self, bot: Zbot):
 		self.bot = bot
 		self.emojiMap = emojiMap
 		self.file = "emojis"

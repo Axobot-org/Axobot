@@ -14,7 +14,7 @@ from discord.ext.commands import Cog
 from libs import halloween
 from libs.halloween import convert_image, check_image
 importlib.reload(halloween)
-from utils import zbot, MyContext
+from utils import Zbot, MyContext
 
 
 class LinkConverter(commands.Converter):
@@ -67,27 +67,27 @@ def _make_check_command(name: str, parent: commands.Group, **kwargs):
         if ctx.message.attachments:
             url = ctx.message.attachments[0].proxy_url
         elif who is None:
-            url = ctx.author.avatar_url
+            url = ctx.author.display_avatar.url
         else:
             if isinstance(who, str):  # LinkConverter
                 url = who
             elif isinstance(who, discord.PartialEmoji):
                 url = who.url
             else:
-                url = who.avatar_url
+                url = who.display_avatar.url
 
         old_msg = await ctx.send("Starting check for {}...".format(ctx.author.mention))
         async with aiohttp.ClientSession() as session:
             async with session.get(str(url)) as image:
-                r = await check_image(await image.read(), theme, name)
+                result = await check_image(await image.read(), theme, name)
         answer = "\n".join(
-            ["> {}: {}%".format(color["name"], color["ratio"]) for color in r['colors']])
+            ["> {}: {}%".format(color["name"], color["ratio"]) for color in result['colors']])
         await ctx.send(f"Results for {ctx.author.mention}:\n"+answer)
-        if r["passed"] and ctx.author.id not in self.cache:
+        if result["passed"] and ctx.author.id not in self.cache:
             await self.bot.get_cog("Utilities").add_user_eventPoint(ctx.author.id, 40)
             self.cache.append(ctx.author.id)
-            with open("halloween-cache.json", "w") as f:
-                json.dump(self.cache, f)
+            with open("halloween-cache.json", "w") as file:
+                json.dump(self.cache, file)
             await ctx.send(f"{ctx.author.mention} you just won 40 event xp thanks to your hallow-iful picture!")
         await old_msg.delete()
 
@@ -113,14 +113,14 @@ def _make_color_command(name, fmodifier, parent, **kwargs):
         if ctx.message.attachments:
             url = ctx.message.attachments[0].proxy_url
         elif who is None:
-            url = ctx.author.avatar_url
+            url = ctx.author.display_avatar.url
         else:
             if isinstance(who, str):  # LinkConverter
                 url = who
             elif isinstance(who, discord.PartialEmoji):
                 url = who.url
             else:
-                url = who.avatar_url
+                url = who.display_avatar.url
 
         if fmodifier == 'hallowify':
             final_modifier = "light"
@@ -146,7 +146,7 @@ def _make_color_command(name, fmodifier, parent, **kwargs):
 
 
 class Halloween(Cog):
-    def __init__(self, bot: zbot):
+    def __init__(self, bot: Zbot):
         self.bot = bot
         self.file = "halloween"
         self.hourly_reward = [4, 17]
@@ -158,13 +158,13 @@ class Halloween(Cog):
                 f.write('[]')
             self.cache = list()
 
-    async def get_default_halloweefier(self, ctx: MyContext):
+    async def get_default_halloweefier(self, _ctx: MyContext):
         return "--hallowify"
 
     @commands.group(name="halloween", aliases=["hw"])
     @commands.check(is_halloween)
     async def hallow_main(self, ctx: MyContext):
-        """Hallowify and be happy for the spooky month! Change your avatar color, check if an image is orange enough, and collect event points to unlock a collector Halloween 2020 card!
+        """Hallowify and be happy for the spooky month! Change your avatar color, check if an image is orange enough, and collect event points to unlock a collector Halloween 2021 card!
         
 A BIG thanks to the Project Blurple and their original code for the colorization part.
 
@@ -179,8 +179,9 @@ A BIG thanks to the Project Blurple and their original code for the colorization
 ..Example hw check dark
 
 ..Example hw collect"""
-        pass
-    
+        if ctx.subcommand_passed is None:
+            await self.bot.get_cog('Help').help_command(ctx,['halloween'])
+
     lightfy = _make_color_command('lightfy', 'light', hallow_main)
     darkfy = _make_color_command('darkfy', 'dark', hallow_main)
     hallowify = _make_color_command('hallowify', 'hallowify', hallow_main)
