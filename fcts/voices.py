@@ -3,12 +3,12 @@ import aiohttp
 from discord.ext import commands
 
 from fcts import checks
-from utils import zbot, MyContext
+from utils import Zbot, MyContext
 
 
 class VoiceChannels(commands.Cog):
 
-    def __init__(self, bot: zbot):
+    def __init__(self, bot: Zbot):
         self.bot = bot
         self.file = "voices"
         self.names = list()

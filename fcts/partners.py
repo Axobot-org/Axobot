@@ -8,11 +8,11 @@ from discord.ext import commands
 from fcts import args, checks
 importlib.reload(args)
 importlib.reload(checks)
-from utils import zbot, MyContext
+from utils import Zbot, MyContext
 
 class Partners(commands.Cog):
 
-    def __init__(self, bot: zbot):
+    def __init__(self, bot: Zbot):
         self.bot = bot
         self.file = 'partners'
         self.table = 'partners_beta' if bot.beta else 'partners'
@@ -208,15 +208,17 @@ class Partners(commands.Cog):
             if owners:
                 fields.append({'name': tr_owner.capitalize(),
                               'value': ", ".join([str(u) for u in owners])})
-            image = str(await self.bot.user_avatar_as(await self.bot.fetch_user(int(partner['target']))))
+            usr = await self.bot.fetch_user(int(partner['target']))
+            image = usr.display_avatar.with_static_format("png") if usr else ""
         except discord.NotFound:
             title += "ID: "+partner['target']
         except Exception as e:
-            image = str(await self.bot.user_avatar_as(await self.bot.fetch_user(int(partner['target']))))
+            usr = await self.bot.fetch_user(int(partner['target']))
+            image = usr.display_avatar.url if usr else ""
             await self.bot.get_cog("Errors").on_error(e, None)
         perm = discord.Permissions.all()
         perm.update(administrator=False)
-        oauth_url = discord.utils.oauth_url(partner['target'], perm)
+        oauth_url = discord.utils.oauth_url(partner['target'], permissions=perm)
         fields.append({'name': tr_invite.capitalize(),
                       'value': f'[Click here]({oauth_url})'})
         return title, fields, image
@@ -228,7 +230,7 @@ class Partners(commands.Cog):
             inv = await self.bot.fetch_invite(partner['target'])
         except discord.errors.NotFound as e:
             raise e
-        image = str(inv.guild.icon_url)
+        image = str(inv.guild.icon)
         if isinstance(inv, discord.Invite) and not inv.revoked:
             title += inv.guild.name
             field1 = {'name': tr_members.capitalize(), 'value': str(
@@ -245,21 +247,23 @@ class Partners(commands.Cog):
 
     async def give_roles(self,invite:discord.Invite,guild:discord.Guild):
         """Give a role to admins of partners"""
-        if isinstance(invite.guild,discord.Guild):
-            if guild.id == 356067272730607628 and self.bot.beta:
-                return
-            roles = await self.bot.get_config(guild.id,'partner_role')
-            roles = [x for x in [guild.get_role(int(x)) for x in roles.split(';') if len(x) > 0 and x.isnumeric()] if x is not None]
-            admins = [x for x in invite.guild.members if x.guild_permissions.administrator]
-            for admin in admins:
-                if admin in guild.members:
-                    member = guild.get_member(admin.id)
-                    for role in roles:
-                        if role not in member.roles:
-                            try:
-                                await member.add_roles(role)
-                            except:
-                                pass
+        if not isinstance(invite.guild,discord.Guild):
+            return
+        if guild.id == 356067272730607628 and self.bot.beta:
+            return
+        roles = await self.bot.get_config(guild.id,'partner_role')
+        roles = (guild.get_role(int(x)) for x in roles.split(';') if len(x) > 0 and x.isnumeric())
+        roles = (x for x in roles if x is not None)
+        admins = [x for x in invite.guild.members if not x.bot and x.guild_permissions.administrator]
+        for admin in admins:
+            if admin in guild.members:
+                member = guild.get_member(admin.id)
+                for role in roles:
+                    if role not in member.roles:
+                        try:
+                            await member.add_roles(role)
+                        except (discord.HTTPException, discord.Forbidden):
+                            pass
 
 
     @commands.group(name="partner",aliases=['partners'])
@@ -274,6 +278,7 @@ class Partners(commands.Cog):
 
     @partner_main.command(name='add')
     @commands.check(checks.database_connected)
+    @commands.check(checks.has_admin)
     async def partner_add(self, ctx: MyContext, invite:args.Invite, *, description=''):
         """Add a partner in your list
 
@@ -311,6 +316,7 @@ class Partners(commands.Cog):
     
     @partner_main.command(name='description',aliases=['desc'])
     @commands.check(checks.database_connected)
+    @commands.check(checks.has_admin)
     async def partner_desc(self, ctx: MyContext, ID:int, *, description:str):
         """Add or modify a description for a partner
 
@@ -328,6 +334,7 @@ class Partners(commands.Cog):
             await ctx.send(await self.bot._(ctx.guild.id,'partners','unknown-error'))
 
     @partner_main.command(name='invite')
+    @commands.check(checks.has_manage_guild)
     async def partner_invite(self, ctx: MyContext, ID:int, new_invite:discord.Invite=None):
         """Get the invite of a guild partner. 
         If you specify an invite, the partner will be updated with this new invite
@@ -436,13 +443,13 @@ class Partners(commands.Cog):
             color = await ctx.bot.get_config(ctx.guild.id,'partner_color')
             if color is None:
                 color = self.bot.get_cog('Servers').default_opt['partner_color']
-            emb = await ctx.bot.get_cog('Embeds').Embed(title=fields_name[0],fields=[{'name':fields_name[1],'value':f[0]},{'name':'​','value':'​'},{'name':fields_name[2],'value':f[1]}],color=color,thumbnail=ctx.guild.icon_url).update_timestamp().create_footer(ctx)
+            emb = await ctx.bot.get_cog('Embeds').Embed(title=fields_name[0],fields=[{'name':fields_name[1],'value':f[0]},{'name':'​','value':'​'},{'name':fields_name[2],'value':f[1]}],color=color,thumbnail=ctx.guild.icon).update_timestamp().create_footer(ctx)
             await ctx.send(embed=emb.discord_embed())
         else:
             await ctx.send(f"__{fields_name[0]}:__\n{f[0]}\n\n__{fields_name[1]}:__\n{f[1]}")
 
     @partner_main.command(name="color",aliases=['colour'])
-    @commands.check(checks.has_manage_guild)
+    @commands.check(checks.has_admin)
     async def partner_color(self, ctx: MyContext, color):
         """Change the color of the partners embed
     It has the same result as `config change partner_color`
@@ -455,7 +462,7 @@ class Partners(commands.Cog):
         await self.bot.get_cog('Servers').conf_color(ctx,'partner_color',str(color))
     
     @partner_main.command(name='reload')
-    @commands.check(checks.has_admin)
+    @commands.check(checks.has_manage_guild)
     @commands.cooldown(1,60,commands.BucketType.guild)
     async def partner_reload(self, ctx: MyContext):
         """Reload your partners channel

@@ -1,7 +1,7 @@
 import discord
 import datetime
 import time
-from utils import zbot
+from utils import Zbot
 
 fr_months = ["Janvier","Février","Mars","Avril","Mai","Juin","Juillet","Aout","Septembre","Octobre","Novembre","Décembre"]
 en_months = ["January","February","March","April","May","June","July","August","September","October","November","December"]
@@ -9,7 +9,7 @@ fi_months = ['tammikuu','helmikuu','maaliskuu','huhtikuu','toukokuu','kesäkuu',
 
 class TimeUtils(discord.ext.commands.Cog):
     """This cog handles all manipulations of date, time, and time interval. So cool, and so fast"""
-    def __init__(self, bot: zbot):
+    def __init__(self, bot: Zbot):
         self.bot = bot
         self.file = "timeutils"
 

@@ -1,3 +1,4 @@
+import datetime
 import discord
 from discord.ext import commands
 import logging
@@ -16,6 +17,8 @@ OUTAGE_REASON = {
 class MyContext(commands.Context):
     """Replacement for the official commands.Context class
     It allows us to add more methods and properties in the whole bot code"""
+
+    bot: 'Zbot'
 
     @property
     def bot_permissions(self) -> discord.Permissions:
@@ -43,7 +46,7 @@ class MyContext(commands.Context):
         return await super().send(*args, **kwargs)
 
 
-def get_prefix(bot:"zbot", msg: discord.Message) -> list:
+def get_prefix(bot:"Zbot", msg: discord.Message) -> list:
     """Get the correct bot prefix from a message
     Prefix can change based on guild, but the bot mention will always be an option"""
     if bot.database_online:
@@ -69,12 +72,13 @@ def get_prefix(bot:"zbot", msg: discord.Message) -> list:
     return commands.when_mentioned_or(*prefixes)(bot, msg)
 
 
-class zbot(commands.bot.AutoShardedBot):
+class Zbot(commands.bot.AutoShardedBot):
     """Bot class, with everything needed to run it"""
 
     def __init__(self, case_insensitive: bool = None, status: discord.Status = None, database_online: bool = True, beta: bool = False, dbl_token: str = "", zombie_mode: bool = False):
+        # pylint: disable=assigning-non-slot
         # defining allowed default mentions
-        ALLOWED = discord.AllowedMentions(everyone=False, roles=False)
+        allowed_mentions = discord.AllowedMentions(everyone=False, roles=False)
         # defining intents usage
         intents = discord.Intents.all()
         intents.typing = False
@@ -82,8 +86,8 @@ class zbot(commands.bot.AutoShardedBot):
         intents.integrations = False
         # we now initialize the bot class
         super().__init__(command_prefix=get_prefix, case_insensitive=case_insensitive,
-                         status=status, allowed_mentions=ALLOWED, intents=intents)
-        self.database_online = database_online # if the mysql database works
+                         status=status, allowed_mentions=allowed_mentions, intents=intents, enable_debug_events=True)
+        self.database_online = database_online  # if the mysql database works
         self.beta = beta # if the bot is in beta mode
         self.database_keys = dict() # credentials for the database
         self.log = logging.getLogger("runner") # logs module
@@ -194,26 +198,14 @@ class zbot(commands.bot.AutoShardedBot):
         else:
             raise ValueError(dict)
 
-    async def user_avatar_as(self, user: discord.User, size: int = 512) -> discord.Asset:
-        """Get the avatar of an user, format gif or png (as webp isn't supported by some browsers)"""
-        if not isinstance(user, (discord.User, discord.Member, discord.ClientUser)):
-            raise ValueError
-        try:
-            if user.is_avatar_animated():
-                return user.avatar_url_as(format='gif', size=size)
-            else:
-                return user.avatar_url_as(format='png', size=size)
-        except Exception as e:
-            await self.get_cog('Errors').on_error(e, None)
-
     class SafeDict(dict):
         def __missing__(self, key):
             return '{' + key + '}'
 
-    async def get_prefix(self, msg: discord.Message):
+    async def get_prefix(self, message: discord.Message):
         """Get a prefix from a message... what did you expect?"""
-        return get_prefix(self, msg)
-    
+        return get_prefix(self, message)
+
     async def get_config(self, guildID: int, option: str) -> Optional[str]:
         cog = self.get_cog("Servers")
         if cog:
@@ -221,7 +213,11 @@ class zbot(commands.bot.AutoShardedBot):
                 return await cog.get_option(guildID, option)
             return cog.default_opt.get(option, None)
         return None
-    
+
+    def utcnow(self) -> datetime.datetime:
+        """Get the current date and time with UTC timezone"""
+        return datetime.datetime.now(datetime.timezone.utc)
+
     @property
     def _(self) -> Callable[[Any, str, str], Coroutine[Any, Any, str]]:
         """Translate something"""
@@ -233,64 +229,65 @@ class zbot(commands.bot.AutoShardedBot):
 
 
 class RankCardsFlag:
-        FLAGS = {
-            1 << 0: "rainbow",
-            1 << 1: "blurple_19",
-            1 << 2: "blurple_20",
-            1 << 3: "christmas_19",
-            1 << 4: "christmas_20",
-            1 << 5: "halloween_20",
-            1 << 6: "blurple_21"
-        }
+    FLAGS = {
+        1 << 0: "rainbow",
+        1 << 1: "blurple_19",
+        1 << 2: "blurple_20",
+        1 << 3: "christmas_19",
+        1 << 4: "christmas_20",
+        1 << 5: "halloween_20",
+        1 << 6: "blurple_21",
+        1 << 7: "halloween_21"
+    }
 
-        def flagsToInt(self, flags: list) -> int:
-            r = 0
-            for k, v in self.FLAGS.items():
-                if v in flags:
-                    r |= k
-            return r
+    def flagsToInt(self, flags: list) -> int:
+        r = 0
+        for k, v in self.FLAGS.items():
+            if v in flags:
+                r |= k
+        return r
 
-        def intToFlags(self, i: int) -> list:
-            return [v for k, v in self.FLAGS.items() if i & k == k]
+    def intToFlags(self, i: int) -> list:
+        return [v for k, v in self.FLAGS.items() if i & k == k]
 
 class UserFlag:
-        FLAGS = {
-            1 << 0: "support",
-            1 << 1: "contributor",
-            1 << 2: "premium",
-            1 << 3: "partner",
-            1 << 4: "translator"
-        }
+    FLAGS = {
+        1 << 0: "support",
+        1 << 1: "contributor",
+        1 << 2: "premium",
+        1 << 3: "partner",
+        1 << 4: "translator"
+    }
 
-        def flagsToInt(self, flags: list) -> int:
-            r = 0
-            for k, v in self.FLAGS.items():
-                if v in flags:
-                    r |= k
-            return r
+    def flagsToInt(self, flags: list) -> int:
+        r = 0
+        for k, v in self.FLAGS.items():
+            if v in flags:
+                r |= k
+        return r
 
-        def intToFlags(self, i: int) -> list:
-            return [v for k, v in self.FLAGS.items() if i & k == k]
+    def intToFlags(self, i: int) -> list:
+        return [v for k, v in self.FLAGS.items() if i & k == k]
 
 def setup_logger():
     """Create the logger module, used for logs"""
     # on chope le premier logger
     log = logging.getLogger("runner")
     # on définis un formatteur
-    format = logging.Formatter("%(asctime)s %(levelname)s: %(message)s", datefmt="[%d/%m/%Y %H:%M]")
+    log_format = logging.Formatter("%(asctime)s %(levelname)s: %(message)s", datefmt="[%d/%m/%Y %H:%M]")
     # ex du format : [08/11/2018 14:46] WARNING Rss fetch_rss_flux l.288 : Cannot get the RSS flux because of the following error: (suivi du traceback)
 
     # log vers un fichier
     file_handler = logging.FileHandler("debug.log")
     # tous les logs de niveau DEBUG et supérieur sont evoyés dans le fichier
     file_handler.setLevel(logging.DEBUG)
-    file_handler.setFormatter(format)
+    file_handler.setFormatter(log_format)
 
     # log vers la console
     stream_handler = logging.StreamHandler(sys.stdout)
     # tous les logs de niveau INFO et supérieur sont evoyés dans le fichier
     stream_handler.setLevel(logging.INFO)
-    stream_handler.setFormatter(format)
+    stream_handler.setFormatter(log_format)
 
     # supposons que tu veuille collecter les erreurs sur ton site d'analyse d'erreurs comme sentry
     #sentry_handler = x

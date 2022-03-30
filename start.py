@@ -8,35 +8,31 @@ if py_version.major != 3 or py_version.minor < 9:
     print("You must use at least Python 3.9!", file=sys.stderr)
     sys.exit(1)
 
+import pkg_resources
+
 def check_libs():
-    count = 0
-    for m in ["mysql","discord","frmc_lib","aiohttp","requests","re","asyncio","datetime","time","importlib","traceback","logging","psutil","platform","subprocess",'json','emoji','imageio','geocoder','tzwhere','pytz','twitter','isbnlib']:
-        try:
-            exec("import "+m)
-            exec("del "+m)
-        except ModuleNotFoundError:
-            print("Library {} missing".format(m))
-            count +=1
-    if count > 0:
-        return False
-    del count
-    return True
+    """Check if the required libraries are installed and can be imported"""
+    with open("requirements.txt", 'r') as file:
+        packages = pkg_resources.parse_requirements(file.readlines())
+    pkg_resources.working_set.resolve(packages)
 
 
-if check_libs():
-    import discord, sys, traceback, asyncio, time, logging, os, mysql.connector, datetime, json
-    from signal import SIGTERM
-    from random import choice
-    from fcts import cryptage, tokens # pylint: disable=no-name-in-module
-    from utils import zbot, setup_logger
-else:
-    import sys
-    print("End of program")
-    sys.exit()
+check_libs()
 
+import discord
+import traceback
+import asyncio
+import time
+import logging
+import os
+import mysql.connector
+from signal import SIGTERM
+from random import choice
+from fcts import cryptage, tokens # pylint: disable=no-name-in-module
+from utils import Zbot, setup_logger
 
 def main():
-    client = zbot(case_insensitive=True,status=discord.Status('online'))
+    client = Zbot(case_insensitive=True,status=discord.Status('online'))
 
     log = setup_logger()
     log.setLevel(logging.DEBUG)
@@ -67,7 +63,7 @@ def main():
                       'fcts.servers',
                       'fcts.timers',
                       'fcts.timeutils',
-                      'fcts.translations',
+                    #   'fcts.translations',
                       'fcts.users',
                       'fcts.utilities',
                       'fcts.voices',
@@ -138,8 +134,8 @@ def main():
             print("\n{} modules not loaded\nEnd of program".format(count))
             sys.exit()
     del count
-    
-    
+
+
     async def on_ready():
         print('\nBot connected')
         print("Name : "+client.user.name)
@@ -164,8 +160,8 @@ def main():
 
     async def sigterm_handler(bot):
         print("SIGTERM received. Disconnecting...")
-        await bot.logout()
-    
+        await bot.close()
+
     asyncio.get_event_loop().add_signal_handler(SIGTERM, lambda: asyncio.ensure_future(sigterm_handler(client)))
 
     if client.database_online:
@@ -211,5 +207,5 @@ def main():
     client.run(token)
 
 
-if check_libs() and __name__ == "__main__":
+if __name__ == "__main__":
     main()

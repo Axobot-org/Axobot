@@ -1,6 +1,6 @@
 import discord, importlib, typing
 from discord.ext import commands
-from utils import zbot, MyContext
+from utils import Zbot, MyContext
 
 from fcts import args, reloads
 importlib.reload(args)
@@ -17,7 +17,7 @@ async def can_edit_case(ctx):
 class Cases(commands.Cog):
     """This part of the bot allows you to manage all your members' cases, to delete or edit them"""
 
-    def __init__(self, bot: zbot):
+    def __init__(self, bot: Zbot):
         self.bot = bot
         self.file = "cases"
         if bot.user is not None:
@@ -28,7 +28,7 @@ class Cases(commands.Cog):
         self.table = 'cases_beta' if self.bot.beta else 'cases'
 
     class Case:
-        def __init__(self,bot:zbot,guildID:int,memberID:int,Type,ModID:int,Reason,date,duration=None,caseID=None):
+        def __init__(self,bot:Zbot,guildID:int,memberID:int,Type,ModID:int,Reason,date,duration=None,caseID=None):
             self.bot = bot
             self.guild = guildID
             self.id = caseID
@@ -215,8 +215,8 @@ class Cases(commands.Cog):
                 if u is None:
                     embed.set_author(name=str(user))
                 else:
-                    embed.set_author(name="Cases from "+str(u), icon_url=str(u.avatar_url_as(format='png')))
-                embed.set_footer(text="Requested by {}".format(ctx.author), icon_url=str(ctx.author.avatar_url_as(format='png')))
+                    embed.set_author(name="Cases from "+str(u), icon_url=str(u.display_avatar.with_format("png")))
+                embed.set_footer(text="Requested by {}".format(ctx.author), icon_url=str(ctx.author.display_avatar.with_format("png")))
                 if len(cases) > 0:
                     l = await self.bot._(ctx.guild.id,"current_lang","current")
                     for x in cases:
