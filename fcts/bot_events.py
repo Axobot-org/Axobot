@@ -53,7 +53,7 @@ class BotEvents(commands.Cog):
     def __init__(self, bot: Zbot):
         self.bot = bot
         self.file = "bot_events"
-        self.hourly_reward = [3, 19]
+        self.hourly_reward = [-8, 20]
         self.current_event: str = None
         self.current_event_data: dict = {}
         self.current_event_id: str = None
