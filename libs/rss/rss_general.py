@@ -122,7 +122,7 @@ class RssMessage:
         if msg_format is None:
             msg_format = self.format
         if isinstance(self.date, datetime.datetime):
-            date = f"<t:{self.date.timestamp():.0f}:d> <t:{self.date.timestamp():.0f}:T>"
+            date = f"<t:{self.date.timestamp():.0f}>"
         else:
             date = self.date
         msg_format = msg_format.replace('\\n','\n')
