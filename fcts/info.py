@@ -1200,12 +1200,12 @@ Servers:
         ..Doc miscellaneous.html#changelogs"""
         if version=='list':
             if not ctx.bot.beta:
-                query = "SELECT `version`, CONVERT_TZ(`release_date`, @@session.time_zone, '+00:00') AS `utc_release` FROM `changelogs` WHERE beta=False ORDER BY release_date"
+                query = "SELECT `version`, `release_date` FROM `changelogs` WHERE beta=False ORDER BY release_date"
             else:
-                query = f"SELECT `version`, CONVERT_TZ(`release_date`, @@session.time_zone, '+00:00') AS `utc_release` FROM `changelogs` ORDER BY release_date"
+                query = f"SELECT `version`, `release_date` FROM `changelogs` ORDER BY release_date"
             async with self.bot.db_query(query) as query_results:
                 results = query_results
-            desc = "\n".join(reversed(["**v{}:** <t:{:.0f}>".format(x['version'],x['utc_release'].timestamp()) for x in results]))
+            desc = "\n".join(reversed(["**v{}:** <t:{:.0f}>".format(x['version'],x['release_date'].timestamp()) for x in results]))
             time = discord.Embed.Empty
             title = await self.bot._(ctx.channel,'info.changelogs.index')
         else:
