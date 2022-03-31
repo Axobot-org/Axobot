@@ -1205,7 +1205,7 @@ Servers:
                 query = f"SELECT `version`, CONVERT_TZ(`release_date`, @@session.time_zone, '+00:00') AS `utc_release` FROM `changelogs` ORDER BY release_date"
             async with self.bot.db_query(query) as query_results:
                 results = query_results
-            desc = "\n".join(reversed(["**v{}:** {}".format(x['version'],x['utc_release']) for x in results]))
+            desc = "\n".join(reversed(["**v{}:** <t:{:.0f}>".format(x['version'],x['utc_release'].timestamp()) for x in results]))
             time = discord.Embed.Empty
             title = await self.bot._(ctx.channel,'info.changelogs.index')
         else:
