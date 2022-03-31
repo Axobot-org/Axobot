@@ -1260,7 +1260,7 @@ Servers:
         if ctx.can_send_embed:
             MAX = 28
             date = ""
-            desc = None
+            desc = discord.embeds.EmptyEmbed
             fields = list()
             if len(global_list) > 0:
             # Usernames part
