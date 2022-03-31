@@ -212,6 +212,8 @@ class Utilities(commands.Cog):
             liste.append('blurple21')
         if 'halloween_21' in unlocked:
             liste.append('halloween21')
+        if 'april_22' in unlocked:
+            liste.append('april22')
         return sorted(liste2)+sorted(liste)
 
     async def get_languages(self, user: discord.User, limit: int=0):
