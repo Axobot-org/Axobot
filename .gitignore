@@ -19,6 +19,7 @@ env/
 
 # Miscellaneous
 *.log
+*.log.*
 ._*
 translation/*
 docs/_*

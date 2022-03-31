@@ -223,7 +223,7 @@ class ServerLogs(commands.Cog):
     async def on_message_delete(self, msg: discord.Message):
         """Triggered when a message is deleted
         Corresponding log: message_delete"""
-        if not msg.guild or msg.author == self.bot:
+        if not msg.guild or msg.author == self.bot.user:
             return
         if channel_ids := await self.is_log_enabled(msg.guild.id, "message_delete"):
             emb = discord.Embed(
