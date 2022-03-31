@@ -327,16 +327,16 @@ class Rss(commands.Cog):
                 channel = flow['channel']
             # flow mentions
             if flow['roles'] == '':
-                role = await self.bot._(ctx.guild.id, "misc.none")
+                roles = await self.bot._(ctx.guild.id, "misc.none")
             else:
-                role = list()
+                roles = []
                 for item in flow['roles'].split(';'):
                     role = discord.utils.get(ctx.guild.roles,id=int(item))
                     if role is not None:
-                        role.append(role.mention)
+                        roles.append(role.mention)
                     else:
-                        role.append(item)
-                role = ", ".join(role)
+                        roles.append(item)
+                roles = ", ".join(roles)
             flow_type = await self.bot._(ctx.guild.id,"rss."+flow['type'])
             # flow name
             flow_name = flow['link']
@@ -355,7 +355,7 @@ class Rss(commands.Cog):
                     embed.add_field(name=self.bot.zws, value=text, inline=False)
                 await ctx.send(embed=embed)
                 flows_to_display.clear()
-            flows_to_display.append(translation.format(flow_type,channel,flow_name,role,flow['ID'],flow['date']))
+            flows_to_display.append(translation.format(flow_type,channel,flow_name,roles,flow['ID'],flow['date']))
         if len(flows_to_display) > 0:
             embed = discord.Embed(title=title, color=self.embed_color, timestamp=ctx.message.created_at)
             embed.set_footer(text=ctx.author, icon_url=ctx.author.display_avatar)
@@ -414,97 +414,6 @@ class Rss(commands.Cog):
             return
         return selection
 
-    async def ask_rss_id_old(self, input_id: Optional[int], ctx: MyContext, title:str, allow_mc: bool=False, display_mentions: bool=True):
-        """Demande l'ID d'un flux rss"""
-        flow = list()
-        if input_id is not None:
-            input_flow = await self.get_flow(input_id)
-            if input_flow is None:
-                input_id = None
-            elif str(input_flow['guild']) != str(ctx.guild.id):
-                input_id = None
-            elif (not allow_mc) and input_flow['type']=='mc':
-                input_id = None
-            else:
-                flow = [input_flow]
-        userid = ctx.author.id
-        if input_id is None:
-            gl = await self.get_guild_flows(ctx.guild.id)
-            if len(gl) == 0:
-                await ctx.send(await self.bot._(ctx.guild.id, "rss.no-feed"))
-                return
-            if display_mentions:
-                text = [await self.bot._(ctx.guild.id, "rss.list")]
-            else:
-                text = [await self.bot._(ctx.guild.id, "rss.list2")]
-            list_of_ids = list()
-            iterator = 1
-            translations = dict()
-            for x in gl:
-                if (not allow_mc) and x['type'] == 'mc':
-                    continue
-                if x['type'] == 'tw' and x['link'].isnumeric():
-                    try:
-                        x['link'] = (await self.twitter_rss.get_user_from_id(int(x['link']))).screen_name
-                    except twitter.TwitterError as err:
-                        self.bot.log.debug(f"[rss:askID] Twitter error: {err}")
-                list_of_ids.append(x['ID'])
-                c = self.bot.get_channel(x['channel'])
-                if c is not None:
-                    c = c.mention
-                else:
-                    c = x['channel']
-                Type = translations.get(x['type'], await self.bot._(ctx.guild.id,"rss."+x['type']))
-                if display_mentions:
-                    if x['roles'] == '':
-                        r = await self.bot._(ctx.guild.id, "misc.none")
-                    else:
-                        r = list()
-                        for item in x['roles'].split(';'):
-                            role = discord.utils.get(ctx.guild.roles,id=int(item))
-                            if role is not None:
-                                r.append(role.mention)
-                            else:
-                                r.append(item)
-                        r = ", ".join(r)
-                    text.append("{}) {} - {} - {} - {}".format(iterator, Type, x['link'], c, r))
-                else:
-                    text.append("{}) {} - {} - {}".format(iterator, Type, x['link'], c))
-                iterator += 1
-            if len("\n".join(text)) < 2048:
-                desc = "\n".join(text)
-                fields = ()
-            else:
-                desc = text[0].split("\n")[0]
-                fields = []
-                field = {'name': text[0].split("\n")[-2], 'value': ''}
-                for line in text[1:]:
-                    if len(field['value'] + line) > 1020:
-                        fields.append(field)
-                        field = {'name': text[0].split("\n")[-2], 'value': ''}
-                    field['value'] += line+"\n"
-                fields.append(field)
-            embed = discord.Embed(title=title, color=self.embed_color, description=desc, timestamp=ctx.message.created_at)
-            embed.set_footer(text=ctx.author, icon_url=ctx.author.display_avatar)
-            for field in fields:
-                embed.add_field(**field)
-            emb_msg = await ctx.send(embed=embed)
-            def check(msg: discord.Message):
-                if not msg.content.isnumeric():
-                    return False
-                return msg.author.id==userid and int(msg.content) in range(1,iterator)
-            try:
-                msg = await self.bot.wait_for('message', check = check, timeout = max(20, 1.5*len(text)))
-            except asyncio.TimeoutError:
-                await ctx.send(await self.bot._(ctx.guild.id, "rss.too-long"))
-                await emb_msg.delete(delay=0)
-                return
-            flow = [await self.get_flow(list_of_ids[int(msg.content)-1])]
-        if len(flow) == 0:
-            await ctx.send(await self.bot._(ctx.guild, "rss.fail-add"))
-            return
-        return flow
-
     def parse_output(self, arg):
         r = re.findall(r'((?<![\\])[\"])((?:.(?!(?<![\\])\1))*.?)\1', arg)
         if len(r) > 0:
@@ -531,18 +440,18 @@ class Rss(commands.Cog):
         ..Doc rss.html#mention-a-role"""
         try:
             # ask for flow ID
-            flow = await self.ask_rss_id(ID,
+            flows = await self.ask_rss_id(ID,
                                     ctx,
                                     await self.bot._(ctx.guild.id, "rss.choose-mentions-1"))
         except Exception as e:
-            flow = []
+            flows = []
             await self.bot.get_cog("Errors").on_error(e,ctx)
-        if flow is None:
+        if flows is None:
             return
-        if len(flow) == 0:
+        if len(flows) == 0:
             await ctx.send(await self.bot._(ctx.guild, "rss.fail-add"))
             return
-        flow = flow[0]
+        flow = await self.get_flow(flows[0])
         no_role = ['aucun','none','_','del']
         if mentions is None: # if no roles was specified: we ask for them
             if flow['roles'] == '':
