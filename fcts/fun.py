@@ -697,8 +697,9 @@ You can specify a verification limit by adding a number in argument (up to 1.000
                 await self.bot.invoke(new_ctx)
 
 
-    @commands.command(name='embed',hidden=False)
+    @commands.command(name="embed",hidden=False)
     @commands.check(checks.has_embed_links)
+    @commands.check(can_say)
     @commands.guild_only()
     async def send_embed(self, ctx: MyContext, *, arguments):
         """Send an embed

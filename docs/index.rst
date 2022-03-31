@@ -16,6 +16,8 @@ The `Moderation` section displays every command related to the moderation of a s
 
 A translation of the Zbot Privacy Policy has been added to `this page <privacy.html>`_ as a guide.
 
+.. warning:: Zbot becomes Axobot! Your favorite bot changes its name and avatar to become even more friendly! Read the `V4 changelog <v4.html>`_ for details on this really huge update.
+
 .. toctree::
    :maxdepth: 2
    :caption: List of available sections:
@@ -35,6 +37,7 @@ A translation of the Zbot Privacy Policy has been added to `this page <privacy.h
    :maxdepth: 1
    :caption: Our articles:
 
+   v4
    scam-detector
 
 
