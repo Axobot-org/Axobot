@@ -855,7 +855,7 @@ The 'reasons' parameter is used to display the mute reasons.
         desc = list()
         title = await self.bot._(ctx.guild.id, "moderation.mute.list-title-0", guild=ctx.guild.name)
         if len(liste) == 0:
-            desc.append(await self.bot._(ctx.guild.id, "moderation.no-mutes"))
+            desc.append(await self.bot._(ctx.guild.id, "moderation.mute.no-mutes"))
         elif reasons:
             _unknown = (await self.bot._(ctx.guild, "misc.unknown")).capitalize()
             for userid, reason in liste.items():
