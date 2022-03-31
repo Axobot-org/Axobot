@@ -21,6 +21,13 @@ class AntiScam(commands.Cog):
         self.file = "antiscam"
         self.agent = AntiScamAgent()
 
+    async def send_bot_log(self, msg: discord.Message):
+        "Send a log to the bot internal log channel"
+        emb = discord.Embed(title="Scam message deleted", description=msg.content, color=discord.Color.red())
+        emb.set_author(name=msg.author, icon_url=msg.author.display_avatar)
+        emb.set_footer(text=f"{msg.guild.name} ({msg.guild.id})" if msg.guild else "No guild")
+        await self.bot.send_embed([emb])
+
     @commands.group(name="antiscam")
     async def antiscam(self, ctx: MyContext):
         "Everything related to the antiscam feature"
@@ -69,12 +76,13 @@ class AntiScam(commands.Cog):
         result = self.agent.predict_bot(message)
         if result.result > 1:
             message.category = 0
-            print("GOT", message.message, result.probabilities[1])
-            if result.probabilities[1] < 0.001: # if probability of not being harmless is less than 0.1%
+            print("GOT", message.message, result.probabilities[2])
+            if result.probabilities[1] < 0.005: # if probability of not being harmless is less than 0.5%
                 try:
                     await msg.delete() # try to delete it, silently fails
                 except discord.Forbidden:
                     pass
+                await self.send_bot_log(msg)
             # msg_id = await bot.insert_msg(message)
             # await bot.send_report(msg, msg_id, message)
 
