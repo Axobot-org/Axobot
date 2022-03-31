@@ -29,7 +29,7 @@ class Languages(discord.ext.commands.Cog):
             # get lang from user
             used_langs = await self.bot.get_cog('Utilities').get_languages(source, limit=1)
             lang_opt = used_langs[0][0]
-        elif source in self.serv_opts.keys():
+        elif source in self.serv_opts:
             # get lang from cache
             lang_opt = self.serv_opts[source]
         elif not self.bot.database_online or source is None:
