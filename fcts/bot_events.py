@@ -14,7 +14,7 @@ data = {
             "april-2021": "Aujourd'hui, c'est la journée internationale des poissons ! Pendant toute la journée, Zbot fêtera le 1er avril avec des émojis spéciaux pour le jeu du morpion, un avatar unique ainsi que d'autres choses trop cool. \n\nProfitez-en pour récupérer des points d'événements et tentez de gagner la carte d'xp rainbow ! Pour rappel, les cartes d'xp sont accessibles via ma commande `profile card`",
             "april-2022": "Aujourd'hui, c'est la journée internationale des poissons ! Pendant toute la journée, Zbot fêtera le 1er avril avec des émojis spéciaux pour le jeu du morpion, des commandes uniques ainsi que d'autres choses trop cool. \n\nProfitez-en pour récupérer des points d'événements et tentez de gagner la carte d'xp rainbow ! Pour rappel, les cartes d'xp sont accessibles via ma commande `profile card`"
         },
-        "events-price": {
+        "events-prices": {
             "april-2021": {
                 "120": "Débloquez la carte d'xp multicolore, obtenable qu'un seul jour par an !"
             },
@@ -32,7 +32,7 @@ data = {
             "april-2021": "Today is International Fish Day! All day long, Zbot will be celebrating April 1st with special tic-tac-toe emojis, a unique avatar and other cool stuff. \nTake the opportunity to collect event points and try to win the rainbow xp card! As a reminder, the xp cards are accessible via my `profile card` command",
             "april-2022": "Today is International Fish Day! Throughout the day, Zbot will be celebrating April 1 with special tic-tac-toe emojis, unique commands and other cool stuff. \n\nTake the opportunity to collect event points and try to win the rainbow xp card! As a reminder, the xp cards are accessible via my `profile card` command"
         },
-        "events-price": {
+        "events-prices": {
             "april-2021": {
                 "120": "Unlock the rainbow xp card, obtainable only one day a year!"
             },
@@ -53,7 +53,7 @@ class BotEvents(commands.Cog):
     def __init__(self, bot: Zbot):
         self.bot = bot
         self.file = "bot_events"
-        self.hourly_reward = [-8, 20]
+        self.hourly_reward = [-10, 50]
         self.current_event: str = None
         self.current_event_data: dict = {}
         self.current_event_id: str = None
@@ -105,7 +105,7 @@ class BotEvents(commands.Cog):
             event_desc = events_desc[current_event]
             # Title
             try:
-                title = data[lang]['events-title']
+                title = data[lang]['events-title'][current_event]
             except KeyError:
                 title = self.current_event
             # Begin/End dates
@@ -113,7 +113,8 @@ class BotEvents(commands.Cog):
             end = f"<t:{self.current_event_data['end'].timestamp():.0f}>"
             if ctx.can_send_embed:
                 emb = discord.Embed(title=title, description=event_desc, color=self.current_event_data["color"])
-                emb.set_image(url=self.current_event_data["icon"])
+                if self.current_event_data["icon"]:
+                    emb.set_image(url=self.current_event_data["icon"])
                 emb.add_field(
                     name=(await self.bot._(ctx.channel, "misc.beginning")).capitalize(),
                     value=begin
@@ -130,7 +131,8 @@ class BotEvents(commands.Cog):
                               v in prices[current_event].items()]
                     emb.add_field(
                         name=await self.bot._(ctx.channel, "bot_events.events-price-title"),
-                        value="\n".join(prices)
+                        value="\n".join(prices),
+                        inline=False
                     )
                 await ctx.send(embed=emb)
             else:
@@ -155,7 +157,7 @@ class BotEvents(commands.Cog):
         lang = 'en' if lang not in ('en', 'fr') else lang
         events_desc = data[lang]['events-desc']
 
-        if not current_event in events_desc.keys():
+        if not current_event in events_desc:
             await ctx.send(await self.bot._(ctx.channel, "bot_events.nothing-desc"))
             return
         if user is None:
@@ -173,10 +175,10 @@ class BotEvents(commands.Cog):
                 user_rank = await self.bot._(ctx.channel, "bot_events.unclassed")
             points = user_rank_query["events_points"]
         title = await self.bot._(ctx.channel, "bot_events.rank-title")
-        prices = await self.bot._(ctx.channel, "bot_events.events-prices")
-        if current_event in prices.keys():
+        prices: dict = data[lang]['events-prices']
+        if current_event in prices:
             emojis = self.bot.get_cog("Emojis").customs["green_check"], self.bot.get_cog("Emojis").customs["red_cross"]
-            p = list()
+            p = []
             for k, v in prices[current_event].items():
                 emoji = emojis[0] if int(k) <= points else emojis[1]
                 p.append(f"{emoji}{min(points,int(k))}/{k}: {v}")
@@ -232,7 +234,10 @@ class BotEvents(commands.Cog):
             points = randint(*self.hourly_reward)
             await self.bot.get_cog("Utilities").add_user_eventPoint(ctx.author.id, points)
             await self.db_add_dailies(ctx.author.id, points)
-            txt = await self.bot._(ctx.channel, "halloween.daily.got-points", pts=points)
+            if points >= 0:
+                txt = await self.bot._(ctx.channel, "halloween.daily.got-points", pts=points)
+            else:
+                txt = await self.bot._(ctx.channel, "halloween.daily.lost-points", pts=points)
         else:
             lang = await self.bot._(ctx.channel, '_used_locale')
             remaining = await FormatUtils.time_delta(-time_since_available, lang=lang)
