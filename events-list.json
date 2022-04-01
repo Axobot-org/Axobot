@@ -59,7 +59,7 @@
         "begin": "2022-04-01",
         "end": "2022-04-02",
         "type": "fish",
-        "icon": null,
+        "icon": "https://zrunner.me/cdn/fish22.jpg",
         "color": 16733391,
         "objectives": [200]
     }
