@@ -871,7 +871,7 @@ class Servers(commands.Cog):
                 msg = await self.bot._(guild.id,"server.edit-success.levelup_channel.any")
             elif value.lower() in {"none", "aucun", "disabled", "nowhere"}:
                 c_id = "none"
-                msg = await self.bot._(guild.id,"server.edit-success.levelup_channel-none")
+                msg = await self.bot._(guild.id,"server.edit-success.levelup_channel.none")
             else:
                 chan = value.strip()
                 try:
