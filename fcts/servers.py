@@ -472,8 +472,6 @@ class Servers(commands.Cog):
                 msg = await self.bot._(ctx.guild.id, "server.edit-error.boolean", name=option)
                 await ctx.send(msg)
                 return
-            if option == "enable_fun":
-                await self.bot.get_cog("Fun").cache_update(ctx.guild.id,v)
             await self.modify_server(ctx.guild.id,values=[(option,v)])
             msg = await self.bot._(ctx.guild.id, "server.edit-success.boolean", opt=option, val=value)
             await ctx.send(msg)
