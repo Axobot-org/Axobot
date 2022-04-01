@@ -199,14 +199,14 @@ class Morpions(commands.Cog):
                 if self.mode == 1 and last_grid:
                     await last_grid.delete()
                 if match_nul:
-                    await self.bot.get_cog("Utilities").add_user_eventPoint(ctx.author.id, 1)
+                    await self.bot.get_cog("Utilities").add_user_eventPoint(ctx.author.id, 2)
                     resultat = await self.bot._(ctx.channel, 'morpion.nul')
                 else:
                     if tour:  # Le bot a gagné
                         resultat = await self.bot._(ctx.channel, 'morpion.win-bot')
                     else:  # L'utilisateur a gagné
                         resultat = await self.bot._(ctx.channel, 'morpion.win-user', user=ctx.author.mention)
-                        await self.bot.get_cog("Utilities").add_user_eventPoint(ctx.author.id, 4)
+                        await self.bot.get_cog("Utilities").add_user_eventPoint(ctx.author.id, 8)
                 await ctx.send(await self.afficher_grille(grille)+'\n'+resultat)
             except Exception as err:
                 await self.bot.get_cog('Errors').on_command_error(ctx, err)
