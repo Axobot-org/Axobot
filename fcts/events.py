@@ -317,6 +317,7 @@ class Events(commands.Cog):
             return
         try:
             now = datetime.datetime.now()
+            utcnow = self.bot.utcnow()
             # Timed tasks - every 20s
             if now.second%20 == 0 and self.bot.database_online:
                 await self.bot.task_handler.check_tasks()
@@ -335,8 +336,8 @@ class Events(commands.Cog):
             # Translation backup - every 12h (start from 1am)
             elif now.hour%12 == 1 and (now.hour != self.last_tr_backup.hour or now.day != self.last_tr_backup.day):
                 await self.translations_backup()
-            # Check current event - every 12h (start from 0:02 am)
-            elif int(now.hour)%12 == 0 and int(now.minute)%2 == 0 and (now.hour != self.last_eventDay_check.hour or now.day != self.last_eventDay_check.day):
+            # Check current event - every 12h UTC (start from 0:02 am)
+            elif utcnow.hour%12 == 0 and utcnow.minute%2 == 0 and (now.hour != self.last_eventDay_check.hour or now.day != self.last_eventDay_check.day):
                 await self.botEventLoop()
             # Send stats logs - every 1h (start from 0:05 am)
             elif now.minute > 5 and (now.day != self.statslogs_last_push.day or now.hour != self.statslogs_last_push.hour) and self.bot.database_online:
