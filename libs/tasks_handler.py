@@ -1,4 +1,5 @@
 from __future__ import annotations
+from datetime import timezone
 
 import json
 import time
@@ -78,8 +79,7 @@ class TaskHandler:
                     await self.remove_task(task['ID'])
                 except Exception as err:  # pylint: disable=broad-except
                     await self.bot.get_cog('Errors').on_error(err, None)
-                    self.bot.log.error(
-                        "[unban_task] Impossible d'unban automatiquement : {}".format(err))
+                    self.bot.log.error("[unban_task] Impossible d'unban automatiquement : %s", err)
             if task['action'] == "timer":
                 try:
                     sent = await self.task_timer(task)
@@ -132,7 +132,7 @@ class TaskHandler:
                         task['data']['msg_url']
                     )
                 title = (await self.bot._(channel, "timers.rmd.embed-title")).capitalize()
-                emb = discord.Embed(title=title, description=task["message"], color=4886754, timestamp=task["utc_begin"])
+                emb = discord.Embed(title=title, description=task["message"], color=4886754, timestamp=task["begin"])
                 emb.set_footer(text=await self.bot._(channel, "timers.rmd.embed-date"))
                 imgs = re.findall(r'(https://\S+\.(?:png|jpe?g|webp|gif))', task['message'])
                 if len(imgs) > 0:
