@@ -70,7 +70,7 @@
             "no-mutes": "No member seems to be banned from here",
             "staff-mute": "You can't prevent another staff member from speaking"
         },
-        "mute-chat": "Member %{user} (%{userid}) has been silenced",
+        "mute-chat": "Member %{user} (%{userid}) has been muted",
         "mute-dm": "You have been muted in the server %{guild}",
         "need-manage-messages": "Permission \"Manage Messages\" missing :confused:",
         "need-read-history": "Oops, I'm missing the permission to \"Read Message History\" :confused:",
