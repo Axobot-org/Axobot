@@ -83,8 +83,11 @@ class AntiScam(commands.Cog):
                 except discord.Forbidden:
                     pass
                 await self.send_bot_log(msg)
-            # msg_id = await bot.insert_msg(message)
-            # await bot.send_report(msg, msg_id, message)
+                self.bot.dispatch("antiscam_delete", msg, result)
+                # msg_id = await bot.insert_msg(message)
+                # await bot.send_report(msg, msg_id, message)
+            elif result.probabilities[1] < 0.3:
+                self.bot.dispatch("antiscam_warn", msg, result)
 
 
 def setup(bot):
