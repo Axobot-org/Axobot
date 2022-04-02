@@ -15,6 +15,10 @@ class Languages(discord.ext.commands.Cog):
         i18n.translations.container.clear()
         i18n.load_path.clear()
         i18n.load_path.append('./fcts/lang2')
+    
+    @property
+    def default_language(self):
+        return self.bot.get_cog('Servers').default_language
 
     async def tr(self, source, string_id: str, **args):
         """Renvoie le texte en fonction de la langue"""
@@ -28,31 +32,31 @@ class Languages(discord.ext.commands.Cog):
         if isinstance(source, (discord.Member, discord.User)):
             # get lang from user
             used_langs = await self.bot.get_cog('Utilities').get_languages(source, limit=1)
-            lang_opt = used_langs[0][0]
+            lang_opt = used_langs[0][0] if len(used_langs) > 0 else self.default_language
         elif source in self.serv_opts:
             # get lang from cache
             lang_opt = self.serv_opts[source]
         elif not self.bot.database_online or source is None:
             # get default lang
-            lang_opt = self.bot.get_cog('Servers').default_language
+            lang_opt = self.default_language
         elif isinstance(source, discord.DMChannel):
             # get lang from DM channel
             recipient = await self.bot.get_recipient(source)
             if recipient is None:
-                lang_opt = self.bot.get_cog('Servers').default_language
+                lang_opt = self.default_language
             else:
                 used_langs = await self.bot.get_cog('Utilities').get_languages(recipient, limit=1)
-                lang_opt = used_langs[0][0]
+                lang_opt = used_langs[0][0] if len(used_langs) > 0 else self.default_language
         else:
             # get lang from server ID
             if lang_id := await self.bot.get_config(source, "language"):
                 lang_opt = self.languages[lang_id]
                 self.serv_opts[source] = lang_opt
             else:
-                lang_opt = self.bot.get_cog('Servers').default_language
+                lang_opt = self.default_language
         if lang_opt not in self.languages:
             # if lang not known: fallback to default
-            lang_opt = self.bot.get_cog('Servers').default_language
+            lang_opt = self.default_language
         return await self._get_translation(lang_opt, string_id, **args)
 
     async def _get_translation(self, locale: str, string_id: str, **args):
