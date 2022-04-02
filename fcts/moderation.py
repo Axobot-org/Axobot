@@ -774,14 +774,14 @@ Permissions for using this command are the same as for the kick
     async def send_modlogs(self, action: str, user: discord.User, author: discord.User, guild: discord.Guild, case: int = None, reason: str = None, duration: str = None):
         if action not in ('warn', 'mute', 'unmute', 'kick', 'ban', 'unban', 'softban'):
             return
-        message = await self.bot._(user, "logs."+action, user=str(user), userid=user.id)
+        message = await self.bot._(guild.id, "logs."+action, user=str(user), userid=user.id)
         fields = list()
         if case:
             _case = await self.bot._(guild.id, "misc.case")
             fields.append({'name': _case.capitalize(),
                           'value': f"#{case}", 'inline': True})
         if duration:
-            _duration = await self.bot._(user, "misc.duration")
+            _duration = await self.bot._(guild.id, "misc.duration")
             if len(duration) > 1020:
                 duration = duration[:1020] + "..."
             fields.append({'name': _duration.capitalize(),
@@ -789,7 +789,7 @@ Permissions for using this command are the same as for the kick
         if reason:
             if len(reason) > 1020:
                 reason = reason[:1020] + "..."
-            _reason = await self.bot._(user, "misc.reason")
+            _reason = await self.bot._(guild.id, "misc.reason")
             fields.append({'name': _reason.capitalize(), 'value': reason})
         await self.bot.get_cog("Events").send_logs_per_server(guild, action, message, author, fields)
 
