@@ -14,20 +14,18 @@ from fcts.args import serverlog
 class ServerLogs(commands.Cog):
     """Handle any kind of server log"""
 
-    available_logs = {
-        "antiraid",
-        "antiscam",
-        "member_roles",
-        "member_nick",
-        "member_avatar",
-        "member_join",
-        "member_leave",
-        "member_ban",
-        "member_unban",
-        "message_update",
-        "message_delete",
-        "role_creation"
+    logs_categories = {
+        "automod": {"antiraid", "antiscam"},
+        "members": {"member_roles", "member_nick", "member_avatar", "member_join", "member_leave"},
+        "moderation": {"member_ban", "member_unban"},
+        "messages": {"message_update", "message_delete"},
+        "roles": {"role_creation"}
     }
+
+    @property
+    def available_logs(self):
+        return {log for category in ServerLogs.logs_categories.values() for log in category}
+
 
     def __init__(self, bot: Zbot):
         self.bot = bot
@@ -62,7 +60,6 @@ class ServerLogs(commands.Cog):
             return cached[channel]
         query = "SELECT kind FROM serverlogs WHERE guild = %s AND channel = %s"
         async with self.bot.db_query(query, (guild, channel)) as query_results:
-            self.cache[guild] = [row['kind'] for row in query_results]
             return [row['kind'] for row in query_results]
 
     async def db_get_from_guild(self, guild: int) -> dict[int, list[str]]:
@@ -71,7 +68,7 @@ class ServerLogs(commands.Cog):
             return cached
         query = "SELECT channel, kind FROM serverlogs WHERE guild = %s"
         async with self.bot.db_query(query, (guild,)) as query_results:
-            res = dict()
+            res = {}
             for row in query_results:
                 res[row['channel']] = res.get(row['channel'], []) + [row['kind']]
             self.cache[guild] = res
@@ -121,29 +118,31 @@ class ServerLogs(commands.Cog):
     @commands.cooldown(1, 10, commands.BucketType.channel)
     async def modlogs_list(self, ctx: MyContext, channel: discord.TextChannel=None):
         """Show the full list of server logs type, or the list of enabled logs for a channel"""
-        if channel:
-            # display logs enabled for this channel only
+        if channel:  # display logs enabled for this channel only
             title = await self.bot._(ctx.guild.id, "serverlogs.list.channel", channel='#'+channel.name)
-            if channel_logs := await self.db_get_from_channel(ctx.guild.id, ctx.channel.id):
-                actual_logs = ('- '+l for l in sorted(channel_logs) if l in self.available_logs)
-                embed = discord.Embed(title=title, description='\n'.join(actual_logs))
+            if channel_logs := await self.db_get_from_channel(ctx.guild.id, channel.id):
+                # actual_logs = ('- '+l for l in sorted(channel_logs) if l in self.available_logs)
+                embed = discord.Embed(title=title)
+                for category, logs in sorted(self.logs_categories.items()):
+                    name = await self.bot._(ctx.guild.id, 'serverlogs.categories.'+category)
+                    actual_logs = ['- '+l for l in sorted(logs) if l in channel_logs]
+                    if actual_logs:
+                        embed.add_field(name=name, value='\n'.join(actual_logs))
             else: # error msg
                 cmd = await self.bot.prefix_manager.get_prefix(ctx.guild) + "modlogs enable"
                 embed = discord.Embed(title=title, description=await self.bot._(ctx.guild.id, "serverlogs.list.none", cmd=cmd))
-        else:
-            # display available logs and logs enabled for the whole server
+        else:  # display available logs and logs enabled for the whole server
             global_title = await self.bot._(ctx.guild.id, "serverlogs.list.all")
-            guild_title = await self.bot._(ctx.guild.id, "serverlogs.list.guild")
-            embed = discord.Embed()
-            embed.add_field(name=global_title, value='\n'.join('- '+l for l in sorted(self.available_logs)))
-            if (guild_logs := await self.db_get_from_guild(ctx.guild.id)) and \
-                    sum(len(values) for values in guild_logs.values()) > 0:
-                # flatten and sort enabled logs
-                guild_logs = sorted(set(x for v in guild_logs.values() for x in v if x in self.available_logs))
-                embed.add_field(name=guild_title, value='\n'.join('- '+l for l in sorted(guild_logs)))
-            else: # error msg
-                cmd = await self.bot.prefix_manager.get_prefix(ctx.guild) + "modlogs enable"
-                embed.add_field(name=guild_title, value=await self.bot._(ctx.guild.id, "serverlogs.list.none", cmd=cmd))
+            # fetch logs enabled in the guild
+            guild_logs = await self.db_get_from_guild(ctx.guild.id)
+            guild_logs = sorted(set(x for v in guild_logs.values() for x in v if x in self.available_logs))
+            # build embed
+            desc = await self.bot._(ctx.guild.id, "serverlogs.list.emojis", enabled='🔹', disabled='◾')
+            embed = discord.Embed(title=global_title, description=desc)
+            for category, logs in sorted(self.logs_categories.items()):
+                name = await self.bot._(ctx.guild.id, 'serverlogs.categories.'+category)
+                embed.add_field(name=name, value='\n'.join([('🔹' if l in guild_logs else '◾') + l for l in sorted(logs)]))
+
         embed.color = discord.Color.blue()
         await ctx.send(embed=embed)
 
