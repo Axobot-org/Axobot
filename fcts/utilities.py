@@ -116,7 +116,7 @@ class Utilities(commands.Cog):
                         else:
                             em = discord.utils.find(
                                 lambda e, id=emoji_id: e.name == id, self.bot.emojis)
-                except commands.ConversionError:
+                except (commands.ConversionError, commands.EmojiNotFound):
                     continue
                 if em is not None:
                     text = text.replace(x.group(0), "<{}:{}:{}>".format(
