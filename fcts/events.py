@@ -268,8 +268,9 @@ class Events(commands.Cog):
         if channel is None:
             return
         emb = discord.Embed(description=message, color=color, timestamp=self.bot.utcnow())
-        for field in fields:
-            emb.add_field(**field)
+        if fields:
+            for field in fields:
+                emb.add_field(**field)
         if author is not None:
             emb.set_author(name=author, icon_url=author.display_avatar)
         try:
