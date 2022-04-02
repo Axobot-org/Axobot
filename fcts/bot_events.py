@@ -63,26 +63,33 @@ class BotEvents(commands.Cog):
         self.coming_event_id: str = None
         self.update_current_event()
 
-    def update_current_event(self):
-        "Update class attributes with the new/incoming bot events if needed"
-        today = datetime.date.today()
-        with open("events-list.json", 'r', encoding='utf-8') as file:
-            events = json.load(file)
+    def reset(self):
+        "Reset current and coming events"
         self.current_event = None
         self.current_event_data = {}
         self.current_event_id = None
+        self.coming_event = None
+        self.coming_event_data = {}
+        self.coming_event_id = None
+
+    def update_current_event(self):
+        "Update class attributes with the new/incoming bot events if needed"
+        now = self.bot.utcnow()
+        with open("events-list.json", 'r', encoding='utf-8') as file:
+            events = json.load(file)
+        self.reset()
         for ev_id, ev_data in events.items():
             ev_data["begin"] = datetime.datetime.strptime(
                 ev_data["begin"], "%Y-%m-%d").replace(tzinfo=datetime.timezone.utc)
             ev_data["end"] = datetime.datetime.strptime(
                 ev_data["end"], "%Y-%m-%d").replace(tzinfo=datetime.timezone.utc)
 
-            if ev_data["begin"].date() <= today <= ev_data["end"].date():
+            if ev_data["begin"] <= now < ev_data["end"]:
                 self.current_event = ev_data["type"]
                 self.current_event_data = ev_data
                 self.current_event_id = ev_id
                 break
-            elif ev_data["begin"].date() - datetime.timedelta(days=1) <= today <= ev_data["end"].date():
+            if ev_data["begin"] - datetime.timedelta(days=1) <= now < ev_data["begin"]:
                 self.coming_event = ev_data["type"]
                 self.coming_event_data = ev_data
                 self.coming_event_id = ev_id
