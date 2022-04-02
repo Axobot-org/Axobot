@@ -1,10 +1,12 @@
 import asyncio
+from typing import Any
 
 import discord
 from cachingutils import LRUCache
 from discord.ext import commands, tasks
 from libs.antiscam.classes import PredictionResult
 from libs.classes import MyContext, Zbot
+from libs.formatutils import FormatUtils
 
 from fcts.args import serverlog
 
@@ -13,6 +15,7 @@ class ServerLogs(commands.Cog):
     """Handle any kind of server log"""
 
     available_logs = {
+        "antiraid",
         "antiscam",
         "member_roles",
         "member_nick",
@@ -443,7 +446,7 @@ class ServerLogs(commands.Cog):
 
     @commands.Cog.listener()
     async def on_antiscam_delete(self, message: discord.Message, prediction: PredictionResult):
-        """Triggered when the antiscam system find a potentially dangerous message
+        """Triggered when the antiscam system delete a dangerous message
         Corresponding log: antiscam"""
         if channel_ids := await self.is_log_enabled(message.guild.id, "antiscam"):
             emb = discord.Embed(
@@ -459,6 +462,54 @@ class ServerLogs(commands.Cog):
             # author
             emb.set_author(name=f"{message.author} ({message.author.id})", icon_url=message.author.display_avatar)
             await self.validate_logs(message.guild, channel_ids, emb)
+
+    @commands.Cog.listener()
+    async def on_antiraid_kick(self, member: discord.Member, data: dict[str, Any]):
+        """Triggered when the antiraid system kicks a member
+        Corresponding log: antiraid"""
+        if channel_ids := await self.is_log_enabled(member.guild.id, "antiraid"):
+            emb = discord.Embed(
+                description=f"**{member.mention} ({member.id}) kicked by anti-raid**",
+                colour=discord.Color.orange()
+            )
+            doc = "https://zbot.rtfd.io/en/latest/moderator.html#anti-raid"
+            emb.set_author(name=str(member), url=doc, icon_url=member.display_avatar)
+            # reason
+            if account_creation_treshold := data.get("account_creation_treshold"):
+                min_age = await FormatUtils.time_delta(account_creation_treshold, hour=(account_creation_treshold<86400))
+                delta = await FormatUtils.time_delta(member.created_at, self.bot.utcnow(), hour=True)
+                value = f"Account created at <t:{member.created_at.timestamp():.0f}> ({delta})\n\
+                    Minimum age required by anti-raid: {min_age}"
+                emb.add_field(name="Account was too recent", value=value, inline=False)
+            if "discord_invite" in data:
+                emb.add_field(name="Contains a Discord invite in their username", value=self.bot.zws, inline=False)
+            await self.validate_logs(member.guild, channel_ids, emb)
+
+    @commands.Cog.listener()
+    async def on_antiraid_ban(self, member: discord.Member, data: dict[str, Any]):
+        """Triggered when the antiraid system kicks a member
+        Corresponding log: antiraid"""
+        if channel_ids := await self.is_log_enabled(member.guild.id, "antiraid"):
+            emb = discord.Embed(
+                description=f"**{member.mention} ({member.id}) banned by anti-raid**",
+                colour=discord.Color.red()
+            )
+            doc = "https://zbot.rtfd.io/en/latest/moderator.html#anti-raid"
+            emb.set_author(name=str(member), url=doc, icon_url=member.display_avatar)
+            # reason
+            if account_creation_treshold := data.get("account_creation_treshold"):
+                min_age = await FormatUtils.time_delta(
+                    account_creation_treshold, hour=(account_creation_treshold < 86400))
+                delta = await FormatUtils.time_delta(member.created_at, self.bot.utcnow(), hour=True)
+                value = f"Account created at <t:{member.created_at.timestamp():.0f}> ({delta})\n\
+                    Minimum age required by anti-raid: {min_age}"
+                emb.add_field(name="Account was too recent", value=value, inline=False)
+            if "discord_invite" in data:
+                emb.add_field(name="Contains a Discord invite in their username", value=self.bot.zws, inline=False)
+            # duration
+            duration = await FormatUtils.time_delta(data["duration"], hour=(data["duration"] < 86400))
+            emb.add_field(name="Duration", value=duration)
+            await self.validate_logs(member.guild, channel_ids, emb)
 
 
 def setup(bot):

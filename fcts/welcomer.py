@@ -184,32 +184,48 @@ class Welcomer(commands.Cog):
         if level >= 4:
             if account_created_since <= 86400: # kick accounts created less than 1d before
                 if await self.kick(member,await self.bot._(member.guild.id,"logs.reason.young")):
+                    self.bot.dispatch("antiraid_kick", member, {"account_creation_treshold": 86400})
                     return True
             if account_created_since <= 3600 and can_ban: # ban (2w) members created less than 1h before
                 if await self.ban(member, await self.bot._(member.guild.id,"logs.reason.young"), 86400*14):
+                    self.bot.dispatch("antiraid_ban", member, {
+                        "account_creation_treshold": 3600,
+                        "duration": 86400*14
+                    })
                     return True
             elif account_created_since <= 3600*3 and can_ban: # ban (1w) members created less than 3h before
                 if await self.ban(member, await self.bot._(member.guild.id,"logs.reason.young"), 86400*7):
+                    self.bot.dispatch("antiraid_ban", member, {
+                        "account_creation_treshold": 3600*3,
+                        "duration": 86400*7
+                    })
                     return True
         # Level 3 or more
         if level >= 3 and can_ban:
             # ban (1w) members with invitations in their nickname
             if self.bot.get_cog('Utilities').sync_check_discord_invite(member.name) is not None:
                 if await self.ban(member, await self.bot._(member.guild.id,"logs.reason.invite"), 86400*7):
+                    self.bot.dispatch("antiraid_ban", member, {
+                        "discord_invite": True,
+                        "duration": 86400*7
+                    })
                     return True
             if account_created_since <= 3600*12: # kick accounts created less than 45min before
                 if await self.kick(member,await self.bot._(member.guild.id,"logs.reason.young")):
+                    self.bot.dispatch("antiraid_kick", member, {"account_creation_treshold": 3600*12})
                     return True
         # Level 2 or more
         if level >= 2: # kick accounts created less than 15min before
             if account_created_since <= 3600*2:
                 if await self.kick(member,await self.bot._(member.guild.id,"logs.reason.young")):
+                    self.bot.dispatch("antiraid_kick", member, {"account_creation_treshold": 3600*2})
                     return True
         # Level 1 or more
         if level >= 1: # kick members with invitations in their nickname
             if self.bot.get_cog('Utilities').sync_check_discord_invite(member.name) is not None:
                 if await self.kick(member,await self.bot._(member.guild.id,"logs.reason.invite")):
-                    return True 
+                    self.bot.dispatch("antiraid_kick", member, {"discord_invite": True})
+                    return True
         # Nothing got triggered
         return False
 
