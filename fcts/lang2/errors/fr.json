@@ -10,6 +10,7 @@
         "duration": "La durée `%{d}` est invalide",
         "emojinotfound": "Emoji `%{e}` introuvable",
         "guildnotfound": "Serveur %{guild} introuvable",
+        "interaction-forbidden": "Tu ne peux pas utiliser ceci !",
         "invalidcardstyle": "Style de carte invalide : `%{s}`",
         "invalidcolor": "La couleur `%{c}` est invalide",
         "invalidemoji": "Emoji invalide",

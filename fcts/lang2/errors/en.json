@@ -10,6 +10,7 @@
         "duration": "The duration `%{d}` is invalid",
         "emojinotfound": "Emoji `%{e}` not found",
         "guildnotfound": "Guild %{guild} not found",
+        "interaction-forbidden": "You cannot use that!",
         "invalidcardstyle": "Invalid card style: `%{s}`",
         "invalidcolor": "Color `%{c}` invalid",
         "invalidemoji": "Invalid emoji",
