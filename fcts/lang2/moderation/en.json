@@ -44,7 +44,7 @@
             "too-high": "It seems that this member is too high for me to kick him out :thinking:",
             "cant-staff": "You can't kick another staff!"
         },
-        "kick-chat": "Member M{user} (%{userid}) has been kicked from this server",
+        "kick-chat": "Member %{user} (%{userid}) has been kicked from this server",
         "kick-dm": "You have just been kicked from the server %{guild} :confused:",
         "missing-manage-nick": "Oops, I'm missing the \"Manage nicknames\" permission!",
         "missing-user-perms": "Oops, you're missing permissions (either manage roles, manage server or manage messages)",
