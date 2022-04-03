@@ -1,26 +1,31 @@
+from typing import Union
 import discord
 import i18n
 from libs.classes import Zbot
 
+SourceType = Union[None, int, discord.Guild, discord.TextChannel, discord.Thread,
+                   discord.Member, discord.User, discord.DMChannel, discord.Interaction]
+
 
 class Languages(discord.ext.commands.Cog):
+    "Translations module"
 
     def __init__(self, bot: Zbot):
         self.bot = bot
         self.file = "languages"
         self.languages = ('fr', 'en', 'lolcat', 'fi', 'de', 'fr2')
-        self.serv_opts: dict[int, str] = dict()
+        self.serv_opts: dict[int, str] = {}
         i18n.set('filename_format', '{locale}.{format}')
         i18n.set('file_format', 'json')
         i18n.translations.container.clear()
         i18n.load_path.clear()
         i18n.load_path.append('./fcts/lang2')
-    
+
     @property
     def default_language(self):
         return self.bot.get_cog('Servers').default_language
 
-    async def tr(self, source, string_id: str, **args):
+    async def tr(self, source: SourceType, string_id: str, **args):
         """Renvoie le texte en fonction de la langue"""
         if isinstance(source, discord.Guild):
             # get ID from guild
@@ -28,6 +33,14 @@ class Languages(discord.ext.commands.Cog):
         elif isinstance(source, (discord.TextChannel, discord.Thread)):
             # get ID from text channel
             source = source.guild.id
+        elif isinstance(source, discord.Interaction):
+            # get ID from guild
+            if source.guild:
+                source = source.guild.id
+            elif source.user:
+                source = source.user
+            else:
+                source = None
 
         if isinstance(source, (discord.Member, discord.User)):
             # get lang from user
