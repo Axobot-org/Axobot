@@ -1,5 +1,7 @@
 {
     "lolcat": {
+        "deleted-channel": "?channel?",
+        "deleted-role": "?role?",
         "edit-error": {
             "xp": "Tihs xp system don't exist. Here is teh list ov availble systems: %{list}",
             "color": "This coulor is sadly invalid",

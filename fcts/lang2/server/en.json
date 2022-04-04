@@ -1,5 +1,7 @@
 {
     "en": {
+        "deleted-channel": "deleted channel",
+        "deleted-role": "deleted role",
         "edit-error": {
             "xp": "This xp system doesn't exist. Here is the list of available systems: %{list}",
             "color": "This colour is invalid",
