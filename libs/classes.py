@@ -70,7 +70,7 @@ class Zbot(commands.bot.AutoShardedBot):
                          status=status, allowed_mentions=allowed_mentions, intents=intents, enable_debug_events=True)
         self.database_online = database_online  # if the mysql database works
         self.beta = beta # if the bot is in beta mode
-        self.database_keys = dict() # credentials for the database
+        self.database_keys = {} # credentials for the database
         self.log = logging.getLogger("runner") # logs module
         self.dbl_token = dbl_token # token for Discord Bot List
         self._cnx = [[None, 0], [None, 0], [None, 0]] # database connections
@@ -78,8 +78,8 @@ class Zbot(commands.bot.AutoShardedBot):
         self.rss_enabled: bool = True # if rss is enabled
         self.alerts_enabled: bool = True # if alerts system is enabled
         self.internal_loop_enabled: bool = True # if internal loop is enabled
-        self.zws = "​"  # here's a zero width space
-        self.others = dict() # other misc credentials
+        self.zws = "\u200B"  # here's a zero width space
+        self.others = {} # other misc credentials
         self.zombie_mode: bool = zombie_mode # if we should listen without sending any message
         self.prefix_manager = PrefixManager(self)
         self.task_handler = TaskHandler(self)
