@@ -1,6 +1,7 @@
 import copy
 import datetime
 import importlib
+from math import ceil
 import operator
 import random
 import re
@@ -17,6 +18,7 @@ from pytz import timezone
 from timezonefinder import TimezoneFinder
 from libs.classes import MyContext, Zbot
 from libs.formatutils import FormatUtils
+from libs.paginator import Paginator
 from utils import flatten_list
 
 from fcts import args, checks, emojis
@@ -864,19 +866,49 @@ You can specify a verification limit by adding a number in argument (up to 1.000
                 data = await r.json()
         if query is not None:
             query = query.lower()
-            jobs = [x for x in data['jobs'] if query in x['location']['name'].lower() or query == x['id'] or query in x['title'].lower()]
+            jobs = [
+                x for x in data['jobs']
+                if query in x['location']['name'].lower() or query == x['id'] or query in x['title'].lower()
+            ]
         else:
             jobs = data['jobs']
         f_jobs = [
-            f"[{x['title']}]({x['absolute_url']})" for x in jobs
+            f"[{x['title'] if len(x['title'])<50 else x['title'][:49]+'…'}]({x['absolute_url']})" for x in jobs
         ]
         if ctx.can_send_embed:
             _title = await self.bot._(ctx.channel, "fun.discordjobs-title")
-            emb = discord.Embed(title=_title, color=7506394, url="https://dis.gd/jobs")
-            emb.description = await self.bot._(ctx.channel, "fun.discordjobs-count", c=len(f_jobs))
-            for i in range(0, len(f_jobs), 10):
-                emb.add_field(name=self.bot.zws, value="\n".join(f_jobs[i:i+10]))
-            await ctx.send(embed=emb)
+            class JobsPaginator(Paginator):
+                "Paginator used to display jobs offers"
+                async def send_init(self, ctx: MyContext):
+                    "Create and send 1st page"
+                    contents = await self.get_page_content(None, 1)
+                    await self._update_buttons(None)
+                    await ctx.send(**contents, view=self)
+                async def get_page_count(self, _: discord.Interaction) -> int:
+                    return ceil(len(f_jobs)/30)
+                async def get_page_content(self, interaction: discord.Interaction, page: int):
+                    "Create one page"
+                    # to_display = f_jobs[(page-1)*30:page*30]
+                    desc = await self.client._(ctx.channel, "fun.discordjobs-count", c=len(f_jobs))
+                    emb = discord.Embed(title=_title, color=7506394, url="https://dis.gd/jobs", description=desc)
+                    page_start, page_end = (page-1)*30, min(page*30, len(f_jobs))
+                    for i in range(page_start, page_end, 10):
+                        column_start, column_end = i+1, min(i+10, len(f_jobs))
+                        emb.add_field(name=f"{column_start}-{column_end}", value="\n".join(f_jobs[i:i+10]))
+                    return {
+                        "embed": emb
+                    }
+
+            if len(f_jobs) < 30:
+                emb = discord.Embed(title=_title, color=7506394, url="https://dis.gd/jobs")
+                emb.description = await self.bot._(ctx.channel, "fun.discordjobs-count", c=len(f_jobs))
+                for i in range(0, len(f_jobs), 10):
+                    emb.add_field(name=self.bot.zws, value="\n".join(f_jobs[i:i+10]))
+                await ctx.send(embed=emb)
+            else:
+                _quit = await self.bot._(ctx.guild, "misc.quit")
+                view = JobsPaginator(self.bot, ctx.author, stop_label=_quit.capitalize())
+                await view.send_init(ctx)
         else:
             await ctx.send("\n".join(f_jobs[:20]))
 
