@@ -24,18 +24,18 @@ class TaskHandler:
         """Renvoie une liste de tous les events qui doivent être exécutés"""
         try:
             if id_only:
-                query = ("SELECT `ID` FROM `timed`")
+                query = ("SELECT `ID` FROM `timed` WHERE beta=%s")
             else:
-                query = ("SELECT *, CONVERT_TZ(`begin`, @@session.time_zone, '+00:00') AS `utc_begin` FROM `timed`")
-            liste = list()
-            async with self.bot.db_query(query) as query_results:
+                query = ("SELECT *, CONVERT_TZ(`begin`, @@session.time_zone, '+00:00') AS `utc_begin` FROM `timed` WHERE beta=%s")
+            events: list[dict] = []
+            async with self.bot.db_query(query, (self.bot.beta,)) as query_results:
                 for row in query_results:
                     if get_all:
-                        liste.append(row)
+                        events.append(row)
                     else:
                         if id_only or row['begin'].timestamp()+row['duration'] < time.time():
-                            liste.append(row)
-            return liste
+                            events.append(row)
+            return events
         except Exception as err:  # pylint: disable=broad-except
             await self.bot.get_cog('Errors').on_error(err, None)
             return []
@@ -46,7 +46,7 @@ class TaskHandler:
         tasks_list = await self.get_events_from_db()
         if len(tasks_list) == 0:
             return
-        self.bot.log.debug("[tasks_loop] Itération ({} tâches trouvées)".format(len(tasks_list)))
+        self.bot.log.debug("[tasks_loop] Itération (%s tâches trouvées)", len(tasks_list))
         for task in tasks_list:
             if task['action'] == 'mute':
                 try:
@@ -109,10 +109,10 @@ class TaskHandler:
                 if channel is None:
                     return False
         else:
-            channel = self.bot.get_channel(task["channel"])
-            if channel is None:
+            channel = self.bot.get_user(task["user"])
+            if not channel:
                 return False
-        user = self.bot.get_user(task["user"])
+        user = channel if isinstance(channel, discord.User) else self.bot.get_user(task["user"])
         if user is None:
             raise discord.errors.NotFound
         try:
@@ -125,12 +125,10 @@ class TaskHandler:
             if task['data'] is not None:
                 task['data'] = json.loads(task['data'])
             msg = await self.bot._(channel, "timers.rmd.embed-asked", user=user.mention, duration=f_duration)
-            if isinstance(channel, discord.User) or channel.permissions_for(guild.me).embed_links:
+            if isinstance(channel, (discord.User, discord.DMChannel)) or channel.permissions_for(guild.me).embed_links:
                 if 'msg_url' in task['data']:
-                    task["message"] += "\n\n[{}]({})".format(
-                        await self.bot._(channel, "timers.rmd.embed-link"),
-                        task['data']['msg_url']
-                    )
+                    click_here = await self.bot._(channel, "timers.rmd.embed-link")
+                    task["message"] += f"\n\n[{click_here}]({task['data']['msg_url']})"
                 title = (await self.bot._(channel, "timers.rmd.embed-title")).capitalize()
                 emb = discord.Embed(title=title, description=task["message"], color=4886754, timestamp=task["begin"])
                 emb.set_footer(text=await self.bot._(channel, "timers.rmd.embed-date"))
@@ -158,7 +156,7 @@ class TaskHandler:
                     and task['action'] != "timer"):
                 return await self.update_duration(task['ID'], duration)
         data = None if data is None else json.dumps(data)
-        query = "INSERT INTO `timed` (`guild`,`channel`,`user`,`action`,`duration`,`message`, `data`) VALUES (%(guild)s,%(channel)s,%(user)s,%(action)s,%(duration)s,%(message)s,%(data)s)"
+        query = "INSERT INTO `timed` (`guild`,`channel`,`user`,`action`,`duration`,`message`, `data`, `beta`) VALUES (%(guild)s,%(channel)s,%(user)s,%(action)s,%(duration)s,%(message)s,%(data)s,%(beta)s)"
         query_args = {
             'guild': guildid,
             'channel': channelid,
@@ -166,7 +164,8 @@ class TaskHandler:
             'action': action,
             'duration': duration,
             'message': message,
-            'data': data
+            'data': data,
+            'beta': self.bot.beta
         }
         async with self.bot.db_query(query, query_args):
             pass
@@ -189,8 +188,8 @@ class TaskHandler:
     async def cancel_unmute(self, user_id: int, guild_id: int):
         """Cancel every automatic unmutes for a member"""
         try:
-            query = 'DELETE FROM `timed` WHERE action="mute" AND guild=%s AND user=%s;'
-            async with self.bot.db_query(query, (guild_id, user_id)):
+            query = 'DELETE FROM `timed` WHERE action="mute" AND guild=%s AND user=%s AND beta=%s;'
+            async with self.bot.db_query(query, (guild_id, user_id, self.bot.beta)):
                 pass
         except Exception as err:  # pylint: disable=broad-except
             await self.bot.get_cog('Errors').on_error(err, None)
