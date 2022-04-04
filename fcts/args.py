@@ -210,10 +210,9 @@ class snowflake(commands.Converter):
 class serverlog(commands.Converter):
     "Convert arguments to a server log type"
     async def convert(self, ctx: MyContext, argument: str) -> str:
-        from fcts.serverlogs import \
-            ServerLogs  # pylint: disable=import-outside-toplevel
+        from fcts.serverlogs import ServerLogs  # pylint: disable=import-outside-toplevel
 
-        if argument in ServerLogs.available_logs or argument == 'all':
+        if argument in ServerLogs.available_logs() or argument == 'all':
             return argument
         raise commands.BadArgument(f'"{argument}" is not a valid server log type')
 

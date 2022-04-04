@@ -22,9 +22,9 @@ class ServerLogs(commands.Cog):
         "roles": {"role_creation"}
     }
 
-    @property
-    def available_logs(self):
-        return {log for category in ServerLogs.logs_categories.values() for log in category}
+    @classmethod
+    def available_logs(cls):
+        return {log for category in cls.logs_categories.values() for log in category}
 
 
     def __init__(self, bot: Zbot):
@@ -135,7 +135,7 @@ class ServerLogs(commands.Cog):
             global_title = await self.bot._(ctx.guild.id, "serverlogs.list.all")
             # fetch logs enabled in the guild
             guild_logs = await self.db_get_from_guild(ctx.guild.id)
-            guild_logs = sorted(set(x for v in guild_logs.values() for x in v if x in self.available_logs))
+            guild_logs = sorted(set(x for v in guild_logs.values() for x in v if x in self.available_logs()))
             # build embed
             desc = await self.bot._(ctx.guild.id, "serverlogs.list.emojis", enabled='🔹', disabled='◾')
             embed = discord.Embed(title=global_title, description=desc)
@@ -153,7 +153,7 @@ class ServerLogs(commands.Cog):
         if len(logs) == 0:
             raise commands.BadArgument('Invalid server log type')
         if 'all' in logs:
-            logs = list(self.available_logs)
+            logs = list(self.available_logs())
         actually_added: list[str] = []
         for log in logs:
             if await self.db_add(ctx.guild.id, ctx.channel.id, log):
@@ -173,7 +173,7 @@ class ServerLogs(commands.Cog):
         if len(logs) == 0:
             raise commands.BadArgument('Invalid server log type')
         if 'all' in logs:
-            logs = list(self.available_logs)
+            logs = list(self.available_logs())
         actually_removed: list[str] = []
         for log in logs:
             if await self.db_remove(ctx.guild.id, ctx.channel.id, log):
