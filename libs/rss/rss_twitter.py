@@ -22,7 +22,7 @@ class TwitterRSS:
         self.bot = bot
         self.min_time_between_posts = 15
         self.api = twitter.Api(**bot.others['twitter'], tweet_mode="extended", timeout=15)
-        self.url_pattern = r'(?:http.*://)?(?:www\.)?(?:twitter\.com/)([^?\s]+)'
+        self.url_pattern = r'(?:http.*://)?(?:www\.)?(?:twitter\.com/)([^?\s/]+)'
 
     def is_twitter_url(self, string: str):
         "Check if an url is a valid Twitter URL"
@@ -86,7 +86,7 @@ class TwitterRSS:
                 img = lastpost.media[0].media_url_https
             obj = RssMessage(
                 bot=self.bot,
-                Type='tw',
+                feed_type='tw',
                 url=url,
                 title=text,
                 date=dt.datetime.fromtimestamp(lastpost.created_at_in_seconds),
@@ -120,7 +120,7 @@ class TwitterRSS:
                     img = post.media[0].media_url_https
                 obj = RssMessage(
                     bot=self.bot,
-                    Type='tw',
+                    feed_type='tw',
                     url=url,
                     title=text,
                     date=dt.datetime.fromtimestamp(post.created_at_in_seconds),
