@@ -232,7 +232,7 @@ You can specify a verification limit by adding a number in argument (up to 1.000
         ..Example blame discord
 
         ..Doc fun.html#blame"""
-        l1 = ['discord','mojang','zbot','google','youtube'] # tout le monde
+        l1 = ['discord','mojang','zbot','google','youtube', 'twitter'] # tout le monde
         l2 = ['tronics','patate','neil','reddemoon','aragorn1202','platon'] # frm
         l3 = ['awhikax','aragorn','adri','zrunner'] # zbot
         l4 = ['benny'] #benny
