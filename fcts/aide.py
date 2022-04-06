@@ -184,25 +184,22 @@ If the bot can't send the new command format, it will try to send the old one.""
                     await destination.send("\n".join(page))
 
     async def display_cmd(self, cmd: commands.Command):
-        return "• **{}**\t\t*{}*".format(cmd.name, cmd.short_doc.strip()) if len(cmd.short_doc) > 0 else "• **{}**".format(cmd.name)
+        return f"• **{cmd.name}**\t\t*{cmd.short_doc.strip()}*" if len(cmd.short_doc) > 0 else f"• **{cmd.name}**"
 
     def sort_by_name(self, cmd: commands.Command) -> str:
         return cmd.name
 
     async def all_commands(self, ctx: MyContext, cmds: List[commands.Command], compress: bool = False):
         """Create pages for every bot command"""
-        categories = {x: list() for x in self.commands_list.keys()}
+        categories = {x: [] for x in self.commands_list.keys()}
         for cmd in cmds:
             try:
                 if cmd.hidden or not cmd.enabled:
                     continue
                 if not await cmd.can_run(ctx):
                     continue
-            except Exception as e:
-                if not "discord.ext.commands.errors" in str(type(e)):
-                    raise e
-                else:
-                    continue
+            except commands.CommandError:
+                continue
             temp = await self.display_cmd(cmd)
             found = False
             for k, v in self.commands_list.items():
@@ -212,7 +209,7 @@ If the bot can't send the new command format, it will try to send the old one.""
                     break
             if not found:
                 categories['unclassed'].append(temp)
-        answer = list()
+        answer = []
         prefix = await self.bot.prefix_manager.get_prefix(ctx.guild)
         if compress:
             for k, v in categories.items():
@@ -261,11 +258,8 @@ If the bot can't send the new command format, it will try to send the old one.""
             try:
                 if (not await cmd.can_run(ctx)) or cmd.hidden or (not cmd.enabled) or cmd.cog_name != cog_name:
                     continue
-            except Exception as e:
-                if not "discord.ext.commands.errors" in str(type(e)):
-                    raise e
-                else:
-                    continue
+            except commands.CommandError:
+                continue
             text = await self.display_cmd(cmd)
             if len(page+text) > 1900:
                 pages.append(form.format(cog_name, description, page))
@@ -314,9 +308,8 @@ If the bot can't send the new command format, it will try to send the old one.""
                         subcmds += "\n• {} {}".format(x.name, "*({})*".format(
                             x.short_doc) if len(x.short_doc) > 0 else "")
                         sublist.append(x.name)
-                except Exception as e:
-                    if "discord.ext.commands.errors" not in str(type(e)):
-                        raise e
+                except commands.CommandError:
+                    pass
         # Is enabled
         enabled = list()
         if not cmd.enabled:

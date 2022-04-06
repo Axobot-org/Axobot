@@ -22,10 +22,10 @@ class Errors(commands.Cog):
         # This prevents any commands with local handlers being handled here in on_command_error.
         if hasattr(ctx.command, 'on_error'):
             return
-        
+
         ignored = (commands.errors.CommandNotFound,commands.errors.CheckFailure,commands.errors.ConversionError,discord.errors.Forbidden)
         actually_not_ignored = (commands.errors.NoPrivateMessage)
-        
+
         # Allows us to check for original exceptions raised and sent to CommandInvokeError.
         # If nothing is found. We keep the exception passed to on_command_error.
         error = getattr(error, 'original', error)
