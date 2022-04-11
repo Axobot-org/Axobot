@@ -834,7 +834,9 @@ You can specify a verification limit by adding a number in argument (up to 1.000
         ..Doc fun.html#nasa"""
         def get_date(raw_str: str):
             return datetime.datetime.strptime(raw_str, "%Y-%m-%d").replace(tzinfo=datetime.timezone.utc)
-        if self.nasa_pict is None or 'date' not in self.nasa_pict or (datetime.datetime.utcnow()-get_date(self.nasa_pict["date"])).total_seconds() > 86400:
+        if self.nasa_pict is None \
+                or 'date' not in self.nasa_pict \
+                or (self.bot.utcnow()-get_date(self.nasa_pict["date"])).total_seconds() > 86400:
             async with aiohttp.ClientSession() as session:
                 key = self.bot.others["nasa"]
                 async with session.get(f"https://api.nasa.gov/planetary/apod?api_key={key}") as r:
