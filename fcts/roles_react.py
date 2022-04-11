@@ -302,23 +302,23 @@ Opposite is the subcommand 'join'
                 await user.remove_roles(role, reason="Roles reaction")
         except discord.errors.Forbidden:
             pass
-        except Exception as e:
-            await self.bot.get_cog('Errors').on_error(e, None)
+        except Exception as err:
+            await self.bot.get_cog('Errors').on_error(err, None)
         else:
             if not ignore_success:
                 await channel.send(await self.bot._(guild.id, "roles_react.role-given" if give else "roles_react.role-lost", r=role.name))
 
     @rr_main.command(name='update')
     @commands.check(checks.database_connected)
-    async def rr_update(self, ctx: MyContext, embed: discord.Message, changeDescription: typing.Optional[bool] = True, emojis: commands.Greedy[args.anyEmoji] = None):
+    async def rr_update(self, ctx: MyContext, embed: discord.Message, change_description: typing.Optional[bool] = True, emojis: commands.Greedy[args.anyEmoji] = None):
         """Update a Zbot message to refresh roles/reactions
         If you don't want to update the embed content, for example if it's a custom embed, then you can use 'False' as a second argument. Zbot will only check the reactions
         Specifying a list of emojis will update the embed only for those emojis, and ignore other roles reactions
 
-        ..Example roles_react update 707726569430319164 False
+        ..Example roles_react update https://discord.com/channels/356067272730607628/625320847296430120/707726569430319164 False
 
         ..Example roles_react update 707726569430319164 True :cool: :vip:
-        
+
         ..Doc roles-reactions.html#update-your-embed"""
         if embed.author != ctx.guild.me:
             return await ctx.send(await self.bot._(ctx.guild, "roles_react.not-zbot-msg"))
@@ -329,8 +329,8 @@ Opposite is the subcommand 'join'
         emb = embed.embeds[0]
         try:
             l = await self.rr_list_role(ctx.guild.id)
-        except Exception as e:
-            return await self.bot.get_cog('Errors').on_command_error(ctx, e)
+        except Exception as err:
+            return await self.bot.get_cog('Errors').on_command_error(ctx, err)
         if emojis is not None:
             emojis = [str(x.id) if isinstance(x, discord.Emoji)
                       else str(x) for x in emojis]
@@ -340,7 +340,7 @@ Opposite is the subcommand 'join'
         for emoji in emojis:
             if emoji not in reacts:
                 await embed.add_reaction(emoji)
-        if emb.description != desc and changeDescription:
+        if emb.description != desc and change_description:
             emb.description = desc
             await embed.edit(embed=emb)
             await ctx.send(await self.bot._(ctx.guild, "roles_react.embed-edited"))
