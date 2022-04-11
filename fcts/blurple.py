@@ -50,6 +50,21 @@ class ThemeConverter(commands.Converter):
             raise commands.errors.BadArgument(f'Could not convert "{argument}" into Blurple Theme')
         return argument
 
+async def get_url_from_ctx(ctx: MyContext, who: typing.Union[discord.Member, discord.PartialEmoji, LinkConverter]):
+    "Get the resource URL from either the who argument or the context"
+    if ctx.message.attachments:
+        url = ctx.message.attachments[0].proxy_url
+    elif who is None:
+        url = ctx.author.display_avatar.url
+    else:
+        if isinstance(who, str):  # LinkConverter
+            url = who
+        elif isinstance(who, discord.PartialEmoji):
+            url = who.url
+        else:
+            url = who.display_avatar.url
+    return url
+
 
 def _make_check_command(name, parent, **kwargs):
     @commands.cooldown(2, 60, commands.BucketType.member)
@@ -57,29 +72,19 @@ def _make_check_command(name, parent, **kwargs):
     @parent.command(name, help=f"{name.title()} an image to know if you're cool enough.", **kwargs)
     async def command(self, ctx: MyContext, theme: ThemeConverter="light", *, who: typing.Union[discord.Member, discord.PartialEmoji, LinkConverter] = None):
 
-        if ctx.message.attachments:
-            url = ctx.message.attachments[0].proxy_url
-        elif who is None:
-            url = ctx.author.display_avatar.url
-        else:
-            if isinstance(who, str):  # LinkConverter
-                url = who
-            elif isinstance(who, discord.PartialEmoji):
-                url = who.url
-            else:
-                url = who.display_avatar.url
+        url = await get_url_from_ctx(ctx, who)
 
         old_msg = await ctx.send(await ctx.bot._(ctx.channel, "blurple.check_intro", user=ctx.author.mention))
         async with aiohttp.ClientSession() as session:
             async with session.get(str(url)) as image:
                 r = await check_image(await image.read(), theme, name)
-        answer = "\n".join(["> {}: {}%".format(color["name"],color["ratio"]) for color in r['colors']])
+        answer = "\n".join([f"> {color['name']}: {color['ratio']}%" for color in r['colors']])
         await ctx.send(f"Results for {ctx.author.mention}:\n"+answer)
         if r["passed"] and ctx.author.id not in self.cache:
             await self.bot.get_cog("Utilities").add_user_eventPoint(ctx.author.id, 40)
             self.cache.append(ctx.author.id)
-            with open("blurple-cache.json", "w") as f:
-                json.dump(self.cache, f)
+            with open("blurple-cache.json", "w", encoding="utf-8") as jsonfile:
+                json.dump(self.cache, jsonfile)
             await ctx.send(f"{ctx.author.mention} you just won 40 event xp thanks to your blurple-liful picture!")
         await old_msg.delete()
 
@@ -102,17 +107,8 @@ def _make_color_command(name, fmodifier, parent, **kwargs):
 
             if method is None:
                 return
-        if ctx.message.attachments:
-            url = ctx.message.attachments[0].proxy_url
-        elif who is None:
-            url = ctx.author.display_avatar.url
-        else:
-            if isinstance(who, str):  # LinkConverter
-                url = who
-            elif isinstance(who, discord.PartialEmoji):
-                url = who.url
-            else:
-                url = who.display_avatar.url
+
+        url = await get_url_from_ctx(ctx, who)
 
         if fmodifier == 'blurplefy':
             final_modifier = "light"
@@ -127,8 +123,8 @@ def _make_color_command(name, fmodifier, parent, **kwargs):
             async with aiohttp.ClientSession() as session:
                 async with session.get(str(url)) as image:
                     r = await convert_image(await image.read(), final_modifier, method,variations)
-        except RuntimeError as e:
-            await ctx.send(await ctx.bot._(ctx.channel, 'blurple.unknown-err', err=str(e)))
+        except RuntimeError as err:
+            await ctx.send(await ctx.bot._(ctx.channel, 'blurple.unknown-err', err=str(err)))
             return
         await ctx.send(await ctx.bot._(ctx.channel, 'blurple.blurplefy.success', user=ctx.author.mention), file=r)
         await old_msg.delete()
@@ -138,16 +134,18 @@ def _make_color_command(name, fmodifier, parent, **kwargs):
 
 
 class Blurplefy(Cog):
+    "Class used to make things blurple, for the Discord birthday event"
+
     def __init__(self, bot: Zbot):
         self.bot = bot
         self.file = "blurple"
         self.hourly_reward = [4, 20]
         try:
-            with open("blurple-cache.json", "r") as f:
-                self.cache: list[int] = json.load(f)
+            with open("blurple-cache.json", "r", encoding="utf-8") as jsonfile:
+                self.cache: list[int] = json.load(jsonfile)
         except FileNotFoundError:
-            with open("blurple-cache.json", "w") as f:
-                json.dump(list(), f)
+            with open("blurple-cache.json", "w", encoding="utf-8") as jsonfile:
+                json.dump(list(), jsonfile)
             self.cache = list()
     
     async def get_default_blurplefier(self, ctx):

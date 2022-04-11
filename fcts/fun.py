@@ -118,7 +118,6 @@ class Fun(commands.Cog):
             return await ctx.send(await self.bot._(ctx.channel,"fun.no-roll"))
         elif len(liste) == 1:
             return await ctx.send(await self.bot._(ctx.channel,"fun.not-enough-roll"))
-        # choosen = random.choice(liste).replace('@everyone','@​everyone').replace('@here','@​here')
         choosen = random.choice(liste)
         await ctx.send(choosen)
 
