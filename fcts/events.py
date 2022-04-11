@@ -6,6 +6,7 @@ import random
 import re
 import shutil
 import time
+from typing import Union
 
 import aiohttp
 import discord
@@ -72,12 +73,19 @@ class Events(commands.Cog):
     async def on_member_update(self, before: discord.Member, after: discord.Member):
         """Called when a member change something (status, activity, nickame, roles)"""
         if before.nick != after.nick:
-            config_option = await self.bot.get_cog('Utilities').get_db_userinfo(['allow_usernames_logs'],["userID="+str(before.id)])
-            if config_option is not None and config_option['allow_usernames_logs'] is False:
-                return
             await self.updade_memberslogs_name(before, after)
 
-    async def updade_memberslogs_name(self, before:discord.Member, after:discord.Member, tries:int=0):
+    @commands.Cog.listener()
+    async def on_user_update(self, before: discord.User, after: discord.User):
+        """Called when a user change something (avatar, username, discrim)"""
+        if before.name != after.name:
+            await self.updade_memberslogs_name(before, after)
+
+    async def updade_memberslogs_name(self, before: Union[discord.User, discord.Member], after: Union[discord.User, discord.Member], tries:int=0):
+        "Save in our database when a user change its nickname or username"
+        config_option = await self.bot.get_cog('Utilities').get_db_userinfo(['allow_usernames_logs'],["userID="+str(before.id)])
+        if config_option is not None and config_option['allow_usernames_logs'] is False:
+            return
         if tries > 5:
             return
         if not self.bot.database_online:
@@ -97,15 +105,6 @@ class Events(commands.Cog):
         except mysql.connector.errors.IntegrityError as err:
             self.bot.log.warning(err)
             await self.updade_memberslogs_name(before, after, tries+1)
-
-    @commands.Cog.listener()
-    async def on_user_update(self, before: discord.User, after: discord.User):
-        """Called when a user change something (avatar, username, discrim)"""
-        if before.name != after.name:
-            config_option = await self.bot.get_cog('Utilities').get_db_userinfo(['allow_usernames_logs'],["userID="+str(before.id)])
-            if config_option is not None and config_option['allow_usernames_logs'] is False:
-                return
-            await self.updade_memberslogs_name(before, after)
 
 
     @commands.Cog.listener()

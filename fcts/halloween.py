@@ -57,23 +57,28 @@ async def is_halloween(ctx: MyContext):
     """Check if we are in Halloween period"""
     return ctx.bot.current_event == "halloween"
 
+async def get_url_from_ctx(ctx: MyContext, who: typing.Union[discord.Member, discord.PartialEmoji, LinkConverter]):
+    "Get the resource URL from either the who argument or the context"
+    if ctx.message.attachments:
+        url = ctx.message.attachments[0].proxy_url
+    elif who is None:
+        url = ctx.author.display_avatar.url
+    else:
+        if isinstance(who, str):  # LinkConverter
+            url = who
+        elif isinstance(who, discord.PartialEmoji):
+            url = who.url
+        else:
+            url = who.display_avatar.url
+    return url
+
 def _make_check_command(name: str, parent: commands.Group, **kwargs):
     @commands.cooldown(2, 60, commands.BucketType.member)
     @commands.cooldown(30, 40, commands.BucketType.guild)
     @parent.command(name, help=f"{name.title()} an image to know if you're cool enough.\n\nTheme is either 'light' or 'dark'", **kwargs)
     async def command(self, ctx: MyContext, theme: ThemeConverter = "light", *, who: typing.Union[discord.Member, discord.PartialEmoji, LinkConverter] = None):
 
-        if ctx.message.attachments:
-            url = ctx.message.attachments[0].proxy_url
-        elif who is None:
-            url = ctx.author.display_avatar.url
-        else:
-            if isinstance(who, str):  # LinkConverter
-                url = who
-            elif isinstance(who, discord.PartialEmoji):
-                url = who.url
-            else:
-                url = who.display_avatar.url
+        url = await get_url_from_ctx(ctx, who)
 
         old_msg = await ctx.send("Starting check for {}...".format(ctx.author.mention))
         async with aiohttp.ClientSession() as session:
@@ -85,7 +90,7 @@ def _make_check_command(name: str, parent: commands.Group, **kwargs):
         if result["passed"] and ctx.author.id not in self.cache:
             await self.bot.get_cog("Utilities").add_user_eventPoint(ctx.author.id, 40)
             self.cache.append(ctx.author.id)
-            with open("halloween-cache.json", "w") as file:
+            with open("halloween-cache.json", "w", encoding="utf-8") as file:
                 json.dump(self.cache, file)
             await ctx.send(f"{ctx.author.mention} you just won 40 event xp thanks to your hallow-iful picture!")
         await old_msg.delete()
@@ -109,17 +114,8 @@ def _make_color_command(name, fmodifier, parent, **kwargs):
 
             if method is None:
                 return
-        if ctx.message.attachments:
-            url = ctx.message.attachments[0].proxy_url
-        elif who is None:
-            url = ctx.author.display_avatar.url
-        else:
-            if isinstance(who, str):  # LinkConverter
-                url = who
-            elif isinstance(who, discord.PartialEmoji):
-                url = who.url
-            else:
-                url = who.display_avatar.url
+
+        url = await get_url_from_ctx(ctx, who)
 
         if fmodifier == 'hallowify':
             final_modifier = "light"
@@ -134,8 +130,8 @@ def _make_color_command(name, fmodifier, parent, **kwargs):
             async with aiohttp.ClientSession() as session:
                 async with session.get(str(url)) as image:
                     r = await self.bot.loop.run_in_executor(None, convert_image, await image.read(), final_modifier, method, variations)
-        except RuntimeError as e:
-            await ctx.send(f"Oops, something went wrong: {e}")
+        except RuntimeError as err:
+            await ctx.send(f"Oops, something went wrong: {err}")
             return
         await ctx.send(f"{ctx.author.mention}, here's your image!", file=r)
         await old_msg.delete()
@@ -145,16 +141,17 @@ def _make_color_command(name, fmodifier, parent, **kwargs):
 
 
 class Halloween(Cog):
+    "Class used for halloween events, mainly to hallowin-ify images"
     def __init__(self, bot: Zbot):
         self.bot = bot
         self.file = "halloween"
         self.hourly_reward = [4, 17]
         try:
-            with open("halloween-cache.json", "r") as f:
-                self.cache = json.load(f)
+            with open("halloween-cache.json", "r", encoding="utf-8") as file:
+                self.cache = json.load(file)
         except FileNotFoundError:
-            with open("halloween-cache.json", "w") as f:
-                f.write('[]')
+            with open("halloween-cache.json", "w", encoding="utf-8") as file:
+                file.write('[]')
             self.cache = list()
 
     async def get_default_halloweefier(self, _ctx: MyContext):
