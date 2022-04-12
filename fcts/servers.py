@@ -223,7 +223,7 @@ class Servers(commands.Cog):
         """Update a server config in the database"""
         if not isinstance(values, list):
             raise ValueError
-        set_query = ', '.join('{}=%s'.format(val[0]) for val in values)
+        set_query = ', '.join(f'`{val[0]}`=%s' for val in values)
         query = f"UPDATE `{self.table}` SET {set_query} WHERE `ID`={guild_id}"
         async with self.bot.db_query(query, (val[1] for val in values)):
             pass
