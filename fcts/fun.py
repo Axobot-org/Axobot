@@ -142,9 +142,10 @@ class Fun(commands.Cog):
 
     @commands.command(name="count_msg",hidden=True)
     @commands.check(is_fun_enabled)
-    @commands.cooldown(5, 30, type=commands.BucketType.channel)
+    @commands.cooldown(5, 30, commands.BucketType.channel)
+    @commands.cooldown(8, 60, commands.BucketType.guild)
     async def count(self, ctx:MyContext, limit:typing.Optional[int]=1000, user:typing.Optional[discord.User]=None, channel:typing.Optional[discord.TextChannel]=None):
-        """Count the number of messages sent by the user
+        """Count the number of messages sent by the user in one channel
 You can specify a verification limit by adding a number in argument (up to 1.000.000)
 
         ..Example count_msg
@@ -154,7 +155,7 @@ You can specify a verification limit by adding a number in argument (up to 1.000
         ..Example count_msg 300 someone
 
         ..Doc fun.html#count-messages"""
-        MAX = 20000
+        MAX = 15_000
         if channel is None:
             channel = ctx.channel
         if not channel.permissions_for(ctx.author).read_message_history:
@@ -173,16 +174,16 @@ You can specify a verification limit by adding a number in argument (up to 1.000
             user = ctx.author
         counter = 0
         tmp = await ctx.send(await self.bot._(ctx.channel,"fun.count.counting"))
-        m = 0
+        total_count = 0
         async for log in channel.history(limit=limit):
-            m += 1
+            total_count += 1
             if log.author == user:
                 counter += 1
-        r = round(counter*100/m,2)
+        result = round(counter*100/total_count,2)
         if user == ctx.author:
-            await tmp.edit(content = await self.bot._(ctx.channel,"fun.count.result-you",limit=m,x=counter,p=r))
+            await tmp.edit(content = await self.bot._(ctx.channel,"fun.count.result-you",limit=total_count,x=counter,p=result))
         else:
-            await tmp.edit(content = await self.bot._(ctx.channel,"fun.count.result-user", limit=m,user=user.display_name,x=counter,p=r))
+            await tmp.edit(content = await self.bot._(ctx.channel,"fun.count.result-user", limit=total_count,user=user.display_name,x=counter,p=result))
 
     @commands.command(name="ragequit",hidden=True)
     @commands.check(is_fun_enabled)
