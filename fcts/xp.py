@@ -929,7 +929,7 @@ class Xp(commands.Cog):
     @commands.command(name='set_xp', aliases=["setxp", "set-xp"])
     @commands.guild_only()
     @commands.check(checks.has_admin)
-    async def set_xp(self, ctx: MyContext, xp:int, *, user:args.user):
+    async def set_xp(self, ctx: MyContext, user: args.user, xp: int):
         """Set the XP of a user
 
         ..Example set_xp 3000 @someone"""
@@ -955,7 +955,7 @@ class Xp(commands.Cog):
             self.bot.log.info(s)
             emb = discord.Embed(description=s,color=8952255, timestamp=self.bot.utcnow())
             emb.set_footer(text=ctx.guild.name)
-            emb.set_author(self.bot.user, icon_url=self.bot.user.display_avatar)
+            emb.set_author(name=self.bot.user, icon_url=self.bot.user.display_avatar)
             await self.bot.send_embed([emb])
 
     async def gen_rr_id(self):
