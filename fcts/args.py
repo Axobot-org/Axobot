@@ -43,29 +43,17 @@ class user(commands.converter.UserConverter):
             if res is None:
                 try:
                     res = await ctx.bot.fetch_user(int(argument))
-                except:
+                except discord.NotFound:
                     pass
             if res is not None:
                 return res
         else:
             try:
                 return await commands.MemberConverter().convert(ctx, argument)
-            except:
+            except commands.BadArgument:
                 return await commands.UserConverter().convert(ctx, argument)
         if res is None:
-            raise commands.errors.BadArgument(
-                'User "{}" not found'.format(argument))
-
-
-class infoType(commands.Converter):
-    def __init__(self):
-        pass
-
-    async def convert(self, ctx: MyContext, argument: str) -> str:
-        if argument.lower() in ['member', 'role', 'user', 'textchannel', 'channel', 'invite', 'voicechannel', 'emoji', 'category', 'guild', 'server', 'id', 'snowflake']:
-            return argument.lower()
-        else:
-            raise commands.errors.BadArgument('Invalid type: '+argument)
+            raise commands.errors.UserNotFound(argument)
 
 
 class cardStyle(commands.Converter):
@@ -84,15 +72,13 @@ class LeaderboardType(commands.Converter):
         pass
 
     async def convert(self, ctx: MyContext, argument: str) -> str:
-        if argument in ['server', 'guild', 'serveur', 'local']:
+        if argument in {'server', 'guild', 'serveur', 'local'}:
             if ctx.guild is None:
-                raise commands.errors.BadArgument(
-                    'Cannot use {} leaderboard type outside a server'.format(argument))
+                raise commands.errors.BadArgument(f'Cannot use {argument} leaderboard type outside a server')
             return 'guild'
-        elif argument in ['all', 'global', 'tout']:
+        elif argument in {'all', 'global', 'tout'}:
             return 'global'
-        raise commands.errors.BadArgument(
-            'Invalid leaderboard type: {}'.format(argument))
+        raise commands.errors.BadArgument(f'Invalid leaderboard type: {argument}')
 
 
 class Invite(commands.Converter):
