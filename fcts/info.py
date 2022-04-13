@@ -234,7 +234,6 @@ class Info(commands.Cog):
     @commands.group(name='info')
     @commands.guild_only()
     @commands.check(checks.bot_can_embed)
-    # async def info_main(self, ctx: MyContext, Type: typing.Optional[args.infoType]=None, *, name: str=None):
     async def info_main(self, ctx: MyContext):
         """Find informations about someone/something
 Available types: member, role, user, emoji, channel, server, invite, category
