@@ -852,7 +852,7 @@ class Xp(commands.Cog):
         ..Example top 7 guild
 
         ..Example top guild
-        
+
         ..Doc user.html#get-the-general-ranking"""
         if ctx.guild is not None:
             if not await self.bot.get_config(ctx.guild.id,'enable_xp'):
@@ -931,7 +931,7 @@ class Xp(commands.Cog):
     @commands.check(checks.has_admin)
     async def set_xp(self, ctx: MyContext, xp:int, *, user:args.user):
         """Set the XP of a user
-        
+
         ..Example set_xp 3000 @someone"""
         if user.bot:
             return await ctx.send(await self.bot._(ctx.guild.id, "xp.no-bot"))
@@ -954,7 +954,7 @@ class Xp(commands.Cog):
             s = "XP of user {} `{}` edited (from {} to {}) in server `{}`".format(user, user.id, prev_xp, xp, ctx.guild.id)
             self.bot.log.info(s)
             emb = discord.Embed(description=s,color=8952255, timestamp=self.bot.utcnow())
-            emb.set_footer(ctx.guild.name)
+            emb.set_footer(text=ctx.guild.name)
             emb.set_author(self.bot.user, icon_url=self.bot.user.display_avatar)
             await self.bot.send_embed([emb])
 
@@ -1024,7 +1024,7 @@ class Xp(commands.Cog):
     @commands.check(checks.bot_can_embed)
     async def rr_list(self, ctx: MyContext):
         """List every roles rewards of your server
-        
+
         ..Doc server.html#roles-rewards"""
         try:
             l = await self.rr_list_role(ctx.guild.id)
@@ -1044,9 +1044,9 @@ class Xp(commands.Cog):
     async def rr_remove(self, ctx: MyContext, level:int):
         """Remove a role reward
         When a member reaches this level, no role will be given anymore
-        
+
         ..Example roles_rewards remove 10
-        
+
         ..Doc server.html#roles-rewards"""
         try:
             l = await self.rr_list_role(ctx.guild.id,level)
