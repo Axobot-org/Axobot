@@ -190,8 +190,8 @@ class Errors(commands.Cog):
             else:
                 await self.senf_err_msg(ctx.guild.name+" | "+ctx.channel.name+"\n"+msg)
             self.bot.log.warning(f"[on_error] {error}", exc_info=exc_info)
-        except Exception as e:
-            self.bot.log.warning(f"[on_error] {e}", exc_info=exc_info)
+        except Exception as err: # pylint: disable=broad-except
+            self.bot.log.warning(f"[on_error] {err}", exc_info=exc_info)
 
 
     async def senf_err_msg(self, msg: str):
@@ -208,5 +208,5 @@ class Errors(commands.Cog):
         return True
 
 
-def setup(bot):
-    bot.add_cog(Errors(bot))
+async def setup(bot):
+    await bot.add_cog(Errors(bot))

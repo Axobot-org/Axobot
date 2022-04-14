@@ -243,5 +243,5 @@ __29 variations: __
 
     
 
-def setup(bot):
-    bot.add_cog(Blurplefy(bot))
+async def setup(bot):
+    await bot.add_cog(Blurplefy(bot))

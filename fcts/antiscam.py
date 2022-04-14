@@ -90,5 +90,5 @@ class AntiScam(commands.Cog):
                 self.bot.dispatch("antiscam_warn", msg, result)
 
 
-def setup(bot):
-    bot.add_cog(AntiScam(bot))
+async def setup(bot):
+    await bot.add_cog(AntiScam(bot))

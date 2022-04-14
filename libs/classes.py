@@ -104,12 +104,19 @@ class Zbot(commands.bot.AutoShardedBot):
             self.log.warning("[current_event_data] %s", err, exc_info=True)
             return None
 
-    async def get_context(self, message: discord.Message, *, cls=MyContext) -> MyContext:
+    # pylint: disable=arguments-differ
+    async def get_context(self, source: discord.Message, *, cls=MyContext) -> MyContext:
         """Get a custom context class when creating one from a message"""
         # when you override this method, you pass your new Context
         # subclass to the super() method, which tells the bot to
         # use the new MyContext class
-        return await super().get_context(message, cls=cls)
+        return await super().get_context(source, cls=cls)
+
+    async def on_command_error(self, context: MyContext, exception: commands.CommandError, /) -> None:
+        if cog := self.get_cog("Errors"):
+            await cog.on_command_error(context, exception)
+        else:
+            self.log.error('Ignoring exception in command %s:', context.command, exc_info=True)
 
     @property
     def cnx_frm(self) -> MySQLConnection:
@@ -243,7 +250,9 @@ class Zbot(commands.bot.AutoShardedBot):
         cog = self.get_cog('Languages')
         if cog is None:
             self.log.error("Unable to load Languages cog")
-            return lambda *args, **kwargs: args[1]
+            async def fake_tr(*args, **_kwargs):
+                return 'en' if args[1] == "_used_locale" else args[1]
+            return fake_tr
         return cog.tr
 
     async def send_embed(self, embeds: list[discord.Embed], url:str=None):

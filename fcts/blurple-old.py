@@ -324,5 +324,5 @@ class BlurpleCog(commands.Cog):
             except Exception:
                 await ctx.send(str(await self.bot._(ctx.guild,'blurple','create_footer_2')).format(ctx.author.mention))
 
-def setup(bot):
-    bot.add_cog(BlurpleCog(bot))
+async def setup(bot):
+    await bot.add_cog(BlurpleCog(bot))

@@ -147,7 +147,7 @@ def load_sql_connection(bot: "Zbot"):
         bot.log.error(err)
         bot.database_online = False
 
-def load_cogs(bot: "Zbot"):
+async def load_cogs(bot: "Zbot"):
     "Load the bot modules"
     initial_extensions = ['fcts.languages',
                       'fcts.admin',
@@ -187,7 +187,7 @@ def load_cogs(bot: "Zbot"):
     count = 0
     for extension in initial_extensions:
         try:
-            bot.load_extension(extension)
+            await bot.load_extension(extension)
         except discord.DiscordException:
             bot.log.critical('Failed to load extension %s', extension, exc_info=True)
             count += 1
@@ -197,14 +197,14 @@ def load_cogs(bot: "Zbot"):
 
 async def count_code_lines():
     """Count lines of Python code in the current folder
-    
+
     Comments and empty lines are ignored."""
     count = 0
     path = os.path.dirname(__file__)+'/**/*.py'
     for filename in glob.iglob(path, recursive=True):
         if '/env/' in filename or not filename.endswith('.py'):
             continue
-        with open(filename, 'r') as file:
+        with open(filename, 'r', encoding='utf-8') as file:
             for line in file.read().split("\n"):
                 cleaned_line = line.strip()
                 if len(cleaned_line) > 2 and not cleaned_line.startswith('#'):

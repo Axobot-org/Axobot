@@ -1,4 +1,4 @@
-discord.py @ git+https://github.com/Rapptz/discord.py.git@38e6dc4f27d70ce22d088fbe605c2da0a31f228d
+discord.py @ git+https://github.com/Rapptz/discord.py.git@e541be0427101a4437ad777b7f1a692cc5b75e55
 aiohttp
 mysql-connector-python>=8.0
 frmc-lib @ git+https://github.com/ZRunner/fr-mc-python-lib.git@v1.0.6
