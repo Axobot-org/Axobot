@@ -917,5 +917,5 @@ Cette option affecte tous les serveurs"""
         await msg.edit(embed=emb)
         await self.add_success_reaction(ctx.message)
 
-def setup(bot):
-    bot.add_cog(Admin(bot))
+async def setup(bot):
+    await bot.add_cog(Admin(bot))

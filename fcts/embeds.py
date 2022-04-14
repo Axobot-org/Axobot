@@ -43,5 +43,5 @@ class Embeds(commands.Cog):
                 await self.bot.get_cog('Errors').senf_err_msg(err_msg)
 
 
-def setup(bot):
-    bot.add_cog(Embeds(bot))
+async def setup(bot):
+    await bot.add_cog(Embeds(bot))

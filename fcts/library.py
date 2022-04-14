@@ -168,5 +168,5 @@ class Library(commands.Cog):
         await self.db_add_search(book['isbn'], book['title'])
 
 
-def setup(bot):
-    bot.add_cog(Library(bot))
+async def setup(bot):
+    await bot.add_cog(Library(bot))

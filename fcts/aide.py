@@ -17,10 +17,10 @@ class Help(commands.Cog):
         self.help_color = 8311585
         self.help_color_DM = 14090153
         self.doc_url = "https://zbot.readthedocs.io/en/latest/"
-        with open('fcts/help.json', 'r') as file:
+        with open('fcts/help.json', 'r', encoding="utf-8") as file:
             self.commands_list = json.load(file)
 
-    def cog_unload(self):
+    async def cog_unload(self):
         self.bot.remove_command("help")
         self.bot.add_command(self.old_cmd)
 
@@ -430,5 +430,5 @@ If the bot can't send the new command format, it will try to send the old one.""
             return await truc.send_command_help(cmd)
 
 
-def setup(bot):
-    bot.add_cog(Help(bot))
+async def setup(bot):
+    await bot.add_cog(Help(bot))

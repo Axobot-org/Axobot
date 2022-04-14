@@ -62,31 +62,31 @@ class Paginator(ui.View):
         self.children[4].disabled = (self.page == count) or self.is_finished()
 
     @ui.button(label='\U000025c0 \U000025c0', style=ButtonStyle.secondary)
-    async def _first_element(self, _: ui.Button, interaction: Interaction):
+    async def _first_element(self, interaction: Interaction, _: ui.Button):
         "Jump to the 1st page"
         await self._set_page(interaction, 1)
         await self._update_contents(interaction)
 
     @ui.button(label='\U000025c0', style=ButtonStyle.blurple)
-    async def _previous_element(self, _: ui.Button, interaction: Interaction):
+    async def _previous_element(self, interaction: Interaction, _: ui.Button):
         "Go to the previous page"
         await self._set_page(interaction, self.page-1)
         await self._update_contents(interaction)
 
     @ui.button(label='...', style=ButtonStyle.red)
-    async def _stop(self, _: ui.Button, interaction: Interaction):
+    async def _stop(self, interaction: Interaction, _: ui.Button):
         "Jump to the last page"
         self.stop()
         await self._update_contents(interaction)
 
     @ui.button(label='\U000025b6', style=ButtonStyle.blurple)
-    async def _next_element(self, _: ui.Button, interaction: Interaction):
+    async def _next_element(self, interaction: Interaction, _: ui.Button):
         "Go to the next page"
         await self._set_page(interaction, self.page+1)
         await self._update_contents(interaction)
 
     @ui.button(label='\U000025b6 \U000025b6', style=ButtonStyle.secondary)
-    async def _last_element(self, _: ui.Button, interaction: Interaction):
+    async def _last_element(self, interaction: Interaction, _: ui.Button):
         "Jump to the last page"
         await self._set_page(interaction, await self.get_page_count(interaction))
         await self._update_contents(interaction)

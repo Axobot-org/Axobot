@@ -348,5 +348,5 @@ Opposite is the subcommand 'join'
             await ctx.send(await self.bot._(ctx.guild, "roles_react.reactions-edited"))
 
 
-def setup(bot):
-    bot.add_cog(RolesReact(bot))
+async def setup(bot):
+    await bot.add_cog(RolesReact(bot))

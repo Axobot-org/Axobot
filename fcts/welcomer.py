@@ -249,5 +249,5 @@ class Welcomer(commands.Cog):
             await self.bot.get_cog("Errors").on_error(e,None)
 
 
-def setup(bot):
-    bot.add_cog(Welcomer(bot))
+async def setup(bot):
+    await bot.add_cog(Welcomer(bot))

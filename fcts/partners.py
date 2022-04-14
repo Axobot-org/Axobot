@@ -472,5 +472,5 @@ class Partners(commands.Cog):
 
 
 
-def setup(bot:commands.Bot):
-    bot.add_cog(Partners(bot))
+async def setup(bot):
+    await bot.add_cog(Partners(bot))
