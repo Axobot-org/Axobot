@@ -368,5 +368,5 @@ class Cases(commands.Cog):
         await self.bot.get_cog("Events").send_logs_per_server(ctx.guild,"case-edit",log,ctx.author)
 
 
-def setup(bot):
-    bot.add_cog(Cases(bot))
+async def setup(bot):
+    await bot.add_cog(Cases(bot))

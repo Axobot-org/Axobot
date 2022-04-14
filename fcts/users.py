@@ -239,5 +239,5 @@ class Users(commands.Cog):
         with open("rankcards_update.json",'w') as f:
             json.dump(old,f)
 
-def setup(bot):
-    bot.add_cog(Users(bot))
+async def setup(bot):
+    await bot.add_cog(Users(bot))

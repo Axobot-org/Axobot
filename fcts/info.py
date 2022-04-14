@@ -1317,7 +1317,7 @@ Servers:
             await ctx.send(text)
 
 
-def setup(bot):
+async def setup(bot):
     locale.setlocale(locale.LC_ALL, '')
-    bot.add_cog(Info(bot))
+    await bot.add_cog(Info(bot))
     

@@ -130,5 +130,5 @@ class Languages(discord.ext.commands.Cog):
             self.serv_opts[server_id] = new_lang
 
 
-def setup(bot):
-    bot.add_cog(Languages(bot))
+async def setup(bot):
+    await bot.add_cog(Languages(bot))

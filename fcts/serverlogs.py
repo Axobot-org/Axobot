@@ -33,7 +33,12 @@ class ServerLogs(commands.Cog):
         self.cache: LRUCache[int, dict[int, list[str]]] = LRUCache(max_size=10000, timeout=3600*4)
         self.to_send: dict[discord.TextChannel, list[discord.Embed]] = {}
         self.auditlogs_timeout = 3 # seconds
+
+    async def cog_load(self):
         self.send_logs_task.start() # pylint: disable=no-member
+
+    async def cog_unload(self):
+        self.send_logs_task.cancel() # pylint: disable=no-member
 
 
     async def is_log_enabled(self, guild: int, log: str) -> list[int]:
@@ -511,5 +516,5 @@ class ServerLogs(commands.Cog):
             await self.validate_logs(member.guild, channel_ids, emb)
 
 
-def setup(bot):
-    bot.add_cog(ServerLogs(bot))
+async def setup(bot):
+    await bot.add_cog(ServerLogs(bot))

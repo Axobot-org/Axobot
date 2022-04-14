@@ -169,5 +169,5 @@ class Timers(commands.Cog):
             await ctx.send(await self.bot._(ctx.channel, "timers.rmd.cleared"))
 
 
-def setup(bot: commands.Bot):
-    bot.add_cog(Timers(bot))
+async def setup(bot):
+    await bot.add_cog(Timers(bot))

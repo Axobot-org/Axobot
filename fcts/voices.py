@@ -11,16 +11,18 @@ class VoiceChannels(commands.Cog):
     def __init__(self, bot: Zbot):
         self.bot = bot
         self.file = "voices"
-        self.names = list()
-        self.channels: dict[int, list[int]] = dict()
+        self.names: list[str] = []
+        self.channels: dict[int, list[int]] = {}
         self.table = 'voices_chats'
-        self.bot.loop.run_until_complete(self.db_get_channels())
+    
+    async def cog_load(self):
+        await self.db_get_channels()
 
     @commands.Cog.listener()
     async def on_ready(self):
         "if the database is still offline when the bot is ready, remove that cog"
         if not self.bot.database_online:
-            self.bot.unload_extension("fcts.voices")
+            await self.bot.unload_extension("fcts.voices")
 
     async def db_get_channels(self):
         "Refresh the channels cache"
@@ -167,7 +169,7 @@ class VoiceChannels(commands.Cog):
         async with aiohttp.ClientSession() as session:
             h = {'X-Api-Key': self.bot.others['random_api_token']}
             async with session.get('https://randommer.io/api/Name?nameType=surname&quantity=20', headers=h) as resp:
-                self.names = await resp.json()
+                self.names: list[str] = await resp.json()
         return self.names.pop()
 
     @commands.command(name="voice-clean")
@@ -194,6 +196,6 @@ class VoiceChannels(commands.Cog):
         await ctx.send(await self.bot._(ctx.guild.id, "voices.deleted", count=i))
 
 
-def setup(bot):
+async def setup(bot: Zbot):
     if bot.database_online:
-        bot.add_cog(VoiceChannels(bot))
+        await bot.add_cog(VoiceChannels(bot))

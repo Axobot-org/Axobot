@@ -25,7 +25,7 @@ class Utilities(commands.Cog):
         self.new_pp = False
         bot.add_check(self.global_check)
 
-    def cog_unload(self):
+    async def cog_unload(self):
         self.bot.remove_check(self.global_check)
 
     @commands.Cog.listener()
@@ -315,5 +315,5 @@ class Utilities(commands.Cog):
             return votes
 
 
-def setup(bot):
-    bot.add_cog(Utilities(bot))
+async def setup(bot):
+    await bot.add_cog(Utilities(bot))

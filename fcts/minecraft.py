@@ -1,3 +1,4 @@
+from typing import Union
 import frmc_lib
 import aiohttp
 import discord
@@ -309,9 +310,9 @@ Every information come from the website www.fr-minecraft.net"""
         async with aiohttp.ClientSession(loop=self.bot.loop, headers=header) as session:
             async with session.get(searchurl, timeout=10) as resp:
                 search: list = await resp.json()
-            if len(search) == 0:
-                await ctx.send(await self.bot._(ctx.channel, "minecraft.no-mod"))
-                return
+        if len(search) == 0:
+            await ctx.send(await self.bot._(ctx.channel, "minecraft.no-mod"))
+            return
         search = search[0]
         authors = ", ".join(
             [f"[{x['name']}]({x['url']})" for x in search['authors']])
@@ -414,23 +415,16 @@ Every information come from the website www.fr-minecraft.net"""
             await ctx.send(await self.bot._(ctx.guild, "rss.fail-add"))
             await self.bot.get_cog("Errors").on_error(e, ctx)
 
-    async def create_server_1(self, guild: discord.Guild, ip: str, port=None):
+    async def create_server_1(self, guild: discord.Guild, ip: str, port=None) -> Union[str, 'MCServer']:
         if port is None:
             url = "https://api.minetools.eu/ping/"+str(ip)
         else:
             url = "https://api.minetools.eu/ping/"+str(ip)+"/"+str(port)
         try:
-            r = requests.get(url, timeout=5).json()
-        # except requests.exceptions.ConnectionError:
-        #     return await self.create_server_2(guild,ip,port)
-        # except requests.exceptions.ReadTimeout:
-        #     return await self.create_server_2(guild,ip,port)
+            r: dict = requests.get(url, timeout=5).json()
         except Exception:
             return await self.create_server_2(guild, ip, port)
-            # self.bot.log.warning("[mc-server-1] Erreur sur l'url {} :".format(url))
-            # await self.bot.get_cog('Errors').on_error(e,None)
-            # return await self.bot._(guild, "minecraft.serv-error")
-        if "error" in r.keys():
+        if "error" in r:
             if r['error'] != 'timed out':
                 self.bot.log.warning("(mc-server) Error on: " +
                                   url+"\n   "+r['error'])
@@ -443,7 +437,7 @@ Every information come from the website www.fr-minecraft.net"""
                     break
         except KeyError:
             players = []
-        if players == []:
+        if not players:
             if r['players']['online'] == 0:
                 players = [str(await self.bot._(guild, "misc.none")).capitalize()]
             else:
@@ -458,7 +452,7 @@ Every information come from the website www.fr-minecraft.net"""
         o = r['players']['online']
         m = r['players']['max']
         l = r['latency']
-        return await self.mcServer(IP, version=v, online_players=o, max_players=m, players=players, img=img_url, ping=l, desc=r['description'], api='api.minetools.eu').clear_desc()
+        return await self.MCServer(IP, version=v, online_players=o, max_players=m, players=players, img=img_url, ping=l, desc=r['description'], api='api.minetools.eu').clear_desc()
 
     async def create_server_2(self, guild: discord.Guild, ip: str, port: str):
         if port is None:
@@ -498,7 +492,7 @@ Every information come from the website www.fr-minecraft.net"""
         o = r['players']['online']
         m = r['players']['max']
         l = None
-        return await self.mcServer(IP, version=version, online_players=o, max_players=m, players=players, img=None, ping=l, desc=desc, api="api.mcsrvstat.us").clear_desc()
+        return await self.MCServer(IP, version=version, online_players=o, max_players=m, players=players, img=None, ping=l, desc=desc, api="api.mcsrvstat.us").clear_desc()
 
     async def username_to_uuid(self, username: str) -> str:
         """Convert a minecraft username to its uuid"""
@@ -510,11 +504,11 @@ Every information come from the website www.fr-minecraft.net"""
                 try:
                     search: dict = await resp.json()
                     self.uuid_cache[username] = search["id"]
-                except aiohttp.client_exceptions.ContentTypeError:
+                except aiohttp.ContentTypeError:
                     self.uuid_cache[username] = None
         return self.uuid_cache[username]
 
-    class mcServer:
+    class MCServer:
         def __init__(self, ip, max_players, online_players, players, ping, img, version, api, desc):
             self.ip = ip
             self.max_players = max_players
@@ -631,5 +625,5 @@ Every information come from the website www.fr-minecraft.net"""
             await self.bot.get_cog('Errors').on_error(e, None)
 
 
-def setup(bot):
-    bot.add_cog(Minecraft(bot))
+async def setup(bot):
+    await bot.add_cog(Minecraft(bot))
