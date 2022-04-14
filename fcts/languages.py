@@ -62,11 +62,12 @@ class Languages(discord.ext.commands.Cog):
                 lang_opt = used_langs[0][0] if len(used_langs) > 0 else self.default_language
         else:
             # get lang from server ID
-            if lang_id := await self.bot.get_config(source, "language"):
+            lang_id = await self.bot.get_config(source, "language")
+            if lang_id is None:
+                lang_opt = self.default_language
+            else:
                 lang_opt = self.languages[lang_id]
                 self.serv_opts[source] = lang_opt
-            else:
-                lang_opt = self.default_language
         if lang_opt not in self.languages:
             # if lang not known: fallback to default
             lang_opt = self.default_language
