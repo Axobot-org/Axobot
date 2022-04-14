@@ -19,7 +19,7 @@ class Languages(discord.ext.commands.Cog):
         i18n.set('file_format', 'json')
         i18n.translations.container.clear()
         i18n.load_path.clear()
-        i18n.load_path.append('./fcts/lang2')
+        i18n.load_path.append('./lang')
 
     @property
     def default_language(self):
