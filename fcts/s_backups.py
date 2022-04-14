@@ -820,5 +820,5 @@ Arguments are:
 
             return problems,logs
 
-def setup(bot):
-    bot.add_cog(Backups(bot))
+async def setup(bot):
+    await bot.add_cog(Backups(bot))

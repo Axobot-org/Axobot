@@ -106,5 +106,5 @@ class Perms(commands.Cog):
             await ctx.send(txt, allowed_mentions=allowed_mentions)
 
 
-def setup(bot):
-    bot.add_cog(Perms(bot))
+async def setup(bot):
+    await bot.add_cog(Perms(bot))

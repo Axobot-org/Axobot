@@ -28,7 +28,7 @@ from fcts import tokens  # pylint: disable=no-name-in-module
 from libs.classes import Zbot
 from utils import load_cogs, load_sql_connection, setup_bot_logger, setup_database_logger, setup_start_parser, parse_crypted_file
 
-def main():
+async def main():
     parser = setup_start_parser()
     args = parser.parse_args()
 
@@ -85,12 +85,13 @@ def main():
     if not args.rss_features:
         client.rss_enabled = False
 
-    load_cogs(client)
 
     client.add_listener(on_ready)
 
-    client.run(token)
+    async with client:
+        await load_cogs(client)
+        await client.start(token)
 
 
 if __name__ == "__main__":
-    main()
+    asyncio.run(main())

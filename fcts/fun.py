@@ -1011,5 +1011,5 @@ You can specify a verification limit by adding a number in argument (up to 1.000
                 await message.reply(msg)
 
 
-def setup(bot):
-    bot.add_cog(Fun(bot))
+async def setup(bot):
+    await bot.add_cog(Fun(bot))

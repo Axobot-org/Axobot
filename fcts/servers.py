@@ -118,10 +118,10 @@ class Servers(commands.Cog):
 
     async def get_languages(self, ignored_guilds: typing.List[int], return_dict: bool = False):
         """Return stats on used languages"""
-        if not self.bot.database_online:
-            return list()
-        query = ("SELECT `language`,`ID` FROM `{}`".format(self.table))
-        liste = list()
+        if not self.bot.database_online or not 'Languages' in self.bot.cogs:
+            return []
+        query = f"SELECT `language`,`ID` FROM `{self.table}`"
+        liste = []
         guilds = {x.id for x in self.bot.guilds if x.id not in ignored_guilds}
         async with self.bot.db_query(query) as query_results:
             for row in query_results:
@@ -130,11 +130,11 @@ class Servers(commands.Cog):
         for _ in range(len(guilds)-len(liste)):
             liste.append(self.bot.get_cog('Languages').languages.index(self.default_language))
         if return_dict:
-            langs = dict()
+            langs = {}
             for e, lang in enumerate(self.bot.get_cog('Languages').languages):
                 langs[lang] = liste.count(e)
         else:
-            langs = list()
+            langs = []
             for e, lang in enumerate(self.bot.get_cog('Languages').languages):
                 langs.append((lang, liste.count(e)))
         return langs
@@ -1124,5 +1124,5 @@ class Servers(commands.Cog):
             await self.bot.send_embed([emb], url="loop")
 
 
-def setup(bot):
-    bot.add_cog(Servers(bot))
+async def setup(bot):
+    await bot.add_cog(Servers(bot))

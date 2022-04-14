@@ -991,5 +991,5 @@ class Emojis(commands.Cog):
         }
         return self.bot.get_emoji(ids[name])
 
-def setup(bot):
-    bot.add_cog(Emojis(bot))
+async def setup(bot):
+    await bot.add_cog(Emojis(bot))

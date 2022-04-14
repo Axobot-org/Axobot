@@ -235,5 +235,5 @@ __29 variations: __
             await ctx.send(txt)
 
 
-def setup(bot):
-    bot.add_cog(Halloween(bot))
+async def setup(bot):
+    await bot.add_cog(Halloween(bot))

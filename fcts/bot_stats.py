@@ -23,12 +23,14 @@ class BotStats(commands.Cog):
         self.bot = bot
         self.file = 'bot_stats'
         self.received_events = {'CMD_USE': 0}
-        self.commands_uses = dict()
+        self.commands_uses = {}
         self.rss_stats = {'checked': 0, 'messages': 0, 'errors': 0}
         self.xp_cards = 0
+
+    async def cog_load(self):
         self.loop.start() # pylint: disable=no-member
 
-    def cog_unload(self):
+    async def cog_unload(self):
         self.loop.cancel() # pylint: disable=no-member
 
     @commands.Cog.listener()
@@ -130,5 +132,5 @@ class BotStats(commands.Cog):
             return result['value']
 
 
-def setup(bot):
-    bot.add_cog(BotStats(bot))
+async def setup(bot):
+    await bot.add_cog(BotStats(bot))

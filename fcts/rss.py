@@ -66,20 +66,22 @@ class Rss(commands.Cog):
         self.min_time_between_posts = {
             'web': 120
         }
-        self.cache = dict()
+        self.cache = {}
         if bot.user is not None:
             self.table = 'rss_flow' if bot.user.id==486896267788812288 else 'rss_flow_beta'
         # launch rss loop
         self.loop_child.change_interval(minutes=self.time_loop) # pylint: disable=no-member
-        self.loop_child.start() # pylint: disable=no-member
+
 
     @commands.Cog.listener()
     async def on_ready(self):
         self.table = 'rss_flow' if self.bot.user.id==486896267788812288 else 'rss_flow_beta'
 
-    def cog_unload(self):
-        # pylint: disable=no-member
-        self.loop_child.cancel()
+    async def cog_load(self):
+        self.loop_child.start() # pylint: disable=no-member
+
+    async def cog_unload(self):
+        self.loop_child.cancel() # pylint: disable=no-member
 
 
     @commands.group(name="rss")
@@ -1205,7 +1207,7 @@ class Rss(commands.Cog):
         t1 = time.time()
         await self.bot.get_cog("Rss").main_loop()
         self.bot.log.info(" Boucle rss terminée en {}s!".format(round(time.time()-t1,2)))
-    
+
     @loop_child.before_loop
     async def before_printer(self):
         """Wait until the bot is ready"""
@@ -1221,7 +1223,7 @@ class Rss(commands.Cog):
             return await ctx.send("Lol, t'as oublié que la base de donnée était hors ligne "+random.choice(["crétin ?","? Tu ferais mieux de fixer tes bugs","?","? :rofl:","?"]))
         if new_state == "start":
             try:
-                await self.loop_child.start() # pylint: disable=no-member
+                self.loop_child.start() # pylint: disable=no-member
             except RuntimeError:
                 await ctx.send("La boucle est déjà en cours !")
             else:
@@ -1251,5 +1253,5 @@ class Rss(commands.Cog):
             await self.bot.get_cog("Errors").on_error(e,None)
 
 
-def setup(bot):
-    bot.add_cog(Rss(bot))
+async def setup(bot):
+    await bot.add_cog(Rss(bot))

@@ -294,5 +294,5 @@ Use `stop` to stop translating
 
 
 
-def setup(bot):
-    bot.add_cog(Translations(bot))
+async def setup(bot):
+    await bot.add_cog(Translations(bot))

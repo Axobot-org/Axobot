@@ -225,5 +225,5 @@ class Morpions(commands.Cog):
                 await self.bot.get_cog('Errors').on_command_error(ctx, err)
 
 
-def setup(bot):
-    bot.add_cog(Morpions(bot))
+async def setup(bot):
+    await bot.add_cog(Morpions(bot))
