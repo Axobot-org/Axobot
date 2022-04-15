@@ -363,7 +363,7 @@ You can also mute this member for a defined duration, then use the following for
                 return False
             if user==ctx.guild.me or (self.bot.database_online and await user_can_mute(user)):
                 emoji = random.choice([':confused:',':upside_down:',self.bot.get_cog('Emojis').customs['wat'],':no_mouth:',self.bot.get_cog('Emojis').customs['owo'],':thinking:',])
-                await ctx.send((await self.bot._(ctx.guild.id, "moderation.staff-mute"))+emoji)
+                await ctx.send((await self.bot._(ctx.guild.id, "moderation.mute.staff-mute"))+emoji)
                 return
             elif not self.bot.database_online and ctx.channel.permissions_for(user).manage_roles:
                 return await ctx.send(await self.bot._(ctx.guild.id, "moderation.warn.cant-staff"))
