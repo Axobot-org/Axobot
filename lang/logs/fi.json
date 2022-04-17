@@ -17,7 +17,7 @@
         "slowmode-disabled": "Hidastusmuoto on kytketty pois kanavalla %{channel}",
         "slowmode-enabled": "Hidastusmuoto on kytketty päälle kanavalla %{channel} (%{seconds}s)",
         "softban": "%{user} (%{userid}) on väliäikaisesti potkittu",
-        "unban": "Käyttäjällä {user} ({userid}) ei ole enää porttikieltoa",
+        "unban": "Käyttäjällä %{user} (%{userid}) ei ole enää porttikieltoa",
         "unmute": "%{user} (%{userid}) ei ole enään mykistetty",
         "warn": "%{user} (%{userid}) on varoitettu"
     }
