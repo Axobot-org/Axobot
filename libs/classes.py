@@ -4,9 +4,9 @@ import time
 from typing import Any, Callable, Coroutine, Optional
 
 import discord
-import mysql
 import requests
 from discord.ext import commands
+from mysql.connector import connect as sql_connect
 from mysql.connector.connection import MySQLConnection
 from mysql.connector.errors import ProgrammingError
 from utils import get_prefix
@@ -135,7 +135,7 @@ class Zbot(commands.bot.AutoShardedBot):
                 self._cnx[0][0].close()
             self.log.debug('Connecting to MySQL (user %s, database "%s")',
                            self.database_keys['user'], self.database_keys['database1'])
-            self._cnx[0][0] = mysql.connector.connect(user=self.database_keys['user'],
+            self._cnx[0][0] = sql_connect(user=self.database_keys['user'],
                 password=self.database_keys['password'],
                 host=self.database_keys['host'],
                 database=self.database_keys['database1'],
@@ -178,7 +178,7 @@ class Zbot(commands.bot.AutoShardedBot):
                 self._cnx[1][0].close()
             self.log.debug('Connecting to MySQL (user %s, database "%s")',
                            self.database_keys['user'], self.database_keys['database2'])
-            self._cnx[1][0] = mysql.connector.connect(user=self.database_keys['user'],
+            self._cnx[1][0] = sql_connect(user=self.database_keys['user'],
                 password=self.database_keys['password'],
                 host=self.database_keys['host'],
                 database=self.database_keys['database2'],
@@ -204,10 +204,10 @@ class Zbot(commands.bot.AutoShardedBot):
                 self._cnx[2][0].close()
             self.log.debug(
                 'Connecting to MySQL (user %s, database "statsbot")', self.database_keys['user'])
-            self._cnx[2][0] = mysql.connector.connect(user=self.database_keys['user'],
-                                                      password=self.database_keys['password'],
-                                                      host=self.database_keys['host'], database='statsbot',
-                                                      buffered=True)
+            self._cnx[2][0] = sql_connect(user=self.database_keys['user'],
+                                          password=self.database_keys['password'],
+                                          host=self.database_keys['host'], database='statsbot',
+                                          buffered=True)
             self._cnx[2][1] = round(time.time())
         else:
             raise ValueError(dict)
