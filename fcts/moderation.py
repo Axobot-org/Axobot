@@ -635,7 +635,7 @@ The 'days_to_delete' option represents the number of days worth of messages to d
                 await ctx.send(await self.bot._(ctx.guild.id, "moderation.ban.cant-ban"))
                 return
             try:
-                banentry = await ctx.guild.fetch_ban(user)
+                await ctx.guild.fetch_ban(user)
             except discord.NotFound:
                 await ctx.send(await self.bot._(ctx.guild.id, "moderation.ban.user-not-banned"))
                 return
