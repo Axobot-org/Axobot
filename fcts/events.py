@@ -127,6 +127,7 @@ class Events(commands.Cog):
 
     async def send_guild_log(self, guild: discord.Guild, log_type: str):
         """Send a log to the logging channel when the bot joins/leave a guild"""
+        await self.bot.wait_until_ready()
         try:
             if log_type == "join":
                 self.bot.log.info("Bot joined the server {}".format(guild.id))
