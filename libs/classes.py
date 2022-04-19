@@ -112,11 +112,11 @@ class Zbot(commands.bot.AutoShardedBot):
         # use the new MyContext class
         return await super().get_context(source, cls=cls)
 
-    async def on_command_error(self, context: MyContext, exception: commands.CommandError, /) -> None:
-        if cog := self.get_cog("Errors"):
-            await cog.on_command_error(context, exception)
-        else:
-            self.log.error('Ignoring exception in command %s:', context.command, exc_info=True)
+    # async def on_command_error(self, context: MyContext, exception: commands.CommandError, /) -> None:
+    #     if cog := self.get_cog("Errors"):
+    #         await cog.on_command_error(context, exception)
+    #     else:
+    #         self.log.error('Ignoring exception in command %s:', context.command, exc_info=True)
 
     @property
     def cnx_frm(self) -> MySQLConnection:
