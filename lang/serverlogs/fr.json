@@ -1,7 +1,15 @@
 {
     "fr": {
+        "categories": {
+            "automod": "Automod",
+            "members": "Membres",
+            "messages": "Messages",
+            "moderation": "Modération",
+            "roles": "Rôles"
+        },
         "list": {
             "all": "Liste des logs utilisables",
+            "emojis": "%{enabled} sont les logs activés dans ce serveur\n%{disabled} sont pour les autres logs disponibles",
             "guild": "Liste des logs utilisés dans ce serveur",
             "channel": "Liste des logs utilisés dans %{channel}",
             "none": "Aucun log n'est utilisé ici. Utilise `%{cmd}` pour commencer à obtenir des logs"

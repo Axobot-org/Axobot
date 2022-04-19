@@ -1,9 +1,12 @@
 import asyncio
+from typing import Any
 
 import discord
 from cachingutils import LRUCache
 from discord.ext import commands, tasks
+from libs.antiscam.classes import PredictionResult
 from libs.classes import MyContext, Zbot
+from libs.formatutils import FormatUtils
 
 from fcts.args import serverlog
 
@@ -11,18 +14,18 @@ from fcts.args import serverlog
 class ServerLogs(commands.Cog):
     """Handle any kind of server log"""
 
-    available_logs = {
-        "member_roles",
-        "member_nick",
-        "member_avatar",
-        "member_join",
-        "member_leave",
-        "member_ban",
-        "member_unban",
-        "message_update",
-        "message_delete",
-        "role_creation"
+    logs_categories = {
+        "automod": {"antiraid", "antiscam"},
+        "members": {"member_roles", "member_nick", "member_avatar", "member_join", "member_leave"},
+        "moderation": {"member_ban", "member_unban"},
+        "messages": {"message_update", "message_delete"},
+        "roles": {"role_creation"}
     }
+
+    @classmethod
+    def available_logs(cls):
+        return {log for category in cls.logs_categories.values() for log in category}
+
 
     def __init__(self, bot: Zbot):
         self.bot = bot
@@ -30,7 +33,12 @@ class ServerLogs(commands.Cog):
         self.cache: LRUCache[int, dict[int, list[str]]] = LRUCache(max_size=10000, timeout=3600*4)
         self.to_send: dict[discord.TextChannel, list[discord.Embed]] = {}
         self.auditlogs_timeout = 3 # seconds
+
+    async def cog_load(self):
         self.send_logs_task.start() # pylint: disable=no-member
+
+    async def cog_unload(self):
+        self.send_logs_task.cancel() # pylint: disable=no-member
 
 
     async def is_log_enabled(self, guild: int, log: str) -> list[int]:
@@ -57,7 +65,6 @@ class ServerLogs(commands.Cog):
             return cached[channel]
         query = "SELECT kind FROM serverlogs WHERE guild = %s AND channel = %s"
         async with self.bot.db_query(query, (guild, channel)) as query_results:
-            self.cache[guild] = [row['kind'] for row in query_results]
             return [row['kind'] for row in query_results]
 
     async def db_get_from_guild(self, guild: int) -> dict[int, list[str]]:
@@ -66,7 +73,7 @@ class ServerLogs(commands.Cog):
             return cached
         query = "SELECT channel, kind FROM serverlogs WHERE guild = %s"
         async with self.bot.db_query(query, (guild,)) as query_results:
-            res = dict()
+            res = {}
             for row in query_results:
                 res[row['channel']] = res.get(row['channel'], []) + [row['kind']]
             self.cache[guild] = res
@@ -116,29 +123,31 @@ class ServerLogs(commands.Cog):
     @commands.cooldown(1, 10, commands.BucketType.channel)
     async def modlogs_list(self, ctx: MyContext, channel: discord.TextChannel=None):
         """Show the full list of server logs type, or the list of enabled logs for a channel"""
-        if channel:
-            # display logs enabled for this channel only
+        if channel:  # display logs enabled for this channel only
             title = await self.bot._(ctx.guild.id, "serverlogs.list.channel", channel='#'+channel.name)
-            if channel_logs := await self.db_get_from_channel(ctx.guild.id, ctx.channel.id):
-                actual_logs = ('- '+l for l in sorted(channel_logs) if l in self.available_logs)
-                embed = discord.Embed(title=title, description='\n'.join(actual_logs))
+            if channel_logs := await self.db_get_from_channel(ctx.guild.id, channel.id):
+                # actual_logs = ('- '+l for l in sorted(channel_logs) if l in self.available_logs)
+                embed = discord.Embed(title=title)
+                for category, logs in sorted(self.logs_categories.items()):
+                    name = await self.bot._(ctx.guild.id, 'serverlogs.categories.'+category)
+                    actual_logs = ['- '+l for l in sorted(logs) if l in channel_logs]
+                    if actual_logs:
+                        embed.add_field(name=name, value='\n'.join(actual_logs))
             else: # error msg
                 cmd = await self.bot.prefix_manager.get_prefix(ctx.guild) + "modlogs enable"
                 embed = discord.Embed(title=title, description=await self.bot._(ctx.guild.id, "serverlogs.list.none", cmd=cmd))
-        else:
-            # display available logs and logs enabled for the whole server
+        else:  # display available logs and logs enabled for the whole server
             global_title = await self.bot._(ctx.guild.id, "serverlogs.list.all")
-            guild_title = await self.bot._(ctx.guild.id, "serverlogs.list.guild")
-            embed = discord.Embed()
-            embed.add_field(name=global_title, value='\n'.join('- '+l for l in sorted(self.available_logs)))
-            if (guild_logs := await self.db_get_from_guild(ctx.guild.id)) and \
-                    sum(len(values) for values in guild_logs.values()) > 0:
-                # flatten and sort enabled logs
-                guild_logs = sorted(set(x for v in guild_logs.values() for x in v if x in self.available_logs))
-                embed.add_field(name=guild_title, value='\n'.join('- '+l for l in sorted(guild_logs)))
-            else: # error msg
-                cmd = await self.bot.prefix_manager.get_prefix(ctx.guild) + "modlogs enable"
-                embed.add_field(name=guild_title, value=await self.bot._(ctx.guild.id, "serverlogs.list.none", cmd=cmd))
+            # fetch logs enabled in the guild
+            guild_logs = await self.db_get_from_guild(ctx.guild.id)
+            guild_logs = sorted(set(x for v in guild_logs.values() for x in v if x in self.available_logs()))
+            # build embed
+            desc = await self.bot._(ctx.guild.id, "serverlogs.list.emojis", enabled='🔹', disabled='◾')
+            embed = discord.Embed(title=global_title, description=desc)
+            for category, logs in sorted(self.logs_categories.items()):
+                name = await self.bot._(ctx.guild.id, 'serverlogs.categories.'+category)
+                embed.add_field(name=name, value='\n'.join([('🔹' if l in guild_logs else '◾') + l for l in sorted(logs)]))
+
         embed.color = discord.Color.blue()
         await ctx.send(embed=embed)
 
@@ -149,7 +158,7 @@ class ServerLogs(commands.Cog):
         if len(logs) == 0:
             raise commands.BadArgument('Invalid server log type')
         if 'all' in logs:
-            logs = list(self.available_logs)
+            logs = list(self.available_logs())
         actually_added: list[str] = []
         for log in logs:
             if await self.db_add(ctx.guild.id, ctx.channel.id, log):
@@ -169,7 +178,7 @@ class ServerLogs(commands.Cog):
         if len(logs) == 0:
             raise commands.BadArgument('Invalid server log type')
         if 'all' in logs:
-            logs = list(self.available_logs)
+            logs = list(self.available_logs())
         actually_removed: list[str] = []
         for log in logs:
             if await self.db_remove(ctx.guild.id, ctx.channel.id, log):
@@ -420,6 +429,92 @@ class ServerLogs(commands.Cog):
                 emb.add_field(name="Specificities", value=", ".join(specs), inline=False)
             await self.validate_logs(role.guild, channel_ids, emb)
 
+    @commands.Cog.listener()
+    async def on_antiscam_warn(self, message: discord.Message, prediction: PredictionResult):
+        """Triggered when the antiscam system find a potentially dangerous message
+        Corresponding log: antiscam"""
+        if channel_ids := await self.is_log_enabled(message.guild.id, "antiscam"):
+            emb = discord.Embed(
+                description=f"**Potentially dangerous [message]({message.jump_url})**",
+                colour=discord.Color.orange()
+            )
+            # probabilities
+            categories: dict = self.bot.get_cog("AntiScam").agent.categories
+            emb.add_field(name="AI detection result", value=prediction.to_string(categories), inline=False)
+            # message content
+            content = message.content if len(message.content) < 1020 else message.content[:1020]+'…'
+            emb.add_field(name="Message content", value=content)
+            # author
+            emb.set_author(name=f"{message.author} ({message.author.id})", icon_url=message.author.display_avatar)
+            await self.validate_logs(message.guild, channel_ids, emb)
 
-def setup(bot):
-    bot.add_cog(ServerLogs(bot))
+    @commands.Cog.listener()
+    async def on_antiscam_delete(self, message: discord.Message, prediction: PredictionResult):
+        """Triggered when the antiscam system delete a dangerous message
+        Corresponding log: antiscam"""
+        if channel_ids := await self.is_log_enabled(message.guild.id, "antiscam"):
+            emb = discord.Embed(
+                description=f"**Dangerous [message]({message.jump_url}) deleted**",
+                colour=discord.Color.red()
+            )
+            # probabilities
+            categories: dict = self.bot.get_cog("AntiScam").agent.categories
+            emb.add_field(name="AI detection result", value=prediction.to_string(categories), inline=False)
+            # message content
+            content = message.content if len(message.content) < 1020 else message.content[:1020]+'…'
+            emb.add_field(name="Message content", value=content)
+            # author
+            emb.set_author(name=f"{message.author} ({message.author.id})", icon_url=message.author.display_avatar)
+            await self.validate_logs(message.guild, channel_ids, emb)
+
+    @commands.Cog.listener()
+    async def on_antiraid_kick(self, member: discord.Member, data: dict[str, Any]):
+        """Triggered when the antiraid system kicks a member
+        Corresponding log: antiraid"""
+        if channel_ids := await self.is_log_enabled(member.guild.id, "antiraid"):
+            emb = discord.Embed(
+                description=f"**{member.mention} ({member.id}) kicked by anti-raid**",
+                colour=discord.Color.orange()
+            )
+            doc = "https://zbot.rtfd.io/en/latest/moderator.html#anti-raid"
+            emb.set_author(name=str(member), url=doc, icon_url=member.display_avatar)
+            # reason
+            if account_creation_treshold := data.get("account_creation_treshold"):
+                min_age = await FormatUtils.time_delta(account_creation_treshold, hour=(account_creation_treshold<86400))
+                delta = await FormatUtils.time_delta(member.created_at, self.bot.utcnow(), hour=True)
+                value = f"Account created at <t:{member.created_at.timestamp():.0f}> ({delta})\n\
+                    Minimum age required by anti-raid: {min_age}"
+                emb.add_field(name="Account was too recent", value=value, inline=False)
+            if "discord_invite" in data:
+                emb.add_field(name="Contains a Discord invite in their username", value=self.bot.zws, inline=False)
+            await self.validate_logs(member.guild, channel_ids, emb)
+
+    @commands.Cog.listener()
+    async def on_antiraid_ban(self, member: discord.Member, data: dict[str, Any]):
+        """Triggered when the antiraid system kicks a member
+        Corresponding log: antiraid"""
+        if channel_ids := await self.is_log_enabled(member.guild.id, "antiraid"):
+            emb = discord.Embed(
+                description=f"**{member.mention} ({member.id}) banned by anti-raid**",
+                colour=discord.Color.red()
+            )
+            doc = "https://zbot.rtfd.io/en/latest/moderator.html#anti-raid"
+            emb.set_author(name=str(member), url=doc, icon_url=member.display_avatar)
+            # reason
+            if account_creation_treshold := data.get("account_creation_treshold"):
+                min_age = await FormatUtils.time_delta(
+                    account_creation_treshold, hour=(account_creation_treshold < 86400))
+                delta = await FormatUtils.time_delta(member.created_at, self.bot.utcnow(), hour=True)
+                value = f"Account created at <t:{member.created_at.timestamp():.0f}> ({delta})\n\
+                    Minimum age required by anti-raid: {min_age}"
+                emb.add_field(name="Account was too recent", value=value, inline=False)
+            if "discord_invite" in data:
+                emb.add_field(name="Contains a Discord invite in their username", value=self.bot.zws, inline=False)
+            # duration
+            duration = await FormatUtils.time_delta(data["duration"], hour=(data["duration"] < 86400))
+            emb.add_field(name="Duration", value=duration)
+            await self.validate_logs(member.guild, channel_ids, emb)
+
+
+async def setup(bot):
+    await bot.add_cog(ServerLogs(bot))

@@ -6,6 +6,7 @@ import random
 import re
 import shutil
 import time
+from typing import Union
 
 import aiohttp
 import discord
@@ -53,12 +54,16 @@ class Events(commands.Cog):
             'role':60,
             'guild':75}
         self.statuspage_header = {"Content-Type": "application/json", "Authorization": "OAuth " + self.bot.others["statuspage"]}
+
+    async def cog_load(self):
         if self.bot.internal_loop_enabled:
             self.loop.start() # pylint: disable=no-member
 
 
-    def cog_unload(self):
-        self.loop.cancel() # pylint: disable=no-member
+    async def cog_unload(self):
+        # pylint: disable=no-member
+        if self.loop.is_running():
+            self.loop.cancel()
 
     @commands.Cog.listener()
     async def on_ready(self):
@@ -72,12 +77,19 @@ class Events(commands.Cog):
     async def on_member_update(self, before: discord.Member, after: discord.Member):
         """Called when a member change something (status, activity, nickame, roles)"""
         if before.nick != after.nick:
-            config_option = await self.bot.get_cog('Utilities').get_db_userinfo(['allow_usernames_logs'],["userID="+str(before.id)])
-            if config_option is not None and config_option['allow_usernames_logs'] is False:
-                return
             await self.updade_memberslogs_name(before, after)
 
-    async def updade_memberslogs_name(self, before:discord.Member, after:discord.Member, tries:int=0):
+    @commands.Cog.listener()
+    async def on_user_update(self, before: discord.User, after: discord.User):
+        """Called when a user change something (avatar, username, discrim)"""
+        if before.name != after.name:
+            await self.updade_memberslogs_name(before, after)
+
+    async def updade_memberslogs_name(self, before: Union[discord.User, discord.Member], after: Union[discord.User, discord.Member], tries:int=0):
+        "Save in our database when a user change its nickname or username"
+        config_option = await self.bot.get_cog('Utilities').get_db_userinfo(['allow_usernames_logs'],["userID="+str(before.id)])
+        if config_option is not None and config_option['allow_usernames_logs'] is False:
+            return
         if tries > 5:
             return
         if not self.bot.database_online:
@@ -97,15 +109,6 @@ class Events(commands.Cog):
         except mysql.connector.errors.IntegrityError as err:
             self.bot.log.warning(err)
             await self.updade_memberslogs_name(before, after, tries+1)
-
-    @commands.Cog.listener()
-    async def on_user_update(self, before: discord.User, after: discord.User):
-        """Called when a user change something (avatar, username, discrim)"""
-        if before.name != after.name:
-            config_option = await self.bot.get_cog('Utilities').get_db_userinfo(['allow_usernames_logs'],["userID="+str(before.id)])
-            if config_option is not None and config_option['allow_usernames_logs'] is False:
-                return
-            await self.updade_memberslogs_name(before, after)
 
 
     @commands.Cog.listener()
@@ -347,8 +350,8 @@ class Events(commands.Cog):
             elif abs((self.last_membercounter - now).total_seconds()) > 60 and self.bot.database_online:
                 await self.bot.get_cog('Servers').update_everyMembercounter()
                 self.last_membercounter = now
-        except Exception as e:
-            await self.bot.get_cog('Errors').on_error(e,None)
+        except Exception as err:
+            await self.bot.get_cog('Errors').on_error(err,None)
             self.loop_errors[0] += 1
             if (datetime.datetime.now() - self.loop_errors[1]).total_seconds() > 120:
                 self.loop_errors[0] = 0
@@ -364,7 +367,7 @@ class Events(commands.Cog):
         self.bot.log.info("[tasks_loop] Lancement de la boucle")
 
 
-    async def status_loop(self, d:datetime.datetime):
+    async def status_loop(self, date: datetime.datetime):
         "Send average latency to zbot.statuspage.io"
         if self.bot.beta:
             return
@@ -372,10 +375,10 @@ class Events(commands.Cog):
             self.latencies_list.append(round(self.bot.latency*1000))
         except OverflowError: # Usually because latency is infinite
             self.latencies_list.append(10e6)
-        if d.minute % 4 == 0 and d.minute != self.last_statusio.minute:
+        if date.minute % 4 == 0 and date.minute != self.last_statusio.minute:
             average = round(sum(self.latencies_list)/len(self.latencies_list))
             async with aiohttp.ClientSession(loop=self.bot.loop, headers=self.statuspage_header) as session:
-                params = {"data": {"timestamp": round(d.timestamp()), "value":average}}
+                params = {"data": {"timestamp": round(date.timestamp()), "value": average}}
                 async with session.post("https://api.statuspage.io/v1/pages/g9cnphg3mhm9/metrics/x4xs4clhkmz0/data", json=params) as r:
                     r.raise_for_status()
                     self.bot.log.debug(f"StatusPage API returned {r.status} for {params} (latency)")
@@ -384,7 +387,7 @@ class Events(commands.Cog):
                     r.raise_for_status()
                     self.bot.log.debug(f"StatusPage API returned {r.status} for {params} (available RAM)")
             self.latencies_list = list()
-            self.last_statusio = d
+            self.last_statusio = date
 
     async def botEventLoop(self):
         self.bot.get_cog("BotEvents").update_current_event()
@@ -562,5 +565,5 @@ class Events(commands.Cog):
         self.statslogs_last_push = datetime.datetime.now()
 
 
-def setup(bot):
-    bot.add_cog(Events(bot))
+async def setup(bot):
+    await bot.add_cog(Events(bot))

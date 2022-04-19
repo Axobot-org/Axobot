@@ -1,15 +1,19 @@
-from typing import Dict, Optional, Tuple, List, Union
-from discord.ext import commands
-import discord
-import re
-import datetime
-import random
-import importlib
 import asyncio
 import copy
-from fcts import checks, args
-from libs.classes import Zbot, MyContext, DeleteView
+import datetime
+import importlib
+import random
+import re
+from math import ceil
+from typing import Dict, List, Optional, Tuple, Union
+
+import discord
+from discord.ext import commands
+from libs.classes import MyContext, Zbot
 from libs.formatutils import FormatUtils
+from libs.paginator import Paginator
+
+from fcts import args, checks
 from fcts.cases import Case
 
 importlib.reload(checks)
@@ -359,7 +363,7 @@ You can also mute this member for a defined duration, then use the following for
                 return False
             if user==ctx.guild.me or (self.bot.database_online and await user_can_mute(user)):
                 emoji = random.choice([':confused:',':upside_down:',self.bot.get_cog('Emojis').customs['wat'],':no_mouth:',self.bot.get_cog('Emojis').customs['owo'],':thinking:',])
-                await ctx.send((await self.bot._(ctx.guild.id, "moderation.staff-mute"))+emoji)
+                await ctx.send((await self.bot._(ctx.guild.id, "moderation.mute.staff-mute"))+emoji)
                 return
             elif not self.bot.database_online and ctx.channel.permissions_for(user).manage_roles:
                 return await ctx.send(await self.bot._(ctx.guild.id, "moderation.warn.cant-staff"))
@@ -630,19 +634,20 @@ The 'days_to_delete' option represents the number of days worth of messages to d
             if not ctx.channel.permissions_for(ctx.guild.me).ban_members:
                 await ctx.send(await self.bot._(ctx.guild.id, "moderation.ban.cant-ban"))
                 return
-            banned_list = [x[1] for x in await ctx.guild.bans()]
-            if user not in banned_list:
+            try:
+                await ctx.guild.fetch_ban(user)
+            except discord.NotFound:
                 await ctx.send(await self.bot._(ctx.guild.id, "moderation.ban.user-not-banned"))
                 return
             reason = await self.bot.get_cog("Utilities").clear_msg(reason,everyone = not ctx.channel.permissions_for(ctx.author).mention_everyone)
             await ctx.guild.unban(user,reason=reason[:512])
-            caseID = "'Unsaved'"
+            case_id = "'Unsaved'"
             if self.bot.database_online:
-                Cases = self.bot.get_cog('Cases')
+                cases_cog = self.bot.get_cog('Cases')
                 case = Case(bot=self.bot,guildID=ctx.guild.id,memberID=user.id,Type="unban",ModID=ctx.author.id,Reason=reason,date=ctx.bot.utcnow())
                 try:
-                    await Cases.add_case(case)
-                    caseID = case.id
+                    await cases_cog.add_case(case)
+                    case_id = case.id
                 except Exception as e:
                     await self.bot.get_cog('Errors').on_error(e,ctx)
             try:
@@ -650,7 +655,7 @@ The 'days_to_delete' option represents the number of days worth of messages to d
             except:
                 pass
             # optional values
-            opt_case = None if caseID=="'Unsaved'" else caseID
+            opt_case = None if case_id=="'Unsaved'" else case_id
             opt_reason = None if reason=="Unspecified" else reason
             # send in chat
             await self.send_chat_answer("unban", user, ctx, opt_case)
@@ -796,6 +801,7 @@ Permissions for using this command are the same as for the kick
     @commands.command(name="banlist")
     @commands.guild_only()
     @commands.check(checks.has_admin)
+    @commands.check(checks.bot_can_embed)
     async def banlist(self, ctx: MyContext, reasons:bool=True):
         """Check the list of currently banned members.
 The 'reasons' parameter is used to display the ban reasons.
@@ -806,36 +812,56 @@ You must be an administrator of this server to use this command.
         if not ctx.channel.permissions_for(ctx.guild.me).ban_members:
             await ctx.send(await self.bot._(ctx.guild.id, "moderation.ban.cant-ban"))
             return
-        try:
-            liste = await ctx.guild.bans()
-        except Exception as e:
-            await ctx.send(await self.bot._(ctx.guild.id, "moderation.error"))
-            await self.bot.get_cog["Errors"].on_command_error(ctx, e)
-            return
-        desc = list()
-        if len(liste) == 0:
-            desc.append(await self.bot._(ctx.guild.id, "moderation.ban.no-bans"))
-        if reasons:
-            for case in liste[:45]:
-                desc.append("{}  *({})*".format(case[1],case[0]))
-            if len(liste)>45:
-                title = await self.bot._(ctx.guild.id, "moderation.ban.list-title-1")
-            else:
-                title = await self.bot._(ctx.guild.id, "moderation.ban.list-title-0")
-        else:
-            for case in liste[:60]:
-                desc.append("{}".format(case[1]))
-            if len(liste)>60:
-                title = await self.bot._(ctx.guild.id, "moderation.ban.list-title-2")
-            else:
-                title = await self.bot._(ctx.guild.id, "moderation.ban.list-title-0")
-        embed = discord.Embed(title=title.format(ctx.guild.name), color=self.bot.get_cog("Servers").embed_color,
-                              description="\n".join(desc), timestamp=ctx.message.created_at)
-        embed.set_footer(text=ctx.author, icon_url=ctx.author.display_avatar)
-        delete_view = DeleteView(await self.bot._(ctx.guild.id, "misc.btn.delete.label"),
-            validation=lambda inter: inter.user==ctx.author,
-                timeout=60*3)
-        await ctx.send(embed=embed, view=delete_view)
+
+        class BansPaginator(Paginator):
+            "Paginator used to display banned users"
+            saved_bans: list[discord.guild.BanEntry] = []
+            users: set[int] = set()
+            async def send_init(self, ctx: MyContext):
+                "Create and send 1st page"
+                contents = await self.get_page_content(None, 1)
+                await self._update_buttons(None)
+                await ctx.send(**contents, view=self)
+            async def get_page_count(self, _: discord.Interaction) -> int:
+                length = len(self.saved_bans)
+                if length == 0:
+                    return 1
+                if length%1000 == 0:
+                    return self.page+1
+                return ceil(length/30)
+            async def get_page_content(self, interaction: discord.Interaction, page: int):
+                "Create one page"
+                if last_user := None if len(self.saved_bans) == 0 else self.saved_bans[-1].user:
+                    self.saved_bans += [
+                        entry async for entry in ctx.guild.bans(limit=1000, after=last_user) if entry.user.id not in self.users
+                    ]
+                else:
+                    self.saved_bans += [
+                        entry async for entry in ctx.guild.bans(limit=1000) if entry.user.id not in self.users
+                    ]
+                self.users = {entry.user.id for entry in self.saved_bans}
+
+                _title = await self.client._(ctx.guild.id, "moderation.ban.list-title-0")
+                emb = discord.Embed(title=_title.format(ctx.guild.name), color=7506394)
+                if len(self.saved_bans) == 0:
+                    emb.description = await self.client._(ctx.guild.id, "moderation.ban.no-bans")
+                else:
+                    page_start, page_end = (page-1)*30, min(page*30, len(self.saved_bans))
+                    for i in range(page_start, page_end, 10):
+                        column_start, column_end = i+1, min(i+10, len(self.saved_bans))
+                        if reasons:
+                            values = [f"{entry.user}  *({entry.reason})*" for entry in self.saved_bans[i:i+10]]
+                        else:
+                            values = [str(entry.user) for entry in self.saved_bans[i:i+10]]
+                        emb.add_field(name=f"{column_start}-{column_end}", value="\n".join(values))
+                emb.set_footer(text=ctx.author, icon_url=ctx.author.display_avatar)
+                return {
+                    "embed": emb
+                }
+
+        _quit = await self.bot._(ctx.guild, "misc.quit")
+        view = BansPaginator(self.bot, ctx.author, stop_label=_quit.capitalize())
+        await view.send_init(ctx)
 
 
     @commands.command(name="mutelist")
@@ -850,7 +876,7 @@ The 'reasons' parameter is used to display the mute reasons.
             liste = await self.bdd_muted_list(ctx.guild.id, reasons=reasons)
         except Exception as e:
             await ctx.send(await self.bot._(ctx.guild.id, "moderation.error"))
-            await self.bot.get_cog["Errors"].on_command_error(ctx, e)
+            await self.bot.get_cog("Errors").on_command_error(ctx, e)
             return
         desc = list()
         title = await self.bot._(ctx.guild.id, "moderation.mute.list-title-0", guild=ctx.guild.name)
@@ -1387,5 +1413,5 @@ ID corresponds to the Identifier of the message
 
 
 
-def setup(bot):
-    bot.add_cog(Moderation(bot))
+async def setup(bot):
+    await bot.add_cog(Moderation(bot))

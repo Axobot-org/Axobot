@@ -118,10 +118,10 @@ class Servers(commands.Cog):
 
     async def get_languages(self, ignored_guilds: typing.List[int], return_dict: bool = False):
         """Return stats on used languages"""
-        if not self.bot.database_online:
-            return list()
-        query = ("SELECT `language`,`ID` FROM `{}`".format(self.table))
-        liste = list()
+        if not self.bot.database_online or not 'Languages' in self.bot.cogs:
+            return []
+        query = f"SELECT `language`,`ID` FROM `{self.table}`"
+        liste = []
         guilds = {x.id for x in self.bot.guilds if x.id not in ignored_guilds}
         async with self.bot.db_query(query) as query_results:
             for row in query_results:
@@ -130,11 +130,11 @@ class Servers(commands.Cog):
         for _ in range(len(guilds)-len(liste)):
             liste.append(self.bot.get_cog('Languages').languages.index(self.default_language))
         if return_dict:
-            langs = dict()
+            langs = {}
             for e, lang in enumerate(self.bot.get_cog('Languages').languages):
                 langs[lang] = liste.count(e)
         else:
-            langs = list()
+            langs = []
             for e, lang in enumerate(self.bot.get_cog('Languages').languages):
                 langs.append((lang, liste.count(e)))
         return langs
@@ -223,7 +223,7 @@ class Servers(commands.Cog):
         """Update a server config in the database"""
         if not isinstance(values, list):
             raise ValueError
-        set_query = ', '.join('{}=%s'.format(val[0]) for val in values)
+        set_query = ', '.join(f'`{val[0]}`=%s' for val in values)
         query = f"UPDATE `{self.table}` SET {set_query} WHERE `ID`={guild_id}"
         async with self.bot.db_query(query, (val[1] for val in values)):
             pass
@@ -449,13 +449,13 @@ class Servers(commands.Cog):
         for r in roles:
             g_role = guild.get_role(int(r))
             if g_role is None:
-                g_roles.append("<unfindable role>")
+                g_roles.append('<' + await self.bot._(guild, "server.deleted-role") + '>')
             elif ext:
                 g_roles.append("@"+g_role.name)
             else:
                 g_roles.append(g_role.mention)
         return g_roles
-        
+
     async def conf_bool(self, ctx: MyContext, option: str, value: str):
         if value == "scret-desc":
             guild = await self.get_guild(ctx)
@@ -523,7 +523,7 @@ class Servers(commands.Cog):
         for r in chans:
             g_chan = guild.get_channel(int(r))
             if g_chan is None:
-                g_chans.append("<unfindable channel>")
+                g_chans.append('<' + await self.bot._(guild, "server.deleted-channel") + '>')
             elif ext:
                 g_chans.append("#"+g_chan.name)
             else:
@@ -567,7 +567,7 @@ class Servers(commands.Cog):
         for r in chans:
             g_chan = guild.get_channel(int(r))
             if g_chan is None:
-                g_chans.append("<unfindable channel>")
+                g_chans.append('<' + await self.bot._(guild, "server.deleted-channel") + '>')
             else:
                 g_chans.append(g_chan.name)
         return g_chans
@@ -576,11 +576,11 @@ class Servers(commands.Cog):
         guild = await self.get_guild(ctx)
         if value == "scret-desc":
             emojis = await self.get_option(guild.id,option)
-            return ", ".join(await self.form_emoji(emojis, option))
+            return ' '.join(await self.form_emoji(emojis, option))
         else:
-            emojis = value.split(",")
-            liste = list()
-            liste2 = list()
+            emojis = value.split(',') if ',' in value else value.split(' ')
+            liste = []
+            liste2 = []
             for e in emojis:
                 e = e.strip()
                 if len(e) == 0:
@@ -615,7 +615,7 @@ class Servers(commands.Cog):
             if r.isnumeric():
                 d_em = discord.utils.get(self.bot.emojis, id=int(r))
                 if d_em is None:
-                    l_em.append("<unfindable emoji>")
+                    l_em.append("?")
                 else:
                     a = 'a' if d_em.animated else ''
                     l_em.append("<{}:{}:{}>".format(a, d_em.name, d_em.id))
@@ -657,7 +657,7 @@ class Servers(commands.Cog):
         for r in chans:
             g_chan = discord.utils.get(guild.voice_channels, id=int(r))
             if g_chan is None:
-                g_chans.append("<unfindable channel>")
+                g_chans.append('<' + await self.bot._(guild, "server.deleted-channel") + '>')
             else:
                 g_chans.append(g_chan.mention)
         return g_chans
@@ -892,7 +892,7 @@ class Servers(commands.Cog):
         if value.isnumeric():
             g_chan = guild.get_channel(int(value))
             if g_chan is None:
-                return "<unfindable channel>"
+                return '<' + await self.bot._(guild, "server.deleted-channel") + '>'
             elif ext:
                 return "#"+g_chan.name
             else:
@@ -938,7 +938,7 @@ class Servers(commands.Cog):
         if not ctx.bot.database_online:
             return await ctx.send(await self.bot._(ctx.guild.id,"cases.no_database"))
         await self.send_see(ctx.guild,ctx.channel,option,ctx.message,ctx)
-        
+
     async def send_see(self, guild: discord.Guild, channel: typing.Union[discord.TextChannel, discord.Thread], option: str, msg: discord.Message, ctx: MyContext):
         """Envoie l'embed dans un salon"""
         if self.bot.zombie_mode:
@@ -951,7 +951,7 @@ class Servers(commands.Cog):
                 return await ctx.send(await self.bot._(channel, "xp.low-page"))
             liste = await self.get_server([],criters=["ID="+str(guild.id)])
             if len(liste) == 0:
-                return await channel.send(await self.bot._(channel.guild, "server.not-found", guild=guild.name))
+                return await channel.send(await self.bot._(channel, "server.not-found", guild=guild.name))
             temp = [(k,v) for k,v in liste[0].items() if k in self.optionsList]
             max_page = ceil(len(temp)/20)
             if page > max_page:
@@ -961,7 +961,7 @@ class Servers(commands.Cog):
                 return await ctx.send("NOPE")
             title = await self.bot._(channel, "server.see-title", guild=guild.name) + f" ({page}/{max_page})"
             embed = discord.Embed(title=title, color=self.embed_color,
-                                  description=await self.bot._(guild.id, "server.see-0"), timestamp=msg.created_at)
+                                  description=await self.bot._(channel, "server.see-0"), timestamp=msg.created_at)
             if guild.icon:
                 embed.set_thumbnail(url=guild.icon.with_static_format('png'))
             diff = channel.guild != guild
@@ -1061,7 +1061,7 @@ class Servers(commands.Cog):
                 r = await self.bot._(channel, "server.option-notfound")
             try:
                 if not channel.permissions_for(channel.guild.me).embed_links:
-                    await channel.send(await self.bot._(channel.id, "minecraft.cant-embed"))
+                    await channel.send(await self.bot._(channel, "minecraft.cant-embed"))
                     return
                 title = await self.bot._(channel, "server.opt_title", opt=option, guild=guild.name)
                 if hasattr(ctx, "message"):
@@ -1122,5 +1122,5 @@ class Servers(commands.Cog):
             await self.bot.send_embed([emb], url="loop")
 
 
-def setup(bot):
-    bot.add_cog(Servers(bot))
+async def setup(bot):
+    await bot.add_cog(Servers(bot))

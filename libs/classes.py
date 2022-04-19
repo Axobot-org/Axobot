@@ -4,9 +4,9 @@ import time
 from typing import Any, Callable, Coroutine, Optional
 
 import discord
-import mysql
 import requests
 from discord.ext import commands
+from mysql.connector import connect as sql_connect
 from mysql.connector.connection import MySQLConnection
 from mysql.connector.errors import ProgrammingError
 from utils import get_prefix
@@ -70,7 +70,7 @@ class Zbot(commands.bot.AutoShardedBot):
                          status=status, allowed_mentions=allowed_mentions, intents=intents, enable_debug_events=True)
         self.database_online = database_online  # if the mysql database works
         self.beta = beta # if the bot is in beta mode
-        self.database_keys = dict() # credentials for the database
+        self.database_keys = {} # credentials for the database
         self.log = logging.getLogger("runner") # logs module
         self.dbl_token = dbl_token # token for Discord Bot List
         self._cnx = [[None, 0], [None, 0], [None, 0]] # database connections
@@ -78,8 +78,8 @@ class Zbot(commands.bot.AutoShardedBot):
         self.rss_enabled: bool = True # if rss is enabled
         self.alerts_enabled: bool = True # if alerts system is enabled
         self.internal_loop_enabled: bool = True # if internal loop is enabled
-        self.zws = "​"  # here's a zero width space
-        self.others = dict() # other misc credentials
+        self.zws = "\u200B"  # here's a zero width space
+        self.others = {} # other misc credentials
         self.zombie_mode: bool = zombie_mode # if we should listen without sending any message
         self.prefix_manager = PrefixManager(self)
         self.task_handler = TaskHandler(self)
@@ -104,12 +104,19 @@ class Zbot(commands.bot.AutoShardedBot):
             self.log.warning("[current_event_data] %s", err, exc_info=True)
             return None
 
-    async def get_context(self, message: discord.Message, *, cls=MyContext) -> MyContext:
+    # pylint: disable=arguments-differ
+    async def get_context(self, source: discord.Message, *, cls=MyContext) -> MyContext:
         """Get a custom context class when creating one from a message"""
         # when you override this method, you pass your new Context
         # subclass to the super() method, which tells the bot to
         # use the new MyContext class
-        return await super().get_context(message, cls=cls)
+        return await super().get_context(source, cls=cls)
+
+    # async def on_command_error(self, context: MyContext, exception: commands.CommandError, /) -> None:
+    #     if cog := self.get_cog("Errors"):
+    #         await cog.on_command_error(context, exception)
+    #     else:
+    #         self.log.error('Ignoring exception in command %s:', context.command, exc_info=True)
 
     @property
     def cnx_frm(self) -> MySQLConnection:
@@ -128,7 +135,7 @@ class Zbot(commands.bot.AutoShardedBot):
                 self._cnx[0][0].close()
             self.log.debug('Connecting to MySQL (user %s, database "%s")',
                            self.database_keys['user'], self.database_keys['database1'])
-            self._cnx[0][0] = mysql.connector.connect(user=self.database_keys['user'],
+            self._cnx[0][0] = sql_connect(user=self.database_keys['user'],
                 password=self.database_keys['password'],
                 host=self.database_keys['host'],
                 database=self.database_keys['database1'],
@@ -171,7 +178,7 @@ class Zbot(commands.bot.AutoShardedBot):
                 self._cnx[1][0].close()
             self.log.debug('Connecting to MySQL (user %s, database "%s")',
                            self.database_keys['user'], self.database_keys['database2'])
-            self._cnx[1][0] = mysql.connector.connect(user=self.database_keys['user'],
+            self._cnx[1][0] = sql_connect(user=self.database_keys['user'],
                 password=self.database_keys['password'],
                 host=self.database_keys['host'],
                 database=self.database_keys['database2'],
@@ -197,10 +204,10 @@ class Zbot(commands.bot.AutoShardedBot):
                 self._cnx[2][0].close()
             self.log.debug(
                 'Connecting to MySQL (user %s, database "statsbot")', self.database_keys['user'])
-            self._cnx[2][0] = mysql.connector.connect(user=self.database_keys['user'],
-                                                      password=self.database_keys['password'],
-                                                      host=self.database_keys['host'], database='statsbot',
-                                                      buffered=True)
+            self._cnx[2][0] = sql_connect(user=self.database_keys['user'],
+                                          password=self.database_keys['password'],
+                                          host=self.database_keys['host'], database='statsbot',
+                                          buffered=True)
             self._cnx[2][1] = round(time.time())
         else:
             raise ValueError(dict)
@@ -243,7 +250,9 @@ class Zbot(commands.bot.AutoShardedBot):
         cog = self.get_cog('Languages')
         if cog is None:
             self.log.error("Unable to load Languages cog")
-            return lambda *args, **kwargs: args[1]
+            async def fake_tr(*args, **_kwargs):
+                return 'en' if args[1] == "_used_locale" else args[1]
+            return fake_tr
         return cog.tr
 
     async def send_embed(self, embeds: list[discord.Embed], url:str=None):
