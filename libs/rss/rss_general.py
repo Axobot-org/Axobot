@@ -60,12 +60,12 @@ def get_emoji(cog: 'Emojis', feed_type: str) -> Union[discord.Emoji, str]:
     elif feed_type == 'deviant':
         return cog.get_emoji('deviant')
     else:
-        return "📰"    
+        return "📰"
 
 class RssMessage:
-    def __init__(self,bot:Zbot,Type:str,url:str,title:str,date=datetime.datetime.now(),author=None,Format=None,channel=None,retweeted_from=None,image=None):
+    def __init__(self, bot: Zbot, feed_type: str, url: str, title: str, date=datetime.datetime.now(), author=None, msg_format=None, channel=None, retweeted_from=None, image=None):
         self.bot = bot
-        self.Type = Type
+        self.rss_type = feed_type
         self.url = url
         self.title = title if len(title) < 300 else title[:299]+'…'
         self.embed = False # WARNING COOKIES WARNINNG
@@ -73,14 +73,14 @@ class RssMessage:
         if isinstance(date, datetime.datetime):
             self.date = date
         elif isinstance(date, time.struct_time):
-            self.date = datetime.datetime(*date[:6])
+            self.date = datetime.datetime(*date[:6]).replace(tzinfo=datetime.timezone.utc)
         elif isinstance(date, str):
             self.date = date
         else:
             self.date = None
         self.author = author if author is None or len(author) < 100 else author[:99]+'…'
-        self.format: str = Format
-        self.logo = get_emoji(bot.get_cog('Emojis'), self.Type)
+        self.format: str = msg_format
+        self.logo = get_emoji(bot.get_cog('Emojis'), self.rss_type)
         if isinstance(self.logo, discord.Emoji):
             self.logo = str(self.logo)
         self.channel = channel
@@ -127,7 +127,7 @@ class RssMessage:
             date = self.date
         msg_format = msg_format.replace('\\n','\n')
         if self.rt_from is not None:
-            self.author = "{} (retweeted from @{})".format(self.author,self.rt_from)
+            self.author = f"{self.author} (retweeted from @{self.rt_from})"
         _channel = discord.utils.escape_markdown(self.channel) if self.channel else "?"
         _author = discord.utils.escape_markdown(self.author) if self.author else "?"
         text = msg_format.format_map(self.bot.SafeDict(channel=_channel, title=self.title, date=date, url=self.url,
@@ -139,7 +139,7 @@ class RssMessage:
             emb = discord.Embed(description=text, color=self.embed_data['color'])
             emb.set_footer(text=self.embed_data['footer'])
             if self.embed_data['title'] is None:
-                if self.Type != 'tw':
+                if self.rss_type != 'tw':
                     emb.title = self.title
                 else:
                     emb.title = self.author

@@ -10,6 +10,7 @@
         "duration": "Invalid timer: `%{d}`",
         "emojinotfound": "Emoji `%{e}` cannot found been",
         "guildnotfound": "Guild %{guild} not exist",
+        "interaction-forbidden": "Uh-uh, dont touch that thx",
         "invalidcardstyle": "Uhh nope, `%{s}` z not a exichtin card styl",
         "invalidcolor": "Ups, I can't find the color `%{c}` :confused:",
         "invalidemoji": "INvalid smiley",

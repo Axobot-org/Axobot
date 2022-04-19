@@ -1,5 +1,7 @@
 {
     "fr": {
+        "deleted-channel": "salon supprimé",
+        "deleted-role": "rôle supprimé",
         "edit-error": {
             "xp": "Ce système d'xp n'existe pas. Voici la liste des systèmes disponibles : %{list}",
             "color": "Cette couleur est invalide",

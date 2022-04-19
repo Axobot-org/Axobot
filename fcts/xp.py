@@ -61,7 +61,7 @@ class Xp(commands.Cog):
         self.table = 'xp_beta' if self.bot.beta else 'xp'
         await self.bdd_load_cache(-1)
         if not self.bot.database_online:
-            self.bot.unload_extension("fcts.xp")
+            await self.bot.unload_extension("fcts.xp")
 
     async def get_lvlup_chan(self, msg: discord.Message):
         value = await self.bot.get_config(msg.guild.id,"levelup_channel")
@@ -362,7 +362,7 @@ class Xp(commands.Cog):
         """Ajoute/reset de l'xp à un utilisateur dans la database"""
         try:
             if not self.bot.database_online:
-                self.bot.unload_extension("fcts.xp")
+                await self.bot.unload_extension("fcts.xp")
                 return None
             if points < 0:
                 return True
@@ -387,7 +387,7 @@ class Xp(commands.Cog):
     async def bdd_get_xp(self, userID: int, guild: int):
         try:
             if not self.bot.database_online:
-                self.bot.unload_extension("fcts.xp")
+                await self.bot.unload_extension("fcts.xp")
                 return None
             if guild is None:
                 cnx = self.bot.cnx_frm
@@ -419,7 +419,7 @@ class Xp(commands.Cog):
         """Get the number of ranked users"""
         try:
             if not self.bot.database_online:
-                self.bot.unload_extension("fcts.xp")
+                await self.bot.unload_extension("fcts.xp")
                 return None
             if guild is None:
                 cnx = self.bot.cnx_frm
@@ -444,7 +444,7 @@ class Xp(commands.Cog):
     async def bdd_load_cache(self, guild: int):
         try:
             if not self.bot.database_online:
-                self.bot.unload_extension("fcts.xp")
+                await self.bot.unload_extension("fcts.xp")
                 return
             target_global = (guild == -1)
             if target_global:
@@ -482,7 +482,7 @@ class Xp(commands.Cog):
     async def bdd_get_top(self, top: int=None, guild: discord.Guild=None):
         try:
             if not self.bot.database_online:
-                self.bot.unload_extension("fcts.xp")
+                await self.bot.unload_extension("fcts.xp")
                 return None
             if guild is not None and await self.bot.get_config(guild.id,'xp_type') != 0:
                 cnx = self.bot.cnx_xp
@@ -521,7 +521,7 @@ class Xp(commands.Cog):
         """Get the rank of a user"""
         try:
             if not self.bot.database_online:
-                self.bot.unload_extension("fcts.xp")
+                await self.bot.unload_extension("fcts.xp")
                 return None
             if guild is not None and await self.bot.get_config(guild.id,'xp_type') != 0:
                 cnx = self.bot.cnx_xp
@@ -558,7 +558,7 @@ class Xp(commands.Cog):
         """Get the total number of earned xp"""
         try:
             if not self.bot.database_online:
-                self.bot.unload_extension("fcts.xp")
+                await self.bot.unload_extension("fcts.xp")
                 return None
             query = f"SELECT SUM(xp) as total FROM `{self.table}`"
             async with self.bot.db_query(query, fetchone=True) as query_results:
@@ -600,7 +600,7 @@ class Xp(commands.Cog):
         colors = {'name':(124, 197, 118),'xp':(124, 197, 118),'NIVEAU':(255, 224, 77),'rank':(105, 157, 206),'bar':bar_colors}
         if style=='blurple':
             colors = {'name':(35,35,50),'xp':(235, 235, 255),'NIVEAU':(245, 245, 255),'rank':(255, 255, 255),'bar':(70, 83, 138)}
-        
+
         name_fnt = ImageFont.truetype('Roboto-Medium.ttf', 40)
 
         if not user.display_avatar.is_animated() or force_static:
@@ -852,7 +852,7 @@ class Xp(commands.Cog):
         ..Example top 7 guild
 
         ..Example top guild
-        
+
         ..Doc user.html#get-the-general-ranking"""
         if ctx.guild is not None:
             if not await self.bot.get_config(ctx.guild.id,'enable_xp'):
@@ -929,9 +929,9 @@ class Xp(commands.Cog):
     @commands.command(name='set_xp', aliases=["setxp", "set-xp"])
     @commands.guild_only()
     @commands.check(checks.has_admin)
-    async def set_xp(self, ctx: MyContext, xp:int, *, user:args.user):
+    async def set_xp(self, ctx: MyContext, user: args.user, xp: int):
         """Set the XP of a user
-        
+
         ..Example set_xp 3000 @someone"""
         if user.bot:
             return await ctx.send(await self.bot._(ctx.guild.id, "xp.no-bot"))
@@ -954,8 +954,8 @@ class Xp(commands.Cog):
             s = "XP of user {} `{}` edited (from {} to {}) in server `{}`".format(user, user.id, prev_xp, xp, ctx.guild.id)
             self.bot.log.info(s)
             emb = discord.Embed(description=s,color=8952255, timestamp=self.bot.utcnow())
-            emb.set_footer(ctx.guild.name)
-            emb.set_author(self.bot.user, icon_url=self.bot.user.display_avatar)
+            emb.set_footer(text=ctx.guild.name)
+            emb.set_author(name=self.bot.user, icon_url=self.bot.user.display_avatar)
             await self.bot.send_embed([emb])
 
     async def gen_rr_id(self):
@@ -1024,7 +1024,7 @@ class Xp(commands.Cog):
     @commands.check(checks.bot_can_embed)
     async def rr_list(self, ctx: MyContext):
         """List every roles rewards of your server
-        
+
         ..Doc server.html#roles-rewards"""
         try:
             l = await self.rr_list_role(ctx.guild.id)
@@ -1044,9 +1044,9 @@ class Xp(commands.Cog):
     async def rr_remove(self, ctx: MyContext, level:int):
         """Remove a role reward
         When a member reaches this level, no role will be given anymore
-        
+
         ..Example roles_rewards remove 10
-        
+
         ..Doc server.html#roles-rewards"""
         try:
             l = await self.rr_list_role(ctx.guild.id,level)
@@ -1086,6 +1086,6 @@ class Xp(commands.Cog):
             await self.bot.get_cog('Errors').on_command_error(ctx,e)
 
 
-def setup(bot):
+async def setup(bot: Zbot):
     if bot.database_online:
-        bot.add_cog(Xp(bot))
+        await bot.add_cog(Xp(bot))

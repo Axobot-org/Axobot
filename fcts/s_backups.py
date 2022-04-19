@@ -676,7 +676,7 @@ Arguments are:
                     logs.append(symb[2]+" AFK timeout duration set to {}s".format(data["afk_timeout"]))
             # banned_users
             try:
-                banned_users = [x[0].id for x in await ctx.guild.bans()]
+                banned_users = [x[0].id async for x in await ctx.guild.bans(limit=None)]
                 users_to_ban = [x for x in data["banned_users"].items() if x[0] not in banned_users]
                 if len(users_to_ban) == 0:
                     logs.append(symb[1]+" No user to ban")
@@ -820,5 +820,5 @@ Arguments are:
 
             return problems,logs
 
-def setup(bot):
-    bot.add_cog(Backups(bot))
+async def setup(bot):
+    await bot.add_cog(Backups(bot))

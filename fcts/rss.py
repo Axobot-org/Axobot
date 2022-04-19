@@ -66,20 +66,22 @@ class Rss(commands.Cog):
         self.min_time_between_posts = {
             'web': 120
         }
-        self.cache = dict()
+        self.cache = {}
         if bot.user is not None:
             self.table = 'rss_flow' if bot.user.id==486896267788812288 else 'rss_flow_beta'
         # launch rss loop
         self.loop_child.change_interval(minutes=self.time_loop) # pylint: disable=no-member
-        self.loop_child.start() # pylint: disable=no-member
+
 
     @commands.Cog.listener()
     async def on_ready(self):
         self.table = 'rss_flow' if self.bot.user.id==486896267788812288 else 'rss_flow_beta'
 
-    def cog_unload(self):
-        # pylint: disable=no-member
-        self.loop_child.cancel()
+    async def cog_load(self):
+        self.loop_child.start() # pylint: disable=no-member
+
+    async def cog_unload(self):
+        self.loop_child.cancel() # pylint: disable=no-member
 
 
     @commands.group(name="rss")
@@ -270,10 +272,10 @@ class Rss(commands.Cog):
         if flow_type is None or not await self.check_rss_url(link):
             return await ctx.send(await self.bot._(ctx.guild.id, "rss.invalid-flow"))
         try:
-            ID = await self.add_flow(ctx.guild.id,ctx.channel.id,flow_type,identifiant)
+            flow_id = await self.add_flow(ctx.guild.id,ctx.channel.id,flow_type,identifiant)
             await ctx.send(await self.bot._(ctx.guild,"rss.success-add", type=display_type, url=link, channel=ctx.channel.mention))
-            self.bot.log.info("RSS feed added into server {} ({} - {})".format(ctx.guild.id,link,ID))
-            await self.send_log("Feed added into server {} ({})".format(ctx.guild.id,ID),ctx.guild)
+            self.bot.log.info("RSS feed added into server {} ({} - {})".format(ctx.guild.id,link,flow_id))
+            await self.send_log("Feed added into server {} ({})".format(ctx.guild.id,flow_id),ctx.guild)
         except Exception as e:
             await ctx.send(await self.bot._(ctx.guild, "rss.fail-add"))
             await self.bot.get_cog("Errors").on_error(e,ctx)
@@ -745,7 +747,7 @@ class Rss(commands.Cog):
                 txt = ['**__Analyse :__**','']
                 yt = await self.youtube_rss.get_chanel_by_any_url(feeds.feed['link'])
                 if yt is None:
-                    tw = await self.twitter_rss.is_twitter_url(feeds.feed['link'])
+                    tw = self.twitter_rss.is_twitter_url(feeds.feed['link'])
                     if tw is not None:
                         txt.append("<:twitter:958325391196585984>  "+tw)
                     elif 'link' in feeds.feed.keys():
@@ -785,7 +787,7 @@ class Rss(commands.Cog):
         r = self.youtube_rss.is_youtube_url(url)
         if r is not None:
             return True
-        r = await self.twitter_rss.is_twitter_url(url)
+        r = self.twitter_rss.is_twitter_url(url)
         if r is not None:
             return True
         r = await self.parse_twitch_url(url)
@@ -832,7 +834,7 @@ class Rss(commands.Cog):
             img_url = None
             if r is not None:
                 img_url = r.group(1)
-            obj = RssMessage(bot=self.bot,Type='twitch',url=feed['link'],title=feed['title'],date=feed['published_parsed'],author=feeds.feed['title'].replace("'s Twitch video RSS",""),image=img_url,channel=nom)
+            obj = RssMessage(bot=self.bot,feed_type='twitch',url=feed['link'],title=feed['title'],date=feed['published_parsed'],author=feeds.feed['title'].replace("'s Twitch video RSS",""),image=img_url,channel=nom)
             return [obj]
         else:
             liste = list()
@@ -845,7 +847,7 @@ class Rss(commands.Cog):
                 img_url = None
                 if r is not None:
                     img_url = r.group(1)
-                obj = RssMessage(bot=self.bot,Type='twitch',url=feed['link'],title=feed['title'],date=feed['published_parsed'],author=feeds.feed['title'].replace("'s Twitch video RSS",""),image=img_url,channel=nom)
+                obj = RssMessage(bot=self.bot,feed_type='twitch',url=feed['link'],title=feed['title'],date=feed['published_parsed'],author=feeds.feed['title'].replace("'s Twitch video RSS",""),image=img_url,channel=nom)
                 liste.append(obj)
             liste.reverse()
             return liste
@@ -859,7 +861,7 @@ class Rss(commands.Cog):
         if 'bozo_exception' in feeds.keys() or len(feeds.entries) == 0:
             return await self.bot._(channel, "rss.web-invalid")
         published = None
-        for i in ['published_parsed','published','updated_parsed']:
+        for i in ['updated_parsed', 'published_parsed', 'published']:
             if i in feeds.entries[0].keys() and feeds.entries[0][i] is not None:
                 published = i
                 break
@@ -901,7 +903,7 @@ class Rss(commands.Cog):
                 img = r.group(0)
             obj = RssMessage(
                 bot=self.bot,
-                Type='web',
+                feed_type='web',
                 url=l,
                 title=title,
                 date=datz,
@@ -944,7 +946,7 @@ class Rss(commands.Cog):
                         img = r.group(0)
                     obj = RssMessage(
                         bot=self.bot,
-                        Type='web',
+                        feed_type='web',
                         url=l,
                         title=title,
                         date=datz,
@@ -969,7 +971,7 @@ class Rss(commands.Cog):
             feed = feeds.entries[0]
             img_url = feed['media_content'][0]['url'] if "media_content" in feed else None
             title = re.search(r"DeviantArt: ([^ ]+)'s gallery",feeds.feed['title']).group(1)
-            obj = RssMessage(bot=self.bot,Type='deviant',url=feed['link'],title=feed['title'],date=feed['published_parsed'],author=title,image=img_url)
+            obj = RssMessage(bot=self.bot,feed_type='deviant',url=feed['link'],title=feed['title'],date=feed['published_parsed'],author=title,image=img_url)
             return [obj]
         else:
             liste = list()
@@ -978,7 +980,7 @@ class Rss(commands.Cog):
                     break
                 img_url = feed['media_content'][0]['url'] if "media_content" in feed else None
                 title = re.search(r"DeviantArt: ([^ ]+)'s gallery",feeds.feed['title']).group(1)
-                obj = RssMessage(bot=self.bot,Type='deviant',url=feed['link'],title=feed['title'],date=feed['published_parsed'],author=title,image=img_url)
+                obj = RssMessage(bot=self.bot,feed_type='deviant',url=feed['link'],title=feed['title'],date=feed['published_parsed'],author=title,image=img_url)
                 liste.append(obj)
             liste.reverse()
             return liste
@@ -1205,7 +1207,7 @@ class Rss(commands.Cog):
         t1 = time.time()
         await self.bot.get_cog("Rss").main_loop()
         self.bot.log.info(" Boucle rss terminée en {}s!".format(round(time.time()-t1,2)))
-    
+
     @loop_child.before_loop
     async def before_printer(self):
         """Wait until the bot is ready"""
@@ -1221,7 +1223,7 @@ class Rss(commands.Cog):
             return await ctx.send("Lol, t'as oublié que la base de donnée était hors ligne "+random.choice(["crétin ?","? Tu ferais mieux de fixer tes bugs","?","? :rofl:","?"]))
         if new_state == "start":
             try:
-                await self.loop_child.start() # pylint: disable=no-member
+                self.loop_child.start() # pylint: disable=no-member
             except RuntimeError:
                 await ctx.send("La boucle est déjà en cours !")
             else:
@@ -1251,5 +1253,5 @@ class Rss(commands.Cog):
             await self.bot.get_cog("Errors").on_error(e,None)
 
 
-def setup(bot):
-    bot.add_cog(Rss(bot))
+async def setup(bot):
+    await bot.add_cog(Rss(bot))

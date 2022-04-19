@@ -48,7 +48,7 @@ class Reloads(commands.Cog):
             else:
                 fcog = cog
             try:
-                self.bot.reload_extension(fcog)
+                await self.bot.reload_extension(fcog)
             except ModuleNotFoundError:
                 await ctx.send(f"Cog {cog} can't be found")
             except commands.errors.ExtensionNotLoaded :
@@ -74,30 +74,30 @@ class Reloads(commands.Cog):
 
     @commands.command(name="add_cog",hidden=True)
     @commands.check(check_admin)
-    async def add_cog(self,ctx,name):
+    async def add_cog(self, ctx: MyContext, name: str):
         """Ajouter un cog au bot"""
         if not ctx.author.id in admins_id:
             return
         try:
-            self.bot.load_extension('fcts.'+name)
+            await self.bot.load_extension('fcts.'+name)
             await ctx.send("Module '{}' ajouté !".format(name))
             self.bot.log.info("Module {} ajouté".format(name))
-        except Exception as e:
-            await ctx.send(str(e))
+        except Exception as err:
+            await ctx.send(str(err))
 
     @commands.command(name="del_cog",aliases=['remove_cog'],hidden=True)
     @commands.check(check_admin)
-    async def rm_cog(self,ctx,name):
+    async def rm_cog(self, ctx: MyContext, name: str):
         """Enlever un cog au bot"""
         if not ctx.author.id in admins_id:
             return
         try:
-            self.bot.unload_extension('fcts.'+name)
-            await ctx.send("Module '{}' désactivé !".format(name))
-            self.bot.log.info("Module {} ajouté".format(name))
-        except Exception as e:
-            await ctx.send(str(e))
+            await self.bot.unload_extension('fcts.'+name)
+            await ctx.send(f"Module '{name}' désactivé !")
+            self.bot.log.info(f"Module {name} ajouté")
+        except Exception as err:
+            await ctx.send(str(err))
 
 
-def setup(bot: Zbot):
-    bot.add_cog(Reloads(bot))
+async def setup(bot):
+    await bot.add_cog(Reloads(bot))

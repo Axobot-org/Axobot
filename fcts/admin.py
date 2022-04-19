@@ -855,14 +855,14 @@ Cette option affecte tous les serveurs"""
         chan = ctx.bot.get_channel(929864644678549534) if self.bot.beta else ctx.bot.get_channel(488769283673948175)
         if chan is None:
             return await ctx.send("Salon introuvable")
-        try:
+        try: # try to fetch message from the bugs channel
             msg = await chan.fetch_message(msg_id)
         except discord.DiscordException as err:
             return await ctx.send(f"`Error:` {err}")
         if len(msg.embeds) != 1:
             return await ctx.send("Nombre d'embeds invalide")
         emb = msg.embeds[0]
-        if fixed:
+        if fixed: # if the bug should be marked as fixed
             emb.color = discord.Color(10146593)
             emb.title = "New bug [fixed soon]"
         else:
@@ -902,19 +902,20 @@ Cette option affecte tous les serveurs"""
         chan = ctx.bot.get_channel(929864644678549534) if self.bot.beta else ctx.bot.get_channel(488769306524385301)
         if chan is None:
             return await ctx.send("Salon introuvable")
-        try:
+        try: # try to fetch message from ideas channel
             msg = await chan.fetch_message(msg_id)
         except discord.DiscordException as err:
+            # something went wrong (invalid message ID, or any other Discord API error)
             return await ctx.send(f"`Error:` {err}")
-        if len(msg.embeds)!=1:
+        if len(msg.embeds) != 1:
             return await ctx.send("Nombre d'embeds invalide")
         emb = msg.embeds[0]
-        if valid:
+        if valid: # if the idea should be marked as soon-released
             emb.color = discord.Color(10146593)
         else:
             emb.color = discord.Color(16106019)
         await msg.edit(embed=emb)
         await self.add_success_reaction(ctx.message)
 
-def setup(bot):
-    bot.add_cog(Admin(bot))
+async def setup(bot):
+    await bot.add_cog(Admin(bot))
