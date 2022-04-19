@@ -876,7 +876,7 @@ The 'reasons' parameter is used to display the mute reasons.
             liste = await self.bdd_muted_list(ctx.guild.id, reasons=reasons)
         except Exception as e:
             await ctx.send(await self.bot._(ctx.guild.id, "moderation.error"))
-            await self.bot.get_cog["Errors"].on_command_error(ctx, e)
+            await self.bot.get_cog("Errors").on_command_error(ctx, e)
             return
         desc = list()
         title = await self.bot._(ctx.guild.id, "moderation.mute.list-title-0", guild=ctx.guild.name)
