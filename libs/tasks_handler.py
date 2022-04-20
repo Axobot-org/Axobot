@@ -126,7 +126,7 @@ class TaskHandler:
                 task['data'] = json.loads(task['data'])
             msg = await self.bot._(channel, "timers.rmd.embed-asked", user=user.mention, duration=f_duration)
             if isinstance(channel, (discord.User, discord.DMChannel)) or channel.permissions_for(guild.me).embed_links:
-                if 'msg_url' in task['data']:
+                if task['data'] is not None and 'msg_url' in task['data']:
                     click_here = await self.bot._(channel, "timers.rmd.embed-link")
                     task["message"] += f"\n\n[{click_here}]({task['data']['msg_url']})"
                 title = (await self.bot._(channel, "timers.rmd.embed-title")).capitalize()
