@@ -979,8 +979,9 @@ class Emojis(commands.Cog):
         for name, unicode in emojiMap.items():
             text = text.replace(unicode, name)
         return text
-    
+
     def get_emoji(self, name: str) -> Optional[discord.Emoji]:
+        "Get a custom emoji object"
         ids = {
             "youtube": 447459436982960143,
             "twitter": 958325391196585984,
