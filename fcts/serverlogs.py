@@ -126,7 +126,6 @@ class ServerLogs(commands.Cog):
         if channel:  # display logs enabled for this channel only
             title = await self.bot._(ctx.guild.id, "serverlogs.list.channel", channel='#'+channel.name)
             if channel_logs := await self.db_get_from_channel(ctx.guild.id, channel.id):
-                # actual_logs = ('- '+l for l in sorted(channel_logs) if l in self.available_logs)
                 embed = discord.Embed(title=title)
                 for category, logs in sorted(self.logs_categories.items()):
                     name = await self.bot._(ctx.guild.id, 'serverlogs.categories.'+category)
@@ -142,11 +141,17 @@ class ServerLogs(commands.Cog):
             guild_logs = await self.db_get_from_guild(ctx.guild.id)
             guild_logs = sorted(set(x for v in guild_logs.values() for x in v if x in self.available_logs()))
             # build embed
-            desc = await self.bot._(ctx.guild.id, "serverlogs.list.emojis", enabled='🔹', disabled='◾')
+            if ctx.bot_permissions.external_emojis and (cog := self.bot.get_cog('Emojis')):
+                enabled_emoji, disabled_emoji = cog.customs["green_check"], cog.customs["gray_check"]
+            else:
+                enabled_emoji, disabled_emoji = '🔹', '◾'
+            desc = await self.bot._(ctx.guild.id, "serverlogs.list.emojis", enabled=enabled_emoji, disabled=disabled_emoji)
             embed = discord.Embed(title=global_title, description=desc)
             for category, logs in sorted(self.logs_categories.items()):
                 name = await self.bot._(ctx.guild.id, 'serverlogs.categories.'+category)
-                embed.add_field(name=name, value='\n'.join([('🔹' if l in guild_logs else '◾') + l for l in sorted(logs)]))
+                embed.add_field(name=name, value='\n'.join([
+                    (enabled_emoji if l in guild_logs else disabled_emoji) + l for l in sorted(logs)
+                    ]))
 
         embed.color = discord.Color.blue()
         await ctx.send(embed=embed)
