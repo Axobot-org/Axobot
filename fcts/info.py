@@ -386,7 +386,7 @@ Available types: member, role, user, emoji, channel, server, invite, category
     async def role_infos(self, ctx: MyContext, role: discord.Role):
         lang = await self.bot._(ctx.guild.id,"_used_locale")
         embed = discord.Embed(colour=role.color, timestamp=ctx.message.created_at)
-        embed.set_author(name=str(role), icon_url=ctx.guild.icon or discord.embeds.EmptyEmbed)
+        embed.set_author(name=str(role), icon_url=ctx.guild.icon)
         embed.set_footer(text='Requested by {}'.format(ctx.author.name), icon_url=ctx.author.display_avatar)
         since = await self.bot._(ctx.guild.id,"misc.since")
         # Name
@@ -515,7 +515,7 @@ Available types: member, role, user, emoji, channel, server, invite, category
             return
         lang = await self.bot._(ctx.guild.id,"_used_locale")
         embed = discord.Embed(colour=default_color, timestamp=ctx.message.created_at)
-        icon_url = channel.guild.icon.with_format('png') if channel.guild.icon else discord.embeds.EmptyEmbed
+        icon_url = channel.guild.icon.with_format('png') if channel.guild.icon else None
         embed.set_author(name="{} '{}'".format(await self.bot._(ctx.guild.id,"info.info.textchan-5"),channel.name), icon_url=icon_url)
         embed.set_footer(text='Requested by {}'.format(ctx.author.name), icon_url=ctx.author.display_avatar.with_format("png"))
         since = await self.bot._(ctx.guild.id,"misc.since")
@@ -558,7 +558,7 @@ Available types: member, role, user, emoji, channel, server, invite, category
         lang = await self.bot._(ctx.guild.id,"_used_locale")
         since = await self.bot._(ctx.guild.id,"misc.since")
         embed = discord.Embed(colour=default_color, timestamp=ctx.message.created_at)
-        icon_url = channel.guild.icon.with_static_format('png') if channel.guild.icon else discord.embeds.EmptyEmbed
+        icon_url = channel.guild.icon.with_static_format('png') if channel.guild.icon else None
         embed.set_author(name="{} '{}'".format(await self.bot._(ctx.guild.id,"info.info.voicechan-0"),channel.name), icon_url=icon_url)
         embed.set_footer(text='Requested by {}'.format(ctx.author.name), icon_url=ctx.author.display_avatar)
         # Name
@@ -599,7 +599,7 @@ Available types: member, role, user, emoji, channel, server, invite, category
         embed = discord.Embed(colour=default_color, timestamp=ctx.message.created_at, description=desc)
         embed.set_footer(text='Requested by {}'.format(ctx.author.name), icon_url=ctx.author.display_avatar)
         # Guild icon
-        icon_url = guild.icon.with_static_format("png") if guild.icon else discord.embeds.EmptyEmbed
+        icon_url = guild.icon.with_static_format("png") if guild.icon else None
         embed.set_author(name="{} '{}'".format(await self.bot._(ctx.guild.id,"info.info.guild-0"),guild.name), icon_url=icon_url)
         embed.set_thumbnail(url=icon_url)
         # Guild banner
@@ -688,7 +688,7 @@ Available types: member, role, user, emoji, channel, server, invite, category
         lang = await self.bot._(ctx.guild.id,"_used_locale")
         since = await self.bot._(ctx.guild.id,"misc.since")
         embed = discord.Embed(colour=default_color, timestamp=ctx.message.created_at)
-        icon_url = invite.guild.icon.with_static_format('png') if invite.guild.icon else discord.embeds.EmptyEmbed
+        icon_url = invite.guild.icon.with_static_format('png') if invite.guild.icon else None
         embed.set_author(name="{} '{}'".format(await self.bot._(ctx.guild.id,"info.info.inv-4"),invite.code), icon_url=icon_url)
         embed.set_footer(text='Requested by {}'.format(ctx.author.name), icon_url=ctx.author.display_avatar.replace(static_format="png", size=256))
         # Try to get the complete invite
@@ -763,7 +763,7 @@ Available types: member, role, user, emoji, channel, server, invite, category
             elif isinstance(channel, discord.VoiceChannel):
                 vchan +=1
         embed = discord.Embed(colour=default_color, timestamp=ctx.message.created_at)
-        icon_url = category.guild.icon.with_static_format('png') if category.guild.icon else discord.embeds.EmptyEmbed
+        icon_url = category.guild.icon.with_static_format('png') if category.guild.icon else None
         embed.set_author(name="{} '{}'".format(await self.bot._(ctx.guild.id,"info.info.categ-0"),category.name), icon_url=icon_url)
         embed.set_footer(text='Requested by {}'.format(ctx.author.name), icon_url=ctx.author.display_avatar)
 
@@ -1259,7 +1259,7 @@ Servers:
         if ctx.can_send_embed:
             MAX = 28
             date = ""
-            desc = discord.embeds.EmptyEmbed
+            desc = None
             fields = list()
             if len(global_list) > 0:
             # Usernames part

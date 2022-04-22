@@ -54,7 +54,7 @@ class Perms(commands.Cog):
             else:
                 perms = channel.permissions_for(target)
             col = target.color
-            avatar = ctx.guild.icon.replace(format='png', size=256) if ctx.guild.icon else discord.embeds.EmptyEmbed
+            avatar = ctx.guild.icon.replace(format='png', size=256) if ctx.guild.icon else None
             name = str(target)
         else:
             return
