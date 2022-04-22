@@ -3,6 +3,7 @@ import typing
 import discord
 from discord.ext import commands
 from libs.classes import MyContext, Zbot
+from libs.paginator import cut_text
 
 AcceptableChannelTypes = typing.Optional[typing.Union[
     discord.TextChannel,
@@ -58,7 +59,7 @@ class Perms(commands.Cog):
             name = str(target)
         else:
             return
-        permsl = list()
+        permsl: list[str] = []
 
         if perms.administrator:
             # If the user is admin, we just say it
@@ -85,14 +86,9 @@ class Perms(commands.Cog):
             else:
                 desc = channel.mention
             embed = discord.Embed(color=col, description=desc)
-            if len(permsl) > 10:
-                sep = int(len(permsl)/2)
-                if len(permsl)%2 == 1:
-                    sep+=1
-                embed.add_field(name=self.bot.zws, value="\n".join(permsl[:sep]))
-                embed.add_field(name=self.bot.zws, value="\n".join(permsl[sep:]))
-            else:
-                embed.add_field(name=self.bot.zws, value="\n".join(permsl))
+            paragraphs = cut_text(permsl, max_size=21)
+            for paragraph in paragraphs:
+                embed.add_field(name=self.bot.zws, value=paragraph)
 
             _whatisthat = await self.bot._(ctx.guild.id, "permissions.whatisthat")
             embed.add_field(name=self.bot.zws, value=f'[{_whatisthat}](https://zbot.readthedocs.io/en/latest/perms.html)',

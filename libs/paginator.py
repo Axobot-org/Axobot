@@ -3,6 +3,22 @@ from discord import ui, ButtonStyle, User, Interaction
 
 from libs.classes import MyContext, Zbot
 
+
+def cut_text(lines: list[str], max_length: int = 1024, max_size=100) -> list[str]:
+    "Cut some text into multiple paragraphs"
+    result: list[str] = []
+    paragraph: list[str] = []
+    for line in lines:
+        if len(paragraph)+1 > max_size or len("\n".join(paragraph+[line])) > max_length:
+            result.append("\n".join(paragraph))
+            paragraph = [line]
+        else:
+            paragraph.append(line)
+    if len(paragraph) > 0:
+        result.append("\n".join(paragraph))
+    return result
+
+
 class Paginator(ui.View):
     "Base class to paginate something"
 
