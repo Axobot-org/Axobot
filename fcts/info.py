@@ -375,7 +375,7 @@ Available types: member, role, user, emoji, channel, server, invite, category
             list_role = list_role[:40]
             embed.add_field(name=_roles, value = ", ".join(list_role), inline=False)
         else:
-            embed.add_field(name=_roles, value = await self.bot._(ctx.guild.id,"activity","nothing"), inline=False)
+            embed.add_field(name=_roles, value=(await self.bot._(ctx.guild.id,"misc.none")).capitalize(), inline=False)
         # member verification gate
         if member.pending:
             _waiting = await self.bot._(ctx.guild.id, 'info.info.member-10')
