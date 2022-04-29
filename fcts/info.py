@@ -1035,19 +1035,22 @@ Servers:
     @commands.bot_has_permissions(send_messages=True)
     async def membercount(self, ctx: MyContext):
         """Get some digits on the number of server members
-        
+
         ..Doc infos.html#membercount"""
         if not ctx.channel.permissions_for(ctx.guild.me).send_messages:
             return
-        total, bots, c_co = await self.bot.get_cog("Utilities").get_members_repartition(ctx.guild.members)
+        total, bots, c_co, unverified = await self.bot.get_cog("Utilities").get_members_repartition(ctx.guild.members)
         h = total - bots
         h_p = "< 1" if 0 < h / total < 0.01 else ("> 99" if 1 > h/total > 0.99 else round(h*100/total))
         b_p = "< 1" if 0 < bots / total < 0.01 else ("> 99" if 1 > bots/total > 0.99 else round(bots*100/total))
         c_p = "< 1" if 0 < c_co / total < 0.01 else ("> 99" if 1 > c_co/total > 0.99 else round(c_co*100/total))
-        l = [(await self.bot._(ctx.guild.id, "info.membercount-0"), str(total)),
+        pen_p = "< 1" if 0 < unverified / total < 0.01 else ("> 99" if 1 > unverified/total > 0.99 else round(unverified*100/total))
+        l = [(await self.bot._(ctx.guild.id, "info.membercount-0"), total),
              (await self.bot._(ctx.guild.id, "info.membercount-2"), "{} ({}%)".format(h, h_p)),
              (await self.bot._(ctx.guild.id, "info.membercount-1"), "{} ({}%)".format(bots, b_p)),
              (await self.bot._(ctx.guild.id, "info.membercount-3"), "{} ({}%)".format(c_co, c_p))]
+        if "MEMBER_VERIFICATION_GATE_ENABLED" in ctx.guild.features:
+            l.append((await self.bot._(ctx.guild.id, "info.membercount-4"), "{} ({}%)".format(unverified, pen_p)))
         if ctx.can_send_embed:
             embed = discord.Embed(colour=ctx.guild.me.color)
             for i in l:
@@ -1056,7 +1059,7 @@ Servers:
         else:
             text = str()
             for i in l:
-                text += "- {i[0]} : {i[1]}\n".format(i=i)
+                text += f"- {i[0]} : {i[1]}\n"
             await ctx.send(text)
 
     @commands.group(name="prefix")
