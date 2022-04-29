@@ -48,9 +48,10 @@ class Admin(commands.Cog):
         self._last_result = None
         self._upvote_emojis = ()
         self.god_mode = []
-    
+
     @property
     def upvote_emojis(self):
+        "Emojis used for the idea channel"
         if not self._upvote_emojis:
             self._upvote_emojis = (
                 self.bot.get_emoji(938416027274993674),
@@ -589,12 +590,12 @@ Cette option affecte tous les serveurs"""
                 await ctx.send("Le système d'alertes est mainenant désactivé")
         else:
             await ctx.send('Module introuvable')
-    
+
     @main_msg.command(name="flag")
     @commands.check(reloads.check_admin)
     async def admin_flag(self, ctx:MyContext, add:str, flag:str, users:commands.Greedy[discord.User]):
         """Ajoute ou retire un attribut à un utilisateur
-        
+
         Flag valides : support, premium, contributor, partner"""
         if add not in ['add', 'remove']:
             return await ctx.send("Action invalide")
@@ -656,11 +657,11 @@ Cette option affecte tous les serveurs"""
         if role is None:
             await ctx.send("Rôle Owners introuvable")
             return
-        owner_list = list()
+        owner_list: list[int] = []
         for guild in self.bot.guilds:
             if len(guild.members)>9:
                 if guild.owner_id is None:
-                    await ctx.send("Oops, askip le propriétaire de {} n'existe pas ._.".format(guild.id))
+                    await ctx.send(f"Oops, askip le propriétaire de {guild.id} n'existe pas ._.")
                     continue
                 owner_list.append(guild.owner_id)
         for member in server.members:
@@ -672,16 +673,16 @@ Cette option affecte tous les serveurs"""
                 await member.remove_roles(role,reason="This user doesn't support me anymore")
         await self.add_success_reaction(ctx.message)
 
-    async def _get_ideas_list(self, channel: discord.TextChannel) -> list[tuple[int, datetime.timedelta, str, int, int]]:
+    async def _get_ideas_list(self, channel: discord.TextChannel):
         "Get ideas from the ideas channel"
         now = self.bot.utcnow()
-        liste = list()
+        liste: list[tuple[int, datetime.timedelta, str, int, int]] = []
         async for msg in channel.history(limit=500):
             if len(msg.reactions) > 0:
                 upvotes = 0
                 downvotes = 0
                 for reaction in msg.reactions:
-                    users = [x for x in await x.users().flatten() if not x.bot]
+                    users = [x async for x in reaction.users() if not x.bot]
                     if reaction.emoji in ('👍', self.upvote_emojis[0]):
                         upvotes = len(users)
                     if reaction.emoji in ('👎', self.upvote_emojis[1]):
@@ -699,10 +700,10 @@ Cette option affecte tous les serveurs"""
     async def best_ideas(self, ctx: MyContext, number:int=10):
         """Donne la liste des 10 meilleures idées"""
         bot_msg = await ctx.send("Chargement des idées...")
-        server = self.bot.get_guild(356067272730607628)
+        server = self.bot.get_guild(356067272730607628 if not self.bot.beta else 625316773771608074)
         if server is None:
             return await ctx.send("Serveur introuvable")
-        channel = server.get_channel(488769306524385301)
+        channel = server.get_channel(488769306524385301 if not self.bot.beta else 929864644678549534)
         if channel is None:
             return await ctx.send("Salon introuvable")
         liste = await self._get_ideas_list(channel)
