@@ -218,6 +218,26 @@ It is recommended to give this role to all new members via the `welcome_roles` o
 .. warning:: For this system, the bot **must** have "`Manage Roles <perms.html#manage-roles>`__" permission. The roles to be removed **must** also be lower than the role of Zbot in your server hierarchy (Server Settings > Roles tab).
 
 
+---------
+Anti-scam
+---------
+
+**How does it work?**
+
+Zbot has an advanced scam message detection system, involving a `highly trained AI <scam-detector.html>`__ that has been conscientiously built over several months. This allows you to automatically filter and remove any messages that are dangerous to your members, such as Nitro scams or other suspicious links.
+
+When Zbot is certain that a message is dangerous, it will delete the message immediately and send a log to the logs channel if you have configured it. If Zbot detects a "probably dangerous" message, it will not take any action but will send you an alert in this same logs channel. So make sure you have configured an antiscam logs channel if you enable this feature.
+
+.. note:: Messages that are too short, or sent by moderators (members with "manage messages" or "manage server" permissions) or bots will not be monitored by this system.
+
+
+**List of commands:**
+:code:`antiscam enable` or :code:`antiscam disable` to enable/disable the system (require "manage server" permission)
+:code:`modlogs enable antiscam` to enable antiscam logs in a channel (require "manage server" permission)
+:code:`antiscam test` followed by any text to test how dangerous this text may be
+
+.. warning:: Warning: by enabling this feature, you allow Zbot to read and analyze all messages on your server, and messages considered suspicious may be anonymized and stored in our database for better detection. You are solely responsible for notifying your community of this.
+
 -----------
 Server logs
 -----------
