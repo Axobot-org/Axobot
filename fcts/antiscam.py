@@ -30,7 +30,9 @@ class AntiScam(commands.Cog):
 
     @commands.group(name="antiscam")
     async def antiscam(self, ctx: MyContext):
-        "Everything related to the antiscam feature"
+        """Everything related to the antiscam feature
+
+        ..Doc moderator.html#anti-scam"""
 
     @antiscam.command(name="test")
     @commands.cooldown(5, 30, commands.BucketType.user)
@@ -46,7 +48,9 @@ class AntiScam(commands.Cog):
     @commands.guild_only()
     @commands.check(checks.has_manage_guild)
     async def antiscam_enable(self, ctx: MyContext):
-        "Enable the anti scam feature in your server"
+        """Enable the anti scam feature in your server
+
+        ..Doc moderator.html#anti-scam"""
         msg: discord.Message = copy.copy(ctx.message)
         msg.content =  f'{ctx.prefix}config change anti_scam true'
         new_ctx = await self.bot.get_context(msg)
@@ -56,7 +60,9 @@ class AntiScam(commands.Cog):
     @commands.guild_only()
     @commands.check(checks.has_manage_guild)
     async def antiscam_disable(self, ctx: MyContext):
-        "Disable the anti scam feature in your server"
+        """Disable the anti scam feature in your server
+
+        ..Doc moderator.html#anti-scam"""
         msg: discord.Message = copy.copy(ctx.message)
         msg.content =  f'{ctx.prefix}config change anti_scam false'
         new_ctx = await self.bot.get_context(msg)
