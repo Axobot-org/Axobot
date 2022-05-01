@@ -9,6 +9,7 @@ from libs.classes import MyContext, Zbot
 from libs.formatutils import FormatUtils
 
 from fcts.args import serverlog
+from fcts import checks
 
 
 class ServerLogs(commands.Cog):
@@ -113,6 +114,7 @@ class ServerLogs(commands.Cog):
 
     @commands.group(name="modlogs")
     @commands.guild_only()
+    @commands.check(checks.has_manage_guild)
     @commands.cooldown(2, 6, commands.BucketType.guild)
     async def modlogs_main(self, ctx: MyContext):
         """Enable or disable server logs in specific channels"""

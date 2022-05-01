@@ -176,6 +176,7 @@ class Info(commands.Cog):
         await msg.edit(content=f":pig:  Groink!\nBot ping: {delta*1000:.0f}ms\nDiscord ping: {self.bot.latency*1000:.0f}ms")
 
     @commands.command(name="ping",aliases=['rep'])
+    @commands.cooldown(5, 45, commands.BucketType.guild)
     async def rep(self, ctx: MyContext, ip=None):
         """Get bot latency
         You can also use this command to ping any other server
