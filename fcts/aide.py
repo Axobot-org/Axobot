@@ -16,9 +16,12 @@ class Help(commands.Cog):
         self.old_cmd = bot.remove_command("help")
         self.help_color = 8311585
         self.help_color_DM = 14090153
-        self.doc_url = "https://zbot.readthedocs.io/en/latest/"
         with open('fcts/help.json', 'r', encoding="utf-8") as file:
             self.commands_list = json.load(file)
+    
+    @property
+    def doc_url(self):
+        return "https://zbot.readthedocs.io/en/develop/" if self.bot.beta else "https://zbot.readthedocs.io/en/latest/"
 
     async def cog_unload(self):
         self.bot.remove_command("help")
