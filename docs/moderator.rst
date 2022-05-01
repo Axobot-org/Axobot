@@ -236,7 +236,7 @@ When Zbot is certain that a message is dangerous, it will delete the message imm
 :code:`modlogs enable antiscam` to enable antiscam logs in a channel (require "manage server" permission)
 :code:`antiscam test` followed by any text to test how dangerous this text may be
 
-.. warning:: Warning: by enabling this feature, you allow Zbot to read and analyze all messages on your server, and messages considered suspicious may be anonymized and stored in our database for better detection. You are solely responsible for notifying your community of this.
+.. warning:: By enabling this feature, you allow Zbot to read and analyze all messages on your server, and messages considered suspicious may be anonymized and stored in our database for better detection. You are solely responsible for notifying your community of this.
 
 -----------
 Server logs
