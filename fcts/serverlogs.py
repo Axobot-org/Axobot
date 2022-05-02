@@ -351,7 +351,7 @@ class ServerLogs(commands.Cog):
     async def on_member_remove(self, member: discord.Member):
         """Triggered when a member leaves a guild
         Corresponding log: member_leave"""
-        if channel_ids := await self.is_log_enabled(member.guild.id, "member_remove"):
+        if channel_ids := await self.is_log_enabled(member.guild.id, "member_leave"):
             emb = discord.Embed(
                 description=f"**{member.mention} ({member.id}) left your server**",
                 colour=discord.Color.orange()
