@@ -65,6 +65,7 @@
         "membercount-1": "Nombre de bots",
         "membercount-2": "Nombre d'humains",
         "membercount-3": "Nombre de membres connectés",
+        "membercount-4": "Nombre de membres non vérifiés",
         "not-found": "Impossible de trouver %{N}",
         "info": {
             "categ-0": "Catégorie",
