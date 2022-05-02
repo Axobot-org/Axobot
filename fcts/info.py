@@ -1209,7 +1209,7 @@ Servers:
             async with self.bot.db_query(query) as query_results:
                 results = query_results
             desc = "\n".join(reversed(["**v{}:** <t:{:.0f}>".format(x['version'],x['release_date'].timestamp()) for x in results]))
-            time = discord.Embed.Empty
+            time = None
             title = await self.bot._(ctx.channel,'info.changelogs.index')
         else:
             if version is None:
