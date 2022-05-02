@@ -127,6 +127,7 @@ class Events(commands.Cog):
 
     async def send_guild_log(self, guild: discord.Guild, log_type: str):
         """Send a log to the logging channel when the bot joins/leave a guild"""
+        await self.bot.wait_until_ready()
         try:
             if log_type == "join":
                 self.bot.log.info("Bot joined the server {}".format(guild.id))
@@ -331,8 +332,8 @@ class Events(commands.Cog):
             # Clear old rank cards - every 20min
             elif now.minute%20 == 0 and self.bot.database_online:
                 await self.bot.get_cog('Xp').clear_cards()
-            # Partners reload - every 7h (start from 1am)
-            elif now.hour%7 == 1 and now.hour != self.partner_last_check.hour and self.bot.database_online:
+            # Partners reload - every 8h UTC (start from 0am)
+            elif utcnow.hour%8 == 0 and now.hour != self.partner_last_check.hour and self.bot.database_online:
                 await self.partners_loop()
             # Bots lists updates - every day
             elif now.hour == 0 and now.day != self.dbl_last_sending.day:

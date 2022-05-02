@@ -42,7 +42,8 @@ class Welcomer(commands.Cog):
         """Fonction principale appelée lorsqu'un membre quitte un serveur"""
         if self.bot.database_online:
             await self.bot.get_cog("Servers").update_memberChannel(member.guild)
-            await self.send_msg(member,"leave")
+            if "MEMBER_VERIFICATION_GATE_ENABLED" not in member.guild.features or not member.pending:
+                await self.send_msg(member,"leave")
             await self.bot.get_cog('Events').check_user_left(member)
 
 

@@ -176,6 +176,7 @@ class Info(commands.Cog):
         await msg.edit(content=f":pig:  Groink!\nBot ping: {delta*1000:.0f}ms\nDiscord ping: {self.bot.latency*1000:.0f}ms")
 
     @commands.command(name="ping",aliases=['rep'])
+    @commands.cooldown(5, 45, commands.BucketType.guild)
     async def rep(self, ctx: MyContext, ip=None):
         """Get bot latency
         You can also use this command to ping any other server
@@ -375,7 +376,7 @@ Available types: member, role, user, emoji, channel, server, invite, category
             list_role = list_role[:40]
             embed.add_field(name=_roles, value = ", ".join(list_role), inline=False)
         else:
-            embed.add_field(name=_roles, value = await self.bot._(ctx.guild.id,"activity","nothing"), inline=False)
+            embed.add_field(name=_roles, value=(await self.bot._(ctx.guild.id,"misc.none")).capitalize(), inline=False)
         # member verification gate
         if member.pending:
             _waiting = await self.bot._(ctx.guild.id, 'info.info.member-10')
@@ -386,7 +387,7 @@ Available types: member, role, user, emoji, channel, server, invite, category
     async def role_infos(self, ctx: MyContext, role: discord.Role):
         lang = await self.bot._(ctx.guild.id,"_used_locale")
         embed = discord.Embed(colour=role.color, timestamp=ctx.message.created_at)
-        embed.set_author(name=str(role), icon_url=ctx.guild.icon or discord.embeds.EmptyEmbed)
+        embed.set_author(name=str(role), icon_url=ctx.guild.icon)
         embed.set_footer(text='Requested by {}'.format(ctx.author.name), icon_url=ctx.author.display_avatar)
         since = await self.bot._(ctx.guild.id,"misc.since")
         # Name
@@ -515,7 +516,7 @@ Available types: member, role, user, emoji, channel, server, invite, category
             return
         lang = await self.bot._(ctx.guild.id,"_used_locale")
         embed = discord.Embed(colour=default_color, timestamp=ctx.message.created_at)
-        icon_url = channel.guild.icon.with_format('png') if channel.guild.icon else discord.embeds.EmptyEmbed
+        icon_url = channel.guild.icon.with_format('png') if channel.guild.icon else None
         embed.set_author(name="{} '{}'".format(await self.bot._(ctx.guild.id,"info.info.textchan-5"),channel.name), icon_url=icon_url)
         embed.set_footer(text='Requested by {}'.format(ctx.author.name), icon_url=ctx.author.display_avatar.with_format("png"))
         since = await self.bot._(ctx.guild.id,"misc.since")
@@ -558,7 +559,7 @@ Available types: member, role, user, emoji, channel, server, invite, category
         lang = await self.bot._(ctx.guild.id,"_used_locale")
         since = await self.bot._(ctx.guild.id,"misc.since")
         embed = discord.Embed(colour=default_color, timestamp=ctx.message.created_at)
-        icon_url = channel.guild.icon.with_static_format('png') if channel.guild.icon else discord.embeds.EmptyEmbed
+        icon_url = channel.guild.icon.with_static_format('png') if channel.guild.icon else None
         embed.set_author(name="{} '{}'".format(await self.bot._(ctx.guild.id,"info.info.voicechan-0"),channel.name), icon_url=icon_url)
         embed.set_footer(text='Requested by {}'.format(ctx.author.name), icon_url=ctx.author.display_avatar)
         # Name
@@ -599,7 +600,7 @@ Available types: member, role, user, emoji, channel, server, invite, category
         embed = discord.Embed(colour=default_color, timestamp=ctx.message.created_at, description=desc)
         embed.set_footer(text='Requested by {}'.format(ctx.author.name), icon_url=ctx.author.display_avatar)
         # Guild icon
-        icon_url = guild.icon.with_static_format("png") if guild.icon else discord.embeds.EmptyEmbed
+        icon_url = guild.icon.with_static_format("png") if guild.icon else None
         embed.set_author(name="{} '{}'".format(await self.bot._(ctx.guild.id,"info.info.guild-0"),guild.name), icon_url=icon_url)
         embed.set_thumbnail(url=icon_url)
         # Guild banner
@@ -688,7 +689,7 @@ Available types: member, role, user, emoji, channel, server, invite, category
         lang = await self.bot._(ctx.guild.id,"_used_locale")
         since = await self.bot._(ctx.guild.id,"misc.since")
         embed = discord.Embed(colour=default_color, timestamp=ctx.message.created_at)
-        icon_url = invite.guild.icon.with_static_format('png') if invite.guild.icon else discord.embeds.EmptyEmbed
+        icon_url = invite.guild.icon.with_static_format('png') if invite.guild.icon else None
         embed.set_author(name="{} '{}'".format(await self.bot._(ctx.guild.id,"info.info.inv-4"),invite.code), icon_url=icon_url)
         embed.set_footer(text='Requested by {}'.format(ctx.author.name), icon_url=ctx.author.display_avatar.replace(static_format="png", size=256))
         # Try to get the complete invite
@@ -763,7 +764,7 @@ Available types: member, role, user, emoji, channel, server, invite, category
             elif isinstance(channel, discord.VoiceChannel):
                 vchan +=1
         embed = discord.Embed(colour=default_color, timestamp=ctx.message.created_at)
-        icon_url = category.guild.icon.with_static_format('png') if category.guild.icon else discord.embeds.EmptyEmbed
+        icon_url = category.guild.icon.with_static_format('png') if category.guild.icon else None
         embed.set_author(name="{} '{}'".format(await self.bot._(ctx.guild.id,"info.info.categ-0"),category.name), icon_url=icon_url)
         embed.set_footer(text='Requested by {}'.format(ctx.author.name), icon_url=ctx.author.display_avatar)
 
@@ -1035,19 +1036,22 @@ Servers:
     @commands.bot_has_permissions(send_messages=True)
     async def membercount(self, ctx: MyContext):
         """Get some digits on the number of server members
-        
+
         ..Doc infos.html#membercount"""
         if not ctx.channel.permissions_for(ctx.guild.me).send_messages:
             return
-        total, bots, c_co = await self.bot.get_cog("Utilities").get_members_repartition(ctx.guild.members)
+        total, bots, c_co, unverified = await self.bot.get_cog("Utilities").get_members_repartition(ctx.guild.members)
         h = total - bots
         h_p = "< 1" if 0 < h / total < 0.01 else ("> 99" if 1 > h/total > 0.99 else round(h*100/total))
         b_p = "< 1" if 0 < bots / total < 0.01 else ("> 99" if 1 > bots/total > 0.99 else round(bots*100/total))
         c_p = "< 1" if 0 < c_co / total < 0.01 else ("> 99" if 1 > c_co/total > 0.99 else round(c_co*100/total))
-        l = [(await self.bot._(ctx.guild.id, "info.membercount-0"), str(total)),
+        pen_p = "< 1" if 0 < unverified / total < 0.01 else ("> 99" if 1 > unverified/total > 0.99 else round(unverified*100/total))
+        l = [(await self.bot._(ctx.guild.id, "info.membercount-0"), total),
              (await self.bot._(ctx.guild.id, "info.membercount-2"), "{} ({}%)".format(h, h_p)),
              (await self.bot._(ctx.guild.id, "info.membercount-1"), "{} ({}%)".format(bots, b_p)),
              (await self.bot._(ctx.guild.id, "info.membercount-3"), "{} ({}%)".format(c_co, c_p))]
+        if "MEMBER_VERIFICATION_GATE_ENABLED" in ctx.guild.features:
+            l.append((await self.bot._(ctx.guild.id, "info.membercount-4"), "{} ({}%)".format(unverified, pen_p)))
         if ctx.can_send_embed:
             embed = discord.Embed(colour=ctx.guild.me.color)
             for i in l:
@@ -1056,7 +1060,7 @@ Servers:
         else:
             text = str()
             for i in l:
-                text += "- {i[0]} : {i[1]}\n".format(i=i)
+                text += f"- {i[0]} : {i[1]}\n"
             await ctx.send(text)
 
     @commands.group(name="prefix")
@@ -1259,7 +1263,7 @@ Servers:
         if ctx.can_send_embed:
             MAX = 28
             date = ""
-            desc = discord.embeds.EmptyEmbed
+            desc = None
             fields = list()
             if len(global_list) > 0:
             # Usernames part

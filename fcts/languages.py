@@ -17,6 +17,8 @@ class Languages(discord.ext.commands.Cog):
         self.serv_opts: dict[int, str] = {}
         i18n.set('filename_format', '{locale}.{format}')
         i18n.set('file_format', 'json')
+        i18n.set('fallback', None)
+        i18n.set('error_on_missing_translation', True)
         i18n.translations.container.clear()
         i18n.load_path.clear()
         i18n.load_path.append('./lang')
@@ -76,18 +78,22 @@ class Languages(discord.ext.commands.Cog):
     async def _get_translation(self, locale: str, string_id: str, **args):
         if string_id == '_used_locale':
             return locale
-        translation = i18n.t(string_id, locale=locale, **args)
-        if translation == string_id:
+        try:
+            translation = i18n.t(string_id, locale=locale, **args)
+        except KeyError:
             await self.msg_not_found(string_id, locale)
+            if locale == "en":
+                return string_id
+            return await self._get_translation("en", string_id, **args)
         return translation
 
     async def msg_not_found(self, string_id: str, lang: str):
         "Signal to the dev that a translation is missing"
         try:
-            await self.bot.get_cog('Errors').senf_err_msg(
-                "Le message {} n'a pas été trouvé dans la base de donnée! (langue {})".format(string_id, lang))
-        except: # pylint: disable=bare-except
-            pass
+            err = f"Le message {string_id} n'a pas été trouvé dans la base de donnée! (langue {lang})"
+            await self.bot.get_cog('Errors').senf_err_msg(err)
+        except Exception: # pylint: disable=broad-except
+            self.bot.log.error(exc_info=True)
 
     async def check_tr(self, channel: discord.TextChannel, lang: str, origin: str="fr"):
         """Check translations from a language to another"""
