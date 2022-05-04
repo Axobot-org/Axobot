@@ -136,7 +136,13 @@ class Tickets(commands.Cog):
         query = "SELECT * FROM `tickets` WHERE `guild_id` = %s AND `topic` IS NOT NULL AND `beta` = %s"
         async with self.bot.db_query(query, (guild_id, self.bot.beta)) as db_query:
             return db_query
-    
+
+    async def db_get_defaults(self, guild_id: int) -> Optional[dict[str, Any]]:
+        "Get the default values for a guild"
+        query = "SELECT * FROM `tickets` WHERE `guild_id` = %s AND `topic` IS NULL AND `beta` = %s"
+        async with self.bot.db_query(query, (guild_id, self.bot.beta), fetchone=True) as db_query:
+            return db_query or None
+
     async def db_get_topic_with_defaults(self, guild_id: int, topic_id: int) -> dict[str, Any]:
         "Fetch a topicfrom its guild and ID"
         if topic_id == -1:
@@ -147,7 +153,7 @@ class Tickets(commands.Cog):
             args = (topic_id, guild_id, self.bot.beta)
         async with self.bot.db_query(query, args, fetchone=True) as db_query:
             return db_query or None
-    
+
     async def db_get_guild_default_id(self, guild_id: int) -> Optional[int]:
         "Return the row ID corresponding to the default guild setup, or None"
         query = "SELECT id FROM `tickets` WHERE guild_id = %s AND topic IS NULL AND beta = %s"
@@ -202,6 +208,11 @@ class Tickets(commands.Cog):
         async with self.bot.db_query(query, (role_id, guild_id, topic_id, self.bot.beta), returnrowcount=True) as db_query:
             return db_query > 0
 
+    async def db_edit_prompt(self, guild_id: int, message: str):
+        query = "UPDATE tickets SET prompt = %s WHERE guild_id = %s AND topic is NULL AND beta = %s"
+        async with self.bot.db_query(query, (message, guild_id, self.bot.beta)) as _:
+            pass
+
     async def ask_user_topic(self, ctx: MyContext) -> Optional[int]:
         view = AskTopicSelect(ctx.author.id, await self.db_get_topics(ctx.guild.id), 1)
         await ctx.send("Choose which topic to edit", view=view)
@@ -234,7 +245,9 @@ class Tickets(commands.Cog):
             if re.match(r'[A-Za-z0-9\_]+:[0-9]{13,20}', topic['topic_emoji']):
                 topic['topic_emoji'] = discord.PartialEmoji.from_str(topic['topic_emoji'])
         other = {"id": -1, "topic": "Other", "topic_emoji": None}
-        await ctx.send("Select a ticket category", view=SelectView(ctx.guild.id, topics + [other]))
+        defaults = await self.db_get_defaults(ctx.guild.id)
+        prompt = defaults["prompt"] if defaults else "Select a ticket category"
+        await ctx.send(prompt, view=SelectView(ctx.guild.id, topics + [other]))
 
     @tickets_portal.command(name="set-hint")
     async def portal_set_hint(self, ctx: MyContext, *, message: str):
@@ -250,18 +263,27 @@ class Tickets(commands.Cog):
             await ctx.send("SUCCESS")
         else:
             await ctx.send("FAILURE")
-    
+
     @tickets_portal.command(name="set-role")
     async def portal_set_role(self, ctx: MyContext, role: Union[discord.Role, Literal["none"]]):
         """Edit a default staff role
         Anyone with this role will be able to read newly created tickets
-        Type "None" to set admins only (`tickets portal set-role`)"""
+        Type "None" to set admins only"""
         row_id = await self.db_get_guild_default_id(ctx.guild.id)
         if row_id is None:
             row_id = await self.db_set_guild_default_id(ctx.guild.id)
         if role == "none":
             role = None
         await self.db_edit_topic_role(ctx.guild.id, row_id, role.id if role else None)
+        await ctx.send("SUCCESS")
+
+    @tickets_portal.command(name="set-text")
+    async def portal_set_text(self, ctx: MyContext, *, message: str):
+        """Set a message to be displayed above the ticket topic selection"""
+        row_id = await self.db_get_guild_default_id(ctx.guild.id)
+        if row_id is None:
+            row_id = await self.db_set_guild_default_id(ctx.guild.id)
+        await self.db_edit_prompt(ctx.guild.id, message)
         await ctx.send("SUCCESS")
 
 
