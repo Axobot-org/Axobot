@@ -16,7 +16,7 @@ class SelectView(discord.ui.View):
         custom_id = f"{guild_id}-tickets-{random.randint(1, 100):03}"
         self.select = discord.ui.Select(placeholder="Chose a topic", options=options, custom_id=custom_id)
         self.add_item(self.select)
-    
+
     def build_options(self, topics: list[dict[str, Any]]):
         res = []
         for topic in topics:
@@ -25,28 +25,34 @@ class SelectView(discord.ui.View):
 
 class SendHintText(discord.ui.View):
     "Used to send a hint and make sure the user actually needs help"
-    def __init__(self, user_id: int):
-        super().__init__()
+    def __init__(self, user_id: int, label_confirm: str, label_cancel: str, text_cancel: str):
+        super().__init__(timeout=180)
         self.user_id = user_id
-        self.confirmed: bool = None
-    
+        self.confirmed: Optional[bool] = None
+        self.interaction: Optional[discord.Interaction] = None
+        confirm_btn = discord.ui.Button(label=label_confirm, style=discord.ButtonStyle.green)
+        confirm_btn.callback = self.confirm
+        self.add_item(confirm_btn)
+        self.text_cancel = text_cancel
+        cancel_btn = discord.ui.Button(label=label_cancel, style=discord.ButtonStyle.red)
+        cancel_btn.callback = self.cancel
+        self.add_item(cancel_btn)
+
     async def interaction_check(self, interaction: discord.Interaction):
         return interaction.user.id == self.user_id
-    
-    @discord.ui.button(label='YES PLZ', style=discord.ButtonStyle.green)
-    async def confirm(self, interaction: discord.Interaction, button: discord.ui.Button):
-        await interaction.response.send_message('CONFIRMING', ephemeral=True)
-        self.value = True
+
+    async def confirm(self, interaction: discord.Interaction):
+        self.confirmed = True
+        self.interaction = interaction
         self.stop()
 
-    @discord.ui.button(label='NO THX', style=discord.ButtonStyle.red)
-    async def cancel(self, interaction: discord.Interaction, button: discord.ui.Button):
+    async def cancel(self, interaction: discord.Interaction):
         await interaction.response.defer()
-        self.value = False
+        self.confirmed = False
         self.stop()
         await self.disable(interaction)
-        await interaction.followup.send("CANCELLING", ephemeral=True)
-    
+        await interaction.followup.send(self.text_cancel, ephemeral=True)
+
     async def disable(self, src: Union[discord.Interaction, discord.Message]):
         for child in self.children:
             child.disabled = True
@@ -58,23 +64,25 @@ class SendHintText(discord.ui.View):
 
 
 class AskTitleModal(discord.ui.Modal):
-    name = discord.ui.TextInput(label="Your subject", placeholder="Type here a meaningful ticket name", style=discord.TextStyle.short, max_length=100)
+    name = discord.ui.TextInput(label="YOUR SUBJECT", placeholder="TYPE HERE A MEANINGFUL TICKET NAME", style=discord.TextStyle.short, max_length=100)
     
-    def __init__(self, guild_id: int, topic: int):
-        super().__init__(title="Your ticket", timeout=600)
+    def __init__(self, guild_id: int, topic: int, title: str, input_label, input_placeholder):
+        super().__init__(title=title, timeout=600)
         self.guild_id = guild_id
         self.topic = topic
+        self.children[0].label = input_label
+        self.children[0].placeholder = input_placeholder
 
     async def on_submit(self, interaction: discord.Interaction):
-        await interaction.response.send_message("no")
+        await interaction.response.send_message("NO")
 
 class AskTopicSelect(discord.ui.View):
     "Ask a user what topic they want to edit/delete"
-    def __init__(self, user_id: int, topics: list[dict[str, Any]], max_values: int):
+    def __init__(self, user_id: int, topics: list[dict[str, Any]], placeholder: str, max_values: int):
         super().__init__()
         self.user_id = user_id
         options = self.build_options(topics)
-        self.select = discord.ui.Select(placeholder='Choose a topic', min_values=1, max_values=max_values, options=options)
+        self.select = discord.ui.Select(placeholder=placeholder, min_values=1, max_values=max_values, options=options)
         self.select.callback = self.callback
         self.add_item(self.select)
         self.topics: list[str] = None
@@ -120,16 +128,29 @@ class Tickets(commands.Cog):
         topic_id: int = int(interaction.data['values'][0])
         topic = await self.db_get_topic_with_defaults(interaction.guild_id, topic_id)
         if topic is None:
-            await interaction.response.send_message("OOPS ERROR")
+            await interaction.response.send_message(await self.bot._(interaction.guild_id, "errors.unknown"))
             return
         if topic['hint']:
-            hint_view = SendHintText(interaction.user.id)
+            hint_view = SendHintText(interaction.user.id,
+                await self.bot._(interaction.guild_id, "tickets.hint-useless"),
+                await self.bot._(interaction.guild_id, "tickets.hint-useful"),
+                await self.bot._(interaction.guild_id, "tickets.cancelled"))
             embed = discord.Embed(color=discord.Color.green(), title=topic['topic'], description=topic['hint'])
             await interaction.response.send_message(embed=embed, view=hint_view, ephemeral=True)
             await hint_view.wait()
-            if not hint_view.value:
+            if hint_view.confirmed is None:
+                # timeout
+                await hint_view.disable(interaction)
                 return
-        await interaction.response.send_modal(AskTitleModal(interaction.guild.id, topic))
+            if not hint_view.confirmed:
+                # cancelled
+                return
+            if hint_view.interaction:
+                interaction = hint_view.interaction
+        modal_title = await self.bot._(interaction.guild_id, "tickets.title-modal.title")
+        modal_label = await self.bot._(interaction.guild_id, "tickets.title-modal.label")
+        modal_placeholder = await self.bot._(interaction.guild_id, "tickets.title-modal.placeholder")
+        await interaction.response.send_modal(AskTitleModal(interaction.guild.id, topic, modal_title, modal_label, modal_placeholder))
     
     async def db_get_topics(self, guild_id: int) -> list[dict[str, Any]]:
         "Fetch the topics associated to a guild"
@@ -178,10 +199,10 @@ class Tickets(commands.Cog):
         except IntegrityError:
             return False
 
-    async def db_delete_topic(self, guild_id: int, name: str) -> bool:
+    async def db_delete_topic(self, guild_id: int, topic_id: int) -> bool:
         "Delete a topic from a guild"
-        query = "DELETE FROM `tickets` WHERE `guild_id` = %s AND LOWER(`topic`) = %s AND `beta` = %s"
-        async with self.bot.db_query(query, (guild_id, name.lower(), self.bot.beta), returnrowcount=True) as db_query:
+        query = "DELETE FROM `tickets` WHERE `guild_id` = %s AND id = %s AND `beta` = %s"
+        async with self.bot.db_query(query, (guild_id, topic_id, self.bot.beta), returnrowcount=True) as db_query:
             return db_query > 0
 
     async def db_topic_exists(self, guild_id: int, topic_id: int):
@@ -214,8 +235,9 @@ class Tickets(commands.Cog):
             pass
 
     async def ask_user_topic(self, ctx: MyContext) -> Optional[int]:
-        view = AskTopicSelect(ctx.author.id, await self.db_get_topics(ctx.guild.id), 1)
-        await ctx.send("Choose which topic to edit", view=view)
+        placeholder = await self.bot._(ctx.guild.id, "tickets.selection-placeholder")
+        view = AskTopicSelect(ctx.author.id, await self.db_get_topics(ctx.guild.id), placeholder, 1)
+        await ctx.send(await self.bot._(ctx.guild.id, "tickets.choose-topic-edition"), view=view)
         await view.wait()
         if view.topics is None:
             return None
@@ -244,9 +266,12 @@ class Tickets(commands.Cog):
             # if emoji is a discord emoji, convert it
             if re.match(r'[A-Za-z0-9\_]+:[0-9]{13,20}', topic['topic_emoji']):
                 topic['topic_emoji'] = discord.PartialEmoji.from_str(topic['topic_emoji'])
-        other = {"id": -1, "topic": "Other", "topic_emoji": None}
+        other = {"id": -1,
+                 "topic": (await self.bot._(ctx.guild.id, "tickets.other")).capitalize(),
+                 "topic_emoji": None
+                 }
         defaults = await self.db_get_defaults(ctx.guild.id)
-        prompt = defaults["prompt"] if defaults else "Select a ticket category"
+        prompt = defaults["prompt"] if defaults else await self.bot._(ctx.guild.id, "tickets.default-topic-prompt")
         await ctx.send(prompt, view=SelectView(ctx.guild.id, topics + [other]))
 
     @tickets_portal.command(name="set-hint")
@@ -260,9 +285,9 @@ class Tickets(commands.Cog):
         if row_id is None:
             row_id = await self.db_set_guild_default_id(ctx.guild.id)
         if await self.db_edit_topic_hint(ctx.guild.id, row_id, message):
-            await ctx.send("SUCCESS")
+            await ctx.send(await self.bot._(ctx.guild.id, "tickets.hint-edited.default"))
         else:
-            await ctx.send("FAILURE")
+            await ctx.send(await self.bot._(ctx.guild.id, "errors.unknown"))
 
     @tickets_portal.command(name="set-role")
     async def portal_set_role(self, ctx: MyContext, role: Union[discord.Role, Literal["none"]]):
@@ -275,7 +300,7 @@ class Tickets(commands.Cog):
         if role == "none":
             role = None
         await self.db_edit_topic_role(ctx.guild.id, row_id, role.id if role else None)
-        await ctx.send("SUCCESS")
+        await ctx.send(await self.bot._(ctx.guild.id, "tickets.role-edited.default"))
 
     @tickets_portal.command(name="set-text")
     async def portal_set_text(self, ctx: MyContext, *, message: str):
@@ -284,7 +309,7 @@ class Tickets(commands.Cog):
         if row_id is None:
             row_id = await self.db_set_guild_default_id(ctx.guild.id)
         await self.db_edit_prompt(ctx.guild.id, message)
-        await ctx.send("SUCCESS")
+        await ctx.send(await self.bot._(ctx.guild.id, "tickets.text-edited"))
 
 
     @tickets_main.group(name="topic")
@@ -298,20 +323,26 @@ class Tickets(commands.Cog):
         A topic name is limited to 100 characters
         Only Discord emojis are accepted for now"""
         if len(name) > 100:
-            await ctx.send("NOPE")
+            await ctx.send(await self.bot._(ctx.guild.id, "tickets.topic.too-long"))
             return
         if await self.db_add_topic(ctx.guild.id, name, f"{emote.name}:{emote.id}" if emote else None):
-            await ctx.send("SUCCESS!")
+            await ctx.send(await self.bot._(ctx.guild.id, "tickets.topic.created", name=name))
         else:
-            await ctx.send("FAILURE!")
+            await ctx.send(await self.bot._(ctx.guild.id, "tickets.topic.cant-create"))
 
     @tickets_topics.command(name="remove")
-    async def topic_remove(self, ctx: MyContext, *, name: str):
+    async def topic_remove(self, ctx: MyContext, topic_id: Optional[int]):
         "Permanently delete a topic by its name"
-        if await self.db_delete_topic(ctx.guild.id, name):
-            await ctx.send("SUCCESS")
+        if not topic_id or not await self.db_topic_exists(ctx.guild.id, topic_id):
+            topic_id = await self.ask_user_topic(ctx)
+            if topic_id is None:
+                await ctx.send(await self.bot._(ctx.guild.id, "errors.unknown"))
+                return
+        topic = await self.db_get_topic_with_defaults(ctx.guild.id, topic_id)
+        if await self.db_delete_topic(ctx.guild.id, topic_id):
+            await ctx.send(await self.bot._(ctx.guild.id, "tickets.topic.deleted", name=topic["topic"]))
         else:
-            await ctx.send("DOES NOT EXIST")
+            await ctx.send(await self.bot._(ctx.guild.id, "errors.unknown"))
 
     @tickets_topics.command(name="set-emote")
     async def topic_set_emote(self, ctx: MyContext, topic_id: Optional[int], emote: Union[discord.PartialEmoji, Literal["none"]]):
@@ -320,14 +351,15 @@ class Tickets(commands.Cog):
         if not topic_id or not await self.db_topic_exists(ctx.guild.id, topic_id):
             topic_id = await self.ask_user_topic(ctx)
             if topic_id is None:
-                await ctx.send("NOPE")
+                await ctx.send(await self.bot._(ctx.guild.id, "errors.unknown"))
                 return
         if emote == "none":
             emote = None
         if await self.db_edit_topic_emoji(ctx.guild.id, topic_id, f"{emote.name}:{emote.id}" if emote else None):
-            await ctx.send("EDITED")
+            topic = await self.db_get_topic_with_defaults(ctx.guild.id, topic_id)
+            await ctx.send(await self.bot._(ctx.guild.id, "tickets.emote-edited", topic=topic["topic"]))
         else:
-            await ctx.send("FAILURE")
+            await ctx.send(await self.bot._(ctx.guild.id, "tickets.nothing-to-edit"))
 
     @tickets_topics.command(name="set-hint")
     async def topic_set_hint(self, ctx: MyContext, topic_id: Optional[int], *, message: str):
@@ -337,14 +369,13 @@ class Tickets(commands.Cog):
         if not topic_id or not await self.db_topic_exists(ctx.guild.id, topic_id):
             topic_id = await self.ask_user_topic(ctx)
             if topic_id is None:
-                await ctx.send("NOPE")
+                await ctx.send(await self.bot._(ctx.guild.id, "errors.unknown"))
                 return
         if message.lower() == "none":
             message = None
-        if await self.db_edit_topic_hint(ctx.guild.id, topic_id, message):
-            await ctx.send("EDITED")
-        else:
-            await ctx.send("FAILURE")
+        await self.db_edit_topic_hint(ctx.guild.id, topic_id, message)
+        topic = await self.db_get_topic_with_defaults(ctx.guild.id, topic_id)
+        await ctx.send(await self.bot._(ctx.guild.id, "tickets.hint-edited.topic", topic=topic["topic"]))
 
     @tickets_topics.command(name="set-role")
     async def topic_set_role(self, ctx: MyContext, topic_id: Optional[int], role: Union[discord.Role, Literal["none"]]):
@@ -354,14 +385,15 @@ class Tickets(commands.Cog):
         if not topic_id or not await self.db_topic_exists(ctx.guild.id, topic_id):
             topic_id = await self.ask_user_topic(ctx)
             if topic_id is None:
-                await ctx.send("NOPE")
+                await ctx.send(await self.bot._(ctx.guild.id, "errors.unknown"))
                 return
         if role == "none":
             role = None
         if await self.db_edit_topic_role(ctx.guild.id, topic_id, role.id if role else None):
-            await ctx.send("EDITED")
+            topic = await self.db_get_topic_with_defaults(ctx.guild.id, topic_id)
+            await ctx.send(await self.bot._(ctx.guild.id, "tickets.role-edited.topic", topic=topic["topic"]))
         else:
-            await ctx.send("FAILURE")
+            await ctx.send(await self.bot._(ctx.guild.id, "tickets.nothing-to-edit"))
 
 
 async def setup(bot):

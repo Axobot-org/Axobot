@@ -1,0 +1,34 @@
+{
+    "en": {
+        "cancelled": "The operation has been cancelled",
+        "choose-topic-edition": "Choose which topic to edit",
+        "default-topic-prompt": "Select a ticket category",
+        "emote-edited": "The emote for the topic \"%{topic}\" has been edited!",
+        "hint-edited": {
+            "default": "The default hint has correctly been edited!",
+            "topic": "The hint for the topic \"%{topic}\" has correctly been edited!"
+        },
+        "hint-useful": "I don't need it anymore",
+        "hint-useless": "Create a ticket",
+        "nothing-to-edit": "Nothing to edit!",
+        "other": "other",
+        "role-edited": {
+            "default": "The default role allowed to see tickets has been edited!",
+            "topic": "The role allowed to see tickets of topic \"%{topic}\" has been edited!"
+        },
+        "selection-placeholder": "Choose a topic",
+        "text-edited": "The message displayed with the selection of a ticket has been edited",
+        "ticket-created": "Ticket opened in %{channel} with the topic \"%{topic}\"!",
+        "title-modal": {
+            "title": "Your ticket",
+            "label": "Your subject",
+            "placeholder": "Type here a meaningful ticket name"
+        },
+        "topic": {
+            "too-long": "The topic name cannot exceed 100 characters",
+            "cant-create": "Oops, unable to create this topic. Make sure you do not already have a topic with this name, and contact support if needed",
+            "created": "The topic \"%{name}\" has successfully been created",
+            "deleted": "The topic \"%{name}\" has been deleted"
+        }
+    }
+}
