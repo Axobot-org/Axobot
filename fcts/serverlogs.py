@@ -9,6 +9,7 @@ from libs.classes import MyContext, Zbot
 from libs.formatutils import FormatUtils
 
 from fcts.args import serverlog
+from fcts import checks
 
 
 class ServerLogs(commands.Cog):
@@ -113,6 +114,7 @@ class ServerLogs(commands.Cog):
 
     @commands.group(name="modlogs")
     @commands.guild_only()
+    @commands.check(checks.has_manage_guild)
     @commands.cooldown(2, 6, commands.BucketType.guild)
     async def modlogs_main(self, ctx: MyContext):
         """Enable or disable server logs in specific channels"""
@@ -349,7 +351,7 @@ class ServerLogs(commands.Cog):
     async def on_member_remove(self, member: discord.Member):
         """Triggered when a member leaves a guild
         Corresponding log: member_leave"""
-        if channel_ids := await self.is_log_enabled(member.guild.id, "member_remove"):
+        if channel_ids := await self.is_log_enabled(member.guild.id, "member_leave"):
             emb = discord.Embed(
                 description=f"**{member.mention} ({member.id}) left your server**",
                 colour=discord.Color.orange()
