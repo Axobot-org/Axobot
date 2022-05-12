@@ -164,6 +164,8 @@ class FeedSelectView(discord.ui.View):
         "Build the options list for Discord"
         res = []
         for feed in feeds:
+            if len(feed['name']) > 90:
+                feed['name'] = feed['name'][:89] + '…'
             label = f"{feed['tr_type']} - {feed['name']}"
             desc = f"{feed['tr_channel']} - Last post: {feed['tr_lastpost']}"
             res.append(discord.SelectOption(value=feed['ID'], label=label, description=desc, emoji=feed['emoji']))
