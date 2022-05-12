@@ -33,8 +33,7 @@ class Errors(commands.Cog):
         # Anything in ignored will return and prevent anything happening.
         if isinstance(error, ignored) and not isinstance(error,actually_not_ignored):
             if self.bot.beta and ctx.guild:
-                c = str(type(error)).replace("<class '",'').replace("'>",'')
-                await ctx.send('`Ignored error:` [{}] {}'.format(c,error))
+                await ctx.send(f"`Ignored error:` [{error.__class__.__module__}.{error.__class__.__name__}] {error}")
             return
         elif isinstance(error, commands.CommandError) and str(error) == "User doesn't have required roles":
             await ctx.send(await self.bot._(ctx.channel, 'errors.notrightroles'))
@@ -57,6 +56,9 @@ class Errors(commands.Cog):
                 return
             d = round(error.retry_after, 2 if error.retry_after < 60 else 0)
             await ctx.send(await self.bot._(ctx.channel,'errors.cooldown',d=d))
+            return
+        elif isinstance(error, commands.BadLiteralArgument):
+            await ctx.send(await self.bot._(ctx.channel, 'errors.badlitteral'))
             return
         elif isinstance(error,(commands.BadArgument,commands.BadUnionArgument)):
             ALLOWED = discord.AllowedMentions(everyone=False, users=False, roles=False)
