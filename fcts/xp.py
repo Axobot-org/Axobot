@@ -597,9 +597,9 @@ class Xp(commands.Cog):
         bar_colors = await self.get_xp_bar_color(user.id)
         if levels_info is None:
             levels_info = await self.calc_level(xp,used_system)
-        colors = {'name':(124, 197, 118),'xp':(124, 197, 118),'NIVEAU':(255, 224, 77),'rank':(105, 157, 206),'bar':bar_colors}
-        if style=='blurple':
-            colors = {'name':(35,35,50),'xp':(235, 235, 255),'NIVEAU':(245, 245, 255),'rank':(255, 255, 255),'bar':(70, 83, 138)}
+        colors = {'name':(124, 197, 118),'xp':(124, 197, 118),'NIVEAU':(255, 224, 77),'rank':(105, 157, 206),'bar':bar_colors, 'bar_background': (180, 180, 180)}
+        if 'blurple' in style:
+            colors = {'name':(240, 240, 255),'xp':(235, 235, 255),'NIVEAU':(245, 245, 255),'rank':(255, 255, 255),'bar':(250, 250, 255), 'bar_background': (27, 29, 31)}
 
         name_fnt = ImageFont.truetype('Roboto-Medium.ttf', 40)
 
@@ -666,15 +666,15 @@ class Xp(commands.Cog):
                     cardL[x,y] = pfpL[x-20,y-29]
                 elif cardL[x, y][3]<128:
                     cardL[x,y] = (255,255,255,0)
-                    
-        
+
+
         xp_fnt = self.fonts['xp_fnt']
         NIVEAU_fnt = self.fonts['NIVEAU_fnt']
         levels_fnt = self.fonts['levels_fnt']
         rank_fnt = self.fonts['rank_fnt']
         RANK_fnt = self.fonts['RANK_fnt']
-        
-        img = self.add_xp_bar(img,xp-levels_info[2],levels_info[1]-levels_info[2],colors['bar'])
+
+        img = self.add_xp_bar(img,xp-levels_info[2],levels_info[1]-levels_info[2],colors['bar'], colors['bar_background'])
         d = ImageDraw.Draw(img)
         d.text(self.calc_pos(user.name,name_fnt,610,68), user.name, font=name_fnt, fill=colors['name'])
         temp = '{} / {} xp ({}/{})'.format(xp-levels_info[2],levels_info[1]-levels_info[2],xp,levels_info[1])
@@ -686,15 +686,18 @@ class Xp(commands.Cog):
         d.text((self.calc_pos(temp,rank_fnt,893,180,'center')), temp, font=rank_fnt, fill=colors['rank'])
         return img
 
-    def add_xp_bar(self, img, xp: int, needed_xp: int, color):
+    def add_xp_bar(self, img, xp: int, needed_xp: int, color: tuple[int, int, int], background: tuple[int, int, int]):
         """Colorize the xp bar"""
         error_rate = 25
         data = np.array(img)   # "data" is a height x width x 4 numpy array
         red, green, blue, alpha = data.T # Temporarily unpack the bands for readability
 
         # Replace white with red... (leaves alpha values alone...)
-        white_areas = (abs(red)-180<error_rate) & (abs(blue)-180<error_rate) & (abs(green)-180<error_rate)
+        white_areas = (abs(red)-background[0] < error_rate) & (
+            abs(blue)-background[1] < error_rate) & (abs(green)-background[2] < error_rate)
         white_areas[:298] = False & False & False
+        white_areas[..., :260] = False & False & False
+        white_areas[..., 300:] = False & False & False
         max_x = round(298 + (980-298)*xp/needed_xp)
         white_areas[max_x:] = False & False & False
         #white_areas[298:980] = True & True & True
