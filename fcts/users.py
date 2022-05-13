@@ -63,8 +63,8 @@ class Users(commands.Cog):
         if rankcard not in RankCardsFlag.FLAGS.values():
             return False
         return rankcard in await self.get_rankcards(user)
-    
-    async def set_rankcard(self, user: discord.User, style: str, add: True):
+
+    async def set_rankcard(self, user: discord.User, style: str, add: bool=True):
         """Add or remove a rank card style for a user"""
         if style not in RankCardsFlag.FLAGS.values():
             raise ValueError("Unknown card style")
