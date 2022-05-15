@@ -60,17 +60,17 @@ class ServerLogs(commands.Cog):
                 else:
                     self.to_send[channel] = [embed]
 
-    async def db_get_from_channel(self, guild: int, channel: int) -> list[str]:
+    async def db_get_from_channel(self, guild: int, channel: int, use_cache: bool=True) -> list[str]:
         "Get enabled logs for a channel"
-        if (cached := self.cache.get(guild)) and channel in cached:
+        if use_cache and (cached := self.cache.get(guild)) and channel in cached:
             return cached[channel]
         query = "SELECT kind FROM serverlogs WHERE guild = %s AND channel = %s"
         async with self.bot.db_query(query, (guild, channel)) as query_results:
             return [row['kind'] for row in query_results]
 
-    async def db_get_from_guild(self, guild: int) -> dict[int, list[str]]:
+    async def db_get_from_guild(self, guild: int, use_cache: bool=True) -> dict[int, list[str]]:
         "Get enabled logs for a guild"
-        if cached := self.cache.get(guild):
+        if use_cache and (cached := self.cache.get(guild)):
             return cached
         query = "SELECT channel, kind FROM serverlogs WHERE guild = %s"
         async with self.bot.db_query(query, (guild,)) as query_results:
@@ -87,14 +87,19 @@ class ServerLogs(commands.Cog):
             if query_result > 0 and guild in self.cache:
                 if channel in self.cache[guild]:
                     self.cache[guild][channel].append(kind)
+                else:
+                    self.cache[guild][channel] = await self.db_get_from_channel(guild, channel, False)
             return query_result > 0
 
     async def db_remove(self, guild: int, channel: int, kind: str) -> bool:
         "Remove logs from a channel"
         query = "DELETE FROM serverlogs WHERE guild = %s AND channel = %s AND kind = %s"
         async with self.bot.db_query(query, (guild, channel, kind), returnrowcount=True) as query_result:
-            if query_result > 0 and guild in self.cache and channel in self.cache[guild]:
-                self.cache[guild][channel] = [x for x in self.cache[guild][channel] if x != kind]
+            if query_result > 0 and guild in self.cache:
+                if channel in self.cache[guild]:
+                    self.cache[guild][channel] = [x for x in self.cache[guild][channel] if x != kind]
+                else:
+                    self.cache[guild] = await self.db_get_from_guild(guild, use_cache=False)
             return query_result > 0
 
 
