@@ -140,7 +140,6 @@ Arguments are:
             'name': g.name,
             'id': g.id,
             'owner': g.owner.id,
-            'voiceregion': str(g.region),
             'afk_timeout': g.afk_timeout,
             'icon': None if g.icon else g.icon.url,
             'verification_level': g.verification_level.value,
@@ -779,21 +778,6 @@ Arguments are:
                     problems[1] += 1
                 else:
                     logs.append(symb[2]+" Verification level set to "+verif_level.name)
-            # voiceregion
-            if str(ctx.guild.region) == data["voiceregion"]:
-                logs.append(symb[1]+" No need to change voice region")
-            else:
-                try:
-                    voicereg = discord.VoiceRegion(data["voiceregion"])
-                    await ctx.guild.edit(region=voicereg)
-                except discord.errors.Forbidden:
-                    logs.append(symb[0]+" Unable to set voice region: missing permissions")
-                    problems[0] += 1
-                except Exception as e:
-                    logs.append(symb[0]+f" Unable to set voice region: {e}")
-                    problems[1] += 1
-                else:
-                    logs.append(symb[2]+" Voice region set to "+voicereg.name)
             # roles
             logs.append(" - Creating roles")
             roles_list = dict()
