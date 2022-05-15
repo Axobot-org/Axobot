@@ -101,11 +101,17 @@ class ServerLogs(commands.Cog):
     @tasks.loop(seconds=30)
     async def send_logs_task(self):
         "Send ready logs every 1min to avoid rate limits"
-        for channel, embeds in dict(self.to_send).items():
-            perms = channel.permissions_for(channel.guild.me)
-            if perms.send_messages and perms.embed_links:
-                await channel.send(embeds=embeds)
-                self.to_send.pop(channel)
+        try:
+            for channel, embeds in dict(self.to_send).items():
+                perms = channel.permissions_for(channel.guild.me)
+                if perms.send_messages and perms.embed_links:
+                    await channel.send(embeds=embeds[:10])
+                    if len(embeds) > 10:
+                        self.to_send[channel] = self.to_send[channel][10:]
+                    else:
+                        self.to_send.pop(channel)
+        except Exception as err: # pylint: disable=broad-except
+            await self.bot.get_cog("Errors").on_error(err, None)
 
     @send_logs_task.before_loop
     async def before_logs_task(self):
