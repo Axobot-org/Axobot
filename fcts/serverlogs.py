@@ -233,8 +233,12 @@ class ServerLogs(commands.Cog):
                 description=f"**[Message]({link}) updated in <#{msg.channel_id}>**",
                 colour=discord.Color.light_gray())
             if old_content:
+                if len(old_content) > 1024:
+                    old_content = old_content[:1020] + '…'
                 emb.add_field(name="Old content", value=old_content, inline=False)
             if new_content:
+                if len(new_content) > 1024:
+                    new_content = new_content[:1020] + '…'
                 emb.add_field(name="New content", value=new_content, inline=False)
             if author:
                 emb.set_author(name=str(author), icon_url=author.display_avatar)
