@@ -299,8 +299,8 @@ class ServerLogs(commands.Cog):
             if added_roles:
                 emb.add_field(name="Roles granted", value=' '.join(r.mention for r in added_roles), inline=False)
             emb.set_author(name=str(after), icon_url=after.avatar or after.default_avatar)
-            # if we have access to audit logs, just wait a bit to make sure the ban is logged
-            if before.guild.me.guild_permissions.view_audit_log:
+            # if we have access to audit logs and no role come from an integration, just wait a bit to make sure the ban is logged
+            if any(not role.managed for role in added_roles+removed_roles) and before.guild.me.guild_permissions.view_audit_log:
                 now = self.bot.utcnow()
                 await asyncio.sleep(self.auditlogs_timeout)
                 async for entry in before.guild.audit_logs(limit=5, action=discord.AuditLogAction.member_role_update,
