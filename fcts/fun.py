@@ -318,11 +318,14 @@ You can specify a verification limit by adding a number in argument (up to 1.000
         """Wow... So cuuuute !
 
         ..Doc fun.html#cat"""
-        await ctx.send(random.choice(['http://images6.fanpop.com/image/photos/40800000/tummy-rub-kitten-animated-gif-cute-kittens-40838484-380-227.gif',
-        'http://25.media.tumblr.com/7774fd7794d99b5998318ebd5438ba21/tumblr_n2r7h35U211rudcwro1_400.gif',
-        'https://www.2tout2rien.fr/wp-content/uploads/2014/10/37-pestes-de-chats-mes-bonbons.gif',
-        'http://coquelico.c.o.pic.centerblog.net/chat-peur.gif',
-        'https://tenor.com/view/nope-bye-cat-leave-done-gif-12387359']))
+        await ctx.send(random.choice([
+            'http://images6.fanpop.com/image/photos/40800000/tummy-rub-kitten-animated-gif-cute-kittens-40838484-380-227.gif',
+            'http://25.media.tumblr.com/7774fd7794d99b5998318ebd5438ba21/tumblr_n2r7h35U211rudcwro1_400.gif',
+            'https://tenor.com/view/seriously-seriously-cat-cat-really-cat-really-look-cat-look-gif-22182662',
+            'https://tenor.com/view/mybc-gif-24798373',
+            'http://coquelico.c.o.pic.centerblog.net/chat-peur.gif',
+            'https://tenor.com/view/nope-bye-cat-leave-done-gif-12387359'
+        ]))
 
     @commands.command(name="happy-birthday", hidden=True, aliases=['birthday', 'hb'])
     @commands.check(is_fun_enabled)
