@@ -379,7 +379,8 @@ class ServerLogs(commands.Cog):
                               inline=False)
             if specs := await self.get_member_specs(member):
                 emb.add_field(name="Specificities", value=", ".join(specs), inline=False)
-            emb.add_field(name=f"Roles ({len(member.roles)})", value=" ".join(r.mention for r in member.roles[::-1][:20]))
+            member_roles = [role for role in member.roles[::-1] if not role.is_default()]
+            emb.add_field(name=f"Roles ({len(member.roles)})", value=" ".join(r.mention for r in member_roles[:20]))
             await self.validate_logs(member.guild, channel_ids, emb)
 
     @commands.Cog.listener()
