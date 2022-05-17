@@ -127,7 +127,7 @@ Arguments are:
                     temp2['type'] = 'member'
                 else:
                     temp2['type'] = 'role'
-                temp2['permissions'] = dict()
+                temp2['permissions'] = {}
                 for x in iter(iter_perm):
                     if x[1] is not None:
                         temp2['permissions'][x[0]] = x[1]
@@ -170,7 +170,7 @@ Arguments are:
                         temp2['type'] = 'member'
                     else:
                         temp2['type'] = 'role'
-                    temp2['permissions'] = dict()
+                    temp2['permissions'] = {}
                     for x in iter(iter_perm):
                         if x[1] is not None:
                             temp2['permissions'][x[0]] = x[1]
@@ -181,18 +181,18 @@ Arguments are:
                 temp['channels'].append(await get_channel_json(chan))
             categ.append(temp)
         back['categories'] = categ
-        back['emojis'] = dict()
-        for e in g.emojis:
-            back['emojis'][e.name] = {"url": str(e.url), "roles": [x.id for x in e.roles]}
+        back['emojis'] = {}
+        for err in g.emojis:
+            back['emojis'][err.name] = {"url": str(err.url), "roles": [x.id for x in err.roles]}
         try:
-            banned = dict()
-            for b in await g.bans():
+            banned = {}
+            async for b in g.bans():
                 banned[b.user.id] = b.reason
             back['banned_users'] = banned
         except discord.errors.Forbidden:
             pass
-        except Exception as e:
-            await ctx.bot.get_cog('Errors').on_error(e,ctx)
+        except Exception as err:
+            await ctx.bot.get_cog('Errors').on_error(err,ctx)
         try:
             webs = list()
             for w in await g.webhooks():
@@ -200,8 +200,8 @@ Arguments are:
             back['webhooks'] = webs
         except discord.errors.Forbidden:
             pass
-        except Exception as e:
-            await ctx.bot.get_cog('Errors').on_error(e,ctx)
+        except Exception as err:
+            await ctx.bot.get_cog('Errors').on_error(err,ctx)
         back['members'] = list()
         for memb in g.members:
             back['members'].append({'id': memb.id,
@@ -257,7 +257,7 @@ Arguments are:
                             if r.permissions.value != role["permissions"]:
                                 await r.edit(permissions = discord.Permissions(role["permissions"]))
                         else:
-                            kwargs = dict()
+                            kwargs = {}
                             if r.name != role["name"]:
                                 kwargs["name"] = role["name"]
                             if r.permissions.value != role["permissions"]:
@@ -338,7 +338,7 @@ Arguments are:
                                 c = await ctx.guild.create_category(name=categ["name"])
                             else:
                                 c = c[0]
-                        kwargs = dict()
+                        kwargs = {}
                         if c.name != categ["name"]:
                             kwargs["name"] = categ["name"]
                         if c.nsfw != categ["is_nsfw"]:
@@ -407,7 +407,7 @@ Arguments are:
                                     c = await ctx.guild.create_voice_channel(name=chan["name"],category=_categ)
                             else:
                                 c = c[0]
-                        kwargs = dict()
+                        kwargs = {}
                         if c.name != chan["name"]:
                             kwargs["name"] = chan["name"]
                         if "is_nsfw" in chan.keys() and c.nsfw != chan["is_nsfw"]:
@@ -675,7 +675,7 @@ Arguments are:
                     logs.append(symb[2]+" AFK timeout duration set to {}s".format(data["afk_timeout"]))
             # banned_users
             try:
-                banned_users = [x[0].id async for x in await ctx.guild.bans(limit=None)]
+                banned_users = [x.user.id async for x in ctx.guild.bans(limit=None)]
                 users_to_ban = [x for x in data["banned_users"].items() if x[0] not in banned_users]
                 if len(users_to_ban) == 0:
                     logs.append(symb[1]+" No user to ban")
@@ -780,11 +780,11 @@ Arguments are:
                     logs.append(symb[2]+" Verification level set to "+verif_level.name)
             # roles
             logs.append(" - Creating roles")
-            roles_list = dict()
+            roles_list = {}
             await self.load_roles(ctx, problems, logs, symb, data, args, roles_list)
             # categories
             logs.append(" - Creating categories")
-            channels_list = dict()
+            channels_list = {}
             await self.load_categories(ctx, problems, logs, symb, data, args, channels_list)
             # channels
             logs.append(" - Creating channels")
