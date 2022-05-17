@@ -598,7 +598,7 @@ class Xp(commands.Cog):
         if levels_info is None:
             levels_info = await self.calc_level(xp,used_system)
         colors = {'name':(124, 197, 118),'xp':(124, 197, 118),'NIVEAU':(255, 224, 77),'rank':(105, 157, 206),'bar':bar_colors, 'bar_background': (180, 180, 180)}
-        if 'blurple' in style:
+        if style in {'blurple21', 'blurple22'}:
             colors = {'name':(240, 240, 255),'xp':(235, 235, 255),'NIVEAU':(245, 245, 255),'rank':(255, 255, 255),'bar':(250, 250, 255), 'bar_background': (27, 29, 31)}
 
         name_fnt = ImageFont.truetype('Roboto-Medium.ttf', 40)
