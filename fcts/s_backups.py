@@ -233,89 +233,92 @@ Arguments are:
 
         async def load_roles(self, ctx:MyContext, problems: list, logs:list, symb:list, data:dict, args:tuple,roles_list:dict):
             if not ctx.guild.me.guild_permissions.manage_roles:
-                logs.append("  "+symb[0]+" Unable to create or update roles: missing permissions")
+                logs.append(f"  {symb[0]} Unable to create or update roles: missing permissions")
                 problems[0] += 1
                 roles_list = {x.id: x for x in ctx.guild.roles}
-            else:
-                for role in data["roles"]:
-                    action = "edit"
-                    try:
-                        # rolename = role["name"].replace("@everyone","@"+u'\u200b'+"everyone").replace("@here","@"+u'\u200b'+"here")
-                        rolename = role["name"]
-                        r = ctx.guild.get_role(role["id"])
-                        if r is None:
-                            r = [x for x in ctx.guild.roles if x.name == role["name"]]
-                            if len(r) == 0:
-                                action = "create"
-                                try:
-                                    r = await ctx.guild.create_role(name=role["name"])
-                                except Exception as e:
-                                    pass
-                            else:
-                                r = r[0]
-                        if role["name"] == "@everyone":
-                            if r.permissions.value != role["permissions"]:
-                                await r.edit(permissions = discord.Permissions(role["permissions"]))
+                return
+            for role_data in sorted(data["roles"], key=lambda role: role['position'], reverse=True):
+                action = "edit"
+                try:
+                    rolename = role_data["name"]
+                    role = ctx.guild.get_role(role_data["id"])
+                    if role is None:
+                        potential_roles = [x for x in ctx.guild.roles if x.name == role_data["name"]]
+                        if len(potential_roles) == 0:
+                            action = "create"
+                            try:
+                                role = await ctx.guild.create_role(name=role_data["name"])
+                            except discord.DiscordException:
+                                pass
                         else:
-                            kwargs = {}
-                            if r.name != role["name"]:
-                                kwargs["name"] = role["name"]
-                            if r.permissions.value != role["permissions"]:
-                                kwargs["permissions"] = discord.Permissions(role["permissions"])
-                            if r.colour.value != role["color"]:
-                                kwargs["colour"] = discord.Colour(role["color"])
-                            if r.hoist != role["hoist"]:
-                                kwargs["hoist"] = role["hoist"]
-                            if r.mentionable != role["mentionable"]:
-                                kwargs["mentionable"] = role["mentionable"]
-                            if len(kwargs.keys()) > 0:
-                                await r.edit(**kwargs)
-                                if action=="create":
-                                    logs.append("  "+symb[2]+" Role {} created".format(rolename))
-                                else:
-                                    logs.append("  "+symb[2]+" Role {} set".format(rolename))
-                            elif action=="create":
-                                logs.append("  "+symb[2]+" Role {} created".format(rolename))
-                            else:
-                                logs.append("  "+symb[1]+" No need to change role {}".format(rolename))
-                        roles_list[role["id"]] = r
-                    except discord.errors.Forbidden:
-                        if action == "create":
-                            await r.delete()
-                        logs.append("  "+symb[0]+" Unable to {} role {}: missing permissions".format(action,rolename))
-                        problems[0] += 1
-                    except Exception as e:
-                        logs.append("  "+symb[0]+" Unable to {} role {}: {}".format(action,rolename,e))
-                        problems[1] += 1
+                            role = potential_roles[0]
+                    if role_data["name"] == "@everyone":
+                        if role.permissions.value != role_data["permissions"]:
+                            await role.edit(permissions = discord.Permissions(role_data["permissions"]))
                     else:
-                        pass
-                if "delete_old_roles" in args:
-                    for role in ctx.guild.roles:
-                        if role in roles_list.values():
-                            continue
-                        try:
-                            await role.delete()
-                        except discord.errors.Forbidden:
-                            logs.append("  "+symb[0]+" Unable to delete role {}: missing permissions".format(role.name))
-                            problems[0] += 1
-                        except Exception as e:
-                            if not "404" in str(e):
-                                logs.append("  "+symb[0]+" Unable to delete role {}: {}".format(role.name,e))
-                                problems[1] += 1
-                        else:
-                            logs.append("  "+symb[2]+" Role {} deleted".format(role.name))
-                for r in data["roles"]:
-                    if r["id"] in roles_list.keys() and r["position"] > 0:
-                        new_pos = min(max(ctx.guild.me.top_role.position-1,1), r["position"])
-                        try:
-                            await roles_list[r["id"]].edit(position = new_pos)
-                        except (discord.errors.HTTPException,discord.errors.Forbidden) as e:
-                            if isinstance(e,discord.errors.Forbidden) or (isinstance(e,discord.errors.HTTPException) and hasattr(e,"status") and e.status in (403,400)):
-                                logs.append("  "+symb[0]+" Unable to move role {} to position {}: missing permissions".format(r["name"],new_pos))
-                                problems[0] += 1
+                        kwargs = {}
+                        if role.name != role_data["name"]:
+                            kwargs["name"] = role_data["name"]
+                        if role.permissions.value != role_data["permissions"]:
+                            kwargs["permissions"] = discord.Permissions(role_data["permissions"])
+                        if role.colour.value != role_data["color"]:
+                            kwargs["colour"] = discord.Colour(role_data["color"])
+                        if role.hoist != role_data["hoist"]:
+                            kwargs["hoist"] = role_data["hoist"]
+                        if role.mentionable != role_data["mentionable"]:
+                            kwargs["mentionable"] = role_data["mentionable"]
+                        if len(kwargs.keys()) > 0:
+                            await role.edit(**kwargs)
+                            if action == "create":
+                                logs.append(f"  {symb[0]} Role {rolename} created")
                             else:
-                                logs.append("  "+symb[0]+" Unable to move role {} to position {}: {}".format(r["name"],new_pos,e))
-                                problems[1] += 1
+                                logs.append(f"  {symb[0]} Role {rolename} set".format(rolename))
+                        elif action == "create":
+                            logs.append(f"  {symb[0]} Role {rolename} created")
+                        else:
+                            logs.append(f"  {symb[0]} No need to change role {rolename}")
+                    roles_list[role_data["id"]] = role
+                except discord.Forbidden:
+                    if action == "create":
+                        await role.delete()
+                    logs.append(f"  {symb[0]} Unable to {action} role {rolename}: missing permissions")
+                    problems[0] += 1
+                except Exception as err:
+                    logs.append(f"  {symb[0]} Unable to {action} role {rolename}: {err}")
+                    problems[1] += 1
+                else:
+                    pass
+            if "delete_old_roles" in args:
+                for role_data in ctx.guild.roles:
+                    if role_data in roles_list.values():
+                        continue
+                    try:
+                        await role_data.delete()
+                    except discord.errors.Forbidden:
+                        logs.append(f"  {symb[0]} Unable to delete role {role_data.name}: missing permissions")
+                        problems[0] += 1
+                    except Exception as err:
+                        if "404" not in str(err):
+                            logs.append(f"  {symb[0]} Unable to delete role {role_data.name}: {err}")
+                            problems[1] += 1
+                    else:
+                        logs.append(f"  {symb[0]} Role {role_data.name} deleted")
+            for role_data in data["roles"]:
+                role_data: dict[str, typing.Any]
+                if role_data["position"] > 0 and (role := roles_list.get(roles_list[role["id"]])):
+                    role: discord.Role
+                    new_pos = min(max(ctx.guild.me.top_role.position-1,1), role_data["position"])
+                    if role.position == new_pos:
+                        continue
+                    try:
+                        await role.edit(position=new_pos)
+                    except (discord.HTTPException, discord.Forbidden) as err:
+                        if isinstance(err, discord.errors.Forbidden) and hasattr(err, "status") and err.status in {403, 400}:
+                            logs.append(f"  {symb[0]} Unable to move role {role_data['name']} to position {new_pos}: missing permissions")
+                            problems[0] += 1
+                        else:
+                            logs.append(f"  {symb[0]} Unable to move role {role_data['name']} to position {new_pos}: {err}")
+                            problems[1] += 1
 
         async def load_categories(self, ctx:MyContext, problems: list, logs:list, symb:list, data:dict, args:tuple, channels_list:dict):
             if not ctx.guild.me.guild_permissions.manage_channels:
@@ -692,7 +695,7 @@ Arguments are:
                 problems[0] += 1
             except Exception as e:
                 logs.append(symb[0]+f" Unable to ban users: {e}")
-                problems[1] += 1                
+                problems[1] += 1
             # default_notifications
             if ctx.guild.default_notifications.value == data["default_notifications"]:
                 logs.append(symb[1]+" No need to change default notifications")
@@ -742,13 +745,15 @@ Arguments are:
             elif data["icon"] is None:
                 logs.append(symb[2]+" Server icon deleted")
             else:
-                problems[1] += 1
                 logs.append(symb[0]+" Unable to set server icon: the image has probably been deleted from Discord cache")
+                problems[1] += 1
             # mfa_level
             if ctx.guild.mfa_level != data["mfa_level"]:
                 logs.append(symb[0]+" Unable to change 2FA requirement: only owner can do that")
+                problems[0] += 1
             else:
                 logs.append(symb[1]+" No need to change 2FA requirement")
+                problems[1] += 1
             # name
             if ctx.guild.name == data["name"]:
                 logs.append(symb[1]+" No need to change server name")
