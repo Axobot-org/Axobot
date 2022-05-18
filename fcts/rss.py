@@ -104,7 +104,7 @@ class Rss(commands.Cog):
         ..Doc rss.html#see-the-last-post"""
         if self.youtube_rss.is_youtube_url(channel):
             # apparently it's a youtube.com link
-            channel = await self.youtube_rss.get_chanel_by_any_url(channel)
+            channel = await self.youtube_rss.get_channel_by_any_url(channel)
         if channel is not None and not await self.youtube_rss.is_valid_channel(channel):
             # argument is not a channel name or ID, but it may be a custom name
             channel = self.youtube_rss.get_channel_by_custom_url(channel)
@@ -228,7 +228,7 @@ class Rss(commands.Cog):
     @commands.guild_only()
     @commands.check(can_use_rss)
     @commands.check(checks.database_connected)
-    async def system_add(self, ctx: MyContext, link):
+    async def system_add(self, ctx: MyContext, link: str):
         """Subscribe to a rss feed, displayed on this channel regularly
 
         ..Example rss add https://www.deviantart.com/adri526
@@ -240,7 +240,7 @@ class Rss(commands.Cog):
         if is_over:
             await ctx.send(await self.bot._(ctx.guild.id,"rss.flow-limit", limit=flow_limit))
             return
-        identifiant = await self.youtube_rss.get_chanel_by_any_url(link)
+        identifiant = await self.youtube_rss.get_channel_by_any_url(link)
         flow_type = None
         if identifiant is not None:
             flow_type = 'yt'
@@ -745,7 +745,7 @@ class Rss(commands.Cog):
                 notok = '<:redcheck:513105827817717762>'
                 nothing = '<:_nothing:446782476375949323>'
                 txt = ['**__Analyse :__**','']
-                yt = await self.youtube_rss.get_chanel_by_any_url(feeds.feed['link'])
+                yt = await self.youtube_rss.get_channel_by_any_url(feeds.feed['link'])
                 if yt is None:
                     tw = self.twitter_rss.is_twitter_url(feeds.feed['link'])
                     if tw is not None:
