@@ -1163,28 +1163,33 @@ The 'reasons' parameter is used to display the mute reasons.
             return await ctx.send(await self.bot._(ctx.guild.id, "moderation.mute.cant-mute"))
         my_position = ctx.guild.me.roles[-1].position
         if role.position >= my_position:
-            return await ctx.send(await self.bot._(ctx.guild.id, "moderation.role.give-too-high",r=role.name))
+            return await ctx.send(await self.bot._(ctx.guild.id, "moderation.role.give-too-high", r=role.name))
         if role.position >= ctx.author.roles[-1].position:
             return await ctx.send(await self.bot._(ctx.guild.id, "moderation.role.give-roles-higher"))
         n_users: set[discord.Member] = set()
         for item in users:
             if item == "everyone":
                 item = ctx.guild.default_role
-            if isinstance(item,discord.Member):
+            if isinstance(item, discord.Member):
                 if role not in item.roles:
                     n_users.add(item)
             else:
                 for m in item.members:
                     if role not in m.roles:
                         n_users.add(m)
+        if len(n_users) > 15:
+            await ctx.send(await self.bot._(ctx.guild.id, "moderation.role.give-pending", n=len(n_users)))
         count = 0
         for user in n_users:
-            if count > 200:
+            if count > 300:
                 break
-            await user.add_roles(role,reason="Asked by {}".format(ctx.author))
+            await user.add_roles(role, reason="Asked by {}".format(ctx.author))
             count += 1
-        answer = await self.bot._(ctx.guild.id, "moderation.role.give-success",count=count, m=len(n_users))
-        await ctx.send(answer)
+        answer = await self.bot._(ctx.guild.id, "moderation.role.give-success", count=count, m=len(n_users))
+        if len(n_users) > 50:
+            await ctx.reply(answer)
+        else:
+            await ctx.send(answer)
 
     @main_role.command(name="remove")
     @commands.check(checks.has_manage_roles)
@@ -1216,14 +1221,19 @@ The 'reasons' parameter is used to display the mute reasons.
                 for m in item.members:
                     if role in m.roles:
                         n_users.add(m)
+        if len(n_users) > 15:
+            await ctx.send(await self.bot._(ctx.guild.id, "moderation.role.remove-pending", n=len(n_users)))
         count = 0
         for user in n_users:
             if count > 200:
                 break
             await user.remove_roles(role,reason="Asked by {}".format(ctx.author))
             count += 1
-        answer = await self.bot._(ctx.guild.id, "moderation.role.give-success",count=count,m=len(n_users))
-        await ctx.send(answer)
+        answer = await self.bot._(ctx.guild.id, "moderation.role.remove-success",count=count,m=len(n_users))
+        if len(n_users) > 50:
+            await ctx.reply(answer)
+        else:
+            await ctx.send(answer)
 
 
     @commands.command(name="pin")

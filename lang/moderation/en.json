@@ -83,6 +83,7 @@
         "react-clear": "I'm unable to find this message :confused:",
         "role": {
             "color-success": "The role %{role} has changed color!",
+            "give-pending": "Assigning the role to %{n} members...",
             "give-success": {
                 "zero": "-> No role could be assigned out of %{m}",
                 "one": "-> 1 role assigned out of %{m}",
@@ -91,7 +92,13 @@
             "give-too-high": "Oops, it seems that this role is too high for me to give or remove to anyone. Please place my role above the `%{r}` role",
             "give-roles-higher": "You can't give or remove roles higher than yours!",
             "too-high": "Oops, this role is too high for me to change. Please move my role above the role `%{r}` before trying again :confused:",
-            "list": "List of server roles"
+            "list": "List of server roles",
+            "remove-pending": "Revoking the role to %{n} members...",
+            "remove-success":{
+                "zero": "-> No role could be revoked out of %{m}",
+                "one": "-> 1 role revoked out of %{m}",
+                "many": "-> %{count} roles revoked out of %{m}!"
+            }
         },
         "slowmode": {
             "disabled": "The slowmode is now disabled in this channel.",
