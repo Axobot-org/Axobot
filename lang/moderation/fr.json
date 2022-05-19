@@ -82,15 +82,22 @@
         "react-clear": "Impossible de retrouver ce message :confused:",
         "role": {
             "color-success": "Le rôle %{role} a changé de couleur !",
+            "give-pending": "Distribution du rôle à %{n} membres...",
             "give-success":{
                 "zero": "-> Aucun rôle n'a pu être attribué sur les %{m}",
                 "one": "-> 1 rôle attribué sur %{m} !",
                 "many": "-> %{count} rôles attribués sur %{m} !"
-            } ,
+            },
             "give-too-high": "Oups, il semblerai que ce rôle soit trop haut pour que je puisse le donner ou l'enlever à qui que ce soit. Veuillez placer mon rôle au-dessus du rôle `%{r}`",
             "give-roles-higher": "Vous ne pouvez pas donner ou enlever des rôles plus hauts que le vôtre !",
             "too-high": "Oups, ce rôle est trop haut pour que je puisse le modifier. Merci de déplacer mon rôle au-dessus du rôle `%{r}` avant de réessayer :confused:",
-            "list": "Liste des rôles du serveur"
+            "list": "Liste des rôles du serveur",
+            "remove-pending": "Retrait du rôle à %{n} membres...",
+            "remove-success":{
+                "zero": "-> Aucun rôle n'a pu être retiré sur les %{m}",
+                "one": "-> 1 rôle retiré sur %{m} !",
+                "many": "-> %{count} rôles retirés sur %{m} !"
+            }
         },
         "slowmode": {
             "disabled": "Le slowmode est désormais désactivé dans ce salon.",
