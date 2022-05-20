@@ -450,14 +450,14 @@ You can specify a verification limit by adding a number in argument (up to 1.000
         if channel is None:
             channel = ctx.channel
         elif not (channel.permissions_for(ctx.author).read_messages and channel.permissions_for(ctx.author).send_messages and channel.guild == ctx.guild):
-            await ctx.send(await self.bot._(ctx.guild, 'fun', 'say-no-perm', channel=channel.mention))
+            await ctx.send(await self.bot._(ctx.guild, 'fun.say-no-perm', channel=channel.mention))
             return
         if self.bot.zombie_mode:
             return
         if m := re.search(r"(?:i am|i'm) ([\w\s]+)", text, re.DOTALL | re.IGNORECASE):
             if m.group(1).lower() != "a bot":
                 first_words = ['dumb', 'really dumb','stupid', 'gay', 'idiot', 'shit', 'trash']
-                words = list()
+                words = []
                 for w in first_words:
                     words += [w, w+' bot', w.upper()]
                 if word := get_close_matches(m.group(1), words, n=1, cutoff=0.8):
