@@ -402,7 +402,8 @@ class Rss(commands.Cog):
                     feed['name'] = channel_name
                 # emoji
                 feed['emoji'] = get_emoji(self.bot.get_cog('Emojis'), feed['type'])
-            view = FeedSelectView(guild_feeds, max_count or len(guild_feeds))
+            form_placeholder = await self.bot._(ctx.channel, 'rss.picker-placeholder')
+            view = FeedSelectView(guild_feeds, max_count or len(guild_feeds), form_placeholder)
             await ctx.send(title, view=view)
             await view.wait()
             if view.feeds is None:

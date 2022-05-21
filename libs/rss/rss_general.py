@@ -152,10 +152,10 @@ class RssMessage:
 
 class FeedSelectView(discord.ui.View):
     "Used to ask to select an rss feed"
-    def __init__(self, feeds: list[dict[str, Any]], max_values: int):
+    def __init__(self, feeds: list[dict[str, Any]], max_values: int, placeholder: str):
         super().__init__()
         options = self.build_options(feeds)
-        self.select = discord.ui.Select(placeholder='Choose a RSS feed', min_values=1, max_values=max_values, options=options)
+        self.select = discord.ui.Select(placeholder=placeholder, min_values=1, max_values=max_values, options=options)
         self.select.callback = self.callback
         self.add_item(self.select)
         self.feeds: list[int] = None
