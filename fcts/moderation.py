@@ -422,12 +422,14 @@ You can also mute this member for a defined duration, then use the following for
         """Call this to unmute someone"""
         # remove the role
         role = await self.get_muted_role(guild)
-        if role is None or not role in user.roles:
-            pass
-        elif author == guild.me:
-            await user.remove_roles(role,reason=await self.bot._(guild.id,"logs.reason.autounmute"))
+        if author == guild.me:
+            reason = await self.bot._(guild.id,"logs.reason.autounmute")
         else:
-            await user.remove_roles(role,reason=await self.bot._(guild.id,"logs.reason.unmute", user=author))
+            reason = await self.bot._(guild.id,"logs.reason.unmute", user=author)
+        if role is None:
+            await user.timeout(None, reason=reason)
+        elif role in user.roles:
+            await user.remove_roles(role, reason=reason)
         # send in modlogs
         await self.send_modlogs("unmute", user, author, guild)
         # remove the muted record in the database
