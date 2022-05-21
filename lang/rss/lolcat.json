@@ -34,6 +34,7 @@
         "no-roles": "No more role hAVe bean configurated yetz.",
         "not-a-role": "The rOle was not finndz. Try against:",
         "nothing": "I finnd nothin on this searrch :confused:",
+        "picker-placeholder": "Pick smth",
         "research-timeout": "This page took toooo long 2 answer, I had to stop teh process :eyes:",
         "roles": {
             "edit-success": {
