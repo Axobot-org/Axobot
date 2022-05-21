@@ -307,11 +307,11 @@ class Servers(commands.Cog):
         msg = await self.bot._(ctx.guild, "server.config-help", p=await self.bot.prefix_manager.get_prefix(ctx.guild))
         await ctx.send(msg.format(ctx.guild.owner.name))
 
-    @sconfig_main.command(name="del")
+    @sconfig_main.command(name="reset", aliases=["delete", "del"])
     @commands.cooldown(1, 2, commands.BucketType.guild)
     @commands.check(checks.has_manage_guild)
     async def sconfig_del(self, ctx: MyContext, option: str):
-        """Reset an option to zero"""
+        """Reset an option to its initial value"""
         if not ctx.bot.database_online:
             return await ctx.send(await self.bot._(ctx.guild.id,"cases.no_database"))
         await self.sconfig_del2(ctx, option)
@@ -1078,9 +1078,10 @@ class Servers(commands.Cog):
                 await self.bot.get_cog('Errors').on_error(e,ctx if isinstance(ctx, commands.Context) else None)
 
 
-    @sconfig_main.command(name="reset")
+    @sconfig_main.command(name="reset-guild")
     @commands.is_owner()
     async def admin_delete(self, ctx: MyContext, ID:int):
+        "Reset the whole config of a server"
         if await self.delete_server(ID):
             await ctx.send("Le serveur n°{} semble avoir correctement été supprimé !".format(ID))
 
