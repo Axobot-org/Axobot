@@ -50,7 +50,8 @@
         "mute": {
             "already-mute": "Ce membre est déjà muet !",
             "already-unmute": "Ce membre n'est pas muet !",
-            "cant-mute": "Oups, il semble que je ne possède pas les permissions suffisantes pour cela... Veuillez m'attribuer la permission `gérer les rôles` avant de continuer.",
+            "cant-mute": "Oups, il semble que je ne possède pas les permissions suffisantes pour cela... Veuillez m'attribuer la permission `Gérer les rôles` avant de continuer.",
+            "cant-timeout": "Oups, il semble que je ne possède pas les permissions suffisantes pour cela... Veuillez m'attribuer la permission `Modérer les membres` avant de continuer, ou créez un rôle 'muted'.",
             "mute-config-err": "Impossible de faire cela. Veuillez vérifier mes permissions dans le serveur et réessayer.",
             "mute-config-success": {
                 "zero": "Le rôle a été créé et configuré avec succès !",

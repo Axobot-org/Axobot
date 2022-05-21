@@ -51,7 +51,8 @@
         "mute": {
             "already-mute": "This member is already muted!",
             "already-unmute": "This member isn't muted!",
-            "cant-mute": "Oops, it seems that I don't have enough permissions for that.... Please give me permission `Manage roles` before continuing.",
+            "cant-mute": "Oops, it seems that I don't have enough permissions for that... Please give me permission `Manage roles` before continuing.",
+            "cant-timeout": "Oops, I don't have permission for that... Please give me the permission `Moderate members` before continuing, or create a muted role.",
             "mute-config-err": "Impossible to do that. Please check my permissions on the server and try again.",
             "mute-config-success": {
                 "zero": "The role has been successfully created and configured!",
