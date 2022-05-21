@@ -489,19 +489,23 @@ This will remove the role 'muted' for the targeted member
             if role.position >= ctx.guild.me.roles[-1].position:
                 await ctx.send(await self.bot._(ctx.guild.id, "moderation.mute.mute-high"))
                 return
+        elif user.is_timed_out():
+            if not ctx.guild.me.guild_permissions.moderate_members:
+                await ctx.send(await self.bot._(ctx.guild.id, "moderation.mute.cant-timeout"))
+                return
         try:
             await self.unmute_event(ctx.guild, user, ctx.author)
             # send in chat
             await self.send_chat_answer("unmute", user, ctx)
             try:
                 await ctx.message.delete()
-            except:
+            except discord.Forbidden:
                 pass
             # remove planned automatic unmutes
             await self.bot.task_handler.cancel_unmute(user.id, ctx.guild.id)
-        except Exception as e:
+        except Exception as err:
             await ctx.send(await self.bot._(ctx.guild.id, "moderation.error"))
-            await self.bot.get_cog('Errors').on_error(e,ctx)
+            await self.bot.get_cog('Errors').on_error(err,ctx)
 
     @commands.command(name="mute-config")
     @commands.cooldown(1,15, commands.BucketType.guild)
