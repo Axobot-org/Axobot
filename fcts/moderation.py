@@ -261,8 +261,8 @@ Slowmode works up to one message every 6h (21600s)
             if user.bot and not user.id==423928230840500254:
                 await ctx.send(await self.bot._(ctx.guild.id, "moderation.warn.cant-bot"))
                 return
-        except Exception as e:
-            await self.bot.get_cog('Errors').on_error(e,ctx)
+        except Exception as err:
+            self.bot.dispatch("command_error", ctx, err)
             return
         try:
             # send DM
@@ -270,10 +270,10 @@ Slowmode works up to one message every 6h (21600s)
             message = await self.bot.get_cog("Utilities").clear_msg(message,everyone = not ctx.channel.permissions_for(ctx.author).mention_everyone)
             caseID = "'Unsaved'"
             if self.bot.database_online:
-                Cases = self.bot.get_cog('Cases')
-                case = Case(bot=self.bot,guildID=ctx.guild.id,memberID=user.id,Type="warn",ModID=ctx.author.id,Reason=message,date=ctx.bot.utcnow())
-                await Cases.add_case(case)
-                caseID = case.id
+                if cases_cog := self.bot.get_cog('Cases'):
+                    case = Case(bot=self.bot,guildID=ctx.guild.id,memberID=user.id,Type="warn",ModID=ctx.author.id,Reason=message,date=ctx.bot.utcnow())
+                    await cases_cog.add_case(case)
+                    caseID = case.id
             else:
                 await ctx.send(await self.bot._(ctx.guild.id,"moderation.warn.warn-but-db"))
             # optional values
@@ -284,27 +284,32 @@ Slowmode works up to one message every 6h (21600s)
             await self.send_modlogs("warn", user, ctx.author, ctx.guild, opt_case, message)
             try:
                 await ctx.message.delete()
-            except:
+            except discord.Forbidden:
                 pass
-        except Exception as e:
+        except Exception as err:
             await ctx.send(await self.bot._(ctx.guild.id, "moderation.error"))
-            await self.bot.get_cog('Errors').on_error(e,ctx)
+            self.bot.dispatch("command_error", ctx, err)
 
     async def get_muted_role(self, guild: discord.Guild):
         opt = await self.bot.get_config(guild.id,'muted_role')
-        if not isinstance(opt,int):
-            return discord.utils.find(lambda x: x.name.lower() == "muted", guild.roles)
-        return guild.get_role(opt)
+        if opt is None or (isinstance(opt, str) and not opt.isdigit()):
+            return None
+            # return discord.utils.find(lambda x: x.name.lower() == "muted", guild.roles)
+        return guild.get_role(int(opt))
 
-    async def mute_event(self, member:discord.Member, author:discord.Member, reason:str, caseID:int, duration:str=None):
+    async def mute_event(self, member:discord.Member, author:discord.Member, reason:str, case_id:int, f_duration:str=None, duration: datetime.timedelta=None):
         """Call when someone should be muted in a guild"""
         # add the muted role
         role = await self.get_muted_role(member.guild)
-        await member.add_roles(role,reason=reason[:512])
+        if role is None:
+            duration = duration or datetime.timedelta(days=28)
+            await member.timeout(duration, reason=reason[:512])
+        else:
+            await member.add_roles(role, reason=reason[:512])
         # send in modlogs
-        opt_case = None if caseID=="'Unsaved'" else caseID
-        opt_reason = None if reason=="Unspecified" else reason
-        await self.send_modlogs("mute", member, author, member.guild, opt_case, opt_reason, duration)
+        opt_case = None if case_id == "'Unsaved'" else case_id
+        opt_reason = None if reason == "Unspecified" else reason
+        await self.send_modlogs("mute", member, author, member.guild, opt_case, opt_reason, f_duration)
         # save in database that the user is muted
         if not self.bot.database_online:
             return
@@ -313,6 +318,7 @@ Slowmode works up to one message every 6h (21600s)
             pass
 
     async def check_mute_context(self, ctx: MyContext, role: discord.Role, user: discord.Member):
+        "Return True if the user can be muted in the given context"
         if await self.is_muted(ctx.guild, user, role):
             await ctx.send(await self.bot._(ctx.guild.id, "moderation.mute.already-mute"))
             return False
@@ -320,8 +326,12 @@ Slowmode works up to one message every 6h (21600s)
             await ctx.send(await self.bot._(ctx.guild.id, "moderation.mute.cant-mute"))
             return False
         if role is None:
-            await ctx.guild.create_role(name="muted")
-            await ctx.send(await self.bot._(ctx.guild.id, "moderation.mute.role-created", p=ctx.prefix))
+            if not ctx.guild.me.guild_permissions.moderate_members:
+                await ctx.send(await self.bot._(ctx.guild.id, "moderation.mute.cant-timeout"))
+                return False
+            # await ctx.guild.create_role(name="muted")
+            # await ctx.send(await self.bot._(ctx.guild.id, "moderation.mute.role-created", p=ctx.prefix))
+            # return True
             return True
         if role.position > ctx.guild.me.roles[-1].position:
             await ctx.send(await self.bot._(ctx.guild.id, "moderation.mute.mute-high"))
@@ -351,7 +361,7 @@ You can also mute this member for a defined duration, then use the following for
             if duration > 60*60*24*365*3: # max 3 years
                 await ctx.send(await self.bot._(ctx.channel, "timers.rmd.too-long"))
                 return
-            f_duration: str = await FormatUtils.time_delta(duration,lang=await self.bot._(ctx.guild,'_used_locale'),form="short")
+            f_duration = await FormatUtils.time_delta(duration,lang=await self.bot._(ctx.guild,'_used_locale'),form="short")
         else:
             f_duration = None
         try:
@@ -367,18 +377,14 @@ You can also mute this member for a defined duration, then use the following for
                 return
             elif not self.bot.database_online and ctx.channel.permissions_for(user).manage_roles:
                 return await ctx.send(await self.bot._(ctx.guild.id, "moderation.warn.cant-staff"))
-        except Exception as e:
-            await self.bot.get_cog('Errors').on_error(e,ctx)
+        except Exception as err:
+            await self.bot.get_cog('Errors').on_error(err,ctx)
             return
         role = await self.get_muted_role(ctx.guild)
         if not await self.check_mute_context(ctx, role, user):
             return
         if role is None:
             role = await self.get_muted_role(ctx.guild)
-        if role is None:
-            self.bot.log.warning(f"[muted_role] Unable to get role for guild {ctx.guild.id}")
-            await ctx.send(await self.bot._(ctx.guild.id, "moderation.no-mute"))
-            return
         caseID = "'Unsaved'"
         try:
             reason = await self.bot.get_cog("Utilities").clear_msg(reason,everyone = not ctx.channel.permissions_for(ctx.author).mention_everyone)
@@ -392,10 +398,10 @@ You can also mute this member for a defined duration, then use the following for
                 try:
                     await Cases.add_case(case)
                     caseID = case.id
-                except Exception as e:
-                    await self.bot.get_cog('Errors').on_error(e,ctx)
+                except Exception as err:
+                    self.bot.dispatch("command_error", ctx, err)
             # actually mute
-            await self.mute_event(user,ctx.author,reason,caseID,f_duration)
+            await self.mute_event(user, ctx.author, reason, caseID, f_duration, datetime.timedelta(seconds=duration) if duration else None)
             # optional values
             opt_case = None if caseID=="'Unsaved'" else caseID
             opt_reason = None if reason=="Unspecified" else reason
@@ -405,11 +411,11 @@ You can also mute this member for a defined duration, then use the following for
             await self.send_chat_answer("mute", user, ctx, opt_case)
             try:
                 await ctx.message.delete()
-            except:
+            except discord.Forbidden:
                 pass
-        except Exception as e:
+        except Exception as err:
             await ctx.send(await self.bot._(ctx.guild.id, "moderation.error"))
-            await self.bot.get_cog('Errors').on_error(e,ctx)
+            self.bot.dispatch("command_error", ctx, err)
 
 
     async def unmute_event(self, guild: discord.Guild, user: discord.Member, author: discord.Member):
@@ -474,15 +480,13 @@ This will remove the role 'muted' for the targeted member
         if not await self.is_muted(ctx.guild, user, role):
             await ctx.send(await self.bot._(ctx.guild.id, "moderation.mute.already-unmute"))
             return
-        if role is None:
-            await ctx.send(await self.bot._(ctx.guild.id, "moderation.mute.no-mute"))
-            return
-        if not ctx.channel.permissions_for(ctx.guild.me).manage_roles:
-            await ctx.send(await self.bot._(ctx.guild.id, "moderation.mute.cant-mute"))
-            return
-        if role.position >= ctx.guild.me.roles[-1].position:
-            await ctx.send(await self.bot._(ctx.guild.id, "moderation.mute.mute-high"))
-            return
+        if role is not None:
+            if not ctx.channel.permissions_for(ctx.guild.me).manage_roles:
+                await ctx.send(await self.bot._(ctx.guild.id, "moderation.mute.cant-mute"))
+                return
+            if role.position >= ctx.guild.me.roles[-1].position:
+                await ctx.send(await self.bot._(ctx.guild.id, "moderation.mute.mute-high"))
+                return
         try:
             await self.unmute_event(ctx.guild, user, ctx.author)
             # send in chat
