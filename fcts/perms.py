@@ -56,6 +56,8 @@ class Perms(commands.Cog):
         voice_perms = self.perms_name['voice'] + common_perms
         for perm_id, value in permissions:
             if not (
+                channel is None
+                or
                 (perm_id in text_perms and isinstance(channel, typing.get_args(TextChannelTypes)))
                 or
                 (perm_id in voice_perms and isinstance(channel, typing.get_args(VoiceChannelTypes)))
