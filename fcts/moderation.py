@@ -329,9 +329,9 @@ Slowmode works up to one message every 6h (21600s)
             if not ctx.guild.me.guild_permissions.moderate_members:
                 await ctx.send(await self.bot._(ctx.guild.id, "moderation.mute.cant-timeout"))
                 return False
-            # await ctx.guild.create_role(name="muted")
-            # await ctx.send(await self.bot._(ctx.guild.id, "moderation.mute.role-created", p=ctx.prefix))
-            # return True
+            if user.top_role.position >= ctx.guild.me.roles[-1].position:
+                await ctx.send(await self.bot._(ctx.guild.id, "moderation.mute.too-high"))
+                return False
             return True
         if role.position > ctx.guild.me.roles[-1].position:
             await ctx.send(await self.bot._(ctx.guild.id, "moderation.mute.mute-high"))
@@ -492,6 +492,9 @@ This will remove the role 'muted' for the targeted member
         elif user.is_timed_out():
             if not ctx.guild.me.guild_permissions.moderate_members:
                 await ctx.send(await self.bot._(ctx.guild.id, "moderation.mute.cant-timeout"))
+                return
+            if user.top_role.position >= ctx.guild.me.roles[-1].position:
+                await ctx.send(await self.bot._(ctx.guild.id, "moderation.mute.too-high"))
                 return
         try:
             await self.unmute_event(ctx.guild, user, ctx.author)

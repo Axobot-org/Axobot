@@ -67,7 +67,8 @@
             "role-created": "Successsfully added da `muted` role! U can naw use `%{p}mute-config` cmd to ask me 2 config it meself",
             "no-mute": "Oooops, seemz dat teh nice `muted` role doznt exist :rofl: Creat'it nd assign perms yourself",
             "no-mutes": "No member seems 2B banned from here",
-            "staff-mute": "U cant prevent another cool staff member frm speek'ng "
+            "staff-mute": "U cant prevent another cool staff member frm speek'ng ",
+            "too-high": "Seemz that this membr iz tooooo high 4 me to time him out :ohno:"
         },
         "mute-chat": "Teh mmber %{user} (%{userid}) haz been silencd",
         "mute-dm": "U've been silenced in teh %{guild} :sadcat:",
