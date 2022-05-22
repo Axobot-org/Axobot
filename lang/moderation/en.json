@@ -69,7 +69,8 @@
             "role-created": "Successfully created `muted` role!\nYou can use the `%{p}mute-config` command for automatic configuration in your server.",
             "no-mute": "Oops, it seems that the role `muted` does not exist :confused: Please create it and assign permissions manually.",
             "no-mutes": "No member seems to be banned from here",
-            "staff-mute": "You can't prevent another staff member from speaking"
+            "staff-mute": "You can't prevent another staff member from speaking",
+            "too-high": "It seems that this member is too high for me to time out him out :thinking:"
         },
         "mute-chat": "Member %{user} (%{userid}) has been muted",
         "mute-dm": "You have been muted in the server %{guild}",
