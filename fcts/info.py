@@ -592,7 +592,7 @@ Available types: member, role, user, emoji, channel, server, invite, category
             if await self.bot.get_cog('Admin').check_if_admin(ctx):
                 guild = await commands.GuildConverter().convert(ctx, guild_id.lstrip())
         since = await self.bot._(ctx.guild.id,"misc.since")
-        _, bots, online = await self.bot.get_cog("Utilities").get_members_repartition(guild.members)
+        _, bots, online, _ = await self.bot.get_cog("Utilities").get_members_repartition(guild.members)
 
         desc = await self.bot.get_config(guild.id,'description')
         if (desc is None or len(desc) == 0) and guild.description is not None:

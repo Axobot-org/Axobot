@@ -24,7 +24,7 @@ class YoutubeRSS:
         self.min_time_between_posts = 120
         self.search_service = Service(5, bot.others['google_api'])
         self.url_pattern = re.compile(
-            r'(?:https?://)?(?:www.)?(?:youtube.com|youtu.be)(?:(?:/channel/|/user/|/c/)(.+)|/[\w-]+$)')
+            r'(?:https?://)?(?:www.)?(?:youtube.com|youtu.be)(?:/channel/|/user/|/c/)([^/\s?]+).*?$')
         self.cookies = {
             "CONSENT": "YES+cb.20220907-07-p1.fr+FX+785"
         }
@@ -52,7 +52,7 @@ class YoutubeRSS:
                 or await self._is_valid_channel_name(session, name)
 
     @acached(timeout=86400)
-    async def get_chanel_by_any_url(self, url: str):
+    async def get_channel_by_any_url(self, url: str):
         "Find a channel ID from any youtube URL"
         match = re.search(self.url_pattern, url)
         if match is None:
@@ -65,7 +65,7 @@ class YoutubeRSS:
                 if self._is_valid_channel_id(session, match.group(1)):
                     return match.group(1)
             return None
-        identifier, name = channels[0].split(": ")
+        identifier, name = channels[0].split(": ", 1)
         if name.lower() == match.group(1).lower() \
             or identifier.lower() == match.group(1).lower():
             return identifier
