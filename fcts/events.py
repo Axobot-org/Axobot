@@ -138,6 +138,8 @@ class Events(commands.Cog):
                     desc = "Bot **may have left** the server {} (guild unavailable)".format(guild.id)
                 else:
                     desc = "Bot **left the server** {} ({}) - {} users".format(guild.name,guild.id,len(guild.members))
+                    if guild.me.joined_at:
+                        desc += f"\nJoined at <t:{guild.me.joined_at.timestamp():.0f}>"
             emb = discord.Embed(description=desc, color=self.embed_colors['welcome'], timestamp=self.bot.utcnow())
             emb.set_author(name=self.bot.user, icon_url=self.bot.user.display_avatar)
             await self.bot.send_embed([emb])
