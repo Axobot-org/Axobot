@@ -51,7 +51,8 @@
         "mute": {
             "already-mute": "This member is already muted!",
             "already-unmute": "This member isn't muted!",
-            "cant-mute": "Oops, it seems that I don't have enough permissions for that.... Please give me permission `Manage roles` before continuing.",
+            "cant-mute": "Oops, it seems that I don't have enough permissions for that... Please give me permission `Manage roles` before continuing.",
+            "cant-timeout": "Oops, I don't have permission for that... Please give me the permission `Moderate members` before continuing, or create a muted role.",
             "mute-config-err": "Impossible to do that. Please check my permissions on the server and try again.",
             "mute-config-success": {
                 "zero": "The role has been successfully created and configured!",
@@ -68,7 +69,8 @@
             "role-created": "Successfully created `muted` role!\nYou can use the `%{p}mute-config` command for automatic configuration in your server.",
             "no-mute": "Oops, it seems that the role `muted` does not exist :confused: Please create it and assign permissions manually.",
             "no-mutes": "No member seems to be banned from here",
-            "staff-mute": "You can't prevent another staff member from speaking"
+            "staff-mute": "You can't prevent another staff member from speaking",
+            "too-high": "It seems that this member is too high for me to time out him out :thinking:"
         },
         "mute-chat": "Member %{user} (%{userid}) has been muted",
         "mute-dm": "You have been muted in the server %{guild}",
@@ -83,6 +85,7 @@
         "react-clear": "I'm unable to find this message :confused:",
         "role": {
             "color-success": "The role %{role} has changed color!",
+            "give-pending": "Assigning the role to %{n} members...",
             "give-success": {
                 "zero": "-> No role could be assigned out of %{m}",
                 "one": "-> 1 role assigned out of %{m}",
@@ -91,7 +94,13 @@
             "give-too-high": "Oops, it seems that this role is too high for me to give or remove to anyone. Please place my role above the `%{r}` role",
             "give-roles-higher": "You can't give or remove roles higher than yours!",
             "too-high": "Oops, this role is too high for me to change. Please move my role above the role `%{r}` before trying again :confused:",
-            "list": "List of server roles"
+            "list": "List of server roles",
+            "remove-pending": "Revoking the role to %{n} members...",
+            "remove-success":{
+                "zero": "-> No role could be revoked out of %{m}",
+                "one": "-> 1 role revoked out of %{m}",
+                "many": "-> %{count} roles revoked out of %{m}!"
+            }
         },
         "slowmode": {
             "disabled": "The slowmode is now disabled in this channel.",

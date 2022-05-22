@@ -34,6 +34,7 @@
         "no-roles": "No role has been configured yet.",
         "not-a-role": "This role can't be found. Try again:",
         "nothing": "I found nothing on this search :confused:",
+        "picker-placeholder": "Choose a RSS feed",
         "research-timeout": "The web page took too long to answer, I had to interrupt the process :eyes:",
         "roles": {
             "edit-success": {

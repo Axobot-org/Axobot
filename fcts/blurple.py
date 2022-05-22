@@ -66,73 +66,6 @@ async def get_url_from_ctx(ctx: MyContext, who: typing.Union[discord.Member, dis
     return url
 
 
-def _make_check_command(name, parent, **kwargs):
-    @commands.cooldown(2, 60, commands.BucketType.member)
-    @commands.cooldown(30, 40, commands.BucketType.guild)
-    @parent.command(name, help=f"{name.title()} an image to know if you're cool enough.", **kwargs)
-    async def command(self, ctx: MyContext, theme: ThemeConverter="light", *, who: typing.Union[discord.Member, discord.PartialEmoji, LinkConverter] = None):
-
-        url = await get_url_from_ctx(ctx, who)
-
-        old_msg = await ctx.send(await ctx.bot._(ctx.channel, "blurple.check_intro", user=ctx.author.mention))
-        async with aiohttp.ClientSession() as session:
-            async with session.get(str(url)) as image:
-                r = await check_image(await image.read(), theme, name)
-        answer = "\n".join([f"> {color['name']}: {color['ratio']}%" for color in r['colors']])
-        await ctx.send(f"Results for {ctx.author.mention}:\n"+answer)
-        if r["passed"] and ctx.author.id not in self.cache:
-            await self.bot.get_cog("Utilities").add_user_eventPoint(ctx.author.id, 40)
-            self.cache.append(ctx.author.id)
-            with open("blurple-cache.json", "w", encoding="utf-8") as jsonfile:
-                json.dump(self.cache, jsonfile)
-            await ctx.send(f"{ctx.author.mention} you just won 40 event xp thanks to your blurple-liful picture!")
-        await old_msg.delete()
-
-    return command
-
-
-def _make_color_command(name, fmodifier, parent, **kwargs):
-    @commands.cooldown(6, 120, commands.BucketType.member)
-    @commands.cooldown(20, 60, commands.BucketType.guild)
-    @parent.command(name, help=f"{name.title()} an image.", **kwargs)
-    async def command(self, ctx: MyContext, method: typing.Optional[FlagConverter] = None,
-                      variations: commands.Greedy[FlagConverter2] = [None], *,
-                      who: typing.Union[discord.Member, discord.PartialEmoji, LinkConverter] = None):
-
-        if not (ctx.guild is None or ctx.channel.permissions_for(ctx.guild.me).attach_files):
-            return await ctx.send(await self.bot._(ctx.channel,"blurple.missing-attachment-perm"))
-
-        if method is None:
-            method = await self.get_default_blurplefier(ctx)
-
-            if method is None:
-                return
-
-        url = await get_url_from_ctx(ctx, who)
-
-        if fmodifier == 'blurplefy':
-            final_modifier = "light"
-
-            if final_modifier is None:
-                return
-        else:
-            final_modifier = fmodifier
-
-        old_msg = await ctx.send(await ctx.bot._(ctx.channel, 'blurple.blurplefy.starting', name=name, user=ctx.author.mention))
-        try:
-            async with aiohttp.ClientSession() as session:
-                async with session.get(str(url)) as image:
-                    r = await convert_image(await image.read(), final_modifier, method,variations)
-        except RuntimeError as err:
-            await ctx.send(await ctx.bot._(ctx.channel, 'blurple.unknown-err', err=str(err)))
-            return
-        await ctx.send(await ctx.bot._(ctx.channel, 'blurple.blurplefy.success', user=ctx.author.mention), file=r)
-        await old_msg.delete()
-        await self.bot.get_cog("Utilities").add_user_eventPoint(ctx.author.id, 3)
-
-    return command
-
-
 class Blurplefy(Cog):
     "Class used to make things blurple, for the Discord birthday event"
 
@@ -147,8 +80,8 @@ class Blurplefy(Cog):
             with open("blurple-cache.json", "w", encoding="utf-8") as jsonfile:
                 json.dump(list(), jsonfile)
             self.cache = list()
-    
-    async def get_default_blurplefier(self, ctx):
+
+    async def get_default_blurplefier(self, _):
         return "--blurplefy"
 
     @commands.group(name="blurple", aliases=["b"])
@@ -171,11 +104,6 @@ Online editor: https://projectblurple.com/paint
 ..Example b check dark"""
         if ctx.subcommand_passed is None:
             await self.bot.get_cog('Help').help_command(ctx, ['blurple'])
-    
-    lightfy = _make_color_command('lightfy', 'light', blurple_main)
-    darkfy = _make_color_command('darkfy', 'dark', blurple_main)
-    blurplefy = _make_color_command('blurplefy', 'blurplefy', blurple_main)
-    check = _make_check_command('check', blurple_main)
 
     @blurple_main.command()
     async def help(self, ctx: MyContext):
@@ -218,6 +146,89 @@ __29 variations: __
         async with self.bot.db_query(query, {'u': userid}, fetchone=True) as query_results:
             result = query_results or None
         return result
+
+    @commands.cooldown(2, 60, commands.BucketType.member)
+    @commands.cooldown(30, 40, commands.BucketType.guild)
+    @blurple_main.command("check", help="Check an image to know if you're cool enough")
+    async def bp_check(self, ctx: MyContext, theme: ThemeConverter = "light", *, who: typing.Union[discord.Member, discord.PartialEmoji, LinkConverter] = None):
+
+        url = await get_url_from_ctx(ctx, who)
+
+        old_msg = await ctx.send(await ctx.bot._(ctx.channel, "blurple.check_intro", user=ctx.author.mention))
+        async with aiohttp.ClientSession() as session:
+            async with session.get(str(url)) as image:
+                r = await check_image(await image.read(), theme, "check")
+        answer = "\n".join([f"> {color['name']}: {color['ratio']}%" for color in r['colors']])
+        await ctx.send(f"Results for {ctx.author.mention}:\n"+answer)
+        if r["passed"] and ctx.author.id not in self.cache:
+            await self.bot.get_cog("Utilities").add_user_eventPoint(ctx.author.id, 40)
+            self.cache.append(ctx.author.id)
+            with open("blurple-cache.json", "w", encoding="utf-8") as jsonfile:
+                json.dump(self.cache, jsonfile)
+            await ctx.send(f"{ctx.author.mention} you just won 40 event xp thanks to your blurple-liful picture!")
+        await old_msg.delete()
+
+    async def color_command(self, fmodifier: str, ctx: MyContext, method: typing.Optional[FlagConverter],
+                      variations: commands.Greedy[FlagConverter2],
+                      who: typing.Union[discord.Member, discord.PartialEmoji, LinkConverter]):
+        "Change a given image with the given modifier, method and variations"
+        if not (ctx.guild is None or ctx.channel.permissions_for(ctx.guild.me).attach_files):
+            await ctx.send(await self.bot._(ctx.channel,"blurple.missing-attachment-perm"))
+            return
+
+        if method is None:
+            method = await self.get_default_blurplefier(ctx)
+
+            if method is None:
+                return
+
+        url = await get_url_from_ctx(ctx, who)
+
+        if fmodifier == 'blurplefy':
+            final_modifier = "light"
+
+            if final_modifier is None:
+                return
+        else:
+            final_modifier = fmodifier
+
+        old_msg = await ctx.send(
+            await ctx.bot._(ctx.channel, 'blurple.blurplefy.starting', name=fmodifier+'fy', user=ctx.author.mention)
+            )
+        try:
+            async with aiohttp.ClientSession() as session:
+                async with session.get(str(url)) as image:
+                    r = await convert_image(await image.read(), final_modifier, method,variations)
+        except RuntimeError as err:
+            await ctx.send(await ctx.bot._(ctx.channel, 'blurple.unknown-err', err=str(err)))
+            return
+        await ctx.send(await ctx.bot._(ctx.channel, 'blurple.blurplefy.success', user=ctx.author.mention), file=r)
+        await old_msg.delete()
+        await self.bot.get_cog("Utilities").add_user_eventPoint(ctx.author.id, 3)
+
+    @commands.cooldown(6, 120, commands.BucketType.member)
+    @commands.cooldown(20, 60, commands.BucketType.guild)
+    @blurple_main.command("lightfy", help="Lightfy an image")
+    async def bp_lightfy(self, ctx: MyContext, method: typing.Optional[FlagConverter] = None,
+                      variations: commands.Greedy[FlagConverter2] = [None], *,
+                      who: typing.Union[discord.Member, discord.PartialEmoji, LinkConverter] = None):
+        await self.color_command("light", ctx, method, variations, who)
+
+    @commands.cooldown(6, 120, commands.BucketType.member)
+    @commands.cooldown(20, 60, commands.BucketType.guild)
+    @blurple_main.command("darkfy", help="Darkfy an image")
+    async def bp_darkfy(self, ctx: MyContext, method: typing.Optional[FlagConverter] = None,
+                      variations: commands.Greedy[FlagConverter2] = [None], *,
+                      who: typing.Union[discord.Member, discord.PartialEmoji, LinkConverter] = None):
+        await self.color_command("dark", ctx, method, variations, who)
+    
+    @commands.cooldown(6, 120, commands.BucketType.member)
+    @commands.cooldown(20, 60, commands.BucketType.guild)
+    @blurple_main.command("blurplefy", help="Blurplefy an image")
+    async def bp_blurplefy(self, ctx: MyContext, method: typing.Optional[FlagConverter] = None,
+                      variations: commands.Greedy[FlagConverter2] = [None], *,
+                      who: typing.Union[discord.Member, discord.PartialEmoji, LinkConverter] = None):
+        await self.color_command("blurplefy", ctx, method, variations, who)
 
     @blurple_main.command(name="collect")
     async def bp_collect(self, ctx: MyContext):

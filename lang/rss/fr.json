@@ -34,6 +34,7 @@
         "no-roles": "Aucun rôle n'a été configuré pour l'instant.",
         "not-a-role": "Ce rôle est introuvable. Réessayez :",
         "nothing": "Je n'ai rien trouvé sur cette recherche :confused:",
+        "picker-placeholder": "Choisis un flux RSS",
         "research-timeout": "La page web a mis trop de temps à répondre, j'ai dû interrompre le processus :eyes:",
         "roles": {
             "edit-success": {
