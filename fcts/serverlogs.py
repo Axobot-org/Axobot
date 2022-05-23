@@ -108,15 +108,18 @@ class ServerLogs(commands.Cog):
         "Send ready logs every 1min to avoid rate limits"
         try:
             for channel, embeds in dict(self.to_send).items():
-                perms = channel.permissions_for(channel.guild.me)
-                if perms.send_messages and perms.embed_links:
-                    await channel.send(embeds=embeds[:10])
-                    if len(embeds) > 10:
-                        self.to_send[channel] = self.to_send[channel][10:]
-                    else:
-                        self.to_send.pop(channel)
+                try:
+                    perms = channel.permissions_for(channel.guild.me)
+                    if perms.send_messages and perms.embed_links:
+                        await channel.send(embeds=embeds[:10])
+                        if len(embeds) > 10:
+                            self.to_send[channel] = self.to_send[channel][10:]
+                        else:
+                            self.to_send.pop(channel)
+                except discord.HTTPException:
+                    self.bot.dispatch('error', err, None)
         except Exception as err: # pylint: disable=broad-except
-            await self.bot.get_cog("Errors").on_error(err, None)
+            self.bot.dispatch('error', err, None)
 
     @send_logs_task.before_loop
     async def before_logs_task(self):
@@ -430,7 +433,8 @@ class ServerLogs(commands.Cog):
             if specs := await self.get_member_specs(member):
                 emb.add_field(name="Specificities", value=", ".join(specs), inline=False)
             member_roles = [role for role in member.roles[::-1] if not role.is_default()]
-            emb.add_field(name=f"Roles ({len(member_roles)})", value=" ".join(r.mention for r in member_roles[:20]))
+            roles_value = " ".join(r.mention for r in member_roles[:20]) if member_roles else "None"
+            emb.add_field(name=f"Roles ({len(member_roles)})", value=roles_value)
             await self.validate_logs(member.guild, channel_ids, emb)
 
     @commands.Cog.listener()
