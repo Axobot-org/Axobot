@@ -108,6 +108,9 @@ class ServerLogs(commands.Cog):
         "Send ready logs every 1min to avoid rate limits"
         try:
             for channel, embeds in dict(self.to_send).items():
+                if not embeds:
+                    self.to_send.pop(channel)
+                    continue
                 try:
                     perms = channel.permissions_for(channel.guild.me)
                     if perms.send_messages and perms.embed_links:
@@ -116,7 +119,7 @@ class ServerLogs(commands.Cog):
                             self.to_send[channel] = self.to_send[channel][10:]
                         else:
                             self.to_send.pop(channel)
-                except discord.HTTPException:
+                except discord.HTTPException as err:
                     self.bot.dispatch('error', err, None)
         except Exception as err: # pylint: disable=broad-except
             self.bot.dispatch('error', err, None)
