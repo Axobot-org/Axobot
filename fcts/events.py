@@ -130,15 +130,15 @@ class Events(commands.Cog):
         await self.bot.wait_until_ready()
         try:
             if log_type == "join":
-                self.bot.log.info("Bot joined the server {}".format(guild.id))
-                desc = "Bot **joined the server** {} ({}) - {} users".format(guild.name,guild.id,len(guild.members))
+                self.bot.log.info(f"Bot joined the server {guild.id}")
+                desc = f"Bot **joined the server** ({guild.name} ({guild.id}) - {len(guild.members)} users"
             else:
-                self.bot.log.info("Bot left the server {}".format(guild.id))
+                self.bot.log.info(f"Bot left the server {guild.id}")
                 if guild.name is None and guild.unavailable:
-                    desc = "Bot **may have left** the server {} (guild unavailable)".format(guild.id)
+                    desc = f"Bot **may have left** the server {guild.id} (guild unavailable)"
                 else:
-                    desc = "Bot **left the server** {} ({}) - {} users".format(guild.name,guild.id,len(guild.members))
-                    if guild.me.joined_at:
+                    desc = f"Bot **left the server** {guild.name} ({guild.id}) - {len(guild.members)} users"
+                    if guild.me and guild.me.joined_at:
                         desc += f"\nJoined at <t:{guild.me.joined_at.timestamp():.0f}>"
             emb = discord.Embed(description=desc, color=self.embed_colors['welcome'], timestamp=self.bot.utcnow())
             emb.set_author(name=self.bot.user, icon_url=self.bot.user.display_avatar)
@@ -146,7 +146,7 @@ class Events(commands.Cog):
             if self.bot.database_online:
                 await self.send_sql_statslogs()
         except Exception as err:
-            await self.bot.get_cog("Errors").on_error(err,None)
+            self.bot.dispatch('error', err, None)
 
 
     @commands.Cog.listener()
