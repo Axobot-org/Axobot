@@ -2,7 +2,7 @@ import re
 import discord
 from discord.ext import commands
 import random
-from typing import Any, Optional, Union, Literal
+from typing import Any, Callable, Optional, Union, Literal
 from mysql.connector.errors import IntegrityError
 
 from libs.classes import MyContext, Zbot
@@ -64,17 +64,20 @@ class SendHintText(discord.ui.View):
 
 
 class AskTitleModal(discord.ui.Modal):
-    name = discord.ui.TextInput(label="YOUR SUBJECT", placeholder="TYPE HERE A MEANINGFUL TICKET NAME", style=discord.TextStyle.short, max_length=100)
+    "Ask a user the name of their ticket"
+    name = discord.ui.TextInput(label="", placeholder=None, style=discord.TextStyle.short, max_length=100)
     
-    def __init__(self, guild_id: int, topic: int, title: str, input_label, input_placeholder):
+    def __init__(self, guild_id: int, topic: dict, title: str, input_label: str, input_placeholder: str, callback: Callable):
         super().__init__(title=title, timeout=600)
         self.guild_id = guild_id
         self.topic = topic
-        self.children[0].label = input_label
-        self.children[0].placeholder = input_placeholder
+        self.callback = callback
+        self.name.label = input_label
+        self.name.placeholder = input_placeholder
 
     async def on_submit(self, interaction: discord.Interaction):
-        await interaction.response.send_message("NO")
+        await interaction.response.defer(ephemeral=True, thinking=True)
+        await self.callback(interaction, self.topic, self.name.value)
 
 class AskTopicSelect(discord.ui.View):
     "Ask a user what topic they want to edit/delete"
@@ -150,7 +153,7 @@ class Tickets(commands.Cog):
         modal_title = await self.bot._(interaction.guild_id, "tickets.title-modal.title")
         modal_label = await self.bot._(interaction.guild_id, "tickets.title-modal.label")
         modal_placeholder = await self.bot._(interaction.guild_id, "tickets.title-modal.placeholder")
-        await interaction.response.send_modal(AskTitleModal(interaction.guild.id, topic, modal_title, modal_label, modal_placeholder))
+        await interaction.response.send_modal(AskTitleModal(interaction.guild.id, topic, modal_title, modal_label, modal_placeholder, self.create_ticket))
     
     async def db_get_topics(self, guild_id: int) -> list[dict[str, Any]]:
         "Fetch the topics associated to a guild"
@@ -170,7 +173,7 @@ class Tickets(commands.Cog):
             query = "SELECT * FROM `tickets` WHERE `guild_id` = %s AND `topic` IS NULL AND `beta` = %s"
             args = (guild_id, self.bot.beta)
         else:
-            query = "SELECT t.id, t.guild_id, t.topic, COALESCE(t.topic_emoji, t2.topic_emoji) as topic_emoji, COALESCE(t.prompt, t2.prompt) as `prompt`, COALESCE(t.role, t2.role) as role, COALESCE(t.hint, t2.hint) as `hint`, t.beta FROM tickets t LEFT JOIN tickets t2 ON t2.guild_id = t.guild_id AND t2.beta = t.beta AND t2.topic is NULL WHERE t.id = %s AND t.guild_id = %s AND t.beta = %s"
+            query = "SELECT t.id, t.guild_id, t.topic, COALESCE(t.topic_emoji, t2.topic_emoji) as topic_emoji, COALESCE(t.prompt, t2.prompt) as `prompt`, COALESCE(t.role, t2.role) as role, COALESCE(t.hint, t2.hint) as `hint`, COALESCE(t.category, t2.category) as `category`, t.beta FROM tickets t LEFT JOIN tickets t2 ON t2.guild_id = t.guild_id AND t2.beta = t.beta AND t2.topic is NULL WHERE t.id = %s AND t.guild_id = %s AND t.beta = %s"
             args = (topic_id, guild_id, self.bot.beta)
         async with self.bot.db_query(query, args, fetchone=True) as db_query:
             return db_query or None
@@ -229,6 +232,12 @@ class Tickets(commands.Cog):
         async with self.bot.db_query(query, (role_id, guild_id, topic_id, self.bot.beta), returnrowcount=True) as db_query:
             return db_query > 0
 
+    async def db_edit_topic_category(self, guild_id: int, topic_id: int, category: Optional[int]) -> bool:
+        "Edit a topic category or channel in which tickets will be created"
+        query = "UPDATE `tickets` SET `category` = %s WHERE `guild_id` = %s AND `id` = %s AND `beta` = %s"
+        async with self.bot.db_query(query, (category, guild_id, topic_id, self.bot.beta), returnrowcount=True) as db_query:
+            return db_query > 0
+
     async def db_edit_prompt(self, guild_id: int, message: str):
         query = "UPDATE tickets SET prompt = %s WHERE guild_id = %s AND topic is NULL AND beta = %s"
         async with self.bot.db_query(query, (message, guild_id, self.bot.beta)) as _:
@@ -246,6 +255,40 @@ class Tickets(commands.Cog):
         except (ValueError, IndexError):
             return None
         return topic_id
+
+    async def create_channel_first_message(self, interaction: discord.Interaction, topic: dict, ticket_name: str) -> discord.Embed:
+        "Create the introduction message at the beginning of the ticket"
+        title = await self.bot._(interaction.guild_id, "tickets.ticket-introduction.title")
+        topic_name = topic['topic'] or await self.bot._(interaction.guild_id, "tickets.other")
+        desc = await self.bot._(interaction.guild_id, "tickets.ticket-introduction.description", user=interaction.user.mention, ticket_name=ticket_name, topic_name=topic_name)
+        return discord.Embed(title=title, description=desc, color=discord.Color.green())
+
+    async def create_ticket(self, interaction: discord.Interaction, topic: dict, ticket_name: str):
+        "Create the ticket once the user has provided every required info"
+        await interaction.channel.send(f"{ticket_name=} {topic=}")
+        category = interaction.guild.get_channel(topic['category'])
+        if category is None:
+            return
+        if isinstance(category, discord.CategoryChannel):
+            try:
+                channel = await category.create_text_channel(str(interaction.user))
+                channel_mention = channel.mention
+            except discord.Forbidden:
+                await interaction.edit_original_message(content="FORBIDDEN")
+                return
+        elif isinstance(category, discord.TextChannel):
+            try:
+                channel = await category.create_thread(name=str(interaction.user), type=discord.ChannelType.private_thread)
+                channel_mention = channel.jump_url
+            except discord.Forbidden:
+                await interaction.edit_original_message(content="FORBIDDEN 2")
+                return
+        else:
+            self.bot.log.error("[ticket] unknown category type: %s", type(category))
+            return
+        await interaction.edit_original_message(content=await self.bot._(interaction.guild_id, "tickets.ticket-created", channel=channel_mention, topic=topic['topic']))
+        await channel.send(embed=await self.create_channel_first_message(interaction, topic, ticket_name))
+
 
     @commands.group(name="ticket", aliases=["tickets"])
     @commands.guild_only()
@@ -310,6 +353,26 @@ class Tickets(commands.Cog):
             row_id = await self.db_set_guild_default_id(ctx.guild.id)
         await self.db_edit_prompt(ctx.guild.id, message)
         await ctx.send(await self.bot._(ctx.guild.id, "tickets.text-edited"))
+
+    @tickets_portal.command(name="set-category", aliases=["set-channel"])
+    async def portal_set_category(self, ctx: MyContext, category_or_channel: Union[discord.CategoryChannel, discord.TextChannel]):
+        """Set the category or the channel in which tickets will be created
+        
+        If you select a channel, tickets will use the Discord threads system but allowed roles may not be applied"""
+        row_id = await self.db_get_guild_default_id(ctx.guild.id)
+        if row_id is None:
+            row_id = await self.db_set_guild_default_id(ctx.guild.id)
+        await self.db_edit_topic_category(ctx.guild.id, row_id, category_or_channel.id)
+        embed = None
+        if isinstance(category_or_channel, discord.CategoryChannel):
+            message = await self.bot._(ctx.guild.id, "tickets.category-edited.default-category", category=category_or_channel.name)
+            if not category_or_channel.permissions_for(ctx.guild.me).manage_channels:
+                embed = discord.Embed(description=await self.bot._(ctx.guild.id, "tickets.category-edited.category-permission-warning"), colour=discord.Color.orange())
+        else:
+            message = await self.bot._(ctx.guild.id, "tickets.category-edited.default-channel", channel=category_or_channel.mention)
+            if "PRIVATE_THREADS" not in ctx.guild.features or not category_or_channel.permissions_for(ctx.guild.me).create_private_threads:
+                embed = discord.Embed(description=await self.bot._(ctx.guild.id, "tickets.category-edited.channel-privacy-warning"), colour=discord.Color.orange())
+        await ctx.send(message, embed=embed)
 
 
     @tickets_main.group(name="topic")

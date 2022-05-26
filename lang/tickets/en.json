@@ -1,5 +1,11 @@
 {
     "en": {
+        "category-edited": {
+            "default-category": "Newly tickets will be created as new channels under the category %{category}!",
+            "default-channel": "Newly tickets will be created as new threads in the channel %{channel}!",
+            "category-permission-warning": "It looks like I don't have the permissions to create new channels under that category. Please fix the situation by granting me the **'Manage Channels' permission**, or I won't be able to add new tickets at all.",
+            "channel-privacy-warning": "It looks like I cannot create private threads in this channel. Make sure you have **unlocked** them and I have the **required permission**. Otherwise I will create tickets as public threads and anyone may be able to read them."
+        },
         "cancelled": "The operation has been cancelled",
         "choose-topic-edition": "Choose which topic to edit",
         "default-topic-prompt": "Select a ticket category",
@@ -19,6 +25,10 @@
         "selection-placeholder": "Choose a topic",
         "text-edited": "The message displayed with the selection of a ticket has been edited",
         "ticket-created": "Ticket opened in %{channel} with the topic \"%{topic}\"!",
+        "ticket-introduction": {
+            "title": "New ticket created!",
+            "description": "Welcome %{user} in your ticket about '%{ticket_name}'! Someone should quickly answer your concerns right here.\nAs a reminder, you selected the topic **'%{topic_name}'**"
+        },
         "title-modal": {
             "title": "Your ticket",
             "label": "Your subject",
