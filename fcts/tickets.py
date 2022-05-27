@@ -76,8 +76,11 @@ class AskTitleModal(discord.ui.Modal):
         self.name.placeholder = input_placeholder
 
     async def on_submit(self, interaction: discord.Interaction):
-        await interaction.response.defer(ephemeral=True, thinking=True)
-        await self.callback(interaction, self.topic, self.name.value)
+        try:
+            await interaction.response.defer(ephemeral=True, thinking=True)
+            await self.callback(interaction, self.topic, self.name.value)
+        except Exception as err: # pylint: disable=broad-except
+            interaction.client.dispatch("error", err)
 
 class AskTopicSelect(discord.ui.View):
     "Ask a user what topic they want to edit/delete"
@@ -124,36 +127,39 @@ class Tickets(commands.Cog):
         if not interaction.guild:
             # DM : not interesting
             return
-        custom_ids: list[str] = interaction.data["custom_id"].split('-')
-        if len(custom_ids) != 3 or custom_ids[0] != str(interaction.guild_id) or custom_ids[1] != "tickets":
-            # unknown custom id
-            return
-        topic_id: int = int(interaction.data['values'][0])
-        topic = await self.db_get_topic_with_defaults(interaction.guild_id, topic_id)
-        if topic is None:
-            await interaction.response.send_message(await self.bot._(interaction.guild_id, "errors.unknown"))
-            return
-        if topic['hint']:
-            hint_view = SendHintText(interaction.user.id,
-                await self.bot._(interaction.guild_id, "tickets.hint-useless"),
-                await self.bot._(interaction.guild_id, "tickets.hint-useful"),
-                await self.bot._(interaction.guild_id, "tickets.cancelled"))
-            embed = discord.Embed(color=discord.Color.green(), title=topic['topic'], description=topic['hint'])
-            await interaction.response.send_message(embed=embed, view=hint_view, ephemeral=True)
-            await hint_view.wait()
-            if hint_view.confirmed is None:
-                # timeout
-                await hint_view.disable(interaction)
+        try:
+            custom_ids: list[str] = interaction.data["custom_id"].split('-')
+            if len(custom_ids) != 3 or custom_ids[0] != str(interaction.guild_id) or custom_ids[1] != "tickets":
+                # unknown custom id
                 return
-            if not hint_view.confirmed:
-                # cancelled
+            topic_id: int = int(interaction.data['values'][0])
+            topic = await self.db_get_topic_with_defaults(interaction.guild_id, topic_id)
+            if topic is None:
+                await interaction.response.send_message(await self.bot._(interaction.guild_id, "errors.unknown"))
                 return
-            if hint_view.interaction:
-                interaction = hint_view.interaction
-        modal_title = await self.bot._(interaction.guild_id, "tickets.title-modal.title")
-        modal_label = await self.bot._(interaction.guild_id, "tickets.title-modal.label")
-        modal_placeholder = await self.bot._(interaction.guild_id, "tickets.title-modal.placeholder")
-        await interaction.response.send_modal(AskTitleModal(interaction.guild.id, topic, modal_title, modal_label, modal_placeholder, self.create_ticket))
+            if topic['hint']:
+                hint_view = SendHintText(interaction.user.id,
+                    await self.bot._(interaction.guild_id, "tickets.hint-useless"),
+                    await self.bot._(interaction.guild_id, "tickets.hint-useful"),
+                    await self.bot._(interaction.guild_id, "tickets.cancelled"))
+                embed = discord.Embed(color=discord.Color.green(), title=topic['topic'], description=topic['hint'])
+                await interaction.response.send_message(embed=embed, view=hint_view, ephemeral=True)
+                await hint_view.wait()
+                if hint_view.confirmed is None:
+                    # timeout
+                    await hint_view.disable(interaction)
+                    return
+                if not hint_view.confirmed:
+                    # cancelled
+                    return
+                if hint_view.interaction:
+                    interaction = hint_view.interaction
+            modal_title = await self.bot._(interaction.guild_id, "tickets.title-modal.title")
+            modal_label = await self.bot._(interaction.guild_id, "tickets.title-modal.label")
+            modal_placeholder = await self.bot._(interaction.guild_id, "tickets.title-modal.placeholder")
+            await interaction.response.send_modal(AskTitleModal(interaction.guild.id, topic, modal_title, modal_label, modal_placeholder, self.create_ticket))
+        except Exception as err: # pylint: disable=broad-except
+            self.bot.dispatch('error', err)
     
     async def db_get_topics(self, guild_id: int) -> list[dict[str, Any]]:
         "Fetch the topics associated to a guild"
@@ -262,31 +268,77 @@ class Tickets(commands.Cog):
         topic_name = topic['topic'] or await self.bot._(interaction.guild_id, "tickets.other")
         desc = await self.bot._(interaction.guild_id, "tickets.ticket-introduction.description", user=interaction.user.mention, ticket_name=ticket_name, topic_name=topic_name)
         return discord.Embed(title=title, description=desc, color=discord.Color.green())
+    
+    async def setup_ticket_channel(self, channel: discord.TextChannel, topic: dict, user: discord.Member):
+        "Setup the required permissions for a channel ticket"
+        permissions = {}
+        # set for everyone
+        permissions[channel.guild.default_role] = discord.PermissionOverwrite(read_messages=False)
+        # set for the user and the bot
+        permissions[user] = discord.PermissionOverwrite(send_messages=True, read_messages=True)
+        permissions[channel.guild.me] = discord.PermissionOverwrite(send_messages=True, read_messages=True)
+        # set for the staff
+        if (role_id := topic.get('role')) and (role := channel.guild.get_role(role_id)):
+            permissions[role] = discord.PermissionOverwrite(
+                send_messages=True,
+                read_messages=True,
+                manage_messages=True,
+                manage_channels=True
+            )
+        # apply everything
+        await channel.edit(overwrites=permissions)
+
+    async def setup_ticket_thread(self, thread: discord.Thread, topic: dict, user: discord.Member):
+        "Add the required members to a Discord thread ticket"
+        mentions = [thread.guild.me.mention, user.mention]
+        if (role_id := topic.get('role')) and (role := thread.guild.get_role(role_id)):
+            mentions.append(role.mention)
+        # sneaky tactic to add a lot of people:
+        # send an empty message (to avoid notifying them)
+        msg = await thread.send("...")
+        # then mention them in the previous message to add them to the thread
+        await msg.edit(content=" ".join(mentions), allowed_mentions=discord.AllowedMentions.all())
+        # then delete to cleanup things
+        await msg.delete()
+
+    async def send_missing_permissions_err(self, interaction: discord.Interaction, category: str):
+        "Send an error when the bot couldn't set up the channel permissions"
+        if interaction.user.guild_permissions.manage_roles:
+            msg = await self.bot._(interaction.guild_id, "tickets.missing-perms-setup.to-staff", category=category)
+        else:
+            msg = await self.bot._(interaction.guild_id, "tickets.missing-perms-setup.to-member")
+        await interaction.edit_original_message(content=msg)
 
     async def create_ticket(self, interaction: discord.Interaction, topic: dict, ticket_name: str):
         "Create the ticket once the user has provided every required info"
-        await interaction.channel.send(f"{ticket_name=} {topic=}")
         category = interaction.guild.get_channel(topic['category'])
         if category is None:
             return
         if isinstance(category, discord.CategoryChannel):
             try:
                 channel = await category.create_text_channel(str(interaction.user))
-                channel_mention = channel.mention
             except discord.Forbidden:
-                await interaction.edit_original_message(content="FORBIDDEN")
+                await interaction.edit_original_message(content=await self.bot._(interaction.guild_id, "tickets.missing-perms-creation.channel"))
                 return
+            try:
+                await self.setup_ticket_channel(channel, topic, interaction.user)
+            except discord.Forbidden:
+                await self.send_missing_permissions_err(interaction, category.name)
         elif isinstance(category, discord.TextChannel):
             try:
-                channel = await category.create_thread(name=str(interaction.user), type=discord.ChannelType.private_thread)
-                channel_mention = channel.jump_url
+                if "PRIVATE_THREADS" in interaction.guild.features and category.permissions_for(interaction.guild.me).create_private_threads:
+                    channel_type = discord.ChannelType.private_thread
+                else:
+                    channel_type = discord.ChannelType.public_thread
+                channel = await category.create_thread(name=str(interaction.user), type=channel_type)
             except discord.Forbidden:
-                await interaction.edit_original_message(content="FORBIDDEN 2")
+                await interaction.edit_original_message(content=await self.bot._(interaction.guild_id, "tickets.missing-perms-creation.thread"))
                 return
+            await self.setup_ticket_thread(channel, topic, interaction.user)
         else:
             self.bot.log.error("[ticket] unknown category type: %s", type(category))
             return
-        await interaction.edit_original_message(content=await self.bot._(interaction.guild_id, "tickets.ticket-created", channel=channel_mention, topic=topic['topic']))
+        await interaction.edit_original_message(content=await self.bot._(interaction.guild_id, "tickets.ticket-created", channel=channel.mention, topic=topic['topic']))
         await channel.send(embed=await self.create_channel_first_message(interaction, topic, ticket_name))
 
 
