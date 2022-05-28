@@ -1,4 +1,5 @@
 import re
+import time
 import discord
 from discord.ext import commands
 import random
@@ -6,6 +7,7 @@ from typing import Any, Callable, Optional, Union, Literal
 from mysql.connector.errors import IntegrityError
 
 from libs.classes import MyContext, Zbot
+from fcts import checks
 
 
 class SelectView(discord.ui.View):
@@ -78,7 +80,7 @@ class AskTitleModal(discord.ui.Modal):
     async def on_submit(self, interaction: discord.Interaction):
         try:
             await interaction.response.defer(ephemeral=True, thinking=True)
-            await self.callback(interaction, self.topic, self.name.value)
+            await self.callback(interaction, self.topic, self.name.value.strip())
         except Exception as err: # pylint: disable=broad-except
             interaction.client.dispatch("error", err)
 
@@ -118,8 +120,8 @@ class Tickets(commands.Cog):
     def __init__(self, bot: Zbot):
         self.bot = bot
         self.file = "tickets"
-        self.bot.add_view
-    
+        self.cooldowns: dict[discord.User, float] = {}
+
     @commands.Cog.listener()
     async def on_interaction(self, interaction: discord.Interaction):
         """Called when *any* interaction from the bot is created
@@ -136,6 +138,9 @@ class Tickets(commands.Cog):
             topic = await self.db_get_topic_with_defaults(interaction.guild_id, topic_id)
             if topic is None:
                 await interaction.response.send_message(await self.bot._(interaction.guild_id, "errors.unknown"))
+                return
+            if (cooldown := self.cooldowns.get(interaction.user)) and cooldown - time.time() < 120:
+                await interaction.response.send_message(await self.bot._(interaction.guild_id, "tickets.too-quick"))
                 return
             if topic['hint']:
                 hint_view = SendHintText(interaction.user.id,
@@ -158,6 +163,7 @@ class Tickets(commands.Cog):
             modal_label = await self.bot._(interaction.guild_id, "tickets.title-modal.label")
             modal_placeholder = await self.bot._(interaction.guild_id, "tickets.title-modal.placeholder")
             await interaction.response.send_modal(AskTitleModal(interaction.guild.id, topic, modal_title, modal_label, modal_placeholder, self.create_ticket))
+            self.cooldowns[interaction.user] = time.time()
         except Exception as err: # pylint: disable=broad-except
             self.bot.dispatch('error', err)
     
@@ -265,8 +271,7 @@ class Tickets(commands.Cog):
     async def create_channel_first_message(self, interaction: discord.Interaction, topic: dict, ticket_name: str) -> discord.Embed:
         "Create the introduction message at the beginning of the ticket"
         title = await self.bot._(interaction.guild_id, "tickets.ticket-introduction.title")
-        topic_name = topic['topic'] or await self.bot._(interaction.guild_id, "tickets.other")
-        desc = await self.bot._(interaction.guild_id, "tickets.ticket-introduction.description", user=interaction.user.mention, ticket_name=ticket_name, topic_name=topic_name)
+        desc = await self.bot._(interaction.guild_id, "tickets.ticket-introduction.description", user=interaction.user.mention, ticket_name=ticket_name, topic_name=topic['topic'])
         return discord.Embed(title=title, description=desc, color=discord.Color.green())
     
     async def setup_ticket_channel(self, channel: discord.TextChannel, topic: dict, user: discord.Member):
@@ -338,6 +343,7 @@ class Tickets(commands.Cog):
         else:
             self.bot.log.error("[ticket] unknown category type: %s", type(category))
             return
+        topic['topic'] = topic['topic'] or await self.bot._(interaction.guild_id, "tickets.other")
         await interaction.edit_original_message(content=await self.bot._(interaction.guild_id, "tickets.ticket-created", channel=channel.mention, topic=topic['topic']))
         await channel.send(embed=await self.create_channel_first_message(interaction, topic, ticket_name))
 
@@ -349,11 +355,13 @@ class Tickets(commands.Cog):
         pass
 
     @tickets_main.group(name="portal")
+    @commands.check(checks.has_manage_guild)
     async def tickets_portal(self, ctx: MyContext):
         "Handle how your members are able to open tickets"
         pass
 
     @tickets_portal.command()
+    @commands.cooldown(2, 30, commands.BucketType.guild)
     async def summon(self, ctx: MyContext):
         "Ask the bot to send a message allowing people to open tickets"
         topics = await self.db_get_topics(ctx.guild.id)
@@ -370,6 +378,7 @@ class Tickets(commands.Cog):
         await ctx.send(prompt, view=SelectView(ctx.guild.id, topics + [other]))
 
     @tickets_portal.command(name="set-hint")
+    @commands.cooldown(3, 30, commands.BucketType.guild)
     async def portal_set_hint(self, ctx: MyContext, *, message: str):
         """Set a default hint message
         The message will be displayed when a user tries to open a ticket, before user confirmation
@@ -385,6 +394,7 @@ class Tickets(commands.Cog):
             await ctx.send(await self.bot._(ctx.guild.id, "errors.unknown"))
 
     @tickets_portal.command(name="set-role")
+    @commands.cooldown(3, 30, commands.BucketType.guild)
     async def portal_set_role(self, ctx: MyContext, role: Union[discord.Role, Literal["none"]]):
         """Edit a default staff role
         Anyone with this role will be able to read newly created tickets
@@ -398,6 +408,7 @@ class Tickets(commands.Cog):
         await ctx.send(await self.bot._(ctx.guild.id, "tickets.role-edited.default"))
 
     @tickets_portal.command(name="set-text")
+    @commands.cooldown(3, 30, commands.BucketType.guild)
     async def portal_set_text(self, ctx: MyContext, *, message: str):
         """Set a message to be displayed above the ticket topic selection"""
         row_id = await self.db_get_guild_default_id(ctx.guild.id)
@@ -407,6 +418,7 @@ class Tickets(commands.Cog):
         await ctx.send(await self.bot._(ctx.guild.id, "tickets.text-edited"))
 
     @tickets_portal.command(name="set-category", aliases=["set-channel"])
+    @commands.cooldown(3, 30, commands.BucketType.guild)
     async def portal_set_category(self, ctx: MyContext, category_or_channel: Union[discord.CategoryChannel, discord.TextChannel]):
         """Set the category or the channel in which tickets will be created
         
@@ -428,11 +440,13 @@ class Tickets(commands.Cog):
 
 
     @tickets_main.group(name="topic")
+    @commands.check(checks.has_manage_guild)
     async def tickets_topics(self, ctx: MyContext):
         "Handle the different ticket topics your members can select"
         pass
 
     @tickets_topics.command(name="add")
+    @commands.cooldown(3, 45, commands.BucketType.guild)
     async def topic_add(self, ctx: MyContext, emote: Optional[discord.PartialEmoji]=None, *, name: str):
         """Create a new ticket topic
         A topic name is limited to 100 characters
@@ -446,6 +460,7 @@ class Tickets(commands.Cog):
             await ctx.send(await self.bot._(ctx.guild.id, "tickets.topic.cant-create"))
 
     @tickets_topics.command(name="remove")
+    @commands.cooldown(3, 45, commands.BucketType.guild)
     async def topic_remove(self, ctx: MyContext, topic_id: Optional[int]):
         "Permanently delete a topic by its name"
         if not topic_id or not await self.db_topic_exists(ctx.guild.id, topic_id):
@@ -460,6 +475,7 @@ class Tickets(commands.Cog):
             await ctx.send(await self.bot._(ctx.guild.id, "errors.unknown"))
 
     @tickets_topics.command(name="set-emote")
+    @commands.cooldown(3, 30, commands.BucketType.guild)
     async def topic_set_emote(self, ctx: MyContext, topic_id: Optional[int], emote: Union[discord.PartialEmoji, Literal["none"]]):
         """Edit a topic emoji
         Type "None" to set no emoji for this topic"""
@@ -477,6 +493,7 @@ class Tickets(commands.Cog):
             await ctx.send(await self.bot._(ctx.guild.id, "tickets.nothing-to-edit"))
 
     @tickets_topics.command(name="set-hint")
+    @commands.cooldown(3, 30, commands.BucketType.guild)
     async def topic_set_hint(self, ctx: MyContext, topic_id: Optional[int], *, message: str):
         """Edit a topic hint message
         The message will be displayed when a user tries to open a ticket, before user confirmation
@@ -493,6 +510,7 @@ class Tickets(commands.Cog):
         await ctx.send(await self.bot._(ctx.guild.id, "tickets.hint-edited.topic", topic=topic["topic"]))
 
     @tickets_topics.command(name="set-role")
+    @commands.cooldown(3, 30, commands.BucketType.guild)
     async def topic_set_role(self, ctx: MyContext, topic_id: Optional[int], role: Union[discord.Role, Literal["none"]]):
         """Edit a topic staff role
         Anyone with this role will be able to read newly created tickets with this topic
