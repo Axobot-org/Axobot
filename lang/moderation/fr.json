@@ -50,7 +50,8 @@
         "mute": {
             "already-mute": "Ce membre est déjà muet !",
             "already-unmute": "Ce membre n'est pas muet !",
-            "cant-mute": "Oups, il semble que je ne possède pas les permissions suffisantes pour cela... Veuillez m'attribuer la permission `gérer les rôles` avant de continuer.",
+            "cant-mute": "Oups, il semble que je ne possède pas les permissions suffisantes pour cela... Veuillez m'attribuer la permission `Gérer les rôles` avant de continuer.",
+            "cant-timeout": "Oups, il semble que je ne possède pas les permissions suffisantes pour cela... Veuillez m'attribuer la permission `Modérer les membres` avant de continuer, ou créez un rôle 'muted'.",
             "mute-config-err": "Impossible de faire cela. Veuillez vérifier mes permissions dans le serveur et réessayer.",
             "mute-config-success": {
                 "zero": "Le rôle a été créé et configuré avec succès !",
@@ -67,7 +68,8 @@
             "role-created": "Rôle `muted` créé avec succès !\nVous pouvez utiliser la commande `%{p}mute-config` pour une configuration automatique dans votre serveur.",
             "no-mute": "Oups, il semble que le rôle `muted` n'existe pas :confused: Veuillez le créer et lui attribuer les permissions manuellement.",
             "no-mutes": "Aucun membre ne semble être actuellement muet dans ce serveur",
-            "staff-mute": "Vous ne pouvez pas empêcher de parler un autre membre du staff"
+            "staff-mute": "Vous ne pouvez pas empêcher de parler un autre membre du staff",
+            "too-high": "Il semble que ce membre soit trop haut pour que je puisse l'exclure :thinking:"
         },
         "mute-chat": "Le membre %{user} (%{userid}) a bien été réduit au silence !",
         "mute-dm": "Vous avez été rendu muet dans le serveur %{guild}",
@@ -82,15 +84,22 @@
         "react-clear": "Impossible de retrouver ce message :confused:",
         "role": {
             "color-success": "Le rôle %{role} a changé de couleur !",
+            "give-pending": "Distribution du rôle à %{n} membres...",
             "give-success":{
                 "zero": "-> Aucun rôle n'a pu être attribué sur les %{m}",
                 "one": "-> 1 rôle attribué sur %{m} !",
                 "many": "-> %{count} rôles attribués sur %{m} !"
-            } ,
+            },
             "give-too-high": "Oups, il semblerai que ce rôle soit trop haut pour que je puisse le donner ou l'enlever à qui que ce soit. Veuillez placer mon rôle au-dessus du rôle `%{r}`",
             "give-roles-higher": "Vous ne pouvez pas donner ou enlever des rôles plus hauts que le vôtre !",
             "too-high": "Oups, ce rôle est trop haut pour que je puisse le modifier. Merci de déplacer mon rôle au-dessus du rôle `%{r}` avant de réessayer :confused:",
-            "list": "Liste des rôles du serveur"
+            "list": "Liste des rôles du serveur",
+            "remove-pending": "Retrait du rôle à %{n} membres...",
+            "remove-success":{
+                "zero": "-> Aucun rôle n'a pu être retiré sur les %{m}",
+                "one": "-> 1 rôle retiré sur %{m} !",
+                "many": "-> %{count} rôles retirés sur %{m} !"
+            }
         },
         "slowmode": {
             "disabled": "Le slowmode est désormais désactivé dans ce salon.",
@@ -114,7 +123,7 @@
                 "4"
             ],
             [
-                "Comment s'appelle le système d'exploitation des téléphones de la marque Apple ?",
+                "Comment s'appelle le système d'exploitation des téléphones de la marque Apple ? (iOS/Android)",
                 "iOS"
             ],
             [

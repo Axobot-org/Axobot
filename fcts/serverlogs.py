@@ -18,7 +18,7 @@ class ServerLogs(commands.Cog):
     logs_categories = {
         "automod": {"antiraid", "antiscam"},
         "members": {"member_roles", "member_nick", "member_avatar", "member_join", "member_leave"},
-        "moderation": {"member_ban", "member_unban"},
+        "moderation": {"member_ban", "member_unban", "member_timeout"},
         "messages": {"message_update", "message_delete"},
         "roles": {"role_creation"}
     }
@@ -60,17 +60,17 @@ class ServerLogs(commands.Cog):
                 else:
                     self.to_send[channel] = [embed]
 
-    async def db_get_from_channel(self, guild: int, channel: int) -> list[str]:
+    async def db_get_from_channel(self, guild: int, channel: int, use_cache: bool=True) -> list[str]:
         "Get enabled logs for a channel"
-        if (cached := self.cache.get(guild)) and channel in cached:
+        if use_cache and (cached := self.cache.get(guild)) and channel in cached:
             return cached[channel]
         query = "SELECT kind FROM serverlogs WHERE guild = %s AND channel = %s"
         async with self.bot.db_query(query, (guild, channel)) as query_results:
             return [row['kind'] for row in query_results]
 
-    async def db_get_from_guild(self, guild: int) -> dict[int, list[str]]:
+    async def db_get_from_guild(self, guild: int, use_cache: bool=True) -> dict[int, list[str]]:
         "Get enabled logs for a guild"
-        if cached := self.cache.get(guild):
+        if use_cache and (cached := self.cache.get(guild)):
             return cached
         query = "SELECT channel, kind FROM serverlogs WHERE guild = %s"
         async with self.bot.db_query(query, (guild,)) as query_results:
@@ -87,25 +87,42 @@ class ServerLogs(commands.Cog):
             if query_result > 0 and guild in self.cache:
                 if channel in self.cache[guild]:
                     self.cache[guild][channel].append(kind)
+                else:
+                    self.cache[guild][channel] = await self.db_get_from_channel(guild, channel, False)
             return query_result > 0
 
     async def db_remove(self, guild: int, channel: int, kind: str) -> bool:
         "Remove logs from a channel"
         query = "DELETE FROM serverlogs WHERE guild = %s AND channel = %s AND kind = %s"
         async with self.bot.db_query(query, (guild, channel, kind), returnrowcount=True) as query_result:
-            if query_result > 0 and guild in self.cache and channel in self.cache[guild]:
-                self.cache[guild][channel] = [x for x in self.cache[guild][channel] if x != kind]
+            if query_result > 0 and guild in self.cache:
+                if channel in self.cache[guild]:
+                    self.cache[guild][channel] = [x for x in self.cache[guild][channel] if x != kind]
+                else:
+                    self.cache[guild] = await self.db_get_from_guild(guild, use_cache=False)
             return query_result > 0
 
 
     @tasks.loop(seconds=30)
     async def send_logs_task(self):
         "Send ready logs every 1min to avoid rate limits"
-        for channel, embeds in dict(self.to_send).items():
-            perms = channel.permissions_for(channel.guild.me)
-            if perms.send_messages and perms.embed_links:
-                await channel.send(embeds=embeds)
-                self.to_send.pop(channel)
+        try:
+            for channel, embeds in dict(self.to_send).items():
+                if not embeds:
+                    self.to_send.pop(channel)
+                    continue
+                try:
+                    perms = channel.permissions_for(channel.guild.me)
+                    if perms.send_messages and perms.embed_links:
+                        await channel.send(embeds=embeds[:10])
+                        if len(embeds) > 10:
+                            self.to_send[channel] = self.to_send[channel][10:]
+                        else:
+                            self.to_send.pop(channel)
+                except discord.HTTPException as err:
+                    self.bot.dispatch('error', err, None)
+        except Exception as err: # pylint: disable=broad-except
+            self.bot.dispatch('error', err, None)
 
     @send_logs_task.before_loop
     async def before_logs_task(self):
@@ -221,14 +238,18 @@ class ServerLogs(commands.Cog):
                 guild = self.bot.get_guild(msg.guild_id)
                 link = f"https://discord.com/channels/{msg.guild_id}/{msg.channel_id}/{msg.message_id}"
             new_content = msg.data.get('content')
-            if new_content is None and msg.data.get('flags', 0) & 32:
+            if new_content is None: # and msg.data.get('flags', 0) & 32:
                 return
             emb = discord.Embed(
                 description=f"**[Message]({link}) updated in <#{msg.channel_id}>**",
                 colour=discord.Color.light_gray())
             if old_content:
+                if len(old_content) > 1024:
+                    old_content = old_content[:1020] + '…'
                 emb.add_field(name="Old content", value=old_content, inline=False)
             if new_content:
+                if len(new_content) > 1024:
+                    new_content = new_content[:1020] + '…'
                 emb.add_field(name="New content", value=new_content, inline=False)
             if author:
                 emb.set_author(name=str(author), icon_url=author.display_avatar)
@@ -271,6 +292,7 @@ class ServerLogs(commands.Cog):
     async def on_member_update(self, before: discord.Member, after: discord.Member):
         """Triggered when a member is updated
         Corresponding logs: member_roles, member_nick, member_avatar"""
+        now = self.bot.utcnow()
         # member roles
         if before.roles != after.roles and (channel_ids := await self.is_log_enabled(before.guild.id, "member_roles")):
             added_roles = [role for role in after.roles if role not in before.roles]
@@ -284,9 +306,8 @@ class ServerLogs(commands.Cog):
             if added_roles:
                 emb.add_field(name="Roles granted", value=' '.join(r.mention for r in added_roles), inline=False)
             emb.set_author(name=str(after), icon_url=after.avatar or after.default_avatar)
-            # if we have access to audit logs, just wait a bit to make sure the ban is logged
-            if before.guild.me.guild_permissions.view_audit_log:
-                now = self.bot.utcnow()
+            # if we have access to audit logs and no role come from an integration, just wait a bit to make sure the ban is logged
+            if any(not role.managed for role in added_roles+removed_roles) and before.guild.me.guild_permissions.view_audit_log:
                 await asyncio.sleep(self.auditlogs_timeout)
                 async for entry in before.guild.audit_logs(limit=5, action=discord.AuditLogAction.member_role_update,
                                                            oldest_first=False):
@@ -318,6 +339,56 @@ class ServerLogs(commands.Cog):
             emb.add_field(name="Server avatar edited", value=f"{before_txt} -> {after_txt}")
             emb.set_author(name=str(after), icon_url=after.avatar or after.default_avatar)
             await self.validate_logs(after.guild, channel_ids, emb)
+        # member timeout
+        if ((before.timed_out_until is None or before.timed_out_until < now)
+            and after.timed_out_until is not None and after.timed_out_until > now
+            and (channel_ids := await self.is_log_enabled(before.guild.id, "member_timeout"))
+            ):
+            emb = discord.Embed(
+                description=f"**Member {before.mention} ({before.id}) set in timeout**",
+                color=discord.Color.orange()
+            )
+            duration = await FormatUtils.time_delta(now, after.timed_out_until, lang='en')
+            emb.add_field(name="Duration", value=f"{duration} (until <t:{after.timed_out_until.timestamp():.0f}>)", inline=False)
+            emb.set_author(name=str(after), icon_url=after.avatar or after.default_avatar)
+            # try to get who timeouted that member
+            if before.guild.me.guild_permissions.view_audit_log:
+                await asyncio.sleep(self.auditlogs_timeout)
+                async for entry in before.guild.audit_logs(limit=5, action=discord.AuditLogAction.member_update,
+                                                           oldest_first=False):
+                    if (entry.target.id == before.id
+                        and entry.after.timed_out_until
+                        and (entry.created_at - now).total_seconds() < 5
+                        ):
+                        emb.add_field(
+                            name="Timeout by", value=f"**{entry.user.mention}** ({entry.user.id})")
+                        break
+            await self.validate_logs(after.guild, channel_ids, emb)
+        # member un-timeout
+        if (before.timed_out_until is not None and before.timed_out_until > now
+            and after.timed_out_until is None
+            and (channel_ids := await self.is_log_enabled(before.guild.id, "member_timeout"))
+            ):
+            emb = discord.Embed(
+                description=f"**Member {before.mention} ({before.id}) no longer in timeout**",
+                color=discord.Color.green()
+            )
+            emb.add_field(name="Planned timeout end", value=f"<t:{before.timed_out_until.timestamp():.0f}>", inline=False)
+            emb.set_author(name=str(after), icon_url=after.avatar or after.default_avatar)
+            # try to get who timeouted that member
+            if after.guild.me.guild_permissions.view_audit_log:
+                await asyncio.sleep(self.auditlogs_timeout)
+                async for entry in before.guild.audit_logs(limit=5, action=discord.AuditLogAction.member_update,
+                                                           oldest_first=False):
+                    if (entry.target.id == before.id
+                        and entry.before.timed_out_until
+                        and (entry.created_at - now).total_seconds() < 5
+                        ):
+                        emb.add_field(
+                            name="Revoked by", value=f"**{entry.user.mention}** ({entry.user.id})")
+                        break
+            await self.validate_logs(after.guild, channel_ids, emb)
+
 
     async def get_member_specs(self, member: discord.Member) -> list[str]:
         "Get specific things to note for a member"
@@ -364,7 +435,9 @@ class ServerLogs(commands.Cog):
                               inline=False)
             if specs := await self.get_member_specs(member):
                 emb.add_field(name="Specificities", value=", ".join(specs), inline=False)
-            emb.add_field(name=f"Roles ({len(member.roles)})", value=" ".join(r.mention for r in member.roles[::-1][:20]))
+            member_roles = [role for role in member.roles[::-1] if not role.is_default()]
+            roles_value = " ".join(r.mention for r in member_roles[:20]) if member_roles else "None"
+            emb.add_field(name=f"Roles ({len(member_roles)})", value=roles_value)
             await self.validate_logs(member.guild, channel_ids, emb)
 
     @commands.Cog.listener()

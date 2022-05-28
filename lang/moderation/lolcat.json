@@ -67,7 +67,8 @@
             "role-created": "Successsfully added da `muted` role! U can naw use `%{p}mute-config` cmd to ask me 2 config it meself",
             "no-mute": "Oooops, seemz dat teh nice `muted` role doznt exist :rofl: Creat'it nd assign perms yourself",
             "no-mutes": "No member seems 2B banned from here",
-            "staff-mute": "U cant prevent another cool staff member frm speek'ng "
+            "staff-mute": "U cant prevent another cool staff member frm speek'ng ",
+            "too-high": "Seemz that this membr iz tooooo high 4 me to time him out :ohno:"
         },
         "mute-chat": "Teh mmber %{user} (%{userid}) haz been silencd",
         "mute-dm": "U've been silenced in teh %{guild} :sadcat:",
@@ -82,6 +83,7 @@
         "react-clear": "I can't find dis message :confused:",
         "role": {
             "color-success": "Teh coulor of role %{role} haz bee'n changd!",
+            "give-pending": "Roger that, %{n} assignations incoming...",
             "give-success": {
                 "zero": "-> eh no, i didn't have 2 give any role",
                 "one": "-> 1 role gived out of %{m}",
@@ -90,7 +92,13 @@
             "give-too-high": "Oops, dat role is 2 high 4 me 2 give or remove 2 anyone. Please place me role above ur `%{r}` :plz:",
             "give-roles-higher": "U can't give / remove roles higher than urs LMAO!",
             "too-high": "Oops, tish role is 2 high for me to change. Move my role above the role `%{r}` be4 trying again, thx",
-            "list": "List of srv roles"
+            "list": "List of srv roles",
+            "remove-pending": "Deletin dis role to %{n} ppl...",
+            "remove-success":{
+                "zero": "-> Oopsie doopsie, looks like i failed",
+                "one": "-> 1 role removd out of %{m} !",
+                "many": "-> %{count} thingy revoked out ov %{m}!"
+            }
         },
         "slowmode": {
             "disabled": "Teh very-cold-mode is now disabld in this nize place.",
