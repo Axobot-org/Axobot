@@ -81,6 +81,10 @@
                 "Vous avez la permission \"Intégrer des liens\"",
                 "Vous devez avoir la permission \"Intégrer des liens\""
             ],
+            "has_manage_channels": [
+                "Vous avez la permission de 'Gérer les salons'",
+                "Permission 'Gérer les salons' manquante"
+            ],
             "has_manage_guild": [
                 "Vous avez la permission 'Gérer le serveur'",
                 "Permission 'Gérer le serveur' manquante"

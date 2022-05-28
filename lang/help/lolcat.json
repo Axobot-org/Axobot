@@ -81,6 +81,10 @@
                 "U haz \"Embed links\" thing",
                 "U need 2 b \"Embed links\" perms"
             ],
+            "has_manage_channels": [
+                "U has 'Manage channels' perm",
+                "'Manage channels' required :angrycat:"
+            ],
             "has_manage_guild": [
                 "U have 'Manage Server' permission",
                 "'Manage Server' permission missed"

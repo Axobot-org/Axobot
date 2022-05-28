@@ -75,6 +75,9 @@ async def has_manage_nicknames(ctx: MyContext) -> bool:
     """... if someone can change nicknames"""
     return ctx.channel.permissions_for(ctx.author).manage_nicknames or await ctx.bot.get_cog('Admin').check_if_god(ctx)
 
+async def has_manage_channels(ctx: MyContext) -> bool:
+    """... if someone can manage the guild channels"""
+    return ctx.channel.permissions_for(ctx.author).manage_channels or await ctx.bot.get_cog('Admin').check_if_god(ctx)
 
 async def has_embed_links(ctx: MyContext) -> bool:
     """... if someone can send embeds"""
