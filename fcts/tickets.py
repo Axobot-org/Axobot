@@ -461,13 +461,12 @@ class Tickets(commands.Cog):
 
     @tickets_topics.command(name="remove")
     @commands.cooldown(3, 45, commands.BucketType.guild)
-    async def topic_remove(self, ctx: MyContext, topic_id: Optional[int]):
+    async def topic_remove(self, ctx: MyContext):
         "Permanently delete a topic by its name"
-        if not topic_id or not await self.db_topic_exists(ctx.guild.id, topic_id):
-            topic_id = await self.ask_user_topic(ctx)
-            if topic_id is None:
-                await ctx.send(await self.bot._(ctx.guild.id, "errors.unknown"))
-                return
+        topic_id = await self.ask_user_topic(ctx)
+        if topic_id is None:
+            await ctx.send(await self.bot._(ctx.guild.id, "errors.unknown"))
+            return
         topic = await self.db_get_topic_with_defaults(ctx.guild.id, topic_id)
         if await self.db_delete_topic(ctx.guild.id, topic_id):
             await ctx.send(await self.bot._(ctx.guild.id, "tickets.topic.deleted", name=topic["topic"]))
