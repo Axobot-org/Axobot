@@ -355,7 +355,7 @@ class Tickets(commands.Cog):
         pass
 
     @tickets_main.group(name="portal")
-    @commands.check(checks.has_manage_guild)
+    @commands.check(checks.has_manage_channels)
     async def tickets_portal(self, ctx: MyContext):
         "Handle how your members are able to open tickets"
         pass
@@ -440,7 +440,7 @@ class Tickets(commands.Cog):
 
 
     @tickets_main.group(name="topic")
-    @commands.check(checks.has_manage_guild)
+    @commands.check(checks.has_manage_channels)
     async def tickets_topics(self, ctx: MyContext):
         "Handle the different ticket topics your members can select"
         pass
