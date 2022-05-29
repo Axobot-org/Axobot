@@ -137,10 +137,18 @@ class Tickets(commands.Cog):
             topic_id: int = int(interaction.data['values'][0])
             topic = await self.db_get_topic_with_defaults(interaction.guild_id, topic_id)
             if topic is None:
-                await interaction.response.send_message(await self.bot._(interaction.guild_id, "errors.unknown"))
+                if topic_id == -1 and await self.db_get_guild_default_id(interaction.guild_id) is None:
+                    await self.db_set_guild_default_id(interaction.guild_id)
+                    topic = await self.db_get_topic_with_defaults(interaction.guild_id, topic_id)
+            if topic is None:
+                await interaction.response.send_message(await self.bot._(interaction.guild_id, "errors.unknown"), ephemeral=True)
+                raise Exception("No topic found on guild %s with interaction %s", interaction.guild_id, topic_id)
+            if topic['category'] is None:
+                await interaction.response.send_message(await self.bot._(interaction.guild_id, "tickets.missing-category-config"), ephemeral=True)
                 return
-            if (cooldown := self.cooldowns.get(interaction.user)) and cooldown - time.time() < 120:
-                await interaction.response.send_message(await self.bot._(interaction.guild_id, "tickets.too-quick"))
+            if (cooldown := self.cooldowns.get(interaction.user)) and time.time() - cooldown < 120:
+                print(cooldown - time.time())
+                await interaction.response.send_message(await self.bot._(interaction.guild_id, "tickets.too-quick"), ephemeral=True)
                 return
             if topic['hint']:
                 hint_view = SendHintText(interaction.user.id,
@@ -318,7 +326,8 @@ class Tickets(commands.Cog):
         "Create the ticket once the user has provided every required info"
         category = interaction.guild.get_channel(topic['category'])
         if category is None:
-            return
+            raise Exception('No category configured for guild %s and topic %s', interaction.guild_id, topic['topic'])
+        sent_error = False
         if isinstance(category, discord.CategoryChannel):
             try:
                 channel = await category.create_text_channel(str(interaction.user))
@@ -329,6 +338,7 @@ class Tickets(commands.Cog):
                 await self.setup_ticket_channel(channel, topic, interaction.user)
             except discord.Forbidden:
                 await self.send_missing_permissions_err(interaction, category.name)
+                sent_error = True
         elif isinstance(category, discord.TextChannel):
             try:
                 if "PRIVATE_THREADS" in interaction.guild.features and category.permissions_for(interaction.guild.me).create_private_threads:
@@ -344,7 +354,11 @@ class Tickets(commands.Cog):
             self.bot.log.error("[ticket] unknown category type: %s", type(category))
             return
         topic['topic'] = topic['topic'] or await self.bot._(interaction.guild_id, "tickets.other")
-        await interaction.edit_original_message(content=await self.bot._(interaction.guild_id, "tickets.ticket-created", channel=channel.mention, topic=topic['topic']))
+        msg = content=await self.bot._(interaction.guild_id, "tickets.ticket-created", channel=channel.mention, topic=topic['topic'])
+        if sent_error:
+            await interaction.followup.send(msg, ephemeral=True)
+        else:
+            await interaction.edit_original_message(msg)
         await channel.send(embed=await self.create_channel_first_message(interaction, topic, ticket_name))
 
 
