@@ -943,7 +943,7 @@ The 'reasons' parameter is used to display the mute reasons.
             await self.bot.get_cog('Help').help_command(ctx,['emoji'])
 
     @emoji_group.command(name="rename")
-    @commands.check(checks.has_admin)
+    @commands.check(checks.has_manage_emojis)
     async def emoji_rename(self, ctx: MyContext, emoji: discord.Emoji, name: str):
         """Rename an emoji
 
@@ -960,7 +960,7 @@ The 'reasons' parameter is used to display the mute reasons.
         await ctx.send(await self.bot._(ctx.guild.id, "moderation.emoji.renamed", emoji=emoji))
 
     @emoji_group.command(name="restrict")
-    @commands.check(checks.has_admin)
+    @commands.check(checks.has_manage_emojis)
     async def emoji_restrict(self, ctx: MyContext, emoji: discord.Emoji, roles: commands.Greedy[Union[discord.Role, args.litteral('everyone')]]):
         """Restrict the use of an emoji to certain roles
 
@@ -1006,7 +1006,7 @@ The 'reasons' parameter is used to display the mute reasons.
             pass
 
     @emoji_group.command(name="info")
-    @commands.check(checks.has_manage_msg)
+    @commands.check(checks.has_manage_emojis)
     async def emoji_info(self, ctx: MyContext, emoji: discord.Emoji):
         """Get info about an emoji
         This is only an alias or `info emoji`
