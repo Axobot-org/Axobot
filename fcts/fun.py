@@ -33,7 +33,7 @@ if typing.TYPE_CHECKING:
 
 cmds_list = ['count_msg', 'ragequit', 'pong', 'run', 'nope', 'blame', 'party', 'bigtext', 'shrug', 'gg', 'money', 'pibkac',
              'osekour', 'me', 'kill', 'cat', 'happy-birthday', 'rekt', 'thanos', 'nuke', 'pikachu', 'pizza', 'google',
-             'loading', 'piece', 'roll', 'afk', 'bubble-wrap', 'reverse']
+             'loading', 'piece', 'roll', 'afk', 'bubble-wrap', 'reverse', 'wink']
 
 
 async def can_say(ctx: MyContext):
@@ -312,7 +312,7 @@ You can specify a verification limit by adding a number in argument (up to 1.000
         elif r == 5:
             await ctx.send(file=await self.utilities.find_img('cameleon.gif'))
 
-    @commands.command(name="cat",hidden=True)
+    @commands.command(name="cat", hidden=True)
     @commands.check(is_fun_enabled)
     async def cat_gif(self, ctx: MyContext):
         """Wow... So cuuuute !
@@ -338,6 +338,19 @@ You can specify a verification limit by adding a number in argument (up to 1.000
         'https://tenor.com/view/celebracion-gif-4928008',
         'https://tenor.com/view/kitty-birthday-birthday-kitty-happy-birthday-happy-birthday-to-you-hbd-gif-13929089',
         'https://tenor.com/view/happy-birthday-happy-birthday-to-you-hbd-birthday-celebrate-gif-13366300']))
+
+    @commands.command(name="wink", hidden=True)
+    @commands.check(is_fun_enabled)
+    async def wink_gif(self, ctx: MyContext):
+        "Haha so funny"
+        await ctx.send(random.choice([
+            'https://tenor.com/view/dr-strange-wink-smirk-trust-me-gif-24332472',
+            'https://tenor.com/view/wink-smile-laugh-wandavision-gif-20321476',
+            'https://tenor.com/view/rowan-atkinson-mr-bean-trying-to-flirt-wink-gif-16439423',
+            'https://tenor.com/view/winking-james-franco-actor-wink-handsome-gif-17801047',
+            'https://tenor.com/view/clin-doeil-wink-playboy-wink-funny-wink-clin-oeil-gif-24871407',
+            'https://tenor.com/view/wink-got-it-dude-rocket-raccoon-hint-gotcha-gif-23822337'
+        ]))
 
     @commands.command(name="bigtext",hidden=True)
     @commands.check(is_fun_enabled)
