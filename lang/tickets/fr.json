@@ -22,7 +22,7 @@
             "thread": "Oups, je n'ai pas pu créer de fil pour votre. Assurez-vous que j'ai les permissions nécessaires et réessayez."
         },
         "missing-perms-setup": {
-            "to-staff": "Oups, je n'ai pas pu configurer les permissions du salon pour votre ticket. Veuillez vous assurer que j'ai le rôle \"Gérer les permissions\" dans la catégorie %{category}, sinon toute personne ayant accès à cette catégorie pourrait voir les nouveaux tickets.",
+            "to-staff": "Oups, je n'ai pas pu configurer les permissions du salon pour votre ticket. Veuillez vous assurer que j'ai la permission \"Gérer les rôles\" dans la catégorie %{category}, sinon toute personne ayant accès à cette catégorie pourrait voir les nouveaux tickets.",
             "to-member": "Oups, je n'ai pas pu configurer correctement le salon de votre ticket. Veuillez demander à un modérateur de serveur de corriger mes permissions, sinon toute personne ayant accès à la catégorie des tickets pourrait être en mesure de lire votre ticket."
         },
         "nothing-to-edit": "Rien à modifier !",
