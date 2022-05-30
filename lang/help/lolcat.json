@@ -81,6 +81,10 @@
                 "U haz \"Embed links\" thing",
                 "U need 2 b \"Embed links\" perms"
             ],
+            "has_manage_emojis": [
+                "U haz 'Manage smol pictures' permission",
+                "Oops, U need to have the 'Manage smol chat pictures' perm for that"
+            ],
             "has_manage_guild": [
                 "U have 'Manage Server' permission",
                 "'Manage Server' permission missed"
