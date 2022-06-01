@@ -194,27 +194,26 @@ Arguments are:
         except Exception as err:
             await ctx.bot.get_cog('Errors').on_error(err,ctx)
         try:
-            webs = list()
+            webs = []
             for w in await g.webhooks():
-                webs.append({'channel':w.channel_id,'name':w.name,'avatar':w.avatar.url,'url':w.url})
+                webs.append({
+                    'channel': w.channel_id,
+                    'name': w.name,
+                    'avatar': w.avatar.url if w.avatar else None,
+                    'url': w.url
+                })
             back['webhooks'] = webs
         except discord.errors.Forbidden:
             pass
         except Exception as err:
             await ctx.bot.get_cog('Errors').on_error(err,ctx)
-        back['members'] = list()
+        back['members'] = []
         for memb in g.members:
             back['members'].append({'id': memb.id,
                 'nickname': memb.nick,
                 'bot': memb.bot,
                 'roles': [x.id for x in memb.roles][1:] })
         return json.dumps(back, sort_keys=True, indent=4)
-        # directory = 'backup/{}.json'.format(g.id)
-        # if not os.path.exists('backup/'):
-        #     os.makedirs('backup/')
-        # with open(directory,'w',encoding='utf-8') as file:
-        #     file.write(js)
-        #     return directory
 
     # ----------
 
