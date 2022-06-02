@@ -25,6 +25,7 @@ A translation of the Zbot Privacy Policy has been added to `this page <privacy.h
    perms
    moderator
    server
+   tickets
    user
    infos
    minecraft
