@@ -5,11 +5,23 @@ from discord.ext import commands
 from libs.classes import MyContext, Zbot
 from libs.paginator import cut_text
 
-AcceptableChannelTypes = typing.Optional[typing.Union[
-    discord.TextChannel,
+if typing.TYPE_CHECKING:
+    from fcts.emojis import Emojis
+
+VoiceChannelTypes = typing.Union[
     discord.VoiceChannel,
+    discord.StageChannel
+]
+
+TextChannelTypes = typing.Union[
+    discord.TextChannel,
     discord.CategoryChannel,
     discord.Thread
+]
+
+AcceptableChannelTypes = typing.Optional[typing.Union[
+    VoiceChannelTypes,
+    TextChannelTypes
 ]]
 AcceptableTargetTypes = typing.Optional[typing.Union[
     discord.Member,
@@ -27,6 +39,38 @@ class Perms(commands.Cog):
             'text':[key for key,value in discord.Permissions().text() if value],
             'voice':[key for key,value in discord.Permissions().voice() if value]}
         self.perms_name['common_channel'] = [x for x in chan_perms if x in self.perms_name['general']]
+
+    async def collect_permissions(self, ctx: MyContext, permissions: discord.Permissions, channel) -> list[tuple[str, str]]:
+        "Iterate over the given permissions and return the needed ones, formatted"
+        result = []
+        emojis_cog: 'Emojis' = self.bot.get_cog('Emojis')
+        # if target is admin, only display that
+        if permissions.administrator:
+            perm_tr = await self.bot._(ctx.guild.id, "permissions.list.administrator")
+            if "permissions.list." in perm_tr: # unsuccessful translation
+                perm_tr = "Administrator"
+            return [(emojis_cog.customs['green_check'], perm_tr)]
+        # else
+        common_perms = self.perms_name['common_channel']
+        text_perms = self.perms_name['text'] + common_perms
+        voice_perms = self.perms_name['voice'] + common_perms
+        for perm_id, value in permissions:
+            if not (
+                channel is None
+                or
+                (perm_id in text_perms and isinstance(channel, typing.get_args(TextChannelTypes)))
+                or
+                (perm_id in voice_perms and isinstance(channel, typing.get_args(VoiceChannelTypes)))
+            ):
+                continue
+            perm_tr = await self.bot._(ctx.guild.id, "permissions.list."+perm_id)
+            if "permissions.list." in perm_tr:  # unsuccessful translation
+                perm_tr = perm_id.replace('_', ' ').title()
+            if value:
+                result.append((emojis_cog.customs['green_check'], perm_tr))
+            else:
+                result.append((emojis_cog.customs['red_cross'], perm_tr))
+        return result
 
     @commands.command(name='perms', aliases=['permissions'])
     @commands.guild_only()
@@ -59,34 +103,17 @@ class Perms(commands.Cog):
             name = str(target)
         else:
             return
-        permsl: list[str] = []
 
-        if perms.administrator:
-            # If the user is admin, we just say it
-            perm_tr = await self.bot._(ctx.guild.id, "permissions.list.administrator")
-            if "permissions.list." in perm_tr: # unsuccessful translation
-                perm_tr = "Administrator"
-            permsl.append(self.bot.get_cog('Emojis').customs['green_check'] + perm_tr)
-        else:
-            # Here we check if the value of each permission is True.
-            for perm_id, value in perms:
-                if (perm_id not in self.perms_name['text']+self.perms_name['common_channel'] and isinstance(channel,discord.abc.Messageable)) or (perm_id not in self.perms_name['voice']+self.perms_name['common_channel'] and isinstance(channel,discord.VoiceChannel)):
-                    continue
-                #perm = perm.replace('_',' ').title()
-                perm_tr = await self.bot._(ctx.guild.id, "permissions.list."+perm_id)
-                if "permissions.list." in perm_tr: # unsuccessful translation
-                    perm_tr = perm_id.replace('_',' ').title()
-                if value:
-                    permsl.append(self.bot.get_cog('Emojis').customs['green_check'] + perm_tr)
-                else:
-                    permsl.append(self.bot.get_cog('Emojis').customs['red_cross'] + perm_tr)
+        perms_list = await self.collect_permissions(ctx, perms, channel)
+        perms_list.sort(key=lambda x: x[1])
+        perms_list = [''.join(perm) for perm in perms_list]
         if ctx.can_send_embed:
             if channel is None:
                 desc = await self.bot._(ctx.guild.id, "permissions.general")
             else:
                 desc = channel.mention
             embed = discord.Embed(color=col, description=desc)
-            paragraphs = cut_text(permsl, max_size=21)
+            paragraphs = cut_text(perms_list, max_size=21)
             for paragraph in paragraphs:
                 embed.add_field(name=self.bot.zws, value=paragraph)
 
@@ -97,7 +124,7 @@ class Perms(commands.Cog):
             embed.set_footer(text=ctx.author, icon_url=ctx.author.display_avatar)
             await ctx.send(embed=embed)
         else:
-            txt = await self.bot._(ctx.guild.id,"permissions.title", name=name) + "\n".join(permsl)
+            txt = await self.bot._(ctx.guild.id,"permissions.title", name=name) + "\n".join(perms_list)
             allowed_mentions = discord.AllowedMentions.none()
             await ctx.send(txt, allowed_mentions=allowed_mentions)
 

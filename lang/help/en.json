@@ -85,6 +85,10 @@
                 "You have the 'Manage channels' permissions",
                 "'Manage channels' permission missing"
             ],
+            "has_manage_emojis": [
+                "You have the 'Manage emojis' permission",
+                "You need to have the 'Manage emojis' permission"
+            ],
             "has_manage_guild": [
                 "You have 'Manage Server' permission",
                 "'Manage Server' permission missing"
