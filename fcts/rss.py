@@ -343,10 +343,8 @@ class Rss(commands.Cog):
             # flow name
             flow_name = flow['link']
             if flow['type'] == 'tw' and flow['link'].isnumeric():
-                try:
-                    flow_name = (await self.twitter_rss.get_user_from_id(int(flow['link']))).screen_name
-                except twitter.TwitterError as err:
-                    self.bot.log.debug(f"[rss:askID] Twitter error: {err}")
+                if tw_user := await self.twitter_rss.get_user_from_id(int(flow['link'])):
+                    flow_name = tw_user.screen_name
             elif flow['type'] == 'yt' and (channel_name := self.youtube_rss.get_channel_name_by_id(flow['link'])):
                 flow_name = channel_name
             # send embed
@@ -394,10 +392,8 @@ class Rss(commands.Cog):
                 # better name format (for Twitter/YouTube ID)
                 feed['name'] = feed['link']
                 if feed['type'] == 'tw' and feed['link'].isnumeric():
-                    try:
-                        feed['name'] = (await self.twitter_rss.get_user_from_id(int(feed['link']))).screen_name
-                    except twitter.TwitterError as err:
-                        self.bot.log.debug(f"[rss:askID] Twitter error: {err}")
+                    if user := await self.twitter_rss.get_user_from_id(int(feed['link'])):
+                        feed['name'] = user.screen_name
                 elif feed['type'] == 'yt' and (channel_name := self.youtube_rss.get_channel_name_by_id(feed['link'])):
                     feed['name'] = channel_name
                 # emoji
