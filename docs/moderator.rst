@@ -24,6 +24,11 @@ This command allows you to warn a member, without really sanctioning him. This m
 Mute/Unmute
 -----------
 
+.. warning::
+    This section describes the use of the mute system when coupled with a "muted" role. As of Zbot 4.0.3, having a special role is no longer mandatory, and Zbot will use Discord's "time out" feature when no role has been configured to mute.  
+
+    If you have a role set to mute but wish to switch to the time out system, you can use the :code:`config reset muted_role` command.
+
 **Syntax:** :code:`mute <user> [duration] [reason]`
 
 This command mutes a member, preventing them from typing. 
@@ -34,7 +39,7 @@ The duration of the tempmute is quite flexible: use :code:`XXd` for days, :code:
 
 .. warning:: The muted role must be placed below the bot role, and the bot must have "`Manage roles <perms.html#manage-roles>`__" (to give the role) permission.
 
-.. note:: Zbot remembers when a member is muted in your server, and only erases this information when someone uses the !unmute command. So, if a member tries to lose his "muted" role by leaving and joining the server, Zbot will give him back his role, even if you removed it manually (without the command)!
+.. note:: Zbot remembers when a member is muted in your server, and only delete this information when someone uses the !unmute command. So, if a member tries to lose his "muted" role by leaving and joining the server, Zbot will give him back his role, even if you removed it manually (without the command)!
 
 **Syntax:** :code:`unmute <user>`
 
@@ -288,7 +293,7 @@ With this command, you can become the undisputed master of the Emojis and handle
 
 
 
-.. warning:: The bot needs the `Manage Emojis <perms.html#manage-emojis>`__ permission to edit these pretty little pictures. And you, you need Administrator permission to use these commands.
+.. warning:: The bot needs the `Manage Emojis <perms.html#manage-emojis>`__ permission to edit these pretty little pictures. And you, you need the "Manage emojis" permission to use these commands.
 
 
 Role Manager

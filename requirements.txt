@@ -1,4 +1,4 @@
-discord.py @ git+https://github.com/Rapptz/discord.py.git@e541be0427101a4437ad777b7f1a692cc5b75e55
+discord.py @ git+https://github.com/Rapptz/discord.py.git@5a06fa5f3e28d2b7191722e1a84c541560008aea
 aiohttp
 mysql-connector-python>=8.0
 frmc-lib @ git+https://github.com/ZRunner/fr-mc-python-lib.git@v1.0.6
@@ -11,7 +11,7 @@ python-twitter>=3.5
 isbnlib
 pytz
 psutil>=5.8
-speedtest-cli
+speedtest-cli>=2.1.3
 feedparser>=6.0
 google-api-python-client
 Babel>=2.9

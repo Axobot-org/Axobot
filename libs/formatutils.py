@@ -39,7 +39,8 @@ class FormatUtils:
             delta = timedelta(seconds=date1)
         else:
             delta: timedelta = abs(date2 - date1)
-        delta: float = delta.total_seconds()
+        # convert delta to a number of seconds
+        delta: int = round(delta.total_seconds())
 
         kwargs = {
             "threshold": 100000,

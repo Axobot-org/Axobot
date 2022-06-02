@@ -33,7 +33,7 @@ if typing.TYPE_CHECKING:
 
 cmds_list = ['count_msg', 'ragequit', 'pong', 'run', 'nope', 'blame', 'party', 'bigtext', 'shrug', 'gg', 'money', 'pibkac',
              'osekour', 'me', 'kill', 'cat', 'happy-birthday', 'rekt', 'thanos', 'nuke', 'pikachu', 'pizza', 'google',
-             'loading', 'piece', 'roll', 'afk', 'bubble-wrap', 'reverse']
+             'loading', 'piece', 'roll', 'afk', 'bubble-wrap', 'reverse', 'wink']
 
 
 async def can_say(ctx: MyContext):
@@ -312,17 +312,20 @@ You can specify a verification limit by adding a number in argument (up to 1.000
         elif r == 5:
             await ctx.send(file=await self.utilities.find_img('cameleon.gif'))
 
-    @commands.command(name="cat",hidden=True)
+    @commands.command(name="cat", hidden=True)
     @commands.check(is_fun_enabled)
     async def cat_gif(self, ctx: MyContext):
         """Wow... So cuuuute !
 
         ..Doc fun.html#cat"""
-        await ctx.send(random.choice(['http://images6.fanpop.com/image/photos/40800000/tummy-rub-kitten-animated-gif-cute-kittens-40838484-380-227.gif',
-        'http://25.media.tumblr.com/7774fd7794d99b5998318ebd5438ba21/tumblr_n2r7h35U211rudcwro1_400.gif',
-        'https://www.2tout2rien.fr/wp-content/uploads/2014/10/37-pestes-de-chats-mes-bonbons.gif',
-        'http://coquelico.c.o.pic.centerblog.net/chat-peur.gif',
-        'https://tenor.com/view/nope-bye-cat-leave-done-gif-12387359']))
+        await ctx.send(random.choice([
+            'http://images6.fanpop.com/image/photos/40800000/tummy-rub-kitten-animated-gif-cute-kittens-40838484-380-227.gif',
+            'http://25.media.tumblr.com/7774fd7794d99b5998318ebd5438ba21/tumblr_n2r7h35U211rudcwro1_400.gif',
+            'https://tenor.com/view/seriously-seriously-cat-cat-really-cat-really-look-cat-look-gif-22182662',
+            'https://tenor.com/view/mybc-gif-24798373',
+            'http://coquelico.c.o.pic.centerblog.net/chat-peur.gif',
+            'https://tenor.com/view/nope-bye-cat-leave-done-gif-12387359'
+        ]))
 
     @commands.command(name="happy-birthday", hidden=True, aliases=['birthday', 'hb'])
     @commands.check(is_fun_enabled)
@@ -335,6 +338,19 @@ You can specify a verification limit by adding a number in argument (up to 1.000
         'https://tenor.com/view/celebracion-gif-4928008',
         'https://tenor.com/view/kitty-birthday-birthday-kitty-happy-birthday-happy-birthday-to-you-hbd-gif-13929089',
         'https://tenor.com/view/happy-birthday-happy-birthday-to-you-hbd-birthday-celebrate-gif-13366300']))
+
+    @commands.command(name="wink", hidden=True)
+    @commands.check(is_fun_enabled)
+    async def wink_gif(self, ctx: MyContext):
+        "Haha so funny"
+        await ctx.send(random.choice([
+            'https://tenor.com/view/dr-strange-wink-smirk-trust-me-gif-24332472',
+            'https://tenor.com/view/wink-smile-laugh-wandavision-gif-20321476',
+            'https://tenor.com/view/rowan-atkinson-mr-bean-trying-to-flirt-wink-gif-16439423',
+            'https://tenor.com/view/winking-james-franco-actor-wink-handsome-gif-17801047',
+            'https://tenor.com/view/clin-doeil-wink-playboy-wink-funny-wink-clin-oeil-gif-24871407',
+            'https://tenor.com/view/wink-got-it-dude-rocket-raccoon-hint-gotcha-gif-23822337'
+        ]))
 
     @commands.command(name="bigtext",hidden=True)
     @commands.check(is_fun_enabled)
@@ -447,14 +463,14 @@ You can specify a verification limit by adding a number in argument (up to 1.000
         if channel is None:
             channel = ctx.channel
         elif not (channel.permissions_for(ctx.author).read_messages and channel.permissions_for(ctx.author).send_messages and channel.guild == ctx.guild):
-            await ctx.send(await self.bot._(ctx.guild, 'fun', 'say-no-perm', channel=channel.mention))
+            await ctx.send(await self.bot._(ctx.guild, 'fun.say-no-perm', channel=channel.mention))
             return
         if self.bot.zombie_mode:
             return
         if m := re.search(r"(?:i am|i'm) ([\w\s]+)", text, re.DOTALL | re.IGNORECASE):
             if m.group(1).lower() != "a bot":
                 first_words = ['dumb', 'really dumb','stupid', 'gay', 'idiot', 'shit', 'trash']
-                words = list()
+                words = []
                 for w in first_words:
                     words += [w, w+' bot', w.upper()]
                 if word := get_close_matches(m.group(1), words, n=1, cutoff=0.8):
