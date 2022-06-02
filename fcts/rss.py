@@ -456,7 +456,7 @@ class Rss(commands.Cog):
             if flow['roles'] == '':
                 text = await self.bot._(ctx.guild.id, "rss.no-roles")
             else:
-                r = list()
+                r = []
                 for item in flow['roles'].split(';'):
                     role = discord.utils.get(ctx.guild.roles,id=int(item))
                     if role is not None:
@@ -464,7 +464,7 @@ class Rss(commands.Cog):
                     else:
                         r.append(item)
                 r = ", ".join(r)
-                text = await self.bot._(ctx.guild.id,"rss.role.list", roles=r)
+                text = await self.bot._(ctx.guild.id,"rss.roles.list", roles=r)
             # ask for roles
             embed = discord.Embed(title=await self.bot._(ctx.guild.id, "rss.choose-roles"), color=discord.Colour(0x77ea5c), description=text, timestamp=ctx.message.created_at)
             emb_msg = await ctx.send(embed=embed)

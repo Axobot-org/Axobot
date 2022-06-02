@@ -1,0 +1,54 @@
+{
+    "fr": {
+        "category-edited": {
+            "default-category": "Les nouveaux tickets seront créés en tant que nouveaux salons dans la catégorie %{category} !",
+            "default-channel": "Les nouveaux tickets seront créés en tant que fils dans le salon %{channel} !",
+            "category-permission-warning": "Il semble que je n'ai pas la permission de créer de nouveaux salons dans cette catégorie. Vous pouvez corriger cela en me donnant la permission de **'Gérer les salons'**, ou je ne serais pas en mesure de créer de ticket du tout.",
+            "channel-privacy-warning": "Il semble que je ne puisse pas créer de fils privés dans ce salon. Assurez-vous de les avoir **débloqué** et de m'avoir donné la **permission requise**. Sans cela je créerai des fils publics et n'importe qui pourrait être en mesure de les lire."
+        },
+        "cancelled": "L'opération a été annulée",
+        "choose-topic-edition": "Choisissez le topic à modifier",
+        "default-topic-prompt": "Sélectionnez une catégorie de tickets",
+        "emote-edited": "L'émoji du topic \"%{topic}\" a été modifié !",
+        "hint-edited": {
+            "default": "L'aide par défaut a bien été modifiée !",
+            "topic": "L'aide pour le topic \"%{topic}\" a bien été modifiée !"
+        },
+        "hint-useful": "Je n'en ai plus besoin",
+        "hint-useless": "Ouvre un ticket",
+        "missing-category-config": "Oups, je n'ai pas pu créer votre ticket parce que personne ne m'a dit où les créer. Vous devriez demander à un modérateur du serveur d'utiliser la commande `tickets portal set-category`.",
+        "missing-perms-creation": {
+            "channel": "Oups, je n'ai pas pu créer de salon pour votre ticket. Assurez-vous que j'ai les permissions nécessaires et réessayez.",
+            "thread": "Oups, je n'ai pas pu créer de fil pour votre. Assurez-vous que j'ai les permissions nécessaires et réessayez."
+        },
+        "missing-perms-setup": {
+            "to-staff": "Oups, je n'ai pas pu configurer les permissions du salon pour votre ticket. Veuillez vous assurer que j'ai la permission \"Gérer les rôles\" dans la catégorie %{category}, sinon toute personne ayant accès à cette catégorie pourrait voir les nouveaux tickets.",
+            "to-member": "Oups, je n'ai pas pu configurer correctement le salon de votre ticket. Veuillez demander à un modérateur de serveur de corriger mes permissions, sinon toute personne ayant accès à la catégorie des tickets pourrait être en mesure de lire votre ticket."
+        },
+        "nothing-to-edit": "Rien à modifier !",
+        "other": "autre",
+        "role-edited": {
+            "default": "Le rôle autorisé à accéder aux tickets par défaut a été modifié !",
+            "topic": "Le rôle autorisé à accéder aux tickets du topic \"%{topic}\" a bien été modifié !"
+        },
+        "selection-placeholder": "Choisissez un topic",
+        "text-edited": "Le message affiché avec la sélection du ticket a été modifié",
+        "ticket-created": "Ticket ouvert dans %{channel} avec le topic \"%{topic}\" !",
+        "ticket-introduction": {
+            "title": "Nouveau ticket créé !",
+            "description": "Bienvenue %{user} dans votre ticket au sujet de '%{ticket_name}' ! Quelqu'un devrais vous répondre dans les plus brefs délais.\nPour rappel, vous avez sélectionné le topic **'%{topic_name}'**"
+        },
+        "title-modal": {
+            "title": "Votre ticket",
+            "label": "Votre sujet",
+            "placeholder": "Entrez ici un nom de ticket pertinent"
+        },
+        "too-quick": "Vous ouvrez des tickets trop vite ! Veuillez attendre quelques minutes entre deux tickets",
+        "topic": {
+            "too-long": "Le nom du topic ne peut excéder 100 caractères",
+            "cant-create": "Oups, impossible de créer ce topic. Assurez-vous de ne pas déjà avoir un topic avec ce nom, et contactez le support du bot si nécessaire",
+            "created": "Le topic \"%{name}\" a bien été créé",
+            "deleted": "Le topic \"%{name}\" a bien été supprimé"
+        }
+    }
+}
