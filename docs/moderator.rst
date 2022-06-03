@@ -261,6 +261,8 @@ To see in Discord which logs exists and which ones you have enabled in your serv
 Types of logs
 -------------
 
+* **antiraid:** A new member is kicked or banned by the raid detection system
+* **antiscan:** A message is flagged as a potential scam by the antiscam AI
 * **member_roles:** A member gets or loses roles
 * **member_nick:** A member has its nickname changed
 * **member_avatar:** A member changes its guild avatar
@@ -268,6 +270,8 @@ Types of logs
 * **member_leave:** A member leaves your server
 * **member_ban:** A user is banned from your server
 * **member_unban:** A user is unbanned from your server
+* **member_timeout:** A member is set on timeout by one of your moderators
+* **member_kick:** A member is kicked from your server
 * **message_update:** A message is edited
 * **message_delete:** A message is deleted
 * **role_creation:** A role is created
