@@ -18,7 +18,7 @@ class ServerLogs(commands.Cog):
     logs_categories = {
         "automod": {"antiraid", "antiscam"},
         "members": {"member_roles", "member_nick", "member_avatar", "member_join", "member_leave"},
-        "moderation": {"member_ban", "member_unban", "member_timeout"},
+        "moderation": {"member_ban", "member_unban", "member_timeout", "member_kick"},
         "messages": {"message_update", "message_delete"},
         "roles": {"role_creation"}
     }
@@ -421,7 +421,9 @@ class ServerLogs(commands.Cog):
     @commands.Cog.listener()
     async def on_member_remove(self, member: discord.Member):
         """Triggered when a member leaves a guild
-        Corresponding log: member_leave"""
+        Corresponding log: member_leave, member_kick"""
+        if not member.guild:
+            return
         if channel_ids := await self.is_log_enabled(member.guild.id, "member_leave"):
             emb = discord.Embed(
                 description=f"**{member.mention} ({member.id}) left your server**",
@@ -439,6 +441,23 @@ class ServerLogs(commands.Cog):
             roles_value = " ".join(r.mention for r in member_roles[:20]) if member_roles else "None"
             emb.add_field(name=f"Roles ({len(member_roles)})", value=roles_value)
             await self.validate_logs(member.guild, channel_ids, emb)
+        if member.guild.me.guild_permissions.view_audit_log and (
+            channel_ids := await self.is_log_enabled(member.guild.id, "member_kick")
+        ):
+            now = self.bot.utcnow()
+            await asyncio.sleep(self.auditlogs_timeout)
+            async for entry in member.guild.audit_logs(limit=5, action=discord.AuditLogAction.kick, oldest_first=False):
+                if entry.target.id == member.id and (entry.created_at - now).total_seconds() < 5:
+                    emb = discord.Embed(
+                        description=f"**{member.mention} ({member.id}) has been kicked**",
+                        colour=discord.Color.red()
+                    )
+                    emb.add_field(name="Kicked by",
+                                  value=f"**{entry.user.mention}** ({entry.user.id})")
+                    emb.add_field(name="With reason",
+                                  value=entry.reason or "No reason specified")
+                    await self.validate_logs(member.guild, channel_ids, emb)
+                    break
 
     @commands.Cog.listener()
     async def on_member_ban(self, guild: discord.Guild, user: discord.User):
