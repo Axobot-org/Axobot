@@ -73,31 +73,31 @@ class BotStats(commands.Cog):
         try:
             # WS events stats
             for k, v in self.received_events.items():
-                cursor.execute(query, (now, 'wsevent.'+k, v, 0, 'event/min', self.bot.beta))
+                cursor.execute(query, (now, 'wsevent.'+k, v, 0, 'event/min', True, self.bot.beta))
                 self.received_events[k] = 0
             # Commands usages stats
             for k, v in self.commands_uses.items():
-                cursor.execute(query, (now, 'cmd.'+k, v, 0, 'cmd/min', self.bot.beta))
+                cursor.execute(query, (now, 'cmd.'+k, v, 0, 'cmd/min', True, self.bot.beta))
             self.commands_uses.clear()
             # RSS stats
             for k, v in self.rss_stats.items():
-                cursor.execute(query, (now, 'rss.'+k, v, 0, k, self.bot.beta))
+                cursor.execute(query, (now, 'rss.'+k, v, 0, k, True, self.bot.beta))
             # XP cards
-            cursor.execute(query, (now, 'xp.generated_cards', self.xp_cards, 0, 'cards/min', self.bot.beta))
+            cursor.execute(query, (now, 'xp.generated_cards', self.xp_cards, 0, 'cards/min', True, self.bot.beta))
             # Latency - RAM usage - CPU usage
             latency = round(self.bot.latency*1000, 3)
             ram = round(py.memory_info()[0]/2.**30, 3)
             cpu = py.cpu_percent(interval=1)
             if not isinf(latency):
-                cursor.execute(query, (now, 'perf.latency', latency, 1, 'ms', self.bot.beta))
-            cursor.execute(query, (now, 'perf.ram', ram, 1, 'Gb', self.bot.beta))
-            cursor.execute(query, (now, 'perf.cpu', cpu, 1, '%', self.bot.beta))
+                cursor.execute(query, (now, 'perf.latency', latency, 1, 'ms', False, self.bot.beta))
+            cursor.execute(query, (now, 'perf.ram', ram, 1, 'Gb', False, self.bot.beta))
+            cursor.execute(query, (now, 'perf.cpu', cpu, 1, '%', False, self.bot.beta))
             # Unavailable guilds
             unav, total = 0, 0
             for guild in self.bot.guilds:
                 unav += guild.unavailable
                 total += 1
-            cursor.execute(query, (now, 'guilds.unavailable', round(unav/total, 3)*100, 1, '%', self.bot.beta))
+            cursor.execute(query, (now, 'guilds.unavailable', round(unav/total, 3)*100, 1, '%', False, self.bot.beta))
             del unav, total
             # Push everything
             cnx.commit()
