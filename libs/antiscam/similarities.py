@@ -24,8 +24,7 @@ def check_message(message: str) -> int:
     score = 0
     message = normalize_unicode(message)
     for link in search_links(message):
-        if link.startswith('www.'):
-            link = link.replace('www.', '', 1)
+        link = ".".join(link.split('.')[-2:])
         score += check_url_similarity(link)
     return max(score,0)
 
