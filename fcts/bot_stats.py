@@ -84,6 +84,7 @@ class BotStats(commands.Cog):
                 cursor.execute(query, (now, 'rss.'+k, v, 0, k, True, self.bot.beta))
             # XP cards
             cursor.execute(query, (now, 'xp.generated_cards', self.xp_cards, 0, 'cards/min', True, self.bot.beta))
+            self.xp_cards = 0
             # Latency - RAM usage - CPU usage
             latency = round(self.bot.latency*1000, 3)
             ram = round(py.memory_info()[0]/2.**30, 3)
