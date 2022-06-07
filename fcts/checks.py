@@ -65,6 +65,9 @@ async def has_manage_guild(ctx: MyContext) -> bool:
     """... if someone can manage the server"""
     return ctx.channel.permissions_for(ctx.author).manage_guild or await ctx.bot.get_cog('Admin').check_if_god(ctx)
 
+async def has_audit_logs(ctx: MyContext) -> bool:
+    """... if someone can see server audit logs"""
+    return ctx.channel.permissions_for(ctx.author).view_audit_log or await ctx.bot.get_cog('Admin').check_if_god(ctx)
 
 async def has_manage_roles(ctx: MyContext) -> bool:
     """... if someone can manage the roles"""

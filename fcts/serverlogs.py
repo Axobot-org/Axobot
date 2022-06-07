@@ -131,7 +131,7 @@ class ServerLogs(commands.Cog):
 
     @commands.group(name="modlogs")
     @commands.guild_only()
-    @commands.check(checks.has_manage_guild)
+    @commands.check(checks.has_audit_logs)
     @commands.cooldown(2, 6, commands.BucketType.guild)
     async def modlogs_main(self, ctx: MyContext):
         """Enable or disable server logs in specific channels"""
