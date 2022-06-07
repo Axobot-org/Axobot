@@ -93,6 +93,10 @@
                 "Vous avez la permission 'Gérer le serveur'",
                 "Permission 'Gérer le serveur' manquante"
             ],
+            "has_audit_logs": [
+                "Vous avez la permission de 'Voir les logs du serveur'",
+                "Permission de 'Voir les logs du serveur' manquante"
+            ],
             "has_manage_msg": [
                 "Vous avez la permission 'Gérer les messages'",
                 "Permission 'Gérer les messages' manquante"

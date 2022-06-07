@@ -93,6 +93,10 @@
                 "U have 'Manage Server' permission",
                 "'Manage Server' permission missed"
             ],
+            "has_audit_logs": [
+                "U have 'Audit logs' perm",
+                "'View Audit Logs' perm required :/"
+            ],
             "has_manage_msg": [
                 "You have 'Manage Messages' permission",
                 "'Manage Messages' permission missed"
