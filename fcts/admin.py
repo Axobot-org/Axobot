@@ -204,9 +204,9 @@ class Admin(commands.Cog):
             ephemeral=False)
         await confirm_view.init()
         if max([len(x) for x in self.update.values()]) > 1900//len(self.update.keys()):
-            for lang, value in self.update.items():
-                text += f"\n{lang}:```\n{value}\n```"
-                await ctx.send(text, view=confirm_view)
+            for i, lang in enumerate(self.update.keys()):
+                text += f"\n{lang}:```\n{self.update.get(lang)}\n```"
+                await ctx.send(text, view=confirm_view if i == len(self.update)-1 else None)
                 text = ''
         else:
             text += "\n"+"\n".join([f"{lang}:\n```\n{value}\n```" for lang, value in self.update.items()])
