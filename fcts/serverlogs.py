@@ -582,7 +582,7 @@ class ServerLogs(commands.Cog):
                 min_age = await FormatUtils.time_delta(account_creation_treshold, hour=(account_creation_treshold<86400))
                 delta = await FormatUtils.time_delta(member.created_at, self.bot.utcnow(), hour=True)
                 value = f"Account created at <t:{member.created_at.timestamp():.0f}> ({delta})\n\
-                    Minimum age required by anti-raid: {min_age}"
+Minimum age required by anti-raid: {min_age}"
                 emb.add_field(name="Account was too recent", value=value, inline=False)
             if "discord_invite" in data:
                 emb.add_field(name="Contains a Discord invite in their username", value=self.bot.zws, inline=False)
@@ -605,7 +605,7 @@ class ServerLogs(commands.Cog):
                     account_creation_treshold, hour=(account_creation_treshold < 86400))
                 delta = await FormatUtils.time_delta(member.created_at, self.bot.utcnow(), hour=True)
                 value = f"Account created at <t:{member.created_at.timestamp():.0f}> ({delta})\n\
-                    Minimum age required by anti-raid: {min_age}"
+Minimum age required by anti-raid: {min_age}"
                 emb.add_field(name="Account was too recent", value=value, inline=False)
             if "discord_invite" in data:
                 emb.add_field(name="Contains a Discord invite in their username", value=self.bot.zws, inline=False)
