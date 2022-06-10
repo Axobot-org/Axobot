@@ -320,7 +320,7 @@ class Rss(commands.Cog):
             return
         title = await self.bot._(ctx.guild.id, "rss.list-title", server=ctx.guild.name)
         translation = await self.bot._(ctx.guild.id, "rss.list-result")
-        flows_to_display = list()
+        flows_to_display: list[str] = []
         for flow in flows_list:
             channel = self.bot.get_channel(flow['channel'])
             if channel is not None:
@@ -339,9 +339,8 @@ class Rss(commands.Cog):
                     else:
                         roles.append(item)
                 roles = ", ".join(roles)
-            flow_type = await self.bot._(ctx.guild.id,"rss."+flow['type'])
             # flow name
-            flow_name = flow['link']
+            flow_name: str = flow['link']
             if flow['type'] == 'tw' and flow['link'].isnumeric():
                 if tw_user := await self.twitter_rss.get_user_from_id(int(flow['link'])):
                     flow_name = tw_user.screen_name
@@ -355,7 +354,18 @@ class Rss(commands.Cog):
                     embed.add_field(name=self.bot.zws, value=text, inline=False)
                 await ctx.send(embed=embed)
                 flows_to_display.clear()
-            flows_to_display.append(translation.format(flow_type,channel,flow_name,roles,flow['ID'],flow['date']))
+            if flow['date']:
+                last_date = f"<t:{flow['date'].timestamp():.0f}>"
+            else:
+                last_date = await self.bot._(ctx.guild.id, "misc.none")
+            flows_to_display.append(translation.format(
+                emoji=get_emoji(self.bot.get_cog('Emojis'), flow['type']),
+                channel=channel,
+                link=flow_name if flow_name.startswith('https') else f"**{flow_name}**",
+                roles=roles,
+                id=flow['ID'],
+                last_post=last_date
+            ))
         if len(flows_to_display) > 0:
             embed = discord.Embed(title=title, color=self.embed_color, timestamp=ctx.message.created_at)
             embed.set_footer(text=ctx.author, icon_url=ctx.author.display_avatar)
@@ -1176,7 +1186,7 @@ class Rss(commands.Cog):
                 await self.bot.get_cog('Errors').on_error(e,None)
             await asyncio.sleep(self.time_between_flows_check)
         await session.close()
-        self.bot.get_cog('Minecraft').flows = dict()
+        self.bot.get_cog('Minecraft').flows.clear()
         d = ["**RSS loop done** in {}s ({}/{} flows)".format(round(time.time()-t,3),check,len(liste))]
         if guildID is None:
             if statscog := self.bot.get_cog("BotStats"):
@@ -1193,7 +1203,7 @@ class Rss(commands.Cog):
         if guildID is None:
             self.loop_processing = False
         self.twitter_over_capacity = False
-        self.cache = dict()
+        self.cache.clear()
 
     @tasks.loop(minutes=20)
     async def loop_child(self):
