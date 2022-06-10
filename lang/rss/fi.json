@@ -16,7 +16,6 @@
         "invalid-flow": "Tämä url on pätemätön (tyhjä tai ei saatavilla) 😕",
         "invalid-link": "Ups, url osoite on pätemätön tai ei valmis 😕",
         "list": "*Lähetä numero virtauksesta muokkaukselle*\n\n**Linkki - Tyyli - Kanava - Maininnat**",
-        "list-result": "Tyyppi: {}\nDiscord kanava: {}\nURL/Kanava: {}\nMaininnat: {}\nIdentiteetti: {}\nViimeisin julkaisu: {}",
         "list-title": "Lista rss lähteistä palvelimelta %{server}",
         "list2": "*Lähetä numero virtauksesta poistamiselle*\n\n**Linkki - Tyyli - Kanava**",
         "mc": "Minecraft",
