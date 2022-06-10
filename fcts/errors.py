@@ -23,15 +23,20 @@ class Errors(commands.Cog):
         if hasattr(ctx.command, 'on_error'):
             return
 
-        ignored = (commands.errors.CommandNotFound,commands.errors.CheckFailure,commands.errors.ConversionError,discord.errors.Forbidden)
-        actually_not_ignored = (commands.errors.NoPrivateMessage)
+        ignored = (
+            commands.errors.CommandNotFound,
+            commands.errors.CheckFailure,
+            commands.errors.ConversionError,
+            discord.errors.Forbidden
+        )
+        actually_not_ignored = (commands.errors.NoPrivateMessage,)
 
         # Allows us to check for original exceptions raised and sent to CommandInvokeError.
         # If nothing is found. We keep the exception passed to on_command_error.
         error = getattr(error, 'original', error)
 
         # Anything in ignored will return and prevent anything happening.
-        if isinstance(error, ignored) and not isinstance(error,actually_not_ignored):
+        if isinstance(error, ignored) and not isinstance(error, actually_not_ignored):
             if self.bot.beta and ctx.guild:
                 await ctx.send(f"`Ignored error:` [{error.__class__.__module__}.{error.__class__.__name__}] {error}")
             return
@@ -172,6 +177,9 @@ class Errors(commands.Cog):
 
     @commands.Cog.listener()
     async def on_error(self, error: Exception, ctx=None):
+        """Called when an error is raised
+
+        Its only purpose is to log the error, ctx param is only useful for traceability"""
         if sys.exc_info()[0] is None:
             exc_info = (type(error), error, error.__traceback__)
         else:
@@ -193,7 +201,7 @@ class Errors(commands.Cog):
                 await self.senf_err_msg(ctx.guild.name+" | "+ctx.channel.name+"\n"+msg)
             self.bot.log.warning(f"[on_error] {error}", exc_info=exc_info)
         except Exception as err: # pylint: disable=broad-except
-            self.bot.log.warning(f"[on_error] {err}", exc_info=exc_info)
+            self.bot.log.error(f"[on_error] {err}", exc_info=exc_info)
 
 
     async def senf_err_msg(self, msg: str):
