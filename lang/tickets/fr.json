@@ -45,6 +45,7 @@
         },
         "too-quick": "Vous ouvrez des tickets trop vite ! Veuillez attendre quelques minutes entre deux tickets",
         "topic": {
+            "list": "Les topics de votre serveur :",
             "too-long": "Le nom du topic ne peut excéder 100 caractères",
             "cant-create": "Oups, impossible de créer ce topic. Assurez-vous de ne pas déjà avoir un topic avec ce nom, et contactez le support du bot si nécessaire",
             "created": "Le topic \"%{name}\" a bien été créé",

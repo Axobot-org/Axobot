@@ -45,6 +45,7 @@
         },
         "too-quick": "You are opening tickets too quick! Please wait a few minutes between two tickets",
         "topic": {
+            "list": "Your server topics:",
             "too-long": "The topic name cannot exceed 100 characters",
             "cant-create": "Oops, unable to create this topic. Make sure you do not already have a topic with this name, and contact support if needed",
             "created": "The topic \"%{name}\" has successfully been created",
