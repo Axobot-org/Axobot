@@ -260,6 +260,7 @@ class Tickets(commands.Cog):
             return db_query > 0
 
     async def db_edit_prompt(self, guild_id: int, message: str):
+        "Edit the prompt displayed for a guild"
         query = "UPDATE tickets SET prompt = %s WHERE guild_id = %s AND topic is NULL AND beta = %s"
         async with self.bot.db_query(query, (message, guild_id, self.bot.beta)) as _:
             pass
@@ -366,21 +367,27 @@ class Tickets(commands.Cog):
     @commands.group(name="ticket", aliases=["tickets"])
     @commands.guild_only()
     async def tickets_main(self, ctx: MyContext):
-        "Manage your tickets system"
+        """Manage your tickets system
+
+        ..Doc tickets.html"""
         if ctx.subcommand_passed is None:
             await self.bot.get_cog('Help').help_command(ctx, ['tickets'])
 
     @tickets_main.group(name="portal")
     @commands.check(checks.has_manage_channels)
     async def tickets_portal(self, ctx: MyContext):
-        "Handle how your members are able to open tickets"
+        """Handle how your members are able to open tickets
+
+        ..Doc tickets.html"""
         if ctx.subcommand_passed is None:
             await self.bot.get_cog('Help').help_command(ctx, ['tickets', 'portal'])
 
     @tickets_portal.command()
     @commands.cooldown(2, 30, commands.BucketType.guild)
     async def summon(self, ctx: MyContext):
-        "Ask the bot to send a message allowing people to open tickets"
+        """Ask the bot to send a message allowing people to open tickets
+
+        ..Doc tickets.html#as-staff-send-the-prompt-message"""
         topics = await self.db_get_topics(ctx.guild.id)
         for topic in topics:
             # if emoji is a discord emoji, convert it
@@ -399,7 +406,11 @@ class Tickets(commands.Cog):
     async def portal_set_hint(self, ctx: MyContext, *, message: str):
         """Set a default hint message
         The message will be displayed when a user tries to open a ticket, before user confirmation
-        Type "none" for no hint message at all"""
+        Type "none" for no hint message at all
+
+        ..Example tickets set-hint Make sure to directly state your question when creating your tickets - Please do not use this form for raid-related issues
+
+        ..Doc tickets.html#default-hint"""
         if message.lower() == "none":
             message = None
         row_id = await self.db_get_guild_default_id(ctx.guild.id)
@@ -415,7 +426,11 @@ class Tickets(commands.Cog):
     async def portal_set_role(self, ctx: MyContext, role: Union[discord.Role, Literal["none"]]):
         """Edit a default staff role
         Anyone with this role will be able to read newly created tickets
-        Type "None" to set admins only"""
+        Type "None" to set admins only
+
+        ..Example tickets set-role Moderators
+
+        ..Doc tickets.html#default-staff-role"""
         row_id = await self.db_get_guild_default_id(ctx.guild.id)
         if row_id is None:
             row_id = await self.db_set_guild_default_id(ctx.guild.id)
@@ -427,7 +442,11 @@ class Tickets(commands.Cog):
     @tickets_portal.command(name="set-text")
     @commands.cooldown(3, 30, commands.BucketType.guild)
     async def portal_set_text(self, ctx: MyContext, *, message: str):
-        """Set a message to be displayed above the ticket topic selection"""
+        """Set a message to be displayed above the ticket topic selection
+
+        ..Example tickets set-text Select a category below to start opening your ticket!
+
+        ..Doc tickets.html#presentation-message"""
         row_id = await self.db_get_guild_default_id(ctx.guild.id)
         if row_id is None:
             row_id = await self.db_set_guild_default_id(ctx.guild.id)
@@ -439,7 +458,13 @@ class Tickets(commands.Cog):
     async def portal_set_category(self, ctx: MyContext, category_or_channel: Union[discord.CategoryChannel, discord.TextChannel]):
         """Set the category or the channel in which tickets will be created
 
-        If you select a channel, tickets will use the Discord threads system but allowed roles may not be applied"""
+        If you select a channel, tickets will use the Discord threads system but allowed roles may not be applied
+
+        ..Example tickets set-category \"Private channels\"
+
+        ..Example tickets set-channels #tickets
+
+        ..Doc tickets.html#tickets-category-channel"""
         row_id = await self.db_get_guild_default_id(ctx.guild.id)
         if row_id is None:
             row_id = await self.db_set_guild_default_id(ctx.guild.id)
@@ -467,7 +492,9 @@ class Tickets(commands.Cog):
     @tickets_main.group(name="topic")
     @commands.check(checks.has_manage_channels)
     async def tickets_topics(self, ctx: MyContext):
-        "Handle the different ticket topics your members can select"
+        """Handle the different ticket topics your members can select
+
+        ..Doc tickets.html"""
         if ctx.subcommand_passed is None:
             await self.bot.get_cog('Help').help_command(ctx, ['tickets', 'topic'])
 
@@ -476,7 +503,13 @@ class Tickets(commands.Cog):
     async def topic_add(self, ctx: MyContext, emote: Optional[discord.PartialEmoji]=None, *, name: str):
         """Create a new ticket topic
         A topic name is limited to 100 characters
-        Only Discord emojis are accepted for now"""
+        Only Discord emojis are accepted for now
+
+        ..Example tickets topic add :diamonds: Economy issues
+
+        ..Example tickets topic add Request a magician
+
+        ..Doc tickets.html#create-a-new-topic"""
         if len(name) > 100:
             await ctx.send(await self.bot._(ctx.guild.id, "tickets.topic.too-long"))
             return
@@ -488,7 +521,9 @@ class Tickets(commands.Cog):
     @tickets_topics.command(name="remove")
     @commands.cooldown(3, 45, commands.BucketType.guild)
     async def topic_remove(self, ctx: MyContext):
-        "Permanently delete a topic by its name"
+        """Permanently delete a topic by its name
+
+        ..Doc tickets.html#delete-a-topic"""
         topic_id = await self.ask_user_topic(ctx)
         if topic_id is None:
             await ctx.send(await self.bot._(ctx.guild.id, "errors.unknown"))
@@ -503,7 +538,11 @@ class Tickets(commands.Cog):
     @commands.cooldown(3, 30, commands.BucketType.guild)
     async def topic_set_emote(self, ctx: MyContext, topic_id: Optional[int], emote: Union[discord.PartialEmoji, Literal["none"]]):
         """Edit a topic emoji
-        Type "None" to set no emoji for this topic"""
+        Type "None" to set no emoji for this topic
+
+        ..Example tickets topic set-emote :money_with_wings:
+
+        ..Doc tickets.html#edit-a-topic-emoji"""
         if not topic_id or not await self.db_topic_exists(ctx.guild.id, topic_id):
             topic_id = await self.ask_user_topic(ctx)
             if topic_id is None:
@@ -522,7 +561,12 @@ class Tickets(commands.Cog):
     async def topic_set_hint(self, ctx: MyContext, topic_id: Optional[int], *, message: str):
         """Edit a topic hint message
         The message will be displayed when a user tries to open a ticket, before user confirmation
-        Type "None" to set the text to the default one (`tickets portal set-hint`)"""
+        Type "None" to set the text to the default one (`tickets portal set-hint`)
+
+        ..Example tickets topic set-hint When trying to join our Minecraft server, make sure to correctly enter our IP!
+If that still doesn't work, please create your ticket
+
+        ..Doc tickets.html#topic-specific-hint"""
         if not topic_id or not await self.db_topic_exists(ctx.guild.id, topic_id):
             topic_id = await self.ask_user_topic(ctx)
             if topic_id is None:
@@ -539,7 +583,13 @@ class Tickets(commands.Cog):
     async def topic_set_role(self, ctx: MyContext, topic_id: Optional[int], role: Union[discord.Role, Literal["none"]]):
         """Edit a topic staff role
         Anyone with this role will be able to read newly created tickets with this topic
-        Type "None" to set the role to the default one (`tickets portal set-role`)"""
+        Type "None" to set the role to the default one (`tickets portal set-role`)
+
+        ..Example tickets topic set-role @Staff
+
+        ..Example tickets topic set-role 347 \"Minecraft moderators\"
+
+        ..Doc tickets.html#topic-specific-staff-role"""
         if not topic_id or not await self.db_topic_exists(ctx.guild.id, topic_id):
             topic_id = await self.ask_user_topic(ctx)
             if topic_id is None:
