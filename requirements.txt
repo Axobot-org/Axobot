@@ -1,4 +1,4 @@
-discord.py @ git+https://github.com/Rapptz/discord.py.git@5a06fa5f3e28d2b7191722e1a84c541560008aea
+discord.py @ git+https://github.com/Rapptz/discord.py.git@36f039a1bffb835a555be8a43976397ba6eb9c76
 aiohttp
 mysql-connector-python>=8.0
 frmc-lib @ git+https://github.com/ZRunner/fr-mc-python-lib.git@v1.0.6
@@ -18,3 +18,4 @@ Babel>=2.9
 cachingutils>=1.0
 typing_extensions>=4.0
 nltk>=3.7
+autopep8
