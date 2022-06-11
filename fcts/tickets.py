@@ -1,12 +1,13 @@
+import random
 import re
 import time
+from typing import Any, Callable, Literal, Optional, Union
+
 import discord
 from discord.ext import commands
-import random
-from typing import Any, Callable, Optional, Union, Literal
+from libs.classes import MyContext, Zbot
 from mysql.connector.errors import IntegrityError
 
-from libs.classes import MyContext, Zbot
 from fcts import checks
 
 
@@ -68,7 +69,7 @@ class SendHintText(discord.ui.View):
 class AskTitleModal(discord.ui.Modal):
     "Ask a user the name of their ticket"
     name = discord.ui.TextInput(label="", placeholder=None, style=discord.TextStyle.short, max_length=100)
-    
+
     def __init__(self, guild_id: int, topic: dict, title: str, input_label: str, input_placeholder: str, callback: Callable):
         super().__init__(title=title, timeout=600)
         self.guild_id = guild_id
@@ -142,7 +143,7 @@ class Tickets(commands.Cog):
                     topic = await self.db_get_topic_with_defaults(interaction.guild_id, topic_id)
             if topic is None:
                 await interaction.response.send_message(await self.bot._(interaction.guild_id, "errors.unknown"), ephemeral=True)
-                raise Exception("No topic found on guild %s with interaction %s", interaction.guild_id, topic_id)
+                raise Exception(f"No topic found on guild {interaction.guild_id} with interaction {topic_id}")
             if topic['category'] is None:
                 await interaction.response.send_message(await self.bot._(interaction.guild_id, "tickets.missing-category-config"), ephemeral=True)
                 return
@@ -174,7 +175,7 @@ class Tickets(commands.Cog):
             self.cooldowns[interaction.user] = time.time()
         except Exception as err: # pylint: disable=broad-except
             self.bot.dispatch('error', err)
-    
+
     async def db_get_topics(self, guild_id: int) -> list[dict[str, Any]]:
         "Fetch the topics associated to a guild"
         query = "SELECT * FROM `tickets` WHERE `guild_id` = %s AND `topic` IS NOT NULL AND `beta` = %s"
@@ -205,14 +206,14 @@ class Tickets(commands.Cog):
             if not db_query:
                 return None
             return db_query['id']
-    
+
     async def db_set_guild_default_id(self, guild_id: int) -> int:
         "Create a new row for default guild setup"
         # INSERT only if not exists
         query = "INSERT INTO `tickets` (guild_id, beta) SELECT %(g)s, %(b)s WHERE (SELECT 1 as `exists` FROM `tickets` WHERE guild_id = %(g)s AND topic IS NULL AND beta = %(b)s) IS NULL"
         async with self.bot.db_query(query, {'g': guild_id, 'b': self.bot.beta}) as db_query:
             return db_query
-    
+
     async def db_add_topic(self, guild_id: int, name: str, emoji: Union[None, str]) -> bool:
         "Add a topic to a guild"
         query = "INSERT INTO `tickets` (`guild_id`, `topic`, `topic_emoji`, `beta`) VALUES (%s, %s, %s, %s)"
@@ -281,7 +282,7 @@ class Tickets(commands.Cog):
         title = await self.bot._(interaction.guild_id, "tickets.ticket-introduction.title")
         desc = await self.bot._(interaction.guild_id, "tickets.ticket-introduction.description", user=interaction.user.mention, ticket_name=ticket_name, topic_name=topic['topic'])
         return discord.Embed(title=title, description=desc, color=discord.Color.green())
-    
+
     async def setup_ticket_channel(self, channel: discord.TextChannel, topic: dict, user: discord.Member):
         "Setup the required permissions for a channel ticket"
         permissions = {}
@@ -326,7 +327,7 @@ class Tickets(commands.Cog):
         "Create the ticket once the user has provided every required info"
         category = interaction.guild.get_channel(topic['category'])
         if category is None:
-            raise Exception('No category configured for guild %s and topic %s', interaction.guild_id, topic['topic'])
+            raise Exception(f"No category configured for guild {interaction.guild_id} and topic {topic['topic']}")
         sent_error = False
         if isinstance(category, discord.CategoryChannel):
             try:
@@ -354,7 +355,7 @@ class Tickets(commands.Cog):
             self.bot.log.error("[ticket] unknown category type: %s", type(category))
             return
         topic['topic'] = topic['topic'] or await self.bot._(interaction.guild_id, "tickets.other")
-        msg = content=await self.bot._(interaction.guild_id, "tickets.ticket-created", channel=channel.mention, topic=topic['topic'])
+        msg = await self.bot._(interaction.guild_id, "tickets.ticket-created", channel=channel.mention, topic=topic['topic'])
         if sent_error:
             await interaction.followup.send(msg, ephemeral=True)
         else:
@@ -366,13 +367,15 @@ class Tickets(commands.Cog):
     @commands.guild_only()
     async def tickets_main(self, ctx: MyContext):
         "Manage your tickets system"
-        pass
+        if ctx.subcommand_passed is None:
+            await self.bot.get_cog('Help').help_command(ctx, ['tickets'])
 
     @tickets_main.group(name="portal")
     @commands.check(checks.has_manage_channels)
     async def tickets_portal(self, ctx: MyContext):
         "Handle how your members are able to open tickets"
-        pass
+        if ctx.subcommand_passed is None:
+            await self.bot.get_cog('Help').help_command(ctx, ['tickets', 'portal'])
 
     @tickets_portal.command()
     @commands.cooldown(2, 30, commands.BucketType.guild)
@@ -435,7 +438,7 @@ class Tickets(commands.Cog):
     @commands.cooldown(3, 30, commands.BucketType.guild)
     async def portal_set_category(self, ctx: MyContext, category_or_channel: Union[discord.CategoryChannel, discord.TextChannel]):
         """Set the category or the channel in which tickets will be created
-        
+
         If you select a channel, tickets will use the Discord threads system but allowed roles may not be applied"""
         row_id = await self.db_get_guild_default_id(ctx.guild.id)
         if row_id is None:
@@ -443,13 +446,21 @@ class Tickets(commands.Cog):
         await self.db_edit_topic_category(ctx.guild.id, row_id, category_or_channel.id)
         embed = None
         if isinstance(category_or_channel, discord.CategoryChannel):
-            message = await self.bot._(ctx.guild.id, "tickets.category-edited.default-category", category=category_or_channel.name)
+            message = await self.bot._(ctx.guild.id,
+                                       "tickets.category-edited.default-category",
+                                       category=category_or_channel.name)
             if not category_or_channel.permissions_for(ctx.guild.me).manage_channels:
-                embed = discord.Embed(description=await self.bot._(ctx.guild.id, "tickets.category-edited.category-permission-warning"), colour=discord.Color.orange())
+                embed = discord.Embed(description=await self.bot._(ctx.guild.id,
+                                                                   "tickets.category-edited.category-permission-warning"),
+                                      colour=discord.Color.orange())
         else:
-            message = await self.bot._(ctx.guild.id, "tickets.category-edited.default-channel", channel=category_or_channel.mention)
+            message = await self.bot._(ctx.guild.id,
+                                       "tickets.category-edited.default-channel",
+                                       channel=category_or_channel.mention)
             if "PRIVATE_THREADS" not in ctx.guild.features or not category_or_channel.permissions_for(ctx.guild.me).create_private_threads:
-                embed = discord.Embed(description=await self.bot._(ctx.guild.id, "tickets.category-edited.channel-privacy-warning"), colour=discord.Color.orange())
+                embed = discord.Embed(description=await self.bot._(ctx.guild.id,
+                                                                   "tickets.category-edited.channel-privacy-warning"),
+                                      colour=discord.Color.orange())
         await ctx.send(message, embed=embed)
 
 
@@ -457,7 +468,8 @@ class Tickets(commands.Cog):
     @commands.check(checks.has_manage_channels)
     async def tickets_topics(self, ctx: MyContext):
         "Handle the different ticket topics your members can select"
-        pass
+        if ctx.subcommand_passed is None:
+            await self.bot.get_cog('Help').help_command(ctx, ['tickets', 'topic'])
 
     @tickets_topics.command(name="add")
     @commands.cooldown(3, 45, commands.BucketType.guild)
@@ -487,7 +499,7 @@ class Tickets(commands.Cog):
         else:
             await ctx.send(await self.bot._(ctx.guild.id, "errors.unknown"))
 
-    @tickets_topics.command(name="set-emote")
+    @tickets_topics.command(name="set-emote", aliases=["set-emoji"])
     @commands.cooldown(3, 30, commands.BucketType.guild)
     async def topic_set_emote(self, ctx: MyContext, topic_id: Optional[int], emote: Union[discord.PartialEmoji, Literal["none"]]):
         """Edit a topic emoji
@@ -541,6 +553,29 @@ class Tickets(commands.Cog):
         else:
             await ctx.send(await self.bot._(ctx.guild.id, "tickets.nothing-to-edit"))
 
+    @tickets_topics.command(name="list")
+    @commands.cooldown(3, 20, commands.BucketType.guild)
+    async def topic_set_roles(self, ctx: MyContext):
+        "List every ticket topic used in your server"
+        topics_repr: list[str] = []
+        none_emoji: str = self.bot.get_cog('Emojis').customs['nothing']
+        topics = await self.db_get_topics(ctx.guild.id)
+        topics.append(await self.db_get_defaults(ctx.guild.id))
+        for topic in topics:
+            name = topic['topic'] or await self.bot._(ctx.guild.id, "tickets.other")
+            if topic['topic_emoji']:
+                emoji = discord.PartialEmoji.from_str(topic['topic_emoji'])
+                topics_repr.append(f"{emoji} {name}")
+            else:
+                topics_repr.append(f"{none_emoji} {name}")
+            if topic['role']:
+                topics_repr[-1] += f" - <@&{topic['role']}>"
+        title = await ctx.bot._(ctx.guild.id, "tickets.topic.list")
+        if ctx.can_send_embed:
+            embed = discord.Embed(title=title, description="\n".join(topics_repr), color=discord.Color.blue())
+            await ctx.send(embed=embed)
+        else:
+            await ctx.send(f"**{title}**\n\n" + "\n".join(topics_repr))
 
 async def setup(bot):
     await bot.add_cog(Tickets(bot))
