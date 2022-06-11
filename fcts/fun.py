@@ -1,15 +1,16 @@
 import copy
 import datetime
 import importlib
-from math import ceil
 import operator
 import random
 import re
 import string
 import typing
 from difflib import get_close_matches
+from math import ceil
 
 import aiohttp
+import autopep8
 import discord
 import emoji as emojilib
 import geocoder
@@ -779,11 +780,12 @@ You can specify a verification limit by adding a number in argument (up to 1.000
         if channel is not None:
             try:
                 await ctx.message.delete()
-            except:
+            except discord.Forbidden:
                 pass
 
 
     async def add_vote(self, msg: discord.Message):
+        "Add votes emojis as reactions under a message"
         if self.bot.database_online and msg.guild is not None:
             emojiz = await self.bot.get_config(msg.guild,'vote_emojis')
         else:
@@ -994,6 +996,7 @@ You can specify a verification limit by adding a number in argument (up to 1.000
         await ctx.message.delete(delay=0)
 
     async def check_suggestion(self, message: discord.Message):
+        "Check for any message sent in a poll channel, in order to add proper reactions"
         if message.guild is None or not self.bot.is_ready() or not self.bot.database_online:
             return
         try:
@@ -1003,28 +1006,22 @@ You can specify a verification limit by adding a number in argument (up to 1.000
             if str(message.channel.id) in channels.split(';') and not message.author.bot:
                 try:
                     await self.add_vote(message)
-                except:
+                except discord.DiscordException:
                     pass
-        except Exception as err:
+        except Exception as err: # pylint: disable=broad-except
             await self.bot.get_cog('Errors').on_error(err,message)
 
-    @commands.Cog.listener()
-    async def on_message(self, message: discord.Message):
-        "I wonder what that does..."
-        if message.author.id == 375598088850505728 and message.guild is not None:
-            if not message.channel.permissions_for(message.guild.me).send_messages:
-                return
-            now = datetime.datetime.now()
-            if now.day != 1 or now.month != 4:
-                return
-            if random.random() < 0.2:
-                msg = random.choice(["COOKIE!",
-                                     '🍪',
-                                     "<a:cookie_hype:806526709561688064>",
-                                     "<:ara_cookie:655874423684857856>",
-                                     "<:cookiepeek:655874423231873034>"
-                                     ])
-                await message.reply(msg)
+    @commands.command(name="pep8", aliases=['autopep8'])
+    @commands.cooldown(3, 30, commands.BucketType.user)
+    async def autopep8_cmd(self, ctx: MyContext, *, code: str):
+        """Auto format your Python code according to PEP8 guidelines"""
+        if code.startswith('```') and code.endswith('```'):
+            code = '\n'.join(code.split('\n')[1:-1])
+        code = autopep8.fix_code(code, {
+            "aggressive": 3,
+            "ignore": set()
+        }).strip()
+        await ctx.send(f"```py\n{code}\n```")
 
 
 async def setup(bot):
