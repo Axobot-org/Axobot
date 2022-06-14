@@ -119,6 +119,7 @@
                 "PUBLIC": "Public server",
                 "ROLE_ICONS": "Roles icons",
                 "SEVEN_DAY_THREAD_ARCHIVE": "7 days thread archive",
+                "TEXT_IN_VOICE_ENABLED": "Text in voice chats",
                 "THREADS_ENABLED": "Threads enabled",
                 "THREE_DAY_THREAD_ARCHIVE": "3 days thread archive",
                 "VANITY_URL": "Custom invite url",
