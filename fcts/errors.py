@@ -189,7 +189,7 @@ class Errors(commands.Cog):
                 ctx = await self.bot.get_context(ctx)
             tr = traceback.format_exception(type(error), error, error.__traceback__)
             tr = " ".join(tr)[:1950]
-            msg = "```python\n{}\n```".format(tr)
+            msg = f"```python\n{tr}\n```"
             if ctx is None:
                 await self.senf_err_msg(f"Internal Error\n{msg}")
             elif ctx.guild is None:
