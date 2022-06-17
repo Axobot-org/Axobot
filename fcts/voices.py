@@ -161,13 +161,17 @@ class VoiceChannels(commands.Cog):
             await self.db_delete_channel(channel)
 
     async def get_names(self):
-        "Get a random name from the randommner API"
+        "Get a random name from the randommer API"
         if len(self.names) != 0:
             return self.names.pop()
         async with aiohttp.ClientSession() as session:
-            h = {'X-Api-Key': self.bot.others['random_api_token']}
-            async with session.get('https://randommer.io/api/Name?nameType=surname&quantity=20', headers=h) as resp:
-                self.names: list[str] = await resp.json()
+            header = {'X-Api-Key': self.bot.others['random_api_token']}
+            try:
+                async with session.get('https://randommer.io/api/Name?nameType=surname&quantity=20', headers=header) as resp:
+                    self.names: list[str] = await resp.json()
+            except aiohttp.ContentTypeError as err:
+                self.bot.dispatch("error", err)
+                return "hello"
         return self.names.pop()
 
     @commands.command(name="voice-clean")
