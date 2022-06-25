@@ -114,6 +114,12 @@ async def verify_role_exists(ctx: MyContext) -> bool:
     roles = [r for r in [ctx.guild.get_role(int(x)) for x in roles_raw.split(';') if x.isnumeric() and len(x) > 0] if r is not None]
     return len(roles) > 0
 
+async def is_translator(ctx: MyContext) -> bool:
+    "Check if the user is an agreeded translator"
+    if cog := ctx.bot.get_cog('Users'):
+        return await cog.has_userflag(ctx.author, 'translator')
+    return False
+
 
 async def database_connected(ctx: MyContext) -> bool:
     "Check if the database is online and accessible"

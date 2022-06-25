@@ -5,7 +5,7 @@
     "users-info": ["perms","profile","rank","top","usernames"],
     "other": ["book","discordjobs","discordstatus","embed","emoji","minecraft","pep8","react","remindme", "reminder"],
     "fun": ["afk","arapproved","bitly","cookie","events","nasa","tic-tac-toe","fish","fun","hour","say","unafk","vote"],
-    "translators": ["tr-file", "tr-reload-todo", "tr-status","translate","tr-edit","tr-loop","tr-merge"],
+    "translators": ["translators"],
     "staff": ["add_cog","admin","bug","del_cog","eval","execute","find","idea","msg","rss_loop","spoil","test"],
     "unclassed": []
 }
