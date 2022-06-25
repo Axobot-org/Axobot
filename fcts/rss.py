@@ -1207,12 +1207,14 @@ class Rss(commands.Cog):
 
     @tasks.loop(minutes=20)
     async def loop_child(self):
+        if not self.bot.rss_enabled:
+            return
         if not self.bot.database_online:
             self.bot.log.warning('Base de donnée hors ligne - check rss annulé')
             return
         self.bot.log.info(" Boucle rss commencée !")
         t1 = time.time()
-        await self.bot.get_cog("Rss").main_loop()
+        await self.main_loop()
         self.bot.log.info(" Boucle rss terminée en {}s!".format(round(time.time()-t1,2)))
 
     @loop_child.before_loop
