@@ -591,38 +591,54 @@ Cette option affecte tous les serveurs"""
         else:
             await ctx.send('Module introuvable')
 
-    @main_msg.command(name="flag")
+    @main_msg.group(name="flag", aliases=['flags'])
     @commands.check(reloads.check_admin)
-    async def admin_flag(self, ctx:MyContext, add:str, flag:str, users:commands.Greedy[discord.User]):
-        """Ajoute ou retire un attribut à un utilisateur
+    async def admin_flag(self, ctx: MyContext):
+        "Ajoute ou retire un attribut à un utilisateur"
+        if ctx.subcommand_passed is None:
+            await self.bot.get_cog('Help').help_command(ctx, ['admin', 'flag'])
 
-        Flag valides : support, premium, contributor, partner"""
-        if add not in ['add', 'remove']:
-            return await ctx.send("Action invalide")
-        for user in users:
-            if flag not in UserFlag.FLAGS.values():
-                await ctx.send("Flag invalide")
-                return
-            userflags: list = await self.bot.get_cog("Users").get_userflags(user)
-            if userflags:
-                if flag in userflags and add == 'add':
-                    await ctx.send(f"L'utilisateur {user} a déjà ce flag")
-                    return
-                if flag not in userflags and add == 'remove':
-                    return await ctx.send(f"L'utilisateur {user} n'a pas ce flag")
-            if add == "add":
-                userflags.append(flag)
-            else:
-                userflags.remove(flag)
-            await self.bot.get_cog('Utilities').change_db_userinfo(user.id, 'user_flags', UserFlag().flagsToInt(userflags))
-            if add == "add":
-                await ctx.send(f"L'utilisateur {user} a maintenant le flag `{flag}`",delete_after=3.0)
-            elif add == "remove":
-                await ctx.send(f"L'utilisateur {user} n'a plus le flag `{flag}`",delete_after=3.0)
-            try:
-                await ctx.message.detele()
-            except:
-                pass
+    @admin_flag.command(name="list")
+    async def admin_flag_list(self, ctx: MyContext, user: discord.User):
+        "Liste les flags d'un utilisateur"
+        userflags: list[str] = await self.bot.get_cog("Users").get_userflags(user)
+        if userflags:
+            await ctx.send(f"Liste des flags de {user} : {', '.join(userflags)}")
+        else:
+            await ctx.send(f"{user} n'a aucun flag pour le moment")
+
+    @admin_flag.command(name="add")
+    async def admin_flag_add(self, ctx: MyContext, user: discord.User, *flags: str):
+        """Ajoute un flag à un utilisateur
+
+        Flags valides : support, contributor, premium, partner, translator, cookie"""
+        userflags: list[str] = await self.bot.get_cog("Users").get_userflags(user)
+        flags = [flag for flag in flags if flag not in userflags]
+        if len(flags) == 0:
+            await ctx.send(f"L'utilisateur {user} a déjà ces flags")
+            return
+        for flag in flags:
+            userflags.append(flag)
+        await self.bot.get_cog('Utilities').change_db_userinfo(user.id, 'user_flags', UserFlag().flagsToInt(userflags))
+        await ctx.send(f"L'utilisateur {user} a maintenant les flags {', '.join(userflags)}")
+
+    @admin_flag.command(name="remove")
+    async def admin_flag_remove(self, ctx: MyContext, user: discord.User, *flags: str):
+        """Retire un flag à un utilisateur
+
+        Flags valides : support, contributor, premium, partner, translator, cookie"""
+        userflags: list[str] = await self.bot.get_cog("Users").get_userflags(user)
+        flags = [flag for flag in flags if flag in userflags]
+        if len(flags) == 0:
+            await ctx.send(f"L'utilisateur {user} n'a aucun de ces flags")
+            return
+        for flag in flags:
+            userflags.remove(flag)
+        await self.bot.get_cog('Utilities').change_db_userinfo(user.id, 'user_flags', UserFlag().flagsToInt(userflags))
+        if userflags:
+            await ctx.send(f"L'utilisateur {user} a maintenant les flags {', '.join(userflags)}")
+        else:
+            await ctx.send(f"L'utilisateur {user} n'a plus aucun flag")
 
     @main_msg.command(name="loop_restart")
     @commands.check(reloads.check_admin)
