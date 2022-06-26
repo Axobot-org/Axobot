@@ -1,14 +1,17 @@
 import asyncio
-from copy import copy, deepcopy
+from io import BytesIO
 import json
 import os
 import typing
+from copy import deepcopy
 
 import discord
-from discord.ext import commands
-from flatten_json import flatten
+from discord.ext import tasks, commands
+from flatten_json import flatten, unflatten
 from libs.classes import MyContext, Zbot
+
 from fcts.checks import is_translator
+from fcts.reloads import check_admin
 
 FlatennedTranslations = dict[str, typing.Optional[str]]
 ModuleDict = dict[str, FlatennedTranslations]
@@ -21,9 +24,10 @@ TodoDict = dict[LanguageId, dict[str, set[str]]]
 T = typing.TypeVar('T')
 def first(of: typing.Union[list[T], set[T]]) -> T:
     "Return the first element of an iterable, or None if empty"
-    for e in of:
+    item = None
+    for item in of:
         break
-    return e
+    return item
 
 class Translations(commands.Cog):
     """Special cog for those who help with the translation of the bot"""
@@ -34,6 +38,12 @@ class Translations(commands.Cog):
         self._translations: TranslationsDict = {}
         self._projects: TranslationsDict = {}
         self._todo: TodoDict = {}
+        self.edited_languages: set[LanguageId] = set()
+        self.save_projects_loop.start() # pylint: disable=no-member
+
+    async def cog_unload(self):
+        "Stop loop when cog is unloaded"
+        self.save_projects_loop.cancel() # pylint: disable=no-member
 
     async def load_translations(self):
         """Load current translations from their JSON files"""
@@ -105,11 +115,11 @@ class Translations(commands.Cog):
         translations = (await self.get_original_translations()).get(language, {})
         project = (await self.get_projects()).get(language, {})
         result = deepcopy(translations)
-        for module, tr in project.items():
+        for module, translation in project.items():
             if module not in result:
-                result[module] = deepcopy(tr)
+                result[module] = deepcopy(translation)
                 continue
-            for key, value in tr.items():
+            for key, value in translation.items():
                 result[module][key] = value
         return result
 
@@ -125,8 +135,11 @@ class Translations(commands.Cog):
         "Save a translation project into its JSON file"
         if translations := (await self.get_projects()).get(lang):
             with open('translation/'+lang+'-project.json', 'w', encoding='utf-8') as file:
-                # TODO: ignore "None" values
+                translations = {module: {key: value for key, value in translation.items() if value}
+                                for module, translation in translations.items()}
                 json.dump(translations, file, ensure_ascii=False, indent=4, sort_keys=True)
+            return True
+        return False
 
     async def get_translation(self, lang: LanguageId, module: str, key: str):
         "Get a translation from either the project or the original translation"
@@ -156,15 +169,29 @@ class Translations(commands.Cog):
         if module not in self._projects[lang]:
             self._projects[lang][module] = {}
         self._projects[lang][module][key] = value
+        self.edited_languages.add(lang)
         # if the key was in the todo, remove it
         if self._todo.get(lang, {}).get(module):
-            self._todo[lang][module].remove(key)
+            try:
+                self._todo[lang][module].remove(key)
+            except KeyError:
+                pass
             # if the module is 100% translated, remove it
             if not self._todo[lang][module]:
                 self._todo[lang].pop(module)
                 # if the language is 100% translated, remove it
                 if not self._todo[lang]:
                     self._todo.pop(lang)
+
+    @tasks.loop(seconds=30)
+    async def save_projects_loop(self):
+        "Save every edited project into their JSON files every minute"
+        to_edit = set(self.edited_languages)
+        for language in to_edit:
+            await self.save_project(language)
+            self.edited_languages.remove(language)
+        if to_edit:
+            self.bot.log.info("[translations] %s edited projects saved", len(to_edit))
 
     @commands.group(name='translators', aliases=['tr'])
     @commands.check(is_translator)
@@ -199,7 +226,7 @@ class Translations(commands.Cog):
         module, key = await self.get_todo_item(lang)
         value = (await self.get_original_translations())['en'][module][key]
         await ctx.send(f"```\n{value}\n```")
-        await ctx.send(f"How would you translate it in {lang}?\n\n  *Key: {key}*\nType 'pass' to choose another one")
+        await ctx.send(f"How would you translate it in {lang}?\n\n  *Key: {module}.{key}*\nType 'pass' to choose another one")
         try:
             def check(msg: discord.Message):
                 is_author = msg.author.id == ctx.author.id
@@ -287,58 +314,54 @@ Use `stop` to stop translating
             txt = f"Translation of {lang}:\n {ratio:.1f}%\n {lang_progress} messages on {en_progress}"
         await ctx.send(txt)
 
-    # @translate_main.command(name='edit')
-    # async def edit_tr(self, ctx: MyContext, lang: str, key: str, *, translation: str=None):
-    #     """Edit a translation"""
-    #     if lang not in self.translations.keys():
-    #         return await ctx.send("Invalid language")
-    #     if not key in self.translations['en'].keys():
-    #         return await ctx.send("Invalid key")
-    #     if translation is None:
-    #         await ctx.send("```\n"+self.translations['en'][key]+"\n```")
-    #         try:
-    #             msg = await self.bot.wait_for('message', check=lambda msg: msg.author.id==ctx.author.id and msg.channel.id==ctx.channel.id, timeout=90)
-    #         except asyncio.TimeoutError:
-    #             return await ctx.send("You were too slow. Try again.")
-    #         translation = msg.content
-    #     await self.modify_project(lang,key,translation)
-    #     await ctx.send(f"New translation:\n :arrow_right: {translation}")
+    @translate_main.command(name='edit')
+    async def edit_tr(self, ctx: MyContext, lang: str, key: str, *, translation: typing.Optional[str]=None):
+        """Edit a translation"""
+        if lang not in languages or lang == 'en':
+            return await ctx.send("Invalid language")
+        if '.' not in key:
+            return await ctx.send("Invalid key")
+        module, key = key.split('.', maxsplit=1)
+        try:
+            value = (await self.get_original_translations())['en'][module][key]
+        except KeyError:
+            return await ctx.send("Invalid key")
+        if translation is None:
+            await ctx.send(f"```\n{value}\n```")
+            try:
+                def check(msg: discord.Message):
+                    return msg.author.id == ctx.author.id and msg.channel.id == ctx.channel.id
+                msg: discord.Message = await self.bot.wait_for('message',
+                                                               check=check,
+                                                               timeout=45)
+            except asyncio.TimeoutError:
+                return await ctx.send("You were too slow. Try again.")
+            translation = msg.content
+        await self.modify_project(lang, module, key, translation)
+        await ctx.send(f"New translation:\n :arrow_right: {translation}")
 
-    # @translate_main.command(name="get-file")
-    # @commands.check(check_admin)
-    # async def fuse_file(self, ctx: MyContext, lang: str):
-    #     """Merge the current project file
-    #     with the already-translated file"""
-    #     if lang not in self.todo.keys():
-    #         return await ctx.send("Invalid language")
-    #     try:
-    #         with open(f'fcts/lang/{lang}.json','r',encoding='utf-8') as old_f:
-    #             with open(f'translation/{lang}-project.json','r',encoding='utf-8') as new_f:
-    #                 new = {k:v for k,v in json.load(new_f).items() if v is not None}
-    #                 new = await self._fuse_file(json.load(old_f),new)
-    #     except FileNotFoundError:
-    #         return await ctx.send("There is no current project with this language")
-    #     with open(f'translation/{lang}.json','w',encoding='utf-8') as f:
-    #         json.dump(new,f, ensure_ascii=False, indent=4, sort_keys=True)
-    #     await ctx.send('Done!',file=discord.File(f'translation/{lang}.json'))
-
-    # @translate_main.command(name="merge")
-    # @commands.check(check_admin)
-    # async def merge_files(self, ctx: MyContext, lang: str="en"):
-    #     """Merge a file with the english version"""
-    #     if not lang in self.project_list:
-    #         return await ctx.send("Invalid language")
-    #     if len(ctx.message.attachments) == 0:
-    #         return await ctx.send("Missing a file")
-    #     from io import BytesIO
-    #     with open(f'fcts/lang/{lang}.json','r',encoding='utf-8') as old_f:
-    #         en_map = self.create_txt_map(json.load(old_f))
-    #     io = BytesIO()
-    #     await ctx.message.attachments[0].save(io)
-    #     data_lang = json.load(io)
-    #     en_map = await self._fuse_file(data_lang,en_map)
-    #     await ctx.send(file= discord.File(BytesIO(json.dumps(en_map,ensure_ascii=False,indent=4,sort_keys=True).encode('utf-8')),filename=ctx.message.attachments[0].filename))
-
+    @translate_main.command(name="get-file")
+    @commands.check(check_admin)
+    async def fuse_file(self, ctx: MyContext, lang: LanguageId, module: str):
+        """Merge the current project file
+        with the already-translated file"""
+        if lang not in languages or lang == 'en':
+            await ctx.send("Invalid language")
+            return
+        original = deepcopy((await self.get_original_translations())[lang])
+        if module not in original:
+            await ctx.send(f"Invalid module.\nExpected modules are: {', '.join(sorted(original.keys()))}")
+            return
+        project = (await self.get_projects()).get(lang, {module: {}})[module]
+        if not project:
+            await ctx.send(f"This module has not yet been edited for the {lang} language")
+            return
+        original = original[module]
+        merged = unflatten(original | project, separator='.')
+        filename = f'translation/{lang}-{module}.json'
+        data = json.dumps(merged, ensure_ascii=False, indent=4, sort_keys=True)
+        file = discord.File(BytesIO(data.encode()), filename=filename)
+        await ctx.send('Done!', file=file)
 
 async def setup(bot):
     await bot.add_cog(Translations(bot))
