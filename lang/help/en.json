@@ -61,7 +61,7 @@
                 "One of your roles is authorized to use this command (`warn`)",
                 "Missing allowed role (`warn`)"
             ],
-            "check_admin": [
+            "is_bot_admin": [
                 "You need to be one of the bot Admins",
                 "You are not a bot Admin"
             ],

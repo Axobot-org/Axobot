@@ -57,7 +57,7 @@
                 "Rollerinizden birisi (`warn`) komutunu kullanmak için yetkilendirildi",
                 "Eksik izinlendirilmiş rol  (`warn`)"
             ],
-            "check_admin": [
+            "is_bot_admin": [
                 "Bot adminlerinden biri olmak gerek",
                 "Bot admini değilsin"
             ],

@@ -23,12 +23,11 @@ from libs.classes import MyContext, Zbot
 from libs.formatutils import FormatUtils
 from utils import count_code_lines
 
-from fcts import args, checks, reloads
+from fcts import args, checks
 
 default_color = discord.Color(0x50e3c2)
 
 importlib.reload(conf)
-# importlib.reload(reloads)
 importlib.reload(args)
 importlib.reload(checks)
 importlib.reload(bitly_api)
@@ -56,11 +55,11 @@ class Info(commands.Cog):
     @commands.command(name='admins')
     async def admin_list(self, ctx: MyContext):
         """Get the list of ZBot administrators
-        
+
         ..Doc miscellaneous.html#admins"""
-        l  = list()
-        for u in reloads.admins_id:
-            if u==552273019020771358:
+        l  = []
+        for u in checks.admins_id:
+            if u == 552273019020771358:
                 continue
             l.append(str(self.bot.get_user(u)))
         await ctx.send(await self.bot._(ctx.channel,"info.admins-list", admins=", ".join(l)))
@@ -792,7 +791,7 @@ Available types: member, role, user, emoji, channel, server, invite, category
 
 
     @commands.group(name="find")
-    @commands.check(reloads.is_support_staff)
+    @commands.check(checks.is_support_staff)
     @commands.check(in_support_server)
     async def find_main(self, ctx: MyContext):
         """Same as info, but in a lighter version"""

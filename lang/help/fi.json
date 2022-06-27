@@ -57,7 +57,7 @@
                 "Yksi sinun rooleista voi käyttää komentoa (`warn`)",
                 "Sallittu rooli puuttuu (`warn`)"
             ],
-            "check_admin": [
+            "is_bot_admin": [
                 "Sinun täytyy olla botin ylläpitäjä",
                 "Et ole botin ylläpitäjä"
             ],

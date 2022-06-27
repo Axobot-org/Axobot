@@ -19,7 +19,7 @@ import speedtest
 from discord.ext import commands
 from libs.classes import MyContext, UserFlag, Zbot, ConfirmView
 
-from fcts import reloads
+from fcts import checks
 
 
 def cleanup_code(content: str):
@@ -64,16 +64,16 @@ class Admin(commands.Cog):
         self.utilities = self.bot.get_cog("Utilities")
 
     async def check_if_admin(self, ctx: MyContext):
-        return await reloads.check_admin(ctx)
+        return await checks.is_bot_admin(ctx)
 
     async def check_if_god(self, ctx: typing.Union[discord.User, discord.Guild, MyContext]):
         "Check if a user is in God mode for a given context"
         if isinstance(ctx, discord.User):
-            return await reloads.check_admin(ctx)
+            return await checks.is_bot_admin(ctx)
         elif isinstance(ctx.guild, discord.Guild) and ctx.guild is not None:
-            return await reloads.check_admin(ctx) and ctx.guild.id in self.god_mode
+            return await checks.is_bot_admin(ctx) and ctx.guild.id in self.god_mode
         else:
-            return await reloads.check_admin(ctx)
+            return await checks.is_bot_admin(ctx)
 
     async def add_success_reaction(self, msg: discord.Message):
         "Add a check reaction to a message"
@@ -91,14 +91,14 @@ class Admin(commands.Cog):
             pass
 
     @commands.command(name='spoil',hidden=True)
-    @commands.check(reloads.check_admin)
+    @commands.check(checks.is_bot_admin)
     async def send_spoiler(self, ctx: MyContext, *, text: str):
         """spoil spoil spoil"""
         spoil = lambda text: "||"+"||||".join(text)+"||"
         await ctx.send("```\n{}\n```".format(spoil(text)))
 
     @commands.command(name='msg',aliases=['tell'])
-    @commands.check(reloads.check_admin)
+    @commands.check(checks.is_bot_admin)
     async def send_msg(self, ctx: MyContext, user:discord.User, *, message: str):
         """Envoie un mp à un membre"""
         try:
@@ -108,7 +108,7 @@ class Admin(commands.Cog):
             await self.bot.get_cog('Errors').on_error(e,ctx)
 
     @commands.group(name='admin',hidden=True)
-    @commands.check(reloads.check_admin)
+    @commands.check(checks.is_bot_admin)
     async def main_msg(self, ctx: MyContext):
         """Commandes réservées aux administrateurs de ZBot"""
         if ctx.subcommand_passed is None:
@@ -121,7 +121,7 @@ class Admin(commands.Cog):
             await ctx.send(text)
 
     @main_msg.command(name='god')
-    @commands.check(reloads.check_admin)
+    @commands.check(checks.is_bot_admin)
     @commands.guild_only()
     async def enable_god_mode(self, ctx: MyContext, enable:bool=True):
         """Donne les pleins-pouvoirs aux admins du bot sur ce serveur (accès à toutes les commandes de modération)"""
@@ -143,7 +143,7 @@ class Admin(commands.Cog):
             pass
 
     @main_msg.command(name="faq",hidden=True)
-    @commands.check(reloads.check_admin)
+    @commands.check(checks.is_bot_admin)
     async def send_faq(self, ctx: MyContext):
         """Envoie les messages du salon <#541228784456695818> vers le salon <#508028818154323980>"""
         msg = await ctx.send("Suppression des salons...")
@@ -169,7 +169,7 @@ class Admin(commands.Cog):
 
 
     @main_msg.command(name="update",hidden=True)
-    @commands.check(reloads.check_admin)
+    @commands.check(checks.is_bot_admin)
     async def update_config(self, ctx: MyContext, send: str=None):
         """Préparer/lancer un message de mise à jour
         Ajouter 'send' en argument déclenche la procédure pour l'envoyer à tous les serveurs"""
@@ -268,7 +268,7 @@ class Admin(commands.Cog):
 
 
     @main_msg.command(name="cogs",hidden=True)
-    @commands.check(reloads.check_admin)
+    @commands.check(checks.is_bot_admin)
     async def cogs_list(self, ctx: MyContext):
         """Voir la liste de tout les cogs"""
         text = str()
@@ -277,7 +277,7 @@ class Admin(commands.Cog):
         await ctx.send(text)
 
     @main_msg.command(name="lang-sort",hidden=True)
-    @commands.check(reloads.check_admin)
+    @commands.check(checks.is_bot_admin)
     async def resort_langs(self, ctx:MyContext, *, lang:str=None):
         """Trie par ordre alphabétique les fichiers de traduction"""
         all_files = sorted([x.replace('fcts/lang/','').replace('.json','') for x in glob("fcts/lang/*.json", recursive=False)])
@@ -299,7 +299,7 @@ class Admin(commands.Cog):
         await ctx.send('{o} fichier{s} trié{s}'.format(o=output,s='' if output<2 else 's'))
 
     @main_msg.command(name="guilds",aliases=['servers'],hidden=True)
-    @commands.check(reloads.check_admin)
+    @commands.check(checks.is_bot_admin)
     async def send_guilds_list(self, ctx: MyContext):
         """Obtenir la liste de tout les serveurs"""
         text = str()
@@ -312,7 +312,7 @@ class Admin(commands.Cog):
             await ctx.send(text)
 
     @main_msg.command(name='shutdown')
-    @commands.check(reloads.check_admin)
+    @commands.check(checks.is_bot_admin)
     async def shutdown(self, ctx: MyContext):
         """Eteint le bot"""
         msg = await ctx.send("Nettoyage de l'espace de travail...")
@@ -334,7 +334,7 @@ class Admin(commands.Cog):
             self.bot.close_database_cnx()
 
     @main_msg.command(name='reboot')
-    @commands.check(reloads.check_admin)
+    @commands.check(checks.is_bot_admin)
     async def restart_bot(self, ctx: MyContext):
         """Relance le bot"""
         await ctx.send(content="Redémarrage en cours...")
@@ -349,20 +349,20 @@ class Admin(commands.Cog):
         os.execl(sys.executable, sys.executable, *args)
 
     @main_msg.command(name='reload')
-    @commands.check(reloads.check_admin)
+    @commands.check(checks.is_bot_admin)
     async def reload_cog(self, ctx: MyContext, *, cog: str):
         """Recharge un module"""
         cogs = cog.split(" ")
         await self.bot.get_cog("Reloads").reload_cogs(ctx,cogs)
         
     @main_msg.command(name="check_tr")
-    @commands.check(reloads.check_admin)
+    @commands.check(checks.is_bot_admin)
     async def check_tr(self, ctx: MyContext,lang='en',origin="fr"):
         """Vérifie si un fichier de langue est complet"""
         await self.bot.get_cog("Languages").check_tr(ctx.channel,lang,origin)
 
     @main_msg.command(name="membercounter")
-    @commands.check(reloads.check_admin)
+    @commands.check(checks.is_bot_admin)
     async def membercounter(self, ctx: MyContext):
         """Recharge tout ces salons qui contiennent le nombre de membres, pour tout les serveurs"""
         if self.bot.database_online:
@@ -375,7 +375,7 @@ class Admin(commands.Cog):
             await ctx.send("Impossible de faire ceci, la base de donnée est inaccessible")
 
     @main_msg.command(name="get_invites",aliases=['invite'])
-    @commands.check(reloads.check_admin)
+    @commands.check(checks.is_bot_admin)
     async def adm_invites(self, ctx: MyContext, *, server: typing.Optional[discord.Guild]):
         """Cherche une invitation pour un serveur"""
         await ctx.author.send(await self.search_invite(server))
@@ -398,7 +398,7 @@ class Admin(commands.Cog):
         return msg
 
     @main_msg.command(name="config")
-    @commands.check(reloads.check_admin)
+    @commands.check(checks.is_bot_admin)
     async def admin_sconfig_see(self, ctx: MyContext, guild: discord.Guild, option=None):
         """Affiche les options d'un serveur"""
         if not ctx.bot.database_online:
@@ -412,7 +412,7 @@ class Admin(commands.Cog):
             await ctx.send("Serveur introuvable")
 
     @main_msg.command(name='db_reload')
-    @commands.check(reloads.check_admin)
+    @commands.check(checks.is_bot_admin)
     async def db_reload(self, ctx: MyContext):
         """Reconnecte le bot à la base de donnée"""
         try:
@@ -430,7 +430,7 @@ class Admin(commands.Cog):
             await self.bot.get_cog('Errors').on_command_error(ctx,err)
 
     @main_msg.command(name="emergency")
-    @commands.check(reloads.check_admin)
+    @commands.check(checks.is_bot_admin)
     async def emergency_cmd(self, ctx: MyContext):
         """Déclenche la procédure d'urgence
         A N'UTILISER QU'EN CAS DE BESOIN ABSOLU ! Le bot quittera tout les serveurs après avoir envoyé un mp à chaque propriétaire"""
@@ -440,7 +440,7 @@ class Admin(commands.Cog):
         if self.bot.zombie_mode:
             return
         time = round(self.emergency_time - level/100,1)
-        for x in reloads.admins_id:
+        for x in checks.admins_id:
             try:
                 user = self.bot.get_user(x)
                 if user.dm_channel is None:
@@ -451,7 +451,7 @@ class Admin(commands.Cog):
                 await self.bot.get_cog('Errors').on_error(e,None)
 
         def check(reaction, user):
-            return user.id in reloads.admins_id
+            return user.id in checks.admins_id
         try:
             await self.bot.wait_for('reaction_add', timeout=time, check=check)
         except asyncio.TimeoutError:
@@ -471,7 +471,7 @@ class Admin(commands.Cog):
             chan = await self.bot.get_channel(500674177548812306)
             await chan.send("{} Prodédure d'urgence déclenchée : {} serveurs quittés - {} propriétaires prévenus".format(self.bot.get_cog('Emojis').customs['red_alert'],servers,len(owners)))
             return "{}  {} propriétaires de serveurs ont été prévenu ({} serveurs)".format(self.bot.get_cog('Emojis').customs['red_alert'],len(owners),servers)
-        for x in reloads.admins_id:
+        for x in checks.admins_id:
             try:
                 user = self.bot.get_user(x)
                 await user.send("La procédure a été annulée !")
@@ -480,7 +480,7 @@ class Admin(commands.Cog):
         return "Qui a appuyé sur le bouton rouge ? :thinking:"
 
     @main_msg.command(name="code")
-    @commands.check(reloads.check_admin)
+    @commands.check(checks.is_bot_admin)
     async def show_code(self, ctx: MyContext, cmd: str):
         obj = self.bot.get_command(cmd)
         if obj is not None:
@@ -498,7 +498,7 @@ class Admin(commands.Cog):
             await ctx.send("Commande `{}` introuvable".format(cmd))
 
     @main_msg.command(name="ignore")
-    @commands.check(reloads.check_admin)
+    @commands.check(checks.is_bot_admin)
     async def add_ignoring(self, ctx: MyContext, ID:int):
         """Ajoute un serveur ou un utilisateur dans la liste des utilisateurs/serveurs ignorés"""
         serv = ctx.bot.get_guild(ID)
@@ -538,7 +538,7 @@ class Admin(commands.Cog):
             await ctx.bot.get_cog('Errors').on_command_error(ctx,e)
 
     @main_msg.command(name="logs")
-    @commands.check(reloads.check_admin)
+    @commands.check(checks.is_bot_admin)
     async def show_last_logs(self, ctx: MyContext, lines:typing.Optional[int]=15, *, match=''):
         """Affiche les <lines> derniers logs ayant <match> dedans"""
         try:
@@ -566,7 +566,7 @@ class Admin(commands.Cog):
             await self.bot.get_cog('Errors').on_error(e,ctx)
 
     @main_msg.command(name="enable_module")
-    @commands.check(reloads.check_admin)
+    @commands.check(checks.is_bot_admin)
     async def enable_module(self, ctx: MyContext, module: str, enabling: bool=True):
         """Active ou désactive un module (xp/rss/alerts)
 Cette option affecte tous les serveurs"""
@@ -592,7 +592,7 @@ Cette option affecte tous les serveurs"""
             await ctx.send('Module introuvable')
 
     @main_msg.group(name="flag", aliases=['flags'])
-    @commands.check(reloads.check_admin)
+    @commands.check(checks.is_bot_admin)
     async def admin_flag(self, ctx: MyContext):
         "Ajoute ou retire un attribut à un utilisateur"
         if ctx.subcommand_passed is None:
@@ -641,7 +641,7 @@ Cette option affecte tous les serveurs"""
             await ctx.send(f"L'utilisateur {user} n'a plus aucun flag")
 
     @main_msg.command(name="loop_restart")
-    @commands.check(reloads.check_admin)
+    @commands.check(checks.is_bot_admin)
     async def loop_restart(self, ctx:MyContext):
         """Relance la boucle principale"""
         try:
@@ -651,7 +651,7 @@ Cette option affecte tous les serveurs"""
 
 
     @main_msg.group(name="server")
-    @commands.check(reloads.check_admin)
+    @commands.check(checks.is_bot_admin)
     async def main_botserv(self, ctx: MyContext):
         """Quelques commandes liées au serveur officiel"""
         if ctx.invoked_subcommand is None or ctx.invoked_subcommand==self.main_botserv:
@@ -661,7 +661,7 @@ Cette option affecte tous les serveurs"""
             await ctx.send(text)
 
     @main_botserv.command(name="owner_reload")
-    @commands.check(reloads.check_admin)
+    @commands.check(checks.is_bot_admin)
     async def owner_reload(self, ctx: MyContext):
         """Ajoute le rôle Owner à tout les membres possédant un serveur avec le bot
         Il est nécessaire d'avoir au moins 10 membres pour que le rôle soit ajouté"""
@@ -712,7 +712,7 @@ Cette option affecte tous les serveurs"""
         return liste
 
     @main_botserv.command(name="best_ideas")
-    @commands.check(reloads.check_admin)
+    @commands.check(checks.is_bot_admin)
     async def best_ideas(self, ctx: MyContext, number:int=10):
         """Donne la liste des 10 meilleures idées"""
         bot_msg = await ctx.send("Chargement des idées...")
@@ -742,7 +742,7 @@ Cette option affecte tous les serveurs"""
             await ctx.send("Le message est trop long pour être envoyé !")
 
     @main_msg.command(name="activity")
-    @commands.check(reloads.check_admin)
+    @commands.check(checks.is_bot_admin)
     async def change_activity(self, ctx: MyContext, Type: str, * act: str):
         """Change l'activité du bot (play, watch, listen, stream)"""
         act = " ".join(act)
@@ -759,7 +759,7 @@ Cette option affecte tous les serveurs"""
         await ctx.message.delete()
 
     @main_msg.command(name="speedtest")
-    @commands.check(reloads.check_admin)
+    @commands.check(checks.is_bot_admin)
     async def speedtest(self, ctx: MyContext, method: str=None):
         """Fais un speedtest du vps
         Les méthodes possibles sont: dict, json, csv"""
@@ -790,7 +790,7 @@ Cette option affecte tous les serveurs"""
 
 
     @commands.command(name='eval')
-    @commands.check(reloads.check_admin)
+    @commands.check(checks.is_bot_admin)
     async def _eval(self, ctx: MyContext, *, body: str):
         """Evaluates a code
         Credits: Rapptz (https://github.com/Rapptz/RoboDanny/blob/rewrite/cogs/admin.py)"""
@@ -836,7 +836,7 @@ Cette option affecte tous les serveurs"""
                 await ctx.send(f'```py\n{value}{ret}\n```')
 
     @commands.command(name='execute',hidden=True)
-    @commands.check(reloads.check_admin)
+    @commands.check(checks.is_bot_admin)
     async def sudo(self, ctx: MyContext, who: typing.Union[discord.Member, discord.User], *, command: str):
         """Run a command as another user
         Credits: Rapptz (https://github.com/Rapptz/RoboDanny/blob/rewrite/cogs/admin.py)"""
@@ -848,7 +848,7 @@ Cette option affecte tous les serveurs"""
         await self.add_success_reaction(ctx.message)
 
     @commands.group(name='bug',hidden=True)
-    @commands.check(reloads.check_admin)
+    @commands.check(checks.is_bot_admin)
     async def main_bug(self, ctx: MyContext):
         """Gère la liste des bugs"""
 
@@ -889,7 +889,7 @@ Cette option affecte tous les serveurs"""
         await self.add_success_reaction(ctx.message)
 
     @commands.group(name="idea",hidden=True)
-    @commands.check(reloads.check_admin)
+    @commands.check(checks.is_bot_admin)
     async def main_idea(self, ctx: MyContext):
         """Ajouter une idée dans le salon des idées, en français et anglais"""
 

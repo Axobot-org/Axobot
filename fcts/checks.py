@@ -1,7 +1,36 @@
+import typing
+
 import discord
 from discord.ext import commands
 from libs.classes import MyContext
 
+admins_id = {279568324260528128,281404141841022976,552273019020771358}
+
+async def is_bot_admin(ctx: typing.Union[MyContext, discord.User]):
+    "Check if the user is one of the bot administrators"
+    if isinstance(ctx, commands.Context):
+        user = ctx.author
+    else:
+        user = ctx
+    if isinstance(user, str) and user.isnumeric():
+        user = int(user)
+    elif isinstance(user, (discord.User, discord.Member)):
+        user = user.id
+    return user in admins_id
+
+async def is_support_staff(ctx: MyContext) -> bool:
+    "Check if the user is one of the bot staff, either by flag or by role"
+    if ctx.author.id in admins_id:
+        return True
+    if UsersCog := ctx.bot.get_cog('Users'):
+        return await UsersCog.has_userflag(ctx.author, 'support')
+    server = ctx.bot.get_guild(356067272730607628)
+    if server is not None:
+        member = server.get_member(ctx.author.id)
+        role = server.get_role(412340503229497361)
+        if member is not None and role is not None:
+            return role in member.roles
+    return False
 
 async def can_mute(ctx: MyContext) -> bool:
     """Check if someone can mute"""
@@ -129,6 +158,7 @@ async def database_connected(ctx: MyContext) -> bool:
 
 
 async def is_fun_enabled(ctx: MyContext, self=None) -> bool:
+    "Check if fun is enabled in a given context"
     if self is None:
         if hasattr(ctx, 'bot'):
             self = ctx.bot.get_cog("Fun")

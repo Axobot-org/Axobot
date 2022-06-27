@@ -1,33 +1,8 @@
 import importlib
 from discord.ext import commands
+from fcts.checks import is_bot_admin
 from libs.classes import MyContext, Zbot
 from utils import count_code_lines
-
-admins_id = {279568324260528128,281404141841022976,552273019020771358}
-
-async def check_admin(ctx):
-    if isinstance(ctx, commands.Context):
-        user = ctx.author
-    else:
-        user = ctx
-    if isinstance(user, str) and user.isnumeric():
-        user = int(user)
-    elif type(user) != int:
-        user = user.id
-    return user in admins_id
-
-async def is_support_staff(ctx):
-    if ctx.author.id in admins_id:
-        return True
-    if UsersCog := ctx.bot.get_cog('Users'):
-        return await UsersCog.has_userflag(ctx.author, 'support')
-    server = ctx.bot.get_guild(356067272730607628)
-    if server is not None:
-        member = server.get_member(ctx.author.id)
-        role = server.get_role(412340503229497361)
-        if member is not None and role is not None:
-            return role in member.roles
-    return False
 
 class Reloads(commands.Cog):
     """Cog to manage the other cogs. Even if all are disabled, this is the last one left."""
@@ -73,24 +48,20 @@ class Reloads(commands.Cog):
                 info_cog.codelines = await count_code_lines()
 
     @commands.command(name="add_cog",hidden=True)
-    @commands.check(check_admin)
+    @commands.check(is_bot_admin)
     async def add_cog(self, ctx: MyContext, name: str):
         """Ajouter un cog au bot"""
-        if not ctx.author.id in admins_id:
-            return
         try:
             await self.bot.load_extension('fcts.'+name)
-            await ctx.send("Module '{}' ajouté !".format(name))
-            self.bot.log.info("Module {} ajouté".format(name))
+            await ctx.send(f"Module '{name}' ajouté !")
+            self.bot.log.info(f"Module {name} ajouté")
         except Exception as err:
             await ctx.send(str(err))
 
     @commands.command(name="del_cog",aliases=['remove_cog'],hidden=True)
-    @commands.check(check_admin)
+    @commands.check(is_bot_admin)
     async def rm_cog(self, ctx: MyContext, name: str):
         """Enlever un cog au bot"""
-        if not ctx.author.id in admins_id:
-            return
         try:
             await self.bot.unload_extension('fcts.'+name)
             await ctx.send(f"Module '{name}' désactivé !")

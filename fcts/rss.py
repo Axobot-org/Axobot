@@ -15,10 +15,9 @@ from libs.classes import MyContext, Zbot
 from libs.formatutils import FormatUtils
 from libs.rss import RssMessage, feed_parse, TwitterRSS, YoutubeRSS
 
-from fcts import args, checks, reloads
+from fcts import args, checks
 from libs.rss.rss_general import FeedSelectView, get_emoji
 
-# importlib.reload(reloads)
 importlib.reload(args)
 importlib.reload(checks)
 
@@ -34,10 +33,6 @@ reddit_link={'minecraft':'https://www.reddit.com/r/Minecraft',
              'reddit':'https://www.reddit.com/r/news',
              'discord':'https://www.reddit.com/r/discordapp'
              }
-
-
-async def check_admin(ctx: MyContext):
-    return await ctx.bot.get_cog('Admin').check_if_admin(ctx)
 
 async def can_use_rss(ctx: MyContext):
     if ctx.guild is None:
@@ -720,7 +715,7 @@ class Rss(commands.Cog):
             await ctx.bot.get_cog('Errors').on_error(e,ctx)
 
     @rss_main.command(name="test")
-    @commands.check(reloads.is_support_staff)
+    @commands.check(checks.is_support_staff)
     async def test_rss(self, ctx: MyContext, url, *, args=None):
         """Test if an rss feed is usable"""
         url = url.replace('<','').replace('>','')
@@ -1224,7 +1219,7 @@ class Rss(commands.Cog):
 
 
     @commands.command(name="rss_loop",hidden=True)
-    @commands.check(check_admin)
+    @commands.check(checks.is_bot_admin)
     async def rss_loop_admin(self, ctx: MyContext, new_state: str = "start"):
         """Manage the rss loop
         new_state can be start, stop or once"""

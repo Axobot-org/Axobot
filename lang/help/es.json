@@ -57,7 +57,7 @@
                 "Uno de sus roles está autorizado a usar este comando (`warn`)",
                 "Falta el rol permitido (`warn`)"
             ],
-            "check_admin": [
+            "is_bot_admin": [
                 "Necesitas ser uno de los Administradores del bot",
                 "No eres un Administrador del bot"
             ],

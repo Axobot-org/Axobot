@@ -61,7 +61,7 @@
                 "One of ur roles iz allowd 2 use this command (`warn`)",
                 "U missed allowed role (`warn`)"
             ],
-            "check_admin": [
+            "is_bot_admin": [
                 "You need 2B one of the bot Admins",
                 "U are not a bot Admin"
             ],
