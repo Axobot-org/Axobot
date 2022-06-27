@@ -61,7 +61,7 @@
                 "L'un de vos rôles est autorisé à utiliser cette commande (`warn`)",
                 "Rôle autorisé manquant (`warn`)"
             ],
-            "check_admin": [
+            "is_bot_admin": [
                 "Il faut être administrateur du bot",
                 "Vous n'êtes pas administrateur du bot"
             ],

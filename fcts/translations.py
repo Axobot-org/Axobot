@@ -10,8 +10,7 @@ from discord.ext import tasks, commands
 from flatten_json import flatten, unflatten
 from libs.classes import MyContext, Zbot
 
-from fcts.checks import is_translator
-from fcts.reloads import check_admin
+from fcts.checks import is_translator, is_bot_admin
 
 FlatennedTranslations = dict[str, typing.Optional[str]]
 ModuleDict = dict[str, FlatennedTranslations]
@@ -341,7 +340,7 @@ Use `stop` to stop translating
         await ctx.send(f"New translation:\n :arrow_right: {translation}")
 
     @translate_main.command(name="get-file")
-    @commands.check(check_admin)
+    @commands.check(is_bot_admin)
     async def fuse_file(self, ctx: MyContext, lang: LanguageId, module: str):
         """Merge the current project file
         with the already-translated file"""

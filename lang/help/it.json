@@ -57,7 +57,7 @@
                 "Uno di tuoi ruoli può usare questo controllo (`warn`)",
                 "Ruolo autorizzato mancante (`warn`)"
             ],
-            "check_admin": [
+            "is_bot_admin": [
                 "Bisogna essere amministratore del robot",
                 "Non sei amministratore del robot"
             ],
