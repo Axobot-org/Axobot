@@ -3,7 +3,6 @@ import copy
 import datetime
 import importlib
 import locale
-import os
 import re
 import sys
 import time
@@ -45,6 +44,8 @@ class Info(commands.Cog):
         self.bot_version = conf.release + ('a' if bot.beta else '')
         self.emoji_table = 'emojis_beta' if self.bot.beta else 'emojis'
         self.BitlyClient = bitly_api.Bitly(api_key=self.bot.others['bitly'])
+        self.process = psutil.Process()
+        self.process.cpu_percent()
 
     @commands.Cog.listener()
     async def on_ready(self):
@@ -83,12 +84,10 @@ class Info(commands.Cog):
         ..Doc infos.html#statistics"""
         v = sys.version_info
         version = str(v.major)+"."+str(v.minor)+"."+str(v.micro)
-        pid = os.getpid()
-        py = psutil.Process(pid)
         latency = round(self.bot.latency*1000, 2)
         async with ctx.channel.typing():
             # RAM/CPU
-            ram_cpu = [round(py.memory_info()[0]/2.**30,3), py.cpu_percent(interval=1)]
+            ram_cpu = [round(self.process.memory_info()[0]/2.**30,3), self.process.cpu_percent()]
             # Guilds count
             ignored_guilds = list()
             if self.bot.database_online:
