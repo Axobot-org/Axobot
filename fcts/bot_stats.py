@@ -1,4 +1,3 @@
-import os
 import typing
 from math import isinf
 
@@ -26,6 +25,7 @@ class BotStats(commands.Cog):
         self.commands_uses = {}
         self.rss_stats = {'checked': 0, 'messages': 0, 'errors': 0}
         self.xp_cards = 0
+        self.process = psutil.Process()
 
     async def cog_load(self):
         self.loop.start() # pylint: disable=no-member
@@ -61,7 +61,7 @@ class BotStats(commands.Cog):
             return
         self.bot.log.debug("Stats loop triggered")
         # get current process for performances logs
-        py = psutil.Process(os.getpid())
+        
         # get current time
         now = self.bot.utcnow()
         # remove seconds and less
@@ -87,8 +87,8 @@ class BotStats(commands.Cog):
             self.xp_cards = 0
             # Latency - RAM usage - CPU usage
             latency = round(self.bot.latency*1000, 3)
-            ram = round(py.memory_info()[0]/2.**30, 3)
-            cpu = py.cpu_percent(interval=1)
+            ram = round(self.process.memory_info()[0]/2.**30, 3)
+            cpu = self.process.cpu_percent()
             if not isinf(latency):
                 cursor.execute(query, (now, 'perf.latency', latency, 1, 'ms', False, self.bot.beta))
             cursor.execute(query, (now, 'perf.ram', ram, 1, 'Gb', False, self.bot.beta))
