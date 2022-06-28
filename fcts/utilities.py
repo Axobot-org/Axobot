@@ -295,18 +295,6 @@ class Utilities(commands.Cog):
                         votes.append(("Discord Bots List", "https://top.gg/"))
             except Exception as e:
                 await self.bot.get_cog("Errors").on_error(e, None)
-            try:  # https://discordlist.space/bot/486896267788812288
-                headers = {'Authorization': self.bot.others['discordlist.space']}
-                async with session.get(f'https://api.discordlist.space/v2/bots/486896267788812288/upvotes/status/{userid}', headers=headers) as r:
-                    if r.status != 404:
-                        js = await r.json()
-                        if 'errors' in js:
-                            raise Exception(f"discordlist.space raised the following exceptions: {js['errors']}")
-                        elif js["upvoted"]:
-                            votes.append(
-                                ("discordlist.space", "https://discordlist.space/"))
-            except Exception as e:
-                await self.bot.get_cog("Errors").on_error(e, None)
             try:  # https://discord.boats/bot/486896267788812288
                 headers = {'Authorization': self.bot.others['discordboats']}
                 async with session.get(f"https://discord.boats/api/bot/486896267788812288/voted?id={userid}", headers=headers) as r:
