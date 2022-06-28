@@ -54,4 +54,3 @@ This program is subject to a **MIT-type license**, which means that you are free
 
 [![Bots on Discord](https://bots.ondiscord.xyz/bots/486896267788812288/embed)](https://bots.ondiscord.xyz/bots/486896267788812288)
 
-[![discordlist.space](https://api.discordlist.space/v2/bots/486896267788812288/widget?rounded=true)](https://discordlist.space/bot/486896267788812288?utm_source=bls&utm_medium=widget&utm_campaign=486896267788812288)
