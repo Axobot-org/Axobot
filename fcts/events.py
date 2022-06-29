@@ -53,7 +53,6 @@ class Events(commands.Cog):
             'channel':45,
             'role':60,
             'guild':75}
-        self.statuspage_header = {"Content-Type": "application/json", "Authorization": "OAuth " + self.bot.others["statuspage"]}
 
     async def cog_load(self):
         if self.bot.internal_loop_enabled:
@@ -328,9 +327,6 @@ class Events(commands.Cog):
             # Timed tasks - every 20s
             if now.second%20 == 0 and self.bot.database_online:
                 await self.bot.task_handler.check_tasks()
-            # Latency usage - every 30s
-            if now.second%30 == 0:
-                await self.status_loop(now)
             # Clear old rank cards - every 20min
             elif now.minute%20 == 0 and self.bot.database_online:
                 await self.bot.get_cog('Xp').clear_cards()
@@ -368,29 +364,6 @@ class Events(commands.Cog):
         await self.bot.wait_until_ready()
         await asyncio.sleep(2)
         self.bot.log.info("[tasks_loop] Lancement de la boucle")
-
-
-    async def status_loop(self, date: datetime.datetime):
-        "Send average latency to zbot.statuspage.io"
-        if self.bot.beta:
-            return
-        try:
-            self.latencies_list.append(round(self.bot.latency*1000))
-        except OverflowError: # Usually because latency is infinite
-            self.latencies_list.append(10e6)
-        if date.minute % 4 == 0 and date.minute != self.last_statusio.minute:
-            average = round(sum(self.latencies_list)/len(self.latencies_list))
-            async with aiohttp.ClientSession(loop=self.bot.loop, headers=self.statuspage_header) as session:
-                params = {"data": {"timestamp": round(date.timestamp()), "value": average}}
-                async with session.post("https://api.statuspage.io/v1/pages/g9cnphg3mhm9/metrics/x4xs4clhkmz0/data", json=params) as r:
-                    r.raise_for_status()
-                    self.bot.log.debug(f"StatusPage API returned {r.status} for {params} (latency)")
-                params["data"]["value"] = psutil.virtual_memory().available
-                async with session.post("https://api.statuspage.io/v1/pages/g9cnphg3mhm9/metrics/72bmf4nnqbwb/data", json=params) as r:
-                    r.raise_for_status()
-                    self.bot.log.debug(f"StatusPage API returned {r.status} for {params} (available RAM)")
-            self.latencies_list = list()
-            self.last_statusio = date
 
     async def botEventLoop(self):
         self.bot.get_cog("BotEvents").update_current_event()
