@@ -80,14 +80,18 @@ class Info(commands.Cog):
     @commands.cooldown(2,60,commands.BucketType.guild)
     async def stats(self, ctx: MyContext):
         """Display some statistics about the bot
-        
+
         ..Doc infos.html#statistics"""
         v = sys.version_info
         version = str(v.major)+"."+str(v.minor)+"."+str(v.micro)
         latency = round(self.bot.latency*1000, 2)
         async with ctx.channel.typing():
             # RAM/CPU
-            ram_cpu = [round(self.process.memory_info()[0]/2.**30,3), self.process.cpu_percent()]
+            ram_usage = round(self.process.memory_info()[0]/2.**30,3)
+            if cog := self.bot.get_cog("BotStats"):
+                cpu: float = await cog.get_list_usage(cog.cpu_records)
+            else:
+                cpu = 0.0
             # Guilds count
             ignored_guilds = list()
             if self.bot.database_online:
@@ -126,8 +130,8 @@ class Info(commands.Cog):
                 ('languages', langs_list),
                 ('python_version', version),
                 ('lib_version', discord.__version__),
-                ('ram_usage', await n_format(ram_cpu[0])),
-                ('cpu_usage', await n_format(ram_cpu[1])),
+                ('ram_usage', await n_format(ram_usage)),
+                ('cpu_usage', await n_format(cpu)),
                 ('api_ping', await n_format(latency)),
                 ('cmds_24h', await n_format(cmds_24h)),
                 ('total_xp', await n_format(total_xp)+" ")]:
