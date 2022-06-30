@@ -266,6 +266,7 @@ class Tickets(commands.Cog):
             pass
 
     async def ask_user_topic(self, ctx: MyContext) -> Optional[int]:
+        "Ask a user which topic they want to edit"
         placeholder = await self.bot._(ctx.guild.id, "tickets.selection-placeholder")
         view = AskTopicSelect(ctx.author.id, await self.db_get_topics(ctx.guild.id), placeholder, 1)
         await ctx.send(await self.bot._(ctx.guild.id, "tickets.choose-topic-edition"), view=view)
@@ -281,7 +282,10 @@ class Tickets(commands.Cog):
     async def create_channel_first_message(self, interaction: discord.Interaction, topic: dict, ticket_name: str) -> discord.Embed:
         "Create the introduction message at the beginning of the ticket"
         title = await self.bot._(interaction.guild_id, "tickets.ticket-introduction.title")
-        desc = await self.bot._(interaction.guild_id, "tickets.ticket-introduction.description", user=interaction.user.mention, ticket_name=ticket_name, topic_name=topic['topic'])
+        desc = await self.bot._(interaction.guild_id, "tickets.ticket-introduction.description",
+                                user=interaction.user.mention,
+                                ticket_name=ticket_name, topic_name=topic['topic']
+                                )
         return discord.Embed(title=title, description=desc, color=discord.Color.green())
 
     async def setup_ticket_channel(self, channel: discord.TextChannel, topic: dict, user: discord.Member):
@@ -449,7 +453,7 @@ class Tickets(commands.Cog):
         ..Doc tickets.html#presentation-message"""
         row_id = await self.db_get_guild_default_id(ctx.guild.id)
         if row_id is None:
-            row_id = await self.db_set_guild_default_id(ctx.guild.id)
+            await self.db_set_guild_default_id(ctx.guild.id)
         await self.db_edit_prompt(ctx.guild.id, message)
         await ctx.send(await self.bot._(ctx.guild.id, "tickets.text-edited"))
 
