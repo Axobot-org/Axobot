@@ -1,13 +1,14 @@
-from libs.classes import Zbot, MyContext, UserFlag, RankCardsFlag
-from discord.ext import commands
 import importlib
-import typing
 import json
 import time
+import typing
+
 import discord
-from typing import List
+from discord.ext import commands
+from libs.classes import MyContext, RankCardsFlag, UserFlag, Zbot
 
 from fcts import args, checks
+
 importlib.reload(args)
 importlib.reload(checks)
 
@@ -18,10 +19,10 @@ class Users(commands.Cog):
         self.bot = bot
         self.file = 'users'
 
-    async def get_userflags(self, user: discord.User) -> List[str]:
+    async def get_userflags(self, user: discord.User) -> list[str]:
         """Check what user flags has a user"""
         if not self.bot.database_online:
-            return list()
+            return []
         parameters = None
         try:
             if cog := self.bot.get_cog("Utilities"):
@@ -41,7 +42,7 @@ class Users(commands.Cog):
             return False
         return flag in await self.get_userflags(user)
     
-    async def get_rankcards(self, user: discord.User) -> List[str]:
+    async def get_rankcards(self, user: discord.User) -> list[str]:
         """Check what rank cards got unlocked by a user"""
         if not self.bot.database_online:
             return list()

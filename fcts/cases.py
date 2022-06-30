@@ -1,9 +1,14 @@
-import discord, importlib, typing
-from discord.ext import commands
-from libs.classes import Zbot, MyContext
+import importlib
+import typing
 
-from fcts import args, reloads
+import discord
+from discord.ext import commands
+from libs.classes import MyContext, Zbot
 from libs.formatutils import FormatUtils
+
+from fcts import args
+from fcts.checks import is_support_staff
+
 importlib.reload(args)
 
 
@@ -175,7 +180,7 @@ class Cases(commands.Cog):
 
     @case_main.command(name="glist")
     @commands.guild_only()
-    @commands.check(reloads.is_support_staff)
+    @commands.check(is_support_staff)
     async def see_case_2(self, ctx: MyContext, guild: typing.Optional[args.Guild], *, user:args.user):
         """Get every case of a user on a specific guild or on every guilds
         This user can have left the server
@@ -293,7 +298,7 @@ class Cases(commands.Cog):
         if not self.bot.database_online:
             return await ctx.send(await self.bot._(ctx.guild.id,'cases.no_database'))
         try:
-            isSupport = await reloads.is_support_staff(ctx)
+            isSupport = await is_support_staff(ctx)
             c = ["ID="+str(case)]
             if not isSupport:
                 c.append("guild="+str(ctx.guild.id))

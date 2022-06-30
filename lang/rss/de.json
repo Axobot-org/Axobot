@@ -14,7 +14,6 @@
         "invalid-flow": "Diese url ist ungültig (leere oder mache einen zugänglichen rss Flow) 😕",
         "invalid-link": "Ups, diese url Adresse ist ungültig oder nicht vollendet 😕",
         "list": "*Schreibe die Nummer von dem Flow um ihn zu verändern*\n\n**Link - Nachricht - Kanal - Erwähnungen**",
-        "list-result": "Nachricht: {}\nDiscord Kanal: {}\nURL/Kanal: {}\nErwähnungen: {}\nIdentifizierung: {}\nletzter Post: {}",
         "list2": "*Schreibe die Nummer von dem Flow, der gelöscht werden soll*\n\n**Link - Nachricht - Kanal**",
         "mc": "Minecraft",
         "no-feed": "Ups, du kannst keine rss Feeds verwalten!",

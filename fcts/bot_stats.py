@@ -1,6 +1,5 @@
-import os
 import typing
-from math import isinf
+import aiohttp
 
 import mysql
 import psutil
@@ -26,12 +25,59 @@ class BotStats(commands.Cog):
         self.commands_uses = {}
         self.rss_stats = {'checked': 0, 'messages': 0, 'errors': 0}
         self.xp_cards = 0
+        self.process = psutil.Process()
+        self.cpu_records: list[float] = []
+        self.latency_records: list[int] = []
+        self.statuspage_header = {"Content-Type": "application/json", "Authorization": "OAuth " + self.bot.others["statuspage"]}
 
     async def cog_load(self):
-        self.loop.start() # pylint: disable=no-member
+         # pylint: disable=no-member
+        self.sql_loop.start()
+        self.record_cpu_usage.start()
+        self.record_ws_latency.start()
+        self.status_loop.start()
 
     async def cog_unload(self):
-        self.loop.cancel() # pylint: disable=no-member
+         # pylint: disable=no-member
+        self.sql_loop.cancel()
+        self.record_cpu_usage.cancel()
+        self.record_ws_latency.cancel()
+        self.status_loop.stop()
+
+    @tasks.loop(seconds=10)
+    async def record_cpu_usage(self):
+        "Record the CPU usage for later use"
+        self.cpu_records.append(self.process.cpu_percent())
+        if len(self.cpu_records) > 6:
+            # if the list becomes too long (over 1min), cut it
+            self.cpu_records = self.cpu_records[-6:]
+
+    @record_cpu_usage.error
+    async def on_record_cpu_error(self, error: Exception):
+        self.bot.dispatch("error", error, "When collecting CPU usage")
+
+    @tasks.loop(seconds=30)
+    async def record_ws_latency(self):
+        "Record the websocket latency for later use"
+        if self.bot.latency is None:
+            return
+        try:
+            self.latency_records.append(round(self.bot.latency*1000))
+        except OverflowError: # Usually because latency is infinite
+            self.latency_records.append(10e6)
+        if len(self.latency_records) > 2:
+            # if the list becomes too long (over 1min), cut it
+            self.latency_records = self.latency_records[-2:]
+
+    @record_ws_latency.error
+    async def on_record_latency_error(self, error: Exception):
+        self.bot.dispatch("error", error, "When collecting WS latency")
+
+    async def get_list_usage(self, origin: list):
+        "Calculate the average list value"
+        if len(origin) > 0:
+            avg = round(sum(origin)/len(origin), 1)
+            return avg
 
     @commands.Cog.listener()
     async def on_socket_raw_receive(self, msg: str):
@@ -55,13 +101,11 @@ class BotStats(commands.Cog):
         self.received_events['CMD_USE'] = nbr + 1
 
     @tasks.loop(minutes=1)
-    async def loop(self):
+    async def sql_loop(self):
         """Send our stats every minute"""
         if not (self.bot.alerts_enabled and self.bot.database_online):
             return
         self.bot.log.debug("Stats loop triggered")
-        # get current process for performances logs
-        py = psutil.Process(os.getpid())
         # get current time
         now = self.bot.utcnow()
         # remove seconds and less
@@ -84,14 +128,15 @@ class BotStats(commands.Cog):
                 cursor.execute(query, (now, 'rss.'+k, v, 0, k, True, self.bot.beta))
             # XP cards
             cursor.execute(query, (now, 'xp.generated_cards', self.xp_cards, 0, 'cards/min', True, self.bot.beta))
+            self.xp_cards = 0
             # Latency - RAM usage - CPU usage
-            latency = round(self.bot.latency*1000, 3)
-            ram = round(py.memory_info()[0]/2.**30, 3)
-            cpu = py.cpu_percent(interval=1)
-            if not isinf(latency):
+            ram = round(self.process.memory_info()[0]/2.**30, 3)
+            if latency := await self.get_list_usage(self.latency_records):
                 cursor.execute(query, (now, 'perf.latency', latency, 1, 'ms', False, self.bot.beta))
             cursor.execute(query, (now, 'perf.ram', ram, 1, 'Gb', False, self.bot.beta))
-            cursor.execute(query, (now, 'perf.cpu', cpu, 1, '%', False, self.bot.beta))
+            cpu = await self.get_list_usage(self.cpu_records)
+            if cpu is not None:
+                cursor.execute(query, (now, 'perf.cpu', cpu, 1, '%', False, self.bot.beta))
             # Unavailable guilds
             unav, total = 0, 0
             for guild in self.bot.guilds:
@@ -103,16 +148,17 @@ class BotStats(commands.Cog):
             cnx.commit()
         except mysql.connector.errors.IntegrityError as err: # duplicate primary key
             self.bot.log.warning(f"Stats loop iteration cancelled: {err}")
-        except Exception as err:
-            await self.bot.get_cog("Errors").on_error(err)
         # if something goes wrong, we still have to close the cursor
         cursor.close()
 
-    @loop.before_loop
-    async def before_printer(self):
+    @sql_loop.before_loop
+    async def before_sql_loop(self):
         """Wait until the bot is ready"""
         await self.bot.wait_until_ready()
 
+    @sql_loop.error
+    async def on_sql_loop_error(self, error: Exception):
+        self.bot.dispatch("error", error, "When sending SQL stats")
 
     async def get_stats(self, variable: str, minutes: int) -> typing.Union[int, float, str, None]:
         """Get the sum of a certain variable in the last X minutes"""
@@ -130,6 +176,34 @@ class BotStats(commands.Cog):
             return float(result['value'])
         else:
             return result['value']
+
+    @tasks.loop(minutes=4)
+    async def status_loop(self):
+        "Send average latency to zbot.statuspage.io every 4min"
+        if self.bot.beta or not self.bot.internal_loop_enabled:
+            return
+        now = self.bot.utcnow()
+        average = await self.get_list_usage(self.latency_records)
+        async with aiohttp.ClientSession(loop=self.bot.loop, headers=self.statuspage_header) as session:
+            params = {"data": {"timestamp": round(
+                now.timestamp()), "value": average}}
+            async with session.post(
+                "https://api.statuspage.io/v1/pages/g9cnphg3mhm9/metrics/x4xs4clhkmz0/data",
+                    json=params) as response:
+                response.raise_for_status()
+                self.bot.log.debug(
+                    f"StatusPage API returned {response.status} for {params} (latency)")
+            params["data"]["value"] = psutil.virtual_memory().available
+            async with session.post(
+                "https://api.statuspage.io/v1/pages/g9cnphg3mhm9/metrics/72bmf4nnqbwb/data",
+                    json=params) as response:
+                response.raise_for_status()
+                self.bot.log.debug(
+                    f"StatusPage API returned {response.status} for {params} (available RAM)")
+
+    @status_loop.error
+    async def on_status_loop_error(self, error: Exception):
+        self.bot.dispatch("error", error, "When sending stats to statuspage.io")
 
 
 async def setup(bot):

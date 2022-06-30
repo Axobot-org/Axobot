@@ -32,7 +32,7 @@ class Languages(discord.ext.commands.Cog):
         if isinstance(source, discord.Guild):
             # get ID from guild
             source = source.id
-        elif isinstance(source, (discord.TextChannel, discord.Thread)):
+        elif isinstance(source, (discord.abc.GuildChannel)):
             # get ID from text channel
             source = source.guild.id
         elif isinstance(source, discord.Interaction):

@@ -18,7 +18,7 @@ class ServerLogs(commands.Cog):
     logs_categories = {
         "automod": {"antiraid", "antiscam"},
         "members": {"member_roles", "member_nick", "member_avatar", "member_join", "member_leave"},
-        "moderation": {"member_ban", "member_unban", "member_timeout"},
+        "moderation": {"member_ban", "member_unban", "member_timeout", "member_kick"},
         "messages": {"message_update", "message_delete"},
         "roles": {"role_creation"}
     }
@@ -108,15 +108,21 @@ class ServerLogs(commands.Cog):
         "Send ready logs every 1min to avoid rate limits"
         try:
             for channel, embeds in dict(self.to_send).items():
-                perms = channel.permissions_for(channel.guild.me)
-                if perms.send_messages and perms.embed_links:
-                    await channel.send(embeds=embeds[:10])
-                    if len(embeds) > 10:
-                        self.to_send[channel] = self.to_send[channel][10:]
-                    else:
-                        self.to_send.pop(channel)
+                if not embeds:
+                    self.to_send.pop(channel)
+                    continue
+                try:
+                    perms = channel.permissions_for(channel.guild.me)
+                    if perms.send_messages and perms.embed_links:
+                        await channel.send(embeds=embeds[:10])
+                        if len(embeds) > 10:
+                            self.to_send[channel] = self.to_send[channel][10:]
+                        else:
+                            self.to_send.pop(channel)
+                except discord.HTTPException as err:
+                    self.bot.dispatch('error', err, None)
         except Exception as err: # pylint: disable=broad-except
-            await self.bot.get_cog("Errors").on_error(err, None)
+            self.bot.dispatch('error', err, None)
 
     @send_logs_task.before_loop
     async def before_logs_task(self):
@@ -125,7 +131,7 @@ class ServerLogs(commands.Cog):
 
     @commands.group(name="modlogs")
     @commands.guild_only()
-    @commands.check(checks.has_manage_guild)
+    @commands.check(checks.has_audit_logs)
     @commands.cooldown(2, 6, commands.BucketType.guild)
     async def modlogs_main(self, ctx: MyContext):
         """Enable or disable server logs in specific channels"""
@@ -232,7 +238,7 @@ class ServerLogs(commands.Cog):
                 guild = self.bot.get_guild(msg.guild_id)
                 link = f"https://discord.com/channels/{msg.guild_id}/{msg.channel_id}/{msg.message_id}"
             new_content = msg.data.get('content')
-            if new_content is None and msg.data.get('flags', 0) & 32:
+            if new_content is None: # and msg.data.get('flags', 0) & 32:
                 return
             emb = discord.Embed(
                 description=f"**[Message]({link}) updated in <#{msg.channel_id}>**",
@@ -415,7 +421,9 @@ class ServerLogs(commands.Cog):
     @commands.Cog.listener()
     async def on_member_remove(self, member: discord.Member):
         """Triggered when a member leaves a guild
-        Corresponding log: member_leave"""
+        Corresponding log: member_leave, member_kick"""
+        if not member.guild:
+            return
         if channel_ids := await self.is_log_enabled(member.guild.id, "member_leave"):
             emb = discord.Embed(
                 description=f"**{member.mention} ({member.id}) left your server**",
@@ -430,8 +438,26 @@ class ServerLogs(commands.Cog):
             if specs := await self.get_member_specs(member):
                 emb.add_field(name="Specificities", value=", ".join(specs), inline=False)
             member_roles = [role for role in member.roles[::-1] if not role.is_default()]
-            emb.add_field(name=f"Roles ({len(member_roles)})", value=" ".join(r.mention for r in member_roles[:20]))
+            roles_value = " ".join(r.mention for r in member_roles[:20]) if member_roles else "None"
+            emb.add_field(name=f"Roles ({len(member_roles)})", value=roles_value)
             await self.validate_logs(member.guild, channel_ids, emb)
+        if member.guild.me.guild_permissions.view_audit_log and (
+            channel_ids := await self.is_log_enabled(member.guild.id, "member_kick")
+        ):
+            now = self.bot.utcnow()
+            await asyncio.sleep(self.auditlogs_timeout)
+            async for entry in member.guild.audit_logs(limit=5, action=discord.AuditLogAction.kick, oldest_first=False):
+                if entry.target.id == member.id and (entry.created_at - now).total_seconds() < 5:
+                    emb = discord.Embed(
+                        description=f"**{member.mention} ({member.id}) has been kicked**",
+                        colour=discord.Color.red()
+                    )
+                    emb.add_field(name="Kicked by",
+                                  value=f"**{entry.user.mention}** ({entry.user.id})")
+                    emb.add_field(name="With reason",
+                                  value=entry.reason or "No reason specified")
+                    await self.validate_logs(member.guild, channel_ids, emb)
+                    break
 
     @commands.Cog.listener()
     async def on_member_ban(self, guild: discord.Guild, user: discord.User):
@@ -511,14 +537,7 @@ class ServerLogs(commands.Cog):
                 description=f"**Potentially dangerous [message]({message.jump_url})**",
                 colour=discord.Color.orange()
             )
-            # probabilities
-            categories: dict = self.bot.get_cog("AntiScam").agent.categories
-            emb.add_field(name="AI detection result", value=prediction.to_string(categories), inline=False)
-            # message content
-            content = message.content if len(message.content) < 1020 else message.content[:1020]+'…'
-            emb.add_field(name="Message content", value=content)
-            # author
-            emb.set_author(name=f"{message.author} ({message.author.id})", icon_url=message.author.display_avatar)
+            await self.prepare_antiscam_embed(message, prediction, emb)
             await self.validate_logs(message.guild, channel_ids, emb)
 
     @commands.Cog.listener()
@@ -530,15 +549,19 @@ class ServerLogs(commands.Cog):
                 description=f"**Dangerous [message]({message.jump_url}) deleted**",
                 colour=discord.Color.red()
             )
-            # probabilities
-            categories: dict = self.bot.get_cog("AntiScam").agent.categories
-            emb.add_field(name="AI detection result", value=prediction.to_string(categories), inline=False)
-            # message content
-            content = message.content if len(message.content) < 1020 else message.content[:1020]+'…'
-            emb.add_field(name="Message content", value=content)
-            # author
-            emb.set_author(name=f"{message.author} ({message.author.id})", icon_url=message.author.display_avatar)
+            await self.prepare_antiscam_embed(message, prediction, emb)
             await self.validate_logs(message.guild, channel_ids, emb)
+
+    async def prepare_antiscam_embed(self, message: discord.Message, prediction: PredictionResult, emb: discord.Embed):
+        "Prepare the embed for an antiscam alert"
+        # probabilities
+        categories: dict = self.bot.get_cog("AntiScam").agent.categories
+        emb.add_field(name="AI detection result", value=prediction.to_string(categories), inline=False)
+        # message content
+        content = message.content if len(message.content) < 1020 else message.content[:1020]+'…'
+        emb.add_field(name="Message content", value=content)
+        # author
+        emb.set_author(name=f"{message.author} ({message.author.id})", icon_url=message.author.display_avatar)
 
     @commands.Cog.listener()
     async def on_antiraid_kick(self, member: discord.Member, data: dict[str, Any]):
@@ -556,7 +579,7 @@ class ServerLogs(commands.Cog):
                 min_age = await FormatUtils.time_delta(account_creation_treshold, hour=(account_creation_treshold<86400))
                 delta = await FormatUtils.time_delta(member.created_at, self.bot.utcnow(), hour=True)
                 value = f"Account created at <t:{member.created_at.timestamp():.0f}> ({delta})\n\
-                    Minimum age required by anti-raid: {min_age}"
+Minimum age required by anti-raid: {min_age}"
                 emb.add_field(name="Account was too recent", value=value, inline=False)
             if "discord_invite" in data:
                 emb.add_field(name="Contains a Discord invite in their username", value=self.bot.zws, inline=False)
@@ -579,7 +602,7 @@ class ServerLogs(commands.Cog):
                     account_creation_treshold, hour=(account_creation_treshold < 86400))
                 delta = await FormatUtils.time_delta(member.created_at, self.bot.utcnow(), hour=True)
                 value = f"Account created at <t:{member.created_at.timestamp():.0f}> ({delta})\n\
-                    Minimum age required by anti-raid: {min_age}"
+Minimum age required by anti-raid: {min_age}"
                 emb.add_field(name="Account was too recent", value=value, inline=False)
             if "discord_invite" in data:
                 emb.add_field(name="Contains a Discord invite in their username", value=self.bot.zws, inline=False)

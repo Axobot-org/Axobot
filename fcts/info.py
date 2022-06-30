@@ -3,7 +3,6 @@ import copy
 import datetime
 import importlib
 import locale
-import os
 import re
 import sys
 import time
@@ -23,12 +22,11 @@ from libs.classes import MyContext, Zbot
 from libs.formatutils import FormatUtils
 from utils import count_code_lines
 
-from fcts import args, checks, reloads
+from fcts import args, checks
 
 default_color = discord.Color(0x50e3c2)
 
 importlib.reload(conf)
-# importlib.reload(reloads)
 importlib.reload(args)
 importlib.reload(checks)
 importlib.reload(bitly_api)
@@ -46,6 +44,8 @@ class Info(commands.Cog):
         self.bot_version = conf.release + ('a' if bot.beta else '')
         self.emoji_table = 'emojis_beta' if self.bot.beta else 'emojis'
         self.BitlyClient = bitly_api.Bitly(api_key=self.bot.others['bitly'])
+        self.process = psutil.Process()
+        self.process.cpu_percent()
 
     @commands.Cog.listener()
     async def on_ready(self):
@@ -56,11 +56,11 @@ class Info(commands.Cog):
     @commands.command(name='admins')
     async def admin_list(self, ctx: MyContext):
         """Get the list of ZBot administrators
-        
+
         ..Doc miscellaneous.html#admins"""
-        l  = list()
-        for u in reloads.admins_id:
-            if u==552273019020771358:
+        l  = []
+        for u in checks.admins_id:
+            if u == 552273019020771358:
                 continue
             l.append(str(self.bot.get_user(u)))
         await ctx.send(await self.bot._(ctx.channel,"info.admins-list", admins=", ".join(l)))
@@ -80,16 +80,18 @@ class Info(commands.Cog):
     @commands.cooldown(2,60,commands.BucketType.guild)
     async def stats(self, ctx: MyContext):
         """Display some statistics about the bot
-        
+
         ..Doc infos.html#statistics"""
         v = sys.version_info
         version = str(v.major)+"."+str(v.minor)+"."+str(v.micro)
-        pid = os.getpid()
-        py = psutil.Process(pid)
         latency = round(self.bot.latency*1000, 2)
         async with ctx.channel.typing():
             # RAM/CPU
-            ram_cpu = [round(py.memory_info()[0]/2.**30,3), py.cpu_percent(interval=1)]
+            ram_usage = round(self.process.memory_info()[0]/2.**30,3)
+            if cog := self.bot.get_cog("BotStats"):
+                cpu: float = await cog.get_list_usage(cog.cpu_records)
+            else:
+                cpu = 0.0
             # Guilds count
             ignored_guilds = list()
             if self.bot.database_online:
@@ -128,8 +130,8 @@ class Info(commands.Cog):
                 ('languages', langs_list),
                 ('python_version', version),
                 ('lib_version', discord.__version__),
-                ('ram_usage', await n_format(ram_cpu[0])),
-                ('cpu_usage', await n_format(ram_cpu[1])),
+                ('ram_usage', await n_format(ram_usage)),
+                ('cpu_usage', await n_format(cpu)),
                 ('api_ping', await n_format(latency)),
                 ('cmds_24h', await n_format(cmds_24h)),
                 ('total_xp', await n_format(total_xp)+" ")]:
@@ -792,7 +794,7 @@ Available types: member, role, user, emoji, channel, server, invite, category
 
 
     @commands.group(name="find")
-    @commands.check(reloads.is_support_staff)
+    @commands.check(checks.is_support_staff)
     @commands.check(in_support_server)
     async def find_main(self, ctx: MyContext):
         """Same as info, but in a lighter version"""

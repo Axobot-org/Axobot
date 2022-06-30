@@ -16,7 +16,7 @@
         "invalid-flow": "Cet url est invalide (flux rss vide ou inaccessible) :blobconfused:",
         "invalid-link": "Oups, cette adresse url est invalide ou incomplète :confused:",
         "list": "*Entre le numéro du flux à modifier*\n\n**Lien - Type - Salon - Roles**\n",
-        "list-result": "Type : {}\nSalon discord : {}\nURL/salon : {}\nPings : {}\nID : {}\nDernier post : {}",
+        "list-result": "{emoji} {link}\nSalon discord : {channel}\nPings : {roles}\nID : {id}\nDernier post : {last_post}",
         "list-title": "Liste des flux rss du serveur %{server}",
         "list2": "*Entre le numéro du flux à supprimer*\n\n**Lien - Type - Salon**\n",
         "loop-processing": "Une check de vos flux RSS est déjà en cours. Veuillez attendre quelques minutes.",

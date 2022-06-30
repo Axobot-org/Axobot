@@ -100,7 +100,7 @@ def create_database_query(cnx_frm: Union[MySQLConnection, 'CMySQLConnection']):
             try:
                 self.cursor.execute(self.query, self.args)
             except errors.ProgrammingError:
-                logging.getLogger("database").error("%s", self.cursor._executed)
+                logging.getLogger("database").error("%s", self.cursor._executed, exc_info=True)
 
             if self.query.startswith("SELECT"):
                 return_type = tuple if self.astuple else dict

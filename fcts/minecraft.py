@@ -524,9 +524,8 @@ Every information come from the website www.fr-minecraft.net"""
             self.desc = desc
 
         async def clear_desc(self):
-            for m in re.finditer(r"§.", self.desc):
-                self.desc = self.desc.replace(m.group(0), "")
-            self.desc = self.desc.replace("\n             ", "\n")
+            self.desc = re.sub(r'§.', '', self.desc)
+            self.desc = re.sub(r'[ \t\r]{2,}', ' ', self.desc).strip()
             return self
 
         async def create_msg(self, guild: discord.Guild, translate):
@@ -548,8 +547,9 @@ Every information come from the website www.fr-minecraft.net"""
             else:
                 embed.add_field(name=await translate(guild, "minecraft.serv-2"), value=", ".join(p))
             if self.ping is not None:
-                embed.add_field(name=await translate(guild, "minecraft.serv-3"), value=str(self.ping)+" ms")
-            embed.add_field(name="Description", value=self.desc, inline=False)
+                embed.add_field(name=await translate(guild, "minecraft.serv-3"), value=f'{self.ping} ms')
+            if self.desc:
+                embed.add_field(name="Description", value=self.desc, inline=False)
             return embed
 
     async def send_msg_server(self, obj, channel: discord.abc.Messageable, ip: str):

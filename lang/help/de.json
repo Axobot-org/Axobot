@@ -57,7 +57,7 @@
                 "Eine deiner Rollen besitzt die Berechtigung für diesen Befehl (`warn`)",
                 "Fehlende Berechtigung (`warn`)"
             ],
-            "check_admin": [
+            "is_bot_admin": [
                 "Dafür musst du ein Bot Administrator sein",
                 "Du bist kein Bot Administrator"
             ],

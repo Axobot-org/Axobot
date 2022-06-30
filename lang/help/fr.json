@@ -61,7 +61,7 @@
                 "L'un de vos rôles est autorisé à utiliser cette commande (`warn`)",
                 "Rôle autorisé manquant (`warn`)"
             ],
-            "check_admin": [
+            "is_bot_admin": [
                 "Il faut être administrateur du bot",
                 "Vous n'êtes pas administrateur du bot"
             ],
@@ -81,9 +81,21 @@
                 "Vous avez la permission \"Intégrer des liens\"",
                 "Vous devez avoir la permission \"Intégrer des liens\""
             ],
+            "has_manage_channels": [
+                "Vous avez la permission de 'Gérer les salons'",
+                "Permission 'Gérer les salons' manquante"
+            ],
+            "has_manage_emojis": [
+                "Vous avez la permission de 'Gérer les émojis'",
+                "Permission 'Gérer les émojis' manquante"
+            ],
             "has_manage_guild": [
                 "Vous avez la permission 'Gérer le serveur'",
                 "Permission 'Gérer le serveur' manquante"
+            ],
+            "has_audit_logs": [
+                "Vous avez la permission de 'Voir les logs du serveur'",
+                "Permission de 'Voir les logs du serveur' manquante"
             ],
             "has_manage_msg": [
                 "Vous avez la permission 'Gérer les messages'",

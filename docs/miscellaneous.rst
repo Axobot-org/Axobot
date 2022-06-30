@@ -88,6 +88,15 @@ The markdown is a set of formatting rules used everywhere, such as on GitHub or 
 .. warning:: Warning, this command contains an invitation link to the information server on the code blocks.
 
 
+------------------------
+Python formatting (pep8)
+------------------------
+
+**Syntax:** :code:`pep8 <code>`
+
+Python's formatting conventions can sometimes be difficult to remember. Summaries exist on the internet, but there are several hundred rules, all more or less specific to their use cases. That's why Zbot offers you to automatically format your Python code following the "PEP 8" (PEP for Python Extension Proposal) rules with a simple command.
+
+
 ---------
 Reminders
 ---------

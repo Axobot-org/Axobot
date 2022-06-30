@@ -3,13 +3,13 @@
         "cases-0": "%{nbr} cases found: (%{start}-%{end})",
         "deleted": "The case #%{ID} has been deleted!",
         "display": {
-            "date": "**Date:**: %{data}",
-            "duration": "**Duration:**: %{data}",
-            "guild": "**Server:**: %{data}",
-            "moderator": "**Moderator:**: %{data}",
-            "reason": "**Reason:**: %{data}",
-            "type": "**Type:**: %{data}",
-            "user": "**User:**: %{data}"
+            "date": "**Date:** %{data}",
+            "duration": "**Duration:** %{data}",
+            "guild": "**Server:** %{data}",
+            "moderator": "**Moderator:** %{data}",
+            "reason": "**Reason:** %{data}",
+            "type": "**Type:** %{data}",
+            "user": "**User:** %{data}"
         },
         "list-0": "**Type:** {T}\n**Moderator:** {M}\n**Date:** {D}\n**Reason:** *{R}*",
         "list-1": "**Server:** {G}\n**Type:** {T}\n**Moderator:** {M}\n**Date:** {D}\n**Reason:** *{R}*",

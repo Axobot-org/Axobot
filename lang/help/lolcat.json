@@ -61,7 +61,7 @@
                 "One of ur roles iz allowd 2 use this command (`warn`)",
                 "U missed allowed role (`warn`)"
             ],
-            "check_admin": [
+            "is_bot_admin": [
                 "You need 2B one of the bot Admins",
                 "U are not a bot Admin"
             ],
@@ -81,9 +81,21 @@
                 "U haz \"Embed links\" thing",
                 "U need 2 b \"Embed links\" perms"
             ],
+            "has_manage_channels": [
+                "U has 'Manage channels' perm",
+                "'Manage channels' required :angrycat:"
+            ],
+            "has_manage_emojis": [
+                "U haz 'Manage smol pictures' permission",
+                "Oops, U need to have the 'Manage smol chat pictures' perm for that"
+            ],
             "has_manage_guild": [
                 "U have 'Manage Server' permission",
                 "'Manage Server' permission missed"
+            ],
+            "has_audit_logs": [
+                "U have 'Audit logs' perm",
+                "'View Audit Logs' perm required :/"
             ],
             "has_manage_msg": [
                 "You have 'Manage Messages' permission",

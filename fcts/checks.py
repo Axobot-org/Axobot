@@ -1,7 +1,36 @@
+import typing
+
 import discord
 from discord.ext import commands
 from libs.classes import MyContext
 
+admins_id = {279568324260528128,281404141841022976,552273019020771358}
+
+async def is_bot_admin(ctx: typing.Union[MyContext, discord.User]):
+    "Check if the user is one of the bot administrators"
+    if isinstance(ctx, commands.Context):
+        user = ctx.author
+    else:
+        user = ctx
+    if isinstance(user, str) and user.isnumeric():
+        user = int(user)
+    elif isinstance(user, (discord.User, discord.Member)):
+        user = user.id
+    return user in admins_id
+
+async def is_support_staff(ctx: MyContext) -> bool:
+    "Check if the user is one of the bot staff, either by flag or by role"
+    if ctx.author.id in admins_id:
+        return True
+    if UsersCog := ctx.bot.get_cog('Users'):
+        return await UsersCog.has_userflag(ctx.author, 'support')
+    server = ctx.bot.get_guild(356067272730607628)
+    if server is not None:
+        member = server.get_member(ctx.author.id)
+        role = server.get_role(412340503229497361)
+        if member is not None and role is not None:
+            return role in member.roles
+    return False
 
 async def can_mute(ctx: MyContext) -> bool:
     """Check if someone can mute"""
@@ -65,6 +94,9 @@ async def has_manage_guild(ctx: MyContext) -> bool:
     """... if someone can manage the server"""
     return ctx.channel.permissions_for(ctx.author).manage_guild or await ctx.bot.get_cog('Admin').check_if_god(ctx)
 
+async def has_audit_logs(ctx: MyContext) -> bool:
+    """... if someone can see server audit logs"""
+    return ctx.channel.permissions_for(ctx.author).view_audit_log or await ctx.bot.get_cog('Admin').check_if_god(ctx)
 
 async def has_manage_roles(ctx: MyContext) -> bool:
     """... if someone can manage the roles"""
@@ -75,6 +107,13 @@ async def has_manage_nicknames(ctx: MyContext) -> bool:
     """... if someone can change nicknames"""
     return ctx.channel.permissions_for(ctx.author).manage_nicknames or await ctx.bot.get_cog('Admin').check_if_god(ctx)
 
+async def has_manage_channels(ctx: MyContext) -> bool:
+    """... if someone can manage the guild channels"""
+    return ctx.channel.permissions_for(ctx.author).manage_channels or await ctx.bot.get_cog('Admin').check_if_god(ctx)
+
+async def has_manage_emojis(ctx: MyContext) -> bool:
+    """... if someone can change nicknames"""
+    return ctx.channel.permissions_for(ctx.author).manage_emojis or await ctx.bot.get_cog('Admin').check_if_god(ctx)
 
 async def has_embed_links(ctx: MyContext) -> bool:
     """... if someone can send embeds"""
@@ -104,6 +143,12 @@ async def verify_role_exists(ctx: MyContext) -> bool:
     roles = [r for r in [ctx.guild.get_role(int(x)) for x in roles_raw.split(';') if x.isnumeric() and len(x) > 0] if r is not None]
     return len(roles) > 0
 
+async def is_translator(ctx: MyContext) -> bool:
+    "Check if the user is an agreeded translator"
+    if cog := ctx.bot.get_cog('Users'):
+        return await cog.has_userflag(ctx.author, 'translator')
+    return False
+
 
 async def database_connected(ctx: MyContext) -> bool:
     "Check if the database is online and accessible"
@@ -113,6 +158,7 @@ async def database_connected(ctx: MyContext) -> bool:
 
 
 async def is_fun_enabled(ctx: MyContext, self=None) -> bool:
+    "Check if fun is enabled in a given context"
     if self is None:
         if hasattr(ctx, 'bot'):
             self = ctx.bot.get_cog("Fun")

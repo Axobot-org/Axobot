@@ -53,7 +53,6 @@ class Events(commands.Cog):
             'channel':45,
             'role':60,
             'guild':75}
-        self.statuspage_header = {"Content-Type": "application/json", "Authorization": "OAuth " + self.bot.others["statuspage"]}
 
     async def cog_load(self):
         if self.bot.internal_loop_enabled:
@@ -130,15 +129,15 @@ class Events(commands.Cog):
         await self.bot.wait_until_ready()
         try:
             if log_type == "join":
-                self.bot.log.info("Bot joined the server {}".format(guild.id))
-                desc = "Bot **joined the server** {} ({}) - {} users".format(guild.name,guild.id,len(guild.members))
+                self.bot.log.info(f"Bot joined the server {guild.id}")
+                desc = f"Bot **joined the server** ({guild.name} ({guild.id}) - {len(guild.members)} users"
             else:
-                self.bot.log.info("Bot left the server {}".format(guild.id))
+                self.bot.log.info(f"Bot left the server {guild.id}")
                 if guild.name is None and guild.unavailable:
-                    desc = "Bot **may have left** the server {} (guild unavailable)".format(guild.id)
+                    desc = f"Bot **may have left** the server {guild.id} (guild unavailable)"
                 else:
-                    desc = "Bot **left the server** {} ({}) - {} users".format(guild.name,guild.id,len(guild.members))
-                    if guild.me.joined_at:
+                    desc = f"Bot **left the server** {guild.name} ({guild.id}) - {len(guild.members)} users"
+                    if guild.me and guild.me.joined_at:
                         desc += f"\nJoined at <t:{guild.me.joined_at.timestamp():.0f}>"
             emb = discord.Embed(description=desc, color=self.embed_colors['welcome'], timestamp=self.bot.utcnow())
             emb.set_author(name=self.bot.user, icon_url=self.bot.user.display_avatar)
@@ -146,7 +145,7 @@ class Events(commands.Cog):
             if self.bot.database_online:
                 await self.send_sql_statslogs()
         except Exception as err:
-            await self.bot.get_cog("Errors").on_error(err,None)
+            self.bot.dispatch('error', err, None)
 
 
     @commands.Cog.listener()
@@ -328,9 +327,6 @@ class Events(commands.Cog):
             # Timed tasks - every 20s
             if now.second%20 == 0 and self.bot.database_online:
                 await self.bot.task_handler.check_tasks()
-            # Latency usage - every 30s
-            if now.second%30 == 0:
-                await self.status_loop(now)
             # Clear old rank cards - every 20min
             elif now.minute%20 == 0 and self.bot.database_online:
                 await self.bot.get_cog('Xp').clear_cards()
@@ -368,29 +364,6 @@ class Events(commands.Cog):
         await self.bot.wait_until_ready()
         await asyncio.sleep(2)
         self.bot.log.info("[tasks_loop] Lancement de la boucle")
-
-
-    async def status_loop(self, date: datetime.datetime):
-        "Send average latency to zbot.statuspage.io"
-        if self.bot.beta:
-            return
-        try:
-            self.latencies_list.append(round(self.bot.latency*1000))
-        except OverflowError: # Usually because latency is infinite
-            self.latencies_list.append(10e6)
-        if date.minute % 4 == 0 and date.minute != self.last_statusio.minute:
-            average = round(sum(self.latencies_list)/len(self.latencies_list))
-            async with aiohttp.ClientSession(loop=self.bot.loop, headers=self.statuspage_header) as session:
-                params = {"data": {"timestamp": round(date.timestamp()), "value": average}}
-                async with session.post("https://api.statuspage.io/v1/pages/g9cnphg3mhm9/metrics/x4xs4clhkmz0/data", json=params) as r:
-                    r.raise_for_status()
-                    self.bot.log.debug(f"StatusPage API returned {r.status} for {params} (latency)")
-                params["data"]["value"] = psutil.virtual_memory().available
-                async with session.post("https://api.statuspage.io/v1/pages/g9cnphg3mhm9/metrics/72bmf4nnqbwb/data", json=params) as r:
-                    r.raise_for_status()
-                    self.bot.log.debug(f"StatusPage API returned {r.status} for {params} (available RAM)")
-            self.latencies_list = list()
-            self.last_statusio = date
 
     async def botEventLoop(self):
         self.bot.get_cog("BotEvents").update_current_event()
@@ -434,20 +407,6 @@ class Events(commands.Cog):
                 answers[1] = resp.status
         except Exception as err:
             answers[1] = "0"
-            await self.bot.get_cog("Errors").on_error(err,None)
-        try: # https://discordlist.space/bot/486896267788812288
-            payload = json.dumps({
-                'serverCount': guildCount
-            })
-            headers = {
-                'Authorization': self.bot.others['discordlist.space'],
-                'Content-Type': 'application/json'
-            }
-            async with session.post('https://api.discordlist.space/v2/bots/{}'.format(self.bot.user.id), data=payload, headers=headers) as resp:
-                self.bot.log.debug('discordlist.space returned {} for {}'.format(resp.status, payload))
-                answers[2] = resp.status
-        except Exception as err:
-            answers[2] = "0"
             await self.bot.get_cog("Errors").on_error(err,None)
         try: # https://discord.boats/bot/486896267788812288
             headers = {
