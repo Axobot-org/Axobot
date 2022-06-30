@@ -1,3 +1,4 @@
+import math
 import typing
 import aiohttp
 
@@ -59,7 +60,7 @@ class BotStats(commands.Cog):
     @tasks.loop(seconds=30)
     async def record_ws_latency(self):
         "Record the websocket latency for later use"
-        if self.bot.latency is None:
+        if self.bot.latency is None or math.isnan(self.bot.latency):
             return
         try:
             self.latency_records.append(round(self.bot.latency*1000))
