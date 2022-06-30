@@ -537,14 +537,7 @@ class ServerLogs(commands.Cog):
                 description=f"**Potentially dangerous [message]({message.jump_url})**",
                 colour=discord.Color.orange()
             )
-            # probabilities
-            categories: dict = self.bot.get_cog("AntiScam").agent.categories
-            emb.add_field(name="AI detection result", value=prediction.to_string(categories), inline=False)
-            # message content
-            content = message.content if len(message.content) < 1020 else message.content[:1020]+'…'
-            emb.add_field(name="Message content", value=content)
-            # author
-            emb.set_author(name=f"{message.author} ({message.author.id})", icon_url=message.author.display_avatar)
+            await self.prepare_antiscam_embed(message, prediction, emb)
             await self.validate_logs(message.guild, channel_ids, emb)
 
     @commands.Cog.listener()
@@ -556,15 +549,19 @@ class ServerLogs(commands.Cog):
                 description=f"**Dangerous [message]({message.jump_url}) deleted**",
                 colour=discord.Color.red()
             )
-            # probabilities
-            categories: dict = self.bot.get_cog("AntiScam").agent.categories
-            emb.add_field(name="AI detection result", value=prediction.to_string(categories), inline=False)
-            # message content
-            content = message.content if len(message.content) < 1020 else message.content[:1020]+'…'
-            emb.add_field(name="Message content", value=content)
-            # author
-            emb.set_author(name=f"{message.author} ({message.author.id})", icon_url=message.author.display_avatar)
+            await self.prepare_antiscam_embed(message, prediction, emb)
             await self.validate_logs(message.guild, channel_ids, emb)
+
+    async def prepare_antiscam_embed(self, message: discord.Message, prediction: PredictionResult, emb: discord.Embed):
+        "Prepare the embed for an antiscam alert"
+        # probabilities
+        categories: dict = self.bot.get_cog("AntiScam").agent.categories
+        emb.add_field(name="AI detection result", value=prediction.to_string(categories), inline=False)
+        # message content
+        content = message.content if len(message.content) < 1020 else message.content[:1020]+'…'
+        emb.add_field(name="Message content", value=content)
+        # author
+        emb.set_author(name=f"{message.author} ({message.author.id})", icon_url=message.author.display_avatar)
 
     @commands.Cog.listener()
     async def on_antiraid_kick(self, member: discord.Member, data: dict[str, Any]):
