@@ -306,6 +306,7 @@ Arguments are:
             for role_data in data["roles"]:
                 role_data: dict[str, typing.Any]
                 if role_data["position"] > 0 and (role := roles_list.get(roles_list[role_data["id"]])):
+=======
                     new_pos = min(max(ctx.guild.me.top_role.position-1,1), role_data["position"])
                     if role.position == new_pos:
                         continue
