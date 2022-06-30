@@ -19,6 +19,9 @@ def check_libs():
 
 check_libs()
 
+# required to avoid segmentation error - don't ask me why
+from nltk import SnowballStemmer # pylint: disable=unused-import
+
 import discord
 import asyncio
 import time
