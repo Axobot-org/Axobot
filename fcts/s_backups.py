@@ -230,11 +230,11 @@ Arguments are:
                         res = None
             return res
 
-        async def load_roles(self, ctx:MyContext, problems: list, logs:list, symb:list, data:dict, args:tuple,roles_list:dict):
+        async def load_roles(self, ctx:MyContext, problems: list, logs:list, symb:list, data:dict, args:tuple, roles_list:dict):
+            "Create and update roles based on the backup map"
             if not ctx.guild.me.guild_permissions.manage_roles:
                 logs.append(f"  {symb[0]} Unable to create or update roles: missing permissions")
                 problems[0] += 1
-                roles_list = {x.id: x for x in ctx.guild.roles}
                 return
             for role_data in sorted(data["roles"], key=lambda role: role['position'], reverse=True):
                 action = "edit"
@@ -306,7 +306,6 @@ Arguments are:
             for role_data in data["roles"]:
                 role_data: dict[str, typing.Any]
                 if role_data["position"] > 0 and (role := roles_list.get(roles_list[role_data["id"]])):
-=======
                     new_pos = min(max(ctx.guild.me.top_role.position-1,1), role_data["position"])
                     if role.position == new_pos:
                         continue
