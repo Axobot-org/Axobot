@@ -1,29 +1,28 @@
-import discord
-import random
-import time
 import asyncio
-import io
 import importlib
-import re
-import os
 import operator
-import typing
-import aiohttp
-import mysql
+import os
+import random
+import re
 import string
-from discord.ext import commands
-from math import ceil
-import numpy as np
-from PIL import Image, ImageDraw, ImageFont, ImageSequence, ImageEnhance
-from urllib.request import urlopen, Request
+import time
+import typing
 from io import BytesIO
-from math import sqrt
+from math import ceil, sqrt
+from urllib.request import Request, urlopen
+
+import aiohttp
+import discord
+import mysql
+import numpy as np
+from discord.ext import commands
+from PIL import Image, ImageDraw, ImageEnhance, ImageFont, ImageSequence
 
 from fcts import args, checks
+
 importlib.reload(args)
 importlib.reload(checks)
-from libs.classes import Zbot, MyContext
-
+from libs.classes import MyContext, Zbot
 
 
 class Xp(commands.Cog):
@@ -581,7 +580,7 @@ class Xp(commands.Cog):
 
     async def get_raw_image(self, url:str):
         req = Request(url, headers={'User-Agent': 'Mozilla/5.0'})
-        im = Image.open(io.BytesIO(urlopen(req).read()))
+        im = Image.open(BytesIO(urlopen(req).read()))
         return im
 
     def calc_pos(self, text:str, font, x: int, y: int, align: str='center'):
@@ -647,7 +646,7 @@ class Xp(commands.Cog):
             cur_size = (int(cur_size[0] * scale), int(cur_size[1] * scale))
             resized_file = orig_image.resize(cur_size, Image.ANTIALIAS)
 
-            with io.BytesIO() as file_bytes:
+            with BytesIO() as file_bytes:
                 resized_file.save(file_bytes, optimize=True, quality=95, format='png')
 
                 if file_bytes.tell() <= max_size:
