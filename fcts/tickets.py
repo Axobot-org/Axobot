@@ -395,7 +395,7 @@ class Tickets(commands.Cog):
         topics = await self.db_get_topics(ctx.guild.id)
         for topic in topics:
             # if emoji is a discord emoji, convert it
-            if re.match(r'[A-Za-z0-9\_]+:[0-9]{13,20}', topic['topic_emoji']):
+            if topic['topic_emoji'] and re.match(r'[A-Za-z0-9\_]+:[0-9]{13,20}', topic['topic_emoji']):
                 topic['topic_emoji'] = discord.PartialEmoji.from_str(topic['topic_emoji'])
         other = {"id": -1,
                  "topic": (await self.bot._(ctx.guild.id, "tickets.other")).capitalize(),
