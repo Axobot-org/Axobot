@@ -202,6 +202,10 @@ class BotStats(commands.Cog):
                 self.bot.log.debug(
                     f"StatusPage API returned {response.status} for {params} (available RAM)")
 
+    @status_loop.before_loop
+    async def before_status_loop(self):
+        await self.bot.wait_until_ready()
+
     @status_loop.error
     async def on_status_loop_error(self, error: Exception):
         self.bot.dispatch("error", error, "When sending stats to statuspage.io")
