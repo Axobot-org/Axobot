@@ -15,10 +15,9 @@ from libs.classes import MyContext, Zbot
 from libs.formatutils import FormatUtils
 from libs.rss import RssMessage, feed_parse, TwitterRSS, YoutubeRSS
 
-from fcts import args, checks, reloads
+from fcts import args, checks
 from libs.rss.rss_general import FeedSelectView, get_emoji
 
-# importlib.reload(reloads)
 importlib.reload(args)
 importlib.reload(checks)
 
@@ -34,10 +33,6 @@ reddit_link={'minecraft':'https://www.reddit.com/r/Minecraft',
              'reddit':'https://www.reddit.com/r/news',
              'discord':'https://www.reddit.com/r/discordapp'
              }
-
-
-async def check_admin(ctx: MyContext):
-    return await ctx.bot.get_cog('Admin').check_if_admin(ctx)
 
 async def can_use_rss(ctx: MyContext):
     if ctx.guild is None:
@@ -320,7 +315,7 @@ class Rss(commands.Cog):
             return
         title = await self.bot._(ctx.guild.id, "rss.list-title", server=ctx.guild.name)
         translation = await self.bot._(ctx.guild.id, "rss.list-result")
-        flows_to_display = list()
+        flows_to_display: list[str] = []
         for flow in flows_list:
             channel = self.bot.get_channel(flow['channel'])
             if channel is not None:
@@ -339,14 +334,11 @@ class Rss(commands.Cog):
                     else:
                         roles.append(item)
                 roles = ", ".join(roles)
-            flow_type = await self.bot._(ctx.guild.id,"rss."+flow['type'])
             # flow name
-            flow_name = flow['link']
+            flow_name: str = flow['link']
             if flow['type'] == 'tw' and flow['link'].isnumeric():
-                try:
-                    flow_name = (await self.twitter_rss.get_user_from_id(int(flow['link']))).screen_name
-                except twitter.TwitterError as err:
-                    self.bot.log.debug(f"[rss:askID] Twitter error: {err}")
+                if tw_user := await self.twitter_rss.get_user_from_id(int(flow['link'])):
+                    flow_name = tw_user.screen_name
             elif flow['type'] == 'yt' and (channel_name := self.youtube_rss.get_channel_name_by_id(flow['link'])):
                 flow_name = channel_name
             # send embed
@@ -357,7 +349,18 @@ class Rss(commands.Cog):
                     embed.add_field(name=self.bot.zws, value=text, inline=False)
                 await ctx.send(embed=embed)
                 flows_to_display.clear()
-            flows_to_display.append(translation.format(flow_type,channel,flow_name,roles,flow['ID'],flow['date']))
+            if flow['date']:
+                last_date = f"<t:{flow['date'].timestamp():.0f}>"
+            else:
+                last_date = await self.bot._(ctx.guild.id, "misc.none")
+            flows_to_display.append(translation.format(
+                emoji=get_emoji(self.bot.get_cog('Emojis'), flow['type']),
+                channel=channel,
+                link=flow_name if flow_name.startswith('https') else f"**{flow_name}**",
+                roles=roles,
+                id=flow['ID'],
+                last_post=last_date
+            ))
         if len(flows_to_display) > 0:
             embed = discord.Embed(title=title, color=self.embed_color, timestamp=ctx.message.created_at)
             embed.set_footer(text=ctx.author, icon_url=ctx.author.display_avatar)
@@ -394,10 +397,8 @@ class Rss(commands.Cog):
                 # better name format (for Twitter/YouTube ID)
                 feed['name'] = feed['link']
                 if feed['type'] == 'tw' and feed['link'].isnumeric():
-                    try:
-                        feed['name'] = (await self.twitter_rss.get_user_from_id(int(feed['link']))).screen_name
-                    except twitter.TwitterError as err:
-                        self.bot.log.debug(f"[rss:askID] Twitter error: {err}")
+                    if user := await self.twitter_rss.get_user_from_id(int(feed['link'])):
+                        feed['name'] = user.screen_name
                 elif feed['type'] == 'yt' and (channel_name := self.youtube_rss.get_channel_name_by_id(feed['link'])):
                     feed['name'] = channel_name
                 # emoji
@@ -460,7 +461,7 @@ class Rss(commands.Cog):
             if flow['roles'] == '':
                 text = await self.bot._(ctx.guild.id, "rss.no-roles")
             else:
-                r = list()
+                r = []
                 for item in flow['roles'].split(';'):
                     role = discord.utils.get(ctx.guild.roles,id=int(item))
                     if role is not None:
@@ -468,7 +469,7 @@ class Rss(commands.Cog):
                     else:
                         r.append(item)
                 r = ", ".join(r)
-                text = await self.bot._(ctx.guild.id,"rss.role.list", roles=r)
+                text = await self.bot._(ctx.guild.id,"rss.roles.list", roles=r)
             # ask for roles
             embed = discord.Embed(title=await self.bot._(ctx.guild.id, "rss.choose-roles"), color=discord.Colour(0x77ea5c), description=text, timestamp=ctx.message.created_at)
             emb_msg = await ctx.send(embed=embed)
@@ -714,7 +715,7 @@ class Rss(commands.Cog):
             await ctx.bot.get_cog('Errors').on_error(e,ctx)
 
     @rss_main.command(name="test")
-    @commands.check(reloads.is_support_staff)
+    @commands.check(checks.is_support_staff)
     async def test_rss(self, ctx: MyContext, url, *, args=None):
         """Test if an rss feed is usable"""
         url = url.replace('<','').replace('>','')
@@ -1180,7 +1181,7 @@ class Rss(commands.Cog):
                 await self.bot.get_cog('Errors').on_error(e,None)
             await asyncio.sleep(self.time_between_flows_check)
         await session.close()
-        self.bot.get_cog('Minecraft').flows = dict()
+        self.bot.get_cog('Minecraft').flows.clear()
         d = ["**RSS loop done** in {}s ({}/{} flows)".format(round(time.time()-t,3),check,len(liste))]
         if guildID is None:
             if statscog := self.bot.get_cog("BotStats"):
@@ -1197,16 +1198,18 @@ class Rss(commands.Cog):
         if guildID is None:
             self.loop_processing = False
         self.twitter_over_capacity = False
-        self.cache = dict()
+        self.cache.clear()
 
     @tasks.loop(minutes=20)
     async def loop_child(self):
+        if not self.bot.rss_enabled:
+            return
         if not self.bot.database_online:
             self.bot.log.warning('Base de donnée hors ligne - check rss annulé')
             return
         self.bot.log.info(" Boucle rss commencée !")
         t1 = time.time()
-        await self.bot.get_cog("Rss").main_loop()
+        await self.main_loop()
         self.bot.log.info(" Boucle rss terminée en {}s!".format(round(time.time()-t1,2)))
 
     @loop_child.before_loop
@@ -1216,7 +1219,7 @@ class Rss(commands.Cog):
 
 
     @commands.command(name="rss_loop",hidden=True)
-    @commands.check(check_admin)
+    @commands.check(checks.is_bot_admin)
     async def rss_loop_admin(self, ctx: MyContext, new_state: str = "start"):
         """Manage the rss loop
         new_state can be start, stop or once"""

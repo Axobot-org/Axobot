@@ -31,7 +31,7 @@ class Backups(commands.Cog):
 
 
     @main_backup.command(name="load")
-    async def backup_load(self,ctx:MyContext,*arguments):
+    async def backup_load(self, ctx: MyContext, *arguments: str):
         """Load a backup created with `backup create`
 Arguments are:
     - reset: delete everything from the current server
@@ -49,26 +49,26 @@ Arguments are:
 ..Doc server.html#server-backup"""
         # Analyzing arguments
         valid_args = ["reset","delete_old_channels","delete_old_roles","delete_old_emojis","delete_old_webhooks"]
-        arguments = set([a.lower() for a in arguments if a.lower() in valid_args])
+        arguments = {a.lower() for a in arguments if a.lower() in valid_args}
         if "reset" in arguments:
             arguments.update(set(['delete_old_channels','delete_old_roles','delete_old_emojis','delete_old_webhooks']))
         # Loading backup from file
         try:
             data = json.loads(await ctx.message.attachments[0].read())
-        except:
+        except (json.decoder.JSONDecodeError, IndexError):
             await ctx.send(await self.bot._(ctx.guild, "s_backup.invalid_file"))
             return
         # Applying backup
         msg = await ctx.send(await self.bot._(ctx.guild, "s_backup.loading"))
         try:
             if data["_backup_version"] == 1:
-                problems, logs = await self.BackupLoaderV1().load_backup(ctx,data,arguments)
+                problems, logs = await self.BackupLoaderV1().load_backup(ctx, data, arguments)
             else:
                 await ctx.send(await self.bot._(ctx.guild, "s_backup.invalid_version"))
                 return
-        except Exception as e:
+        except Exception as err: # pylint: disable=broad-except
+            await ctx.bot.dispatch("error", err, ctx)
             await ctx.send(await self.bot._(ctx.guild, "s_backup.err"))
-            await ctx.bot.get_cog('Errors').on_command_error(ctx,e)
             return
         # Formatting and sending logs
         logs = "Found {} problems (including {} permissions issues)\n\n".format(sum(problems),problems[0]) + "\n".join(logs)
@@ -194,27 +194,26 @@ Arguments are:
         except Exception as err:
             await ctx.bot.get_cog('Errors').on_error(err,ctx)
         try:
-            webs = list()
+            webs = []
             for w in await g.webhooks():
-                webs.append({'channel':w.channel_id,'name':w.name,'avatar':w.avatar.url,'url':w.url})
+                webs.append({
+                    'channel': w.channel_id,
+                    'name': w.name,
+                    'avatar': w.avatar.url if w.avatar else None,
+                    'url': w.url
+                })
             back['webhooks'] = webs
         except discord.errors.Forbidden:
             pass
         except Exception as err:
             await ctx.bot.get_cog('Errors').on_error(err,ctx)
-        back['members'] = list()
+        back['members'] = []
         for memb in g.members:
             back['members'].append({'id': memb.id,
                 'nickname': memb.nick,
                 'bot': memb.bot,
                 'roles': [x.id for x in memb.roles][1:] })
         return json.dumps(back, sort_keys=True, indent=4)
-        # directory = 'backup/{}.json'.format(g.id)
-        # if not os.path.exists('backup/'):
-        #     os.makedirs('backup/')
-        # with open(directory,'w',encoding='utf-8') as file:
-        #     file.write(js)
-        #     return directory
 
     # ----------
 
@@ -231,11 +230,11 @@ Arguments are:
                         res = None
             return res
 
-        async def load_roles(self, ctx:MyContext, problems: list, logs:list, symb:list, data:dict, args:tuple,roles_list:dict):
+        async def load_roles(self, ctx:MyContext, problems: list, logs:list, symb:list, data:dict, args:tuple, roles_list:dict):
+            "Create and update roles based on the backup map"
             if not ctx.guild.me.guild_permissions.manage_roles:
                 logs.append(f"  {symb[0]} Unable to create or update roles: missing permissions")
                 problems[0] += 1
-                roles_list = {x.id: x for x in ctx.guild.roles}
                 return
             for role_data in sorted(data["roles"], key=lambda role: role['position'], reverse=True):
                 action = "edit"
@@ -249,7 +248,7 @@ Arguments are:
                             try:
                                 role = await ctx.guild.create_role(name=role_data["name"])
                             except discord.DiscordException:
-                                pass
+                                continue
                         else:
                             role = potential_roles[0]
                     if role_data["name"] == "@everyone":
@@ -303,10 +302,10 @@ Arguments are:
                             problems[1] += 1
                     else:
                         logs.append(f"  {symb[0]} Role {role_data.name} deleted")
+            del role, role_data
             for role_data in data["roles"]:
                 role_data: dict[str, typing.Any]
-                if role_data["position"] > 0 and (role := roles_list.get(roles_list[role["id"]])):
-                    role: discord.Role
+                if role_data["position"] > 0 and (role := roles_list.get(roles_list[role_data["id"]])):
                     new_pos = min(max(ctx.guild.me.top_role.position-1,1), role_data["position"])
                     if role.position == new_pos:
                         continue

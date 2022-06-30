@@ -61,7 +61,7 @@
                 "One of your roles is authorized to use this command (`warn`)",
                 "Missing allowed role (`warn`)"
             ],
-            "check_admin": [
+            "is_bot_admin": [
                 "You need to be one of the bot Admins",
                 "You are not a bot Admin"
             ],
@@ -81,9 +81,21 @@
                 "You have the 'Embed links' permission",
                 "You need to have 'Embed links' permission"
             ],
+            "has_manage_channels": [
+                "You have the 'Manage channels' permissions",
+                "'Manage channels' permission missing"
+            ],
+            "has_manage_emojis": [
+                "You have the 'Manage emojis' permission",
+                "You need to have the 'Manage emojis' permission"
+            ],
             "has_manage_guild": [
                 "You have 'Manage Server' permission",
                 "'Manage Server' permission missing"
+            ],
+            "has_audit_logs": [
+                "You have the 'View Audit Logs' permission",
+                "'View Audit Logs' permission missing"
             ],
             "has_manage_msg": [
                 "You have 'Manage Messages' permission",

@@ -18,7 +18,7 @@ bool_options = ["enable_xp", "anti_caps_lock", "enable_fun",
 textchan_options = ["welcome_channel", "bot_news", "poll_channels",
                     "modlogs_channel", "noxp_channels", "partner_channel"]
 vocchan_options = ["membercounter", "voice_channel"]
-category_options = ["voice_category"]
+category_options = ["voice_category", "tickets_category"]
 text_options = ["welcome", "leave", "levelup_msg",
                 "description", "voice_channel_format"]
 prefix_options = ['prefix']
@@ -87,11 +87,12 @@ class Servers(commands.Cog):
                'voice_roles':'',
                'voice_channel':'',
                'voice_category':'',
-               'voice_channel_format':'{random}',
-               'compress_help':0,
+               'voice_channel_format': '{random}',
+               'compress_help': 0,
                'ttt_display': 2,
-               'anti_scam': 0}
-        self.optionsList = ["prefix","language","description","clear","slowmode","mute","kick","ban","warn","say","welcome_channel","welcome","leave","welcome_roles","anti_scam","poll_channels","partner_channel","partner_color","partner_role","modlogs_channel","verification_role","enable_xp","levelup_msg","levelup_channel","noxp_channels","xp_rate","xp_type","anti_caps_lock","enable_fun","membercounter","anti_raid","vote_emojis","morpion_emojis","help_in_dm","compress_help","muted_role","voice_roles","voice_channel","voice_category","voice_channel_format","ttt_display","bot_news","update_mentions"]
+               'anti_scam': 0,
+               'tickets_category': ''}
+        self.optionsList = ["prefix","language","description","clear","slowmode","mute","kick","ban","warn","say","welcome_channel","welcome","leave","welcome_roles","anti_scam","poll_channels","partner_channel","partner_color","partner_role","modlogs_channel","verification_role","enable_xp","levelup_msg","levelup_channel","noxp_channels","xp_rate","xp_type","anti_caps_lock","enable_fun","membercounter","anti_raid","vote_emojis","morpion_emojis","help_in_dm","compress_help","muted_role","voice_roles","voice_channel","voice_category","voice_channel_format","ttt_display","bot_news","update_mentions", "tickets_category"]
         self.membercounter_pending = {}
 
     @property

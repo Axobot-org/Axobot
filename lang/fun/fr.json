@@ -2,9 +2,9 @@
     "fr": {
         "afk": {
             "afk-done": "Vous êtes maintenant AFK",
-            "afk-user-reason": "Ce membre est AFK, pour la raison %{reason}",
-            "afk-user-no-reason": "Ce membre est AFK !",
             "no-perm": "Oops, je ne peux pas modifier votre pseudo :confused: Je vais essayer de m'en souvenir, mais il se peut que j'oublie que vous êtes AFK",
+            "afk-user-reason": "Ce membre est AFK, pour la raison %{reason}",
+            "afk-user-noreason": "Ce membre est AFK !",
             "unafk-cant": "Vous n'êtes pas AFK !",
             "unafk-done": "Vous n'êtes maintenant plus AFK"
         },

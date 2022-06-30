@@ -1,12 +1,16 @@
-import sys
-import discord
-import traceback
 import random
 import re
+import sys
+import traceback
+import typing
+
+import discord
 from discord.ext import commands
-from libs.classes import Zbot, MyContext
+from libs.classes import MyContext, Zbot
+
 from fcts import checks
 
+AllowedCtx = typing.Union[MyContext, discord.Message, str]
 
 class Errors(commands.Cog):
     """General cog for error management."""
@@ -23,15 +27,20 @@ class Errors(commands.Cog):
         if hasattr(ctx.command, 'on_error'):
             return
 
-        ignored = (commands.errors.CommandNotFound,commands.errors.CheckFailure,commands.errors.ConversionError,discord.errors.Forbidden)
-        actually_not_ignored = (commands.errors.NoPrivateMessage)
+        ignored = (
+            commands.errors.CommandNotFound,
+            commands.errors.CheckFailure,
+            commands.errors.ConversionError,
+            discord.errors.Forbidden
+        )
+        actually_not_ignored = (commands.errors.NoPrivateMessage,)
 
         # Allows us to check for original exceptions raised and sent to CommandInvokeError.
         # If nothing is found. We keep the exception passed to on_command_error.
         error = getattr(error, 'original', error)
 
         # Anything in ignored will return and prevent anything happening.
-        if isinstance(error, ignored) and not isinstance(error,actually_not_ignored):
+        if isinstance(error, ignored) and not isinstance(error, actually_not_ignored):
             if self.bot.beta and ctx.guild:
                 await ctx.send(f"`Ignored error:` [{error.__class__.__module__}.{error.__class__.__name__}] {error}")
             return
@@ -171,29 +180,39 @@ class Errors(commands.Cog):
         await self.on_error(error,ctx)
 
     @commands.Cog.listener()
-    async def on_error(self, error: Exception, ctx=None):
+    async def on_error(self, error: Exception, ctx: typing.Optional[AllowedCtx] = None):
+        """Called when an error is raised
+
+        Its only purpose is to log the error, ctx param is only useful for traceability"""
         if sys.exc_info()[0] is None:
             exc_info = (type(error), error, error.__traceback__)
         else:
             exc_info = sys.exc_info()
         try:
+            # get traceback info
             if isinstance(ctx, discord.Message):
                 ctx = await self.bot.get_context(ctx)
             tr = traceback.format_exception(type(error), error, error.__traceback__)
             tr = " ".join(tr)[:1950]
-            msg = "```python\n{}\n```".format(tr)
+            msg = f"```python\n{tr}\n```"
+            # get context clue
             if ctx is None:
-                await self.senf_err_msg(f"Internal Error\n{msg}")
+                context = "Internal Error"
+            elif isinstance(ctx, str):
+                context = ctx
             elif ctx.guild is None:
                 recipient = await self.bot.get_recipient(ctx.channel)
-                await self.senf_err_msg(f"DM | {recipient}\n{msg}")
-            elif ctx.channel.id == 625319425465384960:
-                await ctx.send(ctx.guild.name+" | "+ctx.channel.name+"\n"+msg)
+                context = f"DM | {recipient}"
             else:
-                await self.senf_err_msg(ctx.guild.name+" | "+ctx.channel.name+"\n"+msg)
+                context = f"{ctx.guild.name} | {ctx.channel.name}"
+            # if channel is the private beta channel, send it there
+            if isinstance(ctx, MyContext) and ctx.channel.id == 625319425465384960:
+                await ctx.send(context + "\n" + msg)
+            else:
+                await self.senf_err_msg(context + "\n" + msg)
             self.bot.log.warning(f"[on_error] {error}", exc_info=exc_info)
         except Exception as err: # pylint: disable=broad-except
-            self.bot.log.warning(f"[on_error] {err}", exc_info=exc_info)
+            self.bot.log.error(f"[on_error] {err}", exc_info=exc_info)
 
 
     async def senf_err_msg(self, msg: str):

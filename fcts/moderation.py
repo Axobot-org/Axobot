@@ -291,6 +291,7 @@ Slowmode works up to one message every 6h (21600s)
             self.bot.dispatch("command_error", ctx, err)
 
     async def get_muted_role(self, guild: discord.Guild):
+        "Find the muted role from the guild config option"
         opt = await self.bot.get_config(guild.id,'muted_role')
         if opt is None or (isinstance(opt, str) and not opt.isdigit()):
             return None
@@ -383,8 +384,6 @@ You can also mute this member for a defined duration, then use the following for
         role = await self.get_muted_role(ctx.guild)
         if not await self.check_mute_context(ctx, role, user):
             return
-        if role is None:
-            role = await self.get_muted_role(ctx.guild)
         caseID = "'Unsaved'"
         try:
             reason = await self.bot.get_cog("Utilities").clear_msg(reason,everyone = not ctx.channel.permissions_for(ctx.author).mention_everyone)
@@ -943,7 +942,7 @@ The 'reasons' parameter is used to display the mute reasons.
             await self.bot.get_cog('Help').help_command(ctx,['emoji'])
 
     @emoji_group.command(name="rename")
-    @commands.check(checks.has_admin)
+    @commands.check(checks.has_manage_emojis)
     async def emoji_rename(self, ctx: MyContext, emoji: discord.Emoji, name: str):
         """Rename an emoji
 
@@ -960,7 +959,7 @@ The 'reasons' parameter is used to display the mute reasons.
         await ctx.send(await self.bot._(ctx.guild.id, "moderation.emoji.renamed", emoji=emoji))
 
     @emoji_group.command(name="restrict")
-    @commands.check(checks.has_admin)
+    @commands.check(checks.has_manage_emojis)
     async def emoji_restrict(self, ctx: MyContext, emoji: discord.Emoji, roles: commands.Greedy[Union[discord.Role, args.litteral('everyone')]]):
         """Restrict the use of an emoji to certain roles
 
@@ -1006,7 +1005,7 @@ The 'reasons' parameter is used to display the mute reasons.
             pass
 
     @emoji_group.command(name="info")
-    @commands.check(checks.has_manage_msg)
+    @commands.check(checks.has_manage_emojis)
     async def emoji_info(self, ctx: MyContext, emoji: discord.Emoji):
         """Get info about an emoji
         This is only an alias or `info emoji`

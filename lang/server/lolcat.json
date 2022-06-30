@@ -83,6 +83,7 @@
             "save_roles": "Can role bee save:b: wHen an membr leive, in case him retrns? %{value}",
             "say": "Lizt of Rawles dat can wuse teh comnd 'say' : %{value}",
             "slowmode": "Llst of rolz that ca' use 'slowmode' and 'freeze' commmandz: %{value}",
+            "tickets_category": "Category were requests from ppl will be send: %{value}",
             "ttt_display": "How'll use titcattoe: %{value}",
             "update_mentions": "Roles pinged on teh bot changlog: %{value}",
             "verification_role": "Roles removd when smone use !verify itself: %{value}",

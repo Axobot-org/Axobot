@@ -115,7 +115,6 @@ def parse_crypted_file(bot: "Zbot"):
                              'consumer_secret': cryptage.uncrypte(lines[10]),
                              'access_token_key': cryptage.uncrypte(lines[11]),
                              'access_token_secret': cryptage.uncrypte(lines[12])}
-    bot.others['discordlist.space'] = cryptage.uncrypte(lines[13])
     bot.others['discordboats'] = cryptage.uncrypte(lines[14])
     bot.others['discordextremelist'] = cryptage.uncrypte(lines[15])
     bot.others['statuspage'] = cryptage.uncrypte(lines[16])
@@ -174,6 +173,7 @@ async def load_cogs(bot: "Zbot"):
                       'fcts.s_backups',
                       'fcts.serverlogs',
                       'fcts.servers',
+                      'fcts.tickets',
                       'fcts.timers',
                     #   'fcts.translations',
                       'fcts.users',

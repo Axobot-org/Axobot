@@ -50,21 +50,15 @@ class RolesReact(commands.Cog):
         return msg, role
 
     @commands.Cog.listener('on_raw_reaction_add')
-    async def on_raw_reaction(self, payload: discord.RawReactionActionEvent):
-        if not self.bot.database_online:
-            return
-        try:
-            msg, role = await self.prepare_react(payload)
-            if msg is not None:
-                user = msg.guild.get_member(payload.user_id)
-                if user is None:
-                    return
-                await self.give_remove_role(user, role, msg.guild, msg.channel, True, ignore_success=True)
-        except Exception as e:
-            await self.bot.get_cog("Errors").on_error(e)
+    async def on_raw_reaction_add(self, payload: discord.RawReactionActionEvent):
+        await self.on_raw_reaction_event(payload, True)
 
     @commands.Cog.listener('on_raw_reaction_remove')
-    async def on_raw_reaction_2(self, payload: discord.RawReactionActionEvent):
+    async def on_raw_reaction_remove(self, payload: discord.RawReactionActionEvent):
+        await self.on_raw_reaction_event(payload, False)
+
+    async def on_raw_reaction_event(self, payload: discord.RawReactionActionEvent, is_adding: bool):
+        "handle reactions adding/removing events"
         if not self.bot.database_online:
             return
         try:
@@ -73,9 +67,9 @@ class RolesReact(commands.Cog):
                 user = msg.guild.get_member(payload.user_id)
                 if user is None:
                     return
-                await self.give_remove_role(user, role, msg.guild, msg.channel, False, ignore_success=True)
-        except Exception as err:
-            await self.bot.get_cog("Errors").on_error(err)
+                await self.give_remove_role(user, role, msg.guild, msg.channel, is_adding, ignore_success=True)
+        except discord.DiscordException as err:
+            self.bot.dispatch("error", err)
 
     async def rr_get_guilds(self) -> set:
         """Get the list of guilds which have roles reactions"""
