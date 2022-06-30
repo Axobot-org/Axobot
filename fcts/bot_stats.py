@@ -59,6 +59,8 @@ class BotStats(commands.Cog):
     @tasks.loop(seconds=30)
     async def record_ws_latency(self):
         "Record the websocket latency for later use"
+        if self.bot.latency is None:
+            return
         try:
             self.latency_records.append(round(self.bot.latency*1000))
         except OverflowError: # Usually because latency is infinite
