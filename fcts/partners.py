@@ -288,7 +288,7 @@ class Partners(commands.Cog):
         if str(item.id) in current_list:
             return await ctx.send(await self.bot._(ctx.guild, "partners.already-added"))
         if len(description) > 0:
-            description = await self.bot.get_cog('Emojis').anti_code(description)
+            description = await self.bot.emojis_manager.anti_code(description)
         await self.bdd_set_partner(guildID=ctx.guild.id,partnerID=item.id,partnerType=partner_type,desc=description)
         await ctx.send(await self.bot._(ctx.guild.id, "partners.added-partner"))
         # logs
@@ -309,7 +309,7 @@ class Partners(commands.Cog):
         if len(l) == 0:
             return await ctx.send(await self.bot._(ctx.guild.id, "partners.invalid-partner"))
         l = l[0]
-        description = await self.bot.get_cog('Emojis').anti_code(description)
+        description = await self.bot.emojis_manager.anti_code(description)
         if await self.bdd_edit_partner(l['ID'],desc=description):
             await ctx.send(await self.bot._(ctx.guild.id, "partners.changed-desc"))
         else:
@@ -456,7 +456,7 @@ class Partners(commands.Cog):
         """Reload your partners channel
         
         ..Doc server.html#reload-your-list"""
-        msg = await ctx.send(await self.bot._(ctx.guild, "rss.guild-loading", emoji=self.bot.get_cog('Emojis').customs['loading']))
+        msg = await ctx.send(await self.bot._(ctx.guild, "rss.guild-loading", emoji=self.bot.emojis_manager.customs['loading']))
         channel = await self.bot.get_cog('Servers').get_server(criters=[f"`ID`={ctx.guild.id}"],columns=['partner_channel','partner_color'])
         if len(channel) == 0:
             return await msg.edit(content=await self.bot._(ctx.guild, "partners.no-channel"))

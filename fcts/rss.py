@@ -354,7 +354,7 @@ class Rss(commands.Cog):
             else:
                 last_date = await self.bot._(ctx.guild.id, "misc.none")
             flows_to_display.append(translation.format(
-                emoji=get_emoji(self.bot.get_cog('Emojis'), flow['type']),
+                emoji=get_emoji(self.bot.emojis_manager, flow['type']),
                 channel=channel,
                 link=flow_name if flow_name.startswith('https') else f"**{flow_name}**",
                 roles=roles,
@@ -402,7 +402,7 @@ class Rss(commands.Cog):
                 elif feed['type'] == 'yt' and (channel_name := self.youtube_rss.get_channel_name_by_id(feed['link'])):
                     feed['name'] = channel_name
                 # emoji
-                feed['emoji'] = get_emoji(self.bot.get_cog('Emojis'), feed['type'])
+                feed['emoji'] = get_emoji(self.bot.emojis_manager, feed['type'])
             form_placeholder = await self.bot._(ctx.channel, 'rss.picker-placeholder')
             view = FeedSelectView(guild_feeds, max_count or len(guild_feeds), form_placeholder)
             await ctx.send(title, view=view)
@@ -547,7 +547,7 @@ class Rss(commands.Cog):
                 ctx.command.reset_cooldown(ctx)
                 return
             t = time.time()
-            msg = await ctx.send(await self.bot._(ctx.guild.id,"rss.guild-loading", emoji=ctx.bot.get_cog('Emojis').customs['loading']))
+            msg = await ctx.send(await self.bot._(ctx.guild.id,"rss.guild-loading", emoji=ctx.bot.emojis_manager.customs['loading']))
             liste = await self.get_guild_flows(ctx.guild.id)
             await self.main_loop(ctx.guild.id)
             await ctx.send(await self.bot._(ctx.guild.id,"rss.guild-complete", count=len(liste),time=round(time.time()-t,1)))

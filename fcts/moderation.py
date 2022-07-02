@@ -94,7 +94,7 @@ Slowmode works up to one message every 6h (21600s)
             await ctx.send(await self.bot._(ctx.guild.id, "moderation.need-read-history"))
             return
         if number<1:
-            await ctx.send(await self.bot._(ctx.guild.id, "moderation.clear.too-few")+" "+self.bot.get_cog('Emojis').customs["owo"])
+            await ctx.send(await self.bot._(ctx.guild.id, "moderation.clear.too-few")+" "+self.bot.emojis_manager.customs["owo"])
             return
         if len(params) == 0:
             return await self.clear_simple(ctx,number)
@@ -373,7 +373,7 @@ You can also mute this member for a defined duration, then use the following for
                     pass
                 return False
             if user==ctx.guild.me or (self.bot.database_online and await user_can_mute(user)):
-                emoji = random.choice([':confused:',':upside_down:',self.bot.get_cog('Emojis').customs['wat'],':no_mouth:',self.bot.get_cog('Emojis').customs['owo'],':thinking:',])
+                emoji = random.choice([':confused:',':upside_down:',self.bot.emojis_manager.customs['wat'],':no_mouth:',self.bot.emojis_manager.customs['owo'],':thinking:',])
                 await ctx.send((await self.bot._(ctx.guild.id, "moderation.mute.staff-mute"))+emoji)
                 return
             elif not self.bot.database_online and ctx.channel.permissions_for(user).manage_roles:

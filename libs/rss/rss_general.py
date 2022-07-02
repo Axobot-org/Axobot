@@ -13,7 +13,7 @@ from feedparser.util import FeedParserDict
 
 
 if TYPE_CHECKING:
-    from fcts.emojis import Emojis
+    from libs.emojis_manager import EmojisManager
     from libs.classes import Zbot
 
 async def feed_parse(bot: Zbot, url: str, timeout: int, session: ClientSession = None) -> Optional[feedparser.FeedParserDict]:
@@ -46,7 +46,8 @@ async def feed_parse(bot: Zbot, url: str, timeout: int, session: ClientSession =
     headers = {k.decode("utf-8").lower(): v.decode("utf-8") for k, v in headers}
     return feedparser.parse(html, response_headers=headers)
 
-def get_emoji(cog: 'Emojis', feed_type: str) -> Union[discord.Emoji, str]:
+def get_emoji(cog: "EmojisManager", feed_type: str) -> Union[discord.Emoji, str]:
+    "Get the representative emoji of a feed type"
     if feed_type == 'tw':
         return cog.get_emoji('twitter')
     elif feed_type == 'yt':
@@ -80,7 +81,7 @@ class RssMessage:
             self.date = None
         self.author = author if author is None or len(author) < 100 else author[:99]+'…'
         self.format: str = msg_format
-        self.logo = get_emoji(bot.get_cog('Emojis'), self.rss_type)
+        self.logo = get_emoji(bot.emojis_manager, self.rss_type)
         if isinstance(self.logo, discord.Emoji):
             self.logo = str(self.logo)
         self.channel = channel

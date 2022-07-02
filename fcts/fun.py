@@ -22,10 +22,9 @@ from libs.formatutils import FormatUtils
 from libs.paginator import Paginator
 from utils import flatten_list
 
-from fcts import args, checks, emojis
+from fcts import args, checks
 from fcts.checks import is_fun_enabled
 
-importlib.reload(emojis)
 importlib.reload(checks)
 importlib.reload(args)
 
@@ -130,7 +129,7 @@ class Fun(commands.Cog):
         if ctx.author.id == 375598088850505728:
             await ctx.send(file=await self.utilities.find_img("cookie-target.gif"))
         else:
-            emoji = self.bot.get_cog('Emojis').customs['cookies_eat']
+            emoji = self.bot.emojis_manager.customs['cookies_eat']
             await ctx.send(await self.bot._(ctx.guild,"fun.cookie", user=ctx.author.mention, emoji=emoji))
 
     @commands.command(name="reverse", hidden=True)
@@ -166,7 +165,7 @@ You can specify a verification limit by adding a number in argument (up to 1.000
             limit = int(user.name)
             user = None
         if limit > MAX:
-            await ctx.send(await self.bot._(ctx.channel,"fun.count.too-much",l=MAX,e=self.bot.get_cog('Emojis').customs['wat']))
+            await ctx.send(await self.bot._(ctx.channel,"fun.count.too-much",l=MAX,e=self.bot.emojis_manager.customs['wat']))
             return
         if ctx.guild is not None and not channel.permissions_for(ctx.guild.me).read_message_history:
             await ctx.send(await self.bot._(channel,"fun.count.missing-perms"))
@@ -308,7 +307,7 @@ You can specify a verification limit by adding a number in argument (up to 1.000
         elif r == 3:
             await ctx.send(file=await self.utilities.find_img('parrot.gif'))
         elif r == 4:
-            e = self.bot.get_cog('Emojis').customs['blob_dance']
+            e = self.bot.emojis_manager.customs['blob_dance']
             await ctx.send(e*5)
         elif r == 5:
             await ctx.send(file=await self.utilities.find_img('cameleon.gif'))
@@ -364,7 +363,7 @@ You can specify a verification limit by adding a number in argument (up to 1.000
         # contenu = await self.bot.get_cog('Utilities').clear_msg(text,ctx=ctx,emojis=False)
         contenu = await commands.clean_content().convert(ctx, text)
         text = ""
-        Em = self.bot.get_cog('Emojis')
+        Em = self.bot.emojis_manager
         mentions = [x.group(1) for x in re.finditer(r'(<(?:@!?&?|#|a?:[a-zA-Z0-9_]+:)\d+>)',ctx.message.content)]
         content = "¬¬".join(contenu.split("\n"))
         for x in mentions:
@@ -979,7 +978,7 @@ You can specify a verification limit by adding a number in argument (up to 1.000
                 return
         else:
             if ctx.bot_permissions.external_emojis:
-                emojis = self.bot.get_cog('Emojis').numbers
+                emojis = self.bot.emojis_manager.numbers_names
             else:
                 emojis = [chr(48+i)+chr(8419) for i in range(10)]
             if number>20 or number < 0:

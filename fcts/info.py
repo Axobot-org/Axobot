@@ -225,7 +225,7 @@ class Info(commands.Cog):
     @commands.command(name="docs", aliases=['doc','documentation'])
     async def display_doc(self, ctx: MyContext):
         """Get the documentation url"""
-        text = self.bot.get_cog('Emojis').customs['readthedocs'] + await self.bot._(ctx.channel,"info.docs") + \
+        text = self.bot.emojis_manager.customs['readthedocs'] + await self.bot._(ctx.channel,"info.docs") + \
             " https://zbot.rtfd.io"
         if self.bot.beta:
             text += '/en/develop'

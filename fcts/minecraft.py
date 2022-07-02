@@ -20,9 +20,9 @@ Every information come from the website www.fr-minecraft.net"""
 
     def __init__(self, bot: Zbot):
         self.bot = bot
-        self.flows = dict()
+        self.flows = {}
         self.file = "minecraft"
-        self.uuid_cache = dict()
+        self.uuid_cache: dict[str, str] = {}
 
     @commands.command(name="mojang", aliases=['mojang_status'], enabled=False)
     @commands.cooldown(5, 20, commands.BucketType.user)
@@ -55,12 +55,12 @@ Every information come from the website www.fr-minecraft.net"""
                 k = self.bot.get_cog(
                     'Emojis').customs['green_check'] + key
             elif value == "red":
-                k = self.bot.get_cog('Emojis').customs['red_cross'] + key
+                k = self.bot.emojis_manager.customs['red_cross'] + key
             elif value == 'yellow':
                 k = self.bot.get_cog(
                     'Emojis').customs['neutral_check'] + key
             else:
-                k = self.bot.get_cog('Emojis').customs['blurple'] + key
+                k = self.bot.emojis_manager.customs['blurple'] + key
                 dm = self.bot.get_user(279568324260528128).dm_channel
                 if dm is None:
                     await self.bot.get_user(279568324260528128).create_dm()
