@@ -1,5 +1,4 @@
 import random
-import re
 import time
 from typing import Any, Callable, Literal, Optional, Union
 
@@ -9,6 +8,7 @@ from libs.classes import MyContext, Zbot
 from mysql.connector.errors import IntegrityError
 
 from fcts import checks
+from fcts.args import UnicodeEmoji
 
 
 class SelectView(discord.ui.View):
@@ -95,7 +95,7 @@ class AskTopicSelect(discord.ui.View):
         self.select.callback = self.callback
         self.add_item(self.select)
         self.topics: list[str] = None
-    
+
     async def interaction_check(self, interaction: discord.Interaction):
         return interaction.user.id == self.user_id
 
@@ -103,7 +103,7 @@ class AskTopicSelect(discord.ui.View):
         "Build the options list for Discord"
         res = []
         for topic in topics:
-            res.append(discord.SelectOption(value=topic['id'], label=topic['topic']))
+            res.append(discord.SelectOption(label=topic['topic'], value=topic['id'], emoji=topic['topic_emoji']))
         return res
 
     async def callback(self, interaction: discord.Interaction):
@@ -393,10 +393,6 @@ class Tickets(commands.Cog):
 
         ..Doc tickets.html#as-staff-send-the-prompt-message"""
         topics = await self.db_get_topics(ctx.guild.id)
-        for topic in topics:
-            # if emoji is a discord emoji, convert it
-            if topic['topic_emoji'] and re.match(r'[A-Za-z0-9\_]+:[0-9]{13,20}', topic['topic_emoji']):
-                topic['topic_emoji'] = discord.PartialEmoji.from_str(topic['topic_emoji'])
         other = {"id": -1,
                  "topic": (await self.bot._(ctx.guild.id, "tickets.other")).capitalize(),
                  "topic_emoji": None
@@ -504,7 +500,7 @@ class Tickets(commands.Cog):
 
     @tickets_topics.command(name="add")
     @commands.cooldown(3, 45, commands.BucketType.guild)
-    async def topic_add(self, ctx: MyContext, emote: Optional[discord.PartialEmoji]=None, *, name: str):
+    async def topic_add(self, ctx: MyContext, emote: Union[discord.PartialEmoji, UnicodeEmoji, None]=None, *, name: str):
         """Create a new ticket topic
         A topic name is limited to 100 characters
         Only Discord emojis are accepted for now
@@ -517,7 +513,9 @@ class Tickets(commands.Cog):
         if len(name) > 100:
             await ctx.send(await self.bot._(ctx.guild.id, "tickets.topic.too-long"))
             return
-        if await self.db_add_topic(ctx.guild.id, name, f"{emote.name}:{emote.id}" if emote else None):
+        if isinstance(emote, discord.PartialEmoji):
+            emote = f"{emote.name}:{emote.id}"
+        if await self.db_add_topic(ctx.guild.id, name, emote):
             await ctx.send(await self.bot._(ctx.guild.id, "tickets.topic.created", name=name))
         else:
             await ctx.send(await self.bot._(ctx.guild.id, "tickets.topic.cant-create"))
@@ -540,7 +538,8 @@ class Tickets(commands.Cog):
 
     @tickets_topics.command(name="set-emote", aliases=["set-emoji"])
     @commands.cooldown(3, 30, commands.BucketType.guild)
-    async def topic_set_emote(self, ctx: MyContext, topic_id: Optional[int], emote: Union[discord.PartialEmoji, Literal["none"]]):
+    async def topic_set_emote(self, ctx: MyContext, topic_id: Optional[int],
+                              emote: Union[discord.PartialEmoji, UnicodeEmoji, Literal["none"]]):
         """Edit a topic emoji
         Type "None" to set no emoji for this topic
 
