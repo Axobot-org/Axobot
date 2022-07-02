@@ -160,7 +160,7 @@ class ServerLogs(commands.Cog):
             guild_logs = await self.db_get_from_guild(ctx.guild.id)
             guild_logs = sorted(set(x for v in guild_logs.values() for x in v if x in self.available_logs()))
             # build embed
-            if ctx.bot_permissions.external_emojis and (cog := self.bot.get_cog('Emojis')):
+            if ctx.bot_permissions.external_emojis and (cog := self.bot.emojis_manager):
                 enabled_emoji, disabled_emoji = cog.customs["green_check"], cog.customs["gray_check"]
             else:
                 enabled_emoji, disabled_emoji = '🔹', '◾'

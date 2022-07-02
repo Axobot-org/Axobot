@@ -589,7 +589,7 @@ class Servers(commands.Cog):
                 try:
                     e = await commands.EmojiConverter().convert(ctx,e)
                 except commands.errors.BadArgument:
-                    if e not in self.bot.get_cog("Emojis").unicode_list:
+                    if e not in self.bot.emojis_manager.unicode_set:
                         msg = await self.bot._(ctx.guild.id, "server.edit-error.emoji", emoji=e)
                         await ctx.send(msg)
                         return

@@ -156,7 +156,6 @@ async def load_cogs(bot: "Zbot"):
                       'fcts.bot_stats',
                       'fcts.cases',
                       'fcts.embeds',
-                      'fcts.emojis',
                       'fcts.errors',
                       'fcts.events',
                       'fcts.fun',

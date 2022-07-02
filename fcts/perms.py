@@ -5,8 +5,6 @@ from discord.ext import commands
 from libs.classes import MyContext, Zbot
 from libs.paginator import cut_text
 
-if typing.TYPE_CHECKING:
-    from fcts.emojis import Emojis
 
 VoiceChannelTypes = typing.Union[
     discord.VoiceChannel,
@@ -43,7 +41,7 @@ class Perms(commands.Cog):
     async def collect_permissions(self, ctx: MyContext, permissions: discord.Permissions, channel) -> list[tuple[str, str]]:
         "Iterate over the given permissions and return the needed ones, formatted"
         result = []
-        emojis_cog: 'Emojis' = self.bot.get_cog('Emojis')
+        emojis_cog = self.bot.emojis_manager
         # if target is admin, only display that
         if permissions.administrator:
             perm_tr = await self.bot._(ctx.guild.id, "permissions.list.administrator")

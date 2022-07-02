@@ -493,7 +493,7 @@ class Tickets(commands.Cog):
         await ctx.send(message, embed=embed)
 
 
-    @tickets_main.group(name="topic")
+    @tickets_main.group(name="topic", aliases=["topics"])
     @commands.check(checks.has_manage_channels)
     async def tickets_topics(self, ctx: MyContext):
         """Handle the different ticket topics your members can select
@@ -612,7 +612,7 @@ If that still doesn't work, please create your ticket
     async def topic_set_roles(self, ctx: MyContext):
         "List every ticket topic used in your server"
         topics_repr: list[str] = []
-        none_emoji: str = self.bot.get_cog('Emojis').customs['nothing']
+        none_emoji: str = self.bot.emojis_manager.customs['nothing']
         topics = await self.db_get_topics(ctx.guild.id)
         topics.append(await self.db_get_defaults(ctx.guild.id))
         for topic in topics:
