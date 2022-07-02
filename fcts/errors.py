@@ -133,6 +133,10 @@ class Errors(commands.Cog):
             r = re.search(r'Invalid url: (\S+)',raw_error)
             if r is not None:
                 return await ctx.send(await self.bot._(ctx.channel,'errors.invalidurl',u=r.group(1)), allowed_mentions=ALLOWED)
+            # Invalid unicode emoji: lol
+            r = re.search(r'Invalid Unicode emoji: (\S+)',raw_error)
+            if r is not None:
+                return await ctx.send(await self.bot._(ctx.channel,'errors.invalidunicode',u=r.group(1)), allowed_mentions=ALLOWED)
             # Invalid leaderboard type: lol
             r = re.search(r'Invalid leaderboard type: (\S+)',raw_error)
             if r is not None:

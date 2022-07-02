@@ -21,6 +21,7 @@
         "invalidleaderboard": "Type de classement inexistant",
         "invalidmsgid": "ID invalide",
         "invalidserverlog": "Type de log de serveur invalide",
+        "invalidunicode": "Emoji Unicode invalide : %{u}",
         "invalidurl": "Url invalide : `%{u}`",
         "membernotfound": "Impossible de trouver le membre `%{m}` :confused:",
         "missingargument": "Oups, il manque l'argument \"%{a}\" %{e}",

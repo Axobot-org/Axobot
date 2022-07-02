@@ -122,7 +122,7 @@ class RolesReact(commands.Cog):
     @rr_main.command(name="add")
     @commands.check(checks.has_manage_guild)
     @commands.check(checks.database_connected)
-    async def rr_add(self, ctx, emoji: args.anyEmoji, role: discord.Role, *, description: str = ''):
+    async def rr_add(self, ctx, emoji: args.AnyEmoji, role: discord.Role, *, description: str = ''):
         """Add a role reaction
         This role will be given when a membre click on a specific reaction
         Your description can only be a maximum of 150 characters
@@ -304,7 +304,7 @@ Opposite is the subcommand 'join'
 
     @rr_main.command(name='update')
     @commands.check(checks.database_connected)
-    async def rr_update(self, ctx: MyContext, embed: discord.Message, change_description: typing.Optional[bool] = True, emojis: commands.Greedy[args.anyEmoji] = None):
+    async def rr_update(self, ctx: MyContext, embed: discord.Message, change_description: typing.Optional[bool] = True, emojis: commands.Greedy[args.AnyEmoji] = None):
         """Update a Zbot message to refresh roles/reactions
         If you don't want to update the embed content, for example if it's a custom embed, then you can use 'False' as a second argument. Zbot will only check the reactions
         Specifying a list of emojis will update the embed only for those emojis, and ignore other roles reactions
