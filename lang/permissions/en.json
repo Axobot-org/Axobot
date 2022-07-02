@@ -39,6 +39,7 @@
             "send_tts_messages": "Send TTS messages",
             "speak": "Speak",
             "stream": "Go live",
+            "use_application_commands": "Use application commands",
             "use_embedded_activities": "Launch activities in voice channels",
             "use_slash_commands": "Use slash commands",
             "use_voice_activation": "Use voice activity",
