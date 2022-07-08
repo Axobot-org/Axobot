@@ -262,7 +262,14 @@ To do that, you only need to configure a special voice channel where every membe
 
 Then, the bot needs to know where it should create these new channels. A simple :code:`config change voice_category <your category>` will ask the bot to create its new channels at the bottom of a specific category.
 
-Zbot will take a random name for each new channel, from a random names API, but you can change the name format with the :code:`config change voice_channel_format <new format>` command. Use the special :code:`{random}` keyword anywhere in it to insert a random name!
+Zbot will take a random name for each new channel, from a random names API, but you can change the name format with the :code:`config change voice_channel_format <new format>` command. Several special keywords exists so you can get some unique names, feel free to use them in your format:
+
+* :code:`{random}` inserts a random surname from randommer.io
+* :code:`{minecraft}` inserts a random minecraft entity name
+* :code:`{number}` inserts a random number
+* :code:`{user}` inserts the Discord name and tag of the user who summoned the channel
+
+If you have more ideas of variables to add, you can suggest them in our Discord support server!
 
 .. warning:: Zbot needs the "`Manage channels <perms.html#manage-channels>`__", "`Move members <perms.html#move-members>`__" and "`Connect <perms.html#connect>`__" permissions in the selected category to create these news channels!
 
