@@ -157,8 +157,9 @@ class AntiScam(commands.Cog):
     @commands.cooldown(2, 10, commands.BucketType.user)
     async def antiscam_report(self, ctx: MyContext, *, message: typing.Union[discord.Message, str]):
         """Report a suspicious message to the bot team
+        This will help improving the bot detection AI
 
-        This will help improving the bot detection AI"""
+        ..Doc moderator.html#anti-scam"""
         content = message.content if isinstance(message, discord.Message) else message
         mentions_count = len(message.mentions) if isinstance(message, discord.Message) else 0
         msg = Message.from_raw(content, mentions_count)
