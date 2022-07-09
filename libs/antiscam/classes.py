@@ -2,6 +2,8 @@ import re
 from collections import Counter
 from typing import TypeVar
 
+import discord
+
 from .normalization import normalize
 from .similarities import check_message
 
@@ -32,7 +34,19 @@ def get_avg_word_len(msg: str):
     lengths = [len(word) for word in msg.split(' ')]
     return sum(lengths) / len(lengths)
 
+EMBED_COLORS = {
+    "pending": '#000',
+    "deleted": '#0066ff',
+    "harmless": '#bcc2c2',
+    "scam": '#ffa31a',
+    "raid": '#ff3333',
+    "insults": '#cc33ff',
+    "spam": '#ff1aff'
+}
+
 class Message:
+    "Represents a potentially malicious message"
+
     def __init__(self, message: str, normd_message: str, contains_everyone: bool, url_score: int, mentions_count: int, max_frequency: float, punctuation_count: int, caps_percentage: float, avg_word_len: float, category: int):
         self.message = message
         self.normd_message = normd_message
@@ -86,8 +100,9 @@ class Message:
 
 ClassType = TypeVar('ClassType')
 class PredictionResult:
+    "Represents the results of an AI prediction"
     def __init__(self, probabilities: list[float], classes: list[ClassType]):
-        self.probabilities: dict[ClassType, float] = dict()
+        self.probabilities: dict[ClassType, float] = {}
         self.result: ClassType = None
         max_prob = -1
         for prob, cls in zip(probabilities, classes):
@@ -111,3 +126,29 @@ class PredictionResult:
 Probabilities:
     - {probas}
         """
+
+class MsgReportView(discord.ui.View):
+    "Embed view in the internal reports channel, used to confirm/deny/delete a message report"
+    def __init__(self, row_id):
+        super().__init__()
+        for category in ("scam", "insults", "raid", "spam"):
+            self.add_item(discord.ui.Button(
+                label=f"Confirm {category}",
+                style=discord.ButtonStyle.green,
+                custom_id=f'{category}-{row_id}',
+                row=0
+            ))
+        self.add_item(discord.ui.Button(
+            label="Harmless message",
+            style=discord.ButtonStyle.gray,
+            emoji="👌",
+            custom_id=f'harmless-{row_id}',
+            row=1
+        ))
+        self.add_item(discord.ui.Button(
+            label="Personal data message",
+            style=discord.ButtonStyle.red,
+            emoji="🗑",
+            custom_id=f'delete-{row_id}',
+            row=1
+        ))
