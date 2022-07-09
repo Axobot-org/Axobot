@@ -1,0 +1,8 @@
+{
+    "lolcat": {
+        "url-score": "How bad seems to be linkies: %{score}",
+        "report-successful": "Thanks sir, I gotcha!",
+        "result": "Scores:",
+        "probabilities": "Probabilities:"
+    }
+}
