@@ -207,7 +207,7 @@ class AntiScam(commands.Cog):
         if interaction.type != discord.InteractionType.component:
             return
         btn_id: str = interaction.data.get("custom_id", None)
-        if btn_id is None:
+        if btn_id is None or '-' not in btn_id:
             return
         action, msg_id = btn_id.split("-")
         msg_id = int(msg_id)
