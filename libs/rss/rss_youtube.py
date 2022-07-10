@@ -10,7 +10,7 @@ from cachingutils import acached, cached
 
 from libs.youtube_search import Service
 
-from .rss_general import RssMessage, feed_parse
+from .rss_general import FeedObject, RssMessage, feed_parse
 
 if TYPE_CHECKING:
     from libs.classes import Zbot
@@ -102,10 +102,19 @@ class YoutubeRSS:
             img_url = None
             if 'media_thumbnail' in feed.keys() and len(feed['media_thumbnail']) > 0:
                 img_url = feed['media_thumbnail'][0]['url']
-            obj = RssMessage(bot=self.bot,feed_type='yt',url=feed['link'],title=feed['title'],date=feed['published_parsed'],author=feed['author'],channel=feed['author'],image=img_url)
+            obj = RssMessage(
+                bot=self.bot,
+                feed=FeedObject.unrecorded("yt", channel.guild.id, channel.id),
+                url=feed['link'],
+                title=feed['title'],
+                date=feed['published_parsed'],
+                author=feed['author'],
+                channel=feed['author'],
+                image=img_url
+            )
             return [obj]
         else:
-            liste = list()
+            liste = []
             for feed in feeds.entries:
                 if len(liste) > 10:
                     break
@@ -114,7 +123,16 @@ class YoutubeRSS:
                 img_url = None
                 if 'media_thumbnail' in feed.keys() and len(feed['media_thumbnail']) > 0:
                     img_url = feed['media_thumbnail'][0]['url']
-                obj = RssMessage(bot=self.bot,feed_type='yt',url=feed['link'],title=feed['title'],date=feed['published_parsed'],author=feed['author'],channel=feed['author'],image=img_url)
+                obj = RssMessage(
+                    bot=self.bot,
+                    feed=FeedObject.unrecorded("yt", channel.guild.id, channel.id),
+                    url=feed['link'],
+                    title=feed['title'],
+                    date=feed['published_parsed'],
+                    author=feed['author'],
+                    channel=feed['author'],
+                    image=img_url
+                )
                 liste.append(obj)
             liste.reverse()
             return liste
