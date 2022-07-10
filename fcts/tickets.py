@@ -4,12 +4,15 @@ from typing import Any, Callable, Literal, Optional, Union
 
 import discord
 from discord.ext import commands
-from libs.classes import MyContext, Zbot
 from mysql.connector.errors import IntegrityError
+from libs.classes import MyContext, Zbot
 
 from fcts import checks
 from fcts.args import UnicodeEmoji
 
+def is_named_other(name: str, other_translated: str):
+    "Check if a topic name corresponds to any 'other' variant"
+    return name.lower() in {"other", "others", other_translated}
 
 class SelectView(discord.ui.View):
     "Used to ask what kind of ticket a user wants to open"
@@ -21,6 +24,7 @@ class SelectView(discord.ui.View):
         self.add_item(self.select)
 
     def build_options(self, topics: list[dict[str, Any]]):
+        "Compute Select options from topics list"
         res = []
         for topic in topics:
             res.append(discord.SelectOption(label=topic['topic'], value=topic['id'], emoji=topic['topic_emoji']))
@@ -45,11 +49,13 @@ class SendHintText(discord.ui.View):
         return interaction.user.id == self.user_id
 
     async def confirm(self, interaction: discord.Interaction):
+        "When user clicks on the confirm button"
         self.confirmed = True
         self.interaction = interaction
         self.stop()
 
     async def cancel(self, interaction: discord.Interaction):
+        "When user clicks on the cancel button"
         await interaction.response.defer()
         self.confirmed = False
         self.stop()
@@ -57,6 +63,7 @@ class SendHintText(discord.ui.View):
         await interaction.followup.send(self.text_cancel, ephemeral=True)
 
     async def disable(self, src: Union[discord.Interaction, discord.Message]):
+        "When the view timeouts or is disabled"
         for child in self.children:
             child.disabled = True
         if isinstance(src, discord.Interaction):
@@ -512,6 +519,9 @@ class Tickets(commands.Cog):
         ..Doc tickets.html#create-a-new-topic"""
         if len(name) > 100:
             await ctx.send(await self.bot._(ctx.guild.id, "tickets.topic.too-long"))
+            return
+        if is_named_other(name, await self.bot._(ctx.guild.id, "tickets.other")):
+            await ctx.send(await self.bot._(ctx.guild.id, "tickets.topic.other-already-exists"))
             return
         if isinstance(emote, discord.PartialEmoji):
             emote = f"{emote.name}:{emote.id}"
