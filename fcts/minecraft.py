@@ -53,13 +53,11 @@ Every information come from the website www.fr-minecraft.net"""
             if key == "www.minecraft.net/en-us":
                 key = "minecraft.net"
             if value == "green":
-                k = self.bot.get_cog(
-                    'Emojis').customs['green_check'] + key
+                k = self.bot.emojis_manager.customs['green_check'] + key
             elif value == "red":
                 k = self.bot.emojis_manager.customs['red_cross'] + key
             elif value == 'yellow':
-                k = self.bot.get_cog(
-                    'Emojis').customs['neutral_check'] + key
+                k = self.bot.emojis_manager.customs['neutral_check'] + key
             else:
                 k = self.bot.emojis_manager.customs['blurple'] + key
                 dm = self.bot.get_user(279568324260528128).dm_channel
@@ -410,7 +408,7 @@ Every information come from the website www.fr-minecraft.net"""
                 display_ip = ip
             else:
                 display_ip = f"{ip}:{port}"
-            await self.bot.get_cog('Rss').db_add_feed(ctx.guild.id, ctx.channel.id, 'mc', "{}:{}".format(ip, port))
+            await self.bot.get_cog('Rss').db_add_feed(ctx.guild.id, ctx.channel.id, 'mc', f"{ip}:{port}")
             await ctx.send(await self.bot._(ctx.guild, "minecraft.success-add", ip=display_ip, channel=ctx.channel.mention))
         except Exception as err:
             await ctx.send(await self.bot._(ctx.guild, "rss.fail-add"))
@@ -615,7 +613,7 @@ Every information come from the website www.fr-minecraft.net"""
             if msg is None:
                 msg = await self.send_msg_server(obj, channel, i)
                 if msg is not None:
-                    await self.bot.get_cog('Rss').db_update_flow(feed.feed_id, [('structure', str(msg.id)), ('date', self.bot.utcnow())])
+                    await self.bot.get_cog('Rss').db_update_feed(feed.feed_id, [('structure', str(msg.id)), ('date', self.bot.utcnow())])
                     if send_stats:
                         if statscog := self.bot.get_cog("BotStats"):
                             statscog.rss_stats['messages'] += 1

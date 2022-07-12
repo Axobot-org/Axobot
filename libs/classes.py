@@ -1,7 +1,7 @@
 import datetime
 import logging
 import time
-from typing import Any, Callable, Coroutine, Optional
+from typing import Any, Callable, Coroutine, Literal, Optional, TYPE_CHECKING, overload
 
 import discord
 import requests
@@ -16,6 +16,16 @@ from libs.emojis_manager import EmojisManager
 from libs.prefix_manager import PrefixManager
 from libs.tasks_handler import TaskHandler
 
+
+if TYPE_CHECKING:
+    from fcts.aide import Help
+    from fcts.bot_stats import BotStats
+    from fcts.errors import Errors
+    from fcts.minecraft import Minecraft
+    from fcts.rss import Rss
+    from fcts.servers import Servers
+    from fcts.users import Users
+    from fcts.utilities import Utilities
 
 class MyContext(commands.Context):
     """Replacement for the official commands.Context class
@@ -52,7 +62,7 @@ class MyContext(commands.Context):
             return await super().send(reference=self.message.reference, *args, **kwargs)
         return await super().send(*args, **kwargs)
 
-
+# pylint: disable=too-many-instance-attributes
 class Zbot(commands.bot.AutoShardedBot):
     """Bot class, with everything needed to run it"""
 
@@ -114,11 +124,41 @@ class Zbot(commands.bot.AutoShardedBot):
         # use the new MyContext class
         return await super().get_context(source, cls=cls)
 
-    # async def on_command_error(self, context: MyContext, exception: commands.CommandError, /) -> None:
-    #     if cog := self.get_cog("Errors"):
-    #         await cog.on_command_error(context, exception)
-    #     else:
-    #         self.log.error('Ignoring exception in command %s:', context.command, exc_info=True)
+    @overload
+    def get_cog(self, name: Literal["BotStats"]) -> Optional["BotStats"]:
+        ...
+
+    @overload
+    def get_cog(self, name: Literal["Errors"]) -> Optional["Errors"]:
+        ...
+
+    @overload
+    def get_cog(self, name: Literal["Help"]) -> Optional["Help"]:
+        ...
+
+    @overload
+    def get_cog(self, name: Literal["Minecraft"]) -> Optional["Minecraft"]:
+        ...
+
+    @overload
+    def get_cog(self, name: Literal["Rss"]) -> Optional["Rss"]:
+        ...
+
+    @overload
+    def get_cog(self, name: Literal["Servers"]) -> Optional["Servers"]:
+        ...
+
+    @overload
+    def get_cog(self, name: Literal["Users"]) -> Optional["Users"]:
+        ...
+
+    @overload
+    def get_cog(self, name: Literal["Utilities"]) -> Optional["Utilities"]:
+        ...
+
+    @overload
+    def get_cog(self, name: str) -> Optional[commands.Cog]:
+        ...
 
     @property
     def cnx_frm(self) -> MySQLConnection:

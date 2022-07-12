@@ -824,7 +824,7 @@ Available types: member, role, user, emoji, channel, server, invite, category
         # XP card
         xp_card = await self.bot.get_cog('Utilities').get_xp_style(user)
         # Flags
-        userflags: list = await self.bot.get_cog('Users').get_userflags(user)
+        userflags = await self.bot.get_cog('Users').get_userflags(user)
         if await self.bot.get_cog("Admin").check_if_admin(user):
             userflags.append('admin')
         if len(userflags) == 0:
