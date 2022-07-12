@@ -20,6 +20,7 @@ from docs import conf
 from libs import bitly_api
 from libs.classes import MyContext, Zbot
 from libs.formatutils import FormatUtils
+from libs.rss.rss_general import FeedObject
 from utils import count_code_lines
 
 from fcts import args, checks
@@ -917,7 +918,7 @@ Servers:
         # Rss
         rss_len = await self.bot.get_config(guild.id,'rss_max_number')
         rss_len = self.bot.get_cog("Servers").default_opt['rss_max_number'] if rss_len is None else rss_len
-        rss_numb = "{}/{}".format(len(await self.bot.get_cog('Rss').get_guild_flows(guild.id)), rss_len)
+        rss_numb = "{}/{}".format(len(await self.bot.get_cog('Rss').db_get_guild_feeds(guild.id)), rss_len)
         # Join date
         joined_at = f"<t:{guild.me.joined_at.timestamp():.0f}>"
         # ----
@@ -998,23 +999,21 @@ Servers:
 
     @find_main.command(name='rss')
     async def find_rss(self, ctx: MyContext, ID:int):
-        flow = await self.bot.get_cog('Rss').get_flow(ID)
-        if len(flow) == 0:
+        feed: FeedObject = await self.bot.get_cog('Rss').db_get_feed(ID)
+        if feed is None:
             await ctx.send("Invalid ID")
             return
-        else:
-            flow = flow[0]
-        temp = self.bot.get_guild(flow['guild'])
+        temp = self.bot.get_guild(feed.guild_id)
         if temp is None:
-            g = "Unknown ({})".format(flow['guild'])
+            g = "Unknown ({})".format(feed.guild_id)
         else:
-            g = "`{}`\n{}".format(temp.name,temp.id)
-            temp = self.bot.get_channel(flow['channel'])
+            g = "`{}`\n{}".format(temp.name, temp.id)
+            temp = self.bot.get_channel(feed.channel_id)
         if temp is not None:
             c = "`{}`\n{}".format(temp.name,temp.id)
         else:
-            c = "Unknown ({})".format(flow['channel'])
-        d = f"<t:{flow['date'].timestamp():.0f}>"
+            c = "Unknown ({})".format(feed.channel_id)
+        d = f"<t:{feed.date.timestamp():.0f}>"
         if d is None or len(d) == 0:
             d = "never"
         if ctx.can_send_embed:
@@ -1025,13 +1024,13 @@ Servers:
             emb = discord.Embed(title=f"RSS N°{ID}", color=color)
             emb.add_field(name="Server", value=g)
             emb.add_field(name="Channel", value=c)
-            emb.add_field(name="URL", value=flow['link'], inline=False)
-            emb.add_field(name="Type", value=flow['type'])
+            emb.add_field(name="URL", value=feed.link, inline=False)
+            emb.add_field(name="Type", value=feed.type)
             emb.add_field(name="Last post", value=d)
             emb.set_footer(text=ctx.author, icon_url=ctx.author.display_avatar)
             await ctx.send(embed=emb)
         else:
-            await ctx.send("ID: {}\nGuild: {}\nChannel: {}\nLink: <{}>\nType: {}\nLast post: {}".format(flow['ID'],g.replace("\n"," "),c.replace("\n"," "),flow['link'],flow['type'],d))
+            await ctx.send("ID: {}\nGuild: {}\nChannel: {}\nLink: <{}>\nType: {}\nLast post: {}".format(feed.feed_id, g.replace("\n"," "), c.replace("\n"," "), feed.link,feed.type, d))
 
     @commands.command(name="membercount",aliases=['member_count'])
     @commands.guild_only()
