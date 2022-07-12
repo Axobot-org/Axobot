@@ -12,6 +12,7 @@ from frmc_lib import SearchType
 
 from libs.classes import Zbot, MyContext
 from fcts import checks
+from libs.rss.rss_general import FeedObject
 
 
 class Minecraft(commands.Cog):
@@ -20,7 +21,7 @@ Every information come from the website www.fr-minecraft.net"""
 
     def __init__(self, bot: Zbot):
         self.bot = bot
-        self.flows = {}
+        self.feeds = {}
         self.file = "minecraft"
         self.uuid_cache: dict[str, str] = {}
 
@@ -409,11 +410,11 @@ Every information come from the website www.fr-minecraft.net"""
                 display_ip = ip
             else:
                 display_ip = f"{ip}:{port}"
-            await self.bot.get_cog('Rss').add_flow(ctx.guild.id, ctx.channel.id, 'mc', "{}:{}".format(ip, port))
+            await self.bot.get_cog('Rss').db_add_feed(ctx.guild.id, ctx.channel.id, 'mc', "{}:{}".format(ip, port))
             await ctx.send(await self.bot._(ctx.guild, "minecraft.success-add", ip=display_ip, channel=ctx.channel.mention))
-        except Exception as e:
+        except Exception as err:
             await ctx.send(await self.bot._(ctx.guild, "rss.fail-add"))
-            await self.bot.get_cog("Errors").on_error(e, ctx)
+            await self.bot.get_cog("Errors").on_error(err, ctx)
 
     async def create_server_1(self, guild: discord.Guild, ip: str, port=None) -> Union[str, 'MCServer']:
         if port is None:
@@ -578,51 +579,54 @@ Every information come from the website www.fr-minecraft.net"""
         else:
             return await obj.create_msg(guild, self.bot._)
 
-    async def find_msg(self, channel: discord.TextChannel, ip: list, ID: str):
+    async def find_msg(self, channel: discord.TextChannel, ip: list, feed_id: str):
+        "Find the minecraft server message posted from that feed"
         if channel is None:
             return None
-        if ID.isnumeric():
+        if feed_id.isnumeric():
             try:
-                return await channel.fetch_message(int(ID))
+                return await channel.fetch_message(int(feed_id))
             except (discord.Forbidden, discord.NotFound):
                 pass
         return None
 
-    async def check_flow(self, flow: dict, send_stats: bool):
-        i = flow["link"].split(':')
+    async def check_feed(self, feed: FeedObject, send_stats: bool):
+        "Refresh a minecraft server feed"
+        i = feed.link.split(':')
         if i[1] == '':
             i[1] = None
-        guild = self.bot.get_guild(flow['guild'])
+        guild = self.bot.get_guild(feed.guild_id)
         if guild is None:
-            return
-        if flow['link'] in self.flows.keys():
-            obj = self.flows[flow['link']]
+            return False
+        if feed.link in self.feeds:
+            obj = self.feeds[feed.link]
         else:
             try:
                 obj = await self.create_server_1(guild, i[0], i[1])
-            except Exception as e:
-                await self.bot.get_cog('Errors').on_error(e, None)
-                return
-            self.flows[flow['link']] = obj
+            except Exception as err:
+                await self.bot.get_cog('Errors').on_error(err, None)
+                return False
+            self.feeds[feed.link] = obj
         try:
-            channel = guild.get_channel(flow['channel'])
+            channel = guild.get_channel(feed.channel_id)
             if channel is None:
-                return
-            msg = await self.find_msg(channel, i, flow['structure'])
+                return False
+            msg = await self.find_msg(channel, i, feed.structure)
             if msg is None:
                 msg = await self.send_msg_server(obj, channel, i)
                 if msg is not None:
-                    await self.bot.get_cog('Rss').update_flow(flow['ID'], [('structure', str(msg.id)), ('date', self.bot.utcnow())])
+                    await self.bot.get_cog('Rss').db_update_flow(feed.feed_id, [('structure', str(msg.id)), ('date', self.bot.utcnow())])
                     if send_stats:
                         if statscog := self.bot.get_cog("BotStats"):
                             statscog.rss_stats['messages'] += 1
-                return
-            e = await self.form_msg_server(obj, guild, i)
-            await msg.edit(embed=e)
+                return True
+            err = await self.form_msg_server(obj, guild, i)
+            await msg.edit(embed=err)
             if statscog := self.bot.get_cog("BotStats"):
                 statscog.rss_stats['messages'] += 1
-        except Exception as e:
-            await self.bot.get_cog('Errors').on_error(e, None)
+            return True
+        except Exception as err:
+            await self.bot.get_cog('Errors').on_error(err, None)
 
 
 async def setup(bot):

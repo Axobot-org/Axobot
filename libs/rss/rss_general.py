@@ -104,7 +104,7 @@ class RssMessage:
     async def fill_mention(self, guild: discord.Guild):
         "Fill the mentions attribute with required roles mentions"
         if len(self.feed.role_ids) == 0:
-            self.mentions = await self.bot._(guild.id, "misc.none")
+            self.mentions = ""
         else:
             roles = []
             for item in self.feed.role_ids:
@@ -121,7 +121,7 @@ class RssMessage:
     async def create_msg(self, msg_format: str=None):
         "Create a message ready to be sent, either in string or in embed"
         if msg_format is None:
-            msg_format = self.feed.stucture
+            msg_format = self.feed.structure
         if isinstance(self.date, datetime.datetime):
             date = f"<t:{self.date.timestamp():.0f}>"
         else:
@@ -184,7 +184,7 @@ class FeedObject:
     def __init__(self, from_dict: dict):
         self.feed_id: int = from_dict['ID']
         self.added_at: datetime.datetime = from_dict['added_at']
-        self.stucture: str = from_dict['structure']
+        self.structure: str = from_dict['structure']
         self.guild_id: int = from_dict['guild']
         self.channel_id: int = from_dict['channel']
         self.type: FeedType = from_dict['type']
