@@ -215,7 +215,7 @@ class Rss(commands.Cog):
         True if max number reached, followed by the feed limit"""
         feed_limit = await self.bot.get_config(guild.id,'rss_max_number')
         if feed_limit is None:
-            feed_limit = self.bot.get_cog('Servers').default_opt['rss_max_number']
+            feed_limit: int = self.bot.get_cog('Servers').default_opt['rss_max_number']
         return len(await self.db_get_guild_feeds(guild.id)) >= feed_limit, feed_limit
 
     @rss_main.command(name="add")
@@ -1161,12 +1161,12 @@ class Rss(commands.Cog):
                 if send_stats:
                     if statscog := self.bot.get_cog("BotStats"):
                         statscog.rss_stats['messages'] += 1
-            except discord.HTTPException as e:
-                self.bot.log.info("[send_rss_msg] Cannot send message on channel {}: {}".format(channel.id,e))
-                await self.bot.get_cog("Errors").on_error(e)
+            except discord.HTTPException as err:
+                self.bot.log.info(f"[send_rss_msg] Cannot send message on channel {channel.id}: {err}")
+                await self.bot.get_cog("Errors").on_error(err)
                 await self.bot.get_cog("Errors").senf_err_msg(str(t.to_dict()) if hasattr(t, "to_dict") else str(t))
-            except Exception as e:
-                self.bot.log.info("[send_rss_msg] Cannot send message on channel {}: {}".format(channel.id,e))
+            except Exception as err:
+                self.bot.log.info("[send_rss_msg] Cannot send message on channel {}: {}".format(channel.id,err))
 
     async def check_feed(self, feed: FeedObject, session: ClientSession = None, send_stats: bool=False):
         "Check one rss feed and send messages if required"
