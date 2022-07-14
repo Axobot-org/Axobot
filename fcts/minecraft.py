@@ -1,22 +1,23 @@
-from typing import Union
-import frmc_lib
+import datetime
+import re
+import time
+from typing import Any, Union
+
 import aiohttp
 import discord
-import re
-import datetime
-import time
+import frmc_lib
 import requests
+from dateutil.parser import isoparse
 from discord.ext import commands
-from urllib.parse import quote
 from frmc_lib import SearchType
-
-from libs.classes import Zbot, MyContext
-from fcts import checks
+from libs.classes import MyContext, Zbot
 from libs.rss.rss_general import FeedObject
+
+from fcts import checks
 
 
 class Minecraft(commands.Cog):
-    """Cog gathering all commands related to the Minecraft® game. 
+    """Cog gathering all commands related to the Minecraft® game.
 Every information come from the website www.fr-minecraft.net"""
 
     def __init__(self, bot: Zbot):
@@ -102,10 +103,11 @@ Every information come from the website www.fr-minecraft.net"""
             await self.bot.get_cog('Help').help_command(ctx, ['minecraft'])
 
     async def send_embed(self, ctx: MyContext, embed: discord.Embed):
+        "Try to send an embed into a channel, or report the error if it fails"
         try:
             await ctx.send(embed=embed)
-        except Exception as e:
-            await self.bot.get_cog('Errors').on_error(e, ctx)
+        except discord.DiscordException as err:
+            await self.bot.get_cog('Errors').on_error(err, ctx)
             await ctx.send(await self.bot._(ctx.channel, "minecraft.serv-error"))
 
     @mc_main.command(name="block", aliases=["bloc"])
@@ -288,7 +290,7 @@ Every information come from the website www.fr-minecraft.net"""
                     pass
         await self.send_embed(ctx, embed)
 
-    @mc_main.command(name="mod")
+    @mc_main.command(name="mod", enabled=False)
     async def mc_mod(self, ctx: MyContext, *, value: str = 'help'):
         """Get info about any mod registered on CurseForge
 
@@ -301,28 +303,33 @@ Every information come from the website www.fr-minecraft.net"""
         if not ctx.can_send_embed:
             await ctx.send(await self.bot._(ctx.channel, "minecraft.no-embed"))
             return
-        url = 'https://addons-ecs.forgesvc.net/api/v2/addon/'
+        url = 'https://api.curseforge.com/v1/mods/search'
         header = {
             "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0) Gecko/20100101 Firefox/83.0"}
-        searchurl = url+'search?gameId=432&sectionId=6&sort=0&pageSize=2&searchFilter=' + \
-            quote(value.lower())
+        # searchurl = url+'search?gameId=432&sectionId=6&sort=0&pageSize=2&searchFilter=' + \
+        #     quote(value.lower())
+        params = {
+            "gameId": 0,
+            "searchFilter": value
+        }
         async with aiohttp.ClientSession(loop=self.bot.loop, headers=header) as session:
-            async with session.get(searchurl, timeout=10) as resp:
-                search: list = await resp.json()
+            async with session.get(url, params=params, timeout=10) as resp:
+                search: list[dict[str, Any]] = (await resp.json())["data"]
         if len(search) == 0:
             await ctx.send(await self.bot._(ctx.channel, "minecraft.no-mod"))
             return
         search = search[0]
-        authors = ", ".join(
-            [f"[{x['name']}]({x['url']})" for x in search['authors']])
-        raw_date = search['dateModified'][:-1]
-        raw_date += '0'*(23-len(raw_date))
-        date = datetime.datetime.fromisoformat(raw_date).replace(tzinfo=datetime.timezone.utc)
-        date = f"<t:{date.timestamp():.0f}>"
-        versions = set(x['gameVersion']
-                       for x in search['gameVersionLatestFiles'])
-        versions = " - ".join(sorted(versions, reverse=True,
-                              key=lambda a: list(map(int, a.split('.')))))
+        authors = ", ".join([
+            f"[{x['name']}]({x['url']})" for x in search['authors']
+        ])
+        date = f"<t:{isoparse(search['dateModified']).timestamp():.0f}>"
+        versions = set(
+            x['gameVersion'] for x in search['latestFilesIndexes']
+        )
+        versions = " - ".join(
+            sorted(versions, reverse=True,
+                   key=lambda a: list(map(int, a.split('.'))))
+        )
         data = (
             search['name'],
             authors,
@@ -336,11 +343,11 @@ Every information come from the website www.fr-minecraft.net"""
         title = "{} - {}".format((await self.bot._(ctx.channel, "minecraft.names"))[5], search['name'])
         embed = discord.Embed(
             title=title, color=int('16BD06', 16),
-            url=search['websiteUrl'],
+            url=search["links"]['websiteUrl'],
             timestamp=ctx.message.created_at)
         embed.set_footer(text=ctx.author, icon_url=ctx.author.display_avatar)
-        if attachments := search['attachments']:
-            embed.set_thumbnail(url=attachments[0]['thumbnailUrl'])
+        if logo := search['logo']:
+            embed.set_thumbnail(url=logo['thumbnailUrl'])
         for i, field in enumerate(await self.bot._(ctx.channel, "minecraft.mod-fields")):
             if data[i]:
                 try:
