@@ -378,7 +378,7 @@ class Events(commands.Cog):
         if self.bot.beta:
             return
         t = time.time()
-        answers = ['None' for _ in range(4)]
+        answers = ['None' for _ in range(3)]
         self.bot.log.info("Sending server count to bots lists APIs...")
         try:
             guild_count = await self.bot.get_cog('Info').get_guilds_count()
@@ -411,17 +411,6 @@ class Events(commands.Cog):
         except Exception as err:
             answers[1] = "0"
             self.bot.dispatch("error", err, "Sending server count to BotsOnDiscord")
-        try: # https://discord.boats/bot/486896267788812288
-            headers = {
-                'Authorization': self.bot.others['discordboats'],
-                'Content-Type': 'application/json'
-            }
-            async with session.post(f'https://discord.boats/api/bot/{self.bot.user.id}', data=payload, headers=headers) as resp:
-                self.bot.log.debug(f'discord.boats returned {resp.status} for {payload}')
-                answers[2] = resp.status
-        except Exception as err:
-            answers[2] = "0"
-            self.bot.dispatch("error", err, "Sending server count to discord.boats")
         try: # https://api.discordextremelist.xyz/v2/bot/486896267788812288/stats
             payload = json.dumps({
                 'guildCount': guild_count
@@ -432,13 +421,13 @@ class Events(commands.Cog):
             }
             async with session.post(f'https://api.discordextremelist.xyz/v2/bot/{self.bot.user.id}/stats', data=payload, headers=headers) as resp:
                 self.bot.log.debug(f'DiscordExtremeList returned {resp.status} for {payload}')
-                answers[3] = resp.status
+                answers[2] = resp.status
         except Exception as err:
-            answers[3] = "0"
+            answers[2] = "0"
             self.bot.dispatch("error", err, "Sending server count to DiscordExtremeList")
         await session.close()
         answers = '-'.join(str(x) for x in answers)
-        delta_time = round(time.time()-t,3)
+        delta_time = round(time.time()-t, 3)
         emb = discord.Embed(description=f'**Guilds count updated** in {delta_time}s ({answers})', color=7229109, timestamp=self.bot.utcnow())
         emb.set_author(name=self.bot.user, icon_url=self.bot.user.display_avatar)
         await self.bot.send_embed([emb], url="loop")
