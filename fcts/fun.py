@@ -106,7 +106,7 @@ class Fun(commands.Cog):
 
     @commands.command(name='roll',hidden=True)
     @commands.check(is_fun_enabled)
-    async def roll(self,ctx,*,options):
+    async def roll(self, ctx: MyContext, *, options: str):
         """Selects an option at random from a given list
         The options must be separated by a comma `,`
 
@@ -121,7 +121,7 @@ class Fun(commands.Cog):
         choosen = random.choice(liste)
         await ctx.send(choosen)
 
-    @commands.command(name="cookie",aliases=['cookies'],hidden=True)
+    @commands.command(name="cookie", aliases=['cookies', 'crustulum'], hidden=True)
     @commands.check(can_use_cookie)
     @commands.check(is_fun_enabled)
     async def cookie(self, ctx: MyContext):
@@ -130,7 +130,11 @@ class Fun(commands.Cog):
             await ctx.send(file=await self.utilities.find_img("cookie-target.gif"))
         else:
             emoji = self.bot.emojis_manager.customs['cookies_eat']
-            await ctx.send(await self.bot._(ctx.guild,"fun.cookie", user=ctx.author.mention, emoji=emoji))
+            if ctx.invoked_with == "crustulum":
+                msg = f"Pyxidem oft {ctx.author.mention} crustularum <@375598088850505728>! {emoji}"
+            else:
+                msg = await self.bot._(ctx.guild, "fun.cookie", user=ctx.author.mention, emoji=emoji)
+            await ctx.send(msg)
 
     @commands.command(name="reverse", hidden=True)
     @commands.check(is_fun_enabled)

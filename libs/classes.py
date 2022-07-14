@@ -156,9 +156,9 @@ class Zbot(commands.bot.AutoShardedBot):
     def get_cog(self, name: Literal["Utilities"]) -> Optional["Utilities"]:
         ...
 
-    @overload
-    def get_cog(self, name: str) -> Optional[commands.Cog]:
-        ...
+    def get_cog(self, name: str):
+        # pylint: disable=useless-super-delegation
+        return super().get_cog(name)
 
     @property
     def cnx_frm(self) -> MySQLConnection:
@@ -287,7 +287,7 @@ class Zbot(commands.bot.AutoShardedBot):
         return datetime.datetime.now(datetime.timezone.utc)
 
     @property
-    def _(self) -> Callable[[Any, str], Coroutine[Any, Any, str]]:
+    def _(self) -> Callable[..., Coroutine[Any, Any, str]]:
         """Translate something"""
         cog = self.get_cog('Languages')
         if cog is None:
