@@ -1139,6 +1139,18 @@ class Rss(commands.Cog):
         async with self.bot.db_query(query, returnrowcount=True) as query_results:
             return query_results
 
+    async def db_set_active_guilds(self, active_guild_ids: list[int]) -> int:
+        "Mark any guild in the list as an active guild, and every other as inactive (ie. the bot has no access to them anymore"
+        if self.bot.zombie_mode:
+            return
+        ids_list = ', '.join(map(str, active_guild_ids))
+        query = f"UPDATE `{self.table}` SET `active_guild` = 0 WHERE `guild` NOT IN ({ids_list})"
+        async with self.bot.db_query(query, returnrowcount=True) as query_results:
+            self.bot.log.info("[rss] set guild as inactive for %s feeds", query_results)
+        query = f"UPDATE `{self.table}` SET `active_guild` = 1 WHERE `guild` IN ({ids_list})"
+        async with self.bot.db_query(query, returnrowcount=True) as query_results:
+            return query_results
+
     async def send_rss_msg(self, obj: "RssMessage", channel: discord.TextChannel, roles: list[str], send_stats):
         "Send a RSS message into its Discord channel, with the corresponding mentions"
         if channel is not None:
@@ -1166,10 +1178,11 @@ class Rss(commands.Cog):
                 await self.bot.get_cog("Errors").on_error(err)
                 await self.bot.get_cog("Errors").senf_err_msg(str(t.to_dict()) if hasattr(t, "to_dict") else str(t))
             except Exception as err:
-                self.bot.log.info("[send_rss_msg] Cannot send message on channel {}: {}".format(channel.id,err))
+                self.bot.log.info(f"[send_rss_msg] Cannot send message on channel {channel.id}: {err}")
 
     async def check_feed(self, feed: FeedObject, session: ClientSession = None, send_stats: bool=False):
-        "Check one rss feed and send messages if required"
+        """Check one rss feed and send messages if required
+        Return True if the operation was a success"""
         try:
             guild = self.bot.get_guild(feed.guild_id)
             if guild is None:
@@ -1201,15 +1214,18 @@ class Rss(commands.Cog):
                 return True
             elif isinstance(objs, list):
                 latest_post_date = None
-                for o in objs[:self.max_messages]:
-                    # if we can't post messages: abort
-                    if not chan.permissions_for(guild.me).send_messages:
-                        return True
-                    o.feed = feed
-                    o.fill_embed_data()
-                    await o.fill_mention(guild)
-                    await self.send_rss_msg(o, chan, feed.role_ids, send_stats)
-                    latest_post_date = o.date
+                for obj in objs[:self.max_messages]:
+                    # if the guild was marked as inactive (ie the bot wasn't there in the previous loop),
+                    #  mark the feeds as completed but do not send any message, to avoid spamming channels
+                    if feed.is_active_guild:
+                        # if we can't post messages: abort
+                        if not chan.permissions_for(guild.me).send_messages:
+                            return True
+                        obj.feed = feed
+                        obj.fill_embed_data()
+                        await obj.fill_mention(guild)
+                        await self.send_rss_msg(obj, chan, feed.role_ids, send_stats)
+                    latest_post_date = obj.date
                 if isinstance(latest_post_date, datetime.datetime):
                     await self.db_update_feed(feed.feed_id, [('date', latest_post_date)],)
                 return True
@@ -1221,22 +1237,23 @@ class Rss(commands.Cog):
             return False
 
 
-    async def main_loop(self, guildID: int=None):
+    async def main_loop(self, guild_id: int=None):
+        "Loop through feeds and do magic things"
         if not self.bot.rss_enabled:
             return
-        t = time.time()
+        start = time.time()
         if self.loop_processing:
             return
-        if guildID is None:
+        if guild_id is None:
             self.bot.log.info("Check RSS lancé")
             self.loop_processing = True
             feeds_list = await self.db_get_all_feeds()
         else:
-            self.bot.log.info(f"Check RSS lancé pour le serveur {guildID}")
-            feeds_list = await self.db_get_guild_feeds(guildID)
+            self.bot.log.info(f"Check RSS lancé pour le serveur {guild_id}")
+            feeds_list = await self.db_get_guild_feeds(guild_id)
         check = 0
         errors: list[int] = []
-        if guildID is None:
+        if guild_id is None:
             if statscog := self.bot.get_cog("BotStats"):
                 statscog.rss_stats['messages'] = 0
         session = ClientSession()
@@ -1245,12 +1262,12 @@ class Rss(commands.Cog):
                 if feed.type == 'tw' and self.twitter_over_capacity:
                     continue
                 if feed.type == 'mc':
-                    if await self.bot.get_cog('Minecraft').check_feed(feed, send_stats=(guildID is None)):
+                    if await self.bot.get_cog('Minecraft').check_feed(feed, send_stats=(guild_id is None)):
                         check +=1
                     else:
                         errors.append(feed.feed_id)
                 else:
-                    if await self.check_feed(feed, session, send_stats=(guildID is None)):
+                    if await self.check_feed(feed, session, send_stats=(guild_id is None)):
                         check += 1
                     else:
                         errors.append(feed.feed_id)
@@ -1259,11 +1276,12 @@ class Rss(commands.Cog):
             await asyncio.sleep(self.time_between_feeds_check)
         await session.close()
         self.bot.get_cog('Minecraft').feeds.clear()
-        d = ["**RSS loop done** in {}s ({}/{} feeds)".format(round(time.time()-t,3),check,len(feeds_list))]
-        if guildID is None:
+        d = [f"**RSS loop done** in {time.time()-start:.3f}s ({check}/{len(feeds_list)} feeds)"]
+        if guild_id is None:
             if statscog := self.bot.get_cog("BotStats"):
                 statscog.rss_stats['checked'] = check
                 statscog.rss_stats['errors'] = len(errors)
+            await self.db_set_active_guilds(set(feed.guild_id for feed in feeds_list))
         if len(errors) > 0:
             d.append('{} errors: {}'.format(len(errors), ' '.join(str(x) for x in errors)))
             await self.db_increment_errors(errors)
@@ -1272,8 +1290,8 @@ class Rss(commands.Cog):
         await self.bot.send_embed([emb], url="loop")
         self.bot.log.debug(d[0])
         if len(errors) > 0:
-            self.bot.log.warning("[Rss loop] "+d[1])
-        if guildID is None:
+            self.bot.log.warning("[rss] "+d[1])
+        if guild_id is None:
             self.loop_processing = False
         self.twitter_over_capacity = False
         self.cache.clear()
