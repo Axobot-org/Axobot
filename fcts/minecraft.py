@@ -602,6 +602,7 @@ Every information come from the website www.fr-minecraft.net"""
             i[1] = None
         guild = self.bot.get_guild(feed.guild_id)
         if guild is None:
+            self.bot.log.warn("[minecraft feed] Cannot find guild %s", feed.guild_id)
             return False
         if feed.link in self.feeds:
             obj = self.feeds[feed.link]
@@ -609,12 +610,13 @@ Every information come from the website www.fr-minecraft.net"""
             try:
                 obj = await self.create_server_1(guild, i[0], i[1])
             except Exception as err:
-                await self.bot.get_cog('Errors').on_error(err, None)
+                self.bot.dispatch("error", err, f"Guild {feed.guild_id} - id {feed.feed_id}")
                 return False
             self.feeds[feed.link] = obj
         try:
             channel = guild.get_channel(feed.channel_id)
             if channel is None:
+                self.bot.log.warn("[minecraft feed] Cannot find channel %s in guild %s", feed.channel_id, feed.guild_id)
                 return False
             msg = await self.find_msg(channel, i, feed.structure)
             if msg is None:
