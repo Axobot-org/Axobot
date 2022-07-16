@@ -422,6 +422,7 @@ Every information come from the website www.fr-minecraft.net"""
             await self.bot.get_cog("Errors").on_error(err, ctx)
 
     async def create_server_1(self, guild: discord.Guild, ip: str, port=None) -> Union[str, 'MCServer']:
+        "Collect and serialize server data from a given IP, using minetools.eu"
         if port is None:
             url = "https://api.minetools.eu/ping/"+str(ip)
         else:
@@ -461,6 +462,7 @@ Every information come from the website www.fr-minecraft.net"""
         return await self.MCServer(IP, version=v, online_players=o, max_players=m, players=players, img=img_url, ping=l, desc=r['description'], api='api.minetools.eu').clear_desc()
 
     async def create_server_2(self, guild: discord.Guild, ip: str, port: str):
+        "Collect and serialize server data from a given IP, using mcsrvstat.us"
         if port is None:
             url = "https://api.mcsrvstat.us/1/"+str(ip)
         else:
@@ -515,7 +517,7 @@ Every information come from the website www.fr-minecraft.net"""
         return self.uuid_cache[username]
 
     class MCServer:
-        def __init__(self, ip, max_players, online_players, players, ping, img, version, api, desc):
+        def __init__(self, ip: str, max_players: int, online_players: int, players: list[str], ping: float, img, version, api: str, desc: str):
             self.ip = ip
             self.max_players = max_players
             self.online_players = online_players
@@ -530,16 +532,18 @@ Every information come from the website www.fr-minecraft.net"""
             self.desc = desc
 
         async def clear_desc(self):
+            "Clear the server description from any tabulation or color syntax"
             self.desc = re.sub(r'§.', '', self.desc)
             self.desc = re.sub(r'[ \t\r]{2,}', ' ', self.desc).strip()
             return self
 
         async def create_msg(self, guild: discord.Guild, translate):
+            "Create a Discord embed from the saved data"
             if self.players == []:
                 if self.online_players == 0:
                     p = ["Aucun"]
                 else:
-                    p = [await translate(guild, "minecraft.no-player-list")]
+                    p: list[str] = [await translate(guild, "minecraft.no-player-list")]
             else:
                 p = self.players
             embed = discord.Embed(title=await translate(guild, "minecraft.serv-title", ip=self.ip), color=discord.Colour(0x417505), timestamp=datetime.datetime.utcfromtimestamp(time.time()))
@@ -559,6 +563,7 @@ Every information come from the website www.fr-minecraft.net"""
             return embed
 
     async def send_msg_server(self, obj, channel: discord.abc.Messageable, ip: str):
+        "Send the message into a Discord channel"
         guild = None if isinstance(
             channel, discord.DMChannel) else channel.guild
         e = await self.form_msg_server(obj, guild, ip)
