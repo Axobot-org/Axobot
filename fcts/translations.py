@@ -347,19 +347,25 @@ Use `stop` to stop translating
         if lang not in languages or lang == 'en':
             await ctx.send("Invalid language")
             return
-        original = deepcopy((await self.get_original_translations())[lang])
-        if module not in original:
-            await ctx.send(f"Invalid module.\nExpected modules are: {', '.join(sorted(original.keys()))}")
+        english = (await self.get_original_translations())["en"]
+        if module not in english:
+            await ctx.send(f"Invalid module.\nExpected modules are: {', '.join(sorted(english.keys()))}")
             return
         project = (await self.get_projects()).get(lang, {module: {}})[module]
         if not project:
             await ctx.send(f"This module has not yet been edited for the {lang} language")
             return
-        original = original[module]
-        merged = unflatten(original | project, separator='.')
+        original = deepcopy((await self.get_original_translations())[lang])[module]
+        english_module = english[module]
+        # Filter old translations (which are not in englisg anymore)
+        merged_flattened = {key: translation for key, translation in (original | project).items() if key in english_module}
+        # Unflatten to get the JSON maps structure
+        merged = unflatten(merged_flattened, separator='.')
+        # Save into a virtual file
         filename = f'translation/{lang}-{module}.json'
         data = json.dumps(merged, ensure_ascii=False, indent=4, sort_keys=True)
         file = discord.File(BytesIO(data.encode()), filename=filename)
+        # Send and boom
         await ctx.send('Done!', file=file)
 
 async def setup(bot):
