@@ -14,6 +14,16 @@ def is_named_other(name: str, other_translated: str):
     "Check if a topic name corresponds to any 'other' variant"
     return name.lower() in {"other", "others", other_translated}
 
+class TicketCreationEvent:
+    "Represents a ticket being created"
+    def __init__(self, topic: dict, name: str, interaction: discord.Interaction, channel: Union[discord.TextChannel, discord.Thread]):
+        self.topic = topic
+        self.topic_name = topic["topic"]
+        self.name = name
+        self.guild = interaction.guild
+        self.user = interaction.user
+        self.channel = channel
+
 class SelectView(discord.ui.View):
     "Used to ask what kind of ticket a user wants to open"
     def __init__(self, guild_id: int, topics: list[dict[str, Any]]):
@@ -71,7 +81,6 @@ class SendHintText(discord.ui.View):
         else:
             await src.edit(content=src.content, embeds=src.embeds, view=self)
         self.stop()
-
 
 class AskTitleModal(discord.ui.Modal):
     "Ask a user the name of their ticket"
@@ -373,6 +382,7 @@ class Tickets(commands.Cog):
         else:
             await interaction.edit_original_message(content=msg)
         await channel.send(embed=await self.create_channel_first_message(interaction, topic, ticket_name))
+        self.bot.dispatch("ticket_creation", TicketCreationEvent(topic, ticket_name, interaction, channel))
 
 
     @commands.group(name="ticket", aliases=["tickets"])

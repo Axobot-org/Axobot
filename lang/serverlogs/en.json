@@ -5,7 +5,8 @@
             "members": "Members",
             "messages": "Messages",
             "moderation": "Moderation",
-            "roles": "Roles"
+            "roles": "Roles",
+            "tickets": "Tickets"
         },
         "list": {
             "all": "List of available logs",
