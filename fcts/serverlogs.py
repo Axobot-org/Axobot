@@ -4,6 +4,7 @@ from typing import Any
 import discord
 from cachingutils import LRUCache
 from discord.ext import commands, tasks
+from fcts.tickets import TicketCreationEvent
 from libs.antiscam.classes import PredictionResult
 from libs.classes import MyContext, Zbot
 from libs.formatutils import FormatUtils
@@ -20,7 +21,8 @@ class ServerLogs(commands.Cog):
         "members": {"member_roles", "member_nick", "member_avatar", "member_join", "member_leave"},
         "moderation": {"member_ban", "member_unban", "member_timeout", "member_kick"},
         "messages": {"message_update", "message_delete"},
-        "roles": {"role_creation"}
+        "roles": {"role_creation"},
+        "tickets": {"ticket_creation"},
     }
 
     @classmethod
@@ -610,6 +612,20 @@ Minimum age required by anti-raid: {min_age}"
             duration = await FormatUtils.time_delta(data["duration"], hour=(data["duration"] < 86400))
             emb.add_field(name="Duration", value=duration)
             await self.validate_logs(member.guild, channel_ids, emb)
+
+    @commands.Cog.listener()
+    async def on_ticket_creation(self, event: TicketCreationEvent):
+        """Triggered when a ticket is successfully created
+        Corresponding log: ticket_creation"""
+        if channel_ids := await self.is_log_enabled(event.guild.id, "ticket_creation"):
+            emb = discord.Embed(
+                description=f"**{event.user.mention} ({event.user.id}) has opened a ticket**",
+                colour=discord.Color.dark_grey()
+            )
+            emb.add_field(name="Topic", value=event.topic_name)
+            emb.add_field(name="Ticket name", value=event.name)
+            emb.add_field(name="Channel", value=event.channel.mention, inline=False)
+            await self.validate_logs(event.guild, channel_ids, emb)
 
 
 async def setup(bot):
