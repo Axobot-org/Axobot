@@ -209,7 +209,10 @@ class AntiScam(commands.Cog):
         btn_id: str = interaction.data.get("custom_id", None)
         if btn_id is None or '-' not in btn_id:
             return
-        action, msg_id = btn_id.split("-")
+        try:
+            action, msg_id = btn_id.split("-")
+        except ValueError:
+            return
         msg_id = int(msg_id)
         try:
             await interaction.response.defer()
