@@ -184,6 +184,26 @@ class Errors(commands.Cog):
         await self.on_error(error,ctx)
 
     @commands.Cog.listener()
+    async def on_interaction_error(self, interaction: discord.Interaction, error: discord.app_commands.AppCommandError):
+        "Called when an error is raised during an interaction"
+        if interaction.guild:
+            guild = f"{interaction.guild.name} | {interaction.channel.name}"
+        elif interaction.guild_id:
+            guild = f"guild {interaction.guild_id}"
+        else:
+            guild = f"DM with {interaction.user}"
+        if interaction.type == discord.InteractionType.application_command:
+            await self.on_error(error, f"Slash command `{interaction.command.name}` | {guild}")
+        elif interaction.type == discord.InteractionType.ping:
+            await self.on_error(error, f"Ping interaction | {guild}")
+        elif interaction.type == discord.InteractionType.modal_submit:
+            await self.on_error(error, f"Modal submission interaction | {guild}")
+        elif interaction.type == discord.InteractionType.component:
+            await self.on_error(error, f"Component interaction | {guild}")
+        else:
+            self.bot.log.warn(f"Unhandled interaction error type: {interaction.type}")
+
+    @commands.Cog.listener()
     async def on_error(self, error: Exception, ctx: typing.Optional[AllowedCtx] = None):
         """Called when an error is raised
 

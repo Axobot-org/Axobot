@@ -95,6 +95,11 @@ class Zbot(commands.bot.AutoShardedBot):
         self.prefix_manager = PrefixManager(self)
         self.task_handler = TaskHandler(self)
         self.emojis_manager = EmojisManager(self)
+        # app commands
+        self.tree.on_error = self.on_app_cmd_error
+
+    async def on_app_cmd_error(self, interaction: discord.Interaction, error: discord.app_commands.AppCommandError):
+        self.dispatch("interaction_error", interaction, error)
 
     allowed_commands = ("eval", "add_cog", "del_cog")
 
