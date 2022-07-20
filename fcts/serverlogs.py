@@ -421,45 +421,63 @@ class ServerLogs(commands.Cog):
             await self.validate_logs(member.guild, channel_ids, emb)
 
     @commands.Cog.listener()
-    async def on_member_remove(self, member: discord.Member):
+    async def on_raw_member_remove(self, payload: discord.RawMemberRemoveEvent):
         """Triggered when a member leaves a guild
         Corresponding log: member_leave, member_kick"""
-        if not member.guild:
+        if not payload.guild_id:
             return
-        if channel_ids := await self.is_log_enabled(member.guild.id, "member_leave"):
-            emb = discord.Embed(
-                description=f"**{member.mention} ({member.id}) left your server**",
-                colour=discord.Color.orange()
-            )
-            emb.set_author(name=str(member), icon_url=member.display_avatar)
-            emb.add_field(name="Account created at", value=f"<t:{member.created_at.timestamp():.0f}>", inline=False)
-            if member.joined_at:
-                emb.add_field(name="Joined your server at",
-                              value=f"<t:{member.joined_at.timestamp():.0f}> (<t:{member.joined_at.timestamp():.0f}:R>)",
-                              inline=False)
-            if specs := await self.get_member_specs(member):
+        if channel_ids := await self.is_log_enabled(payload.guild_id, "member_leave"):
+            await self.handle_member_leave(payload, channel_ids)
+        if channel_ids := await self.is_log_enabled(payload.guild_id, "member_kick"):
+            await self.handle_member_kick(payload, channel_ids)
+
+    async def handle_member_leave(self, payload: discord.RawMemberRemoveEvent, channel_ids: list[int]):
+        "Handle member_leave log"
+        guild = self.bot.get_guild(payload.guild_id)
+        if guild is None:
+            return
+        emb = discord.Embed(
+            description=f"**{payload.user.mention} ({payload.user.id}) left your server**",
+            colour=discord.Color.orange()
+        )
+        emb.set_author(name=str(payload.user), icon_url=payload.user.display_avatar)
+        emb.add_field(name="Account created at", value=f"<t:{payload.user.created_at.timestamp():.0f}>", inline=False)
+        if isinstance(payload.user, discord.Member):
+            if payload.user.joined_at:
+                emb.add_field(
+                    name="Joined your server at",
+                    value=f"<t:{payload.user.joined_at.timestamp():.0f}> (<t:{payload.user.joined_at.timestamp():.0f}:R>)",
+                    inline=False)
+            if specs := await self.get_member_specs(payload.user):
                 emb.add_field(name="Specificities", value=", ".join(specs), inline=False)
-            member_roles = [role for role in member.roles[::-1] if not role.is_default()]
+            member_roles = [role for role in payload.user.roles[::-1] if not role.is_default()]
             roles_value = " ".join(r.mention for r in member_roles[:20]) if member_roles else "None"
             emb.add_field(name=f"Roles ({len(member_roles)})", value=roles_value)
-            await self.validate_logs(member.guild, channel_ids, emb)
-        if member.guild.me.guild_permissions.view_audit_log and (
-            channel_ids := await self.is_log_enabled(member.guild.id, "member_kick")
-        ):
-            now = self.bot.utcnow()
-            await asyncio.sleep(self.auditlogs_timeout)
-            async for entry in member.guild.audit_logs(limit=5, action=discord.AuditLogAction.kick, oldest_first=False):
-                if entry.target.id == member.id and (entry.created_at - now).total_seconds() < 5:
-                    emb = discord.Embed(
-                        description=f"**{member.mention} ({member.id}) has been kicked**",
-                        colour=discord.Color.red()
-                    )
-                    emb.add_field(name="Kicked by",
-                                  value=f"**{entry.user.mention}** ({entry.user.id})")
-                    emb.add_field(name="With reason",
-                                  value=entry.reason or "No reason specified")
-                    await self.validate_logs(member.guild, channel_ids, emb)
-                    break
+        await self.validate_logs(guild, channel_ids, emb)
+
+    async def handle_member_kick(self, payload: discord.RawMemberRemoveEvent, channel_ids: list[int]):
+        "Handle member_kick log"
+        guild = self.bot.get_guild(payload.guild_id)
+        if guild is None:
+            return
+        if not guild.me.guild_permissions.view_audit_log:
+            return
+        now = self.bot.utcnow()
+        await asyncio.sleep(self.auditlogs_timeout)
+        async for entry in guild.audit_logs(limit=5, action=discord.AuditLogAction.kick, oldest_first=False):
+            if entry.target.id == payload.user.id and (entry.created_at - now).total_seconds() < 5:
+                emb = discord.Embed(
+                    description=f"**{payload.user.mention} ({payload.user.id}) has been kicked**",
+                    colour=discord.Color.red()
+                )
+                emb.set_author(name=str(payload.user), icon_url=payload.user.display_avatar)
+                emb.add_field(name="Kicked by",
+                                value=f"**{entry.user.mention}** ({entry.user.id})")
+                emb.add_field(name="With reason",
+                                value=entry.reason or "No reason specified")
+                await self.validate_logs(guild, channel_ids, emb)
+                break
+
 
     @commands.Cog.listener()
     async def on_member_ban(self, guild: discord.Guild, user: discord.User):
