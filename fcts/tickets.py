@@ -146,6 +146,9 @@ class Tickets(commands.Cog):
         if not interaction.guild:
             # DM : not interesting
             return
+        if interaction.type != discord.InteractionType.component:
+            # Not button : not interesting
+            return
         try:
             custom_ids: list[str] = interaction.data["custom_id"].split('-')
             if len(custom_ids) != 3 or custom_ids[0] != str(interaction.guild_id) or custom_ids[1] != "tickets":
