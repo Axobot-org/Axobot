@@ -289,7 +289,7 @@ Use `stop` to stop translating
         else:
             await ctx.send("The whole ToDo list for every language has been reloaded!")
 
-    @translate_main.command(name="status")
+    @translate_main.command(name="status", aliases=["stats"])
     async def status(self, ctx: MyContext, lang: typing.Optional[LanguageId]=None):
         """Get the status of a translation project"""
         if lang is None:
@@ -307,7 +307,7 @@ Use `stop` to stop translating
         elif lang not in languages or lang == 'en':
             return await ctx.send("Invalid language")
         else:
-            lang_progress = await self.get_translations_count(language)
+            lang_progress = await self.get_translations_count(lang)
             en_progress = await self.get_translations_count('en')
             ratio = lang_progress*100 / en_progress
             txt = f"Translation of {lang}:\n {ratio:.1f}%\n {lang_progress} messages on {en_progress}"
