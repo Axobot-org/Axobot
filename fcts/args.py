@@ -214,3 +214,18 @@ class serverlog(commands.Converter):
             return argument
         raise commands.BadArgument(f'"{argument}" is not a valid server log type')
 
+class RawPermissionValue(int):
+    "Represents a raw permission value, as an integer"
+
+    async def convert(self, ctx: MyContext, argument: str):
+        if re.match(r'0b[0,1]+', argument):
+            return int(argument[2:], 2)
+        if not argument.isnumeric():
+            return None
+        try:
+            value = int(argument, 2 if len(argument) > 13 else 10)
+        except ValueError:
+            value = int(argument)
+        if value > discord.Permissions.all().value:
+            return None
+        return value

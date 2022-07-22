@@ -2,6 +2,7 @@
     "en": {
         "general": "General permissions",
         "title": "**\"%{name}\" permissions:**\n\n",
+        "invalid_arg": "Invalid argument: %{arg}",
         "list": {
             "add_reactions": "Add reactions",
             "administrator": "Administrator",

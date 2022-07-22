@@ -2,6 +2,7 @@
     "lolcat": {
         "general": "gLoBal pErmZ",
         "title": "**'%{name}' permissung:**\n\n",
+        "invalid_arg": "Uh no, %{arg} iz no valid sir",
         "list": {
             "add_reactions": "Add reactions",
             "administrator": "Administrator",
