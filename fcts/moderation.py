@@ -5,7 +5,7 @@ import importlib
 import random
 import re
 from math import ceil
-from typing import Dict, List, Optional, Tuple, Union
+from typing import Dict, List, Literal, Optional, Tuple, Union
 
 import discord
 from discord.ext import commands
@@ -960,7 +960,7 @@ The 'reasons' parameter is used to display the mute reasons.
 
     @emoji_group.command(name="restrict")
     @commands.check(checks.has_manage_emojis)
-    async def emoji_restrict(self, ctx: MyContext, emoji: discord.Emoji, roles: commands.Greedy[Union[discord.Role, args.litteral('everyone')]]):
+    async def emoji_restrict(self, ctx: MyContext, emoji: discord.Emoji, roles: commands.Greedy[Union[discord.Role, Literal['everyone']]]):
         """Restrict the use of an emoji to certain roles
 
         ..Example emoji restrict :vip: @VIP @Admins
@@ -1160,7 +1160,7 @@ The 'reasons' parameter is used to display the mute reasons.
     @main_role.command(name="give", aliases=["add"])
     @commands.check(checks.has_manage_roles)
     @commands.cooldown(1, 30, commands.BucketType.guild)
-    async def roles_give(self, ctx:MyContext, role:discord.Role, users:commands.Greedy[Union[discord.Role,discord.Member,args.litteral('everyone')]]):
+    async def roles_give(self, ctx:MyContext, role:discord.Role, users:commands.Greedy[Union[discord.Role,discord.Member,Literal['everyone']]]):
         """Give a role to a list of roles/members
         Users list may be either members or roles, or even only one member
 
@@ -1206,7 +1206,7 @@ The 'reasons' parameter is used to display the mute reasons.
     @main_role.command(name="remove")
     @commands.check(checks.has_manage_roles)
     @commands.cooldown(1, 30, commands.BucketType.guild)
-    async def roles_remove(self, ctx:MyContext, role:discord.Role, users:commands.Greedy[Union[discord.Role,discord.Member,args.litteral('everyone')]]):
+    async def roles_remove(self, ctx:MyContext, role:discord.Role, users:commands.Greedy[Union[discord.Role,discord.Member,Literal['everyone']]]):
         """Remove a role to a list of roles/members
         Users list may be either members or roles, or even only one member
 

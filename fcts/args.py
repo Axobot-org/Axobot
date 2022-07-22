@@ -214,14 +214,3 @@ class serverlog(commands.Converter):
             return argument
         raise commands.BadArgument(f'"{argument}" is not a valid server log type')
 
-
-def litteral(word: str):
-    """A parameter type where the argument should exactly be the given string"""
-    class Litteral(commands.Converter):
-        _str = word
-        async def convert(self, ctx: MyContext, argument: str):
-            if argument == self._str:
-                return argument
-            raise commands.errors.BadArgument(f'Argument {argument} should be exactly {self._str}')
-    return Litteral
-
