@@ -4,7 +4,7 @@ import importlib
 import random
 import re
 import time
-from typing import Any, Optional, Union
+from typing import Any, Literal, Optional, Union
 
 import discord
 import mysql
@@ -1321,7 +1321,7 @@ class Rss(commands.Cog):
 
     @commands.command(name="rss_loop",hidden=True)
     @commands.check(checks.is_bot_admin)
-    async def rss_loop_admin(self, ctx: MyContext, new_state: str = "start"):
+    async def rss_loop_admin(self, ctx: MyContext, new_state: Literal["start", "stop", "once"]):
         """Manage the rss loop
         new_state can be start, stop or once"""
         if not ctx.bot.database_online:
@@ -1335,7 +1335,7 @@ class Rss(commands.Cog):
             else:
                 await ctx.send("Boucle rss relancée !")
         elif new_state == "stop":
-            await self.loop_child.cancel() # pylint: disable=no-member
+            self.loop_child.cancel() # pylint: disable=no-member
             self.bot.log.info(" Boucle rss arrêtée de force par un admin")
             await ctx.send("Boucle rss arrêtée de force !")
         elif new_state == "once":
