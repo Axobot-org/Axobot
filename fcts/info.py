@@ -1119,7 +1119,7 @@ Servers:
             ctx = await self.bot.get_context(msg)
             if ctx.command is not None:
                 return
-            liste = list(set(re.findall(r'<a?:[\w-]+:(\d{18})>',msg.content)))
+            liste = list(set(re.findall(r'<a?:[\w-]+:(\d{17,19})>',msg.content)))
             if len(liste) == 0:
                 return
             current_timestamp = datetime.datetime.fromtimestamp(round(time.time()))

@@ -146,7 +146,7 @@ Slowmode works up to one message every 6h (21600s)
                 if (i is None and invites==2) or (i is not None and invites == 0):
                     c4 = False
             #return ((m.pinned == pinned) or ((m.attachments != []) == files) or ((r is not None) == links)) and m.author in users
-            mentions = list(map(int, re.findall(r'<@!?(\d{16,18})>', ctx.message.content)))
+            mentions = list(map(int, re.findall(r'<@!?(\d{167,19})>', ctx.message.content)))
             if str(ctx.bot.user.id) in ctx.prefix:
                 mentions.remove(ctx.bot.user.id)
             if mentions and m.author is not None:

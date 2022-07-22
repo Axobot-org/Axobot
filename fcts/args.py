@@ -88,7 +88,7 @@ class Invite(commands.Converter):
     async def convert(self, ctx: MyContext, argument: str) -> typing.Union[str, int]:
         answer = None
         r_invite = re.search(
-            r'^https://discord(?:app)?\.com/(?:api/)?oauth2/authorize\?(?:&?client_id=(\d{18})|&?scope=([a-z\.\+]+?)|&'
+            r'^https://discord(?:app)?\.com/(?:api/)?oauth2/authorize\?(?:&?client_id=(\d{17,19})|&?scope=([a-z\.\+]+?)|&'
             r'?(?:permissions|guild_id|disable_guild_select|redirect_uri)=[^&]+)+$',
             argument)
         if r_invite is None:
@@ -200,7 +200,7 @@ class snowflake(commands.Converter):
             self.worker_id = int(self.binary[-22:-17])
 
     async def convert(self, ctx: MyContext, argument: str) -> int:
-        if len(argument) < 17 or len(argument) > 18 or not argument.isnumeric():
+        if len(argument) < 17 or len(argument) > 19 or not argument.isnumeric():
             return None
         return self.Snowflake(int(argument))
 
