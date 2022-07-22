@@ -2,6 +2,7 @@ import typing
 
 import discord
 from discord.ext import commands
+from fcts.args import RawPermissionValue
 from libs.classes import MyContext, Zbot
 from libs.paginator import cut_text
 
@@ -23,7 +24,8 @@ AcceptableChannelTypes = typing.Optional[typing.Union[
 ]]
 AcceptableTargetTypes = typing.Optional[typing.Union[
     discord.Member,
-    discord.Role
+    discord.Role,
+    RawPermissionValue
 ]]
 
 class Perms(commands.Cog):
@@ -75,12 +77,18 @@ class Perms(commands.Cog):
     async def check_permissions(self, ctx: MyContext, channel:AcceptableChannelTypes=None, *, target:AcceptableTargetTypes=None):
         """Permissions assigned to a member/role (the user by default)
         The channel used to view permissions is the channel in which the command is entered.
+        You can also choose to view the permissions associated to a raw integer/binary value (in which case channel will be ignored)
 
         ..Example perms #announcements everyone
 
         ..Example perms Zbot
 
+        ..Example perms 0b1001
+
         ..Doc infos.html#permissions"""
+        if ctx.current_argument and target is None and channel is None:
+            await ctx.send(await self.bot._(ctx.guild.id, "permissions.invalid_arg", arg=ctx.current_argument))
+            return
         if target is None:
             target = ctx.author
         if isinstance(target, discord.Member):
@@ -99,7 +107,13 @@ class Perms(commands.Cog):
             col = target.color
             avatar = ctx.guild.icon.replace(format='png', size=256) if ctx.guild.icon else None
             name = str(target)
+        elif isinstance(target, int):
+            perms = discord.Permissions(target)
+            col = discord.Color.blurple()
+            avatar = None
+            name = f"{target} | {bin(target)}"
         else:
+            self.bot.dispatch("error", TypeError(f"Unknown target type: {type(target)}"), ctx)
             return
 
         perms_list = await self.collect_permissions(ctx, perms, channel)
