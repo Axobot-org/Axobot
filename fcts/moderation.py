@@ -683,7 +683,7 @@ The 'days_to_delete' option represents the number of days worth of messages to d
     @commands.command(name="softban")
     @commands.guild_only()
     @commands.check(checks.can_kick)
-    async def softban(self, ctx: MyContext, user:discord.Member, reason="Unspecified"):
+    async def softban(self, ctx: MyContext, user:discord.Member, *, reason="Unspecified"):
         """Kick a member and lets Discord delete all his messages up to 7 days old.
 Permissions for using this command are the same as for the kick
 
