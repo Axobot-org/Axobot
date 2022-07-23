@@ -1248,11 +1248,8 @@ Servers:
         ..Doc infos.html#usernames-history"""
         if user is None:
             user = ctx.author
-        cond = f"user='{user.id}'"
-        if not self.bot.beta:
-            cond += " AND beta=0"
-        query = f"SELECT `old`, `new`, `guild`, CONVERT_TZ(`date`, @@session.time_zone, '+00:00') AS `utc_date` FROM `usernames_logs` WHERE {cond} ORDER BY date DESC"
-        async with self.bot.db_query(query) as results:
+        query = f"SELECT `old`, `new`, `guild`, CONVERT_TZ(`date`, @@session.time_zone, '+00:00') AS `utc_date` FROM `usernames_logs` WHERE user = %s AND beta = %s ORDER BY date DESC"
+        async with self.bot.db_query(query, (user.id, self.bot.beta)) as results:
             # List creation
             this_guild = list()
             global_list = [x for x in results if x['guild'] in (None,0)]
@@ -1273,7 +1270,8 @@ Servers:
                     if len(temp) > MAX:
                         temp = temp[:MAX] + [await self.bot._(ctx.channel, 'info.usernames.more', nbr=len(temp)-MAX)]
                     fields.append({'name':await self.bot._(ctx.channel,'info.usernames.global'), 'value':"\n".join(temp)})
-                    date += "General: <t:{}>".format(round(global_list[0]['utc_date'].timestamp()))
+                    _general = await self.bot._(ctx.channel,'info.usernames.general')
+                    date += f"{_general} <t:{global_list[0]['utc_date'].timestamp():.0f}>"
             if len(this_guild) > 0:
             # Nicknames part
                 temp = [x['new'] for x in this_guild if x['new']!='']
@@ -1281,7 +1279,8 @@ Servers:
                     if len(temp) > MAX:
                         temp = temp[:MAX] + [await self.bot._(ctx.channel, 'info.usernames.more', nbr=len(temp)-MAX)]
                     fields.append({'name':await self.bot._(ctx.channel,'info.usernames.local'), 'value':"\n".join(temp)})
-                    date += "\nServer: <t:{}>".format(round(this_guild[0]['utc_date'].timestamp()))
+                    _server = await self.bot._(ctx.channel,'info.usernames.server')
+                    date += f"{_server} <t:{this_guild[0]['utc_date'].timestamp():.0f}>"
             if len(date) > 0:
                 fields.append({'name':await self.bot._(ctx.channel,'info.usernames.last-date'), 'value':date})
             else:
@@ -1295,6 +1294,12 @@ Servers:
                 footer = await self.bot._(ctx.channel,'info.usernames.disallow')
             else:
                 footer = await self.bot._(ctx.channel,'info.usernames.allow')
+            if ctx.guild is not None and not await self.bot.get_config(ctx.guild.id, "nicknames_history"):
+                if len(ctx.guild.members) >= self.bot.get_cog("Servers").max_members_for_nicknames:
+                    warning_disabled = await self.bot._(ctx.guild.id, "info.nicknames-disabled.guild-too-big")
+                else:
+                    warning_disabled = await self.bot._(ctx.guild.id, "info.nicknames-disabled.disabled")
+                desc = warning_disabled if desc is None else warning_disabled + "\n\n" + desc
             emb = discord.Embed(title=t, description=desc, color=c)
             emb.set_footer(text=footer)
             for field in fields:

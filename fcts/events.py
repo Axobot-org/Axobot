@@ -90,10 +90,13 @@ class Events(commands.Cog):
         if config_option is not None and config_option['allow_usernames_logs'] is False:
             return
         if tries > 5:
+            self.bot.dispatch("error", RuntimeError(f"Nickname change failed after 5 attempts for user {before.id}"))
             return
         if not self.bot.database_online:
             return
         if isinstance(before, discord.Member):
+            if not await self.bot.get_config(before.guild.id, "nicknames_history"):
+                return
             before_nick = '' if before.nick is None else before.nick
             after_nick = '' if after.nick is None else after.nick
         else:

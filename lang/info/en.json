@@ -59,13 +59,19 @@
             "last-date": "Last change",
             "local": "Server history",
             "more": "And %{nbr} more",
-            "title": "**%{u}** names history"
+            "title": "**%{u}** names history",
+            "general": "Global:",
+            "server": "On the server:"
         },
         "membercount-0": "Total number of members",
         "membercount-1": "Number of bots",
         "membercount-2": "Number of humans",
         "membercount-3": "Number of online members",
         "membercount-4": "Number of unverified users",
+        "nicknames-disabled": {
+            "guild-too-big": "The nicknames changes in this server are not recorded, probably because your server is too large. Ask an administrator to enable the \"nicknames_history\" option if you want them.",
+            "disabled": "The nicknames changes records in this server have been disabled by an administrator. You won't see any new nickname here :confused:"
+        },
         "not-found": "Unable to find %{N}",
         "info": {
             "categ-0": "Category",
