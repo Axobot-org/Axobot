@@ -59,13 +59,19 @@
             "last-date": "Lastetest change",
             "local": "Serv hystori",
             "more": "+%{nbr} others",
-            "title": "**%{u}** names story"
+            "title": "**%{u}** names story",
+            "general": "General:",
+            "server": "Here only:"
         },
         "membercount-0": "Total nmber of membrz",
         "membercount-1": "Numbr ov botz",
         "membercount-2": "Numbrz for good people",
         "membercount-3": "Nmbr ov god online peepl",
         "membercount-4": "Numer of sus people",
+        "nicknames-disabled": {
+            "guild-too-big": "Oh no, nick changes are disabled here cuz ur server is 2 big to save 'em all. Ask an admin to enabled them with the 'nicknames_history' option!",
+            "disabled": "Oh no, nick changes are been disabled here by an administrator. U won't see new nicknames!"
+        },
         "not-found": "Unable 2 found %{N}",
         "info": {
             "categ-0": "Categori",
