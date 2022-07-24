@@ -10,6 +10,13 @@
         "choose-topic-edition": "Choisissez le topic à modifier",
         "default-topic-prompt": "Sélectionnez une catégorie de tickets",
         "emote-edited": "L'émoji du topic \"%{topic}\" a été modifié !",
+        "format": {
+            "too-long": "Le format de nom de salon ne peut pas excéder %{max} caractères !",
+            "edited": {
+                "default": "Le format de nom de salon par défaut a bien été modifié !",
+                "topic": "Le format de nom de salon pour le topic \"%{topic}\" a bien été modifié !"
+            }
+        },
         "hint-edited": {
             "default": "L'aide par défaut a bien été modifiée !",
             "topic": "L'aide pour le topic \"%{topic}\" a bien été modifiée !"

@@ -10,6 +10,13 @@
         "choose-topic-edition": "Choose which topic to edit",
         "default-topic-prompt": "Select a ticket category",
         "emote-edited": "The emote for the topic \"%{topic}\" has been edited!",
+        "format": {
+            "too-long": "Your channel name format cannot exceed %{max} characters!",
+            "edited": {
+                "default": "The default name format has correctly been edited!",
+                "topic": "The name format for the topic \"%{topic}\" has been edited."
+            }
+        },
         "hint-edited": {
             "default": "The default hint has correctly been edited!",
             "topic": "The hint for the topic \"%{topic}\" has correctly been edited!"

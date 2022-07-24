@@ -10,6 +10,13 @@
         "choose-topic-edition": "Chooz which topik 2 edit",
         "default-topic-prompt": "Select a ticketz categowee",
         "emote-edited": "Teh emote 4 teh topik \"%{topic}\" haz bean edited!",
+        "format": {
+            "too-long": "Uh no, u cant use more than %{max} letterz",
+            "edited": {
+                "default": "Oki doki, the default channel name format has been editd!",
+                "topic": "Oki doki, the channel name format 4 topic \"%{topic}\" has been edited!"
+            }
+        },
         "hint-edited": {
             "default": "Teh deefault hint haz correctly been editd!",
             "topic": "Teh hint fr teh topik \"%{topic}\" haz correctlwy been edited!"
