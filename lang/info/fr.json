@@ -52,8 +52,8 @@
             "users_count": "**Nombre de membres visibles :** %{v0} (dont %{v1} **bots**)"
         },
         "usernames": {
-            "allow": "Vous pouvez réautoriser l'enregistrement automatique via la commande 'profile'",
-            "disallow": "Vous pouvez vous retirer de l'enregistrement automatique via la commande 'profile'",
+            "allow": "Vous pouvez réautoriser l'enregistrement automatique de vos pseudos via la commande 'profile'",
+            "disallow": "Vous pouvez désactiver l'enregistrement automatique de vos pseudos via la commande 'profile'",
             "empty": "Aucun changement enregistré",
             "global": "Historique général",
             "last-date": "Dernier changement",

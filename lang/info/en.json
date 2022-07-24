@@ -52,8 +52,8 @@
             "users_count": "**Number of visible members:** %{v0} (%{v1} **bots**)"
         },
         "usernames": {
-            "allow": "You can reauthorize the automatic recording with the command 'profile'",
-            "disallow": "You can opt out of the automatic recording with the command 'profile'",
+            "allow": "You can reauthorize the automatic recording of your usernames and nicknames with the command 'profile'",
+            "disallow": "You can opt out of the automatic recording of your usernames and nicknames with the command 'profile'",
             "empty": "No change recorded",
             "global": "General history",
             "last-date": "Last change",
