@@ -82,6 +82,22 @@ If you wish, Zbot can send a short help message when a member wants to create a 
 
 It is usually desirable to customize this message according to the ticket topic chosen by the user. The next chapter will show you how to do this.
 
+Default channel name format
+---------------------------
+
+**Syntax:** :code:`tickets portal set-format <format or "none">`
+
+At first Zbot will automatically choose the channel name when someones open a new ticket, based on the user nickname and tag. But you can wish for more customized names, and want to compose your own name format based on the available placeholders listed below:
+* `username`: the user name (like "Z_runner" in "Z_runner#7515")
+* `usertag`: the user tag or discriminator (like "7515" in "Z_runner#7515")
+* `userid`: the internal user ID, which is usually a 18-digits number unique to this user
+* `topic`: the topic name selected by the user
+* `topic_emoji`: the emoji of the topic selected by the user
+* `ticket_name`: the name or subject provided by the user during the ticket creation
+
+Please note that Discord channel names are limited to 100 characters and do not allow spaces or non-ascii characters.
+
+You can also use the "none" keyword to reset the format to its default value.
 
 Create a new topic
 ------------------
@@ -131,3 +147,11 @@ Topic-specific staff role
 Edit the role allowed to read tickets related to this particular topic. Users with the role passed in parameter will be able to read all tickets opened with this topic, reply to them, and close them. If you don't enter a topic ID, Zbot will ask you directly which topic to edit via an intuitive menu.
 
 Use the "none" keyword to use the default staff role (see previous chapter), or no role at all (outside of admins) if no default role has been configured.
+
+
+Topic-specific channel name format
+----------------------------------
+
+**Syntax:** :code:`tickets topic set-format [topic ID] <format or "none">`
+
+Same than for the default channel name format, but specific to the given topic. Use the "none" keyword to use the server default format.

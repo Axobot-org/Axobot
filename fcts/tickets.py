@@ -138,6 +138,8 @@ class Tickets(commands.Cog):
         self.bot = bot
         self.file = "tickets"
         self.cooldowns: dict[discord.User, float] = {}
+        self.default_name_format = "{username}-{usertag}"
+        self.max_format_length = 70
 
     @commands.Cog.listener()
     async def on_interaction(self, interaction: discord.Interaction):
@@ -167,7 +169,6 @@ class Tickets(commands.Cog):
                 await interaction.response.send_message(await self.bot._(interaction.guild_id, "tickets.missing-category-config"), ephemeral=True)
                 return
             if (cooldown := self.cooldowns.get(interaction.user)) and time.time() - cooldown < 120:
-                print(cooldown - time.time())
                 await interaction.response.send_message(await self.bot._(interaction.guild_id, "tickets.too-quick"), ephemeral=True)
                 return
             if topic['hint']:
@@ -191,9 +192,8 @@ class Tickets(commands.Cog):
             modal_label = await self.bot._(interaction.guild_id, "tickets.title-modal.label")
             modal_placeholder = await self.bot._(interaction.guild_id, "tickets.title-modal.placeholder")
             await interaction.response.send_modal(AskTitleModal(interaction.guild.id, topic, modal_title, modal_label, modal_placeholder, self.create_ticket))
-            self.cooldowns[interaction.user] = time.time()
         except Exception as err: # pylint: disable=broad-except
-            self.bot.dispatch('error', err)
+            self.bot.dispatch('error', err, f"when creating a ticket in guild {interaction.guild_id}")
 
     async def db_get_topics(self, guild_id: int) -> list[dict[str, Any]]:
         "Fetch the topics associated to a guild"
@@ -213,7 +213,7 @@ class Tickets(commands.Cog):
             query = "SELECT * FROM `tickets` WHERE `guild_id` = %s AND `topic` IS NULL AND `beta` = %s"
             args = (guild_id, self.bot.beta)
         else:
-            query = "SELECT t.id, t.guild_id, t.topic, COALESCE(t.topic_emoji, t2.topic_emoji) as topic_emoji, COALESCE(t.prompt, t2.prompt) as `prompt`, COALESCE(t.role, t2.role) as role, COALESCE(t.hint, t2.hint) as `hint`, COALESCE(t.category, t2.category) as `category`, t.beta FROM tickets t LEFT JOIN tickets t2 ON t2.guild_id = t.guild_id AND t2.beta = t.beta AND t2.topic is NULL WHERE t.id = %s AND t.guild_id = %s AND t.beta = %s"
+            query = "SELECT t.id, t.guild_id, t.topic, COALESCE(t.topic_emoji, t2.topic_emoji) as topic_emoji, COALESCE(t.prompt, t2.prompt) as `prompt`, COALESCE(t.role, t2.role) as role, COALESCE(t.hint, t2.hint) as `hint`, COALESCE(t.category, t2.category) as `category`, COALESCE(t.name_format, t2.name_format) as name_format, t.beta FROM tickets t LEFT JOIN tickets t2 ON t2.guild_id = t.guild_id AND t2.beta = t.beta AND t2.topic is NULL WHERE t.id = %s AND t.guild_id = %s AND t.beta = %s"
             args = (topic_id, guild_id, self.bot.beta)
         async with self.bot.db_query(query, args, fetchone=True) as db_query:
             return db_query or None
@@ -276,6 +276,12 @@ class Tickets(commands.Cog):
         "Edit a topic category or channel in which tickets will be created"
         query = "UPDATE `tickets` SET `category` = %s WHERE `guild_id` = %s AND `id` = %s AND `beta` = %s"
         async with self.bot.db_query(query, (category, guild_id, topic_id, self.bot.beta), returnrowcount=True) as db_query:
+            return db_query > 0
+    
+    async def db_edit_topic_format(self, guild_id: int, topic_id: int, format: Optional[str]) -> bool:
+        "Edit a topic channel/thread name format"
+        query = "UPDATE `tickets` SET `name_format` = %s WHERE `guild_id` = %s AND `id` = %s AND `beta` = %s"
+        async with self.bot.db_query(query, (format, guild_id, topic_id, self.bot.beta), returnrowcount=True) as db_query:
             return db_query > 0
 
     async def db_edit_prompt(self, guild_id: int, message: str):
@@ -346,16 +352,30 @@ class Tickets(commands.Cog):
         else:
             msg = await self.bot._(interaction.guild_id, "tickets.missing-perms-setup.to-member")
         await interaction.edit_original_message(content=msg)
+    
+    async def get_channel_name(self, format: Optional[str], interaction: discord.Interaction, topic: dict, ticket_name: str) -> str:
+        channel_name = format or self.default_name_format
+        return channel_name.format_map(self.bot.SafeDict({
+            "username": interaction.user.name,
+            "usertag": interaction.user.discriminator,
+            "userid": interaction.user.id,
+            "topic": topic["topic"],
+            "topic_emoji": topic["topic_emoji"],
+            "ticket_name": ticket_name
+        }))[:100]
 
     async def create_ticket(self, interaction: discord.Interaction, topic: dict, ticket_name: str):
         "Create the ticket once the user has provided every required info"
+        # update cooldown
+        self.cooldowns[interaction.user] = time.time()
         category = interaction.guild.get_channel(topic['category'])
         if category is None:
             raise Exception(f"No category configured for guild {interaction.guild_id} and topic {topic['topic']}")
         sent_error = False
+        channel_name = await self.get_channel_name(topic["name_format"], interaction, topic, ticket_name)
         if isinstance(category, discord.CategoryChannel):
             try:
-                channel = await category.create_text_channel(str(interaction.user))
+                channel = await category.create_text_channel(channel_name)
             except discord.Forbidden:
                 await interaction.edit_original_message(content=await self.bot._(interaction.guild_id, "tickets.missing-perms-creation.channel"))
                 return
@@ -370,7 +390,7 @@ class Tickets(commands.Cog):
                     channel_type = discord.ChannelType.private_thread
                 else:
                     channel_type = discord.ChannelType.public_thread
-                channel = await category.create_thread(name=str(interaction.user), type=channel_type)
+                channel = await category.create_thread(name=channel_name, type=channel_type)
             except discord.Forbidden:
                 await interaction.edit_original_message(content=await self.bot._(interaction.guild_id, "tickets.missing-perms-creation.thread"))
                 return
@@ -508,6 +528,28 @@ class Tickets(commands.Cog):
                                       colour=discord.Color.orange())
         await ctx.send(message, embed=embed)
 
+    @tickets_portal.command(name="set-format")
+    @commands.cooldown(3, 30, commands.BucketType.guild)
+    async def portal_set_format(self, ctx: MyContext, name_format: Union[Literal["none"], str]):
+        """Set the format used to generate the channel/thread name
+        You can use the following placeholders: username, usertag, userid, topic, topic_emoji, ticket_name
+        Use "none" to reset the format to the default one
+        Spaces and non-ascii characters will be removed or replaced by dashes
+
+        ..Example tickets set-format {username}-tickets
+
+        ..Example tickets set-format {username}-{topic}"""
+        if len(name_format) > self.max_format_length:
+            await ctx.send(await self.bot._(ctx.guild.id, "tickets.format.too-long", max=self.max_format_length))
+            return
+        row_id = await self.db_get_guild_default_id(ctx.guild.id)
+        if row_id is None:
+            row_id = await self.db_set_guild_default_id(ctx.guild.id)
+        if name_format.lower() == "none":
+            name_format = None
+        await self.db_edit_topic_format(ctx.guild.id, row_id, name_format)
+        await ctx.send(await self.bot._(ctx.guild.id, "tickets.format.edited.default"))
+
 
     @tickets_main.group(name="topic", aliases=["topics"])
     @commands.check(checks.has_manage_channels)
@@ -621,13 +663,41 @@ If that still doesn't work, please create your ticket
             if topic_id is None:
                 await ctx.send(await self.bot._(ctx.guild.id, "errors.unknown"))
                 return
-        if role == "none":
+        if role.lower() == "none":
             role = None
         if await self.db_edit_topic_role(ctx.guild.id, topic_id, role.id if role else None):
             topic = await self.db_get_topic_with_defaults(ctx.guild.id, topic_id)
             await ctx.send(await self.bot._(ctx.guild.id, "tickets.role-edited.topic", topic=topic["topic"]))
         else:
             await ctx.send(await self.bot._(ctx.guild.id, "tickets.nothing-to-edit"))
+
+    @tickets_topics.command(name="set-format")
+    @commands.cooldown(3, 30, commands.BucketType.guild)
+    async def topic_set_role(self, ctx: MyContext, topic_id: Optional[int], name_format: Union[Literal["none"], str]):
+        """Set the format used to generate the channel/thread name
+        You can use the following placeholders: username, usertag, userid, topic, topic_emoji, ticket_name
+        Use "none" to reset the format to the default one
+        Spaces and non-ascii characters will be removed or replaced by dashes
+
+        ..Example tickets set-format {username}-special
+
+        ..Example tickets set-format 347 {username}-{topic}"""
+        if not topic_id or not await self.db_topic_exists(ctx.guild.id, topic_id):
+            topic_id = await self.ask_user_topic(ctx)
+            if topic_id is None:
+                await ctx.send(await self.bot._(ctx.guild.id, "errors.unknown"))
+                return
+        if len(name_format) > self.max_format_length:
+            await ctx.send(await self.bot._(ctx.guild.id, "tickets.format.too-long", max=self.max_format_length))
+            return
+        if name_format.lower() == "none":
+            name_format = None
+        if await self.db_edit_topic_format(ctx.guild.id, topic_id, name_format):
+            topic = await self.db_get_topic_with_defaults(ctx.guild.id, topic_id)
+            await ctx.send(await self.bot._(ctx.guild.id, "tickets.format.edited.topic", topic=topic["topic"]))
+        else:
+            await ctx.send(await self.bot._(ctx.guild.id, "tickets.nothing-to-edit"))
+
 
     @tickets_topics.command(name="list")
     @commands.cooldown(3, 20, commands.BucketType.guild)
