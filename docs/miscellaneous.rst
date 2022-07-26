@@ -121,12 +121,12 @@ Here you will get the full list of pending reminders, waiting for the end of the
 
 .. note:: Giving the "`Embed Links <perms.html#embed-links>`__" permission to the bot can be useful if you want to get a better rendering.
 
-Delete a reminder
------------------
+Delete one or more reminders
+----------------------------
 
-**Syntax:** :code:`reminder delete <ID>`
+**Syntax:** :code:`reminder delete [ID]`
 
-Used when you want to stop a reminder, so Zbot will completely forget it. The reminder ID can be found with the *reminder list* command (see above).
+Used when you want to stop a reminder, so Zbot will completely forget it. If you don't provide any ID, Zbot will ask you to directly select which reminders you want to delete.
 
 Clear every reminders
 ---------------------

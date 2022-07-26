@@ -4,7 +4,6 @@
             "cancelled": "Dropping the process",
             "cleared": "Your reminders have been deleted!",
             "confirm": "Are you sure you want to delete all your reminders? (%{count} pending)",
-            "deleted": "Reminder #%{id} with message `%{message}` has successfully been deleted!",
             "empty": "Oops, you don't have any pending reminder...",
             "item": "ID: `{id}` | In: {duration} | Channel: {channel} | Message: {msg}",
             "saved": "Got it! I'll remind you in %{duration}",
@@ -14,7 +13,15 @@
             "embed-asked": "%{user}, you asked me %{duration} ago to remind you of this:",
             "embed-date": "Request date",
             "embed-link": "Original message",
-            "embed-title": "Reminder"
+            "embed-title": "Reminder",
+            "select-placeholder": "Select one or more reminders",
+            "delete": {
+                "title": "Choose which reminder(s) you want to delete",
+                "success": {
+                    "one": "Your reminder has been deleted!",
+                    "other": "%{count} reminders have successfully been deleted!"
+                }
+            }
         }
     }
 }
