@@ -58,12 +58,23 @@ class Timers(commands.Cog):
         query = "SELECT * FROM `timed` WHERE user=%s AND action='timer'"
         async with self.bot.db_query(query, (user,)) as query_results:
             return query_results
+    
+    async def db_get_user_reminders_count(self, user: int) -> int:
+        "Get the number of active user reminder"
+        query = "SELECT COUNT(*) as count FROM `timed` WHERE user=%s AND action='timer'"
+        async with self.bot.db_query(query, (user,), fetchone=True) as query_results:
+            return query_results["count"]
 
     async def db_delete_reminder(self, reminder_id: int, user: int):
         "Delete a reminder for a user"
         query = "DELETE FROM `timed` WHERE user=%s AND action='timer' AND ID=%s"
         async with self.bot.db_query(query, (user, reminder_id), returnrowcount=True) as query_result:
             return query_result > 0
+    
+    async def db_delete_all_user_reminders(self, user: int):
+        query = "DELETE FROM `timed` WHERE user=%s AND action='timer'"
+        async with self.bot.db_query(query, (user,)) as query_results:
+            pass
 
     @commands.command(name="remindme", aliases=['rmd'])
     @commands.cooldown(5,30,commands.BucketType.channel)
@@ -130,23 +141,22 @@ class Timers(commands.Cog):
 
         ..Doc miscellaneous.html#list-your-reminders
         """
-        query = f"SELECT *, CONVERT_TZ(`begin`, @@session.time_zone, '+00:00') AS `utc_begin` FROM `timed` WHERE user={ctx.author.id} AND action='timer'"
-        async with self.bot.db_query(query) as query_results:
-            if len(query_results) == 0:
-                await ctx.send(await self.bot._(ctx.channel, "timers.rmd.empty"))
-                return
-            result = query_results
+        reminders = await self.db_get_user_reminders(ctx.author.id)
+        if len(reminders) == 0:
+            await ctx.send(await self.bot._(ctx.channel, "timers.rmd.empty"))
+            return
         txt = await self.bot._(ctx.channel, "timers.rmd.item")
         lang = await self.bot._(ctx.channel, '_used_locale')
         liste = list()
-        for item in result:
+        for item in reminders:
             ctx2 = copy.copy(ctx)
             ctx2.message.content = item["message"]
             item["message"] = await commands.clean_content(fix_channel_mentions=True).convert(ctx2, item["message"])
             msg = item['message'] if len(item['message'])<=50 else item['message'][:47]+"..."
             msg = discord.utils.escape_markdown(msg).replace("\n", " ")
             chan = '<#'+str(item['channel'])+'>'
-            end = item["utc_begin"] + datetime.timedelta(seconds=item['duration'])
+            end: datetime.datetime = item["begin"] + datetime.timedelta(seconds=item['duration'])
+            end = end.astimezone(datetime.timezone.utc)
             duration = await FormatUtils.time_delta(ctx.bot.utcnow() if end.tzinfo else datetime.datetime.utcnow(), end, lang=lang, year=True, form="short")
             item = txt.format(id=item['ID'], duration=duration, channel=chan, msg=msg)
             liste.append(item)
@@ -233,7 +243,7 @@ class Timers(commands.Cog):
                 count += 1
         await ctx.send(await self.bot._(ctx.channel, "timers.rmd.delete.success", count=count))
 
-    @remind_main.command(name="clear", enabled=False)
+    @remind_main.command(name="clear")
     @commands.cooldown(3, 60, commands.BucketType.user)
     async def remind_clear(self, ctx: MyContext):
         """Remove every pending reminder
@@ -242,12 +252,10 @@ class Timers(commands.Cog):
         if not (ctx.guild is None or ctx.channel.permissions_for(ctx.guild.me).add_reactions):
             await ctx.send(await self.bot._(ctx.channel, "fun.cant-react"))
             return
-        query = "SELECT COUNT(*) as count FROM `timed` WHERE action='timer' AND user=%s"
-        async with self.bot.db_query(query, (ctx.author.id,), fetchone=True) as query_results:
-            count = query_results['count']
-            if count == 0:
-                await ctx.send(await self.bot._(ctx.channel, "timers.rmd.empty"))
-                return
+        count = await self.db_get_user_reminders_count(ctx.author.id)
+        if count == 0:
+            await ctx.send(await self.bot._(ctx.channel, "timers.rmd.empty"))
+            return
 
         confirm_view = ConfirmView(self.bot, ctx.channel,
             validation=lambda inter: inter.user==ctx.author,
@@ -260,9 +268,7 @@ class Timers(commands.Cog):
             await ctx.send(await self.bot._(ctx.channel, "timers.rmd.cancelled"))
             return
         if confirm_view.value:
-            query = "DELETE FROM `timed` WHERE action='timer' AND user=%s"
-            async with self.bot.db_query(query, (ctx.author.id,)):
-                pass
+            await self.db_delete_all_user_reminders(ctx.author.id)
             await ctx.send(await self.bot._(ctx.channel, "timers.rmd.cleared"))
 
 
