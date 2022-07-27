@@ -365,11 +365,17 @@ Available types: member, role, user, emoji, channel, server, invite, category
             embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.member-7"), value = await self.bot.get_cog('Cases').get_nber(member.id,ctx.guild.id),inline=True)
         # Guilds count
         if member.bot:
-            session = aiohttp.ClientSession(loop=self.bot.loop)
-            guilds_count = await self.bot.get_cog('Partners').get_bot_guilds(member.id,session)
+            async with aiohttp.ClientSession(loop=self.bot.loop) as session:
+                guilds_count = await self.bot.get_cog('Partners').get_bot_guilds(member.id, session)
+                bot_owners = await self.bot.get_cog('Partners').get_bot_owners(member.id, session)
             if guilds_count is not None:
+                guilds_count = await FormatUtils.format_nbr(guilds_count, lang)
                 embed.add_field(name=str(await self.bot._(ctx.guild.id,'misc.servers')).capitalize(),value=guilds_count)
-            await session.close()
+            if bot_owners:
+                embed.add_field(
+                    name=(await self.bot._(ctx.guild.id, 'info.info.guild-1')).capitalize(),
+                    value=", ".join([str(u) for u in bot_owners])
+                )
         # Roles
         _roles = await self.bot._(ctx.guild.id, 'info.info.member-9') + f' [{len(list_role)}]'
         if len(list_role) > 0:
@@ -456,11 +462,20 @@ Available types: member, role, user, emoji, channel, server, invite, category
         # is in server
         embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.user-0"), value=on_server.capitalize())
         if user.bot:
-            session = aiohttp.ClientSession(loop=self.bot.loop)
-            guilds_count = await self.bot.get_cog('Partners').get_bot_guilds(user.id,session)
+            async with aiohttp.ClientSession(loop=self.bot.loop) as session:
+                guilds_count = await self.bot.get_cog('Partners').get_bot_guilds(user.id, session)
+                bot_owners = await self.bot.get_cog('Partners').get_bot_owners(user.id, session)
             if guilds_count is not None:
-                embed.add_field(name=str(await self.bot._(ctx.guild.id,'misc.servers')).capitalize(),value=guilds_count)
-            await session.close()
+                guilds_count = await FormatUtils.format_nbr(guilds_count, lang)
+                embed.add_field(
+                    name=str(await self.bot._(ctx.guild.id, 'misc.servers')).capitalize(),
+                    value=guilds_count
+                )
+            if bot_owners:
+                embed.add_field(
+                    name=(await self.bot._(ctx.guild.id, 'info.info.guild-1')).capitalize(),
+                    value=", ".join([str(u) for u in bot_owners])
+                )
         await ctx.send(embed=embed)
 
     @info_main.command(name="emoji")
