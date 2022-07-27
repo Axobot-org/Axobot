@@ -106,10 +106,7 @@ class Info(commands.Cog):
             langs_list = ' | '.join(["{}: {}%".format(x[0],round(x[1]/lang_total*100)) for x in langs_list if x[1] > 0])
             del lang_total
             # Users/bots
-            try:
-                users,bots = self.get_users_nber(ignored_guilds)
-            except Exception as e:
-                users = bots = 'unknown'
+            users,bots = self.get_users_nber(ignored_guilds)
             # Total XP
             if self.bot.database_online:
                 total_xp = await self.bot.get_cog('Xp').bdd_total_xp()
