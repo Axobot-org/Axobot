@@ -57,7 +57,7 @@ class BotStats(commands.Cog):
     async def on_record_cpu_error(self, error: Exception):
         self.bot.dispatch("error", error, "When collecting CPU usage")
 
-    @tasks.loop(seconds=30)
+    @tasks.loop(seconds=20)
     async def record_ws_latency(self):
         "Record the websocket latency for later use"
         if self.bot.latency is None or math.isnan(self.bot.latency):
@@ -66,9 +66,9 @@ class BotStats(commands.Cog):
             self.latency_records.append(round(self.bot.latency*1000))
         except OverflowError: # Usually because latency is infinite
             self.latency_records.append(10e6)
-        if len(self.latency_records) > 2:
+        if len(self.latency_records) > 3:
             # if the list becomes too long (over 1min), cut it
-            self.latency_records = self.latency_records[-2:]
+            self.latency_records = self.latency_records[-3:]
 
     @record_ws_latency.error
     async def on_record_latency_error(self, error: Exception):
