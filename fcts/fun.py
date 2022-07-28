@@ -815,7 +815,7 @@ You can specify a verification limit by adding a number in argument (up to 1.000
                     await msg.add_reaction(d_em)
                     count +=1
             elif len(r) > 0:
-                await msg.add_reaction(emojilib.emojize(r, use_aliases=True))
+                await msg.add_reaction(emojilib.emojize(r, language="alias"))
                 count +=1
         if count == 0:
             await msg.add_reaction('👍')

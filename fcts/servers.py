@@ -630,7 +630,7 @@ class Servers(commands.Cog):
                     a = 'a' if d_em.animated else ''
                     l_em.append("<{}:{}:{}>".format(a, d_em.name, d_em.id))
             else:
-                l_em.append(emoji.emojize(r, use_aliases=True))
+                l_em.append(emoji.emojize(r, language="alias"))
         return l_em
 
     async def conf_vocal(self, ctx: MyContext, option: str, value: str):

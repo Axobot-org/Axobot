@@ -81,7 +81,7 @@ class Morpions(commands.Cog):
                             if d_em is not None:
                                 self.emojis += (str(d_em), )
                         else:
-                            self.emojis += (emojilib.emojize(emoji_id, use_aliases=True), )
+                            self.emojis += (emojilib.emojize(emoji_id, language="alias"), )
                     self.emojis = self.emojis[:2]
             if len(self.emojis) < 2:
                 self.emojis = (':red_circle:', ':blue_circle:')
