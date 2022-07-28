@@ -189,15 +189,15 @@ You can specify a verification limit by adding a number in argument (up to 1.000
         else:
             await tmp.edit(content = await self.bot._(ctx.channel,"fun.count.result-user", limit=total_count,user=user.display_name,x=counter,p=result))
 
-    @commands.command(name="ragequit",hidden=True)
+    @commands.command(name="ragequit", hidden=True)
     @commands.check(is_fun_enabled)
     async def ragequit(self, ctx: MyContext):
-        """To use when you get angry - limited to certain members
+        """To use when you get angry
 
         ..Doc fun.html#ragequit"""
         await ctx.send(file=await self.utilities.find_img('ragequit{0}.gif'.format(random.randint(1,6))))
 
-    @commands.command(name="run",hidden=True)
+    @commands.command(name="run", hidden=True)
     @commands.check(is_fun_enabled)
     async def run(self, ctx: MyContext):
         """"Just... run... very... fast
@@ -205,7 +205,7 @@ You can specify a verification limit by adding a number in argument (up to 1.000
         ..Doc fun.html#run"""
         await ctx.send("ε=ε=ε=┏( >_<)┛")
 
-    @commands.command(name="pong",hidden=True)
+    @commands.command(name="pong", hidden=True)
     @commands.check(is_fun_enabled)
     async def pong(self, ctx: MyContext):
         """Ping !
