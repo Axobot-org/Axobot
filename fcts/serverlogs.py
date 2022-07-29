@@ -1,4 +1,5 @@
 import asyncio
+import re
 from typing import Any
 
 import discord
@@ -12,6 +13,8 @@ from libs.formatutils import FormatUtils
 from fcts.args import serverlog
 from fcts import checks
 
+DISCORD_INVITE = re.compile(r'(?:https?://)?(?:www[.\s])?((?:discord[.\s](?:gg|io|me|li)|discordapp\.com/invite)[/\s]{,3}\w+)')
+
 
 class ServerLogs(commands.Cog):
     """Handle any kind of server log"""
@@ -20,7 +23,7 @@ class ServerLogs(commands.Cog):
         "automod": {"antiraid", "antiscam"},
         "members": {"member_roles", "member_nick", "member_avatar", "member_join", "member_leave"},
         "moderation": {"member_ban", "member_unban", "member_timeout", "member_kick"},
-        "messages": {"message_update", "message_delete"},
+        "messages": {"message_update", "message_delete", "discord_invite", "ghost_ping"},
         "roles": {"role_creation"},
         "tickets": {"ticket_creation"},
     }
@@ -259,20 +262,39 @@ class ServerLogs(commands.Cog):
             await self.validate_logs(guild, channel_ids, emb)
 
     @commands.Cog.listener()
-    async def on_message_delete(self, msg: discord.Message):
+    async def on_raw_message_delete(self, payload: discord.RawMessageDeleteEvent):
         """Triggered when a message is deleted
-        Corresponding log: message_delete"""
-        if not msg.guild or msg.author == self.bot.user:
+        Corresponding logs: message_delete, ghost_ping"""
+        if not payload.guild_id or (payload.cached_message and payload.cached_message.author == self.bot.user):
             return
-        if channel_ids := await self.is_log_enabled(msg.guild.id, "message_delete"):
+        guild = self.bot.get_guild(payload.guild_id)
+        if guild is None:
+            return
+        # message delete
+        if channel_ids := await self.is_log_enabled(payload.guild_id, "message_delete"):
+            msg = payload.cached_message
             emb = discord.Embed(
-                description=f"**Message deleted in <#{msg.channel.id}>**\n{msg.content}",
+                description=f"**Message deleted in <#{payload.channel_id}>**\n{msg.content if msg else ''}",
                 colour=discord.Color.red()
             )
-            emb.set_author(name=str(msg.author), icon_url=msg.author.display_avatar)
+            if msg is not None:
+                emb.set_author(name=str(msg.author), icon_url=msg.author.display_avatar)
+                emb.add_field(name="Created at", value=f"<t:{msg.created_at.timestamp():.0f}>")
+                emb.add_field(name="Message Author", value=f"{msg.author} ({msg.author.id})")
+            await self.validate_logs(guild, channel_ids, emb)
+        # ghost_ping
+        if payload.cached_message is not None and (channel_ids := await self.is_log_enabled(payload.guild_id, "ghost_ping")):
+            msg = payload.cached_message
+            if len(msg.raw_mentions) == 0 or (self.bot.utcnow() - msg.created_at).total_seconds() > 20:
+                return
+            emb = discord.Embed(
+                description=f"**Ghost ping in <#{payload.channel_id}>**",
+                colour=discord.Color.orange()
+            )
             emb.add_field(name="Created at", value=f"<t:{msg.created_at.timestamp():.0f}>")
             emb.add_field(name="Message Author", value=f"{msg.author} ({msg.author.id})")
-            await self.validate_logs(msg.guild, channel_ids, emb)
+            emb.add_field(name="Mentionning", value=" ".join(f"<@{mention}>" for mention in set(msg.raw_mentions)), inline=False)
+            await self.validate_logs(guild, channel_ids, emb)
 
     @commands.Cog.listener()
     async def on_raw_bulk_message_delete(self, payload: discord.RawBulkMessageDeleteEvent):
@@ -289,6 +311,27 @@ class ServerLogs(commands.Cog):
                 colour=discord.Color.red()
             )
             await self.validate_logs(guild, channel_ids, emb)
+
+    @commands.Cog.listener()
+    async def on_message(self, message: discord.Message):
+        """Triggered when a message is sent by someone
+        Corresponding log: discord_invite"""
+        if message.guild is None or message.author == self.bot.user:
+            return
+        if (invites := DISCORD_INVITE.findall(message.content)) and (channel_ids := await self.is_log_enabled(message.guild.id, "discord_invite")):
+            emb = discord.Embed(
+                description=f"**[Discord invite]({message.jump_url}) detected in {message.channel.mention}**",
+                colour=discord.Color.orange()
+            )
+            emb.set_author(name=str(message.author), icon_url=message.author.display_avatar)
+            emb.add_field(name="Created at", value=f"<t:{message.created_at.timestamp():.0f}>")
+            emb.add_field(name="Message Author", value=f"{message.author} ({message.author.id})")
+            invites_formatted = set(invite.replace(' ', '') for invite in invites)
+            try:
+                emb.add_field(name="Invite" if len(invites) == 1 else "Invites", value=" ".join(invites_formatted), inline=False)
+            except Exception as err:
+                print(err)
+            await self.validate_logs(message.guild, channel_ids, emb)
 
     @commands.Cog.listener()
     async def on_member_update(self, before: discord.Member, after: discord.Member):
