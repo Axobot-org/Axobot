@@ -30,6 +30,7 @@ class BotStats(commands.Cog):
         self.cpu_records: list[float] = []
         self.latency_records: list[int] = []
         self.statuspage_header = {"Content-Type": "application/json", "Authorization": "OAuth " + self.bot.others["statuspage"]}
+        self.antiscam = {"warning": 0, "deletion": 0}
 
     async def cog_load(self):
          # pylint: disable=no-member
@@ -79,6 +80,14 @@ class BotStats(commands.Cog):
         if len(origin) > 0:
             avg = round(sum(origin)/len(origin), 1)
             return avg
+
+    @commands.Cog.listener()
+    async def on_antiscam_warn(self):
+        self.antiscam["warning"] += 1
+
+    @commands.Cog.listener()
+    async def on_antiscam_delete(self):
+        self.antiscam["deletion"] += 1
 
     @commands.Cog.listener()
     async def on_socket_raw_receive(self, msg: str):
@@ -145,6 +154,9 @@ class BotStats(commands.Cog):
                 total += 1
             cursor.execute(query, (now, 'guilds.unavailable', round(unav/total, 3)*100, 1, '%', False, self.bot.beta))
             del unav, total
+            # antiscam warn/deletions
+            cursor.execute(query, (now, 'antiscam.warning', self.antiscam["warning"], 0, 'warning/min', True, self.bot.beta))
+            cursor.execute(query, (now, 'antiscam.deletion', self.antiscam["deletion"], 0, 'deletion/min', True, self.bot.beta))
             # Push everything
             cnx.commit()
         except mysql.connector.errors.IntegrityError as err: # duplicate primary key
