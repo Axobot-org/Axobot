@@ -266,15 +266,16 @@ Types of logs
 * **antiscan:** A message is flagged as a potential scam by the antiscam AI
 * **discord_invite:** A member just sent a message containing one or more Discord server invite link
 * **ghost_ping:** A member deleted a message containing a user mention right after sending it
-* **member_roles:** A member gets or loses roles
-* **member_nick:** A member has its nickname changed
 * **member_avatar:** A member changes its guild avatar
-* **member_join:** A member joins your server
-* **member_leave:** A member leaves your server
 * **member_ban:** A user is banned from your server
-* **member_unban:** A user is unbanned from your server
-* **member_timeout:** A member is set on timeout by one of your moderators
+* **member_join:** A member joins your server
 * **member_kick:** A member is kicked from your server
+* **member_leave:** A member leaves your server
+* **member_nick:** A member has its nickname changed
+* **member_roles:** A member gets or loses roles
+* **member_timeout:** A member is set on timeout by one of your moderators
+* **member_unban:** A user is unbanned from your server
+* **member_verification:** A user has been verified by the Discord community rules screen (if enabled in your server)
 * **message_update:** A message is edited
 * **message_delete:** A message is deleted
 * **role_creation:** A role is created
