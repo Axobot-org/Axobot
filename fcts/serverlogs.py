@@ -21,7 +21,7 @@ class ServerLogs(commands.Cog):
 
     logs_categories = {
         "automod": {"antiraid", "antiscam"},
-        "members": {"member_roles", "member_nick", "member_avatar", "member_join", "member_leave"},
+        "members": {"member_roles", "member_nick", "member_avatar", "member_join", "member_leave", "member_verification"},
         "moderation": {"member_ban", "member_unban", "member_timeout", "member_kick"},
         "messages": {"message_update", "message_delete", "discord_invite", "ghost_ping"},
         "roles": {"role_creation"},
@@ -326,9 +326,9 @@ class ServerLogs(commands.Cog):
             emb.set_author(name=str(message.author), icon_url=message.author.display_avatar)
             emb.add_field(name="Created at", value=f"<t:{message.created_at.timestamp():.0f}>")
             emb.add_field(name="Message Author", value=f"{message.author} ({message.author.id})")
-            invites_formatted = set(invite.replace(' ', '') for invite in invites)
+            invites_formatted: set[str] = set(invite.replace(' ', '') for invite in invites)
             try:
-                emb.add_field(name="Invite" if len(invites) == 1 else "Invites", value=" ".join(invites_formatted), inline=False)
+                emb.add_field(name="Invite" if len(invites) == 1 else "Invites", value="\n".join(invites_formatted), inline=False)
             except Exception as err:
                 print(err)
             await self.validate_logs(message.guild, channel_ids, emb)
@@ -336,104 +336,139 @@ class ServerLogs(commands.Cog):
     @commands.Cog.listener()
     async def on_member_update(self, before: discord.Member, after: discord.Member):
         """Triggered when a member is updated
-        Corresponding logs: member_roles, member_nick, member_avatar"""
+        Corresponding logs: member_roles, member_nick, member_avatar, member_verification"""
         now = self.bot.utcnow()
         # member roles
         if before.roles != after.roles and (channel_ids := await self.is_log_enabled(before.guild.id, "member_roles")):
-            added_roles = [role for role in after.roles if role not in before.roles]
-            removed_roles = [role for role in before.roles if role not in after.roles]
-            emb = discord.Embed(
-                description=f"**Member {before.mention} updated**",
-                color=discord.Color.blurple()
-            )
-            if removed_roles:
-                emb.add_field(name="Roles revoked", value=' '.join(r.mention for r in removed_roles), inline=False)
-            if added_roles:
-                emb.add_field(name="Roles granted", value=' '.join(r.mention for r in added_roles), inline=False)
-            emb.set_author(name=str(after), icon_url=after.avatar or after.default_avatar)
-            # if we have access to audit logs and no role come from an integration, just wait a bit to make sure the ban is logged
-            if any(not role.managed for role in added_roles+removed_roles) and before.guild.me.guild_permissions.view_audit_log:
-                await asyncio.sleep(self.auditlogs_timeout)
-                async for entry in before.guild.audit_logs(limit=5, action=discord.AuditLogAction.member_role_update,
-                                                           oldest_first=False):
-                    if entry.target.id == before.id and (entry.created_at - now).total_seconds() < 5:
-                        emb.add_field(name="Roles edited by", value=f"**{entry.user.mention}** ({entry.user.id})")
-                        break
-            await self.validate_logs(after.guild, channel_ids, emb)
+            await self.handle_member_roles(before, after, channel_ids)
         # member nick
         if before.nick != after.nick and (channel_ids := await self.is_log_enabled(before.guild.id, "member_nick")):
-            emb = discord.Embed(
-                description=f"**Member {before.mention} ({before.id}) updated**",
-                color=discord.Color.blurple()
-            )
-            before_txt = "None" if before.nick is None else discord.utils.escape_markdown(before.nick)
-            after_txt = "None" if after.nick is None else discord.utils.escape_markdown(after.nick)
-            emb.add_field(name="Nickname edited", value=f"{before_txt} -> {after_txt}")
-            emb.set_author(name=str(after), icon_url=after.avatar or after.default_avatar)
-            await self.validate_logs(after.guild, channel_ids, emb)
+            await self.handle_member_nick(before, after, channel_ids)
         # member avatar
         if before.guild_avatar != after.guild_avatar and (
                 channel_ids := await self.is_log_enabled(before.guild.id, "member_avatar")
         ):
-            emb = discord.Embed(
-                description=f"**Member {before.mention} ({before.id}) updated**",
-                color=discord.Color.blurple()
-            )
-            before_txt = "None" if before.guild_avatar is None else f"[Before]({before.guild_avatar})"
-            after_txt = "None" if after.guild_avatar is None else f"[After]{after.guild_avatar}"
-            emb.add_field(name="Server avatar edited", value=f"{before_txt} -> {after_txt}")
-            emb.set_author(name=str(after), icon_url=after.avatar or after.default_avatar)
-            await self.validate_logs(after.guild, channel_ids, emb)
+            await self.handle_member_avatar(before, after, channel_ids)
         # member timeout
         if ((before.timed_out_until is None or before.timed_out_until < now)
             and after.timed_out_until is not None and after.timed_out_until > now
             and (channel_ids := await self.is_log_enabled(before.guild.id, "member_timeout"))
             ):
-            emb = discord.Embed(
-                description=f"**Member {before.mention} ({before.id}) set in timeout**",
-                color=discord.Color.orange()
-            )
-            duration = await FormatUtils.time_delta(now, after.timed_out_until, lang='en')
-            emb.add_field(name="Duration", value=f"{duration} (until <t:{after.timed_out_until.timestamp():.0f}>)", inline=False)
-            emb.set_author(name=str(after), icon_url=after.avatar or after.default_avatar)
-            # try to get who timeouted that member
-            if before.guild.me.guild_permissions.view_audit_log:
-                await asyncio.sleep(self.auditlogs_timeout)
-                async for entry in before.guild.audit_logs(limit=5, action=discord.AuditLogAction.member_update,
-                                                           oldest_first=False):
-                    if (entry.target.id == before.id
-                        and entry.after.timed_out_until
-                        and (entry.created_at - now).total_seconds() < 5
-                        ):
-                        emb.add_field(
-                            name="Timeout by", value=f"**{entry.user.mention}** ({entry.user.id})")
-                        break
-            await self.validate_logs(after.guild, channel_ids, emb)
+            await self.handle_member_timeout(before, after, channel_ids)
         # member un-timeout
         if (before.timed_out_until is not None and before.timed_out_until > now
             and after.timed_out_until is None
             and (channel_ids := await self.is_log_enabled(before.guild.id, "member_timeout"))
             ):
-            emb = discord.Embed(
-                description=f"**Member {before.mention} ({before.id}) no longer in timeout**",
-                color=discord.Color.green()
-            )
-            emb.add_field(name="Planned timeout end", value=f"<t:{before.timed_out_until.timestamp():.0f}>", inline=False)
-            emb.set_author(name=str(after), icon_url=after.avatar or after.default_avatar)
-            # try to get who timeouted that member
-            if after.guild.me.guild_permissions.view_audit_log:
-                await asyncio.sleep(self.auditlogs_timeout)
-                async for entry in before.guild.audit_logs(limit=5, action=discord.AuditLogAction.member_update,
-                                                           oldest_first=False):
-                    if (entry.target.id == before.id
-                        and entry.before.timed_out_until
-                        and (entry.created_at - now).total_seconds() < 5
-                        ):
-                        emb.add_field(
-                            name="Revoked by", value=f"**{entry.user.mention}** ({entry.user.id})")
-                        break
-            await self.validate_logs(after.guild, channel_ids, emb)
+            await self.handle_member_untimeout(before, after, channel_ids)
+        # member verification
+        if (before.pending and not after.pending) and (channel_ids := await self.is_log_enabled(before.guild.id, "member_verification")):
+            await self.handle_member_verification(before, after, channel_ids)
+    
+    async def handle_member_roles(self, before: discord.Member, after: discord.Member, channel_ids: list[int]):
+        "Handle member_roles log"
+        added_roles = [role for role in after.roles if role not in before.roles]
+        removed_roles = [role for role in before.roles if role not in after.roles]
+        emb = discord.Embed(
+            description=f"**Member {before.mention} updated**",
+            color=discord.Color.blurple()
+        )
+        if removed_roles:
+            emb.add_field(name="Roles revoked", value=' '.join(r.mention for r in removed_roles), inline=False)
+        if added_roles:
+            emb.add_field(name="Roles granted", value=' '.join(r.mention for r in added_roles), inline=False)
+        emb.set_author(name=str(after), icon_url=after.avatar or after.default_avatar)
+        # if we have access to audit logs and no role come from an integration, just wait a bit to make sure the ban is logged
+        if any(not role.managed for role in added_roles+removed_roles) and before.guild.me.guild_permissions.view_audit_log:
+            now = self.bot.utcnow()
+            await asyncio.sleep(self.auditlogs_timeout)
+            async for entry in before.guild.audit_logs(limit=5, action=discord.AuditLogAction.member_role_update,
+                                                        oldest_first=False):
+                if entry.target.id == before.id and (entry.created_at - now).total_seconds() < 5:
+                    emb.add_field(name="Roles edited by", value=f"**{entry.user.mention}** ({entry.user.id})")
+                    break
+        await self.validate_logs(after.guild, channel_ids, emb)
 
+    async def handle_member_nick(self, before: discord.Member, after: discord.Member, channel_ids: list[int]):
+        "Handle member_nick log"
+        emb = discord.Embed(
+            description=f"**Member {before.mention} ({before.id}) updated**",
+            color=discord.Color.blurple()
+        )
+        before_txt = "None" if before.nick is None else discord.utils.escape_markdown(before.nick)
+        after_txt = "None" if after.nick is None else discord.utils.escape_markdown(after.nick)
+        emb.add_field(name="Nickname edited", value=f"{before_txt} -> {after_txt}")
+        emb.set_author(name=str(after), icon_url=after.avatar or after.default_avatar)
+        await self.validate_logs(after.guild, channel_ids, emb)
+
+    async def handle_member_avatar(self, before: discord.Member, after: discord.Member, channel_ids: list[int]):
+        "Handle member_avatar log"
+        emb = discord.Embed(
+            description=f"**Member {before.mention} ({before.id}) updated**",
+            color=discord.Color.blurple()
+        )
+        before_txt = "None" if before.guild_avatar is None else f"[Before]({before.guild_avatar})"
+        after_txt = "None" if after.guild_avatar is None else f"[After]{after.guild_avatar}"
+        emb.add_field(name="Server avatar edited", value=f"{before_txt} -> {after_txt}")
+        emb.set_author(name=str(after), icon_url=after.avatar or after.default_avatar)
+        await self.validate_logs(after.guild, channel_ids, emb)
+
+    async def handle_member_timeout(self, before: discord.Member, after: discord.Member, channel_ids: list[int]):
+        "Handle member_timeout log at start"
+        now = self.bot.utcnow()
+        emb = discord.Embed(
+            description=f"**Member {before.mention} ({before.id}) set in timeout**",
+            color=discord.Color.orange()
+        )
+        duration = await FormatUtils.time_delta(now, after.timed_out_until, lang='en')
+        emb.add_field(name="Duration", value=f"{duration} (until <t:{after.timed_out_until.timestamp():.0f}>)", inline=False)
+        emb.set_author(name=str(after), icon_url=after.avatar or after.default_avatar)
+        # try to get who timeouted that member
+        if before.guild.me.guild_permissions.view_audit_log:
+            await asyncio.sleep(self.auditlogs_timeout)
+            async for entry in before.guild.audit_logs(limit=5, action=discord.AuditLogAction.member_update,
+                                                        oldest_first=False):
+                if (entry.target.id == before.id
+                    and entry.after.timed_out_until
+                    and (entry.created_at - now).total_seconds() < 5
+                    ):
+                    emb.add_field(
+                        name="Timeout by", value=f"**{entry.user.mention}** ({entry.user.id})")
+                    break
+        await self.validate_logs(after.guild, channel_ids, emb)
+
+    async def handle_member_untimeout(self, before: discord.Member, after: discord.Member, channel_ids: list[int]):
+        "Handle member_timeout log at end"
+        emb = discord.Embed(
+            description=f"**Member {before.mention} ({before.id}) no longer in timeout**",
+            color=discord.Color.green()
+        )
+        emb.add_field(name="Planned timeout end", value=f"<t:{before.timed_out_until.timestamp():.0f}>", inline=False)
+        emb.set_author(name=str(after), icon_url=after.avatar or after.default_avatar)
+        # try to get who timeouted that member
+        if after.guild.me.guild_permissions.view_audit_log:
+            now = self.bot.utcnow()
+            await asyncio.sleep(self.auditlogs_timeout)
+            async for entry in before.guild.audit_logs(limit=5, action=discord.AuditLogAction.member_update,
+                                                        oldest_first=False):
+                if (entry.target.id == before.id
+                    and entry.before.timed_out_until
+                    and (entry.created_at - now).total_seconds() < 5
+                    ):
+                    emb.add_field(
+                        name="Revoked by", value=f"**{entry.user.mention}** ({entry.user.id})")
+                    break
+        await self.validate_logs(after.guild, channel_ids, emb)
+
+    async def handle_member_verification(self, before: discord.Member, after: discord.Member, channel_ids: list[int]):
+        "Handle member_verification log"
+        emb = discord.Embed(
+            description=f"**{after.mention} ({after.id}) has been verified** through your server rules screen",
+            colour=discord.Color.green()
+        )
+        emb.set_author(name=str(after), icon_url=after.display_avatar)
+        emb.add_field(name="Account created at", value=f"<t:{after.created_at.timestamp():.0f}>", inline=False)
+        await self.validate_logs(after.guild, channel_ids, emb)
 
     async def get_member_specs(self, member: discord.Member) -> list[str]:
         "Get specific things to note for a member"
