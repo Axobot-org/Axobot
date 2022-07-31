@@ -2,6 +2,7 @@
     "en": {
         "categories": {
             "automod": "Automod",
+            "bot": "Bot",
             "members": "Members",
             "messages": "Messages",
             "moderation": "Moderation",

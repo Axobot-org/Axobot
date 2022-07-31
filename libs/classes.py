@@ -1,4 +1,5 @@
 import datetime
+from enum import Enum
 import logging
 import sys
 import time
@@ -437,3 +438,8 @@ class UserFlag:
     def intToFlags(self, i: int) -> list:
         "Convert an integer value to its list of flags"
         return [v for k, v in self.FLAGS.items() if i & k == k]
+
+class ServerWarningType(Enum):
+    WELCOME_MISSING_TXT_PERMISSIONS = 1
+    RSS_MISSING_TXT_PERMISSION = 2
+    RSS_MISSING_EMBED_PERMISSION = 3
