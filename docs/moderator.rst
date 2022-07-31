@@ -267,6 +267,7 @@ Types of logs
 
 * **antiraid:** A new member is kicked or banned by the raid detection system
 * **antiscan:** A message is flagged as a potential scam by the antiscam AI
+* **bot_warnings:** Zbot couldn't do its job due to an external factor (like a missing permission)
 * **discord_invite:** A member just sent a message containing one or more Discord server invite link
 * **ghost_ping:** A member deleted a message containing a user mention right after sending it
 * **member_avatar:** A member changes its guild avatar

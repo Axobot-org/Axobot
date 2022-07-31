@@ -7,7 +7,7 @@ from cachingutils import LRUCache
 from discord.ext import commands, tasks
 from fcts.tickets import TicketCreationEvent
 from libs.antiscam.classes import PredictionResult
-from libs.classes import MyContext, Zbot
+from libs.classes import MyContext, ServerWarningType, Zbot
 from libs.formatutils import FormatUtils
 
 from fcts.args import serverlog
@@ -21,6 +21,7 @@ class ServerLogs(commands.Cog):
 
     logs_categories = {
         "automod": {"antiraid", "antiscam"},
+        "bot": {"bot_warnings"},
         "members": {"member_roles", "member_nick", "member_avatar", "member_join", "member_leave", "member_verification"},
         "moderation": {"member_ban", "member_unban", "member_timeout", "member_kick"},
         "messages": {"message_update", "message_delete", "discord_invite", "ghost_ping"},
@@ -384,7 +385,7 @@ class ServerLogs(commands.Cog):
             await asyncio.sleep(self.auditlogs_timeout)
             async for entry in before.guild.audit_logs(limit=5, action=discord.AuditLogAction.member_role_update,
                                                         oldest_first=False):
-                if entry.target.id == before.id and (entry.created_at - now).total_seconds() < 5:
+                if entry.target.id == before.id and (now - entry.created_at).total_seconds() < 5:
                     emb.add_field(name="Roles edited by", value=f"**{entry.user.mention}** ({entry.user.id})")
                     break
         await self.validate_logs(after.guild, channel_ids, emb)
@@ -430,7 +431,7 @@ class ServerLogs(commands.Cog):
                                                         oldest_first=False):
                 if (entry.target.id == before.id
                     and entry.after.timed_out_until
-                    and (entry.created_at - now).total_seconds() < 5
+                    and (now - entry.created_at).total_seconds() < 5
                     ):
                     emb.add_field(
                         name="Timeout by", value=f"**{entry.user.mention}** ({entry.user.id})")
@@ -453,7 +454,7 @@ class ServerLogs(commands.Cog):
                                                         oldest_first=False):
                 if (entry.target.id == before.id
                     and entry.before.timed_out_until
-                    and (entry.created_at - now).total_seconds() < 5
+                    and (now - entry.created_at).total_seconds() < 5
                     ):
                     emb.add_field(
                         name="Revoked by", value=f"**{entry.user.mention}** ({entry.user.id})")
@@ -543,7 +544,7 @@ class ServerLogs(commands.Cog):
         now = self.bot.utcnow()
         await asyncio.sleep(self.auditlogs_timeout)
         async for entry in guild.audit_logs(limit=5, action=discord.AuditLogAction.kick, oldest_first=False):
-            if entry.target.id == payload.user.id and (entry.created_at - now).total_seconds() < 5:
+            if entry.target.id == payload.user.id and (now - entry.created_at).total_seconds() < 5:
                 emb = discord.Embed(
                     description=f"**{payload.user.mention} ({payload.user.id}) has been kicked**",
                     colour=discord.Color.red()
@@ -572,7 +573,7 @@ class ServerLogs(commands.Cog):
                 now = self.bot.utcnow()
                 await asyncio.sleep(self.auditlogs_timeout)
                 async for entry in guild.audit_logs(limit=5, action=discord.AuditLogAction.ban, oldest_first=False):
-                    if entry.target.id == user.id and (entry.created_at - now).total_seconds() < 5:
+                    if entry.target.id == user.id and (now - entry.created_at).total_seconds() < 5:
                         emb.add_field(name="Banned by", value=f"**{entry.user.mention}** ({entry.user.id})")
                         emb.add_field(name="With reason", value=entry.reason or "No reason specified")
                         break
@@ -593,7 +594,7 @@ class ServerLogs(commands.Cog):
                 now = self.bot.utcnow()
                 await asyncio.sleep(self.auditlogs_timeout)
                 async for entry in guild.audit_logs(limit=5, action=discord.AuditLogAction.unban, oldest_first=False):
-                    if entry.target.id == user.id and (entry.created_at - now).total_seconds() < 5:
+                    if entry.target.id == user.id and (now - entry.created_at).total_seconds() < 5:
                         emb.add_field(name="Unbanned by", value=f"**{entry.user.mention}** ({entry.user.id})")
                         emb.add_field(name="With reason", value=entry.reason or "No reason specified")
                         break
@@ -723,6 +724,29 @@ Minimum age required by anti-raid: {min_age}"
             emb.add_field(name="Channel", value=event.channel.mention, inline=False)
             await self.validate_logs(event.guild, channel_ids, emb)
 
+    @commands.Cog.listener()
+    async def on_server_warning(self, warning_type: ServerWarningType, guild: discord.Guild, **kwargs):
+        """Triggered when the bot fails to do its job in a guild
+        Corresponding log: bot_warnings"""
+        if channel_ids := await self.is_log_enabled(guild.id, "bot_warnings"):
+            field = None
+            if warning_type == ServerWarningType.WELCOME_MISSING_TXT_PERMISSIONS:
+                if kwargs.get("is_join"):
+                    title = f"**Could not send welcome message** in channel {kwargs.get('channel').mention}"
+                else:
+
+                    title = f"**Could not send leaving message** in channel {kwargs.get('channel').mention}"
+                field = ("Missing permission", await self.bot._(guild.id, "permissions.list.send_messages"))
+            else:
+                return
+            emb = discord.Embed(
+                description=title,
+                colour=discord.Color.red()
+            )
+            if field:
+                emb.add_field(name=field[0], value=field[1])
+            await self.validate_logs(guild, channel_ids, emb)
+        
 
 async def setup(bot):
     await bot.add_cog(ServerLogs(bot))

@@ -1,6 +1,6 @@
 import discord
 from discord.ext import commands
-from libs.classes import Zbot
+from libs.classes import ServerWarningType, Zbot
 
 class Welcomer(commands.Cog):
     """Cog which manages the departure and arrival of members in the servers"""
@@ -79,7 +79,11 @@ class Welcomer(commands.Cog):
                     msg = await self.bot.get_cog("Utilities").clear_msg(msg, everyone=False)
                     await channel.send(msg)
                 except discord.Forbidden:
-                    pass
+                    self.bot.dispatch("server_warning",
+                                      ServerWarningType.WELCOME_MISSING_TXT_PERMISSIONS,
+                                      member.guild,
+                                      channel=channel,
+                                      is_join=event_type == "welcome")
                 except Exception as err:
                     self.bot.dispatch("error", err, f"{member.guild} | {channel.name}")
 

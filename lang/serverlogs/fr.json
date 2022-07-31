@@ -2,6 +2,7 @@
     "fr": {
         "categories": {
             "automod": "Automod",
+            "bot": "Bot",
             "members": "Membres",
             "messages": "Messages",
             "moderation": "Modération",
