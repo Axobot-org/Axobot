@@ -11,7 +11,7 @@ import mysql
 import twitter
 from aiohttp import ClientSession, client_exceptions
 from discord.ext import commands, tasks
-from libs.classes import MyContext, Zbot
+from libs.classes import MyContext, ServerWarningType, Zbot
 from libs.formatutils import FormatUtils
 from libs.rss import RssMessage, feed_parse, TwitterRSS, YoutubeRSS
 
@@ -1191,6 +1191,7 @@ class Rss(commands.Cog):
             chan: discord.TextChannel = guild.get_channel(feed.channel_id)
             if chan is None:
                 self.bot.log.info("[send_rss_msg] Cannot send message on channel %s (unknown channel)", feed.channel_id)
+                self.bot.dispatch("server_warning", ServerWarningType.RSS_UNKNOWN_CHANNEL, guild, channel_id=feed.channel_id, feed_id=feed.feed_id)
                 return False
             if feed.link in self.cache:
                 objs = self.cache[feed.link]
@@ -1220,7 +1221,10 @@ class Rss(commands.Cog):
                     if feed.is_active_guild:
                         # if we can't post messages: abort
                         if not chan.permissions_for(guild.me).send_messages:
+                            self.bot.dispatch("server_warning", ServerWarningType.RSS_MISSING_TXT_PERMISSION, guild, channel=chan, feed_id=feed.feed_id)
                             return True
+                        if feed.use_embed and not chan.permissions_for(guild.me).embed_links:
+                            self.bot.dispatch("server_warning", ServerWarningType.RSS_MISSING_EMBED_PERMISSION, guild, channel=chan, feed_id=feed.feed_id)
                         obj.feed = feed
                         obj.fill_embed_data()
                         await obj.fill_mention(guild)

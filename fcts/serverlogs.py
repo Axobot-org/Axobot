@@ -13,7 +13,7 @@ from libs.formatutils import FormatUtils
 from fcts.args import serverlog
 from fcts import checks
 
-DISCORD_INVITE = re.compile(r'(?:https?://)?(?:www[.\s])?((?:discord[.\s](?:gg|io|me|li)|discordapp\.com/invite)[/\s]{,3}\w+)')
+DISCORD_INVITE = re.compile(r'(?:https?://)?(?:www[.\s])?((?:discord[.\s](?:gg|io|me|li(?:nk)?)|discordapp\.com/invite|discord\.com/invite|dsc\.gg)[/ ]{,3}[\w-]{1,25}(?!\w))')
 
 
 class ServerLogs(commands.Cog):
@@ -729,22 +729,36 @@ Minimum age required by anti-raid: {min_age}"
         """Triggered when the bot fails to do its job in a guild
         Corresponding log: bot_warnings"""
         if channel_ids := await self.is_log_enabled(guild.id, "bot_warnings"):
-            field = None
+            emb = discord.Embed(colour=discord.Color.red())
             if warning_type == ServerWarningType.WELCOME_MISSING_TXT_PERMISSIONS:
                 if kwargs.get("is_join"):
-                    title = f"**Could not send welcome message** in channel {kwargs.get('channel').mention}"
+                    emb.description = f"**Could not send welcome message** in channel {kwargs.get('channel').mention}"
                 else:
 
-                    title = f"**Could not send leaving message** in channel {kwargs.get('channel').mention}"
-                field = ("Missing permission", await self.bot._(guild.id, "permissions.list.send_messages"))
+                    emb.description = f"**Could not send leaving message** in channel {kwargs.get('channel').mention}"
+                emb.add_field(
+                    name="Missing permission",
+                    value=await self.bot._(guild.id, "permissions.list.send_messages")
+                )
+            elif warning_type in {ServerWarningType.RSS_MISSING_TXT_PERMISSION, ServerWarningType.RSS_MISSING_EMBED_PERMISSION}:
+                emb.description = f"**Could not send RSS message** in channel {kwargs.get('channel').mention}"
+                emb.add_field(name="Feed ID", value=kwargs.get('feed_id'))
+                if warning_type == ServerWarningType.RSS_MISSING_TXT_PERMISSION:
+                    emb.add_field(
+                        name="Missing permission",
+                        value=await self.bot._(guild.id, "permissions.list.send_messages")
+                    )
+                else:
+                    emb.add_field(
+                        name="Missing permission",
+                        value=await self.bot._(guild.id, "permissions.list.embed_links")
+                    )
+            elif warning_type == ServerWarningType.RSS_UNKNOWN_CHANNEL:
+                emb.description = f"**Could not send RSS message** in channel {kwargs.get('channel_id')}"
+                emb.add_field(name="Reason", value="Unknown or deleted channel")
+                emb.add_field(name="Feed ID", value=kwargs.get('feed_id'))
             else:
                 return
-            emb = discord.Embed(
-                description=title,
-                colour=discord.Color.red()
-            )
-            if field:
-                emb.add_field(name=field[0], value=field[1])
             await self.validate_logs(guild, channel_ids, emb)
         
 
