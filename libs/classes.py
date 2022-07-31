@@ -440,6 +440,11 @@ class UserFlag:
         return [v for k, v in self.FLAGS.items() if i & k == k]
 
 class ServerWarningType(Enum):
+    # channel, is_join
     WELCOME_MISSING_TXT_PERMISSIONS = 1
+    # channel, feed_id
     RSS_MISSING_TXT_PERMISSION = 2
+    # channel, feed_id
     RSS_MISSING_EMBED_PERMISSION = 3
+    # channel_id, feed_id
+    RSS_UNKNOWN_CHANNEL = 4
