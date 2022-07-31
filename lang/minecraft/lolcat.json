@@ -53,16 +53,16 @@
             "Added in da vershun"
         ],
         "item-help": "Dis command allowz you to earn info 'bout any Minecraft itam. You can gave its full or partial nayme, in French r English, r even its identifier. Just entr `%{p}mc item <name>`",
-        "mod-fields": [
-            "Name",
-            "Who wrote dis",
-            "What dat mean",
-            "How'z dat written",
-            "Howold",
-            "How many ppl got it",
-            "Flex versions",
-            "Just a number"
-        ],
+        "mod-fields": {
+            "authors": "Who wrote dis",
+            "categories": "Box tags",
+            "downloads": "How many ppl got it",
+            "id": "Just a number",
+            "name": "Name",
+            "release": "Howold",
+            "summary": "What dat mean",
+            "versions": "Flex versions"
+        },
         "mod-help": "Well uhhhh... u can use dat to get info 'bout some cool mods, cuz mods are cool, right? So just use `%{p}mc mod <name>` 2 get what u need, that's it, right? But eh, I check CurseForge for dat, so I may not find everything dude.",
         "mojang_desc": {
             "account.mojang.com": "Mojang 'ccount managmnt site",

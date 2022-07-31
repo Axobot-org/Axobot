@@ -11,6 +11,7 @@ from dateutil.parser import isoparse
 from discord.ext import commands
 from frmc_lib import SearchType
 from libs.classes import MyContext, Zbot
+from libs.formatutils import FormatUtils
 from libs.rss.rss_general import FeedObject
 
 from fcts import checks
@@ -290,7 +291,7 @@ Every information come from the website www.fr-minecraft.net"""
                     pass
         await self.send_embed(ctx, embed)
 
-    @mc_main.command(name="mod", enabled=False)
+    @mc_main.command(name="mod", aliases=["mods"])
     async def mc_mod(self, ctx: MyContext, *, value: str = 'help'):
         """Get info about any mod registered on CurseForge
 
@@ -305,11 +306,13 @@ Every information come from the website www.fr-minecraft.net"""
             return
         url = 'https://api.curseforge.com/v1/mods/search'
         header = {
-            "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0) Gecko/20100101 Firefox/83.0"}
-        # searchurl = url+'search?gameId=432&sectionId=6&sort=0&pageSize=2&searchFilter=' + \
-        #     quote(value.lower())
+            "x-api-key": self.bot.others["curseforge"]
+        }
         params = {
-            "gameId": 0,
+            "gameId": 432,
+            "classId": 6,
+            "sortField": 2,
+            "sortOrder": "desc",
             "searchFilter": value
         }
         async with aiohttp.ClientSession(loop=self.bot.loop, headers=header) as session:
@@ -323,6 +326,7 @@ Every information come from the website www.fr-minecraft.net"""
             f"[{x['name']}]({x['url']})" for x in search['authors']
         ])
         date = f"<t:{isoparse(search['dateModified']).timestamp():.0f}>"
+        categories = " - ".join(f"[{category['name']}]({category['url']})" for category in search["categories"])
         versions = set(
             x['gameVersion'] for x in search['latestFilesIndexes']
         )
@@ -330,16 +334,16 @@ Every information come from the website www.fr-minecraft.net"""
             sorted(versions, reverse=True,
                    key=lambda a: list(map(int, a.split('.'))))
         )
-        data = (
-            search['name'],
-            authors,
-            search['summary'],
-            search['primaryLanguage'],
-            date,
-            versions,
-            int(search['downloadCount']),
-            search['id']
-        )
+        data = {
+            "name": search['name'],
+            "authors": authors,
+            "release": date,
+            "categories": categories,
+            "summary": search['summary'],
+            "versions": versions,
+            "downloads": int(search['downloadCount']),
+            "id": search['id']
+        }
         title = "{} - {}".format((await self.bot._(ctx.channel, "minecraft.names"))[5], search['name'])
         embed = discord.Embed(
             title=title, color=int('16BD06', 16),
@@ -348,12 +352,15 @@ Every information come from the website www.fr-minecraft.net"""
         embed.set_footer(text=ctx.author, icon_url=ctx.author.display_avatar)
         if logo := search['logo']:
             embed.set_thumbnail(url=logo['thumbnailUrl'])
-        for i, field in enumerate(await self.bot._(ctx.channel, "minecraft.mod-fields")):
-            if data[i]:
-                try:
-                    embed.add_field(name=field, value=str(data[i]), inline=False)
-                except IndexError:
-                    pass
+        lang = await self.bot._(ctx.channel, "_used_locale")
+        for name, data_value in data.items():
+            if not data_value:
+                continue
+            translation = await self.bot._(ctx.channel, "minecraft.mod-fields."+name)
+            if isinstance(data_value, int):
+                data_value = await FormatUtils.format_nbr(data_value, lang)
+            inline = name in {"authors", "release", "downloads", "id"} or name == "categories" and len(data_value) < 100
+            embed.add_field(name=translation, value=data_value, inline=inline)
         await self.send_embed(ctx, embed)
 
     @mc_main.command(name="skin")
