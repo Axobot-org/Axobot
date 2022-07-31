@@ -1,5 +1,6 @@
 import datetime
 import logging
+import sys
 import time
 from typing import Any, Callable, Coroutine, Literal, Optional, TYPE_CHECKING, overload
 
@@ -98,6 +99,13 @@ class Zbot(commands.bot.AutoShardedBot):
         self.emojis_manager = EmojisManager(self)
         # app commands
         self.tree.on_error = self.on_app_cmd_error
+    
+    async def on_error(self, event_method: str, *args, **kwargs):
+        "Called when an event raises an uncaught exception"
+        if event_method.startswith("on_") and event_method != "on_error":
+            _, error, _ = sys.exc_info()
+            await self.dispatch("error", error, f"While handling event `{event_method}`")
+        super().on_error(event_method, *args, **kwargs)
 
     async def on_app_cmd_error(self, interaction: discord.Interaction, error: discord.app_commands.AppCommandError):
         self.dispatch("interaction_error", interaction, error)
