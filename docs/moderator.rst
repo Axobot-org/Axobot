@@ -206,6 +206,9 @@ This option allows you to moderate the entry of your server, with several levels
 Anti-bot verification
 ---------------------
 
+.. warning:: This system is now deprecated in favor of the `Discord rules screening <https://support.discord.com/hc/fr/articles/1500000466882-Rules-Screening-FAQ>`__, and will be removed in a future release.
+
+
 **How does it work?**
 
 The verification system works with a simple command and a role, and filters most of the selfbots that attack your servers.
