@@ -399,12 +399,14 @@ class Tickets(commands.Cog):
             self.bot.log.error("[ticket] unknown category type: %s", type(category))
             return
         topic['topic'] = topic['topic'] or await self.bot._(interaction.guild_id, "tickets.other")
-        msg: str = await self.bot._(interaction.guild_id, "tickets.ticket-created", channel=channel.mention, topic=topic['topic'])
+        txt: str = await self.bot._(interaction.guild_id, "tickets.ticket-created", channel=channel.mention, topic=topic['topic'])
         if sent_error:
-            await interaction.followup.send(msg, ephemeral=True)
+            await interaction.followup.send(txt, ephemeral=True)
         else:
-            await interaction.edit_original_message(content=msg)
-        await channel.send(embed=await self.create_channel_first_message(interaction, topic, ticket_name))
+            await interaction.edit_original_message(content=txt)
+        msg = await channel.send(embed=await self.create_channel_first_message(interaction, topic, ticket_name))
+        if channel.permissions_for(channel.guild.me).manage_messages:
+            await msg.pin()
         self.bot.dispatch("ticket_creation", TicketCreationEvent(topic, ticket_name, interaction, channel))
 
 
