@@ -5,6 +5,7 @@ import aiohttp
 import mysql
 import psutil
 from discord.ext import commands, tasks
+from fcts.tickets import TicketCreationEvent
 from libs.classes import MyContext, Zbot
 
 try:
@@ -31,6 +32,7 @@ class BotStats(commands.Cog):
         self.latency_records: list[int] = []
         self.statuspage_header = {"Content-Type": "application/json", "Authorization": "OAuth " + self.bot.others["statuspage"]}
         self.antiscam = {"warning": 0, "deletion": 0}
+        self.ticket_events = {"creation": 0}
 
     async def cog_load(self):
          # pylint: disable=no-member
@@ -88,6 +90,10 @@ class BotStats(commands.Cog):
     @commands.Cog.listener()
     async def on_antiscam_delete(self):
         self.antiscam["deletion"] += 1
+    
+    @commands.Cog.listener()
+    async def on_ticket_creation(self, event: TicketCreationEvent):
+        self.ticket_events["creation"] += 1
 
     @commands.Cog.listener()
     async def on_socket_raw_receive(self, msg: str):
@@ -157,6 +163,10 @@ class BotStats(commands.Cog):
             # antiscam warn/deletions
             cursor.execute(query, (now, 'antiscam.warning', self.antiscam["warning"], 0, 'warning/min', True, self.bot.beta))
             cursor.execute(query, (now, 'antiscam.deletion', self.antiscam["deletion"], 0, 'deletion/min', True, self.bot.beta))
+            self.antiscam["warning"] = self.antiscam["deletion"] = 0
+            # tickets creation
+            cursor.execute(query, (now, 'tickets.creation', self.ticket_events["creation"], 0, 'new tickets/min', True, self.bot.beta))
+            self.ticket_events["creation"] = 0
             # Push everything
             cnx.commit()
         except mysql.connector.errors.IntegrityError as err: # duplicate primary key
