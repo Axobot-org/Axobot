@@ -3,7 +3,7 @@ from enum import Enum
 import logging
 import sys
 import time
-from typing import Any, Callable, Coroutine, Literal, Optional, TYPE_CHECKING, overload
+from typing import Any, Callable, Coroutine, Literal, Optional, TYPE_CHECKING, Union, overload
 
 import discord
 import requests
@@ -448,3 +448,10 @@ class ServerWarningType(Enum):
     RSS_MISSING_EMBED_PERMISSION = 3
     # channel_id, feed_id
     RSS_UNKNOWN_CHANNEL = 4
+
+class UsernameChangeRecord:
+    def __init__(self, before: Optional[str], after: Optional[str], user: Union[discord.Member, discord.User]):
+        self.user = user
+        self.before = before
+        self.after = after
+        self.is_guild = isinstance(user, discord.Member)

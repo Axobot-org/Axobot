@@ -13,7 +13,7 @@ import discord
 import mysql
 import psutil
 from discord.ext import commands, tasks
-from libs.classes import Zbot
+from libs.classes import UsernameChangeRecord, Zbot
 
 from fcts.checks import is_fun_enabled
 
@@ -107,7 +107,11 @@ class Events(commands.Cog):
         query_args = { 'u': before.id, 'o': before_nick, 'n': after_nick, 'g': guild, 'b': self.bot.beta }
         try:
             async with self.bot.db_query(query, query_args):
-                pass
+                self.bot.dispatch("username_change_record", UsernameChangeRecord(
+                    before_nick or None,
+                    after_nick or None,
+                    after
+                ))
         except mysql.connector.errors.IntegrityError as err:
             self.bot.log.warning(err)
             await self.updade_memberslogs_name(before, after, tries+1)
