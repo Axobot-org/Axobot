@@ -181,6 +181,7 @@ class Translations(commands.Cog):
                 # if the language is 100% translated, remove it
                 if not self._todo[lang]:
                     self._todo.pop(lang)
+        self.bot.dispatch("translation_added", lang)
 
     @tasks.loop(seconds=30)
     async def save_projects_loop(self):
