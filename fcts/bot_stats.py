@@ -34,6 +34,7 @@ class BotStats(commands.Cog):
         self.antiscam = {"warning": 0, "deletion": 0}
         self.ticket_events = {"creation": 0}
         self.usernames = {"guild": 0, "user": 0, "deleted": 0}
+        self.translations_added: dict[str, int] = {}
 
     async def cog_load(self):
          # pylint: disable=no-member
@@ -102,6 +103,13 @@ class BotStats(commands.Cog):
             self.usernames["guild"] += 1
         else:
             self.usernames["user"] += 1
+
+    @commands.Cog.listener()
+    async def on_translation_added(self, language: str):
+        if language in self.translations_added:
+            self.translations_added[language] += 1
+        else:
+            self.translations_added[language] = 1
 
     @commands.Cog.listener()
     async def on_socket_raw_receive(self, msg: str):
@@ -182,6 +190,10 @@ class BotStats(commands.Cog):
             self.usernames["user"] = 0
             cursor.execute(query, (now, 'usernames.deleted', self.usernames["deleted"], 0, 'usernames/min', True, self.bot.beta))
             self.usernames["deleted"] = 0
+            # translations added
+            for lang, count in self.translations_added.items():
+                cursor.execute(query, (now, 'translation.'+lang, count, 0, 'message/min', True, self.bot.beta))
+            self.translations_added.clear()
             # Push everything
             cnx.commit()
         except mysql.connector.errors.IntegrityError as err: # duplicate primary key
