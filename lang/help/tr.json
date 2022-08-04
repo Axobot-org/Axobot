@@ -18,32 +18,32 @@
                 "Bot eksik yetkilere sahip değil"
             ],
             "can_ban": [
-                "Rollerinizden birisi (`ban`) komutunu kullanmak için yetkilendirildi",
-                "eksik izinlendirilmiş rol (`ban`)"
+                "Rollerinizden birisi (`ban_allowed_roles`) komutunu kullanmak için yetkilendirildi",
+                "eksik izinlendirilmiş rol (`ban_allowed_roles`)"
             ],
             "can_clear": [
-                "Rollerinizden birisi (`clear`) komutunu kullanmak için yetkilendirildi",
-                "eksik izinlendirilmiş rol (`clear`)"
+                "Rollerinizden birisi (`clear_allowed_roles`) komutunu kullanmak için yetkilendirildi",
+                "eksik izinlendirilmiş rol (`clear_allowed_roles`)"
             ],
             "can_edit_case": [
-                "Rollerinizden birisi (`warn`) komutunu kullanmak için yetkilendirildi",
-                "eksik izinlendirilmiş rol (`warn`)"
+                "Rollerinizden birisi (`warn_allowed_roles`) komutunu kullanmak için yetkilendirildi",
+                "eksik izinlendirilmiş rol (`warn_allowed_roles`)"
             ],
             "can_kick": [
-                "Rollerinizden birisi (`kick`) komutunu kullanmak için yetkilendirildi",
-                "eksik izinlendirilmiş rol (`kick`)"
+                "Rollerinizden birisi (`kick_allowed_roles`) komutunu kullanmak için yetkilendirildi",
+                "eksik izinlendirilmiş rol (`kick_allowed_roles`)"
             ],
             "can_mute": [
-                "Rollerinizden birisi (`mute`) komutunu kullanmak için yetkilendirildi",
-                "eksik izinlendirilmiş rol (`mute`)"
+                "Rollerinizden birisi (`mute_allowed_roles`) komutunu kullanmak için yetkilendirildi",
+                "eksik izinlendirilmiş rol (`mute_allowed_roles`)"
             ],
             "can_say": [
-                "Rollerinizden birisi (`say`) komutunu kullanmak için yetkilendirildi",
-                "eksik izinlendirilmiş rol (`say`)"
+                "Rollerinizden birisi (`say_allowed_roles`) komutunu kullanmak için yetkilendirildi",
+                "eksik izinlendirilmiş rol (`say_allowed_roles`)"
             ],
             "can_slowmode": [
-                "Rollerinizden birisi (`slowmode`) komutunu kullanmak için yetkilendirildi",
-                "eksik izinlendirilmiş rol (`slowmode`)"
+                "Rollerinizden birisi (`slowmode_allowed_roles`) komutunu kullanmak için yetkilendirildi",
+                "eksik izinlendirilmiş rol (`slowmode_allowed_roles`)"
             ],
             "can_use_cookie": [
                 "Aragorn1202 tarafından seçilmiş birisin",
@@ -54,8 +54,8 @@
                 "'Administrator' yetkisi eksik"
             ],
             "can_warn": [
-                "Rollerinizden birisi (`warn`) komutunu kullanmak için yetkilendirildi",
-                "Eksik izinlendirilmiş rol  (`warn`)"
+                "Rollerinizden birisi (`warn_allowed_roles`) komutunu kullanmak için yetkilendirildi",
+                "Eksik izinlendirilmiş rol  (`warn_allowed_roles`)"
             ],
             "is_bot_admin": [
                 "Bot adminlerinden biri olmak gerek",

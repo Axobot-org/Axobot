@@ -194,7 +194,7 @@ Slowmode works up to one message every 6h (21600s)
                 return
             async def user_can_kick(user):
                 try:
-                    return await self.bot.get_cog("Servers").staff_finder(user,"kick")
+                    return await self.bot.get_cog("Servers").staff_finder(user, "kick_allowed_roles")
                 except commands.errors.CommandError:
                     pass
                 return False
@@ -250,7 +250,7 @@ Slowmode works up to one message every 6h (21600s)
         try:
             async def user_can_warn(user):
                 try:
-                    return await self.bot.get_cog("Servers").staff_finder(user,"warn")
+                    return await self.bot.get_cog("Servers").staff_finder(user, "warn_allowed_roles")
                 except commands.errors.CommandError:
                     pass
                 return False
@@ -368,7 +368,7 @@ You can also mute this member for a defined duration, then use the following for
         try:
             async def user_can_mute(user):
                 try:
-                    return await self.bot.get_cog("Servers").staff_finder(user,"mute")
+                    return await self.bot.get_cog("Servers").staff_finder(user, "mute_allowed_roles")
                 except commands.errors.CommandError:
                     pass
                 return False
@@ -563,7 +563,7 @@ The 'days_to_delete' option represents the number of days worth of messages to d
                 member = ctx.guild.get_member(user.id)
                 async def user_can_ban(user):
                     try:
-                        return await self.bot.get_cog("Servers").staff_finder(user,"ban")
+                        return await self.bot.get_cog("Servers").staff_finder(user, "ban_allowed_roles")
                     except commands.errors.CommandError:
                         pass
                     return False
@@ -696,7 +696,7 @@ Permissions for using this command are the same as for the kick
                 return
             async def user_can_kick(user):
                 try:
-                    return await self.bot.get_cog("Servers").staff_finder(user,"kick")
+                    return await self.bot.get_cog("Servers").staff_finder(user, "kick_allowed_roles")
                 except commands.errors.CommandError:
                     pass
                 return False

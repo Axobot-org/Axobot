@@ -41,7 +41,7 @@ async def can_say(ctx: MyContext):
     if not ctx.bot.database_online:
         return ctx.channel.permissions_for(ctx.author).administrator
     else:
-        return await ctx.bot.get_cog("Servers").staff_finder(ctx.author,"say")
+        return await ctx.bot.get_cog("Servers").staff_finder(ctx.author, "say_allowed_roles")
 
 async def can_use_cookie(ctx: MyContext) -> bool:
     "Check if a user can use the 'cookie' cmd"
@@ -222,7 +222,7 @@ You can specify a verification limit by adding a number in argument (up to 1.000
         await ctx.send(file=await self.utilities.find_img('nope.png'))
         if self.bot.database_online:
             try:
-                if await self.bot.get_cog("Servers").staff_finder(ctx.author,'say'):
+                if await self.bot.get_cog("Servers").staff_finder(ctx.author, "say_allowed_roles"):
                     await ctx.message.delete(delay=0)
             except commands.CommandError: # user can't use 'say'
                 pass
@@ -408,7 +408,7 @@ You can specify a verification limit by adding a number in argument (up to 1.000
         if text1 != []:
             await ctx.send(''.join(text1))
         try:
-            if ctx.bot.database_online and await self.bot.get_cog("Servers").staff_finder(ctx.author,'say'):
+            if ctx.bot.database_online and await self.bot.get_cog("Servers").staff_finder(ctx.author, "say_allowed_roles"):
                 await ctx.message.delete(delay=0)
         except commands.CommandError: # user can't use 'say'
             pass
@@ -513,7 +513,7 @@ You can specify a verification limit by adding a number in argument (up to 1.000
         text = await self.utilities.clear_msg(text,ctx=ctx)
         await ctx.send(text)
         try:
-            if self.bot.database_online and await self.bot.get_cog("Servers").staff_finder(ctx.author,"say"):
+            if self.bot.database_online and await self.bot.get_cog("Servers").staff_finder(ctx.author, "say_allowed_roles"):
                 await ctx.message.delete(delay=0)
         except commands.CommandError: # user can't use 'say'
             pass

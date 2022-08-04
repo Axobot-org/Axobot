@@ -22,32 +22,32 @@
                 "The bot does not have sufficient permissions"
             ],
             "can_ban": [
-                "One of your roles is authorized to use this command (`ban`)",
-                "Missing allowed role (`ban`)"
+                "One of your roles is authorized to use this command (`ban_allowed_roles`)",
+                "Missing allowed role (`ban_allowed_roles`)"
             ],
             "can_clear": [
-                "One of your roles is authorized to use this command (`clear`)",
-                "Missing allowed role (`clear`)"
+                "One of your roles is authorized to use this command (`clear_allowed_roles`)",
+                "Missing allowed role (`clear_allowed_roles`)"
             ],
             "can_edit_case": [
-                "One of your roles is authorized to use this command (`warn`)",
-                "Missing allowed role (`warn`)"
+                "One of your roles is authorized to use this command (`warn_allowed_roles`)",
+                "Missing allowed role (`warn_allowed_roles`)"
             ],
             "can_kick": [
-                "One of your roles is authorized to use this command (`kick`)",
-                "Missing allowed role (`kick`)"
+                "One of your roles is authorized to use this command (`kick_allowed_roles`)",
+                "Missing allowed role (`kick_allowed_roles`)"
             ],
             "can_mute": [
-                "One of your roles is authorized to use this command (`mute`)",
-                "Missing allowed role (`mute`)"
+                "One of your roles is authorized to use this command (`mute_allowed_roles`)",
+                "Missing allowed role (`mute_allowed_roles`)"
             ],
             "can_say": [
-                "One of your roles is authorized to use this command (`say`)",
-                "Missing allowed role (`say`)"
+                "One of your roles is authorized to use this command (`say_allowed_roles`)",
+                "Missing allowed role (`say_allowed_roles`)"
             ],
             "can_slowmode": [
-                "One of your roles is authorized to use this command (`slowmode`)",
-                "Missing allowed role (`slowmode`)"
+                "One of your roles is authorized to use this command (`slowmode_allowed_roles`)",
+                "Missing allowed role (`slowmode_allowed_roles`)"
             ],
             "can_use_cookie": [
                 "You are a chosen one from Aragorn1202",
@@ -58,8 +58,8 @@
                 "'Administrator' permission is missing"
             ],
             "can_warn": [
-                "One of your roles is authorized to use this command (`warn`)",
-                "Missing allowed role (`warn`)"
+                "One of your roles is authorized to use this command (`warn_allowed_roles`)",
+                "Missing allowed role (`warn_allowed_roles`)"
             ],
             "is_bot_admin": [
                 "You need to be one of the bot Admins",
