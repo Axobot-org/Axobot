@@ -18,32 +18,32 @@
                 "Houlà ! Il me manque des perms, là !"
             ],
             "can_ban": [
-                "Un de tes rôles peut utiliser cette commande (`ban`)",
-                "Tu n'as pas le rôle pour le faire ! (`ban`)"
+                "Un de tes rôles peut utiliser cette commande (`ban_allowed_roles`)",
+                "Tu n'as pas le rôle pour le faire ! (`ban_allowed_roles`)"
             ],
             "can_clear": [
-                "Un de tes rôles peut utiliser cette commande (`clear`)",
-                "Tu n'as pas le rôle pour le faire ! (`clear`)"
+                "Un de tes rôles peut utiliser cette commande (`clear_allowed_roles`)",
+                "Tu n'as pas le rôle pour le faire ! (`clear_allowed_roles`)"
             ],
             "can_edit_case": [
-                "Un de tes rôles peut utiliser cette commande (`warn`)",
-                "Tu n'as pas le rôle pour le faire ! (`warn`)"
+                "Un de tes rôles peut utiliser cette commande (`warn_allowed_roles`)",
+                "Tu n'as pas le rôle pour le faire ! (`warn_allowed_roles`)"
             ],
             "can_kick": [
-                "Un de tes rôles peut utiliser cette commande (`kick`)",
-                "Tu n'as pas le rôle pour le faire ! (`kick`)"
+                "Un de tes rôles peut utiliser cette commande (`kick_allowed_roles`)",
+                "Tu n'as pas le rôle pour le faire ! (`kick_allowed_roles`)"
             ],
             "can_mute": [
-                "Un de tes rôles peut utiliser cette commande (`mute`)",
-                "Tu n'as pas le rôle pour le faire ! (`mute`)"
+                "Un de tes rôles peut utiliser cette commande (`mute_allowed_roles`)",
+                "Tu n'as pas le rôle pour le faire ! (`mute_allowed_roles`)"
             ],
             "can_say": [
-                "Un de tes rôles peut utiliser cette commande (`say`)",
-                "Tu n'as pas le rôle pour le faire ! (`say`)"
+                "Un de tes rôles peut utiliser cette commande (`say_allowed_roles`)",
+                "Tu n'as pas le rôle pour le faire ! (`say_allowed_roles`)"
             ],
             "can_slowmode": [
-                "Un de tes rôles peut utiliser cette commande (`slowmode`)",
-                "Tu n'as pas le rôle pour le faire ! (`slowmode`)"
+                "Un de tes rôles peut utiliser cette commande (`slowmode_allowed_roles`)",
+                "Tu n'as pas le rôle pour le faire ! (`slowmode_allowed_roles`)"
             ],
             "can_use_RSS": [
                 "Tu es admin.",
@@ -58,8 +58,8 @@
                 "La perm \"Administrateur\" est manquante"
             ],
             "can_warn": [
-                "Un de tes rôles peut utiliser cette commande (`warn`)",
-                "Tu n'as pas le rôle pour le faire ! (`warn`)"
+                "Un de tes rôles peut utiliser cette commande (`warn_allowed_roles`)",
+                "Tu n'as pas le rôle pour le faire ! (`warn_allowed_roles`)"
             ],
             "is_bot_admin": [
                 "Il faut être administrateur du bot",

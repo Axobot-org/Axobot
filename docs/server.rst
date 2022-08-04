@@ -62,13 +62,13 @@ List of every option
 * prefix: Character string that will be the bot prefix, for all commands, beginning with the validation message. The prefix must be between 1 and 5 characters long. By default, :code:`!`.
 * language: Language of the bot. Currently only the languages :code:`fr` (French), :code:`en` (English), :code:`fi` (Finnish) and :code:`de` (German) are available (also you can use :code:`lolcat` or :code:`fr2` for more fun). The change takes place as soon as the order is validated by the system. Default :code:`fr`.
 * description: Description of the server, used for the `info server <infos.html#info>`__ command and potential partners. Default empty.
-* clear: List of roles allowed to use the `clear <moderator.html#clear>`__ command. By default, none.
-* slowmode: List of roles allowed to use the `slowmode <moderator.html#slowmode>`__ and `freeze <moderator.html#freeze>`__ commands. By default, none.
-* mute: List of roles allowed to use the `mute <moderator.html#mute-unmute>`__ command. By default, none.
-* kick: List of roles allowed to use the `kick <moderator.html#kick>`__ command. By default, none.
-* ban: List of roles allowed to use the `ban <moderator.html#ban>`__ command. By default, none.
-* warn: List of roles allowed to use the `warn <moderator.html#warn>`__ and `cases <moderator.html#handling-cases>`__ commands. By default, none.
-* say: List of roles allowed to use the `say` command. By default, none.
+* clear_allowed_roles: List of roles allowed to use the `clear <moderator.html#clear>`__ command. By default, none.
+* slowmode_allowed_roles: List of roles allowed to use the `slowmode <moderator.html#slowmode>`__ and `freeze <moderator.html#freeze>`__ commands. By default, none.
+* mute_allowed_roles: List of roles allowed to use the `mute <moderator.html#mute-unmute>`__ command. By default, none.
+* kick_allowed_roles: List of roles allowed to use the `kick <moderator.html#kick>`__ command. By default, none.
+* ban_allowed_roles: List of roles allowed to use the `ban <moderator.html#ban>`__ command. By default, none.
+* warn_allowed_roles: List of roles allowed to use the `warn <moderator.html#warn>`__ and `cases <moderator.html#handling-cases>`__ commands. By default, none.
+* say_allowed_roles: List of roles allowed to use the `say` command. By default, none.
 * welcome_channel: List of channels where messages when a member joins/leaves the server will be sent. By default, none.
 * welcome: Message sent when a member joins your server. Some variables are usable, enter the `welcome <infos.html#welcome>`__ command to see them.
 * leave: Message sent when a member leave your server. Some variables are usable, the same as for the welcome message.
