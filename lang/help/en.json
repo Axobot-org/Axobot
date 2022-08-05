@@ -54,8 +54,8 @@
                 "This command uses a whitelist"
             ],
             "can_use_rss": [
-                "You have 'Administrator' permission",
-                "'Administrator' permission is missing"
+                "You have 'Manage server' permission",
+                "'Manage server' permission is required"
             ],
             "can_warn": [
                 "One of your roles is authorized to use this command (`warn_allowed_roles`)",
@@ -75,7 +75,7 @@
             ],
             "has_admin": [
                 "You have 'Administrator' permission",
-                "'Administrator' permission missing"
+                "'Administrator' permission is required"
             ],
             "has_embed_links": [
                 "You have the 'Embed links' permission",

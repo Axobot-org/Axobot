@@ -54,8 +54,8 @@
                 "Cette commande est sur Whitelist uniquement... Et Aragorn ne t'a pas élu ! Au pire, tu peux le MP :wink: !"
             ],
             "can_use_rss": [
-                "T'as la permission \"Administrateur\"",
-                "La perm \"Administrateur\" est manquante"
+                "T'as la permission \"Gérer le serveur\"",
+                "La perm \"Gérer le serveur\" est manquante"
             ],
             "can_warn": [
                 "Un de tes rôles peut utiliser cette commande (`warn_allowed_roles`)",
