@@ -49,10 +49,6 @@
                 "Lei è un prescelto da Aragorn1202",
                 "Questo controllo è su Whitelist"
             ],
-            "can_use_rss": [
-                "Hai la permizione 'Amministratore'",
-                "Permizione 'Amministratore' mancante"
-            ],
             "can_warn": [
                 "Uno di tuoi ruoli può usare questo controllo (`warn_allowed_roles`)",
                 "Ruolo autorizzato mancante (`warn_allowed_roles`)"
@@ -68,26 +64,6 @@
             "has_admin": [
                 "Hai la permizione 'Amministratore'",
                 "Permizione 'Amministratore' mancante"
-            ],
-            "has_embed_links": [
-                "Hai la permizione \"Intégrer des liens\"",
-                "Devi avere la permizione \"Intégrer des liens\""
-            ],
-            "has_manage_guild": [
-                "Hai la permizione 'Gérer le serveur'",
-                "Permizione 'Gérer le serveur' mancante"
-            ],
-            "has_manage_msg": [
-                "Hai la permizione 'Gérer les messages'",
-                "Permizione 'Gérer les messages' mancante"
-            ],
-            "has_manage_nicknames": [
-                "Hai la permizione 'Gérer les pseudos'",
-                "Permizione 'Gérer les pseudos' mancante"
-            ],
-            "has_manage_roles": [
-                "Hai la permizione 'Gérer les rôles'",
-                "Permizione 'Gérer les rôles' mancante"
             ],
             "has_permissions": [
                 "Hai le permizioni Discord sufficienti",

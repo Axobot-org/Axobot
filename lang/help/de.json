@@ -50,8 +50,8 @@
                 "Dieser Befehl ist in der Whitelist"
             ],
             "can_use_rss": [
-                "Du hast 'Administrator' Berechtigungen",
-                "'Administrator' Berechtigung fehlt"
+                "Du hast 'Manage Server' Berechtigungen",
+                "'Manage Server' Berechtigung fehlt"
             ],
             "can_warn": [
                 "Eine deiner Rollen besitzt die Berechtigung für diesen Befehl (`warn_allowed_roles`)",

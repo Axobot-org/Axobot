@@ -49,10 +49,6 @@
                 "Aragorn1202 tarafından seçilmiş birisin",
                 "Bu komut beyaz listeyi kullanır"
             ],
-            "can_use_rss": [
-                "'Administrator' yetkisine sahipsin",
-                "'Administrator' yetkisi eksik"
-            ],
             "can_warn": [
                 "Rollerinizden birisi (`warn_allowed_roles`) komutunu kullanmak için yetkilendirildi",
                 "Eksik izinlendirilmiş rol  (`warn_allowed_roles`)"
@@ -68,30 +64,6 @@
             "guild_only": [
                 "Sadece bir sunucuda kullanılabilir",
                 "Sadece bir sunucuda kullanılabilir"
-            ],
-            "has_admin": [
-                "'Administrator' yetkisine sahipsin",
-                "'Administrator' yetkisi eksik"
-            ],
-            "has_embed_links": [
-                "'Embed links' yetkisine sahipsin",
-                "'Embed links' yetkisine sahip olman gerek"
-            ],
-            "has_manage_guild": [
-                "'Manage Server' yetkin var",
-                "'Manage Server' yetkisi eksik"
-            ],
-            "has_manage_msg": [
-                "'Manage Messages' yetkisine sahipsin",
-                "'Manage Messages' yetkisi eksik"
-            ],
-            "has_manage_nicknames": [
-                "'Manage Nicknames' yetkisine sahipsin",
-                "'Manage Nicknames' yetkisi eksik"
-            ],
-            "has_manage_roles": [
-                "'Manage Roles' yetkisine sahipsin",
-                "'Manage Roles' yetkisi eksik"
             ],
             "has_permissions": [
                 "Eksik Discord yetkilerine sahipsin",

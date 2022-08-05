@@ -50,8 +50,8 @@
                 "Este comando está en una lista blanca"
             ],
             "can_use_rss": [
-                "Tienes el permiso 'Administrador'",
-                "Falta el permiso 'Administrador'"
+                "Tienes el permiso 'Gestionar Servidor'",
+                "Falta el permiso 'Gestionar Servidor'"
             ],
             "can_warn": [
                 "Uno de sus roles está autorizado a usar este comando (`warn_allowed_roles`)",

@@ -54,8 +54,8 @@
                 "This command is on Whitelist. aka NO U LMAO"
             ],
             "can_use_rss": [
-                "U have 'Administrator' permission",
-                "'Administrator' permission is missed"
+                "U have 'Manage server' permission",
+                "'Manage server' permission is missed"
             ],
             "can_warn": [
                 "One of ur roles iz allowd 2 use this command (`warn_allowed_roles`)",
