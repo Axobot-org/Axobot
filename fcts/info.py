@@ -195,6 +195,11 @@ class Info(commands.Cog):
                 p = "∞"
             await m.edit(content=":ping_pong:  Pong !\nBot ping: {}ms\nDiscord ping: {}ms".format(round(t*1000),p))
         else:
+            if ip.startswith("http"):
+                ip = re.sub(r'https?://(www.)?', '', ip)
+            if not (re.match(r'^\d{3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$', ip) or re.match(r'^(\w+|\.)+$', ip)):
+                await ctx.send(await self.bot._(ctx.channel, "info.ping.notfound"))
+                return
             asyncio.run_coroutine_threadsafe(self.ping_address(ctx,ip),asyncio.get_event_loop())
 
     async def ping_address(self, ctx: MyContext, ip: str):
