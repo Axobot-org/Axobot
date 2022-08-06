@@ -5,6 +5,7 @@ import os
 import sys
 from logging.handlers import RotatingFileHandler
 from typing import TYPE_CHECKING
+from LRFutils import progress
 
 import discord
 import mysql
@@ -172,7 +173,7 @@ async def load_cogs(bot: "Zbot"):
                       'fcts.rss',
                       'fcts.s_backups',
                       'fcts.serverlogs',
-                      'fcts.servers',
+                      'fcts.servers',   
                       'fcts.tickets',
                       'fcts.timers',
                       'fcts.translations',
@@ -182,10 +183,12 @@ async def load_cogs(bot: "Zbot"):
                       'fcts.welcomer',
                       'fcts.xp'
     ]
+    progress_bar = progress.bar(max=len(initial_extensions), width=60, prefix="Loading extensions", eta=False, duration=False)
 
     # Here we load our extensions(cogs) listed above in [initial_extensions]
     count = 0
-    for extension in initial_extensions:
+    for i, extension in enumerate(initial_extensions):
+        progress_bar(i)
         try:
             await bot.load_extension(extension)
         except discord.DiscordException:
@@ -194,6 +197,7 @@ async def load_cogs(bot: "Zbot"):
         if count  > 0:
             bot.log.critical("%s modules not loaded\nEnd of program", count)
             sys.exit()
+    progress_bar(len(initial_extensions), stop=True)
 
 async def count_code_lines():
     """Count lines of Python code in the current folder
