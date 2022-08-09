@@ -21,4 +21,4 @@ nltk>=3.7
 autopep8
 flatten-json
 python-dateutil
-LRFutils @ git+https://github.com/LeiRoF/Utils.git
+LRFutils @ git+https://github.com/LeiRoF/LRFutils.git
