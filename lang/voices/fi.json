@@ -1,8 +1,9 @@
 {
-    "fi": {
+    "en": {
         "deleted": {
-            "many": "%{count} poistettuja kanavia"
+            "one": "",
+            "many": ""
         },
-        "no-channel": "Tällä palvelimella ei ole yhtään puhekanavaa tehtynä"
+        "no-channel": ""
     }
 }
