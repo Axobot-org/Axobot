@@ -1,9 +1,9 @@
 {
-    "fr": {
+    "en": {
         "deleted": {
-            "one": "1 salon supprimé",
-            "many": "%{count} salons supprimés"
+            "one": "",
+            "many": ""
         },
-        "no-channel": "Il n'y a aucun salon vocal généré dans ce serveur"
+        "no-channel": ""
     }
 }
