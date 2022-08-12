@@ -1377,6 +1377,13 @@ ID corresponds to the Identifier of the message
             return await ctx.send(txt)
         del txt
 
+        deprecation_embed = discord.Embed(
+            title=await self.bot._(ctx.guild.id, "moderation.deprecated-verify.title"),
+            description=await self.bot._(ctx.guild.id, "moderation.deprecated-verify.desc"),
+            color=discord.Color.red()
+        )
+        await ctx.send(embed=deprecation_embed)
+
         q,a = await self.find_verify_question(ctx)
         qu_msg = await ctx.send(ctx.author.mention+': '+q)
         await asyncio.sleep(random.random()*1.3)
