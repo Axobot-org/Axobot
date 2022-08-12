@@ -1,0 +1,73 @@
+{
+    "en": {
+        "change-txt": "",
+        "choose-delete": "",
+        "choose-mentions-1": "",
+        "choose-roles": "",
+        "delete-success": {
+            "one": "",
+            "many": ""
+        },
+        "deviant": "",
+        "deviant-default-flow": "",
+        "deviant-form-last": "",
+        "embed-json-changed": "",
+        "fail-add": "",
+        "flow-limit": "",
+        "guild-complete": "",
+        "guild-error": "",
+        "guild-loading": "",
+        "invalid-flow": "",
+        "invalid-link": "",
+        "list": "",
+        "list-result": "",
+        "list-title": "",
+        "list2": "",
+        "loop-processing": "",
+        "mc": "",
+        "move-success": {
+            "one": "",
+            "many": ""
+        },
+        "no-feed": "",
+        "no-feed2": "",
+        "no-roles": "",
+        "not-a-role": "",
+        "nothing": "",
+        "picker-placeholder": "",
+        "research-timeout": "",
+        "roles": {
+            "edit-success": {
+                "zero": "",
+                "one": "",
+                "many": ""
+            },
+            "list": "",
+            "cant-find": ""
+        },
+        "success-add": "",
+        "text-success": "",
+        "too-long": "",
+        "tw": "",
+        "tw-default-flow": "",
+        "tw-form-last": "",
+        "tw-help": "",
+        "twitch": "",
+        "twitch-default-flow": "",
+        "twitch-form-last": "",
+        "use_embed-same": "",
+        "use_embed-success": "",
+        "use_embed_false": "",
+        "use_embed_true": "",
+        "web": "",
+        "web-default-flow": "",
+        "web-form-last": "",
+        "web-help": "",
+        "web-invalid": "",
+        "yt": "",
+        "yt-default-flow": "",
+        "yt-form-last": "",
+        "yt-help": "",
+        "yt-invalid": ""
+    }
+}
