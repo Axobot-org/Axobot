@@ -1,5 +1,13 @@
 {
-    "de": {
-        "none-found": "Dieses Buch konnte nicht gefunden werden"
+    "en": {
+        "author": "",
+        "authors": "",
+        "language": "",
+        "none-found": "",
+        "publisher": "",
+        "rate-limited": "",
+        "title": "",
+        "unknown": "",
+        "year": ""
     }
 }
