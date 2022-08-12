@@ -1,27 +1,32 @@
 {
     "lolcat": {
+        "activity": {
+            "listen": "listenin",
+            "nothing": "nothin",
+            "play": "playin",
+            "stream": "streamin",
+            "watch": "watchin"
+        },
         "added_at": "Addd at",
-        "aucune": "none",
         "beginning": "beginning",
+        "bot": "robot",
         "btn": {
-            "confirm": {
-                "label": "CLICK HERE 2 FIRE",
-                "answer": "OK roger!"
-            },
             "cancel": {
-                "label": "nope forget that",
-                "answer": "'k that thing is no more"
+                "answer": "'k that thing is no more",
+                "label": "nope forget that"
+            },
+            "confirm": {
+                "answer": "OK roger!",
+                "label": "CLICK HERE 2 FIRE"
             },
             "delete": {
-                "label": "Trash that",
-                "answer": "its been trashed chief!"
+                "answer": "its been trashed chief!",
+                "label": "Trash that"
             }
         },
-        "bot": "robot",
         "case": "case",
         "category": "box",
         "click_here": "BLUE BUTTON TO CLICK",
-        "depuis": "sinze",
         "dnd": "donot disturb me",
         "doc": "Doc",
         "duration": "how long",
@@ -36,25 +41,19 @@
         "medium": "meadium",
         "member": "human",
         "membres": "memberz",
-        "nom": "nayme",
-        "non": "nop",
+        "name": "näme",
+        "no": "noooo",
         "none": "none",
         "offline": "oofline",
         "online": "on-line",
         "quit": "leave me alone!",
-        "yes": "yup",
         "reason": "why",
         "request_by": "Quest of %{user}",
         "server": "nice place",
         "servers": "guilds",
+        "since": "sinze",
         "unknown": "No known",
         "version": "vershun",
-        "activity": {
-            "listen": "listenin",
-            "nothing": "nothin",
-            "play": "playin",
-            "stream": "streamin",
-            "watch": "watchin"
-        }
+        "yes": "yup"
     }
 }

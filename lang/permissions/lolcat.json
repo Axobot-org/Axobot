@@ -1,7 +1,6 @@
 {
     "lolcat": {
         "general": "gLoBal pErmZ",
-        "title": "**'%{name}' permissung:**\n\n",
         "invalid_arg": "Uh no, %{arg} iz no valid sir",
         "list": {
             "add_reactions": "Add reactions",
@@ -47,6 +46,7 @@
             "view_audit_log": "View audit logs",
             "view_guild_insights": "View guild insights"
         },
+        "title": "**'%{name}' permissung:**\n\n",
         "whatisthat": "click HEEEERE if u wanna know"
     }
 }
