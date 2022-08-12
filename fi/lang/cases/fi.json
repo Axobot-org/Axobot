@@ -1,0 +1,25 @@
+{
+    "en": {
+        "cases-0": "",
+        "deleted": "",
+        "display": {
+            "date": "",
+            "duration": "",
+            "guild": "",
+            "moderator": "",
+            "reason": "",
+            "type": "",
+            "user": ""
+        },
+        "list-0": "",
+        "list-1": "",
+        "no-case": "",
+        "no-user": "",
+        "no_database": "",
+        "not-found": "",
+        "reason-edited": "",
+        "search-0": "",
+        "search-1": "",
+        "title-search": ""
+    }
+}
