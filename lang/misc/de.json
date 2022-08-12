@@ -1,37 +1,59 @@
 {
-    "de": {
-        "added_at": "Hinzugefügt am",
-        "beginning": "Anfang",
-        "bot": "Bot",
-        "category": "Kategorie",
-        "click_here": "Klick hier",
-        "since": "seit",
-        "dnd": "nicht stören",
-        "end": "Ende",
-        "extreme": "Extrem",
-        "ghost": "Geist",
-        "high": "hoch",
-        "idle": "Abwesend",
-        "low": "niedrig",
-        "medium": "mittel",
-        "member": "Mitglied",
-        "membres": "Mitglieder",
-        "name": "Name",
-        "no": "Nein",
-        "none": "keine",
-        "offline": "Offline",
-        "online": "Online",
-        "yes": "Ja",
-        "server": "Server",
-        "servers": "Server",
-        "unknown": "Unbekannt",
-        "version": "Version",
+    "en": {
+        "added_at": "",
+        "beginning": "",
+        "btn": {
+            "confirm": {
+                "label": "",
+                "answer": ""
+            },
+            "cancel": {
+                "label": "",
+                "answer": ""
+            },
+            "delete": {
+                "label": "",
+                "answer": ""
+            }
+        },
+        "bot": "",
+        "case": "",
+        "category": "",
+        "click_here": "",
+        "since": "",
+        "dnd": "",
+        "doc": "",
+        "duration": "",
+        "end": "",
+        "example": "",
+        "extreme": "",
+        "ghost": "",
+        "high": "",
+        "highest": "",
+        "idle": "",
+        "low": "",
+        "medium": "",
+        "member": "",
+        "membres": "",
+        "name": "",
+        "no": "",
+        "none": "",
+        "offline": "",
+        "online": "",
+        "quit": "",
+        "yes": "",
+        "reason": "",
+        "request_by": "",
+        "server": "",
+        "servers": "",
+        "unknown": "",
+        "version": "",
         "activity": {
-            "listen": "hört",
-            "nothing": "nichts",
-            "play": "spielt",
-            "stream": "streamt",
-            "watch": "guckt"
+            "listen": "",
+            "nothing": "",
+            "play": "",
+            "stream": "",
+            "watch": ""
         }
     }
 }
