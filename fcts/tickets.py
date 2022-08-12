@@ -708,6 +708,9 @@ If that still doesn't work, please create your ticket
         topics_repr: list[str] = []
         none_emoji: str = self.bot.emojis_manager.customs['nothing']
         topics = await self.db_get_topics(ctx.guild.id)
+        # make sure an "other" topic exists
+        if await self.db_get_guild_default_id(ctx.guild.id) is None:
+            await self.db_set_guild_default_id(ctx.guild.id)
         topics.append(await self.db_get_defaults(ctx.guild.id))
         for topic in topics:
             name = topic['topic'] or await self.bot._(ctx.guild.id, "tickets.other")
