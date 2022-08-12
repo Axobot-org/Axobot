@@ -21,6 +21,7 @@
         "invalidleaderboard": "Invalid leaderboard type",
         "invalidmsgid": "Invalid message ID",
         "invalidserverlog": "Invalid server log type",
+        "invalidsnowflake": "Invalid Discord ID",
         "invalidunicode": "Invalid Unicode emoji: %{u}",
         "invalidurl": "Invalid url: `%{u}`",
         "membernotfound": "Unable to find the member `%{m}` :confused:",
