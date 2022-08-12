@@ -24,6 +24,10 @@
             "too-few": "Je ne peux pas supprimer si peu de messages",
             "not-found": "Hum... impossible de supprimer ces messages. Discord me dit qu'ils n'existent pas :thinking:"
         },
+        "deprecated-verify": {
+            "title": "Fonctionnalité dépréciée",
+            "desc": "Le système de vérification de Zbot est maintenant obsolète et sera supprimé dans une prochaine mise à jour. Veuillez demander à un gérant du serveur d'activer le [système de vérification de Discord](https://support.discord.com/hc/fr/articles/1500000466882-Rules-Screening-FAQ) à la place."
+        },
         "destop": {
             "no-guild": "Ce message n'appartient pas à ce serveur",
             "too-old": "Je ne peux pas supprimer des messages vieux de plus de %{days} jours !"
