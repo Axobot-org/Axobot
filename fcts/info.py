@@ -798,7 +798,7 @@ Available types: member, role, user, emoji, channel, server, invite, category
         await ctx.send(embed=embed)
 
     @info_main.command(name="id", aliases=["snowflake"])
-    async def snowflake_infos(self, ctx: MyContext, snowflake: args.snowflake):
+    async def snowflake_infos(self, ctx: MyContext, snowflake: args.Snowflake):
         date = f"<t:{snowflake.date.timestamp():.0f}>"
         embed = discord.Embed(color=default_color, timestamp=ctx.message.created_at)
         embed.add_field(name=await self.bot._(ctx.channel,"info.info.snowflake-0"), value=date)

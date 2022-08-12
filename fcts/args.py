@@ -188,21 +188,21 @@ class Color(commands.Converter):
             return None
 
 
-class snowflake(commands.Converter):
+class Snowflake:
     "Convert arguments to a discord Snowflake"
-    class Snowflake:
-        def __init__(self, ID: int):
-            self.id = ID
-            self.binary = bin(ID)
-            self.date = discord.utils.snowflake_time(ID)
-            self.increment = int(self.binary[-12:])
-            self.process_id = int(self.binary[-17:-12])
-            self.worker_id = int(self.binary[-22:-17])
+    def __init__(self, ID: int):
+        self.id = ID
+        self.binary = bin(ID)
+        self.date = discord.utils.snowflake_time(ID)
+        self.increment = int(self.binary[-12:])
+        self.process_id = int(self.binary[-17:-12])
+        self.worker_id = int(self.binary[-22:-17])
 
-    async def convert(self, ctx: MyContext, argument: str) -> int:
-        if len(argument) < 17 or len(argument) > 19 or not argument.isnumeric():
-            return None
-        return self.Snowflake(int(argument))
+    @classmethod
+    async def convert(cls, ctx: MyContext, argument: str) -> int:
+        if len(argument) < 17 or len(argument) > 20 or not argument.isnumeric():
+            raise commands.BadArgument("Invalid snowflake")
+        return cls(int(argument))
 
 
 class serverlog(commands.Converter):
