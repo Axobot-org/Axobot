@@ -1,14 +1,15 @@
 {
-    "tr": {
-        "nothing-desc": "Şu anlık hiç bir etkinlik yok. Bir sonrakinin tarihini öğrenmek için bot haberlerini takip edin!",
-        "events-price-title": "Kazanılacak ödülller",
-        "nothing-prices": "Bu etkinlik için kazanılacak hiçbir şey yok 😕",
-        "objectives": "Hedefler",
-        "points": "puan",
-        "rank-global": "Global sıralama",
-        "rank-title": "Event puanı",
-        "rank-total": "Toplam puan",
-        "unclassed": "Kategorilendirilmemiş",
-        "xp-howto": "Tic-tac-toe oyunları kazanarak, mevcut olduğunda etkinlik komutlarını kullanarak veya diğer çeşitli gizli görevleri gerçekleştirerek etkinlik puanları kazanabilirsiniz. Bilgi istemek için destek sunucusuna gelmekten çekinmeyin!"
+    "en": {
+        "nothing-desc": "",
+        "events-price-title": "",
+        "nothing-prices": "",
+        "objectives": "",
+        "points": "",
+        "rank-global": "",
+        "rank-title": "",
+        "rank-total": "",
+        "soon": "",
+        "unclassed": "",
+        "xp-howto": ""
     }
 }
