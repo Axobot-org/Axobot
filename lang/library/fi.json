@@ -1,13 +1,13 @@
 {
-    "fi": {
-        "author": "kirjailija",
-        "authors": "kirjailijat",
-        "language": "kieli",
-        "none-found": "Mahdotonta löytää tämä kirja",
-        "publisher": "julkaisija",
-        "rate-limited": "En voi etsiä nimellä tällä herkellä. Yritä uudelleen myöhemmin",
-        "title": "nimi",
-        "unknown": "ei tietoa",
-        "year": "julkaisu vuosi"
+    "en": {
+        "author": "",
+        "authors": "",
+        "language": "",
+        "none-found": "",
+        "publisher": "",
+        "rate-limited": "",
+        "title": "",
+        "unknown": "",
+        "year": ""
     }
 }
