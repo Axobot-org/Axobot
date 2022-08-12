@@ -154,30 +154,31 @@ Arguments are:
             roles.append({'id':x.id,'name':x.name,'color':x.colour.value,'position':x.position,'hoist':x.hoist,'mentionable':x.mentionable,'permissions':x.permissions.value})
         back['roles'] = roles
         categ = list()
-        for x in g.by_category():
-            c,l = x[0],x[1]
-            if c is None:
+        for category, channels in g.by_category():
+            if category is None:
                 temp = {'id': None}
             else:
-                temp = {'id': c.id,
-                    'name': c.name,
-                    'position': c.position,
-                    'is_nsfw': c.is_nsfw() }
+                temp = {
+                    'id': category.id,
+                    'name': category.name,
+                    'position': category.position,
+                    'is_nsfw': category.is_nsfw()
+                }
                 perms = list()
-                for iter_obj, iter_perm in c.overwrites.items():
+                for iter_obj, iter_perm in category.overwrites.items():
                     temp2 = {'id':iter_obj.id}
                     if isinstance(iter_obj,discord.Member):
                         temp2['type'] = 'member'
                     else:
                         temp2['type'] = 'role'
                     temp2['permissions'] = {}
-                    for x in iter(iter_perm):
-                        if x[1] is not None:
-                            temp2['permissions'][x[0]] = x[1]
+                    for i, value in iter(iter_perm):
+                        if value is not None:
+                            temp2['permissions'][i] = value
                     perms.append(temp2)
                 temp['permissions_overwrites'] = perms
             temp['channels'] = list()
-            for chan in l:
+            for chan in channels:
                 temp['channels'].append(await get_channel_json(chan))
             categ.append(temp)
         back['categories'] = categ
@@ -323,7 +324,6 @@ Arguments are:
             if not ctx.guild.me.guild_permissions.manage_channels:
                 logs.append("  "+symb[0]+" Unable to create or update categories: missing permissions")
                 problems[0] += 1
-                channels_list = {x.id: x for x in ctx.guild.channels}
             else:
                 for categ in data["categories"]:
                     action = "edit"
@@ -470,7 +470,7 @@ Arguments are:
                     continue
                 try:
                     await item.set_permissions(target,overwrite=new_perms)
-                except:
+                except discord.Forbidden:
                     pass
 
         async def load_perms(self, ctx:MyContext, problems:list, logs:list, symb:list, data:dict, args:tuple, roles_list:dict, channels_list:dict):
@@ -566,7 +566,9 @@ Arguments are:
                             continue
                         try:
                             icon = await self.urlToByte(emojidata["url"])
-                        except:
+                        except aiohttp.ClientError:
+                            icon = None
+                        if icon is None:
                             logs.append("  "+symb[0]+" Unable to create emoji {}: the image has probably been deleted from Discord cache".format(emojiname))
                             continue
                         roles = list()
@@ -619,7 +621,7 @@ Arguments are:
                             continue
                         try:
                             icon = await self.urlToByte(webhook["avatar"])
-                        except:
+                        except aiohttp.ClientError:
                             logs.append("  "+symb[0]+" Unable to get avatar of wbehook {}: the image has probably been deleted from Discord cache".format(webhookname))
                             icon = None
                         try:
@@ -728,7 +730,7 @@ Arguments are:
             # icon
             try:
                 icon = None if data['icon'] is None else await self.urlToByte(data['icon'])
-            except:
+            except aiohttp.ClientError:
                 icon = None
             if icon is not None or data['icon'] is None:
                 try:
