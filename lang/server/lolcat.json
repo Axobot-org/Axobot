@@ -1,66 +1,65 @@
 {
     "lolcat": {
+        "config-help": "Dis cmd is mainly usd 2 configur ur srver. By doin `%{p}config see [option]` u will get overview ov teh currnt configuraishun, and supr cool servr masters can enter `%{p}config change <option> val1 , val2, val4...` to modify configuraishun, or `%{p}config del <option>` 2 reset teh option (`%{p}config change <option>` works same).\nTeh list ov options is displayd at <https://zbot.rtfd.io/en/latest/server.html#list-of-every-option>",
+        "config-list": "List ov options cool taht u can use: %{text}More info @ %{link}",
         "deleted-channel": "?channel?",
         "deleted-role": "?role?",
         "edit-error": {
-            "xp": "Tihs xp system don't exist. Here is teh list ov availble systems: %{list}",
-            "color": "This coulor is sadly invalid",
-            "category": "Dat %{name} category couldnt not be found",
-            "tttdisplay": "Uh no, dat mod doesnt exist. Pls try one of the followin: %{list}",
-            "role": "Teh role '%{role}' waz not findz :innocent: (Check upper caze and special characters)",
-            "boolean": "Teh '%{name}' opshun expects a boolean (True/False) parameter in value :innocent:",
-            "channel": "Teh channel '%{channel}' waz not found :confused: (Enter the exact mention, name 'r identifier of teh channel(s)",
-            "numeric": "Teh '%{name}' :o:ption expects a numbr in parameter :innocent:",
-            "lang": "Dis language is not available. Here is the list of currently supported languages: %{list}",
             "anti_raid": "Ups, dis lvl doz nope exist. Heer iz da list ov currrently availaible levelz: %{list}",
+            "boolean": "Teh '%{name}' opshun expects a boolean (True/False) parameter in value :innocent:",
+            "category": "Dat %{name} category couldnt not be found",
+            "channel": "Teh channel '%{channel}' waz not found :confused: (Enter the exact mention, name 'r identifier of teh channel(s)",
+            "color": "This coulor is sadly invalid",
             "emoji": "Ups, da emoji %{emoji} wasnt findz",
+            "lang": "Dis language is not available. Here is the list of currently supported languages: %{list}",
+            "numeric": "Teh '%{name}' :o:ption expects a numbr in parameter :innocent:",
             "prefix": {
-                "long": "Dis prèfix:x: iz too long 2 be used!",
-                "invalid": "Oooops, it seemz dis prefix is no valid :thinking: If teh problem persists, plz choose a' other one"
+                "invalid": "Oooops, it seemz dis prefix is no valid :thinking: If teh problem persists, plz choose a' other one",
+                "long": "Dis prèfix:x: iz too long 2 be used!"
             },
+            "role": "Teh role '%{role}' waz not findz :innocent: (Check upper caze and special characters)",
+            "tttdisplay": "Uh no, dat mod doesnt exist. Pls try one of the followin: %{list}",
+            "xp": "Tihs xp system don't exist. Here is teh list ov availble systems: %{list}",
             "xp_rate": "The xp rate must :B: between %{min} & %{max}"
         },
-        "option-notfound": "Dis option doz not exist :confused:",
-        "internal-error": "Oops, an internal error occurrd...\nBut doan worry, we'r on teh place: https://memegenerator.net/img/instances/61333990.jpg",
-        "value-deleted": "The '%{option}' opshun value haz been deleted",
         "edit-success": {
             "boolean": "The '%{opt}' opzion haz been modified 2 the value *%{val}*",
             "category": "ur '%{opt}' option haz been changd with teh %{val} category",
+            "channel": "The '%{opt}' opshun has been modifid wif teh channelz %{val}",
             "color": "The coulor uzd for the option %{opt} is naw %{val}",
-            "emojis": "Teh emojiz 4 the opshun '%{opt}' are naw %{val}",
+            "emoji": "Mkay, the emojis 4 the option %{opt} is naw %{val}",
             "lang": "Teh bot lang is naw in %{val}",
             "levelup_channel": {
-                "chan": "lvlup messages will naw B sent 2 %{val}",
                 "any": "Levelup msgs will naw be post directly in teh chat",
+                "chan": "lvlup messages will naw B sent 2 %{val}",
                 "none": "Levelup msg won't :b: send anymore :sad:"
             },
             "prefix": ":cat: The prefiX has been nicely replaced by `%{val}`",
             "raid": "Teh anti-rayd security lvl iz naw set 2 **%{name}** (%{index})",
             "role": "The '%{opt}' option haz been edted with teh following rolz: %{val}",
             "text": "Teh opshun '%{opt}' haz been replacd by the followin txt: \n```\n%{val}\n```",
-            "channel": "The '%{opt}' opshun has been modifid wif teh channelz %{val}",
             "tttdisplay": "Hey great, !ttt will naw use %{val} mod<",
             "xp": "Da xp system uzed is naw %{val}",
             "xp_rate": "The xP rate iz now @ %{val}"
         },
-        "config-help": "Dis cmd is mainly usd 2 configur ur srver. By doin `%{p}config see [option]` u will get overview ov teh currnt configuraishun, and supr cool servr masters can enter `%{p}config change <option> val1 , val2, val4...` to modify configuraishun, or `%{p}config del <option>` 2 reset teh option (`%{p}config change <option>` works same).\nTeh list ov options is displayd at <https://zbot.rtfd.io/en/latest/server.html#list-of-every-option>",
-        "config-list": "List ov options cool taht u can use: %{text}More info @ %{link}",
+        "internal-error": "Oops, an internal error occurrd...\nBut doan worry, we'r on teh place: https://memegenerator.net/img/instances/61333990.jpg",
         "need-manage-server": "U need to be a Cool Boss (server manager) to get this cmd",
         "not-found": "Teh server %{guild} haznt been registered yet in da data board",
         "opt_title": "Opzion '%{opt}' of srver %{guild}",
+        "option-notfound": "Dis option doz not exist :confused:",
         "see-0": "Enter `!config help` 4 more details",
         "see-title": "%{guild} server configurashiun",
         "server_desc": {
             "anti_caps_lock": "Shuld the baot sent a mssge when a mmBEr sents TOO MANY C:a:PITAL LETERZ ??!!??! %{value}",
-            "anti_scam": "Internet is dangerouz. Make sur 2 check where ur clickin. am I not right? %{value}",
             "anti_raid": "Lev3l of anti-rayderz protect: %{value} \n*([Dowcumetaton](https://zbot.rtfd.io/en/latest/moderator.html#anti-raid))*",
+            "anti_scam": "Internet is dangerouz. Make sur 2 check where ur clickin. am I not right? %{value}",
             "autoremove_xp": "XP points taken /day to sleeping people: %{value}",
             "ban_allowed_roles": "List for r:o2:les that cawn use this command 'ban': %{value}",
             "bot_news": "Liist for channnnels were 2 sendz bot nweZ: %{value}",
             "clear_allowed_roles": "Lizt of rawles dat can us teh 'clear' commend: %{value}",
+            "compress_help": "Shuld teh help cmd be smoller? %{value}",
             "description": "Server description:\n %{value}",
             "enable_fun": "R teh c0mmands lysteb in te `!fun` comand enubld? %{value}",
-            "compress_help": "Shuld teh help cmd be smoller? %{value}",
             "enable_xp": "Shald teh xperiense systèm be enabld? %{value}",
             "help_in_dm": "Sent help mess:a:ge on Prvte Msage? %{value}",
             "hunter": "Lyst for al cat roums in wich teh gamz *Hunter* are actved: %{value}",
@@ -98,6 +97,7 @@
             "welcome_roles": "Lizt from rles otomaticall giveD 2 knew mmbr: %{value}",
             "xp_rate": "XP earnings modifier: %{value}",
             "xp_type": "XP system used: %{value}"
-        }
+        },
+        "value-deleted": "The '%{option}' opshun value haz been deleted"
     }
 }
