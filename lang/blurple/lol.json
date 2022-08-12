@@ -1,0 +1,15 @@
+{
+    "en": {
+        "blurplefy": {
+            "starting": "",
+            "success": ""
+        },
+        "check_intro": "",
+        "collect": {
+            "title": "",
+            "too-quick": ""
+        },
+        "missing-attachment-perm": "",
+        "unknown-err": ""
+    }
+}
