@@ -1,0 +1,33 @@
+{
+    "en": {
+        "added-partner": "",
+        "already-added": "",
+        "bot-uptime": "",
+        "changed-desc": "",
+        "changed-invite": "",
+        "confirm-bot": "",
+        "confirm-server": "",
+        "del-canceled": "",
+        "deleted": "",
+        "invalid-bot": "",
+        "invalid-invite": "",
+        "invalid-partner": "",
+        "missing-manage-guild": "",
+        "missing-reactions": "",
+        "no-channel": "",
+        "no-partner": "",
+        "no-partner-2": "",
+        "partners-list": [
+            "",
+            "",
+            ""
+        ],
+        "reloaded": {
+            "zero": "",
+            "one": "",
+            "many": ""
+        },
+        "unknown-error": "",
+        "unknown-server": ""
+    }
+}
