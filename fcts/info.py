@@ -177,7 +177,7 @@ class Info(commands.Cog):
 
     @commands.command(name="ping",aliases=['rep'])
     @commands.cooldown(5, 45, commands.BucketType.guild)
-    async def rep(self, ctx: MyContext, ip=None):
+    async def rep(self, ctx: MyContext, ip: typing.Optional[str]=None):
         """Get bot latency
         You can also use this command to ping any other server
 
@@ -197,7 +197,7 @@ class Info(commands.Cog):
         else:
             if ip.startswith("http"):
                 ip = re.sub(r'https?://(www.)?', '', ip)
-            if not (re.match(r'^\d{3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$', ip) or re.match(r'^(\w+|\.)+$', ip)):
+            if not (re.match(r'^\d{3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$', ip) or re.match(r'^\w[\w\.]*\w$', ip)):
                 await ctx.send(await self.bot._(ctx.channel, "info.ping.notfound"))
                 return
             asyncio.run_coroutine_threadsafe(self.ping_address(ctx,ip),asyncio.get_event_loop())
