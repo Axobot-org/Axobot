@@ -18,44 +18,40 @@
                 "Botilla ei ole riittävästi käyttöoikeuksia"
             ],
             "can_ban": [
-                "Yksi sinun rooleista voi käyttää komentoa (`ban`)",
-                "Sallittu rooli puuttuu (`ban`)"
+                "Yksi sinun rooleista voi käyttää komentoa (`ban_allowed_roles`)",
+                "Sallittu rooli puuttuu (`ban_allowed_roles`)"
             ],
             "can_clear": [
-                "Yksi sinun rooleista voi käyttää komentoa (`clear`)",
-                "Sallittu rooli puuttuu (`clear`)"
+                "Yksi sinun rooleista voi käyttää komentoa (`clear_allowed_roles`)",
+                "Sallittu rooli puuttuu (`clear_allowed_roles`)"
             ],
             "can_edit_case": [
-                "Yksi sinun rooleista voi käyttää komentoa (`warn`)",
-                "Sallittu rooli puuttuu (`warn`)"
+                "Yksi sinun rooleista voi käyttää komentoa (`warn_allowed_roles`)",
+                "Sallittu rooli puuttuu (`warn_allowed_roles`)"
             ],
             "can_kick": [
-                "Yksi sinun rooleista voi käyttää komentoa (`kick`)",
-                "Sallittu rooli puuttuu (`kick`)"
+                "Yksi sinun rooleista voi käyttää komentoa (`kick_allowed_roles`)",
+                "Sallittu rooli puuttuu (`kick_allowed_roles`)"
             ],
             "can_mute": [
-                "Yksi sinun rooleista voi käyttää komentoa (`mute`)",
-                "Sallittu rooli puuttuu (`mute`)"
-            ],
-            "can_say": [
-                "Sallittu rooli puuttuu (`say`)",
-                "Sallittu rooli puuttuu (`say`)"
+                "Yksi sinun rooleista voi käyttää komentoa (`mute_allowed_roles`)",
+                "Sallittu rooli puuttuu (`mute_allowed_roles`)"
             ],
             "can_slowmode": [
-                "Yksi sinun rooleista voi käyttää komentoa (`slowmode`)",
-                "Sallittu rooli puuttuu (`slowmode`)"
+                "Yksi sinun rooleista voi käyttää komentoa (`slowmode`_allowed_roles)",
+                "Sallittu rooli puuttuu (`slowmode_allowed_roles`)"
             ],
             "can_use_cookie": [
                 "Olet yksi valituista jotka Aragorn1202 on valinnut.",
                 "Tämä komento on käytössä"
             ],
             "can_use_rss": [
-                "Sinulla on 'Järjestelmänvalvoja' käyttöoikeus",
-                "'Järjestelmänvalvoja' käyttöoikeus puuttuu"
+                "Sinulla on 'Hallinnoi palvelinta' käyttöoikeus",
+                "'Hallinnoi palvelinta' käyttöoikeus puuttuu"
             ],
             "can_warn": [
-                "Yksi sinun rooleista voi käyttää komentoa (`warn`)",
-                "Sallittu rooli puuttuu (`warn`)"
+                "Yksi sinun rooleista voi käyttää komentoa (`warn_allowed_roles`)",
+                "Sallittu rooli puuttuu (`warn_allowed_roles`)"
             ],
             "is_bot_admin": [
                 "Sinun täytyy olla botin ylläpitäjä",

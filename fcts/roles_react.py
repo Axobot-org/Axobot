@@ -1,4 +1,4 @@
-from typing import Tuple
+from typing import Any, Tuple, Union
 import discord
 import importlib
 import typing
@@ -96,7 +96,7 @@ class RolesReact(commands.Cog):
             query = "SELECT * FROM `{}` WHERE guild={} ORDER BY added_at;".format(self.table, guild)
         else:
             query = "SELECT * FROM `{}` WHERE guild={} AND emoji='{}' ORDER BY added_at;".format(self.table, guild, emoji)
-        liste = list()
+        liste: list[dict[str, Any]] = []
         async with self.bot.db_query(query) as query_results:
             for row in query_results:
                 if emoji is None or row['emoji'] == str(emoji):
@@ -122,7 +122,7 @@ class RolesReact(commands.Cog):
     @rr_main.command(name="add")
     @commands.check(checks.has_manage_guild)
     @commands.check(checks.database_connected)
-    async def rr_add(self, ctx, emoji: args.anyEmoji, role: discord.Role, *, description: str = ''):
+    async def rr_add(self, ctx, emoji: args.AnyEmoji, role: discord.Role, *, description: str = ''):
         """Add a role reaction
         This role will be given when a membre click on a specific reaction
         Your description can only be a maximum of 150 characters
@@ -182,9 +182,9 @@ class RolesReact(commands.Cog):
                 except KeyError:
                     pass
 
-    async def create_list_embed(self, liste: list, guild: discord.Guild) -> Tuple[str, list]:
+    async def create_list_embed(self, liste: list[dict], guild: discord.Guild):
         """Create a text with the roles list"""
-        emojis = list()
+        emojis: list[Union[str, discord.Emoji]] = []
         for k in liste:
             if len(k['emoji']) > 15 and k['emoji'].isnumeric():
                 try:
@@ -196,9 +196,12 @@ class RolesReact(commands.Cog):
                     k['emoji'] = str(temp)
             else:
                 emojis.append(k['emoji'])
-        l = ["{}   <@&{}> - *{}*".format(x['emoji'], x['role'], x['description']) if len(
-            x['description']) > 0 else "{}   <@&{}>".format(x['emoji'], x['role']) for x in liste]
-        return '\n'.join(l), emojis
+        result = [
+            f"{x['emoji']}   <@&{x['role']}> - *{x['description']}*" if len(
+                x['description']) > 0 else f"{x['emoji']}   <@&{x['role']}>"
+            for x in liste
+        ]
+        return '\n'.join(result), emojis
 
     @rr_main.command(name="list")
     @commands.check(checks.database_connected)
@@ -304,7 +307,7 @@ Opposite is the subcommand 'join'
 
     @rr_main.command(name='update')
     @commands.check(checks.database_connected)
-    async def rr_update(self, ctx: MyContext, embed: discord.Message, change_description: typing.Optional[bool] = True, emojis: commands.Greedy[args.anyEmoji] = None):
+    async def rr_update(self, ctx: MyContext, embed: discord.Message, change_description: typing.Optional[bool] = True, emojis: commands.Greedy[args.AnyEmoji] = None):
         """Update a Zbot message to refresh roles/reactions
         If you don't want to update the embed content, for example if it's a custom embed, then you can use 'False' as a second argument. Zbot will only check the reactions
         Specifying a list of emojis will update the embed only for those emojis, and ignore other roles reactions
@@ -322,16 +325,16 @@ Opposite is the subcommand 'join'
             return await ctx.send(await self.bot._(ctx.guild, 'fun', "cant-react"))
         emb = embed.embeds[0]
         try:
-            l = await self.rr_list_role(ctx.guild.id)
+            full_list: dict[str, dict[str, Any]] = {x['emoji']: x for x in await self.rr_list_role(ctx.guild.id)}
         except Exception as err:
             return await self.bot.get_cog('Errors').on_command_error(ctx, err)
         if emojis is not None:
-            emojis = [str(x.id) if isinstance(x, discord.Emoji)
+            emojis_ids: list[str] = [str(x.id) if isinstance(x, discord.Emoji)
                       else str(x) for x in emojis]
-            l = [x for x in l if x['emoji'] in emojis]
-        desc, emojis = await self.create_list_embed(l, ctx.guild)
+            full_list = [full_list[x] for x in emojis_ids if x in full_list]
+        desc, proper_emojis = await self.create_list_embed(full_list, ctx.guild)
         reacts = [x.emoji for x in embed.reactions]
-        for emoji in emojis:
+        for emoji in proper_emojis:
             if emoji not in reacts:
                 await embed.add_reaction(emoji)
         if emb.description != desc and change_description:

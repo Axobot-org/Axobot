@@ -1,10 +1,11 @@
 import string
+from typing import TYPE_CHECKING, Optional
 
-import requests
 import discord
-from typing import Optional
-from discord.ext import commands
-from libs.classes import Zbot
+import requests
+
+if TYPE_CHECKING:
+    from libs.classes import Zbot
 
 # https://github.com/ttacon/emoji/blob/master/emoji.go
 
@@ -930,18 +931,17 @@ characteres = {':': 582223307944886292,
                ' ': 446782476375949323}
 
 
-class Emojis(commands.Cog):
-    """Cog for managing emojis. No more, no less."""
+class EmojisManager:
+    """Class for managing emojis. No more, no less."""
 
-    def __init__(self, bot: Zbot):
+    def __init__(self, bot: "Zbot"):
         self.bot = bot
         self.emoji_map = emojiMap
-        self.file = "emojis"
         self.numbers = numbers
         self.alphabet = alphabet
         self.chars = characteres
 
-        self.numbers = [f"{str(i).ljust(2, '_')}:{emoji}" for i, emoji in enumerate(numbers)]
+        self.numbers_names = [f"{str(i).ljust(2, '_')}:{emoji}" for i, emoji in enumerate(numbers)]
 
         self.customs = {'nothing': '<:_nothing:446782476375949323>',
                         'blob_dance': '<a:blob_dance:483377042725797908>',
@@ -966,11 +966,11 @@ class Emojis(commands.Cog):
 
         try:
             resp = requests.get(
-                "http://www.unicode.org/Public/emoji/14.0/emoji-test.txt")
-            self.unicode_list = list()
+                "http://www.unicode.org/Public/emoji/15.0/emoji-test.txt")
+            self.unicode_set: set[str] = set()
             for line in resp.text:
-                if line not in string.printable and line not in self.unicode_list:
-                    self.unicode_list.append(line)
+                if line not in string.printable:
+                    self.unicode_set.add(line)
         except requests.exceptions.ConnectionError:
             pass
 
@@ -991,6 +991,3 @@ class Emojis(commands.Cog):
             "minecraft": 958305433439834152
         }
         return self.bot.get_emoji(ids[name])
-
-async def setup(bot):
-    await bot.add_cog(Emojis(bot))

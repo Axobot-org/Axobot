@@ -2,6 +2,7 @@
     "fr": {
         "general": "Permissions générales",
         "title": "**Permission de '%{name}' :**\n\n",
+        "invalid_arg": "Argument invalide : %{arg}",
         "list": {
             "add_reactions": "Ajouter des réactions",
             "administrator": "Administrateur",
@@ -39,6 +40,7 @@
             "send_tts_messages": "Envoyer des messages TTS",
             "speak": "Parler",
             "stream": "Passer en direct",
+            "use_application_commands": "Utiliser les commandes d'app",
             "use_embedded_activities": "Lancer des activités dans les salons vocaux",
             "use_slash_commands": "Utiliser les commandes slash",
             "use_voice_activation": "Utiliser la Détection de la voix",

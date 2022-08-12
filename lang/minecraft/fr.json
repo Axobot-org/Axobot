@@ -53,16 +53,16 @@
             "Version d'ajout"
         ],
         "item-help": "Cette commande permet d'obtenir des informations sur n'importe quel item de Minecraft. Vous pouvez donner son nom complet ou partiel, en français ou en anglais, ou même son identifiant. Il suffit d'entrer `%{p}mc item <nom>`",
-        "mod-fields": [
-            "Nom",
-            "Auteurs",
-            "Résumé",
-            "Langue principale",
-            "Dernière mise à jour",
-            "Versions du jeu",
-            "Nombre de téléchargements",
-            "ID"
-        ],
+        "mod-fields": {
+            "authors": "Auteurs",
+            "categories": "Catégories",
+            "downloads": "Nombre de téléchargements",
+            "id": "ID CurseForge",
+            "name": "Nom",
+            "release": "Dernière mise à jour",
+            "summary": "Résumé",
+            "versions": "Versions du jeu"
+        },
         "mod-help": "Cette commande permet d'obtenir des informations sur un grand nombre de mods Minecraft. Vous pouvez donner son nom complet ou partiel, il suffit d'entrer `%{p}mc mod <nom>`. Le mod doit être enregistré sur la plateforme CurseForge pour apparaître",
         "mojang_desc": {
             "account.mojang.com": "Site de gestion des comptes Mojang",

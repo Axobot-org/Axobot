@@ -10,6 +10,13 @@
         "choose-topic-edition": "Chooz which topik 2 edit",
         "default-topic-prompt": "Select a ticketz categowee",
         "emote-edited": "Teh emote 4 teh topik \"%{topic}\" haz bean edited!",
+        "format": {
+            "too-long": "Uh no, u cant use more than %{max} letterz",
+            "edited": {
+                "default": "Oki doki, the default channel name format has been editd!",
+                "topic": "Oki doki, the channel name format 4 topic \"%{topic}\" has been edited!"
+            }
+        },
         "hint-edited": {
             "default": "Teh deefault hint haz correctly been editd!",
             "topic": "Teh hint fr teh topik \"%{topic}\" haz correctlwy been edited!"
@@ -45,11 +52,12 @@
         },
         "too-quick": "U are opening tickets wayyy 2 quick! Keep kalm, wait a few minuts and stop drinkin 2 much coffee mister",
         "topic": {
-            "list": "Ur serv topics:",
-            "too-long": "Uh-uh, no more than 100 chars for ur topic name kthx",
             "cant-create": "woopsie, I couldnt create dis topic (haha, got it?). Make sure u do not already have a topic with dis name, and disturb my support if needed (or not eh, wont blame u)",
             "created": "Dat topic right here, uh, how did u namd it? \"%{name}\"! So uh, i hav successfully created it, no wowwies",
-            "deleted": "Dat topic \"%{name}\" has been voided :thanoscat:"
+            "deleted": "Dat topic \"%{name}\" has been voided :thanoscat:",
+            "list": "Ur serv topics:",
+            "other-already-exists": "A \"other\" topic is already proposed by default by Zbot, no need to add another :proud:",
+            "too-long": "Uh-uh, no more than 100 chars for ur topic name kthx"
         }
     }
 }

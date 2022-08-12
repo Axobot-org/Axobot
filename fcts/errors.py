@@ -133,6 +133,10 @@ class Errors(commands.Cog):
             r = re.search(r'Invalid url: (\S+)',raw_error)
             if r is not None:
                 return await ctx.send(await self.bot._(ctx.channel,'errors.invalidurl',u=r.group(1)), allowed_mentions=ALLOWED)
+            # Invalid unicode emoji: lol
+            r = re.search(r'Invalid Unicode emoji: (\S+)',raw_error)
+            if r is not None:
+                return await ctx.send(await self.bot._(ctx.channel,'errors.invalidunicode',u=r.group(1)), allowed_mentions=ALLOWED)
             # Invalid leaderboard type: lol
             r = re.search(r'Invalid leaderboard type: (\S+)',raw_error)
             if r is not None:
@@ -178,6 +182,26 @@ class Errors(commands.Cog):
         # All other Errors not returned come here... And we can just print the default TraceBack.
         self.bot.log.warning(f'Ignoring exception in command {ctx.message.content}:')
         await self.on_error(error,ctx)
+
+    @commands.Cog.listener()
+    async def on_interaction_error(self, interaction: discord.Interaction, error: discord.app_commands.AppCommandError):
+        "Called when an error is raised during an interaction"
+        if interaction.guild:
+            guild = f"{interaction.guild.name} | {interaction.channel.name}"
+        elif interaction.guild_id:
+            guild = f"guild {interaction.guild_id}"
+        else:
+            guild = f"DM with {interaction.user}"
+        if interaction.type == discord.InteractionType.application_command:
+            await self.on_error(error, f"Slash command `{interaction.command.name}` | {guild}")
+        elif interaction.type == discord.InteractionType.ping:
+            await self.on_error(error, f"Ping interaction | {guild}")
+        elif interaction.type == discord.InteractionType.modal_submit:
+            await self.on_error(error, f"Modal submission interaction | {guild}")
+        elif interaction.type == discord.InteractionType.component:
+            await self.on_error(error, f"Component interaction | {guild}")
+        else:
+            self.bot.log.warn(f"Unhandled interaction error type: {interaction.type}")
 
     @commands.Cog.listener()
     async def on_error(self, error: Exception, ctx: typing.Optional[AllowedCtx] = None):

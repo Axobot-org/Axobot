@@ -52,20 +52,26 @@
             "users_count": "**Number of visible members:** %{v0} (%{v1} **bots**)"
         },
         "usernames": {
-            "allow": "You can reauthorize the automatic recording with the command 'profile'",
-            "disallow": "You can opt out of the automatic recording with the command 'profile'",
+            "allow": "You can reauthorize the automatic recording of your usernames and nicknames with the command 'profile'",
+            "disallow": "You can opt out of the automatic recording of your usernames and nicknames with the command 'profile'",
             "empty": "No change recorded",
             "global": "General history",
             "last-date": "Last change",
             "local": "Server history",
             "more": "And %{nbr} more",
-            "title": "**%{u}** names history"
+            "title": "**%{u}** names history",
+            "general": "Global:",
+            "server": "On the server:"
         },
         "membercount-0": "Total number of members",
         "membercount-1": "Number of bots",
         "membercount-2": "Number of humans",
         "membercount-3": "Number of online members",
         "membercount-4": "Number of unverified users",
+        "nicknames-disabled": {
+            "guild-too-big": "The nicknames changes in this server are not recorded, probably because your server is too large. Ask an administrator to enable the \"nicknames_history\" option if you want them.",
+            "disabled": "The nicknames changes records in this server have been disabled by an administrator. You won't see any new nickname here :confused:"
+        },
         "not-found": "Unable to find %{N}",
         "info": {
             "categ-0": "Category",
@@ -101,18 +107,22 @@
             "guild-features": {
                 "ANIMATED_BANNER": "Animated banner",
                 "ANIMATED_ICON": "Animated server icon",
+                "AUTO_MODERATION": "Auto moderation",
                 "BANNER": "Custom server banner",
                 "CHANNEL_BANNER": "Channel banner",
                 "COMMERCE": "Commerce features",
                 "COMMUNITY": "Community server",
                 "DISCOVERABLE": "Displayed in the Discovery tab",
                 "ENABLED_DISCOVERABLE_BEFORE": "Uses the Discovery feature for a long time",
+                "HAS_DIRECTORY_ENTRY": "Listed in a student hub",
                 "INVITE_SPLASH": "Invite custom screen",
-                "MEMBER_LIST_DISABLED": "Member list disabled",
+                "LINKED_TO_HUB": "Linked to a student hub",
                 "MEMBER_PROFILES": "Custom member profiles",
                 "MEMBER_VERIFICATION_GATE_ENABLED": "Member verification gate enabled",
+                "MONETIZATION_ENABLED": "Monetization enabled",
                 "MORE_EMOJI": "Emojis limit raised",
                 "NEWS": "News channel",
+                "NEW_THREAD_PERMISSIONS": "New thread permissions",
                 "PARTNERED": "Partnered server",
                 "PREVIEW_ENABLED": "Preview enabled",
                 "PRIVATE_THREADS": "Private threads",

@@ -1,28 +1,31 @@
-from typing import Union
-import frmc_lib
+import datetime
+import re
+import time
+from typing import Any, Union
+
 import aiohttp
 import discord
-import re
-import datetime
-import time
+import frmc_lib
 import requests
+from dateutil.parser import isoparse
 from discord.ext import commands
-from urllib.parse import quote
 from frmc_lib import SearchType
+from libs.classes import MyContext, Zbot
+from libs.formatutils import FormatUtils
+from libs.rss.rss_general import FeedObject
 
-from libs.classes import Zbot, MyContext
 from fcts import checks
 
 
 class Minecraft(commands.Cog):
-    """Cog gathering all commands related to the Minecraft® game. 
+    """Cog gathering all commands related to the Minecraft® game.
 Every information come from the website www.fr-minecraft.net"""
 
     def __init__(self, bot: Zbot):
         self.bot = bot
-        self.flows = dict()
+        self.feeds = {}
         self.file = "minecraft"
-        self.uuid_cache = dict()
+        self.uuid_cache: dict[str, str] = {}
 
     @commands.command(name="mojang", aliases=['mojang_status'], enabled=False)
     @commands.cooldown(5, 20, commands.BucketType.user)
@@ -52,15 +55,13 @@ Every information come from the website www.fr-minecraft.net"""
             if key == "www.minecraft.net/en-us":
                 key = "minecraft.net"
             if value == "green":
-                k = self.bot.get_cog(
-                    'Emojis').customs['green_check'] + key
+                k = self.bot.emojis_manager.customs['green_check'] + key
             elif value == "red":
-                k = self.bot.get_cog('Emojis').customs['red_cross'] + key
+                k = self.bot.emojis_manager.customs['red_cross'] + key
             elif value == 'yellow':
-                k = self.bot.get_cog(
-                    'Emojis').customs['neutral_check'] + key
+                k = self.bot.emojis_manager.customs['neutral_check'] + key
             else:
-                k = self.bot.get_cog('Emojis').customs['blurple'] + key
+                k = self.bot.emojis_manager.customs['blurple'] + key
                 dm = self.bot.get_user(279568324260528128).dm_channel
                 if dm is None:
                     await self.bot.get_user(279568324260528128).create_dm()
@@ -103,10 +104,11 @@ Every information come from the website www.fr-minecraft.net"""
             await self.bot.get_cog('Help').help_command(ctx, ['minecraft'])
 
     async def send_embed(self, ctx: MyContext, embed: discord.Embed):
+        "Try to send an embed into a channel, or report the error if it fails"
         try:
             await ctx.send(embed=embed)
-        except Exception as e:
-            await self.bot.get_cog('Errors').on_error(e, ctx)
+        except discord.DiscordException as err:
+            await self.bot.get_cog('Errors').on_error(err, ctx)
             await ctx.send(await self.bot._(ctx.channel, "minecraft.serv-error"))
 
     @mc_main.command(name="block", aliases=["bloc"])
@@ -289,7 +291,7 @@ Every information come from the website www.fr-minecraft.net"""
                     pass
         await self.send_embed(ctx, embed)
 
-    @mc_main.command(name="mod")
+    @mc_main.command(name="mod", aliases=["mods"])
     async def mc_mod(self, ctx: MyContext, *, value: str = 'help'):
         """Get info about any mod registered on CurseForge
 
@@ -302,52 +304,63 @@ Every information come from the website www.fr-minecraft.net"""
         if not ctx.can_send_embed:
             await ctx.send(await self.bot._(ctx.channel, "minecraft.no-embed"))
             return
-        url = 'https://addons-ecs.forgesvc.net/api/v2/addon/'
+        url = 'https://api.curseforge.com/v1/mods/search'
         header = {
-            "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0) Gecko/20100101 Firefox/83.0"}
-        searchurl = url+'search?gameId=432&sectionId=6&sort=0&pageSize=2&searchFilter=' + \
-            quote(value.lower())
+            "x-api-key": self.bot.others["curseforge"]
+        }
+        params = {
+            "gameId": 432,
+            "classId": 6,
+            "sortField": 2,
+            "sortOrder": "desc",
+            "searchFilter": value
+        }
         async with aiohttp.ClientSession(loop=self.bot.loop, headers=header) as session:
-            async with session.get(searchurl, timeout=10) as resp:
-                search: list = await resp.json()
+            async with session.get(url, params=params, timeout=10) as resp:
+                search: list[dict[str, Any]] = (await resp.json())["data"]
         if len(search) == 0:
             await ctx.send(await self.bot._(ctx.channel, "minecraft.no-mod"))
             return
         search = search[0]
-        authors = ", ".join(
-            [f"[{x['name']}]({x['url']})" for x in search['authors']])
-        raw_date = search['dateModified'][:-1]
-        raw_date += '0'*(23-len(raw_date))
-        date = datetime.datetime.fromisoformat(raw_date).replace(tzinfo=datetime.timezone.utc)
-        date = f"<t:{date.timestamp():.0f}>"
-        versions = set(x['gameVersion']
-                       for x in search['gameVersionLatestFiles'])
-        versions = " - ".join(sorted(versions, reverse=True,
-                              key=lambda a: list(map(int, a.split('.')))))
-        data = (
-            search['name'],
-            authors,
-            search['summary'],
-            search['primaryLanguage'],
-            date,
-            versions,
-            int(search['downloadCount']),
-            search['id']
+        authors = ", ".join([
+            f"[{x['name']}]({x['url']})" for x in search['authors']
+        ])
+        date = f"<t:{isoparse(search['dateModified']).timestamp():.0f}>"
+        categories = " - ".join(f"[{category['name']}]({category['url']})" for category in search["categories"])
+        versions = set(
+            x['gameVersion'] for x in search['latestFilesIndexes']
         )
+        versions = " - ".join(
+            sorted(versions, reverse=True,
+                   key=lambda a: list(map(int, a.split('.'))))
+        )
+        data = {
+            "name": search['name'],
+            "authors": authors,
+            "release": date,
+            "categories": categories,
+            "summary": search['summary'],
+            "versions": versions,
+            "downloads": int(search['downloadCount']),
+            "id": search['id']
+        }
         title = "{} - {}".format((await self.bot._(ctx.channel, "minecraft.names"))[5], search['name'])
         embed = discord.Embed(
             title=title, color=int('16BD06', 16),
-            url=search['websiteUrl'],
+            url=search["links"]['websiteUrl'],
             timestamp=ctx.message.created_at)
         embed.set_footer(text=ctx.author, icon_url=ctx.author.display_avatar)
-        if attachments := search['attachments']:
-            embed.set_thumbnail(url=attachments[0]['thumbnailUrl'])
-        for i, field in enumerate(await self.bot._(ctx.channel, "minecraft.mod-fields")):
-            if data[i]:
-                try:
-                    embed.add_field(name=field, value=str(data[i]), inline=False)
-                except IndexError:
-                    pass
+        if logo := search['logo']:
+            embed.set_thumbnail(url=logo['thumbnailUrl'])
+        lang = await self.bot._(ctx.channel, "_used_locale")
+        for name, data_value in data.items():
+            if not data_value:
+                continue
+            translation = await self.bot._(ctx.channel, "minecraft.mod-fields."+name)
+            if isinstance(data_value, int):
+                data_value = await FormatUtils.format_nbr(data_value, lang)
+            inline = name in {"authors", "release", "downloads", "id"} or name == "categories" and len(data_value) < 100
+            embed.add_field(name=translation, value=data_value, inline=inline)
         await self.send_embed(ctx, embed)
 
     @mc_main.command(name="skin")
@@ -409,13 +422,14 @@ Every information come from the website www.fr-minecraft.net"""
                 display_ip = ip
             else:
                 display_ip = f"{ip}:{port}"
-            await self.bot.get_cog('Rss').add_flow(ctx.guild.id, ctx.channel.id, 'mc', "{}:{}".format(ip, port))
+            await self.bot.get_cog('Rss').db_add_feed(ctx.guild.id, ctx.channel.id, 'mc', f"{ip}:{port}")
             await ctx.send(await self.bot._(ctx.guild, "minecraft.success-add", ip=display_ip, channel=ctx.channel.mention))
-        except Exception as e:
+        except Exception as err:
             await ctx.send(await self.bot._(ctx.guild, "rss.fail-add"))
-            await self.bot.get_cog("Errors").on_error(e, ctx)
+            await self.bot.get_cog("Errors").on_error(err, ctx)
 
     async def create_server_1(self, guild: discord.Guild, ip: str, port=None) -> Union[str, 'MCServer']:
+        "Collect and serialize server data from a given IP, using minetools.eu"
         if port is None:
             url = "https://api.minetools.eu/ping/"+str(ip)
         else:
@@ -455,6 +469,7 @@ Every information come from the website www.fr-minecraft.net"""
         return await self.MCServer(IP, version=v, online_players=o, max_players=m, players=players, img=img_url, ping=l, desc=r['description'], api='api.minetools.eu').clear_desc()
 
     async def create_server_2(self, guild: discord.Guild, ip: str, port: str):
+        "Collect and serialize server data from a given IP, using mcsrvstat.us"
         if port is None:
             url = "https://api.mcsrvstat.us/1/"+str(ip)
         else:
@@ -509,7 +524,7 @@ Every information come from the website www.fr-minecraft.net"""
         return self.uuid_cache[username]
 
     class MCServer:
-        def __init__(self, ip, max_players, online_players, players, ping, img, version, api, desc):
+        def __init__(self, ip: str, max_players: int, online_players: int, players: list[str], ping: float, img, version, api: str, desc: str):
             self.ip = ip
             self.max_players = max_players
             self.online_players = online_players
@@ -524,16 +539,18 @@ Every information come from the website www.fr-minecraft.net"""
             self.desc = desc
 
         async def clear_desc(self):
+            "Clear the server description from any tabulation or color syntax"
             self.desc = re.sub(r'§.', '', self.desc)
             self.desc = re.sub(r'[ \t\r]{2,}', ' ', self.desc).strip()
             return self
 
         async def create_msg(self, guild: discord.Guild, translate):
+            "Create a Discord embed from the saved data"
             if self.players == []:
                 if self.online_players == 0:
                     p = ["Aucun"]
                 else:
-                    p = [await translate(guild, "minecraft.no-player-list")]
+                    p: list[str] = [await translate(guild, "minecraft.no-player-list")]
             else:
                 p = self.players
             embed = discord.Embed(title=await translate(guild, "minecraft.serv-title", ip=self.ip), color=discord.Colour(0x417505), timestamp=datetime.datetime.utcfromtimestamp(time.time()))
@@ -553,6 +570,7 @@ Every information come from the website www.fr-minecraft.net"""
             return embed
 
     async def send_msg_server(self, obj, channel: discord.abc.Messageable, ip: str):
+        "Send the message into a Discord channel"
         guild = None if isinstance(
             channel, discord.DMChannel) else channel.guild
         e = await self.form_msg_server(obj, guild, ip)
@@ -578,51 +596,56 @@ Every information come from the website www.fr-minecraft.net"""
         else:
             return await obj.create_msg(guild, self.bot._)
 
-    async def find_msg(self, channel: discord.TextChannel, ip: list, ID: str):
+    async def find_msg(self, channel: discord.TextChannel, ip: list, feed_id: str):
+        "Find the minecraft server message posted from that feed"
         if channel is None:
             return None
-        if ID.isnumeric():
+        if feed_id.isnumeric():
             try:
-                return await channel.fetch_message(int(ID))
+                return await channel.fetch_message(int(feed_id))
             except (discord.Forbidden, discord.NotFound):
                 pass
         return None
 
-    async def check_flow(self, flow: dict, send_stats: bool):
-        i = flow["link"].split(':')
+    async def check_feed(self, feed: FeedObject, send_stats: bool):
+        "Refresh a minecraft server feed"
+        i = feed.link.split(':')
         if i[1] == '':
             i[1] = None
-        guild = self.bot.get_guild(flow['guild'])
+        guild = self.bot.get_guild(feed.guild_id)
         if guild is None:
-            return
-        if flow['link'] in self.flows.keys():
-            obj = self.flows[flow['link']]
+            self.bot.log.warn("[minecraft feed] Cannot find guild %s", feed.guild_id)
+            return False
+        if feed.link in self.feeds:
+            obj = self.feeds[feed.link]
         else:
             try:
                 obj = await self.create_server_1(guild, i[0], i[1])
-            except Exception as e:
-                await self.bot.get_cog('Errors').on_error(e, None)
-                return
-            self.flows[flow['link']] = obj
+            except Exception as err:
+                self.bot.dispatch("error", err, f"Guild {feed.guild_id} - id {feed.feed_id}")
+                return False
+            self.feeds[feed.link] = obj
         try:
-            channel = guild.get_channel(flow['channel'])
+            channel = guild.get_channel(feed.channel_id)
             if channel is None:
-                return
-            msg = await self.find_msg(channel, i, flow['structure'])
+                self.bot.log.warn("[minecraft feed] Cannot find channel %s in guild %s", feed.channel_id, feed.guild_id)
+                return False
+            msg = await self.find_msg(channel, i, feed.structure)
             if msg is None:
                 msg = await self.send_msg_server(obj, channel, i)
                 if msg is not None:
-                    await self.bot.get_cog('Rss').update_flow(flow['ID'], [('structure', str(msg.id)), ('date', self.bot.utcnow())])
+                    await self.bot.get_cog('Rss').db_update_feed(feed.feed_id, [('structure', str(msg.id)), ('date', self.bot.utcnow())])
                     if send_stats:
                         if statscog := self.bot.get_cog("BotStats"):
                             statscog.rss_stats['messages'] += 1
-                return
-            e = await self.form_msg_server(obj, guild, i)
-            await msg.edit(embed=e)
+                return True
+            err = await self.form_msg_server(obj, guild, i)
+            await msg.edit(embed=err)
             if statscog := self.bot.get_cog("BotStats"):
                 statscog.rss_stats['messages'] += 1
-        except Exception as e:
-            await self.bot.get_cog('Errors').on_error(e, None)
+            return True
+        except Exception as err:
+            await self.bot.get_cog('Errors').on_error(err, None)
 
 
 async def setup(bot):

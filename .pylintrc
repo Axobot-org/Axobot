@@ -157,8 +157,9 @@ disable=print-statement,
         missing-module-docstring,
         import-error,
         wrong-import-position,
-        broad-except
-        too-many-locals
+        broad-except,
+        too-many-locals,
+        too-many-return-statements,
 
 # Enable the message, report, category or checker with the given id(s). You can
 # either give multiple identifier separated by comma (,) or put this option
@@ -461,6 +462,7 @@ good-names=i,
            ex,
            xp,
            Run,
+           ip,
            _
 
 # Good variable names regexes, separated by a comma. If names match any regex,

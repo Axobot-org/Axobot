@@ -2,6 +2,13 @@
     "fi": {
         "cases-0": "%{nbr} tapaukset löydetty: (%{start}-%{end})",
         "deleted": "Tapaus #%{ID} on poistettu!",
+        "display": {
+            "date": "**Päivämäärä:** %{data}",
+            "guild": "**Palvelin:** %{data}",
+            "reason": "**Syy:** %{data}",
+            "type": "**Tyyppi:** %{data}"
+        },
+        "list-0": "**Tyyppi:** {T}\n**Valvoja:** {M}**Päivämäärä:** {D}**Syy:** {R}*",
         "no-case": "Tällä käyttäjällä ei ole yhtään tapahtumia!",
         "no-user": "Tämä on mahdotonta löytää tämä käyttäjä. :eyes:",
         "no_database": "Jonkun ajan tietokannan alas käynnin takia, tämä komento on pois käytöstä",

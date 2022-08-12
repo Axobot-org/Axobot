@@ -19,6 +19,11 @@ class AntiScamAgent:
         }
         self.model = self.get_model()
 
+    def get_category_id(self, name: str):
+        for key, value in self.categories.items():
+            if value == name:
+                return key
+
     def get_model(self) -> RandomForest:
         "Get back our trained bayes model"
         class CustomUnpickler(pickle.Unpickler):

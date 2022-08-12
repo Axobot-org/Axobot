@@ -16,7 +16,7 @@ async def can_edit_case(ctx: MyContext):
     if await ctx.bot.get_cog('Admin').check_if_admin(ctx.author):
         return True
     if ctx.bot.database_online:
-        return await ctx.bot.get_cog("Servers").staff_finder(ctx.author,"warn")
+        return await ctx.bot.get_cog("Servers").staff_finder(ctx.author, "warn_allowed_roles")
     return False
 
 class Case:

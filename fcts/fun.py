@@ -22,10 +22,9 @@ from libs.formatutils import FormatUtils
 from libs.paginator import Paginator
 from utils import flatten_list
 
-from fcts import args, checks, emojis
+from fcts import args, checks
 from fcts.checks import is_fun_enabled
 
-importlib.reload(emojis)
 importlib.reload(checks)
 importlib.reload(args)
 
@@ -42,7 +41,7 @@ async def can_say(ctx: MyContext):
     if not ctx.bot.database_online:
         return ctx.channel.permissions_for(ctx.author).administrator
     else:
-        return await ctx.bot.get_cog("Servers").staff_finder(ctx.author,"say")
+        return await ctx.bot.get_cog("Servers").staff_finder(ctx.author, "say_allowed_roles")
 
 async def can_use_cookie(ctx: MyContext) -> bool:
     "Check if a user can use the 'cookie' cmd"
@@ -107,7 +106,7 @@ class Fun(commands.Cog):
 
     @commands.command(name='roll',hidden=True)
     @commands.check(is_fun_enabled)
-    async def roll(self,ctx,*,options):
+    async def roll(self, ctx: MyContext, *, options: str):
         """Selects an option at random from a given list
         The options must be separated by a comma `,`
 
@@ -122,7 +121,7 @@ class Fun(commands.Cog):
         choosen = random.choice(liste)
         await ctx.send(choosen)
 
-    @commands.command(name="cookie",aliases=['cookies'],hidden=True)
+    @commands.command(name="cookie", aliases=['cookies', 'crustulum'], hidden=True)
     @commands.check(can_use_cookie)
     @commands.check(is_fun_enabled)
     async def cookie(self, ctx: MyContext):
@@ -130,8 +129,12 @@ class Fun(commands.Cog):
         if ctx.author.id == 375598088850505728:
             await ctx.send(file=await self.utilities.find_img("cookie-target.gif"))
         else:
-            emoji = self.bot.get_cog('Emojis').customs['cookies_eat']
-            await ctx.send(await self.bot._(ctx.guild,"fun.cookie", user=ctx.author.mention, emoji=emoji))
+            emoji = self.bot.emojis_manager.customs['cookies_eat']
+            if ctx.invoked_with == "crustulum":
+                msg = f"Pyxidem oft {ctx.author.mention} crustularum <@375598088850505728>! {emoji}"
+            else:
+                msg = await self.bot._(ctx.guild, "fun.cookie", user=ctx.author.mention, emoji=emoji)
+            await ctx.send(msg)
 
     @commands.command(name="reverse", hidden=True)
     @commands.check(is_fun_enabled)
@@ -166,7 +169,7 @@ You can specify a verification limit by adding a number in argument (up to 1.000
             limit = int(user.name)
             user = None
         if limit > MAX:
-            await ctx.send(await self.bot._(ctx.channel,"fun.count.too-much",l=MAX,e=self.bot.get_cog('Emojis').customs['wat']))
+            await ctx.send(await self.bot._(ctx.channel,"fun.count.too-much",l=MAX,e=self.bot.emojis_manager.customs['wat']))
             return
         if ctx.guild is not None and not channel.permissions_for(ctx.guild.me).read_message_history:
             await ctx.send(await self.bot._(channel,"fun.count.missing-perms"))
@@ -186,15 +189,15 @@ You can specify a verification limit by adding a number in argument (up to 1.000
         else:
             await tmp.edit(content = await self.bot._(ctx.channel,"fun.count.result-user", limit=total_count,user=user.display_name,x=counter,p=result))
 
-    @commands.command(name="ragequit",hidden=True)
+    @commands.command(name="ragequit", hidden=True)
     @commands.check(is_fun_enabled)
     async def ragequit(self, ctx: MyContext):
-        """To use when you get angry - limited to certain members
+        """To use when you get angry
 
         ..Doc fun.html#ragequit"""
         await ctx.send(file=await self.utilities.find_img('ragequit{0}.gif'.format(random.randint(1,6))))
 
-    @commands.command(name="run",hidden=True)
+    @commands.command(name="run", hidden=True)
     @commands.check(is_fun_enabled)
     async def run(self, ctx: MyContext):
         """"Just... run... very... fast
@@ -202,7 +205,7 @@ You can specify a verification limit by adding a number in argument (up to 1.000
         ..Doc fun.html#run"""
         await ctx.send("ε=ε=ε=┏( >_<)┛")
 
-    @commands.command(name="pong",hidden=True)
+    @commands.command(name="pong", hidden=True)
     @commands.check(is_fun_enabled)
     async def pong(self, ctx: MyContext):
         """Ping !
@@ -219,10 +222,20 @@ You can specify a verification limit by adding a number in argument (up to 1.000
         await ctx.send(file=await self.utilities.find_img('nope.png'))
         if self.bot.database_online:
             try:
-                if await self.bot.get_cog("Servers").staff_finder(ctx.author,'say'):
+                if await self.bot.get_cog("Servers").staff_finder(ctx.author, "say_allowed_roles"):
                     await ctx.message.delete(delay=0)
             except commands.CommandError: # user can't use 'say'
                 pass
+    
+    @commands.command(name="shuffle", hidden=True)
+    @commands.check(is_fun_enabled)
+    async def shuffle(self, ctx: MyContext, *, name: typing.Union[discord.Member, str]):
+        "Randomize letters in a name"
+        if isinstance(name, discord.User):
+            name = name.display_name
+        characters = list(name)
+        random.shuffle(characters)
+        await ctx.reply("".join(characters), allowed_mentions=discord.AllowedMentions.none())
 
     @commands.command(name="blame", hidden=True)
     @commands.check(is_fun_enabled)
@@ -308,7 +321,7 @@ You can specify a verification limit by adding a number in argument (up to 1.000
         elif r == 3:
             await ctx.send(file=await self.utilities.find_img('parrot.gif'))
         elif r == 4:
-            e = self.bot.get_cog('Emojis').customs['blob_dance']
+            e = self.bot.emojis_manager.customs['blob_dance']
             await ctx.send(e*5)
         elif r == 5:
             await ctx.send(file=await self.utilities.find_img('cameleon.gif'))
@@ -364,7 +377,7 @@ You can specify a verification limit by adding a number in argument (up to 1.000
         # contenu = await self.bot.get_cog('Utilities').clear_msg(text,ctx=ctx,emojis=False)
         contenu = await commands.clean_content().convert(ctx, text)
         text = ""
-        Em = self.bot.get_cog('Emojis')
+        Em = self.bot.emojis_manager
         mentions = [x.group(1) for x in re.finditer(r'(<(?:@!?&?|#|a?:[a-zA-Z0-9_]+:)\d+>)',ctx.message.content)]
         content = "¬¬".join(contenu.split("\n"))
         for x in mentions:
@@ -395,7 +408,7 @@ You can specify a verification limit by adding a number in argument (up to 1.000
         if text1 != []:
             await ctx.send(''.join(text1))
         try:
-            if ctx.bot.database_online and await self.bot.get_cog("Servers").staff_finder(ctx.author,'say'):
+            if ctx.bot.database_online and await self.bot.get_cog("Servers").staff_finder(ctx.author, "say_allowed_roles"):
                 await ctx.message.delete(delay=0)
         except commands.CommandError: # user can't use 'say'
             pass
@@ -500,7 +513,7 @@ You can specify a verification limit by adding a number in argument (up to 1.000
         text = await self.utilities.clear_msg(text,ctx=ctx)
         await ctx.send(text)
         try:
-            if self.bot.database_online and await self.bot.get_cog("Servers").staff_finder(ctx.author,"say"):
+            if self.bot.database_online and await self.bot.get_cog("Servers").staff_finder(ctx.author, "say_allowed_roles"):
                 await ctx.message.delete(delay=0)
         except commands.CommandError: # user can't use 'say'
             pass
@@ -802,7 +815,7 @@ You can specify a verification limit by adding a number in argument (up to 1.000
                     await msg.add_reaction(d_em)
                     count +=1
             elif len(r) > 0:
-                await msg.add_reaction(emojilib.emojize(r, use_aliases=True))
+                await msg.add_reaction(emojilib.emojize(r, language="alias"))
                 count +=1
         if count == 0:
             await msg.add_reaction('👍')
@@ -979,7 +992,7 @@ You can specify a verification limit by adding a number in argument (up to 1.000
                 return
         else:
             if ctx.bot_permissions.external_emojis:
-                emojis = self.bot.get_cog('Emojis').numbers
+                emojis = self.bot.emojis_manager.numbers_names
             else:
                 emojis = [chr(48+i)+chr(8419) for i in range(10)]
             if number>20 or number < 0:

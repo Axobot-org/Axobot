@@ -7,7 +7,7 @@ from copy import deepcopy
 
 import discord
 from discord.ext import tasks, commands
-from flatten_json import flatten, unflatten
+from flatten_json import flatten, unflatten_list
 from libs.classes import MyContext, Zbot
 
 from fcts.checks import is_translator, is_bot_admin
@@ -181,6 +181,7 @@ class Translations(commands.Cog):
                 # if the language is 100% translated, remove it
                 if not self._todo[lang]:
                     self._todo.pop(lang)
+        self.bot.dispatch("translation_added", lang)
 
     @tasks.loop(seconds=30)
     async def save_projects_loop(self):
@@ -289,7 +290,7 @@ Use `stop` to stop translating
         else:
             await ctx.send("The whole ToDo list for every language has been reloaded!")
 
-    @translate_main.command(name="status")
+    @translate_main.command(name="status", aliases=["stats"])
     async def status(self, ctx: MyContext, lang: typing.Optional[LanguageId]=None):
         """Get the status of a translation project"""
         if lang is None:
@@ -307,7 +308,7 @@ Use `stop` to stop translating
         elif lang not in languages or lang == 'en':
             return await ctx.send("Invalid language")
         else:
-            lang_progress = await self.get_translations_count(language)
+            lang_progress = await self.get_translations_count(lang)
             en_progress = await self.get_translations_count('en')
             ratio = lang_progress*100 / en_progress
             txt = f"Translation of {lang}:\n {ratio:.1f}%\n {lang_progress} messages on {en_progress}"
@@ -347,19 +348,29 @@ Use `stop` to stop translating
         if lang not in languages or lang == 'en':
             await ctx.send("Invalid language")
             return
-        original = deepcopy((await self.get_original_translations())[lang])
-        if module not in original:
-            await ctx.send(f"Invalid module.\nExpected modules are: {', '.join(sorted(original.keys()))}")
+        english = (await self.get_original_translations())["en"]
+        try:
+            project = (await self.get_projects())[lang]
+        except KeyError:
+            await ctx.send("This language has no translation project")
             return
-        project = (await self.get_projects()).get(lang, {module: {}})[module]
-        if not project:
-            await ctx.send(f"This module has not yet been edited for the {lang} language")
+        if module not in project:
+            await ctx.send(f"Invalid module.\nExpected modules are: {', '.join(sorted(project.keys()))}")
             return
-        original = original[module]
-        merged = unflatten(original | project, separator='.')
+        project = project[module]
+        original = deepcopy((await self.get_original_translations())[lang]).get(module, {})
+        english_module = english[module]
+        # Filter old translations (which are not in englisg anymore)
+        merged_flattened = {key: translation for key, translation in (original | project).items() if key in english_module}
+        # Unflatten to get the JSON maps structure
+        merged = unflatten_list(merged_flattened, separator='.')
+        # add language identifier
+        merged = {lang: merged}
+        # Save into a virtual file
         filename = f'translation/{lang}-{module}.json'
         data = json.dumps(merged, ensure_ascii=False, indent=4, sort_keys=True)
         file = discord.File(BytesIO(data.encode()), filename=filename)
+        # Send and boom
         await ctx.send('Done!', file=file)
 
 async def setup(bot):

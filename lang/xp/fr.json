@@ -40,7 +40,8 @@
             "Bravo {user} ! Tu es désormais niveau {level} ! Cependant, il faut encore monter pour obtenir {random} d'une rareté légendaire...",
             "Houston, on a un problème. {user} a atteint le niveau {level} !!!",
             "Tu vois, le monde se divise en deux catégories : ceux qui levelup et ceux qui levelup pas. Toi {user}, tu levelup au niveau {level} !!!",
-            "Que le niveau {level} soit avec toi, {user}."
+            "Que le niveau {level} soit avec toi, {user}.",
+            "Hey {user}, ton compte banquaire a atteint 50 milliards ! ... Je rigole, en fait il est à peine à {level}."
         ],
         "del-user": "<deleted user>",
         "high-page": "Il n'y a pas autant de pages !",

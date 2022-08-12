@@ -2,10 +2,12 @@
     "fr": {
         "categories": {
             "automod": "Automod",
+            "bot": "Bot",
             "members": "Membres",
             "messages": "Messages",
             "moderation": "Modération",
-            "roles": "Rôles"
+            "roles": "Rôles",
+            "tickets": "Tickets"
         },
         "list": {
             "all": "Liste des logs utilisables",

@@ -5,7 +5,8 @@ import aiohttp
 import mysql
 import psutil
 from discord.ext import commands, tasks
-from libs.classes import MyContext, Zbot
+from fcts.tickets import TicketCreationEvent
+from libs.classes import MyContext, UsernameChangeRecord, Zbot
 
 try:
     import orjson  # type: ignore
@@ -30,6 +31,10 @@ class BotStats(commands.Cog):
         self.cpu_records: list[float] = []
         self.latency_records: list[int] = []
         self.statuspage_header = {"Content-Type": "application/json", "Authorization": "OAuth " + self.bot.others["statuspage"]}
+        self.antiscam = {"warning": 0, "deletion": 0}
+        self.ticket_events = {"creation": 0}
+        self.usernames = {"guild": 0, "user": 0, "deleted": 0}
+        self.translations_added: dict[str, int] = {}
 
     async def cog_load(self):
          # pylint: disable=no-member
@@ -57,7 +62,7 @@ class BotStats(commands.Cog):
     async def on_record_cpu_error(self, error: Exception):
         self.bot.dispatch("error", error, "When collecting CPU usage")
 
-    @tasks.loop(seconds=30)
+    @tasks.loop(seconds=20)
     async def record_ws_latency(self):
         "Record the websocket latency for later use"
         if self.bot.latency is None or math.isnan(self.bot.latency):
@@ -66,9 +71,9 @@ class BotStats(commands.Cog):
             self.latency_records.append(round(self.bot.latency*1000))
         except OverflowError: # Usually because latency is infinite
             self.latency_records.append(10e6)
-        if len(self.latency_records) > 2:
+        if len(self.latency_records) > 3:
             # if the list becomes too long (over 1min), cut it
-            self.latency_records = self.latency_records[-2:]
+            self.latency_records = self.latency_records[-3:]
 
     @record_ws_latency.error
     async def on_record_latency_error(self, error: Exception):
@@ -79,6 +84,32 @@ class BotStats(commands.Cog):
         if len(origin) > 0:
             avg = round(sum(origin)/len(origin), 1)
             return avg
+
+    @commands.Cog.listener()
+    async def on_antiscam_warn(self):
+        self.antiscam["warning"] += 1
+
+    @commands.Cog.listener()
+    async def on_antiscam_delete(self):
+        self.antiscam["deletion"] += 1
+    
+    @commands.Cog.listener()
+    async def on_ticket_creation(self, _event: TicketCreationEvent):
+        self.ticket_events["creation"] += 1
+    
+    @commands.Cog.listener()
+    async def on_username_change_record(self, event: UsernameChangeRecord):
+        if event.is_guild:
+            self.usernames["guild"] += 1
+        else:
+            self.usernames["user"] += 1
+
+    @commands.Cog.listener()
+    async def on_translation_added(self, language: str):
+        if language in self.translations_added:
+            self.translations_added[language] += 1
+        else:
+            self.translations_added[language] = 1
 
     @commands.Cog.listener()
     async def on_socket_raw_receive(self, msg: str):
@@ -145,6 +176,24 @@ class BotStats(commands.Cog):
                 total += 1
             cursor.execute(query, (now, 'guilds.unavailable', round(unav/total, 3)*100, 1, '%', False, self.bot.beta))
             del unav, total
+            # antiscam warn/deletions
+            cursor.execute(query, (now, 'antiscam.warning', self.antiscam["warning"], 0, 'warning/min', True, self.bot.beta))
+            cursor.execute(query, (now, 'antiscam.deletion', self.antiscam["deletion"], 0, 'deletion/min', True, self.bot.beta))
+            self.antiscam["warning"] = self.antiscam["deletion"] = 0
+            # tickets creation
+            cursor.execute(query, (now, 'tickets.creation', self.ticket_events["creation"], 0, 'new tickets/min', True, self.bot.beta))
+            self.ticket_events["creation"] = 0
+            # username changes
+            cursor.execute(query, (now, 'usernames.guild', self.usernames["guild"], 0, 'nicknames/min', True, self.bot.beta))
+            self.usernames["guild"] = 0
+            cursor.execute(query, (now, 'usernames.user', self.usernames["user"], 0, 'usernames/min', True, self.bot.beta))
+            self.usernames["user"] = 0
+            cursor.execute(query, (now, 'usernames.deleted', self.usernames["deleted"], 0, 'usernames/min', True, self.bot.beta))
+            self.usernames["deleted"] = 0
+            # translations added
+            for lang, count in self.translations_added.items():
+                cursor.execute(query, (now, 'translation.'+lang, count, 0, 'message/min', True, self.bot.beta))
+            self.translations_added.clear()
             # Push everything
             cnx.commit()
         except mysql.connector.errors.IntegrityError as err: # duplicate primary key

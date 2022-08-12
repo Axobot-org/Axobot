@@ -1,9 +1,9 @@
-discord.py @ git+https://github.com/Rapptz/discord.py.git@36f039a1bffb835a555be8a43976397ba6eb9c76
+discord.py @ git+https://github.com/Rapptz/discord.py.git@9fe19dcc6923e4b6133bdedafb33658bf37c9ab7
 aiohttp
 mysql-connector-python>=8.0
 frmc-lib @ git+https://github.com/ZRunner/fr-mc-python-lib.git@v1.0.6
 python-i18n @ git+https://github.com/ZRunner/python-i18n/
-emoji
+emoji>=2.0
 imageio
 geocoder
 timezonefinder
@@ -20,3 +20,5 @@ typing_extensions>=4.0
 nltk>=3.7
 autopep8
 flatten-json
+python-dateutil
+LRFutils @ git+https://github.com/LeiRoF/LRFutils.git

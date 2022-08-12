@@ -18,44 +18,40 @@
                 "Il robot non ha le autorizzazioni sufficiente"
             ],
             "can_ban": [
-                "Uno di tuoi ruoli può usare questo controllo (`ban`)",
-                "Ruolo autorizzato mancante (`ban`)"
+                "Uno di tuoi ruoli può usare questo controllo (`ban_allowed_roles`)",
+                "Ruolo autorizzato mancante (`ban_allowed_roles`)"
             ],
             "can_clear": [
-                "Uno di tuoi ruoli può usare questo controllo (`clear`)",
-                "Ruolo autorizzato mancante (`clear`)"
+                "Uno di tuoi ruoli può usare questo controllo (`clear_allowed_roles`)",
+                "Ruolo autorizzato mancante (`clear_allowed_roles`)"
             ],
             "can_edit_case": [
-                "Uno di tuoi ruoli può usare questo controllo (`warn`)",
-                "Ruolo autorizzato mancante (`warn`)"
+                "Uno di tuoi ruoli può usare questo controllo (`warn_allowed_roles`)",
+                "Ruolo autorizzato mancante (`warn_allowed_roles`)"
             ],
             "can_kick": [
-                "Uno di tuoi ruoli può usare questo controllo (`kick`)",
-                "Ruolo autorizzato mancante (`kick`)"
+                "Uno di tuoi ruoli può usare questo controllo (`kick_allowed_roles`)",
+                "Ruolo autorizzato mancante (`kick_allowed_roles`)"
             ],
             "can_mute": [
-                "Uno di tuoi ruoli può usare questo controllo (`mute`)",
-                "Ruolo autorizzato mancante (`mute`)"
+                "Uno di tuoi ruoli può usare questo controllo (`mute_allowed_roles`)",
+                "Ruolo autorizzato mancante (`mute_allowed_roles`)"
             ],
             "can_say": [
-                "Uno di tuoi ruoli può usare questo controllo (`say`)",
-                "Ruolo autorizzato mancante (`say`)"
+                "Uno di tuoi ruoli può usare questo controllo (`say_allowed_roles`)",
+                "Ruolo autorizzato mancante (`say_allowed_roles`)"
             ],
             "can_slowmode": [
-                "Uno di tuoi ruoli può usare questo controllo (`slowmode`)",
-                "Ruolo autorizzato mancante (`slowmode`)"
+                "Uno di tuoi ruoli può usare questo controllo (`slowmode_allowed_roles`)",
+                "Ruolo autorizzato mancante (`slowmode_allowed_roles`)"
             ],
             "can_use_cookie": [
                 "Lei è un prescelto da Aragorn1202",
                 "Questo controllo è su Whitelist"
             ],
-            "can_use_rss": [
-                "Hai la permizione 'Amministratore'",
-                "Permizione 'Amministratore' mancante"
-            ],
             "can_warn": [
-                "Uno di tuoi ruoli può usare questo controllo (`warn`)",
-                "Ruolo autorizzato mancante (`warn`)"
+                "Uno di tuoi ruoli può usare questo controllo (`warn_allowed_roles`)",
+                "Ruolo autorizzato mancante (`warn_allowed_roles`)"
             ],
             "is_bot_admin": [
                 "Bisogna essere amministratore del robot",
@@ -68,26 +64,6 @@
             "has_admin": [
                 "Hai la permizione 'Amministratore'",
                 "Permizione 'Amministratore' mancante"
-            ],
-            "has_embed_links": [
-                "Hai la permizione \"Intégrer des liens\"",
-                "Devi avere la permizione \"Intégrer des liens\""
-            ],
-            "has_manage_guild": [
-                "Hai la permizione 'Gérer le serveur'",
-                "Permizione 'Gérer le serveur' mancante"
-            ],
-            "has_manage_msg": [
-                "Hai la permizione 'Gérer les messages'",
-                "Permizione 'Gérer les messages' mancante"
-            ],
-            "has_manage_nicknames": [
-                "Hai la permizione 'Gérer les pseudos'",
-                "Permizione 'Gérer les pseudos' mancante"
-            ],
-            "has_manage_roles": [
-                "Hai la permizione 'Gérer les rôles'",
-                "Permizione 'Gérer les rôles' mancante"
             ],
             "has_permissions": [
                 "Hai le permizioni Discord sufficienti",
