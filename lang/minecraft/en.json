@@ -53,16 +53,16 @@
             "Added in the version"
         ],
         "item-help": "This command allows you to obtain information on any Minecraft item. You can give its full or partial name, in French or English, or even its identifier. Just enter `%{p}mc item <name>`",
-        "mod-fields": [
-            "Name",
-            "Authors",
-            "Summary",
-            "Primary language",
-            "Last update",
-            "Game versions",
-            "Downloads",
-            "ID"
-        ],
+        "mod-fields": {
+            "authors": "Authors",
+            "categories": "Categories",
+            "downloads": "Downloads count",
+            "id": "CurseForge ID",
+            "name": "Name",
+            "release": "Last update",
+            "summary": "Summary",
+            "versions": "Game versions"
+        },
         "mod-help": "This command provides information about a large number of Minecraft mods. You can give its full or partial name, just enter `%{p}mc mod <name>`. The mod must be registered on the CurseForge platform to appear",
         "mojang_desc": {
             "account.mojang.com": "Mojang account management site",

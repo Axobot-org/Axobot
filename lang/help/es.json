@@ -18,44 +18,44 @@
                 "El bot no tiene suficientes permisos"
             ],
             "can_ban": [
-                "Uno de sus roles está autorizado a usar este comando (`ban`)",
-                "Falta el rol permitido (`ban`)"
+                "Uno de sus roles está autorizado a usar este comando (`ban_allowed_roles`)",
+                "Falta el rol permitido (`ban_allowed_roles`)"
             ],
             "can_clear": [
-                "Uno de sus roles está autorizado a usar este comando (`clear`)",
-                "Falta el rol permitido (`clear`)"
+                "Uno de sus roles está autorizado a usar este comando (`clear`_allowed_roles)",
+                "Falta el rol permitido (`clear_allowed_roles`)"
             ],
             "can_edit_case": [
-                "Uno de sus roles está autorizado a usar este comando (`warn`)",
-                "Falta el rol permitido (`warn`)"
+                "Uno de sus roles está autorizado a usar este comando (`warn_allowed_roles`)",
+                "Falta el rol permitido (`warn_allowed_roles`)"
             ],
             "can_kick": [
-                "Uno de sus roles está autorizado a usar este comando (`kick`)",
-                "Falta el rol permitido (`kick`)"
+                "Uno de sus roles está autorizado a usar este comando (`kick_allowed_roles`)",
+                "Falta el rol permitido (`kick_allowed_roles`)"
             ],
             "can_mute": [
-                "Uno de sus roles está autorizado a usar este comando (`mute`)",
-                "Falta el rol permitido (`mute`)"
+                "Uno de sus roles está autorizado a usar este comando (`mute_allowed_roles`)",
+                "Falta el rol permitido (`mute_allowed_roles`)"
             ],
             "can_say": [
-                "Uno de sus roles está autorizado a usar este comando (`say`)",
-                "Falta el rol permitido (`say`)"
+                "Uno de sus roles está autorizado a usar este comando (`say_allowed_roles`)",
+                "Falta el rol permitido (`say_allowed_roles`)"
             ],
             "can_slowmode": [
-                "Uno de sus roles está autorizado a usar este comando (`slowmode`)",
-                "Falta el rol permitido (`slowmode`)"
+                "Uno de sus roles está autorizado a usar este comando (`slowmode_allowed_roles`)",
+                "Falta el rol permitido (`slowmode_allowed_roles`)"
             ],
             "can_use_cookie": [
                 "Eres un elegido de Aragorn1202",
                 "Este comando está en una lista blanca"
             ],
             "can_use_rss": [
-                "Tienes el permiso 'Administrador'",
-                "Falta el permiso 'Administrador'"
+                "Tienes el permiso 'Gestionar Servidor'",
+                "Falta el permiso 'Gestionar Servidor'"
             ],
             "can_warn": [
-                "Uno de sus roles está autorizado a usar este comando (`warn`)",
-                "Falta el rol permitido (`warn`)"
+                "Uno de sus roles está autorizado a usar este comando (`warn_allowed_roles`)",
+                "Falta el rol permitido (`warn_allowed_roles`)"
             ],
             "is_bot_admin": [
                 "Necesitas ser uno de los Administradores del bot",

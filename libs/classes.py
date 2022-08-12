@@ -1,7 +1,9 @@
 import datetime
+from enum import Enum
 import logging
+import sys
 import time
-from typing import Any, Callable, Coroutine, Optional
+from typing import Any, Callable, Coroutine, Literal, Optional, TYPE_CHECKING, Union, overload
 
 import discord
 import requests
@@ -12,9 +14,21 @@ from mysql.connector.errors import ProgrammingError
 from utils import get_prefix
 
 from libs.database import create_database_query
+from libs.emojis_manager import EmojisManager
 from libs.prefix_manager import PrefixManager
 from libs.tasks_handler import TaskHandler
 
+
+if TYPE_CHECKING:
+    from fcts.aide import Help
+    from fcts.bot_stats import BotStats
+    from fcts.errors import Errors
+    from fcts.minecraft import Minecraft
+    from fcts.partners import Partners
+    from fcts.rss import Rss
+    from fcts.servers import Servers
+    from fcts.users import Users
+    from fcts.utilities import Utilities
 
 class MyContext(commands.Context):
     """Replacement for the official commands.Context class
@@ -51,7 +65,7 @@ class MyContext(commands.Context):
             return await super().send(reference=self.message.reference, *args, **kwargs)
         return await super().send(*args, **kwargs)
 
-
+# pylint: disable=too-many-instance-attributes
 class Zbot(commands.bot.AutoShardedBot):
     """Bot class, with everything needed to run it"""
 
@@ -83,6 +97,19 @@ class Zbot(commands.bot.AutoShardedBot):
         self.zombie_mode: bool = zombie_mode # if we should listen without sending any message
         self.prefix_manager = PrefixManager(self)
         self.task_handler = TaskHandler(self)
+        self.emojis_manager = EmojisManager(self)
+        # app commands
+        self.tree.on_error = self.on_app_cmd_error
+    
+    async def on_error(self, event_method: str, *args, **kwargs):
+        "Called when an event raises an uncaught exception"
+        if event_method.startswith("on_") and event_method != "on_error":
+            _, error, _ = sys.exc_info()
+            await self.dispatch("error", error, f"While handling event `{event_method}`")
+        super().on_error(event_method, *args, **kwargs)
+
+    async def on_app_cmd_error(self, interaction: discord.Interaction, error: discord.app_commands.AppCommandError):
+        self.dispatch("interaction_error", interaction, error)
 
     allowed_commands = ("eval", "add_cog", "del_cog")
 
@@ -112,11 +139,45 @@ class Zbot(commands.bot.AutoShardedBot):
         # use the new MyContext class
         return await super().get_context(source, cls=cls)
 
-    # async def on_command_error(self, context: MyContext, exception: commands.CommandError, /) -> None:
-    #     if cog := self.get_cog("Errors"):
-    #         await cog.on_command_error(context, exception)
-    #     else:
-    #         self.log.error('Ignoring exception in command %s:', context.command, exc_info=True)
+    @overload
+    def get_cog(self, name: Literal["BotStats"]) -> Optional["BotStats"]:
+        ...
+
+    @overload
+    def get_cog(self, name: Literal["Errors"]) -> Optional["Errors"]:
+        ...
+
+    @overload
+    def get_cog(self, name: Literal["Help"]) -> Optional["Help"]:
+        ...
+
+    @overload
+    def get_cog(self, name: Literal["Minecraft"]) -> Optional["Minecraft"]:
+        ...
+
+    @overload
+    def get_cog(self, name: Literal["Partners"]) -> Optional["Partners"]:
+        ...
+
+    @overload
+    def get_cog(self, name: Literal["Rss"]) -> Optional["Rss"]:
+        ...
+
+    @overload
+    def get_cog(self, name: Literal["Servers"]) -> Optional["Servers"]:
+        ...
+
+    @overload
+    def get_cog(self, name: Literal["Users"]) -> Optional["Users"]:
+        ...
+
+    @overload
+    def get_cog(self, name: Literal["Utilities"]) -> Optional["Utilities"]:
+        ...
+
+    def get_cog(self, name: str):
+        # pylint: disable=useless-super-delegation
+        return super().get_cog(name)
 
     @property
     def cnx_frm(self) -> MySQLConnection:
@@ -245,7 +306,7 @@ class Zbot(commands.bot.AutoShardedBot):
         return datetime.datetime.now(datetime.timezone.utc)
 
     @property
-    def _(self) -> Callable[[Any, str], Coroutine[Any, Any, str]]:
+    def _(self) -> Callable[..., Coroutine[Any, Any, str]]:
         """Translate something"""
         cog = self.get_cog('Languages')
         if cog is None:
@@ -377,3 +438,20 @@ class UserFlag:
     def intToFlags(self, i: int) -> list:
         "Convert an integer value to its list of flags"
         return [v for k, v in self.FLAGS.items() if i & k == k]
+
+class ServerWarningType(Enum):
+    # channel, is_join
+    WELCOME_MISSING_TXT_PERMISSIONS = 1
+    # channel, feed_id
+    RSS_MISSING_TXT_PERMISSION = 2
+    # channel, feed_id
+    RSS_MISSING_EMBED_PERMISSION = 3
+    # channel_id, feed_id
+    RSS_UNKNOWN_CHANNEL = 4
+
+class UsernameChangeRecord:
+    def __init__(self, before: Optional[str], after: Optional[str], user: Union[discord.Member, discord.User]):
+        self.user = user
+        self.before = before
+        self.after = after
+        self.is_guild = isinstance(user, discord.Member)

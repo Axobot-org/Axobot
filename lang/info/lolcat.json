@@ -15,8 +15,8 @@
         "botinvite": "Hers a link 2 invite me 2 'nother warm place: %{url}\nDon't hesitate to test my cool `about` cmd 4 + useful links!",
         "cant-see-channel": "Uhh nope, ur not allowed to see that!",
         "changelogs": {
-            "notfound": "Srry but i cannot find das version",
-            "index": "List of indexed versions"
+            "index": "List of indexed versions",
+            "notfound": "Srry but i cannot find das version"
         },
         "discordlinks": [
             "Servers status",
@@ -31,42 +31,6 @@
             "Discord brokn things list"
         ],
         "docs": "Her'z teh link 2 the bot doc:",
-        "ping": {
-            "found": "Pong! (avg ov %{tps}ms that I send 2 %{url})",
-            "notfound": "UwU I cant ping that"
-        },
-        "prefix": "List ov usable prefiXs:",
-        "stats": {
-            "title": "**Boat statz**",
-            "api_ping": "**How much is discord buzy:** %{v} ms",
-            "bot_version": "**Baut vershun:** %{v}",
-            "cmds_24h": "**How much people uze me:** %{v}",
-            "codes_lines": "**Nbr ov code lin:** %{v}",
-            "cpu_usage": "**Computer pressure:** %{v} %",
-            "languages": "**Uzd languages:** %{v}",
-            "lib_version": "**Verson of teh `discord.py` thingy:** %{v}",
-            "python_version": "**Python versoon :** %{v}",
-            "ram_usage": "**Memory thingy:** %{v} GB",
-            "servers_count": "**Nbr ov serverz:** %{v}",
-            "total_xp": "**xp won by ppl:** %{v}xp",
-            "users_count": "**Nbr ov visible memberz:** %{v0} (%{v1} **robots**)"
-        },
-        "usernames": {
-            "allow": "U can anti-optout teh auto logs with da cmd 'profile'",
-            "disallow": "U can optout the auto logging with cmd 'profile' (beeew bad guy)",
-            "empty": ":N:o change savd",
-            "global": "Gen' stori",
-            "last-date": "Lastetest change",
-            "local": "Serv hystori",
-            "more": "+%{nbr} others",
-            "title": "**%{u}** names story"
-        },
-        "membercount-0": "Total nmber of membrz",
-        "membercount-1": "Numbr ov botz",
-        "membercount-2": "Numbrz for good people",
-        "membercount-3": "Nmbr ov god online peepl",
-        "membercount-4": "Numer of sus people",
-        "not-found": "Unable 2 found %{N}",
         "info": {
             "categ-0": "Categori",
             "categ-1": "Posishun",
@@ -101,21 +65,31 @@
             "guild-features": {
                 "ANIMATED_BANNER": "Animated guild flag",
                 "ANIMATED_ICON": "ANIMATED OMEGA COOL OwO server icon",
+                "AUTO_MODERATION": "Auto ban",
                 "BANNER": "Custom srv banner",
                 "CHANNEL_BANNER": "Cool lounge banners",
                 "COMMERCE": "Buy-things features",
                 "COMMUNITY": "BetterTogether server",
                 "DISCOVERABLE": "Showned in the cool Discover tab",
                 "ENABLED_DISCOVERABLE_BEFORE": "Uz Discover sinse long",
+                "HAS_DIRECTORY_ENTRY": "Listed by students",
                 "INVITE_SPLASH": "Inv cstm screen",
-                "MEMBER_LIST_DISABLED": "Hid their membre list",
+                "LINKED_TO_HUB": "Linked to students",
                 "MEMBER_PROFILES": "Actually custom profiles per member",
                 "MEMBER_VERIFICATION_GATE_ENABLED": "Thing 2 prevent bad peopl activated",
+                "MONETIZATION_ENABLED": "Money enabled",
                 "MORE_EMOJI": "Emojis limit went stonk",
                 "NEWS": "News~~paper~~ channel",
+                "NEW_THREAD_PERMISSIONS": "New perms for threads",
                 "PARTNERED": "Partn. serv",
                 "PREVIEW_ENABLED": "Cool things enabled",
+                "PRIVATE_THREADS": "Super private threads",
                 "PUBLIC": "Publ. server",
+                "ROLE_ICONS": "Roles decorations",
+                "SEVEN_DAY_THREAD_ARCHIVE": "7-days-smth for threads",
+                "TEXT_IN_VOICE_ENABLED": "Text in voice with friends",
+                "THREADS_ENABLED": "Threads unlocked",
+                "THREE_DAY_THREAD_ARCHIVE": "3-days-smth for threads",
                 "VANITY_URL": "Cstm inv url",
                 "VERIFIED": "Verif. srv",
                 "VIP_REGIONS": "VIP voice reg",
@@ -163,6 +137,48 @@
             "user-0": "On dis servr?",
             "user-1": "left cuz:",
             "voicechan-0": "Singing ch4nnel"
+        },
+        "membercount-0": "Total nmber of membrz",
+        "membercount-1": "Numbr ov botz",
+        "membercount-2": "Numbrz for good people",
+        "membercount-3": "Nmbr ov god online peepl",
+        "membercount-4": "Numer of sus people",
+        "nicknames-disabled": {
+            "disabled": "Oh no, nick changes are been disabled here by an administrator. U won't see new nicknames!",
+            "guild-too-big": "Oh no, nick changes are disabled here cuz ur server is 2 big to save 'em all. Ask an admin to enabled them with the 'nicknames_history' option!"
+        },
+        "not-found": "Unable 2 found %{N}",
+        "ping": {
+            "found": "Pong! (avg ov %{tps}ms that I send 2 %{url})",
+            "notfound": "UwU I cant ping that"
+        },
+        "prefix": "List ov usable prefiXs:",
+        "stats": {
+            "api_ping": "**How much is discord buzy:** %{v} ms",
+            "bot_version": "**Baut vershun:** %{v}",
+            "cmds_24h": "**How much people uze me:** %{v}",
+            "codes_lines": "**Nbr ov code lin:** %{v}",
+            "cpu_usage": "**Computer pressure:** %{v} %",
+            "languages": "**Uzd languages:** %{v}",
+            "lib_version": "**Verson of teh `discord.py` thingy:** %{v}",
+            "python_version": "**Python versoon :** %{v}",
+            "ram_usage": "**Memory thingy:** %{v} GB",
+            "servers_count": "**Nbr ov serverz:** %{v}",
+            "title": "**Boat statz**",
+            "total_xp": "**xp won by ppl:** %{v}xp",
+            "users_count": "**Nbr ov visible memberz:** %{v0} (%{v1} **robots**)"
+        },
+        "usernames": {
+            "allow": "U can anti-optout teh auto logs with da cmd 'profile'",
+            "disallow": "U can optout the auto logging with cmd 'profile' (beeew bad guy)",
+            "empty": ":N:o change savd",
+            "general": "General:",
+            "global": "Gen' stori",
+            "last-date": "Lastetest change",
+            "local": "Serv hystori",
+            "more": "+%{nbr} others",
+            "server": "Here only:",
+            "title": "**%{u}** names story"
         }
     }
 }

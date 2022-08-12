@@ -81,7 +81,7 @@ class Morpions(commands.Cog):
                             if d_em is not None:
                                 self.emojis += (str(d_em), )
                         else:
-                            self.emojis += (emojilib.emojize(emoji_id, use_aliases=True), )
+                            self.emojis += (emojilib.emojize(emoji_id, language="alias"), )
                     self.emojis = self.emojis[:2]
             if len(self.emojis) < 2:
                 self.emojis = (':red_circle:', ':blue_circle:')
@@ -94,7 +94,7 @@ class Morpions(commands.Cog):
             """Affiche la grille qui est une liste sous forme de chaine de caractères"""
             affichage_grille = ''
             if self.ctx.bot_permissions.external_emojis:
-                emojis = [f'<:{x}>' for x in self.bot.get_cog('Emojis').numbers]
+                emojis = [f'<:{x}>' for x in self.bot.emojis_manager.numbers_names]
             else:
                 emojis = [chr(48+i)+chr(8419) for i in range(10)]
             for k in range(9):

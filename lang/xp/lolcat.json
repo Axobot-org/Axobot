@@ -40,7 +40,8 @@
             "Bravo {user}! You are now level {level}! However, it is still necessary to climb to obtain {random} legendary rarity...",
             "Houston, we have a problem. {user} has passed level {level}!!!!!",
             "You see, the world is divided into two categories: those who levelup and those who don't levelup. You {user}, you levelup to level {level}!!!!",
-            "*May the level {level} be with you, {user}.*"
+            "*May the level {level} be with you, {user}.*",
+            "Hey {user}, your balance is level 50 billion! ... Just kidding, it's actually barely {level}."
         ],
         "del-user": "<deleted usr>",
         "high-page": "There aren't so much pages!",

@@ -11,14 +11,15 @@ from libs.classes import MyContext, Zbot
 
 from fcts import checks
 
-roles_options = ["clear", "slowmode", "mute", "kick", "ban", "warn", "say", "welcome_roles",
-                 "muted_role", 'partner_role', 'update_mentions', 'verification_role', 'voice_roles']
+roles_options = ["clear_allowed_roles", "slowmode_allowed_roles", "mute_allowed_roles", "kick_allowed_roles", "ban_allowed_roles",
+                 "warn_allowed_roles", "say_allowed_roles", "welcome_roles", "muted_role", 'partner_role', 'update_mentions',
+                 'verification_role', 'voice_roles']
 bool_options = ["enable_xp", "anti_caps_lock", "enable_fun",
-                "help_in_dm", "compress_help", "anti_scam"]
+                "help_in_dm", "compress_help", "anti_scam", "nicknames_history"]
 textchan_options = ["welcome_channel", "bot_news", "poll_channels",
                     "modlogs_channel", "noxp_channels", "partner_channel"]
 vocchan_options = ["membercounter", "voice_channel"]
-category_options = ["voice_category", "tickets_category"]
+category_options = ["voice_category"]
 text_options = ["welcome", "leave", "levelup_msg",
                 "description", "voice_channel_format"]
 prefix_options = ['prefix']
@@ -48,13 +49,13 @@ class Servers(commands.Cog):
                "roles_react_max_number":20,
                "language":1,
                "description":"",
-               "clear":"",
-               "slowmode":"",
-               "mute":"",
-               "kick":"",
-               "ban":"",
-               "warn":"",
-               "say":"",
+               "clear_allowed_roles":"",
+               "slowmode_allowed_roles":"",
+               "mute_allowed_roles":"",
+               "kick_allowed_roles":"",
+               "ban_allowed_roles":"",
+               "warn_allowed_roles":"",
+               "say_allowed_roles":"",
                "hunter":"",
                "welcome_channel":'',
                "welcome":"",
@@ -91,9 +92,11 @@ class Servers(commands.Cog):
                'compress_help': 0,
                'ttt_display': 2,
                'anti_scam': 0,
-               'tickets_category': ''}
-        self.optionsList = ["prefix","language","description","clear","slowmode","mute","kick","ban","warn","say","welcome_channel","welcome","leave","welcome_roles","anti_scam","poll_channels","partner_channel","partner_color","partner_role","modlogs_channel","verification_role","enable_xp","levelup_msg","levelup_channel","noxp_channels","xp_rate","xp_type","anti_caps_lock","enable_fun","membercounter","anti_raid","vote_emojis","morpion_emojis","help_in_dm","compress_help","muted_role","voice_roles","voice_channel","voice_category","voice_channel_format","ttt_display","bot_news","update_mentions", "tickets_category"]
+               'nicknames_history': None,
+            }
+        self.optionsList = ["prefix","language","description","clear_allowed_roles","slowmode_allowed_roles","mute_allowed_roles","kick_allowed_roles","ban_allowed_roles","warn_allowed_roles","say_allowed_roles","welcome_channel","welcome","leave","welcome_roles","anti_scam","poll_channels","partner_channel","partner_color","partner_role","modlogs_channel","verification_role","nicknames_history","enable_xp","levelup_msg","levelup_channel","noxp_channels","xp_rate","xp_type","anti_caps_lock","enable_fun","membercounter","anti_raid","vote_emojis","morpion_emojis","help_in_dm","compress_help","muted_role","voice_roles","voice_channel","voice_category","voice_channel_format","ttt_display","bot_news","update_mentions"]
         self.membercounter_pending = {}
+        self.max_members_for_nicknames = 3000
 
     @property
     def table(self):
@@ -193,9 +196,14 @@ class Servers(commands.Cog):
         if len(sql_result) == 0:
             value = None
         elif sql_result[0][0] == '':
-            value = self.default_opt[name]
+            if name == "nicknames_history":
+                value = None
+            else:
+                value = self.default_opt[name]
         else:
             value = sql_result[0][0]
+        if value is None and name == "nicknames_history" and (guild := self.bot.get_guild(guild_id)):
+            value = len(guild.members) > self.max_members_for_nicknames
         self.cache[(guild_id, name)] = value
         return value
 
@@ -460,7 +468,9 @@ class Servers(commands.Cog):
     async def conf_bool(self, ctx: MyContext, option: str, value: str):
         if value == "scret-desc":
             guild = await self.get_guild(ctx)
-            v = await self.get_option(guild.id,option)
+            v = await self.get_option(guild.id, option)
+            if option == "nicknames_history":
+                v = len(ctx.guild.members) < self.max_members_for_nicknames
             return await self.form_bool(v)
         else:
             if value.lower() in {"true","vrai","1","oui","yes","activé"}:
@@ -589,7 +599,7 @@ class Servers(commands.Cog):
                 try:
                     e = await commands.EmojiConverter().convert(ctx,e)
                 except commands.errors.BadArgument:
-                    if e not in self.bot.get_cog("Emojis").unicode_list:
+                    if e not in self.bot.emojis_manager.unicode_set:
                         msg = await self.bot._(ctx.guild.id, "server.edit-error.emoji", emoji=e)
                         await ctx.send(msg)
                         return
@@ -621,7 +631,7 @@ class Servers(commands.Cog):
                     a = 'a' if d_em.animated else ''
                     l_em.append("<{}:{}:{}>".format(a, d_em.name, d_em.id))
             else:
-                l_em.append(emoji.emojize(r, use_aliases=True))
+                l_em.append(emoji.emojize(r, language="alias"))
         return l_em
 
     async def conf_vocal(self, ctx: MyContext, option: str, value: str):
@@ -969,7 +979,9 @@ class Servers(commands.Cog):
             for i,v in liste.items():
                 #if i not in self.optionsList:
                 #    continue
-                if i in roles_options:
+                if i == "nicknames_history" and v is None:
+                    r = len(guild.members) < self.max_members_for_nicknames
+                elif i in roles_options:
                     r = await self.form_roles(guild,v,diff)
                     r = ", ".join(r)
                 elif i in bool_options:
@@ -981,7 +993,6 @@ class Servers(commands.Cog):
                     r = await self.form_category(guild, v, diff)
                     r = ', '.join(r)
                 elif i in text_options:
-                    #r = await self.form_text(v)
                     r = v if len(v)<500 else v[:500]+"..."
                 elif i in numb_options:
                     r = str(v)

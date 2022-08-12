@@ -5,6 +5,7 @@ import os
 import sys
 from logging.handlers import RotatingFileHandler
 from typing import TYPE_CHECKING
+from LRFutils import progress
 
 import discord
 import mysql
@@ -121,6 +122,7 @@ def parse_crypted_file(bot: "Zbot"):
     bot.others['nasa'] = cryptage.uncrypte(lines[17])
     bot.others['random_api_token'] = cryptage.uncrypte(lines[18])
     bot.others['google_api'] = cryptage.uncrypte(lines[19])
+    bot.others['curseforge'] = cryptage.uncrypte(lines[20])
     bot.dbl_token = tokens.get_dbl_token()
 
 def load_sql_connection(bot: "Zbot"):
@@ -156,7 +158,6 @@ async def load_cogs(bot: "Zbot"):
                       'fcts.bot_stats',
                       'fcts.cases',
                       'fcts.embeds',
-                      'fcts.emojis',
                       'fcts.errors',
                       'fcts.events',
                       'fcts.fun',
@@ -172,20 +173,22 @@ async def load_cogs(bot: "Zbot"):
                       'fcts.rss',
                       'fcts.s_backups',
                       'fcts.serverlogs',
-                      'fcts.servers',
+                      'fcts.servers',   
                       'fcts.tickets',
                       'fcts.timers',
-                    #   'fcts.translations',
+                      'fcts.translations',
                       'fcts.users',
                       'fcts.utilities',
                       'fcts.voices',
                       'fcts.welcomer',
                       'fcts.xp'
     ]
+    progress_bar = progress.bar(max=len(initial_extensions), width=60, prefix="Loading extensions", eta=False, duration=False)
 
     # Here we load our extensions(cogs) listed above in [initial_extensions]
     count = 0
-    for extension in initial_extensions:
+    for i, extension in enumerate(initial_extensions):
+        progress_bar(i)
         try:
             await bot.load_extension(extension)
         except discord.DiscordException:
@@ -194,6 +197,7 @@ async def load_cogs(bot: "Zbot"):
         if count  > 0:
             bot.log.critical("%s modules not loaded\nEnd of program", count)
             sys.exit()
+    progress_bar(len(initial_extensions), stop=True)
 
 async def count_code_lines():
     """Count lines of Python code in the current folder

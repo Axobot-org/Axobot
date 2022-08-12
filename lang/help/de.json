@@ -18,44 +18,44 @@
                 "Der Bot hat nicht die benötigten Berechtigungen"
             ],
             "can_ban": [
-                "Eine deiner Rollen besitzt die Berechtigung für diesen Befehl (`ban`)",
-                "Fehlende Berechtigung (`ban`)"
+                "Eine deiner Rollen besitzt die Berechtigung für diesen Befehl (`ban_allowed_roles`)",
+                "Fehlende Berechtigung (`ban_allowed_roles`)"
             ],
             "can_clear": [
-                "Eine deiner Rollen besitzt die Berechtigung für diesen Befehl (`clear`)",
-                "Fehlende Berechtigung (`clear`)"
+                "Eine deiner Rollen besitzt die Berechtigung für diesen Befehl (`clear_allowed_roles`)",
+                "Fehlende Berechtigung (`clear_allowed_roles`)"
             ],
             "can_edit_case": [
-                "Eine deiner Rollen besitzt die Berechtigung für diesen Befehl (`warn`)",
-                "Dir fehlt die Rolle (`warn`)"
+                "Eine deiner Rollen besitzt die Berechtigung für diesen Befehl (`warn_allowed_roles`)",
+                "Dir fehlt die Rolle (`warn_allowed_roles`)"
             ],
             "can_kick": [
-                "Eine deiner Rollen besitzt die Berechtigung für diesen Befehl (`kick`)",
-                "Fehlende Berechtigung (`kick`)"
+                "Eine deiner Rollen besitzt die Berechtigung für diesen Befehl (`kick_allowed_roles`)",
+                "Fehlende Berechtigung (`kick_allowed_roles`)"
             ],
             "can_mute": [
-                "Eine deiner Rollen besitzt die Berechtigung für diesen Befehl (`mute`)",
-                "Fehlende Berechtigung (`mute`)"
+                "Eine deiner Rollen besitzt die Berechtigung für diesen Befehl (`mute_allowed_roles`)",
+                "Fehlende Berechtigung (`mute_allowed_roles`)"
             ],
             "can_say": [
-                "Eine deiner Rollen besitzt die Berechtigung für diesen Befehl (`say`)",
-                "Fehlende Berechtigung (`say`)"
+                "Eine deiner Rollen besitzt die Berechtigung für diesen Befehl (`say_allowed_roles`)",
+                "Fehlende Berechtigung (`say_allowed_roles`)"
             ],
             "can_slowmode": [
-                "Eine deiner Rollen besitzt die Berechtigung für diesen Befehl (`slowmode`)",
-                "Fehlende Berechtigung (`slowmode`)"
+                "Eine deiner Rollen besitzt die Berechtigung für diesen Befehl (`slowmode_allowed_roles`)",
+                "Fehlende Berechtigung (`slowmode_allowed_roles`)"
             ],
             "can_use_cookie": [
                 "Du wurdest von Aragorn1202 ausgewählt!",
                 "Dieser Befehl ist in der Whitelist"
             ],
             "can_use_rss": [
-                "Du hast 'Administrator' Berechtigungen",
-                "'Administrator' Berechtigung fehlt"
+                "Du hast 'Manage Server' Berechtigungen",
+                "'Manage Server' Berechtigung fehlt"
             ],
             "can_warn": [
-                "Eine deiner Rollen besitzt die Berechtigung für diesen Befehl (`warn`)",
-                "Fehlende Berechtigung (`warn`)"
+                "Eine deiner Rollen besitzt die Berechtigung für diesen Befehl (`warn_allowed_roles`)",
+                "Fehlende Berechtigung (`warn_allowed_roles`)"
             ],
             "is_bot_admin": [
                 "Dafür musst du ein Bot Administrator sein",

@@ -9,7 +9,7 @@ import discord
 import twitter
 from cachingutils import acached
 
-from .rss_general import RssMessage
+from .rss_general import FeedObject, RssMessage
 
 if TYPE_CHECKING:
     from libs.classes import Zbot
@@ -80,23 +80,24 @@ class TwitterRSS:
             if lastpost.retweeted:
                 if possible_rt := re.search(r'^RT @([\w-]+):', text):
                     is_rt = possible_rt.group(1)
-            url = "https://twitter.com/{}/status/{}".format(username.lower(), lastpost.id)
+            url = f"https://twitter.com/{username.lower()}/status/{lastpost.id}"
             img = None
             if lastpost.media: # if exists and is not empty
                 img = lastpost.media[0].media_url_https
             obj = RssMessage(
                 bot=self.bot,
-                feed_type='tw',
+                feed=FeedObject.unrecorded("tw", channel.guild.id, channel.id),
                 url=url,
                 title=text,
                 date=dt.datetime.fromtimestamp(lastpost.created_at_in_seconds),
                 author=lastpost.user.screen_name,
                 retweeted_from=is_rt,
                 channel=lastpost.user.name,
-                image=img)
+                image=img
+            )
             return [obj]
         else:
-            liste = list()
+            liste = []
             for post in posts:
                 if len(liste)>10:
                     break
@@ -114,20 +115,21 @@ class TwitterRSS:
                         final_url = await find_url(match.group(0))
                         if "/photo/" in final_url:
                             text = text.replace(match.group(0), '')
-                url = "https://twitter.com/{}/status/{}".format(name.lower(), post.id)
+                url = f"https://twitter.com/{name.lower()}/status/{post.id}"
                 img = None
                 if post.media: # if exists and is not empty
                     img = post.media[0].media_url_https
                 obj = RssMessage(
                     bot=self.bot,
-                    feed_type='tw',
+                    feed=FeedObject.unrecorded("tw", channel.guild.id, channel.id),
                     url=url,
                     title=text,
                     date=dt.datetime.fromtimestamp(post.created_at_in_seconds),
                     author=post.user.screen_name,
                     retweeted_from=is_rt,
                     channel=post.user.name,
-                    image=img)
+                    image=img
+                )
                 liste.append(obj)
             liste.reverse()
             return liste

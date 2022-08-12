@@ -1,3 +1,5 @@
+import json
+import random
 import discord
 import aiohttp
 from discord.ext import commands
@@ -5,6 +7,8 @@ from discord.ext import commands
 from fcts import checks
 from libs.classes import Zbot, MyContext
 
+RANDOM_NAMES_URL = 'https://randommer.io/api/Name?nameType=surname&quantity=20'
+MINECRAFT_ENTITIES_URL = 'https://raw.githubusercontent.com/PixiGeko/Minecraft-generated-data/master/1.19/releases/1.19/data/custom/universal_tags/all_entity_type.json'
 
 class VoiceChannels(commands.Cog):
     "Create automated voice channels and give roles to voice members"
@@ -12,7 +16,7 @@ class VoiceChannels(commands.Cog):
     def __init__(self, bot: Zbot):
         self.bot = bot
         self.file = "voices"
-        self.names: list[str] = []
+        self.names: dict[str, list[str]] = {'random': [], 'minecraft': []}
         self.channels: dict[int, list[int]] = {}
         self.table = 'voices_chats'
 
@@ -61,13 +65,12 @@ class VoiceChannels(commands.Cog):
         if not member.guild.me.guild_permissions.manage_roles:
             self.bot.log.info(f"[Voice] Missing \"manage_roles\" permission on guild \"{member.guild.name}\"")
             return
-        g = member.guild
-        rolesID = await self.bot.get_config(member.guild.id, 'voice_roles')
-        if not rolesID:
+        roles_ids = await self.bot.get_config(member.guild.id, 'voice_roles')
+        if not roles_ids:
             return
-        rolesID = list(map(int, rolesID.split(';')))
-        roles = [g.get_role(x) for x in rolesID]
-        pos = g.me.top_role.position
+        roles_ids = list(map(int, roles_ids.split(';')))
+        roles = [member.guild.get_role(x) for x in roles_ids]
+        pos = member.guild.me.top_role.position
         roles = filter(lambda x: (x is not None) and (x.position < pos), roles)
         if remove:
             await member.remove_roles(*roles, reason="Left the voice chat")
@@ -108,8 +111,8 @@ class VoiceChannels(commands.Cog):
                 await self.give_roles(member, remove=True)
             if before.channel is None:
                 await self.give_roles(member)
-        except Exception as err:
-            await self.bot.get_cog("Errors").on_error(err)
+        except Exception as err: # pylint: disable=broad-except
+            self.bot.dispatch("error", err, f"Member {member}")
 
     async def create_channel(self, member: discord.Member):
         """Create a new voice channel
@@ -143,9 +146,14 @@ class VoiceChannels(commands.Cog):
         over[member.guild.me].manage_roles = None
         # build channel name from config and random
         chan_name = await self.bot.get_config(member.guild.id, 'voice_channel_format')
-        args = {'user': str(member)}
+        args = {
+            'user': str(member),
+            'number': random.randint(0, 1000)
+        }
         if "{random}" in chan_name:
-            args['random'] = await self.get_names()
+            args['random'] = await self.get_random_name()
+        if "{minecraft}" in chan_name:
+            args['minecraft'] = await self.get_mc_name()
         chan_name = chan_name.format_map(self.bot.SafeDict(args))
         # actually create the channel
         new_channel = await voice_category.create_voice_channel(name=chan_name, position=p, overwrites=over)
@@ -160,19 +168,37 @@ class VoiceChannels(commands.Cog):
             await channel.delete(reason="Unusued")
             await self.db_delete_channel(channel)
 
-    async def get_names(self):
+    async def get_random_name(self):
         "Get a random name from the randommer API"
-        if len(self.names) != 0:
-            return self.names.pop()
+        if len(self.names['random']) != 0:
+            return self.names['random'].pop()
         async with aiohttp.ClientSession() as session:
             header = {'X-Api-Key': self.bot.others['random_api_token']}
             try:
-                async with session.get('https://randommer.io/api/Name?nameType=surname&quantity=20', headers=header) as resp:
-                    self.names: list[str] = await resp.json()
+                async with session.get(RANDOM_NAMES_URL, headers=header) as resp:
+                    self.names['random']: list[str] = await resp.json()
             except aiohttp.ContentTypeError as err:
                 self.bot.dispatch("error", err)
                 return "hello"
-        return self.names.pop()
+        return self.names['random'].pop()
+
+    async def get_mc_name(self):
+        "Get a random Minecraft entity name from a JSON file"
+        if len(self.names['minecraft']) != 0:
+            return self.names['minecraft'].pop()
+        async with aiohttp.ClientSession() as session:
+            try:
+                async with session.get(MINECRAFT_ENTITIES_URL) as resp:
+                    data: dict[str, list[str]] = json.loads(await resp.text())
+                    self.names['minecraft']: list[str] = [
+                        name.replace('minecraft:', '').replace('_', ' ') for name in data["values"]
+                    ]
+                    random.shuffle(self.names['minecraft'])
+            except aiohttp.ContentTypeError as err:
+                self.bot.dispatch("error", err)
+                return "hello"
+        return self.names['minecraft'].pop()
+
 
     @commands.command(name="voice-clean")
     @commands.guild_only()

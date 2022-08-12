@@ -10,6 +10,13 @@
         "choose-topic-edition": "Choose which topic to edit",
         "default-topic-prompt": "Select a ticket category",
         "emote-edited": "The emote for the topic \"%{topic}\" has been edited!",
+        "format": {
+            "too-long": "Your channel name format cannot exceed %{max} characters!",
+            "edited": {
+                "default": "The default name format has correctly been edited!",
+                "topic": "The name format for the topic \"%{topic}\" has been edited."
+            }
+        },
         "hint-edited": {
             "default": "The default hint has correctly been edited!",
             "topic": "The hint for the topic \"%{topic}\" has correctly been edited!"
@@ -45,11 +52,12 @@
         },
         "too-quick": "You are opening tickets too quick! Please wait a few minutes between two tickets",
         "topic": {
-            "list": "Your server topics:",
-            "too-long": "The topic name cannot exceed 100 characters",
             "cant-create": "Oops, unable to create this topic. Make sure you do not already have a topic with this name, and contact support if needed",
             "created": "The topic \"%{name}\" has successfully been created",
-            "deleted": "The topic \"%{name}\" has been deleted"
+            "deleted": "The topic \"%{name}\" has been deleted",
+            "list": "Your server topics:",
+            "other-already-exists": "An \"other\" topic is already proposed by default by Zbot, no need to add one :innocent:",
+            "too-long": "The topic name cannot exceed 100 characters"
         }
     }
 }

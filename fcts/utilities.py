@@ -35,13 +35,13 @@ class Utilities(commands.Cog):
     async def get_bot_infos(self):
         config_list = await self.bot.get_cog('Servers').get_bot_infos(self.bot.user.id)
         if len(config_list) > 0:
-            self.config = config_list[0]
+            self.config: dict = config_list[0]
             self.config.pop('token', None)
             return self.config
         return None
 
     async def find_img(self, name: str):
-        return discord.File("../images/{}".format(name))
+        return discord.File(f"../images/{name}")
 
     async def find_url_redirection(self, url: str) -> str:
         """Find where an url is redirected to"""

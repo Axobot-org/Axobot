@@ -406,28 +406,45 @@ class Admin(commands.Cog):
             return
         try:
             await self.bot.get_cog("Servers").send_see(guild,ctx.channel,option,ctx.message,guild)
-        except Exception as e:
-            await self.bot.get_cog("Errors").on_command_error(ctx,e)
+        except Exception as err:
+            await self.bot.get_cog("Errors").on_command_error(ctx,err)
         else:
             await ctx.send("Serveur introuvable")
 
-    @main_msg.command(name='db_reload')
+    @main_msg.group(name="database", aliases=["db"])
     @commands.check(checks.is_bot_admin)
+    async def admin_db(self, ctx: MyContext):
+        "Commandes liées à la base de données"
+
+    @admin_db.command(name='reload')
     async def db_reload(self, ctx: MyContext):
-        """Reconnecte le bot à la base de donnée"""
-        try:
-            self.bot.cnx_frm.close()
-            self.bot.connect_database_frm()
-            self.bot.cnx_xp.close()
-            self.bot.connect_database_xp()
-            self.bot.cnx_stats.close()
-            self.bot.connect_database_stats()
-            if self.bot.cnx_frm is not None and self.bot.cnx_xp is not None and self.bot.cnx_stats is not None:
-                await ctx.message.add_reaction('✅')
-                if xp := self.bot.get_cog("Xp"):
-                    await xp.reload_sus()
-        except Exception as err:
-            await self.bot.get_cog('Errors').on_command_error(ctx,err)
+        "Reconnecte le bot à la base de donnée"
+        self.bot.cnx_frm.close()
+        self.bot.connect_database_frm()
+        self.bot.cnx_xp.close()
+        self.bot.connect_database_xp()
+        self.bot.cnx_stats.close()
+        self.bot.connect_database_stats()
+        if self.bot.cnx_frm is not None and self.bot.cnx_xp is not None and self.bot.cnx_stats is not None:
+            await ctx.message.add_reaction('✅')
+            if xp := self.bot.get_cog("Xp"):
+                await xp.reload_sus()
+
+    @admin_db.command(name='biggest-tables')
+    async def db_biggest(self, ctx: MyContext, database: typing.Optional[str] = None):
+        "Affiche les tables les plus lourdes de la base de données"
+        query = "SELECT table_name AS \"Table\", ROUND(((data_length + index_length) / 1024 / 1024), 2) AS \"Size (MB)\" FROM information_schema.TABLES"
+        if database:
+            query += f" WHERE table_schema = \"{database}\""
+        query += " ORDER BY (data_length + index_length) DESC LIMIT 15"
+        async with self.bot.db_query(query, astuple=True) as query_results:
+            if len(query_results) == 0:
+                await ctx.send("Invalid or empty database")
+                return
+            length = max(len(result[0]) for result in query_results)
+            txt = "\n".join(f"{result[0]:>{length}}: {result[1]} MB" for result in query_results)
+        await ctx.send("```yaml\n" + txt + "\n```")
+
 
     @main_msg.command(name="emergency")
     @commands.check(checks.is_bot_admin)
@@ -445,12 +462,12 @@ class Admin(commands.Cog):
                 user = self.bot.get_user(x)
                 if user.dm_channel is None:
                     await user.create_dm()
-                msg = await user.dm_channel.send("{} La procédure d'urgence vient d'être activée. Si vous souhaitez l'annuler, veuillez cliquer sur la réaction ci-dessous dans les {} secondes qui suivent l'envoi de ce message.".format(self.bot.get_cog('Emojis').customs['red_warning'],time))
+                msg = await user.dm_channel.send("{} La procédure d'urgence vient d'être activée. Si vous souhaitez l'annuler, veuillez cliquer sur la réaction ci-dessous dans les {} secondes qui suivent l'envoi de ce message.".format(self.bot.emojis_manager.customs['red_warning'], time))
                 await msg.add_reaction('🛑')
-            except Exception as e:
-                await self.bot.get_cog('Errors').on_error(e,None)
+            except Exception as err:
+                await self.bot.get_cog('Errors').on_error(err, "Emergency command")
 
-        def check(reaction, user):
+        def check(_, user):
             return user.id in checks.admins_id
         try:
             await self.bot.wait_for('reaction_add', timeout=time, check=check)
@@ -469,14 +486,14 @@ class Admin(commands.Cog):
                 except:
                     continue
             chan = await self.bot.get_channel(500674177548812306)
-            await chan.send("{} Prodédure d'urgence déclenchée : {} serveurs quittés - {} propriétaires prévenus".format(self.bot.get_cog('Emojis').customs['red_alert'],servers,len(owners)))
-            return "{}  {} propriétaires de serveurs ont été prévenu ({} serveurs)".format(self.bot.get_cog('Emojis').customs['red_alert'],len(owners),servers)
+            await chan.send("{} Prodédure d'urgence déclenchée : {} serveurs quittés - {} propriétaires prévenus".format(self.bot.emojis_manager.customs['red_alert'],servers,len(owners)))
+            return "{}  {} propriétaires de serveurs ont été prévenu ({} serveurs)".format(self.bot.emojis_manager.customs['red_alert'],len(owners),servers)
         for x in checks.admins_id:
             try:
                 user = self.bot.get_user(x)
                 await user.send("La procédure a été annulée !")
-            except Exception as e:
-                await self.bot.get_cog('Errors').on_error(e,None)
+            except Exception as err:
+                await self.bot.get_cog('Errors').on_error(err,None)
         return "Qui a appuyé sur le bouton rouge ? :thinking:"
 
     @main_msg.command(name="code")

@@ -1,6 +1,6 @@
 import discord
 from discord.ext import commands
-from libs.classes import Zbot
+from libs.classes import ServerWarningType, Zbot
 
 class Welcomer(commands.Cog):
     """Cog which manages the departure and arrival of members in the servers"""
@@ -47,22 +47,22 @@ class Welcomer(commands.Cog):
             await self.bot.get_cog('Events').check_user_left(member)
 
 
-    async def send_msg(self, member:discord.Member, Type:str):
+    async def send_msg(self, member:discord.Member, event_type:str):
         """Envoie un message de bienvenue/départ dans le serveur"""
         if self.bot.zombie_mode:
             return
-        msg = await self.bot.get_config(member.guild.id,Type)
-        if member.id in self.no_message or (Type == "welcome" and await self.raid_check(member)):
+        msg = await self.bot.get_config(member.guild.id, event_type)
+        if member.id in self.no_message or (event_type == "welcome" and await self.raid_check(member)):
             return
         if self.bot.get_cog('Utilities').sync_check_any_link(member.name) is not None:
             return
-        if msg not in ['',None]:
-            ch = await self.bot.get_config(member.guild.id,'welcome_channel')
-            if ch is None:
+        if msg not in {'', None}:
+            channels = await self.bot.get_config(member.guild.id, 'welcome_channel')
+            if channels is None:
                 return
-            ch = ch.split(';')
-            msg = await self.bot.get_cog('Utilities').clear_msg(msg,ctx=None)
-            for channel in ch:
+            channels = channels.split(';')
+            msg: str = await self.bot.get_cog('Utilities').clear_msg(msg, ctx=None)
+            for channel in channels:
                 if not channel.isnumeric():
                     continue
                 channel = member.guild.get_channel(int(channel))
@@ -71,15 +71,21 @@ class Welcomer(commands.Cog):
                 botormember = await self.bot._(member.guild,"misc.bot" if member.bot else "misc.member")
                 try:
                     msg = msg.format_map(self.bot.SafeDict(
-                        user=member.mention if Type=='welcome' else member.name,
+                        user=member.mention if event_type=='welcome' else member.name,
                         server=member.guild.name,
                         owner=member.guild.owner.name,
                         member_count=member.guild.member_count,
                         type=botormember))
-                    msg = await self.bot.get_cog("Utilities").clear_msg(msg,everyone=False)
+                    msg = await self.bot.get_cog("Utilities").clear_msg(msg, everyone=False)
                     await channel.send(msg)
-                except Exception as e:
-                    await self.bot.get_cog("Errors").on_error(e,None)
+                except discord.Forbidden:
+                    self.bot.dispatch("server_warning",
+                                      ServerWarningType.WELCOME_MISSING_TXT_PERMISSIONS,
+                                      member.guild,
+                                      channel=channel,
+                                      is_join=event_type == "welcome")
+                except Exception as err:
+                    self.bot.dispatch("error", err, f"{member.guild} | {channel.name}")
 
     async def check_owner_server(self, member: discord.Member):
         """Vérifie si un nouvel arrivant est un propriétaire de serveur"""

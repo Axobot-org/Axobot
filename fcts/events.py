@@ -13,7 +13,7 @@ import discord
 import mysql
 import psutil
 from discord.ext import commands, tasks
-from libs.classes import Zbot
+from libs.classes import UsernameChangeRecord, Zbot
 
 from fcts.checks import is_fun_enabled
 
@@ -90,10 +90,13 @@ class Events(commands.Cog):
         if config_option is not None and config_option['allow_usernames_logs'] is False:
             return
         if tries > 5:
+            self.bot.dispatch("error", RuntimeError(f"Nickname change failed after 5 attempts for user {before.id}"))
             return
         if not self.bot.database_online:
             return
         if isinstance(before, discord.Member):
+            if not await self.bot.get_config(before.guild.id, "nicknames_history"):
+                return
             before_nick = '' if before.nick is None else before.nick
             after_nick = '' if after.nick is None else after.nick
         else:
@@ -104,7 +107,11 @@ class Events(commands.Cog):
         query_args = { 'u': before.id, 'o': before_nick, 'n': after_nick, 'g': guild, 'b': self.bot.beta }
         try:
             async with self.bot.db_query(query, query_args):
-                pass
+                self.bot.dispatch("username_change_record", UsernameChangeRecord(
+                    before_nick or None,
+                    after_nick or None,
+                    after
+                ))
         except mysql.connector.errors.IntegrityError as err:
             self.bot.log.warning(err)
             await self.updade_memberslogs_name(before, after, tries+1)
@@ -378,64 +385,56 @@ class Events(commands.Cog):
         if self.bot.beta:
             return
         t = time.time()
-        answers = ['None' for _ in range(5)]
-        self.bot.log.info("[DBL] Envoi des infos sur le nombre de guildes...")
+        answers = ['None' for _ in range(3)]
+        self.bot.log.info("Sending server count to bots lists APIs...")
         try:
-            guildCount = await self.bot.get_cog('Info').get_guilds_count()
+            guild_count = await self.bot.get_cog('Info').get_guilds_count()
         except Exception as err:
-            await self.bot.get_cog('Errors').on_error(err,None)
-            guildCount = len(self.bot.guilds)
+            self.bot.dispatch("error", err, "Fetching guild count")
+            guild_count = len(self.bot.guilds)
         session = aiohttp.ClientSession(loop=self.bot.loop)
         try:# https://top.gg/bot/486896267788812288
-            payload = {'server_count': guildCount}
-            async with session.post('https://top.gg/api/bots/486896267788812288/stats',data=payload,headers={'Authorization':str(self.bot.dbl_token)}) as resp:
-                self.bot.log.debug('top.gg returned {} for {}'.format(resp.status, payload))
+            payload = {'server_count': guild_count}
+            headers={
+                'Authorization': self.bot.dbl_token
+            }
+            async with session.post(f'https://top.gg/api/bots/{self.bot.user.id}/stats' ,data=payload, headers=headers) as resp:
+                self.bot.log.debug(f'top.gg returned {resp.status} for {payload}')
                 answers[0] = resp.status
         except Exception as err:
             answers[0] = "0"
-            await self.bot.get_cog("Errors").on_error(err,None)
+            self.bot.dispatch("error", err, "Sending server count to top.gg")
         try: # https://bots.ondiscord.xyz/bots/486896267788812288
             payload = json.dumps({
-            'guildCount': guildCount
+                'guildCount': guild_count
             })
             headers = {
                 'Authorization': self.bot.others['botsondiscord'],
                 'Content-Type': 'application/json'
             }
-            async with session.post('https://bots.ondiscord.xyz/bot-api/bots/{}/guilds'.format(self.bot.user.id), data=payload, headers=headers) as resp:
-                self.bot.log.debug('BotsOnDiscord returned {} for {}'.format(resp.status, payload))
+            async with session.post(f'https://bots.ondiscord.xyz/bot-api/bots/{self.bot.user.id}/guilds', data=payload, headers=headers) as resp:
+                self.bot.log.debug(f'BotsOnDiscord returned {resp.status} for {payload}')
                 answers[1] = resp.status
         except Exception as err:
             answers[1] = "0"
-            await self.bot.get_cog("Errors").on_error(err,None)
-        try: # https://discord.boats/bot/486896267788812288
-            headers = {
-                'Authorization': self.bot.others['discordboats'],
-                'Content-Type': 'application/json'
-            }
-            async with session.post('https://discord.boats/api/bot/{}'.format(self.bot.user.id), data=payload, headers=headers) as resp:
-                self.bot.log.debug('discord.boats returned {} for {}'.format(resp.status, payload))
-                answers[3] = resp.status
-        except Exception as err:
-            answers[3] = "0"
-            await self.bot.get_cog("Errors").on_error(err,None)
+            self.bot.dispatch("error", err, "Sending server count to BotsOnDiscord")
         try: # https://api.discordextremelist.xyz/v2/bot/486896267788812288/stats
             payload = json.dumps({
-                'guildCount': guildCount
+                'guildCount': guild_count
             })
             headers = {
                 'Authorization': self.bot.others['discordextremelist'],
                 'Content-Type': 'application/json'
             }
-            async with session.post('https://api.discordextremelist.xyz/v2/bot/{}/stats'.format(self.bot.user.id), data=payload, headers=headers) as resp:
-                self.bot.log.debug('DiscordExtremeList returned {} for {}'.format(resp.status, payload))
-                answers[4] = resp.status
+            async with session.post(f'https://api.discordextremelist.xyz/v2/bot/{self.bot.user.id}/stats', data=payload, headers=headers) as resp:
+                self.bot.log.debug(f'DiscordExtremeList returned {resp.status} for {payload}')
+                answers[2] = resp.status
         except Exception as err:
-            answers[4] = "0"
-            await self.bot.get_cog("Errors").on_error(err,None)
+            answers[2] = "0"
+            self.bot.dispatch("error", err, "Sending server count to DiscordExtremeList")
         await session.close()
         answers = '-'.join(str(x) for x in answers)
-        delta_time = round(time.time()-t,3)
+        delta_time = round(time.time()-t, 3)
         emb = discord.Embed(description=f'**Guilds count updated** in {delta_time}s ({answers})', color=7229109, timestamp=self.bot.utcnow())
         emb.set_author(name=self.bot.user, icon_url=self.bot.user.display_avatar)
         await self.bot.send_embed([emb], url="loop")
@@ -471,26 +470,26 @@ class Events(commands.Cog):
     async def translations_backup(self):
         """Do a backup of the translations files"""
         from os import remove
-        t = time.time()
+        start = time.time()
         self.last_tr_backup = datetime.datetime.now()
         try:
             remove('translation-backup.tar')
-        except:
+        except FileNotFoundError:
             pass
         try:
             shutil.make_archive('translation-backup','tar','translation')
         except FileNotFoundError:
             await self.bot.get_cog('Errors').senf_err_msg("Translators backup: Unable to find backup folder")
             return
-        delta_time = round(time.time()-t,3)
+        delta_time = round(time.time()-start, 3)
         emb = discord.Embed(description=f'**Translations files backup** completed in {delta_time}s', color=10197915, timestamp=self.bot.utcnow())
         emb.set_author(name=self.bot.user, icon_url=self.bot.user.display_avatar)
         await self.bot.send_embed([emb], url="loop")
 
     async def send_sql_statslogs(self):
         "Send some stats about the current bot stats"
-        rss_feeds = await self.bot.get_cog("Rss").get_raws_count(True)
-        active_rss_feeds = await self.bot.get_cog("Rss").get_raws_count()
+        rss_feeds = await self.bot.get_cog("Rss").db_get_raws_count(True)
+        active_rss_feeds = await self.bot.get_cog("Rss").db_get_raws_count()
         if infoCog := self.bot.get_cog("Info"):
             member_count, bot_count = infoCog.get_users_nber(list())
         else:

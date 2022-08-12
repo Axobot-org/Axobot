@@ -63,9 +63,11 @@ With this command, you can get the number of members on your server, but also th
 Permissions
 -----------
 
-**Syntax:** :code:`perms [channel] [user|role]` or :code:`permissions [channel] [user|role]`
+**Syntax:** :code:`perms [channel] [user|role]` or :code:`permissions [channel] [user|role]` or :code:`permissions <integer|binary>`
 
 This small command allows you to see the list of permissions assigned to a member/role in a particular channel. The channel can be either a text or a voice chat, but if you don't provide any, the bot will select the general permissions as set in the Server Configuration. To inform a member or a role, it is only necessary to enter his exact name, his `ID <https://support.discord.com/hc/en-us/articles/206346498-Where-can-I-find-my-User-Server-Message-ID->`_ , or his mention. If no name is given the targeted member will be the one who enters the command.
+
+As permissions are internally stored by Discord as integers or bit flags, you can also choose to view the permissions associated to a raw integer/binary value (in which case channel will be ignored). For example :code:`perms 0b01110` or :code:`perms 8` are valid syntaxes.
 
 .. warning:: The only permission needed to grant the bot is "`Embed Links <perms.html#embed-links>`_".
 

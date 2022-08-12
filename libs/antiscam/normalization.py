@@ -2,9 +2,11 @@ import os
 import re
 from json import load
 
-from emoji import UNICODE_EMOJI
+from emoji.unicode_codes import get_aliases_unicode_dict
 from nltk import SnowballStemmer
 from nltk.corpus import stopwords
+
+UNICODE_EMOJI: dict[str, str] = get_aliases_unicode_dict()
 
 RE_EMAIL = re.compile(r'[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+')
 RE_WEB = re.compile(
@@ -33,7 +35,7 @@ PROTECTED_WORDS = ('discordchannel', 'discorduser', 'discordemoji', 'discordrole
 with open(os.path.dirname(__file__)+'/data/unicode_map.json', 'r', encoding='utf-8') as file:
     UNICODE_MAP: dict[str, str] = load(file)
 
-emojis_iter = map(lambda y: y, UNICODE_EMOJI['en'].keys())
+emojis_iter = map(lambda y: y, UNICODE_EMOJI.keys())
 RE_EMOJI = re.compile('|'.join(re.escape(em) for em in emojis_iter))
 
 

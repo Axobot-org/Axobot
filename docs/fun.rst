@@ -241,7 +241,7 @@ Basically this command was designed for the sole use of the Creator. But since e
 
 .. warning:: 
     * The bot needs "`Attach files <perms.html#attach-files>`_" permission to send these images.
-    * We do not own the copyright of each of the images used in this command. If you want to design an image especially for ZBot, and are ready to give us all rights, thank you to contact us as soon as possible!
+    * We do not own the copyright of each of the images used in this command. If you want to design an image specially for ZBot, and are ready to give us all rights, thank you to contact us as soon as possible!
 
 
 React

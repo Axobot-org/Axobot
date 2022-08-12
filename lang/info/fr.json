@@ -52,20 +52,26 @@
             "users_count": "**Nombre de membres visibles :** %{v0} (dont %{v1} **bots**)"
         },
         "usernames": {
-            "allow": "Vous pouvez réautoriser l'enregistrement automatique via la commande 'profile'",
-            "disallow": "Vous pouvez vous retirer de l'enregistrement automatique via la commande 'profile'",
+            "allow": "Vous pouvez réautoriser l'enregistrement automatique de vos pseudos via la commande 'profile'",
+            "disallow": "Vous pouvez désactiver l'enregistrement automatique de vos pseudos via la commande 'profile'",
             "empty": "Aucun changement enregistré",
             "global": "Historique général",
             "last-date": "Dernier changement",
             "local": "Historique du serveur",
             "more": "Et %{nbr} de plus",
-            "title": "Pseudos de **%{u}**"
+            "title": "Pseudos de **%{u}**",
+            "general": "Global :",
+            "server": "Sur le serveur :"
         },
         "membercount-0": "Nombre de membres total",
         "membercount-1": "Nombre de bots",
         "membercount-2": "Nombre d'humains",
         "membercount-3": "Nombre de membres connectés",
         "membercount-4": "Nombre de membres non vérifiés",
+        "nicknames-disabled": {
+            "guild-too-big": "Les changements de pseudo dans ce serveur ne sont pas sauvegardés, probablement parce que votre serveur est trop grand. Demandez à un administrateur d'activer l'option \"nicknames_history\" si vous le souhaitez.",
+            "disabled": "Les enregistrements de changements de pseudo ont été désactivés par un administrateur de ce serveur. Vous ne verrez pas vos nouveaux changements de pseudo ici :confused:"
+        },
         "not-found": "Impossible de trouver %{N}",
         "info": {
             "categ-0": "Catégorie",
@@ -101,17 +107,21 @@
             "guild-features": {
                 "ANIMATED_BANNER": "Bannière animée",
                 "ANIMATED_ICON": "Icône de serveur animée",
+                "AUTO_MODERATION": "Modération automatique",
                 "BANNER": "Bannière de serveur custom",
                 "CHANNEL_BANNER": "Bannières de salon",
                 "COMMERCE": "Fonctionnalités de commerce",
                 "COMMUNITY": "Serveur communautaire",
                 "DISCOVERABLE": "Affiché dans l'onglet Découverte",
                 "ENABLED_DISCOVERABLE_BEFORE": "Utilise la fonctionnalité de Découverte depuis longtemps",
+                "HAS_DIRECTORY_ENTRY": "Listé dans un hub d'étudiants",
                 "INVITE_SPLASH": "Fond d'écran d'invitation",
-                "MEMBER_LIST_DISABLED": "Liste des membres désactivée",
+                "LINKED_TO_HUB": "Lié à un hub d'étudiants",
                 "MEMBER_PROFILES": "Profiles personnalisés par member",
                 "MEMBER_VERIFICATION_GATE_ENABLED": "Portail de vérification des membres activé",
+                "MONETIZATION_ENABLED": "Monétisé",
                 "MORE_EMOJI": "Limite d'émojis augmentée",
+                "NEW_THREAD_PERMISSIONS": "Nouvelles permissions de fils",
                 "NEWS": "Salons de news",
                 "PARTNERED": "Serveur partenaire",
                 "PREVIEW_ENABLED": "Preview activées",

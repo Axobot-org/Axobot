@@ -20,6 +20,7 @@ from docs import conf
 from libs import bitly_api
 from libs.classes import MyContext, Zbot
 from libs.formatutils import FormatUtils
+from libs.rss.rss_general import FeedObject
 from utils import count_code_lines
 
 from fcts import args, checks
@@ -105,10 +106,7 @@ class Info(commands.Cog):
             langs_list = ' | '.join(["{}: {}%".format(x[0],round(x[1]/lang_total*100)) for x in langs_list if x[1] > 0])
             del lang_total
             # Users/bots
-            try:
-                users,bots = self.get_users_nber(ignored_guilds)
-            except Exception as e:
-                users = bots = 'unknown'
+            users,bots = self.get_users_nber(ignored_guilds)
             # Total XP
             if self.bot.database_online:
                 total_xp = await self.bot.get_cog('Xp').bdd_total_xp()
@@ -230,7 +228,7 @@ class Info(commands.Cog):
     @commands.command(name="docs", aliases=['doc','documentation'])
     async def display_doc(self, ctx: MyContext):
         """Get the documentation url"""
-        text = self.bot.get_cog('Emojis').customs['readthedocs'] + await self.bot._(ctx.channel,"info.docs") + \
+        text = self.bot.emojis_manager.customs['readthedocs'] + await self.bot._(ctx.channel,"info.docs") + \
             " https://zbot.rtfd.io"
         if self.bot.beta:
             text += '/en/develop'
@@ -372,11 +370,17 @@ Available types: member, role, user, emoji, channel, server, invite, category
             embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.member-7"), value = await self.bot.get_cog('Cases').get_nber(member.id,ctx.guild.id),inline=True)
         # Guilds count
         if member.bot:
-            session = aiohttp.ClientSession(loop=self.bot.loop)
-            guilds_count = await self.bot.get_cog('Partners').get_bot_guilds(member.id,session)
+            async with aiohttp.ClientSession(loop=self.bot.loop) as session:
+                guilds_count = await self.bot.get_cog('Partners').get_bot_guilds(member.id, session)
+                bot_owners = await self.bot.get_cog('Partners').get_bot_owners(member.id, session)
             if guilds_count is not None:
+                guilds_count = await FormatUtils.format_nbr(guilds_count, lang)
                 embed.add_field(name=str(await self.bot._(ctx.guild.id,'misc.servers')).capitalize(),value=guilds_count)
-            await session.close()
+            if bot_owners:
+                embed.add_field(
+                    name=(await self.bot._(ctx.guild.id, 'info.info.guild-1')).capitalize(),
+                    value=", ".join([str(u) for u in bot_owners])
+                )
         # Roles
         _roles = await self.bot._(ctx.guild.id, 'info.info.member-9') + f' [{len(list_role)}]'
         if len(list_role) > 0:
@@ -463,11 +467,20 @@ Available types: member, role, user, emoji, channel, server, invite, category
         # is in server
         embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.user-0"), value=on_server.capitalize())
         if user.bot:
-            session = aiohttp.ClientSession(loop=self.bot.loop)
-            guilds_count = await self.bot.get_cog('Partners').get_bot_guilds(user.id,session)
+            async with aiohttp.ClientSession(loop=self.bot.loop) as session:
+                guilds_count = await self.bot.get_cog('Partners').get_bot_guilds(user.id, session)
+                bot_owners = await self.bot.get_cog('Partners').get_bot_owners(user.id, session)
             if guilds_count is not None:
-                embed.add_field(name=str(await self.bot._(ctx.guild.id,'misc.servers')).capitalize(),value=guilds_count)
-            await session.close()
+                guilds_count = await FormatUtils.format_nbr(guilds_count, lang)
+                embed.add_field(
+                    name=str(await self.bot._(ctx.guild.id, 'misc.servers')).capitalize(),
+                    value=guilds_count
+                )
+            if bot_owners:
+                embed.add_field(
+                    name=(await self.bot._(ctx.guild.id, 'info.info.guild-1')).capitalize(),
+                    value=", ".join([str(u) for u in bot_owners])
+                )
         await ctx.send(embed=embed)
 
     @info_main.command(name="emoji")
@@ -828,7 +841,7 @@ Available types: member, role, user, emoji, channel, server, invite, category
         # XP card
         xp_card = await self.bot.get_cog('Utilities').get_xp_style(user)
         # Flags
-        userflags: list = await self.bot.get_cog('Users').get_userflags(user)
+        userflags = await self.bot.get_cog('Users').get_userflags(user)
         if await self.bot.get_cog("Admin").check_if_admin(user):
             userflags.append('admin')
         if len(userflags) == 0:
@@ -922,7 +935,7 @@ Servers:
         # Rss
         rss_len = await self.bot.get_config(guild.id,'rss_max_number')
         rss_len = self.bot.get_cog("Servers").default_opt['rss_max_number'] if rss_len is None else rss_len
-        rss_numb = "{}/{}".format(len(await self.bot.get_cog('Rss').get_guild_flows(guild.id)), rss_len)
+        rss_numb = "{}/{}".format(len(await self.bot.get_cog('Rss').db_get_guild_feeds(guild.id)), rss_len)
         # Join date
         joined_at = f"<t:{guild.me.joined_at.timestamp():.0f}>"
         # ----
@@ -1003,23 +1016,21 @@ Servers:
 
     @find_main.command(name='rss')
     async def find_rss(self, ctx: MyContext, ID:int):
-        flow = await self.bot.get_cog('Rss').get_flow(ID)
-        if len(flow) == 0:
+        feed: FeedObject = await self.bot.get_cog('Rss').db_get_feed(ID)
+        if feed is None:
             await ctx.send("Invalid ID")
             return
-        else:
-            flow = flow[0]
-        temp = self.bot.get_guild(flow['guild'])
+        temp = self.bot.get_guild(feed.guild_id)
         if temp is None:
-            g = "Unknown ({})".format(flow['guild'])
+            g = "Unknown ({})".format(feed.guild_id)
         else:
-            g = "`{}`\n{}".format(temp.name,temp.id)
-            temp = self.bot.get_channel(flow['channel'])
+            g = "`{}`\n{}".format(temp.name, temp.id)
+            temp = self.bot.get_channel(feed.channel_id)
         if temp is not None:
             c = "`{}`\n{}".format(temp.name,temp.id)
         else:
-            c = "Unknown ({})".format(flow['channel'])
-        d = f"<t:{flow['date'].timestamp():.0f}>"
+            c = "Unknown ({})".format(feed.channel_id)
+        d = f"<t:{feed.date.timestamp():.0f}>"
         if d is None or len(d) == 0:
             d = "never"
         if ctx.can_send_embed:
@@ -1030,13 +1041,13 @@ Servers:
             emb = discord.Embed(title=f"RSS N°{ID}", color=color)
             emb.add_field(name="Server", value=g)
             emb.add_field(name="Channel", value=c)
-            emb.add_field(name="URL", value=flow['link'], inline=False)
-            emb.add_field(name="Type", value=flow['type'])
+            emb.add_field(name="URL", value=feed.link, inline=False)
+            emb.add_field(name="Type", value=feed.type)
             emb.add_field(name="Last post", value=d)
             emb.set_footer(text=ctx.author, icon_url=ctx.author.display_avatar)
             await ctx.send(embed=emb)
         else:
-            await ctx.send("ID: {}\nGuild: {}\nChannel: {}\nLink: <{}>\nType: {}\nLast post: {}".format(flow['ID'],g.replace("\n"," "),c.replace("\n"," "),flow['link'],flow['type'],d))
+            await ctx.send("ID: {}\nGuild: {}\nChannel: {}\nLink: <{}>\nType: {}\nLast post: {}".format(feed.feed_id, g.replace("\n"," "), c.replace("\n"," "), feed.link,feed.type, d))
 
     @commands.command(name="membercount",aliases=['member_count'])
     @commands.guild_only()
@@ -1125,7 +1136,7 @@ Servers:
             ctx = await self.bot.get_context(msg)
             if ctx.command is not None:
                 return
-            liste = list(set(re.findall(r'<a?:[\w-]+:(\d{18})>',msg.content)))
+            liste = list(set(re.findall(r'<a?:[\w-]+:(\d{17,19})>',msg.content)))
             if len(liste) == 0:
                 return
             current_timestamp = datetime.datetime.fromtimestamp(round(time.time()))
@@ -1254,11 +1265,8 @@ Servers:
         ..Doc infos.html#usernames-history"""
         if user is None:
             user = ctx.author
-        cond = f"user='{user.id}'"
-        if not self.bot.beta:
-            cond += " AND beta=0"
-        query = f"SELECT `old`, `new`, `guild`, CONVERT_TZ(`date`, @@session.time_zone, '+00:00') AS `utc_date` FROM `usernames_logs` WHERE {cond} ORDER BY date DESC"
-        async with self.bot.db_query(query) as results:
+        query = f"SELECT `old`, `new`, `guild`, CONVERT_TZ(`date`, @@session.time_zone, '+00:00') AS `utc_date` FROM `usernames_logs` WHERE user = %s AND beta = %s ORDER BY date DESC"
+        async with self.bot.db_query(query, (user.id, self.bot.beta)) as results:
             # List creation
             this_guild = list()
             global_list = [x for x in results if x['guild'] in (None,0)]
@@ -1279,7 +1287,8 @@ Servers:
                     if len(temp) > MAX:
                         temp = temp[:MAX] + [await self.bot._(ctx.channel, 'info.usernames.more', nbr=len(temp)-MAX)]
                     fields.append({'name':await self.bot._(ctx.channel,'info.usernames.global'), 'value':"\n".join(temp)})
-                    date += "General: <t:{}>".format(round(global_list[0]['utc_date'].timestamp()))
+                    _general = await self.bot._(ctx.channel,'info.usernames.general')
+                    date += f"{_general} <t:{global_list[0]['utc_date'].timestamp():.0f}>"
             if len(this_guild) > 0:
             # Nicknames part
                 temp = [x['new'] for x in this_guild if x['new']!='']
@@ -1287,7 +1296,8 @@ Servers:
                     if len(temp) > MAX:
                         temp = temp[:MAX] + [await self.bot._(ctx.channel, 'info.usernames.more', nbr=len(temp)-MAX)]
                     fields.append({'name':await self.bot._(ctx.channel,'info.usernames.local'), 'value':"\n".join(temp)})
-                    date += "\nServer: <t:{}>".format(round(this_guild[0]['utc_date'].timestamp()))
+                    _server = await self.bot._(ctx.channel,'info.usernames.server')
+                    date += f"{_server} <t:{this_guild[0]['utc_date'].timestamp():.0f}>"
             if len(date) > 0:
                 fields.append({'name':await self.bot._(ctx.channel,'info.usernames.last-date'), 'value':date})
             else:
@@ -1301,6 +1311,12 @@ Servers:
                 footer = await self.bot._(ctx.channel,'info.usernames.disallow')
             else:
                 footer = await self.bot._(ctx.channel,'info.usernames.allow')
+            if ctx.guild is not None and not await self.bot.get_config(ctx.guild.id, "nicknames_history"):
+                if len(ctx.guild.members) >= self.bot.get_cog("Servers").max_members_for_nicknames:
+                    warning_disabled = await self.bot._(ctx.guild.id, "info.nicknames-disabled.guild-too-big")
+                else:
+                    warning_disabled = await self.bot._(ctx.guild.id, "info.nicknames-disabled.disabled")
+                desc = warning_disabled if desc is None else warning_disabled + "\n\n" + desc
             emb = discord.Embed(title=t, description=desc, color=c)
             emb.set_footer(text=footer)
             for field in fields:

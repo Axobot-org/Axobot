@@ -206,6 +206,9 @@ This option allows you to moderate the entry of your server, with several levels
 Anti-bot verification
 ---------------------
 
+.. warning:: This system is now deprecated in favor of the `Discord rules screening <https://support.discord.com/hc/en-us/articles/1500000466882-Rules-Screening-FAQ>`__, and will be removed in a future release.
+
+
 **How does it work?**
 
 The verification system works with a simple command and a role, and filters most of the selfbots that attack your servers.
@@ -240,6 +243,7 @@ When Zbot is certain that a message is dangerous, it will delete the message imm
 :code:`antiscam enable` or :code:`antiscam disable` to enable/disable the system (require "manage server" permission)
 :code:`modlogs enable antiscam` to enable antiscam logs in a channel (require "manage server" permission)
 :code:`antiscam test` followed by any text to test how dangerous this text may be
+:code:`antiscam report` followed by any text or message link to report a malicious message to the bot team
 
 .. warning:: By enabling this feature, you allow Zbot to read and analyze all messages on your server, and messages considered suspicious may be anonymized and stored in our database for better detection. You are solely responsible for notifying your community of this.
 
@@ -263,18 +267,23 @@ Types of logs
 
 * **antiraid:** A new member is kicked or banned by the raid detection system
 * **antiscan:** A message is flagged as a potential scam by the antiscam AI
-* **member_roles:** A member gets or loses roles
-* **member_nick:** A member has its nickname changed
+* **bot_warnings:** Zbot couldn't do its job due to an external factor (like a missing permission)
+* **discord_invite:** A member just sent a message containing one or more Discord server invite link
+* **ghost_ping:** A member deleted a message containing a user mention right after sending it
 * **member_avatar:** A member changes its guild avatar
-* **member_join:** A member joins your server
-* **member_leave:** A member leaves your server
 * **member_ban:** A user is banned from your server
-* **member_unban:** A user is unbanned from your server
-* **member_timeout:** A member is set on timeout by one of your moderators
+* **member_join:** A member joins your server
 * **member_kick:** A member is kicked from your server
+* **member_leave:** A member leaves your server
+* **member_nick:** A member has its nickname changed
+* **member_roles:** A member gets or loses roles
+* **member_timeout:** A member is set on timeout by one of your moderators
+* **member_unban:** A user is unbanned from your server
+* **member_verification:** A user has been verified by the Discord community rules screen (if enabled in your server)
 * **message_update:** A message is edited
 * **message_delete:** A message is deleted
 * **role_creation:** A role is created
+* **ticket_creation:** A `ticket <tickets.html>`__ has been opened
 
 
 --------------

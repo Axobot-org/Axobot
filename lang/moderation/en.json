@@ -1,6 +1,5 @@
 {
     "en": {
-        
         "ban": {
             "too-high": "It seems that this member is too high for me to ban him. :thinking:",
             "list-error": "Oops, it looks like there are too many users to display :confused:",
@@ -24,6 +23,10 @@
             },
             "too-few": "I can't delete so few messages",
             "not-found": "Hmm... impossible to delete these messages. Discord tells me they don't exist :thinking:"
+        },
+        "deprecated-verify": {
+            "title": "Deprecated feature",
+            "desc": "The verification system is now deprecated and will be removed in a future version. Please ask a server manager to enable the [Discord community verification system](https://support.discord.com/hc/en-us/articles/1500000466882-Rules-Screening-FAQ) instead."
         },
         "destop": {
             "no-guild": "This message does not belong to this server",

@@ -27,7 +27,7 @@ Follow a feed
 
 **Syntax:** :code:`rss add <link>`
 
-If you want to automatically track an rss feed, this command should be used. You can only track a maximum feeds, which will be reloaded every 10 minutes. Note that Minecraft server tracing also counts as an rss feed, and therefore will cost you a place.
+If you want to automatically track an rss feed, this command should be used. You can only track a maximum feeds, which will be reloaded every 20 minutes. Note that Minecraft server tracing also counts as an rss feed, and therefore will cost you a slot (which are currently limited to 10 per server).
 
 For Twitter and YouTube channels, simply give the link of the channel, so that the bot automatically detects the type and name of the channel. If no type is recognized, the 'web' type will be selected.
 

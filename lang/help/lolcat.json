@@ -22,44 +22,44 @@
                 "The bot donot've sufficient perms"
             ],
             "can_ban": [
-                "One of your roles iz allowd 2 use this command (`ban`)",
-                "U missed allowed role (`ban`)"
+                "One of your roles iz allowd 2 use this command (`ban_allowed_roles`)",
+                "U missed allowed role (`ban_allowed_roles`)"
             ],
             "can_clear": [
-                "One of Ur roles is authorized to use this command (`clear`)",
-                "U missed allowed role (`clear`)"
+                "One of Ur roles is authorized to use this command (`clear_allowed_roles`)",
+                "U missed allowed role (`clear_allowed_roles`)"
             ],
             "can_edit_case": [
-                "One of UR roles is authorized to use this command (`warn`)",
-                "U missed allowed role (`warn`)"
+                "One of UR roles is authorized to use this command (`warn_allowed_roles`)",
+                "U missed allowed role (`warn_allowed_roles`)"
             ],
             "can_kick": [
-                "One of your roles iiz allowd to use this command (`kick`)",
-                "U missed allowed role (`kick`)"
+                "One of your roles iiz allowd to use this command (`kick_allowed_roles`)",
+                "U missed allowed role (`kick_allowed_roles`)"
             ],
             "can_mute": [
-                "One of your roles iz allowd to use this command (`mute`)",
-                "U missed allowed role (`mute`)"
+                "One of your roles iz allowd to use this command (`mute_allowed_roles`)",
+                "U missed allowed role (`mute_allowed_roles`)"
             ],
             "can_say": [
-                "One of Ur roles is authorized to use this command (`say`)",
-                "U missed allowed role (`say`)"
+                "One of Ur roles is authorized to use this command (`say_allowed_roles`)",
+                "U missed allowed role (`say_allowed_roles`)"
             ],
             "can_slowmode": [
-                "One of your roles's authorized 2 use this command (`slowmode`)",
-                "U missed allowed role (`slowmode`)"
+                "One of your roles's authorized 2 use this command (`slowmode_allowed_roles`)",
+                "U missed allowed role (`slowmode_allowed_roles`)"
             ],
             "can_use_cookie": [
                 "U are THE CHOOSEN ONE from Aragorn1202 :congrats:",
                 "This command is on Whitelist. aka NO U LMAO"
             ],
             "can_use_rss": [
-                "U have 'Administrator' permission",
-                "'Administrator' permission is missed"
+                "U have 'Manage server' permission",
+                "'Manage server' permission is missed"
             ],
             "can_warn": [
-                "One of ur roles iz allowd 2 use this command (`warn`)",
-                "U missed allowed role (`warn`)"
+                "One of ur roles iz allowd 2 use this command (`warn_allowed_roles`)",
+                "U missed allowed role (`warn_allowed_roles`)"
             ],
             "is_bot_admin": [
                 "You need 2B one of the bot Admins",

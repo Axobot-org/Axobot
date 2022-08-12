@@ -5,7 +5,7 @@ import importlib
 import random
 import re
 from math import ceil
-from typing import Dict, List, Optional, Tuple, Union
+from typing import Dict, List, Literal, Optional, Tuple, Union
 
 import discord
 from discord.ext import commands
@@ -94,7 +94,7 @@ Slowmode works up to one message every 6h (21600s)
             await ctx.send(await self.bot._(ctx.guild.id, "moderation.need-read-history"))
             return
         if number<1:
-            await ctx.send(await self.bot._(ctx.guild.id, "moderation.clear.too-few")+" "+self.bot.get_cog('Emojis').customs["owo"])
+            await ctx.send(await self.bot._(ctx.guild.id, "moderation.clear.too-few")+" "+self.bot.emojis_manager.customs["owo"])
             return
         if len(params) == 0:
             return await self.clear_simple(ctx,number)
@@ -146,7 +146,7 @@ Slowmode works up to one message every 6h (21600s)
                 if (i is None and invites==2) or (i is not None and invites == 0):
                     c4 = False
             #return ((m.pinned == pinned) or ((m.attachments != []) == files) or ((r is not None) == links)) and m.author in users
-            mentions = list(map(int, re.findall(r'<@!?(\d{16,18})>', ctx.message.content)))
+            mentions = list(map(int, re.findall(r'<@!?(\d{167,19})>', ctx.message.content)))
             if str(ctx.bot.user.id) in ctx.prefix:
                 mentions.remove(ctx.bot.user.id)
             if mentions and m.author is not None:
@@ -194,7 +194,7 @@ Slowmode works up to one message every 6h (21600s)
                 return
             async def user_can_kick(user):
                 try:
-                    return await self.bot.get_cog("Servers").staff_finder(user,"kick")
+                    return await self.bot.get_cog("Servers").staff_finder(user, "kick_allowed_roles")
                 except commands.errors.CommandError:
                     pass
                 return False
@@ -250,7 +250,7 @@ Slowmode works up to one message every 6h (21600s)
         try:
             async def user_can_warn(user):
                 try:
-                    return await self.bot.get_cog("Servers").staff_finder(user,"warn")
+                    return await self.bot.get_cog("Servers").staff_finder(user, "warn_allowed_roles")
                 except commands.errors.CommandError:
                     pass
                 return False
@@ -368,12 +368,12 @@ You can also mute this member for a defined duration, then use the following for
         try:
             async def user_can_mute(user):
                 try:
-                    return await self.bot.get_cog("Servers").staff_finder(user,"mute")
+                    return await self.bot.get_cog("Servers").staff_finder(user, "mute_allowed_roles")
                 except commands.errors.CommandError:
                     pass
                 return False
             if user==ctx.guild.me or (self.bot.database_online and await user_can_mute(user)):
-                emoji = random.choice([':confused:',':upside_down:',self.bot.get_cog('Emojis').customs['wat'],':no_mouth:',self.bot.get_cog('Emojis').customs['owo'],':thinking:',])
+                emoji = random.choice([':confused:',':upside_down:',self.bot.emojis_manager.customs['wat'],':no_mouth:',self.bot.emojis_manager.customs['owo'],':thinking:',])
                 await ctx.send((await self.bot._(ctx.guild.id, "moderation.mute.staff-mute"))+emoji)
                 return
             elif not self.bot.database_online and ctx.channel.permissions_for(user).manage_roles:
@@ -563,7 +563,7 @@ The 'days_to_delete' option represents the number of days worth of messages to d
                 member = ctx.guild.get_member(user.id)
                 async def user_can_ban(user):
                     try:
-                        return await self.bot.get_cog("Servers").staff_finder(user,"ban")
+                        return await self.bot.get_cog("Servers").staff_finder(user, "ban_allowed_roles")
                     except commands.errors.CommandError:
                         pass
                     return False
@@ -683,7 +683,7 @@ The 'days_to_delete' option represents the number of days worth of messages to d
     @commands.command(name="softban")
     @commands.guild_only()
     @commands.check(checks.can_kick)
-    async def softban(self, ctx: MyContext, user:discord.Member, reason="Unspecified"):
+    async def softban(self, ctx: MyContext, user:discord.Member, *, reason="Unspecified"):
         """Kick a member and lets Discord delete all his messages up to 7 days old.
 Permissions for using this command are the same as for the kick
 
@@ -696,7 +696,7 @@ Permissions for using this command are the same as for the kick
                 return
             async def user_can_kick(user):
                 try:
-                    return await self.bot.get_cog("Servers").staff_finder(user,"kick")
+                    return await self.bot.get_cog("Servers").staff_finder(user, "kick_allowed_roles")
                 except commands.errors.CommandError:
                     pass
                 return False
@@ -960,7 +960,7 @@ The 'reasons' parameter is used to display the mute reasons.
 
     @emoji_group.command(name="restrict")
     @commands.check(checks.has_manage_emojis)
-    async def emoji_restrict(self, ctx: MyContext, emoji: discord.Emoji, roles: commands.Greedy[Union[discord.Role, args.litteral('everyone')]]):
+    async def emoji_restrict(self, ctx: MyContext, emoji: discord.Emoji, roles: commands.Greedy[Union[discord.Role, Literal['everyone']]]):
         """Restrict the use of an emoji to certain roles
 
         ..Example emoji restrict :vip: @VIP @Admins
@@ -1160,7 +1160,7 @@ The 'reasons' parameter is used to display the mute reasons.
     @main_role.command(name="give", aliases=["add"])
     @commands.check(checks.has_manage_roles)
     @commands.cooldown(1, 30, commands.BucketType.guild)
-    async def roles_give(self, ctx:MyContext, role:discord.Role, users:commands.Greedy[Union[discord.Role,discord.Member,args.litteral('everyone')]]):
+    async def roles_give(self, ctx:MyContext, role:discord.Role, users:commands.Greedy[Union[discord.Role,discord.Member,Literal['everyone']]]):
         """Give a role to a list of roles/members
         Users list may be either members or roles, or even only one member
 
@@ -1206,7 +1206,7 @@ The 'reasons' parameter is used to display the mute reasons.
     @main_role.command(name="remove")
     @commands.check(checks.has_manage_roles)
     @commands.cooldown(1, 30, commands.BucketType.guild)
-    async def roles_remove(self, ctx:MyContext, role:discord.Role, users:commands.Greedy[Union[discord.Role,discord.Member,args.litteral('everyone')]]):
+    async def roles_remove(self, ctx:MyContext, role:discord.Role, users:commands.Greedy[Union[discord.Role,discord.Member,Literal['everyone']]]):
         """Remove a role to a list of roles/members
         Users list may be either members or roles, or even only one member
 
@@ -1376,6 +1376,13 @@ ID corresponds to the Identifier of the message
         if len(txt) > 0:
             return await ctx.send(txt)
         del txt
+
+        deprecation_embed = discord.Embed(
+            title=await self.bot._(ctx.guild.id, "moderation.deprecated-verify.title"),
+            description=await self.bot._(ctx.guild.id, "moderation.deprecated-verify.desc"),
+            color=discord.Color.red()
+        )
+        await ctx.send(embed=deprecation_embed)
 
         q,a = await self.find_verify_question(ctx)
         qu_msg = await ctx.send(ctx.author.mention+': '+q)
