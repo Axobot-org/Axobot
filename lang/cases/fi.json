@@ -1,14 +1,25 @@
 {
-    "fi": {
-        "cases-0": "%{nbr} tapaukset löydetty: (%{start}-%{end})",
-        "deleted": "Tapaus #%{ID} on poistettu!",
-        "no-case": "Tällä käyttäjällä ei ole yhtään tapahtumia!",
-        "no-user": "Tämä on mahdotonta löytää tämä käyttäjä. :eyes:",
-        "no_database": "Jonkun ajan tietokannan alas käynnin takia, tämä komento on pois käytöstä",
-        "not-found": "Tätä tapausta ei löydetty :confused:",
-        "reason-edited": "Syy tapaukselle #%{ID} on vaihdettu!",
-        "search-0": "**Käyttäjä:** {U}\n**Muoto:** {T}\n**Valvoja:** {M}\n**Päivämäärä:** {D}\n**Syy:** *{R}*",
-        "search-1": "**Käyttäjä:** {U}\n**Serveri:** {G}\n**Muoto:** {T}\n**Valvoja:** {M}\n**Päivämäärä:** {D}\n**Syy:** *{R}*",
-        "title-search": "Tapaus #%{ID}"
+    "en": {
+        "cases-0": "",
+        "deleted": "",
+        "display": {
+            "date": "",
+            "duration": "",
+            "guild": "",
+            "moderator": "",
+            "reason": "",
+            "type": "",
+            "user": ""
+        },
+        "list-0": "",
+        "list-1": "",
+        "no-case": "",
+        "no-user": "",
+        "no_database": "",
+        "not-found": "",
+        "reason-edited": "",
+        "search-0": "",
+        "search-1": "",
+        "title-search": ""
     }
 }
