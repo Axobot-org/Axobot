@@ -1,0 +1,25 @@
+{
+    "en": {
+        "categories": {
+            "automod": "",
+            "bot": "",
+            "members": "",
+            "messages": "",
+            "moderation": "",
+            "roles": "",
+            "tickets": ""
+        },
+        "list": {
+            "all": "",
+            "emojis": "",
+            "guild": "",
+            "channel": "",
+            "none": ""
+        },
+        "enabled": "",
+        "disabled": "",
+        "embed-warning": "",
+        "none-added": "",
+        "none-removed": ""
+    }
+}
