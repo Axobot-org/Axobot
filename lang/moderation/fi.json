@@ -1,159 +1,182 @@
 {
-    "fi": {
+    "en": {
         "ban": {
-            "too-high": "Näyttää siltä että tämä jäsen on liian korkea että voisin antaa hänelle porttikiellon 🤔",
-            "list-error": "Ups, näyttää siltä että tässä on liian monta jäsentä näytettävänä 😕",
-            "list-title-0": "Lista jäsenistä joilla on porttikielto \"{}\"",
-            "list-title-1": "Lista 45 käyttäjästä joilla on porttikielto tältä palvelimelta \"{}\"",
-            "list-title-2": "Lista 60 käyttäjästä joilla on porttikielto tältä palvelimelta \"{}\"",
-            "no-bans": "Näyttää siltä että kenelläkään ei ole porttikieltoa",
-            "user-not-banned": "Tällä jäsenellä ei ole porttikieltoa 🙃",
-            "cant-ban": "Käyttöoikeus \"Antaa porttikieltoja jäsenille\" tarvitaan 😕",
-            "staff-ban": "Et voi antaa porttikieltoa toiselle työntekijälle!"
+            "too-high": "",
+            "list-error": "",
+            "list-title-0": "",
+            "list-title-1": "",
+            "list-title-2": "",
+            "no-bans": "",
+            "user-not-banned": "",
+            "cant-ban": "",
+            "staff-ban": ""
         },
-        "ban-chat": "Käyttäjällä %{user} (%{userid}) on nyt porttikielto",
-        "ban-dm": "Sinulle on juuri annettu porrtikielto palvelimelta %{guild} 😕",
-        "cant-find-user": "Ups, ei ole mahdollista löytää käyttäjä **%{user}**",
-        "cant-pin": "Ups, minulla ei ole käyttöoikeuksia kiinnittämään viestejä",
-        "caps-lock": "Hei %{user}, ole varuillaan caps lukosta!",
+        "ban-chat": "",
+        "ban-dm": "",
+        "cant-find-user": "",
+        "cant-pin": "",
+        "caps-lock": "",
         "clear": {
             "done": {
-                "one": "1 viesti poistettu!",
-                "many": "%{count} viestiä poistettu!"
+                "one": "",
+                "many": ""
             },
-            "too-few": "En voi poistaa nuin vähän viestejä",
-            "not-found": "Hmm... mahdotonta poistaa näitä viestejä. Discord sanoo minulle että ne ei ole oikeita 🤔"
+            "too-few": "",
+            "not-found": ""
         },
         "destop": {
-            "no-guild": "Tämä viesti ei kuulu tälle palvelimelle",
-            "too-old": "En voi poistaa viestejä, jotka ovat yli %{days} päivää vanhoja!"
+            "no-guild": "",
+            "too-old": ""
         },
         "emoji": {
-            "cant-emoji": "Ups, minulta puuttuu käyttöoikeus `Hallinnoi hymiöitä` 😕",
-            "list": "{} (`:{}:`) lisätty {} {}",
-            "list-title": "Hymiöt palvelimella %{guild}",
-            "private": "[Rajoitettu]",
-            "renamed": "Hymiö %{emoji} on nimetty uudelleen!",
-            "emoji-valid": "Nyt hymiötä %{name} voi vain käyttää roolit `%{roles}`",
-            "wrong-guild": "Ups, näyttää siltä että tämä hymiö ei ole tästä palvelimesta 🤔"
+            "cant-emoji": "",
+            "list": "",
+            "list-title": "",
+            "private": "",
+            "renamed": "",
+            "emoji-valid": "",
+            "wrong-guild": ""
         },
-        "error": "Ups, tuntematon virhe tapahtui. Yritä uudelleen myöhemmin tai ota yhteyttä tukeen",
+        "error": "",
         "kick": {
-            "no-perm": "Käyttöoikeus \"Potkia jäseniä\" tarvitaan 😕",
-            "too-high": "Näyttää siltä että tämä jäsen on liian korkealla niin en voi potkia häntä ulos 🤔",
-            "cant-staff": "Et voi potkia toista työntekijää!"
+            "no-perm": "",
+            "too-high": "",
+            "cant-staff": ""
         },
-        "kick-chat": "Käyttäjä %{user} (%{userid}) on nyt potkittu ulos tältä palvelimelta",
-        "kick-dm": "Sinut on juuri potkittu ulos palvelimelta %{guild} 😕",
-        "missing-manage-nick": "Ups, minulta puuttuu \"Hallinnoi nimimerkkejä\" käyttöoikeus!",
-        "missing-user-perms": "Ups, sinulta puuttuu käyttöoikeuksia (joko hallinnoi rooleja, hallinnoi palvelinta tai hallinnoi viestejä)",
+        "kick-chat": "",
+        "kick-dm": "",
+        "missing-manage-nick": "",
+        "missing-user-perms": "",
         "mute": {
-            "already-mute": "Tämä jäsen on jo mykistetty!",
-            "already-unmute": "Tämä jäsen ei ole mykistetty!",
-            "cant-mute": "Ups, näyttää siltä että minulla ei ole tarpeeksi käyttöoikeuksia tohon... Anna minulle `Hallinnoi rooleja` käyttöoikeudet ennen jatkamista.",
-            "mute-config-err": "Mahdotonta tehdä noin. Varmista onko minulla oikeat käyttöoikeudet ja yritä uudelleen.",
+            "already-mute": "",
+            "already-unmute": "",
+            "cant-mute": "",
+            "cant-timeout": "",
+            "mute-config-err": "",
             "mute-config-success": {
-                "zero": "Rooli on tehty ja konfiguroitu oikein!",
-                "other": "Rooli on tehty ja konfiguroitu oikein! (%{count} kanavaa ei pystytty konfiguroimaan, oikeuksien puutteiden takia)"
+                "zero": "",
+                "other": ""
             },
             "mute-config-success2": {
-                "zero": "Rooli on konfiguroitu oikein!",
-                "other": "Rooli on konfiguroitu oikein! (%{count} kanavaa ei pystytty konfiguroimaan, oikeuksien puutteiden takia)"
+                "zero": "",
+                "other": ""
             },
-            "mute-high": "Ups, näyttää siltä että `mykistetty` rooli on liian korkealla että voisin antaa sen... Korjaa tämä sillä että laita minun roolini `Mykistetty` roolin yläpuolelle.",
-            "list-title-0": "Lista jäähyllä olevista jäsenistä palvelimella \"%{guild}\"",
-            "list-title-1": "Lista 45 jäähyllä olevasta jäsenestä palvelimella \"%{guild}\"",
-            "list-title-2": "Lista 60 jäähyllä olevasta jäsenestä palvelimella \"%{guild}\"",
-            "role-created": "`Muted` rooli tehty! Voit käyttää komentoa `%{p}mute-config` automaattiselle konfiguroinnille palvelimellasi.",
-            "no-mute": "Ups, näyttää siltä että `mykistetty` rooli ei ole olemassa 😕 Tede yksi ja anna käyttöoikeudet manuallisesti.",
-            "no-mutes": "Kenelläkään ei näytä olevan porttikieltoa täällä",
-            "staff-mute": "Et voi mykistää toista työntekijää"
+            "mute-high": "",
+            "list-title-0": "",
+            "list-title-1": "",
+            "list-title-2": "",
+            "role-created": "",
+            "no-mute": "",
+            "no-mutes": "",
+            "staff-mute": "",
+            "too-high": ""
         },
-        "mute-chat": "Käyttäjä %{user} (%{userid}) on pistetty jäähylle",
-        "mute-dm": "Sinut on pistetty jäähylle palvelimella %{guild}",
-        "need-manage-messages": "Käyttöoikeus \"Hallinnoi viestejä\" puuttuu 😕",
-        "need-read-history": "Ups, minulta puuttuu \"Lue viestihistoriaa\" käyttöoikeus 😕",
+        "mute-chat": "",
+        "mute-dm": "",
+        "need-manage-messages": "",
+        "need-read-history": "",
         "pin": {
-            "error-notfound": "Ups, en voi löytää tota viestiä (Virhe : `%{err}`)",
-            "error-toomuch": "Ups, mahdotonta kiinnittää tämä viesti (onko sinulla enemmän kuin 50 kiinnitettyä viestiä?). Virhe : `%{err}`"
+            "error-notfound": "",
+            "error-toomuch": ""
         },
-        "raid-banned": "Sinulle on automaattisesti annettu porttikielto palvelimelta %{guild} mellakkatorjunnan syystä.",
-        "raid-kicked": "Sinut on automaattisesti potkittu ulos palvelimelta %{guild} mellakkatorjunnan syystä. Yritä uudelleen muutaman päivän kuluttua",
-        "react-clear": "En voi löytää tätä viestiä 😕",
+        "raid-banned": "",
+        "raid-kicked": "",
+        "react-clear": "",
         "role": {
-            "color-success": "Rooli %{role} on vaihtanut väriä!",
-            "give-too-high": "Ups, näyttää siltä että tämä rooli on liian ylhäällä jotta voisin antaa tai ottaa sen keneltä tahansa. Laita minun roolini roolin `%{r}` yläpuolelle",
-            "give-roles-higher": "Et voi antaa tai ottaa rooleja jotka ovat sinua ylempänä!",
-            "too-high": "Ups, tämä rooli on liian korkealla että minä voisin muokata sitä. Siirrä minun roolini `%{r}` roolin yli ennen kun yrität uudelleen 😕",
-            "list": "Lista palvelimen rooleista"
+            "color-success": "",
+            "give-pending": "",
+            "give-success": {
+                "zero": "",
+                "one": "",
+                "many": ""
+            },
+            "give-too-high": "",
+            "give-roles-higher": "",
+            "too-high": "",
+            "list": "",
+            "remove-pending": "",
+            "remove-success": {
+                "zero": "",
+                "one": "",
+                "many": ""
+            }
         },
         "slowmode": {
-            "disabled": "Tällä kanavalla ei ole enää etanatilaa",
-            "too-long": "Mahdotonta asettaa pituus isommaksi kuin kuusi tuntia",
-            "enabled": "%{channel} on nyt etanatilassa. Odota %{s} sekunttia ennenkun lähetät viestin.",
-            "invalid": "Tätä ominaisuutta ei ole",
-            "info": "Etanatila tällä kanavalla on %{s} sekunttia"
+            "disabled": "",
+            "too-long": "",
+            "enabled": "",
+            "invalid": "",
+            "info": "",
+            "cant-slowmode": ""
         },
-        "unban-chat": "Käyttäjällä %{user} (%{userid}) ei ole enää porttikieltoa",
+        "unban-chat": "",
         "unhoisted": {
-            "zero": "Lempinimiä ei ole muutettu",
-            "one": "1 nimimerkki muutettu!",
-            "many": "%{count} muokattua nimimerkkiä!"
+            "zero": "",
+            "one": "",
+            "many": ""
         },
-        "unmute-chat": "Käyttäjältä %{user} (%{userid}) on poistettu jäähy",
-        "verify-role-high": "Ups, näyttää siltä että `%{r}` on liian korkealla että voisin antaa sen. Laita minun rooli sen yläpuolelle.",
+        "unmute-chat": "",
+        "verify-role-high": "",
         "verify_questions": [
             [
-                "How many seconds are there in a minute?",
-                "60"
+                "",
+                ""
             ],
             [
-                "How many sides does a triangle have?",
-                "3"
+                "",
+                ""
             ],
             [
-                "What does the emoji :pig: represent? a `fish`, `plant` or `pig`?",
-                "pig"
+                "",
+                ""
             ],
             [
-                "What does the product of 2 by 3 give?",
-                "6"
+                "",
+                ""
             ],
             [
-                "What is 2+7?",
-                "9"
+                "",
+                ""
             ],
             [
-                "What is the first letter of `Zbot`?",
-                "z"
+                "",
+                ""
             ],
             [
-                "What is the fourth cardinal point? North, south, east, ...",
-                "west"
+                "",
+                ""
             ],
             [
-                "What is the name of this server?",
-                "_special_servername"
+                "",
+                ""
             ],
             [
-                "What is the opposite color to black?",
-                "white"
+                "",
+                ""
             ],
             [
-                "What is the result of 10 minus 5?",
-                "5"
+                "",
+                ""
             ],
             [
-                "Which of these words begins with D? `bathtub`, `crow`, `galion` or `drawing`",
-                "drawing"
+                "",
+                ""
+            ],
+            [
+                "",
+                ""
+            ],
+            [
+                "",
+                ""
             ]
         ],
         "warn": {
-            "cant-staff": "Et voi varoittaa toista työntekijää!",
-            "cant-bot": "En voi varoittaa bottia ^^",
-            "warn-but-db": "Meidän tietokanta on poissa käytöstä, varoitusta ei voitu tallentaa. Mutta, jäsen sai yksityis viestin"
+            "cant-staff": "",
+            "cant-bot": "",
+            "warn-but-db": ""
         },
-        "warn-chat": "Käyttäjää %{user} (%{userid}) on varoitettu",
-        "warn-dm": "Sinulle on annettu varoitus palvelimella %{guild}"
+        "warn-chat": "",
+        "warn-dm": ""
     }
 }
