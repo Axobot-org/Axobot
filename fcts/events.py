@@ -11,7 +11,6 @@ from typing import Union
 import aiohttp
 import discord
 import mysql
-import psutil
 from discord.ext import commands, tasks
 from libs.classes import UsernameChangeRecord, Zbot
 

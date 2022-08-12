@@ -1,7 +1,6 @@
-from typing import Any, Tuple, Union
+from typing import Any, Optional, Tuple, Union
 import discord
 import importlib
-import typing
 import re
 from discord.ext import commands
 from libs.classes import Zbot, MyContext
@@ -275,7 +274,7 @@ Opposite is the subcommand 'join'
             return
         await self.give_remove_role(ctx.author, role, ctx.guild, ctx.channel, give=False)
 
-    async def give_remove_role(self, user: discord.Member, role: discord.Role, guild: discord.Guild, channel: typing.Union[discord.TextChannel, discord.Thread], give: bool = True, ignore_success: bool = False, ignore_failure: bool = False):
+    async def give_remove_role(self, user: discord.Member, role: discord.Role, guild: discord.Guild, channel: Union[discord.TextChannel, discord.Thread], give: bool = True, ignore_success: bool = False, ignore_failure: bool = False):
         """Add or remove a role to a user if possible"""
         if self.bot.zombie_mode:
             return
@@ -307,7 +306,7 @@ Opposite is the subcommand 'join'
 
     @rr_main.command(name='update')
     @commands.check(checks.database_connected)
-    async def rr_update(self, ctx: MyContext, embed: discord.Message, change_description: typing.Optional[bool] = True, emojis: commands.Greedy[args.AnyEmoji] = None):
+    async def rr_update(self, ctx: MyContext, embed: discord.Message, change_description: Optional[bool] = True, emojis: commands.Greedy[args.AnyEmoji] = None):
         """Update a Zbot message to refresh roles/reactions
         If you don't want to update the embed content, for example if it's a custom embed, then you can use 'False' as a second argument. Zbot will only check the reactions
         Specifying a list of emojis will update the embed only for those emojis, and ignore other roles reactions
