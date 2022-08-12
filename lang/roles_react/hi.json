@@ -1,0 +1,21 @@
+{
+    "en": {
+        "already-1-rr": "",
+        "already-dont-have": "",
+        "already-have": "",
+        "embed-edited": "",
+        "no-rr": "",
+        "not-zbot-embed": "",
+        "not-zbot-msg": "",
+        "reactions-edited": "",
+        "role-given": "",
+        "role-lost": "",
+        "role-not-in-list": "",
+        "rr-added": "",
+        "rr-embed": "",
+        "rr-list": "",
+        "rr-removed": "",
+        "rr-removed-2": "",
+        "too-many-rr": ""
+    }
+}
