@@ -88,8 +88,8 @@ class Invite(commands.Converter):
     async def convert(self, ctx: MyContext, argument: str) -> typing.Union[str, int]:
         answer = None
         r_invite = re.search(
-            r'^https://discord(?:app)?\.com/(?:api/)?oauth2/authorize\?(?:&?client_id=(\d{17,19})|&?scope=([a-z\.\+]+?)|&'
-            r'?(?:permissions|guild_id|disable_guild_select|redirect_uri)=[^&]+)+$',
+            r'^https://discord(?:app)?\.com/(?:api/)?oauth2/authorize\?(?:&?(?:client_id=(\d{17,19})|scope=([a-z\.\+]+?)|'
+            r'(?:permissions|guild_id|disable_guild_select|redirect_uri)=[^&]+))+$',
             argument)
         if r_invite is None:
             r_invite = re.search(
