@@ -1,14 +1,15 @@
 {
-    "de": {
-        "nthing-desc": "Es sind zur Zeit keine Events. Folge den bot news um das Datum für das nächste Event zu erfahren!",
-        "events-price-title": "Preise zum gewinnen",
-        "nothing-prices": "Es gibt nichts bei diesem Event zu holen 😕",
-        "objectives": "Ziele",
-        "points": "Punkte",
-        "rank-global": "Globale Platzierung",
-        "rank-title": "Event Punkte",
-        "rank-total": "Punkte gesamt",
-        "unclassed": "Du hast noch keine Punkte",
-        "xp-howto": "Du kannst Event Punkte beim gewinnen von tic-tac-toe Spielen bekommen, wenn die Event Befehle möglich sind oder beim lösen von geheimen Aufgaben. Komm bitte nicht zum Support Server, um nur nach Event Informationen zu fragen!"
+    "en": {
+        "nothing-desc": "",
+        "events-price-title": "",
+        "nothing-prices": "",
+        "objectives": "",
+        "points": "",
+        "rank-global": "",
+        "rank-title": "",
+        "rank-total": "",
+        "soon": "",
+        "unclassed": "",
+        "xp-howto": ""
     }
 }
