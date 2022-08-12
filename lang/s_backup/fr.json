@@ -1,10 +1,10 @@
 {
-    "fr": {
-        "backup-done": "Sauvegarde terminée !",
-        "err": "Oups, une erreur interne est survenue... attendez quelques instants ou contactez le support (commande `about`) si cela se reproduit",
-        "finished": "Sauvegarde appliquée ! Voici les logs",
-        "invalid_file": "Veuillez envoyer le fichier de sauvegarde dans le même message que la commande",
-        "invalid_version": "La version de sauvegarde est invalide. Le fichier est probablement corrompu",
-        "loading": "Chargement de la sauvegarde en cours.... veuillez patienter"
+    "en": {
+        "backup-done": "",
+        "err": "",
+        "finished": "",
+        "invalid_file": "",
+        "invalid_version": "",
+        "loading": ""
     }
 }
