@@ -1,8 +1,9 @@
 {
-    "de": {
+    "en": {
         "daily": {
-            "got-points": "Herzlichen Glückwunsch! Du hast gerade **%{pts} Event Punkte** gewonnen!",
-            "too-quick": "Es ist noch zu früh! Du kannst nur einmal pro Stunde Event Punkte abholen."
+            "got-points": "",
+            "lost-points": "",
+            "too-quick": ""
         }
     }
 }
