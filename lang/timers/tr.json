@@ -1,12 +1,27 @@
 {
-    "tr": {
+    "en": {
         "rmd": {
-            "saved": "Anladım! %{duration} sonra size hatırlatacağım",
-            "too-long": "Böyle uzun bir süre ayarlamak imkansız",
-            "too-short": "Geçersiz bir süre girdiniz",
-            "embed-asked": "%{user}, %{duration} önce size şunu hatırlatmamı istediniz:",
-            "embed-date": "İstek tarihi",
-            "embed-title": "Hatırlatıcı"
+            "cancelled": "",
+            "cleared": "",
+            "confirm": "",
+            "empty": "",
+            "item": "",
+            "saved": "",
+            "title": "",
+            "too-long": "",
+            "too-short": "",
+            "embed-asked": "",
+            "embed-date": "",
+            "embed-link": "",
+            "embed-title": "",
+            "select-placeholder": "",
+            "delete": {
+                "title": "",
+                "success": {
+                    "one": "",
+                    "other": ""
+                }
+            }
         }
     }
 }
