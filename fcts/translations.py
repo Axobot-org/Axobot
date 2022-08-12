@@ -349,19 +349,23 @@ Use `stop` to stop translating
             await ctx.send("Invalid language")
             return
         english = (await self.get_original_translations())["en"]
-        if module not in english:
-            await ctx.send(f"Invalid module.\nExpected modules are: {', '.join(sorted(english.keys()))}")
+        try:
+            project = (await self.get_projects())[lang]
+        except KeyError:
+            await ctx.send("This language has no translation project")
             return
-        project = (await self.get_projects()).get(lang, {module: {}})[module]
-        if not project:
-            await ctx.send(f"This module has not yet been edited for the {lang} language")
+        if module not in project:
+            await ctx.send(f"Invalid module.\nExpected modules are: {', '.join(sorted(project.keys()))}")
             return
-        original = deepcopy((await self.get_original_translations())[lang])[module]
+        project = project[module]
+        original = deepcopy((await self.get_original_translations())[lang]).get(module, {})
         english_module = english[module]
         # Filter old translations (which are not in englisg anymore)
         merged_flattened = {key: translation for key, translation in (original | project).items() if key in english_module}
         # Unflatten to get the JSON maps structure
         merged = unflatten(merged_flattened, separator='.')
+        # add language identifier
+        merged = {lang: merged}
         # Save into a virtual file
         filename = f'translation/{lang}-{module}.json'
         data = json.dumps(merged, ensure_ascii=False, indent=4, sort_keys=True)
