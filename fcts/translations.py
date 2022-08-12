@@ -14,7 +14,7 @@ from fcts.checks import is_translator, is_bot_admin
 
 FlatennedTranslations = dict[str, typing.Optional[str]]
 ModuleDict = dict[str, FlatennedTranslations]
-LanguageId = typing.Literal['fr', 'en', 'lolcat', 'fr2', 'fi', 'de', 'tr', 'es', 'it']
+LanguageId = typing.Literal['fr', 'en', 'lolcat', 'fr2', 'fi', 'de', 'tr', 'es', 'it', 'hi']
 languages: set[str] = LanguageId.__args__
 TranslationsDict = dict[LanguageId, ModuleDict]
 
