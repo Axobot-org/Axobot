@@ -1,59 +1,59 @@
 {
-    "fr": {
-        "added_at": "Ajouté le",
-        "beginning": "début",
+    "en": {
+        "added_at": "",
+        "beginning": "",
         "btn": {
             "confirm": {
-                "label": "Confirmer",
-                "answer": "Choix confirmé"
+                "label": "",
+                "answer": ""
             },
             "cancel": {
-                "label": "Annuler",
-                "answer": "Choix annulé"
+                "label": "",
+                "answer": ""
             },
             "delete": {
-                "label": "Supprimer",
-                "answer": "Supprimé !"
+                "label": "",
+                "answer": ""
             }
         },
-        "bot": "bot",
-        "case": "casier",
-        "category": "catégorie",
-        "click_here": "Cliquez ici",
-        "since": "depuis",
-        "dnd": "ne pas déranger",
-        "doc": "Documentation",
-        "duration": "durée",
-        "end": "fin",
-        "example": "exemple",
-        "extreme": "extrême",
-        "ghost": "Fantôme",
-        "high": "élevé",
-        "highest": "très élevé",
-        "idle": "inactif",
-        "low": "faible",
-        "medium": "moyen",
-        "member": "membre",
-        "membres": "membres",
-        "name": "nom",
-        "no": "non",
-        "none": "aucun",
-        "offline": "hors ligne",
-        "online": "en ligne",
-        "quit": "quitter",
-        "yes": "oui",
-        "reason": "raison",
-        "request_by": "Demandé par %{user}",
-        "server": "serveur",
-        "servers": "serveurs",
-        "unknown": "Inconnu",
-        "version": "version",
+        "bot": "",
+        "case": "",
+        "category": "",
+        "click_here": "",
+        "since": "",
+        "dnd": "",
+        "doc": "",
+        "duration": "",
+        "end": "",
+        "example": "",
+        "extreme": "",
+        "ghost": "",
+        "high": "",
+        "highest": "",
+        "idle": "",
+        "low": "",
+        "medium": "",
+        "member": "",
+        "membres": "",
+        "name": "",
+        "no": "",
+        "none": "",
+        "offline": "",
+        "online": "",
+        "quit": "",
+        "yes": "",
+        "reason": "",
+        "request_by": "",
+        "server": "",
+        "servers": "",
+        "unknown": "",
+        "version": "",
         "activity": {
-            "listen": "écoute",
-            "nothing": "rien",
-            "play": "joue à",
-            "stream": "stream",
-            "watch": "regarde"
+            "listen": "",
+            "nothing": "",
+            "play": "",
+            "stream": "",
+            "watch": ""
         }
     }
 }
