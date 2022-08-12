@@ -1,5 +1,15 @@
 {
-    "es": {
-        "check_intro": "%{user}, iniciando el blurple análisis de la imagen (Por favor, tenga en cuenta que esto puede tardar un tiempo)"
+    "en": {
+        "blurplefy": {
+            "starting": "",
+            "success": ""
+        },
+        "check_intro": "",
+        "collect": {
+            "title": "",
+            "too-quick": ""
+        },
+        "missing-attachment-perm": "",
+        "unknown-err": ""
     }
 }
