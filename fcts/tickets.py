@@ -410,6 +410,7 @@ class Tickets(commands.Cog):
         self.bot.dispatch("ticket_creation", TicketCreationEvent(topic, ticket_name, interaction, channel))
 
 
+
     @commands.group(name="ticket", aliases=["tickets"])
     @commands.guild_only()
     async def tickets_main(self, ctx: MyContext):
