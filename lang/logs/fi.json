@@ -1,24 +1,25 @@
 {
-    "fi": {
-        "case-del": "The case #%{id} has been deleted (concerning %{user})",
-        "case-reason": "Tapaus #%{id} on muokattu:\\n`Vanha syy:` %{old}\\n`Uusi syy:` %{new}",
-        "clear": "%{number} viestiä poistettu kanavalla %{channel}",
+    "en": {
+        "ban": "",
+        "case-del": "",
+        "case-reason": "",
+        "clear": "",
         "reason": {
-            "autounmute": "automaattinen mykistyksen poisto",
-            "invite": "Automaattinen valvoja (Discord kutsu linkki)",
-            "memberchan": "Automaattinen tapahtuma (configuraatio käyttäjänlaskelma)",
-            "unban": "porttikiellon poistanut %{user}",
-            "unmute": "mykistäjä %{user}",
-            "welcome_roles": "Automated action (config welcome_roles)",
-            "young": "Automaattinen valvoja (liian uusi käyttäjä)"
+            "autounmute": "",
+            "invite": "",
+            "memberchan": "",
+            "unban": "",
+            "unmute": "",
+            "welcome_roles": "",
+            "young": ""
         },
-        "kick": "%{user} (%{userid}) on potkittu",
-        "mute": "%{user} (%{userid}) on nyt mykistetty",
-        "slowmode-disabled": "Hidastusmuoto on kytketty pois kanavalla %{channel}",
-        "slowmode-enabled": "Hidastusmuoto on kytketty päälle kanavalla %{channel} (%{seconds}s)",
-        "softban": "%{user} (%{userid}) on väliäikaisesti potkittu",
-        "unban": "Käyttäjällä %{user} (%{userid}) ei ole enää porttikieltoa",
-        "unmute": "%{user} (%{userid}) ei ole enään mykistetty",
-        "warn": "%{user} (%{userid}) on varoitettu"
+        "kick": "",
+        "mute": "",
+        "slowmode-disabled": "",
+        "slowmode-enabled": "",
+        "softban": "",
+        "unban": "",
+        "unmute": "",
+        "warn": ""
     }
 }
