@@ -1,0 +1,26 @@
+{
+    "en": {
+        "set_config": {
+            "animated_card": {
+                "false": "",
+                "true": ""
+            },
+            "auto_unafk": {
+                "false": "",
+                "true": ""
+            },
+            "usernames_log": {
+                "false": "",
+                "true": ""
+            }
+        },
+        "card-desc": "",
+        "changed-card": "",
+        "changed-error": "",
+        "config_list": "",
+        "config_success": "",
+        "invalid-card": "",
+        "list-cards": "",
+        "missing-attach-files": ""
+    }
+}
