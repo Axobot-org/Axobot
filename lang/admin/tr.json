@@ -1,5 +1,5 @@
 {
-    "tr": {
-        "emergency": "Bot için acil servis durumu anons edildi. Bu olay birileri benim kodumu ele geçirmeye çalışırken olabilir. \nHasarı limitlemek için, içinde bulunduğum sunucuları acilen terketmeye mecbur bırakıldım, umarım o çok geç değildir.\nDaha fazla bilgi için resmi sunucuma gelin:  https://discord.me/zbot (eğer çalışmazsa dökümantasyonları kontrol edin: https://zbot.rtfd.io)"
+    "en": {
+        "emergency": ""
     }
 }
