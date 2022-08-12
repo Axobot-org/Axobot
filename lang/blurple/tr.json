@@ -1,6 +1,15 @@
 {
-    "tr": {
-        "check_intro": "%{user}, blurple resim analizleri başlatılıyor (Lütfen bunun biraz zaman alacağını unutmayın)",
-        "missing-attachment-perm": "Hay aksi, fotoğraf gönderebilme iznim eksik!"
+    "en": {
+        "blurplefy": {
+            "starting": "",
+            "success": ""
+        },
+        "check_intro": "",
+        "collect": {
+            "title": "",
+            "too-quick": ""
+        },
+        "missing-attachment-perm": "",
+        "unknown-err": ""
     }
 }
