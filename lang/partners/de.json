@@ -1,31 +1,33 @@
 {
-    "de": {
-        "added-partner": "Dieser Partner wurde erfolgreich hinzugefügt",
-        "already-added": "Das ist schon dein Partner!",
-        "bot-uptime": "Uptime",
-        "changed-desc": "Die Beschreibung wurde erfolgreich geändert!",
-        "changed-invite": "Die Einladung wurde modifiziert!",
-        "confirm-bot": "Möchtest du den Bot `%{bot}` wirklich von deinen Partnern entfernen?",
-        "confirm-server": "Möchtest du wirklich den Server `%{server}` von deinen Partnern entfernen?",
-        "del-canceled": "Entfernen abgebrochen",
-        "deleted": "Dieser Partner wurde erfolgreich entfernt",
-        "invalid-bot": "Dieser Bot konnte nicht gefunden werden",
-        "invalid-invite": "Ungültige Einladung",
-        "invalid-partner": "Partner konnte nicht gefunden werden",
-        "missing-manage-guild": "Einladung konnte nicht gefunden werden (mir fehlt die \"Manage server\" Berechtigung)",
-        "missing-reactions": "Berechtigung \"Add reactions\" fehlt :confused:",
-        "no-channel": "Du hast keinen Partnerchannel erstellt",
-        "no-partner": "Du hast keine Partner",
-        "no-partner-2": "Dieser ist kein Partner von deinem",
+    "en": {
+        "added-partner": "",
+        "already-added": "",
+        "bot-uptime": "",
+        "changed-desc": "",
+        "changed-invite": "",
+        "confirm-bot": "",
+        "confirm-server": "",
+        "del-canceled": "",
+        "deleted": "",
+        "invalid-bot": "",
+        "invalid-invite": "",
+        "invalid-partner": "",
+        "missing-manage-guild": "",
+        "missing-reactions": "",
+        "no-channel": "",
+        "no-partner": "",
+        "no-partner-2": "",
         "partners-list": [
-            "Server Partner",
-            "Liste aller Partner",
-            "Liste aller Partner deines Servers"
+            "",
+            "",
+            ""
         ],
         "reloaded": {
-            "many": "%{count} Partner wurden neu geladen"
+            "zero": "",
+            "one": "",
+            "many": ""
         },
-        "unknown-error": "Ein unbekannte Fehler ist aufgetaucht. Bitte kontaktiere den Support für mehr Informationen",
-        "unknown-server": "Serverpartner konnte nicht gefunden werden"
+        "unknown-error": "",
+        "unknown-server": ""
     }
 }
