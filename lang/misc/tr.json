@@ -1,11 +1,59 @@
 {
-    "tr": {
+    "en": {
+        "added_at": "",
+        "beginning": "",
+        "btn": {
+            "confirm": {
+                "label": "",
+                "answer": ""
+            },
+            "cancel": {
+                "label": "",
+                "answer": ""
+            },
+            "delete": {
+                "label": "",
+                "answer": ""
+            }
+        },
+        "bot": "",
+        "case": "",
+        "category": "",
+        "click_here": "",
+        "since": "",
+        "dnd": "",
+        "doc": "",
+        "duration": "",
+        "end": "",
+        "example": "",
+        "extreme": "",
+        "ghost": "",
+        "high": "",
+        "highest": "",
+        "idle": "",
+        "low": "",
+        "medium": "",
+        "member": "",
+        "membres": "",
+        "name": "",
+        "no": "",
+        "none": "",
+        "offline": "",
+        "online": "",
+        "quit": "",
+        "yes": "",
+        "reason": "",
+        "request_by": "",
+        "server": "",
+        "servers": "",
+        "unknown": "",
+        "version": "",
         "activity": {
-            "listen": "dinliyor",
-            "nothing": "hiçbir şey",
-            "play": "oynuyor",
-            "stream": "yayınlıyor",
-            "watch": "izliyor"
+            "listen": "",
+            "nothing": "",
+            "play": "",
+            "stream": "",
+            "watch": ""
         }
     }
 }
