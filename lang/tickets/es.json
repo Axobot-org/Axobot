@@ -1,0 +1,63 @@
+{
+    "en": {
+        "category-edited": {
+            "default-category": "",
+            "default-channel": "",
+            "category-permission-warning": "",
+            "channel-privacy-warning": ""
+        },
+        "cancelled": "",
+        "choose-topic-edition": "",
+        "default-topic-prompt": "",
+        "emote-edited": "",
+        "format": {
+            "too-long": "",
+            "edited": {
+                "default": "",
+                "topic": ""
+            }
+        },
+        "hint-edited": {
+            "default": "",
+            "topic": ""
+        },
+        "hint-useful": "",
+        "hint-useless": "",
+        "missing-category-config": "",
+        "missing-perms-creation": {
+            "channel": "",
+            "thread": ""
+        },
+        "missing-perms-setup": {
+            "to-staff": "",
+            "to-member": ""
+        },
+        "nothing-to-edit": "",
+        "other": "",
+        "role-edited": {
+            "default": "",
+            "topic": ""
+        },
+        "selection-placeholder": "",
+        "text-edited": "",
+        "ticket-created": "",
+        "ticket-introduction": {
+            "title": "",
+            "description": ""
+        },
+        "title-modal": {
+            "title": "",
+            "label": "",
+            "placeholder": ""
+        },
+        "too-quick": "",
+        "topic": {
+            "cant-create": "",
+            "created": "",
+            "deleted": "",
+            "list": "",
+            "other-already-exists": "",
+            "too-long": ""
+        }
+    }
+}
