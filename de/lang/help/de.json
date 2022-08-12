@@ -1,0 +1,164 @@
+{
+    "en": {
+        "aliases": "",
+        "categories": {
+            "data": "",
+            "fun": "",
+            "moderation": "",
+            "other": "",
+            "server-settings": "",
+            "staff": "",
+            "translators": "",
+            "unclassed": "",
+            "users-info": ""
+        },
+        "check-desc": {
+            "bot_can_embed": [
+                "",
+                ""
+            ],
+            "bot_has_permissions": [
+                "",
+                ""
+            ],
+            "can_ban": [
+                "",
+                ""
+            ],
+            "can_clear": [
+                "",
+                ""
+            ],
+            "can_edit_case": [
+                "",
+                ""
+            ],
+            "can_kick": [
+                "",
+                ""
+            ],
+            "can_mute": [
+                "",
+                ""
+            ],
+            "can_say": [
+                "",
+                ""
+            ],
+            "can_slowmode": [
+                "",
+                ""
+            ],
+            "can_use_cookie": [
+                "",
+                ""
+            ],
+            "can_use_rss": [
+                "",
+                ""
+            ],
+            "can_warn": [
+                "",
+                ""
+            ],
+            "is_bot_admin": [
+                "",
+                ""
+            ],
+            "database_connected": [
+                "",
+                ""
+            ],
+            "guild_only": [
+                "",
+                ""
+            ],
+            "has_admin": [
+                "",
+                ""
+            ],
+            "has_embed_links": [
+                "",
+                ""
+            ],
+            "has_manage_channels": [
+                "",
+                ""
+            ],
+            "has_manage_emojis": [
+                "",
+                ""
+            ],
+            "has_manage_guild": [
+                "",
+                ""
+            ],
+            "has_audit_logs": [
+                "",
+                ""
+            ],
+            "has_manage_msg": [
+                "",
+                ""
+            ],
+            "has_manage_nicknames": [
+                "",
+                ""
+            ],
+            "has_manage_roles": [
+                "",
+                ""
+            ],
+            "has_permissions": [
+                "",
+                ""
+            ],
+            "is_fun_enabled": [
+                "",
+                ""
+            ],
+            "is_halloween": [
+                "",
+                ""
+            ],
+            "is_owner": [
+                "",
+                ""
+            ],
+            "is_support_staff": [
+                "",
+                ""
+            ],
+            "is_translator": [
+                "",
+                ""
+            ],
+            "is_ttt_enabled": [
+                "",
+                ""
+            ],
+            "verify_role_exists": [
+                "",
+                ""
+            ],
+            "in_support_server": [
+                "",
+                ""
+            ]
+        },
+        "cmd-count": "",
+        "cmd-not-found": "",
+        "cog-empty-dm": "",
+        "description": "",
+        "embed_title": "",
+        "embed_title_dm": "",
+        "footer": "",
+        "no-desc-cmd": "",
+        "no-desc-cog": "",
+        "no-subcmd": "",
+        "not-enabled": "",
+        "subcmd-not-found": "",
+        "subcmds": "",
+        "warning": ""
+    }
+}
