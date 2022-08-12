@@ -1,9 +1,9 @@
 {
-    "fr": {
+    "en": {
         "daily": {
-            "got-points": "Bravo ! Vous venez de gagner **%{pts} points** d'événement !",
-            "lost-points": "Oh non ! Tu viens de perdre **%{pts} points**",
-            "too-quick": "Il est encore trop tôt ! Vous ne pouvez récupérer des points d'événement qu'une fois par heure"
+            "got-points": "",
+            "lost-points": "",
+            "too-quick": ""
         }
     }
 }
