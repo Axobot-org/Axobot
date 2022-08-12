@@ -1,8 +1,8 @@
 {
-    "fr": {
-        "url-score": "Score de risque des URLs : %{score}",
-        "report-successful": "Nous avons bien recu votre report, merci de votre contribution !",
-        "result": "Résultat :",
-        "probabilities": "Probabilités :"
+    "en": {
+        "url-score": "",
+        "report-successful": "",
+        "result": "",
+        "probabilities": ""
     }
 }
