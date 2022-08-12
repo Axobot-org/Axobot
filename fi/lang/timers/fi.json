@@ -1,0 +1,27 @@
+{
+    "en": {
+        "rmd": {
+            "cancelled": "",
+            "cleared": "",
+            "confirm": "",
+            "empty": "",
+            "item": "",
+            "saved": "",
+            "title": "",
+            "too-long": "",
+            "too-short": "",
+            "embed-asked": "",
+            "embed-date": "",
+            "embed-link": "",
+            "embed-title": "",
+            "select-placeholder": "",
+            "delete": {
+                "title": "",
+                "success": {
+                    "one": "",
+                    "other": ""
+                }
+            }
+        }
+    }
+}
