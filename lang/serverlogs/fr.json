@@ -1,25 +1,25 @@
 {
-    "fr": {
+    "en": {
         "categories": {
-            "automod": "Automod",
-            "bot": "Bot",
-            "members": "Membres",
-            "messages": "Messages",
-            "moderation": "Modération",
-            "roles": "Rôles",
-            "tickets": "Tickets"
+            "automod": "",
+            "bot": "",
+            "members": "",
+            "messages": "",
+            "moderation": "",
+            "roles": "",
+            "tickets": ""
         },
         "list": {
-            "all": "Liste des logs utilisables",
-            "emojis": "%{enabled} sont les logs activés dans ce serveur\n%{disabled} sont pour les autres logs disponibles",
-            "guild": "Liste des logs utilisés dans ce serveur",
-            "channel": "Liste des logs utilisés dans %{channel}",
-            "none": "Aucun log n'est utilisé ici. Utilise `%{cmd}` pour commencer à obtenir des logs"
+            "all": "",
+            "emojis": "",
+            "guild": "",
+            "channel": "",
+            "none": ""
         },
-        "enabled": "Les logs de type %{kind} seront désormais envoyés dans ce salon",
-        "disabled": "Les logs de type %{kind} ne seront plus envoyés dans ce salon",
-        "embed-warning": "Pour envoyer les logs, le bot a besoin de la permission \"Intégrer les liens\" !",
-        "none-added": "Ce salon est déjà abonné à tous ces logs !",
-        "none-removed": "Ce salon n'était déjà abonné à aucun de ces logs !"
+        "enabled": "",
+        "disabled": "",
+        "embed-warning": "",
+        "none-added": "",
+        "none-removed": ""
     }
 }
