@@ -1,25 +1,25 @@
 {
-    "de": {
-        "ban": "%{user} (%{userid}) wurde gebannt",
-        "case-del": "The case #%{id} has been deleted (concerning %{user})",
-        "case-reason": "The case #%{id} has been edited:\n`Old reason:` %{old}\n`New reason:` %{new}",
-        "clear": "%{number} Nachrichten wurden in %{channel} gelöscht",
+    "en": {
+        "ban": "",
+        "case-del": "",
+        "case-reason": "",
+        "clear": "",
         "reason": {
-            "autounmute": "autisch entmuted",
-            "invite": "Automod (Discord Einladung)",
-            "memberchan": "Automatische Aktion (config membercount)",
-            "unban": "Entbannt von %{user}",
-            "unmute": "Entmuted von %{user}",
-            "welcome_roles": "Automated Aktion (config welcome_roles)",
-            "young": "Automod (zu junger Account)"
+            "autounmute": "",
+            "invite": "",
+            "memberchan": "",
+            "unban": "",
+            "unmute": "",
+            "welcome_roles": "",
+            "young": ""
         },
-        "kick": "%{user} (%{userid}) wurde gekickt",
-        "mute": "%{user} (%{userid}) wurde gemuted",
-        "slowmode-disabled": "Slowmode deaktiviert in %{channel}",
-        "slowmode-enabled": "Slowmode aktiviert in %{channel} (%{seconds}s)",
-        "softban": "%{user} (%{userid}) wurde \"gesoftbanned\"",
-        "unban": "%{user} (%{userid}) wurde entbannt",
-        "unmute": "%{user} (%{userid}) ist jetzt nicht mehr gemuted",
-        "warn": "%{user} (%{userid}) wurde verwarnt"
+        "kick": "",
+        "mute": "",
+        "slowmode-disabled": "",
+        "slowmode-enabled": "",
+        "softban": "",
+        "unban": "",
+        "unmute": "",
+        "warn": ""
     }
 }
