@@ -1,0 +1,182 @@
+{
+    "en": {
+        "ban": {
+            "too-high": "",
+            "list-error": "",
+            "list-title-0": "",
+            "list-title-1": "",
+            "list-title-2": "",
+            "no-bans": "",
+            "user-not-banned": "",
+            "cant-ban": "",
+            "staff-ban": ""
+        },
+        "ban-chat": "",
+        "ban-dm": "",
+        "cant-find-user": "",
+        "cant-pin": "",
+        "caps-lock": "",
+        "clear": {
+            "done": {
+                "one": "",
+                "many": ""
+            },
+            "too-few": "",
+            "not-found": ""
+        },
+        "destop": {
+            "no-guild": "",
+            "too-old": ""
+        },
+        "emoji": {
+            "cant-emoji": "",
+            "list": "",
+            "list-title": "",
+            "private": "",
+            "renamed": "",
+            "emoji-valid": "",
+            "wrong-guild": ""
+        },
+        "error": "",
+        "kick": {
+            "no-perm": "",
+            "too-high": "",
+            "cant-staff": ""
+        },
+        "kick-chat": "",
+        "kick-dm": "",
+        "missing-manage-nick": "",
+        "missing-user-perms": "",
+        "mute": {
+            "already-mute": "",
+            "already-unmute": "",
+            "cant-mute": "",
+            "cant-timeout": "",
+            "mute-config-err": "",
+            "mute-config-success": {
+                "zero": "",
+                "other": ""
+            },
+            "mute-config-success2": {
+                "zero": "",
+                "other": ""
+            },
+            "mute-high": "",
+            "list-title-0": "",
+            "list-title-1": "",
+            "list-title-2": "",
+            "role-created": "",
+            "no-mute": "",
+            "no-mutes": "",
+            "staff-mute": "",
+            "too-high": ""
+        },
+        "mute-chat": "",
+        "mute-dm": "",
+        "need-manage-messages": "",
+        "need-read-history": "",
+        "pin": {
+            "error-notfound": "",
+            "error-toomuch": ""
+        },
+        "raid-banned": "",
+        "raid-kicked": "",
+        "react-clear": "",
+        "role": {
+            "color-success": "",
+            "give-pending": "",
+            "give-success": {
+                "zero": "",
+                "one": "",
+                "many": ""
+            },
+            "give-too-high": "",
+            "give-roles-higher": "",
+            "too-high": "",
+            "list": "",
+            "remove-pending": "",
+            "remove-success": {
+                "zero": "",
+                "one": "",
+                "many": ""
+            }
+        },
+        "slowmode": {
+            "disabled": "",
+            "too-long": "",
+            "enabled": "",
+            "invalid": "",
+            "info": "",
+            "cant-slowmode": ""
+        },
+        "unban-chat": "",
+        "unhoisted": {
+            "zero": "",
+            "one": "",
+            "many": ""
+        },
+        "unmute-chat": "",
+        "verify-role-high": "",
+        "verify_questions": [
+            [
+                "",
+                ""
+            ],
+            [
+                "",
+                ""
+            ],
+            [
+                "",
+                ""
+            ],
+            [
+                "",
+                ""
+            ],
+            [
+                "",
+                ""
+            ],
+            [
+                "",
+                ""
+            ],
+            [
+                "",
+                ""
+            ],
+            [
+                "",
+                ""
+            ],
+            [
+                "",
+                ""
+            ],
+            [
+                "",
+                ""
+            ],
+            [
+                "",
+                ""
+            ],
+            [
+                "",
+                ""
+            ],
+            [
+                "",
+                ""
+            ]
+        ],
+        "warn": {
+            "cant-staff": "",
+            "cant-bot": "",
+            "warn-but-db": ""
+        },
+        "warn-chat": "",
+        "warn-dm": ""
+    }
+}
