@@ -1,33 +1,33 @@
 {
-    "fr": {
-        "added-partner": "Le partenaire a bien été ajouté",
-        "already-added": "Vous avez déjà ajouté ce partenaire !",
-        "bot-uptime": "Disponibilité",
-        "changed-desc": "La description a bien été modifiée !",
-        "changed-invite": "L'invitation a bien été modifiée !",
-        "confirm-bot": "Voulez-vous vraiment supprimer le bot `%{bot}` de vos partenaires ?",
-        "confirm-server": "Voulez-vous vraiment supprimer le serveur `%{server}` de vos partenaires ?",
-        "del-canceled": "Suppression annulée",
-        "deleted": "Ce partenaire a bien été supprimé de votre liste",
-        "invalid-bot": "Impossible de trouver ce bot",
-        "invalid-invite": "Invitation invalide",
-        "invalid-partner": "Partenaire introuvable",
-        "missing-manage-guild": "Impossible de voir les invitations de ce serveur (permission 'Gérer le serveur' manquante)",
-        "missing-reactions": "Permission 'Ajouter des réactions' manquante :confused:",
-        "no-channel": "Aucun salon de partenaires n'a été configuré",
-        "no-partner": "Vous n'avez aucun partenaire",
-        "no-partner-2": "Aucun serveur n'a de partenariat avec vous",
+    "en": {
+        "added-partner": "",
+        "already-added": "",
+        "bot-uptime": "",
+        "changed-desc": "",
+        "changed-invite": "",
+        "confirm-bot": "",
+        "confirm-server": "",
+        "del-canceled": "",
+        "deleted": "",
+        "invalid-bot": "",
+        "invalid-invite": "",
+        "invalid-partner": "",
+        "missing-manage-guild": "",
+        "missing-reactions": "",
+        "no-channel": "",
+        "no-partner": "",
+        "no-partner-2": "",
         "partners-list": [
-            "Partenaires du serveur",
-            "Liste de vos partenaires",
-            "Liste des serveurs vous ayant comme partenaire"
+            "",
+            "",
+            ""
         ],
         "reloaded": {
-            "zero": "Aucun partenaire ne semble exister",
-            "one": "Un partenaire a été rechargé",
-            "many": "%{count} partenaires ont été rechargés"
+            "zero": "",
+            "one": "",
+            "many": ""
         },
-        "unknown-error": "Une erreur inconnue est survenue. Veuillez contacter le support pour plus d'informations",
-        "unknown-server": "Serveur partenaire introuvable"
+        "unknown-error": "",
+        "unknown-server": ""
     }
 }
