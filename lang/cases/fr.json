@@ -1,25 +1,25 @@
 {
-    "fr": {
-        "cases-0": "%{nbr} casiers trouvés : (%{start}-%{end})",
-        "deleted": "Le casier n°%{ID} a bien été supprimé !",
+    "en": {
+        "cases-0": "",
+        "deleted": "",
         "display": {
-            "date": "**Date :** %{data}",
-            "duration": "**Durée :** %{data}",
-            "guild": "**Serveur :** %{data}",
-            "moderator": "**Moderateur :** %{data}",
-            "reason": "**Reason :** %{data}",
-            "type": "**Type :** %{data}",
-            "user": "**Membre :** %{data}"
+            "date": "",
+            "duration": "",
+            "guild": "",
+            "moderator": "",
+            "reason": "",
+            "type": "",
+            "user": ""
         },
-        "list-0": "**Type:** {T}\n**Modérateur:** {M}\n**Date:** {D}\n**Raison:** *{R}*",
-        "list-1": "**Serveur:** {G}\n**Type:** {T}\n**Modérateur:** {M}\n**Date:** {D}\n**Raison:** *{R}*",
-        "no-case": "Cet utilisateur n'a aucun casier !",
-        "no-user": "Impossible de trouver cet utilisateur",
-        "no_database": "En raison d'une panne temporaire de la base de donnée, cette commande a été désactivée",
-        "not-found": "Ce casier n'a pas été trouvé :confused:",
-        "reason-edited": "La raison du casier n°%{ID} a bien été modifiée !",
-        "search-0": "**Membre:** {U}\n**Type:** {T}\n**Moderateur:** {M}\n**Date:** {D}\n**Raison:** *{R}*",
-        "search-1": "**Membre:** {U}\n**Serveur:** {G}\n**Type:** {T}\n**Moderateur:** {M}\n**Date:** {D}\n**Raison:** *{R}*",
-        "title-search": "Casier #%{ID}"
+        "list-0": "",
+        "list-1": "",
+        "no-case": "",
+        "no-user": "",
+        "no_database": "",
+        "not-found": "",
+        "reason-edited": "",
+        "search-0": "",
+        "search-1": "",
+        "title-search": ""
     }
 }
