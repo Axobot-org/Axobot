@@ -1,0 +1,106 @@
+{
+    "en": {
+        "adv-fields": [
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            ""
+        ],
+        "adv-help": "",
+        "block-fields": [
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            ""
+        ],
+        "block-help": "",
+        "cant-embed": "",
+        "cmd-fields": [
+            "",
+            "",
+            "",
+            ""
+        ],
+        "cmd-help": "",
+        "contact-mail": "",
+        "dimensions": "",
+        "entity-fields": [
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            ""
+        ],
+        "entity-help": "",
+        "item-fields": [
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            ""
+        ],
+        "item-help": "",
+        "mod-fields": {
+            "authors": "",
+            "categories": "",
+            "downloads": "",
+            "id": "",
+            "name": "",
+            "release": "",
+            "summary": "",
+            "versions": ""
+        },
+        "mod-help": "",
+        "mojang_desc": {
+            "account.mojang.com": "",
+            "api.mojang.com": "",
+            "authserver.mojang.com": "",
+            "minecraft.net": "",
+            "mojang.com": "",
+            "session.minecraft.net": "",
+            "sessionserver.mojang.com": "",
+            "textures.minecraft.net": ""
+        },
+        "names": [
+            "",
+            "",
+            "",
+            "",
+            "",
+            ""
+        ],
+        "no-adv": "",
+        "no-api": "",
+        "no-block": "",
+        "no-cmd": "",
+        "no-embed": "",
+        "no-entity": "",
+        "no-item": "",
+        "no-mod": "",
+        "no-ping": "",
+        "no-player-list": "",
+        "player-not-found": "",
+        "player-skin-download": "",
+        "player-skin-title": "",
+        "serv-0": "",
+        "serv-1": "",
+        "serv-2": "",
+        "serv-3": "",
+        "serv-error": "",
+        "serv-title": "",
+        "success-add": ""
+    }
+}
