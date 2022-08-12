@@ -7,7 +7,7 @@ from copy import deepcopy
 
 import discord
 from discord.ext import tasks, commands
-from flatten_json import flatten, unflatten
+from flatten_json import flatten, unflatten_list
 from libs.classes import MyContext, Zbot
 
 from fcts.checks import is_translator, is_bot_admin
@@ -363,7 +363,7 @@ Use `stop` to stop translating
         # Filter old translations (which are not in englisg anymore)
         merged_flattened = {key: translation for key, translation in (original | project).items() if key in english_module}
         # Unflatten to get the JSON maps structure
-        merged = unflatten(merged_flattened, separator='.')
+        merged = unflatten_list(merged_flattened, separator='.')
         # add language identifier
         merged = {lang: merged}
         # Save into a virtual file
