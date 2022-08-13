@@ -220,7 +220,7 @@ Slowmode works up to one message every 6h (21600s)
                     await self.bot.get_cog('Errors').on_error(e, ctx)
             try:
                 await ctx.message.delete()
-            except:
+            except discord.Forbidden:
                 pass
             # optional values
             opt_case = None if caseID=="'Unsaved'" else caseID
@@ -598,7 +598,7 @@ The 'days_to_delete' option represents the number of days worth of messages to d
                     await self.bot.get_cog('Errors').on_error(err,ctx)
             try:
                 await ctx.message.delete()
-            except:
+            except discord.Forbidden:
                 pass
             # optional values
             opt_case = None if case_id=="'Unsaved'" else case_id
@@ -667,7 +667,7 @@ The 'days_to_delete' option represents the number of days worth of messages to d
                     await self.bot.get_cog('Errors').on_error(e,ctx)
             try:
                 await ctx.message.delete()
-            except:
+            except discord.Forbidden:
                 pass
             # optional values
             opt_case = None if case_id=="'Unsaved'" else case_id
@@ -724,7 +724,7 @@ Permissions for using this command are the same as for the kick
                     await self.bot.get_cog('Errors').on_error(e,ctx)
             try:
                 await ctx.message.delete()
-            except:
+            except discord.Forbidden:
                 pass
             # optional values
             opt_case = None if caseID=="'Unsaved'" else caseID
@@ -1001,7 +1001,7 @@ The 'reasons' parameter is used to display the mute reasons.
             await message.clear_reactions()
         try:
             await ctx.message.delete()
-        except:
+        except discord.Forbidden:
             pass
 
     @emoji_group.command(name="info")
@@ -1284,7 +1284,7 @@ ID corresponds to the Identifier of the message
         if not ctx.channel.permissions_for(ctx.guild.me).manage_nicknames:
             return await ctx.send(await self.bot._(ctx.guild.id,"moderation.missing-manage-nick"))
         if chars is None:
-            def check(username):
+            def check(username: str):
                 while username < '0':
                     username = username[1:]
                     if len(username) == 0:
@@ -1299,11 +1299,11 @@ ID corresponds to the Identifier of the message
         for member in ctx.guild.members:
             try:
                 new = check(member.display_name)
-                if new!=member.display_name:
+                if new != member.display_name:
                     if not self.bot.beta:
                         await member.edit(nick=new)
                     count += 1
-            except:
+            except discord.Forbidden:
                 pass
         await ctx.send(await self.bot._(ctx.guild.id,"moderation.unhoisted",count=count))
 
@@ -1390,7 +1390,7 @@ ID corresponds to the Identifier of the message
         async def del_msg(msg:discord.Message):
             try:
                 await msg.delete()
-            except:
+            except discord.Forbidden:
                 pass
         def check(m):
             return m.author == ctx.author and m.channel == ctx.channel
