@@ -33,6 +33,7 @@ class Reloads(commands.Cog):
                 except ModuleNotFoundError:
                     await ctx.send(f"Cog {cog} was never loaded")
                 else:
+                    self.bot.log.info(f"Lib {cog} rloaded")
                     await ctx.send(f"Lib {cog} reloaded")
             except Exception as err:
                 await errors_cog.on_error(err,ctx)
