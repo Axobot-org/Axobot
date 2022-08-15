@@ -101,11 +101,8 @@ class Admin(commands.Cog):
     @commands.check(checks.is_bot_admin)
     async def send_msg(self, ctx: MyContext, user:discord.User, *, message: str):
         """Envoie un mp à un membre"""
-        try:
-            await user.send(message)
-            await self.add_success_reaction(ctx.message)
-        except Exception as e:
-            await self.bot.get_cog('Errors').on_error(e,ctx)
+        await user.send(message)
+        await self.add_success_reaction(ctx.message)
 
     @commands.group(name='admin',hidden=True)
     @commands.check(checks.is_bot_admin)
@@ -137,10 +134,7 @@ class Admin(commands.Cog):
                 await ctx.send("Mode superadmin désactivé sur ce serveur",delete_after=3)
             else:
                 await ctx.send("Ce mode n'est pas actif ici",delete_after=3)
-        try:
-            await ctx.message.delete()
-        except:
-            pass
+        await ctx.message.delete(delay=0)
 
     @main_msg.command(name="faq",hidden=True)
     @commands.check(checks.is_bot_admin)
@@ -238,7 +232,7 @@ class Admin(commands.Cog):
                 for r in mentions_str.split(';'):
                     try:
                         mentions.append(guild.get_role(int(r)))
-                    except:
+                    except discord.NotFound:
                         pass
                 mentions = [x.mention for x in mentions if x is not None]
             for chan in channels:
@@ -247,7 +241,7 @@ class Admin(commands.Cog):
                 try:
                     await chan.send(self.update[lang]+"\n\n"+" ".join(mentions), allowed_mentions=discord.AllowedMentions(everyone=False, roles=True))
                 except Exception as e:
-                    await ctx.bot.get_cog('Errors').on_error(e,ctx)
+                    self.bot.dispatch("error", e, ctx)
                 else:
                     count += 1
             if guild.id == 356067272730607628:
@@ -374,29 +368,6 @@ class Admin(commands.Cog):
         else:
             await ctx.send("Impossible de faire ceci, la base de donnée est inaccessible")
 
-    @main_msg.command(name="get_invites",aliases=['invite'])
-    @commands.check(checks.is_bot_admin)
-    async def adm_invites(self, ctx: MyContext, *, server: typing.Optional[discord.Guild]):
-        """Cherche une invitation pour un serveur"""
-        await ctx.author.send(await self.search_invite(server))
-        await ctx.message.delete(delay=0)
-
-    async def search_invite(self, guild: typing.Optional[discord.Guild]) -> str:
-        if guild is None:
-            return "Le serveur n'a pas été trouvé"
-        try:
-            inv = await guild.invites()
-            if len(inv) > 0:
-                msg = "`{}` - {} ({} membres) ".format(guild.name,inv[0],len(guild.members))
-            else:
-                msg = "`{}` - Le serveur ne possède pas d'invitation".format(guild.name)
-        except discord.Forbidden:
-            msg = "`{}` - Impossible de récupérer l'invitation du serveur (Forbidden)".format(guild.name)
-        except Exception as e:
-            msg = "`ERROR:` "+str(e)
-            await self.bot.get_cog('Errors').on_error(e,None)
-        return msg
-
     @main_msg.command(name="config")
     @commands.check(checks.is_bot_admin)
     async def admin_sconfig_see(self, ctx: MyContext, guild: discord.Guild, option=None):
@@ -483,7 +454,7 @@ class Admin(commands.Cog):
                         owners.append(server.owner)
                     await server.leave()
                     servers +=1
-                except:
+                except discord.HTTPException:
                     continue
             chan = await self.bot.get_channel(500674177548812306)
             await chan.send("{} Prodédure d'urgence déclenchée : {} serveurs quittés - {} propriétaires prévenus".format(self.bot.emojis_manager.customs['red_alert'],servers,len(owners)))
@@ -516,71 +487,62 @@ class Admin(commands.Cog):
 
     @main_msg.command(name="ignore")
     @commands.check(checks.is_bot_admin)
-    async def add_ignoring(self, ctx: MyContext, ID:int):
+    async def add_ignoring(self, ctx: MyContext, target: typing.Union[discord.Guild, discord.User]):
         """Ajoute un serveur ou un utilisateur dans la liste des utilisateurs/serveurs ignorés"""
-        serv = ctx.bot.get_guild(ID)
-        try:
-            usr = await ctx.bot.fetch_user(ID)
-        except:
-            usr = None
         scog = ctx.bot.get_cog('Servers')
-        try:
-            config = await ctx.bot.get_cog('Utilities').get_bot_infos()
-            if serv is not None and usr is not None:
-                await ctx.send("Serveur trouvé : {}\nUtilisateur trouvé : {}".format(serv.name,usr))
-            elif serv is not None:
-                servs = config['banned_guilds'].split(';')
-                if str(serv.id) in servs:
-                    servs.remove(str(serv.id))
-                    await scog.edit_bot_infos(self.bot.user.id,[('banned_guilds',';'.join(servs))])
-                    await ctx.send("Le serveur {} n'est plus blacklisté".format(serv.name))
-                else:
-                    servs.append(str(serv.id))
-                    await scog.edit_bot_infos(self.bot.user.id,[('banned_guilds',';'.join(servs))])
-                    await ctx.send("Le serveur {} a bien été blacklist".format(serv.name))
-            elif usr is not None:
-                usrs = config['banned_users'].split(';')
-                if str(usr.id) in usrs:
-                    usrs.remove(str(usr.id))
-                    await scog.edit_bot_infos(self.bot.user.id,[('banned_users',';'.join(usrs))])
-                    await ctx.send("L'utilisateur {} n'est plus blacklisté".format(usr))
-                else:
-                    usrs.append(str(usr.id))
-                    await scog.edit_bot_infos(self.bot.user.id,[('banned_users',';'.join(usrs))])
-                    await ctx.send("L'utilisateur {} a bien été blacklist".format(usr))
+        if scog is None:
+            await ctx.send("Unable to find Servers cog")
+            return
+        config = await ctx.bot.get_cog('Utilities').get_bot_infos()
+        if config is None:
+            await ctx.send("The config dictionnary has not been initialized")
+            return
+        if isinstance(target, discord.Guild):
+            servs: list[str] = config['banned_guilds'].split(';')
+            if str(target.id) in servs:
+                servs.remove(str(target.id))
+                await scog.edit_bot_infos(self.bot.user.id,[('banned_guilds',';'.join(servs))])
+                await ctx.send("Le serveur {} n'est plus blacklisté".format(target.name))
             else:
-                await ctx.send("Impossible de trouver cet utilisateur/ce serveur")
-            ctx.bot.get_cog('Utilities').config = None
-        except Exception as e:
-            await ctx.bot.get_cog('Errors').on_command_error(ctx,e)
+                servs.append(str(target.id))
+                await scog.edit_bot_infos(self.bot.user.id,[('banned_guilds',';'.join(servs))])
+                await ctx.send("Le serveur {} a bien été blacklist".format(target.name))
+        else:
+            usrs: list[str] = config['banned_users'].split(';')
+            if str(target.id) in usrs:
+                usrs.remove(str(target.id))
+                await scog.edit_bot_infos(self.bot.user.id,[('banned_users',';'.join(usrs))])
+                await ctx.send("L'utilisateur {} n'est plus blacklisté".format(target))
+            else:
+                usrs.append(str(target.id))
+                await scog.edit_bot_infos(self.bot.user.id,[('banned_users',';'.join(usrs))])
+                await ctx.send("L'utilisateur {} a bien été blacklist".format(target))
+        ctx.bot.get_cog('Utilities').config = None
 
     @main_msg.command(name="logs")
     @commands.check(checks.is_bot_admin)
     async def show_last_logs(self, ctx: MyContext, lines:typing.Optional[int]=15, *, match=''):
         """Affiche les <lines> derniers logs ayant <match> dedans"""
-        try:
-            if lines > 1000:
-                match = str(lines)
-                lines = 15
-            with open('debug.log','r',encoding='utf-8') as file:
-                text = file.read().split("\n")
-            msg = str()
-            liste = list()
-            i = 1
-            while len(liste)<lines and i<min(2000,len(text)):
-                i+=1
-                if (not match in text[-i]) or ctx.message.content in text[-i]:
-                    continue
-                liste.append(text[-i].replace('`',''))
-            for i in liste:
-                if len(msg+i) > 1900:
-                    await ctx.send("```css\n{}\n```".format(msg))
-                    msg = ""
-                if len(i)<1900:
-                    msg += "\n"+i.replace('`','')
-            await ctx.send("```css\n{}\n```".format(msg))
-        except Exception as e:
-            await self.bot.get_cog('Errors').on_error(e,ctx)
+        if lines > 1000:
+            match = str(lines)
+            lines = 15
+        with open('debug.log','r',encoding='utf-8') as file:
+            text = file.read().split("\n")
+        msg = str()
+        liste = list()
+        i = 1
+        while len(liste)<lines and i<min(2000,len(text)):
+            i+=1
+            if (not match in text[-i]) or ctx.message.content in text[-i]:
+                continue
+            liste.append(text[-i].replace('`',''))
+        for i in liste:
+            if len(msg+i) > 1900:
+                await ctx.send("```css\n{}\n```".format(msg))
+                msg = ""
+            if len(i)<1900:
+                msg += "\n"+i.replace('`','')
+        await ctx.send("```css\n{}\n```".format(msg))
 
     @main_msg.command(name="enable_module")
     @commands.check(checks.is_bot_admin)
