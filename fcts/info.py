@@ -206,11 +206,11 @@ class Info(commands.Cog):
         packages = 40
         wait = 0.3
         try:
-            try:
-                m = await ctx.send("Ping...",file=await self.bot.get_cog('Utilities').find_img('discord-loading.gif'))
-            except:
-                m = None
-            t1 = time.time()
+            m = await ctx.send("Ping...",file=await self.bot.get_cog('Utilities').find_img('discord-loading.gif'))
+        except discord.HTTPException:
+            m = None
+        t1 = time.time()
+        try:
             param = '-n' if system_name().lower()=='windows' else '-c'
             command = ['ping', param, str(packages), '-i', str(wait), ip, '-q']
             result = system_call(command) == 0
@@ -1174,7 +1174,7 @@ Servers:
         elif ctx.invoked_subcommand is None and ctx.subcommand_passed is not None:
             try:
                 url = await args.URL.convert(ctx,ctx.subcommand_passed)
-            except:
+            except commands.BadArgument:
                 return
             if url.domain in ['bit.ly','bitly.com','bitly.is']:
                 msg = copy.copy(ctx.message)
