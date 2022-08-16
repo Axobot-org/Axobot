@@ -1,13 +1,11 @@
 {
-    "lolcat": {
-        "categories": {
-            "automod": "Automod thing"
-        },
-        "embed-warning": "2 send logs, I need dat shiny \"embed links\" perm!",
-        "list": {
-            "all": "List ov available logs",
-            "channel": "List ov logs in %{channel}"
-        },
-        "none-added": "Dis channel is already using all these logs <:angry_eyes:691934246872547359>"
-    }
+    "categories": {
+        "automod": "Automod thing"
+    },
+    "embed-warning": "2 send logs, I need dat shiny \"embed links\" perm!",
+    "list": {
+        "all": "List ov available logs",
+        "channel": "List ov logs in %{channel}"
+    },
+    "none-added": "Dis channel is already using all these logs <:angry_eyes:691934246872547359>"
 }

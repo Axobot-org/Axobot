@@ -1,186 +1,184 @@
 {
-    "en": {
-        "ban": {
-            "too-high": "It seems that this member is too high for me to ban him. :thinking:",
-            "list-error": "Oops, it looks like there are too many users to display :confused:",
-            "list-title-0": "List of banned members of the server \"{}\"",
-            "list-title-1": "List of 45 banned members of the server \"{}\"",
-            "list-title-2": "List of 60 banned members of the server \"{}\"",
-            "no-bans": "No member seems to be banned from here",
-            "user-not-banned": "This person is not part of the banned members list :upside_down:",
-            "cant-ban": "Permission \"Ban members\" needed :confused:",
-            "staff-ban": "You can't ban another staff!"
+    "ban": {
+        "cant-ban": "Permission \"Ban members\" needed :confused:",
+        "list-error": "Oops, it looks like there are too many users to display :confused:",
+        "list-title-0": "List of banned members of the server \"{}\"",
+        "list-title-1": "List of 45 banned members of the server \"{}\"",
+        "list-title-2": "List of 60 banned members of the server \"{}\"",
+        "no-bans": "No member seems to be banned from here",
+        "staff-ban": "You can't ban another staff!",
+        "too-high": "It seems that this member is too high for me to ban him. :thinking:",
+        "user-not-banned": "This person is not part of the banned members list :upside_down:"
+    },
+    "ban-chat": "Member %{user} (%{userid}) is now banned",
+    "ban-dm": "You have just been banned from the server %{guild} :confused:",
+    "cant-find-user": "Oops, no way to find the user **%{user}**",
+    "cant-pin": "Oops, I don't have permission to pin messages",
+    "caps-lock": "Hey %{user}, beware of caps lock!",
+    "clear": {
+        "done": {
+            "many": "%{count} messages deleted!",
+            "one": "%{count} message deleted!"
         },
-        "ban-chat": "Member %{user} (%{userid}) is now banned",
-        "ban-dm": "You have just been banned from the server %{guild} :confused:",
-        "cant-find-user": "Oops, no way to find the user **%{user}**",
-        "cant-pin": "Oops, I don't have permission to pin messages",
-        "caps-lock": "Hey %{user}, beware of caps lock!",
-        "clear": {
-            "done": {
-                "one": "%{count} message deleted!",
-                "many": "%{count} messages deleted!"
-            },
-            "too-few": "I can't delete so few messages",
-            "not-found": "Hmm... impossible to delete these messages. Discord tells me they don't exist :thinking:"
+        "not-found": "Hmm... impossible to delete these messages. Discord tells me they don't exist :thinking:",
+        "too-few": "I can't delete so few messages"
+    },
+    "deprecated-verify": {
+        "desc": "The verification system is now deprecated and will be removed in a future version. Please ask a server manager to enable the [Discord community verification system](https://support.discord.com/hc/en-us/articles/1500000466882-Rules-Screening-FAQ) instead.",
+        "title": "Deprecated feature"
+    },
+    "destop": {
+        "no-guild": "This message does not belong to this server",
+        "too-old": "I can't delete messages older than %{days} days!"
+    },
+    "emoji": {
+        "cant-emoji": "Oops, I'm missing the permission `Manage emojis` :confused:",
+        "emoji-valid": "The emoji %{name} has been modified to allow only the roles %{roles}",
+        "list": "{} (`:{}:`) added on {} {}",
+        "list-title": "Emojis of the server %{guild}",
+        "private": "[Restricted]",
+        "renamed": "The emoji %{emoji} has been renamed!",
+        "wrong-guild": "Oops, it seems this emoji doesn't belong to this server :thinking:"
+    },
+    "error": "Oops, an unknown error occurred. Try again later or contact support",
+    "kick": {
+        "cant-staff": "You can't kick another staff!",
+        "no-perm": "Permission \"Kick members\" needed :confused:",
+        "too-high": "It seems that this member is too high for me to kick him out :thinking:"
+    },
+    "kick-chat": "Member %{user} (%{userid}) has been kicked from this server",
+    "kick-dm": "You have just been kicked from the server %{guild} :confused:",
+    "missing-manage-nick": "Oops, I'm missing the \"Manage nicknames\" permission!",
+    "missing-user-perms": "Oops, you're missing permissions (either manage roles, manage server or manage messages)",
+    "mute": {
+        "already-mute": "This member is already muted!",
+        "already-unmute": "This member isn't muted!",
+        "cant-mute": "Oops, it seems that I don't have enough permissions for that... Please give me permission `Manage roles` before continuing.",
+        "cant-timeout": "Oops, I don't have permission for that... Please give me the permission `Moderate members` before continuing, or create a muted role.",
+        "list-title-0": "List of muted members of the server \"%{guild}\"",
+        "list-title-1": "List of 45 muted members of the server \"%{guild}\"",
+        "list-title-2": "List of 60 muted members of the server \"%{guild}\"",
+        "mute-config-err": "Impossible to do that. Please check my permissions on the server and try again.",
+        "mute-config-success": {
+            "other": "The role has been successfully created and configured! (%{count} channels could not be configured, due to lack of permissions)",
+            "zero": "The role has been successfully created and configured!"
         },
-        "deprecated-verify": {
-            "title": "Deprecated feature",
-            "desc": "The verification system is now deprecated and will be removed in a future version. Please ask a server manager to enable the [Discord community verification system](https://support.discord.com/hc/en-us/articles/1500000466882-Rules-Screening-FAQ) instead."
+        "mute-config-success2": {
+            "other": "The role has been successfully configured! (%{count} channels could not be configured, due to lack of permissions)",
+            "zero": "The role has been successfully configured!"
         },
-        "destop": {
-            "no-guild": "This message does not belong to this server",
-            "too-old": "I can't delete messages older than %{days} days!"
+        "mute-high": "Oops, it seems that the `muted` role is too high for me to give it... Please fix this problem by placing my role higher than the `muted` role.",
+        "no-mute": "Oops, it seems that the role `muted` does not exist :confused: Please create it and assign permissions manually.",
+        "no-mutes": "No member seems to be banned from here",
+        "role-created": "Successfully created `muted` role!\nYou can use the `%{p}mute-config` command for automatic configuration in your server.",
+        "staff-mute": "You can't prevent another staff member from speaking",
+        "too-high": "It seems that this member is too high for me to time out him out :thinking:"
+    },
+    "mute-chat": "Member %{user} (%{userid}) has been muted",
+    "mute-dm": "You have been muted in the server %{guild}",
+    "need-manage-messages": "Permission \"Manage Messages\" missing :confused:",
+    "need-read-history": "Oops, I'm missing the permission to \"Read Message History\" :confused:",
+    "pin": {
+        "error-notfound": "Oops, I can't find that message (Error : `%{err}`)",
+        "error-toomuch": "Oops, impossible to pin this message (do you have more than 50 pinned messages?). Error : `%{err}`"
+    },
+    "raid-banned": "You have been automatically banned from the %{guild} server by the antiraid system.",
+    "raid-kicked": "You have been automatically kicked out of the %{guild} server by the anti-raid system. Try again in a few days.",
+    "react-clear": "I'm unable to find this message :confused:",
+    "role": {
+        "color-success": "The role %{role} has changed color!",
+        "give-pending": "Assigning the role to %{n} members...",
+        "give-roles-higher": "You can't give or remove roles higher than yours!",
+        "give-success": {
+            "many": "-> %{count} roles assigned out of %{m}!",
+            "one": "-> 1 role assigned out of %{m}",
+            "zero": "-> No role could be assigned out of %{m}"
         },
-        "emoji": {
-            "cant-emoji": "Oops, I'm missing the permission `Manage emojis` :confused:",
-            "list": "{} (`:{}:`) added on {} {}",
-            "list-title": "Emojis of the server %{guild}",
-            "private": "[Restricted]",
-            "renamed": "The emoji %{emoji} has been renamed!",
-            "emoji-valid": "The emoji %{name} has been modified to allow only the roles %{roles}",
-            "wrong-guild": "Oops, it seems this emoji doesn't belong to this server :thinking:"
+        "give-too-high": "Oops, it seems that this role is too high for me to give or remove to anyone. Please place my role above the `%{r}` role",
+        "list": "List of server roles",
+        "remove-pending": "Revoking the role to %{n} members...",
+        "remove-success": {
+            "many": "-> %{count} roles revoked out of %{m}!",
+            "one": "-> 1 role revoked out of %{m}",
+            "zero": "-> No role could be revoked out of %{m}"
         },
-        "error": "Oops, an unknown error occurred. Try again later or contact support",
-        "kick": {
-            "no-perm": "Permission \"Kick members\" needed :confused:",
-            "too-high": "It seems that this member is too high for me to kick him out :thinking:",
-            "cant-staff": "You can't kick another staff!"
-        },
-        "kick-chat": "Member %{user} (%{userid}) has been kicked from this server",
-        "kick-dm": "You have just been kicked from the server %{guild} :confused:",
-        "missing-manage-nick": "Oops, I'm missing the \"Manage nicknames\" permission!",
-        "missing-user-perms": "Oops, you're missing permissions (either manage roles, manage server or manage messages)",
-        "mute": {
-            "already-mute": "This member is already muted!",
-            "already-unmute": "This member isn't muted!",
-            "cant-mute": "Oops, it seems that I don't have enough permissions for that... Please give me permission `Manage roles` before continuing.",
-            "cant-timeout": "Oops, I don't have permission for that... Please give me the permission `Moderate members` before continuing, or create a muted role.",
-            "mute-config-err": "Impossible to do that. Please check my permissions on the server and try again.",
-            "mute-config-success": {
-                "zero": "The role has been successfully created and configured!",
-                "other": "The role has been successfully created and configured! (%{count} channels could not be configured, due to lack of permissions)"
-            },
-            "mute-config-success2": {
-                "zero": "The role has been successfully configured!",
-                "other": "The role has been successfully configured! (%{count} channels could not be configured, due to lack of permissions)"
-            },
-            "mute-high": "Oops, it seems that the `muted` role is too high for me to give it... Please fix this problem by placing my role higher than the `muted` role.",
-            "list-title-0": "List of muted members of the server \"%{guild}\"",
-            "list-title-1": "List of 45 muted members of the server \"%{guild}\"",
-            "list-title-2": "List of 60 muted members of the server \"%{guild}\"",
-            "role-created": "Successfully created `muted` role!\nYou can use the `%{p}mute-config` command for automatic configuration in your server.",
-            "no-mute": "Oops, it seems that the role `muted` does not exist :confused: Please create it and assign permissions manually.",
-            "no-mutes": "No member seems to be banned from here",
-            "staff-mute": "You can't prevent another staff member from speaking",
-            "too-high": "It seems that this member is too high for me to time out him out :thinking:"
-        },
-        "mute-chat": "Member %{user} (%{userid}) has been muted",
-        "mute-dm": "You have been muted in the server %{guild}",
-        "need-manage-messages": "Permission \"Manage Messages\" missing :confused:",
-        "need-read-history": "Oops, I'm missing the permission to \"Read Message History\" :confused:",
-        "pin": {
-            "error-notfound": "Oops, I can't find that message (Error : `%{err}`)",
-            "error-toomuch": "Oops, impossible to pin this message (do you have more than 50 pinned messages?). Error : `%{err}`"
-        },
-        "raid-banned": "You have been automatically banned from the %{guild} server by the antiraid system.",
-        "raid-kicked": "You have been automatically kicked out of the %{guild} server by the anti-raid system. Try again in a few days.",
-        "react-clear": "I'm unable to find this message :confused:",
-        "role": {
-            "color-success": "The role %{role} has changed color!",
-            "give-pending": "Assigning the role to %{n} members...",
-            "give-success": {
-                "zero": "-> No role could be assigned out of %{m}",
-                "one": "-> 1 role assigned out of %{m}",
-                "many": "-> %{count} roles assigned out of %{m}!"
-            },
-            "give-too-high": "Oops, it seems that this role is too high for me to give or remove to anyone. Please place my role above the `%{r}` role",
-            "give-roles-higher": "You can't give or remove roles higher than yours!",
-            "too-high": "Oops, this role is too high for me to change. Please move my role above the role `%{r}` before trying again :confused:",
-            "list": "List of server roles",
-            "remove-pending": "Revoking the role to %{n} members...",
-            "remove-success":{
-                "zero": "-> No role could be revoked out of %{m}",
-                "one": "-> 1 role revoked out of %{m}",
-                "many": "-> %{count} roles revoked out of %{m}!"
-            }
-        },
-        "slowmode": {
-            "disabled": "The slowmode is now disabled in this channel.",
-            "too-long": "Impossible to set a frequency higher than six hours",
-            "enabled": "The %{channel} channel is now in slowmode. Wait %{s} seconds before sending a message.",
-            "invalid": "This value is invalid",
-            "info": "The slowmode of this channel is currently at {} seconds",
-            "cant-slowmode": "Oops, I don't have permission to `Manage this channel` :confused:"
-        },
-        "unban-chat": "The member %{user} (%{userid}) is no longer banned from this server",
-        "unhoisted": {
-            "zero": "No nickname have been edited",
-            "one": "1 nickname has been edited",
-            "many": "%{count} edited nicknames!"
-        },
-        "unmute-chat": "The member %{user} (%{userid}) has been unmuted",
-        "verify-role-high": "Oops, it seems that the role %{r} is too high for me to give it. Please place this role lower than mine, or place my role above it.",
-        "verify_questions": [
-            [
-                "What is 2+7?",
-                "9"
-            ],
-            [
-                "What does the product of 2 by 3 give?",
-                "6"
-            ],
-            [
-                "Which of these words begins with D? `bathtub`, `crow`, `galion` or `drawing`",
-                "drawing"
-            ],
-            [
-                "How many sides does a triangle have?",
-                "3"
-            ],
-            [
-                "What is the result of 10 minus 5?",
-                "5"
-            ],
-            [
-                "What is the first letter of `Zbot`?",
-                "z"
-            ],
-            [
-                "What is the name of this server?",
-                "_special_servername"
-            ],
-            [
-                "What is the name of the French bread known all over the world? (one word)",
-                "baguette"
-            ],
-            [
-                "What is the opposite color to black?",
-                "white"
-            ],
-            [
-                "What is the fourth cardinal point? North, south, east, ...",
-                "west"
-            ],
-            [
-                "What does the emoji :pig: represent? A `fish`, `plant` or `pig`?",
-                "pig"
-            ],
-            [
-                "What geometric shape has 3 sides?",
-                "triangle"
-            ],
-            [
-                "How many seconds are there in a minute?",
-                "60"
-            ]
+        "too-high": "Oops, this role is too high for me to change. Please move my role above the role `%{r}` before trying again :confused:"
+    },
+    "slowmode": {
+        "cant-slowmode": "Oops, I don't have permission to `Manage this channel` :confused:",
+        "disabled": "The slowmode is now disabled in this channel.",
+        "enabled": "The %{channel} channel is now in slowmode. Wait %{s} seconds before sending a message.",
+        "info": "The slowmode of this channel is currently at {} seconds",
+        "invalid": "This value is invalid",
+        "too-long": "Impossible to set a frequency higher than six hours"
+    },
+    "unban-chat": "The member %{user} (%{userid}) is no longer banned from this server",
+    "unhoisted": {
+        "many": "%{count} edited nicknames!",
+        "one": "1 nickname has been edited",
+        "zero": "No nickname have been edited"
+    },
+    "unmute-chat": "The member %{user} (%{userid}) has been unmuted",
+    "verify-role-high": "Oops, it seems that the role %{r} is too high for me to give it. Please place this role lower than mine, or place my role above it.",
+    "verify_questions": [
+        [
+            "What is 2+7?",
+            "9"
         ],
-        "warn": {
-            "cant-staff": "You can't warn another staff member!",
-            "cant-bot": "I can't warn a bot ^^",
-            "warn-but-db": "Our database being offline, the warning could not be saved. Nevertheless, the member did receive their warning in DM"
-        },
-        "warn-chat": "The member %{user} (%{userid}) has been warned",
-        "warn-dm": "You have received a warning from the %{guild} server"
-    }
+        [
+            "What does the product of 2 by 3 give?",
+            "6"
+        ],
+        [
+            "Which of these words begins with D? `bathtub`, `crow`, `galion` or `drawing`",
+            "drawing"
+        ],
+        [
+            "How many sides does a triangle have?",
+            "3"
+        ],
+        [
+            "What is the result of 10 minus 5?",
+            "5"
+        ],
+        [
+            "What is the first letter of `Zbot`?",
+            "z"
+        ],
+        [
+            "What is the name of this server?",
+            "_special_servername"
+        ],
+        [
+            "What is the name of the French bread known all over the world? (one word)",
+            "baguette"
+        ],
+        [
+            "What is the opposite color to black?",
+            "white"
+        ],
+        [
+            "What is the fourth cardinal point? North, south, east, ...",
+            "west"
+        ],
+        [
+            "What does the emoji :pig: represent? A `fish`, `plant` or `pig`?",
+            "pig"
+        ],
+        [
+            "What geometric shape has 3 sides?",
+            "triangle"
+        ],
+        [
+            "How many seconds are there in a minute?",
+            "60"
+        ]
+    ],
+    "warn": {
+        "cant-bot": "I can't warn a bot ^^",
+        "cant-staff": "You can't warn another staff member!",
+        "warn-but-db": "Our database being offline, the warning could not be saved. Nevertheless, the member did receive their warning in DM"
+    },
+    "warn-chat": "The member %{user} (%{userid}) has been warned",
+    "warn-dm": "You have received a warning from the %{guild} server"
 }

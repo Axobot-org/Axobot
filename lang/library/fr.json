@@ -1,13 +1,11 @@
 {
-    "fr": {
-        "author": "auteur",
-        "authors": "auteurs",
-        "language": "langue",
-        "none-found": "Impossible de trouver un livre correspondant",
-        "publisher": "éditeur",
-        "rate-limited": "Impossible de faire une recherche par nom pour le moment. Veuillez réessayer plus tard",
-        "title": "titre",
-        "unknown": "inconnu",
-        "year": "année de publication"
-    }
+    "author": "auteur",
+    "authors": "auteurs",
+    "language": "langue",
+    "none-found": "Impossible de trouver un livre correspondant",
+    "publisher": "éditeur",
+    "rate-limited": "Impossible de faire une recherche par nom pour le moment. Veuillez réessayer plus tard",
+    "title": "titre",
+    "unknown": "inconnu",
+    "year": "année de publication"
 }

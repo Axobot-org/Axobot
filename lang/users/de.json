@@ -1,25 +1,23 @@
 {
-    "de": {
-        "set_config": {
-            "animated_card": {
-                "false": "Du erlaubst im Moment keine animierten Karten. Danke!",
-                "true": "Die animierten xp Karten können für dich genutzt werden (längere Zeit zum laden)"
-            },
-            "auto_unafk": {
-                "false": "Du musst das AFK-Tag selber entfernen",
-                "true": "Ich werden den AFK-Tag von dir entfernen, sobald du eine Nachricht schickst"
-            },
-            "usernames_log": {
-                "false": "Du hast das aufzeichnen von deinen Nutzer- und Nicknamen ausgeschaltet",
-                "true": "Du hast die Aufzeichnen von deinen Namen und Nicknamen autorisiert"
-            }
+    "card-desc": "Hier ist ein Beispiel von deiner xp Karte. Du kannst den `profile card <style>` Befehl nutzen, um den Stil zu ändern\n*Deine xp Karte wird sich erst ändern, wenn du neues xp bekommen hast*",
+    "changed-card": "Dein xp Kartenstil ist jetzt %{style}",
+    "changed-error": "Ups, ein interner Fehler ist während dem Verfahren aufgetreten. Versuche es später nochmal oder kontaktiere den Zbot Support.",
+    "config_success": "Die %{opt} Option wurde verändert!",
+    "invalid-card": "Diesen Stil gibt es nicht. Hier ist die Liste, von Stilen, die du nutzen kannst: %{cards}",
+    "list-cards": "Hier ist die Liste, von für dich verfügbaren Rank Karten: %{cards}",
+    "missing-attach-files": "Ups, mir fehlt die Berechtigung Dateien anzuhängen 😕",
+    "set_config": {
+        "animated_card": {
+            "false": "Du erlaubst im Moment keine animierten Karten. Danke!",
+            "true": "Die animierten xp Karten können für dich genutzt werden (längere Zeit zum laden)"
         },
-        "card-desc": "Hier ist ein Beispiel von deiner xp Karte. Du kannst den `profile card <style>` Befehl nutzen, um den Stil zu ändern\n*Deine xp Karte wird sich erst ändern, wenn du neues xp bekommen hast*",
-        "changed-card": "Dein xp Kartenstil ist jetzt %{style}",
-        "changed-error": "Ups, ein interner Fehler ist während dem Verfahren aufgetreten. Versuche es später nochmal oder kontaktiere den Zbot Support.",
-        "config_success": "Die %{opt} Option wurde verändert!",
-        "invalid-card": "Diesen Stil gibt es nicht. Hier ist die Liste, von Stilen, die du nutzen kannst: %{cards}",
-        "list-cards": "Hier ist die Liste, von für dich verfügbaren Rank Karten: %{cards}",
-        "missing-attach-files": "Ups, mir fehlt die Berechtigung Dateien anzuhängen 😕"
+        "auto_unafk": {
+            "false": "Du musst das AFK-Tag selber entfernen",
+            "true": "Ich werden den AFK-Tag von dir entfernen, sobald du eine Nachricht schickst"
+        },
+        "usernames_log": {
+            "false": "Du hast das aufzeichnen von deinen Nutzer- und Nicknamen ausgeschaltet",
+            "true": "Du hast die Aufzeichnen von deinen Namen und Nicknamen autorisiert"
+        }
     }
 }

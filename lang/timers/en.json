@@ -1,27 +1,25 @@
 {
-    "en": {
-        "rmd": {
-            "cancelled": "Dropping the process",
-            "cleared": "Your reminders have been deleted!",
-            "confirm": "Are you sure you want to delete all your reminders? (%{count} pending)",
-            "empty": "Oops, you don't have any pending reminder...",
-            "item": "ID: `{id}` | In: {duration} | Channel: {channel} | Message: {msg}",
-            "saved": "Got it! I'll remind you in %{duration}",
-            "title": "List of your reminders",
-            "too-long": "Impossible to set such a long duration",
-            "too-short": "You have entered an invalid duration",
-            "embed-asked": "%{user}, you asked me %{duration} ago to remind you of this:",
-            "embed-date": "Request date",
-            "embed-link": "Original message",
-            "embed-title": "Reminder",
-            "select-placeholder": "Select one or more reminders",
-            "delete": {
-                "title": "Choose which reminder(s) you want to delete",
-                "success": {
-                    "one": "Your reminder has been deleted!",
-                    "other": "%{count} reminders have successfully been deleted!"
-                }
-            }
-        }
+    "rmd": {
+        "cancelled": "Dropping the process",
+        "cleared": "Your reminders have been deleted!",
+        "confirm": "Are you sure you want to delete all your reminders? (%{count} pending)",
+        "delete": {
+            "success": {
+                "one": "Your reminder has been deleted!",
+                "other": "%{count} reminders have successfully been deleted!"
+            },
+            "title": "Choose which reminder(s) you want to delete"
+        },
+        "embed-asked": "%{user}, you asked me %{duration} ago to remind you of this:",
+        "embed-date": "Request date",
+        "embed-link": "Original message",
+        "embed-title": "Reminder",
+        "empty": "Oops, you don't have any pending reminder...",
+        "item": "ID: `{id}` | In: {duration} | Channel: {channel} | Message: {msg}",
+        "saved": "Got it! I'll remind you in %{duration}",
+        "select-placeholder": "Select one or more reminders",
+        "title": "List of your reminders",
+        "too-long": "Impossible to set such a long duration",
+        "too-short": "You have entered an invalid duration"
     }
 }

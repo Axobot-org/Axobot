@@ -19,6 +19,7 @@ class Languages(discord.ext.commands.Cog):
         i18n.set('file_format', 'json')
         i18n.set('fallback', None)
         i18n.set('error_on_missing_translation', True)
+        i18n.set('skip_locale_root_data', True)
         i18n.translations.container.clear()
         i18n.load_path.clear()
         i18n.load_path.append('./lang')

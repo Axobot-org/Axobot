@@ -1,27 +1,24 @@
 {
-    "fi": {
-        "set_config": {
-            "animated_card": {
-                "false": "Et ole tällä hetkellä hyväksymässä animoitua korttia. Kiitos!",
-                "true": "Voit nyt käyttää animoituja xp kortteja  (hitaampi renderaaminen)"
-            },
-            "auto_unafk": {
-                "false": "Sinun täytyy poistaa AFK merkki itse",
-                "true": "Minä poistan AFK merkin sinulta heti kun lähetät viestin"
-            },
-            "usernames_log": {
-                "false": "Olet laittanut nimimerkkien ja käyttäjänimien kuvaamisen",
-                "true": "Olet hyväksynyt käyttäjänimien ja nimimerkkien kuvaamisen"
-            }
+    "card-desc": "Tässä on esimerkki sinun XP kortistasi. Jos haluat vaihtaa tyyliäsi voit viestittää komennon `profile card <style>` *Sinun XP kortti aikoo päivittyä vain kun ole saanut XP:tä*",
+    "changed-card": "Sinun XP kortti käyttää nyt tyyliä: %{style}",
+    "changed-error": "Ups, sisäinen virhe tapahtui pyynnön lähettämisessä. Yritä uudelleen myöhemmin tai ota yhteyttä tukeen.",
+    "config_list": "Lista mahdollisista vaihtoehdoista: %{options}\n\nKäytä `help profile config` komentoa lisätiedoille",
+    "config_success": "%{opt} ominaisuus on vaihdettu!",
+    "invalid-card": "Tämä tyyli on pätemätön. Tässä on lista tyyleistä joita sinä voit käyttää: %{cards}",
+    "list-cards": "Tässä on lista kaikista tyyleistä sinä voit käyttää: %{cards}",
+    "missing-attach-files": "Ups, minulta puuttuu käyttöoikeus: Liitä tiedostoja :confused:",
+    "set_config": {
+        "animated_card": {
+            "false": "Et ole tällä hetkellä hyväksymässä animoitua korttia. Kiitos!",
+            "true": "Voit nyt käyttää animoituja xp kortteja  (hitaampi renderaaminen)"
         },
-        "card-desc": "Tässä on esimerkki sinun XP kortistasi. Jos haluat vaihtaa tyyliäsi voit viestittää komennon `profile card <style>` *Sinun XP kortti aikoo päivittyä vain kun ole saanut XP:tä*",
-        "changed-card": "Sinun XP kortti käyttää nyt tyyliä: %{style}",
-        "changed-error": "Ups, sisäinen virhe tapahtui pyynnön lähettämisessä. Yritä uudelleen myöhemmin tai ota yhteyttä tukeen.",
-        "config_list": "Lista mahdollisista vaihtoehdoista: %{options}\n\nKäytä `help profile config` komentoa lisätiedoille",
-        "config_success": "%{opt} ominaisuus on vaihdettu!",
-        "invalid-card": "Tämä tyyli on pätemätön. Tässä on lista tyyleistä joita sinä voit käyttää: %{cards}",
-        "list-cards": "Tässä on lista kaikista tyyleistä sinä voit käyttää: %{cards}",
-        "missing-attach-files": "Ups, minulta puuttuu käyttöoikeus: Liitä tiedostoja :confused:"
-        
+        "auto_unafk": {
+            "false": "Sinun täytyy poistaa AFK merkki itse",
+            "true": "Minä poistan AFK merkin sinulta heti kun lähetät viestin"
+        },
+        "usernames_log": {
+            "false": "Olet laittanut nimimerkkien ja käyttäjänimien kuvaamisen",
+            "true": "Olet hyväksynyt käyttäjänimien ja nimimerkkien kuvaamisen"
+        }
     }
 }
