@@ -1,7 +1,7 @@
 {
     "deleted": {
-        "many": "%{count} salons supprimés",
-        "one": "1 salon supprimé"
+        "many": "%{count} salons se sont pris une bombe nucléaire 👼",
+        "one": "1 salon vient de se faire nuke"
     },
-    "no-channel": "Il n'y a aucun salon vocal généré dans ce serveur"
+    "no-channel": "Y'a aucun salon vocal généré sur ce serveur, patate."
 }
