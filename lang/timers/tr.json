@@ -1,12 +1,10 @@
 {
-    "tr": {
-        "rmd": {
-            "saved": "Anladım! %{duration} sonra size hatırlatacağım",
-            "too-long": "Böyle uzun bir süre ayarlamak imkansız",
-            "too-short": "Geçersiz bir süre girdiniz",
-            "embed-asked": "%{user}, %{duration} önce size şunu hatırlatmamı istediniz:",
-            "embed-date": "İstek tarihi",
-            "embed-title": "Hatırlatıcı"
-        }
+    "rmd": {
+        "embed-asked": "%{user}, %{duration} önce size şunu hatırlatmamı istediniz:",
+        "embed-date": "İstek tarihi",
+        "embed-title": "Hatırlatıcı",
+        "saved": "Anladım! %{duration} sonra size hatırlatacağım",
+        "too-long": "Böyle uzun bir süre ayarlamak imkansız",
+        "too-short": "Geçersiz bir süre girdiniz"
     }
 }

@@ -1,59 +1,57 @@
 {
-    "fr": {
-        "added_at": "Ajouté le",
-        "beginning": "début",
-        "btn": {
-            "confirm": {
-                "label": "Confirmer",
-                "answer": "Choix confirmé"
-            },
-            "cancel": {
-                "label": "Annuler",
-                "answer": "Choix annulé"
-            },
-            "delete": {
-                "label": "Supprimer",
-                "answer": "Supprimé !"
-            }
+    "activity": {
+        "listen": "écoute",
+        "nothing": "rien",
+        "play": "joue à",
+        "stream": "stream",
+        "watch": "regarde"
+    },
+    "added_at": "Ajouté le",
+    "beginning": "début",
+    "bot": "bot",
+    "btn": {
+        "cancel": {
+            "answer": "Choix annulé",
+            "label": "Annuler"
         },
-        "bot": "bot",
-        "case": "casier",
-        "category": "catégorie",
-        "click_here": "Cliquez ici",
-        "since": "depuis",
-        "dnd": "ne pas déranger",
-        "doc": "Documentation",
-        "duration": "durée",
-        "end": "fin",
-        "example": "exemple",
-        "extreme": "extrême",
-        "ghost": "Fantôme",
-        "high": "élevé",
-        "highest": "très élevé",
-        "idle": "inactif",
-        "low": "faible",
-        "medium": "moyen",
-        "member": "membre",
-        "membres": "membres",
-        "name": "nom",
-        "no": "non",
-        "none": "aucun",
-        "offline": "hors ligne",
-        "online": "en ligne",
-        "quit": "quitter",
-        "yes": "oui",
-        "reason": "raison",
-        "request_by": "Demandé par %{user}",
-        "server": "serveur",
-        "servers": "serveurs",
-        "unknown": "Inconnu",
-        "version": "version",
-        "activity": {
-            "listen": "écoute",
-            "nothing": "rien",
-            "play": "joue à",
-            "stream": "stream",
-            "watch": "regarde"
+        "confirm": {
+            "answer": "Choix confirmé",
+            "label": "Confirmer"
+        },
+        "delete": {
+            "answer": "Supprimé !",
+            "label": "Supprimer"
         }
-    }
+    },
+    "case": "casier",
+    "category": "catégorie",
+    "click_here": "Cliquez ici",
+    "dnd": "ne pas déranger",
+    "doc": "Documentation",
+    "duration": "durée",
+    "end": "fin",
+    "example": "exemple",
+    "extreme": "extrême",
+    "ghost": "Fantôme",
+    "high": "élevé",
+    "highest": "très élevé",
+    "idle": "inactif",
+    "low": "faible",
+    "medium": "moyen",
+    "member": "membre",
+    "membres": "membres",
+    "name": "nom",
+    "no": "non",
+    "none": "aucun",
+    "offline": "hors ligne",
+    "online": "en ligne",
+    "quit": "quitter",
+    "reason": "raison",
+    "request_by": "Demandé par %{user}",
+    "server": "serveur",
+    "servers": "serveurs",
+    "since": "depuis",
+    "unknown": "Inconnu",
+    "version": "version",
+    "yes": "oui"
 }

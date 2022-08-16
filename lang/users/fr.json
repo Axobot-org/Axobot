@@ -1,26 +1,24 @@
 {
-    "fr":  {
-        "set_config": {
-            "animated_card": {
-                "false": "Vous n'utilisez actuellement pas de carte animée",
-                "true": "Les cartes d'xp animées pourront être utilisée pour vous (rendu plus lent)"
-            },
-            "auto_unafk": {
-                "false": "Vous devez enlever le tag AFK vous-même",
-                "true": "Je vous enlèverai le tag AFK dès que vous enverrez un message"
-            },
-            "usernames_log": {
-                "true": "Vous avez désactivé l'enregistrement de vos noms d'utilisateurs ainsi que de vos surnoms",
-                "false": "Vous avez autorisé l'enregistrement de vos noms d'utilisateurs ainsi que de vos surnoms"
-            }
+    "card-desc": "Voici un exemple de votre carte d'xp. Vous pouvez entrer la commande `profile card <style>` pour changer le style\n*Votre carte d'xp ne se réactualisera que lorsque vous aurez gagné de l'xp*",
+    "changed-card": "Votre carte d'xp utilise maintenant le style %{style}",
+    "changed-error": "Oups, une erreur interne est survenue pendant le traitement de la requête. Réessayez plus tard ou contactez le support.",
+    "config_list": "Liste des options possibles : %{options}\n\nUtilisez la commande `help profile config` pour plus de détails",
+    "config_success": "L'option %{opt} a bien été modifiée!",
+    "invalid-card": "Ce style est invalide. Voici la liste des styles que vous pouvez utiliser : %{cards}",
+    "list-cards": "Voici la liste des styles que vous pouvez utiliser : %{cards}",
+    "missing-attach-files": "Oups, il me manque la permission d'Attacher des Fichiers :confused:",
+    "set_config": {
+        "animated_card": {
+            "false": "Vous n'utilisez actuellement pas de carte animée",
+            "true": "Les cartes d'xp animées pourront être utilisée pour vous (rendu plus lent)"
         },
-        "card-desc": "Voici un exemple de votre carte d'xp. Vous pouvez entrer la commande `profile card <style>` pour changer le style\n*Votre carte d'xp ne se réactualisera que lorsque vous aurez gagné de l'xp*",
-        "changed-card": "Votre carte d'xp utilise maintenant le style %{style}",
-        "changed-error": "Oups, une erreur interne est survenue pendant le traitement de la requête. Réessayez plus tard ou contactez le support.",
-        "config_list": "Liste des options possibles : %{options}\n\nUtilisez la commande `help profile config` pour plus de détails",
-        "config_success": "L'option %{opt} a bien été modifiée!",
-        "invalid-card": "Ce style est invalide. Voici la liste des styles que vous pouvez utiliser : %{cards}",
-        "list-cards": "Voici la liste des styles que vous pouvez utiliser : %{cards}",
-        "missing-attach-files": "Oups, il me manque la permission d'Attacher des Fichiers :confused:"
+        "auto_unafk": {
+            "false": "Vous devez enlever le tag AFK vous-même",
+            "true": "Je vous enlèverai le tag AFK dès que vous enverrez un message"
+        },
+        "usernames_log": {
+            "false": "Vous avez désactivé l'enregistrement de vos noms d'utilisateurs ainsi que de vos surnoms",
+            "true": "Vous avez autorisé l'enregistrement de vos noms d'utilisateurs ainsi que de vos surnoms"
+        }
     }
 }

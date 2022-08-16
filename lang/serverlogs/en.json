@@ -1,25 +1,23 @@
 {
-    "en": {
-        "categories": {
-            "automod": "Automod",
-            "bot": "Bot",
-            "members": "Members",
-            "messages": "Messages",
-            "moderation": "Moderation",
-            "roles": "Roles",
-            "tickets": "Tickets"
-        },
-        "list": {
-            "all": "List of available logs",
-            "emojis": "%{enabled} are for modlogs enabled in your server\n%{disabled} are for other available modlogs",
-            "guild": "List of logs used in this server",
-            "channel": "List of logs used in %{channel}",
-            "none": "No log is used here. Use `%{cmd}` to start getting logs"
-        },
-        "enabled": "Logs of type %{kind} will now be sent to this channel",
-        "disabled": "Logs of type %{kind} will no longer be sent to this channel",
-        "embed-warning": "To send logs, the bot needs the \"Embed links\" permission!",
-        "none-added": "This channel is already subscribed to all these logs!",
-        "none-removed": "This channel was already subscribed to none of these logs!"
-    }
+    "categories": {
+        "automod": "Automod",
+        "bot": "Bot",
+        "members": "Members",
+        "messages": "Messages",
+        "moderation": "Moderation",
+        "roles": "Roles",
+        "tickets": "Tickets"
+    },
+    "disabled": "Logs of type %{kind} will no longer be sent to this channel",
+    "embed-warning": "To send logs, the bot needs the \"Embed links\" permission!",
+    "enabled": "Logs of type %{kind} will now be sent to this channel",
+    "list": {
+        "all": "List of available logs",
+        "channel": "List of logs used in %{channel}",
+        "emojis": "%{enabled} are for modlogs enabled in your server\n%{disabled} are for other available modlogs",
+        "guild": "List of logs used in this server",
+        "none": "No log is used here. Use `%{cmd}` to start getting logs"
+    },
+    "none-added": "This channel is already subscribed to all these logs!",
+    "none-removed": "This channel was already subscribed to none of these logs!"
 }
