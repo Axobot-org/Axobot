@@ -1,0 +1,24 @@
+{
+    "card-desc": "Here iz example of ur xp card. U can enter teh command `profile card <style>` 2 change the style\n*Ur xp card will only refresh wehn u have won Xp*",
+    "changed-card": "Ur xp card naw use the style %{style}",
+    "changed-error": "Oops, a wicked error occurrd during the process ov ur request. Try again later or contact these nice support guys.",
+    "config_list": "List ov avaliable opt: %{options}\n\nUse dat `help profile config` cmd 4 + details",
+    "config_success": "Dat %{opt} option has beez changd!",
+    "invalid-card": "Dat style iz no valid. But yop, her's styles u can use: %{cards}",
+    "list-cards": "Her's da list of cards u can use: %{cards}",
+    "missing-attach-files": "Oops, I'm missing the Attach Files perms :upside_down:",
+    "set_config": {
+        "animated_card": {
+            "false": "Anamited xp cards are naw disabld for you",
+            "true": "Animated xp cards ar naw enabled 4U"
+        },
+        "auto_unafk": {
+            "false": "U do ur own job, okay?",
+            "true": "I'll help u, no worries :green_heart:"
+        },
+        "usernames_log": {
+            "false": "U've disallowd the recordering of Ur usr names & nics",
+            "true": "You've enabld the things taht i do with ur usr names & nicks"
+        }
+    }
+}
