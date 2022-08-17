@@ -1,7 +1,0 @@
-{
-    "daily": {
-        "got-points": "GG, u just got **%{pts}** points!",
-        "lost-points": "Oh no, u just lost **%{pts}** points :(",
-        "too-quick": "Ure 2 soon, please wait 1h before each thx!"
-    }
-}
