@@ -6,7 +6,7 @@
     "check_intro": "%{user}, starting blurple img analys (Plz note dat this may take one or two while)",
     "collect": {
         "title": "Blurple thingy",
-        "to-quick": "Hey wait no, u need to wait til %{time} be4 the next!"
+        "too-quick": "Wait no, ur too early! Please wait %{time} again thx!"
     },
     "missing-attachment-perm": "Oops, I'm missing permission to send images!",
     "unknown-err": "Oops, something went terriby wrong :eyes:\n%{err}"
