@@ -2,10 +2,10 @@
     "author": "auteur",
     "authors": "auteurs",
     "language": "langue",
-    "none-found": "Impossible de trouver un livre correspondant :rip:",
+    "none-found": "Impossible de trouver un livre correspondant",
     "publisher": "éditeur",
-    "rate-limited": "Je ne peux pas chercher par nom pour le moment. Réessaie plus tard !",
+    "rate-limited": "Impossible de faire une recherche par nom pour le moment. Veuillez réessayer plus tard",
     "title": "titre",
     "unknown": "inconnu",
-    "year": "année de parution"
+    "year": "année de publication"
 }
