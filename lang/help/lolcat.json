@@ -108,6 +108,10 @@
             "U have enugh Discord permz",
             "U donut has the right Discord things"
         ],
+        "in_support_server": [
+            "U're in teh bot supprt server",
+            "U can only use dat command in deh support server"
+        ],
         "is_bot_admin": [
             "You need 2B one of the bot Admins",
             "U are not a bot Admin"
