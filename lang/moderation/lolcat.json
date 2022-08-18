@@ -23,6 +23,10 @@
         "not-found": "Hmm... unable 2 delete these messages. Discord tell me they don't exist *LOL*",
         "too-few": "Ai cann:o2:t delte so few mesages plize"
     },
+    "deprecated-verify": {
+        "desc": "",
+        "title": "Soon-to-be-removed feature"
+    },
     "destop": {
         "no-guild": "Dat msg donot belong to this cozy serv",
         "too-old": "I can't delete messages that old! ur crazy duh"

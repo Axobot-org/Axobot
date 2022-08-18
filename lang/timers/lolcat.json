@@ -3,7 +3,13 @@
         "cancelled": "ok well, cancelled UwU",
         "cleared": ":deleted:",
         "confirm": "U sure u wanna delete 'em all? (%{count} small bois)",
-        "deleted": "Rmder #%{id} with msg `%{message}` had deleted w/ success :owo:",
+        "delete": {
+            "success": {
+                "one": "Ur reminder ad ben deleted!",
+                "other": "%{count} reminders had been deletd!"
+            },
+            "title": "Chose which reminder u want 2 delete"
+        },
         "embed-asked": "%{user}, u asked me %{duration} ago 2 remind you this:",
         "embed-date": "Ask date",
         "embed-link": "First msg",
@@ -11,6 +17,7 @@
         "empty": "Oops, U don't have any pending reminder lol",
         "item": "ID: `{id}` | In: {duration} | Chan: {channel} | Msg: {msg}",
         "saved": "Got it! I'll remind you in %{duration} OwO",
+        "select-placeholder": "Select 1+ rmd",
         "title": "I'll remind u that becuz ur dumb-dumb :bongocat:",
         "too-long": "Unable 2 set such a long duration .-.",
         "too-short": "U entered an invalid duration"
