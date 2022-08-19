@@ -97,5 +97,5 @@
         "xp_rate": "XP earnings modifier: %{value}",
         "xp_type": "XP system used: %{value}"
     },
-    "value-deleted": "The \"%{option}\" option value has been deleted"
+    "value-deleted": "The \"%{option}\" option value has been reset to its default value"
 }

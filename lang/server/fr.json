@@ -97,5 +97,5 @@
         "xp_rate": "Modficateur de gains d'xp : %{value}",
         "xp_type": "Type de système d'xp : %{value}"
     },
-    "value-deleted": "La valeur de l'option '%{option}' a bien été effacée"
+    "value-deleted": "La valeur de l'option '%{option}' a bien été remise à sa valeur par défaut"
 }
