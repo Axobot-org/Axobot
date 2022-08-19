@@ -469,7 +469,7 @@ class Servers(commands.Cog):
         if value == "scret-desc":
             guild = await self.get_guild(ctx)
             v = await self.get_option(guild.id, option)
-            if option == "nicknames_history":
+            if option == "nicknames_history" and v is None:
                 v = len(ctx.guild.members) < self.max_members_for_nicknames
             return await self.form_bool(v)
         else:
