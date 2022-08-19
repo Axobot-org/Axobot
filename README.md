@@ -2,6 +2,7 @@
 
 [![discord.py](https://img.shields.io/badge/Discord.py-2.0-brightgreen.svg)](https://github.com/Rapptz/discord.py)
 [![Docs status](https://readthedocs.org/projects/zbot/badge/?version=latest)](https://zbot.readthedocs.io)
+[![Crowdin](https://badges.crowdin.net/zbot/localized.svg)](https://crowdin.com/project/zbot)
 ![Last commit](https://img.shields.io/github/last-commit/ZRunner/ZBot.svg?label=Last+commit+on+develop)
 [![Code quality](https://img.shields.io/lgtm/grade/python/github/ZRunner/ZBot)](https://lgtm.com/projects/g/ZRunner/ZBot)
 [![GitHub Super-Linter](https://github.com/ZRunner/ZBot/workflows/Lint%20Code%20Base/badge.svg)](https://github.com/marketplace/actions/super-linter)
