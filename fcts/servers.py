@@ -383,8 +383,9 @@ class Servers(commands.Cog):
             else:
                 msg = await self.bot._(ctx.guild.id, "server.internal-error")
             await ctx.send(msg)
-            msg = "Reset option in server {}: {}".format(ctx.guild.id,option)
+            msg = "Reset option in server {}: {}".format(ctx.guild.id, option)
             emb = discord.Embed(description=msg, color=self.log_color, timestamp=self.bot.utcnow())
+            emb.set_footer(text=ctx.guild.name)
             emb.set_author(name=self.bot.user, icon_url=self.bot.user.display_avatar)
             await self.bot.send_embed([emb])
             self.bot.log.debug(msg)
