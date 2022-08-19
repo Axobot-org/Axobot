@@ -203,7 +203,7 @@ class Servers(commands.Cog):
         else:
             value = sql_result[0][0]
         if value is None and name == "nicknames_history" and (guild := self.bot.get_guild(guild_id)):
-            value = len(guild.members) > self.max_members_for_nicknames
+            value = len(guild.members) < self.max_members_for_nicknames
         self.cache[(guild_id, name)] = value
         return value
 
