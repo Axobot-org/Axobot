@@ -470,9 +470,14 @@ class ServerLogs(commands.Cog):
         emb.set_author(name=str(after), icon_url=after.display_avatar)
         emb.add_field(name="Account created at", value=f"<t:{after.created_at.timestamp():.0f}>", inline=False)
         if after.joined_at:
+            delta = await FormatUtils.time_delta(
+                after.joined_at,
+                self.bot.utcnow(),
+                await self.bot._(after.guild.id, "_used_locale")
+            )
             emb.add_field(
                 name="Joined at",
-                value=f"<t:{after.joined_at.timestamp():.0f}> (<t:{after.joined_at.timestamp():.0f}:R>)",
+                value=f"<t:{after.joined_at.timestamp():.0f}> ({delta})",
                 inline=False)
         await self.validate_logs(after.guild, channel_ids, emb)
 
@@ -528,9 +533,14 @@ class ServerLogs(commands.Cog):
         emb.add_field(name="Account created at", value=f"<t:{payload.user.created_at.timestamp():.0f}>", inline=False)
         if isinstance(payload.user, discord.Member):
             if payload.user.joined_at:
+                delta = await FormatUtils.time_delta(
+                    payload.user.joined_at,
+                    self.bot.utcnow(),
+                    await self.bot._(payload.guild_id, "_used_locale")
+                )
                 emb.add_field(
                     name="Joined your server at",
-                    value=f"<t:{payload.user.joined_at.timestamp():.0f}> (<t:{payload.user.joined_at.timestamp():.0f}:R>)",
+                    value=f"<t:{payload.user.joined_at.timestamp():.0f}> ({delta})",
                     inline=False)
             if specs := await self.get_member_specs(payload.user):
                 emb.add_field(name="Specificities", value=", ".join(specs), inline=False)
