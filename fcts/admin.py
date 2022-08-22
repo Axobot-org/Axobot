@@ -375,16 +375,12 @@ class Admin(commands.Cog):
         if not ctx.bot.database_online:
             await ctx.send("Impossible d'afficher cette commande, la base de donnée est hors ligne :confused:")
             return
-        try:
-            await self.bot.get_cog("Servers").send_see(guild,ctx.channel,option,ctx.message,guild)
-        except Exception as err:
-            await self.bot.get_cog("Errors").on_command_error(ctx,err)
-        else:
-            await ctx.send("Serveur introuvable")
+        await self.bot.get_cog("Servers").send_see(guild,ctx.channel,option,ctx.message,guild)
+        await ctx.send("Serveur introuvable")
 
     @main_msg.group(name="database", aliases=["db"])
     @commands.check(checks.is_bot_admin)
-    async def admin_db(self, ctx: MyContext):
+    async def admin_db(self, _ctx: MyContext):
         "Commandes liées à la base de données"
 
     @admin_db.command(name='reload')
