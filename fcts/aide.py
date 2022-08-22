@@ -74,7 +74,7 @@ Enable "Embed Links" permission for better rendering
         except discord.errors.Forbidden:
             pass
         except Exception as err:
-            await self.bot.get_cog("Errors").on_error(err, ctx)
+            self.bot.dispatch("error", err, ctx)
             if len(args) == 0:
                 await self._default_help_command(ctx)
             else:
@@ -156,7 +156,7 @@ If the bot can't send the new command format, it will try to send the old one.""
             ft = await self.bot._(ctx.channel, "help.footer")
             prefix = await self.bot.prefix_manager.get_prefix(ctx.guild)
         if len(pages) == 0:
-            await self.bot.get_cog("Errors").senf_err_msg("Impossible de trouver d'aide pour la commande " + " ".join(commands))
+            self.bot.dispatch("error", ValueError(f"Unable to find help for the command {' '.join(commands)}"))
             await destination.send(await self.bot._(ctx.channel, "help.cmd-not-found", cmd=" ".join(commands)))
             return
         if destination.permissions_for(me).embed_links:
@@ -205,8 +205,8 @@ If the bot can't send the new command format, it will try to send the old one.""
                 continue
             temp = await self.display_cmd(cmd)
             found = False
-            for k, v in self.commands_list.items():
-                if cmd.name in v:
+            for k, values in self.commands_list.items():
+                if cmd.name in values:
                     categories[k].append(temp)
                     found = True
                     break
@@ -215,37 +215,37 @@ If the bot can't send the new command format, it will try to send the old one.""
         answer = []
         prefix = await self.bot.prefix_manager.get_prefix(ctx.guild)
         if compress:
-            for k, v in categories.items():
-                if len(v) == 0:
+            for k, values in categories.items():
+                if len(values) == 0:
                     continue
                 tr = await self.bot._(ctx.channel, f"help.categories.{k}")
                 title = "__**"+tr.capitalize()+"**__"
                 count = await self.bot._(ctx.channel, "help.cmd-count",
-                                         nbr=len(v),
+                                         nbr=len(values),
                                          p=prefix,
                                          cog=k)
                 answer.append((title, count))
         else:
-            for k, v in categories.items():
-                if len(v) == 0:
+            for k, values in categories.items():
+                if len(values) == 0:
                     continue
                 tr = await self.bot._(ctx.channel, f"help.categories.{k}")
-                if len("\n".join(v)) > 1020:
-                    temp = list(v)
-                    v = list()
+                if len("\n".join(values)) > 1020:
+                    temp = list(values)
+                    values = []
                     i = 1
                     for line in temp:
-                        if len("\n".join(v+[line])) > 1020:
+                        if len("\n".join(values+[line])) > 1020:
                             title = (tr+' - ' + str(i)) if 'help.' not in tr else (k+' - '+str(i))
-                            answer.append(("__**"+title.capitalize()+"**__", "\n".join(v)))
-                            v = list()
+                            answer.append(("__**"+title.capitalize()+"**__", "\n".join(values)))
+                            values.clear()
                             i += 1
-                        v.append(line)
+                        values.append(line)
                     title = (tr+' - ' + str(i)) if 'help.' not in tr else (k+' - '+str(i))
-                    answer.append(("__**"+title.capitalize()+"**__", "\n".join(v)))
+                    answer.append(("__**"+title.capitalize()+"**__", "\n".join(values)))
                 else:
                     title = tr
-                    answer.append(("__**"+title.capitalize()+"**__", "\n".join(v)))
+                    answer.append(("__**"+title.capitalize()+"**__", "\n".join(values)))
         return answer
 
     async def cog_commands(self, ctx: MyContext, cog: commands.Cog):
@@ -253,7 +253,7 @@ If the bot can't send the new command format, it will try to send the old one.""
         description = inspect.getdoc(cog)
         page = ""
         form = "**{}**\n\n {} \n{}"
-        pages = list()
+        pages = []
         cog_name = cog.__class__.__name__
         if description is None:
             description = await self.bot._(ctx.channel, "help.no-desc-cog")
@@ -273,8 +273,9 @@ If the bot can't send the new command format, it will try to send the old one.""
         return pages
 
     async def extract_info(self, desc: str):
+        "Split description, examples and documentation link from the given documentation"
         data = [x.strip() for x in desc.split("\n\n")]
-        desc, example, doc = list(), list(), list()
+        desc, example, doc = [], [], []
         for p in data:
             if p.startswith("..Example "):
                 example.append(p.replace("..Example ", ""))
@@ -284,7 +285,7 @@ If the bot can't send the new command format, it will try to send the old one.""
                 desc.append(p)
         return (x if len(x) > 0 else None for x in ("\n\n".join(desc), example, doc))
 
-    async def cmd_help(self, ctx: MyContext, cmd: commands.core.Command, useEmbed: bool = True):
+    async def cmd_help(self, ctx: MyContext, cmd: commands.core.Command, use_embed: bool = True):
         """Create pages for a command explanation"""
         desc = cmd.description.strip()
         if desc == '' and cmd.help is not None:
@@ -299,11 +300,11 @@ If the bot can't send the new command format, it will try to send the old one.""
         # Syntax
         syntax = cmd.qualified_name + "** " + cmd.signature
         # Subcommands
-        sublist = list()
+        sublist = []
         subcmds = ""
         if isinstance(cmd, commands.core.Group):
             syntax += " ..."
-            if not useEmbed:
+            if not use_embed:
                 subcmds = "__{}__".format(str(await self.bot._(ctx.channel, "help.subcmds")).capitalize())
             for x in sorted(cmd.all_commands.values(), key=self.sort_by_name):
                 try:
@@ -314,11 +315,11 @@ If the bot can't send the new command format, it will try to send the old one.""
                 except commands.CommandError:
                     pass
         # Is enabled
-        enabled = list()
+        enabled: list[str] = []
         if not cmd.enabled:
             enabled.append(await self.bot._(ctx.channel, "help.not-enabled"))
         # Checks
-        checks = list()
+        checks = []
         if len(cmd.checks) > 0:
             maybe_coro = discord.utils.maybe_coroutine
             for c in cmd.checks:
@@ -346,8 +347,8 @@ If the bot can't send the new command format, it will try to send the old one.""
                             checks.append('❌ '+check_msg_tr[1])
                     else:
                         self.bot.log.warning(f"No description for help check {check_name} ({c})")
-                except Exception as e:
-                    await self.bot.get_cog("Errors").on_error(e, ctx)
+                except Exception as err:
+                    self.bot.dispatch("error", err, f"While checking {c} in help")
         # Module
         category = "unclassed"
         for k, v in self.commands_list.items():
@@ -355,8 +356,8 @@ If the bot can't send the new command format, it will try to send the old one.""
                 category = k
                 break
         category = (await self.bot._(ctx.channel, f"help.categories.{category}")).capitalize()
-        if useEmbed:
-            answer = list()
+        if use_embed:
+            answer = []
             answer.append([f"**{prefix}{syntax}"])
             answer.append((await self.bot._(ctx.channel, 'help.description'), desc))
             if example is not None:
