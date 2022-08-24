@@ -878,7 +878,7 @@ Available types: member, role, user, emoji, channel, server, invite, category
             embed.set_thumbnail(url=user.display_avatar.replace(static_format="png", size=1024))
             embed.add_field(name="ID", value=user.id)
             embed.add_field(name="Flags", value="-".join(userflags), inline=False)
-            embed.add_field(name="Servers", value="\n".join(servers_in))
+            embed.add_field(name=f"Servers ({len(servers_in)})", value="\n".join(servers_in))
             embed.add_field(name="Language", value="\n".join(disp_lang))
             embed.add_field(name="XP card", value=xp_card)
             embed.add_field(name="Upvoted the bot?", value=votes)
