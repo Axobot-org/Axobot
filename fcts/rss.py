@@ -89,7 +89,7 @@ class Rss(commands.Cog):
             await self.bot.get_cog('Help').help_command(ctx,['rss'])
 
     @rss_main.command(name="youtube",aliases=['yt'])
-    async def request_yt(self, ctx: MyContext, channel):
+    async def request_yt(self, ctx: MyContext, *, channel):
         """The last video of a YouTube channel
 
         ..Example rss youtube UCZ5XnGb-3t7jCkXdawN2tkA
