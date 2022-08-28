@@ -66,10 +66,7 @@ class YoutubeRSS:
                     return match.group(1)
             return None
         identifier, name = channels[0].split(": ", 1)
-        if name.lower() == match.group(1).lower() \
-            or identifier.lower() == match.group(1).lower():
-            return identifier
-        return None
+        return identifier
 
     @cached(timeout=86400*2) # 2-days cache because we use it really really often
     def get_channel_by_custom_url(self, custom_name: str):
