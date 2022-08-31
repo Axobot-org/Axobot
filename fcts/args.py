@@ -153,7 +153,7 @@ class AnyEmoji(commands.Converter):
         r = re.search(r'<a?:[^:]+:(\d+)>', argument)
         if r is None:
             try:
-                return UnicodeEmoji.convert(ctx, argument)
+                return await UnicodeEmoji.convert(ctx, argument)
             except commands.errors.BadArgument:
                 pass
         else:
