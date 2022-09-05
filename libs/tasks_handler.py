@@ -1,5 +1,4 @@
 from __future__ import annotations
-from datetime import timezone
 
 import json
 import time
