@@ -105,7 +105,7 @@ def create_database_query(cnx_frm: Union[MySQLConnection, 'CMySQLConnection']):
                 await self.__aexit__(*sys.exc_info())
                 raise err
 
-            if self.query.startswith("SELECT"):
+            if self.query.startswith("SELECT") or self.query.startswith("SHOW"):
                 return_type = tuple if self.astuple else dict
                 if self.fetchone:
                     one_row = self.cursor.fetchone()
