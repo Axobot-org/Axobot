@@ -302,6 +302,7 @@ If the bot can't send the new command format, it will try to send the old one.""
         # Subcommands
         sublist = []
         subcmds = ""
+        subs_cant_show = 0
         if isinstance(cmd, commands.core.Group):
             syntax += " ..."
             if not use_embed:
@@ -309,11 +310,16 @@ If the bot can't send the new command format, it will try to send the old one.""
             for x in sorted(cmd.all_commands.values(), key=self.sort_by_name):
                 try:
                     if (not x.hidden) and x.enabled and x.name not in sublist and await x.can_run(ctx):
-                        subcmds += "\n• {} {}".format(x.name, "*({})*".format(
-                            x.short_doc) if len(x.short_doc) > 0 else "")
-                        sublist.append(x.name)
+                        if len(subcmds) > 950:
+                            subs_cant_show += 1
+                        else:
+                            subcmds += "\n• {} {}".format(x.name, "*({})*".format(
+                                x.short_doc) if len(x.short_doc) > 0 else "")
+                            sublist.append(x.name)
                 except commands.CommandError:
                     pass
+        if subs_cant_show > 0:
+            subcmds += "\n" + await self.bot._(ctx.channel, f'help.more-subcmds', count=subs_cant_show)
         # Is enabled
         enabled: list[str] = []
         if not cmd.enabled:
