@@ -106,7 +106,7 @@ class Zbot(commands.bot.AutoShardedBot):
         if isinstance(event_method, str) and event_method.startswith("on_") and event_method != "on_error":
             _, error, _ = sys.exc_info()
             self.dispatch("error", error, f"While handling event `{event_method}`")
-        await super().on_error(event_method, *args, **kwargs)
+        # await super().on_error(event_method, *args, **kwargs)
 
     async def on_app_cmd_error(self, interaction: discord.Interaction, error: discord.app_commands.AppCommandError):
         self.dispatch("interaction_error", interaction, error)
