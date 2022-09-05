@@ -101,12 +101,12 @@ class Zbot(commands.bot.AutoShardedBot):
         # app commands
         self.tree.on_error = self.on_app_cmd_error
     
-    async def on_error(self, event_method: str, *args, **kwargs):
+    async def on_error(self, event_method: Union[Exception, str], *args, **kwargs):
         "Called when an event raises an uncaught exception"
-        if event_method.startswith("on_") and event_method != "on_error":
+        if isinstance(event_method, str) and event_method.startswith("on_") and event_method != "on_error":
             _, error, _ = sys.exc_info()
             self.dispatch("error", error, f"While handling event `{event_method}`")
-        super().on_error(event_method, *args, **kwargs)
+        await super().on_error(event_method, *args, **kwargs)
 
     async def on_app_cmd_error(self, interaction: discord.Interaction, error: discord.app_commands.AppCommandError):
         self.dispatch("interaction_error", interaction, error)
