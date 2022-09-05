@@ -105,7 +105,7 @@ class Zbot(commands.bot.AutoShardedBot):
         "Called when an event raises an uncaught exception"
         if event_method.startswith("on_") and event_method != "on_error":
             _, error, _ = sys.exc_info()
-            await self.dispatch("error", error, f"While handling event `{event_method}`")
+            self.dispatch("error", error, f"While handling event `{event_method}`")
         super().on_error(event_method, *args, **kwargs)
 
     async def on_app_cmd_error(self, interaction: discord.Interaction, error: discord.app_commands.AppCommandError):

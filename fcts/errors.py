@@ -197,7 +197,7 @@ class Errors(commands.Cog):
         else:
             guild = f"DM with {interaction.user}"
         if interaction.type == discord.InteractionType.application_command:
-            await self.on_error(error, f"Slash command `{interaction.command.name}` | {guild}")
+            await self.on_error(error, f"Slash command `{interaction.command.name if interaction.command else None}` | {guild}")
         elif interaction.type == discord.InteractionType.ping:
             await self.on_error(error, f"Ping interaction | {guild}")
         elif interaction.type == discord.InteractionType.modal_submit:
