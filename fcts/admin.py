@@ -1,9 +1,7 @@
 import asyncio
 import copy
 import datetime
-import inspect
 import io
-import json
 import operator
 import os
 import sys
@@ -12,10 +10,10 @@ import time
 import traceback
 import typing
 from contextlib import redirect_stdout
-from glob import glob
 
 import discord
 import speedtest
+from discord import app_commands
 from discord.ext import commands
 from libs.classes import MyContext, UserFlag, Zbot, ConfirmView
 
@@ -29,6 +27,8 @@ def cleanup_code(content: str):
         return '\n'.join(content.split('\n')[1:-1])
     # remove `foo`
     return content.strip('` \n')
+
+PRIVATE_GUILD_ID = discord.Object(625316773771608074)
 
 class Admin(commands.Cog):
     """Here are listed all commands related to the internal administration of the bot. Most of them are not accessible to users, but only to ZBot administrators."""
@@ -90,19 +90,15 @@ class Admin(commands.Cog):
         except discord.DiscordException:
             pass
 
-    @commands.command(name='spoil',hidden=True)
-    @commands.check(checks.is_bot_admin)
-    async def send_spoiler(self, ctx: MyContext, *, text: str):
-        """spoil spoil spoil"""
-        spoil = lambda text: "||"+"||||".join(text)+"||"
-        await ctx.send("```\n{}\n```".format(spoil(text)))
-
-    @commands.command(name='msg',aliases=['tell'])
-    @commands.check(checks.is_bot_admin)
-    async def send_msg(self, ctx: MyContext, user:discord.User, *, message: str):
-        """Envoie un mp à un membre"""
+    @app_commands.command()
+    @app_commands.guilds(PRIVATE_GUILD_ID)
+    @app_commands.default_permissions(administrator=True)
+    @app_commands.check(checks.is_bot_admin)
+    async def send_msg(self, interaction: discord.Interaction, user: discord.User, message: str):
+        "Send a DM to any user the bot can reach"
+        await interaction.response.defer(ephemeral=True)
         await user.send(message)
-        await self.add_success_reaction(ctx.message)
+        await interaction.edit_original_response(content="Done!")
 
     @commands.group(name='admin',hidden=True)
     @commands.check(checks.is_bot_admin)
@@ -270,28 +266,6 @@ class Admin(commands.Cog):
             text +="- {} ({}) \n".format(v.file,k)
         await ctx.send(text)
 
-    @main_msg.command(name="lang-sort",hidden=True)
-    @commands.check(checks.is_bot_admin)
-    async def resort_langs(self, ctx:MyContext, *, lang:str=None):
-        """Trie par ordre alphabétique les fichiers de traduction"""
-        all_files = sorted([x.replace('fcts/lang/','').replace('.json','') for x in glob("fcts/lang/*.json", recursive=False)])
-        if isinstance(lang,str) and ' ' in lang:
-            langs = lang.split(' ')
-        elif lang is None:
-            langs = all_files
-        elif lang in all_files:
-            langs = [lang]
-        else:
-            return await ctx.send('Langue invalide. Liste des langues actuelles : '+" - ".join(all_files))
-        output = 0
-        for l in langs:
-            with open(f'fcts/lang/{l}.json','r') as f:
-                temp = json.load(f)
-            with open(f'fcts/lang/{l}.json','w') as f:
-                json.dump(temp, f,  ensure_ascii=False, indent=4, sort_keys=True)
-            output += 1
-        await ctx.send('{o} fichier{s} trié{s}'.format(o=output,s='' if output<2 else 's'))
-
     @main_msg.command(name="guilds",aliases=['servers'],hidden=True)
     @commands.check(checks.is_bot_admin)
     async def send_guilds_list(self, ctx: MyContext):
@@ -348,12 +322,6 @@ class Admin(commands.Cog):
         """Recharge un module"""
         cogs = cog.split(" ")
         await self.bot.get_cog("Reloads").reload_cogs(ctx,cogs)
-        
-    @main_msg.command(name="check_tr")
-    @commands.check(checks.is_bot_admin)
-    async def check_tr(self, ctx: MyContext,lang='en',origin="fr"):
-        """Vérifie si un fichier de langue est complet"""
-        await self.bot.get_cog("Languages").check_tr(ctx.channel,lang,origin)
 
     @main_msg.command(name="membercounter")
     @commands.check(checks.is_bot_admin)
@@ -462,24 +430,6 @@ class Admin(commands.Cog):
             except Exception as err:
                 await self.bot.get_cog('Errors').on_error(err,None)
         return "Qui a appuyé sur le bouton rouge ? :thinking:"
-
-    @main_msg.command(name="code")
-    @commands.check(checks.is_bot_admin)
-    async def show_code(self, ctx: MyContext, cmd: str):
-        obj = self.bot.get_command(cmd)
-        if obj is not None:
-            code = inspect.getsource(obj.callback)
-            if len(code) > 1950:
-                liste = str()
-                for line in code.split('\n'):
-                    if len(liste+"\n"+line) > 1950:
-                        await ctx.send("```py\n{}\n```".format(liste))
-                        liste = str()
-                    liste += '\n'+line
-            else:
-                await ctx.send("```py\n{}\n```".format(code))
-        else:
-            await ctx.send("Commande `{}` introuvable".format(cmd))
 
     @main_msg.command(name="ignore")
     @commands.check(checks.is_bot_admin)
