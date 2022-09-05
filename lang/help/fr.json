@@ -152,6 +152,10 @@
     "embed_title": "Liste des commandes disponibles pour %{u}",
     "embed_title_dm": "Liste des commandes disponibles en MP",
     "footer": "Entrez {}help commande pour plus d'informations sur une commande",
+    "more-subcmds": {
+        "one": "et 1 de plus",
+        "many": "et %{count} de plus"
+    },
     "no-desc-cmd": "Aucune description pour cette commande",
     "no-desc-cog": "Aucune description pour ce module.",
     "no-subcmd": "La commande %{cmd} n'a aucune sous-commande",
