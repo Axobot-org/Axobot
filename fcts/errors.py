@@ -217,6 +217,10 @@ class Errors(commands.Cog):
         else:
             exc_info = sys.exc_info()
         try:
+            # if this is only an interaction too slow, don't report in bug channel
+            if isinstance(error, discord.NotFound) and error.text == "Unknown interaction":
+                self.bot.log.warning(f"[on_error] {error}", exc_info=exc_info)
+                return
             # get traceback info
             if isinstance(ctx, discord.Message):
                 ctx = await self.bot.get_context(ctx)
