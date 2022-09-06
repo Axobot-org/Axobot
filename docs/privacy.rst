@@ -24,7 +24,7 @@ This page explains our policies regarding the collection, use and disclosure of 
 
 We use your data to provide and improve the Service. By using the Service, you consent to the collection and use of information in accordance with this policy.
 
-**ZBot relies on the DISCORD platform, it is up to the User to inform himself about the security policy implemented by DISCORD (https://discord.com) and about the possible exceptions that this policy could bring to our Privacy Policy, in particular by recording some data collected by ZBot in a transparent way for us.**
+**ZBot relies on the DISCORD platform, it is up to the User to inform themselves about the security policy implemented by DISCORD (https://discord.com) and about the possible exceptions that this policy could bring to our Privacy Policy, in particular by recording some data collected by ZBot in a transparent way for us.**
 
 
 2. Definitions

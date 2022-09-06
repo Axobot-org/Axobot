@@ -7,7 +7,7 @@
         "list-title-2": "List of 60 banned members of the server \"{}\"",
         "no-bans": "No member seems to be banned from here",
         "staff-ban": "You can't ban another staff!",
-        "too-high": "It seems that this member is too high for me to ban him. :thinking:",
+        "too-high": "It seems that this member is too high for me to ban them. :thinking:",
         "user-not-banned": "This person is not part of the banned members list :upside_down:"
     },
     "ban-chat": "Member %{user} (%{userid}) is now banned",
@@ -44,7 +44,7 @@
     "kick": {
         "cant-staff": "You can't kick another staff!",
         "no-perm": "Permission \"Kick members\" needed :confused:",
-        "too-high": "It seems that this member is too high for me to kick him out :thinking:"
+        "too-high": "It seems that this member is too high for me to kick them out :thinking:"
     },
     "kick-chat": "Member %{user} (%{userid}) has been kicked from this server",
     "kick-dm": "You have just been kicked from the server %{guild} :confused:",
@@ -72,7 +72,7 @@
         "no-mutes": "No member seems to be banned from here",
         "role-created": "Successfully created `muted` role!\nYou can use the `%{p}mute-config` command for automatic configuration in your server.",
         "staff-mute": "You can't prevent another staff member from speaking",
-        "too-high": "It seems that this member is too high for me to time out him out :thinking:"
+        "too-high": "It seems that this member is too high for me to time out them out :thinking:"
     },
     "mute-chat": "Member %{user} (%{userid}) has been muted",
     "mute-dm": "You have been muted in the server %{guild}",
