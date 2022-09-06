@@ -316,7 +316,7 @@ Nice command that allows you to do different things with the server roles (other
 
 * :code:`role color <role> <colour>` (alias `role colour`): Changes the color of the given role. The color must be in hexadecimal form, although some common names are accepted (red, blue, gold...). To remove the color, use the name `default`. Please check notes 1. and 2.
 
-* :code:`role give <role> <user(s) | role(s)>`: Give a role to a list of people. You can target as many users or roles as you want, so for example to target your friends Joe and Jack, plus the Admin role, use :code:`role give superRole Joe Jack Admin`. Please check note 2.
+* :code:`role give <role> <user(s) | role(s)>`: Give a role to a list of people. You can target as many users or roles as you want, so for example to target your friends Joe and Jack, plus the Admin role, use :code:`role give superRole Joe Jack Admin`. Please check note 2. To avoid spamming the Discord API, Zbot also limit how many users you can affect by this command, and will tell you if this limit is reached.
 
 * :code:`role remove <role> <user(s) | role(s)>`: Same as above, but instead of giving them, it takes them away. Please check note 2.
 

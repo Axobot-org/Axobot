@@ -26,6 +26,8 @@ class Moderation(commands.Cog):
     def __init__(self, bot: Zbot):
         self.bot = bot
         self.file = "moderation"
+        # maximum of roles granted/revoked by query
+        self.max_roles_modifications = 300
 
     @commands.command(name="slowmode")
     @commands.guild_only()
@@ -1157,7 +1159,7 @@ The 'reasons' parameter is used to display the mute reasons.
         new_ctx = await self.bot.get_context(msg)
         await self.bot.invoke(new_ctx)
 
-    @main_role.command(name="give", aliases=["add"])
+    @main_role.command(name="give", aliases=["add", "grant"])
     @commands.check(checks.has_manage_roles)
     @commands.cooldown(1, 30, commands.BucketType.guild)
     async def roles_give(self, ctx:MyContext, role:discord.Role, users:commands.Greedy[Union[discord.Role,discord.Member,Literal['everyone']]]):
@@ -1193,17 +1195,19 @@ The 'reasons' parameter is used to display the mute reasons.
             await ctx.send(await self.bot._(ctx.guild.id, "moderation.role.give-pending", n=len(n_users)))
         count = 0
         for user in n_users:
-            if count > 300:
+            if count >= self.max_roles_modifications:
                 break
             await user.add_roles(role, reason="Asked by {}".format(ctx.author))
             count += 1
         answer = await self.bot._(ctx.guild.id, "moderation.role.give-success", count=count, m=len(n_users))
+        if count == self.max_roles_modifications and len(n_users) > count:
+            answer += f'\n⚠️ *{await self.bot._(ctx.guild.id, "moderation.role.limit-hit", limit=self.max_roles_modifications)}*'
         if len(n_users) > 50:
             await ctx.reply(answer)
         else:
             await ctx.send(answer)
 
-    @main_role.command(name="remove")
+    @main_role.command(name="remove", aliases=["revoke"])
     @commands.check(checks.has_manage_roles)
     @commands.cooldown(1, 30, commands.BucketType.guild)
     async def roles_remove(self, ctx:MyContext, role:discord.Role, users:commands.Greedy[Union[discord.Role,discord.Member,Literal['everyone']]]):
@@ -1237,11 +1241,13 @@ The 'reasons' parameter is used to display the mute reasons.
             await ctx.send(await self.bot._(ctx.guild.id, "moderation.role.remove-pending", n=len(n_users)))
         count = 0
         for user in n_users:
-            if count > 200:
+            if count >= self.max_roles_modifications:
                 break
             await user.remove_roles(role,reason="Asked by {}".format(ctx.author))
             count += 1
         answer = await self.bot._(ctx.guild.id, "moderation.role.remove-success",count=count,m=len(n_users))
+        if count == self.max_roles_modifications and len(n_users) > count:
+            answer += f'\n⚠️ *{await self.bot._(ctx.guild.id, "moderation.role.limit-hit", limit=self.max_roles_modifications)}*'
         if len(n_users) > 50:
             await ctx.reply(answer)
         else:

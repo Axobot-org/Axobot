@@ -94,7 +94,7 @@ class Languages(discord.ext.commands.Cog):
             err = f"Le message {string_id} n'a pas été trouvé dans la base de donnée! (langue {lang})"
             await self.bot.get_cog('Errors').senf_err_msg(err)
         except Exception: # pylint: disable=broad-except
-            self.bot.log.error(exc_info=True)
+            self.bot.log.error("Something went wrong while reporting a translation as missing", exc_info=True)
 
     async def change_cache(self, server_id: int, new_lang: str):
         #print("change_cache:",new_lang)
