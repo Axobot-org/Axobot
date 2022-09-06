@@ -417,13 +417,13 @@ class Partners(commands.Cog):
             if l['type']=='bot':
                 try:
                     bot = await self.bot.fetch_user(l['target'])
-                except:
+                except discord.HTTPException:
                     bot = l['target']
                 f[0] += "[{}] **{}** `{}` ({} {})\n".format(l['ID'],tr_bot.capitalize(),bot,tr_added,date)
             elif l['type']=='guild':
                 try:
                     server = (await self.bot.fetch_invite(l['target'])).guild.name
-                except:
+                except discord.HTTPException:
                     server = 'discord.gg/'+l['target']
                 f[0] += "[{}] **{}** `{}` ({} {})\n".format(l['ID'],tr_guild.capitalize(),server,tr_added,date)
         if ctx.guild.me.guild_permissions.manage_guild:
