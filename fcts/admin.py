@@ -14,7 +14,7 @@ import discord
 import speedtest
 from cachingutils import acached
 from discord.ext import commands
-from libs.classes import ConfirmView, MyContext, UserFlag, Zbot
+from libs.classes import PRIVATE_GUILD_ID, ConfirmView, MyContext, UserFlag, Zbot
 
 from . import checks
 
@@ -26,8 +26,6 @@ def cleanup_code(content: str):
         return '\n'.join(content.split('\n')[1:-1])
     # remove `foo`
     return content.strip('` \n')
-
-PRIVATE_GUILD_ID = discord.Object(625316773771608074)
 
 class Admin(commands.Cog):
     """Here are listed all commands related to the internal administration of the bot. Most of them are not accessible to users, but only to ZBot administrators."""

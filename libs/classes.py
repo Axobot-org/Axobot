@@ -30,6 +30,8 @@ if TYPE_CHECKING:
     from fcts.users import Users
     from fcts.utilities import Utilities
     from fcts.xp import Xp
+    
+PRIVATE_GUILD_ID = discord.Object(625316773771608074)
 
 class MyContext(commands.Context):
     """Replacement for the official commands.Context class

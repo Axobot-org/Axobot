@@ -18,7 +18,7 @@ from discord.ext import commands
 from discord.ext.commands.converter import run_converters
 from docs import conf
 from libs import bitly_api
-from libs.classes import MyContext, Zbot
+from libs.classes import PRIVATE_GUILD_ID, MyContext, Zbot
 from libs.formatutils import FormatUtils
 from libs.rss.rss_general import FeedObject
 from utils import count_code_lines
@@ -811,33 +811,31 @@ Available types: member, role, user, emoji, channel, server, invite, category
         await ctx.send(embed=embed)
 
 
-    @commands.group(name="find")
-    @commands.check(checks.is_support_staff)
-    @commands.check(in_support_server)
-    async def find_main(self, ctx: MyContext):
-        """Same as info, but in a lighter version"""
-        if ctx.invoked_subcommand is None:
-            await ctx.send("Cette commande permet de retrouver un serveur ou un salon parmi tout les serveurs sur lequel est le"
-            " bot. Vous pouvez aussi rechercher les informations d'un utilisateur Discord, peu importe si il partage un serveur"
-            " avec moi !\nLa syntaxe est `!find <user|channel|guild> <ID>`")
+    find_main = discord.app_commands.Group(
+        name="find",
+        description="Help the bot staff to find things",
+        guild_ids=[PRIVATE_GUILD_ID.id]
+    )
 
     @find_main.command(name="user")
-    async def find_user(self, ctx: MyContext, *, user:discord.User):
-        use_embed = ctx.can_send_embed
+    @commands.check(checks.is_support_staff)
+    async def find_user(self, interaction: discord.Interaction, user: discord.User):
+        "Find any user visible by the bot"
         # Servers list
         servers_in = list()
         owned, membered = 0, 0
-        for s in user.mutual_guilds:
-            if s.owner==user:
-                servers_in.append(":crown: "+s.name)
-                owned += 1
-            else:
-                servers_in.append("- "+s.name)
-                membered += 1
-        if len(servers_in) == 0:
-            servers_in = ["No server"]
-        elif len("\n".join(servers_in)) > 1020:
-            servers_in = [f"{owned} serveurs possédés, membre sur {membered} autres serveurs"]
+        if hasattr(user, "mutual_guilds"):
+            for s in user.mutual_guilds:
+                if s.owner==user:
+                    servers_in.append(":crown: "+s.name)
+                    owned += 1
+                else:
+                    servers_in.append("- "+s.name)
+                    membered += 1
+            if len("\n".join(servers_in)) > 1020:
+                servers_in = [f"{owned} owned servers, member of {membered} others"]
+        else:
+            servers_in = []
         # XP card
         xp_card = await self.bot.get_cog('Utilities').get_xp_style(user)
         # Flags
@@ -847,17 +845,15 @@ Available types: member, role, user, emoji, channel, server, invite, category
         if len(userflags) == 0:
             userflags = ["None"]
         # Votes
-        votes = await ctx.bot.get_cog("Utilities").check_votes(user.id)
-        if use_embed:
-            votes = " - ".join([f"[{x[0]}]({x[1]})" for x in votes])
-        else:
-            votes = " - ".join([x[0] for x in votes])
+        votes = await self.bot.get_cog("Utilities").check_votes(user.id)
+        votes = " - ".join([f"[{x[0]}]({x[1]})" for x in votes])
         if len(votes) == 0:
             votes = "Nowhere"
         # Languages
         disp_lang = list()
-        for lang in await self.bot.get_cog('Utilities').get_languages(user):
-            disp_lang.append('{} ({}%)'.format(lang[0],round(lang[1]*100)))
+        if hasattr(user, "mutual_guilds"):
+            for lang in await self.bot.get_cog('Utilities').get_languages(user):
+                disp_lang.append('{} ({}%)'.format(lang[0],round(lang[1]*100)))
         if len(disp_lang) == 0:
             disp_lang = ["Unknown"]
         # User name
@@ -868,62 +864,46 @@ Available types: member, role, user, emoji, channel, server, invite, category
             if Xp.sus is not None:
                 xp_sus = str(user.id in Xp.sus)
         # ----
-        if use_embed:
-            if ctx.guild is None:
-                color = None
-            else:
-                color = None if ctx.guild.me.color.value == 0 else ctx.guild.me.color
-
-            embed = discord.Embed(title=user_name, color=color)
-            embed.set_thumbnail(url=user.display_avatar.replace(static_format="png", size=1024))
-            embed.add_field(name="ID", value=user.id)
-            embed.add_field(name="Flags", value="-".join(userflags), inline=False)
-            embed.add_field(name=f"Servers ({len(servers_in)})", value="\n".join(servers_in))
-            embed.add_field(name="Language", value="\n".join(disp_lang))
-            embed.add_field(name="XP card", value=xp_card)
-            embed.add_field(name="Upvoted the bot?", value=votes)
-            embed.add_field(name="XP sus?", value=xp_sus)
-            embed.set_footer(text=f'Requested by {ctx.author.name}', icon_url=ctx.author.display_avatar)
-
-            await ctx.send(embed=embed)
+        if interaction.guild is None:
+            color = None
         else:
-            txt = """Name: {}
-ID: {}
-Perks: {}
-Language: {}
-XP card: {}
-Voted? {}
-Servers:
-{}""".format(user_name,
-                user.id,
-                " - ".join(userflags),
-                " - ".join(disp_lang),
-                xp_card,
-                votes,
-                "\n".join(servers_in)
-                )
-            await ctx.send(txt)
+            color = None if interaction.guild.me.color.value == 0 else interaction.guild.me.color
 
-    @find_main.command(name="guild", aliases=['server'])
-    async def find_guild(self, ctx: MyContext, *, guild: str):
+        embed = discord.Embed(title=user_name, color=color)
+        embed.set_thumbnail(url=user.display_avatar.replace(static_format="png", size=1024))
+        embed.add_field(name="ID", value=user.id)
+        embed.add_field(name="Flags", value=" - ".join(userflags), inline=False)
+        embed.add_field(name=f"Servers ({len(servers_in)})", value="\n".join(servers_in) if servers_in else "No server")
+        embed.add_field(name="Language", value="\n".join(disp_lang))
+        embed.add_field(name="XP card", value=xp_card)
+        embed.add_field(name="Upvoted the bot?", value=votes)
+        embed.add_field(name="XP sus?", value=xp_sus)
+
+        await interaction.response.send_message(embed=embed)
+
+    @find_main.command(name="guild")
+    @commands.check(checks.is_support_staff)
+    @discord.app_commands.describe(guild="The server name or ID")
+    async def find_guild(self, interaction: discord.Interaction, guild: str):
+        "Find any guild where the bot is"
         if guild.isnumeric():
-            guild: discord.Guild = ctx.bot.get_guild(int(guild))
+            guild: discord.Guild = self.bot.get_guild(int(guild))
         else:
             for x in self.bot.guilds:
                 if x.name == guild:
                     guild = x
                     break
         if isinstance(guild, str) or guild is None:
-            await ctx.send("Serveur introuvable")
+            await interaction.response.send_message("Unknown server")
             return
         # Bots
         bots = len([x for x in guild.members if x.bot])
         # Lang
-        lang = await ctx.bot.get_config(guild.id,'language')
+        lang = await self.bot.get_config(guild.id,'language')
         if lang is None:
             lang = 'default'
         else:
-            lang = ctx.bot.get_cog('Languages').languages[lang]
+            lang = self.bot.get_cog('Languages').languages[lang]
         # Roles rewards
         rr_len = await self.bot.get_config(guild.id,'rr_max_number')
         rr_len = self.bot.get_cog("Servers").default_opt['rr_max_number'] if rr_len is None else rr_len
@@ -939,86 +919,76 @@ Servers:
         # Join date
         joined_at = f"<t:{guild.me.joined_at.timestamp():.0f}>"
         # ----
-        if ctx.can_send_embed:
-            if ctx.guild is None:
-                color = None
-            else:
-                color = None if ctx.guild.me.color.value == 0 else ctx.guild.me.color
-            emb = discord.Embed(title=guild.name, color=color)
-            if guild.icon:
-                emb.set_thumbnail(url=guild.icon.with_static_format("png"))
-            emb.add_field(name="ID", value=guild.id)
-            emb.add_field(name="Owner", value=f"{guild.owner} ({guild.owner_id})", inline=False)
-            emb.add_field(name="Joined at", value=joined_at, inline=False)
-            emb.add_field(name="Members", value=f"{guild.member_count} (including {bots} bots)")
-            emb.add_field(name="Language", value=lang)
-            emb.add_field(name="Prefix", value=pref)
-            emb.add_field(name="RSS feeds count", value=rss_numb)
-            emb.add_field(name="Roles rewards count", value=rr_len)
-            emb.set_footer(text=ctx.author, icon_url=ctx.author.display_avatar)
-            await ctx.send(embed=emb)
+        if interaction.guild is None:
+            color = None
         else:
-            txt = "Name: {name}\nID: {id}\nOwner: {owner} ({ownerid})\nJoined at: {join}\nMembers: {members} (including {bots} bots)\nLanguage: {lang}\nPrefix: `{prefix}`\nRSS feeds count: {rss}\nRoles rewards count: {rr}".format(name = guild.name,
-                id = guild.id,
-                owner = guild.owner,
-                ownerid = guild.owner_id,
-                join = joined_at,
-                members = guild.member_count,
-                bots = bots,
-                lang = lang,
-                prefix = pref,
-                rss = rss_numb,
-                rr = rr_len)
-            await ctx.send(txt)
+            color = None if interaction.guild.me.color.value == 0 else interaction.guild.me.color
+        emb = discord.Embed(title=guild.name, color=color)
+        if guild.icon:
+            emb.set_thumbnail(url=guild.icon.with_static_format("png"))
+        emb.add_field(name="ID", value=guild.id)
+        emb.add_field(name="Owner", value=f"{guild.owner} ({guild.owner_id})", inline=False)
+        emb.add_field(name="Joined at", value=joined_at, inline=False)
+        emb.add_field(name="Members", value=f"{guild.member_count} (including {bots} bots)")
+        emb.add_field(name="Language", value=lang)
+        emb.add_field(name="Prefix", value=pref)
+        emb.add_field(name="RSS feeds count", value=rss_numb)
+        emb.add_field(name="Roles rewards count", value=rr_len)
+        await interaction.response.send_message(embed=emb)
 
     @find_main.command(name='channel')
-    async def find_channel(self, ctx: MyContext, ID:int):
-        c = self.bot.get_channel(ID)
-        if c is None:
-            await ctx.send("Unknonwn channel")
+    @commands.check(checks.is_support_staff)
+    @discord.app_commands.describe(channel="The ID/name of the channel to look for")
+    async def find_channel(self, interaction: discord.Interaction, channel: str):
+        "Find any channel from any server where the bot is"
+        class FakeCtx:
+            def __init__(self, bot):
+                self.bot = bot
+                self.guild = None
+        try:
+            c = await commands.GuildChannelConverter().convert(FakeCtx(self.bot), channel)
+        except commands.ChannelNotFound:
+            await interaction.response.send_message("Unknonwn channel")
             return
-        if ctx.can_send_embed:
-            if ctx.guild is None:
-                color = None
-            else:
-                color = None if ctx.guild.me.color.value == 0 else ctx.guild.me.color
-            emb = discord.Embed(title="#"+c.name, color=color)
-            emb.add_field(name="ID", value=c.id)
-            emb.add_field(name="Server", value=f"{c.guild.name} ({c.guild.id})", inline=False)
-            emb.set_footer(text=ctx.author, icon_url=ctx.author.display_avatar)
-            await ctx.send(embed=emb)
+        if interaction.guild is None:
+            color = None
         else:
-            await ctx.send("Nom : {}\nID : {}\nServeur : {} ({})".format(c.name,c.id,c.guild.name,c.guild.id))
+            color = None if interaction.guild.me.color.value == 0 else interaction.guild.me.color
+        emb = discord.Embed(title="#"+c.name, color=color)
+        emb.add_field(name="ID", value=c.id)
+        emb.add_field(name="Server", value=f"{c.guild.name} ({c.guild.id})", inline=False)
+        await interaction.response.send_message(embed=emb)
 
     @find_main.command(name='role')
-    async def find_role(self, ctx: MyContext, ID:int):
+    @commands.check(checks.is_support_staff)
+    @discord.app_commands.describe(role="The ID/name of the role to look for")
+    async def find_role(self, interaction: discord.Interaction, role: str):
+        "Find any role from any server where the bot is"
         every_roles = list()
-        for serv in ctx.bot.guilds:
+        for serv in self.bot.guilds:
             every_roles += serv.roles
-        role: discord.Role = discord.utils.find(lambda role: role.id==ID, every_roles)
+        role: discord.Role = discord.utils.find(lambda item: role in {str(item.id), item.name, item.mention}, every_roles)
         if role is None:
-            await ctx.send("Rôle introuvable")
+            await interaction.response.send_message("Unknown role")
             return
-        if ctx.can_send_embed:
-            if ctx.guild is None:
-                color = None
-            else:
-                color = None if ctx.guild.me.color.value == 0 else ctx.guild.me.color
-            emb = discord.Embed(title="@"+role.name, color=color)
-            emb.add_field(name="ID", value=role.id)
-            emb.add_field(name="Server", value=f"{role.guild.name} ({role.guild.id})", inline=False)
-            emb.add_field(name="Members", value=len(role.members))
-            emb.add_field(name="Colour", value=str(role.colour))
-            emb.set_footer(text=ctx.author, icon_url=ctx.author.display_avatar)
-            await ctx.send(embed=emb)
+        if interaction.guild is None:
+            color = None
         else:
-            await ctx.send("Name: {}\nID: {}\nServer: {} ({})\nMembers: {}\nColor: {}".format(role.name,role.id,role.guild.name,role.guild.id,len(role.members),role.colour))
+            color = None if interaction.guild.me.color.value == 0 else interaction.guild.me.color
+        emb = discord.Embed(title="@"+role.name, color=color)
+        emb.add_field(name="ID", value=role.id)
+        emb.add_field(name="Server", value=f"{role.guild.name} ({role.guild.id})", inline=False)
+        emb.add_field(name="Members", value=len(role.members))
+        emb.add_field(name="Colour", value=str(role.colour))
+        await interaction.response.send_message(embed=emb)
 
     @find_main.command(name='rss')
-    async def find_rss(self, ctx: MyContext, ID:int):
-        feed: FeedObject = await self.bot.get_cog('Rss').db_get_feed(ID)
+    @commands.check(checks.is_support_staff)
+    async def find_rss(self, interaction: discord.Interaction, feed_id: int):
+        "Find any active or inactive RSS feed"
+        feed: FeedObject = await self.bot.get_cog('Rss').db_get_feed(feed_id)
         if feed is None:
-            await ctx.send("Invalid ID")
+            await interaction.response.send_message("Unknown RSS feed")
             return
         temp = self.bot.get_guild(feed.guild_id)
         if temp is None:
@@ -1033,21 +1003,17 @@ Servers:
         d = f"<t:{feed.date.timestamp():.0f}>"
         if d is None or len(d) == 0:
             d = "never"
-        if ctx.can_send_embed:
-            if ctx.guild is None:
-                color = None
-            else:
-                color = None if ctx.guild.me.color.value == 0 else ctx.guild.me.color
-            emb = discord.Embed(title=f"RSS N°{ID}", color=color)
-            emb.add_field(name="Server", value=g)
-            emb.add_field(name="Channel", value=c)
-            emb.add_field(name="URL", value=feed.link, inline=False)
-            emb.add_field(name="Type", value=feed.type)
-            emb.add_field(name="Last post", value=d)
-            emb.set_footer(text=ctx.author, icon_url=ctx.author.display_avatar)
-            await ctx.send(embed=emb)
+        if interaction.guild is None:
+            color = None
         else:
-            await ctx.send("ID: {}\nGuild: {}\nChannel: {}\nLink: <{}>\nType: {}\nLast post: {}".format(feed.feed_id, g.replace("\n"," "), c.replace("\n"," "), feed.link,feed.type, d))
+            color = None if interaction.guild.me.color.value == 0 else interaction.guild.me.color
+        emb = discord.Embed(title=f"RSS #{feed_id}", color=color)
+        emb.add_field(name="Server", value=g)
+        emb.add_field(name="Channel", value=c)
+        emb.add_field(name="URL", value=feed.link, inline=False)
+        emb.add_field(name="Type", value=feed.type)
+        emb.add_field(name="Last post", value=d)
+        await interaction.response.send_message(embed=emb)
 
     @commands.command(name="membercount",aliases=['member_count'])
     @commands.guild_only()
