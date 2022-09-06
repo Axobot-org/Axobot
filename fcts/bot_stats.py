@@ -153,8 +153,8 @@ class BotStats(commands.Cog):
         # remove seconds and less
         now = now.replace(second=0, microsecond=0)
         # prepare requests
-        query = "INSERT INTO zbot VALUES (%s, %s, %s, %s, %s, %s, %s);"
-        cnx = self.bot.cnx_stats
+        query = "INSERT INTO `statsbot`.`zbot` VALUES (%s, %s, %s, %s, %s, %s, %s);"
+        cnx = self.bot.cnx_frm
         cursor = cnx.cursor(dictionary=True)
         try:
             # WS events stats
@@ -222,9 +222,9 @@ class BotStats(commands.Cog):
 
     async def get_stats(self, variable: str, minutes: int) -> typing.Union[int, float, str, None]:
         """Get the sum of a certain variable in the last X minutes"""
-        cnx = self.bot.cnx_stats
+        cnx = self.bot.cnx_frm
         cursor = cnx.cursor(dictionary=True)
-        cursor.execute('SELECT variable, SUM(value) as value, type FROM `zbot` WHERE variable = %s AND date BETWEEN (DATE_SUB(UTC_TIMESTAMP(),INTERVAL %s MINUTE)) AND UTC_TIMESTAMP() AND beta=%s', (variable, minutes, self.bot.beta))
+        cursor.execute('SELECT variable, SUM(value) as value, type FROM `statsbot`.`zbot` WHERE variable = %s AND date BETWEEN (DATE_SUB(UTC_TIMESTAMP(),INTERVAL %s MINUTE)) AND UTC_TIMESTAMP() AND beta=%s', (variable, minutes, self.bot.beta))
         result: list[dict] = list(cursor)
         cursor.close()
         if len(result) == 0:
