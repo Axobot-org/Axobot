@@ -4,7 +4,7 @@ import discord
 import aiohttp
 from discord.ext import commands
 
-from fcts import checks
+from . import checks
 from libs.classes import Zbot, MyContext
 
 RANDOM_NAMES_URL = 'https://randommer.io/api/Name?nameType=surname&quantity=20'

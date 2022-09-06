@@ -14,7 +14,7 @@ from libs.classes import MyContext, Zbot
 from libs.formatutils import FormatUtils
 from libs.rss.rss_general import FeedObject
 
-from fcts import checks
+from . import checks
 
 
 class Minecraft(commands.Cog):

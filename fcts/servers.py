@@ -9,7 +9,7 @@ from cachingutils import LRUCache
 from discord.ext import commands
 from libs.classes import MyContext, Zbot
 
-from fcts import checks
+from . import checks
 
 roles_options = ["clear_allowed_roles", "slowmode_allowed_roles", "mute_allowed_roles", "kick_allowed_roles", "ban_allowed_roles",
                  "warn_allowed_roles", "say_allowed_roles", "welcome_roles", "muted_role", 'partner_role', 'update_mentions',

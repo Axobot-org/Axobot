@@ -13,11 +13,10 @@ from contextlib import redirect_stdout
 import discord
 import speedtest
 from cachingutils import acached
-from discord import app_commands
 from discord.ext import commands
 from libs.classes import ConfirmView, MyContext, UserFlag, Zbot
 
-from fcts import checks
+from . import checks
 
 
 def cleanup_code(content: str):
@@ -90,10 +89,10 @@ class Admin(commands.Cog):
         except discord.DiscordException:
             pass
 
-    @app_commands.command()
-    @app_commands.guilds(PRIVATE_GUILD_ID)
-    @app_commands.default_permissions(administrator=True)
-    @app_commands.check(checks.is_bot_admin)
+    @discord.app_commands.command()
+    @discord.app_commands.guilds(PRIVATE_GUILD_ID)
+    @discord.app_commands.default_permissions(administrator=True)
+    @discord.app_commands.check(checks.is_bot_admin)
     async def send_msg(self, interaction: discord.Interaction, user: discord.User, message: str):
         "Send a DM to any user the bot can reach"
         await interaction.response.defer(ephemeral=True)
@@ -101,8 +100,8 @@ class Admin(commands.Cog):
         await interaction.edit_original_response(content="Done!")
 
     @commands.hybrid_group(name='admin', hidden=True)
-    @app_commands.guilds(PRIVATE_GUILD_ID)
-    @app_commands.default_permissions(administrator=True)
+    @discord.app_commands.guilds(PRIVATE_GUILD_ID)
+    @discord.app_commands.default_permissions(administrator=True)
     @commands.check(checks.is_bot_admin)
     async def main_msg(self, ctx: MyContext):
         """Commandes réservées aux administrateurs de ZBot"""
@@ -348,7 +347,7 @@ class Admin(commands.Cog):
             ]
         filtered.sort()
         return [
-            app_commands.Choice(name=cog[0], value=cog[1])
+            discord.app_commands.Choice(name=cog[0], value=cog[1])
             for cog in filtered
         ][:25]
 
@@ -421,7 +420,7 @@ class Admin(commands.Cog):
     async def db_biggest_autocompl(self, interaction: discord.Interaction, current: str):
         databases = await self.get_databases_names()
         return [
-            app_commands.Choice(name=db, value=db)
+            discord.app_commands.Choice(name=db, value=db)
             for db in databases if current.lower() in db.lower()
         ][:25]
 
@@ -545,7 +544,7 @@ class Admin(commands.Cog):
 
     @main_msg.command(name="module")
     @commands.check(checks.is_bot_admin)
-    @app_commands.describe(enable="Should we enable or disable this module")
+    @discord.app_commands.describe(enable="Should we enable or disable this module")
     async def enable_module(self, ctx: MyContext, module: typing.Literal["xp", "rss", "alerts"], enable: bool):
         """Active ou désactive un module (xp/rss/alerts)
 Cette option affecte tous les serveurs"""
@@ -589,8 +588,8 @@ Cette option affecte tous les serveurs"""
 
     @admin_flag.command(name="add")
     @commands.check(checks.is_bot_admin)
-    @app_commands.choices(flag=[
-        app_commands.Choice(name=flag, value=flag)
+    @discord.app_commands.choices(flag=[
+        discord.app_commands.Choice(name=flag, value=flag)
         for flag in UserFlag.FLAGS.values()
     ])
     async def admin_flag_add(self, ctx: MyContext, user: discord.User, flag: str):
@@ -607,8 +606,8 @@ Cette option affecte tous les serveurs"""
 
     @admin_flag.command(name="remove")
     @commands.check(checks.is_bot_admin)
-    @app_commands.choices(flag=[
-        app_commands.Choice(name=flag, value=flag)
+    @discord.app_commands.choices(flag=[
+        discord.app_commands.Choice(name=flag, value=flag)
         for flag in UserFlag.FLAGS.values()
     ])
     async def admin_flag_remove(self, ctx: MyContext, user: discord.User, flag: str):
@@ -729,7 +728,7 @@ Cette option affecte tous les serveurs"""
 
     @main_msg.command(name="activity")
     @commands.check(checks.is_bot_admin)
-    @app_commands.rename(activity_type="type")
+    @discord.app_commands.rename(activity_type="type")
     async def change_activity(self, ctx: MyContext, activity_type: typing.Literal["play", "watch", "listen", "stream"], *, text: str):
         """Change l'activité du bot (play, watch, listen, stream)"""
         if activity_type == "play":
