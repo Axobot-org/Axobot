@@ -10,7 +10,7 @@ from libs.classes import MyContext, Zbot
 
 from . import checks
 
-AllowedCtx = typing.Union[MyContext, discord.Message, str]
+AllowedCtx = typing.Union[MyContext, discord.Message, discord.Interaction, str]
 
 class Errors(commands.Cog):
     """General cog for error management."""
@@ -197,7 +197,7 @@ class Errors(commands.Cog):
         else:
             guild = f"DM with {interaction.user}"
         if interaction.type == discord.InteractionType.application_command:
-            await self.on_error(error, f"Slash command `{interaction.command.name if interaction.command else None}` | {guild}")
+            await self.on_error(error, interaction)
         elif interaction.type == discord.InteractionType.ping:
             await self.on_error(error, f"Ping interaction | {guild}")
         elif interaction.type == discord.InteractionType.modal_submit:
@@ -235,11 +235,13 @@ class Errors(commands.Cog):
             elif ctx.guild is None:
                 recipient = await self.bot.get_recipient(ctx.channel)
                 context = f"DM | {recipient}"
+            elif isinstance(ctx, discord.Interaction):
+                context = f"Slash command `{ctx.command.name if ctx.command else None}` | {ctx.guild.name} | {ctx.channel.name}"
             else:
                 context = f"{ctx.guild.name} | {ctx.channel.name}"
             # if channel is the private beta channel, send it there
-            if isinstance(ctx, MyContext) and ctx.channel.id == 625319425465384960:
-                await ctx.send(context + "\n" + msg)
+            if isinstance(ctx, (MyContext, discord.Interaction)) and ctx.channel.id == 625319425465384960:
+                await ctx.channel.send(context + "\n" + msg)
             else:
                 await self.senf_err_msg(context + "\n" + msg)
             self.bot.log.warning(f"[on_error] {error}", exc_info=exc_info)
