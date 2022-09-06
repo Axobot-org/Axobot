@@ -95,6 +95,7 @@
             "zero": "-> No role could be assigned out of %{m}"
         },
         "give-too-high": "Oops, it seems that this role is too high for me to give or remove to anyone. Please place my role above the `%{r}` role",
+        "limit-hit": "To avoid spamming Discord, I could only affect %{limit} members. Re-run this command in a few seconds if you want to affect more",
         "list": "List of server roles",
         "remove-pending": "Revoking the role to %{n} members...",
         "remove-success": {
