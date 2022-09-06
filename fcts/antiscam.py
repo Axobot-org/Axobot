@@ -6,7 +6,7 @@ from libs.antiscam.classes import EMBED_COLORS, MsgReportView, PredictionResult
 from libs.classes import Zbot, MyContext
 from libs.antiscam import AntiScamAgent, Message
 
-from fcts import checks
+from . import checks
 
 def is_immune(member: discord.Member) -> bool:
     "Check if a member is immune to the anti-scam feature"

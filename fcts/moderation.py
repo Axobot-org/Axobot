@@ -13,7 +13,7 @@ from libs.classes import MyContext, Zbot
 from libs.formatutils import FormatUtils
 from libs.paginator import Paginator
 
-from fcts import args, checks
+from . import args, checks
 from fcts.cases import Case
 
 importlib.reload(checks)

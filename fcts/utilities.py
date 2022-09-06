@@ -9,7 +9,7 @@ import discord
 from discord.ext import commands
 from libs.classes import MyContext, Zbot
 
-from fcts import args
+from . import args
 
 importlib.reload(args)
 

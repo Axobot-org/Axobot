@@ -7,7 +7,7 @@ from discord.ext import commands
 from libs.classes import ConfirmView, MyContext, Zbot
 from libs.formatutils import FormatUtils
 
-from fcts import args, checks
+from . import args, checks
 
 class ReminderSelectView(discord.ui.View):
     "Used to ask to select a reminder to delete"

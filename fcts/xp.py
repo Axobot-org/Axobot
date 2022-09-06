@@ -18,7 +18,7 @@ import numpy as np
 from discord.ext import commands
 from PIL import Image, ImageDraw, ImageEnhance, ImageFont, ImageSequence
 
-from fcts import args, checks
+from . import args, checks
 
 importlib.reload(args)
 importlib.reload(checks)

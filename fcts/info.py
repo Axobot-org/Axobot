@@ -23,7 +23,7 @@ from libs.formatutils import FormatUtils
 from libs.rss.rss_general import FeedObject
 from utils import count_code_lines
 
-from fcts import args, checks
+from . import args, checks
 
 default_color = discord.Color(0x50e3c2)
 

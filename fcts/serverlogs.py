@@ -11,7 +11,7 @@ from libs.classes import MyContext, ServerWarningType, Zbot
 from libs.formatutils import FormatUtils
 
 from fcts.args import serverlog
-from fcts import checks
+from . import checks
 
 DISCORD_INVITE = re.compile(r'(?:https?://)?(?:www[.\s])?((?:discord[.\s](?:gg|io|me|li(?:nk)?)|discordapp\.com/invite|discord\.com/invite|dsc\.gg)[/ ]{,3}[\w-]{1,25}(?!\w))')
 

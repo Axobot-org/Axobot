@@ -15,7 +15,7 @@ from libs.classes import MyContext, ServerWarningType, Zbot
 from libs.formatutils import FormatUtils
 from libs.rss import RssMessage, feed_parse, TwitterRSS, YoutubeRSS
 
-from fcts import args, checks
+from . import args, checks
 from libs.rss.rss_general import FeedObject, FeedSelectView, FeedType
 
 importlib.reload(args)

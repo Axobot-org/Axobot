@@ -22,7 +22,7 @@ from libs.formatutils import FormatUtils
 from libs.paginator import Paginator
 from utils import flatten_list
 
-from fcts import args, checks
+from . import args, checks
 from fcts.checks import is_fun_enabled
 
 importlib.reload(checks)
