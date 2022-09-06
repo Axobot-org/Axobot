@@ -29,6 +29,7 @@ if TYPE_CHECKING:
     from fcts.servers import Servers
     from fcts.users import Users
     from fcts.utilities import Utilities
+    from fcts.xp import Xp
 
 class MyContext(commands.Context):
     """Replacement for the official commands.Context class
@@ -174,6 +175,10 @@ class Zbot(commands.bot.AutoShardedBot):
     @overload
     def get_cog(self, name: Literal["Utilities"]) -> Optional["Utilities"]:
         ...
+    
+    @overload
+    def get_cog(self, name: Literal["Xp"]) -> Optional["Xp"]:
+        ...
 
     def get_cog(self, name: str):
         # pylint: disable=useless-super-delegation
@@ -217,10 +222,6 @@ class Zbot(commands.bot.AutoShardedBot):
             self.cnx_xp.close()
         except ProgrammingError:
             pass
-        try:
-            self.cnx_stats.close()
-        except ProgrammingError:
-            pass
 
     @property
     def cnx_xp(self) -> MySQLConnection:
@@ -245,31 +246,6 @@ class Zbot(commands.bot.AutoShardedBot):
                 database=self.database_keys['database2'],
                 buffered=True)
             self._cnx[1][1] = round(time.time())
-        else:
-            raise ValueError(dict)
-
-    @property
-    def cnx_stats(self) -> MySQLConnection:
-        """Connection to the xp database
-        Used for guilds using local xp (1 table per guild)"""
-        if self._cnx[2][1] + 1260 < round(time.time()):  # 21min
-            self.connect_database_stats()
-            self._cnx[2][1] = round(time.time())
-            return self._cnx[2][0]
-        return self._cnx[2][0]
-
-    def connect_database_stats(self):
-        "Create a connection to the stats database"
-        if len(self.database_keys) > 0:
-            if self._cnx[2][0] is not None:
-                self._cnx[2][0].close()
-            self.log.debug(
-                'Connecting to MySQL (user %s, database "statsbot")', self.database_keys['user'])
-            self._cnx[2][0] = sql_connect(user=self.database_keys['user'],
-                                          password=self.database_keys['password'],
-                                          host=self.database_keys['host'], database='statsbot',
-                                          buffered=True)
-            self._cnx[2][1] = round(time.time())
         else:
             raise ValueError(dict)
 

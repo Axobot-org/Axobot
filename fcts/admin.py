@@ -388,9 +388,7 @@ class Admin(commands.Cog):
         self.bot.connect_database_frm()
         self.bot.cnx_xp.close()
         self.bot.connect_database_xp()
-        self.bot.cnx_stats.close()
-        self.bot.connect_database_stats()
-        if self.bot.cnx_frm is not None and self.bot.cnx_xp is not None and self.bot.cnx_stats is not None:
+        if self.bot.cnx_frm is not None and self.bot.cnx_xp is not None:
             await ctx.message.add_reaction('✅')
             if xp := self.bot.get_cog("Xp"):
                 await xp.reload_sus()
