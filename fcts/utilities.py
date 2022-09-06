@@ -296,16 +296,7 @@ class Utilities(commands.Cog):
                         votes.append(("Discord Bots List", "https://top.gg/"))
             except Exception as e:
                 await self.bot.get_cog("Errors").on_error(e, None)
-            try:  # https://discord.boats/bot/486896267788812288
-                headers = {'Authorization': self.bot.others['discordboats']}
-                async with session.get(f"https://discord.boats/api/bot/486896267788812288/voted?id={userid}", headers=headers) as r:
-                    js = await r.json()
-                    if (not js["error"]) and js["voted"]:
-                        votes.append(
-                            ("Discord Boats", "https://discord.boats/"))
-            except Exception as e:
-                await self.bot.get_cog("Errors").on_error(e, None)
-            return votes
+        return votes
 
 
 async def setup(bot):
