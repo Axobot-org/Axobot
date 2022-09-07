@@ -15,7 +15,7 @@ from libs.classes import MyContext, ServerWarningType, Zbot
 from libs.formatutils import FormatUtils
 from libs.rss import RssMessage, feed_parse, TwitterRSS, YoutubeRSS
 
-from fcts import args, checks
+from . import args, checks
 from libs.rss.rss_general import FeedObject, FeedSelectView, FeedType
 
 importlib.reload(args)
@@ -89,7 +89,7 @@ class Rss(commands.Cog):
             await self.bot.get_cog('Help').help_command(ctx,['rss'])
 
     @rss_main.command(name="youtube",aliases=['yt'])
-    async def request_yt(self, ctx: MyContext, channel):
+    async def request_yt(self, ctx: MyContext, *, channel):
         """The last video of a YouTube channel
 
         ..Example rss youtube UCZ5XnGb-3t7jCkXdawN2tkA

@@ -7,7 +7,7 @@ import discord
 from discord.ext import commands
 from libs.classes import MyContext, RankCardsFlag, UserFlag, Zbot
 
-from fcts import args, checks
+from . import args, checks
 
 importlib.reload(args)
 importlib.reload(checks)

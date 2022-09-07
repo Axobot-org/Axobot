@@ -4,7 +4,7 @@ import importlib
 import re
 from discord.ext import commands
 from libs.classes import Zbot, MyContext
-from fcts import checks, args
+from . import checks, args
 importlib.reload(checks)
 importlib.reload(args)
 
@@ -121,7 +121,7 @@ class RolesReact(commands.Cog):
     @rr_main.command(name="add")
     @commands.check(checks.has_manage_guild)
     @commands.check(checks.database_connected)
-    async def rr_add(self, ctx, emoji: args.AnyEmoji, role: discord.Role, *, description: str = ''):
+    async def rr_add(self, ctx: MyContext, emoji: args.AnyEmoji, role: discord.Role, *, description: str = ''):
         """Add a role reaction
         This role will be given when a membre click on a specific reaction
         Your description can only be a maximum of 150 characters

@@ -11,7 +11,7 @@ In this section, you will find the XP module, a classic in Discord bots, as well
 XP system
 ---------
 
-The xp system is a system for evaluating a person's activity on a server using a point system. Each message brings a certain number of points to its author, allowing him to gain in levels and climb in the ranking. To avoid having a too simple system, each level is a little harder to reach than the previous one, and security measures have obviously been taken against spam or cheating.
+The xp system is a system for evaluating a person's activity on a server using a point system. Each message brings a certain number of points to its author, allowing them to gain in levels and climb in the ranking. To avoid having a too simple system, each level is a little harder to reach than the previous one, and security measures have obviously been taken against spam or cheating.
 
 Check the XP of someone
 -----------------------

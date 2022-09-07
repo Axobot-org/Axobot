@@ -9,7 +9,7 @@ import discord
 from discord.ext import commands
 from libs.classes import MyContext, Zbot
 
-from fcts import args
+from . import args
 
 importlib.reload(args)
 
@@ -66,8 +66,9 @@ class Utilities(commands.Cog):
             return False
         if not isinstance(ctx, commands.Context) or self.config is None:
             return True
-        if ctx.message.type not in {discord.MessageType.default, discord.MessageType.reply}:
-            return False
+        if ctx.message.type not in {discord.MessageType.default, discord.MessageType.reply, discord.MessageType.chat_input_command}:
+            if not ctx.message.type.value == discord.MessageType.chat_input_command:
+                return False
         if await self.bot.get_cog('Admin').check_if_admin(ctx):
             return True
         elif not self.config:
@@ -295,16 +296,7 @@ class Utilities(commands.Cog):
                         votes.append(("Discord Bots List", "https://top.gg/"))
             except Exception as e:
                 await self.bot.get_cog("Errors").on_error(e, None)
-            try:  # https://discord.boats/bot/486896267788812288
-                headers = {'Authorization': self.bot.others['discordboats']}
-                async with session.get(f"https://discord.boats/api/bot/486896267788812288/voted?id={userid}", headers=headers) as r:
-                    js = await r.json()
-                    if (not js["error"]) and js["voted"]:
-                        votes.append(
-                            ("Discord Boats", "https://discord.boats/"))
-            except Exception as e:
-                await self.bot.get_cog("Errors").on_error(e, None)
-            return votes
+        return votes
 
 
 async def setup(bot):
