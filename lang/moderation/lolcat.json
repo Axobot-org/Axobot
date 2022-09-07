@@ -7,7 +7,7 @@
         "list-title-2": "List of 60 bannd membrs ov this nice place '{}'",
         "no-bans": "No mmber seems to be bannd from here",
         "staff-ban": "NOPE, U can't ban another cool staff guy!",
-        "too-high": "Maaaw... 'seems dat dis member iz too high 4 me to ban him :thinking:",
+        "too-high": "Maaaw... 'seems dat dis member iz too high 4 me to ban em :thinking:",
         "user-not-banned": "Dis nice guy iz not part of teh bannd members list :upside_down:"
     },
     "ban-chat": "Mber %{user} (%{userid}) has been banned fr0m dis cool servr.",
@@ -44,7 +44,7 @@
     "kick": {
         "cant-staff": "Yolo NOPE ! U can't kick a-other nice staff mmber!",
         "no-perm": "Perm 'Kick memberz' needed :confused:",
-        "too-high": "Seemz that this membr iz tooooo high 4 me to kick him out :thinking:"
+        "too-high": "Seemz that this membr iz tooooo high 4 me to kick 'em out :thinking:"
     },
     "kick-chat": "Membr %{user} (%{userid}) haz been kick from dis servr",
     "kick-dm": "U have just been kicked from the servr %{guild} :confused:",
@@ -72,7 +72,7 @@
         "no-mutes": "No member seems 2B banned from here",
         "role-created": "Successsfully added da `muted` role! U can naw use `%{p}mute-config` cmd to ask me 2 config it meself",
         "staff-mute": "U cant prevent another cool staff member frm speek'ng ",
-        "too-high": "Seemz that this membr iz tooooo high 4 me to time him out :ohno:"
+        "too-high": "Seemz that this membr iz tooooo high 4 me to time 'em out :ohno:"
     },
     "mute-chat": "Teh mmber %{user} (%{userid}) haz been silencd",
     "mute-dm": "U've been silenced in teh %{guild} :sadcat:",
@@ -95,6 +95,7 @@
             "zero": "-> eh no, i didn't have 2 give any role"
         },
         "give-too-high": "Oops, dat role is 2 high 4 me 2 give or remove 2 anyone. Please place me role above ur `%{r}` :plz:",
+        "limit-hit": "Uh, as I don't really wanna annoy discoword, i stopped at %{limit} ppl. Feel free 2 try it again if you really wanna do :)",
         "list": "List of srv roles",
         "remove-pending": "Deletin dis role to %{n} ppl...",
         "remove-success": {
