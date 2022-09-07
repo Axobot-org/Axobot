@@ -97,5 +97,5 @@
         "xp_rate": "XP earnings modifier: %{value}",
         "xp_type": "XP system used: %{value}"
     },
-    "value-deleted": "The '%{option}' opshun value haz been deleted"
+    "value-deleted": "Teh \"%{option}\" opshun had been reset 2 default sir"
 }
