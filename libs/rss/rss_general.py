@@ -173,10 +173,10 @@ class FeedSelectView(discord.ui.View):
 
     async def callback(self, interaction: discord.Interaction):
         "Called when the dropdown menu has been validated by the user"
-        self.feeds = self.select.values
         await interaction.response.defer()
+        self.feeds = self.select.values
         self.select.disabled = True
-        await interaction.edit_original_message(view=self)
+        await interaction.edit_original_response(view=self)
         self.stop()
 
 class FeedObject:
