@@ -499,10 +499,11 @@ class Events(commands.Cog):
         xptypes_stats = await self.bot.get_cog('Servers').get_xp_types([], return_dict=True)
         supportserver_members = self.bot.get_guild(356067272730607628).member_count
         query = "INSERT INTO `log_stats` (`servers_count`, `members_count`, `bots_count`, `dapi_heartbeat`, `codelines_count`, `earned_xp_total`, `rss_feeds`, `active_rss_feeds`, `supportserver_members`, `languages`, `used_rankcards`, `xp_types`, `beta`) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
-        data = (len(self.bot.guilds),
+        data = (
+            len(self.bot.guilds),
             member_count,
             bot_count,
-            round(self.bot.latency,3),
+            10e6 if self.bot.latency == float("inf") else round(self.bot.latency, 3),
             self.bot.get_cog("Info").codelines,
             await self.bot.get_cog('Xp').bdd_total_xp(),
             rss_feeds,
