@@ -370,7 +370,7 @@ class Rss(commands.Cog):
                 embed.add_field(name=self.bot.zws, value=feed, inline=False)
             await ctx.send(embed=embed)
 
-    async def ask_rss_id(self, input_id: Optional[int], ctx: MyContext, title:str, include_mc: bool=False, max_count:int=1) -> Optional[list[int]]:
+    async def ask_rss_id(self, input_id: Optional[int], ctx: MyContext, title:str, include_mc: bool=False, max_count: Optional[int]=1) -> Optional[list[int]]:
         "Ask the user to select a feed ID"
         selection = []
         if input_id is not None:
@@ -416,7 +416,10 @@ class Rss(commands.Cog):
                 # emoji
                 feed_data['emoji'] = feed.get_emoji(self.bot.emojis_manager)
                 feeds_data.append(feed_data)
-            form_placeholder = await self.bot._(ctx.channel, 'rss.picker-placeholder')
+            if max_count:
+                form_placeholder = await self.bot._(ctx.channel, 'rss.picker-placeholder.single')
+            else:
+                form_placeholder = await self.bot._(ctx.channel, 'rss.picker-placeholder.multi')
             view = FeedSelectView(feeds_data, max_count or len(guild_feeds), form_placeholder)
             await ctx.send(title, view=view)
             await view.wait()
@@ -440,7 +443,7 @@ class Rss(commands.Cog):
         else:
             return arg.split(" ")
 
-    @rss_main.command(name="roles", aliases=['mentions', 'mention'])
+    @rss_main.command(name="mentions", aliases=['roles', 'mention'])
     @commands.guild_only()
     @commands.check(can_use_rss)
     @commands.check(checks.database_connected)
@@ -456,35 +459,40 @@ class Rss(commands.Cog):
 
         ..Doc rss.html#mention-a-role"""
         try:
-            # ask for feed ID
+            # ask for feed IDs
             feeds_ids = await self.ask_rss_id(
                 ID,
                 ctx,
-                await self.bot._(ctx.guild.id, "rss.choose-mentions-1")
+                await self.bot._(ctx.guild.id, "rss.choose-mentions-1"),
+                max_count=None,
             )
         except Exception as err:
             feeds_ids = []
-            await self.bot.get_cog("Errors").on_error(err,ctx)
+            await self.bot.get_cog("Errors").on_error(err, ctx)
         if feeds_ids is None:
             return
-        if len(feeds_ids) == 0:
+        feeds: list[FeedObject] = list(filter(None, [await self.db_get_feed(feed_id) for feed_id in feeds_ids]))
+        if len(feeds) == 0:
             await ctx.send(await self.bot._(ctx.guild, "rss.fail-add"))
             return
-        feed: FeedObject = await self.db_get_feed(feeds_ids[0])
-        no_role = ['aucun','none','_','del']
+        no_role = {'aucun', 'none', '_', 'del'}
         if mentions is None: # if no roles was specified: we ask for them
-            if len(feed.role_ids) == 0:
-                text = await self.bot._(ctx.guild.id, "rss.no-roles")
-            else:
-                roles = []
-                for item in feed.role_ids:
-                    role = discord.utils.get(ctx.guild.roles,id=int(item))
-                    if role is not None:
-                        roles.append(role.mention)
-                    else:
-                        roles.append(item)
-                text = await self.bot._(ctx.guild.id,"rss.roles.list", roles=", ".join(roles))
-                del roles
+            text = await self.bot._(ctx.guild.id, "rss.ask-roles-hint", count=len(feeds))
+            text += "\n" + await self.bot._(ctx.guild.id, "rss.ask-roles-hint-example")
+            if len(feeds) == 1:
+                text += "\n\n"
+                if len(feeds[0].role_ids) == 0:
+                    text += await self.bot._(ctx.guild.id, "rss.no-roles")
+                else:
+                    roles = []
+                    for item in feeds[0].role_ids:
+                        role = discord.utils.get(ctx.guild.roles, id=int(item))
+                        if role is None:
+                            roles.append(item)
+                        else:
+                            roles.append(role.mention)
+                    text += await self.bot._(ctx.guild.id,"rss.roles.list", roles=", ".join(roles))
+                    del roles
             # ask for roles
             embed = discord.Embed(
                 title=await self.bot._(ctx.guild.id, "rss.choose-roles"),
@@ -500,7 +508,7 @@ class Rss(commands.Cog):
                     msg: discord.Message = await self.bot.wait_for('message',
                         check=lambda msg: msg.author==ctx.author, timeout=30.0)
                     if msg.content.lower() in no_role: # if no role should be mentionned
-                        roles_ids: list[str] = [None]
+                        roles_ids: Optional[list[str]] = None
                     else:
                         roles_ids = []
                         names = []
@@ -510,11 +518,11 @@ class Rss(commands.Cog):
                                 roles = await commands.RoleConverter().convert(ctx, arg)
                                 roles_ids.append(str(roles.id))
                                 names.append(roles.name)
-                            except commands.ConversionError:
+                            except commands.BadArgument:
                                 await ctx.send(await self.bot._(ctx.guild.id, "rss.roles.cant-find"))
                                 roles_ids = []
                                 break
-                    if len(roles_ids) > 0:
+                    if roles_ids is None or len(roles_ids) > 0:
                         cond = True
                 except asyncio.TimeoutError:
                     await ctx.send(await self.bot._(ctx.guild.id, "rss.too-long"))
@@ -522,7 +530,7 @@ class Rss(commands.Cog):
                     return
         else: # if roles were specified
             if mentions in no_role: # if no role should be mentionned
-                roles_ids = [None]
+                roles_ids = None
             else: # we need to parse the output
                 params = self.parse_output(mentions)
                 roles_ids = []
@@ -538,13 +546,16 @@ class Rss(commands.Cog):
                     await ctx.send(await self.bot._(ctx.guild.id,"rss.roles.cant-find"))
                     return
         try:
-            if roles_ids[0] is None:
-                await self.db_update_feed(feed.feed_id, values=[('roles', '')])
+            if roles_ids is None:
+                for feed in feeds:
+                    if len(feed.role_ids) > 0:
+                        await self.db_update_feed(feed.feed_id, values=[('roles', '')])
                 await ctx.send(await self.bot._(ctx.guild.id, "rss.roles.edit-success", count=0))
             else:
-                await self.db_update_feed(feed.feed_id, values=[('roles', ';'.join(roles_ids))])
-                txt = await self.bot.get_cog("Utilities").clear_msg(", ".join(names))
-                await ctx.send(await self.bot._(ctx.guild.id, "rss.roles.edit-success", count=len(names), roles=txt))
+                for feed in feeds:
+                    if feed.role_ids != roles_ids:
+                        await self.db_update_feed(feed.feed_id, values=[('roles', ';'.join(roles_ids))])
+                await ctx.send(await self.bot._(ctx.guild.id, "rss.roles.edit-success", count=len(names), roles=", ".join(names)))
         except Exception as err:
             await ctx.send(await self.bot._(ctx.guild, "rss.fail-add"))
             await self.bot.get_cog("Errors").on_error(err, ctx)
@@ -640,31 +651,42 @@ class Rss(commands.Cog):
 
         ..Doc rss.html#change-the-text"""
         try:
+            # ask for feed IDs
             feeds_ids = await self.ask_rss_id(
                 ID,
                 ctx,
-                await self.bot._(ctx.guild.id, "rss.choose-mentions-1")
+                await self.bot._(ctx.guild.id, "rss.choose-mentions-1"),
+                max_count=None,
             )
-            if feeds_ids is None:
-                return
-            if len(feeds_ids) == 0:
-                await ctx.send(await self.bot._(ctx.guild, "rss.fail-add"))
-                return
-            feed = await self.db_get_feed(feeds_ids[0])
-            if text is None:
-                await ctx.send(await self.bot._(ctx.guild.id, "rss.change-txt", text=feed.structure))
-                def check(msg: discord.Message):
-                    return msg.author == ctx.author and msg.channel == ctx.channel
-                try:
-                    msg: discord.Message = await self.bot.wait_for('message', check=check,timeout=90)
-                except asyncio.TimeoutError:
-                    return await ctx.send(await self.bot._(ctx.guild.id, "rss.too-long"))
-                text = msg.content
-            await self.db_update_feed(feed.feed_id, [('structure', text)])
-            await ctx.send(await self.bot._(ctx.guild.id,"rss.text-success", id=feed.feed_id, text=text))
         except Exception as err:
-            await ctx.send(await self.bot._(ctx.guild.id,"rss.guild-error", err=err))
-            await ctx.bot.get_cog('Errors').on_error(err,ctx)
+            feeds_ids = []
+            await self.bot.get_cog("Errors").on_error(err, ctx)
+        if feeds_ids is None:
+            return
+        feeds: list[FeedObject] = list(filter(None, [await self.db_get_feed(feed_id) for feed_id in feeds_ids]))
+        if len(feeds) == 0:
+            await ctx.send(await self.bot._(ctx.guild, "rss.fail-add"))
+            return
+        if text is None:
+            # if no text was specified: we ask for it
+            hint = await self.bot._(ctx.guild.id, "rss.change-txt")
+            if len(feeds) == 1:
+                hint += "\n\n" + await self.bot._(ctx.guild.id, "rss.change-txt-previous", text=feeds[0].structure)
+            await ctx.send(hint)
+            def check(msg: discord.Message):
+                return msg.author == ctx.author and msg.channel == ctx.channel
+            try:
+                msg: discord.Message = await self.bot.wait_for('message', check=check,timeout=90)
+            except asyncio.TimeoutError:
+                return await ctx.send(await self.bot._(ctx.guild.id, "rss.too-long"))
+            text = msg.content
+        for feed in feeds:
+            if feed.structure != text:
+                await self.db_update_feed(feed.feed_id, [('structure', text)])
+        if len(feeds) == 1:
+            await ctx.send(await self.bot._(ctx.guild.id,"rss.text-success.single", id=feed.feed_id, text=text))
+        else:
+            await ctx.send(await self.bot._(ctx.guild.id,"rss.text-success.multiple", text=text))
 
     @rss_main.command(name="use_embed",aliases=['embed'])
     @commands.guild_only()
@@ -708,7 +730,7 @@ class Rss(commands.Cog):
                 def check(msg: discord.Message):
                     try:
                         _ = commands.converter._convert_to_bool(msg.content)
-                    except commands.ConversionError:
+                    except commands.BadArgument:
                         return False
                     return msg.author==ctx.author and msg.channel==ctx.channel
                 try:
