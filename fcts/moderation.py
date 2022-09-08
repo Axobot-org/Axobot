@@ -637,7 +637,7 @@ The 'days_to_delete' option represents the number of days worth of messages to d
             backup = user
             try:
                 user: discord.User = await commands.UserConverter().convert(ctx,user)
-            except commands.ConversionError:
+            except commands.BadArgument:
                 if user.isnumeric():
                     try:
                         user: discord.User = await self.bot.fetch_user(int(user))

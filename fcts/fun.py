@@ -536,7 +536,7 @@ You can specify a verification limit by adding a number in argument (up to 1.000
             try:
                 err = await commands.EmojiConverter().convert(ctx,r)
                 await message.add_reaction(err)
-            except (discord.Forbidden, commands.ConversionError):
+            except (discord.Forbidden, commands.BadArgument):
                 try:
                     await message.add_reaction(r)
                 except discord.errors.HTTPException:
