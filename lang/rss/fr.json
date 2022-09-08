@@ -1,7 +1,13 @@
 {
-    "change-txt": "Le message actuel contient \n```\n%{text}\n```\nVeuillez entrer le texte à utiliser lors d'un nouveau post. Vous pouvez utiliser plusieurs variables, dont voici la liste :\n- `{author}` : l'auteur du post\n- `{channel}` : le nom de la chaîne (généralement le même que l'auteur)\n- `{date}` : la date du post (UTC)\n- `{link}` ou `{url}` : un lien vers le post\n- `{logo}` : un emoji représentant le type de post (web, Twitter, YouTube...)\n- `{mentions}` : la liste des rôles mentionnés\n- `{title}` : le titre du post",
-    "choose-delete": "Veuillez choisir le flux à supprimer",
-    "choose-mentions-1": "Veuillez choisir le flux à modifier",
+    "ask-roles-hint": {
+        "one": "Entrez les rôles à mentionner pour ce flux (au choix leurs noms, IDs ou mentions), séparés par des espaces.",
+        "many": "Entrez les rôles à mentionner pour ces flux (au choix leurs noms, IDs ou mentions), séparés par des espaces."
+    },
+    "ask-roles-hint-example": "Par exemple:\n> Membres \"Super VIP\" @Notifs",
+    "change-txt": "Veuillez entrer le texte à utiliser lors d'un nouveau post. Vous pouvez utiliser plusieurs variables, dont voici la liste :\n- `{author}` : l'auteur du post\n- `{channel}` : le nom de la chaîne (généralement le même que l'auteur)\n- `{date}` : la date du post (UTC)\n- `{link}` ou `{url}` : un lien vers le post\n- `{logo}` : un emoji représentant le type de post (web, Twitter, YouTube...)\n- `{mentions}` : la liste des rôles mentionnés\n- `{title}` : le titre du post",
+    "change-txt-previous": "Le message actuel contient \n```\n%{text}\n```",
+    "choose-delete": "Veuillez choisir les flux à supprimer",
+    "choose-mentions-1": "Veuillez choisir les flux à modifier",
     "choose-roles": "Quels seront les rôles à mentionner ?",
     "delete-success": {
         "many": "%{count} flux ont été supprimé avec succès !",
@@ -33,7 +39,10 @@
     "no-roles": "Aucun rôle n'a été configuré pour l'instant.",
     "not-a-role": "Ce rôle est introuvable. Réessayez :",
     "nothing": "Je n'ai rien trouvé sur cette recherche :confused:",
-    "picker-placeholder": "Choisis un flux RSS",
+    "picker-placeholder": {
+        "single": "Choisis un flux RSS",
+        "multi": "Choisis un ou plusieurs flux RSS"
+    },
     "research-timeout": "La page web a mis trop de temps à répondre, j'ai dû interrompre le processus :eyes:",
     "roles": {
         "cant-find": "Rôle introuvable",
@@ -45,7 +54,10 @@
         "list": "Voici la liste des rôles déjà mentionnés : %{roles}"
     },
     "success-add": "Le flux rss de type '%{type}' avec le lien <%{url}> a bien été ajouté dans le salon %{channel} !",
-    "text-success": "Le texte du flux n°%{id} a bien été modifié ! Nouveau texte : \n```\n%{text}\n```",
+    "text-success": {
+        "single": "Le texte du flux n°%{id} a bien été modifié ! Nouveau texte : \n```\n%{text}\n```",
+        "multiple": "Le texte de ces flux RSS a bien été modifié ! Nouveau texte : \n```\n%{text}\n```"
+    },
     "too-long": "Vous avez trop attendu, désolé :hourglass:",
     "tw": "Twitter",
     "tw-default-flow": "{logo}  | Nouveau tweet de {author} ! ({date})\n\n{title}\n\nLien : {link}\n\n{mentions}",
