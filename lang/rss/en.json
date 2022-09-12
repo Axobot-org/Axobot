@@ -1,5 +1,11 @@
 {
-    "change-txt": "The current message contains  \n```\n%{text}\n```\nPlease enter the text to be used when creating a new post. You can use several variables, of which here is the list:\n- `{author}`: the author of the post\n- `{channel}`: the channel name (usually the same as author)\n- `{date}`: the post date (UTC)\n- `{link}` or `{url}`: a link to the post\n- `{logo}`: an emoji representing the type of post (web, Twitter, YouTube...)\n- `{mentions}`: the list of mentioned roles\n- `{title}`: the title of the post",
+    "ask-roles-hint": {
+        "one": "Type the roles to mention for this feed (either names, IDs or mentions), separated by spaces.",
+        "many": "Type the roles to mention for these feeds (either names, IDs or mentions), separated by spaces."
+    },
+    "ask-roles-hint-example": "For example:\n> Members \"Super VIP\" @Ping roles",
+    "change-txt": "Please enter the text to be used when creating a new post. You can use several variables, of which here is the list:\n- `{author}`: the author of the post\n- `{channel}`: the channel name (usually the same as author)\n- `{date}`: the post date (UTC)\n- `{link}` or `{url}`: a link to the post\n- `{logo}`: an emoji representing the type of post (web, Twitter, YouTube...)\n- `{mentions}`: the list of mentioned roles\n- `{title}`: the title of the post",
+    "change-txt-previous": "The current message contains  \n```\n%{text}\n```",
     "choose-delete": "Please choose the feeds to delete",
     "choose-mentions-1": "Please choose the feeds to modify",
     "choose-roles": "What roles will be mentioned?",
@@ -8,7 +14,7 @@
         "one": "The feed has been successfully deleted!"
     },
     "deviant": "DeviantArt",
-    "deviant-default-flow": "{logo}  | New creation by {author} : **{title}**\nPublished on {date}\nLink: {link}\n{mentions}",
+    "deviant-default-flow": "{logo}  | New creation by {author}: **{title}**\nPublished on {date}\nLink: {link}\n{mentions}",
     "deviant-form-last": "{logo}  | Here is the new creation of {author}:\n{title}\nPublished on {date}\nLink: {url}",
     "embed-json-changed": "The embed of this feed has been modified",
     "fail-add": "An error occurred while processing your response. Please try again later, or contact bot support (enter the command `about` for server link)",
@@ -33,7 +39,10 @@
     "no-roles": "No role has been configured yet.",
     "not-a-role": "This role can't be found. Try again:",
     "nothing": "I found nothing on this search :confused:",
-    "picker-placeholder": "Choose a RSS feed",
+    "picker-placeholder": {
+        "single": "Choose a RSS feed",
+        "multi": "Choose one or multiple RSS feeds"
+    },
     "research-timeout": "The web page took too long to answer, I had to interrupt the process :eyes:",
     "roles": {
         "cant-find": "I can't find this role",
@@ -45,7 +54,10 @@
         "list": "Here is the list of roles already notified: %{roles}"
     },
     "success-add": "The rss feed of type \"%{type}\" with link <%{url}> has been properly added in the channel %{channel}!",
-    "text-success": "The text of the feed #%{id} has been modified!\n New text : \n```\n%{text}\n```",
+    "text-success": {
+        "single": "The text of the feed #%{id} has been modified!\n New text: \n```\n%{text}\n```",
+        "multiple": "The text of these feeds have been modified!\n New text: \n```\n%{text}\n```"
+    },
     "too-long": "You waited too long, sorry :hourglass:",
     "tw": "Twitter",
     "tw-default-flow": "{logo}  | New tweet of {author}! ({date})\n\n{title}\n\nLink: {link}\n\n{mentions}",
@@ -59,7 +71,7 @@
     "use_embed_false": "This feed does not use embed to be sent. Do you want to use an embed for this flow? (true/false)",
     "use_embed_true": "This flow currently uses embeds to be sent. Do you still want to use an embed for this flow? (true/false)",
     "web": "Web",
-    "web-default-flow": "{logo}  | New post on {channel} ({date}) :\n        {title}\n\n{link}\n\n{mentions}",
+    "web-default-flow": "{logo}  | New post on {channel} ({date}):\n        {title}\n\n{link}\n\n{mentions}",
     "web-form-last": "{logo}  |  Here is the last post on {channel}:\n**{title}**\n*Written on {date}*\nLink: {link}",
     "web-help": "To search for an rss feed from any website, simply enter the rss/atom feed url as a parameter. If the feed is valid, I will send you the last article posted on this site.\n*Tip: some rss feeds are already filled in my code. Sometimes you can just put `fr-minecraft` or `minecraft.net`* :wink:",
     "web-invalid": "Oops, this url address is invalid :confused:",
