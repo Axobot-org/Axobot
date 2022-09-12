@@ -371,7 +371,10 @@ If the bot can't send the new command format, it will try to send the old one.""
             if len(subcmds) > 0:
                 answer.append((await self.bot._(ctx.channel, 'help.subcmds'), subcmds))
             if len(cmd.aliases) > 0:
-                answer.append((await self.bot._(ctx.channel, "help.aliases"), " - ".join(cmd.aliases)))
+                if cmd.full_parent_name:
+                    answer.append((await self.bot._(ctx.channel, "help.aliases"), cmd.full_parent_name + " " + " - ".join(cmd.aliases)))
+                else:
+                    answer.append((await self.bot._(ctx.channel, "help.aliases"), " - ".join(cmd.aliases)))
             if len(enabled+checks) > 0:
                 t = await self.bot._(ctx.channel, "help.warning")
                 answer.append((t, '\n'.join(enabled+checks)))
