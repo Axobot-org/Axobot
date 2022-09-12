@@ -370,7 +370,6 @@ class Admin(commands.Cog):
             await ctx.send("Impossible d'afficher cette commande, la base de donnée est hors ligne :confused:")
             return
         await self.bot.get_cog("Servers").send_see(guild, ctx.channel, option, ctx.message, guild)
-        await ctx.send("Serveur introuvable")
 
     @main_msg.group(name="database", aliases=["db"])
     @commands.check(checks.is_bot_admin)
