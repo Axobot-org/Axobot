@@ -153,8 +153,8 @@
     "embed_title_dm": "Cmds list 4 here only",
     "footer": "Type {}help cmd 4 mure info abawt an commandZ",
     "more-subcmds": {
-        "one": "and 1 other",
-        "many": "and %{count} ozers"
+        "one": "+ 1",
+        "many": "+ %{count}"
     },
     "no-desc-cmd": "No descripshun for those c:o2:mmand",
     "no-desc-cog": "No more discripton for dis cogg.",

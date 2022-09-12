@@ -1,5 +1,11 @@
 {
-    "change-txt": "Da current msg contains  \n```\n%{text}\n```\nPlz enter teh text 2B usd when creating a new post. U can use a lot ov variables, here iz the list:\n- `{author}`: author of the post\n- `{channel}`: usually same than author, just4fun\n- `{date}`: post date (UTC)\n- `{link}` or `{url}`: a link 2 the post\n- `{logo}`: a emoji representing teh type of post (website, BlueBird, RedTriangle...)\n- `{mentions}`: the list ov mentioned roles\n- `{title}`: the titl of da post",
+    "ask-roles-hint": {
+        "one": "Enter wat roles shuld be mentionned for dat feed (like uh, dunno, names or number or watever).",
+        "many": "Enter wat roles shuld be mentionned for dis feeds (like uh, dunno, names or number or watever)."
+    },
+    "ask-roles-hint-example": "Smol example:\n> Members \"Super VIP\" @Ping roles",
+    "change-txt": "Plz enter teh text 2 be usd when creating a new post. U can use some magic words, here iz the list:\n- `{author}`: author of the post\n- `{channel}`: usually same than author, but different\n- `{date}`: post date (UTC)\n- `{link}` or `{url}`: a link 2 the post\n- `{logo}`: a emoji representing teh type of post (website, BlueBird, RedTriangle...)\n- `{mentions}`: the list ov mentioned roles\n- `{title}`: the titl of teh post",
+    "change-txt-previous": "Teh current msg is:\n```\n%{text}\n```",
     "choose-delete": "Plz chouse teh flo to delet",
     "choose-mentions-1": "Pleese chose the flow 2 modify",
     "choose-roles": "Which roles should bee piing?",
@@ -8,7 +14,7 @@
         "one": "Teh flow had bein sussellfuccy delet!"
     },
     "deviant": "DeviantArt",
-    "deviant-default-flow": "{logo}  | New draw bye {author} : **{title}**\nDated on {date}\nURL: {link}\n{mentions}",
+    "deviant-default-flow": "{logo}  | New draw by {author} : **{title}**\nDated on {date}\nURL: {link}\n{mentions}",
     "deviant-form-last": "{logo}  | Here is da brand new thing of {author}:\n{title}\nDarwn on {date}\nZelda: {url}",
     "embed-json-changed": "The embed ov feed have been modifed",
     "fail-add": "An fAtal erroR have occurred whale proczzing ur respond. Plz trye again laterz, r contakt boat suPPORt (entr teh comand `about` 4 srver link)",
@@ -33,7 +39,10 @@
     "no-roles": "No more role hAVe bean configurated yetz.",
     "not-a-role": "The rOle was not finndz. Try against:",
     "nothing": "I finnd nothin on this searrch :confused:",
-    "picker-placeholder": "Pick smth",
+    "picker-placeholder": {
+        "single": "Pick smth",
+        "multi": "Pick one or more feed"
+    },
     "research-timeout": "This page took toooo long 2 answer, I had to stop teh process :eyes:",
     "roles": {
         "cant-find": "Err nope, cant find dat role",
@@ -45,7 +54,10 @@
         "list": "Her iz teh lis for rolez alreedy indicatd: %{roles}"
     },
     "success-add": "Teh rss feed for type '%{type}' with lik <%{url}> have bein prperly addded in the cannel %{channel} !",
-    "text-success": "Teh text of the feed #%{id} haz been modified!\n New cute text : \n```\n%{text}\n```",
+    "text-success": {
+        "single": "Teh text of the feed #%{id} haz been modified!\n New cute text : \n```\n%{text}\n```",
+        "multiple": "Teh text of these feeds haz been modified!\n New cute text : \n```\n%{text}\n```"
+    },
     "too-long": "You weighted tooooooo lOng, sory :hourglass:",
     "tw": "Twiter",
     "tw-default-flow": "{logo}  | New tweat for {author}! ({date})\n\n{title}\n\nLink: {link}\n\n{mentions}",
