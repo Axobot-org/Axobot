@@ -167,6 +167,11 @@
         "total_xp": "**xp won by ppl:** %{v}xp",
         "users_count": "**Nbr ov visible memberz:** %{v0} (%{v1} **robots**)"
     },
+    "stats-cmds": {
+        "day": "recently-ish",
+        "title": "How much ppl use my commands",
+        "total": "Since alwayyyys"
+    },
     "usernames": {
         "allow": "U can anti-optout teh auto logs with da cmd 'profile'",
         "disallow": "U can optout the auto logging with cmd 'profile' (beeew bad guy)",
