@@ -169,6 +169,7 @@
     },
     "stats-cmds": {
         "day": "Dans les dernières 24h",
+        "description": "Voici le top %{number} des commandes les plus utilisées, à la fois sur la dernière journée et depuis que nous avons commencé à enregistrer ces stats.",
         "title": "Statistiques sur l'utilisation des commandes",
         "total": "Depuis le début"
     },
