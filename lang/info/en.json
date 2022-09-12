@@ -167,6 +167,11 @@
         "total_xp": "**Total of earned xp:** %{v}xp",
         "users_count": "**Number of visible members:** %{v0} (%{v1} **bots**)"
     },
+    "stats-cmds": {
+        "day": "In the last 24h",
+        "title": "Commands usage statistics",
+        "total": "Since the beginning"
+    },
     "usernames": {
         "allow": "You can reauthorize the automatic recording of your usernames and nicknames with the command 'profile'",
         "disallow": "You can opt out of the automatic recording of your usernames and nicknames with the command 'profile'",

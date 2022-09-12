@@ -167,6 +167,11 @@
         "total_xp": "**Nombre total d'xp gagné :** %{v}xp",
         "users_count": "**Nombre de membres visibles :** %{v0} (dont %{v1} **bots**)"
     },
+    "stats-cmds": {
+        "day": "Dans les dernières 24h",
+        "title": "Statistiques sur l'utilisation des commandes",
+        "total": "Depuis le début"
+    },
     "usernames": {
         "allow": "Vous pouvez réautoriser l'enregistrement automatique de vos pseudos via la commande 'profile'",
         "disallow": "Vous pouvez désactiver l'enregistrement automatique de vos pseudos via la commande 'profile'",

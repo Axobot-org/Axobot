@@ -77,12 +77,22 @@ class Info(commands.Cog):
                 return len(self.bot.guilds)
         return len([x for x in self.bot.guilds if x.id not in ignored_guilds])
 
-    @commands.command(name="stats", enabled=True)
-    @commands.cooldown(2,60,commands.BucketType.guild)
-    async def stats(self, ctx: MyContext):
+    @commands.group(name="stats")
+    @commands.cooldown(2, 60, commands.BucketType.guild)
+    async def stats_main(self, ctx: MyContext):
         """Display some statistics about the bot
 
         ..Doc infos.html#statistics"""
+        if ctx.subcommand_passed is None:
+            msg = copy.copy(ctx.message)
+            msg.content = ctx.prefix + "stats general"
+            new_ctx = await self.bot.get_context(msg)
+            await self.bot.invoke(new_ctx)
+    
+
+    @stats_main.command(name="general")
+    async def stats_general(self, ctx: MyContext):
+        "General statistics about the bot"
         v = sys.version_info
         version = str(v.major)+"."+str(v.minor)+"."+str(v.micro)
         latency = round(self.bot.latency*1000, 2)
@@ -138,9 +148,8 @@ class Info(commands.Cog):
         if ctx.can_send_embed: # if we can use embed
             title = await self.bot._(ctx.channel,"info.stats.title")
             color = ctx.bot.get_cog('Help').help_color
-            embed = discord.Embed(title=title, color=color, timestamp=ctx.message.created_at, description=d)
+            embed = discord.Embed(title=title, color=color, description=d)
             embed.set_thumbnail(url=self.bot.user.display_avatar.with_static_format("png"))
-            embed.set_footer(text=ctx.author, icon_url=ctx.author.display_avatar)
             await ctx.send(embed=embed)
         else:
             await ctx.send(d)
@@ -149,6 +158,44 @@ class Info(commands.Cog):
         members = [x.members for x in self.bot.guilds if x.id not in ignored_guilds]
         members = list(set([x for x in members for x in x])) # filter users
         return len(members),len([x for x in members if x.bot])
+
+    @stats_main.command(name="commands", aliases=["cmds"])
+    async def stats_commands(self, ctx: MyContext):
+        """List the most used commands
+
+        ..Doc infos.html#statistics"""
+        forbidden = ['cmd.eval', 'cmd.admin', 'cmd.test']
+        forbidden_where = ', '.join(['%s' for _ in forbidden])
+        lang = await self.bot._(ctx.channel, '_used_locale')
+        # SQL query
+        async def do_query(special_where: typing.Optional[str], where_args: typing.Optional[typing.Any]):
+            query = f"SELECT variable, SUBSTRING_INDEX(variable, \".\", -1) as cmd, SUM(value) as usages FROM `statsbot`.`zbot` WHERE variable LIKE \"cmd.%\" {'AND '+special_where if special_where else ''} AND UTC_TIMESTAMP() AND `beta` = %s AND `variable` NOT IN ({forbidden_where}) GROUP BY cmd ORDER BY usages DESC LIMIT 15"
+            async with self.bot.db_query(query, (*where_args, self.bot.beta, *forbidden)) as query_result:
+                pass
+            return query_result
+
+        # in the last 24h
+        data_24h = await do_query("date BETWEEN (DATE_SUB(UTC_TIMESTAMP(),INTERVAL %s MINUTE))", (60*24,))
+        text_24h = '⋅ ' + "\n⋅ ".join([data['cmd']+': ' + await FormatUtils.format_nbr(data['usages'], lang) for data in data_24h])
+        title_24h = await self.bot._(ctx.channel, 'info.stats-cmds.day')
+        # since the beginning
+        data_total = await do_query(None, [])
+        text_total = '⋅ ' + "\n⋅ ".join([data['cmd']+': ' + await FormatUtils.format_nbr(data['usages'], lang) for data in data_total])
+        title_total = await self.bot._(ctx.channel, 'info.stats-cmds.total')
+        # message title
+        title = await self.bot._(ctx.channel, "info.stats-cmds.title")
+        # send everything
+        if ctx.can_send_embed:
+            emb = discord.Embed(
+                title=title,
+                color=ctx.bot.get_cog('Help').help_color,
+            )
+            emb.set_thumbnail(url=self.bot.user.display_avatar.with_static_format("png"))
+            emb.add_field(name=title_total, value=text_total)
+            emb.add_field(name=title_24h, value=text_24h)
+            await ctx.send(embed=emb)
+        else:
+            await ctx.send(f"**{title}**\n\n{title_total}:\n{text_total}\n\n{title_24h}:\n{text_24h}")
 
     @commands.command(name="botinvite", aliases=["botinv"])
     async def botinvite(self, ctx:MyContext):
