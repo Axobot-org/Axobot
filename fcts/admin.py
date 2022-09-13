@@ -33,7 +33,7 @@ class Admin(commands.Cog):
     def __init__(self, bot: Zbot):
         self.bot = bot
         self.file = "admin"
-        self.emergency_time = 5.0
+        self.emergency_time = 15.0
         if self.bot.beta:
             self.update = {'fr':'Foo','en':'Bar'}
         else:
@@ -172,7 +172,7 @@ class Admin(commands.Cog):
 
     @main_msg.command(name="update")
     @commands.check(checks.is_bot_admin)
-    async def update_config(self, ctx: MyContext, send: bool=None):
+    async def update_config(self, ctx: MyContext, send: bool=False):
         """Préparer/lancer un message de mise à jour
         Ajouter 'send' en argument déclenche la procédure pour l'envoyer à tous les serveurs"""
         if send:
