@@ -1,10 +1,8 @@
 {
-    "lolcat": {
-        "backup-done": "i wrote some things on tihs file. Dont ask me what tho.",
-        "err": "Oops, an internal error occured... But doan worry, we'r on teh place: https://memegenerator.net/img/instances/61333990.jpg",
-        "finished": "Backup done! Here are some weird things i did 4u",
-        "invalid_file": "Plz send dat backup file IN the SAME message as ur cmd duh",
-        "invalid_version": "lmao dat backup version iz not valid. ur file's maybe corrupted lol",
-        "loading": "Loading bkp... plz wait... a bit longer... woah im tired"
-    }
+    "backup-done": "i wrote some things on tihs file. Dont ask me what tho.",
+    "err": "Oops, an internal error occured... But doan worry, we'r on teh place: https://memegenerator.net/img/instances/61333990.jpg",
+    "finished": "Backup done! Here are some weird things i did 4u",
+    "invalid_file": "Plz send dat backup file IN the SAME message as ur cmd duh",
+    "invalid_version": "lmao dat backup version iz not valid. ur file's maybe corrupted lol",
+    "loading": "Loading bkp... plz wait... a bit longer... woah im tired"
 }

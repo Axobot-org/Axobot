@@ -9,7 +9,7 @@ from cachingutils import LRUCache
 from discord.ext import commands
 from libs.classes import MyContext, Zbot
 
-from fcts import checks
+from . import checks
 
 roles_options = ["clear_allowed_roles", "slowmode_allowed_roles", "mute_allowed_roles", "kick_allowed_roles", "ban_allowed_roles",
                  "warn_allowed_roles", "say_allowed_roles", "welcome_roles", "muted_role", 'partner_role', 'update_mentions',
@@ -383,8 +383,9 @@ class Servers(commands.Cog):
             else:
                 msg = await self.bot._(ctx.guild.id, "server.internal-error")
             await ctx.send(msg)
-            msg = "Reset option in server {}: {}".format(ctx.guild.id,option)
+            msg = "Reset option in server {}: {}".format(ctx.guild.id, option)
             emb = discord.Embed(description=msg, color=self.log_color, timestamp=self.bot.utcnow())
+            emb.set_footer(text=ctx.guild.name)
             emb.set_author(name=self.bot.user, icon_url=self.bot.user.display_avatar)
             await self.bot.send_embed([emb])
             self.bot.log.debug(msg)

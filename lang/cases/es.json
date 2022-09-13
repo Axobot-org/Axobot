@@ -1,15 +1,13 @@
 {
-    "es": {
-        "cases-0": "%{nbr} casos encontrado: (%{start}-%{end})",
-        "deleted": "¡El caso #%{ID} ha sido borrado!",
-        "list-0": "**Tipo:** {T}\n**Moderador:** {M}\n**Fecha:** {D}\n**Razón:** *{R}*",
-        "list-1": "**Servidor:** {G}\n**Tipo:** {T}\n**Moderador:** {M}\n**Fecha:** {D}\n**Razón:** *{R}*",
-        "no-user": "No se puede encontrar a este usuario :eyes:",
-        "no_database": "Debido a una interrupción temporal de la base de datos, este comando ha sido desactivado",
-        "not-found": "Este caso no fue encontrado :confused:",
-        "reason-edited": "La razón del caso #%{ID} ha sido cambiada!",
-        "search-0": "**Usuario:** {U}\n**Tipo:** {T}\n**Moderador:** {M}\n**Decha:** {D}\n**Razón:** *{R}*",
-        "search-1": "**Usuario:** {U}\n**Gremio:** {G}\n**Tipo:** {T}\n**Moderador:** {M}\n**Fecha:** {D}\n**Razón:** *{R}*",
-        "title-search": "Caso #%{ID}"
-    }
+    "cases-0": "%{nbr} casos encontrado: (%{start}-%{end})",
+    "deleted": "¡El caso #%{ID} ha sido borrado!",
+    "list-0": "**Tipo:** {T}\n**Moderador:** {M}\n**Fecha:** {D}\n**Razón:** *{R}*",
+    "list-1": "**Servidor:** {G}\n**Tipo:** {T}\n**Moderador:** {M}\n**Fecha:** {D}\n**Razón:** *{R}*",
+    "no-user": "No se puede encontrar a este usuario :eyes:",
+    "no_database": "Debido a una interrupción temporal de la base de datos, este comando ha sido desactivado",
+    "not-found": "Este caso no fue encontrado :confused:",
+    "reason-edited": "La razón del caso #%{ID} ha sido cambiada!",
+    "search-0": "**Usuario:** {U}\n**Tipo:** {T}\n**Moderador:** {M}\n**Decha:** {D}\n**Razón:** *{R}*",
+    "search-1": "**Usuario:** {U}\n**Gremio:** {G}\n**Tipo:** {T}\n**Moderador:** {M}\n**Fecha:** {D}\n**Razón:** *{R}*",
+    "title-search": "Caso #%{ID}"
 }

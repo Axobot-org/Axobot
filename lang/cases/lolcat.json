@@ -1,25 +1,23 @@
 {
-    "lolcat": {
-        "cases-0": "%{nbr} cases fund: (%{start}-%{end})",
-        "deleted": "The caze #%{ID} has byn deletd!",
-        "display": {
-            "date": "**When?** %{data}",
-            "duration": "**Haw long?** %{data}",
-            "guild": "**Where?** %{data}",
-            "moderator": "**By who?** %{data}",
-            "reason": "**Why?** %{data}",
-            "type": "**What?** %{data}",
-            "user": "**Who?** %{data}"
-        },
-        "list-0": "**Type:** {T}\n**mod:** {M}\n**Date:** {D}\n**Txt:** *{R}*",
-        "list-1": "**Srvr:** {G}\n**Type:** {T}\n**Modz:** {M}\n**date:** {D}\n**Reason:** *{R}*",
-        "no-case": "This user never did anythin wrong :upset_cat:",
-        "no-user": "Unable to find dis usr :eyes:",
-        "no_database": "Dude we'v got an databaz outage, so dis command haz been dizabled",
-        "not-found": "Dis caze was not fund :upside_down:",
-        "reason-edited": "Teh ryson for case #%{ID} has been changd!",
-        "search-0": "**Uzr:** {U}\n**Type:** {T}\n**Mod:** {M}\n**Date:** {D}\n**Reazon:** *{R}*",
-        "search-1": "**Uzr:** {U}\n**Servr:** {G}\n**Type:** {T}\n**Modz:** {M}\n**Date:** {D}\n**Reazon:** *{R}*",
-        "title-search": "Case #%{ID}"
-    }
+    "cases-0": "%{nbr} cases fund: (%{start}-%{end})",
+    "deleted": "The caze #%{ID} has byn deletd!",
+    "display": {
+        "date": "**When?** %{data}",
+        "duration": "**Haw long?** %{data}",
+        "guild": "**Where?** %{data}",
+        "moderator": "**By who?** %{data}",
+        "reason": "**Why?** %{data}",
+        "type": "**What?** %{data}",
+        "user": "**Who?** %{data}"
+    },
+    "list-0": "**Type:** {T}\n**mod:** {M}\n**Date:** {D}\n**Txt:** *{R}*",
+    "list-1": "**Srvr:** {G}\n**Type:** {T}\n**Modz:** {M}\n**date:** {D}\n**Reason:** *{R}*",
+    "no-case": "This user never did anythin wrong :upset_cat:",
+    "no-user": "Unable to find dis usr :eyes:",
+    "no_database": "Dude we'v got an databaz outage, so dis command haz been dizabled",
+    "not-found": "Dis caze was not fund :upside_down:",
+    "reason-edited": "Teh ryson for case #%{ID} has been changd!",
+    "search-0": "**Uzr:** {U}\n**Type:** {T}\n**Mod:** {M}\n**Date:** {D}\n**Reazon:** *{R}*",
+    "search-1": "**Uzr:** {U}\n**Servr:** {G}\n**Type:** {T}\n**Modz:** {M}\n**Date:** {D}\n**Reazon:** *{R}*",
+    "title-search": "Case #%{ID}"
 }

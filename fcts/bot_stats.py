@@ -4,9 +4,10 @@ import aiohttp
 
 import mysql
 import psutil
+import discord
 from discord.ext import commands, tasks
 from fcts.tickets import TicketCreationEvent
-from libs.classes import MyContext, UsernameChangeRecord, Zbot
+from libs.classes import MyContext, ServerWarningType, UsernameChangeRecord, Zbot
 
 try:
     import orjson  # type: ignore
@@ -25,7 +26,7 @@ class BotStats(commands.Cog):
         self.file = 'bot_stats'
         self.received_events = {'CMD_USE': 0}
         self.commands_uses = {}
-        self.rss_stats = {'checked': 0, 'messages': 0, 'errors': 0}
+        self.rss_stats = {'checked': 0, 'messages': 0, 'errors': 0, 'warnings': 0}
         self.xp_cards = 0
         self.process = psutil.Process()
         self.cpu_records: list[float] = []
@@ -110,6 +111,15 @@ class BotStats(commands.Cog):
             self.translations_added[language] += 1
         else:
             self.translations_added[language] = 1
+    
+    @commands.Cog.listener()
+    async def on_server_warning(self, warning_type: ServerWarningType, guild: discord.Guild, **kwargs):
+        if warning_type in {
+            ServerWarningType.RSS_UNKNOWN_CHANNEL,
+            ServerWarningType.RSS_MISSING_TXT_PERMISSION,
+            ServerWarningType.RSS_MISSING_EMBED_PERMISSION,
+        }:
+            self.rss_stats["warnings"] += 1
 
     @commands.Cog.listener()
     async def on_socket_raw_receive(self, msg: str):
@@ -143,8 +153,8 @@ class BotStats(commands.Cog):
         # remove seconds and less
         now = now.replace(second=0, microsecond=0)
         # prepare requests
-        query = "INSERT INTO zbot VALUES (%s, %s, %s, %s, %s, %s, %s);"
-        cnx = self.bot.cnx_stats
+        query = "INSERT INTO `statsbot`.`zbot` VALUES (%s, %s, %s, %s, %s, %s, %s);"
+        cnx = self.bot.cnx_frm
         cursor = cnx.cursor(dictionary=True)
         try:
             # WS events stats
@@ -212,9 +222,9 @@ class BotStats(commands.Cog):
 
     async def get_stats(self, variable: str, minutes: int) -> typing.Union[int, float, str, None]:
         """Get the sum of a certain variable in the last X minutes"""
-        cnx = self.bot.cnx_stats
+        cnx = self.bot.cnx_frm
         cursor = cnx.cursor(dictionary=True)
-        cursor.execute('SELECT variable, SUM(value) as value, type FROM `zbot` WHERE variable = %s AND date BETWEEN (DATE_SUB(UTC_TIMESTAMP(),INTERVAL %s MINUTE)) AND UTC_TIMESTAMP() AND beta=%s', (variable, minutes, self.bot.beta))
+        cursor.execute('SELECT variable, SUM(value) as value, type FROM `statsbot`.`zbot` WHERE variable = %s AND date BETWEEN (DATE_SUB(UTC_TIMESTAMP(),INTERVAL %s MINUTE)) AND UTC_TIMESTAMP() AND beta=%s', (variable, minutes, self.bot.beta))
         result: list[dict] = list(cursor)
         cursor.close()
         if len(result) == 0:

@@ -1,5 +1,3 @@
 {
-    "es": {
-        "check_intro": "%{user}, iniciando el blurple análisis de la imagen (Por favor, tenga en cuenta que esto puede tardar un tiempo)"
-    }
+    "check_intro": "%{user}, iniciando el blurple análisis de la imagen (Por favor, tenga en cuenta que esto puede tardar un tiempo)"
 }

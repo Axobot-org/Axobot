@@ -11,7 +11,6 @@ from typing import Union
 import aiohttp
 import discord
 import mysql
-import psutil
 from discord.ext import commands, tasks
 from libs.classes import UsernameChangeRecord, Zbot
 
@@ -178,14 +177,14 @@ class Events(commands.Cog):
                 if msg.guild is None or msg.channel.permissions_for(msg.guild.me).external_emojis:
                     nudes_reacts += ['<:whut:485924115199426600>','<:thinksmart:513105826530197514>','<:excusemewhat:418154673523130398>','<:blobthinking:499661417012527104>','<a:ano_U:568494122856611850>','<:catsmirk:523929843331498015>','<a:ablobno:537680872820965377>']
                 await msg.channel.send(random.choice(nudes_reacts))
-            except:
+            except discord.HTTPException:
                 pass
         # Halloween event
         elif ("booh" in msg.content.lower() or "halloween" in msg.content.lower() or "witch" in msg.content.lower()) and random.random() < 0.05 and self.bot.current_event=="halloween":
             try:
                 react = random.choice(['🦇','🎃','🕷️']*2+['👀' ])
                 await msg.add_reaction(react)
-            except:
+            except discord.HTTPException:
                 pass
         # April Fool event
         elif random.random() < 0.07 and self.bot.current_event=="fish" and await is_fun_enabled(msg, self.bot.get_cog("Fun")):
@@ -206,7 +205,7 @@ class Events(commands.Cog):
                 if len(clean_content) > 0 and sum(1 for c in clean_content if c.isupper())/len(clean_content) > 0.8 and len(clean_content)>7 and not msg.channel.permissions_for(msg.author).administrator:
                     try:
                         await msg.channel.send(await self.bot._(msg.guild, "moderation.caps-lock", user=msg.author.mention), delete_after=4.0)
-                    except:
+                    except discord.HTTPException:
                         pass
 
 
@@ -236,8 +235,8 @@ class Events(commands.Cog):
         if msg.author.id == self.bot.user.id or 'discord.gg/' not in msg.content:
             return
         try:
-            _ = await self.bot.fetch_invite(msg.content)
-        except:
+            await self.bot.fetch_invite(msg.content)
+        except discord.NotFound:
             return
         # d = datetime.datetime.utcnow() - (await msg.channel.history(limit=2).flatten())[1].created_at
         # if d.total_seconds() > 600:
@@ -500,10 +499,11 @@ class Events(commands.Cog):
         xptypes_stats = await self.bot.get_cog('Servers').get_xp_types([], return_dict=True)
         supportserver_members = self.bot.get_guild(356067272730607628).member_count
         query = "INSERT INTO `log_stats` (`servers_count`, `members_count`, `bots_count`, `dapi_heartbeat`, `codelines_count`, `earned_xp_total`, `rss_feeds`, `active_rss_feeds`, `supportserver_members`, `languages`, `used_rankcards`, `xp_types`, `beta`) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
-        data = (len(self.bot.guilds),
+        data = (
+            len(self.bot.guilds),
             member_count,
             bot_count,
-            round(self.bot.latency,3),
+            10e6 if self.bot.latency == float("inf") else round(self.bot.latency, 3),
             self.bot.get_cog("Info").codelines,
             await self.bot.get_cog('Xp').bdd_total_xp(),
             rss_feeds,

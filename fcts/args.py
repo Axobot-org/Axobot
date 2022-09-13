@@ -1,5 +1,4 @@
 import re
-import string
 import typing
 
 import discord
@@ -85,11 +84,10 @@ class Invite(commands.Converter):
     def __init__(self):
         pass
 
-    async def convert(self, ctx: MyContext, argument: str) -> typing.Union[str, int]:
+    async def convert(self, _ctx: MyContext, argument: str) -> typing.Union[str, int]:
         answer = None
         r_invite = re.search(
-            r'^https://discord(?:app)?\.com/(?:api/)?oauth2/authorize\?(?:&?client_id=(\d{17,19})|&?scope=([a-z\.\+]+?)|&'
-            r'?(?:permissions|guild_id|disable_guild_select|redirect_uri)=[^&]+)+$',
+            r'^https://discord(?:app)?\.com/(?:api/)?oauth2/authorize\?(?:client_id=(\d{17,19})|scope=([a-z\.\+]+?)|(?:permissions|guild_id|disable_guild_select|redirect_uri)=[^&\s]+)(?:&(?:client_id=(\d{17,19})|scope=([a-z\.\+]+?)|(?:permissions|guild_id|disable_guild_select|redirect_uri)=[^&\s]+))*$',
             argument)
         if r_invite is None:
             r_invite = re.search(
@@ -97,9 +95,10 @@ class Invite(commands.Converter):
             if r_invite is not None:
                 answer = r_invite.group(1)
         else:
-            scopes = r_invite.group(2).split('+')
-            if 'bot' in scopes:
-                answer = int(r_invite.group(1))
+            if (r_invite.group(2) or r_invite.group(4)) and (r_invite.group(1) or r_invite.group(3)):
+                scopes = r_invite.group(2).split('+') if r_invite.group(2) else r_invite.group(4).split('+')
+                if 'bot' in scopes:
+                    answer = int(r_invite.group(1) or r_invite.group(3))
         if r_invite is None or answer is None:
             raise commands.errors.BadArgument('Invalid invite: '+argument)
         return answer
@@ -154,7 +153,7 @@ class AnyEmoji(commands.Converter):
         r = re.search(r'<a?:[^:]+:(\d+)>', argument)
         if r is None:
             try:
-                return UnicodeEmoji.convert(ctx, argument)
+                return await UnicodeEmoji.convert(ctx, argument)
             except commands.errors.BadArgument:
                 pass
         else:
@@ -188,21 +187,21 @@ class Color(commands.Converter):
             return None
 
 
-class snowflake(commands.Converter):
+class Snowflake:
     "Convert arguments to a discord Snowflake"
-    class Snowflake:
-        def __init__(self, ID: int):
-            self.id = ID
-            self.binary = bin(ID)
-            self.date = discord.utils.snowflake_time(ID)
-            self.increment = int(self.binary[-12:])
-            self.process_id = int(self.binary[-17:-12])
-            self.worker_id = int(self.binary[-22:-17])
+    def __init__(self, ID: int):
+        self.id = ID
+        self.binary = bin(ID)
+        self.date = discord.utils.snowflake_time(ID)
+        self.increment = int(self.binary[-12:])
+        self.process_id = int(self.binary[-17:-12])
+        self.worker_id = int(self.binary[-22:-17])
 
-    async def convert(self, ctx: MyContext, argument: str) -> int:
-        if len(argument) < 17 or len(argument) > 19 or not argument.isnumeric():
-            return None
-        return self.Snowflake(int(argument))
+    @classmethod
+    async def convert(cls, ctx: MyContext, argument: str) -> int:
+        if len(argument) < 17 or len(argument) > 20 or not argument.isnumeric():
+            raise commands.BadArgument("Invalid snowflake")
+        return cls(int(argument))
 
 
 class serverlog(commands.Converter):

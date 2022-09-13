@@ -18,7 +18,7 @@ import numpy as np
 from discord.ext import commands
 from PIL import Image, ImageDraw, ImageEnhance, ImageFont, ImageSequence
 
-from fcts import args, checks
+from . import args, checks
 
 importlib.reload(args)
 importlib.reload(checks)
@@ -110,13 +110,10 @@ class Xp(commands.Cog):
         if msg.author.id in self.cache['global'].keys():
             prev_points = self.cache['global'][msg.author.id][1]
         else:
-            try:
-                prev_points = (await self.bdd_get_xp(msg.author.id,None))
-                if len(prev_points) > 0:
-                    prev_points = prev_points[0]['xp']
-                else:
-                    prev_points = 0
-            except:
+            prev_points = await self.bdd_get_xp(msg.author.id, None)
+            if prev_points is not None and len(prev_points) > 0:
+                prev_points = prev_points[0]['xp']
+            else:
                 prev_points = 0
         await self.bdd_set_xp(msg.author.id, giv_points, 'add')
         # check for sus people
@@ -142,13 +139,10 @@ class Xp(commands.Cog):
         if msg.author.id in self.cache[msg.guild.id].keys():
             prev_points = self.cache[msg.guild.id][msg.author.id][1]
         else:
-            try:
-                prev_points = (await self.bdd_get_xp(msg.author.id,msg.guild.id))
-                if len(prev_points) > 0:
-                    prev_points = prev_points[0]['xp']
-                else:
-                    prev_points = 0
-            except:
+            prev_points = await self.bdd_get_xp(msg.author.id, msg.guild.id)
+            if prev_points is not None and len(prev_points) > 0:
+                prev_points = prev_points[0]['xp']
+            else:
                 prev_points = 0
         await self.bdd_set_xp(msg.author.id, giv_points, 'add', msg.guild.id)
         # check for sus people
@@ -174,13 +168,10 @@ class Xp(commands.Cog):
         if msg.author.id in self.cache[msg.guild.id].keys():
             prev_points = self.cache[msg.guild.id][msg.author.id][1]
         else:
-            try:
-                prev_points = (await self.bdd_get_xp(msg.author.id,msg.guild.id))
-                if len(prev_points) > 0:
-                    prev_points = prev_points[0]['xp']
-                else:
-                    prev_points = 0
-            except:
+            prev_points = await self.bdd_get_xp(msg.author.id, msg.guild.id)
+            if prev_points is not None and len(prev_points) > 0:
+                prev_points = prev_points[0]['xp']
+            else:
                 prev_points = 0
         await self.bdd_set_xp(msg.author.id, giv_points, 'add', msg.guild.id)
         # check for sus people

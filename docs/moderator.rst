@@ -18,7 +18,7 @@ Warn
 
 **Syntax:** :code:`warn <user> <message>`:
 
-This command allows you to warn a member, without really sanctioning him. This member will receive this warning by personal message (if they have not disabled them), and the warning will be stored in his logs.
+This command allows you to warn a member, without really sanctioning them. This member will receive this warning by personal message (if they have not disabled them), and the warning will be stored in his logs.
 
 -----------
 Mute/Unmute
@@ -33,13 +33,13 @@ Mute/Unmute
 
 This command mutes a member, preventing them from typing. 
 
-The principle is to assign the *muted* role to the member, in order to distinguish him from the others. Simply configure the permissions to have the "send messages" option disabled in your channels. And if configuring the role is too much work for you, you can ask the bot to try to setup it automatically with the :code:`mute-config` command (see below).
+The principle is to assign the *muted* role to the member, in order to distinguish them from the others. Simply configure the permissions to have the "send messages" option disabled in your channels. And if configuring the role is too much work for you, you can ask the bot to try to setup it automatically with the :code:`mute-config` command (see below).
 
 The duration of the tempmute is quite flexible: use :code:`XXd` for days, :code:`XXh` for hours and :code:`XXm` for minutes (replacing **XX** by the corresponding number, of course!)
 
 .. warning:: The muted role must be placed below the bot role, and the bot must have "`Manage roles <perms.html#manage-roles>`__" (to give the role) permission.
 
-.. note:: Zbot remembers when a member is muted in your server, and only delete this information when someone uses the !unmute command. So, if a member tries to lose his "muted" role by leaving and joining the server, Zbot will give him back his role, even if you removed it manually (without the command)!
+.. note:: Zbot remembers when a member is muted in your server, and only delete this information when someone uses the !unmute command. So, if a member tries to lose his "muted" role by leaving and joining the server, Zbot will give them back his role, even if you removed it manually (without the command)!
 
 **Syntax:** :code:`unmute <user>`
 
@@ -87,8 +87,8 @@ Kick
 
 **Syntax:** :code:`kick <user> [reason]`
 
-The kick allows you to eject a member from your server. This member will receive a personal message from the bot to alert him of his expulsion, with the reason for the kick if it's specified.
-It is not possible to cancel a kick. The only way to get a member back is to send him an invitation (see the `invite <infos.html#invite>`__ command) via another server.
+The kick allows you to eject a member from your server. This member will receive a personal message from the bot to alert them of his expulsion, with the reason for the kick if it's specified.
+It is not possible to cancel a kick. The only way to get a member back is to send them an invitation (see the `invite <infos.html#invite>`__ command) via another server.
 
 .. warning:: For the command to succeed, the bot must have "`Kick members <perms.html#kick-members>`__" permissions and be placed higher than the highest role of that member.
 
@@ -113,7 +113,7 @@ The ban allows you to instantly ban a member from your server. This means that t
 
 The duration of the tempban is the same as for the tempmute: use :code:`XXd` for days, :code:`XXh` for hours and :code:`XXm` for minutes (replacing **XX** by the corresponding number, of course!)
 
-To cancel this action, use the Discord interface or the `unban <#unban>`__ command. The member will nevertheless have to decide for himself if he wishes to return to your server.
+To cancel this action, use the Discord interface or the `unban <#unban>`__ command. The member will nevertheless have to decide for themselves if he wishes to return to your server.
 
 
 
@@ -146,7 +146,7 @@ View list
 
 **Syntax:** :code:`cases list <user>`
 
-If you want to know the list of cases/logs that a member has in this server, you can use this command. Note that to select a member, you must either notify him/her, retrieve his/her ID or write his/her full name.
+If you want to know the list of cases/logs that a member has in this server, you can use this command. Note that to select a member, you must either notify them, retrieve their ID or write their full name.
 
 The persons authorized to use this command are the same as for the `warn <#warn>`__ command.
 
@@ -316,7 +316,7 @@ Nice command that allows you to do different things with the server roles (other
 
 * :code:`role color <role> <colour>` (alias `role colour`): Changes the color of the given role. The color must be in hexadecimal form, although some common names are accepted (red, blue, gold...). To remove the color, use the name `default`. Please check notes 1. and 2.
 
-* :code:`role give <role> <user(s) | role(s)>`: Give a role to a list of people. You can target as many users or roles as you want, so for example to target your friends Joe and Jack, plus the Admin role, use :code:`role give superRole Joe Jack Admin`. Please check note 2.
+* :code:`role give <role> <user(s) | role(s)>`: Give a role to a list of people. You can target as many users or roles as you want, so for example to target your friends Joe and Jack, plus the Admin role, use :code:`role give superRole Joe Jack Admin`. Please check note 2. To avoid spamming the Discord API, Zbot also limit how many users you can affect by this command, and will tell you if this limit is reached.
 
 * :code:`role remove <role> <user(s) | role(s)>`: Same as above, but instead of giving them, it takes them away. Please check note 2.
 

@@ -22,7 +22,7 @@ from libs.formatutils import FormatUtils
 from libs.paginator import Paginator
 from utils import flatten_list
 
-from fcts import args, checks
+from . import args, checks
 from fcts.checks import is_fun_enabled
 
 importlib.reload(checks)
@@ -500,7 +500,7 @@ You can specify a verification limit by adding a number in argument (up to 1.000
                 return await ctx.send(str(await self.bot._(ctx.guild.id, 'fun', 'no-say'))+random.choice([' :confused:', '', '', '']))
             await channel.send(text)
             await ctx.message.delete(delay=0)
-        except:
+        except discord.Forbidden:
             pass
 
     @commands.command(name="me", hidden=True)
@@ -536,7 +536,7 @@ You can specify a verification limit by adding a number in argument (up to 1.000
             try:
                 err = await commands.EmojiConverter().convert(ctx,r)
                 await message.add_reaction(err)
-            except:
+            except (discord.Forbidden, commands.BadArgument):
                 try:
                     await message.add_reaction(r)
                 except discord.errors.HTTPException:

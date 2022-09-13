@@ -107,7 +107,7 @@ List of every option
 XP System
 ---------
 
-The xp system is a system for evaluating a person's activity on a server using a point system. Each message brings a certain number of points to its author, allowing him to gain in level and to rise in the ranking. To avoid having a too easy system, each level is a bit more difficult to reach than the previous one, and security measures have obviously been taken against spam or cheating.
+The xp system is a system for evaluating a person's activity on a server using a point system. Each message brings a certain number of points to its author, allowing them to gain in level and to rise in the ranking. To avoid having a too easy system, each level is a bit more difficult to reach than the previous one, and security measures have obviously been taken against spam or cheating.
 
 
 Configure your server
@@ -140,7 +140,7 @@ The main command to manage these roles is :code:`roles_rewards` (or its alias :c
 
 * :code:`roles_rewards remove <level>` : allows you to delete a role-reward at a certain level, to prevent the next people reaching that level from getting the role. People currently with this role will not lose it, unless you perform a reload via the following command.
 
-* :code:`roles_rewards reload` : reload all roles, to check that each member has the right roles. If a member has excess role-reward, they will be removed; similarly, if a member misses certain roles, they will be assigned to him.
+* :code:`roles_rewards reload` : reload all roles, to check that each member has the right roles. If a member has excess role-reward, they will be removed; similarly, if a member misses certain roles, they will be assigned to them.
 
 * :code:`roles_rewards list` : lists all currently configured roles-rewards, with their corresponding level, as well as the maximum number of roles allowed for your server. The bot must have "`Embed Links <perms.html#embed-links>`__" permission.
 

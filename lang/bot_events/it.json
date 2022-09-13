@@ -1,14 +1,12 @@
 {
-    "it": {
-        "nothing-desc": "Tällä hetkellä ei ole tapahtumia. Seuraa botin uutisia jotta tiedät milloin on seuraava tapahtuma!",
-        "events-price-title": "Palkintoja joita voi voittaa",
-        "nothing-prices": "Tällä tapahtumalla ei ole mitään mitä voisi hankkia 😕",
-        "objectives": "Menestymiset",
-        "points": "pisteet",
-        "rank-global": "Maailmalaajuinen taso",
-        "rank-title": "Tapahtuma pisteet",
-        "rank-total": "Yhteis pisteet",
-        "unclassed": "Sinulla ei ole pisteitä",
-        "xp-howto": "Voit voittaa tapahtuma pisteitä voittamalla risti-nolla pelejä, käyttämällä tapahtuma komentoja kun mahdollista tai tekemällä muita salaisia tehtäviä. Älä pelkää tulevasi tuki palvelimelleni jos haluat lisätietoja."
-    }
+    "events-price-title": "Palkintoja joita voi voittaa",
+    "nothing-desc": "Tällä hetkellä ei ole tapahtumia. Seuraa botin uutisia jotta tiedät milloin on seuraava tapahtuma!",
+    "nothing-prices": "Tällä tapahtumalla ei ole mitään mitä voisi hankkia 😕",
+    "objectives": "Menestymiset",
+    "points": "pisteet",
+    "rank-global": "Maailmalaajuinen taso",
+    "rank-title": "Tapahtuma pisteet",
+    "rank-total": "Yhteis pisteet",
+    "unclassed": "Sinulla ei ole pisteitä",
+    "xp-howto": "Voit voittaa tapahtuma pisteitä voittamalla risti-nolla pelejä, käyttämällä tapahtuma komentoja kun mahdollista tai tekemällä muita salaisia tehtäviä. Älä pelkää tulevasi tuki palvelimelleni jos haluat lisätietoja."
 }

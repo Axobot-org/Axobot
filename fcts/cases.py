@@ -6,7 +6,7 @@ from discord.ext import commands
 from libs.classes import MyContext, Zbot
 from libs.formatutils import FormatUtils
 
-from fcts import args
+from . import args
 from fcts.checks import is_support_staff
 
 importlib.reload(args)

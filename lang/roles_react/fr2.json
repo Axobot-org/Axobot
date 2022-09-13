@@ -1,21 +1,19 @@
 {
-    "fr2": {
-        "already-1-rr": "Tu as déjà un rôle désigné pour cet émoji",
-        "already-dont-have": "Tu n'as pas ce rôle !",
-        "already-have": "Tu as déjà ce rôle !",
-        "embed-edited": "L'embed et les réactions ont été mises à jour :loading:",
-        "no-rr": "Aucun rôle n'est lié à cet émoji",
-        "not-zbot-embed": "Ce message ne contient pas d'embed de roles-reactions",
-        "not-zbot-msg": "Ce message n'est pas celui de Zbot !",
-        "reactions-edited": "J'ai bien mis à jour les réactions 👌",
-        "role-given": "Le rôle %{r} a bien été donné",
-        "role-lost": "Le rôle %{r} a bien été retiré",
-        "role-not-in-list": "Ce rôle ne fait pas partie des rôles attribuables",
-        "rr-added": "Le rôle %{r} a bien été ajouté pour l'émoji %{e}",
-        "rr-embed": "S'attribuer un rôle",
-        "rr-list": "Liste des rôles réactions (%{n}/%{m})",
-        "rr-removed": "Le rôle %{r} ne peut plus être donné via l'émoji %{e}",
-        "rr-removed-2": "L'émoji %{e} est à nouveau prêt à donner un rôle",
-        "too-many-rr": "Tu as déjà atteint la limite de %{l} rôles ! Ça veut dire que tu peux plus en avoir d'autres..."
-    }
+    "already-1-rr": "Tu as déjà un rôle désigné pour cet émoji",
+    "already-dont-have": "Tu n'as pas ce rôle !",
+    "already-have": "Tu as déjà ce rôle !",
+    "embed-edited": "L'embed et les réactions ont été mises à jour :loading:",
+    "no-rr": "Aucun rôle n'est lié à cet émoji",
+    "not-zbot-embed": "Ce message ne contient pas d'embed de roles-reactions",
+    "not-zbot-msg": "Ce message n'est pas celui de Zbot !",
+    "reactions-edited": "J'ai bien mis à jour les réactions 👌",
+    "role-given": "Le rôle %{r} a bien été donné",
+    "role-lost": "Le rôle %{r} a bien été retiré",
+    "role-not-in-list": "Ce rôle ne fait pas partie des rôles attribuables",
+    "rr-added": "Le rôle %{r} a bien été ajouté pour l'émoji %{e}",
+    "rr-embed": "S'attribuer un rôle",
+    "rr-list": "Liste des rôles réactions (%{n}/%{m})",
+    "rr-removed": "Le rôle %{r} ne peut plus être donné via l'émoji %{e}",
+    "rr-removed-2": "L'émoji %{e} est à nouveau prêt à donner un rôle",
+    "too-many-rr": "Tu as déjà atteint la limite de %{l} rôles ! Ça veut dire que tu peux plus en avoir d'autres..."
 }

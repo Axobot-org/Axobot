@@ -11,7 +11,7 @@ from libs.classes import MyContext, ServerWarningType, Zbot
 from libs.formatutils import FormatUtils
 
 from fcts.args import serverlog
-from fcts import checks
+from . import checks
 
 DISCORD_INVITE = re.compile(r'(?:https?://)?(?:www[.\s])?((?:discord[.\s](?:gg|io|me|li(?:nk)?)|discordapp\.com/invite|discord\.com/invite|dsc\.gg)[/ ]{,3}[\w-]{1,25}(?!\w))')
 
@@ -461,7 +461,7 @@ class ServerLogs(commands.Cog):
                     break
         await self.validate_logs(after.guild, channel_ids, emb)
 
-    async def handle_member_verification(self, before: discord.Member, after: discord.Member, channel_ids: list[int]):
+    async def handle_member_verification(self, _before: discord.Member, after: discord.Member, channel_ids: list[int]):
         "Handle member_verification log"
         emb = discord.Embed(
             description=f"**{after.mention} ({after.id}) has been verified** through your server rules screen",
@@ -469,6 +469,16 @@ class ServerLogs(commands.Cog):
         )
         emb.set_author(name=str(after), icon_url=after.display_avatar)
         emb.add_field(name="Account created at", value=f"<t:{after.created_at.timestamp():.0f}>", inline=False)
+        if after.joined_at:
+            delta = await FormatUtils.time_delta(
+                after.joined_at,
+                self.bot.utcnow(),
+                await self.bot._(after.guild.id, "_used_locale")
+            )
+            emb.add_field(
+                name="Joined at",
+                value=f"<t:{after.joined_at.timestamp():.0f}> ({delta})",
+                inline=False)
         await self.validate_logs(after.guild, channel_ids, emb)
 
     async def get_member_specs(self, member: discord.Member) -> list[str]:
@@ -523,9 +533,14 @@ class ServerLogs(commands.Cog):
         emb.add_field(name="Account created at", value=f"<t:{payload.user.created_at.timestamp():.0f}>", inline=False)
         if isinstance(payload.user, discord.Member):
             if payload.user.joined_at:
+                delta = await FormatUtils.time_delta(
+                    payload.user.joined_at,
+                    self.bot.utcnow(),
+                    await self.bot._(payload.guild_id, "_used_locale")
+                )
                 emb.add_field(
                     name="Joined your server at",
-                    value=f"<t:{payload.user.joined_at.timestamp():.0f}> (<t:{payload.user.joined_at.timestamp():.0f}:R>)",
+                    value=f"<t:{payload.user.joined_at.timestamp():.0f}> ({delta})",
                     inline=False)
             if specs := await self.get_member_specs(payload.user):
                 emb.add_field(name="Specificities", value=", ".join(specs), inline=False)

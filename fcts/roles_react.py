@@ -1,11 +1,10 @@
-from typing import Any, Tuple, Union
+from typing import Any, Optional, Tuple, Union
 import discord
 import importlib
-import typing
 import re
 from discord.ext import commands
 from libs.classes import Zbot, MyContext
-from fcts import checks, args
+from . import checks, args
 importlib.reload(checks)
 importlib.reload(args)
 
@@ -122,7 +121,7 @@ class RolesReact(commands.Cog):
     @rr_main.command(name="add")
     @commands.check(checks.has_manage_guild)
     @commands.check(checks.database_connected)
-    async def rr_add(self, ctx, emoji: args.AnyEmoji, role: discord.Role, *, description: str = ''):
+    async def rr_add(self, ctx: MyContext, emoji: args.AnyEmoji, role: discord.Role, *, description: str = ''):
         """Add a role reaction
         This role will be given when a membre click on a specific reaction
         Your description can only be a maximum of 150 characters
@@ -187,13 +186,15 @@ class RolesReact(commands.Cog):
         emojis: list[Union[str, discord.Emoji]] = []
         for k in liste:
             if len(k['emoji']) > 15 and k['emoji'].isnumeric():
-                try:
-                    temp = await guild.fetch_emoji(int(k['emoji']))
-                except discord.errors.NotFound:
-                    emojis.append(k['emoji'])
-                else:
-                    emojis.append(temp)
-                    k['emoji'] = str(temp)
+                if not (temp := self.bot.get_emoji(int(k['emoji']))):
+                    # if we couldn't get the emoji from cache, try to load from the guild
+                    try:
+                        temp = await guild.fetch_emoji(int(k['emoji']))
+                    except discord.errors.NotFound:
+                        emojis.append(k['emoji'])
+                        continue
+                emojis.append(temp)
+                k['emoji'] = str(temp)
             else:
                 emojis.append(k['emoji'])
         result = [
@@ -275,7 +276,7 @@ Opposite is the subcommand 'join'
             return
         await self.give_remove_role(ctx.author, role, ctx.guild, ctx.channel, give=False)
 
-    async def give_remove_role(self, user: discord.Member, role: discord.Role, guild: discord.Guild, channel: typing.Union[discord.TextChannel, discord.Thread], give: bool = True, ignore_success: bool = False, ignore_failure: bool = False):
+    async def give_remove_role(self, user: discord.Member, role: discord.Role, guild: discord.Guild, channel: Union[discord.TextChannel, discord.Thread], give: bool = True, ignore_success: bool = False, ignore_failure: bool = False):
         """Add or remove a role to a user if possible"""
         if self.bot.zombie_mode:
             return
@@ -307,7 +308,7 @@ Opposite is the subcommand 'join'
 
     @rr_main.command(name='update')
     @commands.check(checks.database_connected)
-    async def rr_update(self, ctx: MyContext, embed: discord.Message, change_description: typing.Optional[bool] = True, emojis: commands.Greedy[args.AnyEmoji] = None):
+    async def rr_update(self, ctx: MyContext, embed: discord.Message, change_description: Optional[bool] = True, emojis: commands.Greedy[args.AnyEmoji] = None):
         """Update a Zbot message to refresh roles/reactions
         If you don't want to update the embed content, for example if it's a custom embed, then you can use 'False' as a second argument. Zbot will only check the reactions
         Specifying a list of emojis will update the embed only for those emojis, and ignore other roles reactions

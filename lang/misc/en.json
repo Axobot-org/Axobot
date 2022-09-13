@@ -1,59 +1,57 @@
 {
-    "en": {
-        "added_at": "Added on",
-        "beginning": "beginning",
-        "btn": {
-            "confirm": {
-                "label": "Confirm",
-                "answer": "Confirmed"
-            },
-            "cancel": {
-                "label": "Cancel",
-                "answer": "Cancelled"
-            },
-            "delete": {
-                "label": "Delete",
-                "answer": "Deleted!"
-            }
+    "activity": {
+        "listen": "listening to",
+        "nothing": "nothing",
+        "play": "playing",
+        "stream": "streaming",
+        "watch": "watching"
+    },
+    "added_at": "Added on",
+    "beginning": "beginning",
+    "bot": "bot",
+    "btn": {
+        "cancel": {
+            "answer": "Cancelled",
+            "label": "Cancel"
         },
-        "bot": "bot",
-        "case": "case",
-        "category": "category",
-        "click_here": "Click here",
-        "since": "since",
-        "dnd": "do not disturb",
-        "doc": "Documentation",
-        "duration": "duration",
-        "end": "end",
-        "example": "example",
-        "extreme": "extreme",
-        "ghost": "Ghost",
-        "high": "high",
-        "highest": "highest",
-        "idle": "idle",
-        "low": "low",
-        "medium": "medium",
-        "member": "member",
-        "membres": "members",
-        "name": "name",
-        "no": "no",
-        "none": "none",
-        "offline": "offline",
-        "online": "online",
-        "quit": "quit",
-        "yes": "yes",
-        "reason": "reason",
-        "request_by": "Requested by %{user}",
-        "server": "server",
-        "servers": "servers",
-        "unknown": "Unknown",
-        "version": "version",
-        "activity": {
-            "listen": "listening to",
-            "nothing": "nothing",
-            "play": "playing",
-            "stream": "streaming",
-            "watch": "watching"
+        "confirm": {
+            "answer": "Confirmed",
+            "label": "Confirm"
+        },
+        "delete": {
+            "answer": "Deleted!",
+            "label": "Delete"
         }
-    }
+    },
+    "case": "case",
+    "category": "category",
+    "click_here": "Click here",
+    "dnd": "do not disturb",
+    "doc": "Documentation",
+    "duration": "duration",
+    "end": "end",
+    "example": "example",
+    "extreme": "extreme",
+    "ghost": "Ghost",
+    "high": "high",
+    "highest": "highest",
+    "idle": "idle",
+    "low": "low",
+    "medium": "medium",
+    "member": "member",
+    "membres": "members",
+    "name": "name",
+    "no": "no",
+    "none": "none",
+    "offline": "offline",
+    "online": "online",
+    "quit": "quit",
+    "reason": "reason",
+    "request_by": "Requested by %{user}",
+    "server": "server",
+    "servers": "servers",
+    "since": "since",
+    "unknown": "Unknown",
+    "version": "version",
+    "yes": "yes"
 }

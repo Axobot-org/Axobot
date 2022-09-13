@@ -13,7 +13,7 @@ from libs.classes import MyContext, Zbot
 from libs.formatutils import FormatUtils
 from libs.paginator import Paginator
 
-from fcts import args, checks
+from . import args, checks
 from fcts.cases import Case
 
 importlib.reload(checks)
@@ -26,6 +26,8 @@ class Moderation(commands.Cog):
     def __init__(self, bot: Zbot):
         self.bot = bot
         self.file = "moderation"
+        # maximum of roles granted/revoked by query
+        self.max_roles_modifications = 300
 
     @commands.command(name="slowmode")
     @commands.guild_only()
@@ -220,7 +222,7 @@ Slowmode works up to one message every 6h (21600s)
                     await self.bot.get_cog('Errors').on_error(e, ctx)
             try:
                 await ctx.message.delete()
-            except:
+            except discord.Forbidden:
                 pass
             # optional values
             opt_case = None if caseID=="'Unsaved'" else caseID
@@ -598,7 +600,7 @@ The 'days_to_delete' option represents the number of days worth of messages to d
                     await self.bot.get_cog('Errors').on_error(err,ctx)
             try:
                 await ctx.message.delete()
-            except:
+            except discord.Forbidden:
                 pass
             # optional values
             opt_case = None if case_id=="'Unsaved'" else case_id
@@ -635,7 +637,7 @@ The 'days_to_delete' option represents the number of days worth of messages to d
             backup = user
             try:
                 user: discord.User = await commands.UserConverter().convert(ctx,user)
-            except commands.ConversionError:
+            except commands.BadArgument:
                 if user.isnumeric():
                     try:
                         user: discord.User = await self.bot.fetch_user(int(user))
@@ -667,7 +669,7 @@ The 'days_to_delete' option represents the number of days worth of messages to d
                     await self.bot.get_cog('Errors').on_error(e,ctx)
             try:
                 await ctx.message.delete()
-            except:
+            except discord.Forbidden:
                 pass
             # optional values
             opt_case = None if case_id=="'Unsaved'" else case_id
@@ -724,7 +726,7 @@ Permissions for using this command are the same as for the kick
                     await self.bot.get_cog('Errors').on_error(e,ctx)
             try:
                 await ctx.message.delete()
-            except:
+            except discord.Forbidden:
                 pass
             # optional values
             opt_case = None if caseID=="'Unsaved'" else caseID
@@ -1001,7 +1003,7 @@ The 'reasons' parameter is used to display the mute reasons.
             await message.clear_reactions()
         try:
             await ctx.message.delete()
-        except:
+        except discord.Forbidden:
             pass
 
     @emoji_group.command(name="info")
@@ -1157,7 +1159,7 @@ The 'reasons' parameter is used to display the mute reasons.
         new_ctx = await self.bot.get_context(msg)
         await self.bot.invoke(new_ctx)
 
-    @main_role.command(name="give", aliases=["add"])
+    @main_role.command(name="give", aliases=["add", "grant"])
     @commands.check(checks.has_manage_roles)
     @commands.cooldown(1, 30, commands.BucketType.guild)
     async def roles_give(self, ctx:MyContext, role:discord.Role, users:commands.Greedy[Union[discord.Role,discord.Member,Literal['everyone']]]):
@@ -1193,17 +1195,19 @@ The 'reasons' parameter is used to display the mute reasons.
             await ctx.send(await self.bot._(ctx.guild.id, "moderation.role.give-pending", n=len(n_users)))
         count = 0
         for user in n_users:
-            if count > 300:
+            if count >= self.max_roles_modifications:
                 break
             await user.add_roles(role, reason="Asked by {}".format(ctx.author))
             count += 1
         answer = await self.bot._(ctx.guild.id, "moderation.role.give-success", count=count, m=len(n_users))
+        if count == self.max_roles_modifications and len(n_users) > count:
+            answer += f'\n⚠️ *{await self.bot._(ctx.guild.id, "moderation.role.limit-hit", limit=self.max_roles_modifications)}*'
         if len(n_users) > 50:
             await ctx.reply(answer)
         else:
             await ctx.send(answer)
 
-    @main_role.command(name="remove")
+    @main_role.command(name="remove", aliases=["revoke"])
     @commands.check(checks.has_manage_roles)
     @commands.cooldown(1, 30, commands.BucketType.guild)
     async def roles_remove(self, ctx:MyContext, role:discord.Role, users:commands.Greedy[Union[discord.Role,discord.Member,Literal['everyone']]]):
@@ -1237,11 +1241,13 @@ The 'reasons' parameter is used to display the mute reasons.
             await ctx.send(await self.bot._(ctx.guild.id, "moderation.role.remove-pending", n=len(n_users)))
         count = 0
         for user in n_users:
-            if count > 200:
+            if count >= self.max_roles_modifications:
                 break
             await user.remove_roles(role,reason="Asked by {}".format(ctx.author))
             count += 1
         answer = await self.bot._(ctx.guild.id, "moderation.role.remove-success",count=count,m=len(n_users))
+        if count == self.max_roles_modifications and len(n_users) > count:
+            answer += f'\n⚠️ *{await self.bot._(ctx.guild.id, "moderation.role.limit-hit", limit=self.max_roles_modifications)}*'
         if len(n_users) > 50:
             await ctx.reply(answer)
         else:
@@ -1284,7 +1290,7 @@ ID corresponds to the Identifier of the message
         if not ctx.channel.permissions_for(ctx.guild.me).manage_nicknames:
             return await ctx.send(await self.bot._(ctx.guild.id,"moderation.missing-manage-nick"))
         if chars is None:
-            def check(username):
+            def check(username: str):
                 while username < '0':
                     username = username[1:]
                     if len(username) == 0:
@@ -1299,11 +1305,11 @@ ID corresponds to the Identifier of the message
         for member in ctx.guild.members:
             try:
                 new = check(member.display_name)
-                if new!=member.display_name:
+                if new != member.display_name:
                     if not self.bot.beta:
                         await member.edit(nick=new)
                     count += 1
-            except:
+            except discord.Forbidden:
                 pass
         await ctx.send(await self.bot._(ctx.guild.id,"moderation.unhoisted",count=count))
 
@@ -1390,7 +1396,7 @@ ID corresponds to the Identifier of the message
         async def del_msg(msg:discord.Message):
             try:
                 await msg.delete()
-            except:
+            except discord.Forbidden:
                 pass
         def check(m):
             return m.author == ctx.author and m.channel == ctx.channel
