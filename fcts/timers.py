@@ -7,7 +7,7 @@ from discord.ext import commands
 from libs.classes import ConfirmView, MyContext, Zbot
 from libs.formatutils import FormatUtils
 
-from fcts import args, checks
+from . import args, checks
 
 class ReminderSelectView(discord.ui.View):
     "Used to ask to select a reminder to delete"
@@ -216,6 +216,7 @@ class Timers(commands.Cog):
                 selection = list(map(int, view.reminders))
             except ValueError:
                 selection = []
+                self.bot.dispatch("error", ValueError(f"Invalid reminder IDs: {view.reminders}"), ctx)
         if len(selection) == 0:
             await ctx.send(await self.bot._(ctx.guild, "rss.fail-add"))
             return

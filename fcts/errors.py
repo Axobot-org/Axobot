@@ -8,9 +8,9 @@ import discord
 from discord.ext import commands
 from libs.classes import MyContext, Zbot
 
-from fcts import checks
+from . import checks
 
-AllowedCtx = typing.Union[MyContext, discord.Message, str]
+AllowedCtx = typing.Union[MyContext, discord.Message, discord.Interaction, str]
 
 class Errors(commands.Cog):
     """General cog for error management."""
@@ -157,10 +157,14 @@ class Errors(commands.Cog):
             r = re.search(r'Invalid card style: (\S+)',raw_error)
             if r is not None:
                 return await ctx.send(await self.bot._(ctx.channel,'errors.invalidcardstyle', s=r.group(1)), allowed_mentions=ALLOWED)
-             # Invalid server log type
+            # Invalid server log type
             r = re.search(r'Invalid server log type',raw_error)
             if r is not None:
                 return await ctx.send(await self.bot._(ctx.channel,'errors.invalidserverlog'), allowed_mentions=ALLOWED)
+            # Invalid Discord ID
+            r = re.search(r'Invalid snowflake',raw_error)
+            if r is not None:
+                return await ctx.send(await self.bot._(ctx.channel,'errors.invalidsnowflake'), allowed_mentions=ALLOWED)
             self.bot.log.warning('Unknown error type -',error)
         elif isinstance(error,commands.errors.MissingRequiredArgument):
             await ctx.send(await self.bot._(ctx.channel,'errors.missingargument',a=error.param.name,e=random.choice([':eyes:','',':confused:',':thinking:',''])))
@@ -193,7 +197,7 @@ class Errors(commands.Cog):
         else:
             guild = f"DM with {interaction.user}"
         if interaction.type == discord.InteractionType.application_command:
-            await self.on_error(error, f"Slash command `{interaction.command.name}` | {guild}")
+            await self.on_error(error, interaction)
         elif interaction.type == discord.InteractionType.ping:
             await self.on_error(error, f"Ping interaction | {guild}")
         elif interaction.type == discord.InteractionType.modal_submit:
@@ -213,6 +217,10 @@ class Errors(commands.Cog):
         else:
             exc_info = sys.exc_info()
         try:
+            # if this is only an interaction too slow, don't report in bug channel
+            if isinstance(error, discord.NotFound) and error.text == "Unknown interaction":
+                self.bot.log.warning(f"[on_error] {error}", exc_info=exc_info)
+                return
             # get traceback info
             if isinstance(ctx, discord.Message):
                 ctx = await self.bot.get_context(ctx)
@@ -227,11 +235,13 @@ class Errors(commands.Cog):
             elif ctx.guild is None:
                 recipient = await self.bot.get_recipient(ctx.channel)
                 context = f"DM | {recipient}"
+            elif isinstance(ctx, discord.Interaction):
+                context = f"Slash command `{ctx.command.name if ctx.command else None}` | {ctx.guild.name} | {ctx.channel.name}"
             else:
                 context = f"{ctx.guild.name} | {ctx.channel.name}"
             # if channel is the private beta channel, send it there
-            if isinstance(ctx, MyContext) and ctx.channel.id == 625319425465384960:
-                await ctx.send(context + "\n" + msg)
+            if isinstance(ctx, (MyContext, discord.Interaction)) and ctx.channel.id == 625319425465384960:
+                await ctx.channel.send(context + "\n" + msg)
             else:
                 await self.senf_err_msg(context + "\n" + msg)
             self.bot.log.warning(f"[on_error] {error}", exc_info=exc_info)

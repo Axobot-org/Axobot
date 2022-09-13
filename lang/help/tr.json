@@ -1,106 +1,104 @@
 {
-    "tr": {
-        "aliases": "Takma isimler",
-        "categories": {
-            "data": "bilgi",
-            "fun": "eğlence",
-            "moderation": "Moderasyon",
-            "other": "diğerleri",
-            "server-settings": "sunucu ayarları",
-            "staff": "bot yetkilileri",
-            "translators": "çeviri takımı",
-            "unclassed": "Sınıflandırılmamış",
-            "users-info": "Kullanıcılar bilgisi"
-        },
-        "check-desc": {
-            "bot_has_permissions": [
-                "Bot eksik yetkilere sahip",
-                "Bot eksik yetkilere sahip değil"
-            ],
-            "can_ban": [
-                "Rollerinizden birisi (`ban_allowed_roles`) komutunu kullanmak için yetkilendirildi",
-                "eksik izinlendirilmiş rol (`ban_allowed_roles`)"
-            ],
-            "can_clear": [
-                "Rollerinizden birisi (`clear_allowed_roles`) komutunu kullanmak için yetkilendirildi",
-                "eksik izinlendirilmiş rol (`clear_allowed_roles`)"
-            ],
-            "can_edit_case": [
-                "Rollerinizden birisi (`warn_allowed_roles`) komutunu kullanmak için yetkilendirildi",
-                "eksik izinlendirilmiş rol (`warn_allowed_roles`)"
-            ],
-            "can_kick": [
-                "Rollerinizden birisi (`kick_allowed_roles`) komutunu kullanmak için yetkilendirildi",
-                "eksik izinlendirilmiş rol (`kick_allowed_roles`)"
-            ],
-            "can_mute": [
-                "Rollerinizden birisi (`mute_allowed_roles`) komutunu kullanmak için yetkilendirildi",
-                "eksik izinlendirilmiş rol (`mute_allowed_roles`)"
-            ],
-            "can_say": [
-                "Rollerinizden birisi (`say_allowed_roles`) komutunu kullanmak için yetkilendirildi",
-                "eksik izinlendirilmiş rol (`say_allowed_roles`)"
-            ],
-            "can_slowmode": [
-                "Rollerinizden birisi (`slowmode_allowed_roles`) komutunu kullanmak için yetkilendirildi",
-                "eksik izinlendirilmiş rol (`slowmode_allowed_roles`)"
-            ],
-            "can_use_cookie": [
-                "Aragorn1202 tarafından seçilmiş birisin",
-                "Bu komut beyaz listeyi kullanır"
-            ],
-            "can_warn": [
-                "Rollerinizden birisi (`warn_allowed_roles`) komutunu kullanmak için yetkilendirildi",
-                "Eksik izinlendirilmiş rol  (`warn_allowed_roles`)"
-            ],
-            "is_bot_admin": [
-                "Bot adminlerinden biri olmak gerek",
-                "Bot admini değilsin"
-            ],
-            "database_connected": [
-                "Veritabanı çevrimiçi",
-                "Veritabanı çevrimdışı"
-            ],
-            "guild_only": [
-                "Sadece bir sunucuda kullanılabilir",
-                "Sadece bir sunucuda kullanılabilir"
-            ],
-            "has_permissions": [
-                "Eksik Discord yetkilerine sahipsin",
-                "Gerekli Discord izinleriniz yok"
-            ],
-            "is_fun_enabled": [
-                "Eğlence komutları aktif",
-                "Eğlence komutları aktif edilmek zorunda"
-            ],
-            "is_owner": [
-                "Botun sahibi olmak zorundasın",
-                "Botun sahibi değilsin"
-            ],
-            "is_support_staff": [
-                "Botun yetkililerinden birisin",
-                "Botun yetkililerinden biri olmalısın"
-            ],
-            "is_translator": [
-                "Çeviri takımından birisin.",
-                "Çeviri takımının bir parçası olman gerekiyor"
-            ],
-            "verify_role_exists": [
-                "Doğrulama rolü ayarlandı",
-                "Hiçbir doğrulama rolü eklenmedi"
-            ]
-        },
-        "checks": "Gerekliler:",
-        "cmd-not-found": "\"%{cmd}\" isimli bir komut yok",
-        "description": "Açıklama",
-        "embed_title": "%{u} için aktif komutlar",
-        "footer": "Bir komut üzerinde daha fazla bilgi almak için {}help yazın",
-        "no-desc-cmd": "Bu komut için bir açıklama yok",
-        "no-desc-cog": "Bu cog. için bir açıklama yok",
-        "no-subcmd": "`%{cmd}` komutunun alt komutu yok",
-        "not-enabled": "⚠️ Bu komut engelli",
-        "subcmd-not-found": "Bu komutun \"%{name}\" adında bir alt komutu yok",
-        "subcmds": "Alt komutlar:",
-        "warning": "Uyarılar"
-    }
+    "aliases": "Takma isimler",
+    "categories": {
+        "data": "bilgi",
+        "fun": "eğlence",
+        "moderation": "Moderasyon",
+        "other": "diğerleri",
+        "server-settings": "sunucu ayarları",
+        "staff": "bot yetkilileri",
+        "translators": "çeviri takımı",
+        "unclassed": "Sınıflandırılmamış",
+        "users-info": "Kullanıcılar bilgisi"
+    },
+    "check-desc": {
+        "bot_has_permissions": [
+            "Bot eksik yetkilere sahip",
+            "Bot eksik yetkilere sahip değil"
+        ],
+        "can_ban": [
+            "Rollerinizden birisi (`ban_allowed_roles`) komutunu kullanmak için yetkilendirildi",
+            "eksik izinlendirilmiş rol (`ban_allowed_roles`)"
+        ],
+        "can_clear": [
+            "Rollerinizden birisi (`clear_allowed_roles`) komutunu kullanmak için yetkilendirildi",
+            "eksik izinlendirilmiş rol (`clear_allowed_roles`)"
+        ],
+        "can_edit_case": [
+            "Rollerinizden birisi (`warn_allowed_roles`) komutunu kullanmak için yetkilendirildi",
+            "eksik izinlendirilmiş rol (`warn_allowed_roles`)"
+        ],
+        "can_kick": [
+            "Rollerinizden birisi (`kick_allowed_roles`) komutunu kullanmak için yetkilendirildi",
+            "eksik izinlendirilmiş rol (`kick_allowed_roles`)"
+        ],
+        "can_mute": [
+            "Rollerinizden birisi (`mute_allowed_roles`) komutunu kullanmak için yetkilendirildi",
+            "eksik izinlendirilmiş rol (`mute_allowed_roles`)"
+        ],
+        "can_say": [
+            "Rollerinizden birisi (`say_allowed_roles`) komutunu kullanmak için yetkilendirildi",
+            "eksik izinlendirilmiş rol (`say_allowed_roles`)"
+        ],
+        "can_slowmode": [
+            "Rollerinizden birisi (`slowmode_allowed_roles`) komutunu kullanmak için yetkilendirildi",
+            "eksik izinlendirilmiş rol (`slowmode_allowed_roles`)"
+        ],
+        "can_use_cookie": [
+            "Aragorn1202 tarafından seçilmiş birisin",
+            "Bu komut beyaz listeyi kullanır"
+        ],
+        "can_warn": [
+            "Rollerinizden birisi (`warn_allowed_roles`) komutunu kullanmak için yetkilendirildi",
+            "Eksik izinlendirilmiş rol  (`warn_allowed_roles`)"
+        ],
+        "database_connected": [
+            "Veritabanı çevrimiçi",
+            "Veritabanı çevrimdışı"
+        ],
+        "guild_only": [
+            "Sadece bir sunucuda kullanılabilir",
+            "Sadece bir sunucuda kullanılabilir"
+        ],
+        "has_permissions": [
+            "Eksik Discord yetkilerine sahipsin",
+            "Gerekli Discord izinleriniz yok"
+        ],
+        "is_bot_admin": [
+            "Bot adminlerinden biri olmak gerek",
+            "Bot admini değilsin"
+        ],
+        "is_fun_enabled": [
+            "Eğlence komutları aktif",
+            "Eğlence komutları aktif edilmek zorunda"
+        ],
+        "is_owner": [
+            "Botun sahibi olmak zorundasın",
+            "Botun sahibi değilsin"
+        ],
+        "is_support_staff": [
+            "Botun yetkililerinden birisin",
+            "Botun yetkililerinden biri olmalısın"
+        ],
+        "is_translator": [
+            "Çeviri takımından birisin.",
+            "Çeviri takımının bir parçası olman gerekiyor"
+        ],
+        "verify_role_exists": [
+            "Doğrulama rolü ayarlandı",
+            "Hiçbir doğrulama rolü eklenmedi"
+        ]
+    },
+    "checks": "Gerekliler:",
+    "cmd-not-found": "\"%{cmd}\" isimli bir komut yok",
+    "description": "Açıklama",
+    "embed_title": "%{u} için aktif komutlar",
+    "footer": "Bir komut üzerinde daha fazla bilgi almak için {}help yazın",
+    "no-desc-cmd": "Bu komut için bir açıklama yok",
+    "no-desc-cog": "Bu cog. için bir açıklama yok",
+    "no-subcmd": "`%{cmd}` komutunun alt komutu yok",
+    "not-enabled": "⚠️ Bu komut engelli",
+    "subcmd-not-found": "Bu komutun \"%{name}\" adında bir alt komutu yok",
+    "subcmds": "Alt komutlar:",
+    "warning": "Uyarılar"
 }

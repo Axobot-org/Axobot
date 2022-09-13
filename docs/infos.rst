@@ -33,7 +33,7 @@ Allows you to know the list of all the orders currently available for you. The l
 
 You can specify a command (or subcommand) to get more details about it, or a cog (a code module) to see the list of commands related to that cog.
 
-.. note:: For a better visual overview, it is recommended to give the permission "`Embed Links <perms.html#embed-links>`_" to the bot. In addition, you can configure the bot to `send the message as a private message <server.html#list-of-every-option>`_.
+.. note:: For a better visual overview, it is recommended to give the permission "`Embed Links <perms.html#embed-links>`__" to the bot. In addition, you can configure the bot to `send the message as a private message <server.html#list-of-every-option>`_.
 
 ----
 Info
@@ -57,7 +57,7 @@ Membercount
 
 With this command, you can get the number of members on your server, but also the number of bots, of humans, people connected, and probably other numbers that will be added later. This is a small basic command without much functionality, but it allows you to quickly keep up with these statistics. 
 
-.. note:: Good news! The bot does not need any specific permissions for this command! Just keep in mind that the rendering is much prettier with "`Embed Links <perms.html#embed-links>`_" permission enabled.
+.. note:: Good news! The bot does not need any specific permissions for this command! Just keep in mind that the rendering is much prettier with "`Embed Links <perms.html#embed-links>`__" permission enabled.
 
 -----------
 Permissions
@@ -69,7 +69,7 @@ This small command allows you to see the list of permissions assigned to a membe
 
 As permissions are internally stored by Discord as integers or bit flags, you can also choose to view the permissions associated to a raw integer/binary value (in which case channel will be ignored). For example :code:`perms 0b01110` or :code:`perms 8` are valid syntaxes.
 
-.. warning:: The only permission needed to grant the bot is "`Embed Links <perms.html#embed-links>`_".
+.. warning:: The only permission needed to grant the bot is "`Embed Links <perms.html#embed-links>`__".
 
 ----
 Ping
@@ -98,9 +98,13 @@ Note that this result may differ from the :code:`config see prefix` command when
 Statistics
 ----------
 
-**Syntax:** :code:`stats`
+**Syntax:** :code:`stats` or :code:`stats general`
 
 An easy command to get some stats about the bot. Total XP collected by every user, number of servers using the bot, number of code lines, Python version used, and some other more or less useful facts.
+
+**Syntax:** :code:`stats commands`
+
+A list of the most used bot commands, sorted in descending order, both over the last 24 hours and since the beginning of the statistics recording!
 
 -----------------
 Usernames history

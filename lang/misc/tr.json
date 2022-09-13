@@ -1,11 +1,9 @@
 {
-    "tr": {
-        "activity": {
-            "listen": "dinliyor",
-            "nothing": "hiçbir şey",
-            "play": "oynuyor",
-            "stream": "yayınlıyor",
-            "watch": "izliyor"
-        }
+    "activity": {
+        "listen": "dinliyor",
+        "nothing": "hiçbir şey",
+        "play": "oynuyor",
+        "stream": "yayınlıyor",
+        "watch": "izliyor"
     }
 }

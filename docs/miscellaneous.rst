@@ -59,7 +59,7 @@ Embed
 
 This command is particularly useful if the 'say' command is no longer enough for you, if you want something even bigger, with colors, images and everything that goes with it. You can send embeds (these pretty rectangles with colored bars), by customizing the title, content, image, title url, color and footer text!
 
-Each argument is presented in the form :code:`name="value"`. If you want a line break, you can use the character :code:`\n`, and if you want to use quotation marks without closing the argument, you will have to escape them (with a \ in front). To better understand how it works, here is an example of how to use it: :code:`embed title="Here is my title!" content="Blah blah \nBlah ?" footer="Do you mean \"Text\"? "`
+Each argument is presented in the form :code:`name="value"`. If you want a line break, you can use the character :code:`\\n`, and if you want to use quotation marks without closing the argument, you will have to escape them (with a \ in front). To better understand how it works, here is an example of how to use it: :code:`embed title="Here is my title!" content="Blah blah \\nBlah ?" footer="Do you mean \\"Text\\"? "`
 
 .. warning:: Hey, this may sound weird, but Zbot needs "`Embed Links <perms.html#embed-links>`__" permission to send embeds...
 

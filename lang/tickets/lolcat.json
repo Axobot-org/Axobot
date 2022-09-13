@@ -1,63 +1,61 @@
 {
-    "lolcat": {
-        "category-edited": {
-            "default-category": "Newle tiketz wil be creetd as new channelz undr teh categowee %{category}!",
-            "default-channel": "Newle tiketz wil be creetd az new threedz in teh channel %{channel}!",
-            "category-permission-warning": "It lookz liek I dont haz teh permisionz to creete new channelz undr that category. Pls fix the situashun by grantin me the **Manage Channelz' permision** or I wont b able 2 add new tiketz at all.",
-            "channel-privacy-warning": "It lookz liek I cannot creete privee threedz in thiz channel. Make sure u haz **unlocked** them and I haz teh **requird permission**?? Otherwise I will creete tiketz az public threedz and anyone may b able 2 read them."
+    "cancelled": "Teh operation haz bin canceld",
+    "category-edited": {
+        "category-permission-warning": "It lookz liek I dont haz teh permisionz to creete new channelz undr that category. Pls fix the situashun by grantin me the **Manage Channelz' permision** or I wont b able 2 add new tiketz at all.",
+        "channel-privacy-warning": "It lookz liek I cannot creete privee threedz in thiz channel. Make sure u haz **unlocked** them and I haz teh **requird permission**?? Otherwise I will creete tiketz az public threedz and anyone may b able 2 read them.",
+        "default-category": "Newle tiketz wil be creetd as new channelz undr teh categowee %{category}!",
+        "default-channel": "Newle tiketz wil be creetd az new threedz in teh channel %{channel}!"
+    },
+    "choose-topic-edition": "Chooz which topik 2 edit",
+    "default-topic-prompt": "Select a ticketz categowee",
+    "emote-edited": "Teh emote 4 teh topik \"%{topic}\" haz bean edited!",
+    "format": {
+        "edited": {
+            "default": "Oki doki, the default channel name format has been editd!",
+            "topic": "Oki doki, the channel name format 4 topic \"%{topic}\" has been edited!"
         },
-        "cancelled": "Teh operation haz bin canceld",
-        "choose-topic-edition": "Chooz which topik 2 edit",
-        "default-topic-prompt": "Select a ticketz categowee",
-        "emote-edited": "Teh emote 4 teh topik \"%{topic}\" haz bean edited!",
-        "format": {
-            "too-long": "Uh no, u cant use more than %{max} letterz",
-            "edited": {
-                "default": "Oki doki, the default channel name format has been editd!",
-                "topic": "Oki doki, the channel name format 4 topic \"%{topic}\" has been edited!"
-            }
-        },
-        "hint-edited": {
-            "default": "Teh deefault hint haz correctly been editd!",
-            "topic": "Teh hint fr teh topik \"%{topic}\" haz correctlwy been edited!"
-        },
-        "hint-useful": "I donut need it anymoar",
-        "hint-useless": "Creet a ticket",
-        "missing-category-config": "Oops, I couldnt creete ur ticket cause no 1 told me wheere to creete them. Pleez ask servr moderator to use the `ticketz portal set-category` cmd.",
-        "missing-perms-creation": {
-            "channel": "Ouch, I couldnt creete a new ticket channel. Pliz make sure I haz teh requiwed permissions nd try again.",
-            "thread": "Woops, I couldnt creete a new ticket threed. Pleez make sure I haz teh requird permissionz and try harder."
-        },
-        "missing-perms-setup": {
-            "to-staff": "Woops, i couldnt setup teh channel perms for ur ticket. Plz check I have the 'Manage roles' perm in the category %{category}, or I wont prevent other bad guys from seeing teh tickets.",
-            "to-member": "Oopsie, I couldnt setup ur ticket channel. Pls ask a server moderator 2 fix my perms, or any1 havin access to teh tickets thing may be able 2 read ur ticket and that might be uncool u know?"
-        },
-        "nothing-to-edit": "Nothin to edit!!",
-        "other": "Smth else",
-        "role-edited": {
-            "default": "Yup okay, ur default role allowd to see tickets have been changd!",
-            "topic": "Roger that, role authorized 2 see tickets ov topic \"%{topic}\" have been changd!"
-        },
-        "selection-placeholder": "Pick ur topic",
-        "text-edited": "Ye okay i'll use ur weird text, if u insist :coolcat:",
-        "ticket-created": "I created u ur ticket in %{channel}. Btw \"%{topic}\" is a wzird reason imo",
-        "ticket-introduction": {
-            "title": "Mew ticket created!",
-            "description": "Ok so!\n%{user} wantd to create a ticket 'bout '%{ticket_name}' apparently. In da category **'%{topic_name}'**. Dont ask me y\n."
-        },
-        "title-modal": {
-            "title": "Ur ticket or smth idk im not professionnal",
-            "label": "Ur theme",
-            "placeholder": "Type here whataver u want i won't mind"
-        },
-        "too-quick": "U are opening tickets wayyy 2 quick! Keep kalm, wait a few minuts and stop drinkin 2 much coffee mister",
-        "topic": {
-            "cant-create": "woopsie, I couldnt create dis topic (haha, got it?). Make sure u do not already have a topic with dis name, and disturb my support if needed (or not eh, wont blame u)",
-            "created": "Dat topic right here, uh, how did u namd it? \"%{name}\"! So uh, i hav successfully created it, no wowwies",
-            "deleted": "Dat topic \"%{name}\" has been voided :thanoscat:",
-            "list": "Ur serv topics:",
-            "other-already-exists": "A \"other\" topic is already proposed by default by Zbot, no need to add another :proud:",
-            "too-long": "Uh-uh, no more than 100 chars for ur topic name kthx"
-        }
+        "too-long": "Uh no, u cant use more than %{max} letterz"
+    },
+    "hint-edited": {
+        "default": "Teh deefault hint haz correctly been editd!",
+        "topic": "Teh hint fr teh topik \"%{topic}\" haz correctlwy been edited!"
+    },
+    "hint-useful": "I donut need it anymoar",
+    "hint-useless": "Creet a ticket",
+    "missing-category-config": "Oops, I couldnt creete ur ticket cause no 1 told me wheere to creete them. Pleez ask servr moderator to use the `ticketz portal set-category` cmd.",
+    "missing-perms-creation": {
+        "channel": "Ouch, I couldnt creete a new ticket channel. Pliz make sure I haz teh requiwed permissions nd try again.",
+        "thread": "Woops, I couldnt creete a new ticket threed. Pleez make sure I haz teh requird permissionz and try harder."
+    },
+    "missing-perms-setup": {
+        "to-member": "Oopsie, I couldnt setup ur ticket channel. Pls ask a server moderator 2 fix my perms, or any1 havin access to teh tickets thing may be able 2 read ur ticket and that might be uncool u know?",
+        "to-staff": "Woops, i couldnt setup teh channel perms for ur ticket. Plz check I have the 'Manage roles' perm in the category %{category}, or I wont prevent other bad guys from seeing teh tickets."
+    },
+    "nothing-to-edit": "Nothin to edit!!",
+    "other": "Smth else",
+    "role-edited": {
+        "default": "Yup okay, ur default role allowd to see tickets have been changd!",
+        "topic": "Roger that, role authorized 2 see tickets ov topic \"%{topic}\" have been changd!"
+    },
+    "selection-placeholder": "Pick ur topic",
+    "text-edited": "Ye okay i'll use ur weird text, if u insist :coolcat:",
+    "ticket-created": "I created u ur ticket in %{channel}. Btw \"%{topic}\" is a wzird reason imo",
+    "ticket-introduction": {
+        "description": "Ok so!\n%{user} wantd to create a ticket 'bout '%{ticket_name}' apparently. In da category **'%{topic_name}'**. Dont ask me y\n.",
+        "title": "Mew ticket created!"
+    },
+    "title-modal": {
+        "label": "Ur theme",
+        "placeholder": "Type here whataver u want i won't mind",
+        "title": "Ur ticket or smth idk im not professionnal"
+    },
+    "too-quick": "U are opening tickets wayyy 2 quick! Keep kalm, wait a few minuts and stop drinkin 2 much coffee mister",
+    "topic": {
+        "cant-create": "woopsie, I couldnt create dis topic (haha, got it?). Make sure u do not already have a topic with dis name, and disturb my support if needed (or not eh, wont blame u)",
+        "created": "Dat topic right here, uh, how did u namd it? \"%{name}\"! So uh, i hav successfully created it, no wowwies",
+        "deleted": "Dat topic \"%{name}\" has been voided :thanoscat:",
+        "list": "Ur serv topics:",
+        "other-already-exists": "A \"other\" topic is already proposed by default by Zbot, no need to add another :proud:",
+        "too-long": "Uh-uh, no more than 100 chars for ur topic name kthx"
     }
 }

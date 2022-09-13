@@ -1,13 +1,23 @@
 {
-    "lolcat": {
-        "categories": {
-            "automod": "Automod thing"
-        },
-        "embed-warning": "2 send logs, I need dat shiny \"embed links\" perm!",
-        "list": {
-            "all": "List ov available logs",
-            "channel": "List ov logs in %{channel}"
-        },
-        "none-added": "Dis channel is already using all these logs <:angry_eyes:691934246872547359>"
-    }
+    "categories": {
+        "automod": "Automod thing",
+        "bot": "BOt",
+        "members": "Memberz",
+        "messages": "Msgs",
+        "moderation": "Moderashun",
+        "roles": "Roles",
+        "tickets": "Tickets"
+    },
+    "disabled": "Logs ov %{kind} wont be sent 2 dis channel anymore",
+    "embed-warning": "2 send logs, I need dat shiny \"embed links\" perm!",
+    "enabled": "Logs of %{kind} will be sent 2 dis channel, yay",
+    "list": {
+        "all": "List ov available logs",
+        "channel": "List ov logs in %{channel}",
+        "emojis": "%{enabled} are 4 modlogs enabled in ur serv\n%{disabled} are for other things",
+        "guild": "List ov logs here",
+        "none": "No log used here, try `%{cmd}` maybe :)"
+    },
+    "none-added": "Dis channel is already using all these logs <:angry_eyes:691934246872547359>",
+    "none-removed": "Dis channel is already using none ov these logs <:angry_eyes:691934246872547359>"
 }

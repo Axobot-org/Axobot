@@ -1,160 +1,166 @@
 {
-    "lolcat": {
-        "aliases": "Otherz names",
-        "categories": {
-            "data": "usefull things",
-            "fun": "cool things",
-            "moderation": "acute things",
-            "other": "idk, dont ask me plz",
-            "server-settings": "other usefl tihngs",
-            "staff": "bot things",
-            "translators": "langage things",
-            "unclassed": "random things :shrug:",
-            "users-info": "things 'bout cats/people"
-        },
-        "check-desc": {
-            "bot_can_embed": [
-                "Me has the perm to send cool msg",
-                "You must allow me 2 send nicer msg (embeds)"
-            ],
-            "bot_has_permissions": [
-                "The bot have enough perms",
-                "The bot donot've sufficient perms"
-            ],
-            "can_ban": [
-                "One of your roles iz allowd 2 use this command (`ban_allowed_roles`)",
-                "U missed allowed role (`ban_allowed_roles`)"
-            ],
-            "can_clear": [
-                "One of Ur roles is authorized to use this command (`clear_allowed_roles`)",
-                "U missed allowed role (`clear_allowed_roles`)"
-            ],
-            "can_edit_case": [
-                "One of UR roles is authorized to use this command (`warn_allowed_roles`)",
-                "U missed allowed role (`warn_allowed_roles`)"
-            ],
-            "can_kick": [
-                "One of your roles iiz allowd to use this command (`kick_allowed_roles`)",
-                "U missed allowed role (`kick_allowed_roles`)"
-            ],
-            "can_mute": [
-                "One of your roles iz allowd to use this command (`mute_allowed_roles`)",
-                "U missed allowed role (`mute_allowed_roles`)"
-            ],
-            "can_say": [
-                "One of Ur roles is authorized to use this command (`say_allowed_roles`)",
-                "U missed allowed role (`say_allowed_roles`)"
-            ],
-            "can_slowmode": [
-                "One of your roles's authorized 2 use this command (`slowmode_allowed_roles`)",
-                "U missed allowed role (`slowmode_allowed_roles`)"
-            ],
-            "can_use_cookie": [
-                "U are THE CHOOSEN ONE from Aragorn1202 :congrats:",
-                "This command is on Whitelist. aka NO U LMAO"
-            ],
-            "can_use_rss": [
-                "U have 'Manage server' permission",
-                "'Manage server' permission is missed"
-            ],
-            "can_warn": [
-                "One of ur roles iz allowd 2 use this command (`warn_allowed_roles`)",
-                "U missed allowed role (`warn_allowed_roles`)"
-            ],
-            "is_bot_admin": [
-                "You need 2B one of the bot Admins",
-                "U are not a bot Admin"
-            ],
-            "database_connected": [
-                "The db is on",
-                "Teh database iz of"
-            ],
-            "guild_only": [
-                "Can only be usd in a server",
-                "Can only be usd in a server"
-            ],
-            "has_admin": [
-                "U have 'Administrator' permission",
-                "'Administrator' permission missed"
-            ],
-            "has_embed_links": [
-                "U haz \"Embed links\" thing",
-                "U need 2 b \"Embed links\" perms"
-            ],
-            "has_manage_channels": [
-                "U has 'Manage channels' perm",
-                "'Manage channels' required :angrycat:"
-            ],
-            "has_manage_emojis": [
-                "U haz 'Manage smol pictures' permission",
-                "Oops, U need to have the 'Manage smol chat pictures' perm for that"
-            ],
-            "has_manage_guild": [
-                "U have 'Manage Server' permission",
-                "'Manage Server' permission missed"
-            ],
-            "has_audit_logs": [
-                "U have 'Audit logs' perm",
-                "'View Audit Logs' perm required :/"
-            ],
-            "has_manage_msg": [
-                "You have 'Manage Messages' permission",
-                "'Manage Messages' permission missed"
-            ],
-            "has_manage_nicknames": [
-                "You have 'Manage Nicknames' permission",
-                "'Manage Nicknames' permission missed"
-            ],
-            "has_manage_roles": [
-                "You have 'Manage Roles' permission",
-                "'Manage Roles' permission missed"
-            ],
-            "has_permissions": [
-                "U have enugh Discord permz",
-                "U donut has the right Discord things"
-            ],
-            "is_fun_enabled": [
-                "Fun commands are enabled",
-                "Fun commands must be enabled"
-            ],
-            "is_halloween": [
-                "The :ghost: season is therr!",
-                "There are no ghosts at the moment"
-            ],
-            "is_owner": [
-                "You must be the owner of the bot",
-                "You are not the owner of the bot"
-            ],
-            "is_support_staff": [
-                "You're a member of the bot staff",
-                "U must be part of the bot staff"
-            ],
-            "is_translator": [
-                "Ur part ov the translators team",
-                "U must :b: part of translators team"
-            ],
-            "is_ttt_enabled": [
-                "!ttt iz enabled",
-                "Ewe, !ttt is disabled, use !config for dat"
-            ],
-            "verify_role_exists": [
-                "A verification role hav bee setted up",
-                "No verification rol has been addd"
-            ]
-        },
-        "cmd-count": "%{nbr} itemz",
-        "cmd-not-found": "Dere are no comand naymme \"%{cmd}\"",
-        "cog-empty-dm": "Uhh no, dat box has no cmd for here :/ try in ur serv",
-        "description": "Smol text",
-        "embed_title": "Cmds list 4 %{u}",
-        "embed_title_dm": "Cmds list 4 here only",
-        "footer": "Type {}help cmd 4 mure info abawt an commandZ",
-        "no-desc-cmd": "No descripshun for those c:o2:mmand",
-        "no-desc-cog": "No more discripton for dis cogg.",
-        "no-subcmd": "Teh kommand `%{cmd}` had not sub~~scribe~~commanD",
-        "not-enabled": ":warning: This command iz def not enable",
-        "subcmd-not-found": "Thiz commnd have no sUbcommant newmed \"%{name}\"",
-        "subcmds": "Subcommands",
-        "warning": "Warns"
-    }
+    "aliases": "Otherz names",
+    "categories": {
+        "data": "usefull things",
+        "fun": "cool things",
+        "moderation": "acute things",
+        "other": "idk, dont ask me plz",
+        "server-settings": "other usefl tihngs",
+        "staff": "bot things",
+        "translators": "langage things",
+        "unclassed": "random things :shrug:",
+        "users-info": "things 'bout cats/people"
+    },
+    "check-desc": {
+        "bot_can_embed": [
+            "Me has the perm to send cool msg",
+            "You must allow me 2 send nicer msg (embeds)"
+        ],
+        "bot_has_permissions": [
+            "The bot have enough perms",
+            "The bot donot've sufficient perms"
+        ],
+        "can_ban": [
+            "One of your roles iz allowd 2 use this command (`ban_allowed_roles`)",
+            "U missed allowed role (`ban_allowed_roles`)"
+        ],
+        "can_clear": [
+            "One of Ur roles is authorized to use this command (`clear_allowed_roles`)",
+            "U missed allowed role (`clear_allowed_roles`)"
+        ],
+        "can_edit_case": [
+            "One of UR roles is authorized to use this command (`warn_allowed_roles`)",
+            "U missed allowed role (`warn_allowed_roles`)"
+        ],
+        "can_kick": [
+            "One of your roles iiz allowd to use this command (`kick_allowed_roles`)",
+            "U missed allowed role (`kick_allowed_roles`)"
+        ],
+        "can_mute": [
+            "One of your roles iz allowd to use this command (`mute_allowed_roles`)",
+            "U missed allowed role (`mute_allowed_roles`)"
+        ],
+        "can_say": [
+            "One of Ur roles is authorized to use this command (`say_allowed_roles`)",
+            "U missed allowed role (`say_allowed_roles`)"
+        ],
+        "can_slowmode": [
+            "One of your roles's authorized 2 use this command (`slowmode_allowed_roles`)",
+            "U missed allowed role (`slowmode_allowed_roles`)"
+        ],
+        "can_use_cookie": [
+            "U are THE CHOOSEN ONE from Aragorn1202 :congrats:",
+            "This command is on Whitelist. aka NO U LMAO"
+        ],
+        "can_use_rss": [
+            "U have 'Manage server' permission",
+            "'Manage server' permission is missed"
+        ],
+        "can_warn": [
+            "One of ur roles iz allowd 2 use this command (`warn_allowed_roles`)",
+            "U missed allowed role (`warn_allowed_roles`)"
+        ],
+        "database_connected": [
+            "The db is on",
+            "Teh database iz of"
+        ],
+        "guild_only": [
+            "Can only be usd in a server",
+            "Can only be usd in a server"
+        ],
+        "has_admin": [
+            "U have 'Administrator' permission",
+            "'Administrator' permission missed"
+        ],
+        "has_audit_logs": [
+            "U have 'Audit logs' perm",
+            "'View Audit Logs' perm required :/"
+        ],
+        "has_embed_links": [
+            "U haz \"Embed links\" thing",
+            "U need 2 b \"Embed links\" perms"
+        ],
+        "has_manage_channels": [
+            "U has 'Manage channels' perm",
+            "'Manage channels' required :angrycat:"
+        ],
+        "has_manage_emojis": [
+            "U haz 'Manage smol pictures' permission",
+            "Oops, U need to have the 'Manage smol chat pictures' perm for that"
+        ],
+        "has_manage_guild": [
+            "U have 'Manage Server' permission",
+            "'Manage Server' permission missed"
+        ],
+        "has_manage_msg": [
+            "You have 'Manage Messages' permission",
+            "'Manage Messages' permission missed"
+        ],
+        "has_manage_nicknames": [
+            "You have 'Manage Nicknames' permission",
+            "'Manage Nicknames' permission missed"
+        ],
+        "has_manage_roles": [
+            "You have 'Manage Roles' permission",
+            "'Manage Roles' permission missed"
+        ],
+        "has_permissions": [
+            "U have enugh Discord permz",
+            "U donut has the right Discord things"
+        ],
+        "in_support_server": [
+            "U're in teh bot supprt server",
+            "U can only use dat command in deh support server"
+        ],
+        "is_bot_admin": [
+            "You need 2B one of the bot Admins",
+            "U are not a bot Admin"
+        ],
+        "is_fun_enabled": [
+            "Fun commands are enabled",
+            "Fun commands must be enabled"
+        ],
+        "is_halloween": [
+            "The :ghost: season is therr!",
+            "There are no ghosts at the moment"
+        ],
+        "is_owner": [
+            "You must be the owner of the bot",
+            "You are not the owner of the bot"
+        ],
+        "is_support_staff": [
+            "You're a member of the bot staff",
+            "U must be part of the bot staff"
+        ],
+        "is_translator": [
+            "Ur part ov the translators team",
+            "U must :b: part of translators team"
+        ],
+        "is_ttt_enabled": [
+            "!ttt iz enabled",
+            "Ewe, !ttt is disabled, use !config for dat"
+        ],
+        "verify_role_exists": [
+            "A verification role hav bee setted up",
+            "No verification rol has been addd"
+        ]
+    },
+    "cmd-count": "%{nbr} itemz",
+    "cmd-not-found": "Dere are no comand naymme \"%{cmd}\"",
+    "cog-empty-dm": "Uhh no, dat box has no cmd for here :/ try in ur serv",
+    "description": "Smol text",
+    "embed_title": "Cmds list 4 %{u}",
+    "embed_title_dm": "Cmds list 4 here only",
+    "footer": "Type {}help cmd 4 mure info abawt an commandZ",
+    "more-subcmds": {
+        "one": "+ 1",
+        "many": "+ %{count}"
+    },
+    "no-desc-cmd": "No descripshun for those c:o2:mmand",
+    "no-desc-cog": "No more discripton for dis cogg.",
+    "no-subcmd": "Teh kommand `%{cmd}` had not sub~~scribe~~commanD",
+    "not-enabled": ":warning: This command iz def not enable",
+    "subcmd-not-found": "Thiz commnd have no sUbcommant newmed \"%{name}\"",
+    "subcmds": "Subcommands",
+    "warning": "Warns"
 }

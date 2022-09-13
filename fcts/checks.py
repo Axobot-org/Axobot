@@ -6,10 +6,12 @@ from libs.classes import MyContext
 
 admins_id = {279568324260528128,281404141841022976,552273019020771358}
 
-async def is_bot_admin(ctx: typing.Union[MyContext, discord.User]):
+async def is_bot_admin(ctx: typing.Union[MyContext, discord.Interaction, discord.User]):
     "Check if the user is one of the bot administrators"
     if isinstance(ctx, commands.Context):
         user = ctx.author
+    elif isinstance(ctx, discord.Interaction):
+        user = ctx.user
     else:
         user = ctx
     if isinstance(user, str) and user.isnumeric():
@@ -18,15 +20,17 @@ async def is_bot_admin(ctx: typing.Union[MyContext, discord.User]):
         user = user.id
     return user in admins_id
 
-async def is_support_staff(ctx: MyContext) -> bool:
+async def is_support_staff(ctx: typing.Union[MyContext, discord.Interaction]) -> bool:
     "Check if the user is one of the bot staff, either by flag or by role"
-    if ctx.author.id in admins_id:
+    user = ctx.author if isinstance(ctx, commands.Context) else ctx.user
+    if user.id in admins_id:
         return True
-    if UsersCog := ctx.bot.get_cog('Users'):
-        return await UsersCog.has_userflag(ctx.author, 'support')
-    server = ctx.bot.get_guild(356067272730607628)
+    bot = ctx.bot if isinstance(ctx, commands.Context) else ctx.client
+    if UsersCog := bot.get_cog('Users'):
+        return await UsersCog.has_userflag(user, 'support')
+    server = bot.get_guild(356067272730607628)
     if server is not None:
-        member = server.get_member(ctx.author.id)
+        member = server.get_member(user.id)
         role = server.get_role(412340503229497361)
         if member is not None and role is not None:
             return role in member.roles

@@ -1,8 +1,6 @@
 {
-    "en": {
-        "url-score": "URL risk score: %{score}",
-        "report-successful": "We have well received your report, thank you for your contribution!",
-        "result": "Result:",
-        "probabilities": "Probabilities:"
-    }
+    "probabilities": "Probabilities:",
+    "report-successful": "We have well received your report, thank you for your contribution!",
+    "result": "Result:",
+    "url-score": "URL risk score: %{score}"
 }

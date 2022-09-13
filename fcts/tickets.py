@@ -7,7 +7,7 @@ from discord.ext import commands
 from mysql.connector.errors import IntegrityError
 from libs.classes import MyContext, Zbot
 
-from fcts import checks
+from . import checks
 from fcts.args import UnicodeEmoji
 
 def is_named_other(name: str, other_translated: str):
@@ -168,9 +168,6 @@ class Tickets(commands.Cog):
             if topic['category'] is None:
                 await interaction.response.send_message(await self.bot._(interaction.guild_id, "tickets.missing-category-config"), ephemeral=True)
                 return
-            if (cooldown := self.cooldowns.get(interaction.user)) and time.time() - cooldown < 120:
-                await interaction.response.send_message(await self.bot._(interaction.guild_id, "tickets.too-quick"), ephemeral=True)
-                return
             if topic['hint']:
                 hint_view = SendHintText(interaction.user.id,
                     await self.bot._(interaction.guild_id, "tickets.hint-useless"),
@@ -188,6 +185,9 @@ class Tickets(commands.Cog):
                     return
                 if hint_view.interaction:
                     interaction = hint_view.interaction
+            if (cooldown := self.cooldowns.get(interaction.user)) and time.time() - cooldown < 120:
+                await interaction.response.send_message(await self.bot._(interaction.guild_id, "tickets.too-quick"), ephemeral=True)
+                return
             modal_title = await self.bot._(interaction.guild_id, "tickets.title-modal.title")
             modal_label = await self.bot._(interaction.guild_id, "tickets.title-modal.label")
             modal_placeholder = await self.bot._(interaction.guild_id, "tickets.title-modal.placeholder")
