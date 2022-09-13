@@ -233,11 +233,11 @@ class Admin(commands.Cog):
             if lang not in self.update.keys():
                 lang = 'en'
             mentions_str = await self.bot.get_config(guild.id,'update_mentions')
-            if mentions_str is None:
-                mentions = []
-            else:
-                mentions = []
+            mentions: list[discord.Role] = []
+            if mentions_str is not None:
                 for r in mentions_str.split(';'):
+                    if not r.isnumeric():
+                        continue
                     try:
                         mentions.append(guild.get_role(int(r)))
                     except discord.NotFound:
