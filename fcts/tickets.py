@@ -77,7 +77,7 @@ class SendHintText(discord.ui.View):
         for child in self.children:
             child.disabled = True
         if isinstance(src, discord.Interaction):
-            await src.edit_original_message(view=self)
+            await src.edit_original_response(view=self)
         else:
             await src.edit(content=src.content, embeds=src.embeds, view=self)
         self.stop()
@@ -127,7 +127,7 @@ class AskTopicSelect(discord.ui.View):
         self.topics = self.select.values
         await interaction.response.defer()
         self.select.disabled = True
-        await interaction.edit_original_message(view=self)
+        await interaction.edit_original_response(view=self)
         self.stop()
 
 
@@ -351,7 +351,7 @@ class Tickets(commands.Cog):
             msg = await self.bot._(interaction.guild_id, "tickets.missing-perms-setup.to-staff", category=category)
         else:
             msg = await self.bot._(interaction.guild_id, "tickets.missing-perms-setup.to-member")
-        await interaction.edit_original_message(content=msg)
+        await interaction.edit_original_response(content=msg)
     
     async def get_channel_name(self, format: Optional[str], interaction: discord.Interaction, topic: dict, ticket_name: str) -> str:
         channel_name = format or self.default_name_format
@@ -377,7 +377,7 @@ class Tickets(commands.Cog):
             try:
                 channel = await category.create_text_channel(channel_name)
             except discord.Forbidden:
-                await interaction.edit_original_message(content=await self.bot._(interaction.guild_id, "tickets.missing-perms-creation.channel"))
+                await interaction.edit_original_response(content=await self.bot._(interaction.guild_id, "tickets.missing-perms-creation.channel"))
                 return
             try:
                 await self.setup_ticket_channel(channel, topic, interaction.user)
@@ -392,7 +392,7 @@ class Tickets(commands.Cog):
                     channel_type = discord.ChannelType.public_thread
                 channel = await category.create_thread(name=channel_name, type=channel_type)
             except discord.Forbidden:
-                await interaction.edit_original_message(content=await self.bot._(interaction.guild_id, "tickets.missing-perms-creation.thread"))
+                await interaction.edit_original_response(content=await self.bot._(interaction.guild_id, "tickets.missing-perms-creation.thread"))
                 return
             await self.setup_ticket_thread(channel, topic, interaction.user)
         else:
@@ -403,7 +403,7 @@ class Tickets(commands.Cog):
         if sent_error:
             await interaction.followup.send(txt, ephemeral=True)
         else:
-            await interaction.edit_original_message(content=txt)
+            await interaction.edit_original_response(content=txt)
         msg = await channel.send(embed=await self.create_channel_first_message(interaction, topic, ticket_name))
         if channel.permissions_for(channel.guild.me).manage_messages:
             await msg.pin()
