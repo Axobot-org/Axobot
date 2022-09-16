@@ -35,7 +35,7 @@ class ReminderSelectView(discord.ui.View):
         self.reminders = self.select.values
         await interaction.response.defer()
         self.select.disabled = True
-        await interaction.edit_original_message(view=self)
+        await interaction.edit_original_response(view=self)
         self.stop()
 
 class Timers(commands.Cog):
