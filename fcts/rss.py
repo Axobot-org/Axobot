@@ -1173,34 +1173,33 @@ class Rss(commands.Cog):
         async with self.bot.db_query(query, returnrowcount=True) as query_results:
             return query_results
 
-    async def send_rss_msg(self, obj: "RssMessage", channel: discord.TextChannel, roles: list[str], send_stats):
+    async def send_rss_msg(self, obj: "RssMessage", channel: Union[discord.TextChannel, discord.Thread], roles: list[str], send_stats):
         "Send a RSS message into its Discord channel, with the corresponding mentions"
-        if channel is not None:
-            t = await obj.create_msg()
-            mentions = []
-            for item in roles:
-                if item == '':
-                    continue
-                role = discord.utils.get(channel.guild.roles,id=int(item))
-                if role is not None:
-                    mentions.append(role)
-            try:
-                if self.bot.zombie_mode:
-                    return
-                allowed_mentions = discord.AllowedMentions(everyone=False, roles=True)
-                if isinstance(t, discord.Embed):
-                    await channel.send(" ".join(obj.mentions), embed=t, allowed_mentions=allowed_mentions)
-                else:
-                    await channel.send(t, allowed_mentions=allowed_mentions)
-                if send_stats:
-                    if statscog := self.bot.get_cog("BotStats"):
-                        statscog.rss_stats['messages'] += 1
-            except discord.HTTPException as err:
-                self.bot.log.info(f"[send_rss_msg] Cannot send message on channel {channel.id}: {err}")
-                await self.bot.get_cog("Errors").on_error(err)
-                await self.bot.get_cog("Errors").senf_err_msg(str(t.to_dict()) if hasattr(t, "to_dict") else str(t))
-            except Exception as err:
-                self.bot.log.info(f"[send_rss_msg] Cannot send message on channel {channel.id}: {err}")
+        t = await obj.create_msg()
+        mentions = []
+        for item in roles:
+            if item == '':
+                continue
+            role = discord.utils.get(channel.guild.roles,id=int(item))
+            if role is not None:
+                mentions.append(role)
+        if self.bot.zombie_mode:
+            return
+        allowed_mentions = discord.AllowedMentions(everyone=False, roles=True)
+        try:
+            if isinstance(t, discord.Embed):
+                await channel.send(" ".join(obj.mentions), embed=t, allowed_mentions=allowed_mentions)
+            else:
+                await channel.send(t, allowed_mentions=allowed_mentions)
+            if send_stats:
+                if statscog := self.bot.get_cog("BotStats"):
+                    statscog.rss_stats['messages'] += 1
+        except discord.HTTPException as err:
+            self.bot.log.info(f"[send_rss_msg] Cannot send message on channel {channel.id}: {err}")
+            await self.bot.get_cog("Errors").on_error(err)
+            await self.bot.get_cog("Errors").senf_err_msg(str(t.to_dict()) if hasattr(t, "to_dict") else str(t))
+        except Exception as err:
+            self.bot.log.info(f"[send_rss_msg] Cannot send message on channel {channel.id}: {err}")
 
     async def check_feed(self, feed: FeedObject, session: ClientSession = None, send_stats: bool=False):
         """Check one rss feed and send messages if required
@@ -1210,7 +1209,7 @@ class Rss(commands.Cog):
             if guild is None:
                 self.bot.log.info("[send_rss_msg] Cannot send message on server %s (unknown guild)", feed.guild_id)
                 return False
-            chan: discord.TextChannel = guild.get_channel(feed.channel_id)
+            chan: Union[discord.TextChannel, discord.Thread, None] = guild.get_channel_or_thread(feed.channel_id)
             if chan is None:
                 self.bot.log.info("[send_rss_msg] Cannot send message on channel %s (unknown channel)", feed.channel_id)
                 self.bot.dispatch("server_warning", ServerWarningType.RSS_UNKNOWN_CHANNEL, guild, channel_id=feed.channel_id, feed_id=feed.feed_id)
@@ -1224,7 +1223,7 @@ class Rss(commands.Cog):
                     objs = await self.twitter_rss.get_feed(chan, feed.link, feed.date)
                 else:
                     funct = getattr(self, f"rss_{feed.type}")
-                    objs: Union[str, list[RssMessage]] = await funct(chan,feed.link, feed.date, session=session)
+                    objs: Union[str, list[RssMessage]] = await funct(chan, feed.link, feed.date, session=session)
                 if isinstance(objs, twitter.error.TwitterError):
                     self.twitter_over_capacity = True
                     self.bot.log.warning("[send_rss_msg] Twitter over capacity detected")
