@@ -355,12 +355,13 @@ class Tickets(commands.Cog):
     
     async def get_channel_name(self, format: Optional[str], interaction: discord.Interaction, topic: dict, ticket_name: str) -> str:
         channel_name = format or self.default_name_format
+        emoji = topic["topic_emoji"].split(':')[0] if ':' in topic["topic_emoji"] else topic["topic_emoji"]
         return channel_name.format_map(self.bot.SafeDict({
             "username": interaction.user.name,
             "usertag": interaction.user.discriminator,
             "userid": interaction.user.id,
             "topic": topic["topic"],
-            "topic_emoji": topic["topic_emoji"],
+            "topic_emoji": emoji,
             "ticket_name": ticket_name
         }))[:100]
 
@@ -621,7 +622,9 @@ class Tickets(commands.Cog):
                 return
         if emote == "none":
             emote = None
-        if await self.db_edit_topic_emoji(ctx.guild.id, topic_id, f"{emote.name}:{emote.id}" if emote else None):
+        elif isinstance(emote, discord.PartialEmoji):
+            emote = f"{emote.name}:{emote.id}"
+        if await self.db_edit_topic_emoji(ctx.guild.id, topic_id, emote):
             topic = await self.db_get_topic_with_defaults(ctx.guild.id, topic_id)
             await ctx.send(await self.bot._(ctx.guild.id, "tickets.emote-edited", topic=topic["topic"]))
         else:
