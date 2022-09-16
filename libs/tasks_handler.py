@@ -100,7 +100,7 @@ class TaskHandler:
             guild = self.bot.get_guild(task['guild'])
             if guild is None:
                 return False
-            channel = guild.get_channel(task["channel"]) or guild.get_thread(task["channel"])
+            channel = guild.get_channel_or_thread(task["channel"])
             member = await guild.fetch_member(task["user"])
             # if channel has been deleted, or if member left the guild, we send it in DM
             if channel is None or member is None:

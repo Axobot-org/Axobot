@@ -60,7 +60,7 @@ class ServerLogs(commands.Cog):
     async def validate_logs(self, guild: discord.Guild, channel_ids: list[int], embed: discord.Embed):
         "Send a log embed to the corresponding modlogs channels"
         for channel_id in channel_ids:
-            if channel := guild.get_channel(channel_id):
+            if channel := guild.get_channel_or_thread(channel_id):
                 if channel in self.to_send:
                     self.to_send[channel].append(embed)
                 else:

@@ -1040,14 +1040,14 @@ Available types: member, role, user, emoji, channel, server, invite, category
         if feed is None:
             await interaction.response.send_message("Unknown RSS feed")
             return
-        temp = self.bot.get_guild(feed.guild_id)
-        if temp is None:
+        channel = self.bot.get_guild(feed.guild_id)
+        if channel is None:
             g = "Unknown ({})".format(feed.guild_id)
         else:
-            g = "`{}`\n{}".format(temp.name, temp.id)
-            temp = self.bot.get_channel(feed.channel_id)
-        if temp is not None:
-            c = "`{}`\n{}".format(temp.name,temp.id)
+            g = "`{}`\n{}".format(channel.name, channel.id)
+            channel = self.bot.get_channel(feed.channel_id)
+        if channel is not None:
+            c = "`{}`\n{}".format(channel.name,channel.id)
         else:
             c = "Unknown ({})".format(feed.channel_id)
         d = f"<t:{feed.date.timestamp():.0f}>"
@@ -1059,7 +1059,10 @@ Available types: member, role, user, emoji, channel, server, invite, category
             color = None if interaction.guild.me.color.value == 0 else interaction.guild.me.color
         emb = discord.Embed(title=f"RSS #{feed_id}", color=color)
         emb.add_field(name="Server", value=g)
-        emb.add_field(name="Channel", value=c)
+        if isinstance(channel, discord.Thread):
+            emb.add_field(name="Thread", value=c)
+        else:
+            emb.add_field(name="Channel", value=c)
         emb.add_field(name="URL", value=feed.link, inline=False)
         emb.add_field(name="Type", value=feed.type)
         emb.add_field(name="Last post", value=d)
