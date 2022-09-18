@@ -87,11 +87,11 @@ class BotStats(commands.Cog):
             return avg
 
     @commands.Cog.listener()
-    async def on_antiscam_warn(self):
+    async def on_antiscam_warn(self, *args):
         self.antiscam["warning"] += 1
 
     @commands.Cog.listener()
-    async def on_antiscam_delete(self):
+    async def on_antiscam_delete(self, *args):
         self.antiscam["deletion"] += 1
     
     @commands.Cog.listener()
