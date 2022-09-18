@@ -70,16 +70,16 @@ class ServerLogs(commands.Cog):
         "Get enabled logs for a channel"
         if use_cache and (cached := self.cache.get(guild)) and channel in cached:
             return cached[channel]
-        query = "SELECT kind FROM serverlogs WHERE guild = %s AND channel = %s"
-        async with self.bot.db_query(query, (guild, channel)) as query_results:
+        query = "SELECT kind FROM serverlogs WHERE guild = %s AND channel = %s AND beta = %s"
+        async with self.bot.db_query(query, (guild, channel, self.bot.beta)) as query_results:
             return [row['kind'] for row in query_results]
 
     async def db_get_from_guild(self, guild: int, use_cache: bool=True) -> dict[int, list[str]]:
         "Get enabled logs for a guild"
         if use_cache and (cached := self.cache.get(guild)):
             return cached
-        query = "SELECT channel, kind FROM serverlogs WHERE guild = %s"
-        async with self.bot.db_query(query, (guild,)) as query_results:
+        query = "SELECT channel, kind FROM serverlogs WHERE guild = %s AND beta = %s"
+        async with self.bot.db_query(query, (guild, self.bot.beta)) as query_results:
             res = {}
             for row in query_results:
                 res[row['channel']] = res.get(row['channel'], []) + [row['kind']]
@@ -88,8 +88,8 @@ class ServerLogs(commands.Cog):
 
     async def db_add(self, guild: int, channel: int, kind: str) -> bool:
         "Add logs to a channel"
-        query = "INSERT INTO serverlogs (guild, channel, kind) VALUES (%(g)s, %(c)s, %(k)s) ON DUPLICATE KEY UPDATE guild=%(g)s"
-        async with self.bot.db_query(query, {'g': guild, 'c': channel, 'k': kind}) as query_result:
+        query = "INSERT INTO serverlogs (guild, channel, kind) VALUES (%(g)s, %(c)s, %(k)s, %(b)s) ON DUPLICATE KEY UPDATE guild=%(g)s"
+        async with self.bot.db_query(query, {'g': guild, 'c': channel, 'k': kind, 'b': self.bot.beta}) as query_result:
             if query_result > 0 and guild in self.cache:
                 if channel in self.cache[guild]:
                     self.cache[guild][channel].append(kind)
@@ -99,8 +99,8 @@ class ServerLogs(commands.Cog):
 
     async def db_remove(self, guild: int, channel: int, kind: str) -> bool:
         "Remove logs from a channel"
-        query = "DELETE FROM serverlogs WHERE guild = %s AND channel = %s AND kind = %s"
-        async with self.bot.db_query(query, (guild, channel, kind), returnrowcount=True) as query_result:
+        query = "DELETE FROM serverlogs WHERE guild = %s AND channel = %s AND kind = %s AND beta = %s"
+        async with self.bot.db_query(query, (guild, channel, kind, self.bot.beta), returnrowcount=True) as query_result:
             if query_result > 0 and guild in self.cache:
                 if channel in self.cache[guild]:
                     self.cache[guild][channel] = [x for x in self.cache[guild][channel] if x != kind]
