@@ -107,7 +107,7 @@ class AskTopicSelect(discord.ui.View):
         super().__init__()
         self.user_id = user_id
         options = self.build_options(topics)
-        self.select = discord.ui.Select(placeholder=placeholder, min_values=1, max_values=max_values, options=options)
+        self.select = discord.ui.Select(placeholder=placeholder, min_values=1, max_values=min(max_values, len(options)), options=options)
         self.select.callback = self.callback
         self.add_item(self.select)
         self.topics: list[str] = None
@@ -242,11 +242,11 @@ class Tickets(commands.Cog):
         except IntegrityError:
             return False
 
-    async def db_delete_topic(self, guild_id: int, topic_id: int) -> bool:
-        "Delete a topic from a guild"
-        query = "DELETE FROM `tickets` WHERE `guild_id` = %s AND id = %s AND `beta` = %s"
-        async with self.bot.db_query(query, (guild_id, topic_id, self.bot.beta), returnrowcount=True) as db_query:
-            return db_query > 0
+    async def db_delete_topics(self, guild_id: int, topic_ids: list[int]) -> int:
+        "Delete multiple topics from a guild"
+        query = "DELETE FROM `tickets` WHERE `guild_id` = %s AND id IN ({}) AND `beta` = %s".format(', '.join(map(str, topic_ids)))
+        async with self.bot.db_query(query, (guild_id, self.bot.beta), returnrowcount=True) as db_query:
+            return db_query
 
     async def db_topic_exists(self, guild_id: int, topic_id: int):
         "Check if a topic exists for a guild"
@@ -290,19 +290,21 @@ class Tickets(commands.Cog):
         async with self.bot.db_query(query, (message, guild_id, self.bot.beta)) as _:
             pass
 
-    async def ask_user_topic(self, ctx: MyContext) -> Optional[int]:
+    async def ask_user_topic(self, ctx: MyContext, multiple = False, message: Optional[str] = None) -> Union[int, list[int], None]:
         "Ask a user which topic they want to edit"
         placeholder = await self.bot._(ctx.guild.id, "tickets.selection-placeholder")
-        view = AskTopicSelect(ctx.author.id, await self.db_get_topics(ctx.guild.id), placeholder, 1)
-        await ctx.send(await self.bot._(ctx.guild.id, "tickets.choose-topic-edition"), view=view)
+        view = AskTopicSelect(ctx.author.id, await self.db_get_topics(ctx.guild.id), placeholder, 25 if multiple else 1)
+        await ctx.send(message or await self.bot._(ctx.guild.id, "tickets.choose-topic-edition"), view=view)
         await view.wait()
         if view.topics is None:
             return None
         try:
-            topic_id = int(view.topics[0])
+            if multiple:
+                return [int(topic) for topic in view.topics]
+            else:
+                return int(view.topics[0])
         except (ValueError, IndexError):
             return None
-        return topic_id
 
     async def create_channel_first_message(self, interaction: discord.Interaction, topic: dict, ticket_name: str) -> discord.Embed:
         "Create the introduction message at the beginning of the ticket"
@@ -564,7 +566,7 @@ class Tickets(commands.Cog):
         if ctx.subcommand_passed is None:
             await self.bot.get_cog('Help').help_command(ctx, ['tickets', 'topic'])
 
-    @tickets_topics.command(name="add")
+    @tickets_topics.command(name="add", aliases=["create"])
     @commands.cooldown(3, 45, commands.BucketType.guild)
     async def topic_add(self, ctx: MyContext, emote: Union[discord.PartialEmoji, UnicodeEmoji, None]=None, *, name: str):
         """Create a new ticket topic
@@ -582,6 +584,9 @@ class Tickets(commands.Cog):
         if is_named_other(name, await self.bot._(ctx.guild.id, "tickets.other")):
             await ctx.send(await self.bot._(ctx.guild.id, "tickets.topic.other-already-exists"))
             return
+        if len(await self.db_get_topics(ctx.guild.id)) >= 25:
+            await ctx.send(await self.bot._(ctx.guild.id, "tickets.topic.too-many", max=25))
+            return
         if isinstance(emote, discord.PartialEmoji):
             emote = f"{emote.name}:{emote.id}"
         if await self.db_add_topic(ctx.guild.id, name, emote):
@@ -595,13 +600,18 @@ class Tickets(commands.Cog):
         """Permanently delete a topic by its name
 
         ..Doc tickets.html#delete-a-topic"""
-        topic_id = await self.ask_user_topic(ctx)
-        if topic_id is None:
+        topic_ids: Optional[list[int]] = await self.ask_user_topic(ctx, True, await ctx.bot._(ctx.guild.id, "tickets.choose-topics-deletion"))
+        if topic_ids is None or len(topic_ids) == 0:
             await ctx.send(await self.bot._(ctx.guild.id, "errors.unknown"))
             return
-        topic = await self.db_get_topic_with_defaults(ctx.guild.id, topic_id)
-        if await self.db_delete_topic(ctx.guild.id, topic_id):
-            await ctx.send(await self.bot._(ctx.guild.id, "tickets.topic.deleted", name=topic["topic"]))
+        if len(topic_ids) == 1:
+            topic = await self.db_get_topic_with_defaults(ctx.guild.id, topic_ids[0])
+            topic_name = topic["topic"] if topic else ""
+        else:
+            topic_name = ""
+        counter = await self.db_delete_topics(ctx.guild.id, topic_ids)
+        if counter > 0:
+            await ctx.send(await self.bot._(ctx.guild.id, "tickets.topic.deleted", count=counter, name=topic_name))
         else:
             await ctx.send(await self.bot._(ctx.guild.id, "errors.unknown"))
 
