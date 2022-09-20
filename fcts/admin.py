@@ -376,7 +376,7 @@ class Admin(commands.Cog):
     async def admin_db(self, _ctx: MyContext):
         "Commandes liées à la base de données"
 
-    @admin_db.command(name='reload')
+    @admin_db.command(name="reload")
     @commands.check(checks.is_bot_admin)
     async def db_reload(self, ctx: MyContext):
         "Reconnecte le bot à la base de donnée"
@@ -385,11 +385,14 @@ class Admin(commands.Cog):
         self.bot.cnx_xp.close()
         self.bot.connect_database_xp()
         if self.bot.cnx_frm is not None and self.bot.cnx_xp is not None:
-            await ctx.message.add_reaction('✅')
+            if ctx.interaction:
+                await ctx.reply("Done!")
+            else:
+                await self.add_success_reaction(ctx.message)
             if xp := self.bot.get_cog("Xp"):
                 await xp.reload_sus()
 
-    @admin_db.command(name='biggest-tables')
+    @admin_db.command(name="biggest-tables")
     @commands.check(checks.is_bot_admin)
     async def db_biggest(self, ctx: MyContext, database: typing.Optional[str] = None):
         "Affiche les tables les plus lourdes de la base de données"
