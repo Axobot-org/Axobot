@@ -42,7 +42,7 @@ class Timers(commands.Cog):
     def __init__(self, bot: Zbot):
         self.bot = bot
         self.file = "timers"
-    
+
     async def db_get_reminder(self, reminder_id: int, user: Optional[int] = None) -> Optional[dict]:
         if user is not None:
             query = "SELECT * FROM `timed` WHERE user=%s AND action='timer' AND ID=%s"
@@ -52,13 +52,13 @@ class Timers(commands.Cog):
             args = (reminder_id, )
         async with self.bot.db_query(query, args, fetchone=True) as query_result:
             return query_result
-    
+
     async def db_get_user_reminders(self, user: int) -> list[dict]:
         "Get every active user reminder"
         query = "SELECT * FROM `timed` WHERE user=%s AND action='timer'"
         async with self.bot.db_query(query, (user,)) as query_results:
             return query_results
-    
+
     async def db_get_user_reminders_count(self, user: int) -> int:
         "Get the number of active user reminder"
         query = "SELECT COUNT(*) as count FROM `timed` WHERE user=%s AND action='timer'"
@@ -70,7 +70,7 @@ class Timers(commands.Cog):
         query = "DELETE FROM `timed` WHERE user=%s AND action='timer' AND ID=%s"
         async with self.bot.db_query(query, (user, reminder_id), returnrowcount=True) as query_result:
             return query_result > 0
-    
+
     async def db_delete_all_user_reminders(self, user: int):
         query = "DELETE FROM `timed` WHERE user=%s AND action='timer'"
         async with self.bot.db_query(query, (user,)) as query_results:
@@ -84,6 +84,8 @@ class Timers(commands.Cog):
         This is actually an alias of `reminder create`
 
         ..Example rmd 3h 5min It's pizza time!
+
+        ..Example remindme 3months Christmas is coming!
 
         ..Doc miscellaneous.html#create-a-new-reminder"""
         ctx.message.content = ctx.prefix + ("reminder " if args.startswith('create') else "reminder create ") + args
@@ -147,7 +149,7 @@ class Timers(commands.Cog):
             return
         txt = await self.bot._(ctx.channel, "timers.rmd.item")
         lang = await self.bot._(ctx.channel, '_used_locale')
-        liste = list()
+        liste = []
         for item in reminders:
             ctx2 = copy.copy(ctx)
             ctx2.message.content = item["message"]
@@ -157,7 +159,11 @@ class Timers(commands.Cog):
             chan = '<#'+str(item['channel'])+'>'
             end: datetime.datetime = item["begin"] + datetime.timedelta(seconds=item['duration'])
             end = end.astimezone(datetime.timezone.utc)
-            duration = await FormatUtils.time_delta(ctx.bot.utcnow() if end.tzinfo else datetime.datetime.utcnow(), end, lang=lang, year=True, form="short")
+            a = ctx.bot.utcnow() if end.tzinfo else datetime.datetime.utcnow()
+            duration = await FormatUtils.time_delta(
+                a, end,
+                lang=lang, year=True, form="short"
+            )
             item = txt.format(id=item['ID'], duration=duration, channel=chan, msg=msg)
             liste.append(item)
         if ctx.can_send_embed:
