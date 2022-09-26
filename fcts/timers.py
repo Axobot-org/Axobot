@@ -17,8 +17,8 @@ class ReminderSelectView(discord.ui.View):
         self.select = discord.ui.Select(placeholder=placeholder, min_values=1, max_values=len(reminders), options=options)
         self.select.callback = self.callback
         self.add_item(self.select)
-        self.reminders: list[str] = []
-    
+        self.reminders: Optional[list[str]] = None
+
     def build_options(self, reminders: list[dict]):
         "Build the options list for Discord"
         res = []
@@ -29,7 +29,13 @@ class ReminderSelectView(discord.ui.View):
             desc = f"{reminder['tr_channel']} - {reminder['tr_duration']}"
             res.append(discord.SelectOption(value=reminder['id'], label=label, description=desc))
         return res
-    
+
+    async def disable(self, message: discord.Message):
+        "Disable the view and update the message"
+        self.select.disabled = True
+        await message.edit(view=self)
+        self.stop()
+
     async def callback(self, interaction: discord.Interaction):
         "Called when the dropdown menu has been validated by the user"
         self.reminders = self.select.values
@@ -214,9 +220,11 @@ class Timers(commands.Cog):
                 reminders_data.append(rmd_data)
             form_placeholder = await self.bot._(ctx.channel, 'timers.rmd.select-placeholder')
             view = ReminderSelectView(reminders_data, form_placeholder)
-            await ctx.send(title, view=view)
+            msg = await ctx.send(title, view=view)
             await view.wait()
             if view.reminders is None:
+                # timeout
+                await view.disable(msg)
                 return
             try:
                 selection = list(map(int, view.reminders))
