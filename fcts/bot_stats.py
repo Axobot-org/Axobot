@@ -27,7 +27,7 @@ class BotStats(commands.Cog):
         self.received_events = {'CMD_USE': 0}
         self.commands_uses = {}
         self.rss_stats = {'checked': 0, 'messages': 0, 'errors': 0, 'warnings': 0}
-        self.xp_cards = 0
+        self.xp_cards = {'generated': 0, 'sent': 0}
         self.process = psutil.Process()
         self.cpu_records: list[float] = []
         self.latency_records: list[int] = []
@@ -87,17 +87,17 @@ class BotStats(commands.Cog):
             return avg
 
     @commands.Cog.listener()
-    async def on_antiscam_warn(self, *args):
+    async def on_antiscam_warn(self, *_args):
         self.antiscam["warning"] += 1
 
     @commands.Cog.listener()
-    async def on_antiscam_delete(self, *args):
+    async def on_antiscam_delete(self, *_args):
         self.antiscam["deletion"] += 1
-    
+
     @commands.Cog.listener()
     async def on_ticket_creation(self, _event: TicketCreationEvent):
         self.ticket_events["creation"] += 1
-    
+
     @commands.Cog.listener()
     async def on_username_change_record(self, event: UsernameChangeRecord):
         if event.is_guild:
@@ -111,9 +111,9 @@ class BotStats(commands.Cog):
             self.translations_added[language] += 1
         else:
             self.translations_added[language] = 1
-    
+
     @commands.Cog.listener()
-    async def on_server_warning(self, warning_type: ServerWarningType, guild: discord.Guild, **kwargs):
+    async def on_server_warning(self, warning_type: ServerWarningType, _guild: discord.Guild, **_kwargs):
         if warning_type in {
             ServerWarningType.RSS_UNKNOWN_CHANNEL,
             ServerWarningType.RSS_MISSING_TXT_PERMISSION,
@@ -169,8 +169,10 @@ class BotStats(commands.Cog):
             for k, v in self.rss_stats.items():
                 cursor.execute(query, (now, 'rss.'+k, v, 0, k, True, self.bot.beta))
             # XP cards
-            cursor.execute(query, (now, 'xp.generated_cards', self.xp_cards, 0, 'cards/min', True, self.bot.beta))
-            self.xp_cards = 0
+            cursor.execute(query, (now, 'xp.generated_cards', self.xp_cards["generated"], 0, 'cards/min', True, self.bot.beta))
+            cursor.execute(query, (now, 'xp.sent_cards', self.xp_cards["sent"], 0, 'cards/min', True, self.bot.beta))
+            self.xp_cards["generated"] = 0
+            self.xp_cards["sent"] = 0
             # Latency - RAM usage - CPU usage
             ram = round(self.process.memory_info()[0]/2.**30, 3)
             if latency := await self.get_list_usage(self.latency_records):
