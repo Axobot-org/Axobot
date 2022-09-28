@@ -755,7 +755,7 @@ class Xp(commands.Cog):
                 await self.send_txt(ctx,user,xp,rank,ranks_nb,levels_info,xp_used_type)
         except Exception as e:
             await self.bot.get_cog('Errors').on_command_error(ctx,e)
-    
+
     async def send_card(self, ctx: MyContext, user: discord.User, xp, rank, ranks_nb, used_system, levels_info=None):
         try:
             myfile = discord.File('../cards/global/{}-{}-{}.{}'.format(user.id,xp,rank,'gif' if user.display_avatar.is_animated() else 'png'))
@@ -776,11 +776,13 @@ class Xp(commands.Cog):
                 except Exception as e:
                     await self.bot.get_cog("Errors").on_error(e, ctx)
             if statsCog := self.bot.get_cog("BotStats"):
-                statsCog.xp_cards += 1
+                statsCog.xp_cards["generated"] += 1
         try:
             await ctx.send(file=myfile)
         except discord.errors.HTTPException:
             await ctx.send(await self.bot._(ctx.channel, "xp.card-too-large"))
+        if statsCog := self.bot.get_cog("BotStats"):
+            statsCog.xp_cards["sent"] += 1
 
     async def send_embed(self, ctx: MyContext, user: discord.User, xp, rank, ranks_nb, levels_info, used_system):
         txts = [await self.bot._(ctx.channel, "xp.card-level"), await self.bot._(ctx.channel, "xp.card-rank")]
