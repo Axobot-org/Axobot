@@ -163,7 +163,7 @@ class BotStats(commands.Cog):
                 self.received_events[k] = 0
             # Commands usages stats
             for k, v in self.commands_uses.items():
-                cursor.execute(query, (now, 'cmd.'+k, v, 0, 'cmd/min', True, self.bot.beta))
+                cursor.execute(query, (now, 'cmd.'+k, v, 0, 'cmd/min', k == "messages", self.bot.beta))
             self.commands_uses.clear()
             # RSS stats
             for k, v in self.rss_stats.items():
