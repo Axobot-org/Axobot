@@ -1,6 +1,6 @@
 {
-    "url-score": "URL का जोखिम स्कोर: %{score}",
+    "probabilities": "संभावनाएं:",
     "report-successful": "हमने आपकी सूचना को प्राप्त कर लिया है, अपने योगदान के लिए धन्यवाद!",
     "result": "परिणाम:",
-    "probabilities": "संभावनाएं:"
+    "url-score": "URL का जोखिम स्कोर: %{score}"
 }
