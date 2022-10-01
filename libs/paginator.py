@@ -63,7 +63,7 @@ class Paginator(ui.View):
         contents = await self.get_page_content(interaction, self.page)
         await self._update_buttons(interaction)
         await interaction.followup.edit_message(
-            (await interaction.original_message()).id,
+            interaction.message.id,
             view=self,
             **contents
         )

@@ -222,12 +222,12 @@ class AntiScam(commands.Cog):
         if action == 'delete':
             if await self.db_delete_msg(msg_id):
                 await interaction.followup.send("This record has successfully been deleted", ephemeral=True)
-                await self.edit_report_message(await interaction.original_message(), 'deleted')
+                await self.edit_report_message(interaction.message, 'deleted')
                 return
         elif action in ("harmless", "scam", "insults", "raid", "spam"):
             if await self.db_update_msg(msg_id, action):
                 await interaction.followup.send(f"This record has been flagged as {action.title()}", ephemeral=True)
-                await self.edit_report_message(await interaction.original_message(), action)
+                await self.edit_report_message(interaction.message, action)
                 return
         else:
             err = TypeError(f"Unknown antiscam button action: {action}")
