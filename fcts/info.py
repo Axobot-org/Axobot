@@ -1348,26 +1348,30 @@ Available types: member, role, user, emoji, channel, server, invite, category
                         temp = temp[:MAX] + [await self.bot._(ctx.channel, 'info.usernames.more', nbr=len(temp)-MAX)]
                     fields.append({'name':await self.bot._(ctx.channel,'info.usernames.local'), 'value':"\n".join(temp)})
                     _server = await self.bot._(ctx.channel,'info.usernames.server')
-                    date += f"{_server} <t:{this_guild[0]['utc_date'].timestamp():.0f}>"
+                    date += f"\n{_server} <t:{this_guild[0]['utc_date'].timestamp():.0f}>"
+            # Date field
             if len(date) > 0:
-                fields.append({'name':await self.bot._(ctx.channel,'info.usernames.last-date'), 'value':date})
+                fields.append({'name':await self.bot._(ctx.channel,'info.usernames.last-date'), 'value': date})
             else:
                 desc = await self.bot._(ctx.channel,'info.usernames.empty')
             if ctx.guild is not None and ctx.guild.get_member(user.id) is not None and ctx.guild.get_member(user.id).color!=discord.Color(0):
                 c = ctx.guild.get_member(user.id).color
             else:
                 c = 1350390
+            # "How to enable/disable" footer
             allowing_logs = await self.bot.get_cog("Utilities").get_db_userinfo(["allow_usernames_logs"],["userID="+str(user.id)])
             if allowing_logs is None or allowing_logs["allow_usernames_logs"]:
                 footer = await self.bot._(ctx.channel,'info.usernames.disallow')
             else:
                 footer = await self.bot._(ctx.channel,'info.usernames.allow')
+            # Warning in description if disabled in the guild
             if ctx.guild is not None and not await self.bot.get_config(ctx.guild.id, "nicknames_history"):
                 if len(ctx.guild.members) >= self.bot.get_cog("Servers").max_members_for_nicknames:
                     warning_disabled = await self.bot._(ctx.guild.id, "info.nicknames-disabled.guild-too-big")
                 else:
                     warning_disabled = await self.bot._(ctx.guild.id, "info.nicknames-disabled.disabled")
                 desc = warning_disabled if desc is None else warning_disabled + "\n\n" + desc
+            # send the thing
             emb = discord.Embed(title=t, description=desc, color=c)
             emb.set_footer(text=footer)
             for field in fields:
