@@ -1030,6 +1030,8 @@ You can specify a verification limit by adding a number in argument (up to 1.000
         """Auto format your Python code according to PEP8 guidelines"""
         if code.startswith('```') and code.endswith('```'):
             code = '\n'.join(code.split('\n')[1:-1])
+        elif code.startswith('`') and code.endswith('`'):
+            code = code[1:-1]
         code = autopep8.fix_code(code, {
             "aggressive": 3,
             "ignore": set()
