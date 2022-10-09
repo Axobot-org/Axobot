@@ -23,10 +23,6 @@
         "not-found": "Hum... impossible de supprimer ces messages. Discord me dit qu'ils n'existent pas :thinking:",
         "too-few": "Je ne peux pas supprimer si peu de messages"
     },
-    "deprecated-verify": {
-        "desc": "Le système de vérification de Zbot est maintenant obsolète et sera supprimé dans une prochaine mise à jour. Veuillez demander à un gérant du serveur d'activer le [système de vérification de Discord](https://support.discord.com/hc/fr/articles/1500000466882-Rules-Screening-FAQ) à la place.",
-        "title": "Fonctionnalité dépréciée"
-    },
     "destop": {
         "no-guild": "Ce message n'appartient pas à ce serveur",
         "too-old": "Je ne peux pas supprimer des messages vieux de plus de %{days} jours !"
@@ -120,61 +116,6 @@
         "zero": "Aucun surnom n'a été édité"
     },
     "unmute-chat": "Le membre %{user} (%{userid}) peut à nouveau parler !",
-    "verify-role-high": "Oups, il semble que le rôle %{r} soit trop haut pour que je puisse le donner. Veuillez placer ce rôle plus bas que le mien, ou placer mon rôle au-dessus.",
-    "verify_questions": [
-        [
-            "Combien de côtés possède un carré ?",
-            "4"
-        ],
-        [
-            "Comment s'appelle le système d'exploitation des téléphones de la marque Apple ? (iOS/Android)",
-            "iOS"
-        ],
-        [
-            "L'émoji 🐷 représente : un insecte, légume, animal ?",
-            "animal"
-        ],
-        [
-            "Lequel de ces mots commence par P ? `poussin`, `corbeau`, `hirondelle`",
-            "poussin"
-        ],
-        [
-            "Lequel de ces mots désigne un fruit ? pizza, pomme, dinosaure",
-            "pomme"
-        ],
-        [
-            "Que donne le produit de 2 par 5 ? (en chiffres)",
-            "10"
-        ],
-        [
-            "Quel est le discriminant situé après votre pseudo discord ? (sans le #)",
-            "_special_userdiscrim"
-        ],
-        [
-            "Quel est le nom de ce serveur ?",
-            "_special_servername"
-        ],
-        [
-            "Quel est le nom du pain français connu partout dans le monde ? (un seul mot)",
-            "baguette"
-        ],
-        [
-            "Quel est le résultat de 10-6 ?",
-            "4"
-        ],
-        [
-            "Quel est le résultat du produit de deux et cinq ? (en lettres)",
-            "dix"
-        ],
-        [
-            "Quelle est la première lettre de `Zbot` ?",
-            "z"
-        ],
-        [
-            "Quelle forme géométrique possède 3 côtés ?",
-            "triangle"
-        ]
-    ],
     "warn": {
         "cant-bot": "Je ne peux pas avertir un bot ^^",
         "cant-staff": "Vous ne pouvez pas avertir un autre membre du staff !",

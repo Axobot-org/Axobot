@@ -137,16 +137,6 @@ async def bot_can_embed(ctx: MyContext) -> bool:
         return True
     raise CannotSendEmbed()
 
-async def verify_role_exists(ctx: MyContext) -> bool:
-    """Check if the verify role exists"""
-    if ctx.guild is None:
-        return False
-    roles_raw = await ctx.bot.get_config(ctx.guild.id, "verification_role")
-    if roles_raw is None:
-        return False
-    roles = [r for r in [ctx.guild.get_role(int(x)) for x in roles_raw.split(';') if x.isnumeric() and len(x) > 0] if r is not None]
-    return len(roles) > 0
-
 async def is_translator(ctx: MyContext) -> bool:
     "Check if the user is an agreeded translator"
     if cog := ctx.bot.get_cog('Users'):
