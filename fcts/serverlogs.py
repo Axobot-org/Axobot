@@ -473,7 +473,8 @@ class ServerLogs(commands.Cog):
             delta = await FormatUtils.time_delta(
                 after.joined_at,
                 self.bot.utcnow(),
-                await self.bot._(after.guild.id, "_used_locale")
+                lang=await self.bot._(after.guild.id, "_used_locale"),
+                year=True
             )
             emb.add_field(
                 name="Joined at",
@@ -536,7 +537,8 @@ class ServerLogs(commands.Cog):
                 delta = await FormatUtils.time_delta(
                     payload.user.joined_at,
                     self.bot.utcnow(),
-                    await self.bot._(payload.guild_id, "_used_locale")
+                    lang=await self.bot._(payload.guild_id, "_used_locale"),
+                    year=True
                 )
                 emb.add_field(
                     name="Joined your server at",
