@@ -177,7 +177,7 @@ class AntiScam(commands.Cog):
     @commands.Cog.listener()
     async def on_message(self, msg: discord.Message):
         "Check any message for scam dangerousity"
-        if not msg.guild or len(msg.content) < 10 or is_immune(msg.author) or await self.bot.potential_command(msg):
+        if isinstance(msg.author, discord.User) or len(msg.content) < 10 or is_immune(msg.author) or await self.bot.potential_command(msg):
             return
         await self.bot.wait_until_ready()
         if not await self.bot.get_config(msg.guild.id, "anti_scam"):
