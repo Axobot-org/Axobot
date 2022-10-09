@@ -35,7 +35,7 @@ class Users(commands.Cog):
             await self.bot.get_cog("Errors").on_error(e, None)
         if parameters is None:
             return []
-        return UserFlag().intToFlags(parameters['user_flags'])
+        return UserFlag().int_to_flags(parameters['user_flags'])
 
     async def has_userflag(self, user: discord.User, flag: str) -> bool:
         """Check if a user has a specific user flag"""
@@ -58,7 +58,7 @@ class Users(commands.Cog):
             await self.bot.get_cog("Errors").on_error(e, None)
         if parameters is None:
             return list()
-        return RankCardsFlag().intToFlags(parameters['rankcards_unlocked'])
+        return RankCardsFlag().int_to_flags(parameters['rankcards_unlocked'])
 
     async def has_rankcard(self, user: discord.User, rankcard: str) -> bool:
         """Check if a user has unlocked a specific rank card"""
@@ -79,7 +79,7 @@ class Users(commands.Cog):
             rankcards.append(style)
         else:
             rankcards.remove(style)
-        await self.bot.get_cog('Utilities').change_db_userinfo(user.id, 'rankcards_unlocked', RankCardsFlag().flagsToInt(rankcards))
+        await self.bot.get_cog('Utilities').change_db_userinfo(user.id, 'rankcards_unlocked', RankCardsFlag().flags_to_int(rankcards))
 
     async def get_rankcards_stats(self) -> dict:
         """Get how many users use any rank card"""
