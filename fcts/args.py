@@ -4,7 +4,7 @@ import typing
 import discord
 from dateutil.relativedelta import relativedelta
 from discord.ext import commands
-from libs.classes import MyContext
+from libs.bot_classes import MyContext
 
 
 class tempdelta(commands.Converter):

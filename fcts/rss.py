@@ -11,7 +11,8 @@ import mysql
 import twitter
 from aiohttp import ClientSession, client_exceptions
 from discord.ext import commands, tasks
-from libs.classes import MyContext, ServerWarningType, Zbot
+from libs.bot_classes import MyContext, Zbot
+from libs.enums import ServerWarningType
 from libs.formatutils import FormatUtils
 from libs.rss import RssMessage, feed_parse, TwitterRSS, YoutubeRSS
 

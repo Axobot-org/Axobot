@@ -1,7 +1,7 @@
 from typing import Any
 from discord import ui, ButtonStyle, User, Interaction
 
-from libs.classes import MyContext, Zbot
+from libs.bot_classes import MyContext, Zbot
 
 
 def cut_text(lines: list[str], max_length: int = 1024, max_size=100) -> list[str]:

@@ -2,7 +2,7 @@ import typing
 
 import discord
 from discord.ext import commands
-from libs.classes import MyContext
+from libs.bot_classes import MyContext
 
 admins_id = {279568324260528128,281404141841022976,552273019020771358}
 

@@ -3,7 +3,7 @@ import discord
 import importlib
 import re
 from discord.ext import commands
-from libs.classes import Zbot, MyContext
+from libs.bot_classes import Zbot, MyContext
 from . import checks, args
 importlib.reload(checks)
 importlib.reload(args)

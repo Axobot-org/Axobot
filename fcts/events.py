@@ -12,9 +12,10 @@ import aiohttp
 import discord
 import mysql
 from discord.ext import commands, tasks
-from libs.classes import UsernameChangeRecord, Zbot
+from libs.bot_classes import Zbot
 
 from fcts.checks import is_fun_enabled
+from libs.enums import UsernameChangeRecord
 
 
 class Events(commands.Cog):

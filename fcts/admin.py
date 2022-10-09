@@ -14,7 +14,9 @@ import discord
 import speedtest
 from cachingutils import acached
 from discord.ext import commands
-from libs.classes import PRIVATE_GUILD_ID, ConfirmView, MyContext, UserFlag, Zbot
+from libs.bot_classes import PRIVATE_GUILD_ID, MyContext, Zbot
+from libs.enums import UserFlag
+from libs.views import ConfirmView
 
 from . import checks
 

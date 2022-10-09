@@ -28,7 +28,7 @@ import time
 import json
 from random import choice
 from fcts import tokens  # pylint: disable=no-name-in-module
-from libs.classes import Zbot
+from libs.bot_classes import Zbot
 from utils import load_cogs, load_sql_connection, setup_bot_logger, setup_database_logger, setup_start_parser, parse_crypted_file
 
 async def main():

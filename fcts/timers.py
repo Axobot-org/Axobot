@@ -4,8 +4,9 @@ from typing import Optional
 
 import discord
 from discord.ext import commands
-from libs.classes import ConfirmView, MyContext, Zbot
+from libs.bot_classes import MyContext, Zbot
 from libs.formatutils import FormatUtils
+from libs.views import ConfirmView
 
 from . import args, checks
 
@@ -201,7 +202,7 @@ class Timers(commands.Cog):
                 return
             reminders_data: list[dict] = []
             lang = await self.bot._(ctx.channel, '_used_locale')
-            for reminder in reminders[:25]:
+            for reminder in reminders:
                 rmd_data = {
                     "id": reminder["ID"],
                     "message": reminder["message"]

@@ -3,7 +3,7 @@ import typing
 import discord
 from discord.ext import commands
 from fcts.args import RawPermissionValue
-from libs.classes import MyContext, Zbot
+from libs.bot_classes import MyContext, Zbot
 from libs.paginator import cut_text
 
 

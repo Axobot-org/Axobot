@@ -7,7 +7,8 @@ from cachingutils import LRUCache
 from discord.ext import commands, tasks
 from fcts.tickets import TicketCreationEvent
 from libs.antiscam.classes import PredictionResult
-from libs.classes import MyContext, ServerWarningType, Zbot
+from libs.bot_classes import MyContext, Zbot
+from libs.enums import ServerWarningType
 from libs.formatutils import FormatUtils
 
 from fcts.args import serverlog

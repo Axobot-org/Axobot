@@ -14,7 +14,7 @@ from libs import blurple
 from libs.blurple import convert_image, check_image
 from libs.formatutils import FormatUtils
 importlib.reload(blurple)
-from libs.classes import Zbot, MyContext
+from libs.bot_classes import Zbot, MyContext
 
 
 class LinkConverter(commands.Converter):

@@ -5,7 +5,8 @@ import typing
 
 import discord
 from discord.ext import commands
-from libs.classes import MyContext, RankCardsFlag, UserFlag, Zbot
+from libs.bot_classes import MyContext, Zbot
+from libs.enums import RankCardsFlag, UserFlag
 
 from . import args, checks
 

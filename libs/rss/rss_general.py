@@ -15,7 +15,7 @@ FeedType = Literal['tw', 'yt', 'twitch', 'reddit', 'mc', 'deviant', 'web']
 
 if TYPE_CHECKING:
     from libs.emojis_manager import EmojisManager
-    from libs.classes import Zbot
+    from libs.bot_classes import Zbot
 
 async def feed_parse(bot: Zbot, url: str, timeout: int, session: ClientSession = None) -> Optional[feedparser.FeedParserDict]:
     """Asynchronous parsing using cool methods"""

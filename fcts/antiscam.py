@@ -3,7 +3,7 @@ import typing
 import discord
 from discord.ext import commands
 from libs.antiscam.classes import EMBED_COLORS, MsgReportView, PredictionResult
-from libs.classes import Zbot, MyContext
+from libs.bot_classes import Zbot, MyContext
 from libs.antiscam import AntiScamAgent, Message
 
 from . import checks

@@ -5,7 +5,7 @@ import aiohttp
 from discord.ext import commands
 
 from . import checks
-from libs.classes import Zbot, MyContext
+from libs.bot_classes import Zbot, MyContext
 
 RANDOM_NAMES_URL = 'https://randommer.io/api/Name?nameType=surname&quantity=20'
 MINECRAFT_ENTITIES_URL = 'https://raw.githubusercontent.com/PixiGeko/Minecraft-generated-data/master/1.19/releases/1.19/data/custom/universal_tags/all_entity_type.json'
