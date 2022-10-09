@@ -19,7 +19,7 @@ class RankCardsFlag:
         1 << 9: "blurple_22"
     }
 
-    def flagsToInt(self, flags: list) -> int:
+    def flags_to_int(self, flags: list) -> int:
         "Convert a list of flags to its integer value"
         result = 0
         for flag, value in self.FLAGS.items():
@@ -27,7 +27,7 @@ class RankCardsFlag:
                 result |= flag
         return result
 
-    def intToFlags(self, i: int) -> list:
+    def int_to_flags(self, i: int) -> list:
         "Convert an integer value to its list of flags"
         return [v for k, v in self.FLAGS.items() if i & k == k]
 
@@ -42,7 +42,7 @@ class UserFlag:
         1 << 5: "cookie"
     }
 
-    def flagsToInt(self, flags: list) -> int:
+    def flags_to_int(self, flags: list) -> int:
         "Convert a list of flags to its integer value"
         result = 0
         for flag, value in self.FLAGS.items():
@@ -50,12 +50,13 @@ class UserFlag:
                 result |= flag
         return result
 
-    def intToFlags(self, i: int) -> list:
+    def int_to_flags(self, i: int) -> list:
         "Convert an integer value to its list of flags"
         return [v for k, v in self.FLAGS.items() if i & k == k]
 
 class ServerWarningType(Enum):
     "Type of emitted server warning, mainly used for logs"
+
     # channel, is_join
     WELCOME_MISSING_TXT_PERMISSIONS = 1
     # channel, feed_id
@@ -66,6 +67,8 @@ class ServerWarningType(Enum):
     RSS_UNKNOWN_CHANNEL = 4
 
 class UsernameChangeRecord:
+    "Record of a username change, mainly used for logs"
+
     def __init__(self, before: Optional[str], after: Optional[str], user: Union[discord.Member, discord.User]):
         self.user = user
         self.before = before
