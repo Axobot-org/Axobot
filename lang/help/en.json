@@ -140,10 +140,6 @@
             "The tic-tac-toe game is enabled",
             "The tic-tac-toe game must be enabled on this server"
         ],
-        "verify_role_exists": [
-            "A verification role has been set up",
-            "No verification role has been added"
-        ]
     },
     "cmd-count": "%{nbr} commands\n`%{p}help %{cog}` to get the list",
     "cmd-not-found": "There is no command named \"%{cmd}\"",

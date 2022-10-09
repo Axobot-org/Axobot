@@ -95,7 +95,6 @@ List of every option
 * partner_color: The color of the partners embeds. Can be hex, integer or common english names. Default to #a713fe.
 * partner_role: A role given to every administrator of a partner server. Default to None.
 * update_mentions: A list of roles which will be mentioned in each update changelog. You can enable those changelogs with the `bot_news` option. Default to None.
-* verification_role: A role given to (un)verified members
 * voice_roles: List of roles given to people being in a voice channel
 * voice_channel: Channel used by the automated voice channels system (see `below <server.html#voice-channels-managment>`__)
 * voice_category: Category used by the automated voice channels system (see `below <server.html#voice-channels-managment>`__)
