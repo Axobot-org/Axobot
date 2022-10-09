@@ -5,7 +5,7 @@ from typing import Any, Callable, Literal, Optional, Union
 import discord
 from discord.ext import commands
 from mysql.connector.errors import IntegrityError
-from libs.classes import MyContext, Zbot
+from libs.bot_classes import MyContext, Zbot
 
 from . import checks
 from fcts.args import UnicodeEmoji

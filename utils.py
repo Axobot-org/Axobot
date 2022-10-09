@@ -14,7 +14,7 @@ from discord.ext import commands
 from fcts import cryptage, tokens  # pylint: disable=no-name-in-module
 
 if TYPE_CHECKING:
-    from libs.classes import Zbot
+    from libs.bot_classes import Zbot
 
 OUTAGE_REASON = {
     'fr': "Un des datacenters de notre hébergeur OVH a pris feu, rendant ,inaccessible le serveur et toutes ses données. Une vieille sauvegarde de la base de donnée sera peut-être utilisée ultérieurement. Plus d'informations sur https://zbot.statuspage.io/",

@@ -1,5 +1,4 @@
 import datetime
-from enum import Enum
 import logging
 import sys
 import time
@@ -30,7 +29,7 @@ if TYPE_CHECKING:
     from fcts.users import Users
     from fcts.utilities import Utilities
     from fcts.xp import Xp
-    
+
 PRIVATE_GUILD_ID = discord.Object(625316773771608074)
 
 class MyContext(commands.Context):
@@ -103,8 +102,8 @@ class Zbot(commands.bot.AutoShardedBot):
         self.emojis_manager = EmojisManager(self)
         # app commands
         self.tree.on_error = self.on_app_cmd_error
-    
-    async def on_error(self, event_method: Union[Exception, str], *args, **kwargs):
+
+    async def on_error(self, event_method: Union[Exception, str], *_args, **_kwargs):
         "Called when an event raises an uncaught exception"
         if isinstance(event_method, str) and event_method.startswith("on_") and event_method != "on_error":
             _, error, _ = sys.exc_info()
@@ -177,7 +176,7 @@ class Zbot(commands.bot.AutoShardedBot):
     @overload
     def get_cog(self, name: Literal["Utilities"]) -> Optional["Utilities"]:
         ...
-    
+
     @overload
     def get_cog(self, name: Literal["Xp"]) -> Optional["Xp"]:
         ...
@@ -309,127 +308,3 @@ class Zbot(commands.bot.AutoShardedBot):
         for prefix in prefixes:
             is_cmd = is_cmd or message.content.startswith(prefix)
         return is_cmd
-
-
-class ConfirmView(discord.ui.View):
-    "A simple view used to confirm an action"
-
-    def __init__(self, bot: Zbot, ctx, validation: Callable[[discord.Interaction], bool], ephemeral: bool=True, timeout: int=60):
-        super().__init__(timeout=timeout)
-        self.value: bool = None
-        self.bot = bot
-        self.ctx = ctx
-        self.validation = validation
-        self.ephemeral = ephemeral
-
-    async def init(self):
-        "Initialize buttons with translations"
-        confirm_label = await self.bot._(self.ctx, "misc.btn.confirm.label")
-        confirm_btn = discord.ui.Button(label=confirm_label, style=discord.ButtonStyle.green)
-        confirm_btn.callback = self.confirm
-        self.add_item(confirm_btn)
-        cancel_label = await self.bot._(self.ctx, "misc.btn.cancel.label")
-        cancel_btn = discord.ui.Button(label=cancel_label, style=discord.ButtonStyle.grey)
-        cancel_btn.callback = self.cancel
-        self.add_item(cancel_btn)
-
-    async def confirm(self, interaction: discord.Interaction):
-        "Confirm the action when clicking"
-        if not self.validation(interaction):
-            return
-        await interaction.response.send_message(await self.bot._(self.ctx, "misc.btn.confirm.answer"), ephemeral=self.ephemeral)
-        self.value = True
-        self.stop()
-
-    async def cancel(self, interaction: discord.Interaction):
-        "Cancel the action when clicking"
-        if not self.validation(interaction):
-            return
-        await interaction.response.send_message(await self.bot._(self.ctx, "misc.btn.cancel.answer"), ephemeral=self.ephemeral)
-        self.value = False
-        self.stop()
-
-class DeleteView(discord.ui.View):
-    "A simple view used to delete a bot message after reading it"
-
-    def __init__(self, delete_text: str, validation: Callable[[discord.Interaction], bool], \
-            timeout: int=60):
-        super().__init__(timeout=timeout)
-        self.validation = validation
-        delete_btn = discord.ui.Button(label=delete_text, style=discord.ButtonStyle.red, emoji='🗑')
-        delete_btn.callback = self.delete
-        self.add_item(delete_btn)
-
-    async def delete(self, interaction: discord.Interaction):
-        "Delete the message when clicking"
-        if not self.validation(interaction):
-            return
-        await interaction.message.delete(delay=0)
-        self.stop()
-
-class RankCardsFlag:
-    "Flags used for unlocked rank cards"
-    FLAGS = {
-        1 << 0: "rainbow",
-        1 << 1: "blurple_19",
-        1 << 2: "blurple_20",
-        1 << 3: "christmas_19",
-        1 << 4: "christmas_20",
-        1 << 5: "halloween_20",
-        1 << 6: "blurple_21",
-        1 << 7: "halloween_21",
-        1 << 8: "april_22",
-        1 << 9: "blurple_22"
-    }
-
-    def flagsToInt(self, flags: list) -> int:
-        "Convert a list of flags to its integer value"
-        result = 0
-        for flag, value in self.FLAGS.items():
-            if value in flags:
-                result |= flag
-        return result
-
-    def intToFlags(self, i: int) -> list:
-        "Convert an integer value to its list of flags"
-        return [v for k, v in self.FLAGS.items() if i & k == k]
-
-class UserFlag:
-    "Flags used for user permissions/roles"
-    FLAGS = {
-        1 << 0: "support",
-        1 << 1: "contributor",
-        1 << 2: "premium",
-        1 << 3: "partner",
-        1 << 4: "translator",
-        1 << 5: "cookie"
-    }
-
-    def flagsToInt(self, flags: list) -> int:
-        "Convert a list of flags to its integer value"
-        result = 0
-        for flag, value in self.FLAGS.items():
-            if value in flags:
-                result |= flag
-        return result
-
-    def intToFlags(self, i: int) -> list:
-        "Convert an integer value to its list of flags"
-        return [v for k, v in self.FLAGS.items() if i & k == k]
-
-class ServerWarningType(Enum):
-    # channel, is_join
-    WELCOME_MISSING_TXT_PERMISSIONS = 1
-    # channel, feed_id
-    RSS_MISSING_TXT_PERMISSION = 2
-    # channel, feed_id
-    RSS_MISSING_EMBED_PERMISSION = 3
-    # channel_id, feed_id
-    RSS_UNKNOWN_CHANNEL = 4
-
-class UsernameChangeRecord:
-    def __init__(self, before: Optional[str], after: Optional[str], user: Union[discord.Member, discord.User]):
-        self.user = user
-        self.before = before
-        self.after = after
-        self.is_guild = isinstance(user, discord.Member)

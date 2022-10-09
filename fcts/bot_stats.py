@@ -7,7 +7,8 @@ import psutil
 import discord
 from discord.ext import commands, tasks
 from fcts.tickets import TicketCreationEvent
-from libs.classes import MyContext, ServerWarningType, UsernameChangeRecord, Zbot
+from libs.bot_classes import MyContext, Zbot
+from libs.enums import ServerWarningType, UsernameChangeRecord
 
 try:
     import orjson  # type: ignore

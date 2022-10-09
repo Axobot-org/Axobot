@@ -7,7 +7,7 @@ import discord
 import emoji
 from cachingutils import LRUCache
 from discord.ext import commands
-from libs.classes import MyContext, Zbot
+from libs.bot_classes import MyContext, Zbot
 
 from . import checks
 

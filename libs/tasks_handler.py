@@ -10,7 +10,7 @@ import discord
 from libs.formatutils import FormatUtils
 
 if TYPE_CHECKING:
-    from libs.classes import Zbot
+    from libs.bot_classes import Zbot
 
 
 class TaskHandler:

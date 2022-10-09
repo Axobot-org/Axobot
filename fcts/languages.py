@@ -1,7 +1,7 @@
 from typing import Union
 import discord
 import i18n
-from libs.classes import Zbot
+from libs.bot_classes import Zbot
 
 SourceType = Union[None, int, discord.Guild, discord.TextChannel, discord.Thread,
                    discord.Member, discord.User, discord.DMChannel, discord.Interaction]

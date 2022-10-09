@@ -17,7 +17,7 @@ import geocoder
 from discord.ext import commands
 from pytz import timezone
 from timezonefinder import TimezoneFinder
-from libs.classes import MyContext, Zbot
+from libs.bot_classes import MyContext, Zbot
 from libs.formatutils import FormatUtils
 from libs.paginator import Paginator
 from utils import flatten_list

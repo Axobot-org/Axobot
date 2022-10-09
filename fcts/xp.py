@@ -22,7 +22,7 @@ from . import args, checks
 
 importlib.reload(args)
 importlib.reload(checks)
-from libs.classes import MyContext, Zbot
+from libs.bot_classes import MyContext, Zbot
 
 
 class Xp(commands.Cog):

@@ -18,7 +18,7 @@ from discord.ext import commands
 from discord.ext.commands.converter import run_converters
 from docs import conf
 from libs import bitly_api
-from libs.classes import PRIVATE_GUILD_ID, MyContext, Zbot
+from libs.bot_classes import PRIVATE_GUILD_ID, MyContext, Zbot
 from libs.formatutils import FormatUtils
 from libs.rss.rss_general import FeedObject
 from utils import count_code_lines

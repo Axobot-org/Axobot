@@ -6,7 +6,7 @@ from typing import Literal
 import discord
 import emoji as emojilib
 from discord.ext import commands
-from libs.classes import MyContext, Zbot
+from libs.bot_classes import MyContext, Zbot
 
 from fcts.checks import is_ttt_enabled
 

@@ -7,7 +7,7 @@ from typing import List, Optional
 import aiohttp
 import discord
 from discord.ext import commands
-from libs.classes import MyContext, Zbot
+from libs.bot_classes import MyContext, Zbot
 
 from . import args
 

@@ -13,7 +13,7 @@ from libs import halloween
 from libs.halloween import check_image, convert_image
 
 importlib.reload(halloween)
-from libs.classes import MyContext, Zbot
+from libs.bot_classes import MyContext, Zbot
 
 
 class LinkConverter(commands.Converter):
