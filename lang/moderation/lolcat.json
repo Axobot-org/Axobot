@@ -23,10 +23,6 @@
         "not-found": "Hmm... unable 2 delete these messages. Discord tell me they don't exist *LOL*",
         "too-few": "Ai cann:o2:t delte so few mesages plize"
     },
-    "deprecated-verify": {
-        "desc": "",
-        "title": "Soon-to-be-removed feature"
-    },
     "destop": {
         "no-guild": "Dat msg donot belong to this cozy serv",
         "too-old": "I can't delete messages that old! ur crazy duh"
@@ -120,61 +116,6 @@
         "zero": "No bad name editd!"
     },
     "unmute-chat": "Teh mmber %{user} (%{userid}) canow speek 'gain",
-    "verify-role-high": "Oops, that role `%{r}` is toooooooo high 4 me 2 give it. Plz place it role lawer than mine, or place my role 'bove it :plz:",
-    "verify_questions": [
-        [
-            "How many sides does a triangle have?",
-            "3"
-        ],
-        [
-            "What do 2+7?",
-            "9"
-        ],
-        [
-            "What does the product of 2 by 3 give?",
-            "6"
-        ],
-        [
-            "What is the first letter of `Zbot`?",
-            "z"
-        ],
-        [
-            "What is the name of this server?",
-            "_special_servername"
-        ],
-        [
-            "What is the result of 10 minus 5?",
-            "5"
-        ],
-        [
-            "Which of these words begins with D? `bathtub`, `crow`, `galion` or `drawing`",
-            "drawing"
-        ],
-        [
-            "What is the name of this server?",
-            "_special_servername"
-        ],
-        [
-            "What does the emoji :dark_sunglasses: represent? `sunglasses`, `twitter logo` or `eggplant`?",
-            "pig"
-        ],
-        [
-            "What is the first letter of `Groot`?",
-            "g"
-        ],
-        [
-            "What does the product 3x3 give?",
-            "9"
-        ],
-        [
-            "Pls write `cat`",
-            "cat"
-        ],
-        [
-            "Pls write `lol`",
-            "lol"
-        ]
-    ],
     "warn": {
         "cant-bot": "Nope, cant warn anoder cool boat ^^",
         "cant-staff": "Hey NOPE ! U cant warn 'nother staff nice member!",
