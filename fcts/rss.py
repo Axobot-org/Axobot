@@ -4,7 +4,7 @@ import importlib
 import random
 import re
 import time
-from typing import Any, Literal, Optional, Union
+from typing import Literal, Optional, Union
 
 import discord
 import mysql
@@ -14,10 +14,11 @@ from discord.ext import commands, tasks
 from libs.bot_classes import MyContext, Zbot
 from libs.enums import ServerWarningType
 from libs.formatutils import FormatUtils
-from libs.rss import RssMessage, feed_parse, TwitterRSS, YoutubeRSS
+from libs.paginator import PaginatedSelectView
+from libs.rss import RssMessage, TwitterRSS, YoutubeRSS, feed_parse
+from libs.rss.rss_general import FeedObject, FeedType
 
 from . import args, checks
-from libs.rss.rss_general import FeedObject, FeedSelectView, FeedType
 
 importlib.reload(args)
 importlib.reload(checks)
@@ -275,7 +276,7 @@ class Rss(commands.Cog):
             await ctx.send(await self.bot._(ctx.guild, "rss.fail-add"))
             await self.bot.get_cog("Errors").on_error(e,ctx)
 
-    @rss_main.command(name="remove",aliases=['delete'])
+    @rss_main.command(name="remove", aliases=["delete"])
     @commands.guild_only()
     @commands.check(checks.database_connected)
     @commands.check(can_use_rss)
@@ -285,19 +286,18 @@ class Rss(commands.Cog):
         ..Example rss remove
 
         ..Doc rss.html#delete-a-followed-feed"""
-        feeds_ids = await self.ask_rss_id(
+        feed_ids = await self.ask_rss_id(
             ID,
             ctx,
             await self.bot._(ctx.guild.id, "rss.choose-delete"),
             include_mc=True,
             max_count=None
         )
-        if feeds_ids is None:
+        if feed_ids is None:
             return
-        for feed in feeds_ids:
-            await self.db_remove_feed(feed)
-        await ctx.send(await self.bot._(ctx.guild, "rss.delete-success", count=len(feeds_ids)))
-        ids = ', '.join(map(str, feeds_ids))
+        await self.db_remove_feeds(feed_ids)
+        await ctx.send(await self.bot._(ctx.guild, "rss.delete-success", count=len(feed_ids)))
+        ids = ', '.join(map(str, feed_ids))
         self.bot.log.info(f"RSS feed deleted into server {ctx.guild.id} ({ids})")
         await self.send_log(f"Feed deleted into server {ctx.guild.id} ({ids})", ctx.guild)
 
@@ -371,6 +371,42 @@ class Rss(commands.Cog):
                 embed.add_field(name=self.bot.zws, value=feed, inline=False)
             await ctx.send(embed=embed)
 
+    async def transform_feeds_to_options(self, feeds: list[FeedObject], guild: discord.Guild) -> list[discord.SelectOption]:
+        "Transform a list of FeedObject into a list usable by a discord Select"
+        options: list[discord.SelectOption] = []
+        for feed in feeds:
+            # formatted last post date
+            last_post = await FormatUtils.date(
+                feed.date,
+                lang=await self.bot._(guild.id, '_used_locale'),
+                year=True, digital=True
+            )
+            # formatted feed type name
+            tr_type = await self.bot._(guild.id, "rss."+feed.type)
+            # formatted channel
+            if channel := guild.get_channel(feed.channel_id):
+                tr_channel = "#"+channel.name
+            else:
+                tr_channel = "#deleted"
+            # better name format (for Twitter/YouTube ID)
+            name = feed.link
+            if feed.type == 'tw' and feed.link.isnumeric():
+                if user := await self.twitter_rss.get_user_from_id(int(feed.link)):
+                    name = user.screen_name
+            elif feed.type == 'yt' and (channel_name := self.youtube_rss.get_channel_name_by_id(feed.link)):
+                name = channel_name
+            if len(name) > 90:
+                name = name[:89] + '…'
+            # emoji
+            emoji = feed.get_emoji(self.bot.emojis_manager)
+            options.append(discord.SelectOption(
+                value=str(feed.feed_id),
+                label=f"{tr_type} - {name}",
+                description=f"{tr_channel} - Last post: {last_post}",
+                emoji=emoji
+                ))
+        return options
+
     async def ask_rss_id(self, input_id: Optional[int], ctx: MyContext, title:str, include_mc: bool=False, max_count: Optional[int]=1) -> Optional[list[int]]:
         "Ask the user to select a feed ID"
         selection = []
@@ -389,45 +425,23 @@ class Rss(commands.Cog):
                 return
             if not include_mc:
                 guild_feeds = [f for f in guild_feeds if f.type != 'mc']
-            feeds_data: list[dict[str, Any]] = []
-            for feed in guild_feeds:
-                # better type format
-                feed_data = {
-                    "id": feed.feed_id
-                }
-                feed_data['tr_type'] = await self.bot._(ctx.guild.id, "rss."+feed.type)
-                # formatted last post date
-                feed_data['tr_lastpost'] = await FormatUtils.date(
-                    feed.date,
-                    lang=await self.bot._(ctx.channel,'_used_locale'),
-                    year=True, digital=True
-                )
-                # formatted channel
-                if channel := ctx.guild.get_channel(feed.channel_id):
-                    feed_data['tr_channel'] = "#"+channel.name
-                else:
-                    feed_data['tr_channel'] = "#deleted"
-                # better name format (for Twitter/YouTube ID)
-                feed_data['name'] = feed.link
-                if feed.type == 'tw' and feed.link.isnumeric():
-                    if user := await self.twitter_rss.get_user_from_id(int(feed.link)):
-                        feed_data['name'] = user.screen_name
-                elif feed.type == 'yt' and (channel_name := self.youtube_rss.get_channel_name_by_id(feed.link)):
-                    feed_data['name'] = channel_name
-                # emoji
-                feed_data['emoji'] = feed.get_emoji(self.bot.emojis_manager)
-                feeds_data.append(feed_data)
             if max_count:
                 form_placeholder = await self.bot._(ctx.channel, 'rss.picker-placeholder.single')
             else:
                 form_placeholder = await self.bot._(ctx.channel, 'rss.picker-placeholder.multi')
-            view = FeedSelectView(feeds_data, max_count or len(guild_feeds), form_placeholder)
-            await ctx.send(title, view=view)
+            view = PaginatedSelectView(self.bot, title,
+                options=await self.transform_feeds_to_options(guild_feeds, ctx.guild),
+                user=ctx.author,
+                placeholder=form_placeholder,
+                max_values=max_count or len(guild_feeds),
+            )
+            msg = await view.send_init(ctx)
             await view.wait()
-            if view.feeds is None:
+            if view.values is None:
+                await view.disable(msg)
                 return
             try:
-                selection = list(map(int, view.feeds))
+                selection = list(map(int, view.values))
             except ValueError:
                 selection = []
         if len(selection) == 0:
@@ -613,7 +627,7 @@ class Rss(commands.Cog):
                     max_count=None
                 )
                 err = None
-            except Exception as err:
+            except Exception:
                 feeds_ids = []
             if feeds_ids is None:
                 return
@@ -1116,14 +1130,16 @@ class Rss(commands.Cog):
             pass
         return feed_id
 
-    async def db_remove_feed(self, feed_id: int):
-        """Remove a feed from the database"""
-        if not isinstance(feed_id, int):
-            raise ValueError
-        query = ("DELETE FROM `{}` WHERE `ID`='{}'".format(self.table,feed_id))
-        async with self.bot.db_query(query):
-            pass
-        return True
+    async def db_remove_feeds(self, feed_ids: list[int]) -> bool:
+        """Remove some feeds from the database"""
+        if not all(isinstance(feed_id, int) for feed_id in feed_ids):
+            raise ValueError("Feed IDs must be integers")
+        query = "DELETE FROM `{}` WHERE ID IN ({})".format(
+            self.table,
+            ",".join(["%s"] * len(feed_ids))
+        )
+        async with self.bot.db_query(query, feed_ids, returnrowcount=True) as query_result:
+            return query_result > 0
 
     async def db_get_all_feeds(self):
         """Get every feed of the database"""
