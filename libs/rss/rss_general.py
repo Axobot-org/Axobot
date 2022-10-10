@@ -150,35 +150,6 @@ class RssMessage:
             emb.set_thumbnail(url=self.image)
         return emb
 
-class FeedSelectView(discord.ui.View):
-    "Used to ask to select an rss feed"
-    def __init__(self, feeds: list[dict[str, Any]], max_values: int, placeholder: str):
-        super().__init__()
-        options = self.build_options(feeds)
-        self.select = discord.ui.Select(placeholder=placeholder, min_values=1, max_values=max_values, options=options)
-        self.select.callback = self.callback
-        self.add_item(self.select)
-        self.feeds: list[int] = None
-
-    def build_options(self, feeds: list[dict[str, Any]]) -> list[discord.SelectOption]:
-        "Build the options list for Discord"
-        res = []
-        for feed in feeds:
-            if len(feed['name']) > 90:
-                feed['name'] = feed['name'][:89] + '…'
-            label = f"{feed['tr_type']} - {feed['name']}"
-            desc = f"{feed['tr_channel']} - Last post: {feed['tr_lastpost']}"
-            res.append(discord.SelectOption(value=feed['id'], label=label, description=desc, emoji=feed['emoji']))
-        return res
-
-    async def callback(self, interaction: discord.Interaction):
-        "Called when the dropdown menu has been validated by the user"
-        await interaction.response.defer()
-        self.feeds = self.select.values
-        self.select.disabled = True
-        await interaction.edit_original_response(view=self)
-        self.stop()
-
 class FeedObject:
     "A feed record from the database"
     def __init__(self, from_dict: dict):
