@@ -885,10 +885,10 @@ Available types: member, role, user, emoji, channel, server, invite, category
         embed = discord.Embed(color=default_color, timestamp=ctx.message.created_at)
         embed.add_field(name=await self.bot._(ctx.channel,"info.info.snowflake-0"), value=date)
         embed.add_field(name=await self.bot._(ctx.channel,"info.info.snowflake-2"), value=round(snowflake.date.timestamp()))
+        embed.add_field(name=await self.bot._(ctx.channel,"info.info.snowflake-6"), value=len(str(snowflake.id)))
         embed.add_field(name=await self.bot._(ctx.channel,"info.info.snowflake-1"), value=snowflake.binary, inline=False)
         embed.add_field(name=await self.bot._(ctx.channel,"info.info.snowflake-3"), value=snowflake.worker_id)
         embed.add_field(name=await self.bot._(ctx.channel,"info.info.snowflake-4"), value=snowflake.process_id)
-        embed.add_field(name=await self.bot._(ctx.channel,"info.info.snowflake-5"), value=snowflake.increment)
         embed.set_footer(text=ctx.author, icon_url=ctx.author.display_avatar)
         await ctx.send(embed=embed)
 
