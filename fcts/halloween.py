@@ -17,10 +17,10 @@ from libs.bot_classes import MyContext, Zbot
 
 
 class LinkConverter(commands.Converter):
+    "Convert an argument into a media link, by using Discord CDN proxy and embed system"
     async def convert(self, ctx: MyContext, argument: str):
         if not argument.startswith(('http://', 'https://')):
-            raise commands.errors.BadArgument(
-                'Could not convert "{}" into URL'.format(argument))
+            raise commands.errors.BadArgument(f'Could not convert "{argument}" into URL')
 
         for _ in range(10):
             if ctx.message.embeds and ctx.message.embeds[0].thumbnail:
@@ -28,11 +28,11 @@ class LinkConverter(commands.Converter):
 
             await asyncio.sleep(1)
 
-        raise commands.errors.BadArgument(
-            'Discord proxy image did not load in time.')
+        raise commands.errors.BadArgument('Discord proxy image did not load in time.')
 
 
 class FlagConverter(commands.Converter):
+    "Convert an argument into a 'negative' flag"
     async def convert(self, ctx: MyContext, argument: str):
         if not argument.startswith('--'):
             raise commands.errors.BadArgument('Not a valid flag!')
@@ -40,18 +40,12 @@ class FlagConverter(commands.Converter):
 
 
 class FlagConverter2(commands.Converter):
+    "Convert an argument into a 'positive' flag"
     async def convert(self, ctx: MyContext, argument: str):
         if not argument.startswith('++'):
             raise commands.errors.BadArgument('Not a valid flag!')
         return argument
 
-
-class ThemeConverter(commands.Converter):
-    async def convert(self, ctx: MyContext, argument: str):
-        if not argument in ["light", "dark"]:
-            raise commands.errors.BadArgument(
-                f'Could not convert "{argument}" into Halloween Theme')
-        return argument
 
 async def is_halloween(ctx: MyContext):
     """Check if we are in Halloween period"""
@@ -76,16 +70,19 @@ def _make_check_command(name: str, parent: commands.Group, **kwargs):
     @commands.cooldown(2, 60, commands.BucketType.member)
     @commands.cooldown(30, 40, commands.BucketType.guild)
     @parent.command(name, help=f"{name.title()} an image to know if you're cool enough.\n\nTheme is either 'light' or 'dark'", **kwargs)
-    async def command(self, ctx: MyContext, theme: ThemeConverter = "light", *, who: typing.Union[discord.Member, discord.PartialEmoji, LinkConverter] = None):
+    async def command(self: "Halloween", ctx: MyContext,
+                      theme: typing.Literal["light", "dark"] = "light",
+                      *,
+                      who: typing.Union[discord.Member, discord.PartialEmoji, LinkConverter] = None
+                      ):
 
         url = await get_url_from_ctx(ctx, who)
 
-        old_msg = await ctx.send("Starting check for {}...".format(ctx.author.mention))
+        old_msg = await ctx.send(f"Starting check for {ctx.author.mention}...")
         async with aiohttp.ClientSession() as session:
             async with session.get(str(url)) as image:
                 result = await check_image(await image.read(), theme, name)
-        answer = "\n".join(
-            ["> {}: {}%".format(color["name"], color["ratio"]) for color in result['colors']])
+        answer = "\n".join(f"> {color['name']}: {color['ratio']}%" for color in result['colors'])
         await ctx.send(f"Results for {ctx.author.mention}:\n"+answer)
         if result["passed"] and ctx.author.id not in self.cache:
             await self.bot.get_cog("Utilities").add_user_eventPoint(ctx.author.id, 40)
@@ -98,12 +95,12 @@ def _make_check_command(name: str, parent: commands.Group, **kwargs):
     return command
 
 
-def _make_color_command(name, fmodifier, parent, **kwargs):
+def _make_color_command(name: str, fmodifier: str, parent: commands.Group, **kwargs):
     @commands.cooldown(6, 120, commands.BucketType.member)
     @commands.cooldown(20, 60, commands.BucketType.guild)
     @parent.command(name, help=f"{name.title()} an image.", **kwargs)
-    async def command(self, ctx: MyContext, method: typing.Optional[FlagConverter] = None,
-                      variations: commands.Greedy[FlagConverter2] = [None], *,
+    async def command(self: "Halloween", ctx: MyContext, method: typing.Optional[FlagConverter] = None,
+                      variations: commands.Greedy[FlagConverter2] = None, *,
                       who: typing.Union[discord.Member, discord.PartialEmoji, LinkConverter] = None):
 
         if not (ctx.guild is None or ctx.channel.permissions_for(ctx.guild.me).attach_files):
@@ -125,15 +122,20 @@ def _make_color_command(name, fmodifier, parent, **kwargs):
         else:
             final_modifier = fmodifier
 
-        old_msg = await ctx.send("Starting {} for {}...".format(name, ctx.author.mention))
+        old_msg = await ctx.send(f"Starting {name} for {ctx.author.mention}...")
         try:
             async with aiohttp.ClientSession() as session:
                 async with session.get(str(url)) as image:
-                    r = await self.bot.loop.run_in_executor(None, convert_image, await image.read(), final_modifier, method, variations)
+                    result = await self.bot.loop.run_in_executor(None, convert_image,
+                                                                 await image.read(),
+                                                                 final_modifier,
+                                                                 method,
+                                                                 variations or []
+                                                                 )
         except RuntimeError as err:
             await ctx.send(f"Oops, something went wrong: {err}")
             return
-        await ctx.send(f"{ctx.author.mention}, here's your image!", file=r)
+        await ctx.send(f"{ctx.author.mention}, here's your image!", file=result)
         await old_msg.delete()
         await self.bot.get_cog("Utilities").add_user_eventPoint(ctx.author.id, 3)
 
@@ -152,7 +154,7 @@ class Halloween(Cog):
         except FileNotFoundError:
             with open("halloween-cache.json", "w", encoding="utf-8") as file:
                 file.write('[]')
-            self.cache = list()
+            self.cache = []
 
     async def get_default_halloweefier(self, _ctx: MyContext):
         return "--hallowify"
@@ -219,11 +221,13 @@ __29 variations: __
     async def hw_collect(self, ctx: MyContext):
         """Get some events points every hour"""
         events_cog = self.bot.get_cog("BotEvents")
-        last_data: typing.Optional[dict] = await events_cog.db_get_points(ctx.author.id)
+        if events_cog is None:
+            return
+        last_data: typing.Optional[dict] = await events_cog.db_get_dailies(ctx.author.id)
         if last_data is None or (datetime.datetime.now() - last_data['last_update']).total_seconds() > 3600:
             points = randint(*self.hourly_reward)
             await self.bot.get_cog("Utilities").add_user_eventPoint(ctx.author.id, points)
-            await events_cog.db_add_points(ctx.author.id, points)
+            await events_cog.db_add_dailies(ctx.author.id, points)
             txt = await self.bot._(ctx.channel, "halloween.daily.got-points", pts=points)
         else:
             txt = await self.bot._(ctx.channel, "halloween.daily.too-quick")

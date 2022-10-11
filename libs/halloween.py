@@ -344,7 +344,7 @@ VARIATIONS = {
 }
 
 
-def convert_image(image, modifier, method, variations):
+def convert_image(image, modifier: str, method: str, variations: list[str]):
     try:
         modifier_converter = dict(MODIFIERS[modifier])
     except KeyError:
@@ -374,7 +374,7 @@ def convert_image(image, modifier, method, variations):
                     background_color = variation_converter
                     continue
                 except KeyError:
-                    raise RuntimeError('Invalid image variation.')
+                    raise RuntimeError('Invalid image variation') from None
         if not isinstance(variation_converter, tuple):
             modifier_converter['colors'] = variation_converter(modifier_converter['colors'])
         elif method != "--filter":
@@ -438,7 +438,7 @@ def convert_image(image, modifier, method, variations):
     return discord.File(out, filename=filename)
 
 
-async def check_image(image, modifier, method):
+async def check_image(image, modifier: str, method: str):
     try:
         modifier_converter = MODIFIERS[modifier]
     except KeyError:

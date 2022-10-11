@@ -20,6 +20,7 @@ from libs.tasks_handler import TaskHandler
 
 if TYPE_CHECKING:
     from fcts.aide import Help
+    from fcts.bot_events import BotEvents
     from fcts.bot_stats import BotStats
     from fcts.errors import Errors
     from fcts.minecraft import Minecraft
@@ -143,6 +144,10 @@ class Zbot(commands.bot.AutoShardedBot):
 
     @overload
     def get_cog(self, name: Literal["BotStats"]) -> Optional["BotStats"]:
+        ...
+
+    @overload
+    def get_cog(self, name: Literal["BotEvents"]) -> Optional["BotEvents"]:
         ...
 
     @overload
