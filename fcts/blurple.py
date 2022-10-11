@@ -44,12 +44,6 @@ class FlagConverter2(commands.Converter):
             raise commands.errors.BadArgument('Not a valid flag!')
         return argument
 
-class ThemeConverter(commands.Converter):
-    async def convert(self, ctx: MyContext, argument: str):
-        if not argument in ["light", "dark"]:
-            raise commands.errors.BadArgument(f'Could not convert "{argument}" into Blurple Theme')
-        return argument
-
 async def get_url_from_ctx(ctx: MyContext, who: typing.Union[discord.Member, discord.PartialEmoji, LinkConverter]):
     "Get the resource URL from either the who argument or the context"
     if ctx.message.attachments:
@@ -150,7 +144,7 @@ __29 variations: __
     @commands.cooldown(2, 60, commands.BucketType.member)
     @commands.cooldown(30, 40, commands.BucketType.guild)
     @blurple_main.command("check", help="Check an image to know if you're cool enough")
-    async def bp_check(self, ctx: MyContext, theme: ThemeConverter = "light", *, who: typing.Union[discord.Member, discord.PartialEmoji, LinkConverter] = None):
+    async def bp_check(self, ctx: MyContext, theme: typing.Literal["light", "dark"] = "light", *, who: typing.Union[discord.Member, discord.PartialEmoji, LinkConverter] = None):
 
         url = await get_url_from_ctx(ctx, who)
 
