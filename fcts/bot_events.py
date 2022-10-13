@@ -12,7 +12,8 @@ data = {
     "fr": {
         "events-desc": {
             "april-2021": "Aujourd'hui, c'est la journée internationale des poissons ! Pendant toute la journée, Zbot fêtera le 1er avril avec des émojis spéciaux pour le jeu du morpion, un avatar unique ainsi que d'autres choses trop cool. \n\nProfitez-en pour récupérer des points d'événements et tentez de gagner la carte d'xp rainbow ! Pour rappel, les cartes d'xp sont accessibles via ma commande `profile card`",
-            "april-2022": "Aujourd'hui, c'est la journée internationale des poissons ! Pendant toute la journée, Zbot fêtera le 1er avril avec des émojis spéciaux pour le jeu du morpion, des commandes uniques ainsi que d'autres choses trop cool. \n\nProfitez-en pour récupérer des points d'événements et tentez de gagner la carte d'xp rainbow ! Pour rappel, les cartes d'xp sont accessibles via ma commande `profile card`"
+            "april-2022": "Aujourd'hui, c'est la journée internationale des poissons ! Pendant toute la journée, Zbot fêtera le 1er avril avec des émojis spéciaux pour le jeu du morpion, des commandes uniques ainsi que d'autres choses trop cool. \n\nProfitez-en pour récupérer des points d'événements et tentez de gagner la carte d'xp rainbow ! Pour rappel, les cartes d'xp sont accessibles via ma commande `profile card`",
+            "halloween-2022": "Le mois d'octobre est là ! Profitez jusqu'au 1er novembre d'une atmosphère ténébreuse, remplie de chauve-souris, de squelettes et de citrouilles.\nProfitez-en pour redécorer votre serveur aux couleurs d'Halloween avec la commande `halloween hallowify` et ses dérivées, vérifiez que votre avatar soit bien conforme avec la commande `halloween check`, et récupérez des points d'événements toutes les heures avec la commande `halloween collect`.\n\nLes plus courageux d'entre vous réussirons peut-être à débloquer la carte d'xp spécial Halloween 2022, que vous pourrez utiliser via la commande profile card !"
         },
         "events-prices": {
             "april-2021": {
@@ -20,17 +21,23 @@ data = {
             },
             "april-2022": {
                 "200": "Débloquez la carte d'xp sous-marine, obtenable pendant seulement 24h !"
+            },
+            "halloween-2022": {
+                "250": "Débloquez la carte d'xp halloween, obtenable uniquement pendant cet événement !",
+                "400": "Venez réclamer votre rôle spécial Halloween 2022 sur le serveur officiel de Zbot !"
             }
         },
         "events-title": {
             "april-2021": "Joyeux 1er avril !",
-            "april-2022": "Joyeux 1er avril !"
+            "april-2022": "Joyeux 1er avril !",
+            "halloween-2022": "Le temps des citrouilles est arrivé !"
         }
     },
     "en": {
         "events-desc": {
             "april-2021": "Today is International Fish Day! All day long, Zbot will be celebrating April 1st with special tic-tac-toe emojis, a unique avatar and other cool stuff. \nTake the opportunity to collect event points and try to win the rainbow xp card! As a reminder, the xp cards are accessible via my `profile card` command",
-            "april-2022": "Today is International Fish Day! Throughout the day, Zbot will be celebrating April 1 with special tic-tac-toe emojis, unique commands and other cool stuff. \n\nTake the opportunity to collect event points and try to win the rainbow xp card! As a reminder, the xp cards are accessible via my `profile card` command"
+            "april-2022": "Today is International Fish Day! Throughout the day, Zbot will be celebrating April 1 with special tic-tac-toe emojis, unique commands and other cool stuff. \n\nTake the opportunity to collect event points and try to win the rainbow xp card! As a reminder, the xp cards are accessible via my `profile card` command",
+            "halloween-2022": "October is here! Enjoy a dark atmosphere full of bats, skeletons and pumpkins until November 1st.\nTake the opportunity to redecorate your server in Halloween colors with the `halloween hallowify` command and its derivatives, check your avatar with the `halloween check` command, and collect event points every hour with the `halloween collect` command.\n\nThe most courageous among you may succeed in unlocking the special Halloween 2022 xp card, which you can use via the profile card command!"
         },
         "events-prices": {
             "april-2021": {
@@ -38,11 +45,16 @@ data = {
             },
             "april-2022": {
                 "200": "Unlock the submarine xp card, obtainable only for 24h!"
+            },
+            "halloween-2022": {
+                "250": "Unlock the Halloween xp card, obtainable only during this event!",
+                "400": "Come claim your special Halloween 2022 role on the official Zbot server!"
             }
         },
         "events-title": {
             "april-2021": "Happy April 1st!",
-            "april-2022": "Happy April 1st!"
+            "april-2022": "Happy April 1st!",
+            "halloween-2022": "It's pumpkin time!"
         }
     }
 }
@@ -154,6 +166,8 @@ class BotEvents(commands.Cog):
             await ctx.send(await self.bot._(ctx.channel, "bot_events.soon", date=date))
         else:
             await ctx.send(await self.bot._(ctx.channel, "bot_events.nothing-desc"))
+            if current_event:
+                self.bot.dispatch("error", ValueError(f"'{current_event}' has no event description"), ctx)
 
     @events_main.command(name="rank")
     async def events_rank(self, ctx: MyContext, user: discord.User = None):
@@ -166,6 +180,8 @@ class BotEvents(commands.Cog):
 
         if not current_event in events_desc:
             await ctx.send(await self.bot._(ctx.channel, "bot_events.nothing-desc"))
+            if current_event:
+                self.bot.dispatch("error", ValueError(f"'{current_event}' has no event description"), ctx)
             return
         if user is None:
             user = ctx.author
