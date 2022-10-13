@@ -113,17 +113,28 @@ class Admin(commands.Cog):
                     for cmds in cmd.commands:
                         text+="\n        - {} *({})*".format(cmds.name,cmds.help.split('\n')[0])
             await ctx.send(text)
-    
+
     @main_msg.command(name="sync")
     @commands.check(checks.is_bot_admin)
-    async def sync_app_commands(self, ctx: MyContext, target: typing.Literal["global", "guild"]):
+    async def sync_app_commands(self, ctx: MyContext, scope: typing.Literal["global", "staff-guild", "support-guild"]):
         "Sync app commands for either global or staff server scope"
-        if target == "global":
+        await ctx.defer()
+        if scope == "global":
             cmds = await self.bot.tree.sync()
-            await ctx.send(f"{len(cmds)} global app commands synced!")
-        else:
+            txt = f"{len(cmds)} global app commands synced"
+        elif scope == "staff-guild":
             cmds = await self.bot.tree.sync(guild=discord.Object(id=625316773771608074))
-            await ctx.send(f"{len(cmds)} app commands synced in the staff server!")
+            txt = f"{len(cmds)} global app commands synced in staff server"
+        elif scope == "support-guild":
+            cmds = await self.bot.tree.sync(guild=discord.Object(id=356067272730607628))
+            txt = f"{len(cmds)} global app commands synced in the support server"
+        else:
+            await ctx.send("Unknown scope")
+            return
+        self.bot.log.info(txt)
+        emb = discord.Embed(description=txt, color=discord.Color.blue())
+        await self.bot.send_embed(emb)
+        await ctx.send(txt + '!')
 
     @main_msg.command(name="god")
     @commands.check(checks.is_bot_admin)
