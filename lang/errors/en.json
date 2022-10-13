@@ -5,6 +5,7 @@
     "badlitteral": "Oops, unknown argument detected",
     "cannotembed": "Oops, I am missing the permission to send embeds to execute this command!",
     "channotfound": "Channel %{c} not found",
+    "checkfailure": "Oops, it looks like you're not allowed to use this command. Use the %{help_cmd} command to find out why!",
     "cooldown": "You are on cooldown for this command :confused: Please wait %{d} more seconds...",
     "disabled": "The command %{c} is disabled :confused:",
     "duration": "The duration `%{d}` is invalid",

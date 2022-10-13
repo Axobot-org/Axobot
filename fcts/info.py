@@ -900,7 +900,7 @@ Available types: member, role, user, emoji, channel, server, invite, category
     )
 
     @find_main.command(name="user")
-    @commands.check(checks.is_support_staff)
+    @discord.app_commands.check(checks.is_support_staff)
     async def find_user(self, interaction: discord.Interaction, user: discord.User):
         "Find any user visible by the bot"
         # Servers list
@@ -964,7 +964,7 @@ Available types: member, role, user, emoji, channel, server, invite, category
         await interaction.response.send_message(embed=embed)
 
     @find_main.command(name="guild")
-    @commands.check(checks.is_support_staff)
+    @discord.app_commands.check(checks.is_support_staff)
     @discord.app_commands.describe(guild="The server name or ID")
     async def find_guild(self, interaction: discord.Interaction, guild: str):
         "Find any guild where the bot is"
@@ -1019,7 +1019,7 @@ Available types: member, role, user, emoji, channel, server, invite, category
         await interaction.response.send_message(embed=emb)
 
     @find_main.command(name='channel')
-    @commands.check(checks.is_support_staff)
+    @discord.app_commands.check(checks.is_support_staff)
     @discord.app_commands.describe(channel="The ID/name of the channel to look for")
     async def find_channel(self, interaction: discord.Interaction, channel: str):
         "Find any channel from any server where the bot is"
@@ -1042,7 +1042,7 @@ Available types: member, role, user, emoji, channel, server, invite, category
         await interaction.response.send_message(embed=emb)
 
     @find_main.command(name='role')
-    @commands.check(checks.is_support_staff)
+    @discord.app_commands.check(checks.is_support_staff)
     @discord.app_commands.describe(role="The ID/name of the role to look for")
     async def find_role(self, interaction: discord.Interaction, role: str):
         "Find any role from any server where the bot is"
@@ -1065,7 +1065,7 @@ Available types: member, role, user, emoji, channel, server, invite, category
         await interaction.response.send_message(embed=emb)
 
     @find_main.command(name='rss')
-    @commands.check(checks.is_support_staff)
+    @discord.app_commands.check(checks.is_support_staff)
     async def find_rss(self, interaction: discord.Interaction, feed_id: int):
         "Find any active or inactive RSS feed"
         feed: FeedObject = await self.bot.get_cog('Rss').db_get_feed(feed_id)
