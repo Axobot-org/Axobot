@@ -33,7 +33,7 @@ class AntiScam(commands.Cog):
         emb = discord.Embed(title="Scam message deleted", description=msg.content, color=discord.Color.red())
         emb.set_author(name=msg.author, icon_url=msg.author.display_avatar)
         emb.set_footer(text=f"{msg.guild.name} ({msg.guild.id})" if msg.guild else "No guild")
-        await self.bot.send_embed([emb])
+        await self.bot.send_embed(emb)
 
     async def db_insert_msg(self, msg: Message) -> int:
         "Insert a new suspicious message into the database"

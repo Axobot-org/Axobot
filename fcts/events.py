@@ -148,7 +148,7 @@ class Events(commands.Cog):
                         desc += f"\nJoined at <t:{guild.me.joined_at.timestamp():.0f}>"
             emb = discord.Embed(description=desc, color=self.embed_colors['welcome'], timestamp=self.bot.utcnow())
             emb.set_author(name=self.bot.user, icon_url=self.bot.user.display_avatar)
-            await self.bot.send_embed([emb])
+            await self.bot.send_embed(emb)
             if self.bot.database_online:
                 await self.send_sql_statslogs()
         except Exception as err:
@@ -377,7 +377,7 @@ class Events(commands.Cog):
         e = self.bot.get_cog("BotEvents").current_event
         emb = discord.Embed(description=f'**Bot event** updated (current event is {e})', color=1406147, timestamp=self.bot.utcnow())
         emb.set_author(name=self.bot.user, icon_url=self.bot.user.display_avatar)
-        await self.bot.send_embed([emb], url="loop")
+        await self.bot.send_embed(emb, url="loop")
         self.last_eventDay_check = datetime.datetime.today()
 
     async def dbl_send_data(self):
@@ -437,7 +437,7 @@ class Events(commands.Cog):
         delta_time = round(time.time()-t, 3)
         emb = discord.Embed(description=f'**Guilds count updated** in {delta_time}s ({answers})', color=7229109, timestamp=self.bot.utcnow())
         emb.set_author(name=self.bot.user, icon_url=self.bot.user.display_avatar)
-        await self.bot.send_embed([emb], url="loop")
+        await self.bot.send_embed(emb, url="loop")
         self.dbl_last_sending = datetime.datetime.now()
 
     async def partners_loop(self):
@@ -465,7 +465,7 @@ class Events(commands.Cog):
             color=10949630,
             timestamp=self.bot.utcnow())
         emb.set_author(name=self.bot.user, icon_url=self.bot.user.display_avatar)
-        await self.bot.send_embed([emb], url="loop")
+        await self.bot.send_embed(emb, url="loop")
 
     async def translations_backup(self):
         """Do a backup of the translations files"""
@@ -484,7 +484,7 @@ class Events(commands.Cog):
         delta_time = round(time.time()-start, 3)
         emb = discord.Embed(description=f'**Translations files backup** completed in {delta_time}s', color=10197915, timestamp=self.bot.utcnow())
         emb.set_author(name=self.bot.user, icon_url=self.bot.user.display_avatar)
-        await self.bot.send_embed([emb], url="loop")
+        await self.bot.send_embed(emb, url="loop")
 
     async def send_sql_statslogs(self):
         "Send some stats about the current bot stats"
@@ -523,7 +523,7 @@ class Events(commands.Cog):
             raise err
         emb = discord.Embed(description='**Stats logs** updated', color=5293283, timestamp=self.bot.utcnow())
         emb.set_author(name=self.bot.user, icon_url=self.bot.user.display_avatar)
-        await self.bot.send_embed([emb], url="loop")
+        await self.bot.send_embed(emb, url="loop")
         self.statslogs_last_push = datetime.datetime.now()
 
 
