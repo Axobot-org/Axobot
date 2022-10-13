@@ -32,6 +32,7 @@ if TYPE_CHECKING:
     from fcts.xp import Xp
 
 PRIVATE_GUILD_ID = discord.Object(625316773771608074)
+SUPPORT_GUILD_ID = discord.Object(356067272730607628)
 
 class MyContext(commands.Context):
     """Replacement for the official commands.Context class
@@ -298,8 +299,10 @@ class Zbot(commands.bot.AutoShardedBot):
             return fake_tr
         return cog.tr
 
-    async def send_embed(self, embeds: list[discord.Embed], url:str=None):
+    async def send_embed(self, embeds: Union[list[discord.Embed], discord.Embed], url:str=None):
         """Send a list of embeds to a discord channel"""
+        if isinstance(embeds, discord.Embed):
+            embeds = [embeds]
         if cog := self.get_cog('Embeds'):
             await cog.send(embeds, url)
         elif url is not None and url.startswith('https://'):

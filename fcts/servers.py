@@ -269,7 +269,7 @@ class Servers(commands.Cog):
                 raise Exception("Guild not found")
             emb_desc = f"New server in the database :tada: `{guild.name}` ({guild.id})"
             emb = discord.Embed(description=emb_desc, color=self.log_color, timestamp=self.bot.utcnow())
-            await self.bot.send_embed([emb])
+            await self.bot.send_embed(emb)
             return await self.add_server(guild_id)
         return True
 
@@ -386,7 +386,7 @@ class Servers(commands.Cog):
             emb = discord.Embed(description=msg, color=self.log_color, timestamp=self.bot.utcnow())
             emb.set_footer(text=ctx.guild.name)
             emb.set_author(name=self.bot.user, icon_url=self.bot.user.display_avatar)
-            await self.bot.send_embed([emb])
+            await self.bot.send_embed(emb)
             self.bot.log.debug(msg)
         except ValueError:
             await ctx.send(await self.bot._(ctx.guild.id, "server.option-notfound"))
@@ -399,7 +399,7 @@ class Servers(commands.Cog):
         emb = discord.Embed(description=msg, color=self.log_color, timestamp=self.bot.utcnow())
         emb.set_footer(text=guild.name)
         emb.set_author(name=self.bot.user, icon_url=self.bot.user.display_avatar)
-        await self.bot.send_embed([emb])
+        await self.bot.send_embed(emb)
         self.bot.log.debug(msg)
 
 
@@ -1132,7 +1132,7 @@ class Servers(commands.Cog):
         if i > 0:
             emb = discord.Embed(description=f"[MEMBERCOUNTER] {i} channels refreshed", color=5011628, timestamp=self.bot.utcnow())
             emb.set_author(name=self.bot.user, icon_url=self.bot.user.display_avatar)
-            await self.bot.send_embed([emb], url="loop")
+            await self.bot.send_embed(emb, url="loop")
 
 
 async def setup(bot):

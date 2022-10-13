@@ -1330,7 +1330,7 @@ class Rss(commands.Cog):
             await self.db_increment_errors(errors)
         emb = discord.Embed(description='\n'.join(d), color=1655066, timestamp=self.bot.utcnow())
         emb.set_author(name=self.bot.user, icon_url=self.bot.user.display_avatar)
-        await self.bot.send_embed([emb], url="loop")
+        await self.bot.send_embed(emb, url="loop")
         self.bot.log.debug(d[0])
         if len(errors) > 0:
             self.bot.log.warning("[rss] "+d[1])
@@ -1397,7 +1397,7 @@ class Rss(commands.Cog):
             emb = discord.Embed(description="[RSS] "+text, color=5366650, timestamp=self.bot.utcnow())
             emb.set_footer(text=guild.name)
             emb.set_author(name=self.bot.user, icon_url=self.bot.user.display_avatar)
-            await self.bot.send_embed([emb])
+            await self.bot.send_embed(emb)
         except Exception as e:
             await self.bot.get_cog("Errors").on_error(e,None)
 
