@@ -1,15 +1,69 @@
 # -*- coding: utf-8 -*-
 
+import asyncio
 import io
 import math
+import typing
 
 import discord
+from discord.ext import commands
 from PIL import Image, ImageSequence
+
+from libs.bot_classes import MyContext
 
 DARK_ORANGE = (205, 100, 10)
 ORANGE = (255, 140, 26)
 WHITE = (255, 255, 255)
 BLACK = (35, 39, 42)
+
+class LinkConverter(str):
+    "Represents a media link"
+
+    @classmethod
+    async def convert(cls, ctx: MyContext, argument: str):
+        "Convert an argument into a media link, by using Discord CDN proxy and embed system"
+        if not argument.startswith(('http://', 'https://')):
+            raise commands.errors.BadArgument(f'Could not convert "{argument}" into URL')
+
+        for _ in range(10):
+            if ctx.message.embeds and ctx.message.embeds[0].thumbnail:
+                return ctx.message.embeds[0].thumbnail.proxy_url
+
+            await asyncio.sleep(1)
+
+        raise commands.errors.BadArgument('Discord proxy image did not load in time.')
+
+class TargetConverter:
+    "Represents a target usable for color conversion"
+
+    @classmethod
+    async def convert(cls, ctx: MyContext, argument: str):
+        "Convert an argument into a Discord Member, PartialEmoji, or to a media link"
+        try:
+            return await commands.MemberConverter().convert(ctx, argument)
+        except commands.errors.BadArgument:
+            pass
+
+        try:
+            return await commands.PartialEmojiConverter().convert(ctx, argument)
+        except commands.errors.BadArgument:
+            pass
+
+        return await LinkConverter().convert(ctx, argument)
+
+TargetConverterType = typing.Annotated[typing.Union[discord.Member, discord.PartialEmoji, LinkConverter], TargetConverter]
+
+class ColorVariation(str):
+    "Represents a usable color variation for color conversion algorithm"
+
+    @classmethod
+    async def convert(cls, _ctx: MyContext, argument: str):
+        "Convert an argument into a color variation"
+        if not argument.startswith('++'):
+            raise commands.errors.BadArgument('Not a valid flag!')
+        return argument
+
+VariationFlagType = typing.Literal["hallowify", "edge-detect", "filter"]
 
 # source: https://dev.to/enzoftware/how-to-build-amazing-image-filters-with-python-median-filter---sobel-filter---5h7
 def edge_antialiasing(img):
@@ -187,7 +241,7 @@ def remove_alpha(img, bg):
     return background
 
 
-def blurple_filter(img, modifier, variation, maximum, minimum):
+def HALLOWEEN_filter(img, modifier, variation, maximum, minimum):
     img = img.convert('LA')
     pixels = img.getdata()
     img = img.convert('RGBA')
@@ -206,7 +260,7 @@ def hallowify(img, modifier, variation, maximum, minimum):
     return img
 
 
-def variation_maker(base, var):
+def variation_maker(base, var: tuple[float, float, float, float]):
     if var[0] <= -100:
         base1 = base2 = 0
         base3 = (base[2] + base[0]) / 2 * .75
@@ -306,9 +360,9 @@ MODIFIERS = {
 
 }
 METHODS = {
-    '--hallowify': hallowify,
-    '--edge-detect': edge_detect,
-    '--filter': blurple_filter
+    'hallowify': hallowify,
+    'edge-detect': edge_detect,
+    'filter': HALLOWEEN_filter
 }
 VARIATIONS = {
     None: (0, 0, 0, 0),
@@ -345,6 +399,7 @@ VARIATIONS = {
 
 
 def convert_image(image, modifier: str, method: str, variations: list[str]):
+    "Change an image colors into orange-black colors by using given modifier, method and variations"
     try:
         modifier_converter = dict(MODIFIERS[modifier])
     except KeyError:
@@ -360,8 +415,8 @@ def convert_image(image, modifier: str, method: str, variations: list[str]):
 
     variations.sort()
     background_color = None
-    # base_color_var = (.15, .3, .7, .85)
     base_color_var = (.7, .42, .14, .85)
+    variation_converter = (0, 0, 0, 0)
     for var in variations:
         try:
             variation_converter = VARIATIONS[var]
@@ -415,8 +470,8 @@ def convert_image(image, modifier: str, method: str, variations: list[str]):
             try:
                 frames[0].save(out, format='GIF', append_images=frames[1:], save_all=True, loop=loop,
                                duration=durations)
-            except TypeError as e:
-                print(e)
+            except TypeError as err:
+                print(err)
                 raise RuntimeError('Invalid GIF.')
 
             filename = f'{modifier}.gif'
