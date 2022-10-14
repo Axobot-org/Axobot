@@ -169,6 +169,7 @@ class FeedObject:
         self.last_update: Optional[datetime.datetime] = from_dict['last_update']
         self.recent_errors: int = from_dict['recent_errors']
         self.is_active_guild: bool = bool(from_dict['active_guild'])
+        self.enabled: bool = bool(from_dict['enabled'])
 
     @classmethod
     def unrecorded(cls, from_type: str, guild_id: Optional[int]=None, channel_id: Optional[int]=None):
@@ -188,7 +189,8 @@ class FeedObject:
             "embed_color": "",
             "last_update": None,
             "recent_errors": 0,
-            "active_guild": True
+            "active_guild": True,
+            "enabled": True
         })
 
     def get_emoji(self, cog: "EmojisManager") -> Union[discord.Emoji, str]:
