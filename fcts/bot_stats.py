@@ -1,3 +1,4 @@
+from datetime import datetime
 import math
 import typing
 import aiohttp
@@ -140,9 +141,42 @@ class BotStats(commands.Cog):
     async def db_get_disabled_rss(self) -> int:
         "Count the number of disabled RSS feeds in any guild"
         table = 'rss_flow_beta' if self.bot.beta else 'rss_flow'
-        query = f"SELECT COUNT(*) FROM {table} WHERE disabled = 1"
+        query = f"SELECT COUNT(*) FROM {table} WHERE enabled = 0"
         async with self.bot.db_query(query, fetchone=True, astuple=True) as query_result:
             return query_result[0]
+
+    async def db_record_dailies_values(self, now: datetime):
+        "Record into the stats table the total, min, max and median dailies values, as well as the number of dailies rows"
+        args = ("points", False, self.bot.beta)
+        # Total
+        query = "INSERT INTO `statsbot`.`zbot` SELECT %s, %s, SUM(points) AS value, 0, %s, %s, %s FROM `frm`.`dailies`"
+        async with self.bot.db_query(query, (now, "dailies.total", *args)) as _:
+            pass
+        # Min
+        query = "INSERT INTO `statsbot`.`zbot` SELECT %s, %s, MIN(points) AS value, 0, %s, %s, %s FROM `frm`.`dailies`"
+        async with self.bot.db_query(query, (now, "dailies.min", *args)) as _:
+            pass
+        # Max
+        query = "INSERT INTO `statsbot`.`zbot` SELECT %s, %s, MAX(points) AS value, 0, %s, %s, %s FROM `frm`.`dailies`"
+        async with self.bot.db_query(query, (now, "dailies.max", *args)) as _:
+            pass
+        # Median
+        query = """SET @row_index := -1;
+        INSERT INTO `statsbot`.`zbot`
+            SELECT %s, %s, ROUND(AVG(subq.points)) as value, 0, %s, %s, %s
+            FROM (
+                SELECT @row_index:=@row_index + 1 AS row_index, points
+                FROM `frm`.`dailies`
+                ORDER BY points
+            ) AS subq
+            WHERE subq.row_index 
+            IN (FLOOR(@row_index / 2) , CEIL(@row_index / 2))"""
+        async with self.bot.db_query(query, (now, "dailies.median", *args), multi=True) as _:
+            pass
+        # Number of rows
+        query = "INSERT INTO `statsbot`.`zbot` SELECT %s, %s, COUNT(*) AS value, 0, %s, %s, %s FROM `frm`.`dailies`"
+        async with self.bot.db_query(query, (now, "dailies.rows", *args)) as _:
+            pass
 
     @tasks.loop(minutes=1)
     async def sql_loop(self):
@@ -206,6 +240,8 @@ class BotStats(commands.Cog):
             self.usernames["user"] = 0
             cursor.execute(query, (now, 'usernames.deleted', self.usernames["deleted"], 0, 'usernames/min', True, self.bot.beta))
             self.usernames["deleted"] = 0
+            # Dailies points
+            await self.db_record_dailies_values(now)
             # Push everything
             cnx.commit()
         except mysql.connector.errors.IntegrityError as err: # duplicate primary key
