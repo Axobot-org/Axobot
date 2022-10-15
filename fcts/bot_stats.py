@@ -36,7 +36,6 @@ class BotStats(commands.Cog):
         self.antiscam = {"warning": 0, "deletion": 0}
         self.ticket_events = {"creation": 0}
         self.usernames = {"guild": 0, "user": 0, "deleted": 0}
-        self.translations_added: dict[str, int] = {}
 
     async def cog_load(self):
          # pylint: disable=no-member
@@ -101,20 +100,15 @@ class BotStats(commands.Cog):
 
     @commands.Cog.listener()
     async def on_username_change_record(self, event: UsernameChangeRecord):
+        "Called when a user change their username/nickname"
         if event.is_guild:
             self.usernames["guild"] += 1
         else:
             self.usernames["user"] += 1
 
     @commands.Cog.listener()
-    async def on_translation_added(self, language: str):
-        if language in self.translations_added:
-            self.translations_added[language] += 1
-        else:
-            self.translations_added[language] = 1
-
-    @commands.Cog.listener()
     async def on_server_warning(self, warning_type: ServerWarningType, _guild: discord.Guild, **_kwargs):
+        "Called when a server warning is triggered"
         if warning_type in {
             ServerWarningType.RSS_UNKNOWN_CHANNEL,
             ServerWarningType.RSS_MISSING_TXT_PERMISSION,
@@ -143,6 +137,13 @@ class BotStats(commands.Cog):
         nbr = self.received_events.get('CMD_USE', 0)
         self.received_events['CMD_USE'] = nbr + 1
 
+    async def db_get_disabled_rss(self) -> int:
+        "Count the number of disabled RSS feeds in any guild"
+        table = 'rss_flow_beta' if self.bot.beta else 'rss_flow'
+        query = f"SELECT COUNT(*) FROM {table} WHERE disabled = 1"
+        async with self.bot.db_query(query, fetchone=True, astuple=True) as query_result:
+            return query_result[0]
+
     @tasks.loop(minutes=1)
     async def sql_loop(self):
         """Send our stats every minute"""
@@ -169,6 +170,7 @@ class BotStats(commands.Cog):
             # RSS stats
             for k, v in self.rss_stats.items():
                 cursor.execute(query, (now, 'rss.'+k, v, 0, k, True, self.bot.beta))
+            cursor.execute(query, (now, 'rss.disabled', await self.db_get_disabled_rss(), 0, 'disabled', True, self.bot.beta))
             # XP cards
             cursor.execute(query, (now, 'xp.generated_cards', self.xp_cards["generated"], 0, 'cards/min', True, self.bot.beta))
             cursor.execute(query, (now, 'xp.sent_cards', self.xp_cards["sent"], 0, 'cards/min', True, self.bot.beta))
@@ -204,10 +206,6 @@ class BotStats(commands.Cog):
             self.usernames["user"] = 0
             cursor.execute(query, (now, 'usernames.deleted', self.usernames["deleted"], 0, 'usernames/min', True, self.bot.beta))
             self.usernames["deleted"] = 0
-            # translations added
-            for lang, count in self.translations_added.items():
-                cursor.execute(query, (now, 'translation.'+lang, count, 0, 'message/min', True, self.bot.beta))
-            self.translations_added.clear()
             # Push everything
             cnx.commit()
         except mysql.connector.errors.IntegrityError as err: # duplicate primary key
