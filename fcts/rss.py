@@ -66,14 +66,14 @@ class Rss(commands.Cog):
         }
         self.cache = {}
         if bot.user is not None:
-            self.table = 'rss_flow' if bot.user.id==486896267788812288 else 'rss_flow_beta'
+            self.table = 'rss_flow_beta' if bot.beta else 'rss_flow'
         # launch rss loop
         self.loop_child.change_interval(minutes=self.time_loop) # pylint: disable=no-member
 
 
     @commands.Cog.listener()
     async def on_ready(self):
-        self.table = 'rss_flow' if self.bot.user.id==486896267788812288 else 'rss_flow_beta'
+        self.table = 'rss_flow_beta' if self.bot.beta else 'rss_flow'
 
     async def cog_load(self):
         self.loop_child.start() # pylint: disable=no-member
@@ -1364,7 +1364,7 @@ class Rss(commands.Cog):
         else:
             self.bot.log.info(f"Check RSS lancé pour le serveur {guild_id}")
             feeds_list = await self.db_get_guild_feeds(guild_id)
-        check = 0
+        check_count = 0
         errors: list[int] = []
         if guild_id is None:
             if statscog := self.bot.get_cog("BotStats"):
@@ -1379,12 +1379,12 @@ class Rss(commands.Cog):
                     continue
                 if feed.type == 'mc':
                     if await self.bot.get_cog('Minecraft').check_feed(feed, send_stats=(guild_id is None)):
-                        check +=1
+                        check_count +=1
                     else:
                         errors.append(feed.feed_id)
                 else:
                     if await self.check_feed(feed, session, send_stats=(guild_id is None)):
-                        check += 1
+                        check_count += 1
                     else:
                         errors.append(feed.feed_id)
             except Exception as err:
@@ -1392,11 +1392,11 @@ class Rss(commands.Cog):
             await asyncio.sleep(self.time_between_feeds_check)
         await session.close()
         self.bot.get_cog('Minecraft').feeds.clear()
-        desc = [f"**RSS loop done** in {time.time()-start:.3f}s ({check}/{len(feeds_list)} feeds)"]
+        desc = [f"**RSS loop done** in {time.time()-start:.3f}s ({check_count}/{len(feeds_list)} feeds)"]
         if guild_id is None:
             if statscog := self.bot.get_cog("BotStats"):
-                statscog.rss_stats['checked'] = check
-                statscog.rss_stats['errors'] = len(errors)
+                statscog.rss_stats["checked"] = check_count
+                statscog.rss_stats["errors"] = len(errors)
             await self.db_set_active_guilds(set(feed.guild_id for feed in feeds_list))
         if len(errors) > 0:
             desc.append('{} errors: {}'.format(len(errors), ' '.join(str(x) for x in errors)))
