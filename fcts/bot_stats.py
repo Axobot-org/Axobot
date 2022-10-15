@@ -199,11 +199,11 @@ class BotStats(commands.Cog):
                 self.received_events[k] = 0
             # Commands usages stats
             for k, v in self.commands_uses.items():
-                cursor.execute(query, (now, 'cmd.'+k, v, 0, 'cmd/min', k == "messages", self.bot.beta))
+                cursor.execute(query, (now, 'cmd.'+k, v, 0, 'cmd/min', True, self.bot.beta))
             self.commands_uses.clear()
             # RSS stats
             for k, v in self.rss_stats.items():
-                cursor.execute(query, (now, 'rss.'+k, v, 0, k, True, self.bot.beta))
+                cursor.execute(query, (now, 'rss.'+k, v, 0, k, k == "messages", self.bot.beta))
             cursor.execute(query, (now, 'rss.disabled', await self.db_get_disabled_rss(), 0, 'disabled', True, self.bot.beta))
             # XP cards
             cursor.execute(query, (now, 'xp.generated_cards', self.xp_cards["generated"], 0, 'cards/min', True, self.bot.beta))
