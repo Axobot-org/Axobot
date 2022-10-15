@@ -17,8 +17,9 @@ def create_database_query(cnx_frm: Union[MySQLConnection, 'CMySQLConnection']):
         """Represents a context manager to execute a query to a database"""
 
         def __init__(self, query: str, args: Union[tuple, dict] = None, *,
-        fetchone: bool = False, returnrowcount: bool = False, astuple: bool = False):
+        fetchone: bool = False, multi: bool = False, returnrowcount: bool = False, astuple: bool = False):
             self.query = query
+            self.multi = multi
             self.args = () if args is None else args
             if isinstance(self.args, GeneratorType):
                 self.args = tuple(self.args)
@@ -99,7 +100,7 @@ def create_database_query(cnx_frm: Union[MySQLConnection, 'CMySQLConnection']):
             logging.getLogger("database").debug("%s", query_for_logs)
 
             try:
-                self.cursor.execute(self.query, self.args)
+                execute_result = self.cursor.execute(self.query, self.args, multi=self.multi)
             except errors.ProgrammingError as err:
                 logging.getLogger("database").error("%s", self.cursor._executed, exc_info=True)
                 await self.__aexit__(*sys.exc_info())
@@ -113,6 +114,10 @@ def create_database_query(cnx_frm: Union[MySQLConnection, 'CMySQLConnection']):
                 else:
                     result = list(map(return_type, self.cursor.fetchall()))
             else:
+                if self.multi:
+                    # make sure to execute every query
+                    for _ in execute_result:
+                        execute_result.send(None)
                 cnx_frm.commit()
                 if self.returnrowcount:
                     result = self.cursor.rowcount
