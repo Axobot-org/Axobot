@@ -28,9 +28,12 @@ class AntiScam(commands.Cog):
     def report_channel(self) -> discord.TextChannel:
         return self.bot.get_channel(913821367500148776)
 
-    async def send_bot_log(self, msg: discord.Message):
+    async def send_bot_log(self, msg: discord.Message, deleted: bool):
         "Send a log to the bot internal log channel"
-        emb = discord.Embed(title="Scam message deleted", description=msg.content, color=discord.Color.red())
+        emb = discord.Embed(title=f"Scam message {'deleted' if deleted else 'detected'}",
+                            description=msg.content,
+                            color=discord.Color.red() if deleted else discord.Color.orange()
+                            )
         emb.set_author(name=msg.author, icon_url=msg.author.display_avatar)
         emb.set_footer(text=f"{msg.guild.name} ({msg.guild.id})" if msg.guild else "No guild")
         await self.bot.send_embed(emb)
@@ -194,12 +197,15 @@ class AntiScam(commands.Cog):
                     await msg.delete() # try to delete it, silently fails
                 except discord.Forbidden:
                     pass
-                await self.send_bot_log(msg)
+                await self.send_bot_log(msg, deleted=True)
                 self.bot.dispatch("antiscam_delete", msg, result)
                 msg_id = await self.db_insert_msg(message)
                 await self.send_report(msg, msg_id, message)
             elif result.probabilities[1] < 0.3:
+                await self.send_bot_log(msg, deleted=False)
                 self.bot.dispatch("antiscam_warn", msg, result)
+                msg_id = await self.db_insert_msg(message)
+                await self.send_report(msg, msg_id, message)
 
     @commands.Cog.listener()
     async def on_interaction(self, interaction: discord.Interaction):
