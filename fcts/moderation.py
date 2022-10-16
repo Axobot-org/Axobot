@@ -848,7 +848,7 @@ You must be an administrator of this server to use this command.
                 return ceil(length/30)
             async def get_page_content(self, interaction: discord.Interaction, page: int):
                 "Create one page"
-                if last_user := None if len(self.saved_bans) == 0 else self.saved_bans[-1].user:
+                if last_user := (None if len(self.saved_bans) == 0 else self.saved_bans[-1].user):
                     self.saved_bans += [
                         entry async for entry in ctx.guild.bans(limit=1000, after=last_user) if entry.user.id not in self.users
                     ]
@@ -871,7 +871,8 @@ You must be an administrator of this server to use this command.
                         else:
                             values = [str(entry.user) for entry in self.saved_bans[i:i+10]]
                         emb.add_field(name=f"{column_start}-{column_end}", value="\n".join(values))
-                emb.set_footer(text=ctx.author, icon_url=ctx.author.display_avatar)
+                footer = f"{ctx.author}  |  {page}/{await self.get_page_count(interaction)}"
+                emb.set_footer(text=footer, icon_url=ctx.author.display_avatar)
                 return {
                     "embed": emb
                 }

@@ -928,6 +928,8 @@ You can specify a verification limit by adding a number in argument (up to 1.000
                     for i in range(page_start, page_end, 10):
                         column_start, column_end = i+1, min(i+10, len(f_jobs))
                         emb.add_field(name=f"{column_start}-{column_end}", value="\n".join(f_jobs[i:i+10]))
+                    footer = f"Page {page}/{await self.get_page_count(interaction)}"
+                    emb.set_footer(text=footer)
                     return {
                         "embed": emb
                     }
