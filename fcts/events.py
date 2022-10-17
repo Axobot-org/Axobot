@@ -13,10 +13,7 @@ import discord
 import mysql
 from discord.ext import commands, tasks
 from libs.bot_classes import Zbot
-
-from fcts.checks import is_fun_enabled
 from libs.enums import UsernameChangeRecord
-
 
 class Events(commands.Cog):
     """Cog for the management of major events that do not belong elsewhere. Like when a new server invites the bot."""
@@ -178,20 +175,6 @@ class Events(commands.Cog):
                 if msg.guild is None or msg.channel.permissions_for(msg.guild.me).external_emojis:
                     nudes_reacts += ['<:whut:485924115199426600>','<:thinksmart:513105826530197514>','<:excusemewhat:418154673523130398>','<:blobthinking:499661417012527104>','<a:ano_U:568494122856611850>','<:catsmirk:523929843331498015>','<a:ablobno:537680872820965377>']
                 await msg.channel.send(random.choice(nudes_reacts))
-            except discord.HTTPException:
-                pass
-        # Halloween event
-        elif ("booh" in msg.content.lower() or "halloween" in msg.content.lower() or "witch" in msg.content.lower()) and random.random() < 0.05 and self.bot.current_event=="halloween":
-            try:
-                react = random.choice(['🦇','🎃','🕷️']*2+['👀' ])
-                await msg.add_reaction(react)
-            except discord.HTTPException:
-                pass
-        # April Fool event
-        elif random.random() < 0.07 and self.bot.current_event=="fish" and await is_fun_enabled(msg, self.bot.get_cog("Fun")):
-            try:
-                react = random.choice(['🐟','🎣', '🐠', '🐡']*4+['👀'])
-                await msg.add_reaction(react)
             except discord.HTTPException:
                 pass
         if not msg.author.bot:
