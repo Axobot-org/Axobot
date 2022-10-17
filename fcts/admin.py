@@ -671,6 +671,7 @@ Cette option affecte tous les serveurs"""
         if role is None:
             await ctx.send("Rôle Owners introuvable")
             return
+        await ctx.defer()
         owner_list: list[int] = []
         for guild in self.bot.guilds:
             if len(guild.members)>9:
@@ -723,8 +724,8 @@ Cette option affecte tous les serveurs"""
         liste = await self._get_ideas_list(channel)
         count = len(liste)
         liste = liste[:number]
-        title = "Liste des {} meilleures idées (sur {}) :".format(len(liste),count)
-        text = str()
+        title = f"Liste des {len(liste)} meilleures idées (sur {count}) :"
+        text = ""
         if ctx.guild is not None:
             color = ctx.guild.me.color
         else:
