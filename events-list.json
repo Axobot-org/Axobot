@@ -61,7 +61,12 @@
         "type": "fish",
         "icon": "https://zrunner.me/cdn/fish22.png",
         "color": 16733391,
-        "objectives": [200]
+        "objectives": [200],
+        "emojis": {
+            "reactions_list": ["🐟","🎣","🐠", "🐡"],
+            "triggers": ["fish"],
+            "probability": 0.07
+        }
     },
     "halloween-2022": {
         "begin": "2022-10-20",
@@ -69,6 +74,11 @@
         "type": "halloween",
         "icon": null,
         "color": 16089635,
-        "objectives": [300, 600]
+        "objectives": [300, 600],
+        "emojis": {
+            "reactions_list": ["🦇","🎃","🕷️", "👻"],
+            "triggers": ["booh", "halloween", "witch", "ghost"],
+            "probability": 0.5
+        }
     }
 }
