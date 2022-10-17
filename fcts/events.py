@@ -356,9 +356,10 @@ class Events(commands.Cog):
         self.bot.log.info("[tasks_loop] Lancement de la boucle")
 
     async def botEventLoop(self):
+        "Refresh the current bot event every once in a while"
         self.bot.get_cog("BotEvents").update_current_event()
-        e = self.bot.get_cog("BotEvents").current_event
-        emb = discord.Embed(description=f'**Bot event** updated (current event is {e})', color=1406147, timestamp=self.bot.utcnow())
+        event = self.bot.get_cog("BotEvents").current_event
+        emb = discord.Embed(description=f'**Bot event** updated (current event is {event})', color=1406147, timestamp=self.bot.utcnow())
         emb.set_author(name=self.bot.user, icon_url=self.bot.user.display_avatar)
         await self.bot.send_embed(emb, url="loop")
         self.last_eventDay_check = datetime.datetime.today()

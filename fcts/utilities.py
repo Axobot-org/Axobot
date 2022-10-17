@@ -189,36 +189,12 @@ class Utilities(commands.Cog):
             liste2.append('admin')
         if not self.bot.database_online:
             return sorted(liste2)+sorted(liste)
-        userflags: list = await self.bot.get_cog('Users').get_userflags(user)
-        if 'support' in userflags:
-            liste2.append('support')
-        if 'contributor' in userflags:
-            liste2.append('contributor')
-        if 'partner' in userflags:
-            liste2.append('partner')
-        if 'premium' in userflags:
-            liste2.append('premium')
-        unlocked: list = await self.bot.get_cog('Users').get_rankcards(user)
-        if 'blurple_19' in unlocked:
-            liste.append('blurple19')
-        if 'blurple_20' in unlocked:
-            liste.append('blurple20')
-        if 'rainbow' in unlocked:
-            liste.append('rainbow')
-        if 'christmas_19' in unlocked:
-            liste.append('christmas19')
-        if 'christmas_20' in unlocked:
-            liste.append('christmas20')
-        if 'halloween_20' in unlocked:
-            liste.append('halloween20')
-        if 'blurple_21' in unlocked:
-            liste.append('blurple21')
-        if 'halloween_21' in unlocked:
-            liste.append('halloween21')
-        if 'april_22' in unlocked:
-            liste.append('april22')
-        if 'blurple_22' in unlocked:
-            liste.append('blurple22')
+        userflags = await self.bot.get_cog('Users').get_userflags(user)
+        for flag in ("support", "contributor", "partner", "premium"):
+            if flag in userflags:
+                liste2.append(flag)
+        for card in await self.bot.get_cog('Users').get_rankcards(user):
+            liste.append(card)
         return sorted(liste2)+sorted(liste)
 
     async def get_languages(self, user: discord.User, limit: int=0):
@@ -226,8 +202,8 @@ class Utilities(commands.Cog):
         If limit=0, return every languages"""
         if not self.bot.database_online:
             return ["en"]
-        languages = list()
-        disp_lang = list()
+        languages = []
+        disp_lang = []
         available_langs: list[str] = self.bot.get_cog('Languages').languages
         for guild in user.mutual_guilds:
             lang: Optional[int] = await self.bot.get_config(guild.id, 'language')
