@@ -27,8 +27,8 @@ translations_data = {
                 "200": "Débloquez la carte d'xp sous-marine, obtenable pendant seulement 24h !"
             },
             "halloween-2022": {
-                "250": "Débloquez la carte d'xp halloween 2022, obtenable uniquement pendant cet événement !",
-                "400": "Venez réclamer votre rôle spécial Halloween 2022 sur le serveur officiel de Zbot !"
+                "300": "Débloquez la carte d'xp halloween 2022, obtenable uniquement pendant cet événement !",
+                "600": "Venez réclamer votre rôle spécial Halloween 2022 sur le serveur officiel de Zbot !"
             }
         },
         "events-title": {
@@ -51,8 +51,8 @@ translations_data = {
                 "200": "Unlock the submarine xp card, obtainable only for 24h!"
             },
             "halloween-2022": {
-                "250": "Unlock the Halloween 2022 xp card, obtainable only during this event!",
-                "400": "Come claim your special Halloween 2022 role on the official Zbot server!"
+                "300": "Unlock the Halloween 2022 xp card, obtainable only during this event!",
+                "600": "Come claim your special Halloween 2022 role on the official Zbot server!"
             }
         },
         "events-title": {
@@ -226,9 +226,9 @@ class BotEvents(commands.Cog):
                 user_rank = f"{user_rank_query['rank']}/{total_ranked}"
             else:
                 user_rank = await self.bot._(ctx.channel, "bot_events.unclassed")
-            points = user_rank_query["events_points"]
+            points: int = user_rank_query["events_points"]
         title = await self.bot._(ctx.channel, "bot_events.rank-title")
-        prices: dict = translations_data[lang]['events-prices']
+        prices: dict[str, dict[str, str]] = translations_data[lang]['events-prices']
         if current_event in prices:
             emojis = self.bot.emojis_manager.customs["green_check"], self.bot.emojis_manager.customs["red_cross"]
             prices_list = []
@@ -245,7 +245,7 @@ class BotEvents(commands.Cog):
 
         if ctx.can_send_embed:
             desc = await self.bot._(ctx.channel, "bot_events.xp-howto")
-            emb = discord.Embed(title=title, description=desc, color=4254055)
+            emb = discord.Embed(title=title, description=desc, color=self.current_event_data["color"])
             user: discord.User
             emb.set_author(name=user, icon_url=user.display_avatar.replace(static_format="png", size=32))
             if objectives_title != "":
