@@ -8,15 +8,16 @@ class RankCardsFlag:
     "Flags used for unlocked rank cards"
     FLAGS = {
         1 << 0: "rainbow",
-        1 << 1: "blurple_19",
-        1 << 2: "blurple_20",
-        1 << 3: "christmas_19",
-        1 << 4: "christmas_20",
-        1 << 5: "halloween_20",
-        1 << 6: "blurple_21",
-        1 << 7: "halloween_21",
-        1 << 8: "april_22",
-        1 << 9: "blurple_22"
+        1 << 1: "blurple19",
+        1 << 2: "blurple20",
+        1 << 3: "christmas19",
+        1 << 4: "christmas20",
+        1 << 5: "halloween20",
+        1 << 6: "blurple21",
+        1 << 7: "halloween21",
+        1 << 8: "april22",
+        1 << 9: "blurple22",
+        1 << 10: "halloween22",
     }
 
     def flags_to_int(self, flags: list) -> int:
