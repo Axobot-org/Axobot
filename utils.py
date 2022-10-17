@@ -176,7 +176,6 @@ async def load_cogs(bot: "Zbot"):
                       'fcts.servers',   
                       'fcts.tickets',
                       'fcts.timers',
-                      'fcts.translations',
                       'fcts.users',
                       'fcts.utilities',
                       'fcts.voices',
