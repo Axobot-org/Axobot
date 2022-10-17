@@ -1,5 +1,5 @@
 import datetime
-from typing import Literal, Optional, TypedDict
+from typing import Literal, Optional, TypedDict, Union
 
 EventType = Literal["blurple", "halloween", "fish"]
 
@@ -16,5 +16,16 @@ class EventData(TypedDict):
     type: EventType
     icon: Optional[str]
     color: int
-    objectives: list[str]
+    objectives: list[Union["EventRewardCard", "EventRewardCustom"]]
     emojis: Optional[EventEmojis]
+
+class EventRewardCard(TypedDict):
+    "Represents the rank card reward for an event"
+    points: int
+    reward_type: Literal["rankcard"]
+    rank_card: str
+
+class EventRewardCustom(TypedDict):
+    "Represents a custom reward for an event"
+    points: int
+    reward_type: Literal["custom"]

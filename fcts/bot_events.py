@@ -27,7 +27,7 @@ translations_data = {
                 "200": "Débloquez la carte d'xp sous-marine, obtenable pendant seulement 24h !"
             },
             "halloween-2022": {
-                "250": "Débloquez la carte d'xp halloween, obtenable uniquement pendant cet événement !",
+                "250": "Débloquez la carte d'xp halloween 2022, obtenable uniquement pendant cet événement !",
                 "400": "Venez réclamer votre rôle spécial Halloween 2022 sur le serveur officiel de Zbot !"
             }
         },
@@ -51,7 +51,7 @@ translations_data = {
                 "200": "Unlock the submarine xp card, obtainable only for 24h!"
             },
             "halloween-2022": {
-                "250": "Unlock the Halloween xp card, obtainable only during this event!",
+                "250": "Unlock the Halloween 2022 xp card, obtainable only during this event!",
                 "400": "Come claim your special Halloween 2022 role on the official Zbot server!"
             }
         },
@@ -109,6 +109,16 @@ class BotEvents(commands.Cog):
                 self.coming_event = ev_data["type"]
                 self.coming_event_data = ev_data
                 self.coming_event_id = ev_id
+
+    async def get_specific_objectives(self, reward_type: str):
+        "Get all objectives matching a certain reward type"
+        if self.current_event_id is None:
+            return []
+        return [
+            objective
+            for objective in self.current_event_data["objectives"]
+            if objective["reward_type"] == reward_type
+            ]
 
     @commands.Cog.listener()
     async def on_message(self, msg: discord.Message):
