@@ -62,5 +62,13 @@
         "icon": "https://zrunner.me/cdn/fish22.png",
         "color": 16733391,
         "objectives": [200]
+    },
+    "halloween-2022": {
+        "begin": "2022-10-20",
+        "end": "2022-11-01",
+        "type": "halloween",
+        "icon": null,
+        "color": 16089635,
+        "objectives": [300, 600]
     }
 }
