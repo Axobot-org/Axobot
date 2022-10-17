@@ -15,7 +15,7 @@ import speedtest
 from cachingutils import acached
 from discord.ext import commands
 from libs.bot_classes import PRIVATE_GUILD_ID, MyContext, Zbot
-from libs.enums import UserFlag
+from libs.enums import RankCardsFlag, UserFlag
 from libs.views import ConfirmView
 
 from . import checks
@@ -637,6 +637,58 @@ Cette option affecte tous les serveurs"""
             await ctx.send(f"L'utilisateur {user} a maintenant les flags {', '.join(userflags)}")
         else:
             await ctx.send(f"L'utilisateur {user} n'a plus aucun flag")
+
+    @main_msg.group(name="rankcard")
+    @commands.check(checks.is_bot_admin)
+    async def admin_rankcard(self, ctx: MyContext):
+        "Ajoute ou retire une carte d'xp à un utilisateur"
+        if ctx.subcommand_passed is None:
+            await self.bot.get_cog('Help').help_command(ctx, ['admin', 'rankcard'])
+
+    @admin_rankcard.command(name="list")
+    @commands.check(checks.is_bot_admin)
+    async def admin_card_list(self, ctx: MyContext, user: discord.User):
+        "Liste les cartes d'xp d'un utilisateur"
+        rankcards: list[str] = await self.bot.get_cog("Users").get_rankcards(user)
+        if rankcards:
+            await ctx.send(f"Liste des cartes d'xp de {user} : {', '.join(rankcards)}")
+        else:
+            await ctx.send(f"{user} n'a aucune carte d'xp spéciale pour le moment")
+
+    @admin_rankcard.command(name="add")
+    @commands.check(checks.is_bot_admin)
+    @discord.app_commands.choices(rankcard=[
+        discord.app_commands.Choice(name=rankcard, value=rankcard)
+        for rankcard in RankCardsFlag.FLAGS.values()
+    ])
+    async def admin_card_add(self, ctx: MyContext, user: discord.User, rankcard: str):
+        """Autorise une carte d'xp à un utilisateur"""
+        rankcards: list[str] = await self.bot.get_cog("Users").get_rankcards(user)
+        if rankcard in rankcards:
+            await ctx.send(f"L'utilisateur {user} a déjà cette carte d'xp !")
+            return
+        rankcards.append(rankcard)
+        await self.bot.get_cog('Users').set_rankcard(user, rankcard, add=True)
+        await ctx.send(f"L'utilisateur {user} a maintenant les flags {', '.join(rankcards)}")
+
+    @admin_rankcard.command(name="remove")
+    @commands.check(checks.is_bot_admin)
+    @discord.app_commands.choices(rankcard=[
+        discord.app_commands.Choice(name=rankcard, value=rankcard)
+        for rankcard in RankCardsFlag.FLAGS.values()
+    ])
+    async def admin_card_remove(self, ctx: MyContext, user: discord.User, rankcard: str):
+        """Retire une carte d'xp à un utilisateur"""
+        rankcards: list[str] = await self.bot.get_cog("Users").get_rankcards(user)
+        if rankcard not in rankcards:
+            await ctx.send(f"L'utilisateur {user} n'a déjà pas ce flag")
+            return
+        rankcards.remove(rankcard)
+        await self.bot.get_cog('Users').set_rankcard(user, rankcard, add=False)
+        if rankcards:
+            await ctx.send(f"L'utilisateur {user} a maintenant les cartes d'xp {', '.join(rankcards)}")
+        else:
+            await ctx.send(f"L'utilisateur {user} n'a plus aucune catre d'xp spéciale")
 
     @main_msg.command(name="loop_restart")
     @commands.check(checks.is_bot_admin)
