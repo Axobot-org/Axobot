@@ -28,7 +28,7 @@ class BotStats(commands.Cog):
         self.file = 'bot_stats'
         self.received_events = {'CMD_USE': 0}
         self.commands_uses = {}
-        self.rss_stats = {'checked': 0, 'messages': 0, 'errors': 0, 'warnings': 0, 'disabled': 0}
+        self.rss_stats = {'checked': 0, 'messages': 0, 'errors': 0, 'warnings': 0}
         self.xp_cards = {'generated': 0, 'sent': 0}
         self.process = psutil.Process()
         self.cpu_records: list[float] = []
@@ -116,8 +116,6 @@ class BotStats(commands.Cog):
             ServerWarningType.RSS_MISSING_EMBED_PERMISSION,
         }:
             self.rss_stats["warnings"] += 1
-        elif warning_type == ServerWarningType.RSS_DISABLED_FEED:
-            self.rss_stats["disabled"] += 1
 
     @commands.Cog.listener()
     async def on_socket_raw_receive(self, msg: str):
@@ -178,6 +176,41 @@ class BotStats(commands.Cog):
         # Number of rows
         query = "INSERT INTO `statsbot`.`zbot` SELECT %s, %s, COUNT(*) AS value, 0, %s, %s, %s FROM `frm`.`dailies`"
         async with self.bot.db_query(query, (now, "dailies.rows", *args)) as _:
+            pass
+
+    async def db_record_eventpoints_values(self, now: datetime):
+        """Record into the stats table the total, min, max and median event points values,
+        as well as the number of users having at least 1 point"""
+        args = ("points", False, self.bot.beta)
+        # Total
+        query = "INSERT INTO `statsbot`.`zbot` SELECT %s, %s, SUM(`events_points`) AS value, 0, %s, %s, %s FROM `frm`.`users`"
+        async with self.bot.db_query(query, (now, "eventpoints.total", *args)) as _:
+            pass
+        # Min
+        query = "INSERT INTO `statsbot`.`zbot` SELECT %s, %s, MIN(`events_points`) AS value, 0, %s, %s, %s FROM `frm`.`users`"
+        async with self.bot.db_query(query, (now, "eventpoints.min", *args)) as _:
+            pass
+        # Max
+        query = "INSERT INTO `statsbot`.`zbot` SELECT %s, %s, MAX(`events_points`) AS value, 0, %s, %s, %s FROM `frm`.`users`"
+        async with self.bot.db_query(query, (now, "eventpoints.max", *args)) as _:
+            pass
+        # Median
+        query = """SET @row_index := -1;
+        INSERT INTO `statsbot`.`zbot`
+            SELECT %s, %s, ROUND(AVG(subq.`events_points`)) as value, 0, %s, %s, %s
+            FROM (
+                SELECT @row_index:=@row_index + 1 AS row_index, `events_points`
+                FROM `frm`.`users`
+                WHERE `events_points` != 0
+                ORDER BY events_points
+            ) AS subq
+            WHERE subq.row_index 
+            IN (FLOOR(@row_index / 2) , CEIL(@row_index / 2))"""
+        async with self.bot.db_query(query, (now, "eventpoints.median", *args), multi=True) as _:
+            pass
+        # Number of rows
+        query = "INSERT INTO `statsbot`.`zbot` SELECT %s, %s, COUNT(*) AS value, 0, %s, %s, %s FROM `frm`.`users` WHERE `events_points` != 0"
+        async with self.bot.db_query(query, (now, "eventpoints.rows", *args)) as _:
             pass
 
     @tasks.loop(minutes=1)
@@ -244,6 +277,8 @@ class BotStats(commands.Cog):
             self.usernames["deleted"] = 0
             # Dailies points
             await self.db_record_dailies_values(now)
+            # Events points
+            await self.db_record_eventpoints_values(now)
             # Push everything
             cnx.commit()
         except mysql.connector.errors.IntegrityError as err: # duplicate primary key
