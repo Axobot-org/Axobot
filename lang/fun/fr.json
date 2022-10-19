@@ -66,6 +66,8 @@
         "director": "Réalisateur",
         "imdb-id": "ID IMDb",
         "imdb-rating": "Cote IMDb",
+        "no-description": "Aucune description disponible",
+        "no-rating": "Non coté",
         "not-found": "Impossible de trouver ce film",
         "released": "Date de sortie",
         "runtime": "Durée",
