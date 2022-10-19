@@ -222,9 +222,9 @@ class PaginatedSelectView(ui.View):
         "The actual selector"
         # remove values that have been unselected
         selector_all_values = {opt.value for opt in selector.options}
-        for value in self._values:
-            if value in selector_all_values and value not in selector.values:
-                self._values.remove(value)
+        self._values = {value
+                        for value in self._values
+                        if value in selector_all_values and value not in selector.values}
         # add values that have been selected
         self._values |= set(selector.values)
         # disable the selector if the max number of values has been reached
