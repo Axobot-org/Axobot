@@ -28,7 +28,7 @@ class BotStats(commands.Cog):
         self.file = 'bot_stats'
         self.received_events = {'CMD_USE': 0}
         self.commands_uses = {}
-        self.rss_stats = {'checked': 0, 'messages': 0, 'errors': 0, 'warnings': 0}
+        self.rss_stats = {'checked': 0, 'messages': 0, 'errors': 0, 'warnings': 0, 'disabled': 0}
         self.xp_cards = {'generated': 0, 'sent': 0}
         self.process = psutil.Process()
         self.cpu_records: list[float] = []
@@ -116,6 +116,8 @@ class BotStats(commands.Cog):
             ServerWarningType.RSS_MISSING_EMBED_PERMISSION,
         }:
             self.rss_stats["warnings"] += 1
+        elif warning_type == ServerWarningType.RSS_DISABLED_FEED:
+            self.rss_stats["disabled"] += 1
 
     @commands.Cog.listener()
     async def on_socket_raw_receive(self, msg: str):

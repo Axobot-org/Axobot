@@ -66,6 +66,8 @@ class ServerWarningType(Enum):
     RSS_MISSING_EMBED_PERMISSION = 3
     # channel_id, feed_id
     RSS_UNKNOWN_CHANNEL = 4
+    # channel_id, feed_id
+    RSS_DISABLED_FEED = 5
 
 class UsernameChangeRecord:
     "Record of a username change, mainly used for logs"
