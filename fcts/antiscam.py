@@ -191,7 +191,7 @@ class AntiScam(commands.Cog):
         result = self.agent.predict_bot(message)
         if result.result > 1:
             message.category = 0
-            self.bot.log.info("[antiscam] detected", message.message, result.probabilities[2])
+            self.bot.log.info("[antiscam] detected (%s): %s", result.probabilities[2], message.message)
             if result.probabilities[1] < 0.005: # if probability of not being harmless is less than 0.5%
                 try:
                     await msg.delete() # try to delete it, silently fails
