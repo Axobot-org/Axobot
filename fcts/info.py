@@ -18,7 +18,7 @@ from discord.ext import commands
 from discord.ext.commands.converter import run_converters
 from docs import conf
 from libs import bitly_api
-from libs.classes import PRIVATE_GUILD_ID, MyContext, Zbot
+from libs.bot_classes import PRIVATE_GUILD_ID, MyContext, Zbot
 from libs.formatutils import FormatUtils
 from libs.rss.rss_general import FeedObject
 from utils import count_code_lines
@@ -154,10 +154,11 @@ class Info(commands.Cog):
         else:
             await ctx.send(d)
 
-    def get_users_nber(self, ignored_guilds: list):
+    def get_users_nber(self, ignored_guilds: list[int]):
+        "Return the amount of members and the amount of bots in every reachable guild, excepted in ignored guilds"
         members = [x.members for x in self.bot.guilds if x.id not in ignored_guilds]
-        members = list(set([x for x in members for x in x])) # filter users
-        return len(members),len([x for x in members if x.bot])
+        members = list(set(x for x in members for x in x)) # filter users
+        return len(members), len([x for x in members if x.bot])
 
     @stats_main.command(name="commands", aliases=["cmds"])
     async def stats_commands(self, ctx: MyContext):
@@ -165,22 +166,53 @@ class Info(commands.Cog):
 
         ..Doc infos.html#statistics"""
         forbidden = ['cmd.eval', 'cmd.admin', 'cmd.test', 'cmd.remindme']
-        forbidden_where = ', '.join(['%s' for _ in forbidden])
+        forbidden_where = ', '.join(f"'{elem}'" for elem in forbidden)
         commands_limit = 15
         lang = await self.bot._(ctx.channel, '_used_locale')
         # SQL query
-        async def do_query(special_where: typing.Optional[str], where_args: typing.Optional[typing.Any]):
-            query = f"SELECT variable, SUBSTRING_INDEX(variable, \".\", -1) as cmd, SUM(value) as usages FROM `statsbot`.`zbot` WHERE variable LIKE \"cmd.%\" {'AND '+special_where if special_where else ''} AND UTC_TIMESTAMP() AND `beta` = %s AND `variable` NOT IN ({forbidden_where}) GROUP BY cmd ORDER BY usages DESC LIMIT %s"
-            async with self.bot.db_query(query, (*where_args, self.bot.beta, *forbidden, commands_limit)) as query_result:
+        async def do_query(minutes: typing.Optional[int] = None):
+            date_where_clause = "date BETWEEN (DATE_SUB(UTC_TIMESTAMP(), INTERVAL %(minutes)s MINUTE)) AND UTC_TIMESTAMP() AND" if minutes else ""
+            query = f"""
+SELECT
+    `all`.`variable`,
+    SUBSTRING_INDEX(`all`.`variable`, ".", -1) as cmd,
+    SUM(`all`.`value`) as usages
+FROM
+(
+    (
+        SELECT
+    		`variable`,
+	    	`value`
+    	FROM `statsbot`.`zbot`
+    	WHERE
+        	`variable` LIKE "cmd.%" AND
+            {date_where_clause}
+            `variable` NOT IN ({forbidden_where}) AND
+        	`beta` = %(beta)s
+	) UNION ALL (
+    	SELECT
+        	`variable`,
+	    	`value`
+    	FROM `statsbot`.`zbot-archives`
+    	WHERE
+        	`variable` LIKE "cmd.%" AND
+            {date_where_clause}
+            `variable` NOT IN ({forbidden_where}) AND
+        	`beta` = %(beta)s
+	)
+) AS `all`
+GROUP BY cmd
+ORDER BY usages DESC LIMIT %(limit)s"""
+            async with self.bot.db_query(query, { "beta": self.bot.beta, "minutes": minutes, "limit": commands_limit }) as query_result:
                 pass
             return query_result
 
         # in the last 24h
-        data_24h = await do_query("date BETWEEN (DATE_SUB(UTC_TIMESTAMP(),INTERVAL %s MINUTE))", (60*24,))
+        data_24h = await do_query(60*24)
         text_24h = '• ' + "\n• ".join([data['cmd']+': ' + await FormatUtils.format_nbr(data['usages'], lang) for data in data_24h])
         title_24h = await self.bot._(ctx.channel, 'info.stats-cmds.day')
         # since the beginning
-        data_total = await do_query(None, [])
+        data_total = await do_query()
         text_total = '• ' + "\n• ".join([data['cmd']+': ' + await FormatUtils.format_nbr(data['usages'], lang) for data in data_total])
         title_total = await self.bot._(ctx.channel, 'info.stats-cmds.total')
         # message title and desc
@@ -853,10 +885,10 @@ Available types: member, role, user, emoji, channel, server, invite, category
         embed = discord.Embed(color=default_color, timestamp=ctx.message.created_at)
         embed.add_field(name=await self.bot._(ctx.channel,"info.info.snowflake-0"), value=date)
         embed.add_field(name=await self.bot._(ctx.channel,"info.info.snowflake-2"), value=round(snowflake.date.timestamp()))
+        embed.add_field(name=await self.bot._(ctx.channel,"info.info.snowflake-6"), value=len(str(snowflake.id)))
         embed.add_field(name=await self.bot._(ctx.channel,"info.info.snowflake-1"), value=snowflake.binary, inline=False)
         embed.add_field(name=await self.bot._(ctx.channel,"info.info.snowflake-3"), value=snowflake.worker_id)
         embed.add_field(name=await self.bot._(ctx.channel,"info.info.snowflake-4"), value=snowflake.process_id)
-        embed.add_field(name=await self.bot._(ctx.channel,"info.info.snowflake-5"), value=snowflake.increment)
         embed.set_footer(text=ctx.author, icon_url=ctx.author.display_avatar)
         await ctx.send(embed=embed)
 
@@ -868,7 +900,7 @@ Available types: member, role, user, emoji, channel, server, invite, category
     )
 
     @find_main.command(name="user")
-    @commands.check(checks.is_support_staff)
+    @discord.app_commands.check(checks.is_support_staff)
     async def find_user(self, interaction: discord.Interaction, user: discord.User):
         "Find any user visible by the bot"
         # Servers list
@@ -932,7 +964,7 @@ Available types: member, role, user, emoji, channel, server, invite, category
         await interaction.response.send_message(embed=embed)
 
     @find_main.command(name="guild")
-    @commands.check(checks.is_support_staff)
+    @discord.app_commands.check(checks.is_support_staff)
     @discord.app_commands.describe(guild="The server name or ID")
     async def find_guild(self, interaction: discord.Interaction, guild: str):
         "Find any guild where the bot is"
@@ -987,7 +1019,7 @@ Available types: member, role, user, emoji, channel, server, invite, category
         await interaction.response.send_message(embed=emb)
 
     @find_main.command(name='channel')
-    @commands.check(checks.is_support_staff)
+    @discord.app_commands.check(checks.is_support_staff)
     @discord.app_commands.describe(channel="The ID/name of the channel to look for")
     async def find_channel(self, interaction: discord.Interaction, channel: str):
         "Find any channel from any server where the bot is"
@@ -1010,7 +1042,7 @@ Available types: member, role, user, emoji, channel, server, invite, category
         await interaction.response.send_message(embed=emb)
 
     @find_main.command(name='role')
-    @commands.check(checks.is_support_staff)
+    @discord.app_commands.check(checks.is_support_staff)
     @discord.app_commands.describe(role="The ID/name of the role to look for")
     async def find_role(self, interaction: discord.Interaction, role: str):
         "Find any role from any server where the bot is"
@@ -1033,21 +1065,21 @@ Available types: member, role, user, emoji, channel, server, invite, category
         await interaction.response.send_message(embed=emb)
 
     @find_main.command(name='rss')
-    @commands.check(checks.is_support_staff)
+    @discord.app_commands.check(checks.is_support_staff)
     async def find_rss(self, interaction: discord.Interaction, feed_id: int):
         "Find any active or inactive RSS feed"
         feed: FeedObject = await self.bot.get_cog('Rss').db_get_feed(feed_id)
         if feed is None:
             await interaction.response.send_message("Unknown RSS feed")
             return
-        temp = self.bot.get_guild(feed.guild_id)
-        if temp is None:
+        channel = self.bot.get_guild(feed.guild_id)
+        if channel is None:
             g = "Unknown ({})".format(feed.guild_id)
         else:
-            g = "`{}`\n{}".format(temp.name, temp.id)
-            temp = self.bot.get_channel(feed.channel_id)
-        if temp is not None:
-            c = "`{}`\n{}".format(temp.name,temp.id)
+            g = "`{}`\n{}".format(channel.name, channel.id)
+            channel = self.bot.get_channel(feed.channel_id)
+        if channel is not None:
+            c = "`{}`\n{}".format(channel.name,channel.id)
         else:
             c = "Unknown ({})".format(feed.channel_id)
         d = f"<t:{feed.date.timestamp():.0f}>"
@@ -1059,7 +1091,10 @@ Available types: member, role, user, emoji, channel, server, invite, category
             color = None if interaction.guild.me.color.value == 0 else interaction.guild.me.color
         emb = discord.Embed(title=f"RSS #{feed_id}", color=color)
         emb.add_field(name="Server", value=g)
-        emb.add_field(name="Channel", value=c)
+        if isinstance(channel, discord.Thread):
+            emb.add_field(name="Thread", value=c)
+        else:
+            emb.add_field(name="Channel", value=c)
         emb.add_field(name="URL", value=feed.link, inline=False)
         emb.add_field(name="Type", value=feed.type)
         emb.add_field(name="Last post", value=d)
@@ -1313,26 +1348,30 @@ Available types: member, role, user, emoji, channel, server, invite, category
                         temp = temp[:MAX] + [await self.bot._(ctx.channel, 'info.usernames.more', nbr=len(temp)-MAX)]
                     fields.append({'name':await self.bot._(ctx.channel,'info.usernames.local'), 'value':"\n".join(temp)})
                     _server = await self.bot._(ctx.channel,'info.usernames.server')
-                    date += f"{_server} <t:{this_guild[0]['utc_date'].timestamp():.0f}>"
+                    date += f"\n{_server} <t:{this_guild[0]['utc_date'].timestamp():.0f}>"
+            # Date field
             if len(date) > 0:
-                fields.append({'name':await self.bot._(ctx.channel,'info.usernames.last-date'), 'value':date})
+                fields.append({'name':await self.bot._(ctx.channel,'info.usernames.last-date'), 'value': date})
             else:
                 desc = await self.bot._(ctx.channel,'info.usernames.empty')
             if ctx.guild is not None and ctx.guild.get_member(user.id) is not None and ctx.guild.get_member(user.id).color!=discord.Color(0):
                 c = ctx.guild.get_member(user.id).color
             else:
                 c = 1350390
+            # "How to enable/disable" footer
             allowing_logs = await self.bot.get_cog("Utilities").get_db_userinfo(["allow_usernames_logs"],["userID="+str(user.id)])
             if allowing_logs is None or allowing_logs["allow_usernames_logs"]:
                 footer = await self.bot._(ctx.channel,'info.usernames.disallow')
             else:
                 footer = await self.bot._(ctx.channel,'info.usernames.allow')
+            # Warning in description if disabled in the guild
             if ctx.guild is not None and not await self.bot.get_config(ctx.guild.id, "nicknames_history"):
                 if len(ctx.guild.members) >= self.bot.get_cog("Servers").max_members_for_nicknames:
                     warning_disabled = await self.bot._(ctx.guild.id, "info.nicknames-disabled.guild-too-big")
                 else:
                     warning_disabled = await self.bot._(ctx.guild.id, "info.nicknames-disabled.disabled")
                 desc = warning_disabled if desc is None else warning_disabled + "\n\n" + desc
+            # send the thing
             emb = discord.Embed(title=t, description=desc, color=c)
             emb.set_footer(text=footer)
             for field in fields:

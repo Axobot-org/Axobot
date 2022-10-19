@@ -3,7 +3,7 @@ from json.decoder import JSONDecodeError
 import discord
 import requests
 from discord.ext import commands
-from libs.classes import Zbot
+from libs.bot_classes import Zbot
 
 BASE_URL = 'https://discord.com/api/webhooks/'
 

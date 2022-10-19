@@ -10,7 +10,7 @@ import requests
 from dateutil.parser import isoparse
 from discord.ext import commands
 from frmc_lib import SearchType
-from libs.classes import MyContext, Zbot
+from libs.bot_classes import MyContext, Zbot
 from libs.formatutils import FormatUtils
 from libs.rss.rss_general import FeedObject
 

@@ -3,7 +3,7 @@ import typing
 import discord
 from discord.ext import commands
 from libs.antiscam.classes import EMBED_COLORS, MsgReportView, PredictionResult
-from libs.classes import Zbot, MyContext
+from libs.bot_classes import Zbot, MyContext
 from libs.antiscam import AntiScamAgent, Message
 
 from . import checks
@@ -28,12 +28,15 @@ class AntiScam(commands.Cog):
     def report_channel(self) -> discord.TextChannel:
         return self.bot.get_channel(913821367500148776)
 
-    async def send_bot_log(self, msg: discord.Message):
+    async def send_bot_log(self, msg: discord.Message, deleted: bool):
         "Send a log to the bot internal log channel"
-        emb = discord.Embed(title="Scam message deleted", description=msg.content, color=discord.Color.red())
+        emb = discord.Embed(title=f"Scam message {'deleted' if deleted else 'detected'}",
+                            description=msg.content,
+                            color=discord.Color.red() if deleted else discord.Color.orange()
+                            )
         emb.set_author(name=msg.author, icon_url=msg.author.display_avatar)
         emb.set_footer(text=f"{msg.guild.name} ({msg.guild.id})" if msg.guild else "No guild")
-        await self.bot.send_embed([emb])
+        await self.bot.send_embed(emb)
 
     async def db_insert_msg(self, msg: Message) -> int:
         "Insert a new suspicious message into the database"
@@ -177,7 +180,7 @@ class AntiScam(commands.Cog):
     @commands.Cog.listener()
     async def on_message(self, msg: discord.Message):
         "Check any message for scam dangerousity"
-        if not msg.guild or len(msg.content) < 10 or is_immune(msg.author) or await self.bot.potential_command(msg):
+        if isinstance(msg.author, discord.User) or len(msg.content) < 10 or is_immune(msg.author) or await self.bot.potential_command(msg):
             return
         await self.bot.wait_until_ready()
         if not await self.bot.get_config(msg.guild.id, "anti_scam"):
@@ -194,12 +197,15 @@ class AntiScam(commands.Cog):
                     await msg.delete() # try to delete it, silently fails
                 except discord.Forbidden:
                     pass
-                await self.send_bot_log(msg)
+                await self.send_bot_log(msg, deleted=True)
                 self.bot.dispatch("antiscam_delete", msg, result)
                 msg_id = await self.db_insert_msg(message)
                 await self.send_report(msg, msg_id, message)
             elif result.probabilities[1] < 0.3:
+                await self.send_bot_log(msg, deleted=False)
                 self.bot.dispatch("antiscam_warn", msg, result)
+                msg_id = await self.db_insert_msg(message)
+                await self.send_report(msg, msg_id, message)
 
     @commands.Cog.listener()
     async def on_interaction(self, interaction: discord.Interaction):
@@ -222,12 +228,12 @@ class AntiScam(commands.Cog):
         if action == 'delete':
             if await self.db_delete_msg(msg_id):
                 await interaction.followup.send("This record has successfully been deleted", ephemeral=True)
-                await self.edit_report_message(await interaction.original_message(), 'deleted')
+                await self.edit_report_message(interaction.message, 'deleted')
                 return
         elif action in ("harmless", "scam", "insults", "raid", "spam"):
             if await self.db_update_msg(msg_id, action):
                 await interaction.followup.send(f"This record has been flagged as {action.title()}", ephemeral=True)
-                await self.edit_report_message(await interaction.original_message(), action)
+                await self.edit_report_message(interaction.message, action)
                 return
         else:
             err = TypeError(f"Unknown antiscam button action: {action}")

@@ -8,7 +8,7 @@ from copy import deepcopy
 import discord
 from discord.ext import tasks, commands
 from flatten_json import flatten, unflatten_list
-from libs.classes import MyContext, Zbot
+from libs.bot_classes import MyContext, Zbot
 
 from fcts.checks import is_translator, is_bot_admin
 

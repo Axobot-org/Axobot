@@ -12,7 +12,7 @@ from cachingutils import acached
 from .rss_general import FeedObject, RssMessage
 
 if TYPE_CHECKING:
-    from libs.classes import Zbot
+    from libs.bot_classes import Zbot
 
 
 class TwitterRSS:

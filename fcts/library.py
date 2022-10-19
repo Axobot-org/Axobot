@@ -5,7 +5,7 @@ import aiohttp
 import discord
 import isbnlib
 from discord.ext import commands
-from libs.classes import MyContext, Zbot
+from libs.bot_classes import MyContext, Zbot
 
 
 class ISBN(commands.Converter):

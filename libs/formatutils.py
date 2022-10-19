@@ -1,8 +1,10 @@
-from datetime import timedelta, datetime
 import time
+from datetime import datetime, timedelta
 from typing import Union
 
 from babel import dates, numbers
+from dateutil.relativedelta import relativedelta
+
 
 def get_locale(lang: str):
     "Get a i18n locale from a given bot language"
@@ -36,11 +38,9 @@ class FormatUtils:
         form can be 'short' (3d 6h) or 'developed' (3 jours 6 heures)
         """
         if date2 is None:
-            delta = timedelta(seconds=date1)
+            delta = relativedelta(seconds=date1)
         else:
-            delta: timedelta = abs(date2 - date1)
-        # convert delta to a number of seconds
-        delta: int = round(delta.total_seconds())
+            delta = relativedelta(date2, date1)
 
         kwargs = {
             "threshold": 100000,
@@ -49,47 +49,36 @@ class FormatUtils:
         }
 
         result = ""
-        if year and delta >= TIMEDELTA_UNITS.year:
-            # we calculate trunked value in seconds (to avoid babel rounding it)
-            seconds_year = delta // TIMEDELTA_UNITS.year * TIMEDELTA_UNITS.year
-            # then format
-            result += dates.format_timedelta(timedelta(seconds=seconds_year), granularity="year", **kwargs) + " "
+        if year and delta.years > 0 :
+            # add formatted years
+            result += dates.format_timedelta(timedelta(days=365*delta.years), granularity="year", **kwargs) + " "
             # we remove years
-            delta %= TIMEDELTA_UNITS.year
-        if year and delta >= TIMEDELTA_UNITS.month:
-            # we calculate trunked value in seconds (to avoid babel rounding it)
-            seconds_months = delta // TIMEDELTA_UNITS.month * TIMEDELTA_UNITS.month
-            # then format
-            result += dates.format_timedelta(timedelta(seconds=seconds_months), granularity="month", **kwargs) + " "
-        if delta >= TIMEDELTA_UNITS.day:
-            if year:
-                # we remove months
-                delta %= TIMEDELTA_UNITS.month
-            # we calculate trunked value in seconds (to avoid babel rounding it)
-            seconds_days = delta // TIMEDELTA_UNITS.day * TIMEDELTA_UNITS.day
-            # then format
-            result += dates.format_timedelta(timedelta(seconds=seconds_days), granularity="day", **kwargs) + " "
-            # we remove days
-            delta %= TIMEDELTA_UNITS.day
+            delta -= relativedelta(years=delta.years)
+        if year and delta.months > 0 :
+            # add formatted months
+            result += dates.format_timedelta(timedelta(days=31*delta.months), granularity="month", **kwargs) + " "
+            # we remove years
+            delta -= relativedelta(months=delta.months)
+        if delta.days > 0:
+            # add formatted days
+            result += dates.format_timedelta(timedelta(days=delta.days), granularity="day", **kwargs) + " "
+            # we remove years
+            delta -= relativedelta(days=delta.days)
 
-        if hour and delta > 0:
-            if delta >= TIMEDELTA_UNITS.hour:
-                # we calculate trunked value in seconds (to avoid babel rounding it)
-                seconds_hours = delta // TIMEDELTA_UNITS.hour * TIMEDELTA_UNITS.hour
-                # then format
-                result += dates.format_timedelta(timedelta(seconds=seconds_hours), granularity="hour", **kwargs) + " "
+        if hour:
+            if delta.hours > 0:
+                # add formatted hours
+                result += dates.format_timedelta(timedelta(hours=delta.hours), granularity="hour", **kwargs) + " "
                 # we remove hours
-                delta %= TIMEDELTA_UNITS.hour
-            if delta >= TIMEDELTA_UNITS.minute:
-                # we calculate trunked value in seconds (to avoid babel rounding it)
-                seconds_minutes = delta // TIMEDELTA_UNITS.minute * TIMEDELTA_UNITS.minute
-                # then format
-                result += dates.format_timedelta(timedelta(seconds=seconds_minutes), granularity="minute", **kwargs) + " "
+                delta -= relativedelta(hours=delta.hours)
+            if delta.minutes > 0:
+                # add formatted minutes
+                result += dates.format_timedelta(timedelta(minutes=delta.minutes), granularity="minute", **kwargs) + " "
                 # we remove minutes
-                delta %= TIMEDELTA_UNITS.minute
-            # then format
-            if delta > 0:
-                result += dates.format_timedelta(timedelta(seconds=delta), granularity="second", **kwargs)
+                delta -= relativedelta(minutes=delta.minutes)
+            if delta.seconds > 0:
+                # add formatted seconds
+                result += dates.format_timedelta(timedelta(seconds=delta.seconds), granularity="second", **kwargs) + " "
 
         return result.strip()
 

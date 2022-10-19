@@ -17,7 +17,7 @@ import geocoder
 from discord.ext import commands
 from pytz import timezone
 from timezonefinder import TimezoneFinder
-from libs.classes import MyContext, Zbot
+from libs.bot_classes import MyContext, Zbot
 from libs.formatutils import FormatUtils
 from libs.paginator import Paginator
 from utils import flatten_list
@@ -928,6 +928,8 @@ You can specify a verification limit by adding a number in argument (up to 1.000
                     for i in range(page_start, page_end, 10):
                         column_start, column_end = i+1, min(i+10, len(f_jobs))
                         emb.add_field(name=f"{column_start}-{column_end}", value="\n".join(f_jobs[i:i+10]))
+                    footer = f"Page {page}/{await self.get_page_count(interaction)}"
+                    emb.set_footer(text=footer)
                     return {
                         "embed": emb
                     }
@@ -1030,11 +1032,48 @@ You can specify a verification limit by adding a number in argument (up to 1.000
         """Auto format your Python code according to PEP8 guidelines"""
         if code.startswith('```') and code.endswith('```'):
             code = '\n'.join(code.split('\n')[1:-1])
+        elif code.startswith('`') and code.endswith('`'):
+            code = code[1:-1]
         code = autopep8.fix_code(code, {
             "aggressive": 3,
             "ignore": set()
         }).strip()
         await ctx.send(f"```py\n{code}\n```")
+
+    @commands.command(name="movie")
+    @commands.cooldown(5, 40, commands.BucketType.user)
+    @commands.check(checks.bot_can_embed)
+    async def movie_search(self, ctx: MyContext, *, movie_name: str):
+        """Search for a movie information based on its name
+
+        Warning: Only english names are supported for now!
+
+        ..Example movie The Circle"""
+        params = {
+            "apikey": self.bot.others["omdb"]
+        }
+        if re.match(r'tt\d+', movie_name):
+            params['i'] = movie_name
+        else:
+            params['t'] = movie_name
+        async with aiohttp.ClientSession() as session:
+            async with session.get("http://www.omdbapi.com/", params=params) as resp:
+                data = await resp.json()
+        if data["Response"] == "False":
+            await ctx.send(await self.bot._(ctx.channel,"fun.movie.not-found"))
+            return
+        website = data["Website"] if data["Website"] != "N/A" else None
+        embed = discord.Embed(title=data["Title"], url=website, description=data["Plot"], color=0x3498DB)
+        embed.set_thumbnail(url=data["Poster"])
+        embed.add_field(name=await self.bot._(ctx.channel,"fun.movie.director"), value=data["Director"])
+        embed.add_field(name=await self.bot._(ctx.channel,"fun.movie.actors"), value=data["Actors"])
+        embed.add_field(name=await self.bot._(ctx.channel,"fun.movie.released"), value=data["Released"])
+        embed.add_field(name=await self.bot._(ctx.channel,"fun.movie.awards"), value=data["Awards"])
+        embed.add_field(name=await self.bot._(ctx.channel,"fun.movie.runtime"), value=data["Runtime"])
+        embed.add_field(name=await self.bot._(ctx.channel,"fun.movie.writers"), value=data["Writer"])
+        embed.add_field(name=await self.bot._(ctx.channel,"fun.movie.imdb-rating"), value=data["imdbRating"])
+        embed.add_field(name=await self.bot._(ctx.channel,"fun.movie.imdb-id"), value=data["imdbID"])
+        await ctx.send(embed=embed)
 
 
 async def setup(bot):

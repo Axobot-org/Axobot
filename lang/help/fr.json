@@ -139,10 +139,6 @@
         "is_ttt_enabled": [
             "Le jeu du morpion est activé",
             "Le jeu du morpion doit être activé sur ce serveur"
-        ],
-        "verify_role_exists": [
-            "Un rôle de vérification est configuré",
-            "Aucun rôle de vérification n'a été configuré"
         ]
     },
     "cmd-count": "%{nbr} commandes\n`%{p}help %{cog}` pour en afficher la liste",

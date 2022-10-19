@@ -7,11 +7,21 @@
     "change-txt": "Veuillez entrer le texte à utiliser lors d'un nouveau post. Vous pouvez utiliser plusieurs variables, dont voici la liste :\n- `{author}` : l'auteur du post\n- `{channel}` : le nom de la chaîne (généralement le même que l'auteur)\n- `{date}` : la date du post (UTC)\n- `{link}` ou `{url}` : un lien vers le post\n- `{logo}` : un emoji représentant le type de post (web, Twitter, YouTube...)\n- `{mentions}` : la liste des rôles mentionnés\n- `{title}` : le titre du post",
     "change-txt-previous": "Le message actuel contient \n```\n%{text}\n```",
     "choose-delete": "Veuillez choisir les flux à supprimer",
+    "choose-disable": "Veuillez choisir les flux à désactiver",
+    "choose-enable": "Veuillez choisir les flux à réactiver",
     "choose-mentions-1": "Veuillez choisir les flux à modifier",
     "choose-roles": "Quels seront les rôles à mentionner ?",
     "delete-success": {
         "many": "%{count} flux ont été supprimé avec succès !",
         "one": "Le flux a été supprimé avec succès !"
+    },
+    "disable-success": {
+        "many": "%{count} flux ont bien été désactivés !",
+        "one": "Le flux a été désactivé avec succès !"
+    },
+    "enable-success": {
+        "many": "%{count} flux ont bien été réactivés !",
+        "one": "Le flux a été réactivé avec succès !"
     },
     "deviant": "DeviantArt",
     "deviant-default-flow": "{logo}  | Nouvelle création de {author} : **{title}**\nPubliée le {date}\nLien : {link}\n{mentions}",
@@ -25,6 +35,7 @@
     "invalid-flow": "Cet url est invalide (flux rss vide ou inaccessible) :confused:",
     "invalid-link": "Oups, cette adresse url est invalide ou incomplète :confused:",
     "list": "*Entrez le numéro du flux à modifier*\n\n**Lien - Type - Salon - Roles**\n",
+    "list-disabled": "(désactivé)",
     "list-result": "{emoji} {link}\nSalon : {channel}\nRôle mentionné : {roles}\nIdentifiant : {id}\nDernier post : {last_post}",
     "list-title": "Liste des flux rss du serveur %{server}",
     "list2": "*Entrez le numéro du flux à supprimer*\n\n**Lien - Type - Salon**\n",
@@ -36,6 +47,7 @@
     },
     "no-feed": "Oups, vous n'avez aucun flux rss à gérer !",
     "no-feed2": "Ce serveur ne possède aucun flux rss !",
+    "no-feed-filter": "Aucun flux ne peut être sélectionné pour cette commande !",
     "no-roles": "Aucun rôle n'a été configuré pour l'instant.",
     "not-a-role": "Ce rôle est introuvable. Réessayez :",
     "nothing": "Je n'ai rien trouvé sur cette recherche :confused:",

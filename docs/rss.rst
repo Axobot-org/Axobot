@@ -94,8 +94,6 @@ If you want to move an rss feed without having to delete it, recreate a new one 
 
 If no identifier is given, the bot will ask you which one to modify.  As for the channel, if you do not specify any, it will select the one in which you type the command.
 
-.. warning:: Here again, the bot needs "`Embed Links <perms.html#embed-links>`__" permission!
-
 
 ------------------
 Setup a feed embed
@@ -110,7 +108,6 @@ For the first command, if you do not give the feed identifier or a boolean value
 The syntax of the color/text customization parameters is the same as for the `embed <miscellaneous.html#embed>`__ command, i.e. in the form :code:`key = "value"`, with the possible keys "color", "footer" and "title".
 
 
-
 ----------------------
 Delete a followed feed
 ----------------------
@@ -121,7 +118,20 @@ With this command, you can stop following an rss/minecraft feed. And it's also v
 
 The "feed ID" argument is the identifier of the feed (found with the command `rss list <#see-every-feed>`__). If you do not enter this argument, or if the feed can't be found, the bot will open a menu where you can choose which feeds to delete.
 
-.. warning:: ZBot needs "`Embed Links <perms.html#embed-links>`__" permission to send the selection list!
+
+------------------------
+Enable or disable a feed
+------------------------
+
+**Syntax:** :code:`rss enable [feed ID]` or :code:`rss disable [feed ID]`
+
+Sometimes you may want to temporarily disable a feed, without actually deleting it. This command provides an easy way to do this, as the bot won't post new messages from disabled feeds but will still allow you to re-enable it at any time.
+
+This command can also be useful to re-enable a feed that has automatically been disabled by the bot, which can happens when you misconfigured it or if the website is down for too long.
+
+The "feed ID" argument is the identifier of the feed (found with the command `rss list <#see-every-feed>`__). If you do not enter this argument, or if the feed can't be found, the bot will open a menu where you can choose which feeds to enable/disable.
+
+.. warning:: Disabled feeds still count in your server feed count, so disabling a feed won't allow you to add more feeds if you have already hit the max count!
 
 
 -----------------

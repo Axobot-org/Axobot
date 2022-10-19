@@ -7,11 +7,21 @@
     "change-txt": "Please enter the text to be used when creating a new post. You can use several variables, of which here is the list:\n- `{author}`: the author of the post\n- `{channel}`: the channel name (usually the same as author)\n- `{date}`: the post date (UTC)\n- `{link}` or `{url}`: a link to the post\n- `{logo}`: an emoji representing the type of post (web, Twitter, YouTube...)\n- `{mentions}`: the list of mentioned roles\n- `{title}`: the title of the post",
     "change-txt-previous": "The current message contains  \n```\n%{text}\n```",
     "choose-delete": "Please choose the feeds to delete",
+    "choose-disable": "Please choose the feeds to disable",
+    "choose-enable": "Please choose the feeds to enable",
     "choose-mentions-1": "Please choose the feeds to modify",
     "choose-roles": "What roles will be mentioned?",
     "delete-success": {
         "many": "%{count} feeds have been successfully deleted!",
         "one": "The feed has been successfully deleted!"
+    },
+    "disable-success": {
+        "many": "%{count} feeds have been successfully disabled!",
+        "one": "The feed has been successfully disabled!"
+    },
+    "enable-success": {
+        "many": "%{count} feeds have been successfully enabled!",
+        "one": "The feed has been successfully enabled!"
     },
     "deviant": "DeviantArt",
     "deviant-default-flow": "{logo}  | New creation by {author}: **{title}**\nPublished on {date}\nLink: {link}\n{mentions}",
@@ -25,6 +35,7 @@
     "invalid-flow": "This url is invalid (empty or inaccessible rss feeds) :confused:",
     "invalid-link": "Oops, this url address is invalid or incomplete :confused:",
     "list": "*Type the number of the feeds to modify*\n\n**Link - Type - Channel - Mentions**\n",
+    "list-disabled": "(disabled)",
     "list-result": "{emoji} {link}\nDiscord channel: {channel}\nMentions: {roles}\nIdentifier: {id}\nLast post: {last_post}",
     "list-title": "List of rss feeds from the server %{server}",
     "list2": "*Type the number of the feeds to delete*\n\n**Link - Type - Channel**\n",
@@ -36,6 +47,7 @@
     },
     "no-feed": "Oops, you don't have any rss feeds to manage!",
     "no-feed2": "This server has no rss feed!",
+    "no-feed-filter": "No feed can be selected for this command!",
     "no-roles": "No role has been configured yet.",
     "not-a-role": "This role can't be found. Try again:",
     "nothing": "I found nothing on this search :confused:",
