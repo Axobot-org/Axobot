@@ -5,13 +5,14 @@ from typing import Any
 import discord
 from cachingutils import LRUCache
 from discord.ext import commands, tasks
-from fcts.tickets import TicketCreationEvent
 from libs.antiscam.classes import PredictionResult
 from libs.bot_classes import MyContext, Zbot
 from libs.enums import ServerWarningType
 from libs.formatutils import FormatUtils
 
 from fcts.args import serverlog
+from fcts.tickets import TicketCreationEvent
+
 from . import checks
 
 DISCORD_INVITE = re.compile(r'(?:https?://)?(?:www[.\s])?((?:discord[.\s](?:gg|io|me|li(?:nk)?)|discordapp\.com/invite|discord\.com/invite|dsc\.gg)[/ ]{,3}[\w-]{1,25}(?!\w))')
@@ -89,7 +90,7 @@ class ServerLogs(commands.Cog):
 
     async def db_add(self, guild: int, channel: int, kind: str) -> bool:
         "Add logs to a channel"
-        query = "INSERT INTO serverlogs (guild, channel, kind) VALUES (%(g)s, %(c)s, %(k)s, %(b)s) ON DUPLICATE KEY UPDATE guild=%(g)s"
+        query = "INSERT INTO serverlogs (guild, channel, kind, beta) VALUES (%(g)s, %(c)s, %(k)s, %(b)s) ON DUPLICATE KEY UPDATE guild=%(g)s"
         async with self.bot.db_query(query, {'g': guild, 'c': channel, 'k': kind, 'b': self.bot.beta}) as query_result:
             if query_result > 0 and guild in self.cache:
                 if channel in self.cache[guild]:
@@ -773,12 +774,16 @@ Minimum age required by anti-raid: {min_age}"
                     )
             elif warning_type == ServerWarningType.RSS_UNKNOWN_CHANNEL:
                 emb.description = f"**Could not send RSS message** in channel {kwargs.get('channel_id')}"
-                emb.add_field(name="Reason", value="Unknown or deleted channel")
                 emb.add_field(name="Feed ID", value=kwargs.get('feed_id'))
+                emb.add_field(name="Reason", value="Unknown or deleted channel")
+            elif warning_type == ServerWarningType.RSS_DISABLED_FEED:
+                emb.description = f"**Feed has been disabled** in channel <#{kwargs.get('channel_id')}>"
+                emb.add_field(name="Feed ID", value=kwargs.get('feed_id'))
+                emb.add_field(name="Reason", value="Too many recent errors")
             else:
                 return
             await self.validate_logs(guild, channel_ids, emb)
-        
+
 
 async def setup(bot):
     await bot.add_cog(ServerLogs(bot))
