@@ -429,7 +429,7 @@ class Events(commands.Cog):
         t = time.time()
         self.partner_last_check = datetime.datetime.now()
         channels_list = await self.bot.get_cog('Servers').get_server(criters=["`partner_channel`<>''"],columns=['ID','partner_channel','partner_color'])
-        self.bot.log.info("[Partners] Rafraîchissement des salons ({} serveurs prévus)...".format(len(channels_list)))
+        self.bot.log.info(f"[Partners] Rafraîchissement des salons ({len(channels_list)} serveurs prévus)...")
         count = [0,0]
         for guild in channels_list:
             try:
@@ -472,6 +472,7 @@ class Events(commands.Cog):
 
     async def send_sql_statslogs(self):
         "Send some stats about the current bot stats"
+        await self.bot.wait_until_ready()
         rss_feeds = await self.bot.get_cog("Rss").db_get_raws_count(True)
         active_rss_feeds = await self.bot.get_cog("Rss").db_get_raws_count()
         if infoCog := self.bot.get_cog("Info"):
