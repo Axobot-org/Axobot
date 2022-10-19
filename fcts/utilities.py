@@ -254,6 +254,14 @@ class Utilities(commands.Cog):
         async with self.bot.db_query(query, fetchone=True) as query_results:
             return query_results
 
+    async def get_eventsPoints_top(self, number: int):
+        "Get the event points leaderboard containing at max the given number of users"
+        if not self.bot.database_online:
+            return None
+        query = f"SELECT userID, events_points FROM {self.table} ORDER BY events_points DESC LIMIT {number}"
+        async with self.bot.db_query(query) as query_results:
+            return query_results
+
     async def get_eventsPoints_nbr(self) -> int:
         if not self.bot.database_online:
             return 0
