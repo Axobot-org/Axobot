@@ -738,7 +738,10 @@ Cette option affecte tous les serveurs"""
             elif (member.id not in owner_list) and role in member.roles:
                 await ctx.send("Rôle supprimé à "+str(member))
                 await member.remove_roles(role,reason="This user doesn't support me anymore")
-        await self.add_success_reaction(ctx.message)
+        if ctx.interaction:
+            await ctx.send("Done!")
+        else:
+            await self.add_success_reaction(ctx.message)
 
     async def _get_ideas_list(self, channel: discord.TextChannel):
         "Get ideas from the ideas channel"
