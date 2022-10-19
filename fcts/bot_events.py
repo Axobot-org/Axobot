@@ -232,16 +232,17 @@ class BotEvents(commands.Cog):
         if current_event in prices:
             emojis = self.bot.emojis_manager.customs["green_check"], self.bot.emojis_manager.customs["red_cross"]
             prices_list = []
-            for k, v in prices[current_event].items():
-                emoji = emojis[0] if int(k) <= points else emojis[1]
-                prices_list.append(f"{emoji}{min(points,int(k))}/{k}: {v}")
+            for price, desc in prices[current_event].items():
+                emoji = emojis[0] if int(price) <= points else emojis[1]
+                prices_list.append(f"{emoji}{min(points, int(price))}/{price}: {desc}")
             prices = "\n".join(prices_list)
             objectives_title = await self.bot._(ctx.channel, "bot_events.objectives")
         else:
             prices = ""
             objectives_title = ""
-        rank_total = await self.bot._(ctx.channel, "bot_events.rank-total")
-        rank_global = await self.bot._(ctx.channel, "bot_events.rank-global")
+        _rank_total = await self.bot._(ctx.channel, "bot_events.rank-total")
+        _position_global = await self.bot._(ctx.channel, "bot_events.position-global")
+        _rank_global = await self.bot._(ctx.channel, "bot_events.leaderboard-global", count=5)
 
         if ctx.can_send_embed:
             desc = await self.bot._(ctx.channel, "bot_events.xp-howto")
@@ -250,15 +251,26 @@ class BotEvents(commands.Cog):
             emb.set_author(name=user, icon_url=user.display_avatar.replace(static_format="png", size=32))
             if objectives_title != "":
                 emb.add_field(name=objectives_title, value=prices, inline=False)
-            emb.add_field(name=rank_total, value=str(points))
-            emb.add_field(name=rank_global, value=user_rank)
+            emb.add_field(name=_rank_total, value=str(points))
+            emb.add_field(name=_position_global, value=user_rank)
+            emb.add_field(name=_rank_global, value=await self.get_top_5(), inline=False)
             await ctx.send(embed=emb)
         else:
             msg = f"**{title}** ({user})"
             if objectives_title != "":
                 msg += f"\n\n__{objectives_title}:__\n{prices}"
-            msg += f"\n\n__{rank_total}:__ {points}\n__{rank_global}:__ {user_rank}"
+            msg += f"\n\n__{_rank_total}:__ {points}\n__{_rank_global}:__ {user_rank}"
             await ctx.send(msg)
+
+    async def get_top_5(self) -> str:
+        "Get the list of the 5 users with the most event points"
+        top_5 = await self.bot.get_cog("Utilities").get_eventsPoints_top(number=5)
+        if top_5 is None:
+            return await self.bot._(self.bot.get_channel(0), "bot_events.nothing-desc")
+        top_5 = [
+            f"{i+1}. {self.bot.get_user(u['userID']).name} ({u['events_points']} points)"
+            for i, u in enumerate(top_5)]
+        return "\n".join(top_5)
 
     async def db_add_dailies(self, userid: int, points: int):
         "Add dailies points to a user"
