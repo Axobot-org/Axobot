@@ -123,6 +123,7 @@ def parse_crypted_file(bot: "Zbot"):
     bot.others['random_api_token'] = cryptage.uncrypte(lines[18])
     bot.others['google_api'] = cryptage.uncrypte(lines[19])
     bot.others['curseforge'] = cryptage.uncrypte(lines[20])
+    bot.others['omdb'] = cryptage.uncrypte(lines[21])
     bot.dbl_token = tokens.get_dbl_token()
 
 def load_sql_connection(bot: "Zbot"):
