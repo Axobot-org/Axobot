@@ -66,9 +66,12 @@
         "director": "Director",
         "imdb-id": "IMDb ID",
         "imdb-rating": "IMDb rating",
+        "no-description": "No description provided",
+        "no-rating": "Not rated",
         "not-found": "Unable to find this movie",
         "released": "Release date",
-        "runtime": "Runtime"
+        "runtime": "Runtime",
+        "writers": "Writers"
     },
     "nasa-none": "Oops, I'm unable to retrieve the information from NASA at the moment. Try again in a few minutes :confused:",
     "no-database": "As our database is offline, access to fun commands is restricted to people with permission \"Manage Server\"",

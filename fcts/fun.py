@@ -1063,7 +1063,9 @@ You can specify a verification limit by adding a number in argument (up to 1.000
             await ctx.send(await self.bot._(ctx.channel,"fun.movie.not-found"))
             return
         website = data["Website"] if data["Website"] != "N/A" else None
-        embed = discord.Embed(title=data["Title"], url=website, description=data["Plot"], color=0x3498DB)
+        rating = data["imdbRating"] if data["imdbRating"] != "N/A" else await self.bot._(ctx.channel,"fun.movie.no-rating")
+        description = data["Plot"] if data["Plot"] != "N/A" else await self.bot._(ctx.channel,"fun.movie.no-description")
+        embed = discord.Embed(title=data["Title"], url=website, description=description, color=0x3498DB)
         embed.set_thumbnail(url=data["Poster"])
         embed.add_field(name=await self.bot._(ctx.channel,"fun.movie.director"), value=data["Director"])
         embed.add_field(name=await self.bot._(ctx.channel,"fun.movie.actors"), value=data["Actors"])
@@ -1071,7 +1073,7 @@ You can specify a verification limit by adding a number in argument (up to 1.000
         embed.add_field(name=await self.bot._(ctx.channel,"fun.movie.awards"), value=data["Awards"])
         embed.add_field(name=await self.bot._(ctx.channel,"fun.movie.runtime"), value=data["Runtime"])
         embed.add_field(name=await self.bot._(ctx.channel,"fun.movie.writers"), value=data["Writer"])
-        embed.add_field(name=await self.bot._(ctx.channel,"fun.movie.imdb-rating"), value=data["imdbRating"])
+        embed.add_field(name=await self.bot._(ctx.channel,"fun.movie.imdb-rating"), value=rating)
         embed.add_field(name=await self.bot._(ctx.channel,"fun.movie.imdb-id"), value=data["imdbID"])
         await ctx.send(embed=embed)
 
