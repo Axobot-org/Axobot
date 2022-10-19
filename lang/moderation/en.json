@@ -23,10 +23,6 @@
         "not-found": "Hmm... impossible to delete these messages. Discord tells me they don't exist :thinking:",
         "too-few": "I can't delete so few messages"
     },
-    "deprecated-verify": {
-        "desc": "The verification system is now deprecated and will be removed in a future version. Please ask a server manager to enable the [Discord community verification system](https://support.discord.com/hc/en-us/articles/1500000466882-Rules-Screening-FAQ) instead.",
-        "title": "Deprecated feature"
-    },
     "destop": {
         "no-guild": "This message does not belong to this server",
         "too-old": "I can't delete messages older than %{days} days!"
@@ -120,61 +116,6 @@
         "zero": "No nickname have been edited"
     },
     "unmute-chat": "The member %{user} (%{userid}) has been unmuted",
-    "verify-role-high": "Oops, it seems that the role %{r} is too high for me to give it. Please place this role lower than mine, or place my role above it.",
-    "verify_questions": [
-        [
-            "What is 2+7?",
-            "9"
-        ],
-        [
-            "What does the product of 2 by 3 give?",
-            "6"
-        ],
-        [
-            "Which of these words begins with D? `bathtub`, `crow`, `galion` or `drawing`",
-            "drawing"
-        ],
-        [
-            "How many sides does a triangle have?",
-            "3"
-        ],
-        [
-            "What is the result of 10 minus 5?",
-            "5"
-        ],
-        [
-            "What is the first letter of `Zbot`?",
-            "z"
-        ],
-        [
-            "What is the name of this server?",
-            "_special_servername"
-        ],
-        [
-            "What is the name of the French bread known all over the world? (one word)",
-            "baguette"
-        ],
-        [
-            "What is the opposite color to black?",
-            "white"
-        ],
-        [
-            "What is the fourth cardinal point? North, south, east, ...",
-            "west"
-        ],
-        [
-            "What does the emoji :pig: represent? A `fish`, `plant` or `pig`?",
-            "pig"
-        ],
-        [
-            "What geometric shape has 3 sides?",
-            "triangle"
-        ],
-        [
-            "How many seconds are there in a minute?",
-            "60"
-        ]
-    ],
     "warn": {
         "cant-bot": "I can't warn a bot ^^",
         "cant-staff": "You can't warn another staff member!",

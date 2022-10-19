@@ -12,10 +12,8 @@ import aiohttp
 import discord
 import mysql
 from discord.ext import commands, tasks
-from libs.classes import UsernameChangeRecord, Zbot
-
-from fcts.checks import is_fun_enabled
-
+from libs.bot_classes import Zbot
+from libs.enums import UsernameChangeRecord
 
 class Events(commands.Cog):
     """Cog for the management of major events that do not belong elsewhere. Like when a new server invites the bot."""
@@ -147,7 +145,7 @@ class Events(commands.Cog):
                         desc += f"\nJoined at <t:{guild.me.joined_at.timestamp():.0f}>"
             emb = discord.Embed(description=desc, color=self.embed_colors['welcome'], timestamp=self.bot.utcnow())
             emb.set_author(name=self.bot.user, icon_url=self.bot.user.display_avatar)
-            await self.bot.send_embed([emb])
+            await self.bot.send_embed(emb)
             if self.bot.database_online:
                 await self.send_sql_statslogs()
         except Exception as err:
@@ -177,20 +175,6 @@ class Events(commands.Cog):
                 if msg.guild is None or msg.channel.permissions_for(msg.guild.me).external_emojis:
                     nudes_reacts += ['<:whut:485924115199426600>','<:thinksmart:513105826530197514>','<:excusemewhat:418154673523130398>','<:blobthinking:499661417012527104>','<a:ano_U:568494122856611850>','<:catsmirk:523929843331498015>','<a:ablobno:537680872820965377>']
                 await msg.channel.send(random.choice(nudes_reacts))
-            except discord.HTTPException:
-                pass
-        # Halloween event
-        elif ("booh" in msg.content.lower() or "halloween" in msg.content.lower() or "witch" in msg.content.lower()) and random.random() < 0.05 and self.bot.current_event=="halloween":
-            try:
-                react = random.choice(['🦇','🎃','🕷️']*2+['👀' ])
-                await msg.add_reaction(react)
-            except discord.HTTPException:
-                pass
-        # April Fool event
-        elif random.random() < 0.07 and self.bot.current_event=="fish" and await is_fun_enabled(msg, self.bot.get_cog("Fun")):
-            try:
-                react = random.choice(['🐟','🎣', '🐠', '🐡']*4+['👀'])
-                await msg.add_reaction(react)
             except discord.HTTPException:
                 pass
         if not msg.author.bot:
@@ -372,11 +356,12 @@ class Events(commands.Cog):
         self.bot.log.info("[tasks_loop] Lancement de la boucle")
 
     async def botEventLoop(self):
+        "Refresh the current bot event every once in a while"
         self.bot.get_cog("BotEvents").update_current_event()
-        e = self.bot.get_cog("BotEvents").current_event
-        emb = discord.Embed(description=f'**Bot event** updated (current event is {e})', color=1406147, timestamp=self.bot.utcnow())
+        event = self.bot.get_cog("BotEvents").current_event
+        emb = discord.Embed(description=f'**Bot event** updated (current event is {event})', color=1406147, timestamp=self.bot.utcnow())
         emb.set_author(name=self.bot.user, icon_url=self.bot.user.display_avatar)
-        await self.bot.send_embed([emb], url="loop")
+        await self.bot.send_embed(emb, url="loop")
         self.last_eventDay_check = datetime.datetime.today()
 
     async def dbl_send_data(self):
@@ -436,7 +421,7 @@ class Events(commands.Cog):
         delta_time = round(time.time()-t, 3)
         emb = discord.Embed(description=f'**Guilds count updated** in {delta_time}s ({answers})', color=7229109, timestamp=self.bot.utcnow())
         emb.set_author(name=self.bot.user, icon_url=self.bot.user.display_avatar)
-        await self.bot.send_embed([emb], url="loop")
+        await self.bot.send_embed(emb, url="loop")
         self.dbl_last_sending = datetime.datetime.now()
 
     async def partners_loop(self):
@@ -464,7 +449,7 @@ class Events(commands.Cog):
             color=10949630,
             timestamp=self.bot.utcnow())
         emb.set_author(name=self.bot.user, icon_url=self.bot.user.display_avatar)
-        await self.bot.send_embed([emb], url="loop")
+        await self.bot.send_embed(emb, url="loop")
 
     async def translations_backup(self):
         """Do a backup of the translations files"""
@@ -483,7 +468,7 @@ class Events(commands.Cog):
         delta_time = round(time.time()-start, 3)
         emb = discord.Embed(description=f'**Translations files backup** completed in {delta_time}s', color=10197915, timestamp=self.bot.utcnow())
         emb.set_author(name=self.bot.user, icon_url=self.bot.user.display_avatar)
-        await self.bot.send_embed([emb], url="loop")
+        await self.bot.send_embed(emb, url="loop")
 
     async def send_sql_statslogs(self):
         "Send some stats about the current bot stats"
@@ -522,7 +507,7 @@ class Events(commands.Cog):
             raise err
         emb = discord.Embed(description='**Stats logs** updated', color=5293283, timestamp=self.bot.utcnow())
         emb.set_author(name=self.bot.user, icon_url=self.bot.user.display_avatar)
-        await self.bot.send_embed([emb], url="loop")
+        await self.bot.send_embed(emb, url="loop")
         self.statslogs_last_push = datetime.datetime.now()
 
 

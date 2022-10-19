@@ -127,6 +127,7 @@
         "snowflake-3": "Internal worker ID",
         "snowflake-4": "Internal process ID",
         "snowflake-5": "Increment",
+        "snowflake-6": "ID length",
         "textchan-0": "Category",
         "textchan-1": "Description",
         "textchan-2": "NSFW",

@@ -3,7 +3,7 @@ import discord
 import importlib
 import re
 from discord.ext import commands
-from libs.classes import Zbot, MyContext
+from libs.bot_classes import Zbot, MyContext
 from . import checks, args
 importlib.reload(checks)
 importlib.reload(args)
@@ -333,6 +333,8 @@ Opposite is the subcommand 'join'
             emojis_ids: list[str] = [str(x.id) if isinstance(x, discord.Emoji)
                       else str(x) for x in emojis]
             full_list = [full_list[x] for x in emojis_ids if x in full_list]
+        else:
+            full_list = list(full_list.values())
         desc, proper_emojis = await self.create_list_embed(full_list, ctx.guild)
         reacts = [x.emoji for x in embed.reactions]
         for emoji in proper_emojis:

@@ -28,7 +28,7 @@ import time
 import json
 from random import choice
 from fcts import tokens  # pylint: disable=no-name-in-module
-from libs.classes import Zbot
+from libs.bot_classes import Zbot
 from utils import load_cogs, load_sql_connection, setup_bot_logger, setup_database_logger, setup_start_parser, parse_crypted_file
 
 async def main():
@@ -63,7 +63,7 @@ async def main():
         else:
             await client.change_presence(activity=discord.Game(name=choice(status_list['release'])))
         emb = discord.Embed(description=f"**{client.user.name}** is launching !", color=8311585, timestamp=client.utcnow())
-        await client.send_embed([emb])
+        await client.send_embed(emb)
 
     parse_crypted_file(client)
     load_sql_connection(client)

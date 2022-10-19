@@ -1,7 +1,7 @@
 import importlib
 from discord.ext import commands
 from fcts.checks import is_bot_admin
-from libs.classes import MyContext, Zbot
+from libs.bot_classes import MyContext, Zbot
 from utils import count_code_lines
 
 class Reloads(commands.Cog):

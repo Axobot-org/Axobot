@@ -15,7 +15,7 @@ FeedType = Literal['tw', 'yt', 'twitch', 'reddit', 'mc', 'deviant', 'web']
 
 if TYPE_CHECKING:
     from libs.emojis_manager import EmojisManager
-    from libs.classes import Zbot
+    from libs.bot_classes import Zbot
 
 async def feed_parse(bot: Zbot, url: str, timeout: int, session: ClientSession = None) -> Optional[feedparser.FeedParserDict]:
     """Asynchronous parsing using cool methods"""
@@ -150,35 +150,6 @@ class RssMessage:
             emb.set_thumbnail(url=self.image)
         return emb
 
-class FeedSelectView(discord.ui.View):
-    "Used to ask to select an rss feed"
-    def __init__(self, feeds: list[dict[str, Any]], max_values: int, placeholder: str):
-        super().__init__()
-        options = self.build_options(feeds)
-        self.select = discord.ui.Select(placeholder=placeholder, min_values=1, max_values=max_values, options=options)
-        self.select.callback = self.callback
-        self.add_item(self.select)
-        self.feeds: list[int] = None
-
-    def build_options(self, feeds: list[dict[str, Any]]) -> list[discord.SelectOption]:
-        "Build the options list for Discord"
-        res = []
-        for feed in feeds:
-            if len(feed['name']) > 90:
-                feed['name'] = feed['name'][:89] + '…'
-            label = f"{feed['tr_type']} - {feed['name']}"
-            desc = f"{feed['tr_channel']} - Last post: {feed['tr_lastpost']}"
-            res.append(discord.SelectOption(value=feed['id'], label=label, description=desc, emoji=feed['emoji']))
-        return res
-
-    async def callback(self, interaction: discord.Interaction):
-        "Called when the dropdown menu has been validated by the user"
-        await interaction.response.defer()
-        self.feeds = self.select.values
-        self.select.disabled = True
-        await interaction.edit_original_response(view=self)
-        self.stop()
-
 class FeedObject:
     "A feed record from the database"
     def __init__(self, from_dict: dict):
@@ -198,6 +169,7 @@ class FeedObject:
         self.last_update: Optional[datetime.datetime] = from_dict['last_update']
         self.recent_errors: int = from_dict['recent_errors']
         self.is_active_guild: bool = bool(from_dict['active_guild'])
+        self.enabled: bool = bool(from_dict['enabled'])
 
     @classmethod
     def unrecorded(cls, from_type: str, guild_id: Optional[int]=None, channel_id: Optional[int]=None):
@@ -217,7 +189,8 @@ class FeedObject:
             "embed_color": "",
             "last_update": None,
             "recent_errors": 0,
-            "active_guild": True
+            "active_guild": True,
+            "enabled": True
         })
 
     def get_emoji(self, cog: "EmojisManager") -> Union[discord.Emoji, str]:

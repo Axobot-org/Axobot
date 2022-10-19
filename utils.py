@@ -14,7 +14,7 @@ from discord.ext import commands
 from fcts import cryptage, tokens  # pylint: disable=no-name-in-module
 
 if TYPE_CHECKING:
-    from libs.classes import Zbot
+    from libs.bot_classes import Zbot
 
 OUTAGE_REASON = {
     'fr': "Un des datacenters de notre hébergeur OVH a pris feu, rendant ,inaccessible le serveur et toutes ses données. Une vieille sauvegarde de la base de donnée sera peut-être utilisée ultérieurement. Plus d'informations sur https://zbot.statuspage.io/",
@@ -123,6 +123,7 @@ def parse_crypted_file(bot: "Zbot"):
     bot.others['random_api_token'] = cryptage.uncrypte(lines[18])
     bot.others['google_api'] = cryptage.uncrypte(lines[19])
     bot.others['curseforge'] = cryptage.uncrypte(lines[20])
+    bot.others['omdb'] = cryptage.uncrypte(lines[21])
     bot.dbl_token = tokens.get_dbl_token()
 
 def load_sql_connection(bot: "Zbot"):
@@ -176,7 +177,6 @@ async def load_cogs(bot: "Zbot"):
                       'fcts.servers',   
                       'fcts.tickets',
                       'fcts.timers',
-                      'fcts.translations',
                       'fcts.users',
                       'fcts.utilities',
                       'fcts.voices',

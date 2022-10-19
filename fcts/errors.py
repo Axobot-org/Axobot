@@ -6,7 +6,8 @@ import typing
 
 import discord
 from discord.ext import commands
-from libs.classes import MyContext, Zbot
+from libs.bot_classes import MyContext, Zbot
+from libs.errors import NotDuringEventError, VerboseCommandError
 
 from . import checks
 
@@ -33,7 +34,7 @@ class Errors(commands.Cog):
             commands.errors.ConversionError,
             discord.errors.Forbidden
         )
-        actually_not_ignored = (commands.errors.NoPrivateMessage,)
+        actually_not_ignored = (commands.errors.NoPrivateMessage, VerboseCommandError)
 
         # Allows us to check for original exceptions raised and sent to CommandInvokeError.
         # If nothing is found. We keep the exception passed to on_command_error.
@@ -41,136 +42,145 @@ class Errors(commands.Cog):
 
         # Anything in ignored will return and prevent anything happening.
         if isinstance(error, ignored) and not isinstance(error, actually_not_ignored):
+            if isinstance(error, commands.CheckFailure) and ctx.interaction:
+                await ctx.send(await self.bot._(ctx.channel, "errors.checkfailure", help_cmd="`!help`"), ephemeral=True)
             if self.bot.beta and ctx.guild:
                 await ctx.send(f"`Ignored error:` [{error.__class__.__module__}.{error.__class__.__name__}] {error}")
             return
         elif isinstance(error, commands.CommandError) and str(error) == "User doesn't have required roles":
-            await ctx.send(await self.bot._(ctx.channel, 'errors.notrightroles'))
+            await ctx.send(await self.bot._(ctx.channel, 'errors.notrightroles'), ephemeral=True)
             return
         elif isinstance(error, commands.CommandError) and str(error) == "Database offline":
             from utils import OUTAGE_REASON
             if OUTAGE_REASON:
                 lang = await self.bot._(ctx.channel, '_used_locale')
-                r = OUTAGE_REASON.get(lang, OUTAGE_REASON['en'])
-                await ctx.send(await self.bot._(ctx.channel, 'errors.nodb-2', reason=r))
+                reason = OUTAGE_REASON.get(lang, OUTAGE_REASON['en'])
+                await ctx.send(await self.bot._(ctx.channel, 'errors.nodb-2', reason=reason))
             else:
                 await ctx.send(await self.bot._(ctx.channel, 'errors.nodb-1'))
             return
         elif isinstance(error, commands.ExpectedClosingQuoteError):
-            await ctx.send(await self.bot._(ctx.channel, 'errors.quoteserror'))
+            await ctx.send(await self.bot._(ctx.channel, 'errors.quoteserror'), ephemeral=True)
+            return
+        elif isinstance(error, NotDuringEventError):
+            await ctx.send(await self.bot._(ctx.channel, 'errors.notduringevent', cmd="`/event info`"), ephemeral=True)
             return
         elif isinstance(error,commands.errors.CommandOnCooldown):
             if await self.bot.get_cog('Admin').check_if_admin(ctx):
                 await ctx.reinvoke()
                 return
             d = round(error.retry_after, 2 if error.retry_after < 60 else 0)
-            await ctx.send(await self.bot._(ctx.channel,'errors.cooldown',d=d))
+            await ctx.send(await self.bot._(ctx.channel, 'errors.cooldown', d=d), ephemeral=True)
             return
         elif isinstance(error, commands.BadLiteralArgument):
-            await ctx.send(await self.bot._(ctx.channel, 'errors.badlitteral'))
+            await ctx.send(await self.bot._(ctx.channel, 'errors.badlitteral'), ephemeral=True)
             return
         elif isinstance(error,(commands.BadArgument,commands.BadUnionArgument)):
+            async def send_err(tr_key: str, **kwargs):
+                await ctx.send(await self.bot._(ctx.channel, tr_key, **kwargs),
+                               allowed_mentions=ALLOWED, ephemeral=True)
+
             ALLOWED = discord.AllowedMentions(everyone=False, users=False, roles=False)
             raw_error = str(error)
             # Could not convert "limit" into int. OR Converting to "int" failed for parameter "number".
-            r = re.search(r'Could not convert \"(?P<arg>[^\"]+)\" into (?P<type>[^.\n]+)',raw_error)
-            if r is None:
-                r = re.search(r'Converting to \"(?P<type>[^\"]+)\" failed for parameter \"(?P<arg>[^.\n]+)\"',raw_error)
-            if r is not None:
-                return await ctx.send(await self.bot._(ctx.channel,'errors.badarguments',p=r.group('arg'),t=r.group('type')), allowed_mentions=ALLOWED)
+            reason = re.search(r'Could not convert \"(?P<arg>[^\"]+)\" into (?P<type>[^.\n]+)',raw_error)
+            if reason is None:
+                reason = re.search(r'Converting to \"(?P<type>[^\"]+)\" failed for parameter \"(?P<arg>[^.\n]+)\"',raw_error)
+            if reason is not None:
+                return await send_err('errors.badarguments', p=reason.group('arg'), t=reason.group('type'))
             # zzz is not a recognised boolean option
-            r = re.search(r'(?P<arg>[^\"]+) is not a recognised (?P<type>[^.\n]+) option',raw_error)
-            if r is not None:
-                return await ctx.send(await self.bot._(ctx.channel,'errors.badarguments-2',p=r.group('arg'),t=r.group('type')), allowed_mentions=ALLOWED)
+            reason = re.search(r'(?P<arg>[^\"]+) is not a recognised (?P<type>[^.\n]+) option',raw_error)
+            if reason is not None:
+                return await send_err('errors.badarguments-2', p=reason.group('arg'), t=reason.group('type'))
             # Member "Z_runner" not found
-            r = re.search(r'(?<=Member \")(.+)(?=\" not found)',raw_error)
-            if r is not None:
-                return await ctx.send(await self.bot._(ctx.channel,'errors.membernotfound',m=r.group(1)), allowed_mentions=ALLOWED)
+            reason = re.search(r'(?<=Member \")(.+)(?=\" not found)',raw_error)
+            if reason is not None:
+                return await send_err('errors.membernotfound', m=reason.group(1))
             # User "Z_runner" not found
-            r = re.search(r'(?<=User \")(.+)(?=\" not found)',raw_error)
-            if r is not None:
-                return await ctx.send(await self.bot._(ctx.channel,'errors.usernotfound',u=r.group(1)), allowed_mentions=ALLOWED)
+            reason = re.search(r'(?<=User \")(.+)(?=\" not found)',raw_error)
+            if reason is not None:
+                return await send_err('errors.usernotfound', u=reason.group(1))
             # Role "Admin" not found
-            r = re.search(r'(?<=Role \")(.+)(?=\" not found)',raw_error)
-            if r is not None:
-                return await ctx.send(await self.bot._(ctx.channel,'errors.rolenotfound',r=r.group(1)), allowed_mentions=ALLOWED)
+            reason = re.search(r'(?<=Role \")(.+)(?=\" not found)',raw_error)
+            if reason is not None:
+                return await send_err('errors.rolenotfound', r=reason.group(1))
             # Emoji ":shock:" not found
-            r = re.search(r'(?<=Emoji \")(.+)(?=\" not found)',raw_error)
-            if r is not None:
-                return await ctx.send(await self.bot._(ctx.channel,'errors.emojinotfound',e=r.group(1)), allowed_mentions=ALLOWED)
+            reason = re.search(r'(?<=Emoji \")(.+)(?=\" not found)',raw_error)
+            if reason is not None:
+                return await send_err('errors.emojinotfound', e=reason.group(1))
              # Colour "blue" is invalid
-            r = re.search(r'(?<=Colour \")(.+)(?=\" is invalid)',raw_error)
-            if r is not None:
-                return await ctx.send(await self.bot._(ctx.channel,'errors.invalidcolor',c=r.group(1)), allowed_mentions=ALLOWED)
+            reason = re.search(r'(?<=Colour \")(.+)(?=\" is invalid)',raw_error)
+            if reason is not None:
+                return await send_err('errors.invalidcolor', c=reason.group(1))
             # Channel "twitter" not found.
-            r = re.search(r'(?<=Channel \")(.+)(?=\" not found)',raw_error)
-            if r is not None:
-                return await ctx.send(await self.bot._(ctx.channel,'errors.channotfound',c=r.group(1)), allowed_mentions=ALLOWED)
+            reason = re.search(r'(?<=Channel \")(.+)(?=\" not found)',raw_error)
+            if reason is not None:
+                return await send_err('errors.channotfound', c=reason.group(1))
             # Message "1243" not found.
-            r = re.search(r'(?<=Message \")(.+)(?=\" not found)',raw_error)
-            if r is not None:
-                return await ctx.send(await self.bot._(ctx.channel,'errors.msgnotfound',msg=r.group(1)), allowed_mentions=ALLOWED)
+            reason = re.search(r'(?<=Message \")(.+)(?=\" not found)',raw_error)
+            if reason is not None:
+                return await send_err('errors.msgnotfound', msg=reason.group(1))
             # Guild "1243" not found.
-            r = re.search(r'(?<=Guild \")(.+)(?=\" not found)',raw_error)
-            if r is not None:
-                return await ctx.send(await self.bot._(ctx.channel,'errors.guildnotfound',guild=r.group(1)), allowed_mentions=ALLOWED)
+            reason = re.search(r'(?<=Guild \")(.+)(?=\" not found)',raw_error)
+            if reason is not None:
+                return await send_err('errors.guildnotfound', guild=reason.group(1))
             # Too many text channels
             if raw_error=='Too many text channels':
-                return await ctx.send(await self.bot._(ctx.channel,'errors.toomanytxtchan'), allowed_mentions=ALLOWED)
+                return await send_err('errors.toomanytxtchan')
             # Invalid duration: 2d
-            r = re.search(r'Invalid duration: (\S+)',raw_error)
-            if r is not None:
-                return await ctx.send(await self.bot._(ctx.channel,'errors.duration',d=r.group(1)), allowed_mentions=ALLOWED)
+            reason = re.search(r'Invalid duration: (\S+)',raw_error)
+            if reason is not None:
+                return await send_err('errors.duration', d=reason.group(1))
             # Invalid invite: nope
-            r = re.search(r'Invalid invite: (\S+)',raw_error)
-            if r is not None:
-                return await ctx.send(await self.bot._(ctx.channel,'errors.invalidinvite',i=r.group(1)), allowed_mentions=ALLOWED)
+            reason = re.search(r'Invalid invite: (\S+)',raw_error)
+            if reason is not None:
+                return await send_err('errors.invalidinvite', i=reason.group(1))
             # Invalid guild: test
-            r = re.search(r'Invalid guild: (\S+)',raw_error)
-            if r is not None:
-                return await ctx.send(await self.bot._(ctx.channel,'errors.invalidguild',g=r.group(1)), allowed_mentions=ALLOWED)
+            reason = re.search(r'Invalid guild: (\S+)',raw_error)
+            if reason is not None:
+                return await send_err('errors.invalidguild', g=reason.group(1))
             # Invalid url: nou
-            r = re.search(r'Invalid url: (\S+)',raw_error)
-            if r is not None:
-                return await ctx.send(await self.bot._(ctx.channel,'errors.invalidurl',u=r.group(1)), allowed_mentions=ALLOWED)
+            reason = re.search(r'Invalid url: (\S+)',raw_error)
+            if reason is not None:
+                return await send_err('errors.invalidurl', u=reason.group(1))
             # Invalid unicode emoji: lol
-            r = re.search(r'Invalid Unicode emoji: (\S+)',raw_error)
-            if r is not None:
-                return await ctx.send(await self.bot._(ctx.channel,'errors.invalidunicode',u=r.group(1)), allowed_mentions=ALLOWED)
+            reason = re.search(r'Invalid Unicode emoji: (\S+)',raw_error)
+            if reason is not None:
+                return await send_err('errors.invalidunicode', u=reason.group(1))
             # Invalid leaderboard type: lol
-            r = re.search(r'Invalid leaderboard type: (\S+)',raw_error)
-            if r is not None:
-                return await ctx.send(await self.bot._(ctx.channel,'errors.invalidleaderboard'), allowed_mentions=ALLOWED)
+            reason = re.search(r'Invalid leaderboard type: (\S+)',raw_error)
+            if reason is not None:
+                return await send_err('errors.invalidleaderboard')
             # Invalid ISBN: lol
-            r = re.search(r'Invalid ISBN: (\S+)',raw_error)
-            if r is not None:
-                return await ctx.send(await self.bot._(ctx.channel,'errors.invalidisbn'), allowed_mentions=ALLOWED)
+            reason = re.search(r'Invalid ISBN: (\S+)',raw_error)
+            if reason is not None:
+                return await send_err('errors.invalidisbn')
             # Invalid emoji: lmao
-            r = re.search(r'Invalid emoji: (\S+)',raw_error)
-            if r is not None:
-                return await ctx.send(await self.bot._(ctx.channel,'errors.invalidemoji'), allowed_mentions=ALLOWED)
+            reason = re.search(r'Invalid emoji: (\S+)',raw_error)
+            if reason is not None:
+                return await send_err('errors.invalidemoji')
             # Invalid message ID: 007
-            r = re.search(r'Invalid message ID: (\S+)',raw_error)
-            if r is not None:
-                return await ctx.send(await self.bot._(ctx.channel,'errors.invalidmsgid'), allowed_mentions=ALLOWED)
+            reason = re.search(r'Invalid message ID: (\S+)',raw_error)
+            if reason is not None:
+                return await send_err('errors.invalidmsgid')
             # Invalid card style: aqua
-            r = re.search(r'Invalid card style: (\S+)',raw_error)
-            if r is not None:
-                return await ctx.send(await self.bot._(ctx.channel,'errors.invalidcardstyle', s=r.group(1)), allowed_mentions=ALLOWED)
+            reason = re.search(r'Invalid card style: (\S+)',raw_error)
+            if reason is not None:
+                return await send_err('errors.invalidcardstyle', s=reason.group(1))
             # Invalid server log type
-            r = re.search(r'Invalid server log type',raw_error)
-            if r is not None:
-                return await ctx.send(await self.bot._(ctx.channel,'errors.invalidserverlog'), allowed_mentions=ALLOWED)
+            reason = re.search(r'Invalid server log type',raw_error)
+            if reason is not None:
+                return await send_err('errors.invalidserverlog')
             # Invalid Discord ID
-            r = re.search(r'Invalid snowflake',raw_error)
-            if r is not None:
-                return await ctx.send(await self.bot._(ctx.channel,'errors.invalidsnowflake'), allowed_mentions=ALLOWED)
+            reason = re.search(r'Invalid snowflake',raw_error)
+            if reason is not None:
+                return await send_err('errors.invalidsnowflake')
             self.bot.log.warning('Unknown error type -',error)
         elif isinstance(error,commands.errors.MissingRequiredArgument):
             await ctx.send(await self.bot._(ctx.channel,'errors.missingargument',a=error.param.name,e=random.choice([':eyes:','',':confused:',':thinking:',''])))
             return
         elif isinstance(error,commands.errors.DisabledCommand):
-            await ctx.send(await self.bot._(ctx.channel,'errors.disabled', c=ctx.invoked_with))
+            await ctx.send(await self.bot._(ctx.channel,'errors.disabled', c=ctx.invoked_with), ephemeral=True)
             return
         elif isinstance(error,commands.errors.NoPrivateMessage):
             await ctx.send(await self.bot._(ctx.channel,'errors.DM'))
@@ -180,7 +190,7 @@ class Errors(commands.Cog):
             return
         else:
             try:
-                await ctx.send(await self.bot._(ctx.channel,'errors.unknown'))
+                await ctx.send(await self.bot._(ctx.channel,'errors.unknown'), ephemeral=True)
             except Exception as newerror:
                 self.bot.log.info(f"[on_cmd_error] Can't send error on channel {ctx.channel.id}: {newerror}")
         # All other Errors not returned come here... And we can just print the default TraceBack.
@@ -190,6 +200,11 @@ class Errors(commands.Cog):
     @commands.Cog.listener()
     async def on_interaction_error(self, interaction: discord.Interaction, error: discord.app_commands.AppCommandError):
         "Called when an error is raised during an interaction"
+        if isinstance(error, discord.app_commands.CheckFailure):
+            await interaction.response.send_message(
+                await self.bot._(interaction, "errors.checkfailure", help_cmd="`!help`"),
+                ephemeral=True)
+            return
         if interaction.guild:
             guild = f"{interaction.guild.name} | {interaction.channel.name}"
         elif interaction.guild_id:

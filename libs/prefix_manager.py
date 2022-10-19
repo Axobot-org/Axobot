@@ -4,7 +4,7 @@ import discord
 from cachingutils import LRUCache
 
 if TYPE_CHECKING:
-    from libs.classes import Zbot
+    from libs.bot_classes import Zbot
 
 
 class PrefixManager:

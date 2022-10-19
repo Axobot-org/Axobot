@@ -139,10 +139,6 @@
         "is_ttt_enabled": [
             "!ttt iz enabled",
             "Ewe, !ttt is disabled, use !config for dat"
-        ],
-        "verify_role_exists": [
-            "A verification role hav bee setted up",
-            "No verification rol has been addd"
         ]
     },
     "cmd-count": "%{nbr} itemz",

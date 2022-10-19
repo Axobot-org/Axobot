@@ -7,13 +7,13 @@ import discord
 import emoji
 from cachingutils import LRUCache
 from discord.ext import commands
-from libs.classes import MyContext, Zbot
+from libs.bot_classes import MyContext, Zbot
 
 from . import checks
 
 roles_options = ["clear_allowed_roles", "slowmode_allowed_roles", "mute_allowed_roles", "kick_allowed_roles", "ban_allowed_roles",
                  "warn_allowed_roles", "say_allowed_roles", "welcome_roles", "muted_role", 'partner_role', 'update_mentions',
-                 'verification_role', 'voice_roles']
+                 "voice_roles"]
 bool_options = ["enable_xp", "anti_caps_lock", "enable_fun",
                 "help_in_dm", "compress_help", "anti_scam", "nicknames_history"]
 textchan_options = ["welcome_channel", "bot_news", "poll_channels",
@@ -84,7 +84,6 @@ class Servers(commands.Cog):
                "partner_color":10949630,
                'partner_role':'',
                'update_mentions':'',
-               'verification_role':'',
                'voice_roles':'',
                'voice_channel':'',
                'voice_category':'',
@@ -94,7 +93,7 @@ class Servers(commands.Cog):
                'anti_scam': 0,
                'nicknames_history': None,
             }
-        self.optionsList = ["prefix","language","description","clear_allowed_roles","slowmode_allowed_roles","mute_allowed_roles","kick_allowed_roles","ban_allowed_roles","warn_allowed_roles","say_allowed_roles","welcome_channel","welcome","leave","welcome_roles","anti_scam","poll_channels","partner_channel","partner_color","partner_role","modlogs_channel","verification_role","nicknames_history","enable_xp","levelup_msg","levelup_channel","noxp_channels","xp_rate","xp_type","anti_caps_lock","enable_fun","membercounter","anti_raid","vote_emojis","morpion_emojis","help_in_dm","compress_help","muted_role","voice_roles","voice_channel","voice_category","voice_channel_format","ttt_display","bot_news","update_mentions"]
+        self.optionsList = ["prefix","language","description","clear_allowed_roles","slowmode_allowed_roles","mute_allowed_roles","kick_allowed_roles","ban_allowed_roles","warn_allowed_roles","say_allowed_roles","welcome_channel","welcome","leave","welcome_roles","anti_scam","poll_channels","partner_channel","partner_color","partner_role","modlogs_channel","nicknames_history","enable_xp","levelup_msg","levelup_channel","noxp_channels","xp_rate","xp_type","anti_caps_lock","enable_fun","membercounter","anti_raid","vote_emojis","morpion_emojis","help_in_dm","compress_help","muted_role","voice_roles","voice_channel","voice_category","voice_channel_format","ttt_display","bot_news","update_mentions"]
         self.membercounter_pending = {}
         self.max_members_for_nicknames = 3000
 
@@ -270,7 +269,7 @@ class Servers(commands.Cog):
                 raise Exception("Guild not found")
             emb_desc = f"New server in the database :tada: `{guild.name}` ({guild.id})"
             emb = discord.Embed(description=emb_desc, color=self.log_color, timestamp=self.bot.utcnow())
-            await self.bot.send_embed([emb])
+            await self.bot.send_embed(emb)
             return await self.add_server(guild_id)
         return True
 
@@ -387,7 +386,7 @@ class Servers(commands.Cog):
             emb = discord.Embed(description=msg, color=self.log_color, timestamp=self.bot.utcnow())
             emb.set_footer(text=ctx.guild.name)
             emb.set_author(name=self.bot.user, icon_url=self.bot.user.display_avatar)
-            await self.bot.send_embed([emb])
+            await self.bot.send_embed(emb)
             self.bot.log.debug(msg)
         except ValueError:
             await ctx.send(await self.bot._(ctx.guild.id, "server.option-notfound"))
@@ -400,7 +399,7 @@ class Servers(commands.Cog):
         emb = discord.Embed(description=msg, color=self.log_color, timestamp=self.bot.utcnow())
         emb.set_footer(text=guild.name)
         emb.set_author(name=self.bot.user, icon_url=self.bot.user.display_avatar)
-        await self.bot.send_embed([emb])
+        await self.bot.send_embed(emb)
         self.bot.log.debug(msg)
 
 
@@ -1133,7 +1132,7 @@ class Servers(commands.Cog):
         if i > 0:
             emb = discord.Embed(description=f"[MEMBERCOUNTER] {i} channels refreshed", color=5011628, timestamp=self.bot.utcnow())
             emb.set_author(name=self.bot.user, icon_url=self.bot.user.display_avatar)
-            await self.bot.send_embed([emb], url="loop")
+            await self.bot.send_embed(emb, url="loop")
 
 
 async def setup(bot):

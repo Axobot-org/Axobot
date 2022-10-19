@@ -14,7 +14,9 @@ import discord
 import speedtest
 from cachingutils import acached
 from discord.ext import commands
-from libs.classes import PRIVATE_GUILD_ID, ConfirmView, MyContext, UserFlag, Zbot
+from libs.bot_classes import PRIVATE_GUILD_ID, MyContext, Zbot
+from libs.enums import RankCardsFlag, UserFlag
+from libs.views import ConfirmView
 
 from . import checks
 
@@ -111,17 +113,28 @@ class Admin(commands.Cog):
                     for cmds in cmd.commands:
                         text+="\n        - {} *({})*".format(cmds.name,cmds.help.split('\n')[0])
             await ctx.send(text)
-    
+
     @main_msg.command(name="sync")
     @commands.check(checks.is_bot_admin)
-    async def sync_app_commands(self, ctx: MyContext, target: typing.Literal["global", "guild"]):
+    async def sync_app_commands(self, ctx: MyContext, scope: typing.Literal["global", "staff-guild", "support-guild"]):
         "Sync app commands for either global or staff server scope"
-        if target == "global":
+        await ctx.defer()
+        if scope == "global":
             cmds = await self.bot.tree.sync()
-            await ctx.send(f"{len(cmds)} global app commands synced!")
-        else:
+            txt = f"{len(cmds)} global app commands synced"
+        elif scope == "staff-guild":
             cmds = await self.bot.tree.sync(guild=discord.Object(id=625316773771608074))
-            await ctx.send(f"{len(cmds)} app commands synced in the staff server!")
+            txt = f"{len(cmds)} global app commands synced in staff server"
+        elif scope == "support-guild":
+            cmds = await self.bot.tree.sync(guild=discord.Object(id=356067272730607628))
+            txt = f"{len(cmds)} global app commands synced in the support server"
+        else:
+            await ctx.send("Unknown scope")
+            return
+        self.bot.log.info(txt)
+        emb = discord.Embed(description=txt, color=discord.Color.blue())
+        await self.bot.send_embed(emb)
+        await ctx.send(txt + '!')
 
     @main_msg.command(name="god")
     @commands.check(checks.is_bot_admin)
@@ -376,7 +389,7 @@ class Admin(commands.Cog):
     async def admin_db(self, _ctx: MyContext):
         "Commandes liées à la base de données"
 
-    @admin_db.command(name='reload')
+    @admin_db.command(name="reload")
     @commands.check(checks.is_bot_admin)
     async def db_reload(self, ctx: MyContext):
         "Reconnecte le bot à la base de donnée"
@@ -385,11 +398,14 @@ class Admin(commands.Cog):
         self.bot.cnx_xp.close()
         self.bot.connect_database_xp()
         if self.bot.cnx_frm is not None and self.bot.cnx_xp is not None:
-            await ctx.message.add_reaction('✅')
+            if ctx.interaction:
+                await ctx.reply("Done!")
+            else:
+                await self.add_success_reaction(ctx.message)
             if xp := self.bot.get_cog("Xp"):
                 await xp.reload_sus()
 
-    @admin_db.command(name='biggest-tables')
+    @admin_db.command(name="biggest-tables")
     @commands.check(checks.is_bot_admin)
     async def db_biggest(self, ctx: MyContext, database: typing.Optional[str] = None):
         "Affiche les tables les plus lourdes de la base de données"
@@ -598,7 +614,7 @@ Cette option affecte tous les serveurs"""
             await ctx.send(f"L'utilisateur {user} a déjà ce flag !")
             return
         userflags.append(flag)
-        await self.bot.get_cog('Utilities').change_db_userinfo(user.id, 'user_flags', UserFlag().flagsToInt(userflags))
+        await self.bot.get_cog('Utilities').change_db_userinfo(user.id, 'user_flags', UserFlag().flags_to_int(userflags))
         await ctx.send(f"L'utilisateur {user} a maintenant les flags {', '.join(userflags)}")
 
     @admin_flag.command(name="remove")
@@ -616,11 +632,63 @@ Cette option affecte tous les serveurs"""
             await ctx.send(f"L'utilisateur {user} n'a déjà pas ce flag")
             return
         userflags.remove(flag)
-        await self.bot.get_cog('Utilities').change_db_userinfo(user.id, 'user_flags', UserFlag().flagsToInt(userflags))
+        await self.bot.get_cog('Utilities').change_db_userinfo(user.id, 'user_flags', UserFlag().flags_to_int(userflags))
         if userflags:
             await ctx.send(f"L'utilisateur {user} a maintenant les flags {', '.join(userflags)}")
         else:
             await ctx.send(f"L'utilisateur {user} n'a plus aucun flag")
+
+    @main_msg.group(name="rankcard")
+    @commands.check(checks.is_bot_admin)
+    async def admin_rankcard(self, ctx: MyContext):
+        "Ajoute ou retire une carte d'xp à un utilisateur"
+        if ctx.subcommand_passed is None:
+            await self.bot.get_cog('Help').help_command(ctx, ['admin', 'rankcard'])
+
+    @admin_rankcard.command(name="list")
+    @commands.check(checks.is_bot_admin)
+    async def admin_card_list(self, ctx: MyContext, user: discord.User):
+        "Liste les cartes d'xp d'un utilisateur"
+        rankcards: list[str] = await self.bot.get_cog("Users").get_rankcards(user)
+        if rankcards:
+            await ctx.send(f"Liste des cartes d'xp de {user} : {', '.join(rankcards)}")
+        else:
+            await ctx.send(f"{user} n'a aucune carte d'xp spéciale pour le moment")
+
+    @admin_rankcard.command(name="add")
+    @commands.check(checks.is_bot_admin)
+    @discord.app_commands.choices(rankcard=[
+        discord.app_commands.Choice(name=rankcard, value=rankcard)
+        for rankcard in RankCardsFlag.FLAGS.values()
+    ])
+    async def admin_card_add(self, ctx: MyContext, user: discord.User, rankcard: str):
+        """Autorise une carte d'xp à un utilisateur"""
+        rankcards: list[str] = await self.bot.get_cog("Users").get_rankcards(user)
+        if rankcard in rankcards:
+            await ctx.send(f"L'utilisateur {user} a déjà cette carte d'xp !")
+            return
+        rankcards.append(rankcard)
+        await self.bot.get_cog('Users').set_rankcard(user, rankcard, add=True)
+        await ctx.send(f"L'utilisateur {user} a maintenant les flags {', '.join(rankcards)}")
+
+    @admin_rankcard.command(name="remove")
+    @commands.check(checks.is_bot_admin)
+    @discord.app_commands.choices(rankcard=[
+        discord.app_commands.Choice(name=rankcard, value=rankcard)
+        for rankcard in RankCardsFlag.FLAGS.values()
+    ])
+    async def admin_card_remove(self, ctx: MyContext, user: discord.User, rankcard: str):
+        """Retire une carte d'xp à un utilisateur"""
+        rankcards: list[str] = await self.bot.get_cog("Users").get_rankcards(user)
+        if rankcard not in rankcards:
+            await ctx.send(f"L'utilisateur {user} n'a déjà pas ce flag")
+            return
+        rankcards.remove(rankcard)
+        await self.bot.get_cog('Users').set_rankcard(user, rankcard, add=False)
+        if rankcards:
+            await ctx.send(f"L'utilisateur {user} a maintenant les cartes d'xp {', '.join(rankcards)}")
+        else:
+            await ctx.send(f"L'utilisateur {user} n'a plus aucune catre d'xp spéciale")
 
     @main_msg.command(name="loop_restart")
     @commands.check(checks.is_bot_admin)
@@ -655,6 +723,7 @@ Cette option affecte tous les serveurs"""
         if role is None:
             await ctx.send("Rôle Owners introuvable")
             return
+        await ctx.defer()
         owner_list: list[int] = []
         for guild in self.bot.guilds:
             if len(guild.members)>9:
@@ -707,8 +776,8 @@ Cette option affecte tous les serveurs"""
         liste = await self._get_ideas_list(channel)
         count = len(liste)
         liste = liste[:number]
-        title = "Liste des {} meilleures idées (sur {}) :".format(len(liste),count)
-        text = str()
+        title = f"Liste des {len(liste)} meilleures idées (sur {count}) :"
+        text = ""
         if ctx.guild is not None:
             color = ctx.guild.me.color
         else:

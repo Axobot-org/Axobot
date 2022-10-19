@@ -9,7 +9,7 @@ from typing import Dict, List, Literal, Optional, Tuple, Union
 
 import discord
 from discord.ext import commands
-from libs.classes import MyContext, Zbot
+from libs.bot_classes import MyContext, Zbot
 from libs.formatutils import FormatUtils
 from libs.paginator import Paginator
 
@@ -848,7 +848,7 @@ You must be an administrator of this server to use this command.
                 return ceil(length/30)
             async def get_page_content(self, interaction: discord.Interaction, page: int):
                 "Create one page"
-                if last_user := None if len(self.saved_bans) == 0 else self.saved_bans[-1].user:
+                if last_user := (None if len(self.saved_bans) == 0 else self.saved_bans[-1].user):
                     self.saved_bans += [
                         entry async for entry in ctx.guild.bans(limit=1000, after=last_user) if entry.user.id not in self.users
                     ]
@@ -871,7 +871,8 @@ You must be an administrator of this server to use this command.
                         else:
                             values = [str(entry.user) for entry in self.saved_bans[i:i+10]]
                         emb.add_field(name=f"{column_start}-{column_end}", value="\n".join(values))
-                emb.set_footer(text=ctx.author, icon_url=ctx.author.display_avatar)
+                footer = f"{ctx.author}  |  {page}/{await self.get_page_count(interaction)}"
+                emb.set_footer(text=footer, icon_url=ctx.author.display_avatar)
                 return {
                     "embed": emb
                 }
@@ -1344,75 +1345,6 @@ ID corresponds to the Identifier of the message
         await ctx.send(txt, delete_after=2.0)
         log = await self.bot._(ctx.guild.id,"logs.clear", channel=message.channel.mention, number=len(messages))
         await self.bot.get_cog("Events").send_logs_per_server(ctx.guild, "clear", log, ctx.author)
-
-
-    async def find_verify_question(self, ctx: MyContext) -> Tuple[str, str]:
-        """Find a question/answer for a verification question"""
-        raw_info = await self.bot._(ctx.guild,"moderation.verify_questions")
-        q = random.choice(raw_info)
-        a = q[1]
-        q = q[0]
-        if a.startswith('_'):
-            if a=='_special_servername':
-                isascii = lambda s: len(s) == len(s.encode())
-                if isascii(ctx.guild.name):
-                    a = ctx.guild.name
-                else:
-                    return await self.find_verify_question(ctx)
-            elif a=='_special_userdiscrim':
-                a = ctx.author.discriminator
-        return q,a
-
-    @commands.command(name="verify")
-    @commands.guild_only()
-    @commands.check(checks.verify_role_exists)
-    @commands.cooldown(5,120,commands.BucketType.user)
-    async def verify_urself(self, ctx: MyContext):
-        """Verify yourself and loose the role
-
-        ..Doc moderator.html#anti-bot-verification"""
-        roles_raw = await ctx.bot.get_config(ctx.guild.id,"verification_role")
-        roles = [r for r in [ctx.guild.get_role(int(x)) for x in roles_raw.split(';') if x.isnumeric] if r is not None]
-        if not ctx.guild.me.guild_permissions.manage_roles:
-            return await ctx.send(await self.bot._(ctx.guild.id, "moderation.mute.cant-mute"))
-        txt = str()
-        for role in roles:
-            if role.position > ctx.guild.me.roles[-1].position:
-                txt += await self.bot._(ctx.guild.id, "moderation.verify-role-high",r=role.name) + "\n"
-        if len(txt) > 0:
-            return await ctx.send(txt)
-        del txt
-
-        deprecation_embed = discord.Embed(
-            title=await self.bot._(ctx.guild.id, "moderation.deprecated-verify.title"),
-            description=await self.bot._(ctx.guild.id, "moderation.deprecated-verify.desc"),
-            color=discord.Color.red()
-        )
-        await ctx.send(embed=deprecation_embed)
-
-        q,a = await self.find_verify_question(ctx)
-        qu_msg = await ctx.send(ctx.author.mention+': '+q)
-        await asyncio.sleep(random.random()*1.3)
-        async def del_msg(msg:discord.Message):
-            try:
-                await msg.delete()
-            except discord.Forbidden:
-                pass
-        def check(m):
-            return m.author == ctx.author and m.channel == ctx.channel
-        try:
-            msg = await ctx.bot.wait_for('message', check=check, timeout=15)
-        except asyncio.TimeoutError:
-            await del_msg(qu_msg)
-        else:
-            if msg.content.lower() == a.lower():
-                await del_msg(msg)
-                try:
-                    await ctx.author.remove_roles(*roles,reason="Verified")
-                except Exception as e:
-                    await self.bot.get_cog('Errors').on_command_error(ctx,e)
-            await del_msg(qu_msg)
-
 
 
     async def configure_muted_role(self, guild: discord.Guild, role: discord.Role = None):

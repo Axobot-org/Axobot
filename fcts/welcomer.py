@@ -1,6 +1,7 @@
 import discord
 from discord.ext import commands
-from libs.classes import ServerWarningType, Zbot
+from libs.bot_classes import Zbot
+from libs.enums import ServerWarningType
 
 class Welcomer(commands.Cog):
     """Cog which manages the departure and arrival of members in the servers"""

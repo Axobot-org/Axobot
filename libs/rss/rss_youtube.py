@@ -13,7 +13,7 @@ from libs.youtube_search import Service
 from .rss_general import FeedObject, RssMessage, feed_parse
 
 if TYPE_CHECKING:
-    from libs.classes import Zbot
+    from libs.bot_classes import Zbot
 
 
 class YoutubeRSS:

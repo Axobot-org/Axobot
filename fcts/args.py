@@ -2,8 +2,9 @@ import re
 import typing
 
 import discord
+from dateutil.relativedelta import relativedelta
 from discord.ext import commands
-from libs.classes import MyContext
+from libs.bot_classes import MyContext
 
 
 class tempdelta(commands.Converter):
@@ -14,7 +15,7 @@ class tempdelta(commands.Converter):
         duration = 0
         found = False
         # ctx.invoked_with
-        for symbol, coef in [('y', 86400*365), ('w', 604800), ('d', 86400), ('h', 3600), ('m', 60), ('min', 60)]:
+        for symbol, coef in [('w', 604800), ('d', 86400), ('h', 3600), ('m', 60), ('min', 60)]:
             r = re.search(r'^(\d+)'+symbol+'$', argument)
             if r is not None:
                 duration += int(r.group(1))*coef
@@ -22,6 +23,18 @@ class tempdelta(commands.Converter):
         r = re.search(r'^(\d+)h(\d+)m?$', argument)
         if r is not None:
             duration += int(r.group(1))*3600 + int(r.group(2))*60
+            found = True
+        r = re.search(r'^(\d+) ?mo(?:nths?)?$', argument)
+        if r is not None:
+            now = then = ctx.bot.utcnow()
+            then += relativedelta(months=int(r.group(1)))
+            duration += (then - now).total_seconds()
+            found = True
+        r = re.search(r'^(\d+) ?y(?:ears?)?$', argument)
+        if r is not None:
+            now = then = ctx.bot.utcnow()
+            then += relativedelta(years=int(r.group(1)))
+            duration += (then - now).total_seconds()
             found = True
         if not found:
             raise commands.errors.BadArgument('Invalid duration: '+argument)

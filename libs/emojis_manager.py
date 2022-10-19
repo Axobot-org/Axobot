@@ -5,7 +5,7 @@ import discord
 import requests
 
 if TYPE_CHECKING:
-    from libs.classes import Zbot
+    from libs.bot_classes import Zbot
 
 # https://github.com/ttacon/emoji/blob/master/emoji.go
 

@@ -1,11 +1,13 @@
 {
-    "christmas-2019" : {
+    "christmas-2019": {
         "begin": "2019-11-30",
         "end": "2019-12-25",
         "type": "christmas",
         "icon": "https://zrunner.me/cdn/merry_christmas.jpg",
         "color": 4886759,
-        "objectives": [50]
+        "objectives": [
+            50
+        ]
     },
     "april-2020": {
         "begin": "2020-04-01",
@@ -21,7 +23,9 @@
         "type": "blurple",
         "icon": "https://zrunner.me/cdn/blurple.jpg",
         "color": 0,
-        "objectives": [150]
+        "objectives": [
+            150
+        ]
     },
     "halloween-2020": {
         "begin": "2020-10-17",
@@ -29,7 +33,9 @@
         "type": "halloween",
         "icon": null,
         "color": 16089635,
-        "objectives": [200]
+        "objectives": [
+            200
+        ]
     },
     "april-2021": {
         "begin": "2021-04-01",
@@ -37,7 +43,9 @@
         "type": "fish",
         "icon": null,
         "color": 11260705,
-        "objectives": [120]
+        "objectives": [
+            120
+        ]
     },
     "blurple-2021": {
         "begin": "2021-05-07",
@@ -45,7 +53,10 @@
         "type": "blurple",
         "icon": "https://zrunner.me/cdn/blurple_2021.png",
         "color": 7506394,
-        "objectives": [200, 500]
+        "objectives": [
+            200,
+            500
+        ]
     },
     "halloween-2021": {
         "begin": "2021-10-20",
@@ -53,7 +64,9 @@
         "type": "halloween",
         "icon": null,
         "color": 16089635,
-        "objectives": [150]
+        "objectives": [
+            150
+        ]
     },
     "april-2022": {
         "begin": "2022-04-01",
@@ -61,6 +74,56 @@
         "type": "fish",
         "icon": "https://zrunner.me/cdn/fish22.png",
         "color": 16733391,
-        "objectives": [200]
+        "objectives": [
+            {
+                "reward_type": "rankcard",
+                "rank_card": "april22"
+            }
+        ],
+        "emojis": {
+            "reactions_list": [
+                "🐟",
+                "🎣",
+                "🐠",
+                "🐡"
+            ],
+            "triggers": [
+                "fish"
+            ],
+            "probability": 0.07
+        }
+    },
+    "halloween-2022": {
+        "begin": "2022-10-20",
+        "end": "2022-11-01",
+        "type": "halloween",
+        "icon": null,
+        "color": 16089635,
+        "objectives": [
+            {
+                "points": 300,
+                "reward_type": "rankcard",
+                "rank_card": "halloween22"
+            },
+            {
+                "points": 600,
+                "reward_type": "custom"
+            }
+        ],
+        "emojis": {
+            "reactions_list": [
+                "🦇",
+                "🎃",
+                "🕷️",
+                "👻"
+            ],
+            "triggers": [
+                "booh",
+                "halloween",
+                "witch",
+                "ghost"
+            ],
+            "probability": 0.05
+        }
     }
 }
