@@ -13,7 +13,7 @@ from libs.errors import NotDuringEventError
 from libs.halloween import ColorVariation, TargetConverterType, VariationFlagType, check_image, convert_image
 
 importlib.reload(halloween)
-from libs.bot_classes import PRIVATE_GUILD_ID, MyContext, Zbot
+from libs.bot_classes import PRIVATE_GUILD_ID, SUPPORT_GUILD_ID, MyContext, Zbot
 
 
 async def is_halloween(ctx: MyContext):
@@ -54,6 +54,7 @@ class Halloween(Cog):
 
     @commands.hybrid_group(name="halloween", brief="Happy Halloween!")
     @discord.app_commands.guilds(PRIVATE_GUILD_ID)
+    @discord.app_commands.guilds(SUPPORT_GUILD_ID)
     @commands.check(is_halloween)
     async def hallow_main(self, ctx: MyContext):
         """Hallowify and be happy for the spooky month! Change your avatar color, check if an image is orange enough, and collect event points to unlock a collector Halloween 2021 card!
