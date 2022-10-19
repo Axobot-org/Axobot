@@ -1389,7 +1389,6 @@ class Rss(commands.Cog):
             if statscog := self.bot.get_cog("BotStats"):
                 statscog.rss_stats['messages'] = 0
                 statscog.rss_stats['warnings'] = 0
-                statscog.rss_stats['disabled'] = 0
         session = ClientSession()
         for feed in feeds_list:
             if not feed.enabled:
