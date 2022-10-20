@@ -160,22 +160,23 @@ class Admin(commands.Cog):
     @main_msg.command(name="faq")
     @commands.check(checks.is_bot_admin)
     async def send_faq(self, ctx: MyContext):
-        """Envoie les messages du salon <#541228784456695818> vers le salon <#508028818154323980>"""
+        "Update the FAQ channels from the private preparation channels"
         msg = await ctx.send("Suppression des salons...")
-        destination_fr = ctx.guild.get_channel(508028818154323980)
-        destination_en = ctx.guild.get_channel(541599345972346881)
-        chan_fr = ctx.guild.get_channel(541228784456695818)
-        chan_en = ctx.guild.get_channel(541599226623426590)
-        role_fr = ctx.guild.get_role(541224634087899146)
-        role_en = ctx.guild.get_role(537597687801839617)
+        guild = self.bot.get_guild(356067272730607628)
+        destination_fr = guild.get_channel(508028818154323980)
+        destination_en = guild.get_channel(541599345972346881)
+        chan_fr = guild.get_channel(541228784456695818)
+        chan_en = guild.get_channel(541599226623426590)
+        role_fr = guild.get_role(541224634087899146)
+        role_en = guild.get_role(537597687801839617)
         await destination_fr.set_permissions(role_fr, read_messages=False)
         await destination_en.set_permissions(role_en, read_messages=False)
         await destination_fr.purge()
         await destination_en.purge()
         await msg.edit(content="Envoi des messages...")
-        async for message in chan_fr.history(limit=200,oldest_first=True):
+        async for message in chan_fr.history(limit=200, oldest_first=True):
             await destination_fr.send(message.content)
-        async for message in chan_en.history(limit=200,oldest_first=True):
+        async for message in chan_en.history(limit=200, oldest_first=True):
             await destination_en.send(message.content)
         await destination_fr.set_permissions(role_fr, read_messages=True)
         await destination_en.set_permissions(role_en, read_messages=True)
