@@ -1412,7 +1412,7 @@ class Rss(commands.Cog):
             await asyncio.sleep(self.time_between_feeds_check)
         await session.close()
         self.bot.get_cog('Minecraft').feeds.clear()
-        desc = [f"**RSS loop done** in {time.time()-start:.3f}s ({checked_count}/{len(feeds_list)} feeds)"]
+        desc = [f"**RSS loop done** in {time.time()-start:.3f}s ({len(success_ids)}/{checked_count} feeds)"]
         if guild_id is None:
             if statscog := self.bot.get_cog("BotStats"):
                 statscog.rss_stats["checked"] = checked_count
