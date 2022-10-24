@@ -56,7 +56,7 @@ class Halloween(Cog):
     @discord.app_commands.guilds(PRIVATE_GUILD_ID, SUPPORT_GUILD_ID)
     @commands.check(is_halloween)
     async def hallow_main(self, ctx: MyContext):
-        """Hallowify and be happy for the spooky month! Change your avatar color, check if an image is orange enough, and collect event points to unlock a collector Halloween 2021 card!
+        """Hallowify and be happy for the spooky month! Change your avatar color, check if an image is orange enough, and collect event points to unlock a collector Halloween card!
 
 A BIG thanks to the Project Blurple and their original code for the colorization part.
 
@@ -75,7 +75,7 @@ A BIG thanks to the Project Blurple and their original code for the colorization
             await self.bot.get_cog('Help').help_command(ctx, ['halloween'])
 
 
-    async def edit_img_color(self, fmodifier: typing.Literal["light", "dark"], ctx: MyContext, 
+    async def edit_img_color(self, fmodifier: typing.Literal["light", "dark"], ctx: MyContext,
                              method: VariationFlagType = "hallowify",
                              variations: commands.Greedy[ColorVariation] = None, *,
                              who: typing.Optional[TargetConverterType] = None):
@@ -97,9 +97,9 @@ A BIG thanks to the Project Blurple and their original code for the colorization
                         variations or []
                     )
         except RuntimeError as err:
-            await ctx.send(f"Oops, something went wrong: {err}")
+            await ctx.reply(f"Oops, something went wrong: {err}")
             return
-        await ctx.send(f"{ctx.author.mention}, here's your image!", file=result)
+        await ctx.reply("Here's your image!", file=result)
         if not isinstance(old_msg, discord.InteractionMessage):
             await old_msg.delete()
         await ctx.bot.get_cog("Utilities").add_user_eventPoint(ctx.author.id, 3)
@@ -147,7 +147,7 @@ A BIG thanks to the Project Blurple and their original code for the colorization
             async with session.get(str(url)) as image:
                 result = await check_image(await image.read(), theme, "check")
         answer = "\n".join(f"> {color['name']}: {color['ratio']}%" for color in result['colors'])
-        await ctx.send(f"Results for {ctx.author.mention}:\n"+answer)
+        await ctx.reply(f"Results:\n{answer}")
         if result["passed"] and ctx.author.id not in self.cache:
             await ctx.bot.get_cog("Utilities").add_user_eventPoint(ctx.author.id, 40)
             self.cache.append(ctx.author.id)
