@@ -267,10 +267,16 @@ class BotEvents(commands.Cog):
         top_5 = await self.bot.get_cog("Utilities").get_eventsPoints_top(number=5)
         if top_5 is None:
             return await self.bot._(self.bot.get_channel(0), "bot_events.nothing-desc")
-        top_5 = [
-            f"{i+1}. {self.bot.get_user(u['userID']).name} ({u['events_points']} points)"
-            for i, u in enumerate(top_5)]
-        return "\n".join(top_5)
+        top_5_f: list[str] = []
+        for i, row in enumerate(top_5):
+            if user := self.bot.get_user(row['userID']):
+                username = user.name
+            elif user := await self.bot.fetch_user(row['userID']):
+                username = user.name
+            else:
+                username = f"user {row['userID']}"
+            top_5_f.append(f"{i+1}. {username} ({row['events_points']} points)")
+        return "\n".join(top_5_f)
 
     async def db_add_dailies(self, userid: int, points: int):
         "Add dailies points to a user"
