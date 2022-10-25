@@ -60,17 +60,17 @@ class Halloween(Cog):
 
 A BIG thanks to the Project Blurple and their original code for the colorization part.
 
-..Example hw hallowify
+..Example halloween lightfy
 
-..Example hw  hallowify ++more-dark-halloween ++more-dark-halloween ++more-white ++less-halloween
+..Example halloween lightfy ++more-dark-halloween ++more-dark-halloween ++more-white ++less-halloween
 
-..Example hw darkfy @Zbot
+..Example halloween darkfy @Zbot
 
 ..Example halloween check light Zbot
 
-..Example hw check dark
+..Example halloween check dark
 
-..Example hw collect"""
+..Example halloween collect"""
         if ctx.subcommand_passed is None:
             await self.bot.get_cog('Help').help_command(ctx, ['halloween'])
 
@@ -136,9 +136,9 @@ A BIG thanks to the Project Blurple and their original code for the colorization
 
         ..Example halloween check light
 
-        ..Example hw check dark
+        ..Example halloween check dark
 
-        ..Example hw check light Zbot"""
+        ..Example halloween check light Zbot"""
 
         url = await get_url_from_ctx(ctx, who)
 
@@ -163,9 +163,9 @@ A BIG thanks to the Project Blurple and their original code for the colorization
         "Get some help about hallowify and all of this"
         desc = """Hey! We're currently in October, which is the month of bats, skeletons and most importantly pumpkins! For a limited time, you can use this command to make your images more halloween-ish, and add some atmosphere to your server!
 
-For that, you have here some commands to hallowify you. Notably the `hallowify` command, which allows you to modify an image (by default your avatar or that of a friend) by changing its colors. Or why not `darkfy`, for a darker version. As well as `check`, to check that your image is up to Halloween:tm: standards.
+For that, you have here some commands to hallowify you. Notably the `lightfy` command, which allows you to modify an image (by default your avatar or that of a friend) by changing its colors. Or why not `darkfy`, for a darker version. As well as `check`, to check that your image is up to Halloween:tm: standards.
 
-The modification commands (hallowify/darkfy/lightfy) take into account several methods and variations.
+The modification commands (darkfy/lightfy) take into account several methods and variations.
 """
         methods_title = "3 methods"
         methods_desc = """`hallowify` applies a basic hallowify to your image
