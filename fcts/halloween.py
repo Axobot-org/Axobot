@@ -129,23 +129,20 @@ A BIG thanks to the Project Blurple and their original code for the colorization
     @commands.cooldown(30, 40, commands.BucketType.guild)
     @commands.check(is_halloween)
     async def check(self, ctx: MyContext,
-                    theme: typing.Literal["light", "dark"] = "light",
                     who: typing.Optional[TargetConverterType] = None
                     ):
         """Check an image to know if you're cool enough.
 
-        ..Example halloween check light
+        ..Example halloween check
 
-        ..Example halloween check dark
-
-        ..Example halloween check light Zbot"""
+        ..Example halloween check Zbot"""
 
         url = await get_url_from_ctx(ctx, who)
 
         old_msg = await ctx.send(f"Starting check for {ctx.author.mention}...")
         async with aiohttp.ClientSession() as session:
             async with session.get(str(url)) as image:
-                result = await check_image(await image.read(), theme, "check")
+                result = await check_image(await image.read())
         answer = "\n".join(f"> {color['name']}: {color['ratio']}%" for color in result['colors'])
         await ctx.reply(f"Results:\n{answer}")
         if result["passed"] and ctx.author.id not in self.cache:
