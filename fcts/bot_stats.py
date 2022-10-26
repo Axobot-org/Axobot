@@ -272,12 +272,15 @@ class BotStats(commands.Cog):
             cursor.execute(query, (now, 'guilds.total', total, 0, 'guilds', True, self.bot.beta))
             del unav, total
             # antiscam warn/deletions
-            cursor.execute(query, (now, 'antiscam.warning', self.antiscam["warning"], 0, 'warning/min', True, self.bot.beta))
-            cursor.execute(query, (now, 'antiscam.deletion', self.antiscam["deletion"], 0, 'deletion/min', True, self.bot.beta))
+            if self.antiscam["warning"]:
+                cursor.execute(query, (now, 'antiscam.warning', self.antiscam["warning"], 0, 'warning/min', True, self.bot.beta))
+            if self.antiscam["deletion"]:
+                cursor.execute(query, (now, 'antiscam.deletion', self.antiscam["deletion"], 0, 'deletion/min', True, self.bot.beta))
             self.antiscam["warning"] = self.antiscam["deletion"] = 0
             # tickets creation
-            cursor.execute(query, (now, 'tickets.creation', self.ticket_events["creation"], 0, 'tickets/min', True, self.bot.beta))
-            self.ticket_events["creation"] = 0
+            if self.tickets["creation"]:
+                cursor.execute(query, (now, 'tickets.creation', self.ticket_events["creation"], 0, 'tickets/min', True, self.bot.beta))
+                self.ticket_events["creation"] = 0
             # username changes
             cursor.execute(query, (now, 'usernames.guild', self.usernames["guild"], 0, 'nicknames/min', True, self.bot.beta))
             self.usernames["guild"] = 0
