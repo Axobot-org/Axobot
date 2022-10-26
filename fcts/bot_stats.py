@@ -213,6 +213,16 @@ class BotStats(commands.Cog):
         async with self.bot.db_query(query, (now, "eventpoints.rows", *args)) as _:
             pass
 
+    async def db_record_serverlogs_enabled(self, now: datetime):
+        "Record into the stats table the number of enabled serverlogs, grouped by kind"
+        args = (0, "logs", False, self.bot.beta)
+        query = """INSERT INTO `statsbot`.`zbot`
+            SELECT %s, CONCAT("logs.", `kind`, ".enabled"), COUNT(*), %s, %s, %s, %s"
+            FROM `serverlogs`
+            GROUP BY `kind`"""
+        async with self.bot.db_query(query, (now, *args)) as _:
+            pass
+
     @tasks.loop(minutes=1)
     async def sql_loop(self):
         """Send our stats every minute"""
@@ -275,10 +285,13 @@ class BotStats(commands.Cog):
             self.usernames["user"] = 0
             cursor.execute(query, (now, 'usernames.deleted', self.usernames["deleted"], 0, 'usernames/min', True, self.bot.beta))
             self.usernames["deleted"] = 0
-            # Dailies points
-            await self.db_record_dailies_values(now)
-            # Events points
-            await self.db_record_eventpoints_values(now)
+            if self.bot.current_event:
+                # Dailies points
+                await self.db_record_dailies_values(now)
+                # Events points
+                await self.db_record_eventpoints_values(now)
+            # serverlogs
+            await self.db_record_serverlogs_enabled(now)
             # Push everything
             cnx.commit()
         except mysql.connector.errors.IntegrityError as err: # duplicate primary key
