@@ -7,7 +7,6 @@ import time
 from typing import Callable, Literal, Optional, Union
 
 import discord
-import mysql
 import twitter
 from aiohttp import ClientSession, client_exceptions
 from discord.ext import commands, tasks
