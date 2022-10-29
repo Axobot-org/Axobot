@@ -17,18 +17,21 @@ with open(os.path.dirname(__file__)+'/data/base_websites.csv', 'r', encoding='ut
             WHITELISTED_WEBSITES.append(row[1])
 
 
-def _similar(a, b):
-    return SequenceMatcher(None, a, b).ratio()
+def _similar(input_1: str, input_2: str):
+    "Compare two strings and output the similarity ratio"
+    return SequenceMatcher(None, input_1, input_2).ratio()
 
 def check_message(message: str) -> int:
+    "Check every URL in a message and return the sum of each URL's score"
     score = 0
     message = normalize_unicode(message)
     for link in search_links(message):
         link = ".".join(link.split('.')[-2:])
         score += check_url_similarity(link)
-    return max(score,0)
+    return max(score, 0)
 
 def check_url_similarity(url: str):
+    "Check an URL similarity to known safe or dangerous websites"
     matching_score = 0
     url = url.replace(' ', '').lower().strip()
     # print('ANALYZING', url)
@@ -38,7 +41,7 @@ def check_url_similarity(url: str):
         return - 10
     if url in {'bit.ly', 'cutt.ly', 'tinyurl.com'}:
         return 1
-    
+
     for sim in BLACKLISTED_WEBSITES:
         if url == sim:
             matching_score += 5
@@ -51,7 +54,7 @@ def check_url_similarity(url: str):
             matching_score += 2
         elif seq >= 0.7:
             matching_score += 1
-    
+
     if url.endswith('.ru'):
         matching_score += 1
 
@@ -67,7 +70,7 @@ def check_url_similarity(url: str):
             matching_score += 2
         elif seq >= 0.7:
             matching_score += 1
-    
+
     return matching_score
 
 def search_links(message: str):
