@@ -78,6 +78,7 @@
     "twitch": "Twitch",
     "twitch-default-flow": "{logo}  | New live by {author}! ({date})\n\n{title}\n\nLink: {link}\n\n{mentions}",
     "twitch-form-last": "{logo}  | Here is the last video of {author}:\n{title}\nPublished on {date}\nLink: {url}\n",
+    "twitch-invalid": "Oops, I couldn't find any Twitch channel with this name!",
     "use_embed-same": "The use of embeds for this flow has not changed",
     "use_embed-success": "The value has been changed to %{v} for flow n°%{id}!",
     "use_embed_false": "This feed does not use embed to be sent. Do you want to use an embed for this flow? (true/false)",

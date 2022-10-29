@@ -130,9 +130,12 @@ class Rss(commands.Cog):
         ..Example rss tv https://www.twitch.tv/aureliensama
 
         ..Doc rss.html#see-the-last-post"""
-        if re.match(r'https://(?:www\.)twitch.tv/', channel):
+        if re.match(r'^https://(www\.)?twitch\.tv/\w+', channel):
             channel = await self.parse_twitch_url(channel)
-        text = await self.rss_twitch(ctx.channel,channel)
+            if channel is None:
+                await ctx.send(await self.bot._(ctx.channel, "rss.twitch-invalid"))
+                return
+        text = await self.rss_twitch(ctx.channel, channel)
         if isinstance(text, str):
             await ctx.send(text)
         else:
@@ -947,8 +950,8 @@ class Rss(commands.Cog):
             return match.group(1)
 
 
-    async def rss_twitch(self, channel: discord.TextChannel, nom: str, date: datetime.datetime=None, session: ClientSession=None):
-        url = 'https://twitchrss.appspot.com/vod/'+nom
+    async def rss_twitch(self, channel: discord.TextChannel, name: str, date: datetime.datetime=None, session: ClientSession=None):
+        url = 'https://twitchrss.appspot.com/vod/' + name
         feeds = await feed_parse(self.bot, url, 5, session)
         if feeds is None:
             return await self.bot._(channel, "rss.research-timeout")
@@ -968,7 +971,7 @@ class Rss(commands.Cog):
                 date=feed['published_parsed'],
                 author=feeds.feed['title'].replace("'s Twitch video RSS",""),
                 image=img_url,
-                channel=nom
+                channel=name
             )
             return [obj]
         else:
@@ -990,7 +993,7 @@ class Rss(commands.Cog):
                     date=feed['published_parsed'],
                     author=feeds.feed['title'].replace("'s Twitch video RSS",""),
                     image=img_url,
-                    channel=nom
+                    channel=name
                 )
                 liste.append(obj)
             liste.reverse()
