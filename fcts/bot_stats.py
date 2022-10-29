@@ -278,7 +278,7 @@ class BotStats(commands.Cog):
                 cursor.execute(query, (now, 'antiscam.deletion', self.antiscam["deletion"], 0, 'deletion/min', True, self.bot.beta))
             self.antiscam["warning"] = self.antiscam["deletion"] = 0
             # tickets creation
-            if self.tickets["creation"]:
+            if self.ticket_events["creation"]:
                 cursor.execute(query, (now, 'tickets.creation', self.ticket_events["creation"], 0, 'tickets/min', True, self.bot.beta))
                 self.ticket_events["creation"] = 0
             # username changes
