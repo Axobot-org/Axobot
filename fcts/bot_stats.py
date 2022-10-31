@@ -217,7 +217,7 @@ class BotStats(commands.Cog):
         "Record into the stats table the number of enabled serverlogs, grouped by kind"
         args = (0, "logs", False, self.bot.beta)
         query = """INSERT INTO `statsbot`.`zbot`
-            SELECT %s, CONCAT("logs.", `kind`, ".enabled"), COUNT(*), %s, %s, %s, %s"
+            SELECT %s, CONCAT("logs.", `kind`, ".enabled"), COUNT(*), %s, %s, %s, %s
             FROM `serverlogs`
             GROUP BY `kind`"""
         async with self.bot.db_query(query, (now, *args)) as _:
