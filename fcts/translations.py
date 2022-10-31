@@ -2,6 +2,8 @@ import asyncio
 from io import BytesIO
 import json
 import os
+import shutil
+import time
 import typing
 from copy import deepcopy
 
@@ -38,11 +40,42 @@ class Translations(commands.Cog):
         self._projects: TranslationsDict = {}
         self._todo: TodoDict = {}
         self.edited_languages: set[LanguageId] = set()
-        self.save_projects_loop.start() # pylint: disable=no-member
+
+    async def cog_load(self):
+        if self.bot.internal_loop_enabled:
+            # pylint: disable=no-member
+            self.save_projects_loop.start()
+            self.backup_loop.start()
 
     async def cog_unload(self):
         "Stop loop when cog is unloaded"
-        self.save_projects_loop.cancel() # pylint: disable=no-member
+        # pylint: disable=no-member
+        if self.save_projects_loop.is_running():
+            self.save_projects_loop.cancel()
+        if self.backup_loop.is_running():
+            self.backup_loop.cancel()
+
+    @tasks.loop(hours=12)
+    async def backup_loop(self):
+        "Make a backup of every project every 12 hours"
+        start = time.time()
+        try:
+            os.remove('translation-backup.tar')
+        except FileNotFoundError:
+            pass
+        try:
+            shutil.make_archive('translation-backup', 'tar', 'translation')
+        except FileNotFoundError:
+            await self.bot.get_cog('Errors').senf_err_msg("Translators backup: Unable to find backup folder")
+            return
+        txt = f'**Translations files backup** completed in {time.time()-start:.3f}s'
+        self.bot.log.info(txt.replace('**', ''))
+        emb = discord.Embed(
+            description=txt,
+            color=10197915, timestamp=self.bot.utcnow()
+        )
+        emb.set_author(name=self.bot.user, icon_url=self.bot.user.display_avatar)
+        await self.bot.send_embed(emb, url="loop")
 
     async def load_translations(self):
         """Load current translations from their JSON files"""
@@ -185,7 +218,7 @@ class Translations(commands.Cog):
 
     @tasks.loop(seconds=30)
     async def save_projects_loop(self):
-        "Save every edited project into their JSON files every minute"
+        "Save every edited project into their JSON files every 30s"
         to_edit = set(self.edited_languages)
         for language in to_edit:
             await self.save_project(language)
