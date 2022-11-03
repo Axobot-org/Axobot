@@ -126,11 +126,12 @@ class RandomForest:
         for _ in range(ntree):
             self.trees.append(SpamDetector())
         self.tests: list[list[Message]] = []
+        self.classes_: dict[int, int] = {} # map class ID to index
 
     async def fit(self, data: list[Message]):
         learning_amount = round((1-self.test_percent) * len(data))
-        self.tests = []
-        self.classes_ = {}
+        self.tests.clear()
+        self.classes_.clear()
         for tree in self.trees:
             learning = random.sample(data, learning_amount)
             tree.fit(learning)

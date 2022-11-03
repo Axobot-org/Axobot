@@ -1,12 +1,14 @@
 import csv
+import json
 import os
 import pickle
-from typing import Union, Optional
-import requests
-import json
+from typing import Optional, Union
 
-from .classes import Message, PredictionResult
+import requests
+
 from .bayes import RandomForest, SpamDetector
+from .classes import Message, PredictionResult
+
 
 class AntiScamAgent:
     """Class taking care or everything"""
@@ -62,6 +64,12 @@ class AntiScamAgent:
                 return super().find_class(module, name)
         with open(os.path.dirname(__file__)+"/data/bayes_model.pkl", 'rb') as raw:
             return CustomUnpickler(raw).load()
+
+    def save_model(self, new_model: RandomForest):
+        "Replace the current model with a new one"
+        with open(os.path.dirname(__file__)+"/data/bayes_model.pkl", 'wb') as raw:
+            pickle.dump(new_model, raw)
+        self.model = new_model
 
     def predict_bot(self, message: Union[Message, str]):
         "Try to predict the dangerousity of a message"

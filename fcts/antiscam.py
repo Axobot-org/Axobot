@@ -1,14 +1,22 @@
 import copy
+import time
 import typing
+
 import discord
 from discord.ext import commands
-from libs.antiscam.classes import EMBED_COLORS, MsgReportView, PredictionResult, get_avg_word_len, get_caps_count, get_max_frequency, get_mentions_count, get_punctuation_count
+
+from libs.antiscam import AntiScamAgent, Message, update_unicode_map
+from libs.antiscam.bayes import RandomForest
+from libs.antiscam.classes import (EMBED_COLORS, MsgReportView,
+                                   PredictionResult, get_avg_word_len,
+                                   get_caps_count, get_max_frequency,
+                                   get_mentions_count, get_punctuation_count)
 from libs.antiscam.normalization import normalize
 from libs.antiscam.similarities import check_message
-from libs.bot_classes import Zbot, MyContext
-from libs.antiscam import AntiScamAgent, Message, update_unicode_map
+from libs.bot_classes import MyContext, Zbot
 
 from . import checks
+
 
 def is_immune(member: discord.Member) -> bool:
     "Check if a member is immune to the anti-scam feature"
@@ -31,7 +39,7 @@ class AntiScam(commands.Cog):
         if self.bot.database_online:
             try:
                 data: dict[str, bool] = {}
-                query = "SELECT `domain`, `is_safe` FROm `spam-detection`.`websites`"
+                query = "SELECT `domain`, `is_safe` FROM `spam-detection`.`websites`"
                 async with self.bot.db_query(query) as query_result:
                     for row in query_result:
                         data[row['domain']] = row['is_safe']
@@ -157,6 +165,29 @@ class AntiScam(commands.Cog):
         if new_status == 'deleted':
             await message.delete(delay=3)
 
+    async def train_model(self):
+        "Train the model and save it to disk"
+        query = f"SELECT message, normd_message, contains_everyone, url_score, mentions_count, punctuation_count, max_frequency, caps_percentage, avg_word_len, category FROM `spam-detection`.`{self.table}` WHERE category IN (1, 2) GROUP BY message ORDER BY RAND()"
+        data: list[Message] = []
+        async with self.bot.db_query(query) as query_results:
+            for row in query_results:
+                if len(row['message'].split(" ")) > 2:
+                    data.append(Message(
+                        row['message'],
+                        row['normd_message'],
+                        row['contains_everyone'],
+                        row['url_score'],
+                        row['mentions_count'],
+                        row['max_frequency'],
+                        row['punctuation_count'],
+                        row['caps_percentage'],
+                        row['avg_word_len'],
+                        row['category']-1)
+                    )
+        forest = RandomForest(ntree=300, test_percent=0.3)
+        await forest.fit(data)
+        return forest
+
     @commands.group(name="antiscam")
     async def antiscam(self, ctx: MyContext):
         """Everything related to the antiscam feature
@@ -225,6 +256,17 @@ class AntiScam(commands.Cog):
         await ctx.defer()
         counter = await self.db_update_messages(self.table)
         await ctx.send(f"{counter} messages updated!")
+
+    @antiscam.command(name="train")
+    @commands.check(checks.is_bot_admin)
+    async def antiscam_train_model(self, ctx: MyContext):
+        "Re-train the antiscam model (DESTRUCTIVE ACTION)"
+        msg = await ctx.send("Hold on, this may take a while...")
+        start = time.time()
+        model = await self.train_model()
+        acc = model.predict2()
+        # self.agent.save_model(model)
+        await msg.edit(content=f"New model has been generated in {time.time()-start:.2f} seconds!\nAccuracy of {acc:.3f}")
 
     @antiscam.command(name="report")
     @commands.cooldown(5, 30, commands.BucketType.guild)
