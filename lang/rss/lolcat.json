@@ -78,6 +78,7 @@
     "twitch": "Twich",
     "twitch-default-flow": "{logo}  | Mew live by {author}! ({date})\n\n{title}\n\nLink: {link}\n\n{mentions}",
     "twitch-form-last": "{logo}  | Hir iz the last video ov {author}:\n{title}\nShown on {date}\nLink : {url}\n",
+    "twitch-invalid": "Oops, I couldnt find any twich channel with dis näme ._.",
     "use_embed-same": "The use of colorful boxes for dat flow has not changd",
     "use_embed-success": "The value has been changed to %{v} for flow n°%{id}!",
     "use_embed_false": "This feed do not use colored box 2B sent. Do U wants to use a nice box 4 tish flow? (true/false)",
