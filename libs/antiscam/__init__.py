@@ -1,6 +1,7 @@
+import csv
 import os
 import pickle
-from typing import Union
+from typing import Union, Optional
 
 from .classes import Message, PredictionResult
 from .bayes import RandomForest, SpamDetector
@@ -18,6 +19,26 @@ class AntiScamAgent:
             5: 'spam'
         }
         self.model = self.get_model()
+        # map of <domain_name, is_safe>
+        self.websites_list: Optional[dict[str, bool]] = None
+
+    def fetch_websites_locally(self, filename: Optional[str] = None):
+        "Fetch the websites list from a local CSV file, if possible"
+        filepath = filename if filename else os.path.dirname(__file__) + "/data/base_websites.csv"
+        self.websites_list = {}
+        with open(filepath, 'r', encoding='utf-8') as csv_file:
+            spamreader = csv.reader(csv_file)
+            for row in spamreader:
+                self.websites_list[row[0]] = row[1] == '1'
+
+    def save_websites_locally(self, data: dict[str, bool], filename: Optional[str] = None):
+        "Save the websites list to a local CSV file"
+        filepath = filename if filename else os.path.dirname(__file__) + "/data/base_websites.csv"
+        with open(filepath, 'w', encoding='utf-8') as csv_file:
+            spamwriter = csv.writer(csv_file)
+            for key, value in data.items():
+                spamwriter.writerow([key, value])
+        self.websites_list = data
 
     def get_category_id(self, name: str):
         "Get a category ID from its name (like a reversed map)"

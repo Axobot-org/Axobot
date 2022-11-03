@@ -60,10 +60,10 @@ class Message:
         self.category = category
 
     @classmethod
-    def from_raw(cls, raw_message: str, mentions_count: int):
+    def from_raw(cls, raw_message: str, mentions_count: int, websites_reference: dict[str, bool]):
         normd_message = normalize(raw_message)
         contains_everyone = '@everyone' in raw_message
-        url_score = check_message(raw_message)
+        url_score = check_message(raw_message, websites_reference)
         max_frequency = get_max_frequency(raw_message)
         punctuation_count = get_punctuation_count(raw_message)
         caps_percentage = get_caps_count(raw_message)/len(raw_message)

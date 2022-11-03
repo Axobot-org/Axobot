@@ -24,6 +24,23 @@ class AntiScam(commands.Cog):
         self.agent = AntiScamAgent()
         self.table = 'messages_beta'
 
+    async def cog_load(self):
+        "Load websites list from database"
+        if self.bot.database_online:
+            try:
+                data: dict[str, bool] = {}
+                query = "SELECT `domain`, `is_safe` FROm `spam-detection`.`websites`"
+                async with self.bot.db_query(query) as query_result:
+                    for row in query_result:
+                        data[row['domain']] = row['is_safe']
+                self.agent.save_websites_locally(data)
+                self.bot.log.info(f"[antiscam] Loaded {len(data)} domain names from database")
+                return
+            except Exception as err:
+                self.bot.dispatch("error", err, "While loading antiscam domains list")
+        self.agent.fetch_websites_locally()
+        self.bot.log.info(f"[antiscam] Loaded {len(self.agent.websites_list)} domain names from local file")
+
     @property
     def report_channel(self) -> discord.TextChannel:
         return self.bot.get_channel(913821367500148776)
@@ -118,7 +135,7 @@ class AntiScam(commands.Cog):
         """Test the antiscam feature with a given message
 
         ..Example antiscam test free nitro for everyone at bit.ly/tomato"""
-        data = Message.from_raw(msg, 0)
+        data = Message.from_raw(msg, 0, self.agent.websites_list)
         pred = self.agent.predict_bot(data)
         url_score = await self.bot._(ctx.channel, "antiscam.url-score", score=data.url_score)
         result_ = await self.bot._(ctx.channel, "antiscam.result")
@@ -165,7 +182,7 @@ class AntiScam(commands.Cog):
         ..Doc moderator.html#anti-scam"""
         content = message.content if isinstance(message, discord.Message) else message
         mentions_count = len(message.mentions) if isinstance(message, discord.Message) else 0
-        msg = Message.from_raw(content, mentions_count)
+        msg = Message.from_raw(content, mentions_count, self.agent.websites_list)
         if isinstance(message, discord.Message) and message.guild:
             msg.contains_everyone = f'<@&{message.guild.id}>' in content or '@everyone' in content
         else:
@@ -180,12 +197,16 @@ class AntiScam(commands.Cog):
     @commands.Cog.listener()
     async def on_message(self, msg: discord.Message):
         "Check any message for scam dangerousity"
-        if isinstance(msg.author, discord.User) or len(msg.content) < 10 or is_immune(msg.author) or await self.bot.potential_command(msg):
+        if (
+            isinstance(msg.author, discord.User)
+            or len(msg.content) < 10
+            or is_immune(msg.author) or await self.bot.potential_command(msg)
+        ):
             return
         await self.bot.wait_until_ready()
         if not await self.bot.get_config(msg.guild.id, "anti_scam"):
             return
-        message: Message = Message.from_raw(msg.content, len(msg.mentions))
+        message: Message = Message.from_raw(msg.content, len(msg.mentions), self.agent.websites_list)
         if len(message.normd_message) < 3:
             return
         result = self.agent.predict_bot(message)
