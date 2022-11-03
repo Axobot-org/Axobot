@@ -24,6 +24,6 @@ python-dateutil
 LRFutils @ git+https://github.com/LeiRoF/LRFutils.git
 
 # # Antiscam training
-# pandas
-# sklearn
+pandas
+sklearn
 # lightgbm

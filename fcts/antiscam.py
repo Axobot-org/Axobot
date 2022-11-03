@@ -6,14 +6,15 @@ import discord
 from discord.ext import commands
 
 from libs.antiscam import AntiScamAgent, Message, update_unicode_map
-from libs.antiscam.bayes import RandomForest
 from libs.antiscam.classes import (EMBED_COLORS, MsgReportView,
                                    PredictionResult, get_avg_word_len,
                                    get_caps_count, get_max_frequency,
                                    get_mentions_count, get_punctuation_count)
 from libs.antiscam.normalization import normalize
 from libs.antiscam.similarities import check_message
+from libs.antiscam.training_bayes import train_model
 from libs.bot_classes import MyContext, Zbot
+from libs.formatutils import FormatUtils
 
 from . import checks
 
@@ -184,9 +185,7 @@ class AntiScam(commands.Cog):
                         row['avg_word_len'],
                         row['category']-1)
                     )
-        forest = RandomForest(ntree=300, test_percent=0.3)
-        await forest.fit(data)
-        return forest
+        return await train_model(data)
 
     @commands.group(name="antiscam")
     async def antiscam(self, ctx: MyContext):
@@ -261,12 +260,22 @@ class AntiScam(commands.Cog):
     @commands.check(checks.is_bot_admin)
     async def antiscam_train_model(self, ctx: MyContext):
         "Re-train the antiscam model (DESTRUCTIVE ACTION)"
+        if not self.bot.beta:
+            await ctx.send("Not usable in production!", ephemeral=True)
+            return
         msg = await ctx.send("Hold on, this may take a while...")
         start = time.time()
         model = await self.train_model()
         acc = model.predict2()
-        # self.agent.save_model(model)
-        await msg.edit(content=f"New model has been generated in {time.time()-start:.2f} seconds!\nAccuracy of {acc:.3f}")
+        elapsed_time = await FormatUtils.time_delta(time.time() - start, lang="en")
+        txt = f"New model has been generated in {elapsed_time}!\nAccuracy of {acc:.3f}"
+        current_acc = self.agent.model.predict2()
+        if acc > current_acc:
+            self.agent.save_model(model)
+            txt += f"\n✅ This model is better than the current one ({current_acc:.3f}), replacing it!"
+        else:
+            txt += f"\n❌ This model is not better than the current one ({current_acc:.3f})"
+        await msg.edit(content=txt)
 
     @antiscam.command(name="report")
     @commands.cooldown(5, 30, commands.BucketType.guild)
