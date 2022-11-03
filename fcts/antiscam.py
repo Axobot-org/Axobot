@@ -4,7 +4,7 @@ import discord
 from discord.ext import commands
 from libs.antiscam.classes import EMBED_COLORS, MsgReportView, PredictionResult
 from libs.bot_classes import Zbot, MyContext
-from libs.antiscam import AntiScamAgent, Message
+from libs.antiscam import AntiScamAgent, Message, update_unicode_map
 
 from . import checks
 
@@ -171,6 +171,17 @@ class AntiScam(commands.Cog):
         msg.content =  f'{ctx.prefix}config change anti_scam false'
         new_ctx = await self.bot.get_context(msg)
         await self.bot.invoke(new_ctx)
+
+    @antiscam.command(name="fetch-unicode")
+    @commands.check(checks.is_bot_admin)
+    async def antiscam_refetch_uneicode(self, ctx: MyContext):
+        "Refetch the unicode map of confusable characters"
+        if not self.bot.beta:
+            await ctx.send("Not usable in production!", ephemeral=True)
+            return
+        await update_unicode_map()
+        await ctx.send("Done!")
+
 
     @antiscam.command(name="report")
     @commands.cooldown(5, 30, commands.BucketType.guild)
