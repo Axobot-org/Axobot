@@ -2,6 +2,8 @@ import csv
 import os
 import pickle
 from typing import Union, Optional
+import requests
+import json
 
 from .classes import Message, PredictionResult
 from .bayes import RandomForest, SpamDetector
@@ -64,7 +66,7 @@ class AntiScamAgent:
     def predict_bot(self, message: Union[Message, str]):
         "Try to predict the dangerousity of a message"
         if isinstance(message, str):
-            dataset = Message.from_raw(message, 0)
+            dataset = Message.from_raw(message, 0, self.websites_list)
         elif isinstance(message, Message):
             dataset = message
         else:
@@ -73,3 +75,14 @@ class AntiScamAgent:
         prediction = self.model.get_classes(dataset)
 
         return PredictionResult(prediction.values(), prediction.keys())
+
+async def update_unicode_map():
+    "Update the unicode map file from the unicode.org website of confusable characters"
+    lines = requests.get("https://www.unicode.org/Public/security/latest/confusables.txt").text.split("\n")
+    json_data = {}
+    for line in lines:
+        data = list(map(lambda x: x.strip(), line.split('#',1)[0].split(';')[:2]))
+        if len(data) == 2:
+            json_data[data[0]] = data[1]
+    with open(os.path.dirname(__file__)+"/data/unicode_map.json", 'w', encoding='utf8') as json_file:
+        json.dump(json_data, json_file)
