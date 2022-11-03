@@ -2,7 +2,9 @@ import copy
 import typing
 import discord
 from discord.ext import commands
-from libs.antiscam.classes import EMBED_COLORS, MsgReportView, PredictionResult
+from libs.antiscam.classes import EMBED_COLORS, MsgReportView, PredictionResult, get_avg_word_len, get_caps_count, get_max_frequency, get_mentions_count, get_punctuation_count
+from libs.antiscam.normalization import normalize
+from libs.antiscam.similarities import check_message
 from libs.bot_classes import Zbot, MyContext
 from libs.antiscam import AntiScamAgent, Message, update_unicode_map
 
@@ -89,6 +91,38 @@ class AntiScam(commands.Cog):
                 return query_result > 0
         return False
 
+    async def db_update_messages(self, table: str):
+        "Update the messages table with any new info (updated unicode, websites list, etc.)"
+        async with self.bot.db_query(f"SELECT * FROM `spam-detection`.`{table}`") as query_result:
+            messages: list[dict[str, typing.Any]] = query_result
+
+        counter = 0
+        cursor = self.bot.cnx_frm.cursor()
+        for msg in messages:
+            mentions_count = msg['mentions_count'] if msg['mentions_count'] > 0 else get_mentions_count(msg['message'])
+            normd_msg = normalize(msg['message'])
+            edits = {
+                'normd_message': normd_msg,
+                'url_score': check_message(msg['message'], self.agent.websites_list),
+                'mentions_count': mentions_count,
+                'max_frequency': get_max_frequency(msg['message']),
+                'punctuation_count': get_punctuation_count(msg['message']),
+                'caps_percentage': round(get_caps_count(msg['message'])/len(msg['message']), 5),
+                'avg_word_len': round(get_avg_word_len(normd_msg), 3)
+            }
+            if all(value == msg[k] for k, value in edits.items()):
+                # avoid updating rows with no new information
+                continue
+            edits = {k: v for k, v in edits.items() if v != msg[k]}
+            counter += 1
+            query = f"UPDATE `spam-detection`.`{table}` SET {', '.join('{}=%s'.format(k) for k in edits)} WHERE id=%s"
+            params = list(edits.values()) + [msg['id']]
+            # print(cur.mogrify(query, params))
+            cursor.execute(query, params)
+        self.bot.cnx_frm.commit()
+        cursor.close()
+        return counter
+
     async def create_embed(self, msg: Message, author: discord.User, row_id: int, status: str, predicted: PredictionResult):
         "Create an Embed object for a given message report"
         emb = discord.Embed(title="New report",
@@ -128,6 +162,8 @@ class AntiScam(commands.Cog):
         """Everything related to the antiscam feature
 
         ..Doc moderator.html#anti-scam"""
+        if ctx.subcommand_passed is None:
+            await self.bot.get_cog('Help').help_command(ctx, ['antiscam'])
 
     @antiscam.command(name="test")
     @commands.cooldown(5, 30, commands.BucketType.user)
@@ -182,6 +218,13 @@ class AntiScam(commands.Cog):
         await update_unicode_map()
         await ctx.send("Done!")
 
+    @antiscam.command(name="update-table")
+    @commands.check(checks.is_bot_admin)
+    async def antiscam_update_table(self, ctx: MyContext):
+        "Update the recorded messages table"
+        await ctx.defer()
+        counter = await self.db_update_messages(self.table)
+        await ctx.send(f"{counter} messages updated!")
 
     @antiscam.command(name="report")
     @commands.cooldown(5, 30, commands.BucketType.guild)
