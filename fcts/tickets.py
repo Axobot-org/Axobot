@@ -99,7 +99,8 @@ class AskTitleModal(discord.ui.Modal):
             await interaction.response.defer(ephemeral=True, thinking=True)
             await self.callback(interaction, self.topic, self.name.value.strip())
         except Exception as err: # pylint: disable=broad-except
-            interaction.client.dispatch("error", err)
+            interaction.client.dispatch("error", err, f"When opening a ticket in guild {self.guild_id}")
+            await interaction.edit_original_response(content="An error occured while opening your ticket. Please try again later.")
 
 class AskTopicSelect(discord.ui.View):
     "Ask a user what topic they want to edit/delete"
@@ -354,10 +355,14 @@ class Tickets(commands.Cog):
         else:
             msg = await self.bot._(interaction.guild_id, "tickets.missing-perms-setup.to-member")
         await interaction.edit_original_response(content=msg)
-    
-    async def get_channel_name(self, format: Optional[str], interaction: discord.Interaction, topic: dict, ticket_name: str) -> str:
-        channel_name = format or self.default_name_format
-        emoji = topic["topic_emoji"].split(':')[0] if ':' in topic["topic_emoji"] else topic["topic_emoji"]
+
+    async def get_channel_name(self, name_format: Optional[str], interaction: discord.Interaction,
+                               topic: dict, ticket_name: str) -> str:
+        channel_name = name_format or self.default_name_format
+        if isinstance(topic['topic_emoji'], str) and ':' in topic['topic_emoji']:
+            emoji: str = topic["topic_emoji"].split(':')[0]
+        else:
+            emoji = topic['topic_emoji']
         return channel_name.format_map(self.bot.SafeDict({
             "username": interaction.user.name,
             "usertag": interaction.user.discriminator,
