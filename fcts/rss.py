@@ -7,7 +7,6 @@ import time
 from typing import Callable, Literal, Optional, Union
 
 import discord
-import mysql
 import twitter
 from aiohttp import ClientSession, client_exceptions
 from discord.ext import commands, tasks
@@ -131,9 +130,12 @@ class Rss(commands.Cog):
         ..Example rss tv https://www.twitch.tv/aureliensama
 
         ..Doc rss.html#see-the-last-post"""
-        if re.match(r'https://(?:www\.)twitch.tv/', channel):
+        if re.match(r'^https://(www\.)?twitch\.tv/\w+', channel):
             channel = await self.parse_twitch_url(channel)
-        text = await self.rss_twitch(ctx.channel,channel)
+            if channel is None:
+                await ctx.send(await self.bot._(ctx.channel, "rss.twitch-invalid"))
+                return
+        text = await self.rss_twitch(ctx.channel, channel)
         if isinstance(text, str):
             await ctx.send(text)
         else:
@@ -948,8 +950,8 @@ class Rss(commands.Cog):
             return match.group(1)
 
 
-    async def rss_twitch(self, channel: discord.TextChannel, nom: str, date: datetime.datetime=None, session: ClientSession=None):
-        url = 'https://twitchrss.appspot.com/vod/'+nom
+    async def rss_twitch(self, channel: discord.TextChannel, name: str, date: datetime.datetime=None, session: ClientSession=None):
+        url = 'https://twitchrss.appspot.com/vod/' + name
         feeds = await feed_parse(self.bot, url, 5, session)
         if feeds is None:
             return await self.bot._(channel, "rss.research-timeout")
@@ -969,7 +971,7 @@ class Rss(commands.Cog):
                 date=feed['published_parsed'],
                 author=feeds.feed['title'].replace("'s Twitch video RSS",""),
                 image=img_url,
-                channel=nom
+                channel=name
             )
             return [obj]
         else:
@@ -991,7 +993,7 @@ class Rss(commands.Cog):
                     date=feed['published_parsed'],
                     author=feeds.feed['title'].replace("'s Twitch video RSS",""),
                     image=img_url,
-                    channel=nom
+                    channel=name
                 )
                 liste.append(obj)
             liste.reverse()
@@ -1412,7 +1414,7 @@ class Rss(commands.Cog):
             await asyncio.sleep(self.time_between_feeds_check)
         await session.close()
         self.bot.get_cog('Minecraft').feeds.clear()
-        desc = [f"**RSS loop done** in {time.time()-start:.3f}s ({checked_count}/{len(feeds_list)} feeds)"]
+        desc = [f"**RSS loop done** in {time.time()-start:.3f}s ({len(success_ids)}/{checked_count} feeds)"]
         if guild_id is None:
             if statscog := self.bot.get_cog("BotStats"):
                 statscog.rss_stats["checked"] = checked_count

@@ -1,9 +1,14 @@
+import csv
+import json
 import os
 import pickle
-from typing import Union
+from typing import Optional, Union
 
-from .classes import Message, PredictionResult
+import requests
+
 from .bayes import RandomForest, SpamDetector
+from .classes import Message, PredictionResult
+
 
 class AntiScamAgent:
     """Class taking care or everything"""
@@ -18,8 +23,29 @@ class AntiScamAgent:
             5: 'spam'
         }
         self.model = self.get_model()
+        # map of <domain_name, is_safe>
+        self.websites_list: Optional[dict[str, bool]] = None
+
+    def fetch_websites_locally(self, filename: Optional[str] = None):
+        "Fetch the websites list from a local CSV file, if possible"
+        filepath = filename if filename else os.path.dirname(__file__) + "/data/base_websites.csv"
+        self.websites_list = {}
+        with open(filepath, 'r', encoding='utf-8') as csv_file:
+            spamreader = csv.reader(csv_file)
+            for row in spamreader:
+                self.websites_list[row[0]] = row[1] == '1'
+
+    def save_websites_locally(self, data: dict[str, bool], filename: Optional[str] = None):
+        "Save the websites list to a local CSV file"
+        filepath = filename if filename else os.path.dirname(__file__) + "/data/base_websites.csv"
+        with open(filepath, 'w', encoding='utf-8') as csv_file:
+            spamwriter = csv.writer(csv_file)
+            for key, value in data.items():
+                spamwriter.writerow([key, value])
+        self.websites_list = data
 
     def get_category_id(self, name: str):
+        "Get a category ID from its name (like a reversed map)"
         for key, value in self.categories.items():
             if value == name:
                 return key
@@ -39,10 +65,16 @@ class AntiScamAgent:
         with open(os.path.dirname(__file__)+"/data/bayes_model.pkl", 'rb') as raw:
             return CustomUnpickler(raw).load()
 
+    def save_model(self, new_model: RandomForest):
+        "Replace the current model with a new one"
+        with open(os.path.dirname(__file__)+"/data/bayes_model.pkl", 'wb') as raw:
+            pickle.dump(new_model, raw)
+        self.model = new_model
+
     def predict_bot(self, message: Union[Message, str]):
         "Try to predict the dangerousity of a message"
         if isinstance(message, str):
-            dataset = Message.from_raw(message, 0)
+            dataset = Message.from_raw(message, 0, self.websites_list)
         elif isinstance(message, Message):
             dataset = message
         else:
@@ -51,3 +83,14 @@ class AntiScamAgent:
         prediction = self.model.get_classes(dataset)
 
         return PredictionResult(prediction.values(), prediction.keys())
+
+async def update_unicode_map():
+    "Update the unicode map file from the unicode.org website of confusable characters"
+    lines = requests.get("https://www.unicode.org/Public/security/latest/confusables.txt").text.split("\n")
+    json_data = {}
+    for line in lines:
+        data = list(map(lambda x: x.strip(), line.split('#',1)[0].split(';')[:2]))
+        if len(data) == 2:
+            json_data[data[0]] = data[1]
+    with open(os.path.dirname(__file__)+"/data/unicode_map.json", 'w', encoding='utf8') as json_file:
+        json.dump(json_data, json_file)

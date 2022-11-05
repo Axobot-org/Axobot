@@ -56,26 +56,26 @@ class Halloween(Cog):
     @discord.app_commands.guilds(PRIVATE_GUILD_ID, SUPPORT_GUILD_ID)
     @commands.check(is_halloween)
     async def hallow_main(self, ctx: MyContext):
-        """Hallowify and be happy for the spooky month! Change your avatar color, check if an image is orange enough, and collect event points to unlock a collector Halloween 2021 card!
+        """Hallowify and be happy for the spooky month! Change your avatar color, check if an image is orange enough, and collect event points to unlock a collector Halloween card!
 
 A BIG thanks to the Project Blurple and their original code for the colorization part.
 
-..Example hw hallowify
+..Example halloween lightfy
 
-..Example hw  hallowify ++more-dark-halloween ++more-dark-halloween ++more-white ++less-halloween
+..Example halloween lightfy ++more-dark-halloween ++more-dark-halloween ++more-white ++less-halloween
 
-..Example hw darkfy @Zbot
+..Example halloween darkfy @Zbot
 
 ..Example halloween check light Zbot
 
-..Example hw check dark
+..Example halloween check dark
 
-..Example hw collect"""
+..Example halloween collect"""
         if ctx.subcommand_passed is None:
             await self.bot.get_cog('Help').help_command(ctx, ['halloween'])
 
 
-    async def edit_img_color(self, fmodifier: typing.Literal["light", "dark"], ctx: MyContext, 
+    async def edit_img_color(self, fmodifier: typing.Literal["light", "dark"], ctx: MyContext,
                              method: VariationFlagType = "hallowify",
                              variations: commands.Greedy[ColorVariation] = None, *,
                              who: typing.Optional[TargetConverterType] = None):
@@ -97,9 +97,9 @@ A BIG thanks to the Project Blurple and their original code for the colorization
                         variations or []
                     )
         except RuntimeError as err:
-            await ctx.send(f"Oops, something went wrong: {err}")
+            await ctx.reply(f"Oops, something went wrong: {err}")
             return
-        await ctx.send(f"{ctx.author.mention}, here's your image!", file=result)
+        await ctx.reply("Here's your image!", file=result)
         if not isinstance(old_msg, discord.InteractionMessage):
             await old_msg.delete()
         await ctx.bot.get_cog("Utilities").add_user_eventPoint(ctx.author.id, 3)
@@ -129,25 +129,22 @@ A BIG thanks to the Project Blurple and their original code for the colorization
     @commands.cooldown(30, 40, commands.BucketType.guild)
     @commands.check(is_halloween)
     async def check(self, ctx: MyContext,
-                    theme: typing.Literal["light", "dark"] = "light",
                     who: typing.Optional[TargetConverterType] = None
                     ):
         """Check an image to know if you're cool enough.
 
-        ..Example halloween check light
+        ..Example halloween check
 
-        ..Example hw check dark
-
-        ..Example hw check light Zbot"""
+        ..Example halloween check Zbot"""
 
         url = await get_url_from_ctx(ctx, who)
 
         old_msg = await ctx.send(f"Starting check for {ctx.author.mention}...")
         async with aiohttp.ClientSession() as session:
             async with session.get(str(url)) as image:
-                result = await check_image(await image.read(), theme, "check")
+                result = await check_image(await image.read())
         answer = "\n".join(f"> {color['name']}: {color['ratio']}%" for color in result['colors'])
-        await ctx.send(f"Results for {ctx.author.mention}:\n"+answer)
+        await ctx.reply(f"Results:\n{answer}")
         if result["passed"] and ctx.author.id not in self.cache:
             await ctx.bot.get_cog("Utilities").add_user_eventPoint(ctx.author.id, 40)
             self.cache.append(ctx.author.id)
@@ -163,9 +160,9 @@ A BIG thanks to the Project Blurple and their original code for the colorization
         "Get some help about hallowify and all of this"
         desc = """Hey! We're currently in October, which is the month of bats, skeletons and most importantly pumpkins! For a limited time, you can use this command to make your images more halloween-ish, and add some atmosphere to your server!
 
-For that, you have here some commands to hallowify you. Notably the `hallowify` command, which allows you to modify an image (by default your avatar or that of a friend) by changing its colors. Or why not `darkfy`, for a darker version. As well as `check`, to check that your image is up to Halloween:tm: standards.
+For that, you have here some commands to hallowify you. Notably the `lightfy` command, which allows you to modify an image (by default your avatar or that of a friend) by changing its colors. Or why not `darkfy`, for a darker version. As well as `check`, to check that your image is up to Halloween:tm: standards.
 
-The modification commands (hallowify/darkfy/lightfy) take into account several methods and variations.
+The modification commands (darkfy/lightfy) take into account several methods and variations.
 """
         methods_title = "3 methods"
         methods_desc = """`hallowify` applies a basic hallowify to your image

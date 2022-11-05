@@ -211,6 +211,6 @@ async def count_code_lines():
         with open(filename, 'r', encoding='utf-8') as file:
             for line in file.read().split("\n"):
                 cleaned_line = line.strip()
-                if len(cleaned_line) > 2 and not cleaned_line.startswith('#'):
+                if len(cleaned_line) > 2 and not cleaned_line.startswith('#') or cleaned_line.startswith('"'):
                     count += 1
     return count

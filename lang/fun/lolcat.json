@@ -66,9 +66,12 @@
         "director": "Big boss",
         "imdb-id": "IMDb ID",
         "imdb-rating": "IMDb how-good-was-it?",
+        "no-description": "No text providd",
+        "no-rating": "No rate",
         "not-found": "Oops no, I cannt find dis movie",
         "released": "When-was-it-released",
-        "runtime": "How-long-is-it"
+        "runtime": "How-long-is-it",
+        "writers": "Who wrote"
     },
     "nasa-none": "Oops, I can't find gud picts of bautiful stars for now, plz try later :crying_cat_face:",
     "no-database": "As our data ar offline, access to funz commandz iz restricted to guys with permishun \"Manage Server\"",
