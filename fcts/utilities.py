@@ -250,7 +250,7 @@ class Utilities(commands.Cog):
         if not self.bot.database_online:
             return None
         query = (
-            f"SELECT userID, events_points, FIND_IN_SET( events_points, ( SELECT GROUP_CONCAT( events_points ORDER BY events_points DESC ) FROM {self.table} ) ) AS rank FROM {self.table} WHERE userID = {user_id}")
+            f"SELECT `userID`, `events_points`, FIND_IN_SET( `events_points`, ( SELECT GROUP_CONCAT( `events_points` ORDER BY `events_points` DESC ) FROM {self.table} ) ) AS rank FROM {self.table} WHERE `userID` = {user_id}")
         async with self.bot.db_query(query, fetchone=True) as query_results:
             return query_results
 
@@ -258,7 +258,7 @@ class Utilities(commands.Cog):
         "Get the event points leaderboard containing at max the given number of users"
         if not self.bot.database_online:
             return None
-        query = f"SELECT userID, events_points FROM {self.table} ORDER BY events_points DESC LIMIT {number}"
+        query = f"SELECT `userID`, `events_points` FROM {self.table} WHERE `events_points` != 0 ORDER BY `events_points` DESC LIMIT {number}"
         async with self.bot.db_query(query) as query_results:
             return query_results
 
@@ -275,11 +275,11 @@ class Utilities(commands.Cog):
         async with aiohttp.ClientSession() as session:
             try:  # https://top.gg/bot/486896267788812288
                 async with session.get(f'https://top.gg/api/bots/486896267788812288/check?userId={userid}', headers={'Authorization': str(self.bot.dbl_token)}) as r:
-                    js = await r.json()
-                    if js["voted"]:
+                    json = await r.json()
+                    if json["voted"]:
                         votes.append(("Discord Bots List", "https://top.gg/"))
-            except Exception as e:
-                await self.bot.get_cog("Errors").on_error(e, None)
+            except Exception as err:
+                await self.bot.get_cog("Errors").on_error(err, None)
         return votes
 
 

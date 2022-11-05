@@ -14,7 +14,7 @@ The `Moderation` section displays every command related to the moderation of a s
 
 .. note:: If you want to invite this bot to a server, `just click here <https://discord.com/oauth2/authorize?client_id=486896267788812288&scope=bot&permissions=1007021171>`_! And to join our official support server, `click on this link <https://discord.gg/N55zY88>`_!
 
-A translation of the Zbot Privacy Policy has been added to `this page <privacy.html>`_ as a guide.
+Translations of the Zbot `Privacy Policy <legal/privacy.html>`_ and its `Terms of Service <legal/tos.html>`_ have been added to this documentation as a guide.
 
 .. warning:: Zbot becomes Axobot! Your favorite bot changes its name and avatar to become even more friendly! Read the `V4 changelog <v4.html>`_ for details on this really huge update.
 

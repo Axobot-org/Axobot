@@ -1,12 +1,23 @@
 import copy
+import time
 import typing
+
 import discord
 from discord.ext import commands
-from libs.antiscam.classes import EMBED_COLORS, MsgReportView, PredictionResult
-from libs.bot_classes import Zbot, MyContext
-from libs.antiscam import AntiScamAgent, Message
+
+from libs.antiscam import AntiScamAgent, Message, update_unicode_map
+from libs.antiscam.classes import (EMBED_COLORS, MsgReportView,
+                                   PredictionResult, get_avg_word_len,
+                                   get_caps_count, get_max_frequency,
+                                   get_mentions_count, get_punctuation_count)
+from libs.antiscam.normalization import normalize
+from libs.antiscam.similarities import check_message
+from libs.antiscam.training_bayes import train_model
+from libs.bot_classes import MyContext, Zbot
+from libs.formatutils import FormatUtils
 
 from . import checks
+
 
 def is_immune(member: discord.Member) -> bool:
     "Check if a member is immune to the anti-scam feature"
@@ -23,6 +34,23 @@ class AntiScam(commands.Cog):
         self.file = "antiscam"
         self.agent = AntiScamAgent()
         self.table = 'messages_beta'
+
+    async def cog_load(self):
+        "Load websites list from database"
+        if self.bot.database_online:
+            try:
+                data: dict[str, bool] = {}
+                query = "SELECT `domain`, `is_safe` FROM `spam-detection`.`websites`"
+                async with self.bot.db_query(query) as query_result:
+                    for row in query_result:
+                        data[row['domain']] = row['is_safe']
+                self.agent.save_websites_locally(data)
+                self.bot.log.info(f"[antiscam] Loaded {len(data)} domain names from database")
+                return
+            except Exception as err:
+                self.bot.dispatch("error", err, "While loading antiscam domains list")
+        self.agent.fetch_websites_locally()
+        self.bot.log.info(f"[antiscam] Loaded {len(self.agent.websites_list)} domain names from local file")
 
     @property
     def report_channel(self) -> discord.TextChannel:
@@ -72,6 +100,38 @@ class AntiScam(commands.Cog):
                 return query_result > 0
         return False
 
+    async def db_update_messages(self, table: str):
+        "Update the messages table with any new info (updated unicode, websites list, etc.)"
+        async with self.bot.db_query(f"SELECT * FROM `spam-detection`.`{table}`") as query_result:
+            messages: list[dict[str, typing.Any]] = query_result
+
+        counter = 0
+        cursor = self.bot.cnx_frm.cursor()
+        for msg in messages:
+            mentions_count = msg['mentions_count'] if msg['mentions_count'] > 0 else get_mentions_count(msg['message'])
+            normd_msg = normalize(msg['message'])
+            edits = {
+                'normd_message': normd_msg,
+                'url_score': check_message(msg['message'], self.agent.websites_list),
+                'mentions_count': mentions_count,
+                'max_frequency': get_max_frequency(msg['message']),
+                'punctuation_count': get_punctuation_count(msg['message']),
+                'caps_percentage': round(get_caps_count(msg['message'])/len(msg['message']), 5),
+                'avg_word_len': round(get_avg_word_len(normd_msg), 3)
+            }
+            if all(value == msg[k] for k, value in edits.items()):
+                # avoid updating rows with no new information
+                continue
+            edits = {k: v for k, v in edits.items() if v != msg[k]}
+            counter += 1
+            query = f"UPDATE `spam-detection`.`{table}` SET {', '.join('{}=%s'.format(k) for k in edits)} WHERE id=%s"
+            params = list(edits.values()) + [msg['id']]
+            # print(cur.mogrify(query, params))
+            cursor.execute(query, params)
+        self.bot.cnx_frm.commit()
+        cursor.close()
+        return counter
+
     async def create_embed(self, msg: Message, author: discord.User, row_id: int, status: str, predicted: PredictionResult):
         "Create an Embed object for a given message report"
         emb = discord.Embed(title="New report",
@@ -106,11 +166,34 @@ class AntiScam(commands.Cog):
         if new_status == 'deleted':
             await message.delete(delay=3)
 
+    async def train_model(self):
+        "Train the model and save it to disk"
+        query = f"SELECT message, normd_message, contains_everyone, url_score, mentions_count, punctuation_count, max_frequency, caps_percentage, avg_word_len, category FROM `spam-detection`.`{self.table}` WHERE category IN (1, 2) GROUP BY message ORDER BY RAND()"
+        data: list[Message] = []
+        async with self.bot.db_query(query) as query_results:
+            for row in query_results:
+                if len(row['message'].split(" ")) > 2:
+                    data.append(Message(
+                        row['message'],
+                        row['normd_message'],
+                        row['contains_everyone'],
+                        row['url_score'],
+                        row['mentions_count'],
+                        row['max_frequency'],
+                        row['punctuation_count'],
+                        row['caps_percentage'],
+                        row['avg_word_len'],
+                        row['category']-1)
+                    )
+        return await train_model(data)
+
     @commands.group(name="antiscam")
     async def antiscam(self, ctx: MyContext):
         """Everything related to the antiscam feature
 
         ..Doc moderator.html#anti-scam"""
+        if ctx.subcommand_passed is None:
+            await self.bot.get_cog('Help').help_command(ctx, ['antiscam'])
 
     @antiscam.command(name="test")
     @commands.cooldown(5, 30, commands.BucketType.user)
@@ -118,7 +201,7 @@ class AntiScam(commands.Cog):
         """Test the antiscam feature with a given message
 
         ..Example antiscam test free nitro for everyone at bit.ly/tomato"""
-        data = Message.from_raw(msg, 0)
+        data = Message.from_raw(msg, 0, self.agent.websites_list)
         pred = self.agent.predict_bot(data)
         url_score = await self.bot._(ctx.channel, "antiscam.url-score", score=data.url_score)
         result_ = await self.bot._(ctx.channel, "antiscam.result")
@@ -155,6 +238,45 @@ class AntiScam(commands.Cog):
         new_ctx = await self.bot.get_context(msg)
         await self.bot.invoke(new_ctx)
 
+    @antiscam.command(name="fetch-unicode")
+    @commands.check(checks.is_bot_admin)
+    async def antiscam_refetch_uneicode(self, ctx: MyContext):
+        "Refetch the unicode map of confusable characters"
+        if not self.bot.beta:
+            await ctx.send("Not usable in production!", ephemeral=True)
+            return
+        await update_unicode_map()
+        await ctx.send("Done!")
+
+    @antiscam.command(name="update-table")
+    @commands.check(checks.is_bot_admin)
+    async def antiscam_update_table(self, ctx: MyContext):
+        "Update the recorded messages table"
+        await ctx.defer()
+        counter = await self.db_update_messages(self.table)
+        await ctx.send(f"{counter} messages updated!")
+
+    @antiscam.command(name="train")
+    @commands.check(checks.is_bot_admin)
+    async def antiscam_train_model(self, ctx: MyContext):
+        "Re-train the antiscam model (DESTRUCTIVE ACTION)"
+        if not self.bot.beta:
+            await ctx.send("Not usable in production!", ephemeral=True)
+            return
+        msg = await ctx.send("Hold on, this may take a while...")
+        start = time.time()
+        model = await self.train_model()
+        acc = model.predict2()
+        elapsed_time = await FormatUtils.time_delta(time.time() - start, lang="en")
+        txt = f"New model has been generated in {elapsed_time}!\nAccuracy of {acc:.3f}"
+        current_acc = self.agent.model.predict2()
+        if acc > current_acc:
+            self.agent.save_model(model)
+            txt += f"\n✅ This model is better than the current one ({current_acc:.3f}), replacing it!"
+        else:
+            txt += f"\n❌ This model is not better than the current one ({current_acc:.3f})"
+        await msg.edit(content=txt)
+
     @antiscam.command(name="report")
     @commands.cooldown(5, 30, commands.BucketType.guild)
     @commands.cooldown(2, 10, commands.BucketType.user)
@@ -165,7 +287,7 @@ class AntiScam(commands.Cog):
         ..Doc moderator.html#anti-scam"""
         content = message.content if isinstance(message, discord.Message) else message
         mentions_count = len(message.mentions) if isinstance(message, discord.Message) else 0
-        msg = Message.from_raw(content, mentions_count)
+        msg = Message.from_raw(content, mentions_count, self.agent.websites_list)
         if isinstance(message, discord.Message) and message.guild:
             msg.contains_everyone = f'<@&{message.guild.id}>' in content or '@everyone' in content
         else:
@@ -180,12 +302,16 @@ class AntiScam(commands.Cog):
     @commands.Cog.listener()
     async def on_message(self, msg: discord.Message):
         "Check any message for scam dangerousity"
-        if isinstance(msg.author, discord.User) or len(msg.content) < 10 or is_immune(msg.author) or await self.bot.potential_command(msg):
+        if (
+            isinstance(msg.author, discord.User)
+            or len(msg.content) < 10
+            or is_immune(msg.author) or await self.bot.potential_command(msg)
+        ):
             return
         await self.bot.wait_until_ready()
         if not await self.bot.get_config(msg.guild.id, "anti_scam"):
             return
-        message: Message = Message.from_raw(msg.content, len(msg.mentions))
+        message: Message = Message.from_raw(msg.content, len(msg.mentions), self.agent.websites_list)
         if len(message.normd_message) < 3:
             return
         result = self.agent.predict_bot(message)

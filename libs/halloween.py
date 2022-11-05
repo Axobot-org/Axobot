@@ -24,6 +24,8 @@ class LinkConverter(str):
         "Convert an argument into a media link, by using Discord CDN proxy and embed system"
         if not argument.startswith(('http://', 'https://')):
             raise commands.errors.BadArgument(f'Could not convert "{argument}" into URL')
+        if argument.startswith('https://cdn.discordapp.com/attachments/'):
+            return argument
 
         for _ in range(10):
             if ctx.message.embeds and ctx.message.embeds[0].thumbnail:
@@ -65,8 +67,12 @@ class ColorVariation(str):
 
 VariationFlagType = typing.Literal["hallowify", "edge-detect", "filter"]
 
+ColorType = tuple[int, int, int]
+ColorAlphaType = tuple[int, int, int, int]
+VariationType = tuple[float, float, float, float]
+
 # source: https://dev.to/enzoftware/how-to-build-amazing-image-filters-with-python-median-filter---sobel-filter---5h7
-def edge_antialiasing(img):
+def edge_antialiasing(img: Image.Image):
     new_img = Image.new("RGB", img.size, "black")
     for x in range(1, img.width - 1):  # ignore the edge pixels for simplicity (1 to width-1)
         for y in range(1, img.height - 1):  # ignore edge pixels for simplicity (1 to height-1)
@@ -156,7 +162,7 @@ def edge_antialiasing(img):
     return new_img
 
 
-def place_edges(img, edge_img, modifiers):
+def place_edges(img: Image.Image, edge_img: Image.Image, modifier: dict[str, typing.Any]):
     edge_img_minimum = 10
     edge_img_maximum = edge_img.crop().getextrema()[0][1]
     for x in range(1, img.width - 1):
@@ -165,25 +171,25 @@ def place_edges(img, edge_img, modifiers):
             ep = edge_img.getpixel((x, y))
             if (ep[0] > edge_img_minimum):
                 img.putpixel((x, y), edge_colorify((ep[0] - edge_img_minimum) / (edge_img_maximum - edge_img_minimum),
-                                                   modifiers['colors'], p))
+                                                   modifier['colors'], p))
     return img
 
 
-def f(x, n, d, m, l):
+def f(x: float, n: int, d: ColorType, m: tuple[float, float, float], l: ColorType):
     return round(((l[n] - d[n]) / 255) * (255 ** m[n] - (255 - x) ** m[n]) ** (1 / m[n]) + d[n])
 
 
-def light(x):
+def light(x: float) -> ColorType:
     # return tuple(f(x, i, (78, 93, 148), (0.641, 0.716, 1.262), (255, 255, 255)) for i in range(3))
     return tuple(f(x, i, DARK_ORANGE, (1.2, 0.75, 0.42), WHITE) for i in range(3))
 
 
-def dark(x):
+def dark(x: float) -> ColorType:
     # return tuple(f(x, i, (35, 39, 42), (1.064, 1.074, 1.162), (114, 137, 218)) for i in range(3))
     return tuple(f(x, i, BLACK, (1.2, 1.07, 1.04), ORANGE) for i in range(3))
 
 
-def edge_detect(img, modifier, variation, maximum, minimum):
+def edge_detect(img: Image.Image, modifier: dict[str, typing.Any], variation: VariationType, maximum: int, minimum: int):
     img = img.convert('RGBA')
     edge_img = edge_antialiasing(img)
     img = hallowify(img, modifier, variation, maximum, minimum)
@@ -191,11 +197,11 @@ def edge_detect(img, modifier, variation, maximum, minimum):
     return new_img
 
 
-def interpolate(color1, color2, percent):
+def interpolate(color1: int, color2: int, percent: float):
     return round((color2 - color1) * percent + color1)
 
 
-def f2(x, n, colors, variation):
+def f2(x: float, n: int, colors: list[ColorType], variation: VariationType):
     if x < variation[0]:
         return colors[0][n]
     elif x < variation[1]:
@@ -211,7 +217,7 @@ def f2(x, n, colors, variation):
         return colors[2][n]
 
 
-def f3(x, n, colors, cur_color):
+def f3(x: float, n: int, colors: list[ColorType], cur_color: ColorAlphaType):
     array = []
 
     for i in range(len(colors)):
@@ -226,22 +232,22 @@ def f3(x, n, colors, cur_color):
         return interpolate(colors[2][n], colors[1][n], x)
 
 
-def colorify(x, colors, variation):
+def colorify(x: float, colors: list[ColorType], variation: VariationType):
     return tuple(f2(x, i, colors, variation) for i in range(3))
 
 
-def edge_colorify(x, colors, cur_color):
+def edge_colorify(x: float, colors: list[ColorType], cur_color: ColorAlphaType):
     return tuple(f3(x, i, colors, cur_color) for i in range(3))
 
 
-def remove_alpha(img, bg):
+def remove_alpha(img: Image.Image, bg: ColorAlphaType):
     alpha = img.convert('RGBA').getchannel('A')
     background = Image.new("RGBA", img.size, bg)
     background.paste(img, mask=alpha)
     return background
 
 
-def HALLOWEEN_filter(img, modifier, variation, maximum, minimum):
+def HALLOWEEN_filter(img: Image.Image, modifier: dict[str, typing.Any], variation: VariationType, maximum: int, minimum: int):
     img = img.convert('LA')
     pixels = img.getdata()
     img = img.convert('RGBA')
@@ -251,7 +257,7 @@ def HALLOWEEN_filter(img, modifier, variation, maximum, minimum):
     return img
 
 
-def hallowify(img, modifier, variation, maximum, minimum):
+def hallowify(img: Image.Image, modifier: dict[str, typing.Any], variation: VariationType, maximum: int, minimum: int):
     img = img.convert('LA')
     pixels = img.getdata()
     img = img.convert('RGBA')
@@ -260,7 +266,7 @@ def hallowify(img, modifier, variation, maximum, minimum):
     return img
 
 
-def variation_maker(base, var: tuple[float, float, float, float]):
+def variation_maker(base: VariationType, var: VariationType):
     if var[0] <= -100:
         base1 = base2 = 0
         base3 = (base[2] + base[0]) / 2 * .75
@@ -280,29 +286,32 @@ def variation_maker(base, var: tuple[float, float, float, float]):
     return base1, base2, base3, base4
 
 
-def invert_colors(colors):
+def invert_colors(colors: list[ColorType]):
     return list(reversed(colors))
 
 
-def shift_colors(colors):
+def shift_colors(colors: list[ColorType]):
     return [colors[2], colors[0], colors[1]]
 
 
-def interpolate_colors(color1, color2, x):
+def interpolate_colors(color1: ColorType, color2: ColorType, ratio: float) -> ColorType:
+    "Get a mix between two colors, based on the given ratio"
     new_color = [0, 0, 0]
     for i in range(3):
-        new_color[i] = round((color2[i] - color1[i]) * x + color1[i])
+        new_color[i] = round((color2[i] - color1[i]) * ratio + color1[i])
     return tuple(new_color)
 
 
-def distance_to_color(color1, color2):
+def distance_to_color(color1: ColorType, color2: ColorType):
+    "Calculate the distance between two colors, on a RGB base"
     total = 0
     for i in range(3):
         total += (255 - abs(color1[i] - color2[i])) / 255
     return total / 3
 
 
-def find_max_index(array):
+def find_max_index(array: list[float]):
+    "Find the index of the maximum value in an array"
     maximum = 0
     closest = None
     for i in range(len(array)):
@@ -312,14 +321,15 @@ def find_max_index(array):
     return closest
 
 
-def color_ratios(img, colors):
+def color_ratios(img: Image.Image, colors: list[tuple[int, int, int]]):
+    "Calculate the ratio of present colors in the given image (between 0.0 and 1.0)"
     img = img.convert('RGBA')
-    total_pixels = img.width * img.height
-    color_pixels = [0, 0, 0, 0]
+    total_pixels = img.width * img.height # number of pixels in the image
+    color_pixels = [0 for _ in range(len(colors)+1)] # count number of pixels close to each color
     close_colors = []
-    for i in range(3):
-        close_colors.append(interpolate_colors(colors[i], colors[min(i + 1, 2)], .33))
-        close_colors.append(interpolate_colors(colors[i], colors[max(i - 1, 0)], .33))
+    for i, color in enumerate(colors):
+        close_colors.append(interpolate_colors(color, colors[min(i + 1, len(colors)-1)], 1/len(colors)))
+        close_colors.append(interpolate_colors(color, colors[max(i - 1, 0)], 1/len(colors)))
 
     for x in range(0, img.width):
         for y in range(0, img.height):
@@ -327,10 +337,10 @@ def color_ratios(img, colors):
             if p[3] == 0:
                 total_pixels -= 1
                 continue
-            values = [0, 0, 0]
-            for i in range(3):
+            values = [0 for _ in range(len(colors))]
+            for i, color in enumerate(colors):
                 values[i] = max(
-                    distance_to_color(p, colors[i]),
+                    distance_to_color(p, color),
                     distance_to_color(p, close_colors[2 * i]),
                     distance_to_color(p, close_colors[2 * i + 1])
                 )
@@ -338,11 +348,11 @@ def color_ratios(img, colors):
             if values[index] > .93:
                 color_pixels[index] += 1
             else:
-                color_pixels[3] += 1
+                color_pixels[-1] += 1
 
-    percent = [0, 0, 0, 0]
-    for i in range(4):
-        percent[i] = color_pixels[i] / total_pixels
+    percent: list[float] = []
+    for i, count in enumerate(color_pixels):
+        percent.append(count / total_pixels)
     return percent
 
 
@@ -356,9 +366,13 @@ MODIFIERS = {
         'func': dark,
         'colors': [BLACK, DARK_ORANGE, ORANGE],
         'color_names': ['Not Quite Black', 'Dark Orange', 'Orange']
+    },
+    'all': {
+        'colors': [BLACK, DARK_ORANGE, ORANGE, WHITE],
+        'color_names': ['Not Quite Black', 'Dark Orange', 'Orange', 'White']
     }
-
 }
+
 METHODS = {
     'hallowify': hallowify,
     'edge-detect': edge_detect,
@@ -398,7 +412,7 @@ VARIATIONS = {
 }
 
 
-def convert_image(image, modifier: str, method: str, variations: list[str]):
+def convert_image(image: Image.Image, modifier: str, method: str, variations: list[str]):
     "Change an image colors into orange-black colors by using given modifier, method and variations"
     try:
         modifier_converter = dict(MODIFIERS[modifier])
@@ -493,49 +507,48 @@ def convert_image(image, modifier: str, method: str, variations: list[str]):
     return discord.File(out, filename=filename)
 
 
-async def check_image(image, modifier: str, method: str):
-    try:
-        modifier_converter = MODIFIERS[modifier]
-    except KeyError:
-        raise RuntimeError('Invalid image modifier.')
+async def check_image(image: Image.Image):
+    "Check if an image has enough of the event colors, and return the analyse data"
+    colors_refs: list[tuple[int, int, int]] = MODIFIERS["all"]["colors"]
+    colors_names: list[tuple[int, int, int]] = MODIFIERS["all"]["color_names"]
 
     with Image.open(io.BytesIO(image)) as img:
         if img.format == "GIF":
-            total = [0, 0, 0, 0]
+            total = [0, 0, 0, 0, 0]
             count = 0
 
             for frame in ImageSequence.Iterator(img):
                 f = frame.resize((round(img.width / 3), round(img.height / 3)))
-                values = color_ratios(f, modifier_converter['colors'])
+                values = color_ratios(f, colors_refs)
                 for i in range(4):
                     total[i] += values[i]
                 count += 1
 
-            ratios = [0, 0, 0, 0]
-            for i in range(4):
+            ratios = [0 for _ in range(len(total))]
+            for i in range(len(total)):
                 ratios[i] = round(10000 * total[i] / count) / 100
 
-            passed = ratios[3] <= 10
+            passed = ratios[-1] <= 10
 
         else:
             img = img.resize((round(img.width / 3), round(img.height / 3)))
-            values = color_ratios(img, modifier_converter['colors'])
+            values = color_ratios(img, colors_refs)
 
-            ratios = [0, 0, 0, 0]
-            for i in range(4):
+            ratios = [0 for _ in range(len(values))]
+            for i in range(len(values)):
                 ratios[i] = round(10000 * values[i]) / 100
 
-            passed = ratios[3] <= 10
+            passed = ratios[-1] <= 10
 
     colors = []
-    for i in range(3):
+    for name, ratio in zip(colors_names, ratios):
         colors.append({
-            'name': modifier_converter['color_names'][i],
-            'ratio': ratios[i]
+            'name': name,
+            'ratio': ratio
         })
     colors.append({
         'name': 'Non-Halloween',
-        'ratio': ratios[3]
+        'ratio': ratios[-1]
     })
     data = {
         'passed': passed,

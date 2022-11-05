@@ -213,6 +213,16 @@ class BotStats(commands.Cog):
         async with self.bot.db_query(query, (now, "eventpoints.rows", *args)) as _:
             pass
 
+    async def db_record_serverlogs_enabled(self, now: datetime):
+        "Record into the stats table the number of enabled serverlogs, grouped by kind"
+        args = (0, "logs", False, self.bot.beta)
+        query = """INSERT INTO `statsbot`.`zbot`
+            SELECT %s, CONCAT("logs.", `kind`, ".enabled"), COUNT(*), %s, %s, %s, %s
+            FROM `serverlogs`
+            GROUP BY `kind`"""
+        async with self.bot.db_query(query, (now, *args)) as _:
+            pass
+
     @tasks.loop(minutes=1)
     async def sql_loop(self):
         """Send our stats every minute"""
@@ -239,7 +249,7 @@ class BotStats(commands.Cog):
             # RSS stats
             for k, v in self.rss_stats.items():
                 cursor.execute(query, (now, 'rss.'+k, v, 0, k, k == "messages", self.bot.beta))
-            cursor.execute(query, (now, 'rss.disabled', await self.db_get_disabled_rss(), 0, 'disabled', True, self.bot.beta))
+            cursor.execute(query, (now, 'rss.disabled', await self.db_get_disabled_rss(), 0, 'disabled', False, self.bot.beta))
             # XP cards
             cursor.execute(query, (now, 'xp.generated_cards', self.xp_cards["generated"], 0, 'cards/min', True, self.bot.beta))
             cursor.execute(query, (now, 'xp.sent_cards', self.xp_cards["sent"], 0, 'cards/min', True, self.bot.beta))
@@ -262,12 +272,15 @@ class BotStats(commands.Cog):
             cursor.execute(query, (now, 'guilds.total', total, 0, 'guilds', True, self.bot.beta))
             del unav, total
             # antiscam warn/deletions
-            cursor.execute(query, (now, 'antiscam.warning', self.antiscam["warning"], 0, 'warning/min', True, self.bot.beta))
-            cursor.execute(query, (now, 'antiscam.deletion', self.antiscam["deletion"], 0, 'deletion/min', True, self.bot.beta))
+            if self.antiscam["warning"]:
+                cursor.execute(query, (now, 'antiscam.warning', self.antiscam["warning"], 0, 'warning/min', True, self.bot.beta))
+            if self.antiscam["deletion"]:
+                cursor.execute(query, (now, 'antiscam.deletion', self.antiscam["deletion"], 0, 'deletion/min', True, self.bot.beta))
             self.antiscam["warning"] = self.antiscam["deletion"] = 0
             # tickets creation
-            cursor.execute(query, (now, 'tickets.creation', self.ticket_events["creation"], 0, 'tickets/min', True, self.bot.beta))
-            self.ticket_events["creation"] = 0
+            if self.ticket_events["creation"]:
+                cursor.execute(query, (now, 'tickets.creation', self.ticket_events["creation"], 0, 'tickets/min', True, self.bot.beta))
+                self.ticket_events["creation"] = 0
             # username changes
             cursor.execute(query, (now, 'usernames.guild', self.usernames["guild"], 0, 'nicknames/min', True, self.bot.beta))
             self.usernames["guild"] = 0
@@ -275,10 +288,13 @@ class BotStats(commands.Cog):
             self.usernames["user"] = 0
             cursor.execute(query, (now, 'usernames.deleted', self.usernames["deleted"], 0, 'usernames/min', True, self.bot.beta))
             self.usernames["deleted"] = 0
-            # Dailies points
-            await self.db_record_dailies_values(now)
-            # Events points
-            await self.db_record_eventpoints_values(now)
+            if self.bot.current_event:
+                # Dailies points
+                await self.db_record_dailies_values(now)
+                # Events points
+                await self.db_record_eventpoints_values(now)
+            # serverlogs
+            await self.db_record_serverlogs_enabled(now)
             # Push everything
             cnx.commit()
         except mysql.connector.errors.IntegrityError as err: # duplicate primary key

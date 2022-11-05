@@ -23,13 +23,11 @@ class Events(commands.Cog):
         self.file = "events"
         self.dbl_last_sending = datetime.datetime.utcfromtimestamp(0)
         self.partner_last_check = datetime.datetime.utcfromtimestamp(0)
-        self.last_tr_backup = datetime.datetime.utcfromtimestamp(0)
         self.last_eventDay_check = datetime.datetime.utcfromtimestamp(0)
         self.statslogs_last_push = datetime.datetime.utcfromtimestamp(0)
         self.last_statusio = datetime.datetime.utcfromtimestamp(0)
         self.loop_errors = [0,datetime.datetime.utcfromtimestamp(0)]
         self.last_membercounter = datetime.datetime.utcfromtimestamp(0)
-        self.latencies_list = list()
         self.embed_colors = {"welcome":5301186,
             "mute":4868682,
             "unmute":8311585,
@@ -326,9 +324,6 @@ class Events(commands.Cog):
             # Bots lists updates - every day
             elif now.hour == 0 and now.day != self.dbl_last_sending.day:
                 await self.dbl_send_data()
-            # Translation backup - every 12h (start from 1am)
-            elif now.hour%12 == 1 and (now.hour != self.last_tr_backup.hour or now.day != self.last_tr_backup.day):
-                await self.translations_backup()
             # Check current event - every 12h UTC (start from 0:02 am)
             elif utcnow.hour%12 == 0 and utcnow.minute%2 == 0 and (now.hour != self.last_eventDay_check.hour or now.day != self.last_eventDay_check.day):
                 await self.botEventLoop()
@@ -448,25 +443,6 @@ class Events(commands.Cog):
             description=f'**Partners channels updated** in {delta_time}s ({count[0]} channels - {count[1]} partners)',
             color=10949630,
             timestamp=self.bot.utcnow())
-        emb.set_author(name=self.bot.user, icon_url=self.bot.user.display_avatar)
-        await self.bot.send_embed(emb, url="loop")
-
-    async def translations_backup(self):
-        """Do a backup of the translations files"""
-        from os import remove
-        start = time.time()
-        self.last_tr_backup = datetime.datetime.now()
-        try:
-            remove('translation-backup.tar')
-        except FileNotFoundError:
-            pass
-        try:
-            shutil.make_archive('translation-backup','tar','translation')
-        except FileNotFoundError:
-            await self.bot.get_cog('Errors').senf_err_msg("Translators backup: Unable to find backup folder")
-            return
-        delta_time = round(time.time()-start, 3)
-        emb = discord.Embed(description=f'**Translations files backup** completed in {delta_time}s', color=10197915, timestamp=self.bot.utcnow())
         emb.set_author(name=self.bot.user, icon_url=self.bot.user.display_avatar)
         await self.bot.send_embed(emb, url="loop")
 

@@ -3,7 +3,7 @@ import os
 import pickle
 import re
 import string
-from typing import Literal
+from typing import Literal, Optional, TypedDict
 import random
 
 from .classes import Message
@@ -13,15 +13,15 @@ CLASS = Literal[0, 1]
 CUSTOM_ATTRS = {'contains_everyone', 'url_score', 'mentions_count',
                 'punctuation_count', 'max_frequency', 'caps_percentage', 'avg_word_len'}
 
-ROUND_VALUE = {
-    'max_frequency': 3,
-    'caps_percentage': 1,
-    'avg_word_len': 2
-}
+class RoundValueType(TypedDict):
+    max_frequency: int
+    caps_percentage: int
+    avg_word_len: int
 
 class SpamDetector(object):
     """Implementation of Naive Bayes for binary classification"""
-    def __init__(self):
+    def __init__(self, round_values: RoundValueType):
+        self.round_values = round_values
         self.num_messages: dict[str, int] = {}
         self.log_class_priors: dict[str, float] = {}
         self.attr_counts: dict[str, dict[str, int]] = {}
@@ -68,16 +68,16 @@ class SpamDetector(object):
                 if word not in self.attr_counts[c]:
                     self.attr_counts[c][word] = 0
                 self.attr_counts[c][word] += count
-            
+
             for attr in CUSTOM_ATTRS:
                 v = getattr(record, attr)
-                if round_value := ROUND_VALUE.get(attr):
+                if round_value := self.round_values.get(attr):
                     v = round(v, round_value)
                 attr = '_' + attr + '_' + str(v)
                 if attr not in self.attr_counts[c]:
                     self.attr_counts[c][attr] = 0
                 self.attr_counts[c][attr] += 1
-            
+
             if record.category not in self.classes_:
                 self.classes_[record.category] = record.category+1
 
@@ -102,7 +102,7 @@ class SpamDetector(object):
 
             for attr in CUSTOM_ATTRS:
                 v = getattr(record, attr)
-                if round_value := ROUND_VALUE.get(attr):
+                if round_value := self.round_values.get(attr):
                     v = round(v, round_value)
                 attr = '_' + attr + '_' + str(v)
                 log_attr_given_spam = math.log((self.attr_counts['spam'].get(attr, 0) + 1) / (self.num_messages['spam'] + len(self.vocab)))
@@ -119,36 +119,64 @@ class SpamDetector(object):
         return result
 
 class RandomForest:
-    def __init__(self, ntree: int, test_percent: float=0.2):
-        self.trees: list[SpamDetector] = []
-        self.test_percent = test_percent
-        self.vocab = set()
-        for _ in range(ntree):
-            self.trees.append(SpamDetector())
-        self.tests: list[list[Message]] = []
+    "Random forest using the Bayes classification algorithm to detect if a message is a scam"
 
-    async def fit(self, data: list[Message]):
+    def __init__(self, ntree: int, test_percent: float, round_values: RoundValueType):
+        self.ntree = ntree
+        self.test_percent = test_percent
+        self.round_values = round_values
+        self.trees: list[SpamDetector] = []
+        self.vocab = set()
+        self.tests: list[list[Message]] = []
+        self.classes_: dict[int, int] = {} # map class ID to index
+
+    def fit(self, data: list[Message], y_values: Optional[list[CLASS]]=None):
+        "Train the model for a given list of messages"
+        # calculate quantity of rows used to train each tree
         learning_amount = round((1-self.test_percent) * len(data))
-        self.tests = []
-        self.classes_ = {}
+        # reset variables
+        self.vocab.clear()
+        self.tests.clear()
+        self.classes_.clear()
+        # init trees
+        self.trees = [SpamDetector(self.round_values) for _ in range(self.ntree)]
+        # train trees
         for tree in self.trees:
             learning = random.sample(data, learning_amount)
             tree.fit(learning)
             self.vocab |= tree.vocab
             self.classes_ |= tree.classes_
             self.tests.append([x for x in data if x not in learning])
+        return self
+
+    def set_params(self, ntree: int, test_percent: float, round_values: RoundValueType):
+        "Edit the model parameters"
+        self.ntree = ntree
+        self.test_percent = test_percent
+        self.round_values = round_values
+        return self
+
+    def get_params(self, deep: bool = True): # pylint: disable=unused-argument
+        "Get the current model parameters"
+        return {
+            'ntree': self.ntree,
+            'test_percent': self.test_percent,
+            'round_values': self.round_values,
+        }
 
     def save(self):
         pickle.dump(self, open(os.path.dirname(__file__)+"/data/bayes_model.pkl", 'wb'))
 
-    def predict(self, X: list[Message]) -> list[CLASS]:
-        result = [0 for _ in range(len(X))]
+    def predict(self, x_dataset: list[Message]) -> list[CLASS]:
+        "Predict the class index for each given message"
+        result = [0 for _ in range(len(x_dataset))]
         for tree in self.trees:
-            for i, x in enumerate(tree.predict(X)):
+            for i, x in enumerate(tree.predict(x_dataset)):
                 result[i] += x/len(self.trees)
         return [round(x) for x in result]
 
     def predict2(self) -> float:
+        "Get the model accuracy based on test dataset"
         accuracy = 0.0
         for i, tree in enumerate(self.trees):
             tests = self.tests[i]
@@ -158,6 +186,7 @@ class RandomForest:
         return accuracy / len(self.trees)
 
     def get_classes(self, record: Message) -> dict[str, float]:
+        "Get the probability of each class for a given message"
         result = [0, 0]
         for tree in self.trees:
             pred = tree.predict([record])[0]
