@@ -222,7 +222,7 @@ class Morpions(commands.Cog):
                         await self.bot.get_cog("Utilities").add_user_eventPoint(ctx.author.id, 8)
                 await ctx.send(await self.display_grid(grille)+'\n'+resultat)
             except Exception as err:
-                await self.bot.get_cog('Errors').on_command_error(ctx, err)
+                self.bot.dispatch("command_error", ctx, err)
 
 
 async def setup(bot):

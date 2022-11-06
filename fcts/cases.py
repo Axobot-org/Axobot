@@ -116,7 +116,7 @@ class Cases(commands.Cog):
                     return query_results['count']
             return 0
         except Exception as err:
-            await self.bot.get_cog('Errors').on_error(err,None)
+            self.bot.dispatch("error", err)
 
     async def delete_case(self, case_id: int):
         """delete a case from the db"""
@@ -254,8 +254,8 @@ class Cases(commands.Cog):
                             text = ""
                     if len(text) > 0:
                         await ctx.send(text)
-        except Exception as e:
-            await self.bot.get_cog("Errors").on_error(e,None)
+        except Exception as err:
+            self.bot.dispatch("command_error", ctx, err)
 
 
     @case_main.command(name="reason",aliases=['edit'])
@@ -273,8 +273,8 @@ class Cases(commands.Cog):
             if not await self.bot.get_cog('Admin').check_if_admin(ctx.author):
                 c.append("guild="+str(ctx.guild.id))
             cases = await self.get_case(criters=c)
-        except Exception as e:
-            await self.bot.get_cog("Errors").on_error(e,None)
+        except Exception as err:
+            self.bot.dispatch("command_error", ctx, err)
             return
         if len(cases)!=1:
             await ctx.send(await self.bot._(ctx.guild.id,"cases.not-found"))
@@ -304,7 +304,7 @@ class Cases(commands.Cog):
                 c.append("guild="+str(ctx.guild.id))
             cases = await self.get_case(criters=c)
         except Exception as err:
-            await self.bot.get_cog("Errors").on_error(err,ctx)
+            self.bot.dispatch("command_error", ctx, err)
             return
         if len(cases)!=1:
             await ctx.send(await self.bot._(ctx.guild.id,"cases.not-found"))
@@ -338,7 +338,7 @@ class Cases(commands.Cog):
             emb.set_author(name=user, icon_url=user.display_avatar)
             await ctx.send(embed=emb)
         except Exception as err:
-            await self.bot.get_cog("Errors").on_error(err,ctx)
+            self.bot.dispatch("command_error", ctx, err)
 
 
     @case_main.command(name="remove", aliases=["clear", "delete"])
@@ -358,7 +358,7 @@ class Cases(commands.Cog):
                 c.append("guild="+str(ctx.guild.id))
             cases = await self.get_case(columns=['ID','user'],criters=c)
         except Exception as err:
-            await self.bot.get_cog("Errors").on_error(err,None)
+            self.bot.dispatch("command_error", ctx, err)
             return
         if len(cases) != 1:
             await ctx.send(await self.bot._(ctx.guild.id,"cases.not-found"))

@@ -162,8 +162,8 @@ Slowmode works up to one message every 6h (21600s)
             if len(deleted) > 0:
                 log = await self.bot._(ctx.guild.id, "logs.clear", channel=ctx.channel.mention, number=len(deleted))
                 await self.bot.get_cog("Events").send_logs_per_server(ctx.guild,"clear",log,ctx.author)
-        except Exception as e:
-            await self.bot.get_cog('Errors').on_command_error(ctx,e)
+        except Exception as err:
+            self.bot.dispatch("command_error", ctx, err)
 
     async def clear_simple(self, ctx: MyContext, number: int):
         def check(m):
@@ -176,8 +176,8 @@ Slowmode works up to one message every 6h (21600s)
             await self.bot.get_cog("Events").send_logs_per_server(ctx.guild,"clear",log,ctx.author)
         except discord.errors.NotFound:
             await ctx.send(await self.bot._(ctx.guild, "moderation.clear.not-found"))
-        except Exception as e:
-            await self.bot.get_cog('Errors').on_command_error(ctx,e)
+        except Exception as err:
+            self.bot.dispatch("command_error", ctx, err)
 
 
     @commands.command(name="kick")
@@ -218,8 +218,8 @@ Slowmode works up to one message every 6h (21600s)
                 try:
                     await Cases.add_case(case)
                     caseID = case.id
-                except Exception as e:
-                    await self.bot.get_cog('Errors').on_error(e, ctx)
+                except Exception as err:
+                    self.bot.dispatch("error", err, ctx)
             try:
                 await ctx.message.delete()
             except discord.Forbidden:
@@ -233,9 +233,9 @@ Slowmode works up to one message every 6h (21600s)
             await self.send_modlogs("kick", user, ctx.author, ctx.guild, opt_case, opt_reason)
         except discord.errors.Forbidden:
             await ctx.send(await self.bot._(ctx.guild.id, "moderation.kick.too-high"))
-        except Exception as e:
+        except Exception as err:
             await ctx.send(await self.bot._(ctx.guild.id, "moderation.error"))
-            await self.bot.get_cog('Errors').on_error(e,ctx)
+            self.bot.dispatch("error", err, ctx)
         await self.bot.get_cog('Events').add_event('kick')
 
 
@@ -381,7 +381,7 @@ You can also mute this member for a defined duration, then use the following for
             elif not self.bot.database_online and ctx.channel.permissions_for(user).manage_roles:
                 return await ctx.send(await self.bot._(ctx.guild.id, "moderation.warn.cant-staff"))
         except Exception as err:
-            await self.bot.get_cog('Errors').on_error(err,ctx)
+            self.bot.dispatch("command_error", ctx, err)
             return
         role = await self.get_muted_role(ctx.guild)
         if not await self.check_mute_context(ctx, role, user):
@@ -509,7 +509,7 @@ This will remove the role 'muted' for the targeted member
             await self.bot.task_handler.cancel_unmute(user.id, ctx.guild.id)
         except Exception as err:
             await ctx.send(await self.bot._(ctx.guild.id, "moderation.error"))
-            await self.bot.get_cog('Errors').on_error(err,ctx)
+            self.bot.dispatch("command_error", ctx, err)
 
     @commands.command(name="mute-config")
     @commands.cooldown(1,15, commands.BucketType.guild)
@@ -587,17 +587,17 @@ The 'days_to_delete' option represents the number of days worth of messages to d
             await self.bot.get_cog('Events').add_event('ban')
             case_id = "'Unsaved'"
             if self.bot.database_online:
-                Cases = self.bot.get_cog('Cases')
+                cases_cog = self.bot.get_cog('Cases')
                 if f_duration is None:
                     case = Case(bot=self.bot,guildID=ctx.guild.id,memberID=user.id,Type="ban",ModID=ctx.author.id,Reason=reason,date=ctx.bot.utcnow())
                 else:
                     case = Case(bot=self.bot,guildID=ctx.guild.id,memberID=user.id,Type="tempban",ModID=ctx.author.id,Reason=reason,date=ctx.bot.utcnow(),duration=duration)
                     await self.bot.task_handler.add_task('ban',duration,user.id,ctx.guild.id)
                 try:
-                    await Cases.add_case(case)
+                    await cases_cog.add_case(case)
                     case_id = case.id
                 except Exception as err:
-                    await self.bot.get_cog('Errors').on_error(err,ctx)
+                    self.bot.dispatch("error", err, ctx)
             try:
                 await ctx.message.delete()
             except discord.Forbidden:
@@ -613,7 +613,7 @@ The 'days_to_delete' option represents the number of days worth of messages to d
             await ctx.send(await self.bot._(ctx.guild.id, "moderation.ban.too-high"))
         except Exception as err:
             await ctx.send(await self.bot._(ctx.guild.id, "moderation.error"))
-            await self.bot.get_cog('Errors').on_error(err,ctx)
+            self.bot.dispatch("error", err, ctx)
 
     async def unban_event(self, guild: discord.Guild, user: discord.User, author: discord.User):
         if not guild.me.guild_permissions.ban_members:
@@ -665,8 +665,8 @@ The 'days_to_delete' option represents the number of days worth of messages to d
                 try:
                     await cases_cog.add_case(case)
                     case_id = case.id
-                except Exception as e:
-                    await self.bot.get_cog('Errors').on_error(e,ctx)
+                except Exception as err:
+                    self.bot.dispatch("error", err, ctx)
             try:
                 await ctx.message.delete()
             except discord.Forbidden:
@@ -678,9 +678,9 @@ The 'days_to_delete' option represents the number of days worth of messages to d
             await self.send_chat_answer("unban", user, ctx, opt_case)
             # send in modlogs
             await self.send_modlogs("unban", user, ctx.author, ctx.guild, opt_case, opt_reason)
-        except Exception as e:
+        except Exception as err:
             await ctx.send(await self.bot._(ctx.guild.id, "moderation.error"))
-            await self.bot.get_cog('Errors').on_error(e,ctx)
+            self.bot.dispatch("error", err, ctx)
 
     @commands.command(name="softban")
     @commands.guild_only()
@@ -722,8 +722,8 @@ Permissions for using this command are the same as for the kick
                 try:
                     await Cases.add_case(case)
                     caseID = case.id
-                except Exception as e:
-                    await self.bot.get_cog('Errors').on_error(e,ctx)
+                except Exception as err:
+                    self.bot.dispatch("error", err, ctx)
             try:
                 await ctx.message.delete()
             except discord.Forbidden:
@@ -737,9 +737,9 @@ Permissions for using this command are the same as for the kick
             await self.send_modlogs("softban", user, ctx.author, ctx.guild, opt_case, opt_reason)
         except discord.errors.Forbidden:
             await ctx.send(await self.bot._(ctx.guild.id, "moderation.kick.too-high"))
-        except Exception as e:
+        except Exception as err:
             await ctx.send(await self.bot._(ctx.guild.id, "moderation.error"))
-            await self.bot.get_cog('Errors').on_error(e,ctx)
+            self.bot.dispatch("error", err, ctx)
 
     async def dm_user(self, user: discord.User, action: str, ctx: MyContext, reason: str = None, duration: str = None):
         if user.id in self.bot.get_cog('Welcomer').no_message:
@@ -767,13 +767,13 @@ Permissions for using this command are the same as for the kick
             await user.send(embed=emb)
         except discord.Forbidden:
             pass
-        except discord.HTTPException as e:
-            if e.code == 50007:
+        except discord.HTTPException as err:
+            if err.code == 50007:
                 # "Cannot send message to this user"
                 return
-            await self.bot.get_cog('Errors').on_error(e, ctx)
-        except Exception as e:
-            await self.bot.get_cog('Errors').on_error(e, ctx)
+            self.bot.dispatch("error", err, ctx)
+        except Exception as err:
+            self.bot.dispatch("error", err, ctx)
 
     async def send_chat_answer(self, action: str, user: discord.User, ctx: MyContext, case: int = None):
         if action in ('warn', 'mute', 'unmute', 'kick', 'ban', 'unban'):
@@ -892,9 +892,9 @@ The 'reasons' parameter is used to display the mute reasons.
 ..Doc moderator.html#banlist-mutelist"""
         try:
             liste = await self.bdd_muted_list(ctx.guild.id, reasons=reasons)
-        except Exception as e:
+        except Exception as err:
             await ctx.send(await self.bot._(ctx.guild.id, "moderation.error"))
-            await self.bot.get_cog("Errors").on_command_error(ctx, e)
+            self.bot.dispatch("error", err, ctx)
             return
         desc = list()
         title = await self.bot._(ctx.guild.id, "moderation.mute.list-title-0", guild=ctx.guild.name)
@@ -928,8 +928,8 @@ The 'reasons' parameter is used to display the mute reasons.
         embed.set_footer(text=ctx.author, icon_url=ctx.author.display_avatar)
         try:
             await ctx.send(embed=embed, delete_after=20)
-        except discord.errors.HTTPException as e:
-            if e.code == 400:
+        except discord.errors.HTTPException as err:
+            if err.code == 400:
                 await ctx.send(await self.bot._(ctx.guild.id, "moderation.ban.list-error"))
 
 
@@ -1375,8 +1375,8 @@ ID corresponds to the Identifier of the message
                             count += 1
                 if category is not None and category.permissions_for(guild.me).manage_roles:
                     await category.set_permissions(role, send_messages=False)
-        except Exception as e:
-            await self.bot.get_cog('Errors').on_error(e, None)
+        except Exception as err:
+            self.bot.dispatch("error", err)
             count = len(guild.channels)
         await self.bot.get_cog('Servers').modify_server(guild.id, values=[('muted_role',role.id)])
         return role, count

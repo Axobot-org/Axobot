@@ -637,8 +637,8 @@ Available types: member, role, user, emoji, channel, server, invite, category
         # Webhooks count
         try:
             web = len(await channel.webhooks())
-        except Exception as e:
-            await self.bot.get_cog('Errors').on_error(e,ctx)
+        except Exception as err:
+            self.bot.dispatch("error", err, ctx)
             web = await self.bot._(ctx.guild.id,"info.info.textchan-4")
         embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.textchan-3"), value=str(web))
         # Members nber
@@ -738,11 +738,10 @@ Available types: member, role, user, emoji, channel, server, invite, category
         # Splash url
         try:
             embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.guild-15"), value=str(await guild.vanity_invite()))
-        except Exception as e:
-            if isinstance(e,(discord.errors.Forbidden, discord.errors.HTTPException)):
-                pass
-            else:
-                await self.bot.get_cog('Errors').on_error(e,ctx)
+        except (discord.errors.Forbidden, discord.errors.HTTPException):
+            pass
+        except Exception as err:
+            self.bot.dispatch("error", err, ctx)
         # Premium subscriptions count
         if isinstance(guild.premium_subscription_count,int) and guild.premium_subscription_count > 0:
             embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.guild-13"), value=await self.bot._(ctx.guild.id,"info.info.guild-13v",b=guild.premium_subscription_count,p=guild.premium_tier))
@@ -752,8 +751,8 @@ Available types: member, role, user, emoji, channel, server, invite, category
                 roles = [x.mention for x in guild.roles if len(x.members) > 1][1:]
             else:
                 roles = [x.name for x in guild.roles if len(x.members) > 1][1:]
-        except Exception as e:
-            await self.bot.get_cog('Errors').on_error(e,ctx)
+        except Exception as err:
+            self.bot.dispatch("error", err, ctx)
             roles = guild.roles
         roles.reverse()
         if len(roles) == 0:
@@ -802,8 +801,8 @@ Available types: member, role, user, emoji, channel, server, invite, category
                     invite = temp[0]
             except discord.errors.Forbidden:
                 pass
-            except Exception as e:
-                await self.bot.get_cog('Errors').on_error(e,ctx)
+            except Exception as err:
+                self.bot.dispatch("error", err, ctx)
         # Invite URL
         embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.inv-0"), value=invite.url,inline=True)
         # Inviter
@@ -1195,8 +1194,8 @@ Available types: member, role, user, emoji, channel, server, invite, category
             for data in [{ 'i': x, 'l': current_timestamp } for x in liste]:
                 async with self.bot.db_query(query, data):
                     pass
-        except Exception as e:
-            await self.bot.get_cog('Errors').on_error(e,None)
+        except Exception as err:
+            self.bot.dispatch("error", err)
 
     async def get_emojis_info(self, ID: typing.Union[int,list]):
         """Get info about an emoji"""

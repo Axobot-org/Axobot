@@ -160,7 +160,7 @@ class Rss(commands.Cog):
         try:
             text = await self.twitter_rss.get_feed(ctx.channel,name)
         except Exception as err:
-            return await self.bot.get_cog('Errors').on_error(err,ctx)
+            return self.bot.dispatch("error", err, ctx)
         if isinstance(text, str):
             await ctx.send(text)
         else:
@@ -278,7 +278,7 @@ class Rss(commands.Cog):
             await self.send_log("Feed added into server {} ({})".format(ctx.guild.id,feed_id),ctx.guild)
         except Exception as err:
             await ctx.send(await self.bot._(ctx.guild, "rss.fail-add"))
-            await self.bot.get_cog("Errors").on_error(err,ctx)
+            self.bot.dispatch("error", err, ctx)
 
     @rss_main.command(name="remove", aliases=["delete"])
     @commands.guild_only()
@@ -548,7 +548,7 @@ class Rss(commands.Cog):
             )
         except Exception as err:
             feeds_ids = []
-            await self.bot.get_cog("Errors").on_error(err, ctx)
+            self.bot.dispatch("error", err, ctx)
         if feeds_ids is None:
             return
         feeds: list[FeedObject] = list(filter(None, [await self.db_get_feed(feed_id) for feed_id in feeds_ids]))
@@ -638,7 +638,7 @@ class Rss(commands.Cog):
                 await ctx.send(await self.bot._(ctx.guild.id, "rss.roles.edit-success", count=len(names), roles=", ".join(names)))
         except Exception as err:
             await ctx.send(await self.bot._(ctx.guild, "rss.fail-add"))
-            await self.bot.get_cog("Errors").on_error(err, ctx)
+            self.bot.dispatch("error", err, ctx)
             return
 
 
@@ -699,7 +699,7 @@ class Rss(commands.Cog):
             if len(feeds_ids) == 0:
                 await ctx.send(await self.bot._(ctx.guild, "rss.fail-add"))
                 if err is not None:
-                    await self.bot.get_cog("Errors").on_error(err,ctx)
+                    self.bot.dispatch("error", err, ctx)
                 return
             for feed in feeds_ids:
                 await self.db_update_feed(feed, [('channel',channel.id)])
@@ -741,7 +741,7 @@ class Rss(commands.Cog):
             )
         except Exception as err:
             feeds_ids = []
-            await self.bot.get_cog("Errors").on_error(err, ctx)
+            self.bot.dispatch("error", err, ctx)
         if feeds_ids is None:
             return
         feeds: list[FeedObject] = list(filter(None, [await self.db_get_feed(feed_id) for feed_id in feeds_ids]))
@@ -794,13 +794,13 @@ class Rss(commands.Cog):
                 )
             except Exception as err:
                 feeds_ids = []
-                await self.bot.get_cog("Errors").on_error(err,ctx)
+                self.bot.dispatch("error", err, ctx)
             if feeds_ids is None:
                 return
             if len(feeds_ids) == 0:
                 await ctx.send(await self.bot._(ctx.guild, "rss.fail-add"))
                 if err is not None:
-                    await self.bot.get_cog("Errors").on_error(err,ctx)
+                    self.bot.dispatch("error", err, ctx)
                 return
             if arguments is None or len(arguments.keys()) == 0:
                 arguments = None
@@ -841,7 +841,7 @@ class Rss(commands.Cog):
             await ctx.send("\n".join(txt))
         except Exception as err:
             await ctx.send(await self.bot._(ctx.guild.id, "rss.guild-error", err=err))
-            await ctx.bot.get_cog('Errors').on_error(err, ctx)
+            self.bot.dispatch("error", err, ctx)
 
     @rss_main.command(name="test")
     @commands.check(checks.is_support_staff)
@@ -1290,8 +1290,7 @@ class Rss(commands.Cog):
                     statscog.rss_stats['messages'] += 1
         except discord.HTTPException as err:
             self.bot.log.info(f"[send_rss_msg] Cannot send message on channel {channel.id}: {err}")
-            await self.bot.get_cog("Errors").on_error(err)
-            await self.bot.get_cog("Errors").senf_err_msg(str(t.to_dict()) if hasattr(t, "to_dict") else str(t))
+            self.bot.dispatch("error", err)
         except Exception as err:
             self.bot.log.info(f"[send_rss_msg] Cannot send message on channel {channel.id}: {err}")
 
@@ -1496,7 +1495,7 @@ class Rss(commands.Cog):
             emb.set_author(name=self.bot.user, icon_url=self.bot.user.display_avatar)
             await self.bot.send_embed(emb)
         except Exception as err:
-            await self.bot.get_cog("Errors").on_error(err,None)
+            self.bot.dispatch("error", err)
 
 
 async def setup(bot):

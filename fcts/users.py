@@ -32,7 +32,7 @@ class Users(commands.Cog):
                 return False
             parameters = await get_data(criters=["userID="+str(user.id)], columns=['user_flags'])
         except Exception as err:
-            await self.bot.get_cog("Errors").on_error(err, None)
+            self.bot.dispatch("error", err)
         if parameters is None:
             return []
         return UserFlag().int_to_flags(parameters['user_flags'])
@@ -55,7 +55,7 @@ class Users(commands.Cog):
                 return []
             parameters = await get_data(criters=["userID="+str(user.id)], columns=['rankcards_unlocked'])
         except Exception as err:
-            await self.bot.get_cog("Errors").on_error(err, None)
+            self.bot.dispatch("error", err)
         if parameters is None:
             return []
         return RankCardsFlag().int_to_flags(parameters['rankcards_unlocked'])
@@ -94,7 +94,7 @@ class Users(commands.Cog):
             async with self.bot.db_query(query, astuple=True) as query_results:
                 result = {x[0]: x[1] for x in query_results}
         except Exception as err:
-            await self.bot.get_cog("Errors").on_error(err, None)
+            self.bot.dispatch("error", err)
             return {}
         if '' in result:
             result['default'] = result.pop('')
@@ -167,7 +167,7 @@ class Users(commands.Cog):
                 try:
                     await self.reload_event_rankcard(ctx.author.id)
                 except Exception as err:
-                    await self.bot.get_cog("Errors").on_error(err, None)
+                    self.bot.dispatch("error", err)
                 await ctx.send(await self.bot._(ctx.channel, 'users.list-cards', cards=available_cards))
             else:
                 await ctx.send(await self.bot._(ctx.channel, 'users.invalid-card', cards=available_cards))

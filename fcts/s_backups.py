@@ -193,7 +193,7 @@ Arguments are:
         except discord.errors.Forbidden:
             pass
         except Exception as err:
-            await ctx.bot.get_cog('Errors').on_error(err,ctx)
+            self.bot.dispatch("error", err, ctx)
         try:
             webs = []
             for w in await g.webhooks():
@@ -207,7 +207,7 @@ Arguments are:
         except discord.errors.Forbidden:
             pass
         except Exception as err:
-            await ctx.bot.get_cog('Errors').on_error(err,ctx)
+            self.bot.dispatch("error", err, ctx)
         back['members'] = []
         for memb in g.members:
             back['members'].append({'id': memb.id,

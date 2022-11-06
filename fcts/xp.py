@@ -288,9 +288,9 @@ class Xp(commands.Cog):
                 if not self.bot.beta:
                     await member.add_roles(r,reason="Role reward (lvl {})".format(role['level']))
                 c += 1
-            except Exception as e:
+            except Exception as err:
                 if self.bot.beta:
-                    await self.bot.get_cog('Errors').on_error(e,None)
+                    self.bot.dispatch("error", err)
         if not remove:
             return c
         for role in [x for x in rr_list if x['level']>level and x['role'] in has_roles]:
@@ -301,9 +301,9 @@ class Xp(commands.Cog):
                 if not self.bot.beta:
                     await member.remove_roles(r,reason="Role reward (lvl {})".format(role['level']))
                 c += 1
-            except Exception as e:
+            except Exception as err:
                 if self.bot.beta:
-                    await self.bot.get_cog('Errors').on_error(e,None)
+                    self.bot.dispatch("error", err)
         return c
     
     async def reload_sus(self):
@@ -370,8 +370,8 @@ class Xp(commands.Cog):
             cnx.commit()
             cursor.close()
             return True
-        except Exception as e:
-            await self.bot.get_cog('Errors').on_error(e,None)
+        except Exception as err:
+            self.bot.dispatch("error", err)
             return False
     
     async def bdd_get_xp(self, userID: int, guild: int):
@@ -402,8 +402,8 @@ class Xp(commands.Cog):
                     self.cache[g][userID] = [round(time.time())-60,liste[0]['xp']]
             cursor.close()
             return liste
-        except Exception as e:
-            await self.bot.get_cog('Errors').on_error(e,None)
+        except Exception as err:
+            self.bot.dispatch("error", err)
     
     async def bdd_get_nber(self, guild: int=None):
         """Get the number of ranked users"""
@@ -428,8 +428,8 @@ class Xp(commands.Cog):
             if liste is not None and len(liste)==1:
                 return liste[0][0]
             return 0
-        except Exception as e:
-            await self.bot.get_cog('Errors').on_error(e,None)
+        except Exception as err:
+            self.bot.dispatch("error", err)
 
     async def bdd_load_cache(self, guild: int):
         try:
@@ -466,8 +466,8 @@ class Xp(commands.Cog):
                     self.cache[guild][l['userID']] = [round(time.time())-60, int(l['xp'])]
             cursor.close()
             return
-        except Exception as e:
-            await self.bot.get_cog('Errors').on_error(e,None)
+        except Exception as err:
+            self.bot.dispatch("error", err)
 
     async def bdd_get_top(self, top: int=None, guild: discord.Guild=None):
         try:
@@ -505,7 +505,7 @@ class Xp(commands.Cog):
             cursor.close()
             return liste
         except Exception as err:
-            await self.bot.get_cog('Errors').on_error(err,None)
+            self.bot.dispatch("error", err)
 
     async def bdd_get_rank(self, userID: int, guild: discord.Guild=None):
         """Get the rank of a user"""
@@ -522,10 +522,10 @@ class Xp(commands.Cog):
             cursor = cnx.cursor(dictionary = True)
             try:
                 cursor.execute(query)
-            except mysql.connector.errors.ProgrammingError as e:
-                if e.errno == 1146:
+            except mysql.connector.errors.ProgrammingError as err:
+                if err.errno == 1146:
                     return {"rank":0, "xp":0}
-                raise e
+                raise err
             userdata = dict()
             i = 0
             users = list()
@@ -541,8 +541,8 @@ class Xp(commands.Cog):
                     break
             cursor.close()
             return userdata
-        except Exception as e:
-            await self.bot.get_cog('Errors').on_error(e,None)
+        except Exception as err:
+            self.bot.dispatch("error", err)
 
     async def bdd_total_xp(self):
         """Get the total number of earned xp"""
@@ -565,8 +565,8 @@ class Xp(commands.Cog):
             #         result += round(res[0][0])
             # cursor.close()
             return result
-        except Exception as e:
-            await self.bot.get_cog('Errors').on_error(e,None)
+        except Exception as err:
+            self.bot.dispatch("error", err)
 
 
     async def get_raw_image(self, url:str):
@@ -753,8 +753,8 @@ class Xp(commands.Cog):
                 await self.send_embed(ctx,user,xp,rank,ranks_nb,levels_info,xp_used_type)
             else:
                 await self.send_txt(ctx,user,xp,rank,ranks_nb,levels_info,xp_used_type)
-        except Exception as e:
-            await self.bot.get_cog('Errors').on_command_error(ctx,e)
+        except Exception as err:
+            self.bot.dispatch("command_error", ctx, err)
 
     async def send_card(self, ctx: MyContext, user: discord.User, xp, rank, ranks_nb, used_system, levels_info=None):
         try:
@@ -773,8 +773,8 @@ class Xp(commands.Cog):
             if UsersCog := self.bot.get_cog("Users"):
                 try:
                     await UsersCog.used_rank(user.id)
-                except Exception as e:
-                    await self.bot.get_cog("Errors").on_error(e, ctx)
+                except Exception as err:
+                    self.bot.dispatch("error", err, ctx)
             if statsCog := self.bot.get_cog("BotStats"):
                 statsCog.xp_cards["generated"] += 1
         try:
@@ -939,9 +939,9 @@ class Xp(commands.Cog):
             prev_xp = await self.get_xp(user, None if xp_used_type == 0 else ctx.guild.id)
             await self.bdd_set_xp(user.id, xp, Type='set', guild=ctx.guild.id)
             await ctx.send(await self.bot._(ctx.guild.id, "xp.change-xp-ok", user=str(user), xp=xp))
-        except Exception as e:
+        except Exception as err:
             await ctx.send(await self.bot._(ctx.guild.id, "minecraft.serv-error"))
-            await self.bot.get_cog('Errors').on_error(e,ctx)
+            self.bot.dispatch("error", err, ctx)
         else:
             if ctx.guild.id not in self.cache.keys():
                 await self.bdd_load_cache(ctx.guild.id)
@@ -1010,8 +1010,8 @@ class Xp(commands.Cog):
             if len(l) >= max_rr:
                 return await ctx.send(await self.bot._(ctx.guild.id, "xp.too-many-rr", c=len(l)))
             await self.rr_add_role(ctx.guild.id,role.id,level)
-        except Exception as e:
-            await self.bot.get_cog('Errors').on_command_error(ctx,e)
+        except Exception as err:
+            self.bot.dispatch("command_error", ctx, err)
         else:
             await ctx.send(await self.bot._(ctx.guild.id, "xp.rr-added", role=role.name,level=level))
 
@@ -1023,8 +1023,8 @@ class Xp(commands.Cog):
         ..Doc server.html#roles-rewards"""
         try:
             l = await self.rr_list_role(ctx.guild.id)
-        except Exception as e:
-            await self.bot.get_cog('Errors').on_command_error(ctx,e)
+        except Exception as err:
+            self.bot.dispatch("command_error", ctx, err)
         else:
             des = '\n'.join(["• <@&{}> : lvl {}".format(x['role'], x['level']) for x in l])
             max_rr = await self.bot.get_config(ctx.guild.id,'rr_max_number')
@@ -1048,8 +1048,8 @@ class Xp(commands.Cog):
             if len(l) == 0:
                 return await ctx.send(await self.bot._(ctx.guild.id, "xp.no-rr"))
             await self.rr_remove_role(l[0]['ID'])
-        except Exception as e:
-            await self.bot.get_cog('Errors').on_command_error(ctx,e)
+        except Exception as err:
+            self.bot.dispatch("command_error", ctx, err)
         else:
             await ctx.send(await self.bot._(ctx.guild.id, "xp.rr-removed", level=level))
 
@@ -1077,8 +1077,8 @@ class Xp(commands.Cog):
                     level = (await self.calc_level(member['xp'], used_system))[0]
                     c += await self.give_rr(m, level, rr_list, remove=True)
             await ctx.send(await self.bot._(ctx.guild.id, "xp.rr-reload", role_count=c,member_count=ctx.guild.member_count))
-        except Exception as e:
-            await self.bot.get_cog('Errors').on_command_error(ctx,e)
+        except Exception as err:
+            self.bot.dispatch("command_error", ctx, err)
 
 
 async def setup(bot: Zbot):
