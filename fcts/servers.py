@@ -370,8 +370,8 @@ class Servers(commands.Cog):
             else:
                 await ctx.send(await self.bot._(ctx.guild.id, "server.option-notfound"))
                 return
-        except Exception as e:
-            await self.bot.get_cog("Errors").on_error(e,ctx)
+        except Exception as err:
+            self.bot.dispatch("error", err, ctx)
             await ctx.send(await self.bot._(ctx.guild.id, "server.internal-error"))
 
     async def sconfig_del2(self, ctx: MyContext, option: str):
@@ -391,7 +391,7 @@ class Servers(commands.Cog):
         except ValueError:
             await ctx.send(await self.bot._(ctx.guild.id, "server.option-notfound"))
         except Exception as err:
-            await self.bot.get_cog("Errors").on_error(err,ctx)
+            self.bot.dispatch("error", err, ctx)
             await ctx.send(await self.bot._(ctx.guild.id, "server.internal-error"))
 
     async def send_embed(self, guild: discord.Guild, option: str, value: str):
@@ -1067,7 +1067,7 @@ class Servers(commands.Cog):
             if r is not None:
                 try:
                     r = await self.bot._(channel, f"server.server_desc.{option}", value=r)
-                except Exception as e:
+                except Exception as err:
                     pass
             else:
                 r = await self.bot._(channel, "server.option-notfound")
@@ -1084,8 +1084,8 @@ class Servers(commands.Cog):
                 if isinstance(ctx, commands.Context):
                     embed.set_footer(text=ctx.author, icon_url=ctx.author.display_avatar)
                 await channel.send(embed=embed)
-            except Exception as e:
-                await self.bot.get_cog('Errors').on_error(e,ctx if isinstance(ctx, commands.Context) else None)
+            except Exception as err:
+                self.bot.dispatch("error", err, ctx if isinstance(ctx, commands.Context) else None)
 
 
     @sconfig_main.command(name="reset-guild")

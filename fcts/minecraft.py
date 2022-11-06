@@ -108,7 +108,7 @@ Every information come from the website www.fr-minecraft.net"""
         try:
             await ctx.send(embed=embed)
         except discord.DiscordException as err:
-            await self.bot.get_cog('Errors').on_error(err, ctx)
+            self.bot.dispatch("error", err, ctx)
             await ctx.send(await self.bot._(ctx.channel, "minecraft.serv-error"))
 
     @mc_main.command(name="block", aliases=["bloc"])
@@ -426,7 +426,7 @@ Every information come from the website www.fr-minecraft.net"""
             await ctx.send(await self.bot._(ctx.guild, "minecraft.success-add", ip=display_ip, channel=ctx.channel.mention))
         except Exception as err:
             await ctx.send(await self.bot._(ctx.guild, "rss.fail-add"))
-            await self.bot.get_cog("Errors").on_error(err, ctx)
+            self.bot.dispatch("error", err, ctx)
 
     async def create_server_1(self, guild: discord.Guild, ip: str, port=None) -> Union[str, 'MCServer']:
         "Collect and serialize server data from a given IP, using minetools.eu"
@@ -482,10 +482,10 @@ Every information come from the website www.fr-minecraft.net"""
             try:
                 r = requests.get("https://api.mcsrvstat.us/1/" +
                                  str(ip), timeout=5).json()
-            except Exception as e:
-                if not isinstance(e, requests.exceptions.ReadTimeout):
+            except Exception as err:
+                if not isinstance(err, requests.exceptions.ReadTimeout):
                     self.bot.log.error("[mc-server-2] Erreur sur l'url {} :".format(url))
-                await self.bot.get_cog('Errors').on_error(e, None)
+                self.bot.dispatch("error", err)
                 return await self.bot._(guild, "minecraft.serv-error")
         if r["debug"]["ping"] is False:
             return await self.bot._(guild, "minecraft.no-ping")
@@ -645,7 +645,7 @@ Every information come from the website www.fr-minecraft.net"""
                 statscog.rss_stats['messages'] += 1
             return True
         except Exception as err:
-            await self.bot.get_cog('Errors').on_error(err, None)
+            self.bot.dispatch("error", err)
 
 
 async def setup(bot):

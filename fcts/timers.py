@@ -113,7 +113,7 @@ class Timers(commands.Cog):
             d = {'msg_url': ctx.message.jump_url}
             await ctx.bot.task_handler.add_task("timer", duration, ctx.author.id, ctx.guild.id if ctx.guild else None, ctx.channel.id, message, data=d)
         except Exception as err:
-            await ctx.bot.get_cog("Errors").on_command_error(ctx, err)
+            self.bot.dispatch("command_error", ctx, err)
         else:
             await ctx.send(await self.bot._(ctx.channel, "timers.rmd.saved", duration=f_duration))
 

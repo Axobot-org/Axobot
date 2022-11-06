@@ -142,8 +142,8 @@ class RolesReact(commands.Cog):
             if len(l) >= max_rr:
                 return await ctx.send(await self.bot._(ctx.guild.id, "roles_react.too-many-rr", l=max_rr))
             await self.rr_add_role(ctx.guild.id, role.id, emoji, description[:150])
-        except Exception as e:
-            await self.bot.get_cog('Errors').on_command_error(ctx, e)
+        except Exception as err:
+            self.bot.dispatch("command_error", ctx, err)
         else:
             await ctx.send(await self.bot._(ctx.guild.id, "roles_react.rr-added", r=role.name, e=emoji))
             self.guilds_which_have_roles.add(ctx.guild.id)
@@ -153,9 +153,9 @@ class RolesReact(commands.Cog):
     @commands.check(checks.has_manage_guild)
     async def rr_remove(self, ctx, emoji):
         """Remove a role react
-        
+
         ..Example roles_react remove :uwu:
-        
+
         ..Doc roles-reactions.html#add-and-remove-a-reaction"""
         try:
             # if emoji is a custom one:
@@ -167,8 +167,8 @@ class RolesReact(commands.Cog):
             if len(l) == 0:
                 return await ctx.send(await self.bot._(ctx.guild.id, "roles_react.no-rr"))
             await self.rr_remove_role(l[0]['ID'])
-        except Exception as e:
-            await self.bot.get_cog('Errors').on_command_error(ctx, e)
+        except Exception as err:
+            self.bot.dispatch("command_error", ctx, err)
         else:
             role = ctx.guild.get_role(l[0]['role'])
             if role is None:
@@ -214,7 +214,7 @@ class RolesReact(commands.Cog):
         try:
             roles_list = await self.rr_list_role(ctx.guild.id)
         except Exception as err:
-            await self.bot.get_cog('Errors').on_command_error(ctx, err)
+            self.bot.dispatch("command_error", ctx, err)
         else:
             des, _ = await self.create_list_embed(roles_list, ctx.guild)
             max_rr = await self.bot.get_config(ctx.guild.id, 'roles_react_max_number')
@@ -235,7 +235,7 @@ It will only display the whole message with reactions. Still very cool tho
         try:
             roles_list = await self.rr_list_role(ctx.guild.id)
         except Exception as err:
-            await self.bot.get_cog('Errors').on_command_error(ctx, err)
+            self.bot.dispatch("command_error", ctx, err)
         else:
             des, emojis = await self.create_list_embed(roles_list, ctx.guild)
             title = await self.bot._(ctx.guild.id, "roles_react.rr-embed")
@@ -301,7 +301,7 @@ Opposite is the subcommand 'join'
         except discord.errors.Forbidden:
             pass
         except Exception as err:
-            await self.bot.get_cog('Errors').on_error(err, None)
+            self.bot.dispatch("error", err)
         else:
             if not ignore_success:
                 await channel.send(await self.bot._(guild.id, "roles_react.role-given" if give else "roles_react.role-lost", r=role.name))
@@ -328,7 +328,7 @@ Opposite is the subcommand 'join'
         try:
             full_list: dict[str, dict[str, Any]] = {x['emoji']: x for x in await self.rr_list_role(ctx.guild.id)}
         except Exception as err:
-            return await self.bot.get_cog('Errors').on_command_error(ctx, err)
+            return self.bot.dispatch("command_error", ctx, err)
         if emojis is not None:
             emojis_ids: list[str] = [str(x.id) if isinstance(x, discord.Emoji)
                       else str(x) for x in emojis]

@@ -162,8 +162,8 @@ class Events(commands.Cog):
                 await self.bot.get_cog('Fun').check_suggestion(msg)
             except KeyError:
                 pass
-            except Exception as e:
-                await self.bot.get_cog('Errors').on_error(e,msg)
+            except Exception as err:
+                self.bot.dispatch("error", err, msg)
             await self.bot.get_cog('Fun').check_afk(msg)
         if msg.author != self.bot.user:
             await self.bot.get_cog('Info').emoji_analysis(msg)
@@ -256,7 +256,7 @@ class Events(commands.Cog):
                 return
             channel = guild.get_channel(int(config))
         except Exception as err:
-            await self.bot.get_cog("Errors").on_error(err,None)
+            self.bot.dispatch("error", err)
             return
         if channel is None:
             return
@@ -335,7 +335,7 @@ class Events(commands.Cog):
                 await self.bot.get_cog('Servers').update_everyMembercounter()
                 self.last_membercounter = now
         except Exception as err:
-            await self.bot.get_cog('Errors').on_error(err,None)
+            self.bot.dispatch("error", err)
             self.loop_errors[0] += 1
             if (datetime.datetime.now() - self.loop_errors[1]).total_seconds() > 120:
                 self.loop_errors[0] = 0
@@ -437,7 +437,7 @@ class Events(commands.Cog):
                 count[0] += 1
                 count[1] += await self.bot.get_cog('Partners').update_partners(chan,guild['partner_color'])
             except Exception as err:
-                await self.bot.get_cog('Errors').on_error(err,None)
+                self.bot.dispatch("error", err)
         delta_time = round(time.time()-t,3)
         emb = discord.Embed(
             description=f'**Partners channels updated** in {delta_time}s ({count[0]} channels - {count[1]} partners)',

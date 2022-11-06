@@ -156,8 +156,8 @@ class Utilities(commands.Cog):
             async with self.bot.db_query(query, {'u': user_id, 'v': value}):
                 pass
             return True
-        except Exception as e:
-            await self.bot.get_cog('Errors').on_error(e, None)
+        except Exception as err:
+            self.bot.dispatch("error", err)
             return False
 
     async def get_number_premium(self):
@@ -165,15 +165,15 @@ class Utilities(commands.Cog):
         try:
             params = await self.get_db_userinfo(criters=['Premium=1'])
             return len(params)
-        except Exception as e:
-            await self.bot.get_cog('Errors').on_error(e, None)
+        except Exception as err:
+            self.bot.dispatch("error", err)
 
     async def get_xp_style(self, user: discord.User) -> str:
         parameters = None
         try:
             parameters = await self.get_db_userinfo(criters=["userID="+str(user.id)], columns=['xp_style'])
-        except Exception as e:
-            await self.bot.get_cog("Errors").on_error(e, None)
+        except Exception as err:
+            self.bot.dispatch("error", err)
         if parameters is None or parameters['xp_style'] == '':
             return 'dark'
         return parameters['xp_style']
@@ -239,10 +239,10 @@ class Utilities(commands.Cog):
             try:
                 await self.bot.get_cog("Users").reload_event_rankcard(user_id)
             except Exception as err:
-                await self.bot.get_cog("Errors").on_error(err, None)
+                self.bot.dispatch("error", err)
             return True
         except Exception as err:
-            await self.bot.get_cog('Errors').on_error(err, None)
+            self.bot.dispatch("error", err)
             return False
 
     async def get_eventsPoints_rank(self, user_id: int):
@@ -279,7 +279,7 @@ class Utilities(commands.Cog):
                     if json["voted"]:
                         votes.append(("Discord Bots List", "https://top.gg/"))
             except Exception as err:
-                await self.bot.get_cog("Errors").on_error(err, None)
+                self.bot.dispatch("error", err)
         return votes
 
 

@@ -421,7 +421,7 @@ class Admin(commands.Cog):
             length = max(len(result[0]) for result in query_results)
             txt = "\n".join(f"{result[0]:>{length}}: {result[1]} MB" for result in query_results if result[1] is not None)
         await ctx.send("```yaml\n" + txt + "\n```")
-    
+
     @acached(timeout=3600)
     async def get_databases_names(self) -> list[str]:
         "Get every database names visible for Zbot"
@@ -432,6 +432,7 @@ class Admin(commands.Cog):
 
     @db_biggest.autocomplete("database")
     async def db_biggest_autocompl(self, interaction: discord.Interaction, current: str):
+        "Autocompletion for the database name"
         databases = await self.get_databases_names()
         return [
             discord.app_commands.Choice(name=db, value=db)
@@ -458,7 +459,7 @@ class Admin(commands.Cog):
                 msg = await user.dm_channel.send("{} La procédure d'urgence vient d'être activée. Si vous souhaitez l'annuler, veuillez cliquer sur la réaction ci-dessous dans les {} secondes qui suivent l'envoi de ce message.".format(self.bot.emojis_manager.customs['red_warning'], time))
                 await msg.add_reaction('🛑')
             except Exception as err:
-                await self.bot.get_cog('Errors').on_error(err, "Emergency command")
+                self.bot.dispatch("error", err, "Emergency command")
 
         def check(_, user: discord.User):
             return user.id in checks.admins_id
@@ -486,7 +487,7 @@ class Admin(commands.Cog):
                 user = self.bot.get_user(x)
                 await user.send("La procédure a été annulée !")
             except Exception as err:
-                await self.bot.get_cog('Errors').on_error(err,None)
+                self.bot.dispatch("error", err, None)
         return "Qui a appuyé sur le bouton rouge ? :thinking:"
 
     @main_msg.command(name="ignore")
@@ -863,19 +864,19 @@ Cette option affecte tous les serveurs"""
         stdout = io.StringIO()
         try:
             to_compile = f'async def func():\n{textwrap.indent(body, "  ")}'
-        except Exception as e:
-            await self.bot.get_cog('Errors').on_error(e,ctx)
+        except Exception as err:
+            self.bot.dispatch("error", err, ctx)
             return
         try:
             exec(to_compile, env) # pylint: disable=exec-used
-        except Exception as e:
-            return await ctx.send(f'```py\n{e.__class__.__name__}: {e}\n```')
+        except Exception as err:
+            return await ctx.send(f'```py\n{err.__class__.__name__}: {err}\n```')
 
         func = env['func']
         try:
             with redirect_stdout(stdout):
                 ret = await func()
-        except Exception as e:
+        except Exception as err:
             value = stdout.getvalue()
             await ctx.send(f'```py\n{value}{traceback.format_exc()[:1990]}\n```')
         else:

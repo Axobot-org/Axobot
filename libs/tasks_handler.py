@@ -36,7 +36,7 @@ class TaskHandler:
                             events.append(row)
             return events
         except Exception as err:  # pylint: disable=broad-except
-            await self.bot.get_cog('Errors').on_error(err, None)
+            self.bot.dispatch("error", err)
             return []
 
     async def check_tasks(self):
@@ -61,7 +61,7 @@ class TaskHandler:
                         continue
                     await self.remove_task(task['ID'])
                 except Exception as err:  # pylint: disable=broad-except
-                    await self.bot.get_cog('Errors').on_error(err, None)
+                    self.bot.dispatch("error", err)
                     self.bot.log.error("[unmute_task] Impossible d'unmute automatiquement : %s", err)
             if task['action'] == 'ban':
                 try:
@@ -77,7 +77,7 @@ class TaskHandler:
                 except discord.errors.NotFound:
                     await self.remove_task(task['ID'])
                 except Exception as err:  # pylint: disable=broad-except
-                    await self.bot.get_cog('Errors').on_error(err, None)
+                    self.bot.dispatch("error", err)
                     self.bot.log.error("[unban_task] Impossible d'unban automatiquement : %s", err)
             if task['action'] == "timer":
                 try:
@@ -85,7 +85,7 @@ class TaskHandler:
                 except discord.errors.NotFound:
                     await self.remove_task(task['ID'])
                 except Exception as err:  # pylint: disable=broad-except
-                    await self.bot.get_cog('Errors').on_error(err, None)
+                    self.bot.dispatch("error", err)
                     self.bot.log.error("[timer_task] Impossible d'envoyer un timer : %s", err)
                 else:
                     if sent:
@@ -191,4 +191,4 @@ class TaskHandler:
             async with self.bot.db_query(query, (guild_id, user_id, self.bot.beta)):
                 pass
         except Exception as err:  # pylint: disable=broad-except
-            await self.bot.get_cog('Errors').on_error(err, None)
+            self.bot.dispatch("error", err)
