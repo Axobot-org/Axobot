@@ -30,7 +30,10 @@
     "doc": "Documentation",
     "duration": "durée",
     "end": "fin",
-    "example": "exemple",
+    "example": {
+        "one": "exemple",
+        "other": "exemples"
+    },
     "extreme": "extrême",
     "ghost": "Fantôme",
     "high": "élevé",
