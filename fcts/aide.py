@@ -1,12 +1,15 @@
 import copy
 import inspect
 import json
-from typing import List
+from typing import List, Optional, TypedDict
 
 import discord
 from discord.ext import commands
 from libs.bot_classes import MyContext, Zbot
 
+class CommandsCategoryData(TypedDict):
+    emoji: str
+    commands: list[str]
 
 class Help(commands.Cog):
 
@@ -17,7 +20,7 @@ class Help(commands.Cog):
         self.help_color = 8311585
         self.help_color_DM = 14090153
         with open('fcts/help.json', 'r', encoding="utf-8") as file:
-            self.commands_list = json.load(file)
+            self.commands_data: dict[str, CommandsCategoryData] = json.load(file)
     
     @property
     def doc_url(self):
@@ -80,7 +83,7 @@ Enable "Embed Links" permission for better rendering
             else:
                 await self._default_help_command(ctx, args)
 
-    async def help_command(self, ctx: MyContext, commands=()):
+    async def help_command(self, ctx: MyContext, commands: Optional[list[str]] = None):
         """Main command for the creation of the help message
 If the bot can't send the new command format, it will try to send the old one."""
         async with ctx.channel.typing():
@@ -96,25 +99,31 @@ If the bot can't send the new command format, it will try to send the old one.""
                 await ctx.message.author.create_dm()
                 destination = ctx.message.author.dm_channel
 
-            me = destination.me if isinstance(destination, discord.DMChannel) else destination.guild.me
+            bot_usr = destination.me if isinstance(destination, discord.DMChannel) else destination.guild.me
             title = ""
 
-            if " ".join(commands).lower() in self.commands_list.keys():
+            if commands is not None and " ".join(commands).lower() in self.commands_data:
                 categ_name = [" ".join(commands).lower()]
             else:
-                translated_categories = {k: await self.bot._(ctx.channel, f"help.categories.{k}") for k in self.commands_list.keys()}
-                categ_name = [k for k, v in translated_categories.items() if v.lower() == " ".join(commands).lower()]
+                translated_categories = {
+                    k: await self.bot._(ctx.channel, f"help.categories.{k}")
+                    for k in self.commands_data.keys()
+                }
+                if commands is None:
+                    categ_name = []
+                else:
+                    categ_name = [k for k, v in translated_categories.items() if v.lower() == " ".join(commands).lower()]
 
             if len(categ_name) == 1: # cog name
                 if categ_name[0] == "unclassed":
-                    referenced_commands = {x for v in self.commands_list.values() for x in v}
+                    referenced_commands = {x for v in self.commands_data.values() for x in v['commands']}
                     temp = [c for c in self.bot.commands if c.name not in referenced_commands]
                 else:
-                    temp = [c for c in self.bot.commands if c.name in self.commands_list[categ_name[0]]]
+                    temp = [c for c in self.bot.commands if c.name in self.commands_data[categ_name[0]]['commands']]
                 pages = await self.all_commands(ctx, sorted(temp, key=self.sort_by_name))
                 if len(pages) == 0 and ctx.guild is None:
                     pages = [await self.bot._(ctx.channel, "help.cog-empty-dm")]
-            elif len(commands) == 0:  # no command
+            elif not commands:  # no command
                 compress = await self.bot.get_config(ctx.guild, 'compress_help')
                 pages = await self.all_commands(ctx, sorted([c for c in self.bot.commands], key=self.sort_by_name), compress=compress)
                 if ctx.guild is None:
@@ -135,7 +144,7 @@ If the bot can't send the new command format, it will try to send the old one.""
                         name = await discord.ext.commands.clean_content().convert(ctx2, name)
                         await destination.send(await self.bot._(ctx.channel, "help.cmd-not-found", cmd=name))
                         return
-                    pages = await self.cmd_help(ctx, command, destination.permissions_for(me).embed_links)
+                    pages = await self.cmd_help(ctx, command, destination.permissions_for(bot_usr).embed_links)
             else:  # sub-command name?
                 name = commands[0]
                 command = self.bot.all_commands.get(name)
@@ -151,7 +160,7 @@ If the bot can't send the new command format, it will try to send the old one.""
                     except AttributeError:
                         await destination.send(await self.bot._(ctx.channel, "help.no-subcmd", cmd=command.name))
                         return
-                pages = await self.cmd_help(ctx, command, destination.permissions_for(me).embed_links)
+                pages = await self.cmd_help(ctx, command, destination.permissions_for(bot_usr).embed_links)
 
             ft = await self.bot._(ctx.channel, "help.footer")
             prefix = await self.bot.prefix_manager.get_prefix(ctx.guild)
@@ -159,7 +168,7 @@ If the bot can't send the new command format, it will try to send the old one.""
             self.bot.dispatch("error", ValueError(f"Unable to find help for the command {' '.join(commands)}"))
             await destination.send(await self.bot._(ctx.channel, "help.cmd-not-found", cmd=" ".join(commands)))
             return
-        if destination.permissions_for(me).embed_links:
+        if destination.permissions_for(bot_usr).embed_links:
             if ctx.guild is not None:
                 embed_colour = ctx.guild.me.color if ctx.guild.me.color != discord.Colour.default() else discord.Colour(self.help_color)
             else:
@@ -194,7 +203,7 @@ If the bot can't send the new command format, it will try to send the old one.""
 
     async def all_commands(self, ctx: MyContext, cmds: List[commands.Command], compress: bool = False):
         """Create pages for every bot command"""
-        categories = {x: [] for x in self.commands_list.keys()}
+        categories = {x: [] for x in self.commands_data.keys()}
         for cmd in cmds:
             try:
                 if cmd.hidden or not cmd.enabled:
@@ -205,8 +214,8 @@ If the bot can't send the new command format, it will try to send the old one.""
                 continue
             temp = await self.display_cmd(cmd)
             found = False
-            for k, values in self.commands_list.items():
-                if cmd.name in values:
+            for k, values in self.commands_data.items():
+                if cmd.name in values['commands']:
                     categories[k].append(temp)
                     found = True
                     break
@@ -218,10 +227,11 @@ If the bot can't send the new command format, it will try to send the old one.""
             for k, values in categories.items():
                 if len(values) == 0:
                     continue
-                tr = await self.bot._(ctx.channel, f"help.categories.{k}")
-                title = "__**"+tr.capitalize()+"**__"
+                tr_name = await self.bot._(ctx.channel, f"help.categories.{k}")
+                emoji = self.commands_data[k]['emoji']
+                title = f"{emoji}  __**{tr_name.capitalize()}**__"
                 count = await self.bot._(ctx.channel, "help.cmd-count",
-                                         nbr=len(values),
+                                         count=len(values),
                                          p=prefix,
                                          cog=k)
                 answer.append((title, count))
@@ -229,23 +239,24 @@ If the bot can't send the new command format, it will try to send the old one.""
             for k, values in categories.items():
                 if len(values) == 0:
                     continue
-                tr = await self.bot._(ctx.channel, f"help.categories.{k}")
+                emoji = self.commands_data[k]['emoji']
+                tr_name = await self.bot._(ctx.channel, f"help.categories.{k}")
                 if len("\n".join(values)) > 1020:
                     temp = list(values)
                     values = []
                     i = 1
                     for line in temp:
                         if len("\n".join(values+[line])) > 1020:
-                            title = (tr+' - ' + str(i)) if 'help.' not in tr else (k+' - '+str(i))
-                            answer.append(("__**"+title.capitalize()+"**__", "\n".join(values)))
+                            title = (tr_name+' - ' + str(i)) if 'help.' not in tr_name else (k+' - '+str(i))
+                            answer.append((f"{emoji}  __**{title.capitalize()}**__", "\n".join(values)))
                             values.clear()
                             i += 1
                         values.append(line)
-                    title = (tr+' - ' + str(i)) if 'help.' not in tr else (k+' - '+str(i))
-                    answer.append(("__**"+title.capitalize()+"**__", "\n".join(values)))
+                    title = (tr_name+' - ' + str(i)) if 'help.' not in tr_name else (k+' - '+str(i))
+                    answer.append((f"{emoji}  __**{title.capitalize()}**__", "\n".join(values)))
                 else:
-                    title = tr
-                    answer.append(("__**"+title.capitalize()+"**__", "\n".join(values)))
+                    title = tr_name
+                    answer.append((f"{emoji}  __**{title.capitalize()}**__", "\n".join(values)))
         return answer
 
     async def cog_commands(self, ctx: MyContext, cog: commands.Cog):
@@ -348,26 +359,31 @@ If the bot can't send the new command format, it will try to send the old one.""
                             pass_check = False
                         if pass_check:
                             checks.append(
-                                ":small_blue_diamond: "+check_msg_tr[0])
+                                "✅ "+check_msg_tr[0])
                         else:
                             checks.append('❌ '+check_msg_tr[1])
                     else:
-                        self.bot.log.warning(f"No description for help check {check_name} ({c})")
+                        self.bot.dispatch("error", ValueError(f"No description for help check {check_name} ({c})"))
                 except Exception as err:
                     self.bot.dispatch("error", err, f"While checking {c} in help")
         # Module
         category = "unclassed"
-        for k, v in self.commands_list.items():
-            if cmd.name in v or cmd.full_parent_name in v:
-                category = k
+        for key, data in self.commands_data.items():
+            categ_commands = data['commands']
+            if cmd.name in categ_commands or cmd.full_parent_name in categ_commands:
+                category = key
                 break
-        category = (await self.bot._(ctx.channel, f"help.categories.{category}")).capitalize()
+        emoji = self.commands_data[category]['emoji']
+        category = emoji + "  " + (await self.bot._(ctx.channel, f"help.categories.{category}")).capitalize()
         if use_embed:
             answer = []
             answer.append([f"**{prefix}{syntax}"])
             answer.append((await self.bot._(ctx.channel, 'help.description'), desc))
             if example is not None:
-                answer.append(((await self.bot._(ctx.channel, 'misc.example')).capitalize(), "\n".join(example)))
+                answer.append((
+                    (await self.bot._(ctx.channel, 'misc.example', count=len(example))).capitalize(),
+                    "\n".join(example)
+                ))
             if len(subcmds) > 0:
                 answer.append((await self.bot._(ctx.channel, 'help.subcmds'), subcmds))
             if len(cmd.aliases) > 0:
@@ -386,7 +402,9 @@ If the bot can't send the new command format, it will try to send the old one.""
         else:
             answer = f"**{prefix}{syntax}\n\n{desc}\n\n"
             if example is not None:
-                answer += "\n__"+(await self.bot._(ctx.channel, 'misc.example')).capitalize()+"__\n"+"\n".join(example)+"\n"
+                title = (await self.bot._(ctx.channel, 'misc.example', count=len(example))).capitalize()
+                f_examples = '\n'.join(example)
+                answer += f"\n__{title}__\n{f_examples}\n"
             if len(subcmds) > 0:
                 answer += "\n"+subcmds+"\n"
             if len(cmd.aliases) > 0:
@@ -403,17 +421,17 @@ If the bot can't send the new command format, it will try to send the old one.""
             return [answer]
 
     async def _default_help_command(self, ctx: MyContext, command: str = None):
-        truc = commands.DefaultHelpCommand()
-        truc.context = ctx
-        truc._command_impl = self.help_cmd
+        default_help = commands.DefaultHelpCommand()
+        default_help.context = ctx
+        default_help._command_impl = self.help_cmd
         # General help
         if command is None:
-            mapping = truc.get_bot_mapping()
-            return await truc.send_bot_help(mapping)
+            mapping = default_help.get_bot_mapping()
+            return await default_help.send_bot_help(mapping)
         # Check if it's a cog
         cog = self.bot.get_cog(" ".join(command))
         if cog is not None:
-            return await truc.send_cog_help(cog)
+            return await default_help.send_cog_help(cog)
         # If it's not a cog then it's a command.
         # Since we want to have detailed errors when someone
         # passes an invalid subcommand, we need to walk through
@@ -422,25 +440,25 @@ If the bot can't send the new command format, it will try to send the old one.""
         keys = command
         cmd = self.bot.all_commands.get(keys[0])
         if cmd is None:
-            string = await maybe_coro(truc.command_not_found, truc.remove_mentions(keys[0]))
-            return await truc.send_error_message(string)
+            string = await maybe_coro(default_help.command_not_found, default_help.remove_mentions(keys[0]))
+            return await default_help.send_error_message(string)
 
         for key in keys[1:]:
             try:
                 found = cmd.all_commands.get(key)
             except AttributeError:
-                string = await maybe_coro(truc.subcommand_not_found, cmd, truc.remove_mentions(key))
-                return await truc.send_error_message(string)
+                string = await maybe_coro(default_help.subcommand_not_found, cmd, default_help.remove_mentions(key))
+                return await default_help.send_error_message(string)
             else:
                 if found is None:
-                    string = await maybe_coro(truc.subcommand_not_found, cmd, truc.remove_mentions(key))
-                    return await truc.send_error_message(string)
+                    string = await maybe_coro(default_help.subcommand_not_found, cmd, default_help.remove_mentions(key))
+                    return await default_help.send_error_message(string)
                 cmd = found
 
         if isinstance(cmd, commands.Group):
-            return await truc.send_group_help(cmd)
+            return await default_help.send_group_help(cmd)
         else:
-            return await truc.send_command_help(cmd)
+            return await default_help.send_command_help(cmd)
 
 
 async def setup(bot):
