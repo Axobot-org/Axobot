@@ -844,7 +844,7 @@ Cette option affecte tous les serveurs"""
             await msg.edit(content=str(result))
 
 
-    @commands.command(name='eval')
+    @commands.command(name='eval', hidden=True)
     @commands.check(checks.is_bot_admin)
     async def _eval(self, ctx: MyContext, *, body: str):
         """Evaluates a code
