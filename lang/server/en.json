@@ -1,5 +1,4 @@
 {
-    "config-help": "This command is mainly used to configure your server. By doing `%{p}config see [option]` you will get an overview of the current configurations, and server administrators can enter `%{p}config change <option> value1, value2...` to modify a configuration, or `%{p}config del <option>` to reset the option (`%{p}config change <option>` works the same way).\nThe list of available options is available at <https://zbot.rtfd.io/en/latest/server.html#list-of-every-option>, but an index without any explanation can be found with the command `%{p}config list`",
     "config-list": "List of available options: %{text}More info at %{link}",
     "deleted-channel": "deleted channel",
     "deleted-role": "deleted role",
@@ -46,6 +45,11 @@
     "not-found": "The server %{guild} has not yet been registered in the database",
     "opt_title": "Option \"%{opt}\" of server %{guild}",
     "option-notfound": "This option does not exist :confused:",
+    "reset-all": {
+        "confirmation": "Are you sure you really want to reset everything? There will be no going back.",
+        "success": "All your configuration has been reset!",
+        "error": "Oops, something went wrong! Please contact our support if the problem persists"
+    },
     "see-0": "Enter `!config help` for more details",
     "see-title": "%{guild} server configuration",
     "server_desc": {
