@@ -22,6 +22,7 @@ if TYPE_CHECKING:
     from fcts.aide import Help
     from fcts.bot_events import BotEvents
     from fcts.bot_stats import BotStats
+    from fcts.cases import Cases
     from fcts.errors import Errors
     from fcts.minecraft import Minecraft
     from fcts.partners import Partners
@@ -149,6 +150,10 @@ class Zbot(commands.bot.AutoShardedBot):
 
     @overload
     def get_cog(self, name: Literal["BotEvents"]) -> Optional["BotEvents"]:
+        ...
+
+    @overload
+    def get_cog(self, name: Literal["Cases"]) -> Optional["Cases"]:
         ...
 
     @overload
