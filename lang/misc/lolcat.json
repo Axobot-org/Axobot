@@ -30,7 +30,10 @@
     "doc": "Doc",
     "duration": "how long",
     "end": "end",
-    "example": "example",
+    "example": {
+        "one": "exmple",
+        "other": "exmples"
+    },
     "extreme": "Xtrem",
     "ghost": "Goast",
     "high": "high",
