@@ -646,7 +646,7 @@ The 'days_to_delete' option represents the number of days worth of messages to d
                         return
                     del backup
                 else:
-                    await ctx.send(ctx.guild.id, "errors.usernotfound", u=user)
+                    await ctx.send(await self.bot._(ctx.guild.id, "errors.usernotfound", u=user))
                     return
             if not ctx.channel.permissions_for(ctx.guild.me).ban_members:
                 await ctx.send(await self.bot._(ctx.guild.id, "moderation.ban.cant-ban"))
