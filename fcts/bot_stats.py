@@ -223,6 +223,17 @@ class BotStats(commands.Cog):
         async with self.bot.db_query(query, (now, *args)) as _:
             pass
 
+    async def db_get_antiscam_enabled_count(self):
+        "Get the number of active guilds where antiscam is enabled"
+        table = "servers_beta" if self.bot.beta else "servers"
+        query = f"SELECT `ID` FROM `{table}` WHERE `anti_scam` = 1"
+        count = 0
+        async with self.bot.db_query(query) as query_results:
+            for row in query_results:
+                if row["ID"] in self.bot.guilds:
+                    count += 1
+        return count
+
     @tasks.loop(minutes=1)
     async def sql_loop(self):
         """Send our stats every minute"""
@@ -277,6 +288,8 @@ class BotStats(commands.Cog):
             if self.antiscam["deletion"]:
                 cursor.execute(query, (now, 'antiscam.deletion', self.antiscam["deletion"], 0, 'deletion/min', True, self.bot.beta))
             self.antiscam["warning"] = self.antiscam["deletion"] = 0
+            # antiscam activated count
+            cursor.execute(query, (now, 'antiscam.activated', await self.db_get_antiscam_enabled_count(), 0, 'guilds', False, self.bot.beta))
             # tickets creation
             if self.ticket_events["creation"]:
                 cursor.execute(query, (now, 'tickets.creation', self.ticket_events["creation"], 0, 'tickets/min', True, self.bot.beta))
