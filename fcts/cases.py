@@ -121,7 +121,7 @@ class Cases(commands.Cog):
     async def delete_case(self, case_id: int):
         """delete a case from the db"""
         if not self.bot.database_online:
-            return None
+            return False
         if not isinstance(case_id, int):
             raise ValueError
         query = ("DELETE FROM `{}` WHERE `ID`='{}'".format(self.table, case_id))
@@ -132,7 +132,7 @@ class Cases(commands.Cog):
     async def add_case(self, case):
         """add a new case to the db"""
         if not self.bot.database_online:
-            return None
+            return False
         if not isinstance(case, Case):
             raise ValueError
         query = "INSERT INTO `{}` (`guild`, `user`, `type`, `mod`, `reason`,`duration`) VALUES (%(g)s, %(u)s, %(t)s, %(m)s, %(r)s, %(d)s)".format(self.table)
