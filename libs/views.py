@@ -1,4 +1,4 @@
-from typing import Callable
+from typing import Callable, Optional
 
 import discord
 
@@ -8,13 +8,15 @@ from libs.bot_classes import Zbot
 class ConfirmView(discord.ui.View):
     "A simple view used to confirm an action"
 
-    def __init__(self, bot: Zbot, ctx, validation: Callable[[discord.Interaction], bool], ephemeral: bool=True, timeout: int=60):
+    def __init__(self, bot: Zbot, ctx, validation: Callable[[discord.Interaction], bool], ephemeral: bool=True,
+            timeout: int=60, send_confirmation: bool=True):
         super().__init__(timeout=timeout)
-        self.value: bool = None
+        self.value: Optional[bool] = None
         self.bot = bot
         self.ctx = ctx
         self.validation = validation
         self.ephemeral = ephemeral
+        self.send_confirmation = send_confirmation
 
     async def init(self):
         "Initialize buttons with translations"
@@ -31,7 +33,8 @@ class ConfirmView(discord.ui.View):
         "Confirm the action when clicking"
         if not self.validation(interaction):
             return
-        await interaction.response.send_message(await self.bot._(self.ctx, "misc.btn.confirm.answer"), ephemeral=self.ephemeral)
+        if self.send_confirmation:
+            await interaction.response.send_message(await self.bot._(self.ctx, "misc.btn.confirm.answer"), ephemeral=self.ephemeral)
         self.value = True
         self.stop()
 
