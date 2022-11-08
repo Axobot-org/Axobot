@@ -30,7 +30,10 @@
     "doc": "Documentation",
     "duration": "duration",
     "end": "end",
-    "example": "example",
+    "example": {
+        "one": "example",
+        "other": "examples"
+    },
     "extreme": "extreme",
     "ghost": "Ghost",
     "high": "high",
