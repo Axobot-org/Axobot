@@ -335,9 +335,10 @@ class Admin(commands.Cog):
         """Recharge un module"""
         cogs = cog.split(" ")
         await self.bot.get_cog("Reloads").reload_cogs(ctx,cogs)
-    
+
     @reload_cog.autocomplete("cog")
     async def reload_cog_autocom(self, interaction: discord.Interaction, current: str):
+        "Autocompletion for the cog name"
         if " " in current:
             fixed, current = current.rsplit(" ", maxsplit=1)
         else:
