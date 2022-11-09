@@ -105,6 +105,7 @@ class Zbot(commands.bot.AutoShardedBot):
         self.emojis_manager = EmojisManager(self)
         # app commands
         self.tree.on_error = self.on_app_cmd_error
+        self.app_commands_list: Optional[list[discord.app_commands.AppCommand]] = None
 
     async def on_error(self, event_method: Union[Exception, str], *_args, **_kwargs):
         "Called when an event raises an uncaught exception"
@@ -321,3 +322,25 @@ class Zbot(commands.bot.AutoShardedBot):
         for prefix in prefixes:
             is_cmd = is_cmd or message.content.startswith(prefix)
         return is_cmd
+
+    async def fetch_app_commands(self):
+        "Populate the app_commands_list attribute from the Discord API"
+        target = PRIVATE_GUILD_ID if self.beta else None
+        self.app_commands_list = await self.tree.fetch_commands(guild=target)
+
+    async def fetch_app_command_by_name(self, name: str) -> Optional[discord.app_commands.AppCommand]:
+        "Get a specific app command from the Discord API"
+        if self.app_commands_list is None:
+            await self.fetch_app_commands()
+        for command in self.app_commands_list:
+            if command.name == name:
+                return command
+        return None
+
+    async def get_command_mention(self, command_name: str):
+        "Get how a command should be mentionned (either app-command mention or raw name)"
+        if command := await self.fetch_app_command_by_name(command_name.split(' ')[0]):
+            return f"</{command_name}:{command.id}>"
+        if command := self.get_command(command_name):
+            return f"`{command.qualified_name}`"
+        return f"`{command_name}`"

@@ -131,6 +131,7 @@ class Admin(commands.Cog):
         else:
             await ctx.send("Unknown scope")
             return
+        self.bot.app_commands_list.clear()
         self.bot.log.info(txt)
         emb = discord.Embed(description=txt, color=discord.Color.blue())
         await self.bot.send_embed(emb)

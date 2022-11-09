@@ -2,7 +2,7 @@
     "events-price-title": "Prix à gagner",
     "nothing-desc": "Il n'y a actuellement aucun événement. Suivez les news du bot pour connaître la date du prochain !",
     "nothing-prices": "Il n'y a rien à gagner pour cet événement :confused:",
-    "no-objectives": "Cet événement n’a aucun objectif de points, pas besoin de farm pour une fois !\nConsultez `event info` pour plus d’informations.",
+    "no-objectives": "Cet événement n’a aucun objectif de points, pas besoin de farm pour une fois !\nConsultez la commande %{cmd} pour plus d’informations.",
     "objectives": "Objectifs",
     "points": "points",
     "position-global": "Position mondiale",
