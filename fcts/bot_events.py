@@ -221,8 +221,10 @@ class BotEvents(commands.Cog):
             return
         # if current event has no objectives
         if not self.current_event_data["objectives"]:
-            await ctx.send(await self.bot._(ctx.channel, "bot_events.no-objectives"))
+            cmd_mention = await self.bot.get_command_mention("event info")
+            await ctx.send(await self.bot._(ctx.channel, "bot_events.no-objectives", cmd=cmd_mention))
             return
+
         if user is None:
             user = ctx.author
         user_rank_query = await self.bot.get_cog("Utilities").get_eventsPoints_rank(user.id)
