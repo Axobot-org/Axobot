@@ -56,6 +56,10 @@ class Utilities(commands.Cog):
             return str(err.args[0].real_url)
         except (asyncio.exceptions.TimeoutError, aiohttp.ServerTimeoutError):
             return url
+        except ValueError as err:
+            if err.args[0] != "URL should be absolute":
+                self.bot.dispatch("error", err)
+            return url
         return answer
 
     async def global_check(self, ctx: MyContext):

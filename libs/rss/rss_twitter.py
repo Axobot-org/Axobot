@@ -54,6 +54,16 @@ class TwitterRSS:
         except twitter.TwitterError:
             return None
 
+    async def remove_image(self, channel: discord.abc.MessageableChannel, text: str):
+        "Remove images links from a tweet if needed"
+        if channel.permissions_for(channel.guild.me).embed_links:
+            find_url = self.bot.get_cog("Utilities").find_url_redirection
+            for match in re.finditer(r"https://t.co/([^\s]+)", text):
+                final_url = await find_url(match.group(0))
+                if "/photo/" in final_url:
+                    text = text.replace(match.group(0), '')
+        return text
+
     async def get_feed(self, channel: discord.TextChannel, name: str, date: dt.datetime=None) -> Union[str, list[RssMessage]]:
         "Get tweets from a given Twitter user"
         if name == 'help':
@@ -80,6 +90,9 @@ class TwitterRSS:
             if lastpost.retweeted:
                 if possible_rt := re.search(r'^RT @([\w-]+):', text):
                     is_rt = possible_rt.group(1)
+            # remove images links if needed
+            text = await self.remove_image(channel, text)
+            # format URL
             url = f"https://twitter.com/{username.lower()}/status/{lastpost.id}"
             img = None
             if lastpost.media: # if exists and is not empty
@@ -109,12 +122,8 @@ class TwitterRSS:
                     if possible_rt := re.search(r'^RT @([\w-]+):', text):
                         is_rt = possible_rt.group(1)
                 # remove images links if needed
-                if channel.permissions_for(channel.guild.me).embed_links:
-                    find_url = self.bot.get_cog("Utilities").find_url_redirection
-                    for match in re.finditer(r"https://t.co/([^\s]+)", text):
-                        final_url = await find_url(match.group(0))
-                        if "/photo/" in final_url:
-                            text = text.replace(match.group(0), '')
+                text = await self.remove_image(channel, text)
+                # format URL
                 url = f"https://twitter.com/{name.lower()}/status/{post.id}"
                 img = None
                 if post.media: # if exists and is not empty
