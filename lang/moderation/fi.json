@@ -65,7 +65,6 @@
         "mute-high": "Ups, näyttää siltä että `mykistetty` rooli on liian korkealla että voisin antaa sen... Korjaa tämä sillä että laita minun roolini `Mykistetty` roolin yläpuolelle.",
         "no-mute": "Ups, näyttää siltä että `mykistetty` rooli ei ole olemassa 😕 Tede yksi ja anna käyttöoikeudet manuallisesti.",
         "no-mutes": "Kenelläkään ei näytä olevan porttikieltoa täällä",
-        "role-created": "`Muted` rooli tehty! Voit käyttää komentoa `%{p}mute-config` automaattiselle konfiguroinnille palvelimellasi.",
         "staff-mute": "Et voi mykistää toista työntekijää"
     },
     "mute-chat": "Käyttäjä %{user} (%{userid}) on pistetty jäähylle",

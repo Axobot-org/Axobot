@@ -63,7 +63,8 @@ class Errors(commands.Cog):
             await ctx.send(await self.bot._(ctx.channel, 'errors.quoteserror'), ephemeral=True)
             return
         elif isinstance(error, NotDuringEventError):
-            await ctx.send(await self.bot._(ctx.channel, 'errors.notduringevent', cmd="`/event info`"), ephemeral=True)
+            cmd = await self.bot.get_command_mention("event info")
+            await ctx.send(await self.bot._(ctx.channel, 'errors.notduringevent', cmd=cmd), ephemeral=True)
             return
         elif isinstance(error,commands.errors.CommandOnCooldown):
             if await self.bot.get_cog('Admin').check_if_admin(ctx):
@@ -189,8 +190,9 @@ class Errors(commands.Cog):
             await ctx.send(await self.bot._(ctx.channel,'errors.cannotembed'))
             return
         else:
+            cmd = await self.bot.get_command_mention("about")
             try:
-                await ctx.send(await self.bot._(ctx.channel,'errors.unknown'), ephemeral=True)
+                await ctx.send(await self.bot._(ctx.channel, 'errors.unknown', about=cmd), ephemeral=True)
             except Exception as newerror:
                 self.bot.log.info(f"[on_cmd_error] Can't send error on channel {ctx.channel.id}: {newerror}")
         # All other Errors not returned come here... And we can just print the default TraceBack.

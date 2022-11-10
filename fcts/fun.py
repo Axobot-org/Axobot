@@ -658,7 +658,17 @@ You can specify a verification limit by adding a number in argument (up to 1.000
         """Send a tip, a fun fact or something else
 
         ..Doc fun.html#tip"""
-        await ctx.send(random.choice(await self.bot._(ctx.guild,"fun.tip-list")))
+        params = {
+            "about_cmd": await self.bot.get_command_mention("about"),
+            "bigtext_cmd": await self.bot.get_command_mention("bigtext"),
+            "clear_cmd": await self.bot.get_command_mention("clear"),
+            "config_cmd": await self.bot.get_command_mention("config"),
+            "discordlinks_cmd": await self.bot.get_command_mention("discordlinks"),
+            "event_cmd": await self.bot.get_command_mention("event info"),
+            "stats_cmd": await self.bot.get_command_mention("stats"),
+            "say_cmd": await self.bot.get_command_mention("say"),
+        }
+        await ctx.send(random.choice(await self.bot._(ctx.guild, "fun.tip-list", **params)))
 
     @commands.command(name='afk')
     @commands.check(is_fun_enabled)

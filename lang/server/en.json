@@ -62,7 +62,7 @@
         "clear_allowed_roles": "List of roles that can use the \"clear\" command: %{value}",
         "compress_help": "Should the display of the `help` command be compressed? %{value}",
         "description": "Server description:\n %{value}",
-        "enable_fun": "Are the commands listed in the `!fun` command enabled? %{value}",
+        "enable_fun": "Are the commands listed in the `fun` command enabled? %{value}",
         "enable_xp": "Should the xp system be enabled? %{value}",
         "help_in_dm": "Send help message in Private Message? %{value}",
         "hunter": "List of all chat rooms in which the game *Hunter* is active: %{value}",

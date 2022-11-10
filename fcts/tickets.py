@@ -5,10 +5,12 @@ from typing import Any, Callable, Literal, Optional, Union
 import discord
 from discord.ext import commands
 from mysql.connector.errors import IntegrityError
+
+from fcts.args import UnicodeEmoji
 from libs.bot_classes import MyContext, Zbot
 
 from . import checks
-from fcts.args import UnicodeEmoji
+
 
 def is_named_other(name: str, other_translated: str):
     "Check if a topic name corresponds to any 'other' variant"
@@ -167,7 +169,8 @@ class Tickets(commands.Cog):
                 await interaction.response.send_message(await self.bot._(interaction.guild_id, "errors.unknown"), ephemeral=True)
                 raise Exception(f"No topic found on guild {interaction.guild_id} with interaction {topic_id}")
             if topic['category'] is None:
-                await interaction.response.send_message(await self.bot._(interaction.guild_id, "tickets.missing-category-config"), ephemeral=True)
+                cmd = await self.bot.get_command_mention("ticket portal set-category")
+                await interaction.response.send_message(await self.bot._(interaction.guild_id, "tickets.missing-category-config", set_category=cmd), ephemeral=True)
                 return
             if topic['hint']:
                 hint_view = SendHintText(interaction.user.id,

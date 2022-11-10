@@ -34,6 +34,7 @@
     "quoteserror": "Oops, a quotation mark error has occurred. Be sure to correctly use the quotes \", so that each open quote will be closed further on",
     "rolenotfound": "Unable to find the role `%{r}`",
     "toomanytxtchan": "You have too many accessible text channels",
-    "unknown": "Oops, an error occurred :confused: Try again later, or contact support (command `about`).",
+    "unknown": "Oops, an error occurred :confused: Try again later, or contact support (command %{about}).",
+    "unknown2": "An error occurred while processing your response. Please try again later, or contact bot support (enter the command %{about} for server link)",
     "usernotfound": "Unable to find the user `%{u}` :confused:"
 }
