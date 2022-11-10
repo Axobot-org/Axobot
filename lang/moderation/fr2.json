@@ -64,7 +64,6 @@
         "mute-high": "Oups, il semble que le rôle `muted` soit trop haut pour que je puisse le donner... Veuillez fixer ce problème en plaçant mon rôle plus haut que le rôle `muted`.",
         "no-mute": "Oups, il semble que le rôle `muted` n'existe pas :confused: Veuillez le créer et lui attribuer les permissions manuellement.",
         "no-mutes": "J'ai pas l'impression que quiconque soit mute, ici ¯\\_(ツ)_/¯",
-        "role-created": "Rôle `muted` configuré avec succès, chef !\nTu peux utiliser la commande `%{p}mute-config` pour une config automatique de ton serveur.",
         "staff-mute": "Vous ne pouvez pas empêcher de parler un autre membre du staff "
     },
     "mute-chat": "%{user} (%{userid}) vient d'être mute.",

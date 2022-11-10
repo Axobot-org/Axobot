@@ -34,6 +34,7 @@
     "quoteserror": "Oups, une erreur de guillemets est survenue. Assurez-vous de bien utiliser les guillemets \", de manière à ce que chaque guillemet ouvert soit fermé plus loin",
     "rolenotfound": "Impossible de trouver le rôle `%{r}`",
     "toomanytxtchan": "Vous avez trop de salons textuels accessibles",
-    "unknown": "Oups, une erreur est survenue :confused: Réessayez plus tard, ou contactez le support (commande `about`).",
+    "unknown": "Oups, une erreur est survenue :confused: Réessayez plus tard, ou contactez le support (commande %{about}).",
+    "unknown2": "Une erreur s'est produite lors du traitement de votre réponse. Merci de réessayer plus tard, ou de contacter le support du bot (entrez la commande %{about} pour le lien du serveur)",
     "usernotfound": "Impossible de trouver l'utilisateur `%{u}` :confused:"
 }

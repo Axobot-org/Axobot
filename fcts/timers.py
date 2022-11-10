@@ -225,7 +225,8 @@ class Timers(commands.Cog):
                 selection = []
                 self.bot.dispatch("error", ValueError(f"Invalid reminder IDs: {view.values}"), ctx)
         if len(selection) == 0:
-            await ctx.send(await self.bot._(ctx.guild, "rss.fail-add"))
+            cmd = await self.bot.get_command_mention("about")
+            await ctx.send(await self.bot._(ctx.guild, "errors.unknown2", about=cmd))
             return
         return selection
 

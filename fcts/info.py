@@ -247,7 +247,8 @@ ORDER BY usages DESC LIMIT %(limit)s"""
                 url = "https://zrunner.me/invitezbot"
             else:
                 url = raw_oauth
-        await ctx.send(await self.bot._(ctx.channel, "info.botinvite", url=url))
+        cmd = await self.bot.get_command_mention("about")
+        await ctx.send(await self.bot._(ctx.channel, "info.botinvite", url=url, about=cmd))
 
     @commands.command(name="pig", hidden=True)
     async def pig(self, ctx: MyContext):

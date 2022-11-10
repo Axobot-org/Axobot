@@ -23,7 +23,7 @@
     },
     "hint-useful": "Je n'en ai plus besoin",
     "hint-useless": "Ouvre un ticket",
-    "missing-category-config": "Oups, je n'ai pas pu créer votre ticket parce que personne ne m'a dit où les créer. Vous devriez demander à un modérateur du serveur d'utiliser la commande `tickets portal set-category`.",
+    "missing-category-config": "Oups, je n'ai pas pu créer votre ticket parce que personne ne m'a dit où les créer. Vous devriez demander à un modérateur du serveur d'utiliser la commande %{set_category}.",
     "missing-perms-creation": {
         "channel": "Oups, je n'ai pas pu créer de salon pour votre ticket. Assurez-vous que j'ai les permissions nécessaires et réessayez.",
         "thread": "Oups, je n'ai pas pu créer de fil pour votre. Assurez-vous que j'ai les permissions nécessaires et réessayez."

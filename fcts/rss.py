@@ -277,7 +277,8 @@ class Rss(commands.Cog):
             self.bot.log.info("RSS feed added into server {} ({} - {})".format(ctx.guild.id,link,feed_id))
             await self.send_log("Feed added into server {} ({})".format(ctx.guild.id,feed_id),ctx.guild)
         except Exception as err:
-            await ctx.send(await self.bot._(ctx.guild, "rss.fail-add"))
+            cmd = await self.bot.get_command_mention("about")
+            await ctx.send(await self.bot._(ctx.guild, "errors.unknown2", about=cmd))
             self.bot.dispatch("error", err, ctx)
 
     @rss_main.command(name="remove", aliases=["delete"])
@@ -509,7 +510,8 @@ class Rss(commands.Cog):
             except ValueError:
                 selection = []
         if len(selection) == 0:
-            await ctx.send(await self.bot._(ctx.guild, "rss.fail-add"))
+            cmd = await self.bot.get_command_mention("about")
+            await ctx.send(await self.bot._(ctx.guild, "errors.unknown2", about=cmd))
             return
         return selection
 
@@ -553,7 +555,8 @@ class Rss(commands.Cog):
             return
         feeds: list[FeedObject] = list(filter(None, [await self.db_get_feed(feed_id) for feed_id in feeds_ids]))
         if len(feeds) == 0:
-            await ctx.send(await self.bot._(ctx.guild, "rss.fail-add"))
+            cmd = await self.bot.get_command_mention("about")
+            await ctx.send(await self.bot._(ctx.guild, "errors.unknown2", about=cmd))
             return
         no_role = {'aucun', 'none', '_', 'del'}
         if mentions is None: # if no roles was specified: we ask for them
@@ -637,7 +640,8 @@ class Rss(commands.Cog):
                         await self.db_update_feed(feed.feed_id, values=[('roles', ';'.join(roles_ids))])
                 await ctx.send(await self.bot._(ctx.guild.id, "rss.roles.edit-success", count=len(names), roles=", ".join(names)))
         except Exception as err:
-            await ctx.send(await self.bot._(ctx.guild, "rss.fail-add"))
+            cmd = await self.bot.get_command_mention("about")
+            await ctx.send(await self.bot._(ctx.guild, "errors.unknown2", about=cmd))
             self.bot.dispatch("error", err, ctx)
             return
 
@@ -697,7 +701,8 @@ class Rss(commands.Cog):
             if feeds_ids is None:
                 return
             if len(feeds_ids) == 0:
-                await ctx.send(await self.bot._(ctx.guild, "rss.fail-add"))
+                cmd = await self.bot.get_command_mention("about")
+                await ctx.send(await self.bot._(ctx.guild, "errors.unknown2", about=cmd))
                 if err is not None:
                     self.bot.dispatch("error", err, ctx)
                 return
@@ -746,7 +751,8 @@ class Rss(commands.Cog):
             return
         feeds: list[FeedObject] = list(filter(None, [await self.db_get_feed(feed_id) for feed_id in feeds_ids]))
         if len(feeds) == 0:
-            await ctx.send(await self.bot._(ctx.guild, "rss.fail-add"))
+            cmd = await self.bot.get_command_mention("about")
+            await ctx.send(await self.bot._(ctx.guild, "errors.unknown2", about=cmd))
             return
         if text is None:
             # if no text was specified: we ask for it
@@ -798,7 +804,8 @@ class Rss(commands.Cog):
             if feeds_ids is None:
                 return
             if len(feeds_ids) == 0:
-                await ctx.send(await self.bot._(ctx.guild, "rss.fail-add"))
+                cmd = await self.bot.get_command_mention("about")
+                await ctx.send(await self.bot._(ctx.guild, "errors.unknown2", about=cmd))
                 if err is not None:
                     self.bot.dispatch("error", err, ctx)
                 return

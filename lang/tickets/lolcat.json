@@ -23,7 +23,7 @@
     },
     "hint-useful": "I donut need it anymoar",
     "hint-useless": "Creet a ticket",
-    "missing-category-config": "Oops, I couldnt creete ur ticket cause no 1 told me wheere to creete them. Pleez ask servr moderator to use the `ticketz portal set-category` cmd.",
+    "missing-category-config": "Oops, I couldnt creete ur ticket cause no 1 told me wheere to creete them. Pleez ask servr moderator to use the %{set_category} cmd.",
     "missing-perms-creation": {
         "channel": "Ouch, I couldnt creete a new ticket channel. Pliz make sure I haz teh requiwed permissions nd try again.",
         "thread": "Woops, I couldnt creete a new ticket threed. Pleez make sure I haz teh requird permissionz and try harder."

@@ -343,4 +343,5 @@ class Zbot(commands.bot.AutoShardedBot):
             return f"</{command_name}:{command.id}>"
         if command := self.get_command(command_name):
             return f"`{command.qualified_name}`"
+        self.log.error(f"Trying to mention invalid command: {command_name}")
         return f"`{command_name}`"
