@@ -1,13 +1,15 @@
-import random
 import time
-from typing import Any, Callable, Literal, Optional, Union
+from typing import Any, Optional, Union
 
 import discord
+from discord import app_commands
 from discord.ext import commands
 from mysql.connector.errors import IntegrityError
 
-from fcts.args import UnicodeEmoji
-from libs.bot_classes import MyContext, Zbot
+from libs.bot_classes import PRIVATE_GUILD_ID, MyContext, Zbot
+from libs.tickets.converters import EmojiConverterType
+from libs.tickets.views import (AskTitleModal, AskTopicSelect, SelectView,
+                                SendHintText, TicketCreationEvent)
 
 from . import checks
 
@@ -15,123 +17,6 @@ from . import checks
 def is_named_other(name: str, other_translated: str):
     "Check if a topic name corresponds to any 'other' variant"
     return name.lower() in {"other", "others", other_translated}
-
-class TicketCreationEvent:
-    "Represents a ticket being created"
-    def __init__(self, topic: dict, name: str, interaction: discord.Interaction, channel: Union[discord.TextChannel, discord.Thread]):
-        self.topic = topic
-        self.topic_name = topic["topic"]
-        self.name = name
-        self.guild = interaction.guild
-        self.user = interaction.user
-        self.channel = channel
-
-class SelectView(discord.ui.View):
-    "Used to ask what kind of ticket a user wants to open"
-    def __init__(self, guild_id: int, topics: list[dict[str, Any]]):
-        super().__init__(timeout=None)
-        options = self.build_options(topics)
-        custom_id = f"{guild_id}-tickets-{random.randint(1, 100):03}"
-        self.select = discord.ui.Select(placeholder="Chose a topic", options=options, custom_id=custom_id)
-        self.add_item(self.select)
-
-    def build_options(self, topics: list[dict[str, Any]]):
-        "Compute Select options from topics list"
-        res = []
-        for topic in topics:
-            res.append(discord.SelectOption(label=topic['topic'], value=topic['id'], emoji=topic['topic_emoji']))
-        return res
-
-class SendHintText(discord.ui.View):
-    "Used to send a hint and make sure the user actually needs help"
-    def __init__(self, user_id: int, label_confirm: str, label_cancel: str, text_cancel: str):
-        super().__init__(timeout=180)
-        self.user_id = user_id
-        self.confirmed: Optional[bool] = None
-        self.interaction: Optional[discord.Interaction] = None
-        confirm_btn = discord.ui.Button(label=label_confirm, style=discord.ButtonStyle.green)
-        confirm_btn.callback = self.confirm
-        self.add_item(confirm_btn)
-        self.text_cancel = text_cancel
-        cancel_btn = discord.ui.Button(label=label_cancel, style=discord.ButtonStyle.red)
-        cancel_btn.callback = self.cancel
-        self.add_item(cancel_btn)
-
-    async def interaction_check(self, interaction: discord.Interaction):
-        return interaction.user.id == self.user_id
-
-    async def confirm(self, interaction: discord.Interaction):
-        "When user clicks on the confirm button"
-        self.confirmed = True
-        self.interaction = interaction
-        self.stop()
-
-    async def cancel(self, interaction: discord.Interaction):
-        "When user clicks on the cancel button"
-        await interaction.response.defer()
-        self.confirmed = False
-        self.stop()
-        await self.disable(interaction)
-        await interaction.followup.send(self.text_cancel, ephemeral=True)
-
-    async def disable(self, src: Union[discord.Interaction, discord.Message]):
-        "When the view timeouts or is disabled"
-        for child in self.children:
-            child.disabled = True
-        if isinstance(src, discord.Interaction):
-            await src.edit_original_response(view=self)
-        else:
-            await src.edit(content=src.content, embeds=src.embeds, view=self)
-        self.stop()
-
-class AskTitleModal(discord.ui.Modal):
-    "Ask a user the name of their ticket"
-    name = discord.ui.TextInput(label="", placeholder=None, style=discord.TextStyle.short, max_length=100)
-
-    def __init__(self, guild_id: int, topic: dict, title: str, input_label: str, input_placeholder: str, callback: Callable):
-        super().__init__(title=title, timeout=600)
-        self.guild_id = guild_id
-        self.topic = topic
-        self.callback = callback
-        self.name.label = input_label
-        self.name.placeholder = input_placeholder
-
-    async def on_submit(self, interaction: discord.Interaction):
-        try:
-            await interaction.response.defer(ephemeral=True, thinking=True)
-            await self.callback(interaction, self.topic, self.name.value.strip())
-        except Exception as err: # pylint: disable=broad-except
-            interaction.client.dispatch("error", err, f"When opening a ticket in guild {self.guild_id}")
-            await interaction.edit_original_response(content="An error occured while opening your ticket. Please try again later.")
-
-class AskTopicSelect(discord.ui.View):
-    "Ask a user what topic they want to edit/delete"
-    def __init__(self, user_id: int, topics: list[dict[str, Any]], placeholder: str, max_values: int):
-        super().__init__()
-        self.user_id = user_id
-        options = self.build_options(topics)
-        self.select = discord.ui.Select(placeholder=placeholder, min_values=1, max_values=min(max_values, len(options)), options=options)
-        self.select.callback = self.callback
-        self.add_item(self.select)
-        self.topics: list[str] = None
-
-    async def interaction_check(self, interaction: discord.Interaction):
-        return interaction.user.id == self.user_id
-
-    def build_options(self, topics: list[dict[str, Any]]) -> list[discord.SelectOption]:
-        "Build the options list for Discord"
-        res = []
-        for topic in topics:
-            res.append(discord.SelectOption(label=topic['topic'], value=topic['id'], emoji=topic['topic_emoji']))
-        return res
-
-    async def callback(self, interaction: discord.Interaction):
-        "Called when the dropdown menu has been validated by the user"
-        self.topics = self.select.values
-        await interaction.response.defer()
-        self.select.disabled = True
-        await interaction.edit_original_response(view=self)
-        self.stop()
 
 
 class Tickets(commands.Cog):
@@ -169,7 +54,7 @@ class Tickets(commands.Cog):
                 await interaction.response.send_message(await self.bot._(interaction.guild_id, "errors.unknown"), ephemeral=True)
                 raise Exception(f"No topic found on guild {interaction.guild_id} with interaction {topic_id}")
             if topic['category'] is None:
-                cmd = await self.bot.get_command_mention("ticket portal set-category")
+                cmd = await self.bot.get_command_mention("tickets portal set-category")
                 await interaction.response.send_message(await self.bot._(interaction.guild_id, "tickets.missing-category-config", set_category=cmd), ephemeral=True)
                 return
             if topic['hint']:
@@ -298,9 +183,11 @@ class Tickets(commands.Cog):
         "Ask a user which topic they want to edit"
         placeholder = await self.bot._(ctx.guild.id, "tickets.selection-placeholder")
         view = AskTopicSelect(ctx.author.id, await self.db_get_topics(ctx.guild.id), placeholder, 25 if multiple else 1)
-        await ctx.send(message or await self.bot._(ctx.guild.id, "tickets.choose-topic-edition"), view=view)
+        msg = await ctx.send(message or await self.bot._(ctx.guild.id, "tickets.choose-topic-edition"), view=view)
         await view.wait()
         if view.topics is None:
+            # timeout
+            await view.disable(msg)
             return None
         try:
             if multiple:
@@ -420,9 +307,33 @@ class Tickets(commands.Cog):
             await msg.pin()
         self.bot.dispatch("ticket_creation", TicketCreationEvent(topic, ticket_name, interaction, channel))
 
+    async def topic_id_autocompletion(self, interaction: discord.Interaction, current: str, allow_other: bool=True):
+        "Autocompletion to select a topic in an app command"
+        current = current.lower()
+        topics = await self.db_get_topics(interaction.guild_id)
+        if allow_other:
+            topics.append({
+                "id": -1,
+                "topic": (await self.bot._(interaction.guild_id, "tickets.other")).capitalize(),
+                "topic_emoji": None
+            })
+        filtered = sorted([
+            (not topic["topic"].lower().startswith(current), topic["topic"], topic["id"])
+            for topic in topics
+            if current in topic["topic"].lower()
+        ])
+        return [
+            app_commands.Choice(name=name, value=topic_id)
+            for _, name, topic_id in filtered
+        ]
 
+    async def send_error_message(self, ctx: MyContext):
+        about = await self.bot.get_command_mention("about")
+        await ctx.send(await self.bot._(ctx.guild.id, "errors.unknown", about=about))
 
-    @commands.group(name="ticket", aliases=["tickets"])
+    @commands.hybrid_group(name="tickets", aliases=["ticket"])
+    @discord.app_commands.guilds(PRIVATE_GUILD_ID)
+    @discord.app_commands.default_permissions(manage_guild=True)
     @commands.guild_only()
     async def tickets_main(self, ctx: MyContext):
         """Manage your tickets system
@@ -453,9 +364,12 @@ class Tickets(commands.Cog):
                  }
         defaults = await self.db_get_defaults(ctx.guild.id)
         prompt = defaults["prompt"] if defaults else await self.bot._(ctx.guild.id, "tickets.default-topic-prompt")
-        await ctx.send(prompt, view=SelectView(ctx.guild.id, topics + [other]))
+        await ctx.channel.send(prompt, view=SelectView(ctx.guild.id, topics + [other]))
+        if ctx.interaction:
+            await ctx.reply(await self.bot._(ctx.guild.id, "misc.done!"), ephemeral=True)
 
     @tickets_portal.command(name="set-hint")
+    @app_commands.describe(message="The hint to display for this topic - set 'none' for no hint")
     @commands.cooldown(3, 30, commands.BucketType.guild)
     async def portal_set_hint(self, ctx: MyContext, *, message: str):
         """Set a default hint message
@@ -473,11 +387,12 @@ class Tickets(commands.Cog):
         if await self.db_edit_topic_hint(ctx.guild.id, row_id, message):
             await ctx.send(await self.bot._(ctx.guild.id, "tickets.hint-edited.default"))
         else:
-            await ctx.send(await self.bot._(ctx.guild.id, "errors.unknown"))
+            await self.send_error_message(ctx)
 
     @tickets_portal.command(name="set-role")
+    @app_commands.describe(role="The role allowed to see tickets from this topic - do not set to allow anyone")
     @commands.cooldown(3, 30, commands.BucketType.guild)
-    async def portal_set_role(self, ctx: MyContext, role: Union[discord.Role, Literal["none"]]):
+    async def portal_set_role(self, ctx: MyContext, role: Optional[discord.Role]):
         """Edit a default staff role
         Anyone with this role will be able to read newly created tickets
         Type "None" to set admins only
@@ -488,10 +403,9 @@ class Tickets(commands.Cog):
         row_id = await self.db_get_guild_default_id(ctx.guild.id)
         if row_id is None:
             row_id = await self.db_set_guild_default_id(ctx.guild.id)
-        if role == "none":
-            role = None
         await self.db_edit_topic_role(ctx.guild.id, row_id, role.id if role else None)
-        await ctx.send(await self.bot._(ctx.guild.id, "tickets.role-edited.default"))
+        key = "tickets.role-edited.default-reset" if role is None else "tickets.role-edited.default"
+        await ctx.send(await self.bot._(ctx.guild.id, key))
 
     @tickets_portal.command(name="set-text")
     @commands.cooldown(3, 30, commands.BucketType.guild)
@@ -543,8 +457,9 @@ class Tickets(commands.Cog):
         await ctx.send(message, embed=embed)
 
     @tickets_portal.command(name="set-format")
+    @app_commands.describe(name_format="The channel format for this topic - set 'none' to use the default one")
     @commands.cooldown(3, 30, commands.BucketType.guild)
-    async def portal_set_format(self, ctx: MyContext, name_format: Union[Literal["none"], str]):
+    async def portal_set_format(self, ctx: MyContext, name_format: str):
         """Set the format used to generate the channel/thread name
         You can use the following placeholders: username, usertag, userid, topic, topic_emoji, ticket_name
         Use "none" to reset the format to the default one
@@ -576,7 +491,7 @@ class Tickets(commands.Cog):
 
     @tickets_topics.command(name="add", aliases=["create"])
     @commands.cooldown(3, 45, commands.BucketType.guild)
-    async def topic_add(self, ctx: MyContext, emote: Union[discord.PartialEmoji, UnicodeEmoji, None]=None, *, name: str):
+    async def topic_add(self, ctx: MyContext, emote: Optional[EmojiConverterType]=None, *, name: str):
         """Create a new ticket topic
         A topic name is limited to 100 characters
         Only Discord emojis are accepted for now
@@ -604,13 +519,18 @@ class Tickets(commands.Cog):
 
     @tickets_topics.command(name="remove")
     @commands.cooldown(3, 45, commands.BucketType.guild)
-    async def topic_remove(self, ctx: MyContext):
+    async def topic_remove(self, ctx: MyContext, topic_id: Optional[int] = None):
         """Permanently delete a topic by its name
 
         ..Doc tickets.html#delete-a-topic"""
-        topic_ids: Optional[list[int]] = await self.ask_user_topic(ctx, True, await ctx.bot._(ctx.guild.id, "tickets.choose-topics-deletion"))
-        if topic_ids is None or len(topic_ids) == 0:
-            await ctx.send(await self.bot._(ctx.guild.id, "errors.unknown"))
+        if not topic_id or not await self.db_topic_exists(ctx.guild.id, topic_id):
+            topic_id = await self.ask_user_topic(ctx, True, await ctx.bot._(ctx.guild.id, "tickets.choose-topics-deletion"))
+            if topic_id is None:
+                # timeout
+                return
+        topic_ids: Optional[list[int]] = [topic_id]
+        if topic_ids is None:
+            # timeout
             return
         if len(topic_ids) == 1:
             topic = await self.db_get_topic_with_defaults(ctx.guild.id, topic_ids[0])
@@ -621,12 +541,17 @@ class Tickets(commands.Cog):
         if counter > 0:
             await ctx.send(await self.bot._(ctx.guild.id, "tickets.topic.deleted", count=counter, name=topic_name))
         else:
-            await ctx.send(await self.bot._(ctx.guild.id, "errors.unknown"))
+            await self.send_error_message(ctx)
+
+    @topic_remove.autocomplete("topic_id")
+    async def topic_remove_autocomplete(self, interaction: discord.Interaction, current: str):
+        return await self.topic_id_autocompletion(interaction, current, allow_other=False)
+
 
     @tickets_topics.command(name="set-emote", aliases=["set-emoji"])
     @commands.cooldown(3, 30, commands.BucketType.guild)
     async def topic_set_emote(self, ctx: MyContext, topic_id: Optional[int],
-                              emote: Union[discord.PartialEmoji, UnicodeEmoji, Literal["none"]]):
+                              emote: Optional[EmojiConverterType]=None):
         """Edit a topic emoji
         Type "None" to set no emoji for this topic
 
@@ -636,10 +561,8 @@ class Tickets(commands.Cog):
         if not topic_id or not await self.db_topic_exists(ctx.guild.id, topic_id):
             topic_id = await self.ask_user_topic(ctx)
             if topic_id is None:
-                await ctx.send(await self.bot._(ctx.guild.id, "errors.unknown"))
+                # timeout
                 return
-        if emote == "none":
-            emote = None
         elif isinstance(emote, discord.PartialEmoji):
             emote = f"{emote.name}:{emote.id}"
         if await self.db_edit_topic_emoji(ctx.guild.id, topic_id, emote):
@@ -647,10 +570,15 @@ class Tickets(commands.Cog):
             await ctx.send(await self.bot._(ctx.guild.id, "tickets.emote-edited", topic=topic["topic"]))
         else:
             await ctx.send(await self.bot._(ctx.guild.id, "tickets.nothing-to-edit"))
+    
+    @topic_set_emote.autocomplete("topic_id")
+    async def topic_set_emote_autocomplete(self, interaction: discord.Interaction, current: str):
+        return await self.topic_id_autocompletion(interaction, current, allow_other=False)
 
     @tickets_topics.command(name="set-hint")
+    @app_commands.describe(message="The hint to display for this topic - set 'none' to use the default one")
     @commands.cooldown(3, 30, commands.BucketType.guild)
-    async def topic_set_hint(self, ctx: MyContext, topic_id: Optional[int], *, message: str):
+    async def topic_set_hint(self, ctx: MyContext, topic_id: Optional[int]=None, *, message: str):
         """Edit a topic hint message
         The message will be displayed when a user tries to open a ticket, before user confirmation
         Type "None" to set the text to the default one (`tickets portal set-hint`)
@@ -662,17 +590,22 @@ If that still doesn't work, please create your ticket
         if not topic_id or not await self.db_topic_exists(ctx.guild.id, topic_id):
             topic_id = await self.ask_user_topic(ctx)
             if topic_id is None:
-                await ctx.send(await self.bot._(ctx.guild.id, "errors.unknown"))
+                # timeout
                 return
         if message.lower() == "none":
             message = None
         await self.db_edit_topic_hint(ctx.guild.id, topic_id, message)
         topic = await self.db_get_topic_with_defaults(ctx.guild.id, topic_id)
         await ctx.send(await self.bot._(ctx.guild.id, "tickets.hint-edited.topic", topic=topic["topic"]))
+    
+    @topic_set_hint.autocomplete("topic_id")
+    async def topic_set_hint_autocomplete(self, interaction: discord.Interaction, current: str):
+        return await self.topic_id_autocompletion(interaction, current)
 
     @tickets_topics.command(name="set-role")
+    @app_commands.describe(role="The role allowed to see tickets from this topic - do not set to use the default one")
     @commands.cooldown(3, 30, commands.BucketType.guild)
-    async def topic_set_role(self, ctx: MyContext, topic_id: Optional[int], role: Union[discord.Role, Literal["none"]]):
+    async def topic_set_role(self, ctx: MyContext, topic_id: Optional[int]=None, role: Optional[discord.Role]=None):
         """Edit a topic staff role
         Anyone with this role will be able to read newly created tickets with this topic
         Type "None" to set the role to the default one (`tickets portal set-role`)
@@ -685,19 +618,23 @@ If that still doesn't work, please create your ticket
         if not topic_id or not await self.db_topic_exists(ctx.guild.id, topic_id):
             topic_id = await self.ask_user_topic(ctx)
             if topic_id is None:
-                await ctx.send(await self.bot._(ctx.guild.id, "errors.unknown"))
+                # timeout
                 return
-        if role.lower() == "none":
-            role = None
         if await self.db_edit_topic_role(ctx.guild.id, topic_id, role.id if role else None):
             topic = await self.db_get_topic_with_defaults(ctx.guild.id, topic_id)
-            await ctx.send(await self.bot._(ctx.guild.id, "tickets.role-edited.topic", topic=topic["topic"]))
+            key = "tickets.role-edited.topic-reset" if role is None else "tickets.role-edited.topic"
+            await ctx.send(await self.bot._(ctx.guild.id, key, topic=topic["topic"]))
         else:
             await ctx.send(await self.bot._(ctx.guild.id, "tickets.nothing-to-edit"))
+    
+    @topic_set_role.autocomplete("topic_id")
+    async def topic_set_role_autocomplete(self, interaction: discord.Interaction, current: str):
+        return await self.topic_id_autocompletion(interaction, current)
 
     @tickets_topics.command(name="set-format")
+    @app_commands.describe(name_format="The channel format for this topic - set 'none' to use the default one")
     @commands.cooldown(3, 30, commands.BucketType.guild)
-    async def topic_set_role(self, ctx: MyContext, topic_id: Optional[int], name_format: Union[Literal["none"], str]):
+    async def topic_set_format(self, ctx: MyContext, topic_id: Optional[int], name_format: str):
         """Set the format used to generate the channel/thread name
         You can use the following placeholders: username, usertag, userid, topic, topic_emoji, ticket_name
         Use "none" to reset the format to the default one
@@ -709,7 +646,7 @@ If that still doesn't work, please create your ticket
         if not topic_id or not await self.db_topic_exists(ctx.guild.id, topic_id):
             topic_id = await self.ask_user_topic(ctx)
             if topic_id is None:
-                await ctx.send(await self.bot._(ctx.guild.id, "errors.unknown"))
+                # timeout
                 return
         if len(name_format) > self.max_format_length:
             await ctx.send(await self.bot._(ctx.guild.id, "tickets.format.too-long", max=self.max_format_length))
@@ -721,11 +658,15 @@ If that still doesn't work, please create your ticket
             await ctx.send(await self.bot._(ctx.guild.id, "tickets.format.edited.topic", topic=topic["topic"]))
         else:
             await ctx.send(await self.bot._(ctx.guild.id, "tickets.nothing-to-edit"))
+    
+    @topic_set_format.autocomplete("topic_id")
+    async def topic_set_format_autocomplete(self, interaction: discord.Interaction, current: str):
+        return await self.topic_id_autocompletion(interaction, current)
 
 
     @tickets_topics.command(name="list")
     @commands.cooldown(3, 20, commands.BucketType.guild)
-    async def topic_set_roles(self, ctx: MyContext):
+    async def topic_list(self, ctx: MyContext):
         "List every ticket topic used in your server"
         topics_repr: list[str] = []
         none_emoji: str = self.bot.emojis_manager.customs['nothing']
