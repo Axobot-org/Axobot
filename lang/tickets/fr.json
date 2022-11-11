@@ -36,7 +36,9 @@
     "other": "autre",
     "role-edited": {
         "default": "Le rôle autorisé à accéder aux tickets par défaut a été modifié !",
-        "topic": "Le rôle autorisé à accéder aux tickets du topic \"%{topic}\" a bien été modifié !"
+        "default-reset": "Le rôle autorisé à accéder aux tickets par défaut a bien été réinitialisé à 'aucun rôle' !",
+        "topic": "Le rôle autorisé à accéder aux tickets du topic \"%{topic}\" a bien été modifié !",
+        "topic-reset": "Le rôle autorisé à voir les tickets du topic \"%{topic}\" a été réinitialisé à celui par défaut !"
     },
     "selection-placeholder": "Choisissez un topic",
     "text-edited": "Le message affiché avec la sélection du ticket a été modifié",

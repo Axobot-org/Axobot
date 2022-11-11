@@ -36,7 +36,9 @@
     "other": "other",
     "role-edited": {
         "default": "The default role allowed to see tickets has been edited!",
-        "topic": "The role allowed to see tickets of topic \"%{topic}\" has been edited!"
+        "default-reset": "The default role allowed to see tickets has been reset to no role!",
+        "topic": "The role allowed to see tickets of topic \"%{topic}\" has been edited!",
+        "topic-reset": "The role allowed to see tickets of topic \"%{topic}\" has been reset to the default one!"
     },
     "selection-placeholder": "Choose a topic",
     "text-edited": "The message displayed with the selection of a ticket has been edited",
