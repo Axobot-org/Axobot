@@ -167,7 +167,7 @@ class Servers(commands.Cog):
                 if isinstance(row, dict):
                     for k, v in row.items():
                         if v == '':
-                            row[k] = opt_list.default_values[k]
+                            row[k] = opt_list.default_values.get(k, None)
                 liste.append(row)
         return liste
 
@@ -962,7 +962,7 @@ class Servers(commands.Cog):
             option = "1"
         if option.isnumeric():
             page = int(option)
-            if page<1:
+            if page < 1:
                 return await ctx.send(await self.bot._(channel, "xp.low-page"))
             liste = await self.get_server([],criters=["ID="+str(guild.id)])
             if len(liste) == 0:
