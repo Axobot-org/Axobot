@@ -23,7 +23,7 @@
     },
     "hint-useful": "I don't need it anymore",
     "hint-useless": "Create a ticket",
-    "missing-category-config": "Oops, I couldn't create your ticket because no one told me where to create them. Please ask a server moderator to use the `tickets portal set-category` command.",
+    "missing-category-config": "Oops, I couldn't create your ticket because no one told me where to create them. Please ask a server moderator to use the %{set_category} command.",
     "missing-perms-creation": {
         "channel": "Oops, I couldn't create a new ticket channel. Please make sure I have the required permissions and try again.",
         "thread": "Oops, I couldn't create a new ticket thread. Please make sure I have the required permissions and try again."
@@ -36,7 +36,9 @@
     "other": "other",
     "role-edited": {
         "default": "The default role allowed to see tickets has been edited!",
-        "topic": "The role allowed to see tickets of topic \"%{topic}\" has been edited!"
+        "default-reset": "The default role allowed to see tickets has been reset to no role!",
+        "topic": "The role allowed to see tickets of topic \"%{topic}\" has been edited!",
+        "topic-reset": "The role allowed to see tickets of topic \"%{topic}\" has been reset to the default one!"
     },
     "selection-placeholder": "Choose a topic",
     "text-edited": "The message displayed with the selection of a ticket has been edited",
