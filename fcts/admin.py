@@ -591,7 +591,7 @@ Cette option affecte tous les serveurs"""
     async def admin_flag(self, ctx: MyContext):
         "Ajoute ou retire un attribut à un utilisateur"
         if ctx.subcommand_passed is None:
-            await self.bot.get_cog('Help').help_command(ctx, ['admin', 'flag'])
+            await ctx.send_help(ctx.command)
 
     @admin_flag.command(name="list")
     @commands.check(checks.is_bot_admin)
@@ -647,7 +647,7 @@ Cette option affecte tous les serveurs"""
     async def admin_rankcard(self, ctx: MyContext):
         "Ajoute ou retire une carte d'xp à un utilisateur"
         if ctx.subcommand_passed is None:
-            await self.bot.get_cog('Help').help_command(ctx, ['admin', 'rankcard'])
+            await ctx.send_help(ctx.command)
 
     @admin_rankcard.command(name="list")
     @commands.check(checks.is_bot_admin)

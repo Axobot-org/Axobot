@@ -162,7 +162,7 @@ class Cases(commands.Cog):
 
         ..Doc moderator.html#handling-cases"""
         if ctx.subcommand_passed is None:
-            await self.bot.get_cog('Help').help_command(ctx, ['cases'])
+            await ctx.send_help(ctx.command)
 
     @case_main.command(name="list")
     @commands.guild_only()

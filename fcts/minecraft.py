@@ -101,7 +101,7 @@ Every information come from the website www.fr-minecraft.net"""
 
         ..Doc minecraft.html#mc"""
         if ctx.subcommand_passed is None:
-            await self.bot.get_cog('Help').help_command(ctx, ['minecraft'])
+            await ctx.send_help(ctx.command)
 
     async def send_embed(self, ctx: MyContext, embed: discord.Embed):
         "Try to send an embed into a channel, or report the error if it fails"

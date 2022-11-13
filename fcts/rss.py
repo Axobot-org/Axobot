@@ -89,7 +89,7 @@ class Rss(commands.Cog):
 
         ..Doc rss.html#rss"""
         if ctx.subcommand_passed is None:
-            await self.bot.get_cog('Help').help_command(ctx,['rss'])
+            await ctx.send_help(ctx.command)
 
     @rss_main.command(name="youtube",aliases=['yt'])
     async def request_yt(self, ctx: MyContext, *, channel):

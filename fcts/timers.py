@@ -81,7 +81,7 @@ class Timers(commands.Cog):
 
         ..Doc miscellaneous.html#reminders"""
         if ctx.subcommand_passed is None:
-            await self.bot.get_cog('Help').help_command(ctx,['reminder'])
+            await ctx.send_help(ctx.command)
 
 
     @remind_main.command(name="create", aliases=["add"])
