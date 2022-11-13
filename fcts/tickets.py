@@ -332,7 +332,6 @@ class Tickets(commands.Cog):
         await ctx.send(await self.bot._(ctx.guild.id, "errors.unknown", about=about))
 
     @commands.hybrid_group(name="tickets", aliases=["ticket"])
-    @discord.app_commands.guilds(PRIVATE_GUILD_ID)
     @discord.app_commands.default_permissions(manage_guild=True)
     @commands.guild_only()
     async def tickets_main(self, ctx: MyContext):
