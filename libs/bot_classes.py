@@ -69,6 +69,11 @@ class MyContext(commands.Context):
             kwargs["allowed_mentions"].replied_user = False
             return await super().send(reference=self.message.reference, *args, **kwargs)
         return await super().send(*args, **kwargs)
+    
+    async def send_help(self, command: Union[str, commands.Command]):
+        """Send the help message of the given command"""
+        cmd_arg = command.split(' ') if isinstance(command, str) else command.qualified_name.split(' ')
+        await self.bot.get_command("help")(self, *cmd_arg)
 
 # pylint: disable=too-many-instance-attributes
 class Zbot(commands.bot.AutoShardedBot):

@@ -276,7 +276,7 @@ class Partners(commands.Cog):
 
         ..Doc server.html#partners-system"""
         if ctx.subcommand_passed is None:
-            await self.bot.get_cog('Help').help_command(ctx,['partner'])
+            await ctx.send_help(ctx.command)
 
     @partner_main.command(name='add')
     @commands.check(checks.database_connected)

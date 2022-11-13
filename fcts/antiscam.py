@@ -193,7 +193,7 @@ class AntiScam(commands.Cog):
 
         ..Doc moderator.html#anti-scam"""
         if ctx.subcommand_passed is None:
-            await self.bot.get_cog('Help').help_command(ctx, ['antiscam'])
+            await ctx.send_help(ctx.command)
 
     @antiscam.command(name="test")
     @commands.cooldown(5, 30, commands.BucketType.user)

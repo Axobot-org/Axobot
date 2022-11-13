@@ -116,7 +116,7 @@ class RolesReact(commands.Cog):
         
         ..Doc roles-reactions.html"""
         if ctx.subcommand_passed is None:
-            await self.bot.get_cog('Help').help_command(ctx, ['roles_react'])
+            await ctx.send_help(ctx.command)
 
     @rr_main.command(name="add")
     @commands.check(checks.has_manage_guild)

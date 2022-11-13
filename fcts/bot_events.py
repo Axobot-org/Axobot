@@ -145,7 +145,7 @@ class BotEvents(commands.Cog):
     async def events_main(self, ctx: MyContext):
         """When I'm organizing some events"""
         if ctx.subcommand_passed is None:
-            await self.bot.get_cog('Help').help_command(ctx, ['events'])
+            await ctx.send_help(ctx.command)
 
     @events_main.command(name="info")
     async def event_info(self, ctx: MyContext):

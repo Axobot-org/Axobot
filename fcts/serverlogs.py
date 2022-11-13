@@ -144,7 +144,7 @@ class ServerLogs(commands.Cog):
     async def modlogs_main(self, ctx: MyContext):
         """Enable or disable server logs in specific channels"""
         if ctx.subcommand_passed is None:
-            await self.bot.get_cog('Help').help_command(ctx, ['modlogs'])
+            await ctx.send_help(ctx.command)
 
     @modlogs_main.command(name="list")
     @commands.cooldown(1, 10, commands.BucketType.channel)

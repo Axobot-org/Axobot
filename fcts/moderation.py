@@ -942,7 +942,7 @@ The 'reasons' parameter is used to display the mute reasons.
 
         ..Doc moderator.html#emoji-manager"""
         if ctx.subcommand_passed is None:
-            await self.bot.get_cog('Help').help_command(ctx,['emoji'])
+            await ctx.send_help(ctx.command)
 
     @emoji_group.command(name="rename")
     @commands.check(checks.has_manage_emojis)
@@ -1065,7 +1065,7 @@ The 'reasons' parameter is used to display the mute reasons.
 
         ..Doc moderator.html#emoji-manager"""
         if ctx.subcommand_passed is None:
-            await self.bot.get_cog('Help').help_command(ctx,['role'])
+            await ctx.send_help(ctx.command)
 
     @main_role.command(name="color",aliases=['colour'])
     @commands.check(checks.has_manage_roles)

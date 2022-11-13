@@ -340,7 +340,7 @@ class Tickets(commands.Cog):
 
         ..Doc tickets.html"""
         if ctx.subcommand_passed is None:
-            await self.bot.get_cog('Help').help_command(ctx, ['tickets'])
+            await ctx.send_help(ctx.command)
 
     @tickets_main.group(name="portal")
     @commands.check(checks.has_manage_channels)
@@ -349,7 +349,7 @@ class Tickets(commands.Cog):
 
         ..Doc tickets.html"""
         if ctx.subcommand_passed is None:
-            await self.bot.get_cog('Help').help_command(ctx, ['tickets', 'portal'])
+            await ctx.send_help(ctx.command)
 
     @tickets_portal.command()
     @commands.cooldown(2, 30, commands.BucketType.guild)
@@ -487,7 +487,7 @@ class Tickets(commands.Cog):
 
         ..Doc tickets.html"""
         if ctx.subcommand_passed is None:
-            await self.bot.get_cog('Help').help_command(ctx, ['tickets', 'topic'])
+            await ctx.send_help(ctx.command)
 
     @tickets_topics.command(name="add", aliases=["create"])
     @commands.cooldown(3, 45, commands.BucketType.guild)

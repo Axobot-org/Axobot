@@ -131,7 +131,7 @@ class Users(commands.Cog):
     async def profile_main(self, ctx: MyContext):
         """Get and change info about yourself"""
         if ctx.subcommand_passed is None:
-            await self.bot.get_cog('Help').help_command(ctx,['profile'])
+            await ctx.send_help(ctx.command)
 
     @profile_main.command(name='card-preview')
     @commands.check(checks.database_connected)

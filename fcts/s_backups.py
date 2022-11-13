@@ -27,7 +27,7 @@ class Backups(commands.Cog):
 
         ..Doc server.html#server-backup"""
         if ctx.subcommand_passed is None:
-            await self.bot.get_cog('Help').help_command(ctx,['backup'])
+            await ctx.send_help(ctx.command)
 
 
     @main_backup.command(name="load")

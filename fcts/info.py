@@ -1221,7 +1221,7 @@ Available types: member, role, user, emoji, channel, server, invite, category
 
         ..Doc miscellaneous.html#bitly-urls"""
         if ctx.subcommand_passed is None:
-            await self.bot.get_cog('Help').help_command(ctx,['bitly'])
+            await ctx.send_help(ctx.command)
         elif ctx.invoked_subcommand is None and ctx.subcommand_passed is not None:
             try:
                 url = await args.URL.convert(ctx,ctx.subcommand_passed)
