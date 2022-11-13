@@ -1,0 +1,22 @@
+{
+    "check-stream": {
+        "no-nsfw": "Ce stream est marqué comme réservé à une audience adulte, mais ce salon n'est pas NSFW",
+        "offline": "Cette chaîne est actuellement hors ligne",
+        "title": "%{streamer} est en live !"
+    },
+    "subscribe": {
+        "success": "Votre serveur est maintenant abonné aux lives de %{streamer} !",
+        "limit-reached": "Vous ne pouvez pas vous abonner à plus de %{limit} streamers !",
+        "already-subscribed": "Le serveur est déjà abonné aux lives de %{streamer}"
+    },
+    "subs-list": {
+        "title": "Liste des abonnements (%{current}/%{max}):",
+        "empty": "Ce serveur n'est abonné à aucune chaîne !",
+        "empty-tip": "Utilisez la commande %{cmd} pour vous abonner à un maximum de %{max} streamers."
+    },
+    "unknown-streamer": "Streamer inconnu",
+    "unsubscribe": {
+        "success": "Ce serveur a été désabonné des lives de %{streamer}",
+        "not-subscribed": "Ce serveur n'est déjà pas abonné à %{streamer}"
+    }
+}
