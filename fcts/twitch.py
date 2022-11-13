@@ -35,6 +35,12 @@ class Twitch(commands.Cog):
         async with self.bot.db_query(query, (guild_id, platform, user_id, user_name, self.bot.beta), returnrowcount=True) as query_result:
             return query_result > 0
 
+    async def db_get_guild_subscriptions_count(self, guild_id: int) -> int:
+        "Get the number of subscriptions for a guild"
+        query = "SELECT COUNT(*) FROM `streamers` WHERE `guild_id` = %s AND `beta` = %s"
+        async with self.bot.db_query(query, (guild_id, self.bot.beta), astuple=True) as query_result:
+            return query_result[0][0]
+
     async def db_get_guild_streamers(self, guild_id: int, platform: Optional[PlatformId]=None) -> list[StreamersDBObject]:
         "Get the streamers for a guild"
         query = "SELECT * FROM `streamers` WHERE `guild_id` = %s AND `beta` = %s"
@@ -78,9 +84,15 @@ class Twitch(commands.Cog):
     @twitch.command(name="subscribe")
     async def twitch_sub(self, ctx: MyContext, streamer: str):
         "Subscribe to a Twitch streamer"
+        await ctx.defer()
         user = await self.agent.get_user_by_name(streamer)
         if user is None:
             await ctx.send("User not found")
+            return
+        streamers_count = await self.db_get_guild_subscriptions_count(ctx.guild.id)
+        max_count = await self.bot.get_config(ctx.guild.id,'streamers_max_number')
+        if streamers_count >= max_count:
+            await ctx.send(f"You can't subscribe to more than {max_count} streamers!")
             return
         if await self.db_add_streamer(ctx.guild.id, "twitch", user["id"], user["display_name"]):
             await ctx.send(f"Subscribed to channel {user['display_name']}")
@@ -123,8 +135,9 @@ class Twitch(commands.Cog):
     async def twitch_list(self, ctx: MyContext):
         "List all subscribed Twitch streamers"
         streamers = await self.db_get_guild_streamers(ctx.guild.id, "twitch")
+        max_count = await self.bot.get_config(ctx.guild.id,'streamers_max_number')
         if streamers:
-            await ctx.send("Subscribed to:\n• " + "\n• ".join(streamer["user_name"] for streamer in streamers))
+            await ctx.send(f"Subscriptions list ({len(streamers)}/{max_count}):\n• " + "\n• ".join(streamer["user_name"] for streamer in streamers))
 
     @twitch.command(name="check-stream")
     @commands.cooldown(3, 60, commands.BucketType.user)
