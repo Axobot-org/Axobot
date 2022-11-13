@@ -55,6 +55,7 @@
             "roles_react",
             "roles_rewards",
             "tickets",
+            "twitch",
             "welcome"
         ]
     },

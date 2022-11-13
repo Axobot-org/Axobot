@@ -77,7 +77,7 @@ class Twitch(commands.Cog):
 
     @twitch.command(name="subscribe")
     async def twitch_sub(self, ctx: MyContext, streamer: str):
-        "Subscribe to a twitch user"
+        "Subscribe to a Twitch streamer"
         user = await self.agent.get_user_by_name(streamer)
         if user is None:
             await ctx.send("User not found")
@@ -89,7 +89,7 @@ class Twitch(commands.Cog):
 
     @twitch.command(name="unsubscribe")
     async def twitch_unsub(self, ctx: MyContext, streamer: str):
-        "Unsubscribe from a twitch user"
+        "Unsubscribe from a Twitch streamer"
         if streamer.isnumeric():
             user_id = streamer
         else:
@@ -121,14 +121,15 @@ class Twitch(commands.Cog):
 
     @twitch.command(name="list-subscriptions")
     async def twitch_list(self, ctx: MyContext):
-        "List all subscribed twitch users"
+        "List all subscribed Twitch streamers"
         streamers = await self.db_get_guild_streamers(ctx.guild.id, "twitch")
         if streamers:
             await ctx.send("Subscribed to:\n• " + "\n• ".join(streamer["user_name"] for streamer in streamers))
 
     @twitch.command(name="check-stream")
+    @commands.cooldown(3, 60, commands.BucketType.user)
     async def test_twitch(self, ctx: MyContext, streamer: str):
-        "Test the Twitch API"
+        "Check if a streamer is currently streaming"
         if streamer.isnumeric():
             user_id = streamer
         else:
