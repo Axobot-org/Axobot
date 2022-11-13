@@ -506,7 +506,7 @@ class Rss(commands.Cog):
                 await view.disable(msg)
                 return
             try:
-                selection = list(map(int, view.values))
+                selection = list(map(int, view.values)) if isinstance(view.values, list) else [int(view.values)]
             except ValueError:
                 selection = []
         if len(selection) == 0:
@@ -1197,7 +1197,7 @@ class Rss(commands.Cog):
             form = ''
         else:
             form = await self.bot._(guild_id, f"rss.{_type}-default-flow")
-        query = "INSERT INTO `{}` (`ID`, `guild`,`channel`,`type`,`link`,`structure`) VALUES (%(i)s,%(g)s,%(c)s,%(t)s,%(l)s,%(f)s)".format(self.table)
+        query = "INSERT INTO `{}` (`ID`, `guild`, `channel`, `type`, `link`, `structure`) VALUES (%(i)s, %(g)s, %(c)s %(t)s, %(l)s, %(f)s)".format(self.table)
         async with self.bot.db_query(query, { 'i': feed_id, 'g': guild_id, 'c': channel_id, 't': _type, 'l': link, 'f': form }):
             pass
         return feed_id
