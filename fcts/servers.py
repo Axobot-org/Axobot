@@ -242,7 +242,6 @@ class Servers(commands.Cog):
         ][:25]
 
     @commands.hybrid_group(name='config')
-    @discord.app_commands.guilds(PRIVATE_GUILD_ID)
     @discord.app_commands.default_permissions(manage_guild=True)
     @commands.guild_only()
     async def sconfig_main(self, ctx: MyContext):

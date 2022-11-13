@@ -68,7 +68,6 @@ class Twitch(commands.Cog):
             return query_result > 0
 
     @commands.hybrid_group(name="twitch")
-    @app_commands.guilds(PRIVATE_GUILD_ID)
     @app_commands.default_permissions(manage_guild=True)
     @commands.guild_only()
     async def twitch(self, ctx: MyContext):

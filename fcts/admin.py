@@ -14,7 +14,7 @@ import discord
 import speedtest
 from cachingutils import acached
 from discord.ext import commands
-from libs.bot_classes import PRIVATE_GUILD_ID, MyContext, Zbot
+from libs.bot_classes import PRIVATE_GUILD_ID, SUPPORT_GUILD_ID, MyContext, Zbot
 from libs.enums import RankCardsFlag, UserFlag
 from libs.views import ConfirmView
 
@@ -120,14 +120,19 @@ class Admin(commands.Cog):
         "Sync app commands for either global or staff server scope"
         await ctx.defer()
         if scope == "global":
-            cmds = await self.bot.tree.sync()
-            txt = f"{len(cmds)} global app commands synced"
+            if self.bot.beta:
+                self.bot.tree.copy_global_to(guild=PRIVATE_GUILD_ID)
+                cmds = await self.bot.tree.sync(guild=PRIVATE_GUILD_ID)
+                txt = f"{len(cmds)} (global + local) app commands synced in staff server"
+            else:
+                cmds = await self.bot.tree.sync()
+                txt = f"{len(cmds)} global app commands synced"
         elif scope == "staff-guild":
-            cmds = await self.bot.tree.sync(guild=discord.Object(id=625316773771608074))
-            txt = f"{len(cmds)} global app commands synced in staff server"
+            cmds = await self.bot.tree.sync(guild=PRIVATE_GUILD_ID)
+            txt = f"{len(cmds)} app commands synced in staff server"
         elif scope == "support-guild":
-            cmds = await self.bot.tree.sync(guild=discord.Object(id=356067272730607628))
-            txt = f"{len(cmds)} global app commands synced in the support server"
+            cmds = await self.bot.tree.sync(guild=SUPPORT_GUILD_ID)
+            txt = f"{len(cmds)} app commands synced in the support server"
         else:
             await ctx.send("Unknown scope")
             return
