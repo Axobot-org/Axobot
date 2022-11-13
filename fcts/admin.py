@@ -401,6 +401,7 @@ class Admin(commands.Cog):
     @commands.check(checks.is_bot_admin)
     async def db_reload(self, ctx: MyContext):
         "Reconnecte le bot à la base de donnée"
+        await ctx.defer()
         self.bot.cnx_frm.close()
         self.bot.connect_database_frm()
         self.bot.cnx_xp.close()
@@ -412,6 +413,8 @@ class Admin(commands.Cog):
                 await self.add_success_reaction(ctx.message)
             if xp := self.bot.get_cog("Xp"):
                 await xp.reload_sus()
+            if servers := self.bot.get_cog("Servers"):
+                await servers.clear_cache()
 
     @admin_db.command(name="biggest-tables")
     @commands.check(checks.is_bot_admin)

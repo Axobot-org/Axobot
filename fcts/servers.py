@@ -45,6 +45,9 @@ class Servers(commands.Cog):
     def table(self):
         return 'servers_beta' if self.bot.beta else 'servers'
 
+    async def clear_cache(self):
+        self.cache._items.clear()
+
     async def get_bot_infos(self, bot_id: int):
         """Return every options of the bot"""
         if not self.bot.database_online:
