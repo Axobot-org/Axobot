@@ -23,6 +23,7 @@ default_values = {
     "rr_max_number": 7,
     "rss_max_number": 10,
     "roles_react_max_number": 20,
+    "streamers_max_number": 20,
     "language": 1,
     "description": "",
     "clear_allowed_roles": "",

@@ -28,6 +28,7 @@ if TYPE_CHECKING:
     from fcts.partners import Partners
     from fcts.rss import Rss
     from fcts.servers import Servers
+    from fcts.twitch import Twitch
     from fcts.users import Users
     from fcts.utilities import Utilities
     from fcts.xp import Xp
@@ -184,6 +185,10 @@ class Zbot(commands.bot.AutoShardedBot):
 
     @overload
     def get_cog(self, name: Literal["Servers"]) -> Optional["Servers"]:
+        ...
+
+    @overload
+    def get_cog(self, name: Literal["Twitch"]) -> Optional["Twitch"]:
         ...
 
     @overload
