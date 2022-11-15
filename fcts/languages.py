@@ -1,10 +1,11 @@
 from typing import Union
 import discord
 import i18n
-from libs.bot_classes import Zbot
+from libs.bot_classes import MyContext, Zbot
 
 SourceType = Union[None, int, discord.Guild, discord.TextChannel, discord.Thread,
-                   discord.Member, discord.User, discord.DMChannel, discord.Interaction]
+                   discord.Member, discord.User, discord.DMChannel, discord.Interaction,
+                   MyContext]
 
 
 class Languages(discord.ext.commands.Cog):
@@ -44,6 +45,12 @@ class Languages(discord.ext.commands.Cog):
                 source = source.user
             else:
                 source = None
+        elif isinstance(source, MyContext):
+            # get ID from guild
+            if source.guild:
+                source = source.guild.id
+            else:
+                source = source.author
 
         if isinstance(source, (discord.Member, discord.User)):
             # get lang from user
