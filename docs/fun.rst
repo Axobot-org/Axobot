@@ -227,7 +227,7 @@ Any of you like pizza here? Those beautiful dripping pieces of melted cheese and
 Pong
 ----
 
-**Syntax:** :code:`ping`
+**Syntax:** :code:`pong`
 
 This is probably the most useless command in the bot. Try it, you may (maybe) not be disappointed!
 
