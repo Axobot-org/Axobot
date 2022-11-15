@@ -9,10 +9,11 @@ from cachingutils import LRUCache
 from discord import app_commands
 from discord.ext import commands
 
-from libs.bot_classes import PRIVATE_GUILD_ID, MyContext, Zbot
-from libs.views import ConfirmView
+from libs.bot_classes import MyContext, Zbot
 from libs.serverconfig import options_list as opt_list
 from libs.serverconfig.autocomplete import autocomplete_main
+from libs.serverconfig.config_paginator import ServerConfigPaginator
+from libs.views import ConfirmView
 
 from . import checks
 
@@ -950,13 +951,13 @@ class Servers(commands.Cog):
         """Displays the value of an option, or all options if none is specified"""
         if not ctx.bot.database_online:
             return await ctx.send(await self.bot._(ctx.guild.id,"cases.no_database"))
-        await self.send_see(ctx.guild,ctx.channel,option,ctx.message,ctx)
+        await self.send_see(ctx.guild, ctx, option, ctx.message)
 
     @sconfig_see.autocomplete("option")
     async def sconfig_see_autocomplete(self, _: MyContext, option: str):
         return await self.option_name_autocomplete(option)
 
-    async def send_see(self, guild: discord.Guild, channel: typing.Union[discord.TextChannel, discord.Thread], option: str, msg: discord.Message, ctx: MyContext):
+    async def send_see(self, guild: discord.Guild, ctx: MyContext, option: str, msg: discord.Message):
         """Envoie l'embed dans un salon"""
         if self.bot.zombie_mode:
             return
@@ -965,70 +966,10 @@ class Servers(commands.Cog):
         if option.isnumeric():
             page = int(option)
             if page < 1:
-                return await ctx.send(await self.bot._(channel, "xp.low-page"))
-            liste = await self.get_server([],criters=["ID="+str(guild.id)])
-            if len(liste) == 0:
-                return await channel.send(await self.bot._(channel, "server.not-found", guild=guild.name))
-            temp = [(k,v) for k,v in liste[0].items() if k in self.options_list]
-            max_page = ceil(len(temp)/20)
-            if page > max_page:
-                return await ctx.send(await self.bot._(channel, "xp.high-page"))
-            liste = {k:v for k,v in temp[(page-1)*20:page*20] }
-            if len(liste) == 0:
-                return await ctx.send("NOPE")
-            title = await self.bot._(channel, "server.see-title", guild=guild.name) + f" ({page}/{max_page})"
-            embed = discord.Embed(title=title, color=self.embed_color,
-                                  description=await self.bot._(channel, "server.see-0"), timestamp=msg.created_at)
-            if guild.icon:
-                embed.set_thumbnail(url=guild.icon.with_static_format('png'))
-            diff = channel.guild != guild
-            for i,v in liste.items():
-                #if i not in self.optionsList:
-                #    continue
-                if i == "nicknames_history" and v is None:
-                    r = len(guild.members) < self.max_members_for_nicknames
-                elif i in opt_list.roles_options:
-                    r = await self.form_roles(guild,v,diff)
-                    r = ", ".join(r)
-                elif i in opt_list.bool_options:
-                    r = str(await self.form_bool(v))
-                elif i in opt_list.textchan_options:
-                    r = await self.form_textchan(guild,v,diff)
-                    r = ", ".join(r)
-                elif i in opt_list.category_options:
-                    r = await self.form_category(guild, v, diff)
-                    r = ', '.join(r)
-                elif i in opt_list.text_options:
-                    r = v if len(v)<500 else v[:500]+"..."
-                elif i in opt_list.numb_options:
-                    r = str(v)
-                elif i in opt_list.vocchan_options:
-                    r = await self.form_vocal(guild,v)
-                    r = ", ".join(r)
-                elif i == "language":
-                    r = await self.form_lang(v)
-                elif i in opt_list.prefix_options:
-                    r = await self.form_prefix(v)
-                elif i in opt_list.raid_options:
-                    r = await self.form_raid(v)
-                elif i in opt_list.emoji_option:
-                    r = ", ".join(await self.form_emoji(v, i))
-                elif i in opt_list.xp_type_options:
-                    r = await self.form_xp_type(v)
-                elif i in opt_list.color_options:
-                    r = await self.form_color(i,v)
-                elif i in opt_list.xp_rate_option:
-                    r = await self.form_xp_rate(i,v)
-                elif i in opt_list.levelup_channel_option:
-                    r = await self.form_levelup_chan(guild,v,diff)
-                elif i in opt_list.ttt_display_option:
-                    r = await self.form_tttdisplay(v)
-                else:
-                    continue
-                if len(str(r)) == 0:
-                    r = "Ø"
-                embed.add_field(name=i, value=r)
-            await channel.send(embed=embed)
+                return await ctx.send(await self.bot._(ctx.channel, "xp.low-page"))
+            _quit = await self.bot._(ctx.guild, "misc.quit")
+            view = ServerConfigPaginator(self.bot, ctx.author, stop_label=_quit.capitalize(), guild=guild, cog=self)
+            await view.send_init(ctx)
             return
         elif ctx is not None:
             if option in opt_list.roles_options:
@@ -1061,7 +1002,7 @@ class Servers(commands.Cog):
                 r = await self.conf_xp_type(ctx, option, 'scret-desc')
             elif option in opt_list.color_options:
                 r = await self.conf_color(ctx, option, 'scret-desc')
-            elif option in opt_list.opt_list.xp_rate_option:
+            elif option in opt_list.xp_rate_option:
                 r = await self.conf_xp_rate(ctx, option, 'scret-desc')
             elif option in opt_list.levelup_channel_option:
                 r = await self.conf_levelup_chan(ctx, option, 'scret-desc')
@@ -1070,26 +1011,22 @@ class Servers(commands.Cog):
             else:
                 r = None
             guild = ctx if isinstance(ctx, discord.Guild) else ctx.guild
-            if r is not None:
+            if r is None:
+                r = await self.bot._(ctx.channel, "server.option-notfound")
+            else:
                 try:
-                    r = await self.bot._(channel, f"server.server_desc.{option}", value=r)
+                    r = await self.bot._(ctx.channel, f"server.server_desc.{option}", value=r)
                 except Exception as err:
                     pass
-            else:
-                r = await self.bot._(channel, "server.option-notfound")
             try:
-                if not channel.permissions_for(channel.guild.me).embed_links:
-                    await channel.send(await self.bot._(channel, "minecraft.cant-embed"))
+                if not ctx.channel.permissions_for(ctx.guild.me).embed_links:
+                    await ctx.send(await self.bot._(ctx.channel, "minecraft.cant-embed"))
                     return
-                title = await self.bot._(channel, "server.opt_title", opt=option, guild=guild.name)
-                if hasattr(ctx, "message"):
-                    t = ctx.message.created_at
-                else:
-                    t = ctx.bot.utcnow()
-                embed = discord.Embed(title=title, color=self.embed_color, description=r, timestamp=t)
+                title = await self.bot._(ctx.channel, "server.opt_title", opt=option, guild=guild.name)
+                embed = discord.Embed(title=title, color=self.embed_color, description=r)
                 if isinstance(ctx, commands.Context):
                     embed.set_footer(text=ctx.author, icon_url=ctx.author.display_avatar)
-                await channel.send(embed=embed)
+                await ctx.send(embed=embed)
             except Exception as err:
                 self.bot.dispatch("error", err, ctx if isinstance(ctx, commands.Context) else None)
 
