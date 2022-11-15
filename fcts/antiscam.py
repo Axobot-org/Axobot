@@ -187,7 +187,8 @@ class AntiScam(commands.Cog):
                     )
         return await train_model(data)
 
-    @commands.group(name="antiscam")
+    @commands.hybrid_group(name="antiscam")
+    @discord.app_commands.default_permissions(manage_guild=True)
     async def antiscam(self, ctx: MyContext):
         """Everything related to the antiscam feature
 
@@ -197,28 +198,31 @@ class AntiScam(commands.Cog):
 
     @antiscam.command(name="test")
     @commands.cooldown(5, 30, commands.BucketType.user)
-    async def antiscam_test(self, ctx: MyContext, *, msg: str):
+    async def antiscam_test(self, ctx: MyContext, *, text: str):
         """Test the antiscam feature with a given message
 
         ..Example antiscam test free nitro for everyone at bit.ly/tomato"""
-        data = Message.from_raw(msg, 0, self.agent.websites_list)
+        data = Message.from_raw(text, 0, self.agent.websites_list)
         pred = self.agent.predict_bot(data)
         url_score = await self.bot._(ctx.channel, "antiscam.url-score", score=data.url_score)
-        result_ = await self.bot._(ctx.channel, "antiscam.result")
         probabilities_ = await self.bot._(ctx.channel, "antiscam.probabilities")
         probas = '\n    - '.join(f'{self.agent.categories[c]}: {round(p*100, 1)}%' for c, p in pred.probabilities.items())
-        msg = f"""{result_} **{self.agent.categories[pred.result]}**
-
-{probabilities_}
+        answer = f"""{probabilities_}
     - {probas}
+
 {url_score}"""
-        await ctx.send(msg)
+        embed = discord.Embed(
+            title = await self.bot._(ctx.channel, "antiscam.result") + " " + self.agent.categories[pred.result],
+            description = answer,
+            color=discord.Color.red() if pred.result >= 2 else discord.Color.green()
+        )
+        await ctx.send(embed=embed)
 
     @antiscam.command(name="enable")
     @commands.guild_only()
     @commands.check(checks.has_manage_guild)
     async def antiscam_enable(self, ctx: MyContext):
-        """Enable the anti scam feature in your server
+        """Enable the antiscam feature in your server
 
         ..Doc moderator.html#anti-scam"""
         msg: discord.Message = copy.copy(ctx.message)
@@ -230,7 +234,7 @@ class AntiScam(commands.Cog):
     @commands.guild_only()
     @commands.check(checks.has_manage_guild)
     async def antiscam_disable(self, ctx: MyContext):
-        """Disable the anti scam feature in your server
+        """Disable the antiscam feature in your server
 
         ..Doc moderator.html#anti-scam"""
         msg: discord.Message = copy.copy(ctx.message)
@@ -238,7 +242,7 @@ class AntiScam(commands.Cog):
         new_ctx = await self.bot.get_context(msg)
         await self.bot.invoke(new_ctx)
 
-    @antiscam.command(name="fetch-unicode")
+    @antiscam.command(name="fetch-unicode", with_app_command=False)
     @commands.check(checks.is_bot_admin)
     async def antiscam_refetch_uneicode(self, ctx: MyContext):
         "Refetch the unicode map of confusable characters"
@@ -248,7 +252,7 @@ class AntiScam(commands.Cog):
         await update_unicode_map()
         await ctx.send("Done!")
 
-    @antiscam.command(name="update-table")
+    @antiscam.command(name="update-table", with_app_command=False)
     @commands.check(checks.is_bot_admin)
     async def antiscam_update_table(self, ctx: MyContext):
         "Update the recorded messages table"
@@ -256,7 +260,7 @@ class AntiScam(commands.Cog):
         counter = await self.db_update_messages(self.table)
         await ctx.send(f"{counter} messages updated!")
 
-    @antiscam.command(name="train")
+    @antiscam.command(name="train", with_app_command=False)
     @commands.check(checks.is_bot_admin)
     async def antiscam_train_model(self, ctx: MyContext):
         "Re-train the antiscam model (DESTRUCTIVE ACTION)"
@@ -280,16 +284,27 @@ class AntiScam(commands.Cog):
     @antiscam.command(name="report")
     @commands.cooldown(5, 30, commands.BucketType.guild)
     @commands.cooldown(2, 10, commands.BucketType.user)
-    async def antiscam_report(self, ctx: MyContext, *, message: typing.Union[discord.Message, str]):
+    async def antiscam_report(self, ctx: MyContext, *, message: str):
         """Report a suspicious message to the bot team
         This will help improving the bot detection AI
 
         ..Doc moderator.html#anti-scam"""
-        content = message.content if isinstance(message, discord.Message) else message
-        mentions_count = len(message.mentions) if isinstance(message, discord.Message) else 0
+        await ctx.defer()
+        try:
+            src_msg = await commands.converter.MessageConverter().convert(ctx, message)
+        except commands.CommandError:
+            src_msg = None
+            content = message
+            mentions_count = 0
+        else:
+            if not src_msg.content:
+                await ctx.send(await self.bot._(ctx, "antiscam.report-empty"), ephemeral=True)
+                return
+            content = src_msg.content
+            mentions_count = len(src_msg.mentions)
         msg = Message.from_raw(content, mentions_count, self.agent.websites_list)
-        if isinstance(message, discord.Message) and message.guild:
-            msg.contains_everyone = f'<@&{message.guild.id}>' in content or '@everyone' in content
+        if src_msg is not None and src_msg.guild:
+            msg.contains_everyone = f'<@&{src_msg.guild.id}>' in content or '@everyone' in content
         else:
             msg.contains_everyone = '@everyone' in content
         msg_id = await self.db_insert_msg(msg)
