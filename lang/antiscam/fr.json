@@ -1,6 +1,7 @@
 {
     "probabilities": "Probabilités :",
+    "report-empty": "Ce message n'a aucun contenu à signaler !",
     "report-successful": "Nous avons bien recu votre report, merci de votre contribution !",
-    "result": "Résultat :",
+    "result": "Résultat de la détection de scam :",
     "url-score": "Score de risque des URLs : %{score}"
 }
