@@ -1254,28 +1254,6 @@ The 'reasons' parameter is used to display the mute reasons.
         else:
             await ctx.send(answer)
 
-
-    @commands.command(name="pin")
-    @commands.check(checks.has_manage_msg)
-    async def pin_msg(self, ctx: MyContext, msg: int):
-        """Pin a message
-ID corresponds to the Identifier of the message
-
-..Example pin https://discord.com/channels/159962941502783488/201215818724409355/505373568184483851"""
-        if ctx.guild is not None and not ctx.channel.permissions_for(ctx.guild.me).manage_messages:
-            await ctx.send(await self.bot._(ctx.channel, "moderation.cant-pin"))
-            return
-        try:
-            message = await ctx.channel.fetch_message(msg)
-        except Exception as e:
-            await ctx.send(await self.bot._(ctx.channel, "moderation.pin.error-notfound", err=e))
-            return
-        try:
-            await message.pin()
-        except Exception as e:
-            await ctx.send(await self.bot._(ctx.channel, "moderation.pin.error-toomuch", err=e))
-            return
-
     @commands.command(name='unhoist')
     @commands.guild_only()
     @commands.check(checks.has_manage_nicknames)
