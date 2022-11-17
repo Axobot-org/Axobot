@@ -42,10 +42,6 @@ class Servers(commands.Cog):
         self.membercounter_pending: dict[int, int] = {}
         self.max_members_for_nicknames = 3000
 
-    @property
-    def table(self):
-        return 'servers_beta' if self.bot.beta else 'servers'
-
     async def clear_cache(self):
         self.cache._items.clear()
 
@@ -71,10 +67,10 @@ class Servers(commands.Cog):
         """Return stats on used languages"""
         if not self.bot.database_online or not 'Languages' in self.bot.cogs:
             return []
-        query = f"SELECT `language`,`ID` FROM `{self.table}`"
+        query = "SELECT `language`,`ID` FROM `servers` WHERE `beta` = %s"
         liste = []
         guilds = {x.id for x in self.bot.guilds if x.id not in ignored_guilds}
-        async with self.bot.db_query(query) as query_results:
+        async with self.bot.db_query(query, (self.bot.beta,)) as query_results:
             for row in query_results:
                 if row['ID'] in guilds:
                     liste.append(row['language'])
@@ -94,10 +90,10 @@ class Servers(commands.Cog):
         "Return stats on used xp types"
         if not self.bot.database_online:
             return []
-        query = f"SELECT `xp_type`,`ID` FROM `{self.table}`"
+        query = "SELECT `xp_type`,`ID` FROM `servers` WHERE `beta` = %s"
         liste = []
         guilds = {x.id for x in self.bot.guilds if x.id not in ignored_guilds}
-        async with self.bot.db_query(query) as query_results:
+        async with self.bot.db_query(query, (self.bot.beta,)) as query_results:
             for row in query_results:
                 if row['ID'] in guilds:
                     liste.append(row['xp_type'])
@@ -164,9 +160,9 @@ class Servers(commands.Cog):
         else:
             cl = "`"+"`,`".join(columns)+"`"
         relation = " "+relation+" "
-        query = ("SELECT {} FROM `{}` WHERE {}".format(cl, self.table, relation.join(criters)))
+        query = ("SELECT {} FROM `servers` WHERE `beta` = %s AND {}".format(cl, relation.join(criters)))
         liste = list()
-        async with self.bot.db_query(query, astuple=(return_type!=dict)) as query_results:
+        async with self.bot.db_query(query, (self.bot.beta,), astuple=(return_type!=dict)) as query_results:
             for row in query_results:
                 if isinstance(row, dict):
                     for k, v in row.items():
@@ -182,8 +178,8 @@ class Servers(commands.Cog):
         if values is None:
             values = [()]
         set_query = ', '.join(f'`{val[0]}`=%s' for val in values)
-        query = f"UPDATE `{self.table}` SET {set_query} WHERE `ID`={guild_id}"
-        async with self.bot.db_query(query, (val[1] for val in values)):
+        query = f"UPDATE `servers` SET {set_query} WHERE `ID`=%s AND `beta` = %s"
+        async with self.bot.db_query(query, (val[1] for val in values) + (guild_id, self.bot.beta)):
             pass
         for value in values:
             self.cache[(guild_id, value[0])] = value[1]
@@ -205,12 +201,12 @@ class Servers(commands.Cog):
         if isinstance(guild_id, str):
             if not guild_id.isnumeric():
                 raise ValueError
-        query = "INSERT INTO `{}` (`ID`) VALUES ('{}')".format(self.table,guild_id)
-        async with self.bot.db_query(query):
+        query = "INSERT INTO `servers` (`ID`, `beta`) VALUES (%s, %s)"
+        async with self.bot.db_query(query, (guild_id, self.bot.beta)):
             pass
         return True
 
-    async def is_server_exist(self, guild_id: int):
+    async def create_row_if_needed(self, guild_id: int):
         """Check if a server is already in the db"""
         i = await self.get_option(guild_id, "ID")
         if i is None:
@@ -227,8 +223,8 @@ class Servers(commands.Cog):
         """remove a server from the db"""
         if not isinstance(guild_id, int):
             raise ValueError
-        query = f"DELETE FROM `{self.table}` WHERE `ID`='{guild_id}'"
-        async with self.bot.db_query(query):
+        query = f"DELETE FROM `servers` WHERE `ID` = %s AND `beta` = %s"
+        async with self.bot.db_query(query, (guild_id, self.bot.beta)):
             pass
         return True
 
@@ -252,8 +248,6 @@ class Servers(commands.Cog):
         """Function for setting the bot on a server
 
 ..Doc server.html#config-options"""
-        if ctx.bot.database_online:
-            await self.is_server_exist(ctx.guild.id)
         if ctx.invoked_subcommand is None:
             msg = copy.copy(ctx.message)
             subcommand_passed = ctx.message.content.replace(ctx.prefix+"config ","")
@@ -296,6 +290,7 @@ class Servers(commands.Cog):
         """Allows you to modify an option"""
         if not ctx.bot.database_online:
             return await ctx.send(await self.bot._(ctx.guild.id,"cases.no_database"))
+        await self.create_row_if_needed(ctx.guild.id)
         try:
             if option in opt_list.roles_options:
                 await self.conf_roles(ctx, option, value)
@@ -873,6 +868,8 @@ class Servers(commands.Cog):
         ext = not isinstance(ctx, commands.Context)
         if value == "scret-desc":
             chan = await self.get_option(guild.id,option)
+            if chan is None:
+                chan = opt_list.default_values[option]
             return await self.form_levelup_chan(guild, chan, ext)
         else:
             if value.lower() in {"any", "tout", "tous", "current", "all", "any channel"}:
