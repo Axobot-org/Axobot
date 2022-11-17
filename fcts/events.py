@@ -449,6 +449,8 @@ class Events(commands.Cog):
     async def send_sql_statslogs(self):
         "Send some stats about the current bot stats"
         await self.bot.wait_until_ready()
+        if self.bot.get_cog("Rss") is None:
+            return
         rss_feeds = await self.bot.get_cog("Rss").db_get_raws_count(True)
         active_rss_feeds = await self.bot.get_cog("Rss").db_get_raws_count()
         if infoCog := self.bot.get_cog("Info"):
