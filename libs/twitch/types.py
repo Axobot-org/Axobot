@@ -45,3 +45,10 @@ class StreamersDBObject(TypedDict):
     user_name: str
     is_streaming: bool
     beta: bool
+
+class GroupedStreamerDBObject(TypedDict):
+    platform: PlatformId
+    user_id: str
+    user_name: str
+    is_streaming: bool
+    guild_ids: list[int]

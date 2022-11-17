@@ -1,13 +1,22 @@
-from typing import Optional
+import json
+from typing import Optional, TypedDict
 from dateutil.parser import isoparse
 
 import discord
 from discord import app_commands
-from discord.ext import commands
+from discord.ext import commands, tasks
 
 from libs.bot_classes import MyContext, Zbot
 from libs.twitch.api_agent import TwitchApiAgent
-from libs.twitch.types import PlatformId, StreamersDBObject
+from libs.twitch.types import GroupedStreamerDBObject, PlatformId, StreamObject, StreamersDBObject
+
+
+class _StreamersReadyForNotification(TypedDict):
+    platform: PlatformId
+    user_id: str
+    user_name: str
+    is_streaming: bool
+    guilds: list[discord.Guild]
 
 class Twitch(commands.Cog):
     "Handle twitch streams"
@@ -24,11 +33,13 @@ class Twitch(commands.Cog):
             self.bot.others["twitch_client_secret"]
         )
         self.bot.log.info("[twitch] connected to API")
+        self.stream_check_task.start()
 
     async def cog_unload(self):
         "Close the Twitch session"
         await self.agent.close_session()
         self.bot.log.info("[twitch] connection closed")
+        self.stream_check_task.cancel()
 
     async def db_add_streamer(self, guild_id: int, platform: PlatformId, user_id: str, user_name: str):
         "Add a streamer to the database"
@@ -52,15 +63,15 @@ class Twitch(commands.Cog):
         async with self.bot.db_query(query, args) as query_result:
             return query_result
 
-    async def db_get_streamers(self, platform: Optional[PlatformId]=None) -> list[StreamersDBObject]:
+    async def db_get_guilds_per_streamers(self, platform: Optional[PlatformId]=None) -> list[GroupedStreamerDBObject]:
         "Get all streamers objects"
-        query = "SELECT * FROM `streamers` WHERE `beta` = %s"
-        args = [self.bot.beta]
-        if platform is not None:
-            query += " AND `platform` = %s"
-            args.append(platform)
-        async with self.bot.db_query(query, args) as query_result:
-            return query_result
+        where = "" if platform is None else f"AND `platform` = \"{platform}\""
+        query = f"SELECT `platform`, `user_id`, `user_name`, `is_streaming`, JSON_ARRAYAGG(`guild_id`) as \"guild_ids\" FROM `streamers` WHERE `beta` = %s {where} GROUP BY `platform`, `user_id`; "
+        async with self.bot.db_query(query, (self.bot.beta,)) as query_result:
+            return [
+                data | {"guild_ids": json.loads(data["guild_ids"])}
+                for data in query_result
+            ]
 
     async def db_remove_streamer(self, guild_id: int, platform: PlatformId, user_id: str):
         "Remove a streamer from the database"
@@ -188,6 +199,64 @@ class Twitch(commands.Cog):
             await ctx.send(embed=embed)
         else:
             await ctx.send(await self.bot._(ctx.guild.id, "twitch.check-stream.offline", streamer=streamer))
+    
+    async def send_stream_alert(self, stream: StreamObject, channel: discord.abc.GuildChannel):
+        "Send a stream alert to a guild when a streamer is live"
+
+
+    @commands.Cog.listener()
+    async def on_stream_starts(self, stream: StreamObject, guild: discord.Guild):
+        "When a stream starts, send a notification to the subscribed guild"
+        print("Stream started:", stream)
+    
+    @commands.Cog.listener()
+    async def on_stream_ends(self, stream: StreamObject, guild: discord.Guild):
+        "When a stream ends, send a notification to the subscribed guild"
+        print("Stream ended:", stream)
+
+    @tasks.loop(minutes=1)
+    async def stream_check_task(self):
+        "Check if any subscribed streamer is streaming and send notifications"
+        await self.bot.wait_until_ready()
+        count = 0
+        streamer_ids: dict[str, _StreamersReadyForNotification] = {}
+        for streamer in await self.db_get_guilds_per_streamers("twitch"):
+            guilds = [self.bot.get_guild(guild_id) for guild_id in streamer["guild_ids"]]
+            guilds = [guild for guild in guilds if guild]
+            if not guilds:
+                continue
+            streamer_ids[streamer["user_id"]] = streamer | {"guilds": guilds}
+            count += 1
+            # make one request every 30 streamers
+            if len(streamer_ids) > 30:
+                await self._update_streams(streamer_ids)
+                streamer_ids = {}
+        if streamer_ids:
+            await self._update_streams(streamer_ids)
+        self.bot.log.info(f"[twitch] {count} streamers checked")
+
+    async def _update_streams(self, streamer_ids: dict[str, _StreamersReadyForNotification]):
+        streaming_user_ids: set[str] = set()
+        # Check current streams
+        for stream in await self.agent.get_user_stream_by_id(*streamer_ids.keys()):
+            streamer_data = streamer_ids[stream["user_id"]]
+            # mark that this streamer is streaming
+            streaming_user_ids.add(stream["user_id"])
+            # if it was already notified, skip
+            if streamer_data["is_streaming"]:
+                continue
+            # dispatch event
+            for guild in streamer_data["guilds"]:
+                self.bot.dispatch("stream_starts", stream, guild)
+            # mark streamers as streaming
+            await self.db_set_streamer_status("twitch", stream["user_id"], True)
+        # Check streamers that went offline
+        for streamer_id, streamer_data in streamer_ids.items():
+            if streamer_id not in streaming_user_ids and streamer_data["is_streaming"]:
+                for guild in streamer_data["guilds"]:
+                    self.bot.dispatch("stream_ends", streamer_data["user_name"], guild)
+                # mark streamers as offline
+                await self.db_set_streamer_status("twitch", stream["user_id"], False)
 
 
 async def setup(bot: Zbot):
