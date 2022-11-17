@@ -25,5 +25,5 @@ LRFutils @ git+https://github.com/LeiRoF/LRFutils.git@78359b056313b0c73c0a969667
 
 # # Antiscam training
 pandas
-sklearn
+scikit-learn
 # lightgbm
