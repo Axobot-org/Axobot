@@ -23,10 +23,10 @@ class ServerConfigPaginator(Paginator):
 
     async def send_init(self, ctx: MyContext):
         "Create and send 1st page"
-        full_config = (await self.cog.get_server(
-            [],
-            criters=["ID="+str(self.guild.id)]
-        ))[0]
+        if config := await self.cog.get_server([], criters=["ID="+str(self.guild.id)]):
+            full_config = config[0]
+        else:
+            full_config = opt_list.default_values
         for option, value in full_config.items():
             if option in self.cog.options_list:
                 self.server_config[option] = value
