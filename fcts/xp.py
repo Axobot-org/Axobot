@@ -747,12 +747,20 @@ class Xp(commands.Cog):
                     rank = "?"
             if isinstance(rank, float):
                 rank = int(rank)
+            # If we can send the rank card
             if ctx.guild is None or ctx.channel.permissions_for(ctx.guild.me).attach_files:
-                await self.send_card(ctx,user,xp,rank,ranks_nb,xp_used_type,levels_info)
-            elif ctx.can_send_embed:
-                await self.send_embed(ctx,user,xp,rank,ranks_nb,levels_info,xp_used_type)
-            else:
-                await self.send_txt(ctx,user,xp,rank,ranks_nb,levels_info,xp_used_type)
+                try:
+                    await self.send_card(ctx, user, xp, rank, ranks_nb, xp_used_type, levels_info)
+                    return
+                except Exception as err:  # pylint: disable=broad-except
+                    # log the error and fall back to embed/text
+                    self.bot.dispatch("error", err, ctx)
+            # if we can send embeds
+            if ctx.can_send_embed:
+                await self.send_embed(ctx, user, xp, rank, ranks_nb, levels_info, xp_used_type)
+                return
+            # fall back to raw text
+            await self.send_txt(ctx, user, xp, rank, ranks_nb, levels_info, xp_used_type)
         except Exception as err:
             self.bot.dispatch("command_error", ctx, err)
 
@@ -787,22 +795,22 @@ class Xp(commands.Cog):
     async def send_embed(self, ctx: MyContext, user: discord.User, xp, rank, ranks_nb, levels_info, used_system):
         txts = [await self.bot._(ctx.channel, "xp.card-level"), await self.bot._(ctx.channel, "xp.card-rank")]
         if levels_info is None:
-            levels_info = await self.calc_level(xp,used_system)
+            levels_info = await self.calc_level(xp, used_system)
         emb = discord.Embed(color=self.embed_color)
         emb.set_author(name=user, icon_url=user.display_avatar)
-        emb.add_field(name='XP', value="{}/{}".format(xp,levels_info[1]))
-        emb.add_field(name=txts[0], value=levels_info[0])
-        emb.add_field(name=txts[1], value="{}/{}".format(rank,ranks_nb))
+        emb.add_field(name='XP', value="{}/{}".format(xp, levels_info[1]))
+        emb.add_field(name=txts[0].title(), value=levels_info[0])
+        emb.add_field(name=txts[1].title(), value="{}/{}".format(rank, ranks_nb))
         await ctx.send(embed=emb)
 
     async def send_txt(self, ctx: MyContext, user: discord.User, xp, rank, ranks_nb, levels_info, used_system):
         txts = [await self.bot._(ctx.channel, "xp.card-level"), await self.bot._(ctx.channel, "xp.card-rank")]
         if levels_info is None:
-            levels_info = await self.calc_level(xp,used_system)
+            levels_info = await self.calc_level(xp, used_system)
         msg = """__**{}**__
 **XP** {}/{}
 **{}** {}
-**{}** {}/{}""".format(user.name,xp,levels_info[1],txts[0],levels_info[0],txts[1],rank,ranks_nb)
+**{}** {}/{}""".format(user.name, xp, levels_info[1], txts[0].title(), levels_info[0], txts[1].title(), rank, ranks_nb)
         await ctx.send(msg)
 
     def convert_average(self, nbr: int) -> str:
