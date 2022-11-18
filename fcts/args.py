@@ -7,11 +7,9 @@ from discord.ext import commands
 from libs.bot_classes import MyContext
 
 
-class tempdelta(commands.Converter):
-    def __init__(self):
-        pass
-
-    async def convert(self, ctx: MyContext, argument: str) -> int:
+class tempdelta(float):
+    @classmethod
+    async def convert(cls, ctx: MyContext, argument: str) -> int:
         duration = 0
         found = False
         # ctx.invoked_with
@@ -41,11 +39,9 @@ class tempdelta(commands.Converter):
         return duration
 
 
-class user(commands.converter.UserConverter):
-    def __init__(self):
-        pass
-
-    async def convert(self, ctx: MyContext, argument: str) -> discord.User:
+class user(discord.User):
+    @classmethod
+    async def convert(cls, ctx: MyContext, argument: str) -> discord.User:
         res = None
         if argument.isnumeric():
             if ctx.guild is not None:
@@ -68,22 +64,18 @@ class user(commands.converter.UserConverter):
             raise commands.errors.UserNotFound(argument)
 
 
-class cardStyle(commands.Converter):
-    def __init__(self):
-        pass
-
-    async def convert(self, ctx: MyContext, argument: str) -> str:
+class cardStyle(str):
+    @classmethod
+    async def convert(cls, ctx: MyContext, argument: str) -> str:
         if argument in await ctx.bot.get_cog('Utilities').allowed_card_styles(ctx.author):
             return argument
         else:
             raise commands.errors.BadArgument('Invalid card style: '+argument)
 
 
-class LeaderboardType(commands.Converter):
-    def __init__(self):
-        pass
-
-    async def convert(self, ctx: MyContext, argument: str) -> str:
+class LeaderboardTypeConverter(str):
+    @classmethod
+    async def convert(cls, ctx: MyContext, argument: str) -> str:
         if argument in {'server', 'guild', 'serveur', 'local'}:
             if ctx.guild is None:
                 raise commands.errors.BadArgument(f'Cannot use {argument} leaderboard type outside a server')
@@ -91,6 +83,7 @@ class LeaderboardType(commands.Converter):
         elif argument in {'all', 'global', 'tout'}:
             return 'global'
         raise commands.errors.BadArgument(f'Invalid leaderboard type: {argument}')
+LeaderboardType = typing.Annotated[typing.Literal["guild", "global"], LeaderboardTypeConverter]
 
 
 class Invite(commands.Converter):
@@ -117,11 +110,9 @@ class Invite(commands.Converter):
         return answer
 
 
-class Guild(commands.Converter):
-    def __init__(self):
-        pass
-
-    async def convert(self, ctx: MyContext, argument: str) -> discord.Guild:
+class Guild(discord.Guild):
+    @classmethod
+    async def convert(cls, ctx: MyContext, argument: str) -> discord.Guild:
         if argument.isnumeric():
             res = ctx.bot.get_guild(int(argument))
             if res is not None:
@@ -217,9 +208,10 @@ class Snowflake:
         return cls(int(argument))
 
 
-class serverlog(commands.Converter):
+class serverlog(str):
     "Convert arguments to a server log type"
-    async def convert(self, ctx: MyContext, argument: str) -> str:
+    @classmethod
+    async def convert(cls, ctx: MyContext, argument: str) -> str:
         from fcts.serverlogs import ServerLogs  # pylint: disable=import-outside-toplevel
 
         if argument in ServerLogs.available_logs() or argument == 'all':
