@@ -56,7 +56,7 @@ default_values = {
     "vote_emojis": ":thumbsup:;:thumbsdown:;",
     "morpion_emojis": ":red_circle:;:blue_circle:;",
     "help_in_dm": 0,
-    "muted_role": "",
+    "muted_role": None,
     "partner_channel": '',
     "partner_color": 10949630,
     'partner_role': '',
