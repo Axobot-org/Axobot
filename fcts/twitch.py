@@ -214,7 +214,7 @@ class Twitch(commands.Cog):
         "When a stream ends, send a notification to the subscribed guild"
         print("Stream ended:", stream)
 
-    @tasks.loop(minutes=1)
+    @tasks.loop(minutes=5)
     async def stream_check_task(self):
         "Check if any subscribed streamer is streaming and send notifications"
         await self.bot.wait_until_ready()
