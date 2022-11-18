@@ -54,6 +54,7 @@
         "list-title-0": "Liste des membres muets du serveur '%{guild}'",
         "list-title-1": "Liste des 45 premiers membres muets du serveur '%{guild}'",
         "list-title-2": "Liste des 60 premiers membres muets du serveur '%{guild}'",
+        "mute-config-confirm": "Êtes-vous sûr de vouloir faire cela ?\nCette action peut casser certaines permissions avancées dans votre serveur, en révoquant la modification de la permission \"envoyer des messages\" de certains rôles.",
         "mute-config-err": "Impossible de faire cela. Veuillez vérifier mes permissions dans le serveur et réessayer.",
         "mute-config-success": {
             "other": "Le rôle a été créé et configuré avec succès ! (%{count} salons n'ont pas pu être configurés, par manque de permissions)",
