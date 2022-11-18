@@ -65,25 +65,29 @@ Slowmode works up to one message every 6h (21600s)
     @commands.hybrid_command(name="clear")
     @app_commands.default_permissions(manage_messages=True)
     @app_commands.describe(number="The max amount of messages to delete")
+    @app_commands.describe(users="list of user IDs or mentions to delete messages from, separated by spaces")
+    @app_commands.describe(contains_file="Clear only messages that contains (or does not) files")
+    @app_commands.describe(contains_url="Clear only messages that contains (or does not) links")
+    @app_commands.describe(contains_invite="Clear only messages that contains (or does not) Discord invites")
+    @app_commands.describe(is_pinned="Clear only messages that are (or are not) pinned")
     @commands.cooldown(4, 30, commands.BucketType.guild)
     @commands.guild_only()
     @commands.check(checks.can_clear)
-    async def clear(self, ctx: MyContext, number:int, *, params=''):
+    async def clear(self, ctx: MyContext, number:int, users: commands.Greedy[discord.User]=None, *, contains_file: Optional[bool]=None, contains_url: Optional[bool]=None, contains_invite: Optional[bool]=None, is_pinned: Optional[bool]=None):
         """Keep your chat clean
-        <number> : number of messages to check
-        Available parameters :
-            <@user> : list of users to check (just mention them)
-            ('-f' or) '+f' : delete if the message  (does not) contain any file
-            ('-l' or) '+l' : delete if the message (does not) contain any link
-            ('-p' or) '+p' : delete if the message is (not) pinned
-            ('-i' or) '+i' : delete if the message (does not) contain a Discord invite
-        By default, the bot will not delete pinned messages
+        <number>: number of messages to check
+        [users]: list of user IDs or mentions to delete messages from
+        [contains_file]: delete if the message does (or does not) contain any file
+        [contains_url]: delete if the message does (or does not) contain any link
+        [contains_invite] : delete if the message does (or does not) contain a Discord invite
+        [is_pinned]: delete if the message is (or is not) pinned
+        By default, the bot will NOT delete pinned messages
 
 ..Example clear 120
 
 ..Example clear 10 @someone
 
-..Example clear 50 +f +l -p
+..Example clear 50 False False True
 
 ..Doc moderator.html#clear"""
         if not ctx.channel.permissions_for(ctx.guild.me).manage_messages:
@@ -96,81 +100,48 @@ Slowmode works up to one message every 6h (21600s)
             await ctx.send(await self.bot._(ctx.guild.id, "moderation.clear.too-few")+" "+self.bot.emojis_manager.customs["owo"])
             return
         await ctx.defer()
-        if len(params) == 0:
+        if users is None and contains_file is None and contains_url is None and contains_invite is None and is_pinned is None:
             return await self.clear_simple(ctx,number)
-        #file
-        if "-f" in params:
-            files = 0
-        elif "+f" in params:
-            files = 2
+
+        def check(msg: discord.Message):
+            # do not delete invocation message
+            if ctx.interaction is not None and msg.interaction is not None and ctx.interaction.id == msg.interaction.id:
+                return False
+            if is_pinned is not None and msg.pinned != is_pinned:
+                return False
+            elif is_pinned is None and msg.pinned:
+                return False
+            if contains_file is not None and bool(msg.attachments) != contains_file:
+                return False
+            r = self.bot.get_cog("Utilities").sync_check_any_link(msg.content)
+            if contains_url is not None and (r is not None) != contains_url:
+                return False
+            i = self.bot.get_cog("Utilities").sync_check_discord_invite(msg.content)
+            if contains_invite is not None and (i is not None) != contains_invite:
+                return False
+            if users and msg.author is not None:
+                return str(msg.author.id) in users
+            return True
+
+        if ctx.interaction:
+            # we'll have to check past the command answer
+            number += 1
         else:
-            files = 1
-        #link
-        if "-l" in params:
-            links = 0
-        elif "+l" in params:
-            links = 2
-        else:
-            links = 1
-        #pinned
-        if '-p' in params:
-            pinned = 0
-        elif "+p" in params:
-            pinned = 2
-        else:
-            pinned = 1
-        #invite
-        if '-i' in params:
-            invites = 0
-        elif "+i" in params:
-            invites = 2
-        else:
-            invites = 1
-        # 0: does  -  2: does not  -  1: why do we care?
-        def check(m):
-            i = self.bot.get_cog("Utilities").sync_check_discord_invite(m.content)
-            r = self.bot.get_cog("Utilities").sync_check_any_link(m.content)
-            c1 = c2 = c3 = c4 = True
-            if pinned != 1:
-                if (m.pinned and pinned == 0) or (not m.pinned and pinned==2):
-                    c1 = False
-            else:
-                c1 = not m.pinned
-            if files != 1:
-                if (m.attachments != [] and files == 0) or (m.attachments==[] and files==2):
-                    c2 = False
-            if links != 1:
-                if (r is None and links==2) or (r is not None and links == 0):
-                    c3 = False
-            if invites != 1:
-                if (i is None and invites==2) or (i is not None and invites == 0):
-                    c4 = False
-            #return ((m.pinned == pinned) or ((m.attachments != []) == files) or ((r is not None) == links)) and m.author in users
-            mentions = list(map(int, re.findall(r'<@!?(\d{167,19})>', ctx.message.content)))
-            if str(ctx.bot.user.id) in ctx.prefix:
-                mentions.remove(ctx.bot.user.id)
-            if mentions and m.author is not None:
-                return c1 and c2 and c3 and c4 and m.author.id in mentions
-            else:
-                return c1 and c2 and c3 and c4
-        try:
+            # start by deleting the invocation message
             await ctx.message.delete()
-            deleted = await ctx.channel.purge(limit=number, check=check)
-            await ctx.send(await self.bot._(ctx.guild, "moderation.clear.done", count=len(deleted)), delete_after=2.0)
-            if len(deleted) > 0:
-                log = await self.bot._(ctx.guild.id, "logs.clear", channel=ctx.channel.mention, number=len(deleted))
-                await self.bot.get_cog("Events").send_logs_per_server(ctx.guild,"clear",log,ctx.author)
-        except Exception as err:
-            self.bot.dispatch("command_error", ctx, err)
+        deleted = await ctx.channel.purge(limit=number, check=check)
+        await ctx.send(await self.bot._(ctx.guild, "moderation.clear.done", count=len(deleted)), delete_after=2.0)
+        if len(deleted) > 0:
+            log = await self.bot._(ctx.guild.id, "logs.clear", channel=ctx.channel.mention, number=len(deleted))
+            await self.bot.get_cog("Events").send_logs_per_server(ctx.guild, "clear", log, ctx.author)
 
     async def clear_simple(self, ctx: MyContext, number: int):
-        def check(m: discord.Message):
-            if m.pinned or m.id == ctx.message.id:
+        def check(msg: discord.Message):
+            if msg.pinned or msg.id == ctx.message.id:
                 return False
-            if ctx.interaction is None or m.interaction is None:
+            if ctx.interaction is None or msg.interaction is None:
                 return True
-            print(ctx.interaction.id, m.interaction.id)
-            return ctx.interaction.id != m.interaction.id
+            return ctx.interaction.id != msg.interaction.id
         if ctx.interaction:
             # we'll have to check past the command answer
             number += 1
