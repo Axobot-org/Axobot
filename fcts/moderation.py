@@ -159,7 +159,8 @@ Slowmode works up to one message every 6h (21600s)
             self.bot.dispatch("command_error", ctx, err)
 
 
-    @commands.command(name="kick")
+    @commands.hybrid_command(name="kick")
+    @app_commands.default_permissions(kick_members=True)
     @commands.cooldown(5, 20, commands.BucketType.guild)
     @commands.guild_only()
     @commands.check(checks.can_kick)
@@ -173,12 +174,15 @@ Slowmode works up to one message every 6h (21600s)
             if not ctx.channel.permissions_for(ctx.guild.me).kick_members:
                 await ctx.send(await self.bot._(ctx.guild.id, "moderation.kick.no-perm"))
                 return
+            await ctx.defer()
+
             async def user_can_kick(user):
                 try:
                     return await self.bot.get_cog("Servers").staff_finder(user, "kick_allowed_roles")
                 except commands.errors.CommandError:
                     pass
                 return False
+
             if user == ctx.guild.me or (self.bot.database_online and await user_can_kick(user)):
                 return await ctx.send(await self.bot._(ctx.guild.id, "moderation.kick.cant-staff"))
             elif not self.bot.database_online and ctx.channel.permissions_for(user).kick_members:
@@ -188,7 +192,7 @@ Slowmode works up to one message every 6h (21600s)
                 return
             # send DM
             await self.dm_user(user, "kick", ctx, reason = None if reason=="Unspecified" else reason)
-            reason = await self.bot.get_cog("Utilities").clear_msg(reason,everyone = not ctx.channel.permissions_for(ctx.author).mention_everyone)
+            reason = await self.bot.get_cog("Utilities").clear_msg(reason, everyone = not ctx.channel.permissions_for(ctx.author).mention_everyone)
             await ctx.guild.kick(user,reason=reason[:512])
             caseID = "'Unsaved'"
             if self.bot.database_online:
@@ -201,7 +205,7 @@ Slowmode works up to one message every 6h (21600s)
                     self.bot.dispatch("error", err, ctx)
             try:
                 await ctx.message.delete()
-            except discord.Forbidden:
+            except (discord.Forbidden, discord.NotFound):
                 pass
             # optional values
             opt_case = None if caseID=="'Unsaved'" else caseID
@@ -265,7 +269,7 @@ Slowmode works up to one message every 6h (21600s)
             await self.send_modlogs("warn", user, ctx.author, ctx.guild, opt_case, message)
             try:
                 await ctx.message.delete()
-            except discord.Forbidden:
+            except (discord.Forbidden, discord.NotFound):
                 pass
         except Exception as err:
             await ctx.send(await self.bot._(ctx.guild.id, "moderation.error"))
@@ -391,7 +395,7 @@ You can also mute this member for a defined duration, then use the following for
             await self.send_chat_answer("mute", user, ctx, opt_case)
             try:
                 await ctx.message.delete()
-            except discord.Forbidden:
+            except (discord.Forbidden, discord.NotFound):
                 pass
         except Exception as err:
             await ctx.send(await self.bot._(ctx.guild.id, "moderation.error"))
@@ -482,7 +486,7 @@ This will remove the role 'muted' for the targeted member
             await self.send_chat_answer("unmute", user, ctx)
             try:
                 await ctx.message.delete()
-            except discord.Forbidden:
+            except (discord.Forbidden, discord.NotFound):
                 pass
             # remove planned automatic unmutes
             await self.bot.task_handler.cancel_unmute(user.id, ctx.guild.id)
@@ -579,7 +583,7 @@ The 'days_to_delete' option represents the number of days worth of messages to d
                     self.bot.dispatch("error", err, ctx)
             try:
                 await ctx.message.delete()
-            except discord.Forbidden:
+            except (discord.Forbidden, discord.NotFound):
                 pass
             # optional values
             opt_case = None if case_id=="'Unsaved'" else case_id
@@ -648,7 +652,7 @@ The 'days_to_delete' option represents the number of days worth of messages to d
                     self.bot.dispatch("error", err, ctx)
             try:
                 await ctx.message.delete()
-            except discord.Forbidden:
+            except (discord.Forbidden, discord.NotFound):
                 pass
             # optional values
             opt_case = None if case_id=="'Unsaved'" else case_id
@@ -705,7 +709,7 @@ Permissions for using this command are the same as for the kick
                     self.bot.dispatch("error", err, ctx)
             try:
                 await ctx.message.delete()
-            except discord.Forbidden:
+            except (discord.Forbidden, discord.NotFound):
                 pass
             # optional values
             opt_case = None if caseID=="'Unsaved'" else caseID
@@ -744,7 +748,7 @@ Permissions for using this command are the same as for the kick
                           value=reason, inline=False)
         try:
             await user.send(embed=emb)
-        except discord.Forbidden:
+        except (discord.Forbidden, discord.NotFound):
             pass
         except discord.HTTPException as err:
             if err.code == 50007:
@@ -983,7 +987,7 @@ The 'reasons' parameter is used to display the mute reasons.
             await message.clear_reactions()
         try:
             await ctx.message.delete()
-        except discord.Forbidden:
+        except (discord.Forbidden, discord.NotFound):
             pass
 
     @emoji_group.command(name="info")
