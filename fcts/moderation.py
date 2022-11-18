@@ -1,4 +1,3 @@
-import asyncio
 import copy
 import datetime
 import importlib
@@ -8,6 +7,7 @@ from math import ceil
 from typing import Dict, List, Literal, Optional, Tuple, Union
 
 import discord
+from discord import app_commands
 from discord.ext import commands
 from libs.bot_classes import MyContext, Zbot
 from libs.formatutils import FormatUtils
@@ -29,45 +29,42 @@ class Moderation(commands.Cog):
         # maximum of roles granted/revoked by query
         self.max_roles_modifications = 300
 
-    @commands.command(name="slowmode")
+    @commands.hybrid_command(name="slowmode")
+    @app_commands.default_permissions(manage_channels=True)
     @commands.guild_only()
     @commands.cooldown(1, 3, commands.BucketType.guild)
     @commands.check(checks.can_slowmode)
-    async def slowmode(self, ctx: MyContext, time=None):
+    async def slowmode(self, ctx: MyContext, seconds: int = 0):
         """Keep your chat cool
 Slowmode works up to one message every 6h (21600s)
 
 ..Example slowmode 10
 
-..Example slowmode off
+..Example slowmode 0
 
 ..Doc moderator.html#slowmode"""
         if not ctx.channel.permissions_for(ctx.guild.me).manage_channels:
             await ctx.send(await self.bot._(ctx.guild.id, "moderation.no-perm"))
             return
-        if time is None:
-            return await ctx.send(await self.bot._(ctx.guild.id, "moderation.slowmode.info", s=ctx.channel.slowmode_delay))
-        if time.isnumeric():
-            time = int(time)
-        if time == 'off' or time == 0:
+        if seconds == 0:
             await ctx.channel.edit(slowmode_delay=0)
             message = await self.bot._(ctx.guild.id, "moderation.slowmode.disabled")
-            log = await self.bot._(ctx.guild.id,"logs.slowmode-disabled", channel=ctx.channel.mention)
-            await self.bot.get_cog("Events").send_logs_per_server(ctx.guild,"slowmode",log,ctx.author)
-        elif isinstance(time, int):
-            if time > 21600:
-                message = await self.bot._(ctx.guild.id, "moderation.slowmode.too-long")
-            else:
-                await ctx.channel.edit(slowmode_delay=time)
-                message = await self.bot._(ctx.guild.id, "moderation.slowmode.enabled", channel=ctx.channel.mention, s=time)
-                log = await self.bot._(ctx.guild.id,"logs.slowmode-enabled", channel=ctx.channel.mention, seconds=time)
-                await self.bot.get_cog("Events").send_logs_per_server(ctx.guild,"slowmode",log,ctx.author)
+            log = await self.bot._(ctx.guild.id, "logs.slowmode-disabled", channel=ctx.channel.mention)
+            await self.bot.get_cog("Events").send_logs_per_server(ctx.guild, "slowmode", log, ctx.author)
+        elif seconds > 21600:
+            message = await self.bot._(ctx.guild.id, "moderation.slowmode.too-long")
         else:
-            message = await self.bot._(ctx.guild.id, "moderation.slowmode.invalid")
+            await ctx.channel.edit(slowmode_delay=seconds)
+            duration = await FormatUtils.time_delta(seconds, lang=await self.bot._(ctx, "_used_locale"))
+            message = await self.bot._(ctx.guild.id, "moderation.slowmode.enabled", channel=ctx.channel.mention, s=duration)
+            log = await self.bot._(ctx.guild.id, "logs.slowmode-enabled", channel=ctx.channel.mention, seconds=duration)
+            await self.bot.get_cog("Events").send_logs_per_server(ctx.guild, "slowmode", log, ctx.author)
         await ctx.send(message)
 
 
-    @commands.command(name="clear")
+    @commands.hybrid_command(name="clear")
+    @app_commands.default_permissions(manage_messages=True)
+    @app_commands.describe(number="The max amount of messages to delete")
     @commands.cooldown(4, 30, commands.BucketType.guild)
     @commands.guild_only()
     @commands.check(checks.can_clear)
@@ -95,9 +92,10 @@ Slowmode works up to one message every 6h (21600s)
         if not ctx.channel.permissions_for(ctx.guild.me).read_message_history:
             await ctx.send(await self.bot._(ctx.guild.id, "moderation.need-read-history"))
             return
-        if number<1:
+        if number < 1:
             await ctx.send(await self.bot._(ctx.guild.id, "moderation.clear.too-few")+" "+self.bot.emojis_manager.customs["owo"])
             return
+        await ctx.defer()
         if len(params) == 0:
             return await self.clear_simple(ctx,number)
         #file
@@ -166,10 +164,20 @@ Slowmode works up to one message every 6h (21600s)
             self.bot.dispatch("command_error", ctx, err)
 
     async def clear_simple(self, ctx: MyContext, number: int):
-        def check(m):
-            return not m.pinned
-        try:
+        def check(m: discord.Message):
+            if m.pinned or m.id == ctx.message.id:
+                return False
+            if ctx.interaction is None or m.interaction is None:
+                return True
+            print(ctx.interaction.id, m.interaction.id)
+            return ctx.interaction.id != m.interaction.id
+        if ctx.interaction:
+            # we'll have to check past the command answer
+            number += 1
+        else:
+            # start by deleting the invocation message
             await ctx.message.delete()
+        try:
             deleted = await ctx.channel.purge(limit=number, check=check)
             await ctx.send(await self.bot._(ctx.guild, "moderation.clear.done", count=len(deleted)), delete_after=2.0)
             log = await self.bot._(ctx.guild.id, "logs.clear", channel=ctx.channel.mention, number=len(deleted))
