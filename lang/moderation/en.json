@@ -54,6 +54,7 @@
         "list-title-0": "List of muted members of the server \"%{guild}\"",
         "list-title-1": "List of 45 muted members of the server \"%{guild}\"",
         "list-title-2": "List of 60 muted members of the server \"%{guild}\"",
+        "mute-config-confirm": "Are you sure you want to do this?\nThis action may break some advanced permissions in your server, by revoking the 'send messages' permission overwrite from some roles.",
         "mute-config-err": "Impossible to do that. Please check my permissions on the server and try again.",
         "mute-config-success": {
             "other": "The role has been successfully created and configured! (%{count} channels could not be configured, due to lack of permissions)",

@@ -12,6 +12,7 @@ from discord.ext import commands
 from libs.bot_classes import MyContext, Zbot
 from libs.formatutils import FormatUtils
 from libs.paginator import Paginator
+from libs.views import ConfirmView
 
 from . import args, checks
 from fcts.cases import Case
@@ -222,7 +223,9 @@ Slowmode works up to one message every 6h (21600s)
         await self.bot.get_cog('Events').add_event('kick')
 
 
-    @commands.command(name="warn")
+    @commands.hybrid_command(name="warn")
+    @app_commands.default_permissions(moderate_members=True)
+    @app_commands.describe(message="The reason of the warn")
     @commands.cooldown(5, 20, commands.BucketType.guild)
     @commands.guild_only()
     @commands.check(checks.can_warn)
@@ -277,7 +280,7 @@ Slowmode works up to one message every 6h (21600s)
 
     async def get_muted_role(self, guild: discord.Guild):
         "Find the muted role from the guild config option"
-        opt = await self.bot.get_config(guild.id,'muted_role')
+        opt = await self.bot.get_config(guild.id, 'muted_role')
         if opt is None or (isinstance(opt, str) and not opt.isdigit()):
             return None
             # return discord.utils.find(lambda x: x.name.lower() == "muted", guild.roles)
@@ -324,13 +327,15 @@ Slowmode works up to one message every 6h (21600s)
             return False
         return True
 
-    @commands.command(name="mute")
+    @commands.hybrid_command(name="mute")
+    @app_commands.default_permissions(moderate_members=True)
+    @app_commands.describe(time="The duration of the mute, example 3d 7h 12min")
+    @app_commands.describe(reason="The reason of the mute")
     @commands.cooldown(5,20, commands.BucketType.guild)
     @commands.guild_only()
     @commands.check(checks.can_mute)
     async def mute(self, ctx: MyContext, user: discord.Member, time: commands.Greedy[args.tempdelta], *, reason="Unspecified"):
-        """Mute someone.
-When someone is muted, the bot adds the role "muted" to them
+        """Timeout someone.
 You can also mute this member for a defined duration, then use the following format:
 `XXm` : XX minutes
 `XXh` : XX hours
@@ -347,19 +352,22 @@ You can also mute this member for a defined duration, then use the following for
             if duration > 60*60*24*365*3: # max 3 years
                 await ctx.send(await self.bot._(ctx.channel, "timers.rmd.too-long"))
                 return
-            f_duration = await FormatUtils.time_delta(duration,lang=await self.bot._(ctx.guild,'_used_locale'),form="short")
+            f_duration = await FormatUtils.time_delta(duration, lang=await self.bot._(ctx.guild,'_used_locale'), form="short")
         else:
             f_duration = None
+        await ctx.defer()
+
+        async def user_can_mute(user):
+            try:
+                return await self.bot.get_cog("Servers").staff_finder(user, "mute_allowed_roles")
+            except commands.errors.CommandError:
+                pass
+            return False
+
         try:
-            async def user_can_mute(user):
-                try:
-                    return await self.bot.get_cog("Servers").staff_finder(user, "mute_allowed_roles")
-                except commands.errors.CommandError:
-                    pass
-                return False
             if user==ctx.guild.me or (self.bot.database_online and await user_can_mute(user)):
                 emoji = random.choice([':confused:',':upside_down:',self.bot.emojis_manager.customs['wat'],':no_mouth:',self.bot.emojis_manager.customs['owo'],':thinking:',])
-                await ctx.send((await self.bot._(ctx.guild.id, "moderation.mute.staff-mute"))+emoji)
+                await ctx.send((await self.bot._(ctx.guild.id, "moderation.mute.staff-mute")) + " " + emoji)
                 return
             elif not self.bot.database_online and ctx.channel.permissions_for(user).manage_roles:
                 return await ctx.send(await self.bot._(ctx.guild.id, "moderation.warn.cant-staff"))
@@ -450,7 +458,8 @@ You can also mute this member for a defined duration, then use the following for
                 result = [row['userid'] for row in query_results]
         return result
 
-    @commands.command(name="unmute")
+    @commands.hybrid_command(name="unmute")
+    @app_commands.default_permissions(moderate_members=True)
     @commands.cooldown(5,20, commands.BucketType.guild)
     @commands.guild_only()
     @commands.check(checks.can_mute)
@@ -480,6 +489,7 @@ This will remove the role 'muted' for the targeted member
             if user.top_role.position >= ctx.guild.me.roles[-1].position:
                 await ctx.send(await self.bot._(ctx.guild.id, "moderation.mute.too-high"))
                 return
+        await ctx.defer()
         try:
             await self.unmute_event(ctx.guild, user, ctx.author)
             # send in chat
@@ -494,17 +504,30 @@ This will remove the role 'muted' for the targeted member
             await ctx.send(await self.bot._(ctx.guild.id, "moderation.error"))
             self.bot.dispatch("command_error", ctx, err)
 
-    @commands.command(name="mute-config")
-    @commands.cooldown(1,15, commands.BucketType.guild)
+    @commands.hybrid_command(name="mute-config")
+    @app_commands.default_permissions(manage_roles=True)
+    @commands.cooldown(1, 15, commands.BucketType.guild)
     @commands.guild_only()
-    @commands.has_guild_permissions(manage_roles=True)
+    @commands.check(checks.has_manage_roles)
     async def mute_config(self, ctx: MyContext):
-        """Auto configure the muted role for you
+        """Auto configure the muted role for you, if you do not want to use the official timeout
         Useful if you want to have a base for a properly working muted role
         Warning: the process may break some things in your server, depending on how you configured your channel permissions.
 
         ..Doc moderator.html#mute-unmute
         """
+        await ctx.defer()
+        confirm_view = ConfirmView(
+            self.bot, ctx.channel,
+            validation=lambda inter: inter.user == ctx.author,
+            ephemeral=False)
+        await confirm_view.init()
+        await ctx.send(await self.bot._(ctx.guild.id, "moderation.mute.mute-config-confirm"), view=confirm_view)
+        
+        await confirm_view.wait()
+        if not confirm_view.value:
+            return
+
         role = await self.get_muted_role(ctx.guild)
         create = role is None
         role, count = await self.configure_muted_role(ctx.guild, role)
@@ -516,11 +539,15 @@ This will remove the role 'muted' for the targeted member
             await ctx.send(await self.bot._(ctx.guild.id, "moderation.mute.mute-config-success2", count=count))
 
 
-    @commands.command(name="ban")
+    @commands.hybrid_command(name="ban")
+    @app_commands.default_permissions(ban_members=True)
+    @app_commands.describe(time="The duration of the ban, example 3d 7h 12min")
+    @app_commands.describe(days_to_delete="How many days of messages to delete, max 7")
+    @app_commands.describe(reason="The reason of the ban")
     @commands.cooldown(5,20, commands.BucketType.guild)
     @commands.guild_only()
     @commands.check(checks.can_ban)
-    async def ban(self,ctx:MyContext,user:args.user,time:commands.Greedy[args.tempdelta],days_to_delete:Optional[int]=0,*,reason="Unspecified"):
+    async def ban(self, ctx:MyContext, user:args.user, time:commands.Greedy[args.tempdelta]=None, days_to_delete:Optional[int]=0, *, reason="Unspecified"):
         """Ban someone
 The 'days_to_delete' option represents the number of days worth of messages to delete from the user in the guild, bewteen 0 and 7
 
@@ -533,7 +560,7 @@ The 'days_to_delete' option represents the number of days worth of messages to d
 ..Doc moderator.html#ban-unban
         """
         try:
-            duration = sum(time)
+            duration = sum(time) if time else 0
             if duration > 0:
                 if duration > 60*60*24*365*20: # max 20 years
                     await ctx.send(await self.bot._(ctx.channel, "timers.rmd.too-long"))
@@ -566,7 +593,7 @@ The 'days_to_delete' option represents the number of days worth of messages to d
             if days_to_delete not in range(8):
                 days_to_delete = 0
             reason = await self.bot.get_cog("Utilities").clear_msg(reason,everyone = not ctx.channel.permissions_for(ctx.author).mention_everyone)
-            await ctx.guild.ban(user,reason=reason[:512],delete_message_days=days_to_delete)
+            await ctx.guild.ban(user, reason=reason[:512], delete_message_seconds=days_to_delete * 86400)
             await self.bot.get_cog('Events').add_event('ban')
             case_id = "'Unsaved'"
             if self.bot.database_online:
@@ -606,7 +633,8 @@ The 'days_to_delete' option represents the number of days worth of messages to d
         # send in modlogs
         await self.send_modlogs("unban", user, author, guild, reason="Automod")
 
-    @commands.command(name="unban")
+    @commands.hybrid_command(name="unban")
+    @app_commands.default_permissions(ban_members=True)
     @commands.cooldown(5,20, commands.BucketType.guild)
     @commands.guild_only()
     @commands.check(checks.can_ban)
@@ -634,6 +662,7 @@ The 'days_to_delete' option represents the number of days worth of messages to d
             if not ctx.channel.permissions_for(ctx.guild.me).ban_members:
                 await ctx.send(await self.bot._(ctx.guild.id, "moderation.ban.cant-ban"))
                 return
+            await ctx.defer()
             try:
                 await ctx.guild.fetch_ban(user)
             except discord.NotFound:
