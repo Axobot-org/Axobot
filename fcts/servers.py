@@ -179,7 +179,7 @@ class Servers(commands.Cog):
             values = [()]
         set_query = ', '.join(f'`{val[0]}`=%s' for val in values)
         query = f"UPDATE `servers` SET {set_query} WHERE `ID`=%s AND `beta` = %s"
-        async with self.bot.db_query(query, (val[1] for val in values) + (guild_id, self.bot.beta)):
+        async with self.bot.db_query(query, tuple(val[1] for val in values) + (guild_id, self.bot.beta)):
             pass
         for value in values:
             self.cache[(guild_id, value[0])] = value[1]
@@ -291,45 +291,41 @@ class Servers(commands.Cog):
         if not ctx.bot.database_online:
             return await ctx.send(await self.bot._(ctx.guild.id,"cases.no_database"))
         await self.create_row_if_needed(ctx.guild.id)
-        try:
-            if option in opt_list.roles_options:
-                await self.conf_roles(ctx, option, value)
-            elif option in opt_list.bool_options:
-                await self.conf_bool(ctx, option, value)
-            elif option in opt_list.textchan_options:
-                await self.conf_textchan(ctx, option, value)
-            elif option in opt_list.category_options:
-                await self.conf_category(ctx, option, value)
-            elif option in opt_list.text_options:
-                await self.conf_text(ctx, option, value)
-            elif option in opt_list.numb_options:
-                await self.conf_numb(ctx, option, value)
-            elif option in opt_list.vocchan_options:
-                await self.conf_vocal(ctx, option, value)
-            elif option == "language":
-                await self.conf_lang(ctx, option, value)
-            elif option in opt_list.prefix_options:
-                await self.conf_prefix(ctx, option, value)
-            elif option in opt_list.raid_options:
-                await self.conf_raid(ctx, option, value)
-            elif option in opt_list.emoji_option:
-                await self.conf_emoji(ctx, option, value)
-            elif option in opt_list.xp_type_options:
-                await self.conf_xp_type(ctx, option, value)
-            elif option in opt_list.color_options:
-                await self.conf_color(ctx, option, value)
-            elif option in opt_list.xp_rate_option:
-                await self.conf_xp_rate(ctx, option, value)
-            elif option in opt_list.levelup_channel_option:
-                await self.conf_levelup_chan(ctx, option, value)
-            elif option in opt_list.ttt_display_option:
-                await self.conf_tttdisplay(ctx, option, value)
-            else:
-                await ctx.send(await self.bot._(ctx.guild.id, "server.option-notfound"))
-                return
-        except Exception as err:
-            self.bot.dispatch("error", err, ctx)
-            await ctx.send(await self.bot._(ctx.guild.id, "server.internal-error"))
+        if option in opt_list.roles_options:
+            await self.conf_roles(ctx, option, value)
+        elif option in opt_list.bool_options:
+            await self.conf_bool(ctx, option, value)
+        elif option in opt_list.textchan_options:
+            await self.conf_textchan(ctx, option, value)
+        elif option in opt_list.category_options:
+            await self.conf_category(ctx, option, value)
+        elif option in opt_list.text_options:
+            await self.conf_text(ctx, option, value)
+        elif option in opt_list.numb_options:
+            await self.conf_numb(ctx, option, value)
+        elif option in opt_list.vocchan_options:
+            await self.conf_vocal(ctx, option, value)
+        elif option == "language":
+            await self.conf_lang(ctx, option, value)
+        elif option in opt_list.prefix_options:
+            await self.conf_prefix(ctx, option, value)
+        elif option in opt_list.raid_options:
+            await self.conf_raid(ctx, option, value)
+        elif option in opt_list.emoji_option:
+            await self.conf_emoji(ctx, option, value)
+        elif option in opt_list.xp_type_options:
+            await self.conf_xp_type(ctx, option, value)
+        elif option in opt_list.color_options:
+            await self.conf_color(ctx, option, value)
+        elif option in opt_list.xp_rate_option:
+            await self.conf_xp_rate(ctx, option, value)
+        elif option in opt_list.levelup_channel_option:
+            await self.conf_levelup_chan(ctx, option, value)
+        elif option in opt_list.ttt_display_option:
+            await self.conf_tttdisplay(ctx, option, value)
+        else:
+            await ctx.send(await self.bot._(ctx.guild.id, "server.option-notfound"))
+            return
 
     @sconfig_change.autocomplete("option")
     async def sconfig_change_autocomplete_opt(self, _: MyContext, option: str):
@@ -374,7 +370,8 @@ class Servers(commands.Cog):
             if await self.delete_option(ctx.guild.id,option):
                 msg = await self.bot._(ctx.guild.id, "server.value-deleted", option=option)
             else:
-                msg = await self.bot._(ctx.guild.id, "server.internal-error")
+                await ctx.send(await self.bot._(ctx.guild.id, "server.internal-error"))
+                return
             await ctx.send(msg)
             msg = f"Reset option in server {ctx.guild.id}: {option}"
             emb = discord.Embed(description=msg, color=self.log_color, timestamp=self.bot.utcnow())
@@ -385,8 +382,7 @@ class Servers(commands.Cog):
         except ValueError:
             await ctx.send(await self.bot._(ctx.guild.id, "server.option-notfound"))
         except Exception as err:
-            self.bot.dispatch("error", err, ctx)
-            await ctx.send(await self.bot._(ctx.guild.id, "server.internal-error"))
+            self.bot.dispatch("command_error", ctx, err)
 
     async def send_embed(self, guild: discord.Guild, option: str, value: str):
         "Send a log embed into the private logs channel when an option is edited"
