@@ -45,15 +45,16 @@ class Xp(commands.Cog):
         self.types = ['global','mee6-like','local']
         try:
             verdana_name = 'Verdana.ttf'
-            xp_font = ImageFont.truetype(verdana_name, 24)
         except OSError:
             verdana_name = 'Veranda.ttf'
-            xp_font = ImageFont.truetype(verdana_name, 24)
-        self.fonts = {'xp_fnt': xp_font,
-        'NIVEAU_fnt': ImageFont.truetype(verdana_name, 42),
-        'levels_fnt': ImageFont.truetype(verdana_name, 65),
-        'rank_fnt': ImageFont.truetype(verdana_name,29),
-        'RANK_fnt': ImageFont.truetype(verdana_name,23)}
+        self.fonts = {
+            'xp_fnt': ImageFont.truetype(verdana_name, 24),
+            'NIVEAU_fnt': ImageFont.truetype(verdana_name, 42),
+            'levels_fnt': ImageFont.truetype(verdana_name, 65),
+            'rank_fnt': ImageFont.truetype(verdana_name, 29),
+            'RANK_fnt': ImageFont.truetype(verdana_name, 23),
+            'name_fnt': ImageFont.truetype('Roboto-Medium.ttf', 40),
+        }
     
     @commands.Cog.listener()
     async def on_ready(self):
@@ -591,11 +592,9 @@ class Xp(commands.Cog):
         if style in {'blurple21', 'blurple22'}:
             colors = {'name':(240, 240, 255),'xp':(235, 235, 255),'NIVEAU':(245, 245, 255),'rank':(255, 255, 255),'bar':(250, 250, 255), 'bar_background': (27, 29, 31)}
 
-        name_fnt = ImageFont.truetype('Roboto-Medium.ttf', 40)
-
         if not user.display_avatar.is_animated() or force_static:
             pfp = await self.get_raw_image(user.display_avatar.replace(format="png", size=256))
-            img = await self.bot.loop.run_in_executor(None,self.add_overlay,pfp.resize(size=(282,282)),user,card,xp,rank,txt,colors,levels_info,name_fnt)
+            img = await self.bot.loop.run_in_executor(None,self.add_overlay,pfp.resize(size=(282,282)),user,card,xp,rank,txt,colors,levels_info)
             img.save('../cards/global/{}-{}-{}.png'.format(user.id,xp,rank[0]))
             card.close()
             return discord.File('../cards/global/{}-{}-{}.png'.format(user.id,xp,rank[0]))
@@ -611,7 +610,7 @@ class Xp(commands.Cog):
             frames = [frame.copy() for frame in ImageSequence.Iterator(pfp)]
             for frame in frames:
                 frame = frame.convert(mode='RGBA')
-                img = await self.bot.loop.run_in_executor(None,self.add_overlay,frame.resize(size=(282,282)),user,card.copy(),xp,rank,txt,colors,levels_info,name_fnt)
+                img = await self.bot.loop.run_in_executor(None,self.add_overlay,frame.resize(size=(282,282)),user,card.copy(),xp,rank,txt,colors,levels_info)
                 img = ImageEnhance.Contrast(img).enhance(1.5).resize((800,265))
                 images.append(img)
                 duration.append(pfp.info['duration'])
@@ -644,7 +643,7 @@ class Xp(commands.Cog):
                     file_bytes.seek(0, 0)
                     return file_bytes
 
-    def add_overlay(self, pfp, user: discord.User, img, xp: int, rank: list, txt: list, colors, levels_info, name_fnt):
+    def add_overlay(self, pfp, user: discord.User, img, xp: int, rank: list, txt: list, colors, levels_info):
         #img = Image.new('RGBA', (card.width, card.height), color = (250,250,250,0))
         #img.paste(pfp, (20, 29))
         #img.paste(card, (0, 0), card)
@@ -663,6 +662,7 @@ class Xp(commands.Cog):
         levels_fnt = self.fonts['levels_fnt']
         rank_fnt = self.fonts['rank_fnt']
         RANK_fnt = self.fonts['RANK_fnt']
+        name_fnt = self.fonts['name_fnt']
 
         img = self.add_xp_bar(img,xp-levels_info[2],levels_info[1]-levels_info[2],colors['bar'], colors['bar_background'])
         d = ImageDraw.Draw(img)
