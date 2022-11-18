@@ -186,7 +186,6 @@ class ServerLogs(commands.Cog):
     @modlogs_main.command(name="enable", aliases=['add'])
     async def modlogs_enable(self, ctx: MyContext, logs: commands.Greedy[serverlog]):
         """Enable one or more logs in the current channel"""
-        logs: list[str]
         if len(logs) == 0:
             raise commands.BadArgument('Invalid server log type')
         if 'all' in logs:
@@ -206,7 +205,6 @@ class ServerLogs(commands.Cog):
     @modlogs_main.command(name="disable", aliases=['remove'])
     async def modlogs_disable(self, ctx: MyContext, logs: commands.Greedy[serverlog]):
         """Disable one or more logs in the current channel"""
-        logs: list[str]
         if len(logs) == 0:
             raise commands.BadArgument('Invalid server log type')
         if 'all' in logs:

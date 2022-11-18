@@ -846,7 +846,7 @@ class Xp(commands.Cog):
     @commands.command(name='top')
     @commands.bot_has_permissions(send_messages=True)
     @commands.cooldown(5,60,commands.BucketType.user)
-    async def top(self, ctx: MyContext, page: typing.Optional[int]=1, Type: args.LeaderboardType='global'):
+    async def top(self, ctx: MyContext, page: typing.Optional[int]=1, scope: args.LeaderboardType='global'):
         """Get the list of the highest levels
         Each page has 20 users
 
@@ -865,12 +865,12 @@ class Xp(commands.Cog):
             xp_system_used = 0
         xp_system_used = 0 if xp_system_used is None else xp_system_used
         if xp_system_used == 0:
-            if Type == 'global':
+            if scope == 'global':
                 if len(self.cache["global"]) == 0:
                     await self.bdd_load_cache(-1)
                 ranks = sorted([{'userID':key, 'xp':value[1]} for key,value in self.cache['global'].items()], key=lambda x:x['xp'], reverse=True)
                 max_page = ceil(len(self.cache['global'])/20)
-            elif Type == 'guild':
+            elif scope == 'guild':
                 ranks = await self.bdd_get_top(10000,guild=ctx.guild)
                 max_page = ceil(len(ranks)/20)
         else:
@@ -893,7 +893,7 @@ class Xp(commands.Cog):
             await asyncio.sleep(0.2)
         f_name = await self.bot._(ctx.channel, "xp.top-name", min=(page-1)*20+1, max=i, page=page, total=max_page)
         # author
-        rank = await self.bdd_get_rank(ctx.author.id,ctx.guild if (Type=='guild' or xp_system_used != 0) else None)
+        rank = await self.bdd_get_rank(ctx.author.id,ctx.guild if (scope=='guild' or xp_system_used != 0) else None)
         if len(rank) == 0:
             your_rank = {'name':"__"+await self.bot._(ctx.channel, "xp.top-your")+"__",'value':await self.bot._(ctx.guild, "xp.1-no-xp")}
         else:
@@ -904,7 +904,7 @@ class Xp(commands.Cog):
             your_rank = {'name':"__"+await self.bot._(ctx.channel, "xp.top-your")+"__", 'value':"**#{} |** `lvl {}` **|** `xp {}`".format(rk, lvl, xp)}
             del rk
         # title
-        if Type == 'guild' or xp_system_used != 0:
+        if scope == 'guild' or xp_system_used != 0:
             t = await self.bot._(ctx.channel, "xp.top-title-2")
         else:
             t = await self.bot._(ctx.channel, "xp.top-title-1")
