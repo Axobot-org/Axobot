@@ -437,6 +437,7 @@ class ServerLogs(commands.Cog):
                     ):
                     emb.add_field(
                         name="Timeout by", value=f"**{entry.user.mention}** ({entry.user.id})")
+                    emb.add_field(name="With reason", value=entry.reason or "No reason specified")
                     break
         await self.validate_logs(after.guild, channel_ids, emb)
 
