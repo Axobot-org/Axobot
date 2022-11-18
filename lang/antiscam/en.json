@@ -1,6 +1,7 @@
 {
     "probabilities": "Probabilities:",
+    "report-empty": "This message has no content to report!",
     "report-successful": "We have well received your report, thank you for your contribution!",
-    "result": "Result:",
+    "result": "Antiscam detection result:",
     "url-score": "URL risk score: %{score}"
 }
