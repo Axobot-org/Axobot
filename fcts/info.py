@@ -991,16 +991,22 @@ Available types: member, role, user, emoji, channel, server, invite, category
         # rr_len = self.bot.get_cog("Servers").default_opt['rr_max_number'] if rr_len is None else rr_len
         rr_len = '{}/{}'.format(len(await self.bot.get_cog('Xp').rr_list_role(guild.id)), rr_len)
         # Streamers
-        streamers_len =  await self.bot.get_config(guild.id,'streamers_max_number')
-        streamers_len = '{}/{}'.format(await self.bot.get_cog('Twitch').db_get_guild_subscriptions_count(guild.id), streamers_len)
+        if twitch_cog := await self.bot.get_cog('Twitch'):
+            streamers_len =  await self.bot.get_config(guild.id,'streamers_max_number')
+            streamers_len = '{}/{}'.format(twitch_cog.db_get_guild_subscriptions_count(guild.id), streamers_len)
+        else:
+            streamers_len = "Not available"
         # Prefix
         pref = await self.bot.prefix_manager.get_prefix(guild)
         if "`" not in pref:
             pref = "`" + pref + "`"
         # Rss
         rss_len = await self.bot.get_config(guild.id,'rss_max_number')
-        rss_len = self.bot.get_cog("Servers").default_opt['rss_max_number'] if rss_len is None else rss_len
-        rss_numb = "{}/{}".format(len(await self.bot.get_cog('Rss').db_get_guild_feeds(guild.id)), rss_len)
+        if rss_cog := await self.bot.get_cog('Rss'):
+            rss_len = self.bot.get_cog("Servers").default_opt['rss_max_number'] if rss_len is None else rss_len
+            rss_numb = "{}/{}".format(len(rss_cog.db_get_guild_feeds(guild.id)), rss_len)
+        else:
+            rss_numb = "Not available"
         # Join date
         joined_at = f"<t:{guild.me.joined_at.timestamp():.0f}>"
         # ----
