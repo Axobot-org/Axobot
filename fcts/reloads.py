@@ -10,8 +10,15 @@ class Reloads(commands.Cog):
     def __init__(self, bot: Zbot):
         self.bot = bot
         self.file = "reloads"
-        self.ignored_guilds = [471361000126414848,513087032331993090,500648624204808193,264445053596991498,446425626988249089,707248438391078978]
-    
+        self.ignored_guilds = [
+            471361000126414848, # Zbot emojis 1
+            513087032331993090, # Zbot emojis 2
+            500648624204808193, # Emergency server
+            446425626988249089, # Bots on Discord
+            707248438391078978, # ?
+            568567800910839811, # Delly
+        ]
+
     async def reload_cogs(self, ctx: MyContext, cogs: list[str]):
         if len(cogs)==1 and cogs[0]=='all':
             cogs = sorted([x.file for x in self.bot.cogs.values()])
