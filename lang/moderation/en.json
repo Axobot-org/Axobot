@@ -115,6 +115,7 @@
         "one": "1 nickname has been edited",
         "zero": "No nickname have been edited"
     },
+    "unhoist-too-many-members": "Oops, your server has too many members for me to do that. Please contact our support team for more info.",
     "unmute-chat": "The member %{user} (%{userid}) has been unmuted",
     "warn": {
         "cant-bot": "I can't warn a bot ^^",
