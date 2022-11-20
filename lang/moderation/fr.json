@@ -115,6 +115,7 @@
         "one": "1 surnom édité !",
         "zero": "Aucun surnom n'a été édité"
     },
+    "unhoist-too-many-members": "Oups, votre serveur a trop de membres pour que je puisse faire cela. Veuillez contacter notre équipe de support pour plus d'informations.",
     "unmute-chat": "Le membre %{user} (%{userid}) peut à nouveau parler !",
     "warn": {
         "cant-bot": "Je ne peux pas avertir un bot ^^",
