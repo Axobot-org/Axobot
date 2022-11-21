@@ -220,7 +220,10 @@ class Timers(commands.Cog):
                 await view.disable(msg)
                 return
             try:
-                selection = list(map(int, view.values))
+                if isinstance(view.values, str):
+                    selection = [int(view.values)]
+                else:
+                    selection = list(map(int, view.values))
             except ValueError:
                 selection = []
                 self.bot.dispatch("error", ValueError(f"Invalid reminder IDs: {view.values}"), ctx)
@@ -248,7 +251,13 @@ class Timers(commands.Cog):
         if await self.db_delete_reminders(ids, ctx.author.id):
             for reminder_id in ids:
                 await self.bot.task_handler.remove_task(reminder_id)
-        await ctx.send(await self.bot._(ctx.channel, "timers.rmd.delete.success", count=len(ids)))
+            await ctx.send(await self.bot._(ctx.channel, "timers.rmd.delete.success", count=len(ids)))
+        else:
+            await ctx.send(await self.bot._(ctx.channel, "timers.rmd.delete.error"))
+            try:
+                raise ValueError(f"Failed to delete reminders: {ids}")
+            except ValueError as err:
+                self.bot.dispatch("error", err, ctx)
 
     @remind_main.command(name="clear")
     @commands.cooldown(3, 60, commands.BucketType.user)
