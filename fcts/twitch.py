@@ -256,7 +256,7 @@ class Twitch(commands.Cog):
                 for guild in streamer_data["guilds"]:
                     self.bot.dispatch("stream_ends", streamer_data["user_name"], guild)
                 # mark streamers as offline
-                await self.db_set_streamer_status("twitch", stream["user_id"], False)
+                await self.db_set_streamer_status("twitch", streamer_id, False)
 
 
 async def setup(bot: Zbot):
