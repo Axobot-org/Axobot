@@ -444,7 +444,7 @@ You can also mute this member for a defined duration, then use the following for
             result: int = query_results[0]['count']
         return bool(result)
 
-    async def bdd_muted_list(self, guild_id: int, reasons: bool = False) -> Union[List[Dict[int, str]], List[int]]:
+    async def bdd_muted_list(self, guild_id: int, reasons: bool = False) -> Union[Dict[int, str], List[int]]:
         """List muted users for a specific guild
         Set 'reasons' to True if you want the attached reason"""
         if reasons:
@@ -852,13 +852,14 @@ You must be an administrator of this server to use this command.
             saved_bans: list[discord.guild.BanEntry] = []
             users: set[int] = set()
 
-            async def get_page_count(self, _: discord.Interaction) -> int:
+            async def get_page_count(self, interaction) -> int:
                 length = len(self.saved_bans)
                 if length == 0:
                     return 1
                 if length%1000 == 0:
                     return self.page+1
                 return ceil(length/30)
+
             async def get_page_content(self, interaction: discord.Interaction, page: int):
                 "Create one page"
                 if last_user := (None if len(self.saved_bans) == 0 else self.saved_bans[-1].user):
@@ -906,46 +907,97 @@ The 'show_reasons' parameter is used to display the mute reasons.
 
 ..Doc moderator.html#banlist-mutelist"""
         try:
-            liste = await self.bdd_muted_list(ctx.guild.id, reasons=show_reasons)
+            muted_list = await self.bdd_muted_list(ctx.guild.id, reasons=show_reasons)
         except Exception as err:
             await ctx.send(await self.bot._(ctx.guild.id, "moderation.error"))
             self.bot.dispatch("error", err, ctx)
             return
-        desc = list()
-        title = await self.bot._(ctx.guild.id, "moderation.mute.list-title-0", guild=ctx.guild.name)
-        if len(liste) == 0:
-            desc.append(await self.bot._(ctx.guild.id, "moderation.mute.no-mutes"))
-        elif show_reasons:
-            _unknown = (await self.bot._(ctx.guild, "misc.unknown")).capitalize()
-            for userid, reason in liste.items():
-                user: Optional[discord.User] = self.bot.get_user(userid)
-                if user is None:
-                    continue
-                if len(desc) >= 45:
-                    break
-                _reason = reason if (
-                    reason is not None and reason != "Unspecified") else _unknown
-                desc.append("{}  *({})*".format(user, _reason))
-            if len(liste) > 45: # overwrite title with limit
-                title = await self.bot._(ctx.guild.id, "moderation.mute.list-title-1", guild=ctx.guild.name)
-        else:
-            for userid in liste[:45]:
-                user: Optional[discord.User] = self.bot.get_user(userid)
-                if user is None:
-                    continue
-                if len(desc) >= 60:
-                    break
-                desc.append(str(user))
-            if len(liste) > 60: # overwrite title with limit
-                title = await self.bot._(ctx.guild.id, "moderation.mute.list-title-2", guild=ctx.guild.name)
-        embed = discord.Embed(title=title, color=self.bot.get_cog("Servers").embed_color,
-                              description="\n".join(desc), timestamp=ctx.message.created_at)
-        embed.set_footer(text=ctx.author, icon_url=ctx.author.display_avatar)
-        try:
-            await ctx.send(embed=embed, delete_after=20)
-        except discord.errors.HTTPException as err:
-            if err.code == 400:
-                await ctx.send(await self.bot._(ctx.guild.id, "moderation.ban.list-error"))
+
+        class MutesPaginator(Paginator):
+            "Paginator used to display muted users"
+            users_map: dict[int, Optional[discord.User]] = {}
+
+            async def get_page_count(self, interaction) -> int:
+                length = len(muted_list)
+                if length == 0:
+                    return 1
+                return ceil(length/30)
+
+            async def _resolve_user(self, user_id: int):
+                if user := self.users_map.get(user_id):
+                    return user
+                if user := self.client.get_user(user_id):
+                    self.users_map[user_id] = user
+                    return user
+                if user := await self.client.fetch_user(user_id):
+                    self.users_map[user_id] = user
+                    return user
+                return user_id
+
+            async def get_page_content(self, interaction, page):
+                "Create one page"
+                title = await self.client._(ctx.guild.id, "moderation.mute.list-title-0", guild=ctx.guild.name)
+                emb = discord.Embed(title=title, color=self.client.get_cog("Servers").embed_color)
+                if len(muted_list) == 0:
+                    emb.description = await self.client._(ctx.guild.id, "moderation.mute.no-mutes")
+                else:
+                    page_start, page_end = (page-1)*30, min(page*30, len(muted_list))
+                    for i in range(page_start, page_end, 10):
+                        column_start, column_end = i+1, min(i+10, len(muted_list))
+                        values: list[str] = []
+                        if show_reasons:
+                            for user_id, reason in list(muted_list.items())[i:i+10]:
+                                user = await self._resolve_user(user_id)
+                                values.append(f"{user}  *({reason})*")
+                        else:
+                            for user_id in muted_list[i:i+10]:
+                                user = await self._resolve_user(user_id)
+                                values.append(str(user))
+                        emb.add_field(name=f"{column_start}-{column_end}", value="\n".join(values))
+                footer = f"{ctx.author}  |  {page}/{await self.get_page_count(interaction)}"
+                emb.set_footer(text=footer, icon_url=ctx.author.display_avatar)
+                return {
+                    "embed": emb
+                }
+
+        _quit = await self.bot._(ctx.guild, "misc.quit")
+        view = MutesPaginator(self.bot, ctx.author, stop_label=_quit.capitalize())
+        await view.send_init(ctx)
+
+        # desc = list()
+        
+        # if len(muted_list) == 0:
+        #     desc.append(await self.bot._(ctx.guild.id, "moderation.mute.no-mutes"))
+        # elif show_reasons:
+        #     _unknown = (await self.bot._(ctx.guild, "misc.unknown")).capitalize()
+        #     for userid, reason in muted_list.items():
+        #         user: Optional[discord.User] = self.bot.get_user(userid)
+        #         if user is None:
+        #             continue
+        #         if len(desc) >= 45:
+        #             break
+        #         _reason = reason if (
+        #             reason is not None and reason != "Unspecified") else _unknown
+        #         desc.append("{}  *({})*".format(user, _reason))
+        #     if len(muted_list) > 45: # overwrite title with limit
+        #         title = await self.bot._(ctx.guild.id, "moderation.mute.list-title-1", guild=ctx.guild.name)
+        # else:
+        #     for userid in muted_list[:45]:
+        #         user: Optional[discord.User] = self.bot.get_user(userid)
+        #         if user is None:
+        #             continue
+        #         if len(desc) >= 60:
+        #             break
+        #         desc.append(str(user))
+        #     if len(muted_list) > 60: # overwrite title with limit
+        #         title = await self.bot._(ctx.guild.id, "moderation.mute.list-title-2", guild=ctx.guild.name)
+        # embed = discord.Embed(title=title, color=self.bot.get_cog("Servers").embed_color,
+        #                       description="\n".join(desc), timestamp=ctx.message.created_at)
+        # try:
+        #     await ctx.send(embed=embed)
+        # except discord.errors.HTTPException as err:
+        #     if err.code == 400:
+        #         await ctx.send(await self.bot._(ctx.guild.id, "moderation.ban.list-error"))
 
 
     @commands.hybrid_group(name="emoji",aliases=['emojis', 'emote'])
