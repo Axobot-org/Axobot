@@ -89,16 +89,6 @@ class Admin(commands.Cog):
         except discord.DiscordException:
             pass
 
-    @discord.app_commands.command()
-    @discord.app_commands.guilds(PRIVATE_GUILD_ID)
-    @discord.app_commands.default_permissions(administrator=True)
-    @discord.app_commands.check(checks.is_bot_admin)
-    async def send_msg(self, interaction: discord.Interaction, user: discord.User, message: str):
-        "Send a DM to any user the bot can reach"
-        await interaction.response.defer(ephemeral=True)
-        await user.send(message)
-        await interaction.edit_original_response(content="Done!")
-
     @commands.hybrid_group(name='admin', hidden=True)
     @discord.app_commands.guilds(PRIVATE_GUILD_ID)
     @discord.app_commands.default_permissions(administrator=True)
@@ -113,6 +103,14 @@ class Admin(commands.Cog):
                     for cmds in cmd.commands:
                         text+="\n        - {} *({})*".format(cmds.name,cmds.help.split('\n')[0])
             await ctx.send(text)
+
+    @main_msg.command(name="send-msg")
+    @discord.app_commands.check(checks.is_bot_admin)
+    async def send_msg(self, ctx: MyContext, user: discord.User, message: str):
+        "Send a DM to any user the bot can reach"
+        await ctx.defer()
+        await user.send(message)
+        await ctx.send(content="Done!")
 
     @main_msg.command(name="sync")
     @commands.check(checks.is_bot_admin)
