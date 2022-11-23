@@ -1,12 +1,13 @@
 {
-    "cases-0": "%{nbr} cases found: (%{start}-%{end})",
-    "deleted": "The case #%{ID} has been deleted!",
+    "records_number": "%{nbr} records found",
+    "deleted": "The record #%{ID} has been deleted!",
     "display": {
         "date": "**Date:** %{data}",
         "duration": "**Duration:** %{data}",
         "guild": "**Server:** %{data}",
         "moderator": "**Moderator:** %{data}",
         "reason": "**Reason:** %{data}",
+        "title": "Record of %{user} (%{user_id})",
         "type": "**Type:** %{data}",
         "user": "**User:** %{data}"
     },
