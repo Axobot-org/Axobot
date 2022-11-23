@@ -1,13 +1,17 @@
 import importlib
-import typing
+from datetime import datetime
+from math import ceil
+from typing import Optional
 
 import discord
 from discord.ext import commands
+
+from fcts.checks import is_support_staff
 from libs.bot_classes import MyContext, Zbot
 from libs.formatutils import FormatUtils
+from libs.paginator import Paginator
 
 from . import args
-from fcts.checks import is_support_staff
 
 importlib.reload(args)
 
@@ -20,14 +24,14 @@ async def can_edit_case(ctx: MyContext):
     return False
 
 class Case:
-    def __init__(self,bot:Zbot,guildID:int,memberID:int,Type,ModID:int,Reason,date,duration=None,caseID=None):
+    def __init__(self, bot: Zbot, guild_id: int, member_id: int, case_type: str, mod_id: int, reason: str, date: datetime, duration: Optional[int]=None, case_id: Optional[int]=None):
         self.bot = bot
-        self.guild = guildID
-        self.id = caseID
-        self.user = memberID
-        self.type = Type
-        self.mod = ModID
-        self.reason = Reason
+        self.guild = guild_id
+        self.id = case_id
+        self.user = member_id
+        self.type = case_type
+        self.mod = mod_id
+        self.reason = reason
         self.duration = duration
         if date is None:
             self.date = "Unknown"
@@ -78,7 +82,7 @@ class Cases(commands.Cog):
     async def on_ready(self):
         self.table = 'cases_beta' if self.bot.beta else 'cases'
 
-    async def get_case(self, columns=None, criters=None, relation="AND") -> typing.Optional[list[Case]]:
+    async def get_case(self, columns=None, criters=None, relation="AND") -> Optional[list[Case]]:
         """return every cases"""
         if not self.bot.database_online:
             return None
@@ -98,9 +102,17 @@ class Cases(commands.Cog):
         async with self.bot.db_query(query) as query_results:
             if len(columns) == 0:
                 for elem in query_results:
-                    case = Case(bot=self.bot, guildID=elem['guild'], caseID=elem['ID'], memberID=elem['user'],
-                                     Type=elem['type'], ModID=elem['mod'], date=elem['created_at'], Reason=elem['reason'],
-                                     duration=elem['duration'])
+                    case = Case(
+                        bot=self.bot,
+                        guild_id=elem['guild'],
+                        case_id=elem['ID'],
+                        member_id=elem['user'],
+                        case_type=elem['type'],
+                        mod_id=elem['mod'],
+                        date=elem['created_at'],
+                        reason=elem['reason'], 
+                        duration=elem['duration']
+                    )
                     liste.append(case)
             else:
                 for elem in query_results:
@@ -176,12 +188,12 @@ class Cases(commands.Cog):
         ..Doc moderator.html#view-list"""
         if not self.bot.database_online:
             return await ctx.send(await self.bot._(ctx.guild.id,'cases.no_database'))
-        await self.see_case_main(ctx,ctx.guild.id,user.id)
+        await self.see_case_main(ctx, ctx.guild.id, user)
 
     @case_main.command(name="glist")
     @commands.guild_only()
     @commands.check(is_support_staff)
-    async def see_case_2(self, ctx: MyContext, guild: typing.Optional[args.Guild], *, user:args.user):
+    async def see_case_2(self, ctx: MyContext, guild: Optional[args.Guild], *, user:args.user):
         """Get every case of a user on a specific guild or on every guilds
         This user can have left the server
 
@@ -190,64 +202,73 @@ class Cases(commands.Cog):
         ..Example cases glist someone"""
         if not self.bot.database_online:
             return await ctx.send(await self.bot._(ctx.guild.id,'cases.no_database'))
-        await self.see_case_main(ctx, guild.id if guild else None, user.id)
+        await self.see_case_main(ctx, guild.id if guild else None, user)
 
-    async def see_case_main(self, ctx: MyContext, guild:discord.Guild, user:discord.User):
+    async def see_case_main(self, ctx: MyContext, guild: discord.Guild, user: discord.User):
         if guild is not None:
-            criters = ["`user`='{}'".format(user),"guild='{}'".format(guild)]
+            criters = ["`user`='{}'".format(user.id),"guild='{}'".format(guild)]
             syntax: str = await self.bot._(ctx.guild,'cases.list-0')  
         else:
             syntax: str = await self.bot._(ctx.guild,'cases.list-1')
-            criters = ["`user`='{}'".format(user)]
+            criters = ["`user`='{}'".format(user.id)]
         try:
             MAX_CASES = 60
             cases = await self.get_case(criters=criters)
-            total_nbr = len(cases)
-            cases = cases[-MAX_CASES:]
             cases.reverse()
-            u = self.bot.get_user(user)
-            if len(cases) == 0:
+            if cases is None or len(cases) == 0:
                 await ctx.send(await self.bot._(ctx.guild.id, "cases.no-case"))
                 return
+            cases: list[Case]
             if ctx.can_send_embed:
-                last_case = e = total_nbr if len(cases) > 0 else 0
-                embed = discord.Embed(title="title", colour=self.bot.get_cog('Servers').embed_color, timestamp=ctx.message.created_at)
-                if u is None:
-                    embed.set_author(name=str(user))
-                else:
-                    embed.set_author(name="Cases from "+str(u), icon_url=str(u.display_avatar.with_format("png")))
-                embed.set_footer(text="Requested by {}".format(ctx.author), icon_url=str(ctx.author.display_avatar.with_format("png")))
-                if len(cases) > 0:
-                    l = await self.bot._(ctx.guild.id,'_used_locale')
-                    for case in cases:
-                        e -= 1
-                        guild: discord.Guild = self.bot.get_guild(case.guild)
-                        if guild is None:
-                            guild = case.guild
-                        else:
-                            guild = guild.name
-                        mod: discord.Member = self.bot.get_user(case.mod)
-                        if mod is None:
-                            mod = case.mod
-                        else:
-                            mod = mod.mention
-                        date_ = f"<t:{case.date.timestamp():.0f}>"
-                        text = syntax.format(G=guild, T=case.type, M=mod, R=case.reason, D=date_)
-                        if case.duration is not None and case.duration > 0:
-                            text += "\n" + await self.bot._(ctx.guild.id,'cases.display.duration', data=await FormatUtils.time_delta(case.duration,lang=l,year=False,form="short"))
-                        embed.add_field(name=await self.bot._(ctx.guild.id, "cases.title-search", ID=case.id), value=text, inline=False)
-                        if len(embed.fields) == 20:
-                            embed.title = await self.bot._(ctx.guild.id,"cases.cases-0", nbr=total_nbr, start=e+1, end=last_case)
-                            await ctx.send(embed=embed)
-                            embed.clear_fields()
-                            last_case = e
-                if len(embed.fields) > 0:
-                    embed.title = await self.bot._(ctx.guild.id,"cases.cases-0", nbr=total_nbr, start=e+1, end=last_case)
-                    await ctx.send(embed=embed)
+                author_text = await self.bot._(ctx.guild.id, "cases.display.title", user=str(user), user_id=user.id)
+                title = await self.bot._(ctx.guild.id,"cases.records_number", nbr=len(cases))
+                lang = await self.bot._(ctx.guild.id,'_used_locale')
+
+                class RecordsPaginator(Paginator):
+                    "Paginator used to display a user record"
+                    users: dict[int, Optional[discord.User]]
+
+                    async def get_page_count(self, interaction) -> int:
+                        length = len(cases)
+                        if length == 0:
+                            return 1
+                        return ceil(length/21)
+
+                    async def get_page_content(self, interaction, page):
+                        "Create one page"
+                        embed = discord.Embed(title=title, colour=self.client.get_cog('Servers').embed_color, timestamp=ctx.message.created_at)
+                        embed.set_author(name=author_text, icon_url=str(user.display_avatar.with_format("png")))
+                        page_start, page_end = (page-1)*21, page*21
+                        for case in cases[page_start:page_end]:
+                            guild = self.client.get_guild(case.guild)
+                            if guild is None:
+                                guild = case.guild
+                            else:
+                                guild = guild.name
+                            mod = self.client.get_user(case.mod)
+                            if mod is None:
+                                mod = case.mod
+                            else:
+                                mod = mod.mention
+                            date_ = f"<t:{case.date.timestamp():.0f}>"
+                            text = syntax.format(G=guild, T=case.type, M=mod, R=case.reason, D=date_)
+                            if case.duration is not None and case.duration > 0:
+                                formated_duration = await FormatUtils.time_delta(case.duration,lang=lang,year=False,form="short")
+                                text += "\n" + await self.client._(interaction,'cases.display.duration', data=formated_duration)
+                            embed.add_field(name=await self.client._(interaction, "cases.title-search", ID=case.id), value=text, inline=True)
+                        footer = f"{ctx.author}  |  {page}/{await self.get_page_count(interaction)}"
+                        embed.set_footer(text=footer, icon_url=ctx.author.display_avatar)
+                        return {
+                            "embed": embed
+                        }
+                
+                _quit = await self.bot._(ctx.guild, "misc.quit")
+                view = RecordsPaginator(self.bot, ctx.author, stop_label=_quit.capitalize())
+                await view.send_init(ctx)
             else:
                 if len(cases) > 0:
-                    text = await self.bot._(ctx.guild.id,"cases.cases-0", nbr=total_nbr, start=1, end=total_nbr) + "\n"
-                    for e, case in enumerate(cases):
+                    text = await self.bot._(ctx.guild.id,"cases.records_number", nbr=len(cases)) + "\n"
+                    for case in cases:
                         text += "```{}\n```".format((await case.display(True)).replace('*',''))
                         if len(text) > 1800:
                             await ctx.send(text)

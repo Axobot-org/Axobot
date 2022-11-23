@@ -198,7 +198,7 @@ Slowmode works up to one message every 6h (21600s)
             caseID = "'Unsaved'"
             if self.bot.database_online:
                 Cases = self.bot.get_cog('Cases')
-                case = Case(bot=self.bot,guildID=ctx.guild.id,memberID=user.id,Type="kick",ModID=ctx.author.id,Reason=reason,date=ctx.bot.utcnow())
+                case = Case(bot=self.bot,guild_id=ctx.guild.id,member_id=user.id,case_type="kick",mod_id=ctx.author.id,reason=reason,date=ctx.bot.utcnow())
                 try:
                     await Cases.add_case(case)
                     caseID = case.id
@@ -259,7 +259,7 @@ Slowmode works up to one message every 6h (21600s)
             caseID = "'Unsaved'"
             if self.bot.database_online:
                 if cases_cog := self.bot.get_cog('Cases'):
-                    case = Case(bot=self.bot,guildID=ctx.guild.id,memberID=user.id,Type="warn",ModID=ctx.author.id,Reason=message,date=ctx.bot.utcnow())
+                    case = Case(bot=self.bot,guild_id=ctx.guild.id,member_id=user.id,case_type="warn",mod_id=ctx.author.id,reason=message,date=ctx.bot.utcnow())
                     await cases_cog.add_case(case)
                     caseID = case.id
             else:
@@ -383,9 +383,9 @@ You can also mute this member for a defined duration, then use the following for
             if self.bot.database_online:
                 Cases = self.bot.get_cog('Cases')
                 if f_duration is None:
-                    case = Case(bot=self.bot,guildID=ctx.guild.id,memberID=user.id,Type="mute",ModID=ctx.author.id,Reason=reason,date=ctx.bot.utcnow())
+                    case = Case(bot=self.bot,guild_id=ctx.guild.id,member_id=user.id,case_type="mute",mod_id=ctx.author.id,reason=reason,date=ctx.bot.utcnow())
                 else:
-                    case = Case(bot=self.bot,guildID=ctx.guild.id,memberID=user.id,Type="tempmute",ModID=ctx.author.id,Reason=reason,date=ctx.bot.utcnow(),duration=duration)
+                    case = Case(bot=self.bot,guild_id=ctx.guild.id,member_id=user.id,case_type="tempmute",mod_id=ctx.author.id,reason=reason,date=ctx.bot.utcnow(),duration=duration)
                     await self.bot.task_handler.add_task('mute',duration,user.id,ctx.guild.id)
                 try:
                     await Cases.add_case(case)
@@ -599,9 +599,9 @@ The 'days_to_delete' option represents the number of days worth of messages to d
             if self.bot.database_online:
                 cases_cog = self.bot.get_cog('Cases')
                 if f_duration is None:
-                    case = Case(bot=self.bot,guildID=ctx.guild.id,memberID=user.id,Type="ban",ModID=ctx.author.id,Reason=reason,date=ctx.bot.utcnow())
+                    case = Case(bot=self.bot,guild_id=ctx.guild.id,member_id=user.id,case_type="ban",mod_id=ctx.author.id,reason=reason,date=ctx.bot.utcnow())
                 else:
-                    case = Case(bot=self.bot,guildID=ctx.guild.id,memberID=user.id,Type="tempban",ModID=ctx.author.id,Reason=reason,date=ctx.bot.utcnow(),duration=duration)
+                    case = Case(bot=self.bot,guild_id=ctx.guild.id,member_id=user.id,case_type="tempban",mod_id=ctx.author.id,reason=reason,date=ctx.bot.utcnow(),duration=duration)
                     await self.bot.task_handler.add_task('ban',duration,user.id,ctx.guild.id)
                 try:
                     await cases_cog.add_case(case)
@@ -674,7 +674,7 @@ The 'days_to_delete' option represents the number of days worth of messages to d
             case_id = "'Unsaved'"
             if self.bot.database_online:
                 cases_cog = self.bot.get_cog('Cases')
-                case = Case(bot=self.bot,guildID=ctx.guild.id,memberID=user.id,Type="unban",ModID=ctx.author.id,Reason=reason,date=ctx.bot.utcnow())
+                case = Case(bot=self.bot,guild_id=ctx.guild.id,member_id=user.id,case_type="unban",mod_id=ctx.author.id,reason=reason,date=ctx.bot.utcnow())
                 try:
                     await cases_cog.add_case(case)
                     case_id = case.id
@@ -733,7 +733,7 @@ Permissions for using this command are the same as for the kick
             caseID = "'Unsaved'"
             if self.bot.database_online:
                 Cases = self.bot.get_cog('Cases')
-                case = Case(bot=self.bot,guildID=ctx.guild.id,memberID=user.id,Type="softban",ModID=ctx.author.id,Reason=reason,date=ctx.bot.utcnow())
+                case = Case(bot=self.bot,guild_id=ctx.guild.id,member_id=user.id,case_type="softban",mod_id=ctx.author.id,reason=reason,date=ctx.bot.utcnow())
                 try:
                     await Cases.add_case(case)
                     caseID = case.id
@@ -860,7 +860,7 @@ You must be an administrator of this server to use this command.
                     return self.page+1
                 return ceil(length/30)
 
-            async def get_page_content(self, interaction: discord.Interaction, page: int):
+            async def get_page_content(self, interaction, page):
                 "Create one page"
                 if last_user := (None if len(self.saved_bans) == 0 else self.saved_bans[-1].user):
                     self.saved_bans += [
