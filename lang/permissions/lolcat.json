@@ -1,5 +1,9 @@
 {
-    "general": "gLoBal pErmZ",
+    "channel": {
+        "channel": "4 channel %{mention}",
+        "category": "4 teh category %{name}",
+        "general": "Global perms or smth"
+    },
     "invalid_arg": "Uh no, %{arg} iz no valid sir",
     "list": {
         "add_reactions": "Add reactions",
@@ -44,6 +48,11 @@
         "use_voice_activation": "Use voice activity",
         "view_audit_log": "View audit logs",
         "view_guild_insights": "View guild insights"
+    },
+    "target": {
+        "member": "Human %{name}",
+        "role": "People %{name}",
+        "value": "Raw value %{value}"
     },
     "title": "**'%{name}' permissung:**\n\n",
     "whatisthat": "click HEEEERE if u wanna know"
