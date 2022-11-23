@@ -1,6 +1,7 @@
 import typing
 
 import discord
+from discord import app_commands
 from discord.ext import commands
 from fcts.args import RawPermissionValue
 from libs.bot_classes import MyContext, Zbot
@@ -15,18 +16,39 @@ VoiceChannelTypes = typing.Union[
 TextChannelTypes = typing.Union[
     discord.TextChannel,
     discord.CategoryChannel,
+    discord.ForumChannel,
     discord.Thread
 ]
 
 AcceptableChannelTypes = typing.Optional[typing.Union[
     VoiceChannelTypes,
-    TextChannelTypes
+    TextChannelTypes,
 ]]
 AcceptableTargetTypes = typing.Optional[typing.Union[
     discord.Member,
     discord.Role,
     RawPermissionValue
 ]]
+
+
+class TargetConverter(commands.Converter):
+    async def convert(self, ctx: MyContext, argument: str) -> AcceptableTargetTypes:
+        try:
+            return await commands.MemberConverter().convert(ctx, argument)
+        except commands.MemberNotFound:
+            pass
+
+        try:
+            return await commands.RoleConverter().convert(ctx, argument)
+        except commands.RoleNotFound:
+            pass
+
+        try:
+            return await RawPermissionValue().convert(ctx, argument)
+        except commands.BadArgument:
+            pass
+
+        raise commands.BadArgument(f"Could not find a member, role or permission value with the name {argument}")
 
 class Perms(commands.Cog):
     """Cog with a single command, allowing you to see the permissions of a member or a role in a channel."""
@@ -72,18 +94,20 @@ class Perms(commands.Cog):
                 result.append((emojis_cog.customs['red_cross'], perm_tr))
         return result
 
-    @commands.command(name='perms', aliases=['permissions'])
+    @commands.hybrid_command(name='permissions', aliases=['perms'])
+    @app_commands.default_permissions(manage_roles=True)
+    @app_commands.describe(channel="The channel to check the permissions in", target="The member or role to check the permissions of, or an integer/binary value")
     @commands.guild_only()
-    async def check_permissions(self, ctx: MyContext, channel:AcceptableChannelTypes=None, *, target:AcceptableTargetTypes=None):
-        """Permissions assigned to a member/role (the user by default)
-        The channel used to view permissions is the channel in which the command is entered.
+    async def check_permissions(self, ctx: MyContext, channel:AcceptableChannelTypes=None, *, target: typing.Annotated[AcceptableTargetTypes, TargetConverter]=None):
+        """Check the permissions assigned to a member/role
+        By default, it will calculate the author's permissions at the server level.
         You can also choose to view the permissions associated to a raw integer/binary value (in which case channel will be ignored)
 
-        ..Example perms #announcements everyone
+        ..Example permissions #announcements everyone
 
-        ..Example perms Zbot
+        ..Example permissions Zbot
 
-        ..Example perms 0b1001
+        ..Example permissions 0b1001
 
         ..Doc infos.html#permissions"""
         if ctx.current_argument and target is None and channel is None:
@@ -98,7 +122,7 @@ class Perms(commands.Cog):
                 perms = channel.permissions_for(target)
             col = target.color
             avatar = target.display_avatar.replace(static_format="png", size=256)
-            name = str(target)
+            name = await self.bot._(ctx, "permissions.target.member", name=str(target))
         elif isinstance(target, discord.Role):
             if channel is None:
                 perms = target.permissions
@@ -106,12 +130,12 @@ class Perms(commands.Cog):
                 perms = channel.permissions_for(target)
             col = target.color
             avatar = ctx.guild.icon.replace(format='png', size=256) if ctx.guild.icon else None
-            name = str(target)
+            name = await self.bot._(ctx, "permissions.target.role", name=str(target))
         elif isinstance(target, int):
             perms = discord.Permissions(target)
             col = discord.Color.blurple()
             avatar = None
-            name = f"{target} | {bin(target)}"
+            name = await self.bot._(ctx, "permissions.target.value", value=f"{target} | {bin(target)}")
         else:
             self.bot.dispatch("error", TypeError(f"Unknown target type: {type(target)}"), ctx)
             return
@@ -120,16 +144,21 @@ class Perms(commands.Cog):
         perms_list.sort(key=lambda x: x[1])
         perms_list = [''.join(perm) for perm in perms_list]
         if ctx.can_send_embed:
-            if channel is None:
-                desc = await self.bot._(ctx.guild.id, "permissions.general")
+            if isinstance(target, int):
+                desc = None
+            elif channel is None:
+                desc = await self.bot._(ctx, "permissions.channel.general")
+            elif isinstance(channel, discord.CategoryChannel):
+                desc = await self.bot._(ctx, "permissions.channel.category", name=channel.name)
             else:
-                desc = channel.mention
+                desc = await self.bot._(ctx, "permissions.channel.channel", mention=channel.mention)
+
             embed = discord.Embed(color=col, description=desc)
             paragraphs = cut_text(perms_list, max_size=21)
             for paragraph in paragraphs:
                 embed.add_field(name=self.bot.zws, value=paragraph)
 
-            _whatisthat = await self.bot._(ctx.guild.id, "permissions.whatisthat")
+            _whatisthat = await self.bot._(ctx, "permissions.whatisthat")
             embed.add_field(name=self.bot.zws, value=f'[{_whatisthat}](https://zbot.readthedocs.io/en/latest/perms.html)',
                             inline=False)
             embed.set_author(name=name, icon_url=avatar)
