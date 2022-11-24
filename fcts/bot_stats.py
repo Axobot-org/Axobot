@@ -27,7 +27,8 @@ class BotStats(commands.Cog):
         self.bot = bot
         self.file = 'bot_stats'
         self.received_events = {'CMD_USE': 0}
-        self.commands_uses = {}
+        self.commands_uses: dict[str, int] = {}
+        self.app_commands_uses: dict[str, int] = {}
         self.rss_stats = {'checked': 0, 'messages': 0, 'errors': 0, 'warnings': 0}
         self.xp_cards = {'generated': 0, 'sent': 0}
         self.process = psutil.Process()
@@ -133,10 +134,11 @@ class BotStats(commands.Cog):
     async def on_command_completion(self, ctx: MyContext):
         """Called when a command is correctly used by someone"""
         name = ctx.command.full_parent_name.split()[0] if ctx.command.parent is not None else ctx.command.name
-        nbr = self.commands_uses.get(name, 0)
-        self.commands_uses[name] = nbr + 1
-        nbr = self.received_events.get('CMD_USE', 0)
-        self.received_events['CMD_USE'] = nbr + 1
+        self.commands_uses[name] = self.commands_uses.get(name, 0) + 1
+        self.received_events['CMD_USE'] = self.received_events.get('CMD_USE', 0) + 1
+        if ctx.interaction:
+            self.app_commands_uses[name] = self.app_commands_uses.get(name, 0) + 1
+            self.received_events['SLASH_CMD_USE'] = self.received_events.get('SLASH_CMD_USE', 0) + 1
 
     async def db_get_disabled_rss(self) -> int:
         "Count the number of disabled RSS feeds in any guild"
@@ -256,6 +258,9 @@ class BotStats(commands.Cog):
             for k, v in self.commands_uses.items():
                 cursor.execute(query, (now, 'cmd.'+k, v, 0, 'cmd/min', True, self.bot.beta))
             self.commands_uses.clear()
+            for k, v in self.app_commands_uses.items():
+                cursor.execute(query, (now, 'app_cmd.'+k, v, 0, 'cmd/min', True, self.bot.beta))
+            self.app_commands_uses.clear()
             # RSS stats
             for k, v in self.rss_stats.items():
                 cursor.execute(query, (now, 'rss.'+k, v, 0, k, k == "messages", self.bot.beta))
