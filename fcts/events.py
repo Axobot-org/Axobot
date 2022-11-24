@@ -4,9 +4,8 @@ import json
 import marshal
 import random
 import re
-import shutil
 import time
-from typing import Union
+from typing import Optional
 
 import aiohttp
 import discord
@@ -70,46 +69,61 @@ class Events(commands.Cog):
     @commands.Cog.listener()
     async def on_member_update(self, before: discord.Member, after: discord.Member):
         """Called when a member change something (status, activity, nickame, roles)"""
-        if before.nick != after.nick:
-            await self.updade_memberslogs_name(before, after)
+        if before.nick != after.nick and await self.can_register_memberlog(before.id, before.guild.id):
+            await self.register_memberlog_name(before, after)
 
     @commands.Cog.listener()
     async def on_user_update(self, before: discord.User, after: discord.User):
         """Called when a user change something (avatar, username, discrim)"""
-        if before.name != after.name:
-            await self.updade_memberslogs_name(before, after)
-
-    async def updade_memberslogs_name(self, before: Union[discord.User, discord.Member], after: Union[discord.User, discord.Member], tries:int=0):
-        "Save in our database when a user change its nickname or username"
-        config_option = await self.bot.get_cog('Utilities').get_db_userinfo(['allow_usernames_logs'],["userID="+str(before.id)])
+        if before.name != after.name and await self.can_register_memberlog(before.id):
+            await self.register_userlog_name(before, after)
+    
+    async def can_register_memberlog(self, user_id: int, guild_id: Optional[int]=None):
+        "Check if we are allowed to register a memberlog (if database is online, if the user has allowed it, if the server hasn't disabled it)"
+        if not self.bot.database_online:
+            return False
+        config_option = await self.bot.get_cog('Utilities').get_db_userinfo(['allow_usernames_logs'],["userID=" + str(user_id)])
         if config_option is not None and config_option['allow_usernames_logs'] is False:
-            return
+            return False
+        if guild_id:
+            return await self.bot.get_config(guild_id, "nicknames_history")
+        return True
+
+    async def register_memberlog_name(self, before: discord.Member, after: discord.Member, tries:int=0):
+        "Save in our database when a user change its nickname"
         if tries > 5:
             self.bot.dispatch("error", RuntimeError(f"Nickname change failed after 5 attempts for user {before.id}"))
             return
-        if not self.bot.database_online:
-            return
-        if isinstance(before, discord.Member):
-            if not await self.bot.get_config(before.guild.id, "nicknames_history"):
-                return
-            before_nick = '' if before.nick is None else before.nick
-            after_nick = '' if after.nick is None else after.nick
-        else:
-            before_nick = '' if before.name is None else before.name
-            after_nick = '' if after.name is None else after.name
-        guild = before.guild.id if hasattr(before, 'guild') else 0
-        query = "INSERT INTO `usernames_logs` (`user`,`old`,`new`,`guild`,`beta`) VALUES (%(u)s,%(o)s,%(n)s,%(g)s,%(b)s)"
-        query_args = { 'u': before.id, 'o': before_nick, 'n': after_nick, 'g': guild, 'b': self.bot.beta }
+        before_nick = '' if before.nick is None else before.nick
+        after_nick = '' if after.nick is None else after.nick
         try:
-            async with self.bot.db_query(query, query_args):
-                self.bot.dispatch("username_change_record", UsernameChangeRecord(
-                    before_nick or None,
-                    after_nick or None,
-                    after
-                ))
+            await self.db_register_memberlog(before.id, before_nick, after_nick, before.guild.id)
         except mysql.connector.errors.IntegrityError as err:
             self.bot.log.warning(err)
-            await self.updade_memberslogs_name(before, after, tries+1)
+            await self.register_memberlog_name(before, after, tries+1)
+
+    async def register_userlog_name(self, before: discord.User, after: discord.User, tries:int=0):
+        "Save in our database when a user change its username"
+        if tries > 5:
+            self.bot.dispatch("error", RuntimeError(f"Nickname change failed after 5 attempts for user {before.id}"))
+            return
+        before_nick = '' if before.name is None else before.name
+        after_nick = '' if after.name is None else after.name
+        try:
+            await self.db_register_memberlog(before.id, before_nick, after_nick)
+        except mysql.connector.errors.IntegrityError as err:
+            self.bot.log.warning(err)
+            await self.register_userlog_name(before, after, tries+1)
+
+    async def db_register_memberlog(self, user_id: int, before: str, after: str, guild_id: int=0):
+        query = "INSERT INTO `usernames_logs` (`user`,`old`,`new`,`guild`,`beta`) VALUES (%(u)s, %(o)s, %(n)s, %(g)s, %(b)s)"
+        query_args = { 'u': user_id, 'o': before, 'n': after, 'g': guild_id, 'b': self.bot.beta }
+        async with self.bot.db_query(query, query_args):
+            self.bot.dispatch("username_change_record", UsernameChangeRecord(
+                before or None,
+                after or None,
+                after
+            ))
 
 
     @commands.Cog.listener()
