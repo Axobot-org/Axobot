@@ -38,6 +38,7 @@ class BotStats(commands.Cog):
         self.antiscam = {"warning": 0, "deletion": 0}
         self.ticket_events = {"creation": 0}
         self.usernames = {"guild": 0, "user": 0, "deleted": 0}
+        self.emitted_serverlogs: dict[str, int] = {}
 
     async def cog_load(self):
          # pylint: disable=no-member
@@ -139,6 +140,11 @@ class BotStats(commands.Cog):
         if ctx.interaction:
             self.app_commands_uses[name] = self.app_commands_uses.get(name, 0) + 1
             self.received_events['SLASH_CMD_USE'] = self.received_events.get('SLASH_CMD_USE', 0) + 1
+    
+    @commands.Cog.listener()
+    async def on_serverlog(self, guild_id: int, channel_id: int, log_type: str):
+        "Called when a serverlog is emitted"
+        self.emitted_serverlogs[log_type] = self.emitted_serverlogs.get(log_type, 0) + 1
 
     async def db_get_disabled_rss(self) -> int:
         "Count the number of disabled RSS feeds in any guild"
@@ -313,6 +319,9 @@ class BotStats(commands.Cog):
                 await self.db_record_eventpoints_values(now)
             # serverlogs
             await self.db_record_serverlogs_enabled(now)
+            for k, v in self.emitted_serverlogs.items():
+                cursor.execute(query, (now, f'logs.{k}.emitted', v, 0, 'event/min', True, self.bot.beta))
+            self.emitted_serverlogs.clear()
             # Push everything
             cnx.commit()
         except mysql.connector.errors.IntegrityError as err: # duplicate primary key
