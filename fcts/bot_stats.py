@@ -252,7 +252,8 @@ class BotStats(commands.Cog):
         try:
             # WS events stats
             for k, v in self.received_events.items():
-                cursor.execute(query, (now, 'wsevent.'+k, v, 0, 'event/min', True, self.bot.beta))
+                if v:
+                    cursor.execute(query, (now, 'wsevent.'+k, v, 0, 'event/min', True, self.bot.beta))
                 self.received_events[k] = 0
             # Commands usages stats
             for k, v in self.commands_uses.items():
