@@ -41,7 +41,7 @@ class Utilities(commands.Cog):
         return None
 
     async def find_img(self, name: str):
-        return discord.File(f"../images/{name}")
+        return discord.File(f"assets/images/{name}")
 
     async def find_url_redirection(self, url: str) -> str:
         """Find where an url is redirected to"""
