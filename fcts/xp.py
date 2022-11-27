@@ -584,7 +584,7 @@ class Xp(commands.Cog):
 
     async def create_card(self, user: discord.User, style, xp, used_system:int, rank=[1,0], txt=['NIVEAU','RANG'], force_static=False, levels_info=None):
         """Crée la carte d'xp pour un utilisateur"""
-        card = Image.open("../cards/model/{}.png".format(style))
+        card = Image.open("./assets/card-models/{}.png".format(style))
         bar_colors = await self.get_xp_bar_color(user.id)
         if levels_info is None:
             levels_info = await self.calc_level(xp,used_system)
@@ -595,9 +595,9 @@ class Xp(commands.Cog):
         if not user.display_avatar.is_animated() or force_static:
             pfp = await self.get_raw_image(user.display_avatar.replace(format="png", size=256))
             img = await self.bot.loop.run_in_executor(None,self.add_overlay,pfp.resize(size=(282,282)),user,card,xp,rank,txt,colors,levels_info)
-            img.save('../cards/global/{}-{}-{}.png'.format(user.id,xp,rank[0]))
+            img.save('./assets/card/{}-{}-{}.png'.format(user.id,xp,rank[0]))
             card.close()
-            return discord.File('../cards/global/{}-{}-{}.png'.format(user.id,xp,rank[0]))
+            return discord.File('./assets/card/{}-{}-{}.png'.format(user.id,xp,rank[0]))
 
         else:
             async with aiohttp.ClientSession() as cs:
@@ -619,13 +619,13 @@ class Xp(commands.Cog):
 
             # image_file_object = BytesIO()
             gif = images[0]
-            filename = '../cards/global/{}-{}-{}.gif'.format(user.id,xp,rank[0])
+            filename = './assets/card/{}-{}-{}.gif'.format(user.id,xp,rank[0])
             gif.save(filename, format='gif', save_all=True, append_images=images[1:], loop=0, duration=duration, subrectangles=True)
             # image_file_object.seek(0)
             # return discord.File(fp=image_file_object, filename='card.gif')
-            return discord.File('../cards/global/{}-{}-{}.gif'.format(user.id,xp,rank[0]))
-            # imageio.mimwrite('../cards/global/{}-{}-{}.gif'.format(user.id,xp,rank[0]), images, format="GIF-PIL", duration=duration, subrectangles=True)
-            # return discord.File('../cards/global/{}-{}-{}.gif'.format(user.id,xp,rank[0]))
+            return discord.File('./assets/card/{}-{}-{}.gif'.format(user.id,xp,rank[0]))
+            # imageio.mimwrite('./assets/card/{}-{}-{}.gif'.format(user.id,xp,rank[0]), images, format="GIF-PIL", duration=duration, subrectangles=True)
+            # return discord.File('./assets/card/{}-{}-{}.gif'.format(user.id,xp,rank[0]))
 
     def compress(self, original_file, max_size, scale: float):
         assert(0.0 < scale < 1.0)
@@ -766,7 +766,7 @@ class Xp(commands.Cog):
 
     async def send_card(self, ctx: MyContext, user: discord.User, xp, rank, ranks_nb, used_system, levels_info=None):
         try:
-            myfile = discord.File('../cards/global/{}-{}-{}.{}'.format(user.id,xp,rank,'gif' if user.display_avatar.is_animated() else 'png'))
+            myfile = discord.File('./assets/card/{}-{}-{}.{}'.format(user.id,xp,rank,'gif' if user.display_avatar.is_animated() else 'png'))
         except FileNotFoundError:
             style = await self.bot.get_cog('Utilities').get_xp_style(user)
             txts = [await self.bot._(ctx.channel, "xp.card-level"), await self.bot._(ctx.channel, "xp.card-rank")]
@@ -922,7 +922,7 @@ class Xp(commands.Cog):
         """Delete outdated rank cards"""
         files =  os.listdir('../cards/global')
         done = list()
-        for f in sorted([f.split('-')+['../cards/global/'+f] for f in files], key=operator.itemgetter(1), reverse=True):
+        for f in sorted([f.split('-')+['./assets/card/'+f] for f in files], key=operator.itemgetter(1), reverse=True):
             if all or f[0] in done:
                 os.remove(f[3])
             else:
