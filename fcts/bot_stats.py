@@ -20,6 +20,10 @@ else:
     json_loads = orjson.loads
 
 
+async def get_ram_data():
+    data = psutil.virtual_memory()
+    return data.percent, (data.total - data.available)
+
 class BotStats(commands.Cog):
     """Hey, I'm a test cog! Happy to meet you :wave:"""
 
@@ -32,7 +36,8 @@ class BotStats(commands.Cog):
         self.rss_stats = {'checked': 0, 'messages': 0, 'errors': 0, 'warnings': 0}
         self.xp_cards = {'generated': 0, 'sent': 0}
         self.process = psutil.Process()
-        self.cpu_records: list[float] = []
+        self.bot_cpu_records: list[float] = []
+        self.total_cpu_records: list[float] = []
         self.latency_records: list[int] = []
         self.statuspage_header = {"Content-Type": "application/json", "Authorization": "OAuth " + self.bot.others["statuspage"]}
         self.antiscam = {"warning": 0, "deletion": 0}
@@ -57,10 +62,14 @@ class BotStats(commands.Cog):
     @tasks.loop(seconds=10)
     async def record_cpu_usage(self):
         "Record the CPU usage for later use"
-        self.cpu_records.append(self.process.cpu_percent())
-        if len(self.cpu_records) > 6:
+        self.bot_cpu_records.append(self.process.cpu_percent())
+        if len(self.bot_cpu_records) > 6:
             # if the list becomes too long (over 1min), cut it
-            self.cpu_records = self.cpu_records[-6:]
+            self.bot_cpu_records = self.bot_cpu_records[-6:]
+        self.total_cpu_records.append(psutil.cpu_percent())
+        if len(self.total_cpu_records) > 6:
+            # if the list becomes too long (over 1min), cut it
+            self.total_cpu_records = self.total_cpu_records[-6:]
 
     @record_cpu_usage.error
     async def on_record_cpu_error(self, error: Exception):
@@ -277,14 +286,21 @@ class BotStats(commands.Cog):
             cursor.execute(query, (now, 'xp.sent_cards', self.xp_cards["sent"], 0, 'cards/min', True, self.bot.beta))
             self.xp_cards["generated"] = 0
             self.xp_cards["sent"] = 0
-            # Latency - RAM usage - CPU usage
-            ram = round(self.process.memory_info()[0]/2.**30, 3)
+            # Latency - CPU usage - RAM usage
             if latency := await self.get_list_usage(self.latency_records):
                 cursor.execute(query, (now, 'perf.latency', latency, 1, 'ms', False, self.bot.beta))
-            cursor.execute(query, (now, 'perf.ram', ram, 1, 'Gb', False, self.bot.beta))
-            cpu = await self.get_list_usage(self.cpu_records)
-            if cpu is not None:
-                cursor.execute(query, (now, 'perf.cpu', cpu, 1, '%', False, self.bot.beta))
+            bot_cpu = await self.get_list_usage(self.bot_cpu_records)
+            if bot_cpu is not None:
+                cursor.execute(query, (now, 'perf.bot_cpu', bot_cpu, 1, '%', False, self.bot.beta))
+            total_cpu = await self.get_list_usage(self.total_cpu_records)
+            if total_cpu is not None:
+                cursor.execute(query, (now, 'perf.total_cpu', total_cpu, 1, '%', False, self.bot.beta))
+            bot_ram = round(self.process.memory_info()[0] / 2.**30, 3)
+            cursor.execute(query, (now, 'perf.bot_ram', bot_ram, 1, 'Gb', False, self.bot.beta))
+            percent_ram, total_ram = await get_ram_data()
+            #  = round(psutil.virtual_memory().used / 1e9, 3)
+            cursor.execute(query, (now, 'perf.total_ram', round(total_ram / 1e9, 3), 1, 'Gb', False, self.bot.beta))
+            cursor.execute(query, (now, 'perf.percent_total_ram', percent_ram, 1, '%', False, self.bot.beta))
             # Unavailable guilds
             unav, total = 0, 0
             for guild in self.bot.guilds:
@@ -324,7 +340,7 @@ class BotStats(commands.Cog):
             self.emitted_serverlogs.clear()
             # Push everything
             cnx.commit()
-        except mysql.connector.errors.IntegrityError as err: # duplicate primary key
+        except mysql.connector.errors.IntegrityError as err: # usually duplicate primary key
             self.bot.log.warning(f"Stats loop iteration cancelled: {err}")
         # if something goes wrong, we still have to close the cursor
         cursor.close()
@@ -346,7 +362,7 @@ class BotStats(commands.Cog):
         result: list[dict] = list(cursor)
         cursor.close()
         if len(result) == 0:
-            return None
+            return 0
         result = result[0]
         if result['type'] == 0:
             return int(result['value'])

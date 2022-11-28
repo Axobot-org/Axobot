@@ -100,7 +100,7 @@ class Info(commands.Cog):
             # RAM/CPU
             ram_usage = round(self.process.memory_info()[0]/2.**30,3)
             if cog := self.bot.get_cog("BotStats"):
-                cpu: float = await cog.get_list_usage(cog.cpu_records)
+                cpu: float = await cog.get_list_usage(cog.bot_cpu_records)
             else:
                 cpu = 0.0
             # Guilds count
