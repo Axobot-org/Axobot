@@ -37,7 +37,8 @@ class Servers(commands.Cog):
             "partner_role", "modlogs_channel", "nicknames_history", "enable_xp", "levelup_msg", "levelup_channel",
             "noxp_channels", "xp_rate", "xp_type", "anti_caps_lock", "enable_fun", "membercounter", "anti_raid",
             "vote_emojis", "morpion_emojis", "help_in_dm", "compress_help", "muted_role", "voice_roles", "voice_channel",
-            "voice_category", "voice_channel_format", "ttt_display", "bot_news", "update_mentions"
+            "voice_category", "voice_channel_format", "ttt_display", "bot_news", "update_mentions", "streaming_channel",
+            "stream_mention",
         ]
         self.membercounter_pending: dict[int, int] = {}
         self.max_members_for_nicknames = 3000
@@ -295,7 +296,7 @@ class Servers(commands.Cog):
             await self.conf_roles(ctx, option, value)
         elif option in opt_list.bool_options:
             await self.conf_bool(ctx, option, value)
-        elif option in opt_list.textchan_options:
+        elif option in opt_list.textchannels_options:
             await self.conf_textchan(ctx, option, value)
         elif option in opt_list.category_options:
             await self.conf_category(ctx, option, value)
@@ -303,7 +304,7 @@ class Servers(commands.Cog):
             await self.conf_text(ctx, option, value)
         elif option in opt_list.numb_options:
             await self.conf_numb(ctx, option, value)
-        elif option in opt_list.vocchan_options:
+        elif option in opt_list.voicechannels_options:
             await self.conf_vocal(ctx, option, value)
         elif option == "language":
             await self.conf_lang(ctx, option, value)
@@ -970,7 +971,7 @@ class Servers(commands.Cog):
                 r = ", ".join(r)
             elif option in opt_list.bool_options:
                 r = str(await self.conf_bool(ctx, option, 'scret-desc'))
-            elif option in opt_list.textchan_options:
+            elif option in opt_list.textchannels_options:
                 r = await self.conf_textchan(ctx, option, 'scret-desc')
                 r = ", ".join(r)
             elif option in opt_list.category_options:
@@ -980,7 +981,7 @@ class Servers(commands.Cog):
                 r = await self.conf_text(ctx, option, 'scret-desc')
             elif option in opt_list.numb_options:
                 r = await self.conf_numb(ctx, option, 'scret-desc')
-            elif option in opt_list.vocchan_options:
+            elif option in opt_list.voicechannels_options:
                 r = await self.conf_vocal(ctx, option, 'scret-desc')
                 r = ", ".join(r)
             elif option == "language":

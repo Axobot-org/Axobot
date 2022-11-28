@@ -165,7 +165,7 @@ class Twitch(commands.Cog):
         if streamers:
             title = await self.bot._(ctx.guild.id, "twitch.subs-list.title", current=len(streamers), max=max_count)
             streamers_name = [streamer["user_name"] for streamer in streamers]
-            streamers_name.sort()
+            streamers_name.sort(key=str.casefold)
             await ctx.send(title+"\n• " + "\n• ".join(streamers_name))
         else:
             txt = await self.bot._(ctx.guild.id, "twitch.subs-list.empty", max=max_count)
@@ -187,32 +187,50 @@ class Twitch(commands.Cog):
             if stream["is_mature"] and not ctx.channel.is_nsfw():
                 await ctx.send(await self.bot._(ctx.guild.id, "twitch.check-stream.no-nsfw"))
                 return
-            started_at = isoparse(stream["started_at"])
-            embed = discord.Embed(
-                title=await self.bot._(ctx.guild.id, "twitch.check-stream.title", streamer=stream["user_name"]),
-                url=f"https://twitch.tv/{stream['user_name']}",
-                color=self.twitch_color,
-                timestamp=started_at,
-                description=stream["title"],
-            )
-            embed.set_image(url=stream["thumbnail_url"].format(width=1280, height=720))
-            await ctx.send(embed=embed)
+            await ctx.send(embed=await self.create_stream_embed(stream, ctx.guild.id))
         else:
             await ctx.send(await self.bot._(ctx.guild.id, "twitch.check-stream.offline", streamer=streamer))
-    
+
+    async def create_stream_embed(self, stream: StreamObject, guild_id: int):
+        started_at = isoparse(stream["started_at"])
+        embed = discord.Embed(
+            title=await self.bot._(guild_id, "twitch.check-stream.title", streamer=stream["user_name"]),
+            url=f"https://twitch.tv/{stream['user_name']}",
+            color=self.twitch_color,
+            timestamp=started_at,
+            description=stream["title"],
+        )
+        embed.set_image(url=stream["thumbnail_url"].format(width=1280, height=720))
+        return embed
+
     async def send_stream_alert(self, stream: StreamObject, channel: discord.abc.GuildChannel):
         "Send a stream alert to a guild when a streamer is live"
+        msg = await self.bot._(channel.guild, "twitch.stream-alerts", streamer=stream["user_name"], game=stream["game_name"])
+        allowed_mentions = discord.AllowedMentions.none()
+        if role_id := await self.bot.get_config(channel.guild.id, "stream_mention"):
+            if role := channel.guild.get_role(int(role_id)):
+                msg = role.mention + " " + msg
+                allowed_mentions = discord.AllowedMentions(roles=[role])
+        if channel.permissions_for(channel.guild.me).embed_links:
+            embed = await self.create_stream_embed(stream, channel.guild.id)
+        else:
+            embed = None
+            msg += f"\nhttps://twitch.tv/{stream['user_name']}"
+        await channel.send(
+            msg,
+            embed=embed,
+            allowed_mentions=allowed_mentions
+        )
 
 
     @commands.Cog.listener()
     async def on_stream_starts(self, stream: StreamObject, guild: discord.Guild):
         "When a stream starts, send a notification to the subscribed guild"
-        print("Stream started:", stream)
-    
-    @commands.Cog.listener()
-    async def on_stream_ends(self, stream: StreamObject, guild: discord.Guild):
-        "When a stream ends, send a notification to the subscribed guild"
-        print("Stream ended:", stream)
+        if (channel_id := await self.bot.get_config(guild.id, "streaming_channel")) and channel_id.isnumeric():
+            if channel := guild.get_channel(int(channel_id)):
+                await self.send_stream_alert(stream, channel)
+            else:
+                self.bot.log.warn("[twitch] Channel %s not found in guild %s", channel_id, guild.id)
 
     @tasks.loop(minutes=5)
     async def stream_check_task(self):

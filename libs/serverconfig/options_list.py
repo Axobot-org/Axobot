@@ -1,11 +1,11 @@
 roles_options = ["clear_allowed_roles", "slowmode_allowed_roles", "mute_allowed_roles", "kick_allowed_roles", "ban_allowed_roles",
                  "warn_allowed_roles", "say_allowed_roles", "welcome_roles", "muted_role", 'partner_role', 'update_mentions',
-                 "voice_roles"]
+                 "voice_roles", "stream_mention"]
 bool_options = ["enable_xp", "anti_caps_lock", "enable_fun",
                 "help_in_dm", "compress_help", "anti_scam", "nicknames_history"]
-textchan_options = ["welcome_channel", "bot_news", "poll_channels",
-                    "modlogs_channel", "noxp_channels", "partner_channel"]
-vocchan_options = ["membercounter", "voice_channel"]
+textchannels_options = ["welcome_channel", "bot_news", "poll_channels",
+                    "modlogs_channel", "noxp_channels", "partner_channel", "streaming_channel"]
+voicechannels_options = ["membercounter", "voice_channel"]
 category_options = ["voice_category"]
 text_options = ["welcome", "leave", "levelup_msg",
                 "description", "voice_channel_format"]
@@ -69,4 +69,6 @@ default_values = {
     'ttt_display': 2,
     'anti_scam': 0,
     'nicknames_history': None,
+    'streaming_channel': '',
+    'stream_mention': ''
 }
