@@ -286,19 +286,20 @@ class BotStats(commands.Cog):
             cursor.execute(query, (now, 'xp.sent_cards', self.xp_cards["sent"], 0, 'cards/min', True, self.bot.beta))
             self.xp_cards["generated"] = 0
             self.xp_cards["sent"] = 0
-            # Latency - CPU usage - RAM usage
+            # Latency
             if latency := await self.get_list_usage(self.latency_records):
                 cursor.execute(query, (now, 'perf.latency', latency, 1, 'ms', False, self.bot.beta))
+            # CPU usage
             bot_cpu = await self.get_list_usage(self.bot_cpu_records)
             if bot_cpu is not None:
                 cursor.execute(query, (now, 'perf.bot_cpu', bot_cpu, 1, '%', False, self.bot.beta))
             total_cpu = await self.get_list_usage(self.total_cpu_records)
             if total_cpu is not None:
                 cursor.execute(query, (now, 'perf.total_cpu', total_cpu, 1, '%', False, self.bot.beta))
+            # RAM usage
             bot_ram = round(self.process.memory_info()[0] / 2.**30, 3)
             cursor.execute(query, (now, 'perf.bot_ram', bot_ram, 1, 'Gb', False, self.bot.beta))
             percent_ram, total_ram = await get_ram_data()
-            #  = round(psutil.virtual_memory().used / 1e9, 3)
             cursor.execute(query, (now, 'perf.total_ram', round(total_ram / 1e9, 3), 1, 'Gb', False, self.bot.beta))
             cursor.execute(query, (now, 'perf.percent_total_ram', percent_ram, 1, '%', False, self.bot.beta))
             # Unavailable guilds
