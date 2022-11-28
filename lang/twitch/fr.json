@@ -5,6 +5,7 @@
         "title": "%{streamer} est en live !"
     },
     "invalid-streamer-name": "Ce nom n'est pas un nom de streamer Twitch valide.",
+    "on-live-indication": "en live",
     "stream-alerts": "Hey regardez ça ! %{streamer} est en live \"%{game}\" !",
     "subscribe": {
         "success": "Votre serveur est maintenant abonné aux lives de %{streamer} !",
