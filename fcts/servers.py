@@ -38,7 +38,7 @@ class Servers(commands.Cog):
             "noxp_channels", "xp_rate", "xp_type", "anti_caps_lock", "enable_fun", "membercounter", "anti_raid",
             "vote_emojis", "morpion_emojis", "help_in_dm", "compress_help", "muted_role", "voice_roles", "voice_channel",
             "voice_category", "voice_channel_format", "ttt_display", "bot_news", "update_mentions", "streaming_channel",
-            "stream_mention",
+            "stream_mention", "streaming_role",
         ]
         self.membercounter_pending: dict[int, int] = {}
         self.max_members_for_nicknames = 3000
