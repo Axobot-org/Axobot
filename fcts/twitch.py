@@ -211,6 +211,18 @@ class Twitch(commands.Cog):
         embed.set_image(url=stream["thumbnail_url"].format(width=1280, height=720))
         return embed
 
+    async def find_streamer_in_guild(self, streamer_name: str, guild: discord.Guild):
+        "Try to find a member currently streaming with this streamer name in the given guild"
+        streamer_name = streamer_name.lower()
+        for member in guild.members:
+            if member.bot or not member.activities:
+                continue
+            for activity in member.activities:
+                if activity.type != discord.ActivityType.streaming:
+                    continue
+                if activity.twitch_name and activity.twitch_name.lower() == streamer_name:
+                    return member
+
     async def send_stream_alert(self, stream: StreamObject, channel: discord.abc.GuildChannel):
         "Send a stream alert to a guild when a streamer is live"
         msg = await self.bot._(channel.guild, "twitch.stream-alerts", streamer=stream["user_name"], game=stream["game_name"])
@@ -234,11 +246,22 @@ class Twitch(commands.Cog):
     @commands.Cog.listener()
     async def on_stream_starts(self, stream: StreamObject, guild: discord.Guild):
         "When a stream starts, send a notification to the subscribed guild"
+        # Send notification
         if (channel_id := await self.bot.get_config(guild.id, "streaming_channel")) and channel_id.isnumeric():
             if channel := guild.get_channel(int(channel_id)):
                 await self.send_stream_alert(stream, channel)
             else:
                 self.bot.log.warn("[twitch] Channel %s not found in guild %s", channel_id, guild.id)
+        # Grant role
+        if (role_id := await self.bot.get_config(guild.id, "streaming_role")) and role_id.isnumeric():
+            if role := guild.get_role(int(role_id)):
+                if member := await self.find_streamer_in_guild(stream["user_name"], guild):
+                    try:
+                        await member.add_roles(role, reason="Twitch streamer is live")
+                    except discord.Forbidden:
+                        self.bot.log.info("[twitch] Cannot add role %s to member %s in guild %s: Forbidden", role_id, member.id, guild.id)
+            else:
+                self.bot.log.warn("[twitch] Role %s not found in guild %s", role_id, guild.id)
 
     @tasks.loop(minutes=5)
     async def stream_check_task(self):

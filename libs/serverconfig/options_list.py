@@ -1,6 +1,6 @@
 roles_options = ["clear_allowed_roles", "slowmode_allowed_roles", "mute_allowed_roles", "kick_allowed_roles", "ban_allowed_roles",
                  "warn_allowed_roles", "say_allowed_roles", "welcome_roles", "muted_role", 'partner_role', 'update_mentions',
-                 "voice_roles", "stream_mention"]
+                 "voice_roles", "stream_mention", "streaming_role"]
 bool_options = ["enable_xp", "anti_caps_lock", "enable_fun",
                 "help_in_dm", "compress_help", "anti_scam", "nicknames_history"]
 textchannels_options = ["welcome_channel", "bot_news", "poll_channels",
@@ -70,5 +70,6 @@ default_values = {
     'anti_scam': 0,
     'nicknames_history': None,
     'streaming_channel': '',
-    'stream_mention': ''
+    'stream_mention': '',
+    'streaming_role': '',
 }
