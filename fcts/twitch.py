@@ -1,14 +1,16 @@
 import json
 from typing import Optional, TypedDict
-from dateutil.parser import isoparse
 
 import discord
+from dateutil.parser import isoparse
 from discord import app_commands
 from discord.ext import commands, tasks
+from mysql.connector.errors import IntegrityError
 
 from libs.bot_classes import MyContext, Zbot
 from libs.twitch.api_agent import TwitchApiAgent
-from libs.twitch.types import GroupedStreamerDBObject, PlatformId, StreamObject, StreamersDBObject
+from libs.twitch.types import (GroupedStreamerDBObject, PlatformId,
+                               StreamersDBObject, StreamObject)
 
 
 class _StreamersReadyForNotification(TypedDict):
@@ -44,8 +46,11 @@ class Twitch(commands.Cog):
     async def db_add_streamer(self, guild_id: int, platform: PlatformId, user_id: str, user_name: str):
         "Add a streamer to the database"
         query = "INSERT INTO `streamers` (`guild_id`, `platform`, `user_id`, `user_name`, `beta`) VALUES (%s, %s, %s, %s, %s)"
-        async with self.bot.db_query(query, (guild_id, platform, user_id, user_name, self.bot.beta), returnrowcount=True) as query_result:
-            return query_result > 0
+        try:
+            async with self.bot.db_query(query, (guild_id, platform, user_id, user_name, self.bot.beta), returnrowcount=True) as query_result:
+                return query_result > 0
+        except IntegrityError:
+            return False
 
     async def db_get_guild_subscriptions_count(self, guild_id: int) -> Optional[int]:
         "Get the number of subscriptions for a guild"
@@ -164,11 +169,16 @@ class Twitch(commands.Cog):
     @twitch.command(name="list-subscriptions")
     async def twitch_list(self, ctx: MyContext):
         "List all subscribed Twitch streamers"
+        await ctx.defer()
         streamers = await self.db_get_guild_streamers(ctx.guild.id, "twitch")
         max_count = await self.bot.get_config(ctx.guild.id,'streamers_max_number')
         if streamers:
             title = await self.bot._(ctx.guild.id, "twitch.subs-list.title", current=len(streamers), max=max_count)
-            streamers_name = [streamer["user_name"] for streamer in streamers]
+            on_live = await self.bot._(ctx.guild.id, "twitch.on-live-indication")
+            streamers_name = [
+                streamer["user_name"] + (f"  *({on_live})*" if streamer["is_streaming"] else "")
+                for streamer in streamers
+            ]
             streamers_name.sort(key=str.casefold)
             await ctx.send(title+"\n• " + "\n• ".join(streamers_name))
         else:
