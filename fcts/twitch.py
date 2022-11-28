@@ -109,7 +109,11 @@ class Twitch(commands.Cog):
     async def twitch_sub(self, ctx: MyContext, streamer: str):
         "Subscribe to a Twitch streamer"
         await ctx.defer()
-        user = await self.agent.get_user_by_name(streamer)
+        try:
+            user = await self.agent.get_user_by_name(streamer)
+        except ValueError:
+            await ctx.send(await self.bot._(ctx.guild.id, "twitch.invalid-streamer-name"))
+            return
         if user is None:
             await ctx.send(await self.bot._(ctx.guild.id, "twitch.unknown-streamer"))
             return
@@ -180,7 +184,11 @@ class Twitch(commands.Cog):
         if streamer.isnumeric():
             user_id = streamer
         else:
-            user_id = (await self.agent.get_user_by_name(streamer))["id"]
+            try:
+                user_id = (await self.agent.get_user_by_name(streamer))["id"]
+            except ValueError:
+                await ctx.send(await self.bot._(ctx.guild.id, "twitch.invalid-streamer-name"))
+                return
         resp = await self.agent.get_user_stream_by_id(user_id)
         if len(resp) > 0:
             stream = resp[0]
