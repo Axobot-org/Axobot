@@ -9,7 +9,7 @@ async def autocomplete_main(bot: Zbot, interaction: Interaction, option: str, cu
     """Main autocompletion function, calling other sub-functions as needed"""
     if option in options_list.roles_options:
         return await autocomplete_roles(interaction, current)
-    if option in options_list.vocchan_options:
+    if option in options_list.voicechannels_options:
         return await autocomplete_vocchan(interaction, current)
     if option in options_list.bool_options:
         return await autocomplete_bool(interaction, current)

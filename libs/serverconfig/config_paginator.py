@@ -64,7 +64,7 @@ class ServerConfigPaginator(Paginator):
                 r = ", ".join(r)
             elif option in opt_list.bool_options:
                 r = str(await self.cog.form_bool(value))
-            elif option in opt_list.textchan_options:
+            elif option in opt_list.textchannels_options:
                 r = await self.cog.form_textchan(self.guild, value, replace_mentions)
                 r = ", ".join(r)
             elif option in opt_list.category_options:
@@ -74,7 +74,7 @@ class ServerConfigPaginator(Paginator):
                 r = value if len(value) < 500 else value[:500]+"..."
             elif option in opt_list.numb_options:
                 r = str(value)
-            elif option in opt_list.vocchan_options:
+            elif option in opt_list.voicechannels_options:
                 r = await self.cog.form_vocal(self.guild, value)
                 r = ", ".join(r)
             elif option == "language":
