@@ -46,6 +46,17 @@
     "kick-dm": "U have just been kicked from the servr %{guild} :confused:",
     "missing-manage-nick": "Oops, I'm missing the cool \"Manage nicknames\" perms! :sad:",
     "missing-user-perms": "Oops, Ur not pawerful enoogh (either manage roles, manage server or manage messages)",
+    "mute-config": {
+        "err": "Oops, cant do that. Plz check me perms on teh server 'nd try again.",
+        "success": {
+            "other": "Teh role have been successffully created & configured! (%{count} channels couldnotbeconfigured, cuz I lack of perms)",
+            "zero": "Teh role have been successffully created & configured!"
+        },
+        "success2": {
+            "other": "The mouted role iz now correcty setup! (%{count} chats cannut be configured, cuz of a bruh lacking of perms)",
+            "zero": "The mouted role iz now correcty setup!"
+        }
+    },
     "mute": {
         "already-mute": "Dis membr iz 'lready mute!",
         "already-unmute": "This mber iznt muted!",
@@ -54,15 +65,6 @@
         "list-title-0": "List ov mutd people in serv \"%{guild}\"",
         "list-title-1": "List ov a few (45) muted members of ur server \"%{guild}\"",
         "list-title-2": "Lits ov 60 muted members of dat guild \"%{guild}\"",
-        "mute-config-err": "Oops, cant do that. Plz check me perms on teh server 'nd try again.",
-        "mute-config-success": {
-            "other": "Teh role have been successffully created & configured! (%{count} channels couldnotbeconfigured, cuz I lack of perms)",
-            "zero": "Teh role have been successffully created & configured!"
-        },
-        "mute-config-success2": {
-            "other": "The mouted role iz now correcty setup! (%{count} chats cannut be configured, cuz of a bruh lacking of perms)",
-            "zero": "The mouted role iz now correcty setup!"
-        },
         "mute-high": "Ooops, 't sEEms dat `muted` rol iz tooo high 4 me to give it... Plz fiX dis problem by plac'ng my role higher than this nice `muted` role.",
         "no-mute": "Oooops, seemz dat teh nice `muted` role doznt exist :rofl: Creat'it nd assign perms yourself",
         "no-mutes": "No member seems 2B banned from here",

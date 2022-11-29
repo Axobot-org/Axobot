@@ -522,9 +522,12 @@ This will remove the role 'muted' for the targeted member
             validation=lambda inter: inter.user == ctx.author,
             ephemeral=False)
         await confirm_view.init()
-        await ctx.send(await self.bot._(ctx.guild.id, "moderation.mute.mute-config-confirm"), view=confirm_view)
+        confirm_txt = await self.bot._(ctx.guild.id, "moderation.mute-config.confirm")
+        confirm_txt += "\n\n" + await self.bot._(ctx.guild.id, "moderation.mute-config.tip", mute=await self.bot.get_command_mention("mute"))
+        confirm_msg = await ctx.send(confirm_txt, view=confirm_view)
         
         await confirm_view.wait()
+        await confirm_view.disable(confirm_msg)
         if not confirm_view.value:
             return
 
@@ -532,11 +535,11 @@ This will remove the role 'muted' for the targeted member
         create = role is None
         role, count = await self.configure_muted_role(ctx.guild, role)
         if role is None or count >= len(ctx.guild.voice_channels+ctx.guild.text_channels):
-            await ctx.send(await self.bot._(ctx.guild.id, "moderation.mute.mute-config-err"))
+            await ctx.send(await self.bot._(ctx.guild.id, "moderation.mute-config.err"))
         elif create:
-            await ctx.send(await self.bot._(ctx.guild.id, "moderation.mute.mute-config-success", count=count))
+            await ctx.send(await self.bot._(ctx.guild.id, "moderation.mute-config.success", count=count))
         else:
-            await ctx.send(await self.bot._(ctx.guild.id, "moderation.mute.mute-config-success2", count=count))
+            await ctx.send(await self.bot._(ctx.guild.id, "moderation.mute-config.success2", count=count))
 
 
     @commands.hybrid_command(name="ban")
