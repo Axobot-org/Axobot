@@ -1,4 +1,4 @@
-from typing import Literal, TypedDict, Any
+from typing import Literal, TypedDict
 
 class HttpTokenNotSet(Exception):
     pass
@@ -21,6 +21,7 @@ class StreamObject(TypedDict):
     started_at: str
     language: str
     thumbnail_url: str
+    tag_ids: list[str]
     is_mature: bool
 
 class StreamerObject(TypedDict):

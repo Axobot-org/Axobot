@@ -1,12 +1,13 @@
 {
     "check-stream": {
+        "category": "**Catégorie :** %{game}",
         "no-nsfw": "Ce stream est marqué comme réservé à une audience adulte, mais ce salon n'est pas NSFW",
         "offline": "Cette chaîne est actuellement hors ligne",
         "title": "%{streamer} est en live !"
     },
     "invalid-streamer-name": "Ce nom n'est pas un nom de streamer Twitch valide.",
     "on-live-indication": "en live",
-    "stream-alerts": "Hey regardez ça ! %{streamer} est en live \"%{game}\" !",
+    "stream-alerts": "%{streamer} est en live !",
     "subscribe": {
         "success": "Votre serveur est maintenant abonné aux lives de %{streamer} !",
         "limit-reached": "Vous ne pouvez pas vous abonner à plus de %{limit} streamers !",
