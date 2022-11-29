@@ -193,9 +193,12 @@ class Twitch(commands.Cog):
         "Check if a streamer is currently streaming"
         if streamer.isnumeric():
             user_id = streamer
+            avatar = None
         else:
             try:
-                user_id = (await self.agent.get_user_by_name(streamer))["id"]
+                streamer_obj = await self.agent.get_user_by_name(streamer)
+                avatar = streamer_obj["profile_image_url"].format(width=64, height=64)
+                user_id = streamer_obj["id"]
             except ValueError:
                 await ctx.send(await self.bot._(ctx.guild.id, "twitch.invalid-streamer-name"))
                 return
@@ -205,20 +208,21 @@ class Twitch(commands.Cog):
             if stream["is_mature"] and not ctx.channel.is_nsfw():
                 await ctx.send(await self.bot._(ctx.guild.id, "twitch.check-stream.no-nsfw"))
                 return
-            await ctx.send(embed=await self.create_stream_embed(stream, ctx.guild.id))
+            await ctx.send(embed=await self.create_stream_embed(stream, ctx.guild.id, avatar))
         else:
             await ctx.send(await self.bot._(ctx.guild.id, "twitch.check-stream.offline", streamer=streamer))
 
-    async def create_stream_embed(self, stream: StreamObject, guild_id: int):
+    async def create_stream_embed(self, stream: StreamObject, guild_id: int, streamer_avatar: Optional[str]=None):
         started_at = isoparse(stream["started_at"])
         embed = discord.Embed(
-            title=await self.bot._(guild_id, "twitch.check-stream.title", streamer=stream["user_name"]),
+            title=stream["title"],
             url=f"https://twitch.tv/{stream['user_name']}",
             color=self.twitch_color,
             timestamp=started_at,
-            description=stream["title"],
+            description=await self.bot._(guild_id, "twitch.check-stream.category", game=stream['game_name'])
         )
         embed.set_image(url=stream["thumbnail_url"].format(width=1280, height=720))
+        embed.set_author(name=stream["user_name"], url=f"https://twitch.tv/{stream['user_name']}", icon_url=streamer_avatar)
         return embed
 
     async def find_streamer_in_guild(self, streamer_name: str, guild: discord.Guild):
@@ -232,17 +236,27 @@ class Twitch(commands.Cog):
                     continue
                 if activity.twitch_name and activity.twitch_name.lower() == streamer_name:
                     return member
+    
+    async def find_streamer_offline_in_guild(self, guild: discord.Guild, role: discord.Role):
+        "Find any member in the guild who has the streamer role but is not currently streaming"
+        for member in guild.members:
+            if role in member.roles and not any(activity.type == discord.ActivityType.streaming for activity in member.activities):
+                yield member
 
     async def send_stream_alert(self, stream: StreamObject, channel: discord.abc.GuildChannel):
         "Send a stream alert to a guild when a streamer is live"
-        msg = await self.bot._(channel.guild, "twitch.stream-alerts", streamer=stream["user_name"], game=stream["game_name"])
+        msg = await self.bot._(channel.guild, "twitch.stream-alerts", streamer=stream["user_name"])
         allowed_mentions = discord.AllowedMentions.none()
         if role_id := await self.bot.get_config(channel.guild.id, "stream_mention"):
             if role := channel.guild.get_role(int(role_id)):
                 msg = role.mention + " " + msg
                 allowed_mentions = discord.AllowedMentions(roles=[role])
         if channel.permissions_for(channel.guild.me).embed_links:
-            embed = await self.create_stream_embed(stream, channel.guild.id)
+            if streamer := await self.agent.get_user_by_id(stream["user_id"]):
+                avatar = streamer["profile_image_url"].format(width=64, height=64)
+            else:
+                avatar = None
+            embed = await self.create_stream_embed(stream, channel.guild.id, avatar)
         else:
             embed = None
             msg += f"\nhttps://twitch.tv/{stream['user_name']}"
@@ -270,6 +284,19 @@ class Twitch(commands.Cog):
                         await member.add_roles(role, reason="Twitch streamer is live")
                     except discord.Forbidden:
                         self.bot.log.info("[twitch] Cannot add role %s to member %s in guild %s: Forbidden", role_id, member.id, guild.id)
+            else:
+                self.bot.log.warn("[twitch] Role %s not found in guild %s", role_id, guild.id)
+
+    @commands.Cog.listener()
+    async def on_stream_ends(self, streamer_name: str, guild: discord.Guild):
+        "When a stream ends, remove the role from the streamer"
+        if (role_id := await self.bot.get_config(guild.id, "streaming_role")) and role_id.isnumeric():
+            if role := guild.get_role(int(role_id)):
+                async for member in self.find_streamer_offline_in_guild(guild, role):
+                    try:
+                        await member.remove_roles(role, reason="Twitch streamer is offline")
+                    except discord.Forbidden:
+                        self.bot.log.info("[twitch] Cannot remove role %s from member %s in guild %s: Forbidden", role_id, member.id, guild.id)
             else:
                 self.bot.log.warn("[twitch] Role %s not found in guild %s", role_id, guild.id)
 

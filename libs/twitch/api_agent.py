@@ -74,6 +74,21 @@ class TwitchApiAgent:
             except IndexError:
                 return None
 
+    async def get_user_by_id(self, user_id: str) -> Optional[StreamerObject]:
+        "Get the user object from their ID"
+        if not self.is_token_valid:
+            raise HttpTokenNotSet()
+        if not self._session:
+            self._session = aiohttp.ClientSession()
+        url = "https://api.twitch.tv/helix/users"
+        params = {"id": user_id}
+        async with self._session.get(url, headers=await self._get_headers(), params=params) as resp:
+            data = await resp.json()
+            try:
+                return data["data"][0]
+            except IndexError:
+                return None
+
     async def get_user_stream_by_id(self, *user_ids: str) -> list[StreamObject]:
         "Get the stream of users specified by their IDs"
         if not self.is_token_valid:
