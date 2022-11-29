@@ -277,9 +277,10 @@ class Timers(commands.Cog):
             validation=lambda inter: inter.user==ctx.author,
             timeout=20)
         await confirm_view.init()
-        await ctx.send(await self.bot._(ctx.channel, "timers.rmd.confirm", count=count), view=confirm_view)
+        confirm_msg = await ctx.send(await self.bot._(ctx.channel, "timers.rmd.confirm", count=count), view=confirm_view)
 
         await confirm_view.wait()
+        await confirm_view.disable(confirm_msg)
         if confirm_view.value is None:
             await ctx.send(await self.bot._(ctx.channel, "timers.rmd.cancelled"))
             return

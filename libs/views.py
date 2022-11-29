@@ -1,4 +1,4 @@
-from typing import Callable, Optional
+from typing import Callable, Optional, Union
 
 import discord
 
@@ -44,6 +44,20 @@ class ConfirmView(discord.ui.View):
             return
         await interaction.response.send_message(await self.bot._(self.ctx, "misc.btn.cancel.answer"), ephemeral=self.ephemeral)
         self.value = False
+        self.stop()
+
+    async def disable(self, interaction: Union[discord.Message, discord.Interaction]):
+        "Called when the timeout has expired"
+        for child in self.children:
+            child.disabled = True
+        if isinstance(interaction, discord.Interaction):
+            await interaction.followup.edit_message(
+                interaction.message.id,
+                content=interaction.message.content,
+                view=self
+            )
+        else:
+            await interaction.edit(content=interaction.content, view=self)
         self.stop()
 
 class DeleteView(discord.ui.View):

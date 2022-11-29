@@ -349,8 +349,9 @@ class Servers(commands.Cog):
             send_confirmation=False
             )
         await confirm_view.init()
-        await ctx.send(text, view=confirm_view)
+        confirm_msg = await ctx.send(text, view=confirm_view)
         await confirm_view.wait()
+        await confirm_view.disable(confirm_msg)
         if not confirm_view.value:
             return
         if await self.delete_server(ctx.guild.id):
