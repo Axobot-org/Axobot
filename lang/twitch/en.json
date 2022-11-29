@@ -4,6 +4,9 @@
         "offline": "This channel is not currently streaming",
         "title": "%{streamer} is streaming!"
     },
+    "invalid-streamer-name": "This name is not a valid Twitch streamer name",
+    "on-live-indication": "on live",
+    "stream-alerts": "Check it out! %{streamer} is streaming \"%{game}\"!",
     "subscribe": {
         "success": "Your server has subscribed to the streamer %{streamer} notifications!",
         "limit-reached": "You cannot subscribe to more than %{limit} streamers!",
