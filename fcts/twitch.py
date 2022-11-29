@@ -1,4 +1,5 @@
 import json
+import re
 from typing import Optional, TypedDict
 
 import discord
@@ -114,6 +115,8 @@ class Twitch(commands.Cog):
     async def twitch_sub(self, ctx: MyContext, streamer: str):
         "Subscribe to a Twitch streamer"
         await ctx.defer()
+        if match := re.findall(r'^https://(?:www\.)?twitch\.tv/(\w+)', streamer):
+            streamer = match[0]
         try:
             user = await self.agent.get_user_by_name(streamer)
         except ValueError:
