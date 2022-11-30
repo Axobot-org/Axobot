@@ -3,6 +3,7 @@ import time
 import typing
 
 import discord
+from discord import app_commands
 from discord.ext import commands
 
 from libs.antiscam import AntiScamAgent, Message, update_unicode_map
@@ -34,6 +35,11 @@ class AntiScam(commands.Cog):
         self.file = "antiscam"
         self.agent = AntiScamAgent()
         self.table = 'messages_beta'
+        self.report_ctx_menu = app_commands.ContextMenu(
+            name='Report a scam',
+            callback=self.report_context_menu,
+        )
+        self.bot.tree.add_command(self.report_ctx_menu)
 
     async def cog_load(self):
         "Load websites list from database"
@@ -51,6 +57,10 @@ class AntiScam(commands.Cog):
                 self.bot.dispatch("error", err, "While loading antiscam domains list")
         self.agent.fetch_websites_locally()
         self.bot.log.info(f"[antiscam] Loaded {len(self.agent.websites_list)} domain names from local file")
+
+    async def cog_unload(self):
+        "Disable the report context menu"
+        self.bot.tree.remove_command(self.report_ctx_menu.name, type=self.report_ctx_menu.type)
 
     @property
     def report_channel(self) -> discord.TextChannel:
@@ -151,10 +161,10 @@ class AntiScam(commands.Cog):
                           value=f'{pred_title} ({pred_value}%)')
         return emb
 
-    async def send_report(self, ctx: commands.Context, row_id: int, msg: Message):
+    async def send_report(self, message_author: discord.User, row_id: int, msg: Message):
         "Send a message report into the internal reports channel"
         prediction = self.agent.predict_bot(msg)
-        emb = await self.create_embed(msg, ctx.author, row_id, "pending", prediction)
+        emb = await self.create_embed(msg, message_author, row_id, "pending", prediction)
         await self.report_channel.send(embed=emb, view=MsgReportView(row_id))
 
     async def edit_report_message(self, message: discord.InteractionMessage, new_status: str):
@@ -188,7 +198,7 @@ class AntiScam(commands.Cog):
         return await train_model(data)
 
     @commands.hybrid_group(name="antiscam")
-    @discord.app_commands.default_permissions(manage_guild=True)
+    @app_commands.default_permissions(manage_guild=True)
     async def antiscam(self, ctx: MyContext):
         """Everything related to the antiscam feature
 
@@ -197,6 +207,7 @@ class AntiScam(commands.Cog):
             await ctx.send_help(ctx.command)
 
     @antiscam.command(name="test")
+    @app_commands.describe(text="The message to check")
     @commands.cooldown(5, 30, commands.BucketType.user)
     async def antiscam_test(self, ctx: MyContext, *, text: str):
         """Test the antiscam feature with a given message
@@ -280,6 +291,21 @@ class AntiScam(commands.Cog):
         else:
             txt += f"\n❌ This model is not better than the current one ({current_acc:.3f})"
         await msg.edit(content=txt)
+    
+    async def report_context_menu(self, interaction: discord.Interaction, message: discord.Message):
+        "Report a suspicious message to the bot team"
+        if not message.content:
+            await interaction.response.send_message(
+                await self.bot._(interaction.user, "antiscam.report-empty"),
+                ephemeral=True
+            )
+            return
+        await interaction.response.defer(ephemeral=True)
+        await self._report_message(message.author, message.content, len(message.mentions), message.guild.id)
+        await interaction.followup.send(
+            await self.bot._(interaction.user, "antiscam.report-successful"),
+            ephemeral=True
+        )
 
     @antiscam.command(name="report")
     @commands.cooldown(5, 30, commands.BucketType.guild)
@@ -296,23 +322,28 @@ class AntiScam(commands.Cog):
             src_msg = None
             content = message
             mentions_count = 0
+            author = ctx.author
         else:
             if not src_msg.content:
                 await ctx.send(await self.bot._(ctx, "antiscam.report-empty"), ephemeral=True)
                 return
             content = src_msg.content
             mentions_count = len(src_msg.mentions)
-        msg = Message.from_raw(content, mentions_count, self.agent.websites_list)
-        if src_msg is not None and src_msg.guild:
-            msg.contains_everyone = f'<@&{src_msg.guild.id}>' in content or '@everyone' in content
-        else:
-            msg.contains_everyone = '@everyone' in content
-        msg_id = await self.db_insert_msg(msg)
-        await self.send_report(ctx, msg_id, msg)
+            author = src_msg.author
+        await self._report_message(author, content, mentions_count, ctx.guild.id)
         await ctx.reply(
             await self.bot._(ctx.channel, "antiscam.report-successful"),
             allowed_mentions=discord.AllowedMentions.none()
         )
+    
+    async def _report_message(self, message_author: discord.User, content: str, mentions_count: int, guild_id: typing.Optional[int]):
+        msg = Message.from_raw(content, mentions_count, self.agent.websites_list)
+        if guild_id:
+            msg.contains_everyone = f'<@&{guild_id}>' in content or '@everyone' in content
+        else:
+            msg.contains_everyone = '@everyone' in content
+        msg_id = await self.db_insert_msg(msg)
+        await self.send_report(message_author, msg_id, msg)
 
     @commands.Cog.listener()
     async def on_message(self, msg: discord.Message):
@@ -341,12 +372,12 @@ class AntiScam(commands.Cog):
                 await self.send_bot_log(msg, deleted=True)
                 self.bot.dispatch("antiscam_delete", msg, result)
                 msg_id = await self.db_insert_msg(message)
-                await self.send_report(msg, msg_id, message)
+                await self.send_report(msg.author, msg_id, message)
             elif result.probabilities[1] < 0.3:
                 await self.send_bot_log(msg, deleted=False)
                 self.bot.dispatch("antiscam_warn", msg, result)
                 msg_id = await self.db_insert_msg(message)
-                await self.send_report(msg, msg_id, message)
+                await self.send_report(msg.author, msg_id, message)
 
     @commands.Cog.listener()
     async def on_interaction(self, interaction: discord.Interaction):
