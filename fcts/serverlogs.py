@@ -1,17 +1,18 @@
 import asyncio
 import re
-from typing import Any
+from typing import Any, Optional
 
 import discord
 from cachingutils import LRUCache
+from discord import app_commands
 from discord.ext import commands, tasks
+
+from fcts.args import serverlog
+from fcts.tickets import TicketCreationEvent
 from libs.antiscam.classes import PredictionResult
 from libs.bot_classes import MyContext, Zbot
 from libs.enums import ServerWarningType
 from libs.formatutils import FormatUtils
-
-from fcts.args import serverlog
-from fcts.tickets import TicketCreationEvent
 
 from . import checks
 
@@ -78,7 +79,8 @@ class ServerLogs(commands.Cog):
             return [row['kind'] for row in query_results]
 
     async def db_get_from_guild(self, guild: int, use_cache: bool=True) -> dict[int, list[str]]:
-        "Get enabled logs for a guild"
+        """Get enabled logs for a guild
+        Returns a map of ChannelID -> list of enabled logs"""
         if use_cache and (cached := self.cache.get(guild)):
             return cached
         query = "SELECT channel, kind FROM serverlogs WHERE guild = %s AND beta = %s"
@@ -138,9 +140,10 @@ class ServerLogs(commands.Cog):
         await self.bot.wait_until_ready()
 
 
-    @commands.group(name="modlogs")
+    @commands.hybrid_group(name="modlogs")
+    @app_commands.default_permissions(manage_guild=True)
     @commands.guild_only()
-    @commands.check(checks.has_audit_logs)
+    @commands.check(checks.has_manage_guild)
     @commands.cooldown(2, 6, commands.BucketType.guild)
     async def modlogs_main(self, ctx: MyContext):
         """Enable or disable server logs in specific channels"""
@@ -148,8 +151,9 @@ class ServerLogs(commands.Cog):
             await ctx.send_help(ctx.command)
 
     @modlogs_main.command(name="list")
+    @app_commands.describe(channel="The channel to list logs for. Leave empty to list all logs for the server")
     @commands.cooldown(1, 10, commands.BucketType.channel)
-    async def modlogs_list(self, ctx: MyContext, channel: discord.TextChannel=None):
+    async def modlogs_list(self, ctx: MyContext, channel: Optional[discord.TextChannel]=None):
         """Show the full list of server logs type, or the list of enabled logs for a channel"""
         if channel:  # display logs enabled for this channel only
             title = await self.bot._(ctx.guild.id, "serverlogs.list.channel", channel='#'+channel.name)
@@ -203,6 +207,12 @@ class ServerLogs(commands.Cog):
             msg = await self.bot._(ctx.guild.id, "serverlogs.none-added")
         await ctx.send(msg)
 
+    @modlogs_enable.autocomplete("logs")
+    async def _modlogs_enable_autocomplete(self, interaction: discord.Interaction, current: str):
+        actived_logs = await self.db_get_from_channel(interaction.guild_id, interaction.channel_id)
+        available_logs = self.available_logs() - set(actived_logs)
+        return await self.log_name_autocomplete(current, available_logs)
+
     @modlogs_main.command(name="disable", aliases=['remove'])
     async def modlogs_disable(self, ctx: MyContext, logs: commands.Greedy[serverlog]):
         """Disable one or more logs in the current channel"""
@@ -219,7 +229,24 @@ class ServerLogs(commands.Cog):
         else:
             msg = await self.bot._(ctx.guild.id, "serverlogs.none-removed")
         await ctx.send(msg)
+    
+    @modlogs_disable.autocomplete("logs")
+    async def _modlogs_disable_autocomplete(self, interaction: discord.Interaction, current: str):
+        actived_logs = await self.db_get_from_channel(interaction.guild_id, interaction.channel_id)
+        return await self.log_name_autocomplete(current, actived_logs)
 
+    async def log_name_autocomplete(self, current: str, available_logs: Optional[list[str]]=None):
+        "Autocompletion for log names"
+        all_logs = available_logs or list(self.available_logs())
+        filtered = sorted(
+            (not option.startswith(current), option)
+            for option in all_logs
+            if current in option
+        )
+        return [
+            app_commands.Choice(name=value[1], value=value[1])
+            for value in filtered
+        ][:25]
 
     @commands.Cog.listener()
     async def on_raw_message_edit(self, msg: discord.RawMessageUpdateEvent):
