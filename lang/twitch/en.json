@@ -1,12 +1,13 @@
 {
     "check-stream": {
+        "category": "**Category:** %{game}",
         "no-nsfw": "This stream is marked as mature, and this channel is not NSFW",
         "offline": "This channel is not currently streaming",
         "title": "%{streamer} is streaming!"
     },
     "invalid-streamer-name": "This name is not a valid Twitch streamer name",
     "on-live-indication": "on live",
-    "stream-alerts": "Check it out! %{streamer} is streaming \"%{game}\"!",
+    "stream-alerts": "%{streamer} is streaming!",
     "subscribe": {
         "success": "Your server has subscribed to the streamer %{streamer} notifications!",
         "limit-reached": "You cannot subscribe to more than %{limit} streamers!",
