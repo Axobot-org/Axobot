@@ -1,8 +1,11 @@
 from datetime import datetime, timedelta, timezone
 from typing import Optional
-import aiohttp
 
-from libs.twitch.types import HttpTokenNotSet, StreamObject, StreamerObject, TokenResponse
+import aiohttp
+from cachingutils import acached
+
+from libs.twitch.types import (HttpTokenNotSet, StreamerObject, StreamObject,
+                               TokenResponse)
 
 
 class TwitchApiAgent:
@@ -26,6 +29,7 @@ class TwitchApiAgent:
         "Check if the HTTP session is still open"
         return self._session is not None and not self._session.closed
 
+    @acached(timeout=3600) # 1h
     async def api_login(self, client_id: str, client_secret: str):
         "Request a token for the Twitch API"
         url = "https://id.twitch.tv/oauth2/token"
@@ -57,6 +61,7 @@ class TwitchApiAgent:
             "Authorization": f"Bearer {self._token}"
         }            
 
+    @acached(timeout=1 * 60 * 60) # 1h
     async def get_user_by_name(self, username: str) -> Optional[StreamerObject]:
         "Get the ID of a user from their username"
         if not self.is_token_valid:
@@ -74,6 +79,7 @@ class TwitchApiAgent:
             except IndexError:
                 return None
 
+    @acached(timeout=6 * 60 * 60) # 6h
     async def get_user_by_id(self, user_id: str) -> Optional[StreamerObject]:
         "Get the user object from their ID"
         if not self.is_token_valid:
@@ -89,6 +95,7 @@ class TwitchApiAgent:
             except IndexError:
                 return None
 
+    @acached(timeout=2 * 60) # 2min
     async def get_user_stream_by_id(self, *user_ids: str) -> list[StreamObject]:
         "Get the stream of users specified by their IDs"
         if not self.is_token_valid:
