@@ -277,7 +277,7 @@ class Servers(commands.Cog):
         await self.sconfig_del2(ctx, option)
 
     @sconfig_del.autocomplete("option")
-    async def sconfig_del_autocomplete(self, _: MyContext, option: str):
+    async def sconfig_del_autocomplete(self, _: discord.Interaction, option: str):
         return await self.option_name_autocomplete(option)
 
     @sconfig_main.command(name="change")
@@ -329,7 +329,7 @@ class Servers(commands.Cog):
             return
 
     @sconfig_change.autocomplete("option")
-    async def sconfig_change_autocomplete_opt(self, _: MyContext, option: str):
+    async def sconfig_change_autocomplete_opt(self, _: discord.Interaction, option: str):
         return await self.option_name_autocomplete(option)
 
     @sconfig_change.autocomplete("value")
@@ -949,7 +949,7 @@ class Servers(commands.Cog):
         await self.send_see(ctx.guild, ctx, option, ctx.message)
 
     @sconfig_see.autocomplete("option")
-    async def sconfig_see_autocomplete(self, _: MyContext, option: str):
+    async def sconfig_see_autocomplete(self, _: discord.Interaction, option: str):
         return await self.option_name_autocomplete(option)
 
     async def send_see(self, guild: discord.Guild, ctx: MyContext, option: str, msg: discord.Message):
