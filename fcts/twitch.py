@@ -8,6 +8,7 @@ from discord import app_commands
 from discord.ext import commands, tasks
 from mysql.connector.errors import IntegrityError
 
+from . import checks
 from libs.bot_classes import MyContext, Zbot
 from libs.twitch.api_agent import TwitchApiAgent
 from libs.twitch.types import (GroupedStreamerDBObject, PlatformId,
@@ -106,6 +107,7 @@ class Twitch(commands.Cog):
     @commands.hybrid_group(name="twitch")
     @app_commands.default_permissions(manage_guild=True)
     @commands.guild_only()
+    @commands.check(checks.has_manage_guild)
     async def twitch(self, ctx: MyContext):
         "Twitch commands"
         if ctx.invoked_subcommand is None:
