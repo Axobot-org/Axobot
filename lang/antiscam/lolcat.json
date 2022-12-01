@@ -1,6 +1,7 @@
 {
     "probabilities": "Probabilities:",
+    "report-empty": "Uh, what dayawanna report??? I see no message there!",
     "report-successful": "Thanks sir, I gotcha!",
-    "result": "Scores:",
+    "result": "Anti-bad-ppl detecshun result:",
     "url-score": "How bad seems to be linkies: %{score}"
 }
