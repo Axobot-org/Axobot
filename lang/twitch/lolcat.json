@@ -1,9 +1,13 @@
 {
     "check-stream": {
+        "category": "**Activity:** %{game}",
         "no-nsfw": "Dis stream is not-for-children labelled, but ur channel is not nsfw :(",
         "offline": "Dis channel has no stream :(",
         "title": "%{streamer} is teh coolest bro I ever know, I assure u"
     },
+    "invalid-streamer-name": "Dis name iz not a valid twitch name!",
+    "on-live-indication": "streamin'",
+    "stream-alerts": "%{streamer} iz streamin'!",
     "subscribe": {
         "success": "Ur server now follow %{streamer}, gud choice!",
         "limit-reached": "Oopsie daisy, looks like u can't sub 2 more tan %{limit}!",
