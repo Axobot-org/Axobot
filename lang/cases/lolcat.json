@@ -1,12 +1,13 @@
 {
-    "cases-0": "%{nbr} cases fund: (%{start}-%{end})",
-    "deleted": "The caze #%{ID} has byn deletd!",
+    "records_number": "%{nbr} things found:",
+    "deleted": "The record #%{ID} has byn deletd!",
     "display": {
         "date": "**When?** %{data}",
         "duration": "**Haw long?** %{data}",
         "guild": "**Where?** %{data}",
         "moderator": "**By who?** %{data}",
         "reason": "**Why?** %{data}",
+        "title": "Record ov %{user_id} (aka %{user})",
         "type": "**What?** %{data}",
         "user": "**Who?** %{data}"
     },
