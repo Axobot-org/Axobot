@@ -36,7 +36,7 @@ class Partners(commands.Cog):
                 liste = list(query_results)
             return liste
         except Exception as err:
-            await self.bot.get_cog('Errors').on_error(err,None)
+            self.bot.dispatch("error", err)
 
     async def db_get_guild(self, guildID: int):
         """Return every partners of a guild"""
@@ -46,7 +46,7 @@ class Partners(commands.Cog):
                 liste = list(query_results)
             return liste
         except Exception as err:
-            await self.bot.get_cog('Errors').on_error(err,None)
+            self.bot.dispatch("error", err)
 
     async def db_get_partnered(self, invites: list):
         """Return every guilds which has this one as partner"""
@@ -58,7 +58,7 @@ class Partners(commands.Cog):
                 liste = list(query_results)
             return liste
         except Exception as err:
-            await self.bot.get_cog('Errors').on_error(err,None)
+            self.bot.dispatch("error", err)
 
     async def db_set_partner(self,guildID:int,partnerID:str,partnerType:str,desc:str):
         """Add a partner into a server"""
@@ -69,7 +69,7 @@ class Partners(commands.Cog):
                 pass
             return True
         except Exception as err:
-            await self.bot.get_cog('Errors').on_error(err,None)
+            self.bot.dispatch("error", err)
             return False
     
     async def db_edit_partner(self,partnerID:int,target:str=None,desc:str=None,msg:int=None):
@@ -86,7 +86,7 @@ class Partners(commands.Cog):
                 pass
             return True
         except Exception as err:
-            await self.bot.get_cog('Errors').on_error(err,None)
+            self.bot.dispatch("error", err)
             return False
 
     async def db_del_partner(self,partner_id:int):
@@ -97,7 +97,7 @@ class Partners(commands.Cog):
                 pass
             return True
         except Exception as e:
-            await self.bot.get_cog('Errors').on_error(e,None)
+            self.bot.dispatch("error", e)
             return False
     
     async def db_get_bot_guilds(self, bot_id: int) -> Optional[int]:
@@ -184,10 +184,10 @@ class Partners(commands.Cog):
             except discord.errors.NotFound:
                 msg = await channel.send(embed=emb)
                 await self.db_edit_partner(partnerID=partner['ID'],msg=msg.id)
-            except Exception as e:
+            except Exception as err:
                 msg = await channel.send(embed=emb)
                 await self.db_edit_partner(partnerID=partner['ID'],msg=msg.id)
-                await self.bot.get_cog('Errors').on_error(e,None)
+                self.bot.dispatch("error", err)
             count += 1
         await session.close()
         return count
@@ -213,10 +213,10 @@ class Partners(commands.Cog):
             image = usr.display_avatar.with_static_format("png") if usr else ""
         except discord.NotFound:
             title += "ID: "+partner['target']
-        except Exception as e:
+        except Exception as err:
             usr = await self.bot.fetch_user(int(partner['target']))
             image = usr.display_avatar.url if usr else ""
-            await self.bot.get_cog("Errors").on_error(e, None)
+            self.bot.dispatch("error", err)
         perm = discord.Permissions.all()
         perm.update(administrator=False)
         oauth_url = discord.utils.oauth_url(partner['target'], permissions=perm)
@@ -276,7 +276,7 @@ class Partners(commands.Cog):
 
         ..Doc server.html#partners-system"""
         if ctx.subcommand_passed is None:
-            await self.bot.get_cog('Help').help_command(ctx,['partner'])
+            await ctx.send_help(ctx.command)
 
     @partner_main.command(name='add')
     @commands.check(checks.database_connected)
@@ -468,7 +468,7 @@ class Partners(commands.Cog):
     
     ..Doc server.html#change-the-embed-color"""
         await self.bot.get_cog('Servers').conf_color(ctx,'partner_color',str(color))
-    
+
     @partner_main.command(name='reload')
     @commands.check(checks.has_manage_guild)
     @commands.cooldown(1,60,commands.BucketType.guild)

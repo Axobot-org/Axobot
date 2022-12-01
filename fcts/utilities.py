@@ -41,7 +41,7 @@ class Utilities(commands.Cog):
         return None
 
     async def find_img(self, name: str):
-        return discord.File(f"../images/{name}")
+        return discord.File(f"assets/images/{name}")
 
     async def find_url_redirection(self, url: str) -> str:
         """Find where an url is redirected to"""
@@ -55,6 +55,10 @@ class Utilities(commands.Cog):
         except aiohttp.ClientResponseError as err:
             return str(err.args[0].real_url)
         except (asyncio.exceptions.TimeoutError, aiohttp.ServerTimeoutError):
+            return url
+        except ValueError as err:
+            if err.args[0] != "URL should be absolute":
+                self.bot.dispatch("error", err)
             return url
         return answer
 
@@ -156,8 +160,8 @@ class Utilities(commands.Cog):
             async with self.bot.db_query(query, {'u': user_id, 'v': value}):
                 pass
             return True
-        except Exception as e:
-            await self.bot.get_cog('Errors').on_error(e, None)
+        except Exception as err:
+            self.bot.dispatch("error", err)
             return False
 
     async def get_number_premium(self):
@@ -165,15 +169,15 @@ class Utilities(commands.Cog):
         try:
             params = await self.get_db_userinfo(criters=['Premium=1'])
             return len(params)
-        except Exception as e:
-            await self.bot.get_cog('Errors').on_error(e, None)
+        except Exception as err:
+            self.bot.dispatch("error", err)
 
     async def get_xp_style(self, user: discord.User) -> str:
         parameters = None
         try:
             parameters = await self.get_db_userinfo(criters=["userID="+str(user.id)], columns=['xp_style'])
-        except Exception as e:
-            await self.bot.get_cog("Errors").on_error(e, None)
+        except Exception as err:
+            self.bot.dispatch("error", err)
         if parameters is None or parameters['xp_style'] == '':
             return 'dark'
         return parameters['xp_style']
@@ -239,10 +243,10 @@ class Utilities(commands.Cog):
             try:
                 await self.bot.get_cog("Users").reload_event_rankcard(user_id)
             except Exception as err:
-                await self.bot.get_cog("Errors").on_error(err, None)
+                self.bot.dispatch("error", err)
             return True
         except Exception as err:
-            await self.bot.get_cog('Errors').on_error(err, None)
+            self.bot.dispatch("error", err)
             return False
 
     async def get_eventsPoints_rank(self, user_id: int):
@@ -279,7 +283,7 @@ class Utilities(commands.Cog):
                     if json["voted"]:
                         votes.append(("Discord Bots List", "https://top.gg/"))
             except Exception as err:
-                await self.bot.get_cog("Errors").on_error(err, None)
+                self.bot.dispatch("error", err)
         return votes
 
 

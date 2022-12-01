@@ -493,7 +493,7 @@ You can specify a verification limit by adding a number in argument (up to 1.000
         try:
             text = await self.utilities.clear_msg(text, ctx=ctx)
         except Exception as err:
-            await self.bot.get_cog('Errors').on_error(err, ctx)
+            self.bot.dispatch("command_error", ctx, err)
             return
         try:
             if not channel.permissions_for(ctx.guild.me).send_messages:
@@ -543,7 +543,7 @@ You can specify a verification limit by adding a number in argument (up to 1.000
                     await ctx.send(await self.bot._(ctx.channel,"fun.no-emoji"))
                     return
                 except Exception as err:
-                    await self.bot.get_cog("Errors").on_error(err,ctx)
+                    self.bot.dispatch("command_error", ctx, err)
                     continue
         await ctx.message.delete(delay=0)
 
@@ -658,7 +658,17 @@ You can specify a verification limit by adding a number in argument (up to 1.000
         """Send a tip, a fun fact or something else
 
         ..Doc fun.html#tip"""
-        await ctx.send(random.choice(await self.bot._(ctx.guild,"fun.tip-list")))
+        params = {
+            "about_cmd": await self.bot.get_command_mention("about"),
+            "bigtext_cmd": await self.bot.get_command_mention("bigtext"),
+            "clear_cmd": await self.bot.get_command_mention("clear"),
+            "config_cmd": await self.bot.get_command_mention("config"),
+            "discordlinks_cmd": await self.bot.get_command_mention("discordlinks"),
+            "event_cmd": await self.bot.get_command_mention("event info"),
+            "stats_cmd": await self.bot.get_command_mention("stats"),
+            "say_cmd": await self.bot.get_command_mention("say"),
+        }
+        await ctx.send(random.choice(await self.bot._(ctx.guild, "fun.tip-list", **params)))
 
     @commands.command(name='afk')
     @commands.check(is_fun_enabled)
@@ -989,8 +999,8 @@ You can specify a verification limit by adding a number in argument (up to 1.000
             try:
                 await self.add_vote(msg)
             except Exception as err:
-                await ctx.send(await self.bot._(ctx.channel,"fun.no-reaction"))
-                await self.bot.get_cog("Errors").on_error(err, ctx)
+                await ctx.send(await self.bot._(ctx.channel, "fun.no-reaction"))
+                self.bot.dispatch("error", err, ctx)
                 return
         else:
             if ctx.bot_permissions.external_emojis:
@@ -1007,7 +1017,7 @@ You can specify a verification limit by adding a number in argument (up to 1.000
                 except discord.errors.NotFound:
                     return
                 except Exception as err:
-                    await self.bot.get_cog('Errors').on_error(err,ctx)
+                    self.bot.dispatch("command_error", ctx, err)
         await ctx.message.delete(delay=0)
 
     async def check_suggestion(self, message: discord.Message):
@@ -1024,7 +1034,7 @@ You can specify a verification limit by adding a number in argument (up to 1.000
                 except discord.DiscordException:
                     pass
         except Exception as err: # pylint: disable=broad-except
-            await self.bot.get_cog('Errors').on_error(err,message)
+            self.bot.dispatch("error", err, message)
 
     @commands.command(name="pep8", aliases=['autopep8'])
     @commands.cooldown(3, 30, commands.BucketType.user)

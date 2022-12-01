@@ -110,7 +110,7 @@ class Library(commands.Cog):
         
         ..Doc miscellaneous.html#book"""
         if ctx.subcommand_passed is None:
-            await self.bot.get_cog('Help').help_command(ctx, ['book'])
+            await ctx.send_help(ctx.command)
 
     @book_main.command(name="search", aliases=["book"])
     @commands.cooldown(5, 60, commands.BucketType.guild)

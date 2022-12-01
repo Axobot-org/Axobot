@@ -253,8 +253,8 @@ class Welcomer(commands.Cog):
                         await self.bot.get_cog('Events').send_logs_per_server(member.guild,'error',await self.bot._(member.guild, "welcome.error-give-roles",r=role.name, u=str(member)), member.guild.me)
         except discord.errors.NotFound:
             pass
-        except Exception as e:
-            await self.bot.get_cog("Errors").on_error(e,None)
+        except Exception as err:
+            self.bot.dispatch("error", err)
 
 
 async def setup(bot):

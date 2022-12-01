@@ -5,7 +5,7 @@ import traceback
 import typing
 
 import discord
-from discord.ext import commands
+from discord.ext import commands, tasks
 from libs.bot_classes import MyContext, Zbot
 from libs.errors import NotDuringEventError, VerboseCommandError
 
@@ -19,7 +19,37 @@ class Errors(commands.Cog):
     def __init__(self, bot: Zbot):
         self.bot = bot
         self.file = "errors"
+        # map of user ID and number of cooldowns recently hit
+        self.cooldown_pool: dict[int, int] = {}
 
+    async def cog_load(self):
+        self.reduce_cooldown_pool.start()
+
+    async def cog_unload(self):
+        if self.reduce_cooldown_pool.is_running():
+            self.reduce_cooldown_pool.cancel()
+
+    async def can_send_cooldown_error(self, user_id: int):
+        "Check if we can send a cooldown error message for a given user, to avoid spam"
+        spam_score = self.cooldown_pool.get(user_id, 0)
+        self.cooldown_pool[user_id] = spam_score + 1
+        return spam_score < 4
+
+    @tasks.loop(seconds=5)
+    async def reduce_cooldown_pool(self):
+        "Reduce the cooldown score by 1 every 5s"
+        to_delete: set[int] = set()
+        for user_id in self.cooldown_pool:
+            self.cooldown_pool[user_id] -= 1
+            if self.cooldown_pool[user_id] <= 0:
+                to_delete.add(user_id)
+        for user_id in to_delete:
+            del self.cooldown_pool[user_id]
+
+    @reduce_cooldown_pool.error
+    async def on_reduce_cooldown_pool_error(self, error):
+        "Log errors from reduce_cooldown_pool"
+        self.bot.dispatch("error", error)
 
     @commands.Cog.listener()
     async def on_command_error(self, ctx: MyContext, error: Exception):
@@ -63,14 +93,16 @@ class Errors(commands.Cog):
             await ctx.send(await self.bot._(ctx.channel, 'errors.quoteserror'), ephemeral=True)
             return
         elif isinstance(error, NotDuringEventError):
-            await ctx.send(await self.bot._(ctx.channel, 'errors.notduringevent', cmd="`/event info`"), ephemeral=True)
+            cmd = await self.bot.get_command_mention("event info")
+            await ctx.send(await self.bot._(ctx.channel, 'errors.notduringevent', cmd=cmd), ephemeral=True)
             return
         elif isinstance(error,commands.errors.CommandOnCooldown):
-            if await self.bot.get_cog('Admin').check_if_admin(ctx):
+            if await checks.is_bot_admin(ctx):
                 await ctx.reinvoke()
                 return
-            d = round(error.retry_after, 2 if error.retry_after < 60 else 0)
-            await ctx.send(await self.bot._(ctx.channel, 'errors.cooldown', d=d), ephemeral=True)
+            if await self.can_send_cooldown_error(ctx.author.id):
+                d = round(error.retry_after, 2 if error.retry_after < 60 else 0)
+                await ctx.send(await self.bot._(ctx.channel, 'errors.cooldown', d=d), ephemeral=True)
             return
         elif isinstance(error, commands.BadLiteralArgument):
             await ctx.send(await self.bot._(ctx.channel, 'errors.badlitteral'), ephemeral=True)
@@ -189,8 +221,9 @@ class Errors(commands.Cog):
             await ctx.send(await self.bot._(ctx.channel,'errors.cannotembed'))
             return
         else:
+            cmd = await self.bot.get_command_mention("about")
             try:
-                await ctx.send(await self.bot._(ctx.channel,'errors.unknown'), ephemeral=True)
+                await ctx.send(await self.bot._(ctx.channel, 'errors.unknown', about=cmd), ephemeral=True)
             except Exception as newerror:
                 self.bot.log.info(f"[on_cmd_error] Can't send error on channel {ctx.channel.id}: {newerror}")
         # All other Errors not returned come here... And we can just print the default TraceBack.

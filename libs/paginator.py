@@ -33,7 +33,9 @@ class Paginator(ui.View):
 
     async def send_init(self, ctx: MyContext):
         "Build the first page, before anyone actually click"
-        await ctx.send(view=self)
+        contents = await self.get_page_content(None, 1)
+        await self._update_buttons(None)
+        await ctx.send(**contents, view=self)
 
     async def get_page_content(self, interaction: Interaction, page: int) -> dict[str, Any]:
         "Build the page content given the page number and source interaction"
@@ -73,6 +75,11 @@ class Paginator(ui.View):
     async def _update_buttons(self, interaction: Interaction):
         "Mark buttons as enabled/disabled according to current page and view status"
         count = await self.get_page_count(interaction)
+        # remove buttons if not required
+        if count == 1:
+            for child in self.children:
+                self.remove_item(child)
+            return
         self.children[0].disabled = (self.page == 1) or self.is_finished()
         self.children[1].disabled = (self.page == 1) or self.is_finished()
         self.children[2].disabled = self.is_finished()

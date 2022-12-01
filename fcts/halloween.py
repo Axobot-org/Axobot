@@ -72,7 +72,7 @@ A BIG thanks to the Project Blurple and their original code for the colorization
 
 ..Example halloween collect"""
         if ctx.subcommand_passed is None:
-            await self.bot.get_cog('Help').help_command(ctx, ['halloween'])
+            await ctx.send_help(ctx.command)
 
 
     async def edit_img_color(self, fmodifier: typing.Literal["light", "dark"], ctx: MyContext,

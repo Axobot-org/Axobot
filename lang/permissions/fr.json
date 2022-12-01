@@ -1,5 +1,9 @@
 {
-    "general": "Permissions générales",
+    "channel": {
+        "channel": "Dans le salon %{mention}",
+        "category": "Dans la catégorie %{name}",
+        "general": "Permissions générales"
+    },
     "invalid_arg": "Argument invalide : %{arg}",
     "list": {
         "add_reactions": "Ajouter des réactions",
@@ -44,6 +48,11 @@
         "use_voice_activation": "Utiliser la Détection de la voix",
         "view_audit_log": "Voir les logs du serveur",
         "view_guild_insights": "Voir les analyses de serveur"
+    },
+    "target": {
+        "member": "Membre %{name}",
+        "role": "Rôle %{name}",
+        "value": "Valeur %{value}"
     },
     "title": "**Permission de '%{name}' :**\n\n",
     "whatisthat": "De quoi s'agit-il ?"

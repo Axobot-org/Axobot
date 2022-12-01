@@ -22,11 +22,13 @@ if TYPE_CHECKING:
     from fcts.aide import Help
     from fcts.bot_events import BotEvents
     from fcts.bot_stats import BotStats
+    from fcts.cases import Cases
     from fcts.errors import Errors
     from fcts.minecraft import Minecraft
     from fcts.partners import Partners
     from fcts.rss import Rss
     from fcts.servers import Servers
+    from fcts.twitch import Twitch
     from fcts.users import Users
     from fcts.utilities import Utilities
     from fcts.xp import Xp
@@ -68,6 +70,11 @@ class MyContext(commands.Context):
             kwargs["allowed_mentions"].replied_user = False
             return await super().send(reference=self.message.reference, *args, **kwargs)
         return await super().send(*args, **kwargs)
+    
+    async def send_help(self, command: Union[str, commands.Command]):
+        """Send the help message of the given command"""
+        cmd_arg = command.split(' ') if isinstance(command, str) else command.qualified_name.split(' ')
+        await self.bot.get_command("help")(self, *cmd_arg)
 
 # pylint: disable=too-many-instance-attributes
 class Zbot(commands.bot.AutoShardedBot):
@@ -104,6 +111,7 @@ class Zbot(commands.bot.AutoShardedBot):
         self.emojis_manager = EmojisManager(self)
         # app commands
         self.tree.on_error = self.on_app_cmd_error
+        self.app_commands_list: Optional[list[discord.app_commands.AppCommand]] = None
 
     async def on_error(self, event_method: Union[Exception, str], *_args, **_kwargs):
         "Called when an event raises an uncaught exception"
@@ -152,6 +160,10 @@ class Zbot(commands.bot.AutoShardedBot):
         ...
 
     @overload
+    def get_cog(self, name: Literal["Cases"]) -> Optional["Cases"]:
+        ...
+
+    @overload
     def get_cog(self, name: Literal["Errors"]) -> Optional["Errors"]:
         ...
 
@@ -173,6 +185,10 @@ class Zbot(commands.bot.AutoShardedBot):
 
     @overload
     def get_cog(self, name: Literal["Servers"]) -> Optional["Servers"]:
+        ...
+
+    @overload
+    def get_cog(self, name: Literal["Twitch"]) -> Optional["Twitch"]:
         ...
 
     @overload
@@ -316,3 +332,26 @@ class Zbot(commands.bot.AutoShardedBot):
         for prefix in prefixes:
             is_cmd = is_cmd or message.content.startswith(prefix)
         return is_cmd
+
+    async def fetch_app_commands(self):
+        "Populate the app_commands_list attribute from the Discord API"
+        target = PRIVATE_GUILD_ID if self.beta else None
+        self.app_commands_list = await self.tree.fetch_commands(guild=target)
+
+    async def fetch_app_command_by_name(self, name: str) -> Optional[discord.app_commands.AppCommand]:
+        "Get a specific app command from the Discord API"
+        if self.app_commands_list is None:
+            await self.fetch_app_commands()
+        for command in self.app_commands_list:
+            if command.name == name:
+                return command
+        return None
+
+    async def get_command_mention(self, command_name: str):
+        "Get how a command should be mentionned (either app-command mention or raw name)"
+        if command := await self.fetch_app_command_by_name(command_name.split(' ')[0]):
+            return f"</{command_name}:{command.id}>"
+        if command := self.get_command(command_name):
+            return f"`{command.qualified_name}`"
+        self.log.error(f"Trying to mention invalid command: {command_name}")
+        return f"`{command_name}`"
