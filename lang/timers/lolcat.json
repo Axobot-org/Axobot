@@ -4,6 +4,7 @@
         "cleared": ":deleted:",
         "confirm": "U sure u wanna delete 'em all? (%{count} small bois)",
         "delete": {
+            "error": "Whoopsie, something unexpected happend. Pls try again later, or contact our super cool support!",
             "success": {
                 "one": "Ur reminder ad ben deleted!",
                 "other": "%{count} reminders had been deletd!"
