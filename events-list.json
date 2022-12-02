@@ -130,7 +130,7 @@
         "begin": "2022-12-25",
         "end": "2023-01-02",
         "type": "christmas",
-        "icon": null,
+        "icon": "https://zrunner.me/cdn/christmas_banner_2022.png",
         "color": 4886759,
         "objectives": [],
         "emojis": {
