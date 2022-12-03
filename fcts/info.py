@@ -981,18 +981,18 @@ Available types: member, role, user, emoji, channel, server, invite, category
         # Bots
         bots = len([x for x in guild.members if x.bot])
         # Lang
-        lang = await self.bot.get_config(guild.id,'language')
+        lang = await self.bot.get_config(guild.id, "language")
         if lang is None:
             lang = 'default'
         else:
-            lang = self.bot.get_cog('Languages').languages[lang]
+            lang = self.bot.get_cog("Languages").languages[lang]
         # Roles rewards
-        rr_len = await self.bot.get_config(guild.id,'rr_max_number')
-        rr_len = '{}/{}'.format(len(await self.bot.get_cog('Xp').rr_list_role(guild.id)), rr_len)
+        rr_len = await self.bot.get_config(guild.id, "rr_max_number")
+        rr_len = '{}/{}'.format(len(await self.bot.get_cog("Xp").rr_list_role(guild.id)), rr_len)
         # Streamers
-        if twitch_cog := await self.bot.get_cog('Twitch'):
-            streamers_len =  await self.bot.get_config(guild.id,'streamers_max_number')
-            streamers_len = '{}/{}'.format(twitch_cog.db_get_guild_subscriptions_count(guild.id), streamers_len)
+        if twitch_cog := self.bot.get_cog("Twitch"):
+            streamers_len =  await self.bot.get_config(guild.id, "streamers_max_number")
+            streamers_len = '{}/{}'.format(await twitch_cog.db_get_guild_subscriptions_count(guild.id), streamers_len)
         else:
             streamers_len = "Not available"
         # Prefix
@@ -1001,9 +1001,8 @@ Available types: member, role, user, emoji, channel, server, invite, category
             pref = "`" + pref + "`"
         # Rss
         rss_len = await self.bot.get_config(guild.id,'rss_max_number')
-        if rss_cog := await self.bot.get_cog('Rss'):
-            rss_len = self.bot.get_cog("Servers").default_opt['rss_max_number'] if rss_len is None else rss_len
-            rss_numb = "{}/{}".format(len(rss_cog.db_get_guild_feeds(guild.id)), rss_len)
+        if rss_cog := self.bot.get_cog("Rss"):
+            rss_numb = "{}/{}".format(len(await rss_cog.db_get_guild_feeds(guild.id)), rss_len)
         else:
             rss_numb = "Not available"
         # Join date

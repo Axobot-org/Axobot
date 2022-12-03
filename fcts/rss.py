@@ -220,8 +220,6 @@ class Rss(commands.Cog):
         """Check if a guild still has at least a slot
         True if max number reached, followed by the feed limit"""
         feed_limit = await self.bot.get_config(guild.id,'rss_max_number')
-        if feed_limit is None:
-            feed_limit: int = self.bot.get_cog('Servers').default_opt['rss_max_number']
         return len(await self.db_get_guild_feeds(guild.id)) >= feed_limit, feed_limit
 
     @rss_main.command(name="add")

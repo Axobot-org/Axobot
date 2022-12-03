@@ -1017,7 +1017,6 @@ class Xp(commands.Cog):
             if len([x for x in l if x['level']==level]) > 0:
                 return await ctx.send(await self.bot._(ctx.guild.id, "xp.already-1-rr"))
             max_rr = await self.bot.get_config(ctx.guild.id,'rr_max_number')
-            max_rr = self.bot.get_cog("Servers").default_opt['rr_max_number'] if max_rr is None else max_rr
             if len(l) >= max_rr:
                 return await ctx.send(await self.bot._(ctx.guild.id, "xp.too-many-rr", c=len(l)))
             await self.rr_add_role(ctx.guild.id,role.id,level)
@@ -1039,7 +1038,6 @@ class Xp(commands.Cog):
         else:
             des = '\n'.join(["• <@&{}> : lvl {}".format(x['role'], x['level']) for x in l])
             max_rr = await self.bot.get_config(ctx.guild.id,'rr_max_number')
-            max_rr = self.bot.get_cog("Servers").default_opt['rr_max_number'] if max_rr is None else max_rr
             title = await self.bot._(ctx.guild.id,"xp.rr_list", c=len(l), max=max_rr)
             emb = discord.Embed(title=title, description=des, timestamp=ctx.message.created_at)
             emb.set_footer(text=ctx.author, icon_url=ctx.author.display_avatar)

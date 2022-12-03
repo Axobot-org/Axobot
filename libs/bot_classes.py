@@ -16,6 +16,7 @@ from mysql.connector.errors import ProgrammingError
 from libs.database import create_database_query
 from libs.emojis_manager import EmojisManager
 from libs.prefix_manager import PrefixManager
+from libs.serverconfig.options_list import default_values as serverconfig_defaults
 from libs.tasks_handler import TaskHandler
 from utils import get_prefix
 
@@ -282,12 +283,15 @@ class Zbot(commands.bot.AutoShardedBot):
             return '{' + key + '}'
 
     async def get_config(self, guild_id: int, option: str) -> Optional[str]:
-        "Get a configuration option for a specific guild"
+        """Get a configuration option for a specific guild
+        Fallbacks to the default values if the guild is not found"""
         cog = self.get_cog("Servers")
         if cog:
             if self.database_online:
-                return await cog.get_option(guild_id, option)
-            return cog.default_opt.get(option, None)
+                value = await cog.get_option(guild_id, option)
+                if value is not None:
+                    return value
+            return serverconfig_defaults.get(option, None)
         return None
 
     async def get_recipient(self, channel: discord.DMChannel) -> Optional[discord.User]:

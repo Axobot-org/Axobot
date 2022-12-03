@@ -127,28 +127,28 @@ class Servers(commands.Cog):
                 return True
         raise commands.CommandError("User doesn't have required roles")
 
-    async def get_option(self, guild_id: int, name: str) -> typing.Optional[str]:
+    async def get_option(self, guild_id: typing.Union[discord.Guild, int], option_name: str) -> typing.Optional[str]:
         """return the value of an option
-        Return None if this option doesn't exist or if no value has been set"""
+        Return None if this option doesn't exist or if no value has been set (like if the guild isn't in the database)"""
         if isinstance(guild_id, discord.Guild):
             guild_id = guild_id.id
         elif guild_id is None or not self.bot.database_online:
             return None
-        if (cached := self.cache.get((guild_id, name))) is not None:
+        if (cached := self.cache.get((guild_id, option_name))) is not None:
             return cached
-        sql_result = await self.get_server([name],criters=["ID="+str(guild_id)],return_type=list)
+        sql_result = await self.get_server([option_name],criters=["ID="+str(guild_id)],return_type=list)
         if len(sql_result) == 0:
             value = None
         elif sql_result[0][0] == '':
-            if name == "nicknames_history":
+            if option_name == "nicknames_history":
                 value = None
             else:
-                value = opt_list.default_values[name]
+                value = opt_list.default_values[option_name]
         else:
             value = sql_result[0][0]
-        if value is None and name == "nicknames_history" and (guild := self.bot.get_guild(guild_id)):
+        if value is None and option_name == "nicknames_history" and (guild := self.bot.get_guild(guild_id)):
             value = len(guild.members) < self.max_members_for_nicknames
-        self.cache[(guild_id, name)] = value
+        self.cache[(guild_id, option_name)] = value
         return value
 
     async def get_server(self, columns=[], criters=["ID > 1"], relation="AND", return_type=dict):

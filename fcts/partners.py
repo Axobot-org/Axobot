@@ -139,7 +139,7 @@ class Partners(commands.Cog):
                     owners.append(o)
         return owners
 
-    async def update_partners(self, channel: discord.TextChannel, color: int =None) -> int:
+    async def update_partners(self, channel: discord.TextChannel, color: Optional[int] = None) -> int:
         """Update every partners of a channel"""
         if not channel.permissions_for(channel.guild.me).embed_links:
             return 0
@@ -157,8 +157,6 @@ class Partners(commands.Cog):
         count = 0
         if color is None:
             color = await self.bot.get_config(channel.guild.id,'partner_color')
-        if color is None:
-            color = self.bot.get_cog('Servers').default_opt['partner_color']
         session = aiohttp.ClientSession(loop=self.bot.loop)
         for partner in partners:
             target_desc = partner['description']
@@ -443,8 +441,6 @@ class Partners(commands.Cog):
         fields_name = await self.bot._(ctx.guild.id, "partners.partners-list")
         if ctx.can_send_embed:
             color = await ctx.bot.get_config(ctx.guild.id,'partner_color')
-            if color is None:
-                color = self.bot.get_cog('Servers').default_opt['partner_color']
             emb = discord.Embed(title=fields_name[0], color=color, timestamp=self.bot.utcnow())
             if ctx.guild.icon:
                 emb.set_thumbnail(url=ctx.guild.icon)
