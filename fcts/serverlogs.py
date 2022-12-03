@@ -55,7 +55,7 @@ class ServerLogs(commands.Cog):
         "Check if a log kind is enabled for a guild, and return the corresponding logs channel ID"
         guild_logs = await self.db_get_from_guild(guild)
         # if axobot is also there, don't send anything
-        if await self.bot.check_axobot_presence(guild):
+        if await self.bot.check_axobot_presence(guild_id=guild):
             return []
         res: list[int] = []
         for channel, event in guild_logs.items():
