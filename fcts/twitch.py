@@ -312,9 +312,15 @@ class Twitch(commands.Cog):
         count = 0
         streamer_ids: dict[str, _StreamersReadyForNotification] = {}
         for streamer in await self.db_get_guilds_per_streamers("twitch"):
+            # fetch guilds that need to be notified
             guilds = [self.bot.get_guild(guild_id) for guild_id in streamer["guild_ids"]]
-            guilds = [guild for guild in guilds if guild]
-            if not guilds:
+            # remove unfound guilds and guilds where axobot i s
+            guilds = [
+                guild
+                for guild in guilds
+                if guild is not None and not await self.bot.check_axobot_presence(guild=guild)
+            ]
+            if not guilds: # if not guild has been found, skip
                 continue
             streamer_ids[streamer["user_id"]] = streamer | {"guilds": guilds}
             count += 1

@@ -988,7 +988,6 @@ Available types: member, role, user, emoji, channel, server, invite, category
             lang = self.bot.get_cog('Languages').languages[lang]
         # Roles rewards
         rr_len = await self.bot.get_config(guild.id,'rr_max_number')
-        # rr_len = self.bot.get_cog("Servers").default_opt['rr_max_number'] if rr_len is None else rr_len
         rr_len = '{}/{}'.format(len(await self.bot.get_cog('Xp').rr_list_role(guild.id)), rr_len)
         # Streamers
         if twitch_cog := await self.bot.get_cog('Twitch'):

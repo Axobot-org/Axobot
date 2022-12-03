@@ -50,6 +50,9 @@ class TaskHandler:
             return
         self.bot.log.debug("[tasks_loop] Itération (%s tâches trouvées)", len(tasks_list))
         for task in tasks_list:
+            # if axobot is there, let it handle it
+            if task['guild'] and await self.bot.check_axobot_presence(guild_id=task['guild']):
+                return
             if task['action'] == 'mute':
                 try:
                     guild = self.bot.get_guild(task['guild'])
