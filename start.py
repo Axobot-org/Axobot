@@ -71,10 +71,12 @@ async def main():
         client.connect_database_frm()
         client.connect_database_xp()
 
-    if args.token == 'release':
-        token = tokens.get_token(client,486896267788812288)
+    if args.token == 'zbot':
+        token = tokens.get_token(client, 486896267788812288)
+    elif args.token == 'axobot':
+        token = tokens.get_token(client, 1048011651145797673)
     elif args.token == 'beta':
-        token = tokens.get_token(client,436835675304755200)
+        token = tokens.get_token(client, 436835675304755200)
         client.beta = True
     elif len(args.token) < 30:
         print("Invalid bot token")
