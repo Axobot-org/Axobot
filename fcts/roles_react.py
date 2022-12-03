@@ -141,7 +141,6 @@ class RolesReact(commands.Cog):
             if len(l) > 0:
                 return await ctx.send(await self.bot._(ctx.guild.id, "roles_react.already-1-rr"))
             max_rr = await self.bot.get_config(ctx.guild.id, 'roles_react_max_number')
-            max_rr = self.bot.get_cog("Servers").default_opt['roles_react_max_number'] if max_rr is None else max_rr
             if len(l) >= max_rr:
                 return await ctx.send(await self.bot._(ctx.guild.id, "roles_react.too-many-rr", l=max_rr))
             await self.rr_add_role(ctx.guild.id, role.id, emoji, description[:150])
@@ -221,7 +220,6 @@ class RolesReact(commands.Cog):
         else:
             des, _ = await self.create_list_embed(roles_list, ctx.guild)
             max_rr = await self.bot.get_config(ctx.guild.id, 'roles_react_max_number')
-            max_rr = self.bot.get_cog("Servers").default_opt['roles_react_max_number'] if max_rr is None else max_rr
             title = await self.bot._(ctx.guild.id, "roles_react.rr-list", n=len(roles_list), m=max_rr)
             emb = discord.Embed(title=title, description=des, color=self.embed_color, timestamp=ctx.message.created_at)
             emb.set_footer(text=ctx.author, icon_url=ctx.author.display_avatar)

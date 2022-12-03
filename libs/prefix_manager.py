@@ -3,6 +3,8 @@ from typing import TYPE_CHECKING
 import discord
 from cachingutils import LRUCache
 
+from libs.serverconfig.options_list import default_values as serverconfig_defaults
+
 if TYPE_CHECKING:
     from libs.bot_classes import Zbot
 
@@ -28,7 +30,7 @@ class PrefixManager:
         # if database is offline
         if not self.bot.database_online:
             if server_cog := self.bot.get_cog("Servers"):
-                return server_cog.default_opt.get("prefix")
+                return serverconfig_defaults.get("prefix")
             return '!'
         # get the prefix from the database
         prefix = await self.fetch_prefix(guild.id)
