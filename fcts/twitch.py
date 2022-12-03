@@ -330,7 +330,7 @@ class Twitch(commands.Cog):
                 streamer_ids = {}
         if streamer_ids:
             await self._update_streams(streamer_ids)
-        self.bot.log.info(f"[twitch] {count} streamers checked")
+        self.bot.log.info("[twitch] %s streamers checked", count)
 
     async def _update_streams(self, streamer_ids: dict[str, _StreamersReadyForNotification]):
         streaming_user_ids: set[str] = set()
