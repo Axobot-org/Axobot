@@ -2,21 +2,22 @@ import datetime
 import logging
 import sys
 import time
-from typing import Any, Callable, Coroutine, Literal, Optional, TYPE_CHECKING, Union, overload
+from typing import (TYPE_CHECKING, Any, Callable, Coroutine, Literal, Optional,
+                    Union, overload)
 
 import discord
 import requests
+from cachingutils import acached
 from discord.ext import commands
 from mysql.connector import connect as sql_connect
 from mysql.connector.connection import MySQLConnection
 from mysql.connector.errors import ProgrammingError
-from utils import get_prefix
 
 from libs.database import create_database_query
 from libs.emojis_manager import EmojisManager
 from libs.prefix_manager import PrefixManager
 from libs.tasks_handler import TaskHandler
-
+from utils import get_prefix
 
 if TYPE_CHECKING:
     from fcts.aide import Help
@@ -355,3 +356,35 @@ class Zbot(commands.bot.AutoShardedBot):
             return f"`{command.qualified_name}`"
         self.log.error(f"Trying to mention invalid command: {command_name}")
         return f"`{command_name}`"
+
+    async def check_axobot_presence(self, *, ctx: Optional[MyContext] = None, guild: Optional[discord.Guild] = None, interaction: Optional[discord.Interaction] = None, guild_id: Optional[int] = None):
+        "Check if Axobot is present in the given context"
+        if ctx is None and guild is None and interaction is None and guild_id is None:
+            raise ValueError("No context provided")
+        await self.wait_until_ready()
+        if self.user.id != 486896267788812288:
+            # We're not Zbot, we don't care
+            return False
+        channel = None
+        if ctx is not None:
+            guild = ctx.guild
+            channel = ctx.channel
+        elif interaction is not None:
+            guild = interaction.guild
+            channel = interaction.channel
+        elif guild_id is not None:
+            guild = self.get_guild(guild_id)
+        return await self._check_axobot_in_guild(guild, channel)
+    
+    @acached(timeout=60)
+    async def _check_axobot_in_guild(self, guild: Optional[discord.Guild], channel: Optional[discord.abc.GuildChannel] = None):
+        if guild is None:
+            return False
+        axo_member = guild.get_member(1048011651145797673)
+        if axo_member is None:
+            return False
+        if guild.id == 625316773771608074 and channel:
+            # if we're in the support server, check by channel instead
+            return channel.permissions_for(axo_member).read_messages
+        # else, don't bother and just return True
+        return True

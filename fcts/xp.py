@@ -41,7 +41,6 @@ class Xp(commands.Cog):
         self.file = 'xp'
         self.xp_channels_cache = dict()
         self.sus = None
-        bot.add_listener(self.add_xp,'on_message')
         self.types = ['global','mee6-like','local']
         try:
             verdana_name = 'Verdana.ttf'
@@ -75,9 +74,13 @@ class Xp(commands.Cog):
         except discord.errors.NotFound:
             return None
 
+    @commands.Cog.listener(name="on_message")
     async def add_xp(self, msg: discord.Message):
         """Attribue un certain nombre d'xp à un message"""
         if msg.author.bot or msg.guild is None or not self.bot.xp_enabled:
+            return
+        # If axobot is already there, let it handle it
+        if await self.bot.check_axobot_presence(guild=msg.guild):
             return
         used_xp_type = await self.bot.get_config(msg.guild.id,'xp_type')
         if not ( await self.check_noxp(msg) and await self.bot.get_config(msg.guild.id,'enable_xp') ):

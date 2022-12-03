@@ -82,6 +82,9 @@ class Events(commands.Cog):
         "Check if we are allowed to register a memberlog (if database is online, if the user has allowed it, if the server hasn't disabled it)"
         if not self.bot.database_online:
             return False
+        # If axobot is already there, let it handle it
+        if guild_id and await self.bot.check_axobot_presence(guild_id=guild_id):
+            return
         config_option = await self.bot.get_cog('Utilities').get_db_userinfo(['allow_usernames_logs'],["userID=" + str(user_id)])
         if config_option is not None and config_option['allow_usernames_logs'] is False:
             return False
@@ -169,16 +172,11 @@ class Events(commands.Cog):
         """Called for each new message because it's cool"""
         if self.bot.zombie_mode:
             return
+        # If axobot is already there, don't do anything
+        if msg.guild and await self.bot.check_axobot_presence(guild=msg.guild):
+            return
         if msg.guild is None and not msg.flags.ephemeral:
             await self.send_mp(msg)
-        else:
-            try:
-                await self.bot.get_cog('Fun').check_suggestion(msg)
-            except KeyError:
-                pass
-            except Exception as err:
-                self.bot.dispatch("error", err, msg)
-            await self.bot.get_cog('Fun').check_afk(msg)
         if msg.author != self.bot.user:
             await self.bot.get_cog('Info').emoji_analysis(msg)
         if "send nudes" in msg.content.lower() and len(msg.content)<13 and random.random() > 0.0:
@@ -234,8 +232,6 @@ class Events(commands.Cog):
             await self.bot.fetch_invite(msg.content)
         except discord.NotFound:
             return
-        # d = datetime.datetime.utcnow() - (await msg.channel.history(limit=2).flatten())[1].created_at
-        # if d.total_seconds() > 600:
         await msg.channel.send(await self.bot._(msg.channel,"events.mp-adv"))
 
     async def check_owner_server(self, owner: discord.User):

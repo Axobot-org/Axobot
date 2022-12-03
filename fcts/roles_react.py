@@ -60,6 +60,9 @@ class RolesReact(commands.Cog):
         "handle reactions adding/removing events"
         if not self.bot.database_online:
             return
+        # If axobot is already there, let it handle it
+        if payload.guild_id and await self.bot.check_axobot_presence(guild_id=payload.guild_id):
+            return
         try:
             msg, role = await self.prepare_react(payload)
             if msg is not None:
