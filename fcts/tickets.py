@@ -6,7 +6,7 @@ from discord import app_commands
 from discord.ext import commands
 from mysql.connector.errors import IntegrityError
 
-from libs.bot_classes import PRIVATE_GUILD_ID, MyContext, Zbot
+from libs.bot_classes import MyContext, Zbot
 from libs.tickets.converters import EmojiConverterType
 from libs.tickets.views import (AskTitleModal, AskTopicSelect, SelectView,
                                 SendHintText, TicketCreationEvent)

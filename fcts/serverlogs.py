@@ -51,11 +51,11 @@ class ServerLogs(commands.Cog):
         self.send_logs_task.cancel() # pylint: disable=no-member
 
 
-    async def is_log_enabled(self, guild: int, log: str) -> list[int]:
+    async def is_log_enabled(self, guild_id: int, log: str) -> list[int]:
         "Check if a log kind is enabled for a guild, and return the corresponding logs channel ID"
-        guild_logs = await self.db_get_from_guild(guild)
+        guild_logs = await self.db_get_from_guild(guild_id)
         # if axobot is also there, don't send anything
-        if await self.bot.check_axobot_presence(guild_id=guild):
+        if await self.bot.check_axobot_presence(guild_id=guild_id):
             return []
         res: list[int] = []
         for channel, event in guild_logs.items():
