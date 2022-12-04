@@ -99,7 +99,7 @@ class Servers(commands.Cog):
 
     @property
     def table(self):
-        return 'servers_beta' if self.bot.beta else 'servers'
+        return 'servers'
 
     async def get_bot_infos(self, botID: int):
         """Return every options of the bot"""
@@ -223,9 +223,9 @@ class Servers(commands.Cog):
                 if isinstance(row, dict):
                     for k, v in row.items():
                         if v == '':
-                            row[k] = self.default_opt[k]
+                            row[k] = self.default_opt.get(k, None)
                 liste.append(row)
-        return liste    
+        return liste
 
     async def modify_server(self, guild_id: int, values=[()]):
         """Update a server config in the database"""
