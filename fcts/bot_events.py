@@ -129,7 +129,10 @@ class BotEvents(commands.Cog):
         if msg.guild is not None and not msg.channel.permissions_for(msg.guild.me).add_reactions:
             # don't react if we don't have the required permission
             return
-        if self.current_event and (data := self.current_event_data["emojis"]):
+        if msg.guild and await self.bot.check_axobot_presence(guild=msg.guild):
+            # If axobot is already there, don't do anything
+            return
+        if self.current_event and (data := self.current_event_data.get("emojis")):
             if not await is_fun_enabled(msg, self.bot.get_cog("Fun")):
                 # don't react if fun is disabled for this guild
                 return

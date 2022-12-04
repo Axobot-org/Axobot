@@ -1216,7 +1216,12 @@ class Rss(commands.Cog):
 
     async def db_get_all_feeds(self):
         """Get every feed of the database"""
-        query = "SELECT * FROM `{}` WHERE `guild` in ({})".format(self.table,','.join(["'{}'".format(x.id) for x in self.bot.guilds]))
+        guild_ids = [
+            guild.id
+            for guild in self.bot.guilds
+            if not await self.bot.check_axobot_presence(guild=guild)
+        ]
+        query = "SELECT * FROM `{}` WHERE `guild` in ({})".format(self.table,','.join(["'{}'".format(g_id) for g_id in guild_ids]))
         async with self.bot.db_query(query) as query_results:
             liste = [FeedObject(result) for result in query_results]
         return liste

@@ -53,6 +53,9 @@ class ServerLogs(commands.Cog):
     async def is_log_enabled(self, guild: int, log: str) -> list[int]:
         "Check if a log kind is enabled for a guild, and return the corresponding logs channel ID"
         guild_logs = await self.db_get_from_guild(guild)
+        # if axobot is also there, don't send anything
+        if await self.bot.check_axobot_presence(guild=guild):
+            return []
         res: list[int] = []
         for channel, event in guild_logs.items():
             if log in event:
@@ -113,7 +116,7 @@ class ServerLogs(commands.Cog):
 
     @tasks.loop(seconds=30)
     async def send_logs_task(self):
-        "Send ready logs every 1min to avoid rate limits"
+        "Send ready logs every 30s to avoid rate limits"
         try:
             for channel, embeds in dict(self.to_send).items():
                 if not embeds:

@@ -44,7 +44,7 @@ class Paginator(ui.View):
         raise NotImplementedError("get_page_count must be implemented!")
 
 
-    async def interaction_check(self, interaction: Interaction) -> bool:
+    async def interaction_check(self, interaction: Interaction, /) -> bool:
         "Check if the user is actually allowed to press that"
         result = True
         if user := interaction.user:
