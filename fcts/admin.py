@@ -13,6 +13,7 @@ from contextlib import redirect_stdout
 import discord
 import speedtest
 from cachingutils import acached
+from git import Repo, exc
 from discord.ext import commands
 from libs.bot_classes import PRIVATE_GUILD_ID, SUPPORT_GUILD_ID, MyContext, Zbot
 from libs.enums import RankCardsFlag, UserFlag
@@ -332,6 +333,24 @@ class Admin(commands.Cog):
             args.append('o' if ctx.bot.rss_enabled else 'n')
         self.bot.log.info("Redémarrage du bot")
         os.execl(sys.executable, sys.executable, *args)
+
+    @main_msg.command(name="pull")
+    @commands.check(checks.is_bot_admin)
+    async def git_pull(self, ctx: MyContext, branch: typing.Optional[typing.Literal["main", "develop", "release-candidate"]]=None):
+        """Pull du code depuis le dépôt git"""
+        msg = await ctx.send("Pull en cours...")
+        repo = Repo(os.getcwd())
+        assert not repo.bare
+        if branch:
+            try:
+                repo.git.checkout(branch)
+            except exc.GitCommandError as e:
+                self.bot.dispatch("command_error", ctx, e)
+            else:
+                msg = await msg.edit(content=msg.content+f"\nBranche {branch} correctement sélectionnée")
+        origin = repo.remotes.origin
+        origin.pull()
+        await msg.edit(content=msg.content + f"\nPull effectué avec succès sur la branche {repo.active_branch.name}")
 
     @main_msg.command(name="reload")
     @commands.check(checks.is_bot_admin)
