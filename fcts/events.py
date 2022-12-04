@@ -87,12 +87,12 @@ class Events(commands.Cog):
         if tries > 5:
             self.bot.dispatch("error", RuntimeError(f"Nickname change failed after 5 attempts for user {before.id}"))
             return
-        # If axobot is already there, let it handle it
-        if before.guild and await self.bot.check_axobot_presence(guild=before.guild):
-            return
         if not self.bot.database_online:
             return
         if isinstance(before, discord.Member):
+            # If axobot is already there, let it handle it
+            if await self.bot.check_axobot_presence(guild=before.guild):
+                return
             if not await self.bot.get_config(before.guild.id, "nicknames_history"):
                 return
             before_nick = '' if before.nick is None else before.nick
