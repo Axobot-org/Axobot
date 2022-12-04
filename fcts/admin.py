@@ -336,7 +336,7 @@ class Admin(commands.Cog):
 
     @main_msg.command(name="pull")
     @commands.check(checks.is_bot_admin)
-    async def git_pull(self, ctx: MyContext, branch: typing.Optional[typing.Literal["main", "develop", "release-candidate"]]=None):
+    async def git_pull(self, ctx: MyContext, branch: typing.Optional[typing.Literal["main", "develop", "release-candidate"]]=None, install_requirements: bool=False):
         """Pull du code depuis le dépôt git"""
         msg = await ctx.send("Pull en cours...")
         repo = Repo(os.getcwd())
@@ -350,7 +350,11 @@ class Admin(commands.Cog):
                 msg = await msg.edit(content=msg.content+f"\nBranche {branch} correctement sélectionnée")
         origin = repo.remotes.origin
         origin.pull()
-        await msg.edit(content=msg.content + f"\nPull effectué avec succès sur la branche {repo.active_branch.name}")
+        msg = await msg.edit(content=msg.content + f"\nPull effectué avec succès sur la branche {repo.active_branch.name}")
+        if install_requirements:
+            await msg.edit(content=msg.content+"\nInstallation des dépendances...")
+            os.system("pip install -qr requirements.txt")
+            msg = await msg.edit(content=msg.content+"\nDépendances installées")
 
     @main_msg.command(name="reload")
     @commands.check(checks.is_bot_admin)
