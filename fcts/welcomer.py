@@ -16,6 +16,9 @@ class Welcomer(commands.Cog):
     async def on_member_join(self, member:discord.Member):
         """Main function called when a member joins a server"""
         if self.bot.database_online:
+            # If axobot is already there, let it handle it
+            if await self.bot.check_axobot_presence(guild=member.guild):
+                return
             await self.bot.get_cog("Servers").update_memberChannel(member.guild)
             if "MEMBER_VERIFICATION_GATE_ENABLED" not in member.guild.features:
                 await self.send_msg(member,"welcome")
@@ -30,6 +33,9 @@ class Welcomer(commands.Cog):
     @commands.Cog.listener()
     async def on_member_update(self, before:discord.Member, after:discord.Member):
         """Main function called when a member got verified in a community server"""
+        # If axobot is already there, let it handle it
+        if await self.bot.check_axobot_presence(guild=before.guild):
+            return
         if before.pending and not after.pending:
             if "MEMBER_VERIFICATION_GATE_ENABLED" in after.guild.features:
                 await self.send_msg(after,"welcome")
@@ -42,6 +48,9 @@ class Welcomer(commands.Cog):
     async def on_member_remove(self, member:discord.Member):
         """Fonction principale appelée lorsqu'un membre quitte un serveur"""
         if self.bot.database_online:
+            # If axobot is already there, let it handle it
+            if await self.bot.check_axobot_presence(guild=member.guild):
+                return
             await self.bot.get_cog("Servers").update_memberChannel(member.guild)
             if "MEMBER_VERIFICATION_GATE_ENABLED" not in member.guild.features or not member.pending:
                 await self.send_msg(member,"leave")

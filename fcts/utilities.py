@@ -64,6 +64,8 @@ class Utilities(commands.Cog):
             if isinstance(ctx, commands.Context) and ctx.command.name in self.bot.allowed_commands:
                 return True
             return False
+        if await self.bot.check_axobot_presence(ctx=ctx):
+            return False
         if not isinstance(ctx, commands.Context) or self.config is None:
             return True
         if ctx.message.type not in {discord.MessageType.default, discord.MessageType.reply, discord.MessageType.chat_input_command}:

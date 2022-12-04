@@ -87,6 +87,9 @@ class Events(commands.Cog):
         if tries > 5:
             self.bot.dispatch("error", RuntimeError(f"Nickname change failed after 5 attempts for user {before.id}"))
             return
+        # If axobot is already there, let it handle it
+        if before.guild and await self.bot.check_axobot_presence(guild=before.guild):
+            return
         if not self.bot.database_online:
             return
         if isinstance(before, discord.Member):
@@ -155,16 +158,11 @@ class Events(commands.Cog):
         """Called for each new message because it's cool"""
         if self.bot.zombie_mode:
             return
+        # If axobot is already there, don't do anything
+        if msg.guild and await self.bot.check_axobot_presence(guild=msg.guild):
+            return
         if msg.guild is None and not msg.flags.ephemeral:
             await self.send_mp(msg)
-        else:
-            try:
-                await self.bot.get_cog('Fun').check_suggestion(msg)
-            except KeyError:
-                pass
-            except Exception as e:
-                await self.bot.get_cog('Errors').on_error(e,msg)
-            await self.bot.get_cog('Fun').check_afk(msg)
         if msg.author != self.bot.user:
             await self.bot.get_cog('Info').emoji_analysis(msg)
         if "send nudes" in msg.content.lower() and len(msg.content)<13 and random.random() > 0.0:
@@ -220,8 +218,6 @@ class Events(commands.Cog):
             await self.bot.fetch_invite(msg.content)
         except discord.NotFound:
             return
-        # d = datetime.datetime.utcnow() - (await msg.channel.history(limit=2).flatten())[1].created_at
-        # if d.total_seconds() > 600:
         await msg.channel.send(await self.bot._(msg.channel,"events.mp-adv"))
 
     async def check_owner_server(self, owner: discord.User):

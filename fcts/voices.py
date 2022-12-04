@@ -92,6 +92,9 @@ class VoiceChannels(commands.Cog):
                 return
             if not self.bot.database_online:
                 return
+            # If axobot is already there, let it handle it
+            if await self.bot.check_axobot_presence(guild=member.guild):
+                return
             config = await self.bot.get_config(member.guild.id, 'voice_channel')
             if config is None:  # if nothing was setup
                 return
