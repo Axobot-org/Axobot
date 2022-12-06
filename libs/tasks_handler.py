@@ -49,7 +49,7 @@ class TaskHandler:
         for task in tasks_list:
             # if axobot is there, let it handle it
             if task['guild'] and await self.bot.check_axobot_presence(guild_id=task['guild']):
-                return
+                continue
             if task['action'] == 'mute':
                 try:
                     guild = self.bot.get_guild(task['guild'])
