@@ -140,12 +140,17 @@ class Timers(commands.Cog):
             msg = discord.utils.escape_markdown(msg).replace("\n", " ")
             chan = '<#'+str(item['channel'])+'>'
             end: datetime.datetime = item["begin"] + datetime.timedelta(seconds=item['duration'])
-            end = end.astimezone(datetime.timezone.utc)
-            a = ctx.bot.utcnow() if end.tzinfo else datetime.datetime.utcnow()
-            duration = await FormatUtils.time_delta(
-                a, end,
-                lang=lang, year=True, form="short"
-            )
+            now = ctx.bot.utcnow() if end.tzinfo else datetime.datetime.utcnow()
+            if now > end:
+                duration = "-" + await FormatUtils.time_delta(
+                    end, now,
+                    lang=lang, year=True, form="short"
+                )
+            else:
+                duration = await FormatUtils.time_delta(
+                    now, end,
+                    lang=lang, year=True, form="short"
+                )
             item = txt.format(id=item['ID'], duration=duration, channel=chan, msg=msg)
             liste.append(item)
         if ctx.can_send_embed:
@@ -200,8 +205,17 @@ class Timers(commands.Cog):
                     rmd_data["tr_channel"] = reminder["channel"]
                 # duration
                 end: datetime.datetime = reminder["begin"] + datetime.timedelta(seconds=reminder['duration'])
-                end = end.astimezone(datetime.timezone.utc)
-                duration = await FormatUtils.time_delta(ctx.bot.utcnow(), end, lang=lang, year=True, form="short")
+                now = ctx.bot.utcnow() if end.tzinfo else datetime.datetime.utcnow()
+                if now > end:
+                    duration = "-" + await FormatUtils.time_delta(
+                        end, now,
+                        lang=lang, year=True, form="short"
+                    )
+                else:
+                    duration = await FormatUtils.time_delta(
+                        now, end,
+                        lang=lang, year=True, form="short"
+                    )
                 rmd_data["tr_duration"] = duration
                 # append to the list
                 reminders_data.append(rmd_data)
