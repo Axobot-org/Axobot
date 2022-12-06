@@ -18,30 +18,30 @@ class Timers(commands.Cog):
 
     async def db_get_reminder(self, reminder_id: int, user: Optional[int] = None) -> Optional[dict]:
         if user is not None:
-            query = "SELECT * FROM `timed` WHERE user=%s AND action='timer' AND ID=%s"
-            args = (user, reminder_id)
+            query = "SELECT * FROM `timed` WHERE user=%s AND action='timer' AND ID=%s AND `beta`=%s"
+            args = (user, reminder_id, self.bot.beta)
         else:
-            query = "SELECT * FROM `timed` WHERE action='timer' AND ID=%s"
-            args = (reminder_id, )
+            query = "SELECT * FROM `timed` WHERE action='timer' AND ID=%s AND `beta`=%s"
+            args = (reminder_id, self.bot.beta)
         async with self.bot.db_query(query, args, fetchone=True) as query_result:
             return query_result
 
     async def db_get_user_reminders(self, user: int) -> list[dict]:
         "Get every active user reminder"
-        query = "SELECT * FROM `timed` WHERE user=%s AND action='timer'"
-        async with self.bot.db_query(query, (user,)) as query_results:
+        query = "SELECT * FROM `timed` WHERE user=%s AND action='timer' AND `beta`=%s"
+        async with self.bot.db_query(query, (user, self.bot.beta)) as query_results:
             return query_results
 
     async def db_get_user_reminders_count(self, user: int) -> int:
         "Get the number of active user reminder"
-        query = "SELECT COUNT(*) as count FROM `timed` WHERE user=%s AND action='timer'"
-        async with self.bot.db_query(query, (user,), fetchone=True) as query_results:
+        query = "SELECT COUNT(*) as count FROM `timed` WHERE user=%s AND action='timer' AND `beta`=%s"
+        async with self.bot.db_query(query, (user, self.bot.beta), fetchone=True) as query_results:
             return query_results["count"]
 
     async def db_delete_reminder(self, reminder_id: int, user: int):
         "Delete a reminder for a user"
-        query = "DELETE FROM `timed` WHERE user=%s AND action='timer' AND ID=%s"
-        async with self.bot.db_query(query, (user, reminder_id), returnrowcount=True) as query_result:
+        query = "DELETE FROM `timed` WHERE user=%s AND action='timer' AND ID=%s AND `beta`=%s"
+        async with self.bot.db_query(query, (user, reminder_id, self.bot.beta), returnrowcount=True) as query_result:
             return query_result > 0
 
     async def db_delete_reminders(self, reminder_ids: list[int], user: int) -> bool:
@@ -54,8 +54,8 @@ class Timers(commands.Cog):
 
     async def db_delete_all_user_reminders(self, user: int):
         "Delete every reminder for a user"
-        query = "DELETE FROM `timed` WHERE user=%s AND action='timer'"
-        async with self.bot.db_query(query, (user,)) as _:
+        query = "DELETE FROM `timed` WHERE user=%s AND action='timer' AND `beta`=%s"
+        async with self.bot.db_query(query, (user, self.bot.beta)) as _:
             pass
 
     @commands.command(name="remindme", aliases=['rmd'])
@@ -140,12 +140,17 @@ class Timers(commands.Cog):
             msg = discord.utils.escape_markdown(msg).replace("\n", " ")
             chan = '<#'+str(item['channel'])+'>'
             end: datetime.datetime = item["begin"] + datetime.timedelta(seconds=item['duration'])
-            end = end.astimezone(datetime.timezone.utc)
-            a = ctx.bot.utcnow() if end.tzinfo else datetime.datetime.utcnow()
-            duration = await FormatUtils.time_delta(
-                a, end,
-                lang=lang, year=True, form="short"
-            )
+            now = ctx.bot.utcnow() if end.tzinfo else datetime.datetime.utcnow()
+            if now > end:
+                duration = "-" + await FormatUtils.time_delta(
+                    end, now,
+                    lang=lang, year=True, form="short"
+                )
+            else:
+                duration = await FormatUtils.time_delta(
+                    now, end,
+                    lang=lang, year=True, form="short"
+                )
             item = txt.format(id=item['ID'], duration=duration, channel=chan, msg=msg)
             liste.append(item)
         if ctx.can_send_embed:
@@ -200,8 +205,17 @@ class Timers(commands.Cog):
                     rmd_data["tr_channel"] = reminder["channel"]
                 # duration
                 end: datetime.datetime = reminder["begin"] + datetime.timedelta(seconds=reminder['duration'])
-                end = end.astimezone(datetime.timezone.utc)
-                duration = await FormatUtils.time_delta(ctx.bot.utcnow(), end, lang=lang, year=True, form="short")
+                now = ctx.bot.utcnow() if end.tzinfo else datetime.datetime.utcnow()
+                if now > end:
+                    duration = "-" + await FormatUtils.time_delta(
+                        end, now,
+                        lang=lang, year=True, form="short"
+                    )
+                else:
+                    duration = await FormatUtils.time_delta(
+                        now, end,
+                        lang=lang, year=True, form="short"
+                    )
                 rmd_data["tr_duration"] = duration
                 # append to the list
                 reminders_data.append(rmd_data)
