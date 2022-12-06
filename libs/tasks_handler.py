@@ -1,7 +1,7 @@
 from __future__ import annotations
 
+import datetime
 import json
-import time
 import re
 from typing import TYPE_CHECKING
 from datetime import timezone
@@ -35,7 +35,7 @@ class TaskHandler:
                     if get_all:
                         events.append(row)
                     else:
-                        if id_only or row['begin'].timestamp() + row['duration'] < time.time():
+                        if id_only or (row['begin'] + datetime.timedelta(seconds=row['duration'])) < datetime.datetime.utcnow():
                             events.append(row)
             return events
         except Exception as err:  # pylint: disable=broad-except
@@ -51,8 +51,8 @@ class TaskHandler:
         self.bot.log.debug("[tasks_loop] Itération (%s tâches trouvées)", len(tasks_list))
         for task in tasks_list:
             # if axobot is there, let it handle it
-            if task['guild'] and await self.bot.check_axobot_presence(guild_id=task['guild']):
-                return
+            if task['guild'] and await self.bot.check_axobot_presence(guild_id=task['guild'], channel_id=task['channel']):
+                continue
             if task['action'] == 'mute':
                 try:
                     guild = self.bot.get_guild(task['guild'])

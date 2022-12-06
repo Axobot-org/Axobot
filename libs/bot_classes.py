@@ -361,7 +361,7 @@ class Zbot(commands.bot.AutoShardedBot):
         self.log.error(f"Trying to mention invalid command: {command_name}")
         return f"`{command_name}`"
 
-    async def check_axobot_presence(self, *, ctx: Optional[MyContext] = None, guild: Optional[discord.Guild] = None, interaction: Optional[discord.Interaction] = None, guild_id: Optional[int] = None):
+    async def check_axobot_presence(self, *, ctx: Optional[MyContext] = None, guild: Optional[discord.Guild] = None, interaction: Optional[discord.Interaction] = None, guild_id: Optional[int] = None, channel_id: Optional[int] = None):
         "Check if Axobot is present in the given context"
         if ctx is None and guild is None and interaction is None and guild_id is None:
             raise ValueError("No context provided")
@@ -378,6 +378,8 @@ class Zbot(commands.bot.AutoShardedBot):
             channel = interaction.channel
         elif guild_id is not None:
             guild = self.get_guild(guild_id)
+        if channel_id is not None:
+            channel = self.get_channel(channel_id)
         return await self._check_axobot_in_guild(guild, channel)
     
     @acached(timeout=60)
