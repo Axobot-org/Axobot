@@ -122,7 +122,7 @@ class ServerLogs(commands.Cog):
         "Send ready logs every 30s to avoid rate limits"
         try:
             for channel, embeds in dict(self.to_send).items():
-                if not embeds:
+                if not embeds or channel.guild.me is None:
                     self.to_send.pop(channel)
                     continue
                 try:
@@ -588,7 +588,7 @@ class ServerLogs(commands.Cog):
         guild = self.bot.get_guild(payload.guild_id)
         if guild is None:
             return
-        if not guild.me.guild_permissions.view_audit_log:
+        if guild.me is None or not guild.me.guild_permissions.view_audit_log:
             return
         now = self.bot.utcnow()
         await asyncio.sleep(self.auditlogs_timeout)
