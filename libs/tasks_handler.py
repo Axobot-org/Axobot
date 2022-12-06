@@ -1,7 +1,7 @@
 from __future__ import annotations
 
+import datetime
 import json
-import time
 import re
 from typing import TYPE_CHECKING
 
@@ -32,7 +32,7 @@ class TaskHandler:
                     if get_all:
                         events.append(row)
                     else:
-                        if id_only or row['begin'].timestamp()+row['duration'] < time.time():
+                        if id_only or (row['begin'] + datetime.timedelta(seconds=row['duration'])) < datetime.datetime.utcnow():
                             events.append(row)
             return events
         except Exception as err:  # pylint: disable=broad-except
