@@ -114,6 +114,8 @@ class Twitch(commands.Cog):
             await ctx.send_help(ctx.command)
 
     @twitch.command(name="subscribe")
+    @commands.guild_only()
+    @commands.check(checks.has_manage_guild)
     async def twitch_sub(self, ctx: MyContext, streamer: str):
         "Subscribe to a Twitch streamer"
         await ctx.defer()
@@ -138,6 +140,8 @@ class Twitch(commands.Cog):
             await ctx.send(await self.bot._(ctx.guild.id, "twitch.subscribe.already-subscribed", streamer=user["display_name"]))
 
     @twitch.command(name="unsubscribe")
+    @commands.guild_only()
+    @commands.check(checks.has_manage_guild)
     async def twitch_unsub(self, ctx: MyContext, streamer: str):
         "Unsubscribe from a Twitch streamer"
         if streamer.isnumeric():
@@ -172,6 +176,8 @@ class Twitch(commands.Cog):
         ]
 
     @twitch.command(name="list-subscriptions")
+    @commands.guild_only()
+    @commands.check(checks.has_manage_guild)
     async def twitch_list(self, ctx: MyContext):
         "List all subscribed Twitch streamers"
         await ctx.defer()
@@ -205,17 +211,17 @@ class Twitch(commands.Cog):
                 avatar = streamer_obj["profile_image_url"].format(width=64, height=64)
                 user_id = streamer_obj["id"]
             except ValueError:
-                await ctx.send(await self.bot._(ctx.guild.id, "twitch.invalid-streamer-name"))
+                await ctx.send(await self.bot._(ctx, "twitch.invalid-streamer-name"))
                 return
         resp = await self.agent.get_user_stream_by_id(user_id)
         if len(resp) > 0:
             stream = resp[0]
-            if stream["is_mature"] and not ctx.channel.is_nsfw():
-                await ctx.send(await self.bot._(ctx.guild.id, "twitch.check-stream.no-nsfw"))
+            if stream["is_mature"] and not (ctx.guild is None or ctx.channel.is_nsfw()):
+                await ctx.send(await self.bot._(ctx, "twitch.check-stream.no-nsfw"))
                 return
-            await ctx.send(embed=await self.create_stream_embed(stream, ctx.guild.id, avatar))
+            await ctx.send(embed=await self.create_stream_embed(stream, ctx, avatar))
         else:
-            await ctx.send(await self.bot._(ctx.guild.id, "twitch.check-stream.offline", streamer=streamer))
+            await ctx.send(await self.bot._(ctx, "twitch.check-stream.offline", streamer=streamer))
 
     async def create_stream_embed(self, stream: StreamObject, guild_id: int, streamer_avatar: Optional[str]=None):
         started_at = isoparse(stream["started_at"])
