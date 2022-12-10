@@ -31,6 +31,7 @@ Translations of the Zbot `Privacy Policy <legal/privacy.html>`_ and its `Terms o
    minecraft
    rss
    roles-reactions
+   streamers
    fun
    miscellaneous
 

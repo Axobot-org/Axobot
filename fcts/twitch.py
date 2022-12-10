@@ -109,7 +109,9 @@ class Twitch(commands.Cog):
     @commands.guild_only()
     @commands.check(checks.has_manage_guild)
     async def twitch(self, ctx: MyContext):
-        "Twitch commands"
+        """Twitch commands
+
+..Doc streamers.html"""
         if ctx.invoked_subcommand is None:
             await ctx.send_help(ctx.command)
 
@@ -117,7 +119,13 @@ class Twitch(commands.Cog):
     @commands.guild_only()
     @commands.check(checks.has_manage_guild)
     async def twitch_sub(self, ctx: MyContext, streamer: str):
-        "Subscribe to a Twitch streamer"
+        """Subscribe to a Twitch streamer
+
+..Example twitch subscribe https://twitch.tv/monstercat
+
+..Example twitch subscribe Zerator
+
+..Doc streamers.html#subscribe-or-unsubscribe-to-a-streamer"""
         await ctx.defer()
         if match := re.findall(r'^https://(?:www\.)?twitch\.tv/(\w+)', streamer):
             streamer = match[0]
@@ -143,7 +151,11 @@ class Twitch(commands.Cog):
     @commands.guild_only()
     @commands.check(checks.has_manage_guild)
     async def twitch_unsub(self, ctx: MyContext, streamer: str):
-        "Unsubscribe from a Twitch streamer"
+        """Unsubscribe from a Twitch streamer
+
+..Example twitch unsubscribe monstercat
+
+..Doc streamers.html#subscribe-or-unsubscribe-to-a-streamer"""
         if streamer.isnumeric():
             user_id = streamer
             user_name = await self.db_get_streamer_name("twitch", user_id)
@@ -179,7 +191,11 @@ class Twitch(commands.Cog):
     @commands.guild_only()
     @commands.check(checks.has_manage_guild)
     async def twitch_list(self, ctx: MyContext):
-        "List all subscribed Twitch streamers"
+        """List all subscribed Twitch streamers
+
+..Example twitch list-subscriptions
+
+..Doc streamers.html#list-your-subscriptions"""
         await ctx.defer()
         streamers = await self.db_get_guild_streamers(ctx.guild.id, "twitch")
         max_count = await self.bot.get_config(ctx.guild.id,'streamers_max_number')
@@ -201,7 +217,11 @@ class Twitch(commands.Cog):
     @twitch.command(name="check-stream")
     @commands.cooldown(3, 60, commands.BucketType.user)
     async def test_twitch(self, ctx: MyContext, streamer: str):
-        "Check if a streamer is currently streaming"
+        """Check if a streamer is currently streaming
+
+..Example twitch check-stream monstercat
+
+..Doc streamers.html#check-a-streamer-status"""
         if streamer.isnumeric():
             user_id = streamer
             avatar = None
