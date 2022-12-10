@@ -458,7 +458,7 @@ class Events(commands.Cog):
         rankcards_stats = await self.bot.get_cog('Users').get_rankcards_stats()
         xptypes_stats = await self.bot.get_cog('Servers').get_xp_types([], return_dict=True)
         supportserver_members = self.bot.get_guild(356067272730607628).member_count
-        query = "INSERT INTO `log_stats` (`servers_count`, `members_count`, `bots_count`, `dapi_heartbeat`, `codelines_count`, `earned_xp_total`, `rss_feeds`, `active_rss_feeds`, `supportserver_members`, `languages`, `used_rankcards`, `xp_types`, `beta`) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
+        query = "INSERT INTO `log_stats` (`servers_count`, `members_count`, `bots_count`, `dapi_heartbeat`, `codelines_count`, `earned_xp_total`, `rss_feeds`, `active_rss_feeds`, `supportserver_members`, `languages`, `used_rankcards`, `xp_types`, `entity_id`) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
         data = (
             len(self.bot.guilds),
             member_count,
@@ -472,7 +472,7 @@ class Events(commands.Cog):
             marshal.dumps(lang_stats),
             marshal.dumps(rankcards_stats),
             marshal.dumps(xptypes_stats),
-            int(self.bot.beta),
+            self.bot.entity_id,
         )
         try:
             async with self.bot.db_query(query, data):
