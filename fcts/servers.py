@@ -269,6 +269,7 @@ class Servers(commands.Cog):
     @sconfig_main.command(name="reset")
     @app_commands.describe(option="The option to reset")
     @commands.cooldown(1, 2, commands.BucketType.guild)
+    @commands.guild_only()
     @commands.check(checks.has_manage_guild)
     async def sconfig_del(self, ctx: MyContext, option: str):
         """Reset an option to its initial value"""
@@ -286,6 +287,7 @@ class Servers(commands.Cog):
         value="The new option value"
         )
     @commands.cooldown(1, 2, commands.BucketType.guild)
+    @commands.guild_only()
     @commands.check(checks.has_manage_guild)
     async def sconfig_change(self, ctx: MyContext, option:str, *, value: str):
         """Allows you to modify an option"""
@@ -337,6 +339,7 @@ class Servers(commands.Cog):
         return await autocomplete_main(self.bot, interaction, interaction.namespace.option, value)
 
     @sconfig_main.command(name="reset-all")
+    @commands.guild_only()
     @commands.check(checks.has_admin)
     async def admin_delete(self, ctx: MyContext):
         """Reset the whole config of your server
@@ -942,6 +945,7 @@ class Servers(commands.Cog):
 
     @sconfig_main.command(name="see")
     @commands.cooldown(1,10,commands.BucketType.guild)
+    @commands.guild_only()
     async def sconfig_see(self, ctx: MyContext, option: typing.Optional[str]=None):
         """Displays the value of an option, or all options if none is specified"""
         if not ctx.bot.database_online:
