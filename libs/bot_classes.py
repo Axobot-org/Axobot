@@ -97,6 +97,7 @@ class Zbot(commands.bot.AutoShardedBot):
                          status=status, allowed_mentions=allowed_mentions, intents=intents, enable_debug_events=True)
         self.database_online = database_online  # if the mysql database works
         self.beta = beta # if the bot is in beta mode
+        self.entity_id: int = 0 # ID of the bot for the statistics database
         self.database_keys = {} # credentials for the database
         self.log = logging.getLogger("runner") # logs module
         self.dbl_token = dbl_token # token for Discord Bot List

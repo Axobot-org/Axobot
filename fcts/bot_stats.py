@@ -164,7 +164,7 @@ class BotStats(commands.Cog):
 
     async def db_record_dailies_values(self, now: datetime):
         "Record into the stats table the total, min, max and median dailies values, as well as the number of dailies rows"
-        args = ("points", False, self.bot.beta)
+        args = ("points", False, self.bot.entity_id)
         # Total
         query = "INSERT INTO `statsbot`.`zbot` SELECT %s, %s, SUM(points) AS value, 0, %s, %s, %s FROM `frm`.`dailies`"
         async with self.bot.db_query(query, (now, "dailies.total", *args)) as _:
@@ -198,7 +198,7 @@ class BotStats(commands.Cog):
     async def db_record_eventpoints_values(self, now: datetime):
         """Record into the stats table the total, min, max and median event points values,
         as well as the number of users having at least 1 point"""
-        args = ("points", False, self.bot.beta)
+        args = ("points", False, self.bot.entity_id)
         # Total
         query = "INSERT INTO `statsbot`.`zbot` SELECT %s, %s, SUM(`events_points`) AS value, 0, %s, %s, %s FROM `frm`.`users`"
         async with self.bot.db_query(query, (now, "eventpoints.total", *args)) as _:
@@ -232,7 +232,7 @@ class BotStats(commands.Cog):
 
     async def db_record_serverlogs_enabled(self, now: datetime):
         "Record into the stats table the number of enabled serverlogs, grouped by kind"
-        args = (0, "logs", False, self.bot.beta)
+        args = (0, "logs", False, self.bot.entity_id)
         query = """INSERT INTO `statsbot`.`zbot`
             SELECT %s, CONCAT("logs.", `kind`, ".enabled"), COUNT(*), %s, %s, %s, %s
             FROM `serverlogs`
@@ -268,66 +268,66 @@ class BotStats(commands.Cog):
             # WS events stats
             for k, v in self.received_events.items():
                 if v:
-                    cursor.execute(query, (now, 'wsevent.'+k, v, 0, 'event/min', True, self.bot.beta))
+                    cursor.execute(query, (now, 'wsevent.'+k, v, 0, 'event/min', True, self.bot.entity_id))
                 self.received_events[k] = 0
             # Commands usages stats
             for k, v in self.commands_uses.items():
-                cursor.execute(query, (now, 'cmd.'+k, v, 0, 'cmd/min', True, self.bot.beta))
+                cursor.execute(query, (now, 'cmd.'+k, v, 0, 'cmd/min', True, self.bot.entity_id))
             self.commands_uses.clear()
             for k, v in self.app_commands_uses.items():
-                cursor.execute(query, (now, 'app_cmd.'+k, v, 0, 'cmd/min', True, self.bot.beta))
+                cursor.execute(query, (now, 'app_cmd.'+k, v, 0, 'cmd/min', True, self.bot.entity_id))
             self.app_commands_uses.clear()
             # RSS stats
             for k, v in self.rss_stats.items():
-                cursor.execute(query, (now, 'rss.'+k, v, 0, k, k == "messages", self.bot.beta))
-            cursor.execute(query, (now, 'rss.disabled', await self.db_get_disabled_rss(), 0, 'disabled', False, self.bot.beta))
+                cursor.execute(query, (now, 'rss.'+k, v, 0, k, k == "messages", self.bot.entity_id))
+            cursor.execute(query, (now, 'rss.disabled', await self.db_get_disabled_rss(), 0, 'disabled', False, self.bot.entity_id))
             # XP cards
-            cursor.execute(query, (now, 'xp.generated_cards', self.xp_cards["generated"], 0, 'cards/min', True, self.bot.beta))
-            cursor.execute(query, (now, 'xp.sent_cards', self.xp_cards["sent"], 0, 'cards/min', True, self.bot.beta))
+            cursor.execute(query, (now, 'xp.generated_cards', self.xp_cards["generated"], 0, 'cards/min', True, self.bot.entity_id))
+            cursor.execute(query, (now, 'xp.sent_cards', self.xp_cards["sent"], 0, 'cards/min', True, self.bot.entity_id))
             self.xp_cards["generated"] = 0
             self.xp_cards["sent"] = 0
             # Latency
             if latency := await self.get_list_usage(self.latency_records):
-                cursor.execute(query, (now, 'perf.latency', latency, 1, 'ms', False, self.bot.beta))
+                cursor.execute(query, (now, 'perf.latency', latency, 1, 'ms', False, self.bot.entity_id))
             # CPU usage
             bot_cpu = await self.get_list_usage(self.bot_cpu_records)
             if bot_cpu is not None:
-                cursor.execute(query, (now, 'perf.bot_cpu', bot_cpu, 1, '%', False, self.bot.beta))
+                cursor.execute(query, (now, 'perf.bot_cpu', bot_cpu, 1, '%', False, self.bot.entity_id))
             total_cpu = await self.get_list_usage(self.total_cpu_records)
             if total_cpu is not None:
-                cursor.execute(query, (now, 'perf.total_cpu', total_cpu, 1, '%', False, self.bot.beta))
+                cursor.execute(query, (now, 'perf.total_cpu', total_cpu, 1, '%', False, self.bot.entity_id))
             # RAM usage
             bot_ram = round(self.process.memory_info()[0] / 2.**30, 3)
-            cursor.execute(query, (now, 'perf.bot_ram', bot_ram, 1, 'Gb', False, self.bot.beta))
+            cursor.execute(query, (now, 'perf.bot_ram', bot_ram, 1, 'Gb', False, self.bot.entity_id))
             percent_ram, total_ram = await get_ram_data()
-            cursor.execute(query, (now, 'perf.total_ram', round(total_ram / 1e9, 3), 1, 'Gb', False, self.bot.beta))
-            cursor.execute(query, (now, 'perf.percent_total_ram', percent_ram, 1, '%', False, self.bot.beta))
+            cursor.execute(query, (now, 'perf.total_ram', round(total_ram / 1e9, 3), 1, 'Gb', False, self.bot.entity_id))
+            cursor.execute(query, (now, 'perf.percent_total_ram', percent_ram, 1, '%', False, self.bot.entity_id))
             # Unavailable guilds
             unav, total = 0, 0
             for guild in self.bot.guilds:
                 unav += guild.unavailable
                 total += 1
-            cursor.execute(query, (now, 'guilds.unavailable', round(unav/total, 3)*100, 1, '%', False, self.bot.beta))
-            cursor.execute(query, (now, 'guilds.total', total, 0, 'guilds', True, self.bot.beta))
+            cursor.execute(query, (now, 'guilds.unavailable', round(unav/total, 3)*100, 1, '%', False, self.bot.entity_id))
+            cursor.execute(query, (now, 'guilds.total', total, 0, 'guilds', True, self.bot.entity_id))
             del unav, total
             # antiscam warn/deletions
             if self.antiscam["warning"]:
-                cursor.execute(query, (now, 'antiscam.warning', self.antiscam["warning"], 0, 'warning/min', True, self.bot.beta))
+                cursor.execute(query, (now, 'antiscam.warning', self.antiscam["warning"], 0, 'warning/min', True, self.bot.entity_id))
             if self.antiscam["deletion"]:
-                cursor.execute(query, (now, 'antiscam.deletion', self.antiscam["deletion"], 0, 'deletion/min', True, self.bot.beta))
+                cursor.execute(query, (now, 'antiscam.deletion', self.antiscam["deletion"], 0, 'deletion/min', True, self.bot.entity_id))
             self.antiscam["warning"] = self.antiscam["deletion"] = 0
             # antiscam activated count
-            cursor.execute(query, (now, 'antiscam.activated', await self.db_get_antiscam_enabled_count(), 0, 'guilds', False, self.bot.beta))
+            cursor.execute(query, (now, 'antiscam.activated', await self.db_get_antiscam_enabled_count(), 0, 'guilds', False, self.bot.entity_id))
             # tickets creation
             if self.ticket_events["creation"]:
-                cursor.execute(query, (now, 'tickets.creation', self.ticket_events["creation"], 0, 'tickets/min', True, self.bot.beta))
+                cursor.execute(query, (now, 'tickets.creation', self.ticket_events["creation"], 0, 'tickets/min', True, self.bot.entity_id))
                 self.ticket_events["creation"] = 0
             # username changes
-            cursor.execute(query, (now, 'usernames.guild', self.usernames["guild"], 0, 'nicknames/min', True, self.bot.beta))
+            cursor.execute(query, (now, 'usernames.guild', self.usernames["guild"], 0, 'nicknames/min', True, self.bot.entity_id))
             self.usernames["guild"] = 0
-            cursor.execute(query, (now, 'usernames.user', self.usernames["user"], 0, 'usernames/min', True, self.bot.beta))
+            cursor.execute(query, (now, 'usernames.user', self.usernames["user"], 0, 'usernames/min', True, self.bot.entity_id))
             self.usernames["user"] = 0
-            cursor.execute(query, (now, 'usernames.deleted', self.usernames["deleted"], 0, 'usernames/min', True, self.bot.beta))
+            cursor.execute(query, (now, 'usernames.deleted', self.usernames["deleted"], 0, 'usernames/min', True, self.bot.entity_id))
             self.usernames["deleted"] = 0
             if self.bot.current_event:
                 # Dailies points
@@ -337,7 +337,7 @@ class BotStats(commands.Cog):
             # serverlogs
             await self.db_record_serverlogs_enabled(now)
             for k, v in self.emitted_serverlogs.items():
-                cursor.execute(query, (now, f'logs.{k}.emitted', v, 0, 'event/min', True, self.bot.beta))
+                cursor.execute(query, (now, f'logs.{k}.emitted', v, 0, 'event/min', True, self.bot.entity_id))
             self.emitted_serverlogs.clear()
             # Push everything
             cnx.commit()
@@ -359,7 +359,7 @@ class BotStats(commands.Cog):
         """Get the sum of a certain variable in the last X minutes"""
         cnx = self.bot.cnx_frm
         cursor = cnx.cursor(dictionary=True)
-        cursor.execute('SELECT variable, SUM(value) as value, type FROM `statsbot`.`zbot` WHERE variable = %s AND date BETWEEN (DATE_SUB(UTC_TIMESTAMP(),INTERVAL %s MINUTE)) AND UTC_TIMESTAMP() AND beta=%s', (variable, minutes, self.bot.beta))
+        cursor.execute('SELECT variable, SUM(value) as value, type FROM `statsbot`.`zbot` WHERE variable = %s AND date BETWEEN (DATE_SUB(UTC_TIMESTAMP(),INTERVAL %s MINUTE)) AND UTC_TIMESTAMP() AND beta=%s', (variable, minutes, self.bot.entity_id))
         result: list[dict] = list(cursor)
         cursor.close()
         if len(result) == 0:
