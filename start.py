@@ -71,16 +71,24 @@ async def main():
         client.connect_database_frm()
         client.connect_database_xp()
 
-    if args.token == 'release':
-        token = tokens.get_token(client,486896267788812288)
+    if args.token == 'zbot':
+        bot_data = tokens.get_token(client, 486896267788812288)
+        token = bot_data["token"]
+        client.entity_id = bot_data["entity_id"]
+    elif args.token == 'axobot':
+        bot_data = tokens.get_token(client, 1048011651145797673)
+        token = bot_data["token"]
+        client.entity_id = bot_data["entity_id"]
     elif args.token == 'beta':
-        token = tokens.get_token(client,436835675304755200)
+        bot_data = tokens.get_token(client, 436835675304755200)
+        token = bot_data["token"]
+        client.entity_id = bot_data["entity_id"]
         client.beta = True
     elif len(args.token) < 30:
         print("Invalid bot token")
         return
     else:
-        token = args.token
+        token: str = args.token
     # Events loop
     if not args.event_loop:
         client.internal_loop_enabled = False
