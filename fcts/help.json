@@ -62,7 +62,7 @@
     "users-info": {
         "emoji": "👥",
         "commands": [
-            "perms",
+            "permissions",
             "profile",
             "rank",
             "top",
