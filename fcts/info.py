@@ -126,8 +126,8 @@ class Info(commands.Cog):
             cmds_24h = await self.bot.get_cog("BotStats").get_stats("wsevent.CMD_USE", 60*24)
             # number formatter
             lang = await self.bot._(ctx.guild.id,"_used_locale")
-            async def n_format(nbr):
-                return await FormatUtils.format_nbr(nbr, lang)
+            async def n_format(nbr: typing.Union[int, float, None]):
+                return await FormatUtils.format_nbr(nbr, lang) if nbr is not None else "0"
             # Generating message
             d = ""
             for key, var in [
