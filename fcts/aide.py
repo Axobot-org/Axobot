@@ -370,7 +370,7 @@ If the bot can't send the new command format, it will try to send the old one.""
         category = "unclassed"
         for key, data in self.commands_data.items():
             categ_commands = data['commands']
-            if cmd.name in categ_commands or cmd.full_parent_name in categ_commands:
+            if cmd.name in categ_commands or (cmd.full_parent_name and cmd.full_parent_name.split(" ")[0] in categ_commands):
                 category = key
                 break
         emoji = self.commands_data[category]['emoji']
