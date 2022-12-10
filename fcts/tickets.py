@@ -332,7 +332,8 @@ class Tickets(commands.Cog):
         await ctx.send(await self.bot._(ctx.guild.id, "errors.unknown", about=about))
 
     @commands.hybrid_group(name="tickets", aliases=["ticket"])
-    @discord.app_commands.default_permissions(manage_guild=True)
+    @discord.app_commands.default_permissions(manage_channels=True)
+    @commands.check(checks.has_manage_channels)
     @commands.guild_only()
     async def tickets_main(self, ctx: MyContext):
         """Manage your tickets system
@@ -342,6 +343,7 @@ class Tickets(commands.Cog):
             await ctx.send_help(ctx.command)
 
     @tickets_main.group(name="portal")
+    @commands.guild_only()
     @commands.check(checks.has_manage_channels)
     async def tickets_portal(self, ctx: MyContext):
         """Handle how your members are able to open tickets
@@ -352,6 +354,8 @@ class Tickets(commands.Cog):
 
     @tickets_portal.command()
     @commands.cooldown(2, 30, commands.BucketType.guild)
+    @commands.guild_only()
+    @commands.check(checks.has_manage_channels)
     async def summon(self, ctx: MyContext):
         """Ask the bot to send a message allowing people to open tickets
 
@@ -370,6 +374,8 @@ class Tickets(commands.Cog):
     @tickets_portal.command(name="set-hint")
     @app_commands.describe(message="The hint to display for this topic - set 'none' for no hint")
     @commands.cooldown(3, 30, commands.BucketType.guild)
+    @commands.guild_only()
+    @commands.check(checks.has_manage_channels)
     async def portal_set_hint(self, ctx: MyContext, *, message: str):
         """Set a default hint message
         The message will be displayed when a user tries to open a ticket, before user confirmation
@@ -391,6 +397,8 @@ class Tickets(commands.Cog):
     @tickets_portal.command(name="set-role")
     @app_commands.describe(role="The role allowed to see tickets from this topic - do not set to allow anyone")
     @commands.cooldown(3, 30, commands.BucketType.guild)
+    @commands.guild_only()
+    @commands.check(checks.has_manage_channels)
     async def portal_set_role(self, ctx: MyContext, role: Optional[discord.Role]):
         """Edit a default staff role
         Anyone with this role will be able to read newly created tickets
@@ -408,6 +416,8 @@ class Tickets(commands.Cog):
 
     @tickets_portal.command(name="set-text")
     @commands.cooldown(3, 30, commands.BucketType.guild)
+    @commands.guild_only()
+    @commands.check(checks.has_manage_channels)
     async def portal_set_text(self, ctx: MyContext, *, message: str):
         """Set a message to be displayed above the ticket topic selection
 
@@ -422,6 +432,8 @@ class Tickets(commands.Cog):
 
     @tickets_portal.command(name="set-category", aliases=["set-channel"])
     @commands.cooldown(3, 30, commands.BucketType.guild)
+    @commands.guild_only()
+    @commands.check(checks.has_manage_channels)
     async def portal_set_category(self, ctx: MyContext, category_or_channel: Union[discord.CategoryChannel, discord.TextChannel]):
         """Set the category or the channel in which tickets will be created
 
@@ -458,6 +470,8 @@ class Tickets(commands.Cog):
     @tickets_portal.command(name="set-format")
     @app_commands.describe(name_format="The channel format for this topic - set 'none' to use the default one")
     @commands.cooldown(3, 30, commands.BucketType.guild)
+    @commands.guild_only()
+    @commands.check(checks.has_manage_channels)
     async def portal_set_format(self, ctx: MyContext, name_format: str):
         """Set the format used to generate the channel/thread name
         You can use the following placeholders: username, usertag, userid, topic, topic_emoji, ticket_name
@@ -480,6 +494,7 @@ class Tickets(commands.Cog):
 
 
     @tickets_main.group(name="topic", aliases=["topics"])
+    @commands.guild_only()
     @commands.check(checks.has_manage_channels)
     async def tickets_topics(self, ctx: MyContext):
         """Handle the different ticket topics your members can select
@@ -490,6 +505,8 @@ class Tickets(commands.Cog):
 
     @tickets_topics.command(name="add", aliases=["create"])
     @commands.cooldown(3, 45, commands.BucketType.guild)
+    @commands.guild_only()
+    @commands.check(checks.has_manage_channels)
     async def topic_add(self, ctx: MyContext, emote: Optional[EmojiConverterType]=None, *, name: str):
         """Create a new ticket topic
         A topic name is limited to 100 characters
@@ -518,6 +535,8 @@ class Tickets(commands.Cog):
 
     @tickets_topics.command(name="remove")
     @commands.cooldown(3, 45, commands.BucketType.guild)
+    @commands.guild_only()
+    @commands.check(checks.has_manage_channels)
     async def topic_remove(self, ctx: MyContext, topic_id: Optional[int] = None):
         """Permanently delete a topic by its name
 
@@ -549,6 +568,8 @@ class Tickets(commands.Cog):
 
     @tickets_topics.command(name="set-emote", aliases=["set-emoji"])
     @commands.cooldown(3, 30, commands.BucketType.guild)
+    @commands.guild_only()
+    @commands.check(checks.has_manage_channels)
     async def topic_set_emote(self, ctx: MyContext, topic_id: Optional[int],
                               emote: Optional[EmojiConverterType]=None):
         """Edit a topic emoji
@@ -577,6 +598,8 @@ class Tickets(commands.Cog):
     @tickets_topics.command(name="set-hint")
     @app_commands.describe(message="The hint to display for this topic - set 'none' to use the default one")
     @commands.cooldown(3, 30, commands.BucketType.guild)
+    @commands.guild_only()
+    @commands.check(checks.has_manage_channels)
     async def topic_set_hint(self, ctx: MyContext, topic_id: Optional[int]=None, *, message: str):
         """Edit a topic hint message
         The message will be displayed when a user tries to open a ticket, before user confirmation
@@ -604,6 +627,8 @@ If that still doesn't work, please create your ticket
     @tickets_topics.command(name="set-role")
     @app_commands.describe(role="The role allowed to see tickets from this topic - do not set to use the default one")
     @commands.cooldown(3, 30, commands.BucketType.guild)
+    @commands.guild_only()
+    @commands.check(checks.has_manage_channels)
     async def topic_set_role(self, ctx: MyContext, topic_id: Optional[int]=None, role: Optional[discord.Role]=None):
         """Edit a topic staff role
         Anyone with this role will be able to read newly created tickets with this topic
@@ -633,6 +658,8 @@ If that still doesn't work, please create your ticket
     @tickets_topics.command(name="set-format")
     @app_commands.describe(name_format="The channel format for this topic - set 'none' to use the default one")
     @commands.cooldown(3, 30, commands.BucketType.guild)
+    @commands.guild_only()
+    @commands.check(checks.has_manage_channels)
     async def topic_set_format(self, ctx: MyContext, topic_id: Optional[int], name_format: str):
         """Set the format used to generate the channel/thread name
         You can use the following placeholders: username, usertag, userid, topic, topic_emoji, ticket_name
@@ -665,6 +692,8 @@ If that still doesn't work, please create your ticket
 
     @tickets_topics.command(name="list")
     @commands.cooldown(3, 20, commands.BucketType.guild)
+    @commands.guild_only()
+    @commands.check(checks.has_manage_channels)
     async def topic_list(self, ctx: MyContext):
         "List every ticket topic used in your server"
         topics_repr: list[str] = []

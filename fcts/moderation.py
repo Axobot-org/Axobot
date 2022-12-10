@@ -1017,11 +1017,12 @@ The 'show_reasons' parameter is used to display the mute reasons.
 
     @emoji_group.command(name="rename")
     @app_commands.describe(emoji="The emoji to rename", name="The new name")
+    @commands.guild_only()
     @commands.check(checks.has_manage_emojis)
     async def emoji_rename(self, ctx: MyContext, emoji: discord.Emoji, name: str):
         """Rename an emoji
 
-        ..Example emoji rename :cool: supercool
+        ..Example emoji rename :cool\: supercool
 
         ..Doc moderator.html#emoji-manager"""
         if emoji.guild != ctx.guild:
@@ -1035,6 +1036,7 @@ The 'show_reasons' parameter is used to display the mute reasons.
 
     @emoji_group.command(name="restrict")
     @app_commands.describe(emoji="The emoji to restrict", roles="The roles allowed to use this emoji (separated by spaces), or 'everyone'")
+    @commands.guild_only()
     @commands.check(checks.has_manage_emojis)
     async def emoji_restrict(self, ctx: MyContext, emoji: discord.Emoji, roles: commands.Greedy[Union[discord.Role, Literal['everyone']]]):
         """Restrict the use of an emoji to certain roles
@@ -1059,6 +1061,7 @@ The 'show_reasons' parameter is used to display the mute reasons.
         await ctx.send(await self.bot._(ctx.guild.id, "moderation.emoji.emoji-valid", name=emoji, roles=", ".join([x.name for x in roles])))
 
     @emoji_group.command(name="clear")
+    @commands.guild_only()
     @commands.check(checks.has_manage_msg)
     async def emoji_clear(self, ctx: MyContext, message: discord.Message, emoji: discord.Emoji = None):
         """Remove all reactions under a message
@@ -1081,6 +1084,7 @@ The 'show_reasons' parameter is used to display the mute reasons.
             pass
 
     @emoji_group.command(name="list")
+    @commands.guild_only()
     @commands.check(checks.bot_can_embed)
     async def emoji_list(self, ctx: MyContext):
         """List every emoji of your server
@@ -1145,6 +1149,7 @@ The 'show_reasons' parameter is used to display the mute reasons.
 
     @main_role.command(name="set-color", aliases=['set-colour'])
     @app_commands.describe(color="The new color role, preferably in hex format (#ff6699)")
+    @commands.guild_only()
     @commands.check(checks.has_manage_roles)
     async def role_color(self, ctx: MyContext, role: discord.Role, color: discord.Color):
         """Change a color of a role
@@ -1162,7 +1167,9 @@ The 'show_reasons' parameter is used to display the mute reasons.
         await ctx.send(await self.bot._(ctx.guild.id,"moderation.role.color-success", role=role.name))
 
     @main_role.command(name="members-list")
-    @commands.cooldown(5,30,commands.BucketType.guild)
+    @commands.cooldown(5, 30, commands.BucketType.guild)
+    @commands.guild_only()
+    @commands.check(checks.has_manage_roles)
     async def role_list(self, ctx: MyContext, *, role: discord.Role):
         """Send the list of members in a role
 
@@ -1193,8 +1200,9 @@ The 'show_reasons' parameter is used to display the mute reasons.
 
 
     @main_role.command(name="grant", aliases=["add", "give"])
-    @commands.check(checks.has_manage_roles)
     @commands.cooldown(1, 30, commands.BucketType.guild)
+    @commands.guild_only()
+    @commands.check(checks.has_manage_roles)
     async def roles_give(self, ctx:MyContext, role:discord.Role, users:commands.Greedy[Union[discord.Role,discord.Member,Literal['everyone']]]):
         """Give a role to a list of roles/members
         Users list may be either members or roles, or even only one member
@@ -1241,8 +1249,9 @@ The 'show_reasons' parameter is used to display the mute reasons.
             await ctx.send(answer)
 
     @main_role.command(name="revoke", aliases=["remove"])
-    @commands.check(checks.has_manage_roles)
     @commands.cooldown(1, 30, commands.BucketType.guild)
+    @commands.guild_only()
+    @commands.check(checks.has_manage_roles)
     async def roles_remove(self, ctx:MyContext, role:discord.Role, users:commands.Greedy[Union[discord.Role,discord.Member,Literal['everyone']]]):
         """Remove a role to a list of roles/members
         Users list may be either members or roles, or even only one member
