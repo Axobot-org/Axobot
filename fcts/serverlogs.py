@@ -155,6 +155,8 @@ class ServerLogs(commands.Cog):
 
     @modlogs_main.command(name="list")
     @app_commands.describe(channel="The channel to list logs for. Leave empty to list all logs for the server")
+    @commands.guild_only()
+    @commands.check(checks.has_manage_guild)
     @commands.cooldown(1, 10, commands.BucketType.channel)
     async def modlogs_list(self, ctx: MyContext, channel: Optional[discord.TextChannel]=None):
         """Show the full list of server logs type, or the list of enabled logs for a channel"""
@@ -192,6 +194,8 @@ class ServerLogs(commands.Cog):
         await ctx.send(embed=embed)
 
     @modlogs_main.command(name="enable", aliases=['add'])
+    @commands.guild_only()
+    @commands.check(checks.has_manage_guild)
     async def modlogs_enable(self, ctx: MyContext, logs: commands.Greedy[serverlog]):
         """Enable one or more logs in the current channel"""
         if len(logs) == 0:
@@ -217,6 +221,8 @@ class ServerLogs(commands.Cog):
         return await self.log_name_autocomplete(current, available_logs)
 
     @modlogs_main.command(name="disable", aliases=['remove'])
+    @commands.guild_only()
+    @commands.check(checks.has_manage_guild)
     async def modlogs_disable(self, ctx: MyContext, logs: commands.Greedy[serverlog]):
         """Disable one or more logs in the current channel"""
         if len(logs) == 0:
