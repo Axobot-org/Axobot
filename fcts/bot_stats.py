@@ -359,7 +359,7 @@ class BotStats(commands.Cog):
         """Get the sum of a certain variable in the last X minutes"""
         cnx = self.bot.cnx_frm
         cursor = cnx.cursor(dictionary=True)
-        cursor.execute('SELECT variable, SUM(value) as value, type FROM `statsbot`.`zbot` WHERE variable = %s AND date BETWEEN (DATE_SUB(UTC_TIMESTAMP(),INTERVAL %s MINUTE)) AND UTC_TIMESTAMP() AND beta=%s', (variable, minutes, self.bot.entity_id))
+        cursor.execute('SELECT variable, SUM(value) as value, type FROM `statsbot`.`zbot` WHERE variable = %s AND date BETWEEN (DATE_SUB(UTC_TIMESTAMP(),INTERVAL %s MINUTE)) AND UTC_TIMESTAMP() AND `entity_id`=%s', (variable, minutes, self.bot.entity_id))
         result: list[dict] = list(cursor)
         cursor.close()
         if len(result) == 0:
