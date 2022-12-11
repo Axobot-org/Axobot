@@ -370,8 +370,8 @@ class Zbot(commands.bot.AutoShardedBot):
         axo_member = guild.get_member(1048011651145797673)
         if axo_member is None:
             return False
-        if guild.id == 625316773771608074 and channel:
-            # if we're in the support server, check by channel instead
+        if guild.id in {625316773771608074, 356067272730607628} and channel:
+            # if we're in the staff or support server, check by channel instead
             return channel.permissions_for(axo_member).read_messages
         # else, don't bother and just return True
         return True
