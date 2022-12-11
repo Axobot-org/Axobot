@@ -923,13 +923,13 @@ class Xp(commands.Cog):
 
     async def clear_cards(self, all: bool=False):
         """Delete outdated rank cards"""
-        files =  os.listdir('../cards/global')
-        done = list()
+        files =  os.listdir('./assets/cards/')
+        done: set[str] = set()
         for f in sorted([f.split('-')+['./assets/cards/'+f] for f in files], key=operator.itemgetter(1), reverse=True):
             if all or f[0] in done:
                 os.remove(f[3])
             else:
-                done.append(f[0])
+                done.add(f[0])
 
 
     @commands.command(name='set_xp', aliases=["setxp", "set-xp"])
