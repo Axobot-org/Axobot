@@ -154,7 +154,7 @@ class FeedObject:
     "A feed record from the database"
     def __init__(self, from_dict: dict):
         self.feed_id: int = from_dict['ID']
-        self.added_at: datetime.datetime = from_dict['added_at']
+        self.added_at: datetime.datetime = from_dict['added_at'].replace(tzinfo=datetime.timezone.utc) if from_dict['added_at'] else from_dict['added_at']
         self.structure: str = from_dict['structure']
         self.guild_id: int = from_dict['guild']
         self.channel_id: int = from_dict['channel']
@@ -166,10 +166,19 @@ class FeedObject:
         self.embed_footer: str = from_dict['embed_footer']
         self.embed_title: str = from_dict['embed_title']
         self.embed_color: int = from_dict['embed_color']
-        self.last_update: Optional[datetime.datetime] = from_dict['last_update']
+        self.last_update: Optional[datetime.datetime] = from_dict['last_update'].replace(tzinfo=datetime.timezone.utc) if from_dict['last_update'] else from_dict['last_update']
+        self.last_refresh: Optional[datetime.datetime] = from_dict['last_refresh'].replace(tzinfo=datetime.timezone.utc) if from_dict['last_refresh'] else from_dict['last_refresh']
         self.recent_errors: int = from_dict['recent_errors']
-        self.is_active_guild: bool = bool(from_dict['active_guild'])
         self.enabled: bool = bool(from_dict['enabled'])
+    
+    def has_recently_been_refreshed(self):
+        if self.last_refresh is None:
+            return False
+        if self.last_refresh.tzinfo:
+            now = datetime.datetime.now(datetime.timezone.utc)
+        else:
+            now = datetime.datetime.utcnow()
+        return self.last_refresh > now - datetime.timedelta(days=7)
 
     @classmethod
     def unrecorded(cls, from_type: str, guild_id: Optional[int]=None, channel_id: Optional[int]=None):
@@ -188,6 +197,7 @@ class FeedObject:
             "embed_title": "",
             "embed_color": "",
             "last_update": None,
+            "last_refresh": None,
             "recent_errors": 0,
             "active_guild": True,
             "enabled": True
