@@ -1265,8 +1265,8 @@ class Rss(commands.Cog):
             async with self.bot.db_query(query, returnrowcount=True) as query_results:
                 return query_results
 
-    async def db_set_active_guilds(self, active_guild_ids: list[int]) -> int:
-        "Mark any guild in the list as an active guild, and every other as inactive (ie. the bot has no access to them anymore"
+    async def db_set_active_guilds(self, active_guild_ids: list[int]):
+        "Mark any guild in the list as an active guild, and every other as inactive (ie. the bot has no access to them anymore)"
         if self.bot.zombie_mode:
             return
         ids_list = ', '.join(map(str, active_guild_ids))
@@ -1275,7 +1275,8 @@ class Rss(commands.Cog):
             self.bot.log.info("[rss] set guild as inactive for %s feeds", query_results)
         query = f"UPDATE `{self.table}` SET `active_guild` = 1 WHERE `guild` IN ({ids_list})"
         async with self.bot.db_query(query, returnrowcount=True) as query_results:
-            return query_results
+            if query_results:
+                self.bot.log.info("[rss] set guild as active for %s feeds", query_results)
 
     async def send_rss_msg(self, obj: "RssMessage", channel: Union[discord.TextChannel, discord.Thread], roles: list[str], send_stats):
         "Send a RSS message into its Discord channel, with the corresponding mentions"
