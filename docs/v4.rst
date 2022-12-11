@@ -14,11 +14,11 @@ Without further ado, here is the almost exhaustive list of changes made by V4:
 New identity!!!
 ---------------
 
-Yes, you read that right! We're going to take advantage of V4 to change Zbot's identity!
+Yes, you read that right! We're going to take advantage of V4 and the migration to slash commands to change Zbot's identity!
 
-In the next few weeks, Zbot will gradually become Axobot, a slightly cuter bot based on the axolotl. This means a change of name, avatar and colors! To let users get used to it smoothly, we'll spread out these changes as much as possible, starting with the bot's name on Discord and a warning on the documentation homepage.
+In the next year (2023), Zbot will be gradually replaced by Axobot, a slightly cuter bot based on the axolotl. This means a change of name, avatar and colors! To let users get used to it smoothly, we'll keep Zbot online for a year, but Axobot will have quicker updates and be more advertised, to make sure no one miss it! You can invite it at any time by using the following URL: https://zrunner.me/invite-zbot !
 
-If you want to know the reasons for this change and get a preview of the new avatar, join the `bot's Discord server <https://discord.gg/N55zY88>`__ now and read the latest announcements!
+If you want to know the reasons for this change and tell us what you think about it, join the `bot's Discord server <https://discord.gg/N55zY88>`__ right now!
 
 
 What's new
