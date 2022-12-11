@@ -238,14 +238,13 @@ ORDER BY usages DESC LIMIT %(limit)s"""
 
         ..Doc infos.html#bot-invite"""
         raw_oauth = "<" + discord.utils.oauth_url(self.bot.user.id) + ">"
+        url = "https://zrunner.me/" + ("invitezbot" if self.bot.entity_id == 0 else "invite-axobot")
         try:
-            r = requests.get("https://zrunner.me/invitezbot", timeout=3)
+            r = requests.get(url, timeout=3)
         except requests.exceptions.Timeout:
             url = raw_oauth
         else:
-            if r.status_code < 400:
-                url = "https://zrunner.me/invitezbot"
-            else:
+            if r.status_code >= 400:
                 url = raw_oauth
         cmd = await self.bot.get_command_mention("about")
         await ctx.send(await self.bot._(ctx.channel, "info.botinvite", url=url, about=cmd))
