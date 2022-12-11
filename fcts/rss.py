@@ -54,7 +54,6 @@ class Rss(commands.Cog):
         self.file = "rss"
         self.embed_color = discord.Color(6017876)
         self.loop_processing = False
-        self.last_update = None
         self.errors_treshold = 24 * 3 # max errors allowed before disabling a feed (24h)
 
         self.youtube_rss = YoutubeRSS(self.bot)
@@ -409,12 +408,14 @@ class Rss(commands.Cog):
                     embed.add_field(name=self.bot.zws, value=text, inline=False)
                 await ctx.send(embed=embed)
                 feeds_to_display.clear()
+            # last post date
             if isinstance(feed.date, datetime.datetime):
                 last_date = f"<t:{feed.date.timestamp():.0f}>"
             elif isinstance(feed.date, str):
                 last_date = feed.date
             else:
                 last_date = await self.bot._(ctx.guild.id, "misc.none")
+            # append data
             feeds_to_display.append(translation.format(
                 emoji=feed.get_emoji(self.bot.emojis_manager),
                 channel=channel,
@@ -1195,7 +1196,7 @@ class Rss(commands.Cog):
             form = ''
         else:
             form = await self.bot._(guild_id, f"rss.{_type}-default-flow")
-        query = "INSERT INTO `{}` (`ID`, `guild`, `channel`, `type`, `link`, `structure`) VALUES (%(i)s, %(g)s, %(c)s %(t)s, %(l)s, %(f)s)".format(self.table)
+        query = "INSERT INTO `{}` (`ID`, `guild`, `channel`, `type`, `link`, `structure`) VALUES (%(i)s, %(g)s, %(c)s, %(t)s, %(l)s, %(f)s)".format(self.table)
         async with self.bot.db_query(query, { 'i': feed_id, 'g': guild_id, 'c': channel_id, 't': _type, 'l': link, 'f': form }):
             pass
         return feed_id
@@ -1266,7 +1267,7 @@ class Rss(commands.Cog):
                 return query_results
 
     async def db_set_active_guilds(self, active_guild_ids: list[int]):
-        "Mark any guild in the list as an active guild, and every other as inactive (ie. the bot has no access to them anymore)"
+        "DEPRECATED - Mark any guild in the list as an active guild, and every other as inactive (ie. the bot has no access to them anymore)"
         if self.bot.zombie_mode:
             return
         ids_list = ', '.join(map(str, active_guild_ids))
@@ -1277,6 +1278,15 @@ class Rss(commands.Cog):
         async with self.bot.db_query(query, returnrowcount=True) as query_results:
             if query_results:
                 self.bot.log.info("[rss] set guild as active for %s feeds", query_results)
+
+    async def db_set_last_refresh(self, feed_ids: list[int]):
+        "Update the last_refresh field for the given feed IDs"
+        if self.bot.zombie_mode:
+            return
+        ids_list = ', '.join(map(str, feed_ids))
+        query = f"UPDATE `{self.table}` SET `last_refresh` = %s WHERE `ID` IN ({ids_list})"
+        async with self.bot.db_query(query, (datetime.datetime.utcnow(),), returnrowcount=True) as query_results:
+            self.bot.log.info("[rss] set last refresh for %s feeds", query_results)
 
     async def send_rss_msg(self, obj: "RssMessage", channel: Union[discord.TextChannel, discord.Thread], roles: list[str], send_stats):
         "Send a RSS message into its Discord channel, with the corresponding mentions"
@@ -1343,7 +1353,7 @@ class Rss(commands.Cog):
                 for obj in objs[:self.max_messages]:
                     # if the guild was marked as inactive (ie the bot wasn't there in the previous loop),
                     #  mark the feeds as completed but do not send any message, to avoid spamming channels
-                    if feed.is_active_guild:
+                    if feed.has_recently_been_refreshed():
                         # if we can't post messages: abort
                         if not chan.permissions_for(guild.me).send_messages:
                             self.bot.dispatch("server_warning", ServerWarningType.RSS_MISSING_TXT_PERMISSION, guild, channel=chan, feed_id=feed.feed_id)
@@ -1363,7 +1373,7 @@ class Rss(commands.Cog):
             else:
                 return True
         except Exception as err:
-            error_msg = f"Erreur rss sur le flux {feed.link} (type {feed.type} - salon {feed.channel_id} - id {feed.feed_id})"
+            error_msg = f"Erreur rss sur le flux {feed.feed_id} (type {feed.type} - salon {feed.channel_id} - id {feed.feed_id})"
             self.bot.dispatch("error", err, error_msg)
             return False
 
@@ -1429,7 +1439,8 @@ class Rss(commands.Cog):
             if statscog := self.bot.get_cog("BotStats"):
                 statscog.rss_stats["checked"] = checked_count
                 statscog.rss_stats["errors"] = len(errors_ids)
-            await self.db_set_active_guilds(set(feed.guild_id for feed in feeds_list))
+            # await self.db_set_active_guilds(set(feed.guild_id for feed in feeds_list))
+            await self.db_set_last_refresh(set(feed.feed_id for feed in feeds_list))
         if len(errors_ids) > 0:
             desc.append(f"{len(errors_ids)} errors: {' '.join(str(x) for x in errors_ids)}")
             # update errors count in database
