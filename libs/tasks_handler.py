@@ -35,7 +35,8 @@ class TaskHandler:
                     if get_all:
                         events.append(row)
                     else:
-                        if id_only or (row['begin'] + datetime.timedelta(seconds=row['duration'])) < datetime.datetime.utcnow():
+                        now = self.bot.utcnow() if row["begin"].tzinfo else datetime.datetime.utcnow()
+                        if id_only or (row['begin'] + datetime.timedelta(seconds=row['duration'])) < now:
                             events.append(row)
             return events
         except Exception as err:  # pylint: disable=broad-except
