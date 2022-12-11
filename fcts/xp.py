@@ -846,7 +846,7 @@ class Xp(commands.Cog):
             txt.append('{} • **{} |** `lvl {}` **|** `xp {}`'.format(i,"__"+user_name+"__" if user==ctx.author else user_name,l[0],xp))
         return txt,i
 
-    @commands.command(name='top')
+    @commands.command(name="top")
     @commands.bot_has_permissions(send_messages=True)
     @commands.cooldown(5,60,commands.BucketType.user)
     async def top(self, ctx: MyContext, page: typing.Optional[int]=1, scope: args.LeaderboardType='global'):
@@ -874,7 +874,7 @@ class Xp(commands.Cog):
                 ranks = sorted([{'userID':key, 'xp':value[1]} for key,value in self.cache['global'].items()], key=lambda x:x['xp'], reverse=True)
                 max_page = ceil(len(self.cache['global'])/20)
             elif scope == 'guild':
-                ranks = await self.bdd_get_top(10000,guild=ctx.guild)
+                ranks = await self.bdd_get_top(10000, guild=ctx.guild)
                 max_page = ceil(len(ranks)/20)
         else:
             #ranks = await self.bdd_get_top(20*page,guild=ctx.guild)
@@ -884,6 +884,8 @@ class Xp(commands.Cog):
             max_page = ceil(len(ranks)/20)
         if page < 1:
             return await ctx.send(await self.bot._(ctx.channel, "xp.low-page"))
+        elif max_page == 0:
+            return await ctx.send(await self.bot._(ctx.channel, "xp.no-rank"))
         elif page > max_page:
             return await ctx.send(await self.bot._(ctx.channel, "xp.high-page"))
         ranks = ranks[(page-1)*20:]

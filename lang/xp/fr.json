@@ -132,6 +132,7 @@
     "low-page": "Impossible d'afficher un numéro de page négatif !",
     "negative-xp": "Vous ne pouvez pas mettre un nombre d'xp négatif !",
     "no-bot": "Impossible de modifier l'XP d'un bot !",
+    "no-rank": "Personne n'a encore obtenu d'xp, réessayez plus tard !",
     "no-rr": "Aucun rôle n'a été configuré pour ce niveau",
     "no-rr-2": "Vous n'avez aucun rôle-récompense configuré !",
     "rr-added": "Le rôle %{role} a correctement été ajouté pour le niveau %{level} !",
