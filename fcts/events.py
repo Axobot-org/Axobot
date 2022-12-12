@@ -24,7 +24,6 @@ class Events(commands.Cog):
         self.partner_last_check = datetime.datetime.utcfromtimestamp(0)
         self.last_eventDay_check = datetime.datetime.utcfromtimestamp(0)
         self.statslogs_last_push = datetime.datetime.utcfromtimestamp(0)
-        self.last_statusio = datetime.datetime.utcfromtimestamp(0)
         self.loop_errors = [0,datetime.datetime.utcfromtimestamp(0)]
         self.last_membercounter = datetime.datetime.utcfromtimestamp(0)
         self.embed_colors = {"welcome":5301186,
