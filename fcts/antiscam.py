@@ -157,7 +157,7 @@ class AntiScam(commands.Cog):
             pred_title = self.agent.categories[predicted.result].title()
             pred_value = round(
                 predicted.probabilities[predicted.result]*100, 2)
-            emb.add_field(name="According to Zbot",
+            emb.add_field(name=f"According to {self.bot.user.name}",
                           value=f'{pred_title} ({pred_value}%)')
         return emb
 

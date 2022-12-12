@@ -31,7 +31,7 @@ def cleanup_code(content: str):
     return content.strip('` \n')
 
 class Admin(commands.Cog):
-    """Here are listed all commands related to the internal administration of the bot. Most of them are not accessible to users, but only to ZBot administrators."""
+    """Here are listed all commands related to the internal administration of the bot. Most of them are not accessible to users, but only to the bot administrators."""
 
     def __init__(self, bot: Zbot):
         self.bot = bot
@@ -95,7 +95,7 @@ class Admin(commands.Cog):
     @discord.app_commands.default_permissions(administrator=True)
     @commands.check(checks.is_bot_admin)
     async def main_msg(self, ctx: MyContext):
-        """Commandes réservées aux administrateurs de ZBot"""
+        """Commandes réservées aux administrateurs du bot"""
         if ctx.subcommand_passed is None:
             text = "Liste des commandes disponibles :"
             for cmd in sorted(ctx.command.commands, key=lambda x:x.name):
@@ -455,7 +455,7 @@ class Admin(commands.Cog):
 
     @acached(timeout=3600)
     async def get_databases_names(self) -> list[str]:
-        "Get every database names visible for Zbot"
+        "Get every database names visible for the bot"
         query = "SHOW DATABASES"
         async with self.bot.db_query(query, astuple=True) as query_results:
             print(query_results)
@@ -750,7 +750,7 @@ Cette option affecte tous les serveurs"""
         Il est nécessaire d'avoir au moins 10 membres pour que le rôle soit ajouté"""
         server = self.bot.get_guild(356067272730607628)
         if server is None:
-            await ctx.send("Serveur ZBot introuvable")
+            await ctx.send("Serveur de support introuvable")
             return
         role = server.get_role(486905171738361876)
         if role is None:

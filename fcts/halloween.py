@@ -64,9 +64,9 @@ A BIG thanks to the Project Blurple and their original code for the colorization
 
 ..Example halloween lightfy ++more-dark-halloween ++more-dark-halloween ++more-white ++less-halloween
 
-..Example halloween darkfy @Zbot
+..Example halloween darkfy @Axobot
 
-..Example halloween check light Zbot
+..Example halloween check light Axobot
 
 ..Example halloween check dark
 

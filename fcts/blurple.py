@@ -91,9 +91,9 @@ Online editor: https://projectblurple.com/paint
 
 ..Example b  blurplefy ++more-dark-blurple ++more-dark-blurple ++more-white ++less-blurple
 
-..Example b darkfy @Zbot
+..Example b darkfy @Axobot
 
-..Example blurple check light Zbot
+..Example blurple check light Axobot
 
 ..Example b check dark"""
         if ctx.subcommand_passed is None:

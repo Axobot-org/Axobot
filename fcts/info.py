@@ -37,7 +37,7 @@ async def in_support_server(ctx):
     return ctx.guild is not None and ctx.guild.id == 625316773771608074
 
 class Info(commands.Cog):
-    """Here you will find various useful commands to get information about ZBot."""
+    "Here you will find various useful commands to get information about anything"
 
     def __init__(self, bot: Zbot):
         self.bot = bot
@@ -56,7 +56,7 @@ class Info(commands.Cog):
 
     @commands.command(name='admins')
     async def admin_list(self, ctx: MyContext):
-        """Get the list of ZBot administrators
+        """Get the list of the bot administrators
 
         ..Doc miscellaneous.html#admins"""
         l  = []
@@ -67,7 +67,7 @@ class Info(commands.Cog):
         await ctx.send(await self.bot._(ctx.channel,"info.admins-list", admins=", ".join(l)))
 
     async def get_guilds_count(self, ignored_guilds:list=None) -> int:
-        """Get the number of guilds where Zbot is"""
+        """Get the number of guilds where the bot is"""
         if ignored_guilds is None:
             if self.bot.database_online:
                 if 'banned_guilds' not in self.bot.get_cog('Utilities').config.keys():

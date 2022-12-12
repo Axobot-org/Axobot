@@ -19,7 +19,7 @@ sys.path.insert(0, os.path.abspath('.'))
 
 # -- Project information -----------------------------------------------------
 
-project = 'ZBot'
+project = 'Axobot'
 copyright = '2019 - 2022, ZRunner'
 author = 'ZRunner'
 

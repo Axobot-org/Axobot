@@ -5,7 +5,7 @@
     "embed-edited": "L'embed et les réactions ont bien été mises à jour",
     "no-rr": "Aucun rôle n'est lié à cet émoji",
     "not-zbot-embed": "Ce message ne contient pas d'embed de roles-reactions",
-    "not-zbot-msg": "Ce message n'est pas celui de Zbot",
+    "not-zbot-msg": "Ce message ne vient pas de moi !",
     "reactions-edited": "Les réactions ont bien été mises à jour",
     "role-given": "Le rôle %{r} a bien été donné",
     "role-lost": "Le rôle %{r} a bien été retiré",

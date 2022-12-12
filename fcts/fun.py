@@ -63,13 +63,14 @@ class Fun(commands.Cog):
     def utilities(self) -> 'Utilities':
         return self.bot.get_cog("Utilities")
 
-    async def is_on_guild(self, user: discord.Member, guild: int):
+    async def is_on_guild(self, user: discord.Member, guild_id: int):
         "Check if a member is part of a guild"
         if self.bot.user.id == 436835675304755200:
             return True
+        # Zrunner, someone, Awhikax
         if user.id in {279568324260528128, 392766377078816789, 281404141841022976}:
             return True
-        server = self.bot.get_guild(guild)
+        server = self.bot.get_guild(guild_id)
         if server is not None:
             return user in server.members
         return False
