@@ -297,7 +297,7 @@ class Events(commands.Cog):
 
 
     async def check_user_left(self, member: discord.Member):
-        """Vérifie si un joueur a été banni ou kick par ZBot"""
+        "Check if someone has been kicked or banned by the bot"
         try:
             async for entry in member.guild.audit_logs(user=member.guild.me, limit=15):
                 if entry.created_at < self.bot.utcnow()-datetime.timedelta(seconds=60):
