@@ -40,7 +40,7 @@ class RolesReact(commands.Cog):
         except Exception as e:
             self.bot.log.warning(f"Could not fetch roles-reactions message {payload.message_id} in guild {payload.guild_id}: {e}")
             return None, None
-        if len(msg.embeds) == 0 or msg.embeds[0].footer.text != self.footer_txt or msg.author.id != self.bot.user.id:
+        if len(msg.embeds) == 0 or msg.embeds[0].footer.text != self.footer_txt:
             return None, None
         temp = await self.rr_list_role(payload.guild_id, payload.emoji.id if payload.emoji.is_custom_emoji() else payload.emoji.name)
         if len(temp) == 0:
