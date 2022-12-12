@@ -179,12 +179,12 @@ class Partners(commands.Cog):
             try:
                 msg = await channel.fetch_message(partner['messageID'])
                 await msg.edit(embed=emb)
-            except discord.errors.NotFound:
+            except (discord.errors.NotFound, discord.errors.Forbidden):
                 msg = await channel.send(embed=emb)
-                await self.db_edit_partner(partnerID=partner['ID'],msg=msg.id)
+                await self.db_edit_partner(partnerID=partner['ID'], msg=msg.id)
             except Exception as err:
                 msg = await channel.send(embed=emb)
-                await self.db_edit_partner(partnerID=partner['ID'],msg=msg.id)
+                await self.db_edit_partner(partnerID=partner['ID'], msg=msg.id)
                 self.bot.dispatch("error", err)
             count += 1
         await session.close()
