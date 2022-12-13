@@ -1,5 +1,6 @@
 from datetime import datetime
 import math
+import re
 import typing
 import aiohttp
 
@@ -44,6 +45,7 @@ class BotStats(commands.Cog):
         self.ticket_events = {"creation": 0}
         self.usernames = {"guild": 0, "user": 0, "deleted": 0}
         self.emitted_serverlogs: dict[str, int] = {}
+        self.last_backup_size: typing.Optional[int] = None
 
     async def cog_load(self):
          # pylint: disable=no-member
@@ -154,6 +156,18 @@ class BotStats(commands.Cog):
     async def on_serverlog(self, guild_id: int, channel_id: int, log_type: str):
         "Called when a serverlog is emitted"
         self.emitted_serverlogs[log_type] = self.emitted_serverlogs.get(log_type, 0) + 1
+
+
+    @commands.Cog.listener()
+    async def on_message(self, message: discord.Message):
+        "Collect the last backup size from the logs channel"
+        if message.channel.id != 625316773771608074 or len(message.embeds) != 1:
+            return
+        embed = message.embeds[0]
+        if match := re.search(r"Database backup done! \((\d+(?:\.\d+)?)([GM])\)", embed.description):
+            unit = match.group(2)
+            self.last_backup_size = float(match.group(1)) / (1024 if unit == "M" else 1)
+            self.bot.log.info(f"Last backup size detected: {self.last_backup_size}G")
 
     async def db_get_disabled_rss(self) -> int:
         "Count the number of disabled RSS feeds in any guild"
@@ -339,6 +353,10 @@ class BotStats(commands.Cog):
             for k, v in self.emitted_serverlogs.items():
                 cursor.execute(query, (now, f'logs.{k}.emitted', v, 0, 'event/min', True, self.bot.entity_id))
             self.emitted_serverlogs.clear()
+            # Last backup save
+            if self.last_backup_size:
+                cursor.execute(query, (now, 'backup.size', self.last_backup_size, 1, 'Gb', False, self.bot.entity_id))
+                self.last_backup_size = None
             # Push everything
             cnx.commit()
         except mysql.connector.errors.IntegrityError as err: # usually duplicate primary key
