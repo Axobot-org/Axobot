@@ -200,25 +200,32 @@ class ServerLogs(commands.Cog):
         await ctx.send(embed=embed)
 
     @modlogs_main.command(name="enable", aliases=['add'])
+    @app_commands.describe(channel="The channel to add logs to. Leave empty to select the current channel")
     @commands.guild_only()
     @commands.check(checks.has_manage_guild)
-    async def modlogs_enable(self, ctx: MyContext, logs: commands.Greedy[serverlog]):
+    async def modlogs_enable(self, ctx: MyContext, logs: commands.Greedy[serverlog], channel: Optional[discord.TextChannel]=None):
         """Enable one or more logs in the current channel
 
         ..Example modlogs enable ban bot_warnings
 
+        ..Example modlogs enable role_creation bot_warnings #mod-logs
+
         ..Doc moderator.html#how-to-setup-logs"""
         if len(logs) == 0:
             raise commands.BadArgument('Invalid server log type')
+        dest_channel = channel or ctx.channel
         if 'all' in logs:
             logs = list(self.available_logs())
         actually_added: list[str] = []
         for log in logs:
-            if await self.db_add(ctx.guild.id, ctx.channel.id, log):
+            if await self.db_add(ctx.guild.id, dest_channel.id, log):
                 actually_added.append(log)
         if actually_added:
-            msg = await self.bot._(ctx.guild.id, "serverlogs.enabled", kind=', '.join(actually_added))
-            if not ctx.channel.permissions_for(ctx.guild.me).embed_links:
+            if dest_channel == ctx.channel:
+                msg = await self.bot._(ctx.guild.id, "serverlogs.enabled.current", kind=', '.join(actually_added))
+            else:
+                msg = await self.bot._(ctx.guild.id, "serverlogs.enabled.other", kind=', '.join(actually_added), channel=dest_channel.mention)
+            if not dest_channel.permissions_for(ctx.guild.me).embed_links:
                 msg += "\n:warning: " + await self.bot._(ctx.guild.id, "serverlogs.embed-warning")
         else:
             msg = await self.bot._(ctx.guild.id, "serverlogs.none-added")
@@ -226,41 +233,56 @@ class ServerLogs(commands.Cog):
 
     @modlogs_enable.autocomplete("logs")
     async def _modlogs_enable_autocomplete(self, interaction: discord.Interaction, current: str):
-        actived_logs = await self.db_get_from_channel(interaction.guild_id, interaction.channel_id)
+        if channel := interaction.namespace.channel:
+            channel_id: int = channel.id
+        else:
+            channel_id = interaction.channel_id
+        actived_logs = await self.db_get_from_channel(interaction.guild_id, channel_id)
         available_logs = self.available_logs() - set(actived_logs)
         return await self.log_name_autocomplete(current, available_logs)
 
     @modlogs_main.command(name="disable", aliases=['remove'])
+    @app_commands.describe(channel="The channel to remove logs from. Leave empty to select the current channel")
     @commands.guild_only()
     @commands.check(checks.has_manage_guild)
-    async def modlogs_disable(self, ctx: MyContext, logs: commands.Greedy[serverlog]):
+    async def modlogs_disable(self, ctx: MyContext, logs: commands.Greedy[serverlog], channel: Optional[discord.TextChannel]=None):
         """Disable one or more logs in the current channel
 
         ..Example modlogs disable ban message_delete
+
+        ..Example modlogs disable ghost_ping #mod-logs
 
         ..Doc moderator.html#how-to-setup-logs"""
         if len(logs) == 0:
             raise commands.BadArgument('Invalid server log type')
         if 'all' in logs:
             logs = list(self.available_logs())
+        dest_channel = channel or ctx.channel
         actually_removed: list[str] = []
         for log in logs:
-            if await self.db_remove(ctx.guild.id, ctx.channel.id, log):
+            if await self.db_remove(ctx.guild.id, dest_channel.id, log):
                 actually_removed.append(log)
         if actually_removed:
-            msg = await self.bot._(ctx.guild.id, "serverlogs.disabled", kind=', '.join(actually_removed))
+            if dest_channel == ctx.channel:
+                msg = await self.bot._(ctx.guild.id, "serverlogs.disabled.current", kind=', '.join(actually_removed))
+            else:
+                msg = await self.bot._(ctx.guild.id, "serverlogs.disabled.other", kind=', '.join(actually_removed), channel=dest_channel.mention)
         else:
             msg = await self.bot._(ctx.guild.id, "serverlogs.none-removed")
         await ctx.send(msg)
     
     @modlogs_disable.autocomplete("logs")
     async def _modlogs_disable_autocomplete(self, interaction: discord.Interaction, current: str):
-        actived_logs = await self.db_get_from_channel(interaction.guild_id, interaction.channel_id)
+        if channel := interaction.namespace.channel:
+            channel_id: int = channel.id
+        else:
+            channel_id = interaction.channel_id
+        actived_logs = await self.db_get_from_channel(interaction.guild_id, channel_id)
         return await self.log_name_autocomplete(current, actived_logs)
 
     async def log_name_autocomplete(self, current: str, available_logs: Optional[list[str]]=None):
         "Autocompletion for log names"
-        all_logs = available_logs or list(self.available_logs())
+        all_logs = list(self.available_logs()) if available_logs is None else  available_logs
         filtered = sorted(
             (not option.startswith(current), option)
             for option in all_logs
