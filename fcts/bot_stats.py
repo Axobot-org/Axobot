@@ -161,7 +161,7 @@ class BotStats(commands.Cog):
     @commands.Cog.listener()
     async def on_message(self, message: discord.Message):
         "Collect the last backup size from the logs channel"
-        if message.channel.id != 625316773771608074 or len(message.embeds) != 1:
+        if message.channel.id != 625319946271850537 or len(message.embeds) != 1:
             return
         embed = message.embeds[0]
         if match := re.search(r"Database backup done! \((\d+(?:\.\d+)?)([GM])\)", embed.description):
