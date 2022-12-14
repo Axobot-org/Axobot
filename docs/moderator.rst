@@ -231,7 +231,7 @@ To help you moderate your server and keep track of what's going on, Zbot has a l
 How to setup logs
 -----------------
 
-You can enable one or more logs types in a channel by using the :code:`modlogs enable <logs>` in the channel you want them to appear in. In the same way, use :code:`modlogs disable <logs>` to disable a kind of logs in the current channel. Please note that you can use the keyword "all" as a log type to enable or disable all at the same time.
+You can enable one or more logs types in a channel by using the :code:`modlogs enable <logs> [channel]` in the channel you want them to appear in (or in another channel by mentionning it). In the same way, use :code:`modlogs disable <logs> [channel]` to disable a kind of logs in the current channel. Please note that you can use the keyword "all" as a log type to enable or disable all at the same time.
 
 To see in Discord which logs exists and which ones you have enabled in your server, use the command :code:`modlogs list`. You can also use this command followed by a channel mention or ID to see which logs are enabled in a specific channel.
 

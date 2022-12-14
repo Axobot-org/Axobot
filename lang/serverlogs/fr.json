@@ -8,9 +8,15 @@
         "roles": "Rôles",
         "tickets": "Tickets"
     },
-    "disabled": "Les logs de type %{kind} ne seront plus envoyés dans ce salon",
+    "disabled": {
+        "current": "Les logs de type %{kind} ne seront plus envoyés dans ce salon",
+        "other": "Les logs de type %{kind} ne seront plus envoyés dans %{channel}"
+    },
     "embed-warning": "Pour envoyer les logs, le bot a besoin de la permission \"Intégrer les liens\" !",
-    "enabled": "Les logs de type %{kind} seront désormais envoyés dans ce salon",
+    "enabled": {
+        "current": "Les logs de type %{kind} seront désormais envoyés dans ce salon",
+        "other": "Les logs de type %{kind} seront désormais envoyés dans %{channel}"
+    },
     "list": {
         "all": "Liste des logs utilisables",
         "channel": "Liste des logs utilisés dans %{channel}",
