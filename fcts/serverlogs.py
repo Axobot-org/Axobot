@@ -149,7 +149,9 @@ class ServerLogs(commands.Cog):
     @commands.check(checks.has_manage_guild)
     @commands.cooldown(2, 6, commands.BucketType.guild)
     async def modlogs_main(self, ctx: MyContext):
-        """Enable or disable server logs in specific channels"""
+        """Enable or disable server logs in specific channels
+
+        ..Doc moderator.html#server-logs"""
         if ctx.subcommand_passed is None:
             await ctx.send_help(ctx.command)
 
@@ -159,7 +161,11 @@ class ServerLogs(commands.Cog):
     @commands.check(checks.has_manage_guild)
     @commands.cooldown(1, 10, commands.BucketType.channel)
     async def modlogs_list(self, ctx: MyContext, channel: Optional[discord.TextChannel]=None):
-        """Show the full list of server logs type, or the list of enabled logs for a channel"""
+        """Show the full list of server logs type, or the list of enabled logs for a channel
+
+        ..Example modlogs list
+
+        ..Doc moderator.html#how-to-setup-logs"""
         if channel:  # display logs enabled for this channel only
             title = await self.bot._(ctx.guild.id, "serverlogs.list.channel", channel='#'+channel.name)
             if channel_logs := await self.db_get_from_channel(ctx.guild.id, channel.id):
@@ -197,7 +203,11 @@ class ServerLogs(commands.Cog):
     @commands.guild_only()
     @commands.check(checks.has_manage_guild)
     async def modlogs_enable(self, ctx: MyContext, logs: commands.Greedy[serverlog]):
-        """Enable one or more logs in the current channel"""
+        """Enable one or more logs in the current channel
+
+        ..Example modlogs enable ban bot_warnings
+
+        ..Doc moderator.html#how-to-setup-logs"""
         if len(logs) == 0:
             raise commands.BadArgument('Invalid server log type')
         if 'all' in logs:
@@ -224,7 +234,11 @@ class ServerLogs(commands.Cog):
     @commands.guild_only()
     @commands.check(checks.has_manage_guild)
     async def modlogs_disable(self, ctx: MyContext, logs: commands.Greedy[serverlog]):
-        """Disable one or more logs in the current channel"""
+        """Disable one or more logs in the current channel
+
+        ..Example modlogs disable ban message_delete
+
+        ..Doc moderator.html#how-to-setup-logs"""
         if len(logs) == 0:
             raise commands.BadArgument('Invalid server log type')
         if 'all' in logs:
@@ -256,6 +270,7 @@ class ServerLogs(commands.Cog):
             app_commands.Choice(name=value[1], value=value[1])
             for value in filtered
         ][:25]
+
 
     @commands.Cog.listener()
     async def on_raw_message_edit(self, msg: discord.RawMessageUpdateEvent):
