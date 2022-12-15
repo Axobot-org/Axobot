@@ -35,5 +35,6 @@
     "rolenotfound": "Impossible de trouver le rôle `%{r}`",
     "toomanytxtchan": "Vous avez trop de salons textuels accessibles",
     "unknown": "Oups, une erreur est survenue :confused: Réessayez plus tard, ou contactez le support (commande `about`).",
-    "usernotfound": "Impossible de trouver l'utilisateur `%{u}` :confused:"
+    "usernotfound": "Impossible de trouver l'utilisateur `%{u}` :confused:",
+    "zbot-migration": "Ce serveur utilise désormais Axobot, la nouvelle identité de Zbot. Si vous avez besoin d'aide pour la migration, n'hésitez pas à nous demander à <%{invite}> !"
 }
