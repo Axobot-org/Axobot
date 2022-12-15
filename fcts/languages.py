@@ -70,7 +70,7 @@ class Languages(discord.ext.commands.Cog):
             else:
                 used_langs = await self.bot.get_cog('Utilities').get_languages(recipient, limit=1)
                 lang_opt = used_langs[0][0] if len(used_langs) > 0 else self.default_language
-        else:
+        elif isinstance(source, int):
             # get lang from server ID
             lang_id = await self.bot.get_config(source, "language")
             if lang_id is None:
@@ -78,6 +78,8 @@ class Languages(discord.ext.commands.Cog):
             else:
                 lang_opt = self.languages[lang_id]
                 self.serv_opts[source] = lang_opt
+        else:
+            raise TypeError(f"Unknown type for translation source: {type(source)}")
         if lang_opt not in self.languages:
             # if lang not known: fallback to default
             lang_opt = self.default_language
