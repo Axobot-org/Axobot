@@ -102,7 +102,8 @@ Arguments are:
 ..Doc server.html#server-backup"""
         try:
             data = await self.create_backup(ctx)
-            await ctx.send(await self.bot._(ctx.guild.id, "s_backup.backup-done"),file=discord.File(BytesIO(data.encode()), filename=f"backup-{ctx.guild.id}.json"))
+            file = discord.File(BytesIO(data.encode()), filename=f"backup-{ctx.guild.id}.json")
+            await ctx.send(await self.bot._(ctx.guild.id, "s_backup.backup-done"), file=file)
         except Exception as e:
             await ctx.bot.get_cog('Errors').on_command_error(ctx,e)
 
