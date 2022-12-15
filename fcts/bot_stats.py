@@ -151,7 +151,7 @@ class BotStats(commands.Cog):
         if ctx.interaction:
             self.app_commands_uses[name] = self.app_commands_uses.get(name, 0) + 1
             self.received_events['SLASH_CMD_USE'] = self.received_events.get('SLASH_CMD_USE', 0) + 1
-    
+
     @commands.Cog.listener()
     async def on_serverlog(self, guild_id: int, channel_id: int, log_type: str):
         "Called when a serverlog is emitted"
