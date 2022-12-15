@@ -125,5 +125,30 @@
             ],
             "probability": 0.05
         }
+    },
+    "christmas-2022": {
+        "begin": "2022-12-25",
+        "end": "2023-01-02",
+        "type": "christmas",
+        "icon": "https://zrunner.me/cdn/christmas_banner_2022.png",
+        "color": 4886759,
+        "objectives": [],
+        "emojis": {
+            "reactions_list": [
+                "❄",
+                "⛇",
+                "🎅",
+                "🎄",
+                "🎁"
+            ],
+            "triggers": [
+                "christmas",
+                "present",
+                "noël",
+                "xmas",
+                "snowflake"
+            ],
+            "probability": 0.05
+        }
     }
 }

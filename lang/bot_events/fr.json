@@ -1,7 +1,12 @@
 {
+    "christmas": {
+        "already-collected": "Vous avez déjà reçu votre cadeau de Noël ! Profitez de vos cadeaux et prenez soin de vous !",
+        "collected": "Tu as récupéré ta carte de Noël 2022!\nEssaie la commande %{cmd} (style \"christmas22\") pour commencer à l'utiliser !"
+    },
     "events-price-title": "Prix à gagner",
     "nothing-desc": "Il n'y a actuellement aucun événement. Suivez les news du bot pour connaître la date du prochain !",
     "nothing-prices": "Il n'y a rien à gagner pour cet événement :confused:",
+    "no-objectives": "Cet événement n’a aucun objectif de points, pas besoin de farm pour une fois !\nConsultez la commande %{cmd} pour plus d’informations.",
     "objectives": "Objectifs",
     "points": "points",
     "position-global": "Position mondiale",

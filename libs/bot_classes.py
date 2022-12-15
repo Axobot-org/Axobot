@@ -106,6 +106,7 @@ class Zbot(commands.bot.AutoShardedBot):
         self.emojis_manager = EmojisManager(self)
         # app commands
         self.tree.on_error = self.on_app_cmd_error
+        self.app_commands_list: Optional[list[discord.app_commands.AppCommand]] = None
 
     async def on_error(self, event_method: Union[Exception, str], *_args, **_kwargs):
         "Called when an event raises an uncaught exception"
