@@ -35,5 +35,6 @@
     "rolenotfound": "Unable to find the role `%{r}`",
     "toomanytxtchan": "You have too many accessible text channels",
     "unknown": "Oops, an error occurred :confused: Try again later, or contact support (command `about`).",
-    "usernotfound": "Unable to find the user `%{u}` :confused:"
+    "usernotfound": "Unable to find the user `%{u}` :confused:",
+    "zbot-migration": "This server now use Axobot, the new identity of Zbot. If you need help with the migration, don't hesitate to ask us at <%{invite}>!"
 }
