@@ -627,7 +627,7 @@ Every information come from the website www.fr-minecraft.net"""
                 return False
             self.feeds[feed.link] = obj
         try:
-            channel = guild.get_channel(feed.channel_id)
+            channel = guild.get_channel_or_thread(feed.channel_id)
             if channel is None:
                 self.bot.log.warn("[minecraft feed] Cannot find channel %s in guild %s", feed.channel_id, feed.guild_id)
                 return False

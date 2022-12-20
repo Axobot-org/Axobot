@@ -444,8 +444,8 @@ class Rss(commands.Cog):
             # formatted feed type name
             tr_type = await self.bot._(guild.id, "rss."+feed.type)
             # formatted channel
-            if channel := guild.get_channel(feed.channel_id):
-                tr_channel = "#"+channel.name
+            if channel := guild.get_channel_or_thread(feed.channel_id):
+                tr_channel = channel.mention
             else:
                 tr_channel = "#deleted"
             # better name format (for Twitter/YouTube ID)

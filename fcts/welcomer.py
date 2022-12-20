@@ -75,7 +75,7 @@ class Welcomer(commands.Cog):
             for channel in channels:
                 if not channel.isnumeric():
                     continue
-                channel = member.guild.get_channel(int(channel))
+                channel = member.guild.get_channel_or_thread(int(channel))
                 if channel is None:
                     continue
                 botormember = await self.bot._(member.guild,"misc.bot" if member.bot else "misc.member")
