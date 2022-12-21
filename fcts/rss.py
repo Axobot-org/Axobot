@@ -1483,7 +1483,7 @@ class Rss(commands.Cog):
     @loop_child.error
     async def loop_error(self, error: Exception):
         "When the loop fails"
-        self.bot.dispatch("error", error, "RSS main loop")
+        self.bot.dispatch("error", error, "RSS main loop has stopped <@279568324260528128>")
 
 
     @commands.command(name="rss_loop",hidden=True)

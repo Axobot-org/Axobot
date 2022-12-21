@@ -371,7 +371,7 @@ class BotStats(commands.Cog):
 
     @sql_loop.error
     async def on_sql_loop_error(self, error: Exception):
-        self.bot.dispatch("error", error, "When sending SQL stats")
+        self.bot.dispatch("error", error, "SQL stats loop has stopped <@279568324260528128>")
 
     async def get_stats(self, variable: str, minutes: int) -> typing.Union[int, float, str, None]:
         """Get the sum of a certain variable in the last X minutes"""
@@ -420,7 +420,7 @@ class BotStats(commands.Cog):
 
     @status_loop.error
     async def on_status_loop_error(self, error: Exception):
-        self.bot.dispatch("error", error, "When sending stats to statuspage.io")
+        self.bot.dispatch("error", error, "When sending stats to statuspage.io (<@279568324260528128>)")
 
 
 async def setup(bot):
