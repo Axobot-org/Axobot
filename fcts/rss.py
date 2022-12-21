@@ -1468,8 +1468,12 @@ class Rss(commands.Cog):
             return
         self.bot.log.info(" Boucle rss commencée !")
         start_time = time.time()
-        await self.main_loop()
-        self.bot.log.info(f" Boucle rss terminée en {time.time() - start_time:.2f}s!")
+        try:
+            await self.main_loop()
+        except Exception as err:
+            self.bot.dispatch("error", err, "RSS main loop")
+        else:
+            self.bot.log.info(f" Boucle rss terminée en {time.time() - start_time:.2f}s!")
 
     @loop_child.before_loop
     async def before_printer(self):
