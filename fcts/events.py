@@ -148,7 +148,7 @@ class Events(commands.Cog):
         try:
             if log_type == "join":
                 self.bot.log.info(f"Bot joined the server {guild.id}")
-                desc = f"Bot **joined the server** ({guild.name} ({guild.id}) - {len(guild.members)} users"
+                desc = f"Bot **joined the server** {guild.name} ({guild.id}) - {len(guild.members)} users"
             else:
                 self.bot.log.info(f"Bot left the server {guild.id}")
                 if guild.name is None and guild.unavailable:
