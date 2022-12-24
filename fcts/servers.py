@@ -528,7 +528,7 @@ class Servers(commands.Cog):
         chans = chans.split(";")
         g_chans = list()
         for r in chans:
-            g_chan = guild.get_channel(int(r))
+            g_chan = guild.get_channel_or_thread(int(r))
             if g_chan is None:
                 g_chans.append('<' + await self.bot._(guild, "server.deleted-channel") + '>')
             elif ext:
@@ -899,7 +899,7 @@ class Servers(commands.Cog):
         if value == "none":
             return "Nowhere"
         if value.isnumeric():
-            g_chan = guild.get_channel(int(value))
+            g_chan = guild.get_channel_or_thread(int(value))
             if g_chan is None:
                 return '<' + await self.bot._(guild, "server.deleted-channel") + '>'
             elif ext:

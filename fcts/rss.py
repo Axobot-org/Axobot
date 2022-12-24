@@ -444,8 +444,8 @@ class Rss(commands.Cog):
             # formatted feed type name
             tr_type = await self.bot._(guild.id, "rss."+feed.type)
             # formatted channel
-            if channel := guild.get_channel(feed.channel_id):
-                tr_channel = "#"+channel.name
+            if channel := guild.get_channel_or_thread(feed.channel_id):
+                tr_channel = channel.mention
             else:
                 tr_channel = "#deleted"
             # better name format (for Twitter/YouTube ID)
@@ -1468,8 +1468,12 @@ class Rss(commands.Cog):
             return
         self.bot.log.info(" Boucle rss commencée !")
         start_time = time.time()
-        await self.main_loop()
-        self.bot.log.info(f" Boucle rss terminée en {time.time() - start_time:.2f}s!")
+        try:
+            await self.main_loop()
+        except Exception as err:
+            self.bot.dispatch("error", err, "RSS main loop")
+        else:
+            self.bot.log.info(f" Boucle rss terminée en {time.time() - start_time:.2f}s!")
 
     @loop_child.before_loop
     async def before_printer(self):
@@ -1479,7 +1483,7 @@ class Rss(commands.Cog):
     @loop_child.error
     async def loop_error(self, error: Exception):
         "When the loop fails"
-        self.bot.dispatch("error", error, "RSS main loop")
+        self.bot.dispatch("error", error, "RSS main loop has stopped <@279568324260528128>")
 
 
     @commands.command(name="rss_loop",hidden=True)

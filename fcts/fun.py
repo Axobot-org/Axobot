@@ -773,7 +773,7 @@ You can specify a verification limit by adding a number in argument (up to 1.000
         r = re.search(r'<#(\d+)>', arguments.split(" ")[0])
         if r is not None:
             arguments = " ".join(arguments.split(" ")[1:])
-            channel = ctx.guild.get_channel(int(r.group(1)))
+            channel = ctx.guild.get_channel_or_thread(int(r.group(1)))
         arguments = await args.arguments().convert(ctx, arguments)
         if len(arguments) == 0:
             raise commands.errors.MissingRequiredArgument(ctx.command.clean_params['arguments'])

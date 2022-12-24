@@ -479,7 +479,7 @@ class Partners(commands.Cog):
         chan: str = channel[0]['partner_channel'].split(';')[0]
         if not chan.isnumeric():
             return await msg.edit(content=await self.bot._(ctx.guild, "partners.no-channel"))
-        chan = ctx.guild.get_channel(int(chan))
+        chan = ctx.guild.get_channel_or_thread(int(chan))
         if chan is None:
             return await msg.edit(content=await self.bot._(ctx.guild, "partners.no-channel"))
         count = await self.update_partners(chan,channel[0]['partner_color'])
