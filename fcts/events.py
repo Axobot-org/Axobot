@@ -148,7 +148,7 @@ class Events(commands.Cog):
         try:
             if log_type == "join":
                 self.bot.log.info(f"Bot joined the server {guild.id}")
-                desc = f"Bot **joined the server** ({guild.name} ({guild.id}) - {len(guild.members)} users"
+                desc = f"Bot **joined the server** {guild.name} ({guild.id}) - {len(guild.members)} users"
             else:
                 self.bot.log.info(f"Bot left the server {guild.id}")
                 if guild.name is None and guild.unavailable:
@@ -263,7 +263,7 @@ class Events(commands.Cog):
             config = str(await self.bot.get_config(guild.id,"modlogs_channel")).split(';', maxsplit=1)[0]
             if config == "" or not config.isnumeric():
                 return
-            channel = guild.get_channel(int(config))
+            channel = guild.get_channel_or_thread(int(config))
         except Exception as err:
             self.bot.dispatch("error", err)
             return

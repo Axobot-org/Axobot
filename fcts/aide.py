@@ -24,7 +24,11 @@ class Help(commands.Cog):
     
     @property
     def doc_url(self):
-        return "https://zbot.readthedocs.io/en/develop/" if self.bot.beta else "https://zbot.readthedocs.io/en/latest/"
+        return (
+            "https://zbot.readthedocs.io/en/latest/",
+            "https://zbot.readthedocs.io/en/develop/",
+            "https://zbot.readthedocs.io/en/release-candidate/",
+        )[self.bot.entity_id]
 
     async def cog_unload(self):
         self.bot.remove_command("help")

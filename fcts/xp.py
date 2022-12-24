@@ -69,7 +69,7 @@ class Xp(commands.Cog):
         if value == "any":
             return msg.channel
         try:
-            chan = msg.guild.get_channel(int(value))
+            chan = msg.guild.get_channel_or_thread(int(value))
             return chan
         except discord.errors.NotFound:
             return None
