@@ -322,7 +322,7 @@ class BotStats(commands.Cog):
                 unav += guild.unavailable
                 total += 1
             cursor.execute(query, (now, 'guilds.unavailable', round(unav/total, 3)*100, 1, '%', False, self.bot.entity_id))
-            cursor.execute(query, (now, 'guilds.total', total, 0, 'guilds', True, self.bot.entity_id))
+            cursor.execute(query, (now, 'guilds.total', total, 0, 'guilds', False, self.bot.entity_id))
             del unav, total
             # antiscam warn/deletions
             if self.antiscam["warning"]:
