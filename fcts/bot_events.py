@@ -289,10 +289,10 @@ class BotEvents(commands.Cog):
             return
         if (users_cog := self.bot.get_cog("Users")) is None:
             raise RuntimeError("Users cog not found")
-        if await users_cog.has_rankcard(ctx.author, "christmas-2022"):
+        if await users_cog.has_rankcard(ctx.author, "christmas22"):
             await ctx.send(await self.bot._(ctx.channel, "bot_events.christmas.already-collected"))
             return
-        await users_cog.set_rankcard(ctx.author, "christmas-2022")
+        await users_cog.set_rankcard(ctx.author, "christmas22")
         profile_cmd = await self.bot.get_command_mention("profile card")
         await ctx.send(await self.bot._(ctx.channel, "bot_events.christmas.collected", cmd=profile_cmd))
 
