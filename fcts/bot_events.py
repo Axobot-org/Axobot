@@ -284,15 +284,15 @@ class BotEvents(commands.Cog):
     @commands.cooldown(3, 60, commands.BucketType.user)
     async def event_collect(self, ctx: MyContext):
         "Collect your Christmas present!"
-        if self.current_event_id != "christmas22":
+        if self.current_event_id != "christmas-2022":
             await ctx.send(await self.bot._(ctx.channel, "bot_events.nothing-desc"))
             return
         if (users_cog := self.bot.get_cog("Users")) is None:
             raise RuntimeError("Users cog not found")
-        if await users_cog.has_rankcard(ctx.author, "christmas22"):
+        if await users_cog.has_rankcard(ctx.author, "christmas-2022"):
             await ctx.send(await self.bot._(ctx.channel, "bot_events.christmas.already-collected"))
             return
-        await users_cog.set_rankcard(ctx.author, "christmas22")
+        await users_cog.set_rankcard(ctx.author, "christmas-2022")
         profile_cmd = await self.bot.get_command_mention("profile card")
         await ctx.send(await self.bot._(ctx.channel, "bot_events.christmas.collected", cmd=profile_cmd))
 
