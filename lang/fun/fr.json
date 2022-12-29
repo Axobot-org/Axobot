@@ -60,19 +60,6 @@
         "{2}.exe *a cessé de fonctionner*"
     ],
     "markdown": "__**Règles du Markdown** sur *Discord*__\n\n`*italique*` = *italique*\n`__souligné__` = __souligné__\n`**gras**` = **gras**\n`***gras italique***` = ***gras italique***\n`~~barré~~` = ~~barré~~\n`__*souligné italique*__` = __*souligné italique*__\n`__**souligné gras**__` = __**souligné gras**__\n`__***souligné gras italique***__` = __***souligné gras italique***__\n`||spoiler||` = ||spoiler||\n> citation = `> citation`\n\\`code\\` = `code`\n\\\\ pour ignorer\n\nPour les blocs de code, cf <https://discord.gg/DGahTNn>",
-    "movie": {
-        "actors": "Acteurs",
-        "awards": "Récompenses",
-        "director": "Réalisateur",
-        "imdb-id": "ID IMDb",
-        "imdb-rating": "Cote IMDb",
-        "no-description": "Aucune description disponible",
-        "no-rating": "Non coté",
-        "not-found": "Impossible de trouver ce film",
-        "released": "Date de sortie",
-        "runtime": "Durée",
-        "writers": "Scénaristes"
-    },
     "nasa-none": "Oups, impossible de récupérer les informations de la NASA pour le moment. Réessayez dans quelques minutes :confused:",
     "no-database": "Notre base de donnée étant hors ligne, l'accès aux commandes fun est restreint aux personnes ayant la permission de Gérer le Serveur",
     "no-embed-perm": "Je ne possède pas la permission \"Intégrer des liens\" :confused:",
