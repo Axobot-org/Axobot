@@ -60,19 +60,6 @@
         "{2}.exe *has stopeD wurkin*"
     ],
     "markdown": "__**Markdown Rules** on *Discord*__\n\n`*italics*` = *italics*\n`__underline__` = __underline__\n`**bold**` = **bold**\n`***bold italics***` = ***bold italics***\n`~~strikeout~~` = ~~strikeout~~\n`__*underline italics*__` = __*underline italics*__\n`__**underline bold**__` = __**underline bold**__\n`__***underline bold italics***__` = __***underline bold italics***__\n`||spoiler||` = ||spoiler||\n> quote = `> quote`\n\\`code\\` = `code`\n\\\\ to ignore\n                \nFor code blocks, cf <https://discord.gg/DGahTNn>",
-    "movie": {
-        "actors": "Players",
-        "awards": "Shiny awards",
-        "director": "Big boss",
-        "imdb-id": "IMDb ID",
-        "imdb-rating": "IMDb how-good-was-it?",
-        "no-description": "No text providd",
-        "no-rating": "No rate",
-        "not-found": "Oops no, I cannt find dis movie",
-        "released": "When-was-it-released",
-        "runtime": "How-long-is-it",
-        "writers": "Who wrote"
-    },
     "nasa-none": "Oops, I can't find gud picts of bautiful stars for now, plz try later :crying_cat_face:",
     "no-database": "As our data ar offline, access to funz commandz iz restricted to guys with permishun \"Manage Server\"",
     "no-embed-perm": "I dont haz permishun 2 \"Embed links\" :confused:",
