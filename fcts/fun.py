@@ -1057,43 +1057,6 @@ You can specify a verification limit by adding a number in argument (up to 1.000
         }).strip()
         await ctx.send(f"```py\n{code}\n```")
 
-    @commands.command(name="movie")
-    @commands.cooldown(5, 40, commands.BucketType.user)
-    @commands.check(checks.bot_can_embed)
-    async def movie_search(self, ctx: MyContext, *, movie_name: str):
-        """Search for a movie information based on its name
-
-        Warning: Only english names are supported for now!
-
-        ..Example movie The Circle"""
-        params = {
-            "apikey": self.bot.others["omdb"]
-        }
-        if re.match(r'tt\d+', movie_name):
-            params['i'] = movie_name
-        else:
-            params['t'] = movie_name
-        async with aiohttp.ClientSession() as session:
-            async with session.get("http://www.omdbapi.com/", params=params) as resp:
-                data = await resp.json()
-        if data["Response"] == "False":
-            await ctx.send(await self.bot._(ctx.channel,"fun.movie.not-found"))
-            return
-        website = data["Website"] if data["Website"] != "N/A" else None
-        rating = data["imdbRating"] if data["imdbRating"] != "N/A" else await self.bot._(ctx.channel,"fun.movie.no-rating")
-        description = data["Plot"] if data["Plot"] != "N/A" else await self.bot._(ctx.channel,"fun.movie.no-description")
-        embed = discord.Embed(title=data["Title"], url=website, description=description, color=0x3498DB)
-        embed.set_thumbnail(url=data["Poster"])
-        embed.add_field(name=await self.bot._(ctx.channel,"fun.movie.director"), value=data["Director"])
-        embed.add_field(name=await self.bot._(ctx.channel,"fun.movie.actors"), value=data["Actors"])
-        embed.add_field(name=await self.bot._(ctx.channel,"fun.movie.released"), value=data["Released"])
-        embed.add_field(name=await self.bot._(ctx.channel,"fun.movie.awards"), value=data["Awards"])
-        embed.add_field(name=await self.bot._(ctx.channel,"fun.movie.runtime"), value=data["Runtime"])
-        embed.add_field(name=await self.bot._(ctx.channel,"fun.movie.writers"), value=data["Writer"])
-        embed.add_field(name=await self.bot._(ctx.channel,"fun.movie.imdb-rating"), value=rating)
-        embed.add_field(name=await self.bot._(ctx.channel,"fun.movie.imdb-id"), value=data["imdbID"])
-        await ctx.send(embed=embed)
-
 
 async def setup(bot):
     await bot.add_cog(Fun(bot))
