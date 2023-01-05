@@ -477,7 +477,11 @@ You can specify a verification limit by adding a number in argument (up to 1.000
         ..Doc miscellaneous.html#say"""
         if channel is None:
             channel = ctx.channel
-        elif not (channel.permissions_for(ctx.author).read_messages and channel.permissions_for(ctx.author).send_messages and channel.guild == ctx.guild):
+        elif not ((
+            channel.permissions_for(ctx.author).read_messages and
+            channel.permissions_for(ctx.author).send_messages and
+            channel.guild == ctx.guild
+        ) or await self.bot.get_cog('Admin').check_if_god(ctx)):
             await ctx.send(await self.bot._(ctx.guild, 'fun.say-no-perm', channel=channel.mention))
             return
         if self.bot.zombie_mode:
