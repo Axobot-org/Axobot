@@ -843,7 +843,8 @@ Cette option affecte tous les serveurs"""
             await self.bot.change_presence(activity=discord.Activity(type=discord.ActivityType.streaming,name=text, timestamps={'start':time.time()}))
         else:
             await ctx.send("Sélectionnez *play*, *watch*, *listen* ou *stream* suivi du nom")
-        await ctx.message.delete()
+        if not ctx.interaction:
+            await ctx.message.delete()
 
     @main_msg.command(name="speedtest")
     @commands.check(checks.is_bot_admin)
