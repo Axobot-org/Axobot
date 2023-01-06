@@ -60,19 +60,6 @@
         "{2}.exe *has stopped working*"
     ],
     "markdown": "__**Markdown Rules** on *Discord*__\n\n`*italics*` = *italics*\n`__underline__` = __underline__\n`**bold**` = **bold**\n`***bold italics***` = ***bold italics***\n`~~strikeout~~` = ~~strikeout~~\n`__*underline italics*__` = __*underline italics*__\n`__**underline bold**__` = __**underline bold**__\n`__***underline bold italics***__` = __***underline bold italics***__\n`||spoiler||` = ||spoiler||\n> quote = `> quote`\n\\`code\\` = `code`\n \\ to ignore\n\nFor code blocks, cf <https://discord.gg/DGahTNn>",
-    "movie": {
-        "actors": "Actors",
-        "awards": "Awards",
-        "director": "Director",
-        "imdb-id": "IMDb ID",
-        "imdb-rating": "IMDb rating",
-        "no-description": "No description provided",
-        "no-rating": "Not rated",
-        "not-found": "Unable to find this movie",
-        "released": "Release date",
-        "runtime": "Runtime",
-        "writers": "Writers"
-    },
     "nasa-none": "Oops, I'm unable to retrieve the information from NASA at the moment. Try again in a few minutes :confused:",
     "no-database": "As our database is offline, access to fun commands is restricted to people with permission \"Manage Server\"",
     "no-embed-perm": "I don't have permission to \"Embed links\" :confused:",
