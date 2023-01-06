@@ -40,8 +40,8 @@ class Help(commands.Cog):
         """Help on setting up welcome / leave messages
 
 ..Doc infos.html#welcome-message"""
-        prefix = await self.bot.prefix_manager.get_prefix(ctx.guild)
-        await ctx.send(await self.bot._(ctx.guild, "welcome.help", p=prefix))
+        config_cmd = await self.bot.get_command_mention("config change")
+        await ctx.send(await self.bot._(ctx.guild, "welcome.help", config_cmd=config_cmd))
 
     @commands.command(name="about", aliases=["botinfos", "botinfo"])
     @commands.cooldown(7, 30, commands.BucketType.user)

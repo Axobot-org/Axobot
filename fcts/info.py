@@ -188,7 +188,7 @@ FROM
         	`variable` LIKE "cmd.%" AND
             {date_where_clause}
             `variable` NOT IN ({forbidden_where}) AND
-        	`beta` = %(beta)s
+        	`entity_id` = %(entity_id)s
 	) UNION ALL (
     	SELECT
         	`variable`,
@@ -198,12 +198,12 @@ FROM
         	`variable` LIKE "cmd.%" AND
             {date_where_clause}
             `variable` NOT IN ({forbidden_where}) AND
-        	`beta` = %(beta)s
+        	`entity_id` = %(entity_id)s
 	)
 ) AS `all`
 GROUP BY cmd
 ORDER BY usages DESC LIMIT %(limit)s"""
-            async with self.bot.db_query(query, { "beta": self.bot.beta, "minutes": minutes, "limit": commands_limit }) as query_result:
+            async with self.bot.db_query(query, { "entity_id": self.bot.entity_id, "minutes": minutes, "limit": commands_limit }) as query_result:
                 pass
             return query_result
 

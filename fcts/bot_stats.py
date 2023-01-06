@@ -296,10 +296,12 @@ class BotStats(commands.Cog):
                 cursor.execute(query, (now, 'rss.'+k, v, 0, k, k == "messages", self.bot.entity_id))
             cursor.execute(query, (now, 'rss.disabled', await self.db_get_disabled_rss(), 0, 'disabled', False, self.bot.entity_id))
             # XP cards
-            cursor.execute(query, (now, 'xp.generated_cards', self.xp_cards["generated"], 0, 'cards/min', True, self.bot.entity_id))
-            cursor.execute(query, (now, 'xp.sent_cards', self.xp_cards["sent"], 0, 'cards/min', True, self.bot.entity_id))
-            self.xp_cards["generated"] = 0
-            self.xp_cards["sent"] = 0
+            if self.xp_cards["generated"]:
+                cursor.execute(query, (now, 'xp.generated_cards', self.xp_cards["generated"], 0, 'cards/min', True, self.bot.entity_id))
+                self.xp_cards["generated"] = 0
+            if self.xp_cards["sent"]:
+                cursor.execute(query, (now, 'xp.sent_cards', self.xp_cards["sent"], 0, 'cards/min', True, self.bot.entity_id))
+                self.xp_cards["sent"] = 0
             # Latency
             if latency := await self.get_list_usage(self.latency_records):
                 cursor.execute(query, (now, 'perf.latency', latency, 1, 'ms', False, self.bot.entity_id))
@@ -322,7 +324,7 @@ class BotStats(commands.Cog):
                 unav += guild.unavailable
                 total += 1
             cursor.execute(query, (now, 'guilds.unavailable', round(unav/total, 3)*100, 1, '%', False, self.bot.entity_id))
-            cursor.execute(query, (now, 'guilds.total', total, 0, 'guilds', True, self.bot.entity_id))
+            cursor.execute(query, (now, 'guilds.total', total, 0, 'guilds', False, self.bot.entity_id))
             del unav, total
             # antiscam warn/deletions
             if self.antiscam["warning"]:
