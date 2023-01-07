@@ -78,7 +78,7 @@ class Info(commands.Cog):
         return len([x for x in self.bot.guilds if x.id not in ignored_guilds])
 
     @commands.group(name="stats")
-    @commands.cooldown(2, 60, commands.BucketType.guild)
+    @commands.cooldown(3, 60, commands.BucketType.guild)
     async def stats_main(self, ctx: MyContext):
         """Display some statistics about the bot
 
