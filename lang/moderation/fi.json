@@ -46,6 +46,17 @@
     "kick-dm": "Sinut on juuri potkittu ulos palvelimelta %{guild} 😕",
     "missing-manage-nick": "Ups, minulta puuttuu \"Hallinnoi nimimerkkejä\" käyttöoikeus!",
     "missing-user-perms": "Ups, sinulta puuttuu käyttöoikeuksia (joko hallinnoi rooleja, hallinnoi palvelinta tai hallinnoi viestejä)",
+    "mute-config": {
+        "err": "Mahdotonta tehdä noin. Varmista onko minulla oikeat käyttöoikeudet ja yritä uudelleen.",
+        "success": {
+            "other": "Rooli on tehty ja konfiguroitu oikein! (%{count} kanavaa ei pystytty konfiguroimaan, oikeuksien puutteiden takia)",
+            "zero": "Rooli on tehty ja konfiguroitu oikein!"
+        },
+        "success2": {
+            "other": "Rooli on konfiguroitu oikein! (%{count} kanavaa ei pystytty konfiguroimaan, oikeuksien puutteiden takia)",
+            "zero": "Rooli on konfiguroitu oikein!"
+        }
+    },
     "mute": {
         "already-mute": "Tämä jäsen on jo mykistetty!",
         "already-unmute": "Tämä jäsen ei ole mykistetty!",
@@ -53,19 +64,9 @@
         "list-title-0": "Lista jäähyllä olevista jäsenistä palvelimella \"%{guild}\"",
         "list-title-1": "Lista 45 jäähyllä olevasta jäsenestä palvelimella \"%{guild}\"",
         "list-title-2": "Lista 60 jäähyllä olevasta jäsenestä palvelimella \"%{guild}\"",
-        "mute-config-err": "Mahdotonta tehdä noin. Varmista onko minulla oikeat käyttöoikeudet ja yritä uudelleen.",
-        "mute-config-success": {
-            "other": "Rooli on tehty ja konfiguroitu oikein! (%{count} kanavaa ei pystytty konfiguroimaan, oikeuksien puutteiden takia)",
-            "zero": "Rooli on tehty ja konfiguroitu oikein!"
-        },
-        "mute-config-success2": {
-            "other": "Rooli on konfiguroitu oikein! (%{count} kanavaa ei pystytty konfiguroimaan, oikeuksien puutteiden takia)",
-            "zero": "Rooli on konfiguroitu oikein!"
-        },
         "mute-high": "Ups, näyttää siltä että `mykistetty` rooli on liian korkealla että voisin antaa sen... Korjaa tämä sillä että laita minun roolini `Mykistetty` roolin yläpuolelle.",
         "no-mute": "Ups, näyttää siltä että `mykistetty` rooli ei ole olemassa 😕 Tede yksi ja anna käyttöoikeudet manuallisesti.",
         "no-mutes": "Kenelläkään ei näytä olevan porttikieltoa täällä",
-        "role-created": "`Muted` rooli tehty! Voit käyttää komentoa `%{p}mute-config` automaattiselle konfiguroinnille palvelimellasi.",
         "staff-mute": "Et voi mykistää toista työntekijää"
     },
     "mute-chat": "Käyttäjä %{user} (%{userid}) on pistetty jäähylle",

@@ -91,13 +91,13 @@ Online editor: https://projectblurple.com/paint
 
 ..Example b  blurplefy ++more-dark-blurple ++more-dark-blurple ++more-white ++less-blurple
 
-..Example b darkfy @Zbot
+..Example b darkfy @Axobot
 
-..Example blurple check light Zbot
+..Example blurple check light Axobot
 
 ..Example b check dark"""
         if ctx.subcommand_passed is None:
-            await self.bot.get_cog('Help').help_command(ctx, ['blurple'])
+            await ctx.send_help(ctx.command)
 
     @blurple_main.command()
     async def help(self, ctx: MyContext):

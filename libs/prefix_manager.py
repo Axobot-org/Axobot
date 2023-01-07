@@ -3,6 +3,8 @@ from typing import TYPE_CHECKING
 import discord
 from cachingutils import LRUCache
 
+from libs.serverconfig.options_list import default_values as serverconfig_defaults
+
 if TYPE_CHECKING:
     from libs.bot_classes import Zbot
 
@@ -28,7 +30,7 @@ class PrefixManager:
         # if database is offline
         if not self.bot.database_online:
             if server_cog := self.bot.get_cog("Servers"):
-                return server_cog.default_opt.get("prefix")
+                return serverconfig_defaults.get("prefix")
             return '!'
         # get the prefix from the database
         prefix = await self.fetch_prefix(guild.id)
@@ -47,10 +49,9 @@ class PrefixManager:
         if not (server_cog := self.bot.get_cog("Servers")):
             raise RuntimeError("Server cog not loaded")
         # prepare the SQL query
-        table = server_cog.table
-        query = f"SELECT `prefix` FROM `{table}` WHERE `ID`={guild_id}"
+        query = f"SELECT `prefix` FROM `servers` WHERE `ID` = %s AND `beta` = %s"
         # get the thing
-        async with self.bot.db_query(query, fetchone=True) as query_result:
+        async with self.bot.db_query(query, (guild_id, self.bot.beta), fetchone=True) as query_result:
             if query_result and len(query_result['prefix']) > 0:
                 prefix: str = query_result['prefix']
             else:

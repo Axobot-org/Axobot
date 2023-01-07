@@ -27,7 +27,7 @@ class Backups(commands.Cog):
 
         ..Doc server.html#server-backup"""
         if ctx.subcommand_passed is None:
-            await self.bot.get_cog('Help').help_command(ctx,['backup'])
+            await ctx.send_help(ctx.command)
 
 
     @main_backup.command(name="load")
@@ -102,7 +102,8 @@ Arguments are:
 ..Doc server.html#server-backup"""
         try:
             data = await self.create_backup(ctx)
-            await ctx.send(await self.bot._(ctx.guild.id, "s_backup.backup-done"),file=discord.File(BytesIO(data.encode()), filename=f"backup-{ctx.guild.id}.json"))
+            file = discord.File(BytesIO(data.encode()), filename=f"backup-{ctx.guild.id}.json")
+            await ctx.send(await self.bot._(ctx.guild.id, "s_backup.backup-done"), file=file)
         except Exception as e:
             await ctx.bot.get_cog('Errors').on_command_error(ctx,e)
 
@@ -193,7 +194,7 @@ Arguments are:
         except discord.errors.Forbidden:
             pass
         except Exception as err:
-            await ctx.bot.get_cog('Errors').on_error(err,ctx)
+            self.bot.dispatch("error", err, ctx)
         try:
             webs = []
             for w in await g.webhooks():
@@ -207,7 +208,7 @@ Arguments are:
         except discord.errors.Forbidden:
             pass
         except Exception as err:
-            await ctx.bot.get_cog('Errors').on_error(err,ctx)
+            self.bot.dispatch("error", err, ctx)
         back['members'] = []
         for memb in g.members:
             back['members'].append({'id': memb.id,

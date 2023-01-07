@@ -7,7 +7,6 @@
     "deviant-default-flow": "{logo}  | Nouvelle création de {author} : **{title}**\nPubliée le {date}\nLien : {link}\n{mentions}",
     "deviant-form-last": "{logo}  | Voici la dernière création de {author}:\n{title}\nPubliée le {date}\nLien : {url}",
     "embed-json-changed": "L'embed de ce flux a bien été modifié",
-    "fail-add": "Une erreur s'est produite lors du traitement de ta réponse :blobconfused:. Merci de réessayer plus tard, ou de contacter le support du bot (entrez la commande `about` pour le lien du serveur)",
     "flow-limit": "Pour des raisons de performances, tu peux pas suivre plus de %{limit} flux rss par serveur.",
     "guild-complete": "%{count} flux rss ont correctement été rechargés, en %{time} secondes !",
     "guild-error": "Une erreur est survenue pendant la procédure : `%{err}`\nSi tu penses que cette erreur ne vient pas de toi, avertis-en le support plz.",

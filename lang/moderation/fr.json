@@ -46,6 +46,19 @@
     "kick-dm": "Vous venez d'être expulsé du serveur %{guild} :confused:",
     "missing-manage-nick": "Oups, il me manque la permission \"Gérer les pseudos\"",
     "missing-user-perms": "Oups, il vous manque des permissions (gérer les rôles, gérer le serveur ou gérer les messages)",
+    "mute-config": {
+        "confirm": "Êtes-vous sûr de vouloir configurer un rôle \"muted\" ?\nCette action peut casser certaines permissions avancées dans votre serveur, en révoquant la modification de la permission \"envoyer des messages\" de certains rôles.",
+        "err": "Impossible de faire cela. Veuillez vérifier mes permissions dans le serveur et réessayer.",
+        "success": {
+            "other": "Le rôle a été créé et configuré avec succès ! (%{count} salons n'ont pas pu être configurés, par manque de permissions)",
+            "zero": "Le rôle a été créé et configuré avec succès !"
+        },
+        "success2": {
+            "other": "Le rôle a été configuré avec succès ! (%{count} salons n'ont pas pu être configurés, par manque de permissions)",
+            "zero": "Le rôle a été configuré avec succès !"
+        },
+        "tip": "*Remarque : L'utilisation de la commande %{mute} sans qu'aucun rôle muet ne soit configuré utilisera le système officiel d'exclusion de Discord, qui pourrait mieux convenir à vos besoins.*"
+    },
     "mute": {
         "already-mute": "Ce membre est déjà muet !",
         "already-unmute": "Ce membre n'est pas muet !",
@@ -54,19 +67,9 @@
         "list-title-0": "Liste des membres muets du serveur '%{guild}'",
         "list-title-1": "Liste des 45 premiers membres muets du serveur '%{guild}'",
         "list-title-2": "Liste des 60 premiers membres muets du serveur '%{guild}'",
-        "mute-config-err": "Impossible de faire cela. Veuillez vérifier mes permissions dans le serveur et réessayer.",
-        "mute-config-success": {
-            "other": "Le rôle a été créé et configuré avec succès ! (%{count} salons n'ont pas pu être configurés, par manque de permissions)",
-            "zero": "Le rôle a été créé et configuré avec succès !"
-        },
-        "mute-config-success2": {
-            "other": "Le rôle a été configuré avec succès ! (%{count} salons n'ont pas pu être configurés, par manque de permissions)",
-            "zero": "Le rôle a été configuré avec succès !"
-        },
         "mute-high": "Oups, il semble que le rôle `muted` soit trop haut pour que je puisse le donner... Veuillez fixer ce problème en plaçant mon rôle plus haut que le rôle `muted`.",
         "no-mute": "Oups, il semble que le rôle `muted` n'existe pas :confused: Veuillez le créer et lui attribuer les permissions manuellement.",
         "no-mutes": "Aucun membre ne semble être actuellement muet dans ce serveur",
-        "role-created": "Rôle `muted` créé avec succès !\nVous pouvez utiliser la commande `%{p}mute-config` pour une configuration automatique dans votre serveur.",
         "staff-mute": "Vous ne pouvez pas empêcher de parler un autre membre du staff",
         "too-high": "Il semble que ce membre soit trop haut pour que je puisse l'exclure :thinking:"
     },
@@ -115,6 +118,7 @@
         "one": "1 surnom édité !",
         "zero": "Aucun surnom n'a été édité"
     },
+    "unhoist-too-many-members": "Oups, votre serveur a trop de membres pour que je puisse faire cela. Veuillez contacter notre équipe de support pour plus d'informations.",
     "unmute-chat": "Le membre %{user} (%{userid}) peut à nouveau parler !",
     "warn": {
         "cant-bot": "Je ne peux pas avertir un bot ^^",

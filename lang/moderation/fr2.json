@@ -45,6 +45,17 @@
     "kick-dm": "Tu viens juste d'être kick de %{guild} 😕",
     "missing-manage-nick": "Oups, il me manque la permission \"Gérer les pseudos\"",
     "missing-user-perms": "Wolala 😬 !\nIl te manque des perms (style, manager les roles, le serveur, ou les messages)",
+    "mute-config": {
+        "err": "Euh...\nAlors, je peux pas faire ça.\n\nDonc va checker mes perms sur ce serveur, et ENSUITE tu réessaies.",
+        "success": {
+            "other": "Ce rôle a été créé et configuré avec succès ! (%{count} salons n'ont pas pu être configurés, par contre. J'avais pas les perms 😓)",
+            "zero": "Ce rôle a été créé et configuré avec succès !"
+        },
+        "success2": {
+            "other": "Ce rôle a été configuré avec succès ! *(Bon, j'ai pas pu configurer %{count} salons, parce qu'il me manquait des perms 😓)*",
+            "zero": "Ce rôle a été configuré avec succès !"
+        }
+    },
     "mute": {
         "already-mute": "Ce membre est déjà muet !",
         "already-unmute": "Ce membre n'est pas muet !",
@@ -52,19 +63,9 @@
         "list-title-0": "Liste des membres mute sur *%{guild}*",
         "list-title-1": "Liste de 45 membres mute sur *%{guild}*",
         "list-title-2": "Liste de 60 membres mute sur *%{guild}*",
-        "mute-config-err": "Euh...\nAlors, je peux pas faire ça.\n\nDonc va checker mes perms sur ce serveur, et ENSUITE tu réessaies.",
-        "mute-config-success": {
-            "other": "Ce rôle a été créé et configuré avec succès ! (%{count} salons n'ont pas pu être configurés, par contre. J'avais pas les perms 😓)",
-            "zero": "Ce rôle a été créé et configuré avec succès !"
-        },
-        "mute-config-success2": {
-            "other": "Ce rôle a été configuré avec succès ! *(Bon, j'ai pas pu configurer %{count} salons, parce qu'il me manquait des perms 😓)*",
-            "zero": "Ce rôle a été configuré avec succès !"
-        },
         "mute-high": "Oups, il semble que le rôle `muted` soit trop haut pour que je puisse le donner... Veuillez fixer ce problème en plaçant mon rôle plus haut que le rôle `muted`.",
         "no-mute": "Oups, il semble que le rôle `muted` n'existe pas :confused: Veuillez le créer et lui attribuer les permissions manuellement.",
         "no-mutes": "J'ai pas l'impression que quiconque soit mute, ici ¯\\_(ツ)_/¯",
-        "role-created": "Rôle `muted` configuré avec succès, chef !\nTu peux utiliser la commande `%{p}mute-config` pour une config automatique de ton serveur.",
         "staff-mute": "Vous ne pouvez pas empêcher de parler un autre membre du staff "
     },
     "mute-chat": "%{user} (%{userid}) vient d'être mute.",

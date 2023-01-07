@@ -8,9 +8,15 @@
         "roles": "Roles",
         "tickets": "Tickets"
     },
-    "disabled": "Logs of type %{kind} will no longer be sent to this channel",
+    "disabled": {
+        "current": "Logs of type %{kind} will no longer be sent to this channel",
+        "other": "Logs of type %{kind} will no longer be sent to %{channel}"
+    },
     "embed-warning": "To send logs, the bot needs the \"Embed links\" permission!",
-    "enabled": "Logs of type %{kind} will now be sent to this channel",
+    "enabled": {
+        "current": "Logs of type %{kind} will now be sent to this channel",
+        "other": "Logs of type %{kind} will now be sent to %{channel}"
+    },
     "list": {
         "all": "List of available logs",
         "channel": "List of logs used in %{channel}",

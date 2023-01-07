@@ -4,16 +4,17 @@ import json
 import marshal
 import random
 import re
-import shutil
 import time
-from typing import Union
+from typing import Optional
 
 import aiohttp
 import discord
 import mysql
 from discord.ext import commands, tasks
-from libs.bot_classes import Zbot
+
+from libs.bot_classes import MyContext, Zbot
 from libs.enums import UsernameChangeRecord
+
 
 class Events(commands.Cog):
     """Cog for the management of major events that do not belong elsewhere. Like when a new server invites the bot."""
@@ -25,7 +26,6 @@ class Events(commands.Cog):
         self.partner_last_check = datetime.datetime.utcfromtimestamp(0)
         self.last_eventDay_check = datetime.datetime.utcfromtimestamp(0)
         self.statslogs_last_push = datetime.datetime.utcfromtimestamp(0)
-        self.last_statusio = datetime.datetime.utcfromtimestamp(0)
         self.loop_errors = [0,datetime.datetime.utcfromtimestamp(0)]
         self.last_membercounter = datetime.datetime.utcfromtimestamp(0)
         self.embed_colors = {"welcome":5301186,
@@ -70,49 +70,64 @@ class Events(commands.Cog):
     @commands.Cog.listener()
     async def on_member_update(self, before: discord.Member, after: discord.Member):
         """Called when a member change something (status, activity, nickame, roles)"""
-        if before.nick != after.nick:
-            await self.updade_memberslogs_name(before, after)
+        if before.nick != after.nick and await self.can_register_memberlog(before.id, before.guild.id):
+            await self.register_memberlog_name(before, after)
 
     @commands.Cog.listener()
     async def on_user_update(self, before: discord.User, after: discord.User):
         """Called when a user change something (avatar, username, discrim)"""
-        if before.name != after.name:
-            await self.updade_memberslogs_name(before, after)
-
-    async def updade_memberslogs_name(self, before: Union[discord.User, discord.Member], after: Union[discord.User, discord.Member], tries:int=0):
-        "Save in our database when a user change its nickname or username"
-        config_option = await self.bot.get_cog('Utilities').get_db_userinfo(['allow_usernames_logs'],["userID="+str(before.id)])
-        if config_option is not None and config_option['allow_usernames_logs'] is False:
+        if before.name != after.name and await self.can_register_memberlog(before.id):
+            await self.register_userlog_name(before, after)
+    
+    async def can_register_memberlog(self, user_id: int, guild_id: Optional[int]=None):
+        "Check if we are allowed to register a memberlog (if database is online, if the user has allowed it, if the server hasn't disabled it)"
+        if not self.bot.database_online:
+            return False
+        # If axobot is already there, let it handle it
+        if guild_id and await self.bot.check_axobot_presence(guild_id=guild_id):
             return
+        config_option = await self.bot.get_cog('Utilities').get_db_userinfo(['allow_usernames_logs'],["userID=" + str(user_id)])
+        if config_option is not None and config_option['allow_usernames_logs'] is False:
+            return False
+        if guild_id:
+            return await self.bot.get_config(guild_id, "nicknames_history")
+        return True
+
+    async def register_memberlog_name(self, before: discord.Member, after: discord.Member, tries:int=0):
+        "Save in our database when a user change its nickname"
         if tries > 5:
             self.bot.dispatch("error", RuntimeError(f"Nickname change failed after 5 attempts for user {before.id}"))
             return
-        if not self.bot.database_online:
-            return
-        if isinstance(before, discord.Member):
-            # If axobot is already there, let it handle it
-            if await self.bot.check_axobot_presence(guild=before.guild):
-                return
-            if not await self.bot.get_config(before.guild.id, "nicknames_history"):
-                return
-            before_nick = '' if before.nick is None else before.nick
-            after_nick = '' if after.nick is None else after.nick
-        else:
-            before_nick = '' if before.name is None else before.name
-            after_nick = '' if after.name is None else after.name
-        guild = before.guild.id if hasattr(before, 'guild') else 0
-        query = "INSERT INTO `usernames_logs` (`user`,`old`,`new`,`guild`,`beta`) VALUES (%(u)s,%(o)s,%(n)s,%(g)s,%(b)s)"
-        query_args = { 'u': before.id, 'o': before_nick, 'n': after_nick, 'g': guild, 'b': self.bot.beta }
+        before_nick = '' if before.nick is None else before.nick
+        after_nick = '' if after.nick is None else after.nick
         try:
-            async with self.bot.db_query(query, query_args):
-                self.bot.dispatch("username_change_record", UsernameChangeRecord(
-                    before_nick or None,
-                    after_nick or None,
-                    after
-                ))
+            await self.db_register_memberlog(before.id, before_nick, after_nick, before.guild.id)
         except mysql.connector.errors.IntegrityError as err:
             self.bot.log.warning(err)
-            await self.updade_memberslogs_name(before, after, tries+1)
+            await self.register_memberlog_name(before, after, tries+1)
+
+    async def register_userlog_name(self, before: discord.User, after: discord.User, tries:int=0):
+        "Save in our database when a user change its username"
+        if tries > 5:
+            self.bot.dispatch("error", RuntimeError(f"Nickname change failed after 5 attempts for user {before.id}"))
+            return
+        before_nick = '' if before.name is None else before.name
+        after_nick = '' if after.name is None else after.name
+        try:
+            await self.db_register_memberlog(before.id, before_nick, after_nick)
+        except mysql.connector.errors.IntegrityError as err:
+            self.bot.log.warning(err)
+            await self.register_userlog_name(before, after, tries+1)
+
+    async def db_register_memberlog(self, user_id: int, before: str, after: str, guild_id: int=0):
+        query = "INSERT INTO `usernames_logs` (`user`,`old`,`new`,`guild`,`beta`) VALUES (%(u)s, %(o)s, %(n)s, %(g)s, %(b)s)"
+        query_args = { 'u': user_id, 'o': before, 'n': after, 'g': guild_id, 'b': self.bot.beta }
+        async with self.bot.db_query(query, query_args):
+            self.bot.dispatch("username_change_record", UsernameChangeRecord(
+                before or None,
+                after or None,
+                after
+            ))
 
 
     @commands.Cog.listener()
@@ -135,7 +150,7 @@ class Events(commands.Cog):
         try:
             if log_type == "join":
                 self.bot.log.info(f"Bot joined the server {guild.id}")
-                desc = f"Bot **joined the server** ({guild.name} ({guild.id}) - {len(guild.members)} users"
+                desc = f"Bot **joined the server** {guild.name} ({guild.id}) - {len(guild.members)} users"
             else:
                 self.bot.log.info(f"Bot left the server {guild.id}")
                 if guild.name is None and guild.unavailable:
@@ -250,9 +265,9 @@ class Events(commands.Cog):
             config = str(await self.bot.get_config(guild.id,"modlogs_channel")).split(';', maxsplit=1)[0]
             if config == "" or not config.isnumeric():
                 return
-            channel = guild.get_channel(int(config))
+            channel = guild.get_channel_or_thread(int(config))
         except Exception as err:
-            await self.bot.get_cog("Errors").on_error(err,None)
+            self.bot.dispatch("error", err)
             return
         if channel is None:
             return
@@ -284,7 +299,7 @@ class Events(commands.Cog):
 
 
     async def check_user_left(self, member: discord.Member):
-        """Vérifie si un joueur a été banni ou kick par ZBot"""
+        "Check if someone has been kicked or banned by the bot"
         try:
             async for entry in member.guild.audit_logs(user=member.guild.me, limit=15):
                 if entry.created_at < self.bot.utcnow()-datetime.timedelta(seconds=60):
@@ -331,7 +346,7 @@ class Events(commands.Cog):
                 await self.bot.get_cog('Servers').update_everyMembercounter()
                 self.last_membercounter = now
         except Exception as err:
-            await self.bot.get_cog('Errors').on_error(err,None)
+            self.bot.dispatch("error", err)
             self.loop_errors[0] += 1
             if (datetime.datetime.now() - self.loop_errors[1]).total_seconds() > 120:
                 self.loop_errors[0] = 0
@@ -433,7 +448,7 @@ class Events(commands.Cog):
                 count[0] += 1
                 count[1] += await self.bot.get_cog('Partners').update_partners(chan,guild['partner_color'])
             except Exception as err:
-                await self.bot.get_cog('Errors').on_error(err,None)
+                self.bot.dispatch("error", err)
         delta_time = round(time.time()-t,3)
         emb = discord.Embed(
             description=f'**Partners channels updated** in {delta_time}s ({count[0]} channels - {count[1]} partners)',
@@ -484,6 +499,26 @@ class Events(commands.Cog):
         emb.set_author(name=self.bot.user, icon_url=self.bot.user.display_avatar)
         await self.bot.send_embed(emb, url="loop")
         self.statslogs_last_push = datetime.datetime.now()
+
+
+    @commands.Cog.listener()
+    async def on_command_completion(self, ctx: MyContext):
+        "If a command is executed with Zbot, remind the user to invite Axobot instead"
+        class MigrationView(discord.ui.View):
+            def __init__(self):
+                super().__init__()
+                self.add_item(discord.ui.Button(label='Invite Axobot', url="https://zrunner.me/invite-axobot", style=discord.ButtonStyle.blurple))
+                self.add_item(discord.ui.Button(label='About the migration', url="https://zbot.readthedocs.io/en/release-candidate/v4.html#new-identity"))
+                self.add_item(discord.ui.Button(label='Support server', url="https://discord.gg/N55zY88"))
+        
+        if self.bot.entity_id == 0 and random.random() < 0.1:
+            txt = """Hey, Zbot is currently changing its identity to **Axobot**!
+
+During the migration period, Zbot will continue to work, but will **receive updates later** than Axobot and may not work as well.
+Luckily for you, **the migration is very quick**, just invite Axobot and give it the same roles as Zbot to avoid any service interruption!"""
+            emb = discord.Embed(title="Zbot is becoming Axobot !", description=txt, color=0x00ff00)
+            emb.set_thumbnail(url="https://zrunner.me/axolotl.png")
+            await ctx.send(embed=emb, view=MigrationView())
 
 
 async def setup(bot):

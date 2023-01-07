@@ -6,7 +6,6 @@
     "deviant-default-flow": "{logo} | Neue Kreation von {author} : **{title}**\nVeröffentlicht am {date}\nLink: {link}\n{mentions}",
     "deviant-form-last": "{logo} | Hier ist die neuste Kreation von {author}:\n{title}\nVeröffentlicht am {date}\nLink: {url}",
     "embed-json-changed": "Der eingebettete Feed wurde verändert",
-    "fail-add": "Ein Fehler ist während dem antworten aufgetreten. Bitte versuche es später oder kontaktiere den Zbot Support (gebe den `about` Befehl für den Server Link ein)",
     "flow-limit": "Wegen auftretenden Fehlern, kannst du nicht mehr, als %{limit} rss Feeds pro Server haben.",
     "guild-complete": "%{count} rss Streams wurden in %{time} Sekunden neu geladen!",
     "guild-error": "Ein Fehler ist während dem Verfahren aufgetreten: `%{err}`\nWenn du denkst, dass es nicht dein Fehler war, gehe zu Zbot Support",

@@ -81,7 +81,7 @@ class Timers(commands.Cog):
 
         ..Doc miscellaneous.html#reminders"""
         if ctx.subcommand_passed is None:
-            await self.bot.get_cog('Help').help_command(ctx,['reminder'])
+            await ctx.send_help(ctx.command)
 
 
     @remind_main.command(name="create", aliases=["add"])
@@ -113,7 +113,7 @@ class Timers(commands.Cog):
             d = {'msg_url': ctx.message.jump_url}
             await ctx.bot.task_handler.add_task("timer", duration, ctx.author.id, ctx.guild.id if ctx.guild else None, ctx.channel.id, message, data=d)
         except Exception as err:
-            await ctx.bot.get_cog("Errors").on_command_error(ctx, err)
+            self.bot.dispatch("command_error", ctx, err)
         else:
             await ctx.send(await self.bot._(ctx.channel, "timers.rmd.saved", duration=f_duration))
 
@@ -234,12 +234,16 @@ class Timers(commands.Cog):
                 await view.disable(msg)
                 return
             try:
-                selection = list(map(int, view.values))
+                if isinstance(view.values, str):
+                    selection = [int(view.values)]
+                else:
+                    selection = list(map(int, view.values))
             except ValueError:
                 selection = []
                 self.bot.dispatch("error", ValueError(f"Invalid reminder IDs: {view.values}"), ctx)
         if len(selection) == 0:
-            await ctx.send(await self.bot._(ctx.guild, "rss.fail-add"))
+            cmd = await self.bot.get_command_mention("about")
+            await ctx.send(await self.bot._(ctx.guild, "errors.unknown2", about=cmd))
             return
         return selection
 
@@ -261,7 +265,13 @@ class Timers(commands.Cog):
         if await self.db_delete_reminders(ids, ctx.author.id):
             for reminder_id in ids:
                 await self.bot.task_handler.remove_task(reminder_id)
-        await ctx.send(await self.bot._(ctx.channel, "timers.rmd.delete.success", count=len(ids)))
+            await ctx.send(await self.bot._(ctx.channel, "timers.rmd.delete.success", count=len(ids)))
+        else:
+            await ctx.send(await self.bot._(ctx.channel, "timers.rmd.delete.error"))
+            try:
+                raise ValueError(f"Failed to delete reminders: {ids}")
+            except ValueError as err:
+                self.bot.dispatch("error", err, ctx)
 
     @remind_main.command(name="clear")
     @commands.cooldown(3, 60, commands.BucketType.user)
@@ -281,9 +291,10 @@ class Timers(commands.Cog):
             validation=lambda inter: inter.user==ctx.author,
             timeout=20)
         await confirm_view.init()
-        await ctx.send(await self.bot._(ctx.channel, "timers.rmd.confirm", count=count), view=confirm_view)
+        confirm_msg = await ctx.send(await self.bot._(ctx.channel, "timers.rmd.confirm", count=count), view=confirm_view)
 
         await confirm_view.wait()
+        await confirm_view.disable(confirm_msg)
         if confirm_view.value is None:
             await ctx.send(await self.bot._(ctx.channel, "timers.rmd.cancelled"))
             return

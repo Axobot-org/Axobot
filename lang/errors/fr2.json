@@ -25,6 +25,7 @@
     "quoteserror": "Alors.\nUne erreur de guillemet, c'est ballot ! Mais le pire, c'est que ça vient d'arriver !\nFais bien attention à utiliser les guillemets \", comme ça chaque guillemet ouvert sera bien fermé un peu plus tard.",
     "rolenotfound": "Impossible de trouver ce p\\*\\*\\*\\* de rôle (`%{r}`) !",
     "toomanytxtchan": "Tu as trop de salons textuels accessibles...",
-    "unknown": "Wtf ?\nY'a eu une erreur 😠 😢 😕...\n\nRéessaie plus tard, ou contacte le support (commande `about`).",
+    "unknown": "Wtf ?\nY'a eu une erreur 😠 😢 😕...\n\nRéessaie plus tard, ou contacte le support (commande %{about}).",
+    "unknown2": "Une erreur s'est produite lors du traitement de ta réponse :blobconfused:. Merci de réessayer plus tard, ou de contacter le support du bot (entrez la commande %{about} pour le lien du serveur)",
     "usernotfound": "Impossible de trouver cet utilisateur `%{u}` :blobconfused:"
 }

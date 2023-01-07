@@ -18,7 +18,8 @@ translations_data = {
             "april-2021": "Aujourd'hui, c'est la journée internationale des poissons ! Pendant toute la journée, Zbot fêtera le 1er avril avec des émojis spéciaux pour le jeu du morpion, un avatar unique ainsi que d'autres choses trop cool. \n\nProfitez-en pour récupérer des points d'événements et tentez de gagner la carte d'xp rainbow ! Pour rappel, les cartes d'xp sont accessibles via ma commande `profile card`",
             "april-2022": "Aujourd'hui, c'est la journée internationale des poissons ! Pendant toute la journée, Zbot fêtera le 1er avril avec des émojis spéciaux pour le jeu du morpion, des commandes uniques ainsi que d'autres choses trop cool. \n\nProfitez-en pour récupérer des points d'événements et tentez de gagner la carte d'xp rainbow ! Pour rappel, les cartes d'xp sont accessibles via ma commande `profile card`",
             "halloween-2022": "Le mois d'octobre est là ! Profitez jusqu'au 1er novembre d'une atmosphère ténébreuse, remplie de chauve-souris, de squelettes et de citrouilles.\nProfitez-en pour redécorer votre serveur aux couleurs d'Halloween avec la commande `halloween lightfy` et ses dérivées, vérifiez que votre avatar soit bien conforme avec la commande `halloween check`, et récupérez des points d'événements toutes les heures avec la commande `halloween collect`.\n\nLes plus courageux d'entre vous réussirons peut-être à débloquer la carte d'xp spécial Halloween 2022, que vous pourrez utiliser via la commande profile card !",
-            "christmas-2022": "La période des fêtes de fin d'année est là ! C'est l'occasion rêvée de retrouver ses amis et sa famille, de partager de bons moments ensemble, et de s'offrir tout plein de somptueux cadeaux !\n\nPour cet événement de rassemblement, nulle compétition, il vous suffit d'utiliser la commande `event collect` pour récupérer votre carte d'XP spécial Noël 2022 !\nVous pourrez ensuite utiliser cette carte d'XP via la commande `profile card`.\n\nBonne fêtes de fin d'année à tous !"
+            "christmas-2022": "La période des fêtes de fin d'année est là ! C'est l'occasion rêvée de retrouver ses amis et sa famille, de partager de bons moments ensemble, et de s'offrir tout plein de somptueux cadeaux !\n\nPour cet événement de rassemblement, nulle compétition, il vous suffit d'utiliser la commande `event collect` pour récupérer votre carte d'XP spécial Noël 2022 !\nVous pourrez ensuite utiliser cette carte d'XP via la commande `profile card`.\n\nBonne fêtes de fin d'année à tous !",
+            "test-2022": "Test event!"
         },
         "events-prices": {
             "april-2021": {
@@ -36,7 +37,8 @@ translations_data = {
             "april-2021": "Joyeux 1er avril !",
             "april-2022": "Joyeux 1er avril !",
             "halloween-2022": "Le temps des citrouilles est arrivé !",
-            "christmas-2022": "Joyeuses fêtes de fin d'année !"
+            "christmas-2022": "Joyeuses fêtes de fin d'année !",
+            "test-2022": "Test event!"
         }
     },
     "en": {
@@ -44,7 +46,8 @@ translations_data = {
             "april-2021": "Today is International Fish Day! All day long, Zbot will be celebrating April 1st with special tic-tac-toe emojis, a unique avatar and other cool stuff. \nTake the opportunity to collect event points and try to win the rainbow xp card! As a reminder, the xp cards are accessible via my `profile card` command",
             "april-2022": "Today is International Fish Day! Throughout the day, Zbot will be celebrating April 1 with special tic-tac-toe emojis, unique commands and other cool stuff. \n\nTake the opportunity to collect event points and try to win the rainbow xp card! As a reminder, the xp cards are accessible via my `profile card` command",
             "halloween-2022": "October is here! Enjoy a dark atmosphere full of bats, skeletons and pumpkins until November 1st.\nTake the opportunity to redecorate your server in Halloween colors with the `halloween lightfy` command and its derivatives, check your avatar with the `halloween check` command, and collect event points every hour with the `halloween collect` command.\n\nThe most courageous among you may succeed in unlocking the special Halloween 2022 xp card, which you can use via the profile card command!",
-            "christmas-2022": "The holiday season is here! It's the perfect opportunity to get together with friends and family, share good times together, and get all sorts of wonderful gifts!\n\nFor this gathering event, no competition, just use the `event collect` command to get your Christmas 2022 XP card!\nYou can then use this XP card via the `profile card` command.\n\nMerry Christmas to all!"
+            "christmas-2022": "The holiday season is here! It's the perfect opportunity to get together with friends and family, share good times together, and get all sorts of wonderful gifts!\n\nFor this gathering event, no competition, just use the `event collect` command to get your Christmas 2022 XP card!\nYou can then use this XP card via the `profile card` command.\n\nMerry Christmas to all!",
+            "test-2022": "Test event!"
         },
         "events-prices": {
             "april-2021": {
@@ -62,7 +65,8 @@ translations_data = {
             "april-2021": "Happy April 1st!",
             "april-2022": "Happy April 1st!",
             "halloween-2022": "It's pumpkin time!",
-            "christmas-2022": "Merry Christmas!"
+            "christmas-2022": "Merry Christmas!",
+            "test-2022": "Test event!"
         }
     }
 }
@@ -148,7 +152,7 @@ class BotEvents(commands.Cog):
     async def events_main(self, ctx: MyContext):
         """When I'm organizing some events"""
         if ctx.subcommand_passed is None:
-            await self.bot.get_cog('Help').help_command(ctx, ['events'])
+            await ctx.send_help(ctx.command)
 
     @events_main.command(name="info")
     async def event_info(self, ctx: MyContext):
@@ -280,6 +284,9 @@ class BotEvents(commands.Cog):
     @commands.cooldown(3, 60, commands.BucketType.user)
     async def event_collect(self, ctx: MyContext):
         "Collect your Christmas present!"
+        if self.current_event_id != "christmas-2022":
+            await ctx.send(await self.bot._(ctx.channel, "bot_events.nothing-desc"))
+            return
         if (users_cog := self.bot.get_cog("Users")) is None:
             raise RuntimeError("Users cog not found")
         if await users_cog.has_rankcard(ctx.author, "christmas22"):

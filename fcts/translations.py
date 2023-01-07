@@ -235,7 +235,7 @@ class Translations(commands.Cog):
             cmd = self.bot.get_command("translators translate")
             await cmd(ctx, ctx.subcommand_passed)
         elif ctx.subcommand_passed is None:
-            await self.bot.get_cog('Help').help_command(ctx, ['tr'])
+            await ctx.send_help(ctx.command)
 
     @translate_main.command(name="translate")
     async def translate_smth(self, ctx: MyContext, lang: typing.Optional[LanguageId] = None):
@@ -245,7 +245,7 @@ class Translations(commands.Cog):
 
         Use no argument to get a help message"""
         if lang is None:
-            await self.bot.get_cog('Help').help_command(ctx, ['translators'])
+            await ctx.send_help(ctx.command)
             return
         if lang not in languages or lang == 'en':
             return await ctx.send("Invalid language")

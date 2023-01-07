@@ -141,7 +141,11 @@
             "Le jeu du morpion doit être activé sur ce serveur"
         ]
     },
-    "cmd-count": "%{nbr} commandes\n`%{p}help %{cog}` pour en afficher la liste",
+    "cmd-count": {
+        "zero": "Aucune commande",
+        "one": "1 commande\n`%{p}help %{cog}` pour l'afficher",
+        "other": "%{count} commandes\n`%{p}help %{cog}` pour en afficher la liste"
+    },
     "cmd-not-found": "Aucune commande nommée \"%{cmd}\"",
     "cog-empty-dm": "Aucune commande de ce module n'est disponible en MP !",
     "description": "Description",
@@ -158,5 +162,5 @@
     "not-enabled": ":warning: Cette commande est désactivée",
     "subcmd-not-found": "Cette commande ne possède aucune sous-commande nommée \"%{name}\"",
     "subcmds": "Sous-commandes",
-    "warning": "Avertissements"
+    "warning": "Prérequis"
 }

@@ -1,4 +1,3 @@
-import asyncio
 import copy
 import datetime
 import importlib
@@ -8,10 +7,12 @@ from math import ceil
 from typing import Dict, List, Literal, Optional, Tuple, Union
 
 import discord
+from discord import app_commands
 from discord.ext import commands
 from libs.bot_classes import MyContext, Zbot
 from libs.formatutils import FormatUtils
 from libs.paginator import Paginator
+from libs.views import ConfirmView
 
 from . import args, checks
 from fcts.cases import Case
@@ -29,64 +30,65 @@ class Moderation(commands.Cog):
         # maximum of roles granted/revoked by query
         self.max_roles_modifications = 300
 
-    @commands.command(name="slowmode")
+    @commands.hybrid_command(name="slowmode")
+    @app_commands.default_permissions(manage_channels=True)
     @commands.guild_only()
     @commands.cooldown(1, 3, commands.BucketType.guild)
     @commands.check(checks.can_slowmode)
-    async def slowmode(self, ctx: MyContext, time=None):
+    async def slowmode(self, ctx: MyContext, seconds: int = 0):
         """Keep your chat cool
 Slowmode works up to one message every 6h (21600s)
 
 ..Example slowmode 10
 
-..Example slowmode off
+..Example slowmode 0
 
 ..Doc moderator.html#slowmode"""
         if not ctx.channel.permissions_for(ctx.guild.me).manage_channels:
             await ctx.send(await self.bot._(ctx.guild.id, "moderation.no-perm"))
             return
-        if time is None:
-            return await ctx.send(await self.bot._(ctx.guild.id, "moderation.slowmode.info", s=ctx.channel.slowmode_delay))
-        if time.isnumeric():
-            time = int(time)
-        if time == 'off' or time == 0:
+        if seconds == 0:
             await ctx.channel.edit(slowmode_delay=0)
             message = await self.bot._(ctx.guild.id, "moderation.slowmode.disabled")
-            log = await self.bot._(ctx.guild.id,"logs.slowmode-disabled", channel=ctx.channel.mention)
-            await self.bot.get_cog("Events").send_logs_per_server(ctx.guild,"slowmode",log,ctx.author)
-        elif isinstance(time, int):
-            if time > 21600:
-                message = await self.bot._(ctx.guild.id, "moderation.slowmode.too-long")
-            else:
-                await ctx.channel.edit(slowmode_delay=time)
-                message = await self.bot._(ctx.guild.id, "moderation.slowmode.enabled", channel=ctx.channel.mention, s=time)
-                log = await self.bot._(ctx.guild.id,"logs.slowmode-enabled", channel=ctx.channel.mention, seconds=time)
-                await self.bot.get_cog("Events").send_logs_per_server(ctx.guild,"slowmode",log,ctx.author)
+            log = await self.bot._(ctx.guild.id, "logs.slowmode-disabled", channel=ctx.channel.mention)
+            await self.bot.get_cog("Events").send_logs_per_server(ctx.guild, "slowmode", log, ctx.author)
+        elif seconds > 21600:
+            message = await self.bot._(ctx.guild.id, "moderation.slowmode.too-long")
         else:
-            message = await self.bot._(ctx.guild.id, "moderation.slowmode.invalid")
+            await ctx.channel.edit(slowmode_delay=seconds)
+            duration = await FormatUtils.time_delta(seconds, lang=await self.bot._(ctx, "_used_locale"))
+            message = await self.bot._(ctx.guild.id, "moderation.slowmode.enabled", channel=ctx.channel.mention, s=duration)
+            log = await self.bot._(ctx.guild.id, "logs.slowmode-enabled", channel=ctx.channel.mention, seconds=duration)
+            await self.bot.get_cog("Events").send_logs_per_server(ctx.guild, "slowmode", log, ctx.author)
         await ctx.send(message)
 
 
-    @commands.command(name="clear")
+    @commands.hybrid_command(name="clear")
+    @app_commands.default_permissions(manage_messages=True)
+    @app_commands.describe(number="The max amount of messages to delete")
+    @app_commands.describe(users="list of user IDs or mentions to delete messages from, separated by spaces")
+    @app_commands.describe(contains_file="Clear only messages that contains (or does not) files")
+    @app_commands.describe(contains_url="Clear only messages that contains (or does not) links")
+    @app_commands.describe(contains_invite="Clear only messages that contains (or does not) Discord invites")
+    @app_commands.describe(is_pinned="Clear only messages that are (or are not) pinned")
     @commands.cooldown(4, 30, commands.BucketType.guild)
     @commands.guild_only()
     @commands.check(checks.can_clear)
-    async def clear(self, ctx: MyContext, number:int, *, params=''):
+    async def clear(self, ctx: MyContext, number:int, users: commands.Greedy[discord.User]=None, *, contains_file: Optional[bool]=None, contains_url: Optional[bool]=None, contains_invite: Optional[bool]=None, is_pinned: Optional[bool]=None):
         """Keep your chat clean
-        <number> : number of messages to check
-        Available parameters :
-            <@user> : list of users to check (just mention them)
-            ('-f' or) '+f' : delete if the message  (does not) contain any file
-            ('-l' or) '+l' : delete if the message (does not) contain any link
-            ('-p' or) '+p' : delete if the message is (not) pinned
-            ('-i' or) '+i' : delete if the message (does not) contain a Discord invite
-        By default, the bot will not delete pinned messages
+        <number>: number of messages to check
+        [users]: list of user IDs or mentions to delete messages from
+        [contains_file]: delete if the message does (or does not) contain any file
+        [contains_url]: delete if the message does (or does not) contain any link
+        [contains_invite] : delete if the message does (or does not) contain a Discord invite
+        [is_pinned]: delete if the message is (or is not) pinned
+        By default, the bot will NOT delete pinned messages
 
 ..Example clear 120
 
 ..Example clear 10 @someone
 
-..Example clear 50 +f +l -p
+..Example clear 50 False False True
 
 ..Doc moderator.html#clear"""
         if not ctx.channel.permissions_for(ctx.guild.me).manage_messages:
@@ -95,92 +97,71 @@ Slowmode works up to one message every 6h (21600s)
         if not ctx.channel.permissions_for(ctx.guild.me).read_message_history:
             await ctx.send(await self.bot._(ctx.guild.id, "moderation.need-read-history"))
             return
-        if number<1:
+        if number < 1:
             await ctx.send(await self.bot._(ctx.guild.id, "moderation.clear.too-few")+" "+self.bot.emojis_manager.customs["owo"])
             return
-        if len(params) == 0:
+        await ctx.defer()
+        if users is None and contains_file is None and contains_url is None and contains_invite is None and is_pinned is None:
             return await self.clear_simple(ctx,number)
-        #file
-        if "-f" in params:
-            files = 0
-        elif "+f" in params:
-            files = 2
+
+        def check(msg: discord.Message):
+            # do not delete invocation message
+            if ctx.interaction is not None and msg.interaction is not None and ctx.interaction.id == msg.interaction.id:
+                return False
+            if is_pinned is not None and msg.pinned != is_pinned:
+                return False
+            elif is_pinned is None and msg.pinned:
+                return False
+            if contains_file is not None and bool(msg.attachments) != contains_file:
+                return False
+            r = self.bot.get_cog("Utilities").sync_check_any_link(msg.content)
+            if contains_url is not None and (r is not None) != contains_url:
+                return False
+            i = self.bot.get_cog("Utilities").sync_check_discord_invite(msg.content)
+            if contains_invite is not None and (i is not None) != contains_invite:
+                return False
+            if users and msg.author is not None:
+                return str(msg.author.id) in users
+            return True
+
+        if ctx.interaction:
+            # we'll have to check past the command answer
+            number += 1
         else:
-            files = 1
-        #link
-        if "-l" in params:
-            links = 0
-        elif "+l" in params:
-            links = 2
-        else:
-            links = 1
-        #pinned
-        if '-p' in params:
-            pinned = 0
-        elif "+p" in params:
-            pinned = 2
-        else:
-            pinned = 1
-        #invite
-        if '-i' in params:
-            invites = 0
-        elif "+i" in params:
-            invites = 2
-        else:
-            invites = 1
-        # 0: does  -  2: does not  -  1: why do we care?
-        def check(m):
-            i = self.bot.get_cog("Utilities").sync_check_discord_invite(m.content)
-            r = self.bot.get_cog("Utilities").sync_check_any_link(m.content)
-            c1 = c2 = c3 = c4 = True
-            if pinned != 1:
-                if (m.pinned and pinned == 0) or (not m.pinned and pinned==2):
-                    c1 = False
-            else:
-                c1 = not m.pinned
-            if files != 1:
-                if (m.attachments != [] and files == 0) or (m.attachments==[] and files==2):
-                    c2 = False
-            if links != 1:
-                if (r is None and links==2) or (r is not None and links == 0):
-                    c3 = False
-            if invites != 1:
-                if (i is None and invites==2) or (i is not None and invites == 0):
-                    c4 = False
-            #return ((m.pinned == pinned) or ((m.attachments != []) == files) or ((r is not None) == links)) and m.author in users
-            mentions = list(map(int, re.findall(r'<@!?(\d{167,19})>', ctx.message.content)))
-            if str(ctx.bot.user.id) in ctx.prefix:
-                mentions.remove(ctx.bot.user.id)
-            if mentions and m.author is not None:
-                return c1 and c2 and c3 and c4 and m.author.id in mentions
-            else:
-                return c1 and c2 and c3 and c4
-        try:
+            # start by deleting the invocation message
             await ctx.message.delete()
-            deleted = await ctx.channel.purge(limit=number, check=check)
-            await ctx.send(await self.bot._(ctx.guild, "moderation.clear.done", count=len(deleted)), delete_after=2.0)
-            if len(deleted) > 0:
-                log = await self.bot._(ctx.guild.id, "logs.clear", channel=ctx.channel.mention, number=len(deleted))
-                await self.bot.get_cog("Events").send_logs_per_server(ctx.guild,"clear",log,ctx.author)
-        except Exception as e:
-            await self.bot.get_cog('Errors').on_command_error(ctx,e)
+        deleted = await ctx.channel.purge(limit=number, check=check)
+        await ctx.send(await self.bot._(ctx.guild, "moderation.clear.done", count=len(deleted)), delete_after=2.0)
+        if len(deleted) > 0:
+            log = await self.bot._(ctx.guild.id, "logs.clear", channel=ctx.channel.mention, number=len(deleted))
+            await self.bot.get_cog("Events").send_logs_per_server(ctx.guild, "clear", log, ctx.author)
 
     async def clear_simple(self, ctx: MyContext, number: int):
-        def check(m):
-            return not m.pinned
-        try:
+        def check(msg: discord.Message):
+            if msg.pinned or msg.id == ctx.message.id:
+                return False
+            if ctx.interaction is None or msg.interaction is None:
+                return True
+            return ctx.interaction.id != msg.interaction.id
+        if ctx.interaction:
+            # we'll have to check past the command answer
+            number += 1
+        else:
+            # start by deleting the invocation message
             await ctx.message.delete()
+        try:
             deleted = await ctx.channel.purge(limit=number, check=check)
             await ctx.send(await self.bot._(ctx.guild, "moderation.clear.done", count=len(deleted)), delete_after=2.0)
             log = await self.bot._(ctx.guild.id, "logs.clear", channel=ctx.channel.mention, number=len(deleted))
             await self.bot.get_cog("Events").send_logs_per_server(ctx.guild,"clear",log,ctx.author)
         except discord.errors.NotFound:
             await ctx.send(await self.bot._(ctx.guild, "moderation.clear.not-found"))
-        except Exception as e:
-            await self.bot.get_cog('Errors').on_command_error(ctx,e)
+        except Exception as err:
+            self.bot.dispatch("command_error", ctx, err)
 
 
-    @commands.command(name="kick")
+    @commands.hybrid_command(name="kick")
+    @app_commands.default_permissions(kick_members=True)
     @commands.cooldown(5, 20, commands.BucketType.guild)
     @commands.guild_only()
     @commands.check(checks.can_kick)
@@ -194,12 +175,15 @@ Slowmode works up to one message every 6h (21600s)
             if not ctx.channel.permissions_for(ctx.guild.me).kick_members:
                 await ctx.send(await self.bot._(ctx.guild.id, "moderation.kick.no-perm"))
                 return
+            await ctx.defer()
+
             async def user_can_kick(user):
                 try:
                     return await self.bot.get_cog("Servers").staff_finder(user, "kick_allowed_roles")
                 except commands.errors.CommandError:
                     pass
                 return False
+
             if user == ctx.guild.me or (self.bot.database_online and await user_can_kick(user)):
                 return await ctx.send(await self.bot._(ctx.guild.id, "moderation.kick.cant-staff"))
             elif not self.bot.database_online and ctx.channel.permissions_for(user).kick_members:
@@ -209,20 +193,20 @@ Slowmode works up to one message every 6h (21600s)
                 return
             # send DM
             await self.dm_user(user, "kick", ctx, reason = None if reason=="Unspecified" else reason)
-            reason = await self.bot.get_cog("Utilities").clear_msg(reason,everyone = not ctx.channel.permissions_for(ctx.author).mention_everyone)
+            reason = await self.bot.get_cog("Utilities").clear_msg(reason, everyone = not ctx.channel.permissions_for(ctx.author).mention_everyone)
             await ctx.guild.kick(user,reason=reason[:512])
             caseID = "'Unsaved'"
             if self.bot.database_online:
                 Cases = self.bot.get_cog('Cases')
-                case = Case(bot=self.bot,guildID=ctx.guild.id,memberID=user.id,Type="kick",ModID=ctx.author.id,Reason=reason,date=ctx.bot.utcnow())
+                case = Case(bot=self.bot,guild_id=ctx.guild.id,member_id=user.id,case_type="kick",mod_id=ctx.author.id,reason=reason,date=ctx.bot.utcnow())
                 try:
                     await Cases.add_case(case)
                     caseID = case.id
-                except Exception as e:
-                    await self.bot.get_cog('Errors').on_error(e, ctx)
+                except Exception as err:
+                    self.bot.dispatch("error", err, ctx)
             try:
                 await ctx.message.delete()
-            except discord.Forbidden:
+            except (discord.Forbidden, discord.NotFound):
                 pass
             # optional values
             opt_case = None if caseID=="'Unsaved'" else caseID
@@ -233,13 +217,15 @@ Slowmode works up to one message every 6h (21600s)
             await self.send_modlogs("kick", user, ctx.author, ctx.guild, opt_case, opt_reason)
         except discord.errors.Forbidden:
             await ctx.send(await self.bot._(ctx.guild.id, "moderation.kick.too-high"))
-        except Exception as e:
+        except Exception as err:
             await ctx.send(await self.bot._(ctx.guild.id, "moderation.error"))
-            await self.bot.get_cog('Errors').on_error(e,ctx)
+            self.bot.dispatch("error", err, ctx)
         await self.bot.get_cog('Events').add_event('kick')
 
 
-    @commands.command(name="warn")
+    @commands.hybrid_command(name="warn")
+    @app_commands.default_permissions(moderate_members=True)
+    @app_commands.describe(message="The reason of the warn")
     @commands.cooldown(5, 20, commands.BucketType.guild)
     @commands.guild_only()
     @commands.check(checks.can_warn)
@@ -273,7 +259,7 @@ Slowmode works up to one message every 6h (21600s)
             caseID = "'Unsaved'"
             if self.bot.database_online:
                 if cases_cog := self.bot.get_cog('Cases'):
-                    case = Case(bot=self.bot,guildID=ctx.guild.id,memberID=user.id,Type="warn",ModID=ctx.author.id,Reason=message,date=ctx.bot.utcnow())
+                    case = Case(bot=self.bot,guild_id=ctx.guild.id,member_id=user.id,case_type="warn",mod_id=ctx.author.id,reason=message,date=ctx.bot.utcnow())
                     await cases_cog.add_case(case)
                     caseID = case.id
             else:
@@ -286,7 +272,7 @@ Slowmode works up to one message every 6h (21600s)
             await self.send_modlogs("warn", user, ctx.author, ctx.guild, opt_case, message)
             try:
                 await ctx.message.delete()
-            except discord.Forbidden:
+            except (discord.Forbidden, discord.NotFound):
                 pass
         except Exception as err:
             await ctx.send(await self.bot._(ctx.guild.id, "moderation.error"))
@@ -294,7 +280,7 @@ Slowmode works up to one message every 6h (21600s)
 
     async def get_muted_role(self, guild: discord.Guild):
         "Find the muted role from the guild config option"
-        opt = await self.bot.get_config(guild.id,'muted_role')
+        opt = await self.bot.get_config(guild.id, 'muted_role')
         if opt is None or (isinstance(opt, str) and not opt.isdigit()):
             return None
             # return discord.utils.find(lambda x: x.name.lower() == "muted", guild.roles)
@@ -341,13 +327,15 @@ Slowmode works up to one message every 6h (21600s)
             return False
         return True
 
-    @commands.command(name="mute")
+    @commands.hybrid_command(name="mute")
+    @app_commands.default_permissions(moderate_members=True)
+    @app_commands.describe(time="The duration of the mute, example 3d 7h 12min")
+    @app_commands.describe(reason="The reason of the mute")
     @commands.cooldown(5,20, commands.BucketType.guild)
     @commands.guild_only()
     @commands.check(checks.can_mute)
     async def mute(self, ctx: MyContext, user: discord.Member, time: commands.Greedy[args.tempdelta], *, reason="Unspecified"):
-        """Mute someone.
-When someone is muted, the bot adds the role "muted" to them
+        """Timeout someone.
 You can also mute this member for a defined duration, then use the following format:
 `XXm` : XX minutes
 `XXh` : XX hours
@@ -364,24 +352,27 @@ You can also mute this member for a defined duration, then use the following for
             if duration > 60*60*24*365*3: # max 3 years
                 await ctx.send(await self.bot._(ctx.channel, "timers.rmd.too-long"))
                 return
-            f_duration = await FormatUtils.time_delta(duration,lang=await self.bot._(ctx.guild,'_used_locale'),form="short")
+            f_duration = await FormatUtils.time_delta(duration, lang=await self.bot._(ctx.guild,'_used_locale'), form="short")
         else:
             f_duration = None
+        await ctx.defer()
+
+        async def user_can_mute(user):
+            try:
+                return await self.bot.get_cog("Servers").staff_finder(user, "mute_allowed_roles")
+            except commands.errors.CommandError:
+                pass
+            return False
+
         try:
-            async def user_can_mute(user):
-                try:
-                    return await self.bot.get_cog("Servers").staff_finder(user, "mute_allowed_roles")
-                except commands.errors.CommandError:
-                    pass
-                return False
             if user==ctx.guild.me or (self.bot.database_online and await user_can_mute(user)):
                 emoji = random.choice([':confused:',':upside_down:',self.bot.emojis_manager.customs['wat'],':no_mouth:',self.bot.emojis_manager.customs['owo'],':thinking:',])
-                await ctx.send((await self.bot._(ctx.guild.id, "moderation.mute.staff-mute"))+emoji)
+                await ctx.send((await self.bot._(ctx.guild.id, "moderation.mute.staff-mute")) + " " + emoji)
                 return
             elif not self.bot.database_online and ctx.channel.permissions_for(user).manage_roles:
                 return await ctx.send(await self.bot._(ctx.guild.id, "moderation.warn.cant-staff"))
         except Exception as err:
-            await self.bot.get_cog('Errors').on_error(err,ctx)
+            self.bot.dispatch("command_error", ctx, err)
             return
         role = await self.get_muted_role(ctx.guild)
         if not await self.check_mute_context(ctx, role, user):
@@ -392,9 +383,9 @@ You can also mute this member for a defined duration, then use the following for
             if self.bot.database_online:
                 Cases = self.bot.get_cog('Cases')
                 if f_duration is None:
-                    case = Case(bot=self.bot,guildID=ctx.guild.id,memberID=user.id,Type="mute",ModID=ctx.author.id,Reason=reason,date=ctx.bot.utcnow())
+                    case = Case(bot=self.bot,guild_id=ctx.guild.id,member_id=user.id,case_type="mute",mod_id=ctx.author.id,reason=reason,date=ctx.bot.utcnow())
                 else:
-                    case = Case(bot=self.bot,guildID=ctx.guild.id,memberID=user.id,Type="tempmute",ModID=ctx.author.id,Reason=reason,date=ctx.bot.utcnow(),duration=duration)
+                    case = Case(bot=self.bot,guild_id=ctx.guild.id,member_id=user.id,case_type="tempmute",mod_id=ctx.author.id,reason=reason,date=ctx.bot.utcnow(),duration=duration)
                     await self.bot.task_handler.add_task('mute',duration,user.id,ctx.guild.id)
                 try:
                     await Cases.add_case(case)
@@ -412,7 +403,7 @@ You can also mute this member for a defined duration, then use the following for
             await self.send_chat_answer("mute", user, ctx, opt_case)
             try:
                 await ctx.message.delete()
-            except discord.Forbidden:
+            except (discord.Forbidden, discord.NotFound):
                 pass
         except Exception as err:
             await ctx.send(await self.bot._(ctx.guild.id, "moderation.error"))
@@ -453,12 +444,12 @@ You can also mute this member for a defined duration, then use the following for
             result: int = query_results[0]['count']
         return bool(result)
 
-    async def bdd_muted_list(self, guild_id: int, reasons: bool = False) -> Union[List[Dict[int, str]], List[int]]:
+    async def bdd_muted_list(self, guild_id: int, reasons: bool = False) -> Union[Dict[int, str], List[int]]:
         """List muted users for a specific guild
         Set 'reasons' to True if you want the attached reason"""
         if reasons:
             cases_table = "cases_beta" if self.bot.beta else "cases"
-            query = f'SELECT userid, (SELECT reason FROM {cases_table} WHERE {cases_table}.user=userid AND {cases_table}.guild=guildid AND {cases_table}.type="mute" ORDER BY `{cases_table}`.`created_at` DESC LIMIT 1) as reason FROM `mutes` WHERE guildid=%s'
+            query = f'SELECT userid, (SELECT reason FROM {cases_table} WHERE {cases_table}.user=userid AND {cases_table}.guild=guildid AND {cases_table}.type LIKE "%mute" ORDER BY `{cases_table}`.`created_at` DESC LIMIT 1) as reason FROM `mutes` WHERE guildid=%s'
             async with self.bot.db_query(query, (guild_id,)) as query_results:
                 result = {row['userid']: row['reason'] for row in query_results}
         else:
@@ -467,7 +458,8 @@ You can also mute this member for a defined duration, then use the following for
                 result = [row['userid'] for row in query_results]
         return result
 
-    @commands.command(name="unmute")
+    @commands.hybrid_command(name="unmute")
+    @app_commands.default_permissions(moderate_members=True)
     @commands.cooldown(5,20, commands.BucketType.guild)
     @commands.guild_only()
     @commands.check(checks.can_mute)
@@ -497,47 +489,68 @@ This will remove the role 'muted' for the targeted member
             if user.top_role.position >= ctx.guild.me.roles[-1].position:
                 await ctx.send(await self.bot._(ctx.guild.id, "moderation.mute.too-high"))
                 return
+        await ctx.defer()
         try:
             await self.unmute_event(ctx.guild, user, ctx.author)
             # send in chat
             await self.send_chat_answer("unmute", user, ctx)
             try:
                 await ctx.message.delete()
-            except discord.Forbidden:
+            except (discord.Forbidden, discord.NotFound):
                 pass
             # remove planned automatic unmutes
             await self.bot.task_handler.cancel_unmute(user.id, ctx.guild.id)
         except Exception as err:
             await ctx.send(await self.bot._(ctx.guild.id, "moderation.error"))
-            await self.bot.get_cog('Errors').on_error(err,ctx)
+            self.bot.dispatch("command_error", ctx, err)
 
-    @commands.command(name="mute-config")
-    @commands.cooldown(1,15, commands.BucketType.guild)
+    @commands.hybrid_command(name="mute-config")
+    @app_commands.default_permissions(manage_roles=True)
+    @commands.cooldown(1, 15, commands.BucketType.guild)
     @commands.guild_only()
-    @commands.has_guild_permissions(manage_roles=True)
+    @commands.check(checks.has_manage_roles)
     async def mute_config(self, ctx: MyContext):
-        """Auto configure the muted role for you
+        """Auto configure the muted role for you, if you do not want to use the official timeout
         Useful if you want to have a base for a properly working muted role
         Warning: the process may break some things in your server, depending on how you configured your channel permissions.
 
         ..Doc moderator.html#mute-unmute
         """
+        await ctx.defer()
+        confirm_view = ConfirmView(
+            self.bot, ctx.channel,
+            validation=lambda inter: inter.user == ctx.author,
+            ephemeral=False)
+        await confirm_view.init()
+        confirm_txt = await self.bot._(ctx.guild.id, "moderation.mute-config.confirm")
+        confirm_txt += "\n\n" + await self.bot._(ctx.guild.id, "moderation.mute-config.tip", mute=await self.bot.get_command_mention("mute"))
+        confirm_msg = await ctx.send(confirm_txt, view=confirm_view)
+        
+        await confirm_view.wait()
+        await confirm_view.disable(confirm_msg)
+        if not confirm_view.value:
+            return
+
         role = await self.get_muted_role(ctx.guild)
         create = role is None
         role, count = await self.configure_muted_role(ctx.guild, role)
         if role is None or count >= len(ctx.guild.voice_channels+ctx.guild.text_channels):
-            await ctx.send(await self.bot._(ctx.guild.id, "moderation.mute.mute-config-err"))
+            await ctx.send(await self.bot._(ctx.guild.id, "moderation.mute-config.err"))
         elif create:
-            await ctx.send(await self.bot._(ctx.guild.id, "moderation.mute.mute-config-success", count=count))
+            await ctx.send(await self.bot._(ctx.guild.id, "moderation.mute-config.success", count=count))
         else:
-            await ctx.send(await self.bot._(ctx.guild.id, "moderation.mute.mute-config-success2", count=count))
+            await ctx.send(await self.bot._(ctx.guild.id, "moderation.mute-config.success2", count=count))
 
 
-    @commands.command(name="ban")
+    @commands.hybrid_command(name="ban")
+    @app_commands.default_permissions(ban_members=True)
+    @app_commands.describe(time="The duration of the ban, example 3d 7h 12min")
+    @app_commands.describe(days_to_delete="How many days of messages to delete, max 7")
+    @app_commands.describe(reason="The reason of the ban")
     @commands.cooldown(5,20, commands.BucketType.guild)
     @commands.guild_only()
     @commands.check(checks.can_ban)
-    async def ban(self,ctx:MyContext,user:args.user,time:commands.Greedy[args.tempdelta],days_to_delete:Optional[int]=0,*,reason="Unspecified"):
+    async def ban(self, ctx:MyContext, user:args.user, time:commands.Greedy[args.tempdelta]=None, days_to_delete:Optional[int]=0, *, reason="Unspecified"):
         """Ban someone
 The 'days_to_delete' option represents the number of days worth of messages to delete from the user in the guild, bewteen 0 and 7
 
@@ -550,7 +563,7 @@ The 'days_to_delete' option represents the number of days worth of messages to d
 ..Doc moderator.html#ban-unban
         """
         try:
-            duration = sum(time)
+            duration = sum(time) if time else 0
             if duration > 0:
                 if duration > 60*60*24*365*20: # max 20 years
                     await ctx.send(await self.bot._(ctx.channel, "timers.rmd.too-long"))
@@ -583,24 +596,24 @@ The 'days_to_delete' option represents the number of days worth of messages to d
             if days_to_delete not in range(8):
                 days_to_delete = 0
             reason = await self.bot.get_cog("Utilities").clear_msg(reason,everyone = not ctx.channel.permissions_for(ctx.author).mention_everyone)
-            await ctx.guild.ban(user,reason=reason[:512],delete_message_days=days_to_delete)
+            await ctx.guild.ban(user, reason=reason[:512], delete_message_seconds=days_to_delete * 86400)
             await self.bot.get_cog('Events').add_event('ban')
             case_id = "'Unsaved'"
             if self.bot.database_online:
-                Cases = self.bot.get_cog('Cases')
+                cases_cog = self.bot.get_cog('Cases')
                 if f_duration is None:
-                    case = Case(bot=self.bot,guildID=ctx.guild.id,memberID=user.id,Type="ban",ModID=ctx.author.id,Reason=reason,date=ctx.bot.utcnow())
+                    case = Case(bot=self.bot,guild_id=ctx.guild.id,member_id=user.id,case_type="ban",mod_id=ctx.author.id,reason=reason,date=ctx.bot.utcnow())
                 else:
-                    case = Case(bot=self.bot,guildID=ctx.guild.id,memberID=user.id,Type="tempban",ModID=ctx.author.id,Reason=reason,date=ctx.bot.utcnow(),duration=duration)
+                    case = Case(bot=self.bot,guild_id=ctx.guild.id,member_id=user.id,case_type="tempban",mod_id=ctx.author.id,reason=reason,date=ctx.bot.utcnow(),duration=duration)
                     await self.bot.task_handler.add_task('ban',duration,user.id,ctx.guild.id)
                 try:
-                    await Cases.add_case(case)
+                    await cases_cog.add_case(case)
                     case_id = case.id
                 except Exception as err:
-                    await self.bot.get_cog('Errors').on_error(err,ctx)
+                    self.bot.dispatch("error", err, ctx)
             try:
                 await ctx.message.delete()
-            except discord.Forbidden:
+            except (discord.Forbidden, discord.NotFound):
                 pass
             # optional values
             opt_case = None if case_id=="'Unsaved'" else case_id
@@ -613,7 +626,7 @@ The 'days_to_delete' option represents the number of days worth of messages to d
             await ctx.send(await self.bot._(ctx.guild.id, "moderation.ban.too-high"))
         except Exception as err:
             await ctx.send(await self.bot._(ctx.guild.id, "moderation.error"))
-            await self.bot.get_cog('Errors').on_error(err,ctx)
+            self.bot.dispatch("error", err, ctx)
 
     async def unban_event(self, guild: discord.Guild, user: discord.User, author: discord.User):
         if not guild.me.guild_permissions.ban_members:
@@ -623,7 +636,9 @@ The 'days_to_delete' option represents the number of days worth of messages to d
         # send in modlogs
         await self.send_modlogs("unban", user, author, guild, reason="Automod")
 
-    @commands.command(name="unban")
+    @commands.hybrid_command(name="unban")
+    @app_commands.default_permissions(ban_members=True)
+    @app_commands.describe(reason="The reason of the unban")
     @commands.cooldown(5,20, commands.BucketType.guild)
     @commands.guild_only()
     @commands.check(checks.can_ban)
@@ -646,11 +661,12 @@ The 'days_to_delete' option represents the number of days worth of messages to d
                         return
                     del backup
                 else:
-                    await ctx.send(ctx.guild.id, "errors.usernotfound", u=user)
+                    await ctx.send(await self.bot._(ctx.guild.id, "errors.usernotfound", u=user))
                     return
             if not ctx.channel.permissions_for(ctx.guild.me).ban_members:
                 await ctx.send(await self.bot._(ctx.guild.id, "moderation.ban.cant-ban"))
                 return
+            await ctx.defer()
             try:
                 await ctx.guild.fetch_ban(user)
             except discord.NotFound:
@@ -661,15 +677,15 @@ The 'days_to_delete' option represents the number of days worth of messages to d
             case_id = "'Unsaved'"
             if self.bot.database_online:
                 cases_cog = self.bot.get_cog('Cases')
-                case = Case(bot=self.bot,guildID=ctx.guild.id,memberID=user.id,Type="unban",ModID=ctx.author.id,Reason=reason,date=ctx.bot.utcnow())
+                case = Case(bot=self.bot,guild_id=ctx.guild.id,member_id=user.id,case_type="unban",mod_id=ctx.author.id,reason=reason,date=ctx.bot.utcnow())
                 try:
                     await cases_cog.add_case(case)
                     case_id = case.id
-                except Exception as e:
-                    await self.bot.get_cog('Errors').on_error(e,ctx)
+                except Exception as err:
+                    self.bot.dispatch("error", err, ctx)
             try:
                 await ctx.message.delete()
-            except discord.Forbidden:
+            except (discord.Forbidden, discord.NotFound):
                 pass
             # optional values
             opt_case = None if case_id=="'Unsaved'" else case_id
@@ -678,14 +694,16 @@ The 'days_to_delete' option represents the number of days worth of messages to d
             await self.send_chat_answer("unban", user, ctx, opt_case)
             # send in modlogs
             await self.send_modlogs("unban", user, ctx.author, ctx.guild, opt_case, opt_reason)
-        except Exception as e:
+        except Exception as err:
             await ctx.send(await self.bot._(ctx.guild.id, "moderation.error"))
-            await self.bot.get_cog('Errors').on_error(e,ctx)
+            self.bot.dispatch("error", err, ctx)
 
-    @commands.command(name="softban")
+    @commands.hybrid_command(name="softban")
+    @app_commands.default_permissions(kick_members=True)
+    @app_commands.describe(reason="The reason of the kick")
     @commands.guild_only()
     @commands.check(checks.can_kick)
-    async def softban(self, ctx: MyContext, user:discord.Member, *, reason="Unspecified"):
+    async def softban(self, ctx: MyContext, user: discord.Member, *, reason="Unspecified"):
         """Kick a member and lets Discord delete all his messages up to 7 days old.
 Permissions for using this command are the same as for the kick
 
@@ -718,15 +736,15 @@ Permissions for using this command are the same as for the kick
             caseID = "'Unsaved'"
             if self.bot.database_online:
                 Cases = self.bot.get_cog('Cases')
-                case = Case(bot=self.bot,guildID=ctx.guild.id,memberID=user.id,Type="softban",ModID=ctx.author.id,Reason=reason,date=ctx.bot.utcnow())
+                case = Case(bot=self.bot,guild_id=ctx.guild.id,member_id=user.id,case_type="softban",mod_id=ctx.author.id,reason=reason,date=ctx.bot.utcnow())
                 try:
                     await Cases.add_case(case)
                     caseID = case.id
-                except Exception as e:
-                    await self.bot.get_cog('Errors').on_error(e,ctx)
+                except Exception as err:
+                    self.bot.dispatch("error", err, ctx)
             try:
                 await ctx.message.delete()
-            except discord.Forbidden:
+            except (discord.Forbidden, discord.NotFound):
                 pass
             # optional values
             opt_case = None if caseID=="'Unsaved'" else caseID
@@ -737,9 +755,9 @@ Permissions for using this command are the same as for the kick
             await self.send_modlogs("softban", user, ctx.author, ctx.guild, opt_case, opt_reason)
         except discord.errors.Forbidden:
             await ctx.send(await self.bot._(ctx.guild.id, "moderation.kick.too-high"))
-        except Exception as e:
+        except Exception as err:
             await ctx.send(await self.bot._(ctx.guild.id, "moderation.error"))
-            await self.bot.get_cog('Errors').on_error(e,ctx)
+            self.bot.dispatch("error", err, ctx)
 
     async def dm_user(self, user: discord.User, action: str, ctx: MyContext, reason: str = None, duration: str = None):
         if user.id in self.bot.get_cog('Welcomer').no_message:
@@ -765,15 +783,15 @@ Permissions for using this command are the same as for the kick
                           value=reason, inline=False)
         try:
             await user.send(embed=emb)
-        except discord.Forbidden:
+        except (discord.Forbidden, discord.NotFound):
             pass
-        except discord.HTTPException as e:
-            if e.code == 50007:
+        except discord.HTTPException as err:
+            if err.code == 50007:
                 # "Cannot send message to this user"
                 return
-            await self.bot.get_cog('Errors').on_error(e, ctx)
-        except Exception as e:
-            await self.bot.get_cog('Errors').on_error(e, ctx)
+            self.bot.dispatch("error", err, ctx)
+        except Exception as err:
+            self.bot.dispatch("error", err, ctx)
 
     async def send_chat_answer(self, action: str, user: discord.User, ctx: MyContext, case: int = None):
         if action in ('warn', 'mute', 'unmute', 'kick', 'ban', 'unban'):
@@ -815,13 +833,15 @@ Permissions for using this command are the same as for the kick
             fields.append({'name': _reason.capitalize(), 'value': reason})
         await self.bot.get_cog("Events").send_logs_per_server(guild, action, message, author, fields)
 
-    @commands.command(name="banlist")
+    @commands.hybrid_command(name="banlist")
+    @app_commands.default_permissions(ban_members=True)
+    @app_commands.describe(show_reasons="Show or not the bans reasons")
     @commands.guild_only()
     @commands.check(checks.has_admin)
     @commands.check(checks.bot_can_embed)
-    async def banlist(self, ctx: MyContext, reasons:bool=True):
+    async def banlist(self, ctx: MyContext, show_reasons: bool=True):
         """Check the list of currently banned members.
-The 'reasons' parameter is used to display the ban reasons.
+The 'show_reasons' parameter is used to display the ban reasons.
 
 You must be an administrator of this server to use this command.
 
@@ -834,19 +854,16 @@ You must be an administrator of this server to use this command.
             "Paginator used to display banned users"
             saved_bans: list[discord.guild.BanEntry] = []
             users: set[int] = set()
-            async def send_init(self, ctx: MyContext):
-                "Create and send 1st page"
-                contents = await self.get_page_content(None, 1)
-                await self._update_buttons(None)
-                await ctx.send(**contents, view=self)
-            async def get_page_count(self, _: discord.Interaction) -> int:
+
+            async def get_page_count(self, interaction) -> int:
                 length = len(self.saved_bans)
                 if length == 0:
                     return 1
                 if length%1000 == 0:
                     return self.page+1
                 return ceil(length/30)
-            async def get_page_content(self, interaction: discord.Interaction, page: int):
+
+            async def get_page_content(self, interaction, page):
                 "Create one page"
                 if last_user := (None if len(self.saved_bans) == 0 else self.saved_bans[-1].user):
                     self.saved_bans += [
@@ -866,7 +883,7 @@ You must be an administrator of this server to use this command.
                     page_start, page_end = (page-1)*30, min(page*30, len(self.saved_bans))
                     for i in range(page_start, page_end, 10):
                         column_start, column_end = i+1, min(i+10, len(self.saved_bans))
-                        if reasons:
+                        if show_reasons:
                             values = [f"{entry.user}  *({entry.reason})*" for entry in self.saved_bans[i:i+10]]
                         else:
                             values = [str(entry.user) for entry in self.saved_bans[i:i+10]]
@@ -882,58 +899,112 @@ You must be an administrator of this server to use this command.
         await view.send_init(ctx)
 
 
-    @commands.command(name="mutelist")
+    @commands.hybrid_command(name="mutelist")
+    @app_commands.default_permissions(moderate_members=True)
+    @app_commands.describe(show_reasons="Show or not the mute reasons")
     @commands.guild_only()
     @commands.check(checks.can_mute)
-    async def mutelist(self, ctx: MyContext, reasons:bool=True):
-        """Check the list of currently muted members.
-The 'reasons' parameter is used to display the mute reasons.
+    async def mutelist(self, ctx: MyContext, show_reasons:bool=True):
+        """Check the list of members currently **muted by using this bot**.
+The 'show_reasons' parameter is used to display the mute reasons.
 
 ..Doc moderator.html#banlist-mutelist"""
         try:
-            liste = await self.bdd_muted_list(ctx.guild.id, reasons=reasons)
-        except Exception as e:
+            muted_list = await self.bdd_muted_list(ctx.guild.id, reasons=show_reasons)
+        except Exception as err:
             await ctx.send(await self.bot._(ctx.guild.id, "moderation.error"))
-            await self.bot.get_cog("Errors").on_command_error(ctx, e)
+            self.bot.dispatch("error", err, ctx)
             return
-        desc = list()
-        title = await self.bot._(ctx.guild.id, "moderation.mute.list-title-0", guild=ctx.guild.name)
-        if len(liste) == 0:
-            desc.append(await self.bot._(ctx.guild.id, "moderation.mute.no-mutes"))
-        elif reasons:
-            _unknown = (await self.bot._(ctx.guild, "misc.unknown")).capitalize()
-            for userid, reason in liste.items():
-                user: Optional[discord.User] = self.bot.get_user(userid)
-                if user is None:
-                    continue
-                if len(desc) >= 45:
-                    break
-                _reason = reason if (
-                    reason is not None and reason != "Unspecified") else _unknown
-                desc.append("{}  *({})*".format(user, _reason))
-            if len(liste) > 45: # overwrite title with limit
-                title = await self.bot._(ctx.guild.id, "moderation.mute.list-title-1", guild=ctx.guild.name)
-        else:
-            for userid in liste[:45]:
-                user: Optional[discord.User] = self.bot.get_user(userid)
-                if user is None:
-                    continue
-                if len(desc) >= 60:
-                    break
-                desc.append(str(user))
-            if len(liste) > 60: # overwrite title with limit
-                title = await self.bot._(ctx.guild.id, "moderation.mute.list-title-2", guild=ctx.guild.name)
-        embed = discord.Embed(title=title, color=self.bot.get_cog("Servers").embed_color,
-                              description="\n".join(desc), timestamp=ctx.message.created_at)
-        embed.set_footer(text=ctx.author, icon_url=ctx.author.display_avatar)
-        try:
-            await ctx.send(embed=embed, delete_after=20)
-        except discord.errors.HTTPException as e:
-            if e.code == 400:
-                await ctx.send(await self.bot._(ctx.guild.id, "moderation.ban.list-error"))
+
+        class MutesPaginator(Paginator):
+            "Paginator used to display muted users"
+            users_map: dict[int, Optional[discord.User]] = {}
+
+            async def get_page_count(self, interaction) -> int:
+                length = len(muted_list)
+                if length == 0:
+                    return 1
+                return ceil(length/30)
+
+            async def _resolve_user(self, user_id: int):
+                if user := self.users_map.get(user_id):
+                    return user
+                if user := self.client.get_user(user_id):
+                    self.users_map[user_id] = user
+                    return user
+                if user := await self.client.fetch_user(user_id):
+                    self.users_map[user_id] = user
+                    return user
+                return user_id
+
+            async def get_page_content(self, interaction, page):
+                "Create one page"
+                title = await self.client._(ctx.guild.id, "moderation.mute.list-title-0", guild=ctx.guild.name)
+                emb = discord.Embed(title=title, color=self.client.get_cog("Servers").embed_color)
+                if len(muted_list) == 0:
+                    emb.description = await self.client._(ctx.guild.id, "moderation.mute.no-mutes")
+                else:
+                    page_start, page_end = (page-1)*30, min(page*30, len(muted_list))
+                    for i in range(page_start, page_end, 10):
+                        column_start, column_end = i+1, min(i+10, len(muted_list))
+                        values: list[str] = []
+                        if show_reasons:
+                            for user_id, reason in list(muted_list.items())[i:i+10]:
+                                user = await self._resolve_user(user_id)
+                                values.append(f"{user}  *({reason})*")
+                        else:
+                            for user_id in muted_list[i:i+10]:
+                                user = await self._resolve_user(user_id)
+                                values.append(str(user))
+                        emb.add_field(name=f"{column_start}-{column_end}", value="\n".join(values))
+                footer = f"{ctx.author}  |  {page}/{await self.get_page_count(interaction)}"
+                emb.set_footer(text=footer, icon_url=ctx.author.display_avatar)
+                return {
+                    "embed": emb
+                }
+
+        _quit = await self.bot._(ctx.guild, "misc.quit")
+        view = MutesPaginator(self.bot, ctx.author, stop_label=_quit.capitalize())
+        await view.send_init(ctx)
+
+        # desc = list()
+        
+        # if len(muted_list) == 0:
+        #     desc.append(await self.bot._(ctx.guild.id, "moderation.mute.no-mutes"))
+        # elif show_reasons:
+        #     _unknown = (await self.bot._(ctx.guild, "misc.unknown")).capitalize()
+        #     for userid, reason in muted_list.items():
+        #         user: Optional[discord.User] = self.bot.get_user(userid)
+        #         if user is None:
+        #             continue
+        #         if len(desc) >= 45:
+        #             break
+        #         _reason = reason if (
+        #             reason is not None and reason != "Unspecified") else _unknown
+        #         desc.append("{}  *({})*".format(user, _reason))
+        #     if len(muted_list) > 45: # overwrite title with limit
+        #         title = await self.bot._(ctx.guild.id, "moderation.mute.list-title-1", guild=ctx.guild.name)
+        # else:
+        #     for userid in muted_list[:45]:
+        #         user: Optional[discord.User] = self.bot.get_user(userid)
+        #         if user is None:
+        #             continue
+        #         if len(desc) >= 60:
+        #             break
+        #         desc.append(str(user))
+        #     if len(muted_list) > 60: # overwrite title with limit
+        #         title = await self.bot._(ctx.guild.id, "moderation.mute.list-title-2", guild=ctx.guild.name)
+        # embed = discord.Embed(title=title, color=self.bot.get_cog("Servers").embed_color,
+        #                       description="\n".join(desc), timestamp=ctx.message.created_at)
+        # try:
+        #     await ctx.send(embed=embed)
+        # except discord.errors.HTTPException as err:
+        #     if err.code == 400:
+        #         await ctx.send(await self.bot._(ctx.guild.id, "moderation.ban.list-error"))
 
 
-    @commands.group(name="emoji",aliases=['emojis', 'emote'])
+    @commands.hybrid_group(name="emoji",aliases=['emojis', 'emote'])
+    @app_commands.default_permissions(manage_emojis=True)
     @commands.guild_only()
     @commands.cooldown(5,20, commands.BucketType.guild)
     async def emoji_group(self, ctx: MyContext):
@@ -942,14 +1013,16 @@ The 'reasons' parameter is used to display the mute reasons.
 
         ..Doc moderator.html#emoji-manager"""
         if ctx.subcommand_passed is None:
-            await self.bot.get_cog('Help').help_command(ctx,['emoji'])
+            await ctx.send_help(ctx.command)
 
     @emoji_group.command(name="rename")
+    @app_commands.describe(emoji="The emoji to rename", name="The new name")
+    @commands.guild_only()
     @commands.check(checks.has_manage_emojis)
     async def emoji_rename(self, ctx: MyContext, emoji: discord.Emoji, name: str):
         """Rename an emoji
 
-        ..Example emoji rename :cool: supercool
+        ..Example emoji rename :cool\: supercool
 
         ..Doc moderator.html#emoji-manager"""
         if emoji.guild != ctx.guild:
@@ -962,6 +1035,8 @@ The 'reasons' parameter is used to display the mute reasons.
         await ctx.send(await self.bot._(ctx.guild.id, "moderation.emoji.renamed", emoji=emoji))
 
     @emoji_group.command(name="restrict")
+    @app_commands.describe(emoji="The emoji to restrict", roles="The roles allowed to use this emoji (separated by spaces), or 'everyone'")
+    @commands.guild_only()
     @commands.check(checks.has_manage_emojis)
     async def emoji_restrict(self, ctx: MyContext, emoji: discord.Emoji, roles: commands.Greedy[Union[discord.Role, Literal['everyone']]]):
         """Restrict the use of an emoji to certain roles
@@ -986,6 +1061,7 @@ The 'reasons' parameter is used to display the mute reasons.
         await ctx.send(await self.bot._(ctx.guild.id, "moderation.emoji.emoji-valid", name=emoji, roles=", ".join([x.name for x in roles])))
 
     @emoji_group.command(name="clear")
+    @commands.guild_only()
     @commands.check(checks.has_manage_msg)
     async def emoji_clear(self, ctx: MyContext, message: discord.Message, emoji: discord.Emoji = None):
         """Remove all reactions under a message
@@ -1004,24 +1080,13 @@ The 'reasons' parameter is used to display the mute reasons.
             await message.clear_reactions()
         try:
             await ctx.message.delete()
-        except discord.Forbidden:
+        except (discord.Forbidden, discord.NotFound):
             pass
 
-    @emoji_group.command(name="info")
-    @commands.check(checks.has_manage_emojis)
-    async def emoji_info(self, ctx: MyContext, emoji: discord.Emoji):
-        """Get info about an emoji
-        This is only an alias or `info emoji`
-
-        ..Example info :owo:"""
-        msg = copy.copy(ctx.message)
-        msg.content = ctx.prefix + "info emoji " + str(emoji.id)
-        new_ctx = await self.bot.get_context(msg)
-        await self.bot.invoke(new_ctx)
-
     @emoji_group.command(name="list")
+    @commands.guild_only()
     @commands.check(checks.bot_can_embed)
-    async def emoji_list(self, ctx: MyContext, page: int = 1):
+    async def emoji_list(self, ctx: MyContext):
         """List every emoji of your server
 
         ..Example emojis list
@@ -1029,50 +1094,67 @@ The 'reasons' parameter is used to display the mute reasons.
         ..Example emojis list 2
 
         ..Doc moderator.html#emoji-manager"""
-        if page < 1:
-            await ctx.send(await self.bot._(ctx.guild.id, "xp.low-page"))
-            return
         structure = await self.bot._(ctx.guild.id, "moderation.emoji.list")
-        date = FormatUtils.date
-        lang = await self.bot._(ctx.guild.id,'_used_locale')
         priv = "**"+await self.bot._(ctx.guild.id, "moderation.emoji.private")+"**"
         title = await self.bot._(ctx.guild.id, "moderation.emoji.list-title", guild=ctx.guild.name)
-        try:
-            emotes = [structure.format(x,x.name,await date(x.created_at,lang,year=True,hour=False,digital=True),priv if len(x.roles) > 0 else '') for x in ctx.guild.emojis if not x.animated]
-            emotes += [structure.format(x,x.name,await date(x.created_at,lang,year=True,hour=False,digital=True),priv if len(x.roles) > 0 else '') for x in ctx.guild.emojis if x.animated]
-            if (page-1)*50 >= len(emotes):
-                await ctx.send(await self.bot._(ctx.guild.id, "xp.high-page"))
-                return
-            emotes = emotes[(page-1)*50:page*50]
-            nbr = len(emotes)
-            embed = discord.Embed(title=title, color=self.bot.get_cog('Servers').embed_color)
-            for i in range(0, min(50, nbr), 10):
-                emotes_list = list()
-                for emote in emotes[i:i+10]:
-                    emotes_list.append(emote)
-                field_name = "{}-{}".format(i+1, i+10 if i+10 < nbr else nbr)
-                embed.add_field(name=field_name, value="\n".join(emotes_list), inline=False)
-            embed.set_footer(text=ctx.author, icon_url=ctx.author.display_avatar)
-            await ctx.send(embed=embed)
-        except Exception as e:
-            await ctx.bot.get_cog('Errors').on_command_error(ctx,e)
+        # static emojis
+        emotes = [
+            structure.format(x, x.name, f"<t:{x.created_at.timestamp():.0f}>", priv if len(x.roles) > 0 else '')
+            for x in ctx.guild.emojis
+            if not x.animated
+        ]
+        # animated emojis
+        emotes += [
+            structure.format(x, x.name, f"<t:{x.created_at.timestamp():.0f}>", priv if len(x.roles) > 0 else '')
+            for x in ctx.guild.emojis
+            if x.animated
+        ]
+
+        class EmojisPaginator(Paginator):
+            async def get_page_count(self, _: discord.Interaction) -> int:
+                length = len(emotes)
+                if length == 0:
+                    return 1
+                return ceil(length / 50)
+
+            async def get_page_content(self, _: discord.Interaction, page: int):
+                "Create one page"
+                first_index = (page - 1) * 50
+                last_index = min(first_index + 50, len(emotes))
+                embed = discord.Embed(title=title, color=ctx.bot.get_cog('Servers').embed_color)
+                for i in range(first_index, last_index, 10):
+                    emotes_list = list()
+                    for emote in emotes[i:i+10]:
+                        emotes_list.append(emote)
+                    field_name = "{}-{}".format(i + 1, i + len(emotes_list))
+                    embed.add_field(name=field_name, value="\n".join(emotes_list), inline=False)
+                return {
+                    "embed": embed
+                }
+
+        _quit = await self.bot._(ctx.guild, "misc.quit")
+        view = EmojisPaginator(self.bot, ctx.author, stop_label=_quit.capitalize())
+        await view.send_init(ctx)
 
 
-    @commands.group(name="role", aliases=["roles"])
+    @commands.hybrid_group(name="role", aliases=["roles"])
+    @app_commands.default_permissions(manage_roles=True)
     @commands.guild_only()
     async def main_role(self, ctx: MyContext):
         """A few commands to manage roles
 
         ..Doc moderator.html#emoji-manager"""
-        if ctx.subcommand_passed is None:
-            await self.bot.get_cog('Help').help_command(ctx,['role'])
+        if ctx.subcommand_passed is None and ctx.interaction is None:
+            await ctx.send_help(ctx.command)
 
-    @main_role.command(name="color",aliases=['colour'])
+    @main_role.command(name="set-color", aliases=['set-colour'])
+    @app_commands.describe(color="The new color role, preferably in hex format (#ff6699)")
+    @commands.guild_only()
     @commands.check(checks.has_manage_roles)
     async def role_color(self, ctx: MyContext, role: discord.Role, color: discord.Color):
         """Change a color of a role
 
-        ..Example role color "Admin team" red
+        ..Example role set-color "Admin team" red
 
         ..Doc moderator.html#role-manager"""
         if not ctx.guild.me.guild_permissions.manage_roles:
@@ -1084,12 +1166,14 @@ The 'reasons' parameter is used to display the mute reasons.
         await role.edit(colour=color,reason="Asked by {}".format(ctx.author))
         await ctx.send(await self.bot._(ctx.guild.id,"moderation.role.color-success", role=role.name))
 
-    @main_role.command(name="list")
-    @commands.cooldown(5,30,commands.BucketType.guild)
+    @main_role.command(name="members-list")
+    @commands.cooldown(5, 30, commands.BucketType.guild)
+    @commands.guild_only()
+    @commands.check(checks.has_manage_roles)
     async def role_list(self, ctx: MyContext, *, role: discord.Role):
         """Send the list of members in a role
 
-        ..Example role list "Technical team"
+        ..Example role members-list "Technical team"
 
         ..Doc moderator.html#role-manager"""
         if not (await checks.has_manage_roles(ctx) or await checks.has_manage_guild(ctx) or await checks.has_manage_msg(ctx)):
@@ -1114,62 +1198,18 @@ The 'reasons' parameter is used to display the mute reasons.
         emb.set_footer(text=ctx.author, icon_url=ctx.author.display_avatar)
         await ctx.send(embed=emb)
 
-    @main_role.command(name="server-list",aliases=["glist"])
-    @commands.check(checks.bot_can_embed)
-    @commands.cooldown(5,30,commands.BucketType.guild)
-    async def role_glist(self, ctx:MyContext):
-        """Check the list of every role
 
-        ..Example role glist
-
-        ..Doc moderator.html#role-manager"""
-        if not (await checks.has_manage_roles(ctx) or await checks.has_manage_guild(ctx) or await checks.has_manage_msg(ctx)):
-            await ctx.send(await self.bot._(ctx.guild.id, "moderation.missing-user-perms"))
-            return
-        tr_mbr = await self.bot._(ctx.guild.id,"misc.membres")
-        title = await self.bot._(ctx.guild.id, "moderation.role.list")
-        desc = list()
-        count = 0
-        for role in ctx.guild.roles[1:]:
-            txt = "{} - {} {}".format(role.mention, len(role.members), tr_mbr)
-            if count+len(txt) > 2040:
-                emb = discord.Embed(title=title, description="\n".join(desc), color=ctx.guild.me.color, timestamp=ctx.message.created_at)
-                emb.set_footer(text=ctx.author, icon_url=ctx.author.display_avatar)
-                await ctx.send(embed=emb)
-                desc.clear()
-                count = 0
-            desc.append(txt)
-            count += len(txt)+2
-        if count > 0:
-            emb = discord.Embed(title=title, description="\n".join(desc), color=ctx.guild.me.color, timestamp=ctx.message.created_at)
-            emb.set_footer(text=ctx.author, icon_url=ctx.author.display_avatar)
-            await ctx.send(embed=emb)
-
-
-    @main_role.command(name="info")
-    @commands.check(checks.has_manage_msg)
-    async def role_info(self, ctx: MyContext, role:discord.Role):
-        """Get info about a role
-        This is only an alias or `info role`
-
-        ..Example role info VIP+
-
-        ..Doc moderator.html#role-manager"""
-        msg = copy.copy(ctx.message)
-        msg.content = ctx.prefix + "info role " + str(role.id)
-        new_ctx = await self.bot.get_context(msg)
-        await self.bot.invoke(new_ctx)
-
-    @main_role.command(name="give", aliases=["add", "grant"])
-    @commands.check(checks.has_manage_roles)
+    @main_role.command(name="grant", aliases=["add", "give"])
     @commands.cooldown(1, 30, commands.BucketType.guild)
+    @commands.guild_only()
+    @commands.check(checks.has_manage_roles)
     async def roles_give(self, ctx:MyContext, role:discord.Role, users:commands.Greedy[Union[discord.Role,discord.Member,Literal['everyone']]]):
         """Give a role to a list of roles/members
         Users list may be either members or roles, or even only one member
 
-        ..Example role give Elders everyone
+        ..Example role grant Elders everyone
 
-        ..Example role give Slime Theo AsiliS
+        ..Example role grant Slime Theo AsiliS
 
         ..Doc moderator.html#role-manager"""
         if len(users) == 0:
@@ -1208,14 +1248,15 @@ The 'reasons' parameter is used to display the mute reasons.
         else:
             await ctx.send(answer)
 
-    @main_role.command(name="remove", aliases=["revoke"])
-    @commands.check(checks.has_manage_roles)
+    @main_role.command(name="revoke", aliases=["remove"])
     @commands.cooldown(1, 30, commands.BucketType.guild)
+    @commands.guild_only()
+    @commands.check(checks.has_manage_roles)
     async def roles_remove(self, ctx:MyContext, role:discord.Role, users:commands.Greedy[Union[discord.Role,discord.Member,Literal['everyone']]]):
         """Remove a role to a list of roles/members
         Users list may be either members or roles, or even only one member
 
-        ..Example role remove VIP @muted
+        ..Example role revoke VIP @muted
 
         ..Doc moderator.html#role-manager"""
         if len(users) == 0:
@@ -1231,8 +1272,8 @@ The 'reasons' parameter is used to display the mute reasons.
         for item in users:
             if item == "everyone":
                 item = ctx.guild.default_role
-            if isinstance(item,discord.Member):
-                if role not in item.roles:
+            if isinstance(item, discord.Member):
+                if role in item.roles:
                     n_users.add(item)
             else:
                 for m in item.members:
@@ -1254,33 +1295,13 @@ The 'reasons' parameter is used to display the mute reasons.
         else:
             await ctx.send(answer)
 
-
-    @commands.command(name="pin")
-    @commands.check(checks.has_manage_msg)
-    async def pin_msg(self, ctx: MyContext, msg: int):
-        """Pin a message
-ID corresponds to the Identifier of the message
-
-..Example pin https://discord.com/channels/159962941502783488/201215818724409355/505373568184483851"""
-        if ctx.guild is not None and not ctx.channel.permissions_for(ctx.guild.me).manage_messages:
-            await ctx.send(await self.bot._(ctx.channel, "moderation.cant-pin"))
-            return
-        try:
-            message = await ctx.channel.fetch_message(msg)
-        except Exception as e:
-            await ctx.send(await self.bot._(ctx.channel, "moderation.pin.error-notfound", err=e))
-            return
-        try:
-            await message.pin()
-        except Exception as e:
-            await ctx.send(await self.bot._(ctx.channel, "moderation.pin.error-toomuch", err=e))
-            return
-
-    @commands.command(name='unhoist')
+    @commands.hybrid_command(name='unhoist')
+    @app_commands.default_permissions(manage_nicknames=True)
+    @app_commands.describe(chars="The list of characters that should be considered as hoisting")
     @commands.guild_only()
     @commands.check(checks.has_manage_nicknames)
     async def unhoist(self, ctx: MyContext, chars: str=None):
-        """Remove the special characters from usernames
+        """Remove the special characters from the beginning of usernames
 
         ..Example unhoist
 
@@ -1289,19 +1310,23 @@ ID corresponds to the Identifier of the message
         ..Doc moderator.html#unhoist-members"""
         count = 0
         if not ctx.channel.permissions_for(ctx.guild.me).manage_nicknames:
-            return await ctx.send(await self.bot._(ctx.guild.id,"moderation.missing-manage-nick"))
+            return await ctx.send(await self.bot._(ctx.guild.id, "moderation.missing-manage-nick"))
+        if len(ctx.guild.members) > 5000:
+            return await ctx.send(await self.bot._(ctx.guild.id, "moderation.unhoist-too-many-members"))
         if chars is None:
             def check(username: str):
-                while username < '0':
+                while username < '0' and len(username):
                     username = username[1:]
-                    if len(username) == 0:
-                        username = "z unhoisted"
+                if len(username) == 0:
+                    username = "z unhoisted"
                 return username
         else:
             chars = chars.lower()
-            def check(username):
-                while username[0].lower() in chars+' ':
+            def check(username: str):
+                while len(username) and username[0].lower() in chars+' ':
                     username = username[1:]
+                if len(username) == 0:
+                    username = "z unhoisted"
                 return username
         for member in ctx.guild.members:
             try:
@@ -1314,36 +1339,38 @@ ID corresponds to the Identifier of the message
                 pass
         await ctx.send(await self.bot._(ctx.guild.id,"moderation.unhoisted",count=count))
 
-    @commands.command(name="destop")
+    @commands.hybrid_command(name="destop")
+    @app_commands.default_permissions(manage_messages=True)
     @commands.guild_only()
     @commands.check(checks.can_clear)
     @commands.cooldown(2, 30, commands.BucketType.channel)
-    async def destop(self, ctx:MyContext, message:discord.Message):
-        """Clear every message between now and another message
+    async def destop(self, ctx:MyContext, start_message:discord.Message):
+        """Clear every message between now and an older message
         Message can be either ID or url
         Limited to 1,000 messages
 
         ..Example destop https://discordapp.com/channels/356067272730607628/488769306524385301/740249890201796688
 
         ..Doc moderator.html#clear"""
-        if message.guild != ctx.guild:
+        if start_message.guild != ctx.guild:
             await ctx.send(await self.bot._(ctx.guild.id, "moderation.destop.no-guild"))
             return
-        if not message.channel.permissions_for(ctx.guild.me).manage_messages:
+        if not start_message.channel.permissions_for(ctx.guild.me).manage_messages:
             await ctx.send(await self.bot._(ctx.guild.id, "moderation.need-manage-messages"))
             return
-        if not message.channel.permissions_for(ctx.guild.me).read_message_history:
+        if not start_message.channel.permissions_for(ctx.guild.me).read_message_history:
             await ctx.send(await self.bot._(ctx.guild.id, "moderation.need-read-history"))
             return
-        if message.created_at < ctx.bot.utcnow() - datetime.timedelta(days=21):
+        if start_message.created_at < ctx.bot.utcnow() - datetime.timedelta(days=21):
             await ctx.send(await self.bot._(ctx.guild.id, "moderation.destop.too-old", days=21))
             return
-        messages = await message.channel.purge(after=message, limit=1000, oldest_first=False)
-        await message.delete()
-        messages.append(message)
+        await ctx.defer()
+        messages = await start_message.channel.purge(after=start_message, before=ctx.message, limit=1000, oldest_first=False)
+        await start_message.delete()
+        messages.append(start_message)
         txt = await self.bot._(ctx.guild.id, "moderation.clear.done", count=len(messages))
         await ctx.send(txt, delete_after=2.0)
-        log = await self.bot._(ctx.guild.id,"logs.clear", channel=message.channel.mention, number=len(messages))
+        log = await self.bot._(ctx.guild.id,"logs.clear", channel=start_message.channel.mention, number=len(messages))
         await self.bot.get_cog("Events").send_logs_per_server(ctx.guild, "clear", log, ctx.author)
 
 
@@ -1375,8 +1402,8 @@ ID corresponds to the Identifier of the message
                             count += 1
                 if category is not None and category.permissions_for(guild.me).manage_roles:
                     await category.set_permissions(role, send_messages=False)
-        except Exception as e:
-            await self.bot.get_cog('Errors').on_error(e, None)
+        except Exception as err:
+            self.bot.dispatch("error", err)
             count = len(guild.channels)
         await self.bot.get_cog('Servers').modify_server(guild.id, values=[('muted_role',role.id)])
         return role, count

@@ -44,15 +44,16 @@ class Xp(commands.Cog):
         self.types = ['global','mee6-like','local']
         try:
             verdana_name = 'Verdana.ttf'
-            xp_font = ImageFont.truetype(verdana_name, 24)
         except OSError:
             verdana_name = 'Veranda.ttf'
-            xp_font = ImageFont.truetype(verdana_name, 24)
-        self.fonts = {'xp_fnt': xp_font,
-        'NIVEAU_fnt': ImageFont.truetype(verdana_name, 42),
-        'levels_fnt': ImageFont.truetype(verdana_name, 65),
-        'rank_fnt': ImageFont.truetype(verdana_name,29),
-        'RANK_fnt': ImageFont.truetype(verdana_name,23)}
+        self.fonts = {
+            'xp_fnt': ImageFont.truetype(verdana_name, 24),
+            'NIVEAU_fnt': ImageFont.truetype(verdana_name, 42),
+            'levels_fnt': ImageFont.truetype(verdana_name, 65),
+            'rank_fnt': ImageFont.truetype(verdana_name, 29),
+            'RANK_fnt': ImageFont.truetype(verdana_name, 23),
+            'name_fnt': ImageFont.truetype('Roboto-Medium.ttf', 40),
+        }
     
     @commands.Cog.listener()
     async def on_ready(self):
@@ -68,7 +69,7 @@ class Xp(commands.Cog):
         if value == "any":
             return msg.channel
         try:
-            chan = msg.guild.get_channel(int(value))
+            chan = msg.guild.get_channel_or_thread(int(value))
             return chan
         except discord.errors.NotFound:
             return None
@@ -291,9 +292,9 @@ class Xp(commands.Cog):
                 if not self.bot.beta:
                     await member.add_roles(r,reason="Role reward (lvl {})".format(role['level']))
                 c += 1
-            except Exception as e:
+            except Exception as err:
                 if self.bot.beta:
-                    await self.bot.get_cog('Errors').on_error(e,None)
+                    self.bot.dispatch("error", err)
         if not remove:
             return c
         for role in [x for x in rr_list if x['level']>level and x['role'] in has_roles]:
@@ -304,9 +305,9 @@ class Xp(commands.Cog):
                 if not self.bot.beta:
                     await member.remove_roles(r,reason="Role reward (lvl {})".format(role['level']))
                 c += 1
-            except Exception as e:
+            except Exception as err:
                 if self.bot.beta:
-                    await self.bot.get_cog('Errors').on_error(e,None)
+                    self.bot.dispatch("error", err)
         return c
     
     async def reload_sus(self):
@@ -373,8 +374,8 @@ class Xp(commands.Cog):
             cnx.commit()
             cursor.close()
             return True
-        except Exception as e:
-            await self.bot.get_cog('Errors').on_error(e,None)
+        except Exception as err:
+            self.bot.dispatch("error", err)
             return False
     
     async def bdd_get_xp(self, userID: int, guild: int):
@@ -405,8 +406,8 @@ class Xp(commands.Cog):
                     self.cache[g][userID] = [round(time.time())-60,liste[0]['xp']]
             cursor.close()
             return liste
-        except Exception as e:
-            await self.bot.get_cog('Errors').on_error(e,None)
+        except Exception as err:
+            self.bot.dispatch("error", err)
     
     async def bdd_get_nber(self, guild: int=None):
         """Get the number of ranked users"""
@@ -431,8 +432,8 @@ class Xp(commands.Cog):
             if liste is not None and len(liste)==1:
                 return liste[0][0]
             return 0
-        except Exception as e:
-            await self.bot.get_cog('Errors').on_error(e,None)
+        except Exception as err:
+            self.bot.dispatch("error", err)
 
     async def bdd_load_cache(self, guild: int):
         try:
@@ -469,8 +470,8 @@ class Xp(commands.Cog):
                     self.cache[guild][l['userID']] = [round(time.time())-60, int(l['xp'])]
             cursor.close()
             return
-        except Exception as e:
-            await self.bot.get_cog('Errors').on_error(e,None)
+        except Exception as err:
+            self.bot.dispatch("error", err)
 
     async def bdd_get_top(self, top: int=None, guild: discord.Guild=None):
         try:
@@ -508,7 +509,7 @@ class Xp(commands.Cog):
             cursor.close()
             return liste
         except Exception as err:
-            await self.bot.get_cog('Errors').on_error(err,None)
+            self.bot.dispatch("error", err)
 
     async def bdd_get_rank(self, userID: int, guild: discord.Guild=None):
         """Get the rank of a user"""
@@ -525,10 +526,10 @@ class Xp(commands.Cog):
             cursor = cnx.cursor(dictionary = True)
             try:
                 cursor.execute(query)
-            except mysql.connector.errors.ProgrammingError as e:
-                if e.errno == 1146:
+            except mysql.connector.errors.ProgrammingError as err:
+                if err.errno == 1146:
                     return {"rank":0, "xp":0}
-                raise e
+                raise err
             userdata = dict()
             i = 0
             users = list()
@@ -544,8 +545,8 @@ class Xp(commands.Cog):
                     break
             cursor.close()
             return userdata
-        except Exception as e:
-            await self.bot.get_cog('Errors').on_error(e,None)
+        except Exception as err:
+            self.bot.dispatch("error", err)
 
     async def bdd_total_xp(self):
         """Get the total number of earned xp"""
@@ -568,8 +569,8 @@ class Xp(commands.Cog):
             #         result += round(res[0][0])
             # cursor.close()
             return result
-        except Exception as e:
-            await self.bot.get_cog('Errors').on_error(e,None)
+        except Exception as err:
+            self.bot.dispatch("error", err)
 
 
     async def get_raw_image(self, url:str):
@@ -586,7 +587,7 @@ class Xp(commands.Cog):
 
     async def create_card(self, user: discord.User, style, xp, used_system:int, rank=[1,0], txt=['NIVEAU','RANG'], force_static=False, levels_info=None):
         """Crée la carte d'xp pour un utilisateur"""
-        card = Image.open("../cards/model/{}.png".format(style))
+        card = Image.open("./assets/card-models/{}.png".format(style))
         bar_colors = await self.get_xp_bar_color(user.id)
         if levels_info is None:
             levels_info = await self.calc_level(xp,used_system)
@@ -594,14 +595,12 @@ class Xp(commands.Cog):
         if style in {'blurple21', 'blurple22'}:
             colors = {'name':(240, 240, 255),'xp':(235, 235, 255),'NIVEAU':(245, 245, 255),'rank':(255, 255, 255),'bar':(250, 250, 255), 'bar_background': (27, 29, 31)}
 
-        name_fnt = ImageFont.truetype('Roboto-Medium.ttf', 40)
-
         if not user.display_avatar.is_animated() or force_static:
             pfp = await self.get_raw_image(user.display_avatar.replace(format="png", size=256))
-            img = await self.bot.loop.run_in_executor(None,self.add_overlay,pfp.resize(size=(282,282)),user,card,xp,rank,txt,colors,levels_info,name_fnt)
-            img.save('../cards/global/{}-{}-{}.png'.format(user.id,xp,rank[0]))
+            img = await self.bot.loop.run_in_executor(None,self.add_overlay,pfp.resize(size=(282,282)),user,card,xp,rank,txt,colors,levels_info)
+            img.save('./assets/cards/{}-{}-{}.png'.format(user.id,xp,rank[0]))
             card.close()
-            return discord.File('../cards/global/{}-{}-{}.png'.format(user.id,xp,rank[0]))
+            return discord.File('./assets/cards/{}-{}-{}.png'.format(user.id,xp,rank[0]))
 
         else:
             async with aiohttp.ClientSession() as cs:
@@ -614,7 +613,7 @@ class Xp(commands.Cog):
             frames = [frame.copy() for frame in ImageSequence.Iterator(pfp)]
             for frame in frames:
                 frame = frame.convert(mode='RGBA')
-                img = await self.bot.loop.run_in_executor(None,self.add_overlay,frame.resize(size=(282,282)),user,card.copy(),xp,rank,txt,colors,levels_info,name_fnt)
+                img = await self.bot.loop.run_in_executor(None,self.add_overlay,frame.resize(size=(282,282)),user,card.copy(),xp,rank,txt,colors,levels_info)
                 img = ImageEnhance.Contrast(img).enhance(1.5).resize((800,265))
                 images.append(img)
                 duration.append(pfp.info['duration'])
@@ -623,13 +622,13 @@ class Xp(commands.Cog):
 
             # image_file_object = BytesIO()
             gif = images[0]
-            filename = '../cards/global/{}-{}-{}.gif'.format(user.id,xp,rank[0])
+            filename = './assets/cards/{}-{}-{}.gif'.format(user.id,xp,rank[0])
             gif.save(filename, format='gif', save_all=True, append_images=images[1:], loop=0, duration=duration, subrectangles=True)
             # image_file_object.seek(0)
             # return discord.File(fp=image_file_object, filename='card.gif')
-            return discord.File('../cards/global/{}-{}-{}.gif'.format(user.id,xp,rank[0]))
-            # imageio.mimwrite('../cards/global/{}-{}-{}.gif'.format(user.id,xp,rank[0]), images, format="GIF-PIL", duration=duration, subrectangles=True)
-            # return discord.File('../cards/global/{}-{}-{}.gif'.format(user.id,xp,rank[0]))
+            return discord.File('./assets/cards/{}-{}-{}.gif'.format(user.id,xp,rank[0]))
+            # imageio.mimwrite('./assets/cards/{}-{}-{}.gif'.format(user.id,xp,rank[0]), images, format="GIF-PIL", duration=duration, subrectangles=True)
+            # return discord.File('./assets/cards/{}-{}-{}.gif'.format(user.id,xp,rank[0]))
 
     def compress(self, original_file, max_size, scale: float):
         assert(0.0 < scale < 1.0)
@@ -647,7 +646,7 @@ class Xp(commands.Cog):
                     file_bytes.seek(0, 0)
                     return file_bytes
 
-    def add_overlay(self, pfp, user: discord.User, img, xp: int, rank: list, txt: list, colors, levels_info, name_fnt):
+    def add_overlay(self, pfp, user: discord.User, img, xp: int, rank: list, txt: list, colors, levels_info):
         #img = Image.new('RGBA', (card.width, card.height), color = (250,250,250,0))
         #img.paste(pfp, (20, 29))
         #img.paste(card, (0, 0), card)
@@ -666,6 +665,7 @@ class Xp(commands.Cog):
         levels_fnt = self.fonts['levels_fnt']
         rank_fnt = self.fonts['rank_fnt']
         RANK_fnt = self.fonts['RANK_fnt']
+        name_fnt = self.fonts['name_fnt']
 
         img = self.add_xp_bar(img,xp-levels_info[2],levels_info[1]-levels_info[2],colors['bar'], colors['bar_background'])
         d = ImageDraw.Draw(img)
@@ -750,18 +750,26 @@ class Xp(commands.Cog):
                     rank = "?"
             if isinstance(rank, float):
                 rank = int(rank)
+            # If we can send the rank card
             if ctx.guild is None or ctx.channel.permissions_for(ctx.guild.me).attach_files:
-                await self.send_card(ctx,user,xp,rank,ranks_nb,xp_used_type,levels_info)
-            elif ctx.can_send_embed:
-                await self.send_embed(ctx,user,xp,rank,ranks_nb,levels_info,xp_used_type)
-            else:
-                await self.send_txt(ctx,user,xp,rank,ranks_nb,levels_info,xp_used_type)
-        except Exception as e:
-            await self.bot.get_cog('Errors').on_command_error(ctx,e)
+                try:
+                    await self.send_card(ctx, user, xp, rank, ranks_nb, xp_used_type, levels_info)
+                    return
+                except Exception as err:  # pylint: disable=broad-except
+                    # log the error and fall back to embed/text
+                    self.bot.dispatch("error", err, ctx)
+            # if we can send embeds
+            if ctx.can_send_embed:
+                await self.send_embed(ctx, user, xp, rank, ranks_nb, levels_info, xp_used_type)
+                return
+            # fall back to raw text
+            await self.send_txt(ctx, user, xp, rank, ranks_nb, levels_info, xp_used_type)
+        except Exception as err:
+            self.bot.dispatch("command_error", ctx, err)
 
     async def send_card(self, ctx: MyContext, user: discord.User, xp, rank, ranks_nb, used_system, levels_info=None):
         try:
-            myfile = discord.File('../cards/global/{}-{}-{}.{}'.format(user.id,xp,rank,'gif' if user.display_avatar.is_animated() else 'png'))
+            myfile = discord.File('./assets/cards/{}-{}-{}.{}'.format(user.id,xp,rank,'gif' if user.display_avatar.is_animated() else 'png'))
         except FileNotFoundError:
             style = await self.bot.get_cog('Utilities').get_xp_style(user)
             txts = [await self.bot._(ctx.channel, "xp.card-level"), await self.bot._(ctx.channel, "xp.card-rank")]
@@ -776,8 +784,8 @@ class Xp(commands.Cog):
             if UsersCog := self.bot.get_cog("Users"):
                 try:
                     await UsersCog.used_rank(user.id)
-                except Exception as e:
-                    await self.bot.get_cog("Errors").on_error(e, ctx)
+                except Exception as err:
+                    self.bot.dispatch("error", err, ctx)
             if statsCog := self.bot.get_cog("BotStats"):
                 statsCog.xp_cards["generated"] += 1
         try:
@@ -790,22 +798,22 @@ class Xp(commands.Cog):
     async def send_embed(self, ctx: MyContext, user: discord.User, xp, rank, ranks_nb, levels_info, used_system):
         txts = [await self.bot._(ctx.channel, "xp.card-level"), await self.bot._(ctx.channel, "xp.card-rank")]
         if levels_info is None:
-            levels_info = await self.calc_level(xp,used_system)
+            levels_info = await self.calc_level(xp, used_system)
         emb = discord.Embed(color=self.embed_color)
         emb.set_author(name=user, icon_url=user.display_avatar)
-        emb.add_field(name='XP', value="{}/{}".format(xp,levels_info[1]))
-        emb.add_field(name=txts[0], value=levels_info[0])
-        emb.add_field(name=txts[1], value="{}/{}".format(rank,ranks_nb))
+        emb.add_field(name='XP', value="{}/{}".format(xp, levels_info[1]))
+        emb.add_field(name=txts[0].title(), value=levels_info[0])
+        emb.add_field(name=txts[1].title(), value="{}/{}".format(rank, ranks_nb))
         await ctx.send(embed=emb)
 
     async def send_txt(self, ctx: MyContext, user: discord.User, xp, rank, ranks_nb, levels_info, used_system):
         txts = [await self.bot._(ctx.channel, "xp.card-level"), await self.bot._(ctx.channel, "xp.card-rank")]
         if levels_info is None:
-            levels_info = await self.calc_level(xp,used_system)
+            levels_info = await self.calc_level(xp, used_system)
         msg = """__**{}**__
 **XP** {}/{}
 **{}** {}
-**{}** {}/{}""".format(user.name,xp,levels_info[1],txts[0],levels_info[0],txts[1],rank,ranks_nb)
+**{}** {}/{}""".format(user.name, xp, levels_info[1], txts[0].title(), levels_info[0], txts[1].title(), rank, ranks_nb)
         await ctx.send(msg)
 
     def convert_average(self, nbr: int) -> str:
@@ -838,10 +846,10 @@ class Xp(commands.Cog):
             txt.append('{} • **{} |** `lvl {}` **|** `xp {}`'.format(i,"__"+user_name+"__" if user==ctx.author else user_name,l[0],xp))
         return txt,i
 
-    @commands.command(name='top')
+    @commands.command(name="top")
     @commands.bot_has_permissions(send_messages=True)
     @commands.cooldown(5,60,commands.BucketType.user)
-    async def top(self, ctx: MyContext, page: typing.Optional[int]=1, Type: args.LeaderboardType='global'):
+    async def top(self, ctx: MyContext, page: typing.Optional[int]=1, scope: args.LeaderboardType='global'):
         """Get the list of the highest levels
         Each page has 20 users
 
@@ -860,13 +868,13 @@ class Xp(commands.Cog):
             xp_system_used = 0
         xp_system_used = 0 if xp_system_used is None else xp_system_used
         if xp_system_used == 0:
-            if Type == 'global':
+            if scope == 'global':
                 if len(self.cache["global"]) == 0:
                     await self.bdd_load_cache(-1)
                 ranks = sorted([{'userID':key, 'xp':value[1]} for key,value in self.cache['global'].items()], key=lambda x:x['xp'], reverse=True)
                 max_page = ceil(len(self.cache['global'])/20)
-            elif Type == 'guild':
-                ranks = await self.bdd_get_top(10000,guild=ctx.guild)
+            elif scope == 'guild':
+                ranks = await self.bdd_get_top(10000, guild=ctx.guild)
                 max_page = ceil(len(ranks)/20)
         else:
             #ranks = await self.bdd_get_top(20*page,guild=ctx.guild)
@@ -876,6 +884,8 @@ class Xp(commands.Cog):
             max_page = ceil(len(ranks)/20)
         if page < 1:
             return await ctx.send(await self.bot._(ctx.channel, "xp.low-page"))
+        elif max_page == 0:
+            return await ctx.send(await self.bot._(ctx.channel, "xp.no-rank"))
         elif page > max_page:
             return await ctx.send(await self.bot._(ctx.channel, "xp.high-page"))
         ranks = ranks[(page-1)*20:]
@@ -888,7 +898,7 @@ class Xp(commands.Cog):
             await asyncio.sleep(0.2)
         f_name = await self.bot._(ctx.channel, "xp.top-name", min=(page-1)*20+1, max=i, page=page, total=max_page)
         # author
-        rank = await self.bdd_get_rank(ctx.author.id,ctx.guild if (Type=='guild' or xp_system_used != 0) else None)
+        rank = await self.bdd_get_rank(ctx.author.id,ctx.guild if (scope=='guild' or xp_system_used != 0) else None)
         if len(rank) == 0:
             your_rank = {'name':"__"+await self.bot._(ctx.channel, "xp.top-your")+"__",'value':await self.bot._(ctx.guild, "xp.1-no-xp")}
         else:
@@ -899,7 +909,7 @@ class Xp(commands.Cog):
             your_rank = {'name':"__"+await self.bot._(ctx.channel, "xp.top-your")+"__", 'value':"**#{} |** `lvl {}` **|** `xp {}`".format(rk, lvl, xp)}
             del rk
         # title
-        if Type == 'guild' or xp_system_used != 0:
+        if scope == 'guild' or xp_system_used != 0:
             t = await self.bot._(ctx.channel, "xp.top-title-2")
         else:
             t = await self.bot._(ctx.channel, "xp.top-title-1")
@@ -915,13 +925,13 @@ class Xp(commands.Cog):
 
     async def clear_cards(self, all: bool=False):
         """Delete outdated rank cards"""
-        files =  os.listdir('../cards/global')
-        done = list()
-        for f in sorted([f.split('-')+['../cards/global/'+f] for f in files], key=operator.itemgetter(1), reverse=True):
+        files =  os.listdir('./assets/cards/')
+        done: set[str] = set()
+        for f in sorted([f.split('-')+['./assets/cards/'+f] for f in files], key=operator.itemgetter(1), reverse=True):
             if all or f[0] in done:
                 os.remove(f[3])
             else:
-                done.append(f[0])
+                done.add(f[0])
 
 
     @commands.command(name='set_xp', aliases=["setxp", "set-xp"])
@@ -942,9 +952,9 @@ class Xp(commands.Cog):
             prev_xp = await self.get_xp(user, None if xp_used_type == 0 else ctx.guild.id)
             await self.bdd_set_xp(user.id, xp, Type='set', guild=ctx.guild.id)
             await ctx.send(await self.bot._(ctx.guild.id, "xp.change-xp-ok", user=str(user), xp=xp))
-        except Exception as e:
+        except Exception as err:
             await ctx.send(await self.bot._(ctx.guild.id, "minecraft.serv-error"))
-            await self.bot.get_cog('Errors').on_error(e,ctx)
+            self.bot.dispatch("error", err, ctx)
         else:
             if ctx.guild.id not in self.cache.keys():
                 await self.bdd_load_cache(ctx.guild.id)
@@ -991,7 +1001,7 @@ class Xp(commands.Cog):
         
         ..Doc server.html#roles-rewards"""
         if ctx.subcommand_passed is None:
-            await self.bot.get_cog('Help').help_command(ctx,['rr'])
+            await ctx.send_help(ctx.command)
 
     @rr_main.command(name="add")
     @commands.check(checks.has_manage_guild)
@@ -1009,12 +1019,11 @@ class Xp(commands.Cog):
             if len([x for x in l if x['level']==level]) > 0:
                 return await ctx.send(await self.bot._(ctx.guild.id, "xp.already-1-rr"))
             max_rr = await self.bot.get_config(ctx.guild.id,'rr_max_number')
-            max_rr = self.bot.get_cog("Servers").default_opt['rr_max_number'] if max_rr is None else max_rr
             if len(l) >= max_rr:
                 return await ctx.send(await self.bot._(ctx.guild.id, "xp.too-many-rr", c=len(l)))
             await self.rr_add_role(ctx.guild.id,role.id,level)
-        except Exception as e:
-            await self.bot.get_cog('Errors').on_command_error(ctx,e)
+        except Exception as err:
+            self.bot.dispatch("command_error", ctx, err)
         else:
             await ctx.send(await self.bot._(ctx.guild.id, "xp.rr-added", role=role.name,level=level))
 
@@ -1026,12 +1035,11 @@ class Xp(commands.Cog):
         ..Doc server.html#roles-rewards"""
         try:
             l = await self.rr_list_role(ctx.guild.id)
-        except Exception as e:
-            await self.bot.get_cog('Errors').on_command_error(ctx,e)
+        except Exception as err:
+            self.bot.dispatch("command_error", ctx, err)
         else:
             des = '\n'.join(["• <@&{}> : lvl {}".format(x['role'], x['level']) for x in l])
             max_rr = await self.bot.get_config(ctx.guild.id,'rr_max_number')
-            max_rr = self.bot.get_cog("Servers").default_opt['rr_max_number'] if max_rr is None else max_rr
             title = await self.bot._(ctx.guild.id,"xp.rr_list", c=len(l), max=max_rr)
             emb = discord.Embed(title=title, description=des, timestamp=ctx.message.created_at)
             emb.set_footer(text=ctx.author, icon_url=ctx.author.display_avatar)
@@ -1051,8 +1059,8 @@ class Xp(commands.Cog):
             if len(l) == 0:
                 return await ctx.send(await self.bot._(ctx.guild.id, "xp.no-rr"))
             await self.rr_remove_role(l[0]['ID'])
-        except Exception as e:
-            await self.bot.get_cog('Errors').on_command_error(ctx,e)
+        except Exception as err:
+            self.bot.dispatch("command_error", ctx, err)
         else:
             await ctx.send(await self.bot._(ctx.guild.id, "xp.rr-removed", level=level))
 
@@ -1080,8 +1088,8 @@ class Xp(commands.Cog):
                     level = (await self.calc_level(member['xp'], used_system))[0]
                     c += await self.give_rr(m, level, rr_list, remove=True)
             await ctx.send(await self.bot._(ctx.guild.id, "xp.rr-reload", role_count=c,member_count=ctx.guild.member_count))
-        except Exception as e:
-            await self.bot.get_cog('Errors').on_command_error(ctx,e)
+        except Exception as err:
+            self.bot.dispatch("command_error", ctx, err)
 
 
 async def setup(bot: Zbot):
