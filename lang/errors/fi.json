@@ -25,6 +25,7 @@
     "quoteserror": "Ups, lainaus merkki virhe tapahtui. Varmista, että käytät oikeita lainaus merkkejä \", jotta jokainen avattu lainaus suljetaan myöhemmin",
     "rolenotfound": "On mahdotonta löytää rooli `%{r}`",
     "toomanytxtchan": "Sinulla on liikaa teksti kanavia",
-    "unknown": "Ups, tapahtui virhe 😕 Yritä uudelleen myöhemmin, tai ota yhteyttä tukeen (löytyy komennosta `about`).",
+    "unknown": "Ups, tapahtui virhe 😕 Yritä uudelleen myöhemmin, tai ota yhteyttä tukeen (löytyy komennosta %{about}).",
+    "unknown2": "Virhe tapahtui sinun vastauksen käsittelyssä. Yritä uudelleen myöhemmin, tai ota yhteyttä tukeen (kutsu linkin saat lähettämällä %{about} komennon)",
     "usernotfound": "On mahdotonta löytää käyttäjä `%{u}` :confused:"
 }

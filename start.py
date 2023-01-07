@@ -53,7 +53,7 @@ async def main():
         print(time.strftime("%d/%m  %H:%M:%S"))
         print('------')
         await asyncio.sleep(3)
-        with open("status_list.json", 'r') as status_file:
+        with open("status_list.json", 'r', encoding="utf-8") as status_file:
             status_list = json.load(status_file)
         if not client.database_online:
             activity = discord.Activity(type=discord.ActivityType.listening,name=choice(status_list['no-db']))

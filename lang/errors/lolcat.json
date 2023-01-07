@@ -34,6 +34,8 @@
     "quoteserror": "Oops, u guys did smth wrong with quotes \" Make sur u using tehm correclty",
     "rolenotfound": "Unable 2 find ur role (`%{r}`)",
     "toomanytxtchan": "U have toooo many visibl text channels lmao. Why so much? useless/20. U should seriously think 'bout it dude. Pro-tip :smirk:",
-    "unknown": "Ups, somthin' wen't horribly wrong :fearful: pls contact zbot authorities immdiatly",
-    "usernotfound": "Unabled 2 find teh userZ `%{u}` :confused:"
+    "unknown": "Ups, somthin' wen't horribly wrong :fearful: pls contact zbot authorities immediatly (%{about}).",
+    "unknown2": "An fAtal erroR have occurred wHiLe proczzing ur respond. Plz trye again laterz, or contact suPPORt (use %{about} for teh server link)",
+    "usernotfound": "Unabled 2 find teh userZ `%{u}` :confused:",
+    "zbot-migration": "Dis serv naw use <@1048011651145797673>, teh new Zbot vershun. If ya ever need help with dis migrashin, ur welcome 2 ask us at <%{invite}>!"
 }

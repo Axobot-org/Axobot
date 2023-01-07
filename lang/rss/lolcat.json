@@ -27,7 +27,6 @@
     "deviant-default-flow": "{logo}  | New draw by {author} : **{title}**\nDated on {date}\nURL: {link}\n{mentions}",
     "deviant-form-last": "{logo}  | Here is da brand new thing of {author}:\n{title}\nDarwn on {date}\nZelda: {url}",
     "embed-json-changed": "The embed ov feed have been modifed",
-    "fail-add": "An fAtal erroR have occurred whale proczzing ur respond. Plz trye again laterz, r contakt boat suPPORt (entr teh comand `about` 4 srver link)",
     "flow-limit": "Fr pirformunce reesons, U can notz track mor than %{limit} rss feeds per srver.",
     "guild-complete": "%{count} rss streams haz correctly rechargd in %{time} seconds!",
     "guild-error": "A error occurrd durin teh load: `%{err}`\nIf you think dis err iz not your auwn, u can report it to support staff",

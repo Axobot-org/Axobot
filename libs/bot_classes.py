@@ -2,6 +2,8 @@ import datetime
 import logging
 import sys
 import time
+from io import BytesIO
+from json import dumps
 from typing import (TYPE_CHECKING, Any, Callable, Coroutine, Literal, Optional,
                     Union, overload)
 
@@ -16,6 +18,7 @@ from mysql.connector.errors import ProgrammingError
 from libs.database import create_database_query
 from libs.emojis_manager import EmojisManager
 from libs.prefix_manager import PrefixManager
+from libs.serverconfig.options_list import default_values as serverconfig_defaults
 from libs.tasks_handler import TaskHandler
 from utils import get_prefix
 
@@ -23,11 +26,13 @@ if TYPE_CHECKING:
     from fcts.aide import Help
     from fcts.bot_events import BotEvents
     from fcts.bot_stats import BotStats
+    from fcts.cases import Cases
     from fcts.errors import Errors
     from fcts.minecraft import Minecraft
     from fcts.partners import Partners
     from fcts.rss import Rss
     from fcts.servers import Servers
+    from fcts.twitch import Twitch
     from fcts.users import Users
     from fcts.utilities import Utilities
     from fcts.xp import Xp
@@ -61,14 +66,28 @@ class MyContext(commands.Context):
         """If the bot has the right permissions to send an embed in the current context"""
         return self.bot_permissions.embed_links
 
-    async def send(self, *args, **kwargs) -> Optional[discord.Message]:
+    async def send(self, *args, json: Union[dict, list, None]=None, **kwargs) -> Optional[discord.Message]:
         if self.bot.zombie_mode and self.command.name not in self.bot.allowed_commands:
             return
         if self.message.type == discord.MessageType.reply and self.message.reference:
             kwargs["allowed_mentions"] = kwargs.get("allowed_mentions", self.bot.allowed_mentions)
             kwargs["allowed_mentions"].replied_user = False
-            return await super().send(reference=self.message.reference, *args, **kwargs)
+            kwargs["reference"] = self.message.reference
+        if json is not None:
+            file = discord.File(BytesIO(dumps(json, indent=2).encode()), filename="message.json")
+            if "file" in kwargs:
+                kwargs["files"] = [kwargs["file"], file]
+                kwargs.pop("file")
+            elif "files" in kwargs:
+                kwargs["files"].append(file)
+            else:
+                kwargs["file"] = file
         return await super().send(*args, **kwargs)
+    
+    async def send_help(self, command: Union[str, commands.Command]):
+        """Send the help message of the given command"""
+        cmd_arg = command.split(' ') if isinstance(command, str) else command.qualified_name.split(' ')
+        await self.bot.get_command("help")(self, *cmd_arg)
 
 # pylint: disable=too-many-instance-attributes
 class Zbot(commands.bot.AutoShardedBot):
@@ -155,6 +174,10 @@ class Zbot(commands.bot.AutoShardedBot):
         ...
 
     @overload
+    def get_cog(self, name: Literal["Cases"]) -> Optional["Cases"]:
+        ...
+
+    @overload
     def get_cog(self, name: Literal["Errors"]) -> Optional["Errors"]:
         ...
 
@@ -176,6 +199,10 @@ class Zbot(commands.bot.AutoShardedBot):
 
     @overload
     def get_cog(self, name: Literal["Servers"]) -> Optional["Servers"]:
+        ...
+
+    @overload
+    def get_cog(self, name: Literal["Twitch"]) -> Optional["Twitch"]:
         ...
 
     @overload
@@ -268,12 +295,15 @@ class Zbot(commands.bot.AutoShardedBot):
             return '{' + key + '}'
 
     async def get_config(self, guild_id: int, option: str) -> Optional[str]:
-        "Get a configuration option for a specific guild"
+        """Get a configuration option for a specific guild
+        Fallbacks to the default values if the guild is not found"""
         cog = self.get_cog("Servers")
         if cog:
             if self.database_online:
-                return await cog.get_option(guild_id, option)
-            return cog.default_opt.get(option, None)
+                value = await cog.get_option(guild_id, option)
+                if value is not None:
+                    return value
+            return serverconfig_defaults.get(option, None)
         return None
 
     async def get_recipient(self, channel: discord.DMChannel) -> Optional[discord.User]:

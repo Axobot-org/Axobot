@@ -37,7 +37,7 @@ async def in_support_server(ctx):
     return ctx.guild is not None and ctx.guild.id == 625316773771608074
 
 class Info(commands.Cog):
-    """Here you will find various useful commands to get information about ZBot."""
+    "Here you will find various useful commands to get information about anything"
 
     def __init__(self, bot: Zbot):
         self.bot = bot
@@ -56,7 +56,7 @@ class Info(commands.Cog):
 
     @commands.command(name='admins')
     async def admin_list(self, ctx: MyContext):
-        """Get the list of ZBot administrators
+        """Get the list of the bot administrators
 
         ..Doc miscellaneous.html#admins"""
         l  = []
@@ -67,7 +67,7 @@ class Info(commands.Cog):
         await ctx.send(await self.bot._(ctx.channel,"info.admins-list", admins=", ".join(l)))
 
     async def get_guilds_count(self, ignored_guilds:list=None) -> int:
-        """Get the number of guilds where Zbot is"""
+        """Get the number of guilds where the bot is"""
         if ignored_guilds is None:
             if self.bot.database_online:
                 if 'banned_guilds' not in self.bot.get_cog('Utilities').config.keys():
@@ -100,7 +100,7 @@ class Info(commands.Cog):
             # RAM/CPU
             ram_usage = round(self.process.memory_info()[0]/2.**30,3)
             if cog := self.bot.get_cog("BotStats"):
-                cpu: float = await cog.get_list_usage(cog.cpu_records)
+                cpu: float = await cog.get_list_usage(cog.bot_cpu_records)
             else:
                 cpu = 0.0
             # Guilds count
@@ -126,8 +126,8 @@ class Info(commands.Cog):
             cmds_24h = await self.bot.get_cog("BotStats").get_stats("wsevent.CMD_USE", 60*24)
             # number formatter
             lang = await self.bot._(ctx.guild.id,"_used_locale")
-            async def n_format(nbr):
-                return await FormatUtils.format_nbr(nbr, lang)
+            async def n_format(nbr: typing.Union[int, float, None]):
+                return await FormatUtils.format_nbr(nbr, lang) if nbr is not None else "0"
             # Generating message
             d = ""
             for key, var in [
@@ -165,7 +165,7 @@ class Info(commands.Cog):
         """List the most used commands
 
         ..Doc infos.html#statistics"""
-        forbidden = ['cmd.eval', 'cmd.admin', 'cmd.test', 'cmd.remindme']
+        forbidden = ['cmd.eval', 'cmd.admin', 'cmd.test', 'cmd.remindme', 'cmd.bug', 'cmd.idea', 'cmd.send_msg']
         forbidden_where = ', '.join(f"'{elem}'" for elem in forbidden)
         commands_limit = 15
         lang = await self.bot._(ctx.channel, '_used_locale')
@@ -188,7 +188,7 @@ FROM
         	`variable` LIKE "cmd.%" AND
             {date_where_clause}
             `variable` NOT IN ({forbidden_where}) AND
-        	`beta` = %(beta)s
+        	`entity_id` = %(entity_id)s
 	) UNION ALL (
     	SELECT
         	`variable`,
@@ -198,12 +198,12 @@ FROM
         	`variable` LIKE "cmd.%" AND
             {date_where_clause}
             `variable` NOT IN ({forbidden_where}) AND
-        	`beta` = %(beta)s
+        	`entity_id` = %(entity_id)s
 	)
 ) AS `all`
 GROUP BY cmd
 ORDER BY usages DESC LIMIT %(limit)s"""
-            async with self.bot.db_query(query, { "beta": self.bot.beta, "minutes": minutes, "limit": commands_limit }) as query_result:
+            async with self.bot.db_query(query, { "entity_id": self.bot.entity_id, "minutes": minutes, "limit": commands_limit }) as query_result:
                 pass
             return query_result
 
@@ -238,16 +238,16 @@ ORDER BY usages DESC LIMIT %(limit)s"""
 
         ..Doc infos.html#bot-invite"""
         raw_oauth = "<" + discord.utils.oauth_url(self.bot.user.id) + ">"
+        url = "https://zrunner.me/" + ("invitezbot" if self.bot.entity_id == 0 else "invite-axobot")
         try:
-            r = requests.get("https://zrunner.me/invitezbot", timeout=3)
+            r = requests.get(url, timeout=3)
         except requests.exceptions.Timeout:
             url = raw_oauth
         else:
-            if r.status_code < 400:
-                url = "https://zrunner.me/invitezbot"
-            else:
+            if r.status_code >= 400:
                 url = raw_oauth
-        await ctx.send(await self.bot._(ctx.channel, "info.botinvite", url=url))
+        cmd = await self.bot.get_command_mention("about")
+        await ctx.send(await self.bot._(ctx.channel, "info.botinvite", url=url, about=cmd))
 
     @commands.command(name="pig", hidden=True)
     async def pig(self, ctx: MyContext):
@@ -312,8 +312,10 @@ ORDER BY usages DESC LIMIT %(limit)s"""
         """Get the documentation url"""
         text = self.bot.emojis_manager.customs['readthedocs'] + await self.bot._(ctx.channel,"info.docs") + \
             " https://zbot.rtfd.io"
-        if self.bot.beta:
+        if self.bot.entity_id == 1:
             text += '/en/develop'
+        elif self.bot.entity_id == 2:
+            text += '/en/release-candidate'
         await ctx.send(text)
 
     async def display_critical(self, ctx: MyContext):
@@ -637,8 +639,8 @@ Available types: member, role, user, emoji, channel, server, invite, category
         # Webhooks count
         try:
             web = len(await channel.webhooks())
-        except Exception as e:
-            await self.bot.get_cog('Errors').on_error(e,ctx)
+        except Exception as err:
+            self.bot.dispatch("error", err, ctx)
             web = await self.bot._(ctx.guild.id,"info.info.textchan-4")
         embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.textchan-3"), value=str(web))
         # Members nber
@@ -738,11 +740,10 @@ Available types: member, role, user, emoji, channel, server, invite, category
         # Splash url
         try:
             embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.guild-15"), value=str(await guild.vanity_invite()))
-        except Exception as e:
-            if isinstance(e,(discord.errors.Forbidden, discord.errors.HTTPException)):
-                pass
-            else:
-                await self.bot.get_cog('Errors').on_error(e,ctx)
+        except (discord.errors.Forbidden, discord.errors.HTTPException):
+            pass
+        except Exception as err:
+            self.bot.dispatch("error", err, ctx)
         # Premium subscriptions count
         if isinstance(guild.premium_subscription_count,int) and guild.premium_subscription_count > 0:
             embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.guild-13"), value=await self.bot._(ctx.guild.id,"info.info.guild-13v",b=guild.premium_subscription_count,p=guild.premium_tier))
@@ -752,8 +753,8 @@ Available types: member, role, user, emoji, channel, server, invite, category
                 roles = [x.mention for x in guild.roles if len(x.members) > 1][1:]
             else:
                 roles = [x.name for x in guild.roles if len(x.members) > 1][1:]
-        except Exception as e:
-            await self.bot.get_cog('Errors').on_error(e,ctx)
+        except Exception as err:
+            self.bot.dispatch("error", err, ctx)
             roles = guild.roles
         roles.reverse()
         if len(roles) == 0:
@@ -802,8 +803,8 @@ Available types: member, role, user, emoji, channel, server, invite, category
                     invite = temp[0]
             except discord.errors.Forbidden:
                 pass
-            except Exception as e:
-                await self.bot.get_cog('Errors').on_error(e,ctx)
+            except Exception as err:
+                self.bot.dispatch("error", err, ctx)
         # Invite URL
         embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.inv-0"), value=invite.url,inline=True)
         # Inviter
@@ -981,23 +982,30 @@ Available types: member, role, user, emoji, channel, server, invite, category
         # Bots
         bots = len([x for x in guild.members if x.bot])
         # Lang
-        lang = await self.bot.get_config(guild.id,'language')
+        lang = await self.bot.get_config(guild.id, "language")
         if lang is None:
             lang = 'default'
         else:
-            lang = self.bot.get_cog('Languages').languages[lang]
+            lang = self.bot.get_cog("Languages").languages[lang]
         # Roles rewards
-        rr_len = await self.bot.get_config(guild.id,'rr_max_number')
-        rr_len = self.bot.get_cog("Servers").default_opt['rr_max_number'] if rr_len is None else rr_len
-        rr_len = '{}/{}'.format(len(await self.bot.get_cog('Xp').rr_list_role(guild.id)),rr_len)
+        rr_len = await self.bot.get_config(guild.id, "rr_max_number")
+        rr_len = '{}/{}'.format(len(await self.bot.get_cog("Xp").rr_list_role(guild.id)), rr_len)
+        # Streamers
+        if twitch_cog := self.bot.get_cog("Twitch"):
+            streamers_len =  await self.bot.get_config(guild.id, "streamers_max_number")
+            streamers_len = '{}/{}'.format(await twitch_cog.db_get_guild_subscriptions_count(guild.id), streamers_len)
+        else:
+            streamers_len = "Not available"
         # Prefix
         pref = await self.bot.prefix_manager.get_prefix(guild)
         if "`" not in pref:
             pref = "`" + pref + "`"
         # Rss
         rss_len = await self.bot.get_config(guild.id,'rss_max_number')
-        rss_len = self.bot.get_cog("Servers").default_opt['rss_max_number'] if rss_len is None else rss_len
-        rss_numb = "{}/{}".format(len(await self.bot.get_cog('Rss').db_get_guild_feeds(guild.id)), rss_len)
+        if rss_cog := self.bot.get_cog("Rss"):
+            rss_numb = "{}/{}".format(len(await rss_cog.db_get_guild_feeds(guild.id)), rss_len)
+        else:
+            rss_numb = "Not available"
         # Join date
         joined_at = f"<t:{guild.me.joined_at.timestamp():.0f}>"
         # ----
@@ -1016,6 +1024,7 @@ Available types: member, role, user, emoji, channel, server, invite, category
         emb.add_field(name="Prefix", value=pref)
         emb.add_field(name="RSS feeds count", value=rss_numb)
         emb.add_field(name="Roles rewards count", value=rr_len)
+        emb.add_field(name="Streamers count", value=streamers_len)
         await interaction.response.send_message(embed=emb)
 
     @find_main.command(name='channel')
@@ -1195,8 +1204,8 @@ Available types: member, role, user, emoji, channel, server, invite, category
             for data in [{ 'i': x, 'l': current_timestamp } for x in liste]:
                 async with self.bot.db_query(query, data):
                     pass
-        except Exception as e:
-            await self.bot.get_cog('Errors').on_error(e,None)
+        except Exception as err:
+            self.bot.dispatch("error", err)
 
     async def get_emojis_info(self, ID: typing.Union[int,list]):
         """Get info about an emoji"""
@@ -1221,7 +1230,7 @@ Available types: member, role, user, emoji, channel, server, invite, category
 
         ..Doc miscellaneous.html#bitly-urls"""
         if ctx.subcommand_passed is None:
-            await self.bot.get_cog('Help').help_command(ctx,['bitly'])
+            await ctx.send_help(ctx.command)
         elif ctx.invoked_subcommand is None and ctx.subcommand_passed is not None:
             try:
                 url = await args.URL.convert(ctx,ctx.subcommand_passed)

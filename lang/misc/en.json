@@ -28,9 +28,13 @@
     "click_here": "Click here",
     "dnd": "do not disturb",
     "doc": "Documentation",
+    "done!": "Done!",
     "duration": "duration",
     "end": "end",
-    "example": "example",
+    "example": {
+        "one": "example",
+        "other": "examples"
+    },
     "extreme": "extreme",
     "ghost": "Ghost",
     "high": "high",

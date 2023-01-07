@@ -63,13 +63,14 @@ class Fun(commands.Cog):
     def utilities(self) -> 'Utilities':
         return self.bot.get_cog("Utilities")
 
-    async def is_on_guild(self, user: discord.Member, guild: int):
+    async def is_on_guild(self, user: discord.Member, guild_id: int):
         "Check if a member is part of a guild"
         if self.bot.user.id == 436835675304755200:
             return True
+        # Zrunner, someone, Awhikax
         if user.id in {279568324260528128, 392766377078816789, 281404141841022976}:
             return True
-        server = self.bot.get_guild(guild)
+        server = self.bot.get_guild(guild_id)
         if server is not None:
             return user in server.members
         return False
@@ -476,7 +477,11 @@ You can specify a verification limit by adding a number in argument (up to 1.000
         ..Doc miscellaneous.html#say"""
         if channel is None:
             channel = ctx.channel
-        elif not (channel.permissions_for(ctx.author).read_messages and channel.permissions_for(ctx.author).send_messages and channel.guild == ctx.guild):
+        elif not ((
+            channel.permissions_for(ctx.author).read_messages and
+            channel.permissions_for(ctx.author).send_messages and
+            channel.guild == ctx.guild
+        ) or await self.bot.get_cog('Admin').check_if_god(ctx)):
             await ctx.send(await self.bot._(ctx.guild, 'fun.say-no-perm', channel=channel.mention))
             return
         if self.bot.zombie_mode:
@@ -493,7 +498,7 @@ You can specify a verification limit by adding a number in argument (up to 1.000
         try:
             text = await self.utilities.clear_msg(text, ctx=ctx)
         except Exception as err:
-            await self.bot.get_cog('Errors').on_error(err, ctx)
+            self.bot.dispatch("command_error", ctx, err)
             return
         try:
             if not channel.permissions_for(ctx.guild.me).send_messages:
@@ -543,7 +548,7 @@ You can specify a verification limit by adding a number in argument (up to 1.000
                     await ctx.send(await self.bot._(ctx.channel,"fun.no-emoji"))
                     return
                 except Exception as err:
-                    await self.bot.get_cog("Errors").on_error(err,ctx)
+                    self.bot.dispatch("command_error", ctx, err)
                     continue
         await ctx.message.delete(delay=0)
 
@@ -658,7 +663,17 @@ You can specify a verification limit by adding a number in argument (up to 1.000
         """Send a tip, a fun fact or something else
 
         ..Doc fun.html#tip"""
-        await ctx.send(random.choice(await self.bot._(ctx.guild,"fun.tip-list")))
+        params = {
+            "about_cmd": await self.bot.get_command_mention("about"),
+            "bigtext_cmd": await self.bot.get_command_mention("bigtext"),
+            "clear_cmd": await self.bot.get_command_mention("clear"),
+            "config_cmd": await self.bot.get_command_mention("config"),
+            "discordlinks_cmd": await self.bot.get_command_mention("discordlinks"),
+            "event_cmd": await self.bot.get_command_mention("event info"),
+            "stats_cmd": await self.bot.get_command_mention("stats"),
+            "say_cmd": await self.bot.get_command_mention("say"),
+        }
+        await ctx.send(random.choice(await self.bot._(ctx.guild, "fun.tip-list", **params)))
 
     @commands.command(name='afk')
     @commands.check(is_fun_enabled)
@@ -762,7 +777,7 @@ You can specify a verification limit by adding a number in argument (up to 1.000
         r = re.search(r'<#(\d+)>', arguments.split(" ")[0])
         if r is not None:
             arguments = " ".join(arguments.split(" ")[1:])
-            channel = ctx.guild.get_channel(int(r.group(1)))
+            channel = ctx.guild.get_channel_or_thread(int(r.group(1)))
         arguments = await args.arguments().convert(ctx, arguments)
         if len(arguments) == 0:
             raise commands.errors.MissingRequiredArgument(ctx.command.clean_params['arguments'])
@@ -995,8 +1010,8 @@ You can specify a verification limit by adding a number in argument (up to 1.000
             try:
                 await self.add_vote(msg)
             except Exception as err:
-                await ctx.send(await self.bot._(ctx.channel,"fun.no-reaction"))
-                await self.bot.get_cog("Errors").on_error(err, ctx)
+                await ctx.send(await self.bot._(ctx.channel, "fun.no-reaction"))
+                self.bot.dispatch("error", err, ctx)
                 return
         else:
             if ctx.bot_permissions.external_emojis:
@@ -1013,7 +1028,7 @@ You can specify a verification limit by adding a number in argument (up to 1.000
                 except discord.errors.NotFound:
                     return
                 except Exception as err:
-                    await self.bot.get_cog('Errors').on_error(err,ctx)
+                    self.bot.dispatch("command_error", ctx, err)
         await ctx.message.delete(delay=0)
 
     async def check_suggestion(self, message: discord.Message):
@@ -1030,7 +1045,7 @@ You can specify a verification limit by adding a number in argument (up to 1.000
                 except discord.DiscordException:
                     pass
         except Exception as err: # pylint: disable=broad-except
-            await self.bot.get_cog('Errors').on_error(err,message)
+            self.bot.dispatch("error", err, message)
 
     @commands.command(name="pep8", aliases=['autopep8'])
     @commands.cooldown(3, 30, commands.BucketType.user)
@@ -1045,43 +1060,6 @@ You can specify a verification limit by adding a number in argument (up to 1.000
             "ignore": set()
         }).strip()
         await ctx.send(f"```py\n{code}\n```")
-
-    @commands.command(name="movie")
-    @commands.cooldown(5, 40, commands.BucketType.user)
-    @commands.check(checks.bot_can_embed)
-    async def movie_search(self, ctx: MyContext, *, movie_name: str):
-        """Search for a movie information based on its name
-
-        Warning: Only english names are supported for now!
-
-        ..Example movie The Circle"""
-        params = {
-            "apikey": self.bot.others["omdb"]
-        }
-        if re.match(r'tt\d+', movie_name):
-            params['i'] = movie_name
-        else:
-            params['t'] = movie_name
-        async with aiohttp.ClientSession() as session:
-            async with session.get("http://www.omdbapi.com/", params=params) as resp:
-                data = await resp.json()
-        if data["Response"] == "False":
-            await ctx.send(await self.bot._(ctx.channel,"fun.movie.not-found"))
-            return
-        website = data["Website"] if data["Website"] != "N/A" else None
-        rating = data["imdbRating"] if data["imdbRating"] != "N/A" else await self.bot._(ctx.channel,"fun.movie.no-rating")
-        description = data["Plot"] if data["Plot"] != "N/A" else await self.bot._(ctx.channel,"fun.movie.no-description")
-        embed = discord.Embed(title=data["Title"], url=website, description=description, color=0x3498DB)
-        embed.set_thumbnail(url=data["Poster"])
-        embed.add_field(name=await self.bot._(ctx.channel,"fun.movie.director"), value=data["Director"])
-        embed.add_field(name=await self.bot._(ctx.channel,"fun.movie.actors"), value=data["Actors"])
-        embed.add_field(name=await self.bot._(ctx.channel,"fun.movie.released"), value=data["Released"])
-        embed.add_field(name=await self.bot._(ctx.channel,"fun.movie.awards"), value=data["Awards"])
-        embed.add_field(name=await self.bot._(ctx.channel,"fun.movie.runtime"), value=data["Runtime"])
-        embed.add_field(name=await self.bot._(ctx.channel,"fun.movie.writers"), value=data["Writer"])
-        embed.add_field(name=await self.bot._(ctx.channel,"fun.movie.imdb-rating"), value=rating)
-        embed.add_field(name=await self.bot._(ctx.channel,"fun.movie.imdb-id"), value=data["imdbID"])
-        await ctx.send(embed=embed)
 
 
 async def setup(bot):

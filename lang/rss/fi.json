@@ -7,7 +7,6 @@
     "deviant-default-flow": "{logo}  | Uusi luomus tekijä: {author} : **{title}**\nJulkaistu {date}\nLinkki: {link}\n{mentions}",
     "deviant-form-last": "{logo}  | Tässä uusi luomus tekijältä {author}:\n{title}\nJulkaistu {date}\nLinkki: {url}",
     "embed-json-changed": "Upotettu linkki tällä virtauksella on muokattu",
-    "fail-add": "Virhe tapahtui sinun vastauksen käsittelyssä. Yritä uudelleen myöhemmin, tai ota yhteyttä tukeen (kutsu linkin saat lähettämällä `about` komennon)",
     "flow-limit": "Suorituskykyjen syystä, et voi seurata enempää kuin %{limit} rss syötettä per palvelin.",
     "guild-complete": "%{count} rss suoratoistoa on päivitetty, %{time} sekunnissa!",
     "guild-error": "Virhe tapahtui menettelyssä: `%{err}`\nJos luulet että tämä virhe ei ole sinun, ota yhteyttä tukeen",

@@ -1,5 +1,4 @@
 {
-    "config-help": "Cette commande sert principalement à configurer votre serveur. En faisant `%{p}config see [option]` vous obtiendrez l'aperçu des configurations actuelles, et les administrateurs du serveur peuvent entrer `%{p}config change <option> valeur1, valeur2...` pour modifier une configuration, ou `%{p}config del <option>` pour réinitialiser l'option (`%{p}config change <option> del` fonctionne de même).\nLa liste des options disponible est accessible à l'adresse <https://zbot.rtfd.io/en/latest/server.html#list-of-every-option>",
     "config-list": "Liste des options disponibles :%{text}Plus d'information : %{link}",
     "deleted-channel": "salon supprimé",
     "deleted-role": "rôle supprimé",
@@ -82,6 +81,9 @@
         "save_roles": "Les rôles doivent-ils être sauvegardés lorsqu'un membre part, au cas où il revienne ? %{value}",
         "say_allowed_roles": "Liste des rôles qui peuvent utiliser la commande 'say' : %{value}",
         "slowmode_allowed_roles": "Liste des rôles qui peuvent utiliser les commandes 'slowmode' et 'freeze' : %{value}",
+        "streaming_channel": "Salon où envoyer les notifications de live : %{value}",
+        "stream_mention": "Rôle à mentionner lorsqu'un live débute : %{value}",
+        "streaming_role": "Rôle donné aux membres autorisés lorsqu'ils sont en live : %{value}",
         "ttt_display": "Mode d'utilisation du morpion : %{value}",
         "update_mentions": "Rôles mentionnés lors d'une mise à jour du bot : %{value}",
         "verification_role": "Rôles enlevés lorsqu'un joueur s'authentifie avec la commande `verify` : %{value}",

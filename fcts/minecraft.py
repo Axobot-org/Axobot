@@ -101,14 +101,14 @@ Every information come from the website www.fr-minecraft.net"""
 
         ..Doc minecraft.html#mc"""
         if ctx.subcommand_passed is None:
-            await self.bot.get_cog('Help').help_command(ctx, ['minecraft'])
+            await ctx.send_help(ctx.command)
 
     async def send_embed(self, ctx: MyContext, embed: discord.Embed):
         "Try to send an embed into a channel, or report the error if it fails"
         try:
             await ctx.send(embed=embed)
         except discord.DiscordException as err:
-            await self.bot.get_cog('Errors').on_error(err, ctx)
+            self.bot.dispatch("error", err, ctx)
             await ctx.send(await self.bot._(ctx.channel, "minecraft.serv-error"))
 
     @mc_main.command(name="block", aliases=["bloc"])
@@ -425,8 +425,9 @@ Every information come from the website www.fr-minecraft.net"""
             await self.bot.get_cog('Rss').db_add_feed(ctx.guild.id, ctx.channel.id, 'mc', f"{ip}:{port}")
             await ctx.send(await self.bot._(ctx.guild, "minecraft.success-add", ip=display_ip, channel=ctx.channel.mention))
         except Exception as err:
-            await ctx.send(await self.bot._(ctx.guild, "rss.fail-add"))
-            await self.bot.get_cog("Errors").on_error(err, ctx)
+            cmd = await self.bot.get_command_mention("about")
+            await ctx.send(await self.bot._(ctx.guild, "errors.unknown2", about=cmd))
+            self.bot.dispatch("error", err, ctx)
 
     async def create_server_1(self, guild: discord.Guild, ip: str, port=None) -> Union[str, 'MCServer']:
         "Collect and serialize server data from a given IP, using minetools.eu"
@@ -482,10 +483,10 @@ Every information come from the website www.fr-minecraft.net"""
             try:
                 r = requests.get("https://api.mcsrvstat.us/1/" +
                                  str(ip), timeout=5).json()
-            except Exception as e:
-                if not isinstance(e, requests.exceptions.ReadTimeout):
+            except Exception as err:
+                if not isinstance(err, requests.exceptions.ReadTimeout):
                     self.bot.log.error("[mc-server-2] Erreur sur l'url {} :".format(url))
-                await self.bot.get_cog('Errors').on_error(e, None)
+                self.bot.dispatch("error", err)
                 return await self.bot._(guild, "minecraft.serv-error")
         if r["debug"]["ping"] is False:
             return await self.bot._(guild, "minecraft.no-ping")
@@ -626,7 +627,7 @@ Every information come from the website www.fr-minecraft.net"""
                 return False
             self.feeds[feed.link] = obj
         try:
-            channel = guild.get_channel(feed.channel_id)
+            channel = guild.get_channel_or_thread(feed.channel_id)
             if channel is None:
                 self.bot.log.warn("[minecraft feed] Cannot find channel %s in guild %s", feed.channel_id, feed.guild_id)
                 return False
@@ -645,7 +646,7 @@ Every information come from the website www.fr-minecraft.net"""
                 statscog.rss_stats['messages'] += 1
             return True
         except Exception as err:
-            await self.bot.get_cog('Errors').on_error(err, None)
+            self.bot.dispatch("error", err)
 
 
 async def setup(bot):

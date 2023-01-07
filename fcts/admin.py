@@ -13,8 +13,9 @@ from contextlib import redirect_stdout
 import discord
 import speedtest
 from cachingutils import acached
+from git import Repo, exc
 from discord.ext import commands
-from libs.bot_classes import PRIVATE_GUILD_ID, MyContext, Zbot
+from libs.bot_classes import PRIVATE_GUILD_ID, SUPPORT_GUILD_ID, MyContext, Zbot
 from libs.enums import RankCardsFlag, UserFlag
 from libs.views import ConfirmView
 
@@ -30,7 +31,7 @@ def cleanup_code(content: str):
     return content.strip('` \n')
 
 class Admin(commands.Cog):
-    """Here are listed all commands related to the internal administration of the bot. Most of them are not accessible to users, but only to ZBot administrators."""
+    """Here are listed all commands related to the internal administration of the bot. Most of them are not accessible to users, but only to the bot administrators."""
 
     def __init__(self, bot: Zbot):
         self.bot = bot
@@ -89,22 +90,12 @@ class Admin(commands.Cog):
         except discord.DiscordException:
             pass
 
-    @discord.app_commands.command()
-    @discord.app_commands.guilds(PRIVATE_GUILD_ID)
-    @discord.app_commands.default_permissions(administrator=True)
-    @discord.app_commands.check(checks.is_bot_admin)
-    async def send_msg(self, interaction: discord.Interaction, user: discord.User, message: str):
-        "Send a DM to any user the bot can reach"
-        await interaction.response.defer(ephemeral=True)
-        await user.send(message)
-        await interaction.edit_original_response(content="Done!")
-
     @commands.hybrid_group(name='admin', hidden=True)
     @discord.app_commands.guilds(PRIVATE_GUILD_ID)
     @discord.app_commands.default_permissions(administrator=True)
     @commands.check(checks.is_bot_admin)
     async def main_msg(self, ctx: MyContext):
-        """Commandes réservées aux administrateurs de ZBot"""
+        """Commandes réservées aux administrateurs du bot"""
         if ctx.subcommand_passed is None:
             text = "Liste des commandes disponibles :"
             for cmd in sorted(ctx.command.commands, key=lambda x:x.name):
@@ -114,23 +105,37 @@ class Admin(commands.Cog):
                         text+="\n        - {} *({})*".format(cmds.name,cmds.help.split('\n')[0])
             await ctx.send(text)
 
+    @main_msg.command(name="send-msg")
+    @discord.app_commands.check(checks.is_bot_admin)
+    async def send_msg(self, ctx: MyContext, user: discord.User, message: str):
+        "Send a DM to any user the bot can reach"
+        await ctx.defer()
+        await user.send(message)
+        await ctx.send(content="Done!")
+
     @main_msg.command(name="sync")
     @commands.check(checks.is_bot_admin)
     async def sync_app_commands(self, ctx: MyContext, scope: typing.Literal["global", "staff-guild", "support-guild"]):
         "Sync app commands for either global or staff server scope"
         await ctx.defer()
         if scope == "global":
-            cmds = await self.bot.tree.sync()
-            txt = f"{len(cmds)} global app commands synced"
+            if self.bot.beta:
+                self.bot.tree.copy_global_to(guild=PRIVATE_GUILD_ID)
+                cmds = await self.bot.tree.sync(guild=PRIVATE_GUILD_ID)
+                txt = f"{len(cmds)} (global + local) app commands synced in staff server"
+            else:
+                cmds = await self.bot.tree.sync()
+                txt = f"{len(cmds)} global app commands synced"
         elif scope == "staff-guild":
-            cmds = await self.bot.tree.sync(guild=discord.Object(id=625316773771608074))
-            txt = f"{len(cmds)} global app commands synced in staff server"
+            cmds = await self.bot.tree.sync(guild=PRIVATE_GUILD_ID)
+            txt = f"{len(cmds)} app commands synced in staff server"
         elif scope == "support-guild":
-            cmds = await self.bot.tree.sync(guild=discord.Object(id=356067272730607628))
-            txt = f"{len(cmds)} global app commands synced in the support server"
+            cmds = await self.bot.tree.sync(guild=SUPPORT_GUILD_ID)
+            txt = f"{len(cmds)} app commands synced in the support server"
         else:
             await ctx.send("Unknown scope")
             return
+        self.bot.app_commands_list = None
         self.bot.log.info(txt)
         emb = discord.Embed(description=txt, color=discord.Color.blue())
         await self.bot.send_embed(emb)
@@ -236,6 +241,9 @@ class Admin(commands.Cog):
             return
         count = 0
         for guild in ctx.bot.guilds:
+            if guild.id == 356067272730607628 and self.bot.entity_id == 0:
+                # The support server should not receive updates from Zbot but only Axobot
+                continue
             channels = await ctx.bot.get_config(guild.id,'bot_news')
             if channels is None or len(channels) == 0:
                 continue
@@ -329,15 +337,38 @@ class Admin(commands.Cog):
         self.bot.log.info("Redémarrage du bot")
         os.execl(sys.executable, sys.executable, *args)
 
+    @main_msg.command(name="pull")
+    @commands.check(checks.is_bot_admin)
+    async def git_pull(self, ctx: MyContext, branch: typing.Optional[typing.Literal["main", "develop", "release-candidate"]]=None, install_requirements: bool=False):
+        """Pull du code depuis le dépôt git"""
+        msg = await ctx.send("Pull en cours...")
+        repo = Repo(os.getcwd())
+        assert not repo.bare
+        if branch:
+            try:
+                repo.git.checkout(branch)
+            except exc.GitCommandError as e:
+                self.bot.dispatch("command_error", ctx, e)
+            else:
+                msg = await msg.edit(content=msg.content+f"\nBranche {branch} correctement sélectionnée")
+        origin = repo.remotes.origin
+        origin.pull()
+        msg = await msg.edit(content=msg.content + f"\nPull effectué avec succès sur la branche {repo.active_branch.name}")
+        if install_requirements:
+            await msg.edit(content=msg.content+"\nInstallation des dépendances...")
+            os.system("pip install -qr requirements.txt")
+            msg = await msg.edit(content=msg.content+"\nDépendances installées")
+
     @main_msg.command(name="reload")
     @commands.check(checks.is_bot_admin)
     async def reload_cog(self, ctx: MyContext, *, cog: str):
         """Recharge un module"""
         cogs = cog.split(" ")
         await self.bot.get_cog("Reloads").reload_cogs(ctx,cogs)
-    
+
     @reload_cog.autocomplete("cog")
     async def reload_cog_autocom(self, interaction: discord.Interaction, current: str):
+        "Autocompletion for the cog name"
         if " " in current:
             fixed, current = current.rsplit(" ", maxsplit=1)
         else:
@@ -383,7 +414,7 @@ class Admin(commands.Cog):
         if not ctx.bot.database_online:
             await ctx.send("Impossible d'afficher cette commande, la base de donnée est hors ligne :confused:")
             return
-        await self.bot.get_cog("Servers").send_see(guild, ctx.channel, option, ctx.message, guild)
+        await self.bot.get_cog("Servers").send_see(guild, ctx, option, ctx.message)
 
     @main_msg.group(name="database", aliases=["db"])
     @commands.check(checks.is_bot_admin)
@@ -394,6 +425,7 @@ class Admin(commands.Cog):
     @commands.check(checks.is_bot_admin)
     async def db_reload(self, ctx: MyContext):
         "Reconnecte le bot à la base de donnée"
+        await ctx.defer()
         self.bot.cnx_frm.close()
         self.bot.connect_database_frm()
         self.bot.cnx_xp.close()
@@ -405,6 +437,8 @@ class Admin(commands.Cog):
                 await self.add_success_reaction(ctx.message)
             if xp := self.bot.get_cog("Xp"):
                 await xp.reload_sus()
+            if servers := self.bot.get_cog("Servers"):
+                await servers.clear_cache()
 
     @admin_db.command(name="biggest-tables")
     @commands.check(checks.is_bot_admin)
@@ -421,10 +455,10 @@ class Admin(commands.Cog):
             length = max(len(result[0]) for result in query_results)
             txt = "\n".join(f"{result[0]:>{length}}: {result[1]} MB" for result in query_results if result[1] is not None)
         await ctx.send("```yaml\n" + txt + "\n```")
-    
+
     @acached(timeout=3600)
     async def get_databases_names(self) -> list[str]:
-        "Get every database names visible for Zbot"
+        "Get every database names visible for the bot"
         query = "SHOW DATABASES"
         async with self.bot.db_query(query, astuple=True) as query_results:
             print(query_results)
@@ -432,6 +466,7 @@ class Admin(commands.Cog):
 
     @db_biggest.autocomplete("database")
     async def db_biggest_autocompl(self, interaction: discord.Interaction, current: str):
+        "Autocompletion for the database name"
         databases = await self.get_databases_names()
         return [
             discord.app_commands.Choice(name=db, value=db)
@@ -458,7 +493,7 @@ class Admin(commands.Cog):
                 msg = await user.dm_channel.send("{} La procédure d'urgence vient d'être activée. Si vous souhaitez l'annuler, veuillez cliquer sur la réaction ci-dessous dans les {} secondes qui suivent l'envoi de ce message.".format(self.bot.emojis_manager.customs['red_warning'], time))
                 await msg.add_reaction('🛑')
             except Exception as err:
-                await self.bot.get_cog('Errors').on_error(err, "Emergency command")
+                self.bot.dispatch("error", err, "Emergency command")
 
         def check(_, user: discord.User):
             return user.id in checks.admins_id
@@ -486,7 +521,7 @@ class Admin(commands.Cog):
                 user = self.bot.get_user(x)
                 await user.send("La procédure a été annulée !")
             except Exception as err:
-                await self.bot.get_cog('Errors').on_error(err,None)
+                self.bot.dispatch("error", err, None)
         return "Qui a appuyé sur le bouton rouge ? :thinking:"
 
     @main_msg.command(name="ignore")
@@ -588,7 +623,7 @@ Cette option affecte tous les serveurs"""
     async def admin_flag(self, ctx: MyContext):
         "Ajoute ou retire un attribut à un utilisateur"
         if ctx.subcommand_passed is None:
-            await self.bot.get_cog('Help').help_command(ctx, ['admin', 'flag'])
+            await ctx.send_help(ctx.command)
 
     @admin_flag.command(name="list")
     @commands.check(checks.is_bot_admin)
@@ -644,7 +679,7 @@ Cette option affecte tous les serveurs"""
     async def admin_rankcard(self, ctx: MyContext):
         "Ajoute ou retire une carte d'xp à un utilisateur"
         if ctx.subcommand_passed is None:
-            await self.bot.get_cog('Help').help_command(ctx, ['admin', 'rankcard'])
+            await ctx.send_help(ctx.command)
 
     @admin_rankcard.command(name="list")
     @commands.check(checks.is_bot_admin)
@@ -718,7 +753,7 @@ Cette option affecte tous les serveurs"""
         Il est nécessaire d'avoir au moins 10 membres pour que le rôle soit ajouté"""
         server = self.bot.get_guild(356067272730607628)
         if server is None:
-            await ctx.send("Serveur ZBot introuvable")
+            await ctx.send("Serveur de support introuvable")
             return
         role = server.get_role(486905171738361876)
         if role is None:
@@ -811,7 +846,8 @@ Cette option affecte tous les serveurs"""
             await self.bot.change_presence(activity=discord.Activity(type=discord.ActivityType.streaming,name=text, timestamps={'start':time.time()}))
         else:
             await ctx.send("Sélectionnez *play*, *watch*, *listen* ou *stream* suivi du nom")
-        await ctx.message.delete()
+        if not ctx.interaction:
+            await ctx.message.delete()
 
     @main_msg.command(name="speedtest")
     @commands.check(checks.is_bot_admin)
@@ -843,7 +879,7 @@ Cette option affecte tous les serveurs"""
             await msg.edit(content=str(result))
 
 
-    @commands.command(name='eval')
+    @commands.command(name='eval', hidden=True)
     @commands.check(checks.is_bot_admin)
     async def _eval(self, ctx: MyContext, *, body: str):
         """Evaluates a code
@@ -863,19 +899,19 @@ Cette option affecte tous les serveurs"""
         stdout = io.StringIO()
         try:
             to_compile = f'async def func():\n{textwrap.indent(body, "  ")}'
-        except Exception as e:
-            await self.bot.get_cog('Errors').on_error(e,ctx)
+        except Exception as err:
+            self.bot.dispatch("error", err, ctx)
             return
         try:
             exec(to_compile, env) # pylint: disable=exec-used
-        except Exception as e:
-            return await ctx.send(f'```py\n{e.__class__.__name__}: {e}\n```')
+        except Exception as err:
+            return await ctx.send(f'```py\n{err.__class__.__name__}: {err}\n```')
 
         func = env['func']
         try:
             with redirect_stdout(stdout):
                 ret = await func()
-        except Exception as e:
+        except Exception as err:
             value = stdout.getvalue()
             await ctx.send(f'```py\n{value}{traceback.format_exc()[:1990]}\n```')
         else:

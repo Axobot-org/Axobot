@@ -1,5 +1,9 @@
 {
-    "general": "General permissions",
+    "channel": {
+        "channel": "In channel %{mention}",
+        "category": "In category %{name}",
+        "general": "General permissions"
+    },
     "invalid_arg": "Invalid argument: %{arg}",
     "list": {
         "add_reactions": "Add reactions",
@@ -44,6 +48,11 @@
         "use_voice_activation": "Use voice activity",
         "view_audit_log": "View audit logs",
         "view_guild_insights": "View guild insights"
+    },
+    "target": {
+        "member": "Member %{name}",
+        "role": "Role %{name}",
+        "value": "Value %{value}"
     },
     "title": "**\"%{name}\" permissions:**\n\n",
     "whatisthat": "What do they mean?"

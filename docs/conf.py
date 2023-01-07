@@ -19,14 +19,14 @@ sys.path.insert(0, os.path.abspath('.'))
 
 # -- Project information -----------------------------------------------------
 
-project = 'ZBot'
+project = 'Axobot'
 copyright = '2019 - 2022, ZRunner'
 author = 'ZRunner'
 
 # The short X.Y version
-version = '4.1'
+version = '4.2'
 # The full version, including alpha/beta/rc tags
-release = '4.1.4'
+release = '4.2.0'
 
 
 # Example configuration for intersphinx: refer to the Python standard library.

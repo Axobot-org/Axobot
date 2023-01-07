@@ -36,7 +36,7 @@ class Partners(commands.Cog):
                 liste = list(query_results)
             return liste
         except Exception as err:
-            await self.bot.get_cog('Errors').on_error(err,None)
+            self.bot.dispatch("error", err)
 
     async def db_get_guild(self, guildID: int):
         """Return every partners of a guild"""
@@ -46,7 +46,7 @@ class Partners(commands.Cog):
                 liste = list(query_results)
             return liste
         except Exception as err:
-            await self.bot.get_cog('Errors').on_error(err,None)
+            self.bot.dispatch("error", err)
 
     async def db_get_partnered(self, invites: list):
         """Return every guilds which has this one as partner"""
@@ -58,7 +58,7 @@ class Partners(commands.Cog):
                 liste = list(query_results)
             return liste
         except Exception as err:
-            await self.bot.get_cog('Errors').on_error(err,None)
+            self.bot.dispatch("error", err)
 
     async def db_set_partner(self,guildID:int,partnerID:str,partnerType:str,desc:str):
         """Add a partner into a server"""
@@ -69,7 +69,7 @@ class Partners(commands.Cog):
                 pass
             return True
         except Exception as err:
-            await self.bot.get_cog('Errors').on_error(err,None)
+            self.bot.dispatch("error", err)
             return False
     
     async def db_edit_partner(self,partnerID:int,target:str=None,desc:str=None,msg:int=None):
@@ -86,7 +86,7 @@ class Partners(commands.Cog):
                 pass
             return True
         except Exception as err:
-            await self.bot.get_cog('Errors').on_error(err,None)
+            self.bot.dispatch("error", err)
             return False
 
     async def db_del_partner(self,partner_id:int):
@@ -97,7 +97,7 @@ class Partners(commands.Cog):
                 pass
             return True
         except Exception as e:
-            await self.bot.get_cog('Errors').on_error(e,None)
+            self.bot.dispatch("error", e)
             return False
     
     async def db_get_bot_guilds(self, bot_id: int) -> Optional[int]:
@@ -139,7 +139,7 @@ class Partners(commands.Cog):
                     owners.append(o)
         return owners
 
-    async def update_partners(self, channel: discord.TextChannel, color: int =None) -> int:
+    async def update_partners(self, channel: discord.TextChannel, color: Optional[int] = None) -> int:
         """Update every partners of a channel"""
         if not channel.permissions_for(channel.guild.me).embed_links:
             return 0
@@ -157,8 +157,6 @@ class Partners(commands.Cog):
         count = 0
         if color is None:
             color = await self.bot.get_config(channel.guild.id,'partner_color')
-        if color is None:
-            color = self.bot.get_cog('Servers').default_opt['partner_color']
         session = aiohttp.ClientSession(loop=self.bot.loop)
         for partner in partners:
             target_desc = partner['description']
@@ -181,13 +179,13 @@ class Partners(commands.Cog):
             try:
                 msg = await channel.fetch_message(partner['messageID'])
                 await msg.edit(embed=emb)
-            except discord.errors.NotFound:
+            except (discord.errors.NotFound, discord.errors.Forbidden):
                 msg = await channel.send(embed=emb)
-                await self.db_edit_partner(partnerID=partner['ID'],msg=msg.id)
-            except Exception as e:
+                await self.db_edit_partner(partnerID=partner['ID'], msg=msg.id)
+            except Exception as err:
                 msg = await channel.send(embed=emb)
-                await self.db_edit_partner(partnerID=partner['ID'],msg=msg.id)
-                await self.bot.get_cog('Errors').on_error(e,None)
+                await self.db_edit_partner(partnerID=partner['ID'], msg=msg.id)
+                self.bot.dispatch("error", err)
             count += 1
         await session.close()
         return count
@@ -213,10 +211,10 @@ class Partners(commands.Cog):
             image = usr.display_avatar.with_static_format("png") if usr else ""
         except discord.NotFound:
             title += "ID: "+partner['target']
-        except Exception as e:
+        except Exception as err:
             usr = await self.bot.fetch_user(int(partner['target']))
             image = usr.display_avatar.url if usr else ""
-            await self.bot.get_cog("Errors").on_error(e, None)
+            self.bot.dispatch("error", err)
         perm = discord.Permissions.all()
         perm.update(administrator=False)
         oauth_url = discord.utils.oauth_url(partner['target'], permissions=perm)
@@ -276,7 +274,7 @@ class Partners(commands.Cog):
 
         ..Doc server.html#partners-system"""
         if ctx.subcommand_passed is None:
-            await self.bot.get_cog('Help').help_command(ctx,['partner'])
+            await ctx.send_help(ctx.command)
 
     @partner_main.command(name='add')
     @commands.check(checks.database_connected)
@@ -443,8 +441,6 @@ class Partners(commands.Cog):
         fields_name = await self.bot._(ctx.guild.id, "partners.partners-list")
         if ctx.can_send_embed:
             color = await ctx.bot.get_config(ctx.guild.id,'partner_color')
-            if color is None:
-                color = self.bot.get_cog('Servers').default_opt['partner_color']
             emb = discord.Embed(title=fields_name[0], color=color, timestamp=self.bot.utcnow())
             if ctx.guild.icon:
                 emb.set_thumbnail(url=ctx.guild.icon)
@@ -468,7 +464,7 @@ class Partners(commands.Cog):
     
     ..Doc server.html#change-the-embed-color"""
         await self.bot.get_cog('Servers').conf_color(ctx,'partner_color',str(color))
-    
+
     @partner_main.command(name='reload')
     @commands.check(checks.has_manage_guild)
     @commands.cooldown(1,60,commands.BucketType.guild)
@@ -483,7 +479,7 @@ class Partners(commands.Cog):
         chan: str = channel[0]['partner_channel'].split(';')[0]
         if not chan.isnumeric():
             return await msg.edit(content=await self.bot._(ctx.guild, "partners.no-channel"))
-        chan = ctx.guild.get_channel(int(chan))
+        chan = ctx.guild.get_channel_or_thread(int(chan))
         if chan is None:
             return await msg.edit(content=await self.bot._(ctx.guild, "partners.no-channel"))
         count = await self.update_partners(chan,channel[0]['partner_color'])

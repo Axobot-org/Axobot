@@ -28,9 +28,13 @@
     "click_here": "Cliquez ici",
     "dnd": "ne pas déranger",
     "doc": "Documentation",
+    "done!": "Fait !",
     "duration": "durée",
     "end": "fin",
-    "example": "exemple",
+    "example": {
+        "one": "exemple",
+        "other": "exemples"
+    },
     "extreme": "extrême",
     "ghost": "Fantôme",
     "high": "élevé",

@@ -124,6 +124,8 @@ def parse_crypted_file(bot: "Zbot"):
     bot.others['google_api'] = cryptage.uncrypte(lines[19])
     bot.others['curseforge'] = cryptage.uncrypte(lines[20])
     bot.others['omdb'] = cryptage.uncrypte(lines[21])
+    bot.others['twitch_client_id'] = cryptage.uncrypte(lines[22])
+    bot.others['twitch_client_secret'] = cryptage.uncrypte(lines[23])
     bot.dbl_token = tokens.get_dbl_token()
 
 def load_sql_connection(bot: "Zbot"):
@@ -177,6 +179,7 @@ async def load_cogs(bot: "Zbot"):
                       'fcts.servers',   
                       'fcts.tickets',
                       'fcts.timers',
+                      'fcts.twitch',
                       'fcts.users',
                       'fcts.utilities',
                       'fcts.voices',

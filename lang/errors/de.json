@@ -23,6 +23,7 @@
     "quoteserror": "Ups, ein Anführungszeichen Fehler ist aufgetreten. Schau nochmal nach ob du die Anführungszeichen “ richtig benutzt hast, sodass beide Anführungszeichen später geschlossen sind",
     "rolenotfound": "Die Rolle `%{r}` konnte nicht gefunden werden",
     "toomanytxtchan": "Du hast zu viele Erreichbare Textkanäle",
-    "unknown": "Ups, ein Fehler ist aufgetreten 😕 Versuche es später nochmal oder kontaktiere den Support (command `about`).",
+    "unknown": "Ups, ein Fehler ist aufgetreten 😕 Versuche es später nochmal oder kontaktiere den Support (command %{about}).",
+    "unknown2": "Ein Fehler ist während dem antworten aufgetreten. Bitte versuche es später oder kontaktiere den Zbot Support (gebe den %{about} Befehl für den Server Link ein)",
     "usernotfound": "Der Nutzer `%{u}` konnte nicht gefunden werden :confused:"
 }

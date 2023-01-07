@@ -8,9 +8,15 @@
         "roles": "Roles",
         "tickets": "Tickets"
     },
-    "disabled": "Logs ov %{kind} wont be sent 2 dis channel anymore",
+    "disabled": {
+        "current": "Logs ov %{kind} wont be sent 2 dis channel anymore",
+        "other": "Logs ov %{kind} wont be sent 2 %{channel} anymore"
+    },
     "embed-warning": "2 send logs, I need dat shiny \"embed links\" perm!",
-    "enabled": "Logs of %{kind} will be sent 2 dis channel, yay",
+    "enabled": {
+        "current": "Logs of %{kind} will be sent 2 dis channel, yay",
+        "other": "Logs of %{kind} will be sent 2 %{channel}, hurray"
+    },
     "list": {
         "all": "List ov available logs",
         "channel": "List ov logs in %{channel}",

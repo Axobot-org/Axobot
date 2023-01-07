@@ -23,7 +23,7 @@
     },
     "hint-useful": "Je n'en ai plus besoin",
     "hint-useless": "Ouvre un ticket",
-    "missing-category-config": "Oups, je n'ai pas pu créer votre ticket parce que personne ne m'a dit où les créer. Vous devriez demander à un modérateur du serveur d'utiliser la commande `tickets portal set-category`.",
+    "missing-category-config": "Oups, je n'ai pas pu créer votre ticket parce que personne ne m'a dit où les créer. Vous devriez demander à un modérateur du serveur d'utiliser la commande %{set_category}.",
     "missing-perms-creation": {
         "channel": "Oups, je n'ai pas pu créer de salon pour votre ticket. Assurez-vous que j'ai les permissions nécessaires et réessayez.",
         "thread": "Oups, je n'ai pas pu créer de fil pour votre. Assurez-vous que j'ai les permissions nécessaires et réessayez."
@@ -36,7 +36,9 @@
     "other": "autre",
     "role-edited": {
         "default": "Le rôle autorisé à accéder aux tickets par défaut a été modifié !",
-        "topic": "Le rôle autorisé à accéder aux tickets du topic \"%{topic}\" a bien été modifié !"
+        "default-reset": "Le rôle autorisé à accéder aux tickets par défaut a bien été réinitialisé à 'aucun rôle' !",
+        "topic": "Le rôle autorisé à accéder aux tickets du topic \"%{topic}\" a bien été modifié !",
+        "topic-reset": "Le rôle autorisé à voir les tickets du topic \"%{topic}\" a été réinitialisé à celui par défaut !"
     },
     "selection-placeholder": "Choisissez un topic",
     "text-edited": "Le message affiché avec la sélection du ticket a été modifié",
@@ -59,7 +61,7 @@
             "many": "%{count} topics ont bien été supprimés"
         },
         "list": "Les topics de votre serveur :",
-        "other-already-exists": "Un topic \"autre\" est déjà proposé par défaut par Zbot, pas la peine de le rajouter :innocent:",
+        "other-already-exists": "Un topic \"autre\" est déjà proposé par défaut, pas la peine de le rajouter :innocent:",
         "too-long": "Le nom du topic ne peut excéder 100 caractères",
         "too-many": "Oups, vous avez atteint la limite de topics autorisée ! À cause des limitations de Discord, vous ne pouvez pas avoir plus de %{max} topics en même temps."
     }

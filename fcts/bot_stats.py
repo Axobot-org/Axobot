@@ -1,5 +1,6 @@
 from datetime import datetime
 import math
+import re
 import typing
 import aiohttp
 
@@ -20,6 +21,10 @@ else:
     json_loads = orjson.loads
 
 
+async def get_ram_data():
+    data = psutil.virtual_memory()
+    return data.percent, (data.total - data.available)
+
 class BotStats(commands.Cog):
     """Hey, I'm a test cog! Happy to meet you :wave:"""
 
@@ -27,16 +32,20 @@ class BotStats(commands.Cog):
         self.bot = bot
         self.file = 'bot_stats'
         self.received_events = {'CMD_USE': 0}
-        self.commands_uses = {}
+        self.commands_uses: dict[str, int] = {}
+        self.app_commands_uses: dict[str, int] = {}
         self.rss_stats = {'checked': 0, 'messages': 0, 'errors': 0, 'warnings': 0}
         self.xp_cards = {'generated': 0, 'sent': 0}
         self.process = psutil.Process()
-        self.cpu_records: list[float] = []
+        self.bot_cpu_records: list[float] = []
+        self.total_cpu_records: list[float] = []
         self.latency_records: list[int] = []
         self.statuspage_header = {"Content-Type": "application/json", "Authorization": "OAuth " + self.bot.others["statuspage"]}
         self.antiscam = {"warning": 0, "deletion": 0}
         self.ticket_events = {"creation": 0}
         self.usernames = {"guild": 0, "user": 0, "deleted": 0}
+        self.emitted_serverlogs: dict[str, int] = {}
+        self.last_backup_size: typing.Optional[int] = None
 
     async def cog_load(self):
          # pylint: disable=no-member
@@ -55,10 +64,14 @@ class BotStats(commands.Cog):
     @tasks.loop(seconds=10)
     async def record_cpu_usage(self):
         "Record the CPU usage for later use"
-        self.cpu_records.append(self.process.cpu_percent())
-        if len(self.cpu_records) > 6:
+        self.bot_cpu_records.append(self.process.cpu_percent())
+        if len(self.bot_cpu_records) > 6:
             # if the list becomes too long (over 1min), cut it
-            self.cpu_records = self.cpu_records[-6:]
+            self.bot_cpu_records = self.bot_cpu_records[-6:]
+        self.total_cpu_records.append(psutil.cpu_percent())
+        if len(self.total_cpu_records) > 6:
+            # if the list becomes too long (over 1min), cut it
+            self.total_cpu_records = self.total_cpu_records[-6:]
 
     @record_cpu_usage.error
     async def on_record_cpu_error(self, error: Exception):
@@ -133,10 +146,28 @@ class BotStats(commands.Cog):
     async def on_command_completion(self, ctx: MyContext):
         """Called when a command is correctly used by someone"""
         name = ctx.command.full_parent_name.split()[0] if ctx.command.parent is not None else ctx.command.name
-        nbr = self.commands_uses.get(name, 0)
-        self.commands_uses[name] = nbr + 1
-        nbr = self.received_events.get('CMD_USE', 0)
-        self.received_events['CMD_USE'] = nbr + 1
+        self.commands_uses[name] = self.commands_uses.get(name, 0) + 1
+        self.received_events['CMD_USE'] = self.received_events.get('CMD_USE', 0) + 1
+        if ctx.interaction:
+            self.app_commands_uses[name] = self.app_commands_uses.get(name, 0) + 1
+            self.received_events['SLASH_CMD_USE'] = self.received_events.get('SLASH_CMD_USE', 0) + 1
+
+    @commands.Cog.listener()
+    async def on_serverlog(self, guild_id: int, channel_id: int, log_type: str):
+        "Called when a serverlog is emitted"
+        self.emitted_serverlogs[log_type] = self.emitted_serverlogs.get(log_type, 0) + 1
+
+
+    @commands.Cog.listener()
+    async def on_message(self, message: discord.Message):
+        "Collect the last backup size from the logs channel"
+        if message.channel.id != 625319946271850537 or len(message.embeds) != 1:
+            return
+        embed = message.embeds[0]
+        if match := re.search(r"Database backup done! \((\d+(?:\.\d+)?)([GM])\)", embed.description):
+            unit = match.group(2)
+            self.last_backup_size = float(match.group(1)) / (1024 if unit == "M" else 1)
+            self.bot.log.info(f"Last backup size detected: {self.last_backup_size}G")
 
     async def db_get_disabled_rss(self) -> int:
         "Count the number of disabled RSS feeds in any guild"
@@ -223,6 +254,16 @@ class BotStats(commands.Cog):
         async with self.bot.db_query(query, (now, *args)) as _:
             pass
 
+    async def db_get_antiscam_enabled_count(self):
+        "Get the number of active guilds where antiscam is enabled"
+        query = f"SELECT `ID` FROM `servers` WHERE `anti_scam` = 1"
+        count = 0
+        async with self.bot.db_query(query) as query_results:
+            for row in query_results:
+                if row["ID"] in self.bot.guilds:
+                    count += 1
+        return count
+
     @tasks.loop(minutes=1)
     async def sql_loop(self):
         """Send our stats every minute"""
@@ -247,30 +288,43 @@ class BotStats(commands.Cog):
             for k, v in self.commands_uses.items():
                 cursor.execute(query, (now, 'cmd.'+k, v, 0, 'cmd/min', True, self.bot.entity_id))
             self.commands_uses.clear()
+            for k, v in self.app_commands_uses.items():
+                cursor.execute(query, (now, 'app_cmd.'+k, v, 0, 'cmd/min', True, self.bot.entity_id))
+            self.app_commands_uses.clear()
             # RSS stats
             for k, v in self.rss_stats.items():
                 cursor.execute(query, (now, 'rss.'+k, v, 0, k, k == "messages", self.bot.entity_id))
             cursor.execute(query, (now, 'rss.disabled', await self.db_get_disabled_rss(), 0, 'disabled', False, self.bot.entity_id))
             # XP cards
-            cursor.execute(query, (now, 'xp.generated_cards', self.xp_cards["generated"], 0, 'cards/min', True, self.bot.entity_id))
-            cursor.execute(query, (now, 'xp.sent_cards', self.xp_cards["sent"], 0, 'cards/min', True, self.bot.entity_id))
-            self.xp_cards["generated"] = 0
-            self.xp_cards["sent"] = 0
-            # Latency - RAM usage - CPU usage
-            ram = round(self.process.memory_info()[0]/2.**30, 3)
+            if self.xp_cards["generated"]:
+                cursor.execute(query, (now, 'xp.generated_cards', self.xp_cards["generated"], 0, 'cards/min', True, self.bot.entity_id))
+                self.xp_cards["generated"] = 0
+            if self.xp_cards["sent"]:
+                cursor.execute(query, (now, 'xp.sent_cards', self.xp_cards["sent"], 0, 'cards/min', True, self.bot.entity_id))
+                self.xp_cards["sent"] = 0
+            # Latency
             if latency := await self.get_list_usage(self.latency_records):
                 cursor.execute(query, (now, 'perf.latency', latency, 1, 'ms', False, self.bot.entity_id))
-            cursor.execute(query, (now, 'perf.ram', ram, 1, 'Gb', False, self.bot.entity_id))
-            cpu = await self.get_list_usage(self.cpu_records)
-            if cpu is not None:
-                cursor.execute(query, (now, 'perf.cpu', cpu, 1, '%', False, self.bot.entity_id))
+            # CPU usage
+            bot_cpu = await self.get_list_usage(self.bot_cpu_records)
+            if bot_cpu is not None:
+                cursor.execute(query, (now, 'perf.bot_cpu', bot_cpu, 1, '%', False, self.bot.entity_id))
+            total_cpu = await self.get_list_usage(self.total_cpu_records)
+            if total_cpu is not None:
+                cursor.execute(query, (now, 'perf.total_cpu', total_cpu, 1, '%', False, self.bot.entity_id))
+            # RAM usage
+            bot_ram = round(self.process.memory_info()[0] / 2.**30, 3)
+            cursor.execute(query, (now, 'perf.bot_ram', bot_ram, 1, 'Gb', False, self.bot.entity_id))
+            percent_ram, total_ram = await get_ram_data()
+            cursor.execute(query, (now, 'perf.total_ram', round(total_ram / 1e9, 3), 1, 'Gb', False, self.bot.entity_id))
+            cursor.execute(query, (now, 'perf.percent_total_ram', percent_ram, 1, '%', False, self.bot.entity_id))
             # Unavailable guilds
             unav, total = 0, 0
             for guild in self.bot.guilds:
                 unav += guild.unavailable
                 total += 1
             cursor.execute(query, (now, 'guilds.unavailable', round(unav/total, 3)*100, 1, '%', False, self.bot.entity_id))
-            cursor.execute(query, (now, 'guilds.total', total, 0, 'guilds', True, self.bot.entity_id))
+            cursor.execute(query, (now, 'guilds.total', total, 0, 'guilds', False, self.bot.entity_id))
             del unav, total
             # antiscam warn/deletions
             if self.antiscam["warning"]:
@@ -278,6 +332,8 @@ class BotStats(commands.Cog):
             if self.antiscam["deletion"]:
                 cursor.execute(query, (now, 'antiscam.deletion', self.antiscam["deletion"], 0, 'deletion/min', True, self.bot.entity_id))
             self.antiscam["warning"] = self.antiscam["deletion"] = 0
+            # antiscam activated count
+            cursor.execute(query, (now, 'antiscam.activated', await self.db_get_antiscam_enabled_count(), 0, 'guilds', False, self.bot.entity_id))
             # tickets creation
             if self.ticket_events["creation"]:
                 cursor.execute(query, (now, 'tickets.creation', self.ticket_events["creation"], 0, 'tickets/min', True, self.bot.entity_id))
@@ -296,9 +352,16 @@ class BotStats(commands.Cog):
                 await self.db_record_eventpoints_values(now)
             # serverlogs
             await self.db_record_serverlogs_enabled(now)
+            for k, v in self.emitted_serverlogs.items():
+                cursor.execute(query, (now, f'logs.{k}.emitted', v, 0, 'event/min', True, self.bot.entity_id))
+            self.emitted_serverlogs.clear()
+            # Last backup save
+            if self.last_backup_size:
+                cursor.execute(query, (now, 'backup.size', self.last_backup_size, 1, 'Gb', False, self.bot.entity_id))
+                self.last_backup_size = None
             # Push everything
             cnx.commit()
-        except mysql.connector.errors.IntegrityError as err: # duplicate primary key
+        except mysql.connector.errors.IntegrityError as err: # usually duplicate primary key
             self.bot.log.warning(f"Stats loop iteration cancelled: {err}")
         # if something goes wrong, we still have to close the cursor
         cursor.close()
@@ -310,7 +373,7 @@ class BotStats(commands.Cog):
 
     @sql_loop.error
     async def on_sql_loop_error(self, error: Exception):
-        self.bot.dispatch("error", error, "When sending SQL stats")
+        self.bot.dispatch("error", error, "SQL stats loop has stopped <@279568324260528128>")
 
     async def get_stats(self, variable: str, minutes: int) -> typing.Union[int, float, str, None]:
         """Get the sum of a certain variable in the last X minutes"""
@@ -320,7 +383,7 @@ class BotStats(commands.Cog):
         result: list[dict] = list(cursor)
         cursor.close()
         if len(result) == 0:
-            return None
+            return 0
         result = result[0]
         if result['type'] == 0:
             return int(result['value'])
@@ -359,7 +422,7 @@ class BotStats(commands.Cog):
 
     @status_loop.error
     async def on_status_loop_error(self, error: Exception):
-        self.bot.dispatch("error", error, "When sending stats to statuspage.io")
+        self.bot.dispatch("error", error, "When sending stats to statuspage.io (<@279568324260528128>)")
 
 
 async def setup(bot):

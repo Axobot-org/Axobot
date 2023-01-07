@@ -65,15 +65,13 @@ Clear
 
 **Syntax:** :code:`clear <number> [parameters]`
 
-This command allows you to efficiently delete messages, with a list of possible parameters for more accuracy. You can thus specify a list of members to check by mentioning them, `+i` to delete all messages containing files/images, `+l` for those containing links or Discord invitations, `+p` for pinned messages. By default, the bot will not delete pinned messages.
+This command allows you to efficiently delete messages, with a list of possible parameters for more accuracy. You can thus specify a list of members to check by mentioning them, if it should delete all messages containing files/images, or all containing links or Discord invitations, or even pinned messages. By default, the bot will not delete pinned messages.
 
-Be careful, all specified settings must be validated for the message to be deleted. For example, if you enter :code:`clear 10 @Z_runner#7515 +i`, the bot will check in the last ten messages if the message comes from Z_runner#7515 AND if the message contains an image. 
+Be careful, all specified settings must be validated for the message to be deleted. For example, if you enter :code:`/clear 10 users: @Z_runner#7515 contains_file: True`, the bot will check in the last ten messages if the message comes from Z_runner#7515 AND if the message contains an image. 
 
-If you enter :code:`clear 25 -p +l`, the bot will clear the last 25 messages if they contains a link AND if they're not pinned, no matter the author.
+If you enter :code:`/clear 25 contains_url: True`, the bot will clear the last 25 messages if they contains a link AND if they're not pinned, no matter the author.
 
-If you enter :code:`clear 13 -p -i @Z_runner#7515`, the bot will clear the last 13 messages if they are not pinned AND if they does not contain any file/image AND if the author is Z_runner#7515.
-
-If you enter :code:`clear 1000 @Z_runner#7515 @ZBot beta#4940`, the bot will delete all messages contained in the last 1000 messages of the channel AND written by Z_runner#7515 OR ZBot beta#4940 
+If you enter :code:`/clear 1000 users: @Z_runner#7515 @ZBot beta#4940`, the bot will delete all (not pinned) messages contained in the last 1000 messages of the channel AND written by Z_runner#7515 OR ZBot beta#4940 
 
 .. warning:: The permissions "`Manage messages <perms.html#manage-messages>`__" and "`Read messages history <perms.html#read-message-history>`__" are required.
 
@@ -233,7 +231,7 @@ To help you moderate your server and keep track of what's going on, Zbot has a l
 How to setup logs
 -----------------
 
-You can enable one or more logs types in a channel by using the :code:`modlogs enable <logs>` in the channel you want them to appear in. In the same way, use :code:`modlogs disable <logs>` to disable a kind of logs in the current channel. Please note that you can use the keyword "all" as a log type to enable or disable all at the same time.
+You can enable one or more logs types in a channel by using the :code:`modlogs enable <logs> [channel]` in the channel you want them to appear in (or in another channel by mentionning it). In the same way, use :code:`modlogs disable <logs> [channel]` to disable a kind of logs in the current channel. Please note that you can use the keyword "all" as a log type to enable or disable all at the same time.
 
 To see in Discord which logs exists and which ones you have enabled in your server, use the command :code:`modlogs list`. You can also use this command followed by a channel mention or ID to see which logs are enabled in a specific channel.
 

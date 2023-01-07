@@ -46,6 +46,19 @@
     "kick-dm": "U have just been kicked from the servr %{guild} :confused:",
     "missing-manage-nick": "Oops, I'm missing the cool \"Manage nicknames\" perms! :sad:",
     "missing-user-perms": "Oops, Ur not pawerful enoogh (either manage roles, manage server or manage messages)",
+    "mute-config": {
+        "confirm": "Are u sure u wanna setup teh \"muted\" role??\nI dont wanna be annoying, but uh, dat might break some things in ur server. Especially if u playd with teh \"send msg\" perms. Think twice or get bonk.",
+        "err": "Oops, cant do that. Plz check me perms on teh server 'nd try again.",
+        "success": {
+            "other": "Teh role have been successffully created & configured! (%{count} channels couldnotbeconfigured, cuz I lack of perms)",
+            "zero": "Teh role have been successffully created & configured!"
+        },
+        "success2": {
+            "other": "The mouted role iz now correcty setup! (%{count} chats cannut be configured, cuz of a bruh lacking of perms)",
+            "zero": "The role iz now correcty setup!"
+        },
+        "tip": "*Tip: U can also use the \"timeout\" discord feature with teh bot by **not** specifying any muted role in teh config!*"
+    },
     "mute": {
         "already-mute": "Dis membr iz 'lready mute!",
         "already-unmute": "This mber iznt muted!",
@@ -54,19 +67,9 @@
         "list-title-0": "List ov mutd people in serv \"%{guild}\"",
         "list-title-1": "List ov a few (45) muted members of ur server \"%{guild}\"",
         "list-title-2": "Lits ov 60 muted members of dat guild \"%{guild}\"",
-        "mute-config-err": "Oops, cant do that. Plz check me perms on teh server 'nd try again.",
-        "mute-config-success": {
-            "other": "Teh role have been successffully created & configured! (%{count} channels couldnotbeconfigured, cuz I lack of perms)",
-            "zero": "Teh role have been successffully created & configured!"
-        },
-        "mute-config-success2": {
-            "other": "The mouted role iz now correcty setup! (%{count} chats cannut be configured, cuz of a bruh lacking of perms)",
-            "zero": "The mouted role iz now correcty setup!"
-        },
         "mute-high": "Ooops, 't sEEms dat `muted` rol iz tooo high 4 me to give it... Plz fiX dis problem by plac'ng my role higher than this nice `muted` role.",
         "no-mute": "Oooops, seemz dat teh nice `muted` role doznt exist :rofl: Creat'it nd assign perms yourself",
-        "no-mutes": "No member seems 2B banned from here",
-        "role-created": "Successsfully added da `muted` role! U can naw use `%{p}mute-config` cmd to ask me 2 config it meself",
+        "no-mutes": "No member seems 2B muted ._.",
         "staff-mute": "U cant prevent another cool staff member frm speek'ng ",
         "too-high": "Seemz that this membr iz tooooo high 4 me to time 'em out :ohno:"
     },
@@ -115,6 +118,7 @@
         "one": "1 bad name edited .-.",
         "zero": "No bad name editd!"
     },
+    "unhoist-too-many-members": "Uups, it's not that I'm lazy, u know... But oh wow, dat's a hell ov a big server u got here. Hell naw, i refuse to work dat much thanks.",
     "unmute-chat": "Teh mmber %{user} (%{userid}) canow speek 'gain",
     "warn": {
         "cant-bot": "Nope, cant warn anoder cool boat ^^",
