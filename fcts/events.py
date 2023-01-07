@@ -11,8 +11,10 @@ import aiohttp
 import discord
 import mysql
 from discord.ext import commands, tasks
-from libs.bot_classes import Zbot
+
+from libs.bot_classes import MyContext, Zbot
 from libs.enums import UsernameChangeRecord
+
 
 class Events(commands.Cog):
     """Cog for the management of major events that do not belong elsewhere. Like when a new server invites the bot."""
@@ -497,6 +499,26 @@ class Events(commands.Cog):
         emb.set_author(name=self.bot.user, icon_url=self.bot.user.display_avatar)
         await self.bot.send_embed(emb, url="loop")
         self.statslogs_last_push = datetime.datetime.now()
+
+
+    @commands.Cog.listener()
+    async def on_command_completion(self, ctx: MyContext):
+        "If a command is executed with Zbot, remind the user to invite Axobot instead"
+        class MigrationView(discord.ui.View):
+            def __init__(self):
+                super().__init__()
+                self.add_item(discord.ui.Button(label='Invite Axobot', url="https://zrunner.me/invite-axobot", style=discord.ButtonStyle.blurple))
+                self.add_item(discord.ui.Button(label='About the migration', url="https://zbot.readthedocs.io/en/release-candidate/v4.html#new-identity"))
+                self.add_item(discord.ui.Button(label='Support server', url="https://discord.gg/N55zY88"))
+        
+        if self.bot.entity_id == 0 and random.random() < 0.1:
+            txt = """Hey, Zbot is currently changing its identity to **Axobot**!
+
+During the migration period, Zbot will continue to work, but will **receive updates later** than Axobot and may not work as well.
+Luckily for you, **the migration is very quick**, just invite Axobot and give it the same roles as Zbot to avoid any service interruption!"""
+            emb = discord.Embed(title="Zbot is becoming Axobot !", description=txt, color=0x00ff00)
+            emb.set_thumbnail(url="https://zrunner.me/axolotl.png")
+            await ctx.send(embed=emb, view=MigrationView())
 
 
 async def setup(bot):
