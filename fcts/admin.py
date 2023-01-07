@@ -241,6 +241,9 @@ class Admin(commands.Cog):
             return
         count = 0
         for guild in ctx.bot.guilds:
+            if guild.id == 356067272730607628 and self.bot.entity_id == 0:
+                # The support server should not receive updates from Zbot but only Axobot
+                continue
             channels = await ctx.bot.get_config(guild.id,'bot_news')
             if channels is None or len(channels) == 0:
                 continue
