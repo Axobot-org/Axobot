@@ -247,10 +247,6 @@ class BotStats(commands.Cog):
 
     async def db_record_serverlogs_enabled(self, now: datetime):
         "Record into the stats table the number of enabled serverlogs, grouped by kind"
-        # query = """INSERT INTO `statsbot`.`zbot`
-        #     SELECT %s, CONCAT("logs.", `kind`, ".enabled"), COUNT(*), %s, %s, %s, %s
-        #     FROM `serverlogs`
-        #     GROUP BY `kind`"""
         guild_ids = {guild.id for guild in self.bot.guilds}
         query = """SELECT guild, kind FROM `serverlogs` WHERE `beta` = %s"""
         async with self.bot.db_query(query, (self.bot.beta,)) as query_results:
