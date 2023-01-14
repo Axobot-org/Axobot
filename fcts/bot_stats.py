@@ -271,6 +271,16 @@ class BotStats(commands.Cog):
                     count += 1
         return count
 
+    async def db_get_antiscam_enabled_count(self):
+        "Get the number of active guilds where antiscam is enabled"
+        query = f"SELECT `ID` FROM `servers` WHERE `anti_scam` = 1"
+        count = 0
+        async with self.bot.db_query(query) as query_results:
+            for row in query_results:
+                if row["ID"] in self.bot.guilds:
+                    count += 1
+        return count
+
     @tasks.loop(minutes=1)
     async def sql_loop(self):
         """Send our stats every minute"""
