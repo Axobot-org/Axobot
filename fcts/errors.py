@@ -97,9 +97,9 @@ class Errors(commands.Cog):
             await ctx.send(await self.bot._(ctx.channel, 'errors.notduringevent', cmd=cmd), ephemeral=True)
             return
         elif isinstance(error,commands.errors.CommandOnCooldown):
-            # if await checks.is_bot_admin(ctx):
-            #     await ctx.reinvoke()
-            #     return
+            if await checks.is_bot_admin(ctx):
+                await ctx.reinvoke()
+                return
             if await self.can_send_cooldown_error(ctx.author.id):
                 d = round(error.retry_after, 2 if error.retry_after < 60 else None)
                 await ctx.send(await self.bot._(ctx.channel, 'errors.cooldown', d=d), ephemeral=True)
