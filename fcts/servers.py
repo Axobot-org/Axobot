@@ -250,11 +250,12 @@ class Servers(commands.Cog):
 
 ..Doc server.html#config-options"""
         if ctx.invoked_subcommand is None:
+            subcommand_passed = ctx.message.content.replace(ctx.prefix+"config", "").strip()
+            if subcommand_passed == "":
+                await ctx.send_help("config")
+                return
             msg = copy.copy(ctx.message)
-            subcommand_passed = ctx.message.content.replace(ctx.prefix+"config ","")
-            if subcommand_passed is None:
-                msg.content = ctx.prefix + "config help"
-            elif subcommand_passed.isnumeric():
+            if subcommand_passed.isnumeric():
                 msg.content = ctx.prefix + "config see " + subcommand_passed
             elif subcommand_passed.split(" ")[0] in self.options_list:
                 if len(subcommand_passed.split(" "))==1:
