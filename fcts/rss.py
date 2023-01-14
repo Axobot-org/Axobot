@@ -1311,9 +1311,10 @@ class Rss(commands.Cog):
                     statscog.rss_stats['messages'] += 1
         except discord.HTTPException as err:
             self.bot.log.info(f"[send_rss_msg] Cannot send message on channel {channel.id}: {err}")
-            self.bot.dispatch("error", err)
+            self.bot.dispatch("error", err, f"While sending feed {obj.feed.feed_id} on channel {channel.id}")
         except Exception as err:
             self.bot.log.info(f"[send_rss_msg] Cannot send message on channel {channel.id}: {err}")
+            self.bot.dispatch("error", err, f"While sending feed {obj.feed.feed_id} on channel {channel.id}")
 
     async def check_feed(self, feed: FeedObject, session: ClientSession = None, send_stats: bool=False):
         """Check one rss feed and send messages if required

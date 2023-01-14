@@ -17,7 +17,7 @@
     "no-user": "Unable to find this user :eyes:",
     "no_database": "Due to a temporary database outage, this command has been disabled",
     "not-found": "This case was not found :confused:",
-    "reason-edited": "The reason for case #{ID} has been changed!",
+    "reason-edited": "The reason for case #%{ID} has been changed!",
     "search-0": "**User:** {U}\n**Type:** {T}\n**Moderator:** {M}\n**Date:** {D}\n**Reason:** *{R}*",
     "search-1": "**User:** {U}\n**Guild:** {G}\n**Type:** {T}\n**Moderator:** {M}\n**Date:** {D}\n**Reason:** *{R}*",
     "title-search": "Case #%{ID}"
