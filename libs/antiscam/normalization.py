@@ -14,7 +14,7 @@ RE_WEB = re.compile(
 RE_MONEY = re.compile(r'£|\$|€')
 RE_PHONE = re.compile(
     r'\D((?:(?:\+|00)33|0)\s*[\d](?:[\s.-]*\d{2}){4}|(?:0|\+?44)\s?(?:\d\s?){9,10}\d)(?!\d)')
-RE_NUMBER_DOT = re.compile(r'((?:\d{1,3}(?:,\d{3})*|\d+)(?:[\.]\d+)?)(?:\D|$)')
+RE_NUMBER_DOT = re.compile(r'((?:\d{1,3}(?:,\d{3})*|\d+)(?:[\.]\d+)?)(?=\D|$)')
 RE_PUNCTUATION = re.compile(r'(?:[^\w\d\s]|_)+')
 RE_PUNCTUATION_NO_DOTS = re.compile(r'(?:[^\w\d\s\.\!\?]|_)+')
 RE_DOTS = re.compile(r'[\.\!\?]+')
@@ -64,7 +64,7 @@ def normalize_words(message: str) -> str:
     message = RE_DISCORD_ROLE.sub(' discordrole ', message)
     message = RE_DISCORD_EMOJI.sub(' discordemoji ', message)
     message = RE_DISCORD_CHANNEL.sub(' discordchannel ', message)
-    message = RE_DISCORD_ID.sub(' discordid ', message)
+    message = RE_DISCORD_ID.sub('\\1 discordid \\2', message)
 
     message = RE_PHONE.sub(' phonenumber ', message)
     message = RE_NUMBER_DOT.sub(' number ', message)
