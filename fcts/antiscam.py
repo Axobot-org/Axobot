@@ -267,9 +267,9 @@ class AntiScam(commands.Cog):
     @commands.check(checks.is_bot_admin)
     async def antiscam_update_table(self, ctx: MyContext):
         "Update the recorded messages table"
-        await ctx.defer()
+        msg = await ctx.send("Hold on, I'm on it...")
         counter = await self.db_update_messages(self.table)
-        await ctx.send(f"{counter} messages updated!")
+        await msg.edit(content=f"{counter} messages updated!")
 
     @antiscam.command(name="train", with_app_command=False)
     @commands.check(checks.is_bot_admin)
@@ -291,6 +291,7 @@ class AntiScam(commands.Cog):
         else:
             txt += f"\n❌ This model is not better than the current one ({current_acc:.3f})"
         await msg.edit(content=txt)
+        self.bot.log.info(txt)
     
     async def report_context_menu(self, interaction: discord.Interaction, message: discord.Message):
         "Report a suspicious message to the bot team"
