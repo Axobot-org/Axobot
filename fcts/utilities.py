@@ -73,6 +73,8 @@ class Utilities(commands.Cog):
                 invite = 'http://discord.gg/N55zY88'
                 await ctx.send(await self.bot._(ctx.guild.id, "errors.zbot-migration", invite=invite))
             return False
+        if self.config is None:
+            await self.get_bot_infos()
         if not isinstance(ctx, commands.Context) or self.config is None:
             return True
         if ctx.message.type not in {discord.MessageType.default, discord.MessageType.reply, discord.MessageType.chat_input_command}:
