@@ -25,7 +25,7 @@ RE_DISCORD_ROLE = re.compile(r'<@&\d{15,}>')
 RE_DISCORD_EMOJI = re.compile(r'<a?:\w+:\d+>')
 RE_DISCORD_CHANNEL = re.compile(r'<#&?\d{15,}>')
 RE_DISCORD_INVITE = re.compile(r'(https?://)?(www\.)?(discord\.(gg|io|me|li)|discordapp\.com/invite)/ ?[\w-]{3,}')
-RE_DISCORD_ID = re.compile(r'(?:\D|^)(\d{17,19})(?:\D|$)')
+RE_DISCORD_ID = re.compile(r'(?P<pre>\D|^)(\d{17,19})(?P<post>\D|$)')
 
 STOP_WORDS = set(stopwords.words('english'))
 AFFIXES_STEM = SnowballStemmer("english")
@@ -64,7 +64,7 @@ def normalize_words(message: str) -> str:
     message = RE_DISCORD_ROLE.sub(' discordrole ', message)
     message = RE_DISCORD_EMOJI.sub(' discordemoji ', message)
     message = RE_DISCORD_CHANNEL.sub(' discordchannel ', message)
-    message = RE_DISCORD_ID.sub('\\1 discordid \\2', message)
+    message = RE_DISCORD_ID.sub('\\g<pre> discordid \\g<post>', message)
 
     message = RE_PHONE.sub(' phonenumber ', message)
     message = RE_NUMBER_DOT.sub(' number ', message)
