@@ -101,7 +101,7 @@ class YoutubeRSS:
                 img_url = feed['media_thumbnail'][0]['url']
             obj = RssMessage(
                 bot=self.bot,
-                feed=FeedObject.unrecorded("yt", channel.guild.id, channel.id),
+                feed=FeedObject.unrecorded("yt", channel.guild.id if channel.guild else None, channel.id),
                 url=feed['link'],
                 title=feed['title'],
                 date=feed['published_parsed'],
@@ -122,7 +122,7 @@ class YoutubeRSS:
                     img_url = feed['media_thumbnail'][0]['url']
                 obj = RssMessage(
                     bot=self.bot,
-                    feed=FeedObject.unrecorded("yt", channel.guild.id, channel.id),
+                    feed=FeedObject.unrecorded("yt", channel.guild.id if channel.guild else None, channel.id),
                     url=feed['link'],
                     title=feed['title'],
                     date=feed['published_parsed'],
