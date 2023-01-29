@@ -321,7 +321,7 @@ class Xp(commands.Cog):
         if len(result) > 1:
             result = [item['userID'] for item in result]
         self.sus = set(result)
-        self.bot.log.info("Suspects d'xp rechargé (%d suspects)", len(self.sus))
+        self.bot.log.info("[xp] Reloaded xp suspects (%d suspects)", len(self.sus))
     
     async def send_sus_msg(self, msg: discord.Message, xp: int):
         """Send a message into the sus channel"""
@@ -442,11 +442,11 @@ class Xp(commands.Cog):
                 return
             target_global = (guild == -1)
             if target_global:
-                self.bot.log.info("Chargement du cache XP (global)")
+                self.bot.log.info("[xp] Loading XP cache (global)")
                 cnx = self.bot.cnx_frm
                 query = ("SELECT `userID`,`xp` FROM `{}` WHERE `banned`=0".format(self.table))
             else:
-                self.bot.log.info("Chargement du cache XP (guild {})".format(guild))
+                self.bot.log.info("[xp] Loading XP cache (guild {})".format(guild))
                 table = await self.get_table(guild,False)
                 if table is None:
                     self.cache[guild] = dict()
@@ -960,7 +960,7 @@ class Xp(commands.Cog):
                 await self.bdd_load_cache(ctx.guild.id)
             self.cache[ctx.guild.id][user.id] = [round(time.time()), xp]
             s = "XP of user {} `{}` edited (from {} to {}) in server `{}`".format(user, user.id, prev_xp, xp, ctx.guild.id)
-            self.bot.log.info(s)
+            self.bot.log.info("[xp] " + s)
             emb = discord.Embed(description=s,color=8952255, timestamp=self.bot.utcnow())
             emb.set_footer(text=ctx.guild.name)
             emb.set_author(name=self.bot.user, icon_url=self.bot.user.display_avatar)
