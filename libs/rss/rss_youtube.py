@@ -24,7 +24,8 @@ class YoutubeRSS:
         self.min_time_between_posts = 120
         self.search_service = Service(5, bot.others['google_api'])
         self.url_pattern = re.compile(
-            r'(?:https?://)?(?:www.)?(?:youtube.com|youtu.be)(?:/channel/|/user/|/c/)([^/\s?]+).*?$')
+            r'(?:https?://)?(?:www.)?(?:youtube.com|youtu.be)/(?:channel/|user/|c/)?@?([^/\s?]+).*?$'
+        )
         self.cookies = {
             "CONSENT": "YES+cb.20220907-07-p1.fr+FX+785"
         }
