@@ -11,7 +11,7 @@ async def get_roundvalues_combinations(values_range: range) -> list[RoundValueTy
     values = [list(values_range) for _ in range(len(keys))]
     return [dict(zip(keys, v)) for v in itertools.product(*values)]
 
-async def train_model(data: list[Message]):
+async def train_model(data: list[Message], quick_train: bool=False):
     "Train a new model with the given data"
     model = RandomForest(ntree=100, test_percent=0.2, round_values={'max_frequency': 3, 'caps_percentage': 1, 'avg_word_len': 2})
     param_grid = {
@@ -24,7 +24,7 @@ async def train_model(data: list[Message]):
     # Start the training
     search = RandomizedSearchCV(model, param_grid,
                                 scoring="balanced_accuracy",
-                                n_iter=30,
+                                n_iter=5 if quick_train else 30,
                                 n_jobs=-1,
                                 error_score='raise'
                                 )

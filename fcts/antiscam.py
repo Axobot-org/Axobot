@@ -33,7 +33,11 @@ class AntiScam(commands.Cog):
     def __init__(self, bot: Zbot):
         self.bot = bot
         self.file = "antiscam"
-        self.agent = AntiScamAgent()
+        try:
+            self.agent = AntiScamAgent()
+        except FileNotFoundError:
+            self.bot.log.error("[antiscam] Failed to load the agent: file not found")
+            self.agent = None
         self.table = 'messages_beta'
         self.report_ctx_menu = app_commands.ContextMenu(
             name='Report a scam',
@@ -44,6 +48,12 @@ class AntiScam(commands.Cog):
     async def cog_load(self):
         "Load websites list from database"
         if self.bot.database_online:
+            if self.agent is None:
+                self.bot.log.warning("[antiscam] No model found, training a new one... this will take a while")
+                model = await train_model(await self.get_messages_list(), quick_train=True)
+                AntiScamAgent.save_model_to_file(model)
+                self.agent = AntiScamAgent()
+                self.bot.log.info("[antiscam] Model trained and saved to file")
             try:
                 data: dict[str, bool] = {}
                 query = "SELECT `domain`, `is_safe` FROM `spam-detection`.`websites`"
@@ -176,8 +186,8 @@ class AntiScam(commands.Cog):
         if new_status == 'deleted':
             await message.delete(delay=3)
 
-    async def train_model(self):
-        "Train the model and save it to disk"
+    async def get_messages_list(self):
+        "Get the list of messages to train the model, from the database"
         query = f"SELECT message, normd_message, contains_everyone, url_score, mentions_count, punctuation_count, max_frequency, caps_percentage, avg_word_len, category FROM `spam-detection`.`{self.table}` WHERE category IN (1, 2) GROUP BY message ORDER BY RAND()"
         data: list[Message] = []
         async with self.bot.db_query(query) as query_results:
@@ -195,7 +205,7 @@ class AntiScam(commands.Cog):
                         row['avg_word_len'],
                         row['category']-1)
                     )
-        return await train_model(data)
+        return data
 
     @commands.hybrid_group(name="antiscam")
     @app_commands.default_permissions(manage_guild=True)
@@ -280,11 +290,12 @@ class AntiScam(commands.Cog):
             return
         msg = await ctx.send("Hold on, this may take a while...")
         start = time.time()
-        model = await self.train_model()
-        acc = model.predict2()
+        data = await self.get_messages_list()
+        model = await train_model(data)
+        acc = model.get_external_accuracy(data)
         elapsed_time = await FormatUtils.time_delta(time.time() - start, lang="en")
         txt = f"New model has been generated in {elapsed_time}!\nAccuracy of {acc:.3f}"
-        current_acc = self.agent.model.predict2()
+        current_acc = self.agent.model.get_external_accuracy(data)
         if acc > current_acc:
             self.agent.save_model(model)
             txt += f"\n✅ This model is better than the current one ({current_acc:.3f}), replacing it!"
