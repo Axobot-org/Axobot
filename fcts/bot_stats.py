@@ -416,13 +416,6 @@ class BotStats(commands.Cog):
                 response.raise_for_status()
                 self.bot.log.debug(
                     f"StatusPage API returned {response.status} for {params} (latency)")
-            params["data"]["value"] = psutil.virtual_memory().available
-            async with session.post(
-                "https://api.statuspage.io/v1/pages/g9cnphg3mhm9/metrics/72bmf4nnqbwb/data",
-                    json=params) as response:
-                response.raise_for_status()
-                self.bot.log.debug(
-                    f"StatusPage API returned {response.status} for {params} (available RAM)")
 
     @status_loop.before_loop
     async def before_status_loop(self):
