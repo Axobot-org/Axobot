@@ -95,39 +95,6 @@ def setup_start_parser():
 
     return parser
 
-def parse_crypted_file(bot: "Zbot"):
-    "Parse the secret file containing all types of tokens and private things"
-    with open('fcts/requirements', 'r') as file:
-        lines = file.read().split('\n')
-    # remove comments, empty lines and all
-    for line in lines:
-        if line.startswith("//") or line == '':
-            lines.remove(line)
-    while '' in lines:
-        lines.remove('')
-    # database
-    for i, line in enumerate(['user', 'password', 'host', 'database1', 'database2']):
-        bot.database_keys[line] = cryptage.uncrypte(lines[i])
-    # misc APIs
-    bot.others['botsondiscord'] = cryptage.uncrypte(lines[6])
-    bot.others['discordbotsgroup'] = cryptage.uncrypte(lines[7])
-    bot.others['bitly'] = cryptage.uncrypte(lines[8])
-    bot.others['twitter'] = {'consumer_key': cryptage.uncrypte(lines[9]),
-                             'consumer_secret': cryptage.uncrypte(lines[10]),
-                             'access_token_key': cryptage.uncrypte(lines[11]),
-                             'access_token_secret': cryptage.uncrypte(lines[12])}
-    bot.others['discordboats'] = cryptage.uncrypte(lines[14])
-    bot.others['discordextremelist'] = cryptage.uncrypte(lines[15])
-    bot.others['statuspage'] = cryptage.uncrypte(lines[16])
-    bot.others['nasa'] = cryptage.uncrypte(lines[17])
-    bot.others['random_api_token'] = cryptage.uncrypte(lines[18])
-    bot.others['google_api'] = cryptage.uncrypte(lines[19])
-    bot.others['curseforge'] = cryptage.uncrypte(lines[20])
-    bot.others['omdb'] = cryptage.uncrypte(lines[21])
-    bot.others['twitch_client_id'] = cryptage.uncrypte(lines[22])
-    bot.others['twitch_client_secret'] = cryptage.uncrypte(lines[23])
-    bot.dbl_token = tokens.get_dbl_token()
-
 def load_sql_connection(bot: "Zbot"):
     "Load the connection to the database, preferably in local mode"
     try:
