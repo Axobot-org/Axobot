@@ -1,12 +1,12 @@
-:og:description: Welcome to the official Zbot documentation, containing every and any info you'll ever need about this Discord bot!
+:og:description: Welcome to the official Axobot documentation, containing every and any info you'll ever need about this Discord bot!
 
-.. ZBot documentation master file, created by
+.. Axobot documentation master file, created by
    sphinx-quickstart on Mon Aug  6 23:45:24 2018.
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to ZBot documentation!
-==============================
+Welcome to Axobot documentation!
+================================
 
 Welcome to the **ZBot** bot documentation, a Discord bot coded in Python 3 by a small French developer, *Z_runner*. You will find in the documentation all the explanations on each of the usable commands, as well as the list of the last additions and some code examples. The documentation is currently in English but the bot is available in several languages, including its main language, French.
 
@@ -14,7 +14,7 @@ The `Moderation` section displays every command related to the moderation of a s
 
 .. note:: If you want to invite this bot to a server, `just click here <https://discord.com/oauth2/authorize?client_id=486896267788812288&scope=bot&permissions=1007021171>`_! And to join our official support server, `click on this link <https://discord.gg/N55zY88>`_!
 
-Translations of the Zbot `Privacy Policy <legal/privacy.html>`_ and its `Terms of Service <legal/tos.html>`_ have been added to this documentation as a guide.
+Translations of the Axobot `Privacy Policy <legal/privacy.html>`_ and its `Terms of Service <legal/tos.html>`_ have been added to this documentation as a guide.
 
 .. warning:: Zbot becomes Axobot! Your favorite bot changes its name and avatar to become even more friendly! Read the `V4 changelog <v4.html>`_ for details on this really huge update.
 

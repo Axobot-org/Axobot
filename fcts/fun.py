@@ -247,10 +247,10 @@ You can specify a verification limit by adding a number in argument (up to 1.000
         ..Example blame discord
 
         ..Doc fun.html#blame"""
-        l1 = ['discord','mojang','zbot','google','youtube', 'twitter'] # tout le monde
-        l2 = ['tronics','patate','neil','reddemoon','aragorn1202','platon'] # frm
-        l3 = ['awhikax','aragorn','adri','zrunner'] # zbot
-        l4 = ['benny'] #benny
+        l1 = ['discord','mojang','zbot','google','youtube', 'twitter'] # everyone
+        l2 = ['tronics','patate','neil','reddemoon','aragorn1202','platon'] # fr-minecraft semi-public server
+        l3 = ['awhikax','aragorn','adri','zrunner'] # Axobot official server
+        l4 = ['benny'] # benny server
         name = name.lower()
         if name in l1:
             await ctx.send(file=await self.utilities.find_img('blame-{}.png'.format(name)))
@@ -258,7 +258,7 @@ You can specify a verification limit by adding a number in argument (up to 1.000
             if await self.is_on_guild(ctx.author,391968999098810388): # fr-minecraft
                 await ctx.send(file=await self.utilities.find_img('blame-{}.png'.format(name)))
         elif name in l3:
-            if await self.is_on_guild(ctx.author,356067272730607628): # Zbot server
+            if await self.is_on_guild(ctx.author,356067272730607628): # Axobot server
                 await ctx.send(file=await self.utilities.find_img('blame-{}.png'.format(name)))
         elif name in l4:
             if await self.is_on_guild(ctx.author,523525264517496834): # Benny Support
@@ -267,7 +267,7 @@ You can specify a verification limit by adding a number in argument (up to 1.000
             liste = l1
             if await self.is_on_guild(ctx.author,391968999098810388): # fr-minecraft
                 liste += l2
-            if await self.is_on_guild(ctx.author,356067272730607628): # Zbot server
+            if await self.is_on_guild(ctx.author,356067272730607628): # Axobot server
                 liste += l3
             if await self.is_on_guild(ctx.author,523525264517496834): # Benny Support
                 liste += l4

@@ -131,7 +131,7 @@ Allows the bot to read the history of all messages in a channel. Examples of use
 Mention @veryone, @here and All Roles
 --------------------------------------
 
-Allows the bot to mention any role *including* @everyone (which results in sending a notification to all members with access to the channel) and @here (sends a notification to all online members with access to the channel). Zbot uses a great Discord protection to avoid unwanted mentions, so you should be safe granting it. Example of use: `rss follows with mentions <rss.html#mention-a-role>`__
+Allows the bot to mention any role *including* @everyone (which results in sending a notification to all members with access to the channel) and @here (sends a notification to all online members with access to the channel). Axobot uses a great Discord protection to avoid unwanted mentions, so you should be safe granting it. Example of use: `rss follows with mentions <rss.html#mention-a-role>`__
 
 Use External Emojis
 -------------------
@@ -211,4 +211,4 @@ Allows users to have their volume higher than the other members in a voice chann
 Request To Speak
 ----------------
 
-Allows users to raise their hands in `stage channels <https://support.discord.com/hc/en-us/articles/1500005513722-Stage-Channels-FAQ>`__. Not used by Zbot.
+Allows users to raise their hands in `stage channels <https://support.discord.com/hc/en-us/articles/1500005513722-Stage-Channels-FAQ>`__. Not used by Axobot.

@@ -196,7 +196,7 @@ class Users(commands.Cog):
     @commands.check(checks.database_connected)
     async def user_config(self, ctx: MyContext, option: str, allow: bool=None):
         """Modify any config option
-        Here you can (dis)allow one of the users option that Zbot have, which are:
+        Here you can (dis)allow one of the users option that Axobot has, which are:
         - animated_card: Display an animated rank card if your pfp is a gif (way slower rendering)
         - auto_unafk: Automatically remove your AFK mode
         - usernames_log: Record when you change your username/nickname

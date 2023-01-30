@@ -517,7 +517,7 @@ class Events(commands.Cog):
 
 During the migration period, Zbot will continue to work, but will **receive updates later** than Axobot and may not work as well.
 Luckily for you, **the migration is very quick**, just invite Axobot and give it the same roles as Zbot to avoid any service interruption!"""
-            emb = discord.Embed(title="Zbot is becoming Axobot !", description=txt, color=0x00ff00)
+            emb = discord.Embed(title="Zbot is becoming Axobot!", description=txt, color=0x00ff00)
             emb.set_thumbnail(url="https://zrunner.me/axolotl.png")
             await ctx.send(embed=emb, view=MigrationView())
 

@@ -105,7 +105,7 @@ class Perms(commands.Cog):
 
         ..Example permissions #announcements everyone
 
-        ..Example permissions Zbot
+        ..Example permissions Axobot
 
         ..Example permissions 0b1001
 

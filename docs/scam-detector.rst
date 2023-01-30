@@ -1,21 +1,21 @@
-:og:description: Zbot has a very cool and unique scam detection feature. This article explains how that massive thing technically works.
+:og:description: Axobot has a very cool and unique scam detection feature. This article explains how that massive thing technically works.
 
-==================
-Zbot scam detector
-==================
+====================
+Axobot scam detector
+====================
 
 As Discord becomes an increasingly important social network, attracting hundreds of new users worldwide every day, it is naturally subject to more and more phishing and other scams. Developers are already reacting to this plague, such as by buying a cybersecurity company or adding new auto-moderation and reporting features, but scams are becoming more sophisticated and affecting many users all the time.
 
-As the Zbot developer and a CS student, I think it’s important to try to limit the spread of these scams as much as possible. That’s why I decided several months ago to work on an AI able to detect scams among the thousands of messages read by Zbot every hour, so as to be able to warn the moderators of the affected servers and take the necessary actions.
+As the Axobot developer and a CS student, I think it’s important to try to limit the spread of these scams as much as possible. That’s why I decided several months ago to work on an AI able to detect scams among the thousands of messages read by Axobot every hour, so as to be able to warn the moderators of the affected servers and take the necessary actions.
 
-This page is not about how you will use this new feature in Zbot, but rather about how I reached this result from a technical point of view and what it entails.
+This page is not about how you will use this new feature in Axobot, but rather about how I reached this result from a technical point of view and what it entails.
 
 
 ----------
 The Basics
 ----------
 
-Scams in Discord are a very specific category of scams, fortunately easy to isolate. They are mainly fake links that look like the official websites of Discord, Steam or Epic Games, as well as offers for free PayPal accounts or Nitro subscriptions. There are also scams offering “ friends ” to download malicious software, but this version exists almost only in DM; thus Zbot is not able to detect it, even less to prevent it.
+Scams in Discord are a very specific category of scams, fortunately easy to isolate. They are mainly fake links that look like the official websites of Discord, Steam or Epic Games, as well as offers for free PayPal accounts or Nitro subscriptions. There are also scams offering “ friends ” to download malicious software, but this version exists almost only in DM; thus Axobot is not able to detect it, even less to prevent it.
 
 Here are some examples of particularly blatant scams for context: 
 
@@ -48,7 +48,7 @@ The advantage of this kind of message is that certain words or message character
 
 To put it simply, the scam detector is created in two phases: the learning phase, when the program reads and analyzes thousands of messages already knowing if they are scams or not, and then the testing phase, when it takes new messages and tries to predict if they are actually scams. The learning phase is crucial, because it needs to have a large enough and varied enough set of messages for the AI to be able to deduce similarities and rules, which will allow it to correctly detect scams, even when faced with messages written in a way he has never seen before.
 
-.. note:: My tests with Zbot contain just under 2000 messages already classified, half of which are scam messages. As the bot will be used in real time, it will be able to collect more messages and thus improve its learning.
+.. note:: My tests with Axobot contain "only" about 2000 messages already classified, half of which are scam messages. As the bot will be used in real time, it will be able to collect more messages and thus improve its learning.
 
 
 --------------------
@@ -61,7 +61,7 @@ Keep in mind that the system I describe here is the one in place at the time of 
 Dataset Creation
 ----------------
 
-It all starts with the creation of the dataset, which will be used by our agent (the AI) to train. To achieve this, Zbot scans many real messages from Discord and external datasets, and tries to detect their dangerousness.
+It all starts with the creation of the dataset, which will be used by our agent (the AI) to train. To achieve this, Axobot scans many real messages from Discord and external datasets, and tries to detect their dangerousness.
 
 But since the model is still in its beginnings, it needs to check if its classification is correct, it cannot base its learning only on what it already knows! Therefore, as soon as the bot thinks that a message is potentially a scam, it sends a confirmation request in a private channel before actually recording it as a scam. This system also allows us to verify that no personal data or sensitive messages are recorded in our database.
 
