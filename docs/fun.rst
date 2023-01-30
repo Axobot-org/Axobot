@@ -80,7 +80,7 @@ Count messages
 
 A nice little order that counts the number of messages in the history of this channel posted by someone. The limit corresponds to the number of messages to study in the chat, 1000 by default. And since some very old chats can have a very many many many MANY many messages (yes, 5 times *many*), we have a set limit on the number of messages you wish to search.
 
-If no user is given as parameter, Zbot will count your own messages. Same for the channel, if you don't provide any, Zbot uses the current one.
+If no user is given as parameter, Axobot will count your own messages. Same for the channel, if you don't provide any, Axobot uses the current one.
 
 .. warning:: It seems obvious, but the bot needs "`Read message history <perms.html#read-message-history>`_" permission to read the messages history...
 
@@ -304,7 +304,7 @@ Thanos
 
 I assume you know Thanos from the Avengers series. If not, to make it short, he's a bad guy who decided to kill half the universe with a single snap of his finger.
 
-Well, if you want to know if you will be spared by this guy or not, check out the great oracle Zbot!
+Well, if you want to know if you will be spared by this guy or not, check out the great oracle Axobot!
 
 
 Tip
@@ -319,7 +319,7 @@ If you want to get some advice on how to use the bot, or just a funny fact, you 
 Bot events
 ----------
 
-From time to time, for special events of the year, Zbot has fun organizing an event where some small changes are made to the code. There is for example the tic-tac-toe whose symbols change, or many other small easter eggs of this kind... as well as the possibility to win event points!
+From time to time, for special events of the year, Axobot has fun organizing an event where some small changes are made to the code. There is for example the tic-tac-toe whose symbols change, or many other small easter eggs of this kind... as well as the possibility to win event points!
 
 To get event points, it is usually enough to use the bot: win games of tic-tac-toe, increase in xp level, or other actions of this kind.
 

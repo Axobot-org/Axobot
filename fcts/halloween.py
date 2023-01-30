@@ -135,7 +135,7 @@ A BIG thanks to the Project Blurple and their original code for the colorization
 
         ..Example halloween check
 
-        ..Example halloween check Zbot"""
+        ..Example halloween check Axobot"""
 
         url = await get_url_from_ctx(ctx, who)
 

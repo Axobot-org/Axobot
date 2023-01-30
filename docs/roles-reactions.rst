@@ -56,7 +56,7 @@ Update your embed
 
 This command is very useful for those who have pinned the embed containing all the reactions of the bot. Instead of deleting and resending the message each time you add or remove a role, simply use the command to have the bot check the roles descriptions and usable reactions.
 
-The second argument 'changeDescription' can be used when you don't want Zbot to change the embed description, and is "True" by default. If you set it to "False", it will only update the reactions (ie. adding new ones if needed).
+The second argument 'changeDescription' can be used when you don't want Axobot to change the embed description, and is "True" by default. If you set it to "False", it will only update the reactions (ie. adding new ones if needed).
 
 You can also use the third argument, a list of emojis, if you want your embed to contain only specific roles/emojis. Thus you can create different roles-reactions embeds with the same system.
 

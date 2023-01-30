@@ -315,7 +315,7 @@ Opposite is the subcommand 'join'
     @rr_main.command(name='update')
     @commands.check(checks.database_connected)
     async def rr_update(self, ctx: MyContext, embed: discord.Message, change_description: Optional[bool] = True, emojis: commands.Greedy[args.AnyEmoji] = None):
-        """Update a Zbot message to refresh roles/reactions
+        """Update an Axobot message to refresh roles/reactions
         If you don't want to update the embed content (for example if it's a custom embed) then you can use 'False' as a second argument, and I will only check the reactions
         Specifying a list of emojis will update the embed only for those emojis, and ignore other roles reactions
 
