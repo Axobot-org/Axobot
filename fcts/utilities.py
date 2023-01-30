@@ -7,7 +7,7 @@ from typing import List, Optional
 import aiohttp
 import discord
 from discord.ext import commands
-from libs.bot_classes import MyContext, Zbot
+from libs.bot_classes import MyContext, Axobot
 
 from . import args
 
@@ -17,7 +17,7 @@ importlib.reload(args)
 class Utilities(commands.Cog):
     """This cog has various useful functions for the rest of the bot."""
 
-    def __init__(self, bot: Zbot):
+    def __init__(self, bot: Axobot):
         self.bot = bot
         self.file = "utilities"
         self.config = {}

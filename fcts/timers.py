@@ -4,7 +4,7 @@ from typing import Optional
 
 import discord
 from discord.ext import commands
-from libs.bot_classes import MyContext, Zbot
+from libs.bot_classes import MyContext, Axobot
 from libs.formatutils import FormatUtils
 from libs.paginator import PaginatedSelectView
 from libs.views import ConfirmView
@@ -12,7 +12,7 @@ from libs.views import ConfirmView
 from . import args, checks
 
 class Timers(commands.Cog):
-    def __init__(self, bot: Zbot):
+    def __init__(self, bot: Axobot):
         self.bot = bot
         self.file = "timers"
 

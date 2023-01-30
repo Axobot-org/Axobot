@@ -1,7 +1,6 @@
 import copy
 import time
 import typing
-from math import ceil
 
 import discord
 import emoji
@@ -9,7 +8,7 @@ from cachingutils import LRUCache
 from discord import app_commands
 from discord.ext import commands
 
-from libs.bot_classes import MyContext, Zbot
+from libs.bot_classes import MyContext, Axobot
 from libs.serverconfig import options_list as opt_list
 from libs.serverconfig.autocomplete import autocomplete_main
 from libs.serverconfig.config_paginator import ServerConfigPaginator
@@ -22,7 +21,7 @@ class Servers(commands.Cog):
     """"Cog in charge of all the bot configuration management for your server. As soon as an option
     is searched, modified or deleted, this cog will handle the operations."""
 
-    def __init__(self, bot: Zbot):
+    def __init__(self, bot: Axobot):
         self.bot = bot
         self.default_language = 'en'
         self.embed_color = discord.Colour(0x3fb9ef)

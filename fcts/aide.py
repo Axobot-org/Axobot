@@ -5,7 +5,7 @@ from typing import List, Optional, TypedDict
 
 import discord
 from discord.ext import commands
-from libs.bot_classes import MyContext, Zbot
+from libs.bot_classes import MyContext, Axobot
 
 class CommandsCategoryData(TypedDict):
     emoji: str
@@ -13,7 +13,7 @@ class CommandsCategoryData(TypedDict):
 
 class Help(commands.Cog):
 
-    def __init__(self, bot: Zbot):
+    def __init__(self, bot: Axobot):
         self.bot = bot
         self.file = "aide"
         self.old_cmd = bot.remove_command("help")

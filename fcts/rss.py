@@ -10,7 +10,7 @@ import discord
 import twitter
 from aiohttp import ClientSession, client_exceptions
 from discord.ext import commands, tasks
-from libs.bot_classes import MyContext, Zbot
+from libs.bot_classes import MyContext, Axobot
 from libs.enums import ServerWarningType
 from libs.formatutils import FormatUtils
 from libs.paginator import PaginatedSelectView
@@ -45,7 +45,7 @@ async def can_use_rss(ctx: MyContext):
 class Rss(commands.Cog):
     """Cog which deals with everything related to rss feeds. Whether it is to add automatic tracking to a stream, or just to see the latest video released by Discord, it is this cog that will be used."""
 
-    def __init__(self, bot: Zbot):
+    def __init__(self, bot: Axobot):
         self.bot = bot
         self.time_loop = 20 # min minutes between two rss loops
         self.time_between_feeds_check = 0.15 # seconds between two rss checks within a loop

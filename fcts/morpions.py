@@ -6,7 +6,7 @@ from typing import Literal
 import discord
 import emoji as emojilib
 from discord.ext import commands
-from libs.bot_classes import MyContext, Zbot
+from libs.bot_classes import MyContext, Axobot
 
 from fcts.checks import is_ttt_enabled
 
@@ -14,7 +14,7 @@ from fcts.checks import is_ttt_enabled
 class Morpions(commands.Cog):
     "Allow users to play PvP tic-tac-toe"
 
-    def __init__(self, bot: Zbot):
+    def __init__(self, bot: Axobot):
         self.bot = bot
         self.file = 'morpions'
         self.in_game = {}

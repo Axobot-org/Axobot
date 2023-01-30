@@ -7,7 +7,7 @@ import discord
 from discord.ext import commands
 
 from fcts.checks import is_support_staff
-from libs.bot_classes import MyContext, Zbot
+from libs.bot_classes import MyContext, Axobot
 from libs.formatutils import FormatUtils
 from libs.paginator import Paginator
 
@@ -24,7 +24,7 @@ async def can_edit_case(ctx: MyContext):
     return False
 
 class Case:
-    def __init__(self, bot: Zbot, guild_id: int, member_id: int, case_type: str, mod_id: int, reason: str, date: datetime, duration: Optional[int]=None, case_id: Optional[int]=None):
+    def __init__(self, bot: Axobot, guild_id: int, member_id: int, case_type: str, mod_id: int, reason: str, date: datetime, duration: Optional[int]=None, case_id: Optional[int]=None):
         self.bot = bot
         self.guild = guild_id
         self.id = case_id
@@ -72,7 +72,7 @@ class Case:
 class Cases(commands.Cog):
     """This part of the bot allows you to manage all your members' cases, to delete or edit them"""
 
-    def __init__(self, bot: Zbot):
+    def __init__(self, bot: Axobot):
         self.bot = bot
         self.file = "cases"
         if bot.user is not None:

@@ -5,7 +5,7 @@ import aiohttp
 from discord.ext import commands
 
 from . import checks
-from libs.bot_classes import Zbot, MyContext
+from libs.bot_classes import Axobot, MyContext
 
 RANDOM_NAMES_URL = 'https://randommer.io/api/Name?nameType=surname&quantity=20'
 MINECRAFT_ENTITIES_URL = 'https://raw.githubusercontent.com/PixiGeko/Minecraft-generated-data/master/1.19/releases/1.19/data/custom/universal_tags/all_entity_type.json'
@@ -13,7 +13,7 @@ MINECRAFT_ENTITIES_URL = 'https://raw.githubusercontent.com/PixiGeko/Minecraft-g
 class VoiceChannels(commands.Cog):
     "Create automated voice channels and give roles to voice members"
 
-    def __init__(self, bot: Zbot):
+    def __init__(self, bot: Axobot):
         self.bot = bot
         self.file = "voices"
         self.names: dict[str, list[str]] = {'random': [], 'minecraft': []}
@@ -227,6 +227,6 @@ class VoiceChannels(commands.Cog):
         await ctx.send(await self.bot._(ctx.guild.id, "voices.deleted", count=i))
 
 
-async def setup(bot: Zbot):
+async def setup(bot: Axobot):
     if bot.database_online:
         await bot.add_cog(VoiceChannels(bot))

@@ -3,14 +3,14 @@ import discord
 import importlib
 import re
 from discord.ext import commands
-from libs.bot_classes import Zbot, MyContext
+from libs.bot_classes import Axobot, MyContext
 from . import checks, args
 importlib.reload(checks)
 importlib.reload(args)
 
 
 class RolesReact(commands.Cog):
-    def __init__(self, bot: Zbot):
+    def __init__(self, bot: Axobot):
         self.bot = bot
         self.file = 'roles_react'
         self.table = 'roles_react_beta' if bot.beta else 'roles_react'

@@ -15,7 +15,7 @@ import speedtest
 from cachingutils import acached
 from git import Repo, exc
 from discord.ext import commands
-from libs.bot_classes import PRIVATE_GUILD_ID, SUPPORT_GUILD_ID, MyContext, Zbot
+from libs.bot_classes import PRIVATE_GUILD_ID, SUPPORT_GUILD_ID, MyContext, Axobot
 from libs.enums import RankCardsFlag, UserFlag
 from libs.views import ConfirmView
 
@@ -33,7 +33,7 @@ def cleanup_code(content: str):
 class Admin(commands.Cog):
     """Here are listed all commands related to the internal administration of the bot. Most of them are not accessible to users, but only to the bot administrators."""
 
-    def __init__(self, bot: Zbot):
+    def __init__(self, bot: Axobot):
         self.bot = bot
         self.file = "admin"
         self.emergency_time = 15.0

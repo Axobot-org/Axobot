@@ -5,7 +5,7 @@ import typing
 
 import discord
 from discord.ext import commands
-from libs.bot_classes import MyContext, Zbot
+from libs.bot_classes import MyContext, Axobot
 from libs.enums import RankCardsFlag, UserFlag
 
 from . import args, checks
@@ -16,7 +16,7 @@ importlib.reload(checks)
 
 class Users(commands.Cog):
 
-    def __init__(self, bot: Zbot):
+    def __init__(self, bot: Axobot):
         self.bot = bot
         self.file = 'users'
 

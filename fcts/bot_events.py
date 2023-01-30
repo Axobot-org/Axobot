@@ -6,7 +6,7 @@ from typing import Optional
 
 import discord
 from discord.ext import commands
-from libs.bot_classes import MyContext, Zbot
+from libs.bot_classes import MyContext, Axobot
 from libs.bot_events import EventData, EventType
 from libs.formatutils import FormatUtils
 
@@ -74,7 +74,7 @@ translations_data = {
 class BotEvents(commands.Cog):
     "Cog related to special bot events (like Halloween and Christmas)"
 
-    def __init__(self, bot: Zbot):
+    def __init__(self, bot: Axobot):
         self.bot = bot
         self.file = "bot_events"
         self.hourly_reward = [-10, 60]

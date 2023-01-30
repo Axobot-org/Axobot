@@ -3,7 +3,7 @@ from typing import TYPE_CHECKING, Union
 
 import discord
 
-from libs.bot_classes import MyContext, Zbot
+from libs.bot_classes import MyContext, Axobot
 from libs.paginator import Paginator
 
 from . import options_list as opt_list
@@ -14,7 +14,7 @@ if TYPE_CHECKING:
 class ServerConfigPaginator(Paginator):
     "Allow user to see a server config and navigate into its pages"
 
-    def __init__(self, client: Zbot, user: discord.User, stop_label: str, guild: discord.Guild, cog: "Servers"):
+    def __init__(self, client: Axobot, user: discord.User, stop_label: str, guild: discord.Guild, cog: "Servers"):
         super().__init__(client, user, stop_label, timeout=120)
         self.guild = guild
         self.cog = cog

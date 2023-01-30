@@ -9,7 +9,7 @@ from discord.ext import commands, tasks
 from mysql.connector.errors import IntegrityError
 
 from . import checks
-from libs.bot_classes import MyContext, Zbot
+from libs.bot_classes import MyContext, Axobot
 from libs.twitch.api_agent import TwitchApiAgent
 from libs.twitch.types import (GroupedStreamerDBObject, PlatformId,
                                StreamersDBObject, StreamObject)
@@ -25,7 +25,7 @@ class _StreamersReadyForNotification(TypedDict):
 class Twitch(commands.Cog):
     "Handle twitch streams"
 
-    def __init__(self, bot: Zbot):
+    def __init__(self, bot: Axobot):
         self.bot = bot
         self.file = "twitch"
         self.agent = TwitchApiAgent()
@@ -382,5 +382,5 @@ class Twitch(commands.Cog):
                 await self.db_set_streamer_status("twitch", streamer_id, False)
 
 
-async def setup(bot: Zbot):
+async def setup(bot: Axobot):
     await bot.add_cog(Twitch(bot))

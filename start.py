@@ -28,14 +28,14 @@ import time
 import json
 from random import choice
 from fcts import tokens  # pylint: disable=no-name-in-module
-from libs.bot_classes import Zbot
+from libs.bot_classes import Axobot
 from utils import load_cogs, load_sql_connection, setup_bot_logger, setup_database_logger, setup_start_parser
 
 async def main():
     parser = setup_start_parser()
     args = parser.parse_args()
 
-    client = Zbot(case_insensitive=True,status=discord.Status('online'))
+    client = Axobot(case_insensitive=True,status=discord.Status('online'))
 
     setup_database_logger()
     log = setup_bot_logger()

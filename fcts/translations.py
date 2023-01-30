@@ -10,7 +10,7 @@ from copy import deepcopy
 import discord
 from discord.ext import tasks, commands
 from flatten_json import flatten, unflatten_list
-from libs.bot_classes import MyContext, Zbot
+from libs.bot_classes import MyContext, Axobot
 
 from fcts.checks import is_translator, is_bot_admin
 
@@ -33,7 +33,7 @@ def first(of: typing.Union[list[T], set[T]]) -> T:
 class Translations(commands.Cog):
     """Special cog for those who help with the translation of the bot"""
 
-    def __init__(self, bot: Zbot):
+    def __init__(self, bot: Axobot):
         self.bot = bot
         self.file = 'translations'
         self._translations: TranslationsDict = {}
