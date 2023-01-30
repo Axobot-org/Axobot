@@ -1,12 +1,12 @@
 import discord
 from discord.ext import commands
-from libs.bot_classes import Zbot
+from libs.bot_classes import Axobot
 from libs.enums import ServerWarningType
 
 class Welcomer(commands.Cog):
     """Cog which manages the departure and arrival of members in the servers"""
 
-    def __init__(self, bot: Zbot):
+    def __init__(self, bot: Axobot):
         self.bot = bot
         self.file = "welcomer"
         self.no_message = [392766377078816789,504269440872087564,552273019020771358]

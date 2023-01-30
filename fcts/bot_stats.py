@@ -10,7 +10,7 @@ import psutil
 import discord
 from discord.ext import commands, tasks
 from fcts.tickets import TicketCreationEvent
-from libs.bot_classes import MyContext, Zbot
+from libs.bot_classes import MyContext, Axobot
 from libs.enums import ServerWarningType, UsernameChangeRecord
 
 try:
@@ -29,7 +29,7 @@ async def get_ram_data():
 class BotStats(commands.Cog):
     """Hey, I'm a test cog! Happy to meet you :wave:"""
 
-    def __init__(self, bot: Zbot):
+    def __init__(self, bot: Axobot):
         self.bot = bot
         self.file = 'bot_stats'
         self.received_events = {'CMD_USE': 0}

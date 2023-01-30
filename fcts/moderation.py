@@ -1,15 +1,13 @@
-import copy
 import datetime
 import importlib
 import random
-import re
 from math import ceil
-from typing import Dict, List, Literal, Optional, Tuple, Union
+from typing import Dict, List, Literal, Optional, Union
 
 import discord
 from discord import app_commands
 from discord.ext import commands
-from libs.bot_classes import MyContext, Zbot
+from libs.bot_classes import MyContext, Axobot
 from libs.formatutils import FormatUtils
 from libs.paginator import Paginator
 from libs.views import ConfirmView
@@ -24,7 +22,7 @@ class Moderation(commands.Cog):
     """Here you will find everything you need to moderate your server.
     Please note that most of the commands are reserved for certain members only."""
 
-    def __init__(self, bot: Zbot):
+    def __init__(self, bot: Axobot):
         self.bot = bot
         self.file = "moderation"
         # maximum of roles granted/revoked by query

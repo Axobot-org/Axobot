@@ -12,14 +12,14 @@ import discord
 import mysql
 from discord.ext import commands, tasks
 
-from libs.bot_classes import MyContext, Zbot
+from libs.bot_classes import MyContext, Axobot
 from libs.enums import UsernameChangeRecord
 
 
 class Events(commands.Cog):
     """Cog for the management of major events that do not belong elsewhere. Like when a new server invites the bot."""
 
-    def __init__(self, bot: Zbot):
+    def __init__(self, bot: Axobot):
         self.bot = bot
         self.file = "events"
         self.dbl_last_sending = datetime.datetime.utcfromtimestamp(0)

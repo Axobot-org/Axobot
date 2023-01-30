@@ -18,7 +18,7 @@ from discord.ext import commands
 from discord.ext.commands.converter import run_converters
 from docs import conf
 from libs import bitly_api
-from libs.bot_classes import PRIVATE_GUILD_ID, MyContext, Zbot
+from libs.bot_classes import PRIVATE_GUILD_ID, MyContext, Axobot
 from libs.formatutils import FormatUtils
 from libs.rss.rss_general import FeedObject
 from utils import count_code_lines
@@ -39,7 +39,7 @@ async def in_support_server(ctx):
 class Info(commands.Cog):
     "Here you will find various useful commands to get information about anything"
 
-    def __init__(self, bot: Zbot):
+    def __init__(self, bot: Axobot):
         self.bot = bot
         self.file = "info"
         self.bot_version = conf.release + ('a' if bot.beta else '')

@@ -12,13 +12,13 @@ from cachingutils import acached
 from .rss_general import FeedObject, RssMessage
 
 if TYPE_CHECKING:
-    from libs.bot_classes import Zbot
+    from libs.bot_classes import Axobot
 
 
 class TwitterRSS:
     "Utilities class for any twitter-related RSS actions"
 
-    def __init__(self, bot: Zbot):
+    def __init__(self, bot: Axobot):
         self.bot = bot
         self.min_time_between_posts = 15
         self.api = twitter.Api(**bot.others['twitter'], tweet_mode="extended", timeout=15)

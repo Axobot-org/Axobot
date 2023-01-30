@@ -5,7 +5,7 @@ import aiohttp
 import discord
 import isbnlib
 from discord.ext import commands
-from libs.bot_classes import MyContext, Zbot
+from libs.bot_classes import MyContext, Axobot
 
 
 class ISBN(commands.Converter):
@@ -20,7 +20,7 @@ class ISBN(commands.Converter):
 
 class Library(commands.Cog):
 
-    def __init__(self, bot: Zbot):
+    def __init__(self, bot: Axobot):
         self.bot = bot
         self.file = 'library'
         self.tables = ['librarystats_beta', 'library_beta'] if bot.beta else ['librarystats', 'library']

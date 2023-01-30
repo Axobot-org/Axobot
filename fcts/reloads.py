@@ -1,13 +1,13 @@
 import importlib
 from discord.ext import commands
 from fcts.checks import is_bot_admin
-from libs.bot_classes import MyContext, Zbot
+from libs.bot_classes import MyContext, Axobot
 from utils import count_code_lines
 
 class Reloads(commands.Cog):
     """Cog to manage the other cogs. Even if all are disabled, this is the last one left."""
 
-    def __init__(self, bot: Zbot):
+    def __init__(self, bot: Axobot):
         self.bot = bot
         self.file = "reloads"
         self.ignored_guilds = [

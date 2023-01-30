@@ -13,13 +13,13 @@ from libs.youtube_search import Service
 from .rss_general import FeedObject, RssMessage, feed_parse
 
 if TYPE_CHECKING:
-    from libs.bot_classes import Zbot
+    from libs.bot_classes import Axobot
 
 
 class YoutubeRSS:
     "Utilities class for any youtube-related RSS actions"
 
-    def __init__(self, bot: Zbot):
+    def __init__(self, bot: Axobot):
         self.bot = bot
         self.min_time_between_posts = 120
         self.search_service = Service(5, bot.others['google_api'])

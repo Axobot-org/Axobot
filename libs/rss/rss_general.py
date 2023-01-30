@@ -15,9 +15,9 @@ FeedType = Literal['tw', 'yt', 'twitch', 'reddit', 'mc', 'deviant', 'web']
 
 if TYPE_CHECKING:
     from libs.emojis_manager import EmojisManager
-    from libs.bot_classes import Zbot
+    from libs.bot_classes import Axobot
 
-async def feed_parse(bot: Zbot, url: str, timeout: int, session: ClientSession = None) -> Optional[feedparser.FeedParserDict]:
+async def feed_parse(bot: Axobot, url: str, timeout: int, session: ClientSession = None) -> Optional[feedparser.FeedParserDict]:
     """Asynchronous parsing using cool methods"""
     # if session is provided, we have to not close it
     _session = session or ClientSession()
@@ -51,7 +51,7 @@ class RssMessage:
     "Represents a message ready to be sent"
 
     def __init__(self,
-                 bot: Zbot,
+                 bot: Axobot,
                  feed: "FeedObject",
                  url: str,
                  title: str,

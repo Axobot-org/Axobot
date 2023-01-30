@@ -11,12 +11,12 @@ from . import args, checks
 
 importlib.reload(args)
 importlib.reload(checks)
-from libs.bot_classes import MyContext, Zbot
+from libs.bot_classes import MyContext, Axobot
 
 
 class Partners(commands.Cog):
 
-    def __init__(self, bot: Zbot):
+    def __init__(self, bot: Axobot):
         self.bot = bot
         self.file = 'partners'
         self.table = 'partners_beta' if bot.beta else 'partners'

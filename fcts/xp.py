@@ -22,12 +22,12 @@ from . import args, checks
 
 importlib.reload(args)
 importlib.reload(checks)
-from libs.bot_classes import MyContext, Zbot
+from libs.bot_classes import MyContext, Axobot
 
 
 class Xp(commands.Cog):
 
-    def __init__(self, bot: Zbot):
+    def __init__(self, bot: Axobot):
         self.bot = bot
         self.cache = {'global':{}}
         self.levels = [0]
@@ -1092,6 +1092,6 @@ class Xp(commands.Cog):
             self.bot.dispatch("command_error", ctx, err)
 
 
-async def setup(bot: Zbot):
+async def setup(bot: Axobot):
     if bot.database_online:
         await bot.add_cog(Xp(bot))

@@ -6,13 +6,13 @@ from cachingutils import LRUCache
 from libs.serverconfig.options_list import default_values as serverconfig_defaults
 
 if TYPE_CHECKING:
-    from libs.bot_classes import Zbot
+    from libs.bot_classes import Axobot
 
 
 class PrefixManager:
     """Manage prefixes for the bot, with cache and everything"""
 
-    def __init__(self, bot: 'Zbot'):
+    def __init__(self, bot: 'Axobot'):
         self.bot = bot
         self.cache: LRUCache[int, str] = LRUCache(max_size=1000, timeout=3600)
 

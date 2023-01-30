@@ -6,7 +6,7 @@ import typing
 
 import discord
 from discord.ext import commands, tasks
-from libs.bot_classes import MyContext, Zbot
+from libs.bot_classes import MyContext, Axobot
 from libs.errors import NotDuringEventError, VerboseCommandError
 
 from . import checks
@@ -16,7 +16,7 @@ AllowedCtx = typing.Union[MyContext, discord.Message, discord.Interaction, str]
 class Errors(commands.Cog):
     """General cog for error management."""
 
-    def __init__(self, bot: Zbot):
+    def __init__(self, bot: Axobot):
         self.bot = bot
         self.file = "errors"
         # map of user ID and number of cooldowns recently hit

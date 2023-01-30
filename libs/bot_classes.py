@@ -45,7 +45,7 @@ class MyContext(commands.Context):
     """Replacement for the official commands.Context class
     It allows us to add more methods and properties in the whole bot code"""
 
-    bot: 'Zbot'
+    bot: 'Axobot'
 
     @property
     def bot_permissions(self) -> discord.Permissions:
@@ -91,7 +91,7 @@ class MyContext(commands.Context):
         await self.bot.get_command("help")(self, *cmd_arg)
 
 # pylint: disable=too-many-instance-attributes
-class Zbot(commands.bot.AutoShardedBot):
+class Axobot(commands.bot.AutoShardedBot):
     """Bot class, with everything needed to run it"""
 
     def __init__(self, case_insensitive: bool = None, status: discord.Status = None, database_online: bool = True, \

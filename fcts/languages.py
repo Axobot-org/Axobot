@@ -1,7 +1,7 @@
 from typing import Union
 import discord
 import i18n
-from libs.bot_classes import MyContext, Zbot
+from libs.bot_classes import MyContext, Axobot
 
 SourceType = Union[None, int, discord.Guild, discord.TextChannel, discord.Thread,
                    discord.Member, discord.User, discord.DMChannel, discord.Interaction,
@@ -11,7 +11,7 @@ SourceType = Union[None, int, discord.Guild, discord.TextChannel, discord.Thread
 class Languages(discord.ext.commands.Cog):
     "Translations module"
 
-    def __init__(self, bot: Zbot):
+    def __init__(self, bot: Axobot):
         self.bot = bot
         self.file = "languages"
         self.languages = ('fr', 'en', 'lolcat', 'fi', 'de', 'fr2')

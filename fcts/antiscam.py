@@ -14,7 +14,7 @@ from libs.antiscam.classes import (EMBED_COLORS, MsgReportView,
 from libs.antiscam.normalization import normalize
 from libs.antiscam.similarities import check_message
 from libs.antiscam.training_bayes import train_model
-from libs.bot_classes import MyContext, Zbot
+from libs.bot_classes import MyContext, Axobot
 from libs.formatutils import FormatUtils
 
 from . import checks
@@ -30,7 +30,7 @@ def is_immune(member: discord.Member) -> bool:
 class AntiScam(commands.Cog):
     "Anti scam feature which read every message and detect if they are malicious"
 
-    def __init__(self, bot: Zbot):
+    def __init__(self, bot: Axobot):
         self.bot = bot
         self.file = "antiscam"
         try:
