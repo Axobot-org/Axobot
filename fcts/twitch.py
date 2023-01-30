@@ -33,8 +33,8 @@ class Twitch(commands.Cog):
 
     async def cog_load(self):
         await self.agent.api_login(
-            self.bot.others["twitch_client_id"],
-            self.bot.others["twitch_client_secret"]
+            self.bot.others["twitch"]["client_id"],
+            self.bot.others["twitch"]["client_secret"]
         )
         self.bot.log.info("[twitch] connected to API")
         self.stream_check_task.start()

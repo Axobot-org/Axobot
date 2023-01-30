@@ -15,6 +15,7 @@ from mysql.connector import connect as sql_connect
 from mysql.connector.connection import MySQLConnection
 from mysql.connector.errors import ProgrammingError
 
+from fcts.tokens import get_database_connection, get_secrets_dict
 from libs.database import create_database_query
 from libs.emojis_manager import EmojisManager
 from libs.prefix_manager import PrefixManager
@@ -109,16 +110,15 @@ class Zbot(commands.bot.AutoShardedBot):
         self.database_online = database_online  # if the mysql database works
         self.beta = beta # if the bot is in beta mode
         self.entity_id: int = 0 # ID of the bot for the statistics database
-        self.database_keys = {} # credentials for the database
+        self.database_keys = get_database_connection() # credentials for the database
         self.log = logging.getLogger("runner") # logs module
-        self.dbl_token = dbl_token # token for Discord Bot List
         self._cnx = [[None, 0], [None, 0], [None, 0]] # database connections
         self.xp_enabled: bool = True # if xp is enabled
         self.rss_enabled: bool = True # if rss is enabled
         self.alerts_enabled: bool = True # if alerts system is enabled
         self.internal_loop_enabled: bool = True # if internal loop is enabled
         self.zws = "\u200B"  # here's a zero width space
-        self.others = {} # other misc credentials
+        self.others = get_secrets_dict() # other misc credentials
         self.zombie_mode: bool = zombie_mode # if we should listen without sending any message
         self.prefix_manager = PrefixManager(self)
         self.task_handler = TaskHandler(self)
@@ -126,6 +126,10 @@ class Zbot(commands.bot.AutoShardedBot):
         # app commands
         self.tree.on_error = self.on_app_cmd_error
         self.app_commands_list: Optional[list[discord.app_commands.AppCommand]] = None
+    
+    @property
+    def dbl_token(self):
+        return self.others["dbl_zbot"] if self.entity_id == 0 else self.others["dbl_axobot"]
 
     async def on_error(self, event_method: Union[Exception, str], *_args, **_kwargs):
         "Called when an event raises an uncaught exception"
