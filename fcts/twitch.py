@@ -358,6 +358,10 @@ class Twitch(commands.Cog):
             await self._update_streams(streamer_ids)
         self.bot.log.info("[twitch] %s streamers checked", count)
 
+    @stream_check_task.error
+    async def on_stream_check_error(self, error: Exception):
+        self.bot.dispatch("error", error, "When refreshing streamers")
+
     async def _update_streams(self, streamer_ids: dict[str, _StreamersReadyForNotification]):
         streaming_user_ids: set[str] = set()
         # Check current streams
