@@ -308,6 +308,8 @@ class ServerLogs(commands.Cog):
             if msg.cached_message:
                 if msg.cached_message.author.bot:
                     return
+                if "pinned" in msg.data and msg.cached_message.pinned != msg.data['pinned']:
+                    return
                 old_content = msg.cached_message.content
                 author = msg.cached_message.author
                 guild = msg.cached_message.guild
