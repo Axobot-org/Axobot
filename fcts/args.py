@@ -4,12 +4,14 @@ import typing
 import discord
 from dateutil.relativedelta import relativedelta
 from discord.ext import commands
-from libs.bot_classes import MyContext
+
+if typing.TYPE_CHECKING:
+    from libs.bot_classes import MyContext
 
 
 class tempdelta(float):
     @classmethod
-    async def convert(cls, ctx: MyContext, argument: str) -> int:
+    async def convert(cls, ctx: "MyContext", argument: str) -> int:
         duration = 0
         found = False
         # ctx.invoked_with
@@ -41,7 +43,7 @@ class tempdelta(float):
 
 class user(discord.User):
     @classmethod
-    async def convert(cls, ctx: MyContext, argument: str) -> discord.User:
+    async def convert(cls, ctx: "MyContext", argument: str) -> discord.User:
         res = None
         if argument.isnumeric():
             if ctx.guild is not None:
@@ -66,7 +68,7 @@ class user(discord.User):
 
 class cardStyle(str):
     @classmethod
-    async def convert(cls, ctx: MyContext, argument: str) -> str:
+    async def convert(cls, ctx: "MyContext", argument: str) -> str:
         if argument in await ctx.bot.get_cog('Utilities').allowed_card_styles(ctx.author):
             return argument
         else:
@@ -75,7 +77,7 @@ class cardStyle(str):
 
 class LeaderboardTypeConverter(str):
     @classmethod
-    async def convert(cls, ctx: MyContext, argument: str) -> str:
+    async def convert(cls, ctx: "MyContext", argument: str) -> str:
         if argument in {'server', 'guild', 'serveur', 'local'}:
             if ctx.guild is None:
                 raise commands.errors.BadArgument(f'Cannot use {argument} leaderboard type outside a server')
@@ -90,7 +92,7 @@ class Invite(commands.Converter):
     def __init__(self):
         pass
 
-    async def convert(self, _ctx: MyContext, argument: str) -> typing.Union[str, int]:
+    async def convert(self, _ctx: "MyContext", argument: str) -> typing.Union[str, int]:
         answer = None
         r_invite = re.search(
             r'^https://discord(?:app)?\.com/(?:api/)?oauth2/authorize\?(?:client_id=(\d{17,19})|scope=([a-z\.\+]+?)|(?:permissions|guild_id|disable_guild_select|redirect_uri)=[^&\s]+)(?:&(?:client_id=(\d{17,19})|scope=([a-z\.\+]+?)|(?:permissions|guild_id|disable_guild_select|redirect_uri)=[^&\s]+))*$',
@@ -112,7 +114,7 @@ class Invite(commands.Converter):
 
 class Guild(discord.Guild):
     @classmethod
-    async def convert(cls, ctx: MyContext, argument: str) -> discord.Guild:
+    async def convert(cls, ctx: "MyContext", argument: str) -> discord.Guild:
         if argument.isnumeric():
             res = ctx.bot.get_guild(int(argument))
             if res is not None:
@@ -133,7 +135,7 @@ class URL:
         return f"Url(url='{self.url}', domain='{self.domain}', path='{self.path}', is_https={self.is_https})"
 
     @classmethod
-    async def convert(cls, _ctx: MyContext, argument: str) -> "URL":
+    async def convert(cls, _ctx: "MyContext", argument: str) -> "URL":
         "Convert a string to a proper URL instance, else raise BadArgument"
         r = re.search(
             r'(?P<https>https?)://(?:www\.)?(?P<domain>[^/\s]+)(?:/(?P<path>[\S]+))?', argument)
@@ -144,7 +146,7 @@ class URL:
 class UnicodeEmoji(str):
     "Represents any Unicode emoji"
     @classmethod
-    async def convert(cls, ctx: MyContext, argument: str):
+    async def convert(cls, ctx: "MyContext", argument: str):
         "Check if a string is a unicod emoji, else raise BadArgument"
         unicodes = ctx.bot.emojis_manager.unicode_set
         if all(char in unicodes for char in argument):
@@ -153,7 +155,7 @@ class UnicodeEmoji(str):
 
 class AnyEmoji(commands.Converter):
     "Convert argument to any emoji, either custom or unicode"
-    async def convert(self, ctx: MyContext, argument: str) -> typing.Union[str, discord.Emoji]:
+    async def convert(self, ctx: "MyContext", argument: str) -> typing.Union[str, discord.Emoji]:
         r = re.search(r'<a?:[^:]+:(\d+)>', argument)
         if r is None:
             try:
@@ -170,7 +172,7 @@ class AnyEmoji(commands.Converter):
 
 class arguments(commands.Converter):
     "Convert arguments to a foo=bar dictionary"
-    async def convert(self, ctx: MyContext, argument: str) -> dict:
+    async def convert(self, ctx: "MyContext", argument: str) -> dict:
         answer = dict()
         for result in re.finditer(r'(\w+) ?= ?\"((?:[^\"\\]|\\\"|\\)+)\"', argument):
             answer[result.group(1)] = result.group(2).replace('\\"', '"')
@@ -179,7 +181,7 @@ class arguments(commands.Converter):
 
 class Color(commands.Converter):
     "Convert arguments to a valid color (hexa or decimal)"
-    async def convert(self, ctx: MyContext, argument: str) -> int:
+    async def convert(self, ctx: "MyContext", argument: str) -> int:
         if argument.startswith('#') and len(argument) % 3 == 1:
             arg = argument[1:]
             rgb = [int(arg[i:i+2], 16)
@@ -202,7 +204,7 @@ class Snowflake:
         self.worker_id = int(self.binary[-22:-17])
 
     @classmethod
-    async def convert(cls, ctx: MyContext, argument: str) -> int:
+    async def convert(cls, ctx: "MyContext", argument: str) -> int:
         if len(argument) < 17 or len(argument) > 20 or not argument.isnumeric():
             raise commands.BadArgument("Invalid snowflake")
         return cls(int(argument))
@@ -211,7 +213,7 @@ class Snowflake:
 class serverlog(str):
     "Convert arguments to a server log type"
     @classmethod
-    async def convert(cls, ctx: MyContext, argument: str) -> str:
+    async def convert(cls, ctx: "MyContext", argument: str) -> str:
         from fcts.serverlogs import ServerLogs  # pylint: disable=import-outside-toplevel
 
         if argument in ServerLogs.available_logs() or argument == 'all':
@@ -221,7 +223,7 @@ class serverlog(str):
 class RawPermissionValue(int):
     "Represents a raw permission value, as an integer"
 
-    async def convert(self, ctx: MyContext, argument: str):
+    async def convert(self, ctx: "MyContext", argument: str):
         if re.match(r'0b[0,1]+', argument):
             return int(argument[2:], 2)
         if not argument.isnumeric():
