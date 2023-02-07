@@ -226,14 +226,12 @@ class Utilities(commands.Cog):
         """Get the most used languages of an user
         If limit=0, return every languages"""
         if not self.bot.database_online:
-            return ["en"]
+            return [("en", 1.0)]
         languages = []
-        disp_lang = []
+        disp_lang: list[tuple[str, float]] = []
         available_langs: list[str] = options["language"]["values"]
         for guild in user.mutual_guilds:
-            lang: Optional[str] = await self.bot.get_config(guild.id, 'language')
-            if lang is None:
-                lang: str = options["language"]["default"]
+            lang: str = await self.bot.get_config(guild.id, "language")
             languages.append(lang)
         for lang in available_langs:
             if (count := languages.count(lang)) > 0:

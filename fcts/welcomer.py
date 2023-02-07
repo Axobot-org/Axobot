@@ -5,6 +5,7 @@ from discord.ext import commands
 
 from libs.bot_classes import Axobot
 from libs.enums import ServerWarningType
+from libs.serverconfig.options_list import options
 
 
 class Welcomer(commands.Cog):
@@ -65,7 +66,7 @@ class Welcomer(commands.Cog):
         """Envoie un message de bienvenue/départ dans le serveur"""
         if self.bot.zombie_mode:
             return
-        msg = await self.bot.get_config(member.guild.id, event_type)
+        msg: Optional[str] = await self.bot.get_config(member.guild.id, event_type)
         if member.id in self.no_message or (event_type == "welcome" and await self.raid_check(member)):
             return
         if self.bot.get_cog('Utilities').sync_check_any_link(member.name) is not None:
@@ -74,7 +75,7 @@ class Welcomer(commands.Cog):
             channel: Optional[discord.TextChannel] = await self.bot.get_config(member.guild.id, 'welcome_channel')
             if channel is None:
                 return
-            msg: str = await self.bot.get_cog('Utilities').clear_msg(msg, ctx=None)
+            msg = await self.bot.get_cog('Utilities').clear_msg(msg, ctx=None)
             botormember = await self.bot._(member.guild,"misc.bot" if member.bot else "misc.member")
             try:
                 msg = msg.format_map(self.bot.SafeDict(
@@ -127,8 +128,11 @@ class Welcomer(commands.Cog):
         """Give roles rewards/muted role to new users"""
         if not self.bot.database_online:
             return
-        used_xp_type = await self.bot.get_config(member.guild.id,'xp_type')
-        xp = await self.bot.get_cog('Xp').bdd_get_xp(member.id, None if used_xp_type == 0 else member.guild.id)
+        used_xp_type = await self.bot.get_config(member.guild.id, "xp_type")
+        if used_xp_type == "global":
+            xp = await self.bot.get_cog('Xp').bdd_get_xp(member.id, None)
+        else:
+            xp = await self.bot.get_cog('Xp').bdd_get_xp(member.id, member.guild.id)
         if xp is not None and len(xp) == 1:
             await self.bot.get_cog('Xp').give_rr(member,(await self.bot.get_cog('Xp').calc_level(xp[0]['xp'],used_xp_type))[0],await self.bot.get_cog('Xp').rr_list_role(member.guild.id))
 
@@ -187,11 +191,11 @@ class Welcomer(commands.Cog):
         # if guild is unavailable or the bot left the guild
         if member.guild is None or member.guild.me is None:
             return False
-        level = str(await self.bot.get_config(member.guild.id,"anti_raid"))
+        level_name: str = await self.bot.get_config(member.guild.id, "anti_raid")
         # if level is unreadable or bot can't kick
-        if not level.isnumeric() or not member.guild.channels[0].permissions_for(member.guild.me).kick_members:
+        if level_name != "none" or not member.guild.channels[0].permissions_for(member.guild.me).kick_members:
             return
-        level = int(level)
+        level: int = options["anti_raid"]["values"].index(level_name)
         can_ban = member.guild.get_member(self.bot.user.id).guild_permissions.ban_members
         account_created_since = (self.bot.utcnow() - member.created_at).total_seconds()
         # Level 4
@@ -247,16 +251,17 @@ class Welcomer(commands.Cog):
     async def give_roles(self, member: discord.Member):
         """Give new roles to new users"""
         try:
-            roles = str(await self.bot.get_config(member.guild.id,"welcome_roles"))
-            for r in roles.split(";"):
-                if (not r.isnumeric()) or len(r) == 0:
-                    continue
-                role = member.guild.get_role(int(r))
-                if role is not None:
-                    try:
-                        await member.add_roles(role,reason=await self.bot._(member.guild.id,"logs.reason.welcome_roles"))
-                    except discord.errors.Forbidden:
-                        await self.bot.get_cog('Events').send_logs_per_server(member.guild,'error',await self.bot._(member.guild, "welcome.error-give-roles",r=role.name, u=str(member)), member.guild.me)
+            roles: list[discord.Role] = await self.bot.get_config(member.guild.id, "welcome_roles")
+            for role in roles:
+                try:
+                    await member.add_roles(role,reason=await self.bot._(member.guild.id,"logs.reason.welcome_roles"))
+                except discord.errors.Forbidden:
+                    await self.bot.get_cog('Events').send_logs_per_server(
+                        member.guild,
+                        "error",
+                        await self.bot._(member.guild, "welcome.error-give-roles", r=role.name, u=str(member)),
+                        member.guild.me
+                    )
         except discord.errors.NotFound:
             pass
         except Exception as err:

@@ -701,7 +701,7 @@ Available types: member, role, user, emoji, channel, server, invite, category
         since = await self.bot._(ctx.guild.id,"misc.since")
         _, bots, online, _ = await self.bot.get_cog("Utilities").get_members_repartition(guild.members)
 
-        desc = await self.bot.get_config(guild.id,'description')
+        desc = await self.bot.get_config(guild.id, "description")
         if (desc is None or len(desc) == 0) and guild.description is not None:
             desc = guild.description
         embed = discord.Embed(colour=default_color, timestamp=ctx.message.created_at, description=desc)
@@ -939,7 +939,7 @@ Available types: member, role, user, emoji, channel, server, invite, category
         disp_lang = list()
         if hasattr(user, "mutual_guilds"):
             for lang in await self.bot.get_cog('Utilities').get_languages(user):
-                disp_lang.append('{} ({}%)'.format(lang[0],round(lang[1]*100)))
+                disp_lang.append('{} ({}%)'.format(lang[0], round(lang[1]*100)))
         if len(disp_lang) == 0:
             disp_lang = ["Unknown"]
         # User name
@@ -987,12 +987,12 @@ Available types: member, role, user, emoji, channel, server, invite, category
         # Lang
         lang: str = await self.bot.get_config(guild.id, "language")
         # Roles rewards
-        rr_len = await self.bot.get_config(guild.id, "rr_max_number")
-        rr_len = '{}/{}'.format(len(await self.bot.get_cog("Xp").rr_list_role(guild.id)), rr_len)
+        rr_len: int = await self.bot.get_config(guild.id, "rr_max_number")
+        rr_len: str = '{}/{}'.format(len(await self.bot.get_cog("Xp").rr_list_role(guild.id)), rr_len)
         # Streamers
         if twitch_cog := self.bot.get_cog("Twitch"):
-            streamers_len =  await self.bot.get_config(guild.id, "streamers_max_number")
-            streamers_len = '{}/{}'.format(await twitch_cog.db_get_guild_subscriptions_count(guild.id), streamers_len)
+            streamers_len: int =  await self.bot.get_config(guild.id, "streamers_max_number")
+            streamers_len: str = '{}/{}'.format(await twitch_cog.db_get_guild_subscriptions_count(guild.id), streamers_len)
         else:
             streamers_len = "Not available"
         # Prefix
@@ -1000,7 +1000,7 @@ Available types: member, role, user, emoji, channel, server, invite, category
         if "`" not in pref:
             pref = "`" + pref + "`"
         # Rss
-        rss_len = await self.bot.get_config(guild.id,'rss_max_number')
+        rss_len: int = await self.bot.get_config(guild.id, "rss_max_number")
         if rss_cog := self.bot.get_cog("Rss"):
             rss_numb = "{}/{}".format(len(await rss_cog.db_get_guild_feeds(guild.id)), rss_len)
         else:

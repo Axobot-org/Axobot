@@ -274,8 +274,8 @@ class Partners(commands.Cog):
         except discord.NotFound as err:
             raise err
         image = str(inv.guild.icon) if inv.guild.icon else None
-        if isinstance(inv, discord.Invite) and not inv.revoked:
-            title += inv.guild.name
+        if isinstance(inv, discord.Invite) and not inv.revoked and inv.guild:
+            title += str(inv.guild.name)
             field1 = {'name': tr_members.capitalize(), 'value': str(
                 inv.approximate_member_count)}
             await self.give_roles(inv, channel.guild)
@@ -285,7 +285,7 @@ class Partners(commands.Cog):
         field2 = {'name': tr_invite.capitalize(
         ), 'value': '[{}](https://discord.gg/{})'.format(tr_click.capitalize(), partner['target'])}
         if len(target_desc) == 0:
-            target_desc = await self.bot.get_config(inv.guild.id, 'description')
+            target_desc: Optional[str] = await self.bot.get_config(inv.guild.id, 'description')
         return title, (field1, field2), image, target_desc
 
     async def give_roles(self,invite:discord.Invite,guild:discord.Guild):
@@ -483,7 +483,7 @@ class Partners(commands.Cog):
             f[1] = await self.bot._(ctx.guild.id, "partners.no-partner-2")
         fields_name = await self.bot._(ctx.guild.id, "partners.partners-list")
         if ctx.can_send_embed:
-            color = await ctx.bot.get_config(ctx.guild.id,'partner_color')
+            color = await ctx.bot.get_config(ctx.guild.id, "partner_color")
             emb = discord.Embed(title=fields_name[0], color=color, timestamp=self.bot.utcnow())
             if ctx.guild.icon:
                 emb.set_thumbnail(url=ctx.guild.icon)

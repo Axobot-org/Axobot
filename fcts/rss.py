@@ -220,7 +220,7 @@ class Rss(commands.Cog):
     async def is_overflow(self, guild: discord.Guild) -> tuple[bool, int]:
         """Check if a guild still has at least a slot
         True if max number reached, followed by the feed limit"""
-        feed_limit = await self.bot.get_config(guild.id,'rss_max_number')
+        feed_limit: int = await self.bot.get_config(guild.id, "rss_max_number")
         return len(await self.db_get_guild_feeds(guild.id)) >= feed_limit, feed_limit
 
     @rss_main.command(name="add")

@@ -728,7 +728,7 @@ You can specify a verification limit by adding a number in argument (up to 1.000
         if msg.author.bot:
             return
         ctx = await self.bot.get_context(msg)
-        if not await is_fun_enabled(ctx, self):
+        if not await is_fun_enabled(ctx):
             return
         if self.bot.zombie_mode:
             return

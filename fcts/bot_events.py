@@ -141,7 +141,7 @@ class BotEvents(commands.Cog):
             # If axobot is already there, don't do anything
             return
         if self.current_event and (data := self.current_event_data.get("emojis")):
-            if not await is_fun_enabled(msg, self.bot.get_cog("Fun")):
+            if not await is_fun_enabled(msg):
                 # don't react if fun is disabled for this guild
                 return
             if random.random() < data["probability"] and any(trigger in msg.content for trigger in data["triggers"]):

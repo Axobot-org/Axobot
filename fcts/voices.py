@@ -94,10 +94,10 @@ class VoiceChannels(commands.Cog):
             # If axobot is already there, let it handle it
             if await self.bot.check_axobot_presence(guild=member.guild):
                 return
-            config = await self.bot.get_config(member.guild.id, 'voice_channel')
-            if config is None:  # if nothing was setup
+            voice_channel: Optional[discord.VoiceChannel] = await self.bot.get_config(member.guild.id, "voice_channel")
+            if voice_channel is None:  # if nothing was setup
                 return
-            if after.channel == config:
+            if after.channel == voice_channel:
                 if before.channel is not None and len(before.channel.members) == 0: # move from another channel which is now empty
                     if (member.guild.id in self.channels) and (before.channel.id in self.channels[member.guild.id]):
                         # if they come from an automated channel, we move them back if the channel is now empty
@@ -138,7 +138,7 @@ class VoiceChannels(commands.Cog):
         over[member].manage_roles = None
         over[member.guild.me].manage_roles = None
         # build channel name from config and random
-        chan_name = await self.bot.get_config(member.guild.id, 'voice_channel_format')
+        chan_name: str = await self.bot.get_config(member.guild.id, "voice_channel_format")
         args = {
             'user': str(member),
             'number': random.randint(0, 1000)
