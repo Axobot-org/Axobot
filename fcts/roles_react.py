@@ -114,7 +114,7 @@ class RolesReact(commands.Cog):
 
     @commands.group(name="roles_react", aliases=['role_react'])
     @commands.guild_only()
-    async def rr_main(self, ctx):
+    async def rr_main(self, ctx: MyContext):
         """Manage your roles reactions
         
         ..Doc roles-reactions.html"""
@@ -140,7 +140,7 @@ class RolesReact(commands.Cog):
             l = await self.rr_list_role(ctx.guild.id, emoji)
             if len(l) > 0:
                 return await ctx.send(await self.bot._(ctx.guild.id, "roles_react.already-1-rr"))
-            max_rr = await self.bot.get_config(ctx.guild.id, 'roles_react_max_number')
+            max_rr: int = await self.bot.get_config(ctx.guild.id, 'roles_react_max_number')
             if len(l) >= max_rr:
                 return await ctx.send(await self.bot._(ctx.guild.id, "roles_react.too-many-rr", l=max_rr))
             await self.rr_add_role(ctx.guild.id, role.id, emoji, description[:150])
@@ -219,7 +219,7 @@ class RolesReact(commands.Cog):
             self.bot.dispatch("command_error", ctx, err)
         else:
             des, _ = await self.create_list_embed(roles_list, ctx.guild)
-            max_rr = await self.bot.get_config(ctx.guild.id, 'roles_react_max_number')
+            max_rr: int = await self.bot.get_config(ctx.guild.id, 'roles_react_max_number')
             title = await self.bot._(ctx.guild.id, "roles_react.rr-list", n=len(roles_list), m=max_rr)
             emb = discord.Embed(title=title, description=des, color=self.embed_color, timestamp=ctx.message.created_at)
             emb.set_footer(text=ctx.author, icon_url=ctx.author.display_avatar)

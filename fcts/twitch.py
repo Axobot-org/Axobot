@@ -138,7 +138,7 @@ class Twitch(commands.Cog):
             await ctx.send(await self.bot._(ctx.guild.id, "twitch.unknown-streamer"))
             return
         streamers_count = await self.db_get_guild_subscriptions_count(ctx.guild.id)
-        max_count = await self.bot.get_config(ctx.guild.id,'streamers_max_number')
+        max_count: int = await self.bot.get_config(ctx.guild.id, "streamers_max_number")
         if streamers_count >= max_count:
             await ctx.send(await self.bot._(ctx.guild.id, "twitch.subscribe.limit-reached", max_count))
             return
@@ -198,7 +198,7 @@ class Twitch(commands.Cog):
 ..Doc streamers.html#list-your-subscriptions"""
         await ctx.defer()
         streamers = await self.db_get_guild_streamers(ctx.guild.id, "twitch")
-        max_count = await self.bot.get_config(ctx.guild.id,'streamers_max_number')
+        max_count: int = await self.bot.get_config(ctx.guild.id, "streamers_max_number")
         if streamers:
             title = await self.bot._(ctx.guild.id, "twitch.subs-list.title", current=len(streamers), max=max_count)
             on_live = await self.bot._(ctx.guild.id, "twitch.on-live-indication")
@@ -278,10 +278,10 @@ class Twitch(commands.Cog):
         "Send a stream alert to a guild when a streamer is live"
         msg = await self.bot._(channel.guild, "twitch.stream-alerts", streamer=stream["user_name"])
         allowed_mentions = discord.AllowedMentions.none()
-        if role_id := await self.bot.get_config(channel.guild.id, "stream_mention"):
-            if role := channel.guild.get_role(int(role_id)):
-                msg = role.mention + " " + msg
-                allowed_mentions = discord.AllowedMentions(roles=[role])
+        if role := await self.bot.get_config(channel.guild.id, "stream_mention"):
+            role: discord.Role
+            msg = role.mention + " " + msg
+            allowed_mentions = discord.AllowedMentions(roles=[role])
         if channel.permissions_for(channel.guild.me).embed_links:
             if streamer := await self.agent.get_user_by_id(stream["user_id"]):
                 avatar = streamer["profile_image_url"].format(width=64, height=64)

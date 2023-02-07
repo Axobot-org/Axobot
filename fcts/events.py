@@ -190,7 +190,7 @@ class Events(commands.Cog):
         if not msg.author.bot:
             cond = False
             if self.bot.database_online:
-                cond = str(await self.bot.get_config(msg.guild,"anti_caps_lock")) in ['1','True']
+                cond: bool = await self.bot.get_config(msg.guild, "anti_caps_lock")
             if cond:
                 clean_content = msg.content
                 for rgx_match in (r'\|', r'\*', r'_', r'<a?:\w+:\d+>', r'<(#|@&?!?)\d+>', r'https?://\w+\.\S+'):

@@ -276,13 +276,10 @@ Slowmode works up to one message every 6h (21600s)
             await ctx.send(await self.bot._(ctx.guild.id, "moderation.error"))
             self.bot.dispatch("command_error", ctx, err)
 
-    async def get_muted_role(self, guild: discord.Guild):
+    async def get_muted_role(self, guild: discord.Guild) -> Optional[discord.Role]:
         "Find the muted role from the guild config option"
-        opt = await self.bot.get_config(guild.id, 'muted_role')
-        if opt is None or (isinstance(opt, str) and not opt.isdigit()):
-            return None
-            # return discord.utils.find(lambda x: x.name.lower() == "muted", guild.roles)
-        return guild.get_role(int(opt))
+        return await self.bot.get_config(guild.id, "muted_role")
+        # return discord.utils.find(lambda x: x.name.lower() == "muted", guild.roles)
 
     async def mute_event(self, member:discord.Member, author:discord.Member, reason:str, case_id:int, f_duration:str=None, duration: datetime.timedelta=None):
         """Call when someone should be muted in a guild"""

@@ -20,10 +20,10 @@ class Morpions(commands.Cog):
         self.in_game = {}
         self.types: tuple[str] = options['ttt_display']['values']
 
-    async def get_ttt_mode(self, ctx: MyContext) -> int:
+    async def get_ttt_mode(self, ctx: MyContext) -> str:
         """Get the used mode for a specific context"""
         if ctx.guild is None:
-            return 2
+            return options["ttt_display"]["default"]
         return await ctx.bot.get_config(ctx.guild.id, "ttt_display")
 
     @commands.command(name="tic-tac-toe", aliases=['morpion', 'tictactoe', 'ttt'])
@@ -54,11 +54,11 @@ class Morpions(commands.Cog):
     class Game():
         "An actual tictactoe game running"
 
-        def __init__(self, ctx: MyContext, cog: 'Morpions', mode: int):
+        def __init__(self, ctx: MyContext, cog: 'Morpions', mode: Literal["disabled", "short", "normal"]):
             self.cog = cog
             self.ctx = ctx
             self.bot = ctx.bot
-            self.mode = mode
+            self.use_short = mode == "short"
             self.emojis: tuple[str, str] = tuple()
             self.entrees_valides = [str(x) for x in range(1, 10)]
             self.compositions_gagnantes = [[0, 1, 2], [3, 4, 5], [6, 7, 8], [
@@ -147,7 +147,7 @@ class Morpions(commands.Cog):
                     if tour:  # Si c'est au joueur
                         if display_grille:
                             # if needed, clean the messages
-                            if self.mode == 1 and last_grid:
+                            if self.use_short and last_grid:
                                 await last_grid.delete()
                             last_grid = await ctx.send(await self.display_grid(grille))
                         display_grille = True
@@ -161,7 +161,7 @@ class Morpions(commands.Cog):
                             if await self.test_valid_cell(grille, saisie):
                                 grille = await self.replace_cell(grille, tour, saisie)
                                 tour = False
-                                if self.mode == 1:
+                                if self.use_short:
                                     await msg.delete(delay=0.1)
                             else: # cell is not empty
                                 await ctx.send(await self.bot._(ctx.channel, 'morpion.pion-1'))
@@ -200,7 +200,7 @@ class Morpions(commands.Cog):
                         break
                 ###
                 # if needed, clean the messages
-                if self.mode == 1 and last_grid:
+                if self.use_short and last_grid:
                     await last_grid.delete()
                 if match_nul:
                     await self.bot.get_cog("Utilities").add_user_eventPoint(ctx.author.id, 2)

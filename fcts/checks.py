@@ -151,19 +151,14 @@ async def database_connected(ctx: MyContext) -> bool:
     raise commands.CommandError("Database offline")
 
 
-async def is_fun_enabled(ctx: MyContext, self=None) -> bool:
+async def is_fun_enabled(ctx: MyContext) -> bool:
     "Check if fun is enabled in a given context"
-    if self is None:
-        if hasattr(ctx, 'bot'):
-            self = ctx.bot.get_cog("Fun")
-        else:
-            return False
     if ctx.guild is None:
         return True
-    if not self.bot.database_online and not ctx.guild.channels[0].permissions_for(ctx.author).manage_guild:
+    if not ctx.bot.database_online and not ctx.guild.channels[0].permissions_for(ctx.author).manage_guild:
         return False
     ID = ctx.guild.id
-    return bool(await self.bot.get_config(ID, "enable_fun"))
+    return await ctx.bot.get_config(ID, "enable_fun")
 
 
 
@@ -176,7 +171,7 @@ async def is_a_cmd(msg: discord.Message, bot: commands.Bot) -> bool:
     return is_cmd
 
 async def is_ttt_enabled(ctx: MyContext, self=None) -> bool:
+    "Check if the tic-tac-toe game is enabled in a given context"
     if ctx.guild is None:
         return True
-    mode = await ctx.bot.get_config(ctx.guild.id, "ttt_display")
-    return mode != 0
+    return await ctx.bot.get_config(ctx.guild.id, "ttt_display") != "disabled"

@@ -363,7 +363,7 @@ options: dict[str, "AllRepresentation"] = {
     },
     "xp_type": {
         "type": "enum",
-        "values": ["local", "global", "mee6-like"],
+        "values": ['global','mee6-like','local'],
         "default": "global",
         "is_listed": True,
     },
