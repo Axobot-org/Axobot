@@ -41,7 +41,7 @@ async def can_say(ctx: MyContext):
     if not ctx.bot.database_online:
         return ctx.channel.permissions_for(ctx.author).administrator
     else:
-        return await ctx.bot.get_cog("Servers").staff_finder(ctx.author, "say_allowed_roles")
+        return await ctx.bot.get_cog("ServerConfig").check_member_config_permission(ctx.author, "say_allowed_roles")
 
 async def can_use_cookie(ctx: MyContext) -> bool:
     "Check if a user can use the 'cookie' cmd"
@@ -223,7 +223,7 @@ You can specify a verification limit by adding a number in argument (up to 1.000
         await ctx.send(file=await self.utilities.find_img('nope.png'))
         if self.bot.database_online:
             try:
-                if await self.bot.get_cog("Servers").staff_finder(ctx.author, "say_allowed_roles"):
+                if await self.bot.get_cog("ServerConfig").check_member_config_permission(ctx.author, "say_allowed_roles"):
                     await ctx.message.delete(delay=0)
             except commands.CommandError: # user can't use 'say'
                 pass
@@ -409,7 +409,7 @@ You can specify a verification limit by adding a number in argument (up to 1.000
         if text1 != []:
             await ctx.send(''.join(text1))
         try:
-            if ctx.bot.database_online and await self.bot.get_cog("Servers").staff_finder(ctx.author, "say_allowed_roles"):
+            if ctx.bot.database_online and await self.bot.get_cog("ServerConfig").check_member_config_permission(ctx.author, "say_allowed_roles"):
                 await ctx.message.delete(delay=0)
         except commands.CommandError: # user can't use 'say'
             pass
@@ -518,7 +518,7 @@ You can specify a verification limit by adding a number in argument (up to 1.000
         text = await self.utilities.clear_msg(text,ctx=ctx)
         await ctx.send(text)
         try:
-            if self.bot.database_online and await self.bot.get_cog("Servers").staff_finder(ctx.author, "say_allowed_roles"):
+            if self.bot.database_online and await self.bot.get_cog("ServerConfig").check_member_config_permission(ctx.author, "say_allowed_roles"):
                 await ctx.message.delete(delay=0)
         except commands.CommandError: # user can't use 'say'
             pass
@@ -789,7 +789,8 @@ You can specify a verification limit by adding a number in argument (up to 1.000
             return await ctx.send(await self.bot._(ctx.channel,"fun.embed-invalid-channel"))
         if not destination.permissions_for(ctx.guild.me).embed_links:
             return await ctx.send(await self.bot._(ctx.channel,"fun.no-embed-perm"))
-        k = {'title':"",'content':"",'url':'','footer':"",'image':'','color':ctx.bot.get_cog('Servers').embed_color}
+        embed_color = ctx.bot.get_cog('ServerConfig').embed_color
+        k = {'title':"",'content':"",'url':'','footer':"",'image':'','color':embed_color}
         for key,value in arguments.items():
             if key=='title':
                 k['title'] = value[:255]
@@ -821,26 +822,13 @@ You can specify a verification limit by adding a number in argument (up to 1.000
     async def add_vote(self, msg: discord.Message):
         "Add votes emojis as reactions under a message"
         if self.bot.database_online and msg.guild is not None:
-            emojiz = await self.bot.get_config(msg.guild,'vote_emojis')
+            emojis_list: list[typing.Union[str, discord.Emoji]] = await self.bot.get_config(msg.guild.id, "vote_emojis")
         else:
-            emojiz = None
-        if emojiz is None or len(emojiz) == 0:
             await msg.add_reaction('👍')
             await msg.add_reaction('👎')
             return
-        count = 0
-        for r in emojiz.split(';'):
-            if r.isnumeric():
-                d_em = discord.utils.get(self.bot.emojis, id=int(r))
-                if d_em is not None:
-                    await msg.add_reaction(d_em)
-                    count +=1
-            elif len(r) > 0:
-                await msg.add_reaction(emojilib.emojize(r, language="alias"))
-                count +=1
-        if count == 0:
-            await msg.add_reaction('👍')
-            await msg.add_reaction('👎')
+        for emoji in emojis_list:
+            await msg.add_reaction(emoji)
 
     @commands.command(name="markdown")
     async def markdown(self, ctx: MyContext):
@@ -1036,10 +1024,10 @@ You can specify a verification limit by adding a number in argument (up to 1.000
         if message.guild is None or not self.bot.is_ready() or not self.bot.database_online:
             return
         try:
-            channels = await self.bot.get_config(message.guild.id,'poll_channels')
-            if channels is None or len(channels) == 0:
+            channels: typing.Optional[list[discord.TextChannel]] = await self.bot.get_config(message.guild.id, "poll_channels")
+            if channels is None:
                 return
-            if str(message.channel.id) in channels.split(';') and not message.author.bot:
+            if message.channel in channels and not message.author.bot:
                 try:
                     await self.add_vote(message)
                 except discord.DiscordException:

@@ -302,34 +302,25 @@ class Twitch(commands.Cog):
     async def on_stream_starts(self, stream: StreamObject, guild: discord.Guild):
         "When a stream starts, send a notification to the subscribed guild"
         # Send notification
-        if (channel_id := await self.bot.get_config(guild.id, "streaming_channel")) and channel_id.isnumeric():
-            if channel := guild.get_channel(int(channel_id)):
-                await self.send_stream_alert(stream, channel)
-            else:
-                self.bot.log.warn("[twitch] Channel %s not found in guild %s", channel_id, guild.id)
+        if channel := await self.bot.get_config(guild.id, "streaming_channel"):
+            await self.send_stream_alert(stream, channel)
         # Grant role
-        if (role_id := await self.bot.get_config(guild.id, "streaming_role")) and role_id.isnumeric():
-            if role := guild.get_role(int(role_id)):
-                if member := await self.find_streamer_in_guild(stream["user_name"], guild):
-                    try:
-                        await member.add_roles(role, reason="Twitch streamer is live")
-                    except discord.Forbidden:
-                        self.bot.log.info("[twitch] Cannot add role %s to member %s in guild %s: Forbidden", role_id, member.id, guild.id)
-            else:
-                self.bot.log.warn("[twitch] Role %s not found in guild %s", role_id, guild.id)
+        if role := await self.bot.get_config(guild.id, "streaming_role"):
+            if member := await self.find_streamer_in_guild(stream["user_name"], guild):
+                try:
+                    await member.add_roles(role, reason="Twitch streamer is live")
+                except discord.Forbidden:
+                    self.bot.log.info("[twitch] Cannot add role %s to member %s in guild %s: Forbidden", role.id, member.id, guild.id)
 
     @commands.Cog.listener()
     async def on_stream_ends(self, streamer_name: str, guild: discord.Guild):
         "When a stream ends, remove the role from the streamer"
-        if (role_id := await self.bot.get_config(guild.id, "streaming_role")) and role_id.isnumeric():
-            if role := guild.get_role(int(role_id)):
-                async for member in self.find_streamer_offline_in_guild(guild, role):
-                    try:
-                        await member.remove_roles(role, reason="Twitch streamer is offline")
-                    except discord.Forbidden:
-                        self.bot.log.info("[twitch] Cannot remove role %s from member %s in guild %s: Forbidden", role_id, member.id, guild.id)
-            else:
-                self.bot.log.warn("[twitch] Role %s not found in guild %s", role_id, guild.id)
+        if role := await self.bot.get_config(guild.id, "streaming_role"):
+            async for member in self.find_streamer_offline_in_guild(guild, role):
+                try:
+                    await member.remove_roles(role, reason="Twitch streamer is offline")
+                except discord.Forbidden:
+                    self.bot.log.info("[twitch] Cannot remove role %s from member %s in guild %s: Forbidden", role.id, member.id, guild.id)
 
     @tasks.loop(minutes=5)
     async def stream_check_task(self):

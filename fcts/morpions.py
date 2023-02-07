@@ -4,11 +4,11 @@ import time
 from typing import Literal
 
 import discord
-import emoji as emojilib
 from discord.ext import commands
-from libs.bot_classes import MyContext, Axobot
 
 from fcts.checks import is_ttt_enabled
+from libs.bot_classes import Axobot, MyContext
+from libs.serverconfig.options_list import options
 
 
 class Morpions(commands.Cog):
@@ -18,7 +18,7 @@ class Morpions(commands.Cog):
         self.bot = bot
         self.file = 'morpions'
         self.in_game = {}
-        self.types = "disabled", "short", "normal"
+        self.types: tuple[str] = options['ttt_display']['values']
 
     async def get_ttt_mode(self, ctx: MyContext) -> int:
         """Get the used mode for a specific context"""
@@ -73,16 +73,7 @@ class Morpions(commands.Cog):
             elif self.bot.current_event == 'fish':
                 self.emojis = ("🐟", "🐠")
             elif self.ctx.guild:
-                config = await self.bot.get_config(self.ctx.guild.id, "morpion_emojis")
-                if config is not None and config != "":
-                    for emoji_id in config.split(';'):
-                        if emoji_id.isnumeric():
-                            d_em = discord.utils.get(self.ctx.guild.emojis, id=int(emoji_id))
-                            if d_em is not None:
-                                self.emojis += (str(d_em), )
-                        else:
-                            self.emojis += (emojilib.emojize(emoji_id, language="alias"), )
-                    self.emojis = self.emojis[:2]
+                self.emojis = await self.bot.get_config(self.ctx.guild.id, "morpion_emojis")
             if len(self.emojis) < 2:
                 self.emojis = (':red_circle:', ':blue_circle:')
 

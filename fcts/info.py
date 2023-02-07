@@ -88,7 +88,6 @@ class Info(commands.Cog):
             msg.content = ctx.prefix + "stats general"
             new_ctx = await self.bot.get_context(msg)
             await self.bot.invoke(new_ctx)
-    
 
     @stats_main.command(name="general")
     async def stats_general(self, ctx: MyContext):
@@ -110,7 +109,11 @@ class Info(commands.Cog):
             ignored_guilds += self.bot.get_cog('Reloads').ignored_guilds
             len_servers = await self.get_guilds_count(ignored_guilds)
             # Languages
-            langs_list: list = await self.bot.get_cog('Servers').get_languages(ignored_guilds)
+            langs_list = [
+                (k, v)
+                for k, v in
+                (await self.bot.get_cog('ServerConfig').get_languages(ignored_guilds)).items()
+            ]
             langs_list.sort(reverse=True, key=lambda x: x[1])
             lang_total = sum([x[1] for x in langs_list])
             langs_list = ' | '.join(["{}: {}%".format(x[0],round(x[1]/lang_total*100)) for x in langs_list if x[1] > 0])
@@ -982,11 +985,7 @@ Available types: member, role, user, emoji, channel, server, invite, category
         # Bots
         bots = len([x for x in guild.members if x.bot])
         # Lang
-        lang = await self.bot.get_config(guild.id, "language")
-        if lang is None:
-            lang = 'default'
-        else:
-            lang = self.bot.get_cog("Languages").languages[lang]
+        lang: str = await self.bot.get_config(guild.id, "language")
         # Roles rewards
         rr_len = await self.bot.get_config(guild.id, "rr_max_number")
         rr_len = '{}/{}'.format(len(await self.bot.get_cog("Xp").rr_list_role(guild.id)), rr_len)
@@ -1311,7 +1310,8 @@ Available types: member, role, user, emoji, channel, server, invite, category
         if len(results) == 0:
             await ctx.send(await self.bot._(ctx.channel,'info.changelog.notfound'))
         elif ctx.can_send_embed:
-            emb = discord.Embed(title=title, description=desc, timestamp=time, color=ctx.bot.get_cog('Servers').embed_color)
+            embed_color = ctx.bot.get_cog('ServerConfig').embed_color
+            emb = discord.Embed(title=title, description=desc, timestamp=time, color=embed_color)
             await ctx.send(embed=emb)
         else:
             await ctx.send(desc)
@@ -1375,7 +1375,7 @@ Available types: member, role, user, emoji, channel, server, invite, category
                 footer = await self.bot._(ctx.channel,'info.usernames.allow')
             # Warning in description if disabled in the guild
             if ctx.guild is not None and not await self.bot.get_config(ctx.guild.id, "nicknames_history"):
-                if len(ctx.guild.members) >= self.bot.get_cog("Servers").max_members_for_nicknames:
+                if len(ctx.guild.members) >= self.bot.get_cog("ServerConfig").max_members_for_nicknames:
                     warning_disabled = await self.bot._(ctx.guild.id, "info.nicknames-disabled.guild-too-big")
                 else:
                     warning_disabled = await self.bot._(ctx.guild.id, "info.nicknames-disabled.disabled")

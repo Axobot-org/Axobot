@@ -2,12 +2,13 @@ import asyncio
 import importlib
 import operator
 import re
-from typing import List, Optional
+from typing import Any, List, Optional
 
 import aiohttp
 import discord
 from discord.ext import commands
 from libs.bot_classes import MyContext, Axobot
+from libs.serverconfig.options_list import options
 
 from . import args
 
@@ -33,12 +34,25 @@ class Utilities(commands.Cog):
         await self.get_bot_infos()
 
     async def get_bot_infos(self):
-        config_list = await self.bot.get_cog('Servers').get_bot_infos(self.bot.user.id)
+        if not self.bot.database_online:
+            return list()
+        query = ("SELECT * FROM `bot_infos` WHERE `ID` = %s")
+        async with self.bot.db_query(query, (self.bot.user.id,)) as query_results:
+            config_list = list(query_results)
         if len(config_list) > 0:
             self.config: dict = config_list[0]
             self.config.pop('token', None)
             return self.config
         return None
+
+    async def edit_bot_infos(self, bot_id: int, values: list[tuple[str, Any]]):
+        if not isinstance(values, list) or len(values) == 0:
+            raise ValueError
+        set_query = ', '.join('{}=%s'.format(val[0]) for val in values)
+        query = f"UPDATE `bot_infos` SET {set_query} WHERE `ID`='{bot_id}'"
+        async with self.bot.db_query(query, (val[1] for val in values)):
+            pass
+        return True
 
     async def find_img(self, name: str):
         return discord.File(f"assets/images/{name}")
@@ -215,17 +229,18 @@ class Utilities(commands.Cog):
             return ["en"]
         languages = []
         disp_lang = []
-        available_langs: list[str] = self.bot.get_cog('Languages').languages
+        available_langs: list[str] = options["language"]["values"]
         for guild in user.mutual_guilds:
-            lang: Optional[int] = await self.bot.get_config(guild.id, 'language')
+            lang: Optional[str] = await self.bot.get_config(guild.id, 'language')
             if lang is None:
-                lang = available_langs.index(
-                    self.bot.get_cog('Servers').default_language)
+                lang: str = options["language"]["default"]
             languages.append(lang)
-        for i in range(len(self.bot.get_cog('Languages').languages)):
-            if languages.count(i) > 0:
-                disp_lang.append((available_langs[i], round(
-                    languages.count(i)/len(languages), 2)))
+        for lang in available_langs:
+            if (count := languages.count(lang)) > 0:
+                disp_lang.append((
+                    lang,
+                    round(count/len(languages), 2)
+                ))
         disp_lang.sort(key=operator.itemgetter(1), reverse=True)
         if limit == 0:
             return disp_lang
@@ -287,7 +302,9 @@ class Utilities(commands.Cog):
             try:  # https://top.gg/bot/486896267788812288
                 async with session.get(f'https://top.gg/api/bots/486896267788812288/check?userId={userid}', headers={'Authorization': str(self.bot.dbl_token)}) as r:
                     json = await r.json()
-                    if json["voted"]:
+                    if json["error"]:
+                        raise ValueError("Error while checking votes on top.gg: "+json["error"])
+                    elif json["voted"]:
                         votes.append(("Discord Bots List", "https://top.gg/"))
             except Exception as err:
                 self.bot.dispatch("error", err)

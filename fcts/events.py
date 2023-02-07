@@ -23,7 +23,6 @@ class Events(commands.Cog):
         self.bot = bot
         self.file = "events"
         self.dbl_last_sending = datetime.datetime.utcfromtimestamp(0)
-        self.partner_last_check = datetime.datetime.utcfromtimestamp(0)
         self.last_eventDay_check = datetime.datetime.utcfromtimestamp(0)
         self.statslogs_last_push = datetime.datetime.utcfromtimestamp(0)
         self.loop_errors = [0,datetime.datetime.utcfromtimestamp(0)]
@@ -262,10 +261,7 @@ class Events(commands.Cog):
             return
         color = self.embed_colors[log_type.lower()]
         try:
-            config = str(await self.bot.get_config(guild.id,"modlogs_channel")).split(';', maxsplit=1)[0]
-            if config == "" or not config.isnumeric():
-                return
-            channel = guild.get_channel_or_thread(int(config))
+            channel: Optional[discord.TextChannel] = await self.bot.get_config(guild.id, "modlogs_channel")
         except Exception as err:
             self.bot.dispatch("error", err)
             return
@@ -329,9 +325,6 @@ class Events(commands.Cog):
             # Clear old rank cards - every 20min
             elif now.minute%20 == 0 and self.bot.database_online:
                 await self.bot.get_cog('Xp').clear_cards()
-            # Partners reload - every 8h UTC (start from 0am)
-            elif utcnow.hour%8 == 0 and now.hour != self.partner_last_check.hour and self.bot.database_online:
-                await self.partners_loop()
             # Bots lists updates - every day
             elif now.hour == 0 and now.day != self.dbl_last_sending.day:
                 await self.dbl_send_data()
@@ -343,7 +336,7 @@ class Events(commands.Cog):
                 await self.send_sql_statslogs()
             # Refresh needed membercounter channels - every 1min
             elif abs((self.last_membercounter - now).total_seconds()) > 60 and self.bot.database_online:
-                await self.bot.get_cog('Servers').update_everyMembercounter()
+                await self.bot.get_cog('ServerConfig').update_everyMembercounter()
                 self.last_membercounter = now
         except Exception as err:
             self.bot.dispatch("error", err)
@@ -431,33 +424,6 @@ class Events(commands.Cog):
         await self.bot.send_embed(emb, url="loop")
         self.dbl_last_sending = datetime.datetime.now()
 
-    async def partners_loop(self):
-        """Update partners channels (every 7 hours)"""
-        t = time.time()
-        self.partner_last_check = datetime.datetime.now()
-        channels_list = await self.bot.get_cog('Servers').get_server(criters=["`partner_channel`<>''"],columns=['ID','partner_channel','partner_color'])
-        self.bot.log.info(f"[Partners] Rafraîchissement des salons ({len(channels_list)} serveurs prévus)...")
-        count = [0,0]
-        for guild in channels_list:
-            try:
-                chan = guild['partner_channel'].split(';')[0]
-                if not chan.isnumeric():
-                    continue
-                chan = self.bot.get_channel(int(chan))
-                if chan is None:
-                    continue
-                count[0] += 1
-                count[1] += await self.bot.get_cog('Partners').update_partners(chan,guild['partner_color'])
-            except Exception as err:
-                self.bot.dispatch("error", err)
-        delta_time = round(time.time()-t,3)
-        emb = discord.Embed(
-            description=f'**Partners channels updated** in {delta_time}s ({count[0]} channels - {count[1]} partners)',
-            color=10949630,
-            timestamp=self.bot.utcnow())
-        emb.set_author(name=self.bot.user, icon_url=self.bot.user.display_avatar)
-        await self.bot.send_embed(emb, url="loop")
-
     async def send_sql_statslogs(self):
         "Send some stats about the current bot stats"
         await self.bot.wait_until_ready()
@@ -470,9 +436,9 @@ class Events(commands.Cog):
         else:
             member_count = len(self.bot.users)
             bot_count = len([1 for x in self.bot.users if x.bot])
-        lang_stats = await self.bot.get_cog('Servers').get_languages([], return_dict=True)
+        lang_stats = await self.bot.get_cog('ServerConfig').get_languages([])
         rankcards_stats = await self.bot.get_cog('Users').get_rankcards_stats()
-        xptypes_stats = await self.bot.get_cog('Servers').get_xp_types([], return_dict=True)
+        xptypes_stats = await self.bot.get_cog('ServerConfig').get_xp_types([])
         supportserver_members = self.bot.get_guild(356067272730607628).member_count
         query = "INSERT INTO `log_stats` (`servers_count`, `members_count`, `bots_count`, `dapi_heartbeat`, `codelines_count`, `earned_xp_total`, `rss_feeds`, `active_rss_feeds`, `supportserver_members`, `languages`, `used_rankcards`, `xp_types`, `entity_id`) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
         data = (
