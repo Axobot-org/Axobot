@@ -53,7 +53,7 @@ async def autocomplete_bool(_interaction: Interaction, _current: str):
 
 async def autocomplete_language(bot: Axobot, _interaction: Interaction, current: str):
     "Autocomplete a language"
-    languages: list[str] = bot.get_cog("Languages").languages
+    languages: tuple[str] = options_list.options["language"]["values"]
     if current:
         return [
             Choice(name=language, value=language) for language in languages
@@ -65,7 +65,7 @@ async def autocomplete_language(bot: Axobot, _interaction: Interaction, current:
 
 async def autocomplete_raid(bot: Axobot, _interaction: Interaction, current: str):
     "Autocomplete a raid protection level"
-    levels = bot.get_cog("Servers").raids_levels
+    levels: tuple[str] = options_list.options["anti_raid"]["values"]
     if current:
         return [
             Choice(name=level, value=level) for level in levels
@@ -77,7 +77,7 @@ async def autocomplete_raid(bot: Axobot, _interaction: Interaction, current: str
 
 async def autocomplete_xp_type(bot: Axobot, _interaction: Interaction, current: str):
     "Autocomplete a xp type"
-    types = bot.get_cog('Xp').types
+    types: tuple[str] = options_list.options["xp_type"]["values"]
     if current:
         return [
             Choice(name=type_name, value=type_name) for type_name in types
@@ -89,7 +89,7 @@ async def autocomplete_xp_type(bot: Axobot, _interaction: Interaction, current: 
 
 async def autocomplete_ttt_mode(bot: Axobot, _interaction: Interaction, current: str):
     "Autocomplete a tic-tac-toe display mode"
-    types: list[str] = bot.get_cog("Morpions").types
+    types: tuple[str] = options_list.options["ttt_display"]["values"]
     if current:
         return [
             Choice(name=type_name, value=type_name) for type_name in types

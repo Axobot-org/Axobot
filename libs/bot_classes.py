@@ -19,7 +19,7 @@ from fcts.tokens import get_database_connection, get_secrets_dict
 from libs.database import create_database_query
 from libs.emojis_manager import EmojisManager
 from libs.prefix_manager import PrefixManager
-from libs.serverconfig.options_list import default_values as serverconfig_defaults
+from libs.serverconfig.options_list import options as options_list
 from libs.tasks_handler import TaskHandler
 from utils import get_prefix
 
@@ -32,7 +32,7 @@ if TYPE_CHECKING:
     from fcts.minecraft import Minecraft
     from fcts.partners import Partners
     from fcts.rss import Rss
-    from fcts.servers import Servers
+    from fcts.serverconfig import ServerConfig
     from fcts.twitch import Twitch
     from fcts.users import Users
     from fcts.utilities import Utilities
@@ -202,7 +202,7 @@ class Axobot(commands.bot.AutoShardedBot):
         ...
 
     @overload
-    def get_cog(self, name: Literal["Servers"]) -> Optional["Servers"]:
+    def get_cog(self, name: Literal["ServerConfig"]) -> Optional["ServerConfig"]:
         ...
 
     @overload
@@ -298,16 +298,16 @@ class Axobot(commands.bot.AutoShardedBot):
         def __missing__(self, key):
             return '{' + key + '}'
 
-    async def get_config(self, guild_id: int, option: str) -> Optional[str]:
+    async def get_config(self, guild_id: int, option: str):
         """Get a configuration option for a specific guild
         Fallbacks to the default values if the guild is not found"""
-        cog = self.get_cog("Servers")
+        cog = self.get_cog("ServerConfig")
         if cog:
             if self.database_online:
                 value = await cog.get_option(guild_id, option)
                 if value is not None:
                     return value
-            return serverconfig_defaults.get(option, None)
+            return options_list.get(option, {"default": None})["default"]
         return None
 
     async def get_recipient(self, channel: discord.DMChannel) -> Optional[discord.User]:

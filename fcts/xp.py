@@ -39,7 +39,6 @@ class Xp(commands.Cog):
         self.xp_per_char = 0.11
         self.max_xp_per_msg = 70
         self.file = 'xp'
-        self.xp_channels_cache = dict()
         self.sus = None
         self.types = ['global','mee6-like','local']
         try:
@@ -192,19 +191,8 @@ class Xp(commands.Cog):
         """Check if this channel/user can get xp"""
         if msg.guild is None:
             return False
-        if msg.guild.id in self.xp_channels_cache.keys():
-            if msg.channel.id in self.xp_channels_cache[msg.guild.id]:
-                return False
-        else:
-            chans = await self.bot.get_config(msg.guild.id,'noxp_channels')
-            if chans is not None:
-                chans = [int(x) for x in chans.split(';') if x.isnumeric()]
-                if msg.channel.id in chans:
-                    return False
-            else:
-                chans = []
-            self.xp_channels_cache[msg.guild.id] = chans
-        return True
+        chans = await self.bot.get_config(msg.guild.id, 'noxp_channels')
+        return chans is not None and msg.channel in chans
 
 
     async def send_levelup(self, msg: discord.Message, lvl: int):
