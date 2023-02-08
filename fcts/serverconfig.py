@@ -135,7 +135,7 @@ class ServerConfig(commands.Cog):
         guilds = {x.id for x in self.bot.guilds if x.id not in ignored_guilds}
         async with self.bot.db_query(query, (self.bot.beta,)) as query_results:
             for row in query_results:
-                if row['ID'] in guilds:
+                if row['guild_id'] in guilds:
                     values_list.append(row['value'])
         for _ in range(len(guilds)-len(values_list)):
             values_list.append(options_list['xp_type']['default'])
