@@ -84,10 +84,7 @@ class Info(commands.Cog):
 
         ..Doc infos.html#statistics"""
         if ctx.subcommand_passed is None:
-            msg = copy.copy(ctx.message)
-            msg.content = ctx.prefix + "stats general"
-            new_ctx = await self.bot.get_context(msg)
-            await self.bot.invoke(new_ctx)
+            await self.stats_general(ctx)
 
     @stats_main.command(name="general")
     async def stats_general(self, ctx: MyContext):
@@ -1236,15 +1233,9 @@ Available types: member, role, user, emoji, channel, server, invite, category
             except commands.BadArgument:
                 return
             if url.domain in ['bit.ly','bitly.com','bitly.is']:
-                msg = copy.copy(ctx.message)
-                msg.content = ctx.prefix + 'bitly find '+url.url
-                new_ctx = await self.bot.get_context(msg)
-                await self.bot.invoke(new_ctx)
+                await self.bitly_find(ctx, url)
             else:
-                msg = copy.copy(ctx.message)
-                msg.content = ctx.prefix + 'bitly create '+url.url
-                new_ctx = await self.bot.get_context(msg)
-                await self.bot.invoke(new_ctx)
+                await self.bitly_create(ctx, url)
 
     @bitly_main.command(name="create", aliases=["shorten"])
     async def bitly_create(self, ctx: MyContext, url: args.URL):
