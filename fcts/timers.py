@@ -72,7 +72,7 @@ class Timers(commands.Cog):
         ..Doc miscellaneous.html#create-a-new-reminder"""
         ctx.message.content = ctx.prefix + ("reminder " if args.startswith('create') else "reminder create ") + args
         new_ctx = await self.bot.get_context(ctx.message)
-        await self.bot.invoke(new_ctx)
+        await self.remind_main.invoke(new_ctx)
 
 
     @commands.group(name="reminder", aliases=["remind", "reminds", "reminders"])

@@ -744,10 +744,7 @@ You can specify a verification limit by adding a number in argument (up to 1.000
                 user_config = await self.utilities.get_db_userinfo(["auto_unafk"],[f'`userID`={ctx.author.id}'])
                 if user_config is None or (not user_config['auto_unafk']):
                     return
-                msg = copy.copy(msg)
-                msg.content = await self.bot.prefix_manager.get_prefix(ctx.guild) + 'unafk'
-                new_ctx = await self.bot.get_context(msg)
-                await self.bot.invoke(new_ctx)
+                await self.unafk(ctx)
 
 
     @commands.command(name="embed",hidden=False)
