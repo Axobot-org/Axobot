@@ -1,4 +1,4 @@
 -i https://pypi.org/simple
 sphinx
 sphinxext-opengraph>=0.6
-sphinxawesome-theme
+sphinx_book_theme
