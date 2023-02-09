@@ -20,7 +20,7 @@ sys.path.insert(0, os.path.abspath('.'))
 # -- Project information -----------------------------------------------------
 
 project = 'Axobot'
-copyright = '2019 - 2023, ZRunner'
+copyright = '2019 - 2023'
 author = 'ZRunner'
 
 # The short X.Y version
@@ -40,7 +40,6 @@ release = '4.2.0'
 # ones.
 extensions = [
     "sphinxext.opengraph", # opengraph metadata
-    "sphinxawesome_theme",
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -75,7 +74,7 @@ pygments_style = 'sphinx'
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
-html_theme = 'sphinxawesome_theme'
+html_theme = 'sphinx_book_theme'
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
@@ -97,6 +96,10 @@ html_static_path = []
 # 'searchbox.html']``.
 #
 # html_sidebars = {}
+
+html_title = "Axobot Documentation"
+
+html_copy_source = False
 
 
 # -- Options for HTMLHelp output ---------------------------------------------
@@ -158,4 +161,9 @@ texinfo_documents = [
 
 # -- Extension configuration -------------------------------------------------
 
-html_permalinks_icon = "<span>#</span>"
+html_theme_options = {
+    "toc_title": "On this page",
+    "show_toc_level": 2,
+    "repository_url": "https://github.com/ZRunner/Zbot",
+    "use_repository_button": True,
+}
