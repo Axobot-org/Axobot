@@ -20,7 +20,7 @@ sys.path.insert(0, os.path.abspath('.'))
 # -- Project information -----------------------------------------------------
 
 project = 'Axobot'
-copyright = '2019 - 2022, ZRunner'
+copyright = '2019 - 2023, ZRunner'
 author = 'ZRunner'
 
 # The short X.Y version
@@ -28,14 +28,6 @@ version = '4.2'
 # The full version, including alpha/beta/rc tags
 release = '4.2.0'
 
-
-# Example configuration for intersphinx: refer to the Python standard library.
-intersphinx_mapping = {
-    "python": ("https://docs.python.org/3.7", None),
-    "requests": ("http://docs.python-requests.org/en/master", None),
-    "re": ("https://docs.python.org/3.7/library", None),
-    "discord": ("https://discordpy.readthedocs.io/en/latest/", None)
-}
 
 # -- General configuration ---------------------------------------------------
 
@@ -47,12 +39,8 @@ intersphinx_mapping = {
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = [
-    "sphinxext.opengraph",
-    "sphinx.ext.autodoc",
-    "sphinx.ext.intersphinx",
-    "sphinx.ext.viewcode",
-    "sphinx.ext.napoleon",
-    "sphinxcontrib.asyncio",
+    "sphinxext.opengraph", # opengraph metadata
+    "sphinxawesome_theme",
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -87,8 +75,7 @@ pygments_style = 'sphinx'
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
-#
-html_theme = 'sphinx_rtd_theme'
+html_theme = 'sphinxawesome_theme'
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
@@ -99,7 +86,7 @@ html_theme = 'sphinx_rtd_theme'
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
-html_static_path = ['_static']
+html_static_path = []
 
 # Custom sidebar templates, must be a dictionary that maps document names
 # to template names.
@@ -115,7 +102,7 @@ html_static_path = ['_static']
 # -- Options for HTMLHelp output ---------------------------------------------
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'zbotdoc'
+htmlhelp_basename = 'axodoc'
 
 
 # -- Options for LaTeX output ------------------------------------------------
@@ -142,7 +129,7 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-    (master_doc, 'zbot.tex', 'zbot Documentation',
+    (master_doc, 'axobot.tex', 'Axobot Documentation',
      'ZRunner', 'manual'),
 ]
 
@@ -152,7 +139,7 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    (master_doc, 'zbot', 'zbot Documentation',
+    (master_doc, 'axobot', 'Axobot Documentation',
      [author], 1)
 ]
 
@@ -163,10 +150,12 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-    (master_doc, 'zbot', 'zbot Documentation',
-     author, 'zbot', 'One line description of project.',
+    (master_doc, 'axobot', 'Axobot Documentation',
+     author, 'axobot', 'Axobot is a cool multipurpose Discord bot.',
      'Miscellaneous'),
 ]
 
 
 # -- Extension configuration -------------------------------------------------
+
+html_permalinks_icon = "<span>#</span>"
