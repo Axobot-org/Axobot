@@ -1,3 +1,4 @@
+:orphan:
 :og:description: A translated version of the Zbot Terms of Service.
 
 ================
