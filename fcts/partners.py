@@ -495,9 +495,9 @@ class Partners(commands.Cog):
         else:
             await ctx.send(f"__{fields_name[0]}:__\n{f[0]}\n\n__{fields_name[1]}:__\n{f[1]}")
 
-    @partner_main.command(name="color",aliases=['colour'])
+    @partner_main.command(name="color", aliases=['colour'])
     @commands.check(checks.has_manage_guild)
-    async def partner_color(self, ctx: MyContext, color):
+    async def partner_color(self, ctx: MyContext, color: str):
         """Change the color of the partners embed
     It has the same result as `config change partner_color`
 
@@ -506,9 +506,9 @@ class Partners(commands.Cog):
     ..Example partners color #FF00FF
     
     ..Doc server.html#change-the-embed-color"""
-        await self.bot.get_cog('Servers').conf_color(ctx,'partner_color',str(color))
+        await self.bot.get_cog('ServerConfig').config_set_cmd(ctx, "partner_color", color)
 
-    @partner_main.command(name='reload')
+    @partner_main.command(name="reload")
     @commands.check(checks.has_manage_guild)
     @commands.cooldown(1,60,commands.BucketType.guild)
     async def partner_reload(self, ctx: MyContext):
