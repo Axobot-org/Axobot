@@ -9,7 +9,7 @@ from discord.ext import commands, tasks
 from mysql.connector.errors import IntegrityError
 
 from . import checks
-from libs.bot_classes import MyContext, Zbot
+from libs.bot_classes import MyContext, Axobot
 from libs.twitch.api_agent import TwitchApiAgent
 from libs.twitch.types import (GroupedStreamerDBObject, PlatformId,
                                StreamersDBObject, StreamObject)
@@ -25,7 +25,7 @@ class _StreamersReadyForNotification(TypedDict):
 class Twitch(commands.Cog):
     "Handle twitch streams"
 
-    def __init__(self, bot: Zbot):
+    def __init__(self, bot: Axobot):
         self.bot = bot
         self.file = "twitch"
         self.agent = TwitchApiAgent()
@@ -33,8 +33,8 @@ class Twitch(commands.Cog):
 
     async def cog_load(self):
         await self.agent.api_login(
-            self.bot.others["twitch_client_id"],
-            self.bot.others["twitch_client_secret"]
+            self.bot.others["twitch"]["client_id"],
+            self.bot.others["twitch"]["client_secret"]
         )
         self.bot.log.info("[twitch] connected to API")
         self.stream_check_task.start()
@@ -138,7 +138,7 @@ class Twitch(commands.Cog):
             await ctx.send(await self.bot._(ctx.guild.id, "twitch.unknown-streamer"))
             return
         streamers_count = await self.db_get_guild_subscriptions_count(ctx.guild.id)
-        max_count = await self.bot.get_config(ctx.guild.id,'streamers_max_number')
+        max_count: int = await self.bot.get_config(ctx.guild.id, "streamers_max_number")
         if streamers_count >= max_count:
             await ctx.send(await self.bot._(ctx.guild.id, "twitch.subscribe.limit-reached", max_count))
             return
@@ -198,7 +198,7 @@ class Twitch(commands.Cog):
 ..Doc streamers.html#list-your-subscriptions"""
         await ctx.defer()
         streamers = await self.db_get_guild_streamers(ctx.guild.id, "twitch")
-        max_count = await self.bot.get_config(ctx.guild.id,'streamers_max_number')
+        max_count: int = await self.bot.get_config(ctx.guild.id, "streamers_max_number")
         if streamers:
             title = await self.bot._(ctx.guild.id, "twitch.subs-list.title", current=len(streamers), max=max_count)
             on_live = await self.bot._(ctx.guild.id, "twitch.on-live-indication")
@@ -278,10 +278,10 @@ class Twitch(commands.Cog):
         "Send a stream alert to a guild when a streamer is live"
         msg = await self.bot._(channel.guild, "twitch.stream-alerts", streamer=stream["user_name"])
         allowed_mentions = discord.AllowedMentions.none()
-        if role_id := await self.bot.get_config(channel.guild.id, "stream_mention"):
-            if role := channel.guild.get_role(int(role_id)):
-                msg = role.mention + " " + msg
-                allowed_mentions = discord.AllowedMentions(roles=[role])
+        if role := await self.bot.get_config(channel.guild.id, "stream_mention"):
+            role: discord.Role
+            msg = role.mention + " " + msg
+            allowed_mentions = discord.AllowedMentions(roles=[role])
         if channel.permissions_for(channel.guild.me).embed_links:
             if streamer := await self.agent.get_user_by_id(stream["user_id"]):
                 avatar = streamer["profile_image_url"].format(width=64, height=64)
@@ -302,34 +302,25 @@ class Twitch(commands.Cog):
     async def on_stream_starts(self, stream: StreamObject, guild: discord.Guild):
         "When a stream starts, send a notification to the subscribed guild"
         # Send notification
-        if (channel_id := await self.bot.get_config(guild.id, "streaming_channel")) and channel_id.isnumeric():
-            if channel := guild.get_channel(int(channel_id)):
-                await self.send_stream_alert(stream, channel)
-            else:
-                self.bot.log.warn("[twitch] Channel %s not found in guild %s", channel_id, guild.id)
+        if channel := await self.bot.get_config(guild.id, "streaming_channel"):
+            await self.send_stream_alert(stream, channel)
         # Grant role
-        if (role_id := await self.bot.get_config(guild.id, "streaming_role")) and role_id.isnumeric():
-            if role := guild.get_role(int(role_id)):
-                if member := await self.find_streamer_in_guild(stream["user_name"], guild):
-                    try:
-                        await member.add_roles(role, reason="Twitch streamer is live")
-                    except discord.Forbidden:
-                        self.bot.log.info("[twitch] Cannot add role %s to member %s in guild %s: Forbidden", role_id, member.id, guild.id)
-            else:
-                self.bot.log.warn("[twitch] Role %s not found in guild %s", role_id, guild.id)
+        if role := await self.bot.get_config(guild.id, "streaming_role"):
+            if member := await self.find_streamer_in_guild(stream["user_name"], guild):
+                try:
+                    await member.add_roles(role, reason="Twitch streamer is live")
+                except discord.Forbidden:
+                    self.bot.log.info("[twitch] Cannot add role %s to member %s in guild %s: Forbidden", role.id, member.id, guild.id)
 
     @commands.Cog.listener()
     async def on_stream_ends(self, streamer_name: str, guild: discord.Guild):
         "When a stream ends, remove the role from the streamer"
-        if (role_id := await self.bot.get_config(guild.id, "streaming_role")) and role_id.isnumeric():
-            if role := guild.get_role(int(role_id)):
-                async for member in self.find_streamer_offline_in_guild(guild, role):
-                    try:
-                        await member.remove_roles(role, reason="Twitch streamer is offline")
-                    except discord.Forbidden:
-                        self.bot.log.info("[twitch] Cannot remove role %s from member %s in guild %s: Forbidden", role_id, member.id, guild.id)
-            else:
-                self.bot.log.warn("[twitch] Role %s not found in guild %s", role_id, guild.id)
+        if role := await self.bot.get_config(guild.id, "streaming_role"):
+            async for member in self.find_streamer_offline_in_guild(guild, role):
+                try:
+                    await member.remove_roles(role, reason="Twitch streamer is offline")
+                except discord.Forbidden:
+                    self.bot.log.info("[twitch] Cannot remove role %s from member %s in guild %s: Forbidden", role.id, member.id, guild.id)
 
     @tasks.loop(minutes=5)
     async def stream_check_task(self):
@@ -358,6 +349,10 @@ class Twitch(commands.Cog):
             await self._update_streams(streamer_ids)
         self.bot.log.info("[twitch] %s streamers checked", count)
 
+    @stream_check_task.error
+    async def on_stream_check_error(self, error: Exception):
+        self.bot.dispatch("error", error, "When refreshing streamers")
+
     async def _update_streams(self, streamer_ids: dict[str, _StreamersReadyForNotification]):
         streaming_user_ids: set[str] = set()
         # Check current streams
@@ -382,5 +377,5 @@ class Twitch(commands.Cog):
                 await self.db_set_streamer_status("twitch", streamer_id, False)
 
 
-async def setup(bot: Zbot):
+async def setup(bot: Axobot):
     await bot.add_cog(Twitch(bot))

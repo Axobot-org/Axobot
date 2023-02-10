@@ -15,10 +15,11 @@ from mysql.connector import connect as sql_connect
 from mysql.connector.connection import MySQLConnection
 from mysql.connector.errors import ProgrammingError
 
+from fcts.tokens import get_database_connection, get_secrets_dict
 from libs.database import create_database_query
 from libs.emojis_manager import EmojisManager
 from libs.prefix_manager import PrefixManager
-from libs.serverconfig.options_list import default_values as serverconfig_defaults
+from libs.serverconfig.options_list import options as options_list
 from libs.tasks_handler import TaskHandler
 from utils import get_prefix
 
@@ -31,7 +32,7 @@ if TYPE_CHECKING:
     from fcts.minecraft import Minecraft
     from fcts.partners import Partners
     from fcts.rss import Rss
-    from fcts.servers import Servers
+    from fcts.serverconfig import ServerConfig
     from fcts.twitch import Twitch
     from fcts.users import Users
     from fcts.utilities import Utilities
@@ -44,7 +45,7 @@ class MyContext(commands.Context):
     """Replacement for the official commands.Context class
     It allows us to add more methods and properties in the whole bot code"""
 
-    bot: 'Zbot'
+    bot: 'Axobot'
 
     @property
     def bot_permissions(self) -> discord.Permissions:
@@ -90,7 +91,7 @@ class MyContext(commands.Context):
         await self.bot.get_command("help")(self, *cmd_arg)
 
 # pylint: disable=too-many-instance-attributes
-class Zbot(commands.bot.AutoShardedBot):
+class Axobot(commands.bot.AutoShardedBot):
     """Bot class, with everything needed to run it"""
 
     def __init__(self, case_insensitive: bool = None, status: discord.Status = None, database_online: bool = True, \
@@ -109,16 +110,15 @@ class Zbot(commands.bot.AutoShardedBot):
         self.database_online = database_online  # if the mysql database works
         self.beta = beta # if the bot is in beta mode
         self.entity_id: int = 0 # ID of the bot for the statistics database
-        self.database_keys = {} # credentials for the database
+        self.database_keys = get_database_connection() # credentials for the database
         self.log = logging.getLogger("runner") # logs module
-        self.dbl_token = dbl_token # token for Discord Bot List
         self._cnx = [[None, 0], [None, 0], [None, 0]] # database connections
         self.xp_enabled: bool = True # if xp is enabled
         self.rss_enabled: bool = True # if rss is enabled
         self.alerts_enabled: bool = True # if alerts system is enabled
         self.internal_loop_enabled: bool = True # if internal loop is enabled
         self.zws = "\u200B"  # here's a zero width space
-        self.others = {} # other misc credentials
+        self.others = get_secrets_dict() # other misc credentials
         self.zombie_mode: bool = zombie_mode # if we should listen without sending any message
         self.prefix_manager = PrefixManager(self)
         self.task_handler = TaskHandler(self)
@@ -126,6 +126,10 @@ class Zbot(commands.bot.AutoShardedBot):
         # app commands
         self.tree.on_error = self.on_app_cmd_error
         self.app_commands_list: Optional[list[discord.app_commands.AppCommand]] = None
+    
+    @property
+    def dbl_token(self):
+        return self.others["dbl_zbot"] if self.entity_id == 0 else self.others["dbl_axobot"]
 
     async def on_error(self, event_method: Union[Exception, str], *_args, **_kwargs):
         "Called when an event raises an uncaught exception"
@@ -198,7 +202,7 @@ class Zbot(commands.bot.AutoShardedBot):
         ...
 
     @overload
-    def get_cog(self, name: Literal["Servers"]) -> Optional["Servers"]:
+    def get_cog(self, name: Literal["ServerConfig"]) -> Optional["ServerConfig"]:
         ...
 
     @overload
@@ -294,16 +298,16 @@ class Zbot(commands.bot.AutoShardedBot):
         def __missing__(self, key):
             return '{' + key + '}'
 
-    async def get_config(self, guild_id: int, option: str) -> Optional[str]:
+    async def get_config(self, guild_id: int, option: str):
         """Get a configuration option for a specific guild
         Fallbacks to the default values if the guild is not found"""
-        cog = self.get_cog("Servers")
+        cog = self.get_cog("ServerConfig")
         if cog:
             if self.database_online:
                 value = await cog.get_option(guild_id, option)
                 if value is not None:
                     return value
-            return serverconfig_defaults.get(option, None)
+            return options_list.get(option, {"default": None})["default"]
         return None
 
     async def get_recipient(self, channel: discord.DMChannel) -> Optional[discord.User]:

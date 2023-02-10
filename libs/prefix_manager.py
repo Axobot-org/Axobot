@@ -3,16 +3,16 @@ from typing import TYPE_CHECKING
 import discord
 from cachingutils import LRUCache
 
-from libs.serverconfig.options_list import default_values as serverconfig_defaults
+from libs.serverconfig.options_list import options as options_list
 
 if TYPE_CHECKING:
-    from libs.bot_classes import Zbot
+    from libs.bot_classes import Axobot
 
 
 class PrefixManager:
     """Manage prefixes for the bot, with cache and everything"""
 
-    def __init__(self, bot: 'Zbot'):
+    def __init__(self, bot: 'Axobot'):
         self.bot = bot
         self.cache: LRUCache[int, str] = LRUCache(max_size=1000, timeout=3600)
 
@@ -29,9 +29,7 @@ class PrefixManager:
             await self.bot.wait_until_ready()
         # if database is offline
         if not self.bot.database_online:
-            if server_cog := self.bot.get_cog("Servers"):
-                return serverconfig_defaults.get("prefix")
-            return '!'
+            return options_list["prefix"]["default"]
         # get the prefix from the database
         prefix = await self.fetch_prefix(guild.id)
         # cache it
@@ -44,10 +42,6 @@ class PrefixManager:
         # if database is offline
         if not self.bot.database_online:
             raise RuntimeError("Database is not loaded")
-        # if we can't load the server cog
-        # pylint: disable=superfluous-parens
-        if not (server_cog := self.bot.get_cog("Servers")):
-            raise RuntimeError("Server cog not loaded")
         # prepare the SQL query
         query = f"SELECT `prefix` FROM `servers` WHERE `ID` = %s AND `beta` = %s"
         # get the thing

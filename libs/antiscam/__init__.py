@@ -64,11 +64,16 @@ class AntiScamAgent:
                 return super().find_class(module, name)
         with open(os.path.dirname(__file__)+"/data/bayes_model.pkl", 'rb') as raw:
             return CustomUnpickler(raw).load()
+    
+    @staticmethod
+    def save_model_to_file(model: RandomForest):
+        "Save the model to a file"
+        with open(os.path.dirname(__file__)+"/data/bayes_model.pkl", 'wb') as raw:
+            pickle.dump(model, raw)
 
     def save_model(self, new_model: RandomForest):
         "Replace the current model with a new one"
-        with open(os.path.dirname(__file__)+"/data/bayes_model.pkl", 'wb') as raw:
-            pickle.dump(new_model, raw)
+        self.save_model_to_file(new_model)
         self.model = new_model
 
     def predict_bot(self, message: Union[Message, str]):

@@ -13,9 +13,11 @@ from contextlib import redirect_stdout
 import discord
 import speedtest
 from cachingutils import acached
-from git import Repo, exc
 from discord.ext import commands
-from libs.bot_classes import PRIVATE_GUILD_ID, SUPPORT_GUILD_ID, MyContext, Zbot
+from git import Repo, exc
+
+from docs import conf
+from libs.bot_classes import PRIVATE_GUILD_ID, SUPPORT_GUILD_ID, Axobot, MyContext
 from libs.enums import RankCardsFlag, UserFlag
 from libs.views import ConfirmView
 
@@ -33,7 +35,7 @@ def cleanup_code(content: str):
 class Admin(commands.Cog):
     """Here are listed all commands related to the internal administration of the bot. Most of them are not accessible to users, but only to the bot administrators."""
 
-    def __init__(self, bot: Zbot):
+    def __init__(self, bot: Axobot):
         self.bot = bot
         self.file = "admin"
         self.emergency_time = 15.0
@@ -244,47 +246,31 @@ class Admin(commands.Cog):
             if guild.id == 356067272730607628 and self.bot.entity_id == 0:
                 # The support server should not receive updates from Zbot but only Axobot
                 continue
-            channels = await ctx.bot.get_config(guild.id,'bot_news')
-            if channels is None or len(channels) == 0:
+            channel: typing.Optional[discord.TextChannel] = await ctx.bot.get_config(guild.id, 'bot_news')
+            if channel is None:
                 continue
-            channels = [guild.get_channel(int(x)) for x in channels.split(';') if len(x)>5 and x.isnumeric()]
-            lang = await ctx.bot.get_config(guild.id,'language')
-            if not isinstance(lang, int):
-                lang = 0
-            lang = ctx.bot.get_cog('Languages').languages[lang]
+            lang: typing.Optional[str] = await ctx.bot.get_config(guild.id, 'language')
             if lang not in self.update.keys():
                 lang = 'en'
-            mentions_str = await self.bot.get_config(guild.id,'update_mentions')
-            mentions: list[discord.Role] = []
-            if mentions_str is not None:
-                for r in mentions_str.split(';'):
-                    if not r.isnumeric():
-                        continue
-                    try:
-                        mentions.append(guild.get_role(int(r)))
-                    except discord.NotFound:
-                        pass
-                mentions = [x.mention for x in mentions if x is not None]
-            for chan in channels:
-                if chan is None:
-                    continue
-                try:
-                    await chan.send(self.update[lang]+"\n\n"+" ".join(mentions), allowed_mentions=discord.AllowedMentions(everyone=False, roles=True))
-                except Exception as e:
-                    self.bot.dispatch("error", e, ctx)
-                else:
-                    count += 1
+            mentions_roles: list[discord.Role] = await self.bot.get_config(guild.id, 'update_mentions') or []
+            mentions = " ".join(x.mention for x in mentions_roles if x is not None)
+            allowed_mentions = discord.AllowedMentions(everyone=False, roles=True)
+            try:
+                await channel.send(self.update[lang]+"\n\n"+mentions, allowed_mentions=allowed_mentions)
+            except Exception as e:
+                self.bot.dispatch("error", e, ctx)
+            else:
+                count += 1
             if guild.id == 356067272730607628:
                 fr_chan = guild.get_channel(494870602146906113)
-                if fr_chan not in channels:
-                    await fr_chan.send(self.update['fr']+"\n\n"+" ".join(mentions), allowed_mentions=discord.AllowedMentions(everyone=False, roles=True))
+                if fr_chan not in channel:
+                    await fr_chan.send(self.update['fr']+"\n\n"+mentions, allowed_mentions=allowed_mentions)
                     count += 1
 
         await ctx.send("Message envoyé dans {} salons !".format(count))
         # add changelog in the database
-        version = self.bot.get_cog('Info').bot_version
-        query = "INSERT INTO `changelogs` (`version`, `release_date`, `fr`, `en`, `beta`) VALUES (%(v)s, %(r)s, %(fr)s, %(en)s, %(b)s) ON DUPLICATE KEY UPDATE `fr` = '%(fr)s', `en` = '%(en)s';"
-        args = { 'v': version, 'r': ctx.message.created_at, 'fr': self.update['fr'], 'en': self.update['en'], 'b': self.bot.beta }
+        query = "INSERT INTO `changelogs` (`version`, `release_date`, `fr`, `en`, `beta`) VALUES (%(v)s, %(r)s, %(fr)s, %(en)s, %(b)s) ON DUPLICATE KEY UPDATE `fr` = %(fr)s, `en` = %(en)s;"
+        args = { 'v': conf.release, 'r': ctx.message.created_at, 'fr': self.update['fr'], 'en': self.update['en'], 'b': self.bot.beta }
         async with self.bot.db_query(query, args):
             pass
         for k in self.update.keys():
@@ -401,7 +387,7 @@ class Admin(commands.Cog):
         if self.bot.database_online:
             i = 0
             for x in self.bot.guilds:
-                if await self.bot.get_cog("Servers").update_memberChannel(x):
+                if await self.bot.get_cog("ServerConfig").update_memberChannel(x):
                     i += 1
             await ctx.send(f"{i} salons mis à jours !")
         else:
@@ -409,12 +395,15 @@ class Admin(commands.Cog):
 
     @main_msg.command(name="config")
     @commands.check(checks.is_bot_admin)
-    async def admin_sconfig_see(self, ctx: MyContext, guild: discord.Guild, option=None):
+    async def admin_sconfig_see(self, ctx: MyContext, guild: discord.Guild, option: typing.Optional[str]=None):
         """Affiche les options d'un serveur"""
         if not ctx.bot.database_online:
             await ctx.send("Impossible d'afficher cette commande, la base de donnée est hors ligne :confused:")
             return
-        await self.bot.get_cog("Servers").send_see(guild, ctx, option, ctx.message)
+        if option is None:
+            await self.bot.get_cog("ServerConfig").send_all_config(guild, ctx)
+        else:
+            await self.bot.get_cog("ServerConfig").send_specific_config(guild, ctx, option)
 
     @main_msg.group(name="database", aliases=["db"])
     @commands.check(checks.is_bot_admin)
@@ -437,8 +426,8 @@ class Admin(commands.Cog):
                 await self.add_success_reaction(ctx.message)
             if xp := self.bot.get_cog("Xp"):
                 await xp.reload_sus()
-            if servers := self.bot.get_cog("Servers"):
-                await servers.clear_cache()
+            if serverconfig := self.bot.get_cog("ServerConfig"):
+                await serverconfig.clear_cache()
 
     @admin_db.command(name="biggest-tables")
     @commands.check(checks.is_bot_admin)
@@ -528,9 +517,9 @@ class Admin(commands.Cog):
     @commands.check(checks.is_bot_admin)
     async def add_ignoring(self, ctx: MyContext, target_id: int):
         """Ajoute un serveur ou un utilisateur dans la liste des utilisateurs/serveurs ignorés"""
-        scog = ctx.bot.get_cog('Servers')
-        if scog is None:
-            await ctx.send("Unable to find Servers cog")
+        utils = ctx.bot.get_cog('Utilities')
+        if utils is None:
+            await ctx.send("Unable to find Utilities cog")
             return
         config = await ctx.bot.get_cog('Utilities').get_bot_infos()
         if config is None:
@@ -545,21 +534,21 @@ class Admin(commands.Cog):
             servs: list[str] = config['banned_guilds'].split(';')
             if str(target) in servs:
                 servs.remove(str(target))
-                await scog.edit_bot_infos(self.bot.user.id,[('banned_guilds',';'.join(servs))])
+                await utils.edit_bot_infos(self.bot.user.id,[('banned_guilds',';'.join(servs))])
                 await ctx.send("Le serveur {} n'est plus blacklisté".format(target.name))
             else:
                 servs.append(str(target.id))
-                await scog.edit_bot_infos(self.bot.user.id,[('banned_guilds',';'.join(servs))])
+                await utils.edit_bot_infos(self.bot.user.id,[('banned_guilds',';'.join(servs))])
                 await ctx.send("Le serveur {} a bien été blacklist".format(target.name))
         else:
             usrs: list[str] = config['banned_users'].split(';')
             if str(target.id) in usrs:
                 usrs.remove(str(target.id))
-                await scog.edit_bot_infos(self.bot.user.id,[('banned_users',';'.join(usrs))])
+                await utils.edit_bot_infos(self.bot.user.id,[('banned_users',';'.join(usrs))])
                 await ctx.send("L'utilisateur {} n'est plus blacklisté".format(target))
             else:
                 usrs.append(str(target.id))
-                await scog.edit_bot_infos(self.bot.user.id,[('banned_users',';'.join(usrs))])
+                await utils.edit_bot_infos(self.bot.user.id,[('banned_users',';'.join(usrs))])
                 await ctx.send("L'utilisateur {} a bien été blacklist".format(target))
         ctx.bot.get_cog('Utilities').config = None
 
@@ -859,7 +848,7 @@ Cette option affecte tous les serveurs"""
             return
         msg = await ctx.send("Début de l'analyse...")
         s = speedtest.Speedtest()
-        s.get_servers([])
+        s.get_servers()
         s.get_best_server()
         s.download()
         s.upload(pre_allocate=False)

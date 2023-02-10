@@ -1,22 +1,24 @@
 import asyncio
+import datetime
 import importlib
 import time
 from typing import Optional, Union
 
 import aiohttp
 import discord
-from discord.ext import commands
+from discord.ext import commands, tasks
 
 from . import args, checks
 
 importlib.reload(args)
 importlib.reload(checks)
-from libs.bot_classes import MyContext, Zbot
+from libs.bot_classes import Axobot, MyContext
 
+utc = datetime.timezone.utc
 
 class Partners(commands.Cog):
 
-    def __init__(self, bot: Zbot):
+    def __init__(self, bot: Axobot):
         self.bot = bot
         self.file = 'partners'
         self.table = 'partners_beta' if bot.beta else 'partners'
@@ -24,6 +26,41 @@ class Partners(commands.Cog):
     @commands.Cog.listener()
     async def on_ready(self):
         self.table = 'partners_beta' if self.bot.beta else 'partners'
+    
+    async def cog_load(self):
+        self.refresh_loop.start()
+    
+    async def cog_unload(self):
+        self.refresh_loop.cancel()
+    
+    @tasks.loop(time=[
+        datetime.time(hour=7, tzinfo=utc),
+        datetime.time(hour=14, tzinfo=utc),
+        datetime.time(hour=21, tzinfo=utc)
+    ], reconnect=True)
+    async def refresh_loop(self):
+        await self.bot.wait_until_ready()
+        t = time.time()
+        channels = await self.get_partners_channels()
+        self.bot.log.info(f"[Partners] Reloading channels ({len(channels)} planned guilds)...")
+        count = [0,0]
+        for channel in channels:
+            try:
+                count[0] += 1
+                count[1] += await self.update_partners(channel)
+            except Exception as err:
+                self.bot.dispatch("error", err)
+        delta_time = round(time.time()-t,3)
+        emb = discord.Embed(
+            description=f'**Partners channels updated** in {delta_time}s ({count[0]} channels - {count[1]} partners)',
+            color=10949630,
+            timestamp=self.bot.utcnow())
+        emb.set_author(name=self.bot.user, icon_url=self.bot.user.display_avatar)
+        await self.bot.send_embed(emb, url="loop")
+    
+    @refresh_loop.error
+    async def on_refresh_loop_error(self, error):
+        self.bot.dispatch("error", error, "When refreshing partners channels")
 
     async def generate_id(self):
         return round(time.time()/2)
@@ -116,7 +153,7 @@ class Partners(commands.Cog):
         """Get the guilds count of a bot
         None if unknown bot/count not provided"""
         db_count = await self.db_get_bot_guilds(bot_id)
-        async with session.get('https://top.gg/api/bots/{}/stats'.format(bot_id), headers={'Authorization':str(self.bot.dbl_token)}) as resp:
+        async with session.get('https://top.gg/api/bots/{}/stats'.format(bot_id), headers={'Authorization': self.bot.dbl_token}) as resp:
             ans: dict = await resp.json()
         if 'server_count' in ans:
             api_count: int = ans['server_count']
@@ -128,7 +165,7 @@ class Partners(commands.Cog):
     async def get_bot_owners(self, bot_id:int, session:aiohttp.ClientSession) -> list[Union[discord.User, int]]:
         """Get the owners list of a bot
         Empty list if unknown bot/owners not provided"""
-        async with session.get('https://top.gg/api/bots/{}'.format(bot_id), headers={'Authorization':str(self.bot.dbl_token)}) as resp:
+        async with session.get('https://top.gg/api/bots/{}'.format(bot_id), headers={'Authorization': self.bot.dbl_token}) as resp:
             ans: dict = await resp.json()
         owners = list()
         if 'owners' in ans:
@@ -138,6 +175,13 @@ class Partners(commands.Cog):
                 except discord.NotFound:
                     owners.append(o)
         return owners
+    
+    async def get_partners_channels(self):
+        channels: list[discord.abc.GuildChannel] = []
+        for guild in self.bot.guilds:
+            if channel := await self.bot.get_config(guild.id, "partner_channel"):
+                channels.append(channel)
+        return channels
 
     async def update_partners(self, channel: discord.TextChannel, color: Optional[int] = None) -> int:
         """Update every partners of a channel"""
@@ -156,7 +200,7 @@ class Partners(commands.Cog):
         tr_owner = await self.bot._(channel.guild.id, 'info.info.guild-1')
         count = 0
         if color is None:
-            color = await self.bot.get_config(channel.guild.id,'partner_color')
+            color = await self.bot.get_config(channel.guild.id, "partner_color")
         session = aiohttp.ClientSession(loop=self.bot.loop)
         for partner in partners:
             target_desc = partner['description']
@@ -230,8 +274,8 @@ class Partners(commands.Cog):
         except discord.NotFound as err:
             raise err
         image = str(inv.guild.icon) if inv.guild.icon else None
-        if isinstance(inv, discord.Invite) and not inv.revoked:
-            title += inv.guild.name
+        if isinstance(inv, discord.Invite) and not inv.revoked and inv.guild:
+            title += str(inv.guild.name)
             field1 = {'name': tr_members.capitalize(), 'value': str(
                 inv.approximate_member_count)}
             await self.give_roles(inv, channel.guild)
@@ -241,7 +285,7 @@ class Partners(commands.Cog):
         field2 = {'name': tr_invite.capitalize(
         ), 'value': '[{}](https://discord.gg/{})'.format(tr_click.capitalize(), partner['target'])}
         if len(target_desc) == 0:
-            target_desc = await self.bot.get_config(inv.guild.id, 'description')
+            target_desc: Optional[str] = await self.bot.get_config(inv.guild.id, 'description')
         return title, (field1, field2), image, target_desc
 
     async def give_roles(self,invite:discord.Invite,guild:discord.Guild):
@@ -250,19 +294,18 @@ class Partners(commands.Cog):
             return
         if guild.id == 356067272730607628 and self.bot.beta:
             return
-        roles = await self.bot.get_config(guild.id,'partner_role')
-        roles = (guild.get_role(int(x)) for x in roles.split(';') if len(x) > 0 and x.isnumeric())
-        roles = (x for x in roles if x is not None)
+        role = await self.bot.get_config(guild.id, 'partner_role')
+        if role is None:
+            return
         admins = [x for x in invite.guild.members if not x.bot and x.guild_permissions.administrator]
         for admin in admins:
             if admin in guild.members:
                 member = guild.get_member(admin.id)
-                for role in roles:
-                    if role not in member.roles:
-                        try:
-                            await member.add_roles(role)
-                        except (discord.HTTPException, discord.Forbidden):
-                            pass
+                if role not in member.roles:
+                    try:
+                        await member.add_roles(role)
+                    except discord.HTTPException:
+                        pass
 
 
     @commands.group(name="partner",aliases=['partners'])
@@ -440,7 +483,7 @@ class Partners(commands.Cog):
             f[1] = await self.bot._(ctx.guild.id, "partners.no-partner-2")
         fields_name = await self.bot._(ctx.guild.id, "partners.partners-list")
         if ctx.can_send_embed:
-            color = await ctx.bot.get_config(ctx.guild.id,'partner_color')
+            color = await ctx.bot.get_config(ctx.guild.id, "partner_color")
             emb = discord.Embed(title=fields_name[0], color=color, timestamp=self.bot.utcnow())
             if ctx.guild.icon:
                 emb.set_thumbnail(url=ctx.guild.icon)
@@ -473,19 +516,11 @@ class Partners(commands.Cog):
         
         ..Doc server.html#reload-your-list"""
         msg = await ctx.send(await self.bot._(ctx.guild, "rss.guild-loading", emoji=self.bot.emojis_manager.customs['loading']))
-        channel = await self.bot.get_cog('Servers').get_server(criters=[f"`ID`={ctx.guild.id}"],columns=['partner_channel','partner_color'])
-        if len(channel) == 0:
+        channel: Optional[discord.abc.GuildChannel] = await self.bot.get_config(ctx.guild.id, "partner_channel")
+        if channel is None:
             return await msg.edit(content=await self.bot._(ctx.guild, "partners.no-channel"))
-        chan: str = channel[0]['partner_channel'].split(';')[0]
-        if not chan.isnumeric():
-            return await msg.edit(content=await self.bot._(ctx.guild, "partners.no-channel"))
-        chan = ctx.guild.get_channel_or_thread(int(chan))
-        if chan is None:
-            return await msg.edit(content=await self.bot._(ctx.guild, "partners.no-channel"))
-        count = await self.update_partners(chan,channel[0]['partner_color'])
+        count = await self.update_partners(channel)
         await msg.edit(content=await self.bot._(ctx.guild, "partners.reloaded", count=count))
-
-
 
 
 async def setup(bot):

@@ -78,7 +78,7 @@ List of every option
 * poll_channels: List of channels in which the bot will add the reactions 👍 and 👎 to each message
 * enable_xp: Boolean indicating whether the xp system is activated. Default is :code:`True`.
 * levelup_msg: Message to send when someone reaches a new XP level. You can use :code:`{level}` variable to include the reached level, and :code:`{user}` to mention the user (or `{username}` if you only want the name). Default is a random sentence.
-* levelup_channel: Channel where the bot will send every levelup announcement message. It can be either a text channel, or "none" for no channel (Zbot won't send any levelup channel), or "any" if you want it in the same channel as the message. Default to any.
+* levelup_channel: Channel where the bot will send every levelup announcement message. It can be either a text channel, or "none" for no channel (Axobot won't send any levelup channel), or "any" if you want it in the same channel as the message. Default to any.
 * xp_rate: Exp modifier, which multiplies the gain of xp by this number. It must be between 0.1 and 3, rounded to the nearest 1/100.
 * xp_type: Type of XP system to use: :code:`global` if you want to use the accross-server system, common with every other servers which use it, or :code:`local` if you want a more private system. There is also a :code:`mee6-like` system, which uses the same rules as the MEE6 bot, and is also local. Default to :code:`global`.
 * noxp_channels: List of text channels where members will not be able to earn any exp. Not necessary if XP is disabled in your server.
@@ -90,7 +90,7 @@ List of every option
 * morpion_emojis: List of emojis used to play on tic-tac-toe. Two emojis must be entered: one for the bot, and one for the player. Discord emojis as well as server emojis can work.
 * help_in_dm: Boolean indicating whether the help command message should be sent as a private message, or in the server. If the value is set to :code:`True`, the message will be sent in DM.
 * compress_help: Boolean indicating whether the full help message (without any specified command/module) should show every command or only their count
-* muted_role: Role used to mute your members. If no role is specified, Zbot will check for any role called "muted", and create one if needed, with basic permissions.
+* muted_role: Role used to mute your members. If no role is specified, Axobot will check for any role called "muted", and create one if needed, with basic permissions.
 * partner_channel: One channel where every partners of the server will be displayed. Default to None.
 * partner_color: The color of the partners embeds. Can be hex, integer or common english names. Default to #a713fe.
 * partner_role: A role given to every administrator of a partner server. Default to None.
@@ -118,11 +118,11 @@ There are several ways to customize your xp system. In particular, you have 4 `c
 
 - **Change the levelup message:** the bot automatically uses a long list of random messages for your members' level changes, but you can put a single one written by you via the option :code:`levelup_msg`. It is up to you to use then :code:`{user}` to mention the member, :code:`{level}` for his level and :code:`{username}` for his simple name (without notifications).
 
-- **Select the type of xp:** there are natively three different xp systems at Zbot, modifiable with the option :code:`xp_type`: a :code:`global`, in common with all servers using this system (default), a :code:`local` respecting the same calculations but without synchronization between the servers, and a :code:`mee6-like` which uses the same rules as the famous `MEE6 bot <https://mee6.xyz/?zbot>`__.
+- **Select the type of xp:** there are natively three different xp systems at Axobot, modifiable with the option :code:`xp_type`: a :code:`global`, in common with all servers using this system (default), a :code:`local` respecting the same calculations but without synchronization between the servers, and a :code:`mee6-like` which uses the same rules as the famous MEE6 bot.
 
 - **Change the gain rate of xp:** if you find that your members are not earning xp fast enough (or too fast), or if you want to make a special event xp for a limited time, you can add a gain modifier between x0.1 and x3, which will multiply by its value each point of xp earned. Not usable for the global xp system, of course. Option name: :code:`xp_rate`.
 
-- **Prevent xp in some channels:** although Zbot prevents people from earning xp with its commands, it cannot detect commands from other bots. So you can prevent your members from earning xp in certain channels via the :code:`noxp_channels` option, which contains a list of all channels where your users can't have any experience points.
+- **Prevent xp in some channels:** although Axobot prevents people from earning xp with its commands, it cannot detect commands from other bots. So you can prevent your members from earning xp in certain channels via the :code:`noxp_channels` option, which contains a list of all channels where your users can't have any experience points.
 
 - **Select a channel where to send levelup messages:** sometimes levelup messages can be a bit spammy. So you have an option to select a single channel where to send level up messages. It is also possible to disable these messages via the same option. Enter the command :code:`config change levelup_channel` followed by the name of your channel, or "none" to disable the message.
 
@@ -143,16 +143,16 @@ The main command to manage these roles is :code:`roles_rewards` (or its alias :c
 
 * :code:`roles_rewards list` : lists all currently configured roles-rewards, with their corresponding level, as well as the maximum number of roles allowed for your server. The bot must have "`Embed Links <perms.html#embed-links>`__" permission.
 
-.. warning:: For these roles to work properly, the bot **must** have "`Manage roles <perms.html#manage-roles>`__" permission. The roles to be given or removed **must** also be lower than the role of Zbot in your server hierarchy (Server Settings > Roles tab).
+.. warning:: For these roles to work properly, the bot **must** have "`Manage roles <perms.html#manage-roles>`__" permission. The roles to be given or removed **must** also be lower than the role of Axobot in your server hierarchy (Server Settings > Roles tab).
 
 
 ---------------
 Partners system
 ---------------
 
-As a server grows, it is not uncommon to see partnerships formed with other servers. Some may even partner with bots. Zbot therefore offers a system to manage these partnerships in a clean and automatic way. Thanks to this system you can add, edit or remove partners in a few commands, and they will all be displayed in the same place, with the main information about them.
+As a server grows, it is not uncommon to see partnerships formed with other servers. Some may even partner with bots. Axobot therefore offers a system to manage these partnerships in a clean and automatic way. Thanks to this system you can add, edit or remove partners in a few commands, and they will all be displayed in the same place, with the main information about them.
 
-This information on partners is refreshed every 7 hours, starting at 1am (Paris time). It is currently impossible to reload the list yourself, only a Zbot administrator can do so.
+This information on partners is refreshed every 7 hours, starting at 1am (Paris time). It is currently impossible to reload the list yourself, only a Axobot administrator can do so.
 
 
 Add a partner
@@ -184,7 +184,7 @@ Change a server invite
 
 **Syntax:** :code:`partner invite <ID> [new invite]`
 
-It often happens that for X reason an invitation becomes invalid. Problem: Zbot uses the partner invitation to synchronize partners with the channel. There is therefore a command to quickly change the invitation of a server. 
+It often happens that for X reason an invitation becomes invalid. Problem: Axobot uses the partner invitation to synchronize partners with the channel. There is therefore a command to quickly change the invitation of a server. 
 
 .. note:: If no new invitation is given in the command, the bot will send you the one currently in use.
 
@@ -218,7 +218,7 @@ Allows you to remove a partner from the list. You will be asked for a confirmati
 Server backup
 -------------
 
-Zbot has a system to backup your server, saving your roles, channels, emojis, webhooks, icons, permissions, and much more. You will also find in this file the list of members and their permissions, although Zbot is not able to reinvite members if needed.  
+Axobot has a system to backup your server, saving your roles, channels, emojis, webhooks, icons, permissions, and much more. You will also find in this file the list of members and their permissions, although Axobot is not able to reinvite members if needed.  
 This backup will avoid the most important damage, those little mistakes that can destroy your server as I myself experienced a few years ago. I hope to be able to save what is important to you.
 
 When you load the backup, the bot may not be able to apply some changes. However, it will give you a complete list of what has and hasn't been changed so that you can fix it yourself.
@@ -237,7 +237,7 @@ Load a backup
 
 **Syntax:** :code:`backup load`
 
-Uses the file attached to this message to load a backup, based on the data stored in the file. Be sure to send the file in the same message as the command, so that Zbot can easily find it. If the bot lacks permissions, it will try to skip this step and write it down in the logs. The set of logs is then sent at the end of the procedure.
+Uses the file attached to this message to load a backup, based on the data stored in the file. Be sure to send the file in the same message as the command, so that Axobot can easily find it. If the bot lacks permissions, it will try to skip this step and write it down in the logs. The set of logs is then sent at the end of the procedure.
 
 
 ------------------------
@@ -260,7 +260,7 @@ To do that, you only need to configure a special voice channel where every membe
 
 Then, the bot needs to know where it should create these new channels. A simple :code:`config change voice_category <your category>` will ask the bot to create its new channels at the bottom of a specific category.
 
-Zbot will take a random name for each new channel, from a random names API, but you can change the name format with the :code:`config change voice_channel_format <new format>` command. Several special keywords exists so you can get some unique names, feel free to use them in your format:
+Axobot will take a random name for each new channel, from a random names API, but you can change the name format with the :code:`config change voice_channel_format <new format>` command. Several special keywords exists so you can get some unique names, feel free to use them in your format:
 
 * :code:`{random}` inserts a random surname from randommer.io
 * :code:`{minecraft}` inserts a random minecraft entity name
@@ -269,11 +269,11 @@ Zbot will take a random name for each new channel, from a random names API, but 
 
 If you have more ideas of variables to add, you can suggest them in our Discord support server!
 
-.. warning:: Zbot needs the "`Manage channels <perms.html#manage-channels>`__", "`Move members <perms.html#move-members>`__" and "`Connect <perms.html#connect>`__" permissions in the selected category to create these news channels!
+.. warning:: Axobot needs the "`Manage channels <perms.html#manage-channels>`__", "`Move members <perms.html#move-members>`__" and "`Connect <perms.html#connect>`__" permissions in the selected category to create these news channels!
 
 Clear your unusued auto channels
 --------------------------------
 
-Zbot will try to delete the channels automatically created once everyone left it. But if, for any reason, you still have some unusued auto voice channels, you can use the super :code:`voice-clean` command to start a big cleanup!
+Axobot will try to delete the channels automatically created once everyone left it. But if, for any reason, you still have some unusued auto voice channels, you can use the super :code:`voice-clean` command to start a big cleanup!
 
 .. note:: Aynone with "`Manage channels <perms.html#manage-channels>`__" permission can use that command!

@@ -1,3 +1,4 @@
+from collections import defaultdict
 from datetime import datetime
 import math
 import re
@@ -9,7 +10,7 @@ import psutil
 import discord
 from discord.ext import commands, tasks
 from fcts.tickets import TicketCreationEvent
-from libs.bot_classes import MyContext, Zbot
+from libs.bot_classes import MyContext, Axobot
 from libs.enums import ServerWarningType, UsernameChangeRecord
 
 try:
@@ -28,7 +29,7 @@ async def get_ram_data():
 class BotStats(commands.Cog):
     """Hey, I'm a test cog! Happy to meet you :wave:"""
 
-    def __init__(self, bot: Zbot):
+    def __init__(self, bot: Axobot):
         self.bot = bot
         self.file = 'bot_stats'
         self.received_events = {'CMD_USE': 0}
@@ -115,7 +116,7 @@ class BotStats(commands.Cog):
     @commands.Cog.listener()
     async def on_username_change_record(self, event: UsernameChangeRecord):
         "Called when a user change their username/nickname"
-        if event.is_guild:
+        if event.is_in_guild:
             self.usernames["guild"] += 1
         else:
             self.usernames["user"] += 1
@@ -246,21 +247,27 @@ class BotStats(commands.Cog):
 
     async def db_record_serverlogs_enabled(self, now: datetime):
         "Record into the stats table the number of enabled serverlogs, grouped by kind"
-        args = (0, "logs", False, self.bot.entity_id)
-        query = """INSERT INTO `statsbot`.`zbot`
-            SELECT %s, CONCAT("logs.", `kind`, ".enabled"), COUNT(*), %s, %s, %s, %s
-            FROM `serverlogs`
-            GROUP BY `kind`"""
-        async with self.bot.db_query(query, (now, *args)) as _:
-            pass
+        guild_ids = {guild.id for guild in self.bot.guilds}
+        query = """SELECT guild, kind FROM `serverlogs` WHERE `beta` = %s"""
+        async with self.bot.db_query(query, (self.bot.beta,)) as query_results:
+            enabled_kinds = defaultdict(int)
+            for row in query_results:
+                if row["guild"] in guild_ids:
+                    enabled_kinds[row["kind"]] += 1
+        query = "INSERT INTO `statsbot`.`zbot` VALUES (%s, %s, %s,  0,\"logs\", 0, %s);"
+        return ((query, (now, f"logs.{kind}.enabled", count, self.bot.entity_id))
+            for kind, count in enabled_kinds.items()
+        )
+            
 
     async def db_get_antiscam_enabled_count(self):
         "Get the number of active guilds where antiscam is enabled"
         query = f"SELECT `ID` FROM `servers` WHERE `anti_scam` = 1"
         count = 0
+        guild_ids = {guild.id for guild in self.bot.guilds}
         async with self.bot.db_query(query) as query_results:
             for row in query_results:
-                if row["ID"] in self.bot.guilds:
+                if row["ID"] in guild_ids:
                     count += 1
         return count
 
@@ -351,7 +358,8 @@ class BotStats(commands.Cog):
                 # Events points
                 await self.db_record_eventpoints_values(now)
             # serverlogs
-            await self.db_record_serverlogs_enabled(now)
+            for serverlogs_query in await self.db_record_serverlogs_enabled(now):
+                cursor.execute(*serverlogs_query)
             for k, v in self.emitted_serverlogs.items():
                 cursor.execute(query, (now, f'logs.{k}.emitted', v, 0, 'event/min', True, self.bot.entity_id))
             self.emitted_serverlogs.clear()
@@ -408,13 +416,6 @@ class BotStats(commands.Cog):
                 response.raise_for_status()
                 self.bot.log.debug(
                     f"StatusPage API returned {response.status} for {params} (latency)")
-            params["data"]["value"] = psutil.virtual_memory().available
-            async with session.post(
-                "https://api.statuspage.io/v1/pages/g9cnphg3mhm9/metrics/72bmf4nnqbwb/data",
-                    json=params) as response:
-                response.raise_for_status()
-                self.bot.log.debug(
-                    f"StatusPage API returned {response.status} for {params} (available RAM)")
 
     @status_loop.before_loop
     async def before_status_loop(self):

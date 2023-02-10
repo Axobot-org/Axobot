@@ -14,29 +14,6 @@
     },
     "see-0": "Enter `!config help` for more details",
     "see-title": "%{guild} server configuration",
-    "set_success": {
-        "int": "The %{opt} has been set to %{val}",
-        "float": "The %{opt} has been set to %{val}",
-        "boolean": {
-            "true": "The %{opt} option has been activated",
-            "false": "The %{opt} option has been deactivated"
-        },
-        "enum": "The %{opt} option has been set to %{val}",
-        "text": "The text option %{opt} has been set to \"%{val}\"",
-        "role": "The %{opt} option has been set  to the role %{val}",
-        "roles_list": "The %{opt} option has been set to the roles %{val}",
-        "text_channel": "The %{opt} option has been set to the channel %{val}",
-        "text_channels_list": "The %{opt} option has been set to the channels %{val}",
-        "voice_channel": "The %{opt} option has been set to the voice channel %{val}",
-        "category": "The '%{opt}' option has been set to the \"%{val}\" category",
-        "emojis_list": "The %{opt} option has been set to the emojis %{val}",
-        "color": "%{opt} will now use the color %{val}",
-        "levelup_channel": {
-            "any": "Levelup messages will now be posted directly in the chat",
-            "channel": "Levelup messages will now be sent to %{val}",
-            "none": "Levelup messages won't be sent anymore"
-        }
-    },
     "set_error": {
         "BOOLEAN_INVALID": "The value must be \"true\" or \"false\"",
         "CATEGORY_INVALID": "You have to provide a valid category for this option",
@@ -61,6 +38,29 @@
         "ROLE_INTEGRATED": "You cannot use an integrated role for this option",
         "ROLE_INVALID": "%{input} is not a valid role",
         "text_err": "The text of this option must be between %{min} and %{max} characters long"
+    },
+    "set_success": {
+        "int": "The %{opt} has been set to %{val}",
+        "float": "The %{opt} has been set to %{val}",
+        "boolean": {
+            "true": "The %{opt} option has been activated",
+            "false": "The %{opt} option has been deactivated"
+        },
+        "enum": "The %{opt} option has been set to %{val}",
+        "text": "The text option %{opt} has been set to \"%{val}\"",
+        "role": "The %{opt} option has been set to the role %{val}",
+        "roles_list": "The %{opt} option has been set to the roles %{val}",
+        "text_channel": "The %{opt} option has been set to the channel %{val}",
+        "text_channels_list": "The %{opt} option has been set to the channels %{val}",
+        "voice_channel": "The %{opt} option has been set to the voice channel %{val}",
+        "category": "The '%{opt}' option has been set to the \"%{val}\" category",
+        "emojis_list": "The %{opt} option has been set to the emojis %{val}",
+        "color": "%{opt} will now use the color %{val}",
+        "levelup_channel": {
+            "any": "Levelup messages will now be posted directly in the chat",
+            "channel": "Levelup messages will now be sent to %{val}",
+            "none": "Levelup messages won't be sent anymore"
+        }
     },
     "server_desc": {
         "anti_caps_lock": "Should I send a message when a member sends too many capital letters? %{value}",

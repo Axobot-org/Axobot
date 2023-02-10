@@ -1,3 +1,4 @@
+:orphan:
 :og:description: A translated version of the Zbot privacy policy
 
 ==============
@@ -31,15 +32,19 @@ We use your data to provide and improve the Service. By using the Service, you c
 --------------
 
 * **Service**
+
 By Service we mean the additional functionalities brought by ZBot in the use of the Discord platform, all detailed in the documentation available at https://zbot.readthedocs.io/.
 
 * **Discord or Discord Platform**
+
 Discord is a service providing a chat function and a social platform accessible at https://discord.com. All the rights and conditions of use of this platform are available at the same address.
 
 * **Personal Data**
+
 Personal Data means data about a living individual who can be identified from such data (or from such data and other information in our possession or likely to come into our possession).
 
 * **Usage Data**
+
 Usage Data is collected automatically and is generated either through the use of the Service, or on a voluntary basis by the Users of the Service (e.g. Service configuration, usage statistics).
 
 

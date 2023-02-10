@@ -14,7 +14,7 @@ from libs import blurple
 from libs.blurple import convert_image, check_image
 from libs.formatutils import FormatUtils
 importlib.reload(blurple)
-from libs.bot_classes import Zbot, MyContext
+from libs.bot_classes import Axobot, MyContext
 
 
 class LinkConverter(commands.Converter):
@@ -63,7 +63,7 @@ async def get_url_from_ctx(ctx: MyContext, who: typing.Union[discord.Member, dis
 class Blurplefy(Cog):
     "Class used to make things blurple, for the Discord birthday event"
 
-    def __init__(self, bot: Zbot):
+    def __init__(self, bot: Axobot):
         self.bot = bot
         self.file = "blurple"
         self.hourly_reward = [4, 20]
