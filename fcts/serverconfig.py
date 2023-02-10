@@ -473,7 +473,7 @@ class ServerConfig(commands.Cog):
         await self.set_option(ctx.guild.id, option_name, value)
         await ctx.send(await self._get_set_success_message(ctx, option_name, value))
         # Send internal log
-        msg = f"Changed option in server {ctx.guild.id}: {option_name} = `{value}`"
+        msg = f"Changed option in server {ctx.guild.id}: {option_name} = `{to_raw(option_name, value)}`"
         emb = discord.Embed(description=msg, color=self.log_color, timestamp=self.bot.utcnow())
         emb.set_footer(text=ctx.guild.name)
         emb.set_author(name=self.bot.user, icon_url=self.bot.user.display_avatar)
