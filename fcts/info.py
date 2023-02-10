@@ -1087,9 +1087,10 @@ Available types: member, role, user, emoji, channel, server, invite, category
             c = "`{}`\n{}".format(channel.name,channel.id)
         else:
             c = "Unknown ({})".format(feed.channel_id)
-        d = f"<t:{feed.date.timestamp():.0f}>"
-        if d is None or len(d) == 0:
+        if feed.date is None:
             d = "never"
+        else:
+            d = f"<t:{feed.date.timestamp():.0f}>"
         if interaction.guild is None:
             color = None
         else:
