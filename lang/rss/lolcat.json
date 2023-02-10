@@ -74,6 +74,7 @@
     "tw-default-flow": "{logo}  | New tweat for {author}! ({date})\n\n{title}\n\nLink: {link}\n\n{mentions}",
     "tw-form-last": "{logo}  |  Hre is teh last twit of {author}:\nWritten on {date}\n\n{title}\n\nZelda : {url}\n",
     "tw-help": "To seerch 4 a twittr acount, you must entr the identifierz of this accounT. You would find it at the end from the strin url plz, it usualy corrresponds to the uer'z naym. For ex:a:mple, for %https://twitter.com/Mc_AsiliS*, u must entr `Mc_AsiliS`.",
+    "tw-no-tweet": "Oops, looks like dis user has no tweet :confused:",
     "twitch": "Twich",
     "twitch-default-flow": "{logo}  | Mew live by {author}! ({date})\n\n{title}\n\nLink: {link}\n\n{mentions}",
     "twitch-form-last": "{logo}  | Hir iz the last video ov {author}:\n{title}\nShown on {date}\nLink : {url}\n",
