@@ -284,7 +284,7 @@ class Errors(commands.Cog):
                 recipient = await self.bot.get_recipient(ctx.channel)
                 context = f"DM | {recipient}"
             elif isinstance(ctx, discord.Interaction):
-                context = f"Slash command `{ctx.command.name if ctx.command else None}` | {ctx.guild.name} | {ctx.channel.name}"
+                context = f"Slash command `{ctx.command.qualified_name if ctx.command else None}` | {ctx.guild.name} | {ctx.channel.name}"
             else:
                 context = f"{ctx.guild.name} | {ctx.channel.name}"
             # if channel is the private beta channel, send it there
