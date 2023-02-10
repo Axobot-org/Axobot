@@ -116,7 +116,7 @@ class BotStats(commands.Cog):
     @commands.Cog.listener()
     async def on_username_change_record(self, event: UsernameChangeRecord):
         "Called when a user change their username/nickname"
-        if event.is_guild:
+        if event.is_in_guild:
             self.usernames["guild"] += 1
         else:
             self.usernames["user"] += 1
