@@ -356,8 +356,9 @@ class ServerLogs(commands.Cog):
             )
             if msg is not None:
                 emb.set_author(name=str(msg.author), icon_url=msg.author.display_avatar)
-                emb.add_field(name="Created at", value=f"<t:{msg.created_at.timestamp():.0f}>")
                 emb.add_field(name="Message Author", value=f"{msg.author} ({msg.author.id})")
+            created_at = discord.utils.snowflake_time(payload.message_id)
+            emb.add_field(name="Created at", value=f"<t:{created_at.timestamp():.0f}>")
             await self.validate_logs(guild, channel_ids, emb, "message_delete")
         # ghost_ping
         if payload.cached_message is not None and (channel_ids := await self.is_log_enabled(payload.guild_id, "ghost_ping")):
