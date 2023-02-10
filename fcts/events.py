@@ -125,7 +125,8 @@ class Events(commands.Cog):
             self.bot.dispatch("username_change_record", UsernameChangeRecord(
                 before or None,
                 after or None,
-                after
+                is_in_guild=guild_id != 0,
+                user=self.bot.get_user(user_id)
             ))
 
 
