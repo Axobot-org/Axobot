@@ -2,13 +2,13 @@ from typing import Callable, Optional, Union
 
 import discord
 
-from libs.bot_classes import Zbot
+from libs.bot_classes import Axobot
 
 
 class ConfirmView(discord.ui.View):
     "A simple view used to confirm an action"
 
-    def __init__(self, bot: Zbot, ctx, validation: Callable[[discord.Interaction], bool], ephemeral: bool=True,
+    def __init__(self, bot: Axobot, ctx, validation: Callable[[discord.Interaction], bool], ephemeral: bool=True,
             timeout: int=60, send_confirmation: bool=True):
         super().__init__(timeout=timeout)
         self.value: Optional[bool] = None

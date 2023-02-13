@@ -18,7 +18,7 @@ from discord.ext import commands
 from discord.ext.commands.converter import run_converters
 from docs import conf
 from libs import bitly_api
-from libs.bot_classes import PRIVATE_GUILD_ID, MyContext, Zbot
+from libs.bot_classes import PRIVATE_GUILD_ID, MyContext, Axobot
 from libs.formatutils import FormatUtils
 from libs.rss.rss_general import FeedObject
 from utils import count_code_lines
@@ -39,7 +39,7 @@ async def in_support_server(ctx):
 class Info(commands.Cog):
     "Here you will find various useful commands to get information about anything"
 
-    def __init__(self, bot: Zbot):
+    def __init__(self, bot: Axobot):
         self.bot = bot
         self.file = "info"
         self.bot_version = conf.release + ('a' if bot.beta else '')
@@ -84,11 +84,7 @@ class Info(commands.Cog):
 
         ..Doc infos.html#statistics"""
         if ctx.subcommand_passed is None:
-            msg = copy.copy(ctx.message)
-            msg.content = ctx.prefix + "stats general"
-            new_ctx = await self.bot.get_context(msg)
-            await self.bot.invoke(new_ctx)
-    
+            await self.stats_general(ctx)
 
     @stats_main.command(name="general")
     async def stats_general(self, ctx: MyContext):
@@ -110,7 +106,11 @@ class Info(commands.Cog):
             ignored_guilds += self.bot.get_cog('Reloads').ignored_guilds
             len_servers = await self.get_guilds_count(ignored_guilds)
             # Languages
-            langs_list: list = await self.bot.get_cog('Servers').get_languages(ignored_guilds)
+            langs_list = [
+                (k, v)
+                for k, v in
+                (await self.bot.get_cog('ServerConfig').get_languages(ignored_guilds)).items()
+            ]
             langs_list.sort(reverse=True, key=lambda x: x[1])
             lang_total = sum([x[1] for x in langs_list])
             langs_list = ' | '.join(["{}: {}%".format(x[0],round(x[1]/lang_total*100)) for x in langs_list if x[1] > 0])
@@ -698,7 +698,7 @@ Available types: member, role, user, emoji, channel, server, invite, category
         since = await self.bot._(ctx.guild.id,"misc.since")
         _, bots, online, _ = await self.bot.get_cog("Utilities").get_members_repartition(guild.members)
 
-        desc = await self.bot.get_config(guild.id,'description')
+        desc = await self.bot.get_config(guild.id, "description")
         if (desc is None or len(desc) == 0) and guild.description is not None:
             desc = guild.description
         embed = discord.Embed(colour=default_color, timestamp=ctx.message.created_at, description=desc)
@@ -936,7 +936,7 @@ Available types: member, role, user, emoji, channel, server, invite, category
         disp_lang = list()
         if hasattr(user, "mutual_guilds"):
             for lang in await self.bot.get_cog('Utilities').get_languages(user):
-                disp_lang.append('{} ({}%)'.format(lang[0],round(lang[1]*100)))
+                disp_lang.append('{} ({}%)'.format(lang[0], round(lang[1]*100)))
         if len(disp_lang) == 0:
             disp_lang = ["Unknown"]
         # User name
@@ -982,18 +982,14 @@ Available types: member, role, user, emoji, channel, server, invite, category
         # Bots
         bots = len([x for x in guild.members if x.bot])
         # Lang
-        lang = await self.bot.get_config(guild.id, "language")
-        if lang is None:
-            lang = 'default'
-        else:
-            lang = self.bot.get_cog("Languages").languages[lang]
+        lang: str = await self.bot.get_config(guild.id, "language")
         # Roles rewards
-        rr_len = await self.bot.get_config(guild.id, "rr_max_number")
-        rr_len = '{}/{}'.format(len(await self.bot.get_cog("Xp").rr_list_role(guild.id)), rr_len)
+        rr_len: int = await self.bot.get_config(guild.id, "rr_max_number")
+        rr_len: str = '{}/{}'.format(len(await self.bot.get_cog("Xp").rr_list_role(guild.id)), rr_len)
         # Streamers
         if twitch_cog := self.bot.get_cog("Twitch"):
-            streamers_len =  await self.bot.get_config(guild.id, "streamers_max_number")
-            streamers_len = '{}/{}'.format(await twitch_cog.db_get_guild_subscriptions_count(guild.id), streamers_len)
+            streamers_len: int =  await self.bot.get_config(guild.id, "streamers_max_number")
+            streamers_len: str = '{}/{}'.format(await twitch_cog.db_get_guild_subscriptions_count(guild.id), streamers_len)
         else:
             streamers_len = "Not available"
         # Prefix
@@ -1001,7 +997,7 @@ Available types: member, role, user, emoji, channel, server, invite, category
         if "`" not in pref:
             pref = "`" + pref + "`"
         # Rss
-        rss_len = await self.bot.get_config(guild.id,'rss_max_number')
+        rss_len: int = await self.bot.get_config(guild.id, "rss_max_number")
         if rss_cog := self.bot.get_cog("Rss"):
             rss_numb = "{}/{}".format(len(await rss_cog.db_get_guild_feeds(guild.id)), rss_len)
         else:
@@ -1091,9 +1087,10 @@ Available types: member, role, user, emoji, channel, server, invite, category
             c = "`{}`\n{}".format(channel.name,channel.id)
         else:
             c = "Unknown ({})".format(feed.channel_id)
-        d = f"<t:{feed.date.timestamp():.0f}>"
-        if d is None or len(d) == 0:
+        if feed.date is None:
             d = "never"
+        else:
+            d = f"<t:{feed.date.timestamp():.0f}>"
         if interaction.guild is None:
             color = None
         else:
@@ -1237,15 +1234,9 @@ Available types: member, role, user, emoji, channel, server, invite, category
             except commands.BadArgument:
                 return
             if url.domain in ['bit.ly','bitly.com','bitly.is']:
-                msg = copy.copy(ctx.message)
-                msg.content = ctx.prefix + 'bitly find '+url.url
-                new_ctx = await self.bot.get_context(msg)
-                await self.bot.invoke(new_ctx)
+                await self.bitly_find(ctx, url)
             else:
-                msg = copy.copy(ctx.message)
-                msg.content = ctx.prefix + 'bitly create '+url.url
-                new_ctx = await self.bot.get_context(msg)
-                await self.bot.invoke(new_ctx)
+                await self.bitly_create(ctx, url)
 
     @bitly_main.command(name="create", aliases=["shorten"])
     async def bitly_create(self, ctx: MyContext, url: args.URL):
@@ -1311,7 +1302,8 @@ Available types: member, role, user, emoji, channel, server, invite, category
         if len(results) == 0:
             await ctx.send(await self.bot._(ctx.channel,'info.changelog.notfound'))
         elif ctx.can_send_embed:
-            emb = discord.Embed(title=title, description=desc, timestamp=time, color=ctx.bot.get_cog('Servers').embed_color)
+            embed_color = ctx.bot.get_cog('ServerConfig').embed_color
+            emb = discord.Embed(title=title, description=desc, timestamp=time, color=embed_color)
             await ctx.send(embed=emb)
         else:
             await ctx.send(desc)
@@ -1375,7 +1367,7 @@ Available types: member, role, user, emoji, channel, server, invite, category
                 footer = await self.bot._(ctx.channel,'info.usernames.allow')
             # Warning in description if disabled in the guild
             if ctx.guild is not None and not await self.bot.get_config(ctx.guild.id, "nicknames_history"):
-                if len(ctx.guild.members) >= self.bot.get_cog("Servers").max_members_for_nicknames:
+                if len(ctx.guild.members) >= self.bot.get_cog("ServerConfig").max_members_for_nicknames:
                     warning_disabled = await self.bot._(ctx.guild.id, "info.nicknames-disabled.guild-too-big")
                 else:
                     warning_disabled = await self.bot._(ctx.guild.id, "info.nicknames-disabled.disabled")

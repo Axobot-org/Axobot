@@ -13,18 +13,19 @@ from libs.youtube_search import Service
 from .rss_general import FeedObject, RssMessage, feed_parse
 
 if TYPE_CHECKING:
-    from libs.bot_classes import Zbot
+    from libs.bot_classes import Axobot
 
 
 class YoutubeRSS:
     "Utilities class for any youtube-related RSS actions"
 
-    def __init__(self, bot: Zbot):
+    def __init__(self, bot: Axobot):
         self.bot = bot
         self.min_time_between_posts = 120
         self.search_service = Service(5, bot.others['google_api'])
         self.url_pattern = re.compile(
-            r'(?:https?://)?(?:www.)?(?:youtube.com|youtu.be)(?:/channel/|/user/|/c/)([^/\s?]+).*?$')
+            r'(?:https?://)?(?:www.)?(?:youtube.com|youtu.be)/(?:channel/|user/|c/)?@?([^/\s?]+).*?$'
+        )
         self.cookies = {
             "CONSENT": "YES+cb.20220907-07-p1.fr+FX+785"
         }
@@ -101,7 +102,7 @@ class YoutubeRSS:
                 img_url = feed['media_thumbnail'][0]['url']
             obj = RssMessage(
                 bot=self.bot,
-                feed=FeedObject.unrecorded("yt", channel.guild.id, channel.id),
+                feed=FeedObject.unrecorded("yt", channel.guild.id if channel.guild else None, channel.id),
                 url=feed['link'],
                 title=feed['title'],
                 date=feed['published_parsed'],
@@ -122,7 +123,7 @@ class YoutubeRSS:
                     img_url = feed['media_thumbnail'][0]['url']
                 obj = RssMessage(
                     bot=self.bot,
-                    feed=FeedObject.unrecorded("yt", channel.guild.id, channel.id),
+                    feed=FeedObject.unrecorded("yt", channel.guild.id if channel.guild else None, channel.id),
                     url=feed['link'],
                     title=feed['title'],
                     date=feed['published_parsed'],

@@ -10,7 +10,7 @@ import psutil
 import discord
 from discord.ext import commands, tasks
 from fcts.tickets import TicketCreationEvent
-from libs.bot_classes import MyContext, Zbot
+from libs.bot_classes import MyContext, Axobot
 from libs.enums import ServerWarningType, UsernameChangeRecord
 
 try:
@@ -29,7 +29,7 @@ async def get_ram_data():
 class BotStats(commands.Cog):
     """Hey, I'm a test cog! Happy to meet you :wave:"""
 
-    def __init__(self, bot: Zbot):
+    def __init__(self, bot: Axobot):
         self.bot = bot
         self.file = 'bot_stats'
         self.received_events = {'CMD_USE': 0}
@@ -116,7 +116,7 @@ class BotStats(commands.Cog):
     @commands.Cog.listener()
     async def on_username_change_record(self, event: UsernameChangeRecord):
         "Called when a user change their username/nickname"
-        if event.is_guild:
+        if event.is_in_guild:
             self.usernames["guild"] += 1
         else:
             self.usernames["user"] += 1
@@ -181,15 +181,15 @@ class BotStats(commands.Cog):
         "Record into the stats table the total, min, max and median dailies values, as well as the number of dailies rows"
         args = ("points", False, self.bot.entity_id)
         # Total
-        query = "INSERT INTO `statsbot`.`zbot` SELECT %s, %s, SUM(points) AS value, 0, %s, %s, %s FROM `frm`.`dailies`"
+        query = "INSERT INTO `statsbot`.`zbot` SELECT %s, %s, SUM(points) AS value, 0, %s, %s, %s FROM `axobot`.`dailies`"
         async with self.bot.db_query(query, (now, "dailies.total", *args)) as _:
             pass
         # Min
-        query = "INSERT INTO `statsbot`.`zbot` SELECT %s, %s, MIN(points) AS value, 0, %s, %s, %s FROM `frm`.`dailies`"
+        query = "INSERT INTO `statsbot`.`zbot` SELECT %s, %s, MIN(points) AS value, 0, %s, %s, %s FROM `axobot`.`dailies`"
         async with self.bot.db_query(query, (now, "dailies.min", *args)) as _:
             pass
         # Max
-        query = "INSERT INTO `statsbot`.`zbot` SELECT %s, %s, MAX(points) AS value, 0, %s, %s, %s FROM `frm`.`dailies`"
+        query = "INSERT INTO `statsbot`.`zbot` SELECT %s, %s, MAX(points) AS value, 0, %s, %s, %s FROM `axobot`.`dailies`"
         async with self.bot.db_query(query, (now, "dailies.max", *args)) as _:
             pass
         # Median
@@ -198,7 +198,7 @@ class BotStats(commands.Cog):
             SELECT %s, %s, ROUND(AVG(subq.points)) as value, 0, %s, %s, %s
             FROM (
                 SELECT @row_index:=@row_index + 1 AS row_index, points
-                FROM `frm`.`dailies`
+                FROM `axobot`.`dailies`
                 ORDER BY points
             ) AS subq
             WHERE subq.row_index 
@@ -206,7 +206,7 @@ class BotStats(commands.Cog):
         async with self.bot.db_query(query, (now, "dailies.median", *args), multi=True) as _:
             pass
         # Number of rows
-        query = "INSERT INTO `statsbot`.`zbot` SELECT %s, %s, COUNT(*) AS value, 0, %s, %s, %s FROM `frm`.`dailies`"
+        query = "INSERT INTO `statsbot`.`zbot` SELECT %s, %s, COUNT(*) AS value, 0, %s, %s, %s FROM `axobot`.`dailies`"
         async with self.bot.db_query(query, (now, "dailies.rows", *args)) as _:
             pass
 
@@ -215,15 +215,15 @@ class BotStats(commands.Cog):
         as well as the number of users having at least 1 point"""
         args = ("points", False, self.bot.entity_id)
         # Total
-        query = "INSERT INTO `statsbot`.`zbot` SELECT %s, %s, SUM(`events_points`) AS value, 0, %s, %s, %s FROM `frm`.`users`"
+        query = "INSERT INTO `statsbot`.`zbot` SELECT %s, %s, SUM(`events_points`) AS value, 0, %s, %s, %s FROM `axobot`.`users`"
         async with self.bot.db_query(query, (now, "eventpoints.total", *args)) as _:
             pass
         # Min
-        query = "INSERT INTO `statsbot`.`zbot` SELECT %s, %s, MIN(`events_points`) AS value, 0, %s, %s, %s FROM `frm`.`users`"
+        query = "INSERT INTO `statsbot`.`zbot` SELECT %s, %s, MIN(`events_points`) AS value, 0, %s, %s, %s FROM `axobot`.`users`"
         async with self.bot.db_query(query, (now, "eventpoints.min", *args)) as _:
             pass
         # Max
-        query = "INSERT INTO `statsbot`.`zbot` SELECT %s, %s, MAX(`events_points`) AS value, 0, %s, %s, %s FROM `frm`.`users`"
+        query = "INSERT INTO `statsbot`.`zbot` SELECT %s, %s, MAX(`events_points`) AS value, 0, %s, %s, %s FROM `axobot`.`users`"
         async with self.bot.db_query(query, (now, "eventpoints.max", *args)) as _:
             pass
         # Median
@@ -232,7 +232,7 @@ class BotStats(commands.Cog):
             SELECT %s, %s, ROUND(AVG(subq.`events_points`)) as value, 0, %s, %s, %s
             FROM (
                 SELECT @row_index:=@row_index + 1 AS row_index, `events_points`
-                FROM `frm`.`users`
+                FROM `axobot`.`users`
                 WHERE `events_points` != 0
                 ORDER BY events_points
             ) AS subq
@@ -241,7 +241,7 @@ class BotStats(commands.Cog):
         async with self.bot.db_query(query, (now, "eventpoints.median", *args), multi=True) as _:
             pass
         # Number of rows
-        query = "INSERT INTO `statsbot`.`zbot` SELECT %s, %s, COUNT(*) AS value, 0, %s, %s, %s FROM `frm`.`users` WHERE `events_points` != 0"
+        query = "INSERT INTO `statsbot`.`zbot` SELECT %s, %s, COUNT(*) AS value, 0, %s, %s, %s FROM `axobot`.`users` WHERE `events_points` != 0"
         async with self.bot.db_query(query, (now, "eventpoints.rows", *args)) as _:
             pass
 
@@ -283,7 +283,7 @@ class BotStats(commands.Cog):
         now = now.replace(second=0, microsecond=0)
         # prepare requests
         query = "INSERT INTO `statsbot`.`zbot` VALUES (%s, %s, %s, %s, %s, %s, %s);"
-        cnx = self.bot.cnx_frm
+        cnx = self.bot.cnx_axobot
         cursor = cnx.cursor(dictionary=True)
         try:
             # WS events stats
@@ -385,7 +385,7 @@ class BotStats(commands.Cog):
 
     async def get_stats(self, variable: str, minutes: int) -> typing.Union[int, float, str, None]:
         """Get the sum of a certain variable in the last X minutes"""
-        cnx = self.bot.cnx_frm
+        cnx = self.bot.cnx_axobot
         cursor = cnx.cursor(dictionary=True)
         cursor.execute('SELECT variable, SUM(value) as value, type FROM `statsbot`.`zbot` WHERE variable = %s AND date BETWEEN (DATE_SUB(UTC_TIMESTAMP(),INTERVAL %s MINUTE)) AND UTC_TIMESTAMP() AND `entity_id`=%s', (variable, minutes, self.bot.entity_id))
         result: list[dict] = list(cursor)
@@ -416,13 +416,6 @@ class BotStats(commands.Cog):
                 response.raise_for_status()
                 self.bot.log.debug(
                     f"StatusPage API returned {response.status} for {params} (latency)")
-            params["data"]["value"] = psutil.virtual_memory().available
-            async with session.post(
-                "https://api.statuspage.io/v1/pages/g9cnphg3mhm9/metrics/72bmf4nnqbwb/data",
-                    json=params) as response:
-                response.raise_for_status()
-                self.bot.log.debug(
-                    f"StatusPage API returned {response.status} for {params} (available RAM)")
 
     @status_loop.before_loop
     async def before_status_loop(self):

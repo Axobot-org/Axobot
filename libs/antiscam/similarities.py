@@ -1,5 +1,5 @@
 from difflib import SequenceMatcher
-from re import finditer
+from re import finditer, sub, IGNORECASE
 
 from .normalization import normalize_unicode
 
@@ -12,6 +12,7 @@ def check_message(message: str, websites_reference: dict[str, bool]) -> int:
     "Check every URL in a message and return the sum of each URL's score"
     score = 0
     message = normalize_unicode(message)
+    message = sub(r'(\S)\(dot\)(\S)', r'\1.\2', message, flags=IGNORECASE)
     for link in search_links(message):
         link = ".".join(link.split('.')[-2:])
         score += check_url_similarity(link, websites_reference)

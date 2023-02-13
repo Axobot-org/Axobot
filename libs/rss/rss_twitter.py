@@ -12,13 +12,13 @@ from cachingutils import acached
 from .rss_general import FeedObject, RssMessage
 
 if TYPE_CHECKING:
-    from libs.bot_classes import Zbot
+    from libs.bot_classes import Axobot
 
 
 class TwitterRSS:
     "Utilities class for any twitter-related RSS actions"
 
-    def __init__(self, bot: Zbot):
+    def __init__(self, bot: Axobot):
         self.bot = bot
         self.min_time_between_posts = 15
         self.api = twitter.Api(**bot.others['twitter'], tweet_mode="extended", timeout=15)
@@ -56,7 +56,7 @@ class TwitterRSS:
 
     async def remove_image(self, channel: discord.abc.MessageableChannel, text: str):
         "Remove images links from a tweet if needed"
-        if channel.permissions_for(channel.guild.me).embed_links:
+        if channel.guild is None or channel.permissions_for(channel.guild.me).embed_links:
             find_url = self.bot.get_cog("Utilities").find_url_redirection
             for match in re.finditer(r"https://t.co/([^\s]+)", text):
                 final_url = await find_url(match.group(0))
@@ -99,7 +99,7 @@ class TwitterRSS:
                 img = lastpost.media[0].media_url_https
             obj = RssMessage(
                 bot=self.bot,
-                feed=FeedObject.unrecorded("tw", channel.guild.id, channel.id),
+                feed=FeedObject.unrecorded("tw", channel.guild.id if channel.guild else None, channel.id),
                 url=url,
                 title=text,
                 date=dt.datetime.fromtimestamp(lastpost.created_at_in_seconds),
@@ -130,7 +130,7 @@ class TwitterRSS:
                     img = post.media[0].media_url_https
                 obj = RssMessage(
                     bot=self.bot,
-                    feed=FeedObject.unrecorded("tw", channel.guild.id, channel.id),
+                    feed=FeedObject.unrecorded("tw", channel.guild.id if channel.guild else None, channel.id),
                     url=url,
                     title=text,
                     date=dt.datetime.fromtimestamp(post.created_at_in_seconds),

@@ -10,7 +10,7 @@ import requests
 from dateutil.parser import isoparse
 from discord.ext import commands
 from frmc_lib import SearchType
-from libs.bot_classes import MyContext, Zbot
+from libs.bot_classes import MyContext, Axobot
 from libs.formatutils import FormatUtils
 from libs.rss.rss_general import FeedObject
 
@@ -21,7 +21,7 @@ class Minecraft(commands.Cog):
     """Cog gathering all commands related to the Minecraft® game.
 Every information come from the website www.fr-minecraft.net"""
 
-    def __init__(self, bot: Zbot):
+    def __init__(self, bot: Axobot):
         self.bot = bot
         self.feeds = {}
         self.file = "minecraft"

@@ -3,14 +3,14 @@ from json.decoder import JSONDecodeError
 import discord
 import requests
 from discord.ext import commands
-from libs.bot_classes import Zbot
+from libs.bot_classes import Axobot
 
 BASE_URL = 'https://discord.com/api/webhooks/'
 
 class Embeds(commands.Cog):
     """Cog for the management of the embeds. No more, no less."""
 
-    def __init__(self, bot: Zbot):
+    def __init__(self, bot: Axobot):
         self.bot = bot
         self.logs = {'classic':"625369482587537408/uGh5fJWD6S1XAddNKOGohvyfXWOxPmsodQQPcp7iasagi5kJm8DKfbzmf7-UFb5u3gnd",
             'loop':'625369730127101964/04KUvJxdb-Dl-BIkIdBydqZIoziBn5qy06YugIO3T4uOUYqMIT4YgoP6C0kv6CrrA8h8',

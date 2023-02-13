@@ -4,7 +4,7 @@ import discord
 from discord import app_commands
 from discord.ext import commands
 from fcts.args import RawPermissionValue
-from libs.bot_classes import MyContext, Zbot
+from libs.bot_classes import MyContext, Axobot
 from libs.paginator import cut_text
 
 
@@ -53,7 +53,7 @@ class TargetConverter(commands.Converter):
 class Perms(commands.Cog):
     """Cog with a single command, allowing you to see the permissions of a member or a role in a channel."""
 
-    def __init__(self, bot: Zbot):
+    def __init__(self, bot: Axobot):
         self.bot = bot
         self.file = "perms"
         chan_perms = [key for key,value in discord.Permissions().all_channel() if value]
@@ -105,7 +105,7 @@ class Perms(commands.Cog):
 
         ..Example permissions #announcements everyone
 
-        ..Example permissions Zbot
+        ..Example permissions Axobot
 
         ..Example permissions 0b1001
 
