@@ -1437,7 +1437,7 @@ class Rss(commands.Cog):
             await asyncio.sleep(self.time_between_feeds_check)
         await session.close()
         self.bot.get_cog('Minecraft').feeds.clear()
-        desc = [f"**RSS loop done** in {time.time()-start:.3f}s ({len(success_ids)}/{checked_count} feeds)"]
+        desc = [f"**RSS loop done** in {time.time()-start:.0f}s ({len(success_ids)}/{checked_count} feeds)"]
         if guild_id is None:
             if statscog := self.bot.get_cog("BotStats"):
                 statscog.rss_stats["checked"] = checked_count
@@ -1453,7 +1453,7 @@ class Rss(commands.Cog):
         emb = discord.Embed(description='\n'.join(desc), color=1655066, timestamp=self.bot.utcnow())
         emb.set_author(name=self.bot.user, icon_url=self.bot.user.display_avatar)
         await self.bot.send_embed(emb, url="loop")
-        self.bot.log.debug(desc[0])
+        self.bot.log.info(desc[0])
         if len(errors_ids) > 0:
             self.bot.log.warning("[rss] "+desc[1])
         if guild_id is None:
@@ -1475,8 +1475,6 @@ class Rss(commands.Cog):
             await self.main_loop()
         except Exception as err:
             self.bot.dispatch("error", err, "RSS main loop")
-        else:
-            self.bot.log.info(f" Boucle rss terminée en {time.time() - start_time:.2f}s!")
 
     @loop_child.before_loop
     async def before_printer(self):
