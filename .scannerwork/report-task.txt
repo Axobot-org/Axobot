@@ -1,0 +1,6 @@
+projectKey=ZRunner_ZBot_AYcZirM5nIdtIeElAWF2
+serverUrl=https://sonarqube.zrunner.me
+serverVersion=9.9.0.65466
+dashboardUrl=https://sonarqube.zrunner.me/dashboard?id=ZRunner_ZBot_AYcZirM5nIdtIeElAWF2
+ceTaskId=AYgGZmhdv7TdYLyrmHUq
+ceTaskUrl=https://sonarqube.zrunner.me/api/ce/task?id=AYgGZmhdv7TdYLyrmHUq
